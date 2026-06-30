@@ -37,7 +37,7 @@ Identificadores vigentes:
 - WordPress page: `postId=250265`, slug `aeo-2`, status `publish`.
 - Elementor widget host: `convers`, classes `gh-aeo-form-card gh-aeo-growth-form-host`.
 - Form slug: `efeonce-aeo-diagnostic`.
-- Form definition/version: `fdef-efeonce-aeo-diagnostic` / `fver-efeonce-aeo-diagnostic-v1`.
+- Form definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` (v2; v1 `fver-efeonce-aeo-diagnostic-v1` deprecated 2026-06-30).
 - Host surface: `fhsf-efeonce-aeo-diagnostic`.
 - API base: `https://greenhouse.efeoncepro.com`.
 - Turnstile site key in WordPress: `0x4AAAAAADqwX2R7v-k9pItv`.
@@ -48,7 +48,7 @@ Field contract:
 | Public field | Greenhouse persistence | HubSpot mapping |
 | --- | --- | --- |
 | `firstName` | yes | `firstname` |
-| `email` | yes | `email` |
+| `email` | yes; `validator=corporate_email` | `email` |
 | `brandWebsite` | yes | not mapped until HubSpot form/property exists |
 | `country` | yes | `pais_gh` |
 | `companySize` | yes | `tamano_de_la_empresa` |
@@ -57,6 +57,7 @@ Field contract:
 Runtime guardrails:
 
 - WordPress must never know HubSpot mapping, portal credentials, destination secrets or Turnstile secret.
+- The AEO form requires corporate email: the published field uses `validator=corporate_email` and `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. Gmail/free/disposable addresses must be rejected before accepted submission.
 - A submit without Turnstile token must fail as `403 captcha_failed/missing_token` and must not create a lead.
 - The browser origin must pass CORS before the public API response is consumable, but CORS does not replace form/surface/origin validation in the engine.
 - Do not revert this surface to the old `ai-visibility-grader` slug or a meeting-link fallback unless explicitly rolling back.

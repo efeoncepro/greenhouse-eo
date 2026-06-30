@@ -42,15 +42,16 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 La landing publica `https://efeoncepro.com/aeo-2/` (`postId=250265`) ya envia leads al motor gobernado:
 
 - Form slug: `efeonce-aeo-diagnostic`.
-- Definition/version: `fdef-efeonce-aeo-diagnostic` / `fver-efeonce-aeo-diagnostic-v1`.
+- Definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` (v2; v1 deprecated).
 - Host surface: `fhsf-efeonce-aeo-diagnostic`.
 - API base: `https://greenhouse.efeoncepro.com`.
 - HubSpot destination: portal `48713323`, form GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6` (`AEO - Lead Form`).
 - Campos publicados: `firstName`, `email`, `brandWebsite`, `country`, `companySize`, `mainCompetitor`.
+- Gate de email: `email.validator=corporate_email` + `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. El bridge AEO consulta `/verify-email` antes de Turnstile y el servidor vuelve a validar en `submitForm`.
 - Mapping HubSpot: `firstName -> firstname`, `email -> email`, `country -> pais_gh`, `companySize -> tamano_de_la_empresa`, `mainCompetitor -> marca_de_competencia`.
 - `brandWebsite` queda persistido en Greenhouse pero no se envia a HubSpot hasta que exista una propiedad/campo correspondiente en ese form.
 
-La landing usa un bridge HTML con Turnstile invisible en el widget Elementor `convers`. Esto es una excepcion controlada, no un fork del producto: campos, consentimiento, validacion, CORS, captcha, persistence policy y destination plan siguen viviendo en Greenhouse. Cuando el renderer portable soporte Turnstile, el host debe volver a:
+La landing usa un bridge HTML con Turnstile invisible en el widget Elementor `convers`. Esto es una excepcion controlada, no un fork del producto: campos, consentimiento, validacion, CORS, captcha, persistence policy, email gate y destination plan siguen viviendo en Greenhouse. Cuando el renderer portable soporte Turnstile, el host debe volver a:
 
 ```html
 <greenhouse-form form="efeonce-aeo-diagnostic" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL"></greenhouse-form>

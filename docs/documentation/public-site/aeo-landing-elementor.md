@@ -200,19 +200,20 @@ Elementos clave:
 | Header | `convers`, `.gh-aeo-section-header` | Eyebrow `Tu primer paso`, H2 `Descubre hoy cómo te ve la IA. Gratis.` y bajada `Recibe tu Diagnóstico de Visibilidad en IA...`. |
 | Form card | `convers`, widget `html`, `.gh-aeo-form-card gh-aeo-growth-form-host` | Card estilo Growth Forms, con metadata `data-greenhouse-growth-form="efeonce-aeo-diagnostic"` y `data-growth-surface="fhsf-efeonce-aeo-diagnostic"`. |
 | Campos | `.gh-aeo-growth-form-fields` | `Nombre`, `Email corporativo`, `Marca / sitio web`, `País`, `Tamaño de empresa`, `Principal competidor (opcional)`. |
-| CTA principal | `.gh-aeo-growth-form-button` | `Quiero mi diagnóstico gratis →`; ejecuta Turnstile invisible y luego `POST https://greenhouse.efeoncepro.com/api/public/growth/forms/efeonce-aeo-diagnostic/submit`. |
+| CTA principal | `.gh-aeo-growth-form-button` | `Quiero mi diagnóstico gratis →`; primero consulta `POST /verify-email` para bloquear correos no corporativos, luego ejecuta Turnstile invisible y finalmente `POST https://greenhouse.efeoncepro.com/api/public/growth/forms/efeonce-aeo-diagnostic/submit`. |
 | Trust/privacidad | `.gh-aeo-growth-form-proof`, `.gh-aeo-growth-form-privacy` | Mantener `Sin costo`, `Sin compromiso`, `Sin amarres`, `Tus datos están seguros` y link a `/politica-de-privacidad/`. |
 
 Guardrails:
 
 - No capturar datos en WordPress. WordPress solo renderiza la card y manda el payload al endpoint publico gobernado de Greenhouse con `surfaceId`, campos, `consent:true`, `captchaToken`, `pageUri` y honeypot.
-- El formulario gobernado vigente es `efeonce-aeo-diagnostic` (`fdef-efeonce-aeo-diagnostic`, `fver-efeonce-aeo-diagnostic-v1`) y la surface es `fhsf-efeonce-aeo-diagnostic`. Destination HubSpot: portal `48713323`, form GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6`.
+- El formulario gobernado vigente es `efeonce-aeo-diagnostic` (`fdef-efeonce-aeo-diagnostic`, versión publicada `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` / v2) y la surface es `fhsf-efeonce-aeo-diagnostic`. Destination HubSpot: portal `48713323`, form GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6`.
+- El campo `email` debe usar `validator=corporate_email` y la versión publicada debe conservar `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. El bridge HTML consulta `/api/public/growth/forms/efeonce-aeo-diagnostic/verify-email` antes de pedir Turnstile; si el correo es Gmail/free/disposable, muestra error y no llama `/submit`.
 - Mapping HubSpot vigente: `firstName → firstname`, `email → email`, `country → pais_gh`, `companySize → tamano_de_la_empresa`, `mainCompetitor → marca_de_competencia`. `brandWebsite` se conserva en Greenhouse pero no se envia a HubSpot porque el form `AEO - Lead Form` no expone un campo equivalente.
 - El renderer canonico `<greenhouse-form>` todavia no emite `captchaToken`; por eso la landing usa un host bridge HTML scoped con Turnstile invisible. Cuando el renderer incorpore Turnstile, migrar a `<greenhouse-form form="efeonce-aeo-diagnostic" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL">`.
 - El API publico de Growth Forms necesita CORS para `https://efeoncepro.com` / `https://www.efeoncepro.com` en `GET`, `POST` y `OPTIONS`; se corrigio en producción el 2026-06-30.
 - El bloque actual debe mantener `letter-spacing:0` en labels, inputs, trust bullets y links. El H2 de la seccion conserva el tracking display global de la landing.
 - Los selects necesitan `appearance:none` + caret scoped; el theme Ohio puede repetir flechas nativas si se elimina ese CSS.
-- Verificar desktop/mobile: 4 inputs, 2 selects, CTA teal, privacidad visible, `scrollWidth == clientWidth` y browser fetch desde la pagina devuelve `captcha_failed/missing_token` si se prueba sin token (sin crear lead).
+- Verificar desktop/mobile: 4 inputs, 2 selects, CTA teal, privacidad visible, `scrollWidth == clientWidth`, Gmail/free email bloqueado con `/verify-email` y `submit=0`, y browser fetch desde la pagina devuelve `captcha_failed/missing_token` si se prueba sin token (sin crear lead).
 
 ## Seccion FAQ actual
 

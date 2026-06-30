@@ -2,6 +2,8 @@
 
 ## 2026-06-30
 
+- **Public Website / Growth Forms — AEO `/aeo-2/` bloquea correos no corporativos.** Se publicó la v2 del form `efeonce-aeo-diagnostic` (`fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657`) con `email.validator=corporate_email` y `emailPolicy.block_field`, deprecando la v1. El bridge HTML de WordPress ahora llama `/verify-email` antes de Turnstile; Gmail/free/disposable muestra error y no dispara `/submit`. Cambio live aplicado con `Document::save()` solo sobre el widget `convers`, backup `_gh_backup_before_aeo_growth_form_email_gate_20260630T101746Z`, Kinsta purgado, `heroans` intacto y Playwright desktop/mobile 390px verificó `verify=1`, `submit=0`, `overflowX=0`.
+
 - **Public Website / Growth Forms — AEO `/aeo-2/` conectado a HubSpot real.** Se creó el formulario gobernado `efeonce-aeo-diagnostic` + surface `fhsf-efeonce-aeo-diagnostic`, apuntando por adapter HubSpot secure-submit al form `AEO - Lead Form` (`8649e76c-8b01-41f3-9b0c-5713d7b4dba6`). La card de conversión de `/aeo-2/` ahora envía al endpoint público de Growth Forms con Turnstile invisible; WordPress no captura datos. También se desplegó CORS público en Vercel prod (`greenhouse-qbxqrrzpm`) para `efeoncepro.com`, se purgó Kinsta y Playwright verificó desktop/mobile sin overflow, form nuevo presente, `heroans` intacto y browser fetch sin token devolviendo `captcha_failed/missing_token`.
 
 ## 2026-06-29
