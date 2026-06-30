@@ -13,7 +13,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -31,6 +31,20 @@
 - Domain: `public-site|growth`
 - Blocked by: `TASK-1297`
 - Branch: `task/TASK-1298-aeo-greenhouse-form-wordpress-migration`
+
+## Closure 2026-06-30 (complete)
+
+**Rollout previo:** TASK-1297 promovido a producción primero (release `1abf65d1`, manifest `released`) — prod ya resuelve `GET .../forms/<formKey>` → 200; sin eso el embed por `form-key` daba 404. Ver Handoff.
+
+**Migración aplicada (WordPress `postId=250265`, sección `convers`):** el widget `html` de 32 814 b (bridge) se reemplazó por el embed `<greenhouse-form form-key="b120566a-dd1a-43c8-956a-4e0121e805b8" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light" appearance="bare">` + `renderer-latest.js` + `<style>` scoped, envuelto por la card aprobada (**Opción A**). Save vía `Document::save()` con backup (`_gh_aeo_backup_20260630_task1298_convers_migration`), guard de hash y Kinsta purge.
+
+**Verificado en vivo (desktop + mobile 390):** gate `pnpm public-website:verify-aeo-form-typography` (reescrito a `.ghf-*` + mount-wait + DM Sans) **verde**; `overflowX=0` ambos; renderer monta; **una sola card** (sin card-on-card, `.ghf-scope` interno transparente); `color-scheme=light`; CTA `Solicitar diagnóstico gratis →` desde el contrato; `heroans` md5 estable `e0b951b2456a83578cd9e22005900521`; bridge eliminado (`gh-aeo-growth-form-fields`=0).
+
+**Robustez (causa raíz, no parche):** se halló que el renderer re-declaraba los tokens `--ghf-*` en el wrapper interno `.ghf-scope`, sombreando los overrides del host (`appearance="bare"` + `--ghf-font`). Fix de raíz en el renderer (`FormRendererOptions.hosted` → el wrapper interno ya no lleva `.ghf-scope` dentro de un host; +2 tests, suite 51/51 verde). El CSS de AEO targetea host **y** `.ghf-scope` (determinista + forward-compatible: cuando el fix llegue a prod queda inerte sin re-save).
+
+**Hallazgo colateral (ops-worker deploy drift):** `src/lib/growth/forms/**` faltaba en el filtro de paths de `ops-worker-deploy.yml` (mismo bug class que nubox/grader). Agregado a las 3 listas (paths trigger + resolve-SHA + `WORKER_RUNTIME_PATHS`). Benigno para este release (TASK-1297 solo tocó el path GET/render, no el dispatch del worker).
+
+**Pendiente de rollout:** el fix de raíz del renderer + el filtro de ops-worker viven en `develop`; llegan a prod en el próximo release. AEO funciona hoy con el prod actual (CSS forward-compatible). Sin push de `develop` salvo instrucción.
 
 ## Summary
 

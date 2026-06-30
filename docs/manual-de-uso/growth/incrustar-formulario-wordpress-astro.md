@@ -144,6 +144,18 @@ estilos de los campos. Esto significa dos cosas:
 `--ghf-radius`, `--ghf-gap`, `--ghf-focus`. El widget Elementor ya expone acento + ancho
 máximo en la pestaña **Estilo**; el resto se ajusta con CSS scoped al contenedor.
 
+> **Propagación de tokens (TASK-1298 — leer si overrideás tokens vía CSS scoped).** El
+> renderer monta el contenido en un `<div class="ghf-root">`. Desde el fix `hosted` del
+> renderer, ese wrapper **NO** re-declara los tokens cuando está dentro de un host
+> `<greenhouse-form>`, así que un override en `greenhouse-form { --ghf-* }` **propaga**
+> a todo el contenido (es el patrón canónico). En la versión previa del renderer (servida
+> hasta que el fix llegue a prod) el wrapper interno llevaba `.ghf-scope` y re-declaraba los
+> tokens, sombreando el override; el workaround forward-compatible es targetear también el
+> scope: `greenhouse-form, greenhouse-form .ghf-scope { --ghf-* }`. Si overrideás tokens y
+> no ves el cambio en el contenido (solo en el borde del host), es esto: agregá el selector
+> `.ghf-scope`. Mismo motivo aplica a `appearance="bare"`: cubre el host; el workaround lo
+> extiende al scope interno.
+
 **Modo claro/oscuro — gotcha importante:** por defecto el renderer sigue el modo del SO
 del visitante (`prefers-color-scheme`). Si tu sección es una **banda clara**, un visitante
 con el SO en oscuro vería el formulario oscuro y descuadrado. Forzá claro en el embed:

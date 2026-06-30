@@ -1,3 +1,19 @@
+## Sesion 2026-06-30 — Release TASK-1297 → prod + TASK-1298 AEO greenhouse-form migration — Claude — ✅ complete (local-first; develop sin push)
+
+> **Pedido:** `/implement-task 1298`; al detectar el bloqueo de rollout, el operador eligió **(A) promover TASK-1297 a prod primero** vía `/release`, y autorizó avanzar end-to-end sin confirmaciones por paso.
+>
+> **Release TASK-1297 → producción (control plane):** PR #135 `develop→main` (merge commit **`1abf65d1`**) → orquestador `production-release.yml` run `28475706093` con `bypass_preflight_reason` (override auditado por la migración additive) → 2 compuertas Production aprobadas → **4 workers Cloud Run + Vercel READY + health OK → manifest `released`**. Verificado en prod: `GET .../forms/b120566a-…` (por formKey) **→ 200** (antes 404), con `copy.submit` v4 + `security.captcha`. Gates: CI + CI Deep + Playwright verdes sobre `1abf65d1` (sin flake ISSUE-111 esta vez). Flags: ninguno que prender (TASK-1297 no agregó flags; pendientes del ledger = finance/Nexa, no relacionados).
+>
+> **Drift ops-worker (real, benigno este release):** watchdog marcó `error` por ops-worker en `21aa7f97` (no el target). Causa: `ops-worker-deploy.yml` saltea el deploy si no hay diff en sus runtime paths, y **`src/lib/growth/forms/**` no estaba en el filtro** (mismo bug class que nubox/grader). TASK-1297 solo tocó el path GET/render (no el dispatch del worker) → ops-worker funcionalmente correcto. **Fix aplicado** (3 listas del workflow). Llega a prod next release.
+>
+> **TASK-1298 (WordPress live, `postId=250265`, sección `convers`):** bridge HTML (32 814 b) reemplazado por `<greenhouse-form form-key="b120566a-…" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light" appearance="bare">` + `renderer-latest.js` + `<style>` scoped, envuelto por la card aprobada (**Opción A**). `Document::save()` con backup (`_gh_aeo_backup_20260630_task1298_convers_migration`), guard de hash, Kinsta purge. **Verificado live desktop+mobile 390:** gate `verify-aeo-form-typography` (reescrito a `.ghf-*` + mount-wait + DM Sans) verde, `overflowX=0`, una sola card (`.ghf-scope` interno transparente), CTA desde contrato, `heroans` md5 estable, bridge eliminado.
+>
+> **Robustez (causa raíz, no parche — directiva del operador):** el renderer re-declaraba los tokens `--ghf-*` en el wrapper interno `.ghf-scope`, sombreando los overrides del host (`appearance="bare"` + `--ghf-font` no propagaban al contenido). **Fix de raíz en el renderer:** `FormRendererOptions.hosted` → el wrapper interno ya no lleva `.ghf-scope` dentro de un host `<greenhouse-form>` (+2 tests; suite renderer 51/51 verde). El CSS de AEO targetea host **y** `.ghf-scope` (determinista + forward-compatible).
+>
+> **Rollout pendiente:** el fix de raíz del renderer + el filtro de ops-worker viven en `develop` (sin push); llegan a prod en el próximo release. AEO funciona hoy con el prod actual (CSS forward-compatible, no requiere re-save). **Sin push de `develop` salvo instrucción.**
+>
+> **F6 (follow-up TASK-1297, no bloqueante):** los labels del `field_schema` del contrato difieren del bridge aprobado (`Email corporativo` vs `Correo corporativo`, etc.). Si se quiere paridad de copy, ajustar el `field_schema` del contrato (dominio TASK-1297), no el embed.
+
 ## Sesion 2026-06-30 — TASK-1297 Growth Forms stable identity (`formKey`) + render copy contract — Claude — ✅ complete
 
 > **Pedido:** implementar TASK-1297 (`/implement-task 1297`), local-first en `develop`, sin push.
