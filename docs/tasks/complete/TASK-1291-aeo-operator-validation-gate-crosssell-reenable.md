@@ -1,5 +1,13 @@
 # TASK-1291 — AEO: gate de validación pre-run del operador + reabilitación segura del cross-sell
 
+## Delta 2026-06-30 — CIERRE: cross-sell reabilitado en prod + staging, smoke verde
+
+- **`OPERATOR_SEND_ENABLED` re-enable APLICADO** (cierra el AC que quedaba pendiente). El flag pasó a **ON en Production** (flip masivo Growth/AEO del release `056c2dde8`, redeploy `greenhouse-ic8cg4ery`, autorización explícita del operador / riesgo aceptado) **y en staging** (parity flip 2026-06-30 → redeploy `greenhouse-bt9fvga8d`). Verdad live: `vercel env ls`. El guard de esta task ya estaba en `main` ANTES del flip → la cross-sell NO se reabilitó a ciegas: el código de `assertSubjectGradeable` está deployado junto al flag.
+- **Criterio de reabilitación cumplido:** eval TASK-1292 (Capa A determinista) **verde + complete**; sign-off = aceptación explícita del operador (es el decisor comercial; no hubo un sign-off legal separado — residual menor anotado abajo).
+- **Smoke staging verde (2026-06-30, post-redeploy):** signal `growth.ai_visibility.operator_gate_blocking` en `/api/admin/reliability` de staging → `severity=ok`, **`operator_send_enabled=true`** (antes `false`), `prospect_ungradeable=0`, `org_linked=2` ("Todos los prospectos enlazados pasan el gate"). Reabilitar la cross-sell SEND **no expuso ningún sujeto propenso al falso-0**. El block-path (`unknown` → bloqueo) queda cubierto por los tests deterministas (subject-gradeable 8/8 + wiring run/send): no hay ningún perfil org-linked `unknown` en la PG compartida para ejercerlo vía org real (todos los org-linked están resueltos).
+- **Residual menor (no bloqueante):** el re-enable se hizo bajo aceptación de riesgo del operador, no un sign-off legal formal documentado aparte; el smoke E2E del SEND con email real a un prospecto NO se disparó (evitar spam) — el guard + el signal steady son la evidencia. Si comercial/legal exige un sign-off formal del outbound a prospectos, queda como follow-up de TASK-1279, no de esta task.
+- **Lifecycle → `complete`.** ISSUE-110 cerrado por el conjunto EPIC-021 (motor 1288/1289/1290 + guard 1291 + eval 1292). EPIC-021 movido a `complete/`.
+
 ## Delta 2026-06-29 — foundation (TASK-1288) shipped
 
 - **El guard `unknown` YA EXISTE** (TASK-1288): `commands.ts buildExecuteInput` (chokepoint universal) bloquea con `aeo_category_unresolved` detrás del flag `GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED` (OFF) + pre-check limpio en portal/operador (`category_unresolved` blocked). El signal `growth.ai_visibility.profile_category_unresolved` ya está cableado. Esta task agrega el **review/confirm unificado** del operador (categoría + modelo + prompts juntos, Adaptive Sidecar `reconciler`) + reabilita TASK-1279.
@@ -26,7 +34,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -240,7 +248,7 @@ Defense-in-depth: aunque el motor genere prompts correctos, el gate garantiza qu
 ## Acceptance Criteria
 
 - [x] `assertSubjectGradeable` bloquea run/envío operador si `category_node_id = unknown` o `business_model` no confirmado (prospecto); cliente exige al menos categoría resuelta. Wired en el chokepoint (`requestGraderRunAsOperator` + `sendAeoReportAndCreateLead`), errores canónicos (`aeo_category_unresolved` + `aeo_business_model_unconfirmed`). Tests verdes (subject-gradeable 8/8 + wiring run/send).
-- [ ] `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` — **re-enable pendiente (gateado por TASK-1292).** Estado live verificado: **ABSENT en todos los envs Vercel** (la cross-sell SEND está gateada OFF; corrige el ledger que decía "staging ON"). El guard de esta task hace seguro el re-enable; prod (y el re-enable staging) gated por eval TASK-1292 + sign-off comercial/legal.
+- [x] `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` — **re-enable APLICADO (2026-06-30).** ON en Production (release `056c2dde8` / redeploy `greenhouse-ic8cg4ery`) **y** en staging (parity flip → redeploy `greenhouse-bt9fvga8d`). Criterio cumplido: eval TASK-1292 verde + aceptación explícita del operador. El guard de esta task estaba en `main` antes del flip → re-enable NO a ciegas. Verdad live: `vercel env ls`.
 - [x] Reliability signal `growth.ai_visibility.operator_gate_blocking` (drift); test 5/5 + **live en staging** (`/api/admin/reliability`, severity `ok`, `prospect_ungradeable=0`/`org_linked=2` → SQL validado contra PG real). Smoke del guard cubierto por unit/wiring tests; el smoke del SEND requiere re-enable (gateado por TASK-1292).
 
 ## Verification
@@ -252,13 +260,13 @@ Defense-in-depth: aunque el motor genere prompts correctos, el gate garantiza qu
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (EPIC-021, TASK-1279, ISSUE-110) — marcar ISSUE-110 resuelto si el motor + gate cierran el caso
-- [ ] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [ ] `Handoff.md` actualizado — **deferred por coordinación**: Codex tiene WIP uncommitted en `Handoff.md` (Public Site AEO `/aeo-2/`); no se toca para no clobberear su sesión activa (misma razón que TASK-1292).
+- [ ] `changelog.md` actualizado — **deferred por coordinación** (misma razón).
+- [x] chequeo de impacto cruzado (EPIC-021 → `complete/`, TASK-1279 reabilitado con guard, ISSUE-110 → `resolved/`)
+- [x] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
 
 ## Follow-ups
 

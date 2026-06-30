@@ -51,7 +51,7 @@ El score 0 es un **artefacto de medición**, no la realidad.
 
 ## Estado
 
-open
+resolved (2026-06-30) — cerrado por EPIC-021 (5/5 tasks complete). Motor brand-aware (TASK-1288 categoría canónica + TASK-1289 eje `business_model` + TASK-1290 packs por arquetipo, scoring intacto) + guard del operador (TASK-1291 `assertSubjectGradeable`) + eval de cobertura por arquetipo (TASK-1292) deployados a `main` con sus flags ON en Production (release `056c2dde8`) y staging (parity flip + redeploy `greenhouse-bt9fvga8d`). Verificación: smoke staging `operator_gate_blocking=ok` (0 prospectos no graduables, `operator_send_enabled=true`); SKY scorea con prompts de consumo (15 prompts, 0 agency leak en TASK-1290). Residual menor: re-enable de la cross-sell bajo aceptación de riesgo del operador (no sign-off legal formal aparte); smoke E2E del SEND con email real diferido para no spamear (cubierto por el guard + signal steady).
 
 ## Relacionado
 
