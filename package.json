@@ -162,6 +162,7 @@
     "public-website:diff-runtime": "tsx scripts/public-website/diff-runtime-baseline.ts",
     "public-website:export-live-code": "tsx scripts/public-website/export-live-code-baseline.ts",
     "public-website:runtime-status": "tsx scripts/public-website/runtime-status.ts",
+    "public-website:verify-aeo-form-typography": "tsx scripts/public-website/verify-aeo-form-typography.ts",
     "public-website:wpcli": "tsx scripts/public-website/wpcli-remote.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",
