@@ -1,3 +1,13 @@
+## Sesion 2026-06-30 — Skill Public Site WordPress refactor a router + referencias — Codex — ✅ aplicado local
+
+> **Pedido:** evitar el problema recurrente de carga truncada en `efeonce-public-site-wordpress` y dejar un modelo robusto/escalable para muchas landings, no solo AEO.
+>
+> **Resultado:** se refactorizaron las skills `.codex/skills/efeonce-public-site-wordpress/SKILL.md` y `.claude/skills/efeonce-public-site-wordpress/SKILL.md` para que `SKILL.md` sea un router compacto (100 lineas) con reglas duras, matriz de carga y comandos. El detalle operativo se movio a referencias cargables: `references/landing-workflow.md`, `landing-registry.md`, `elementor-mutation.md`, `growth-forms-wordpress.md`, `content-factory-gutenberg.md`, `custom-elementor-widgets.md`, `layout-incidents.md`, `runtime-and-discovery.md` y fichas por landing en `references/landings/` (`aeo.md`, `agencia-creativa.md`, `hubspot-services.md`). La copia Claude fue sincronizada mecanicamente desde Codex y `diff -qr` quedo limpio.
+>
+> **Docs canonicos nuevos:** arquitectura `docs/architecture/GREENHOUSE_PUBLIC_SITE_SKILL_ROUTER_ARCHITECTURE_V1.md` + manual `docs/manual-de-uso/public-site/operar-public-site-skill-router.md`; decision indexada en `docs/architecture/DECISIONS_INDEX.md`.
+>
+> **Evidencia:** `python3 /Users/jreye/.codex/skills/.system/skill-creator/scripts/quick_validate.py` paso para ambas skills; `wc -l` confirma `SKILL.md` en 100 lineas y referencias pequenas; chequeo de existencia/cobertura de referencias OK. Auditoria posterior contra la skill anterior restauro routing explicito para AI Content Factory/Gutenberg, WP Abilities, bridge provisioning, WordPress React boundary e incidentes Blog/Contacto. No se mutó WordPress ni runtime publico.
+
 ## Sesion 2026-06-29 — Public Site AEO `/aeo-2/` FAQ con Ohio Accordion — Codex — ✅ aplicado live
 
 > **Pedido:** reemplazar/optimizar la seccion `Preguntas frecuentes` usando el acordeon Ohio (`ohio_accordion`) como primitive canonica.

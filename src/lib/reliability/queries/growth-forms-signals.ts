@@ -3,13 +3,16 @@ import 'server-only'
 /**
  * TASK-1229 — Growth Forms engine · reliability signals (prefijo `growth.forms.*`).
  *
- * 3 signals desde el motor (ventana 1 día salvo dead-letter, que es absoluto):
- *  - dead_letter_count: attempts agotados (steady=0; cualquier >0 = error → humano);
+ * 3 signals desde el motor (ventana 1 día salvo dead-letter, que es de estado vigente):
+ *  - dead_letter_count: attempts REALES agotados y NO resueltos (steady=0; cualquier >0 = error →
+ *    humano). SSOT en `countDeadLetterAttempts` (excluye el adapter de test + los ya resueltos por
+ *    un `succeeded` posterior); ver store.ts. NO es un COUNT crudo de por vida (append-only TASK-1229);
  *  - destination_failure_rate: submissions cuya entrega falló (posture);
  *  - submission_rejection_rate: submissions rechazadas (honeypot/consent/surface) —
  *    rechazar es comportamiento de seguridad esperado (steady ok).
  * DB vacía / sin forms publicados → steady ok. Error de lectura → severity unknown.
  */
+import { countDeadLetterAttempts } from '@/lib/growth/forms/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { ReliabilitySignal } from '@/types/reliability'
@@ -25,10 +28,9 @@ export const getGrowthFormsSignals = async (): Promise<ReliabilitySignal[]> => {
   const observedAt = new Date().toISOString()
 
   try {
-    const attemptRows = await runGreenhousePostgresQuery<{ dead_letters: number }>(
-      `SELECT COUNT(*) FILTER (WHERE status = 'dead_letter')::int AS dead_letters
-       FROM greenhouse_growth.form_destination_attempt`,
-    )
+    // SSOT del conteo de dead-letters vigentes (real + no-resuelto, excluye fixtures de test).
+    // Ver `countDeadLetterAttempts` en growth/forms/store.ts (append-only TASK-1229).
+    const deadLetters = await countDeadLetterAttempts()
 
     const submissionRows = await runGreenhousePostgresQuery<{ total: number; failed: number; rejected: number }>(
       `SELECT
@@ -39,7 +41,6 @@ export const getGrowthFormsSignals = async (): Promise<ReliabilitySignal[]> => {
        WHERE created_at > NOW() - INTERVAL '1 day'`,
     )
 
-    const deadLetters = Number(attemptRows[0]?.dead_letters ?? 0)
     const total = Number(submissionRows[0]?.total ?? 0)
     const failed = Number(submissionRows[0]?.failed ?? 0)
     const rejected = Number(submissionRows[0]?.rejected ?? 0)

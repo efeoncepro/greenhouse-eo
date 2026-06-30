@@ -691,11 +691,42 @@ export const getConsentSnapshot = async (submissionId: string): Promise<FormCons
 return rows[0] ?? null
 }
 
+/**
+ * Versión del adapter de test/fake (echo + hubspot-en-modo-fake). Los smoke/tests escriben
+ * attempts con esta versión en la PG compartida; NUNCA deben contar en un signal de producción.
+ * SSOT del discriminador de test para `countDeadLetterAttempts`.
+ */
+export const FAKE_ADAPTER_VERSION = 'fake-v1'
+
+/**
+ * SSOT del conteo de dead-letters VIGENTES (alimenta `growth.forms.dead_letter_count`).
+ *
+ * `form_destination_attempt` es append-only (TASK-1229: trigger bloquea DELETE), así que un
+ * `COUNT(*)` crudo de `status='dead_letter'` es un ratchet de una sola vía que nunca vuelve a 0.
+ * Definición canónica de "dead-letter vigente":
+ *   1. status='dead_letter';
+ *   2. adapter REAL (excluye `FAKE_ADAPTER_VERSION` — fixtures de test no manchan un signal prod);
+ *   3. sin un `succeeded` posterior para el mismo (submission_id, destination_id) — recovery-aware:
+ *      cuando exista un replay/requeue que appende un `succeeded`, el signal se auto-limpia.
+ * Un dead-letter de adapter real NUNCA se excluye (los adapters reales usan otra versión).
+ */
 export const countDeadLetterAttempts = async (): Promise<number> => {
   const rows = await query<{ n: string }>(
-    `SELECT COUNT(*)::text AS n FROM greenhouse_growth.form_destination_attempt WHERE status = 'dead_letter'`,
+    `SELECT COUNT(*)::text AS n
+       FROM greenhouse_growth.form_destination_attempt a
+      WHERE a.status = 'dead_letter'
+        AND a.adapter_version <> $1
+        AND NOT EXISTS (
+          SELECT 1
+            FROM greenhouse_growth.form_destination_attempt s
+           WHERE s.submission_id = a.submission_id
+             AND s.destination_id = a.destination_id
+             AND s.status = 'succeeded'
+             AND s.created_at > a.created_at
+        )`,
+    [FAKE_ADAPTER_VERSION],
   )
 
-  
+
 return Number(rows[0]?.n ?? 0)
 }
