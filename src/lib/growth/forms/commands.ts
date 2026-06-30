@@ -75,6 +75,9 @@ export interface AuthorDraftFormInput {
   fieldSchema: unknown
   /** TASK-1254 — política de validación por form (incluye emailPolicy del gate corporativo). */
   validationSchema?: unknown
+  /** TASK-1297 — render copy (copyRef → string) publicado al render contract. Se sanea
+   *  browser-safe en el policy-compiler (sanitizeRenderCopy) antes de exponerse. */
+  copyRefs?: unknown
   uiPolicy?: unknown
   successBehavior?: unknown
   consentPolicyVersion?: string
@@ -107,6 +110,7 @@ export const authorDraftForm = async (input: AuthorDraftFormInput): Promise<{ fo
     locale: input.locale ?? definition.default_locale,
     fieldSchema: input.fieldSchema,
     validationSchema: input.validationSchema,
+    copyRefs: input.copyRefs,
     uiPolicy: input.uiPolicy,
     successBehavior: input.successBehavior,
     consentPolicyVersion: input.consentPolicyVersion ?? null,
