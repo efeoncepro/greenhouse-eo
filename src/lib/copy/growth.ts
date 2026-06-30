@@ -725,6 +725,7 @@ export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
     history: 'Historial de acciones'
   },
   conflict: 'Este reporte ya fue revisado por {reviewer} — actualizando la cola.',
+  demo: { label: 'Vista de demostración', queue: 'Cola', empty: 'Cola vacía' },
   states: {
     emptyTitle: 'Sin reportes pendientes',
     emptyBody: 'No hay diagnósticos esperando revisión.',

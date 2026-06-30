@@ -26,6 +26,8 @@ import TableRow from '@mui/material/TableRow'
 import Card from '@mui/material/Card'
 import IconButton from '@mui/material/IconButton'
 import LinearProgress from '@mui/material/LinearProgress'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import { alpha, type Theme } from '@mui/material/styles'
 
 import {
@@ -54,6 +56,8 @@ interface QueueRow {
   ageLabel: string
   reviewer: string | null
   conflictCount: number
+  abstained?: boolean
+  conflictReviewer?: string
 }
 
 interface EnginePresence {
@@ -92,6 +96,7 @@ interface ReportDetail {
   gateReason: string
   evidenceIncomplete: boolean
   abstained: boolean
+  conflictReviewer: string | null
   perEngine: EnginePresence[]
   internalReasons: InternalReason[]
   dimensions: DimensionBar[]
@@ -106,7 +111,7 @@ const QUEUE: QueueRow[] = [
   { reportId: 'rep_01J6Z9K8Q7V3', brand: 'RevOps Latam', domain: 'revopslatam.com', status: 'review_required', score: 58, riskTone: 'warning', riskReason: 'Categoría incorrecta', ageLabel: '2h 05m', reviewer: 'María G.', conflictCount: 0 },
   { reportId: 'rep_01J6Z9K8Q7V4', brand: 'F11', domain: 'f11.ai', status: 'review_required', score: 71, riskTone: 'warning', riskReason: 'Falta fuente clave', ageLabel: '2h 42m', reviewer: null, conflictCount: 0 },
   { reportId: 'rep_01J6Z9K8Q7V5', brand: 'Kranon', domain: 'kranon.com', status: 'review_required', score: 33, riskTone: 'error', riskReason: 'Afirmación no soportada', ageLabel: '3h 10m', reviewer: 'Luis R.', conflictCount: 2 },
-  { reportId: 'rep_01J6Z9K8Q7V6', brand: 'Bemmbo', domain: 'bemmbo.com', status: 'review_required', score: 47, riskTone: 'warning', riskReason: 'Pocas menciones', ageLabel: '4h 05m', reviewer: null, conflictCount: 0 },
+  { reportId: 'rep_01J6Z9K8Q7V6', brand: 'Bemmbo', domain: 'bemmbo.com', status: 'review_required', score: 47, riskTone: 'warning', riskReason: 'Datos insuficientes', ageLabel: '4h 05m', reviewer: null, conflictCount: 0, abstained: true },
   { reportId: 'rep_01J6Z9K8Q7V7', brand: 'Clara', domain: 'clara.dev', status: 'in_review', score: 62, riskTone: 'warning', riskReason: 'Falta fuente clave', ageLabel: '45m', reviewer: 'Ana M.', conflictCount: 0 },
   { reportId: 'rep_01J6Z9K8Q7V8', brand: 'Xepelin', domain: 'xepelin.com', status: 'review_required', score: 28, riskTone: 'error', riskReason: 'Entidad colisionada', ageLabel: '5h 12m', reviewer: null, conflictCount: 0 }
 ]
@@ -123,6 +128,7 @@ const DETAIL_BY_ID: Record<string, ReportDetail> = {
     gateReason: 'Entidad colisionada',
     evidenceIncomplete: true,
     abstained: false,
+    conflictReviewer: 'Luis R.',
     perEngine: [
       { engine: 'chatgpt', label: 'ChatGPT', present: true, citations: 2, asOfLabel: 'hace 2 días', stale: false },
       { engine: 'perplexity', label: 'Perplexity', present: false, citations: 0, asOfLabel: 'hace 12 días', stale: true },
@@ -343,6 +349,17 @@ const ReportDetailPanel = ({ detail, onClose }: { detail: ReportDetail; onClose:
     {/* Contenido scrollable */}
     <Box sx={{ flex: '1 1 auto', overflowY: 'auto', minHeight: 0, px: 4, py: 4 }}>
       <Stack spacing={4}>
+        {/* Conflicto multi-revisor (command 1244: invalid_transition / not_reviewable) */}
+        {detail.conflictReviewer && (
+          <Box sx={{ p: 3, borderRadius: (t: Theme) => `${t.shape.customBorderRadius.md}px`, bgcolor: (t: Theme) => alpha(t.palette.info.main, 0.08), display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+            <i className='tabler-info-circle' aria-hidden='true' style={{ color: 'var(--mui-palette-info-main)' }} />
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant='body2' sx={{ fontWeight: 600 }} color='info.main'>{C.conflict.replace('{reviewer}', detail.conflictReviewer)}</Typography>
+            </Box>
+            <GreenhouseButton size='small' variant='text' kind='custom' leadingIcon={<i className='tabler-refresh' aria-hidden='true' />}>{C.actions.refresh}</GreenhouseButton>
+          </Box>
+        )}
+
         {/* HERO: score + riesgo + razón del gate */}
         <Card
           elevation={0}
@@ -477,13 +494,47 @@ const detailFor = (id: string): ReportDetail => {
   const row = QUEUE.find(r => r.reportId === id) ?? QUEUE[0]!
   const base = DETAIL_BY_ID.rep_01J6Z9K8Q7V2!
 
-  return { ...base, reportId: row.reportId, brand: row.brand, domain: row.domain, score: row.score, riskTone: row.riskTone, gateReason: row.riskReason }
+  return {
+    ...base,
+    reportId: row.reportId,
+    brand: row.brand,
+    domain: row.domain,
+    score: row.score,
+    riskTone: row.riskTone,
+    gateReason: row.riskReason,
+    abstained: row.abstained ?? false,
+    conflictReviewer: row.conflictReviewer ?? null,
+    summary: base.summary.replaceAll('Globe', row.brand)
+  }
 }
+
+const EmptyQueue = () => (
+  <Box data-capture='admin-review-empty' role='status' sx={{ textAlign: 'center', py: 12, px: 4 }}>
+    <Box
+      sx={{
+        width: 56,
+        height: 56,
+        mx: 'auto',
+        mb: 3,
+        borderRadius: '50%',
+        display: 'grid',
+        placeItems: 'center',
+        bgcolor: (t: Theme) => alpha(t.palette.success.main, 0.1),
+        color: 'success.main'
+      }}
+    >
+      <i className='tabler-checks' aria-hidden='true' />
+    </Box>
+    <Typography variant='h5'>{C.states.emptyTitle}</Typography>
+    <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>{C.states.emptyBody}</Typography>
+  </Box>
+)
 
 const AdminReviewMockupView = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [demo, setDemo] = useState<'queue' | 'empty'>('queue')
   const close = useCallback(() => setSelectedId(null), [])
-  const detail = selectedId ? detailFor(selectedId) : null
+  const detail = demo === 'queue' && selectedId ? detailFor(selectedId) : null
 
   return (
     <Box sx={{ p: { xs: 4, md: 6 } }}>
@@ -500,6 +551,16 @@ const AdminReviewMockupView = () => {
           <Typography variant='h4'>{C.pageTitle}</Typography>
           <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>{C.pageSubtitle}</Typography>
         </Box>
+        <ToggleButtonGroup
+          size='small'
+          exclusive
+          value={demo}
+          onChange={(_, v) => { if (v) { setDemo(v as 'queue' | 'empty'); setSelectedId(null) } }}
+          aria-label={C.demo.label}
+        >
+          <ToggleButton value='queue'>{C.demo.queue}</ToggleButton>
+          <ToggleButton value='empty'>{C.demo.empty}</ToggleButton>
+        </ToggleButtonGroup>
       </Stack>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ mb: 4 }}>
@@ -529,7 +590,7 @@ const AdminReviewMockupView = () => {
               dataCapture='growth-ai-visibility-admin-review-sidecar'
               source='task-1247-admin-review-mockup'
             >
-              <QueueTable rows={QUEUE} selectedId={selectedId} onSelect={setSelectedId} />
+              {demo === 'empty' ? <EmptyQueue /> : <QueueTable rows={QUEUE} selectedId={selectedId} onSelect={setSelectedId} />}
             </AdaptiveSidecarLayout>
           )
         }}

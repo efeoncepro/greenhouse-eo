@@ -6,6 +6,8 @@ import type { CaptureScenario } from '../lib/scenario'
 export const scenario: CaptureScenario = {
   name: 'growth-ai-visibility-admin-review',
   route: '/admin/growth/ai-visibility/mockup',
+  mutating: true,
+  safeForCapture: true,
   viewport: { width: 1440, height: 900 },
   initialHoldMs: 1200,
   finalHoldMs: 500,
@@ -24,9 +26,16 @@ export const scenario: CaptureScenario = {
     { kind: 'mark', label: 'queue-closed', note: 'Cola full-width, drawer cerrado (estado default que respira)' },
     { kind: 'click', selector: 'text=globe.com' },
     { kind: 'sleep', ms: 450 },
-    { kind: 'mark', label: 'drawer-open', note: 'Reconciler abre como drawer overlay sobre la cola' },
-    { kind: 'click', selector: 'button[aria-label="Cerrar"]' },
-    { kind: 'sleep', ms: 300 },
-    { kind: 'mark', label: 'queue-after-close', note: 'La cola vuelve a quedar full-width al cerrar el drawer' }
+    { kind: 'mark', label: 'drawer-open-conflict', note: 'Reconciler con banner de conflicto multi-revisor (Globe)' },
+    { kind: 'press', key: 'Escape' },
+    { kind: 'sleep', ms: 350 },
+    { kind: 'click', selector: 'text=bemmbo.com' },
+    { kind: 'sleep', ms: 450 },
+    { kind: 'mark', label: 'drawer-abstained', note: 'Abstención del grader (insufficient_data) — no se publica' },
+    { kind: 'press', key: 'Escape' },
+    { kind: 'sleep', ms: 350 },
+    { kind: 'click', selector: 'button:has-text("Cola vacía")' },
+    { kind: 'sleep', ms: 400 },
+    { kind: 'mark', label: 'empty', note: 'Estado vacío: sin reportes pendientes' }
   ]
 }
