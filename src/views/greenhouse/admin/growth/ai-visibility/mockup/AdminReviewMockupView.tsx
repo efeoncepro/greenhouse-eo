@@ -11,9 +11,10 @@
  * evidence ledger = capa-2 anti-falso-0 con presencia POR-MOTOR + frescura + procedencia.
  */
 
-import { useMemo, useState } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
+import Grow from '@mui/material/Grow'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
@@ -23,6 +24,7 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Card from '@mui/material/Card'
+import IconButton from '@mui/material/IconButton'
 import LinearProgress from '@mui/material/LinearProgress'
 import { alpha, type Theme } from '@mui/material/styles'
 
@@ -178,10 +180,28 @@ const ScoreBadge = ({ score, tone }: { score: number; tone: RiskTone }) => (
   </Box>
 )
 
-const QueueTable = ({ rows, selectedId, onSelect }: { rows: QueueRow[]; selectedId: string; onSelect: (id: string) => void }) => (
-  <Box data-capture='admin-review-queue' sx={{ minWidth: 0, overflowX: 'clip' }}>
+const ScoreRing = ({ score, tone }: { score: number; tone: RiskTone }) => (
+  <Box
+    sx={{
+      width: 64,
+      height: 64,
+      flexShrink: 0,
+      borderRadius: '50%',
+      display: 'grid',
+      placeItems: 'center',
+      border: (t: Theme) => `3px solid ${t.palette[toneColor(tone)].main}`,
+      color: (t: Theme) => t.palette[toneColor(tone)].main
+    }}
+  >
+    <Typography variant='kpiValue' sx={{ lineHeight: 1 }}>{score}</Typography>
+  </Box>
+)
+
+const QueueTable = ({ rows, selectedId, onSelect }: { rows: QueueRow[]; selectedId: string | null; onSelect: (id: string) => void }) => (
+  <Box data-capture='admin-review-queue' sx={{ minWidth: 0 }}>
     <Typography variant='h5' sx={{ mb: 3 }}>{C.queue.title}</Typography>
-    <Table size='small'>
+    <Box sx={{ overflowX: 'auto' }}>
+    <Table size='small' sx={{ minWidth: 760 }}>
       <TableHead>
         <TableRow>
           <TableCell>{C.queue.colBrand}</TableCell>
@@ -242,131 +262,228 @@ const QueueTable = ({ rows, selectedId, onSelect }: { rows: QueueRow[]; selected
         })}
       </TableBody>
     </Table>
-  </Box>
-)
-
-const PerEngineEvidence = ({ rows }: { rows: EnginePresence[] }) => (
-  <Box>
-    <Typography variant='overline' color='text.secondary'>{C.detail.perEngineTitle}</Typography>
-    <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 2 }}>{C.detail.perEngineHint}</Typography>
-    <Stack spacing={2}>
-      {rows.map(e => (
-        <Box key={e.engine} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <GreenhouseChip
-            kind='status'
-            size='small'
-            variant='label'
-            tone={e.present ? 'success' : 'secondary'}
-            label={e.present ? `${e.label} · presente` : `${e.label} · ausente`}
-          />
-          <Typography variant='caption' color='text.secondary'>{e.citations} citas</Typography>
-          <Box sx={{ flex: 1 }} />
-          <Typography variant='caption' color={e.stale ? 'error.main' : 'text.secondary'}>
-            {C.detail.asOf} {e.asOfLabel}{e.stale ? ' ⚠' : ''}
-          </Typography>
-        </Box>
-      ))}
-    </Stack>
-  </Box>
-)
-
-const ReportDetailPanel = ({ detail }: { detail: ReportDetail }) => (
-  <Box data-capture='admin-review-detail' sx={{ p: 4, minWidth: 0 }}>
-    <Stack direction='row' alignItems='flex-start' justifyContent='space-between' sx={{ mb: 3 }}>
-      <Box>
-        <Typography variant='h5'>{detail.brand} <Typography component='span' variant='body2' color='text.secondary'>({detail.domain})</Typography></Typography>
-        <Stack direction='row' spacing={4} sx={{ mt: 1 }}>
-          <Typography variant='caption' color='text.secondary'>{C.detail.reportId}: {detail.reportId}</Typography>
-          <Typography variant='caption' color='text.secondary'>{C.detail.generated}: {detail.generatedLabel}</Typography>
-        </Stack>
-      </Box>
-    </Stack>
-
-    {detail.evidenceIncomplete && (
-      <Box sx={{ p: 3, mb: 3, borderRadius: (t: Theme) => `${t.shape.customBorderRadius.sm}px`, bgcolor: (t: Theme) => alpha(t.palette.warning.main, 0.08) }}>
-        <Typography variant='body2' sx={{ fontWeight: 600 }} color='warning.main'>{C.evidence.incompleteTitle}</Typography>
-        <Typography variant='caption' color='text.secondary'>{C.evidence.incompleteBody}</Typography>
-      </Box>
-    )}
-
-    {/* Capa-2 anti-falso-0: presencia POR MOTOR + frescura */}
-    <Box sx={{ p: 3, mb: 3, border: (t: Theme) => `1px solid ${t.palette.divider}`, borderRadius: (t: Theme) => `${t.shape.customBorderRadius.md}px` }}>
-      <PerEngineEvidence rows={detail.perEngine} />
     </Box>
+  </Box>
+)
 
-    <Stack direction={{ xs: 'column', lg: 'row' }} spacing={4}>
-      {/* Vista pública exacta (WYSIWYG) */}
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Stack direction='row' alignItems='center' spacing={2} sx={{ mb: 2 }}>
-          <Typography variant='overline' color='text.secondary'>{C.detail.publicViewTitle}</Typography>
-          <GreenhouseChip kind='metric' size='small' variant='label' tone='info' label={C.detail.publicViewHint} />
+/** Sección con título overline consistente + contenido. */
+const Section = ({ title, hint, action, children }: { title: string; hint?: string; action?: ReactNode; children: ReactNode }) => (
+  <Box>
+    <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ mb: 2 }}>
+      <Box>
+        <Typography variant='overline' color='text.secondary'>{title}</Typography>
+        {hint && <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>{hint}</Typography>}
+      </Box>
+      {action}
+    </Stack>
+    {children}
+  </Box>
+)
+
+const PerEngineRow = ({ e }: { e: EnginePresence }) => (
+  <Stack direction='row' alignItems='center' spacing={3} sx={{ py: 1.5 }}>
+    <Box
+      sx={{
+        width: 8,
+        height: 8,
+        borderRadius: '50%',
+        flexShrink: 0,
+        bgcolor: (t: Theme) => (e.present ? t.palette.success.main : alpha(t.palette.text.disabled, 0.5))
+      }}
+    />
+    <Box sx={{ minWidth: 116 }}>
+      <Typography variant='body2' sx={{ fontWeight: 600 }}>{e.label}</Typography>
+      <Typography variant='caption' color={e.present ? 'success.main' : 'text.secondary'}>
+        {e.present ? C.detail.present : C.detail.absent}
+      </Typography>
+    </Box>
+    <Typography variant='caption' color='text.secondary' sx={{ minWidth: 64 }}>
+      {e.citations === 1 ? C.detail.citationOne : `${e.citations} ${C.detail.citations}`}
+    </Typography>
+    <Box sx={{ flex: 1 }} />
+    {e.stale ? (
+      <GreenhouseChip kind='status' size='small' variant='outlined' tone='error' label={`${C.detail.asOf} ${e.asOfLabel}`} />
+    ) : (
+      <Typography variant='caption' color='text.secondary'>{C.detail.asOf} {e.asOfLabel}</Typography>
+    )}
+  </Stack>
+)
+
+const cardSx = (t: Theme) => ({
+  border: `1px solid ${t.palette.divider}`,
+  borderRadius: `${t.shape.customBorderRadius.md}px`
+})
+
+const ReportDetailPanel = ({ detail, onClose }: { detail: ReportDetail; onClose: () => void }) => (
+  <Box
+    data-capture='admin-review-detail'
+    sx={{ height: '100%', maxHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: 0, bgcolor: 'background.paper' }}
+  >
+    {/* Header fijo */}
+    <Stack
+      direction='row'
+      alignItems='flex-start'
+      justifyContent='space-between'
+      sx={{ px: 4, pt: 4, pb: 3, borderBottom: (t: Theme) => `1px solid ${t.palette.divider}` }}
+    >
+      <Box sx={{ minWidth: 0 }}>
+        <Typography variant='h5'>
+          {detail.brand} <Typography component='span' variant='body2' color='text.secondary'>{detail.domain}</Typography>
+        </Typography>
+        <Stack direction='row' spacing={4} sx={{ mt: 1 }} flexWrap='wrap'>
+          <Typography variant='caption' color='text.secondary'>{C.detail.reportId} · {detail.reportId}</Typography>
+          <Typography variant='caption' color='text.secondary'>{C.detail.generated} · {detail.generatedLabel}</Typography>
         </Stack>
-        <Card elevation={0} sx={{ p: 3, border: (t: Theme) => `1px solid ${t.palette.divider}`, borderRadius: (t: Theme) => `${t.shape.customBorderRadius.md}px` }}>
-          <Stack direction='row' justifyContent='space-between' alignItems='baseline'>
-            <Typography variant='h4'>{detail.brand}</Typography>
-            <Typography variant='kpiValue' color={`${toneColor(detail.riskTone)}.main`}>{detail.score}<Typography component='span' variant='body2' color='text.secondary'>/100</Typography></Typography>
-          </Stack>
-          <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>{detail.summary}</Typography>
-          <Divider sx={{ my: 3 }} />
-          <Stack spacing={2}>
-            {detail.dimensions.map(d => (
-              <Box key={d.label}>
-                <Stack direction='row' justifyContent='space-between' sx={{ mb: 0.5 }}>
-                  <Typography variant='caption'>{d.label}</Typography>
-                  <Typography variant='caption' color='text.secondary'>{d.value}/100</Typography>
-                </Stack>
-                <LinearProgress variant='determinate' value={d.value} color={toneColor(d.tone)} sx={{ height: 6, borderRadius: 3 }} />
-              </Box>
-            ))}
+      </Box>
+      <IconButton size='small' onClick={onClose} aria-label={C.detail.close}>
+        <i className='tabler-x' aria-hidden='true' />
+      </IconButton>
+    </Stack>
+
+    {/* Contenido scrollable */}
+    <Box sx={{ flex: '1 1 auto', overflowY: 'auto', minHeight: 0, px: 4, py: 4 }}>
+      <Stack spacing={4}>
+        {/* HERO: score + riesgo + razón del gate */}
+        <Card
+          elevation={0}
+          sx={(t: Theme) => ({
+            ...cardSx(t),
+            borderLeft: `3px solid ${t.palette[toneColor(detail.riskTone)].main}`,
+            bgcolor: alpha(t.palette[toneColor(detail.riskTone)].main, 0.04),
+            p: 3
+          })}
+        >
+          <Stack direction='row' alignItems='center' spacing={4}>
+            <ScoreRing score={detail.score} tone={detail.riskTone} />
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Stack direction='row' alignItems='center' spacing={2}>
+                <GreenhouseChip kind='status' size='small' variant='label' tone={toneColor(detail.riskTone)} label={`${C.detail.riskLabel} ${riskLabel(detail.riskTone).toLowerCase()}`} />
+                <Typography variant='body2' sx={{ fontWeight: 600 }}>{detail.gateReason}</Typography>
+              </Stack>
+              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
+                {C.detail.consequenceBody}
+              </Typography>
+            </Box>
           </Stack>
         </Card>
-      </Box>
 
-      {/* Razones internas (no públicas) */}
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography variant='overline' color='text.secondary' sx={{ display: 'block', mb: 2 }}>{C.detail.internalReasonsTitle}</Typography>
-        <Stack spacing={2}>
-          {detail.internalReasons.map(r => (
-            <Card key={r.id} elevation={0} sx={{ p: 3, border: (t: Theme) => `1px solid ${t.palette.divider}`, borderRadius: (t: Theme) => `${t.shape.customBorderRadius.md}px` }}>
-              <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                <Typography variant='body2' sx={{ fontWeight: 600 }} color={`${toneColor(r.tone)}.main`}>{r.title}</Typography>
-                <GreenhouseChip kind='status' size='small' variant='label' tone={toneColor(r.tone)} label={r.severityLabel} />
-              </Stack>
-              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>{r.detail}</Typography>
-              <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mt: 2 }}>
-                <Typography variant='caption' color='text.secondary'>{C.detail.impact}: {r.impact} pts</Typography>
-                <GreenhouseButton size='small' variant='text' kind='custom'>{C.detail.seeEvidence} ({r.evidenceCount})</GreenhouseButton>
-              </Stack>
-            </Card>
-          ))}
-        </Stack>
-      </Box>
-    </Stack>
+        {/* Estado de evidencia (incompleta / abstención) */}
+        {detail.abstained ? (
+          <Box sx={{ p: 3, borderRadius: (t: Theme) => `${t.shape.customBorderRadius.md}px`, bgcolor: (t: Theme) => alpha(t.palette.error.main, 0.06), display: 'flex', gap: 2 }}>
+            <i className='tabler-alert-octagon' aria-hidden='true' style={{ color: 'var(--mui-palette-error-main)' }} />
+            <Box>
+              <Typography variant='body2' sx={{ fontWeight: 600 }} color='error.main'>{C.evidence.abstainedTitle}</Typography>
+              <Typography variant='caption' color='text.secondary'>{C.evidence.abstainedBody}</Typography>
+            </Box>
+          </Box>
+        ) : detail.evidenceIncomplete ? (
+          <Box sx={{ p: 3, borderRadius: (t: Theme) => `${t.shape.customBorderRadius.md}px`, bgcolor: (t: Theme) => alpha(t.palette.warning.main, 0.08), display: 'flex', gap: 2 }}>
+            <i className='tabler-alert-triangle' aria-hidden='true' style={{ color: 'var(--mui-palette-warning-main)' }} />
+            <Box>
+              <Typography variant='body2' sx={{ fontWeight: 600 }} color='warning.main'>{C.evidence.incompleteTitle}</Typography>
+              <Typography variant='caption' color='text.secondary'>{C.evidence.incompleteBody}</Typography>
+            </Box>
+          </Box>
+        ) : null}
 
-    {/* Decisión */}
-    <Divider sx={{ my: 4 }} />
-    <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ md: 'flex-end' }} data-capture='admin-review-actions'>
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography variant='caption' color='text.secondary'>{C.decision.rejectReasonLabel}</Typography>
-        <Box sx={{ mt: 1, p: 2, minHeight: 56, border: (t: Theme) => `1px solid ${t.palette.divider}`, borderRadius: (t: Theme) => `${t.shape.customBorderRadius.sm}px` }}>
-          <Typography variant='body2' color='text.disabled'>{C.decision.rejectReasonPlaceholder}</Typography>
-        </Box>
+        {/* Presencia por motor (capa-2 anti-falso-0) */}
+        <Section title={C.detail.perEngineTitle} hint={C.detail.perEngineHint}>
+          <Card elevation={0} sx={t => ({ ...cardSx(t), px: 3, py: 1 })}>
+            {detail.perEngine.map((e, i) => (
+              <Box key={e.engine} sx={i > 0 ? { borderTop: (t: Theme) => `1px solid ${t.palette.divider}` } : undefined}>
+                <PerEngineRow e={e} />
+              </Box>
+            ))}
+          </Card>
+        </Section>
+
+        {/* Vista pública exacta (WYSIWYG) */}
+        <Section
+          title={C.detail.publicViewTitle}
+          action={<GreenhouseChip kind='metric' size='small' variant='label' tone='info' label={C.detail.publicViewHint} />}
+        >
+          <Card elevation={0} sx={t => ({ ...cardSx(t), p: 3 })}>
+            <Stack direction='row' justifyContent='space-between' alignItems='baseline'>
+              <Typography variant='h4'>{detail.brand}</Typography>
+              <Typography variant='kpiValue' color={`${toneColor(detail.riskTone)}.main`}>
+                {detail.score}<Typography component='span' variant='body2' color='text.secondary'>/100</Typography>
+              </Typography>
+            </Stack>
+            <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>{detail.summary}</Typography>
+            <Divider sx={{ my: 3 }} />
+            <Stack spacing={2}>
+              {detail.dimensions.map(d => (
+                <Box key={d.label}>
+                  <Stack direction='row' justifyContent='space-between' sx={{ mb: 0.5 }}>
+                    <Typography variant='caption'>{d.label}</Typography>
+                    <Typography variant='caption' color='text.secondary'>{d.value}/100</Typography>
+                  </Stack>
+                  <LinearProgress variant='determinate' value={d.value} color={toneColor(d.tone)} sx={{ height: 6, borderRadius: 3 }} />
+                </Box>
+              ))}
+            </Stack>
+          </Card>
+        </Section>
+
+        {/* Razones internas (no públicas) — stagger sutil */}
+        <Section title={C.detail.internalReasonsTitle}>
+          <Stack spacing={2}>
+            {detail.internalReasons.map((r, i) => (
+              <Grow in key={r.id} timeout={320} style={{ transitionDelay: `${i * 55}ms` }}>
+                <Card elevation={0} sx={t => ({ ...cardSx(t), borderLeft: `3px solid ${t.palette[toneColor(r.tone)].main}`, p: 3 })}>
+                  <Stack direction='row' justifyContent='space-between' alignItems='center' spacing={2}>
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>{r.title}</Typography>
+                    <GreenhouseChip kind='status' size='small' variant='label' tone={toneColor(r.tone)} label={r.severityLabel} />
+                  </Stack>
+                  <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>{r.detail}</Typography>
+                  <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mt: 2 }}>
+                    <Typography variant='caption' color={`${toneColor(r.tone)}.main`} sx={{ fontWeight: 600 }}>{C.detail.impact} {r.impact} pts</Typography>
+                    <GreenhouseButton size='small' variant='text' kind='custom'>{C.detail.seeEvidence} ({r.evidenceCount})</GreenhouseButton>
+                  </Stack>
+                </Card>
+              </Grow>
+            ))}
+          </Stack>
+        </Section>
+      </Stack>
+    </Box>
+
+    {/* Footer de decisión fijo (acción de consecuencia siempre visible) */}
+    <Box
+      data-capture='admin-review-actions'
+      sx={{ flexShrink: 0, px: 4, py: 3, borderTop: (t: Theme) => `1px solid ${t.palette.divider}`, bgcolor: 'background.paper' }}
+    >
+      <Typography variant='caption' color='text.secondary'>{C.decision.rejectReasonLabel}</Typography>
+      <Box sx={{ mt: 1, mb: 3, p: 2, minHeight: 44, border: (t: Theme) => `1px solid ${t.palette.divider}`, borderRadius: (t: Theme) => `${t.shape.customBorderRadius.sm}px` }}>
+        <Typography variant='body2' color='text.disabled'>{C.decision.rejectReasonPlaceholder}</Typography>
       </Box>
       <Stack direction='row' spacing={2}>
-        <GreenhouseButton variant='outlined' kind='custom' tone='success'>{C.decision.approve}</GreenhouseButton>
-        <GreenhouseButton variant='outlined' kind='custom' tone='error'>{C.decision.reject}</GreenhouseButton>
+        <GreenhouseButton variant='outlined' kind='custom' tone='error' leadingIcon={<i className='tabler-x' aria-hidden='true' />}>{C.decision.reject}</GreenhouseButton>
+        <Box sx={{ flex: 1 }} />
+        <GreenhouseButton variant='outlined' kind='custom' tone='success' leadingIcon={<i className='tabler-check' aria-hidden='true' />}>{C.decision.approve}</GreenhouseButton>
       </Stack>
-    </Stack>
+    </Box>
   </Box>
 )
 
 // ─── View principal ─────────────────────────────────────────────────────────────────
 
-const AdminReviewMockupView = () => {
-  const [selectedId, setSelectedId] = useState<string>(QUEUE[0]!.reportId)
-  const detail = useMemo(() => DETAIL_BY_ID[selectedId] ?? DETAIL_BY_ID[QUEUE[0]!.reportId]!, [selectedId])
+/** Detalle de cualquier fila: real para Globe, sintetizado desde la fila para el resto (mockup). */
+const detailFor = (id: string): ReportDetail => {
+  const known = DETAIL_BY_ID[id]
 
-  const sidecar = <ReportDetailPanel detail={detail} />
+  if (known) return known
+
+  const row = QUEUE.find(r => r.reportId === id) ?? QUEUE[0]!
+  const base = DETAIL_BY_ID.rep_01J6Z9K8Q7V2!
+
+  return { ...base, reportId: row.reportId, brand: row.brand, domain: row.domain, score: row.score, riskTone: row.riskTone, gateReason: row.riskReason }
+}
+
+const AdminReviewMockupView = () => {
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const close = useCallback(() => setSelectedId(null), [])
+  const detail = selectedId ? detailFor(selectedId) : null
 
   return (
     <Box sx={{ p: { xs: 4, md: 6 } }}>
@@ -399,15 +516,15 @@ const AdminReviewMockupView = () => {
         regions={{
           primary: (
             <AdaptiveSidecarLayout
-              open
-              onOpenChange={() => undefined}
+              open={detail !== null}
+              onOpenChange={open => { if (!open) close() }}
               kind='reconciler'
-              preferredMode='push'
-              sidecar={sidecar}
-              sidecarWidth={620}
-              sidecarMinWidth={480}
-              sidecarMaxWidth={760}
-              mainMinWidth={560}
+              preferredMode='temporary'
+              sidecar={detail ? <ReportDetailPanel detail={detail} onClose={close} /> : null}
+              sidecarWidth={680}
+              sidecarMinWidth={520}
+              sidecarMaxWidth={820}
+              mainMinWidth={320}
               panelEntrance='slide'
               dataCapture='growth-ai-visibility-admin-review-sidecar'
               source='task-1247-admin-review-mockup'
