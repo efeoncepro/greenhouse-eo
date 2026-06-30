@@ -153,7 +153,7 @@ const DETAIL_BY_ID: Record<string, ReportDetail> = {
   }
 }
 
-const toneColor = (t: RiskTone) => (t === 'error' ? 'error' : t === 'warning' ? 'warning' : 'success') as const
+const toneColor = (t: RiskTone): RiskTone => (t === 'error' ? 'error' : t === 'warning' ? 'warning' : 'success')
 const riskLabel = (t: RiskTone) => (t === 'error' ? 'Alto' : t === 'warning' ? 'Medio' : 'Bajo')
 
 // ─── Subcomponentes ────────────────────────────────────────────────────────────────
