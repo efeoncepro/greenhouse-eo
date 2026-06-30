@@ -59,6 +59,12 @@ export const RENDERER_CSS = `
     }
   }
 
+  /* TASK-1297 — appearance="bare" (chromeless): el renderer no dibuja card; este modo
+     neutraliza el único fill (--ghf-bg) para integrarlo dentro de una card del host sin
+     card-on-card. Afford­ance transversal: cualquier host opta sin escribir CSS scoped. */
+  greenhouse-form[data-appearance="bare"],
+  .ghf-scope[data-appearance="bare"] { --ghf-bg: transparent; background: transparent; }
+
   greenhouse-form *,
   greenhouse-form *::before,
   greenhouse-form *::after,

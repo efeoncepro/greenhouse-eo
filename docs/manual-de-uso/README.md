@@ -93,6 +93,7 @@ La diferencia con otras capas de documentacion:
 - [Activar y desactivar el Modo Mantenimiento](plataforma/modo-mantenimiento.md) — paso a paso para poner el portal detrás de la página `/maintenance` durante una mantención planificada: setear `MAINTENANCE_MODE=true` (+ `MAINTENANCE_BYPASS_SECRET`) + redeploy, verificar con `?gh_bypass`, apagar, qué significan el 503/cookie/mensajes rotativos, qué no hacer y troubleshooting.
 - [Greenhouse Visual Capture](plataforma/captura-visual-playwright.md) — `pnpm fe:capture` para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patrón de `_cap.mjs` ad-hoc. Scenario DSL declarativo, agent auth canónico, scroll robusto, captura full-page/por sección, 5 capas defense-in-depth Safety, GC de artifacts.
 - [Operar UI Platform y Design System](plataforma/operar-ui-platform-design-system.md) — runbook para diseñar/implementar superficies con primitives, tokens, Composition Shell, Adaptive Card Density, GVC, design-system catalog y gobernanza Figma.
+- [Production Release Orchestrator + slash command `/release`](plataforma/release-orchestrator.md) — cómo promover `develop → main` por el control plane: disparar el orquestador, aprobar el environment Production, leer estados (`released`/`degraded`/`aborted`), prender flags pendientes del ledger; incluye el atajo **`/release`** de Claude Code (modos release/rollback/watchdog/drift/break-glass) y su equivalente skill en Codex. No tratar un `push:main` como release completo.
 
 ### Herramientas IA
 

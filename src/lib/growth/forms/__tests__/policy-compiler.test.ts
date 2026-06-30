@@ -1,15 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  COPY_VALUE_MAX,
   TELEMETRY_ALLOWED_PAYLOAD_KEYS,
   TELEMETRY_FORBIDDEN_PAYLOAD_KEYS,
   publicSubmitInputSchema,
+  sanitizeRenderCopy,
 } from '../contracts'
 import { compileFormVersion } from '../policy-compiler'
 import type { FormDefinitionRow, FormDestinationRow, FormVersionRow } from '../store'
 
 const definition = (overrides: Partial<FormDefinitionRow> = {}): FormDefinitionRow => ({
   form_id: 'fdef-1',
+  form_key: '00000000-0000-4000-8000-000000000001',
   slug: 'test-form',
   name: 'Test',
   form_kind: 'lead_magnet',
@@ -152,6 +155,59 @@ describe('render_contract — browser-safe', () => {
       execution: 'submit',
     })
     expect(JSON.stringify(result.renderContract).toLowerCase()).not.toContain('secret')
+  })
+})
+
+describe('render_contract — formKey + copy gate (TASK-1297)', () => {
+  it('expone formKey (identidad estable) en el render contract', () => {
+    const result = compileFormVersion(
+      definition({ form_key: '11111111-1111-4111-8111-111111111111' }),
+      version(),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.renderContract?.form.formKey).toBe('11111111-1111-4111-8111-111111111111')
+  })
+
+  it('publica el copy renderizable válido (copyRef → string)', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({ copy_refs_json: { copy: { submit: 'Solicitar diagnóstico gratis →' } } }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.renderContract?.copy).toEqual({ submit: 'Solicitar diagnóstico gratis →' })
+  })
+
+  it('descarta entradas de copy no browser-safe (nested / no-string / over-length)', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({
+        copy_refs_json: {
+          copy: {
+            submit: 'Enviar',
+            leaked: { portalId: '48713323', formGuid: 'secret' } as unknown as string,
+            count: 42 as unknown as string,
+            huge: 'x'.repeat(COPY_VALUE_MAX + 1),
+          },
+        },
+      }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.renderContract?.copy).toEqual({ submit: 'Enviar' })
+    expect(JSON.stringify(result.renderContract)).not.toContain('48713323')
+    expect(JSON.stringify(result.renderContract)).not.toContain('formGuid')
+  })
+
+  it('sanitizeRenderCopy es tolerante por-entrada y nunca lanza', () => {
+    expect(sanitizeRenderCopy({ a: 'ok', b: 3, c: { nested: true } })).toEqual({ a: 'ok' })
+    expect(sanitizeRenderCopy(null)).toEqual({})
+    expect(sanitizeRenderCopy(['array'])).toEqual({})
+    expect(sanitizeRenderCopy('string')).toEqual({})
   })
 })
 

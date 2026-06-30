@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/public/growth/forms/cors'
 import { isFormsPublicApiEnabled } from '@/lib/growth/forms/flags'
-import { getPublishedRenderContract } from '@/lib/growth/forms/readers'
+import { getPublishedRenderContractByRef } from '@/lib/growth/forms/readers'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 /**
@@ -28,13 +28,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ form
     return NextResponse.json({ error: 'No disponible.' }, { status: 404, headers })
   }
 
+  // `formSlug` es un formRef: acepta slug (alias legacy) o form_key (UUID, identidad estable).
   const { formSlug } = await params
   const { searchParams } = new URL(request.url)
   const surfaceId = searchParams.get('surfaceId')
   const origin = request.headers.get('origin')
 
   try {
-    const contract = await getPublishedRenderContract(formSlug, { surfaceId, origin })
+    const contract = await getPublishedRenderContractByRef(formSlug, { surfaceId, origin })
 
     if (!contract) {
       return NextResponse.json({ error: 'Formulario no encontrado.' }, { status: 404, headers })

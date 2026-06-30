@@ -4,6 +4,7 @@ import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/pu
 import { type PublicSubmitInput, type PublicSubmitOutcome } from '@/lib/growth/forms/contracts'
 import { submitForm } from '@/lib/growth/forms/commands'
 import { isFormsPublicApiEnabled } from '@/lib/growth/forms/flags'
+import { resolveFormSlugFromRef } from '@/lib/growth/forms/readers'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 /**
@@ -45,7 +46,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
     return NextResponse.json({ outcome: 'disabled', message: 'No disponible.' }, { status: 404, headers })
   }
 
-  const { formSlug } = await params
+  // `formSlug` es un formRef: acepta slug (alias legacy) o form_key (UUID). El resto del
+  // command opera por slug (surface allowlist, dedupe), así que resolvemos primero.
+  const { formSlug: formRef } = await params
+  const formSlug = await resolveFormSlugFromRef(formRef)
+
+  if (!formSlug) {
+    return NextResponse.json({ outcome: 'form_not_published', message: 'Formulario no encontrado.' }, { status: 404, headers })
+  }
 
   let body: Record<string, unknown>
 

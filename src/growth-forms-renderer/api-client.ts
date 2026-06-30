@@ -13,9 +13,17 @@ export interface RendererApiConfig {
   /** Origen del portal Greenhouse (ej. https://greenhouse.efeoncepro.com). */
   baseUrl: string
   slug: string
+  /** TASK-1297 — identidad estable opaca (UUID). Si está, es el segmento de ruta preferido. */
+  formKey?: string
   surfaceId?: string
   embedKey?: string
 }
+
+/**
+ * TASK-1297 — segmento de ruta del formRef: el `form_key` (identidad estable) si está
+ * presente, si no el `slug` (backward-compatible). El servidor desambigua slug-vs-uuid.
+ */
+const formRef = (config: RendererApiConfig): string => config.formKey || config.slug
 
 export class ContractLoadError extends Error {
   constructor(
@@ -34,7 +42,7 @@ export const fetchRenderContract = async (
   config: RendererApiConfig,
   fetchImpl: typeof fetch = fetch,
 ): Promise<RenderContract> => {
-  const url = new URL(join(config.baseUrl, `/api/public/growth/forms/${encodeURIComponent(config.slug)}`))
+  const url = new URL(join(config.baseUrl, `/api/public/growth/forms/${encodeURIComponent(formRef(config))}`))
 
   if (config.surfaceId) url.searchParams.set('surfaceId', config.surfaceId)
 
@@ -86,7 +94,7 @@ export const verifyPublicEmail = async (
   email: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<EmailVerifyResult> => {
-  const url = join(config.baseUrl, `/api/public/growth/forms/${encodeURIComponent(config.slug)}/verify-email`)
+  const url = join(config.baseUrl, `/api/public/growth/forms/${encodeURIComponent(formRef(config))}/verify-email`)
 
   let response: Response
 
@@ -147,7 +155,7 @@ export const submitPublicForm = async (
   payload: SubmitPayload,
   fetchImpl: typeof fetch = fetch,
 ): Promise<PublicSubmitResult> => {
-  const url = join(config.baseUrl, `/api/public/growth/forms/${encodeURIComponent(config.slug)}/submit`)
+  const url = join(config.baseUrl, `/api/public/growth/forms/${encodeURIComponent(formRef(config))}/submit`)
 
   const body = {
     surfaceId: config.surfaceId,

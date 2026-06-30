@@ -13,7 +13,7 @@ La autorizacion de surface por `origin_allowlist_json` no reemplaza el contrato 
 
 - **Transporte browser:** las rutas publicas que consume el browser (`GET /api/public/growth/forms/{slug}`, `POST /api/public/growth/forms/{slug}/submit`, `POST /api/public/growth/forms/{slug}/verify-email` y sus `OPTIONS`) reflejan `Access-Control-Allow-Origin` solo para origins publicos aprobados.
 - **Autoridad del engine:** form publicado, surface activa, slug permitido, `originAllowed`, consent, honeypot, Turnstile, server validation, rate-limit y destination plan server-only siguen siendo obligatorios.
-- **Secreto y mapping:** el browser nunca recibe destination mapping, portalId, formGuid, HubSpot property names ni secretos.
+- **Secreto y mapping:** el browser nunca recibe destination mapping, portalId, el **HubSpot destination form GUID** (`form_destination.mapping_json.formGuid`), HubSpot property names ni secretos. (Desde TASK-1297, el render contract SÍ expone `form.formKey`: esa es la identidad **pública/opaca de Growth Forms** — NO el HubSpot GUID. Son cosas distintas: `formKey` ≠ HubSpot `formGuid`.)
 
 Allowlist productivo vigente:
 
@@ -23,10 +23,11 @@ Allowlist productivo vigente:
 Smoke live de referencia del primer rollout WordPress AEO:
 
 - `OPTIONS /api/public/growth/forms/efeonce-aeo-diagnostic/submit` -> 204 con ACAO.
-- `GET /api/public/growth/forms/efeonce-aeo-diagnostic?surfaceId=fhsf-efeonce-aeo-diagnostic` -> 200 con ACAO.
+- `GET /api/public/growth/forms/efeonce-aeo-diagnostic?surfaceId=fhsf-efeonce-aeo-diagnostic` -> 200 con ACAO y `render_contract.security.captcha`.
 - `POST /api/public/growth/forms/efeonce-aeo-diagnostic/submit` sin token -> `403 captcha_failed/missing_token` con ACAO y sin persistir submission.
 
 Deploy que introdujo CORS en produccion: `greenhouse-qbxqrrzpm`.
+Deploy que serializa `security.captcha` en produccion: `greenhouse-drl142ckj`.
 
 ## AEO WordPress Bridge
 
@@ -37,7 +38,8 @@ Identificadores vigentes:
 - WordPress page: `postId=250265`, slug `aeo-2`, status `publish`.
 - Elementor widget host: `convers`, classes `gh-aeo-form-card gh-aeo-growth-form-host`.
 - Form slug: `efeonce-aeo-diagnostic`.
-- Form definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-9507f6a7-431d-4215-a699-9c713328b69b` (v3; v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` and v1 `fver-efeonce-aeo-diagnostic-v1` deprecated 2026-06-30).
+- **Form key (identidad estable, TASK-1297):** `b120566a-dd1a-43c8-956a-4e0121e805b8` (AEO). El del AI Visibility Grader es `69cd5269-5f97-4d32-99c4-0b23f41aa2f5` (distinto). Embed/resolución preferida por `form-key`; `slug` queda como alias backward-compatible.
+- Form definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94` (v4, expone `copy.submit="Solicitar diagnóstico gratis →"` + `security.captcha`; v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b` deprecada 2026-06-30 por TASK-1297; v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` y v1 `fver-efeonce-aeo-diagnostic-v1` deprecadas).
 - Host surface: `fhsf-efeonce-aeo-diagnostic`.
 - API base: `https://greenhouse.efeoncepro.com`.
 - Turnstile site key in WordPress: `0x4AAAAAADqwX2R7v-k9pItv`.
@@ -58,7 +60,7 @@ Runtime guardrails:
 
 - WordPress must never know HubSpot mapping, portal credentials, destination secrets or Turnstile secret.
 - The AEO form requires corporate email: the published field uses `validator=corporate_email` and `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. Gmail/free/disposable addresses must be rejected before accepted submission.
-- The AEO v3 form declares `ui_policy_json.security.captcha` with public Turnstile site key `0x4AAAAAADqwX2R7v-k9pItv`, `required:true`, `mode:"invisible"` and `execution:"submit"`. Until TASK-1294 code is deployed to production, public `GET` may expose v3 without serializing `render_contract.security`; public `POST` remains fail-closed without a token.
+- The AEO v3 form declares `ui_policy_json.security.captcha` with public Turnstile site key `0x4AAAAAADqwX2R7v-k9pItv`, `required:true`, `mode:"invisible"` and `execution:"submit"`. Production public `GET` now serializes `render_contract.security.captcha`; public `POST` remains fail-closed without a token.
 - The temporary WordPress bridge must mirror the Growth Forms reactive validation contract: field-level errors close to the input, `aria-invalid`/`aria-describedby`, debounced `/verify-email` for corporate email, and no `/submit` while field validation blocks. Do not regress to status-only/global validation.
 - A submit without Turnstile token must fail as `403 captcha_failed/missing_token` and must not create a lead.
 - The browser origin must pass CORS before the public API response is consumable, but CORS does not replace form/surface/origin validation in the engine.

@@ -32,7 +32,7 @@ El motor depende de tres flags independientes. Para que funcione punta a punta l
 
 **Verdad live:** `vercel env ls` (flag Vercel) + `gcloud run services describe ops-worker --region=us-east4` (flags worker). El ledger es el estado humano, no la verdad.
 
-**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; desde TASK-1294 `<greenhouse-form>` ya emite `captchaToken` cuando el contract declara Turnstile, y desde TASK-1296 AEO v3 declara `ui_policy_json.security.captcha`. No asumir rollout generico hasta desplegar el codigo que serializa `security` en el `GET` publico y pasar smoke WordPress/dataLayer con un form generico real.
+**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; desde TASK-1294 `<greenhouse-form>` ya emite `captchaToken` cuando el contract declara Turnstile, y desde TASK-1296 AEO v3 declara `ui_policy_json.security.captcha`. Produccion ya serializa `render_contract.security.captcha` en el `GET` publico. No asumir rollout generico hasta pasar smoke WordPress/dataLayer con un form generico real.
 
 ## Prender en un environment
 
@@ -85,6 +85,17 @@ Señales reliability (en `/admin/operations`): `growth.forms.dead_letter_count`,
 - No generalizar el publico en produccion sin form publicado, host surface autorizado, CORS revisado, Turnstile operativo, smoke WordPress/dataLayer y sign-off. La excepcion vigente es AEO `/aeo-2/`, que sigue usando host bridge HTML aunque el renderer ya emite `captchaToken` y el form v3 ya declara `security.captcha`; migrarlo requiere task WordPress/visual separada.
 - No llamar a HubSpot inline desde el submit: la entrega SIEMPRE corre en el dispatcher async (overlay #3).
 - No reintentar manualmente una submission `delivered` (duplica el lead en HubSpot — secure-submit NO es idempotente).
+
+## Publicar copy renderizable de un form (TASK-1297)
+
+Para que el renderer muestre un CTA aprobado (ej. `Solicitar diagnóstico gratis →`) en vez del
+default per-tipo, el copy se publica en el render contract (`copy.submit`). NO se edita una versión
+publicada in-place: se clona, se setea el copy y se publica una versión nueva. El patrón canónico es
+un script idempotente que resuelve el form por su `form_key` (identidad estable, no por etiqueta/slug),
+muestra slug/form_id/surface antes de mutar, preserva fields/validación/Turnstile/destinos, y corre
+dry-run por defecto. Ejemplo (AEO): `scripts/growth/activate-aeo-render-copy-contract.ts` —
+`npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-render-copy-contract.ts`
+(dry-run) y `--apply` para publicar. El `form_key` real de un form: `SELECT slug, form_key FROM greenhouse_growth.form_definition`.
 
 ## Referencias tecnicas
 

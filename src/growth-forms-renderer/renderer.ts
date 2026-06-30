@@ -126,6 +126,7 @@ export class FormRenderer {
 
     const base: TelemetryPayload = {
       form_id: this.contract.form.formId,
+      form_key: this.contract.form.formKey,
       form_slug: this.contract.form.slug,
       form_version_id: this.contract.form.formVersionId,
       form_kind: this.contract.form.formKind,

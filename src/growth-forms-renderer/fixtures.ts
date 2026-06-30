@@ -5,6 +5,7 @@ export const staticContractFixture = (over: Partial<RenderContract> = {}): Rende
   contractVersion: 'greenhouse-growth-public-forms.v1',
   form: {
     formId: 'form_demo',
+    formKey: '00000000-0000-4000-8000-0000000000de',
     slug: 'ai-visibility-intake',
     formVersionId: 'fv_demo_1',
     version: 1,

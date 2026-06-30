@@ -31,7 +31,7 @@ const el = (doc: Document, tag: string, attrs: Record<string, string> = {}, text
 }
 
 export class GreenhouseFormElement extends HTMLElement {
-  static readonly observedAttributes = ['form', 'surface', 'locale', 'base-url', 'embed-key']
+  static readonly observedAttributes = ['form', 'form-key', 'surface', 'locale', 'base-url', 'embed-key', 'appearance']
 
   private internals: ElementInternals | null = null
   private renderer: FormRenderer | null = null
@@ -52,6 +52,9 @@ export class GreenhouseFormElement extends HTMLElement {
 
     this.applyRegionSemantics(copy.formRegionAria)
     if (this.getAttribute('color-scheme') === 'light') this.dataset.colorScheme = 'light'
+    // TASK-1297 — `appearance="bare"` (chromeless): el host neutraliza el fill del renderer
+    // (`--ghf-bg: transparent`) sin escribir CSS scoped propio. Transversal a cualquier host.
+    if (this.getAttribute('appearance') === 'bare') this.dataset.appearance = 'bare'
 
     void this.load()
   }
@@ -86,6 +89,9 @@ export class GreenhouseFormElement extends HTMLElement {
     return {
       baseUrl: this.getAttribute('base-url') || DEFAULT_BASE_URL,
       slug: this.getAttribute('form') || '',
+      // TASK-1297 — identidad estable opaca; cuando está presente, el cliente la usa como
+      // segmento de ruta (formRef) en vez del slug. Backward-compatible con `form`.
+      formKey: this.getAttribute('form-key') || undefined,
       surfaceId: this.getAttribute('surface') || undefined,
       embedKey: this.getAttribute('embed-key') || undefined,
     }
@@ -97,8 +103,9 @@ export class GreenhouseFormElement extends HTMLElement {
     ensureStylesInjected(doc)
     const copy = resolveSystemCopy(this.getAttribute('locale') ?? undefined)
     const slug = this.getAttribute('form')
+    const formKey = this.getAttribute('form-key')
 
-    if (!slug) {
+    if (!slug && !formKey) {
       this.renderUnavailable(copy.unavailable)
 
       return

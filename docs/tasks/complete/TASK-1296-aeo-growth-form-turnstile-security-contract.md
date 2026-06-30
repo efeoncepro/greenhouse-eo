@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -21,19 +21,19 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `optional`
-- Status real: `Data rollout aplicado; serializacion publica de security pendiente de deploy TASK-1294`
+- Status real: `Complete 2026-06-30; produccion serializa security.captcha y POST falla cerrado sin token`
 - Rank: `TBD`
 - Domain: `growth|public-site`
 - Blocked by: `none`
-- Branch: `develop` (operador pidio continuar; ejecutar hook con `--develop`)
+- Branch: `codex/aeo-forms-turnstile-followup`
 
 ## Summary
 
-Publicar una nueva version del form `efeonce-aeo-diagnostic` que declare `security.captcha` con Turnstile invisible y site key publica. El renderer ya sabe emitir `captchaToken`; este cambio deja el dato AEO listo sin tocar WordPress live. El cierre completo queda pendiente del deploy del codigo TASK-1294 que serializa `security` en el `GET` publico.
+Publicar una nueva version del form `efeonce-aeo-diagnostic` que declare `security.captcha` con Turnstile invisible y site key publica. El renderer ya sabe emitir `captchaToken`; produccion ya serializa `render_contract.security.captcha` en el `GET` publico. La task queda cerrada sin tocar WordPress live.
 
 ## Why This Task Exists
 
-TASK-1294 completo la paridad tecnica del renderer, pero el `GET /api/public/growth/forms/efeonce-aeo-diagnostic` live aun devuelve la version `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` sin `security`. Sin esa metadata, `<greenhouse-form>` no ejecuta Turnstile aunque el runtime ya pueda hacerlo.
+TASK-1294 completo la paridad tecnica del renderer, pero AEO necesitaba una version publicada que declarara la metadata browser-safe `security.captcha` y un deploy productivo que la serializara en el render contract publico. Sin esa metadata, `<greenhouse-form>` no ejecuta Turnstile aunque el runtime ya pueda hacerlo.
 
 ## Goal
 
@@ -98,12 +98,12 @@ Reglas obligatorias:
 - AEO form slug `efeonce-aeo-diagnostic`.
 - Surface `fhsf-efeonce-aeo-diagnostic`.
 - Public site key `0x4AAAAAADqwX2R7v-k9pItv`.
-- Public GET returns the current published v3 version but no `security` object until TASK-1294 code is deployed.
+- Public GET returns the current published v3 version and serializes `render_contract.security.captcha`.
 - TASK-1294 added renderer support for `security.captcha`.
 
 ### Gap
 
-- The AEO v3 form version now declares `ui_policy_json.security.captcha`; production public GET still needs the TASK-1294 code deploy to serialize that policy into `render_contract.security`.
+- The AEO v3 form version declares `ui_policy_json.security.captcha`; production public GET serializes that policy into `render_contract.security`.
 
 ## Backend/Data Contract
 
@@ -168,7 +168,7 @@ Reglas obligatorias:
 
 - Dry-run output.
 - Apply output with new `formVersionId`.
-- Public GET with ACAO from `https://efeoncepro.com` showing v3 immediately and `security.captcha` after TASK-1294 code deployment.
+- Public GET with ACAO from `https://efeoncepro.com` showing v3 and `security.captcha`.
 - Public submit without token still returns `captcha_failed/missing_token`.
 - No WordPress mutation.
 
@@ -265,7 +265,7 @@ Sin flag nuevo. Existing `GROWTH_FORMS_PUBLIC_API_ENABLED` gates public render/s
 ## Acceptance Criteria
 
 - [x] AEO published form version v3 declares `ui_policy_json.security.captcha` in the source-of-truth form policy.
-- [ ] Public render contract `GET` exposes `security.captcha` after TASK-1294 code is deployed to production.
+- [x] Public render contract `GET` exposes `security.captcha` in production.
 - [x] Previous email gate and HubSpot destination remain intact.
 - [x] Public GET has ACAO, returns v3, and does not expose secrets/mapping.
 - [x] Public POST without token remains fail-closed.
@@ -284,13 +284,13 @@ Sin flag nuevo. Existing `GROWTH_FORMS_PUBLIC_API_ENABLED` gates public render/s
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real.
-- [ ] archivo movido a `complete/` si se cierra.
-- [ ] `docs/tasks/README.md` sincronizado.
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` sincronizado.
-- [ ] `Handoff.md` actualizado.
-- [ ] `changelog.md` actualizado.
-- [ ] docs Growth Forms/AEO actualizados.
+- [x] `Lifecycle` del markdown sincronizado con el estado real.
+- [x] archivo movido a `complete/` si se cierra.
+- [x] `docs/tasks/README.md` sincronizado.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` sincronizado.
+- [x] `Handoff.md` actualizado.
+- [x] `changelog.md` actualizado.
+- [x] docs Growth Forms/AEO actualizados.
 
 ## Follow-ups
 
@@ -348,9 +348,11 @@ Execution evidence 2026-06-30:
 - Dry-run with Cloud SQL proxy showed current v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657`, missing/different Turnstile config and one destination to copy.
 - Apply published v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, copied destination `fdst-f72e46fa-09c1-455e-8585-4bce09dd0c46 -> fdst-04bcf89d-ff7c-4b4b-a6b0-4b415f30ae91` and deprecated v2.
 - Idempotency dry-run after apply reported current v3 with matching Turnstile config and "Nada que hacer."
-- Public `GET` from `https://efeoncepro.com` returns HTTP 200 with ACAO and `formVersionId=fver-9507f6a7-431d-4215-a699-9c713328b69b`, but does not yet serialize `security` because production code does not include TASK-1294.
+- Public `GET` from `https://efeoncepro.com` returns HTTP 200 with ACAO, `formVersionId=fver-9507f6a7-431d-4215-a699-9c713328b69b`, `hasSecurity=true` and `security.captcha={provider:"turnstile",required:true,mode:"invisible",siteKey:"0x4AAAAAADqwX2R7v-k9pItv",execution:"submit"}` on production deploy `greenhouse-drl142ckj`.
 - Public `POST` without `captchaToken` returns HTTP 403 `{ "outcome":"captcha_failed", "message":"missing_token" }` with ACAO.
 - No WordPress, Elementor, Kinsta or hero mutation was performed.
+- Renderer assets `renderer-latest.js` and `renderer-preview.js` respond HTTP 200 and contain the Turnstile/captchaToken path.
+- GitHub CI, CI Deep Verification and Playwright E2E smoke for `main` SHA `1ac49552d` are green.
 
 Plan:
 1. Agregar script idempotente `scripts/growth/activate-aeo-turnstile-security.ts`.

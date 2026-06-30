@@ -20,6 +20,7 @@ import {
   destinationPlanEntrySchema,
   fieldDefinitionSchema,
   renderSecuritySchema,
+  sanitizeRenderCopy,
   successBehaviorSchema,
   telemetryPolicySchema,
 } from './contracts'
@@ -170,6 +171,7 @@ export const compileFormVersion = (
         contractVersion: CONTRACT_VERSION,
         form: {
           formId: definition.form_id,
+          formKey: definition.form_key,
           slug: definition.slug,
           formVersionId: version.form_version_id,
           version: version.version,
@@ -179,7 +181,10 @@ export const compileFormVersion = (
         composition,
         fields,
         conditions: [],
-        copy: (asObject(version.copy_refs_json).copy as Record<string, string>) ?? {},
+        // TASK-1297 — gate browser-safe del copy público: sólo strings acotados llegan al
+        // contrato (descarta nested/no-string/over-length). Antes era un cast crudo: era el
+        // único sub-objeto del render contract sin validar (consent/security ya usan safeParse).
+        copy: sanitizeRenderCopy(asObject(version.copy_refs_json).copy),
         consent: consentDisplay.success ? consentDisplay.data : undefined,
         successBehavior: successParsed.data,
         styleVariant: version.style_variant ?? undefined,
