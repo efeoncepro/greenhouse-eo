@@ -1,3 +1,13 @@
+## Sesion 2026-06-30 — TASK-1296 AEO Growth Form Turnstile security contract — Codex — ✅ complete
+
+> **Pedido:** revisar si el runtime ya permitía avanzar después del pase a producción y cerrar lo pendiente de Forms/Turnstile sin tocar el trabajo de release de Claude.
+>
+> **Resultado:** se cerró `TASK-1296`. La versión publicada AEO v3 (`fver-9507f6a7-431d-4215-a699-9c713328b69b`) ya declara `ui_policy_json.security.captcha` y producción (`greenhouse-drl142ckj`) serializa `render_contract.security.captcha` en `GET /api/public/growth/forms/efeonce-aeo-diagnostic?surfaceId=fhsf-efeonce-aeo-diagnostic`. `POST /submit` sin `captchaToken` sigue fail-closed con `403 captcha_failed/missing_token`.
+>
+> **Evidencia:** contract GET desde `Origin: https://efeoncepro.com` devuelve ACAO, `hasSecurity=true`, Turnstile invisible y site key pública; `renderer-latest.js`/`renderer-preview.js` contienen el path `captchaToken`/Turnstile; CI, CI Deep Verification y Playwright E2E smoke de `main` SHA `1ac49552d` están verdes. El verificador `pnpm public-website:verify-aeo-form-typography` sigue verde en desktop/mobile 390.
+>
+> **No tocado:** WordPress/Elementor/Kinsta/hero no fueron mutados. AEO `/aeo-2/` sigue en bridge HTML hasta una task UI/WordPress separada para migrar a `<greenhouse-form>` con backup Elementor, guard `heroans`, purge Kinsta y Playwright/GVC.
+
 ## Sesion 2026-06-30 — TASK-1294 Growth Forms renderer Turnstile `captchaToken` parity — Codex — ✅ implementado local
 
 > **Pedido:** crear una task formal y arrancar de inmediato la implementación para que el renderer genérico de Growth Forms deje de depender de bridges HTML por landing cuando Turnstile ya está resuelto server-side.

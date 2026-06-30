@@ -23,10 +23,11 @@ Allowlist productivo vigente:
 Smoke live de referencia del primer rollout WordPress AEO:
 
 - `OPTIONS /api/public/growth/forms/efeonce-aeo-diagnostic/submit` -> 204 con ACAO.
-- `GET /api/public/growth/forms/efeonce-aeo-diagnostic?surfaceId=fhsf-efeonce-aeo-diagnostic` -> 200 con ACAO.
+- `GET /api/public/growth/forms/efeonce-aeo-diagnostic?surfaceId=fhsf-efeonce-aeo-diagnostic` -> 200 con ACAO y `render_contract.security.captcha`.
 - `POST /api/public/growth/forms/efeonce-aeo-diagnostic/submit` sin token -> `403 captcha_failed/missing_token` con ACAO y sin persistir submission.
 
 Deploy que introdujo CORS en produccion: `greenhouse-qbxqrrzpm`.
+Deploy que serializa `security.captcha` en produccion: `greenhouse-drl142ckj`.
 
 ## AEO WordPress Bridge
 
@@ -58,7 +59,7 @@ Runtime guardrails:
 
 - WordPress must never know HubSpot mapping, portal credentials, destination secrets or Turnstile secret.
 - The AEO form requires corporate email: the published field uses `validator=corporate_email` and `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. Gmail/free/disposable addresses must be rejected before accepted submission.
-- The AEO v3 form declares `ui_policy_json.security.captcha` with public Turnstile site key `0x4AAAAAADqwX2R7v-k9pItv`, `required:true`, `mode:"invisible"` and `execution:"submit"`. Until TASK-1294 code is deployed to production, public `GET` may expose v3 without serializing `render_contract.security`; public `POST` remains fail-closed without a token.
+- The AEO v3 form declares `ui_policy_json.security.captcha` with public Turnstile site key `0x4AAAAAADqwX2R7v-k9pItv`, `required:true`, `mode:"invisible"` and `execution:"submit"`. Production public `GET` now serializes `render_contract.security.captcha`; public `POST` remains fail-closed without a token.
 - The temporary WordPress bridge must mirror the Growth Forms reactive validation contract: field-level errors close to the input, `aria-invalid`/`aria-describedby`, debounced `/verify-email` for corporate email, and no `/submit` while field validation blocks. Do not regress to status-only/global validation.
 - A submit without Turnstile token must fail as `403 captcha_failed/missing_token` and must not create a lead.
 - The browser origin must pass CORS before the public API response is consumable, but CORS does not replace form/surface/origin validation in the engine.

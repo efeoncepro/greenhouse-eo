@@ -32,7 +32,7 @@ El motor depende de tres flags independientes. Para que funcione punta a punta l
 
 **Verdad live:** `vercel env ls` (flag Vercel) + `gcloud run services describe ops-worker --region=us-east4` (flags worker). El ledger es el estado humano, no la verdad.
 
-**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; desde TASK-1294 `<greenhouse-form>` ya emite `captchaToken` cuando el contract declara Turnstile, y desde TASK-1296 AEO v3 declara `ui_policy_json.security.captcha`. No asumir rollout generico hasta desplegar el codigo que serializa `security` en el `GET` publico y pasar smoke WordPress/dataLayer con un form generico real.
+**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; desde TASK-1294 `<greenhouse-form>` ya emite `captchaToken` cuando el contract declara Turnstile, y desde TASK-1296 AEO v3 declara `ui_policy_json.security.captcha`. Produccion ya serializa `render_contract.security.captcha` en el `GET` publico. No asumir rollout generico hasta pasar smoke WordPress/dataLayer con un form generico real.
 
 ## Prender en un environment
 

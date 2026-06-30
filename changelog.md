@@ -2,6 +2,8 @@
 
 ## 2026-06-30
 
+- **TASK-1296 — AEO Growth Form Turnstile security contract complete.** Producción ya serializa `render_contract.security.captcha` para `efeonce-aeo-diagnostic` v3 (`fver-9507f6a7-431d-4215-a699-9c713328b69b`) con Turnstile invisible y site key pública; el `GET` público devuelve ACAO + `hasSecurity=true` y el `POST /submit` sin `captchaToken` sigue fail-closed con `captcha_failed/missing_token`. No se tocó WordPress/Elementor: `/aeo-2/` continúa en bridge HTML hasta la task visual gobernada de migración a `<greenhouse-form>`.
+
 - **TASK-1294 — Growth Forms renderer Turnstile `captchaToken` parity.** El renderer portable `<greenhouse-form>` ya puede declarar `RenderContract.security.captcha` browser-safe para Turnstile invisible, cargar la API explicit de Cloudflare de forma idempotente, ejecutar el challenge antes del submit y enviar `captchaToken` al endpoint público gobernado. `submitPublicForm()` incluye el token cuando existe y no expone secretos; si el token falla, el renderer no postea. AEO `/aeo-2/` sigue usando el bridge HTML hasta una task WordPress/visual separada con backup Elementor, `heroans` guard, Kinsta purge y Playwright/GVC.
 
 - **Public Website — AEO `/aeo-2/` proof/timing de `Por qué nosotros` corregidos.** Se ajustó CSS page-scoped (`gh-aeo-why-proof-surface-balance-v1`) para compactar el proof de marcas como bloque centrado y eliminar la doble superficie del callout `Ventaja de timing`. Cambio live aplicado con `Document::save()` sobre `postId=250265`; Home, hero y `/aeo` viejo no se tocaron; backup `_gh_aeo_backup_20260630_122440_why_proof_surface`, `heroans` intacto, Kinsta purgada y Playwright desktop/mobile 390 verificó `overflowX=0`, timing con una sola card visible y host del formulario aún transparente.

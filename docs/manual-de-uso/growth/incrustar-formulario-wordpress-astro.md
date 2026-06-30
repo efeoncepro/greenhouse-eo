@@ -28,7 +28,7 @@ consentimiento y destino del lead viven en Greenhouse.
 > de rollout visual, no porque falte el token en el renderer: desde TASK-1294
 > `<greenhouse-form>` emite `captchaToken` cuando el contract declara
 > `security.captcha`, y desde TASK-1296 la version AEO v3 ya declara esa metadata en
-> `ui_policy_json` (la serializacion publica depende del deploy de TASK-1294). El bridge debe seguir consultando `/verify-email` antes de
+> `ui_policy_json`; produccion ya serializa `render_contract.security.captcha`. El bridge debe seguir consultando `/verify-email` antes de
 > Turnstile para respetar el gate corporativo del form (`corporate_email` +
 > `emailPolicy.block_field`) y debe mostrar validación inline por campo, no solo un
 > status global. La migracion a `<greenhouse-form form="efeonce-aeo-diagnostic"
