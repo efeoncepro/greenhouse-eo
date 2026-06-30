@@ -1,5 +1,24 @@
 # TASK-1247 — Growth AI Visibility: Admin Review UI
 
+## Delta 2026-06-30 — validación multi-skill (product-design + seo-aeo + arch) + 6 ajustes
+
+Revisión con `greenhouse-ux` + `seo-aeo` + `arch-architect`, **verificando el backend real** (no supuestos):
+
+**Validado en código (los supuestos se sostienen → scope UI-pura correcto):**
+
+- Backend de 1244 EXISTE: `src/lib/growth/ai-visibility/review/{commands,queries,state}.ts` + rutas `runs/[runId]/review/{approve,reject}/route.ts` + `reviews/route.ts`.
+- Capability `growth.ai_visibility.report.review` **granteada a EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN** (`runtime.ts:234`). El cross-check de grant que esta task marcaba como pendiente **queda RESUELTO** — no hay permission-denied-for-all.
+- Guard de conflicto multi-revisor: el state machine deriva del log append-only `grader_report_reviews` (`pending→approved|rejected`); flip terminal (approved↔rejected) → **`invalid_transition`**; gate fuera de `review_required` → **`not_reviewable`** (ambos 409). El guard YA existe.
+
+**Ajustes a incorporar (de la revisión):**
+
+1. **[seo-aeo · load-bearing] El Evidence Ledger es la 2ª capa de defensa contra el falso-0 (ISSUE-110).** Esta surface es el último gate humano antes de mandar un diagnóstico AEO a un prospecto. Errores más peligrosos de publicar, en orden: (a) **falso-negativo/falso-0** ("no apareces en IA" cuando sí te citan — la clase ISSUE-110, destruye credibilidad al instante); (b) **cita/claim alucinado**; (c) **evidencia stale** (los motores cambian semanalmente); (d) **conflación entre motores** (~11% de solapamiento ChatGPT↔Perplexity → un veredicto único sin desglose por-motor es engañoso). Por eso el ledger DEBE mostrar, como evidencia bounded: **presencia por-motor con la probe verbatim + snippet de respuesta + `as_of` por motor**, **flag de frescura/staleness**, y **procedencia de cada claim público** (cada afirmación del DTO trazable a una respuesta de motor bounded). Marco de seguridad: motor brand-aware (EPIC-021) = capa 1; este gate humano = capa 2 del MISMO falso-0.
+2. **[product-design] Primitive lookup de `reconciler` ANTES de asumir effort.** La task asume `AdaptiveSidecarLayout` variante `reconciler` como si existiera. En Discovery: grep `src/components/greenhouse/primitives` — si el variant NO existe, nacerlo es protocolo Primitive+Variants+Kinds completo (Lab interno `/admin/design-system/<nombre>` + GVC + nodo AXIS), lo que **sube el effort** (deja de ser `ui-standard`). Reportar reuse/extend/new ANTES de codear.
+3. **[product-design] La cola densa usa `DataTableShell`, no MUI crudo.** Las filas (brand, score, gate reason, risk type, evidence completeness, age, reviewer/lock, conflict) son >8 columnas → regla dura: `<DataTableShell>`.
+4. **[arch] Nombrar los error codes canónicos del conflicto.** La UI mapea `invalid_transition` / `not_reviewable` (409) → copy honesto "este reporte ya fue revisado por otro operador (actualizando cola)", NO "guard de versión/estado" genérico ni error genérico. El guard ya existe; la UI solo traduce esos códigos. La aprobación está ligada a la `score_version` revisada (re-score → nueva versión `pending`): mostrar la `score_version` vigente y detectar staleness.
+5. **[seo + state-design] Estado de abstención del grader (`insufficient_data` / `confidence=none`) de primera clase.** "Evidencia incompleta porque una probe falló" ≠ "el grader se abstuvo por evidencia insuficiente". Son decisiones de review distintas; un abstención normalmente NO se publica. Agregar al state inventory.
+6. **[arch · menor] `Backend impact: none` es impreciso** — hay una migración de seed del viewCode (`administracion.growth_ai_visibility` en `VIEW_REGISTRY`). Es plumbing de UI-access (no contrato de negocio) → el profile `ui-ux` está bien, pero la migración sigue la regla seed+VIEW_REGISTRY mismo-PR (TASK-827/982).
+
 ## Delta 2026-06-26 — desbloqueada por TASK-1244 (complete dev)
 
 El backend del gate humano ya existe — esta UI es cliente puro de él (Full API parity). Consumir, sin lógica nueva de negocio:
@@ -130,11 +149,11 @@ Reglas obligatorias:
 
 - Surface: `/admin/growth/ai-visibility` como entrada principal de menú **Growth → AEO Grader**; `/review` puede ser child/deep link. **Ruta admin interna** → viewCode routeGroup `admin`, NUNCA `client_*`.
 - Composition Shell: `aplica` — declarar composición `leadPlusContext` (cola lead + evidencia/decisión context); regiones singleton, sin grid/morph ad-hoc.
-- Primitive decision: `reuse` — CompositionShell, AdaptiveSidecar, GreenhouseAsyncActionButton, GreenhouseCommandFeedback, tables/cards existentes.
+- Primitive decision: `reuse` — CompositionShell, AdaptiveSidecar, GreenhouseAsyncActionButton, GreenhouseCommandFeedback, cards existentes. **Cola densa (>8 cols: brand, score, gate reason, risk type, evidence completeness, age, reviewer/lock, conflict) → `DataTableShell` obligatorio (regla dura), NO MUI `<Table>` crudo.** **⚠️ Primitive lookup pendiente en Discovery:** confirmar si `AdaptiveSidecarLayout` ya tiene el variant `reconciler` (`grep src/components/greenhouse/primitives`); si NO existe, nacerlo es protocolo Primitive+Variants+Kinds COMPLETO (Lab interno + GVC + nodo AXIS) → sube el effort sobre `ui-standard`. Reportar reuse/extend/new ANTES de codear.
 - Adaptive density / The Seam: `aplica` — filas/cards de cola condensan en sidebars y mobile con `card-density` (condensación honesta, el dato clave nunca desaparece).
 - Floating/Sidecar/Dialog decision: AdaptiveSidecar para detalle, mapeado a variante oficial **`reconciler`** (flujo de adjudicación aprobar/rechazar con evidencia) — NO drawer/modal custom, desktop = lane in-flow. Dialog solo para la confirmación del rechazo (acción de consecuencia legal/pública).
 - Copy source: `src/config/greenhouse-nomenclature.ts` / `src/config/greenhouse-navigation-copy.ts` para label/subtitle de menú; `src/lib/copy/growth.ts` para copy funcional de la surface (invocar `greenhouse-ux-writing`, es-CL).
-- Access impact: `views|entitlements` — seed `administracion.growth_ai_visibility` con label **AEO Grader** bajo Growth y capability `growth.ai_visibility.report.review` definida por TASK-1244. **Cross-check:** confirmar que 1244 la granteó a ≥1 ROLE_CODE real interno (no existe rol `growth_*`); sin grant, la ruta queda permission-denied para todos. Nueva ruta `(dashboard)` → entrada obligatoria en `route-reachability-manifest.ts` + seed viewCode en `VIEW_REGISTRY` el mismo PR (TASK-827/982).
+- Access impact: `views|entitlements` — seed `administracion.growth_ai_visibility` con label **AEO Grader** bajo Growth y capability `growth.ai_visibility.report.review` definida por TASK-1244. **Cross-check RESUELTO (verificado 2026-06-30):** la capability está granteada a **EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN** en `src/lib/entitlements/runtime.ts:234` — no hay permission-denied-for-all. Nueva ruta `(dashboard)` → entrada obligatoria en `route-reachability-manifest.ts` + seed viewCode en `VIEW_REGISTRY` el mismo PR (TASK-827/982).
 
 ### Approved visual direction
 
@@ -152,6 +171,11 @@ Reglas obligatorias:
 - Evidence ledger merge from option 2:
   - Include a chronological/checklist-style evidence ledger for score gate, accuracy detector, public snapshot check, provider coverage and publish readiness.
   - Ledger rows show status, bounded detail, impact and timestamp; use evidence peeks only for bounded internal snippets, never raw provider dumps.
+  - **[seo-aeo · capa-2 anti-falso-0 ISSUE-110] El ledger DEBE incluir, como evidencia bounded:**
+    - **Presencia por-motor con la probe verbatim + el snippet de respuesta del motor + `as_of` por motor** (ChatGPT/Perplexity/Gemini/AI Overviews por separado — NO un veredicto único blended; ~11% de solapamiento entre motores). Es el check que deja al reviewer sanity-checkear "¿probamos bien?" antes de afirmar "no apareces en IA".
+    - **Flag de frescura/staleness:** edad del `as_of` por motor; los motores cambian semanalmente → una probe vieja es señal de rechazo.
+    - **Procedencia de cada claim público:** cada afirmación del DTO público trazable a la respuesta de motor bounded que la respalda (anti cita/claim alucinado). Un claim sin respaldo trazable = no publicable.
+  - **Errores más peligrosos de publicar (orden):** falso-negativo/falso-0 > cita alucinada > evidencia stale > conflación entre motores. El reviewer debe poder detectar los 4 desde el ledger.
 - Reconciler checklist merge from option 3:
   - Decision panel includes a public-safe publish readiness checklist: exact public DTO preview, no raw evidence, disclaimer present, evidence complete or explicitly partial, rejection reason captured.
   - Conflict state is first-class: "este reporte ya fue revisado/actualizado por otro operador" with refresh path, not a generic error.
@@ -167,7 +191,8 @@ Reglas obligatorias:
 - Empty: no hay reportes pendientes.
 - Error: reader falla o comando rechaza.
 - Degraded / partial: evidencia incompleta o run partial — **mostrar explícitamente "evidencia incompleta/Pendiente" (nunca render confiado sobre un slice fallido): aprobar sobre evidencia silenciosamente incompleta es el riesgo de seguridad #1 de esta surface.**
-- **Stale / conflicto entre revisores:** dos operadores abren el mismo `review_required`; uno acciona y el otro tiene una vista vieja. El comando de TASK-1244 debe tener guard de versión/estado; la UI surface el conflicto honesto ("Este reporte ya fue revisado por X — actualizando cola"), refresca y NO muestra error genérico. (No es el doble-submit del mismo usuario; es concurrencia multi-revisor.)
+- **Abstención del grader (`insufficient_data` / `confidence=none`):** distinto de "una probe falló" — acá el grader MISMO se abstuvo por evidencia insuficiente. Mostrarlo como estado de review de primera clase (badge propio, copy explícito); un abstención normalmente **NO se publica**. No confundir con `degraded/partial`.
+- **Stale / conflicto entre revisores:** dos operadores abren el mismo `review_required`; uno acciona y el otro tiene una vista vieja. **El guard YA existe en el command de 1244** (state machine sobre el log append-only `grader_report_reviews`): un flip terminal (approved↔rejected) lanza **`invalid_transition`** y accionar un gate ya fuera de `review_required` lanza **`not_reviewable`** (ambos 409). La UI **mapea esos dos códigos** → copy honesto "Este reporte ya fue revisado por X — actualizando cola", refresca y NO muestra error genérico. Además la aprobación está ligada a la `score_version` revisada (un re-score genera una nueva versión `pending`): mostrar la `score_version` vigente y detectar staleness. (No es el doble-submit del mismo usuario; es concurrencia multi-revisor.)
 - Permission denied: sin capability `report.review`.
 - Long content: evidencia/reasons scroll interno, no pagina horizontal.
 - Mobile / compact: cola y detalle apilados/drawer.
@@ -317,6 +342,7 @@ La UI debe ser un consumer del contrato `TASK-1244`: lista pendientes, lee detal
 **Esta es una surface de gate de seguridad — el diseño debe reflejarlo:**
 
 - **WYSIWYG del artefacto público:** el reviewer ve el **DTO público EXACTO que se va a publicar** (el mismo `PublicGraderReport` que vería el prospecto, vía el preview de TASK-1239) lado a lado con las razones internas bounded. Se aprueba el artefacto real, no una aproximación.
+- **[capa-2 anti-falso-0] Evidencia por-motor + frescura + procedencia:** junto al DTO, el ledger expone **presencia por-motor** (probe verbatim + snippet del motor + `as_of`, ChatGPT/Perplexity/Gemini/AI Overviews por separado), **frescura** (probe vieja = señal de rechazo; los motores cambian semanalmente) y **procedencia** (cada claim público trazable a una respuesta bounded). Es la segunda capa del mismo falso-0 que el motor (EPIC-021) cierra en la capa 1: el reviewer debe poder cazar un falso-0/cita alucinada/evidencia stale ANTES de publicar a un prospecto.
 - **Framing de consecuencia (no sesgar a aprobar):** "Aprobar" comunica su consecuencia ("Esto publica el reporte al prospecto"); aprobar y rechazar tienen igual peso visual; ninguna acción de consecuencia está pre-enfocada por default. La confirmación de rechazo va en Dialog.
 - **Razón de rechazo = campo `forms-ux`:** label-above, `min length` razonable, error inline ("qué falta"), preserva el texto en error de comando. La razón ES el registro de auditoría del rechazo (la consume el command de 1244); tratarla como dato sensible (no loggear crudo si trae contexto del prospecto).
 
@@ -379,7 +405,10 @@ Slice 1 -> Slice 2 -> Slice 3 -> Slice 4. No conectar acciones antes de tener es
 - [ ] No se filtra raw provider text o accuracy findings al publico; esta surface es interna.
 - [ ] Sidecar = `AdaptiveSidecarLayout` variante `reconciler` (no drawer/modal custom); Composition Shell con composición declarada.
 - [ ] El reviewer ve el DTO público EXACTO (WYSIWYG) + razones internas; evidencia incompleta se muestra explícita (no render confiado sobre slice fallido).
-- [ ] Conflicto multi-revisor surface honesto (no error genérico) apoyado en guard de versión/estado del command de 1244.
+- [ ] **[anti-falso-0 ISSUE-110]** El Evidence Ledger muestra **presencia por-motor** (probe verbatim + snippet + `as_of` por motor, sin blendear), **flag de frescura/staleness**, y **procedencia bounded de cada claim público** (claim sin respaldo trazable = no publicable).
+- [ ] Estado de **abstención del grader** (`insufficient_data`/`confidence=none`) renderizado como review distinto de `degraded/partial`; un abstención no se publica por default.
+- [ ] Cola densa (>8 cols) implementada con **`DataTableShell`** (no MUI `<Table>` crudo); decisión de primitive del `reconciler` reportada (reuse/extend/new) antes de codear.
+- [ ] Conflicto multi-revisor: la UI **mapea `invalid_transition` / `not_reviewable` (409)** del command de 1244 → copy honesto "ya fue revisado por otro" + refresh (no error genérico); muestra la `score_version` vigente.
 - [ ] Razón de rechazo con `forms-ux` (label-above, min length, preserva en error) y tratada como dato sensible.
 - [ ] Ruta `(dashboard)` en `route-reachability-manifest.ts` + viewCode seed en `VIEW_REGISTRY` (mismo PR); capability `report.review` confirmada con grant a ROLE_CODE real.
 
