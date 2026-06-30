@@ -112,13 +112,24 @@ Mandatory gate after touching conversion/form CSS or HTML:
 pnpm public-website:verify-aeo-form-typography
 ```
 
+## FAQ Contract
+
+- FAQ root: `faq5b46`, `.gh-aeo-faq`.
+- FAQ widget: `faqlist`, `ohio_accordion`, `.gh-aeo-faq-accordion`, 9 tabs.
+- Schema/init widget: `schema3`, `.gh-aeo-jsonld`.
+- Keep JSON-LD `ProfessionalService` + `FAQPage` in `schema3`.
+- Current scoped initializer: `gh-aeo-faq-accordion-init-v5`.
+- The initializer owns click/keyboard, ARIA, measured-height motion, and toggle-close behavior. Clicking an open item must close it and leave no active item (`activeIndex=-1`).
+- Do not restore `height:auto`/`display:none` as the transition mechanism; it causes the visible pop. Use measured pixel height and reduced-motion fallback.
+- Current CSS markers: `gh-aeo-faq-compact-density-v1`, `gh-aeo-faq-compact-density-v2`, `gh-aeo-faq-accordion-motion-v1`, `gh-aeo-faq-accordion-motion-v2`.
+
 ## Verification Checklist
 
 - `heroans` hash unchanged for non-hero work.
 - Desktop and mobile 390px screenshots/measurements.
 - `scrollWidth == clientWidth`.
 - 7 post-hero Ohio badges if post-hero section headers are touched.
-- FAQ accordion still opens/collapses.
+- FAQ accordion opens, closes on second click, and animates with intermediate heights.
 - Conversion form has one visible card, no technical kicker.
 - Required errors inline for `firstName`, `email`, `brandWebsite`.
 - Gmail/free email: `/verify-email >= 1`, `/submit = 0`, inline error.

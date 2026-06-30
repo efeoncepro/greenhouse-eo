@@ -173,16 +173,17 @@ Elementos clave:
 | Card izquierda | `whyacar`, `.gh-aeo-why-compare-card gh-aeo-why-compare-card-muted` | `Medir por tu cuenta` / `Te muestra el problema`; debe explicar que una herramienta o analisis suelto no cierra el gap. |
 | Card derecha | `whybcar`, `.gh-aeo-why-compare-card gh-aeo-why-compare-card-primary` | `Surround Discovery` / `Lo convierte en sistema`; debe conectar estrategia, arquitectura de contenido, ejecucion y pipeline. |
 | Objecion | `whybuil`, `.gh-aeo-note gh-aeo-why-objection` | Banda navy `Objeción honesta`: responde si el equipo interno puede hacerlo con velocidad, metodo y foco. |
-| Proof strip | `whylogo`, `.gh-aeo-why-proof-strip` | Texto/pills de marcas LatAm (`Sky Airline`, `Pinturas Berel`, `ANAM`, `+120 marcas · 4 países`). |
+| Proof strip | `whylogo`, `.gh-aeo-why-proof-widget` | Texto/pills de marcas LatAm (`Sky Airline`, `Pinturas Berel`, `ANAM`, `+120 marcas · 4 países`) en una composicion centrada y compacta; no volver al grid 2-column con aire muerto. |
 | Credenciales | `whycred`, `.gh-aeo-why-cred-grid` | Grid de dos credenciales: `HubSpot Solutions Partner` y `Liderado por Julio Reyes`. |
 | Credencial HubSpot | `credaca`, `.gh-aeo-why-cred-card` | Enfatiza integracion con la suite comercial y pipeline. |
 | Credencial metodo | `credbca`, `.gh-aeo-why-cred-card` | Enfatiza Surround Discovery como metodo propio y liderazgo publico. |
-| Timing | `whyearl`, `.gh-aeo-why-timing` | Callout teal suave: `Ventaja de timing`, con cierre `Sé quien lo vio venir.` |
+| Timing | `whyearl`, `.gh-aeo-why-early-widget` | Callout teal suave de una sola surface visible: `Ventaja de timing`, con cierre `Sé quien lo vio venir.` El widget puede tener fondo/borde, pero el `<p>` interno debe quedar transparente para evitar card sobre card. |
 
 Guardrails:
 
 - No reintroducir HTML rico con nested `<div>` dentro de widgets `text-editor` en esta seccion. Elementor/Ohio puede descartar el contenido y renderizar lorem ipsum. Usar markup simple (`small`, `h3`, `p`, `ul/li`, `span`) o mover piezas complejas a un widget/HTML widget seguro.
 - Si se agregan logos reales en lugar de pills de texto, hacerlo como widget seguro y verificar carga live. Assets encontrados durante la iteracion: Sky (`EO_Logo-SKY.png`) y ANAM (`EO_Logo-Anam.webp`); no se encontro asset Berel estable.
+- El proof de marcas y el callout de timing deben seguir siendo superficies sobrias y escaneables: proof centrado, sin desbalance izquierda/derecha; timing con una sola card visual, no widget con card interna adicional.
 - Mantener el acento del H2 color-only: sin underline, fondo, glow, borde, `text-shadow` ni pseudo-elementos.
 - La microinteraccion aprobada es sutil: hover con desplazamiento corto en cards y `prefers-reduced-motion` sin transiciones ni transform. No convertirlo en animacion continua.
 - Mantener tracking de display solo en el H2. Títulos internos, labels, pills, body copy y proof marks deben quedar con `letter-spacing: normal/0` y sin uppercase forzado.
@@ -228,18 +229,18 @@ Elementos clave:
 | --- | --- | --- |
 | Root | `faq5b46`, `.gh-aeo-faq` | Seccion clara; no debe volver a un listado plano ni a `<details>` manual. |
 | Header | `faqhead`, `.gh-aeo-section-header` | Eyebrow `Antes de que preguntes` y H2 `Preguntas frecuentes`. |
-| FAQ accordion | `faqlist`, widget `ohio_accordion`, `.gh-aeo-faq-accordion` | Primitive Ohio canonica para FAQ. `block_layout=outline`, 9 tabs, primera pregunta abierta por defecto. |
+| FAQ accordion | `faqlist`, widget `ohio_accordion`, `.gh-aeo-faq-accordion` | Primitive Ohio canonica para FAQ. `block_layout=outline`, 9 tabs, primera pregunta abierta por defecto. Densidad compacta: ancho maximo `920px`, filas cerradas de ~63px desktop y ~59-68px mobile. |
 | CTA | `faqctad`, widget `ohio_button` | `Solicita tu diagnóstico gratis`; mantener centrado y sin halo/glow extra. |
-| Schema + init | `schema3`, widget `html`, `.gh-aeo-jsonld` | Conserva JSON-LD `ProfessionalService` + `FAQPage` y contiene inicializador scoped vigente `gh-aeo-faq-accordion-init-v2` para apertura/cierre y ARIA. |
+| Schema + init | `schema3`, widget `html`, `.gh-aeo-jsonld` | Conserva JSON-LD `ProfessionalService` + `FAQPage` y contiene inicializador scoped vigente `gh-aeo-faq-accordion-init-v5` para apertura/cierre, ARIA, toggle del item activo y motion por altura medida. |
 
 Guardrails:
 
 - Usar `ohio_accordion` para FAQ; no reintroducir `text-editor` con `<details>`.
 - Mantener los tabs como `list_title`, `list_content_type=editor`, `list_content_editor`; no usar templates Elementor para respuestas simples.
-- El runtime publico de esta landing necesito un inicializador scoped en `schema3` para que la primitive Ohio alterne paneles y exponga `aria-expanded`/`aria-controls`. El v1 renderizaba, pero el handler Ohio podia dejar `visible` sin `active` y colapsar el cuerpo a altura `0`; el vigente v2 captura click/keyboard en `.accordion-button`, `.icon-button` y `.accordion-header` y fija `active`, `visible`, `hidden`, `display`, `height` y ARIA. Si se elimina, verificar antes que el handler nativo de Ohio siga abriendo/cerrando en frontend publico.
-- El estilo aprobado vive en CSS page-scoped con markers `gh-aeo-faq-ohio-accordion-v1`, `gh-aeo-faq-ohio-accordion-active-body-fix-v1` y `gh-aeo-faq-accordion-body-padding-v2`: superficie unica, header activo teal suave, cuerpo alineado opticamente con el titulo.
+- El runtime publico de esta landing necesita un inicializador scoped en `schema3` para que la primitive Ohio alterne paneles y exponga `aria-expanded`/`aria-controls`. El v1 renderizaba, pero el handler Ohio podia dejar `visible` sin `active` y colapsar el cuerpo a altura `0`; el v2 arreglo click/keyboard pero forzaba `display:none`/`height:auto`, generando un pop visual. El vigente v5 captura click/keyboard en `.accordion-button`, `.icon-button` y `.accordion-header`, abre un item cerrando los demas, permite cerrar el item activo con un segundo click, escribe `height` inline con prioridad para ganarle a Ohio y anima `0px -> scrollHeight` con reduced-motion respetado. Si se elimina, verificar antes que el handler nativo de Ohio siga abriendo/cerrando en frontend publico.
+- El estilo aprobado vive en CSS page-scoped con markers `gh-aeo-faq-ohio-accordion-v1`, `gh-aeo-faq-ohio-accordion-active-body-fix-v1`, `gh-aeo-faq-accordion-body-padding-v2`, `gh-aeo-faq-compact-density-v1`, `gh-aeo-faq-compact-density-v2`, `gh-aeo-faq-accordion-motion-v1` y `gh-aeo-faq-accordion-motion-v2`: superficie unica, header activo teal suave, cuerpo alineado opticamente con el titulo y apertura/cierre por altura medida. No volver a `height:auto` para transicionar; CSS no interpola `auto` y el resultado se siente como pop.
 - Mantener `letter-spacing: normal` y `text-transform: none` en preguntas/respuestas; el H2 conserva tracking de display.
-- Verificar desktop/mobile/reduced-motion: `hasAccordion=true`, `hasDetails=false`, 9 items, click funcional en fila/icono/titulo, panel abierto con altura real, `scrollWidth == clientWidth`, `transitionDuration=0s` en reduced-motion.
+- Verificar desktop/mobile/reduced-motion: `hasAccordion=true`, `hasDetails=false`, 9 items, click funcional en fila/icono/titulo, panel abierto con altura real, segundo click sobre el activo deja `activeIndex=-1` y `aria-expanded=false`, muestras intermedias durante la apertura/cierre, `scrollWidth == clientWidth`, `transitionDuration=0s` en reduced-motion.
 
 ## Contrato visual post-hero
 
@@ -345,6 +346,7 @@ Evidencia de cierre acumulada:
 - Verificacion tipografica de levels: H2 con tracking ajustado al hero, `cinco niveles` en teal color-only, terminos ingleses alineados opticamente con sus titulos, y lead/titulos internos/cuerpos/eyebrow/badges/labels de resultado/`Surround Discovery`/chips de metodo con `letter-spacing: normal/0` y sin `text-transform: uppercase` forzado para alinearlo al ritmo del hero.
 - Verificacion de cohesion post-hero 2026-06-30: 7 eyebrows (`markete`, `pipelin`, `levelse`, `diagnos`, `whyeyeb`, `convers`, `faqeyeb`) convertidos a `elementor-widget-ohio_badge`; cada uno renderiza `.ohio-widget.badge.-outlined`, sin `::before/::after`, desktop/mobile 390 con `overflowX=0`, FAQ funcional y reduced-motion sin transforms.
 - Verificacion tipografica del formulario 2026-06-30: el H2 de conversion y `.gh-aeo-growth-form-title` usan el contrato de heading `letter-spacing:-0.045em` (`Descubre...` computa `-1.944px` desktop / `-1.35px` mobile; `Solicita...` computa `-1.53px` desktop / `-1.305px` mobile). Lead, labels, inputs, CTA, trust copy y links mantienen `letter-spacing: normal/0`. Se documento como drift frecuente de Ohio/Elementor: una regla page-scoped con `!important` puede pisar el CSS correcto del bridge, asi que la evidencia aceptable es computed style desktop/mobile, no inspeccion estatica. El gate durable es `pnpm public-website:verify-aeo-form-typography`, que falla si el titulo interno vuelve a `normal/0` o si aparece overflow en desktop/mobile 390. Desktop/mobile 390 sin overflow y validacion reactiva intacta.
+- Verificacion visual de `why` 2026-06-30: CSS page-scoped `gh-aeo-why-proof-surface-balance-v1` compacta `whylogo` como proof centrado y elimina la doble surface de `whyearl` reseteando el `<p>` interno. Backup meta `_gh_aeo_backup_20260630_122440_why_proof_surface`; `heroans` preservado (`e0b951b2456a83578cd9e22005900521`); Kinsta cache purgada. Playwright desktop/mobile 390: `scrollWidth == clientWidth`, proof sin desbalance de columnas, timing con un solo borde/fondo visible y conversion form host transparente. Capturas: `.captures/aeo-why-proof-surface-balance-v1/`.
 - Hash `heroans` estable en mutaciones de avatar group, dark section y H1 accent.
 
 ## Lo que no se debe repetir
