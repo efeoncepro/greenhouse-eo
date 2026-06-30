@@ -147,6 +147,8 @@ export interface RenderContract {
   contractVersion: string
   form: {
     formId: string
+    /** TASK-1297 — identidad estable/opaca pública (UUID). NUNCA el HubSpot destination formGuid. */
+    formKey: string
     slug: string
     formVersionId: string
     version: number

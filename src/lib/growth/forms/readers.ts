@@ -15,6 +15,7 @@ import {
   type FormHostSurfaceRow,
   type FormSubmissionRow,
   getFormDefinitionById,
+  getFormDefinitionByKey,
   getHostSurfaceById,
   getPublishedVersionBySlug,
   getConsentSnapshot,
@@ -68,6 +69,45 @@ export const getPublishedRenderContract = async (
   }
 
   return contract
+}
+
+/**
+ * TASK-1297 — un `formRef` público puede ser el `slug` (alias humano/legacy) o el
+ * `form_key` (identidad estable opaca, UUID). UUID estricto v4-ish (hex 8-4-4-4-12) =
+ * key; cualquier otra cosa = slug. Los slugs son kebab humano (`efeonce-aeo-diagnostic`),
+ * jamás con forma UUID → la desambiguación es determinista y sin colisión.
+ */
+const FORM_KEY_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export const isFormKey = (ref: string): boolean => FORM_KEY_RE.test(ref)
+
+/**
+ * Resuelve un `formRef` (slug o form_key) al `slug` canónico. Los consumers públicos
+ * (render/submit) siguen operando por slug aguas abajo (surface allowlist, dedupe), así
+ * que la resolución por key se centraliza acá: un primitive, los 3 endpoints lo reusan.
+ * Devuelve `null` si el ref es un key que no existe o cuya definición no está activa.
+ */
+export const resolveFormSlugFromRef = async (ref: string): Promise<string | null> => {
+  if (!isFormKey(ref)) return ref
+  const definition = await getFormDefinitionByKey(ref)
+
+  return definition && definition.status === 'active' ? definition.slug : null
+}
+
+/**
+ * Render contract público resuelto por `formRef` (slug o form_key). Mantiene la surface
+ * policy por slug (mismo path que `getPublishedRenderContract`). Es lo que permite que
+ * `<greenhouse-form form-key="...">` cargue por identidad estable sin ruta ni CORS nueva.
+ */
+export const getPublishedRenderContractByRef = async (
+  ref: string,
+  options: GetRenderContractOptions = {},
+): Promise<RenderContract | null> => {
+  const slug = await resolveFormSlugFromRef(ref)
+
+  if (!slug) return null
+
+  return getPublishedRenderContract(slug, options)
 }
 
 // ─── Admin readers ────────────────────────────────────────────────────────────
@@ -222,6 +262,8 @@ export const resolveDestinationReadiness = (destinations: Pick<FormDestinationRo
  */
 export interface InsertableFormCatalogEntryVm {
   displayName: string
+  /** TASK-1297 — identidad estable/opaca; preferir sobre slug para embeds/mutaciones. */
+  formKey: string
   formSlug: string
   formKind: string
   /** Versión publicada (la insertable). */
@@ -275,6 +317,7 @@ export const listInsertableFormCatalog = async (
 
     entries.push({
       displayName: definition.name,
+      formKey: definition.form_key,
       formSlug: definition.slug,
       formKind: definition.form_kind,
       version: publishedVersion.version,

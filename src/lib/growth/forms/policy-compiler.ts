@@ -170,6 +170,7 @@ export const compileFormVersion = (
         contractVersion: CONTRACT_VERSION,
         form: {
           formId: definition.form_id,
+          formKey: definition.form_key,
           slug: definition.slug,
           formVersionId: version.form_version_id,
           version: version.version,

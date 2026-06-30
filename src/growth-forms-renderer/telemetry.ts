@@ -23,6 +23,7 @@ export type RendererGtmEvent = (typeof RENDERER_GTM_EVENTS)[number]
 /** Espejo de `TELEMETRY_ALLOWED_PAYLOAD_KEYS`. Solo estas claves cruzan al browser. */
 export const RENDERER_ALLOWED_PAYLOAD_KEYS = [
   'form_id',
+  'form_key',
   'form_slug',
   'form_version_id',
   'form_kind',

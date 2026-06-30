@@ -148,6 +148,7 @@ export type GtmEventName = (typeof GTM_EVENT_NAMES)[number]
 /** Claves de payload PERMITIDAS en analytics browser-safe (Arch §15). */
 export const TELEMETRY_ALLOWED_PAYLOAD_KEYS = [
   'form_id',
+  'form_key',
   'form_slug',
   'form_version_id',
   'form_kind',
@@ -230,6 +231,34 @@ export type FieldDefinition = z.infer<typeof fieldDefinitionSchema>
 
 export const CONTRACT_VERSION = 'greenhouse-growth-public-forms.v1'
 
+/**
+ * TASK-1297 — Render copy contract (browser-safe). El `copy` del render contract es un
+ * mapa `copyRef → string` que el renderer usa para labels/help/submit/success. Es PÚBLICO,
+ * así que sólo puede contener strings acotados: NUNCA objetos anidados, números, PII
+ * estructurada ni payloads. `copyDisplaySchema` documenta la forma canónica;
+ * `sanitizeRenderCopy` la aplica por-entrada (tolerante: conserva las entradas válidas y
+ * descarta las inseguras, en vez de tirar todo el copy si una entrada falla) en el borde
+ * de serialización del `policy-compiler` — alineado con `consentDisplay`/`security`, que
+ * el compiler ya valida con `safeParse` antes de exponerlos.
+ */
+export const COPY_KEY_MAX = 120
+export const COPY_VALUE_MAX = 4000
+export const copyDisplaySchema = z.record(z.string().min(1).max(COPY_KEY_MAX), z.string().max(COPY_VALUE_MAX))
+export type CopyDisplay = z.infer<typeof copyDisplaySchema>
+
+export const sanitizeRenderCopy = (raw: unknown): Record<string, string> => {
+  const source = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {}
+  const out: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(source)) {
+    if (typeof key !== 'string' || key.length === 0 || key.length > COPY_KEY_MAX) continue
+    if (typeof value !== 'string' || value.length > COPY_VALUE_MAX) continue
+    out[key] = value
+  }
+
+  return out
+}
+
 export const consentDisplaySchema = z.object({
   consentPolicyVersion: z.string().optional(),
   noticeText: z.string().max(4000).optional(),
@@ -267,6 +296,8 @@ export const renderContractSchema = z.object({
   contractVersion: z.literal(CONTRACT_VERSION),
   form: z.object({
     formId: z.string(),
+    /** TASK-1297 — identidad estable/opaca pública (UUID). NUNCA el HubSpot destination formGuid. */
+    formKey: z.string(),
     slug: z.string(),
     formVersionId: z.string(),
     version: z.number().int(),
