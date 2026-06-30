@@ -7,7 +7,7 @@
 - Product Design asset: `live WordPress /aeo-2/ conversion section`
 - Intended consumers: public visitors on `https://efeoncepro.com/aeo-2/`
 - Copy source: Growth Forms render contract + AEO landing wrapper copy
-- Primitive decision: `reuse` — `<greenhouse-form form-guid>` portable renderer inside existing AEO conversion section
+- Primitive decision: `reuse` — `<greenhouse-form form-key>` portable renderer inside existing AEO conversion section
 - UI ready target: `yes`
 
 ## Brief
@@ -24,8 +24,8 @@
 |---|---|---|---|---|
 | 0 | Section band | Keep the light AEO conversion area and spacing | Elementor section `.gh-aeo-conversion` | WordPress page `postId=250265` |
 | 1 | Header | Preserve public-facing conversion promise | Existing Ohio heading/badge widgets | AEO page content |
-| 2 | Form shell | Host one visible card without card-on-card | Existing `.gh-aeo-growth-form-card` wrapper or renderer-themed host | WordPress HTML widget + renderer |
-| 3 | Form fields | Render canonical fields and validation | `<greenhouse-form form-guid>` | AEO `formGuid` render contract |
+| 2 | Form shell | One visible card, no card-on-card (Opción A) | Existing `.gh-aeo-growth-form-card` wraps the renderer; renderer `--ghf-bg: transparent` (renderer draws no card) | WordPress markup + renderer |
+| 3 | Form fields | Render canonical fields and validation | `<greenhouse-form form-key … color-scheme="light">` (`--ghf-font` DM Sans) | AEO `formKey` render contract |
 | 4 | Trust footer | Preserve trust bullets/privacy/direct conversation | AEO wrapper copy or renderer-compatible surrounding markup | AEO page content |
 
 ## Copy Ledger
@@ -62,16 +62,16 @@
 ## Implementation Mapping
 
 - Route / surface: WordPress page `postId=250265`, URL `https://efeoncepro.com/aeo-2/`, section `convers`.
-- Primitives: `<greenhouse-form form-guid>` portable renderer from `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`.
+- Primitives: `<greenhouse-form form-key … surface … locale="es-CL" color-scheme="light">` portable renderer from `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`, with inner no-JS fallback (direct-link). Renderer draws no card and renders no heading: card chrome stays on `.gh-aeo-growth-form-card`, title/trust/privacy/direct-link stay WordPress markup. Theme via `--ghf-bg: transparent` + `--ghf-font` DM Sans scoped to `.gh-aeo-conversion`.
 - Variants / kinds: Growth Forms `formKind=diagnostic_intake`, host surface `fhsf-efeonce-aeo-diagnostic`.
 - Component candidates: existing HTML widget in `convers`; existing `.gh-aeo-conversion`, `.gh-aeo-form-card`, `.gh-aeo-growth-form-card` CSS scope.
 - Copy source: `render_contract.copy.submit` for CTA; existing WordPress wrapper copy for section header/trust/privacy.
-- Data reader / command: public GET/POST/verify-email APIs by AEO `formGuid`; slug remains backward-compatible.
+- Data reader / command: public GET/POST/verify-email APIs by AEO `formKey`; slug remains backward-compatible.
 - API parity: WordPress only embeds renderer; validation, captcha, submit and destinations stay in Growth Forms.
 - Access / capability: public host surface allowlist + CORS for `https://efeoncepro.com`.
 - Runtime consumers: public browser, GTM/dataLayer, Growth Forms backend, HubSpot secure-submit dispatcher.
 - Print/email/PDF considerations: N/A.
-- GVC markers: existing `.gh-aeo-conversion`; add/keep renderer root marker with AEO `formGuid` if needed for capture.
+- GVC markers: existing `.gh-aeo-conversion`; add/keep renderer root marker with AEO `formKey` if needed for capture.
 
 ## GVC Scenario Plan
 
@@ -81,7 +81,7 @@
 - Required steps:
   - load page and scroll to `.gh-aeo-conversion`;
   - assert one visible card surface, no card-on-card;
-  - assert `<greenhouse-form form-guid>` is mounted and bridge-only class no longer owns submit logic;
+  - assert `<greenhouse-form form-key>` is mounted and bridge-only class no longer owns submit logic;
   - trigger required errors;
   - enter Gmail/free email and assert inline block before submit;
   - verify corporate email path reaches Turnstile/submit boundary without raw errors.
@@ -90,9 +90,12 @@
 - Assertions:
   - `scrollWidth == clientWidth` desktop and mobile 390;
   - CTA text equals `Solicitar diagnóstico gratis →`;
-  - `form.formGuid` equals the real AEO GUID from `TASK-1297`;
+  - `form.formKey` equals the real AEO formKey from `TASK-1297`;
   - `security.captcha` present in contract;
   - no technical kicker;
+  - form renders light even under `prefers-color-scheme: dark` (`color-scheme="light"`);
+  - form typography uses the DM Sans stack (computed-style), consistent with the landing;
+  - `verify-aeo-form-typography` (rewritten to `.ghf-*` control selectors) passes against the renderer;
   - `heroans` md5 unchanged.
 - Scroll-width checks: desktop + mobile 390 via Playwright.
 - Accessibility/focus checks: first invalid field receives focus; errors are announced via ARIA attributes.
@@ -104,7 +107,8 @@
 - Alternatives considered: keep bridge HTML longer; rewrite renderer styles inside WordPress; fork AEO-specific renderer.
 - Why this pattern: the engine/renderer is now capable of Turnstile and email validation; keeping bridge logic would duplicate submit/captcha/validation by landing.
 - Reuse / extend / new primitive: reuse portable renderer; no new UI primitive.
-- Open risks: renderer default styling may need scoped CSS variables to match the approved AEO card without card-on-card.
+- Surface composition (F2 = Opción A, arch + product design): keep `.gh-aeo-growth-form-card` as the single visible surface wrapping a transparent renderer (`--ghf-bg: transparent`); do NOT give card chrome to the renderer. Rationale: one owner of card chrome (AEO landing CSS, consistent with market/pipeline/diagnostic cards), lowest blast-radius, reuses the already-gated surface. Alternative B (renderer themed as the card) rejected: re-creates card styling on the renderer and splits chrome ownership → drift.
+- Open risks: renderer default styling needs scoped CSS (`--ghf-bg`, `--ghf-font`) to match the approved AEO card; `verify-aeo-form-typography` must be rewritten to the renderer's `.ghf-*` control selectors (it currently targets bridge DOM).
 - Follow-up: generalize additional theme tokens only if a second landing needs the same treatment.
 
 ## Acceptance Checklist

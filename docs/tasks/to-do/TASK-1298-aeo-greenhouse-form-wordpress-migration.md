@@ -1,5 +1,10 @@
 # TASK-1298 — AEO WordPress greenhouse-form migration
 
+## Delta 2026-06-30
+
+- Naming de identidad de Growth Forms fijado en `TASK-1297`: la identidad pública/opaca es **`form_key`** (DB) / **`formKey`** (contrato) / **`form-key`** (atributo del renderer), NO `form_guid`/`formGuid` (ese nombre es del GUID secreto de destino de HubSpot, server-only). Esta task se actualizó: embed, atributo, acceptance, wireframe y verificación ahora usan `form-key`/`formKey`. El `<AEO_FORM_KEY>` real proviene del runtime verificado por `TASK-1297`.
+- `TASK-1297` también fija que la resolución por key va por el segmento `[formSlug]` existente (slug-or-uuid disambiguado server-side), sin ruta ni superficie CORS nueva: el embed `<greenhouse-form form-key="...">` golpea las mismas rutas públicas.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -37,9 +42,11 @@ El bridge AEO fue correcto como transicion, pero ya no debe quedarse como logica
 
 ## Goal
 
-- Reemplazar la logica bridge del widget `convers` por `<greenhouse-form form-guid="<AEO_FORM_GUID>" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL">`.
+- Reemplazar la logica bridge del widget `convers` por `<greenhouse-form form-key="<AEO_FORM_KEY>" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light">`.
+- **Composición de superficie (decisión F2, arch + product design 2026-06-30): Opción A — la card aprobada `.gh-aeo-growth-form-card` sigue siendo la única superficie visible y envuelve al renderer transparente.** Dentro de la card: título (markup WP) + `<greenhouse-form>` con `--ghf-bg: transparent` + trust/privacidad/direct-link (markup WP). NO se le da chrome de card al renderer (un solo dueño del chrome = la CSS de la landing AEO; menor blast-radius; reusa el surface ya gateado).
+- Tematizar el renderer con CSS scoped: `--ghf-font` = stack DM Sans (Ohio) para no clashear con la tipografía de la landing; `color-scheme="light"` para no caer a dark sobre la banda clara `convers`.
 - Preservar el shell visual AEO y evitar card-on-card.
-- Verificar desktop/mobile 390, overflow, focus, validation, Turnstile boundary, dataLayer y `heroans` hash.
+- Verificar desktop/mobile 390, overflow, focus, validation, Turnstile boundary, dataLayer, gate de tipografía y `heroans` hash.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -76,7 +83,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1297`: public GET AEO debe exponer `formGuid`, copy de renderer aprobado, al menos `copy.submit`, y resolucion por GUID.
+- `TASK-1297`: public GET AEO debe exponer `formKey`, copy de renderer aprobado, al menos `copy.submit`, y resolucion por formKey.
 - `TASK-1294`: renderer Turnstile/captchaToken parity.
 - `TASK-1296`: AEO `security.captcha` serializado en produccion.
 - WordPress page `postId=250265`, section/widget `convers`.
@@ -89,6 +96,8 @@ Reglas obligatorias:
 
 ### Files owned
 
+- `scripts/public-website/verify-aeo-form-typography.ts` (el gate está acoplado al DOM del bridge; ver F1 — hay que reescribir los selectores de control a `.ghf-*` del renderer)
+- WordPress `postId=250265` Elementor `convers` (mutación live vía `Document::save()` + backup meta)
 - `docs/documentation/public-site/aeo-landing-elementor.md`
 - `docs/documentation/growth/motor-formularios-publicos.md`
 - `docs/manual-de-uso/growth/incrustar-formulario-wordpress-astro.md`
@@ -107,13 +116,27 @@ Reglas obligatorias:
 - Conversion section: `convers`, `.gh-aeo-conversion`.
 - Temporary bridge host/card: `.gh-aeo-form-card gh-aeo-growth-form-host` + `.gh-aeo-growth-form-card`.
 - Renderer endpoint: `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`.
-- Public contract: slug `efeonce-aeo-diagnostic`, real `formGuid` pendiente de `TASK-1297`, surface `fhsf-efeonce-aeo-diagnostic`, `security.captcha` present.
+- Public contract: slug `efeonce-aeo-diagnostic`, real `formKey` pendiente de `TASK-1297`, surface `fhsf-efeonce-aeo-diagnostic`, `security.captcha` present.
 - Typography gate: `pnpm public-website:verify-aeo-form-typography`.
 
 ### Gap
 
 - WordPress still owns submit, `/verify-email`, Turnstile execution and error state in a bridge HTML blob.
 - The generic renderer has not yet been smoke-tested as the live AEO form inside Elementor.
+
+### Renderer reality (ground-truth `src/growth-forms-renderer/**`, verificado 2026-06-30)
+
+Lo que el renderer SÍ trae (apoyarse en esto, no reimplementar): skeleton de carga (no blank), errores inline con `aria-invalid`/`aria-describedby`/`role=alert`, email-gate debounced + typo-suggest con degradación honesta (404 → no bloquea), submit pending + anti-doble-submit, success inline/redirect, error de servidor **sanitizado** (nunca muestra `reason` crudo), estados honestos `"Formulario no disponible"` y `"No pudimos cargar… Reintentar"`, reduced-motion global, Turnstile invisible 1px sin layout shift, telemetry con allowlist dura sin valores de campo. Light-DOM (clases `.ghf-*`), themable por `--ghf-*`.
+
+Lo que el renderer NO trae y la task debe autorar como markup WordPress (NO existe en el renderer):
+
+- **No dibuja card** — solo un fill `--ghf-bg`. Para integrarlo en la card AEO (Opción A): `greenhouse-form { --ghf-bg: transparent }`.
+- **No renderiza ningún heading** (`h1`–`h6`) — el título de la card (`.gh-aeo-growth-form-title`) es markup WP.
+- **No tiene "Agenda una conversación →" / contacto / direct-link** — es markup WP y además el fallback honesto si el form no carga.
+- **No auto-renderiza el no-JS fallback** (`noScriptFallback`) — el contenido interno de `<greenhouse-form>…</greenhouse-form>` es lo que se ve si el script no carga; autorarlo (el direct-link sirve doble).
+- **`color-scheme` solo fuerza light y no está en `observedAttributes`** — setear `color-scheme="light"` en el embed (la banda `convers` es clara; sin esto, un visitante con OS dark vería el form oscuro).
+- **`--ghf-font` default = `system-ui`** — setear stack DM Sans para alinear con la landing Ohio.
+- **`form-key` aún no aceptado por el renderer** — lo agrega `TASK-1297` (blocker).
 
 ## UI/UX Contract
 
@@ -131,9 +154,10 @@ Reglas obligatorias:
 - Surface: WordPress/Elementor page `postId=250265`, section `convers`.
 - Composition Shell: `no aplica` — landing WordPress/Elementor existente, no vista Greenhouse React.
 - Primitive decision: `reuse` — `<greenhouse-form>` portable renderer.
+- **Card composition (F2 = Opción A):** la card aprobada `.gh-aeo-growth-form-card` (borde hairline + sombra baja + radio + padding) es la única superficie visible y envuelve al renderer; el host `.gh-aeo-form-card` queda transparente (como hoy) y el renderer va `--ghf-bg: transparent`. NO se le da chrome de card al renderer (un solo dueño del chrome = CSS de la landing AEO, consistente con market/pipeline/diagnostic). Título + trust + privacidad + direct-link son markup WP dentro de la card.
 - Adaptive density / The Seam: `no aplica` — no se crea card primitive Greenhouse; se adapta con CSS scoped del host.
 - Floating/Sidecar/Dialog decision: N/A.
-- Copy source: `render_contract.copy` para CTA del renderer + copy local aprobado en AEO wrapper.
+- Copy source: `render_contract.copy` para CTA del renderer + copy local aprobado en AEO wrapper. **Los labels/placeholders de campo salen del `field_schema` del contrato publicado, no del bridge** — verificar pre-save que matchean la copy es-CL aprobada (F6).
 - Access impact: `none`; surface/origin/CORS ya gobernados por Growth Forms.
 
 ### State inventory
@@ -141,8 +165,8 @@ Reglas obligatorias:
 - Default: renderer montado con campos AEO visibles.
 - Loading: estado de carga del renderer no deja caja vacia ni salto severo.
 - Empty: N/A; form debe existir.
-- Error: errores inline del renderer; errores submit sanitizados.
-- Degraded / partial: API disabled/unavailable muestra fallback honesto del renderer.
+- Error: errores inline del renderer; errores submit sanitizados (el renderer nunca muestra `reason` crudo).
+- Degraded / partial: el renderer muestra `"Formulario no disponible"` (404) o `"No pudimos cargar… Reintentar"` (red/otros) — fallback honesto real, no blank. Además, el direct-link `Agenda una conversación →` (markup WP, siempre visible dentro de la card) es la recovery CTA si el renderer no monta, y dobla como no-JS fallback dentro de `<greenhouse-form>…</greenhouse-form>`.
 - Permission denied: N/A para publico; origin/surface failure debe mostrarse como unavailable, no raw error.
 - Long content: mobile 390 sin overflow ni solapes.
 - Mobile / compact: una columna, CTA y privacidad visibles.
@@ -172,10 +196,10 @@ Reglas obligatorias:
 ### Implementation mapping
 
 - Route / surface: `https://efeoncepro.com/aeo-2/`, WordPress `postId=250265`, section `convers`.
-- Primitive / variant / kind: `<greenhouse-form form-guid>` / `diagnostic_intake` / AEO form contract.
+- Primitive / variant / kind: `<greenhouse-form form-key>` / `diagnostic_intake` / AEO form contract.
 - Component candidates: HTML widget existing host + renderer script; scoped CSS variables/classes.
 - Copy source: `render_contract.copy.submit` from `TASK-1297`; section/trust copy remains in WordPress wrapper.
-- Data reader / command: public Growth Forms GET/POST/verify-email por `formGuid` con slug backward-compatible.
+- Data reader / command: public Growth Forms GET/POST/verify-email por `formKey` con slug backward-compatible.
 - API parity: WordPress embeds only; business logic stays in Growth Forms.
 - Access / capability: public surface allowlist + CORS.
 - States to implement: default, loading, field error, email gate, submit pending, captcha failure, success/unavailable.
@@ -228,19 +252,23 @@ Reglas obligatorias:
 
 - Inspeccionar Elementor `convers`, widget IDs/classes/CSS page-scoped y bridge HTML vigente.
 - Crear backup meta y validar `heroans` hash antes de cualquier save.
-- Probar renderer AEO en navegador sin guardar si es posible para observar layout/copy/states.
+- Probar renderer AEO en navegador sin guardar para observar layout/copy/states (incluyendo dark-mode del OS y tipografía vs DM Sans).
+- **Verificar PRE-save que el `field_schema` del contrato publicado tiene los labels/placeholders es-CL aprobados** (`Nombre`, `Correo corporativo`, `Sitio web de tu marca`, `País principal`, `Tamaño de la empresa`, `Competidor principal (opcional)` + placeholders) — el renderer los toma del contrato, no del bridge (F6). Si difieren, es bloqueante de `TASK-1297` (copy del contrato), no de esta task.
 
 ### Slice 2 — Elementor migration
 
-- Reemplazar la logica bridge por embed `<greenhouse-form>` y script renderer.
-- Mantener shell visual AEO, una sola superficie visible y copy/trust aprobado.
-- Preservar/ajustar CSS scoped solo dentro de `.gh-aeo-conversion`.
+- Reemplazar la logica bridge por embed `<greenhouse-form form-key="..." surface="..." locale="es-CL" color-scheme="light">` + script renderer, con **contenido interno de fallback no-JS** (el direct-link) dentro de `<greenhouse-form>…</greenhouse-form>`.
+- **Opción A:** mantener `.gh-aeo-growth-form-card` como única card visible envolviendo al renderer; host `.gh-aeo-form-card` transparente; renderer `--ghf-bg: transparent`. NO dar chrome de card al renderer.
+- CSS scoped (solo dentro de `.gh-aeo-conversion`): `greenhouse-form { --ghf-bg: transparent; --ghf-font: <DM Sans stack Ohio>; }` + alinear `--ghf-accent`/radio/gap al lenguaje AEO si hace falta.
+- Conservar como markup WP dentro de la card: título (`.gh-aeo-growth-form-title`, contrato `letter-spacing:-0.045em`), trust bullets (`.gh-aeo-growth-form-proof`), nota de privacidad y direct-link. NO renderizar kicker técnico.
+- Preservar/ajustar CSS scoped solo dentro de `.gh-aeo-conversion`; no tocar seams globales.
 
-### Slice 3 — Verification and closure
+### Slice 3 — Typography gate + verification and closure
 
+- **Reescribir `scripts/public-website/verify-aeo-form-typography.ts`** (F1): los selectores de control (`.gh-aeo-growth-form-label/-input/-button`) apuntan al DOM del bridge que la migración elimina → cambiarlos a las clases light-DOM del renderer (`.ghf-label`/`.ghf-input`/el botón submit). `title`/`lead`/`proof` siguen contra el markup WP. El gate debe quedar verde contra el renderer, no contra el bridge.
 - Purgar Kinsta.
-- Verificar desktop/mobile 390/reduced-motion, overflow, spacing, letter-spacing, no solapes, focus/ARIA, email gate, Turnstile boundary, dataLayer no PII.
-- Actualizar docs/manuales/skills si cambian contratos operativos.
+- Verificar desktop/mobile 390/reduced-motion, overflow, spacing, letter-spacing, no solapes, focus/ARIA, email gate, Turnstile boundary, dataLayer no PII, **dark-mode del OS forzado a light**, y `heroans` hash.
+- **Reescribir la sección `convers` de `docs/documentation/public-site/aeo-landing-elementor.md`** (describe hoy el bridge → describir el renderer + Opción A + el contrato de tematización `--ghf-*`). Actualizar manuales/skills si cambian contratos operativos.
 
 ## Out of Scope
 
@@ -255,16 +283,28 @@ Reglas obligatorias:
 Embed objetivo:
 
 ```html
-<greenhouse-form form-guid="<AEO_FORM_GUID>" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL"></greenhouse-form>
+<greenhouse-form form-key="<AEO_FORM_KEY>" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light">
+  <!-- Fallback no-JS / si el renderer no carga: el direct-link aprobado -->
+  <a href="<AGENDA_URL>">¿Prefieres coordinar directo? Agenda una conversación →</a>
+</greenhouse-form>
 ```
 
-`<AEO_FORM_GUID>` debe venir del `form_guid` real publicado por `TASK-1297`; no inventarlo ni reemplazarlo por slug/surface/page. El host debe cargar el renderer desde `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js` siguiendo el contrato del widget/host actual. Si el widget Elementor existente ya provee esta carga, preferirlo sobre HTML manual.
+`<AEO_FORM_KEY>` debe venir del `form_key` real publicado por `TASK-1297`; no inventarlo ni reemplazarlo por slug/surface/page. `color-scheme="light"` es obligatorio (la banda `convers` es clara; sin él, un visitante con OS dark vería el form oscuro). El contenido interno de `<greenhouse-form>` es el fallback no-JS (el renderer NO auto-renderiza `noScriptFallback`). El host debe cargar el renderer desde `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js` siguiendo el contrato del widget/host actual. Si el widget Elementor existente ya provee esta carga, preferirlo sobre HTML manual.
+
+Tematización CSS scoped (dentro de `.gh-aeo-conversion`):
+
+```css
+.gh-aeo-conversion greenhouse-form {
+  --ghf-bg: transparent;            /* la card visible es .gh-aeo-growth-form-card, no el renderer */
+  --ghf-font: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+```
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- `TASK-1297` debe estar complete antes de ejecutar esta task, incluyendo el `formGuid` real de AEO y el GET publico por GUID.
+- `TASK-1297` debe estar complete antes de ejecutar esta task, incluyendo el `formKey` real de AEO y el GET publico por formKey.
 - Slice 1 backup/hash/preview -> Slice 2 save Elementor -> Kinsta purge -> Slice 3 verification.
 - Si `heroans` hash cambia, detener y revertir solo el cambio de esta task.
 
@@ -272,8 +312,12 @@ Embed objetivo:
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Card-on-card o visual regression | public-site | medium | preview + scoped CSS + Playwright desktop/mobile | screenshot/capture |
-| Renderer no carga por CSP/CORS | public-site/growth | medium | GET script + public contract smoke antes de save | blank form/unavailable |
+| Card-on-card o visual regression | public-site | low | Opción A (renderer `--ghf-bg:transparent` dentro de la card aprobada) + Playwright desktop/mobile | screenshot/capture |
+| Gate `verify-aeo-form-typography` rompe (selectores del bridge) | public-site/tooling | high | reescribir selectores de control a `.ghf-*` en Slice 3 antes de cerrar | gate rojo o pasa vacío |
+| Form se ve oscuro sobre banda clara (OS dark) | public-site | medium | `color-scheme="light"` en el embed + verificar con `prefers-color-scheme:dark` | form dark en `convers` claro |
+| Tipografía del form clashea con la landing (system-ui vs DM Sans) | public-site | medium | `--ghf-font` DM Sans scoped + computed-style check | familia distinta al resto |
+| Labels del contrato ≠ copy aprobada | growth | medium | verificar `field_schema` pre-save (F6) | label/placeholder en inglés u otra copy |
+| Renderer no carga por CSP/CORS | public-site/growth | medium | GET script + public contract smoke antes de save + fallback no-JS (direct-link) | blank form/unavailable |
 | Submit/captcha falla | growth/public-site | medium | smoke fail-closed + Turnstile boundary | `captcha_failed` unexpected |
 | Hero se altera por Document::save | public-site | low | hash `heroans` before/after | md5 drift |
 
@@ -307,6 +351,33 @@ N/A — cambio live WordPress autorizado por la task; no requiere portal manual 
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## 4-Pillar Score
+
+### Safety
+
+- **What can go wrong**: el browser recibe mapping/secret/HubSpot `formGuid`, o dataLayer filtra PII.
+- **Gates**: el renderer no expone destination/secrets (server-only); telemetry con allowlist dura sin valores de campo; CORS/origin/surface gobernados por el engine; WordPress nunca captura datos.
+- **Blast radius**: público (`/aeo-2/`). Mitigado por backup Elementor + rollback por restore.
+- **Residual**: `page_uri` en dataLayer si la URL de la landing trae PII en query — aceptado (no aplica a `/aeo-2/`).
+
+### Robustness
+
+- **Atomicity**: mutación Elementor vía `Document::save()` + backup meta; rollback por restore.
+- **Race protection**: hash `heroans` before/after; abort si drift.
+- **Constraint coverage**: gate `verify-aeo-form-typography` (reescrito a `.ghf-*`), `scrollWidth==clientWidth`, computed-style checks.
+- **Gap cerrado**: F1 (gate del bridge) + F6 (labels del contrato) verificados pre/post.
+
+### Resilience
+
+- **Estados honestos**: el renderer trae unavailable + load-error+Reintentar (no blank); direct-link WP siempre visible = recovery + no-JS fallback.
+- **Recovery**: restore de backup Elementor + Kinsta purge.
+- **Degradation**: ningún `$0`/blank; estados con texto.
+
+### Scalability
+
+- **Patrón reusable**: primera migración real del renderer portable con Turnstile en una landing Efeonce; informa futuras landings.
+- **Cost**: una página; sin cambio de engine.
+
 ## Acceptance Criteria
 
 - [ ] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
@@ -314,16 +385,20 @@ N/A — cambio live WordPress autorizado por la task; no requiere portal manual 
 - [ ] Se declaro `Wireframe: docs/ui/wireframes/TASK-1298-aeo-greenhouse-form-migration.md` y el archivo existe.
 - [ ] Se declaro `Motion: docs/ui/motion/TASK-1298-aeo-greenhouse-form-migration-motion.md` y el archivo existe.
 - [ ] `TASK-1297` esta complete antes del save WordPress.
-- [ ] AEO `/aeo-2/` usa `<greenhouse-form form-guid>` para render/validation/submit en lugar del bridge HTML.
-- [ ] El target se identifica por el `formGuid` real de AEO, no por pagina, screenshot, slug o surface.
-- [ ] La seccion conserva una sola card visible y no muestra kicker tecnico.
-- [ ] CTA visible es `Solicitar diagnóstico gratis →`.
+- [ ] AEO `/aeo-2/` usa `<greenhouse-form form-key>` para render/validation/submit en lugar del bridge HTML.
+- [ ] El target se identifica por el `formKey` real de AEO, no por pagina, screenshot, slug o surface.
+- [ ] La seccion conserva una sola card visible (`.gh-aeo-growth-form-card` envolviendo al renderer transparente, Opción A) y no muestra kicker tecnico.
+- [ ] El embed declara `color-scheme="light"` y un fallback no-JS interno (direct-link); con `prefers-color-scheme:dark` el form NO se ve oscuro.
+- [ ] La tipografía del form usa el stack DM Sans (`--ghf-font` scoped), consistente con la landing.
+- [ ] Los labels/placeholders del renderer (desde el contrato) matchean la copy es-CL aprobada.
+- [ ] CTA visible es `Solicitar diagnóstico gratis →` (desde `render_contract.copy.submit`).
 - [ ] Email Gmail/free/disposable se bloquea inline antes de `/submit`.
 - [ ] Turnstile/captchaToken path funciona; submit sin token sigue fail-closed.
 - [ ] dataLayer events no contienen PII.
 - [ ] Desktop y mobile 390 tienen `scrollWidth == clientWidth`, sin solapes.
 - [ ] `heroans` md5 sigue `e0b951b2456a83578cd9e22005900521`.
-- [ ] `pnpm public-website:verify-aeo-form-typography` pasa.
+- [ ] `scripts/public-website/verify-aeo-form-typography.ts` quedó reescrito a los selectores del renderer (`.ghf-*`) y `pnpm public-website:verify-aeo-form-typography` pasa contra el renderer (no contra el bridge).
+- [ ] La sección `convers` de `docs/documentation/public-site/aeo-landing-elementor.md` describe el renderer + Opción A (no el bridge).
 
 ## Verification
 
