@@ -1,3 +1,13 @@
+## Sesion 2026-06-30 — TASK-1297 Growth Forms stable identity (`formKey`) + render copy contract — Claude — 🔧 in-progress
+
+> **Pedido:** implementar TASK-1297 (`/implement-task 1297`), local-first en `develop`, sin push.
+>
+> **Estado:** task movida `to-do/`→`in-progress/`; README/registry sincronizados + naming corregido (`form_guid`→`form_key`). Trabajo en `develop` local-first, sin branch.
+>
+> **Alcance (5 slices):** (1) migration additive `form_definition.form_key UUID NOT NULL UNIQUE DEFAULT gen_random_uuid()` + store/readers `getFormDefinitionByKey`; (2) `formKey` en `RenderContract.form` + mirror renderer + catálogo editor-safe + telemetry allowlists; resolución por key vía segmento `[formSlug]` slug-or-uuid (sin ruta/CORS nueva); atributo `form-key` + `appearance` chromeless transversal en el renderer; (3) `copyRefs` en `authorDraftForm` + `copyDisplaySchema` browser-safe en `policy-compiler`; (4) script idempotente AEO por formKey; (5) docs + GUIDs reales.
+>
+> **Naming fijado (F1):** identidad pública = `form_key`/`formKey`/`form-key`; NUNCA `form_guid`/`formGuid` (ese es el GUID de destino HubSpot, server-only).
+
 ## Sesion 2026-06-30 — TASK-1296 AEO Growth Form Turnstile security contract — Codex — ✅ complete
 
 > **Pedido:** revisar si el runtime ya permitía avanzar después del pase a producción y cerrar lo pendiente de Forms/Turnstile sin tocar el trabajo de release de Claude.
