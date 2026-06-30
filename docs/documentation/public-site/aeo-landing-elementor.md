@@ -62,7 +62,7 @@ Elementos clave:
 | --- | --- | --- |
 | Root | `marketa`, `.gh-aeo-market` | Seccion full-width clara conectada visualmente con el hero navy mediante gradientes suaves y hairline teal. |
 | Header | `marketh`, `.gh-aeo-section-header` | Contiene eyebrow y H2 centrado; no usar espaciadores para separar del grid. |
-| Eyebrow | `markete`, `.gh-aeo-eyebrow` | Texto `El juego cambió`; en runtime se presenta en uppercase con lineas teal laterales. |
+| Eyebrow | `markete`, widget `ohio_badge`, `.gh-aeo-eyebrow gh-aeo-eyebrow-badge` | Texto `El juego cambió`; usa badge/chip Ohio `.ohio-widget.badge.-outlined`, sin lineas ni pseudo-elementos decorativos. |
 | H2 | `marketh`, widget `ohio_heading` | `El descubrimiento se mudó a la IA. La mayoría de las marcas son invisibles ahí.` |
 | Grid | `marketg`, `.gh-aeo-grid-3 gh-aeo-market-grid` | Tres cards metricas con gap controlado; en mobile apilan a ancho completo sin padding interno extra. |
 | Cards | `marketa`, `marketb`, `marketc`, `.gh-aeo-metric-card` | Conservan las tres estadisticas aprobadas; cards blancas con borde/top accent teal, sombra suave, fuente con logo/wordmark y minima altura mobile para evitar clipping de Elementor. |
@@ -214,7 +214,7 @@ Guardrails:
 - El API publico de Growth Forms necesita CORS para `https://efeoncepro.com` / `https://www.efeoncepro.com` en `GET`, `POST` y `OPTIONS`; se corrigio en producción el 2026-06-30.
 - La separación visual pertenece a la seccion `.gh-aeo-conversion`, hoy como banda `#f4f8fa`; no volver a resolverla con una card exterior alrededor del formulario. Si se ajusta el fondo, hacerlo en la seccion, no en `.gh-aeo-form-card`.
 - No exponer metadata interna en la landing. El kicker técnico `Growth Forms · Diagnóstico AEO` no debe renderizarse; la card pública empieza con `Solicita tu diagnóstico`.
-- El bloque actual debe mantener `letter-spacing:0` en labels, inputs, trust bullets y links. El H2 de la seccion conserva el tracking display global de la landing.
+- El bloque actual debe mantener `letter-spacing:0` en lead, labels, inputs, trust bullets y links. Los dos titulos del formulario tienen contrato de heading: el H2 de seccion y `.gh-aeo-growth-form-title` deben computar `letter-spacing:-0.045em`. Ojo: Ohio/Elementor tiende a dejar reglas page-scoped con `!important` que pisan el HTML bridge; verificar siempre el valor computado en navegador, no solo la presencia de la regla en el widget. Marcadores vigentes: `gh-aeo-form-typography-spacing-v1`, `gh-aeo-form-title-letter-spacing-html-v1` y `gh-aeo-form-title-letter-spacing-specificity-v1`.
 - Los selects necesitan `appearance:none` + caret scoped; el theme Ohio puede repetir flechas nativas si se elimina ese CSS.
 - Verificar desktop/mobile: banda de seccion visible, una sola card de formulario, host exterior sin borde/sombra/padding, sin kicker técnico, 4 inputs, 2 selects, CTA teal, privacidad visible, `scrollWidth == clientWidth`, Gmail/free email bloqueado inline con `/verify-email` y `submit=0`, required errors inline para `firstName`/`email`/`brandWebsite`, success de email corporativo solo después de `/verify-email`, y browser fetch desde la pagina devuelve `captcha_failed/missing_token` si se prueba sin token (sin crear lead).
 
@@ -241,6 +241,13 @@ Guardrails:
 - Mantener `letter-spacing: normal` y `text-transform: none` en preguntas/respuestas; el H2 conserva tracking de display.
 - Verificar desktop/mobile/reduced-motion: `hasAccordion=true`, `hasDetails=false`, 9 items, click funcional en fila/icono/titulo, panel abierto con altura real, `scrollWidth == clientWidth`, `transitionDuration=0s` en reduced-motion.
 
+## Contrato visual post-hero
+
+- Desde `market` hasta `FAQ`, las secciones alternan bandas claras (`#f4f8fa`) y superficies blancas para evitar que la landing parezca una suma de estilos distintos.
+- Los headers de seccion usan una jerarquia comun: `ohio_badge` como eyebrow, `ohio_heading` para H2, lead centrado cuando aplica. No volver a implementar eyebrows como `text-editor` con lineas `::before`/`::after`; el patron aprobado es chip/badge Ohio `.ohio-widget.badge.-outlined` con `letter-spacing:0`, `text-transform:none`, radio `10px` y borde/fondo teal suave.
+- Cards, FAQ y formulario usan una misma gravedad visual: borde hairline, sombra baja y radios consistentes. La conversion mantiene una sola card visible (`.gh-aeo-growth-form-card`) sobre banda de seccion; no restaurar card exterior.
+- La motion post-hero es sutil y opcional: hover de cards solo en `pointer:fine`; con `prefers-reduced-motion: reduce` debe quedar `transitionDuration=0s` y sin transforms.
+
 ## Aprendizajes de diseño
 
 1. **Fondo azul tipo Home:** funciona mejor que el fondo blanco para esta landing porque conecta con el lenguaje publico de Efeonce y da mas presencia al modulo de IA.
@@ -253,6 +260,7 @@ Guardrails:
 8. **Social proof HubSpot:** en el hero no usar `HubSpot Solutions Partner` como badge generico. Debe reutilizar el patron del Home: `span.gh-hubspot-wordmark` con `hubspot-logotype.svg` blanco inline + `<strong>Solutions Partner</strong>`. El wrapper `.gh-aeo-hubspot-partner` debe quedar transparente, sin borde, sin padding y sin box-shadow; solo los elementos secundarios conservan look de chip.
 9. **Market section:** la seccion `El juego cambió` no debe quedar como texto/cards flotando en un canvas claro. Debe funcionar como puente visual desde el hero: fondo claro con acentos navy/teal, cards con jerarquia numerica clara y statement final destacado.
 10. **Pipeline section:** la seccion `Por qué importa ahora` debe leerse como prueba comercial, no como metricas decorativas. Mantener la secuencia de evidencia y cerrar con una tesis accionable.
+11. **Eyebrows post-hero:** usar el widget Ohio `ohio_badge` como chip, no lineas decorativas ni pseudo-elementos. El hero tambien usa `ohio_badge`, pero su variante oscura es propia del hero; los badges post-hero son light/outlined.
 11. **Levels section:** la seccion de cinco niveles debe leerse como escalera de madurez, no como checklist. El resultado de cada nivel ayuda a escanear el avance y evita depender de color o del texto largo.
 12. **Diagnostic section:** la seccion del diagnostico debe vender claridad operativa, no volumen de reporte. Cuatro entregables con salida visible convierten mejor que una lista pesada de features.
 13. **Why section:** la seccion `Por qué nosotros` debe responder la objecion comercial, no solo decorar credenciales. El contraste herramienta vs sistema y la objecion honesta hacen mas creible el paso del diagnostico a la solicitud.
@@ -335,6 +343,8 @@ Evidencia de cierre acumulada:
 - Verificacion de la seccion why: root `why5421` con `.gh-aeo-why-optimized`, comparativa `Medir por tu cuenta` vs `Surround Discovery`, objecion navy, proof strip, credenciales y callout de timing; `heroans` estable y Playwright desktop/mobile/reduced-motion sin overflow (`scrollWidth == clientWidth`), con motion reducido a `transitionDuration=0s` y `translate=0px`.
 - Verificacion de la seccion FAQ: root `faq5b46`, widget `faqlist` como `ohio_accordion`, `data-ohio-accordion=true`, 9 items, sin `<details>`, primera pregunta abierta, click funcional en fila/icono/titulo para abrir la segunda pregunta, panel abierto con altura real, `heroans` estable y Playwright desktop/mobile/reduced-motion sin overflow (`scrollWidth == clientWidth`), con `transitionDuration=0s` en reduced-motion.
 - Verificacion tipografica de levels: H2 con tracking ajustado al hero, `cinco niveles` en teal color-only, terminos ingleses alineados opticamente con sus titulos, y lead/titulos internos/cuerpos/eyebrow/badges/labels de resultado/`Surround Discovery`/chips de metodo con `letter-spacing: normal/0` y sin `text-transform: uppercase` forzado para alinearlo al ritmo del hero.
+- Verificacion de cohesion post-hero 2026-06-30: 7 eyebrows (`markete`, `pipelin`, `levelse`, `diagnos`, `whyeyeb`, `convers`, `faqeyeb`) convertidos a `elementor-widget-ohio_badge`; cada uno renderiza `.ohio-widget.badge.-outlined`, sin `::before/::after`, desktop/mobile 390 con `overflowX=0`, FAQ funcional y reduced-motion sin transforms.
+- Verificacion tipografica del formulario 2026-06-30: el H2 de conversion y `.gh-aeo-growth-form-title` usan el contrato de heading `letter-spacing:-0.045em` (`Descubre...` computa `-1.944px` desktop / `-1.35px` mobile; `Solicita...` computa `-1.53px` desktop / `-1.305px` mobile). Lead, labels, inputs, CTA, trust copy y links mantienen `letter-spacing: normal/0`. Se documento como drift frecuente de Ohio/Elementor: una regla page-scoped con `!important` puede pisar el CSS correcto del bridge, asi que la evidencia aceptable es computed style desktop/mobile, no inspeccion estatica. Desktop/mobile 390 sin overflow y validacion reactiva intacta.
 - Hash `heroans` estable en mutaciones de avatar group, dark section y H1 accent.
 
 ## Lo que no se debe repetir

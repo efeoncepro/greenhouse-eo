@@ -9368,3 +9368,11 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 - La sección de conversión recuperó fondo propio como banda clara antes del FAQ, sin reintroducir card exterior alrededor del formulario.
 - `.gh-aeo-form-card` queda como host transparente sin borde/sombra/padding; `.gh-aeo-growth-form-card` es la única card visible.
 - Se removió el kicker técnico `Growth Forms · Diagnóstico AEO` del HTML público y se verificó desktop/mobile 390px sin overflow, sin kicker y con validación reactiva intacta.
+
+## 2026-06-30 — Public Site AEO `/aeo-2/`: cohesión visual post-hero
+
+- Se unificó la landing desde `market` hasta `FAQ` sin tocar el hero: bandas alternadas, títulos/lead/cards con escala común y motion reducida respetada.
+- Los 7 eyebrows post-hero ahora son widgets Ohio `ohio_badge` (`.ohio-widget.badge.-outlined`) en vez de texto con líneas decorativas; se eliminaron pseudo-elementos duplicados.
+- Se corrigió el tracking de la sección/formulario de conversión: el H2 y el título interno `Solicita tu diagnóstico` computan `letter-spacing:-0.045em`, mientras lead/labels/inputs/CTA/trust quedan `normal/0`.
+- Se documentó como drift frecuente de Ohio/Elementor que el título del form puede quedar en `letter-spacing:normal` cuando reglas `!important` o el bridge `.gh-aeo-growth-form-card *{letter-spacing:0}` pisan la regla correcta; la verificación requerida es computed style desktop/mobile.
+- Se preservó `heroans` con hash HTML `e0b951b2456a83578cd9e22005900521`, se purgó Kinsta y se verificó desktop/mobile 390px sin overflow, FAQ funcional y Growth Forms reactivo intacto.
