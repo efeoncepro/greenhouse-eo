@@ -10,7 +10,7 @@
 - Product Design asset: Review Command Center (PNGs ↑) + master flow EPIC-020 Journey F
 - Intended consumers: operador interno Growth/Marketing Ops o admin Efeonce (capability `growth.ai_visibility.report.review`) — NUNCA `client_*`
 - Copy source: menú `greenhouse-nomenclature.ts`/`greenhouse-navigation-copy.ts`; funcional `src/lib/copy/growth.ts`
-- Primitive decision: `reuse` — CompositionShell (`leadPlusContext`), AdaptiveSidecar variant **`reconciler`**, `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`, tables/cards
+- Primitive decision (verificado 2026-06-30, primitive lookup): `reuse` total — CompositionShell composición **`split`** (kind `queueInspector`), AdaptiveSidecar kind/variant **`reconciler`** (EXISTE en `adaptive-sidecar-controller.ts` → no primitive nueva), `DataTableShell`, `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`. **Corrección:** la composición canónica de cola+inspector es `split` (`queueInspector`), NO `leadPlusContext` (ese es el kind `nexaMoment`, AI Overviews in-place). El visual aprobado confirma split (cola izquierda + reconciler derecha).
 - UI ready target: `no`
 
 ## Brief
@@ -28,7 +28,7 @@
 | 0 | Header | breadcrumb + título + counts/SLA/risk summary + postura de acción capability-safe | `GreenhouseBreadcrumbs` + summary | reviews reader |
 | 1 (lead) | **Queue lane** | filtros/búsqueda + filas densas: marca, score, razón del gate, tipo de riesgo, completitud de evidencia, edad, reviewer/lock, conflicto | `DataTableShell` + `card-density` | `/api/admin/.../reviews` |
 | 2 (context) | **Reconciler/detail lane** (AdaptiveSidecar `reconciler`) | preview WYSIWYG del reporte público + razones internas acotadas + warning de evidencia + audit trail + controles de decisión | AdaptiveSidecar `reconciler` | run detail (1244) |
-| 2a | **Evidence ledger** | checklist cronológico: score gate · accuracy detector · public snapshot check · provider coverage · publish readiness (status + detalle acotado + impacto + timestamp; evidence peeks acotados, NUNCA dumps crudos) | ledger list | run evidence (1244) |
+| 2a | **Evidence ledger** | checklist cronológico: score gate · accuracy detector · public snapshot check · provider coverage · publish readiness (status + detalle acotado + impacto + timestamp; evidence peeks acotados, NUNCA dumps crudos). **[capa-2 anti-falso-0 ISSUE-110]** incluir **presencia por-motor** (ChatGPT/Perplexity/Gemini/AI Overviews POR SEPARADO, no blended: ~11% solapamiento) con probe verbatim + snippet + **`as_of` por motor** + **flag de staleness**, y **procedencia bounded de cada claim público**. NOTA: el visual aprobado (2026-06-25) muestra "Motor: LLM_A" único + barras por dimensión — el desglose por-motor es ADICIÓN de esta revisión, no está en el PNG | ledger list | run evidence + probes (1244/1267) |
 | 2b | **Publish readiness checklist** | DTO público exacto · sin evidencia cruda · disclaimer presente · evidencia completa o explícitamente parcial · razón de rechazo capturada | checklist | derived |
 | 3 | **Decision area** | aprobar/rechazar **balanceados** (sin CTA aprobar pre-focuseada, sin sesgo a publicar) | `GreenhouseAsyncActionButton` ×2 | approve/reject (1244) |
 
@@ -50,8 +50,9 @@
 | loading | — | skeleton de cola y detalle | — | |
 | empty | Sin reportes pendientes | nada que revisar | — | |
 | error | No pudimos cargar la cola | — | reintentar | reader/command |
-| degraded/partial | **Evidencia incompleta / Pendiente** | qué slice faltó | — | **riesgo de seguridad #1: nunca render confiado sobre slice fallido** |
-| stale/conflicto | Este reporte ya fue revisado por {X} | actualizando cola | refrescar | guard de versión (1244); NO error genérico |
+| degraded/partial | **Evidencia incompleta / Pendiente** | qué slice/probe falló | — | **riesgo de seguridad #1: nunca render confiado sobre slice fallido** |
+| **abstención grader** | **Datos insuficientes** | el grader se abstuvo (`insufficient_data`/`confidence=none`) — distinto de "una probe falló" | — | badge propio; **no se publica por default** |
+| stale/conflicto | Este reporte ya fue revisado por {X} | actualizando cola | refrescar | command 1244 lanza **`invalid_transition`** (flip terminal) / **`not_reviewable`** (gate fuera de review_required), ambos 409 → mapear a este copy, NO error genérico; mostrar `score_version` vigente |
 | permission denied | — | sin capability `report.review` | — | |
 
 ## Accessibility Contract
@@ -65,14 +66,14 @@
 
 ## Implementation Mapping
 
-- Route / surface: `/admin/growth/ai-visibility` (menú Growth → AEO Grader); `/review` child/deep-link. routeGroup `admin`, NUNCA `client_*`
-- Primitives: CompositionShell `leadPlusContext` + AdaptiveSidecar `reconciler` + `GreenhouseAsyncActionButton` + `GreenhouseCommandFeedback` + `DataTableShell` + `card-density`
-- Variants / kinds: `leadPlusContext`, AdaptiveSidecar `reconciler`
+- Route / surface: `/admin/growth/ai-visibility` (menú **Growth → AEO Grader** top-level, sibling de Forms); `/review` child/deep-link. routeGroup `admin`, NUNCA `client_*`. **OJO:** el PNG aprobado (2026-06-25) muestra el nav viejo "Administración > Growth > AI Visibility > Review" + título "AI Visibility" — quedó **stale** 1 día antes de la decisión de nav (2026-06-26). Implementar con label **AEO Grader**; el título/contenido puede decir "AI Visibility Grader".
+- Primitives: CompositionShell composición **`split`** (kind `queueInspector`) + AdaptiveSidecar kind `reconciler` + `GreenhouseAsyncActionButton` + `GreenhouseCommandFeedback` + `DataTableShell` + `card-density`
+- Variants / kinds: CompositionShell `split`/`queueInspector`, AdaptiveSidecar `reconciler`
 - Component candidates: queue lane + reconciler detail + evidence ledger + publish-readiness checklist + decision area
 - Copy source: `growth.ts` (funcional) + nomenclatura (menú)
 - Data reader / command: cola reader + `approveAiVisibilityReport` / `rejectAiVisibilityReport` + `report/publish` (TASK-1244) — endpoints `/api/admin/growth/ai-visibility/reviews` + `runs/[runId]/review/{approve,reject}` + `report/publish`
 - API parity: la UI es cliente de los commands de 1244; cero lógica de aprobación local
-- Access / capability: viewCode `administracion.growth_ai_visibility` (seed mismo PR, TASK-827) + capability `growth.ai_visibility.report.review` (cross-check: 1244 la granteó a ≥1 ROLE_CODE interno real — no existe `growth_*`) + route-reachability (TASK-982)
+- Access / capability: viewCode `administracion.growth_ai_visibility` (seed mismo PR, TASK-827) + capability `growth.ai_visibility.report.review` (**cross-check RESUELTO 2026-06-30: granteada a EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN en `runtime.ts:234`** — no hay permission-denied-for-all) + route-reachability (TASK-982)
 - States to implement: default/loading/empty/error/partial/stale-conflict/denied/mobile
 - GVC markers: `admin-review-queue`, `admin-review-detail`, `admin-review-actions`
 
@@ -91,11 +92,12 @@
 
 ## Design Decision Log
 
-- Decision: **Review Command Center** (release gate workbench) + evidence ledger (checklist cronológico) + publish-readiness checklist público-safe; `leadPlusContext` + AdaptiveSidecar `reconciler`
-- Alternatives considered: landing/hero público / gradientes-orbs / vanity tiles / tabla de transcript crudo / muro de logos / modal o drawer custom para review (todas **rechazadas**)
-- Why this pattern: superficie interna safety-oriented; el revisor necesita las razones internas acotadas JUNTO al artefacto público exacto, no solo el preview
-- Reuse / extend / new primitive: reuse total (CompositionShell + AdaptiveSidecar `reconciler` + async action/feedback) — sin primitive nueva
-- Open risks: conflicto multi-revisor exige guard de versión en el command de 1244; capability grant real (no `growth_*`); el preview público debe ser el DTO público EXACTO
+- Decision: **Review Command Center** (release gate workbench) + evidence ledger (checklist cronológico, **+ evidencia por-motor anti-falso-0**) + publish-readiness checklist público-safe; composición **`split`/`queueInspector`** + AdaptiveSidecar `reconciler`
+- Alternatives considered: landing/hero público / gradientes-orbs / vanity tiles / tabla de transcript crudo / muro de logos / modal o drawer custom para review (todas **rechazadas**); composición `leadPlusContext` **rechazada** (es el kind nexaMoment; cola+inspector = `split`)
+- Why this pattern: superficie interna safety-oriented; el revisor necesita las razones internas acotadas JUNTO al artefacto público exacto, no solo el preview; la evidencia por-motor es la 2ª capa del mismo falso-0 que EPIC-021 cierra en el motor
+- Reuse / extend / new primitive: **reuse total verificado (primitive lookup 2026-06-30)** — CompositionShell `split` + AdaptiveSidecar `reconciler` (existe) + `DataTableShell` + async action/feedback. Sin primitive nueva → effort `ui-standard` se sostiene
+- Open risks (RESUELTOS 2026-06-30): ~~conflicto multi-revisor exige guard~~ → el command 1244 ya lo tiene (`invalid_transition`/`not_reviewable`); ~~capability grant real~~ → granteada a EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN; ~~¿reconciler existe?~~ → sí.
+- **Scope de la evidencia por-motor (verificado 2026-06-30, protege "Backend impact: none"):** la **presencia por-motor + dominios citados + `as_of`/staleness** YA existen bounded (`report/citation-breakdown.ts` sobre `provider_observations` + `byProvider` de `report/builder.ts` + `observedAt` de probes) → **1247 los consume UI-pura**. El **probe verbatim + snippet de respuesta** NO está expuesto (los readers strippean raw provider text a propósito) → mostrarlo necesita un **reader interno-only nuevo = delta backend** → **FUERA de scope de 1247** (follow-up). 1247 cubre falso-0 (#1) + stale (#3) con lo que existe; el snippet verbatim (anti-alucinación #2) es follow-up.
 
 ## Acceptance Checklist
 
