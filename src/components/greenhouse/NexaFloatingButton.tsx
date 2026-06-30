@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { usePathname } from 'next/navigation'
-
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
@@ -137,7 +135,6 @@ interface NexaFloatingButtonProps {
 }
 
 const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
-  const pathname = usePathname()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [open, setOpen] = useState(false)
@@ -334,9 +331,6 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       }
     }
   }
-
-  // Hide where Nexa already owns the surface inline.
-  if (pathname === '/home') return null
 
   const panelContent = (
     <AssistantRuntimeProvider runtime={runtime}>

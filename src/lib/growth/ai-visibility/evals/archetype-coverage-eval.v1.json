@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "artifact": "archetype-coverage-eval.v1",
+    "task": "TASK-1292 (EPIC-021, cierra ISSUE-110)",
+    "schemaVersion": "archetype_coverage_v1",
+    "purpose": "Contrato gobernado de COBERTURA del generador de prompts por arquetipo (Capa A: DETERMINISTA). Para cada business_model, el pack que resuelve `resolveArchetypeBaselinePack` debe cubrir las etapas de buyer-intent MÍNIMAS exigibles (archetype-aware), no usar framing de agencia (salvo el arquetipo agencia, que ES una agencia), y abarcar amplitud de Query Fan-Out. NO mide presencia real en el LLM (eso es la Capa B: smoke real allowlisted, evidencia NO gate de CI). NO es tautológico: codifica el contrato JTBD/Query-Fan-Out de cada modelo, no 'lo que el pack hoy contiene'.",
+    "kind": "coverage_spec — {archetype → required coverage assertions}; NO es {input → expectedFinding} como el golden-set (precedente: category-taxonomy-eval.v1).",
+    "consumedBy": [
+      "src/lib/growth/ai-visibility/evals/archetype-coverage-eval.ts (harness runArchetypeCoverageEval, SSOT)",
+      "src/lib/growth/ai-visibility/__tests__/archetype-coverage-eval.test.ts (CI gate)",
+      "src/lib/reliability/queries/growth-ai-visibility-archetype-coverage-signals.ts (drift signal growth.ai_visibility.archetype_coverage_gap, steady=0)"
+    ],
+    "matrixRationale": {
+      "archetype_aware": "public_institution NO exige purchase_intent ni enterprise ni comparison (sin transacción comercial / sin competencia). marketplace NO exige purchase_intent ni local (su spine es trust/comparación). consumer_b2c/retail → local (búsqueda local del consumidor). b2b_product_saas/agencia → enterprise (intención enterprise B2B).",
+      "verifiedGreenAgainstPacks": "Cada minStage fue verificado presente en su pack shipped (baseline-packs.ts) al 2026-06-29 — el eval es verde el día 1; un edit futuro que retire una etapa exigible lo pone rojo (esa es la red).",
+      "agencyAnchor": "b2b_service_provider = pack agencia v1 EXACTO; noAgencyLeak=false (ES una agencia). La identidad referencial (=== PACK_V1) se ancla en archetype-baseline-packs.test.ts (TASK-1290); aquí se ancla su cobertura de etapas."
+    }
+  },
+  "expectations": [
+    {
+      "businessModel": "consumer_b2c",
+      "expectedPackVersion": "archetype-consumer_b2c.v1",
+      "minStages": ["awareness", "consideration", "comparison", "trust", "purchase_intent", "local", "message_recall"],
+      "minDistinctFanOutTypes": 3,
+      "noAgencyLeak": true,
+      "requiresCategoryToken": true
+    },
+    {
+      "businessModel": "b2b_service_provider",
+      "expectedPackVersion": "prompt-pack.v1",
+      "minStages": ["awareness", "consideration", "comparison", "trust", "purchase_intent", "enterprise", "message_recall"],
+      "minDistinctFanOutTypes": 3,
+      "noAgencyLeak": false,
+      "requiresCategoryToken": true
+    },
+    {
+      "businessModel": "b2b_product_saas",
+      "expectedPackVersion": "archetype-b2b_product_saas.v1",
+      "minStages": ["awareness", "consideration", "comparison", "trust", "purchase_intent", "enterprise", "message_recall"],
+      "minDistinctFanOutTypes": 3,
+      "noAgencyLeak": true,
+      "requiresCategoryToken": true
+    },
+    {
+      "businessModel": "retail_ecommerce",
+      "expectedPackVersion": "archetype-retail_ecommerce.v1",
+      "minStages": ["awareness", "consideration", "comparison", "trust", "purchase_intent", "local", "message_recall"],
+      "minDistinctFanOutTypes": 3,
+      "noAgencyLeak": true,
+      "requiresCategoryToken": true
+    },
+    {
+      "businessModel": "marketplace",
+      "expectedPackVersion": "archetype-marketplace.v1",
+      "minStages": ["awareness", "consideration", "comparison", "trust", "message_recall"],
+      "minDistinctFanOutTypes": 3,
+      "noAgencyLeak": true,
+      "requiresCategoryToken": true
+    },
+    {
+      "businessModel": "public_institution",
+      "expectedPackVersion": "archetype-public_institution.v1",
+      "minStages": ["awareness", "consideration", "trust", "local", "message_recall"],
+      "minDistinctFanOutTypes": 3,
+      "noAgencyLeak": true,
+      "requiresCategoryToken": true
+    },
+    {
+      "businessModel": "unknown",
+      "expectedPackVersion": "archetype-generic.v1",
+      "minStages": ["awareness", "consideration", "comparison", "trust", "message_recall"],
+      "minDistinctFanOutTypes": 3,
+      "noAgencyLeak": true,
+      "requiresCategoryToken": true
+    }
+  ]
+}

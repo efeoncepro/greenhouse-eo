@@ -1,0 +1,23 @@
+{
+  "//": "Plantilla Article/BlogPosting — para contenido editorial. author como Person con credenciales eleva E-E-A-T. dateModified honesto = factor de frescura IA. Marca SOLO contenido visible.",
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "@id": "https://EXAMPLE.com/slug-del-articulo/#article",
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "https://EXAMPLE.com/slug-del-articulo/" },
+  "headline": "TÍTULO DEL ARTÍCULO (≤110 caracteres)",
+  "description": "RESUMEN / META DESCRIPTION.",
+  "image": ["https://EXAMPLE.com/img/articulo-1200x630.jpg"],
+  "datePublished": "AAAA-MM-DDT09:00:00-04:00",
+  "dateModified": "AAAA-MM-DDT09:00:00-04:00",
+  "author": {
+    "@type": "Person",
+    "@id": "https://EXAMPLE.com/autores/nombre-autor/#person",
+    "name": "NOMBRE DEL AUTOR/A",
+    "url": "https://EXAMPLE.com/autores/nombre-autor/",
+    "jobTitle": "CARGO / CREDENCIAL",
+    "knowsAbout": ["TEMA 1", "TEMA 2"],
+    "sameAs": ["https://www.linkedin.com/in/PERFIL"]
+  },
+  "publisher": { "@id": "https://EXAMPLE.com/#organization" },
+  "inLanguage": "es-CL"
+}

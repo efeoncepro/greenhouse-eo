@@ -296,6 +296,28 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-layout-cards'
   },
   {
+    id: 'growth-forms-renderer',
+    title: 'Growth Forms renderer',
+    description:
+      'Preview del renderer portable Growth Forms (TASK-1231): el mismo core Web Component <greenhouse-form> que WordPress y Astro montan en producción, consumiendo solo el render_contract gobernado (Full API Parity). Sin lógica de destino/vendor en el browser. Composiciones static/conditional/multi-step y estados loading/error/no-disponible, montados desde fixtures.',
+    route: '/design-system/growth-forms-renderer',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Hardening',
+    owner: 'src/growth-forms-renderer/*',
+    tags: ['growth', 'forms', 'web component', 'renderer', 'portable', 'wordpress', 'astro'],
+    searchAliases: [
+      'growth forms',
+      'formularios',
+      'web component',
+      'greenhouse-form',
+      'render contract',
+      'portable renderer',
+      'wordpress astro'
+    ],
+    icon: 'tabler-forms'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',
@@ -631,6 +653,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     owner: 'microinteraction primitives',
     tags: ['feedback', 'thinking', 'validation', 'decision'],
     icon: 'tabler-click'
+  },
+  {
+    id: 'team-avatar-group',
+    title: 'Team Avatar Group',
+    description:
+      'Grupo compacto de avatares solapados con tooltip + microinteracción pull-up. Kinds: members (personas, foto/iniciales) y brands (isotipos de motor/integración con Tooltip AXIS + label inline). TASK-1248.',
+    route: '/design-system/team-avatar-group',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'TeamAvatarGroup',
+    tags: ['avatar', 'group', 'team', 'personas', 'isotipos', 'marcas', 'integraciones', 'overlap'],
+    searchAliases: ['team avatar', 'avatar group', 'isotipos', 'marcas', 'engines', 'evaluado en'],
+    icon: 'tabler-users'
   },
   {
     id: 'catalog',

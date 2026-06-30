@@ -2,7 +2,7 @@ import { test, expect, gotoAuthenticated } from '../fixtures/auth'
 
 test.describe('admin / navigation', () => {
   test('GET /admin renders the admin dashboard for efeonce_admin', async ({ page }) => {
-    const response = await gotoAuthenticated(page, '/admin')
+    const response = await gotoAuthenticated(page, '/admin', { waitUntil: 'commit' })
 
     expect(response?.status(), '/admin status').toBeLessThan(400)
 

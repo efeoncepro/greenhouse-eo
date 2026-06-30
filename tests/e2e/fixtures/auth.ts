@@ -1,4 +1,4 @@
-import { test, expect, type BrowserContext, type Page } from '@playwright/test'
+import { test, expect, type APIRequestContext, type BrowserContext, type Page } from '@playwright/test'
 
 const SIGN_IN_PATH_MARKERS = ['/login', '/signin', '/auth/signin', '/auth/access-denied']
 const DEFAULT_NAVIGATION_ATTEMPTS = 3
@@ -18,6 +18,7 @@ interface GotoWithTransientRetriesOptions {
   attempts?: number
   timeoutMs?: number
   backoffMs?: number
+  waitUntil?: NonNullable<Parameters<Page['goto']>[1]>['waitUntil']
 }
 
 type PlaywrightCookie = Parameters<BrowserContext['addCookies']>[0][number]
@@ -95,12 +96,13 @@ export async function gotoWithTransientRetries(
   const attempts = options.attempts ?? DEFAULT_NAVIGATION_ATTEMPTS
   const timeoutMs = options.timeoutMs ?? DEFAULT_NAVIGATION_TIMEOUT_MS
   const backoffMs = options.backoffMs ?? DEFAULT_NAVIGATION_BACKOFF_MS
+  const waitUntil = options.waitUntil ?? 'domcontentloaded'
   let lastError: unknown
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
       return await page.goto(path, {
-        waitUntil: 'domcontentloaded',
+        waitUntil,
         timeout: timeoutMs
       })
     } catch (error) {
@@ -117,8 +119,8 @@ export async function gotoWithTransientRetries(
   throw lastError
 }
 
-export async function gotoAuthenticated(page: Page, path: string) {
-  const response = await gotoWithTransientRetries(page, path)
+export async function gotoAuthenticated(page: Page, path: string, options: GotoWithTransientRetriesOptions = {}) {
+  const response = await gotoWithTransientRetries(page, path, options)
 
   if (response) {
     expect(response.status(), `GET ${path} returned ${response.status()}`).toBeLessThan(400)
@@ -127,4 +129,19 @@ export async function gotoAuthenticated(page: Page, path: string) {
   await expectAuthenticated(page)
 
   return response
+}
+
+export async function getAuthenticatedJson<T = unknown>(
+  request: APIRequestContext,
+  path: string,
+  options: { timeoutMs?: number } = {}
+): Promise<T> {
+  const response = await request.get(path, {
+    timeout: options.timeoutMs ?? 60_000
+  })
+
+  expect(response.status(), `GET ${path} returned ${response.status()}`).toBeLessThan(400)
+  expect(response.headers()['content-type'] ?? '', `GET ${path} returned JSON`).toContain('application/json')
+
+  return response.json() as Promise<T>
 }

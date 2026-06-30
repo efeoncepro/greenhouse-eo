@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react'
 
-export type EmailDomain = 'identity' | 'payroll' | 'finance' | 'hr' | 'delivery' | 'system'
+export type EmailDomain = 'identity' | 'payroll' | 'finance' | 'hr' | 'delivery' | 'system' | 'growth'
 
 export type EmailType =
   | 'password_reset'
@@ -21,6 +21,7 @@ export type EmailType =
   | 'leave_request_pending_review'
   | 'quote_share'
   | 'contractor_remittance_paid'
+  | 'ai_visibility_grader_report'
 
 export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered' | 'dead_letter'
 
@@ -50,6 +51,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   weekly_executive_digest:      'broadcast',
   quote_share:                  'transactional',
   contractor_remittance_paid:   'transactional',
+  ai_visibility_grader_report:  'transactional',
 }
 
 export interface EmailRecipient {
@@ -115,6 +117,17 @@ export interface SendEmailInput<TContext extends EmailTemplateContext = EmailTem
   /** Priority override. Defaults to EMAIL_PRIORITY_MAP[emailType] ?? 'broadcast'. */
   priority?: EmailPriority
 }
+
+/**
+ * AGENCY-branded email types: sender = **Efeonce** (the agency), NOT the platform sender
+ * `getEmailFromAddress()` (which today is the carried-debt "Efeonce Greenhouse"). These are
+ * public, agency-facing surfaces (lead magnet) where a cold prospect must see Efeonce. The
+ * address stays a Resend-verified domain; only the display name differs.
+ */
+export const AGENCY_FROM_ADDRESS = 'Efeonce <greenhouse@efeoncepro.com>'
+export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
+  'ai_visibility_grader_report'
+])
 
 export interface SendEmailResult {
   deliveryId: string

@@ -543,6 +543,28 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     filesOwned: ['src/lib/knowledge/**', 'src/lib/reliability/queries/knowledge-*.ts'],
     expectedSignalKinds: ['data_quality', 'freshness', 'dead_letter', 'incident'],
     incidentDomainTag: 'knowledge'
+  },
+  {
+    moduleKey: 'growth',
+    label: 'Growth · AI Visibility Grader',
+    description:
+      'Dominio growth (TASK-1226): grader de visibilidad en answer engines (OpenAI/Anthropic/Perplexity/Gemini). Provider adapters server-only tras flags (default OFF), run-engine canónico (Full API parity) y evidence ledger append-only en greenhouse_growth. La evidencia de provider NO es business truth; el score/report se derivan después (TASK-1227).',
+    domain: 'growth',
+    routes: [],
+    apis: [{ path: '/api/admin/growth/ai-visibility/runs', label: 'Grader runs (internal read/smoke)' }],
+    dependencies: [
+      'greenhouse_growth.grader_profiles',
+      'greenhouse_growth.grader_runs',
+      'greenhouse_growth.provider_observations'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/growth/**',
+      'src/lib/reliability/queries/growth-ai-visibility-*.ts',
+      'src/lib/reliability/queries/growth-search-console-*.ts'
+    ],
+    expectedSignalKinds: ['data_quality', 'runtime', 'cost_guard', 'posture', 'test_lane', 'drift'],
+    incidentDomainTag: 'growth'
   }
 ]
 

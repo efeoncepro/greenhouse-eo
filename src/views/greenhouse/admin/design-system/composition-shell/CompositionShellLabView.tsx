@@ -21,8 +21,8 @@ import {
 import { startViewTransition } from '@/lib/motion/view-transition'
 
 /**
- * Lab interno del CompositionShell (TASK-1114 Slice 3 + TASK-1117/1119). INTERNAL ONLY — los clientes
- * nunca lo ven. Specimen vivo: recorre las 4 composiciones con el morph in-place (View Transitions) +
+ * Lab interno del CompositionShell (TASK-1114 Slice 3 + TASK-1117/1119 + TASK-1248 masterDetail). INTERNAL
+ * ONLY — los clientes nunca lo ven. Specimen vivo: recorre las composiciones con el morph in-place (VT) +
  * demuestra el enriquecimiento de fluidez (TASK-1117): entrada con stagger (`fluidity='rich'`), morph
  * interrumpible (`morphStrategy='interruptible'`), promoción shared-element (card → lead) y telemetry
  * opt-in. Verifica el substrato desktop+mobile vía GVC.
@@ -32,6 +32,7 @@ const COMPOSITIONS: { value: CompositionShellComposition; label: string }[] = [
   { value: 'single', label: 'single' },
   { value: 'leadPlusContext', label: 'leadPlusContext' },
   { value: 'split', label: 'split' },
+  { value: 'masterDetail', label: 'masterDetail' },
   { value: 'focused', label: 'focused' }
 ]
 
@@ -108,10 +109,11 @@ const MockAside = () => {
         height: '100%'
       }}
     >
-      <Typography variant='subtitle2'>Inspector</Typography>
+      <Typography variant='subtitle2'>Inspector / Navigator</Typography>
       <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
         Panel companion in-flow (`aside`): reserva espacio y el contenido principal reflowea — no lo tapa. En
-        compact se vuelve drawer temporal (semántica modal, focus trap).
+        `split` es el inspector (ancho a la derecha, colapsa a drawer en compact). En `masterDetail` es el
+        navigator (angosto a la izquierda; el detail `primary` es el que colapsa a drawer en compact).
       </Typography>
     </Box>
   )
@@ -242,6 +244,8 @@ const CompositionShellLabView = () => {
         morphStrategy={morphStrategy}
         onTelemetry={handleTelemetry}
         telemetrySource='design-system-lab'
+        asideLabel='Inspector / Navigator'
+        detailLabel='Detalle'
         regions={{
           lead: <MockLead promoteActive={promoteLead} />,
           primary: <MockPrimary promoteActive={promotePrimaryCard} />,

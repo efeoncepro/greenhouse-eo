@@ -64,7 +64,14 @@ MIN_INSTANCES="0"
 MAX_INSTANCES="5"
 MEMORY="2Gi"
 CPU="2"
-TIMEOUT="540"
+# TIMEOUT=3600s (60 min, Cloud Run máximo): el AI Visibility Grader async
+# (/growth/grader/drain, TASK-1234) ejecuta un run `full`/`internal_audit`
+# multi-provider de forma secuencial (hasta ~16 prompts × 4 providers × ~35s ≈ 37
+# min con Gemini 3 ≈ 56s/call) DENTRO del request Cloud Run — el timeout del request
+# es el límite duro real (el attempt-deadline del scheduler que se rinde NO mata el
+# request en vuelo). El resto de handlers (reactive/outbox/finance) terminan en
+# segundos; subir el techo no cambia su comportamiento, sólo deja correr al grader.
+TIMEOUT="3600"
 CONCURRENCY="4"
 REACTIVE_BATCH_SIZE="500"
 DEFAULT_EMAIL_FROM="Efeonce Greenhouse <greenhouse@efeoncepro.com>"
@@ -241,6 +248,29 @@ ENV_VARS="${ENV_VARS},RELIABILITY_AI_OBSERVER_ENABLED=${RELIABILITY_AI_OBSERVER_
 CLOUD_COST_AI_COPILOT_ENABLED="${CLOUD_COST_AI_COPILOT_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},CLOUD_COST_AI_COPILOT_ENABLED=${CLOUD_COST_AI_COPILOT_ENABLED}"
 
+# TASK-990 / TASK-995 / TASK-1210 — Finance multi-currency MXN + CLF activación.
+# El ops-worker corre el Nubox sync (/nubox/sync, /nubox/quotes-hot-sync) que
+# materializa income; estos flags gatean el plano nativo MXN + la proyección CLF.
+# Declarativo acá para que `--set-env-vars` (destructivo) NO los borre en cada
+# redeploy. Activados en producción 2026-06-22 (release develop→main, sign-off CEO).
+# Rollback (<5min): `FINANCE_CORE_MXN_ENABLED=false ... bash services/ops-worker/deploy.sh`.
+FINANCE_CORE_MXN_ENABLED="${FINANCE_CORE_MXN_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},FINANCE_CORE_MXN_ENABLED=${FINANCE_CORE_MXN_ENABLED}"
+NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED="${NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED=${NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED}"
+FINANCE_MXN_PAYMENT_ORDERS_ENABLED="${FINANCE_MXN_PAYMENT_ORDERS_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},FINANCE_MXN_PAYMENT_ORDERS_ENABLED=${FINANCE_MXN_PAYMENT_ORDERS_ENABLED}"
+FINANCE_MULTI_CURRENCY_REPORTING_ENABLED="${FINANCE_MULTI_CURRENCY_REPORTING_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},FINANCE_MULTI_CURRENCY_REPORTING_ENABLED=${FINANCE_MULTI_CURRENCY_REPORTING_ENABLED}"
+FINANCE_CORE_CLF_INDEXED_ENABLED="${FINANCE_CORE_CLF_INDEXED_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},FINANCE_CORE_CLF_INDEXED_ENABLED=${FINANCE_CORE_CLF_INDEXED_ENABLED}"
+FINANCE_CLF_INCOME_PROJECTION_ENABLED="${FINANCE_CLF_INCOME_PROJECTION_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},FINANCE_CLF_INCOME_PROJECTION_ENABLED=${FINANCE_CLF_INCOME_PROJECTION_ENABLED}"
+FINANCE_CLF_OBLIGATIONS_ENABLED="${FINANCE_CLF_OBLIGATIONS_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},FINANCE_CLF_OBLIGATIONS_ENABLED=${FINANCE_CLF_OBLIGATIONS_ENABLED}"
+FINANCE_CLF_REPORTING_ENABLED="${FINANCE_CLF_REPORTING_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},FINANCE_CLF_REPORTING_ENABLED=${FINANCE_CLF_REPORTING_ENABLED}"
+
 # TASK-916 — RpA V2 writeback (Flip A). Cuando true, el consumer reactivo
 # `notion_rpa_writeback` hace PATCH a la propiedad Notion `[GH] RpA v2` (separada
 # de la formula legacy `RpA` — coexistencia Strangler; NO toca el bono, que sigue
@@ -301,6 +331,177 @@ if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
 else
   echo "WARN: RESEND_API_KEY_SECRET_REF is not set; ops-worker will skip outbound email delivery."
 fi
+
+# TASK-1234 — AI Visibility Grader async worker (/growth/grader/drain via Cloud Scheduler).
+# El ops-worker es un servicio Cloud Run COMPARTIDO staging+prod → los flags se ramifican por
+# ENV (igual que los secret refs): en `staging` espejan al portal Vercel staging (GRADER +
+# OpenAI/Anthropic/Perplexity/Gemini ON) para que el drain ejecute runs `full` reales; en
+# `production` quedan OFF (el schema greenhouse_growth aún no está migrado en prod — fuera de
+# scope) y el handler de drain hace no-op prod-safe (gate isGraderEnabled, cero queries/Sentry).
+# Los *_API_KEY_SECRET_REF se declaran siempre para que el worker resuelva las API keys
+# server-side (resolveSecret); Gemini usa Vertex via WIF (sin secret, GCP_PROJECT + IAM).
+# Declarativo para que --set-env-vars (destructivo) NO los borre en cada redeploy.
+if [ "${ENV}" = "staging" ]; then
+  DEFAULT_GROWTH_GRADER_ENABLED="true"
+  DEFAULT_GROWTH_OPENAI_ENABLED="true"
+  DEFAULT_GROWTH_ANTHROPIC_ENABLED="true"
+  DEFAULT_GROWTH_PERPLEXITY_ENABLED="true"
+  DEFAULT_GROWTH_GEMINI_ENABLED="true"
+  # TASK-1229/1230 — Motor Growth Forms en vivo en staging (operador 2026-06-25).
+  DEFAULT_FORMS_DISPATCH_ENABLED="true"
+  DEFAULT_FORMS_HUBSPOT_ENABLED="true"
+  # TASK-1242 — HubSpot lead handoff: el WRITE (executeLeadHandoff) corre en este worker.
+  # Staging ON (operador 2026-06-25, smoke). Prod OFF (gated por EPIC-020 + sign-off).
+  DEFAULT_GROWTH_LEAD_HANDOFF_ENABLED="true"
+  # TASK-1250 — Email de entrega del informe: el WRITE (dispatchAiVisibilityReportEmail) corre
+  # en este worker. Staging ON (operador 2026-06-27, rollout). Prod OFF (gated por EPIC-020 + sign-off legal/from-address).
+  DEFAULT_GROWTH_REPORT_EMAIL_ENABLED="true"
+  # TASK-1279 — Cross-sell operador: el WRITE (executeOperatorReportSend → email + Lead HubSpot)
+  # corre en este worker (reactive consumer growth_ai_visibility_operator_send, lane ops-reactive-growth).
+  # GATEADO OFF (2026-06-29): el smoke con SKY reveló que el grader genera un diagnóstico FALSO para
+  # marcas no-agencia (prompt pack hardcodeado a ICP Efeonce + taxonomy bypass del HubSpot industry enum).
+  # No se reabilita hasta que el motor de prompts brand-aware valide categoría + modelo de negocio
+  # (EPIC del prompt-generation engine). Ver ISSUE del falso-0.
+  DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="false"
+  # TASK-1265 — Google AI Overviews / AI Mode provider (DataForSEO). El run async del grader
+  # ejecuta en este worker, así que el flag + creds DataForSEO deben vivir acá (no sólo en
+  # Vercel) para que los 3 endpoints (public/client-portal/operator) midan AI Overviews.
+  # Staging ON (operador 2026-06-28, smoke real verde). Prod OFF (gated por EPIC-020 +
+  # sign-off + rotación del password DataForSEO expuesto en provisión).
+  DEFAULT_GROWTH_GOOGLE_AIO_ENABLED="true"
+  # TASK-1266 — Site Readiness Probe Layer: el probe gatherer corre dentro de
+  # executeClaimedGraderRun → en el path async ejecuta en ESTE worker, así que el flag
+  # debe vivir acá (no sólo en Vercel). Staging ON (rollout 2026-06-28). Prod OFF
+  # (gated por EPIC-020 + release control plane). AGENTIC requiere PROBES ON (gating en código).
+  DEFAULT_GROWTH_PROBES_ENABLED="true"
+  DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED="true"
+  # TASK-1267 — Entity Infrastructure Probes (eje `entity`: Google Knowledge Graph + Wikidata +
+  # Reddit-UGC). Mismo razonamiento DUAL-LOCATION que PROBES: el gatherer corre en este worker en
+  # el path async. Staging ON (rollout 2026-06-28). Prod OFF (gated EPIC-020). Requiere PROBES ON
+  # (gating en código). La KG api key se resuelve server-side (resolveSecret); sin ella el KG probe
+  # degrada honesto `not_configured` (Wikidata/Reddit no requieren auth).
+  DEFAULT_GROWTH_ENTITY_PROBES_ENABLED="true"
+  # TASK-1270 — Re-grade recurrente AEO. Staging ON tras rollout develop
+  # (2026-06-29); prod OFF gated por EPIC-020/release control.
+  DEFAULT_GROWTH_REGRADE_ENABLED="true"
+  DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED="false"
+  # TASK-1288 — Brand Intelligence (lectura grounded compartida) ON en staging; el guard de
+  # categoría (CATEGORY_GUARD) queda OFF aún en staging: bloquearía el lead magnet público con
+  # categorías free-text no resueltas, y su beneficiario (cross-sell operador) está OFF — se
+  # prende con el review de TASK-1291. La resolución canónica + label en prompts es code-level
+  # (sin flag). Prod OFF (gated EPIC-021/release control).
+  DEFAULT_GROWTH_BRAND_INTELLIGENCE_ENABLED="true"
+  DEFAULT_GROWTH_CATEGORY_GUARD_ENABLED="false"
+  # TASK-1290 — prompts por arquetipo + autoría LLM ON en staging (rollout 2026-06-29). El run usa
+  # el baseline del arquetipo del perfil (o el set autorado active) en vez del pack agencia; agencia
+  # = v1 bit-for-bit. La autoría LLM es manual (command), no auto-run. Prod OFF (gated EPIC-021/
+  # release control + eval TASK-1292).
+  DEFAULT_GROWTH_ARCHETYPE_PROMPTS_ENABLED="true"
+  DEFAULT_GROWTH_PROMPT_AUTHORING_ENABLED="true"
+  # TASK-1267 — KG api key publicada en Secret Manager (key restringida a kgsearch.googleapis.com,
+  # 2026-06-28). Staging la wirea; el worker la resuelve server-side (resolveSecret) + el conditional
+  # de abajo appendea el ref + bindea secretAccessor.
+  DEFAULT_GOOGLE_KG_KEY_SECRET_REF="greenhouse-google-knowledge-graph-api-key"
+else
+  DEFAULT_GROWTH_GRADER_ENABLED="false"
+  DEFAULT_GROWTH_OPENAI_ENABLED="false"
+  DEFAULT_GROWTH_ANTHROPIC_ENABLED="false"
+  DEFAULT_GROWTH_PERPLEXITY_ENABLED="false"
+  DEFAULT_GROWTH_GEMINI_ENABLED="false"
+  DEFAULT_FORMS_DISPATCH_ENABLED="false"
+  DEFAULT_FORMS_HUBSPOT_ENABLED="false"
+  DEFAULT_GROWTH_LEAD_HANDOFF_ENABLED="false"
+  DEFAULT_GROWTH_REPORT_EMAIL_ENABLED="false"
+  DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="false"
+  DEFAULT_GROWTH_GOOGLE_AIO_ENABLED="false"
+  DEFAULT_GROWTH_PROBES_ENABLED="false"
+  DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED="false"
+  DEFAULT_GROWTH_ENTITY_PROBES_ENABLED="false"
+  DEFAULT_GROWTH_REGRADE_ENABLED="false"
+  DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED="true"
+  DEFAULT_GROWTH_BRAND_INTELLIGENCE_ENABLED="false"
+  DEFAULT_GROWTH_CATEGORY_GUARD_ENABLED="false"
+  DEFAULT_GROWTH_ARCHETYPE_PROMPTS_ENABLED="false"
+  DEFAULT_GROWTH_PROMPT_AUTHORING_ENABLED="false"
+  DEFAULT_GOOGLE_KG_KEY_SECRET_REF=""
+fi
+GROWTH_AI_VISIBILITY_GRADER_ENABLED="${GROWTH_AI_VISIBILITY_GRADER_ENABLED:-${DEFAULT_GROWTH_GRADER_ENABLED}}"
+GROWTH_AI_VISIBILITY_OPENAI_ENABLED="${GROWTH_AI_VISIBILITY_OPENAI_ENABLED:-${DEFAULT_GROWTH_OPENAI_ENABLED}}"
+GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED="${GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED:-${DEFAULT_GROWTH_ANTHROPIC_ENABLED}}"
+GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED="${GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED:-${DEFAULT_GROWTH_PERPLEXITY_ENABLED}}"
+GROWTH_AI_VISIBILITY_GEMINI_ENABLED="${GROWTH_AI_VISIBILITY_GEMINI_ENABLED:-${DEFAULT_GROWTH_GEMINI_ENABLED}}"
+GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED="${GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED:-false}"
+GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED="${GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED:-${DEFAULT_GROWTH_LEAD_HANDOFF_ENABLED}}"
+GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED="${GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED:-${DEFAULT_GROWTH_REPORT_EMAIL_ENABLED}}"
+GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED="${GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED:-${DEFAULT_GROWTH_OPERATOR_SEND_ENABLED}}"
+GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED="${GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED:-${DEFAULT_GROWTH_GOOGLE_AIO_ENABLED}}"
+GROWTH_AI_VISIBILITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_PROBES_ENABLED:-${DEFAULT_GROWTH_PROBES_ENABLED}}"
+GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED="${GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED:-${DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED}}"
+GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED:-${DEFAULT_GROWTH_ENTITY_PROBES_ENABLED}}"
+GROWTH_AI_VISIBILITY_REGRADE_ENABLED="${GROWTH_AI_VISIBILITY_REGRADE_ENABLED:-${DEFAULT_GROWTH_REGRADE_ENABLED}}"
+GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE="${GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE:-5}"
+GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD="${GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD:-50}"
+GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED="${GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED:-${DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED}}"
+GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED="${GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED:-${DEFAULT_GROWTH_BRAND_INTELLIGENCE_ENABLED}}"
+GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED="${GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED:-${DEFAULT_GROWTH_CATEGORY_GUARD_ENABLED}}"
+GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED="${GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED:-${DEFAULT_GROWTH_ARCHETYPE_PROMPTS_ENABLED}}"
+GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED="${GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED:-${DEFAULT_GROWTH_PROMPT_AUTHORING_ENABLED}}"
+# TASK-1267 — KG api key (eje entity). Opcional: sólo se appendea + bindea si viene poblada
+# (mismo patrón que DATAFORSEO_API_LOGIN), para que un --set-env-vars destructivo no deje un
+# secret ref vacío y para no referenciar un secret inexistente. Sin ella → KG probe degrada
+# honesto `not_configured` (Wikidata/Reddit corren igual, no requieren auth).
+GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF="${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF:-${DEFAULT_GOOGLE_KG_KEY_SECRET_REF}}"
+OPENAI_API_KEY_SECRET_REF="${OPENAI_API_KEY_SECRET_REF:-greenhouse-openai-api-key}"
+ANTHROPIC_API_KEY_SECRET_REF="${ANTHROPIC_API_KEY_SECRET_REF:-greenhouse-anthropic-api-key}"
+# TASK-1265 — DataForSEO (fuente SERP/AI Mode del provider google_ai_overview). El password
+# se resuelve server-side via secret ref; el login es config no-secreta que el CI inyecta
+# desde la GH Actions variable DATAFORSEO_API_LOGIN (ops-worker-deploy.yml). Sin login, el
+# adapter degrada limpio (missing_secret) — por eso sólo se appendea cuando viene poblado
+# (evita que un --set-env-vars destructivo deje DATAFORSEO_API_LOGIN="" en el worker).
+DATAFORSEO_API_PASSWORD_SECRET_REF="${DATAFORSEO_API_PASSWORD_SECRET_REF:-greenhouse-dataforseo-api-password}"
+DATAFORSEO_API_LOGIN="${DATAFORSEO_API_LOGIN:-}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_GRADER_ENABLED=${GROWTH_AI_VISIBILITY_GRADER_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_OPENAI_ENABLED=${GROWTH_AI_VISIBILITY_OPENAI_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED=${GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=${GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_GEMINI_ENABLED=${GROWTH_AI_VISIBILITY_GEMINI_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED=${GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED=${GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED=${GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED=${GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=${GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PROBES_ENABLED=${GROWTH_AI_VISIBILITY_PROBES_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED=${GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED=${GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_REGRADE_ENABLED=${GROWTH_AI_VISIBILITY_REGRADE_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED=${GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED=${GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED=${GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED=${GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE=${GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD=${GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD}"
+if [ -n "${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF}" ]; then
+  ENV_VARS="${ENV_VARS},GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF=${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF}"
+  ensure_secret_accessor_binding "${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF}"
+fi
+ENV_VARS="${ENV_VARS},DATAFORSEO_API_PASSWORD_SECRET_REF=${DATAFORSEO_API_PASSWORD_SECRET_REF}"
+if [ -n "${DATAFORSEO_API_LOGIN}" ]; then
+  ENV_VARS="${ENV_VARS},DATAFORSEO_API_LOGIN=${DATAFORSEO_API_LOGIN}"
+fi
+ensure_secret_accessor_binding "${DATAFORSEO_API_PASSWORD_SECRET_REF}:latest"
+# TASK-1229/1230 — Motor Growth Forms: dispatcher + adapter HubSpot Forms secure-submit.
+# Staging ON (forms en vivo en develop); prod OFF (gated por TASK-1232 primer form real +
+# sign-off). Gate prod-safe: con OFF el handler/adapter no-opean (cero queries/writes).
+GROWTH_FORMS_DISPATCH_ENABLED="${GROWTH_FORMS_DISPATCH_ENABLED:-${DEFAULT_FORMS_DISPATCH_ENABLED}}"
+GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED="${GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED:-${DEFAULT_FORMS_HUBSPOT_ENABLED}}"
+ENV_VARS="${ENV_VARS},GROWTH_FORMS_DISPATCH_ENABLED=${GROWTH_FORMS_DISPATCH_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED=${GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED}"
+ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
+ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
+ensure_secret_accessor_binding "${OPENAI_API_KEY_SECRET_REF}:latest"
+ensure_secret_accessor_binding "${ANTHROPIC_API_KEY_SECRET_REF}:latest"
+# TASK-1230 — el adapter resuelve el token HubSpot via resolveSecretByRef('hubspot-access-token').
+ensure_secret_accessor_binding "hubspot-access-token:latest"
 
 # Secrets from Secret Manager (mounted as env vars)
 SECRETS="NEXTAUTH_SECRET=${NEXTAUTH_SECRET_REF}"
@@ -548,12 +749,13 @@ delete_scheduler_job() {
 }
 
 # Helper: create-or-update a Cloud Scheduler HTTP job with OIDC auth.
-# Args: job_name, schedule, path, message_body
+# Args: job_name, schedule, path, message_body, [paused]
 upsert_scheduler_job() {
   local job_name="$1"
   local schedule="$2"
   local uri_path="$3"
   local body="$4"
+  local paused="${5:-false}"
 
   gcloud scheduler jobs create http "${job_name}" \
     --project="${PROJECT_ID}" \
@@ -583,6 +785,18 @@ upsert_scheduler_job() {
     --attempt-deadline="540s" \
     --max-retry-attempts=1 \
     --quiet
+
+  if [ "${paused}" = "true" ]; then
+    gcloud scheduler jobs pause "${job_name}" \
+      --project="${PROJECT_ID}" \
+      --location="${REGION}" \
+      --quiet
+  else
+    gcloud scheduler jobs resume "${job_name}" \
+      --project="${PROJECT_ID}" \
+      --location="${REGION}" \
+      --quiet 2>/dev/null || true
+  fi
 }
 
 # Cleanup: remove legacy "all domains" jobs replaced by per-domain lanes (TASK-379 Slice 3).
@@ -637,6 +851,17 @@ upsert_scheduler_job \
   '{"domain":"cost_intelligence","batchSize":500}'
 echo "  -> ops-reactive-cost-intelligence: */10 * * * * (cost_intelligence domain)"
 
+# TASK-1251 — Growth domain lane. Drena `growth.forms.submission_accepted` (grader-form)
+# → enqueue grader run + materialize lead (proyección growth_grader_run_from_submission).
+# Sin este job, los submissions del grader convergente NO encolarían run (rollout dep del
+# flag GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED; default OFF = sin tráfico hasta el flip).
+upsert_scheduler_job \
+  "ops-reactive-growth" \
+  "*/5 * * * *" \
+  "/reactive/process-domain" \
+  '{"domain":"growth","batchSize":500}'
+echo "  -> ops-reactive-growth: */5 * * * * (growth domain, TASK-1251)"
+
 # ─── Outbox publisher (TASK-773) ─────────────────────────────────────────────
 # Migración desde Vercel cron /api/cron/outbox-publish (que solo corre en
 # producción) a Cloud Scheduler (que corre por proyecto GCP, igual en staging
@@ -652,6 +877,52 @@ upsert_scheduler_job \
   "/outbox/publish-batch" \
   '{"batchSize":500,"maxRetries":5}'
 echo "  -> ops-outbox-publish: */2 * * * * (outbox PG → BQ raw publisher, TASK-773)"
+
+# AI Visibility Grader async drain — TASK-1234.
+#
+# El endpoint admin encola un run `pending`; este job lo reclama (claim atómico
+# FOR UPDATE SKIP LOCKED, sin doble ejecución) y lo ejecuta vía el primitive,
+# persistiendo cada observación incrementalmente, además de recuperar runs
+# huérfanos en `running`. batchSize=1: un run por invocación (los runs full son
+# largos; el request Cloud Run lo sostiene hasta el TIMEOUT=3600s). El
+# attempt-deadline del scheduler (540s) que se rinde NO mata el request en vuelo
+# — el run termina y el siguiente ciclo simplemente no encuentra pending.
+#
+# Cron */5 min: SLA de arranque ≤5 min para un run encolado (los runs duran
+# minutos, no segundos). Gated: con los flags GROWTH_AI_VISIBILITY_* OFF (default)
+# cada adapter resuelve skip limpio; cero llamadas, cero costo.
+upsert_scheduler_job \
+  "ops-growth-grader-drain" \
+  "*/5 * * * *" \
+  "/growth/grader/drain" \
+  '{"batchSize":1}'
+echo "  -> ops-growth-grader-drain: */5 * * * * (AI Visibility Grader async execution, TASK-1234)"
+
+# AI Visibility recurring re-grade — TASK-1270.
+#
+# Staging activo tras rollout develop; production queda OFF/paused por default.
+# El handler gatea por GROWTH_AI_VISIBILITY_REGRADE_ENABLED + opt-in por perfil
+# + budget mensual, por lo que un job activo sin perfiles due es no-op.
+upsert_scheduler_job \
+  "ops-growth-grader-regrade" \
+  "0 8 * * *" \
+  "/growth/grader/regrade" \
+  '{"batchSize":5}' \
+  "${GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED}"
+echo "  -> ops-growth-grader-regrade: 0 8 * * * (paused=${GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED}, AI Visibility recurring re-grade, TASK-1270)"
+
+# Growth Forms dispatch — TASK-1229.
+#
+# Cron */2 min: entrega async de submissions aceptadas del motor Growth Forms
+# (delivery SLA ≤2 min, mismo cadence que el outbox publisher). Gated: con
+# GROWTH_FORMS_DISPATCH_ENABLED OFF (default) el handler hace no-op (cero queries).
+# El adapter en 1229 es fake/echo; el HubSpot real es TASK-1230.
+upsert_scheduler_job \
+  "ops-growth-forms-dispatch" \
+  "*/2 * * * *" \
+  "/growth/forms/dispatch" \
+  '{}'
+echo "  -> ops-growth-forms-dispatch: */2 * * * * (Growth Forms delivery, TASK-1229)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

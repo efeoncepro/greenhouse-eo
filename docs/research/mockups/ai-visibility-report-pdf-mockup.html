@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<!--
+  TASK-1273 — AI Visibility Report · PDF premium renderer · MOCKUP (SoT visual) · v2 redesign.
+  Replanteado con skills product-design (modern-ui · dataviz-design · typography-design ·
+  greenhouse-ux-writing): restraint editorial, un acento navy, assets de marca REALES
+  embebidos (wordmark Efeonce + isotipos Gemini/ChatGPT/Claude/Perplexity), sin jerga
+  "público-safe" en portada (la postura pública-safe vive en el disclaimer final).
+
+  Tokens 1:1 con src/lib/finance/pdf/tokens.ts. Datos: fixture "Globe" (variant attachment).
+  Los <img> apuntan a assets reales copiados al folder /assets (en producción react-pdf
+  los rasteriza a PNG vía scripts/build-pdf-brand-assets.ts).
+-->
+<html lang="es-CL">
+<head>
+<meta charset="utf-8" />
+<title>AI Visibility Report — PDF mockup v2 (Globe)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,500;0,600;0,700;0,800;1,800;1,900&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #023c70; --navy-deep: #022a4f; --accent: #0375db;
+    --text: #2F2B3D; --muted: #6E6B7B; --subtle: #A5A3AE;
+    --surface: #F8F7FA; --divider: #E4E5EB; --track: #ECEAF0; --paper:#fff;
+    --success: #157f47; --warning: #ffb703; --warning-ink:#8a6200; --error: #dc2e39;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#5b6472; font-family:'Geist',sans-serif; color:var(--text); -webkit-font-smoothing:antialiased; }
+  .page { width:794px; height:1123px; background:var(--paper); margin:26px auto; position:relative; box-shadow:0 14px 44px rgba(0,0,0,.34); overflow:hidden; }
+  .pad { padding:54px 60px 88px; }
+
+  /* type */
+  .poppins{font-family:'Poppins',sans-serif;}
+  .eyebrow{font-family:'Geist';font-weight:600;font-size:9.5px;letter-spacing:1.7px;text-transform:uppercase;color:var(--accent);}
+  .eyebrow.dim{color:rgba(255,255,255,.62);}
+  .section-title{font-family:'Poppins';font-weight:600;font-size:20px;letter-spacing:-.3px;color:var(--navy);}
+  .section-helper{font-size:11px;color:var(--muted);margin-top:4px;max-width:560px;}
+  .overline{font-family:'Geist';font-weight:600;font-size:8.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--subtle);}
+  .body{font-size:11.5px;line-height:1.55;color:var(--text);}
+  .muted{color:var(--muted);}
+  .caption{font-size:9px;line-height:1.5;color:var(--subtle);}
+  .tnum{font-variant-numeric:tabular-nums;}
+  .section{margin-top:44px;}
+  /* canonical Efeonce slogan */
+  .slogan{font-size:13px;letter-spacing:.2px;color:#848484;}
+  .slogan .a{font-family:'Poppins';font-weight:800;font-style:italic;}
+  .slogan .b{font-family:'Poppins';font-weight:800;font-style:normal;}
+  .slogan .c{font-family:'Poppins';font-weight:900;font-style:italic;}
+
+  /* ── COVER (full-navy hero) ── */
+  .cover-page{padding:56px 60px;color:#fff;overflow:hidden;
+    background:linear-gradient(158deg,#023c70 0%,#022a4f 100%);}
+  .cover-page::after{content:'';position:absolute;right:-150px;top:300px;width:520px;height:520px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.07);box-shadow:0 0 0 50px rgba(255,255,255,.03);pointer-events:none;}
+  .wm{height:27px;width:auto;}
+  .cv-head{margin-top:128px;}
+  .cover-org{font-family:'Poppins';font-weight:700;font-size:56px;line-height:1.02;letter-spacing:-1.6px;margin-top:12px;}
+  .cover-period{font-size:13px;color:rgba(255,255,255,.7);margin-top:18px;font-variant-numeric:tabular-nums;}
+
+  .cv-hero{display:flex;align-items:center;gap:40px;margin-top:96px;position:relative;z-index:1;}
+  .cv-verdict{flex:1;}
+  .cv-vttl{font-family:'Poppins';font-weight:600;font-size:19px;color:#fff;margin-top:8px;}
+  .cv-vbody{font-size:12.5px;line-height:1.6;color:rgba(255,255,255,.78);margin-top:9px;max-width:440px;}
+
+  .cover-engines{position:absolute;left:60px;bottom:78px;}
+  .cover-engines .lbl{font-family:'Geist';font-weight:600;font-size:9px;letter-spacing:1.3px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px;}
+  .eng-strip{display:flex;gap:10px;}
+  .eng-tile{width:38px;height:38px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.18);}
+  .eng-tile img{width:22px;height:22px;object-fit:contain;}
+  .cover-foot{position:absolute;left:60px;right:60px;bottom:34px;display:flex;justify-content:space-between;align-items:center;}
+
+  .gauge{position:relative;flex:none;}
+  .gauge .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .gauge .ctr b{font-family:'Poppins';font-weight:800;color:var(--navy);line-height:1;}
+  .gauge .ctr s{font-size:11px;color:var(--muted);margin-top:4px;text-decoration:none;}
+
+  .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:10px;font-weight:600;font-family:'Geist';}
+  .chip .d{width:6px;height:6px;border-radius:50%;}
+  .chip.warn{background:rgba(255,183,3,.15);color:var(--warning-ink);} .chip.warn .d{background:var(--warning);}
+  .chip.warn-on-navy{background:rgba(255,183,3,.18);color:#ffd66b;} .chip.warn-on-navy .d{background:var(--warning);}
+  .chip.err{background:rgba(220,46,57,.1);color:var(--error);} .chip.err .d{background:var(--error);}
+  .chip.ok{background:rgba(21,127,71,.1);color:var(--success);} .chip.ok .d{background:var(--success);}
+  .chip.neutral{background:var(--surface);color:var(--muted);border:1px solid var(--divider);}
+
+  /* closing brand mark (doubles as the last-page footer) */
+  .closing{margin-top:34px;padding-top:22px;border-top:1px solid var(--divider);display:flex;flex-direction:column;align-items:center;gap:9px;}
+  .closing img{height:24px;width:auto;}
+  .closing-legal{font-size:8px;letter-spacing:.3px;color:var(--subtle);margin-top:3px;}
+
+  /* ── Levels ── */
+  .levels{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:20px;}
+  .lvl{border:1px solid var(--divider);border-radius:11px;padding:17px 19px;display:flex;align-items:center;gap:14px;}
+  .lvl.span2{grid-column:1/-1;}
+  .lvl .ord{font-family:'Poppins';font-weight:700;font-size:16px;color:var(--accent);width:22px;}
+  .lvl .m{flex:1;}
+  .lvl .lab{font-weight:600;font-size:12.5px;color:var(--text);}
+  .lvl .en{font-size:10px;color:var(--subtle);font-weight:400;white-space:nowrap;}
+  .lvl .q{font-size:10px;color:var(--muted);margin-top:2px;}
+  .lvl .sc{font-family:'Poppins';font-weight:700;font-size:17px;font-variant-numeric:tabular-nums;}
+  .axisband{display:flex;gap:18px;margin-top:14px;}
+  .axisband span{font-size:9.5px;color:var(--muted);} .axisband b{color:var(--navy);font-weight:600;}
+
+  /* ── Engine presence rows ── */
+  .erow{display:flex;align-items:center;gap:14px;margin-top:21px;}
+  .etile{width:36px;height:36px;border-radius:9px;background:var(--surface);border:1px solid var(--divider);display:flex;align-items:center;justify-content:center;flex:none;}
+  .etile img{width:21px;height:21px;object-fit:contain;}
+  .ebody{flex:1;}
+  .bhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .bhead .n{font-size:11.5px;color:var(--text);} .bhead .n.b{font-weight:700;}
+  .bhead .v{font-family:'Geist';font-weight:600;font-size:10.5px;font-variant-numeric:tabular-nums;}
+  .track{height:9px;border-radius:6px;background:var(--track);overflow:hidden;}
+  .fill{height:100%;border-radius:6px;}
+
+  /* ── dimensions: brand-blue bars, severity = dot + colored score (not bar color) ── */
+  .drow{margin-top:18px;}
+  .dscore{display:flex;align-items:center;gap:7px;}
+  .dot{width:7px;height:7px;border-radius:50%;}
+
+  /* ── KPI cards ── */
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px;}
+  .kpi{border:1px solid var(--divider);border-radius:11px;padding:19px 20px;}
+  .kpi .v{font-family:'Poppins';font-weight:700;font-size:26px;color:var(--navy);margin-top:11px;font-variant-numeric:tabular-nums;}
+  .kpi .h{font-size:10px;color:var(--muted);margin-top:8px;}
+
+  /* ── sentiment distribution (stacked bar) ── */
+  .senti{margin-top:22px;}
+  .senti-bar{display:flex;height:11px;border-radius:6px;overflow:hidden;}
+  .senti-legend{display:flex;gap:22px;margin-top:11px;}
+  .senti-legend .it{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--muted);}
+  .senti-legend .sw{width:9px;height:9px;border-radius:3px;}
+  .senti-legend b{color:var(--text);font-variant-numeric:tabular-nums;}
+
+  /* ── Gap callout ── */
+  .gap{border:1px solid var(--divider);border-left:4px solid var(--error);border-radius:11px;padding:18px 20px;margin-top:16px;background:var(--surface);}
+  .gap .t{font-family:'Poppins';font-weight:600;font-size:14px;color:var(--text);}
+  .gap .mv{font-size:11.5px;color:var(--muted);margin-top:9px;line-height:1.5;} .gap .mv b{color:var(--accent);font-weight:600;}
+
+  /* ── Recommendations ── */
+  .rec{display:flex;gap:15px;margin-top:18px;}
+  .rn{width:27px;height:27px;flex:none;border-radius:8px;background:var(--navy);color:#fff;font-family:'Poppins';font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;}
+  .rb .t{font-weight:600;font-size:13px;color:var(--text);display:flex;align-items:center;gap:9px;}
+  .rb .a{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5;max-width:600px;}
+
+  /* ── Provenance ── */
+  .prov{width:100%;border-collapse:collapse;margin-top:14px;}
+  .prov td{padding:9px 0;border-bottom:1px solid var(--divider);font-size:11.5px;}
+  .prov td.k{color:var(--muted);} .prov td.v{font-weight:600;text-align:right;font-variant-numeric:tabular-nums;}
+
+  .disc{margin-top:18px;padding-top:14px;border-top:1px solid var(--divider);}
+
+  /* footer */
+  .ft{position:absolute;left:60px;right:60px;bottom:32px;border-top:1px solid var(--divider);padding-top:8px;}
+  .ft .a{display:flex;justify-content:space-between;font-size:7px;color:var(--muted);}
+  .ft .b{display:flex;justify-content:space-between;font-size:7px;color:var(--subtle);margin-top:2px;}
+  .ft b{font-weight:700;}
+  .pageno{position:absolute;right:60px;top:42px;font-size:9px;color:var(--subtle);letter-spacing:1px;font-variant-numeric:tabular-nums;}
+  .ASSET{}
+</style>
+</head>
+<body>
+
+<!-- ════════ PAGE 1 · COVER (full-navy hero, score integrado) ════════ -->
+<section class="page cover-page">
+  <img class="wm" src="./assets/efeonce-wordmark-white.svg" alt="Efeonce" />
+
+  <div class="cv-head">
+    <div class="eyebrow dim">Informe de visibilidad en IA</div>
+    <div class="cover-org">Globe</div>
+    <div class="cover-period">Visibilidad de marca en IA · 4 – 19 de mayo de 2026</div>
+  </div>
+
+  <div class="cv-hero">
+    <div class="gauge" style="width:158px;height:158px">
+      <svg width="158" height="158" viewBox="0 0 158 158">
+        <circle cx="79" cy="79" r="66" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="13"/>
+        <circle cx="79" cy="79" r="66" fill="none" stroke="#ffb703" stroke-width="13" stroke-linecap="round"
+          stroke-dasharray="414.7" stroke-dashoffset="153.4" transform="rotate(-90 79 79)"/>
+      </svg>
+      <div class="ctr"><b style="font-size:50px;color:#fff">63</b><s style="color:rgba(255,255,255,.7)">de 100</s></div>
+    </div>
+    <div class="cv-verdict">
+      <div class="eyebrow dim">Veredicto · visibilidad estimada</div>
+      <div class="cv-vttl">Presencia sólida, por debajo de los líderes</div>
+      <p class="cv-vbody">Globe aparece en los cuatro motores de IA, pero los líderes de su categoría superan 85. El mayor freno es la calidad de citas verificables.</p>
+      <div style="margin-top:14px;display:flex;gap:11px;align-items:center">
+        <span class="chip warn-on-navy"><span class="d"></span>Atención</span>
+        <span class="caption" style="color:rgba(255,255,255,.55)">4 de 4 motores respondieron · estimación, no garantía de ranking</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-engines">
+    <div class="lbl">Evaluado en</div>
+    <div class="eng-strip">
+      <div class="eng-tile"><img src="./assets/gemini.svg" alt="Gemini" /></div>
+      <div class="eng-tile"><img src="./assets/gpt.svg" alt="ChatGPT" /></div>
+      <div class="eng-tile"><img src="./assets/claude.svg" alt="Claude" /></div>
+      <div class="eng-tile"><img src="./assets/perplexity-icon.svg" alt="Perplexity" /></div>
+    </div>
+  </div>
+
+  <div class="cover-foot">
+    <span class="caption" style="color:rgba(255,255,255,.5)">Preparado por Efeonce · efeoncepro.com</span>
+  </div>
+</section>
+
+<!-- ════════ PAGE 2 · NIVELES + VISIBILIDAD POR MOTOR ════════ -->
+<section class="page">
+  <div class="pad">
+    <div class="pageno">02</div>
+
+    <div class="eyebrow">Marco de evaluación</div>
+    <h2 class="section-title" style="margin-top:6px">Niveles para existir en un internet de agentes</h2>
+    <div class="axisband">
+      <span><b>Percepción</b> · ¿te mencionan?</span>
+      <span><b>Operabilidad</b> · ¿te pueden usar?</span>
+    </div>
+    <div class="levels">
+      <div class="lvl"><div class="ord">01</div><div class="m"><div class="lab">Que te encuentre <span class="en">· Be Found</span></div><div class="q">¿Existes para la IA?</div></div><div class="sc" style="color:var(--warning-ink)">72</div></div>
+      <div class="lvl"><div class="ord">02</div><div class="m"><div class="lab">Que te entienda <span class="en">· Be Readable</span></div><div class="q">¿Te puede leer sin adivinar?</div></div><div class="sc" style="color:var(--warning-ink)">51</div></div>
+      <div class="lvl"><div class="ord">03</div><div class="m"><div class="lab">Que te represente bien <span class="en">· Be Correct</span></div><div class="q">¿Lo que dice de ti es verdad?</div></div><span class="chip neutral">En cobertura</span></div>
+      <div class="lvl"><div class="ord">04</div><div class="m"><div class="lab">Que pueda actuar <span class="en">· Be Actionable</span></div><div class="q">¿Te pueden usar, no solo citar?</div></div><span class="chip neutral">En cobertura</span></div>
+      <div class="lvl span2"><div class="ord">05</div><div class="m"><div class="lab">Que te prefiera <span class="en">· Be Intrinsic</span></div><div class="q">¿Eres el default de tu categoría?</div></div><div class="sc" style="color:var(--warning-ink)">54</div></div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Visibilidad por motor</h2>
+      <div class="section-helper">Tu visibilidad no es uniforme: cada motor de IA es un canal distinto.</div>
+
+      <div class="erow">
+        <div class="etile"><img src="./assets/gemini.svg" alt="Gemini" /></div>
+        <div class="ebody"><div class="bhead"><span class="n">Gemini <span class="muted">(Google)</span></span><span class="v">19 de 24 respuestas</span></div><div class="track"><div class="fill" style="width:79%;background:var(--success)"></div></div></div>
+      </div>
+      <div class="erow">
+        <div class="etile"><img src="./assets/gpt.svg" alt="ChatGPT" /></div>
+        <div class="ebody"><div class="bhead"><span class="n">ChatGPT <span class="muted">(OpenAI)</span></span><span class="v">18 de 24 respuestas</span></div><div class="track"><div class="fill" style="width:75%;background:var(--success)"></div></div></div>
+      </div>
+      <div class="erow">
+        <div class="etile"><img src="./assets/claude.svg" alt="Claude" /></div>
+        <div class="ebody"><div class="bhead"><span class="n">Claude <span class="muted">(Anthropic)</span></span><span class="v">17 de 24 respuestas</span></div><div class="track"><div class="fill" style="width:71%;background:var(--success)"></div></div></div>
+      </div>
+      <div class="erow">
+        <div class="etile"><img src="./assets/perplexity-icon.svg" alt="Perplexity" /></div>
+        <div class="ebody"><div class="bhead"><span class="n">Perplexity</span><span class="v">14 de 24 respuestas</span></div><div class="track"><div class="fill" style="width:58%;background:var(--warning)"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ft">
+    <div class="a"><b>Efeonce Group SpA · RUT 77.357.182-1</b><span>Dr. Manuel Barros Borgoño 71 of. 05, Providencia, Santiago</span></div>
+    <div class="b"><b style="color:var(--muted)">efeoncepro.com</b><span>Informe de visibilidad en IA · Globe</span></div>
+  </div>
+</section>
+
+<!-- ════════ PAGE 3 · BRECHA + DIMENSIONES + SEÑALES + SOV ════════ -->
+<section class="page">
+  <div class="pad">
+    <div class="pageno">03</div>
+
+    <div class="eyebrow">Dónde enfocar</div>
+    <h2 class="section-title" style="margin-top:6px">Brecha principal</h2>
+    <div class="gap">
+      <div class="t">Calidad de citas verificables por debajo del benchmark</div>
+      <div class="mv"><b>Movimiento recomendado</b> · construir presencia en medios y directorios de autoridad que la IA reconozca como fuente confiable.</div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Desempeño por dimensión</h2>
+      <!-- bar = brand blue (length encoding); severity = colored score + dot (not bar color) -->
+      <div class="drow"><div class="bhead"><span class="n">Visibilidad en IA</span><span class="dscore"><span class="dot" style="background:var(--warning)"></span><span class="v" style="color:var(--warning-ink)">72/100</span></span></div><div class="track"><div class="fill" style="width:72%;background:var(--accent)"></div></div></div>
+      <div class="drow"><div class="bhead"><span class="n">Claridad de entidad</span><span class="dscore"><span class="dot" style="background:var(--warning)"></span><span class="v" style="color:var(--warning-ink)">68/100</span></span></div><div class="track"><div class="fill" style="width:68%;background:var(--accent)"></div></div></div>
+      <div class="drow"><div class="bhead"><span class="n">Propiedad de categoría</span><span class="dscore"><span class="dot" style="background:var(--warning)"></span><span class="v" style="color:var(--warning-ink)">54/100</span></span></div><div class="track"><div class="fill" style="width:54%;background:var(--accent)"></div></div></div>
+      <div class="drow"><div class="bhead"><span class="n">Share of Voice competitivo</span><span class="dscore"><span class="dot" style="background:var(--warning)"></span><span class="v" style="color:var(--warning-ink)">63/100</span></span></div><div class="track"><div class="fill" style="width:63%;background:var(--accent)"></div></div></div>
+      <div class="drow"><div class="bhead"><span class="n">Calidad de citas</span><span class="dscore"><span class="dot" style="background:var(--error)"></span><span class="v" style="color:var(--error)">32/100</span></span></div><div class="track"><div class="fill" style="width:32%;background:var(--error)"></div></div></div>
+      <div class="drow"><div class="bhead"><span class="n">Alineación de mensaje</span><span class="dscore"><span class="v muted">En cobertura</span></span></div><div class="track"></div></div>
+      <div class="drow"><div class="bhead"><span class="n">Cobertura de intención de compra</span><span class="dscore"><span class="dot" style="background:var(--warning)"></span><span class="v" style="color:var(--warning-ink)">45/100</span></span></div><div class="track"><div class="fill" style="width:45%;background:var(--accent)"></div></div></div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Señales AEO</h2>
+      <div class="section-helper">Cómo te citan, con qué tono te mencionan y qué tan arriba apareces en las respuestas.</div>
+      <div class="kpis">
+        <div class="kpi"><div class="overline">Share de citas</div><div class="v">32%</div><div class="h">32 de 100 menciones llevan cita</div></div>
+        <div class="kpi"><div class="overline">Sentimiento neto</div><div class="v" style="font-size:23px">Neutral</div><div class="h">Sobre 100 menciones calificadas</div></div>
+        <div class="kpi"><div class="overline">Prominencia</div><div class="v">#2</div><div class="h">Mejor posición · promedio #3</div></div>
+      </div>
+
+      <div class="senti">
+        <div class="overline" style="margin-bottom:11px">Distribución de sentimiento</div>
+        <div class="senti-bar">
+          <div style="width:38%;background:var(--success)"></div>
+          <div style="width:45%;background:var(--subtle)"></div>
+          <div style="width:17%;background:var(--error)"></div>
+        </div>
+        <div class="senti-legend">
+          <span class="it"><span class="sw" style="background:var(--success)"></span>Positivo <b>38%</b></span>
+          <span class="it"><span class="sw" style="background:var(--subtle)"></span>Neutral <b>45%</b></span>
+          <span class="it"><span class="sw" style="background:var(--error)"></span>Negativo <b>17%</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ft">
+    <div class="a"><b>Efeonce Group SpA · RUT 77.357.182-1</b><span>Dr. Manuel Barros Borgoño 71 of. 05, Providencia, Santiago</span></div>
+    <div class="b"><b style="color:var(--muted)">efeoncepro.com</b><span>Informe de visibilidad en IA · Globe</span></div>
+  </div>
+</section>
+
+<!-- ════════ PAGE 4 · RECOMENDACIONES + PROVENIENCIA ════════ -->
+<section class="page">
+  <div class="pad" style="padding-bottom:48px">
+    <div class="pageno">04</div>
+
+    <div class="eyebrow">Tu marca frente al mercado</div>
+    <h2 class="section-title" style="margin-top:6px">Share of Voice competitivo</h2>
+    <div class="section-helper">Participación de menciones de tu marca frente a competidores en respuestas de IA.</div>
+    <div class="drow"><div class="bhead"><span class="n b">Tu marca</span><span class="v" style="color:var(--accent)">32 menciones</span></div><div class="track"><div class="fill" style="width:67%;background:var(--accent)"></div></div></div>
+    <div class="drow"><div class="bhead"><span class="n">Competidor A</span><span class="v muted">48 menciones</span></div><div class="track"><div class="fill" style="width:100%;background:var(--subtle)"></div></div></div>
+    <div class="drow"><div class="bhead"><span class="n">Competidor B</span><span class="v muted">41 menciones</span></div><div class="track"><div class="fill" style="width:85%;background:var(--subtle)"></div></div></div>
+    <div class="drow"><div class="bhead"><span class="n">Competidor C</span><span class="v muted">23 menciones</span></div><div class="track"><div class="fill" style="width:48%;background:var(--subtle)"></div></div></div>
+
+    <div class="eyebrow" style="margin-top:34px">Plan de acción</div>
+    <h2 class="section-title" style="margin-top:6px">Recomendaciones prioritarias</h2>
+
+    <div class="rec"><div class="rn">1</div><div class="rb"><div class="t">Fortalecer citas verificables <span class="chip err"><span class="d"></span>Crítico</span></div><div class="a">Conseguir cobertura en medios y directorios de autoridad que la IA reconozca como fuente confiable, para que tus menciones tengan respaldo citable.</div></div></div>
+    <div class="rec"><div class="rn">2</div><div class="rb"><div class="t">Reforzar propiedad de categoría <span class="chip warn"><span class="d"></span>Atención</span></div><div class="a">Publicar contenido de autoridad que asocie tu marca con la categoría central, para que la IA te nombre cuando alguien pregunta por el rubro.</div></div></div>
+    <div class="rec"><div class="rn">3</div><div class="rb"><div class="t">Cubrir intención de compra <span class="chip warn"><span class="d"></span>Atención</span></div><div class="a">Crear contenido de fondo de embudo (comparativas, casos, precios) para aparecer en las respuestas donde la decisión de compra ya está en marcha.</div></div></div>
+
+    <div class="section" style="margin-top:30px">
+      <h2 class="section-title">Proveniencia y metodología</h2>
+      <table class="prov">
+        <tr><td class="k">Datos al</td><td class="v">19 may 2026</td></tr>
+        <tr><td class="k">Proveedores muestreados</td><td class="v">4</td></tr>
+        <tr><td class="k">Prompts evaluados</td><td class="v">24</td></tr>
+        <tr><td class="k">Versión del score</td><td class="v">v1.0</td></tr>
+        <tr><td class="k">Versión del prompt pack</td><td class="v">2.3.1</td></tr>
+      </table>
+    </div>
+
+    <div class="disc">
+      <p class="caption">Este informe presenta una estimación de visibilidad en motores de IA basada en datos agregados y públicos. No constituye una garantía de posicionamiento ni de resultados. Los valores pueden variar entre ejecuciones según la disponibilidad y respuesta de cada motor.</p>
+    </div>
+
+    <div class="closing">
+      <img src="./assets/efeonce-wordmark-navy.svg" alt="Efeonce" />
+      <span class="slogan"><span class="a">Empower</span> <span class="b">your</span> <span class="c">Growth</span></span>
+      <span class="closing-legal">Efeonce Group SpA · RUT 77.357.182-1 · efeoncepro.com</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

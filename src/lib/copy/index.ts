@@ -135,6 +135,7 @@ export type {
   MagicLinkEmailTemplateCopy,
   MicrocopyDictionary,
   MicrocopyNamespace,
+  AiVisibilityGraderReportEmailTemplateCopy,
   MonthsCopy,
   NotificationEmailTemplateCopy,
   NotificationCategoryCopy,

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional
 > **Version:** 1.0
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-06-14 por Codex
+> **Ultima actualizacion:** 2026-06-23 por Claude
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime:** WordPress en Kinsta, theme `ohio-child` sobre `ohio`, Elementor / Elementor Pro
@@ -135,6 +135,29 @@ Greenhouse puede operar este runtime por SSH/WP-CLI para discovery y fixes contr
 - HubSpot conserva atribucion CRM y formularios cuando aplique.
 
 Hasta que el bridge exista, cualquier fix en WordPress debe documentar comando, backup, rollback y verificacion visual.
+
+## Guardrail: `Document::save()` y metas Ohio fuera de Elementor
+
+`Document::save()` es el camino correcto para mutar el arbol Elementor porque ejecuta hooks, permisos, cache y regeneracion de CSS. Pero no debe tratarse como una operacion aislada al widget: en paginas Ohio publicadas, el render visible tambien depende de post meta y page meta fuera de `_elementor_data`.
+
+Riesgo confirmado: en paginas cuyo headline usa:
+
+```text
+page_header_title_background_type=featured
+```
+
+el hero depende de `_thumbnail_id` / `get_the_post_thumbnail_url()`. Si un guardado Elementor deja `_thumbnail_id` vacio o no lo preserva, Ohio sigue intentando pintar el background desde la imagen destacada, pero el asset desaparece del headline.
+
+Antes de cualquier `Document::save()` sobre una pagina Ohio publicada:
+
+1. Leer y guardar `_thumbnail_id`, `get_the_post_thumbnail_url()`, `page_header_title_background_type` y metas `page_header_title_background_*`.
+2. Guardar `_elementor_data`, `_elementor_page_settings` y metas Ohio relevantes en el backup de rollback.
+3. Aplicar el cambio con `Document::save()`.
+4. Leer de nuevo `_thumbnail_id` y `page_header_title_background_type`.
+5. Si `_thumbnail_id` cambio o quedo vacio sin ser parte explicita del cambio, restaurarlo inmediatamente con `set_post_thumbnail()`.
+6. Verificar visualmente `.page-headline .bg-image` y que `elementorFrontendConfig.post.featuredImage` no sea `false`.
+
+Incidente fuente (2026-06-23): en `page_id=249582` (`/agencia-creativa/`), un cambio de configuracion del widget `greenhouse_comparison_table` via `Document::save()` dejo la imagen destacada vacia. Ohio seguia en `page_header_title_background_type=featured`, por lo que el hero quedo blanco. El asset correcto del hero era `attachment_id=249672` (`EO_Landing-GiroAgencia.webp`); el OpenGraph `attachment_id=249740` (`EO_Opengraph_AgenciaCreativa.webp`) era parecido, pero contenia logo/texto quemado y no era el background correcto.
 
 ## Incidente 2026-06-14: hero HubSpot services
 
@@ -385,3 +408,60 @@ La regla aprendida para Ohio + Elementor es:
 - usar CSS page-scoped solo cuando el contenedor correcto ya existe y el problema es de presentacion, no de estructura;
 - no declarar resuelto un problema visual solo porque los valores computados cambiaron: debe validarse con captura visual y compararse contra el sintoma reportado por el operador;
 - si un fix no cambia la percepcion del problema, revertir o reemplazar el enfoque antes de acumular selectores mas fuertes.
+
+## Modulo sticky-scroll "Como trabajamos" (Agencia Creativa, page_id 249582)
+
+### Como se comporta
+
+La seccion `7489ca6` de `/agencia-creativa/` es un row full-bleed dividido en dos columnas:
+
+- **Izquierda `49d5a98` (63%)** — scrollea: ilustracion + titulo "Cada ciclo mejora el siguiente" + los 7 pasos del proceso (widgets `ohio_service_table`) + dos cards de intro.
+- **Derecha `97e545e` (37%)** — se queda fija: bloque "CÓMO TRABAJAMOS / La diferencia no es…".
+
+El "se queda fija" NO es el efecto Sticky de Elementor Pro: es `position: sticky; top:0` aplicado por la clase custom `-sticky-block` (definida en `Landing Custom CSS.css`) sobre `d0ef9a7` (bloque derecho) y `e6facfa` (ilustracion izquierda). Los pasos y las cards no son sticky, por eso recorren mientras la derecha permanece anclada.
+
+### Por que se veia "pegada a los bordes" (gotcha home vs pagina boxeada)
+
+El modulo usa las clases `lp-container-offset-left` / `lp-container-offset-right` para insetarse del borde. Pero su padding solo existe en reglas de `Landing Custom CSS.css` **scopeadas a `body.home, body.front-page`**. En el Home el `.page-container` es full-bleed (`--container-max-width: 100%`), asi que el offset calcula 0 y el contenido al borde se ve bien. Reusado en `agencia-creativa` (`body.page-id-249582`, `.page-container` boxeado a `min(1344px, 86vw)`, inset ~192px @1728), esas reglas no aplican y `--container-max-width` queda indefinida, por lo que el modulo se escapa full-bleed (contenido en x≈20) mientras el resto de la pagina respeta el container. No es un bug de ancho de columna: es un desfase de scope de selector.
+
+### Como se corrige
+
+Levantar el contenido del modulo del borde con un gutter simetrico restringido via CSS page-scoped en `global-fixes.css` (scopeado a `body.page-id-249582`, desktop), preservando el fondo rosado full-bleed. No editar las reglas de offset scopeadas a home.
+
+Valor aplicado (2026-06-23):
+
+```css
+@media (min-width: 1025px) {
+  body.page-id-249582 .elementor-element.elementor-element-7489ca6 {
+    padding-left: clamp(24px, 3vw, 56px);
+    padding-right: clamp(24px, 3vw, 56px);
+  }
+}
+```
+
+≈52px @1728. Backport en runtime repo `efeoncepro/efeonce-public-site-runtime` (`main`, commit `010a2e5`).
+
+Iteracion / aprendizaje: el primer intento alineo el modulo al `.page-container` completo (`calc((100vw - min(1344px, 86vw)) / 2)` ≈192px @1728, gateado a >=1200px para matchear el breakpoint donde Ohio boxea el container). El operador lo rechazo por "demasiado margen". Leccion: para un modulo full-bleed que se ve "pegado", preferir un gutter modesto que lo despegue del borde antes que boxearlo por completo al container del sitio; el full-bleed editorial es intencional y solo necesita respiro, no boxeo.
+
+### Regla aprendida
+
+- Antes de tocar un modulo "que se queda fijo", verificar si el sticky es `position:sticky` por clase custom (`-sticky-block`) y no el efecto de Elementor Pro; no hay keys `sticky`/`motion_fx` en `_elementor_data`.
+- Cuando un modulo se "pega a los bordes" solo en una pagina, sospechar de clases cuyo CSS esta scopeado a `body.home`/`body.front-page` reusadas en una pagina boxeada, antes de cambiar anchos de Elementor.
+
+## Franja de logos de clientes (Agencia Creativa, page_id 249582)
+
+La franja "Marcas que confían en Globe" usa cuatro widgets Ohio `ohio_clients_logo` dentro del grid Elementor `a43cacf`. Elementor puede generar reglas por widget con `width` y `height` fijos (`post-249582.css`), y eso deforma logos cuando el asset trae una proporcion/canvas distinto al valor elegido en el editor.
+
+Regla aplicada (2026-06-23): no mutar la data Elementor para este caso. Corregir la proporcion en `global-fixes.css`, page-scoped al grid de logos, dejando que la imagen conserve su ratio natural:
+
+```css
+body.page-id-249582 .elementor-element.elementor-element-a43cacf .ohio-widget.logo img {
+  width: auto !important;
+  height: auto !important;
+  max-width: min(100%, 170px);
+  max-height: 54px;
+  object-fit: contain !important;
+}
+```
+
+Verificacion requerida: medir con navegador real que `renderedWidth / renderedHeight` coincida con `naturalWidth / naturalHeight` para cada logo, y revisar una captura de la seccion. Fix live backport en runtime repo `efeoncepro/efeonce-public-site-runtime` commit `56ae819`.

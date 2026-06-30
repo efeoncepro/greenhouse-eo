@@ -90,6 +90,8 @@ const enUS: NavigationCopy = {
     adminTalentOps: { label: 'Talent health', subtitle: 'System metrics and maintenance' },
     adminIdentityAccess: { label: 'Identity and access', subtitle: 'Users, roles, views and accounts' },
     adminTeamOps: { label: 'Team and operations', subtitle: 'Talent, business lines and instruments' },
+    growth: { label: 'Growth', subtitle: 'Demand capture, forms and growth operations' },
+    growthForms: { label: 'Forms', subtitle: 'Public forms, submissions and destinations' },
     knowledge: { label: 'Knowledge', subtitle: 'Guides, sources and operational memory' },
     roadmap: { label: 'Roadmap', subtitle: 'Operational backlog: epics, tasks, mini-tasks and incidents' }
   },

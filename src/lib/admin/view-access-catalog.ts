@@ -517,6 +517,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.growth_forms',
+    section: 'administracion',
+    label: 'Growth Forms',
+    description: 'Control plane de formularios públicos, submissions, destinos y host surfaces.',
+    routePath: '/admin/growth/forms',
+    routeGroup: 'admin'
+  },
+  {
     // TASK-873 Slice 4 — Workforce Activation workspace V1 (esqueleto admin governance).
     //
     // **Surface canonical**: este es el variant `admin governance / transitional`
@@ -907,6 +915,15 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Web Delivery',
     description: 'Web Delivery operativo. Módulo Wave.',
     routePath: '/web-delivery',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.ai_visibility_report',
+    section: 'cliente',
+    label: 'AEO',
+    description:
+      'Informe AEO client-scoped (TASK-1248): cómo te ve la IA — puntaje, dimensiones, plan AEO y tendencia. Deep-link, sin evidencia cruda.',
+    routePath: '/aeo',
     routeGroup: 'client'
   }
 ]

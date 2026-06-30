@@ -20,6 +20,10 @@ const taskFixture = ({
   domain = 'ops',
   executionProfile = 'standard',
   uiImpact = 'none',
+  uiReady = 'n/a',
+  wireframe = 'none',
+  flow = 'none',
+  motion = 'none',
   uiUxContract = '',
   backendImpact = 'none',
   backendDataContract = '',
@@ -37,6 +41,10 @@ const taskFixture = ({
 - Type: \`implementation\`
 - Execution profile: \`${executionProfile}\`
 - UI impact: \`${uiImpact}\`
+- UI ready: \`${uiReady}\`
+- Wireframe: \`${wireframe}\`
+- Flow: \`${flow}\`
+- Motion: \`${motion}\`
 - Backend impact: \`${backendImpact}\`
 - Epic: \`none\`
 - Status real: \`Diseno\`
@@ -142,6 +150,9 @@ const createRepo = () => {
   mkdirSync(join(root, 'docs', 'tasks', 'to-do'), { recursive: true })
   mkdirSync(join(root, 'docs', 'tasks', 'in-progress'), { recursive: true })
   mkdirSync(join(root, 'docs', 'tasks', 'complete'), { recursive: true })
+  mkdirSync(join(root, 'docs', 'ui', 'wireframes'), { recursive: true })
+  mkdirSync(join(root, 'docs', 'ui', 'flows'), { recursive: true })
+  mkdirSync(join(root, 'docs', 'ui', 'motion'), { recursive: true })
 
   write(
     join(root, 'docs', 'tasks', 'README.md'),
@@ -157,6 +168,9 @@ const createRepo = () => {
       '| `TASK-999` | `to-do` | Fixture. | `docs/tasks/to-do/TASK-999-fixture.md` |'
     ].join('\n')
   )
+  write(join(root, 'docs', 'ui', 'wireframes', 'TASK-999-fixture.md'), '# TASK-999 Fixture Wireframe\n')
+  write(join(root, 'docs', 'ui', 'flows', 'TASK-999-fixture-flow.md'), '# TASK-999 Fixture Flow\n')
+  write(join(root, 'docs', 'ui', 'motion', 'TASK-999-fixture-motion.md'), '# TASK-999 Fixture Motion\n')
 
   return root
 }
@@ -373,13 +387,132 @@ const cases = [
       write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
         domain: 'ui|platform',
         executionProfile: 'ui-ux',
-        uiImpact: 'layout'
+        uiImpact: 'layout',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md'
       }))
 
       const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
 
       assert.equal(result.errors.length, 0)
       assert.equal(result.warnings.some(item => item.rule === 'ui-ux-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'warns when a UI task omits the UI readiness field',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md'
+      }).replace('- UI ready: `n/a`\n', ''))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.warnings.some(item => item.rule === 'ui-readiness-gate'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'errors when the UI readiness field has an invalid value',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        uiReady: 'maybe',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md'
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-readiness-gate'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'requires implementation mapping, GVC plan and decision log before UI ready yes',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        uiReady: 'yes',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`',
+          '- Usuario / rol: operador interno'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-readiness-gate'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'accepts UI ready yes when mapping, GVC plan and decision log are present',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'ui', 'wireframes', 'TASK-999-fixture.md'), [
+        '# TASK-999 Fixture Wireframe',
+        '',
+        '## Implementation Mapping',
+        '',
+        '- Primitive: existing.',
+        '',
+        '## GVC Scenario Plan',
+        '',
+        '- Scenario: fixture.',
+        '',
+        '## Design Decision Log',
+        '',
+        '- Decision: reuse existing primitive.'
+      ].join('\n'))
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        uiReady: 'yes',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`',
+          '',
+          '### Implementation mapping',
+          '',
+          '- Primitive: existing.',
+          '',
+          '### GVC scenario plan',
+          '',
+          '- Scenario: fixture.',
+          '',
+          '### Design decision log',
+          '',
+          '- Decision: reuse existing primitive.'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-readiness-gate'), false)
+      assert.equal(result.warnings.some(item => item.rule === 'ui-readiness-gate'), false)
       rmSync(root, { recursive: true, force: true })
     }
   },
@@ -392,6 +525,7 @@ const cases = [
         domain: 'ui|platform',
         executionProfile: 'ui-ux',
         uiImpact: 'interaction',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
         uiUxContract: [
           '## UI/UX Contract',
           '',
@@ -460,6 +594,8 @@ const cases = [
         domain: 'ui|api',
         executionProfile: 'backend-data',
         uiImpact: 'flow',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        flow: 'docs/ui/flows/TASK-999-fixture-flow.md',
         backendImpact: 'api',
         uiUxContract: [
           '## UI/UX Contract',
@@ -495,6 +631,8 @@ const cases = [
         domain: 'ui|api',
         executionProfile: 'backend-data',
         uiImpact: 'flow',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        flow: 'docs/ui/flows/TASK-999-fixture-flow.md',
         backendImpact: 'api',
         uiUxContract: [
           '## UI/UX Contract',
@@ -537,6 +675,7 @@ const cases = [
         domain: 'ui|platform',
         executionProfile: 'ui-ux',
         uiImpact: 'layout',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
         backendImpact: 'none',
         uiUxContract: [
           '## UI/UX Contract',
@@ -563,6 +702,8 @@ const cases = [
         domain: 'ui|api',
         executionProfile: 'backend-data',
         uiImpact: 'flow',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        flow: 'docs/ui/flows/TASK-999-fixture-flow.md',
         backendImpact: 'api',
         uiUxContract: [
           '## UI/UX Contract',
@@ -583,6 +724,234 @@ const cases = [
       const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
 
       assert.equal(result.warnings.some(item => item.rule === 'hybrid-profile-justification'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'errors when a UI task is missing the wireframe contract in focal mode',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-wireframe-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'keeps missing UI wireframes warning-only in active inventory mode',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, active: true, task: null } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-wireframe-contract'), false)
+      assert.equal(result.warnings.some(item => item.rule === 'ui-wireframe-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'accepts a UI task with a docs/ui/wireframes path',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-wireframe-contract'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'errors when a flow UI task is missing the flow contract in focal mode',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'flow',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-flow-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'accepts a flow UI task with a docs/ui/flows path',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'flow',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        flow: 'docs/ui/flows/TASK-999-fixture-flow.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-flow-contract'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'warns when a non-flow UI task mentions a sidecar but Flow is none',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'interaction',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }).replace('## Detailed Spec\n\nFixture.', '## Detailed Spec\n\nOpen a sidecar from the selected row and restore focus on close.'))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-flow-contract'), false)
+      assert.equal(result.warnings.some(item => item.rule === 'ui-flow-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'errors when a motion UI task is missing the motion contract in focal mode',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|motion',
+        executionProfile: 'ui-ux',
+        uiImpact: 'motion',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-motion-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'accepts a motion UI task with a docs/ui/motion path',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|motion',
+        executionProfile: 'ui-ux',
+        uiImpact: 'motion',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        motion: 'docs/ui/motion/TASK-999-fixture-motion.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-motion-contract'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'warns when a non-motion UI task mentions non-trivial animation but Motion is none',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'interaction',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }).replace('## Detailed Spec\n\nFixture.', '## Detailed Spec\n\nUse a short framer transition when the selected card changes.'))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-motion-contract'), false)
+      assert.equal(result.warnings.some(item => item.rule === 'ui-motion-contract'), true)
       rmSync(root, { recursive: true, force: true })
     }
   }

@@ -147,6 +147,7 @@ import {
   getSisterPlatformOAuthStaleClientConfigSignal
 } from './queries/sister-platform-oauth-signals'
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
+import { getFinanceAiSignalsStaleMaterializationSignal } from './queries/finance-ai-signals-stale-materialization'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollComplianceExportDriftSignal } from './queries/payroll-compliance-export-drift'
@@ -169,6 +170,25 @@ import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx
 import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
+import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
+import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
+import { getGrowthAiVisibilityArchetypeCoverageSignals } from './queries/growth-ai-visibility-archetype-coverage-signals'
+import { getGrowthAiVisibilityCategorySignals } from './queries/growth-ai-visibility-category-signals'
+import { getGrowthAiVisibilityBusinessModelSignals } from './queries/growth-ai-visibility-business-model-signals'
+import { getGrowthAiVisibilityProbeSignals } from './queries/growth-ai-visibility-probe-signals'
+import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
+import { getGrowthAiVisibilityPublicDeliverySignals } from './queries/growth-ai-visibility-public-delivery-signals'
+import { getGrowthFormsSignals } from './queries/growth-forms-signals'
+import { getGrowthFormsEmailSignals } from './queries/growth-forms-email-signals'
+import { getGrowthFormsHubspotSignals } from './queries/growth-forms-hubspot-signals'
+import { getGrowthFormsPiiSignals } from './queries/growth-forms-pii-signals'
+import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
+import { getGrowthAiVisibilityReportEmailSignals } from './queries/growth-ai-visibility-report-email-signals'
+import { getGrowthAiVisibilityOperatorSendSignals } from './queries/growth-ai-visibility-operator-send-signals'
+import { getGrowthAiVisibilityOperatorGateSignals } from './queries/growth-ai-visibility-operator-gate-signals'
+import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-visibility-entitlement-signals'
+import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibility-regrade-signals'
+import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
@@ -236,6 +256,7 @@ import {
 import { getCommercialOrganizationIncompleteIdentitySignal } from './queries/commercial-organization-incomplete-identity'
 import { getCommercialOrganizationIndustryNoncanonicalSignal } from './queries/commercial-organization-industry-noncanonical'
 import { getCommercialOrganizationTypeLifecycleDriftSignal } from './queries/commercial-organization-type-lifecycle-drift'
+import { getOrganizationWebsiteUrlUnsyncedSignal } from './queries/organization-website-url-unsynced'
 // TASK-1212 — cotizaciones emitidas sin líneas (autoría fuera del command atómico). Roll up `commercial`.
 import { getCommercialQuoteAuthoredWithoutCommandSignal } from './queries/commercial-quote-authored-without-command'
 import {
@@ -610,6 +631,28 @@ interface ReliabilityOverviewSources {
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
+  growthAiVisibility?: ReliabilitySignal[] | null
+  growthAiVisibilityScoring?: ReliabilitySignal[] | null
+  growthAiVisibilityProbe?: ReliabilitySignal[] | null
+  growthAiVisibilityArchetypeCoverage?: ReliabilitySignal[] | null
+  growthAiVisibilityCategory?: ReliabilitySignal[] | null
+  growthAiVisibilityBusinessModel?: ReliabilitySignal[] | null
+  growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
+  growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
+  growthForms?: ReliabilitySignal[] | null
+  growthFormsEmail?: ReliabilitySignal[] | null
+  growthFormsHubspot?: ReliabilitySignal[] | null
+  growthFormsPii?: ReliabilitySignal[] | null
+  growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
+  growthAiVisibilityReportEmail?: ReliabilitySignal[] | null
+  growthAiVisibilityOperatorSend?: ReliabilitySignal[] | null
+  growthAiVisibilityOperatorGate?: ReliabilitySignal[] | null
+  growthAiVisibilityEntitlement?: ReliabilitySignal[] | null
+  growthAiVisibilityRegrade?: ReliabilitySignal[] | null
+  growthSearchConsoleTokenHealth?: ReliabilitySignal | null
+
+  /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
+  financeAiStaleMaterialization?: ReliabilitySignal | null
 
   /** TASK-725 — Finance VAT position drift (documentos con IVA sin asiento en períodos materializados). */
   vatPositionDrift?: ReliabilitySignal | null
@@ -1014,6 +1057,25 @@ export const buildReliabilityOverview = (
     // TASK-1190 — Operational P&L cost coverage gate. Evita tratar como
     // margen canónico un período con revenue y costo 0 cuando falta upstream.
     ...(sources.operationalPlCostCoverageDegraded ? [sources.operationalPlCostCoverageDegraded] : []),
+    ...(sources.growthAiVisibility ?? []),
+    ...(sources.growthAiVisibilityScoring ?? []),
+    ...(sources.growthAiVisibilityProbe ?? []),
+    ...(sources.growthAiVisibilityArchetypeCoverage ?? []),
+    ...(sources.growthAiVisibilityCategory ?? []),
+    ...(sources.growthAiVisibilityBusinessModel ?? []),
+    ...(sources.growthAiVisibilityPublicIntake ?? []),
+    ...(sources.growthAiVisibilityPublicDelivery ?? []),
+    ...(sources.growthForms ?? []),
+    ...(sources.growthFormsEmail ?? []),
+    ...(sources.growthFormsHubspot ?? []),
+    ...(sources.growthFormsPii ?? []),
+    ...(sources.growthAiVisibilityLeadHandoff ?? []),
+    ...(sources.growthAiVisibilityReportEmail ?? []),
+    ...(sources.growthAiVisibilityOperatorSend ?? []),
+    ...(sources.growthAiVisibilityOperatorGate ?? []),
+    ...(sources.growthAiVisibilityEntitlement ?? []),
+    ...(sources.growthAiVisibilityRegrade ?? []),
+    ...(sources.growthSearchConsoleTokenHealth ? [sources.growthSearchConsoleTokenHealth] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1061,6 +1123,8 @@ export const buildReliabilityOverview = (
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
     ...(sources.providerBqSyncDeadLetter ?? []),
+    // TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat SoT).
+    ...(sources.financeAiStaleMaterialization ? [sources.financeAiStaleMaterialization] : []),
     // TASK-725 — Finance VAT position drift (documentos con IVA sin asiento).
     ...(sources.vatPositionDrift ? [sources.vatPositionDrift] : []),
     // TASK-1185 — VAT FX/data-quality signals.
@@ -1375,10 +1439,127 @@ export const getReliabilityOverview = async (
       ? preloadedSources.operationalPlCostCoverageDegraded
       : await getOperationalPlCostCoverageDegradedSignal().catch(() => null)
 
+  // TASK-1226 — Growth AI Visibility Grader (4 signals: error rate, latency p95,
+  // cost budget, skipped). DB vacía / grader OFF → estado sano (steady pre-launch).
+  const growthAiVisibility =
+    preloadedSources.growthAiVisibility !== undefined
+      ? preloadedSources.growthAiVisibility
+      : await getGrowthAiVisibilitySignals().catch(() => null)
+
+  // TASK-1227 — normalización/scoring signals (insufficient_data/review_required
+  // rates + golden-set eval regression + stubs de fallo). DB vacía → steady ok.
+  const growthAiVisibilityScoring =
+    preloadedSources.growthAiVisibilityScoring !== undefined
+      ? preloadedSources.growthAiVisibilityScoring
+      : await getGrowthAiVisibilityScoringSignals().catch(() => null)
+
+  // TASK-1266 — probes de site readiness (failure rate + cobertura headless). DB vacía / probes OFF → steady ok.
+  const growthAiVisibilityProbe =
+    preloadedSources.growthAiVisibilityProbe !== undefined
+      ? preloadedSources.growthAiVisibilityProbe
+      : await getGrowthAiVisibilityProbeSignals().catch(() => null)
+
+  // TASK-1292 — cobertura de prompts por arquetipo (Capa A, determinista). Harness
+  // PURO: nunca null en steady. Drift = un arquetipo dejó de cubrir su buyer-intent.
+  const growthAiVisibilityArchetypeCoverage =
+    preloadedSources.growthAiVisibilityArchetypeCoverage !== undefined
+      ? preloadedSources.growthAiVisibilityArchetypeCoverage
+      : await getGrowthAiVisibilityArchetypeCoverageSignals().catch(() => null)
+
+  const growthAiVisibilityCategory =
+    preloadedSources.growthAiVisibilityCategory !== undefined
+      ? preloadedSources.growthAiVisibilityCategory
+      : await getGrowthAiVisibilityCategorySignals().catch(() => null)
+
+  // TASK-1289 — perfiles de marca con business_model sin resolver (buyer-intent indefinido).
+  const growthAiVisibilityBusinessModel =
+    preloadedSources.growthAiVisibilityBusinessModel !== undefined
+      ? preloadedSources.growthAiVisibilityBusinessModel
+      : await getGrowthAiVisibilityBusinessModelSignals().catch(() => null)
+
+  // TASK-1240 — intake público (rate/cost/blocked). DB vacía / intake OFF → steady ok.
+  const growthAiVisibilityPublicIntake =
+    preloadedSources.growthAiVisibilityPublicIntake !== undefined
+      ? preloadedSources.growthAiVisibilityPublicIntake
+      : await getGrowthAiVisibilityPublicIntakeSignals().catch(() => null)
+
+  // TASK-1245 — entrega pública (read volume / delivery estancada / inconsistente). DB vacía → steady ok.
+  const growthAiVisibilityPublicDelivery =
+    preloadedSources.growthAiVisibilityPublicDelivery !== undefined
+      ? preloadedSources.growthAiVisibilityPublicDelivery
+      : await getGrowthAiVisibilityPublicDeliverySignals().catch(() => null)
+
+  // TASK-1229 — Growth Forms engine (dead-letter / failure / rejection). Sin forms
+  // publicados / DB vacía → steady ok.
+  const growthForms =
+    preloadedSources.growthForms !== undefined
+      ? preloadedSources.growthForms
+      : await getGrowthFormsSignals().catch(() => null)
+
+  // TASK-1254 — Gate de correo corporativo (rechazos + leads sospechosos).
+  const growthFormsEmail =
+    preloadedSources.growthFormsEmail !== undefined
+      ? preloadedSources.growthFormsEmail
+      : await getGrowthFormsEmailSignals().catch(() => null)
+
+  // TASK-1230 — HubSpot Forms secure-submit adapter (fallos/dead-letter de entrega).
+  const growthFormsHubspot =
+    preloadedSources.growthFormsHubspot !== undefined
+      ? preloadedSources.growthFormsHubspot
+      : await getGrowthFormsHubspotSignals().catch(() => null)
+
+  // TASK-1255 — Reveal de PII de leads sin razón válida (enforcement saltado).
+  const growthFormsPii =
+    preloadedSources.growthFormsPii !== undefined
+      ? preloadedSources.growthFormsPii
+      : await getGrowthFormsPiiSignals().catch(() => null)
+
+  // TASK-1242 — HubSpot lead handoff (leads con score listo sin sincronizar).
+  const growthAiVisibilityLeadHandoff =
+    preloadedSources.growthAiVisibilityLeadHandoff !== undefined
+      ? preloadedSources.growthAiVisibilityLeadHandoff
+      : await getGrowthAiVisibilityLeadHandoffSignals().catch(() => null)
+
+  // TASK-1250 — email de entrega del informe (dispatches en failed sin recuperar).
+  const growthAiVisibilityReportEmail =
+    preloadedSources.growthAiVisibilityReportEmail !== undefined
+      ? preloadedSources.growthAiVisibilityReportEmail
+      : await getGrowthAiVisibilityReportEmailSignals().catch(() => null)
+
+  // TASK-1279 — cross-sell operador (envío informe + Lead HubSpot en failed sin recuperar).
+  const growthAiVisibilityOperatorSend =
+    preloadedSources.growthAiVisibilityOperatorSend !== undefined
+      ? preloadedSources.growthAiVisibilityOperatorSend
+      : await getGrowthAiVisibilityOperatorSendSignals().catch(() => null)
+
+  // TASK-1291 — gate de validación del cross-sell (prospectos no graduables mientras el flag está ON).
+  const growthAiVisibilityOperatorGate =
+    preloadedSources.growthAiVisibilityOperatorGate !== undefined
+      ? preloadedSources.growthAiVisibilityOperatorGate
+      : await getGrowthAiVisibilityOperatorGateSignals().catch(() => null)
+
+  // TASK-1277 — entitlement & metering (integridad del chokepoint / budget de trials /
+  // atribución cliente vs sales). DB vacía / portal OFF → steady ok.
+  const growthAiVisibilityEntitlement =
+    preloadedSources.growthAiVisibilityEntitlement !== undefined
+      ? preloadedSources.growthAiVisibilityEntitlement
+      : await getGrowthAiVisibilityEntitlementSignals().catch(() => null)
+
+  // TASK-1270 — recurring re-grade cadence/cost/stale profile signals.
+  const growthAiVisibilityRegrade =
+    preloadedSources.growthAiVisibilityRegrade !== undefined
+      ? preloadedSources.growthAiVisibilityRegrade
+      : await getGrowthAiVisibilityRegradeSignals().catch(() => null)
+
   const payrollComplianceExportDrift =
     preloadedSources.payrollComplianceExportDrift !== undefined
       ? preloadedSources.payrollComplianceExportDrift
       : await getPayrollComplianceExportDriftSignal().catch(() => null)
+
+  const growthSearchConsoleTokenHealth =
+    preloadedSources.growthSearchConsoleTokenHealth !== undefined
+      ? preloadedSources.growthSearchConsoleTokenHealth
+      : await getGrowthSearchConsoleTokenHealthSignal().catch(() => null)
 
   // TASK-957 Slice A — Contractor double-rail overlap. Corre regardless del flag
   // PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED (detector temprano). Steady=0:
@@ -1465,6 +1646,13 @@ export const getReliabilityOverview = async (
     preloadedSources.vatPositionDrift !== undefined
       ? preloadedSources.vatPositionDrift
       : await getVatPositionDriftSignal().catch(() => null)
+
+  // TASK-1201 — Finance AI anomaly-materialization staleness heartbeat. Degrada
+  // honesto (severity='unknown') si su query falla; no envenena el overview.
+  const financeAiStaleMaterialization =
+    preloadedSources.financeAiStaleMaterialization !== undefined
+      ? preloadedSources.financeAiStaleMaterialization
+      : await getFinanceAiSignalsStaleMaterializationSignal().catch(() => null)
 
   // TASK-1185 — VAT FX/data-quality signals. Degradan honesto (severity='unknown')
   // si su query falla; no envenenan el overview.
@@ -2135,6 +2323,8 @@ export const getReliabilityOverview = async (
           getCommercialClientActiveWithoutSpaceSignal().catch(() => null),
           // TASK-997 Slice 1 — industria fuera del enum canónico HubSpot (data quality).
           getCommercialOrganizationIndustryNoncanonicalSignal().catch(() => null),
+          // TASK-1285 — web del cliente en el raw layer pero NO promovida a la org canónica.
+          getOrganizationWebsiteUrlUnsyncedSignal().catch(() => null),
           // TASK-992 — Client Lifecycle Orchestrator signals (roll up bajo `commercial`).
           getClientLifecycleOnboardingStalledSignal().catch(() => null),
           getClientLifecycleChecklistOrphanItemsSignal().catch(() => null),
@@ -2264,6 +2454,25 @@ export const getReliabilityOverview = async (
     domainIncidents,
     paymentOrderSettlement,
     operationalPlCostCoverageDegraded,
+    growthAiVisibility,
+    growthAiVisibilityScoring,
+    growthAiVisibilityProbe,
+    growthAiVisibilityArchetypeCoverage,
+    growthAiVisibilityCategory,
+    growthAiVisibilityBusinessModel,
+    growthAiVisibilityPublicIntake,
+    growthAiVisibilityPublicDelivery,
+    growthForms,
+    growthFormsEmail,
+    growthFormsHubspot,
+    growthFormsPii,
+    growthAiVisibilityLeadHandoff,
+    growthAiVisibilityReportEmail,
+    growthAiVisibilityOperatorSend,
+    growthAiVisibilityOperatorGate,
+    growthAiVisibilityEntitlement,
+    growthAiVisibilityRegrade,
+    growthSearchConsoleTokenHealth,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,
@@ -2273,6 +2482,7 @@ export const getReliabilityOverview = async (
     payrollContractTaxonomy,
     financeClpDrift,
     providerBqSyncDeadLetter,
+    financeAiStaleMaterialization,
     vatPositionDrift,
     vatEntryUnresolvedFx,
     vatEligibleWithoutPeriod,

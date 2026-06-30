@@ -383,6 +383,8 @@ Severity: `medium-high`
 
 Cost Intelligence is recovered technically, but June has revenue with zero cost because upstream labor allocation is missing. Do not use June 2026 `operational_pl` as real margin for leadership, Nexa, pricing, or client profitability decisions until payroll/labor allocation is complete and the degradation signal clears.
 
+**Resolution 2026-06-23 (TASK-1200):** Root cause confirmed against live PG — NOT a pipeline bug. `payroll_periods` only has 2026-02…05 (the payroll system starts Feb 2026); June payroll has not run yet (runs next week, operator-confirmed). Periods with revenue/cost 0: 2025-11, 2025-12, 2026-01 (pre-system → `unavailable`) and 2026-06 (open, payroll pending → `pending`). Built `resolveLaborAllocationReadiness(year, month)` (`src/lib/commercial-cost-attribution/labor-allocation-readiness.ts`) classifying coverage `canonical | degraded | unavailable | pending` (fail-closed via `isLaborAllocationCoverageCanonical`), exposed on `GET /api/finance/intelligence/operational-pl` (`readiness` field). The `finance.operational_pl.cost_coverage_degraded` signal now alarms (`error`) only on a real `degraded` bug (payroll exists but allocation missing — currently 0); `pending`/`unavailable` are honest `ok`. No invention, no rematerialization (no payroll to allocate). June self-heals when its payroll runs. Historical pre-system months stay `unavailable` permanently (no historical payroll backfill).
+
 ### FD-5 - `/api/finance/data-quality` ledger checks were stale relative to canonical ledger semantics
 
 Severity: `medium`

@@ -1,0 +1,376 @@
+# TASK-1290 — AEO: packs de prompts por arquetipo × buyer-intent (reemplaza el pack único de agencia)
+
+## Delta 2026-06-29 — foundation (TASK-1288) shipped
+
+- **El `brand_intelligence` snapshot YA EXISTE** y es el **grounding compartido** que el autor LLM consume (NO re-lee el sitio): `what_the_brand_does`, `candidate_category_node` (macro/mid), **`fine_category`** (descriptor buyer-facing, la cola larga como dato), `candidate_business_model`. Tabla `grader_brand_intelligence` + módulo `src/lib/growth/ai-visibility/brand-intelligence/`.
+- La **categoría canónica** (`category_node_id` + label) ya está persistida en `grader_profiles`; el autor usa el nodo (arquetipo) + `fine_category` (especificidad). El prompt del grounded read fue validado con skill seo-aeo (entidad buyer-facing que alimenta este fan-out).
+- `desbloqueada` (TASK-1288 complete).
+
+## Delta 2026-06-29 — TASK-1289 shipped (eje `business_model` listo para consumir)
+
+- **El eje `business_model` YA EXISTE** persistido en `grader_profiles` (`business_model`/`business_model_confidence`/`business_model_source`), derivado por `classifyBusinessModel` (`src/lib/growth/ai-visibility/taxonomy/business-model.ts`) + override operador gobernado. Enum `BUSINESS_MODELS` (= `BRAND_BUSINESS_MODELS`): `consumer_b2c`/`b2b_service_provider`/`b2b_product_saas`/`retail_ecommerce`/`marketplace`/`public_institution`/`unknown`. Verificado live: SKY/Berel/Banco de Chile→`consumer_b2c`, Vercel→`b2b_product_saas`, Efeonce→`b2b_service_provider`.
+- **Regla dura (reforzada por el operador 2026-06-29):** los packs DEBEN ser **universales** — un generador por arquetipo (categoría × `business_model` × buyer-intent) que produzca el Query Fan-Out apropiado a CUALQUIER marca (consumo/B2B/retail/marketplace/público), NO un pack agencia-only con casos especiales. El de agencia es UN arquetipo entre varios, no el default. Con `business_model=unknown` degradar honesto (gate TASK-1291), NUNCA caer al pack de agencia por defecto (eso re-introduce ISSUE-110).
+- `business_model` se lee del perfil (`GraderProfileRow.businessModel`); NO se re-clasifica en 1290.
+
+## Delta 2026-06-29 — Análisis multi-skill (arch-architect · seo-aeo · commercial-expert · product-design): ajustes load-bearing
+
+> Revisión de la spec con los 4 lentes. La spec ya era robusta (LLM-autora-luego-congela, artefacto versionado, baseline determinista, scoring intacto, flag). Estos son los ajustes **necesarios** que faltaban; el #1 es **bloqueante de correctitud**.
+
+### A) 🔴 [arch — load-bearing] El scorer y el normalizer leen los tags del pack ESTÁTICO por `promptId`. Hay que desacoplar, o "scoring inalterado" es IMPOSIBLE para marcas no-agencia.
+
+Hallazgo verificado en código (no asunción): **`scoring/engine.ts`** y **`normalization/normalizer.ts`** derivan los tags de cada prompt con `lookupPrompt(promptId)` contra **`GROWTH_AI_VISIBILITY_PROMPT_PACK_V1`** (el pack estático), para computar:
+- `isDiscovery` = `!prompt.namesBrand` (dimensión de descubrimiento),
+- `isRevenueIntent` = `REVENUE_INTENT_STAGES.has(prompt.intentStage)` (peso de intención de compra) + `intentStage === 'message_recall'`,
+- `coverage.promptFamilies` = nº de `prompt.family` distintas.
+
+Pero `GraderRunPromptInput` y `grader_runs.execution_prompts` cargan **sólo `{promptId, promptText}`** — los tags **NO viajan con el run**. Consecuencia: un set generado por arquetipo con **ids nuevos** (no `p01–p16`) hace que `lookupPrompt` devuelva `undefined` → `isDiscovery=false`, `isRevenueIntent=false`, `family` vacío para TODA query → **el score se corrompe en silencio** (probablemente cerca de 0 otra vez, por un mecanismo distinto al de ISSUE-110). El invariante "scoring inalterado" es necesario pero **insuficiente**: no dice CÓMO llegan los tags al scorer, y hoy llegan por una vía que se rompe con prompts generados.
+
+**Corrección (Slice 0, antes que todo):** los tags por query deben **viajar con el run** y el normalizer/scorer deben leerlos del **set RESUELTO del run**, no del pack estático.
+- Extender `GraderRunPromptInput` + `grader_runs.execution_prompts` + `grader_prompt_sets.prompts_json` para cargar `{promptId, promptText, family, fanOutType, intentStage, namesBrand}`.
+- `normalizer.ts` y `engine.ts` reciben/consultan un `promptTagCatalog: Map<promptId, tags>` construido del set del run (no importan `GROWTH_AI_VISIBILITY_PROMPT_PACK_V1`). Hoy la coupling está **duplicada** en los 2 archivos (incluido un `REVENUE_INTENT_STAGES` copiado) — consolidar.
+- **No-regresión:** el agency baseline conserva `p01–p16` con sus tags idénticos → mismo score bit-for-bit. Test: correr el scorer con el set del run vs el lookup estático para el caso agencia → idéntico.
+- `score_version` NO cambia (la fórmula no cambia; sólo la **fuente** de los tags pasa del pack estático al set del run).
+
+### B) [arch] Vocabularios de tags CERRADOS = contrato set↔scorer (hoy son strings libres).
+
+`intentStage`/`family`/`fanOutType`/`namesBrand` son strings libres en v1, pero el scorer depende de **valores exactos** (`REVENUE_INTENT_STAGES = {consideration, comparison, purchase_intent, enterprise, local}`, `message_recall`, y `fanOutType ∈ {related, comparative, implicit, recent}` por seo-aeo §04). El LLM autor DEBE estar constreñido a **enums cerrados**: si emite "booking"/"reserva" donde el scorer espera `purchase_intent`, la query queda mal pesada. Definir los 4 vocabularios canónicos en **un solo módulo** (`prompt-packs/tag-vocabulary.ts`) compartido por: pack v1, baselines por arquetipo, schema structured del autor LLM, normalizer y scorer. Valor fuera de enum en el output LLM = rechazo de schema → baseline (degradación honesta).
+
+### C) [commercial/JTBD] El buyer-intent difiere por arquetipo en SUSTANCIA, no sólo en copy.
+
+El agency pack modela un journey B2B largo (comité 6–10, RFP, "mejores agencias", "proveedores enterprise"). Eso NO se traduce a otros arquetipos — se **reemplaza** por el journey real (JTBD + buying-committee por modelo de negocio):
+- `consumer_b2c`: comprador N=1, journey rápido, intención emocional+precio (rutas/tarifas/"¿vale la pena?"/reseñas/app/reclamos). Stages: awareness · comparison · trust · purchase_intent · risk.
+- `b2b_product_saas`: evaluación de software (integraciones, seguridad/compliance, pricing, alternativas, reviews G2/Capterra). Stages: problem_aware · consideration · comparison · trust · purchase_intent.
+- `retail_ecommerce`: producto/stock/envío/devoluciones/medios de pago; comparación de tiendas. Stages: awareness · comparison · trust · purchase_intent · local.
+- `marketplace`: oferta/liquidez/confianza/comisiones (dos lados). Stages: awareness · consideration · trust · risk.
+- `b2b_service_provider` (agency): el pack actual = **un** arquetipo, no el molde.
+- `public_institution`: trámite/requisitos/canales oficiales (intención = resolver, no comprar).
+
+El baseline por arquetipo y el system prompt del autor codifican **qué stages e intents cubre cada `business_model`** (no un find-replace del pack agencia). Costo de NO hacerlo: el diagnóstico pierde credibilidad ante una marca Globe de consumo (mide preguntas que su comprador nunca haría).
+
+### D) [seo-aeo] El set ES la fan-out matrix — reforzar 3 cosas (las demás ya están en la spec).
+
+1. **Cobertura del fan-out real:** un query del usuario dispara 8–12 sub-queries (related/comparative/implicit/recent). El set debe cubrir los **4 `fanOutType` por etapa relevante**, no sólo la keyword principal (seo-aeo §04). El system prompt del autor ya se deriva de seo-aeo — explicitar la matriz fan-out × stage como objetivo de cobertura.
+2. **Los prompts de descubrimiento (`namesBrand=false`) son los que miden visibilidad REAL.** Si el set sobre-pesa `namesBrand=true` (recall), mide notoriedad asistida, no si te encuentran a ciegas. El balance discovery/recall es parte del contrato del arquetipo (lo lee `isDiscovery`).
+3. **Frescura/temporal (`fanOutType=recent`, `{{year}}`)** ya está soportada; mantenerla por arquetipo. *Nota provider:* cada motor cita fuentes distintas (~11% de solape ChatGPT/Perplexity) — eso es problema de **medición** (qué providers se corren), no del prompt; el set es provider-agnóstico (OK como está, no se ajusta acá).
+
+### E) [product-design] El artefacto nace review-ready (insumo directo de TASK-1291).
+
+1290 no construye UI, pero `grader_prompt_sets.prompts_json` debe cargar lo que el reconciler de TASK-1291 (Adaptive Sidecar, variant `reconciler`) necesita para un review con contexto, no una lista plana: por query, además de los tags, un `rationale` corto (por qué esta pregunta) y `groundingRef` (qué señal del snapshot la motivó). Así el review agrupa por `intentStage`/`family`, marca `namesBrand`, y muestra el **diff vs baseline** del arquetipo. Garantizar el shape acá evita re-trabajo en 1291.
+
+## Implementación 2026-06-29 — COMPLETE (develop local, sin push)
+
+4 slices. El corazón del fix de ISSUE-110 (SKY medible con prompts de consumo).
+
+- **S0** `prompt-packs/tag-vocabulary.ts` (enums cerrados, consolida `REVENUE_INTENT_STAGES` antes duplicado) + tags viajan en `GraderRunPromptInput`/`execution_prompts`; `scoreGraderRun` arma `promptTagCatalog` desde el run → normalizer + scorer leen de ahí (fallback pack v1). **Fix de correctitud:** sin esto un set con ids nuevos corrompía el score. Test bit-for-bit agencia + decouple.
+- **S1** `prompt-packs/archetypes/baseline-packs.ts` (`resolveArchetypeBaselinePack`): packs por arquetipo con JTBD real; agencia = v1 exacto; `unknown`→genérico. Flag `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED`; `buildExecuteInput` selecciona por arquetipo; `businessModel` fluye del perfil.
+- **S2** migración `grader_prompt_sets` (versionado + lifecycle `draft→approved→active`, un solo active, supersede atómico) + provenance en `grader_runs` + capability `growth.ai_visibility.prompt_set.manage`. `prompt-set-store` + `prompt-set-command` gobernado. `enqueueGraderRun` resuelve el set active (o baseline). **El LLM NO corre por run.**
+- **S3** `prompt-packs/authoring/` (`authorPromptSet` + system prompt versionado `aeo-author.v1` derivado de seo-aeo + JTBD; router gemini→openai→anthropic; sanitizer + vocabulario cerrado + NO-LEADING; degradación honesta → baseline). Command `authorGraderPromptSetDraft`. Flag `GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED`.
+
+**Verificación live (`greenhouse-pg-dev`, gemini):** S2 lifecycle (draft v1→active, v2→active+v1 superseded, one-active). S3 autoría SKY → status `ok`, 15 prompts consumo (8 discovery, 0 agency leak, 7 stages): "mejores aerolíneas low cost en Chile", "Santiago-Calama", "LATAM vs JetSmart". Decouple bit-for-bit (caso agencia).
+
+**Gates:** `pnpm test` full + `pnpm build` + `pnpm local:check` + capability-grant-coverage verdes.
+
+**Decisión (delta a la spec):** capability DEDICADA `prompt_set.manage` (acción gobernada distinta) en vez de reuse; vocabulario de tags cerrado consolidado en `tag-vocabulary.ts`.
+
+**Rollout pendiente (Runtime Rollout Completion Gate):** flags `ARCHETYPE_PROMPTS` + `PROMPT_AUTHORING` OFF en todos los environments. Las 2 AC de "run real SKY scored ≠ 0" quedan **rollout-pending**: requieren prender el flag en staging + correr un run scored end-to-end (la autoría + el decouple están verificados; el run scored con flag ON es el paso de rollout, gateado por el review TASK-1291 + la eval TASK-1292). Prod vía release control plane (EPIC-021).
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `complete`
+- Priority: `P1`
+- Impact: `Alto`
+- Effort: `Alto`
+- Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `migration`
+- Epic: `EPIC-021`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `growth`
+- Blocked by: `TASK-1289`
+- Branch: `task/TASK-1290-aeo-archetype-prompt-packs`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+El corazón del fix: reemplazar el prompt pack único (cableado a "¿qué agencias/proveedores de {category} ayudan a empresas enterprise?") por un **prompt set generado por marca**. El patrón canónico es **LLM-autora-luego-congela**: al momento de AUTORÍA, un LLM investiga el espacio de buyer-intent real de la marca (categoría canónica + modelo de negocio + sitio) y propone el fan-out; ese set se **persiste como artefacto versionado e inmutable** atado al perfil, **se revisa** (operador/AEO, obligatorio para prospectos) y **se congela**; los **runs usan el set congelado y aprobado** → deterministas, reproducibles y baratos (el LLM corrió una vez al autorar, **NUNCA por run**). Plantillas por arquetipo = **baseline determinista / fallback** (sin LLM disponible o casos triviales). El **scoring se queda determinista e idéntico** (presencia/SoV/citación se computan igual); solo cambian las preguntas. Cierra el núcleo de ISSUE-110.
+
+## Why This Task Exists
+
+Es la pieza que hace que el grader **mida la realidad**. Hoy `prompt-pack-v1.ts` (y v2) son una lista estática agencia-only; el Query Fan-Out / prompt-research (seo-aeo §04) debe reflejar el journey de compra **real** de la marca (rutas/precio para una aerolínea, "cuenta sin comisiones" para un banco…), que una plantilla genérica no captura. La interpretación de "qué le preguntaría un comprador real a la IA sobre esta marca" es exactamente lo que un LLM hace bien — pero debe quedar **congelado y reproducible** para poder medir en el tiempo, evaluar y no sesgar la medición. Sin esto, SKY (y toda marca de consumo/no-agencia) seguirá saliendo 0.
+
+## Goal
+
+- **Autoría (LLM):** `authorPromptSet({ brandName, categoryNodeId, categoryLabel, businessModel, market, locale, competitors, websiteSignals? })` propone, vía el cliente LLM canónico (`src/lib/ai/*`), un fan-out que cubre las etapas (awareness · consideration · comparison · trust · purchase) con los tipos de sub-query del Query Fan-Out (related/comparative/implicit/recent), acotado en costo. NO leading (no preguntas redactadas para que la marca aparezca).
+- **Artefacto congelado:** el set se persiste versionado + inmutable (lifecycle `draft → approved → active`), con provenance (modelo, inputs, estrategia). Los **runs referencian el set `active` aprobado**; misma marca → mismo set (reproducible).
+- **Baseline determinista:** plantillas por arquetipo como fallback cuando no hay LLM / set aprobado, garantizando no-regresión bit-for-bit del caso agencia.
+- El **scoring NO cambia**; provenance del set/versión en el run.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (prompt packs inmutables + versionados; scoring determinista)
+- `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` (invariantes de providers LLM — usar el cliente canónico de `src/lib/ai/*`, secret server-side)
+- `docs/epics/to-do/EPIC-021-aeo-brand-aware-prompt-generation-engine.md`
+- seo-aeo `modules/04_AEO_GEO.md` (Query Fan-Out, prompt/answer-space research)
+
+Reglas obligatorias:
+
+- **El LLM autora, NUNCA por run.** El LLM corre en el momento de AUTORÍA del set (una vez por marca/versión); el set se congela; los runs usan el set `active` aprobado. Generar prompts en vivo por run rompe la reproducibilidad (no se puede medir en el tiempo / evaluar drift), el costo y la seguridad.
+- El scoring (presencia/SoV/citación) **NO cambia** — solo cambian los prompts. Cualquier cambio de scoring es regresión.
+- El prompt set es **inmutable + versionado** (cambios → versión nueva), con lifecycle `draft → approved → active` (append-only). Un set `active` no se edita; se supersede con una versión nueva aprobada.
+- **NUNCA** instanciar un SDK LLM nuevo en este dominio — usar el cliente canónico de `src/lib/ai/*` (helper structured); secret server-side; output validado contra schema; degradación honesta (sin LLM / schema inválido → baseline determinista, NO prompts rotos ni enum crudo).
+- **No leading**: el LLM no debe redactar prompts diseñados para que la marca aparezca (sesgaría la medición); el review + eval (TASK-1292) lo controla.
+- **System prompt del autor = artefacto versionado derivado de `seo-aeo`** (NO un "eres experto SEO" ad-hoc): codifica Query Fan-Out + etapas de buyer-intent + sub-query types + framing por modelo de negocio + restricción no-leading + la taxonomía del pack actual (`family`/`fanOutType`/`intentStage`/`namesBrand`). Su versión (`system_prompt_version`) es parte de la provenance del set; cambiarla re-dispara la eval.
+- **Output estructurado** (queries tipadas con sus tags, mismo shape que el pack actual) vía el helper structured del cliente canónico; el scoring depende de los tags, así que texto libre es inaceptable.
+- Interpolación de marca/categoría como **dato delimitado** (anti prompt-injection), nunca PII; prompts con `{{competitor}}` sin competidor se descartan (patrón existente).
+- El run persiste **provenance**: `business_model`, `category_node_id`, id/versión del prompt set usado.
+- **Los tags por query viajan con el run (Delta A).** `GraderRunPromptInput` + `grader_runs.execution_prompts` + `grader_prompt_sets.prompts_json` cargan `{promptId, promptText, family, fanOutType, intentStage, namesBrand}`. El normalizer y el scorer leen los tags del **set RESUELTO del run** (`promptTagCatalog`), **NUNCA** de `GROWTH_AI_VISIBILITY_PROMPT_PACK_V1` (el lookup estático por id se elimina). Sin esto, un set con ids nuevos colapsa el score en silencio (`isDiscovery=false`, `isRevenueIntent=false`, `family` vacío).
+- **Vocabularios de tags CERRADOS (Delta B).** `family`/`fanOutType`/`intentStage`/`namesBrand` salen de un único módulo canónico (`prompt-packs/tag-vocabulary.ts`) compartido por pack v1, baselines, schema del autor LLM, normalizer y scorer. El output del autor LLM se valida contra esos enums; valor fuera de enum → rechazo de schema → baseline. `REVENUE_INTENT_STAGES` (hoy duplicado en normalizer + engine) se consolida ahí.
+- **El buyer-intent por arquetipo es SUSTANCIA, no copy (Delta C).** Cada baseline + el system prompt del autor codifican las etapas/intents reales del `business_model` (JTBD por arquetipo); el agency pack es **un** arquetipo, NUNCA el molde a traducir.
+
+## Normative Docs
+
+- `docs/issues/open/ISSUE-110-aeo-grader-false-zero-non-agency-brands-taxonomy-bypass.md`
+- `src/lib/growth/ai-visibility/prompt-packs/prompt-pack-v1.ts` (el pack a generalizar)
+- `src/lib/growth/ai-visibility/prompt-pack.ts` (interpolación)
+
+## Dependencies & Impact
+
+### Depende de
+
+- **TASK-1288** (categoría canónica + label + **`brand_intelligence` snapshot compartido** que el autor LLM consume como grounding) y **TASK-1289** (business_model). Bloqueante.
+
+### Impacta a
+
+- El run-engine (resuelve prompts vía el generador, no el pack fijo; persiste tags + provenance).
+- **`scoring/engine.ts` + `normalization/normalizer.ts`** (Slice 0: leen tags del set del run, no del pack estático). Cambio de **fuente** de los tags, NO de la fórmula (`score_version` intacto).
+- **TASK-1292** (eval golden-set por arquetipo).
+- El lead magnet (debe seguir bit-for-bit para el caso agencia).
+
+### Files owned
+
+- `migrations/<ts>_task-1290-grader-prompt-sets.sql` (tabla `grader_prompt_sets` + provenance en `grader_runs`; tags en `execution_prompts`)
+- `src/lib/growth/ai-visibility/prompt-packs/tag-vocabulary.ts` (enums cerrados `family`/`fanOutType`/`intentStage` + `REVENUE_INTENT_STAGES`, consolidado) **(Slice 0)**
+- `src/lib/growth/ai-visibility/normalization/normalizer.ts` + `src/lib/growth/ai-visibility/scoring/engine.ts` (leer tags del set del run, NO del pack estático) **(Slice 0)**
+- `src/lib/growth/ai-visibility/run-engine.ts` (extender `GraderRunPromptInput` con los 4 tags + persistirlos en `execution_prompts` + provenance del set)
+- `src/lib/growth/ai-visibility/prompt-packs/archetypes/*.ts` (baseline determinista por arquetipo) `[verificar naming]`
+- `src/lib/growth/ai-visibility/prompt-packs/author-prompt-set.ts` (autoría LLM vía cliente canónico + grounding sources) `[verificar]`
+- `src/lib/growth/ai-visibility/prompt-packs/author-system-prompt.ts` (system prompt experto AEO versionado, derivado de seo-aeo) + schema structured `[verificar]`
+- `src/lib/growth/ai-visibility/prompt-packs/prompt-set-store.ts` (lifecycle draft→approved→active + resolve active) `[verificar]`
+- `src/lib/growth/ai-visibility/prompt-pack.ts` (resolver el set active, fallback baseline)
+- `src/lib/ai/*` (reuse del cliente LLM canónico + helper structured — NO SDK nuevo)
+
+## Current Repo State
+
+### Already exists
+
+- `prompt-pack-v1.ts`/`v2` (estáticos, agencia-only) + `prompt-pack.ts` (interpolación + descarte de `{{competitor}}`).
+- `grader_runs.execution_prompts` (persiste los prompts resueltos) + `prompt_pack_version`.
+
+### Gap
+
+- No hay prompt set por marca, ni autoría LLM, ni artefacto persistido/versionado, ni baseline por arquetipo; el run siempre usa el pack agencia en código.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical` (cambia qué se le pregunta a los motores reales en TODAS las puertas del grader + introduce autoría LLM)
+- Impacto principal: `migration` (artefacto del prompt set) + `command` (autoría LLM + lifecycle) + `integration` (cliente LLM canónico)
+- Source of truth afectado: nuevo `greenhouse_growth.grader_prompt_sets` (artefacto versionado por perfil) + provenance en `grader_runs`
+- Consumidores afectados: run-engine (3 puertas: público/cliente/operador) · review operador (TASK-1291) · eval (TASK-1292)
+- Runtime target: `local|staging|production`
+
+### Contract surface
+
+- Contratos nuevos: `authorPromptSet(profileVars) → draft set` (LLM, cliente canónico `src/lib/ai/*`, structured + cost-bounded) · `approvePromptSet(setId)` (draft→active, congela) · `resolveActivePromptSet(profileId) → GraderRunPromptInput[]` (lo que usa el run). Baseline determinista por arquetipo como fallback.
+- Backward compatibility: `compatible` para el caso agencia (el baseline `b2b_service_provider` produce el MISMO set que hoy); `additive` para el artefacto + arquetipos nuevos.
+- Full API parity: la autoría/approve/resolución son commands/readers gobernados; las 3 puertas resuelven el set `active` por construcción.
+
+### Data model and invariants
+
+- Entidades: `grader_prompt_sets` (`set_id`, `profile_id`, `version`, `business_model`, `category_node_id`, `prompts_json` (queries **estructuradas**: `family`/`fanOutType`/`intentStage`/`namesBrand`/`text`, mismo shape que el pack actual), `generation_strategy` `llm`|`template_baseline`, `model`, `system_prompt_version` (versión del cerebro AEO autor), `grounding_sources_json` (qué señales reales se usaron: site_probe/competitors/search_data), `status` `draft`|`approved`|`active`|`superseded`, `created_by`, `approved_by`, timestamps); baseline por arquetipo en código (versionado). `grader_runs` (+ `prompt_set_id`/`version` provenance).
+- Invariantes:
+  - Un perfil tiene a lo sumo UN set `active`; aprobar uno nuevo supersede el anterior (append-only, no edit-in-place).
+  - El run usa el set `active`; misma marca → mismo set (reproducible). Si no hay set `active` → baseline determinista del arquetipo (no prompts rotos, no enum crudo).
+  - Para `b2b_service_provider` el baseline es **idéntico** al pack actual (no regresión del lead magnet).
+  - Scoring inalterado (mismo `score_version`); el LLM NO toca el score.
+  - LLM output validado contra schema; prompts no-leading; interpolación delimitada; descarte de `{{competitor}}` sin competidor.
+- Tenant/space boundary: el set es per-profile (per-org).
+- Idempotency/concurrency: la AUTORÍA LLM no es determinista (por eso se congela un artefacto); la RESOLUCIÓN en run es determinista (lee el set `active`). Approve por claim atómico (un solo `active`).
+- Audit/outbox/history: `grader_prompt_sets` append-only + provenance (modelo, inputs, quién aprobó); provenance del set en el run.
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive` (tabla `grader_prompt_sets` + columna provenance en `grader_runs`).
+- Default state: detrás de flag `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` (default OFF): con OFF el run usa el pack agencia actual (no-op); con ON resuelve el set `active` (o baseline). La AUTORÍA LLM gateada por su propio flag + el kill switch global del grader; secret server-side.
+- Backfill plan: autorar (o baseline) un set `active` para los perfiles existentes (dry-run; los de consumo se re-autoran). Idempotente.
+- Rollback path: flag OFF → pack agencia; reverse migration (drop tabla); el LLM-author se apaga por flag.
+- External coordination: review del copy de los prompts autorados (comercial/AEO) — gate de TASK-1291; sign-off de costo de la autoría LLM.
+
+### Security and access
+
+- Auth/access gate: autoría/approve gateados por capability operador del grader (reuse); resolución sin capability (run ya gobernado).
+- Sensitive data posture: sin PII; el LLM recibe marca/categoría/sitio (públicos), nunca PII; interpolación delimitada anti-injection; secret LLM server-side (`*_SECRET_REF`).
+- Error contract: canónico; degradación honesta — sin LLM / schema inválido / sin set `active` → baseline determinista + signal, NUNCA prompts rotos ni enum crudo.
+- Abuse/rate-limit posture: la autoría LLM es 1×/marca/versión (no por run) + cost ceiling; el run no agrega costo LLM.
+
+### Runtime evidence
+
+- Local checks: tests del baseline (agencia = set idéntico al actual; cada arquetipo cubre etapas; descarte de competitor) + del lifecycle del artefacto (un solo `active`, supersede) + del fallback (sin LLM → baseline).
+- DB/runtime checks: autorar+aprobar un set para SKY (staging) → run usa el set `active` → prompts de consumo → SKY aparece → score realista ≠ 0; reproducibilidad (2 runs, mismo set).
+- Integration checks: los 3 endpoints resuelven el set `active`; el cliente LLM canónico responde structured + acotado en costo.
+- Reliability signals/logs: signal de runs con baseline-fallback (sin set `active`) + de autorías LLM fallidas.
+- Production verification sequence: flag ON staging → autorar SKY → review → run realista → eval (TASK-1292) verde → prod.
+
+### Acceptance criteria additions
+
+- [x] SoT (`grader_prompt_sets` artefacto versionado + provenance) y los commands (author/approve/resolve) nombrados; scoring inalterado.
+- [x] LLM autora al momento de autoría (no por run); el run usa el set `active` congelado (reproducible); fallback a baseline determinista.
+- [x] No regresión: el baseline `b2b_service_provider` es idéntico al pack actual.
+- [ ] Run real SKY con set autorado → score realista ≠ 0 (evidencia); un solo `active` por perfil; LLM vía cliente canónico + secret server-side.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 0 — Desacople tags-del-run + vocabulario cerrado (correctitud del scoring) 🔴
+
+- `prompt-packs/tag-vocabulary.ts`: enums cerrados `family`/`fanOutType`/`intentStage` + `REVENUE_INTENT_STAGES` (consolida la copia duplicada de `normalizer.ts` y `engine.ts`). Pack v1 referencia estos enums (sin cambiar valores → no-regresión).
+- Extender `GraderRunPromptInput` + `grader_runs.execution_prompts` para cargar los 4 tags por query; el run-engine resuelve los tags del set (o baseline) y los persiste.
+- `normalizer.ts` + `scoring/engine.ts`: leer los tags del **set resuelto del run** (`promptTagCatalog: Map<promptId, tags>`), eliminar `lookupPrompt` contra el pack estático. Test bit-for-bit: caso agencia (ids `p01–p16`) → score idéntico al actual (mismo `score_version`).
+- **Prerequisito de Slice 1–3:** sin esto, cualquier set generado corrompe el score. Es la base de "scoring inalterado".
+
+### Slice 1 — Baseline determinista por arquetipo (no regresión)
+
+- Plantillas por arquetipo (`b2b_service_provider` reproduce **idéntico** el pack actual — test de no-regresión vs `prompt-pack-v1`; `consumer_b2c`/`b2b_product_saas`/`retail_ecommerce`/`marketplace`/`public_institution` cubren las etapas). Es el fallback determinista.
+
+### Slice 2 — Artefacto del prompt set + lifecycle
+
+- Migration `grader_prompt_sets` (versionado, `draft→approved→active`, provenance) + `prompt-set-store.ts` (resolve active, approve atómico un-solo-active, supersede). `run-engine` referencia el set active (o baseline) + provenance.
+
+### Slice 3 — Autoría LLM + flag
+
+- `author-prompt-set.ts`: el LLM (cliente canónico `src/lib/ai/*`, structured + cost-bounded) propone un set `draft` por marca; validación de schema + no-leading; fallback a baseline si falla. Flag `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` + flag propio de la autoría LLM. (El approve/review operador vive en TASK-1291; acá se expone el command de approve.)
+
+## Out of Scope
+
+- El gate de validación + la UI de review operador (TASK-1291).
+- La eval golden-set por arquetipo (TASK-1292).
+- Re-autoría automática recurrente del set (cuando cambie el sitio/categoría) — follow-up.
+
+## Detailed Spec
+
+Dos tiempos separados. **Autoría** (no por run): el LLM, dada la marca + categoría canónica (label, no enum) + modelo de negocio + señales del sitio, propone el fan-out de buyer-intent; se valida (schema, no-leading) y se persiste como `draft`. **Aprobación**: operador/AEO revisa (TASK-1291) y aprueba → el set queda `active` (congelado, inmutable). **Medición** (cada run): el run-engine resuelve el set `active` del perfil (determinista, reproducible, sin costo LLM) o, si no hay, cae al **baseline determinista** del arquetipo. El scoring downstream es agnóstico a la pregunta (mide presencia/SoV/citación sobre las observaciones) → generalizar los prompts NO toca el motor de score. Esto resuelve la tensión "LLM interpreta vs reproducibilidad": el LLM interpreta **una vez al autorar**; el run mide con un set **fijo**.
+
+### Estrategia de autoría LLM (grounded + experto AEO)
+
+El LLM autor **mina el espacio de queries de buyer-intent** (no es el grounding de la medición — el grounding real es el run contra los motores; el LLM sólo *propone* las preguntas). Dos decisiones canónicas:
+
+- **Autoría *grounded* (no a ciegas):** el LLM recibe el **`brand_intelligence` snapshot compartido** (TASK-1288 — ya leyó el site probe TASK-1266 + entity TASK-1267 y entendió qué hace la marca) + la categoría canónica + el modelo de negocio + competidores. **NO re-lee el sitio** (consume el snapshot; la lectura es una sola pasada compartida). Esto hace las queries específicas y locales (rutas/precio para una aerolínea), no genéricas. Lo usado queda en `grounding_sources_json` (provenance). Degradación honesta: sin snapshot → autoría solo desde marca+categoría+modelo (peor, pero no roto) o baseline.
+- **System prompt = experto AEO versionado, derivado de la doctrina canónica:** el rol del LLM NO se inventa — se deriva de la skill `seo-aeo` (Query Fan-Out, etapas de buyer-intent, sub-query types, framing por modelo de negocio, restricción **no-leading**) + la taxonomía del pack actual (`family`/`fanOutType`/`intentStage`/`namesBrand`). El system prompt es un **artefacto versionado** (`system_prompt_version` en el set): cambiarlo cambia la versión del set → la **eval (TASK-1292) lo re-valida** (ningún cambio del "cerebro" sin eval).
+- **Output ESTRUCTURADO, no texto libre:** el LLM devuelve queries tipadas con sus tags (`family`/`fanOutType`/`intentStage`/`namesBrand`/`text`), mismo shape que el pack actual, vía el helper structured del cliente canónico. Es obligatorio: el **scoring depende de esos tags** (ej. `namesBrand=false` = prompt de descubrimiento). Texto suelto rompería el motor.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- **S0 (desacople tags-del-run + vocabulario cerrado — correctitud)** → S1 (baseline + agencia no-regresión) → S2 (artefacto + lifecycle) → S3 (autoría LLM + flag). S0 es prerequisito duro: sin tags viajando con el run, S1–S3 corrompen el score. Bloqueada por TASK-1288/1289. El set autorado NO se usa en prod sin review (TASK-1291) + eval (TASK-1292).
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Regresión del lead magnet (baseline agencia cambia) | growth | medium | test de no-regresión bit-for-bit vs pack actual + flag | diff en `execution_prompts` del caso agencia |
+| LLM genera prompts pobres / leading / off-topic | growth | medium | review operador (TASK-1291) + eval (TASK-1292) + no-leading constraint + schema | score irreal en eval / review rechaza |
+| LLM por run (no reproducible) por error de diseño | growth | low | autoría 1×/marca/versión + set congelado; el run resuelve, no genera | costo LLM por run / set cambia entre runs |
+| Sin set active → prompts rotos | growth | low | fallback a baseline determinista (no enum crudo) + signal | runs con baseline-fallback |
+| Arquetipo `unknown` → prompts rotos | growth | low | fallback seguro + signal (no inyectar enum) | runs con arquetipo fallback |
+
+### Feature flags / cutover
+
+- `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` (default OFF → pack agencia actual; ON → por arquetipo). Flip tras eval verde.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1 | revert PR | <10 min | sí |
+| Slice 2 | revert PR | <10 min | sí |
+| Slice 3 | flag OFF | <5 min | sí |
+
+### Production verification sequence
+
+1. flag OFF: verificar baseline agencia idéntico (no-regresión).
+2. flag ON staging: autorar (LLM) un set para SKY → review → approve → run usa el set active → prompts consumo → score realista; 2 runs = mismo set (reproducible).
+3. eval (TASK-1292) verde multi-arquetipo.
+4. prod tras sign-off (review del copy autorado + costo LLM).
+
+### Out-of-band coordination required
+
+- Review del copy de los prompts autorados por el LLM (comercial/AEO) — gate de TASK-1291.
+- Sign-off de costo de la autoría LLM (1×/marca/versión).
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [x] **Scoring desacoplado del pack estático (Slice 0):** el normalizer y el scorer leen `family`/`fanOutType`/`intentStage`/`namesBrand` del set RESUELTO del run (tags persistidos en `execution_prompts`), no de `GROWTH_AI_VISIBILITY_PROMPT_PACK_V1`; un set con ids nuevos produce el score CORRECTO (no near-0 por tags `undefined`). Tags de un vocabulario CERRADO (`tag-vocabulary.ts`); `score_version` inalterado; caso agencia bit-for-bit idéntico.
+- [x] **Autoría LLM (no por run):** `authorPromptSet` produce un `draft` por marca vía el cliente canónico `src/lib/ai/*` (structured + cost-bounded, no-leading, schema-validado contra los enums cerrados); el LLM NO corre por run.
+- [x] **Artefacto congelado + reproducible:** `grader_prompt_sets` versionado con lifecycle `draft→approved→active` (un solo `active` por perfil, supersede append-only); el run resuelve el set `active` (2 runs de la misma marca = mismo set).
+- [x] **Baseline + no-regresión:** sin set `active` → baseline determinista del arquetipo (no enum crudo); el baseline `b2b_service_provider` es **idéntico** al `prompt-pack-v1` actual (test bit-for-bit).
+- [ ] Run real sobre SKY (staging, set autorado+aprobado) genera prompts de consumo y devuelve score realista ≠ 0 (evidencia); scoring inalterado (mismo `score_version`); provenance del set en el run; flag + fallback honesto.
+
+## Verification
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- run real staging sobre SKY + diff de no-regresión del caso agencia
+
+## Closing Protocol
+
+- [x] `Lifecycle` sincronizado
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (EPIC-021, TASK-1291/1292, ISSUE-110)
+- [x] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (prompt generation por arquetipo)
+
+## Follow-ups
+
+- Re-autoría automática del set cuando cambie el sitio/categoría/competidores de la marca (cadencia, opt-in) — alimenta el re-grade recurrente (TASK-1270).
+- Sub-segmentación por mercado/locale más fina si el buyer-intent difiere mucho por país (un set `active` por (perfil, market)).
+
+## Open Questions
+
+- ¿El review/approve (TASK-1291) es obligatorio para TODA marca o solo prospectos (cliente contratado podría auto-aprobar el baseline)? (definir con comercial).
+- ¿Qué modelo LLM para la autoría (Gemini/Anthropic/OpenAI del cliente canónico) y su cost ceiling por autoría? (definir con el dueño de costo AEO).
+- ¿El `system_prompt_version` del autor vive como artefacto en código (string versionado) o en DB para editarlo sin deploy? (recomendación: código + eval-gated; definir en Discovery).
+- **[Delta A] ¿Los tags viajan en `execution_prompts` (run self-describing, consistente con la resumibilidad del worker TASK-1234) o el scorer/normalizer los resuelven del `grader_prompt_sets` por `prompt_set_id`?** Recomendación: **tags en `execution_prompts`** (el run queda autodescrito; el worker async no re-lee el artefacto; menos acoplamiento). Definir en Discovery de Slice 0.
+- **[Delta C] ¿El set de etapas (`intentStage`) del vocabulario cerrado es único cross-arquetipo (cada arquetipo elige un subconjunto) o hay stages exclusivas por modelo de negocio?** Recomendación: **vocabulario único** (awareness/problem_aware/consideration/comparison/trust/purchase_intent/local/risk/message_recall/enterprise); cada arquetipo cubre el subconjunto que aplica. Mantiene el scorer agnóstico. Validar con comercial que cubre los journeys Globe.

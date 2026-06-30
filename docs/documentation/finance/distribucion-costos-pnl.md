@@ -69,3 +69,26 @@ La cola admin vive en:
 - `POST /api/admin/finance/expense-distribution/suggestions/[suggestionId]`
 
 Una sugerencia no modifica P&L ni cierra períodos. Solo una aprobación humana puede crear una resolución `ai_approved`; esa resolución queda auditada y sigue sin tocar caja, bancos ni conciliación.
+
+## Cobertura laboral y margen canónico (TASK-1200)
+
+El margen del Operational P&L de un período es **canónico** solo si tiene cobertura
+laboral materializada. Un período puede tener ingresos pero costo 0; en ese caso el
+margen **no es real** y la plataforma no lo trata como tal. El estado de cobertura se
+resuelve por período:
+
+| Estado | Qué significa | Margen |
+|---|---|---|
+| Canónico (`canonical`) | El payroll del período corrió y la asignación laboral está materializada. | Confiable. |
+| Pendiente (`pending`) | El payroll del período aún no corrió/cerró (p. ej. el mes en curso). | No canónico — se vuelve canónico solo cuando corra el payroll. |
+| No disponible (`unavailable`) | Período anterior al inicio del sistema de payroll (no hay fuente de costo laboral). | No canónico de forma permanente. |
+| Degradado (`degraded`) | El payroll existe pero la asignación no se materializó: bug. | No usar; revisar el pipeline. |
+
+A junio 2026 el sistema de payroll arranca en febrero 2026, así que los meses previos
+(nov/dic 2025, ene 2026) son "No disponible", y junio 2026 está "Pendiente" hasta que
+corra su payroll. No se inventa costo para tapar la ausencia de payroll.
+
+> Detalle técnico: `resolveLaborAllocationReadiness` y `isLaborAllocationCoverageCanonical`
+> en `src/lib/commercial-cost-attribution/labor-allocation-readiness.ts`; expuesto en
+> `GET /api/finance/intelligence/operational-pl` (campo `readiness`). Señal de salud:
+> `finance.operational_pl.cost_coverage_degraded` (solo alarma ante el bug `degraded`).

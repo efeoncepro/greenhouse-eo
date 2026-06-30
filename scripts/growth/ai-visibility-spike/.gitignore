@@ -1,0 +1,4 @@
+# Raw provider captures — evidencia cruda no acotada, NUNCA committear.
+# Los artefactos durables (prompt pack, golden set, calibración) viven en
+# docs/architecture/growth/ai-visibility/ y docs/architecture/, no acá.
+captures/

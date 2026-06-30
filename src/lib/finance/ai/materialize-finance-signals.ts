@@ -1,11 +1,16 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 import { detectFinanceAnomalies, type FinanceMetricSnapshot } from './anomaly-detector'
-import type { FinanceSignalRecord } from './finance-signal-types'
+import {
+  stableFinanceMaterializationRunId,
+  type FinanceMaterializationRunStatus,
+  type FinanceSignalRecord
+} from './finance-signal-types'
 
 const MODEL_VERSION = 'finance-ai-anomaly-v1'
 const HISTORY_WINDOW_MONTHS = 6
@@ -26,6 +31,9 @@ export interface MaterializeFinanceSignalsResult {
   signalsWritten: number
   triggerType: string
   durationMs: number
+  // TASK-1201 — status honesto del run de materialización + id de provenance.
+  status: FinanceMaterializationRunStatus
+  materializationRunId: string
 }
 
 // ─── Load snapshots from client_economics ──────────────────────────────────
@@ -220,6 +228,70 @@ const persistSignals = async (
   }
 }
 
+// ─── Materialization provenance (append-only ledger) — TASK-1201 ────────────
+//
+// Una fila por ejecución del anomaly step. Append-only (NO DELETE/UPDATE). Es lo
+// que permite al reader/status distinguir empty-positive (corrió, economics
+// elegible, 0 anomalías) de empty-pending (nunca corrió / economics no listo).
+// SoT: GREENHOUSE_FINANCE_AI_SIGNAL_SOURCE_OF_TRUTH_DECISION_V1.md
+
+const resolveMaterializationStatus = (
+  snapshotsEvaluated: number,
+  signalsWritten: number
+): FinanceMaterializationRunStatus => {
+  if (snapshotsEvaluated === 0) return 'skipped_no_eligible_data'
+  if (signalsWritten === 0) return 'empty_positive'
+
+  return 'succeeded'
+}
+
+interface PersistMaterializationRunInput {
+  materializationRunId: string
+  triggerEventId: string | null
+  periodYear: number
+  periodMonth: number
+  triggerType: string
+  status: FinanceMaterializationRunStatus
+  snapshotsEvaluated: number
+  signalsWritten: number
+  errorMessage: string | null
+  durationMs: number
+  startedAt: string
+  completedAt: string | null
+}
+
+const persistMaterializationRun = async (run: PersistMaterializationRunInput): Promise<void> => {
+  await query(
+    `
+      INSERT INTO greenhouse_serving.finance_ai_materialization_runs (
+        materialization_run_id, trigger_event_id, period_year, period_month,
+        trigger_type, status, snapshots_evaluated, signals_written,
+        model_version, error_message, duration_ms, started_at, completed_at, synced_at
+      ) VALUES (
+        $1, $2, $3, $4,
+        $5, $6, $7, $8,
+        $9, $10, $11, $12, $13, NOW()
+      )
+      ON CONFLICT (materialization_run_id) DO NOTHING
+    `,
+    [
+      run.materializationRunId,
+      run.triggerEventId,
+      run.periodYear,
+      run.periodMonth,
+      run.triggerType,
+      run.status,
+      run.snapshotsEvaluated,
+      run.signalsWritten,
+      MODEL_VERSION,
+      run.errorMessage,
+      run.durationMs,
+      run.startedAt,
+      run.completedAt
+    ]
+  )
+}
+
 // ─── Latest materializable period resolver (TASK-941 Slice 7) ───────────────
 //
 // `client_economics` es una projection reactiva que materializa cuando cierra el
@@ -263,43 +335,99 @@ export const getLatestClientEconomicsPeriod = async (): Promise<{
 export const materializeFinanceSignals = async (
   input: MaterializeFinanceSignalsInput
 ): Promise<MaterializeFinanceSignalsResult> => {
-  const startedAt = Date.now()
+  const startedAtMs = Date.now()
+  const startedAt = new Date(startedAtMs).toISOString()
   const { periodYear, periodMonth } = input
   const triggerType = input.triggerType ?? 'manual'
+  const materializationRunId = stableFinanceMaterializationRunId(periodYear, periodMonth)
 
-  const { current, history } = await loadClientEconomicsWindow(periodYear, periodMonth)
+  try {
+    const { current, history } = await loadClientEconomicsWindow(periodYear, periodMonth)
 
-  const generatedAt = new Date().toISOString()
+    const generatedAt = new Date().toISOString()
 
-  const signals = detectFinanceAnomalies({
-    currentSnapshots: current,
-    historyByScope: history,
-    generatedAt,
-    modelVersion: MODEL_VERSION
-  })
+    const signals = detectFinanceAnomalies({
+      currentSnapshots: current,
+      historyByScope: history,
+      generatedAt,
+      modelVersion: MODEL_VERSION
+    })
 
-  await persistSignals(signals, periodYear, periodMonth)
+    await persistSignals(signals, periodYear, periodMonth)
 
-  await publishOutboxEvent({
-    aggregateType: AGGREGATE_TYPES.financeAiSignals,
-    aggregateId: `finance-ai-signals-${periodYear}-${String(periodMonth).padStart(2, '0')}`,
-    eventType: EVENT_TYPES.financeAiSignalsMaterialized,
-    payload: {
+    const snapshotsEvaluated = current.length
+    const signalsWritten = signals.length
+    const status = resolveMaterializationStatus(snapshotsEvaluated, signalsWritten)
+    const durationMs = Date.now() - startedAtMs
+
+    // Provenance honesta del anomaly step (append-only). Best-effort: la falla del
+    // ledger no debe tumbar el run, pero sí queda observable en Sentry.
+    await persistMaterializationRun({
+      materializationRunId,
+      triggerEventId: input.triggerEventId ?? null,
       periodYear,
       periodMonth,
-      snapshotsEvaluated: current.length,
-      signalsWritten: signals.length,
-      triggerEventId: input.triggerEventId ?? null,
-      triggerType
-    }
-  }).catch(() => {})
+      triggerType,
+      status,
+      snapshotsEvaluated,
+      signalsWritten,
+      errorMessage: null,
+      durationMs,
+      startedAt,
+      completedAt: new Date().toISOString()
+    }).catch(error => {
+      captureWithDomain(error, 'finance', {
+        tags: { source: 'finance_ai_materialization_run', stage: 'provenance_write' }
+      })
+    })
 
-  return {
-    periodYear,
-    periodMonth,
-    snapshotsEvaluated: current.length,
-    signalsWritten: signals.length,
-    triggerType,
-    durationMs: Date.now() - startedAt
+    await publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.financeAiSignals,
+      aggregateId: `finance-ai-signals-${periodYear}-${String(periodMonth).padStart(2, '0')}`,
+      eventType: EVENT_TYPES.financeAiSignalsMaterialized,
+      payload: {
+        periodYear,
+        periodMonth,
+        snapshotsEvaluated,
+        signalsWritten,
+        status,
+        triggerEventId: input.triggerEventId ?? null,
+        triggerType
+      }
+    }).catch(() => {})
+
+    return {
+      periodYear,
+      periodMonth,
+      snapshotsEvaluated,
+      signalsWritten,
+      triggerType,
+      durationMs,
+      status,
+      materializationRunId
+    }
+  } catch (error) {
+    // Run-truth: una excepción NO es succeeded. Registrar provenance `failed`
+    // (best-effort) y propagar para que el caller degrade/alerte honestamente.
+    await persistMaterializationRun({
+      materializationRunId,
+      triggerEventId: input.triggerEventId ?? null,
+      periodYear,
+      periodMonth,
+      triggerType,
+      status: 'failed',
+      snapshotsEvaluated: 0,
+      signalsWritten: 0,
+      errorMessage: error instanceof Error ? error.message : 'Unknown materialization error',
+      durationMs: Date.now() - startedAtMs,
+      startedAt,
+      completedAt: new Date().toISOString()
+    }).catch(provenanceError => {
+      captureWithDomain(provenanceError, 'finance', {
+        tags: { source: 'finance_ai_materialization_run', stage: 'provenance_write_failed' }
+      })
+    })
+
+    throw error
   }
 }

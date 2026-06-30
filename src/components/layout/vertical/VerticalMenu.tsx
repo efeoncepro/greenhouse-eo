@@ -244,6 +244,20 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       })
     }
 
+    if (canSeeView('administracion.growth_forms', isAdminUser)) {
+      menuData.push({
+        label: nl(GH_INTERNAL_NAV.growth),
+        icon: 'tabler-growth',
+        children: [
+          {
+            label: nl(GH_INTERNAL_NAV.growthForms),
+            href: '/admin/growth/forms',
+            icon: 'tabler-forms'
+          }
+        ]
+      })
+    }
+
     // ── PERSONAS Y HR (section: 1 flat + 3 collapsibles, conditional) ──
     const hasHrAccess = isHrUser || isAdminUser
 

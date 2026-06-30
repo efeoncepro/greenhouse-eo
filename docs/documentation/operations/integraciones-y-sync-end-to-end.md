@@ -77,6 +77,14 @@ HubSpot participa en comercial, products, companies, services, quotes y lifecycl
 
 Notion alimenta Delivery/operaciones y transiciones demo. La arquitectura exige raw freshness real, titulos reales o `NULL` cuando falten, warnings en `source_sync_failures` y prohibicion de placeholders sentinela. El webhook de Notion es aviso; la fuente de verdad se re-fetch/normaliza.
 
+### Google Search Console
+
+Search Console conecta datos de visibilidad orgánica por organización cliente. A diferencia de HubSpot/Notion/Nubox, no es una sync batch: cada organización autoriza su propiedad con OAuth 3-legged, el refresh token vive en Secret Manager y Greenhouse lee Search Analytics on-demand por `organization_id`.
+
+Desde TASK-1283, el lane operador muestra un panel en Account-360 para ver el estado de la conexión, ingresar la propiedad (`sc-domain:` o URL), iniciar consentimiento Google, reconectar si el acceso fue revocado y desconectar con confirmación. El panel está gated por `growth.search_console.connect` y por el flag `GROWTH_SEARCH_CONSOLE_ENABLED`; si falta permiso o el flag está apagado, la UI debe degradar honesto.
+
+La operación completa sigue en rollout pendiente hasta que Google OAuth/consent/secrets/IAM estén configurados y verificados en staging. Mientras tanto, el panel puede estar code-complete pero no se debe declarar la integración como healthy en runtime real.
+
 ### Nubox
 
 Nubox participa en finance/quotes y syncs programadas. El patron esperado es raw BigQuery, conformed BigQuery, projection Postgres y runs en `source_sync_runs`.
@@ -144,6 +152,8 @@ Los webhooks inbound entran por `/api/webhooks/[endpointKey]`, se autentican seg
 - "Un webhook de Notion ya trae toda la data?"
 - "Como se reintenta una entrega outbound?"
 - "Por que no puedo escribir directo en la tabla producto?"
+- "Por que Search Console aparece conectado/revocado/no conectado?"
+- "Que falta para habilitar OAuth real de Search Console en staging?"
 
 ## Referencias de codigo y DB
 

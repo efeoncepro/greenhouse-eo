@@ -1,0 +1,87 @@
+import { describe, expect, it, vi } from 'vitest'
+
+import { type RendererApiConfig, verifyPublicEmail } from '../api-client'
+
+const api: RendererApiConfig = { baseUrl: 'https://gh.test', slug: 'ai-visibility-intake' }
+
+const jsonResponse = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
+
+describe('growth-forms-renderer · verifyPublicEmail', () => {
+  it('maps a sanitized ok verdict', async () => {
+    const fetchImpl = vi.fn(async () =>
+      jsonResponse({
+        outcome: 'ok',
+        syntaxValid: true,
+        isCorporate: true,
+        isDisposable: false,
+        isRoleBased: false,
+        isFreeProvider: false,
+        deliverable: 'deliverable',
+        quality: 'verified',
+        suggestion: null,
+        reasonCode: null,
+      }),
+    ) as unknown as typeof fetch
+
+    const result = await verifyPublicEmail(api, 'ana@empresa.com', fetchImpl)
+
+    expect(result.outcome).toBe('ok')
+
+    if (result.outcome === 'ok') {
+      expect(result.isCorporate).toBe(true)
+      expect(result.reasonCode).toBeNull()
+    }
+
+    // POST al endpoint público correcto.
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'https://gh.test/api/public/growth/forms/ai-visibility-intake/verify-email',
+      expect.objectContaining({ method: 'POST' }),
+    )
+  })
+
+  it('degrades honest: 404 → disabled (flag OFF), 429 → rate_limited', async () => {
+    const off = vi.fn(async () => jsonResponse({ outcome: 'disabled' }, 404)) as unknown as typeof fetch
+    const limited = vi.fn(async () => jsonResponse({ outcome: 'rate_limited' }, 429)) as unknown as typeof fetch
+
+    expect((await verifyPublicEmail(api, 'x@y.com', off)).outcome).toBe('disabled')
+    expect((await verifyPublicEmail(api, 'x@y.com', limited)).outcome).toBe('rate_limited')
+  })
+
+  it('maps network error and 5xx to error (never throws)', async () => {
+    const throwing = vi.fn(async () => {
+      throw new Error('network')
+    }) as unknown as typeof fetch
+
+    const serverError = vi.fn(async () => jsonResponse({ outcome: 'invalid' }, 502)) as unknown as typeof fetch
+
+    expect((await verifyPublicEmail(api, 'x@y.com', throwing)).outcome).toBe('error')
+    expect((await verifyPublicEmail(api, 'x@y.com', serverError)).outcome).toBe('error')
+  })
+
+  it('surfaces a typo suggestion when present', async () => {
+    const fetchImpl = vi.fn(async () =>
+      jsonResponse({
+        outcome: 'ok',
+        syntaxValid: true,
+        isCorporate: false,
+        isDisposable: false,
+        isRoleBased: false,
+        isFreeProvider: true,
+        deliverable: 'unknown',
+        quality: 'suspect',
+        suggestion: 'ana@gmail.com',
+        reasonCode: 'email_not_corporate',
+      }),
+    ) as unknown as typeof fetch
+
+    const result = await verifyPublicEmail(api, 'ana@gmial.com', fetchImpl)
+
+    expect(result.outcome).toBe('ok')
+
+    if (result.outcome === 'ok') {
+      expect(result.suggestion).toBe('ana@gmail.com')
+      expect(result.reasonCode).toBe('email_not_corporate')
+    }
+  })
+})

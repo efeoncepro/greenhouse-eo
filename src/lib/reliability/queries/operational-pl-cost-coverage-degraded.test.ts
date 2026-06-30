@@ -12,20 +12,15 @@ vi.mock('@/lib/observability/capture', () => ({
 
 import { getOperationalPlCostCoverageDegradedSignal } from './operational-pl-cost-coverage-degraded'
 
-describe('getOperationalPlCostCoverageDegradedSignal', () => {
+const FLOOR = 202602
+
+describe('getOperationalPlCostCoverageDegradedSignal (TASK-1200 — honest classification)', () => {
   beforeEach(() => {
     queryMock.mockReset()
   })
 
-  it('returns ok when no periods have missing upstream cost coverage', async () => {
-    queryMock.mockResolvedValueOnce([
-      {
-        period_count: 0,
-        snapshot_count: 0,
-        revenue_clp: 0,
-        periods: ''
-      }
-    ])
+  it('sin períodos sospechosos → ok', async () => {
+    queryMock.mockResolvedValueOnce([])
 
     const signal = await getOperationalPlCostCoverageDegradedSignal()
 
@@ -36,25 +31,49 @@ describe('getOperationalPlCostCoverageDegradedSignal', () => {
     expect(signal.summary).toContain('no tiene períodos')
   })
 
-  it('returns error when P&L has revenue and zero cost without upstream attribution', async () => {
+  it('solo pending + unavailable (sin bug) → ok, NO error (estado real Jun2026 + pre-sistema)', async () => {
     queryMock.mockResolvedValueOnce([
-      {
-        period_count: 1,
-        snapshot_count: 3,
-        revenue_clp: '20706000',
-        periods: '2026-06'
-      }
+      // pre-sistema → unavailable
+      { period_year: 2025, period_month: 11, snapshot_count: 9, revenue_clp: '7772603', floor_key: FLOOR, payroll_entry_count: 0, labor_allocation_row_count: 0 },
+      { period_year: 2026, period_month: 1, snapshot_count: 6, revenue_clp: '7654730', floor_key: FLOOR, payroll_entry_count: 0, labor_allocation_row_count: 0 },
+      // payroll por correr → pending
+      { period_year: 2026, period_month: 6, snapshot_count: 8, revenue_clp: '16340109', floor_key: FLOOR, payroll_entry_count: 0, labor_allocation_row_count: 0 }
+    ])
+
+    const signal = await getOperationalPlCostCoverageDegradedSignal()
+
+    expect(signal.severity).toBe('ok')
+    expect(signal.summary).toContain('pending')
+    expect(signal.summary).toContain('unavailable')
+    expect(signal.evidence.find(e => e.label === 'degraded_bug_periods')?.value).toBe('0')
+    expect(signal.evidence.find(e => e.label === 'pending_periods')?.value).toContain('2026-06')
+  })
+
+  it('payroll existe pero asignación 0 → degraded → error', async () => {
+    queryMock.mockResolvedValueOnce([
+      { period_year: 2026, period_month: 4, snapshot_count: 3, revenue_clp: '6902000', floor_key: FLOOR, payroll_entry_count: 6, labor_allocation_row_count: 0 }
     ])
 
     const signal = await getOperationalPlCostCoverageDegradedSignal()
 
     expect(signal.severity).toBe('error')
-    expect(signal.summary).toContain('2026-06')
-    expect(signal.summary).toContain('No usar ese margen como canónico')
-    expect(signal.evidence.find(e => e.label === 'period_count')?.value).toBe('1')
+    expect(signal.summary).toContain('2026-04')
+    expect(signal.summary).toContain('bug')
+    expect(signal.evidence.find(e => e.label === 'degraded_bug_periods')?.value).toContain('2026-04')
   })
 
-  it('returns unknown when the query fails', async () => {
+  it('snapshot con cost=0 pero asignación presente → canonical, excluido del alarm', async () => {
+    queryMock.mockResolvedValueOnce([
+      { period_year: 2026, period_month: 2, snapshot_count: 1, revenue_clp: '9912190', floor_key: FLOOR, payroll_entry_count: 2, labor_allocation_row_count: 2 }
+    ])
+
+    const signal = await getOperationalPlCostCoverageDegradedSignal()
+
+    expect(signal.severity).toBe('ok')
+    expect(signal.evidence.find(e => e.label === 'degraded_bug_periods')?.value).toBe('0')
+  })
+
+  it('query falla → unknown', async () => {
     queryMock.mockRejectedValueOnce(new Error('schema drift'))
 
     const signal = await getOperationalPlCostCoverageDegradedSignal()

@@ -48,7 +48,12 @@ export const ENTITLEMENT_MODULES = [
   'roadmap',
   // TASK-1161 — namespace Public Site control plane. V1 read-only para observar
   // el rail Astro/Vercel target desde Greenhouse sin deploy/cutover.
-  'public_site'
+  'public_site',
+  // TASK-1226 — namespace del dominio Growth (acquisition intelligence /
+  // pre-pipeline diagnostic). Distinto de `commercial` (consume handoffs
+  // calificados) y de `public_site` (host surface). V1: AI Visibility Grader
+  // (growth.ai_visibility.run.execute + growth.ai_visibility.observation.read).
+  'growth'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -315,6 +320,22 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   },
   {
     key: 'finance.status',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-1200 — readiness de cobertura laboral del Operational P&L
+    // (canonical/pending/unavailable/degraded). Read-only.
+    key: 'finance.operational_pl.read_readiness',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-1201 — lectura de Finance AI insights/señales (dataStatus + insights).
+    // Read-only.
+    key: 'finance.ai.read_insights',
     module: 'finance',
     actions: ['read'] as const,
     defaultScope: 'tenant'
@@ -1480,6 +1501,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'all'
   },
   {
+    // Public Site Comparison Table governed authoring (TASK-1225): validate a
+    // comparisonTable.v1 manifest and (propose→confirm→execute) author the
+    // greenhouse_comparison_table widget into a draft via the signed bridge.
+    // Internal-only; the actual write stays flag/secret-gated (default OFF).
+    key: 'platform.public_site.comparison_table.author',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
     key: 'public_site.runtime_binding.read',
     module: 'public_site',
     actions: ['read'] as const,
@@ -1872,7 +1903,196 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'roadmap',
     actions: ['read'] as const,
     defaultScope: 'tenant'
-  }
+  },
+  // TASK-1226 — Growth AI Visibility Grader (dominio growth.ai_visibility).
+  // run.execute: correr el grader/smoke interno (governed; el LLM nunca escribe
+  // directo — propose→confirm→execute para writes de negocio futuros).
+  // observation.read: leer runs/observations del evidence ledger.
+  // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN) mismo PR.
+  {
+    key: 'growth.ai_visibility.run.execute',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'growth.ai_visibility.observation.read',
+    module: 'growth',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1235 — report.read: ver el `grader_report` (narrativa + recomendaciones)
+  // SIN la evidencia cruda de provider (least-privilege; un audience public/client
+  // verá el reporte sin observation.read). Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.report.read',
+    module: 'growth',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1287 — report.read_operator: lectura del reporte AEO (shape ClientGraderReport
+  // leak-safe) y del agregado cross-org del cockpit, para operadores internos (Growth/AM).
+  // NO expone evidencia cruda de provider. Distinta de report.read (cliente, scope por su
+  // propio tenant): el operador lee una org ARBITRARIA → el reader self-guarda con can().
+  // Grant en runtime.ts = mismo set operador que run.operator.
+  {
+    key: 'growth.ai_visibility.report.read_operator',
+    module: 'growth',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1239 — report.publish: congelar el snapshot público inmutable + emitir token
+  // (EPIC-020 A). Mint interno gobernado; la LECTURA pública es token-based (sin
+  // capability). Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.report.publish',
+    module: 'growth',
+    // Acción canónica `execute` (verbo de gobernanza; `publish` no está en el enum
+    // de EntitlementAction). La key `report.publish` conserva la intención.
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1242 — lead_handoff.execute: re-trigger/replay gobernado del handoff de un lead a
+  // HubSpot (Full API Parity). El worker automático corre con identidad de sistema (sin
+  // capability); esta gatea la superficie operada por humano/agente (endpoint admin, Nexa,
+  // CLI). Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.lead_handoff.execute',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1244 — report.review: gate humano de release YMYL. Aprobar/rechazar (+ ver la
+  // cola) un reporte `review_required` ANTES de publicarlo al público. Acción canónica
+  // `execute` (verbo de gobernanza; el LLM nunca aprueba — propose→confirm→execute). El
+  // reviewer debe ser ≥ privilegiado que el publisher (report.publish): mismo set interno.
+  // Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.report.review',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1269 — fix_it.generate: generación gobernada de artefactos public-safe
+  // (JSON-LD, llms.txt, briefs) desde un reporte/probes existentes. No muta el sitio
+  // del prospecto; sólo entrega archivos deterministas. Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.fix_it.generate',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1243 — report.read_client: 3.er consumer de la parity. Un usuario `client_*`
+  // autenticado ve el reporte del grader de SU organización (DTO cliente sin evidencia
+  // cruda de provider). Capability DEDICADA (no scope-overload de report.read interno):
+  // least-privilege explícito + desacopla el acceso cliente del lifecycle del read interno.
+  // defaultScope `own` (su propia org, derivada server-side del orgContext de sesión).
+  // Grant a client_executive/client_manager/client_specialist en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.report.read_client',
+    module: 'growth',
+    actions: ['read'] as const,
+    defaultScope: 'own'
+  },
+  // TASK-1277 — AEO run chokepoint (entitlement & metering). DOS capabilities:
+  //  - run.portal: un usuario `client_*` dispara un análisis AEO de SU org (gobernado:
+  //    entitlement → ventana → allowance → costo). scope `own`. Grant a client_* + set interno.
+  //  - run.operator: Growth/AM corre el motor sobre cualquier cliente o prospecto como jugada
+  //    de venta (ilimitado, costo a "sales"). scope `tenant`. Grant a efeonce_account/admin/
+  //    ai_tooling_admin/efeonce_operations. Ambos `can()`-checked en las routes (coverage).
+  {
+    key: 'growth.ai_visibility.run.portal',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'own'
+  },
+  {
+    key: 'growth.ai_visibility.run.operator',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1275 — recommendation.set_status: el operador (Growth/AM) registra el avance de
+  // ejecución del Plan AEO por (org × gap key). Write gobernado `setRecommendationStatus`,
+  // consumible por la vista operador (TASK-1276) + Nexa/MCP. El reader del status es
+  // gate-agnostic (cliente lo VE read-only por su tenant). Grant = set operador (run.operator).
+  {
+    key: 'growth.ai_visibility.recommendation.set_status',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1289 — profile.set_business_model: el operador (Growth/AM) corrige el `business_model`
+  // derivado de un perfil AEO (consumer_b2c/b2b_*/retail/marketplace/public/unknown). Command
+  // gobernado `overrideProfileBusinessModel` (auditado append-only), consumible por la vista
+  // operador + Nexa/MCP vía propose→confirm→execute. Grant = set operador (run.operator).
+  {
+    key: 'growth.ai_visibility.profile.set_business_model',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1290 — prompt_set.manage: autorar (draft) + aprobar (draft→active) el set de prompts AEO
+  // por marca. Commands gobernados `createGraderPromptSetDraft`/`approveGraderPromptSet`,
+  // consumibles por la UI de review (TASK-1291) + Nexa. Grant = set operador (run.operator).
+  {
+    key: 'growth.ai_visibility.prompt_set.manage',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1286 — entitlement.manage: asignar/cambiar/superseder tiers AEO por org.
+  // Command gobernado `assignAeoTier`, consumible por cockpit operador, Account-360 y Nexa
+  // vía confirmación humana. Grant restringido a efeonce_account + efeonce_admin.
+  {
+    key: 'growth.ai_visibility.entitlement.manage',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1279 — lead.open: cross-sell operador. Enviar el informe AEO + crear/asociar un Lead
+  // de HubSpot (objeto `leads`, NO un Deal). Command gobernado `sendAeoReportAndCreateLead`,
+  // consumible por la vista operador (TASK-1276) + Nexa vía propose→confirm→execute. Grant =
+  // set operador (mismo que run.operator). Distinta de lead_handoff.execute (lead del form público).
+  {
+    key: 'growth.ai_visibility.lead.open',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1270 — regrade.manage: gobernanza futura del opt-in/cadencia del re-grade
+  // recurrente. El batch automático corre como sistema desde ops-worker; esta capability
+  // queda para surfaces humanas/agentes que habiliten/deshabiliten el monitoreo.
+  {
+    key: 'growth.ai_visibility.regrade.manage',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1229 — Growth Forms engine (dominio growth.forms). 8 capabilities gobernadas
+  // (Full API Parity): cada acción de negocio nace como command/reader, no como botón.
+  // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪ EFEONCE_OPERATIONS)
+  // mismo PR. `publish/author/review/manage/retry` → acción `execute` (la intención vive
+  // en la key); `read`/`submissions.read` → `read`.
+  { key: 'growth.forms.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.author', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.review', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.publish', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.submissions.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.destinations.manage', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.retry_delivery', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.surfaces.manage', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1255 — Reveal gobernado de PII de un lead (cédula/email/teléfono). MÁS sensible
+  // que `submissions.read` (que devuelve masked): el unmasked exige esta capability fina +
+  // reason + audit append-only. Grant least-privilege (EFEONCE_ADMIN ∪ EFEONCE_OPERATIONS,
+  // NO EFEONCE_ACCOUNT) en runtime.ts mismo PR.
+  { key: 'growth.forms.lead_pii.reveal', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1282 — Search Console connection. Conectar/desconectar la propiedad Google
+  // Search Console de una organización cliente (OAuth 3-legged, token per-org). Acción
+  // canónica `execute` (verbo de gobernanza: connect/disconnect son commands; el LLM
+  // nunca conecta directo). Grant set operador (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT
+  // ∪ EFEONCE_OPERATIONS ∪ AI_TOOLING_ADMIN) en runtime.ts mismo PR.
+  { key: 'growth.search_console.connect', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

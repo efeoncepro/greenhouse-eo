@@ -64,6 +64,9 @@ export default [
       'scripts/lib/server-only-empty.cjs',
       'tests/playwright/test-results/**',
       'artifacts/**',
+      // Scratch/temp dir (gitignored) — agents drop throwaway verify scripts here; never lint them.
+      'tmp/**',
+      '**/tmp/**',
       '**/* (1).js',
       '**/* (1).jsx',
       '**/* (1).ts',
@@ -373,7 +376,9 @@ export default [
       'src/app/global-error.tsx',
       'src/app/public/**',
       'src/emails/**',
-      'src/lib/finance/pdf/**'
+      'src/lib/finance/pdf/**',
+      // TASK-1273 — AI Visibility Report PDF (react-pdf StyleSheet: HEX/fontFamily/fontSize crudos legítimos).
+      'src/components/growth/ai-visibility/report-artifact/pdf/**'
     ],
     rules: {
       'greenhouse/no-hardcoded-fontfamily': 'off',
@@ -459,6 +464,40 @@ export default [
     ],
     rules: {
       'greenhouse/no-untokenized-fx-math': 'off'
+    }
+  },
+
+  // TASK-1253 — Guard de pureza isomórfica. El core de validadores
+  // (`src/lib/growth/forms/validators/**`) y `src/lib/identity-documents/**` los
+  // importa el renderer portable (bundle esbuild WordPress/Astro) Y el servidor
+  // (`submitForm`). NUNCA deben importar `server-only`, `node:*`, Zod ni capas
+  // server-only (postgres/secrets/bigquery): romperían el bundle portable o
+  // filtrarían código server al browser. Paridad cliente↔servidor por construcción.
+  {
+    files: [
+      'src/lib/identity-documents/**/*.ts',
+      'src/lib/growth/forms/validators/**/*.ts',
+      // TASK-1254 — los módulos browser-safe de email-verification (dataset + Tier 1)
+      // son isomórficos: los importa `validators/core.ts` (corporate_email) y el renderer.
+      // El resto de email-verification/ (provider/orchestrator/cache) SÍ es server-only.
+      'src/lib/growth/forms/email-verification/email-domain-data.ts',
+      'src/lib/growth/forms/email-verification/tier1.ts',
+    ],
+    ignores: ['**/__tests__/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            { name: 'server-only', message: 'TASK-1253: el core isomórfico no puede importar server-only (lo bundlea el renderer portable).' },
+            { name: 'zod', message: 'TASK-1253: el core isomórfico es Zod-free (no inflar el bundle portable del renderer).' }
+          ],
+          patterns: [
+            { group: ['node:*'], message: 'TASK-1253: el core isomórfico no puede importar node builtins (corre en el browser).' },
+            { group: ['@/lib/postgres/*', '@/lib/db', '@/lib/secrets/*', '@/lib/bigquery'], message: 'TASK-1253: el core isomórfico no puede tocar capas server-only.' }
+          ]
+        }
+      ]
     }
   },
 

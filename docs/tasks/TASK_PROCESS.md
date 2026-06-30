@@ -28,7 +28,7 @@ Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_
 - Consultar `docs/tasks/TASK_ID_REGISTRY.md` para reservar el siguiente ID disponible antes de crear una task nueva
 - Si la task pertenece a un programa mayor, declarar `Epic: EPIC-###` dentro de `## Status` y sincronizarla con `docs/epics/`
 - Branch convention: `task/TASK-###-short-slug` (e.g., `task/TASK-003-finance-dashboard-fix`)
-- Las tasks con UI visible usan el mismo `TASK-###`, pero declaran `Execution profile: ui-ux`, `UI impact` y completan `## UI/UX Contract`.
+- Las tasks con UI visible usan el mismo `TASK-###`, pero declaran `Execution profile: ui-ux`, `UI impact`, `UI ready`, `Wireframe: docs/ui/wireframes/...`, `Flow: docs/ui/flows/...|none`, `Motion: docs/ui/motion/...|none` y completan `## UI/UX Contract`.
 - Las tasks con backend/data usan el mismo `TASK-###`, pero declaran `Execution profile: backend-data`, `Backend impact` y completan `## Backend/Data Contract`.
 
 ---
@@ -50,7 +50,7 @@ El campo `Type` en Zone 0 determina que zonas y pasos aplican. Cuando hay duda, 
 | Execution profile | Cuando usar | Contrato adicional |
 |---|---|---|
 | `standard` | Docs, tooling o cambios sin superficie visible ni contrato runtime/data relevante | Template base |
-| `ui-ux` | Cualquier cambio visible, copy, layout, estados, interaccion, motion, primitive, flujo o GVC | `## UI/UX Contract` desde `TASK_UI_UX_ADDENDUM.md` |
+| `ui-ux` | Cualquier cambio visible, copy, layout, estados, interaccion, motion, primitive, flujo o GVC | `UI ready: no|yes` + `Wireframe: docs/ui/wireframes/...` + `Flow: docs/ui/flows/...` cuando aplique + `Motion: docs/ui/motion/...` cuando aplique + `## UI/UX Contract` desde `TASK_UI_UX_ADDENDUM.md` |
 | `backend-data` | API, DB, readers, commands, migrations, sync, cron, webhook, integration o source-of-truth/data contract | `## Backend/Data Contract` desde `TASK_BACKEND_DATA_ADDENDUM.md` |
 
 `UI impact` ayuda a clasificar el alcance visible:
@@ -219,6 +219,24 @@ Reglas V1:
   se revisan con `--task TASK-###` / `--changed` y el agente debe normalizarlas si corresponde.
 - Paridad contra `TASK_ID_REGISTRY.md` y marcador "siguiente ID disponible" nacen como
   `warning` para rollout warn-first; no deben bloquear hasta que el registry este saneado.
+- Tasks template con impacto UI/UX deben declarar `Wireframe: docs/ui/wireframes/...`
+  apuntando a un archivo existente. En revision focal (`--task`) o cambios (`--changed`)
+  esto es `error` para impedir JSX/copy visible sin contrato de contenido/interaccion.
+- Tasks template con `UI impact: flow` deben declarar `Flow: docs/ui/flows/...`
+  apuntando a un archivo existente. En revision focal (`--task`) o cambios (`--changed`)
+  esto es `error`; menciones de sidecar/drawer/modal/popover/navegacion con `Flow: none`
+  generan warning para forzar decision explicita.
+- Tasks template con `UI impact: motion` deben declarar `Motion: docs/ui/motion/...`
+  apuntando a un archivo existente. En revision focal (`--task`) o cambios (`--changed`)
+  esto es `error`; menciones de motion/microinteracciones/animaciones/transiciones con
+  `Motion: none` generan warning para forzar decision explicita.
+- Tasks template con impacto UI/UX deben declarar `UI ready: no|yes|n/a`; ausencia
+  genera warning para rollout gradual. `UI ready: yes` es gate duro en revision focal
+  o cambios: exige `## UI/UX Contract` con `### Implementation mapping`,
+  `### GVC scenario plan` y `### Design decision log`; ademas exige que el wireframe
+  tenga `## Implementation Mapping`, `## GVC Scenario Plan` y `## Design Decision Log`.
+  Si hay `Flow` o `Motion` declarados, esos contratos tambien deben incluir sus planes
+  de evidencia y decision log. Hasta entonces la task debe quedarse en `UI ready: no`.
 - Tasks template con impacto UI/UX sin `## UI/UX Contract` y tasks template con impacto backend/data sin
   `## Backend/Data Contract` generan `warning` en rollout warn-first; no bloquean hasta que el backlog
   nuevo demuestre adopcion estable.
@@ -227,7 +245,8 @@ Reglas V1:
   historico ni tasks completas. Si una task hibrida esta justificada, la seccion debe explicar por que
   no se dividio, perfil primario, frontera de contrato y controles de riesgo.
 
-CI corre `.github/workflows/task-contract.yml` en modo `--changed` warn-first. No usar el
+CI corre `.github/workflows/task-contract.yml` en modo `--changed`: errores estructurales y
+wireframe faltante en tasks UI bloquean; algunas reglas de adopcion siguen warning-first. No usar el
 linter para reescribir backlog legacy ni para auto-mover archivos; reporta drift y el agente
 lo corrige siguiendo este proceso.
 
@@ -317,7 +336,10 @@ El agente DEBE hacer estas acciones antes de producir un plan:
    Si la task cambia source of truth, schema compartido, access model, auth/session, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, el ADR check es obligatorio.
 8. **Skill scan** — consultar skills disponibles en el entorno del agente a nivel global o de repo. Leer cada skill relevante antes de escribir codigo que la necesite. Registrar en Discovery summary que skills se usaran y para que slice.
 9. **Subagent assessment** — evaluar si la task se beneficia de delegacion a subagentes (ver protocolo abajo). Registrar la decision en el plan: ejecucion secuencial por el agente principal, o fork con coordinacion.
-10. **UI/UX profile check** — si `Execution profile: ui-ux` o `UI impact != none`, completar `## UI/UX Contract` antes de escribir JSX/copy visible:
+10. **UI/UX profile check** — si `Execution profile: ui-ux` o `UI impact != none`, completar `## UI/UX Contract`, declarar un wireframe existente y declarar flow/motion contract cuando aplique antes de escribir JSX/copy visible:
+   - correr `pnpm ui:wireframe-check --task TASK-###`;
+   - correr `pnpm ui:flow-check --task TASK-###` si `UI impact: flow` o hay sidecar/drawer/modal/popover/navegacion;
+   - correr `pnpm ui:motion-check --task TASK-###` si `UI impact: motion` o hay motion/microinteracciones no triviales;
    - decidir reuse / extend / new primitive + variant/kind;
    - resolver Composition Shell, Adaptive Card density, Floating Surface/Sidecar/Dialog si aplica;
    - declarar estados visuales obligatorios;

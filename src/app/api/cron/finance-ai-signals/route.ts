@@ -92,14 +92,18 @@ export async function GET(request: Request) {
           triggerType: 'cron'
         })
 
-        entry.enrich = {
-          runId: enrichResult.run.runId,
-          status: enrichResult.run.status,
-          signalsSeen: enrichResult.run.signalsSeen,
-          succeeded: enrichResult.succeeded,
-          failed: enrichResult.failed,
-          skipped: enrichResult.skipped
-        }
+        // TASK-1201 — run-truth: el worker retorna run=null cuando no hubo señales
+        // (noop). Reportar honestamente en vez de asumir un run.
+        entry.enrich = enrichResult.run
+          ? {
+              runId: enrichResult.run.runId,
+              status: enrichResult.run.status,
+              signalsSeen: enrichResult.run.signalsSeen,
+              succeeded: enrichResult.succeeded,
+              failed: enrichResult.failed,
+              skipped: enrichResult.skipped
+            }
+          : { status: 'noop', signalsSeen: 0 }
       }
 
       results.push(entry)

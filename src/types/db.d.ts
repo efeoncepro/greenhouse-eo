@@ -6439,6 +6439,485 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   vat_position_id: string;
 }
 
+export interface GreenhouseGrowthEmailVerificationCache {
+  created_at: Generated<Timestamp>;
+  deliverable: Generated<string>;
+  domain: string | null;
+  email_hash: string;
+  expires_at: Timestamp;
+  is_corporate: Generated<boolean>;
+  is_disposable: Generated<boolean>;
+  is_free_provider: Generated<boolean>;
+  is_role_based: Generated<boolean>;
+  provider: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  verified_at: Generated<Timestamp>;
+  verified_tier: Generated<string>;
+}
+
+export interface GreenhouseGrowthFormDefinition {
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  default_locale: Generated<string>;
+  form_id: Generated<string>;
+  form_kind: string;
+  name: string;
+  owner_team: string | null;
+  purpose: string;
+  risk_profile: Generated<string>;
+  slug: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthFormDestination {
+  adapter_kind: Generated<string>;
+  adapter_version: Generated<string>;
+  consent_requirements_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  delivery_mode: Generated<string>;
+  destination_id: Generated<string>;
+  enabled: Generated<boolean>;
+  endpoint_status: Generated<string>;
+  form_version_id: string;
+  mapping_json: Generated<Json>;
+  provider: string;
+  retry_policy_json: Generated<Json>;
+}
+
+export interface GreenhouseGrowthFormDestinationAttempt {
+  adapter_version: string;
+  attempt_id: Generated<string>;
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  destination_id: string;
+  error_class: string | null;
+  external_id: string | null;
+  http_status: number | null;
+  next_retry_at: Timestamp | null;
+  provider: string;
+  retry_count: Generated<number>;
+  status: Generated<string>;
+  submission_id: string;
+}
+
+export interface GreenhouseGrowthFormHostSurface {
+  allowed_form_slugs_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  csp_requirements_json: Generated<Json>;
+  embed_key_hash: string | null;
+  embed_key_id: string | null;
+  origin_allowlist_json: Generated<Json>;
+  renderer_channel: Generated<string>;
+  status: Generated<string>;
+  surface_id: Generated<string>;
+  surface_kind: string;
+  surface_name: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthFormSubmission {
+  created_at: Generated<Timestamp>;
+  dedupe_fingerprint: string | null;
+  delivery_attempts: Generated<number>;
+  email_domain_class: string | null;
+  email_quality: string | null;
+  encrypted_fields_json: Generated<Json>;
+  form_id: string;
+  form_version_id: string;
+  ip_hash: string | null;
+  lead_email_hash: string | null;
+  next_attempt_at: Timestamp | null;
+  normalized_fields_json: Generated<Json>;
+  page_name: string | null;
+  page_uri: string | null;
+  rejection_reason_class: string | null;
+  request_id: string | null;
+  status: Generated<string>;
+  submission_id: Generated<string>;
+  surface_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthFormSubmissionConsentSnapshot {
+  checkboxes_json: Generated<Json>;
+  consent_policy_version: string;
+  created_at: Generated<Timestamp>;
+  hubspot_legal_consent_options_json: Generated<Json>;
+  legal_basis: Generated<string>;
+  notice_text_hash: string | null;
+  privacy_url: string | null;
+  submission_id: string;
+}
+
+export interface GreenhouseGrowthFormVersion {
+  analytics_policy_json: Generated<Json>;
+  commercial_handoff_policy_json: Generated<Json>;
+  consent_policy_version: string | null;
+  copy_refs_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  data_classification_json: Generated<Json>;
+  destination_policy_json: Generated<Json>;
+  field_schema_json: Generated<Json>;
+  form_id: string;
+  form_version_id: Generated<string>;
+  locale: Generated<string>;
+  published_at: Timestamp | null;
+  retention_policy_json: Generated<Json>;
+  status: Generated<string>;
+  style_variant: string | null;
+  success_behavior_json: Generated<Json>;
+  ui_policy_json: Generated<Json>;
+  validation_schema_json: Generated<Json>;
+  version: number;
+}
+
+export interface GreenhouseGrowthGraderBrandIntelligence {
+  brand_intelligence_id: Generated<string>;
+  candidate_business_model: string | null;
+  candidate_category_node: string | null;
+  confidence: Numeric | null;
+  created_at: Generated<Timestamp>;
+  fine_category: string | null;
+  model: string | null;
+  profile_id: string;
+  provider: string | null;
+  signals_used: Generated<Json>;
+  status: Generated<string>;
+  version: number;
+  what_the_brand_does: string | null;
+}
+
+export interface GreenhouseGrowthGraderBusinessModelHistory {
+  changed_at: Generated<Timestamp>;
+  changed_by: string;
+  confidence: Numeric | null;
+  from_business_model: string | null;
+  history_id: Generated<string>;
+  organization_id: string | null;
+  profile_id: string;
+  reason: string | null;
+  to_business_model: string;
+  to_source: string;
+}
+
+export interface GreenhouseGrowthGraderIntakeEvents {
+  created_at: Generated<Timestamp>;
+  email_hash: string | null;
+  estimated_cost_usd: Numeric | null;
+  event_id: Generated<string>;
+  ip_hash: string | null;
+  outcome: string;
+  run_id: string | null;
+}
+
+export interface GreenhouseGrowthGraderLeads {
+  brand_name: string;
+  category: string;
+  company_size: string | null;
+  competitors_declared: Generated<string[]>;
+  consent: boolean;
+  consent_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  email: string;
+  first_name: string | null;
+  hubspot_synced_at: Timestamp | null;
+  industry: string | null;
+  ip_hash: string | null;
+  last_name: string | null;
+  lead_id: Generated<string>;
+  main_challenge: string | null;
+  market: string;
+  persona: string | null;
+  profile_id: string | null;
+  run_id: string | null;
+  source: Generated<string>;
+  submission_id: string | null;
+  website_url: string | null;
+}
+
+export interface GreenhouseGrowthGraderProbeResults {
+  axis: string;
+  created_at: Generated<Timestamp>;
+  error_code: string | null;
+  evidence: Generated<Json>;
+  latency_ms: Generated<number>;
+  probe_id: Generated<string>;
+  probe_kind: string;
+  probe_layer_version: string;
+  reason: string;
+  run_id: string;
+  score: Numeric | null;
+  status: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthGraderProfiles {
+  brand_name: string;
+  business_model: string | null;
+  business_model_confidence: Numeric | null;
+  business_model_source: string | null;
+  category: string | null;
+  category_confidence: Numeric | null;
+  category_label: string | null;
+  category_node_id: string | null;
+  category_source: string | null;
+  competitors_declared: Generated<string[]>;
+  created_at: Generated<Timestamp>;
+  locale: string;
+  market: string;
+  organization_id: string | null;
+  profile_id: Generated<string>;
+  public_id: Generated<string>;
+  recurring_regrade_cadence: Generated<string>;
+  recurring_regrade_enabled: Generated<boolean>;
+  recurring_regrade_last_at: Timestamp | null;
+  recurring_regrade_last_run_id: string | null;
+  recurring_regrade_next_at: Timestamp | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  website_url: string | null;
+}
+
+export interface GreenhouseGrowthGraderPromptSets {
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  business_model: string | null;
+  category_node_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  generation_strategy: string;
+  grounding_sources_json: Generated<Json>;
+  model: string | null;
+  profile_id: string;
+  prompts_json: Generated<Json>;
+  set_id: Generated<string>;
+  status: Generated<string>;
+  system_prompt_version: string | null;
+  updated_at: Generated<Timestamp>;
+  version: number;
+}
+
+export interface GreenhouseGrowthGraderRecommendationStatus {
+  created_at: Generated<Timestamp>;
+  organization_id: string;
+  reason: string | null;
+  recommendation_key: string;
+  source_run_id: string | null;
+  status: string;
+  status_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  updated_by: string;
+}
+
+export interface GreenhouseGrowthGraderRecommendationStatusHistory {
+  changed_at: Generated<Timestamp>;
+  changed_by: string;
+  from_status: string | null;
+  history_id: Generated<string>;
+  organization_id: string;
+  reason: string | null;
+  recommendation_key: string;
+  source_run_id: string | null;
+  to_status: string;
+}
+
+export interface GreenhouseGrowthGraderReportEmailDispatches {
+  claimed_at: Generated<Timestamp>;
+  dispatch_id: Generated<string>;
+  email_type: Generated<string>;
+  lead_id: string;
+  reason: string | null;
+  recipient_email: string;
+  report_id: string;
+  resend_message_id: string | null;
+  run_id: string;
+  sent_at: Timestamp | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthGraderReportReviews {
+  created_at: Generated<Timestamp>;
+  decision: string;
+  reason: string | null;
+  review_id: Generated<string>;
+  reviewed_by_user_id: string;
+  run_id: string;
+  score_version: string;
+}
+
+export interface GreenhouseGrowthGraderReports {
+  as_of: Generated<Timestamp>;
+  audience: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  expires_at: Timestamp | null;
+  public_report_json: Json;
+  recommendation_pack_version: string;
+  report_id: Generated<string>;
+  report_token: Generated<string>;
+  report_version: string;
+  run_id: string;
+  score_version: string;
+}
+
+export interface GreenhouseGrowthGraderReportSendLog {
+  consent_ref: string | null;
+  email_status: Generated<string>;
+  hubspot_company_id: string | null;
+  hubspot_contact_id: string | null;
+  hubspot_lead_id: string | null;
+  lead_status: Generated<string>;
+  lead_type: string;
+  legal_basis: string;
+  organization_id: string;
+  reason: string | null;
+  recipient_email: string;
+  recipient_name: string | null;
+  requested_at: Generated<Timestamp>;
+  requested_by: string;
+  resend_message_id: string | null;
+  run_id: string;
+  send_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthGraderRuns {
+  assignment_id: string | null;
+  cost_attribution: string | null;
+  cost_ceiling_usd: Numeric | null;
+  created_at: Generated<Timestamp>;
+  estimated_cost_usd: Generated<Numeric>;
+  execution_prompts: Generated<Json>;
+  finished_at: Timestamp | null;
+  idempotency_key: string | null;
+  mode: string;
+  organization_id: string | null;
+  poll_token: Generated<string>;
+  profile_id: string;
+  prompt_pack_version: string;
+  prompt_set_id: string | null;
+  prompt_set_version: number | null;
+  provider_policy_version: string;
+  public_delivery_state: Generated<string>;
+  public_id: Generated<string>;
+  requested_providers: Generated<string[]>;
+  run_id: Generated<string>;
+  run_kind: string;
+  run_source: string | null;
+  started_at: Timestamp | null;
+  status: Generated<string>;
+}
+
+export interface GreenhouseGrowthGraderScores {
+  auto_releasable: Generated<boolean>;
+  confidence: Generated<Numeric>;
+  coverage: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  dimensions: Generated<Json>;
+  evidence_count: Generated<number>;
+  overall_score: Numeric | null;
+  review_reasons: Generated<string[]>;
+  run_id: string;
+  score_id: Generated<string>;
+  score_status: string;
+  score_version: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthLeadPiiRevealAudit {
+  action: Generated<string>;
+  actor_email: string | null;
+  actor_user_id: string;
+  audit_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  diff_json: Generated<Json>;
+  form_id: string;
+  ip_address: string | null;
+  reason: string;
+  submission_id: string;
+  user_agent: string | null;
+}
+
+export interface GreenhouseGrowthNormalizedFindings {
+  brand_mentioned: string;
+  brand_rank: number | null;
+  category_associations: Generated<string[]>;
+  citation_domains: Generated<string[]>;
+  commercial_intent_match: string;
+  competitors_mentioned: Generated<string[]>;
+  confidence: Numeric;
+  created_at: Generated<Timestamp>;
+  finding_id: string;
+  message_drift_claims: Generated<string[]>;
+  prompt_id: string;
+  provider: string;
+  run_id: string;
+  schema_version: string;
+  sentiment_label: string;
+  sentiment_score: Numeric | null;
+  source_types: Generated<string[]>;
+  trust_signal: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthPromptPacks {
+  created_at: Generated<Timestamp>;
+  locale: string;
+  market: string;
+  prompt_pack_id: Generated<string>;
+  prompts: Generated<Json>;
+  status: Generated<string>;
+  version: string;
+}
+
+export interface GreenhouseGrowthProviderObservations {
+  answer_excerpt: string | null;
+  answer_text_hash: string | null;
+  citations: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  error_code: string | null;
+  latency_ms: Generated<number>;
+  model: string;
+  observation_id: string;
+  prompt_id: string;
+  prompt_pack_version: string;
+  provider: string;
+  provider_policy_version: string;
+  provider_request_hash: string;
+  raw_evidence_pointer: string | null;
+  run_id: string;
+  status: string;
+  usage: Generated<Json>;
+}
+
+export interface GreenhouseGrowthSearchConsoleConnections {
+  connected_at: Timestamp | null;
+  connected_by_user_id: string | null;
+  connection_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  last_error_code: string | null;
+  last_verified_at: Timestamp | null;
+  organization_id: string;
+  scopes: Generated<string[]>;
+  site_url: string | null;
+  status: Generated<string>;
+  token_secret_ref: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthSearchConsoleOauthStates {
+  consumed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  expires_at: Timestamp;
+  organization_id: string;
+  site_url: string;
+  state_hash: string;
+  state_id: Generated<string>;
+}
+
 export interface GreenhouseHrContractorEngagementEvents {
   actor_user_id: string | null;
   contractor_engagement_id: string;
@@ -8282,6 +8761,26 @@ export interface GreenhouseServingFinanceAiEnrichmentRuns {
   synced_at: Generated<Timestamp>;
   tokens_in: number | null;
   tokens_out: number | null;
+  trigger_event_id: string | null;
+  trigger_type: string;
+}
+
+export interface GreenhouseServingFinanceAiMaterializationRuns {
+  client_id: string | null;
+  completed_at: Timestamp | null;
+  duration_ms: number | null;
+  error_message: string | null;
+  materialization_run_id: string;
+  model_version: string;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  signals_written: Generated<number>;
+  snapshots_evaluated: Generated<number>;
+  source: Generated<string>;
+  started_at: Timestamp;
+  status: string;
+  synced_at: Generated<Timestamp>;
   trigger_event_id: string | null;
   trigger_type: string;
 }
@@ -10559,6 +11058,35 @@ export interface DB {
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
+  "greenhouse_growth.email_verification_cache": GreenhouseGrowthEmailVerificationCache;
+  "greenhouse_growth.form_definition": GreenhouseGrowthFormDefinition;
+  "greenhouse_growth.form_destination": GreenhouseGrowthFormDestination;
+  "greenhouse_growth.form_destination_attempt": GreenhouseGrowthFormDestinationAttempt;
+  "greenhouse_growth.form_host_surface": GreenhouseGrowthFormHostSurface;
+  "greenhouse_growth.form_submission": GreenhouseGrowthFormSubmission;
+  "greenhouse_growth.form_submission_consent_snapshot": GreenhouseGrowthFormSubmissionConsentSnapshot;
+  "greenhouse_growth.form_version": GreenhouseGrowthFormVersion;
+  "greenhouse_growth.grader_brand_intelligence": GreenhouseGrowthGraderBrandIntelligence;
+  "greenhouse_growth.grader_business_model_history": GreenhouseGrowthGraderBusinessModelHistory;
+  "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
+  "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
+  "greenhouse_growth.grader_probe_results": GreenhouseGrowthGraderProbeResults;
+  "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
+  "greenhouse_growth.grader_prompt_sets": GreenhouseGrowthGraderPromptSets;
+  "greenhouse_growth.grader_recommendation_status": GreenhouseGrowthGraderRecommendationStatus;
+  "greenhouse_growth.grader_recommendation_status_history": GreenhouseGrowthGraderRecommendationStatusHistory;
+  "greenhouse_growth.grader_report_email_dispatches": GreenhouseGrowthGraderReportEmailDispatches;
+  "greenhouse_growth.grader_report_reviews": GreenhouseGrowthGraderReportReviews;
+  "greenhouse_growth.grader_report_send_log": GreenhouseGrowthGraderReportSendLog;
+  "greenhouse_growth.grader_reports": GreenhouseGrowthGraderReports;
+  "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
+  "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
+  "greenhouse_growth.lead_pii_reveal_audit": GreenhouseGrowthLeadPiiRevealAudit;
+  "greenhouse_growth.normalized_findings": GreenhouseGrowthNormalizedFindings;
+  "greenhouse_growth.prompt_packs": GreenhouseGrowthPromptPacks;
+  "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;
+  "greenhouse_growth.search_console_connections": GreenhouseGrowthSearchConsoleConnections;
+  "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
   "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
   "greenhouse_hr.contractor_invoice_assets": GreenhouseHrContractorInvoiceAssets;
@@ -10644,6 +11172,7 @@ export interface DB {
   "greenhouse_serving.contract_profitability_snapshots": GreenhouseServingContractProfitabilitySnapshots;
   "greenhouse_serving.deal_pipeline_snapshots": GreenhouseServingDealPipelineSnapshots;
   "greenhouse_serving.finance_ai_enrichment_runs": GreenhouseServingFinanceAiEnrichmentRuns;
+  "greenhouse_serving.finance_ai_materialization_runs": GreenhouseServingFinanceAiMaterializationRuns;
   "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
   "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
   "greenhouse_serving.gtm_investment_pnl": GreenhouseServingGtmInvestmentPnl;

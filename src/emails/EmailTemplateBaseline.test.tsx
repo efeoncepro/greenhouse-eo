@@ -312,6 +312,24 @@ const EMAIL_BASELINE_CASES: EmailBaselineCase[] = [
 ]
 
 describe('email template baseline snapshots', () => {
+  it('renders leave pending review preheader without zero-width preview padding', async () => {
+    const html = await render(
+      <LeaveRequestPendingReviewEmail
+        reviewerFirstName='Julio'
+        memberName='Andres Carlosama'
+        leaveTypeName='Permiso por estudio'
+        startDate='2026-04-09'
+        endDate='2026-04-09'
+        requestedDays={0.5}
+        reason='Sustentacion de trabajo de fin de master.'
+        locale='es'
+      />
+    )
+
+    expect(html).toContain('data-skip-in-text="true">Andres Carlosama — Permiso por estudio</div>')
+    expect(html).not.toMatch(/[\u200B-\u200F\uFEFF]/)
+  })
+
   it('keeps beneficiary payment profile emails scoped to destination account only', async () => {
     const html = await render(
       <BeneficiaryPaymentProfileChangedEmail

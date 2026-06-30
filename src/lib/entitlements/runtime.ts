@@ -170,6 +170,275 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1226 — Growth AI Visibility Grader. Operación interna del dominio growth
+  // (correr el grader/smoke + leer el evidence ledger). route_group internal ∪
+  // EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN (los AI tooling admins operan integraciones
+  // de providers). Los clientes (`client_*`) NO lo ven — V1 es internal/pre-tenant.
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.AI_TOOLING_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.run.execute',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.observation.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    // TASK-1235 — report.read: el reporte derivado (sin evidencia cruda). En V1 el
+    // reporte es internal-only, así que el grant es el mismo set; la separación de
+    // capability deja preparado el least-privilege para audiences public/client.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    // TASK-1239 — report.publish: congelar el snapshot público + emitir token.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.publish',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
+
+    // TASK-1242 — lead_handoff.execute: re-trigger/replay del handoff de un lead a HubSpot.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.lead_handoff.execute',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
+
+    // TASK-1244 — report.review: gate humano de release YMYL (aprobar/rechazar +
+    // ver la cola de `review_required`). Mismo set interno que report.publish: el
+    // reviewer del lead magnet debe ser ≥ privilegiado que quien publica el snapshot.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.review',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
+
+    // TASK-1269 — fix_it.generate: artefactos deterministas public-safe desde report+probes.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.fix_it.generate',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
+
+    // TASK-1243 — report.read_client: el cliente la usa con scope 'own' (grant en el
+    // bloque tenantType='client' de abajo). Se replica al set interno SOLO para el guard
+    // de cobertura (capability-grant-coverage.test usa un superset interno; toda capability
+    // can()-checked debe ser alcanzable por él). Inocuo: el endpoint exige
+    // requireClientTenantContext → ningún interno lo pasa, así que no gana acceso real.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.read_client',
+      action: 'read',
+      scope: 'own',
+      source
+    })
+
+    // TASK-1277 — run.portal: el cliente la usa con scope 'own' (grant real en el bloque
+    // tenantType='client' de abajo). Se replica al set interno SOLO para el guard de cobertura
+    // (toda capability can()-checked debe ser alcanzable por el superset interno). Inocuo: la
+    // route exige requireClientTenantContext → ningún interno gana acceso real por esta vía.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.run.portal',
+      action: 'execute',
+      scope: 'own',
+      source
+    })
+  }
+
+  // TASK-1277 — run.operator: Growth/AM corre el motor AEO sobre cualquier cliente o prospecto
+  // como jugada de venta (ilimitado, costo atribuido a "sales"). Set: route_group internal ∪
+  // EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT (AM, dueño del cross-sell) ∪ EFEONCE_OPERATIONS (growth ops)
+  // ∪ AI_TOOLING_ADMIN (opera el motor). Los client_* NUNCA tienen la puerta operador.
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS) ||
+    hasRole(subject, ROLE_CODES.AI_TOOLING_ADMIN)
+  ) {
+    const operatorSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal')
+      ? 'route_group'
+      : 'role'
+
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.run.operator',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    // TASK-1287 — report.read_operator: leer el reporte AEO de cualquier cliente/prospecto
+    // (detalle operador) y el agregado cross-org (cockpit). Mismo set operador que run.operator
+    // (quien corre el motor debe poder leer su salida). El reader self-guarda con can() porque
+    // recibe una org arbitraria. Read leak-safe (shape ClientGraderReport), sin evidencia cruda.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.read_operator',
+      action: 'read',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    // TASK-1275 — recommendation.set_status: el operador registra el avance del Plan AEO
+    // (estado por org × gap key). Mismo set operador que run.operator (quien ejecuta el
+    // servicio AEO marca su progreso). El command self-guarda con can() (org arbitraria).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.recommendation.set_status',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    // TASK-1289 — profile.set_business_model: el operador corrige el modelo de negocio
+    // derivado de un perfil AEO (reencuadra el buyer-intent de todo run futuro de la org).
+    // Mismo set operador que run.operator. El command self-guarda con can() (profile arbitrario).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.profile.set_business_model',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    // TASK-1290 — prompt_set.manage: el operador autora (draft) + aprueba (draft→active) el set
+    // de prompts AEO por marca (define qué se le pregunta a los motores). Mismo set operador que
+    // run.operator. El command self-guarda con can() (profileId/setId arbitrario).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.prompt_set.manage',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    // TASK-1286 — entitlement.manage: el set operador completo NO recibe esta mutación.
+    // Sólo AM (`efeonce_account`) y admin pueden asignar/cambiar/superseder tiers AEO.
+    if (
+      hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+      hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
+    ) {
+      addEntitlement(entries, {
+        module: 'growth',
+        capability: 'growth.ai_visibility.entitlement.manage',
+        action: 'execute',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+
+    // TASK-1270 — regrade.manage: gobierna surfaces futuras de opt-in/cadencia; el
+    // scheduler automático corre como sistema y no depende de sesión humana.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.regrade.manage',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    // TASK-1279 — lead.open: enviar el informe AEO + crear un Lead HubSpot (cross-sell). Mismo
+    // set operador que run.operator (quien corre el motor cierra el loop comercial). El command
+    // self-guarda con can() (org arbitraria) + consent gate server-side (interés legítimo).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.lead.open',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    // TASK-1282 — search_console.connect: el operador conecta la propiedad Search
+    // Console de un cliente (OAuth 3-legged, token per-org) como parte de la operación
+    // growth/medición. Mismo set operador que run.operator (scope tenant = puede operar
+    // sobre cualquier org cliente; la org objetivo va horneada en el state firmado).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.search_console.connect',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+  }
+
+  // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios
+  // públicos (author/review/publish/destinations/surfaces/submissions/retry). V1
+  // internal-only: route_group internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪
+  // EFEONCE_OPERATIONS (account/operations operan growth/GTM). Los `client_*` NO lo
+  // ven. Cada capability nace gobernada (Full API Parity): un primitive, muchos
+  // consumers (admin cockpit, Nexa/MCP, CLI) sobre los mismos commands/readers.
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    const formsSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    const FORMS_READ_CAPS = ['growth.forms.read', 'growth.forms.submissions.read'] as const
+
+    for (const capability of FORMS_READ_CAPS) {
+      addEntitlement(entries, { module: 'growth', capability, action: 'read', scope: 'tenant', source: formsSource })
+    }
+
+    const FORMS_EXECUTE_CAPS = [
+      'growth.forms.author',
+      'growth.forms.review',
+      'growth.forms.publish',
+      'growth.forms.destinations.manage',
+      'growth.forms.retry_delivery',
+      'growth.forms.surfaces.manage',
+    ] as const
+
+    for (const capability of FORMS_EXECUTE_CAPS) {
+      addEntitlement(entries, { module: 'growth', capability, action: 'execute', scope: 'tenant', source: formsSource })
+    }
+  }
+
+  // TASK-1255 — Reveal de PII de leads (cédula/email/teléfono): MÁS restringido que el
+  // read masked. Least-privilege: solo admin internos y operaciones (NO efeonce_account,
+  // que vende pero no necesita ver cédulas crudas). reason + audit obligatorios en runtime.
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.forms.lead_pii.reveal',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role',
+    })
+  }
+
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'people') ? 'route_group' : 'authorized_view'
 
@@ -939,6 +1208,37 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1200 — readiness de cobertura laboral del Operational P&L. Read-only.
+  // Superset de la audiencia de requireFinanceTenantContext (route_group=finance
+  // OR EFEONCE_ADMIN), + FINANCE_ADMIN/FINANCE_ANALYST explícitos.
+  if (
+    hasRouteGroup(subject, 'finance') ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ANALYST) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const readinessSource: TenantEntitlementSource = hasRouteGroup(subject, 'finance')
+      ? 'route_group'
+      : 'role'
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.operational_pl.read_readiness',
+      action: 'read',
+      scope: 'tenant',
+      source: readinessSource
+    })
+
+    // TASK-1201 — lectura de Finance AI insights (misma audiencia read finance).
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.ai.read_insights',
+      action: 'read',
+      scope: 'tenant',
+      source: readinessSource
+    })
+  }
+
   if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = 'role'
 
@@ -1184,6 +1484,14 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       module: 'platform',
       capability: 'platform.public_site.bridge.inspect',
       action: 'read',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.public_site.comparison_table.author',
+      action: 'execute',
       scope: 'all',
       source: 'role'
     })
@@ -2117,6 +2425,28 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         source: 'role'
       })
     }
+
+    // TASK-1243 — 3.er consumer de la parity del AI Visibility Grader: el cliente ve el
+    // reporte de SU organización (DTO sin evidencia cruda). Scope 'own' (su propia org,
+    // derivada server-side). Cubre client_executive/client_manager/client_specialist.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.read_client',
+      action: 'read',
+      scope: 'own',
+      source: 'role'
+    })
+
+    // TASK-1277 — run.portal: el cliente dispara un análisis AEO de SU org (scope 'own'). El
+    // ACCESO efectivo lo gobierna el chokepoint (entitlement del módulo → ventana → allowance →
+    // costo) y el módulo asignado per-org; esta capability es el plano fino "puede pedir un run".
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.run.portal',
+      action: 'execute',
+      scope: 'own',
+      source: 'role'
+    })
   }
 
   // TASK-910 — Notion Demo Teamspace Sandbox capabilities (canonical defense in depth).

@@ -12,11 +12,16 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 /**
  * TASK-1001 — helper canónico SSOT para invitar un usuario al portal cliente.
  *
- * Extraído de `/api/admin/invite` para que el flujo de onboarding (checklist
- * `provision_client_users_access`) y el admin invite legacy compartan una sola
- * primitiva (crear `client_users` + `user_role_assignments` additive + token +
- * email). Diferencias por caller vía `onExisting`:
- *  - `'error'` (admin/invite): email duplicado → throw 409 (comportamiento preservado).
+ * Primitiva única de invitación al portal cliente (crear `client_users` +
+ * `user_role_assignments` additive + token + email). El consumer canónico es el
+ * route gobernado del checklist de onboarding
+ * (`/api/admin/clients/[organizationId]/lifecycle/portal-users/invite`, gateado por
+ * `client.lifecycle.portal_user.invite`). El route legacy `/api/admin/invite` —
+ * duplicado huérfano con gate inline `roleCodes.includes()` y `client_id`/`role_codes`
+ * desde el body — fue deprecado y removido en TASK-1178 (deuda admin-coarse).
+ *
+ * Modos por caller vía `onExisting`:
+ *  - `'error'`: email duplicado → throw 409 (modo estricto-no-duplicado).
  *  - `'ensure'` (lifecycle): email existente → reusa el user, asegura el rol
  *    additive (ON CONFLICT DO NOTHING), NO duplica fila ni re-envía email (idempotente).
  *

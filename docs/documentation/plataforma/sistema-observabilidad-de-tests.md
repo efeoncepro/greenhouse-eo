@@ -123,6 +123,7 @@ Contrato operativo vigente desde ISSUE-072:
 - el pool del publisher se limita a `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=1`
 - la primitive Postgres compartida reintenta con backoff errores transitorios como `53300`
 - el parser canónico `scripts/lib/smoke-lane-report.ts` usa el último intento de Playwright para distinguir `failed` de `flaky`
+- cuando un reporte Playwright compartido se publica a varios lane keys, el parser filtra specs por lane antes de calcular totales; specs platform/tooling no deben pintar rojo `finance.web`, `delivery.web` ni `identity.web`
 - las navegaciones autenticadas de smoke tests deben usar `gotoAuthenticated()` o `gotoWithTransientRetries()` para cold-starts/timeouts transitorios sin ocultar errores HTTP o de sesión
 
 ---

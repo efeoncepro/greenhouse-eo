@@ -699,6 +699,52 @@ export interface QuoteShareEmailTemplateCopy {
   plainTextCta: string
 }
 
+/**
+ * TASK-1250 — Email transaccional de entrega del informe del AI Visibility Grader
+ * (dirección aprobada "Report Packet Delivery"). Cuerpo breve + adjunto PDF público-safe
+ * (TASK-1273) + link tokenizado. Copy es-CL canónico; en-US como fallback legacy.
+ */
+export interface AiVisibilityGraderReportEmailTemplateCopy {
+  previewText: (organizationName: string) => string
+  heading: string
+  headingPartial: string
+  greeting: string
+  intro: (organizationName: string) => string
+  partialBanner: string
+  summary: {
+    scoreLabel: string
+    scoreSuffix: string
+    scoreEmpty: string
+    levelLabel: string
+    gapLabel: string
+    gapEmpty: string
+    contentLabel: string
+    contentValue: string
+  }
+  insight: {
+    eyebrow: string
+    detectionLabel: string
+    importanceLabel: string
+    actionLabel: string
+  }
+  cta: string
+  ctaHelp: string
+  attachment: {
+    title: string
+    formatPrefix: string
+    description: string
+  }
+  why: {
+    title: string
+    body: string
+  }
+  fallback: {
+    title: string
+    note: string
+  }
+  automatedFooter: () => string
+}
+
 export interface WeeklyExecutiveDigestEmailTemplateCopy {
   subject: string
   previewText: (periodLabel: string, totalInsights: number, spacesAffected: number) => string
@@ -766,6 +812,9 @@ export interface EmailsCopy {
   beneficiaryPaymentProfileChanged: BeneficiaryPaymentProfileChangedEmailTemplateCopy
   quoteShare: QuoteShareEmailTemplateCopy
   weeklyExecutiveDigest: WeeklyExecutiveDigestEmailTemplateCopy
+  growth: {
+    aiVisibilityReport: AiVisibilityGraderReportEmailTemplateCopy
+  }
   notificationCategories: NotificationCategoryCopy
   subjects: {
     passwordReset: string
@@ -789,6 +838,7 @@ export interface EmailsCopy {
     leaveRequestSubmitted: (leaveTypeName: string) => string
     leaveRequestPendingReview: (memberName: string, leaveTypeName: string) => string
     quoteShare: (quotationNumber: string, versionNumber: number, clientName: string) => string
+    aiVisibilityGraderReport: (isPartial: boolean) => string
   }
 }
 

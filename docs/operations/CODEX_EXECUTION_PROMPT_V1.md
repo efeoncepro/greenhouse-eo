@@ -91,11 +91,30 @@ SOURCE OF TRUTH
 
 Si hay conflicto entre task/spec, documentación y runtime real, prevalece arquitectura vigente + código/schema/runtime verificados. Corrige o anota el drift antes de implementar si cambia contrato o bloquea.
 
+GOAL PREFLIGHT
+
+Antes de ejecutar el hook para una `TASK-###`, verifica si el operador ya dio un
+`/goal` explícito en la conversación actual.
+
+- Si NO hay `/goal` explícito y el operador pide ejecutar/implementar/continuar
+  una task, no empieces implementación todavía: propone un `/goal` recomendado
+  para esa task y espera confirmación del operador.
+- El `/goal` recomendado debe incluir objetivo de cierre, evidencia obligatoria,
+  límites de alcance, estado correcto si falta rollout (`code complete, rollout
+  pendiente` u `operativamente bloqueado`) y si conviene `mantente en develop` o
+  `con subagentes`.
+- Si el operador acepta el goal o entrega uno propio, continúa con el hook
+  (`pnpm codex:task-hook ...`) usando `--develop` y/o `--subagents` cuando
+  corresponda.
+- Si el operador ordena explícitamente ejecutar sin goal, documenta la excepción
+  en Audit/Plan/Handoff y sigue el hook.
+
 MODO DE RAMA / WORKTREE
 
 - No cambies de rama por iniciativa propia.
 - No crees `git worktree` ni carpetas clon por iniciativa propia.
 - Si el operador pide `mantente en develop`, no cambies de rama y documenta la excepción en Audit/Plan/Handoff.
+- Si el operador pide subagentes, delegación o trabajo paralelo, pasa `--subagents` al hook para que la autorización quede impresa en el prompt.
 - Si la task declara otra branch o parece haber ownership activo, verifica `git status --short`, PRs/branches/handoff y decide con cuidado. Pide confirmación solo si el estado bloquea avanzar sin pisar trabajo ajeno.
 - No hagas push a `develop` ni a ramas remotas como cierre automático sin instrucción explícita.
 
@@ -145,12 +164,46 @@ ACCESS MODEL:
 SKILLS A USAR:
 - skill → para qué
 SUBAGENTES:
-- sí/no + por qué
+- `sequential` | `fork` | `fork recomendado, no autorizado/no disponible` + por qué
 RIESGOS / BLAST RADIUS:
 - ...
 OPEN QUESTIONS RESUELTAS:
 - Q → resolución → rationale
 ===
+
+SUBAGENT TOOLING
+
+Durante Discovery decide explícitamente `sequential` vs `fork` usando
+`docs/tasks/TASK_PROCESS.md`:
+
+- Usa `fork` cuando los slices son independientes, no comparten archivos de
+  edición, requieren skills distintas, el volumen justifica coordinación, o la
+  task tiene `Effort = Alto` con slices separables.
+- Usa `sequential` cuando hay dependencia causal, archivos owned solapados,
+  effort bajo/medio con flujo lineal, o la coordinación cuesta más que ejecutar.
+- No delegues el bloqueo inmediato del que depende la siguiente acción local.
+
+Si el operador pidió explícitamente subagentes, delegación, trabajo paralelo o
+el hook imprimió `subagentes autorizados`:
+
+- Antes de cerrar el plan, carga el tooling multi-agent disponible. En Codex
+  desktop normalmente está lazy-loaded: usa `tool_search` con una consulta como
+  `multi-agent subagent spawn manage agents` para exponer `multi_agent_v1`.
+- Si el plan decide `fork`, spawnea subagentes `explorer` para preguntas
+  read-only independientes o `worker` para slices de implementación con scope de
+  archivos exclusivo.
+- Cada subagente debe recibir contexto autocontenido: task, slice, archivos que
+  puede tocar, archivos que no puede tocar, interfaces a respetar, skills que
+  debe leer y acceptance criteria propios.
+- Mientras corren, el agente principal trabaja en piezas no solapadas. No
+  repitas el trabajo delegado. Al volver, revisa cambios/resultados, integra y
+  corre verificación sobre el resultado combinado.
+- Cierra subagentes que ya no sean necesarios.
+
+Si la task cumple criterios de `fork` pero no hay autorización explícita vigente
+o el tooling no está disponible, registra `fork recomendado, no autorizado/no
+disponible` en Audit/Plan y sigue secuencialmente solo si el riesgo sigue siendo
+aceptable; para P0/P1, Effort Alto o blast radius alto, pide checkpoint humano.
 
 MAPA DE CONEXIONES
 
@@ -177,7 +230,7 @@ Antes de implementar, presenta un plan slice-by-slice proporcional. Orden sugeri
 8. Docs / handoff / changelog / arquitectura
 9. Verificación
 
-Para cada slice nuevo, explica qué reutilizas, qué archivos toca, skills aplicables, dependencias y si requiere subagente. Para P0/P1 o blast radius alto, detente al final del plan para checkpoint humano si corresponde.
+Para cada slice nuevo, explica qué reutilizas, qué archivos toca, skills aplicables, dependencias y si requiere subagente. Si `fork` está autorizado, define subagentes concretos con ownership exclusivo, orden de consolidación y verificación combinada. Para P0/P1 o blast radius alto, detente al final del plan para checkpoint humano si corresponde.
 
 SKILLS
 
@@ -208,7 +261,7 @@ Si la task tiene `Execution profile: ui-ux`, `UI impact != none`, toca UI visibl
 Condición mínima recomendada:
 
 ```text
-/goal [TASK-###] UI enterprise-ready: las skills product design aplicables fueron cargadas antes de JSX; la decisión primitive reuse/extend/new quedó documentada; no hay HEX/font/px hardcodeado fuera de tokens; copy visible vive en la capa canónica; GVC desktop+mobile corrió en loop y los frames PNG fueron revisados; scrollWidth==clientWidth en desktop y 390px o hay blocker exacto; no hay overlaps, clipping incoherente ni console/page errors; docs, handoff y gates proporcionales están sincronizados.
+/goal [TASK-###] UI enterprise-ready: las skills product design aplicables fueron cargadas antes de JSX; la task declara UI ready y permanece no hasta que el wireframe/UI contract tengan implementation mapping, GVC scenario plan y design decision log; si se declara UI ready yes, pnpm task:lint --task TASK-### pasa sin findings; el wireframe está declarado en la task, existe bajo docs/ui/wireframes y pasa pnpm ui:wireframe-check --task TASK-###; si hay flow, sidecar, drawer, modal, popover o navegación cruzada, el flow contract está declarado, existe bajo docs/ui/flows y pasa pnpm ui:flow-check --task TASK-###; si hay motion o microinteracciones no triviales, el motion contract está declarado, existe bajo docs/ui/motion y pasa pnpm ui:motion-check --task TASK-###; la decisión primitive reuse/extend/new quedó documentada; no hay HEX/font/px hardcodeado fuera de tokens; copy visible vive en la capa canónica; GVC desktop+mobile corrió en loop y los frames PNG fueron revisados; scrollWidth==clientWidth en desktop y 390px o hay blocker exacto; no hay overlaps, clipping incoherente ni console/page errors; docs, handoff y gates proporcionales están sincronizados.
 ```
 
 No declares UI lista si esa condición no está demostrada en la conversación con comandos, rutas de captura y hallazgos resueltos o bloqueadores exactos.
@@ -226,7 +279,7 @@ IMPLEMENTACIÓN
 - No leas secretos DB directo desde código nuevo.
 - Migraciones: crea con `pnpm migrate:create <slug>`; no fabriques nombres a mano.
 - Copy reusable vive en `src/lib/copy/*` o nomenclatura canónica; no hardcodees copy reutilizable en JSX.
-- UI visible: aplica `DESIGN.md`, primitive lookup, token mapping y GVC (`pnpm fe:capture`) con revisión visual real.
+- UI visible: aplica `DESIGN.md`, `pnpm ui:wireframe-check --task TASK-###`, `pnpm ui:flow-check --task TASK-###` cuando aplique, `pnpm ui:motion-check --task TASK-###` cuando aplique, primitive lookup, token mapping y GVC (`pnpm fe:capture`) con revisión visual real.
 - Acciones destructivas o blast radius alto: confirma antes.
 
 VALIDACIÓN
@@ -290,6 +343,7 @@ correr:
 ```bash
 pnpm codex:task-hook:check
 pnpm codex:task-hook 1109 --develop --prompt-only
+pnpm codex:task-hook 1109 --develop --subagents --prompt-only
 pnpm docs:closure-check
 pnpm docs:context-check
 git diff --check
@@ -305,6 +359,7 @@ Mantener V1 cuando el cambio sea compatible:
 - alias nuevos que sigan resolviendo al mismo hook `TASK-*`
 - ajustes de redacción
 - matriz de skills
+- flags aditivos del hook que sólo imprimen autorización o contexto operativo
 - checks aditivos
 - protocolo de mantenimiento
 - mejoras del script de smoke

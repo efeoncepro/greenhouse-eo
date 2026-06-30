@@ -81,6 +81,46 @@ export type CanonicalErrorCode =
   | 'ico_sync_source_not_connected'
   // Finance fiscal scope (TASK-725) — sin entidad legal operating configurada.
   | 'fiscal_entity_unavailable'
+  // Growth Forms engine (TASK-1229).
+  | 'growth_form_invalid_input'
+  | 'growth_form_not_found'
+  | 'growth_submission_not_found'
+  | 'growth_lead_field_not_revealable'
+  | 'growth_lead_reveal_reason_required'
+  // Growth AI Visibility · admin grader routes (TASK-1226/1235/1239) + review gate (TASK-1244).
+  | 'grader_run_not_found'
+  | 'grader_run_invalid_input'
+  | 'grader_report_not_releasable'
+  | 'grader_report_not_reviewable'
+  | 'grader_report_invalid_review_transition'
+  | 'grader_report_review_reason_required'
+  // AEO entitlement & metering · run chokepoint (TASK-1277).
+  | 'aeo_not_entitled'
+  | 'aeo_run_disabled'
+  | 'aeo_profile_required'
+  | 'aeo_category_unresolved'
+  | 'aeo_business_model_unconfirmed'
+  | 'aeo_quota_exhausted'
+  | 'aeo_cost_blocked'
+  | 'aeo_assignment_invalid_tier'
+  | 'aeo_assignment_invalid_input'
+  | 'aeo_assignment_website_required'
+  | 'aeo_assignment_org_not_found'
+  // AEO operator cross-sell: send report + create Lead (TASK-1279).
+  | 'aeo_send_invalid_input'
+  | 'aeo_send_consent_required'
+  | 'aeo_send_report_unavailable'
+  | 'aeo_send_disabled'
+  // AEO Plan recommendation execution status (TASK-1275).
+  | 'recommendation_status_invalid_input'
+  // Growth Search Console connection · OAuth multi-tenant (TASK-1282).
+  | 'search_console_disabled'
+  | 'search_console_not_connected'
+  | 'search_console_oauth_state_invalid'
+  | 'search_console_oauth_failed'
+  | 'search_console_token_unhealthy'
+  | 'search_console_property_not_accessible'
+  | 'search_console_sites_unavailable'
 // Reserved for future canonical codes — extender aquí cuando emerjan
 // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -258,6 +298,185 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     message:
       'Este cliente aún no tiene Notion conectado, así que no se puede activar su sync de ICO. Conéctalo primero desde el onboarding.',
     actionable: false
+  },
+  // TASK-1229 — Growth Forms engine.
+  growth_form_invalid_input: {
+    status: 400,
+    message: 'Revisa los datos del formulario. Falta un campo obligatorio o un valor no es válido.',
+    actionable: true
+  },
+  growth_form_not_found: {
+    status: 404,
+    message: 'No encontramos ese formulario. Puede que se haya archivado o no exista.',
+    actionable: false
+  },
+  // TASK-1255 — Growth Forms PII reveal gobernado.
+  growth_submission_not_found: {
+    status: 404,
+    message: 'No encontramos ese lead.',
+    actionable: false
+  },
+  growth_lead_field_not_revealable: {
+    status: 404,
+    message: 'Ese campo no se puede revelar.',
+    actionable: false
+  },
+  growth_lead_reveal_reason_required: {
+    status: 400,
+    message: 'Indica una razón de al menos 10 caracteres para revelar este dato (queda auditado).',
+    actionable: true
+  },
+  // Growth AI Visibility · admin grader routes (TASK-1226/1235/1239) + review gate (TASK-1244).
+  // Errores estructurales (no se resuelven reintentando) → actionable: false; los de input
+  // (el operador corrige y reenvía) → actionable: true.
+  grader_run_not_found: {
+    status: 404,
+    message: 'No encontramos ese análisis del grader, o aún no tiene datos para mostrar.',
+    actionable: false
+  },
+  grader_run_invalid_input: {
+    status: 400,
+    message: 'Revisa los datos del análisis: falta un campo obligatorio o un valor no es válido.',
+    actionable: true
+  },
+  grader_report_not_releasable: {
+    status: 409,
+    message: 'El reporte no es publicable en su estado actual (requiere cobertura suficiente o aprobación de revisión).',
+    actionable: false
+  },
+  grader_report_not_reviewable: {
+    status: 409,
+    message: 'Este reporte no está en revisión: solo se aprueba o rechaza un reporte marcado para revisión humana.',
+    actionable: false
+  },
+  grader_report_invalid_review_transition: {
+    status: 409,
+    message: 'Ese cambio no es válido: el reporte ya fue aprobado o rechazado.',
+    actionable: false
+  },
+  grader_report_review_reason_required: {
+    status: 422,
+    message: 'Indica el motivo del rechazo para continuar (queda en el registro interno).',
+    actionable: true
+  },
+  // AEO entitlement & metering · run chokepoint (TASK-1277). Bloqueos estructurales (no se
+  // resuelven reintentando ahora) → actionable: false.
+  aeo_not_entitled: {
+    status: 403,
+    message: 'Tu organización no tiene activado el análisis AEO. Habla con tu equipo de Efeonce para activarlo.',
+    actionable: false
+  },
+  aeo_run_disabled: {
+    status: 409,
+    message: 'El análisis AEO no está disponible en este momento. Intenta más tarde.',
+    actionable: false
+  },
+  aeo_profile_required: {
+    status: 409,
+    message: 'Aún falta configurar la marca a analizar de tu organización. Tu equipo de Efeonce la activa antes del primer análisis.',
+    actionable: false
+  },
+  aeo_category_unresolved: {
+    status: 409,
+    message: 'Todavía no pudimos clasificar la categoría de esta marca. Tu equipo de Efeonce la confirma antes de correr el análisis.',
+    actionable: false
+  },
+  aeo_business_model_unconfirmed: {
+    status: 409,
+    message: 'Falta confirmar el modelo de negocio de esta marca antes de correr o enviar el análisis a un prospecto. Tu equipo de Efeonce lo confirma primero.',
+    actionable: false
+  },
+  aeo_quota_exhausted: {
+    status: 429,
+    message: 'Agotaste los análisis AEO incluidos este mes. Se renuevan el próximo período o puedes ampliar tu plan con Efeonce.',
+    actionable: false
+  },
+  aeo_cost_blocked: {
+    status: 429,
+    message: 'El análisis AEO no está disponible temporalmente por alta demanda. Intenta más tarde.',
+    actionable: false
+  },
+  aeo_assignment_invalid_tier: {
+    status: 400,
+    message: 'El tier AEO no es válido. Usa trial, contracted, pilot o none.',
+    actionable: true
+  },
+  aeo_assignment_invalid_input: {
+    status: 400,
+    message: 'Revisa la asignación AEO: falta un campo obligatorio o un valor no es válido.',
+    actionable: true
+  },
+  recommendation_status_invalid_input: {
+    status: 400,
+    message: 'Revisa el foco del Plan AEO: el estado o la recomendación no son válidos, o falta el motivo.',
+    actionable: true
+  },
+  aeo_assignment_website_required: {
+    status: 422,
+    message:
+      'Esta organización aún no tiene una web canónica. Completa website_url antes de activar AEO.',
+    actionable: false
+  },
+  aeo_assignment_org_not_found: {
+    status: 404,
+    message: 'No encontramos esa organización activa para asignar AEO.',
+    actionable: false
+  },
+  aeo_send_invalid_input: {
+    status: 400,
+    message: 'Revisa el envío del informe AEO: falta el correo del destinatario o un dato no es válido.',
+    actionable: true
+  },
+  aeo_send_consent_required: {
+    status: 422,
+    message:
+      'Para enviar el informe a un prospecto necesitas registrar el consentimiento capturado en la conversación previa. No se permite envío en frío.',
+    actionable: false
+  },
+  aeo_send_report_unavailable: {
+    status: 409,
+    message: 'Aún no hay un informe AEO listo para enviar de esta organización. Corre el análisis primero.',
+    actionable: false
+  },
+  aeo_send_disabled: {
+    status: 409,
+    message: 'El envío de informes AEO no está disponible en este momento.',
+    actionable: false
+  },
+  search_console_disabled: {
+    status: 409,
+    message: 'La conexión con Search Console no está disponible por ahora.',
+    actionable: false
+  },
+  search_console_not_connected: {
+    status: 409,
+    message: 'Esta organización aún no tiene conectada una propiedad de Search Console.',
+    actionable: false
+  },
+  search_console_oauth_state_invalid: {
+    status: 400,
+    message: 'El enlace de conexión expiró o no es válido. Vuelve a iniciar la conexión con Search Console.',
+    actionable: true
+  },
+  search_console_oauth_failed: {
+    status: 502,
+    message: 'No pudimos completar la conexión con Search Console. Intenta de nuevo.',
+    actionable: true
+  },
+  search_console_token_unhealthy: {
+    status: 409,
+    message: 'La conexión con Search Console se revocó o expiró. Vuelve a conectar tu cuenta de Google.',
+    actionable: true
+  },
+  search_console_property_not_accessible: {
+    status: 409,
+    message: 'Esa propiedad no está disponible en la cuenta de Google con la que conectaste. Elige una de las propiedades que aparecen en la lista.',
+    actionable: true
+  },
+  search_console_sites_unavailable: {
+    status: 502,
+    message: 'No pudimos obtener tus propiedades de Search Console. Intenta de nuevo en unos minutos.',
+    actionable: true
   }
 }
 

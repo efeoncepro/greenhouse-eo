@@ -110,6 +110,7 @@ async function generateIconsCSS() {
       'logos:miro-icon',
       'logos:notion-icon',
       'logos:openai-icon',
+      'logos:perplexity-icon',
       'logos:vercel-icon',
 
       // 'fa6-regular-comment',

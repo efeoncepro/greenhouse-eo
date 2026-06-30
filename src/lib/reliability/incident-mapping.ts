@@ -124,7 +124,9 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'signable'
   ],
   // TASK-1082 — Knowledge Platform ingestion.
-  knowledge: ['knowledge_', 'knowledge platform', 'knowledge ingestion', 'quarantine', 'greenhouse_knowledge']
+  knowledge: ['knowledge_', 'knowledge platform', 'knowledge ingestion', 'quarantine', 'greenhouse_knowledge'],
+  // TASK-1226 — Growth AI Visibility Grader (provider adapters, runs, observations).
+  growth: ['ai visibility', 'ai_visibility', 'growth.ai_visibility', 'greenhouse_growth', 'grader run']
 }
 
 /**
@@ -150,6 +152,8 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   documents: 17,
   // TASK-1082 — knowledge ingestion: prioridad media (dueño del corpus/quarantine).
   knowledge: 16,
+  // TASK-1226 — growth AI Visibility: prioridad media (dueño del grader/observations).
+  growth: 16,
   home: 15,
   // TASK-773 — sync infraestructure: prioridad media-baja. Si un incident
   // matchea ambos `outbox` y `finance`, finance gana (el outbox es el medium,

@@ -11,6 +11,7 @@ vi.mock('@/lib/db', () => ({
 const {
   FINANCE_TIMELINE_DEFAULT_LIMIT,
   FINANCE_TIMELINE_MAX_LIMIT,
+  isFinanceAiInsightConsumable,
   readClientFinanceAiLlmSummary,
   readFinanceAiLlmSummary,
   readFinanceAiLlmTimeline
@@ -18,6 +19,50 @@ const {
 
 beforeEach(() => {
   mockQuery.mockReset()
+})
+
+describe('isFinanceAiInsightConsumable (TASK-1201 Slice 4 — consumer gate)', () => {
+  const base = {
+    totalAnalyzed: 0,
+    lastAnalysis: null,
+    runStatus: null,
+    insights: [],
+    timeline: []
+  }
+
+  it('ready + insights → consumible', () => {
+    expect(
+      isFinanceAiInsightConsumable({
+        ...base,
+        dataStatus: 'ready',
+        insights: [
+          {
+            id: 'EO-FAIE-1',
+            signalType: 'anomaly',
+            metricId: 'net_margin_pct',
+            severity: 'warning',
+            explanation: 'x',
+            rootCauseNarrative: null,
+            recommendedAction: null
+          }
+        ]
+      })
+    ).toBe(true)
+  })
+
+  it('ready pero sin insights → NO consumible', () => {
+    expect(isFinanceAiInsightConsumable({ ...base, dataStatus: 'ready' })).toBe(false)
+  })
+
+  it('empty-positive / empty-pending / stale-degraded → NO consumible', () => {
+    for (const dataStatus of ['empty-positive', 'empty-pending', 'stale-degraded'] as const) {
+      expect(isFinanceAiInsightConsumable({ ...base, dataStatus })).toBe(false)
+    }
+  })
+
+  it('sin dataStatus → NO consumible', () => {
+    expect(isFinanceAiInsightConsumable({ ...base })).toBe(false)
+  })
 })
 
 describe('readFinanceAiLlmTimeline (TASK-944)', () => {

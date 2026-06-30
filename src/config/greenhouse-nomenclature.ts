@@ -59,6 +59,8 @@ export const GH_INTERNAL_NAV = {
   adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' },
   adminIdentityAccess: { label: 'Identidad y acceso', subtitle: 'Usuarios, roles, vistas y cuentas' },
   adminTeamOps: { label: 'Equipo y operaciones', subtitle: 'Talento, líneas de negocio e instrumentos' },
+  growth: { label: 'Growth', subtitle: 'Captura, forms y operaciones de demanda' },
+  growthForms: { label: 'Forms', subtitle: 'Formularios públicos, submissions y destinos' },
   knowledge: { label: 'Knowledge', subtitle: 'Guías, fuentes y memoria operativa' },
   roadmap: { label: 'Roadmap', subtitle: 'Backlog operativo: epics, tasks, mini-tasks e incidentes' }
 } as const

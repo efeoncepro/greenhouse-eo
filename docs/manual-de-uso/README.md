@@ -29,6 +29,12 @@ La diferencia con otras capas de documentacion:
 - [Pipeline comercial](comercial/pipeline-comercial.md) — como usar la lane dedicada de forecast comercial sin confundirla con revenue reconocido ni cierre financiero.
 - [Sample Sprints](comercial/sample-sprints.md) — como declarar, aprobar, registrar progreso y cerrar outcomes de pilotos/trials/POCs/discovery.
 
+### Growth
+
+- [Correr el AI Visibility Grader (smoke + endpoint)](growth/ai-visibility-grader-smoke.md) — como ejecutar una corrida del grader (fake sin secretos / proveedor real uno por vez), interpretar estados (`skipped`/`partial`/`costGuard`), usar el endpoint interno, operar el worker async y verificar/revertir el re-grade recurrente por Scheduler (TASK-1270).
+- [Enviar informe AEO + crear Lead (cross-sell del operador)](growth/enviar-informe-aeo-crear-lead.md) — cómo el operador envía el informe AEO + abre un **Lead** de HubSpot (objeto `leads`, **no un Deal**): prerrequisitos (informe publicado + consentimiento para prospectos), regla de no-cold-send, estados, qué no hacer, troubleshooting (`consent_required`/`report_unavailable`/`disabled`) y los pasos de rollout (provisionar `aeo_check_result` + flag + smoke). TASK-1279.
+- [Conectar Google Search Console a una marca](growth/conectar-search-console.md) — paso a paso para conectar la propiedad de Search Console de un cliente (modelo operador-mediado: conectas tu cuenta una vez, eliges la propiedad del desplegable), estados, qué no hacer, problemas comunes (org_internal, "no pudimos obtener tus propiedades", grant `secretAccessor`) y verificación.
+
 ### Identidad y acceso
 
 - [Operar Identity, Access y Admin Center](identity/operar-identity-access-admin-center.md) — guia para crear/revisar usuarios, roles, vistas, permission sets, SCIM, reconciliacion y diagnostico de acceso sin aplicar bypasses inseguros.

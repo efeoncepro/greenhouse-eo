@@ -5,7 +5,18 @@
 > Versión: `1.10`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-06-22` por TASK-845 (Node 24 app/test runtime)
+> Última actualización: `2026-06-28` por Playwright smoke false-red fix
+
+## Delta 2026-06-28 — Playwright API smoke contract + lane-scoped publishing
+
+El smoke de staging protege contratos funcionales; no debe convertir latencia de un endpoint JSON pesado en falla de producto ni propagar un spec platform/tooling a lanes de dominio no dueñas. La investigacion de los runs develop `fd50bea`, `0bd03e9` y `4a66fc0` encontro que `platform.cron.staging_drift` estaba sano (`count=0`), pero `cron-staging-parity.spec.ts` agotaba el budget al navegar con Chromium a `/api/admin/reliability`.
+
+Contrato vigente:
+
+- Los smoke specs API-only que validan endpoints JSON deben usar el request context autenticado (`getAuthenticatedJson()` en `tests/e2e/fixtures/auth.ts`) en vez de `page.goto()`. El contrato debe validar status `<400`, `content-type: application/json` y tener un timeout explicito acorde al endpoint.
+- Los smoke specs de navegacion/UI siguen usando `gotoAuthenticated()` o `gotoWithTransientRetries()`; no se deben mezclar helpers de UI para probar JSON API-only.
+- `pnpm sync:smoke-lane <lane-key>` debe filtrar el reporte Playwright compartido por lane antes de computar `total_tests`, `failed_tests`, `flakyCount` y `status` para `greenhouse_sync.smoke_lane_runs`.
+- Specs platform/tooling sin ownership de dominio no deben marcar rojos `finance.web`, `delivery.web` ni `identity.web`. Si se agrega un lane nuevo, debe declararse su mapping en `scripts/lib/smoke-lane-report.ts`; lanes desconocidas conservan fallback full-report hasta quedar mapeadas.
 
 ## Delta 2026-06-22 — TASK-845: Node 24 app/test/build runtime
 
@@ -761,3 +772,45 @@ Artefactos canónicos nuevos:
 - FinOps AI runner/persist: [`src/lib/cloud/finops-ai/`](../../src/lib/cloud/finops-ai/)
 - Migration: [`migrations/20260503115518831_task-769-cloud-cost-ai-observations.sql`](../../migrations/20260503115518831_task-769-cloud-cost-ai-observations.sql)
 - ops-worker endpoint: `POST /cloud-cost-ai-watch` en [`services/ops-worker/server.ts`](../../services/ops-worker/server.ts)
+
+## Delta 2026-06-24 — módulo `growth` (AI Visibility Grader, TASK-1226)
+
+Nuevo módulo de reliability **`growth`** (domain `growth`, incidentDomainTag `growth`) registrado en `registry.ts`. 4 signals nuevos sobre el evidence ledger `greenhouse_growth` (lecturas de 7 días, reader `src/lib/reliability/queries/growth-ai-visibility-signals.ts`, wired en `get-reliability-overview.ts`):
+
+- `growth.ai_visibility.provider_error_rate` (data_quality) — % de observaciones failed/rate_limited; steady=0/ok.
+- `growth.ai_visibility.provider_latency_p95` (runtime) — p95 latencia de observaciones exitosas.
+- `growth.ai_visibility.cost_budget_used` (cost_guard) — max(estimated/ceiling) por run.
+- `growth.ai_visibility.provider_call_skipped` (posture) — skips esperados pre-launch (grader OFF); nunca error por sí mismo.
+
+DB vacía / grader OFF → todos en estado sano (`ok`/`awaiting_data`), steady esperado mientras los flags `GROWTH_AI_VISIBILITY_*_ENABLED` estén OFF. Cada signal degrada honestamente (`unknown` + `captureWithDomain('growth')`) si su query falla.
+
+## Delta 2026-06-24 — módulo `growth`: signals de normalización/scoring (TASK-1227)
+
+5 signals adicionales del motor de normalización/scoring (reader `src/lib/reliability/queries/growth-ai-visibility-scoring-signals.ts`, wired en `get-reliability-overview.ts`):
+
+- `growth.ai_visibility.insufficient_data_rate` (data_quality) — fracción de `grader_scores` con `score_status=insufficient_data` (30 días).
+- `growth.ai_visibility.report_review_required_rate` (posture) — fracción `review_required` (comportamiento de seguridad esperado, severity ok).
+- `growth.ai_visibility.prompt_pack_eval_regression` (test_lane) — corre el golden eval (1228) sobre el normalizer determinista; `error` si hay divergencias deterministas vs el baseline.
+- `growth.ai_visibility.archetype_coverage_gap` (test_lane, TASK-1292) — corre `runArchetypeCoverageEval` sobre la matriz `archetype-coverage-eval.v1.json` (Capa A determinista de EPIC-021); `error` si un arquetipo deja de cubrir su contrato de buyer-intent (etapas mínimas archetype-aware, amplitud de fan-out, sin fuga de framing de agencia, framing category-noun). Steady = 0 gaps. Red de no-regresión del falso-0 de ISSUE-110.
+- `growth.ai_visibility.normalization_failed` + `growth.ai_visibility.score_recompute_failed` (runtime) — **stub** (sin failure-ledger todavía; los fallos van a Sentry domain=growth). Follow-up: tabla de intentos (patrón `auth_attempts`).
+
+Módulo `growth` `expectedSignalKinds` ahora incluye `test_lane`. DB vacía → todos en estado sano.
+
+## Delta 2026-06-24 — módulo `growth`: signals de ejecución async (TASK-1234)
+
+2 signals adicionales de salud de la ejecución async del grader (worker Cloud Run), en el mismo reader `src/lib/reliability/queries/growth-ai-visibility-signals.ts` (auto-wired vía el array de `getGrowthAiVisibilitySignals`):
+
+- `growth.ai_visibility.run_execution_lag` (lag) — runs en `pending` desde hace > `GROWTH_AI_VISIBILITY_PENDING_LAG_THRESHOLD_MINUTES` (20 min) ⇒ el worker `ops-growth-grader-drain` no está drenando. steady=0; 1-2 → warning, >2 → error.
+- `growth.ai_visibility.run_stuck_running` (runtime) — runs en `running` desde hace > `GROWTH_AI_VISIBILITY_STUCK_RUNNING_THRESHOLD_MINUTES` (90 min) ⇒ crash/timeout mid-run; `recoverStuckRunningRuns` los finaliza con la evidencia ya persistida. steady=0; >0 → error.
+
+Date-math segura (timestamptz − timestamptz vía `make_interval`, nunca `EXTRACT(EPOCH FROM (date−date))`); SQL ejercitada contra PG real. Detección live 2026-06-24: 1 run huérfano real (`running`) del timeout inline de TASK-1233 → `run_stuck_running=1` hasta el primer drain.
+
+## Delta 2026-06-25 — módulo `growth`: signals de entrega pública (TASK-1245)
+
+3 signals nuevos sobre la entrega pública del run del AI Visibility Grader (`src/lib/reliability/queries/growth-ai-visibility-public-delivery-signals.ts`, wired en `get-reliability-overview.ts`):
+
+- `growth.ai_visibility.public_status_read` (posture) — volumen de reads públicos (status + report token) en 24 h; visibilidad de tráfico/DoS. steady = cualquiera (informativo).
+- `growth.ai_visibility.public_delivery_pending` (data_quality, steady=0) — runs terminales (succeeded/partial) cuyo finalizador NO materializó la entrega (`public_delivery_state='pending'`) >15 min después de terminar: auto-publish estancado/caído. 1-3 → warning, >3 → error.
+- `growth.ai_visibility.public_delivery_inconsistent` (data_quality, steady=0) — invariante `public_delivery_state='ready' ⟹ existe snapshot publicable`; una fila `ready` sin snapshot es corrupción del estado materializado.
+
+DB vacía / pre-launch → steady ok. Error de lectura → degradación honesta (severity unknown). Spec: `docs/tasks/complete/TASK-1245-growth-ai-visibility-public-run-status-delivery-orchestrator.md`.

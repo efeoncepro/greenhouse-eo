@@ -96,6 +96,11 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Servicios engagement](comercial/servicios-engagement.md) — sincronizacion HubSpot p_services, materializacion de servicios y degradacion honesta
 - [Surfaces comerciales sobre rutas legacy Finance](comercial/surfaces-comerciales-sobre-rutas-finance.md) — cotizaciones, contratos/SOW, acuerdos marco y productos como owner-domain Comercial mientras conservan URLs `/finance/...`
 
+### Growth
+
+- [AI Visibility Grader — Motor de Providers](growth/ai-visibility-grader.md) — cómo mide Greenhouse la visibilidad de una marca en los answer engines de IA (OpenAI/Anthropic/Perplexity/Gemini): runs, observaciones, evidencia ≠ verdad, estados, providers tras flags, endpoint interno, ejecución async, reporte, Fix-It/email, re-grade recurrente de clientes opt-in y **cross-sell del operador (enviar informe + crear Lead, no Deal — TASK-1279)**. Foundation TASK-1226; scoring/reporte TASK-1227/1235; re-grade TASK-1270.
+- [Conexion a Google Search Console](growth/conexion-search-console.md) — cómo conecta Greenhouse la propiedad de Search Console de cada marca (datos reales de búsqueda, solo lectura): modelo operador-mediado estilo Semrush (un token de operador + desplegable de propiedades), estados de conexión, quién la opera y quién consume los datos. TASK-1282 (staging verificado E2E con Grupo Berel).
+
 ### HR y Nomina
 
 - [People, Workforce, Payroll y Contractors end-to-end](hr/people-workforce-payroll-contractors-end-to-end.md) — mapa funcional completo reconciliado contra codigo y DB: Workforce Activation, HR Core, Payroll, honorarios, Deel/internacional, Contractors, payables, offboarding/finiquitos y puente con Finance; separa automatico vs operador y evita mezclar contractors con nomina dependiente.

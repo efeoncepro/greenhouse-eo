@@ -844,3 +844,9 @@ export type {
   GreenhouseActivityTimelineTone,
   GreenhouseActivityTimelineVariant
 } from './GreenhouseActivityTimeline'
+
+// TeamAvatarGroup vive fuera de `primitives/` (lo importa GreenhouseActivityTimeline; moverlo crearía ciclo).
+// Se re-exporta acá para canonizarlo como primitive (TASK-1248): kinds `members` (personas) + `brands`
+// (isotipos de motor/integración con Tooltip AXIS). Doc: ui-platform/PRIMITIVES.md · lab /design-system/team-avatar-group.
+export { default as TeamAvatarGroup } from '../TeamAvatarGroup'
+export type { TeamAvatarGroupMember, TeamAvatarGroupBrand } from '../TeamAvatarGroup'

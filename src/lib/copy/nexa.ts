@@ -254,6 +254,16 @@ export const GH_NEXA = {
   home_bento_last_analysis: (count: number, label: string) =>
     `${count} ${count === 1 ? 'señal analizada' : 'señales analizadas'} · último análisis: ${label}`,
   home_bento_view_all_cta: 'Ver todos los insights del mes',
+  home_bento_source_chip: 'Priorizado por Nexa',
+  home_bento_priority_label: 'Prioridad Nexa',
+  home_bento_signal_label: 'Señal',
+  home_bento_impact_label: 'Impacto',
+  home_bento_root_cause_label: 'Causa probable',
+  home_bento_open_root_cause_cta: 'Abrir causa raíz',
+  home_bento_ask_nexa_overview_aria: 'Pregúntale a Nexa sobre los insights priorizados',
+  home_bento_ask_nexa_overview_seed: 'Explícame los insights priorizados de Home y qué debería revisar primero.',
+  home_bento_ask_nexa_seed: (metric: string) =>
+    `Explícame este insight de ${metric || 'la operación'} y qué debería hacer primero.`,
 
   // ── Nexa agent panel (concept C redesign) — conversational header ──
   agent_eyebrow: 'Nexa',

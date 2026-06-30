@@ -179,6 +179,31 @@ Regla:
 - Si esta tabla falta o el runtime reporta `permission denied for schema greenhouse_serving`, el fix correcto es aplicar migración/grants y replay de proyecciones, no devolver privilegios DDL al runtime.
 - TASK-1190 agrega replay focal operador-safe en `scripts/reactive-backfill.ts` (`--replay-failed-handlers` + `--handler=<key>`) para recuperar handlers históricos sin borrar evidencia. Evidencia 2026-06-20: `commercial_cost_attribution:*` quedó `healthy` y con `0` dead letters activas tras replay de `126` eventos.
 
+## Delta 2026-06-23 — TASK-1200: Labor Allocation Readiness gate (margen no canónico honesto)
+
+Cierra FD-4 del audit (junio 2026 con revenue y costo 0). **Root cause confirmado contra PG real: NO es un bug del pipeline.** Cuando hay payroll upstream, el pipeline produce costo correctamente (Feb–May 2026 tienen labor + cost). El costo 0 = **ausencia de payroll upstream**:
+
+- `payroll_periods` solo tiene Feb–May 2026 (todos `exported`); junio aún no existe como período (payroll corre la próxima semana).
+- `payroll_entries` existen solo para 2026-02…05.
+- Períodos con revenue>0 y costo 0: 2025-11, 2025-12, 2026-01 (pre-sistema), 2026-06 (open, payroll por correr).
+
+**Deliverable:** `src/lib/commercial-cost-attribution/labor-allocation-readiness.ts` — reader server-side `resolveLaborAllocationReadiness(year, month)` que clasifica la cobertura por período (single source of truth = `classifyLaborAllocationCoverage`):
+
+| status | condición | margen |
+|---|---|---|
+| `canonical` | asignación laboral presente (`laborAllocationRowCount > 0`) | confiable |
+| `degraded` | payroll existe (`payrollEntryCount > 0`) pero asignación 0 → **bug real** | NO usar |
+| `unavailable` | período `< floor` del sistema de payroll (pre-sistema) | NO canónico (permanente) |
+| `pending` | `>= floor`, payroll aún no corrido/materializado | NO canónico (self-heal) |
+
+`isLaborAllocationCoverageCanonical(readiness)` es fail-closed (canónico solo si `status==='canonical'`). Expuesto en `GET /api/finance/intelligence/operational-pl` (campo `readiness`) detrás de la **capability gobernada `finance.operational_pl.read_readiness`** (Full API parity: `capabilities_registry` + catálogo TS + grant en `runtime.ts` a route_group=finance + FINANCE_ADMIN/FINANCE_ANALYST/EFEONCE_ADMIN + enforcement `can()`).
+
+**Signal honesto:** `finance.operational_pl.cost_coverage_degraded` ahora clasifica la causa: `error` SOLO si hay `degraded` (bug); `pending`/`unavailable` → `ok` (ausencia esperada por calendario/pre-sistema). Deja de ser `error` permanente. El fail-closed de margen vive en el readiness reader, no en la severidad del signal.
+
+**Estado por período (sin invención, sin rematerialización — no hay payroll que materializar):**
+- **2025-11, 2025-12, 2026-01:** `unavailable` (pre-sistema, primer período payroll = 2026-02). Margen NO canónico permanente para esos meses. Documentado, no se reconstruye payroll histórico.
+- **2026-06:** `pending`. Se auto-sana cuando corra el payroll de junio (próxima semana) y se materialice la asignación; entonces el readiness flipea a `canonical` sin intervención.
+
 ## Estrategia de Cutover
 
 ### Delta 2026-05-07 — TASK-806 service-aware GTM reclassification

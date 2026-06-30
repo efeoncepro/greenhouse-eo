@@ -36,11 +36,15 @@ export interface MaterializeFinanceAiLlmEnrichmentsInput {
 }
 
 export interface MaterializeFinanceAiLlmEnrichmentsResult {
-  run: FinanceEnrichmentRunRecord
+  // TASK-1201 — run-truth: `null` cuando no hubo señales que enriquecer (noop).
+  // Un run de enrichment SOLO existe cuando enrichment realmente corrió sobre ≥1
+  // señal. La provenance del "corrió, 0 señales" vive en finance_ai_materialization_runs.
+  run: FinanceEnrichmentRunRecord | null
   recordsWritten: number
   succeeded: number
   failed: number
   skipped: number
+  noop: boolean
 }
 
 // ─── Utilities ──────────────────────────────────────────────────────────────
@@ -394,6 +398,20 @@ export const materializeFinanceAiLlmEnrichments = async (
     input.clientId ?? null
   )
 
+  // TASK-1201 — run-truth: 0 señales = nada que enriquecer. NO persistir un run
+  // engañoso `succeeded`; cortar como noop. La provenance del "corrió, 0 señales"
+  // ya vive en finance_ai_materialization_runs (anomaly step).
+  if (signals.length === 0) {
+    return {
+      run: null,
+      recordsWritten: 0,
+      succeeded: 0,
+      failed: 0,
+      skipped: 0,
+      noop: true
+    }
+  }
+
   const resolvedContext = await resolveFinanceSignalContext(signals)
 
   const records: FinanceSignalEnrichmentRecord[] = []
@@ -521,6 +539,7 @@ export const materializeFinanceAiLlmEnrichments = async (
     recordsWritten: records.length,
     succeeded,
     failed,
-    skipped
+    skipped,
+    noop: false
   }
 }

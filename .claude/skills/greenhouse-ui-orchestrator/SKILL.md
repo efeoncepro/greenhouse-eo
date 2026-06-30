@@ -23,6 +23,15 @@ Every NEW Greenhouse surface/screen/view MUST **start from the Composition Shell
 - `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
 - `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
 
+## Wireframe Contract
+
+Before JSX for any new or materially changed visible UI, create or register a
+wireframe in `docs/ui/wireframes/` when the surface is new, reusable,
+client/public/executive-facing, state/copy-heavy, chart/report/PDF/email-based,
+or tied to a Product Design asset. Use
+`docs/ui/wireframes/WIREFRAME_TEMPLATE.md` and return the wireframe path in the
+recommendation. If no wireframe is needed, state the reason explicitly.
+
 ## Adaptive Sidecar Decision Rules
 
 - For contextual assistance, inspection, review, preview, and low-risk contextual editing where the main work context must remain visible, recommend the Adaptive Sidecar primitive first.
@@ -45,6 +54,7 @@ Every NEW Greenhouse surface/screen/view MUST **start from the Composition Shell
 - request normalization
 - recommended pattern
 - local target path
+- wireframe path or explicit reason no wireframe is needed
 - guardrails and anti-patterns
 - validation notes
 

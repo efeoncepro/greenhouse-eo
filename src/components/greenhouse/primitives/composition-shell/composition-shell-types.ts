@@ -16,8 +16,15 @@ import type { ReactNode } from 'react'
 /** Regiones — roles SINGLETON (constraint View Transitions: ≤1 elemento por `view-transition-name`). */
 export type CompositionShellRegion = 'primary' | 'aside' | 'lead' | 'dock' | 'overlay'
 
-/** Composiciones — los variants funcionales (canonical layouts de Greenhouse, framing M3). NO skins. */
-export type CompositionShellComposition = 'single' | 'leadPlusContext' | 'split' | 'focused'
+/**
+ * Composiciones — los variants funcionales (canonical layouts de Greenhouse, framing M3). NO skins.
+ * - `masterDetail` (TASK-1248): navigator angosto IZQUIERDA + detail canvas ancho DERECHA. Inverso del
+ *   `split` (primary ancho + aside angosto): acá `aside` = navigator (angosto) y `primary` = detail (ancho).
+ *   En compact colapsa el DETAIL (`primary`) a drawer temporal y el navigator (`aside`) se queda — semántica
+ *   de drawer invertida vs `split` (que colapsa el `aside`). Gobernado por config (`compactDrawerRegion`,
+ *   `splitTemplateColumns`, `regionMinInlineSize`), NO por ramas `composition===` en el componente.
+ */
+export type CompositionShellComposition = 'single' | 'leadPlusContext' | 'split' | 'focused' | 'masterDetail'
 
 /** Kinds semánticos de dominio/workflow → resuelven a una composición EXISTENTE (nunca una nueva por dominio). */
 export type CompositionShellKind =
@@ -25,6 +32,7 @@ export type CompositionShellKind =
   | 'nexaMoment' // → leadPlusContext (AI Overviews in-place)
   | 'queueInspector' // → split (cola + inspector)
   | 'workspaceDetail' // → split (org workspace shell)
+  | 'workbench' // → masterDetail (navigator + detail canvas)
   | 'reader' // → focused
   | 'custom'
 
@@ -58,6 +66,25 @@ export interface CompositionShellCompositionConfig {
   contentRegions: readonly CompositionShellRegion[]
   /** `primary` cede espacio (condensa, nunca desaparece) cuando otra región lidera. */
   condensesPrimary: boolean
+  /**
+   * Qué región de contenido colapsa a drawer temporal (semántica modal) en compact (solo aplica a
+   * `layout: 'split'`). `split` → `aside` (el inspector se esconde); `masterDetail` → `primary` (el detail
+   * se esconde y el navigator se queda). `undefined` → no hay drawer (la composición ya es stack).
+   */
+  compactDrawerRegion?: CompositionShellRegion
+  /**
+   * `grid-template-columns` responsive cuando `layout: 'split'` se sostiene (expanded/medium). Data, no CSS
+   * inline: el componente lo aplica via sx. `undefined` → el default histórico de `split`
+   * (`minmax(0,1fr) clamp(320px,32%,480px)`). El orden de columnas espeja el orden de `contentRegions`.
+   */
+  splitTemplateColumns?: { xs: string; sm: string }
+  /**
+   * Override per-composición del `min-inline-size` de una región (layout constraint, no spacing scale).
+   * Necesario cuando una composición usa una región con un ancho distinto al de su rol default — p.ej.
+   * `masterDetail` usa `aside` como navigator angosto, así que baja su min para que el clamp del grid
+   * gobierne y no fuerce overflow en compact stack (clase ISSUE-015).
+   */
+  regionMinInlineSize?: Partial<Record<CompositionShellRegion, number>>
 }
 
 /** Metadata por región: `view-transition-name` estable (singleton) + ancho mínimo. */
@@ -85,8 +112,13 @@ export interface CompositionShellProps {
   sizeClass?: CompositionShellSizeClass
   /** Label accesible de la región `lead` (a11y). */
   leadLabel?: string
-  /** Label accesible de la región `aside` (a11y). */
+  /** Label accesible de la región `aside` (a11y). En `masterDetail` el `aside` es el navigator. */
   asideLabel?: string
+  /**
+   * Label accesible + texto del trigger del detail-as-drawer (a11y). Solo aplica cuando una composición
+   * colapsa `primary` a drawer en compact (`masterDetail`). Default `'Detalle'`.
+   */
+  detailLabel?: string
   /**
    * ID estable opcional para escopar view-transition-name por instancia sin depender de `useId`.
    * Útil en surfaces SSR donde el árbol puede montar widgets de terceros/MUI con IDs propios.

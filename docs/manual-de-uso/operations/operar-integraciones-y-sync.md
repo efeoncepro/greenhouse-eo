@@ -27,6 +27,17 @@ No ejecutes syncs manuales para "probar suerte" en produccion si hay una causa d
 6. Si es HubSpot, revisa freshness de services/companies segun el panel.
 7. Si hay degraded, lee la razon antes de ejecutar retry.
 
+## Conectar Search Console por cliente
+
+1. Abre el Account-360 del cliente en `/agency/clients/[organizationId]/lifecycle`.
+2. Revisa el panel "Google Search Console".
+3. Si el panel indica que el flag está apagado o no tienes permiso, no fuerces la conexión: falta rollout o capability `growth.search_console.connect`.
+4. Ingresa la propiedad exacta que el cliente puede autorizar (`sc-domain:ejemplo.com` o `https://ejemplo.com/`).
+5. Selecciona `Conectar` o `Reconectar`; Greenhouse redirige al consentimiento de Google.
+6. Al volver al panel, confirma que el estado sea `Conectado` y que la propiedad visible sea la esperada.
+7. Si aparece `Acceso revocado` o `Expirado`, reconecta desde el mismo panel.
+8. Para retirar una conexión, usa `Desconectar` y confirma en el dialog.
+
 ## Disparar sync manual
 
 1. Confirma que la integracion no este pausada.
@@ -97,6 +108,10 @@ Revisa data quality checks. Run sano no equivale a calidad completa.
 
 No intentes llamar endpoints internos sin secreto. Configura entorno o marca rollout pendiente.
 
+### Search Console no conecta
+
+Confirma que TASK-1282 esté desplegada en el entorno, que `GROWTH_SEARCH_CONSOLE_ENABLED` esté ON, que existan los secretos OAuth de Google, que el consent screen permita el scope `webmasters.readonly` y que el service account runtime pueda escribir secretos con prefijo `search-console-token-*`.
+
 ## Que no hacer
 
 - No escribir directo en tablas producto saltandote raw/conformed/projection.
@@ -104,6 +119,7 @@ No intentes llamar endpoints internos sin secreto. Configura entorno o marca rol
 - No reanudar una integracion pausada sin resolver causa.
 - No declarar healthy solo por un HTTP 200.
 - No ignorar partial success.
+- No pedir tokens manuales de Search Console al cliente ni guardar refresh tokens en Postgres.
 
 ## Referencias tecnicas
 

@@ -19,7 +19,10 @@ export const PROJECTION_DOMAINS = [
   'delivery',
   'cost_intelligence',
   // TASK-1094 — auto-ingest del corpus de conocimiento desde webhook Notion.
-  'knowledge'
+  'knowledge',
+  // TASK-1251 — convergencia del intake del grader sobre el motor Growth Forms
+  // (submission → run + lead). Drenado por el cron `ops-reactive-growth` (deploy.sh).
+  'growth'
 ] as const
 
 export type ProjectionDomain = (typeof PROJECTION_DOMAINS)[number]

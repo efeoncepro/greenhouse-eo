@@ -82,6 +82,7 @@ describe('upsertCanonicalOrganization — TASK-991 SSOT', () => {
       'RFC',
       'MX',
       'manual',
+      null,
       null
     ])
   })
@@ -171,6 +172,7 @@ describe('ensureOrganizationForSupplier', () => {
       'RUT',
       'CL',
       'manual',
+      null,
       null
     ])
   })
@@ -205,6 +207,7 @@ describe('ensureOrganizationForSupplier', () => {
       'RUT',
       'CL',
       'manual',
+      null,
       null
     ])
   })
@@ -314,6 +317,7 @@ describe('ensureOrganizationForClient', () => {
       'RUT',
       'CL',
       'manual',
+      null,
       null
     ])
   })
@@ -344,6 +348,7 @@ describe('ensureOrganizationForClient', () => {
       'hubspot-1',
       'client',
       'manual',
+      null,
       null
     ])
   })

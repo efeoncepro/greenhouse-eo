@@ -117,6 +117,11 @@ import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
 import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 
 import { resolveCleanSeedDate } from '@/lib/finance/account-balances-clean-seed-resolver'
+import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai-visibility/run-engine'
+import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
+import { handleRecurringRegradeBatch } from '@/lib/growth/ai-visibility/regrade'
+import { dispatchPendingSubmissions } from '@/lib/growth/forms/dispatch'
+import { isFormsDispatchEnabled } from '@/lib/growth/forms/flags'
 
 import { computeRollingRematerializationWindow } from './finance-rematerialize-seed'
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
@@ -1589,6 +1594,152 @@ const handleOutboxPublishBatch = async (req: IncomingMessage, res: ServerRespons
   }
 }
 
+// ─── /growth/grader/drain ───────────────────────────────────────────────────
+//
+// TASK-1234 — AI Visibility Grader: ejecución async fuera del request Vercel.
+// El endpoint admin encola un run `pending`; este handler (Cloud Scheduler) lo
+// reclama (claim atómico FOR UPDATE SKIP LOCKED, sin doble ejecución) y lo ejecuta
+// vía el primitive `drainPendingGraderRuns`, persistiendo cada observación de forma
+// incremental → un timeout/crash mid-run no pierde evidencia. Además recupera runs
+// huérfanos en `running` (crash previo) recomputando su estado.
+//
+// Razón Cloud Scheduler (no Vercel cron): un run `full` multi-provider (Gemini 3 ≈
+// 56s/call × N prompts × M providers) excede el timeout de la función Vercel. El
+// worker Cloud Run no tiene ese límite. Vercel custom env (staging) tampoco corre
+// crons → el drain quedaría invisible en staging (mismo motivo que TASK-773).
+//
+// Gated: con los flags GROWTH_AI_VISIBILITY_* OFF (default) cada adapter resuelve
+// skip limpio; no hay llamadas a providers ni costo.
+//
+// Body opcional: {batchSize?: number, stuckThresholdMinutes?: number}
+const handleGrowthGraderDrain = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const batchSize = typeof body.batchSize === 'number' && body.batchSize > 0
+    ? Math.min(50, Math.floor(body.batchSize))
+    : 3
+
+  const stuckThresholdMinutes = typeof body.stuckThresholdMinutes === 'number' && body.stuckThresholdMinutes > 0
+    ? Math.floor(body.stuckThresholdMinutes)
+    : undefined
+
+  // Gate prod-safe: el ops-worker es un servicio Cloud Run compartido staging+prod.
+  // Con el grader OFF (default prod; el schema greenhouse_growth puede no existir aún)
+  // el handler NO toca la DB → cero queries, cero error, cero ruido en Sentry. El
+  // scheduler `ops-growth-grader-drain` puede seguir disparando sin acoplarse a prod.
+  if (!isGraderEnabled()) {
+    json(res, 200, { ok: true, skipped: 'grader_disabled', claimedCount: 0, recoveredCount: 0 })
+
+    return
+  }
+
+  console.log(`[ops-worker] POST /growth/grader/drain — batchSize=${batchSize}`)
+
+  try {
+    // Recovery primero: libera runs huérfanos antes de drenar nuevos pending.
+    const recovery = await recoverStuckRunningRuns(stuckThresholdMinutes)
+    const drain = await drainPendingGraderRuns({ batchSize })
+
+    console.log(
+      `[ops-worker] /growth/grader/drain done — claimed=${drain.claimedCount} ` +
+      `recovered=${recovery.recoveredCount}`
+    )
+
+    json(res, 200, {
+      ok: true,
+      claimedCount: drain.claimedCount,
+      results: drain.results,
+      recoveredCount: recovery.recoveredCount,
+      recovered: recovery.recovered
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown grader drain error'
+
+    console.error('[ops-worker] /growth/grader/drain failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_growth_grader_drain' } })
+    json(res, 502, { error: message })
+  }
+}
+
+// ─── /growth/grader/regrade ─────────────────────────────────────────────────
+//
+// TASK-1270 — Re-grade recurrente de perfiles AEO opt-in. Este handler NO ejecuta
+// providers directamente: selecciona perfiles due, encola runs `full` idempotentes
+// y deja que `/growth/grader/drain` los reclame/ejecute con el run-engine canónico.
+// Cloud Scheduler > ops-worker por la misma razón que TASK-1234: staging visible y
+// duración/costo fuera del request Vercel.
+//
+// Body opcional: {batchSize?: number}
+const handleGrowthGraderRegrade = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const batchSize = typeof body.batchSize === 'number' && body.batchSize > 0
+    ? Math.min(50, Math.floor(body.batchSize))
+    : undefined
+
+  console.log(`[ops-worker] POST /growth/grader/regrade — batchSize=${batchSize ?? 'default'}`)
+
+  try {
+    const result = await handleRecurringRegradeBatch({ batchSize })
+
+    console.log(
+      `[ops-worker] /growth/grader/regrade done — claimed=${result.claimedProfiles} ` +
+        `enqueued=${result.enqueuedRuns} failed=${result.failedProfiles} skipped=${result.skipped ?? 'none'}`
+    )
+
+    json(res, 200, result)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown grader regrade error'
+
+    console.error('[ops-worker] /growth/grader/regrade failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_growth_grader_regrade' } })
+    json(res, 502, { error: message })
+  }
+}
+
+// ─── /growth/forms/dispatch ─────────────────────────────────────────────────
+//
+// TASK-1229 — Motor Growth Forms: entrega async de submissions aceptadas. El submit
+// (Vercel) acepta + persiste {submission + consent + outbox event} en una tx y
+// responde 202; la ENTREGA al destino corre acá (Cloud Scheduler), drenando las
+// submissions pendientes vía el primitive `dispatchPendingSubmissions` (re-lee PG).
+// Razón Cloud Scheduler (no Vercel cron): mismo motivo que el outbox publisher
+// (TASK-773) — Vercel custom env (staging) no corre crons → la entrega quedaría
+// invisible en staging. En 1229 el adapter es fake/echo; el HubSpot real es TASK-1230.
+//
+// Gate prod-safe: con GROWTH_FORMS_DISPATCH_ENABLED OFF (default) el handler hace
+// no-op (cero queries; el schema greenhouse_growth puede no existir aún en prod).
+const handleGrowthFormsDispatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const limit = typeof body.limit === 'number' && body.limit > 0 ? Math.min(200, Math.floor(body.limit)) : 50
+
+  if (!isFormsDispatchEnabled()) {
+    json(res, 200, { ok: true, skipped: 'forms_dispatch_disabled', processed: 0, delivered: 0, failed: 0 })
+
+    return
+  }
+
+  console.log(`[ops-worker] POST /growth/forms/dispatch — limit=${limit}`)
+
+  try {
+    const summary = await dispatchPendingSubmissions(limit)
+
+    console.log(
+      `[ops-worker] /growth/forms/dispatch done — processed=${summary.processed} ` +
+      `delivered=${summary.delivered} failed=${summary.failed}`
+    )
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown forms dispatch error'
+
+    console.error('[ops-worker] /growth/forms/dispatch failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_growth_forms_dispatch' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /email-deliverability-monitor ──────────────────────────────────────────
 //
 // TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
@@ -2223,6 +2374,24 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/email-deliverability-monitor') {
       await handleEmailDeliverabilityMonitor(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/growth/grader/drain') {
+      await handleGrowthGraderDrain(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/growth/grader/regrade') {
+      await handleGrowthGraderRegrade(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/growth/forms/dispatch') {
+      await handleGrowthFormsDispatch(req, res)
 
       return
     }

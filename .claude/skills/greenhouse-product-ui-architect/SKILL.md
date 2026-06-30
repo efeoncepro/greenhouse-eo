@@ -22,6 +22,36 @@ Every NEW Greenhouse surface/screen/view MUST **start from the Composition Shell
 - `docs/architecture/GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1.md`
 - `docs/operations/GREENHOUSE_UI_DELIVERY_LOOP_V1.md`
 
+## Wireframe Contract (mandatory for UI work)
+
+Before writing JSX for a new or materially changed visible UI, create or update a
+wireframe under `docs/ui/wireframes/` when the surface is new, reusable,
+client/public/executive-facing, has meaningful states/copy, includes charts,
+report artifacts, PDF/email output, or is based on a Product Design asset.
+
+Use `docs/ui/wireframes/WIREFRAME_TEMPLATE.md`. The wireframe must link the
+approved visual asset, map the layout skeleton, list copy ids, define state
+copy, document accessibility/chart alternatives, list GVC markers, and name the
+primitive/adapters decision. It must also include `## Implementation Mapping`,
+`## GVC Scenario Plan`, and `## Design Decision Log` before the owning task can
+set `UI ready: yes`. If a tiny one-off does not need a wireframe, state why
+before coding.
+
+## UI Readiness Gate
+
+For any task with `Execution profile: ui-ux` or `UI impact != none`, keep
+`UI ready: no` until the task and wireframe answer:
+
+- what route/surface, primitive/variant/kind, component candidates, copy source,
+  data reader/command, API parity and access/capability the implementation will use;
+- what GVC scenario route, viewports, captures, markers, assertions, scroll-width
+  checks and focus/reduced-motion evidence will prove the UI;
+- what design decision was made, what alternatives were rejected, and whether the
+  result reuses, extends or creates a primitive.
+
+Only set `UI ready: yes` after `pnpm task:lint --task TASK-###` passes with zero
+findings. That is the handoff point for writing JSX/copy visible.
+
 ## Primitive + Variants + Kinds Method
 
 Use `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md` for reusable UI.
@@ -65,6 +95,7 @@ Canonical shape:
 - Greenhouse implementation mapping
 - primitives to reuse
 - copy/access decisions
+- UI readiness status (`no` until implementation mapping, GVC plan and decision log are complete)
 - screenshot plan
 - verification plan
 

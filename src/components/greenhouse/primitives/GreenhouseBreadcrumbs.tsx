@@ -104,7 +104,10 @@ const getItemSx = (isCurrent: boolean, hitArea: GreenhouseBreadcrumbsHitArea): S
   py: hitArea === 'comfortable' ? 1 : undefined,
   color: isCurrent ? theme.palette.text.primary : theme.palette.primary.main,
   textDecoration: 'none',
-  borderRadius: `${hitArea === 'comfortable' ? theme.shape.customBorderRadius.md : theme.shape.customBorderRadius.xs}px`,
+  borderRadius: `${hitArea === 'comfortable'
+    ? (theme.shape.customBorderRadius?.md ?? theme.shape.borderRadius)
+    : (theme.shape.customBorderRadius?.xs ?? theme.shape.customBorderRadius?.sm ?? theme.shape.borderRadius)
+  }px`,
   fontWeight: hitArea === 'comfortable' ? 500 : undefined,
   outlineOffset: 2,
   touchAction: hitArea === 'comfortable' ? 'manipulation' : undefined,

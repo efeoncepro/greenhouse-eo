@@ -1,0 +1,349 @@
+/**
+ * TASK-1226 — Growth AI Visibility Grader · Feature flags (Slice 3).
+ *
+ * Flags env-var del grader, TODOS default OFF (ver FEATURE_FLAG_STATE_LEDGER).
+ * El kill switch global `GROWTH_AI_VISIBILITY_GRADER_ENABLED` gatea a todos; cada
+ * provider tiene además su propio flag. Sin flag → el adapter resuelve enabled=
+ * false y produce skip controlado (NUNCA crash). Lectura pura de env (testeable).
+ */
+
+import { type GrowthAiVisibilityProviderId } from './contracts'
+
+export const GROWTH_AI_VISIBILITY_GRADER_FLAG = 'GROWTH_AI_VISIBILITY_GRADER_ENABLED'
+
+export const GROWTH_AI_VISIBILITY_PROVIDER_FLAGS: Record<GrowthAiVisibilityProviderId, string> = {
+  openai: 'GROWTH_AI_VISIBILITY_OPENAI_ENABLED',
+  anthropic: 'GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED',
+  perplexity: 'GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED',
+  gemini: 'GROWTH_AI_VISIBILITY_GEMINI_ENABLED',
+  google_ai_overview: 'GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED'
+}
+
+const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
+
+/** Kill switch global. Default OFF. */
+export const isGraderEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_GRADER_FLAG])
+
+/** Flag del provider (solo cuenta si el grader global está ON). Default OFF. */
+export const isProviderFlagEnabled = (
+  provider: GrowthAiVisibilityProviderId,
+  env: NodeJS.ProcessEnv = process.env
+): boolean => isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PROVIDER_FLAGS[provider]])
+
+/**
+ * TASK-1227 — Fallback LLM de extracción para campos de prosa (sentiment,
+ * categoryAssociations, messageDriftClaims, refinar ambiguous). Default OFF: sin
+ * el flag, el normalizer es determinista-first y preserva `unknown`.
+ */
+export const GROWTH_AI_VISIBILITY_LLM_EXTRACTION_FLAG = 'GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED'
+
+export const isLlmExtractionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_LLM_EXTRACTION_FLAG])
+
+/**
+ * TASK-1234 — Cutover inline → async. Default OFF: el endpoint admin ejecuta el run
+ * INLINE (como hoy; sólo `light`/OpenAI cabe en el timeout de la función Vercel).
+ * Con ON: el endpoint ENCOLA el run `pending` (202 + runId) y el worker Cloud Run
+ * lo ejecuta async (sin límite de duración) — única vía para runs `full` multi-provider.
+ */
+export const GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_FLAG = 'GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED'
+
+export const isAsyncExecutionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_FLAG])
+
+/**
+ * TASK-1240 — Intake público (lead magnet). Default OFF: el POST público está cerrado
+ * (404) hasta el rollout + sign-off legal del consent + secret de captcha. Gateado además
+ * por el kill switch `isGraderEnabled`. Con ON: el endpoint público acepta el intake
+ * (captcha + rate-limit + cost ceiling) y encola un run `public_diagnostic`+`light`.
+ */
+export const GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_FLAG = 'GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED'
+
+export const isPublicIntakeEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_FLAG])
+
+/**
+ * TASK-1251 — Convergencia del intake del grader sobre el motor Growth Forms.
+ * Default OFF: `POST /run` usa el path a-medida actual (`createPublicGraderRun` inline).
+ * Con ON: `POST /run` actúa como fachada que persiste un SUBMISSION del motor
+ * (`form_submission` + consent_snapshot + outbox `growth.forms.submission_accepted`);
+ * un reactive consumer scoped al grader-form encola el run + persiste el lead (no inline).
+ * Como el intake público NO ha lanzado (sin tráfico vivo), el cutover es converge-before-launch:
+ * prender este flag junto a `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` cuando se lance.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_FLAG = 'GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED'
+
+export const isGraderIntakeOnFormsEngineEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_FLAG])
+
+/**
+ * TASK-1242 — HubSpot lead handoff. Default OFF: el reactive consumer resuelve disabled y
+ * produce `skipped` (NUNCA escribe a HubSpot, NUNCA crash). El enqueue del evento igual
+ * ocurre (barato); el gate vive en el WRITE (execute) para no perder eventos al prender.
+ * Con ON: el consumer hace el upsert contact/company en HubSpot (cliente in-app directo).
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_LEAD_HANDOFF_FLAG = 'GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED'
+
+export const isLeadHandoffEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_LEAD_HANDOFF_FLAG])
+
+/**
+ * TASK-1250 — Email transaccional de entrega del informe al lead. Default OFF: el reactive
+ * consumer resuelve disabled y produce `skipped` (NUNCA envía email, NUNCA crash). El enqueue
+ * del evento igual ocurre (barato); el gate vive en el WRITE (dispatch) para no perder eventos
+ * al prender. Con ON: el consumer arma el adjunto PDF público-safe + envía vía `sendEmail`,
+ * con consent-gate, gate de estado del reporte e idempotencia DB-level por (report_id, email_type).
+ * No production send hasta TASK-1246. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md
+ * (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_REPORT_EMAIL_FLAG = 'GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED'
+
+export const isReportEmailDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_REPORT_EMAIL_FLAG])
+
+/**
+ * TASK-1266 — Site Readiness Probe Layer (gatherer de probes técnicos del sitio analizado).
+ * Default OFF: sin el flag, el probe gatherer no se invoca (el run sigue idéntico; sólo
+ * percepción). Gateado además por el kill switch `isGraderEnabled`. Con ON: tras ejecutar
+ * un run, el run-engine corre los probes structural (robots IA, JSON-LD, llms.txt, sitemap)
+ * read-only sobre el dominio del sujeto y persiste `grader_probe_results`. Es el flag MAESTRO
+ * del eje `structural`; el eje `agentic` requiere ADEMÁS `..._AGENTIC_READINESS_ENABLED`.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_PROBES_FLAG = 'GROWTH_AI_VISIBILITY_PROBES_ENABLED'
+
+export const isProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PROBES_FLAG])
+
+/**
+ * TASK-1266 — Eje `agentic` (operabilidad agéntica: WebMCP tools, .well-known/mcp, API
+ * discoverability, DOM semántico, potentialAction). Default OFF. Requiere que los probes estén
+ * ON (`isProbesEnabled`): el eje agentic es aditivo sobre el structural, no independiente.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_AGENTIC_READINESS_FLAG = 'GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED'
+
+export const isAgenticReadinessEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_AGENTIC_READINESS_FLAG])
+
+/**
+ * TASK-1267 — Eje `entity` (backbone real de entidad de la marca: Google Knowledge Graph,
+ * Wikidata/Wikipedia, presencia en Reddit/UGC). Probes read-only sobre APIs PÚBLICAS de
+ * terceros (no el sitio del sujeto). Default OFF. Requiere que los probes estén ON
+ * (`isProbesEnabled`): el eje entity es aditivo sobre el structural, no independiente —
+ * igual que el eje agentic. La API key del Knowledge Graph se resuelve server-side
+ * (`GOOGLE_KNOWLEDGE_GRAPH_API_KEY` / `..._SECRET_REF`); sin ella el KG probe degrada honesto.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_ENTITY_PROBES_FLAG = 'GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED'
+
+export const isEntityProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_ENTITY_PROBES_FLAG])
+
+/**
+ * TASK-1269 — Fix-It Artifacts (JSON-LD / llms.txt / content briefs).
+ * Default OFF: los endpoints de generación no entregan artefactos hasta revisión
+ * de copy/legal. Gateado además por el kill switch global del grader. La generación
+ * es determinista/on-demand y no escribe en el sitio del prospecto.
+ */
+export const GROWTH_AI_VISIBILITY_FIX_IT_FLAG = 'GROWTH_AI_VISIBILITY_FIX_IT_ENABLED'
+
+export const isFixItArtifactsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_FIX_IT_FLAG])
+
+/**
+ * TASK-1277 — Run gobernado de portal (chokepoint). Default OFF: las puertas cliente del
+ * run (contratado/trial/pilot) están cerradas hasta el rollout + staging shadow. Gateado
+ * además por el kill switch `isGraderEnabled`. Con ON: `requestGraderRunForOrganization`
+ * acepta runs de portal (entitlement → ventana → allowance → costo). La puerta operador
+ * (`requestGraderRunAsOperator`) NO depende de este flag — es capability-gated y unlimited.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_PORTAL_RUN_FLAG = 'GROWTH_AI_VISIBILITY_PORTAL_RUN_ENABLED'
+
+export const isPortalRunEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PORTAL_RUN_FLAG])
+
+/**
+ * TASK-1277 — Tier trial PLG (self-serve para clientes existentes sin AEO contratado).
+ * Default OFF: aunque el portal run esté ON, el tier trial no entrega allowance hasta medir
+ * costo en shadow. Con ON: las orgs con assignment tier=trial reciben N runs/mes (config)
+ * con reset mensual + tope global mensual de costo (backstop). Registrar en el ledger.
+ */
+export const GROWTH_AI_VISIBILITY_TRIAL_FLAG = 'GROWTH_AI_VISIBILITY_TRIAL_ENABLED'
+
+export const isTrialTierEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_TRIAL_FLAG])
+
+/**
+ * TASK-1270 — Re-grade recurrente de perfiles AEO opt-in. Default OFF. Requiere
+ * el kill switch global del grader y corre sólo desde ops-worker/Cloud Scheduler.
+ */
+export const GROWTH_AI_VISIBILITY_REGRADE_FLAG = 'GROWTH_AI_VISIBILITY_REGRADE_ENABLED'
+
+export const isRecurringRegradeEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_REGRADE_FLAG])
+
+/**
+ * TASK-1279 — Cross-sell operador: enviar el informe AEO + crear un Lead de HubSpot
+ * (objeto `leads`, asociado a Contact/Company — NUNCA un Deal). Default OFF: el command
+ * gobernado rechaza el envío (y el reactive consumer hace skip controlado) hasta el smoke
+ * staging real (email + Lead) + sign-off comercial/legal del copy a prospectos + provisión
+ * de la property `aeo_check_result` en HubSpot. Gateado además por el kill switch global.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_OPERATOR_SEND_FLAG = 'GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED'
+
+export const isOperatorSendEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_OPERATOR_SEND_FLAG])
+
+/**
+ * TASK-1288 — Guard de categoría no resuelta. Default OFF: cuando ON, un run/envío cuyo
+ * perfil tenga `category_node_id = unknown` (o confianza baja) se bloquea con razón canónica
+ * en vez de generar prompts basura (ISSUE-110). Se prende sólo tras el backfill verificado
+ * (no romper el lead magnet con muchos `unknown` legacy). Registrar en el ledger.
+ */
+export const GROWTH_AI_VISIBILITY_CATEGORY_GUARD_FLAG = 'GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED'
+
+export const isCategoryGuardEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_CATEGORY_GUARD_FLAG])
+
+/**
+ * TASK-1290 — Prompts por arquetipo (categoría × business_model × buyer-intent). Default OFF:
+ * el run usa el pack agencia v1 actual (no-op, no-regresión del lead magnet). Con ON: el run
+ * resuelve el baseline determinista del arquetipo del perfil (consumo/B2B/retail/…), o el set
+ * congelado autorado por LLM cuando exista y esté `active` (Slice 2/3). Se prende tras la eval
+ * verde (TASK-1292). Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_FLAG = 'GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED'
+
+export const isArchetypePromptsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_FLAG])
+
+/**
+ * TASK-1290 Slice 3 — Autoría LLM del prompt set por marca. Default OFF: sin el flag, el autor
+ * cae al baseline determinista del arquetipo (Slice 1) — NUNCA prompts rotos. Gateado además por
+ * el kill switch global del grader. El LLM corre 1×/marca/versión (al autorar), NUNCA por run; el
+ * set se congela (approve) y los runs lo reproducen. Registrar en FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_FLAG = 'GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED'
+
+export const isPromptAuthoringEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_FLAG])
+
+/**
+ * TASK-1288 — Lectura grounded `brand_intelligence` (LLM sobre contenido del sitio + entity).
+ * Default OFF: la lectura LLM (1×/marca/versión, cacheada) se activa tras sign-off de costo;
+ * con OFF la resolución de categoría cae al prior determinista (HubSpot map + alias). Gateado
+ * además por el kill switch global del grader. Registrar en el ledger.
+ */
+export const GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_FLAG = 'GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED'
+
+export const isBrandIntelligenceEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_FLAG])
+
+/**
+ * TASK-1277 — Config de allowance AEO por tier (per-org-per-mes) + tope global de trials.
+ * Defaults conservadores (sign-off comercial): trial 1/mes, contratado 20/mes (fair-use, NO
+ * ilimitado self-serve), pilot 3/mes, tope global de trials USD 25/mes (cost backstop que
+ * espeja el budget diario público de abuse-guard). Todos override-ables por env (sin deploy).
+ * El costo por-run del backstop usa el cost ceiling del modo `light` (defense conservadora).
+ */
+export interface AeoAllowanceConfig {
+  trialRunsPerMonth: number
+  contractedRunsPerMonth: number
+  pilotRunsPerMonth: number
+  trialGlobalMonthlyBudgetUsd: number
+}
+
+const toPositiveInt = (value: string | undefined, fallback: number): number => {
+  const parsed = Number.parseInt(value ?? '', 10)
+
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
+const toPositiveFloat = (value: string | undefined, fallback: number): number => {
+  const parsed = Number.parseFloat(value ?? '')
+
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
+export const resolveAeoAllowanceConfig = (env: NodeJS.ProcessEnv = process.env): AeoAllowanceConfig => ({
+  trialRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_TRIAL_RUNS_PER_MONTH, 1),
+  contractedRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_CONTRACTED_RUNS_PER_MONTH, 20),
+  pilotRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_PILOT_RUNS_PER_MONTH, 3),
+  trialGlobalMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_TRIAL_GLOBAL_MONTHLY_BUDGET_USD, 25)
+})
+
+export interface RecurringRegradeConfig {
+  batchSize: number
+  monthlyBudgetUsd: number
+}
+
+/**
+ * Re-grade usa modo `full` (cross-engine SoV), por eso tiene presupuesto mensual
+ * propio además del cost ceiling per-run de policy.ts. Defaults conservadores y
+ * override-ables por env; con flag OFF no se consulta ni gasta.
+ */
+export const resolveRecurringRegradeConfig = (env: NodeJS.ProcessEnv = process.env): RecurringRegradeConfig => ({
+  batchSize: Math.max(1, Math.min(50, toPositiveInt(env.GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE, 5))),
+  monthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD, 50)
+})
+
+/**
+ * TASK-1271 — Prose extraction router. El extractor de prosa (sentiment/category/
+ * drift) sigue gateado por `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` (default OFF);
+ * estos controles solo eligen QUÉ proveedor lo ejecuta cuando ese flag está ON.
+ *
+ * `_PROVIDER` (default `anthropic`, behavior-preserving): proveedor productivo del
+ * extractor. Un valor inválido o no registrado degrada al fallback determinista.
+ * `_SHADOW_ENABLED` (default OFF): NO afecta el path de runs; lo consume sólo el
+ * harness/CLI de eval (TASK-1271 Slice 3) para comparar proveedores sin gastar en
+ * runs normales (Open Question #2 → eval allowlisted, no doble llamado por run).
+ */
+export const GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER_FLAG = 'GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER'
+
+export const GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_FLAG =
+  'GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_ENABLED'
+
+export const PROSE_EXTRACTION_PROVIDER_IDS = ['anthropic', 'gemini', 'openai'] as const
+export type ProseExtractionProviderFlagValue = (typeof PROSE_EXTRACTION_PROVIDER_IDS)[number]
+
+/** Proveedor productivo del extractor. Default `anthropic`; valor desconocido → `anthropic`. */
+export const resolveProseExtractionProvider = (
+  env: NodeJS.ProcessEnv = process.env
+): ProseExtractionProviderFlagValue => {
+  const raw = env[GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER_FLAG]?.trim().toLowerCase()
+
+  return (PROSE_EXTRACTION_PROVIDER_IDS as readonly string[]).includes(raw ?? '')
+    ? (raw as ProseExtractionProviderFlagValue)
+    : 'anthropic'
+}
+
+export const isProseExtractionShadowEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_FLAG])
+
+export interface ProseExtractionConfig {
+  provider: ProseExtractionProviderFlagValue
+  /** Tope de tokens de salida por extracción (circuit breaker de costo). */
+  maxOutputTokens: number
+  /** Cost ceiling estimado por extracción (USD); si se excede, se registra para alerta. */
+  maxCostUsd: number
+}
+
+/**
+ * Config del extractor (override por env, defaults conservadores). El paso de
+ * extracción es cognitivamente simple → 1024 tokens basta; el cost ceiling es un
+ * guard de presupuesto, no contabilidad exacta.
+ */
+export const resolveProseExtractionConfig = (env: NodeJS.ProcessEnv = process.env): ProseExtractionConfig => ({
+  provider: resolveProseExtractionProvider(env),
+  maxOutputTokens: Math.max(
+    256,
+    Math.min(4096, toPositiveInt(env.GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_MAX_TOKENS, 1024))
+  ),
+  maxCostUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_MAX_COST_USD, 0.02)
+})

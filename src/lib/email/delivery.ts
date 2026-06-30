@@ -24,10 +24,18 @@ import type {
   SendEmailInput,
   SendEmailResult
 } from './types'
-import { EMAIL_PRIORITY_MAP } from './types'
+import { AGENCY_BRANDED_EMAIL_TYPES, AGENCY_FROM_ADDRESS, EMAIL_PRIORITY_MAP } from './types'
 
 // ── Broadcast types that include List-Unsubscribe header ──
 const BROADCAST_EMAIL_TYPES: EmailType[] = ['payroll_export', 'notification', 'payroll_receipt']
+
+/**
+ * Sender per email type: agency-branded surfaces (lead magnet) send as **Efeonce**; everything
+ * else uses the platform sender. Centralized policy (not a per-call override) so the brand
+ * boundary is one decision, not 18 callers remembering it.
+ */
+const resolveEmailFromAddress = (emailType: EmailType): string =>
+  AGENCY_BRANDED_EMAIL_TYPES.has(emailType) ? AGENCY_FROM_ADDRESS : getEmailFromAddress()
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase()
 
@@ -522,7 +530,7 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       : {}
 
     const result = await resend.emails.send({
-      from: getEmailFromAddress(),
+      from: resolveEmailFromAddress(input.emailType),
       to: normalizeEmail(input.recipient.email),
       subject: resolvedTemplate.subject,
       react: resolvedTemplate.react,

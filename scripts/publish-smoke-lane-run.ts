@@ -25,7 +25,12 @@ import { randomUUID } from 'node:crypto'
 import { closeGreenhousePostgres, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
-import { flattenPlaywrightReport, summarizeSmokeLaneSpecs, type PlaywrightReport } from './lib/smoke-lane-report'
+import {
+  filterSmokeLaneSpecs,
+  flattenPlaywrightReport,
+  summarizeSmokeLaneSpecs,
+  type PlaywrightReport
+} from './lib/smoke-lane-report'
 
 loadGreenhouseToolEnv()
 applyGreenhousePostgresProfile('runtime')
@@ -100,7 +105,7 @@ const main = async () => {
     process.exit(1)
   }
 
-  const flattened = flattenPlaywrightReport(report)
+  const flattened = filterSmokeLaneSpecs(flattenPlaywrightReport(report), args.laneKey)
   const totals = summarizeSmokeLaneSpecs(flattened)
 
   const status: 'passed' | 'failed' | 'flaky' = totals.failed > 0 ? 'failed' : totals.flaky > 0 ? 'flaky' : 'passed'
@@ -112,6 +117,7 @@ const main = async () => {
   ).toISOString()
 
   const summaryJson = {
+    laneKey: args.laneKey,
     suites: flattened.map(s => ({
       title: s.title,
       file: s.file,

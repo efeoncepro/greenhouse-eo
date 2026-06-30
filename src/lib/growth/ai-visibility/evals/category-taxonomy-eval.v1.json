@@ -1,0 +1,136 @@
+{
+  "_meta": {
+    "artifact": "category-taxonomy-eval.v1",
+    "task": "TASK-1272",
+    "taxonomyVersion": "category_taxonomy_v1",
+    "purpose": "Regression fixture for governed brand/category mapping. Raw provider/LLM candidates must map to canonical IDs or degrade honestly."
+  },
+  "cases": [
+    {
+      "id": "ct01_asaas_growth_os",
+      "candidate": "ASaaS",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "category:growth_operating_system"
+    },
+    {
+      "id": "ct02_inbound_marketing",
+      "candidate": "Inbound Marketing",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "category:inbound_marketing"
+    },
+    {
+      "id": "ct03_fintech_sector",
+      "candidate": "fintech",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "sector:fintech"
+    },
+    {
+      "id": "ct04_healthtech_sector",
+      "candidate": "healthtech",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "sector:healthtech"
+    },
+    {
+      "id": "ct05_buyer_persona",
+      "candidate": "CMO",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "buyer:cmo"
+    },
+    {
+      "id": "ct06_market",
+      "candidate": "Chile",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "market:chile"
+    },
+    {
+      "id": "ct07_ai_agents",
+      "candidate": "AI agents",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "category:ai_agents"
+    },
+    {
+      "id": "ct08_business_intelligence",
+      "candidate": "business intelligence",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "category:business_intelligence"
+    },
+    {
+      "id": "ct09_telemedicine",
+      "candidate": "telemedicine",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "category:telemedicine"
+    },
+    {
+      "id": "ct10_property_management",
+      "candidate": "property management",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "category:property_management"
+    },
+    {
+      "id": "ct11_supply_chain",
+      "candidate": "supply chain",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "sector:supply_chain"
+    },
+    {
+      "id": "ct12_cybersecurity",
+      "candidate": "cybersecurity",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "sector:cybersecurity"
+    },
+    {
+      "id": "ct13_ecommerce",
+      "candidate": "ecommerce",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "sector:ecommerce_marketplaces"
+    },
+    {
+      "id": "ct14_cfo",
+      "candidate": "CFO",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "buyer:cfo"
+    },
+    {
+      "id": "ct15_customer_success",
+      "candidate": "Customer Success leader",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "buyer:customer_success_leader"
+    },
+    {
+      "id": "ct16_mexico",
+      "candidate": "Mexico",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "market:mexico"
+    },
+    {
+      "id": "ct17_small_business",
+      "candidate": "SMB",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "market:small_business"
+    },
+    {
+      "id": "ct18_compliance",
+      "candidate": "compliance",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "use_case:compliance_risk"
+    },
+    {
+      "id": "ct19_appointment_scheduling",
+      "candidate": "appointment scheduling",
+      "expectedStatus": "mapped",
+      "expectedNodeId": "use_case:appointment_scheduling"
+    },
+    {
+      "id": "ct20_ambiguous_automation",
+      "candidate": "automation",
+      "expectedStatus": "ambiguous",
+      "expectedNodeId": null
+    },
+    {
+      "id": "ct21_unknown_candidate",
+      "candidate": "categoria inventada por el proveedor",
+      "expectedStatus": "needs_review",
+      "expectedNodeId": null
+    }
+  ]
+}

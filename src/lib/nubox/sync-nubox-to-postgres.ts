@@ -330,12 +330,36 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
       await withGreenhousePostgresTransaction(async client => {
         const fxSnapshotId = fxEvidence ? await persistFxSnapshot(fxEvidence, client) : null
 
+        // TASK-990 Slice 8 / TASK-1210 — reporting USD plane en el backfill de fila
+        // existente (mirror del INSERT branch): amount_usd = functional CLP × tasa
+        // CLP→USD a la fecha de emisión (presentation currency derivada del functional,
+        // NUNCA native→USD directo, IAS 21). Degrade-honest: sin tasa CLP→USD, queda NULL.
+        let reportingFxSnapshotId: string | null = null
+        let amountUsd: number | null = null
+
+        const reporting = await resolveFxSnapshotEvidence({
+          fromCurrency: 'CLP',
+          toCurrency: 'USD',
+          rateDate: sale.emission_date ?? new Date().toISOString().slice(0, 10),
+          policy: 'rate_at_event',
+          domain: 'finance_core'
+        })
+
+        if (reporting.evidence) {
+          reportingFxSnapshotId = await persistFxSnapshot(reporting.evidence, client)
+          const functionalClp = Math.abs(safeNum(sale.functional_total_amount_clp) ?? 0) * signMultiplier
+
+          amountUsd = Math.round(functionalClp * Number(reporting.evidence.rate) * 100) / 100
+        }
+
         await client.query(
           buildUpdateSql(`
         native_amount = COALESCE(greenhouse_finance.income.native_amount, $14),
         native_currency = COALESCE(greenhouse_finance.income.native_currency, $15),
-        native_to_functional_fx_snapshot_id = COALESCE(greenhouse_finance.income.native_to_functional_fx_snapshot_id, $16),`),
-          [...baseUpdateParams, nativeAmount, nativeCurrency, fxSnapshotId]
+        native_to_functional_fx_snapshot_id = COALESCE(greenhouse_finance.income.native_to_functional_fx_snapshot_id, $16),
+        amount_usd = COALESCE(greenhouse_finance.income.amount_usd, $17),
+        functional_to_reporting_fx_snapshot_id = COALESCE(greenhouse_finance.income.functional_to_reporting_fx_snapshot_id, $18),`),
+          [...baseUpdateParams, nativeAmount, nativeCurrency, fxSnapshotId, amountUsd, reportingFxSnapshotId]
         )
       })
     } else {

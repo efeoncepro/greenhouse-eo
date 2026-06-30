@@ -154,6 +154,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Adaptive Card density Lab (TASK-1115) — child surface del Design System para el contrato de densidad de cards (full/condensed/peek por container query); capacidad hermana del Composition Shell; alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/growth-forms-renderer',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Growth Forms portable renderer preview (TASK-1231) — child surface del Design System que monta el mismo core Web Component que WordPress/Astro renderizan en produccion, desde fixtures del render_contract; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/handoff',
     parent: '/design-system',
     via: 'inline-link',
@@ -334,6 +341,20 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Geometry Lab (TASK-1050) — child surface del Design System para spacing/radius AXIS y la extension Greenhouse xxl/display, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/team-avatar-group',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Team Avatar Group Lab (TASK-1248) — child surface del Design System para la primitive TeamAvatarGroup (kinds members + brands/isotipos), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/aeo',
+    parent: '/home',
+    via: 'inline-link',
+    reason:
+      'AI Visibility client report (TASK-1248) — surface client-scoped (routeGroup client, viewCode cliente.ai_visibility_report). Deep-link primero (OQ resuelta): se alcanza desde Account 360 / el handoff del Report Packet Delivery (TASK-1250), no como item de nav principal hasta que exista el monitor recurrente. Gateada server-side por client tenant + capability growth.ai_visibility.report.read_client.'
   }
 ]
 
