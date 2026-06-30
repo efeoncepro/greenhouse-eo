@@ -645,3 +645,86 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_TIERING = {
   // Contacto del equipo (reusa el patrón del workbench: mailto al equipo de Efeonce).
   teamMailto: 'mailto:hola@efeonce.com'
 } as const
+
+/**
+ * TASK-1247 — Admin Review UI del AEO Grader (gate humano pre-publicación).
+ * Copy es-CL (tuteo) de la cola de revisión + reconciler de evidencia + decisión.
+ * Surface INTERNA (capability `growth.ai_visibility.report.review`) — nunca client-facing.
+ */
+export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
+  breadcrumb: { admin: 'Admin', growth: 'Growth', grader: 'AEO Grader', review: 'Revisión' },
+  pageTitle: 'Revisión de reportes — AI Visibility Grader',
+  pageSubtitle: 'Gate humano antes de publicar un diagnóstico a un prospecto.',
+  summary: {
+    pending: 'Pendientes',
+    inReview: 'En revisión',
+    highRisk: 'Riesgo alto',
+    sla: 'SLA objetivo'
+  },
+  actions: { refresh: 'Actualizar', export: 'Exportar', savedFilters: 'Filtros guardados' },
+  filters: {
+    risk: 'Riesgo',
+    status: 'Estado',
+    engine: 'Motor',
+    age: 'Antigüedad',
+    search: 'Buscar por marca o reporte…',
+    all: 'Todos'
+  },
+  queue: {
+    title: 'Cola de revisión',
+    colBrand: 'Marca',
+    colStatus: 'Estado',
+    colScore: 'Score',
+    colRisk: 'Riesgo / Razón',
+    colAge: 'Antigüedad',
+    colReviewer: 'Revisor',
+    colConflict: 'Conflicto',
+    unassigned: '—'
+  },
+  detail: {
+    reportId: 'ID reporte',
+    generated: 'Generado',
+    engineHeader: 'Motores',
+    publicViewTitle: 'Vista pública (exacta)',
+    publicViewHint: 'Así se mostraría al publicar',
+    internalReasonsTitle: 'Razones internas (no públicas)',
+    consequenceTitle: 'Consecuencia pública',
+    consequenceBody: 'Si se publica, este reporte será visible para el prospecto en el portal.',
+    perEngineTitle: 'Presencia por motor',
+    perEngineHint: 'Cada motor es un canal distinto — no se promedia.',
+    asOf: 'Medido',
+    staleWarning: 'Evidencia desactualizada — los motores cambian seguido.',
+    seeEvidence: 'Ver evidencia',
+    impact: 'Impacto en score',
+    close: 'Cerrar'
+  },
+  evidence: {
+    incompleteTitle: 'Evidencia incompleta',
+    incompleteBody: 'Faltan fuentes clave en algunas dimensiones evaluadas.',
+    abstainedTitle: 'Datos insuficientes',
+    abstainedBody: 'El grader se abstuvo: la evidencia no alcanza para un diagnóstico confiable. No se publica por defecto.'
+  },
+  decision: {
+    rejectReasonLabel: 'Motivo del rechazo (requerido)',
+    rejectReasonPlaceholder: 'Selecciona o escribe el motivo del rechazo…',
+    rejectReasonRequired: 'Este campo es requerido para rechazar el reporte.',
+    approve: 'Aprobar publicación',
+    approveHint: 'Publica el reporte tal como está',
+    reject: 'Rechazar reporte',
+    rejectHint: 'Devuelve el reporte para corrección',
+    commandStateTitle: 'Estado del comando',
+    pending: 'Pendiente',
+    approved: 'Aprobado',
+    rejected: 'Rechazado',
+    conflict: 'Conflicto',
+    history: 'Historial de acciones'
+  },
+  conflict: 'Este reporte ya fue revisado por {reviewer} — actualizando la cola.',
+  states: {
+    emptyTitle: 'Sin reportes pendientes',
+    emptyBody: 'No hay diagnósticos esperando revisión.',
+    errorTitle: 'No pudimos cargar la cola',
+    permissionTitle: 'Sin acceso',
+    permissionBody: 'Necesitas la capability de revisión del grader.'
+  }
+} as const
