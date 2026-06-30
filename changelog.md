@@ -1,6 +1,28 @@
 # changelog.md
 
+## 2026-06-30
+
+- **TASK-1294 — Growth Forms renderer Turnstile `captchaToken` parity.** El renderer portable `<greenhouse-form>` ya puede declarar `RenderContract.security.captcha` browser-safe para Turnstile invisible, cargar la API explicit de Cloudflare de forma idempotente, ejecutar el challenge antes del submit y enviar `captchaToken` al endpoint público gobernado. `submitPublicForm()` incluye el token cuando existe y no expone secretos; si el token falla, el renderer no postea. AEO `/aeo-2/` sigue usando el bridge HTML hasta una task WordPress/visual separada con backup Elementor, `heroans` guard, Kinsta purge y Playwright/GVC.
+
+- **Public Website — AEO `/aeo-2/` proof/timing de `Por qué nosotros` corregidos.** Se ajustó CSS page-scoped (`gh-aeo-why-proof-surface-balance-v1`) para compactar el proof de marcas como bloque centrado y eliminar la doble superficie del callout `Ventaja de timing`. Cambio live aplicado con `Document::save()` sobre `postId=250265`; Home, hero y `/aeo` viejo no se tocaron; backup `_gh_aeo_backup_20260630_122440_why_proof_surface`, `heroans` intacto, Kinsta purgada y Playwright desktop/mobile 390 verificó `overflowX=0`, timing con una sola card visible y host del formulario aún transparente.
+
+- **Public Website — AEO `/aeo-2/` FAQ compacto, editorial y con motion fluida.** La seccion FAQ mantiene `ohio_accordion`, pero ahora usa tratamiento de lista editorial ligera: sin card exterior/interior, sin rail teal en la respuesta, separadores inset y padding interno en filas. El copy fue reescrito como preguntas orientadas a decisión/objeción y el header paso a `Antes de avanzar` / `Respuestas claras para decidir`, evitando el cierre generico `Preguntas frecuentes`. El nodo `FAQPage` del JSON-LD `@graph` quedó sincronizado con el contenido visible. El inicializador vigente `gh-aeo-faq-accordion-init-v5` abre un item cerrando los demas y permite cerrar el activo con segundo click; verificado desktop/mobile 390/reduced-motion con `faqSchemaCount=9`, `activeIndex=-1`, `aria-expanded=false`, `box-shadow:none`, `border:0`, `border-left:0` en body y sin overflow horizontal.
+
+- **Public Website Skills — `efeonce-public-site-wordpress` ahora es router escalable.** La skill principal dejó de almacenar toda la memoria operativa inline y pasó a una matriz de carga compacta; el detalle vive en referencias por workflow, Elementor, Growth Forms, Content Factory/Gutenberg, custom widgets, incidentes de layout, runtime/discovery y fichas por landing (`aeo`, `agencia-creativa`, `hubspot-services`). Se documentó el contrato en `GREENHOUSE_PUBLIC_SITE_SKILL_ROUTER_ARCHITECTURE_V1.md` y el manual `operar-public-site-skill-router.md`; copias Codex/Claude sincronizadas y validadas con `quick_validate.py`.
+
+- **Public Website / Growth Forms — AEO `/aeo-2/` bloquea correos no corporativos.** Se publicó la v2 del form `efeonce-aeo-diagnostic` (`fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657`) con `email.validator=corporate_email` y `emailPolicy.block_field`, deprecando la v1. El bridge HTML de WordPress ahora llama `/verify-email` antes de Turnstile; Gmail/free/disposable muestra error y no dispara `/submit`. Cambio live aplicado con `Document::save()` solo sobre el widget `convers`, backup `_gh_backup_before_aeo_growth_form_email_gate_20260630T101746Z`, Kinsta purgado, `heroans` intacto y Playwright desktop/mobile 390px verificó `verify=1`, `submit=0`, `overflowX=0`.
+
+- **Public Website / Growth Forms — AEO `/aeo-2/` conectado a HubSpot real.** Se creó el formulario gobernado `efeonce-aeo-diagnostic` + surface `fhsf-efeonce-aeo-diagnostic`, apuntando por adapter HubSpot secure-submit al form `AEO - Lead Form` (`8649e76c-8b01-41f3-9b0c-5713d7b4dba6`). La card de conversión de `/aeo-2/` ahora envía al endpoint público de Growth Forms con Turnstile invisible; WordPress no captura datos. También se desplegó CORS público en Vercel prod (`greenhouse-qbxqrrzpm`) para `efeoncepro.com`, se purgó Kinsta y Playwright verificó desktop/mobile sin overflow, form nuevo presente, `heroans` intacto y browser fetch sin token devolviendo `captcha_failed/missing_token`.
+
 ## 2026-06-29
+
+- **Public Website — AEO `/aeo-2/` FAQ migrado a `ohio_accordion`.** La sección `Preguntas frecuentes` dejó el `text-editor` con `<details>` y ahora usa la primitive canónica Ohio `ohio_accordion` (`faqlist`, 9 tabs, primera pregunta abierta). Se agregó estilo page-scoped para una superficie única de FAQ y un inicializador scoped para asegurar apertura/cierre y ARIA en el frontend público. Hotfix posterior: el handler Ohio dejaba `visible` sin `active` y colapsaba el panel a altura 0; el inicializador v2 captura el click y fija estado/ARIA de forma consistente. Cambio live aplicado con `Document::save()` sobre `postId=250265`; Home no se tocó; `heroans` permaneció estable (`md5=e0b951b2456a83578cd9e22005900521`), backups meta creados, cache Kinsta purgada y Playwright desktop/mobile/reduced-motion confirmó `hasAccordion=true`, `hasDetails=false`, click funcional en fila/icono/título, `overflowX=0` y motion reducido.
+
+- **Public Website — AEO `/aeo-2/` sección `Por qué nosotros` optimizada.** La sección posterior al diagnóstico quedó rediseñada como argumento comparativo: H2 con acento teal en `Cerrarlo`, cards `Medir por tu cuenta` vs `Surround Discovery`, banda navy de objeción honesta, proof strip con marcas LatAm, credenciales de HubSpot/método propio y callout de ventaja de timing. Cambio live aplicado con `Document::save()` sobre `postId=250265`; Home no se tocó; `heroans` permaneció estable (`md5=e0b951b2456a83578cd9e22005900521`), backups meta creados, cache Kinsta purgada y Playwright desktop/mobile/reduced-motion confirmó `overflowX=0`, cards alineadas y motion desactivado correctamente.
+
+- **Public Website — AEO `/aeo-2/` sección diagnóstico optimizada.** La sección `Tu Diagnóstico de Visibilidad en IA` pasó de una lista grande dentro de un contenedor único a un bloque de 4 entregables en grid responsive, con jerarquía más escaneable, labels de salida (`Score por motor`, `Mapa competitivo`, `Prompts críticos`, `Primeros movimientos`) y una banda navy de lectura experta. Cambio live aplicado con `Document::save()` sobre `postId=250265`; Home no se tocó; `heroans` permaneció estable (`md5=e0b951b2456a83578cd9e22005900521`), backups meta creados, cache Kinsta purgada y Playwright desktop/mobile confirmó `overflowX=0`, cards alineadas y letter-spacing normal en títulos internos/labels.
+
+- **Public Website — AEO `/aeo-2/` letter-spacing global normalizado.** Se auditó toda la landing AEO y se agregó CSS page-scoped (`gh-aeo-global-letter-spacing-system`) para reservar tracking de display solo a H1/H2 y dejar el resto de textos en `letter-spacing: normal/0` sin uppercase forzado: eyebrows, labels, chips, source marks, años, body copy, H3/H4, CTAs y FAQ. Cambio aplicado con `Document::save()` sobre `postId=250265`; Home no se tocó; `heroans` permaneció estable (`md5=e0b951b2456a83578cd9e22005900521`), backup meta creado, cache Kinsta purgada y Playwright desktop/mobile confirmó `suspiciousCount=0`, `uppercaseCount=0`, `overflowX=0`.
 
 - **Public Website — AEO `/aeo-2/` proof HubSpot alineado al Home.** En el hero AEO se reemplazo el primer chip `HubSpot Solutions Partner` por el patron real del Home: wordmark inline `HubSpot` blanco (`hubspot-logotype.svg`) + `Solutions Partner`, dejando `+120 marcas` y paises como chips secundarios. Se agrego CSS page-scoped para que `.gh-aeo-hubspot-partner` no herede fondo/padding/borde de badge. El modulo derecho `heroans` quedo intacto (`md5=e0b951b2456a83578cd9e22005900521`), cache Kinsta purgada y verificacion Playwright desktop/mobile sin overflow.
 
@@ -9335,3 +9357,40 @@ Foundation backend (reader-only, additive) de los dos readers operador-scoped qu
 ## 2026-06-29 — TASK-1275 Recommendation Execution-Status del Plan AEO (contrato backend) — EPIC-020
 
 Estado de ejecución del Plan AEO por organización × recomendación (gap key), persistente entre re-grades con `source_run_id` de provenance. Tabla `grader_recommendation_status` + history append-only, state machine `not_started|in_progress|blocked|done|dismissed` (`blocked`/`dismissed` con reason), command `setRecommendationStatus` (self-guard, idempotencia no-op, UPSERT+history+outbox transaccional) + reader gate-agnostic + capability + evento `recommendation_status_changed` + route parity. Desbloquea la vista operador (TASK-1276, write) y el follow-up cliente (TASK-1248, read). Sin push (local). Gates: typecheck + suite full (8479) + build + 10 focal + smoke PG.
+
+## 2026-06-30 — Public Site AEO `/aeo-2/`: conversion card preparada para Growth Forms
+
+- Reemplazado el placeholder de `Solicita tu diagnóstico` por una card estilo Growth Forms con los campos del diagnóstico AEO: nombre, email corporativo, marca/sitio, país, tamaño de empresa y competidor principal opcional.
+- El CTA vivo apunta a HubSpot Meetings para evitar capturas falsas mientras producción mantiene apagados el render contract público de Growth Forms y el intake AEO (`No disponible` / `outcome=disabled`).
+- Guardado vía Elementor `Document::save()`, backups meta creados, Kinsta cache purgada y `heroans` preservado con hash `e0b951b2456a83578cd9e22005900521`.
+- Verificado con Playwright desktop/mobile: campos visibles, CTA/privacidad correctos y sin overflow en 1440px ni 390px.
+
+## 2026-06-30 — Public Site AEO `/aeo-2/`: Growth Forms inline validation
+
+- El bridge temporal AEO ahora replica validación reactiva de Growth Forms: errores inline por campo, `aria-invalid`/`aria-describedby`, verificación `/verify-email` debounced junto al email y success del email solo tras verificación corporativa remota.
+- Gmail/free/disposable queda bloqueado antes de Turnstile y sin `/submit`; los requeridos vigentes (`firstName`, `email`, `brandWebsite`) muestran su error en campo, mientras `country` y `companySize` siguen opcionales según el contrato publicado.
+- Guardado vía Elementor `Document::save()`, Kinsta cache purgada y `heroans` preservado con hash `e0b951b2456a83578cd9e22005900521`; verificado con Playwright desktop/mobile 390px sin overflow.
+
+## 2026-06-30 — Public Site AEO `/aeo-2/`: conversión single-surface
+
+- La sección de conversión recuperó fondo propio como banda clara antes del FAQ, sin reintroducir card exterior alrededor del formulario.
+- `.gh-aeo-form-card` queda como host transparente sin borde/sombra/padding; `.gh-aeo-growth-form-card` es la única card visible.
+- Se removió el kicker técnico `Growth Forms · Diagnóstico AEO` del HTML público y se verificó desktop/mobile 390px sin overflow, sin kicker y con validación reactiva intacta.
+
+## 2026-06-30 — Public Site AEO `/aeo-2/`: cohesión visual post-hero
+
+- Se unificó la landing desde `market` hasta `FAQ` sin tocar el hero: bandas alternadas, títulos/lead/cards con escala común y motion reducida respetada.
+- Los 7 eyebrows post-hero ahora son widgets Ohio `ohio_badge` (`.ohio-widget.badge.-outlined`) en vez de texto con líneas decorativas; se eliminaron pseudo-elementos duplicados.
+- Se corrigió el tracking de la sección/formulario de conversión: el H2 y el título interno `Solicita tu diagnóstico` computan `letter-spacing:-0.045em`, mientras lead/labels/inputs/CTA/trust quedan `normal/0`.
+- Se documentó como drift frecuente de Ohio/Elementor que el título del form puede quedar en `letter-spacing:normal` cuando reglas `!important` o el bridge `.gh-aeo-growth-form-card *{letter-spacing:0}` pisan la regla correcta; la verificación requerida es computed style desktop/mobile.
+- Se agregó el gate durable `pnpm public-website:verify-aeo-form-typography`, que falla si el título interno del formulario vuelve a `normal/0`, si los textos utilitarios dejan de ser `normal/0`, o si aparece overflow en desktop/mobile 390px.
+- Se elevó `greenhouse-gvc-playwright` como skill obligatoria para landings públicas WordPress/Elementor: se usa la disciplina Webwright de observar antes de autorar y medir computed styles, sin adoptar el runtime libre de Webwright.
+- Se instaló Webwright como plugin local de Codex (`webwright@webwright-local`) mediante marketplace adaptador, con runtime Python + Playwright Firefox/Chromium verificado. Webwright queda como ayuda de exploración/autoría; GVC/Playwright repo-level siguen siendo el cierre durable.
+- Se preservó `heroans` con hash HTML `e0b951b2456a83578cd9e22005900521`, se purgó Kinsta y se verificó desktop/mobile 390px sin overflow, FAQ funcional y Growth Forms reactivo intacto.
+
+## 2026-06-30 — Growth Forms AEO: renderer Turnstile parity + v3 security metadata
+
+- TASK-1294 agregó soporte transversal de Turnstile al renderer portable: `RenderContract.security.captcha`, loader invisible idempotente y `captchaToken` en el payload de submit.
+- TASK-1296 publicó la versión AEO v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b` con `ui_policy_json.security.captcha`, copió el destination HubSpot y deprecó v2 sin tocar WordPress/Elementor.
+- Smoke live: `GET` público devuelve v3 con ACAO, y `POST` sin token sigue fallando cerrado con `captcha_failed/missing_token`. La serialización de `security` en el `GET` público queda pendiente del deploy del código de TASK-1294.
+- TASK-1295 quedó creada para separar la arquitectura Growth Forms en router + docs temáticos + `HISTORIAL.md`, evitando que el doc principal siga creciendo como historial append-only.

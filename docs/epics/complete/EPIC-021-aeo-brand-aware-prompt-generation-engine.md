@@ -1,12 +1,14 @@
 # EPIC-021 — AEO Brand-Aware Prompt Generation Engine
 
+> **COMPLETE 2026-06-30.** Las 5 child tasks (TASK-1288…1292) están complete; motor + guard + eval deployados a `main` con flags ON en Production (release `056c2dde8`) y staging (parity flip + redeploy `greenhouse-bt9fvga8d`). **Cerró ISSUE-110** (→ `resolved/`). Smoke staging verde (`operator_gate_blocking=ok`, 0 prospectos no graduables). Follow-up vigente: UI de review operador (`ui-ux`).
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `growth`
 - Owner: `unassigned`

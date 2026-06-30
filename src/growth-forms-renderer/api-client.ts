@@ -138,6 +138,7 @@ export interface SubmitPayload {
   referrer?: string
   idempotencyKey?: string
   formVersionId?: string
+  captchaToken?: string
 }
 
 /** Envía la submission al endpoint público gobernado. Mapea network error → outcome `invalid`. */
@@ -160,6 +161,7 @@ export const submitPublicForm = async (
     referrer: payload.referrer,
     honeypot: payload.honeypot,
     idempotencyKey: payload.idempotencyKey,
+    captchaToken: payload.captchaToken,
   }
 
   let response: Response

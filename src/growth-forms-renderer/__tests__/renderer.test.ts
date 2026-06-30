@@ -5,6 +5,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import type { RendererApiConfig } from '../api-client'
 import { FormRenderer } from '../renderer'
 import { conditionalContractFixture, multiStepContractFixture, staticContractFixture } from '../fixtures'
+import { resetTurnstileLoaderForTests } from '../turnstile'
 
 const api: RendererApiConfig = { baseUrl: 'https://gh.test', slug: 'ai-visibility-intake', surfaceId: 'wordpress-public' }
 
@@ -26,6 +27,8 @@ describe('growth-forms-renderer · FormRenderer', () => {
   beforeEach(() => {
     document.body.replaceChildren()
     ;(window as unknown as { dataLayer?: unknown[] }).dataLayer = []
+    ;(window as unknown as { turnstile?: unknown }).turnstile = undefined
+    resetTurnstileLoaderForTests()
     window.localStorage.clear()
   })
 
@@ -447,5 +450,99 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.querySelector<HTMLInputElement>('[name="national_id"]')!.value).toBe('')
     // Aviso de borrador recuperado visible.
     expect(root.querySelector('.ghf-draft-note')).not.toBeNull()
+  })
+
+  // ─── TASK-1294 — Turnstile captchaToken parity ──────────────────────────────
+
+  const captchaContract = () =>
+    staticContractFixture({
+      fields: [
+        { key: 'work_email', type: 'email', label: 'Correo', required: true, autocomplete: 'email' },
+        { key: 'brand', type: 'text', label: 'Marca', required: true },
+      ],
+      consent: undefined,
+      security: {
+        captcha: {
+          provider: 'turnstile',
+          required: true,
+          mode: 'invisible',
+          siteKey: 'site-key-public',
+          execution: 'submit',
+        },
+      },
+    })
+
+  const fillCaptchaContract = (root: HTMLElement) => {
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'lead@brand.com'
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.dispatchEvent(new Event('input'))
+    root.querySelector<HTMLInputElement>('[name="brand"]')!.value = 'Brand'
+    root.querySelector<HTMLInputElement>('[name="brand"]')!.dispatchEvent(new Event('input'))
+  }
+
+  const installTurnstile = (mode: 'success' | 'error' = 'success') => {
+    let callbacks: { callback: (token: string) => void; 'error-callback': () => void } | null = null
+
+    const render = vi.fn((_container: HTMLElement, options: typeof callbacks & { sitekey: string }) => {
+      callbacks = options
+
+      return 'widget-1'
+    })
+
+    const execute = vi.fn(() => {
+      if (!callbacks) throw new Error('missing callbacks')
+      if (mode === 'success') callbacks.callback('captcha-token')
+      else callbacks['error-callback']()
+    })
+
+    const reset = vi.fn()
+
+    ;(window as unknown as { turnstile: unknown }).turnstile = { render, execute, reset }
+
+    return { render, execute, reset }
+  }
+
+  it('executes Turnstile before submit and sends captchaToken', async () => {
+    const turnstile = installTurnstile()
+    const fetchImpl = okFetch()
+    const { root } = mountInto(captchaContract(), fetchImpl)
+
+    fillCaptchaContract(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+    await vi.waitFor(() => expect(root.querySelector('[role="status"]')?.textContent).toContain('Listo'))
+
+    const body = JSON.parse((fetchImpl as unknown as { mock: { calls: Array<[string, { body: string }]> } }).mock.calls[0][1].body)
+
+    expect(body.captchaToken).toBe('captcha-token')
+    expect(turnstile.render).toHaveBeenCalledTimes(1)
+    expect(turnstile.execute).toHaveBeenCalledWith('widget-1')
+    expect(turnstile.reset).toHaveBeenCalledWith('widget-1')
+  })
+
+  it('does not POST when Turnstile token acquisition fails', async () => {
+    installTurnstile('error')
+    const fetchImpl = okFetch()
+    const { root } = mountInto(captchaContract(), fetchImpl)
+
+    fillCaptchaContract(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+    await vi.waitFor(() => expect(root.querySelector('[data-ghf-summary]')?.textContent).toBeTruthy())
+
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
+  it('reuses the same Turnstile widget across failed submit retries', async () => {
+    const turnstile = installTurnstile()
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ outcome: 'invalid' }), { status: 400 })) as unknown as typeof fetch
+    const { root } = mountInto(captchaContract(), fetchImpl)
+
+    fillCaptchaContract(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+    await vi.waitFor(() => expect(fetchImpl).toHaveBeenCalledTimes(1))
+
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+    await vi.waitFor(() => expect(fetchImpl).toHaveBeenCalledTimes(2))
+
+    expect(turnstile.render).toHaveBeenCalledTimes(1)
+    expect(turnstile.execute).toHaveBeenCalledTimes(2)
   })
 })

@@ -124,6 +124,18 @@ export interface RendererSurfacePolicy {
   rendererChannel?: 'stable' | 'beta' | 'preview'
 }
 
+export interface RendererCaptchaSecurity {
+  provider: 'turnstile'
+  required?: boolean
+  mode: 'invisible'
+  siteKey: string
+  execution: 'submit'
+}
+
+export interface RendererSecurity {
+  captcha?: RendererCaptchaSecurity
+}
+
 export interface RendererTelemetryPolicy {
   enabled?: boolean
   allowedEvents?: string[]
@@ -150,6 +162,7 @@ export interface RenderContract {
   successBehavior: RendererSuccessBehavior
   styleVariant?: string
   surfacePolicy: RendererSurfacePolicy
+  security?: RendererSecurity
   telemetryPolicy: RendererTelemetryPolicy
 }
 

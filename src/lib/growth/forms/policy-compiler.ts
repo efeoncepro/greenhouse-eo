@@ -19,6 +19,7 @@ import {
   consentDisplaySchema,
   destinationPlanEntrySchema,
   fieldDefinitionSchema,
+  renderSecuritySchema,
   successBehaviorSchema,
   telemetryPolicySchema,
 } from './contracts'
@@ -145,6 +146,24 @@ export const compileFormVersion = (
   // — Composición —
   const composition = (typeof uiPolicy.composition === 'string' ? uiPolicy.composition : 'static') as CompositionMode
 
+  const securityCandidate =
+    asObject(uiPolicy.security).captcha !== undefined
+      ? asObject(uiPolicy.security)
+      : asObject(uiPolicy.captcha).provider !== undefined
+        ? { captcha: asObject(uiPolicy.captcha) }
+        : undefined
+
+  const securityParsed = securityCandidate ? renderSecuritySchema.safeParse(securityCandidate) : null
+
+  if (securityParsed && !securityParsed.success) {
+    addWarning({
+      code: 'security_captcha_invalid',
+      dimension: 'policy',
+      message: 'configuración de captcha inválida o incompleta',
+      blocking: options.forPublication === true,
+    })
+  }
+
   // — Render contract (browser-safe) —
   const renderContract: RenderContract | null = successParsed.success
     ? {
@@ -168,6 +187,7 @@ export const compileFormVersion = (
           allowedOrigins: [],
           rendererChannel: 'stable',
         },
+        ...(securityParsed?.success ? { security: securityParsed.data } : {}),
         telemetryPolicy: telemetryPolicySchema.parse(asObject(version.analytics_policy_json)),
       }
     : null

@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.1 — 2026-06-25 (Codex, TASK-1232)
+> **Version:** 1.2 — 2026-06-30 (Codex, AEO `/aeo-2/` live bridge)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -18,7 +18,7 @@ Operar (prender, verificar, revertir) el motor de formularios publicos de Growth
 5. Usa las acciones gobernadas: **Enviar a review**, **Publicar**, **Deprecar**, **Archivar** y **Ejecutar dispatch**.
 6. Para auditoría, abre **Ver evidencia** y revisa consent snapshot, delivery attempts, retry state y errores.
 
-El cockpit consume los mismos Product APIs/readers del motor. No reemplaza smoke público: antes de producción hay que validar WordPress/dataLayer contra un form genérico renderizado por `<greenhouse-form>`.
+El cockpit consume los mismos Product APIs/readers del motor. No reemplaza smoke público: AEO `/aeo-2/` ya valida el motor público con un bridge HTML Turnstile, pero antes de generalizar producción hay que validar WordPress/dataLayer contra un form genérico renderizado por `<greenhouse-form>`.
 
 ## Los tres flags
 
@@ -32,7 +32,7 @@ El motor depende de tres flags independientes. Para que funcione punta a punta l
 
 **Verdad live:** `vercel env ls` (flag Vercel) + `gcloud run services describe ops-worker --region=us-east4` (flags worker). El ledger es el estado humano, no la verdad.
 
-**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = OFF hasta release/sign-off + smoke WordPress/dataLayer.
+**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; desde TASK-1294 `<greenhouse-form>` ya emite `captchaToken` cuando el contract declara Turnstile, y desde TASK-1296 AEO v3 declara `ui_policy_json.security.captcha`. No asumir rollout generico hasta desplegar el codigo que serializa `security` en el `GET` publico y pasar smoke WordPress/dataLayer con un form generico real.
 
 ## Prender en un environment
 
@@ -82,7 +82,7 @@ Señales reliability (en `/admin/operations`): `growth.forms.dead_letter_count`,
 
 ## Que NO hacer
 
-- No prender el publico en produccion sin form generico publicado, host surface autorizado, smoke WordPress/dataLayer y sign-off — el endpoint quedaria abierto sin evidencia real de operación.
+- No generalizar el publico en produccion sin form publicado, host surface autorizado, CORS revisado, Turnstile operativo, smoke WordPress/dataLayer y sign-off. La excepcion vigente es AEO `/aeo-2/`, que sigue usando host bridge HTML aunque el renderer ya emite `captchaToken` y el form v3 ya declara `security.captcha`; migrarlo requiere task WordPress/visual separada.
 - No llamar a HubSpot inline desde el submit: la entrega SIEMPRE corre en el dispatcher async (overlay #3).
 - No reintentar manualmente una submission `delivered` (duplica el lead en HubSpot — secure-submit NO es idempotente).
 

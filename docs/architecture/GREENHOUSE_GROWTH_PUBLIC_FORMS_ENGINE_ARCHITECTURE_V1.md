@@ -1257,6 +1257,16 @@ Shippeado el runtime del §19 (renderer portable + adapters de host), local-firs
 - **Decisiones** (arch-architect + a11y-architect + forms-ux): vanilla TS + esbuild static asset (boring-tech, no Lit); **light DOM + ElementInternals** (IDREF/`role=alert` no cruzan shadow boundary — causa #1 de a11y rota; autofill nativo). `autocomplete`/`inputMode` ya vienen del contract (sin dependencia upstream). Máscara display derivada por type/inputMode (envía crudo).
 - **Estado**: code-complete, **rollout pendiente** — el render/submit público sigue gated por `GROWTH_FORMS_PUBLIC_API_ENABLED` (default OFF) y requiere un form publicado + host surface con origin allowlist (TASK-1232). El smoke real WordPress/Astro contra staging queda condicionado a ese flip + a publicar un form. Sin flag nuevo (reusa el de 1229). **Follow-up**: bloque Gutenberg equivalente para páginas no-Elementor; migración del lead magnet del grader (TASK-1241) a este renderer = first migration de TASK-1232.
 
+## Delta 2026-06-30 — TASK-1294: renderer Turnstile `captchaToken` parity (§19/§20)
+
+El renderer portable cierra el gap que obligaba a hosts públicos a copiar un bridge HTML para Turnstile:
+
+- **Contrato browser-safe:** `render_contract.security.captcha` declara sólo metadata pública (`provider:"turnstile"`, `mode:"invisible"`, `execution:"submit"`, `required`, `siteKey`). `TURNSTILE_SECRET`, destination mapping, HubSpot GUIDs y property names siguen server-only.
+- **Renderer:** `<greenhouse-form>` carga `https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit` de forma idempotente, renderiza un widget invisible fuera del layout, ejecuta el challenge antes del POST y envía `captchaToken` al submit gobernado. Si no obtiene token, no postea.
+- **API:** `SubmitPayload.captchaToken` se serializa en `POST /api/public/growth/forms/{slug}/submit`; `submitForm` conserva la verificación server-side/fail-closed a través del port compartido `src/lib/growth/public-submission/`.
+- **Compatibilidad:** forms sin `security.captcha` mantienen el comportamiento previo. No hay migración DB ni flag nuevo.
+- **AEO:** `/aeo-2/` sigue en bridge HTML hasta una task UI/WordPress separada con backup Elementor, `heroans` hash guard, Kinsta purge, Playwright desktop/mobile 390 y smoke dataLayer/runtime. El soporte de token en el renderer es condición necesaria, no cutover live automático.
+
 ## Delta 2026-06-25 — TASK-1251: primer consumer del evento de submission + projection domain `growth` (code complete dev)
 
 El AI Visibility Grader es el **primer form real migrado al motor** (de facto la first-migration de TASK-1232): sembrado como `form_definition` gobernado `fdef-ai-visibility-grader` con su `form_version` publicada (FK anchor — no se renderiza por el GET genérico; tiene su página propia TASK-1241) + `host_surface`.

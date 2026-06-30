@@ -1994,3 +1994,25 @@ diseño: la eval son **dos capas ortogonales**, no una.
 cada lectura del reliability overview. Con esta red verde, el flip de los flags `ARCHETYPE_PROMPTS`/`PROMPT_AUTHORING` y la
 reabilitación del cross-sell (TASK-1291) quedan habilitados con confianza (gateados por sign-off comercial/legal + el smoke
 real de la Capa B).
+
+## Delta 2026-06-30 — EPIC-021 ROLLOUT + cierre (ISSUE-110 resuelto) · EPIC-021
+
+**EPIC-021 quedó operativamente completo (no solo code-complete).** El motor brand-aware (TASK-1288 categoría canónica +
+TASK-1289 eje `business_model` + TASK-1290 packs por arquetipo) + el guard del operador (TASK-1291 `assertSubjectGradeable`) +
+la eval de cobertura (TASK-1292) están **deployados a `main` y con sus flags ON en Production** (release `056c2dde8`, flip masivo
+Growth/AEO, redeploy `greenhouse-ic8cg4ery`) **y en staging** (parity flip 2026-06-30 + redeploy `greenhouse-bt9fvga8d`).
+
+- **Flags EPIC-021 ON en prod + staging:** `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED`, `PROMPT_AUTHORING_ENABLED`,
+  `BRAND_INTELLIGENCE_ENABLED`, `CATEGORY_GUARD_ENABLED`, `OPERATOR_SEND_ENABLED` (re-enable de la cross-sell), `LLM_EXTRACTION`,
+  `PROSE_EXTRACTION_SHADOW`, `REGRADE`. development a parity 30/30 (perplexity/google_aio held-off por creds expuestas, rotación
+  TASK-1293). Verdad live: `vercel env ls`. Ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Re-enable seguro, no a ciegas:** el guard `assertSubjectGradeable` ya estaba en `main` ANTES del flip → reabilitar
+  `OPERATOR_SEND` no reintrodujo el riesgo del falso-0. Smoke staging (post-redeploy): signal
+  `growth.ai_visibility.operator_gate_blocking` = `ok`, `operator_send_enabled=true`, `prospect_ungradeable=0`, `org_linked=2`
+  ("todos los prospectos enlazados pasan el gate"). SKY scorea con prompts de consumo (TASK-1290 smoke: 15 prompts, 0 agency leak).
+- **ISSUE-110 → `resolved/`.** El falso-0 a marcas de consumo/no-agencia queda cerrado por el conjunto de las 5 tasks.
+- **Residual menor (no bloqueante):** el re-enable se hizo bajo aceptación de riesgo del operador (no un sign-off legal formal
+  documentado aparte); el smoke E2E del SEND con email real a un prospecto no se disparó (evitar spam) — el guard + el signal
+  steady son la evidencia. Si comercial/legal exige sign-off formal del outbound, queda como follow-up de TASK-1279.
+- **Follow-up vigente:** la UI de review operador (confirmar categoría/arquetipo + preview de prompts antes de correr sobre un
+  prospecto) sigue como task `ui-ux` dentro del alcance EPIC-021.

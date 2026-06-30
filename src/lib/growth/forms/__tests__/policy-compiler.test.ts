@@ -122,6 +122,37 @@ describe('render_contract — browser-safe', () => {
 
     expect(result.destinationPlan?.destinations[0]?.mapping).toEqual({ hubspot_prop: 'email' })
   })
+
+  it('can expose browser-safe Turnstile metadata without exposing secrets', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({
+        ui_policy_json: {
+          security: {
+            captcha: {
+              provider: 'turnstile',
+              required: true,
+              mode: 'invisible',
+              siteKey: '0x-public-site-key',
+              execution: 'submit',
+            },
+          },
+        },
+      }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(true)
+    expect(result.renderContract?.security?.captcha).toEqual({
+      provider: 'turnstile',
+      required: true,
+      mode: 'invisible',
+      siteKey: '0x-public-site-key',
+      execution: 'submit',
+    })
+    expect(JSON.stringify(result.renderContract).toLowerCase()).not.toContain('secret')
+  })
 })
 
 describe('telemetry contract', () => {
