@@ -525,6 +525,17 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    // TASK-1247 — Admin Review UI del AEO Grader (gate humano pre-publicación, EPIC-020 F).
+    // Sembrado SOLO a efeonce_admin + ai_tooling_admin (mismos roles con la capability
+    // growth.ai_visibility.report.review). NUNCA client_* (YMYL / gate interno).
+    viewCode: 'administracion.growth_ai_visibility',
+    section: 'administracion',
+    label: 'AEO Grader',
+    description: 'Revisión humana de reportes de visibilidad en IA antes de publicarlos a un prospecto.',
+    routePath: '/admin/growth/ai-visibility',
+    routeGroup: 'admin'
+  },
+  {
     // TASK-873 Slice 4 — Workforce Activation workspace V1 (esqueleto admin governance).
     //
     // **Surface canonical**: este es el variant `admin governance / transitional`

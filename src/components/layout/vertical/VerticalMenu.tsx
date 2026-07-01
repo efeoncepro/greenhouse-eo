@@ -244,16 +244,32 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       })
     }
 
-    if (canSeeView('administracion.growth_forms', isAdminUser)) {
+    const canSeeGrowthForms = canSeeView('administracion.growth_forms', isAdminUser)
+    const canSeeGrowthAiVisibility = canSeeView('administracion.growth_ai_visibility', isAdminUser)
+
+    if (canSeeGrowthForms || canSeeGrowthAiVisibility) {
       menuData.push({
         label: nl(GH_INTERNAL_NAV.growth),
         icon: 'tabler-growth',
         children: [
-          {
-            label: nl(GH_INTERNAL_NAV.growthForms),
-            href: '/admin/growth/forms',
-            icon: 'tabler-forms'
-          }
+          ...(canSeeGrowthForms
+            ? [
+                {
+                  label: nl(GH_INTERNAL_NAV.growthForms),
+                  href: '/admin/growth/forms',
+                  icon: 'tabler-forms'
+                }
+              ]
+            : []),
+          ...(canSeeGrowthAiVisibility
+            ? [
+                {
+                  label: nl(GH_INTERNAL_NAV.growthAiVisibility),
+                  href: '/admin/growth/ai-visibility',
+                  icon: 'tabler-robot'
+                }
+              ]
+            : [])
         ]
       })
     }

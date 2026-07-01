@@ -92,6 +92,7 @@ const enUS: NavigationCopy = {
     adminTeamOps: { label: 'Team and operations', subtitle: 'Talent, business lines and instruments' },
     growth: { label: 'Growth', subtitle: 'Demand capture, forms and growth operations' },
     growthForms: { label: 'Forms', subtitle: 'Public forms, submissions and destinations' },
+    growthAiVisibility: { label: 'AEO Grader', subtitle: 'Review AI visibility reports before delivery' },
     knowledge: { label: 'Knowledge', subtitle: 'Guides, sources and operational memory' },
     roadmap: { label: 'Roadmap', subtitle: 'Operational backlog: epics, tasks, mini-tasks and incidents' }
   },
