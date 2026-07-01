@@ -1,3 +1,21 @@
+## Sesion 2026-07-01 — TASK-1247 Admin Review UI del AEO Grader · runtime promotion — Claude — ✅ complete (local, sin push)
+
+> **Pedido:** completar el runtime del gate humano pre-publicación del AEO Grader (la sesión previa dejó el diseño/mockup verificado en GVC y el runtime como slice aparte).
+>
+> **Resultado:** ruta real `/admin/growth/ai-visibility` viva, gateada y alcanzable por nav **Growth → AEO Grader**. TASK-1247 → `complete` (movida a `complete/`).
+>
+> **Slices (rama `develop`, local-first):**
+> - **R1** `listPendingReportReviews` enriquecido — JOIN `grader_profiles` (brand/website/categoría/mercado) + `grader_scores` (overall_score/status/confidence/evidence) + `resolveSeverity` (SoT). Honra `null ≠ 0`. Live-test contra PG real (gate TASK-893). Commit `3088d8be6`.
+> - **R2** ruta + view runtime + page-guard doble puerta (viewCode + capability `report.review` **execute**). `AdminReviewView` (client): cola `GET /reviews` + drawer fetch `GET /runs/[runId]/report` (VM del `GraderReport` real) + approve/reject gobernado (reject exige motivo, `throwIfNotOk` canónico). Presentación extraída a `review/shared.tsx` (primitives severity-driven SoT) + `review/adapters.ts` (builders puros, 8 tests focales). Estados honestos loading/empty/error. Commit `665088398`.
+> - **R3** migración seed viewCode `administracion.growth_ai_visibility` (`view_registry` + `role_view_assignments` → efeonce_admin + ai_tooling_admin, DO block ≥2), **aplicada + verificada live**. VIEW_REGISTRY catalog + nav copy + VerticalMenu + reachability (0 orphans). Commit `b480a7a20`.
+> - **R4** GVC runtime desktop+mobile mirado (empty state honesto, nav activa) + `pnpm test` full **8625/0** + `pnpm build` prod **exit 0**. Commit `a4bb86b24`.
+>
+> **Bug real destapado por GVC (lección):** `GH_INTERNAL_NAV` vive en `greenhouse-nomenclature.ts` (lo consume `VerticalMenu`), no en `greenhouse-navigation-copy.ts`. La key faltante hacía `nl(undefined).label` → **500 en TODO el dashboard**. typecheck+lint pasaban; solo mirar el frame real del bundle lo atrapó. Fix en la SoT correcta.
+>
+> **Decisión de diseño runtime:** la evidencia per-motor (anti-falso-0) vive en el DRAWER (fetch del report), no en cada fila de la cola (evita construir N reports); la cola muestra triage barato (brand/dominio/score/severidad/razones). El mockup queda como harness de diseño congelado; el runtime usa el módulo compartido canónico.
+>
+> **Rollout:** code complete + verificado local, **sin push** (local-first). Capability + viewCode ya sembrados → no requiere flag nuevo; se activa en staging/prod con el próximo release del control plane. **Nota Codex:** commits acotados a mis archivos (`git add` explícito por path, nunca `-A`); el registry/README tenían solo mis filas de TASK-1247.
+
 ## Sesion 2026-07-01 — Growth Forms public-site skills sync — Codex — ✅ docs/skills
 
 > **Pedido:** confirmar si las skills `efeonce-public-site-wordpress` y `greenhouse-growth-forms` quedaron actualizadas con todo lo agregado al motor/formulario AEO.

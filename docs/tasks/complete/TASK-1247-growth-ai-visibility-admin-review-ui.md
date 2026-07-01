@@ -1,6 +1,19 @@
 # TASK-1247 — Growth AI Visibility: Admin Review UI
 
-## Delta 2026-07-01 — DISEÑO COMPLETO (mockup runtime + GVC en loop); runtime promotion pendiente (con hallazgo)
+## Delta 2026-07-01 (PM) — RUNTIME PROMOTION COMPLETA · ship done
+
+**Estado: `complete`.** La ruta real `/admin/growth/ai-visibility` está viva, gateada, alcanzable por nav y verificada en GVC (desktop+mobile). Cierra los 5 pasos del slice restante:
+
+- **[R1] Reader de cola enriquecido** — `listPendingReportReviews` (`review/queries.ts`) ahora hace JOIN a `grader_profiles` (brand/website/categoría/mercado) + `grader_scores` (overall_score/status/confidence/evidence) y deriva severidad con el resolver canónico `resolveSeverity` (SoT, sin drift). Honra `null ≠ 0`. Live-test contra PG real (gate TASK-893): SQL con JOINs válida + parse numérico OK (Sky Airlines 36.1, Vercel 33.3, "0.0"→0). El hallazgo "reader lean" del delta AM queda **resuelto** — sí era delta backend, hecho como backend-lite.
+- **[R2] Ruta real + view runtime** — `page.tsx` con page-guard de doble puerta (viewCode `administracion.growth_ai_visibility` + capability `growth.ai_visibility.report.review` acción **`execute`**). `AdminReviewView.tsx` (client): cola desde `GET /reviews` + drawer que hace fetch de `GET /runs/[runId]/report` al abrir (VM desde el `GraderReport` real) + acción gobernada approve/reject (reject exige motivo) vía `throwIfNotOk` canónico. Estados honestos loading/empty/error + drawer loading/error. Presentación extraída a `review/shared.tsx` (primitives severity-driven, SoT) + `review/adapters.ts` (builders puros DTO→VM, 8 tests focales). **Decisión de diseño runtime:** la per-engine evidence (anti-falso-0) vive en el DRAWER (fetch del report), no en cada fila de la cola (evita construir N reports); la cola muestra brand/dominio/score/severidad/razones (triage barato). El mockup queda como harness de diseño congelado (verificado); el runtime usa el módulo compartido canónico.
+- **[R3] Governance + nav** — migración seed viewCode (`view_registry` + `role_view_assignments` → efeonce_admin + ai_tooling_admin, DO block threshold ≥2), aplicada + **verificada live** (registry active + 2 grants). VIEW_REGISTRY catalog TS + nav "Growth → AEO Grader" (sibling de Forms, gateada por cualquiera de las 2 vistas). Ruta menu-anchored → `route-reachability-gate` verde (0 orphans).
+- **[R4] Verificación** — GVC runtime desktop+mobile mirado (empty state honesto, nav activa, guard OK); test focal adapters 8/8; `pnpm test` full **8625 passed / 0 failed**; `pnpm build` prod **exit 0**.
+
+**⚠️ Bug real destapado por GVC (lección):** `GH_INTERNAL_NAV` vive en `greenhouse-nomenclature.ts` (lo consume `VerticalMenu`), NO en `greenhouse-navigation-copy.ts`. Agregar la key solo en navigation-copy dejaba `nl(undefined).label` → **500 en TODO el dashboard** (VerticalMenu renderiza en cada página). typecheck+lint pasaban; solo mirar el frame real del bundle lo atrapó. Fix: key en la SoT correcta. Refuerza `[[feedback_verify_visual_root_cause_prelive]]`.
+
+**Rollout:** code complete + verificado local. Sin push (local-first). El runtime queda operativo en dev; en staging/prod se activa con el próximo release del control plane (no requiere flag nuevo — capability + viewCode ya sembrados).
+
+## Delta 2026-07-01 (AM) — DISEÑO COMPLETO (mockup runtime + GVC en loop); runtime promotion pendiente (con hallazgo)
 
 **Estado: design complete, runtime promotion pendiente.** Se implementó la surface como **ruta real mockup** (`/admin/growth/ai-visibility/mockup`, `src/views/greenhouse/admin/growth/ai-visibility/mockup/AdminReviewMockupView.tsx`) y se iteró en loop GVC (desktop) con `product-design-loop` + `modern-ui` + `state-design` + `greenhouse-ux-writing`. Commits: Slice 1 (mockup base) → Slice 2 (drawer overlay + pase estético) → Slice 3 (estados empty/abstención/conflicto) → Slice 4 (loading/permission + hover/a11y).
 
@@ -60,14 +73,14 @@ El backend del gate humano ya existe — esta UI es cliente puro de él (Full AP
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1247-growth-ai-visibility-admin-review-ui.md`
 - Flow: `docs/ui/flows/TASK-1247-growth-ai-visibility-admin-review-ui-flow.md`
 - Motion: `docs/ui/motion/TASK-1247-growth-ai-visibility-admin-review-ui-motion.md`
@@ -252,6 +265,35 @@ Reglas obligatorias:
 - Accessibility/focus checks: focus order, aria labels, keyboard action.
 - Before/after evidence: N/A pagina nueva.
 - Known visual debt: depende del route shell admin existente.
+
+### Implementation mapping
+
+Mapeo superficie → archivos reales entregados (runtime):
+
+- **Ruta / guard:** `src/app/(dashboard)/admin/growth/ai-visibility/page.tsx` — server component, `getTenantContext` + `hasAuthorizedViewCode('administracion.growth_ai_visibility')` + `can(tenant, 'growth.ai_visibility.report.review', 'execute', 'tenant')`; redirect `/login` (sin tenant) / `/401` (sin acceso).
+- **View runtime:** `src/views/greenhouse/admin/growth/ai-visibility/review/AdminReviewView.tsx` — `CompositionShell composition='single'` + `AdaptiveSidecarLayout kind='reconciler' preferredMode='temporary'`. Cola vía `GET /api/admin/growth/ai-visibility/reviews`; drawer vía `GET /runs/[runId]/report`; acciones `POST /runs/[runId]/review/{approve,reject}` con `throwIfNotOk` canónico.
+- **Presentación compartida (SoT):** `review/shared.tsx` — `ScoreRing/ScoreBadge/Section/SummaryStat/StateBlock/QueueSkeleton/RetryButton` + helpers severity-driven (`severityColor/severityColorToken/severityBarColor/severityChipTone/severityRiskLabel`) sobre el enum real `GraderReportSeverity`.
+- **Adapters puros:** `review/adapters.ts` — `buildReportDetailVM(report, publicReport, queueRow)` + `accuracyConfidenceToSeverity` + `providerLabel`. Tests: `review/__tests__/adapters.test.ts` (8 casos).
+- **Reader de cola:** `src/lib/growth/ai-visibility/review/queries.ts::listPendingReportReviews` (enriquecido R1).
+- **Copy:** `src/lib/copy/growth.ts::GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW`.
+- **Governance:** migración `migrations/20260701112402304_task-1247-seed-ai-visibility-admin-review-view.sql` + `src/lib/admin/view-access-catalog.ts` + nav (`greenhouse-nomenclature.ts` `GH_INTERNAL_NAV.growthAiVisibility` + `greenhouse-navigation-copy.ts` + `VerticalMenu.tsx`).
+- **Primitive decision:** reuse total (CompositionShell + AdaptiveSidecarLayout reconciler + GreenhouseChip/Button/Breadcrumbs). Ninguna primitive nueva; los helpers locales de score/severidad se extrajeron a `review/shared.tsx` como SoT compartida (no fork del mockup).
+
+### GVC scenario plan
+
+- **Scenarios entregados:** `growth-ai-visibility-admin-review-runtime.scenario.ts` (desktop 1440×900) + `growth-ai-visibility-admin-review-runtime-mobile.scenario.ts` (390×844), ruta real `/admin/growth/ai-visibility`. Mockup (design harness congelado): `growth-ai-visibility-admin-review[.mobile]`.
+- **Readiness:** `[data-capture="admin-review-empty"]` (dev sin pendientes = estado empty honesto), `absentSelectors` skeleton + login-card; assertions `noLoginRedirect` + `noErrorBoundary`.
+- **`data-capture` markers:** `admin-review-queue`, `admin-review-detail`, `admin-review-actions`, `admin-review-empty`, `admin-review-error`, `admin-review-loading`, `admin-review-detail-error`.
+- **Evidencia mirada:** frames desktop + mobile del runtime revisados (nav activa Growth→AEO Grader, breadcrumb, KPIs Pendientes/Riesgo alto, empty state, sin overflow ni overlaps). Los estados poblados (cola + drawer) los cubre el mockup (mismos primitives compartidos). El empty runtime es el estado honesto en dev (todos los `review_required` ya decididos).
+
+### Design decision log
+
+- **Inspector = drawer overlay** (`reconciler` `preferredMode='temporary'`), NO push — decisión del operador (el push aplastaba la cola). La cola queda full-width; el detalle abre encima con backdrop/Escape/click-away.
+- **Per-engine anti-falso-0 en el DRAWER, no en la cola** — la evidencia decisoria (presencia por-motor) requiere el `GraderReport` completo (caro por fila); se fetchea al abrir el drawer donde ocurre la decisión. La cola muestra triage barato (brand/dominio/score/severidad/razones). Alinea con la doctrina seo-aeo: triage en la lista, evidencia en la superficie de decisión.
+- **Severidad = enum real `GraderReportSeverity` (4-valued)**, no un RiskTone 3-valued — honra `sin_dato` (`null ≠ 0`): score sin evidencia se pinta "—" neutro, nunca 0/rojo falso.
+- **Mockup congelado, runtime usa `shared.tsx` canónico** — el mockup (verificado en GVC en la sesión de diseño) queda como harness; la SoT de presentación productiva es `review/shared.tsx`. Se evita destabilizar el artefacto verificado.
+- **Reject exige motivo** (422 `reason_required` del command 1244); approve envía `reason` opcional. Errores 409 `not_reviewable`/`invalid_transition` se muestran con el prose es-CL canónico (sin "Reintentar" — son estructurales), y se refresca la cola.
+- **Bug de nav destapado por GVC:** la key de nav debía ir en `GH_INTERNAL_NAV` (`greenhouse-nomenclature.ts`), la SoT que consume `VerticalMenu` — no en `greenhouse-navigation-copy.ts`. Registrado como lección de "verificar el frame real del bundle".
 
 ## Backend/Data Contract
 
