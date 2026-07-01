@@ -6032,3 +6032,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - TASK-1298 AEO produjo salvaguardas reutilizables para `<greenhouse-form>` en hosts WordPress/Ohio: renderer hardening, preview live-safe en memoria, captura de estados y frame review pixel-aware.
 - Ese esfuerzo no se debe repetir completo para cada formulario. Nuevos Growth Forms usan flujo proporcional: identidad por `form-key`, smoke API, captcha/email gate cuando aplique, desktop/mobile 390 sin overflow y frame review visual.
 - `pnpm public-website:verify-aeo-prelive-contract` queda como gate estricto de AEO por su bridge restaurado, `heroans` protegido y rollback previo; para otros formularios se escala el patrón solo si el host/superficie lo justifica.
+
+## Delta 2026-06-30 — HubSpot Forms field upsert gobernado
+
+- Para agregar campos a un HubSpot form destino, usar `pnpm hubspot:forms:upsert-fields -- --config <json> [--apply]`.
+- El script lee la definición del form por HubSpot Forms API `2026-09-beta`, asegura CRM properties existentes o las crea solo si el config trae `createProperty`, y actualiza `fieldGroups` preservando el resto del form.
+- Después de aplicar en HubSpot, aún hay que actualizar `form_destination.mapping_json.fieldMapping` en Greenhouse y correr smoke de secure-submit; HubSpot puede rechazar fields enviados si no están en la definición del form.

@@ -56,6 +56,24 @@ Field contract:
 | `companySize` | yes | `tamano_de_la_empresa` |
 | `mainCompetitor` | yes | `marca_de_competencia` |
 
+## HubSpot Form Definition Upsert
+
+HubSpot Forms secure-submit validates against the destination form definition. When a new
+Greenhouse field is added to `form_destination.mapping_json.fieldMapping`, the HubSpot form may also
+need the matching field in `fieldGroups`.
+
+- Governed tool: `pnpm hubspot:forms:upsert-fields -- --config <json> [--apply]`.
+- Implementation: `scripts/hubspot/upsert-form-fields.ts`.
+- API used: HubSpot Forms API `2026-09-beta`, `PATCH /marketing/forms/2026-09-beta/{formId}`,
+  scope `forms`.
+- Dry-run is default. `--apply` reads the form, verifies CRM properties, creates missing properties
+  only when the config includes `createProperty`, ensures `formField=true` when possible, and patches
+  `fieldGroups` while preserving unrelated form settings.
+- The tool does not replace Growth Forms as source of truth: after a HubSpot field addition, update
+  the Greenhouse destination mapping server-side and run secure-submit smoke.
+- AEO example config: `scripts/hubspot/examples/upsert-aeo-brand-website-field.json` plans
+  `brandWebsite -> companies.domain` for the HubSpot destination form.
+
 Runtime guardrails:
 
 - WordPress must never know HubSpot mapping, portal credentials, destination secrets or Turnstile secret.

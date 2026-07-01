@@ -97,6 +97,46 @@ dry-run por defecto. Ejemplo (AEO): `scripts/growth/activate-aeo-render-copy-con
 `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-render-copy-contract.ts`
 (dry-run) y `--apply` para publicar. El `form_key` real de un form: `SELECT slug, form_key FROM greenhouse_growth.form_definition`.
 
+## Agregar campos a un formulario de HubSpot
+
+Cuando un destination HubSpot Forms necesita recibir un campo nuevo, no hacerlo a mano a ciegas en
+la UI. Usar el script gobernado:
+
+```bash
+pnpm hubspot:forms:upsert-fields -- --config scripts/hubspot/examples/upsert-aeo-brand-website-field.json
+pnpm hubspot:forms:upsert-fields -- --config scripts/hubspot/examples/upsert-aeo-brand-website-field.json --apply
+```
+
+El script es dry-run por defecto. Con `--apply`:
+
+- lee la definición del form por HubSpot Forms API `2026-09-beta`;
+- verifica que las CRM properties existan;
+- crea properties si el config trae `createProperty`;
+- marca properties como `formField=true` cuando corresponde;
+- agrega el campo faltante a `fieldGroups` preservando el resto de la definición del form.
+
+Config mínimo:
+
+```json
+{
+  "formId": "<hubspot-form-guid>",
+  "fields": [
+    {
+      "objectType": "companies",
+      "name": "domain",
+      "label": "Sitio web de la marca",
+      "fieldType": "single_line_text",
+      "after": "email"
+    }
+  ]
+}
+```
+
+Si la property no existe, agregar `createProperty` con `label`, `type`, `fieldType` y opcionalmente
+`options`. Después del `--apply`, actualizar también el `form_destination.mapping_json.fieldMapping`
+en Greenhouse y correr un smoke de secure-submit; HubSpot puede rechazar fields enviados si no están
+en la definición del form.
+
 ## Referencias tecnicas
 
 - Arquitectura: `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md` (§Delta 2026-06-25 + §22).

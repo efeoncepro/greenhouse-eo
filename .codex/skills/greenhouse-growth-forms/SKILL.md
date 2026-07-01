@@ -254,6 +254,34 @@ each governed by a capability + tenant auth + audit).
 - HubSpot adapter: mapping + `formGuid` + portal stay server-only. Use `captureWithDomain` (never
   `Sentry.captureException` directly).
 
+### HubSpot form definition fields
+
+HubSpot secure-submit can reject fields that are not part of the destination form definition, even
+when the CRM property exists. When adding a new Greenhouse field to a HubSpot-backed form:
+
+1. Add or verify the CRM property on the right HubSpot object.
+2. Add the field to the HubSpot form `fieldGroups`.
+3. Update Greenhouse `form_destination.mapping_json.fieldMapping`.
+4. Run secure-submit smoke.
+
+Use the governed script instead of the HubSpot UI or ad-hoc curl:
+
+```bash
+pnpm hubspot:forms:upsert-fields -- --config <json>
+pnpm hubspot:forms:upsert-fields -- --config <json> --apply
+```
+
+The script is dry-run by default. With `--apply` it reads the form through HubSpot Forms API
+`2026-09-beta`, verifies existing properties, creates missing properties only when the config
+explicitly includes `createProperty`, ensures `formField=true` when possible, and patches
+`fieldGroups` while preserving unrelated form settings. Example config:
+`scripts/hubspot/examples/upsert-aeo-brand-website-field.json` (`brandWebsite -> companies.domain`
+for the AEO destination form).
+
+Do not expose HubSpot `formGuid`, portal id, property names or mappings to the browser while doing
+this. The browser still gets only the Greenhouse render contract; HubSpot form definition changes are
+server-side destination hygiene.
+
 ---
 
 ## Security & PII
