@@ -1,5 +1,9 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-07-01 (b) — TASK-1280 completada (unblocker headless cerrado)
+
+TASK-1280 (Public Report Model Contract) se cerró: `GET /report/[token]` ya expone `model` (`publicWeb`) + `modelVersion` + `header` render-ready, así que **el aporte Greenhouse del render público headless está listo**. Lo que resta del split público (form + landing + render + wiring GTM) vive en `efeoncepro/efeonce-web` y consume este contrato por `modelVersion` — fuera de este repo. Consecuencia para esta task: el Slice 2 (smoke `form→run→status→report→email`) sigue **inejecutable desde greenhouse-eo** y debe rescoparse al split headless (la parte greenhouse — intake + status + report contract — ya está completa y verificada por sus tests). Code complete local, sin push (live fetch pendiente de deploy).
+
 ## Delta 2026-07-01 — realidad live ≠ supuestos de la task (verificado con `vercel env ls`)
 
 Auditoría read-only del readiness al 2026-07-01. Tres correcciones que la task asume mal:

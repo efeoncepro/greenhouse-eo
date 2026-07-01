@@ -19,7 +19,7 @@ Auditoría profunda contra el código vigente (`model.ts`, `report-artifact-no-l
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -273,31 +273,32 @@ return NextResponse.json({
 
 ## Acceptance Criteria
 
-- [ ] `GET /api/public/growth/ai-visibility/report/[token]` devuelve `model` (variant `publicWeb`) + `modelVersion` + `header`, manteniendo `report`/`asOf`/`expiresAt` (back-compat).
-- [ ] El `model` se construye con `modelFromPublicReport(..., 'publicWeb')` — el endpoint no recomputa ni reimplementa la derivación; el `header` reutiliza la primitive canónica del email (no reinventa copy).
-- [ ] El payload público **no** contiene `providerFindings`, `accuracyFindings`, texto crudo de providers, prompts, citation URLs, reasons internos ni recommendation `priority` (test de contrato no-leak verde).
-- [ ] El payload público **sí** incluye `engineSnapshot`/`providerPresence` (headline público) y `header` con `organizationName`/`reportDate`/`periodLabel` no vacíos.
-- [ ] `modelVersion` está definido como constante estable server-safe en `src/lib/growth/ai-visibility/report/**` y presente en el payload.
-- [ ] El builder es server-importable sin arrastrar React al bundle del route handler (build verde) — sin extraer builder nuevo.
-- [ ] Docstring stale de `ProviderPresence` en `contracts.ts` y el ADR (`…HEADLESS_RENDER_DECISION_V1.md` líneas 46/86) corregidos para reflejar que `engineSnapshot` es público-safe (TASK-1252).
+- [x] `GET /api/public/growth/ai-visibility/report/[token]` devuelve `model` (variant `publicWeb`) + `modelVersion` + `header`, manteniendo `report`/`asOf`/`expiresAt` (back-compat). — `route.ts`
+- [x] El `model` se construye con `modelFromPublicReport(..., 'publicWeb')` — el endpoint no recomputa ni reimplementa la derivación; el `header` reutiliza la primitive canónica (`buildReportHeader`, SSOT compartido con email/operador).
+- [x] El payload público **no** contiene `providerFindings`, `accuracyFindings`, texto crudo de providers, prompts, citation URLs, reasons internos ni recommendation `priority` (test de contrato no-leak verde — `route-contract.test.ts`).
+- [x] El payload público **sí** incluye `engineSnapshot`/`providerPresence` (headline público) y `header` con `organizationName`/`reportDate`/`periodLabel` no vacíos.
+- [x] `modelVersion` está definido como constante estable server-safe en `src/lib/growth/ai-visibility/report/contracts.ts` (`GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION = '1.0.0'`) y presente en el payload.
+- [x] El builder es server-importable sin arrastrar React al bundle del route handler (`pnpm build` verde) — sin extraer builder nuevo (ya era puro).
+- [x] Docstring stale de `ProviderPresence` en `contracts.ts` y el ADR corregidos para reflejar que `engineSnapshot` es público-safe (TASK-1252).
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test` (test de contrato no-leak + focal del report-artifact)
-- Fetch real del endpoint contra un snapshot `ready` (staging) → `model` + `modelVersion` + no-leak.
+- ✅ `pnpm local:check` (lint + tsc) verde.
+- ✅ `pnpm test` (full) 8630 passed / 0 failed.
+- ✅ `pnpm build` (Turbopack) exit 0 — route importa el builder sin arrastrar React.
+- ✅ `pnpm pg:doctor` healthy.
+- ⏳ Fetch real del endpoint contra un snapshot `ready` (staging) → pendiente de deploy (local-first, sin push). Cambio aditivo sin flag/migración: funciona al desplegar.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado
-- [ ] Delta en el ADR `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`: (a) open question #1 resuelta (forma de exponer el modelo + `header`); (b) **corregir líneas 46 y 86** que dicen "NUNCA exponer `engineSnapshot`" — es público-safe desde TASK-1252 (lo internal-only es `providerFindings`).
-- [ ] Corregir docstring stale de `ProviderPresence` en `src/lib/growth/ai-visibility/report/contracts.ts` ("INTERNAL ONLY: nunca viaja al DTO público" → refleja que `providerPresence`/conteos SÍ va al público, sólo la narrativa cruda es internal-only).
+- [x] `Lifecycle` del markdown sincronizado (`in-progress` → `complete`)
+- [x] el archivo vive en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado (In Progress → Complete)
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1246 + TASK-1241)
+- [x] Delta en el ADR `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`: OQ#1 resuelta + hard rules/framing recalibrados (engineSnapshot público + header) + Delta 2026-07-01.
+- [x] Docstring stale de `ProviderPresence` en `contracts.ts` corregido.
 
 ## Follow-ups
 

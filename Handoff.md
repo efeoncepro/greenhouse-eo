@@ -1,3 +1,21 @@
+## Sesion 2026-07-01 — TASK-1280 Public Report Model Contract (headless unblocker EPIC-020) — Claude — ✅ complete (local, sin push)
+
+> **Pedido:** analizar a profundidad TASK-1280 con skills (arquitectura/SEO/product design), ajustar la spec, e implementarla (`/implement-task 1280`).
+>
+> **Auditoría (turno de análisis):** encontré **dos defectos de fondo en la spec** (recalibrados antes de implementar):
+> 1. **No-leak invertido (crítico).** La spec repetía "`publicWeb` excluye `engineSnapshot`". FALSO: TASK-1252 (Delta 2026-06-27) reclasificó `engineSnapshot`/`providerPresence` (conteos de visibilidad por motor) como **público-safe** — es el headline del lead magnet — y el test `report-artifact-no-leak.test.tsx:73-78` lo afirma. Lo internal-only real es `providerFindings` (narrativa cruda) + `accuracyFindings` (YMYL), que estructuralmente no existen en `PublicGraderReport` (no-leak por construcción de tipo). Implementar el test como pedía la spec habría roto el lead magnet.
+> 2. **Faltaba el `header`.** El artifact se pinta con `ReportHeader { organizationName, reportDate, periodLabel }` separado del modelo; el modelo no lleva el nombre de la marca. Sin exponerlo, efeonce-web no puede pintar el masthead. → el payload ahora lo entrega.
+>
+> **Resultado (2 slices, rama `develop`, local-first, sin push):**
+> - **Slice 1** (`9680c4b7d`): `GET /api/public/growth/ai-visibility/report/[token]` ahora devuelve `{ report, model, modelVersion, header, asOf, expiresAt }` (aditivo, back-compat). `model = modelFromPublicReport(publicReport,'publicWeb')` (SSOT único); `modelVersion='1.0.0'` en `contracts.ts`; `header` vía nuevo SSOT `buildReportHeader` (`report/report-header.ts`), que **refactoricé** en `dispatch-report-email.ts` + `execute-operator-send.ts` para eliminar la duplicación de `formatReportDate`. `brandName` resuelto por JOIN `grader_reports→grader_runs→grader_profiles` (INNER JOIN seguro por integridad referencial NOT NULL). `report-snapshot.test` actualizado al nuevo shape.
+> - **Slice 2** (`15f39377c`): `route-contract.test.ts` (5 tests) bloquea el payload — model/modelVersion/header presentes, `engineSnapshot` presente (headline), ausencia de `providerFindings`/`accuracyFindings`/`INTERNAL`, 429/404 sin filtrar. Corregí el docstring stale de `ProviderPresence` en `contracts.ts` y el ADR `HEADLESS_RENDER_DECISION_V1` (OQ#1 resuelta + hard rules/framing + Delta 2026-07-01).
+>
+> **Gates:** `local:check` verde · `pnpm test` full **8630/0** · `pnpm build` prod exit 0 · `pg:doctor` healthy · `docs:closure-check` + `qa:gates --changed` sin findings (0 flags nuevos).
+>
+> **Rollout:** code complete + gates verdes local. Sin migración/flag/capability/signal → cambio aditivo puro; **funciona al desplegar**. Pendiente único: fetch real de un token `ready` en staging (requiere deploy; local-first sin push). Follow-up: task hermana en `efeoncepro/efeonce-web` (render Tailwind + form + GTM en `think.efeoncepro.com`) consume este contrato por `modelVersion`.
+>
+> **Nota Codex:** `git add` explícito por path (nunca `-A`); commits acotados a mis archivos.
+
 ## Sesion 2026-07-01 — TASK-1247 Admin Review UI del AEO Grader · runtime promotion — Claude — ✅ complete (local, sin push)
 
 > **Pedido:** completar el runtime del gate humano pre-publicación del AEO Grader (la sesión previa dejó el diseño/mockup verificado en GVC y el runtime como slice aparte).
