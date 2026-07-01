@@ -287,7 +287,7 @@ return NextResponse.json({
 - ✅ `pnpm test` (full) 8630 passed / 0 failed.
 - ✅ `pnpm build` (Turbopack) exit 0 — route importa el builder sin arrastrar React.
 - ✅ `pnpm pg:doctor` healthy.
-- ⏳ Fetch real del endpoint contra un snapshot `ready` (staging) → pendiente de deploy (local-first, sin push). Cambio aditivo sin flag/migración: funciona al desplegar.
+- ✅ **Fetch real contra staging live (2026-07-01, deploy `greenhouse-of2ms9too`, commit `8d0236ae4`):** token `ready` real (run SKY `grun-9a77f285`, snapshot publicado `grpt-837f9492`) → payload con las 6 keys, `modelVersion='1.0.0'`, `model.variant='publicWeb'`, `header={organizationName:'Sky Airlines', reportDate:'1 jul 2026', periodLabel:'Diagnóstico al 1 jul 2026'}` (marca real, no fija), `engineSnapshot` presente, back-compat intacto, y **sin** `providerFindings`/`accuracyFindings`/`INTERNAL`/`promptText`/`answer_text`. Path 404 (token inexistente) → `HTTP 404` saneado. **Rollout operativamente completo.**
 
 ## Closing Protocol
 

@@ -12,7 +12,7 @@
 >
 > **Gates:** `local:check` verde · `pnpm test` full **8630/0** · `pnpm build` prod exit 0 · `pg:doctor` healthy · `docs:closure-check` + `qa:gates --changed` sin findings (0 flags nuevos).
 >
-> **Rollout:** code complete + gates verdes local. Sin migración/flag/capability/signal → cambio aditivo puro; **funciona al desplegar**. Pendiente único: fetch real de un token `ready` en staging (requiere deploy; local-first sin push). Follow-up: task hermana en `efeoncepro/efeonce-web` (render Tailwind + form + GTM en `think.efeoncepro.com`) consume este contrato por `modelVersion`.
+> **Rollout: operativamente completo.** Pusheado a `develop` (`0496e548e..8d0236ae4`); deploy staging `greenhouse-of2ms9too` Ready. **Verificado end-to-end en staging live:** publiqué el snapshot de un run SKY `succeeded` (`grun-9a77f285`) vía el endpoint admin y fetché el público → payload con `model`(publicWeb)+`modelVersion`(1.0.0)+`header`(`organizationName:'Sky Airlines'`, marca real) + `engineSnapshot` presente + back-compat intacto + **sin** `providerFindings`/`accuracyFindings`/`INTERNAL`/`promptText`; path 404 saneado. (ADC local vencida → resolví el token vía admin API de staging, no PG local.) Follow-up: task hermana en `efeoncepro/efeonce-web` (render Tailwind + form + GTM en `think.efeoncepro.com`) consume este contrato por `modelVersion`.
 >
 > **Nota Codex:** `git add` explícito por path (nunca `-A`); commits acotados a mis archivos.
 
