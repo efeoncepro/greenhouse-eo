@@ -77,10 +77,12 @@ The drift report keeps legacy `status` counts but also includes:
   considered safe. If `false`, do not deploy the full repo; scope the release or reconcile first.
 
 Current known state (2026-07-01): latest classified report
-`docs/operations/public-site-drift/drift-2026-07-01T10-19-16-439Z.json` has
-`fullRepoDeploySafe=false`, mostly because `eo-elementor-widgets` and the new Growth Forms Ohio host
-layer are pending release while Kinsta live still differs. This is expected code-ready/pending-release
-state, not permission to upload the whole repo.
+`docs/operations/public-site-drift/drift-2026-07-01T10-54-46-557Z.json` has
+`fullRepoDeploySafe=true`, `content_drift=0`, `repo_pending_release=0` and
+`live_untracked_file=0`; only three live backup artifacts are ignored by policy. The runtime repo
+is clean at `1d36d51` after reconciling the AEO engine avatar group and Growth Form catalog widget
+files with Kinsta. A full production deploy still requires an explicit release decision; do not infer
+authorization from a green drift report alone.
 
 ## Bridge State
 

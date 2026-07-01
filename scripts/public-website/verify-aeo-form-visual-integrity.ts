@@ -22,11 +22,50 @@ type ControlSnapshot = {
   height: number
 }
 
+type HostSnapshot = {
+  card: {
+    left: number
+    top: number
+    width: number
+    height: number
+    paddingTop: number
+    paddingRight: number
+    paddingBottom: number
+    paddingLeft: number
+    backgroundColor: string
+    borderColor: string
+    borderStyle: string
+    borderWidth: string
+    backgroundImage: string
+  }
+  titleInset: {
+    left: number
+    top: number
+  }
+  proof: {
+    display: string
+    listStyleType: string
+    paddingLeft: number
+    rowGap: string
+    columnGap: string
+    childCount: number
+    firstItemDisplay: string
+    firstItemBeforeContent: string
+  }
+  quietCopy: {
+    helpCount: number
+    counterCount: number
+    visibleHelpCount: number
+    visibleCounterCount: number
+  }
+}
+
 type ViewportResult = {
   name: string
   implementation: 'bridge' | 'renderer'
   overflowX: number
   screenshot: string
+  host: HostSnapshot
   inputs: ControlSnapshot[]
   selects: (ControlSnapshot & { name: string | null; firstOption: string })[]
   dropdown?: ControlSnapshot & { optionCount: number }
@@ -131,6 +170,86 @@ const readControl = async (page: Page, selector: string): Promise<ControlSnapsho
   }, selector)
 }
 
+const readHost = async (page: Page): Promise<HostSnapshot> => {
+  return page.evaluate(() => {
+    const card = document.querySelector<HTMLElement>('.gh-aeo-conversion .gh-aeo-growth-form-card')
+    const title = document.querySelector<HTMLElement>('.gh-aeo-conversion .gh-aeo-growth-form-title')
+    const proof = document.querySelector<HTMLElement>('.gh-aeo-conversion .gh-aeo-growth-form-proof')
+
+    if (!card || !title || !proof) {
+      throw new Error('AEO form host composition is missing card, title, or proof list')
+    }
+
+    const cardStyle = getComputedStyle(card)
+    const proofStyle = getComputedStyle(proof)
+    const cardRect = card.getBoundingClientRect()
+    const titleRect = title.getBoundingClientRect()
+    const firstItem = proof.querySelector<HTMLElement>('li')
+    const firstItemStyle = firstItem ? getComputedStyle(firstItem) : null
+    const firstItemBeforeStyle = firstItem ? getComputedStyle(firstItem, '::before') : null
+    const helpElements = Array.from(document.querySelectorAll('.gh-aeo-conversion greenhouse-form .ghf-help'))
+    const counterElements = Array.from(document.querySelectorAll('.gh-aeo-conversion greenhouse-form .ghf-counter'))
+    let visibleHelpCount = 0
+    let visibleCounterCount = 0
+
+    for (const element of helpElements) {
+      const rect = element.getBoundingClientRect()
+      const style = getComputedStyle(element)
+
+      if (style.display !== 'none' && style.visibility !== 'hidden' && (rect.width > 4 || rect.height > 4)) {
+        visibleHelpCount += 1
+      }
+    }
+
+    for (const element of counterElements) {
+      const rect = element.getBoundingClientRect()
+      const style = getComputedStyle(element)
+
+      if (style.display !== 'none' && style.visibility !== 'hidden' && (rect.width > 4 || rect.height > 4)) {
+        visibleCounterCount += 1
+      }
+    }
+
+    return {
+      card: {
+        left: cardRect.left,
+        top: cardRect.top,
+        width: cardRect.width,
+        height: cardRect.height,
+        paddingTop: Number.parseFloat(cardStyle.paddingTop),
+        paddingRight: Number.parseFloat(cardStyle.paddingRight),
+        paddingBottom: Number.parseFloat(cardStyle.paddingBottom),
+        paddingLeft: Number.parseFloat(cardStyle.paddingLeft),
+        backgroundColor: cardStyle.backgroundColor,
+        borderColor: cardStyle.borderColor,
+        borderStyle: cardStyle.borderStyle,
+        borderWidth: cardStyle.borderWidth,
+        backgroundImage: cardStyle.backgroundImage,
+      },
+      titleInset: {
+        left: titleRect.left - cardRect.left,
+        top: titleRect.top - cardRect.top,
+      },
+      proof: {
+        display: proofStyle.display,
+        listStyleType: proofStyle.listStyleType,
+        paddingLeft: Number.parseFloat(proofStyle.paddingLeft),
+        rowGap: proofStyle.rowGap,
+        columnGap: proofStyle.columnGap,
+        childCount: proof.querySelectorAll('li').length,
+        firstItemDisplay: firstItemStyle?.display ?? '',
+        firstItemBeforeContent: firstItemBeforeStyle?.content ?? '',
+      },
+      quietCopy: {
+        helpCount: helpElements.length,
+        counterCount: counterElements.length,
+        visibleHelpCount,
+        visibleCounterCount,
+      },
+    }
+  })
+}
+
 const assertControlSurface = (label: string, snapshot: ControlSnapshot) => {
   if (!isNearWhite(snapshot.backgroundColor)) {
     throw new Error(`${label} background is ${snapshot.backgroundColor}; expected approved white field surface`)
@@ -142,6 +261,58 @@ const assertControlSurface = (label: string, snapshot: ControlSnapshot) => {
 
   if (snapshot.height < 42) {
     throw new Error(`${label} height is ${snapshot.height}px; expected >=42px tap target`)
+  }
+}
+
+const assertHost = (testCaseName: string, snapshot: HostSnapshot) => {
+  const minPadding = testCaseName === 'mobile390' ? 18 : 30
+
+  if (!isNearWhite(snapshot.card.backgroundColor) && !snapshot.card.backgroundImage.includes('linear-gradient')) {
+    throw new Error(
+      `${testCaseName} form card background is color=${snapshot.card.backgroundColor} image=${snapshot.card.backgroundImage}; expected the approved white premium card`
+    )
+  }
+
+  if (snapshot.card.borderStyle === 'none' || Number.parseFloat(snapshot.card.borderWidth) < 1) {
+    throw new Error(`${testCaseName} form card has no visible border; expected the single approved card surface`)
+  }
+
+  if (snapshot.card.paddingLeft < minPadding || snapshot.card.paddingTop < minPadding) {
+    throw new Error(
+      `${testCaseName} form card padding is top=${snapshot.card.paddingTop}px left=${snapshot.card.paddingLeft}px; expected >=${minPadding}px`
+    )
+  }
+
+  if (snapshot.titleInset.left < minPadding - 2 || snapshot.titleInset.top < minPadding - 2) {
+    throw new Error(
+      `${testCaseName} form title inset is left=${snapshot.titleInset.left}px top=${snapshot.titleInset.top}px; card chrome likely collapsed`
+    )
+  }
+
+  if (snapshot.proof.display !== 'flex') {
+    throw new Error(`${testCaseName} trust proof display is ${snapshot.proof.display}; expected flex row/wrap`)
+  }
+
+  if (snapshot.proof.listStyleType !== 'none' || snapshot.proof.paddingLeft > 2) {
+    throw new Error(
+      `${testCaseName} trust proof is styled like a default list (listStyle=${snapshot.proof.listStyleType}, paddingLeft=${snapshot.proof.paddingLeft}px)`
+    )
+  }
+
+  if (snapshot.proof.childCount !== 4 || !snapshot.proof.firstItemDisplay.includes('flex')) {
+    throw new Error(
+      `${testCaseName} trust proof items are not the approved inline guarantees (count=${snapshot.proof.childCount}, firstDisplay=${snapshot.proof.firstItemDisplay})`
+    )
+  }
+
+  if (snapshot.proof.firstItemBeforeContent === 'none' || snapshot.proof.firstItemBeforeContent === 'normal') {
+    throw new Error(`${testCaseName} trust proof items are missing the checkmark affordance`)
+  }
+
+  if (snapshot.quietCopy.visibleHelpCount > 0 || snapshot.quietCopy.visibleCounterCount > 0) {
+    throw new Error(
+      `${testCaseName} renderer help/counters occupy initial layout (help=${snapshot.quietCopy.visibleHelpCount}, counters=${snapshot.quietCopy.visibleCounterCount})`
+    )
   }
 }
 
@@ -261,6 +432,7 @@ async function main() {
       )
 
       const button = await readControl(page, `.gh-aeo-conversion ${buttonSelector}`)
+      const host = await readHost(page)
       const overflowX = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
       const trustText = await page.locator('.gh-aeo-conversion .gh-aeo-growth-form-proof').first().textContent().catch(() => '')
       const screenshot = `${screenshotDir.replace(/\/$/, '')}/aeo-form-visual-integrity-${testCase.name}.png`
@@ -279,6 +451,7 @@ async function main() {
       await page.screenshot({ path: screenshot, fullPage: false })
 
       inputs.forEach((snapshot, index) => assertControlSurface(`${testCase.name} input ${index + 1}`, snapshot))
+      assertHost(testCase.name, host)
       selects.forEach((snapshot, index) => {
         assertControlSurface(`${testCase.name} select ${index + 1}`, snapshot)
         assertSelectCaret(`${testCase.name} select ${index + 1}`, snapshot)
@@ -309,6 +482,7 @@ async function main() {
         implementation,
         overflowX,
         screenshot,
+        host,
         inputs,
         selects,
         dropdown,

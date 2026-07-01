@@ -10,34 +10,28 @@
  *   pnpm public-website:diff-runtime -- --write
  */
 
-import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import {
   existsSync,
   mkdirSync,
   readdirSync,
-  readFileSync,
   statSync,
   writeFileSync
 } from 'node:fs'
-import { join, relative, resolve } from 'node:path'
+import { join, resolve } from 'node:path'
+
+import {
+  DEFAULT_PUBLIC_SITE_RUNTIME_REPO_ROOT,
+  listPublicSiteRepoFiles,
+  readPublicSiteLiveManifest,
+  readPublicSiteRuntimeBinding
+} from '../../src/lib/public-site/runtime-binding'
 
 type CliOptions = {
   liveManifest: string | null
   repoRoot: string
   write: boolean
   help: boolean
-}
-
-type ManifestFile = {
-  path: string
-  bytes: number
-  sha256: string
-}
-
-type LiveManifest = {
-  generatedAt: string
-  files: ManifestFile[]
 }
 
 type DriftStatus = 'in_sync' | 'drifted' | 'repo_missing' | 'repo_extra' | 'ignored_live'
@@ -60,7 +54,7 @@ type DriftRow = {
   impact?: string
 }
 
-const DEFAULT_REPO_ROOT = '/Users/jreye/Documents/efeonce-public-site-runtime'
+const DEFAULT_REPO_ROOT = DEFAULT_PUBLIC_SITE_RUNTIME_REPO_ROOT
 const BASELINES_ROOT = 'tmp/public-site-code-baselines'
 const REPORTS_ROOT = 'docs/operations/public-site-drift'
 
@@ -71,6 +65,7 @@ const IGNORED_LIVE_PATTERNS: Array<{ pattern: RegExp; reason: string }> = [
   { pattern: /(^|\/)vendor\//, reason: 'Vendor folders are not part of the governed baseline.' },
   { pattern: /\.bak($|-)/i, reason: 'Emergency backup artifact.' },
   { pattern: /backup/i, reason: 'Session/live backup artifact.' },
+  { pattern: /(^|\/)global-fixes-before-.*\.css$/i, reason: 'Pre-change CSS backup artifact.' },
   { pattern: /\.env($|\.)/i, reason: 'Environment/secrets file.' }
 ]
 
@@ -146,47 +141,12 @@ const findLatestLiveManifest = () => {
   return latest
 }
 
-const hashFile = (path: string) => {
-  const contents = readFileSync(path)
-
-  return {
-    bytes: contents.byteLength,
-    sha256: createHash('sha256').update(contents).digest('hex')
-  }
-}
-
-const listRepoFiles = (repoRoot: string, current = repoRoot): ManifestFile[] => {
-  const entries = readdirSync(current, { withFileTypes: true })
-  const files: ManifestFile[] = []
-
-  for (const entry of entries) {
-    const absolutePath = join(current, entry.name)
-    const normalizedRelative = relative(repoRoot, absolutePath)
-
-    if (normalizedRelative.startsWith('.git/')) continue
-
-    if (entry.isDirectory()) {
-      files.push(...listRepoFiles(repoRoot, absolutePath))
-      continue
-    }
-
-    if (!entry.isFile()) continue
-
-    const hash = hashFile(absolutePath)
-
-    files.push({
-      path: normalizedRelative,
-      bytes: hash.bytes,
-      sha256: hash.sha256
-    })
-  }
-
-  return files.sort((a, b) => a.path.localeCompare(b.path))
-}
-
 const ignoreReason = (path: string) => {
   return IGNORED_LIVE_PATTERNS.find(entry => entry.pattern.test(path))?.reason ?? null
 }
+
+const isGovernedPath = (path: string, governedPaths: string[]) =>
+  governedPaths.some(governedPath => path === governedPath || path.startsWith(`${governedPath}/`))
 
 const git = (repoRoot: string, args: string[]) => {
   try {
@@ -287,9 +247,10 @@ return
     throw new Error(`Runtime repo root not found: ${repoRoot}`)
   }
 
-  const liveManifest = JSON.parse(readFileSync(liveManifestPath, 'utf8')) as LiveManifest
-  const liveFiles = liveManifest.files
-  const repoFiles = listRepoFiles(repoRoot).filter(file => file.path.startsWith('wp-content/'))
+  const { binding } = readPublicSiteRuntimeBinding()
+  const liveManifest = readPublicSiteLiveManifest(liveManifestPath)
+  const liveFiles = liveManifest.files.filter(file => isGovernedPath(file.path, binding.governedPaths))
+  const repoFiles = listPublicSiteRepoFiles(repoRoot, { governedPaths: binding.governedPaths })
   const repoByPath = new Map(repoFiles.map(file => [file.path, file]))
   const liveByPath = new Map(liveFiles.map(file => [file.path, file]))
   const pendingReleasePaths = listPendingReleasePaths(repoRoot)
@@ -419,6 +380,7 @@ return
     liveManifestPath,
     liveGeneratedAt: liveManifest.generatedAt,
     repoRoot,
+    governedPaths: binding.governedPaths,
     counts,
     classificationCounts,
     releaseSafety,

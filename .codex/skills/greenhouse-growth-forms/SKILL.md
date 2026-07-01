@@ -211,10 +211,13 @@ native-control hardening and generic tokens to Growth Forms host wrappers (`.eo-
 `.gh-growth-form-host`, `.gh-aeo-growth-form-host`, `.gh-aeo-growth-form-card`).
 
 Use it to avoid repeating per-landing CSS fights with Ohio. Do not put fields, validation, copy,
-HubSpot mapping, Turnstile secrets or destination behavior in the child theme. Before deploying it,
-refresh public-site drift (`public-website:export-live-code` + `public-website:diff-runtime`) and
-avoid collateral plugin rollout if `runtime-status` reports `releaseSafety.fullRepoDeploySafe=false`
-or `eo-elementor-widgets` is classified as `repo_pending_release`.
+HubSpot mapping, Turnstile secrets or destination behavior in the child theme. It is live on Kinsta
+after the scoped 2026-07-01 rollout (only `growth-forms-host.css` + `inc/enqueue-and-layout.php`;
+remote backup `/tmp/greenhouse-growth-forms-host-layer-20260701T103729Z`; AEO live gate green after
+Kinsta purge). The broader public-site runtime repo can still be unsafe for full deploy; refresh
+drift (`public-website:export-live-code` + `public-website:diff-runtime`) and avoid collateral plugin
+rollout if `runtime-status` reports `releaseSafety.fullRepoDeploySafe=false` or `eo-elementor-widgets`
+is classified as `repo_pending_release`.
 
 ### Premium diagnostic forms
 

@@ -65,6 +65,9 @@ pegado en cada pagina:
 - CSS gobernado: `wp-content/themes/ohio-child/assets/css/growth-forms-host.css`.
 - Enqueue gobernado: `wp-content/themes/ohio-child/inc/enqueue-and-layout.php`
   (`ohio-child-growth-forms-host`, versionado por `filemtime`).
+- Estado live: desplegado en Kinsta el 2026-07-01 por rollout acotado de esos dos archivos
+  (backup remoto `/tmp/greenhouse-growth-forms-host-layer-20260701T103729Z`), con hashes
+  repo/live sincronizados y `pnpm public-website:verify-aeo-live-contract` verde.
 - Scope unico: `.eo-growth-form`, `.gh-growth-form-host`,
   `.gh-aeo-growth-form-host`, `.gh-aeo-growth-form-card` + `<greenhouse-form>`.
 
@@ -85,11 +88,12 @@ No responsabilidad de la capa:
 Rollout guard:
 
 - El deploy del child theme no debe mezclar automaticamente el plugin
-  `eo-elementor-widgets` si produccion no lo tiene en el export live. El diff clasificado
-  `docs/operations/public-site-drift/drift-2026-07-01T10-19-16-439Z.json` muestra
-  `releaseSafety.fullRepoDeploySafe=false` y `eo-elementor-widgets` como
-  `repo_pending_release`; por eso el rollout de esta capa debe ser acotado al child theme
-  o esperar un release explicito del plugin.
+  `eo-elementor-widgets` salvo que el diff gobernado lo declare sincronizado o el release
+  incluya explicitamente el plugin. Desde 2026-07-01 el export live y el binding incluyen
+  `eo-elementor-widgets`; el reporte vigente
+  `docs/operations/public-site-drift/drift-2026-07-01T10-54-46-557Z.json` muestra
+  `releaseSafety.fullRepoDeploySafe=true`, `repo_pending_release=0`, `content_drift=0` y
+  `live_untracked_file=0` despues de la reconciliacion acotada.
 - Antes de aplicar a Kinsta, refrescar snapshot con `pnpm public-website:export-live-code`
   y verificar `pnpm public-website:diff-runtime`. Despues de aplicar, purgar Kinsta y
   correr el gate especifico de la landing; para AEO, `pnpm public-website:verify-aeo-live-contract`.

@@ -9,7 +9,7 @@ Use this reference for public Growth Forms embeds and the AEO renderer.
 - Generic public renderer is `<greenhouse-form>`, served from Greenhouse.
 - AEO `/aeo-2/` now uses the live `<greenhouse-form>` renderer by stable `form-key` after the governed TASK-1298 cutover (2026-07-01). The temporary bridge was replaced in Elementor widget `convers`; `heroans` stayed stable (`e0b951b2456a83578cd9e22005900521`), Kinsta was purged, and backup meta is `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`.
 - TASK-1298's long recovery created reusable platform safeguards. Do **not** assume every new form needs the full AEO ceremony. New forms should use the hardened renderer plus a proportional public API smoke, desktop/mobile 390 frame review, overflow check, and captcha/email-gate smoke when configured. Add a landing-specific pixel-aware gate only for high-value public landings or hostile host CSS.
-- Ohio child theme owns the shared **host safety layer** for Growth Forms (`wp-content/themes/ohio-child/assets/css/growth-forms-host.css`, enqueued as `ohio-child-growth-forms-host`). It is scoped to Growth Forms host wrappers and prevents Ohio's broad `input/select/button` CSS from leaking into the renderer. It must not contain form fields, destinations, HubSpot mapping, Turnstile secrets or per-form business logic.
+- Ohio child theme owns the shared **host safety layer** for Growth Forms (`wp-content/themes/ohio-child/assets/css/growth-forms-host.css`, enqueued as `ohio-child-growth-forms-host`). It is live on Kinsta after the scoped 2026-07-01 rollout (only `growth-forms-host.css` + `inc/enqueue-and-layout.php`; backup `/tmp/greenhouse-growth-forms-host-layer-20260701T103729Z`). It is scoped to Growth Forms host wrappers and prevents Ohio's broad `input/select/button` CSS from leaking into the renderer. It must not contain form fields, destinations, HubSpot mapping, Turnstile secrets or per-form business logic.
 
 Canonical docs:
 
@@ -57,6 +57,11 @@ Use the child-theme layer instead of page-specific CSS when Ohio fights a Growth
   `.gh-aeo-growth-form-card` + `<greenhouse-form>`.
 
 Rollout safety:
+
+Live status: the child-theme layer itself is deployed and hash-synced with the runtime repo as of
+2026-07-01 (`pnpm public-website:verify-aeo-live-contract` green after Kinsta purge). The broader
+runtime repo is still **not** safe for full deploy while `runtime-status` reports
+`releaseSafety.fullRepoDeploySafe=false`; do not include `eo-elementor-widgets` as collateral.
 
 1. Refresh production code before applying: `pnpm public-website:export-live-code` then
    `pnpm public-website:diff-runtime`.

@@ -51,6 +51,7 @@ const IGNORED_LIVE_PATTERNS: Array<{ pattern: RegExp; reason: string }> = [
   { pattern: /(^|\/)vendor\//, reason: 'Vendor folders are not part of the governed baseline.' },
   { pattern: /\.bak($|-)/i, reason: 'Emergency backup artifact.' },
   { pattern: /backup/i, reason: 'Session/live backup artifact.' },
+  { pattern: /(^|\/)global-fixes-before-.*\.css$/i, reason: 'Pre-change CSS backup artifact.' },
   { pattern: /\.env($|\.)/i, reason: 'Environment/secrets file.' }
 ]
 

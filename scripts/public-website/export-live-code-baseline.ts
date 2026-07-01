@@ -61,6 +61,11 @@ const TARGETS: Target[] = [
     required: false
   },
   {
+    label: 'EO Elementor widgets plugin',
+    remotePath: 'wp-content/plugins/eo-elementor-widgets',
+    required: false
+  },
+  {
     label: 'EO Ohio Elementor widgets plugin',
     remotePath: 'wp-content/plugins/eo-ohio-elementor-widgets',
     required: false

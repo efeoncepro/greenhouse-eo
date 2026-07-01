@@ -66,12 +66,14 @@ multi-paso) y estados (cargando / error / no disponible) desde fixtures.
 ### Capa compartida Ohio para Growth Forms
 
 En el sitio publico Efeonce, el child theme `ohio-child` debe cargar una capa compartida
-de compatibilidad para Growth Forms:
+de compatibilidad para Growth Forms. Esta capa esta live en Kinsta desde el rollout acotado
+del 2026-07-01:
 
 - runtime repo: `efeonce-public-site-runtime`;
 - CSS: `wp-content/themes/ohio-child/assets/css/growth-forms-host.css`;
 - enqueue: `wp-content/themes/ohio-child/inc/enqueue-and-layout.php`, handle
   `ohio-child-growth-forms-host`;
+- backup remoto inmediato del rollout: `/tmp/greenhouse-growth-forms-host-layer-20260701T103729Z`;
 - scope permitido: `.eo-growth-form`, `.gh-growth-form-host`,
   `.gh-aeo-growth-form-host`, `.gh-aeo-growth-form-card` + descendiente
   `<greenhouse-form>`.
