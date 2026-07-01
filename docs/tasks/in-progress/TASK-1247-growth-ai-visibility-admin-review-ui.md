@@ -1,5 +1,28 @@
 # TASK-1247 — Growth AI Visibility: Admin Review UI
 
+## Delta 2026-07-01 — DISEÑO COMPLETO (mockup runtime + GVC en loop); runtime promotion pendiente (con hallazgo)
+
+**Estado: design complete, runtime promotion pendiente.** Se implementó la surface como **ruta real mockup** (`/admin/growth/ai-visibility/mockup`, `src/views/greenhouse/admin/growth/ai-visibility/mockup/AdminReviewMockupView.tsx`) y se iteró en loop GVC (desktop) con `product-design-loop` + `modern-ui` + `state-design` + `greenhouse-ux-writing`. Commits: Slice 1 (mockup base) → Slice 2 (drawer overlay + pase estético) → Slice 3 (estados empty/abstención/conflicto) → Slice 4 (loading/permission + hover/a11y).
+
+**Diseño final (aprobado por el operador, verificado en GVC):**
+
+- **Inspector = drawer overlay** (`AdaptiveSidecarLayout kind='reconciler' preferredMode='temporary'`), NO push — la cola queda full-width y respira; el detalle se abre encima (backdrop, Escape/X/click-away). (El operador rechazó explícitamente el push que aplastaba la cola.)
+- **Hero de verdict** en el drawer: score ring + chip de riesgo + razón del gate + consecuencia pública (acento de tono).
+- **Presencia por-motor** (capa-2 anti-falso-0): dot de presencia + Presente/Ausente + citas + frescura (chip rojo si stale). Presente=verde `label` / ausente=`outlined` neutro.
+- **Footer de decisión STICKY**: motivo de rechazo + Rechazar/Aprobar balanceados (ambos `outlined`, sin sesgo a publicar) siempre visibles.
+- **6 estados**: default · drawer+conflicto (mapea `invalid_transition`/`not_reviewable`) · abstención (`insufficient_data`) · empty · loading (skeleton) · permission-denied (locked). GVC scenarios `growth-ai-visibility-admin-review[.mobile]`.
+- Copy es-CL en `src/lib/copy/growth.ts` (`GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW`); primitives reuse total (CompositionShell/AdaptiveSidecar/DataTableShell-pattern/GreenhouseChip/Button); tokenizado.
+
+**⚠️ HALLAZGO que cambia el scope de la runtime promotion (contradice `Backend impact: none`):** el reader real de cola `listPendingReportReviews` (`review/queries.ts`) devuelve una shape **lean** — `{ runId, scoreVersion, reviewReasons[], finishedAt, createdAt }`. **NO trae brand/domain/score/riskTone** (viven en `grader_profiles` + `grader_scores`). Renderizar la cola del diseño aprobado en runtime **requiere enriquecer el reader** (JOIN `grader_runs → grader_profiles` para brand/domain + `grader_scores` para score/risk) o un reader nuevo `listPendingReportReviewsEnriched`. Eso es un **delta backend (reader)**, no UI-pura. La per-engine evidence del drawer sigue el scope ya acordado (presencia+citas+as_of existen bounded vía `citation-breakdown`/`byProvider`; el snippet verbatim = follow-up interno-only).
+
+**Runtime promotion = slice restante (bien acotado):**
+
+1. **[backend-lite] Enriquecer el reader de cola** (`listPendingReportReviews` → +brand/domain/score/riskTone via JOIN) + live-test contra PG (gate TASK-893).
+2. Ruta real `/admin/growth/ai-visibility` (page + view runtime, adapta `AdminReviewMockupView`) consumiendo el reader enriquecido + `GET /runs/[runId]/report` (detalle) + `approve`/`reject` (rutas de 1244).
+3. **Migración seed** del viewCode `administracion.growth_ai_visibility` en `VIEW_REGISTRY` (mismo PR, TASK-827) + **nav "Growth → AEO Grader"** (`greenhouse-navigation-copy.ts`) + entrada en `route-reachability-manifest.ts` (TASK-982).
+4. **Page guard** capability `growth.ai_visibility.report.review` (ya granteada a EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN — verificado).
+5. GVC sobre la ruta runtime (baseline diff vs el mockup aprobado) + `pnpm test` full + `pnpm build` + docs closure + mover a `complete/`.
+
 ## Delta 2026-06-30 — validación multi-skill (product-design + seo-aeo + arch) + 6 ajustes
 
 Revisión con `greenhouse-ux` + `seo-aeo` + `arch-architect`, **verificando el backend real** (no supuestos):
