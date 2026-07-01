@@ -7,9 +7,11 @@
 > **Trabajo hecho (doc/gobernanza, safe):**
 > - **Sign-off legal confirmado por el operador** (consent + aviso de privacidad Ley 21.719 revisados/aprobados) → prerequisito cerrado en ledger + task.
 > - **Ledger reconciliado:** Delta 2026-07-01 (TASK-1246) en el encabezado con los valores reales verificados + fila `PUBLIC_INTAKE` actualizada (prod ON + sign-off OK + mitigante).
-> - **TASK-1246 recalibrada** (Delta c): ground truth, sign-off, mitigante (form vive en efeonce-web, aún no live → tráfico ≈ 0), residuales, runbook de rotación de `TURNSTILE_SECRET`, acceptance criteria anotados.
+> - **TASK-1246 recalibrada** (Delta c): ground truth, sign-off, mitigante, residuales, runbook `TURNSTILE_SECRET`, acceptance criteria anotados.
 >
-> **Residuales (NO cerré — no son de este repo/task):** (1) rotar `TURNSTILE_SECRET` (operador, secret fresco de Cloudflare; runbook en la task) — expuesto en chat; (2) smoke E2E de la cara pública → repo `efeonce-web`; (3) cierre formal de TASK-1253 (server validation) + TASK-1255 (PII: backfill legacy + job de retención `GROWTH_FORMS_RETENTION_PURGE_ENABLED`) — sus tasks, siguen in-progress.
+> **CORRECCIÓN (el operador me hizo investigar, no asumir):** yo había escrito "el form del lead magnet vive en efeonce-web, aún no live". **Es FALSO — verificado en código.** El grader self-serve (form `fdef-ai-visibility-grader`) **NO está embebido en ninguna superficie pública**: no hay page en greenhouse-eo; `/aeo-2/` (WordPress live) es el form COMERCIAL `efeonce-aeo-diagnostic` → HubSpot, que **NO corre el grader** (el consumer `growth-grader-run-from-submission` filtra por `form_id === fdef-ai-visibility-grader`); no existe en efeonce-web. → **0 tráfico self-serve real** porque el form no está puesto en ningún lado. **Deuda documental:** el ADR `HEADLESS_RENDER_DECISION_V1` (06-28) planeó el render en efeonce-web pero está **sin construir/irreal**; el grader ya es un form gobernado embebible con `<greenhouse-form>` (como `/aeo-2/`).
+>
+> **Residuales (NO cerré):** (1) `TURNSTILE_SECRET` — **operador decidió NO rotar por ahora** (riesgo aceptado); runbook queda por si se retoma; (2) **construir la superficie pública del grader self-serve** (no existe en ningún lado; resolver primero la deuda del ADR efeonce-web vs `<greenhouse-form>`); (3) cierre formal de TASK-1253 + TASK-1255 (backfill PII + retención) — sus tasks, siguen in-progress.
 >
 > **Lifecycle:** queda **in-progress** (Runtime Rollout Completion Gate: residuales externos abiertos). El valor greenhouse-eo-side (reconciliación + sign-off) está cerrado. Sin push aún (doc-only; se puede pushear a develop cuando el operador confirme).
 

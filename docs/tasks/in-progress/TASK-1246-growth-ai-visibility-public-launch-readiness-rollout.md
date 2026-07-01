@@ -8,11 +8,18 @@ Trabajo del 2026-07-01 sobre "lo pendiente" de esta task. Resultado: la task est
 
 **2. Sign-off legal = CONFIRMADO.** El prerequisito abierto "sign-off legal del consent/aviso de privacidad (Ley 21.719) antes de prender prod" (fila `PUBLIC_INTAKE` del ledger) fue **confirmado por el operador (2026-07-01)**: el consentimiento + aviso de privacidad están revisados/aprobados. Riesgo legal → cerrado.
 
-**3. Mitigante de exposición.** La cara pública (form + landing) vive en `efeonce-web` headless (ADR 2026-06-28) y **aún no está live** → aunque el intake está ON en prod, el tráfico público real ≈ 0 hasta que ese form salga al aire. El riesgo de abuso/costo es latente, no activo.
+**3. Mitigante de exposición (VERIFICADO EN CÓDIGO 2026-07-01 — corrige el supuesto errado previo).** El intake del grader está ON en prod, PERO el grader self-serve (form `fdef-ai-visibility-grader`) **NO está embebido en ninguna superficie pública**:
+- No hay `page.tsx` pública del grader en greenhouse-eo (solo rutas admin `(dashboard)`).
+- `/aeo-2/` (WordPress, live) es el form **COMERCIAL** `efeonce-aeo-diagnostic` (form-key `b120566a…`) → HubSpot "AEO - Lead Form"; **NO corre el grader** — el consumer `growth-grader-run-from-submission` filtra por `form_id === fdef-ai-visibility-grader` (distinto), así que un submit de `/aeo-2/` es solo captura de lead.
+- No existe form del grader en efeonce-web (confirmado por el operador).
+
+→ **0 tráfico self-serve real hoy**; el riesgo de abuso/costo es latente, no activo (aunque el intake API es técnicamente alcanzable, protegido por captcha+rate-limit+budget).
+
+**Deuda documental detectada:** el ADR `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1` (2026-06-28) decidió que el form/render del lead magnet va a **efeonce-web (Astro)**, pero **eso no se construyó** y además el grader ya es un form gobernado embebible con el mismo `<greenhouse-form>` que usa `/aeo-2/` en WordPress. El ADR quedó **parcialmente irreal / sin ejecutar** → decisión abierta: ¿la cara pública del grader se embebe vía `<greenhouse-form>` (WordPress u otra page) o sí se hace en efeonce-web? Resolver antes de "lanzar" de verdad.
 
 **Residuales (NO greenhouse-eo o NO esta task):**
-- ⚠️ **Rotar `TURNSTILE_SECRET`** (operador): el secret de prod quedó expuesto en chat. Runbook abajo. Requiere un secret fresco del dashboard Cloudflare (Turnstile del sitio público) — no lo tiene el agente.
-- **Smoke E2E de la cara pública** (`form → run → status → report → email`): inejecutable desde greenhouse-eo; corre en `efeonce-web`. La parte greenhouse (intake/status/report contract TASK-1280) ya está verificada por sus tests + fetch live.
+- ⚠️ **Rotar `TURNSTILE_SECRET`** (operador): el secret de prod quedó expuesto en chat. **Decisión operador 2026-07-01: NO se rotará por ahora** (riesgo aceptado). Runbook abajo por si se decide más adelante.
+- **Definir + construir la superficie pública del grader self-serve** (embed `<greenhouse-form>` del form `fdef-ai-visibility-grader`) — hoy NO existe en ningún lado. Prerequisito real de un lanzamiento público. (Resolver la deuda del ADR arriba primero.)
 - **Cierre formal de TASK-1253 (server validation) + TASK-1255 (PII hardening):** ambos code-complete + flags ON en prod, pero siguen `in-progress` por backfill de PII legacy + job de retención/purga (`GROWTH_FORMS_RETENTION_PURGE_ENABLED`, aún no declarado) + evidencia runtime. Son SUS tasks, no ésta.
 
 ### Runbook — rotación de `TURNSTILE_SECRET` (operador ejecuta)
@@ -328,16 +335,16 @@ Slice 1 (checklist) -> Slice 2 (staging) -> Slice 3 (production). Produccion no 
 
 ## Acceptance Criteria
 
-> **Nota 2026-07-01 (Delta c):** varios criterios quedaron satisfechos-por-realidad (el cutover ya ocurrió) o rescopeados al split headless `efeonce-web`. Estado anotado abajo.
+> **Nota 2026-07-01 (Delta c):** varios criterios quedaron satisfechos-por-realidad (el cutover ya ocurrió) o bloqueados porque **no existe superficie pública del grader self-serve** (verificado en código). Estado anotado abajo.
 
 - [x] Checklist legal/privacy/captcha/envs/flags completo y aprobado — **sign-off legal confirmado por el operador 2026-07-01**; captcha/envs/flags verificados live.
-- [~] Staging smoke end-to-end (intake→worker→status→token→public report→email) — **RESCOPEADO a `efeonce-web`** (la cara pública vive ahí). La parte greenhouse (intake/status/report contract TASK-1280) está verificada por tests + fetch live staging.
-- [ ] HubSpot handoff validado (dry-run o live controlado) — pendiente del smoke E2E público (efeonce-web).
-- [ ] Signals de costo/abuso/run/delivery/handoff revisadas y documentadas — pendiente (revisión cuando haya tráfico público real).
+- [ ] Staging smoke end-to-end (intake→worker→status→token→public report→email) — **BLOQUEADO: no existe superficie pública del grader self-serve** (form `fdef-ai-visibility-grader` sin embeber; `/aeo-2/` es el form comercial, NO corre el grader). La parte de contrato (report/model TASK-1280) sí está verificada por tests + fetch live staging.
+- [ ] HubSpot handoff validado (dry-run o live controlado) — pendiente del smoke E2E (requiere la superficie pública).
+- [ ] Signals de costo/abuso/run/delivery/handoff revisadas y documentadas — pendiente (no hay tráfico público real: el grader no está embebido en ningún lado).
 - [x] Production cutover con rollback flag OFF <5 min — **hecho (flags ON en prod, revert = `vercel env` flag OFF + redeploy)**; rollback documentado en el ledger.
 - [~] Promoción vía release control plane (NO flip ad-hoc) — **overtaken by events:** el cutover ocurrió por flip ad-hoc 2026-06-30 (autorizado por el operador, riesgo aceptado), no por el control plane. Registrado como desviación, no como pendiente accionable.
-- [ ] Jobs Cloud Scheduler + ops-worker activos en staging (outbox publisher + handoff consumer) — verificar como parte del smoke E2E (efeonce-web).
-- [ ] **`TURNSTILE_SECRET` rotado** (expuesto en chat) + verificado contra el consumer real — **PENDIENTE (operador; runbook en Delta c)**.
+- [ ] Jobs Cloud Scheduler + ops-worker activos en staging (outbox publisher + handoff consumer) — verificar como parte del smoke E2E (cuando exista la superficie pública).
+- [~] **`TURNSTILE_SECRET` rotado** (expuesto en chat) — **decisión operador 2026-07-01: NO se rota por ahora (riesgo aceptado)**; runbook queda en Delta c por si se retoma.
 - [x] `FEATURE_FLAG_STATE_LEDGER.md` reconciliado a la verdad live (valores reales prod) + `pnpm docs:closure-check` verde.
 - [x] Handoff/changelog/architecture delta actualizados con evidencia runtime.
 
