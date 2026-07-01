@@ -1,5 +1,9 @@
 # TASK-1280 — Growth AI Visibility: Public Report Model Contract (headless render unblocker)
 
+## Delta 2026-07-01 — keystone Greenhouse del lead magnet público; absorbe el render de 1241
+
+Auditoría 2026-07-01: esta task es **el único aporte pendiente del lado Greenhouse** para el render público del lead magnet. **TASK-1241 (página Next.js en greenhouse-eo) quedó SUPERSEDED** por el ADR de render headless (2026-06-28): el form/landing/render migran a `efeonce-web` (Astro), y este endpoint-modelo es lo que los alimenta. **Gap confirmado en código:** `GET /api/public/growth/ai-visibility/report/[token]/route.ts` hoy devuelve `{ report: snapshot.publicReport }` (DTO crudo) — todavía NO expone el `ReportArtifactModel` + `modelVersion`. Sin blockers, effort bajo → listo para implementar.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

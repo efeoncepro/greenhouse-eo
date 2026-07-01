@@ -1,5 +1,16 @@
 # TASK-1241 — Growth AI Visibility: Public Lead Magnet Page
 
+## Delta 2026-07-01 — ⚠️ SUPERSEDED por la decisión de render headless (ADR 2026-06-28)
+
+**La premisa de esta task — "página pública Next.js en `greenhouse-eo`" — quedó invalidada.** El ADR **`docs/architecture/GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md` (Accepted 2026-06-28)** decidió que el **form + landing + render del informe del lead magnet viven en `efeonce-web` (Astro + Tailwind, repo `efeoncepro/efeonce-web`)**, consumiendo a Greenhouse **headless** (fetch server-side, sin CORS, sin iframe, sin MUI en el sitio público). La Open Question #1 de abajo ("Astro/Next/WordPress sigue abierta") es **anterior al ADR** → cerrada.
+
+**Redistribución del trabajo:**
+
+- **Lado Greenhouse (este repo):** el único aporte pendiente es **TASK-1280** (Public Report Model Contract) — extender `GET /api/public/growth/ai-visibility/report/[token]` para servir el `ReportArtifactModel` (variant `publicWeb`) + `modelVersion`, no el DTO crudo. Es el *unblocker* del render headless. El intake (`POST /run`) y el poll (`GET /run/[handle]`) ya existen y se reusan tal cual.
+- **Lado público (`efeonce-web`, fuera de este workspace):** landing + form + Turnstile + poll + render del `ReportArtifactModel` con stack propio + GTM.
+
+**Acción recomendada:** cerrar/re-scopear esta task (su work en `greenhouse-eo` no existe; migró a 1280 + efeonce-web). Se deja `to-do` con este Delta hasta que el operador decida moverla a superseded. Los Deltas de abajo (report artifact, poll contract, Turnstile keys) siguen siendo referencia válida para quien implemente en `efeonce-web`.
+
 ## Delta 2026-06-27 — Report Artifact Design System implementado (TASK-1252)
 
 El render del reporte YA existe como sistema reusable feature-local: **NO inventar componentes paralelos**. Consumir `AiVisibilityReportArtifact` (web) desde `@/components/growth/ai-visibility/report-artifact` con `model={modelFromPublicReport(publicReport, 'publicWeb')}` + `header`. El modelo, la disclosure matrix (engine snapshot = internal-only), el copy (`GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT`), la a11y y el no-leak test ya están horneados. Esta página aporta data real (`readPublicGraderReport(token)`) + estados loading/empty/error/poll del consumer.
@@ -355,7 +366,7 @@ La página es **cliente puro** de los endpoints públicos: form → `POST /run` 
 
 ## Open Questions
 
-1. **¿Dónde se hospeda la página?** Next.js public route en greenhouse-eo (más simple, reusa primitives + endpoints) vs WordPress/Kinsta (sitio marketing, EPIC-019). Decidir en Discovery con EPIC-019 (la decisión Astro/Next/WordPress del arch sigue abierta).
+1. ~~**¿Dónde se hospeda la página?** Next.js public route en greenhouse-eo vs WordPress/Kinsta.~~ **RESUELTO por ADR 2026-06-28** (`GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`): la página vive en **`efeonce-web` (Astro)**, Greenhouse headless. Ni Next.js-en-greenhouse ni WordPress. Ver Delta 2026-07-01 arriba.
 2. ¿El flujo muestra el reporte inline tras el poll, o envía el link del snapshot por email (o ambos)? V1 sugerido: inline + email. **La entrega por email (cuerpo breve + link tokenizado + adjunto public-safe) la implementa `TASK-1250`** (consumer del mismo delivery state de `TASK-1245`); esta página es el consumer en pantalla. Ambos comparten el `reportToken`.
 
 ## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO

@@ -1,5 +1,15 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-07-01 — realidad live ≠ supuestos de la task (verificado con `vercel env ls`)
+
+Auditoría read-only del readiness al 2026-07-01. Tres correcciones que la task asume mal:
+
+1. **Los flags YA están ON en prod (no OFF).** El 2026-06-30 el operador prendió en **Vercel Production** todo el set Growth/AEO con riesgo aceptado (ledger §Delta 2026-06-30 + verificado live: `PUBLIC_INTAKE_ENABLED`, `GRADER_ENABLED`, `TURNSTILE_SECRET`, `SERVER_VALIDATION`, `PII_ENCRYPTION`, `EMAIL_VERIFICATION` presentes en prod, redeploy `greenhouse-ic8cg4ery`). Entonces **Slice 3 (cutover) ya ocurrió — pero por flip ad-hoc, NO por el release control plane** que esta task prescribe. La task quedó parcialmente *overtaken by events*.
+2. **La cara pública NO es Next.js/WordPress — es `efeonce-web` headless** (ADR `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`, 2026-06-28). La Open Question #1 de abajo quedó cerrada. **TASK-1241 (página Next.js) está SUPERSEDED**; el aporte Greenhouse del render público es **TASK-1280** (model contract, el *unblocker*). Slice 2 (staging smoke `form→run→status→report→email`) sigue **inejecutable desde greenhouse-eo** porque el form/landing/render viven en efeonce-web (repo aparte).
+3. **Riesgo flag-ahead-of-code abierto (aceptado, pero conviene nombrarlo):** `SERVER_VALIDATION_ENABLED` ON en prod con **TASK-1253 in-progress** (autoridad real del submit) + `PII_ENCRYPTION`/`EMAIL_VERIFICATION` ON con **TASK-1255 to-do** (PII hardening Ley 21.719). El gate está abierto, la protección detrás no está completa. Más el `TURNSTILE_SECRET` de prod expuesto en chat → rotación pendiente.
+
+**Estado real de blockers al 2026-07-01:** ✅ 1242/1244/1245/1250 complete · ⚠️ 1241 **superseded → 1280** · 🔶 1253 in-progress · ❌ 1255 to-do. **Conclusión:** la task no se puede "completar" hoy como está escrita; su valor remanente es (a) **reconciliar el ledger de flags a la realidad live** (los snapshots por-fila dicen prod OFF; están ON), (b) formalizar el riesgo flag-ahead de 1253/1255, (c) rescopear el "staging smoke E2E" al split headless (Greenhouse valida sus endpoints + modelo 1280; el smoke de la cara pública corre en efeonce-web). No arrancar el "rollout gobernado" clásico: ya no aplica tal cual.
+
 ## Delta 2026-06-29 — palanca de costo de prosa lista (TASK-1271, evidencia-first)
 
 TASK-1271 desacopló la extracción de prosa (sentiment/category/drift) de Anthropic en un router provider-agnóstico con candidatos low-cost (Gemini Flash-Lite / OpenAI nano) + harness de eval/cost (`scripts/growth/ai-visibility-prose-eval.ts`). **Default sigue `anthropic` (behavior-preserving) y la extracción sigue OFF** — nada cambia hoy. Pero al planificar el launch público, si se decide activar `sentimentSummary` real, existe ahora una palanca de costo evidencia-first: correr el CLI en staging shadow (presupuesto acotado), comparar exactitud + costo por proveedor, documentar el veredicto y flip de `_PROSE_EXTRACTION_PROVIDER` ANTES de prender `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` en volumen. Incluir esto en el readiness/cutover de costo del launch.
@@ -332,4 +342,4 @@ Slice 1 (checklist) -> Slice 2 (staging) -> Slice 3 (production). Produccion no 
 
 ## Open Questions
 
-1. ¿El primer launch sera Next.js Greenhouse route o sitio publico WordPress/Astro? Propuesta: seguir la decision de `TASK-1241`/EPIC-019 y no duplicar.
+1. ~~¿El primer launch sera Next.js Greenhouse route o sitio publico WordPress/Astro?~~ **RESUELTO por ADR 2026-06-28** (`GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`): **`efeonce-web` (Astro) headless**. La cara pública NO vive en greenhouse-eo. Ver Delta 2026-07-01 arriba. Greenhouse-side unblocker = TASK-1280.
