@@ -2,7 +2,7 @@
 name: greenhouse-growth-forms
 description: >-
   Operate the Greenhouse Growth Forms engine — public lead-capture forms authored, versioned and
-  governed in Greenhouse, rendered anywhere by the portable `<greenhouse-form>` web component, and
+  governed in Greenhouse, rendered anywhere by the portable `greenhouse-form` web component, and
   delivered to destinations (HubSpot) via an async at-most-once dispatcher. Invoke when touching
   `src/lib/growth/forms/**`, `src/growth-forms-renderer/**`, the public `/api/public/growth/forms/**`
   routes, the admin cockpit, form theming/embedding (WordPress/Astro), submission delivery/dispatch,
@@ -201,6 +201,19 @@ AEO's `pnpm public-website:verify-aeo-live-contract` is the **strict AEO live ga
 universal tax. New forms should not need `heroans`, AEO WordPress guards, or AEO copy/layout
 assertions unless they live on AEO. If another host/theme breaks the renderer, fix the renderer or
 shared fixture globally and add a reusable gate; do not patch that one landing in isolation.
+
+### WordPress Ohio host layer
+
+For Efeonce WordPress (`ohio-child`), the shared host safety layer lives outside this repo in
+`efeonce-public-site-runtime/wp-content/themes/ohio-child/assets/css/growth-forms-host.css` and is
+enqueued by `inc/enqueue-and-layout.php` as `ohio-child-growth-forms-host`. It scopes containment,
+native-control hardening and generic tokens to Growth Forms host wrappers (`.eo-growth-form`,
+`.gh-growth-form-host`, `.gh-aeo-growth-form-host`, `.gh-aeo-growth-form-card`).
+
+Use it to avoid repeating per-landing CSS fights with Ohio. Do not put fields, validation, copy,
+HubSpot mapping, Turnstile secrets or destination behavior in the child theme. Before deploying it,
+refresh public-site drift (`public-website:export-live-code` + `public-website:diff-runtime`) and
+avoid collateral plugin rollout if `eo-elementor-widgets` is still `repo_extra` in the live export.
 
 ### Premium diagnostic forms
 

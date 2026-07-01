@@ -1,3 +1,17 @@
+## Sesion 2026-07-01 — Growth Forms Ohio child theme host layer — Codex — 🚧 code-ready, rollout pendiente
+
+> **Pedido:** evitar seguir peleando formulario por formulario contra Ohio y verificar que no se suba una version vieja/rota.
+>
+> **Estado runtime verificado:** `efeonce-public-site-runtime` esta en `main`, `HEAD=27c1468` y `origin/main=fdc0d0b` (`ahead 1`, TASK-1259 selector de Growth Form desde catalogo). Worktree ya venia sucio con cambios ajenos del plugin `eo-elementor-widgets`/AEO engine avatar group; no se revirtieron ni se tocaron como parte de este cambio.
+>
+> **Drift live fresco:** `pnpm public-website:export-live-code` exporto produccion a `tmp/public-site-code-baselines/2026-07-01T07-31-43-908Z`. `pnpm public-website:diff-runtime -- --write` dejo `docs/operations/public-site-drift/drift-2026-07-01T07-32-13-512Z.json`: `drifted=1`, `repo_missing=1`, `repo_extra=14`. Importante: produccion no exporta `eo-elementor-widgets`; ese plugin aparece como `repo_extra`, asi que **no subir runtime completo** para este cambio. Rollout seguro = child theme acotado o release explicito del plugin.
+>
+> **Cambio code-ready en runtime repo:** se agrego `wp-content/themes/ohio-child/assets/css/growth-forms-host.css` y se encolo desde `wp-content/themes/ohio-child/inc/enqueue-and-layout.php` como `ohio-child-growth-forms-host`. La capa esta scopeada a `.eo-growth-form`, `.gh-growth-form-host`, `.gh-aeo-growth-form-host`, `.gh-aeo-growth-form-card` + `<greenhouse-form>`; da contencion, tokens genericos y hardening de `.ghf-*` frente a `input/select/button` globales de Ohio. No contiene campos, mapping, Turnstile, destino ni copy contractual.
+>
+> **Verificacion sin mutar live:** `php -l` del enqueue verde. Se inyecto exactamente el CSS nuevo sobre `https://efeoncepro.com/aeo-2/` en desktop y mobile 390: `overflowX=0`, `form-key=b120566a-dd1a-43c8-956a-4e0121e805b8`, inputs/selects/dropdown blancos, `background-image:none`, CTA teal, tracking normal, dropdown con 6 opciones. Screenshots temporales: `/tmp/aeo-growth-forms-host-css-desktop.png`, `/tmp/aeo-growth-forms-host-css-mobile390.png`. `pnpm public-website:verify-aeo-live-contract` tambien verde antes del cambio live.
+>
+> **Pendiente:** decidir/applicar rollout Kinsta del child theme sin arrastrar `eo-elementor-widgets`. El deploy apply sigue bloqueado por el rail (`production_deploy_apply_requires_explicit_release_task`, faltan tokens Kinsta para backups/cache en este entorno). Despues de aplicar: purgar Kinsta y correr `pnpm public-website:verify-aeo-live-contract`.
+
 ## Sesion 2026-07-01 — AEO premium renderer live cutover — Codex — ✅ live
 
 > **Pedido:** poner live el renderer premium AEO con los dos dropdowns estilizados y aclarar si esto escala a otros formularios.

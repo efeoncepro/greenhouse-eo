@@ -55,6 +55,44 @@ Premium modernization contract (live):
 - WordPress cutover backup meta: `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`.
 - Live verification command: `pnpm public-website:verify-aeo-live-contract`.
 
+## WordPress Ohio Host Layer
+
+El tema Ohio es un host CSS agresivo para controles nativos. El contrato vigente para
+evitar una nueva pelea por landing es una capa compartida en el child theme, no CSS
+pegado en cada pagina:
+
+- Runtime repo: `efeonce-public-site-runtime`.
+- CSS gobernado: `wp-content/themes/ohio-child/assets/css/growth-forms-host.css`.
+- Enqueue gobernado: `wp-content/themes/ohio-child/inc/enqueue-and-layout.php`
+  (`ohio-child-growth-forms-host`, versionado por `filemtime`).
+- Scope unico: `.eo-growth-form`, `.gh-growth-form-host`,
+  `.gh-aeo-growth-form-host`, `.gh-aeo-growth-form-card` + `<greenhouse-form>`.
+
+Responsabilidad de la capa:
+
+- contencion (`max-width:100%`, `min-width:0`, `overflow-x`);
+- default tokens seguros para hosts genericos;
+- hardening scoped de `.ghf-input`, `.ghf-textarea`, `.ghf-select`,
+  `.ghf-select-trigger`, `.ghf-select-list` y `.ghf-btn` frente a reglas globales
+  `input/select/button` de Ohio;
+- reduced-motion defensivo solo dentro del host.
+
+No responsabilidad de la capa:
+
+- identidad, version, fields, validacion, condiciones, copy, Turnstile, submit,
+  telemetry, HubSpot mapping o dispatch. Eso sigue en Greenhouse + renderer.
+
+Rollout guard:
+
+- El deploy del child theme no debe mezclar automaticamente el plugin
+  `eo-elementor-widgets` si produccion no lo tiene en el export live. El diff fresco
+  `docs/operations/public-site-drift/drift-2026-07-01T07-32-13-512Z.json` mostro
+  `eo-elementor-widgets` como `repo_extra`; por eso el rollout de esta capa debe ser
+  acotado al child theme o esperar un release explicito del plugin.
+- Antes de aplicar a Kinsta, refrescar snapshot con `pnpm public-website:export-live-code`
+  y verificar `pnpm public-website:diff-runtime`. Despues de aplicar, purgar Kinsta y
+  correr el gate especifico de la landing; para AEO, `pnpm public-website:verify-aeo-live-contract`.
+
 Field contract:
 
 | Public field | Greenhouse persistence | HubSpot mapping |

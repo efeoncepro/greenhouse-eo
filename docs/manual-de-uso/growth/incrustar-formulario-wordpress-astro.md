@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.3 — 2026-07-01 (Codex, TASK-1298 AEO live renderer premium)
+> **Version:** 1.4 — 2026-07-01 (Codex, Ohio child theme Growth Forms host layer)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -62,6 +62,38 @@ multi-paso) y estados (cargando / error / no disponible) desde fixtures.
 
 > El widget solo emite `<greenhouse-form …>` y carga el bundle pineado de Greenhouse.
 > Nunca cambia campos ni destinos.
+
+### Capa compartida Ohio para Growth Forms
+
+En el sitio publico Efeonce, el child theme `ohio-child` debe cargar una capa compartida
+de compatibilidad para Growth Forms:
+
+- runtime repo: `efeonce-public-site-runtime`;
+- CSS: `wp-content/themes/ohio-child/assets/css/growth-forms-host.css`;
+- enqueue: `wp-content/themes/ohio-child/inc/enqueue-and-layout.php`, handle
+  `ohio-child-growth-forms-host`;
+- scope permitido: `.eo-growth-form`, `.gh-growth-form-host`,
+  `.gh-aeo-growth-form-host`, `.gh-aeo-growth-form-card` + descendiente
+  `<greenhouse-form>`.
+
+Esta capa existe para que Ohio no vuelva a imponer estilos globales de
+`input/select/button` sobre el renderer. No mueve logica a WordPress: no define campos,
+validacion, destinos, mapping HubSpot, Turnstile ni microcopy contractual. El renderer y
+el render contract siguen siendo la fuente de verdad.
+
+Regla operativa:
+
+1. Para nuevas landings en WordPress, envolver el embed en una de las clases host
+   compartidas y usar `form-key`, `surface`, `locale`, `color-scheme="light"` y
+   `appearance` segun la composicion.
+2. Si un form se rompe por Ohio, primero ajustar esta capa o el renderer de forma
+   transversal. No crear CSS page-scoped por formulario salvo excepcion documentada.
+3. Antes de desplegar cambios del child theme, correr `pnpm public-website:export-live-code`
+   + `pnpm public-website:diff-runtime` para confirmar que no se pisara drift de
+   produccion. Si el plugin `eo-elementor-widgets` aparece como `repo_extra`, no lo mezcles
+   en el rollout del child theme.
+4. Validar con desktop + mobile 390, `scrollWidth == clientWidth`, dropdown abierto,
+   foco/ARIA y la prueba publica/fail-closed que aplique al formulario.
 
 ### Configurar el catálogo del selector (una vez por sitio)
 
