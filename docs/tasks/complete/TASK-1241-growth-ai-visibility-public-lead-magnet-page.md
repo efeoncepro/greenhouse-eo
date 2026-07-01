@@ -47,14 +47,14 @@ Cuando el flag `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED` esté ON (converge
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
-- UI impact: `flow`
-- UI ready: `no`
+- UI impact: `none`
+- UI ready: `n/a`
 - Wireframe: `docs/ui/wireframes/TASK-1241-growth-ai-visibility-public-lead-magnet-page.md`
 - Flow: `docs/ui/flows/TASK-1241-growth-ai-visibility-public-lead-magnet-page-flow.md`
 - Motion: `docs/ui/motion/TASK-1241-growth-ai-visibility-public-lead-magnet-page-motion.md`
