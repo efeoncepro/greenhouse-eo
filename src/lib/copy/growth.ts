@@ -701,7 +701,18 @@ export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
     staleWarning: 'Evidencia desactualizada — los motores cambian seguido.',
     seeEvidence: 'Ver evidencia',
     impact: 'Impacto en score',
-    close: 'Cerrar'
+    close: 'Cerrar',
+    // Runtime (TASK-1247): campos reales del GraderReport
+    noScore: 'Sin dato',
+    market: 'Mercado',
+    category: 'Categoría',
+    confidence: 'Confianza',
+    evidence: 'Evidencia',
+    responsesEvaluated: 'respuestas evaluadas',
+    provenanceAsOf: 'Datos al',
+    providersSampled: 'Motores consultados',
+    loadingReport: 'Cargando evidencia del reporte…',
+    reportError: 'No pudimos cargar la evidencia de este reporte.'
   },
   evidence: {
     incompleteTitle: 'Evidencia incompleta',
@@ -722,7 +733,13 @@ export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
     approved: 'Aprobado',
     rejected: 'Rechazado',
     conflict: 'Conflicto',
-    history: 'Historial de acciones'
+    history: 'Historial de acciones',
+    // Runtime (TASK-1247): estados de la acción gobernada
+    approving: 'Aprobando…',
+    rejecting: 'Rechazando…',
+    actionError: 'No pudimos completar la acción. Intenta de nuevo.',
+    approvedFeedback: 'Reporte aprobado y publicado.',
+    rejectedFeedback: 'Reporte rechazado y devuelto para corrección.'
   },
   conflict: 'Este reporte ya fue revisado por {reviewer} — actualizando la cola.',
   demo: { label: 'Vista de demostración', queue: 'Cola', loading: 'Cargando', empty: 'Cola vacía', denied: 'Sin acceso' },
@@ -731,6 +748,8 @@ export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
     emptyTitle: 'Sin reportes pendientes',
     emptyBody: 'No hay diagnósticos esperando revisión.',
     errorTitle: 'No pudimos cargar la cola',
+    errorBody: 'Ocurrió un problema al traer los reportes pendientes.',
+    retry: 'Reintentar',
     permissionTitle: 'Sin acceso a la revisión',
     permissionBody: 'Necesitas el permiso de revisión del AEO Grader. Pídeselo a un administrador.'
   }
