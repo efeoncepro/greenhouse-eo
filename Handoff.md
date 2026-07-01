@@ -1,3 +1,18 @@
+## Sesion 2026-07-01 — TASK-1246 Public Launch Readiness · reconciliación live — Claude — 🔧 in-progress (residuales cross-repo/operador/cross-task)
+
+> **Pedido:** "vamos con lo pendiente de 1246".
+>
+> **Hallazgo clave (ground truth):** la task estaba fuertemente *overtaken by events*. Verifiqué los **valores reales** de los flags del lead magnet en Production vía `vercel env pull` (no solo presencia): `PUBLIC_INTAKE`, `GRADER`, `ASYNC_EXECUTION`, `GROWTH_FORMS_PUBLIC_API/SERVER_VALIDATION/PII_ENCRYPTION/EMAIL_VERIFICATION` y `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE` = **`true` confirmado en prod**. El cutover ya ocurrió (flip ad-hoc 30-06), no vía release control plane. El ledger top ya se auto-reconciliaba ("snapshots por-fila stale; vercel env ls manda"), pero la fila `PUBLIC_INTAKE` seguía diciendo "prod: OFF" con el sign-off legal como prerequisito abierto.
+>
+> **Trabajo hecho (doc/gobernanza, safe):**
+> - **Sign-off legal confirmado por el operador** (consent + aviso de privacidad Ley 21.719 revisados/aprobados) → prerequisito cerrado en ledger + task.
+> - **Ledger reconciliado:** Delta 2026-07-01 (TASK-1246) en el encabezado con los valores reales verificados + fila `PUBLIC_INTAKE` actualizada (prod ON + sign-off OK + mitigante).
+> - **TASK-1246 recalibrada** (Delta c): ground truth, sign-off, mitigante (form vive en efeonce-web, aún no live → tráfico ≈ 0), residuales, runbook de rotación de `TURNSTILE_SECRET`, acceptance criteria anotados.
+>
+> **Residuales (NO cerré — no son de este repo/task):** (1) rotar `TURNSTILE_SECRET` (operador, secret fresco de Cloudflare; runbook en la task) — expuesto en chat; (2) smoke E2E de la cara pública → repo `efeonce-web`; (3) cierre formal de TASK-1253 (server validation) + TASK-1255 (PII: backfill legacy + job de retención `GROWTH_FORMS_RETENTION_PURGE_ENABLED`) — sus tasks, siguen in-progress.
+>
+> **Lifecycle:** queda **in-progress** (Runtime Rollout Completion Gate: residuales externos abiertos). El valor greenhouse-eo-side (reconciliación + sign-off) está cerrado. Sin push aún (doc-only; se puede pushear a develop cuando el operador confirme).
+
 ## Sesion 2026-07-01 — TASK-1280 Public Report Model Contract (headless unblocker EPIC-020) — Claude — ✅ complete (local, sin push)
 
 > **Pedido:** analizar a profundidad TASK-1280 con skills (arquitectura/SEO/product design), ajustar la spec, e implementarla (`/implement-task 1280`).

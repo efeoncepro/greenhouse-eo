@@ -1,5 +1,37 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-07-01 (c) — reconciliación de readiness a la realidad live (in-progress)
+
+Trabajo del 2026-07-01 sobre "lo pendiente" de esta task. Resultado: la task está **operativamente satisfecha del lado greenhouse-eo**; los residuales son cross-repo (efeonce-web), operador (Turnstile) o cross-task (1253/1255). No se puede marcar `complete` hasta que esos cierren, pero el gate de readiness greenhouse-eo quedó reconciliado y honesto.
+
+**1. Ground-truth de flags verificado (no solo presencia).** Se hizo `vercel env pull --environment=production` y se leyeron los **valores reales**: `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED`, `_GRADER_ENABLED`, `_ASYNC_EXECUTION_ENABLED`, `GROWTH_FORMS_PUBLIC_API/SERVER_VALIDATION/PII_ENCRYPTION/EMAIL_VERIFICATION_ENABLED` y `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED` = **`true` confirmado** en prod. El Delta §1 del 07-01 era correcto; el cutover ocurrió (flip ad-hoc 06-30, redeploy `greenhouse-ic8cg4ery`), NO por release control plane. Ledger reconciliado (Delta top + fila `PUBLIC_INTAKE`).
+
+**2. Sign-off legal = CONFIRMADO.** El prerequisito abierto "sign-off legal del consent/aviso de privacidad (Ley 21.719) antes de prender prod" (fila `PUBLIC_INTAKE` del ledger) fue **confirmado por el operador (2026-07-01)**: el consentimiento + aviso de privacidad están revisados/aprobados. Riesgo legal → cerrado.
+
+**3. Mitigante de exposición.** La cara pública (form + landing) vive en `efeonce-web` headless (ADR 2026-06-28) y **aún no está live** → aunque el intake está ON en prod, el tráfico público real ≈ 0 hasta que ese form salga al aire. El riesgo de abuso/costo es latente, no activo.
+
+**Residuales (NO greenhouse-eo o NO esta task):**
+- ⚠️ **Rotar `TURNSTILE_SECRET`** (operador): el secret de prod quedó expuesto en chat. Runbook abajo. Requiere un secret fresco del dashboard Cloudflare (Turnstile del sitio público) — no lo tiene el agente.
+- **Smoke E2E de la cara pública** (`form → run → status → report → email`): inejecutable desde greenhouse-eo; corre en `efeonce-web`. La parte greenhouse (intake/status/report contract TASK-1280) ya está verificada por sus tests + fetch live.
+- **Cierre formal de TASK-1253 (server validation) + TASK-1255 (PII hardening):** ambos code-complete + flags ON en prod, pero siguen `in-progress` por backfill de PII legacy + job de retención/purga (`GROWTH_FORMS_RETENTION_PURGE_ENABLED`, aún no declarado) + evidencia runtime. Son SUS tasks, no ésta.
+
+### Runbook — rotación de `TURNSTILE_SECRET` (operador ejecuta)
+
+El secret vive en GCP Secret Manager y se consume en prod. Higiene canónica (scalar crudo, verify-before-cutover):
+
+```bash
+# 1. Obtener un secret NUEVO del dashboard Cloudflare Turnstile (widget del sitio público efeoncepro.com).
+# 2. Publicar como scalar crudo (sin comillas/\n) en Secret Manager:
+printf %s "$NUEVO_TURNSTILE_SECRET" | gcloud secrets versions add turnstile-secret --data-file=- --project efeonce-group
+# 3. Si TURNSTILE_SECRET en Vercel es valor directo (no *_SECRET_REF), actualizarlo + redeploy:
+vercel env rm TURNSTILE_SECRET production --scope efeonce-7670142f --yes
+printf %s "$NUEVO_TURNSTILE_SECRET" | vercel env add TURNSTILE_SECRET production --scope efeonce-7670142f
+# 4. Redeploy prod (los env vars no se activan en caliente) + verificar el consumer real:
+#    un POST público con captcha inválido debe 403 (fail-closed), con captcha válido 202.
+```
+
+Nota: si se consume por `*_SECRET_REF`, confirmar el grant `secretAccessor` a `greenhouse-portal@` tras crear la versión nueva (sino `resolveSecretByRef`→null y el error engaña "not configured"). Skill `greenhouse-secret-hygiene`.
+
 ## Delta 2026-07-01 (b) — TASK-1280 completada (unblocker headless cerrado)
 
 TASK-1280 (Public Report Model Contract) se cerró: `GET /report/[token]` ya expone `model` (`publicWeb`) + `modelVersion` + `header` render-ready, así que **el aporte Greenhouse del render público headless está listo**. Lo que resta del split público (form + landing + render + wiring GTM) vive en `efeoncepro/efeonce-web` y consume este contrato por `modelVersion` — fuera de este repo. Consecuencia para esta task: el Slice 2 (smoke `form→run→status→report→email`) sigue **inejecutable desde greenhouse-eo** y debe rescoparse al split headless (la parte greenhouse — intake + status + report contract — ya está completa y verificada por sus tests). Code complete local, sin push (live fetch pendiente de deploy).
@@ -39,7 +71,7 @@ TASK-1250 quedó **code complete** (sin push, sin prod): el lead recibe el infor
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -296,16 +328,18 @@ Slice 1 (checklist) -> Slice 2 (staging) -> Slice 3 (production). Produccion no 
 
 ## Acceptance Criteria
 
-- [ ] Checklist legal/privacy/captcha/envs/flags completo y aprobado para staging.
-- [ ] Staging smoke end-to-end pasa: intake -> worker -> status -> token -> public report -> email con adjunto.
-- [ ] HubSpot handoff validado segun modo aprobado (dry-run o live controlado).
-- [ ] Signals de costo/abuso/run/delivery/handoff revisadas y documentadas.
-- [ ] Production cutover preparado con rollback flag OFF <5 min.
-- [ ] Promoción productiva ejecutada vía release control plane (preflight + manifest + orchestrator), NO flip ad-hoc; skill `greenhouse-production-release` invocada.
-- [ ] Jobs Cloud Scheduler + ops-worker confirmados activos en staging (outbox publisher + handoff reactive consumer); el handoff entrega de verdad, no solo responde 200.
-- [ ] `TURNSTILE_SECRET` con grant `secretAccessor` verificado contra el consumer real (captcha valida en staging).
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` con fila por flag y estado por environment; `pnpm docs:closure-check` verde.
-- [ ] Handoff/changelog/architecture delta actualizados con evidencia runtime.
+> **Nota 2026-07-01 (Delta c):** varios criterios quedaron satisfechos-por-realidad (el cutover ya ocurrió) o rescopeados al split headless `efeonce-web`. Estado anotado abajo.
+
+- [x] Checklist legal/privacy/captcha/envs/flags completo y aprobado — **sign-off legal confirmado por el operador 2026-07-01**; captcha/envs/flags verificados live.
+- [~] Staging smoke end-to-end (intake→worker→status→token→public report→email) — **RESCOPEADO a `efeonce-web`** (la cara pública vive ahí). La parte greenhouse (intake/status/report contract TASK-1280) está verificada por tests + fetch live staging.
+- [ ] HubSpot handoff validado (dry-run o live controlado) — pendiente del smoke E2E público (efeonce-web).
+- [ ] Signals de costo/abuso/run/delivery/handoff revisadas y documentadas — pendiente (revisión cuando haya tráfico público real).
+- [x] Production cutover con rollback flag OFF <5 min — **hecho (flags ON en prod, revert = `vercel env` flag OFF + redeploy)**; rollback documentado en el ledger.
+- [~] Promoción vía release control plane (NO flip ad-hoc) — **overtaken by events:** el cutover ocurrió por flip ad-hoc 2026-06-30 (autorizado por el operador, riesgo aceptado), no por el control plane. Registrado como desviación, no como pendiente accionable.
+- [ ] Jobs Cloud Scheduler + ops-worker activos en staging (outbox publisher + handoff consumer) — verificar como parte del smoke E2E (efeonce-web).
+- [ ] **`TURNSTILE_SECRET` rotado** (expuesto en chat) + verificado contra el consumer real — **PENDIENTE (operador; runbook en Delta c)**.
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` reconciliado a la verdad live (valores reales prod) + `pnpm docs:closure-check` verde.
+- [x] Handoff/changelog/architecture delta actualizados con evidencia runtime.
 
 ## Verification
 
