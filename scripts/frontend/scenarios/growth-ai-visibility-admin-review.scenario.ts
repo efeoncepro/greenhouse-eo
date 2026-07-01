@@ -34,8 +34,14 @@ export const scenario: CaptureScenario = {
     { kind: 'mark', label: 'drawer-abstained', note: 'Abstención del grader (insufficient_data) — no se publica' },
     { kind: 'press', key: 'Escape' },
     { kind: 'sleep', ms: 350 },
+    { kind: 'click', selector: 'button:has-text("Cargando")' },
+    { kind: 'sleep', ms: 350 },
+    { kind: 'mark', label: 'loading', note: 'Skeleton de la cola (loading)' },
     { kind: 'click', selector: 'button:has-text("Cola vacía")' },
     { kind: 'sleep', ms: 400 },
-    { kind: 'mark', label: 'empty', note: 'Estado vacío: sin reportes pendientes' }
+    { kind: 'mark', label: 'empty', note: 'Estado vacío: sin reportes pendientes' },
+    { kind: 'click', selector: 'button:has-text("Sin acceso")' },
+    { kind: 'sleep', ms: 350 },
+    { kind: 'mark', label: 'denied', note: 'Permission denied: sin capability de revisión' }
   ]
 }

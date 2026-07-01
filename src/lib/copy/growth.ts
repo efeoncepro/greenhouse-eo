@@ -725,12 +725,13 @@ export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
     history: 'Historial de acciones'
   },
   conflict: 'Este reporte ya fue revisado por {reviewer} — actualizando la cola.',
-  demo: { label: 'Vista de demostración', queue: 'Cola', empty: 'Cola vacía' },
+  demo: { label: 'Vista de demostración', queue: 'Cola', loading: 'Cargando', empty: 'Cola vacía', denied: 'Sin acceso' },
   states: {
+    loading: 'Cargando la cola de revisión…',
     emptyTitle: 'Sin reportes pendientes',
     emptyBody: 'No hay diagnósticos esperando revisión.',
     errorTitle: 'No pudimos cargar la cola',
-    permissionTitle: 'Sin acceso',
-    permissionBody: 'Necesitas la capability de revisión del grader.'
+    permissionTitle: 'Sin acceso a la revisión',
+    permissionBody: 'Necesitas el permiso de revisión del AEO Grader. Pídeselo a un administrador.'
   }
 } as const
