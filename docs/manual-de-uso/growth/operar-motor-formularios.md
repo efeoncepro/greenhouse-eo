@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.2 — 2026-06-30 (Codex, AEO `/aeo-2/` live bridge)
+> **Version:** 1.3 — 2026-07-01 (Codex, AEO `/aeo-2/` live renderer premium)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -18,7 +18,7 @@ Operar (prender, verificar, revertir) el motor de formularios publicos de Growth
 5. Usa las acciones gobernadas: **Enviar a review**, **Publicar**, **Deprecar**, **Archivar** y **Ejecutar dispatch**.
 6. Para auditoría, abre **Ver evidencia** y revisa consent snapshot, delivery attempts, retry state y errores.
 
-El cockpit consume los mismos Product APIs/readers del motor. No reemplaza smoke público: AEO `/aeo-2/` ya valida el motor público con un bridge HTML Turnstile, pero antes de generalizar producción hay que validar WordPress/dataLayer contra un form genérico renderizado por `<greenhouse-form>`.
+El cockpit consume los mismos Product APIs/readers del motor. No reemplaza smoke público: AEO `/aeo-2/` valida el motor público con `<greenhouse-form>` live, Turnstile invisible, email gate, dataLayer y HubSpot dispatcher gobernado.
 
 ## Los tres flags
 
@@ -32,7 +32,7 @@ El motor depende de tres flags independientes. Para que funcione punta a punta l
 
 **Verdad live:** `vercel env ls` (flag Vercel) + `gcloud run services describe ops-worker --region=us-east4` (flags worker). El ledger es el estado humano, no la verdad.
 
-**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; desde TASK-1294 `<greenhouse-form>` ya emite `captchaToken` cuando el contract declara Turnstile, y desde TASK-1296 AEO v3 declara `ui_policy_json.security.captcha`. Produccion ya serializa `render_contract.security.captcha` en el `GET` publico. No asumir rollout generico hasta pasar smoke WordPress/dataLayer con un form generico real.
+**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; AEO v6 (`fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`) publica `style_variant=diagnostic_premium`, `security.captcha`, CTA/copy premium y se embebe en WordPress por `form-key=b120566a-dd1a-43c8-956a-4e0121e805b8`.
 
 ## Prender en un environment
 
@@ -82,7 +82,7 @@ Señales reliability (en `/admin/operations`): `growth.forms.dead_letter_count`,
 
 ## Que NO hacer
 
-- No generalizar el publico en produccion sin form publicado, host surface autorizado, CORS revisado, Turnstile operativo, smoke WordPress/dataLayer y sign-off. La excepcion vigente es AEO `/aeo-2/`, que sigue usando host bridge HTML aunque el renderer ya emite `captchaToken` y el form v3 ya declara `security.captcha`; migrarlo requiere task WordPress/visual separada.
+- No generalizar el publico en produccion sin form publicado, host surface autorizado, CORS revisado, Turnstile operativo, smoke WordPress/dataLayer y sign-off. AEO `/aeo-2/` es la referencia live actual: renderer premium, guard de `heroans`, backup Elementor, Kinsta purge y `pnpm public-website:verify-aeo-live-contract`.
 - No llamar a HubSpot inline desde el submit: la entrega SIEMPRE corre en el dispatcher async (overlay #3).
 - No reintentar manualmente una submission `delivered` (duplica el lead en HubSpot — secure-submit NO es idempotente).
 
@@ -96,6 +96,41 @@ muestra slug/form_id/surface antes de mutar, preserva fields/validación/Turnsti
 dry-run por defecto. Ejemplo (AEO): `scripts/growth/activate-aeo-render-copy-contract.ts` —
 `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-render-copy-contract.ts`
 (dry-run) y `--apply` para publicar. El `form_key` real de un form: `SELECT slug, form_key FROM greenhouse_growth.form_definition`.
+
+## Activar variante premium AEO
+
+La modernización premium del formulario AEO se publica como contrato de Growth Forms, no como CSS en
+WordPress. El script resuelve por `form_key`, preserva validación/Turnstile/destinos/policies y
+publica una nueva versión con `style_variant=diagnostic_premium`, labels, placeholders, helper copy,
+errores específicos, CTA y success copy.
+
+```bash
+pnpm growth:forms:activate-aeo-premium
+pnpm growth:forms:activate-aeo-premium -- --apply
+```
+
+El comando es dry-run por defecto. Si falla con `invalid_rapt`/`invalid_grant`, refrescar ambas
+credenciales locales antes de repetir:
+
+```bash
+gcloud auth login
+gcloud auth application-default login
+```
+
+Este script **no** muta WordPress ni hace cutover live por si solo. En AEO el cutover live ya fue
+ejecutado con backup `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`, `heroans`
+guard, Kinsta purge y verificacion `pnpm public-website:verify-aeo-live-contract`.
+
+## Verificar AEO live
+
+```bash
+pnpm public-website:verify-aeo-live-contract
+```
+
+El gate valida WordPress (`convers` con `<greenhouse-form>` por `form-key`, sin bridge, `heroans`
+estable), API publica por slug/formKey, captcha fail-closed, tipografia, integridad visual
+desktop/mobile 390, dropdowns premium, focus/ARIA, email gate, boundary de `captchaToken` y
+`dataLayer` sin PII.
 
 ## Agregar campos a un formulario de HubSpot
 

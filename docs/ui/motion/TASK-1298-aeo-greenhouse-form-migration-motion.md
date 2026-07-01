@@ -22,7 +22,7 @@
 
 | Element | Trigger | Motion / feedback | Primitive | Required? |
 |---|---|---|---|---|
-| Renderer submit button | hover/focus/press/submit | subtle elevation/press state + pending affordance; text remains authoritative | `<greenhouse-form>` | yes |
+| Renderer submit button | hover/focus/press/submit | subtle elevation/press state + pending affordance; arrow shifts a few px on hover; text remains authoritative | `<greenhouse-form>` | yes |
 | Field focus | focus/blur | border/focus ring transition, no layout shift | `<greenhouse-form>` | yes |
 | Field error/status | input/blur/submit | inline error/success feedback; text is authoritative; small reveal only if reduced-motion safe | `<greenhouse-form>` | yes |
 | Email verification | debounce/response | status line appears near field, no card jump; pending indicator with text | `<greenhouse-form>` | yes |
@@ -35,26 +35,28 @@
 |---|---|---|---|---|---|---|---|
 | Submit | enabled | small transform/shadow or tonal shift | visible focus ring | brief press compression | N/A | disabled/pending text/state | success/error status |
 | Fields | editable | border/tint only if pointer | visible focus ring | N/A | N/A | verifying state for email | inline error/success text + border/icon |
-| Selects | editable | border/tint only if pointer | visible focus ring | pressed/open native behavior | selected value | N/A | error text if required in future |
+| Selects | editable + premium listbox | border/tint only if pointer | visible focus ring + chevron accent | combobox opens custom listbox; arrow keys move active option; Enter selects; Escape closes | selected value | N/A | error text if required in future |
 
 ## Transition Specs
 
 | Transition | From | To | Timing / easing token | Behavior | Reduced-motion fallback |
 |---|---|---|---|---|---|
 | Field focus | neutral | focused | 120-160ms / emphasized ease | border/focus ring changes only | instant focus ring |
+| Select listbox | closed | open | 120-160ms / emphasized ease | panel appears anchored below the control; no OS-native dropdown styling | panel appears instantly |
 | Field validation | neutral | error/success | 120-180ms / emphasized ease | reveal inline message without large vertical jump | message appears instantly |
 | CTA hover/press | idle | hover/pressed | 75-140ms / emphasized ease | small elevation/translate on hover and shadow compression on press | no transform, color/focus remains |
+| CTA arrow | idle | hover | 120-140ms / emphasized ease | arrow translates 3px to reinforce continuation | arrow remains static |
 | Submit pending | idle | pending | 120-200ms | disabled affordance + text change; no spinner-only meaning | text/state change only |
 
 ## Primitive & Token Mapping
 
-- Primitive: `<greenhouse-form>` existing renderer.
+- Primitive: `<greenhouse-form>` existing renderer with `styleVariant=diagnostic_premium`.
 - Imports allowed: none in WordPress; renderer script only.
 - Imports forbidden: GSAP, Framer, Lottie, ad-hoc animation libraries.
 - Timing tokens: 75ms press, 120-160ms focus, 180ms validation reveal, 200ms pending transition.
 - Easing tokens: `cubic-bezier(0.2, 0, 0, 1)` or existing renderer equivalent.
 - Layout animation: none.
-- CSS properties: opacity, transform, border-color, box-shadow and background-color only; no height animation that causes layout jumps. Current renderer uses tokenized field/action shadows and focus halo; host overrides stay through `--ghf-*`.
+- CSS properties: opacity, transform, border-color, box-shadow and background-color only; no height animation that causes layout jumps. Current renderer uses tokenized field/action shadows, focus halo, custom select icon/listbox and CTA arrow span; host overrides stay through `--ghf-*`.
 - GSAP/Lottie justification: N/A.
 
 ## Reduced Motion Contract
@@ -85,19 +87,20 @@
 ## GVC / Micro Evidence
 
 - Scenario: AEO conversion renderer migration / modernized form parity.
-- Scenario file: `pnpm public-website:verify-aeo-renderer-interaction-preview` for pre-live interaction states; direct route capture or new GVC scenario still required after live save.
+- Scenario file: `pnpm public-website:verify-aeo-form-live-behavior` for live focus/ARIA, email gate, Turnstile boundary and dataLayer checks.
 - Route: `https://efeoncepro.com/aeo-2/`.
 - Viewports: desktop, mobile 390, reduced-motion.
-- Required steps: load conversion section, focus first field, trigger invalid submit, verify summary/ARIA, verify reduced-motion; after live save, also trigger email gate and pending submit boundary.
-- Required captures: default, focus state, required error state, reduced-motion pre-live; email gate/verifying state, pending submit boundary and success/error recovery after governed live cutover or a safe staging harness.
+- Required steps: load conversion section, focus first field, trigger invalid submit, verify summary/ARIA, verify premium dropdown ARIA, trigger email gate and pending submit boundary.
+- Required captures: default, focus state, required error state, email gate/verifying state and submit boundary.
 - Required frame labels: `default`, `focus`, `field-error`, `reduced-motion`; later `email-gate`, `pending`.
 - Required `data-capture` markers: `.gh-aeo-conversion`, renderer root, submit button.
 - Assertions: no layout jump/overflow, reduced-motion preserves state meaning, focus ring visible, CTA not dark/default, selects clean, errors announced by text.
-- Reduced-motion evidence: `verify-aeo-renderer-interaction-preview` checks computed transition/animation duration `<=1ms` and saves `.captures/aeo-renderer-interaction-reduced-motion-desktop.png`.
+- Reduced-motion evidence remains covered by renderer tests/prelive fixture; live behavior covers the current production interaction boundary.
 
 ## Design Decision Log
 
 - Decision: allow purposeful microinteractions in the renderer, but no decorative WordPress host animation.
+- Decision delta 2026-06-30 premium pass: `diagnostic_premium` may add CTA arrow motion, custom single-select combobox/listbox, chevron focus feedback and calmer error reveal because each reduces uncertainty or reinforces continuation; no card entrance choreography.
 - Decision delta 2026-06-30: prevent primary `pointerdown` default so blur validation cannot shift layout under the first submit click; submit handler remains the authority for full-step validation.
 - Alternatives considered: animated card entrance, custom spinner-only pending state, accordion-like reveal around errors, glow-heavy CTA.
 - Why this pattern: this is a trust/conversion form; modern feel should come from responsive feedback, not theatrical motion.

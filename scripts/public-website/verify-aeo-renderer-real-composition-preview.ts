@@ -27,8 +27,10 @@ type ViewportResult = {
   name: string
   overflowX: number
   screenshot: string
+  dropdownScreenshot: string
   inputs: ControlSnapshot[]
   selects: (ControlSnapshot & { firstOption: string })[]
+  dropdown: ControlSnapshot & { optionCount: number }
   button: ControlSnapshot
   trustText: string
   formKey: string | null
@@ -43,7 +45,7 @@ const rendererBundlePath = resolve(process.cwd(), 'public/growth-forms/renderer-
 
 const viewports = [
   { name: 'desktop', viewport: { width: 1440, height: 1200 } },
-  { name: 'mobile390', viewport: { width: 390, height: 1100 } },
+  { name: 'mobile390', viewport: { width: 390, height: 1300 } },
 ]
 
 const parseRgb = (value: string): Rgb | null => {
@@ -158,6 +160,20 @@ const assertButton = (snapshot: ControlSnapshot) => {
   }
 }
 
+const assertDropdown = (label: string, snapshot: ControlSnapshot & { optionCount: number }) => {
+  if (!isNearWhite(snapshot.backgroundColor)) {
+    throw new Error(`${label} background is ${snapshot.backgroundColor}; expected premium white dropdown panel`)
+  }
+
+  if (snapshot.borderStyle === 'none' || Number.parseFloat(snapshot.borderWidth) < 1) {
+    throw new Error(`${label} border is ${snapshot.borderWidth} ${snapshot.borderStyle}; expected visible dropdown border`)
+  }
+
+  if (snapshot.optionCount < 5) {
+    throw new Error(`${label} option count is ${snapshot.optionCount}; expected full option list`)
+  }
+}
+
 const assertSameDesktopRow = (viewportName: string, label: string, first: ControlSnapshot, second: ControlSnapshot) => {
   if (viewportName !== 'desktop') return
 
@@ -172,12 +188,30 @@ const assertSameDesktopRow = (viewportName: string, label: string, first: Contro
 }
 
 const injectRendererPreview = async (page: Page) => {
-  await page.evaluate(({ formKeyValue, surfaceIdValue }) => {
+  const mode = await page.evaluate(({ formKeyValue, surfaceIdValue }) => {
     const card = document.querySelector<HTMLElement>('.gh-aeo-growth-form-card')
+    const liveForm = document.querySelector<HTMLElement>('.gh-aeo-growth-form-card greenhouse-form')
+
+    if (card && liveForm) {
+      const preview = document.createElement('div')
+
+      preview.className = 'gh-aeo-renderer-real-composition-preview'
+      liveForm.before(preview)
+      preview.appendChild(liveForm)
+      card
+        .querySelectorAll<HTMLElement>(
+          '.gh-aeo-growth-form-proof, .gh-aeo-growth-form-privacy, .gh-aeo-growth-form-direct, .gh-aeo-growth-form-status'
+        )
+        .forEach(node => preview.appendChild(node))
+      card.setAttribute('data-greenhouse-renderer-preview', 'live-renderer')
+
+      return 'live-renderer'
+    }
+
     const bridgeForm = document.querySelector<HTMLElement>('.gh-aeo-growth-form')
 
     if (!card || !bridgeForm) {
-      throw new Error('Missing AEO bridge card/form on live page')
+      throw new Error('Missing AEO bridge card/form or live greenhouse-form on live page')
     }
 
     const trustNodes = Array.from(
@@ -218,11 +252,18 @@ const injectRendererPreview = async (page: Page) => {
     trustNodes.forEach(node => preview.appendChild(node))
     bridgeForm.replaceWith(preview)
     card.setAttribute('data-greenhouse-renderer-preview', '1')
+
+    return 'in-memory-preview'
   }, { formKeyValue: formKey, surfaceIdValue: surfaceId })
 
-  await page.addScriptTag({ path: rendererBundlePath })
+  if (mode === 'in-memory-preview') {
+    await page.addScriptTag({ path: rendererBundlePath })
+  }
+
   await page.waitForSelector('greenhouse-form .ghf-btn', { timeout: 15000 })
   await page.waitForTimeout(500)
+
+  return mode
 }
 
 async function main() {
@@ -264,9 +305,10 @@ async function main() {
       const selects = await Promise.all(
         [0, 1].map(index =>
           page.locator('.gh-aeo-conversion greenhouse-form .ghf-select').nth(index).evaluate((node, selected) => {
-            const element = node as HTMLSelectElement
+            const element = node as HTMLElement
             const style = getComputedStyle(element)
             const rect = element.getBoundingClientRect()
+            const nativeSelect = element instanceof HTMLSelectElement
 
             return {
               selector: selected,
@@ -283,7 +325,9 @@ async function main() {
               top: rect.top,
               width: rect.width,
               height: rect.height,
-              firstOption: element.querySelector('option')?.textContent?.replace(/^—/, '').trim() ?? '',
+              firstOption: nativeSelect
+                ? element.querySelector('option')?.textContent?.replace(/^—/, '').trim() ?? ''
+                : element.textContent?.trim().replace(/\s+/g, ' ') ?? '',
             }
           }, `.gh-aeo-conversion greenhouse-form .ghf-select >> nth=${index}`)
         )
@@ -294,20 +338,32 @@ async function main() {
       const overflowX = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
       const currentFormKey = await page.locator('greenhouse-form').first().getAttribute('form-key')
       const screenshot = `${screenshotDir}/aeo-renderer-real-composition-preview-${testCase.name}.png`
+      const dropdownScreenshot = `${screenshotDir}/aeo-renderer-real-composition-preview-dropdown-${testCase.name}.png`
 
       await page.screenshot({ path: screenshot, fullPage: false })
+
+      await page.locator('.gh-aeo-conversion greenhouse-form .ghf-select-trigger').nth(1).click()
+      await page.waitForSelector('.gh-aeo-conversion greenhouse-form .ghf-select-list:not([hidden])', { timeout: 3000 })
+
+      const dropdown = {
+        ...(await readControl(page, '.gh-aeo-conversion greenhouse-form .ghf-select-list:not([hidden])')),
+        optionCount: await page.locator('.gh-aeo-conversion greenhouse-form .ghf-select-list:not([hidden]) [role="option"]').count(),
+      }
+
+      await page.screenshot({ path: dropdownScreenshot, fullPage: false })
 
       inputs.forEach((snapshot, index) => assertField(`${testCase.name} renderer input ${index + 1}`, snapshot))
       selects.forEach((snapshot, index) => assertSelect(`${testCase.name} renderer select ${index + 1}`, snapshot))
       assertButton(button)
+      assertDropdown(`${testCase.name} renderer dropdown`, dropdown)
       assertSameDesktopRow(testCase.name, 'name/email fields', inputs[0], inputs[1])
       assertSameDesktopRow(testCase.name, 'country/company size selects', selects[0], selects[1])
 
-      if (selects[0]?.firstOption !== 'Selecciona país') {
+      if (!selects[0]?.firstOption.includes('Selecciona país')) {
         throw new Error(`${testCase.name} country select placeholder is "${selects[0]?.firstOption}"`)
       }
 
-      if (selects[1]?.firstOption !== 'Selecciona tamaño') {
+      if (!selects[1]?.firstOption.includes('Selecciona tamaño')) {
         throw new Error(`${testCase.name} size select placeholder is "${selects[1]?.firstOption}"`)
       }
 
@@ -325,8 +381,10 @@ async function main() {
         name: testCase.name,
         overflowX,
         screenshot,
+        dropdownScreenshot,
         inputs,
         selects,
+        dropdown,
         button,
         trustText: trustText?.trim().replace(/\s+/g, ' ') ?? '',
         formKey: currentFormKey,

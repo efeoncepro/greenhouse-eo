@@ -1,5 +1,14 @@
 # TASK-1298 — AEO WordPress greenhouse-form migration
 
+## Delta 2026-07-01 — cutover live completado
+
+- AEO `/aeo-2/` quedo migrada del bridge HTML temporal a `<greenhouse-form>` con identidad estable `form-key="b120566a-dd1a-43c8-956a-4e0121e805b8"`, surface `fhsf-efeonce-aeo-diagnostic`, `color-scheme="light"` y `appearance="bare"`.
+- La version publicada vigente del formulario es v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, con `style_variant=diagnostic_premium`. La v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4` quedo deprecada.
+- El renderer premium reemplaza los selects nativos por listboxes propios para los dos dropdowns (`Pais principal` y `Tamano de la empresa`), con `role=combobox/listbox/option`, teclado, foco visible, panel blanco con borde y placeholders aprobados.
+- WordPress se mutó con Elementor `Document::save()`; backup meta: `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`; Kinsta purgado; `heroans` se mantuvo en `e0b951b2456a83578cd9e22005900521`.
+- Gate live verde: `pnpm public-website:verify-aeo-live-contract` valida WordPress post-cutover (`<greenhouse-form>`, sin bridge), API publica por slug/formKey, captcha fail-closed, tipografia, visual desktop/mobile 390, dropdown premium, focus/ARIA, email gate, Turnstile `captchaToken` y dataLayer sin PII.
+- El patron reusable no exige repetir este parto para cada form: nuevos formularios pueden usar `styleVariant=diagnostic_premium` y el renderer endurecido. AEO conserva guards extra por ser una landing publica critica con hero protegido e historial de incidente.
+
 ## Delta 2026-06-30
 
 - Naming de identidad de Growth Forms fijado en `TASK-1297`: la identidad pública/opaca es **`form_key`** (DB) / **`formKey`** (contrato) / **`form-key`** (atributo del renderer), NO `form_guid`/`formGuid` (ese nombre es del GUID secreto de destino de HubSpot, server-only). Esta task se actualizó: embed, atributo, acceptance, wireframe y verificación ahora usan `form-key`/`formKey`. El `<AEO_FORM_KEY>` real proviene del runtime verificado por `TASK-1297`.
@@ -13,24 +22,24 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1298-aeo-greenhouse-form-migration.md`
 - Flow: `none`
 - Motion: `docs/ui/motion/TASK-1298-aeo-greenhouse-form-migration-motion.md`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `public-site|growth`
-- Blocked by: `live_cutover_pending_after_pre_live_parity`
-- Branch: `task/TASK-1298-aeo-greenhouse-form-wordpress-migration`
+- Blocked by: `none`
+- Branch: `develop`
 
 ## Revert 2026-06-30 — migración shipeada y REVERTIDA (lección)
 
@@ -64,7 +73,7 @@
 
 ## Summary
 
-Migrar la seccion de conversion de AEO `/aeo-2/` desde el bridge HTML temporal a `<greenhouse-form>`, preservando la experiencia publica aprobada: una sola card visible, copy AEO, validacion inline, email corporativo, Turnstile invisible, dataLayer y mobile 390 sin overflow. No toca Home, hero ni el `/aeo` viejo.
+Migracion completada de la seccion de conversion de AEO `/aeo-2/` desde el bridge HTML temporal a `<greenhouse-form>`, preservando y mejorando la experiencia publica: una sola card visible, copy AEO, validacion inline, email corporativo, Turnstile invisible, dataLayer sin PII, dropdowns premium y mobile 390 sin overflow. No se tocó Home, hero ni el `/aeo` viejo.
 
 ## Why This Task Exists
 
@@ -72,12 +81,10 @@ El bridge AEO fue correcto como transicion, pero ya no debe quedarse como logica
 
 ## Goal
 
-- Mantener producción en el bridge restaurado mientras el renderer no alcance al menos paridad visual real dentro de Ohio.
-- Endurecer `<greenhouse-form>` hasta reproducir o superar el formulario aprobado: campos blancos con borde, selects limpios con placeholders `Selecciona país` / `Selecciona tamaño`, CTA teal, trust inline, single-surface, mobile 390 sin overflow y estados/foco accesibles.
-- Permitir una versión modernizada del formulario con estética más premium, microcopy más claro, motion sutil y microinteracciones útiles, siempre que reduzcan incertidumbre y respeten reduced-motion.
-- Crear/verificar gates visuales durables que miren controles reales y guarden frames desktop/mobile: `pnpm public-website:verify-aeo-prelive-contract` protege el bridge live restaurado y `heroans`, prueba API publica por slug/formKey + captcha fail-closed, corre tipografia + fixture Ohio-like hostil + renderer inyectado en la composición real de `/aeo-2/` sin mutar WordPress, y valida que los PNG existan, sean recientes, no estén blank y que el muestreo de píxeles dentro de inputs/selects/CTA confirme campos blancos, selects limpios y botón teal. Es defensa mecánica y no reemplaza revisión visual/GVC post-cutover.
-- Solo después de pasar paridad visual contra el bridge, reemplazar la lógica bridge del widget `convers` por `<greenhouse-form form-key="<AEO_FORM_KEY>" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light">`.
-- Verificar desktop/mobile 390, overflow, focus, validation, Turnstile boundary, dataLayer, gate de tipografía, gate visual y `heroans` hash antes de cerrar.
+- Dejar AEO `/aeo-2/` usando el renderer portable `<greenhouse-form>` por `form-key`, sin bridge local de submit/captcha/validacion.
+- Superar el baseline del bridge con una variante premium reusable: campos blancos con borde, dropdowns custom limpios con placeholders `Selecciona país` / `Selecciona tamaño`, CTA teal, trust inline, single-surface, mobile 390 sin overflow y estados/foco accesibles.
+- Hacer el cutover WordPress de forma gobernada: backup Elementor, `heroans` hash before/after, `Document::save()`, Kinsta purge y rollback documentado.
+- Verificar desktop/mobile 390, overflow, focus/ARIA, email gate, Turnstile boundary, dataLayer sin PII, tipografia, visual integrity y API publica antes de cerrar.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -146,15 +153,15 @@ Reglas obligatorias:
 
 - AEO live page: `https://efeoncepro.com/aeo-2/`, `postId=250265`, status `publish`.
 - Conversion section: `convers`, `.gh-aeo-conversion`.
-- Temporary bridge host/card: `.gh-aeo-form-card gh-aeo-growth-form-host` + `.gh-aeo-growth-form-card`.
+- Renderer host/card: `.gh-aeo-form-card gh-aeo-growth-form-host` + `.gh-aeo-growth-form-card` con `<greenhouse-form>`.
 - Renderer endpoint: `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`.
-- Public contract: slug `efeonce-aeo-diagnostic`, **`formKey` real `b120566a-dd1a-43c8-956a-4e0121e805b8`** (TASK-1297 complete), versión publicada v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4` con `copy.submit="Solicitar diagnóstico gratis →"`, `security.captcha` y placeholders `Selecciona país` / `Selecciona tamaño`, surface `fhsf-efeonce-aeo-diagnostic`. GET por formKey === por slug verificado.
-- Typography gate: `pnpm public-website:verify-aeo-form-typography`.
+- Public contract: slug `efeonce-aeo-diagnostic`, **`formKey` real `b120566a-dd1a-43c8-956a-4e0121e805b8`** (TASK-1297 complete), versión publicada v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d` con `style_variant=diagnostic_premium`, `copy.submit="Solicitar diagnóstico gratis →"`, `security.captcha` y placeholders `Selecciona país` / `Selecciona tamaño`, surface `fhsf-efeonce-aeo-diagnostic`. GET por formKey === por slug verificado.
+- Live gate: `pnpm public-website:verify-aeo-live-contract`.
 
 ### Gap
 
-- WordPress still owns submit, `/verify-email`, Turnstile execution and error state in a bridge HTML blob.
-- The generic renderer was smoke-tested as the live AEO form inside Elementor and failed visual parity in Ohio; it must be hardened and visually re-gated before another cutover.
+- Ningun gap bloqueante de TASK-1298. El bridge local fue reemplazado; WordPress ya no es dueño del submit, `/verify-email`, Turnstile execution ni error state.
+- Follow-up opcional: aplicar `styleVariant=diagnostic_premium` a otros formularios donde convenga la misma estética.
 
 ### Renderer reality (ground-truth `src/growth-forms-renderer/**`, verificado 2026-06-30)
 
@@ -425,47 +432,23 @@ El cambio live WordPress **no queda autorizado solo por existir esta task**. Mie
 
 ## Acceptance Criteria
 
-### Estado actual aceptable mientras está bloqueada
-
-- [x] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
-- [x] Se declaro `Wireframe: docs/ui/wireframes/TASK-1298-aeo-greenhouse-form-migration.md` y el archivo existe.
-- [x] Se declaro `Motion: docs/ui/motion/TASK-1298-aeo-greenhouse-form-migration-motion.md` y el archivo existe.
-- [x] `TASK-1297` esta complete y `formKey` real existe en prod, pero no se trata como bloqueo vigente.
-- [x] AEO `/aeo-2/` se mantiene en bridge restaurado mientras no exista cutover live gobernado.
-- [x] `pnpm public-website:verify-aeo-form-typography` pasa contra el bridge vigente.
-- [x] `pnpm public-website:verify-aeo-form-visual-integrity` pasa contra el bridge vigente y guarda screenshots desktop/mobile.
-- [x] `pnpm public-website:verify-aeo-renderer-prelive` pasa contra el renderer hardenizado y contra `/aeo-2/` inyectando el renderer en memoria sin mutar WordPress; guarda screenshots desktop/mobile para ambos sub-gates.
-- [x] El renderer pre-live aserta desktop en dos columnas para pares AEO (`Nombre`/`Email`, `País`/`Tamaño`) y mobile 390 en una columna sin overflow.
-- [x] `pnpm public-website:verify-aeo-renderer-interaction-preview` pasa y captura foco/error/reduced-motion en composición real inyectada en memoria.
-- [x] `pnpm public-website:verify-aeo-form-visual-contract` pasa y genera `.captures/aeo-form-visual-frame-review.json` con frames fresh/nonblank + `pixelReviews`: bridge live, fixture Ohio hostil, renderer en composición real y estados foco/error/reduced-motion. El review muestrea los bounding boxes reales de inputs/selects/CTA y falla si un frame muestra campos grises, demasiados píxeles oscuros en selects o CTA no-teal.
-- [x] `pnpm public-website:verify-aeo-public-api-contract` pasa: GET por slug y `formKey` devuelve misma v5 con `copy.submit`/`security.captcha`, sin leak de HubSpot/mapping, y POST sin captcha falla `403 captcha_failed/missing_token`.
-- [x] `pnpm public-website:verify-aeo-prelive-contract` pasa e incluye WP-CLI read-only: AEO publish, `heroans` hash estable, `convers` en bridge y sin `<greenhouse-form>`.
-- [x] El bridge vigente muestra inputs blancos con borde, 2 selects limpios con placeholders `Selecciona país` / `Selecciona tamaño`, CTA teal, trust inline y mobile 390 sin overflow.
+- [x] `TASK-1297` esta complete y el `formKey` real existe en produccion.
+- [x] AEO `/aeo-2/` usa `<greenhouse-form form-key="b120566a-dd1a-43c8-956a-4e0121e805b8">` para render/validation/submit en lugar del bridge HTML.
+- [x] El target se identifica por `formKey`, no por pagina, screenshot, slug o surface.
+- [x] La version publicada vigente es v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d` con `style_variant=diagnostic_premium`, CTA `Solicitar diagnóstico gratis →`, `security.captcha` y placeholders `Selecciona país` / `Selecciona tamaño`.
+- [x] Los dos dropdowns AEO (`Pais principal` y `Tamano de la empresa`) usan el listbox premium del renderer, no el select nativo vulnerable a Ohio.
+- [x] Desktop conserva pares escaneables (`Nombre`/`Email`, `Pais`/`Tamano`) y campos largos full-width; mobile 390 apila en una columna sin scroll horizontal.
+- [x] El cutover WordPress se hizo con Elementor `Document::save()` y backup meta `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`.
+- [x] Kinsta fue purgado despues del save.
 - [x] `heroans` md5 sigue `e0b951b2456a83578cd9e22005900521`.
-- [x] La task/README/registry/Handoff/changelog no declaran la migración como complete mientras no exista cutover live verificado.
-
-### Criterios para desbloquear y cerrar la migración futura
-
-- [ ] Se agrego `Cutover Unlock Evidence` a esta task, con aprobacion explicita para mutar WordPress live y plan exacto de backup/restore Elementor.
-- [ ] `UI ready` cambia a `yes` solo si wireframe y `## UI/UX Contract` tienen implementation mapping, GVC scenario plan y design decision log vigentes para el cutover live; `pnpm task:lint --task TASK-1298` pasa.
-- [ ] El renderer reproduce o supera el formulario aprobado dentro de Ohio antes del save live: inputs blancos con borde, selects limpios, placeholders aprobados, CTA teal/trust inline o una alternativa modernizada aprobada por frame review.
-- [ ] Desktop conserva pares escaneables (`Nombre`/`Email`, `País`/`Tamaño`) y campos largos full-width; mobile 390 apila en una columna sin scroll horizontal.
-- [ ] El renderer pasa `pnpm public-website:verify-aeo-prelive-contract` y tiene captura/GVC pre-save in-memory de la composición real revisada antes del cutover.
-- [ ] La versión modernizada declara microcopy, estados, motion/microinteracciones y reduced-motion en wireframe/motion antes de implementación live.
-- [ ] AEO `/aeo-2/` usa `<greenhouse-form form-key>` para render/validation/submit en lugar del bridge HTML.
-- [ ] El target se identifica por el `formKey` real de AEO, no por pagina, screenshot, slug o surface.
-- [ ] La seccion conserva una sola card visible (`.gh-aeo-growth-form-card` envolviendo al renderer transparente, Opción A) y no muestra kicker tecnico.
-- [ ] El embed declara `color-scheme="light"` y un fallback no-JS interno (direct-link); con `prefers-color-scheme:dark` el form NO se ve oscuro.
-- [ ] La tipografía del form usa el stack DM Sans (`--ghf-font` scoped), consistente con la landing.
-- [ ] Los labels/placeholders del renderer (desde el contrato) matchean la copy es-CL aprobada.
-- [ ] CTA visible es `Solicitar diagnóstico gratis →` (desde `render_contract.copy.submit`).
-- [ ] Email Gmail/free/disposable se bloquea inline antes de `/submit`.
-- [ ] Turnstile/captchaToken path funciona; submit sin token sigue fail-closed.
-- [ ] dataLayer events no contienen PII.
-- [ ] Desktop y mobile 390 tienen `scrollWidth == clientWidth`, sin solapes.
-- [ ] `heroans` md5 sigue `e0b951b2456a83578cd9e22005900521`.
-- [ ] `scripts/public-website/verify-aeo-form-typography.ts` y `scripts/public-website/verify-aeo-form-visual-integrity.ts` pasan contra el renderer migrado.
-- [ ] La sección `convers` de `docs/documentation/public-site/aeo-landing-elementor.md` describe el renderer + Opción A (no el bridge).
+- [x] El embed declara `color-scheme="light"` y `appearance="bare"`; la card visible sigue siendo una sola superficie AEO.
+- [x] CTA visible es `Solicitar diagnóstico gratis →` desde `render_contract.copy.submit`.
+- [x] Email Gmail/free/disposable se bloquea inline antes de `/submit`.
+- [x] Turnstile/captchaToken path funciona; submit sin token sigue fail-closed.
+- [x] dataLayer events no contienen PII.
+- [x] Desktop y mobile 390 tienen `scrollWidth == clientWidth`, sin solapes.
+- [x] `scripts/public-website/verify-aeo-form-typography.ts`, `verify-aeo-form-visual-integrity.ts`, `verify-aeo-form-live-behavior.ts`, `verify-aeo-wordpress-guards.ts` y `verify-aeo-public-api-contract.ts` pasan contra el renderer migrado.
+- [x] La sección `convers` de `docs/documentation/public-site/aeo-landing-elementor.md` describe el renderer live + variante premium, no el bridge como estado vigente.
 
 ## Verification
 
@@ -474,12 +457,11 @@ El cambio live WordPress **no queda autorizado solo por existir esta task**. Mie
 - `pnpm ui:motion-check --task TASK-1298`
 - `pnpm public-website:verify-aeo-form-typography`
 - `pnpm public-website:verify-aeo-form-visual-integrity`
-- `pnpm public-website:verify-aeo-renderer-prelive`
-- `pnpm public-website:verify-aeo-renderer-interaction-preview`
 - `pnpm public-website:verify-aeo-form-visual-contract`
 - `pnpm public-website:verify-aeo-wordpress-guards`
 - `pnpm public-website:verify-aeo-public-api-contract`
-- `pnpm public-website:verify-aeo-prelive-contract`
+- `pnpm public-website:verify-aeo-form-live-behavior`
+- `pnpm public-website:verify-aeo-live-contract`
 - `pnpm vitest run src/growth-forms-renderer/__tests__/renderer.test.ts src/growth-forms-renderer/__tests__/api-client.test.ts src/lib/growth/forms/__tests__/renderer-contract-parity.test.ts src/lib/growth/forms/__tests__/policy-compiler.test.ts`
 - `pnpm renderer:build`
 - `pnpm exec tsc --noEmit --pretty false`
@@ -488,15 +470,14 @@ El cambio live WordPress **no queda autorizado solo por existir esta task**. Mie
 - `pnpm qa:gates --changed --agent codex --task TASK-1298 --ui --runtime --docs`
 - `pnpm docs:closure-check`
 - `pnpm docs:context-check`
-- Public Growth Forms GET by slug/formKey returns same v5; POST without captcha returns `403` with `outcome=captcha_failed`, `message=missing_token`.
+- Public Growth Forms GET by slug/formKey returns same v6; POST without captcha returns `403` with `outcome=captcha_failed`, `message=missing_token`.
 - WP-CLI read-only `tmp/_aeo_convers_extract.php`: `heroansHash=e0b951b2456a83578cd9e22005900521`.
-- `pnpm codex:task-hook TASK-1298 --develop` fails intentionally while blocker `live_cutover_pending_after_pre_live_parity` remains.
-- Before removing the blocker: `Cutover Unlock Evidence` exists in this task and names the approved mutation window, backup meta key, rollback command/script, post-save GVC/frame review and Kinsta purge.
+- WordPress backup meta: `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`.
 
 ## Closing Protocol
 
-- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress`, cutover live pendiente)
-- [x] el archivo vive en la carpeta correcta (`docs/tasks/in-progress/`)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`complete`, cutover live verificado)
+- [x] el archivo vive en la carpeta correcta (`docs/tasks/complete/`)
 - [x] `docs/tasks/README.md` quedo sincronizado con el estado actual
 - [x] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado
 - [x] `Handoff.md` quedo actualizado

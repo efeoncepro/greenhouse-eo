@@ -1265,7 +1265,21 @@ El renderer portable cierra el gap que obligaba a hosts públicos a copiar un br
 - **Renderer:** `<greenhouse-form>` carga `https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit` de forma idempotente, renderiza un widget invisible fuera del layout, ejecuta el challenge antes del POST y envía `captchaToken` al submit gobernado. Si no obtiene token, no postea.
 - **API:** `SubmitPayload.captchaToken` se serializa en `POST /api/public/growth/forms/{slug}/submit`; `submitForm` conserva la verificación server-side/fail-closed a través del port compartido `src/lib/growth/public-submission/`.
 - **Compatibilidad:** forms sin `security.captcha` mantienen el comportamiento previo. No hay migración DB ni flag nuevo.
-- **AEO:** `/aeo-2/` sigue en bridge HTML hasta una task UI/WordPress separada con backup Elementor, `heroans` hash guard, Kinsta purge, Playwright desktop/mobile 390 y smoke dataLayer/runtime. El soporte de token en el renderer es condición necesaria, no cutover live automático.
+- **AEO (estado de este delta histórico 2026-06-30):** `/aeo-2/` seguia en bridge HTML hasta una task UI/WordPress separada con backup Elementor, `heroans` hash guard, Kinsta purge, Playwright desktop/mobile 390 y smoke dataLayer/runtime. El soporte de token en el renderer era condición necesaria, no cutover live automático. El estado vigente queda actualizado en el delta TASK-1298 del 2026-07-01.
+
+## Delta 2026-07-01 — TASK-1298: AEO live renderer premium cutover
+
+El estado anterior de AEO como bridge HTML terminó. La landing pública `/aeo-2/`
+usa `<greenhouse-form form-key="b120566a-dd1a-43c8-956a-4e0121e805b8">` en
+WordPress (`postId=250265`, widget `convers`) con la version publicada v6
+`fver-9ec43a66-5372-45b7-829d-2c9e6381e27d` y `style_variant=diagnostic_premium`.
+El bridge queda solo como referencia historica/rollback explícito por backup
+Elementor `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`.
+
+- **Runtime live:** `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`.
+- **Host:** WordPress renderiza la card y trust/privacidad; Growth Forms gobierna campos, validacion, email gate, Turnstile, submit, telemetry y destinos.
+- **Premium selects:** `diagnostic_premium` reemplaza los selects nativos por listboxes propios para ambos dropdowns AEO, evitando el popup/skin del sistema operativo y la interferencia CSS de Ohio.
+- **Gate:** `pnpm public-website:verify-aeo-live-contract` valida WordPress post-cutover, API publica por slug/formKey, captcha fail-closed, tipografia, visual desktop/mobile 390, dropdown premium, focus/ARIA, email gate, Turnstile `captchaToken` y dataLayer sin PII.
 
 ## Delta 2026-06-25 — TASK-1251: primer consumer del evento de submission + projection domain `growth` (code complete dev)
 

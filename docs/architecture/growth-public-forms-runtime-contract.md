@@ -29,21 +29,31 @@ Smoke live de referencia del primer rollout WordPress AEO:
 Deploy que introdujo CORS en produccion: `greenhouse-qbxqrrzpm`.
 Deploy que serializa `security.captcha` en produccion: `greenhouse-drl142ckj`.
 
-## AEO WordPress Bridge
+## AEO WordPress Renderer
 
-La landing publica `/aeo-2/` usa temporalmente un host bridge HTML con Turnstile invisible. Desde TASK-1294 el renderer portable `<greenhouse-form>` ya puede emitir `captchaToken`, desde TASK-1296 AEO declara `security.captcha` en el contrato publico, y desde TASK-1298 pre-live parity la version publicada vigente es v5 con placeholders es-CL alineados al bridge. Aun asi esta landing sigue en bridge hasta una migracion WordPress gobernada con backup Elementor, Kinsta purge y Playwright/GVC desktop/mobile 390.
+La landing publica `/aeo-2/` usa el renderer portable `<greenhouse-form>` en WordPress desde el cutover gobernado de TASK-1298 (2026-07-01). El bridge HTML temporal quedo reemplazado en el widget `convers`; el submit, la validacion, Turnstile, telemetry y destinos vuelven al contrato Growth Forms.
 
 Identificadores vigentes:
 
 - WordPress page: `postId=250265`, slug `aeo-2`, status `publish`.
-- Elementor widget host: `convers`, classes `gh-aeo-form-card gh-aeo-growth-form-host`.
+- Elementor widget host: `convers`, wrapper `.gh-aeo-growth-form-card`.
 - Form slug: `efeonce-aeo-diagnostic`.
 - **Form key (identidad estable, TASK-1297):** `b120566a-dd1a-43c8-956a-4e0121e805b8` (AEO). El del AI Visibility Grader es `69cd5269-5f97-4d32-99c4-0b23f41aa2f5` (distinto). Embed/resolución preferida por `form-key`; `slug` queda como alias backward-compatible.
-- Form definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4` (v5, expone `copy.submit="Solicitar diagnóstico gratis →"`, placeholders `Selecciona país` / `Selecciona tamaño` y `security.captcha`; v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94` deprecada 2026-06-30 por TASK-1298 pre-live parity; v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b` deprecada 2026-06-30 por TASK-1297; v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` y v1 `fver-efeonce-aeo-diagnostic-v1` deprecadas).
+- WordPress embed: `<greenhouse-form form-key="b120566a-dd1a-43c8-956a-4e0121e805b8" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light" appearance="bare">` + `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`.
+- Form definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d` (v6, `style_variant=diagnostic_premium`, expone `copy.submit="Solicitar diagnóstico gratis →"`, placeholders `Selecciona país` / `Selecciona tamaño`, helper/error/success copy premium y `security.captcha`; v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4` deprecada 2026-07-01; v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` y v1 `fver-efeonce-aeo-diagnostic-v1` deprecadas).
 - Host surface: `fhsf-efeonce-aeo-diagnostic`.
 - API base: `https://greenhouse.efeoncepro.com`.
-- Turnstile site key in WordPress: `0x4AAAAAADqwX2R7v-k9pItv`.
+- Turnstile site key in render contract: `0x4AAAAAADqwX2R7v-k9pItv`.
 - HubSpot secure-submit destination: portal `48713323`, form GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6` (`AEO - Lead Form`).
+
+Premium modernization contract (live):
+
+- `style_variant=diagnostic_premium` is the governed renderer path for the AEO premium pass. It keeps the look in the Growth Forms render contract + renderer tokens, not in WordPress page CSS.
+- Script: `pnpm growth:forms:activate-aeo-premium` dry-runs and `pnpm growth:forms:activate-aeo-premium -- --apply` publishes a new AEO form version by `form_key=b120566a-dd1a-43c8-956a-4e0121e805b8`.
+- The script updates labels/placeholders/help/errors/submit/success copy, preserves fields, validation, Turnstile, destinations and policies, publishes vNext and deprecates the previous version.
+- Applied production data: v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`.
+- WordPress cutover backup meta: `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`.
+- Live verification command: `pnpm public-website:verify-aeo-live-contract`.
 
 Field contract:
 
@@ -79,7 +89,7 @@ Runtime guardrails:
 - WordPress must never know HubSpot mapping, portal credentials, destination secrets or Turnstile secret.
 - The AEO form requires corporate email: the published field uses `validator=corporate_email` and `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. Gmail/free/disposable addresses must be rejected before accepted submission.
 - The current AEO published form declares `ui_policy_json.security.captcha` with public Turnstile site key `0x4AAAAAADqwX2R7v-k9pItv`, `required:true`, `mode:"invisible"` and `execution:"submit"`. Production public `GET` now serializes `render_contract.security.captcha`; public `POST` remains fail-closed without a token.
-- The temporary WordPress bridge must mirror the Growth Forms reactive validation contract: field-level errors close to the input, `aria-invalid`/`aria-describedby`, debounced `/verify-email` for corporate email, and no `/submit` while field validation blocks. Do not regress to status-only/global validation.
+- The WordPress embed must keep validation in Growth Forms: field-level errors close to the input, `aria-invalid`/`aria-describedby`, debounced `/verify-email` for corporate email, and no `/submit` while field validation blocks. Do not regress to status-only/global validation or a landing-local submit bridge.
 - A submit without Turnstile token must fail as `403 captcha_failed/missing_token` and must not create a lead.
 - The browser origin must pass CORS before the public API response is consumable, but CORS does not replace form/surface/origin validation in the engine.
 - Do not revert this surface to the old `ai-visibility-grader` slug or a meeting-link fallback unless explicitly rolling back.
@@ -90,9 +100,9 @@ Contrato renderer desde TASK-1294:
 - `<greenhouse-form>` carga `https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit`, renderiza un widget invisible idempotente y envia `captchaToken` en el body de `POST /submit`.
 - El server sigue siendo autoridad: `TURNSTILE_SECRET` nunca sale al browser y `submitForm` verifica/falla cerrado.
 
-Cuando se ejecute la migracion AEO:
+Post-cutover guardrails:
 
-- migrar WordPress de vuelta a `<greenhouse-form form-key="b120566a-dd1a-43c8-956a-4e0121e805b8" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light" appearance="bare">`;
 - conservar el mismo backend contract y surface;
-- no mover mapping HubSpot ni consent policy a WordPress.
-- no ejecutar el cutover mientras `pnpm codex:task-hook TASK-1298 --develop` siga bloqueando por `live_cutover_pending_after_pre_live_parity`; primero debe existir evidencia pre-save y post-save de frames desktop/mobile 390, `heroans` estable y fallback/Turnstile/email/dataLayer verificados.
+- no mover mapping HubSpot ni consent policy a WordPress;
+- no volver al bridge HTML salvo rollback explicito usando el backup meta;
+- antes de declarar cambios futuros en este form, correr `pnpm public-website:verify-aeo-live-contract` y confirmar `heroans` estable.

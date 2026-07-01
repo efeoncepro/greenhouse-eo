@@ -63,6 +63,12 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.classList.contains('ghf-scope')).toBe(false)
   })
 
+  it('exposes contract styleVariant on the renderer root for governed visual variants', () => {
+    const { root } = mountInto(staticContractFixture({ styleVariant: 'diagnostic_premium' }))
+
+    expect(root.getAttribute('data-ghf-style-variant')).toBe('diagnostic_premium')
+  })
+
   it('renders labels above inputs with autocomplete + inputmode from the contract', () => {
     const { root } = mountInto()
     const email = root.querySelector<HTMLInputElement>('[name="work_email"]')!
@@ -182,6 +188,58 @@ describe('growth-forms-renderer · FormRenderer', () => {
     const select = root.querySelector<HTMLSelectElement>('[name="country"]')!
 
     expect(Array.from(select.options).map(option => option.textContent)).toEqual(['Selecciona país', 'Chile'])
+    expect(select.closest('.ghf-control--select')?.querySelector('.ghf-select-icon')).not.toBeNull()
+  })
+
+  it('renders premium selects as an accessible custom listbox instead of the native popup', () => {
+    const { root } = mountInto(staticContractFixture({
+      styleVariant: 'diagnostic_premium',
+      fields: [
+        {
+          key: 'companySize',
+          type: 'select',
+          label: 'Tamaño de empresa',
+          options: [
+            { value: '', label: 'Selecciona tamaño' },
+            { value: '1-10', label: '1 - 10' },
+            { value: '11-50', label: '11 - 50' },
+          ],
+        },
+      ],
+      consent: undefined,
+    }))
+
+    const trigger = root.querySelector<HTMLButtonElement>('[name="companySize"].ghf-select-trigger')!
+    const list = root.querySelector<HTMLElement>('.ghf-select-list')!
+
+    expect(trigger.getAttribute('role')).toBe('combobox')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(list.hidden).toBe(true)
+
+    trigger.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(list.hidden).toBe(false)
+    expect(root.querySelectorAll('[role="option"]')).toHaveLength(3)
+
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+    expect(trigger.textContent).toContain('1 - 10')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(root.querySelector('[role="option"][aria-selected="true"]')?.textContent).toBe('1 - 10')
+  })
+
+  it('uses contract-provided field required copy when present', () => {
+    const { root } = mountInto(staticContractFixture({
+      fields: [{ key: 'firstName', type: 'text', label: 'Nombre', required: true }],
+      copy: { 'firstName.error.required': 'Escribe tu nombre para personalizar el diagnóstico.' },
+      consent: undefined,
+    }))
+
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    expect(root.querySelector('.ghf-error')?.textContent).toBe('Escribe tu nombre para personalizar el diagnóstico.')
   })
 
   it('keeps short fields and selects paired while long intent fields span the form', () => {
@@ -484,7 +542,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(readiness.textContent).toMatch(/Falta/)
     expect(readiness.getAttribute('data-ready')).toBe('false')
 
-    // Completar todo lo requerido → "Listo para enviar".
+    // Completar todo lo requerido → readiness premium.
     const brand = root.querySelector<HTMLInputElement>('[name="brand"]')!
 
     brand.value = 'Brand'
@@ -495,7 +553,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
     consent.dispatchEvent(new Event('change'))
 
     expect(readiness.getAttribute('data-ready')).toBe('true')
-    expect(readiness.textContent).toBe('Listo para enviar')
+    expect(readiness.textContent).toBe('Todo listo para solicitar el diagnóstico')
   })
 
   it('updates the character counter live for maxLength fields', () => {

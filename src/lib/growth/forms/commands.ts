@@ -78,6 +78,8 @@ export interface AuthorDraftFormInput {
   /** TASK-1297 — render copy (copyRef → string) publicado al render contract. Se sanea
    *  browser-safe en el policy-compiler (sanitizeRenderCopy) antes de exponerse. */
   copyRefs?: unknown
+  /** Variante visual gobernada del renderer portable (`form_version.style_variant`). */
+  styleVariant?: string | null
   uiPolicy?: unknown
   successBehavior?: unknown
   consentPolicyVersion?: string
@@ -111,6 +113,7 @@ export const authorDraftForm = async (input: AuthorDraftFormInput): Promise<{ fo
     fieldSchema: input.fieldSchema,
     validationSchema: input.validationSchema,
     copyRefs: input.copyRefs,
+    styleVariant: input.styleVariant,
     uiPolicy: input.uiPolicy,
     successBehavior: input.successBehavior,
     consentPolicyVersion: input.consentPolicyVersion ?? null,

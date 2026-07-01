@@ -16,11 +16,14 @@ type GuardPayload = {
   conversLength: number
   conversHasBridge: boolean
   conversHasGreenhouseForm: boolean
+  conversHasStableFormKey: boolean
+  conversHasRendererScript: boolean
   conversHasApprovedCta: boolean
   conversHasTrustCopy: boolean
 }
 
 const expectedHeroansHash = 'e0b951b2456a83578cd9e22005900521'
+const expectedFormKey = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 const phpStartMarker = 'GH_AEO_WP_GUARD_JSON_START'
 const phpEndMarker = 'GH_AEO_WP_GUARD_JSON_END'
 
@@ -92,6 +95,8 @@ $payload = array(
   'conversLength' => strlen($convers_html),
   'conversHasBridge' => strpos($convers_html, 'gh-aeo-growth-form') !== false && strpos($convers_html, 'gh-aeo-growth-form-button') !== false,
   'conversHasGreenhouseForm' => stripos($convers_html, '<greenhouse-form') !== false,
+  'conversHasStableFormKey' => strpos($convers_html, 'form-key="b120566a-dd1a-43c8-956a-4e0121e805b8"') !== false,
+  'conversHasRendererScript' => strpos($convers_html, 'https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js') !== false,
   'conversHasApprovedCta' => strpos($convers_html, 'Solicitar diagnóstico gratis') !== false,
   'conversHasTrustCopy' => strpos($convers_html, 'Sin costo') !== false && strpos($convers_html, 'Sin compromiso') !== false,
 );
@@ -131,16 +136,20 @@ const assertPayload = (payload: GuardPayload) => {
     throw new Error('convers widget was not found in Elementor data')
   }
 
-  if (!payload.conversHasBridge) {
-    throw new Error(`convers widget no longer looks like the approved bridge form: ${JSON.stringify(payload)}`)
+  if (payload.conversHasBridge) {
+    throw new Error(`convers widget still looks like the temporary bridge form: ${JSON.stringify(payload)}`)
   }
 
-  if (payload.conversHasGreenhouseForm) {
-    throw new Error('convers widget already contains <greenhouse-form>; live cutover should not be present yet')
+  if (!payload.conversHasGreenhouseForm) {
+    throw new Error('convers widget does not contain the live <greenhouse-form> renderer embed')
   }
 
-  if (!payload.conversHasApprovedCta) {
-    throw new Error('convers widget is missing approved CTA copy')
+  if (!payload.conversHasStableFormKey) {
+    throw new Error(`convers widget is missing stable Growth Forms form-key ${expectedFormKey}`)
+  }
+
+  if (!payload.conversHasRendererScript) {
+    throw new Error('convers widget is missing renderer-latest.js script')
   }
 
   if (!payload.conversHasTrustCopy) {
@@ -183,8 +192,9 @@ const main = () => {
 
     console.log(JSON.stringify({
       ok: true,
-      contract: 'AEO WordPress live remains on restored bridge and protected heroans hash is stable',
+      contract: 'AEO WordPress live uses the premium Growth Forms renderer and protected heroans hash is stable',
       expectedHeroansHash,
+      expectedFormKey,
       payload,
     }, null, 2))
   } finally {

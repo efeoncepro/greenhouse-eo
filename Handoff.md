@@ -1,3 +1,37 @@
+## Sesion 2026-07-01 — AEO premium renderer live cutover — Codex — ✅ live
+
+> **Pedido:** poner live el renderer premium AEO con los dos dropdowns estilizados y aclarar si esto escala a otros formularios.
+>
+> **Estado live:** `/aeo-2/` (`postId=250265`, widget `convers`) ya no usa el bridge temporal. Quedó embebido `<greenhouse-form form-key="b120566a-dd1a-43c8-956a-4e0121e805b8" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light" appearance="bare">` + `renderer-latest.js`. Ambos dropdowns (`País principal`, `Tamaño de empresa`) usan el combobox/listbox premium del renderer, no el popup nativo oscuro del OS.
+>
+> **Contrato/data:** AEO v6 publicada `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, `style_variant=diagnostic_premium`, CTA `Solicitar diagnóstico gratis →`, `security.captcha` Turnstile invisible y formKey estable `b120566a-dd1a-43c8-956a-4e0121e805b8`. v5 quedó deprecada.
+>
+> **WordPress:** mutación hecha con Elementor `Document::save()`, no escritura directa a `_elementor_data`. Backup meta: `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`. `heroans` preservado (`e0b951b2456a83578cd9e22005900521`). Kinsta purgada (`purge_complete_caches`). No se tocó Home `2791`, old `/aeo` `250255` ni el hero.
+>
+> **Deploy:** Vercel prod `greenhouse-wcs4mhqi1-efeonce-7670142f.vercel.app`; `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js` verificado con `diagnostic_premium`, `ghf-select-trigger`, `ghf-select-list`.
+>
+> **Verificación live:** `pnpm public-website:verify-aeo-live-contract` verde. Cubre WordPress guard (`convers` con `<greenhouse-form>`, sin bridge, `heroans` estable), API slug/formKey v6 + captcha fail-closed, tipografía, visual desktop/mobile 390 sin overflow, dropdowns premium, foco/ARIA, email gate, Turnstile `captchaToken` boundary y dataLayer sin PII.
+>
+> **GVC:** se intentó `pnpm fe:capture --route=/aeo-2/ --env=production --hold=3000`; quedó bloqueado correctamente por el triple gate de producción (`GREENHOUSE_CAPTURE_ALLOW_PROD`, `--prod`, `GREENHOUSE_CAPTURE_ACTOR_CAPABILITY`). No se saltó el guardrail. La evidencia visual usada para cierre viene de Playwright live contract con screenshots desktop/mobile/dropdown.
+>
+> **Escalabilidad:** esto no debería repetirse como parto de 2h por formulario. El costo grande fue hardening/gates de plataforma para Ohio/AEO. Nuevos formularios usan `form-key`, `styleVariant` si aplica, smoke API, desktop/mobile 390, overflow y behavior checks proporcionales. Solo landings críticas o hosts CSS hostiles necesitan un gate pixel-aware estilo AEO.
+
+## Sesion 2026-06-30 — AEO premium renderer contract — Codex — 🚧 code-ready, apply pendiente por auth
+
+> **Pedido:** llevar el form AEO a una version mas premium/2026 sin volver a romper WordPress. Se uso el contrato UI/UX/microcopy/microinteracciones sobre `TASK-1298`, pero sin mutar live.
+>
+> **Implementado local:** el renderer ahora soporta `styleVariant` como `data-ghf-style-variant` y agrega la variante `diagnostic_premium` en `src/growth-forms-renderer/styles.ts`: controles blancos con borde/halo premium, selects con chevron propio, error state sin fondo rosado agresivo, CTA teal centrado con flecha animable, success state y hardening contra Ohio (`text-transform`, select background, button skin). El boton preserva texto accesible y separa la flecha para motion. La validacion inline puede usar copy especifico por campo (`<field>.error.required`) desde el render contract.
+>
+> **Copy/contrato AEO:** se agrego `scripts/growth/activate-aeo-premium-contract.ts` y el script `pnpm growth:forms:activate-aeo-premium` (dry-run por defecto; `-- --apply` publica vNext). Resuelve por `form_key=b120566a-dd1a-43c8-956a-4e0121e805b8`, preserva fields/validacion/Turnstile/destinos/policies, setea `style_variant=diagnostic_premium`, labels/placeholders/help/errors, CTA `Solicitar diagnóstico gratis →` y success copy. No toca WordPress.
+>
+> **Verificacion:** `pnpm vitest run src/growth-forms-renderer/__tests__/renderer.test.ts` (30 pass), `pnpm exec eslint ...` focal verde, `pnpm typecheck` verde, `pnpm renderer:build` verde y `pnpm public-website:verify-aeo-renderer-ohio-fixture` verde. Se inspeccionaron frames `.captures/aeo-renderer-ohio-fixture-{desktop,mobile390}.png`: placeholders sentence-case, selects limpios, CTA teal, mobile one-column, sin overflow visible.
+>
+> **Pendiente operativo:** el dry-run real `pnpm growth:forms:activate-aeo-premium` no pudo leer PG porque la auth local GCP expiro (`invalid_rapt`/`invalid_grant`). No hubo mutacion. Reautenticar con `gcloud auth login` + `gcloud auth application-default login` antes de `--apply`. WordPress `/aeo-2/` sigue en bridge; el cutover a `<greenhouse-form>` requiere el flujo 1298 completo con backup Elementor, `heroans` hash, Kinsta purge y frame review post-save.
+>
+> **Docs/skills:** arquitectura, manual Growth Forms, wireframe/motion 1298 y skills Codex/Claude documentan que `diagnostic_premium` es el camino gobernado. No parchear esta estetica en WordPress.
+>
+> **Correccion posterior sobre selects:** el bug viejo de la pared de flechas ya estaba cubierto; el problema nuevo era el popup nativo del `<select>` abierto (macOS/Chrome lo pinta oscuro y no es estilable de forma fiable). Se cambio `diagnostic_premium` para renderizar single-selects como combobox/listbox custom accesible (`role=combobox/listbox/option`, flechas/Enter/Escape), manteniendo el valor en el renderer. El gate `pnpm public-website:verify-aeo-renderer-ohio-fixture` ahora abre el desplegable y verifica el panel visible blanco con borde, 6 opciones y `overflowX=0` en desktop/mobile. WordPress live sigue intacto.
+
 ## Sesion 2026-06-30 — TASK-1298 AEO migration guardrails + visual integrity gate — Codex — 🚧 in-progress, WordPress live intacto
 
 > **Pedido:** avanzar 1298 después del rollback y aclarar si la migración era innecesaria o mal implementada. Conclusión operativa: **1298 sigue siendo necesaria**, pero fue mal implementada al cortar a `<greenhouse-form>` sin paridad visual real en Ohio. El bridge restaurado queda como baseline público estable; no es el techo estético. El renderer puede modernizar mucho más el formulario (UI/UX, microcopy, estados, microinteracciones), pero primero debe reproducir o superar el baseline con evidencia visual.

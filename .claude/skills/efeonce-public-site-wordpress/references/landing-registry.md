@@ -5,7 +5,7 @@ canonical docs or WordPress runtime inspection.
 
 | Landing | URL | WordPress id | Status | Reference | Key guardrails |
 | --- | --- | ---: | --- | --- | --- |
-| AEO | `https://efeoncepro.com/aeo-2/` | `250265` | publish | `landings/aeo.md` | Do not touch Home `2791`; do not revive old `/aeo` `250255`; protect `heroans`; Growth Forms bridge + Turnstile; typography gate |
+| AEO | `https://efeoncepro.com/aeo-2/` | `250265` | publish | `landings/aeo.md` | Do not touch Home `2791`; do not revive old `/aeo` `250255`; protect `heroans`; Growth Forms renderer + Turnstile; live contract gate |
 | Agencia Creativa | `https://efeoncepro.com/agencia-creativa/` | `249582` | publish | `landings/agencia-creativa.md` | Protect featured hero `_thumbnail_id=249672`; sticky-scroll edge gutter; comparison table widget |
 | HubSpot Services | `https://efeoncepro.com/servicios-contratar-hubspot/` | `244079` | publish | `landings/hubspot-services.md` | Protect Ohio headline featured image `248703`; partner proof legacy sections; headline display helper |
 

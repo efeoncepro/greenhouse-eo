@@ -5,7 +5,7 @@ import { PNG } from 'pngjs'
 
 type FrameContract = {
   path: string
-  kind: 'bridge-live' | 'renderer-fixture' | 'renderer-real-composition' | 'renderer-interaction'
+  kind: 'renderer-live' | 'renderer-fixture' | 'renderer-real-composition' | 'renderer-interaction'
   viewport: 'desktop' | 'mobile390'
   minWidth: number
   minHeight: number
@@ -33,6 +33,7 @@ type ControlBox = {
 type ViewportManifestResult = {
   name: string
   screenshot: string
+  dropdownScreenshot?: string
   inputs: ControlBox[]
   selects: ControlBox[]
   button: ControlBox
@@ -62,14 +63,14 @@ const outputPath = '.captures/aeo-form-visual-frame-review.json'
 const frames: FrameContract[] = [
   {
     path: '.captures/aeo-form-visual-integrity-desktop.png',
-    kind: 'bridge-live',
+    kind: 'renderer-live',
     viewport: 'desktop',
     minWidth: 900,
     minHeight: 600,
   },
   {
     path: '.captures/aeo-form-visual-integrity-mobile390.png',
-    kind: 'bridge-live',
+    kind: 'renderer-live',
     viewport: 'mobile390',
     minWidth: 320,
     minHeight: 600,
@@ -89,6 +90,20 @@ const frames: FrameContract[] = [
     minHeight: 500,
   },
   {
+    path: '.captures/aeo-renderer-ohio-fixture-dropdown-desktop.png',
+    kind: 'renderer-fixture',
+    viewport: 'desktop',
+    minWidth: 700,
+    minHeight: 500,
+  },
+  {
+    path: '.captures/aeo-renderer-ohio-fixture-dropdown-mobile390.png',
+    kind: 'renderer-fixture',
+    viewport: 'mobile390',
+    minWidth: 320,
+    minHeight: 500,
+  },
+  {
     path: '.captures/aeo-renderer-real-composition-preview-desktop.png',
     kind: 'renderer-real-composition',
     viewport: 'desktop',
@@ -97,6 +112,20 @@ const frames: FrameContract[] = [
   },
   {
     path: '.captures/aeo-renderer-real-composition-preview-mobile390.png',
+    kind: 'renderer-real-composition',
+    viewport: 'mobile390',
+    minWidth: 320,
+    minHeight: 600,
+  },
+  {
+    path: '.captures/aeo-renderer-real-composition-preview-dropdown-desktop.png',
+    kind: 'renderer-real-composition',
+    viewport: 'desktop',
+    minWidth: 900,
+    minHeight: 600,
+  },
+  {
+    path: '.captures/aeo-renderer-real-composition-preview-dropdown-mobile390.png',
     kind: 'renderer-real-composition',
     viewport: 'mobile390',
     minWidth: 320,
@@ -372,7 +401,7 @@ const main = () => {
 
   const payload = {
     ok: true,
-    contract: 'AEO form visual frames exist, are fresh, nonblank, cover bridge + renderer pre-live default/focus/error/reduced-motion states, and pixel-sample controls for white fields, clean selects, and teal CTA',
+    contract: 'AEO form visual frames exist, are fresh, nonblank, cover live renderer + hostile fixture + composition/focus/error/reduced-motion states, and pixel-sample controls for white fields, clean dropdowns, and teal CTA',
     maxFrameAgeSeconds: maxFrameAgeMs / 1000,
     outputPath,
     byKind,

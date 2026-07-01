@@ -194,6 +194,7 @@ export class FormRenderer {
     }
 
     if (this.opts.colorScheme) this.opts.root.setAttribute('data-color-scheme', this.opts.colorScheme)
+    if (this.contract.styleVariant) this.opts.root.setAttribute('data-ghf-style-variant', this.contract.styleVariant)
     this.telemetry.emit('gh_form_viewed', {})
     this.renderForm()
   }
@@ -324,6 +325,13 @@ export class FormRenderer {
       checkWrap.appendChild(control)
       checkWrap.appendChild(el(this.doc, 'span', {}, label))
       wrap.appendChild(checkWrap)
+    } else if (field.type === 'select' || field.type === 'multiselect') {
+      const controlWrap = el(this.doc, 'div', { class: 'ghf-control ghf-control--select' })
+      const customSelect = control.classList.contains('ghf-select-composite')
+
+      controlWrap.appendChild(control)
+      if (field.type === 'select' && !customSelect) controlWrap.appendChild(el(this.doc, 'span', { class: 'ghf-select-icon', 'aria-hidden': 'true' }))
+      wrap.appendChild(controlWrap)
     } else if (supportsStatusIcon) {
       const controlWrap = el(this.doc, 'div', { class: 'ghf-control' })
 
@@ -400,6 +408,7 @@ export class FormRenderer {
       }
 
       case 'select':
+        if (this.usesPremiumSelect()) return this.renderPremiumSelectControl(field, common)
 
       case 'multiselect': {
         const select = el(this.doc, 'select', { ...common, class: 'ghf-select' })
@@ -455,6 +464,164 @@ export class FormRenderer {
         return input
       }
     }
+  }
+
+  private usesPremiumSelect(): boolean {
+    return this.contract.styleVariant === 'diagnostic_premium'
+  }
+
+  private selectOptionsFor(field: RendererFieldDefinition): { value: string; label: string }[] {
+    const hasBlankOption = field.options?.some(opt => opt.value === '') ?? false
+    const options = [...(field.options ?? [])]
+
+    if (!isFieldRequired(field, this.values) && !hasBlankOption) {
+      options.unshift({ value: '', label: field.placeholder ?? '—' })
+    }
+
+    return options.map(option => ({
+      value: option.value,
+      label: option.copyRef && this.contract.copy?.[option.copyRef] ? this.contract.copy[option.copyRef] : option.label ?? option.value,
+    }))
+  }
+
+  private renderPremiumSelectControl(field: RendererFieldDefinition, common: Record<string, string>): HTMLElement {
+    const options = this.selectOptionsFor(field)
+    const current = typeof this.values[field.key] === 'string' ? (this.values[field.key] as string) : ''
+    const selectedIndex = options.findIndex(option => option.value === current)
+    const initialIndex = selectedIndex >= 0 ? selectedIndex : 0
+    const listId = `${common.id}-listbox`
+    let activeIndex = initialIndex
+    let open = false
+
+    const wrap = el(this.doc, 'div', { class: 'ghf-select-composite' })
+
+    const trigger = el(this.doc, 'button', {
+      ...common,
+      type: 'button',
+      class: 'ghf-select ghf-select-trigger',
+      role: 'combobox',
+      'aria-haspopup': 'listbox',
+      'aria-expanded': 'false',
+      'aria-controls': listId,
+    })
+
+    const valueText = el(this.doc, 'span', { class: 'ghf-select-value' })
+    const icon = el(this.doc, 'span', { class: 'ghf-select-icon', 'aria-hidden': 'true' })
+    const list = el(this.doc, 'div', { class: 'ghf-select-list', id: listId, role: 'listbox', hidden: 'hidden' })
+
+    const renderSelected = () => {
+      const selected = options.find(option => option.value === this.values[field.key]) ?? options[0]
+
+      valueText.textContent = selected?.label ?? ''
+      trigger.dataset.placeholder = selected?.value ? 'false' : 'true'
+    }
+
+    const setActive = (index: number) => {
+      activeIndex = Math.max(0, Math.min(options.length - 1, index))
+
+      list.querySelectorAll<HTMLElement>('.ghf-select-option').forEach((option, optionIndex) => {
+        const isActive = optionIndex === activeIndex
+
+        option.dataset.active = isActive ? 'true' : 'false'
+
+        if (isActive) {
+          trigger.setAttribute('aria-activedescendant', option.id)
+          option.scrollIntoView?.({ block: 'nearest' })
+        }
+      })
+    }
+
+    const setOpen = (next: boolean) => {
+      open = next
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false')
+      wrap.dataset.open = open ? 'true' : 'false'
+
+      if (open) {
+        list.hidden = false
+        setActive(activeIndex)
+      } else {
+        list.hidden = true
+        trigger.removeAttribute('aria-activedescendant')
+      }
+    }
+
+    const choose = (index: number) => {
+      const option = options[index]
+
+      if (!option) return
+      this.values[field.key] = option.value
+      this.touched.add(field.key)
+      renderSelected()
+      list.querySelectorAll<HTMLElement>('.ghf-select-option').forEach((item, optionIndex) => {
+        item.setAttribute('aria-selected', optionIndex === index ? 'true' : 'false')
+      })
+      setActive(index)
+      setOpen(false)
+      trigger.focus()
+      this.liveStatus(field)
+      this.onValueChange(field)
+    }
+
+    trigger.appendChild(valueText)
+    trigger.appendChild(icon)
+    wrap.appendChild(trigger)
+
+    options.forEach((option, index) => {
+      const item = el(this.doc, 'div', {
+        id: `${common.id}-option-${index}`,
+        class: 'ghf-select-option',
+        role: 'option',
+        'aria-selected': index === initialIndex ? 'true' : 'false',
+        'data-value': option.value,
+      })
+
+      item.appendChild(el(this.doc, 'span', { class: 'ghf-select-option-label' }, option.label))
+      item.addEventListener('mousedown', event => event.preventDefault())
+      item.addEventListener('click', () => choose(index))
+      list.appendChild(item)
+    })
+
+    wrap.appendChild(list)
+    renderSelected()
+    setActive(initialIndex)
+
+    trigger.addEventListener('click', () => setOpen(!open))
+    trigger.addEventListener('keydown', event => {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        if (!open) setOpen(true)
+        setActive(activeIndex + 1)
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        if (!open) setOpen(true)
+        setActive(activeIndex - 1)
+      } else if (event.key === 'Home') {
+        event.preventDefault()
+        if (!open) setOpen(true)
+        setActive(0)
+      } else if (event.key === 'End') {
+        event.preventDefault()
+        if (!open) setOpen(true)
+        setActive(options.length - 1)
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        if (open) choose(activeIndex)
+        else setOpen(true)
+      } else if (event.key === 'Escape') {
+        if (open) {
+          event.preventDefault()
+          setOpen(false)
+        }
+      }
+    })
+
+    wrap.addEventListener('focusout', () => {
+      window.setTimeout(() => {
+        if (!wrap.contains(this.doc.activeElement)) setOpen(false)
+      }, 0)
+    })
+
+    return wrap
   }
 
   /**
@@ -595,7 +762,7 @@ export class FormRenderer {
       return
     }
 
-    const error = validateField(field, this.values, this.copy)
+    const error = this.validateRendererField(field)
 
     if (!error) {
       delete this.errors[key]
@@ -623,7 +790,7 @@ export class FormRenderer {
       setTimeout(() => {
         this.statusTimers.delete(key)
         if (this.destroyed || this.isFieldEmpty(key)) return
-        const late = validateField(field, this.values, this.copy)
+        const late = this.validateRendererField(field)
 
         if (late) {
           this.errors[key] = late
@@ -1012,9 +1179,10 @@ export class FormRenderer {
 
     const isLast = this.isLastStep()
     const submitLabel = isLast ? this.submitLabel() : this.copy.stepNext
-    const primary = el(this.doc, 'button', { type: 'submit', class: 'ghf-btn' }, submitLabel)
+    const primary = el(this.doc, 'button', { type: 'submit', class: 'ghf-btn' })
 
     primary.dataset.ghfPrimary = 'true'
+    this.setPrimaryLabel(primary, submitLabel)
     primary.addEventListener('pointerdown', event => {
       // Avoid a pre-click blur validation layout shift moving the submit button under
       // the pointer. The submit handler validates the full visible step immediately.
@@ -1023,7 +1191,7 @@ export class FormRenderer {
 
     if (this.submitting) {
       primary.setAttribute('aria-disabled', 'true')
-      primary.textContent = this.copy.submitPending
+      this.setPrimaryLabel(primary, this.copy.submitPending)
     } else if (this.isVerifyingAny()) {
       // Una verificación de correo en vuelo deshabilita el submit (UX; no autoridad).
       primary.setAttribute('aria-disabled', 'true')
@@ -1047,6 +1215,21 @@ export class FormRenderer {
     const fromCopy = this.contract.copy?.['submit']
 
     return fromCopy ?? this.copy.submitByKind[this.contract.form.formKind] ?? this.copy.stepNext
+  }
+
+  private setPrimaryLabel(button: HTMLElement, label: string): void {
+    button.replaceChildren()
+
+    const trimmed = label.trim()
+
+    if (trimmed.endsWith('→')) {
+      button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-label' }, trimmed.slice(0, -1).trim()))
+      button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-arrow', 'aria-hidden': 'true' }, '→'))
+
+      return
+    }
+
+    button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-label' }, label))
   }
 
   private isLastStep(): boolean {
@@ -1079,7 +1262,7 @@ export class FormRenderer {
 
   private revalidateField(field: RendererFieldDefinition): void {
     if (!this.touched.has(field.key)) return
-    const error = validateField(field, this.values, this.copy)
+    const error = this.validateRendererField(field)
     const prev = this.errors[field.key]
 
     if (error) this.errors[field.key] = error
@@ -1096,6 +1279,33 @@ export class FormRenderer {
     if (error) this.setFieldStatus(field, 'error')
     else if (!this.isFieldEmpty(field.key)) this.setFieldStatus(field, this.hasMeaningfulValidator(field) ? 'success' : 'neutral')
     else this.setFieldStatus(field, 'neutral')
+  }
+
+  private validateRendererField(field: RendererFieldDefinition): string | null {
+    const error = validateField(field, this.values, this.copy)
+
+    if (!error) return null
+
+    if (error === this.copy.errors.required) {
+      const customRequired = this.contract.copy?.[`${field.key}.error.required`]
+
+      if (customRequired) return customRequired
+    }
+
+    return error
+  }
+
+  private validateRendererFields(fields: RendererFieldDefinition[]): FieldErrors {
+    const errors: FieldErrors = {}
+
+    for (const field of fields) {
+      if (field.type === 'hidden') continue
+      const error = this.validateRendererField(field)
+
+      if (error) errors[field.key] = error
+    }
+
+    return errors
   }
 
   /** Actualiza solo el DOM del error de un campo (sin re-render completo). */
@@ -1297,7 +1507,7 @@ export class FormRenderer {
 
     for (const f of stepFields) this.touched.add(f.key)
 
-    this.errors = validateFields(stepFields, this.values, this.copy)
+    this.errors = this.validateRendererFields(stepFields)
     const consentError = this.isLastStep() ? this.validateConsent() : null
 
     // Hay errores (de campo o de consentimiento): mostrar el resumen accesible arriba,
@@ -1451,7 +1661,7 @@ export class FormRenderer {
       ?? (behavior.messageCopyRef ? this.contract.copy?.[behavior.messageCopyRef] : undefined)
       ?? this.copy.successFallback
 
-    const status = el(this.doc, 'div', { class: 'ghf-status', role: 'status', 'aria-live': 'polite', tabindex: '-1' }, message)
+    const status = el(this.doc, 'div', { class: 'ghf-status ghf-status--success', role: 'status', 'aria-live': 'polite', tabindex: '-1' }, message)
 
     root.appendChild(status)
     status.focus?.()

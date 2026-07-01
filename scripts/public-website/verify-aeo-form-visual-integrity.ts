@@ -29,6 +29,7 @@ type ViewportResult = {
   screenshot: string
   inputs: ControlSnapshot[]
   selects: (ControlSnapshot & { name: string | null; firstOption: string })[]
+  dropdown?: ControlSnapshot & { optionCount: number }
   button: ControlSnapshot
   trustText: string
 }
@@ -152,6 +153,20 @@ const assertSelectCaret = (label: string, snapshot: ControlSnapshot) => {
   }
 }
 
+const assertDropdown = (label: string, snapshot: ControlSnapshot & { optionCount: number }) => {
+  if (!isNearWhite(snapshot.backgroundColor)) {
+    throw new Error(`${label} background is ${snapshot.backgroundColor}; expected approved white dropdown panel`)
+  }
+
+  if (!isVisibleBorder(snapshot)) {
+    throw new Error(`${label} border is ${snapshot.borderWidth} ${snapshot.borderStyle} ${snapshot.borderColor}; expected visible dropdown border`)
+  }
+
+  if (snapshot.optionCount < 5) {
+    throw new Error(`${label} option count is ${snapshot.optionCount}; expected full dropdown option list`)
+  }
+}
+
 const assertButton = (snapshot: ControlSnapshot) => {
   if (!snapshot.text.includes('Solicitar diagnóstico gratis')) {
     throw new Error(`CTA text is "${snapshot.text}"; expected "Solicitar diagnóstico gratis →"`)
@@ -216,9 +231,10 @@ async function main() {
       const selects = await Promise.all(
         [0, 1].map(index =>
           page.locator(`.gh-aeo-conversion ${selectSelector}`).nth(index).evaluate((node, selected) => {
-            const element = node as HTMLSelectElement
+            const element = node as HTMLElement
             const style = getComputedStyle(element)
             const rect = element.getBoundingClientRect()
+            const nativeSelect = element instanceof HTMLSelectElement
 
             return {
               selector: selected,
@@ -236,7 +252,9 @@ async function main() {
               width: rect.width,
               height: rect.height,
               name: element.getAttribute('name'),
-              firstOption: element.querySelector('option')?.textContent?.trim() ?? '',
+              firstOption: nativeSelect
+                ? element.querySelector('option')?.textContent?.trim() ?? ''
+                : element.textContent?.trim().replace(/\s+/g, ' ') ?? '',
             }
           }, `.gh-aeo-conversion ${selectSelector} >> nth=${index}`)
         )
@@ -246,6 +264,17 @@ async function main() {
       const overflowX = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
       const trustText = await page.locator('.gh-aeo-conversion .gh-aeo-growth-form-proof').first().textContent().catch(() => '')
       const screenshot = `${screenshotDir.replace(/\/$/, '')}/aeo-form-visual-integrity-${testCase.name}.png`
+      let dropdown: (ControlSnapshot & { optionCount: number }) | undefined
+
+      if (implementation === 'renderer') {
+        await page.locator('.gh-aeo-conversion greenhouse-form .ghf-select-trigger').nth(1).click()
+        await page.waitForSelector('.gh-aeo-conversion greenhouse-form .ghf-select-list:not([hidden])', { timeout: 3000 })
+
+        dropdown = {
+          ...(await readControl(page, '.gh-aeo-conversion greenhouse-form .ghf-select-list:not([hidden])')),
+          optionCount: await page.locator('.gh-aeo-conversion greenhouse-form .ghf-select-list:not([hidden]) [role="option"]').count(),
+        }
+      }
 
       await page.screenshot({ path: screenshot, fullPage: false })
 
@@ -255,12 +284,13 @@ async function main() {
         assertSelectCaret(`${testCase.name} select ${index + 1}`, snapshot)
       })
       assertButton(button)
+      if (dropdown) assertDropdown(`${testCase.name} renderer dropdown`, dropdown)
 
-      if (selects[0]?.firstOption !== 'Selecciona país') {
+      if (!selects[0]?.firstOption.includes('Selecciona país')) {
         throw new Error(`${testCase.name} country select placeholder is "${selects[0]?.firstOption}"; expected "Selecciona país"`)
       }
 
-      if (selects[1]?.firstOption !== 'Selecciona tamaño') {
+      if (!selects[1]?.firstOption.includes('Selecciona tamaño')) {
         throw new Error(`${testCase.name} size select placeholder is "${selects[1]?.firstOption}"; expected "Selecciona tamaño"`)
       }
 
@@ -281,6 +311,7 @@ async function main() {
         screenshot,
         inputs,
         selects,
+        dropdown,
         button,
         trustText: trustText?.trim().replace(/\s+/g, ' ') ?? '',
       })

@@ -94,19 +94,36 @@ async function main() {
 
       await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 60000 })
       await page.waitForSelector('.gh-aeo-conversion .gh-aeo-growth-form-card', { timeout: 30000 })
+      await page.waitForSelector(
+        '.gh-aeo-conversion greenhouse-form .ghf-btn, .gh-aeo-conversion .gh-aeo-growth-form-label',
+        { timeout: 30000 }
+      )
       await page.evaluate(() => document.fonts?.ready).catch(() => undefined)
       await page.locator('.gh-aeo-conversion').scrollIntoViewIfNeeded()
 
       const sectionTitle = await readProbe(page, '.gh-aeo-conversion .gh-aeo-section-title .title')
       const formTitle = await readProbe(page, '.gh-aeo-conversion .gh-aeo-growth-form-title')
 
-      const zeroSelectors = [
-        '.gh-aeo-conversion .gh-aeo-growth-form-lead',
-        '.gh-aeo-conversion .gh-aeo-growth-form-label',
-        '.gh-aeo-conversion .gh-aeo-growth-form-input',
-        '.gh-aeo-conversion .gh-aeo-growth-form-button',
-        '.gh-aeo-conversion .gh-aeo-growth-form-proof',
-      ]
+      const implementation = await page.evaluate(() =>
+        document.querySelector('greenhouse-form .ghf-btn') ? 'renderer' : 'bridge'
+      ) as 'bridge' | 'renderer'
+
+      const zeroSelectors = implementation === 'renderer'
+        ? [
+            '.gh-aeo-conversion .gh-aeo-growth-form-lead',
+            '.gh-aeo-conversion greenhouse-form .ghf-label',
+            '.gh-aeo-conversion greenhouse-form .ghf-input',
+            '.gh-aeo-conversion greenhouse-form .ghf-select',
+            '.gh-aeo-conversion greenhouse-form .ghf-btn',
+            '.gh-aeo-conversion .gh-aeo-growth-form-proof',
+          ]
+        : [
+            '.gh-aeo-conversion .gh-aeo-growth-form-lead',
+            '.gh-aeo-conversion .gh-aeo-growth-form-label',
+            '.gh-aeo-conversion .gh-aeo-growth-form-input',
+            '.gh-aeo-conversion .gh-aeo-growth-form-button',
+            '.gh-aeo-conversion .gh-aeo-growth-form-proof',
+          ]
 
       const zeroTracking = await Promise.all(zeroSelectors.map(selector => readProbe(page, selector)))
       const overflowX = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)

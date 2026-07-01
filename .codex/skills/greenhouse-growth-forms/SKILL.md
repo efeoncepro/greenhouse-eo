@@ -171,15 +171,12 @@ propagating to the content).
 - `color-scheme="light"` is mandatory on light bands (else OS-dark visitors see a dark form).
 - TASK-1298 hostile-host hardening: controls/CTA now re-declare native-control-critical properties
   through scoped tokenized `!important` rules so generic Ohio `input/select/button` skins cannot turn
-  fields gray, tile select carets, add tracking, or darken the CTA. Before any AEO cutover, run
-  `pnpm public-website:verify-aeo-prelive-contract`, then review the saved desktop/mobile frames.
-  This aggregate gate protects WordPress `heroans` + restored bridge, checks the public API by slug
-  and `formKey` including fail-closed captcha, runs typography, protects the live bridge baseline,
-  runs the hostile Ohio fixture, injects the renderer into live `/aeo-2/` in memory only, and
-  validates the saved PNG frames are fresh/nonblank. The AEO pre-live renderer must also keep
-  desktop paired rows for `Nombre`/`Email` and `País`/`Tamaño`, while mobile 390 stacks cleanly.
-  It also captures focus/error/reduced-motion states via `pnpm public-website:verify-aeo-renderer-interaction-preview`.
-  It does not mutate WordPress.
+  fields gray, tile select carets, add tracking, or darken the CTA. AEO `/aeo-2/` is live on the
+  renderer after the governed cutover (backup `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`).
+  For AEO changes, run `pnpm public-website:verify-aeo-live-contract`: it protects WordPress
+  `heroans`, confirms `<greenhouse-form>` by stable `form-key`, checks the public API by slug/formKey
+  including fail-closed captcha, runs typography/visual desktop+mobile, validates premium dropdowns,
+  focus/ARIA, email gate, Turnstile `captchaToken` boundary and dataLayer no-PII.
 
 ### TASK-1298 lesson — one-time platform hardening, not per-form ceremony
 
@@ -200,10 +197,26 @@ For a new ordinary Growth Form embed, use a proportional path:
    composition without mutating live, assert `scrollWidth==clientWidth`, and pixel-sample inputs,
    selects and CTA when host CSS could fight native controls.
 
-AEO's `pnpm public-website:verify-aeo-prelive-contract` is the **strict AEO cutover gate**, not a
-universal tax. New forms should not need `heroans`, bridge guards, or AEO copy/layout assertions
-unless they live on AEO. If another host/theme breaks the renderer, fix the renderer or shared
-fixture globally and add a reusable gate; do not patch that one landing in isolation.
+AEO's `pnpm public-website:verify-aeo-live-contract` is the **strict AEO live gate**, not a
+universal tax. New forms should not need `heroans`, AEO WordPress guards, or AEO copy/layout
+assertions unless they live on AEO. If another host/theme breaks the renderer, fix the renderer or
+shared fixture globally and add a reusable gate; do not patch that one landing in isolation.
+
+### Premium diagnostic forms
+
+For AEO-class diagnostic forms, the governed premium path is a render-contract `styleVariant`, not
+WordPress CSS surgery. The current AEO premium variant is `styleVariant=diagnostic_premium`, backed
+by renderer tokens, a custom single-select combobox/listbox (no OS-native popup for premium selects),
+CTA motion and field-level copy in the contract.
+
+- Publish or change premium visuals through a new form version (`style_variant` + copy/labels),
+  never by editing a published version in-place.
+- AEO helper: `pnpm growth:forms:activate-aeo-premium` (dry-run) and
+  `pnpm growth:forms:activate-aeo-premium -- --apply` to publish vNext by stable `form_key`.
+- The helper must preserve fields, validation, Turnstile, destinations and policies. It does not
+  mutate WordPress.
+- AEO is live on this premium renderer. Do not restore the temporary bridge unless explicitly
+  rolling back from the Elementor backup.
 
 ---
 

@@ -11,6 +11,7 @@ type RenderContract = {
     version?: number
     locale?: string
   }
+  styleVariant?: string
   fields?: Array<{
     key?: string
     label?: string
@@ -38,7 +39,6 @@ const origin = 'https://efeoncepro.com'
 const slug = 'efeonce-aeo-diagnostic'
 const formKey = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 const surfaceId = 'fhsf-efeonce-aeo-diagnostic'
-const expectedFormVersionId = 'fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4'
 const expectedTurnstileSiteKey = '0x4AAAAAADqwX2R7v-k9pItv'
 
 const fetchJson = async <T>(url: string, init: RequestInit): Promise<{ status: number; headers: Headers; json: T; raw: string }> => {
@@ -82,8 +82,16 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
     throw new Error(`${label} formKey is ${contract.form?.formKey}; expected ${formKey}`)
   }
 
-  if (contract.form?.formVersionId !== expectedFormVersionId) {
-    throw new Error(`${label} formVersionId is ${contract.form?.formVersionId}; expected ${expectedFormVersionId}`)
+  if (!contract.form?.formVersionId?.startsWith('fver-')) {
+    throw new Error(`${label} formVersionId is ${contract.form?.formVersionId}; expected a published form version id`)
+  }
+
+  if ((contract.form?.version ?? 0) < 6) {
+    throw new Error(`${label} version is ${contract.form?.version}; expected premium v6+`)
+  }
+
+  if (contract.styleVariant !== 'diagnostic_premium') {
+    throw new Error(`${label} styleVariant is ${contract.styleVariant}; expected diagnostic_premium`)
   }
 
   if (contract.copy?.submit !== 'Solicitar diagnóstico gratis →') {

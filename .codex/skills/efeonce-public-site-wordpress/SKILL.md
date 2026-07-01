@@ -86,7 +86,7 @@ Growth Forms embed gate from `references/growth-forms-wordpress.md`):
 
 ```bash
 pnpm public-website:verify-aeo-form-typography
-pnpm public-website:verify-aeo-prelive-contract
+pnpm public-website:verify-aeo-live-contract
 ```
 
 ## Update Protocol

@@ -93,11 +93,11 @@ const aeoContract = staticContractFixture({
   fields: [
     { key: 'firstName', type: 'text', label: 'Nombre', required: true, maxLength: 120, autocomplete: 'given-name' },
     { key: 'email', type: 'email', label: 'Correo corporativo', required: true, autocomplete: 'email', inputMode: 'email', validator: 'corporate_email' },
-    { key: 'brandWebsite', type: 'url', label: 'Marca / sitio web', required: true, maxLength: 240, inputMode: 'url', placeholder: 'tuempresa.com' },
+    { key: 'brandWebsite', type: 'url', label: 'Sitio web principal', required: true, maxLength: 240, inputMode: 'url', placeholder: 'ej. tuempresa.com' },
     {
       key: 'country',
       type: 'select',
-      label: 'País',
+      label: 'País principal',
       options: [
         { value: '', label: 'Selecciona país' },
         { value: 'CL', label: 'Chile' },
@@ -119,11 +119,19 @@ const aeoContract = staticContractFixture({
         { value: '1000+', label: '+1000' },
       ],
     },
-    { key: 'mainCompetitor', type: 'text', label: 'Principal competidor', maxLength: 200, placeholder: 'marca de tu competencia' },
+    { key: 'mainCompetitor', type: 'text', label: 'Competidor a comparar', maxLength: 200, placeholder: 'ej. marca competidora' },
   ],
   copy: {
     submit: 'Solicitar diagnóstico gratis →',
+    'email.help': 'Usa tu correo corporativo para recibir el diagnóstico.',
+    'brandWebsite.help': 'Usaremos este sitio para revisar señales públicas de visibilidad.',
+    'mainCompetitor.help': 'Opcional: ayuda a comparar tu presencia en IA.',
+    'firstName.error.required': 'Escribe tu nombre para personalizar el diagnóstico.',
+    'email.error.required': 'Usa tu correo corporativo para enviarte el diagnóstico.',
+    'brandWebsite.error.required': 'Indica el sitio principal de tu marca para evaluarla.',
   },
+  successBehavior: { kind: 'inline_message', message: 'Solicitud recibida. Prepararemos tu lectura inicial y te contactaremos pronto.' },
+  styleVariant: 'diagnostic_premium',
   consent: undefined,
   surfacePolicy: {
     surfaceId: 'fhsf-efeonce-aeo-diagnostic',
@@ -261,6 +269,28 @@ const assertSelect = (label: string, snapshot: ControlSnapshot) => {
   }
 }
 
+const assertDropdown = (label: string, snapshot: ControlSnapshot, optionCount: number) => {
+  if (!snapshot.text.includes('Selecciona tamaño') || !snapshot.text.includes('1 - 10')) {
+    throw new Error(`${label} text is "${snapshot.text}"; expected premium option list content`)
+  }
+
+  if (!isNearWhite(snapshot.backgroundColor)) {
+    throw new Error(`${label} background is ${snapshot.backgroundColor}; expected premium white panel`)
+  }
+
+  if (snapshot.borderStyle === 'none' || Number.parseFloat(snapshot.borderWidth) < 1) {
+    throw new Error(`${label} border is ${snapshot.borderWidth} ${snapshot.borderStyle}; expected visible panel border`)
+  }
+
+  if (optionCount < 5) {
+    throw new Error(`${label} option count is ${optionCount}; expected full company size list`)
+  }
+
+  if (snapshot.width < 300 || snapshot.height < 180) {
+    throw new Error(`${label} size is ${snapshot.width}x${snapshot.height}; expected usable custom dropdown panel`)
+  }
+}
+
 const assertButton = (snapshot: ControlSnapshot) => {
   if (!snapshot.text.includes('Solicitar diagnóstico gratis')) {
     throw new Error(`CTA text is "${snapshot.text}"; expected approved AEO CTA`)
@@ -324,11 +354,20 @@ async function main() {
       const button = await readControl(page, 'greenhouse-form .ghf-btn')
       const overflowX = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
       const screenshot = `${screenshotDir}/aeo-renderer-ohio-fixture-${testCase.name}.png`
+      const dropdownScreenshot = `${screenshotDir}/aeo-renderer-ohio-fixture-dropdown-${testCase.name}.png`
 
       await page.screenshot({ path: screenshot, fullPage: false })
 
+      await page.locator('greenhouse-form .ghf-select-trigger').nth(1).click()
+      await page.waitForSelector('greenhouse-form .ghf-select-list:not([hidden])', { timeout: 2000 })
+      const dropdown = await readControl(page, 'greenhouse-form .ghf-select-list:not([hidden])')
+      const dropdownOptionCount = await page.locator('greenhouse-form .ghf-select-list:not([hidden]) [role="option"]').count()
+
+      await page.screenshot({ path: dropdownScreenshot, fullPage: false })
+
       inputs.forEach((snapshot, index) => assertField(`${testCase.name} input ${index + 1}`, snapshot))
       selects.forEach((snapshot, index) => assertSelect(`${testCase.name} select ${index + 1}`, snapshot))
+      assertDropdown(`${testCase.name} open dropdown`, dropdown, dropdownOptionCount)
       assertButton(button)
       assertSameDesktopRow(testCase.name, 'name/email fields', inputs[0], inputs[1])
       assertSameDesktopRow(testCase.name, 'country/company size selects', selects[0], selects[1])
@@ -341,8 +380,11 @@ async function main() {
         name: testCase.name,
         overflowX,
         screenshot,
+        dropdownScreenshot,
         inputs,
         selects,
+        dropdown,
+        dropdownOptionCount,
         button,
       })
 
