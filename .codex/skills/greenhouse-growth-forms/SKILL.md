@@ -214,10 +214,13 @@ Use it to avoid repeating per-landing CSS fights with Ohio. Do not put fields, v
 HubSpot mapping, Turnstile secrets or destination behavior in the child theme. It is live on Kinsta
 after the scoped 2026-07-01 rollout (only `growth-forms-host.css` + `inc/enqueue-and-layout.php`;
 remote backup `/tmp/greenhouse-growth-forms-host-layer-20260701T103729Z`; AEO live gate green after
-Kinsta purge). The broader public-site runtime repo can still be unsafe for full deploy; refresh
-drift (`public-website:export-live-code` + `public-website:diff-runtime`) and avoid collateral plugin
-rollout if `runtime-status` reports `releaseSafety.fullRepoDeploySafe=false` or `eo-elementor-widgets`
-is classified as `repo_pending_release`.
+Kinsta purge). The public-site control plane now includes `eo-elementor-widgets` in the governed
+export/binding and the reconciled report
+`docs/operations/public-site-drift/drift-2026-07-01T10-54-46-557Z.json` is green
+(`fullRepoDeploySafe=true`, no content drift, no pending release). Still refresh drift
+(`public-website:export-live-code` + `public-website:diff-runtime`) before any rollout and avoid
+collateral plugin rollout if `runtime-status` regresses to `releaseSafety.fullRepoDeploySafe=false`
+or classifies `eo-elementor-widgets` as `repo_pending_release`.
 
 ### Premium diagnostic forms
 

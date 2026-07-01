@@ -1,3 +1,11 @@
+## Sesion 2026-07-01 — Growth Forms public-site skills sync — Codex — ✅ docs/skills
+
+> **Pedido:** confirmar si las skills `efeonce-public-site-wordpress` y `greenhouse-growth-forms` quedaron actualizadas con todo lo agregado al motor/formulario AEO.
+>
+> **Resultado:** ambas copias Codex y Claude quedaron sincronizadas. Se corrigió una frase obsoleta que aún describía el runtime público como `fullRepoDeploySafe=false`; ahora las referencias apuntan al reporte reconciliado `docs/operations/public-site-drift/drift-2026-07-01T10-54-46-557Z.json` (`fullRepoDeploySafe=true`, `content_drift=0`, `repo_pending_release=0`, `live_untracked_file=0`) y mantienen la regla operativa: refrescar `runtime-status` antes de cualquier rollout y no asumir autorización de deploy solo por drift verde.
+>
+> **Cobertura en skills:** stable public identity `form-key`, no exponer HubSpot `formGuid`, renderer premium `diagnostic_premium`, proportional gates para nuevos forms, AEO strict gate, Turnstile `captchaToken`, `copyRefs`, HubSpot form-definition sync, Ohio child-theme host layer, widget `eo-elementor-widgets`, y control-plane public-site con export/binding gobernado.
+
 ## Sesion 2026-07-01 — AEO Growth Forms host chrome hotfix — Codex — ✅ live
 
 > **Pedido:** el operador reportó que `/aeo-2/` volvió a verse roto: card sin padding, trust como lista default, helpers/contadores visibles y layout más alto.

@@ -58,10 +58,13 @@ Use the child-theme layer instead of page-specific CSS when Ohio fights a Growth
 
 Rollout safety:
 
-Live status: the child-theme layer itself is deployed and hash-synced with the runtime repo as of
-2026-07-01 (`pnpm public-website:verify-aeo-live-contract` green after Kinsta purge). The broader
-runtime repo is still **not** safe for full deploy while `runtime-status` reports
-`releaseSafety.fullRepoDeploySafe=false`; do not include `eo-elementor-widgets` as collateral.
+Live status: the child-theme layer is deployed and hash-synced with the runtime repo as of
+2026-07-01 (`pnpm public-website:verify-aeo-live-contract` green after Kinsta purge). The public-site
+control plane now includes `eo-elementor-widgets` in the governed export/binding; latest reconciled
+report `docs/operations/public-site-drift/drift-2026-07-01T10-54-46-557Z.json` has
+`releaseSafety.fullRepoDeploySafe=true`, `content_drift=0`, `repo_pending_release=0` and
+`live_untracked_file=0`. Still refresh `runtime-status` immediately before any rollout; green drift
+is evidence, not automatic authorization for a full production deploy.
 
 1. Refresh production code before applying: `pnpm public-website:export-live-code` then
    `pnpm public-website:diff-runtime`.
