@@ -43,7 +43,8 @@ Greenhouse es un app Next.js con login para clientes (`(dashboard)`), pero **ya 
 `modelFromPublicReport(publicReport, 'publicWeb')` ya construye el modelo render-ready (niveles, severidad, ejes, gaps, recomendaciones) en Greenhouse. Si el endpoint entrega **ese modelo**, `efeonce-web` solo mapea modelo→componentes Tailwind, **sin re-implementar la derivación** (que es justo lo que causaría drift). El builder queda como SSOT único.
 
 - **Versionado:** el payload lleva `modelVersion` (semver del contrato) para que los dos repos evolucionen seguro. Cambios additive no rompen; breaking changes suben major + el render lo maneja.
-- **No-leak por construcción:** el endpoint solo serializa el modelo `publicWeb` (nunca `engineSnapshot`, raw provider text ni hallazgos internos). `efeonce-web` **no puede filtrar lo que nunca recibe** — la frontera de no-filtración se mueve al servidor (más fuerte que confiar en el render). Tests no-leak existentes (`report-artifact-no-leak.test`) cubren el modelo.
+- **Header render-ready:** el `ReportArtifactModel` NO carga el nombre de la marca ni las fechas — el payload agrega un bloque `header { organizationName, reportDate, periodLabel }` (masthead) resuelto server-side (`grader_profiles.brand_name` de la marca evaluada + `formatReportDate(asOf)` + copy plantilla único). Sin él, `efeonce-web` no podría pintar el encabezado ni tener contexto de marca en un link compartido.
+- **No-leak por construcción de tipo:** el endpoint solo serializa el modelo `publicWeb`, derivado de `PublicGraderReport` — un TIPO que estructuralmente NO carga `providerFindings` (narrativa cruda por motor), `accuracyFindings`, raw provider text, prompts ni citation URLs. `efeonce-web` **no puede filtrar lo que nunca recibe** — la frontera de no-filtración vive en el tipo (más fuerte que confiar en el render). **`engineSnapshot`/`providerPresence` (conteos de visibilidad por motor) SÍ va al payload público: es el headline del lead magnet (TASK-1252), no un leak.** Tests no-leak (`report-artifact-no-leak.test` + el test de contrato del endpoint TASK-1280) cubren modelo y payload.
 - **Auth:** el `reportToken` (256 bits, no enumerable) ES la autenticación. Sin sesión. Expirado/inexistente → 404 indistinto.
 
 ### Transporte: fetch server-side (sin CORS)
@@ -83,7 +84,7 @@ Greenhouse es un app Next.js con login para clientes (`(dashboard)`), pero **ya 
 
 - **NUNCA** renderizar el informe público dentro de un iframe (rompe GTM) ni dentro del grupo `(dashboard)` de Greenhouse (eso pide login).
 - **NUNCA** re-implementar la derivación del modelo (niveles/severidad/gaps) en `efeonce-web` — consumir el `ReportArtifactModel` que Greenhouse construye (SSOT único).
-- **NUNCA** exponer en el endpoint público campos internos (`engineSnapshot`, raw provider text, hallazgos privados). El contrato es el modelo `publicWeb`.
+- **NUNCA** exponer en el endpoint público campos internal-only (`providerFindings` = narrativa cruda por motor, `accuracyFindings`, raw provider text, prompts, citation URLs, reasons internos). El contrato es el modelo `publicWeb` (que estructuralmente no los tiene). **`engineSnapshot`/`providerPresence` (conteos de visibilidad por motor) SÍ es público** — headline del lead magnet (TASK-1252), NO removerlo del payload.
 - **NUNCA** fetchear el reporte client-side con el token expuesto si se puede server-side (Astro SSR) — token server-side, sin CORS abierto.
 - **SIEMPRE** versionar el payload (`modelVersion`); breaking change = major + render adaptado en el mismo ciclo.
 
@@ -97,7 +98,13 @@ Greenhouse es un app Next.js con login para clientes (`(dashboard)`), pero **ya 
 
 ## Open questions (deliberadamente no decididas)
 
-1. **Forma de exponer el modelo:** extender `GET /report/[token]` para devolver el modelo vs endpoint `/model` paralelo vs `?format=model`. (Recomendado: extender con `model` en el payload + `modelVersion`, back-compat.)
+1. **Forma de exponer el modelo:** ✅ **Resuelto (TASK-1280, 2026-07-01): extender `GET /report/[token]`** con `model` (variant `publicWeb`) + `modelVersion` + `header` top-level en el payload por defecto (aditivo, back-compat; se conserva el DTO crudo `report`). No se creó endpoint `/model` paralelo ni `?format=model`. Contrato + no-leak cubiertos por `route-contract.test.ts`.
 2. **App del hub:** ✅ **Resuelto (operador, 2026-06-28): `efeonce-web`** sirve `think.efeoncepro.com` (Vercel multi-dominio, un proyecto; reuso total de brand + patrón WP-headless). No se crea repo nuevo.
 3. **Ruta del informe dentro del hub:** `think.efeoncepro.com/ai-visibility/[publicId]` u otra; convención de rutas por lead magnet.
 4. **Landing del grader:** ¿se construye en el hub Astro, o el form sigue en WP posteando al mismo intake? (No bloquea el contrato.)
+
+## Delta 2026-07-01 — TASK-1280 (contrato headless implementado en Greenhouse)
+
+- `GET /api/public/growth/ai-visibility/report/[token]` ahora devuelve `{ report, model, modelVersion, header, asOf, expiresAt }` (aditivo, back-compat). `model` = `modelFromPublicReport(publicReport, 'publicWeb')` (SSOT único, el endpoint no re-deriva); `modelVersion = '1.0.0'` (`GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION`); `header` = masthead render-ready (`organizationName` = marca evaluada por `grader_profiles.brand_name`, `reportDate`, `periodLabel`), armado con el SSOT `buildReportHeader` (reusado por email/operador).
+- **Corrección de framing (era drift):** este ADR decía "NUNCA exponer `engineSnapshot`". Falso desde TASK-1252 (Delta 2026-06-27): `engineSnapshot`/`providerPresence` (conteos de visibilidad por motor) es **público-safe** — el headline del lead magnet — y va en el payload. Lo internal-only es `providerFindings` (narrativa cruda) + `accuracyFindings`, que estructuralmente no existen en `PublicGraderReport` (no-leak por construcción de tipo). También se corrigió el docstring stale de `ProviderPresence` en `contracts.ts`.
+- Cobertura: `route-contract.test.ts` (payload: model+modelVersion+header, engineSnapshot presente, sin `providerFindings`/`accuracyFindings`/`INTERNAL`) + `report-snapshot.test.ts` (JOIN → `brandName`).

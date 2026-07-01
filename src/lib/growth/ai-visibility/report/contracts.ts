@@ -187,7 +187,13 @@ export interface SourceTypeCount {
   count: number
 }
 
-/** Presencia por motor (OQ#3) — INTERNAL ONLY: nunca viaja al DTO público. */
+/**
+ * Presencia por motor (conteos `resolved`/`present`) de la marca evaluada. PÚBLICO-SAFE
+ * desde TASK-1252 (Delta 2026-06-27): es la visibilidad propia por canal — el headline del
+ * lead magnet — y SÍ viaja al DTO público (`PublicGraderReport.providerPresence`) + al modelo
+ * `publicWeb`. Lo internal-only es `providerFindings` (la NARRATIVA cruda por motor), NO estos
+ * conteos.
+ */
 export interface ProviderPresence {
   provider: string
   resolved: number
