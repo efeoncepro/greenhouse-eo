@@ -213,7 +213,8 @@ native-control hardening and generic tokens to Growth Forms host wrappers (`.eo-
 Use it to avoid repeating per-landing CSS fights with Ohio. Do not put fields, validation, copy,
 HubSpot mapping, Turnstile secrets or destination behavior in the child theme. Before deploying it,
 refresh public-site drift (`public-website:export-live-code` + `public-website:diff-runtime`) and
-avoid collateral plugin rollout if `eo-elementor-widgets` is still `repo_extra` in the live export.
+avoid collateral plugin rollout if `runtime-status` reports `releaseSafety.fullRepoDeploySafe=false`
+or `eo-elementor-widgets` is classified as `repo_pending_release`.
 
 ### Premium diagnostic forms
 

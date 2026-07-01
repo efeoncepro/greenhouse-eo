@@ -132,7 +132,9 @@ const main = () => {
           reportPath: latestDrift.reportPath,
           generatedAt: latestDrift.report.generatedAt,
           liveGeneratedAt: latestDrift.report.liveGeneratedAt,
-          counts: latestDrift.report.counts
+          counts: latestDrift.report.counts,
+          classificationCounts: latestDrift.report.classificationCounts ?? null,
+          releaseSafety: latestDrift.report.releaseSafety ?? null
         }
       : null,
     blockedCapabilities,

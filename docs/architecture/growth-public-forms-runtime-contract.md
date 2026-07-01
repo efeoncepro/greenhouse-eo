@@ -85,10 +85,11 @@ No responsabilidad de la capa:
 Rollout guard:
 
 - El deploy del child theme no debe mezclar automaticamente el plugin
-  `eo-elementor-widgets` si produccion no lo tiene en el export live. El diff fresco
-  `docs/operations/public-site-drift/drift-2026-07-01T07-32-13-512Z.json` mostro
-  `eo-elementor-widgets` como `repo_extra`; por eso el rollout de esta capa debe ser
-  acotado al child theme o esperar un release explicito del plugin.
+  `eo-elementor-widgets` si produccion no lo tiene en el export live. El diff clasificado
+  `docs/operations/public-site-drift/drift-2026-07-01T10-19-16-439Z.json` muestra
+  `releaseSafety.fullRepoDeploySafe=false` y `eo-elementor-widgets` como
+  `repo_pending_release`; por eso el rollout de esta capa debe ser acotado al child theme
+  o esperar un release explicito del plugin.
 - Antes de aplicar a Kinsta, refrescar snapshot con `pnpm public-website:export-live-code`
   y verificar `pnpm public-website:diff-runtime`. Despues de aplicar, purgar Kinsta y
   correr el gate especifico de la landing; para AEO, `pnpm public-website:verify-aeo-live-contract`.

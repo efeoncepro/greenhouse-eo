@@ -60,8 +60,9 @@ Rollout safety:
 
 1. Refresh production code before applying: `pnpm public-website:export-live-code` then
    `pnpm public-website:diff-runtime`.
-2. If `eo-elementor-widgets` appears as `repo_extra`, do not deploy it as collateral in a
-   child-theme CSS rollout; it needs its own plugin release decision.
+2. If `runtime-status` reports `releaseSafety.fullRepoDeploySafe=false` or
+   `eo-elementor-widgets` under `classificationCounts.repo_pending_release`, do not deploy it as
+   collateral in a child-theme CSS rollout; it needs its own plugin release decision.
 3. Validate by injection or staging before Kinsta mutation: desktop + mobile 390, dropdown
    open, `scrollWidth==clientWidth`, focus/ARIA and relevant captcha/email-gate smoke.
 4. After a live child-theme update, purge Kinsta and run the landing gate. AEO uses

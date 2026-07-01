@@ -90,8 +90,9 @@ Regla operativa:
    transversal. No crear CSS page-scoped por formulario salvo excepcion documentada.
 3. Antes de desplegar cambios del child theme, correr `pnpm public-website:export-live-code`
    + `pnpm public-website:diff-runtime` para confirmar que no se pisara drift de
-   produccion. Si el plugin `eo-elementor-widgets` aparece como `repo_extra`, no lo mezcles
-   en el rollout del child theme.
+   produccion. Luego leer `pnpm public-website:runtime-status`: si
+   `releaseSafety.fullRepoDeploySafe=false` o `eo-elementor-widgets` aparece como
+   `repo_pending_release`, no lo mezcles en el rollout del child theme.
 4. Validar con desktop + mobile 390, `scrollWidth == clientWidth`, dropdown abierto,
    foco/ARIA y la prueba publica/fail-closed que aplique al formulario.
 
