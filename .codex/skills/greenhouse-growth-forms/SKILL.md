@@ -181,6 +181,30 @@ propagating to the content).
   It also captures focus/error/reduced-motion states via `pnpm public-website:verify-aeo-renderer-interaction-preview`.
   It does not mutate WordPress.
 
+### TASK-1298 lesson — one-time platform hardening, not per-form ceremony
+
+The long AEO recovery was expensive because it built missing **platform safeguards**: hostile-host
+CSS hardening, live-safe in-memory preview, interaction captures, and pixel-aware frame review. Do
+not repeat that whole AEO ceremony for every new form.
+
+For a new ordinary Growth Form embed, use a proportional path:
+
+1. Publish the form contract under a stable `form_key` (labels/placeholders/CTA/security live in the
+   contract, not in WordPress).
+2. Smoke `GET` by `formKey` (and slug if an alias exists), plus fail-closed `/submit` when captcha is
+   required.
+3. Embed `<greenhouse-form form-key="..." surface="..." locale="..." color-scheme="light">` with
+   host-owned title/trust/privacy/no-JS fallback.
+4. Capture desktop + mobile 390 and inspect the frame. For high-value public landings, add a small
+   landing-specific visual gate that reuses the TASK-1298 pattern: render in the real host
+   composition without mutating live, assert `scrollWidth==clientWidth`, and pixel-sample inputs,
+   selects and CTA when host CSS could fight native controls.
+
+AEO's `pnpm public-website:verify-aeo-prelive-contract` is the **strict AEO cutover gate**, not a
+universal tax. New forms should not need `heroans`, bridge guards, or AEO copy/layout assertions
+unless they live on AEO. If another host/theme breaks the renderer, fix the renderer or shared
+fixture globally and add a reusable gate; do not patch that one landing in isolation.
+
 ---
 
 ## Public API contract (`/api/public/growth/forms/`)
@@ -306,6 +330,12 @@ Invoke the `efeonce-public-site-wordpress` skill. Mutate Elementor **only** via
    (reads the renderer's `.ghf-*` classes, waits for mount, checks tracking + overflow + font).
 5. Rollback = restore the backup meta + purge.
 
+For non-AEO forms, keep the same safety principles but scale the gate: use the public API smoke,
+desktop/mobile 390 frame review, overflow check, captcha/email-gate smoke when configured, and a
+landing-specific pixel-aware visual gate only when the surface is high-value or the host CSS is
+known to be hostile. Do not carry AEO-only hashes, bridge rollback state, or `heroans` requirements
+into unrelated forms.
+
 ---
 
 ## ops-worker deploy filter (recurring bug class)
@@ -333,6 +363,9 @@ nubox/grader/reliability. Verify with `pnpm release:watchdog --json` (worker GIT
 - **NUNCA** log/telemeter PII; reveal is capability + reason + append-only audit.
 - **NUNCA** override `--ghf-*` tokens expecting them to reach the content without accounting for the
   `.ghf-scope` scope (use the `hosted` fix or target `.ghf-scope`).
+- **NUNCA** turn every new form launch into a full AEO TASK-1298 cutover. Use the shared renderer
+  hardening and proportional gates; escalate to AEO-level pre-live evidence only for critical
+  public landings, new hostile hosts, or renderer/theme regressions.
 - **NUNCA** add a `*_ENABLED` flag without a `FEATURE_FLAG_STATE_LEDGER.md` row; **NUNCA** add a
   capability without a real-role grant in the same PR.
 - **SIEMPRE** keep the no-leak test, the render-contract parity test (server `contracts.ts` ↔ renderer

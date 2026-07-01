@@ -6026,3 +6026,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - **Activar ICO de un cliente** = acción gobernada `POST /api/delivery/ico/enable-sync` (capability `delivery.ico.sync.enable`, command `enableClientIcoSync`, outbox `space_notion_source.ico_sync_enabled` → reactive consumer en ops-worker propaga a BigQuery; Vercel es BQ read-only). Reemplaza el path admin-coarse `/api/integrations/notion/register` (queda solo backward-compat).
 - **Verificar ICO de un cliente** = `GET /api/delivery/ico/sync-status` (capability `delivery.ico.sync.read`, escalera `not_connected→connected_not_enabled→enabled_not_calculating→calculating`).
 - Nexa-operable por construcción (Full API Parity). Spec: `docs/architecture/metrics/ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` § ICO Client Inclusion. Pendiente: UI affordance interna.
+
+## Delta 2026-06-30 — Growth Forms embeds usan gates proporcionales
+
+- TASK-1298 AEO produjo salvaguardas reutilizables para `<greenhouse-form>` en hosts WordPress/Ohio: renderer hardening, preview live-safe en memoria, captura de estados y frame review pixel-aware.
+- Ese esfuerzo no se debe repetir completo para cada formulario. Nuevos Growth Forms usan flujo proporcional: identidad por `form-key`, smoke API, captcha/email gate cuando aplique, desktop/mobile 390 sin overflow y frame review visual.
+- `pnpm public-website:verify-aeo-prelive-contract` queda como gate estricto de AEO por su bridge restaurado, `heroans` protegido y rollback previo; para otros formularios se escala el patrón solo si el host/superficie lo justifica.

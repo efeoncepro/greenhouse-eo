@@ -55,6 +55,12 @@ The conversion widget `convers` uses a custom HTML bridge, not the generic `<gre
 
 Reason: the generic renderer emits Turnstile `captchaToken` since TASK-1294 and has `form-key` since TASK-1297, but TASK-1298's first live migration was reverted because Ohio broke the renderer controls visually. Pre-live parity is now proven with hostile fixture + real-composition preview in memory; the live AEO bridge remains in place until the governed live cutover runs with Elementor backup, `heroans` guard, Kinsta purge and GVC/frame evidence on the saved page.
 
+Scope note: AEO is a critical restored landing with a protected hero and a reverted bridge incident,
+so its gate is intentionally stricter than a normal new Growth Form embed. Do not copy AEO-only
+requirements (`heroans`, bridge-live guard, AEO copy/layout assertions) into unrelated forms. Reuse
+the platform pattern instead: stable `form-key`, live-safe preview, desktop/mobile 390 frame review,
+overflow check, and pixel sampling only when host CSS risk justifies it.
+
 Identifiers:
 
 - Form slug: `efeonce-aeo-diagnostic`
