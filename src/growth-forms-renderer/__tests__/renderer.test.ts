@@ -94,6 +94,16 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(errorNode.textContent).toBeTruthy()
   })
 
+  it('prevents primary pointerdown from causing pre-submit blur layout shift', () => {
+    const { root } = mountInto()
+    const primary = root.querySelector<HTMLButtonElement>('[data-ghf-primary]')!
+    const event = new window.Event('pointerdown', { bubbles: true, cancelable: true })
+
+    primary.dispatchEvent(event)
+
+    expect(event.defaultPrevented).toBe(true)
+  })
+
   it('submits raw values, emits the funnel, and shows inline success', async () => {
     const fetchImpl = okFetch()
     const { root } = mountInto(staticContractFixture(), fetchImpl)
@@ -151,6 +161,46 @@ describe('growth-forms-renderer · FormRenderer', () => {
     select.value = 'growth'
     select.dispatchEvent(new Event('change'))
     expect(root.querySelector('[name="budget"]')).not.toBeNull()
+  })
+
+  it('keeps contract-provided blank select placeholders as the first option', () => {
+    const { root } = mountInto(staticContractFixture({
+      fields: [
+        {
+          key: 'country',
+          type: 'select',
+          label: 'País',
+          options: [
+            { value: '', label: 'Selecciona país' },
+            { value: 'CL', label: 'Chile' },
+          ],
+        },
+      ],
+      consent: undefined,
+    }))
+
+    const select = root.querySelector<HTMLSelectElement>('[name="country"]')!
+
+    expect(Array.from(select.options).map(option => option.textContent)).toEqual(['Selecciona país', 'Chile'])
+  })
+
+  it('keeps short fields and selects paired while long intent fields span the form', () => {
+    const { root } = mountInto(staticContractFixture({
+      fields: [
+        { key: 'firstName', type: 'text', label: 'Nombre', maxLength: 120 },
+        { key: 'email', type: 'email', label: 'Email' },
+        { key: 'brandWebsite', type: 'url', label: 'Marca / sitio web', maxLength: 240 },
+        { key: 'country', type: 'select', label: 'País', options: [{ value: '', label: 'Selecciona país' }] },
+        { key: 'mainCompetitor', type: 'text', label: 'Principal competidor', maxLength: 200 },
+      ],
+      consent: undefined,
+    }))
+
+    expect(root.querySelector('[name="firstName"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(false)
+    expect(root.querySelector('[name="email"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(false)
+    expect(root.querySelector('[name="brandWebsite"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(true)
+    expect(root.querySelector('[name="country"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(false)
+    expect(root.querySelector('[name="mainCompetitor"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(true)
   })
 
   it('multi_step_light advances per step and preserves data going back', () => {

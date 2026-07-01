@@ -33,6 +33,10 @@ export const RENDERER_CSS = `
     --ghf-radius: 8px;
     --ghf-gap: 16px;
     --ghf-focus: #2563eb;
+    --ghf-field-shadow: 0 1px 2px rgba(16, 22, 43, 0.04);
+    --ghf-field-shadow-focus: 0 0 0 4px rgba(37, 99, 235, 0.14);
+    --ghf-action-shadow: 0 10px 24px rgba(16, 22, 43, 0.10);
+    --ghf-action-shadow-hover: 0 14px 30px rgba(16, 22, 43, 0.14);
 
     display: block;
     container-type: inline-size;
@@ -56,6 +60,10 @@ export const RENDERER_CSS = `
       --ghf-error: #ff8aa0;
       --ghf-error-bg: #2a151b;
       --ghf-success: #34d399;
+      --ghf-field-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+      --ghf-field-shadow-focus: 0 0 0 4px rgba(108, 140, 255, 0.18);
+      --ghf-action-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
+      --ghf-action-shadow-hover: 0 14px 30px rgba(0, 0, 0, 0.42);
     }
   }
 
@@ -99,7 +107,8 @@ export const RENDERER_CSS = `
     width: 100%;
     min-height: 44px;
     line-height: 1.4;
-    transition: border-color 120ms ease, box-shadow 120ms ease;
+    box-shadow: var(--ghf-field-shadow);
+    transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease, background-color 140ms ease;
   }
   .ghf-textarea { min-height: 96px; resize: vertical; }
   .ghf-input:hover,
@@ -114,6 +123,11 @@ export const RENDERER_CSS = `
   .ghf-btn:focus-visible {
     outline: 2px solid var(--ghf-focus);
     outline-offset: 2px;
+  }
+  .ghf-input:focus-visible,
+  .ghf-textarea:focus-visible,
+  .ghf-select:focus-visible {
+    box-shadow: var(--ghf-field-shadow-focus);
   }
 
   .ghf-field[data-invalid="true"] .ghf-input,
@@ -203,9 +217,73 @@ export const RENDERER_CSS = `
     border-radius: var(--ghf-radius); border: 1px solid transparent;
     cursor: pointer;
     background: var(--ghf-accent); color: var(--ghf-accent-contrast);
+    box-shadow: var(--ghf-action-shadow);
+    transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease, opacity 140ms ease;
   }
+  .ghf-btn:hover { transform: translateY(-1px); box-shadow: var(--ghf-action-shadow-hover); filter: saturate(1.04); }
+  .ghf-btn:active { transform: translateY(0); box-shadow: var(--ghf-action-shadow); filter: saturate(0.98); }
   .ghf-btn[aria-disabled="true"] { opacity: 0.7; cursor: progress; }
   .ghf-btn--ghost { background: transparent; color: var(--ghf-accent); border-color: var(--ghf-border-strong); }
+
+  /* TASK-1298 — hostile-host hardening.
+     WordPress/Ohio can apply aggressive input/select/button declarations (including
+     background images on selects and default dark button skins). These rules keep the
+     portable renderer visually stable while preserving host theming through --ghf-* tokens. */
+  greenhouse-form .ghf-form .ghf-input,
+  greenhouse-form .ghf-form .ghf-textarea,
+  greenhouse-form .ghf-form .ghf-select,
+  .ghf-scope .ghf-form .ghf-input,
+  .ghf-scope .ghf-form .ghf-textarea,
+  .ghf-scope .ghf-form .ghf-select {
+    font: inherit !important;
+    color: var(--ghf-fg) !important;
+    background-color: var(--ghf-field-bg) !important;
+    border: 1px solid var(--ghf-border) !important;
+    box-shadow: var(--ghf-field-shadow) !important;
+    letter-spacing: normal !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-input:focus-visible,
+  greenhouse-form .ghf-form .ghf-textarea:focus-visible,
+  greenhouse-form .ghf-form .ghf-select:focus-visible,
+  .ghf-scope .ghf-form .ghf-input:focus-visible,
+  .ghf-scope .ghf-form .ghf-textarea:focus-visible,
+  .ghf-scope .ghf-form .ghf-select:focus-visible {
+    box-shadow: var(--ghf-field-shadow-focus) !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-select,
+  .ghf-scope .ghf-form .ghf-select,
+  greenhouse-form .ghf-form .ghf-tel-country,
+  .ghf-scope .ghf-form .ghf-tel-country {
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    text-transform: none !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-btn,
+  .ghf-scope .ghf-form .ghf-btn {
+    font: inherit !important;
+    font-weight: 600 !important;
+    background: var(--ghf-accent) !important;
+    color: var(--ghf-accent-contrast) !important;
+    border-color: transparent !important;
+    box-shadow: var(--ghf-action-shadow) !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-btn:hover,
+  .ghf-scope .ghf-form .ghf-btn:hover {
+    box-shadow: var(--ghf-action-shadow-hover) !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-btn--ghost,
+  .ghf-scope .ghf-form .ghf-btn--ghost {
+    background: transparent !important;
+    color: var(--ghf-accent) !important;
+    border-color: var(--ghf-border-strong) !important;
+  }
 
   .ghf-summary { color: var(--ghf-error); font-size: 0.875rem; }
   .ghf-progress { font-size: 0.8125rem; color: var(--ghf-muted); font-weight: 600; }

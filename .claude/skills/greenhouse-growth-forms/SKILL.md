@@ -153,7 +153,8 @@ is what shows if the script never loads — author it; the renderer wipes it on 
 
 Tokens (`styles.ts`): `--ghf-font`, `--ghf-bg`, `--ghf-fg`, `--ghf-muted`, `--ghf-accent`
 (+`-contrast`), `--ghf-field-bg`, `--ghf-border` (+`-strong`), `--ghf-error` (+`-bg`),
-`--ghf-success`, `--ghf-radius`, `--ghf-gap`, `--ghf-focus`. Override scoped to the host container,
+`--ghf-success`, `--ghf-radius`, `--ghf-gap`, `--ghf-focus`, `--ghf-field-shadow`,
+`--ghf-field-shadow-focus`, `--ghf-action-shadow`, `--ghf-action-shadow-hover`. Override scoped to the host container,
 **never hex inline** in JSX/markup.
 
 **Scope behavior (load-bearing):** the core renders into an inner `<div class="ghf-root">`. In
@@ -168,6 +169,17 @@ propagating to the content).
 - Against an OLD renderer bundle (before the fix reaches prod): also target the inner scope —
   `greenhouse-form, greenhouse-form .ghf-scope { --ghf-* }` (forward-compatible: harmless once fixed).
 - `color-scheme="light"` is mandatory on light bands (else OS-dark visitors see a dark form).
+- TASK-1298 hostile-host hardening: controls/CTA now re-declare native-control-critical properties
+  through scoped tokenized `!important` rules so generic Ohio `input/select/button` skins cannot turn
+  fields gray, tile select carets, add tracking, or darken the CTA. Before any AEO cutover, run
+  `pnpm public-website:verify-aeo-prelive-contract`, then review the saved desktop/mobile frames.
+  This aggregate gate protects WordPress `heroans` + restored bridge, checks the public API by slug
+  and `formKey` including fail-closed captcha, runs typography, protects the live bridge baseline,
+  runs the hostile Ohio fixture, injects the renderer into live `/aeo-2/` in memory only, and
+  validates the saved PNG frames are fresh/nonblank. The AEO pre-live renderer must also keep
+  desktop paired rows for `Nombre`/`Email` and `País`/`Tamaño`, while mobile 390 stacks cleanly.
+  It also captures focus/error/reduced-motion states via `pnpm public-website:verify-aeo-renderer-interaction-preview`.
+  It does not mutate WordPress.
 
 ---
 

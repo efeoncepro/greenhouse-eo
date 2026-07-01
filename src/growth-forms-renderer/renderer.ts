@@ -293,10 +293,10 @@ export class FormRenderer {
     const helpId = helpText ? `${fieldId}-help` : undefined
     const required = isFieldRequired(field, this.values)
     const error = this.errors[field.key]
-    const isPaired = field.type === 'tel' || field.type === 'date' || field.type === 'number'
+    const fullWidth = this.fieldPrefersFullWidth(field)
 
     const wrap = el(this.doc, 'div', {
-      class: `ghf-field${isPaired ? '' : ' ghf-field--full'}`,
+      class: `ghf-field${fullWidth ? ' ghf-field--full' : ''}`,
       'data-invalid': error ? 'true' : 'false',
       'data-status': this.fieldStatus.get(field.key) ?? 'neutral',
     })
@@ -350,6 +350,20 @@ export class FormRenderer {
     return wrap
   }
 
+  private fieldPrefersFullWidth(field: RendererFieldDefinition): boolean {
+    if (field.type === 'textarea' || field.type === 'multiselect' || field.type === 'checkbox' || field.type === 'consent') {
+      return true
+    }
+
+    if (field.type === 'url' || field.type === 'national_id') return true
+
+    if (field.type === 'text') {
+      return !field.maxLength || field.maxLength > 160
+    }
+
+    return false
+  }
+
   private fieldLabel(field: RendererFieldDefinition): string {
     if (field.label) return field.label
     if (field.copyRef && this.contract.copy?.[field.copyRef]) return this.contract.copy[field.copyRef]
@@ -391,7 +405,11 @@ export class FormRenderer {
         const select = el(this.doc, 'select', { ...common, class: 'ghf-select' })
 
         if (field.type === 'multiselect') select.setAttribute('multiple', 'multiple')
-        if (!required && field.type === 'select') select.appendChild(el(this.doc, 'option', { value: '' }, '—'))
+        const hasBlankOption = field.options?.some(opt => opt.value === '') ?? false
+
+        if (!required && field.type === 'select' && !hasBlankOption) {
+          select.appendChild(el(this.doc, 'option', { value: '' }, field.placeholder ?? '—'))
+        }
 
         for (const opt of field.options ?? []) {
           select.appendChild(el(this.doc, 'option', { value: opt.value }, opt.label ?? opt.value))
@@ -997,6 +1015,11 @@ export class FormRenderer {
     const primary = el(this.doc, 'button', { type: 'submit', class: 'ghf-btn' }, submitLabel)
 
     primary.dataset.ghfPrimary = 'true'
+    primary.addEventListener('pointerdown', event => {
+      // Avoid a pre-click blur validation layout shift moving the submit button under
+      // the pointer. The submit handler validates the full visible step immediately.
+      if (!this.submitting && !this.isVerifyingAny()) event.preventDefault()
+    })
 
     if (this.submitting) {
       primary.setAttribute('aria-disabled', 'true')

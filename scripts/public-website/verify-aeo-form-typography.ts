@@ -92,7 +92,9 @@ async function main() {
     for (const testCase of viewports) {
       const page = await browser.newPage({ viewport: testCase.viewport })
 
-      await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 60000 })
+      await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 60000 })
+      await page.waitForSelector('.gh-aeo-conversion .gh-aeo-growth-form-card', { timeout: 30000 })
+      await page.evaluate(() => document.fonts?.ready).catch(() => undefined)
       await page.locator('.gh-aeo-conversion').scrollIntoViewIfNeeded()
 
       const sectionTitle = await readProbe(page, '.gh-aeo-conversion .gh-aeo-section-title .title')

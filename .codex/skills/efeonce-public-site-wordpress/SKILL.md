@@ -81,10 +81,11 @@ pnpm public-website:deploy-dry-run
 pnpm public-website:wpcli -- --eval-file ./tmp/<script>.php --wp-user 12
 ```
 
-For AEO form typography/overflow:
+For AEO form typography/overflow/renderer visual parity:
 
 ```bash
 pnpm public-website:verify-aeo-form-typography
+pnpm public-website:verify-aeo-prelive-contract
 ```
 
 ## Update Protocol
