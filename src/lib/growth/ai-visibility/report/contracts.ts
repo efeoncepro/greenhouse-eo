@@ -23,6 +23,16 @@ import { type CategoryTaxonomyLevel, type CategoryTaxonomyVersion } from '../tax
 export const GROWTH_AI_VISIBILITY_REPORT_VERSION = 'ai_visibility_report_v1' as const
 export const GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION = 'ai_visibility_recommendation_pack_v1' as const
 
+/**
+ * TASK-1280 — Semver del CONTRATO PÚBLICO HEADLESS que sirve `GET /report/[token]`
+ * (`{ report, model, modelVersion, header, asOf, expiresAt }`). Greenhouse = dueño del
+ * modelo; `efeonce-web` (`think.efeoncepro.com`) = render tonto que lo consume por este
+ * versionado. Cambio additive del shape → no rompe (no bump necesario); breaking change
+ * del shape → bump MAJOR + render de `efeonce-web` adaptado en el mismo ciclo (ADR
+ * `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1`).
+ */
+export const GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION = '1.0.0' as const
+
 export type GraderReportVersion = typeof GROWTH_AI_VISIBILITY_REPORT_VERSION
 export type RecommendationPackVersion = typeof GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION
 

@@ -45,7 +45,9 @@ const fakeRow = {
   report_token: 'grt-deadbeef',
   as_of: '2026-06-24T22:00:00.000Z',
   expires_at: null,
-  public_report_json: { audience: 'public' }
+  public_report_json: { audience: 'public' },
+  // TASK-1280 — el read path JOINea run → profile por la marca evaluada (para el `header`).
+  brand_name: 'Globe'
 }
 
 vi.mock('@/lib/postgres/client', () => ({
@@ -56,7 +58,9 @@ vi.mock('@/lib/postgres/client', () => ({
       return sql.insertReturnsRow ? [fakeRow] : []
     }
 
-    if (text.includes('SELECT report_id')) {
+    // Publish idempotency recover (`SELECT report_id ...`) y read path público
+    // (`SELECT gr.report_id ... JOIN grader_runs ... grader_profiles`, TASK-1280).
+    if (text.includes('SELECT report_id') || text.includes('SELECT gr.report_id')) {
       return sql.selectReturnsRow ? [fakeRow] : []
     }
 
@@ -112,7 +116,9 @@ describe('growth/ai-visibility — public report snapshot (TASK-1239)', () => {
     const found = await readPublicGraderReport('grt-deadbeef')
 
     expect(found?.reportToken).toBe('grt-deadbeef')
-    expect(sql.calls[0].text).toContain('expires_at IS NULL OR expires_at > NOW()')
+    // TASK-1280 — el read path resuelve la marca evaluada (para el `header` del contrato headless).
+    expect(found?.brandName).toBe('Globe')
+    expect(sql.calls[0].text).toContain('gr.expires_at IS NULL OR gr.expires_at > NOW()')
 
     sql.selectReturnsRow = false
     expect(await readPublicGraderReport('grt-missing')).toBeNull()

@@ -4,12 +4,12 @@ import {
   modelFromPublicReport,
   type ReportArtifactModel
 } from '@/components/growth/ai-visibility/report-artifact/model'
-import type { ReportHeader } from '@/components/growth/ai-visibility/report-artifact/web/AiVisibilityReportArtifact'
 import type { AiVisibilityReportEmailInsight } from '@/emails/AiVisibilityGraderReportEmail'
 import { sendEmail } from '@/lib/email/delivery'
 import { isReportEmailDeliveryEnabled } from '@/lib/growth/ai-visibility/flags'
 import { buildPublicReportUrl, getLatestReportTokenForRun } from '@/lib/growth/ai-visibility/hubspot/report-link'
 import { getGraderLeadForHandoff } from '@/lib/growth/ai-visibility/public-intake/store'
+import { buildReportHeader } from '@/lib/growth/ai-visibility/report/report-header'
 import { readPublicGraderReport } from '@/lib/growth/ai-visibility/report/snapshot'
 import type { GraderReportSeverity } from '@/lib/growth/ai-visibility/report/contracts'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -71,9 +71,6 @@ const buildInsight = (model: ReportArtifactModel): AiVisibilityReportEmailInsigh
   return { detection, importance, action }
 }
 
-const formatReportDate = (iso: string): string =>
-  new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(iso))
-
 const leadDisplayName = (firstName: string | null, lastName: string | null): string | undefined => {
   const name = [firstName, lastName].filter(Boolean).join(' ').trim()
 
@@ -119,13 +116,7 @@ export const dispatchAiVisibilityReportEmail = async (runId: string): Promise<Re
   try {
     const model = modelFromPublicReport(snapshot.publicReport, 'attachment')
     const organizationName = lead.brandName
-    const reportDate = formatReportDate(snapshot.asOf)
-
-    const header: ReportHeader = {
-      organizationName,
-      reportDate,
-      periodLabel: `Diagnóstico al ${reportDate}`
-    }
+    const header = buildReportHeader({ organizationName, asOf: snapshot.asOf })
 
     const attachment = await buildAiVisibilityReportAttachment({ publicReport: snapshot.publicReport, header })
 
