@@ -262,6 +262,21 @@ Todo gateado por `GROWTH_SEO_ENABLED` (default OFF) + fila en `FEATURE_FLAG_STAT
 
 ---
 
+## 15. Granularidad URL / Topic Cluster — "Search Visibility 360 granular" (extensión, 2026-07-02)
+
+El 360 no vive solo a nivel marca: su expresión más potente es **a nivel página y topic cluster**. Para una landing específica (o un cluster temático completo) el sistema debe responder, en el tiempo: **keywords que rankea · avg position · clicks (GSC) · qué grounded queries la cita la IA · en qué motores · citation share** — y el cuadrante 360 a ESE nivel. Ninguna herramienta suelta (Semrush = solo SEO, Profound = solo IA) da esto; es el diferenciador más fuerte del producto.
+
+**Qué ya existe (no hay que construirlo):**
+- **SEO por URL:** `seo_rank_snapshots` guarda `position` + `url`; `seo_gsc_daily` es `query × page`; `readRankEvolution` ya filtra por URL. Keywords/avg-position/clicks por landing = cubierto.
+- **AEO cita-por-URL:** el grader **ya captura las citas con URL**. `GrowthAiVisibilityCitation` (`src/lib/growth/ai-visibility/contracts.ts`) + `buildCitations`/`extractCitationDomain` (`observation.ts`) normalizan citas con `url`/`domain`/`title`; el adapter AI-mode (`providers/google-ai-overview-adapter.ts` → `collectCitationCandidates`) parsea `references`/`links`/`sources` de DataForSEO. Cada observación es por prompt → el prompt ES el **grounded query**.
+
+**Qué falta (la extensión, 3 tasks):**
+- **`TASK-1311` — AEO citation attribution (URL-level + grounded queries):** capa de lectura/atribución que filtra las citas al dominio propio, las mapea a la **URL específica**, y las agrupa por **grounded query (prompt) + engine + tiempo** (+ citation share). Confirmar que las citas persistan queryable (JSONB en `provider_observations` o tabla normalizada) — la CAPTURA ya existe, esto es reader/rollup.
+- **`TASK-1312` — Topic Cluster como entidad de primera clase:** `seo_topic_clusters` (agrupa URLs + keyword sets por tema, per target, membership append-only) + rollup reader. Hoy el primitive más cercano es `seo_keyword_sets` + `tags[]`; el cluster lo formaliza y hace roll-up SEO+AEO.
+- **`TASK-1313` — Unified Page/Cluster Visibility 360 read:** `readPageVisibility360(url)` + `readClusterVisibility360(clusterId)` — derived read que une SEO (rank/gsc por url) × AEO (citation attribution por url) por `org + url/cluster`, en el tiempo. Es la evolución de `readSeoAeoGap` de nivel marca → nivel página/cluster.
+
+**Boundary intacto:** sigue siendo un **derived read** con join más rico (`org + url + keyword/cluster`), sin merge de tablas ni fusión de scoring — el boundary §1.1 aplica igual. El consumer UI (vista de análisis granular por landing/cluster) es follow-up ui-ux posterior; estas 3 tasks son la fundación backend-data.
+
 ## 14. Documentación relacionada
 
 - ADR: `GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md`
