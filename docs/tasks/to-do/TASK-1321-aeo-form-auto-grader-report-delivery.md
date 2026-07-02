@@ -1,5 +1,16 @@
 # TASK-1321 — AEO `/aeo-2/` submit auto-runs Grader + emails report (self-serve intake)
 
+## Delta 2026-07-02 — verificación de campos (pre-implementación)
+
+Verificado contra código: el grader exige `brandName` + `market` + `locale` + `category` + `email` + `consent` no-vacíos (`public-intake/contracts.ts:81-87` `isValidPublicGraderInput`; `createPublicGraderRun` NO deriva — los pasa tal cual). Cruzado con lo que `/aeo-2/` (`fdef-efeonce-aeo-diagnostic`) captura hoy:
+
+- `email` + `consent` + `websiteUrl` (`brandWebsite`) → **directo**.
+- `market` + `locale` → **derivables de `country`** (mapeo determinista). Sub-gap: `country` hoy es **opcional** → hay que hacerlo **requerido** (o defaultear CL/es-CL) para derivar confiable.
+- `category` → **derivable** vía `brand-intelligence` (fetch del sitio + LLM, gated por confianza) — pero esa capa **exige `brandName` como input** (`BrandIntelligenceInput.brandName: string`, NO lo deriva del dominio).
+- **`brandName` → NO lo captura el form y NO es derivable de forma confiable.** Ninguna capa saca el nombre de marca desde el dominio; derivarlo heurístico (`acme-corp.com`→"Acme Corp") es frágil y alimentaría un informe equivocado (lección EPIC-021).
+
+**Conclusión: falta 1 campo real — `brandName` (nombre de la marca).** Decisión: **agregarlo como campo al form** (baja fricción; el usuario lo sabe) + hacer `country` requerido; derivar market/locale; clasificar category gated. Refina el Slice 1 (de "derivar brandName" → "capturar brandName"). El label del campo se autora en el contrato del form (nueva versión, clone→publish→deprecate), validado con `greenhouse-ux-writing`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -39,7 +50,7 @@ Hoy hay dos formularios distintos: `/aeo-2/` (comercial → HubSpot "AEO - Lead 
 ## Goal
 
 - Extender el pipeline existente para que `fdef-efeonce-aeo-diagnostic` (`/aeo-2/`) dispare un grader run async por cada submit corporativo aceptado.
-- Mapear/derivar los campos del form `/aeo-2/` al intake requerido del grader (`brandName`, `market`, `locale`, `category`), con **gate de confianza de categoría** (no correr `unknown`).
+- Cerrar el gap de campos: **capturar `brandName`** (nuevo campo, el único no derivable) + `country` requerido; **derivar** `market`/`locale` de `country` y **clasificar** `category` (gated), para armar el intake requerido del grader.
 - Entregar el informe al cliente **por correo con PDF adjunto apenas el informe esté listo** (event-driven); si no queda listo, **no enviar**.
 - **Dedup del lead HubSpot**: enriquecer el mismo contacto/empresa (por email/dominio), nunca duplicar.
 - Cost-cap + guardrails anti-abuso; flags default-OFF + staging shadow antes de prod.
@@ -98,6 +109,7 @@ Reglas obligatorias:
 ### Files owned
 
 - Adapter nuevo `src/lib/growth/ai-visibility/public-intake/aeo-form-grader-adapter.ts` (o equivalente): mapeo `/aeo-2/` → intake grader.
+- Activation script para publicar la versión nueva del form `/aeo-2/` con `brandName` + `country` requerido (`scripts/growth/activate-aeo-*.ts`, clone→publish→deprecate).
 - `src/lib/sync/projections/growth-grader-run-from-submission.ts` (extender scope) o sibling projection nueva + `projections/index.ts`.
 - `src/lib/growth/ai-visibility/public-intake/create-public-run.ts` (reuso; no fork).
 - `src/lib/growth/ai-visibility/hubspot/execute.ts` (dedup del lead).
@@ -120,7 +132,7 @@ Reglas obligatorias:
 ### Gap
 
 - La projection no gatilla para `fdef-efeonce-aeo-diagnostic`.
-- No hay adapter que mapee los campos de `/aeo-2/` al intake del grader (`brandName`/`market`/`locale`/`category` faltan: el form tiene dominio + country, no esos 4).
+- No hay adapter que mapee los campos de `/aeo-2/` al intake del grader. **Gap de campos verificado (Delta 2026-07-02):** el form no captura `brandName` (único no derivable — hay que agregarlo); `market`/`locale` derivables de `country` (pero `country` es opcional → requerido); `category` derivable vía `brand-intelligence` gated. Ver `## Delta`.
 - No hay política de dedup entre el destino HubSpot del form y el handoff del grader.
 - No hay cost-cap por período para runs disparados desde `/aeo-2/`.
 - Los flags `REPORT_EMAIL` + `LEAD_HANDOFF` pueden estar OFF en prod (verificar).
@@ -158,7 +170,7 @@ Reglas obligatorias:
 
 ### Migration, backfill and rollout
 
-- Migration posture: `none` esperado (reuso de tablas del grader). Si el adapter necesita persistir el mapeo `/aeo-2/`→run, evaluar columna aditiva. Confirmar en Discovery.
+- Migration posture: `none` de DB esperado (reuso de tablas del grader). **Sí incluye una publicación de versión nueva del form `/aeo-2/`** (clone→publish→deprecate) para agregar `brandName` + `country` requerido — es cambio de contrato de datos (`form_version.field_schema_json`), no DDL. Si el adapter necesita persistir el mapeo `/aeo-2/`→run, evaluar columna aditiva. Confirmar en Discovery.
 - Default state: detrás de flag OFF → `/aeo-2/` sigue igual (lead comercial, sin grader).
 - Backfill plan: none (aplica a submits nuevos).
 - Rollback path: apagar el flag de scope → `/aeo-2/` vuelve a solo-comercial. Reversible sin DDL.
@@ -199,15 +211,21 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Adapter de mapeo/derivación `/aeo-2/` → intake grader
+### Slice 1 — Form contract (capturar `brandName` + `country` requerido) + adapter de mapeo
 
-- Adapter que traduce un `form_submission` de `fdef-efeonce-aeo-diagnostic` al intake del grader:
-  - `brandWebsite` → `websiteUrl` + dominio.
-  - `country` → `market` + `locale`.
-  - Derivar `brandName` del dominio (o del site content que el grader ya fetchea).
-  - Clasificar `category` con el clasificador EPIC-021 + **gate de confianza**: si no resuelve, marcar el submission como `grader_skipped:category_unresolved` (sin run).
-  - `email`/`consent` desde el submission (solo a `grader_leads`, no al run engine).
-- Tests: mapeo feliz, país→market/locale, categoría no resuelta → skip.
+**1a — Nueva versión del form `/aeo-2/`** (clone→publish→deprecate; NUNCA editar la publicada in-place):
+- Agregar campo `brandName` ("Nombre de tu marca", requerido) — el único input que el grader no puede derivar (`brand-intelligence` lo exige como input).
+- Hacer `country` **requerido** (hoy opcional) para derivar `market`/`locale` confiable; o defaultear CL/es-CL si se deja opcional.
+- Label/placeholder validados con `greenhouse-ux-writing` (es-CL). Preservar fields/validation/Turnstile/destino HubSpot/namePolicy/consent existentes.
+- Decidir mapping HubSpot del `brandName` (¿`companies.name`? o solo Greenhouse) — vía el adapter allowlisted, sin exponer mapping al browser.
+
+**1b — Adapter `/aeo-2/` → intake grader:**
+- `brandName` → `brandName` (directo, ahora capturado).
+- `brandWebsite` → `websiteUrl` + dominio.
+- `country` → `market` + `locale` (mapeo determinista).
+- Clasificar `category` vía `brand-intelligence` / `category-guard` (brandName + fetch del sitio) + **gate de confianza**: si no resuelve, marcar el submission `grader_skipped:category_unresolved` (sin run, fallback comercial).
+- `email`/`consent` solo a `grader_leads`, NUNCA al run engine.
+- Tests: mapeo feliz, país→market/locale, brandName directo, categoría no resuelta → skip.
 
 ### Slice 2 — Projection scope: gatillar el grader desde `/aeo-2/`
 
@@ -245,6 +263,7 @@ Reglas obligatorias:
 
 ### Decisiones de producto tomadas
 
+- **Campos (Delta 2026-07-02):** **agregar `brandName`** al form (único no derivable) + `country` requerido; `market`/`locale` derivan de `country`; `category` se clasifica vía `brand-intelligence` gated. NO derivar brandName heurístico del dominio (frágil → informe equivocado, lección EPIC-021).
 - **Q1 (volumen):** todo submit corporativo corre el grader + **cost-cap por período**. (El `corporate_email` gate ya filtra free/disposable.)
 - **Email:** event-driven — se envía **apenas el informe esté listo**; si no está listo, **no se envía**. Template del grader.
 - **Q4 (categoría no clasificable):** **skip grader + no email**, degradar al lead comercial (+ opcional flag operador). Sin runs basura.
@@ -313,7 +332,7 @@ La entrega event-driven hace que "24–48h" del Success Card actual quede desali
 ## Acceptance Criteria
 
 - [ ] Un submit corporativo aceptado en `/aeo-2/` encola un grader run async (detrás de flag), idempotente por `submissionId`.
-- [ ] Los campos de `/aeo-2/` se mapean/derivan al intake del grader; `category` pasa por el gate de confianza y un `unknown` **no corre run** (degrada a lead comercial).
+- [ ] El form `/aeo-2/` publica versión nueva con `brandName` (capturado) + `country` requerido; los campos se mapean/derivan al intake del grader (`brandName` directo, `market`/`locale` de `country`); `category` pasa por el gate de confianza y un `unknown` **no corre run** (degrada a lead comercial).
 - [ ] El informe se entrega al cliente **por correo con PDF adjunto apenas esté `ready`/`partial`**; si no queda listo, **no se envía**.
 - [ ] El lead HubSpot se **dedupea** (un contacto enriquecido, sin duplicado) coexistiendo con el destino "AEO - Lead Form".
 - [ ] Cost-cap por período aplicado antes de encolar; corporate-email + Turnstile + rate-limit intactos.
