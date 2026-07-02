@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,11 +21,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `optional`
-- Status real: `code complete, rollout pendiente`
+- Status real: `complete — rollout production verified 2026-07-02`
 - Rank: `TBD`
 - Domain: `growth|public-site|hubspot`
-- Blocked by: `production code rollout approval / release control plane; develop release preflight requires break-glass due broader batch`
-- Branch: `develop` (`codex:task-hook` declared `task/TASK-1318-growth-forms-full-name-destination-split`; operator requested immediate execution without branch switch)
+- Blocked by: `none — release control plane completed for target_sha=398b7f1b55115b21b0ea5309c3b58bbfcba05504`
+- Branch: `develop` (`codex:task-hook` declared `task/TASK-1318-growth-forms-full-name-destination-split`; operator requested immediate execution without branch switch; production release merged via PR #137)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -414,7 +414,7 @@ Sin flag — additive and policy-gated by form version. Cutover happens by publi
 - [x] Public render contract does not expose HubSpot mapping or destination form GUID. Evidence: public API verifier remains green.
 - [x] `pnpm public-website:verify-aeo-live-contract` passes after publish, or rollout remains explicitly pending.
 - [x] `UI ready: yes` is justified by the wireframe implementation mapping, GVC plan and design decision log; `pnpm task:lint --task TASK-1318` passes.
-- [ ] Production runtime executes the new server-side split code. Pending: promote/deploy this code through the release control plane, or rollback/mitigate AEO v8.
+- [x] Production runtime executes the new server-side split code. Evidence: production release orchestrator run `28608774955` completed `success` for target SHA `398b7f1b55115b21b0ea5309c3b58bbfcba05504`; release manifest id `398b7f1b5511-4dec0dd7-d37c-4d2f-a943-3d47debdac77` transitioned `verifying -> released`; Vercel production deployment `dpl_Cfjyn22zx7iJS6zZXz9yWf2SEZrD` reached `READY`; `/api/auth/health` returned `200` with `overallStatus=ready`.
 
 ## Verification
 
@@ -430,18 +430,25 @@ Sin flag — additive and policy-gated by form version. Cutover happens by publi
 - ✅ `pnpm hubspot:forms:upsert-fields -- --config scripts/hubspot/examples/upsert-aeo-lastname-field.json` — dry-run found `contacts.lastname` already present on the form; no apply needed.
 - ✅ `pnpm growth:forms:activate-aeo-reference-copy -- --apply` — published v8 and deprecated v7.
 - ✅ `pnpm public-website:verify-aeo-live-contract` — live label/API/visual contract passed after v8 publish.
-- ⚠️ Production deployment not performed: `greenhouse-production-release` requires explicit approval for external production mutation. Runtime submit split remains rollout-pending until this code is promoted.
-- ⚠️ Release preflight attempted after pushing `develop`: `pnpm release:preflight --target-sha=7b598d10a5e81735efe1ddf4d69177af3cee4c05 --target-branch=main --json --output-file=.release-preflight-task-1318.json` reported `readyToDeploy=false` with `release_batch_policy=requires_break_glass` because `origin/main` is behind `develop` and the candidate release spans a broader 328-file batch including `db_migrations` and `cloud_release`. The JSON artifact was removed after inspection.
+- ✅ Production release completed after operator approval: PR #137 landed `398b7f1b55115b21b0ea5309c3b58bbfcba05504` on `main`; `Production Release Orchestrator` run `28608774955` completed `success`.
+- ✅ Release manifest evidence: `398b7f1b5511-4dec0dd7-d37c-4d2f-a943-3d47debdac77` transitioned to `released` with reason `Post-release health verified (orchestrator workflow 28608774955)`.
+- ✅ Vercel production readiness: orchestrator log found deployment `dpl_Cfjyn22zx7iJS6zZXz9yWf2SEZrD` in `READY`; local Vercel CLI listed production READY deployment `https://greenhouse-py8qjmw8w-efeonce-7670142f.vercel.app` for commit `398b7f1b55115b21b0ea5309c3b58bbfcba05504`.
+- ✅ Production health smoke: `curl https://greenhouse.efeoncepro.com/api/auth/health` returned `HTTP 200`, `overallStatus=ready`, providers `azure-ad`, `google` and `credentials` ready.
+- ✅ Target SHA contains runtime split path: `git show 398b7f1b...:src/lib/growth/forms/commands.ts` has `normalizedFields = applyNameNormalizationPolicy(version.validation_schema_json, normalizedFields)`; `git show 398b7f1b...:src/lib/growth/forms/name-normalization.ts` has `split_full_name` and `applyNameNormalizationPolicy`.
+- ✅ Release-readiness guard added post-rollout: `scripts/growth/activate-aeo-reference-copy-contract.ts --apply` now fails closed unless the configured production runtime ref (`GREENHOUSE_AEO_RUNTIME_REF`, default `origin/main`) contains the full-name split runtime, or the operator explicitly passes `--allow-runtime-pending`.
+- ✅ Public contract guard strengthened: `pnpm public-website:verify-aeo-public-api-contract` now asserts AEO v8 exposes `fullName` label `Nombre completo`, `autocomplete=name`, no legacy visible `firstName`, and still fails closed without captcha. Evidence 2026-07-02: production returned `formVersionId=fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63`, `version=8`, `fullNameField` correct, `captcha_failed/missing_token`.
+- ✅ Destination mapping verifier added and executed: `pnpm growth:forms:verify-aeo-full-name-destination-contract` reads the published AEO version, asserts `namePolicy.split_full_name`, applies the normalizer to a sample, reads server-side HubSpot mapping and builds the secure-submit body (`email`, `firstname`, `lastname`, no `fullName`). Evidence 2026-07-02: AEO v8 `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63`, destination `fdst-f0b3bd5a-27ec-474c-9a59-72e6c1b99918`, mapping `firstName -> firstname`, `lastName -> lastname`, `fullName=null`, sample secure-submit fields `email`, `lastname`, `firstname`.
+- ⚠️ Historical pre-release blocker: before PR #137, a `release:preflight` for `7b598d10a5e81735efe1ddf4d69177af3cee4c05` reported `readyToDeploy=false` with `release_batch_policy=requires_break_glass`; that blocker is superseded by the approved release to `398b7f1b`.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real.
-- [ ] archivo movido a `complete/` si se cierra.
-- [ ] `docs/tasks/README.md` sincronizado.
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` sincronizado.
-- [ ] `Handoff.md` actualizado con `/goal` exception, rollout evidence and any pending external blocker.
-- [ ] `changelog.md` actualizado.
-- [ ] Runtime docs updated if AEO vNext is published.
+- [x] `Lifecycle` del markdown sincronizado con el estado real.
+- [x] archivo movido a `complete/` si se cierra.
+- [x] `docs/tasks/README.md` sincronizado.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` sincronizado.
+- [x] `Handoff.md` actualizado con rollout evidence and server-side mapping verification.
+- [x] `changelog.md` actualizado.
+- [x] Runtime docs updated if AEO vNext is published.
 
 ## Follow-ups
 

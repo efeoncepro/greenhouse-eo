@@ -1,3 +1,17 @@
+## Sesion 2026-07-02 — TASK-1318 post-release closure + drift guard — Codex — ✅ complete
+
+> **Pedido:** continuar desde el estado actual de `TASK-1318`, considerando que el release a producción ya fue realizado, trazar qué faltaba, cerrar el gap de rollout con evidencia y agregar un guard para que el drift no se repita.
+>
+> **Cierre:** `TASK-1318` quedó movida a `docs/tasks/complete/TASK-1318-growth-forms-full-name-destination-split.md`, con `Lifecycle: complete`, README/registry sincronizados y último acceptance de producción marcado. El bloqueo del hook (`production code rollout approval / release control plane`) estaba stale: el release ya había cerrado el gap.
+>
+> **Evidencia release/runtime:** `origin/main` = `398b7f1b55115b21b0ea5309c3b58bbfcba05504`; `Production Release Orchestrator` run `28608774955` = success; release id `398b7f1b5511-4dec0dd7-d37c-4d2f-a943-3d47debdac77` transicionó a `released`; Vercel production deployment `dpl_Cfjyn22zx7iJS6zZXz9yWf2SEZrD` READY; Vercel CLI listó `https://greenhouse-py8qjmw8w-efeonce-7670142f.vercel.app` READY para ese commit; `https://greenhouse.efeoncepro.com/api/auth/health` respondió `200` con `overallStatus=ready`; el target SHA contiene `applyNameNormalizationPolicy` en `commands.ts` y `split_full_name` en `name-normalization.ts`.
+>
+> **Contrato público verificado:** `pnpm public-website:verify-aeo-public-api-contract` verde contra producción: AEO v8 `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63`, field `fullName` label `Nombre completo`, `autocomplete=name`, sin `firstName` visible, fail-closed sin Turnstile (`403 captcha_failed/missing_token`).
+>
+> **Guard nuevo:** `scripts/growth/activate-aeo-reference-copy-contract.ts --apply` ahora revisa `GREENHOUSE_AEO_RUNTIME_REF` (default `origin/main`) y falla si el runtime productivo no contiene `applyNameNormalizationPolicy`/`split_full_name`; sólo permite publicar con `--allow-runtime-pending` explícito. También se agregó `pnpm growth:forms:verify-aeo-full-name-destination-contract` para validar server-side `namePolicy` + mapping HubSpot (`firstName -> firstname`, `lastName -> lastname`, no `fullName`) sin crear leads.
+>
+> **Mapping destino verificado:** con `gcloud` + ADC activos, `pnpm growth:forms:verify-aeo-full-name-destination-contract` pasó contra producción: AEO v8 `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63`, `namePolicy.split_full_name`, destination `fdst-f0b3bd5a-27ec-474c-9a59-72e6c1b99918`, mapping `firstName -> firstname` / `lastName -> lastname` / `fullName=null`, secure-submit sample `email`, `lastname`, `firstname` y sin `fullName`.
+
 ## Sesion 2026-07-02 — Release develop→main + ISSUE-111 (pdf-parse Node 24 flake) — Claude — ✅ released
 
 > **Pedido:** pasar a producción el código de TASK-1318 (Growth Forms full-name split); durante el `/release` el preflight `ci_green` bloqueó por un flake de CI ajeno; el operador pidió fix robusto (nada de parches/bypass), y al cierre: cuándo/dónde se rompió + prevención + issue resuelto.
@@ -10,9 +24,9 @@
 >
 > **Release completado:** PR #136 (`347f35c0d`) desplegó el código a Vercel prod pero el orquestador murió en preflight (drift: prod deployado sin manifest). Tras el fix, PR #137 → `main` HEAD **`398b7f1b`** (target_sha). Orquestador `28608774955` **success** con `bypass_preflight_reason` (batch-policy por migración TASK-1247 ya aplicada + ops-worker path-filter): preflight ci_green ✅, manifest **`released`** ✅, gate Production aprobado (×2, Azure gated skip no-diff), Vercel READY ✅, 4 workers Cloud Run deployados (ops-worker incluido, EXPECTED_SHA gate) ✅, health check ✅, watchdog "no findings > ok". **Drift de control-plane cerrado.**
 >
-> **TASK-1318:** su último criterio pendiente ("Production runtime executes the new server-side split code") queda **satisfecho** — `398b7f1b` (con `applyNameNormalizationPolicy`) está `released` en prod. Falta mover el archivo a `complete/` (lifecycle).
+> **TASK-1318:** su último criterio pendiente ("Production runtime executes the new server-side split code") queda **satisfecho** — `398b7f1b` (con `applyNameNormalizationPolicy`) está `released` en prod. Lifecycle cerrado después en la entrada "TASK-1318 post-release closure + drift guard".
 >
-> **Nota tooling:** ADC de gcloud local vencida (`invalid_rapt`) — bloquea lecturas locales de PG/Cloud Run (no el release, que corrió con creds de CI); refrescar con `gcloud auth login` + `application-default login` para futuras verificaciones locales.
+> **Nota tooling:** durante el release, ADC local estaba vencida (`invalid_rapt`) y bloqueaba lecturas locales de PG/Cloud Run; en el cierre post-release de TASK-1318 se confirmó `gcloud` + ADC activos y el verificador server-side AEO→HubSpot pasó contra producción.
 
 ## Sesion 2026-07-02 — Public Site primitives registry — Codex — ✅ docs
 
@@ -48,13 +62,13 @@
 >
 > **Nota operativa:** el operador no entregó `/goal` explícito y pidió ejecución inmediata; se documenta la excepción al goal preflight aquí y en la task. Se debe ejecutar `pnpm codex:task-hook TASK-1318` antes de tocar código.
 >
-> **Estado actual:** `code complete, rollout pendiente`. Task tomada en `docs/tasks/in-progress/TASK-1318-growth-forms-full-name-destination-split.md`; wireframe `docs/ui/wireframes/TASK-1318-growth-forms-full-name-destination-split.md`; registry/README sincronizados. Decisión UX: mantener un solo campo visible `Nombre completo` en AEO para baja fricción, preservar `fullName` y derivar `firstName`/`lastName` server-side con política declarativa. HubSpot usa propiedades nativas de contacto `firstname` y `lastname`; el mapping sigue server-only.
+> **Estado actual:** `complete` desde el cierre post-release; task en `docs/tasks/complete/TASK-1318-growth-forms-full-name-destination-split.md`. Decisión UX: mantener un solo campo visible `Nombre completo` en AEO para baja fricción, preservar `fullName` y derivar `firstName`/`lastName` server-side con política declarativa. HubSpot usa propiedades nativas de contacto `firstname` y `lastname`; el mapping sigue server-only.
 >
 > **Implementación local:** `src/lib/growth/forms/name-normalization.ts` agrega `namePolicy.mode=split_full_name`; `submitForm` aplica la política antes de persistir/despachar; tests cubren 1 token, 2 tokens, 3+ tokens, whitespace y preservación de `firstName/lastName` explícitos. El adapter HubSpot queda probado con mapping `firstName -> firstname`, `lastName -> lastname` y sin enviar `fullName`.
 >
 > **Runtime aplicado:** AEO v8 publicado `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63` con campo visible `fullName` label `Nombre completo`, `autocomplete=name`, `validation_schema_json.namePolicy.split_full_name`, y mapping server-side `firstName -> firstname`, `lastName -> lastname`. HubSpot dry-run para `scripts/hubspot/examples/upsert-aeo-lastname-field.json` reportó `form_field_exists contacts.lastname`, sin apply necesario. `pnpm public-website:verify-aeo-live-contract` pasó después del publish.
 >
-> **Bloqueo operativo:** el código que deriva `firstName/lastName` aún está local y no fue promovido a producción. Hasta que este cambio pase por el release control plane, submissions live de v8 pueden no enviar `firstname/lastname` derivados. No ejecutar `git push`, Vercel production deploy, rollback ni promoción sin aprobación explícita del operador y `greenhouse-production-release`.
+> **Bloqueo operativo:** resuelto por release `398b7f1b` vía PR #137 / orchestrator `28608774955`; submissions live de v8 ya corren con el runtime que deriva `firstName/lastName`.
 >
 > **Preflight de rollout:** tras el push a `develop`, se probó `pnpm release:preflight --target-sha=7b598d10a5e81735efe1ddf4d69177af3cee4c05 --target-branch=main --json --output-file=.release-preflight-task-1318.json`. Resultado: `readyToDeploy=false`; `release_batch_policy=requires_break_glass` porque `origin/main` está detrás de `develop` y el release candidato abarca un batch amplio de 328 archivos con dominios `db_migrations` y `cloud_release`. No se promovió `main` ni se disparó orquestador. El artefacto local `.release-preflight-task-1318.json` fue eliminado después de inspección.
 >

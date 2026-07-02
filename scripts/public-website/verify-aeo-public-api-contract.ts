@@ -18,6 +18,7 @@ type RenderContract = {
     type?: string
     required?: boolean
     placeholder?: string
+    autocomplete?: string
     options?: Array<{ value?: string; label?: string }>
   }>
   copy?: {
@@ -112,6 +113,22 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
 
   const country = getField(contract, 'country')
   const companySize = getField(contract, 'companySize')
+  const fullName = getField(contract, 'fullName')
+  const legacyFirstName = getField(contract, 'firstName')
+
+  if (!fullName) {
+    throw new Error(`${label} is missing fullName field; expected AEO v8 Nombre completo contract`)
+  }
+
+  if (fullName.label !== 'Nombre completo' || fullName.required !== true || fullName.autocomplete !== 'name') {
+    throw new Error(
+      `${label} fullName field is ${JSON.stringify(fullName)}; expected label Nombre completo, required=true, autocomplete=name`
+    )
+  }
+
+  if (legacyFirstName) {
+    throw new Error(`${label} still exposes legacy firstName field; expected only fullName in the public render contract`)
+  }
 
   if (country?.placeholder !== 'Selecciona tu país' && country?.options?.[0]?.label !== 'Selecciona tu país') {
     throw new Error(
@@ -220,6 +237,7 @@ const main = async () => {
     surfaceId,
     formVersionId: byFormKey.json.form?.formVersionId,
     version: byFormKey.json.form?.version,
+    fullNameField: getField(byFormKey.json, 'fullName'),
     submitWithoutCaptcha: {
       status: submit.status,
       outcome: submit.json.outcome,
