@@ -85,6 +85,9 @@ const main = async (): Promise<void> => {
       'Formulario publico de diagnostico AEO para capturar leads y derivarlos al motor Growth Forms.',
     riskProfile: (definition?.risk_profile as 'low' | 'medium' | 'high' | undefined) ?? 'low',
     locale: current.locale,
+    // Preservar styleVariant (columna de la versión, NO viaja en field_schema) — sin esto el
+    // renderer pierde el premium y los selects se vuelven nativos (regresión TASK-1321).
+    styleVariant: current.style_variant,
     fieldSchema: fields,
     successBehavior: current.success_behavior_json,
     consentPolicyVersion: current.consent_policy_version ?? 'efeonce-aeo-diagnostic-consent-v1',

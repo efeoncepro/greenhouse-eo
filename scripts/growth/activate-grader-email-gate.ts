@@ -101,6 +101,9 @@ const main = async (): Promise<void> => {
     formKind: 'diagnostic_intake',
     purpose: 'Lead magnet público: captura marca + email (con consent) y dispara un diagnóstico de visibilidad en IA.',
     locale: current.locale,
+    // Preservar styleVariant (columna de la versión, NO viaja en field_schema) — sin esto el
+    // renderer pierde el premium y los selects se vuelven nativos (regresión TASK-1321).
+    styleVariant: current.style_variant,
     fieldSchema: current.field_schema_json,
     successBehavior: current.success_behavior_json,
     consentPolicyVersion: current.consent_policy_version ?? 'ai-visibility-grader-consent-v1',

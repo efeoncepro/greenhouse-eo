@@ -152,6 +152,9 @@ const main = async (): Promise<void> => {
     purpose: definition.purpose,
     riskProfile: (definition.risk_profile as 'low' | 'medium' | 'high' | undefined) ?? 'low',
     locale: current.locale,
+    // Preservar styleVariant (columna de la versión, NO viaja en field_schema) — sin esto el
+    // renderer pierde el premium y los selects se vuelven nativos (regresión TASK-1321).
+    styleVariant: current.style_variant,
     fieldSchema: nextFields,
     validationSchema: current.validation_schema_json,
     copyRefs: current.copy_refs_json,
