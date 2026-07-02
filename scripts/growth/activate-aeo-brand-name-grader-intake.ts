@@ -1,15 +1,17 @@
 import 'server-only'
 
 /**
- * TASK-1321 — Activación gobernada del campo `brandName` + `country` requerido en el form
- * público `/aeo-2/` (`efeonce-aeo-diagnostic`), prerequisito de datos para que el submit
- * pueda correr el AEO Grader (el único input que el grader NO puede derivar).
+ * TASK-1321 — Activación gobernada del campo `brandName` en el form público `/aeo-2/`
+ * (`efeonce-aeo-diagnostic`), prerequisito de datos para que el submit pueda correr el AEO
+ * Grader (el único input que el grader NO puede derivar).
  *
  * Publica una versión NUEVA de la definición AEO:
- *   - AGREGA `brandName` (text, requerido) antes de `brandWebsite` — nombre de la marca.
- *   - Hace `country` **requerido** (hoy opcional) para derivar `market`/`locale` confiable.
+ *   - AGREGA `brandName` (text, requerido, full-width) antes de `brandWebsite` — nombre de la marca.
  *   - Relabela `brandWebsite` → "Sitio web de tu marca" (no-redundante ahora que hay brandName).
- *   - Agrega copy es-CL de error required para ambos campos (validado con greenhouse-ux-writing).
+ *   - Agrega copy es-CL de error required para `brandName` (validado con greenhouse-ux-writing).
+ *   - `country` se deja OPCIONAL (ver nota en `withBrandFields`): el adapter deriva market/locale
+ *     del país cuando viene y cae a CL/es-CL cuando no; requerirlo introducía una trampa de data
+ *     en el custom-select (default visible "Chile"). Verificado visualmente 2026-07-02.
  *
  * Preserva el resto de fields, validation (namePolicy split_full_name), copy, Turnstile,
  * success (success_card TASK-1320), consent, destinations (el `brandName` NO se agrega al
@@ -38,12 +40,16 @@ const APPLY = process.argv.includes('--apply')
 const AEO_FORM_KEY = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 
 // El único input que el grader no puede derivar (brand-intelligence lo exige como input).
+// `maxLength: 200` (>160) hace que el renderer lo trate como FULL-WIDTH (heurística
+// `fieldPrefersFullWidth`), igual que `brandWebsite` (text, 240). Así los dos campos de marca
+// quedan apilados full-width sin dejar una media-fila vacía (que se vería rota). Verificado
+// visualmente contra el contract live 2026-07-02.
 const BRAND_NAME_FIELD = {
   key: 'brandName',
   type: 'text',
   label: 'Nombre de tu marca',
   required: true,
-  maxLength: 120,
+  maxLength: 200,
   placeholder: 'ej. Grupo Berel',
 } as const
 
@@ -52,20 +58,26 @@ const BRAND_WEBSITE_LABEL = 'Sitio web de tu marca'
 // Copy es-CL (tuteo, imperativo, dice cómo resolver) — espeja el estilo de fullName.error.required.
 const NEW_COPY: Record<string, string> = {
   'brandName.error.required': 'Escribe el nombre de tu marca para personalizar tu diagnóstico.',
-  'country.error.required': 'Selecciona tu país para ajustar el diagnóstico a tu mercado.',
 }
 
 const asObject = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 
-/** Añade brandName (antes de brandWebsite), country required y relabel de brandWebsite. Idempotente. */
+/**
+ * Añade brandName (antes de brandWebsite) + relabel de brandWebsite. Idempotente.
+ *
+ * `country` se deja OPCIONAL a propósito (verificación visual 2026-07-02): hacerlo requerido
+ * hace que el custom-select por defecto muestre "Chile" (primera opción) en vez del placeholder
+ * "Selecciona tu país" → trampa de data (un submit de otro país queda como Chile). El adapter
+ * ya deriva market/locale del país cuando viene, y cae a CL/es-CL cuando no — sin necesidad de
+ * forzarlo y sin tocar el comportamiento actual del campo país.
+ */
 const withBrandFields = (fieldSchema: unknown): unknown[] => {
   const fields = Array.isArray(fieldSchema) ? [...fieldSchema] : []
 
   const remapped = fields.map(field => {
     const candidate = asObject(field)
 
-    if (candidate.key === 'country') return { ...candidate, required: true }
     if (candidate.key === 'brandWebsite') return { ...candidate, label: BRAND_WEBSITE_LABEL }
 
     return field
@@ -92,13 +104,13 @@ const alreadyApplied = (fieldSchema: unknown): boolean => {
   if (!Array.isArray(fieldSchema)) return false
 
   const brandName = fieldSchema.find(field => asObject(field).key === 'brandName')
-  const country = fieldSchema.find(field => asObject(field).key === 'country')
+  const brandWebsite = fieldSchema.find(field => asObject(field).key === 'brandWebsite')
 
-  return Boolean(brandName) && asObject(country).required === true
+  return Boolean(brandName) && asObject(brandWebsite).label === BRAND_WEBSITE_LABEL
 }
 
 const main = async (): Promise<void> => {
-  console.log(`Activación brandName + country requerido AEO — mode: ${APPLY ? 'APPLY' : 'DRY-RUN'}`)
+  console.log(`Activación brandName AEO — mode: ${APPLY ? 'APPLY' : 'DRY-RUN'}`)
 
   const definition = await getFormDefinitionByKey(AEO_FORM_KEY)
 
@@ -126,7 +138,7 @@ const main = async (): Promise<void> => {
   console.log(`  versión publicada vigente: ${current.form_version_id} (v${current.version})`)
 
   if (alreadyApplied(current.field_schema_json)) {
-    console.log('\nIdempotente: la versión publicada vigente ya expone brandName + country requerido. Nada que hacer.')
+    console.log('\nIdempotente: la versión publicada vigente ya expone brandName + brandWebsite relabelado. Nada que hacer.')
 
     return
   }
@@ -138,7 +150,7 @@ const main = async (): Promise<void> => {
   console.log('\nPlan:')
   console.log(`  - Clonar v${current.version}`)
   console.log(`  - Agregar campo brandName (requerido) antes de brandWebsite`)
-  console.log(`  - country → requerido; brandWebsite label → "${BRAND_WEBSITE_LABEL}"`)
+  console.log(`  - brandWebsite label → "${BRAND_WEBSITE_LABEL}" (country se deja opcional)`)
   console.log(`  - Agregar copy: ${Object.keys(NEW_COPY).join(', ')}`)
   console.log('  - Preservar validation (namePolicy), Turnstile, success (success_card), consent y policies')
   console.log(`  - Copiar ${destinations.length} destino(s) (brandName NO se agrega al mapping HubSpot)`)
@@ -202,7 +214,7 @@ const main = async (): Promise<void> => {
   await deprecateForm(current.form_version_id)
   console.log(`Deprecada: ${current.form_version_id}`)
 
-  console.log('\nAPPLY completo. /aeo-2/ ahora captura brandName + country requerido → grader intake listo.')
+  console.log('\nAPPLY completo. /aeo-2/ ahora captura brandName → grader intake listo (country opcional, market cae a CL).')
 }
 
 main()

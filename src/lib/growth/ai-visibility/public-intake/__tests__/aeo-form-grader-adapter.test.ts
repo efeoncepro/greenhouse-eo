@@ -9,7 +9,7 @@ import {
 const baseFields = (): Record<string, unknown> => ({
   brandName: 'Grupo Berel',
   brandWebsite: 'https://grupoberel.com',
-  country: 'MX',
+  country: 'México',
   email: 'marketing@grupoberel.com',
   fullName: 'Ana Silva',
   firstName: 'Ana',
@@ -24,15 +24,23 @@ describe('TASK-1321 — aeo-form-grader-adapter', () => {
   })
 
   describe('resolveAeoMarketLocale', () => {
-    it('derives market/locale for the four form countries', () => {
+    it('derives market/locale from the REAL form values (full Spanish names with accents)', () => {
+      // El <select> live submite el nombre completo, NO el ISO (verificado contra el contract live).
+      expect(resolveAeoMarketLocale('Chile')).toEqual({ market: 'CL', locale: 'es-CL' })
+      expect(resolveAeoMarketLocale('Colombia')).toEqual({ market: 'CO', locale: 'es-CO' })
+      expect(resolveAeoMarketLocale('México')).toEqual({ market: 'MX', locale: 'es-MX' })
+      expect(resolveAeoMarketLocale('Perú')).toEqual({ market: 'PE', locale: 'es-PE' })
+    })
+
+    it('accepts unaccented variants and ISO-2 codes (robustness)', () => {
+      expect(resolveAeoMarketLocale('Mexico')).toEqual({ market: 'MX', locale: 'es-MX' })
+      expect(resolveAeoMarketLocale('Peru')).toEqual({ market: 'PE', locale: 'es-PE' })
       expect(resolveAeoMarketLocale('CL')).toEqual({ market: 'CL', locale: 'es-CL' })
-      expect(resolveAeoMarketLocale('CO')).toEqual({ market: 'CO', locale: 'es-CO' })
       expect(resolveAeoMarketLocale('MX')).toEqual({ market: 'MX', locale: 'es-MX' })
-      expect(resolveAeoMarketLocale('PE')).toEqual({ market: 'PE', locale: 'es-PE' })
     })
 
     it('is case/whitespace tolerant', () => {
-      expect(resolveAeoMarketLocale('  mx ')).toEqual({ market: 'MX', locale: 'es-MX' })
+      expect(resolveAeoMarketLocale('  méxico ')).toEqual({ market: 'MX', locale: 'es-MX' })
     })
 
     it('falls back to CL/es-CL for unknown or empty country (never empty)', () => {

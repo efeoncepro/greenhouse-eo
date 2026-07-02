@@ -36,18 +36,28 @@ export const AEO_DIAGNOSTIC_FORM_ID = 'fdef-efeonce-aeo-diagnostic'
 export const AEO_DIAGNOSTIC_FORM_KEY = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 
 /**
- * country (ISO-2) → market + locale del grader. Cubre las opciones vigentes del select de
- * `/aeo-2/` (CL/CO/MX/PE) + US. Conservador; ampliar cuando el form ofrezca otro país.
- * Fuente única de la derivación en el path público (el `MARKET_BY_COUNTRY` de
- * `provision-profile.ts` es portal-only y solo cubre CL/MX/US).
+ * country → market + locale del grader. El `<select>` del form live (`/aeo-2/`) submite el
+ * **nombre completo en español** como value (`"Chile"`/`"Colombia"`/`"México"`/`"Perú"`),
+ * NO el ISO-2 (verificado contra el RenderContract live 2026-07-02). Mapeamos por nombre
+ * normalizado (minúsculas + sin acentos) y también aceptamos ISO-2 por robustez, para no
+ * quedar atados al value exacto del select. Fuente única de la derivación en el path público
+ * (el `MARKET_BY_COUNTRY` de `provision-profile.ts` es portal-only y solo cubre CL/MX/US).
  */
 const AEO_MARKET_BY_COUNTRY: Record<string, { market: string; locale: string }> = {
-  CL: { market: 'CL', locale: 'es-CL' },
-  CO: { market: 'CO', locale: 'es-CO' },
-  MX: { market: 'MX', locale: 'es-MX' },
-  PE: { market: 'PE', locale: 'es-PE' },
-  US: { market: 'US', locale: 'en-US' },
+  cl: { market: 'CL', locale: 'es-CL' },
+  chile: { market: 'CL', locale: 'es-CL' },
+  co: { market: 'CO', locale: 'es-CO' },
+  colombia: { market: 'CO', locale: 'es-CO' },
+  mx: { market: 'MX', locale: 'es-MX' },
+  mexico: { market: 'MX', locale: 'es-MX' },
+  pe: { market: 'PE', locale: 'es-PE' },
+  peru: { market: 'PE', locale: 'es-PE' },
+  us: { market: 'US', locale: 'en-US' },
 }
+
+/** minúsculas + sin acentos, para matchear "México"/"Perú" y sus variantes sin tilde. */
+const normalizeCountryKey = (country: string): string =>
+  country.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
 /**
  * Deriva `market`/`locale` desde el `country` del form. Fallback conservador a CL/es-CL
@@ -57,9 +67,9 @@ const AEO_MARKET_BY_COUNTRY: Record<string, { market: string; locale: string }> 
 export const resolveAeoMarketLocale = (
   country: string | null | undefined,
 ): { market: string; locale: string } => {
-  const code = (country ?? '').trim().toUpperCase()
+  const key = normalizeCountryKey(country ?? '')
 
-  return AEO_MARKET_BY_COUNTRY[code] ?? { market: 'CL', locale: 'es-CL' }
+  return AEO_MARKET_BY_COUNTRY[key] ?? { market: 'CL', locale: 'es-CL' }
 }
 
 /**
