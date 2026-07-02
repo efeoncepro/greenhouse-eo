@@ -1,5 +1,21 @@
 # TASK-1321 — AEO `/aeo-2/` submit auto-runs Grader + emails report (self-serve intake)
 
+## Delta 2026-07-02 (2) — implementación (code complete · rollout pendiente)
+
+Implementado local-first en `develop` (sin push). Decisiones tomadas en Discovery (verificadas contra código):
+
+- **Sibling projection, no extensión.** El path de `/aeo-2/` diverge del grader-form (namespace de campos distinto, categoría vía LLM, cost-cap propio) → se creó `growth_aeo_diagnostic_grader_run_from_submission` (`src/lib/sync/projections/growth-aeo-diagnostic-grader-run-from-submission.ts`), scoped a `fdef-efeonce-aeo-diagnostic`, aislado del grader-form (cero regresión). El run engine sigue siendo el SSOT.
+- **Categoría vía brand-intelligence por submit.** El form no colecta industria/categoría → helper profile-less `resolvePublicBrandCategory` (`brand-intelligence/resolve-public-brand-category.ts`): fetch sitio + `runBrandIntelligence` + `resolveCanonicalCategory`. unknown/baja confianza → **skip** (sin run, degrada al lead comercial). Pasa `categoryNodeId`+label+confidence al enqueue → el gate del run acepta.
+- **Cost-cap en la projection.** El submit de `/aeo-2/` NO pasa por el abuse guard del grader → se aplica `checkIntakeAbuse` (budget global + per-email/IP) ANTES del LLM + `recordIntakeEvent` (contabilidad unificada en `grader_intake_events`).
+- **country→market/locale (CL/CO/MX/PE)** en el adapter puro (`aeo-form-grader-adapter.ts`); el `MARKET_BY_COUNTRY` existente es portal-only (CL/MX/US).
+- **Flag `GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED` = kill-switch default-ON** (directiva del operador: "flag ON, no dark"; desvía del patrón default-OFF, documentado en el ledger).
+- **Slice 3 (dedup) y Slice 4 (email event-driven) = nativos, sin código.** HubSpot dedupea por email/dominio (search-then-PATCH) → coexisten Forms (crea lead) + grader (enriquece). El email ya es event-driven (`finalizeRunDelivery`→`requestAiVisibilityReportEmail`→projection→dispatch, `ready`/`partial`).
+- **Form contract (Slice 1-form):** activation script `scripts/growth/activate-aeo-brand-name-grader-intake.ts` (clone→publish→deprecate) agrega `brandName` (req) + `country` req + relabel `brandWebsite`→"Sitio web de tu marca" + copy es-CL. DRY-RUN verificado live (v8 `fver-38d38bbc-…`). `brandName` queda Greenhouse-side (no al mapping HubSpot).
+- **Slice 5 (copy):** Success Card AEO → event-driven ("apenas esté listo"), acoplado a que grader-on-submit + success_card se activen juntos en el mismo release.
+
+**Palanca de activación REAL ≠ el flag:** con el flag ON pero el form sin `brandName`, cada submit cae en `missing_brand_name → skip`. El grader `/aeo-2/` no corre de verdad hasta: (1) `--apply` del activation script (mutación live outward-facing, **pendiente autorización operador**) → (2) deploy del código a ops-worker vía release control plane → (3) smoke E2E. Flags aguas abajo ya ON en prod (06-30). **⚠️ Esto invalida el mitigante del ledger "`/aeo-2/` no corre el grader" (Delta 2026-07-01).**
+
+
 ## Delta 2026-07-02 — verificación de campos (pre-implementación)
 
 Verificado contra código: el grader exige `brandName` + `market` + `locale` + `category` + `email` + `consent` no-vacíos (`public-intake/contracts.ts:81-87` `isValidPublicGraderInput`; `createPublicGraderRun` NO deriva — los pasa tal cual). Cruzado con lo que `/aeo-2/` (`fdef-efeonce-aeo-diagnostic`) captura hoy:

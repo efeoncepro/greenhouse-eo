@@ -1,14 +1,31 @@
-## Sesion 2026-07-02 — TASK-1321 AEO `/aeo-2/` → Grader auto-run — Claude — 🚧 in-progress (Slice 1a done)
+## Sesion 2026-07-02 — Nexa lane margins regression — Codex — ✅ code complete local
+
+> **Pedido:** el chat/lane de Nexa apareció pegado al viewport sin márgenes visuales.
+>
+> **Diagnóstico:** el modo afectado es `lane` (C), montado por `NexaLaneContentHost` sobre `AdaptiveSidecarLayout` con `sidecarExtent='viewport'`. Ese modo seguía reservando espacio para el dashboard, pero posicionaba el panel fixed en top/right/bottom `0`, por eso el header navy de Nexa quedaba pegado al borde del navegador.
+>
+> **Cambio aplicado:** `AdaptiveSidecarLayout` ganó prop aditiva `viewportGutter` (default `0`, sin cambiar consumidores existentes). En modo viewport, el gutter se aplica a top/bottom/lado exterior del panel y al splitter, y se suma a la reserva del grid para no solapar contenido. `NexaLaneContentHost` usa `viewportGutter={16}`. Docs actualizadas: `GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md` y `nexa-intelligence/experience/conversational-experience.md`.
+>
+> **Evidencia local:** `eslint` focal verde, `vitest` focal verde (`AdaptiveSidecarLayout` + interaction mode), `pnpm nexa:doc-gate --changed` verde, Playwright desktop `/home` con preferencia `lane` midió panel top/right/bottom `16px` y `pageOverflowX=0`; mobile `414px` cae a Drawer temporary y mantiene `pageOverflowX=0`. GVC canónico `pnpm fe:capture nexa-lane-sidecar --env=local` verde en desktop/mobile (`.captures/2026-07-02T21-26-24_nexa-lane-sidecar`, 22 frames). `pnpm typecheck` quedó bloqueado por errores preexistentes ajenos en Growth AI visibility (`brand-intelligence` test + `growth-aeo-diagnostic-grader-run-from-submission.ts`).
+
+## Sesion 2026-07-02 — TASK-1321 AEO `/aeo-2/` → Grader auto-run — Claude — 🚧 code complete · rollout pendiente
 
 > **Pedido:** `/implement-task 1321` — conectar el submit de `/aeo-2/` (`fdef-efeonce-aeo-diagnostic`) con el pipeline del AEO Grader (email event-driven con PDF + dedup lead), local-first sin push.
 >
 > **Discovery (3 subagentes):** el seam submit→outbox→projection→enqueue YA existe end-to-end (`growth-grader-run-from-submission.ts`, scoped a `fdef-ai-visibility-grader`). Email event-driven, HubSpot dedup (search-then-PATCH por email/domain → enriquece, no duplica) y cost-cap global (budget 24h + per-email/IP) YA existen. **Recalibración:** (1) el submit de `/aeo-2/` NO pasa por el abuse guard del grader (entra por `submitForm` genérico) → el cost-cap debe aplicarse en la projection + registrar `grader_intake_events`; (2) `category` NO es un field-read — `/aeo-2/` no colecta industry/category → requiere un **brand-intelligence LLM read** (fetch sitio + LLM) en la projection antes del enqueue (duplica costo LLM/submit + modo de falla unknown→sin informe); (3) `MARKET_BY_COUNTRY` solo cubre CL/MX/US y es portal-only → mapa nuevo CL/CO/MX/PE; (4) consent policy de `/aeo-2/` (`efeonce-aeo-diagnostic-consent-v1`) ≠ la del grader → gate legal para el flip.
 >
-> **Slice 1a done (commit `03efb5199`):** adapter puro `public-intake/aeo-form-grader-adapter.ts` — remap determinista de campos `/aeo-2/`→intake grader + `resolveAeoMarketLocale` (CL/CO/MX/PE) + skip reasons (missing brandName/website/email → degradar a lead comercial). 13 tests, lint/tsc verdes. Sin I/O, sin LLM, sin flag — decision-independiente.
+> **Checkpoint resuelto por el operador:** categoría = **brand-intelligence por submit** (skip honesto si unknown); flag = **ON** (kill-switch, no dark); form confirmado = el live de `/aeo-2/` (formKey `b120566a-…` = `fdef-efeonce-aeo-diagnostic`, verificado curl a la página).
 >
-> **Open questions resueltas (defaults):** flag nuevo `GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED` (default-OFF); dedup = coexisten (Forms crea lead, grader enriquece); cost-cap = reuso budget global en projection.
+> **CODE COMPLETE (5 slices, develop, sin push):**
+> - **1a** `03efb5199` — adapter puro `aeo-form-grader-adapter.ts` (remap + market/locale CL/CO/MX/PE + skip reasons). 13 tests.
+> - **2** `704ef015f` — sibling projection `growth_aeo_diagnostic_grader_run_from_submission` (aislada del grader-form, cero regresión) + `resolvePublicBrandCategory` (brand-intelligence profile-less; unknown→skip) + cost-cap en la projection + `grader_intake_events` + flag kill-switch default-ON + ledger. 12 tests.
+> - **1-form** `352086369` — activation script `activate-aeo-brand-name-grader-intake.ts` (brandName req + country req + relabel brandWebsite→"Sitio web de tu marca" + copy es-CL). DRY-RUN verificado live (v8 `fver-38d38bbc-…`, 1 destino). `brandName` queda Greenhouse-side.
+> - **3/4** — nativos, sin código: HubSpot dedup por email/dominio (coexisten Forms+grader); email event-driven (`finalizeRunDelivery`→`requestAiVisibilityReportEmail`→dispatch, `ready`/`partial`).
+> - **5** `b89b3e02b` — Success Card AEO copy → event-driven ("apenas esté listo"), acoplado a que grader-on-submit + success_card se activen en el mismo release.
 >
-> **Checkpoint pendiente (antes de Slice 2 — cablear projection):** confirmar con el operador (a) el costo LLM ×2/submit + fetch de sitio por el brand-intelligence read para categoría (¿ok?), y (b) el gate legal/consent (la consent de `/aeo-2/` cubre correr grader + enviar informe?). El flip prod (Slice 5) además requiere verificar flags live + sign-off. Todo lo demás es code-complete-able detrás de flag OFF.
+> **Gates:** 25 focales + 1142 regresión (registry+growth) verdes; lint 0; `tsc` 0 en `src/` (ruido `.next/dev/types` ajeno; ver nota Codex); flags:audit 0 sin registrar. `pnpm test` full + `pnpm build` verificándose.
+>
+> **Estado = code complete · rollout pendiente.** Palanca real ≠ el flag: con flag ON pero form sin `brandName`, cada submit cae en `missing_brand_name→skip`. Secuencia: (1) `--apply` del activation script (mutación live **outward-facing, pendiente autorización operador**) → (2) deploy ops-worker vía release control plane → (3) smoke E2E. Flags aguas abajo ya ON en prod (06-30). **Invalida el mitigante del ledger "`/aeo-2/` no corre el grader".** El operador quiere UN release coordinado (Success Card 1319/1320 + grader-on-submit 1321).
 
 ## Sesion 2026-07-02 — TASK-1320 Growth Forms Success Card Renderer — Codex — 🚧 code complete · rollout pendiente
 
