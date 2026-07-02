@@ -16,8 +16,20 @@ Operate the Cloud Run service that bridges HubSpot CRM writes/webhooks ↔ `gree
 | **HubSpot write bridge + webhooks** (Cloud Run `hubspot-greenhouse-integration`, 23 routes) | `greenhouse-eo/services/hubspot_greenhouse_integration/` | **this skill** owns this system |
 | **Greenhouse runtime** (Next.js on Vercel) | `greenhouse-eo/src/**` | `src/lib/integrations/hubspot-greenhouse-service.ts` is the canonical client |
 | **Secret Manager** (3 secrets) | GCP project `efeonce-group` | Runtime SA `greenhouse-portal@` reads at boot |
+| **Kortex HubSpot CMS / Content Hub operations** | `greenhouse-eo/docs/architecture/kortex/hubspot-cms/` + Kortex control plane | Kortex OAuth runtime + HubSpot Developer Platform; this skill only cross-links |
 
-Confusing ownership is the #1 bug source. Always ask: "which of the 5 systems above owns this change?" before touching code or config.
+Confusing ownership is the #1 bug source. Always ask: "which system above owns this change?" before touching code or config.
+
+## Related but separate: Kortex HubSpot CMS / Content Hub
+
+Use `docs/architecture/kortex/hubspot-cms/` for Kortex-backed HubSpot Content Hub / CMS work: landing pages, CMS Pages API, templates, modules, CMS React, Developer Projects, and portal-specific access notes.
+
+Hard boundary:
+- Do **not** use or rotate `hubspot-access-token` for Kortex/ANAM CMS operations. That secret belongs to the Greenhouse HubSpot bridge/private app path.
+- Kortex portal-scoped OAuth is the runtime path for ANAM (`hubspot_portal_id=19893546`, active as of 2026-07-02).
+- HubSpot CLI asset work for ANAM needs a separate CLI account/auth profile, e.g. `hs account auth --account anam-19893546`; do not replace the existing Efeonce profile.
+- Landing-page creation via API must be draft-first (`state: DRAFT`). Publishing, scheduling, archiving, deleting, replacing templates, or overwriting modules/themes requires explicit operator approval.
+- Treat page/content payloads as reviewed artifacts: inspect inventory/templates first, create draft, preview/validate, then publish only as a separate approved step.
 
 ## Canonical operational paths
 
@@ -131,6 +143,10 @@ bq query 'SELECT count(*) FROM hubspot_crm.events WHERE DATE(receivedAt) = CURRE
 - `services/hubspot_greenhouse_integration/README.md` — full route table + env var reference + local dev
 - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` — service topology
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` — monorepo vs sibling ownership post-TASK-574
+- `docs/architecture/kortex/hubspot-cms/README.md` — Kortex + HubSpot CMS / Content Hub documentation index
+- `docs/architecture/kortex/hubspot-cms/developer-platform-research.md` — HubSpot CMS developer platform research
+- `docs/architecture/kortex/hubspot-cms/landing-page-runbook.md` — draft-first landing page runbook
+- `docs/architecture/kortex/hubspot-cms/anam-portal-access.md` — ANAM portal OAuth install/access notes
 - `src/lib/integrations/hubspot-greenhouse-service.ts` — client TS + types shared with the bridge contract
 - `references/workflows.md` (this skill dir) — exact command sequences for common ops
 - `references/company_property_spec.example.json` (this skill dir) — input format for `ensure_hubspot_company_properties.py`

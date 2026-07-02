@@ -1,3 +1,11 @@
+## Sesion 2026-07-02 - Kortex HubSpot CMS / ANAM Content Hub - Codex - docs
+
+> **Pedido:** investigar HubSpot Developer Platform para CMS/landing pages antes de tocar runtime, sumar el aprendizaje a la skill HubSpot existente y abrir carpeta Kortex en Greenhouse si no existia.
+>
+> **Resultado:** no se creo isla paralela: se extendio `docs/architecture/kortex/` con `hubspot-cms/` y subdocs para research, runbook draft-first y acceso ANAM. Se sincronizaron las skills Codex/Claude `hubspot-greenhouse-bridge` con la frontera Kortex CMS vs Greenhouse bridge: Kortex OAuth opera ANAM (`hubspot_portal_id=19893546`, portal `www.anam.cl`, install active); el token `hubspot-access-token` sigue siendo del bridge Greenhouse; assets CMS via CLI requieren un perfil adicional ANAM sin reemplazar Efeonce.
+>
+> **Guardrail:** cualquier landing page por API debe crearse primero como `DRAFT`; publish/schedule/archive/delete/reemplazo de templates/modulos requiere aprobacion explicita del operador.
+
 ## Sesion 2026-07-02 — Nexa lane margins regression — Codex — ✅ code complete local
 
 > **Pedido:** el chat/lane de Nexa apareció pegado al viewport sin márgenes visuales.
