@@ -17,7 +17,7 @@ Verificado contra código: el grader exige `brandName` + `market` + `locale` + `
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
