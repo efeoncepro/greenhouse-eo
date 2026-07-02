@@ -58,6 +58,9 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1312` — [planificada, backend-data] Topic Cluster como entidad de primera clase (`seo_topic_clusters`) + rollup SEO+AEO.
 - `TASK-1313` — [planificada, backend-data] Unified Page/Cluster Visibility 360 read (`readPageVisibility360`/`readClusterVisibility360`).
 - `TASK-1314` — [planificada, backend-data] Pillar-cluster health / topical authority (score + huecos; compone rank/audit/citation, no captura nueva).
+- `TASK-1315` — [planificada, backend-data] E-E-A-T signal extraction (entity + author + trust) — capa de autor + probes de trust, reusando entity probes (KG/Wikidata/Reddit) + json-ld.
+- `TASK-1316` — [planificada, backend-data] E-E-A-T rater (rúbrica 4 pilares, YMYL-aware) — assessment LLM reusando brand-intelligence + evals/accuracy, con confianza calibrada (anti falso-0).
+- `TASK-1317` — [planificada, backend-data] E-E-A-T scorecard reader + integración (`readEeatScorecard`; alimenta topical authority 1314 + el 360; medido vs evaluado).
 
 ## Existing Related Work
 
@@ -93,3 +96,7 @@ Se suma el bloque **"Search Visibility 360 granular"** (nivel página + topic cl
 ## Delta 2026-07-02 (cont.) — pillar page + topical authority
 
 El topic cluster gana estructura **pillar + supporting**: la pillar page es el hub del tema, donde SEO clásico y AEO convergen (debe rankear el head term *y* ser la fuente que la IA cita como autoridad). Dos piezas: (1) **delta a `TASK-1312`** — `role` (`pillar`|`supporting`) en el member + único pillar activo por cluster (índice único parcial); (2) **`TASK-1314`** — pillar-cluster health / topical authority: reader que compone cobertura (keyword gap) + estructura (internal linking del audit 1304) + rendimiento (rank 1303) + el twist AEO (¿la pillar es la citada? 1311) → topical authority score + huecos. Compone readers, cero captura nueva, boundary §1.1 intacto. Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15.1.
+
+## Delta 2026-07-02 (cont. 2) — E-E-A-T como capa de entidad/calidad conectiva
+
+E-E-A-T (Experience · Expertise · Authoritativeness · Trustworthiness) es el "por qué" debajo de rankear (SEO) Y de ser citado (AEO), y el multiplicador del topical authority. Hallazgo al aterrizar el diseño: **~70% de la materia prima ya existe en el probe layer del grader** (eje `entity` KG/Wikidata/Reddit-UGC de TASK-1267 + `json-ld` structural + `brand-intelligence` LLM del contenido del sitio). Gap = capa de autor + rúbrica/rater 4 pilares (YMYL-aware) + señales de trust explícitas. **Vive cerca del grader** (extiende su eje entity), el módulo SEO la **consume** (un primitive, dos consumers). Regla dura: E-E-A-T es un **assessment**, no un dial — medido (●) vs evaluado (◑), calibración anti falso-0 (lección EPIC-021), reusa evals/accuracy. 3 tasks: `TASK-1315/1316/1317`. Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §16.

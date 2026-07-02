@@ -284,6 +284,20 @@ Un topic cluster no es una lista plana de URLs: tiene estructura **pillar + supp
 - **Modelo (delta a `TASK-1312`):** los miembros del cluster llevan un `role` (`pillar` | `supporting`, default `supporting`), con un **único pillar activo por cluster** (índice único parcial `WHERE role='pillar' AND effective_to IS NULL`). No es entidad nueva — es un campo del member.
 - **Capacidad (`TASK-1314` — pillar-cluster health / topical authority):** reader analítico que **compone** los primitives existentes (no captura nueva): cobertura (¿hay pillar + suficientes supporting, o huecos vs keyword gap Labs?), estructura (¿las supporting enlazan al pillar? — internal linking del OnPage audit `TASK-1304`), rendimiento (¿la pillar rankea el head term y las supporting el long-tail? — `TASK-1303`), y el twist AEO: **¿es la pillar la fuente citada por la IA para el tema, o la IA cita a un competidor / a una supporting suelta?** (`TASK-1311`). Emite un **topical authority score** por cluster + los huecos accionables, con evolución temporal. Boundary §1.1 intacto (compone readers, no fusiona).
 
+## 16. E-E-A-T — capa de entidad/calidad conectiva (extensión, 2026-07-02)
+
+E-E-A-T (Experience · Expertise · Authoritativeness · Trustworthiness) es el "por qué" debajo de rankear (SEO) **y** de ser citado (AEO): una entidad fuerte hace ambas. Es la capa conectiva más profunda del 360 y el multiplicador del topical authority (§15.1). **YMYL** (finanzas/salud/legal) sube el listón.
+
+**Materia prima ya existe (~70%, en el probe layer del grader):** eje `entity` (TASK-1267) — `probes/entity/knowledge-graph.ts` (¿entidad reconocida por Google KG?), `wikidata.ts` (entrada estructurada + sitio oficial), `reddit-ugc.ts` (reputación/menciones, fuente top de citas ChatGPT); eje `structural` — `probes/structural/json-ld.ts` (schema.org en el HTML); `brand-intelligence/` — LLM que **lee y analiza el contenido real del sitio** (`fetch-site-content.ts` + providers + prompt + store); + backlinks/referring domains (TASK-1304).
+
+**Gap (la extensión):** (1) **capa de AUTOR** — E-E-A-T 2026 es cada vez más author-level (`Person`/`Author` schema, author pages, `sameAs`, credenciales); hoy se modela la entidad-marca, no la entidad-autor. (2) **rúbrica/rater E-E-A-T** que mapea las señales a los 4 pilares con una rúbrica derivada de las Quality Rater Guidelines de Google, YMYL-aware. (3) **señales de trust explícitas** (about/contact/policies/reviews/HTTPS).
+
+**Dónde vive:** la evaluación E-E-A-T vive **cerca del grader** (extiende su eje entity + suma autor + rúbrica); el **módulo SEO la CONSUME** como señal en topical authority (1314) + recomendaciones. Un primitive, dos consumers. Boundary §1.1 intacto: es una capa de entidad/calidad que ambos motores referencian por `org`, no una tabla que los fusione.
+
+**Honestidad obligatoria (regla dura):** E-E-A-T **NO es un dial de ranking que se lee** — es un *assessment*. Señales duras = **medibles** (●); pilares cualitativos = **juicio de rater LLM** (◑), que necesita **calibración + confianza honesta**. El rater NO puede repetir el falso-0 del grader (corregido en EPIC-021): marcar medido vs evaluado, reusar `evals/`+`accuracy/`, nunca falsa precisión; YMYL exige rúbrica más estricta.
+
+**Tasks:** `TASK-1315` (signal extraction entity+author+trust), `TASK-1316` (rater rúbrica 4 pilares YMYL-aware + calibración golden-set), `TASK-1317` (`readEeatScorecard` + integración a topical authority/360). Consumer UI = follow-up ui-ux.
+
 ## 14. Documentación relacionada
 
 - ADR: `GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md`
