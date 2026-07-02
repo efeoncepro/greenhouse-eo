@@ -1,5 +1,13 @@
 # TASK-1321 — AEO `/aeo-2/` submit auto-runs Grader + emails report (self-serve intake)
 
+## Delta 2026-07-02 (3) — verificación visual del form (recalibra el campo `country`)
+
+Verificado contra el **RenderContract live** + un preview Playwright con intercept del contract (sin mutar live), mirando el frame real (a pedido del operador: "que se vea bien, no lo dañes"). Dos hallazgos que el fixture stale ocultaba:
+
+- **`country` submite el nombre completo en español** (`"Chile"`/`"Colombia"`/`"México"`/`"Perú"`), **NO ISO** (`CL`/`CO`/…). El `resolveAeoMarketLocale` original (keyed por ISO) habría defaulteado TODOS a CL. Corregido: normaliza (minúsculas + sin acentos) + acepta ISO por robustez.
+- **`country` se deja OPCIONAL** (supersede el "country requerido" de las Delta (1)/(2) y del Scope): hacerlo requerido hace que el custom-select muestre `"Chile"` por defecto (primera opción) en vez del placeholder → **trampa de data** (un submit de otro país queda como Chile). El adapter ya deriva market/locale del país cuando viene y cae a CL/es-CL cuando no — sin forzarlo ni tocar el comportamiento actual del campo país.
+- **`brandName` = full-width** (`maxLength 200` → heurística `fieldPrefersFullWidth`), apilado con `brandWebsite` (relabelado "Sitio web de tu marca"); sin media-fila vacía. Screenshot desktop+mobile confirmado: campo nativo al diseño premium, `overflowX=0`.
+
 ## Delta 2026-07-02 (2) — implementación (code complete · rollout pendiente)
 
 Implementado local-first en `develop` (sin push). Decisiones tomadas en Discovery (verificadas contra código):
@@ -14,7 +22,6 @@ Implementado local-first en `develop` (sin push). Decisiones tomadas en Discover
 - **Slice 5 (copy):** Success Card AEO → event-driven ("apenas esté listo"), acoplado a que grader-on-submit + success_card se activen juntos en el mismo release.
 
 **Palanca de activación REAL ≠ el flag:** con el flag ON pero el form sin `brandName`, cada submit cae en `missing_brand_name → skip`. El grader `/aeo-2/` no corre de verdad hasta: (1) `--apply` del activation script (mutación live outward-facing, **pendiente autorización operador**) → (2) deploy del código a ops-worker vía release control plane → (3) smoke E2E. Flags aguas abajo ya ON en prod (06-30). **⚠️ Esto invalida el mitigante del ledger "`/aeo-2/` no corre el grader" (Delta 2026-07-01).**
-
 
 ## Delta 2026-07-02 — verificación de campos (pre-implementación)
 
