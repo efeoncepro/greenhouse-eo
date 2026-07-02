@@ -24,7 +24,7 @@ const groundedFields = (nodeId: string, confidence: number) => ({
 
 describe('TASK-1321 — resolvePublicBrandCategory', () => {
   it('resolves a confident grounded node to the canonical category', async () => {
-    const runner = vi.fn(async () => biResult(groundedFields('industry:technology', 0.8)) as never)
+    const runner = vi.fn<(input: unknown, options?: unknown) => Promise<never>>(async () => biResult(groundedFields('industry:technology', 0.8)) as never)
 
     const result = await resolvePublicBrandCategory({
       brandName: 'Acme',
@@ -42,7 +42,7 @@ describe('TASK-1321 — resolvePublicBrandCategory', () => {
   })
 
   it('skips (null) when the grounded read produced no fields (disabled/no signals/error)', async () => {
-    const runner = vi.fn(async () => biResult(null) as never)
+    const runner = vi.fn<(input: unknown, options?: unknown) => Promise<never>>(async () => biResult(null) as never)
 
     const result = await resolvePublicBrandCategory({
       brandName: 'Acme',
@@ -54,7 +54,7 @@ describe('TASK-1321 — resolvePublicBrandCategory', () => {
   })
 
   it('skips (null) when grounded confidence is below the grounded threshold', async () => {
-    const runner = vi.fn(async () => biResult(groundedFields('industry:technology', 0.4)) as never)
+    const runner = vi.fn<(input: unknown, options?: unknown) => Promise<never>>(async () => biResult(groundedFields('industry:technology', 0.4)) as never)
 
     const result = await resolvePublicBrandCategory({
       brandName: 'Acme',
@@ -66,7 +66,7 @@ describe('TASK-1321 — resolvePublicBrandCategory', () => {
   })
 
   it('skips (null) when the grounded node is not a real taxonomy node (hallucinated)', async () => {
-    const runner = vi.fn(async () => biResult(groundedFields('not_a_real_node', 0.9)) as never)
+    const runner = vi.fn<(input: unknown, options?: unknown) => Promise<never>>(async () => biResult(groundedFields('not_a_real_node', 0.9)) as never)
 
     const result = await resolvePublicBrandCategory({
       brandName: 'Acme',
@@ -78,7 +78,7 @@ describe('TASK-1321 — resolvePublicBrandCategory', () => {
   })
 
   it('passes injected site content to the runner (no fetch)', async () => {
-    const runner = vi.fn(async () => biResult(groundedFields('industry:technology', 0.8)) as never)
+    const runner = vi.fn<(input: unknown, options?: unknown) => Promise<never>>(async () => biResult(groundedFields('industry:technology', 0.8)) as never)
 
     await resolvePublicBrandCategory({
       brandName: 'Acme',

@@ -97,6 +97,11 @@ export const growthAeoDiagnosticGraderRunProjection: ProjectionDefinition = {
     const intake = mapped.intake
     const emailHash = hashIdentifier(intake.email)
 
+    if (!emailHash) {
+      // intake.email es no-vacío (garantizado por el adapter); un emailHash null sería anómalo.
+      return `aeo_grader_run skip: submission ${submissionId} sin emailHash derivable → sin run`
+    }
+
     // 3. Cost-cap ANTES del brand-intelligence read (el LLM caro). El submit de /aeo-2/ no pasó
     //    por el abuse guard del grader; lo aplicamos acá + registramos el evento (cost accounting
     //    unificado en grader_intake_events).
