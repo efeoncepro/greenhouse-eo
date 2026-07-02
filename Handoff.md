@@ -12,6 +12,8 @@
 >
 > **Bloqueo operativo:** el código que deriva `firstName/lastName` aún está local y no fue promovido a producción. Hasta que este cambio pase por el release control plane, submissions live de v8 pueden no enviar `firstname/lastname` derivados. No ejecutar `git push`, Vercel production deploy, rollback ni promoción sin aprobación explícita del operador y `greenhouse-production-release`.
 >
+> **Preflight de rollout:** tras el push a `develop`, se probó `pnpm release:preflight --target-sha=7b598d10a5e81735efe1ddf4d69177af3cee4c05 --target-branch=main --json --output-file=.release-preflight-task-1318.json`. Resultado: `readyToDeploy=false`; `release_batch_policy=requires_break_glass` porque `origin/main` está detrás de `develop` y el release candidato abarca un batch amplio de 328 archivos con dominios `db_migrations` y `cloud_release`. No se promovió `main` ni se disparó orquestador. El artefacto local `.release-preflight-task-1318.json` fue eliminado después de inspección.
+>
 > **Evidencia local:** `pnpm vitest run src/lib/growth/forms` (17 files / 135 tests), `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm task:lint --task TASK-1318`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`. `docs:closure-check` conserva warnings advisory por cambios AEO/skills previos en el worktree; no hay flags sin registrar.
 
 ## Sesion 2026-07-02 — AEO market SparkToro logo correcto — Codex — ✅ live

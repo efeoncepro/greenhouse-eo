@@ -24,7 +24,7 @@
 - Status real: `code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth|public-site|hubspot`
-- Blocked by: `production code rollout approval / release control plane`
+- Blocked by: `production code rollout approval / release control plane; develop release preflight requires break-glass due broader batch`
 - Branch: `develop` (`codex:task-hook` declared `task/TASK-1318-growth-forms-full-name-destination-split`; operator requested immediate execution without branch switch)
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -431,6 +431,7 @@ Sin flag — additive and policy-gated by form version. Cutover happens by publi
 - ✅ `pnpm growth:forms:activate-aeo-reference-copy -- --apply` — published v8 and deprecated v7.
 - ✅ `pnpm public-website:verify-aeo-live-contract` — live label/API/visual contract passed after v8 publish.
 - ⚠️ Production deployment not performed: `greenhouse-production-release` requires explicit approval for external production mutation. Runtime submit split remains rollout-pending until this code is promoted.
+- ⚠️ Release preflight attempted after pushing `develop`: `pnpm release:preflight --target-sha=7b598d10a5e81735efe1ddf4d69177af3cee4c05 --target-branch=main --json --output-file=.release-preflight-task-1318.json` reported `readyToDeploy=false` with `release_batch_policy=requires_break_glass` because `origin/main` is behind `develop` and the candidate release spans a broader 328-file batch including `db_migrations` and `cloud_release`. The JSON artifact was removed after inspection.
 
 ## Closing Protocol
 
