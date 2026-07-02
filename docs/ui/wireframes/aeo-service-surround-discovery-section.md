@@ -75,7 +75,7 @@
 - Variants / kinds: static editorial service section, not a reusable primitive
 - Component candidates: one root container `servic`, widgets `servicee`, `serviceh`, `servicel`, `serviceg`, `servicen`, `serviceis` for scoped CSS
 - Copy source: inline Elementor static copy from operator-provided reference
-- Visual assets: `docs/assets/public-site/aeo-service-icons/measure.png`, `create.png`, `distribute.png`, `optimize.png`; WordPress attachments `250642`-`250645`
+- Visual assets: current v2 set in `docs/assets/public-site/aeo-service-icons/v2/measure.png`, `create.png`, `distribute.png`, `optimize.png`; WordPress attachments `250708`-`250711`. V1 rollback assets remain in `docs/assets/public-site/aeo-service-icons/` with attachments `250642`-`250645`.
 - Data reader / command: none
 - API parity: none; this is static marketing content
 - Access / capability: public
@@ -100,6 +100,7 @@
 
 - Decision: render as a compact service method section with 2x2 low cards and one navy method note, inserted after `levels9`. Density was tuned live to `gh-aeo-service-method-density-v3` after operator feedback: H2 aligned to post-hero scale, cards reduced, copy unchanged.
 - Decision: add four generated 3D contextual icons to the service cards as decorative visual anchors. The assets intentionally avoid text, third-party logos, AI-engine marks and interactive affordance; they are static PNGs scoped to the WordPress section.
+- Decision update 2026-07-02: replace the initial high-detail icon set with a simpler native Codex image generation set in Clay3D matte style. The v2 direction favors larger silhouettes and fewer details so the icons remain legible at the live 92px desktop / 66px mobile sizes.
 - Alternatives considered: duplicate the existing later `why` comparison section; replace the diagnostic section; use a dashboard mockup visual.
 - Why this pattern: it bridges maturity levels to execution without asking the visitor to interpret a fake product UI.
 - Reuse / extend / new primitive: one-off Elementor section; reuses existing AEO badge/heading/card/note language and page-scoped CSS.

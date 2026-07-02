@@ -70,6 +70,21 @@ describe('buildSecureSubmitBody', () => {
     expect(JSON.stringify(body)).not.toContain('secret')
     expect((body.legalConsentOptions as { consent: { consentToProcess: boolean } }).consent.consentToProcess).toBe(true)
   })
+
+  it('mapea nombres derivados a firstname/lastname sin enviar fullName si no está allowlisteado', () => {
+    const body = buildSecureSubmitBody(
+      submission({ email: 'ana@example.com', fullName: 'Ana Silva', firstName: 'Ana', lastName: 'Silva' }),
+      consent(),
+      { ...VALID_MAPPING, fieldMapping: { email: 'email', firstName: 'firstname', lastName: 'lastname' } },
+    )
+
+    expect(body.fields).toEqual([
+      { name: 'email', value: 'ana@example.com' },
+      { name: 'firstname', value: 'Ana' },
+      { name: 'lastname', value: 'Silva' },
+    ])
+    expect(JSON.stringify(body)).not.toContain('fullName')
+  })
 })
 
 describe('deliverToHubSpotForms', () => {

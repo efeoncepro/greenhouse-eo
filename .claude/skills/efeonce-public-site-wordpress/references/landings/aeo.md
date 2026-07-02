@@ -20,7 +20,7 @@ Canonical doc: `docs/documentation/public-site/aeo-landing-elementor.md`.
 - All non-form CTAs that send visitors to the form must link to `#diagnostico`; the Growth Forms submit remains a real `<button type="submit">Empezar con mi diagnóstico →</button>`.
 - Do not validate visual bugs only by DOM or CSS gap. For marquees/logos, measure screenshots: painted logo bounding boxes, visual gaps, set width versus viewport, loop phases, empty wrappers, effective asset canvases, masks/fades, animation duration, and whether `translate(-33.333%)` matches three identical sets.
 - The logo marquee gap issue was composition/asset driven, not simply color, SVG invisibility, or CSS `gap`. The live contract is 7 unique logos, 3 identical sets, set width wider than viewport, subtle fades, no cards, reduced-motion without animation/duplicates, and proof row as a secondary caption.
-- Proof row polish matters: it should feel like evidence, not a CTA. Current treatment is low-shadow pill, color logo discs for Berel/Sky/Bresler, `+120 marcas - 4 países`, and a flat inline globe in slate, not a teal circular icon or dashed mono box.
+- Proof row polish matters: it should feel like evidence, not a CTA. Current treatment is low-shadow pill, color logo discs for Berel/Sky/Bresler plus a smaller navy `+120` count disc tucked behind the last logo, with micro almost-white count text, and a compact navy country list `Chile · Colombia · México · Perú` with a flat inline globe. Do not restore visible `marcas`, `4 países`, a teal circular icon, or a dashed mono box.
 - Title tracking drift is a recurring Ohio/Elementor problem. Display tracking is allowed only on H1/H2 and their accent spans (`herotit`, `levelsh`, `serviceh`, `whyhead`); internal H3, proof labels, pills, body, inputs, CTAs, and FAQ copy must compute normal/0 tracking. Verify computed style desktop and mobile, not static CSS.
 - Post-hero spacing bugs came from stacked margins. Do not add a header `margin-bottom` plus first-content `margin-top`; current measured rhythm is 52px/28px normal, 48px/32px service, and 40px/32px why.
 - The service line was a real pseudo-element (`.gh-aeo-service-method::before`), not a screenshot artifact. Keep it disabled unless the visual direction explicitly changes.
@@ -59,6 +59,12 @@ Current approved market copy:
 - Card 3 body: `Probabilidad de que los motores de IA repitan la misma lista de marcas en dos respuestas. Sin un sistema, tu aparición es azar.`
 - Bottom statement: `SEO te hacía rankear. AEO decide si los motores de IA te mencionan, te citan y te recomiendan — antes de que exista un clic.`
 
+Market source mark contract:
+
+- HubSpot uses the SVG served from WordPress (`/wp-content/uploads/greenhouse-axis/hubspot-logotype.svg`).
+- SparkToro must use the provided real SVG served from WordPress (`/wp-content/uploads/greenhouse/aeo-market-logos/sparktoro-logo.svg`) with `role="img"`/`aria-label="SparkToro"` and an empty child `img alt`; do not revert it to local orange text.
+- McKinsey remains an inline accessible wordmark.
+
 Current approved pipeline copy:
 
 - H2: `Aparecer en las respuestas de IA no es vanidad. Es pipeline.`
@@ -94,7 +100,7 @@ Current approved service section:
 - Card 2: `02 · Crear` / `Creamos activos que los motores de IA citan` / `Construimos el contenido y la arquitectura que los motores entienden, citan y reproducen — para máquinas y para humanos. No "más contenido": el correcto.`
 - Card 3: `03 · Distribuir` / `Te ponemos en cada superficie` / `Distribuimos tu presencia donde los motores de IA descubren marcas, no solo en tu sitio. Apareces donde se toma la decisión.`
 - Card 4: `04 · Optimizar` / `Optimizamos en loop` / `Cada ciclo aprende del anterior: subimos un nivel, medimos, corregimos y volvemos a subir. La visibilidad ante los motores de IA no se "logra"; se sostiene.`
-- Card icons: decorative/contextual 3D PNGs inside `serv1cat`-`serv4cat` as `.gh-aeo-service-card-icon`, `alt="" aria-hidden="true"`. WordPress attachment IDs: `250642` measure, `250643` create, `250644` distribute, `250645` optimize. Source files live in `docs/assets/public-site/aeo-service-icons/`. Scope icon CSS to `.elementor-element-servic`, not `#servic`, because Elementor renders `data-id="servic"` plus class rather than a DOM id.
+- Card icons: decorative/contextual 3D PNGs inside `serv1cat`-`serv4cat` as `.gh-aeo-service-card-icon`, `alt="" aria-hidden="true"`. Current live v2 icons use native Codex image generation direction, simplified Clay3D matte silhouettes and restrained teal/cyan tech accents. WordPress attachment IDs: `250708` measure, `250709` create, `250710` distribute, `250711` optimize; v1 rollback attachments remain `250642`-`250645`. Source files live in `docs/assets/public-site/aeo-service-icons/v2/` (v1 in the parent folder). Scope icon CSS to `.elementor-element-servic`, not `#servic`, because Elementor renders `data-id="servic"` plus class rather than a DOM id.
 - Note: `Cómo trabajamos: funcionamos como tu equipo de AEO dedicado. Empezamos por el diagnóstico, priorizamos por impacto, ejecutamos en ciclos y te reportamos el avance en la escalera. Combinamos las mejores herramientas del mercado con sistemas propios, pero el método conduce. Medible por etapas, sin amarres.`
 - Result: `El resultado: dejas de aparecer por azar. Subes de visible a preferido — y esa preferencia llega a la conversación de compra antes que tu competencia.` (`visible` and `preferido` are emphasized with `<em>`).
 - Visual contract: static editorial service section, compact H2 aligned to post-hero scale, desktop 2x2 low cards, mobile 390 one column, no ornamental hover/motion and no center rail/pseudo-line behind the cards. The header-to-grid gap is measured by the grid margin only: 48px desktop and 32px mobile. The teal service title accent must inherit the H2 tracking in desktop and mobile.
@@ -111,7 +117,7 @@ Current approved why section:
   - `Foco. Tu equipo sigue en lo suyo; nosotros traemos la ejecución ya andando, sin desenfocarlo.`
 - Navy panel close: `Complemento, no reemplazo: te damos un sistema probado y velocidad.`
 - Why rhythm: because the header has no lead paragraph, the navy panel should sit closer than normal content: 40px desktop, 32px mobile. Do not restore stacked `header margin-bottom` + panel `margin-top`.
-- Proof: `Marcas que ya confían en nosotros`, separado del panel navy; widget `greenhouse_logo_marquee` (`whylogom`) con 7 logos únicos en 3 sets idénticos (`sky`, `anam`, `gobierno-santiago`, `berel`, `carozzi`, `bresler`, `marca-chile`) y proof row tipo `TeamAvatarGroup` con discos solapados en color de Berel, Sky y Bresler, `+120 marcas - 4 países` con ícono flat de mundo (Inter/sistema, no mono/dashed box genérico). La pill debe sentirse como proof caption secundario: sombra muy baja, borde sutil, globe inline slate sin círculo teal. Validar visualmente por fases; no usar assets que ocupan ancho pero quedan invisibles o abren huecos perceptibles.
+- Proof: `Marcas que ya confían en nosotros`, separado del panel navy; widget `greenhouse_logo_marquee` (`whylogom`) con 7 logos únicos en 3 sets idénticos (`sky`, `anam`, `gobierno-santiago`, `berel`, `carozzi`, `bresler`, `marca-chile`) y proof row tipo `TeamAvatarGroup` con discos solapados en color de Berel, Sky y Bresler, más un cuarto disco navy pequeño `+120` detrás del último logo con texto micro casi blanco. El copy visible posterior debe ser solo `Chile · Colombia · México · Perú` con ícono flat de mundo en navy compacto; no reintroducir la palabra visible `marcas` ni `4 países`. La pill debe sentirse como proof caption secundario: sombra muy baja, borde sutil, sin círculo teal ni mono/dashed box genérico. Validar visualmente por fases; no usar assets que ocupan ancho pero quedan invisibles o abren huecos perceptibles.
 - Typography guard: display tracking is allowed only on H1/H2 display titles and their accent spans (`herotit`, `levelsh`, `serviceh`, `whyhead`); internal H3/proof labels/body/pills stay `normal/0`.
 - Old `whygrid`, `whycred`, and `whyearl` are not visible in the current reference layout.
 - Elementor class note: update both `css_classes` and `_css_classes` for container classes; `css_classes` is what renders on the live root.
@@ -128,7 +134,7 @@ Current approved diagnostic section:
 - Card 3: `Prompts críticos` / `Los prompts —en español, por país— donde no apareces` / `Ves el hueco exacto, no una idea vaga.` / outcome `Prompts donde no apareces`.
 - Card 4: `Plan priorizado` / `Un plan de acción priorizado` / `Sales con los primeros movimientos claros, no con un PDF que archivas.` / outcome `Primeros movimientos claros`.
 - Note: `Lectura experta`; `No es un reporte automático. Nuestro equipo lo interpreta a la luz de tu categoría y tu mercado: qué significan los números para ti y qué hacer con ellos. El dato lo da la máquina; el criterio lo ponemos nosotros.` The words `para ti` are emphasized with `<em>`.
-- CTA: `Empieza con un diagnóstico gratis`.
+- CTA: `Empieza con tu diagnóstico gratis` (standardized to `tu`, 2026-07-02; `diagnos` ohio_button).
 - Diagnostic copy follows the red-line reference screenshot from 2026-07-02. Keep the current 2x2 card layout unless the operator explicitly asks for the reference's flat row layout.
 
 ## Hero Guardrail
@@ -139,8 +145,13 @@ Current approved hero copy:
 
 - Badge `herotag`: `AEO · Visibilidad en IA`
 - Subcopy `herosub`: `Hacemos que los motores de IA —<strong>ChatGPT, Google AI Overviews, Gemini, Perplexity, Copilot y Claude</strong>— entiendan, citen y recomienden tu marca cuando tu comprador pregunta.`
-- CTA `herobut`: `Empieza con un diagnóstico gratis`, linked to `#diagnostico`.
-- Reassurance `heronot`: `En 24–48h sabes en qué nivel estás — y por dónde empezamos a subirte · Sin costo · Sin compromiso`.
+- CTA `herobut`: `Empieza con tu diagnóstico gratis`, linked to `#diagnostico`. Icon stays `arrow_outward` — do NOT change to `arrow_downward`/forward (a down arrow on a CTA reads as download; `arrow_outward` is the site's consistent "go" affordance).
+- Reassurance `heronot` (restructured 2026-07-02 for WCAG AA + trust chips):
+  - lead `.gh-aeo-reassure-lead`: `En 24–48h sabes en qué nivel estás y por dónde empezamos a subirte.`
+  - chips `.gh-aeo-reassure-chips` > `.gh-aeo-reassure-chip`: `Sin costo` and `Sin compromiso` (teal-dot chips on their own line).
+  - CSS marker `gh-aeo-cta-zone-a11y-v1` (page custom_css) raises `.gh-aeo-reassure` text to AA (computed ≈15:1 desktop+mobile 390). Do NOT restore the low-alpha `.gh-aeo-reassure p { color: rgba(220,231,244,0.52) }`.
+- CTA copy standardized to `tu` on `herobut` + `diagnos`; `faqctad` still uses `Solicita tu diagnóstico gratis` (verb unification pending, out of scope 2026-07-02).
+- Rollback for the 2026-07-02 CTA-zone change: backup meta `_gh_backup_before_aeo_cta_zone_20260702T105510Z` (raw `_elementor_data` + page settings). `heroans` hash unchanged (`e0b951b2456a83578cd9e22005900521`).
 
 Protect the right hero widget:
 
@@ -206,6 +217,16 @@ Email contract:
 - The renderer must use debounced `/verify-email`, `aria-invalid`, `aria-describedby`, field-level errors, and success only after remote verification.
 
 ## Conversion Visual Contract
+
+Approved conversion copy (2026-07-02 — de-duplicated vs hero/H2; subhead now carries a distinct job):
+
+- Kicker `convers` `ohio_badge`: `Diagnóstico gratis`.
+- H2 `convers` `ohio_heading` `.gh-aeo-section-title`: `Descubre en qué nivel estás hoy — y por dónde empezar.` (was `— y empieza a subir`; changed to stop echoing the hero/subhead).
+- Lead `convers` `text-editor` `.gh-aeo-section-lead` (two `<p>`):
+  - `Tu diagnóstico personalizado en 24–48h, con lectura de nuestro equipo. Gratis y sin compromiso.` (was a near-duplicate of the hero reassurance; now leads with the personalizado + expert-reading differentiator).
+  - `Para marcas medianas y grandes con equipo de marketing y compra considerada —B2B o B2C.` (qualifier, preserved verbatim).
+- Note: `convers` id repeats across the badge, H2 and lead widgets — match by `widgetType` + `css_classes` + text fingerprint, never id alone. Do not touch the form/renderer widget.
+- Rollback for the 2026-07-02 conversion-copy change: backup meta `_gh_backup_before_aeo_conv_copy_20260702T111151Z`. `verify-aeo-form-typography` passed; `heroans` hash unchanged.
 
 - `.gh-aeo-conversion` owns the section separation as a light band.
 - `.gh-aeo-form-card` is a transparent Elementor host: no border, no shadow, no padding.

@@ -30,9 +30,9 @@ const SUBMIT_COPY = 'Empezar con mi diagnóstico →'
 const SUCCESS_MESSAGE = 'Solicitud recibida. En 24–48h tendrás una lectura inicial para saber en qué nivel estás y por dónde empezar.'
 
 const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
-  firstName: {
-    label: 'Nombre',
-    autocomplete: 'given-name',
+  fullName: {
+    label: 'Nombre completo',
+    autocomplete: 'name',
   },
   email: {
     label: 'Email corporativo',
@@ -65,7 +65,7 @@ const COPY_UPDATES: Record<string, string> = {
   'email.help': 'Usa tu email corporativo para recibir el diagnóstico.',
   'brandWebsite.help': 'Usaremos este sitio para revisar señales públicas de visibilidad.',
   'mainCompetitor.help': 'Opcional: ayuda a comparar tu presencia en IA.',
-  'firstName.error.required': 'Escribe tu nombre para personalizar el diagnóstico.',
+  'fullName.error.required': 'Escribe tu nombre completo para personalizar el diagnóstico.',
   'email.error.required': 'Usa tu email corporativo para enviarte el diagnóstico.',
   'brandWebsite.error.required': 'Indica la marca o sitio web que quieres evaluar.',
 }
@@ -83,12 +83,13 @@ const withReferenceFields = (fieldSchema: unknown): unknown[] => {
 
   return fieldSchema.map(field => {
     const candidate = asObject(field)
-    const key = typeof candidate.key === 'string' ? candidate.key : null
+    const currentKey = typeof candidate.key === 'string' ? candidate.key : null
+    const key = currentKey === 'firstName' ? 'fullName' : currentKey
     const updates = key ? FIELD_UPDATES[key] : undefined
 
     if (!key || !updates) return field
 
-    const next: Record<string, unknown> = { ...candidate, ...updates }
+    const next: Record<string, unknown> = { ...candidate, key, ...updates }
     const blankLabel = SELECT_PLACEHOLDER_LABELS[key]
 
     if (blankLabel && Array.isArray(candidate.options)) {
@@ -108,6 +109,33 @@ const withReferenceCopy = (copyRefs: unknown): Record<string, unknown> => {
   const copy = asObject(refs.copy)
 
   return { ...refs, copy: { ...copy, ...COPY_UPDATES } }
+}
+
+const withNamePolicy = (validationSchema: unknown): Record<string, unknown> => {
+  const current = asObject(validationSchema)
+
+  return {
+    ...current,
+    namePolicy: {
+      mode: 'split_full_name',
+      sourceField: 'fullName',
+      firstNameField: 'firstName',
+      lastNameField: 'lastName',
+      confidenceField: 'nameParseConfidence',
+    },
+  }
+}
+
+const withFullNameDestinationMapping = (mapping: unknown): Record<string, unknown> => {
+  const current = asObject(mapping)
+  const fieldMapping = asObject(current.fieldMapping)
+  const nextFieldMapping: Record<string, unknown> = { ...fieldMapping }
+
+  delete nextFieldMapping.fullName
+  nextFieldMapping.firstName = 'firstname'
+  nextFieldMapping.lastName = 'lastname'
+
+  return { ...current, fieldMapping: nextFieldMapping }
 }
 
 const withReferenceSuccess = (successBehavior: unknown): Record<string, unknown> => {
@@ -161,12 +189,19 @@ const main = async (): Promise<void> => {
 
   const destinations = await listDestinationsForVersion(current.form_version_id)
   const nextFields = withReferenceFields(current.field_schema_json)
+  const nextValidation = withNamePolicy(current.validation_schema_json)
   const nextCopyRefs = withReferenceCopy(current.copy_refs_json)
   const nextSuccess = withReferenceSuccess(current.success_behavior_json)
+  const nextDestinationMappings = destinations.map(destination => withFullNameDestinationMapping(destination.mapping_json))
   const styleAlreadyPremium = current.style_variant === STYLE_VARIANT
   const fieldsAlreadyReference = stableJson(nextFields) === stableJson(current.field_schema_json)
+  const validationAlreadyReference = stableJson(nextValidation) === stableJson(current.validation_schema_json)
   const copyAlreadyReference = stableJson(nextCopyRefs) === stableJson(current.copy_refs_json)
   const successAlreadyReference = stableJson(nextSuccess) === stableJson(current.success_behavior_json)
+
+  const destinationsAlreadyReference = destinations.every(
+    (destination, index) => stableJson(nextDestinationMappings[index]) === stableJson(destination.mapping_json),
+  )
 
   console.log(`\nVersión publicada vigente: ${current.form_version_id} (v${current.version})`)
   console.log(`  style_variant actual : ${current.style_variant ?? '(sin definir)'}`)
@@ -177,7 +212,14 @@ const main = async (): Promise<void> => {
     console.log(`  field ${key}: ${Object.keys(updates).join(', ')}`)
   }
 
-  if (styleAlreadyPremium && fieldsAlreadyReference && copyAlreadyReference && successAlreadyReference) {
+  if (
+    styleAlreadyPremium &&
+    fieldsAlreadyReference &&
+    validationAlreadyReference &&
+    copyAlreadyReference &&
+    successAlreadyReference &&
+    destinationsAlreadyReference
+  ) {
     console.log('\nIdempotente: la versión publicada vigente ya expone el copy de referencia AEO. Nada que hacer.')
 
     return
@@ -187,6 +229,8 @@ const main = async (): Promise<void> => {
   console.log(`  - Clonar v${current.version}`)
   console.log(`  - Mantener style_variant = ${STYLE_VARIANT}`)
   console.log('  - Ajustar labels/placeholders/help/error copy al texto de referencia')
+  console.log('  - Setear namePolicy.split_full_name para derivar firstName/lastName desde fullName')
+  console.log('  - Actualizar mapping HubSpot server-side: firstName->firstname, lastName->lastname; fullName no se envía')
   console.log('  - Preservar validation, ui_policy.security.captcha, consent, data/destination/analytics/retention/commercial policies')
   console.log(`  - Copiar ${destinations.length} destino(s) de la versión vigente`)
   console.log(`  - Publicar versión nueva + deprecar ${current.form_version_id}`)
@@ -205,7 +249,7 @@ const main = async (): Promise<void> => {
     riskProfile: (definition.risk_profile as 'low' | 'medium' | 'high' | undefined) ?? 'low',
     locale: current.locale,
     fieldSchema: nextFields,
-    validationSchema: current.validation_schema_json,
+    validationSchema: nextValidation,
     copyRefs: nextCopyRefs,
     styleVariant: STYLE_VARIANT,
     uiPolicy: current.ui_policy_json,
@@ -221,7 +265,7 @@ const main = async (): Promise<void> => {
 
   console.log(`\nDraft creado: ${formVersionId}`)
 
-  for (const destination of destinations) {
+  for (const [index, destination] of destinations.entries()) {
     const copied = await addDestination({
       formVersionId,
       provider: destination.provider,
@@ -229,7 +273,7 @@ const main = async (): Promise<void> => {
       adapterVersion: destination.adapter_version,
       endpointStatus: destination.endpoint_status,
       deliveryMode: destination.delivery_mode,
-      mapping: destination.mapping_json,
+      mapping: nextDestinationMappings[index],
       consentRequirements: destination.consent_requirements_json,
       retryPolicy: destination.retry_policy_json,
     })

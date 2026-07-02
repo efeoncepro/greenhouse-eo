@@ -32,6 +32,7 @@ import { splitAndEncryptPii } from './pii/encryption'
 import type { EncryptedFieldEnvelope } from './pii/types'
 import { validateFieldValue } from './validators/core'
 import { evaluateFormEmailGate } from './email-verification'
+import { applyNameNormalizationPolicy } from './name-normalization'
 import { compileFormVersion } from './policy-compiler'
 import {
   type CaptchaVerifier,
@@ -391,6 +392,11 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
       })
     }
   }
+
+  // TASK-1318 — Name policy enrichment. Runs after field normalization and before
+  // email/PII/storage/destination so all downstream consumers see the same derived
+  // contract. Default is off; raw fullName is preserved and lastName is never fabricated.
+  normalizedFields = applyNameNormalizationPolicy(version.validation_schema_json, normalizedFields)
 
   // TASK-1254/1263 — Gate de email por política del form (default OFF via flag), vía el helper
   // canónico `evaluateFormEmailGate` (un primitive, muchos consumers: submitForm + las dos

@@ -91,7 +91,7 @@ const aeoContract = staticContractFixture({
     formKind: 'diagnostic_intake',
   },
   fields: [
-    { key: 'firstName', type: 'text', label: 'Nombre', required: true, maxLength: 120, autocomplete: 'given-name' },
+    { key: 'fullName', type: 'text', label: 'Nombre completo', required: true, maxLength: 120, autocomplete: 'name' },
     { key: 'email', type: 'email', label: 'Email corporativo', required: true, autocomplete: 'email', inputMode: 'email', validator: 'corporate_email', placeholder: 'nombre@tuempresa.com' },
     { key: 'brandWebsite', type: 'url', label: 'Marca / sitio web', required: true, maxLength: 240, inputMode: 'url', placeholder: 'tuempresa.com' },
     {
@@ -126,7 +126,7 @@ const aeoContract = staticContractFixture({
     'email.help': 'Usa tu correo corporativo para recibir el diagnóstico.',
     'brandWebsite.help': 'Usaremos este sitio para revisar señales públicas de visibilidad.',
     'mainCompetitor.help': 'Opcional: ayuda a comparar tu presencia en IA.',
-    'firstName.error.required': 'Escribe tu nombre para personalizar el diagnóstico.',
+    'fullName.error.required': 'Escribe tu nombre completo para personalizar el diagnóstico.',
     'email.error.required': 'Usa tu correo corporativo para enviarte el diagnóstico.',
     'brandWebsite.error.required': 'Indica el sitio principal de tu marca para evaluarla.',
   },

@@ -179,6 +179,8 @@
     "public-website:verify-aeo-form-typography": "tsx scripts/public-website/verify-aeo-form-typography.ts",
     "public-website:verify-aeo-form-live-behavior": "tsx scripts/public-website/verify-aeo-form-live-behavior.ts",
     "public-website:verify-aeo-form-visual-integrity": "tsx scripts/public-website/verify-aeo-form-visual-integrity.ts",
+    "public-website:verify-aeo-market-sparktoro-logo": "tsx scripts/public-website/verify-aeo-market-sparktoro-logo.ts",
+    "public-website:verify-aeo-why-proof-meta": "tsx scripts/public-website/verify-aeo-why-proof-meta.ts",
     "public-website:wpcli": "tsx scripts/public-website/wpcli-remote.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",

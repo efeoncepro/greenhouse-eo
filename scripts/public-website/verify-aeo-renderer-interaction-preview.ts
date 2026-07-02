@@ -126,12 +126,12 @@ const setupPage = async (page: Page, label: string) => {
 }
 
 const captureInteraction = async (page: Page, name: 'desktop' | 'mobile390'): Promise<InteractionResult> => {
-  const firstName = page.locator('.gh-aeo-conversion greenhouse-form [name="firstName"]').first()
+  const fullName = page.locator('.gh-aeo-conversion greenhouse-form [name="fullName"]').first()
 
-  await firstName.focus()
+  await fullName.focus()
   await page.waitForTimeout(150)
 
-  const focus = await firstName.evaluate((node, screenshotPath) => {
+  const focus = await fullName.evaluate((node, screenshotPath) => {
     const element = node as HTMLInputElement
     const style = getComputedStyle(element)
 
@@ -144,8 +144,8 @@ const captureInteraction = async (page: Page, name: 'desktop' | 'mobile390'): Pr
     }
   }, `${screenshotDir}/aeo-renderer-interaction-focus-${name}.png`)
 
-  if (focus.activeName !== 'firstName') {
-    throw new Error(`${name} focus activeName is ${focus.activeName}; expected firstName`)
+  if (focus.activeName !== 'fullName') {
+    throw new Error(`${name} focus activeName is ${focus.activeName}; expected fullName`)
   }
 
   const hasOutline = focus.outlineStyle !== 'none' && Number.parseFloat(focus.outlineWidth) >= 1
@@ -218,7 +218,7 @@ const captureInteraction = async (page: Page, name: 'desktop' | 'mobile390'): Pr
 }
 
 const captureReducedMotion = async (page: Page): Promise<ReducedMotionResult> => {
-  await page.locator('.gh-aeo-conversion greenhouse-form [name="firstName"]').focus()
+  await page.locator('.gh-aeo-conversion greenhouse-form [name="fullName"]').focus()
   await page.waitForTimeout(50)
 
   const screenshot = `${screenshotDir}/aeo-renderer-interaction-reduced-motion-desktop.png`

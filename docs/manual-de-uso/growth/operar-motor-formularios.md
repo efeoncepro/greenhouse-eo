@@ -32,7 +32,7 @@ El motor depende de tres flags independientes. Para que funcione punta a punta l
 
 **Verdad live:** `vercel env ls` (flag Vercel) + `gcloud run services describe ops-worker --region=us-east4` (flags worker). El ledger es el estado humano, no la verdad.
 
-**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; AEO v7 (`fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`) publica `style_variant=diagnostic_premium`, `security.captcha`, CTA/copy de referencia y se embebe en WordPress por `form-key=b120566a-dd1a-43c8-956a-4e0121e805b8`.
+**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; AEO v8 (`fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63`) publica `style_variant=diagnostic_premium`, `security.captcha`, CTA/copy de referencia, campo visible `Nombre completo` con `namePolicy.split_full_name`, y se embebe en WordPress por `form-key=b120566a-dd1a-43c8-956a-4e0121e805b8`.
 
 ## Prender en un environment
 
@@ -127,6 +127,15 @@ gcloud auth application-default login
 Este script **no** muta WordPress ni hace cutover live por si solo. En AEO el cutover live ya fue
 ejecutado con backup `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`, `heroans`
 guard, Kinsta purge y verificacion `pnpm public-website:verify-aeo-live-contract`.
+
+Desde TASK-1318, el mismo script tambien mantiene el contrato de nombre completo: el field visible
+es `fullName` (`Nombre completo`, `autocomplete=name`) y `validation_schema.namePolicy` deriva
+`firstName`/`lastName` en el submit server-side para enviar a HubSpot `firstname`/`lastname`. La
+property/form field HubSpot `contacts.lastname` debe existir en el form destino; verificar con:
+
+```bash
+pnpm hubspot:forms:upsert-fields -- --config scripts/hubspot/examples/upsert-aeo-lastname-field.json
+```
 
 ## Verificar AEO live
 

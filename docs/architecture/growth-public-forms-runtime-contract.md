@@ -40,7 +40,7 @@ Identificadores vigentes:
 - Form slug: `efeonce-aeo-diagnostic`.
 - **Form key (identidad estable, TASK-1297):** `b120566a-dd1a-43c8-956a-4e0121e805b8` (AEO). El del AI Visibility Grader es `69cd5269-5f97-4d32-99c4-0b23f41aa2f5` (distinto). Embed/resolución preferida por `form-key`; `slug` queda como alias backward-compatible.
 - WordPress embed: `<greenhouse-form form-key="b120566a-dd1a-43c8-956a-4e0121e805b8" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light" appearance="bare">` + `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`.
-- Form definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad` (v7, `style_variant=diagnostic_premium`, expone `copy.submit="Empezar con mi diagnóstico →"`, placeholders `Selecciona tu país` / `Selecciona un rango`, helper/error/success copy de referencia y `security.captcha`; v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` y v1 `fver-efeonce-aeo-diagnostic-v1` deprecadas).
+- Form definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63` (v8, `style_variant=diagnostic_premium`, expone `copy.submit="Empezar con mi diagnóstico →"`, campo visible `fullName` label `Nombre completo`, `validation_schema.namePolicy.split_full_name`, placeholders `Selecciona tu país` / `Selecciona un rango`, helper/error/success copy de referencia y `security.captcha`; v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`, v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` y v1 `fver-efeonce-aeo-diagnostic-v1` deprecadas).
 - Host surface: `fhsf-efeonce-aeo-diagnostic`.
 - API base: `https://greenhouse.efeoncepro.com`.
 - Turnstile site key in render contract: `0x4AAAAAADqwX2R7v-k9pItv`.
@@ -51,7 +51,7 @@ Premium modernization contract (live):
 - `style_variant=diagnostic_premium` is the governed renderer path for the AEO premium pass. It keeps the look in the Growth Forms render contract + renderer tokens, not in WordPress page CSS.
 - Script: `pnpm growth:forms:activate-aeo-reference-copy` dry-runs and `pnpm growth:forms:activate-aeo-reference-copy -- --apply` publishes a new AEO form version by `form_key=b120566a-dd1a-43c8-956a-4e0121e805b8` with the current reference copy. `pnpm growth:forms:activate-aeo-premium` remains the older premium-style activation helper.
 - The script updates labels/placeholders/help/errors/submit/success copy, preserves fields, validation, Turnstile, destinations and policies, publishes vNext and deprecates the previous version.
-- Applied production data: v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`.
+- Applied production data: v8 `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63`.
 - WordPress cutover backup meta: `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`.
 - Live verification command: `pnpm public-website:verify-aeo-live-contract`.
 
@@ -102,7 +102,9 @@ Field contract:
 
 | Public field | Greenhouse persistence | HubSpot mapping |
 | --- | --- | --- |
-| `firstName` | yes | `firstname` |
+| `fullName` | yes; raw visible field preserved in Greenhouse | not mapped to HubSpot |
+| derived `firstName` | yes; derived server-side from `fullName` when `namePolicy.mode="split_full_name"` | `firstname` |
+| derived `lastName` | yes when derivable; never fabricated for one-token names | `lastname` |
 | `email` | yes; `validator=corporate_email` | `email` |
 | `brandWebsite` | yes | not mapped until HubSpot form/property exists |
 | `country` | yes | `pais_gh` |
@@ -131,6 +133,7 @@ Runtime guardrails:
 
 - WordPress must never know HubSpot mapping, portal credentials, destination secrets or Turnstile secret.
 - The AEO form requires corporate email: the published field uses `validator=corporate_email` and `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. Gmail/free/disposable addresses must be rejected before accepted submission.
+- The AEO form captures one visible `fullName` field (`Nombre completo`). Server-side `submitForm` applies `validation_schema.namePolicy={mode:"split_full_name",sourceField:"fullName",firstNameField:"firstName",lastNameField:"lastName"}` before persistence/delivery. HubSpot receives native contact `firstname`/`lastname` from derived fields; the browser never sees this mapping.
 - The current AEO published form declares `ui_policy_json.security.captcha` with public Turnstile site key `0x4AAAAAADqwX2R7v-k9pItv`, `required:true`, `mode:"invisible"` and `execution:"submit"`. Production public `GET` now serializes `render_contract.security.captcha`; public `POST` remains fail-closed without a token.
 - The WordPress embed must keep validation in Growth Forms: field-level errors close to the input, `aria-invalid`/`aria-describedby`, debounced `/verify-email` for corporate email, and no `/submit` while field validation blocks. Do not regress to status-only/global validation or a landing-local submit bridge.
 - A submit without Turnstile token must fail as `403 captcha_failed/missing_token` and must not create a lead.

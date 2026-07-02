@@ -172,7 +172,7 @@ const main = async () => {
     surfaceId,
     formVersionId: byFormKey.json.form?.formVersionId,
     fields: {
-      firstName: 'AEO Preflight',
+      fullName: 'AEO Preflight',
       email: 'aeo.preflight@efeonce.org',
       brandWebsite: 'efeoncepro.com',
       country: 'CL',

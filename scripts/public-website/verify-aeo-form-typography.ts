@@ -131,7 +131,7 @@ async function main() {
             '.gh-aeo-conversion .gh-aeo-growth-form-proof',
           ]
 
-      const existingZeroSelectors = []
+      const existingZeroSelectors: string[] = []
 
       for (const selector of zeroSelectors) {
         if ((await page.locator(selector).count()) > 0) {

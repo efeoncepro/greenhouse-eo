@@ -1,3 +1,35 @@
+## Sesion 2026-07-02 — TASK-1318 Growth Forms full name destination split — Codex — 🚧 creada + ejecución inmediata
+
+> **Pedido:** crear task para cambiar el campo `Nombre` del formulario AEO a `Nombre completo` y resolver backend/destinos para HubSpot/Greenhouse como capacidad reusable de Growth Forms, pasando de inmediato a ejecutarla.
+>
+> **Nota operativa:** el operador no entregó `/goal` explícito y pidió ejecución inmediata; se documenta la excepción al goal preflight aquí y en la task. Se debe ejecutar `pnpm codex:task-hook TASK-1318` antes de tocar código.
+>
+> **Estado actual:** `code complete, rollout pendiente`. Task tomada en `docs/tasks/in-progress/TASK-1318-growth-forms-full-name-destination-split.md`; wireframe `docs/ui/wireframes/TASK-1318-growth-forms-full-name-destination-split.md`; registry/README sincronizados. Decisión UX: mantener un solo campo visible `Nombre completo` en AEO para baja fricción, preservar `fullName` y derivar `firstName`/`lastName` server-side con política declarativa. HubSpot usa propiedades nativas de contacto `firstname` y `lastname`; el mapping sigue server-only.
+>
+> **Implementación local:** `src/lib/growth/forms/name-normalization.ts` agrega `namePolicy.mode=split_full_name`; `submitForm` aplica la política antes de persistir/despachar; tests cubren 1 token, 2 tokens, 3+ tokens, whitespace y preservación de `firstName/lastName` explícitos. El adapter HubSpot queda probado con mapping `firstName -> firstname`, `lastName -> lastname` y sin enviar `fullName`.
+>
+> **Runtime aplicado:** AEO v8 publicado `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63` con campo visible `fullName` label `Nombre completo`, `autocomplete=name`, `validation_schema_json.namePolicy.split_full_name`, y mapping server-side `firstName -> firstname`, `lastName -> lastname`. HubSpot dry-run para `scripts/hubspot/examples/upsert-aeo-lastname-field.json` reportó `form_field_exists contacts.lastname`, sin apply necesario. `pnpm public-website:verify-aeo-live-contract` pasó después del publish.
+>
+> **Bloqueo operativo:** el código que deriva `firstName/lastName` aún está local y no fue promovido a producción. Hasta que este cambio pase por el release control plane, submissions live de v8 pueden no enviar `firstname/lastname` derivados. No ejecutar `git push`, Vercel production deploy, rollback ni promoción sin aprobación explícita del operador y `greenhouse-production-release`.
+>
+> **Evidencia local:** `pnpm vitest run src/lib/growth/forms` (17 files / 135 tests), `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm task:lint --task TASK-1318`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`. `docs:closure-check` conserva warnings advisory por cambios AEO/skills previos en el worktree; no hay flags sin registrar.
+
+## Sesion 2026-07-02 — AEO market SparkToro logo correcto — Codex — ✅ live
+
+> **Pedido:** cambiar el logo de SparkToro en la tercera card de la seccion `market` de `/aeo-2/` por el SVG correcto compartido por el operador.
+>
+> **Cambio live:** se trabajo solo WordPress `postId=250265` en `marketg > marketc`. Se versiono el SVG en `docs/assets/public-site/aeo-market-logos/sparktoro-logo.svg`, se subio a `/wp-content/uploads/greenhouse/aeo-market-logos/sparktoro-logo.svg` y se reemplazo el texto `SparkToro` por `<img>` dentro de `.gh-aeo-source-logo-sparktoro`, manteniendo `role="img"`/`aria-label="SparkToro"` y `alt=""`. CSS page-scoped ajusta el SVG a `height:18px`; el copy, las otras cards, Home `2791`, old `/aeo` `250255`, hero y Growth Forms quedaron intactos. Backup `_gh_backup_before_aeo_sparktoro_logo_svg_20260702T114406Z`; settings backup `_gh_backup_page_settings_before_aeo_sparktoro_logo_svg_20260702T114406Z`; `heroans` preservado (`e0b951b2456a83578cd9e22005900521`); Kinsta purgada.
+>
+> **Verificacion:** `pnpm public-website:verify-aeo-market-sparktoro-logo` verde con capturas `.captures/aeo-market-sparktoro-logo-2026-07-02T11-50-38-995Z/`: desktop 1440 y mobile 390, SVG servido como `image/svg+xml`, `naturalWidth=300`, render `87.44x18`, `aria-label=SparkToro`, sin texto fallback visible, sin solape con `2026`, `pageOverflowX=0`, `sectionOverflowX=0`. También verdes: `pnpm public-website:verify-aeo-wordpress-guards` y `pnpm public-website:verify-aeo-live-contract`.
+
+## Sesion 2026-07-02 — AEO service icons v2 con motor nativo — Codex — ✅ live
+
+> **Pedido:** reemplazar los iconos detallados de la seccion `El servicio` en `/aeo-2/` por 4 iconos contextuales Clay3D mate usando el motor de generacion de imagen de Codex, evaluar acento tech/neon transparente e incrustarlos.
+>
+> **Cambio live:** se genero un sprite 2x2 con el motor nativo de imagen de Codex (no el helper canonico del repo), se recortaron los cuatro iconos, se limpio el fondo a alpha y se guardaron como fuente v2 en `docs/assets/public-site/aeo-service-icons/v2/`. La direccion visual baja el microdetalle respecto a v1: siluetas mas grandes, clay 3D mate, navy/blanco y acentos teal/cyan tech/neon muy contenidos. Se subieron a WordPress como adjuntos `250708` measure, `250709` create, `250710` distribute, `250711` optimize, y se actualizaron solo los `src` de los `<img class="gh-aeo-service-card-icon">` en `serv1cat`-`serv4cat`, manteniendo `alt="" aria-hidden="true"`. Los adjuntos v1 `250642`-`250645` quedan como rollback. Backup Elementor `_gh_backup_before_aeo_service_native_icons_v2_20260702T113628Z`; `heroans` preservado (`e0b951b2456a83578cd9e22005900521`); Kinsta purgada.
+>
+> **Verificacion:** `node tmp/verify-aeo-service-native-icons-v2.mjs` verde con capturas `.captures/aeo-service-native-icons-v2-2026-07-02T11-37-29-202Z/`: desktop 1440 y mobile 390, 4 PNG v2 cargados, `naturalWidth=656`, `alt=""`, `aria-hidden=true`, iconos dentro de card, sin solapar kicker/title, `pageOverflowX=0`, `bodyOverflowX=0`, `sectionOverflowX=0`. También verdes: `pnpm public-website:verify-aeo-wordpress-guards` y `pnpm public-website:verify-aeo-live-contract`.
+
 ## Sesion 2026-07-02 — AEO aprendizaje de sesion documentado — Codex — ✅ docs
 
 > **Pedido:** documentar absolutamente todo el aprendizaje de la sesion AEO/Growth Forms en la skill y donde corresponda, y luego commitear.
@@ -65,6 +97,8 @@
 > **Cambio live:** plugin `eo-elementor-widgets`, widget `greenhouse_logo_marquee`: set aprobado de 7 logos (`sky`, `anam`, `gobierno-santiago`, `berel`, `carozzi`, `bresler`, `marca-chile`), 3 sets idénticos/21 nodos, viewport desktop 1160px dentro de wrapper 1200px alineado al panel navy, set desktop ~1218px, gap visual/fase ~55px para que respiren sin abrir huecos, fades laterales, duración 44s desktop y 38s mobile, reduced-motion sin animación y sin duplicados. Se mantuvieron sin cards/cuadrados.
 >
 > **Follow-up de polish UI:** a pedido del operador, se separó el título `Marcas que ya confían en nosotros` del panel navy y se reemplazó el meta genérico `+120 marcas · 4 países` por un proof row tipo `TeamAvatarGroup`: tres discos solapados con logos en color de Berel, Sky y Bresler, más `+120 marcas - 4 países` con ícono flat de mundo. Quedó sin cajas dashed/heredadas y con Inter/sistema. Medición final: `filter=none`, `opacity=1`, `dashedBorders=0`; el verificador principal reportó `pageOverflowX=0`, `rootOverflowX=0`.
+>
+> **Follow-up de meta proof:** el estado vigente ya no es `+120 marcas - 4 países`: `+120` vive como cuarto disco navy dentro del `TeamAvatarGroup`, detrás de Bresler, con texto micro casi blanco; el copy visible de países es `Chile · Colombia · México · Perú` en navy compacto con globe inline. Backup Elementor `_gh_backup_before_aeo_why_proof_avatar_countries_20260702T115614Z`; evidencia `.captures/aeo-why-proof-meta-2026-07-02T12-08-15-864Z/`; gate `pnpm public-website:verify-aeo-why-proof-meta` verde.
 >
 > **Follow-up de espaciado:** se midió el desacople vertical: `h3` traía `margin-bottom=26px`, el widget del marquee `margin-bottom=18px` y el meta `margin-top=30px`, lo que abría `titleToLogoVisual~90px` y `logoVisualToProof~84px`. Se normalizó a `h3 margin-bottom=0`, marquee widget `margin-bottom=0`, meta `margin-top=16px`; cierre medido `titleToLogoVisual=58px`, `logoVisualToProof=52px`, `overflow=0`.
 >

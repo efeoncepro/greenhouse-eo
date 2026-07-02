@@ -20,7 +20,7 @@ const piiNeedles = [
 ]
 
 const fillRequiredFields = async (page: Page, email: string) => {
-  await page.locator('.gh-aeo-conversion greenhouse-form [name="firstName"]').fill(email.includes('gmail') ? 'Ana Publica' : 'Julio Empresa')
+  await page.locator('.gh-aeo-conversion greenhouse-form [name="fullName"]').fill(email.includes('gmail') ? 'Ana Publica' : 'Julio Empresa')
   await page.locator('.gh-aeo-conversion greenhouse-form [name="email"]').fill(email)
   await page.locator('.gh-aeo-conversion greenhouse-form [name="brandWebsite"]').fill('empresa-demo.com')
 }
@@ -93,11 +93,11 @@ async function main() {
 
     await page.keyboard.press('Escape')
 
-    const firstName = page.locator('.gh-aeo-conversion greenhouse-form [name="firstName"]').first()
+    const fullName = page.locator('.gh-aeo-conversion greenhouse-form [name="fullName"]').first()
 
-    await firstName.focus()
+    await fullName.focus()
 
-    const focus = await firstName.evaluate(node => {
+    const focus = await fullName.evaluate(node => {
       const element = node as HTMLInputElement
       const style = getComputedStyle(element)
 
@@ -109,7 +109,7 @@ async function main() {
       }
     })
 
-    if (focus.activeName !== 'firstName' || (focus.outlineStyle === 'none' && focus.boxShadow === 'none')) {
+    if (focus.activeName !== 'fullName' || (focus.outlineStyle === 'none' && focus.boxShadow === 'none')) {
       throw new Error(`Focus affordance failed: ${JSON.stringify(focus)}`)
     }
 
