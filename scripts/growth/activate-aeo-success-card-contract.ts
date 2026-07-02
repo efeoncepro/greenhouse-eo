@@ -31,16 +31,19 @@ const PRODUCTION_RUNTIME_REF = process.env.GREENHOUSE_AEO_SUCCESS_CARD_RUNTIME_R
 const AEO_FORM_KEY = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 
 const SUCCESS_CARD_BEHAVIOR = {
-  kind: 'review_pending',
+  kind: 'inline_message',
   presentation: 'success_card',
-  title: 'Recibimos tu información',
-  body: 'Tu solicitud quedó registrada. Revisaremos las señales públicas de tu marca y te mostraremos el siguiente paso.',
-  steps: [
-    { label: 'Validamos la información enviada.' },
-    { label: 'Revisamos el contexto público de tu marca.' },
-    { label: 'Te proponemos el siguiente paso.' },
+  title: 'Tu informe de visibilidad en IA va en camino',
+  body: 'Recibimos tu solicitud. Estamos preparando tu diagnóstico y te llegará por correo en las próximas 24–48 horas.',
+  supportingNote: '¿No lo ves en 48 horas? Revisa tu spam o escríbenos.',
+  actions: [
+    {
+      kind: 'schedule',
+      label: 'Agenda una conversación',
+      href: 'https://meetings.hubspot.com/efeoncepro/agenda-discovery',
+      target: '_blank',
+    },
   ],
-  supportingNote: 'Esta confirmación indica recepción en Greenhouse; la entrega a sistemas externos ocurre de forma posterior.',
 } as const
 
 const stableJson = (value: unknown): string => JSON.stringify(value)
