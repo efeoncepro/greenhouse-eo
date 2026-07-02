@@ -17,6 +17,9 @@ export const RENDERER_GTM_EVENTS = [
   'gh_form_submission_rejected',
   'gh_form_destination_delivered',
   'gh_form_asset_accessed',
+  // TASK-1319 success card capability — eventos render-only (espejo de GTM_EVENT_NAMES).
+  'gh_form_success_viewed',
+  'gh_form_success_action_clicked',
 ] as const
 export type RendererGtmEvent = (typeof RENDERER_GTM_EVENTS)[number]
 
@@ -42,6 +45,9 @@ export const RENDERER_ALLOWED_PAYLOAD_KEYS = [
   'reason_class',
   'success_behavior',
   'destination_kind',
+  // TASK-1319 success card capability — clasificadores browser-safe (nunca valores/PII).
+  'action_kind',
+  'reward_kind',
 ] as const
 export type RendererAllowedPayloadKey = (typeof RENDERER_ALLOWED_PAYLOAD_KEYS)[number]
 

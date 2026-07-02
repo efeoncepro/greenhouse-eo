@@ -142,6 +142,10 @@ export const GTM_EVENT_NAMES = [
   'gh_form_submission_rejected',
   'gh_form_destination_delivered',
   'gh_form_asset_accessed',
+  // TASK-1319 success card capability — eventos render-only (browser/GTM), sin equivalente
+  // server-side en TELEMETRY_EVENT_NAMES (no hay round-trip: la card se ve/clickea en el cliente).
+  'gh_form_success_viewed',
+  'gh_form_success_action_clicked',
 ] as const
 export type GtmEventName = (typeof GTM_EVENT_NAMES)[number]
 
@@ -167,6 +171,9 @@ export const TELEMETRY_ALLOWED_PAYLOAD_KEYS = [
   'reason_class',
   'success_behavior',
   'destination_kind',
+  // TASK-1319 success card capability — clasificadores browser-safe (nunca valores/PII).
+  'action_kind',
+  'reward_kind',
 ] as const
 export type TelemetryAllowedPayloadKey = (typeof TELEMETRY_ALLOWED_PAYLOAD_KEYS)[number]
 
@@ -270,10 +277,106 @@ export const consentDisplaySchema = z.object({
 })
 export type ConsentDisplay = z.infer<typeof consentDisplaySchema>
 
+// ─── Success card capability (TASK-1319) — browser-safe in-card thank-you ──────
+//
+// `presentation` es ORTOGONAL a `kind`: `kind` = QUÉ outcome se promete
+// (inline_message/redirect/asset_access/review_pending/tokenized_report); `presentation`
+// = CÓMO se muestra (mensaje simple vs success card estructurada). El `reward` es un
+// sub-bloque de la card, NO un repurpose del `kind='asset_access'`. Estos campos cruzan
+// al browser tal cual (el compiler hace passthrough y el GET serializa el contrato), así
+// que el schema ES el leak boundary: strings acotados + `href` allowlisted.
+
+/** Presentación del estado success. `success_card` habilita la card in-card estructurada. */
+export const SUCCESS_PRESENTATIONS = ['inline_message', 'success_card'] as const
+export type SuccessPresentation = (typeof SUCCESS_PRESENTATIONS)[number]
+
+/** Kinds de acción permitidos en V1 (browser-safe). */
+export const SUCCESS_ACTION_KINDS = ['external_link', 'download', 'asset_access', 'schedule'] as const
+export type SuccessActionKind = (typeof SUCCESS_ACTION_KINDS)[number]
+
+/** Kinds de reward para lead magnets / gated resources. `none` = sin reward. */
+export const SUCCESS_REWARD_KINDS = ['none', 'ebook', 'guide', 'template', 'report_preview', 'surprise'] as const
+export type SuccessRewardKind = (typeof SUCCESS_REWARD_KINDS)[number]
+
+export const SUCCESS_HREF_MAX = 2000
+export const SUCCESS_STEPS_MAX = 4
+export const SUCCESS_ACTIONS_MAX = 2
+
+/**
+ * href allowlist browser-safe (TASK-1319): sólo URLs seguras cruzan al browser.
+ * Acepta: https absoluta, http SÓLO en localhost/127.0.0.1 (dev/test), o path root-relative
+ * same-origin (`/algo`, NUNCA protocol-relative `//host`). Rechaza: `javascript:`/`data:`/
+ * `vbscript:`, non-https externas, y cualquier signed/private URL no aprobada explícitamente.
+ */
+export const isBrowserSafeSuccessHref = (value: string): boolean => {
+  const trimmed = value.trim()
+
+  if (trimmed.length === 0) return false
+  const lower = trimmed.toLowerCase()
+
+  if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) return false
+  // Path root-relative same-origin (excluye protocol-relative `//host`).
+  if (trimmed.startsWith('/') && !trimmed.startsWith('//')) return true
+
+  try {
+    const url = new URL(trimmed)
+
+    if (url.protocol === 'https:') return true
+    if (url.protocol === 'http:' && (url.hostname === 'localhost' || url.hostname === '127.0.0.1')) return true
+
+    return false
+  } catch {
+    return false
+  }
+}
+
+export const successCardHrefSchema = z
+  .string()
+  .max(SUCCESS_HREF_MAX)
+  .refine(isBrowserSafeSuccessHref, {
+    message: 'href debe ser https (o path same-origin `/`); sin javascript:/data:/non-https externa',
+  })
+
+export const successCardActionSchema = z.object({
+  kind: z.enum(SUCCESS_ACTION_KINDS),
+  label: z.string().max(80).optional(),
+  labelCopyRef: z.string().max(120).optional(),
+  href: successCardHrefSchema.optional(),
+  target: z.enum(['_self', '_blank']).optional(),
+  telemetryKey: z.string().max(80).optional(),
+})
+export type SuccessCardAction = z.infer<typeof successCardActionSchema>
+
+export const successCardRewardSchema = z.object({
+  kind: z.enum(SUCCESS_REWARD_KINDS),
+  title: z.string().max(120).optional(),
+  titleCopyRef: z.string().max(120).optional(),
+  body: z.string().max(600).optional(),
+  bodyCopyRef: z.string().max(120).optional(),
+  action: successCardActionSchema.optional(),
+})
+export type SuccessCardReward = z.infer<typeof successCardRewardSchema>
+
+export const successCardStepSchema = z.object({
+  label: z.string().max(160).optional(),
+  copyRef: z.string().max(120).optional(),
+})
+
 export const successBehaviorSchema = z.object({
   kind: z.enum(['inline_message', 'redirect', 'asset_access', 'review_pending', 'tokenized_report']),
+  presentation: z.enum(SUCCESS_PRESENTATIONS).optional(),
   message: z.string().max(2000).optional(),
   messageCopyRef: z.string().optional(),
+  // Success card estructurada (browser-safe) — TASK-1319.
+  title: z.string().max(160).optional(),
+  titleCopyRef: z.string().max(120).optional(),
+  body: z.string().max(1000).optional(),
+  bodyCopyRef: z.string().max(120).optional(),
+  steps: z.array(successCardStepSchema).max(SUCCESS_STEPS_MAX).optional(),
+  reward: successCardRewardSchema.optional(),
+  actions: z.array(successCardActionSchema).max(SUCCESS_ACTIONS_MAX).optional(),
+  supportingNote: z.string().max(400).optional(),
+  supportingNoteCopyRef: z.string().max(120).optional(),
   redirectUrl: z.string().url().optional(),
 })
 export type SuccessBehavior = z.infer<typeof successBehaviorSchema>

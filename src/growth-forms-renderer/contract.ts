@@ -105,10 +105,55 @@ export type RendererSuccessKind =
   | 'review_pending'
   | 'tokenized_report'
 
+// Success card capability (TASK-1319) — espejo de tipos browser-safe. La SoT
+// (`successBehaviorSchema`) valida/acota; acá vive sólo el shape que el renderer consume.
+export type RendererSuccessPresentation = 'inline_message' | 'success_card'
+export type RendererSuccessActionKind = 'external_link' | 'download' | 'asset_access' | 'schedule'
+export type RendererSuccessRewardKind =
+  | 'none'
+  | 'ebook'
+  | 'guide'
+  | 'template'
+  | 'report_preview'
+  | 'surprise'
+
+export interface RendererSuccessCardAction {
+  kind: RendererSuccessActionKind
+  label?: string
+  labelCopyRef?: string
+  href?: string
+  target?: '_self' | '_blank'
+  telemetryKey?: string
+}
+
+export interface RendererSuccessCardReward {
+  kind: RendererSuccessRewardKind
+  title?: string
+  titleCopyRef?: string
+  body?: string
+  bodyCopyRef?: string
+  action?: RendererSuccessCardAction
+}
+
+export interface RendererSuccessCardStep {
+  label?: string
+  copyRef?: string
+}
+
 export interface RendererSuccessBehavior {
   kind: RendererSuccessKind
+  presentation?: RendererSuccessPresentation
   message?: string
   messageCopyRef?: string
+  title?: string
+  titleCopyRef?: string
+  body?: string
+  bodyCopyRef?: string
+  steps?: RendererSuccessCardStep[]
+  reward?: RendererSuccessCardReward
+  actions?: RendererSuccessCardAction[]
+  supportingNote?: string
+  supportingNoteCopyRef?: string
   redirectUrl?: string
 }
 

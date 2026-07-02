@@ -211,6 +211,162 @@ describe('render_contract — formKey + copy gate (TASK-1297)', () => {
   })
 })
 
+describe('success card capability (TASK-1319)', () => {
+  const successCardBehavior = {
+    kind: 'inline_message',
+    presentation: 'success_card',
+    titleCopyRef: 'success.title',
+    bodyCopyRef: 'success.body',
+    steps: [{ copyRef: 'success.step.review' }, { copyRef: 'success.step.follow_up' }],
+    reward: {
+      kind: 'ebook',
+      titleCopyRef: 'reward.ebook.title',
+      action: { kind: 'download', href: 'https://efeoncepro.com/recursos/aeo.pdf', target: '_blank' },
+    },
+    actions: [{ kind: 'schedule', labelCopyRef: 'action.schedule', href: 'https://cal.efeoncepro.com/aeo' }],
+    supportingNoteCopyRef: 'support.note',
+  }
+
+  it('compila y expone la success-card metadata browser-safe en el render contract', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({ success_behavior_json: successCardBehavior }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(true)
+    const success = result.renderContract?.successBehavior
+
+    expect(success?.presentation).toBe('success_card')
+    expect(success?.steps).toHaveLength(2)
+    expect(success?.reward?.kind).toBe('ebook')
+    expect(success?.reward?.action?.href).toBe('https://efeoncepro.com/recursos/aeo.pdf')
+    expect(success?.actions?.[0]?.kind).toBe('schedule')
+  })
+
+  it('presentation es ORTOGONAL a kind: redirect + success_card coexisten', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({
+        success_behavior_json: {
+          kind: 'redirect',
+          presentation: 'success_card',
+          redirectUrl: 'https://efeoncepro.com/gracias',
+          titleCopyRef: 'success.title',
+        },
+      }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(true)
+    expect(result.renderContract?.successBehavior.kind).toBe('redirect')
+    expect(result.renderContract?.successBehavior.presentation).toBe('success_card')
+  })
+
+  it('bloquea publicación si un href de acción no es browser-safe (javascript:)', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({
+        success_behavior_json: {
+          kind: 'inline_message',
+          presentation: 'success_card',
+          actions: [{ kind: 'external_link', href: 'javascript:alert(1)' }],
+        },
+      }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(false)
+    expect(result.blockingReasons.join(' ')).toContain('success_behavior')
+  })
+
+  it('bloquea publicación si un href es non-https externo o protocol-relative', () => {
+    for (const href of ['http://evil.example.com/x', '//evil.example.com/x', 'data:text/html,x']) {
+      const result = compileFormVersion(
+        definition(),
+        version({
+          success_behavior_json: {
+            kind: 'inline_message',
+            presentation: 'success_card',
+            actions: [{ kind: 'external_link', href }],
+          },
+        }),
+        [destination()],
+        { forPublication: true },
+      )
+
+      expect(result.ok, `href ${href} debería bloquear`).toBe(false)
+    }
+  })
+
+  it('acepta https absoluta y path root-relative same-origin', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({
+        success_behavior_json: {
+          kind: 'inline_message',
+          presentation: 'success_card',
+          actions: [
+            { kind: 'schedule', href: 'https://cal.efeoncepro.com/aeo' },
+            { kind: 'download', href: '/recursos/aeo.pdf' },
+          ],
+        },
+      }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(true)
+  })
+
+  it('bloquea publicación si se exceden las cotas (steps > 4, actions > 2)', () => {
+    const tooManySteps = compileFormVersion(
+      definition(),
+      version({
+        success_behavior_json: {
+          kind: 'inline_message',
+          presentation: 'success_card',
+          steps: Array.from({ length: 5 }, (_, i) => ({ copyRef: `s.${i}` })),
+        },
+      }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(tooManySteps.ok).toBe(false)
+
+    const tooManyActions = compileFormVersion(
+      definition(),
+      version({
+        success_behavior_json: {
+          kind: 'inline_message',
+          presentation: 'success_card',
+          actions: Array.from({ length: 3 }, () => ({ kind: 'external_link', href: 'https://efeoncepro.com' })),
+        },
+      }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(tooManyActions.ok).toBe(false)
+  })
+
+  it('los contratos legacy (inline_message, redirect) siguen compilando byte-compatible', () => {
+    const inline = compileFormVersion(
+      definition(),
+      version({ success_behavior_json: { kind: 'inline_message', message: 'Gracias' } }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(inline.ok).toBe(true)
+    expect(inline.renderContract?.successBehavior).toEqual({ kind: 'inline_message', message: 'Gracias' })
+  })
+})
+
 describe('telemetry contract', () => {
   it('las claves prohibidas no se solapan con las permitidas', () => {
     const allowed = new Set<string>(TELEMETRY_ALLOWED_PAYLOAD_KEYS)
@@ -218,6 +374,13 @@ describe('telemetry contract', () => {
     for (const forbidden of TELEMETRY_FORBIDDEN_PAYLOAD_KEYS) {
       expect(allowed.has(forbidden)).toBe(false)
     }
+  })
+
+  it('allowlistea los clasificadores de la success card (action_kind, reward_kind) — TASK-1319', () => {
+    const allowed = new Set<string>(TELEMETRY_ALLOWED_PAYLOAD_KEYS)
+
+    expect(allowed.has('action_kind')).toBe(true)
+    expect(allowed.has('reward_kind')).toBe(true)
   })
 })
 
