@@ -1,18 +1,20 @@
 /**
  * TASK-782 — PDF PeriodReportDocument structural regression tests.
  *
- * Verifies the canonical 4-regime PDF structure by parsing the rendered
- * PDF buffer and asserting key textual landmarks. Cannot snapshot the JSX
- * tree directly (renderToStream returns a binary stream), so we parse
- * with `pdf-parse` and assert on extracted text.
+ * Verifies the canonical 4-regime PDF structure by walking the react-pdf
+ * `<Document>` element tree and asserting on the text content of each `<Text>`
+ * node (group dividers, subtotals, column headers, badges).
  *
- * NOTE: pdf-parse pulls heavy native deps. We assert only on landmarks
- * that the canonical contract guarantees (group dividers, subtotals,
- * column headers).
+ * Robust-by-construction: we assert on the element tree via
+ * `extractReactPdfText`, NOT on a binary PDF re-parsed with `pdf-parse` (whose
+ * bundled pdf.js throws `Illegal character: 41` non-deterministically in CI).
+ * `buildPayrollPeriodReportElement` is the SSOT the production renderer also
+ * consumes, so these assertions cover the exact document production ships.
  */
 
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
+import { extractReactPdfText } from '@/test/react-pdf-text'
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
 
 vi.mock('@/lib/payroll/get-payroll-entries', () => ({
@@ -38,7 +40,7 @@ vi.mock('@/lib/payroll/adjustments/apply-adjustment', () => ({
 
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
-import { generatePayrollPeriodPdf } from './generate-payroll-pdf'
+import { buildPayrollPeriodReportElement } from './generate-payroll-pdf'
 
 // Period fixture
 const period: PayrollPeriod = {
@@ -194,17 +196,12 @@ const baseDeel = (): PayrollEntry => ({
   workingDaysInPeriod: null
 })
 
-// pdf-parse extractor — load lib/pdf-parse.js directly to avoid the
-// upstream bug where index.js opens a non-existent test fixture on first require.
-const extractText = async (buffer: Buffer): Promise<string> => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pdfParse = require('pdf-parse/lib/pdf-parse.js') as (
-    buf: Buffer
-  ) => Promise<{ text: string }>
+// Extract the text runs from the period-report <Document> element (SSOT the
+// production renderer also consumes), without rendering to a binary PDF.
+const runsFor = async (): Promise<string[]> => {
+  const element = await buildPayrollPeriodReportElement(period.periodId)
 
-  const result = await pdfParse(buffer)
-
-  return result.text
+  return extractReactPdfText(element).runs
 }
 
 describe('PDF PeriodReportDocument — TASK-782 disaggregation', () => {
@@ -220,30 +217,25 @@ describe('PDF PeriodReportDocument — TASK-782 disaggregation', () => {
       baseDeel()
     ])
 
-    const buffer = await generatePayrollPeriodPdf(period.periodId)
-    const text = await extractText(buffer)
+    const runs = await runsFor()
 
-    // Subtotal labels render literal (without letter-spacing styling).
-    expect(text).toContain('Total Chile dependiente')
-    expect(text).toContain('Total Honorarios')
-    expect(text).toContain('Total Internacional Deel')
+    // Each canonical subtotal label is its own <Text> run.
+    expect(runs).toContain('Total Chile dependiente')
+    expect(runs).toContain('Total Honorarios')
+    expect(runs).toContain('Total Internacional Deel')
 
-    // ANTI-REGRESSION: legacy "Total Chile" mixed subtotal must NOT exist
-    // outside the canonical "Total Chile dependiente" prefix. The PDF
-    // extractor preserves "Total Chile dependiente" — we just assert the
-    // legacy short form does not appear with a CLP/$ amount immediately
-    // after as a standalone token.
-    expect(text).not.toMatch(/Total Chile\s+CLP/)
+    // ANTI-REGRESSION: the legacy mixed "Total Chile" subtotal must not exist as
+    // a standalone label. The canonical form is "Total Chile dependiente".
+    expect(runs).not.toContain('Total Chile')
   })
 
   it('renders new column headers (10 columns canonical)', async () => {
     vi.mocked(getPayrollEntries).mockResolvedValue([baseChileDep()])
-    const buffer = await generatePayrollPeriodPdf(period.periodId)
-    const text = await extractText(buffer)
 
-    // Headers render literal (no uppercase letter-spacing on this style).
-    expect(text).toContain('Desc. previs.')
-    expect(text).toContain('Retención SII')
+    const runs = await runsFor()
+
+    expect(runs).toContain('Desc. previs.')
+    expect(runs).toContain('Retención SII')
   })
 
   it('renders 4-value Régimen badges in entry rows (CL-DEP / HON / DEEL)', async () => {
@@ -252,25 +244,27 @@ describe('PDF PeriodReportDocument — TASK-782 disaggregation', () => {
       baseHonorarios(),
       baseDeel()
     ])
-    const buffer = await generatePayrollPeriodPdf(period.periodId)
-    const text = await extractText(buffer)
 
-    // Badge tokens appear inline in entry rows (no letter-spacing applied
-    // on the data row Régimen cell).
-    expect(text).toMatch(/Valentina HoyosCL-DEP/)
-    expect(text).toMatch(/Humberly Henr.*HON/)
-    expect(text).toMatch(/Daniela FerreiraDEEL/)
+    const runs = await runsFor()
+
+    // Badge codes and their member names each render as their own cell/run.
+    expect(runs).toContain('CL-DEP')
+    expect(runs).toContain('HON')
+    expect(runs).toContain('DEEL')
+    expect(runs).toContain('Valentina Hoyos')
+    expect(runs).toContain('Humberly Henríquez')
+    expect(runs).toContain('Daniela Ferreira')
   })
 
   it('omits a regime subtotal entirely when N=0', async () => {
     vi.mocked(getPayrollEntries).mockResolvedValue([baseChileDep()])
-    const buffer = await generatePayrollPeriodPdf(period.periodId)
-    const text = await extractText(buffer)
 
-    expect(text).toContain('Total Chile dependiente')
-    expect(text).not.toContain('Total Honorarios')
-    expect(text).not.toContain('Total Internacional Deel')
-    expect(text).not.toContain('Total Internacional interno')
+    const runs = await runsFor()
+
+    expect(runs).toContain('Total Chile dependiente')
+    expect(runs).not.toContain('Total Honorarios')
+    expect(runs).not.toContain('Total Internacional Deel')
+    expect(runs).not.toContain('Total Internacional interno')
   })
 
   it('renders summary strip BRUTO/NETO CLP separated from BRUTO USD when mixed', async () => {
@@ -278,16 +272,13 @@ describe('PDF PeriodReportDocument — TASK-782 disaggregation', () => {
       baseChileDep(),
       baseDeel()
     ])
-    const buffer = await generatePayrollPeriodPdf(period.periodId)
-    const text = await extractText(buffer)
 
-    // KPI labels are uppercase + letter-spaced in summary strip; assert
-    // by stripping spaces and looking for the canonical token.
-    const compact = text.replace(/\s+/g, '')
+    const runs = await runsFor()
 
-    expect(compact).toContain('BRUTOCLP')
-    expect(compact).toContain('BRUTOUSD')
-    // ANTI-REGRESSION: legacy mixed "Total Chile" not present in summary
-    expect(compact).not.toContain('TotalChileCLP')
+    expect(runs).toContain('BRUTO CLP')
+    expect(runs).toContain('NETO CLP')
+    expect(runs).toContain('BRUTO USD')
+    // ANTI-REGRESSION: legacy mixed "Total Chile" not present.
+    expect(runs).not.toContain('Total Chile')
   })
 })
