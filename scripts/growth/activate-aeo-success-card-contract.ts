@@ -34,8 +34,8 @@ const SUCCESS_CARD_BEHAVIOR = {
   kind: 'inline_message',
   presentation: 'success_card',
   title: 'Tu informe de visibilidad en IA va en camino',
-  body: 'Recibimos tu solicitud. Estamos preparando tu diagnóstico y te llegará por correo en las próximas 24–48 horas.',
-  supportingNote: '¿No lo ves en 48 horas? Revisa tu spam o escríbenos.',
+  body: 'Recibimos tu solicitud. Estamos preparando tu diagnóstico y te llegará por correo apenas esté listo.',
+  supportingNote: '¿No lo ves en tu bandeja? Revisa tu spam o escríbenos.',
   actions: [
     {
       kind: 'schedule',
