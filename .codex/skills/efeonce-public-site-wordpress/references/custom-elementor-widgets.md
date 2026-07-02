@@ -19,6 +19,18 @@ Do not create a new plugin for each widget. Add:
 
 The shared Elementor category is `Greenhouse`.
 
+## Public-Site Primitives Registry
+
+Reusable public-site modules are canonized in:
+
+```text
+docs/architecture/public-site/PRIMITIVES.md
+```
+
+Use that registry before creating page-local Elementor HTML/CSS for a repeated pattern. It is the public-site counterpart to the private Greenhouse UI Platform primitives; do not treat `docs/architecture/ui-platform/PRIMITIVES.md` or `src/components/greenhouse/primitives/**` as the runtime source for WordPress components.
+
+The current registry includes `ComparisonTable`, `GrowthFormEmbed`, `LogoMarquee`, and the AEO `BrandProofAvatarGroup` pattern. If a landing-scoped pattern is reused outside its first page, graduate it to a widget or governed widget option and update the registry.
+
 ## Widget Types
 
 ### Server-rendered semantic widget

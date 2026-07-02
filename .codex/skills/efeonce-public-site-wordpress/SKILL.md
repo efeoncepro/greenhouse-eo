@@ -56,6 +56,7 @@ Use repo docs as source of truth for long-lived contracts:
 - `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md`
 - `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`
 - `docs/documentation/public-site/wordpress-custom-widgets-react-strategy.md`
+- `docs/architecture/public-site/PRIMITIVES.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
 - `docs/operations/public-site-repository-control-plane-discovery-20260614.md`

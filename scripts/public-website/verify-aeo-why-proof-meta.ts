@@ -19,12 +19,19 @@ type ViewportResult = {
   proofAriaLabel: string | null
   discCount: number
   countDiscText: string
+  firstDiscBox: Box | null
+  previousDiscBox: Box | null
   countDiscBox: Box | null
   countriesBox: Box | null
   proofBox: Box | null
   countDiscBackground: string | null
   countDiscBackgroundImage: string | null
   countDiscColor: string | null
+  countDiscFontSize: string | null
+  countDiscAfterBackgroundImage: string | null
+  countDiscAfterContent: string | null
+  countDiscAfterFontFamily: string | null
+  countDiscSpanHidden: boolean
   countDiscVisible: boolean
   countryTextVisible: boolean
   oldBrandLabelVisible: boolean
@@ -84,9 +91,14 @@ const main = async () => {
       const countDisc = document.querySelector<HTMLElement>('.gh-aeo-why-logo-marquee-wrap .gh-aeo-brand-proof-disc--count')
       const countries = document.querySelector<HTMLElement>('.gh-aeo-why-logo-marquee-wrap .gh-aeo-brand-proof-copy--countries')
       const countDiscStyle = countDisc ? getComputedStyle(countDisc) : null
+      const countDiscAfterStyle = countDisc ? getComputedStyle(countDisc, '::after') : null
+      const countDiscSpan = countDisc?.querySelector<HTMLElement>('span') || null
+      const countDiscSpanStyle = countDiscSpan ? getComputedStyle(countDiscSpan) : null
       const proofText = proof?.innerText.replace(/\s+/g, ' ').trim() || ''
       const bodyText = document.body.innerText.replace(/\s+/g, ' ')
       const countDiscRect = countDisc?.getBoundingClientRect()
+      const firstDiscRect = discs[0]?.getBoundingClientRect()
+      const previousDiscRect = discs[2]?.getBoundingClientRect()
       const countriesRect = countries?.getBoundingClientRect()
       const proofRect = proof?.getBoundingClientRect()
 
@@ -98,6 +110,12 @@ const main = async () => {
         proofAriaLabel: proof?.getAttribute('aria-label') || null,
         discCount: discs.length,
         countDiscText: countDisc?.innerText.trim() || '',
+        firstDiscBox: firstDiscRect
+          ? { x: firstDiscRect.x, y: firstDiscRect.y, width: firstDiscRect.width, height: firstDiscRect.height }
+          : null,
+        previousDiscBox: previousDiscRect
+          ? { x: previousDiscRect.x, y: previousDiscRect.y, width: previousDiscRect.width, height: previousDiscRect.height }
+          : null,
         countDiscBox: countDiscRect
           ? { x: countDiscRect.x, y: countDiscRect.y, width: countDiscRect.width, height: countDiscRect.height }
           : null,
@@ -108,6 +126,20 @@ const main = async () => {
         countDiscBackground: countDiscStyle?.backgroundColor || null,
         countDiscBackgroundImage: countDiscStyle?.backgroundImage || null,
         countDiscColor: countDiscStyle?.color || null,
+        countDiscFontSize: countDiscStyle?.fontSize || null,
+        countDiscAfterBackgroundImage: countDiscAfterStyle?.backgroundImage || null,
+        countDiscAfterContent: countDiscAfterStyle?.content || null,
+        countDiscAfterFontFamily: countDiscAfterStyle?.fontFamily || null,
+        countDiscSpanHidden: Boolean(
+          countDiscSpanStyle &&
+            countDiscSpanStyle.position === 'absolute' &&
+            countDiscSpanStyle.overflow === 'hidden' &&
+            countDiscSpanStyle.whiteSpace === 'nowrap' &&
+            Number.parseFloat(countDiscSpanStyle.width || '0') <= 1 &&
+            (Number.parseFloat(countDiscSpanStyle.height || '0') <= 1 ||
+              countDiscSpanStyle.clipPath === 'inset(50%)' ||
+              countDiscSpanStyle.clip.includes('rect(0px, 0px, 0px, 0px)')),
+        ),
         countDiscVisible: Boolean(countDisc && countDisc.offsetParent !== null),
         countryTextVisible: Boolean(proofText.includes(expectedCountriesText)),
         oldBrandLabelVisible: /\+120\s+marcas/i.test(proofText),
@@ -119,12 +151,12 @@ const main = async () => {
 
     if (metrics.discCount !== 4) failures.push(`Expected 4 avatar discs, found ${metrics.discCount}`)
     if (!metrics.countDiscVisible) failures.push('Count disc is not visible')
-    if (metrics.countDiscText !== '+120') failures.push(`Count disc text is "${metrics.countDiscText}"`)
+    if (metrics.countDiscText !== '+90') failures.push(`Count disc text is "${metrics.countDiscText}"`)
     if (!metrics.countryTextVisible) failures.push('Country list is not visible in the proof pill')
     if (metrics.oldBrandLabelVisible) failures.push('Old visible "+120 marcas" copy is still present')
     if (metrics.oldCountryCopyVisible) failures.push('Old visible "4 países" copy is still present')
 
-    if (!metrics.proofAriaLabel?.includes('más de 120 marcas acompañadas en Chile, Colombia, México y Perú')) {
+    if (!metrics.proofAriaLabel?.includes('más de 90 marcas acompañadas en Chile, Colombia, México y Perú')) {
       failures.push('Accessible proof label does not describe the brand count and countries')
     }
 
@@ -133,6 +165,57 @@ const main = async () => {
       (!metrics.countDiscBackgroundImage || metrics.countDiscBackgroundImage === 'none')
     ) {
       failures.push('Count disc does not have a visible gray fill')
+    }
+
+    if (metrics.countDiscBackgroundImage?.includes('18, 48, 75')) {
+      failures.push('Count disc still uses the old navy fill')
+    }
+
+    if (metrics.countDiscColor !== 'rgb(111, 129, 147)') {
+      failures.push(`Count disc text color is not subdued slate: ${metrics.countDiscColor}`)
+    }
+
+    if (!metrics.countDiscSpanHidden) {
+      failures.push('Count disc DOM text is not visually hidden for the vector micro-count treatment')
+    }
+
+    if (
+      metrics.countDiscAfterContent !== '"+90"' &&
+      metrics.countDiscAfterContent !== "'+90'"
+    ) {
+      failures.push(`Count disc pseudo-element should render +90: ${metrics.countDiscAfterContent}`)
+    }
+
+    if (!metrics.countDiscAfterFontFamily?.includes('DM Sans')) {
+      failures.push(`Count disc pseudo-element should use DM Sans: ${metrics.countDiscAfterFontFamily}`)
+    }
+
+    if (
+      metrics.firstDiscBox &&
+      metrics.countDiscBox &&
+      (Math.abs(metrics.firstDiscBox.width - metrics.countDiscBox.width) > 1 ||
+        Math.abs(metrics.firstDiscBox.height - metrics.countDiscBox.height) > 1)
+    ) {
+      failures.push(
+        `Count disc is not the same size as the avatar discs: ${metrics.countDiscBox.width}x${metrics.countDiscBox.height} vs ${metrics.firstDiscBox.width}x${metrics.firstDiscBox.height}`,
+      )
+    }
+
+    if (metrics.previousDiscBox && metrics.countDiscBox && metrics.firstDiscBox) {
+      const previousOverlapPx = metrics.previousDiscBox.x + metrics.previousDiscBox.width - metrics.countDiscBox.x
+      const minimumOverlapPx = metrics.firstDiscBox.width * 0.32
+
+      if (previousOverlapPx < minimumOverlapPx) {
+        failures.push(
+          `Count disc does not sit behind the previous avatar enough: ${previousOverlapPx.toFixed(2)}px overlap, expected at least ${minimumOverlapPx.toFixed(2)}px`,
+        )
+      }
+    }
+
+    const countFontSize = Number.parseFloat(metrics.countDiscFontSize || '0')
+
+    if (!Number.isFinite(countFontSize) || countFontSize !== 0) {
+      failures.push(`Count disc font-size should be zero when SVG micro-count is active: ${metrics.countDiscFontSize}`)
     }
 
     if (metrics.pageOverflowX !== 0) failures.push(`Page horizontal overflow ${metrics.pageOverflowX}px`)
