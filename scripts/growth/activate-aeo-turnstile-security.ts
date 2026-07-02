@@ -105,6 +105,7 @@ const main = async (): Promise<void> => {
     // Preservar styleVariant (columna de la versión, NO viaja en field_schema) — sin esto el
     // renderer pierde el premium y los selects se vuelven nativos (regresión TASK-1321).
     styleVariant: current.style_variant,
+    copyRefs: current.copy_refs_json,
     fieldSchema: current.field_schema_json,
     successBehavior: current.success_behavior_json,
     consentPolicyVersion: current.consent_policy_version ?? 'efeonce-aeo-diagnostic-consent-v1',
