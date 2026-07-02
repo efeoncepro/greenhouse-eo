@@ -1,3 +1,13 @@
+## Sesion 2026-07-02 — AEO aprendizaje de sesion documentado — Codex — ✅ docs
+
+> **Pedido:** documentar absolutamente todo el aprendizaje de la sesion AEO/Growth Forms en la skill y donde corresponda, y luego commitear.
+>
+> **Cambio docs:** se agrego un ledger operativo `Session Learnings 2026-07-02` en las skills Codex y Claude de `efeonce-public-site-wordpress` para la landing AEO, cubriendo: `Document::save()` + backups, lectura defensiva de `_elementor_data`, diferencia entre IDs internos Elementor y anchors publicos (`_element_id=diagnostico`), CTAs externos a `#diagnostico`, diagnostico visual del marquee por screenshots/bounding boxes/fases, contrato del marquee/proof row, drift de `letter-spacing`, ritmo post-hero por margenes acumulados, pseudo-linea de `service`, FAQ + JSON-LD sincronizados, falsos positivos de overflow por megamenu Ohio y contrato Growth Forms v7. Tambien se reforzo el rail general de mutacion Elementor con estas reglas reutilizables.
+>
+> **Docs tocados:** `.codex/skills/efeonce-public-site-wordpress/references/landings/aeo.md`, `.claude/skills/efeonce-public-site-wordpress/references/landings/aeo.md`, `.codex/skills/efeonce-public-site-wordpress/references/elementor-mutation.md`, `.claude/skills/efeonce-public-site-wordpress/references/elementor-mutation.md`, `docs/documentation/public-site/aeo-landing-elementor.md`, `project_context.md`, `Handoff.md` y `changelog.md`.
+>
+> **Verificacion:** docs-only; no se mutó WordPress ni runtime. Gates docs ejecutados antes de commit: `git diff --check`, `pnpm docs:closure-check` y `pnpm docs:context-check`.
+
 ## Sesion 2026-07-02 — AEO hero CTA hacia formulario — Codex — ✅ live
 
 > **Pedido:** ajustar solo texto del CTA del hero y su microcopy; hacer que todos los CTAs de la landing dirijan a la sección del formulario, excepto el CTA submit del formulario.

@@ -290,6 +290,38 @@ Guardrails:
 - Cards, FAQ y formulario usan una misma gravedad visual: borde hairline, sombra baja y radios consistentes. La conversion mantiene una sola card visible (`.gh-aeo-growth-form-card`) sobre banda de seccion; no restaurar card exterior.
 - La motion post-hero es sutil y opcional: hover de cards solo en `pointer:fine`; con `prefers-reduced-motion: reduce` debe quedar `transitionDuration=0s` y sin transforms.
 
+## Aprendizajes operativos 2026-07-02
+
+Esta sesion dejo reglas durables para futuros cambios en `/aeo-2/`. Aplican antes de tocar WordPress, plugin o CSS page-scoped.
+
+### Mutacion Elementor
+
+- La pagina live es una superficie protegida. Cada mutacion debe usar `Document::save()`, backup de `_elementor_data`, `_elementor_page_settings`, `_thumbnail_id` y hash `heroans`, luego purge de Elementor/Kinsta y verificacion publica.
+- `_elementor_data` puede venir ya como JSON valido. Para scripts PHP, leer primero con `json_decode($raw, true)` y usar `wp_unslash()` solo como fallback; hacerlo siempre al reves puede romper strings HTML/copias.
+- `id`, `data-id` y `.elementor-element-<id>` son identificadores internos de Elementor, no anchors publicos. Para un hash URL real se debe setear `_element_id` y validar con `document.getElementById()`. En AEO el destino publico del formulario es `#diagnostico` sobre el root `convers`.
+- El CSS para nodos Elementor debe considerar como renderiza el frontend. Ejemplo: `servic` renderiza como `.elementor-element-servic`/`data-id`, no necesariamente como `id="servic"`.
+
+### Diagnostico visual
+
+- Para marquees, logos, carruseles y franjas con fades, el DOM no basta. La evidencia valida incluye captura, bounding boxes visuales de logos, distancia entre logos pintados, ancho del set, fase del loop, wrappers vacios, lienzo interno de assets, mask/fades, duracion y verificacion de que 3 sets identicos usan `translate(-33.333%)`.
+- El hueco del marquee de logos no era solo color, SVG blanco ni `gap` CSS. La causa fue composicion/asset: set corto y assets que ocupaban ancho sin aportar presencia visual. El contrato live aprobado usa 7 logos, 3 sets identicos, set mayor al viewport, gap visual moderado, fades laterales, no cards, y reduced-motion sin duplicados.
+- La proof pill de logos debe ser secundaria. Si la sombra, borde, icono o color compite con el resto, bajar intensidad antes de rediseñar la seccion.
+- Los falsos positivos de overflow existen. En AEO, el megamenu Ohio absoluto/inactivo podia inflar `scrollWidth` durante capturas; primero identificar offenders off-screen, luego aplicar guard page-scoped sin romper hover/focus.
+
+### Ritmo y tipografia
+
+- El problema de espacios verticales entre headers y contenido fue acumulacion de margenes: header `margin-bottom` mas primer bloque `margin-top`. No resolver agregando mas padding. Contrato medido: 52px desktop / 28px mobile en secciones normales, 48px / 32px en `service`, 40px / 32px en `why`.
+- La linea central de `service` era `.gh-aeo-service-method::before`; mantenerla desactivada salvo nueva decision visual.
+- El drift de letter-spacing en Ohio/Elementor es real. Verificar computed styles, no solo CSS: los H1/H2 y sus accent spans heredan tracking de display; H3 internos, proof rows, pills, cuerpos, FAQ, labels, inputs, CTAs y trust copy se mantienen en `letter-spacing: normal/0`.
+- Elementor post CSS puede pisar plugin/child theme. Si una correccion tipografica parece existir en el codigo pero no en pantalla, revisar especificidad y orden de carga en navegador desktop/mobile.
+
+### Copy, FAQ y conversion
+
+- El HTML fuente `/Users/jreye/Documents/AEO/landing-aeo-efeonce-mockup.html` es referencia de copy, no reemplazo estructural directo. Si cambia FAQ, actualizar `faqlist` y el nodo `FAQPage` de `schema3` en el mismo save.
+- Todos los CTAs externos al formulario deben llevar a `#diagnostico`; el CTA interno del renderer Growth Forms sigue siendo `button[type="submit"]`.
+- El formulario AEO live es Growth Forms v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad` con `style_variant=diagnostic_premium`, validacion de email corporativo, Turnstile fail-closed y dropdowns premium. WordPress no captura datos.
+- Gate minimo despues de cambios relevantes: `pnpm public-website:verify-aeo-wordpress-guards`, `pnpm public-website:verify-aeo-live-contract`, verificador/capturas de la seccion, desktop + mobile 390, `scrollWidth == clientWidth`, y hash `heroans` intacto si no se edito el hero.
+
 ## Aprendizajes de diseño
 
 1. **Fondo azul tipo Home:** funciona mejor que el fondo blanco para esta landing porque conecta con el lenguaje publico de Efeonce y da mas presencia al modulo de IA.

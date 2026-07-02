@@ -12,6 +12,23 @@ Canonical doc: `docs/documentation/public-site/aeo-landing-elementor.md`.
 - Do not touch Home: `postId=2791`
 - Do not revive old `/aeo`: `postId=250255`, discarded/trash
 
+## Session Learnings 2026-07-02
+
+- Treat this landing as a protected live surface, not a static mockup. Use Elementor `Document::save()`, back up `_elementor_data`, `_elementor_page_settings`, `_thumbnail_id`, and the protected `heroans` hash before live mutations; purge Elementor/Kinsta after saving.
+- Read Elementor data defensively. Try `json_decode($raw, true)` before `wp_unslash($raw)`; some live payloads are already valid JSON and unconditional unslash can corrupt copied HTML strings.
+- Elementor ids are not URL anchors. The public form target is `#diagnostico` because `convers` has `_element_id=diagnostico`; `.elementor-element-convers` and `data-id="convers"` alone do not create `document.getElementById('diagnostico')`.
+- All non-form CTAs that send visitors to the form must link to `#diagnostico`; the Growth Forms submit remains a real `<button type="submit">Empezar con mi diagnóstico →</button>`.
+- Do not validate visual bugs only by DOM or CSS gap. For marquees/logos, measure screenshots: painted logo bounding boxes, visual gaps, set width versus viewport, loop phases, empty wrappers, effective asset canvases, masks/fades, animation duration, and whether `translate(-33.333%)` matches three identical sets.
+- The logo marquee gap issue was composition/asset driven, not simply color, SVG invisibility, or CSS `gap`. The live contract is 7 unique logos, 3 identical sets, set width wider than viewport, subtle fades, no cards, reduced-motion without animation/duplicates, and proof row as a secondary caption.
+- Proof row polish matters: it should feel like evidence, not a CTA. Current treatment is low-shadow pill, color logo discs for Berel/Sky/Bresler, `+120 marcas - 4 países`, and a flat inline globe in slate, not a teal circular icon or dashed mono box.
+- Title tracking drift is a recurring Ohio/Elementor problem. Display tracking is allowed only on H1/H2 and their accent spans (`herotit`, `levelsh`, `serviceh`, `whyhead`); internal H3, proof labels, pills, body, inputs, CTAs, and FAQ copy must compute normal/0 tracking. Verify computed style desktop and mobile, not static CSS.
+- Post-hero spacing bugs came from stacked margins. Do not add a header `margin-bottom` plus first-content `margin-top`; current measured rhythm is 52px/28px normal, 48px/32px service, and 40px/32px why.
+- The service line was a real pseudo-element (`.gh-aeo-service-method::before`), not a screenshot artifact. Keep it disabled unless the visual direction explicitly changes.
+- FAQ copy and JSON-LD must move together. The source reference is `/Users/jreye/Documents/AEO/landing-aeo-efeonce-mockup.html`; live FAQ currently has 14 items and `schema3` must keep the same `FAQPage` questions.
+- Ohio inactive mega menus can create false page `scrollWidth` during screenshots. The AEO page has a scoped `gh-aeo-page-menu-overflow-guard-v1`; if overflow appears, inspect off-screen offenders before blaming the active section.
+- Growth Forms AEO is renderer v7 (`fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`) with `style_variant=diagnostic_premium`, corporate email verification, Turnstile fail-closed, premium listboxes, and no WordPress data capture. Do not restore the temporary bridge unless explicitly rolling back.
+- Minimum verification after meaningful live change: `pnpm public-website:verify-aeo-wordpress-guards`, `pnpm public-website:verify-aeo-live-contract`, section-specific verifier/captures, desktop plus mobile 390, `scrollWidth == clientWidth`, and `heroans` unchanged unless the hero was intentionally edited.
+
 ## Section Map
 
 Root sections:
