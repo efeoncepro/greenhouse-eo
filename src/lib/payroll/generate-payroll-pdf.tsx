@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { Fragment } from 'react'
+import { Fragment, type ReactElement } from 'react'
 
 import { Document, Image, Page, StyleSheet, Text, View, renderToStream } from '@react-pdf/renderer'
 
@@ -930,7 +930,13 @@ const ReceiptDocument = ({
 
 // ─── Public API ──────────────────────────────────────────────────
 
-export const generatePayrollPeriodPdf = async (periodId: string): Promise<Buffer> => {
+/**
+ * SSOT for the period-report PDF: assembles the source data and returns the
+ * `<Document>` React element. Production renders it to a Buffer via
+ * `generatePayrollPeriodPdf`; tests inspect the element tree directly (no
+ * binary re-parse). See `src/test/react-pdf-text.ts`.
+ */
+export const buildPayrollPeriodReportElement = async (periodId: string): Promise<ReactElement> => {
   const period = await getPayrollPeriod(periodId)
 
   if (!period) {
@@ -946,7 +952,12 @@ export const generatePayrollPeriodPdf = async (periodId: string): Promise<Buffer
     getOperatingEntityIdentity()
   ])
 
-  const stream = await renderToStream(<PeriodReportDocument period={period} entries={entries} operatingEntity={operatingEntity} />)
+  return <PeriodReportDocument period={period} entries={entries} operatingEntity={operatingEntity} />
+}
+
+export const generatePayrollPeriodPdf = async (periodId: string): Promise<Buffer> => {
+  const element = await buildPayrollPeriodReportElement(periodId)
+  const stream = await renderToStream(element as unknown as Parameters<typeof renderToStream>[0])
 
   const chunks: Uint8Array[] = []
 

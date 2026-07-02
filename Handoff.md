@@ -1,3 +1,31 @@
+## Sesion 2026-07-02 — Public Site primitives registry — Codex — ✅ docs
+
+> **Pedido:** canonizar el componente/patrón del proof row AEO como alternativa reusable para sitio público, separada del docs de primitives del portal privado Greenhouse.
+>
+> **Cambio docs:** se creó `docs/architecture/public-site/PRIMITIVES.md` con el registro canónico de primitives públicas para `efeoncepro.com` y `docs/architecture/public-site/README.md` como router. El registro separa explícitamente runtime público WordPress/Elementor (`efeonce-public-site-runtime`, plugin `eo-elementor-widgets`) de `src/components/greenhouse/primitives/**` y `docs/architecture/ui-platform/PRIMITIVES.md`.
+>
+> **Registry inicial:** `ComparisonTable` (`canonical/widget`), `GrowthFormEmbed` (`canonical/host-adapter`), `LogoMarquee` (`canonical/widget`) y `BrandProofAvatarGroup` (`canonical/pattern`). El proof AEO queda gobernado como pattern público: Berel/Sky/Bresler solapados, count `+90` frosted detrás de Bresler, `::after` en DM Sans, countries visibles `Chile · Colombia · México · Perú`, sin `marcas` visible ni `4 países`.
+>
+> **Skills/docs sincronizadas:** `.codex/.claude` `efeonce-public-site-wordpress/SKILL.md` agregan el registry como doc canónico; `references/custom-elementor-widgets.md` apunta al registry antes de crear HTML/CSS landing-scoped; `references/landings/aeo.md`, `docs/documentation/public-site/wordpress-custom-widgets-react-strategy.md`, `docs/documentation/public-site/aeo-landing-elementor.md`, `project_context.md` y `changelog.md` quedan enlazados.
+>
+> **Pendiente futuro:** si `BrandProofAvatarGroup` se reutiliza fuera de AEO, graduarlo a widget `greenhouse_brand_proof_group` o a opción gobernada dentro de `greenhouse_logo_marquee`, con controles/manifest para `brands[]`, `countLabel`, `countAccessibleLabel`, `markets[]`, density y variant. No hubo mutación de WordPress ni deploy en esta canonización docs-only.
+
+## Sesion 2026-07-02 — AEO proof row `+90` count solapado — Codex — ✅ live
+
+> **Pedido:** corregir el disco count usando el patrón de avatar/count de Figma como referencia: no `+120` largo pegado al borde, sino un count más corto (`+90`) y solape real del disco Bresler sobre el count.
+>
+> **Cambio live:** `whylogometa` quedó sincronizado a `+90` en DOM/aria (`más de 90 marcas acompañadas en Chile, Colombia, México y Perú`) con backup Elementor `_gh_backup_before_aeo_why_proof_count_90_20260702T143756Z`. En `wp-content/plugins/eo-elementor-widgets/assets/css/logo-marquee.css`, el cuarto disco vuelve a quedar detrás de Bresler (`z-index:0`, margen negativo fuerte) y el count se renderiza como `::after` en DM Sans, desplazado dentro de la porción visible del disco para no tocar el borde derecho.
+>
+> **Rollout/verificación:** deploy plugin con backup remoto `/tmp/greenhouse-eo-logo-marquee-widget-20260702T144603Z.tar.gz`, OPcache reset y Kinsta purgada. Evidencia focal `.captures/aeo-why-proof-meta-2026-07-02T14-46-10-708Z/`: desktop/mobile con `+90`, computed `::after font-family="DM Sans"`, `pageOverflowX=0`, `proofOverflowX=0`, 4 discos, count y aria sincronizados, sin `marcas` visible ni `4 países`. Ajuste final: `font-weight:580` y slate suavizado para bajar protagonismo. Gates verdes: `pnpm public-website:verify-aeo-why-proof-meta`, `pnpm public-website:verify-aeo-wordpress-guards`, `pnpm public-website:verify-aeo-live-contract`.
+
+## Sesion 2026-07-02 — AEO proof row `+120` microcount — Codex — ✅ live
+
+> **Pedido:** corregir el disco `+120` del proof row porque el `120` seguía grande y pegado al borde derecho.
+>
+> **Cambio live:** se ajustó solo `wp-content/plugins/eo-elementor-widgets/assets/css/logo-marquee.css` del plugin `eo-elementor-widgets`: el cuarto disco del `TeamAvatarGroup` queda claro/frosted, con texto slate micro, `font-size: 0.32rem !important` desktop y `0.28rem !important` mobile, y el span se centra dentro de la porción visible del disco solapado. Se preserva el solape con Berel/Sky/Bresler y el copy visible `Chile · Colombia · México · Perú`.
+>
+> **Rollout/verificación:** deploy `pnpm exec tsx tmp/deploy_eo_logo_marquee_widget.ts`, backup remoto `/tmp/greenhouse-eo-logo-marquee-widget-20260702T135740Z.tar.gz`, OPcache reset y Kinsta purgada. Evidencia focal `.captures/aeo-why-proof-meta-2026-07-02T13-57-59-046Z/`: desktop `countDiscFontSize=5.12px`, mobile `4.48px`, `pageOverflowX=0`, `proofOverflowX=0`, sin `+120 marcas` ni `4 países`. Gates verdes: `pnpm public-website:verify-aeo-why-proof-meta`, `pnpm public-website:verify-aeo-wordpress-guards`, `pnpm public-website:verify-aeo-live-contract`.
+
 ## Sesion 2026-07-02 — TASK-1318 Growth Forms full name destination split — Codex — 🚧 creada + ejecución inmediata
 
 > **Pedido:** crear task para cambiar el campo `Nombre` del formulario AEO a `Nombre completo` y resolver backend/destinos para HubSpot/Greenhouse como capacidad reusable de Growth Forms, pasando de inmediato a ejecutarla.

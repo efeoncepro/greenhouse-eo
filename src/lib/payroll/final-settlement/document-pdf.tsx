@@ -2,7 +2,7 @@ import 'server-only'
 
 import { createHash } from 'node:crypto'
 
-import { createElement } from 'react'
+import { createElement, type ReactElement } from 'react'
 
 import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from '@react-pdf/renderer'
 
@@ -1257,16 +1257,28 @@ const FinalSettlementPdfDocument = ({
   )
 }
 
+/**
+ * SSOT for the finiquito PDF: returns the `<Document>` React element. Production
+ * renders it to a Buffer via `renderFinalSettlementDocumentPdf`; tests inspect
+ * the element tree directly (no binary re-parse). Font registration is a render
+ * concern and stays out of the builder. See `src/test/react-pdf-text.ts`.
+ */
+export const buildFinalSettlementDocumentElement = (
+  snapshot: FinalSettlementDocumentSnapshot,
+  options: { documentStatus?: string | null } = {}
+): ReactElement =>
+  createElement(FinalSettlementPdfDocument, {
+    snapshot,
+    documentStatus: options.documentStatus ?? null
+  })
+
 export const renderFinalSettlementDocumentPdf = async (
   snapshot: FinalSettlementDocumentSnapshot,
   options: { documentStatus?: string | null } = {}
 ): Promise<Buffer> => {
   await ensurePdfFontsRegistered()
 
-  const element = createElement(FinalSettlementPdfDocument, {
-    snapshot,
-    documentStatus: options.documentStatus ?? null
-  })
+  const element = buildFinalSettlementDocumentElement(snapshot, options)
 
   return renderToBuffer(element as unknown as Parameters<typeof renderToBuffer>[0])
 }

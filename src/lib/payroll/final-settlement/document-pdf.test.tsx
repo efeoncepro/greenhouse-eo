@@ -2,19 +2,9 @@ import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
-import { renderFinalSettlementDocumentPdf } from './document-pdf'
+import { extractReactPdfText } from '@/test/react-pdf-text'
+import { buildFinalSettlementDocumentElement } from './document-pdf'
 import type { FinalSettlementDocumentSnapshot } from './document-types'
-
-const extractText = async (buffer: Buffer): Promise<string> => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pdfParse = require('pdf-parse/lib/pdf-parse.js') as (
-    buf: Buffer
-  ) => Promise<{ text: string }>
-
-  const result = await pdfParse(buffer)
-
-  return result.text
-}
 
 const snapshot: FinalSettlementDocumentSnapshot = {
   schemaVersion: 1,
@@ -128,72 +118,73 @@ const snapshot: FinalSettlementDocumentSnapshot = {
   }
 }
 
+// Extract the finiquito document's text runs from the <Document> element (SSOT
+// the production renderer also consumes), without rendering to a binary PDF.
+// `normalized` joins every <Text> run with a single space, so cross-node phrase
+// assertions read the same as the previous pdf-parse text — but deterministic
+// in CI. `runs` preserves per-node boundaries for exact label checks.
+const extract = (snap: FinalSettlementDocumentSnapshot): { runs: string[]; normalized: string } => {
+  const { runs, normalized } = extractReactPdfText(buildFinalSettlementDocumentElement(snap))
+
+  return { runs, normalized }
+}
+
 describe('renderFinalSettlementDocumentPdf', () => {
-  it('renders the approved finiquito mockup landmarks and policy columns', async () => {
-    const buffer = await renderFinalSettlementDocumentPdf(snapshot)
+  it('renders the approved finiquito mockup landmarks and policy columns', () => {
+    const { runs, normalized } = extract(snapshot)
+    const lower = normalized.toLocaleLowerCase('es-CL')
 
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse/lib/pdf-parse.js') as (
-      buf: Buffer
-    ) => Promise<{ text: string; numpages: number }>
+    // Document produced text (replaces the old "PDF parseable / numpages>=1" check;
+    // the element tree carries the real content, not a page count).
+    expect(runs.length).toBeGreaterThan(0)
 
-    const { text, numpages } = await pdfParse(buffer)
-
-    // TASK-862 Slice D — pre-Slice asseraba numpages===1; ahora el documento puede
-    // ocupar 1-2 paginas por las clausulas narrativas PRIMERO-QUINTO + Ley 21.389 banner
-    // + reserva de derechos + 3-col signatures. Relajamos a >=1 preservando el spirit
-    // del check ("el render produce un PDF parseable", no "exactamente 1 pagina").
-    expect(numpages).toBeGreaterThanOrEqual(1)
-    expect(text.replace(/\s+/g, ' ')).toContain('Finiquito de contrato de trabajo')
-    expect(text).toContain('Listo para firma')
-    expect(text).not.toContain('Requiere revisión')
+    expect(normalized).toContain('Finiquito de contrato de trabajo')
+    expect(normalized).toContain('Listo para firma')
+    expect(normalized).not.toContain('Requiere revisión')
     // TASK-863 V1.1 — metadata técnica movida del header top al footer auditoría.
     // El prefix "Documento" se quitó; el ID sigue presente en el footer.
-    expect(text).toMatch(/GH-FIN-2026-[A-F0-9]{8}/)
-    expect(text).toContain('Snapshot fs-v1')
-    expect(text).toContain('Tratamiento')
-    expect(text).toContain('Respaldo')
-    expect(text).toContain('Feriado proporcional')
-    const normalizedText = text.replace(/\s+/g, ' ')
-    const lowerText = normalizedText.toLocaleLowerCase('es-CL')
+    expect(normalized).toMatch(/GH-FIN-2026-[A-F0-9]{8}/)
+    expect(normalized).toContain('Snapshot fs-v1')
+    expect(normalized).toContain('Tratamiento')
+    expect(normalized).toContain('Respaldo')
+    expect(normalized).toContain('Feriado proporcional')
 
-    expect(normalizedText).toContain('Compensación por feriado proporcional')
-    expect(normalizedText).toContain('Base de cálculo')
-    expect(lowerText).toContain('días hábiles a indemnizar')
-    expect(lowerText).toContain('días corridos compensados')
-    expect(lowerText).toContain('base diaria')
-    expect(normalizedText).toContain('Saldo de vacaciones + regla DT art. 73')
-    expect(normalizedText).toContain('Fuente: saldo de vacaciones registrado y regla DT de feriado proporcional')
-    expect(text).toContain('No tributable')
-    expect(text).toContain('No imponible')
-    expect(text).toContain('Relación y causal')
-    expect(text).toContain('30-04-2026')
-    expect(text).toContain('Chile dependiente')
-    expect(text).toContain('nómina interna')
-    expect(text).toContain('Constancia para firma y ratificación')
-    expect(text).not.toContain('internal payroll')
-    expect(text).not.toContain('Policy')
-    expect(text).not.toContain('Evidencia estructurada')
-    expect(text).not.toContain('Sin descuentos previsionales pendientes')
-    expect(text).not.toContain('Monto líquido calculado en esta versión')
-    expect(text).toContain('Documento confidencial')
-    expect(text.toLocaleLowerCase('es-CL')).toContain('líquido / pago neto')
+    expect(normalized).toContain('Compensación por feriado proporcional')
+    expect(normalized).toContain('Base de cálculo')
+    expect(lower).toContain('días hábiles a indemnizar')
+    expect(lower).toContain('días corridos compensados')
+    expect(lower).toContain('base diaria')
+    expect(normalized).toContain('Saldo de vacaciones + regla DT art. 73')
+    expect(normalized).toContain('Fuente: saldo de vacaciones registrado y regla DT de feriado proporcional')
+    expect(normalized).toContain('No tributable')
+    expect(normalized).toContain('No imponible')
+    expect(normalized).toContain('Relación y causal')
+    expect(normalized).toContain('30-04-2026')
+    expect(normalized).toContain('Chile dependiente')
+    expect(normalized).toContain('nómina interna')
+    expect(normalized).toContain('Constancia para firma y ratificación')
+    expect(normalized).not.toContain('internal payroll')
+    expect(normalized).not.toContain('Policy')
+    expect(normalized).not.toContain('Evidencia estructurada')
+    expect(normalized).not.toContain('Sin descuentos previsionales pendientes')
+    expect(normalized).not.toContain('Monto líquido calculado en esta versión')
+    expect(normalized).toContain('Documento confidencial')
+    expect(lower).toContain('líquido / pago neto')
 
-    // TASK-862 Slice D — nuevas assertions: clausulas narrativas + Ley 21.389 + ministro de fe.
-    expect(normalizedText).toContain('ARTÍCULO 159 N°2 DEL CÓDIGO DEL TRABAJO')
-    expect(normalizedText).toContain('amplio, total y definitivo finiquito')
-    expect(normalizedText).toContain('artículo 162 inciso 5°')
-    expect(text).toContain('Ministro de fe')
-    expect(text).toContain('Pendiente de ratificación')
-    // Huella renderiza dentro de la caja huellaBox; pdf-parse no siempre captura
-    // strings dentro de boxes pequenos. TASK-863 V1.1 — footer consolidado: el
-    // brand "Greenhouse · greenhouse.efeoncepro.com" reemplaza "Documento generado
-    // con Greenhouse" del V1.0.
-    expect(text).toContain('Greenhouse · greenhouse.efeoncepro.com')
+    // TASK-862 Slice D — clausulas narrativas + Ley 21.389 + ministro de fe.
+    expect(normalized).toContain('ARTÍCULO 159 N°2 DEL CÓDIGO DEL TRABAJO')
+    expect(normalized).toContain('amplio, total y definitivo finiquito')
+    expect(normalized).toContain('artículo 162 inciso 5°')
+    expect(normalized).toContain('Ministro de fe')
+    expect(normalized).toContain('Pendiente de ratificación')
+    // TASK-863 V1.1 — footer consolidado: brand "Greenhouse · greenhouse.efeoncepro.com".
+    // El walker captura el run aunque viva dentro de una caja pequeña (a diferencia
+    // de pdf-parse, que a veces lo omitía).
+    expect(normalized).toContain('Greenhouse · greenhouse.efeoncepro.com')
   })
 
-  it('uses document readiness instead of settlement warnings for the visible issuance state', async () => {
-    const buffer = await renderFinalSettlementDocumentPdf({
+  it('uses document readiness instead of settlement warnings for the visible issuance state', () => {
+    const { normalized } = extract({
       ...snapshot,
       readiness: {
         status: 'needs_review',
@@ -214,10 +205,8 @@ describe('renderFinalSettlementDocumentPdf', () => {
       }
     })
 
-    const text = await extractText(buffer)
-
-    expect(text).toContain('Listo para firma')
-    expect(text).not.toContain('Requiere revisión')
-    expect(text).not.toContain('Readiness de emisión')
+    expect(normalized).toContain('Listo para firma')
+    expect(normalized).not.toContain('Requiere revisión')
+    expect(normalized).not.toContain('Readiness de emisión')
   })
 })

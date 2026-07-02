@@ -8,7 +8,7 @@
 > **Runtime observado:** WordPress en Kinsta, Ohio `3.7.0`, `ohio-child`, Elementor `4.1.3`, Elementor Pro `4.1.1`, Ohio Extra `3.7.0`
 > **Repositorio runtime:** `efeoncepro/efeonce-public-site-runtime`
 > **Bridge runtime repo actual:** `wp-content/plugins/greenhouse-wp-bridge` v0.3.1 foundation con endpoints read-only Elementor/Gutenberg/Ohio, contrato HMAC draft-only y provisioning WP-CLI sin tocar `wp-config.php`. Las rutas draft/private firmadas quedan default-disabled hasta provisionar shared secret, flag de writes, staging/preview y permisos minimos.
-> **Relacionados:** [Inventario Ohio + Elementor](./wordpress-ohio-elementor-widget-inventory.md), [Playbook de landings Ohio + Elementor](../../manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md), [Landing Control Plane](../../architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md)
+> **Relacionados:** [Inventario Ohio + Elementor](./wordpress-ohio-elementor-widget-inventory.md), [Playbook de landings Ohio + Elementor](../../manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md), [Landing Control Plane](../../architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md), [Public Site Primitives Registry](../../architecture/public-site/PRIMITIVES.md)
 
 ## Objetivo
 
@@ -45,24 +45,26 @@ Lectura operativa: WordPress expone React mediante `@wordpress/element` y usa Re
 
 ## Decision operativa
 
+### Primitives publicas del sitio
+
+Los componentes reutilizables del sitio publico se canonizan en `docs/architecture/public-site/PRIMITIVES.md`. Ese registro es hermano, no extension, de `docs/architecture/ui-platform/PRIMITIVES.md`: las primitives del portal privado pueden servir como referencia de patron, pero el runtime publico debe declarar su propio owner WordPress/Elementor, selectors, a11y, responsive, evidencia visual y rail de deploy/cache.
+
+Estado vigente:
+
+- `ComparisonTable`, `LogoMarquee` y `GrowthFormEmbed` son primitives publicas con runtime owner.
+- `BrandProofAvatarGroup` queda canonizado como `landing-pattern` en AEO mientras no se reutilice fuera de `/aeo-2/`; si aparece en otra landing, debe graduar a widget `greenhouse_brand_proof_group` o a una opcion gobernada de `greenhouse_logo_marquee`.
+
 ### Si necesitamos un modulo visual reutilizable en las landings actuales
 
 Usar **widget custom de Elementor en plugin propio**.
 
-Ruta recomendada. El skeleton ya existe en el repo runtime, pero hoy solo expone inspeccion read-only; los widgets custom son una etapa posterior:
-
-```text
-wp-content/plugins/greenhouse-wp-bridge/
-  includes/elementor-widgets/
-```
-
-Alternativa si se separa el bridge de UI:
+Ruta vigente:
 
 ```text
 wp-content/plugins/eo-elementor-widgets/
 ```
 
-El plugin debe versionarse en `efeoncepro/efeonce-public-site-runtime`, desplegarse por el rail GitOps/Kinsta y ser gobernado por Greenhouse como source of truth operativo. No debe implementarse dentro de `wp-content/themes/ohio/` ni depender de editar archivos del parent theme.
+El plugin debe versionarse en `efeoncepro/efeonce-public-site-runtime`, desplegarse por el rail GitOps/Kinsta y ser gobernado por Greenhouse como source of truth operativo. No debe implementarse dentro de `wp-content/themes/ohio/`, dentro del parent theme, ni como plugin nuevo por cada widget.
 
 ### Si necesitamos una experiencia editorial/admin rica
 
@@ -186,16 +188,14 @@ El codigo debe vivir en el repo runtime:
 /Users/jreye/Documents/efeonce-public-site-runtime
 ```
 
-Ruta sugerida:
+Ruta vigente para widgets publicos:
 
 ```text
-wp-content/plugins/greenhouse-wp-bridge/
-  greenhouse-wp-bridge.php
+wp-content/plugins/eo-elementor-widgets/
+  eo-elementor-widgets.php
   includes/
-    class-greenhouse-elementor-widgets.php
-    elementor-widgets/
-      class-greenhouse-partner-proof-widget.php
-      class-greenhouse-hubspot-form-widget.php
+    widgets/
+      class-eo-<nombre>-widget.php
   assets/
     css/
     js/
