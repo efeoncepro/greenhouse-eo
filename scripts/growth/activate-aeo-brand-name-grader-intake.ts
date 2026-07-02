@@ -31,6 +31,7 @@ import {
   listDestinationsForVersion,
 } from '@/lib/growth/forms/store'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
+import { preserveFormVersionFields } from '../lib/preserve-form-version-fields'
 
 loadGreenhouseToolEnv()
 applyGreenhousePostgresProfile('ops')
@@ -179,23 +180,10 @@ const main = async (): Promise<void> => {
     formKind: definition.form_kind as 'diagnostic_intake',
     purpose: definition.purpose,
     riskProfile: (definition.risk_profile as 'low' | 'medium' | 'high' | undefined) ?? 'low',
-    locale: current.locale,
-    // ⚠️ CRÍTICO: preservar el styleVariant (`diagnostic_premium`). Sin esto el renderer cae al
-    // estilo base y los selects premium se vuelven planos/nativos (regresión live 2026-07-02).
-    // Fallback a `diagnostic_premium` porque una versión previa lo pudo perder (justo el bug que
-    // esto arregla) → si el current publicado ya no lo trae, lo restauramos.
+    ...preserveFormVersionFields(current),
     styleVariant: current.style_variant ?? AEO_STYLE_VARIANT,
     fieldSchema: nextFields,
-    validationSchema: current.validation_schema_json,
     copyRefs: nextCopy,
-    uiPolicy: current.ui_policy_json,
-    successBehavior: current.success_behavior_json,
-    consentPolicyVersion: current.consent_policy_version ?? 'efeonce-aeo-diagnostic-consent-v1',
-    dataClassification: current.data_classification_json,
-    destinationPolicy: current.destination_policy_json,
-    analyticsPolicy: current.analytics_policy_json,
-    retentionPolicy: current.retention_policy_json,
-    commercialHandoffPolicy: current.commercial_handoff_policy_json,
     createdBy: 'aeo-brand-name-grader-intake-activation',
   })
 

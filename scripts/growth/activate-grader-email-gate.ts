@@ -27,6 +27,7 @@ import 'server-only'
 import { authorDraftForm, deprecateForm, publishForm } from '@/lib/growth/forms/commands'
 import { resolveEmailPolicy } from '@/lib/growth/forms/contracts'
 import { getPublishedVersionBySlug } from '@/lib/growth/forms/store'
+import { preserveFormVersionFields } from '../lib/preserve-form-version-fields'
 
 const APPLY = process.argv.includes('--apply')
 
@@ -100,18 +101,8 @@ const main = async (): Promise<void> => {
     name: 'AI Visibility Grader',
     formKind: 'diagnostic_intake',
     purpose: 'Lead magnet público: captura marca + email (con consent) y dispara un diagnóstico de visibilidad en IA.',
-    locale: current.locale,
-    // Preservar styleVariant (columna de la versión, NO viaja en field_schema) — sin esto el
-    // renderer pierde el premium y los selects se vuelven nativos (regresión TASK-1321).
-    styleVariant: current.style_variant,
-    copyRefs: current.copy_refs_json,
-    uiPolicy: current.ui_policy_json,
-    dataClassification: current.data_classification_json,
-    analyticsPolicy: current.analytics_policy_json,
-    commercialHandoffPolicy: current.commercial_handoff_policy_json,
+    ...preserveFormVersionFields(current),
     fieldSchema: current.field_schema_json,
-    successBehavior: current.success_behavior_json,
-    consentPolicyVersion: current.consent_policy_version ?? 'ai-visibility-grader-consent-v1',
     validationSchema: VALIDATION_SCHEMA,
     destinationPolicy: DESTINATION_POLICY,
     retentionPolicy: RETENTION_POLICY,

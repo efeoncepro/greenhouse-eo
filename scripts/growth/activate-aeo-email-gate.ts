@@ -14,6 +14,7 @@ import 'server-only'
 import { addDestination, authorDraftForm, deprecateForm, publishForm } from '@/lib/growth/forms/commands'
 import { resolveEmailPolicy } from '@/lib/growth/forms/contracts'
 import { getFormDefinitionById, getPublishedVersionBySlug, listDestinationsForVersion } from '@/lib/growth/forms/store'
+import { preserveFormVersionFields } from '../lib/preserve-form-version-fields'
 
 const APPLY = process.argv.includes('--apply')
 
@@ -84,21 +85,9 @@ const main = async (): Promise<void> => {
       definition?.purpose ??
       'Formulario publico de diagnostico AEO para capturar leads y derivarlos al motor Growth Forms.',
     riskProfile: (definition?.risk_profile as 'low' | 'medium' | 'high' | undefined) ?? 'low',
-    locale: current.locale,
-    // Preservar styleVariant (columna de la versión, NO viaja en field_schema) — sin esto el
-    // renderer pierde el premium y los selects se vuelven nativos (regresión TASK-1321).
-    styleVariant: current.style_variant,
-    copyRefs: current.copy_refs_json,
+    ...preserveFormVersionFields(current),
     fieldSchema: fields,
-    successBehavior: current.success_behavior_json,
-    consentPolicyVersion: current.consent_policy_version ?? 'efeonce-aeo-diagnostic-consent-v1',
     validationSchema: VALIDATION_SCHEMA,
-    uiPolicy: current.ui_policy_json,
-    dataClassification: current.data_classification_json,
-    destinationPolicy: current.destination_policy_json,
-    analyticsPolicy: current.analytics_policy_json,
-    retentionPolicy: current.retention_policy_json,
-    commercialHandoffPolicy: current.commercial_handoff_policy_json,
     createdBy: 'aeo-email-gate-activation',
   })
 

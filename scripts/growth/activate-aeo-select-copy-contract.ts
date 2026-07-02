@@ -26,6 +26,7 @@ import {
   listHostSurfaces,
 } from '@/lib/growth/forms/store'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
+import { preserveFormVersionFields } from '../lib/preserve-form-version-fields'
 
 loadGreenhouseToolEnv()
 applyGreenhousePostgresProfile('ops')
@@ -151,21 +152,8 @@ const main = async (): Promise<void> => {
     formKind: definition.form_kind as 'diagnostic_intake',
     purpose: definition.purpose,
     riskProfile: (definition.risk_profile as 'low' | 'medium' | 'high' | undefined) ?? 'low',
-    locale: current.locale,
-    // Preservar styleVariant (columna de la versión, NO viaja en field_schema) — sin esto el
-    // renderer pierde el premium y los selects se vuelven nativos (regresión TASK-1321).
-    styleVariant: current.style_variant,
+    ...preserveFormVersionFields(current),
     fieldSchema: nextFields,
-    validationSchema: current.validation_schema_json,
-    copyRefs: current.copy_refs_json,
-    uiPolicy: current.ui_policy_json,
-    successBehavior: current.success_behavior_json,
-    consentPolicyVersion: current.consent_policy_version ?? 'efeonce-aeo-diagnostic-consent-v1',
-    dataClassification: current.data_classification_json,
-    destinationPolicy: current.destination_policy_json,
-    analyticsPolicy: current.analytics_policy_json,
-    retentionPolicy: current.retention_policy_json,
-    commercialHandoffPolicy: current.commercial_handoff_policy_json,
     createdBy: 'aeo-select-copy-contract-activation',
   })
 
