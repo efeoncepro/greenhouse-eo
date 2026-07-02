@@ -17,16 +17,18 @@
 - Uncertainty reduced: the user sees that the same card accepted the submission and changed state, instead of a small message appearing below the form.
 - User decision supported: read next steps and choose an optional follow-up action.
 - Non-goals: cinematic animation, scroll effects, GSAP/Lottie, confetti, decorative spectacle, or any motion that hides content until animation completes.
+- Delta 2026-07-02 "wow sobrio": the renderer may use a layered CSS-only confirmation sequence (card settle, halo/ring, check mark, content rise, CTA hover lift) as long as content and CTA are available immediately and reduced-motion removes delays.
 
 ## Motion Inventory
 
 | Element | Trigger | Motion / feedback | Primitive | Required? |
 |---|---|---|---|---|
 | Form body | Submit accepted | Fade/translate out or immediate replace before success render | CSS | Optional |
-| Success card | Accepted render | Short fade/translate in using opacity + transform only | CSS | Yes, unless reduced motion |
-| Status mark | Success card mount | Subtle scale/opacity settle | CSS | Optional |
-| Reward block | Success card mount with reward | No separate entrance unless it helps scan order | CSS | Optional |
-| CTA row | Success card mount | No delayed animation; visible immediately with success copy | CSS | Required to be immediate |
+| Success card | Accepted render | Short opacity/translate/scale settle with scoped highlight line and aura | CSS | Yes, unless reduced motion |
+| Status mark | Success card mount | Check mark lands with one subtle ring pulse | CSS | Yes |
+| Content stack | Success card mount | Title/body/steps/reward/support rise by layers within the transition budget | CSS | Optional |
+| Reward block | Success card mount with reward | Static card with subtle accent rail; no hidden/delayed action | CSS | Optional |
+| CTA row | Success card mount | Visible immediately; hover lifts by 1px and press returns to rest | CSS | Required to be immediate |
 
 ## Microinteraction States
 
@@ -40,9 +42,11 @@
 
 | Transition | From | To | Timing / easing token | Behavior | Reduced-motion fallback |
 |---|---|---|---|---|---|
-| accepted-to-success | submitted form | success card | 160-220ms, theme/renderer ease-out token if available | Replace content; success card becomes focus target immediately after DOM paint | immediate replace, no transform, focus still moves |
-| mark-settle | hidden/initial status mark | visible status mark | 120-180ms ease-out | opacity + scale only | static mark |
-| reward-reveal | no reward block | reward block visible | no delay or <=80ms | reward appears with card; no stagger that delays action | static block |
+| accepted-to-success | submitted form | success card | ~360ms cubic-bezier(0.16, 1, 0.3, 1) | Replace content; success card becomes focus target immediately after DOM paint | immediate replace, no transform, focus still moves |
+| card-highlight | inactive surface | success surface | <=720ms, decorative only | aura/line confirms state without carrying meaning | hidden/static |
+| mark-settle | hidden/initial status mark | visible status mark | <=440ms + one ring pulse | opacity + scale only; check visible as state marker | static mark |
+| content-rise | hidden/initial content | visible content | <=360ms, small stagger inside first paint moment | preserves scan order; CTA not gated behind long delay | static content |
+| reward-reveal | no reward block | reward block visible | no separate delay | reward appears with card; no stagger that delays action | static block |
 
 ## Primitive & Token Mapping
 
@@ -60,7 +64,7 @@
 - Detection: CSS `@media (prefers-reduced-motion: reduce)`.
 - Replacement behavior: render success card immediately with no transform or delayed entrance.
 - Meaning preserved: title/body/next steps/action remain identical.
-- Animations removed: form exit, card entrance, status mark settle.
+- Animations removed: form exit, card entrance, aura/line, status mark settle, ring pulse, content stagger and CTA hover transition delay.
 - Animations retained: focus ring and static state styling only.
 
 ## Accessibility & Feedback
@@ -95,7 +99,8 @@
 
 ## Design Decision Log
 
-- Decision: use a small CSS transition inside the renderer, not a new animation dependency.
+- Decision: use a CSS-only "premium confirmation" sequence inside the renderer, not a new animation dependency.
+- Delta 2026-07-02: upgrade V1 from simple fade/slide to layered confirmation (aura + top highlight + check ring + content rise + CTA affordance), still compositor-friendly and renderer-scoped.
 - Alternatives considered: route-level view transition, confetti/celebration, host-page scroll animation, no transition.
 - Why this pattern: it upgrades perceived quality while keeping renderer portable, fast and accessible.
 - Reuse / extend / new primitive: extend renderer status primitive; no new global motion primitive.
@@ -104,11 +109,11 @@
 
 ## Acceptance Checklist
 
-- [ ] The owning task declares this file in `Motion` when required.
-- [ ] Motion intent is tied to feedback, orientation, uncertainty reduction or error prevention.
-- [ ] Reduced-motion behavior preserves the same meaning.
-- [ ] Focus, selected, pending and error states do not rely on motion alone.
-- [ ] Imports use approved Greenhouse wrappers/primitives.
-- [ ] Performance guardrails avoid layout thrash and excessive animation.
+- [x] The owning task declares this file in `Motion` when required.
+- [x] Motion intent is tied to feedback, orientation, uncertainty reduction or error prevention.
+- [x] Reduced-motion behavior preserves the same meaning.
+- [x] Focus, selected, pending and error states do not rely on motion alone.
+- [x] Imports use approved Greenhouse wrappers/primitives.
+- [x] Performance guardrails avoid layout thrash and excessive animation.
 - [ ] GVC/micro evidence proves the meaningful interaction, not only a static screenshot.
-- [ ] Design decision log explains why this motion is needed and what was rejected.
+- [x] Design decision log explains why this motion is needed and what was rejected.

@@ -512,6 +512,8 @@ export const RENDERER_CSS = `
   .ghf-status--error { color: var(--ghf-error); }
 
   .ghf-success-card {
+    position: relative;
+    isolation: isolate;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 14px;
@@ -521,16 +523,51 @@ export const RENDERER_CSS = `
     border: 1px solid color-mix(in srgb, var(--ghf-success) 28%, var(--ghf-border));
     border-radius: var(--ghf-radius);
     background:
-      linear-gradient(135deg, color-mix(in srgb, var(--ghf-success) 10%, transparent), transparent 48%),
+      linear-gradient(135deg, color-mix(in srgb, var(--ghf-success) 12%, transparent), transparent 48%),
       color-mix(in srgb, var(--ghf-bg) 94%, var(--ghf-field-bg));
     color: var(--ghf-fg);
     box-shadow: var(--ghf-field-shadow);
-    animation: ghf-success-card-in 180ms ease-out;
+    overflow: hidden;
+    transform-origin: 50% 0%;
+    animation: ghf-success-card-in 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ghf-success-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 18% auto;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--ghf-success) 72%, white), transparent);
+    opacity: 0.88;
+    transform: scaleX(0);
+    transform-origin: center;
+    animation: ghf-success-line 560ms cubic-bezier(0.16, 1, 0.3, 1) 70ms both;
+    z-index: 0;
+  }
+  .ghf-success-card__aura {
+    position: absolute;
+    inset: -32px -22px auto auto;
+    width: min(210px, 58%);
+    aspect-ratio: 1;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle, color-mix(in srgb, var(--ghf-success) 20%, transparent) 0%, transparent 68%),
+      radial-gradient(circle at 42% 38%, color-mix(in srgb, var(--ghf-accent) 12%, transparent), transparent 62%);
+    opacity: 0;
+    transform: translate3d(8px, -8px, 0) scale(0.82);
+    animation: ghf-success-aura 720ms cubic-bezier(0.16, 1, 0.3, 1) 40ms both;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .ghf-success-card__mark,
+  .ghf-success-card__content {
+    position: relative;
+    z-index: 1;
   }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-success-card {
     padding: 20px;
     border-color: color-mix(in srgb, var(--ghf-success) 34%, var(--ghf-border));
-    box-shadow: 0 18px 44px rgba(16, 24, 39, 0.08);
+    box-shadow: 0 18px 44px rgba(16, 24, 39, 0.08), 0 1px 0 rgba(255, 255, 255, 0.72) inset;
   }
   .ghf-success-card:focus { outline: none; }
   .ghf-success-card:focus-visible {
@@ -538,30 +575,56 @@ export const RENDERER_CSS = `
     outline-offset: 4px;
   }
   .ghf-success-card__mark {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     margin-block-start: 2px;
     border-radius: 999px;
-    color: var(--ghf-success);
-    background: color-mix(in srgb, var(--ghf-success) 14%, transparent);
-    border: 1px solid color-mix(in srgb, var(--ghf-success) 36%, transparent);
+    color: color-mix(in srgb, var(--ghf-success) 82%, white);
+    background:
+      linear-gradient(145deg, color-mix(in srgb, var(--ghf-success) 22%, white), color-mix(in srgb, var(--ghf-success) 16%, transparent)),
+      color-mix(in srgb, var(--ghf-success) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ghf-success) 42%, white);
+    box-shadow:
+      0 12px 28px color-mix(in srgb, var(--ghf-success) 20%, transparent),
+      0 1px 0 rgba(255, 255, 255, 0.72) inset;
     flex: 0 0 auto;
+    animation: ghf-success-mark-land 440ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
+  }
+  .ghf-success-card__mark::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: inherit;
+    border: 1px solid color-mix(in srgb, var(--ghf-success) 26%, transparent);
+    opacity: 0;
+    transform: scale(0.58);
+    animation: ghf-success-ring 680ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
   }
   .ghf-success-card__mark-glyph {
     display: inline-flex;
     line-height: 1;
     font-weight: 800;
+    font-size: 1.02rem;
     transform-origin: center;
-    animation: ghf-pop 160ms ease-out;
+    animation: ghf-success-check 320ms cubic-bezier(0.16, 1, 0.3, 1) 210ms both;
   }
   .ghf-success-card__content {
     display: grid;
     gap: 10px;
     min-width: 0;
   }
+  .ghf-success-card__content > * {
+    animation: ghf-success-content-rise 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ghf-success-card__content > *:nth-child(1) { animation-delay: 80ms; }
+  .ghf-success-card__content > *:nth-child(2) { animation-delay: 120ms; }
+  .ghf-success-card__content > *:nth-child(3) { animation-delay: 160ms; }
+  .ghf-success-card__content > *:nth-child(4) { animation-delay: 190ms; }
+  .ghf-success-card__content > *:nth-child(5) { animation-delay: 220ms; }
   .ghf-success-card__title,
   .ghf-success-card__body,
   .ghf-success-card__reward-title,
@@ -594,6 +657,7 @@ export const RENDERER_CSS = `
     font-weight: 800;
   }
   .ghf-success-card__reward {
+    position: relative;
     display: grid;
     gap: 8px;
     min-width: 0;
@@ -601,7 +665,18 @@ export const RENDERER_CSS = `
     padding: 12px;
     border: 1px solid var(--ghf-border);
     border-radius: max(6px, calc(var(--ghf-radius) - 2px));
-    background: color-mix(in srgb, var(--ghf-field-bg) 84%, transparent);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--ghf-accent) 8%, transparent), transparent 54%),
+      color-mix(in srgb, var(--ghf-field-bg) 88%, transparent);
+    overflow: hidden;
+  }
+  .ghf-success-card__reward::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: color-mix(in srgb, var(--ghf-success) 52%, var(--ghf-accent));
+    opacity: 0.72;
   }
   .ghf-success-card__reward-title {
     font-size: 0.92rem;
@@ -627,6 +702,16 @@ export const RENDERER_CSS = `
     text-align: center;
     text-decoration: none;
     overflow-wrap: anywhere;
+    transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+  }
+  .ghf-success-card__action:hover,
+  .ghf-success-card__reward-action:hover {
+    filter: saturate(1.04);
+    transform: translateY(-1px);
+  }
+  .ghf-success-card__action:active,
+  .ghf-success-card__reward-action:active {
+    transform: translateY(0);
   }
   .ghf-success-card__support {
     margin-block-start: 2px;
@@ -640,8 +725,8 @@ export const RENDERER_CSS = `
       padding: 16px;
     }
     .ghf-success-card__mark {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
     }
     .ghf-success-card__actions,
     .ghf-success-card__reward {
@@ -665,12 +750,41 @@ export const RENDERER_CSS = `
   @keyframes ghf-spin { to { transform: rotate(360deg); } }
   @keyframes ghf-pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   @keyframes ghf-fade { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
-  @keyframes ghf-success-card-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @keyframes ghf-success-card-in {
+    from { opacity: 0.88; transform: translateY(10px) scale(0.985); filter: blur(0.5px); }
+    72% { filter: blur(0); }
+    to { opacity: 1; transform: none; filter: none; }
+  }
+  @keyframes ghf-success-line { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 0.88; } }
+  @keyframes ghf-success-aura {
+    0% { opacity: 0; transform: translate3d(10px, -10px, 0) scale(0.82); }
+    42% { opacity: 0.9; }
+    100% { opacity: 0.72; transform: translate3d(0, 0, 0) scale(1); }
+  }
+  @keyframes ghf-success-mark-land {
+    0% { opacity: 0.76; transform: translateY(6px) scale(0.74); }
+    58% { opacity: 1; transform: translateY(-1px) scale(1.04); }
+    100% { opacity: 1; transform: none; }
+  }
+  @keyframes ghf-success-ring {
+    0% { opacity: 0; transform: scale(0.58); }
+    38% { opacity: 0.86; }
+    100% { opacity: 0; transform: scale(1.28); }
+  }
+  @keyframes ghf-success-check {
+    from { opacity: 0.72; transform: rotate(-16deg) scale(0.48); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes ghf-success-content-rise {
+    from { transform: translateY(5px); }
+    to { transform: none; }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     greenhouse-form *, greenhouse-form *::before, greenhouse-form *::after,
     .ghf-scope *, .ghf-scope *::before, .ghf-scope *::after {
-      animation-duration: 0.001ms !important; transition-duration: 0.001ms !important;
+      animation-duration: 0.001ms !important; animation-delay: 0ms !important;
+      transition-duration: 0.001ms !important; transition-delay: 0ms !important;
     }
   }
 
@@ -678,6 +792,17 @@ export const RENDERER_CSS = `
     .ghf-input, .ghf-textarea, .ghf-select { border-color: ButtonText; }
     .ghf-btn { border-color: ButtonText; }
     .ghf-field[data-invalid="true"] .ghf-input { border-color: Mark; }
+    .ghf-success-card,
+    .ghf-success-card__mark,
+    .ghf-success-card__reward {
+      border-color: ButtonText;
+    }
+    .ghf-success-card__aura,
+    .ghf-success-card::before,
+    .ghf-success-card__mark::before,
+    .ghf-success-card__reward::before {
+      display: none;
+    }
   }
 `
 

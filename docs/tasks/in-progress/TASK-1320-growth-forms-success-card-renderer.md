@@ -23,6 +23,18 @@ Codex implementó la mitad visible del split consumiendo el contrato de TASK-131
 
 Estado honesto: **code complete; task permanece `in-progress`** porque AEO no debe publicar `success_card` hasta que el renderer esté released en producción y el activation guard pase sin override.
 
+## Delta 2026-07-02 — motion polish "wow sobrio"
+
+Por pedido del operador, la Success Card sube de V1 profesional a una microinteracción más premium, manteniendo el contrato portable del renderer:
+
+- Card settle CSS-only con ligera escala/blur de entrada, highlight superior y aura decorativa scoped.
+- Status mark con check + ring pulse de confirmación; el significado sigue siendo texto-first y `role=status`.
+- Contenido entra por capas dentro de un presupuesto corto; el CTA no queda bloqueado por una espera teatral.
+- CTA/reward action agrega hover/press affordance; reward conserva accent rail discreto.
+- `prefers-reduced-motion` ahora elimina duración **y delays**, para que la card aparezca completa al instante.
+
+Evidencia actualizada: `pnpm fe:capture growth-forms-success-card --env=local` verde en `.captures/2026-07-02T20-18-33_growth-forms-success-card` (desktop + mobile 390, 6 frames, assertions pass). Nota: el entorno dev reporta `runtime_hydration_warning` best-effort en la ruta preview; no hay layout findings y el frame mobile fue revisado visualmente para asegurar contenido completo.
+
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

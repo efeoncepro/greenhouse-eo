@@ -1697,6 +1697,8 @@ export class FormRenderer {
       'data-capture': 'growth-form-success-card',
     })
 
+    const aura = el(this.doc, 'span', { class: 'ghf-success-card__aura', 'aria-hidden': 'true' })
+
     const mark = el(this.doc, 'span', { class: 'ghf-success-card__mark', 'aria-hidden': 'true' })
 
     mark.appendChild(el(this.doc, 'span', { class: 'ghf-success-card__mark-glyph', 'aria-hidden': 'true' }, '✓'))
@@ -1730,7 +1732,7 @@ export class FormRenderer {
 
     if (support) content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__support' }, support))
 
-    card.append(mark, content)
+    card.append(aura, mark, content)
 
     return card
   }
