@@ -55,6 +55,11 @@ const BRAND_NAME_FIELD = {
 
 const BRAND_WEBSITE_LABEL = 'Sitio web de tu marca'
 
+// Variante visual canónica del form AEO — hace los selects premium (custom dropdown) en vez de
+// nativos. Es una columna aparte de la versión (`form_version.style_variant`); NO viaja en el
+// field_schema, por eso hay que pasarla explícita a `authorDraftForm` al clonar.
+const AEO_STYLE_VARIANT = 'diagnostic_premium'
+
 // Copy es-CL (tuteo, imperativo, dice cómo resolver) — espeja el estilo de fullName.error.required.
 const NEW_COPY: Record<string, string> = {
   'brandName.error.required': 'Escribe el nombre de tu marca para personalizar tu diagnóstico.',
@@ -100,13 +105,19 @@ const withNewCopy = (copyRefs: unknown): Record<string, unknown> => {
   return { ...root, copy: { ...copy, ...NEW_COPY } }
 }
 
-const alreadyApplied = (fieldSchema: unknown): boolean => {
+const alreadyApplied = (fieldSchema: unknown, styleVariant: string | null): boolean => {
   if (!Array.isArray(fieldSchema)) return false
 
   const brandName = fieldSchema.find(field => asObject(field).key === 'brandName')
   const brandWebsite = fieldSchema.find(field => asObject(field).key === 'brandWebsite')
 
-  return Boolean(brandName) && asObject(brandWebsite).label === BRAND_WEBSITE_LABEL
+  // Requiere el end-state COMPLETO: brandName + relabel + styleVariant premium. Si una versión
+  // previa perdió el styleVariant (regresión), NO está aplicado → hay que republicar para restaurar.
+  return (
+    Boolean(brandName) &&
+    asObject(brandWebsite).label === BRAND_WEBSITE_LABEL &&
+    styleVariant === AEO_STYLE_VARIANT
+  )
 }
 
 const main = async (): Promise<void> => {
@@ -137,7 +148,7 @@ const main = async (): Promise<void> => {
   console.log(`  form_id  : ${definition.form_id}`)
   console.log(`  versión publicada vigente: ${current.form_version_id} (v${current.version})`)
 
-  if (alreadyApplied(current.field_schema_json)) {
+  if (alreadyApplied(current.field_schema_json, current.style_variant)) {
     console.log('\nIdempotente: la versión publicada vigente ya expone brandName + brandWebsite relabelado. Nada que hacer.')
 
     return
@@ -169,6 +180,11 @@ const main = async (): Promise<void> => {
     purpose: definition.purpose,
     riskProfile: (definition.risk_profile as 'low' | 'medium' | 'high' | undefined) ?? 'low',
     locale: current.locale,
+    // ⚠️ CRÍTICO: preservar el styleVariant (`diagnostic_premium`). Sin esto el renderer cae al
+    // estilo base y los selects premium se vuelven planos/nativos (regresión live 2026-07-02).
+    // Fallback a `diagnostic_premium` porque una versión previa lo pudo perder (justo el bug que
+    // esto arregla) → si el current publicado ya no lo trae, lo restauramos.
+    styleVariant: current.style_variant ?? AEO_STYLE_VARIANT,
     fieldSchema: nextFields,
     validationSchema: current.validation_schema_json,
     copyRefs: nextCopy,
