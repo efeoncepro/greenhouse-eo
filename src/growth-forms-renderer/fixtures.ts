@@ -92,6 +92,42 @@ export const dataIntegrityContractFixture = (): RenderContract =>
     ],
   })
 
+/** Fixture TASK-1320: success card/reward gobernada desde success_behavior_json. */
+export const successCardContractFixture = (): RenderContract =>
+  staticContractFixture({
+    successBehavior: {
+      kind: 'asset_access',
+      presentation: 'success_card',
+      title: 'Recibimos tu información',
+      body: 'Tu solicitud quedó registrada. Revisaremos las señales públicas de tu marca y te mostraremos el siguiente paso.',
+      steps: [
+        { label: 'Validamos la información enviada.' },
+        { label: 'Revisamos el contexto público de tu marca.' },
+        { label: 'Te proponemos el siguiente paso.' },
+      ],
+      reward: {
+        kind: 'ebook',
+        title: 'Te dejamos un recurso para empezar',
+        body: 'Puedes abrirlo ahora sin volver a completar el formulario.',
+        action: {
+          kind: 'download',
+          label: 'Descargar ebook',
+          href: 'https://efeoncepro.com/recursos/aeo.pdf',
+          target: '_blank',
+        },
+      },
+      actions: [
+        {
+          kind: 'schedule',
+          label: 'Agendar una conversación',
+          href: 'https://efeoncepro.com/contacto/',
+          target: '_self',
+        },
+      ],
+      supportingNote: 'Confirmamos recepción en Greenhouse; la entrega a sistemas externos ocurre después.',
+    },
+  })
+
 /** Fixture multi_step_light de 2 pasos. */
 export const multiStepContractFixture = (): RenderContract =>
   staticContractFixture({

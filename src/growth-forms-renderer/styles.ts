@@ -115,6 +115,12 @@ export const RENDERER_CSS = `
   .ghf-required { color: var(--ghf-error); margin-inline-start: 2px; }
   .ghf-optional { color: var(--ghf-muted); font-weight: 400; margin-inline-start: 4px; }
   .ghf-help { font-size: 0.8125rem; color: var(--ghf-muted); line-height: 1.4; }
+  .ghf-help a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    color: var(--ghf-accent);
+  }
 
   .ghf-input,
   .ghf-textarea,
@@ -459,7 +465,9 @@ export const RENDERER_CSS = `
   }
 
   greenhouse-form .ghf-form .ghf-btn,
-  .ghf-scope .ghf-form .ghf-btn {
+  greenhouse-form .ghf-success-card .ghf-btn,
+  .ghf-scope .ghf-form .ghf-btn,
+  .ghf-scope .ghf-success-card .ghf-btn {
     font: inherit !important;
     font-weight: 600 !important;
     background: var(--ghf-accent) !important;
@@ -471,7 +479,9 @@ export const RENDERER_CSS = `
   }
 
   greenhouse-form .ghf-form .ghf-btn:hover,
-  .ghf-scope .ghf-form .ghf-btn:hover {
+  greenhouse-form .ghf-success-card .ghf-btn:hover,
+  .ghf-scope .ghf-form .ghf-btn:hover,
+  .ghf-scope .ghf-success-card .ghf-btn:hover {
     box-shadow: var(--ghf-action-shadow-hover) !important;
   }
 
@@ -501,6 +511,148 @@ export const RENDERER_CSS = `
   }
   .ghf-status--error { color: var(--ghf-error); }
 
+  .ghf-success-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px;
+    width: 100%;
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid color-mix(in srgb, var(--ghf-success) 28%, var(--ghf-border));
+    border-radius: var(--ghf-radius);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--ghf-success) 10%, transparent), transparent 48%),
+      color-mix(in srgb, var(--ghf-bg) 94%, var(--ghf-field-bg));
+    color: var(--ghf-fg);
+    box-shadow: var(--ghf-field-shadow);
+    animation: ghf-success-card-in 180ms ease-out;
+  }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-success-card {
+    padding: 20px;
+    border-color: color-mix(in srgb, var(--ghf-success) 34%, var(--ghf-border));
+    box-shadow: 0 18px 44px rgba(16, 24, 39, 0.08);
+  }
+  .ghf-success-card:focus { outline: none; }
+  .ghf-success-card:focus-visible {
+    outline: 3px solid var(--ghf-focus);
+    outline-offset: 4px;
+  }
+  .ghf-success-card__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-block-start: 2px;
+    border-radius: 999px;
+    color: var(--ghf-success);
+    background: color-mix(in srgb, var(--ghf-success) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ghf-success) 36%, transparent);
+    flex: 0 0 auto;
+  }
+  .ghf-success-card__mark-glyph {
+    display: inline-flex;
+    line-height: 1;
+    font-weight: 800;
+    transform-origin: center;
+    animation: ghf-pop 160ms ease-out;
+  }
+  .ghf-success-card__content {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+  }
+  .ghf-success-card__title,
+  .ghf-success-card__body,
+  .ghf-success-card__reward-title,
+  .ghf-success-card__reward-body,
+  .ghf-success-card__support {
+    margin: 0;
+  }
+  .ghf-success-card__title {
+    font-size: 1.02rem;
+    line-height: 1.28;
+    font-weight: 750;
+    color: var(--ghf-fg);
+  }
+  .ghf-success-card__body,
+  .ghf-success-card__step,
+  .ghf-success-card__reward-body,
+  .ghf-success-card__support {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--ghf-muted);
+  }
+  .ghf-success-card__steps {
+    display: grid;
+    gap: 8px;
+    margin: 2px 0 0;
+    padding-inline-start: 1.25rem;
+  }
+  .ghf-success-card__step::marker {
+    color: var(--ghf-success);
+    font-weight: 800;
+  }
+  .ghf-success-card__reward {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    margin-block-start: 2px;
+    padding: 12px;
+    border: 1px solid var(--ghf-border);
+    border-radius: max(6px, calc(var(--ghf-radius) - 2px));
+    background: color-mix(in srgb, var(--ghf-field-bg) 84%, transparent);
+  }
+  .ghf-success-card__reward-title {
+    font-size: 0.92rem;
+    line-height: 1.35;
+    font-weight: 700;
+    color: var(--ghf-fg);
+  }
+  .ghf-success-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    min-width: 0;
+  }
+  .ghf-success-card__action,
+  .ghf-success-card__reward-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    text-align: center;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .ghf-success-card__support {
+    margin-block-start: 2px;
+    font-size: 0.8125rem;
+  }
+
+  @container (max-width: 420px) {
+    .ghf-success-card {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    .ghf-success-card__mark {
+      width: 32px;
+      height: 32px;
+    }
+    .ghf-success-card__actions,
+    .ghf-success-card__reward {
+      width: 100%;
+    }
+    .ghf-success-card__action,
+    .ghf-success-card__reward-action {
+      width: 100%;
+    }
+  }
+
   .ghf-skeleton { display: grid; gap: var(--ghf-gap); }
   .ghf-skeleton-row { height: 64px; border-radius: var(--ghf-radius); background: var(--ghf-error-bg); background:
     linear-gradient(90deg, var(--ghf-border) 0%, var(--ghf-field-bg) 50%, var(--ghf-border) 100%);
@@ -513,6 +665,7 @@ export const RENDERER_CSS = `
   @keyframes ghf-spin { to { transform: rotate(360deg); } }
   @keyframes ghf-pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   @keyframes ghf-fade { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
+  @keyframes ghf-success-card-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
     greenhouse-form *, greenhouse-form *::before, greenhouse-form *::after,

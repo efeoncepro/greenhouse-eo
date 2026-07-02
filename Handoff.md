@@ -1,3 +1,15 @@
+## Sesion 2026-07-02 — TASK-1320 Growth Forms Success Card Renderer — Codex — 🚧 code complete · rollout pendiente
+
+> **Pedido:** ejecutar `TASK-1320` en `develop`, consumiendo el contrato de `TASK-1319` ya implementado por Claude, sin tocar schema/compiler/backend ownership.
+>
+> **Estado:** la mitad UI/UX quedó **code complete** y la task permanece `in-progress` porque el cutover AEO requiere que el renderer esté released en producción. El hook `pnpm codex:task-hook TASK-1320 --develop` pasó después de corregir el blocker stale (`TASK-1319` ya estaba complete). Sin subagentes.
+>
+> **Implementación:** `src/growth-forms-renderer/renderer.ts` ahora soporta `successBehavior.presentation='success_card'`: reemplaza el form tras `accepted` por una card in-card con `role=status`, `aria-live=polite`, foco al contenedor, título/body, steps, reward/action opcional y support note. Preserva `redirect` legacy, no dibuja chrome/heading del host, no expone PII/submission/destination internals y emite `gh_form_success_viewed`, `gh_form_success_action_clicked` y `gh_form_asset_accessed` con payload allowlisted. Se agregaron fallbacks de copy es-CL/en-US, CSS `ghf-success-card`, hardening contra host CSS para CTAs, preview fixture y scenario GVC.
+>
+> **Guard de rollout:** `pnpm growth:forms:activate-aeo-success-card -- --apply` falla antes de mutar DB si `origin/main` no contiene el soporte del renderer (`buildSuccessCard`, CSS `ghf-success-card`, copy `successCardTitle`). Resultado actual esperado: FAIL por runtime pendiente. El dry-run resuelve AEO v8 sin mutar. `pnpm public-website:verify-aeo-public-api-contract` sigue verde con `successBehavior.presentation='inline_message'`; el modo `--expect-success-card` queda listo para post-cutover.
+>
+> **Evidencia:** `pnpm exec vitest run src/growth-forms-renderer`, renderer focal 61 tests verde; `pnpm typecheck`, `pnpm lint`, `pnpm build` verdes. GVC local `growth-forms-success-card` desktop + mobile 390 verde en `.captures/2026-07-02T19-24-33_growth-forms-success-card` (6 frames, assertions pass, `qualityFindings: []`). Pendiente: task/UI/ops/docs closure gates finales y release/cutover productivo.
+
 ## Sesion 2026-07-02 — TASK-1319 split + backend implementado — Claude — ✅ complete (1319) · 🆕 to-do (1320)
 
 > **Pedido:** analizar la TASK-1319 con múltiples lentes (copywriting/CRO/marketing/arquitectura/product-design/commercial), partirla en 2 (UI para Codex, backend para mí), escribir UI Flow + UI Motion, e implementar el backend (`/implement-task 1319`).

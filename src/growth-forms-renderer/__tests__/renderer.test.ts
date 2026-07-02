@@ -23,6 +23,19 @@ const mountInto = (contract = staticContractFixture(), fetchImpl = okFetch()) =>
   return { root, renderer }
 }
 
+const fillStaticRequiredFields = (root: HTMLElement) => {
+  root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'lead@brand.com'
+  root.querySelector<HTMLInputElement>('[name="work_email"]')!.dispatchEvent(new Event('input'))
+  root.querySelector<HTMLInputElement>('[name="brand"]')!.value = 'Brand'
+  root.querySelector<HTMLInputElement>('[name="brand"]')!.dispatchEvent(new Event('input'))
+  const consent = root.querySelector<HTMLInputElement>('[data-ghf-consent="tos"]')
+
+  if (consent) {
+    consent.checked = true
+    consent.dispatchEvent(new Event('change'))
+  }
+}
+
 describe('growth-forms-renderer · FormRenderer', () => {
   beforeEach(() => {
     document.body.replaceChildren()
@@ -142,6 +155,113 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(body.fields.phone).toBe('+56912345678') // crudo, no enmascarado
     expect(body.consentCheckboxes).toEqual(['tos'])
     expect(root.querySelector('[role="status"]')?.textContent).toContain('Listo')
+  })
+
+  it('renders a structured success card after accepted and focuses it', async () => {
+    const contract = staticContractFixture({
+      copy: {
+        'success.title': 'Recibimos tu diagnóstico',
+        'success.body': 'Tu solicitud quedó registrada. Revisaremos las señales públicas de tu marca.',
+        'success.step.review': 'Validamos la información enviada.',
+        'success.step.next': 'Preparamos el siguiente paso.',
+      },
+      successBehavior: {
+        kind: 'review_pending',
+        presentation: 'success_card',
+        titleCopyRef: 'success.title',
+        bodyCopyRef: 'success.body',
+        steps: [{ copyRef: 'success.step.review' }, { copyRef: 'success.step.next' }],
+        supportingNote: 'Confirmamos recepción; la entrega a sistemas externos ocurre después.',
+      },
+    })
+
+    const { root } = mountInto(contract)
+    const viewed: CustomEvent[] = []
+
+    root.addEventListener('gh_form_success_viewed', event => viewed.push(event as CustomEvent))
+    fillStaticRequiredFields(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    await vi.waitFor(() => expect(root.querySelector('[data-capture="growth-form-success-card"]')).not.toBeNull())
+
+    const card = root.querySelector<HTMLElement>('[data-capture="growth-form-success-card"]')!
+
+    expect(card.getAttribute('role')).toBe('status')
+    expect(card.getAttribute('aria-live')).toBe('polite')
+    expect(document.activeElement).toBe(card)
+    expect(root.querySelector('form')).toBeNull()
+    expect(card.textContent).toContain('Recibimos tu diagnóstico')
+    expect(card.textContent).toContain('Validamos la información enviada.')
+    expect(card.textContent).toContain('Confirmamos recepción')
+    expect(root.querySelectorAll('.ghf-success-card__step')).toHaveLength(2)
+    expect(viewed).toHaveLength(1)
+    expect(viewed[0].detail).toMatchObject({ event: 'gh_form_success_viewed', success_behavior: 'review_pending' })
+    expect(JSON.stringify(viewed[0].detail)).not.toContain('lead@brand.com')
+  })
+
+  it('renders governed reward/action CTAs and emits allowlisted action telemetry without field values', async () => {
+    const contract = staticContractFixture({
+      successBehavior: {
+        kind: 'asset_access',
+        presentation: 'success_card',
+        title: 'Recibimos tu información',
+        body: 'Puedes abrir el recurso de inicio.',
+        steps: [{ label: 'Guardamos tu solicitud.' }],
+        reward: {
+          kind: 'ebook',
+          title: 'Te dejamos un recurso para empezar',
+          body: 'Puedes descargarlo ahora sin volver a completar el formulario.',
+          action: {
+            kind: 'download',
+            label: 'Descargar ebook',
+            href: 'https://efeoncepro.com/recursos/aeo.pdf',
+            target: '_blank',
+          },
+        },
+        actions: [
+          {
+            kind: 'schedule',
+            label: 'Agendar una conversación',
+            href: 'https://efeoncepro.com/contacto/',
+            target: '_self',
+          },
+        ],
+      },
+    })
+
+    const { root } = mountInto(contract)
+    const actionEvents: CustomEvent[] = []
+    const assetEvents: CustomEvent[] = []
+
+    root.addEventListener('gh_form_success_action_clicked', event => actionEvents.push(event as CustomEvent))
+    root.addEventListener('gh_form_asset_accessed', event => assetEvents.push(event as CustomEvent))
+    fillStaticRequiredFields(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    await vi.waitFor(() => expect(root.querySelector('[data-capture="growth-form-success-reward"]')).not.toBeNull())
+
+    const rewardAction = root.querySelector<HTMLAnchorElement>('.ghf-success-card__reward-action')!
+
+    expect(rewardAction.textContent).toBe('Descargar ebook')
+    expect(rewardAction.getAttribute('target')).toBe('_blank')
+    expect(rewardAction.getAttribute('rel')).toBe('noopener noreferrer')
+    expect(root.querySelector('[data-capture="growth-form-success-actions"]')?.textContent).toContain('Agendar una conversación')
+
+    rewardAction.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+
+    expect(actionEvents[0].detail).toMatchObject({
+      event: 'gh_form_success_action_clicked',
+      action_kind: 'download',
+      reward_kind: 'ebook',
+    })
+    expect(assetEvents[0].detail).toMatchObject({
+      event: 'gh_form_asset_accessed',
+      success_behavior: 'asset_access',
+      action_kind: 'download',
+      reward_kind: 'ebook',
+    })
+    expect(JSON.stringify(actionEvents[0].detail)).not.toContain('lead@brand.com')
+    expect(JSON.stringify(actionEvents[0].detail)).not.toContain('submissionId')
   })
 
   it('blocks submit until required consent is checked', async () => {

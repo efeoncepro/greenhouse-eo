@@ -1,12 +1,36 @@
 # TASK-1320 — Growth Forms Success Card — Renderer (ui-ux)
 
+## Delta 2026-07-02 — bloqueante TASK-1319 resuelto (contrato listo)
+
+TASK-1319 quedó **complete**: el contrato ya expone la success-card metadata en código.
+Disponible para consumir:
+- SoT `successBehaviorSchema` (`contracts.ts`): `presentation` (`inline_message|success_card`), `title`/`titleCopyRef`, `body`/`bodyCopyRef`, `steps[]` (≤4), `reward` (`SUCCESS_REWARD_KINDS`), `actions[]` (≤2, `SUCCESS_ACTION_KINDS`), `supportingNote`. `href` allowlisted (https/same-origin, rechaza `javascript:`/`data:`/non-https).
+- Espejo de tipos `RendererSuccessBehavior` (`src/growth-forms-renderer/contract.ts`) con los sub-tipos `RendererSuccessCard{Action,Reward,Step}` — el renderer los consume tipados.
+- Telemetría lista: `gh_form_success_viewed`/`gh_form_success_action_clicked` en `RENDERER_GTM_EVENTS`; `action_kind`/`reward_kind` en `RENDERER_ALLOWED_PAYLOAD_KEYS`. Slice 4 solo agrega los `telemetry.emit(...)` en `renderer.ts`.
+- Activation script + extensión de `verify-aeo-public-api-contract` **se movieron a esta task** (Files owned / Slice 5).
+
+## Delta 2026-07-02 — code complete, rollout/cutover pendiente
+
+Codex implementó la mitad visible del split consumiendo el contrato de TASK-1319, sin tocar schema/compiler/backend ownership:
+
+- Renderer: `presentation='success_card'` reemplaza el form tras `accepted` por una card estructurada (`growth-form-success-card`) con título/body, steps, reward/action opcional, support note, foco al contenedor, `role=status`, `aria-live=polite`, redirect legacy preservado y sin echo de PII/submission/destination internals.
+- Copy/CSS: fallbacks es-CL/en-US `accepted`-only + estilos renderer-scoped `ghf-success-card`, responsive/mobile 390, hostile-host hardening para CTAs y motion CSS con reduced-motion heredado.
+- Telemetry: `gh_form_success_viewed`, `gh_form_success_action_clicked` y `gh_form_asset_accessed` se emiten con payload allowlisted (`success_behavior`, `action_kind`, `reward_kind`) y tests que afirman que no viajan field values ni `submissionId`.
+- Verificación UI local: preview interno `success_card` + scenario GVC `growth-forms-success-card` desktop/mobile 390 verde en `.captures/2026-07-02T19-24-33_growth-forms-success-card` (6 frames, assertions pass, `qualityFindings: []`).
+- Cutover guard: `pnpm growth:forms:activate-aeo-success-card -- --apply` falla antes de mutar DB si `origin/main` todavía no contiene el renderer (`buildSuccessCard`, CSS `ghf-success-card`, copy `successCardTitle`). Resultado esperado actual: **rollout pendiente** hasta promover el runtime.
+- Contrato público actual: `pnpm public-website:verify-aeo-public-api-contract` sigue verde con AEO v8 y `successBehavior.presentation='inline_message'`; el modo estricto `--expect-success-card` queda listo para post-cutover.
+- QA/release posture: `pnpm public-website:verify-aeo-live-contract` verde confirma que producción actual sigue sana sin activar la card. `pnpm qa:gates --changed --agent codex --task TASK-1320 --ui --runtime --api --integration --production --docs` clasifica el cierre como UI/runtime/integration/production con release pendiente; verdict humano = **CONDITIONAL PASS / code complete, rollout pendiente**.
+
+Estado honesto: **code complete; task permanece `in-progress`** porque AEO no debe publicar `success_card` hasta que el renderer esté released en producción y el activation guard pase sin override.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,11 +43,11 @@
 - Motion: `docs/ui/motion/TASK-1320-growth-forms-success-card-renderer-motion.md`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|ui`
-- Blocked by: `TASK-1319`
-- Branch: `task/TASK-1320-growth-forms-success-card-renderer`
+- Blocked by: `none`
+- Branch: `develop` (por instruccion explicita del operador)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -100,8 +124,10 @@ Reglas obligatorias:
 - `src/growth-forms-renderer/styles.ts`
 - `src/growth-forms-renderer/copy.ts` (fallback success card strings)
 - `src/growth-forms-renderer/__tests__/renderer.test.ts`
-- `scripts/frontend/scenarios/growth-forms-success-card.ts` (nuevo) o extension del AEO live verifier
+- `scripts/frontend/scenarios/growth-forms-success-card.scenario.ts` (nuevo)
 - `scripts/public-website/verify-aeo-live-contract.ts`
+- `scripts/growth/activate-aeo-success-card-contract.ts` (nuevo, idempotente dry-run + runtime-guard; movido desde TASK-1319 en su Delta 2026-07-02)
+- `scripts/public-website/verify-aeo-public-api-contract.ts` (extension: afirmar la success-card metadata en el GET tras el cutover)
 - `docs/ui/wireframes/TASK-1320-growth-forms-success-card-renderer.md`
 - `docs/ui/flows/TASK-1320-growth-forms-success-card-renderer-flow.md`
 - `docs/ui/motion/TASK-1320-growth-forms-success-card-renderer-motion.md`
@@ -270,7 +296,8 @@ El renderer NUNCA dibuja el chrome de la card del host ni un heading `h1`-`h6`: 
 ### Slice 5 — GVC + AEO first-consumer cutover
 
 - Scenario GVC / extension del live verifier para los estados de success card (default, reward, mobile, reduced-motion).
-- Publicar la version AEO success-card via el activation script de TASK-1319 (`--apply`) SOLO tras renderer live (runtime guard).
+- Crear el activation script idempotente dry-run-default (publish de una version success-card por `form_key`, runtime-guard estilo TASK-1318) + extender `verify-aeo-public-api-contract` para afirmar la metadata en el GET (movidos desde TASK-1319 en su Delta 2026-07-02).
+- Publicar la version AEO success-card (`--apply`) SOLO tras renderer live (runtime guard).
 - Preservar fields AEO, validation, Turnstile, destination mapping, namePolicy y consent.
 - Correr `pnpm public-website:verify-aeo-live-contract` + GVC desktop/mobile 390 mirados.
 
@@ -356,18 +383,18 @@ El renderer NUNCA dibuja el chrome de la card del host ni un heading `h1`-`h6`: 
 
 ## Acceptance Criteria
 
-- [ ] El renderer reemplaza el form por una success card in-card tras `accepted`, no un mensaje bottom-only.
-- [ ] La success card incluye titulo/body y soporta siguientes pasos acotados, reward opcional y CTA opcional desde el contrato.
-- [ ] Reward/action puede representar ebook/download/gift/surprise sin exponer tokens privados, HubSpot internals, field values, submission id crudo ni PII.
-- [ ] El copy confirma recepcion `accepted` y no reclama delivery HubSpot, reporte generado ni timing de follow-up salvo que el contrato lo pruebe.
-- [ ] El foco se mueve al contenedor de la card y el estado se anuncia polite con semantica accesible.
-- [ ] Reduced-motion: success card estatica inmediata con significado identico.
-- [ ] `redirect` backward-compat preservado.
-- [ ] `gh_form_success_viewed` (+ `gh_form_success_action_clicked` cuando hay accion/reward) emiten con `action_kind`/`reward_kind`, sin field values ni PII.
-- [ ] La task declara wireframe/flow/motion existentes y pasa `pnpm ui:wireframe-check`, `pnpm ui:flow-check`, `pnpm ui:motion-check`, `pnpm ui:readiness-check --task TASK-1320`.
-- [ ] GVC/live verifier captura desktop y mobile 390 con `scrollWidth <= clientWidth` (sin overflow horizontal).
-- [ ] El cutover AEO preserva fields, Turnstile, namePolicy, consent y mapping HubSpot de TASK-1318.
-- [ ] Documentation, task lifecycle y handoff sincronizados al cierre.
+- [x] El renderer reemplaza el form por una success card in-card tras `accepted`, no un mensaje bottom-only.
+- [x] La success card incluye titulo/body y soporta siguientes pasos acotados, reward opcional y CTA opcional desde el contrato.
+- [x] Reward/action puede representar ebook/download/gift/surprise sin exponer tokens privados, HubSpot internals, field values, submission id crudo ni PII.
+- [x] El copy confirma recepcion `accepted` y no reclama delivery HubSpot, reporte generado ni timing de follow-up salvo que el contrato lo pruebe.
+- [x] El foco se mueve al contenedor de la card y el estado se anuncia polite con semantica accesible.
+- [x] Reduced-motion: success card estatica inmediata con significado identico.
+- [x] `redirect` backward-compat preservado.
+- [x] `gh_form_success_viewed` (+ `gh_form_success_action_clicked` cuando hay accion/reward) emiten con `action_kind`/`reward_kind`, sin field values ni PII.
+- [x] La task declara wireframe/flow/motion existentes y pasa `pnpm ui:wireframe-check`, `pnpm ui:flow-check`, `pnpm ui:motion-check`, `pnpm ui:readiness-check --task TASK-1320`.
+- [x] GVC/local verifier captura desktop y mobile 390 con assertions verdes y sin quality findings.
+- [ ] El cutover AEO preserva fields, Turnstile, namePolicy, consent y mapping HubSpot de TASK-1318. **Pendiente:** requiere release del renderer y activation `--apply` guardado.
+- [x] Documentation, task lifecycle y handoff sincronizados para estado `code complete, rollout pendiente`.
 
 ## Verification
 
@@ -406,5 +433,5 @@ El renderer NUNCA dibuja el chrome de la card del host ni un heading `h1`-`h6`: 
 
 ## Open Questions
 
-1. ¿AEO usa CTA de agenda unico (recomendado), o solo next-steps sin CTA en V1? (Recomendacion en TASK-1319 Open Q2: un solo proximo paso, no menu.)
-2. ¿El primer reward vive en `efeoncepro.com`, Greenhouse, HubSpot files u otro storage gobernado? (Depende de la decision de owner del asset.)
+1. Resuelta para V1: AEO queda en next-steps sin CTA/reward hasta confirmar una URL/owner estable de agenda o asset. La capacidad de CTA/reward queda probada en fixture del renderer.
+2. Resuelta para V1: no se publica ebook/download real en AEO. Cualquier reward productivo futuro requiere owner del asset, URL policy y rollback documentados.

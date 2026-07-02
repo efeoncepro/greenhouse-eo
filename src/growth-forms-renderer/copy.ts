@@ -24,6 +24,11 @@ export interface RendererSystemCopy {
   submitError: string
   formRegionAria: string
   successFallback: string
+  successCardTitle: string
+  successCardBody: string
+  successCardSteps: string[]
+  successRewardTitle: string
+  successRewardBody: string
   /** Título del resumen de errores accesible al enviar (TASK-1256 Slice 1d). */
   errorSummaryTitle: string
   /** Hint vivo de campos pendientes junto al submit. */
@@ -69,6 +74,15 @@ const esCL: RendererSystemCopy = {
   submitError: 'No pudimos enviar tu formulario. Intenta de nuevo en unos minutos.',
   formRegionAria: 'Formulario',
   successFallback: 'Recibimos tu información. Gracias.',
+  successCardTitle: 'Recibimos tu información',
+  successCardBody: 'Tu solicitud quedó registrada. La estamos revisando y aquí mismo te mostramos el siguiente paso.',
+  successCardSteps: [
+    'Validamos la información enviada.',
+    'Revisamos el contexto de tu marca.',
+    'Te proponemos el siguiente paso.',
+  ],
+  successRewardTitle: 'Te dejamos un recurso para empezar',
+  successRewardBody: 'Puedes abrirlo ahora sin volver a completar el formulario.',
   errorSummaryTitle: 'Revisa estos campos para continuar',
   fieldsRemaining: count => (count === 1 ? 'Falta 1 campo' : `Faltan ${count} campos`),
   readyToSend: 'Todo listo para solicitar el diagnóstico',
@@ -120,6 +134,15 @@ const enUS: RendererSystemCopy = {
   submitError: 'We couldn’t send your form. Please try again in a few minutes.',
   formRegionAria: 'Form',
   successFallback: 'We received your information. Thank you.',
+  successCardTitle: 'We received your information',
+  successCardBody: 'Your request was registered. We are reviewing it and showing you the next safe step here.',
+  successCardSteps: [
+    'We validate the information you sent.',
+    'We review your brand context.',
+    'We suggest the next step.',
+  ],
+  successRewardTitle: 'Here is a resource to get started',
+  successRewardBody: 'You can open it now without completing the form again.',
   errorSummaryTitle: 'Review these fields to continue',
   fieldsRemaining: count => (count === 1 ? '1 field left' : `${count} fields left`),
   readyToSend: 'Ready to request the diagnostic',
