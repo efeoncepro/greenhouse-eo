@@ -25,7 +25,7 @@
 >
 > **Gates:** 25 focales + 1142 regresión (registry+growth) verdes; lint 0; `tsc` 0 en `src/` (ruido `.next/dev/types` ajeno; ver nota Codex); flags:audit 0 sin registrar. `pnpm test` full + `pnpm build` verificándose.
 >
-> **Estado = code complete · rollout pendiente.** Palanca real ≠ el flag: con flag ON pero form sin `brandName`, cada submit cae en `missing_brand_name→skip`. Secuencia: (1) `--apply` del activation script (mutación live **outward-facing, pendiente autorización operador**) → (2) deploy ops-worker vía release control plane → (3) smoke E2E. Flags aguas abajo ya ON en prod (06-30). **Invalida el mitigante del ledger "`/aeo-2/` no corre el grader".** El operador quiere UN release coordinado (Success Card 1319/1320 + grader-on-submit 1321).
+> **Estado = code complete · rollout PARCIAL.** Secuencia: (1) ~~`--apply` del activation script~~ **HECHO 2026-07-02 (autorización explícita del operador):** form live v9 `fver-7196526d-…` publicada (v8 deprecada) — `/aeo-2/` ya captura `brandName` (full-width) + `brandWebsite`→"Sitio web de tu marca"; verificado live con screenshot (`overflowX=0`, native al diseño premium). Hallazgo del render live: el `<select>` país envía nombre completo ("Chile"/"México"/…), NO ISO → `resolveAeoMarketLocale` corregido; país queda opcional (required = default visible "Chile" = trampa de data). **El grader aún NO corre** (código sin deploy) → hoy `/aeo-2/` = lead comercial + campo nuevo. → (2) deploy ops-worker vía release control plane → (3) smoke E2E. Flags aguas abajo ya ON en prod (06-30). El operador quiere UN release coordinado (Success Card 1319/1320 + grader-on-submit 1321).
 
 ## Sesion 2026-07-02 — TASK-1320 Growth Forms Success Card Renderer — Codex — 🚧 code complete · rollout pendiente
 
