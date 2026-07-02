@@ -17,8 +17,23 @@ import 'server-only'
  * PII (email/firstName/lastName) sale mapeada para el lead; NUNCA la usa el enqueue del run.
  */
 
-/** ID del form público de `/aeo-2/` (governed forms engine). */
+/**
+ * Form-definition id del form público de `/aeo-2/` (governed forms engine).
+ *
+ * ⚠️ NO confundir con el **formKey** público `b120566a-dd1a-43c8-956a-4e0121e805b8`
+ * (el handle opaco que el WordPress `<greenhouse-form form-key="…">` embebe y que resuelve
+ * el activation script vía `getFormDefinitionByKey`). Son dos identificadores del MISMO form:
+ *   - formKey `b120566a-…`  → handle público (renderer + publish de versión nueva).
+ *   - `fdef-efeonce-aeo-diagnostic` → id de definición: es lo que viaja en el outbox event
+ *     (`FormSubmissionAcceptedEventPayload.formId`) y lo que persiste `form_submission.form_id`.
+ * La projection matchea por ESTE id (no por el formKey), porque es lo que trae el evento.
+ * Live verificado 2026-07-02: `/aeo-2/` renderiza `form-key="b120566a-…"` surface
+ * `fhsf-efeonce-aeo-diagnostic` → slug `efeonce-aeo-diagnostic` → este id.
+ */
 export const AEO_DIAGNOSTIC_FORM_ID = 'fdef-efeonce-aeo-diagnostic'
+
+/** formKey público del form `/aeo-2/` (handle del renderer + target del activation script). */
+export const AEO_DIAGNOSTIC_FORM_KEY = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 
 /**
  * country (ISO-2) → market + locale del grader. Cubre las opciones vigentes del select de
