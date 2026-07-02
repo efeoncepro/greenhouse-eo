@@ -57,6 +57,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1311` — [planificada, backend-data] AEO citation attribution URL-level + grounded queries (reader/rollup sobre las citas que el grader YA captura).
 - `TASK-1312` — [planificada, backend-data] Topic Cluster como entidad de primera clase (`seo_topic_clusters`) + rollup SEO+AEO.
 - `TASK-1313` — [planificada, backend-data] Unified Page/Cluster Visibility 360 read (`readPageVisibility360`/`readClusterVisibility360`).
+- `TASK-1314` — [planificada, backend-data] Pillar-cluster health / topical authority (score + huecos; compone rank/audit/citation, no captura nueva).
 
 ## Existing Related Work
 
@@ -88,3 +89,7 @@ Epic autorado desde una planificación con 4 lentes (arquitectura, SEO, product 
 ## Delta 2026-07-02 — extensión granularidad URL / Topic Cluster
 
 Se suma el bloque **"Search Visibility 360 granular"** (nivel página + topic cluster, no solo marca): para una landing o cluster, análisis unificado de keywords · avg position · clicks · **grounded queries que la cita la IA** · citation share · cuadrante 360 a ese nivel. Hallazgo clave al aterrizar el diseño: **el grader YA captura las citas con URL** (`GrowthAiVisibilityCitation` + `buildCitations` + el adapter AI-mode parsea `references`/`links`/`sources`), así que la extensión es reader/atribución + entidad cluster + read unificado, NO nueva captura. 3 tasks nuevas: `TASK-1311` (citation attribution URL-level), `TASK-1312` (topic cluster entity), `TASK-1313` (`readPageVisibility360`/`readClusterVisibility360`). Boundary §1.1 intacto (derived read con join `org+url/cluster`, sin merge de tablas). Consumer UI granular = follow-up ui-ux posterior. Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15.
+
+## Delta 2026-07-02 (cont.) — pillar page + topical authority
+
+El topic cluster gana estructura **pillar + supporting**: la pillar page es el hub del tema, donde SEO clásico y AEO convergen (debe rankear el head term *y* ser la fuente que la IA cita como autoridad). Dos piezas: (1) **delta a `TASK-1312`** — `role` (`pillar`|`supporting`) en el member + único pillar activo por cluster (índice único parcial); (2) **`TASK-1314`** — pillar-cluster health / topical authority: reader que compone cobertura (keyword gap) + estructura (internal linking del audit 1304) + rendimiento (rank 1303) + el twist AEO (¿la pillar es la citada? 1311) → topical authority score + huecos. Compone readers, cero captura nueva, boundary §1.1 intacto. Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15.1.

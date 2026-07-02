@@ -37,7 +37,7 @@ Formaliza el **Topic Cluster como entidad de primera clase** del módulo SEO: `s
 
 ## Goal
 
-- `greenhouse_growth.seo_topic_clusters` (per target/org: `name`, `theme`, `status`, `created_by`) + `seo_topic_cluster_members` (append-only: URLs + `keyword_set_id` refs + `effective_from`/`effective_to`) como entidad de primera clase.
+- `greenhouse_growth.seo_topic_clusters` (per target/org: `name`, `theme`, `status`, `created_by`) + `seo_topic_cluster_members` (append-only: URLs + `keyword_set_id` refs + `role` `pillar`|`supporting` + `effective_from`/`effective_to`) como entidad de primera clase (la pillar page = el hub del cluster; un único pillar activo por cluster).
 - Membership append-only: una URL/keyword-set entra con `effective_from`, sale con `effective_to`; NUNCA DELETE (espejo de `seo_keyword_set_members`/`seo_competitors`).
 - `readTopicClusterRollup(clusterId)`: agrega métricas SEO (rank/gsc) del set del cluster + hook para el eje AEO (TASK-1313).
 - Migración additive con marker `-- Up Migration` + DO-block de verificación + GRANTs runtime; `db.d.ts` regenerado + verificado contra PG.
@@ -126,10 +126,11 @@ Reglas obligatorias (§15 + §4 + §1.1 — load-bearing):
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `greenhouse_growth.seo_topic_clusters` (`cluster_id` PK, `public_id` sequence, `seo_target_id` FK, `name`, `theme`, `status`, `created_by`, `created_at`, `updated_at`), `greenhouse_growth.seo_topic_cluster_members` (`member_id` PK, `cluster_id` FK, `url` NULLABLE, `keyword_set_id` FK NULLABLE, `effective_from`, `effective_to` NULLABLE, `created_at`; CHECK que al menos uno de `url`/`keyword_set_id` esté presente).
+- Entidades/tablas/views afectadas: `greenhouse_growth.seo_topic_clusters` (`cluster_id` PK, `public_id` sequence, `seo_target_id` FK, `name`, `theme`, `status`, `created_by`, `created_at`, `updated_at`), `greenhouse_growth.seo_topic_cluster_members` (`member_id` PK, `cluster_id` FK, `url` NULLABLE, `keyword_set_id` FK NULLABLE, `role` TEXT NOT NULL DEFAULT `supporting` CHECK `role IN ('pillar','supporting')`, `effective_from`, `effective_to` NULLABLE, `created_at`; CHECK que al menos uno de `url`/`keyword_set_id` esté presente; índice único parcial `WHERE role='pillar' AND effective_to IS NULL` = un solo pillar activo por cluster).
 - Invariantes que no se pueden romper:
   - **Membership append-only:** `seo_topic_cluster_members` NUNCA DELETE; una URL/keyword-set sale cerrando `effective_to` (término). Espejo de `seo_keyword_set_members`.
   - **Cluster per-target:** `seo_topic_clusters.seo_target_id` FK a `seo_targets`; UNIQUE lógico `(seo_target_id, name)` [verificar] — no dos clusters con el mismo nombre en el mismo target activo.
+  - **Un solo pillar activo por cluster:** índice único parcial `WHERE role='pillar' AND effective_to IS NULL`. Un cluster tiene exactamente una pillar page (el hub); las demás URLs son `supporting`. La pillar se reasigna cerrando el member pillar viejo (`effective_to`) y abriendo el nuevo con `role='pillar'` (append-only, sin DELETE).
   - **Cero FK cross-motor:** cero FK/columna que apunte a `grader_*`/`provider_observations`. El eje AEO es un hook resuelto por TASK-1313, no una relación de schema.
   - **Rollup on-read, no materializado:** `readTopicClusterRollup` agrega desde `seo_rank_snapshots`/`seo_gsc_daily` en memoria/SQL; NO se crea una tabla `seo_topic_cluster_rollup_snapshots` en esta task.
   - **`status` acotado por CHECK** (`active|archived` [verificar enum]).

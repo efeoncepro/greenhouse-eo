@@ -277,6 +277,13 @@ El 360 no vive solo a nivel marca: su expresión más potente es **a nivel pági
 
 **Boundary intacto:** sigue siendo un **derived read** con join más rico (`org + url + keyword/cluster`), sin merge de tablas ni fusión de scoring — el boundary §1.1 aplica igual. El consumer UI (vista de análisis granular por landing/cluster) es follow-up ui-ux posterior; estas 3 tasks son la fundación backend-data.
 
+### 15.1 Pillar page + topical authority (`TASK-1312` delta + `TASK-1314`)
+
+Un topic cluster no es una lista plana de URLs: tiene estructura **pillar + supporting**. La **pillar page** es el hub del tema (cubre el término cabeza, amplio); las **supporting pages** cubren long-tail y enlazan de vuelta al pillar. La pillar es el punto donde **SEO clásico y AEO convergen**: es a la vez el activo que debe rankear el head term *y* el que la IA debería elegir citar como autoridad del tema. Es la unidad real de **topical authority**.
+
+- **Modelo (delta a `TASK-1312`):** los miembros del cluster llevan un `role` (`pillar` | `supporting`, default `supporting`), con un **único pillar activo por cluster** (índice único parcial `WHERE role='pillar' AND effective_to IS NULL`). No es entidad nueva — es un campo del member.
+- **Capacidad (`TASK-1314` — pillar-cluster health / topical authority):** reader analítico que **compone** los primitives existentes (no captura nueva): cobertura (¿hay pillar + suficientes supporting, o huecos vs keyword gap Labs?), estructura (¿las supporting enlazan al pillar? — internal linking del OnPage audit `TASK-1304`), rendimiento (¿la pillar rankea el head term y las supporting el long-tail? — `TASK-1303`), y el twist AEO: **¿es la pillar la fuente citada por la IA para el tema, o la IA cita a un competidor / a una supporting suelta?** (`TASK-1311`). Emite un **topical authority score** por cluster + los huecos accionables, con evolución temporal. Boundary §1.1 intacto (compone readers, no fusiona).
+
 ## 14. Documentación relacionada
 
 - ADR: `GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md`
