@@ -1,3 +1,19 @@
+## Sesion 2026-07-02 — Release develop→main + ISSUE-111 (pdf-parse Node 24 flake) — Claude — ✅ released
+
+> **Pedido:** pasar a producción el código de TASK-1318 (Growth Forms full-name split); durante el `/release` el preflight `ci_green` bloqueó por un flake de CI ajeno; el operador pidió fix robusto (nada de parches/bypass), y al cierre: cuándo/dónde se rompió + prevención + issue resuelto.
+>
+> **Root cause (ISSUE-111, estaba open sin causa identificada):** los 3 tests de `src/lib/payroll/generate-payroll-pdf.test.ts` (TASK-782) re-parseaban el PDF binario con `pdf-parse@1.1.1` (pdf.js ~2016) → `Illegal character: 41` no-determinista **bajo Node 24**. Detonante: cutover CI Node 20→24 del 2026-06-22 (`1d0c731fd`, TASK-845). Bloqueó el preflight de 2 releases (2026-06-30 y 2026-07-02).
+>
+> **Fix robusto (commit `c2280c7f`):** helper compartido `src/test/react-pdf-text.ts` (`extractReactPdfText`) que aserta sobre el árbol de elementos react-pdf **sin binario**; patrón SSOT `buildPayrollPeriodReportElement` / `buildFinalSettlementDocumentElement` (producción renderiza el mismo `<Document>` que los tests inspeccionan); ambos tests migrados; **`pdf-parse` eliminado** de `package.json`. La generación de PDFs (`@react-pdf/renderer`, `renderToStream`/`renderToBuffer`) quedó **intacta**. Gates: `pnpm test` 8639/0, typecheck+lint+build verdes; CI de develop `5ae43359d` verde (CI+Playwright+workers).
+>
+> **Prevención:** dependencia removida (structural) + patrón canónico ("nunca re-parsear un PDF binario en test; usar `extractReactPdfText`"). ISSUE-111 → `resolved`. Docs commit `5ae43359d` (README + changelog).
+>
+> **Release completado:** PR #136 (`347f35c0d`) desplegó el código a Vercel prod pero el orquestador murió en preflight (drift: prod deployado sin manifest). Tras el fix, PR #137 → `main` HEAD **`398b7f1b`** (target_sha). Orquestador `28608774955` **success** con `bypass_preflight_reason` (batch-policy por migración TASK-1247 ya aplicada + ops-worker path-filter): preflight ci_green ✅, manifest **`released`** ✅, gate Production aprobado (×2, Azure gated skip no-diff), Vercel READY ✅, 4 workers Cloud Run deployados (ops-worker incluido, EXPECTED_SHA gate) ✅, health check ✅, watchdog "no findings > ok". **Drift de control-plane cerrado.**
+>
+> **TASK-1318:** su último criterio pendiente ("Production runtime executes the new server-side split code") queda **satisfecho** — `398b7f1b` (con `applyNameNormalizationPolicy`) está `released` en prod. Falta mover el archivo a `complete/` (lifecycle).
+>
+> **Nota tooling:** ADC de gcloud local vencida (`invalid_rapt`) — bloquea lecturas locales de PG/Cloud Run (no el release, que corrió con creds de CI); refrescar con `gcloud auth login` + `application-default login` para futuras verificaciones locales.
+
 ## Sesion 2026-07-02 — Public Site primitives registry — Codex — ✅ docs
 
 > **Pedido:** canonizar el componente/patrón del proof row AEO como alternativa reusable para sitio público, separada del docs de primitives del portal privado Greenhouse.
