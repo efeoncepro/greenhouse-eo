@@ -1,3 +1,15 @@
+## Sesion 2026-07-02 — TASK-1321 AEO `/aeo-2/` → Grader auto-run — Claude — 🚧 in-progress (Slice 1a done)
+
+> **Pedido:** `/implement-task 1321` — conectar el submit de `/aeo-2/` (`fdef-efeonce-aeo-diagnostic`) con el pipeline del AEO Grader (email event-driven con PDF + dedup lead), local-first sin push.
+>
+> **Discovery (3 subagentes):** el seam submit→outbox→projection→enqueue YA existe end-to-end (`growth-grader-run-from-submission.ts`, scoped a `fdef-ai-visibility-grader`). Email event-driven, HubSpot dedup (search-then-PATCH por email/domain → enriquece, no duplica) y cost-cap global (budget 24h + per-email/IP) YA existen. **Recalibración:** (1) el submit de `/aeo-2/` NO pasa por el abuse guard del grader (entra por `submitForm` genérico) → el cost-cap debe aplicarse en la projection + registrar `grader_intake_events`; (2) `category` NO es un field-read — `/aeo-2/` no colecta industry/category → requiere un **brand-intelligence LLM read** (fetch sitio + LLM) en la projection antes del enqueue (duplica costo LLM/submit + modo de falla unknown→sin informe); (3) `MARKET_BY_COUNTRY` solo cubre CL/MX/US y es portal-only → mapa nuevo CL/CO/MX/PE; (4) consent policy de `/aeo-2/` (`efeonce-aeo-diagnostic-consent-v1`) ≠ la del grader → gate legal para el flip.
+>
+> **Slice 1a done (commit `03efb5199`):** adapter puro `public-intake/aeo-form-grader-adapter.ts` — remap determinista de campos `/aeo-2/`→intake grader + `resolveAeoMarketLocale` (CL/CO/MX/PE) + skip reasons (missing brandName/website/email → degradar a lead comercial). 13 tests, lint/tsc verdes. Sin I/O, sin LLM, sin flag — decision-independiente.
+>
+> **Open questions resueltas (defaults):** flag nuevo `GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED` (default-OFF); dedup = coexisten (Forms crea lead, grader enriquece); cost-cap = reuso budget global en projection.
+>
+> **Checkpoint pendiente (antes de Slice 2 — cablear projection):** confirmar con el operador (a) el costo LLM ×2/submit + fetch de sitio por el brand-intelligence read para categoría (¿ok?), y (b) el gate legal/consent (la consent de `/aeo-2/` cubre correr grader + enviar informe?). El flip prod (Slice 5) además requiere verificar flags live + sign-off. Todo lo demás es code-complete-able detrás de flag OFF.
+
 ## Sesion 2026-07-02 — TASK-1320 Growth Forms Success Card Renderer — Codex — 🚧 code complete · rollout pendiente
 
 > **Pedido:** ejecutar `TASK-1320` en `develop`, consumiendo el contrato de `TASK-1319` ya implementado por Claude, sin tocar schema/compiler/backend ownership.
