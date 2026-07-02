@@ -15,7 +15,6 @@ import 'server-only'
  */
 
 import { modelFromPublicReport } from '@/components/growth/ai-visibility/report-artifact/model'
-import type { ReportHeader } from '@/components/growth/ai-visibility/report-artifact/web/AiVisibilityReportArtifact'
 import type { AiVisibilityReportEmailInsight } from '@/emails/AiVisibilityGraderReportEmail'
 import { sendEmail } from '@/lib/email/delivery'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -25,6 +24,7 @@ import { createOperatorCrossSellLead } from '../hubspot/crm-client'
 import { buildPublicReportUrl, getLatestReportTokenForRun } from '../hubspot/report-link'
 import { buildAiVisibilityReportAttachment } from '../public-delivery/email/build-report-attachment'
 import type { GraderReportSeverity } from '../report/contracts'
+import { buildReportHeader } from '../report/report-header'
 import { readPublicGraderReport, type PublishedSnapshot } from '../report/snapshot'
 import { buildOperatorCrossSellPayload } from './hubspot-cross-sell-mapper'
 import { getOrganizationCommercialFacts, type OrganizationCommercialFacts } from './organization-commercial-facts'
@@ -59,9 +59,6 @@ const LEVEL_LABEL_BY_SEVERITY: Record<GraderReportSeverity, string | null> = {
   sin_dato: null
 }
 
-const formatReportDate = (iso: string): string =>
-  new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(iso))
-
 /** Extrae el dominio corporativo de una website (sin protocolo / www / path). Null si no parsea. */
 const domainFromWebsite = (websiteUrl: string | null): string | null => {
   if (!websiteUrl) return null
@@ -88,13 +85,7 @@ const runEmailStep = async (ctx: SendContext): Promise<StepOutcome> => {
   }
 
   const model = modelFromPublicReport(ctx.snapshot.publicReport, 'attachment')
-  const reportDate = formatReportDate(ctx.snapshot.asOf)
-
-  const header: ReportHeader = {
-    organizationName: ctx.organizationName,
-    reportDate,
-    periodLabel: `Diagnóstico al ${reportDate}`
-  }
+  const header = buildReportHeader({ organizationName: ctx.organizationName, asOf: ctx.snapshot.asOf })
 
   const attachment = await buildAiVisibilityReportAttachment({ publicReport: ctx.snapshot.publicReport, header })
 

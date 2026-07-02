@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.2 — 2026-06-30 (Codex, TASK-1294 Turnstile renderer parity)
+> **Version:** 1.4 — 2026-07-01 (Codex, Ohio child theme Growth Forms host layer)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -18,22 +18,17 @@ consentimiento y destino del lead viven en Greenhouse.
 2. Tiene que existir una **host surface** registrada para ese sitio, con el origen del
    sitio en su allowlist (ej. `wordpress-public` para WordPress, `astro` para Astro).
 3. El **flag publico** `GROWTH_FORMS_PUBLIC_API_ENABLED` tiene que estar ON en el
-   environment de Greenhouse que el sitio apunta (staging: ON; produccion: ON solo
-   para rollouts aprobados; AEO `/aeo-2/` ya usa el motor por bridge HTML).
+   environment de Greenhouse que el sitio apunta (staging: ON; produccion: ON para
+   rollouts aprobados; AEO `/aeo-2/` ya usa el motor por `<greenhouse-form>`).
 4. El **CSP del sitio** debe permitir cargar el script y llamar a la API desde el
    origen de Greenhouse (ver "CSP" abajo).
 
-> Nota vigente: la landing AEO `/aeo-2/` no usa todavia el widget generico
-> `greenhouse_growth_form`. Usa un host bridge HTML con Turnstile invisible por decision
-> de rollout visual, no porque falte el token en el renderer: desde TASK-1294
-> `<greenhouse-form>` emite `captchaToken` cuando el contract declara
-> `security.captcha`, y desde TASK-1296 la version AEO v3 ya declara esa metadata en
-> `ui_policy_json`; produccion ya serializa `render_contract.security.captcha`. El bridge debe seguir consultando `/verify-email` antes de
-> Turnstile para respetar el gate corporativo del form (`corporate_email` +
-> `emailPolicy.block_field`) y debe mostrar validación inline por campo, no solo un
-> status global. La migracion a `<greenhouse-form form="efeonce-aeo-diagnostic"
-> surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL">` requiere task WordPress
-> separada, con backup Elementor, cache purge y Playwright desktop/mobile 390.
+> Nota vigente: la landing AEO `/aeo-2/` ya usa `<greenhouse-form>` live por
+> `form-key` desde TASK-1298. El cutover fue gobernado con backup Elementor,
+> `Document::save()`, Kinsta purge, `heroans` guard y `pnpm public-website:verify-aeo-live-contract`.
+> La variante visual `diagnostic_premium` es reusable para otros formularios que necesiten
+> el mismo nivel de pulido (dropdowns premium, CTA teal, focus/ARIA y microcopy de diagnostico);
+> AEO solo agrega guards extra por ser una landing publica critica.
 
 ## Vista previa interna (antes de tocar un sitio)
 
@@ -67,6 +62,41 @@ multi-paso) y estados (cargando / error / no disponible) desde fixtures.
 
 > El widget solo emite `<greenhouse-form …>` y carga el bundle pineado de Greenhouse.
 > Nunca cambia campos ni destinos.
+
+### Capa compartida Ohio para Growth Forms
+
+En el sitio publico Efeonce, el child theme `ohio-child` debe cargar una capa compartida
+de compatibilidad para Growth Forms. Esta capa esta live en Kinsta desde el rollout acotado
+del 2026-07-01:
+
+- runtime repo: `efeonce-public-site-runtime`;
+- CSS: `wp-content/themes/ohio-child/assets/css/growth-forms-host.css`;
+- enqueue: `wp-content/themes/ohio-child/inc/enqueue-and-layout.php`, handle
+  `ohio-child-growth-forms-host`;
+- backup remoto inmediato del rollout: `/tmp/greenhouse-growth-forms-host-layer-20260701T103729Z`;
+- scope permitido: `.eo-growth-form`, `.gh-growth-form-host`,
+  `.gh-aeo-growth-form-host`, `.gh-aeo-growth-form-card` + descendiente
+  `<greenhouse-form>`.
+
+Esta capa existe para que Ohio no vuelva a imponer estilos globales de
+`input/select/button` sobre el renderer. No mueve logica a WordPress: no define campos,
+validacion, destinos, mapping HubSpot, Turnstile ni microcopy contractual. El renderer y
+el render contract siguen siendo la fuente de verdad.
+
+Regla operativa:
+
+1. Para nuevas landings en WordPress, envolver el embed en una de las clases host
+   compartidas y usar `form-key`, `surface`, `locale`, `color-scheme="light"` y
+   `appearance` segun la composicion.
+2. Si un form se rompe por Ohio, primero ajustar esta capa o el renderer de forma
+   transversal. No crear CSS page-scoped por formulario salvo excepcion documentada.
+3. Antes de desplegar cambios del child theme, correr `pnpm public-website:export-live-code`
+   + `pnpm public-website:diff-runtime` para confirmar que no se pisara drift de
+   produccion. Luego leer `pnpm public-website:runtime-status`: si
+   `releaseSafety.fullRepoDeploySafe=false` o `eo-elementor-widgets` aparece como
+   `repo_pending_release`, no lo mezcles en el rollout del child theme.
+4. Validar con desktop + mobile 390, `scrollWidth == clientWidth`, dropdown abierto,
+   foco/ARIA y la prueba publica/fail-closed que aplique al formulario.
 
 ### Configurar el catálogo del selector (una vez por sitio)
 
@@ -144,6 +174,18 @@ estilos de los campos. Esto significa dos cosas:
 `--ghf-radius`, `--ghf-gap`, `--ghf-focus`. El widget Elementor ya expone acento + ancho
 máximo en la pestaña **Estilo**; el resto se ajusta con CSS scoped al contenedor.
 
+> **Propagación de tokens (TASK-1298 — leer si overrideás tokens vía CSS scoped).** El
+> renderer monta el contenido en un `<div class="ghf-root">`. Desde el fix `hosted` del
+> renderer, ese wrapper **NO** re-declara los tokens cuando está dentro de un host
+> `<greenhouse-form>`, así que un override en `greenhouse-form { --ghf-* }` **propaga**
+> a todo el contenido (es el patrón canónico). En la versión previa del renderer (servida
+> hasta que el fix llegue a prod) el wrapper interno llevaba `.ghf-scope` y re-declaraba los
+> tokens, sombreando el override; el workaround forward-compatible es targetear también el
+> scope: `greenhouse-form, greenhouse-form .ghf-scope { --ghf-* }`. Si overrideás tokens y
+> no ves el cambio en el contenido (solo en el borde del host), es esto: agregá el selector
+> `.ghf-scope`. Mismo motivo aplica a `appearance="bare"`: cubre el host; el workaround lo
+> extiende al scope interno.
+
 **Modo claro/oscuro — gotcha importante:** por defecto el renderer sigue el modo del SO
 del visitante (`prefers-color-scheme`). Si tu sección es una **banda clara**, un visitante
 con el SO en oscuro vería el formulario oscuro y descuadrado. Forzá claro en el embed:
@@ -192,9 +234,9 @@ El catálogo del selector (`InsertableFormCatalogEntryVm.formKey`) ya lo expone.
 - **No** apuntes a un canal `stable` antes de aprobar el smoke; deja `preview`/`beta`.
 - **No** copies el bundle del renderer al sitio: siempre se carga desde Greenhouse
   (asi todos los sitios quedan en la misma version).
-- **No** reemplaces el bridge AEO `/aeo-2/` por el widget generico sin task de migracion
-  y smoke visual/runtime. El renderer ya emite `captchaToken`, pero el cambio live exige
-  backup Elementor, protección del hero y verificacion desktop/mobile 390.
+- **No** restaures el bridge AEO `/aeo-2/` salvo rollback explicito del operador usando
+  el backup documentado. Cualquier cambio futuro sobre AEO exige backup Elementor,
+  protección del hero y `pnpm public-website:verify-aeo-live-contract`.
 
 ## Problemas comunes
 

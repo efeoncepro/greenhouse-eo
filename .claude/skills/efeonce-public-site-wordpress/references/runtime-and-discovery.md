@@ -54,6 +54,36 @@ pnpm public-website:deploy-dry-run
 
 `public-website:*` commands load `.env.local` / `.env` safely. Do not paste secrets into command lines.
 
+## Local/Live Sync Contract
+
+Before any public-site runtime rollout, refresh the live Kinsta snapshot and read the classified
+drift report:
+
+```bash
+pnpm public-website:export-live-code
+pnpm public-website:diff-runtime -- --write
+pnpm public-website:runtime-status
+```
+
+The drift report keeps legacy `status` counts but also includes:
+
+- `classificationCounts.repo_pending_release`: local repo/worktree differs from Kinsta live because
+  a governed file is not deployed yet. Use a scoped release package or explicitly include it.
+- `classificationCounts.content_drift`: same governed file differs and is not explained by local
+  pending changes. Inspect before any deploy.
+- `classificationCounts.live_untracked_file`: Kinsta live has a governed file missing from repo.
+  Reconcile or ignore by policy before claiming local/live sync.
+- `releaseSafety.fullRepoDeploySafe`: must be `true` before a blind/full runtime repo deploy is
+  considered safe. If `false`, do not deploy the full repo; scope the release or reconcile first.
+
+Current known state (2026-07-01): latest classified report
+`docs/operations/public-site-drift/drift-2026-07-01T10-54-46-557Z.json` has
+`fullRepoDeploySafe=true`, `content_drift=0`, `repo_pending_release=0` and
+`live_untracked_file=0`; only three live backup artifacts are ignored by policy. The runtime repo
+is clean at `1d36d51` after reconciling the AEO engine avatar group and Growth Form catalog widget
+files with Kinsta. A full production deploy still requires an explicit release decision; do not infer
+authorization from a green drift report alone.
+
 ## Bridge State
 
 `greenhouse-wp-bridge` is deployed as a read/inspection foundation; writes remain gated by explicit rollout, shared secret, flags, and rollback plan.

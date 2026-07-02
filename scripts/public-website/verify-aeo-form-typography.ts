@@ -13,7 +13,7 @@ type ViewportCheck = {
   viewport: { width: number; height: number }
   overflowX: number
   sectionTitle: TextProbe
-  formTitle: TextProbe
+  formTitle: TextProbe | null
   zeroTracking: TextProbe[]
   screenshot: string
 }
@@ -62,6 +62,12 @@ const readProbe = async (page: Page, selector: string): Promise<TextProbe> => {
   }, selector)
 }
 
+const readOptionalProbe = async (page: Page, selector: string): Promise<TextProbe | null> => {
+  const count = await page.locator(selector).count()
+
+  return count > 0 ? readProbe(page, selector) : null
+}
+
 const assertTitleTracking = (label: string, probe: TextProbe) => {
   if (probe.letterSpacing === 'normal' || probe.letterSpacingPx === null) {
     throw new Error(`${label} computed letter-spacing is ${probe.letterSpacing}; expected ${titleTrackingEm}em`)
@@ -92,21 +98,48 @@ async function main() {
     for (const testCase of viewports) {
       const page = await browser.newPage({ viewport: testCase.viewport })
 
-      await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 60000 })
+      await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 60000 })
+      await page.waitForSelector('.gh-aeo-conversion .gh-aeo-growth-form-card', { timeout: 30000 })
+      await page.waitForSelector(
+        '.gh-aeo-conversion greenhouse-form .ghf-btn, .gh-aeo-conversion .gh-aeo-growth-form-label',
+        { timeout: 30000 }
+      )
+      await page.evaluate(() => document.fonts?.ready).catch(() => undefined)
       await page.locator('.gh-aeo-conversion').scrollIntoViewIfNeeded()
 
       const sectionTitle = await readProbe(page, '.gh-aeo-conversion .gh-aeo-section-title .title')
-      const formTitle = await readProbe(page, '.gh-aeo-conversion .gh-aeo-growth-form-title')
+      const formTitle = await readOptionalProbe(page, '.gh-aeo-conversion .gh-aeo-growth-form-title')
 
-      const zeroSelectors = [
-        '.gh-aeo-conversion .gh-aeo-growth-form-lead',
-        '.gh-aeo-conversion .gh-aeo-growth-form-label',
-        '.gh-aeo-conversion .gh-aeo-growth-form-input',
-        '.gh-aeo-conversion .gh-aeo-growth-form-button',
-        '.gh-aeo-conversion .gh-aeo-growth-form-proof',
-      ]
+      const implementation = await page.evaluate(() =>
+        document.querySelector('greenhouse-form .ghf-btn') ? 'renderer' : 'bridge'
+      ) as 'bridge' | 'renderer'
 
-      const zeroTracking = await Promise.all(zeroSelectors.map(selector => readProbe(page, selector)))
+      const zeroSelectors = implementation === 'renderer'
+        ? [
+            '.gh-aeo-conversion .gh-aeo-growth-form-lead',
+            '.gh-aeo-conversion greenhouse-form .ghf-label',
+            '.gh-aeo-conversion greenhouse-form .ghf-input',
+            '.gh-aeo-conversion greenhouse-form .ghf-select',
+            '.gh-aeo-conversion greenhouse-form .ghf-btn',
+            '.gh-aeo-conversion .gh-aeo-growth-form-proof',
+          ]
+        : [
+            '.gh-aeo-conversion .gh-aeo-growth-form-lead',
+            '.gh-aeo-conversion .gh-aeo-growth-form-label',
+            '.gh-aeo-conversion .gh-aeo-growth-form-input',
+            '.gh-aeo-conversion .gh-aeo-growth-form-button',
+            '.gh-aeo-conversion .gh-aeo-growth-form-proof',
+          ]
+
+      const existingZeroSelectors: string[] = []
+
+      for (const selector of zeroSelectors) {
+        if ((await page.locator(selector).count()) > 0) {
+          existingZeroSelectors.push(selector)
+        }
+      }
+
+      const zeroTracking = await Promise.all(existingZeroSelectors.map(selector => readProbe(page, selector)))
       const overflowX = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
 
       const screenshot = `${screenshotDir.replace(/\/$/, '')}/aeo-form-typography-gate-${testCase.name}.png`
@@ -114,8 +147,12 @@ async function main() {
       await page.screenshot({ path: screenshot, fullPage: false })
 
       assertTitleTracking(`${testCase.name} section title`, sectionTitle)
-      assertTitleTracking(`${testCase.name} form title`, formTitle)
-      zeroTracking.forEach((probe, index) => assertZeroTracking(`${testCase.name} zero tracking ${zeroSelectors[index]}`, probe))
+
+      if (formTitle) {
+        assertTitleTracking(`${testCase.name} form title`, formTitle)
+      }
+
+      zeroTracking.forEach((probe, index) => assertZeroTracking(`${testCase.name} zero tracking ${existingZeroSelectors[index]}`, probe))
 
       if (overflowX !== 0) {
         throw new Error(`${testCase.name} has horizontal overflow: ${overflowX}px`)

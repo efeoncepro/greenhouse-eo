@@ -38,6 +38,16 @@ export interface PublishedSnapshot {
   publicReport: PublicGraderReport
 }
 
+/**
+ * TASK-1280 — extensión ADITIVA del snapshot leído por token: suma `brandName` (la marca
+ * evaluada, resuelta por `run → profile`) para armar el `header` render-ready del contrato
+ * público headless. `brandName` es público-safe (lo declaró el propio usuario). Structural
+ * subtype de `PublishedSnapshot` → no rompe consumers que sólo leen los campos previos.
+ */
+export interface PublicReportSnapshot extends PublishedSnapshot {
+  brandName: string
+}
+
 type RawSnapshot = {
   report_id: unknown
   run_id: unknown
@@ -134,14 +144,26 @@ export const publishGraderReportSnapshot = async (input: {
  * `expires_at` en SQL (expirado o inexistente → null, sin distinguir para no filtrar
  * existencia). NUNCA recomputa: sirve el payload congelado.
  */
-export const readPublicGraderReport = async (reportToken: string): Promise<PublishedSnapshot | null> => {
-  const rows = await runGreenhousePostgresQuery<RawSnapshot>(
-    `SELECT report_id, run_id, report_token, as_of, expires_at, public_report_json
-       FROM greenhouse_growth.grader_reports
-      WHERE report_token = $1 AND (expires_at IS NULL OR expires_at > NOW())
+export const readPublicGraderReport = async (reportToken: string): Promise<PublicReportSnapshot | null> => {
+  // JOIN a run → profile por la marca evaluada (para el `header` del contrato headless,
+  // TASK-1280). INNER JOIN es seguro: `grader_reports.run_id` (NOT NULL FK) → `grader_runs`
+  // → `grader_runs.profile_id` (NOT NULL FK) → `grader_profiles.brand_name` (NOT NULL) están
+  // garantizados por integridad referencial, así que el JOIN nunca convierte un reporte
+  // válido en 404. NUNCA recompone: sirve el `public_report_json` congelado tal cual.
+  const rows = await runGreenhousePostgresQuery<RawSnapshot & { brand_name: unknown }>(
+    `SELECT gr.report_id, gr.run_id, gr.report_token, gr.as_of, gr.expires_at, gr.public_report_json,
+            p.brand_name
+       FROM greenhouse_growth.grader_reports gr
+       JOIN greenhouse_growth.grader_runs r ON r.run_id = gr.run_id
+       JOIN greenhouse_growth.grader_profiles p ON p.profile_id = r.profile_id
+      WHERE gr.report_token = $1 AND (gr.expires_at IS NULL OR gr.expires_at > NOW())
       LIMIT 1`,
     [reportToken]
   )
 
-  return rows[0] ? projectSnapshot(rows[0]) : null
+  const row = rows[0]
+
+  if (!row) return null
+
+  return { ...projectSnapshot(row), brandName: String(row.brand_name) }
 }

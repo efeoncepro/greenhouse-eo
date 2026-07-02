@@ -6,58 +6,66 @@
 - Owner task: `TASK-1298 — AEO WordPress greenhouse-form migration`
 - Related wireframe: `docs/ui/wireframes/TASK-1298-aeo-greenhouse-form-migration.md`
 - Related flow: `none`
-- Motion type: `none`
-- Primary primitive / library: `existing primitive`
+- Motion type: `microinteraction`
+- Primary primitive / library: `existing renderer CSS transitions; no new external library in WordPress`
 - Copy source: Growth Forms render contract + AEO landing wrapper copy
 
 ## Motion Brief
 
 - Primary user: public AEO diagnostic visitor.
-- Motion intent: no new decorative or layout motion; preserve clarity during validation, pending submit and error states.
-- Uncertainty reduced: field/status feedback must remain understandable even when motion is reduced or disabled.
+- Motion intent: modernize the form feel through useful feedback only: focus clarity, validation recovery, pending submit, email verification and success/error confirmation.
+- Uncertainty reduced: visitors should understand whether the form is editable, validating, blocked, submitting or accepted without relying on a global status blob.
 - User decision supported: submit with confidence that the form accepted validation/captcha steps.
-- Non-goals: add entrance animations, stagger, layout morph, GSAP, Framer or decorative effects.
+- Non-goals: decorative entrance choreography, staggered hero-like reveals, GSAP/Framer/Lottie in WordPress, confetti, glow-heavy CTAs or motion that distracts from conversion.
 
 ## Motion Inventory
 
 | Element | Trigger | Motion / feedback | Primitive | Required? |
 |---|---|---|---|---|
-| Renderer submit button | submit | existing pending/disabled feedback from renderer | `<greenhouse-form>` | yes |
-| Field error/status | input/blur/submit | existing inline status; text is authoritative | `<greenhouse-form>` | yes |
+| Renderer submit button | hover/focus/press/submit | subtle elevation/press state + pending affordance; arrow shifts a few px on hover; text remains authoritative | `<greenhouse-form>` | yes |
+| Field focus | focus/blur | border/focus ring transition, no layout shift | `<greenhouse-form>` | yes |
+| Field error/status | input/blur/submit | inline error/success feedback; text is authoritative; small reveal only if reduced-motion safe | `<greenhouse-form>` | yes |
+| Email verification | debounce/response | status line appears near field, no card jump; pending indicator with text | `<greenhouse-form>` | yes |
 | Turnstile boundary | submit | invisible challenge; no visible decorative motion | Turnstile + renderer | yes |
-| AEO host card | mount/load | no new motion | WordPress host | yes |
+| AEO host card | mount/load | no decorative mount motion in WordPress live; renderer lab may prototype subtle field readiness only | WordPress host / renderer | no |
 
 ## Microinteraction States
 
 | Element | Idle | Hover | Focus | Pressed | Selected | Pending | Success / error |
 |---|---|---|---|---|---|---|---|
-| Submit | enabled | existing renderer style | visible focus | pressed state | N/A | disabled/pending text/state | success/error status |
-| Fields | editable | existing renderer style | visible focus | N/A | N/A | verifying state for email | inline error/success text |
+| Submit | enabled | small transform/shadow or tonal shift | visible focus ring | brief press compression | N/A | disabled/pending text/state | success/error status |
+| Fields | editable | border/tint only if pointer | visible focus ring | N/A | N/A | verifying state for email | inline error/success text + border/icon |
+| Selects | editable + premium listbox | border/tint only if pointer | visible focus ring + chevron accent | combobox opens custom listbox; arrow keys move active option; Enter selects; Escape closes | selected value | N/A | error text if required in future |
 
 ## Transition Specs
 
 | Transition | From | To | Timing / easing token | Behavior | Reduced-motion fallback |
 |---|---|---|---|---|---|
-| N/A | N/A | N/A | N/A | no new transition | same static state |
+| Field focus | neutral | focused | 120-160ms / emphasized ease | border/focus ring changes only | instant focus ring |
+| Select listbox | closed | open | 120-160ms / emphasized ease | panel appears anchored below the control; no OS-native dropdown styling | panel appears instantly |
+| Field validation | neutral | error/success | 120-180ms / emphasized ease | reveal inline message without large vertical jump | message appears instantly |
+| CTA hover/press | idle | hover/pressed | 75-140ms / emphasized ease | small elevation/translate on hover and shadow compression on press | no transform, color/focus remains |
+| CTA arrow | idle | hover | 120-140ms / emphasized ease | arrow translates 3px to reinforce continuation | arrow remains static |
+| Submit pending | idle | pending | 120-200ms | disabled affordance + text change; no spinner-only meaning | text/state change only |
 
 ## Primitive & Token Mapping
 
-- Primitive: `<greenhouse-form>` existing renderer.
+- Primitive: `<greenhouse-form>` existing renderer with `styleVariant=diagnostic_premium`.
 - Imports allowed: none in WordPress; renderer script only.
 - Imports forbidden: GSAP, Framer, Lottie, ad-hoc animation libraries.
-- Timing tokens: existing renderer only.
-- Easing tokens: existing renderer only.
+- Timing tokens: 75ms press, 120-160ms focus, 180ms validation reveal, 200ms pending transition.
+- Easing tokens: `cubic-bezier(0.2, 0, 0, 1)` or existing renderer equivalent.
 - Layout animation: none.
-- CSS properties: scoped host CSS may adjust layout/color/spacing only.
+- CSS properties: opacity, transform, border-color, box-shadow and background-color only; no height animation that causes layout jumps. Current renderer uses tokenized field/action shadows, focus halo, custom select icon/listbox and CTA arrow span; host overrides stay through `--ghf-*`.
 - GSAP/Lottie justification: N/A.
 
 ## Reduced Motion Contract
 
 - Detection: Playwright/GVC with `prefers-reduced-motion: reduce`.
-- Replacement behavior: same states remain visible without relying on animation.
+- Replacement behavior: same states remain visible without transform/transition; text, border, focus ring and aria state remain.
 - Meaning preserved: pending, errors and success are expressed by text/ARIA/state, not motion.
-- Animations removed: no new host animation is introduced.
-- Animations retained: only browser/renderer default feedback if non-disruptive.
+- Animations removed: decorative transforms, field reveal animations and CTA press transform.
+- Animations retained: immediate state/color changes when they do not convey meaning alone.
 
 ## Accessibility & Feedback
 
@@ -78,24 +86,26 @@
 
 ## GVC / Micro Evidence
 
-- Scenario: AEO conversion renderer migration.
-- Scenario file: direct route capture or new scenario if needed.
+- Scenario: AEO conversion renderer migration / modernized form parity.
+- Scenario file: `pnpm public-website:verify-aeo-form-live-behavior` for live focus/ARIA, email gate, Turnstile boundary and dataLayer checks.
 - Route: `https://efeoncepro.com/aeo-2/`.
 - Viewports: desktop, mobile 390, reduced-motion.
-- Required steps: load conversion section, trigger invalid submit, trigger email gate, observe pending submit boundary.
-- Required captures: default, error state, pending/email verification state, reduced-motion.
-- Required frame labels: `default`, `field-error`, `email-gate`, `reduced-motion`.
+- Required steps: load conversion section, focus first field, trigger invalid submit, verify summary/ARIA, verify premium dropdown ARIA, trigger email gate and pending submit boundary.
+- Required captures: default, focus state, required error state, email gate/verifying state and submit boundary.
+- Required frame labels: `default`, `focus`, `field-error`, `reduced-motion`; later `email-gate`, `pending`.
 - Required `data-capture` markers: `.gh-aeo-conversion`, renderer root, submit button.
-- Assertions: no new host animation, no layout jump/overflow, reduced-motion preserves state meaning.
-- Reduced-motion evidence: computed transition/animation checks or visual capture showing stable static states.
+- Assertions: no layout jump/overflow, reduced-motion preserves state meaning, focus ring visible, CTA not dark/default, selects clean, errors announced by text.
+- Reduced-motion evidence remains covered by renderer tests/prelive fixture; live behavior covers the current production interaction boundary.
 
 ## Design Decision Log
 
-- Decision: no new motion; reuse renderer feedback.
-- Alternatives considered: animated card entrance, custom pending spinner, accordion-like reveal around errors.
-- Why this pattern: this is a trust/conversion form, so clarity and stability matter more than decorative motion.
-- Reuse / extend / new primitive: reuse existing renderer; do not create a motion primitive.
-- Open risks: renderer built-in transitions may need observation if they cause layout shift in Elementor.
+- Decision: allow purposeful microinteractions in the renderer, but no decorative WordPress host animation.
+- Decision delta 2026-06-30 premium pass: `diagnostic_premium` may add CTA arrow motion, custom single-select combobox/listbox, chevron focus feedback and calmer error reveal because each reduces uncertainty or reinforces continuation; no card entrance choreography.
+- Decision delta 2026-06-30: prevent primary `pointerdown` default so blur validation cannot shift layout under the first submit click; submit handler remains the authority for full-step validation.
+- Alternatives considered: animated card entrance, custom spinner-only pending state, accordion-like reveal around errors, glow-heavy CTA.
+- Why this pattern: this is a trust/conversion form; modern feel should come from responsive feedback, not theatrical motion.
+- Reuse / extend / new primitive: extend existing renderer interaction styling; do not create a one-off WordPress motion layer.
+- Open risks: renderer built-in transitions may need observation if they cause layout shift in Elementor or conflict with Ohio.
 - Follow-up: only introduce host-level motion if a future landing pattern requires a reusable contract.
 
 ## Acceptance Checklist

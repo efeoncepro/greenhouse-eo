@@ -33,6 +33,10 @@ export const RENDERER_CSS = `
     --ghf-radius: 8px;
     --ghf-gap: 16px;
     --ghf-focus: #2563eb;
+    --ghf-field-shadow: 0 1px 2px rgba(16, 22, 43, 0.04);
+    --ghf-field-shadow-focus: 0 0 0 4px rgba(37, 99, 235, 0.14);
+    --ghf-action-shadow: 0 10px 24px rgba(16, 22, 43, 0.10);
+    --ghf-action-shadow-hover: 0 14px 30px rgba(16, 22, 43, 0.14);
 
     display: block;
     container-type: inline-size;
@@ -40,6 +44,26 @@ export const RENDERER_CSS = `
     color: var(--ghf-fg);
     background: var(--ghf-bg);
     -webkit-text-size-adjust: 100%;
+  }
+
+  [data-ghf-style-variant="diagnostic_premium"] {
+    --ghf-accent: #36c8bf;
+    --ghf-accent-contrast: #052b42;
+    --ghf-fg: #101827;
+    --ghf-muted: #68758a;
+    --ghf-field-bg: #ffffff;
+    --ghf-border: #d9e4ee;
+    --ghf-border-strong: #9fb0c4;
+    --ghf-error: #a73b2e;
+    --ghf-error-bg: #fff7f5;
+    --ghf-success: #17885f;
+    --ghf-radius: 12px;
+    --ghf-gap: 18px;
+    --ghf-focus: #24b8b0;
+    --ghf-field-shadow: 0 1px 0 rgba(16, 24, 39, 0.02), 0 10px 26px rgba(16, 24, 39, 0.035);
+    --ghf-field-shadow-focus: 0 0 0 4px rgba(54, 200, 191, 0.18), 0 14px 34px rgba(16, 24, 39, 0.07);
+    --ghf-action-shadow: 0 16px 34px rgba(54, 200, 191, 0.28), 0 2px 8px rgba(5, 43, 66, 0.08);
+    --ghf-action-shadow-hover: 0 20px 44px rgba(54, 200, 191, 0.34), 0 4px 12px rgba(5, 43, 66, 0.10);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -56,6 +80,10 @@ export const RENDERER_CSS = `
       --ghf-error: #ff8aa0;
       --ghf-error-bg: #2a151b;
       --ghf-success: #34d399;
+      --ghf-field-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+      --ghf-field-shadow-focus: 0 0 0 4px rgba(108, 140, 255, 0.18);
+      --ghf-action-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
+      --ghf-action-shadow-hover: 0 14px 30px rgba(0, 0, 0, 0.42);
     }
   }
 
@@ -82,6 +110,7 @@ export const RENDERER_CSS = `
   }
 
   .ghf-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-field { gap: 8px; }
   .ghf-label { font-size: 0.875rem; font-weight: 600; line-height: 1.3; color: var(--ghf-fg); }
   .ghf-required { color: var(--ghf-error); margin-inline-start: 2px; }
   .ghf-optional { color: var(--ghf-muted); font-weight: 400; margin-inline-start: 4px; }
@@ -99,9 +128,19 @@ export const RENDERER_CSS = `
     width: 100%;
     min-height: 44px;
     line-height: 1.4;
-    transition: border-color 120ms ease, box-shadow 120ms ease;
+    box-shadow: var(--ghf-field-shadow);
+    transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease, background-color 140ms ease;
   }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-input,
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-textarea,
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-select {
+    min-height: 52px;
+    padding: 14px 16px;
+    border-radius: var(--ghf-radius);
+  }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-select { padding-inline-end: 44px; }
   .ghf-textarea { min-height: 96px; resize: vertical; }
+  .ghf-select { appearance: none; }
   .ghf-input:hover,
   .ghf-textarea:hover,
   .ghf-select:hover { border-color: var(--ghf-border-strong); }
@@ -115,20 +154,161 @@ export const RENDERER_CSS = `
     outline: 2px solid var(--ghf-focus);
     outline-offset: 2px;
   }
+  .ghf-input:focus-visible,
+  .ghf-textarea:focus-visible,
+  .ghf-select:focus-visible {
+    box-shadow: var(--ghf-field-shadow-focus);
+  }
 
   .ghf-field[data-invalid="true"] .ghf-input,
   .ghf-field[data-invalid="true"] .ghf-textarea,
-  .ghf-field[data-invalid="true"] .ghf-select { border-color: var(--ghf-error); background: var(--ghf-error-bg); }
+  .ghf-field[data-invalid="true"] .ghf-select {
+    border-color: var(--ghf-error);
+    background: var(--ghf-field-bg);
+    box-shadow: 0 0 0 3px rgba(179, 35, 56, 0.10);
+  }
 
   .ghf-error {
     display: flex; align-items: flex-start; gap: 6px;
     font-size: 0.8125rem; line-height: 1.4; color: var(--ghf-error);
   }
   .ghf-error::before { content: "!"; flex: 0 0 auto; font-weight: 700; }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-error {
+    gap: 8px;
+    color: var(--ghf-error);
+    font-weight: 600;
+  }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-error::before {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 16px;
+    block-size: 16px;
+    border-radius: 999px;
+    color: var(--ghf-error);
+    background: var(--ghf-error-bg);
+    font-size: 0.6875rem;
+    line-height: 1;
+  }
 
   /* TASK-1256 Slice 1c — estado reactivo: ✓ verde al validar (reward early). */
   .ghf-control { position: relative; display: block; min-width: 0; }
   .ghf-status-icon { position: absolute; right: 12px; top: 22px; pointer-events: none; display: none; line-height: 1; }
+  .ghf-select-icon {
+    position: absolute;
+    inset-inline-end: 16px;
+    top: 50%;
+    inline-size: 9px;
+    block-size: 9px;
+    border-inline-end: 2px solid var(--ghf-muted);
+    border-block-end: 2px solid var(--ghf-muted);
+    pointer-events: none;
+    transform: translateY(-65%) rotate(45deg);
+    transition: transform 140ms ease, border-color 140ms ease;
+  }
+  .ghf-control--select:focus-within .ghf-select-icon {
+    border-color: var(--ghf-accent);
+    transform: translateY(-45%) rotate(45deg);
+  }
+  .ghf-select-composite {
+    position: relative;
+    min-width: 0;
+  }
+  .ghf-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: start;
+    cursor: pointer;
+  }
+  .ghf-select-trigger .ghf-select-icon {
+    position: static;
+    flex: 0 0 auto;
+    inline-size: 18px;
+    block-size: 18px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    transform: none;
+    margin: 0;
+  }
+  .ghf-select-trigger .ghf-select-icon::before {
+    content: "";
+    inline-size: 8px;
+    block-size: 8px;
+    border-inline-end: 2px solid var(--ghf-muted);
+    border-block-end: 2px solid var(--ghf-muted);
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 140ms ease, border-color 140ms ease;
+  }
+  .ghf-select-composite[data-open="true"] .ghf-select-trigger {
+    border-color: var(--ghf-focus);
+    box-shadow: var(--ghf-field-shadow-focus);
+  }
+  .ghf-select-composite[data-open="true"] .ghf-select-icon {
+    border-color: transparent;
+  }
+  .ghf-select-composite[data-open="true"] .ghf-select-icon::before {
+    border-color: var(--ghf-accent);
+    transform: translateY(2px) rotate(-135deg);
+  }
+  .ghf-select-value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ghf-select-trigger[data-placeholder="true"] .ghf-select-value {
+    color: var(--ghf-muted);
+  }
+  .ghf-select-list {
+    position: absolute;
+    z-index: 30;
+    inset-inline: 0;
+    top: calc(100% + 8px);
+    display: grid;
+    gap: 4px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid var(--ghf-border);
+    border-radius: var(--ghf-radius);
+    background: var(--ghf-field-bg);
+    box-shadow: 0 24px 56px rgba(16, 24, 39, 0.16), 0 4px 14px rgba(16, 24, 39, 0.08);
+  }
+  .ghf-select-list[hidden] { display: none; }
+  .ghf-select-option {
+    position: relative;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 9px 12px 9px 34px;
+    border-radius: 9px;
+    color: var(--ghf-fg);
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 120ms ease, color 120ms ease, transform 120ms ease;
+  }
+  .ghf-select-option::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 12px;
+    color: var(--ghf-accent);
+    font-weight: 800;
+  }
+  .ghf-select-option[aria-selected="true"]::before { content: "✓"; }
+  .ghf-select-option:hover,
+  .ghf-select-option[data-active="true"] {
+    background: rgba(54, 200, 191, 0.12);
+    color: var(--ghf-accent-contrast);
+  }
+  .ghf-select-option[aria-selected="true"] {
+    background: rgba(54, 200, 191, 0.18);
+    color: var(--ghf-accent-contrast);
+    font-weight: 700;
+  }
   .ghf-field[data-status="success"] .ghf-status-icon { display: block; color: var(--ghf-success); }
   .ghf-field[data-status="success"] .ghf-status-icon::before { content: "✓"; font-weight: 700; }
   .ghf-field[data-status="success"] .ghf-input { border-color: var(--ghf-success); padding-right: 36px; }
@@ -197,20 +377,128 @@ export const RENDERER_CSS = `
   .ghf-check a { color: var(--ghf-accent); }
 
   .ghf-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-actions { justify-content: center; }
   .ghf-btn {
     font: inherit; font-weight: 600;
     min-height: 44px; padding: 10px 20px;
     border-radius: var(--ghf-radius); border: 1px solid transparent;
     cursor: pointer;
     background: var(--ghf-accent); color: var(--ghf-accent-contrast);
+    box-shadow: var(--ghf-action-shadow);
+    transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease, opacity 140ms ease;
   }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 52px;
+    min-width: min(100%, 420px);
+    padding: 13px 26px;
+    font-weight: 700;
+    letter-spacing: 0 !important;
+  }
+  .ghf-btn-arrow {
+    display: inline-block;
+    transform: translateX(0);
+    transition: transform 140ms ease;
+  }
+  .ghf-btn:hover { transform: translateY(-1px); box-shadow: var(--ghf-action-shadow-hover); filter: saturate(1.04); }
+  .ghf-btn:hover .ghf-btn-arrow { transform: translateX(3px); }
+  .ghf-btn:active { transform: translateY(0); box-shadow: var(--ghf-action-shadow); filter: saturate(0.98); }
   .ghf-btn[aria-disabled="true"] { opacity: 0.7; cursor: progress; }
   .ghf-btn--ghost { background: transparent; color: var(--ghf-accent); border-color: var(--ghf-border-strong); }
+
+  /* TASK-1298 — hostile-host hardening.
+     WordPress/Ohio can apply aggressive input/select/button declarations (including
+     background images on selects and default dark button skins). These rules keep the
+     portable renderer visually stable while preserving host theming through --ghf-* tokens. */
+  greenhouse-form .ghf-form .ghf-input,
+  greenhouse-form .ghf-form .ghf-textarea,
+  greenhouse-form .ghf-form .ghf-select,
+  .ghf-scope .ghf-form .ghf-input,
+  .ghf-scope .ghf-form .ghf-textarea,
+  .ghf-scope .ghf-form .ghf-select {
+    font: inherit !important;
+    color: var(--ghf-fg) !important;
+    background: var(--ghf-field-bg) !important;
+    background-color: var(--ghf-field-bg) !important;
+    border: 1px solid var(--ghf-border) !important;
+    box-shadow: var(--ghf-field-shadow) !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-input:focus-visible,
+  greenhouse-form .ghf-form .ghf-textarea:focus-visible,
+  greenhouse-form .ghf-form .ghf-select:focus-visible,
+  .ghf-scope .ghf-form .ghf-input:focus-visible,
+  .ghf-scope .ghf-form .ghf-textarea:focus-visible,
+  .ghf-scope .ghf-form .ghf-select:focus-visible {
+    box-shadow: var(--ghf-field-shadow-focus) !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-field[data-invalid="true"] .ghf-input,
+  greenhouse-form .ghf-form .ghf-field[data-invalid="true"] .ghf-textarea,
+  greenhouse-form .ghf-form .ghf-field[data-invalid="true"] .ghf-select,
+  .ghf-scope .ghf-form .ghf-field[data-invalid="true"] .ghf-input,
+  .ghf-scope .ghf-form .ghf-field[data-invalid="true"] .ghf-textarea,
+  .ghf-scope .ghf-form .ghf-field[data-invalid="true"] .ghf-select {
+    border-color: var(--ghf-error) !important;
+    background-color: var(--ghf-field-bg) !important;
+    box-shadow: 0 0 0 3px rgba(179, 35, 56, 0.10) !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-select,
+  .ghf-scope .ghf-form .ghf-select,
+  greenhouse-form .ghf-form .ghf-tel-country,
+  .ghf-scope .ghf-form .ghf-tel-country {
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    text-transform: none !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-btn,
+  .ghf-scope .ghf-form .ghf-btn {
+    font: inherit !important;
+    font-weight: 600 !important;
+    background: var(--ghf-accent) !important;
+    color: var(--ghf-accent-contrast) !important;
+    border-color: transparent !important;
+    box-shadow: var(--ghf-action-shadow) !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-btn:hover,
+  .ghf-scope .ghf-form .ghf-btn:hover {
+    box-shadow: var(--ghf-action-shadow-hover) !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-btn--ghost,
+  .ghf-scope .ghf-form .ghf-btn--ghost {
+    background: transparent !important;
+    color: var(--ghf-accent) !important;
+    border-color: var(--ghf-border-strong) !important;
+  }
 
   .ghf-summary { color: var(--ghf-error); font-size: 0.875rem; }
   .ghf-progress { font-size: 0.8125rem; color: var(--ghf-muted); font-weight: 600; }
 
   .ghf-status { font-size: 0.9375rem; line-height: 1.5; }
+  .ghf-status--success {
+    border: 1px solid rgba(31, 157, 87, 0.24);
+    border-radius: var(--ghf-radius);
+    background: rgba(31, 157, 87, 0.08);
+    color: var(--ghf-fg);
+    padding: 14px 16px;
+    font-weight: 600;
+  }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-status--success {
+    border-color: rgba(23, 136, 95, 0.28);
+    background: rgba(23, 136, 95, 0.08);
+    box-shadow: 0 14px 34px rgba(16, 24, 39, 0.06);
+  }
   .ghf-status--error { color: var(--ghf-error); }
 
   .ghf-skeleton { display: grid; gap: var(--ghf-gap); }

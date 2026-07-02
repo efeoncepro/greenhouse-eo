@@ -39,15 +39,23 @@ export type PublicSiteRuntimeDriftStatus =
   | 'repo_missing'
   | 'repo_extra'
   | 'ignored_live'
+export type PublicSiteRuntimeDriftClassification =
+  | 'live_synced'
+  | 'ignored_runtime_artifact'
+  | 'repo_pending_release'
+  | 'live_untracked_file'
+  | 'content_drift'
 
 export type PublicSiteRuntimeDriftRow = {
   path: string
   status: PublicSiteRuntimeDriftStatus
+  classification?: PublicSiteRuntimeDriftClassification
   liveSha256?: string
   repoSha256?: string
   liveBytes?: number
   repoBytes?: number
   reason?: string
+  impact?: string
 }
 
 export type PublicSiteRuntimeDriftReportV1 = {
@@ -57,6 +65,12 @@ export type PublicSiteRuntimeDriftReportV1 = {
   liveGeneratedAt: string
   repoRoot: string
   counts: Record<PublicSiteRuntimeDriftStatus, number>
+  classificationCounts?: Record<PublicSiteRuntimeDriftClassification, number>
+  releaseSafety?: {
+    fullRepoDeploySafe: boolean
+    mustReviewBeforeFullRepoDeploy: number
+    guidance: string
+  }
   rows: PublicSiteRuntimeDriftRow[]
 }
 

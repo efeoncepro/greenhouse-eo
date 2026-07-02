@@ -1,0 +1,14 @@
+{
+  "formId": "8649e76c-8b01-41f3-9b0c-5713d7b4dba6",
+  "fields": [
+    {
+      "objectType": "companies",
+      "name": "domain",
+      "label": "Sitio web de la marca",
+      "fieldType": "single_line_text",
+      "required": false,
+      "hidden": false,
+      "after": "email"
+    }
+  ]
+}

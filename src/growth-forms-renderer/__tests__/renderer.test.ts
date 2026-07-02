@@ -32,6 +32,43 @@ describe('growth-forms-renderer · FormRenderer', () => {
     window.localStorage.clear()
   })
 
+  it('scopes the standalone mount root with .ghf-scope (div mount / internal preview)', () => {
+    const { root } = mountInto()
+
+    expect(root.classList.contains('ghf-scope')).toBe(true)
+  })
+
+  it('does NOT add .ghf-scope when hosted inside <greenhouse-form> (host is the scope, TASK-1298)', () => {
+    // El host declara los tokens --ghf-* (selector `greenhouse-form`); re-declararlos en
+    // el wrapper interno (.ghf-scope) sombrearía los overrides del host — appearance="bare"
+    // y `greenhouse-form { --ghf-font/--ghf-bg }` dejaban de propagar al contenido.
+    const host = document.createElement('div')
+
+    document.body.appendChild(host)
+    const root = document.createElement('div')
+
+    host.appendChild(root)
+
+    const renderer = new FormRenderer({
+      root,
+      contract: staticContractFixture(),
+      api,
+      fetchImpl: okFetch(),
+      doc: document,
+      hosted: true,
+    })
+
+    renderer.mount()
+
+    expect(root.classList.contains('ghf-scope')).toBe(false)
+  })
+
+  it('exposes contract styleVariant on the renderer root for governed visual variants', () => {
+    const { root } = mountInto(staticContractFixture({ styleVariant: 'diagnostic_premium' }))
+
+    expect(root.getAttribute('data-ghf-style-variant')).toBe('diagnostic_premium')
+  })
+
   it('renders labels above inputs with autocomplete + inputmode from the contract', () => {
     const { root } = mountInto()
     const email = root.querySelector<HTMLInputElement>('[name="work_email"]')!
@@ -61,6 +98,16 @@ describe('growth-forms-renderer · FormRenderer', () => {
 
     expect(errorNode.getAttribute('role')).toBe('alert')
     expect(errorNode.textContent).toBeTruthy()
+  })
+
+  it('prevents primary pointerdown from causing pre-submit blur layout shift', () => {
+    const { root } = mountInto()
+    const primary = root.querySelector<HTMLButtonElement>('[data-ghf-primary]')!
+    const event = new window.Event('pointerdown', { bubbles: true, cancelable: true })
+
+    primary.dispatchEvent(event)
+
+    expect(event.defaultPrevented).toBe(true)
   })
 
   it('submits raw values, emits the funnel, and shows inline success', async () => {
@@ -120,6 +167,98 @@ describe('growth-forms-renderer · FormRenderer', () => {
     select.value = 'growth'
     select.dispatchEvent(new Event('change'))
     expect(root.querySelector('[name="budget"]')).not.toBeNull()
+  })
+
+  it('keeps contract-provided blank select placeholders as the first option', () => {
+    const { root } = mountInto(staticContractFixture({
+      fields: [
+        {
+          key: 'country',
+          type: 'select',
+          label: 'País',
+          options: [
+            { value: '', label: 'Selecciona país' },
+            { value: 'CL', label: 'Chile' },
+          ],
+        },
+      ],
+      consent: undefined,
+    }))
+
+    const select = root.querySelector<HTMLSelectElement>('[name="country"]')!
+
+    expect(Array.from(select.options).map(option => option.textContent)).toEqual(['Selecciona país', 'Chile'])
+    expect(select.closest('.ghf-control--select')?.querySelector('.ghf-select-icon')).not.toBeNull()
+  })
+
+  it('renders premium selects as an accessible custom listbox instead of the native popup', () => {
+    const { root } = mountInto(staticContractFixture({
+      styleVariant: 'diagnostic_premium',
+      fields: [
+        {
+          key: 'companySize',
+          type: 'select',
+          label: 'Tamaño de empresa',
+          options: [
+            { value: '', label: 'Selecciona tamaño' },
+            { value: '1-10', label: '1 - 10' },
+            { value: '11-50', label: '11 - 50' },
+          ],
+        },
+      ],
+      consent: undefined,
+    }))
+
+    const trigger = root.querySelector<HTMLButtonElement>('[name="companySize"].ghf-select-trigger')!
+    const list = root.querySelector<HTMLElement>('.ghf-select-list')!
+
+    expect(trigger.getAttribute('role')).toBe('combobox')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(list.hidden).toBe(true)
+
+    trigger.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(list.hidden).toBe(false)
+    expect(root.querySelectorAll('[role="option"]')).toHaveLength(3)
+
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+    expect(trigger.textContent).toContain('1 - 10')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(root.querySelector('[role="option"][aria-selected="true"]')?.textContent).toBe('1 - 10')
+  })
+
+  it('uses contract-provided field required copy when present', () => {
+    const { root } = mountInto(staticContractFixture({
+      fields: [{ key: 'firstName', type: 'text', label: 'Nombre', required: true }],
+      copy: { 'firstName.error.required': 'Escribe tu nombre para personalizar el diagnóstico.' },
+      consent: undefined,
+    }))
+
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    expect(root.querySelector('.ghf-error')?.textContent).toBe('Escribe tu nombre para personalizar el diagnóstico.')
+  })
+
+  it('keeps short fields and selects paired while long intent fields span the form', () => {
+    const { root } = mountInto(staticContractFixture({
+      fields: [
+        { key: 'firstName', type: 'text', label: 'Nombre', maxLength: 120 },
+        { key: 'email', type: 'email', label: 'Email' },
+        { key: 'brandWebsite', type: 'url', label: 'Marca / sitio web', maxLength: 240 },
+        { key: 'country', type: 'select', label: 'País', options: [{ value: '', label: 'Selecciona país' }] },
+        { key: 'mainCompetitor', type: 'text', label: 'Principal competidor', maxLength: 200 },
+      ],
+      consent: undefined,
+    }))
+
+    expect(root.querySelector('[name="firstName"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(false)
+    expect(root.querySelector('[name="email"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(false)
+    expect(root.querySelector('[name="brandWebsite"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(true)
+    expect(root.querySelector('[name="country"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(false)
+    expect(root.querySelector('[name="mainCompetitor"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(true)
   })
 
   it('multi_step_light advances per step and preserves data going back', () => {
@@ -403,7 +542,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(readiness.textContent).toMatch(/Falta/)
     expect(readiness.getAttribute('data-ready')).toBe('false')
 
-    // Completar todo lo requerido → "Listo para enviar".
+    // Completar todo lo requerido → readiness premium.
     const brand = root.querySelector<HTMLInputElement>('[name="brand"]')!
 
     brand.value = 'Brand'
@@ -414,7 +553,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
     consent.dispatchEvent(new Event('change'))
 
     expect(readiness.getAttribute('data-ready')).toBe('true')
-    expect(readiness.textContent).toBe('Listo para enviar')
+    expect(readiness.textContent).toBe('Todo listo para solicitar el diagnóstico')
   })
 
   it('updates the character counter live for maxLength fields', () => {

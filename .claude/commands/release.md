@@ -1,6 +1,6 @@
 ---
-description: Paso a producción Greenhouse (develop→main) vía control plane — preflight → promoción → orquestador → approval gate → workers + Vercel + Azure → health → manifest → watchdog → flags. Conservador por diseño.
-argument-hint: "[target-sha | release goal | rollback | watchdog | drift | incident/break-glass context]"
+description: Paso a produccion Greenhouse develop a main via control plane (preflight, promocion, orquestador, approval gate, workers, Vercel, health, manifest, watchdog). Conservador por diseno.
+argument-hint: target-sha | release goal | rollback | watchdog | drift | break-glass
 ---
 
 # Paso a producción `$ARGUMENTS`

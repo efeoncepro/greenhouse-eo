@@ -8,6 +8,7 @@
 > ADR: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_DECISION_V1.md`
 > Domain: `growth` (`GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`)
 > Runtime contract: `greenhouse-public-ai-visibility-grader.v1` (planned)
+> Complemento SEO (búsqueda clásica): `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` — motor hermano `growth.seo` (EPIC-022 "Search Visibility 360") que mide Google orgánico (rankeo/click/evolución). Los dos motores se **cruzan solo por `organization_id`** en el derived read `readSeoAeoGap` (quadrant 360 rankeo×citabilidad); **NUNCA** fusionan scoring ni comparten tablas.
 
 ## 1. Purpose
 

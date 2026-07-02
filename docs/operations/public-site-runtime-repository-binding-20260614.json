@@ -21,7 +21,8 @@
     "wp-content/themes/ohio-child",
     "wp-content/plugins/eo-headless-content",
     "wp-content/plugins/eo-vibe-coding-api",
-    "wp-content/plugins/greenhouse-wp-bridge"
+    "wp-content/plugins/greenhouse-wp-bridge",
+    "wp-content/plugins/eo-elementor-widgets"
   ],
   "initialBaseline": {
     "sourceExport": "tmp/public-site-code-baselines/2026-06-14T13-47-14-635Z/",

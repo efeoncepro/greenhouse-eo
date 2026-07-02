@@ -47,6 +47,7 @@ Capture:
 
 - Existing pages mix Elementor `container`, legacy `section`, `column`, and `widget`. Support all shapes.
 - Identify nodes by `id`, `elType`, `widgetType`, classes, title/content fingerprint, and parent context. Treat path as diagnostic only.
+- Elementor node ids are not DOM anchors. `id`, `data-id`, and `.elementor-element-<id>` identify Elementor internals; a public URL hash target requires the Advanced CSS ID (`_element_id`) and must be verified with `document.getElementById()`.
 - Prefer Ohio widgets already common on the site: `ohio_heading`, `ohio_service_table`, `ohio_icon_box`, `ohio_button`, `ohio_counter`, `ohio_clients_logo`, `ohio_badge`, `ohio_testimonial`, `ohio_recent_posts`, `ohio_recent_projects`.
 - For full-width backgrounds with balanced inner content, first try native Elementor section controls such as `layout=boxed` + `content_width`.
 - Use semantic classes such as `gh-section-*`, `gh-widget-*`, `gh-slot-*`, and landing-specific `gh-<landing>-*`.
@@ -57,7 +58,8 @@ Capture:
 2. Elementor page settings and generated `post-<id>.css`.
 3. Ohio page meta and `--clb-*` runtime variables.
 4. Browser computed CSS at desktop and mobile 390px.
-5. Child theme or page-scoped CSS only when native controls do not own the problem.
+5. Visual evidence: screenshots, visible bounding boxes, gaps between painted pixels, animation phases, and asset canvases. DOM gap/CSS values alone are not sufficient for logo strips, marquees, carousels, or masked/faded modules.
+6. Child theme or page-scoped CSS only when native controls do not own the problem.
 
 Useful Ohio controls to check before CSS:
 
@@ -77,5 +79,9 @@ Visual guardrails:
 
 - `Document::save()` can affect metas outside the edited widget on published Ohio pages. Protect `_thumbnail_id`, especially when `page_header_title_background_type=featured`.
 - Elementor/Ohio may repeat ids across containers and widgets. Use semantic classes + text/structure when selecting.
+- Elementor data may already be valid JSON. When reading `_elementor_data`, try `json_decode($raw, true)` first and use `wp_unslash()` only as fallback; unconditional unslash can corrupt copied HTML/copy strings.
 - Page-level `!important` rules can override correct widget HTML/CSS; verify computed style.
+- Elementor post CSS can load after plugin or child-theme CSS. For typography/rhythm fixes, verify computed styles in the browser at desktop and mobile, especially `letter-spacing` on nested spans.
+- Absolute Ohio header elements such as inactive wide submenus can create false horizontal `scrollWidth` during visual captures. Identify off-screen offenders before blaming the section under test; scope any guard to the page and preserve hover/focus behavior.
+- Marquee/logo bugs are often composition bugs, not keyframe bugs: check set width versus viewport, number of duplicated sets, `translate()` fraction, animation duration, effective item widths, visible asset pixels, internal whitespace in the files, mask/fades, and empty wrappers.
 - Do not globally patch `#masthead`, footer, sidebar, or hero layers to hide a section seam.

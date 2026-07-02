@@ -10,16 +10,22 @@
  *   pnpm public-website:diff-runtime -- --write
  */
 
-import { createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 import {
   existsSync,
   mkdirSync,
   readdirSync,
-  readFileSync,
   statSync,
   writeFileSync
 } from 'node:fs'
-import { join, relative, resolve } from 'node:path'
+import { join, resolve } from 'node:path'
+
+import {
+  DEFAULT_PUBLIC_SITE_RUNTIME_REPO_ROOT,
+  listPublicSiteRepoFiles,
+  readPublicSiteLiveManifest,
+  readPublicSiteRuntimeBinding
+} from '../../src/lib/public-site/runtime-binding'
 
 type CliOptions = {
   liveManifest: string | null
@@ -28,30 +34,27 @@ type CliOptions = {
   help: boolean
 }
 
-type ManifestFile = {
-  path: string
-  bytes: number
-  sha256: string
-}
-
-type LiveManifest = {
-  generatedAt: string
-  files: ManifestFile[]
-}
-
 type DriftStatus = 'in_sync' | 'drifted' | 'repo_missing' | 'repo_extra' | 'ignored_live'
+type DriftClassification =
+  | 'live_synced'
+  | 'ignored_runtime_artifact'
+  | 'repo_pending_release'
+  | 'live_untracked_file'
+  | 'content_drift'
 
 type DriftRow = {
   path: string
   status: DriftStatus
+  classification: DriftClassification
   liveSha256?: string
   repoSha256?: string
   liveBytes?: number
   repoBytes?: number
   reason?: string
+  impact?: string
 }
 
-const DEFAULT_REPO_ROOT = '/Users/jreye/Documents/efeonce-public-site-runtime'
+const DEFAULT_REPO_ROOT = DEFAULT_PUBLIC_SITE_RUNTIME_REPO_ROOT
 const BASELINES_ROOT = 'tmp/public-site-code-baselines'
 const REPORTS_ROOT = 'docs/operations/public-site-drift'
 
@@ -62,6 +65,7 @@ const IGNORED_LIVE_PATTERNS: Array<{ pattern: RegExp; reason: string }> = [
   { pattern: /(^|\/)vendor\//, reason: 'Vendor folders are not part of the governed baseline.' },
   { pattern: /\.bak($|-)/i, reason: 'Emergency backup artifact.' },
   { pattern: /backup/i, reason: 'Session/live backup artifact.' },
+  { pattern: /(^|\/)global-fixes-before-.*\.css$/i, reason: 'Pre-change CSS backup artifact.' },
   { pattern: /\.env($|\.)/i, reason: 'Environment/secrets file.' }
 ]
 
@@ -137,46 +141,90 @@ const findLatestLiveManifest = () => {
   return latest
 }
 
-const hashFile = (path: string) => {
-  const contents = readFileSync(path)
-
-  return {
-    bytes: contents.byteLength,
-    sha256: createHash('sha256').update(contents).digest('hex')
-  }
-}
-
-const listRepoFiles = (repoRoot: string, current = repoRoot): ManifestFile[] => {
-  const entries = readdirSync(current, { withFileTypes: true })
-  const files: ManifestFile[] = []
-
-  for (const entry of entries) {
-    const absolutePath = join(current, entry.name)
-    const normalizedRelative = relative(repoRoot, absolutePath)
-
-    if (normalizedRelative.startsWith('.git/')) continue
-
-    if (entry.isDirectory()) {
-      files.push(...listRepoFiles(repoRoot, absolutePath))
-      continue
-    }
-
-    if (!entry.isFile()) continue
-
-    const hash = hashFile(absolutePath)
-
-    files.push({
-      path: normalizedRelative,
-      bytes: hash.bytes,
-      sha256: hash.sha256
-    })
-  }
-
-  return files.sort((a, b) => a.path.localeCompare(b.path))
-}
-
 const ignoreReason = (path: string) => {
   return IGNORED_LIVE_PATTERNS.find(entry => entry.pattern.test(path))?.reason ?? null
+}
+
+const isGovernedPath = (path: string, governedPaths: string[]) =>
+  governedPaths.some(governedPath => path === governedPath || path.startsWith(`${governedPath}/`))
+
+const git = (repoRoot: string, args: string[]) => {
+  try {
+    return execFileSync('git', ['-C', repoRoot, ...args], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim()
+  } catch {
+    return null
+  }
+}
+
+const listPendingReleasePaths = (repoRoot: string) => {
+  const paths = new Set<string>()
+  const upstream = git(repoRoot, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'])
+
+  if (upstream) {
+    const aheadDiff = git(repoRoot, ['diff', '--name-only', `${upstream}...HEAD`, '--', 'wp-content'])
+
+    for (const path of aheadDiff?.split('\n') ?? []) {
+      if (path.trim()) paths.add(path.trim())
+    }
+  }
+
+  const status = git(repoRoot, ['status', '--porcelain', '--untracked-files=all', '--', 'wp-content'])
+
+  for (const line of status?.split('\n') ?? []) {
+    const path = line.slice(3).trim()
+
+    if (path) paths.add(path.replace(/^"|"$/g, ''))
+  }
+
+  return paths
+}
+
+const classifyRow = (
+  status: DriftStatus,
+  path: string,
+  pendingReleasePaths: Set<string>
+): Pick<DriftRow, 'classification' | 'impact'> => {
+  if ((status === 'drifted' || status === 'repo_extra') && pendingReleasePaths.has(path)) {
+    return {
+      classification: 'repo_pending_release',
+      impact:
+        'Local repo/worktree intentionally differs from Kinsta live for this path. Treat as pending release; include only in a scoped rollout.'
+    }
+  }
+
+  switch (status) {
+    case 'in_sync':
+      return {
+        classification: 'live_synced',
+        impact: 'Local runtime file matches the latest Kinsta export.'
+      }
+    case 'ignored_live':
+      return {
+        classification: 'ignored_runtime_artifact',
+        impact: 'Live-only runtime artifact ignored by policy.'
+      }
+    case 'repo_extra':
+      return {
+        classification: 'repo_pending_release',
+        impact:
+          'Repo contains a governed file not present in Kinsta live. Treat as pending release; do not deploy the full repo unless this file is intentionally included.'
+      }
+    case 'repo_missing':
+      return {
+        classification: 'live_untracked_file',
+        impact:
+          'Kinsta live contains a governed file missing from the repo. Reconcile or explicitly ignore before claiming local/live sync.'
+      }
+    case 'drifted':
+      return {
+        classification: 'content_drift',
+        impact:
+          'The same governed file exists in local repo and Kinsta live with different content. Inspect before deploy to avoid overwriting live changes.'
+      }
+  }
 }
 
 const main = () => {
@@ -199,11 +247,13 @@ return
     throw new Error(`Runtime repo root not found: ${repoRoot}`)
   }
 
-  const liveManifest = JSON.parse(readFileSync(liveManifestPath, 'utf8')) as LiveManifest
-  const liveFiles = liveManifest.files
-  const repoFiles = listRepoFiles(repoRoot).filter(file => file.path.startsWith('wp-content/'))
+  const { binding } = readPublicSiteRuntimeBinding()
+  const liveManifest = readPublicSiteLiveManifest(liveManifestPath)
+  const liveFiles = liveManifest.files.filter(file => isGovernedPath(file.path, binding.governedPaths))
+  const repoFiles = listPublicSiteRepoFiles(repoRoot, { governedPaths: binding.governedPaths })
   const repoByPath = new Map(repoFiles.map(file => [file.path, file]))
   const liveByPath = new Map(liveFiles.map(file => [file.path, file]))
+  const pendingReleasePaths = listPendingReleasePaths(repoRoot)
   const rows: DriftRow[] = []
 
   for (const liveFile of liveFiles) {
@@ -213,6 +263,7 @@ return
       rows.push({
         path: liveFile.path,
         status: 'ignored_live',
+        ...classifyRow('ignored_live', liveFile.path, pendingReleasePaths),
         liveSha256: liveFile.sha256,
         liveBytes: liveFile.bytes,
         reason: ignoredReason
@@ -226,6 +277,7 @@ return
       rows.push({
         path: liveFile.path,
         status: 'repo_missing',
+        ...classifyRow('repo_missing', liveFile.path, pendingReleasePaths),
         liveSha256: liveFile.sha256,
         liveBytes: liveFile.bytes
       })
@@ -236,6 +288,7 @@ return
       rows.push({
         path: liveFile.path,
         status: 'drifted',
+        ...classifyRow('drifted', liveFile.path, pendingReleasePaths),
         liveSha256: liveFile.sha256,
         repoSha256: repoFile.sha256,
         liveBytes: liveFile.bytes,
@@ -247,6 +300,7 @@ return
     rows.push({
       path: liveFile.path,
       status: 'in_sync',
+      ...classifyRow('in_sync', liveFile.path, pendingReleasePaths),
       liveSha256: liveFile.sha256,
       repoSha256: repoFile.sha256,
       liveBytes: liveFile.bytes,
@@ -260,6 +314,7 @@ return
     rows.push({
       path: repoFile.path,
       status: 'repo_extra',
+      ...classifyRow('repo_extra', repoFile.path, pendingReleasePaths),
       repoSha256: repoFile.sha256,
       repoBytes: repoFile.bytes
     })
@@ -286,13 +341,49 @@ return
     }
   )
 
+  const classificationCounts = rows.reduce<Record<DriftClassification, number>>(
+    (acc, row) => {
+      acc[row.classification] += 1
+
+      return acc
+    },
+    {
+      content_drift: 0,
+      ignored_runtime_artifact: 0,
+      live_synced: 0,
+      live_untracked_file: 0,
+      repo_pending_release: 0
+    }
+  )
+
+  const releaseSafety = {
+    fullRepoDeploySafe:
+      classificationCounts.content_drift === 0 &&
+      classificationCounts.live_untracked_file === 0 &&
+      classificationCounts.repo_pending_release === 0,
+    mustReviewBeforeFullRepoDeploy:
+      classificationCounts.content_drift +
+      classificationCounts.live_untracked_file +
+      classificationCounts.repo_pending_release,
+    guidance:
+      classificationCounts.content_drift +
+        classificationCounts.live_untracked_file +
+        classificationCounts.repo_pending_release >
+      0
+        ? 'Do not deploy the full runtime repo blindly. Use a scoped release package or reconcile local/live first.'
+        : 'Local governed runtime files match Kinsta live except ignored artifacts.'
+  }
+
   const report = {
     contractVersion: 'public-site-runtime-drift-report.v1',
     generatedAt: new Date().toISOString(),
     liveManifestPath,
     liveGeneratedAt: liveManifest.generatedAt,
     repoRoot,
+    governedPaths: binding.governedPaths,
     counts,
+    classificationCounts,
+    releaseSafety,
     rows
   }
 
@@ -306,7 +397,7 @@ return
     console.log(`Wrote drift report: ${outputPath}`)
   }
 
-  console.log(JSON.stringify({ counts, liveManifestPath, repoRoot }, null, 2))
+  console.log(JSON.stringify({ counts, classificationCounts, releaseSafety, liveManifestPath, repoRoot }, null, 2))
 
   if (counts.drifted > 0 || counts.repo_missing > 0) {
     process.exitCode = 2

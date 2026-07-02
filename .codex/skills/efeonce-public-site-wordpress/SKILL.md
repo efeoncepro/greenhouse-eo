@@ -81,10 +81,12 @@ pnpm public-website:deploy-dry-run
 pnpm public-website:wpcli -- --eval-file ./tmp/<script>.php --wp-user 12
 ```
 
-For AEO form typography/overflow:
+For AEO form typography/overflow/renderer visual parity (AEO-specific; new forms use a proportional
+Growth Forms embed gate from `references/growth-forms-wordpress.md`):
 
 ```bash
 pnpm public-website:verify-aeo-form-typography
+pnpm public-website:verify-aeo-live-contract
 ```
 
 ## Update Protocol

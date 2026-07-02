@@ -26,6 +26,7 @@ import TableRow from '@mui/material/TableRow'
 import Card from '@mui/material/Card'
 import IconButton from '@mui/material/IconButton'
 import LinearProgress from '@mui/material/LinearProgress'
+import Skeleton from '@mui/material/Skeleton'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import { alpha, type Theme } from '@mui/material/styles'
@@ -228,10 +229,19 @@ const QueueTable = ({ rows, selectedId, onSelect }: { rows: QueueRow[]; selected
               key={row.reportId}
               hover
               selected={selected}
+              tabIndex={0}
               onClick={() => onSelect(row.reportId)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(row.reportId) } }}
               sx={{
                 cursor: 'pointer',
-                ...(selected && { bgcolor: (t: Theme) => alpha(t.palette.primary.main, 0.06) })
+                transition: 'box-shadow 150ms ease, background-color 150ms ease',
+                '& td:first-of-type': { boxShadow: 'inset 3px 0 0 transparent', transition: 'box-shadow 150ms ease' },
+                '&:hover td:first-of-type': { boxShadow: (t: Theme) => `inset 3px 0 0 ${t.palette.primary.main}` },
+                '&:focus-visible': { outline: (t: Theme) => `2px solid ${t.palette.primary.main}`, outlineOffset: '-2px' },
+                ...(selected && {
+                  bgcolor: (t: Theme) => alpha(t.palette.primary.main, 0.06),
+                  '& td:first-of-type': { boxShadow: (t: Theme) => `inset 3px 0 0 ${t.palette.primary.main}` }
+                })
               }}
             >
               <TableCell>
@@ -508,8 +518,10 @@ const detailFor = (id: string): ReportDetail => {
   }
 }
 
-const EmptyQueue = () => (
-  <Box data-capture='admin-review-empty' role='status' sx={{ textAlign: 'center', py: 12, px: 4 }}>
+type DemoState = 'queue' | 'loading' | 'empty' | 'denied'
+
+const StateBlock = ({ icon, tone, title, body, capture }: { icon: string; tone: RiskTone | 'info'; title: string; body: string; capture: string }) => (
+  <Box data-capture={capture} role='status' sx={{ textAlign: 'center', py: 12, px: 4 }}>
     <Box
       sx={{
         width: 56,
@@ -519,20 +531,37 @@ const EmptyQueue = () => (
         borderRadius: '50%',
         display: 'grid',
         placeItems: 'center',
-        bgcolor: (t: Theme) => alpha(t.palette.success.main, 0.1),
-        color: 'success.main'
+        bgcolor: (t: Theme) => alpha(tone === 'info' ? t.palette.info.main : t.palette[toneColor(tone)].main, 0.1),
+        color: tone === 'info' ? 'info.main' : `${toneColor(tone)}.main`
       }}
     >
-      <i className='tabler-checks' aria-hidden='true' />
+      <i className={icon} aria-hidden='true' />
     </Box>
-    <Typography variant='h5'>{C.states.emptyTitle}</Typography>
-    <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>{C.states.emptyBody}</Typography>
+    <Typography variant='h5'>{title}</Typography>
+    <Typography variant='body2' color='text.secondary' sx={{ mt: 1, maxWidth: 420, mx: 'auto' }}>{body}</Typography>
+  </Box>
+)
+
+const QueueSkeleton = () => (
+  <Box data-capture='admin-review-loading' role='status' aria-busy='true' aria-label={C.states.loading} sx={{ minWidth: 0 }}>
+    <Skeleton variant='text' width={180} height={28} sx={{ mb: 3 }} />
+    {Array.from({ length: 6 }).map((_, i) => (
+      <Stack key={i} direction='row' alignItems='center' spacing={4} sx={{ py: 2, borderBottom: (t: Theme) => `1px solid ${t.palette.divider}` }}>
+        <Box sx={{ flex: 1 }}>
+          <Skeleton variant='text' width='30%' height={20} />
+          <Skeleton variant='text' width='45%' height={14} />
+        </Box>
+        <Skeleton variant='rounded' width={110} height={24} />
+        <Skeleton variant='circular' width={40} height={40} />
+        <Skeleton variant='text' width={120} height={16} />
+      </Stack>
+    ))}
   </Box>
 )
 
 const AdminReviewMockupView = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [demo, setDemo] = useState<'queue' | 'empty'>('queue')
+  const [demo, setDemo] = useState<DemoState>('queue')
   const close = useCallback(() => setSelectedId(null), [])
   const detail = demo === 'queue' && selectedId ? detailFor(selectedId) : null
 
@@ -555,11 +584,13 @@ const AdminReviewMockupView = () => {
           size='small'
           exclusive
           value={demo}
-          onChange={(_, v) => { if (v) { setDemo(v as 'queue' | 'empty'); setSelectedId(null) } }}
+          onChange={(_, v) => { if (v) { setDemo(v as DemoState); setSelectedId(null) } }}
           aria-label={C.demo.label}
         >
           <ToggleButton value='queue'>{C.demo.queue}</ToggleButton>
+          <ToggleButton value='loading'>{C.demo.loading}</ToggleButton>
           <ToggleButton value='empty'>{C.demo.empty}</ToggleButton>
+          <ToggleButton value='denied'>{C.demo.denied}</ToggleButton>
         </ToggleButtonGroup>
       </Stack>
 
@@ -590,7 +621,15 @@ const AdminReviewMockupView = () => {
               dataCapture='growth-ai-visibility-admin-review-sidecar'
               source='task-1247-admin-review-mockup'
             >
-              {demo === 'empty' ? <EmptyQueue /> : <QueueTable rows={QUEUE} selectedId={selectedId} onSelect={setSelectedId} />}
+              {demo === 'loading' ? (
+                <QueueSkeleton />
+              ) : demo === 'empty' ? (
+                <StateBlock capture='admin-review-empty' icon='tabler-checks' tone='success' title={C.states.emptyTitle} body={C.states.emptyBody} />
+              ) : demo === 'denied' ? (
+                <StateBlock capture='admin-review-denied' icon='tabler-lock' tone='info' title={C.states.permissionTitle} body={C.states.permissionBody} />
+              ) : (
+                <QueueTable rows={QUEUE} selectedId={selectedId} onSelect={setSelectedId} />
+              )}
             </AdaptiveSidecarLayout>
           )
         }}
