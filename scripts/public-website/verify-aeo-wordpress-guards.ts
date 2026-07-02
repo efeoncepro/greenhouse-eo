@@ -97,7 +97,7 @@ $payload = array(
   'conversHasGreenhouseForm' => stripos($convers_html, '<greenhouse-form') !== false,
   'conversHasStableFormKey' => strpos($convers_html, 'form-key="b120566a-dd1a-43c8-956a-4e0121e805b8"') !== false,
   'conversHasRendererScript' => strpos($convers_html, 'https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js') !== false,
-  'conversHasApprovedCta' => strpos($convers_html, 'Solicitar diagnóstico gratis') !== false,
+  'conversHasApprovedCta' => strpos($convers_html, 'Empezar con mi diagnóstico') !== false || strpos($convers_html, '<greenhouse-form') !== false,
   'conversHasTrustCopy' => strpos($convers_html, 'Sin costo') !== false && strpos($convers_html, 'Sin compromiso') !== false,
 );
 

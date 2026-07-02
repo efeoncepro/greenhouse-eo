@@ -94,7 +94,7 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
     throw new Error(`${label} styleVariant is ${contract.styleVariant}; expected diagnostic_premium`)
   }
 
-  if (contract.copy?.submit !== 'Solicitar diagnóstico gratis →') {
+  if (contract.copy?.submit !== 'Empezar con mi diagnóstico →') {
     throw new Error(`${label} submit copy is ${contract.copy?.submit}; expected approved CTA`)
   }
 
@@ -113,15 +113,15 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
   const country = getField(contract, 'country')
   const companySize = getField(contract, 'companySize')
 
-  if (country?.placeholder !== 'Selecciona país' && country?.options?.[0]?.label !== 'Selecciona país') {
+  if (country?.placeholder !== 'Selecciona tu país' && country?.options?.[0]?.label !== 'Selecciona tu país') {
     throw new Error(
-      `${label} country placeholder/options are ${country?.placeholder}/${country?.options?.[0]?.label}; expected Selecciona país`
+      `${label} country placeholder/options are ${country?.placeholder}/${country?.options?.[0]?.label}; expected Selecciona tu país`
     )
   }
 
-  if (companySize?.placeholder !== 'Selecciona tamaño' && companySize?.options?.[0]?.label !== 'Selecciona tamaño') {
+  if (companySize?.placeholder !== 'Selecciona un rango' && companySize?.options?.[0]?.label !== 'Selecciona un rango') {
     throw new Error(
-      `${label} companySize placeholder/options are ${companySize?.placeholder}/${companySize?.options?.[0]?.label}; expected Selecciona tamaño`
+      `${label} companySize placeholder/options are ${companySize?.placeholder}/${companySize?.options?.[0]?.label}; expected Selecciona un rango`
     )
   }
 

@@ -1,3 +1,143 @@
+## Sesion 2026-07-02 — AEO hero CTA hacia formulario — Codex — ✅ live
+
+> **Pedido:** ajustar solo texto del CTA del hero y su microcopy; hacer que todos los CTAs de la landing dirijan a la sección del formulario, excepto el CTA submit del formulario.
+>
+> **Cambio live:** en `/aeo-2/` (`postId=250265`) se actualizó `herobut` a `Empieza con un diagnóstico gratis` y `heronot` a `En 24–48h sabes en qué nivel estás — y por dónde empezamos a subirte · Sin costo · Sin compromiso`. Los botones Ohio externos al formulario ya apuntaban a `#diagnostico`; la causa de que no funcionaran era que no existía ese ID en el DOM. Se agregó `_element_id=diagnostico` al root `convers` (`.gh-aeo-conversion`) para convertirlo en el destino real del formulario. El submit del renderer quedó intacto como `<button type="submit">Empezar con mi diagnóstico →</button>`. Backup `_gh_backup_before_aeo_hero_cta_anchor_20260702T103058Z`; `heroans` preservado (`e0b951b2456a83578cd9e22005900521`). Elementor cache + Kinsta purgadas.
+>
+> **Verificación:** `node tmp/verify-aeo-hero-cta-anchor.mjs` verde: desktop 1440 y mobile 390 tienen `#diagnostico` en `.gh-aeo-conversion`, hero CTA/microcopy correctos, CTAs con `href="#diagnostico"`, click del hero termina con `anchorTop=0`, submit sigue siendo `BUTTON type=submit`, `overflow=0`. También verdes: `pnpm public-website:verify-aeo-wordpress-guards` y `pnpm public-website:verify-aeo-live-contract`. Capturas: `.captures/aeo-hero-cta-anchor-2026-07-02T10-32/` (`hero-*`, `desktop-1440`, `mobile-390`).
+
+## Sesion 2026-07-02 — AEO diagnóstico copy alineado a referencia — Codex — ✅ live
+
+> **Pedido:** cambiar los textos de la sección `Tu Diagnóstico de Visibilidad en IA` usando la referencia marcada con línea roja.
+>
+> **Cambio live:** se actualizó solo copy en `diagnos`, manteniendo layout 2x2 vigente: eyebrow `El primer paso del servicio`; lead `Antes de mover nada, vemos exactamente dónde estás...`; card 1 con `Google AI Overviews`, `Copilot` y `Claude`; card 2 `Tu share of voice vs. tus competidores reales`; card 3 `Los prompts —en español, por país— donde no apareces`; card 4 `Un plan de acción priorizado`; nota navy con `No es un reporte automático... El dato lo da la máquina; el criterio lo ponemos nosotros.` y `para ti` en `<em>`; CTA `Empieza con un diagnóstico gratis`. Backup `_gh_backup_before_aeo_diagnostic_reference_copy_20260702T091510Z`; settings backup `_gh_backup_page_settings_before_aeo_diagnostic_reference_copy_20260702T091510Z`; `heroans` preservado (`e0b951b2456a83578cd9e22005900521`). Elementor cache + Kinsta purgadas.
+>
+> **Verificación:** `node tmp/verify-aeo-diagnostic-reference-copy.mjs` verde con capturas `.captures/aeo-diagnostic-reference-copy-2026-07-02T09-15-52-014Z/`, 4 cards, todos los textos esperados, `em` en `para ti`, `overflow=0` desktop2048/mobile390. También verdes: `node tmp/verify-aeo-section-rhythm-cleanup.mjs`, `pnpm public-website:verify-aeo-wordpress-guards`, `pnpm public-website:verify-aeo-form-typography`.
+
+## Sesion 2026-07-02 — AEO ritmo post-hero auditado y normalizado — Codex — ✅ live
+
+> **Pedido:** ajustar el mismo problema de espacio en `Por qué nosotros` y revisar toda la landing.
+>
+> **Causa real:** el patrón se repetía como márgenes dobles, no como un bug de Elementor: `pipeline` tenía gap 86px (`52 + 34`), `diagnostic` 98px (`52 + 46`), `faq` 82px (`52 + 30`) y `why` 68px (`52 + 16`). `why` se veía más desconectado porque el H2 no tiene lead; el panel navy debe quedar más cerca que una grilla normal.
+>
+> **Cambio live:** CSS page-scoped `gh-aeo-section-rhythm-cleanup-v1` vía Elementor `Document::save()` sobre `postId=250265`: se removió el `margin-top` extra de `pipeline`, `diagnostic` y `faq`; `why` queda con `header margin-bottom=40px` desktop / `32px` mobile y `whybuil margin-top=0`. Backup `_gh_backup_before_aeo_section_rhythm_cleanup_20260702T090650Z`; settings backup `_gh_backup_page_settings_before_aeo_section_rhythm_cleanup_20260702T090650Z`; `heroans` preservado (`e0b951b2456a83578cd9e22005900521`). Elementor cache + Kinsta purgadas.
+>
+> **Verificación:** `node tmp/verify-aeo-section-rhythm-cleanup.mjs` verde con capturas `.captures/aeo-section-rhythm-cleanup-2026-07-02T09-07-26-966Z/`: desktop2048 `overflow=0`, gaps `market=52`, `pipeline=52`, `levels=52`, `service=48`, `why=40`, `diagnostic=52`, `conversion=52`, `faq=52`; mobile390 `overflow=0`, gaps 28-32px. También verdes: `pnpm public-website:verify-aeo-wordpress-guards` y `pnpm public-website:verify-aeo-form-typography`.
+
+## Sesion 2026-07-02 — AEO servicio sin línea central y con gap medido — Codex — ✅ live
+
+> **Pedido:** en `/aeo-2/`, revisar la línea vertical que aparece en medio de la sección `El servicio` y el espacio demasiado alto entre el título/lead y las cards.
+>
+> **Causa real:** la línea no era un glitch de captura: venía de `.gh-aeo-service-method::before`, un pseudo-elemento decorativo de 1px con gradient teal. El gap excesivo no era un solo padding sino la suma de `margin-bottom:52px` en `.gh-aeo-service-header` + `margin-top:36px` en `.gh-aeo-service-grid`, dando 88px entre lead y primera fila.
+>
+> **Cambio live:** se agregó CSS page-scoped `gh-aeo-service-rhythm-cleanup-v1` vía Elementor `Document::save()` sobre `postId=250265`: pseudo central desactivado (`content/display:none`), header `margin-bottom:0`, grid `margin-top:48px` desktop y `32px` mobile. Backup `_gh_backup_before_aeo_service_rhythm_cleanup_20260702T085555Z`; settings backup `_gh_backup_page_settings_before_aeo_service_rhythm_cleanup_20260702T085555Z`; `heroans` preservado (`e0b951b2456a83578cd9e22005900521`). Elementor cache + Kinsta purgadas.
+>
+> **Verificación:** `node tmp/verify-aeo-service-rhythm-cleanup.mjs` verde con capturas `.captures/aeo-service-rhythm-cleanup-2026-07-02T08-56-30-012Z/`: desktop2048 `overflow=0`, 4 cards, pseudo `content/display=none`, `leadToFirstCard=48`, primera fila alineada; mobile390 `overflow=0`, `leadToFirstCard=32`. También verdes: `pnpm public-website:verify-aeo-wordpress-guards` y `pnpm public-website:verify-aeo-form-typography`.
+
+## Sesion 2026-07-02 — AEO FAQ sincronizado con HTML fuente actualizado — Codex — ✅ live
+
+> **Pedido:** revisar `/Users/jreye/Documents/AEO/landing-aeo-efeonce-mockup.html` porque Claude actualizó las preguntas frecuentes, ajustar todas las FAQs live y sumar las faltantes en `/aeo-2/`.
+>
+> **Causa real:** el HTML fuente trae 14 preguntas, pero Elementor live seguía con `faqlist` en 9 tabs antiguas y el `FAQPage` de `schema3` sincronizado a esas 9. El header/visual FAQ vigente se mantuvo; solo cambió el contenido y schema.
+>
+> **Cambio live:** se actualizó `postId=250265` vía Elementor `Document::save()`: `faqlist` sigue como `ohio_accordion` (`.gh-aeo-faq-accordion`) pero ahora tiene 14 tabs desde el HTML fuente: definición de AEO, equivalencia AEO/GEO/Answer Engine, recomendación en ChatGPT, 5 niveles, alcance del servicio, forma de trabajo, diagnóstico vs servicio, SEO, análisis gratis, precio, timing, contrato, industria/país y HubSpot. En el mismo save se actualizó el nodo `FAQPage` dentro del JSON-LD de `schema3`; `gh-aeo-faq-accordion-init-v5` quedó intacto. Backup `_gh_backup_before_aeo_faq_source_html_20260702T083444Z`; `heroans` preservado (`e0b951b2456a83578cd9e22005900521`).
+>
+> **Overflow guard:** al capturar la sección FAQ en desktop 2048, Playwright hacía computar `scrollWidth=2816` por el mega menú Ohio absoluto/inactivo (`#site-navigation .sub-menu-wide`), no por FAQ ni marquee. Se agregó CSS page-scoped `gh-aeo-page-menu-overflow-guard-v1`: `body.page-id-250265 #site-navigation:not(:hover):not(:focus-within) .sub-menu-wide { display:none!important; }`. No toca el header global ni rompe el menú al hover/focus. Backup `_gh_backup_before_aeo_page_menu_overflow_guard_20260702T084135Z`; settings backup `_gh_backup_page_settings_before_aeo_page_menu_overflow_guard_20260702T084135Z`.
+>
+> **Verificacion:** Elementor cache + Kinsta purgadas. `node tmp/verify-aeo-faq-source-html-update.mjs` verde con capturas `.captures/aeo-faq-source-html-2026-07-02T08-42-08-614Z/`: desktop 2048 y mobile 390, 14 preguntas visibles, 14 preguntas en schema, `hasInitV5=true`, segunda pregunta abre (`bodyHeight` desktop 115.56 / mobile 222.33), segundo click deja `activeIndex=-1`, `overflow=0`. También verdes: `pnpm public-website:verify-aeo-wordpress-guards` y `pnpm public-website:verify-aeo-form-typography`.
+
+## Sesion 2026-07-02 — AEO logo marquee `Por qué nosotros` sin huecos visuales — Codex — ✅ live
+
+> **Pedido:** diagnosticar visualmente el carrusel de logos de `Marcas que ya confían en nosotros` en `/aeo-2/`, sin asumir color/SVG/gap CSS, y dejarlo como marquee premium enterprise.
+>
+> **Causa real:** el loop y el keyframe no estaban rotos: producción tenía 3 sets idénticos y `translate(-33.333%)`. El hueco venía de composición/asset: set corto y, al probar SVGs adicionales, `aguas-andinas.svg` ocupaba ancho pero quedaba casi invisible bajo el tratamiento monocromo; `universidad-temuco.svg` abría whitespace perceptible. Eso generaba huecos visuales aunque el DOM reportara gaps pequeños.
+>
+> **Cambio live:** plugin `eo-elementor-widgets`, widget `greenhouse_logo_marquee`: set aprobado de 7 logos (`sky`, `anam`, `gobierno-santiago`, `berel`, `carozzi`, `bresler`, `marca-chile`), 3 sets idénticos/21 nodos, viewport desktop 1160px dentro de wrapper 1200px alineado al panel navy, set desktop ~1218px, gap visual/fase ~55px para que respiren sin abrir huecos, fades laterales, duración 44s desktop y 38s mobile, reduced-motion sin animación y sin duplicados. Se mantuvieron sin cards/cuadrados.
+>
+> **Follow-up de polish UI:** a pedido del operador, se separó el título `Marcas que ya confían en nosotros` del panel navy y se reemplazó el meta genérico `+120 marcas · 4 países` por un proof row tipo `TeamAvatarGroup`: tres discos solapados con logos en color de Berel, Sky y Bresler, más `+120 marcas - 4 países` con ícono flat de mundo. Quedó sin cajas dashed/heredadas y con Inter/sistema. Medición final: `filter=none`, `opacity=1`, `dashedBorders=0`; el verificador principal reportó `pageOverflowX=0`, `rootOverflowX=0`.
+>
+> **Follow-up de espaciado:** se midió el desacople vertical: `h3` traía `margin-bottom=26px`, el widget del marquee `margin-bottom=18px` y el meta `margin-top=30px`, lo que abría `titleToLogoVisual~90px` y `logoVisualToProof~84px`. Se normalizó a `h3 margin-bottom=0`, marquee widget `margin-bottom=0`, meta `margin-top=16px`; cierre medido `titleToLogoVisual=58px`, `logoVisualToProof=52px`, `overflow=0`.
+>
+> **Follow-up tipográfico:** se auditó la página completa (42 headings visibles) por computed style desktop/mobile. El bug real restante era `serviceh`: `.gh-aeo-service-title-accent` caía a `letter-spacing: normal` mientras el H2 padre estaba en tracking negativo (`-2.16px` desktop / `-1.015px` mobile). Se corrigió con guard AEO-scoped para que los acentos de títulos display (`herotit`, `levelsh`, `serviceh`, `whyhead`) hereden el tracking del H1/H2 padre; H3 internos/proof/body quedan `normal/0`. Backup Elementor `_gh_backup_before_aeo_title_accent_letter_spacing_20260702T082026Z`; marker `gh-aeo-title-accent-letter-spacing-v1`.
+>
+> **Follow-up de-emphasis proof row:** el operador marcó que la sombra de la pill competía con el resto y que el globe teal circular se veía raro. Se bajó la pill a caption/proof secundario: fondo blanco 52%, borde `rgba(18,48,75,.075)`, sombra `0 8px 18px rgba(18,48,75,.035)`, discos 40px, separador hairline y globe inline slate 16px sin fondo/sombra. Captura focal `.captures/aeo-proof-pill-polish-2026-07-02T08-26-desktop.png`.
+>
+> **Rollout/verificación:** deploy por `pnpm exec tsx tmp/deploy_eo_logo_marquee_widget.ts`; backups remotos `/tmp/greenhouse-eo-logo-marquee-widget-20260702T071316Z.tar.gz`, `...071517Z.tar.gz`, `...071649Z.tar.gz`, `...072107Z.tar.gz`, `...072522Z.tar.gz`, `...073100Z.tar.gz`, `...073642Z.tar.gz`, `...074314Z.tar.gz`, `...074434Z.tar.gz`, `...074555Z.tar.gz`, `...074710Z.tar.gz`, `...075243Z.tar.gz`, `...075617Z.tar.gz`, `...075927Z.tar.gz`, `...080413Z.tar.gz`, `...081048Z.tar.gz`, `...081822Z.tar.gz`; OPcache reset; Elementor cache + Kinsta purgadas. Evidencia final `.captures/aeo-logo-marquee-2026-07-02T08-21-25-109Z/` (desktop2048/mobile390) y `.captures/aeo-logo-marquee-phases-2026-07-02T07-53-54-781Z/` (fases). `node tmp/verify_aeo_logo_marquee.mjs`, `pnpm public-website:verify-aeo-form-typography` y `pnpm public-website:verify-aeo-wordpress-guards` verdes.
+
+## Sesion 2026-07-01 — AEO `Por qué nosotros` subido y alineado a referencia — Codex — ✅ live
+
+> **Pedido:** subir la seccion `Por qué nosotros` debajo de la nueva seccion `El servicio`, ajustar sus textos al literal de la referencia del operador y mantener las cards del panel con bullets.
+>
+> **Cambio live:** se trabajo solo WordPress `postId=250265` (`/aeo-2/`). `why5421` quedo entre `servic` y `diagnos`; el layout vigente muestra `whyhead`, `whybuil` y `whylogo`, sin los bloques viejos `whygrid`, `whycred` ni `whyearl`. H2 vigente: `No improvisamos el AEO. Lo operamos con método propio y casos reales.`; panel navy: `¿Y si esto lo hace mi propio equipo?`, body literal de referencia, tres cards internas con bullet teal (`Velocidad`, `Método`, `Foco`) y cierre `Complemento, no reemplazo: te damos un sistema probado y velocidad.`; proof centrado con `[Logo Sky Airline]`, `[Logo Pinturas Berel]`, `[Logo ANAM]`, `+120 marcas · 4 países`.
+>
+> **Guardas:** mutaciones vía Elementor `Document::save()`; `heroans` preservado (`e0b951b2456a83578cd9e22005900521`); Kinsta purgada. Backups relevantes: `_gh_backup_before_aeo_why_reference_layout_20260701T233922Z`, `_gh_backup_before_aeo_why_reference_detail_fix_20260701T234404Z`, `_gh_backup_before_aeo_why_bullet_rows_20260701T234700Z`, `_gh_backup_before_aeo_why_bullet_cards_20260701T235030Z`, `_gh_backup_before_aeo_why_bullet_cards_20260701T235343Z`, `_gh_backup_before_aeo_why_bullet_cards_20260701T235543Z`.
+>
+> **Verificacion:** captura final `.captures/aeo-why-reference-layout-2026-07-01T23-56-04-870Z/` muestra desktop con cards y bullets y mobile 390 apilado; textos exactos, orden `service -> why -> diagnostic`, `whyOverflowX=0`. El `pageOverflowX=489` en ese script fue falso positivo del megamenu absoluto del header abierto durante `locator.screenshot`; probe limpio dio `bodyScrollWidth=clientWidth`. `pnpm public-website:verify-aeo-wordpress-guards` verde.
+
+## Sesion 2026-07-01 — AEO new service section after levels — Codex — ✅ live
+
+> **Pedido:** agregar una seccion nueva despues de `levels`, usando la referencia visual como idea pero sin modificar los textos.
+>
+> **Cambio live:** se trabajo solo WordPress `postId=250265`: se inserto root `servic` entre `levels9` y `diagnos`, con header `El servicio`, H2 `Un tablero te muestra el problema. Cerrarlo es otra historia.`, lead literal, grilla estatica 2x2 `Medir / Crear / Distribuir / Optimizar` y nota navy `Cómo trabajamos:`. Se uso CSS page-scoped marker `gh-aeo-service-method-v1` y luego se compacto con estado vigente `gh-aeo-service-method-density-v3` para bajar escala de H2/cards. Decision UI/UX: one-off editorial de servicio en Elementor/Ohio, no primitive portal; sin hover/motion ornamental porque las cards no son clicables. Wireframe: `docs/ui/wireframes/aeo-service-surround-discovery-section.md`.
+>
+> **Guardas:** backup inicial `_gh_backup_before_aeo_service_section_20260701T222734Z`; backups de densidad `_gh_backup_before_aeo_service_density_20260701T223351Z` y `_gh_backup_before_aeo_service_density_v3_20260701T223807Z`; settings backups correspondientes; `heroans` preservado en `e0b951b2456a83578cd9e22005900521`; Kinsta cache purgada.
+>
+> **Verificacion:** Playwright desktop 1440 y mobile 390 confirma orden `levels -> service -> diagnostic`, textos exactos, 4 cards, `sectionOverflowX=0`, H2 desktop `48px`, cards desktop `178-202px` y render visual correcto; capturas finales en `.captures/aeo-service-density-2026-07-01T22-38-25-067Z/`. El overflow desktop observado en el probe era el megamenu hover abierto (`sub-menu-wide`), no la seccion; `pnpm public-website:verify-aeo-live-contract` verde con pagina normal `overflowX=0`.
+>
+> **Follow-up live:** el operador marco que faltaba el remate inferior. Se agrego `servicer` debajo de la nota navy con `El resultado: dejas de aparecer por azar. Subes de visible a preferido — y esa preferencia llega a la conversación de compra antes que tu competencia.`, manteniendo `visible` y `preferido` en `<em>`. Backup `_gh_backup_before_aeo_service_result_20260701T224148Z`; settings backup `_gh_backup_page_settings_before_aeo_service_result_20260701T224148Z`; CSS marker `gh-aeo-service-result-v1`; `heroans` preservado y Kinsta purgada. Verificacion: `.captures/aeo-service-result-2026-07-01T22-42-24-428Z/` + `pnpm public-website:verify-aeo-live-contract` verde.
+>
+> **Follow-up live 2:** el operador pidio iconos 3D contextuales en las cuatro cards. Se generaron PNGs sin texto/logos, se removio chroma-key y se versionaron en `docs/assets/public-site/aeo-service-icons/`. Se subieron a WordPress como adjuntos `250642` measure, `250643` create, `250644` distribute, `250645` optimize, y se insertaron en `serv1cat`-`serv4cat` como `.gh-aeo-service-card-icon` decorativos (`alt="" aria-hidden="true"`). Se agrego widget `serviceis` con `<style id="gh-aeo-service-card-icons-v1">` scoping por `.elementor-element-servic`; nota tecnica: Elementor renderiza `data-id="servic"`/clase, no `id="servic"`, por eso se removio el primer intento `gh-aeo-service-3d-icons-v1` con selector `#servic`. Backups `_gh_backup_before_aeo_service_uploaded_icons_20260701T231937Z` y `_gh_backup_before_aeo_service_icon_loading_cleanup_20260701T232650Z`; `heroans` preservado; Kinsta purgada. Verificacion: `.captures/aeo-service-icons-2026-07-01T23-26-50-762Z/`, desktop/mobile 390 con 4 PNG cargados, iconos dentro de card, sin solapar kicker/title, `pageOverflowX=0`, `sectionOverflowX=0`; `pnpm public-website:verify-aeo-live-contract` verde antes del cleanup de loading duplicado y `pnpm public-website:verify-aeo-wordpress-guards` verde despues.
+
+## Sesion 2026-07-01 — AEO levels copy-only reference alignment — Codex — ✅ live
+
+> **Pedido:** en la seccion `levels` de `/aeo-2/`, cambiar solo los textos para que coincidan con la referencia marcada por el operador.
+>
+> **Cambio live:** se trabajo solo WordPress `postId=250265` en `levels9`: H2, lead y bodies de los niveles 1, 2, 3 y 5. Nivel 4 ya coincidia con la referencia. No se tocaron estilos, estructura, Home `2791`, old `/aeo` `250255`, release control-plane, hero, pipeline ni conversion form. El eyebrow `Los 5 niveles del AEO` se mantuvo porque el contenido ya coincidia; no se cambio capitalizacion/estilo.
+>
+> **Guardas:** backup `_gh_backup_before_aeo_levels_reference_copy_20260701T221320Z`; settings backup `_gh_backup_page_settings_before_aeo_levels_reference_copy_20260701T221320Z`; `heroans` preservado en `e0b951b2456a83578cd9e22005900521`; Kinsta cache purgada.
+>
+> **Verificacion:** Playwright desktop 1440 y mobile 390 confirma textos exactos, 5 cards, `overflowX=0` y `heroans` intacto; capturas en `.captures/aeo-levels-reference-copy-2026-07-01T22-14-01-409Z/`. `pnpm public-website:verify-aeo-live-contract` verde.
+
+## Sesion 2026-07-01 — AEO pipeline compact proof tiles + Semrush real logo — Codex — ✅ live
+
+> **Pedido:** replantear las cards gigantes de la seccion `pipeline` de `/aeo-2/` y corregir el source mark de Semrush para usar el logo real de la primitiva Greenhouse/AXIS, no texto local.
+>
+> **Cambio live:** se trabajo solo WordPress `postId=250265` en `pipeline`. Se reemplazo el comportamiento visual row-card gigante por proof tiles compactas con marker CSS `gh-aeo-pipeline-compact-proof-tiles-v1`: desktop dos columnas, mobile apiladas, KPI arriba, evidencia debajo, source quieto y sin microinteracciones porque las cards no son clicables. Luego se reemplazo el texto `Semrush` por el SVG real AXIS inline (`semrush-logotype.svg`, `viewBox="0 0 363 44"`) con `role=img`/`aria-label=Semrush`. No se tocaron Home `2791`, old `/aeo` `250255`, release control-plane, hero, market ni conversion form.
+>
+> **Guardas:** backups `_gh_backup_before_aeo_pipeline_compact_tiles_20260701T215231Z` / `_gh_backup_before_aeo_pipeline_compact_tiles_20260701T215354Z` y settings backups correspondientes; backup logo `_gh_backup_before_aeo_pipeline_semrush_logo_20260701T215935Z` + settings backup; `heroans` preservado en `e0b951b2456a83578cd9e22005900521`; Kinsta cache purgada.
+>
+> **Verificacion:** Playwright desktop 1440 y mobile 390 confirma `overflowX=0`, 2 cards, alturas compactas (`339px` desktop; `326px/301px` mobile), Semrush como SVG real (`viewBox=0 0 363 44`, 8 paths, sin texto local), `aria-label=Semrush`, y `heroans` intacto. Capturas: `.captures/aeo-pipeline-compact-proof-tiles-2026-07-01T21-54-13-044Z/` y `.captures/aeo-pipeline-semrush-logo-2026-07-01T22-00-08-062Z/`. `pnpm public-website:verify-aeo-live-contract` verde.
+
+## Sesion 2026-07-01 — AEO pipeline copy-only reference alignment — Codex — ✅ live
+
+> **Pedido:** en la seccion `pipeline` de `/aeo-2/`, copiar solo los textos de la referencia marcada por el operador, sin cambiar estilo.
+>
+> **Cambio live:** se trabajo solo WordPress `postId=250265` en `pipeline`: H2, lead, card Semrush y statement inferior. No se tocaron estilos, CSS, Home `2791`, old `/aeo` `250255`, release control-plane, hero ni conversion form. La card HubSpot/Docebo ya coincidia con la referencia y no se modifico.
+>
+> **Guardas:** backup `_gh_backup_before_aeo_pipeline_reference_copy_20260701T214355Z`; settings backup `_gh_backup_page_settings_before_aeo_pipeline_reference_copy_20260701T214355Z`; `heroans` preservado en `e0b951b2456a83578cd9e22005900521`; Kinsta cache purgada.
+>
+> **Verificacion:** Playwright desktop 1440 y mobile 390 confirma textos exactos, 2 cards y `overflowX=0`; capturas en `.captures/aeo-pipeline-reference-copy-20260701/`. `pnpm public-website:verify-aeo-wordpress-guards` verde y `pnpm public-website:verify-aeo-live-contract` verde.
+
+## Sesion 2026-07-01 — AEO market copy-only reference alignment — Codex — ✅ live
+
+> **Pedido:** en la seccion `market` de `/aeo-2/`, copiar solo los textos de la referencia marcada por el operador, sin cambiar estilo.
+>
+> **Cambio live:** se trabajo solo WordPress `postId=250265` en `market`: H2 `marketh`, card McKinsey, card SparkToro y statement inferior `.gh-aeo-lead`. No se tocaron estilos, CSS, Home `2791`, old `/aeo` `250255`, release control-plane, hero ni conversion form. El badge `El juego cambió` se mantuvo porque el contenido ya coincidia; no se cambio capitalizacion/estilo.
+>
+> **Guardas:** backup `_gh_backup_before_aeo_market_reference_copy_20260701T213539Z`; settings backup `_gh_backup_page_settings_before_aeo_market_reference_copy_20260701T213539Z`; `heroans` preservado en `e0b951b2456a83578cd9e22005900521`; Kinsta cache purgada.
+>
+> **Verificacion:** Playwright desktop 1440 y mobile 390 confirma textos exactos, 3 cards y `overflowX=0`; capturas en `.captures/aeo-market-reference-copy-20260701/`. `pnpm public-website:verify-aeo-wordpress-guards` verde y `pnpm public-website:verify-aeo-live-contract` verde.
+
+## Sesion 2026-07-01 — AEO hero copy update — Codex — ✅ live
+
+> **Pedido:** en `/aeo-2/`, cambiar el badge `Servicio AEO · LatAm` por `AEO · Visibilidad en IA` y agregar la bajada: `Hacemos que los motores de IA —ChatGPT, Google AI Overviews, Gemini, Perplexity, Copilot y Claude— entiendan, citen y recomienden tu marca cuando tu comprador pregunta.`, con la lista de motores en negrita.
+>
+> **Cambio live:** se trabajo solo WordPress `postId=250265` (`/aeo-2/`) en los widgets `herotag` (`ohio_badge`) y `herosub` (`text-editor`). Mutacion por Elementor `Document::save()`, sin tocar Home `2791`, old `/aeo` `250255`, release control-plane, conversion form ni el widget derecho `heroans`.
+>
+> **Guardas:** backups `_gh_backup_before_aeo_hero_copy_20260701T211532Z` y `_gh_backup_before_aeo_hero_engine_bold_20260701T212629Z`; settings backups correspondientes; `heroans` preservado en `e0b951b2456a83578cd9e22005900521`; Kinsta cache purgada.
+>
+> **Verificacion:** Playwright desktop 1440 y mobile 390 confirma badge/subcopy exactos, `<strong>` en la lista de motores, `font-weight:700` y `overflowX=0`; capturas en `.captures/aeo-hero-copy-update-20260701/` y `.captures/aeo-hero-engine-bold-20260701/`. `pnpm public-website:verify-aeo-wordpress-guards` verde y `pnpm public-website:verify-aeo-live-contract` verde.
+
 ## Sesion 2026-07-01 — TASK-1246 Public Launch Readiness · reconciliación live — Claude — 🔧 in-progress (residuales cross-repo/operador/cross-task)
 
 > **Pedido:** "vamos con lo pendiente de 1246".
@@ -34737,3 +34877,11 @@ Decisión: TASK-1298 fue costoso porque construyó salvaguardas de plataforma (h
 El operador preguntó si se podían agregar campos al form HubSpot por API y luego pidió un método/script. Se confirmó con docs oficiales HubSpot (`PATCH /marketing/forms/2026-09-beta/{formId}`, scope `forms`) y GET read-only real que el form `AEO - Lead Form` (`8649e76c-8b01-41f3-9b0c-5713d7b4dba6`) es legible por API. Campos actuales: `firstname`, `lastname`, `email`, `pais_gh`, `tamano_de_la_empresa`, `marca_de_competencia`; no tiene `brandWebsite`. Propiedades candidatas existentes: `contacts.website`, `companies.website`, `companies.domain`.
 
 Se agregó herramienta gobernada: `pnpm hubspot:forms:upsert-fields -- --config <json> [--apply]` (`scripts/hubspot/upsert-form-fields.ts`). Dry-run por defecto; con `--apply` lee el form por API `2026-09-beta`, verifica/crea CRM properties si el config trae `createProperty`, marca `formField=true` cuando aplica y agrega fields faltantes a `fieldGroups` preservando la definición existente. Ejemplo versionado para AEO: `scripts/hubspot/examples/upsert-aeo-brand-website-field.json` agrega `companies.domain` después de `email`. Verificación: `pnpm exec eslint scripts/hubspot/upsert-form-fields.ts` y `pnpm exec tsc --noEmit --pretty false` verdes. Dry-run real inicial contra AEO devolvió plan `would_add_form_field companies.domain` + `would_patch_form_field_groups`, sin mutar HubSpot; después expiró auth local (`invalid_rapt`), y el script quedó con error claro: setear `HUBSPOT_ACCESS_TOKEN` o refrescar `gcloud auth login && gcloud auth application-default login`.
+## 2026-07-02 — AEO conversion reference copy — COMPLETE
+
+- Public site `/aeo-2/` (`postId=250265`) conversion section updated as copy-only against the latest reference: eyebrow `Diagnóstico gratis`, H2 `Descubre en qué nivel estás hoy — y empieza a subir.`, lead `En 24–48h sabes en qué nivel estás y por dónde empezamos a subirte. Sin costo, sin compromiso.` plus audience line `Para marcas medianas y grandes con equipo de marketing y compra considerada —B2B o B2C.`
+- Growth Forms AEO published v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad` via `scripts/growth/activate-aeo-reference-copy-contract.ts`; it preserves `style_variant=diagnostic_premium`, Turnstile, validation, policies and HubSpot destination, and updates CTA/fields/placeholders to reference copy. v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d` is deprecated.
+- Elementor widget `convers` saved through `Document::save()`; backup `_gh_backup_before_aeo_conversion_reference_copy_20260702T093257Z`; `heroans` hash stable at `e0b951b2456a83578cd9e22005900521`; Elementor cache + Kinsta purged.
+- Verification green: `pnpm public-website:verify-aeo-live-contract`; public API returns v7; clean visual proof `node tmp/verify-aeo-conversion-reference-copy.mjs` with screenshots `.captures/aeo-conversion-reference-copy-2026-07-02T09-39-36-373Z/conversion-{desktop,mobile390}.png`, both `overflowX=0`.
+- Follow-up privacy copy 2026-07-02: `convers` privacy line now reads `Tratamos tus datos según nuestra política de privacidad.` with the existing privacy URL. Backup `_gh_backup_before_aeo_conversion_privacy_copy_20260702T101413Z`; `heroans` unchanged. Verification: `node tmp/verify-aeo-conversion-reference-copy.mjs` screenshots `.captures/aeo-conversion-reference-copy-2026-07-02T10-15-35-355Z/`, `pnpm public-website:verify-aeo-wordpress-guards`, and `pnpm public-website:verify-aeo-live-contract` all green.
+- Note: `País`, `Tamaño de empresa` and `Principal competidor` remain optional by contract, so the renderer still appends `(opcional)`. Do not make those fields required just to hide that suffix unless product explicitly changes the validation contract.

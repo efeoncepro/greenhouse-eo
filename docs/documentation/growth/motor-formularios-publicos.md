@@ -35,20 +35,20 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 ## Estado de rollout
 
 - **Staging (`develop`): VIVO** desde 2026-06-25. Los tres flags estan ON: el API publico (`GROWTH_FORMS_PUBLIC_API_ENABLED`), el dispatcher de entrega (`GROWTH_FORMS_DISPATCH_ENABLED`) y el adapter HubSpot real (`GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`). Verificado: el endpoint publico responde el render contract y una submission real llego a un HubSpot test form (200).
-- **Produccion: ACTIVO de forma acotada para AEO `/aeo-2/`.** El primer submit productivo publico usa el form `efeonce-aeo-diagnostic` y, desde TASK-1298 (2026-07-01), el renderer portable `<greenhouse-form>` en WordPress por `form-key`. AEO v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d` declara `style_variant=diagnostic_premium`, Turnstile invisible y los dos dropdowns premium (`Pais principal`, `Tamano de la empresa`). La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Produccion: ACTIVO de forma acotada para AEO `/aeo-2/`.** El primer submit productivo publico usa el form `efeonce-aeo-diagnostic` y, desde TASK-1298 (2026-07-01), el renderer portable `<greenhouse-form>` en WordPress por `form-key`. AEO v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad` declara `style_variant=diagnostic_premium`, Turnstile invisible, CTA `Empezar con mi diagnóstico →` y los dos dropdowns premium (`País`, `Tamaño de empresa`). La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Primer form productivo publico — AEO `/aeo-2/`
 
 La landing publica `https://efeoncepro.com/aeo-2/` (`postId=250265`) ya envia leads al motor gobernado:
 
 - Form slug: `efeonce-aeo-diagnostic`.
-- Definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d` (v6, `style_variant=diagnostic_premium`; v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` and v1 `fver-efeonce-aeo-diagnostic-v1` deprecated).
+- Definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad` (v7, `style_variant=diagnostic_premium`; v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` and v1 `fver-efeonce-aeo-diagnostic-v1` deprecated).
 - Host surface: `fhsf-efeonce-aeo-diagnostic`.
 - API base: `https://greenhouse.efeoncepro.com`.
 - HubSpot destination: portal `48713323`, form GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6` (`AEO - Lead Form`).
 - Campos publicados: `firstName`, `email`, `brandWebsite`, `country`, `companySize`, `mainCompetitor`.
 - Gate de email: `email.validator=corporate_email` + `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. El renderer AEO consulta `/verify-email` de forma reactiva/debounced y antes de pedir Turnstile; si el correo es Gmail/free/disposable muestra el error inline en `email` y no llama `/submit`. El servidor revalida en `submitForm`.
-- Captcha contract: v6 declara `ui_policy_json.security.captcha={provider:"turnstile",required:true,mode:"invisible",siteKey:"0x4AAAAAADqwX2R7v-k9pItv",execution:"submit"}` y el `GET` publico de produccion serializa `render_contract.security.captcha`. El `POST` falla cerrado sin token (`captcha_failed/missing_token`) y el renderer AEO emite `captchaToken` en submit.
+- Captcha contract: v7 declara `ui_policy_json.security.captcha={provider:"turnstile",required:true,mode:"invisible",siteKey:"0x4AAAAAADqwX2R7v-k9pItv",execution:"submit"}` y el `GET` publico de produccion serializa `render_contract.security.captcha`. El `POST` falla cerrado sin token (`captcha_failed/missing_token`) y el renderer AEO emite `captchaToken` en submit.
 - Mapping HubSpot: `firstName -> firstname`, `email -> email`, `country -> pais_gh`, `companySize -> tamano_de_la_empresa`, `mainCompetitor -> marca_de_competencia`.
 - `brandWebsite` queda persistido en Greenhouse pero no se envia a HubSpot hasta que exista una propiedad/campo correspondiente en ese form.
 

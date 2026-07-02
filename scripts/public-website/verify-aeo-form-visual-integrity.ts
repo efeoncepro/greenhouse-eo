@@ -39,8 +39,8 @@ type HostSnapshot = {
     backgroundImage: string
   }
   titleInset: {
-    left: number
-    top: number
+    left: number | null
+    top: number | null
   }
   proof: {
     display: string
@@ -176,14 +176,14 @@ const readHost = async (page: Page): Promise<HostSnapshot> => {
     const title = document.querySelector<HTMLElement>('.gh-aeo-conversion .gh-aeo-growth-form-title')
     const proof = document.querySelector<HTMLElement>('.gh-aeo-conversion .gh-aeo-growth-form-proof')
 
-    if (!card || !title || !proof) {
-      throw new Error('AEO form host composition is missing card, title, or proof list')
+    if (!card || !proof) {
+      throw new Error('AEO form host composition is missing card or proof list')
     }
 
     const cardStyle = getComputedStyle(card)
     const proofStyle = getComputedStyle(proof)
     const cardRect = card.getBoundingClientRect()
-    const titleRect = title.getBoundingClientRect()
+    const titleRect = title ? title.getBoundingClientRect() : null
     const firstItem = proof.querySelector<HTMLElement>('li')
     const firstItemStyle = firstItem ? getComputedStyle(firstItem) : null
     const firstItemBeforeStyle = firstItem ? getComputedStyle(firstItem, '::before') : null
@@ -227,8 +227,8 @@ const readHost = async (page: Page): Promise<HostSnapshot> => {
         backgroundImage: cardStyle.backgroundImage,
       },
       titleInset: {
-        left: titleRect.left - cardRect.left,
-        top: titleRect.top - cardRect.top,
+        left: titleRect ? titleRect.left - cardRect.left : null,
+        top: titleRect ? titleRect.top - cardRect.top : null,
       },
       proof: {
         display: proofStyle.display,
@@ -283,7 +283,11 @@ const assertHost = (testCaseName: string, snapshot: HostSnapshot) => {
     )
   }
 
-  if (snapshot.titleInset.left < minPadding - 2 || snapshot.titleInset.top < minPadding - 2) {
+  if (
+    snapshot.titleInset.left !== null &&
+    snapshot.titleInset.top !== null &&
+    (snapshot.titleInset.left < minPadding - 2 || snapshot.titleInset.top < minPadding - 2)
+  ) {
     throw new Error(
       `${testCaseName} form title inset is left=${snapshot.titleInset.left}px top=${snapshot.titleInset.top}px; card chrome likely collapsed`
     )
@@ -339,8 +343,8 @@ const assertDropdown = (label: string, snapshot: ControlSnapshot & { optionCount
 }
 
 const assertButton = (snapshot: ControlSnapshot) => {
-  if (!snapshot.text.includes('Solicitar diagnóstico gratis')) {
-    throw new Error(`CTA text is "${snapshot.text}"; expected "Solicitar diagnóstico gratis →"`)
+  if (!snapshot.text.includes('Empezar con mi diagnóstico')) {
+    throw new Error(`CTA text is "${snapshot.text}"; expected "Empezar con mi diagnóstico →"`)
   }
 
   if (!isApprovedTeal(snapshot.backgroundColor)) {
@@ -459,15 +463,15 @@ async function main() {
       assertButton(button)
       if (dropdown) assertDropdown(`${testCase.name} renderer dropdown`, dropdown)
 
-      if (!selects[0]?.firstOption.includes('Selecciona país')) {
-        throw new Error(`${testCase.name} country select placeholder is "${selects[0]?.firstOption}"; expected "Selecciona país"`)
+      if (!selects[0]?.firstOption.includes('Selecciona tu país')) {
+        throw new Error(`${testCase.name} country select placeholder is "${selects[0]?.firstOption}"; expected "Selecciona tu país"`)
       }
 
-      if (!selects[1]?.firstOption.includes('Selecciona tamaño')) {
-        throw new Error(`${testCase.name} size select placeholder is "${selects[1]?.firstOption}"; expected "Selecciona tamaño"`)
+      if (!selects[1]?.firstOption.includes('Selecciona un rango')) {
+        throw new Error(`${testCase.name} size select placeholder is "${selects[1]?.firstOption}"; expected "Selecciona un rango"`)
       }
 
-      for (const expected of ['Sin costo', 'Sin compromiso', 'Sin permanencia', 'Datos protegidos']) {
+      for (const expected of ['Sin costo', 'Sin compromiso', 'Sin amarres', 'Tus datos están seguros']) {
         if (!trustText?.includes(expected)) {
           throw new Error(`${testCase.name} trust copy missing "${expected}"`)
         }

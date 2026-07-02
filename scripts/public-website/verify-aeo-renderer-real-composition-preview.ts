@@ -147,7 +147,7 @@ const assertSelect = (label: string, snapshot: ControlSnapshot) => {
 }
 
 const assertButton = (snapshot: ControlSnapshot) => {
-  if (!snapshot.text.includes('Solicitar diagnóstico gratis')) {
+  if (!snapshot.text.includes('Empezar con mi diagnóstico')) {
     throw new Error(`CTA text is "${snapshot.text}"; expected approved AEO CTA`)
   }
 
@@ -359,15 +359,15 @@ async function main() {
       assertSameDesktopRow(testCase.name, 'name/email fields', inputs[0], inputs[1])
       assertSameDesktopRow(testCase.name, 'country/company size selects', selects[0], selects[1])
 
-      if (!selects[0]?.firstOption.includes('Selecciona país')) {
+      if (!selects[0]?.firstOption.includes('Selecciona tu país')) {
         throw new Error(`${testCase.name} country select placeholder is "${selects[0]?.firstOption}"`)
       }
 
-      if (!selects[1]?.firstOption.includes('Selecciona tamaño')) {
+      if (!selects[1]?.firstOption.includes('Selecciona un rango')) {
         throw new Error(`${testCase.name} size select placeholder is "${selects[1]?.firstOption}"`)
       }
 
-      for (const expected of ['Sin costo', 'Sin compromiso', 'Sin permanencia', 'Datos protegidos']) {
+      for (const expected of ['Sin costo', 'Sin compromiso', 'Sin amarres', 'Tus datos están seguros']) {
         if (!trustText?.includes(expected)) {
           throw new Error(`${testCase.name} trust copy missing "${expected}"`)
         }

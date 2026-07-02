@@ -32,7 +32,7 @@ El motor depende de tres flags independientes. Para que funcione punta a punta l
 
 **Verdad live:** `vercel env ls` (flag Vercel) + `gcloud run services describe ops-worker --region=us-east4` (flags worker). El ledger es el estado humano, no la verdad.
 
-**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; AEO v6 (`fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`) publica `style_variant=diagnostic_premium`, `security.captcha`, CTA/copy premium y se embebe en WordPress por `form-key=b120566a-dd1a-43c8-956a-4e0121e805b8`.
+**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; AEO v7 (`fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`) publica `style_variant=diagnostic_premium`, `security.captcha`, CTA/copy de referencia y se embebe en WordPress por `form-key=b120566a-dd1a-43c8-956a-4e0121e805b8`.
 
 ## Prender en un environment
 
@@ -88,7 +88,7 @@ Señales reliability (en `/admin/operations`): `growth.forms.dead_letter_count`,
 
 ## Publicar copy renderizable de un form (TASK-1297)
 
-Para que el renderer muestre un CTA aprobado (ej. `Solicitar diagnóstico gratis →`) en vez del
+Para que el renderer muestre un CTA aprobado (ej. `Empezar con mi diagnóstico →`) en vez del
 default per-tipo, el copy se publica en el render contract (`copy.submit`). NO se edita una versión
 publicada in-place: se clona, se setea el copy y se publica una versión nueva. El patrón canónico es
 un script idempotente que resuelve el form por su `form_key` (identidad estable, no por etiqueta/slug),
@@ -107,6 +107,13 @@ errores específicos, CTA y success copy.
 ```bash
 pnpm growth:forms:activate-aeo-premium
 pnpm growth:forms:activate-aeo-premium -- --apply
+```
+
+Para actualizar el copy vigente de referencia de AEO sin tocar estilos ni WordPress, usar:
+
+```bash
+pnpm growth:forms:activate-aeo-reference-copy
+pnpm growth:forms:activate-aeo-reference-copy -- --apply
 ```
 
 El comando es dry-run por defecto. Si falla con `invalid_rapt`/`invalid_grant`, refrescar ambas

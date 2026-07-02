@@ -92,14 +92,14 @@ const aeoContract = staticContractFixture({
   },
   fields: [
     { key: 'firstName', type: 'text', label: 'Nombre', required: true, maxLength: 120, autocomplete: 'given-name' },
-    { key: 'email', type: 'email', label: 'Correo corporativo', required: true, autocomplete: 'email', inputMode: 'email', validator: 'corporate_email' },
-    { key: 'brandWebsite', type: 'url', label: 'Sitio web principal', required: true, maxLength: 240, inputMode: 'url', placeholder: 'ej. tuempresa.com' },
+    { key: 'email', type: 'email', label: 'Email corporativo', required: true, autocomplete: 'email', inputMode: 'email', validator: 'corporate_email', placeholder: 'nombre@tuempresa.com' },
+    { key: 'brandWebsite', type: 'url', label: 'Marca / sitio web', required: true, maxLength: 240, inputMode: 'url', placeholder: 'tuempresa.com' },
     {
       key: 'country',
       type: 'select',
       label: 'País principal',
       options: [
-        { value: '', label: 'Selecciona país' },
+        { value: '', label: 'Selecciona tu país' },
         { value: 'CL', label: 'Chile' },
         { value: 'CO', label: 'Colombia' },
         { value: 'MX', label: 'México' },
@@ -111,7 +111,7 @@ const aeoContract = staticContractFixture({
       type: 'select',
       label: 'Tamaño de empresa',
       options: [
-        { value: '', label: 'Selecciona tamaño' },
+        { value: '', label: 'Selecciona un rango' },
         { value: '1-10', label: '1 - 10' },
         { value: '11-50', label: '11 - 50' },
         { value: '51-200', label: '51 - 200' },
@@ -119,10 +119,10 @@ const aeoContract = staticContractFixture({
         { value: '1000+', label: '+1000' },
       ],
     },
-    { key: 'mainCompetitor', type: 'text', label: 'Competidor a comparar', maxLength: 200, placeholder: 'ej. marca competidora' },
+    { key: 'mainCompetitor', type: 'text', label: 'Principal competidor', maxLength: 200, placeholder: 'marca de tu competencia' },
   ],
   copy: {
-    submit: 'Solicitar diagnóstico gratis →',
+    submit: 'Empezar con mi diagnóstico →',
     'email.help': 'Usa tu correo corporativo para recibir el diagnóstico.',
     'brandWebsite.help': 'Usaremos este sitio para revisar señales públicas de visibilidad.',
     'mainCompetitor.help': 'Opcional: ayuda a comparar tu presencia en IA.',
@@ -270,7 +270,7 @@ const assertSelect = (label: string, snapshot: ControlSnapshot) => {
 }
 
 const assertDropdown = (label: string, snapshot: ControlSnapshot, optionCount: number) => {
-  if (!snapshot.text.includes('Selecciona tamaño') || !snapshot.text.includes('1 - 10')) {
+  if (!snapshot.text.includes('Selecciona un rango') || !snapshot.text.includes('1 - 10')) {
     throw new Error(`${label} text is "${snapshot.text}"; expected premium option list content`)
   }
 
@@ -292,7 +292,7 @@ const assertDropdown = (label: string, snapshot: ControlSnapshot, optionCount: n
 }
 
 const assertButton = (snapshot: ControlSnapshot) => {
-  if (!snapshot.text.includes('Solicitar diagnóstico gratis')) {
+  if (!snapshot.text.includes('Empezar con mi diagnóstico')) {
     throw new Error(`CTA text is "${snapshot.text}"; expected approved AEO CTA`)
   }
 
