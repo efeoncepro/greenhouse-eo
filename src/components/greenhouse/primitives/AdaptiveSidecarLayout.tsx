@@ -41,6 +41,7 @@ export interface AdaptiveSidecarLayoutProps {
   onSidecarWidthChange?: (width: number) => void
   sidecarExtent?: 'content' | 'viewport'
   viewportOffsetTop?: number | string
+  viewportGutter?: number | string
   viewportShellReflow?: 'none' | 'greenhouse-vertical-navbar'
   viewportShellGap?: number | string
   minHeight?: number | string
@@ -93,6 +94,17 @@ const toCssSize = (value: number | string) => (typeof value === 'number' ? `${va
 
 const toNumericWidth = (value: number | string) => (typeof value === 'number' ? value : DEFAULT_SIDECAR_WIDTH)
 
+const toNumericSpacing = (value: number | string) => (typeof value === 'number' ? value : Number.parseFloat(value) || 0)
+
+const isZeroCssSize = (value: number | string) => value === 0 || value === '0' || value === '0px'
+
+const addCssSizes = (base: number | string, extra: number | string) => {
+  if (isZeroCssSize(extra)) return toCssSize(base)
+  if (isZeroCssSize(base)) return toCssSize(extra)
+
+  return `calc(${toCssSize(base)} + ${toCssSize(extra)})`
+}
+
 const isInlineMode = (mode: AdaptiveSidecarResolvedMode) => mode === 'push' || mode === 'inline'
 
 const clampWidth = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
@@ -112,6 +124,7 @@ const AdaptiveSidecarLayout = ({
   onSidecarWidthChange,
   sidecarExtent = 'content',
   viewportOffsetTop = 0,
+  viewportGutter = 0,
   viewportShellReflow = 'none',
   viewportShellGap = DEFAULT_VIEWPORT_SHELL_GAP,
   minHeight,
@@ -254,7 +267,8 @@ const AdaptiveSidecarLayout = ({
   }, [dirty, emit, onDirtyCloseAttempt, onOpenChange, resolvedMode, restoreFocusRef])
 
   const sidecarSize = toCssSize(effectiveSidecarWidth)
-  const viewportOffsetSize = toCssSize(viewportOffsetTop)
+  const viewportOffsetSize = addCssSizes(viewportOffsetTop, viewportGutter)
+  const viewportGutterSize = toCssSize(viewportGutter)
   const inlineOpen = open && isInlineMode(resolvedMode)
   const layoutInlineOpen = inlineOpen || inlineLayoutPresent
   const viewportExtent = layoutInlineOpen && sidecarExtent === 'viewport'
@@ -269,6 +283,7 @@ const AdaptiveSidecarLayout = ({
           0,
           effectiveSidecarWidth -
             (side === 'right' ? viewportInlineOffsets.end : viewportInlineOffsets.start) +
+            toNumericSpacing(viewportGutter) +
             (shellReflowEnabled ? DEFAULT_VIEWPORT_CONTENT_GUTTER : 0)
         )}px`
       : sidecarSize
@@ -472,9 +487,9 @@ const AdaptiveSidecarLayout = ({
         position: viewportExtent ? 'fixed' : 'relative',
         zIndex: viewportExtent ? (shellReflowEnabled ? theme.zIndex.appBar + 1 : theme.zIndex.appBar - 1) : 2,
         insetBlockStart: viewportExtent ? viewportOffsetSize : 'auto',
-        insetBlockEnd: viewportExtent ? 0 : 'auto',
-        insetInlineEnd: viewportExtent && side === 'right' ? sidecarSize : 'auto',
-        insetInlineStart: viewportExtent && side === 'left' ? sidecarSize : 'auto',
+        insetBlockEnd: viewportExtent ? viewportGutterSize : 'auto',
+        insetInlineEnd: viewportExtent && side === 'right' ? addCssSizes(sidecarSize, viewportGutter) : 'auto',
+        insetInlineStart: viewportExtent && side === 'left' ? addCssSizes(sidecarSize, viewportGutter) : 'auto',
         minWidth: `${RESIZE_HANDLE_WIDTH}px`,
         cursor: 'col-resize',
         bgcolor: resizing ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
@@ -657,8 +672,8 @@ const AdaptiveSidecarLayout = ({
                   minHeight: 0,
                   position: viewportExtent ? 'fixed' : 'relative',
                   insetBlockStart: viewportExtent ? viewportOffsetSize : 'auto',
-                  insetBlockEnd: viewportExtent ? 0 : 'auto',
-                  insetInlineStart: viewportExtent ? 0 : 'auto',
+                  insetBlockEnd: viewportExtent ? viewportGutterSize : 'auto',
+                  insetInlineStart: viewportExtent ? viewportGutterSize : 'auto',
                   width: viewportExtent ? sidecarSize : 'auto',
                   zIndex: viewportExtent ? (shellReflowEnabled ? theme.zIndex.appBar + 1 : theme.zIndex.appBar - 1) : 'auto',
                   transformOrigin: '0% 50%',
@@ -706,8 +721,8 @@ const AdaptiveSidecarLayout = ({
                   minHeight: 0,
                   position: viewportExtent ? 'fixed' : 'relative',
                   insetBlockStart: viewportExtent ? viewportOffsetSize : 'auto',
-                  insetBlockEnd: viewportExtent ? 0 : 'auto',
-                  insetInlineEnd: viewportExtent ? 0 : 'auto',
+                  insetBlockEnd: viewportExtent ? viewportGutterSize : 'auto',
+                  insetInlineEnd: viewportExtent ? viewportGutterSize : 'auto',
                   width: viewportExtent ? sidecarSize : 'auto',
                   zIndex: viewportExtent ? (shellReflowEnabled ? theme.zIndex.appBar + 1 : theme.zIndex.appBar - 1) : 'auto',
                   transformOrigin: '100% 50%',

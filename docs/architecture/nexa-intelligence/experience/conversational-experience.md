@@ -52,7 +52,7 @@ usuario final elige según cómo trabaja — **es una preferencia, no un flag bi
 | --- | --- | --- |
 | `dock` (A) | Burbuja flotante compacta | panel chico (Drawer mobile / Card desktop) |
 | `expandible` (B) | Panel ampliable con historial | `NexaFloatingPanel` (TASK-1078), compacto↔ancho |
-| `lane` (C) | Sidecar full-height in-flow | `AdaptiveSidecarLayout` + `NexaLanePanel`; el dashboard queda 100% visible al lado (split) |
+| `lane` (C) | Sidecar in-flow con gutter de shell | `AdaptiveSidecarLayout` + `NexaLanePanel`; el dashboard queda 100% visible al lado (split) y el panel conserva margen visual respecto del viewport |
 
 - **Cero lógica de chat duplicada:** los 3 modos comparten `useNexaPersistentRuntime`,
   `nexa_threads`/`nexa_messages` (historial), `NexaHistoryRail` y `NexaModelSelector`. Solo cambia el chrome.

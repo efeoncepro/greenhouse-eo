@@ -139,7 +139,7 @@ Motion contract:
 - GSAP is not the default sidecar motion stack; it remains reserved for exceptional choreography covered by its own ADR.
 - Desktop `push`/`inline` sidecars are full-height lanes inside the work canvas, separated by structure, not boxed drawers with shadow/radius chrome.
 - Desktop resizable sidecars must expose a visible splitter with `role="separator"`, `aria-orientation="vertical"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and keyboard adjustment.
-- `sidecarExtent='viewport'` is the shell-level presentation: panel and splitter run top-to-bottom through the viewport, while the route content still reserves layout space so the main surface is not covered.
+- `sidecarExtent='viewport'` is the shell-level presentation: panel and splitter run through the viewport, while the route content still reserves layout space so the main surface is not covered. If the lane should breathe inside the app shell instead of touching the browser edge, use `viewportGutter` and reserve the same gutter in the lane contract; do not patch a consumer with ad hoc fixed offsets.
 - If a viewport sidecar needs to occupy the global app-bar area, the implementation must use `viewportShellReflow='greenhouse-vertical-navbar'` inside `AdaptiveSidecarShellProvider`. The sidecar publishes a bounded reservation; the navbar consumes it through its `overrideStyles` contract and preserves global actions/avatar. Do not patch the navbar with route-local global CSS or `!important`.
 - Viewport sidecars must not remove the global footer. Surfaces that use full-height lanes must budget header/content padding/footer height in their own canvas so `scrollHeight === clientHeight` when the workbench is intended to be non-scrolling.
 
@@ -361,7 +361,7 @@ Allowed in V1:
 - fixed width presets by `kind` and breakpoint;
 - optional `density` prop;
 - optional `resizable` prop with `sidecarMinWidth`, `sidecarMaxWidth`, `onSidecarWidthChange`, visual splitter, keyboard controls and GVC evidence;
-- optional `sidecarExtent='viewport'` for shell-level lanes that should visually occupy top-to-bottom viewport height;
+- optional `sidecarExtent='viewport'` for shell-level lanes that should visually occupy viewport height, with `viewportGutter` when the lane must preserve app-shell breathing room;
 - route-local remembered open state only when the surface owner proves it is safe.
 
 Not allowed in V1:
