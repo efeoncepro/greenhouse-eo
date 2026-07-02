@@ -1,3 +1,27 @@
+## Sesion 2026-07-02 — TASK-1319 split + backend implementado — Claude — ✅ complete (1319) · 🆕 to-do (1320)
+
+> **Pedido:** analizar la TASK-1319 con múltiples lentes (copywriting/CRO/marketing/arquitectura/product-design/commercial), partirla en 2 (UI para Codex, backend para mí), escribir UI Flow + UI Motion, e implementar el backend (`/implement-task 1319`).
+>
+> **Split hecho:** `TASK-1319` → **backend-data** (contrato, mío) + `TASK-1320` → **ui-ux** (renderer, Codex, `Blocked by: TASK-1319`). Frontera de archivos: 1319 posee `contracts.ts` + `contract.ts` (espejo) + constantes de `telemetry.ts` + tests + parity; 1320 posee `renderer.ts` + `styles.ts` + `copy.ts` + emit calls + GVC + cutover AEO + activation script + `verify-aeo-public-api-contract` (movidos en Delta 2026-07-02). Wireframe/Motion renombrados a slug 1320; **UI Flow nuevo** `docs/ui/flows/TASK-1320-…-renderer-flow.md`. Corrección clave por el operador: la capacidad es **transversal a TODO Growth Form**, AEO es primer consumidor, NO owner (se despacoplo del framing EPIC-020).
+>
+> **Backend 1319 implementado (complete):** `successBehaviorSchema` extendido con `success_card` **ortogonal a `kind`** (`presentation` + `title`/`body`/`steps` ≤4/`reward`/`actions` ≤2/`supportingNote`, acotados) + `href` allowlist (`isBrowserSafeSuccessHref`: https/same-origin, rechaza `javascript:`/`data:`/non-https/`//`). El schema ES el leak boundary — **el compiler NO se tocó** (passthrough `successParsed.data` + `GET` serializa completo; bloquea vía `safeParse`). Espejo de tipos `RendererSuccessBehavior` + sub-tipos (parity compile-time verde). Telemetría en ambos espejos: `action_kind`/`reward_kind` allowlisted + `gh_form_success_viewed`/`_action_clicked` render-only en `GTM_EVENT_NAMES`/`RENDERER_GTM_EVENTS` (sin server-side, no hay round-trip).
+>
+> **Recalibración pre-ejecución (Delta):** Slice 2 (compiler) pasó a solo-tests; Slice 5 (activation script + verifier AEO) movido a 1320 (no verificable sin renderer live). Open Q3 resuelta = eventos GTM-only.
+>
+> **Gates verdes:** `pnpm test` 8649 passed / 0 failed, `pnpm typecheck`, `pnpm lint`, `pnpm build`; focal `vitest src/lib/growth/forms src/growth-forms-renderer` 202. `task:lint`/`ui:*-check`/`ops:lint --changed` sin findings. Commit código `8df3b829e`. Local en `develop`, **sin push**.
+>
+> **Próximo paso:** TASK-1320 (Codex) — el contrato ya está listo en código para consumir (ver Delta 2026-07-02 en la task 1320).
+
+## Sesion 2026-07-02 — TASK-1319 Growth Forms Success Card Capability — Codex — 🆕 to-do
+
+> **Pedido:** crear una task de alto detalle para convertir el thank-you post-submit de Growth Forms en capacidad transversal, sin implementar todavia.
+>
+> **Task creada:** `docs/tasks/to-do/TASK-1319-growth-forms-success-card-capability.md` queda registrada como `P1 / Alto / Alto`, `Execution profile: backend-data`, `UI impact: primitive`, `Backend impact: api`. La capacidad propuesta extiende `success_behavior_json` + renderer portable para reemplazar el mensaje simple post-submit por una Success Card dentro de la misma card del formulario, con siguientes pasos, CTA/reward opcional (ebook/descarga/regalo/sorpresa), foco/accesibilidad, telemetry allowlisted y motion/reduced-motion. Primer consumidor sugerido: AEO `/aeo-2/`; no Thank You page ni script host-specific.
+>
+> **Contratos UI creados:** wireframe `docs/ui/wireframes/TASK-1319-growth-forms-success-card-capability.md` y motion contract `docs/ui/motion/TASK-1319-growth-forms-success-card-capability-motion.md`. `UI ready` queda `no` a proposito hasta Discovery/Plan/decision de asset strategy.
+>
+> **Gates de creacion:** `pnpm task:lint --task TASK-1319`, `pnpm ui:wireframe-check --task TASK-1319`, `pnpm ui:motion-check --task TASK-1319` y `pnpm ops:lint --changed` pasaron con `errors=0 warnings=0`.
+
 ## Sesion 2026-07-02 — TASK-1318 post-release closure + drift guard — Codex — ✅ complete
 
 > **Pedido:** continuar desde el estado actual de `TASK-1318`, considerando que el release a producción ya fue realizado, trazar qué faltaba, cerrar el gap de rollout con evidencia y agregar un guard para que el drift no se repita.

@@ -6,9 +6,15 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-07-02 (baseline recalibration pre-execution)
+
+- Discovery confirmo passthrough total del compiler (`successBehavior: successParsed.data`, `policy-compiler.ts:189`) y GET que serializa el contrato completo (`route.ts:44`): **extender el schema fluye los campos al browser sin tocar el compiler**; el schema (bounds + `href` allowlist) ES el boundary. Slice 2 pasa a ser **solo tests** (compile fixture + reject unsafe), sin editar `policy-compiler.ts`.
+- El **activation script + la extension de `verify-aeo-public-api-contract`** se mueven a **TASK-1320**: no son verificables en 1319 sin AEO publish + renderer live (el verifier live fallaria contra la AEO actual sin success-card). 1319 queda contrato puro, 100% unit-verificable (schema + compiler + telemetry + parity tests). Evidencia runtime del contrato = el consumidor AEO en TASK-1320.
+- Open Q3 resuelta: eventos success card render-only → GTM/browser only (`GTM_EVENT_NAMES` + `RENDERER_GTM_EVENTS`), NUNCA `TELEMETRY_EVENT_NAMES` (evita phantom server events).
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -102,9 +108,8 @@ Reglas obligatorias:
 - `src/growth-forms-renderer/telemetry.ts` (solo constantes espejo: `RENDERER_GTM_EVENTS` + `RENDERER_ALLOWED_PAYLOAD_KEYS`; NO los emit calls)
 - `src/lib/growth/forms/__tests__/policy-compiler.test.ts`
 - `src/lib/growth/forms/__tests__/renderer-contract-parity.test.ts` (mantener verde)
-- el no-leak test del policy-compiler `[verificar nombre exacto]`
-- `scripts/growth/activate-aeo-success-card-contract.ts` (nuevo, idempotente dry-run) o extension de un activation script existente
-- `scripts/public-website/verify-aeo-public-api-contract.ts`
+- `src/growth-forms-renderer/__tests__/telemetry.test.ts` (cobertura de las claves nuevas)
+- (MOVIDOS a TASK-1320: `scripts/growth/activate-aeo-success-card-contract.ts`, `scripts/public-website/verify-aeo-public-api-contract.ts`)
 
 ## Current Repo State
 
@@ -204,11 +209,12 @@ Reglas obligatorias:
 - Campos acotados: `presentation`, `title`/`titleCopyRef`, `body`/`bodyCopyRef`, `steps[]` (bounded), `reward` (metadata ebook/download/gift/surprise), `actions[]` (bounded), `supportingNote`/`supportingNoteCopyRef`.
 - Mantener los kinds existentes validos y byte-compatibles salvo que un test pruebe que el comportamiento actual era inseguro.
 
-### Slice 2 — Policy compiler: compile + reject unsafe
+### Slice 2 — Policy compiler tests (sin cambio de codigo)
 
-- Compilar la success-card metadata browser-safe en el `RenderContract` (`policy-compiler.ts`), pasando strings por `sanitizeRenderCopy` donde corresponda.
-- Agregar tests de compiler que RECHACEN shapes inseguros (title/body over-length, arrays fuera de cota, `href` no-allowlisted, reward con token/URL privada).
-- Mantener el no-leak test verde (la metadata nunca lleva mapping/GUID/token/PII/field values).
+- NOTA (Delta): el compiler ya hace passthrough (`successBehavior: successParsed.data`) y bloquea en `!successParsed.success`. NO requiere cambio de codigo; el schema (Slice 1/3) hace la validacion/rechazo.
+- Agregar tests que compilen un fixture success-card valido y afirmen que el `renderContract.successBehavior` carga la metadata browser-safe.
+- Agregar tests que RECHACEN shapes inseguros (title/body over-length, arrays fuera de cota, `href` no-allowlisted) via `safeParse` → publicacion bloqueada.
+- Mantener el gate de no-leak: la metadata nunca lleva mapping/GUID/token/PII/field values (bounds + href allowlist en el schema).
 
 ### Slice 3 — Reward / action URL allowlist (contract layer)
 
@@ -228,12 +234,9 @@ Reglas obligatorias:
 - Extender el forbidden-keys test para cubrir el espacio negativo (nunca field values/email/name/phone/HubSpot IDs/private tokens en estos eventos).
 - NOTA de boundary: esta task define las CONSTANTES (enums + allowlist). Los `telemetry.emit(...)` calls viven en `renderer.ts` = TASK-1320.
 
-### Slice 5 — Activation primitive + contract verifier
+### Slice 5 — MOVIDO a TASK-1320 (recalibracion)
 
-- Crear/extender un activation script idempotente dry-run-default que publique una version con success-card metadata (por `form_key`), preservando fields, validation, Turnstile, destinations, namePolicy y consent.
-- Guard de release-readiness: no publicar contratos success-card antes de que el runtime (renderer) los soporte (mismo patron que TASK-1318 apply guard).
-- Extender `verify-aeo-public-api-contract` para afirmar la success-card metadata en el GET publico por slug/formKey.
-- El `--apply` real del cutover AEO + GVC live es TASK-1320 (consumidor visible), gated al renderer live.
+El activation script (publish de una version success-card por `form_key`, dry-run + runtime-guard) y la extension de `verify-aeo-public-api-contract` se movieron a **TASK-1320**: dependen del AEO publish + renderer live y no son verificables en 1319. Ver `## Delta 2026-07-02`. La evidencia de contrato de 1319 es unit (schema + compiler fixture + telemetry + parity).
 
 ## Out of Scope
 
@@ -355,23 +358,22 @@ Reglas:
 
 ## Acceptance Criteria
 
-- [ ] `success_behavior_json` soporta una presentacion success card browser-safe sin romper `inline_message`, `redirect`, `asset_access`, `review_pending` ni `tokenized_report`.
-- [ ] `presentation` queda ORTOGONAL a `kind`; el reward es sub-bloque, no un repurpose de `asset_access`.
-- [ ] El compiler compila la metadata browser-safe y RECHAZA shapes inseguros (over-length, arrays fuera de cota, `href` no-allowlisted, reward con token/URL privada).
-- [ ] El render contract nunca expone mapping/GUID/token/PII/field values/dispatcher state (no-leak test verde).
-- [ ] `action_kind`/`reward_kind` quedan allowlisted en `TELEMETRY_ALLOWED_PAYLOAD_KEYS` (SoT) + `RENDERER_ALLOWED_PAYLOAD_KEYS` (espejo); `gh_form_success_viewed`/`gh_form_success_action_clicked` en `GTM_EVENT_NAMES`/`RENDERER_GTM_EVENTS`; forbidden-keys test extendido.
-- [ ] `renderer-contract-parity.test.ts` verde tras extender el contrato (server ↔ renderer en lockstep).
-- [ ] Activation script dry-run por default, idempotente, con guard que bloquea publish si el runtime no soporta success-card.
-- [ ] `verify-aeo-public-api-contract` afirma la success-card metadata en el GET publico.
-- [ ] Source of truth, contract surface, invariantes, boundary de acceso y migration/rollback posture explicitos.
-- [ ] Documentation, task lifecycle y handoff sincronizados al cierre.
+- [x] `success_behavior_json` soporta una presentacion success card browser-safe sin romper `inline_message`, `redirect`, `asset_access`, `review_pending` ni `tokenized_report`. (test "legacy siguen compilando byte-compatible")
+- [x] `presentation` queda ORTOGONAL a `kind`; el reward es sub-bloque, no un repurpose de `asset_access`. (test "redirect + success_card coexisten")
+- [x] El compiler compila la metadata browser-safe y RECHAZA shapes inseguros (over-length, arrays fuera de cota, `href` no-allowlisted, reward con token/URL privada). (schema `safeParse` → `success_behavior_invalid` blocking; tests de href/cotas)
+- [x] El render contract nunca expone mapping/GUID/token/PII/field values/dispatcher state (no-leak test verde). (`render_contract — browser-safe` describe verde; success metadata = author copy acotado + href allowlisted)
+- [x] `action_kind`/`reward_kind` quedan allowlisted en `TELEMETRY_ALLOWED_PAYLOAD_KEYS` (SoT) + `RENDERER_ALLOWED_PAYLOAD_KEYS` (espejo); `gh_form_success_viewed`/`gh_form_success_action_clicked` en `GTM_EVENT_NAMES`/`RENDERER_GTM_EVENTS`.
+- [x] `renderer-contract-parity.test.ts` verde tras extender el contrato (server ↔ renderer en lockstep; typecheck valida la aserción compile-time).
+- [~] Activation script dry-run + guard → **MOVIDO a TASK-1320** (Delta 2026-07-02; requiere renderer live).
+- [~] `verify-aeo-public-api-contract` afirma la metadata → **MOVIDO a TASK-1320** (requiere AEO publish).
+- [x] Source of truth, contract surface, invariantes, boundary de acceso y migration/rollback posture explicitos. (Backend/Data Contract)
+- [x] Documentation, task lifecycle y handoff sincronizados al cierre.
 
 ## Verification
 
 - `pnpm task:lint --task TASK-1319`
 - `pnpm exec vitest run src/lib/growth/forms` (incluye gates load-bearing: `renderer-contract-parity.test.ts` + policy-compiler + no-leak test)
 - `pnpm exec vitest run src/growth-forms-renderer` (parity de tipos/telemetria del espejo)
-- `pnpm public-website:verify-aeo-public-api-contract`
 - `pnpm typecheck`
 - `pnpm lint`
 - `pnpm build`
