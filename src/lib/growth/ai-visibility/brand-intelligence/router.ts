@@ -55,25 +55,6 @@ const fallbackMetadata = (
   usage: null
 })
 
-/** Resolve the first configured provider in cheap-first priority order. */
-const resolveConfiguredProvider = async (
-  preferred?: BrandIntelligenceProviderId
-): Promise<BrandIntelligenceProvider | null> => {
-  const order: BrandIntelligenceProviderId[] = preferred
-    ? [preferred, ...BRAND_INTELLIGENCE_PROVIDER_IDS.filter(id => id !== preferred)]
-    : [...BRAND_INTELLIGENCE_PROVIDER_IDS]
-
-  for (const id of order) {
-    const provider = PROVIDER_REGISTRY[id]
-    // isConfigured() may throw (e.g. missing Vertex credential) → treat as not configured.
-    const configured = await provider.isConfigured().catch(() => false)
-
-    if (configured) return provider
-  }
-
-  return null
-}
-
 /**
  * Run the grounded read. ALWAYS resolves a `BrandIntelligenceResult` (never throws).
  * `provider` forces a provider (eval/shadow) without touching the flag.
@@ -94,42 +75,59 @@ export const runBrandIntelligence = async (
     return { fields: null, metadata: fallbackMetadata('no_signals', null) }
   }
 
-  const provider = await resolveConfiguredProvider(options?.provider)
+  // Orden cheap-first; si se fuerza un provider (eval/shadow), va primero.
+  const order: BrandIntelligenceProviderId[] = options?.provider
+    ? [options.provider, ...BRAND_INTELLIGENCE_PROVIDER_IDS.filter(id => id !== options.provider)]
+    : [...BRAND_INTELLIGENCE_PROVIDER_IDS]
 
-  if (!provider) {
-    return { fields: null, metadata: fallbackMetadata('not_configured', options?.provider ?? null) }
-  }
+  // Resiliencia (fix 2026-07-02): CAER al siguiente provider cuando uno no está configurado O su
+  // `extract()` falla O devuelve un shape inválido. Antes sólo caía en `isConfigured()=false`, así
+  // que un provider que se auto-declaraba configurado pero erroraba (p.ej. Gemini/Vertex con
+  // credencial rota) tumbaba TODA la lectura aunque OpenAI/Anthropic estuvieran sanos → categoría
+  // `unknown` → runs saltados. Ahora un provider caído no bloquea a los sanos.
+  let lastStatus: BrandIntelligenceResult['metadata']['status'] = 'not_configured'
+  let lastProviderId: BrandIntelligenceProviderId | null = null
 
-  const started = Date.now()
+  for (const id of order) {
+    const provider = PROVIDER_REGISTRY[id]
+    const configured = await provider.isConfigured().catch(() => false)
 
-  try {
-    const response = await provider.extract(input)
-    const latencyMs = Date.now() - started
-    const fields = sanitizeBrandIntelligenceOutput(response.data)
+    if (!configured) continue
 
-    if (!fields) {
-      return { fields: null, metadata: fallbackMetadata('schema_invalid', provider.id, latencyMs) }
-    }
+    lastProviderId = provider.id
+    const started = Date.now()
 
-    return {
-      fields,
-      metadata: {
-        providerId: provider.id,
-        model: response.model,
-        version: BRAND_INTELLIGENCE_VERSION,
-        status: 'ok',
-        latencyMs,
-        usage: response.usage
+    try {
+      const response = await provider.extract(input)
+      const latencyMs = Date.now() - started
+      const fields = sanitizeBrandIntelligenceOutput(response.data)
+
+      if (!fields) {
+        lastStatus = 'schema_invalid'
+        continue
       }
+
+      return {
+        fields,
+        metadata: {
+          providerId: provider.id,
+          model: response.model,
+          version: BRAND_INTELLIGENCE_VERSION,
+          status: 'ok',
+          latencyMs,
+          usage: response.usage
+        }
+      }
+    } catch (error) {
+      captureWithDomain(error, 'growth', {
+        tags: { source: 'growth_ai_visibility_brand_intelligence', provider: provider.id },
+        extra: { ...options?.telemetry }
+      })
+
+      lastStatus = 'provider_error'
+      // cae al siguiente provider del orden
     }
-  } catch (error) {
-    const latencyMs = Date.now() - started
-
-    captureWithDomain(error, 'growth', {
-      tags: { source: 'growth_ai_visibility_brand_intelligence', provider: provider.id },
-      extra: { ...options?.telemetry }
-    })
-
-    return { fields: null, metadata: fallbackMetadata('provider_error', provider.id, latencyMs) }
   }
+
+  return { fields: null, metadata: fallbackMetadata(lastStatus, lastProviderId) }
 }

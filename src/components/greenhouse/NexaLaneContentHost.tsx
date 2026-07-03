@@ -36,6 +36,7 @@ const NexaLaneContentHost = ({ children }: { children: ReactNode }) => {
       sidecarMinWidth={440}
       sidecarMaxWidth={660}
       sidecarExtent='viewport'
+      viewportGutter={16}
       viewportShellReflow='greenhouse-vertical-navbar'
       mainMinWidth={520}
       temporaryPlacement='right'

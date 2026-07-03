@@ -10,6 +10,8 @@ import 'server-only'
  * - preserva validation, Turnstile/security, destinations y policies
  */
 
+import { execFileSync } from 'node:child_process'
+
 import { addDestination, authorDraftForm, deprecateForm, publishForm } from '@/lib/growth/forms/commands'
 import {
   getFormDefinitionByKey,
@@ -18,11 +20,14 @@ import {
   listHostSurfaces,
 } from '@/lib/growth/forms/store'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
+import { preserveFormVersionFields } from '../lib/preserve-form-version-fields'
 
 loadGreenhouseToolEnv()
 applyGreenhousePostgresProfile('ops')
 
 const APPLY = process.argv.includes('--apply')
+const ALLOW_RUNTIME_PENDING = process.argv.includes('--allow-runtime-pending')
+const PRODUCTION_RUNTIME_REF = process.env.GREENHOUSE_AEO_RUNTIME_REF?.trim() || 'origin/main'
 
 const AEO_FORM_KEY = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 const STYLE_VARIANT = 'diagnostic_premium'
@@ -150,8 +155,47 @@ const withReferenceSuccess = (successBehavior: unknown): Record<string, unknown>
 
 const stableJson = (value: unknown): string => JSON.stringify(value)
 
+const readFileAtRef = (ref: string, filePath: string): string => {
+  try {
+    return execFileSync('git', ['show', `${ref}:${filePath}`], { encoding: 'utf8' })
+  } catch {
+    return ''
+  }
+}
+
+const assertProductionRuntimeSupportsFullNameSplit = (): void => {
+  if (!APPLY) return
+
+  const normalizer = readFileAtRef(PRODUCTION_RUNTIME_REF, 'src/lib/growth/forms/name-normalization.ts')
+  const commands = readFileAtRef(PRODUCTION_RUNTIME_REF, 'src/lib/growth/forms/commands.ts')
+
+  const runtimeReady =
+    normalizer.includes('applyNameNormalizationPolicy') &&
+    normalizer.includes('split_full_name') &&
+    commands.includes('applyNameNormalizationPolicy(version.validation_schema_json, normalizedFields)')
+
+  if (runtimeReady) {
+    console.log(`\nRuntime guard: ${PRODUCTION_RUNTIME_REF} already contains the Growth Forms full-name split runtime.`)
+
+    return
+  }
+
+  const message =
+    `AEO reference copy would publish namePolicy.split_full_name, but ${PRODUCTION_RUNTIME_REF} does not contain ` +
+    'the server-side applyNameNormalizationPolicy runtime. Release the code first, or pass --allow-runtime-pending ' +
+    'only with an explicit rollout blocker/rollback plan.'
+
+  if (!ALLOW_RUNTIME_PENDING) {
+    console.error(`\nFAIL: ${message}`)
+    process.exit(1)
+  }
+
+  console.warn(`\nWARNING: ${message}`)
+}
+
 const main = async (): Promise<void> => {
   console.log(`Activación copy referencia AEO — mode: ${APPLY ? 'APPLY' : 'DRY-RUN'}`)
+  assertProductionRuntimeSupportsFullNameSplit()
 
   const definition = await getFormDefinitionByKey(AEO_FORM_KEY)
 
@@ -247,19 +291,12 @@ const main = async (): Promise<void> => {
     formKind: definition.form_kind as 'diagnostic_intake',
     purpose: definition.purpose,
     riskProfile: (definition.risk_profile as 'low' | 'medium' | 'high' | undefined) ?? 'low',
-    locale: current.locale,
+    ...preserveFormVersionFields(current),
     fieldSchema: nextFields,
     validationSchema: nextValidation,
     copyRefs: nextCopyRefs,
     styleVariant: STYLE_VARIANT,
-    uiPolicy: current.ui_policy_json,
     successBehavior: nextSuccess,
-    consentPolicyVersion: current.consent_policy_version ?? 'efeonce-aeo-diagnostic-consent-v1',
-    dataClassification: current.data_classification_json,
-    destinationPolicy: current.destination_policy_json,
-    analyticsPolicy: current.analytics_policy_json,
-    retentionPolicy: current.retention_policy_json,
-    commercialHandoffPolicy: current.commercial_handoff_policy_json,
     createdBy: 'aeo-reference-copy-activation',
   })
 

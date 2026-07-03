@@ -41,6 +41,37 @@ describe('growth-forms-renderer · telemetry', () => {
     expect(dl[0]).not.toHaveProperty('email')
   })
 
+  it('keeps success-card classifiers (action_kind, reward_kind) and drops field values — TASK-1319', () => {
+    const out = sanitizeTelemetryPayload({
+      success_behavior: 'inline_message',
+      action_kind: 'schedule',
+      reward_kind: 'ebook',
+      email: 'leak@x.com',
+      raw_value: 'Julio',
+    })
+
+    expect(out).toEqual({ success_behavior: 'inline_message', action_kind: 'schedule', reward_kind: 'ebook' })
+    expect(out).not.toHaveProperty('email')
+    expect(out).not.toHaveProperty('raw_value')
+  })
+
+  it('emits the success-card view/action events on the host — TASK-1319', () => {
+    const host = document.createElement('div')
+    const seen: string[] = []
+
+    host.addEventListener('gh_form_success_viewed', e => seen.push((e as CustomEvent).type))
+    host.addEventListener('gh_form_success_action_clicked', e => seen.push((e as CustomEvent).type))
+    const emitter = createTelemetryEmitter(host, { enabled: true, gtmDataLayer: true }, { form_slug: 's' })
+
+    emitter.emit('gh_form_success_viewed', { success_behavior: 'inline_message' })
+    emitter.emit('gh_form_success_action_clicked', { action_kind: 'schedule', reward_kind: 'ebook' })
+
+    expect(seen).toEqual(['gh_form_success_viewed', 'gh_form_success_action_clicked'])
+    const dl = (window as unknown as { dataLayer: Array<Record<string, unknown>> }).dataLayer
+
+    expect(dl[1]).toMatchObject({ event: 'gh_form_success_action_clicked', action_kind: 'schedule', reward_kind: 'ebook' })
+  })
+
   it('respects disabled policy and dataLayer opt-out', () => {
     const host = document.createElement('div')
 

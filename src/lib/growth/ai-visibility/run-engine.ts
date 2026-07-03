@@ -54,6 +54,7 @@ import {
 } from './store'
 import { finalizeRunDelivery } from './public-delivery/finalize-delivery'
 import { gatherRunProbes } from './probes/command'
+import { scoreGraderRun } from './scoring/command'
 import {
   type PromptFamily,
   type PromptFanOutType,
@@ -301,6 +302,27 @@ export const executeClaimedGraderRun = async (
     estimatedCostUsd,
     finishedAt: new Date().toISOString()
   })
+
+  // Auto-score del run terminal-con-datos ANTES de finalizar el delivery. `scoreGraderRun` era
+  // sólo manual (endpoint admin), así que el path ASYNC (lead magnet público / grader-on-submit)
+  // ejecutaba las observaciones pero nunca persistía el score → `readGraderReport` devolvía
+  // `score_not_found` → delivery `unavailable` → sin informe/correo aunque hubiera evidencia sana.
+  // scoreGraderRun es DETERMINISTA (el enrich LLM está OFF por default) + IDEMPOTENTE (no recomputa
+  // si ya existe para el score_version) → seguro en el finalize. Best-effort: un fallo se degrada
+  // honesto a `unavailable` (NO crashea el run; las observaciones ya están persistidas). El gate de
+  // PUBLICACIÓN sigue viviendo en el `score_status` (autoReleasable → ready; review_required →
+  // in_review), así que auto-scorear no salta la revisión humana donde aplica.
+  if (status === 'succeeded' || status === 'partial') {
+    try {
+      await scoreGraderRun({ runId: finalized.runId })
+    } catch (error) {
+      captureWithDomain(error, 'growth', {
+        level: 'warning',
+        tags: { source: 'growth_ai_visibility_run_engine', reason: 'auto_score_failed' },
+        extra: { runId: finalized.runId }
+      })
+    }
+  }
 
   // TASK-1245 — auto-publish del snapshot + materialización del delivery state público (write-side,
   // NO on-read). succeeded/partial publicable → ready; review_required → in_review; resto → unavailable.

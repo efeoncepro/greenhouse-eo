@@ -15,6 +15,7 @@ import {
   dataIntegrityContractFixture,
   multiStepContractFixture,
   staticContractFixture,
+  successCardContractFixture,
 } from '@/growth-forms-renderer/fixtures'
 
 /**
@@ -27,13 +28,14 @@ import {
  * Demuestra la regla "Greenhouse preview usa el mismo contract/core que public hosts".
  */
 
-type FixtureKey = 'static' | 'conditional' | 'multi_step' | 'data_integrity'
+type FixtureKey = 'static' | 'conditional' | 'multi_step' | 'data_integrity' | 'success_card'
 
 const FIXTURES: Record<FixtureKey, { label: string; build: () => RenderContract }> = {
   static: { label: 'Estático', build: staticContractFixture },
   conditional: { label: 'Condicional', build: conditionalContractFixture },
   multi_step: { label: 'Multi-paso', build: multiStepContractFixture },
   data_integrity: { label: 'Integridad', build: dataIntegrityContractFixture },
+  success_card: { label: 'Success card', build: successCardContractFixture },
 }
 
 type StateKey = 'live' | 'loading' | 'error' | 'unavailable'

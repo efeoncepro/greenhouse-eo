@@ -79,6 +79,24 @@ export const isGraderIntakeOnFormsEngineEnabled = (env: NodeJS.ProcessEnv = proc
   isTrue(env[GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_FLAG])
 
 /**
+ * TASK-1321 — `/aeo-2/` submit (`fdef-efeonce-aeo-diagnostic`) → grader run auto-disparado.
+ *
+ * ⚠️ KILL-SWITCH default-**ON** (desvía del patrón canónico default-OFF por directiva explícita
+ * del operador 2026-07-02: la capacidad nace activa, no dark). El flag APAGA (`=false`), no
+ * prende. Aun así la entrega real sigue gobernada aguas abajo por los flags existentes del
+ * grader (`GROWTH_AI_VISIBILITY_GRADER_ENABLED`, `..._BRAND_INTELLIGENCE_ENABLED` para la
+ * categoría, `..._REPORT_EMAIL_ENABLED` para el correo, `..._LEAD_HANDOFF_ENABLED` para HubSpot)
+ * — con este scope ON pero el grader global OFF en un environment, no corre nada. Los guardrails
+ * que hacen segura la posición ON: cost-cap global (budget 24h + per-email/IP), gate de categoría
+ * (unknown→skip), corporate-email + Turnstile del form, dedup HubSpot nativo.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AEO_FORM_GRADER_INTAKE_FLAG = 'GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED'
+
+export const isAeoFormGraderIntakeEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  env[GROWTH_AEO_FORM_GRADER_INTAKE_FLAG]?.trim().toLowerCase() !== 'false'
+
+/**
  * TASK-1242 — HubSpot lead handoff. Default OFF: el reactive consumer resuelve disabled y
  * produce `skipped` (NUNCA escribe a HubSpot, NUNCA crash). El enqueue del evento igual
  * ocurre (barato); el gate vive en el WRITE (execute) para no perder eventos al prender.

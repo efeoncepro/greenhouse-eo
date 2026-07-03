@@ -42,6 +42,12 @@ Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 
 - [`runbook.md`](operations/runbook.md): smokes, rollout, errores esperados y que hacer antes de habilitar live/admin.
 
+### [`hubspot-cms/`](hubspot-cms/README.md) — CMS / Content Hub / landing pages
+
+- [`developer-platform-research.md`](hubspot-cms/developer-platform-research.md): investigacion oficial de HubSpot Developer Platform para landing pages, modulos, templates, CMS React y CLI.
+- [`landing-page-runbook.md`](hubspot-cms/landing-page-runbook.md): carril seguro para crear landing pages como `DRAFT` y publicar solo con aprobacion.
+- [`anam-portal-access.md`](hubspot-cms/anam-portal-access.md): estado del acceso OAuth Kortex al portal ANAM `19893546`.
+
 ## Estado operativo vigente
 
 - Greenhouse staging actual: `https://greenhouse-9j6rau39c-efeonce-7670142f.vercel.app`
@@ -52,6 +58,7 @@ Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 - Staging live/admin: prendidos por aprobacion explicita del operador para pruebas (`KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`, `KORTEX_COMMAND_ADMIN_TOKEN` sensitive provisionado).
 - Production live/admin: deshabilitado hasta aprobacion explicita.
 - Kortex GitHub commands: habilitados en staging para pruebas gobernadas (`KORTEX_GITHUB_COMMANDS_ENABLED=true`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`, `KORTEX_GITHUB_ALLOWED_WORKFLOWS=CI`, `KORTEX_GITHUB_ALLOWED_REFS=main,develop`); production sigue OFF.
+- Kortex OAuth adicional para ANAM: portal HubSpot `19893546`, `install_status=active`, documentado en [`hubspot-cms/anam-portal-access.md`](hubspot-cms/anam-portal-access.md). Este acceso es adicional al portal Efeonce `48713323`.
 
 ## Regla de mantenimiento
 
@@ -62,3 +69,4 @@ Si cambia una capacidad Kortex que Greenhouse pueda leer o ejecutar, actualizar 
 - nuevos permisos, flags o secretos -> `governance/`
 - nuevos pasos de rollout/smoke -> `operations/`
 - nueva capacidad de negocio -> `capabilities/`
+- nuevas capacidades CMS/Content Hub/landing pages -> `hubspot-cms/`

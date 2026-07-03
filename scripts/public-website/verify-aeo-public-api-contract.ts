@@ -18,6 +18,7 @@ type RenderContract = {
     type?: string
     required?: boolean
     placeholder?: string
+    autocomplete?: string
     options?: Array<{ value?: string; label?: string }>
   }>
   copy?: {
@@ -32,6 +33,20 @@ type RenderContract = {
       execution?: string
     }
   }
+  successBehavior?: {
+    kind?: string
+    presentation?: string
+    title?: string
+    titleCopyRef?: string
+    body?: string
+    bodyCopyRef?: string
+    steps?: Array<{ label?: string; copyRef?: string }>
+    reward?: { kind?: string; title?: string; body?: string; action?: { kind?: string; href?: string; target?: string } }
+    actions?: Array<{ kind?: string; label?: string; href?: string; target?: string }>
+    supportingNote?: string
+    supportingNoteCopyRef?: string
+    redirectUrl?: string
+  }
 }
 
 const apiBase = 'https://greenhouse.efeoncepro.com'
@@ -40,6 +55,7 @@ const slug = 'efeonce-aeo-diagnostic'
 const formKey = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 const surfaceId = 'fhsf-efeonce-aeo-diagnostic'
 const expectedTurnstileSiteKey = '0x4AAAAAADqwX2R7v-k9pItv'
+const expectSuccessCard = process.argv.includes('--expect-success-card') || process.env.AEO_EXPECT_SUCCESS_CARD === 'true'
 
 const fetchJson = async <T>(url: string, init: RequestInit): Promise<{ status: number; headers: Headers; json: T; raw: string }> => {
   const response = await fetch(url, init)
@@ -112,6 +128,22 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
 
   const country = getField(contract, 'country')
   const companySize = getField(contract, 'companySize')
+  const fullName = getField(contract, 'fullName')
+  const legacyFirstName = getField(contract, 'firstName')
+
+  if (!fullName) {
+    throw new Error(`${label} is missing fullName field; expected AEO v8 Nombre completo contract`)
+  }
+
+  if (fullName.label !== 'Nombre completo' || fullName.required !== true || fullName.autocomplete !== 'name') {
+    throw new Error(
+      `${label} fullName field is ${JSON.stringify(fullName)}; expected label Nombre completo, required=true, autocomplete=name`
+    )
+  }
+
+  if (legacyFirstName) {
+    throw new Error(`${label} still exposes legacy firstName field; expected only fullName in the public render contract`)
+  }
 
   if (country?.placeholder !== 'Selecciona tu país' && country?.options?.[0]?.label !== 'Selecciona tu país') {
     throw new Error(
@@ -128,6 +160,30 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
   for (const forbidden of ['8649e76c-8b01-41f3-9b0c-5713d7b4dba6', '48713323', 'pais_gh', 'tamano_de_la_empresa', 'marca_de_competencia']) {
     if (raw.includes(forbidden)) {
       throw new Error(`${label} leaked destination/internal mapping token: ${forbidden}`)
+    }
+  }
+
+  if (expectSuccessCard) {
+    const success = contract.successBehavior
+
+    if (success?.presentation !== 'success_card') {
+      throw new Error(`${label} successBehavior.presentation is ${success?.presentation}; expected success_card`)
+    }
+
+    if (!success.title && !success.titleCopyRef) {
+      throw new Error(`${label} success card is missing title/titleCopyRef`)
+    }
+
+    if (!success.body && !success.bodyCopyRef) {
+      throw new Error(`${label} success card is missing body/bodyCopyRef`)
+    }
+
+    if (!Array.isArray(success.steps) || success.steps.length < 1 || success.steps.length > 4) {
+      throw new Error(`${label} success card steps are ${JSON.stringify(success.steps)}; expected 1-4 bounded steps`)
+    }
+
+    if (raw.includes('submissionId') || raw.includes('firstname') || raw.includes('lastname')) {
+      throw new Error(`${label} leaked submission/destination-only fields in success-card contract`)
     }
   }
 }
@@ -220,6 +276,9 @@ const main = async () => {
     surfaceId,
     formVersionId: byFormKey.json.form?.formVersionId,
     version: byFormKey.json.form?.version,
+    fullNameField: getField(byFormKey.json, 'fullName'),
+    successBehavior: byFormKey.json.successBehavior,
+    expectSuccessCard,
     submitWithoutCaptcha: {
       status: submit.status,
       outcome: submit.json.outcome,

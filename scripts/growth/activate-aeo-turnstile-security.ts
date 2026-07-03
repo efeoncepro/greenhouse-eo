@@ -12,6 +12,7 @@ import 'server-only'
 
 import { addDestination, authorDraftForm, deprecateForm, publishForm } from '@/lib/growth/forms/commands'
 import { getFormDefinitionById, getPublishedVersionBySlug, listDestinationsForVersion } from '@/lib/growth/forms/store'
+import { preserveFormVersionFields } from '../lib/preserve-form-version-fields'
 
 const APPLY = process.argv.includes('--apply')
 
@@ -101,17 +102,9 @@ const main = async (): Promise<void> => {
       definition?.purpose ??
       'Formulario publico de diagnostico AEO para capturar leads y derivarlos al motor Growth Forms.',
     riskProfile: (definition?.risk_profile as 'low' | 'medium' | 'high' | undefined) ?? 'low',
-    locale: current.locale,
+    ...preserveFormVersionFields(current),
     fieldSchema: current.field_schema_json,
-    successBehavior: current.success_behavior_json,
-    consentPolicyVersion: current.consent_policy_version ?? 'efeonce-aeo-diagnostic-consent-v1',
-    validationSchema: current.validation_schema_json,
     uiPolicy: nextUiPolicy,
-    dataClassification: current.data_classification_json,
-    destinationPolicy: current.destination_policy_json,
-    analyticsPolicy: current.analytics_policy_json,
-    retentionPolicy: current.retention_policy_json,
-    commercialHandoffPolicy: current.commercial_handoff_policy_json,
     createdBy: 'aeo-turnstile-security-activation',
   })
 

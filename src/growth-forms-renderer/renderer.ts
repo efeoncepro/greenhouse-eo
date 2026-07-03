@@ -13,6 +13,10 @@
 import type {
   RenderContract,
   RendererFieldDefinition,
+  RendererSuccessBehavior,
+  RendererSuccessCardAction,
+  RendererSuccessCardReward,
+  RendererSuccessCardStep,
   RendererStep,
 } from './contract'
 import { isFieldRequired, isFieldVisible, type FieldValues } from './conditions'
@@ -1657,6 +1661,16 @@ export class FormRenderer {
 
     root.replaceChildren()
 
+    if (behavior.presentation === 'success_card') {
+      const card = this.buildSuccessCard(behavior)
+
+      root.appendChild(card)
+      this.telemetry.emit('gh_form_success_viewed', { success_behavior: behavior.kind })
+      card.focus?.()
+
+      return
+    }
+
     const message = behavior.message
       ?? (behavior.messageCopyRef ? this.contract.copy?.[behavior.messageCopyRef] : undefined)
       ?? this.copy.successFallback
@@ -1665,6 +1679,126 @@ export class FormRenderer {
 
     root.appendChild(status)
     status.focus?.()
+  }
+
+  private buildSuccessCard(behavior: RendererSuccessBehavior): HTMLElement {
+    const title = this.resolveContractCopy(behavior.title, behavior.titleCopyRef, this.copy.successCardTitle)
+    const body = this.resolveContractCopy(behavior.body, behavior.bodyCopyRef, this.copy.successCardBody)
+    const steps = this.resolveSuccessSteps(behavior.steps)
+    const actions = (behavior.actions ?? []).slice(0, 2).filter(action => this.successActionLabel(action) && action.href)
+    const reward = this.buildSuccessReward(behavior.reward)
+    const support = this.resolveContractCopy(behavior.supportingNote, behavior.supportingNoteCopyRef)
+
+    const card = el(this.doc, 'section', {
+      class: 'ghf-success-card',
+      role: 'status',
+      'aria-live': 'polite',
+      tabindex: '-1',
+      'data-capture': 'growth-form-success-card',
+    })
+
+    const aura = el(this.doc, 'span', { class: 'ghf-success-card__aura', 'aria-hidden': 'true' })
+
+    const mark = el(this.doc, 'span', { class: 'ghf-success-card__mark', 'aria-hidden': 'true' })
+
+    mark.appendChild(el(this.doc, 'span', { class: 'ghf-success-card__mark-glyph', 'aria-hidden': 'true' }, '✓'))
+
+    const content = el(this.doc, 'div', { class: 'ghf-success-card__content' })
+
+    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__title' }, title))
+    content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__body' }, body))
+
+    if (steps.length > 0) {
+      const list = el(this.doc, 'ol', { class: 'ghf-success-card__steps' })
+
+      for (const step of steps) {
+        list.appendChild(el(this.doc, 'li', { class: 'ghf-success-card__step' }, step))
+      }
+
+      content.appendChild(list)
+    }
+
+    if (reward) content.appendChild(reward)
+
+    if (actions.length > 0) {
+      const actionRow = el(this.doc, 'div', { class: 'ghf-success-card__actions', 'data-capture': 'growth-form-success-actions' })
+
+      for (const action of actions) {
+        actionRow.appendChild(this.buildSuccessAction(action, 'ghf-success-card__action'))
+      }
+
+      content.appendChild(actionRow)
+    }
+
+    if (support) content.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__support' }, support))
+
+    card.append(aura, mark, content)
+
+    return card
+  }
+
+  private buildSuccessReward(reward: RendererSuccessCardReward | undefined): HTMLElement | null {
+    if (!reward || reward.kind === 'none') return null
+
+    const title = this.resolveContractCopy(reward.title, reward.titleCopyRef, this.copy.successRewardTitle)
+    const body = this.resolveContractCopy(reward.body, reward.bodyCopyRef, this.copy.successRewardBody)
+    const wrap = el(this.doc, 'div', { class: 'ghf-success-card__reward', 'data-capture': 'growth-form-success-reward' })
+
+    wrap.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__reward-title' }, title))
+    if (body) wrap.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__reward-body' }, body))
+
+    if (reward.action && this.successActionLabel(reward.action) && reward.action.href) {
+      wrap.appendChild(this.buildSuccessAction(reward.action, 'ghf-success-card__reward-action', reward.kind))
+    }
+
+    return wrap
+  }
+
+  private buildSuccessAction(action: RendererSuccessCardAction, className: string, rewardKind?: string): HTMLAnchorElement {
+    const anchor = el(this.doc, 'a', {
+      class: `ghf-btn ${className}`,
+      href: action.href ?? '#',
+      target: action.target ?? '_self',
+    }, this.successActionLabel(action) ?? '')
+
+    if ((action.target ?? '_self') === '_blank') anchor.setAttribute('rel', 'noopener noreferrer')
+    anchor.addEventListener('click', () => {
+      this.telemetry.emit('gh_form_success_action_clicked', {
+        action_kind: action.kind,
+        ...(rewardKind ? { reward_kind: rewardKind } : {}),
+      })
+
+      if (action.kind === 'asset_access' || action.kind === 'download') {
+        this.telemetry.emit('gh_form_asset_accessed', {
+          success_behavior: this.contract.successBehavior.kind,
+          action_kind: action.kind,
+          ...(rewardKind ? { reward_kind: rewardKind } : {}),
+        })
+      }
+    })
+
+    return anchor
+  }
+
+  private successActionLabel(action: RendererSuccessCardAction): string | undefined {
+    return this.resolveContractCopy(action.label, action.labelCopyRef)
+  }
+
+  private resolveSuccessSteps(steps: RendererSuccessCardStep[] | undefined): string[] {
+    const resolved = (steps ?? [])
+      .slice(0, 4)
+      .map(step => this.resolveContractCopy(step.label, step.copyRef))
+      .filter((step): step is string => Boolean(step))
+
+    return resolved.length > 0 ? resolved : this.copy.successCardSteps
+  }
+
+  private resolveContractCopy(value?: string, copyRef?: string, fallback?: string): string | undefined {
+    const refValue = copyRef ? this.contract.copy?.[copyRef] : undefined
+    const candidate = value ?? refValue ?? fallback
+    const text = candidate?.trim()
+
+    return text || undefined
   }
 
   // ─── Focus + summary helpers ─────────────────────────────────────────────---
