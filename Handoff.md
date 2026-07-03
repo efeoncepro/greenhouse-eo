@@ -1,3 +1,33 @@
+## Sesion 2026-07-03 - TASK-1321 AEO grader-on-submit - Claude - validado E2E + prod prep (promoción pendiente)
+
+> **Pedido:** implementar el grader-on-submit de `/aeo-2/` (submit → auto-run del AEO Grader → informe por correo + lead HubSpot), y luego "todo activo en prod, avanzar end-to-end sin preguntar".
+>
+> **El bug real, RESUELTO (root-cause, no parche):** el path async/público **nunca scoreaba** el run → `readGraderReport` tiraba `score_not_found` → delivery `unavailable` → sin informe ni correo. Fix: `executeClaimedGraderRun` ([src/lib/growth/ai-visibility/run-engine.ts](src/lib/growth/ai-visibility/run-engine.ts)) ahora auto-scorea (determinístico + idempotente + best-effort) antes de finalizar delivery. Ambos paths (sync `executeGraderRun` + async `drainPendingGraderRuns`) confluyen ahí.
+>
+> **Validado E2E en staging (backend compartido)** con marcas NO-cliente (Cencosud): run `EO-GRUN-00034` → auto-score **48.9** → informe generado → delivery `ready` → **correo SENT** (Resend `d1ad52f6`). Cadena completa: `submit → projection → adapter → categoría → run → score → informe → correo`.
+>
+> **3 fixes de providers (ISSUE-113):** (1) router `runBrandIntelligence` cae al siguiente provider ante extract-error, no solo unconfigured (Gemini/Vertex caído ya no tumba a OpenAI/Anthropic sanos); (2) `PERPLEXITY_API_KEY_SECRET_REF` wireado en `deploy.sh` (dual-location gap); (3) Gemini root-cause = hold de billing GCP dunning en Vertex → **desbloqueado tras el pago del operador, verificado en vivo 2026-07-02** (`gemini-2.5-flash-lite` OK) → Gemini queda ON.
+>
+> **Prod activation robusta (commit `daf55cb7c`):** backend es UNA sola instancia Postgres + un ops-worker compartidos staging+prod (no hay DB prod separada; el comentario "schema no migrado en prod" era stale). El bloque `production` de `services/ops-worker/deploy.sh` ahora **espeja staging** (grader stack completo ON, Gemini ON) → cero regresión de comportamiento en el worker compartido; el prod release lo activa por construcción. OFF intencional (mirror staging): `OPERATOR_SEND` (cross-sell gated) + `CATEGORY_GUARD`.
+>
+> **Estado del release:** develop verde en `daf55cb7c` (pre-push `local:check` OK). **Bloqueado en la promoción `develop→main`:** el push directo a `main` lo deniega el harness auto-mode (bypass del control plane) + la batch policy pide break-glass (`platform.release.bypass_preflight`, deploy.sh = `cloud_release`). Requiere: (a) el operador promueve `daf55cb7c` a `main` (o me autoriza fuera de auto-mode), (b) dispatch orchestrator con `bypass_preflight_reason`, (c) aprobar el gate `Production` en GitHub, (d) smoke E2E `/aeo-2/` en prod. Higiene diferida por decisión del operador: rotación `TURNSTILE_SECRET` + password DataForSEO (funcionan; rotación pendiente).
+>
+> **Docs:** `FEATURE_FLAG_STATE_LEDGER.md` (fila `GROWTH_AEO_FORM_GRADER_INTAKE` actualizada), `ISSUE-113` documentado, changelog TASK-1321.
+
+## Sesion 2026-07-03 - Public Site About `/about-us-efeonce/` - Codex - fix preparado, no publicado
+
+> **Pedido:** revisar una sección de la landing pública About donde el módulo Loop Marketing quedaba pegado al borde, sospechando que el CSS del Home no aplicaba fuera del Home.
+>
+> **Diagnóstico:** confirmado. La página live es `https://efeoncepro.com/about-us-efeonce/`, `page_id=249770`, título `About us (Boceto)`. La sección afectada es `59385ab`; usa `lp-container-offset-left/right`, pero las reglas de `Landing Custom CSS.css` están scopeadas a `body.home` / `body.front-page`. En desktop 2048, el bloque izquierdo arrancaba en `x=20` y la columna visual derecha llegaba a `x=2165` con `clientWidth=2048`.
+>
+> **Cambio preparado en runtime repo:** `../efeonce-public-site-runtime/wp-content/themes/ohio-child/assets/css/global-fixes.css` agrega una regla page-scoped para `body.page-id-249770 .elementor-element.elementor-element-59385ab`: `padding-left/right: clamp(24px, 3vw, 56px)` y `overflow-x: clip` en `min-width:1025px`. Mantiene el fondo full-bleed; no alinea al `.page-container` completo.
+>
+> **Docs/skills:** registrada la landing en `.codex` y `.claude` `efeonce-public-site-wordpress` (`landing-registry.md` + `landings/about-us-efeonce.md`) y documentado el patrón en `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`.
+>
+> **Evidencia local:** Playwright sobre live con CSS inyectado: desktop 2048 mueve el sticky izquierdo de `x=20` a `x=76`; desktop 1440 queda en `x=63.2`; mobile 390 no cambia porque la regla no aplica. El módulo queda contenido por su root. Residual: la página About aún muestra otros desbordes ajenos a esta sección (`scrollWidth=2053` en viewport 2048 y `443` en mobile 390), por revisar si el operador quiere limpieza integral.
+>
+> **Estado:** no se mutó WordPress/Kinsta ni se purgó cache porque el pedido fue revisar y la skill del sitio público exige aprobación explícita para mutación live. Para publicar: desplegar/sincronizar el archivo `global-fixes.css` del runtime a Kinsta, purgar cache y repetir Playwright/GVC desktop + mobile.
+
 ## Sesion 2026-07-03 - Kortex HubSpot CMS / ANAM chat landing - Codex - live + docs
 
 > **Pedido:** crear y cerrar una landing de contacto ANAM en HubSpot CMS React, orientada a contener el chat agent de HubSpot; luego documentar todo en Greenhouse y commitear.
