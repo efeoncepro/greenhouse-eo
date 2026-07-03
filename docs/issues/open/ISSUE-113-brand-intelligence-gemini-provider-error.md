@@ -27,6 +27,19 @@ Impacto: **toda** clasificación grounded (categoría + business_model) quedaba 
 - Tests: `__tests__/router-fallthrough.test.ts` (gemini-throws→openai, unconfigured, all-throw, no-signals)
 - Verificado live: `resolvePublicBrandCategory('Grupo Berel')` resuelve vía OpenAI tras el error de Gemini.
 
+## Delta 2026-07-02 (2) — el smoke reveló un 2.º provider caído: Perplexity `missing_secret`
+
+Al investigar por qué el informe salió `insufficient_data` (run `EO-GRUN-00032`), las observaciones mostraron que **solo OpenAI produjo datos**; los otros del set `light` (`[openai, perplexity, gemini, google_ai_overview]`):
+
+- `openai` → **succeeded** (6 respuestas reales, prompt pack `archetype-retail_ecommerce.v1`).
+- `gemini` → **failed** `provider_error` (este issue, Vertex).
+- `perplexity` → **skipped `missing_secret`** ← nuevo hallazgo.
+- `google_ai_overview` → **skipped `no_ai_overview_block`** (legítimo: Google no mostró AIO para esas queries).
+
+Con 1 solo provider, el gate de calidad no computa score → no hay informe → `unavailable`. **Root cause de Perplexity (patrón DUAL-LOCATION):** el flag `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` estaba ON en el ops-worker, y el secret `greenhouse-perplexity-api-key` existe en Secret Manager + `PERPLEXITY_API_KEY_SECRET_REF` estaba wireado en **Vercel** — pero **NO en `services/ops-worker/deploy.sh`** (declaraba OpenAI/Anthropic, nunca Perplexity). El run async corre en el ops-worker → `resolveSecret('PERPLEXITY_API_KEY')` no encontraba el ref → `missing_secret` → skip.
+
+**Fix aplicado (2026-07-02):** `deploy.sh` ahora declara + appendea + bindea `PERPLEXITY_API_KEY_SECRET_REF=greenhouse-perplexity-api-key` (espejo de OpenAI/Anthropic; el `ensure_secret_accessor_binding` da secretAccessor a la SA del ops-worker). Toma efecto en el próximo deploy (push develop). Post-deploy: el run tendrá OpenAI + Perplexity (+ Gemini cuando se arregle Vertex) → suficiente para score + informe.
+
 ## Pendiente (raíz de Gemini)
 
 - **Arreglar la credencial/config de Vertex** del provider Gemini en el ops-worker (y ADC local), o

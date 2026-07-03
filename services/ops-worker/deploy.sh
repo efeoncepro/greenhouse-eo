@@ -453,6 +453,11 @@ GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED="${GROWTH_AI_VISIBILITY_PROMPT_AUT
 GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF="${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF:-${DEFAULT_GOOGLE_KG_KEY_SECRET_REF}}"
 OPENAI_API_KEY_SECRET_REF="${OPENAI_API_KEY_SECRET_REF:-greenhouse-openai-api-key}"
 ANTHROPIC_API_KEY_SECRET_REF="${ANTHROPIC_API_KEY_SECRET_REF:-greenhouse-anthropic-api-key}"
+# ISSUE-113 / smoke TASK-1321 (2026-07-02): el flag PERPLEXITY_ENABLED estaba ON pero su secret
+# ref NUNCA se cableó acá → el worker resolvía `missing_secret` y saltaba el provider (el grader
+# quedaba con 1 solo provider → informe `insufficient_data`). El secret existe en Secret Manager;
+# acá lo declaramos + appendeamos + bindeamos igual que OpenAI/Anthropic (el flag gatea el uso).
+PERPLEXITY_API_KEY_SECRET_REF="${PERPLEXITY_API_KEY_SECRET_REF:-greenhouse-perplexity-api-key}"
 # TASK-1265 — DataForSEO (fuente SERP/AI Mode del provider google_ai_overview). El password
 # se resuelve server-side via secret ref; el login es config no-secreta que el CI inyecta
 # desde la GH Actions variable DATAFORSEO_API_LOGIN (ops-worker-deploy.yml). Sin login, el
@@ -498,8 +503,10 @@ ENV_VARS="${ENV_VARS},GROWTH_FORMS_DISPATCH_ENABLED=${GROWTH_FORMS_DISPATCH_ENAB
 ENV_VARS="${ENV_VARS},GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED=${GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
+ENV_VARS="${ENV_VARS},PERPLEXITY_API_KEY_SECRET_REF=${PERPLEXITY_API_KEY_SECRET_REF}"
 ensure_secret_accessor_binding "${OPENAI_API_KEY_SECRET_REF}:latest"
 ensure_secret_accessor_binding "${ANTHROPIC_API_KEY_SECRET_REF}:latest"
+ensure_secret_accessor_binding "${PERPLEXITY_API_KEY_SECRET_REF}:latest"
 # TASK-1230 — el adapter resuelve el token HubSpot via resolveSecretByRef('hubspot-access-token').
 ensure_secret_accessor_binding "hubspot-access-token:latest"
 
