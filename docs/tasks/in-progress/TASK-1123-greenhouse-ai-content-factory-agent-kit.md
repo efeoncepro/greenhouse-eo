@@ -636,6 +636,38 @@ implementado).
 - Full API Parity: el orquestador es un consumer de los primitives, no reimplementa
   lógica; el mismo path sirve a CLI, futura UI y Nexa.
 
+#### Slice 9 implementation note — 2026-07-03 (ideación LLM shipped + verificada en vivo)
+
+- Estado: `in-progress`. Los dos verbos LLM sobre el lienzo compartido (la spec)
+  están shipped y **verificados con llamada real a Claude** (no solo mocks).
+- **Requisito del operador (2026-07-03):** dos modos sobre el mismo backbone —
+  (1) autónomo (un agente produce solo) y (2) co-creativo (operador + Claude
+  Code/Codex/Nexa iteran). Ambos usan la `GutenbergArticleSpec` como artefacto
+  compartido → Full API Parity (un primitive, muchos co-autores).
+- **Primitives** `src/lib/public-site/content-factory/article-ideation.ts` (server-only):
+  - `ideateArticleSpec(input)` — idea+contexto → spec (autónomo).
+  - `reviseArticleSpec({spec, instruction})` — steering del operador → spec revisada
+    preservando lo no tocado (co-creación).
+  - Vía `generateStructuredAnthropic` (cliente canónico `src/lib/ai/`), system
+    prompt con reglas editoriales Efeonce (es-CL, estructura, `public-data-only`,
+    no inventa media/cifras, SEO con variables Yoast). Normalizador que descarta
+    bloques vacíos y mapea a `GutenbergArticleSpec`.
+- **CLI** `pnpm public-website:content-factory:ideate -- --idea "…"` / `--revise spec.json --instruction "…"`
+  (server-only shim). Ensambla + valida; no toca WordPress.
+- **Smoke LIVE (verificado, no mock):** `ideate` con idea real de AEO →
+  `claude-sonnet-4-6`, 3562 tokens, spec de 5 H2 + 2 H3, `validate=pass`, SEO con
+  marca, metadesc 150 chars. `revise` con instrucción del operador → agregó la
+  sección pedida, preservó el resto, CTA más directo, `validate=pass`, 8 secciones.
+- Tests: `article-ideation.test.ts` (mock del LLM) — ideate/revise/normalización/
+  prompt. Suite content-factory 53/53, typecheck limpio en los archivos propios.
+- **Env:** `CONTENT_FACTORY_IDEATION_MODEL` (override de modelo, opcional; default
+  `claude-sonnet-4-6`) — NO es un `*_ENABLED` flag, no va al feature-flag ledger.
+  Requiere `ANTHROPIC_API_KEY`/`_SECRET_REF` (`greenhouse-anthropic-api-key`).
+- **Pendiente Slice 9 (orquestador de una-sola-llamada + write):** encadenar
+  `ideate → author → send-draft` con la autoría del operador (bridge `authorId`).
+  Hoy el write sigue siendo el paso gobernado manual (post 250748 probado).
+- Doc funcional: `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`.
+
 ## Out of Scope
 
 - Construir un chat o nueva UI conversacional.
