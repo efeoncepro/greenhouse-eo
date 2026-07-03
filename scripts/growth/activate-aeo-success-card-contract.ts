@@ -40,7 +40,7 @@ const SUCCESS_CARD_BEHAVIOR = {
   actions: [
     {
       kind: 'schedule',
-      label: 'Agenda una conversación',
+      label: 'Agenda una reunión',
       href: 'https://meetings.hubspot.com/efeoncepro/agenda-discovery',
       target: '_blank',
     },

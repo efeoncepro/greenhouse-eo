@@ -9509,3 +9509,10 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 - TASK-1296 publicó la versión AEO v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b` con `ui_policy_json.security.captcha`, copió el destination HubSpot y deprecó v2 sin tocar WordPress/Elementor.
 - Smoke live: `GET` público devuelve v3 con ACAO, y `POST` sin token sigue fallando cerrado con `captcha_failed/missing_token`. La serialización de `security` en el `GET` público queda pendiente del deploy del código de TASK-1294.
 - TASK-1295 quedó creada para separar la arquitectura Growth Forms en router + docs temáticos + `HISTORIAL.md`, evitando que el doc principal siga creciendo como historial append-only.
+
+## 2026-07-03 — Public Site AEO `/aeo-2/`: dropdown chevrons + meeting CTA
+
+- Se corrigió en vivo el bug visual de los chevrons de los dropdowns premium: al abrir apuntan hacia arriba y al cerrar vuelven hacia abajo, sin quedarse desplazados como esquina. El host AEO incluye el marcador `gh-aeo-calendar-meeting-chevron-v1` como resguardo hasta el próximo release del renderer.
+- El link directo bajo el formulario cambió de `Agenda una conversación` a `Agenda una reunión` y ahora incluye icono decorativo de calendario.
+- Growth Forms AEO publicó v12 `fver-f933f877-c1ff-4e76-9832-2078ca64c6dd`; la Success Card conserva `presentation=success_card` y su acción schedule también usa `Agenda una reunión`.
+- Se corrigió la causa raíz en el renderer para que el transform de focus del select nativo no afecte el icono del combobox premium, y se agregaron assertions de chevron open/closed al behavior gate.

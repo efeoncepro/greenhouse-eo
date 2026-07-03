@@ -26,6 +26,22 @@ const fillRequiredFields = async (page: Page, email: string) => {
   await page.locator('.gh-aeo-conversion greenhouse-form [name="brandWebsite"]').fill('empresa-demo.com')
 }
 
+const readFirstChevronState = async (page: Page, label: string) => page
+  .locator('.gh-aeo-conversion greenhouse-form [role="combobox"]')
+  .first()
+  .evaluate((trigger, stateLabel) => {
+    const icon = trigger.querySelector('.ghf-select-icon')
+    const iconStyle = icon ? getComputedStyle(icon) : null
+    const beforeStyle = icon ? getComputedStyle(icon, '::before') : null
+
+    return {
+      label: stateLabel,
+      expanded: trigger.getAttribute('aria-expanded'),
+      iconTransform: iconStyle?.transform ?? null,
+      beforeTransform: beforeStyle?.transform ?? null,
+    }
+  }, label)
+
 async function main() {
   const browser = await chromium.launch({ headless: true })
   const page = await browser.newPage({ viewport: { width: 1440, height: 1200 } })
@@ -79,6 +95,7 @@ async function main() {
 
     await comboboxes.nth(0).click()
     await page.waitForSelector('.gh-aeo-conversion greenhouse-form [role="listbox"]:not([hidden])', { timeout: 5000 })
+    await page.waitForTimeout(220)
 
     const dropdownAria = await comboboxes.nth(0).evaluate(element => ({
       role: element.getAttribute('role'),
@@ -92,7 +109,21 @@ async function main() {
       throw new Error(`Premium dropdown ARIA/listbox contract failed: ${JSON.stringify(dropdownAria)}`)
     }
 
+    const chevronOpen = await readFirstChevronState(page, 'open')
+
     await page.keyboard.press('Escape')
+    await page.waitForTimeout(220)
+
+    const chevronClosed = await readFirstChevronState(page, 'closedAfterOpen')
+
+    if (
+      chevronOpen.iconTransform !== 'none' ||
+      chevronClosed.iconTransform !== 'none' ||
+      chevronOpen.beforeTransform === chevronClosed.beforeTransform ||
+      chevronClosed.expanded !== 'false'
+    ) {
+      throw new Error(`Premium dropdown chevron contract failed: ${JSON.stringify({ chevronOpen, chevronClosed })}`)
+    }
 
     const fullName = page.locator('.gh-aeo-conversion greenhouse-form [name="fullName"]').first()
 
@@ -187,6 +218,10 @@ async function main() {
       url,
       contract: 'AEO live renderer behavior: premium dropdown ARIA, focus, corporate email gate, Turnstile captchaToken boundary, no PII in dataLayer',
       dropdownAria,
+      chevron: {
+        open: chevronOpen,
+        closedAfterOpen: chevronClosed,
+      },
       focus,
       capturedRequests: captured.map(entry => ({
         url: entry.url.split('?')[0],

@@ -211,7 +211,7 @@ export const RENDERER_CSS = `
     transform: translateY(-65%) rotate(45deg);
     transition: transform 140ms ease, border-color 140ms ease;
   }
-  .ghf-control--select:focus-within .ghf-select-icon {
+  .ghf-control--select:focus-within > .ghf-select-icon {
     border-color: var(--ghf-accent);
     transform: translateY(-45%) rotate(45deg);
   }
@@ -256,7 +256,7 @@ export const RENDERER_CSS = `
   }
   .ghf-select-composite[data-open="true"] .ghf-select-icon::before {
     border-color: var(--ghf-accent);
-    transform: translateY(2px) rotate(-135deg);
+    transform: translateY(2px) rotate(225deg);
   }
   .ghf-select-value {
     min-width: 0;
@@ -703,6 +703,20 @@ export const RENDERER_CSS = `
     text-decoration: none;
     overflow-wrap: anywhere;
     transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+  }
+  .ghf-success-card__action-icon {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1em;
+    block-size: 1em;
+    flex: 0 0 auto;
+    color: currentColor;
+  }
+  .ghf-success-card__action-icon svg {
+    display: block;
+    inline-size: 1em;
+    block-size: 1em;
+    stroke: currentColor;
   }
   .ghf-success-card__action:hover,
   .ghf-success-card__reward-action:hover {

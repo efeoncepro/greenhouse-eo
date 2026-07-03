@@ -20,6 +20,8 @@ type GuardPayload = {
   conversHasRendererScript: boolean
   conversHasApprovedCta: boolean
   conversHasTrustCopy: boolean
+  conversHasMeetingCopy: boolean
+  conversHasChevronOverride: boolean
 }
 
 const expectedHeroansHash = 'e0b951b2456a83578cd9e22005900521'
@@ -99,6 +101,8 @@ $payload = array(
   'conversHasRendererScript' => strpos($convers_html, 'https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js') !== false,
   'conversHasApprovedCta' => strpos($convers_html, 'Empezar con mi diagnóstico') !== false || strpos($convers_html, '<greenhouse-form') !== false,
   'conversHasTrustCopy' => strpos($convers_html, 'Sin costo') !== false && strpos($convers_html, 'Sin compromiso') !== false,
+  'conversHasMeetingCopy' => strpos($convers_html, 'Agenda una reunión') !== false && strpos($convers_html, 'Agenda una conversación') === false,
+  'conversHasChevronOverride' => strpos($convers_html, 'gh-aeo-calendar-meeting-chevron-v1') !== false,
 );
 
 echo "${phpStartMarker}\\n";
@@ -154,6 +158,14 @@ const assertPayload = (payload: GuardPayload) => {
 
   if (!payload.conversHasTrustCopy) {
     throw new Error('convers widget is missing trust copy')
+  }
+
+  if (!payload.conversHasMeetingCopy) {
+    throw new Error('convers widget is missing the approved Agenda una reunión copy or still contains Agenda una conversación')
+  }
+
+  if (!payload.conversHasChevronOverride) {
+    throw new Error('convers widget is missing the AEO chevron override marker')
   }
 }
 

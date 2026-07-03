@@ -233,7 +233,9 @@ Approved conversion copy (2026-07-02 — de-duplicated vs hero/H2; subhead now c
 - `.gh-aeo-growth-form-card` is the only visible card.
 - Do not expose internal kickers such as `Growth Forms · Diagnóstico AEO`.
 - Public card starts directly with the rendered form fields; do not restore the old internal H3 `Solicita tu diagnóstico AEO` unless the operator explicitly asks for it.
+- Direct scheduling link: the visible/fallback form-card CTA uses `Agenda una reunión` with a decorative calendar icon, not `Agenda una conversación` nor the arrow-only treatment. Live marker: `gh-aeo-calendar-meeting-chevron-v1`; rollback backup `_gh_backup_before_aeo_agenda_meeting_chevron_20260703T095511Z`.
 - Renderer live layout: desktop pairs short fields/selects (`Nombre` + `Email`, `País` + `Tamaño`) and keeps long intent fields full-width; mobile 390 stacks to one column with no horizontal overflow. Single selects use premium combobox/listbox, not the native OS popup.
+- Premium select chevrons must not inherit the native-select `focus-within` transform. In the AEO host, `gh-aeo-calendar-meeting-chevron-v1` keeps the icon wrapper stable (`transform:none`) and rotates only the chevron pseudo-element; upstream renderer source owns the same root fix.
 
 Typography:
 

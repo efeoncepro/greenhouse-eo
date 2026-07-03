@@ -221,7 +221,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
         actions: [
           {
             kind: 'schedule',
-            label: 'Agendar una conversación',
+            label: 'Agenda una reunión',
             href: 'https://efeoncepro.com/contacto/',
             target: '_self',
           },
@@ -245,7 +245,8 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(rewardAction.textContent).toBe('Descargar ebook')
     expect(rewardAction.getAttribute('target')).toBe('_blank')
     expect(rewardAction.getAttribute('rel')).toBe('noopener noreferrer')
-    expect(root.querySelector('[data-capture="growth-form-success-actions"]')?.textContent).toContain('Agendar una conversación')
+    expect(root.querySelector('[data-capture="growth-form-success-actions"]')?.textContent).toContain('Agenda una reunión')
+    expect(root.querySelector('.ghf-success-card__action .ghf-success-card__action-icon svg')).not.toBeNull()
 
     rewardAction.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 

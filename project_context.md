@@ -6050,3 +6050,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Para agregar campos a un HubSpot form destino, usar `pnpm hubspot:forms:upsert-fields -- --config <json> [--apply]`.
 - El script lee la definición del form por HubSpot Forms API `2026-09-beta`, asegura CRM properties existentes o las crea solo si el config trae `createProperty`, y actualiza `fieldGroups` preservando el resto del form.
 - Después de aplicar en HubSpot, aún hay que actualizar `form_destination.mapping_json.fieldMapping` en Greenhouse y correr smoke de secure-submit; HubSpot puede rechazar fields enviados si no están en la definición del form.
+
+## Delta 2026-07-03 — AEO Growth Forms meeting CTA + chevron guard
+
+- En `/aeo-2/`, el link directo bajo el formulario debe decir `Agenda una reunión` y usar icono de calendario; no volver a `Agenda una conversación`.
+- La Success Card de AEO usa el mismo label en su acción schedule desde la versión publicada `fver-f933f877-c1ff-4e76-9832-2078ca64c6dd` (v12).
+- Los chevrons de los dropdowns premium no deben heredar transforms del select nativo: el renderer limita el focus transform al hijo directo, y el host WordPress mantiene el marker `gh-aeo-calendar-meeting-chevron-v1` como resguardo live hasta el próximo release.

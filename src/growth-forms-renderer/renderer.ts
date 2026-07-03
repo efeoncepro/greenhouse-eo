@@ -1755,11 +1755,16 @@ export class FormRenderer {
   }
 
   private buildSuccessAction(action: RendererSuccessCardAction, className: string, rewardKind?: string): HTMLAnchorElement {
+    const label = this.successActionLabel(action) ?? ''
+
     const anchor = el(this.doc, 'a', {
       class: `ghf-btn ${className}`,
       href: action.href ?? '#',
       target: action.target ?? '_self',
-    }, this.successActionLabel(action) ?? '')
+    })
+
+    if (action.kind === 'schedule') anchor.appendChild(this.buildCalendarIcon())
+    anchor.appendChild(el(this.doc, 'span', { class: 'ghf-success-card__action-label' }, label))
 
     if ((action.target ?? '_self') === '_blank') anchor.setAttribute('rel', 'noopener noreferrer')
     anchor.addEventListener('click', () => {
@@ -1778,6 +1783,37 @@ export class FormRenderer {
     })
 
     return anchor
+  }
+
+  private buildCalendarIcon(): HTMLElement {
+    const icon = el(this.doc, 'span', { class: 'ghf-success-card__action-icon', 'aria-hidden': 'true' })
+    const svg = this.doc.createElementNS('http://www.w3.org/2000/svg', 'svg')
+
+    svg.setAttribute('viewBox', '0 0 24 24')
+    svg.setAttribute('fill', 'none')
+    svg.setAttribute('stroke-width', '2')
+    svg.setAttribute('stroke-linecap', 'round')
+    svg.setAttribute('stroke-linejoin', 'round')
+    svg.setAttribute('focusable', 'false')
+
+    for (const d of ['M8 2v4', 'M16 2v4', 'M3 10h18']) {
+      const path = this.doc.createElementNS('http://www.w3.org/2000/svg', 'path')
+
+      path.setAttribute('d', d)
+      svg.appendChild(path)
+    }
+
+    const rect = this.doc.createElementNS('http://www.w3.org/2000/svg', 'rect')
+
+    rect.setAttribute('x', '3')
+    rect.setAttribute('y', '4')
+    rect.setAttribute('width', '18')
+    rect.setAttribute('height', '18')
+    rect.setAttribute('rx', '2')
+    svg.appendChild(rect)
+    icon.appendChild(svg)
+
+    return icon
   }
 
   private successActionLabel(action: RendererSuccessCardAction): string | undefined {
