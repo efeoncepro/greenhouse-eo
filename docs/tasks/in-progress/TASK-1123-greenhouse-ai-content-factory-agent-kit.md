@@ -181,6 +181,104 @@ Reglas obligatorias:
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Plan — Editorial Loop end-to-end hasta draft (2026-07-03)
+
+### Decisión
+
+Cerrar el loop `idea → draft Gutenberg estructurado → escrito en WordPress como
+`private`` **reutilizando los primitives ya implementados** (planner, validator,
+composition profile, catálogos, smoke-plan). No se construye un sistema nuevo.
+Los tres gaps reales son: (1) puerta de ideación que emite un
+`contentFactoryBrief.v1` válido, (2) ejecutar por primera vez la escritura real
+al bridge (Slice 6, hoy plan-only), (3) el pegamento orquestador que encadena
+todo en un flujo. El form-factor V1 es **agente/CLI** (barato, prueba el loop
+real); la consola de portal queda para después.
+
+**Frontera de esta task:** el loop termina en `draft|private`. El **auto-publish
+con guardrails** (private → published sin intervención humana) es el *Out of
+Scope* declarado de esta task ("Publicar contenido en WordPress", "AI autonomous
+publish") y vive en **TASK-1323** (capability propia + ADR de excepción +
+defense-in-depth), secuenciada **después** de que la escritura de draft de aquí
+esté probada. No mover auto-publish a esta task.
+
+### Estado real de los slices existentes
+
+- Slices 1–5 (spec, recipes Gutenberg, catálogos, primitives, CLI evidence):
+  **shipped** según las implementation notes 2026-06-14. `validateGeneratedGutenbergDraft`,
+  `planGeneratedGutenbergPostDraft`, `EFEONCE_BLOGPOST_COMPOSITION_PROFILE`,
+  catálogo/registry y los CLIs `plan|validate|inspect|patterns|capabilities`
+  existen con tests.
+- Slice 6 (first draft smoke): **plan-only**. `prepareGutenbergDraftSmokePlan`
+  existe; el `--send` real nunca se ejecutó; bridge no desplegado, writes OFF.
+- Slice 7 (MCP): design-only, no bloquea.
+
+### Ruta ejecutable restante (local-first, sin push salvo instrucción)
+
+**Slice A — Puerta de ideación (gap #1, ver Slice 8 abajo).**
+Skill/CLI orquestadora `content-factory:ideate` que toma una idea en una línea +
+contexto y produce un `contentFactoryBrief.v1` validado. La estructura/copy se
+compone con las skills `copywriting`, `digital-marketing` y `seo-aeo`
+(keyword primaria/secundaria, ángulo, outline, CTA HubSpot, tono es-CL Efeonce).
+El output NO es prosa suelta: es el brief tipado que ya consume el planner.
+Regla dura heredada: `public-data-only` en el brief (sin dato interno/cliente).
+
+**Slice B — Orquestador end-to-end (gap #3, ver Slice 9 abajo).**
+Un flujo único `ideate → plan → validate → (si pass) send-draft → readback`
+que corre los primitives en cadena y entrega la URL de preview del draft privado.
+`validation.status === 'block'` es hard-stop; `warning` exige revisión humana.
+
+**Slice C — Ejecutar la escritura real (Slice 6 existente).**
+Desplegar el plugin `greenhouse-wp-bridge` en Kinsta, habilitar writes en la
+ventana mínima aprobada (`GREENHOUSE_WP_BRIDGE_WRITES_ENABLED=true`), y ejecutar
+el primer `post_draft_gutenberg` real con slug disposable `greenhouse-smoke-*`,
+status `private`, ownership metadata, HMAC firmado, readback por bridge inspection
+y rollback por trash del `manifestId`. Requiere aprobación explícita del operador
+(ya declarado en la task) + resolución del secret
+`PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF`.
+
+### Autoría del post (`post_author` = Julio Reyes) — requisito del operador 2026-07-03
+
+Hallazgo verificado en el runtime del bridge: el draft controller crea el post con
+`post_author = get_current_user_id()` (el usuario que autentica el request, hoy el
+usuario técnico del Application Password). El contrato del draft **no** acepta un
+`authorId`. El operador requiere que el autor visible del post sea **su usuario
+WordPress (Julio Reyes)**, no el usuario de servicio.
+
+Decisión: **desacoplar identidad-máquina de byline** (patrón canónico de la casa).
+
+- El usuario de servicio del bridge autentica (Application Password) y debe tener
+  capability `edit_others_posts` (rol Editor/Admin).
+- Agregar `authorId` al `contentFactoryGeneratedDraft.v1` / payload firmado del draft.
+- El plugin `greenhouse-wp-bridge` setea `post_author => $payload['authorId']`
+  cuando viene y el caller está autorizado; fallback al usuario actual si no.
+- **`[verificar]`**: existencia + `user_id` del usuario WordPress de Julio Reyes en
+  `efeoncepro.com` (el wrapper WP-CLI usa `--wp-user 12` por default; NO confirmado
+  que 12 = Julio). Resolver con `wp user list` read-only en Discovery de Slice C.
+- **NO** usar la Opción A (Application Password = usuario de Julio): mezcla identidad
+  humana con identidad de servicio y viola la higiene de identidad de Greenhouse.
+
+Este requisito aplica igual al publish (TASK-1323): el post publicado conserva el
+`post_author` del draft.
+
+### Orden duro
+
+Slice A y B se implementan y prueban **plan-only** primero (sin tocar WordPress).
+Slice C solo corre con aprobación del operador y ventana de write mínima. El
+auto-publish (TASK-1323) NO arranca hasta que Slice C haya producido y leído de
+vuelta al menos un draft real.
+
+### 4-pilar (resumen; el detalle vive en Rollout Plan & Risk Matrix)
+
+- **Safety:** loop termina en `private`; validator `block` como hard-stop; HMAC +
+  Application Password; regla `public-data-only`; revisión humana antes de publish.
+- **Robustness:** `manifestId` idempotente; el bridge revalida fingerprint
+  server-side; validator rechaza HTML inseguro/bloques inválidos.
+- **Resilience:** plan-only por defecto (un fallo no deja estado corrupto);
+  rollback por trash del draft. Falta a construir: reliability signal del write
+  path (draft creado ≠ readback OK) — declararlo en Slice C.
+- **Scalability:** volumen bajísimo (unidades/semana); costo = LLM por generación,
+  sin hot path.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
@@ -429,6 +527,35 @@ Reglas obligatorias:
   - `prepare_wordpress_draft`
   - `inspect_public_site_document`
 - No implementar MCP writes hasta que command idempotency, authz, audit and draft smoke estén probados.
+
+### Slice 8 — Ideation Front-Door (orquestación de brief)
+
+- Crear la puerta de ideación que convierte una idea informal + contexto en un
+  `contentFactoryBrief.v1` válido, sin escribir prosa suelta.
+- Form-factor V1: skill/CLI orquestadora `content-factory:ideate` (agente-first);
+  NO una UI de portal en este slice.
+- Composición de skills al autorar el brief: `copywriting` (titular, ángulo,
+  hook, cuerpo, CTA, voz Efeonce es-CL), `digital-marketing` (encuadre GTM,
+  intención de búsqueda, mapeo a campaña/bowtie HubSpot), `seo-aeo` (keyword
+  primaria/secundarias, citabilidad, chunking para AI Overviews).
+- Output: brief tipado que ya consume `planGeneratedGutenbergPostDraft()`. El
+  brief incluye outline propuesto (H2/H3), enriquecimientos sugeridos y CTA.
+- Regla dura: `public-data-only` — el brief nunca incluye dato interno/cliente.
+- Evidencia: correr `plan` + `validate` sobre el brief generado → `status=pass`,
+  sin tocar WordPress.
+
+### Slice 9 — End-to-End Orchestrator (pegamento del loop)
+
+- Crear el flujo único que encadena `ideate → plan → validate → send-draft →
+  readback` y entrega la URL de preview del draft privado.
+- `validation.status === 'block'` es hard-stop; `warning` exige revisión humana
+  explícita antes de continuar al send.
+- El paso `send-draft` reutiliza el contrato firmado de Slice 6; en modo
+  plan-only por defecto, y solo `--send` con aprobación + writes habilitados.
+- Declarar el reliability signal del write path (draft creado ≠ readback OK) para
+  que el orquestador degrade honesto si el bridge escribe pero el readback falla.
+- Full API Parity: el orquestador es un consumer de los primitives, no reimplementa
+  lógica; el mismo path sirve a CLI, futura UI y Nexa.
 
 ## Out of Scope
 
