@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.3
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-07-01 por Codex (AEO `/aeo-2/` live renderer premium)
+> **Ultima actualizacion:** 2026-07-03 por Codex (AEO `/aeo-2/` Success Card v16 + renderer polish)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -35,14 +35,14 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 ## Estado de rollout
 
 - **Staging (`develop`): VIVO** desde 2026-06-25. Los tres flags estan ON: el API publico (`GROWTH_FORMS_PUBLIC_API_ENABLED`), el dispatcher de entrega (`GROWTH_FORMS_DISPATCH_ENABLED`) y el adapter HubSpot real (`GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`). Verificado: el endpoint publico responde el render contract y una submission real llego a un HubSpot test form (200).
-- **Produccion: ACTIVO de forma acotada para AEO `/aeo-2/`.** El primer submit productivo publico usa el form `efeonce-aeo-diagnostic` y, desde TASK-1298 (2026-07-01), el renderer portable `<greenhouse-form>` en WordPress por `form-key`. AEO v8 `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63` declara `style_variant=diagnostic_premium`, Turnstile invisible, CTA `Empezar con mi diagnóstico →`, campo visible `Nombre completo` con split server-side hacia HubSpot `firstname`/`lastname`, y los dos dropdowns premium (`País`, `Tamaño de empresa`). La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Produccion: ACTIVO de forma acotada para AEO `/aeo-2/`.** El primer submit productivo publico usa el form `efeonce-aeo-diagnostic` y, desde TASK-1298 (2026-07-01), el renderer portable `<greenhouse-form>` en WordPress por `form-key`. AEO v16 `fver-bfc40c59-8d95-4d38-8ae5-0da7dc4ab468` declara `style_variant=diagnostic_premium`, Turnstile invisible, CTA `Empezar con mi diagnóstico →`, campo visible `Nombre completo` con placeholder `ej. María González` y split server-side hacia HubSpot `firstname`/`lastname`, los dos dropdowns premium (`País`, `Tamaño de empresa`) y Success Card `presentation="success_card"` con `steps=[]`. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Primer form productivo publico — AEO `/aeo-2/`
 
 La landing publica `https://efeoncepro.com/aeo-2/` (`postId=250265`) ya envia leads al motor gobernado:
 
 - Form slug: `efeonce-aeo-diagnostic`.
-- Definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63` (v8, `style_variant=diagnostic_premium`; v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`, v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` and v1 `fver-efeonce-aeo-diagnostic-v1` deprecated).
+- Definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-bfc40c59-8d95-4d38-8ae5-0da7dc4ab468` (v16, `style_variant=diagnostic_premium`, `successBehavior.presentation="success_card"`, `steps=[]`; v15 `fver-1139a7f7-4e62-4fb7-8e5c-be024652d217`, v14 `fver-2cc79ff4-6dcc-404e-b79b-094bd0a81e29`, v13 `fver-1f727049-6600-4d68-8089-1718b9edd54e`, v12 `fver-f933f877-c1ff-4e76-9832-2078ca64c6dd`, v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`, v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` and v1 `fver-efeonce-aeo-diagnostic-v1` deprecated).
 - Host surface: `fhsf-efeonce-aeo-diagnostic`.
 - API base: `https://greenhouse.efeoncepro.com`.
 - HubSpot destination: portal `48713323`, form GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6` (`AEO - Lead Form`).
@@ -76,6 +76,7 @@ El mismo formulario se ve igual en WordPress, en Astro y en la vista interna de 
 - **Donde se ve por dentro:** Greenhouse tiene una vista interna de referencia en **Design System → Growth Forms renderer** (solo equipo Efeonce) para previsualizar como se vera en los sitios publicos.
 - **Como se incrusta:** en WordPress hay un widget de Elementor ("Greenhouse Growth Form"); en Astro un componente; ambos piden el formulario por su identidad. Paso a paso en el [manual de incrustacion](../../manual-de-uso/growth/incrustar-formulario-wordpress-astro.md).
 - **Identidad estable `form-key` (TASK-1297):** cada formulario tiene una identidad propia, opaca e inmutable (un `form_key` tipo UUID) que no cambia aunque se publique una versión nueva, se renombre el slug o se muestre en otro sitio. Es la forma recomendada de referenciarlo en embeds y mutaciones (el slug queda como alias legible). Es pública/opaca y **nunca** es el identificador de destino de HubSpot. El renderer también acepta `appearance="bare"` para integrarse dentro de una tarjeta del sitio sin "tarjeta sobre tarjeta", y el texto del botón puede venir del formulario publicado (`copy.submit`) en vez de un default genérico.
+- **Success Card transversal:** si el contrato publicado declara `successBehavior.presentation="success_card"`, el renderer pinta la card con estructura, mark SVG de celebración, icono calendario para acciones de agenda, motion/reduced-motion y telemetry sin PII. Los overrides live `gh-aeo-success-card-*` y el ocultamiento del footer externo son un puente específico de AEO/WordPress; no se copian a otros forms sin promover antes el patrón al renderer.
 
 ## Cockpit operativo — TASK-1232
 

@@ -368,6 +368,56 @@ const validateBlogpostCompositionProfile = ({
   }
 }
 
+const HEADING_ANCHOR_PATTERN = /<h[1-6][^>]*\sid=["'][^"']+["']/i
+const TOC_LINK_PATTERN = /data-level=|<a\s+href=["']#/i
+
+/**
+ * When a Yoast table of contents is present, the index is only useful if (a) the
+ * TOC block is populated with anchor links and (b) the body headings carry `id`
+ * anchors those links resolve to. This catches the defect that shipped in the
+ * first live post (250748, 2026-07-03) where the TOC rendered as a dead heading.
+ */
+const validateTableOfContentsIntegrity = (
+  postContent: string,
+  blocks: ParsedGutenbergBlockComment[],
+  findings: ContentFactoryValidationFinding[]
+) => {
+  const tocIndex = blocks.findIndex(block => !block.closing && block.blockName === 'yoast-seo/table-of-contents')
+
+  if (tocIndex < 0) return
+
+  const tocSlice = postContent.slice(blocks[tocIndex].index, blocks[tocIndex + 1]?.index ?? postContent.length)
+
+  if (!TOC_LINK_PATTERN.test(tocSlice)) {
+    findings.push({
+      severity: 'warning',
+      code: 'blogpost_toc_not_populated',
+      message:
+        'The yoast-seo/table-of-contents block has no anchor links; build it with renderYoastTableOfContents(outline) so the index is functional.',
+      path: `draft.postContent[${blocks[tocIndex].index}]`
+    })
+  }
+
+  let unanchored = 0
+
+  for (const [blockIndex, block] of blocks.entries()) {
+    if (block.closing || block.blockName !== 'core/heading') continue
+
+    const slice = postContent.slice(block.index, blocks[blockIndex + 1]?.index ?? postContent.length)
+
+    if (!HEADING_ANCHOR_PATTERN.test(slice)) unanchored += 1
+  }
+
+  if (unanchored > 0) {
+    findings.push({
+      severity: 'warning',
+      code: 'blogpost_toc_headings_unanchored',
+      message: `${unanchored} heading block(s) lack an id anchor, so the table of contents cannot link to them; emit headings via renderHeadingBlock().`,
+      path: 'draft.postContent'
+    })
+  }
+}
+
 export const validateGeneratedGutenbergDraft = (
   draft: ContentFactoryGeneratedDraft,
   options: GutenbergDraftValidationOptions = {}
@@ -469,6 +519,8 @@ export const validateGeneratedGutenbergDraft = (
       profile: compositionProfile
     })
   }
+
+  validateTableOfContentsIntegrity(postContent, blocks, findings)
 
   if (postContent.length < 600) {
     findings.push({

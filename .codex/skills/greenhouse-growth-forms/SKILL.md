@@ -30,6 +30,8 @@ hold business logic, mapping, secrets or PII.
 - Destinations + dispatch (HubSpot secure-submit, retries, dead-letter), reliability signals.
 - Security/PII (Turnstile, email verification, rate limits, PII encryption, reveal audit, telemetry allowlist).
 - Embedding a form on a host (WordPress/Elementor, Astro), theming a form into a host card.
+- The **Success Card / thank-you card** (`success_behavior_json`, `presentation='success_card'`) or the
+  **AEO grader-on-submit** capability of `/aeo-2/` → companion `references/SUCCESS_CARD_AND_GRADER_ON_SUBMIT.md`.
 - Feature flags / rollout of the engine across environments.
 
 ---
@@ -240,6 +242,28 @@ CTA motion and field-level copy in the contract.
 
 ---
 
+## Success Card (thank-you card) + AEO grader-on-submit → **companion**
+
+Two engine capabilities added 2026-07 (TASK-1319/1320/1321) live in the companion
+`references/SUCCESS_CARD_AND_GRADER_ON_SUBMIT.md` — **read it before touching either**:
+
+- **Success Card (thank-you card):** the success state generalized from a plain inline message to a
+  structured card (`success_behavior_json`: `presentation='success_card'` + title/body/steps/reward/
+  actions, orthogonal to `kind`). It **crosses to the browser as-is** → the schema is the leak
+  boundary (bounded strings + `successCardHrefSchema` browser-safe allowlist). Any form can declare
+  one; change it via clone→publish→deprecate with `preserveFormVersionFields` (never edit in place),
+  and only publish `presentation='success_card'` after the renderer reaches prod (the activation
+  script's runtime guard enforces this). Renderer-level mark/motion are shared; AEO WordPress markers
+  remain host-specific bridge CSS until the runtime bundle carries the source.
+- **AEO grader-on-submit:** the **landing** form `/aeo-2/` (`fdef-efeonce-aeo-diagnostic`, a
+  **commercial** intake — **NOT** the grader's own self-serve form `fdef-ai-visibility-grader`) was
+  given the capability to auto-run the AEO Grader on submit, via a **sibling** projection
+  (`growth-aeo-diagnostic-grader-run-from-submission`, kill-switch `GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED`
+  default-ON). The run engine stays the SSOT; this is a second client (remap + grounded category +
+  own cost-cap). Do not conflate the two forms; do not branch the grader-form's projection.
+
+---
+
 ## Public API contract (`/api/public/growth/forms/`)
 
 | Route | Method | Purpose |
@@ -446,6 +470,7 @@ pnpm release:watchdog --json                                      # worker GIT_S
 
 ## Reference docs
 
+- **Companion — Success Card + AEO grader-on-submit: `references/SUCCESS_CARD_AND_GRADER_ON_SUBMIT.md`**
 - Architecture: `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - Runtime contract: `docs/architecture/growth-public-forms-runtime-contract.md`
 - Functional: `docs/documentation/growth/motor-formularios-publicos.md`

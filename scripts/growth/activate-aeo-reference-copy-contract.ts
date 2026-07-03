@@ -38,6 +38,7 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
   fullName: {
     label: 'Nombre completo',
     autocomplete: 'name',
+    placeholder: 'ej. María González',
   },
   email: {
     label: 'Email corporativo',

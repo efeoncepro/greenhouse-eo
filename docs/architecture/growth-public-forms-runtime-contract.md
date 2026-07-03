@@ -40,7 +40,7 @@ Identificadores vigentes:
 - Form slug: `efeonce-aeo-diagnostic`.
 - **Form key (identidad estable, TASK-1297):** `b120566a-dd1a-43c8-956a-4e0121e805b8` (AEO). El del AI Visibility Grader es `69cd5269-5f97-4d32-99c4-0b23f41aa2f5` (distinto). Embed/resolución preferida por `form-key`; `slug` queda como alias backward-compatible.
 - WordPress embed: `<greenhouse-form form-key="b120566a-dd1a-43c8-956a-4e0121e805b8" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light" appearance="bare">` + `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`.
-- Form definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63` (v8, `style_variant=diagnostic_premium`, expone `copy.submit="Empezar con mi diagnóstico →"`, campo visible `fullName` label `Nombre completo`, `validation_schema.namePolicy.split_full_name`, placeholders `Selecciona tu país` / `Selecciona un rango`, helper/error/success copy de referencia y `security.captcha`; v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`, v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` y v1 `fver-efeonce-aeo-diagnostic-v1` deprecadas).
+- Form definition/current published version: `fdef-efeonce-aeo-diagnostic` / `fver-bfc40c59-8d95-4d38-8ae5-0da7dc4ab468` (v16, `style_variant=diagnostic_premium`, expone `copy.submit="Empezar con mi diagnóstico →"`, campo visible `fullName` label `Nombre completo` con placeholder `ej. María González`, `validation_schema.namePolicy.split_full_name`, placeholders `Selecciona tu país` / `Selecciona un rango`, `security.captcha` y `successBehavior.presentation="success_card"` con `steps=[]`, CTA `Agenda una reunión` y copy `Tu informe de visibilidad va en camino.`; v15 `fver-1139a7f7-4e62-4fb7-8e5c-be024652d217`, v14 `fver-2cc79ff4-6dcc-404e-b79b-094bd0a81e29`, v13 `fver-1f727049-6600-4d68-8089-1718b9edd54e`, v12 `fver-f933f877-c1ff-4e76-9832-2078ca64c6dd`, v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`, v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` y v1 `fver-efeonce-aeo-diagnostic-v1` deprecadas).
 - Host surface: `fhsf-efeonce-aeo-diagnostic`.
 - API base: `https://greenhouse.efeoncepro.com`.
 - Turnstile site key in render contract: `0x4AAAAAADqwX2R7v-k9pItv`.
@@ -51,9 +51,19 @@ Premium modernization contract (live):
 - `style_variant=diagnostic_premium` is the governed renderer path for the AEO premium pass. It keeps the look in the Growth Forms render contract + renderer tokens, not in WordPress page CSS.
 - Script: `pnpm growth:forms:activate-aeo-reference-copy` dry-runs and `pnpm growth:forms:activate-aeo-reference-copy -- --apply` publishes a new AEO form version by `form_key=b120566a-dd1a-43c8-956a-4e0121e805b8` with the current reference copy. `pnpm growth:forms:activate-aeo-premium` remains the older premium-style activation helper.
 - The script updates labels/placeholders/help/errors/submit/success copy, preserves fields, validation, Turnstile, destinations and policies, publishes vNext and deprecates the previous version.
-- Applied production data: v8 `fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63`.
+- Applied production data: v16 `fver-bfc40c59-8d95-4d38-8ae5-0da7dc4ab468`.
 - WordPress cutover backup meta: `_gh_backup_before_aeo_1298_premium_renderer_20260701T065707Z`.
 - Live verification command: `pnpm public-website:verify-aeo-live-contract`.
+
+## Success Card Renderer Contract
+
+`successBehavior.presentation="success_card"` es un contrato transversal del renderer portable, no un snippet local de AEO. Cuando un form publicado lo declara, el browser debe recibir la card desde el render contract y `buildSuccessCard` la pinta dentro de `<greenhouse-form>`.
+
+Queda transversal en `src/growth-forms-renderer/**`: la estructura `.ghf-success-card`, el mark SVG inline de celebración tipo party popper (`buildSuccessMarkGraphic`), el icono calendario para acciones `kind="schedule"`, la entrada con motion respetando `prefers-reduced-motion`, y la telemetry allowlisted sin PII.
+
+Queda acotado a la variante premium: `style_variant=diagnostic_premium` renderiza la Success Card sin marco interno, sin línea superior, sin sombra propia y sin focus frame persistente; el host conserva la card exterior como única superficie visible. Si otra variante necesita ese tratamiento, debe promoverse a token/variant del renderer, no copiar CSS de AEO.
+
+Queda AEO-only y temporal: los markers WordPress `gh-aeo-success-card-polish-v1`, `gh-aeo-success-card-compact-steps-v1`, `gh-aeo-success-card-recraft-popper-v1`, `gh-aeo-success-card-borderless-v1` y `gh-aeo-readiness-centered-v1` son bridge CSS live para `/aeo-2/` hasta que el bundle productivo sirva la fuente actualizada. No son patrón para otros forms.
 
 ## WordPress Ohio Host Layer
 

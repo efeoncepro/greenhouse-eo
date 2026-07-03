@@ -1573,7 +1573,7 @@ registerPreviewMeta('ai_visibility_grader_report', {
       importance: 'Limita tu visibilidad en respuestas generativas y en resultados relevantes.',
       action: 'Publica 2-3 contenidos pilar sobre tus temas clave y consigue menciones en sitios de tu industria.'
     },
-    reportUrl: 'https://greenhouse.efeoncepro.com/grader/r/grt-preview-token',
+    reportUrl: 'https://think.efeoncepro.com/brand-visibility/r/grt-preview-token',
     attachmentFilename: 'informe-visibilidad-ia.pdf',
     attachmentSizeLabel: '~2 MB',
     locale: 'es'

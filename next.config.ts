@@ -55,9 +55,29 @@ const resolveBuildCpus = (): number => {
 
 const buildMemoryCaps = { cpus: resolveBuildCpus() }
 
+// TASK-1324 — redirect puente para links YA ENVIADOS con el path viejo del portal.
+// El render público del informe migró al hub headless `efeonce-think`
+// (`think.efeoncepro.com/brand-visibility/r/<token>`, ADR
+// GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1). El helper `buildPublicReportUrl`
+// ya genera la URL del hub para los correos nuevos; este redirect recupera los correos
+// viejos cuyo botón apunta a `greenhouse.efeoncepro.com/grader/r/<token>` (hoy 404).
+// Mismo host canónico que el helper (env var `PUBLIC_GRADER_HUB_URL`). `permanent: false`
+// (307) — reversible por rollback (revert + redeploy), sin caché dura del navegador.
+const GRADER_HUB_URL = (process.env.PUBLIC_GRADER_HUB_URL?.trim() || 'https://think.efeoncepro.com').replace(/\/+$/, '')
+
 const nextConfig: NextConfig = {
   basePath: process.env.BASEPATH,
   distDir: process.env.NEXT_DIST_DIR || '.next',
+
+  async redirects() {
+    return [
+      {
+        source: '/grader/r/:token',
+        destination: `${GRADER_HUB_URL}/brand-visibility/r/:token`,
+        permanent: false,
+      },
+    ]
+  },
 
   // TASK-1152 — el Roadmap work item index reader lee el backlog Markdown
   // (`docs/{epics,tasks,mini-tasks,issues}/**`) en runtime. Next.js solo bundlea

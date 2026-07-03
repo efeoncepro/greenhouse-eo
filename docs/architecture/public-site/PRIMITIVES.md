@@ -53,13 +53,13 @@ Do not copy private Greenhouse primitives directly into WordPress. Use their des
 | `ComparisonTable` | `canonical/widget` | `semantic-widget` | `eo-elementor-widgets`, widget `greenhouse_comparison_table`; PHP class under `includes/widgets/`; CSS/JS under plugin assets | `/agencia-creativa/` | Functional doc `docs/documentation/public-site/comparison-table-widget.md`; manual `docs/manual-de-uso/public-site/comparison-table-widget.md`; manifest governance family `comparisonTable.v1` | Table semantics, responsive card mode, scoped assets, `theme_schema()` parity, visual desktop/mobile evidence |
 | `GrowthFormEmbed` | `canonical/host-adapter` | `host-adapter` | Elementor widget `greenhouse_growth_form` + `<greenhouse-form>` renderer from Greenhouse Growth Forms | AEO `/aeo-2/` conversion and future public lead magnets | `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`; `docs/architecture/growth-public-forms-runtime-contract.md`; `docs/documentation/growth/motor-formularios-publicos.md` | `pnpm public-website:verify-aeo-live-contract` for AEO; proportional API/render/overflow/form gates for new forms |
 | `LogoMarquee` | `canonical/widget` | `semantic-widget` | `eo-elementor-widgets`, widget `greenhouse_logo_marquee`; CSS `assets/css/logo-marquee.css` | AEO `/aeo-2/` why proof strip | AEO doc `docs/documentation/public-site/aeo-landing-elementor.md`; landing skill refs | 7 unique logos, 3 identical sets, fades, loop `translate(-33.333%)`, reduced-motion static state, visual phase checks |
-| `BrandProofAvatarGroup` | `canonical/pattern` | `landing-pattern` | Current implementation inside `greenhouse_logo_marquee` meta markup + `assets/css/logo-marquee.css` selectors `.gh-aeo-brand-proof*` | AEO `/aeo-2/` under `Marcas que ya confían en nosotros` | This registry + AEO doc. Current visible contract: Berel/Sky/Bresler discs in color, count disc `+90` frosted behind Bresler, DM Sans `::after`, countries `Chile · Colombia · México · Perú` | `pnpm public-website:verify-aeo-why-proof-meta`; desktop/mobile visual review; no visible `marcas`/`4 países`; no page/proof overflow |
+| `BrandProofAvatarGroup` | `canonical/pattern` | `landing-pattern` | Current implementation inside `greenhouse_logo_marquee` meta markup + `assets/css/logo-marquee.css` selectors `.gh-aeo-brand-proof*`; About dark-context skin in `ohio-child/assets/css/global-fixes.css` | AEO `/aeo-2/` under `Marcas que ya confían en nosotros`; About `/about-us-efeonce/` hero proof strip `abproof` | This registry + AEO/About docs. Current visible contract: Berel/Sky/Bresler discs in color, count disc `+90` frosted behind Bresler, DM Sans `::after`, countries `Chile · Colombia · México · Perú`; dark hero variants must adapt logo contrast, not reuse the light treatment blindly | `pnpm public-website:verify-aeo-why-proof-meta`; desktop/mobile visual review; no visible `marcas`/`4 países`; no page/proof overflow; About live Playwright capture |
 
 ## `BrandProofAvatarGroup` Contract
 
 This pattern covers compact social proof rows that combine known client/brand discs with a small aggregate count and market list.
 
-Current AEO contract:
+Current contract:
 
 - Root proof row remains visually secondary: subtle translucent pill, low shadow, restrained border.
 - Brand discs overlap like a team avatar group. The next disc visually covers the previous one; the count disc sits behind the last brand disc, not detached to the right.
@@ -68,10 +68,14 @@ Current AEO contract:
 - Visible geography copy is only `Chile · Colombia · México · Perú` with a compact flat globe. Do not restore visible `marcas` or `4 países`.
 - Accessible label communicates the fuller meaning, currently `más de 90 marcas acompañadas en Chile, Colombia, México y Perú`.
 - Desktop and mobile must be verified from actual screenshots, not only computed font size.
+- On dark backgrounds, keep the same structure/a11y but apply a surface-specific
+  contrast skin: light/ice logo treatment and a frosted pill. Do not paste the
+  light-background visual treatment unchanged onto dark heroes.
 
 Graduation path:
 
-- If reused outside AEO, extract this pattern into either:
+- This pattern is now reused outside AEO (`/about-us-efeonce/` hero). Extract it
+  into either:
   - a dedicated Elementor widget `greenhouse_brand_proof_group`; or
   - a governed option inside `greenhouse_logo_marquee` when it remains tightly coupled to a marquee.
 - Extraction must expose controls or manifest fields for `brands[]`, `countLabel`, `countAccessibleLabel`, `markets[]`, density, and visual variant.

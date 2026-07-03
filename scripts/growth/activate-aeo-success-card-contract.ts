@@ -34,20 +34,34 @@ const AEO_FORM_KEY = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 const SUCCESS_CARD_BEHAVIOR = {
   kind: 'inline_message',
   presentation: 'success_card',
-  title: 'Tu informe de visibilidad en IA va en camino',
-  body: 'Recibimos tu solicitud. Estamos preparando tu diagnóstico y te llegará por correo apenas esté listo.',
-  supportingNote: '¿No lo ves en tu bandeja? Revisa tu spam o escríbenos.',
+  title: 'Tu informe de visibilidad va en camino.',
+  body: 'Lo estamos preparando y te llegará por correo apenas esté listo.',
+  supportingNote: 'Si quieres avanzar antes, en la reunión revisamos oportunidades concretas para mejorar tu visibilidad en IA.',
+  steps: [],
   actions: [
     {
       kind: 'schedule',
-      label: 'Agenda una conversación',
+      label: 'Agenda una reunión',
       href: 'https://meetings.hubspot.com/efeoncepro/agenda-discovery',
       target: '_blank',
     },
   ],
 } as const
 
-const stableJson = (value: unknown): string => JSON.stringify(value)
+const stableJson = (value: unknown): string => {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`
+
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>
+
+    return `{${Object.keys(record)
+      .sort()
+      .map(key => `${JSON.stringify(key)}:${stableJson(record[key])}`)
+      .join(',')}}`
+  }
+
+  return JSON.stringify(value)
+}
 
 const readFileAtRef = (ref: string, filePath: string): string => {
   try {

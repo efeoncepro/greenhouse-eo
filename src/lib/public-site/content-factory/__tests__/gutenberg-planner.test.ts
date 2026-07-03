@@ -47,6 +47,15 @@ describe('planGeneratedGutenbergPostDraft', () => {
       }
     })
     expect(validation.status).toBe('pass')
+
+    // The generated draft must ship a functional TOC: body headings carry Yoast
+    // anchors and the TOC links resolve to them (regression guard for the 250748 defect).
+    const postContent = draft.draft.kind === 'gutenberg_post' ? draft.draft.postContent : ''
+
+    expect(postContent).toContain('<h2 class="wp-block-heading" id="h-')
+    expect(postContent).toContain('data-level="2"')
+    expect(validation.findings.some(finding => finding.code === 'blogpost_toc_not_populated')).toBe(false)
+    expect(validation.findings.some(finding => finding.code === 'blogpost_toc_headings_unanchored')).toBe(false)
   })
 
   it('normalizes accents and punctuation in slugs', () => {

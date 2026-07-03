@@ -22,8 +22,25 @@ const piiNeedles = [
 const fillRequiredFields = async (page: Page, email: string) => {
   await page.locator('.gh-aeo-conversion greenhouse-form [name="fullName"]').fill(email.includes('gmail') ? 'Ana Publica' : 'Julio Empresa')
   await page.locator('.gh-aeo-conversion greenhouse-form [name="email"]').fill(email)
+  await page.locator('.gh-aeo-conversion greenhouse-form [name="brandName"]').fill('Empresa Demo')
   await page.locator('.gh-aeo-conversion greenhouse-form [name="brandWebsite"]').fill('empresa-demo.com')
 }
+
+const readFirstChevronState = async (page: Page, label: string) => page
+  .locator('.gh-aeo-conversion greenhouse-form [role="combobox"]')
+  .first()
+  .evaluate((trigger, stateLabel) => {
+    const icon = trigger.querySelector('.ghf-select-icon')
+    const iconStyle = icon ? getComputedStyle(icon) : null
+    const beforeStyle = icon ? getComputedStyle(icon, '::before') : null
+
+    return {
+      label: stateLabel,
+      expanded: trigger.getAttribute('aria-expanded'),
+      iconTransform: iconStyle?.transform ?? null,
+      beforeTransform: beforeStyle?.transform ?? null,
+    }
+  }, label)
 
 async function main() {
   const browser = await chromium.launch({ headless: true })
@@ -47,8 +64,8 @@ async function main() {
         contentType: 'application/json',
         body: JSON.stringify(
           email.endsWith('@gmail.com')
-            ? { ok: true, isCorporate: false, quality: 'suspect', reasonCode: 'email_not_corporate' }
-            : { ok: true, isCorporate: true, quality: 'valid', reasonCode: null }
+            ? { outcome: 'ok', syntaxValid: true, isCorporate: false, isDisposable: false, isRoleBased: false, isFreeProvider: true, deliverable: 'unknown', quality: 'suspect', suggestion: null, reasonCode: 'email_not_corporate' }
+            : { outcome: 'ok', syntaxValid: true, isCorporate: true, isDisposable: false, isRoleBased: false, isFreeProvider: false, deliverable: 'unknown', quality: 'verified', suggestion: null, reasonCode: null }
         ),
       })
     })
@@ -78,6 +95,7 @@ async function main() {
 
     await comboboxes.nth(0).click()
     await page.waitForSelector('.gh-aeo-conversion greenhouse-form [role="listbox"]:not([hidden])', { timeout: 5000 })
+    await page.waitForTimeout(220)
 
     const dropdownAria = await comboboxes.nth(0).evaluate(element => ({
       role: element.getAttribute('role'),
@@ -91,7 +109,21 @@ async function main() {
       throw new Error(`Premium dropdown ARIA/listbox contract failed: ${JSON.stringify(dropdownAria)}`)
     }
 
+    const chevronOpen = await readFirstChevronState(page, 'open')
+
     await page.keyboard.press('Escape')
+    await page.waitForTimeout(220)
+
+    const chevronClosed = await readFirstChevronState(page, 'closedAfterOpen')
+
+    if (
+      chevronOpen.iconTransform !== 'none' ||
+      chevronClosed.iconTransform !== 'none' ||
+      chevronOpen.beforeTransform === chevronClosed.beforeTransform ||
+      chevronClosed.expanded !== 'false'
+    ) {
+      throw new Error(`Premium dropdown chevron contract failed: ${JSON.stringify({ chevronOpen, chevronClosed })}`)
+    }
 
     const fullName = page.locator('.gh-aeo-conversion greenhouse-form [name="fullName"]').first()
 
@@ -146,7 +178,7 @@ async function main() {
     await page.waitForTimeout(250)
     await page.locator('.gh-aeo-conversion greenhouse-form .ghf-btn').click()
     await page.waitForFunction(
-      `Boolean(document.querySelector('.gh-aeo-conversion greenhouse-form .ghf-status--success'))`,
+      `Boolean(document.querySelector('.gh-aeo-conversion greenhouse-form .ghf-success-card, .gh-aeo-conversion greenhouse-form .ghf-status--success'))`,
       null,
       { timeout: 10000 }
     )
@@ -186,6 +218,10 @@ async function main() {
       url,
       contract: 'AEO live renderer behavior: premium dropdown ARIA, focus, corporate email gate, Turnstile captchaToken boundary, no PII in dataLayer',
       dropdownAria,
+      chevron: {
+        open: chevronOpen,
+        closedAfterOpen: chevronClosed,
+      },
       focus,
       capturedRequests: captured.map(entry => ({
         url: entry.url.split('?')[0],

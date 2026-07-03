@@ -181,6 +181,161 @@ Reglas obligatorias:
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Plan — Editorial Loop end-to-end hasta draft (2026-07-03)
+
+### Decisión
+
+Cerrar el loop `idea → draft Gutenberg estructurado → escrito en WordPress como
+`private`` **reutilizando los primitives ya implementados** (planner, validator,
+composition profile, catálogos, smoke-plan). No se construye un sistema nuevo.
+Los tres gaps reales son: (1) puerta de ideación que emite un
+`contentFactoryBrief.v1` válido, (2) ejecutar por primera vez la escritura real
+al bridge (Slice 6, hoy plan-only), (3) el pegamento orquestador que encadena
+todo en un flujo. El form-factor V1 es **agente/CLI** (barato, prueba el loop
+real); la consola de portal queda para después.
+
+**Frontera de esta task:** el loop termina en `draft|private`. El **auto-publish
+con guardrails** (private → published sin intervención humana) es el *Out of
+Scope* declarado de esta task ("Publicar contenido en WordPress", "AI autonomous
+publish") y vive en **TASK-1323** (capability propia + ADR de excepción +
+defense-in-depth), secuenciada **después** de que la escritura de draft de aquí
+esté probada. No mover auto-publish a esta task.
+
+### Estado real de los slices existentes
+
+- Slices 1–5 (spec, recipes Gutenberg, catálogos, primitives, CLI evidence):
+  **shipped** según las implementation notes 2026-06-14. `validateGeneratedGutenbergDraft`,
+  `planGeneratedGutenbergPostDraft`, `EFEONCE_BLOGPOST_COMPOSITION_PROFILE`,
+  catálogo/registry y los CLIs `plan|validate|inspect|patterns|capabilities`
+  existen con tests.
+- Slice 6 (first draft smoke): **plan-only**. `prepareGutenbergDraftSmokePlan`
+  existe; el `--send` real nunca se ejecutó; bridge no desplegado, writes OFF.
+- Slice 7 (MCP): design-only, no bloquea.
+
+### Ruta ejecutable restante (local-first, sin push salvo instrucción)
+
+**Slice A — Puerta de ideación (gap #1, ver Slice 8 abajo).**
+Skill/CLI orquestadora `content-factory:ideate` que toma una idea en una línea +
+contexto y produce un `contentFactoryBrief.v1` validado. La estructura/copy se
+compone con las skills `copywriting`, `digital-marketing` y `seo-aeo`
+(keyword primaria/secundaria, ángulo, outline, CTA HubSpot, tono es-CL Efeonce).
+El output NO es prosa suelta: es el brief tipado que ya consume el planner.
+Regla dura heredada: `public-data-only` en el brief (sin dato interno/cliente).
+
+**Slice B — Orquestador end-to-end (gap #3, ver Slice 9 abajo).**
+Un flujo único `ideate → plan → validate → (si pass) send-draft → readback`
+que corre los primitives en cadena y entrega la URL de preview del draft privado.
+`validation.status === 'block'` es hard-stop; `warning` exige revisión humana.
+
+**Slice C — Ejecutar la escritura real (Slice 6 existente).**
+Desplegar el plugin `greenhouse-wp-bridge` en Kinsta, habilitar writes en la
+ventana mínima aprobada (`GREENHOUSE_WP_BRIDGE_WRITES_ENABLED=true`), y ejecutar
+el primer `post_draft_gutenberg` real con slug disposable `greenhouse-smoke-*`,
+status `private`, ownership metadata, HMAC firmado, readback por bridge inspection
+y rollback por trash del `manifestId`. Requiere aprobación explícita del operador
+(ya declarado en la task) + resolución del secret
+`PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF`.
+
+### Autoría del post (`post_author` = Julio Reyes) — requisito del operador 2026-07-03
+
+Hallazgo verificado en el runtime del bridge: el draft controller crea el post con
+`post_author = get_current_user_id()` (el usuario que autentica el request, hoy el
+usuario técnico del Application Password). El contrato del draft **no** acepta un
+`authorId`. El operador requiere que el autor visible del post sea **su usuario
+WordPress (Julio Reyes)**, no el usuario de servicio.
+
+Decisión: **desacoplar identidad-máquina de byline** (patrón canónico de la casa).
+
+- El usuario de servicio del bridge autentica (Application Password) y debe tener
+  capability `edit_others_posts` (rol Editor/Admin).
+- Agregar `authorId` al `contentFactoryGeneratedDraft.v1` / payload firmado del draft.
+- El plugin `greenhouse-wp-bridge` setea `post_author => $payload['authorId']`
+  cuando viene y el caller está autorizado; fallback al usuario actual si no.
+- **`[verificar]`**: existencia + `user_id` del usuario WordPress de Julio Reyes en
+  `efeoncepro.com` (el wrapper WP-CLI usa `--wp-user 12` por default; NO confirmado
+  que 12 = Julio). Resolver con `wp user list` read-only en Discovery de Slice C.
+- **NO** usar la Opción A (Application Password = usuario de Julio): mezcla identidad
+  humana con identidad de servicio y viola la higiene de identidad de Greenhouse.
+
+Este requisito aplica igual al publish (TASK-1323): el post publicado conserva el
+`post_author` del draft.
+
+### Orden duro
+
+Slice A y B se implementan y prueban **plan-only** primero (sin tocar WordPress).
+Slice C solo corre con aprobación del operador y ventana de write mínima. El
+auto-publish (TASK-1323) NO arranca hasta que Slice C haya producido y leído de
+vuelta al menos un draft real.
+
+### 4-pilar (resumen; el detalle vive en Rollout Plan & Risk Matrix)
+
+- **Safety:** loop termina en `private`; validator `block` como hard-stop; HMAC +
+  Application Password; regla `public-data-only`; revisión humana antes de publish.
+- **Robustness:** `manifestId` idempotente; el bridge revalida fingerprint
+  server-side; validator rechaza HTML inseguro/bloques inválidos.
+- **Resilience:** plan-only por defecto (un fallo no deja estado corrupto);
+  rollback por trash del draft. Falta a construir: reliability signal del write
+  path (draft creado ≠ readback OK) — declararlo en Slice C.
+- **Scalability:** volumen bajísimo (unidades/semana); costo = LLM por generación,
+  sin hot path.
+
+### Slice C — EJECUTADO en vivo (evidencia) 2026-07-03
+
+Primera escritura real end-to-end probada, con contenido real (artículo del
+operador desde Notion `38339c2f…`, "I Know Kung Fu / Agent Skills"):
+
+- **Estado del bridge (verificado read-only):** plugin `greenhouse-wp-bridge`
+  **ACTIVO** en vivo (v0.4.0) — la task decía "no desplegado". `WRITES_ENABLED`
+  = `undefined` (OFF). `production_deploy_apply` es capability bloqueada + editar
+  `wp-config` Kinsta es emergency-only → el flip global de writes del bridge NO
+  es la vía. Se usó la vía sancionada de menor blast-radius (misma que mutaciones
+  AEO Elementor): **write gobernado vía `wpcli eval-file`** (usuario 12
+  `Greenhouse INTEGRATION`, admin con `edit_others_posts`).
+- **Post creado:** id `250748`, `post_status=private` (404 a anónimos, verificado),
+  `post_author=1` (**Julio Reyes**, requisito de autoría cumplido), slug
+  `i-know-kung-fu-agent-skills-momento-matrix-ia-empresarial`, ownership meta
+  `_greenhouse_owned/_greenhouse_manifest_id/_greenhouse_source`.
+- **35 bloques parseados por el propio WordPress** (`parse_blocks`): 20 párrafos,
+  TOC Yoast, 9 headings, lista, 2 pullquotes, quote, separator. Idempotente por
+  `_greenhouse_manifest_id`. Rollback: `wp_trash_post(250748)`.
+- **Usuarios WP resueltos:** autor canónico = ID 1 `jreysgo` (display name
+  corregido `JULIO REYES`→`Julio Reyes`); ID 11 `jreyesi7s1` es un segundo Julio
+  (artefacto import/SSO); ID 12 = usuario de servicio del bridge.
+- **Publish** queda como paso humano (gobernanza): el post está `private`, el
+  operador revisa y publica.
+
+**Dos defectos encontrados en el pipeline (feedback del render real, corregidos in-situ):**
+
+1. **Recipe del TOC de Yoast es defectuosa** (`gutenberg-post-authoring-recipes.md`):
+   el ejemplo produce un bloque `yoast-seo/table-of-contents` con solo
+   `<h2>Tabla de contenidos</h2>` (sin `<ul>` de enlaces) y los headings SIN
+   ancla → el TOC sale vacío/no-funcional y en el editor se lee como un H2 suelto.
+   Formato correcto (verificado contra post real 248398): headings
+   `<h2 class="wp-block-heading" id="h-{slug}">` (prefijo `h-` + slug sin acentos)
+   + TOC con `<ul><li><a href="#h-{slug}" data-level="2">…</a><ul>…H3…</ul></li></ul>`.
+   **Follow-up:** corregir la recipe + hacer que el planner/generador (Slice 8/9)
+   emita headings anclados + TOC poblado.
+2. **UTF-8 en el write path:** embeder strings vía `JSON.stringify`/`json.dumps`
+   (que produce `\uXXXX` ASCII) dentro de un PHP eval-file rompe los acentos
+   (PHP no entiende `\uXXXX` sin `{}`) → la meta description salió `pasu00f3`.
+   El cuerpo/título salieron bien porque usaron nowdoc con UTF-8 crudo.
+   **Regla:** todo string es-CL al write path va como UTF-8 crudo (nowdoc /
+   single-quote / parámetro), NUNCA `\uXXXX`. Aplica al bridge `authorId`/payload.
+
+**Defecto #1 RESUELTO 2026-07-03 (generador + validador + recipe):** se extrajo el
+helper canónico `src/lib/public-site/content-factory/gutenberg-blocks.ts`
+(`renderHeadingBlock` + `renderYoastTableOfContents` + `yoastHeadingAnchor`) que
+emite headings anclados (`class="wp-block-heading" id="h-{slug}"`) + TOC poblado
+(nested `<ul>` con `data-level` links). El planner (`gutenberg-planner.ts`) y el
+catálogo (`gutenberg-pattern-catalog.ts`) ahora lo usan; el validador
+(`gutenberg-validator.ts`) tiene guardrail nuevo (`blogpost_toc_not_populated` +
+`blogpost_toc_headings_unanchored`) que atrapa el TOC roto; recipe corregida.
+Tests: `gutenberg-blocks.test.ts` (nuevo) + guardrail + planner assertions; suite
+41/41 verde, typecheck limpio. Cualquier autor (template o agente) que use estos
+helpers produce un TOC funcional por construcción. **Defecto #2 (UTF-8)** sigue
+como regla del write path (aplica al `authorId`/payload del bridge, aún no
+implementado).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
@@ -429,6 +584,103 @@ Reglas obligatorias:
   - `prepare_wordpress_draft`
   - `inspect_public_site_document`
 - No implementar MCP writes hasta que command idempotency, authz, audit and draft smoke estén probados.
+
+### Slice 8 — Ideation Front-Door (orquestación de brief)
+
+- Crear la puerta de ideación que convierte una idea informal + contexto en un
+  `contentFactoryBrief.v1` válido, sin escribir prosa suelta.
+- Form-factor V1: skill/CLI orquestadora `content-factory:ideate` (agente-first);
+  NO una UI de portal en este slice.
+- Composición de skills al autorar el brief: `copywriting` (titular, ángulo,
+  hook, cuerpo, CTA, voz Efeonce es-CL), `digital-marketing` (encuadre GTM,
+  intención de búsqueda, mapeo a campaña/bowtie HubSpot), `seo-aeo` (keyword
+  primaria/secundarias, citabilidad, chunking para AI Overviews).
+- Output: brief tipado que ya consume `planGeneratedGutenbergPostDraft()`. El
+  brief incluye outline propuesto (H2/H3), enriquecimientos sugeridos y CTA.
+- Regla dura: `public-data-only` — el brief nunca incluye dato interno/cliente.
+- Evidencia: correr `plan` + `validate` sobre el brief generado → `status=pass`,
+  sin tocar WordPress.
+
+#### Slice 8 implementation note — 2026-07-03 (backbone de autoría shipped)
+
+- Estado: `in-progress`. El backbone determinista de la autoría está shipped; la
+  capa LLM de ideación queda como productización.
+- **Primitive de autoría** `src/lib/public-site/content-factory/article-authoring.ts`:
+  `authorGutenbergDraft(spec: GutenbergArticleSpec)` → `contentFactoryGeneratedDraft.v1`.
+  El autor (agente Claude/Codex o LLM futuro) decide el CONTENIDO en una spec
+  tipada (title, seo, intro[], sections[{heading, level, blocks[]}], cta); el
+  primitive garantiza la ESTRUCTURA (headings anclados + TOC poblado vía los
+  helpers canónicos, escaping, slug kebab, observedBlocks, no inventa media).
+  Principio: libertad semántica en la spec, determinismo en el ensamblado → la
+  clase de defecto 250748 no puede reaparecer.
+- **CLI consumer** `pnpm public-website:content-factory:author -- --file spec.json`
+  (Full API Parity: el primitive es canónico, el CLI lo envuelve; no toca WordPress).
+- Tests: `article-authoring.test.ts` re-autora el artículo Kung Fu vía spec →
+  `validate=pass` (reemplaza el Python ad-hoc del primer post manual). Suite
+  content-factory 46/46, typecheck limpio.
+- **Pendiente de Slice 8/9:** la capa `content-factory:ideate` que compone
+  `copywriting` + `digital-marketing` + `seo-aeo` para PRODUCIR la spec/contenido.
+  Hoy la produce el agente in-session (agent-first, como el Kung Fu); la versión
+  LLM-programática (Slice 9) llama `src/lib/ai/*` con los helpers como herramienta.
+
+### Slice 9 — End-to-End Orchestrator (pegamento del loop)
+
+- Crear el flujo único que encadena `ideate → plan → validate → send-draft →
+  readback` y entrega la URL de preview del draft privado.
+- `validation.status === 'block'` es hard-stop; `warning` exige revisión humana
+  explícita antes de continuar al send.
+- El paso `send-draft` reutiliza el contrato firmado de Slice 6; en modo
+  plan-only por defecto, y solo `--send` con aprobación + writes habilitados.
+- Declarar el reliability signal del write path (draft creado ≠ readback OK) para
+  que el orquestador degrade honesto si el bridge escribe pero el readback falla.
+- Full API Parity: el orquestador es un consumer de los primitives, no reimplementa
+  lógica; el mismo path sirve a CLI, futura UI y Nexa.
+
+#### Slice 9 implementation note — 2026-07-03 (ideación LLM shipped + verificada en vivo)
+
+- Estado: `in-progress`. Los dos verbos LLM sobre el lienzo compartido (la spec)
+  están shipped y **verificados con llamada real a Claude** (no solo mocks).
+- **Requisito del operador (2026-07-03):** dos modos sobre el mismo backbone —
+  (1) autónomo (un agente produce solo) y (2) co-creativo (operador + Claude
+  Code/Codex/Nexa iteran). Ambos usan la `GutenbergArticleSpec` como artefacto
+  compartido → Full API Parity (un primitive, muchos co-autores).
+- **Primitives** `src/lib/public-site/content-factory/article-ideation.ts` (server-only):
+  - `ideateArticleSpec(input)` — idea+contexto → spec (autónomo).
+  - `reviseArticleSpec({spec, instruction})` — steering del operador → spec revisada
+    preservando lo no tocado (co-creación).
+  - Vía `generateStructuredAnthropic` (cliente canónico `src/lib/ai/`), system
+    prompt con reglas editoriales Efeonce (es-CL, estructura, `public-data-only`,
+    no inventa media/cifras, SEO con variables Yoast). Normalizador que descarta
+    bloques vacíos y mapea a `GutenbergArticleSpec`.
+- **CLI** `pnpm public-website:content-factory:ideate -- --idea "…"` / `--revise spec.json --instruction "…"`
+  (server-only shim). Ensambla + valida; no toca WordPress.
+- **Smoke LIVE (verificado, no mock):** `ideate` con idea real de AEO →
+  `claude-sonnet-4-6`, 3562 tokens, spec de 5 H2 + 2 H3, `validate=pass`, SEO con
+  marca, metadesc 150 chars. `revise` con instrucción del operador → agregó la
+  sección pedida, preservó el resto, CTA más directo, `validate=pass`, 8 secciones.
+- Tests: `article-ideation.test.ts` (mock del LLM) — ideate/revise/normalización/
+  prompt. Suite content-factory 53/53, typecheck limpio en los archivos propios.
+- **Env:** `CONTENT_FACTORY_IDEATION_MODEL` (override de modelo, opcional; default
+  `claude-sonnet-4-6`) — NO es un `*_ENABLED` flag, no va al feature-flag ledger.
+  Requiere `ANTHROPIC_API_KEY`/`_SECRET_REF` (`greenhouse-anthropic-api-key`).
+- **Orquestador end-to-end shipped (dry-verificado):**
+  `pnpm public-website:content-factory:run -- [--idea "…" | --spec spec.json] [--send --author-id N]`.
+  Encadena `ideate|spec → author → validate → (send gated)`. DRY por default (produce
+  + valida, NO escribe). `--send` ejecuta el write gobernado solo si `validation=pass`
+  (block ⇒ rehúsa; warning ⇒ exige `--allow-warnings`) y con `--author-id` (tu usuario
+  WP = `post_author`). Write builder puro `draft-write-eval.ts`
+  (`buildGovernedDraftWriteEval`): private, idempotente por `manifestId`, UTF-8 nowdoc
+  (gotcha #2), ownership + Yoast meta, readback JSON parseable; generaliza el método
+  del post 250748 (unit-tested). Verificado: dry-run `validation=pass` sin write; gate
+  rehúsa `--send` sin author-id. **`--send` live VERIFICADO end-to-end (2026-07-03):**
+  smoke disposable creó el post `250770` (`status=private`, `author_id=1` Julio Reyes,
+  `manifest=greenhouse-cf-smoke-orchestrator`, `owned=1`, 11 bloques, 404 a anónimos),
+  idempotencia confirmada (2ª corrida → `already_exists`), y trash de limpieza
+  (`status=trash`, solo por match de manifest+owned). El write del orquestador queda
+  probado en vivo de punta a punta. El bridge `/v1/drafts` con `authorId` queda como
+  productización futura (hoy writes OFF + `production_deploy_apply` bloqueada → wpcli
+  es la vía sancionada).
+- Doc funcional: `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`.
 
 ## Out of Scope
 

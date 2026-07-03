@@ -26,7 +26,7 @@ Canonical doc: `docs/documentation/public-site/aeo-landing-elementor.md`.
 - The service line was a real pseudo-element (`.gh-aeo-service-method::before`), not a screenshot artifact. Keep it disabled unless the visual direction explicitly changes.
 - FAQ copy and JSON-LD must move together. The source reference is `/Users/jreye/Documents/AEO/landing-aeo-efeonce-mockup.html`; live FAQ currently has 14 items and `schema3` must keep the same `FAQPage` questions.
 - Ohio inactive mega menus can create false page `scrollWidth` during screenshots. The AEO page has a scoped `gh-aeo-page-menu-overflow-guard-v1`; if overflow appears, inspect off-screen offenders before blaming the active section.
-- Growth Forms AEO is renderer v7 (`fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`) with `style_variant=diagnostic_premium`, corporate email verification, Turnstile fail-closed, premium listboxes, and no WordPress data capture. Do not restore the temporary bridge unless explicitly rolling back.
+- Growth Forms AEO is renderer v16 (`fver-bfc40c59-8d95-4d38-8ae5-0da7dc4ab468`) with `style_variant=diagnostic_premium`, corporate email verification, Turnstile fail-closed, premium listboxes, `successBehavior.presentation="success_card"`, and no WordPress data capture. Do not restore the temporary bridge unless explicitly rolling back.
 - Minimum verification after meaningful live change: `pnpm public-website:verify-aeo-wordpress-guards`, `pnpm public-website:verify-aeo-live-contract`, section-specific verifier/captures, desktop plus mobile 390, `scrollWidth == clientWidth`, and `heroans` unchanged unless the hero was intentionally edited.
 
 ## Section Map
@@ -55,9 +55,11 @@ Do not reintroduce text-editor eyebrows with lines, pseudo-elements, uppercase, 
 Current approved market copy:
 
 - H2 `marketh`: `El descubrimiento se mudó a la búsqueda con IA. La mayoría de las marcas son invisibles ahí.`
-- Card 2 body: `De los consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir qué comprar — en todas las generaciones.`
-- Card 3 body: `Probabilidad de que los motores de IA repitan la misma lista de marcas en dos respuestas. Sin un sistema, tu aparición es azar.`
-- Bottom statement: `SEO te hacía rankear. AEO decide si los motores de IA te mencionan, te citan y te recomiendan — antes de que exista un clic.`
+- Card 1 body: `<strong class="gh-aeo-card-takeaway">El tráfico que antes llegaba solo ya no está garantizado.</strong>` + `El tráfico orgánico de clientes HubSpot cayó 27% interanual. La búsqueda tradicional ya no alcanza por sí sola.`
+- Card 2 body: `<strong class="gh-aeo-card-takeaway">Tu comprador ya le pregunta a la IA qué elegir.</strong>` + `Uno de cada dos consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir compras.`
+- Card 3 body: `<strong class="gh-aeo-card-takeaway">Aparecer una vez no es una estrategia.</strong>` + `Los motores de IA casi nunca repiten la misma lista de marcas. Sin sistema, tu visibilidad depende del azar.`
+- Bottom statement: `SEO te hacía competir por el ranking. AEO te hace competir por la recomendación: que la IA te entienda, te cite y te elija — antes de que exista un clic.`
+- Visual markers: `gh-aeo-market-card-takeaway-spacing-v1`, `gh-aeo-market-card-polish-no-top-accent-v1`, `gh-aeo-market-card-polish-specificity-v1`, `gh-aeo-market-quote-watermark-v1`. The takeaway renders as a block with a small margin before the proof copy. Metric cards no longer use the teal top accent line; they keep a quiet white gradient, hairline border and softer shadow. Desktop adds a low-opacity SVG closing quote (`”`) as an editorial watermark, positioned mostly to the right of the third card so the closing-quote silhouette stays legible while still sitting behind the card system; keep it clear of the fixed social rail. It is hidden below `1024px`. Mobile 390 uses `height:auto` + `min-height:286px` for `.gh-aeo-metric-card` so source marks stay visible after the added narrative line.
 
 Market source mark contract:
 
@@ -70,14 +72,16 @@ Current approved pipeline copy:
 - H2: `Aparecer en las respuestas de IA no es vanidad. Es pipeline.`
 - Lead: `Cuando tu marca es la que los motores de IA nombran, ganas algo más que visibilidad: ganas la conversación de compra antes que tu competencia. Y el tráfico que llega desde ahí llega más decidido a comprar.`
 - Card 1 body: `Los visitantes que llegan desde motores de IA convierten cerca de 4,4 veces más que los de búsqueda orgánica: llegan pre-calificados por el propio motor.`
-- Card 2 body: `De los leads de Docebo ya provienen del tráfico de IA tras priorizar su visibilidad en motores generativos.`
+- Card 2 body: `Los compradores B2B ya usan IA para investigar, comparar y decidir. La oportunidad es aparecer en esas respuestas antes de que lleguen a ventas.`
 - Bottom statement: `Por eso el AEO no es un experimento de marketing: es un canal de adquisición temprano, con ventaja para quien llega primero.`
 
 Pipeline visual contract:
 
 - Proof cards use compact proof tiles (`gh-aeo-pipeline-compact-proof-tiles-v1`), not the previous giant row-card layout.
 - Semrush source mark must use the real AXIS/primitive SVG logotype inline (`semrush-logotype.svg`, `viewBox="0 0 363 44"`), not local text styled as a wordmark.
-- Docebo remains an inline accessible wordmark; HubSpot uses the SVG served from WordPress.
+- The second proof card uses `Compra B2B` / `94%` and the Forrester 2026 source. The Forrester source mark must use the transparent PNG uploaded to WordPress (`forrester-logo-transparent-*.png`) with `role="img"`/`aria-label="Forrester"` and child `<img alt="">`; do not restore the old Docebo/HubSpot source combo or the `~15%` lead-source proof.
+- The Forrester paragraph has an optical type tune via `.gh-aeo-pipeline-proof-copy-forrester p` (`17px` desktop, `16px` mobile, proportional line-height) because the shorter copy otherwise reads visually larger than the Semrush paragraph even when computed at the same size.
+- The center rail pseudo-element in `.gh-aeo-pipeline::before` stays disabled by the page-scoped `gh-aeo-pipeline-proof-update-v1` CSS marker; do not reintroduce the vertical line between the cards.
 
 Current approved levels copy:
 
@@ -182,8 +186,8 @@ Identifiers:
 - Form slug: `efeonce-aeo-diagnostic`
 - Form definition: `fdef-efeonce-aeo-diagnostic`
 - Form key: `b120566a-dd1a-43c8-956a-4e0121e805b8`
-- Current published version: `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad` (v7; `style_variant=diagnostic_premium`, declares `copy.submit="Empezar con mi diagnóstico →"`, preserves `ui_policy_json.security.captcha` and aligns premium select placeholders/listboxes)
-- Deprecated versions: v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657`, v1 `fver-efeonce-aeo-diagnostic-v1`
+- Current published version: `fver-bfc40c59-8d95-4d38-8ae5-0da7dc4ab468` (v16; `style_variant=diagnostic_premium`, declares `copy.submit="Empezar con mi diagnóstico →"`, preserves `ui_policy_json.security.captcha`, streamlined Success Card with `steps=[]` and approved placeholders including `fullName.placeholder="ej. María González"`)
+- Deprecated versions: v15 `fver-1139a7f7-4e62-4fb7-8e5c-be024652d217`, v14 `fver-2cc79ff4-6dcc-404e-b79b-094bd0a81e29`, v13 `fver-1f727049-6600-4d68-8089-1718b9edd54e`, v12 `fver-f933f877-c1ff-4e76-9832-2078ca64c6dd`, v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`, v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657`, v1 `fver-efeonce-aeo-diagnostic-v1`
 - Surface: `fhsf-efeonce-aeo-diagnostic`
 - API base: `https://greenhouse.efeoncepro.com`
 - Turnstile site key in render contract: `0x4AAAAAADqwX2R7v-k9pItv`
@@ -192,7 +196,7 @@ Identifiers:
 
 Fields:
 
-- `firstName`
+- `fullName`
 - `email`
 - `brandWebsite`
 - `country`
@@ -233,7 +237,11 @@ Approved conversion copy (2026-07-02 — de-duplicated vs hero/H2; subhead now c
 - `.gh-aeo-growth-form-card` is the only visible card.
 - Do not expose internal kickers such as `Growth Forms · Diagnóstico AEO`.
 - Public card starts directly with the rendered form fields; do not restore the old internal H3 `Solicita tu diagnóstico AEO` unless the operator explicitly asks for it.
+- Direct scheduling link: the visible/fallback form-card CTA uses `Agenda una reunión` with a decorative calendar icon, not `Agenda una conversación` nor the arrow-only treatment. It must be visually separated from the preceding question (`display:flex`, 12px row gap) and the icon/text pair must stay aligned with a 16px calendar icon and 8px internal gap. Hover for this link and `política de privacidad` must not use underline, background, border, or shadow; approved feedback is teal color shift. `Agenda una reunión` may add a subtle calendar icon micro-lift/scale; reduced-motion disables it. Keyboard focus keeps a visible outline. Live markers: `gh-aeo-calendar-meeting-chevron-v1`, `gh-aeo-meeting-link-spacing-v1`, `gh-aeo-link-hover-modern-v1`, `gh-aeo-link-hover-minimal-v1`, `gh-aeo-link-hover-signal-final-v1`; rollback backups `_gh_backup_before_aeo_agenda_meeting_chevron_20260703T095511Z`, `_gh_backup_before_aeo_meeting_link_spacing_20260703T101900Z`, `_gh_backup_before_aeo_link_hover_modern_20260703T103300Z`, `_gh_backup_before_aeo_link_hover_minimal_20260703T104200Z`, `_gh_backup_before_aeo_link_hover_signal_final_20260703T110000Z`.
+- Success Card AEO must stay concise and non-duplicative: title `Tu informe de visibilidad va en camino.`, body `Lo estamos preparando y te llegará por correo apenas esté listo.`, support `Si quieres avanzar antes, en la reunión revisamos oportunidades concretas para mejorar tu visibilidad en IA.`, one primary action `Agenda una reunión`, no numbered steps (`steps=[]`). When the Success Card is visible, hide the external `.gh-aeo-growth-form-proof`, `.gh-aeo-growth-form-direct` and `.gh-aeo-growth-form-privacy` footer to avoid duplicate scheduling CTAs. The success state should not show a teal inner frame/top line or persistent card focus frame; keep keyboard focus visible on actionable controls. Live markers: `gh-aeo-success-card-polish-v1`, `gh-aeo-success-card-compact-steps-v1`, `gh-aeo-success-card-recraft-popper-v1`, `gh-aeo-success-card-borderless-v1`; rollback backups `_gh_backup_before_aeo_success_card_polish_20260703T071500Z`, `_gh_backup_settings_before_aeo_success_card_polish_20260703T071500Z`, `_gh_backup_before_aeo_success_card_compact_steps_20260703T072200Z`, `_gh_backup_settings_before_aeo_success_card_compact_steps_20260703T072200Z`, `_gh_backup_before_aeo_success_card_recraft_popper_20260703T115248Z`, `_gh_backup_settings_before_aeo_success_card_recraft_popper_20260703T115248Z`, `_gh_backup_before_aeo_success_card_borderless_20260703T121057Z`, `_gh_backup_settings_before_aeo_success_card_borderless_20260703T121057Z`.
 - Renderer live layout: desktop pairs short fields/selects (`Nombre` + `Email`, `País` + `Tamaño`) and keeps long intent fields full-width; mobile 390 stacks to one column with no horizontal overflow. Single selects use premium combobox/listbox, not the native OS popup.
+- Readiness copy (`Todo listo para solicitar el diagnóstico`) must be centered under the primary submit CTA, not aligned to the field column. Live marker: `gh-aeo-readiness-centered-v1`; rollback backup `_gh_backup_before_aeo_readiness_centered_20260703T122245Z`.
+- Premium select chevrons must not inherit the native-select `focus-within` transform. In the AEO host, `gh-aeo-calendar-meeting-chevron-v1` keeps the icon wrapper stable (`transform:none`) and rotates only the chevron pseudo-element; upstream renderer source owns the same root fix.
 
 Typography:
 

@@ -26,7 +26,7 @@ const baseFacts: OperatorCrossSellFacts = {
   organizationDomain: 'globe.com',
   leadType: 'new_business',
   report: baseReport,
-  reportUrl: 'https://greenhouse.efeoncepro.com/grader/r/grt-token'
+  reportUrl: 'https://think.efeoncepro.com/brand-visibility/r/grt-token'
 }
 
 describe('deriveAeoCheckResult', () => {

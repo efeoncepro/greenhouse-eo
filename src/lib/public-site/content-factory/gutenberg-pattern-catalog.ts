@@ -1,10 +1,9 @@
 import type { GutenbergBlockPatternCatalog, GutenbergBlockPatternCatalogEntry } from './contracts'
+import { renderHeadingBlock, renderYoastTableOfContents } from './gutenberg-blocks'
 
-const headingExample = [
-  '<!-- wp:heading {"level":2} -->',
-  '<h2>Que cambia para el equipo comercial</h2>',
-  '<!-- /wp:heading -->'
-].join('\n')
+// Examples are generated from the canonical block builders so they are always
+// anchored + populated by construction (regression guard for the 250748 defect).
+const headingExample = renderHeadingBlock({ level: 2, text: 'Que cambia para el equipo comercial' })
 
 const paragraphExample = [
   '<!-- wp:paragraph -->',
@@ -33,11 +32,10 @@ const pullquoteExample = [
   '<!-- /wp:pullquote -->'
 ].join('\n')
 
-const tocExample = [
-  '<!-- wp:yoast-seo/table-of-contents -->',
-  '<div class="wp-block-yoast-seo-table-of-contents yoast-table-of-contents"><h2>Tabla de contenidos</h2></div>',
-  '<!-- /wp:yoast-seo/table-of-contents -->'
-].join('\n')
+const tocExample = renderYoastTableOfContents([
+  { level: 2, text: 'Que cambia para el equipo comercial' },
+  { level: 3, text: 'Como aterrizarlo' }
+])
 
 const youtubeExample = [
   '<!-- wp:embed {"url":"https://www.youtube.com/watch?v=VIDEO_ID","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->',
@@ -67,7 +65,8 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
     constraints: [
       'Never generate H1 in post_content.',
       'Use H2 for major sections and H3 for children.',
-      'Do not jump from H2 directly to H4.'
+      'Do not jump from H2 directly to H4.',
+      'Emit via renderHeadingBlock(): every heading needs class="wp-block-heading" + an id="h-{slug}" anchor so the TOC can link to it.'
     ],
     example: headingExample
   },
@@ -78,7 +77,11 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
     refreshPolicy: 'preserve',
     description: 'Yoast table of contents block used by long Efeonce editorial posts.',
     requires: ['Multiple H2/H3 sections'],
-    constraints: ['Place after intro/TL;DR and before the body outline.', 'Preserve if present in existing posts.'],
+    constraints: [
+      'Place after intro/TL;DR and before the body outline.',
+      'Preserve if present in existing posts.',
+      'Must be populated with anchor links via renderYoastTableOfContents(outline); an empty TOC (title only) renders as a dead heading.'
+    ],
     example: tocExample
   },
   {
