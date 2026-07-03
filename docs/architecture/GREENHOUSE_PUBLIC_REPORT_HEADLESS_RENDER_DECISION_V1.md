@@ -117,3 +117,38 @@ Verificación en código (TASK-1246, 2026-07-01): **la parte de este ADR que dec
 - **Tensión con el approach forms-engine:** el grader ya es embebible con el mismo web component `<greenhouse-form>` que `/aeo-2/` usa live en WordPress (TASK-1298). Eso hace que "reconstruir el render en Astro/efeonce-web" sea **redundante** para el form (no para el render rico del informe, que sí es distinto). La parte **de datos** de este ADR (contrato headless `model`/`modelVersion`/`header`) sí se implementó (TASK-1280) y es válida; la parte de **dónde se pinta** quedó abierta.
 
 **Decisión abierta (reabre la Open Question #4):** la cara pública del grader self-serve puede ser (a) embed `<greenhouse-form>` del form `fdef-ai-visibility-grader` en WordPress (como `/aeo-2/`) + render del informe consumiendo el contrato headless, o (b) efeonce-web (Astro) como decía este ADR. **Resolver antes de "lanzar" el lead magnet self-serve** — hoy simplemente no hay dónde llenarlo. No tratar el render efeonce-web como hecho.
+
+## ✅ Delta 2026-07-03 — RESUELTO: hub dedicado `efeonce-think` + plan de 2 superficies
+
+Cierra la Open Question reabierta el 2026-07-01 ("dónde se pinta la cara pública"). **La parte de datos de este ADR (contrato headless `model`/`modelVersion`/`header`, TASK-1280) sigue válida; lo que se resuelve acá es el DÓNDE y el CÓMO.**
+
+### Decisión de infra (operador, 2026-07-03)
+
+El render + la landing del lead magnet **NO viven en `efeonce-web`** sino en un **repo + proyecto Vercel dedicado: `efeoncepro/efeonce-think` → `think.efeoncepro.com`** (hub de lead magnets). Razón: desacoplar el lanzamiento del lead magnet de la migración completa del sitio raíz (más lenta) + aislar blast radius. **Convergencia planificada en `efeonce-web` más adelante** → por eso nace con **mismo stack (Astro 7), marca compartida y URL final** para que el merge no obligue a re-trabajo ni rompa links. El repo es **gobernable desde Greenhouse** (lleva `greenhouse.repo.json`, schema `greenhouse.externalRepo.v1`; cableado del control plane multi-repo = TASK-1326).
+
+### El hub tiene 2 superficies públicas
+
+| Superficie | Ruta | Rol | Index |
+|---|---|---|---|
+| **A. Render del informe** | `think.efeoncepro.com/brand-visibility/r/<token>` | el lead **VE** su reporte (llega desde el email) | **noindex** |
+| **B. Landing + form** | `think.efeoncepro.com/brand-visibility` | usuario nuevo **DEJA sus datos** (intake self-serve) | sí |
+
+Loop completo: `landing (B) → form → grader corre async → email con enlace → clic → render (A)`.
+
+### Cómo se construye cada una (qué ya existe)
+
+- **A — Render:** el **diseño + modelo del informe YA existen** (TASK-1252: `report-artifact/model.ts` = `ReportArtifactModel` con score, niveles percepción/agentic, `primaryGap`, recomendaciones, `engineSnapshot`; `report-artifact/web/*` = render React/MUI; + print/PDF/no-leak tests). El hub **NO rediseña**: **porta ese layout a Astro + Tailwind** y pinta el mismo modelo que sirve TASK-1280 (render "tonto", fetch server-side, token no expuesto). No se importa MUI al sitio público (hard rule del ADR).
+- **B — Landing/form:** el form del grader **ya es gobernado** (`fdef-ai-visibility-grader`, formKey `69cd5269…`, surface `fhsf-ai-visibility-grader`). La landing **NO construye un form nuevo**: **embebe `<greenhouse-form form-key="69cd5269…">`** (renderer portable), heredando validación, consent, Turnstile, telemetry y el path submission→outbox→pipeline. Es el mismo web component que `/aeo-2/` usa live (TASK-1298). Esto **resuelve la tensión** que notaba el Delta 2026-07-01: no se reconstruye el form, se embebe; el render rico del informe (que sí es distinto) se porta a Tailwind.
+
+### Marca compartida (decisión práctica)
+
+Para pintar el informe con la identidad AXIS sin bloquear: **copiar los tokens AXIS al Tailwind del hub ahora** (config CSS-first) y **formalizar un paquete compartido después** (consumible por hub + efeonce-web al converger). No duplicar lógica; solo los valores de token, con plan de consolidación.
+
+### Secuencia y mapa de tasks
+
+1. **TASK-1325** (in-progress) — hub + **Slice 2 = render (A)**. Prioridad: desbloquea el bug del email. Slice 1 (repo+Vercel+deploy+dominio+SSL) ✅.
+2. **TASK-1324** — repuntar el enlace de los correos a `/brand-visibility/r/<token>` (arregla el 404). Se destraba cuando A esté verificado.
+3. **TASK-1326** — control plane multi-repo (gobernar `efeonce-think` desde el portal).
+4. **TASK-1327** — landing + embed del form (**B**), self-serve. Task nueva (creada 2026-07-03).
+
+**Hard rule que se mantiene:** Greenhouse = dueño del dato/modelo; el hub = render tonto. Ni scoring ni derivación en Astro. `engineSnapshot` es público (headline), no leak.
