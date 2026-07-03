@@ -207,6 +207,18 @@ Prefijar con un contexto explícito (`DEPLOY_UID`, `BUILD_PPID`, etc.) o usar mi
 
 **Regla**: arch-architect review obligatorio para CUALQUIER cambio en `src/lib/secrets/`, `src/lib/release/`, `src/lib/auth-secrets.ts`, workflow files, deploy scripts. Costo: 90s. Beneficio: previene 3h de churn.
 
+### 7. Confundir latencia de evidencia o skip esperado con deploy omitido
+
+**Caso real (TASK-1328, 2026-07-03)**: el primer orquestador fallo porque `main` todavia no tenia toda la evidencia para el `target_sha` (CI/smoke en carrera). Despues el release termino bien, pero surgio la duda de si Azure o `ico-batch-worker` se habian skippeado. Azure habia hecho `no_infra_diff` esperado; `ico-batch-worker` si ejecuto deploy, paso health y quedo `Ready=True`. El drift real era solo `ops-worker`, detectado por watchdog.
+
+**Regla**:
+
+- Preflight race por CI/smoke faltante = esperar o disparar el check para el SHA exacto; no cambiar gates.
+- Azure `no_infra_diff` = skip esperado solo si el job termina `success` y el summary explica la razon.
+- Worker "skip/no deploy" = aceptable solo si Cloud Run ya expone el `target_sha` o el watchdog queda OK.
+- Si `pnpm release:watchdog --json` reporta `worker_revision_drift`, el release no esta cerrado aunque el orquestador haya terminado.
+- Ante duda operacional, mirar job summary/log + Cloud Run `Ready=True` + `GIT_SHA`; no inferir desde el nombre del job.
+
 ---
 
 ## Decisión: ¿cuándo eliminar / relajar el preflight?

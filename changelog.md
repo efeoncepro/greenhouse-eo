@@ -9541,3 +9541,8 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 - El AI Visibility public report ahora publica snapshots despues de probes/readiness: `executeClaimedGraderRun` ejecuta `gatherRunProbes()` antes de `finalizeRunDelivery()`.
 - `ReportArtifactModel` expone readiness, denominadores por motor, fuentes citadas por dominio, categoria condicional y provenance sin filtrar prompts, respuestas raw ni URLs completas; `Be Actionable` usa `readiness.agentic.overallScore`.
 - `efeonce-think` renderiza los bloques public-safe de metodologia, cobertura por motor, fuentes y readiness; categoria solo aparece cuando hay datos reales. Release Greenhouse PR #140 + hub `f4e0747` live. Produccion validada con token `grt-45361f263b724327a4d4b95dc8c04ab624c2946469514712bbdcfccef1364b86`; `ico-batch-worker` deployado, watchdog 4/4 workers OK.
+
+## 2026-07-03 — Production release learning: skip esperado vs drift real
+
+- Se actualizo el runbook de produccion, playbook de incidentes, watchdog runbook y skills Codex/Claude para no confundir Azure `no_infra_diff` con fallo ni asumir que un worker fue skippeado sin Cloud Run `Ready=True` + `GIT_SHA` o watchdog OK.
+- Se canonizo el caso TASK-1328: el primer preflight fallo por carrera de evidencia CI/smoke; `ico-batch-worker` si deployo; el drift real fue `ops-worker` y el release solo quedo cerrado tras watchdog `aggregateSeverity: ok`.

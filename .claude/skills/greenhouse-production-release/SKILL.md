@@ -58,6 +58,7 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 - Never run `git push`, GitHub workflow dispatch, Cloud Run deploy, Vercel promotion, rollback, DB release transition, or approval gate without explicit user approval for that external mutation.
 - Never bypass `production-release.yml` because "the workers already deployed".
 - Never introduce or change a production deploy workflow without updating `src/lib/release/workflow-allowlist.ts`, the orchestrator wiring, tests, docs, and this skill.
+- Never infer that Azure or a worker "skipped" from the workflow name alone. Read the job summary/logs and verify Cloud Run `Ready=True` + `GIT_SHA` or watchdog OK. Azure `no_infra_diff` can be an expected no-op; worker revision drift is never a clean release closure.
 - **Never `git push` to `main` (including hotfixes, doc-only commits, or fixes "that don't affect workers") without immediately dispatching the canonical orchestrator `production-release.yml` with `target_sha=<HEAD del push>`.** Every commit on `main` MUST be tracked by a release manifest. The Vercel auto-deploy on `push:main` is NOT a release — only the manifest in `greenhouse_sync.release_manifests` reflects what production is supposed to be. **Anti-pattern detectado 2026-05-14**: Codex pushó 3 hotfixes directo a main (`982accaf`, `4fe799cf`, `cfea1784`) post un release ajeno; Vercel auto-deployó pero el manifest quedó en el SHA del release anterior → drift cosmético + audit trail roto.
 - **Never cherry-pick to `main` a commit that also exists on `develop`.** Creates duplicate SHAs for the same logical change (caso real 2026-05-14: `fa5258a5/4fe799cf` mismo diff distinto SHA), confuses audit trail, breaks the exact mirror between develop/main. Canonical hotfix path: branch from `main` → fix → PR → merge → orchestrator dispatch → cherry-pick back to develop (not the other direction).
 - **Never assume "hotfix small, no orchestrator needed"** — the rule has zero exceptions outside break-glass. Even a typo fix to `main` requires orchestrator dispatch to keep manifest aligned. If the fix is too trivial for a release manifest, it's too trivial to push to `main` — merge to develop and wait for the next regular release.
@@ -154,9 +155,12 @@ LIMIT 5;
    - incomplete orchestrator run
    - direct worker deploy
    - push-triggered partial deploy
+   - workflow no-op/skip that left Cloud Run on an older `GIT_SHA`
    - stale manifest
    - Cloud Run deployment failure
-4. Prefer a fresh orchestrator attempt for the verified target SHA. Use a
+4. Prefer a fresh orchestrator attempt for the verified target SHA. If a
+   worker workflow skipped due to perceived runtime equivalence but watchdog
+   still reports drift, treat it as incomplete closure, not success. Use a
    single worker workflow dispatch only as break-glass when the orchestrator is
    blocked and the user approves the external mutation.
    - For `hubspot-greenhouse-integration`, use:
@@ -173,7 +177,8 @@ gh workflow run hubspot-greenhouse-integration-deploy.yml \
      reports `drift_count=0`. Do not edit `greenhouse_sync.release_manifests`
      by SQL to fix drift.
 5. Re-run watchdog.
-6. Document the incident in `Handoff.md`.
+6. Document the incident in `Handoff.md`, including whether the suspected skip
+   was expected (`no_infra_diff`) or real drift (`worker_revision_drift`).
 
 ## Break-Glass
 
