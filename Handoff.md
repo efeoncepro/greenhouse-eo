@@ -28,6 +28,16 @@
 >
 > **Evidencia local:** `eslint` focal verde, `vitest` focal verde (`AdaptiveSidecarLayout` + interaction mode), `pnpm nexa:doc-gate --changed` verde, Playwright desktop `/home` con preferencia `lane` midió panel top/right/bottom `16px` y `pageOverflowX=0`; mobile `414px` cae a Drawer temporary y mantiene `pageOverflowX=0`. GVC canónico `pnpm fe:capture nexa-lane-sidecar --env=local` verde en desktop/mobile (`.captures/2026-07-02T21-26-24_nexa-lane-sidecar`, 22 frames). `pnpm typecheck` quedó bloqueado por errores preexistentes ajenos en Growth AI visibility (`brand-intelligence` test + `growth-aeo-diagnostic-grader-run-from-submission.ts`).
 
+## Sesion 2026-07-02 — TASK-1321 AEO `/aeo-2/` → Grader auto-run — Claude — 🚧 code complete · smoke staging OK · rollout parcial
+
+> **Smoke E2E staging (2026-07-02) + 3 fixes de providers:** se pusheó a `develop` (deploy ops-worker staging verde) y se corrió un submit de prueba `/aeo-2/`. **Core VALIDADO:** submit → outbox → reactive consumer → mi projection dispara → adapter remap (market "MX" de "México") → **categoría resuelta** → run encolado (`EO-GRUN-00032`) + lead materializado. El smoke destapó 3 problemas de providers (ninguno es código de 1321), 2 arreglados:
+> 1. **Router brand-intelligence sin fallthrough** → categoría no resolvía. FIX: `router.ts` cae al siguiente provider en extract-error (no solo unconfigured) + test. Commit `9a7a240dc`. Probado live: Berel resuelve vía OpenAI tras error de Gemini.
+> 2. **Perplexity `missing_secret`** (dual-location): el ref estaba en Vercel pero NO en `services/ops-worker/deploy.sh` (declaraba OpenAI/Anthropic, nunca Perplexity). FIX: agregado al deploy.sh (declara+cablea+bindea). Commit `1e7b45b5a`. **Pusheado — aplica al redeploy** (`b6beab6a5`).
+> 3. **Gemini `provider_error` = 403 dunning de GCP** (`"Lightning dunning decision is deny"`): hold de cobranza de Google sobre Vertex/Generative AI (cuenta open pero pago vencido). **El operador pagó 2026-07-02**; esperando propagación del hold. NO es código. Monitor en background chequea cada 20 min. Ver **ISSUE-113**.
+> - El informe del smoke salió `unavailable` (solo OpenAI produjo datos → gate `insufficient_data`). Con Perplexity wireado (post-redeploy) el run tendrá ≥2 providers → debería generar informe. **Pendiente: re-smoke con marca NO-cliente** (Bresler/Cencosud — NO usar clientes como Berel; regla del operador) para confirmar informe + correo con PDF.
+> - Limpieza: el lead de prueba (PII) borrado; submission/run/observations son append-only (TASK-1226/1229, no se borran); **cero contaminación de HubSpot** (handoff no sincronizó, `hubspot_synced_at` null).
+> - **NO se validó límite fino de roles/tiers** ni el flip prod. Rollout real sigue = release control plane develop→main (con Success Card 1319/1320).
+
 ## Sesion 2026-07-02 — TASK-1321 AEO `/aeo-2/` → Grader auto-run — Claude — 🚧 code complete · rollout pendiente
 
 > **Pedido:** `/implement-task 1321` — conectar el submit de `/aeo-2/` (`fdef-efeonce-aeo-diagnostic`) con el pipeline del AEO Grader (email event-driven con PDF + dedup lead), local-first sin push.
