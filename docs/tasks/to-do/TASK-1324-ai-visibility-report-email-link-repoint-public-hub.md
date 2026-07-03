@@ -1,5 +1,9 @@
 # TASK-1324 — AI Visibility report email link → 404 (repoint al hub público)
 
+## Delta 2026-07-03 — DESBLOQUEADA por TASK-1325 (hub live)
+
+El destino del repoint ya existe y está vivo: **`https://think.efeoncepro.com/brand-visibility/r/<token>`** responde 200 con token real (render enterprise, `noindex`, fetch server-side). TASK-1325 quedó **complete**. Esta task ya puede ejecutarse: fijar esa URL canónica como fuente única (correo + HubSpot `report_url`), repuntar `buildPublicReportUrl` vía env var dedicada, actualizar el ADR y opcionalmente agregar un redirect puente desde la ruta vieja `greenhouse.efeoncepro.com/grader/r/<token>` (404 hoy). Es el último paso para cerrar el loop del lead magnet (el correo llega con enlace roto hasta que esto se haga).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

@@ -1,3 +1,21 @@
+## Sesion 2026-07-03 - Hub público del informe (efeonce-think): render enterprise + escalera canonizada como primitiva - Claude - live
+
+> **Pedido:** el enlace del correo del AI Visibility Grader daba 404; construir el render del informe en `think.efeoncepro.com` (repo/Vercel dedicado `efeonce-think`), llevarlo de crudo a **enterprise** sección por sección en loop GVC con skills product-design, hacer 4 pasadas secuenciales (tipografía → motion/microinteracciones → copywriting → SEO/AEO), y finalmente **canonizar la escalera como primitiva canónica**. Cierre: documentar todo en greenhouse.
+>
+> **Resultado (TASK-1325 COMPLETE, live):** `https://think.efeoncepro.com/brand-visibility/r/<token>` → **200** con token real. Ejecución en el repo externo `efeoncepro/efeonce-think` (Astro 7 + Tailwind 4 + GSAP + ECharts; Vercel team `efeonce-7670142f`, auto-deploy en push a `main`). En `greenhouse-eo` NO hay cambio de código (el endpoint headless TASK-1280 ya existía) — sólo documentación.
+>
+> **Render (`src/pages/brand-visibility/r/[token].astro`):** narrativa de arriba a abajo — hero (gauge navy + veredicto, count-up + arc draw) → evidencia por motor (`EngineMark`, logos reales gemini/chatgpt/claude/perplexity/google, monograma fallback, sin emoji) → benchmark competitivo (`CompetitiveBenchmark`) → **escalera de madurez 5-Be** → brecha + qué hacer → detalle por dimensión (chips/badges de severidad + score prominente + borde por severidad) + radar ECharts → CTA navy → footer plomo. Motion GSAP "se arma" al scroll con `prefers-reduced-motion` + **fail-safe** (nunca deja contenido en blanco si el JS falla). OG/Twitter cards para unfurl + `noindex` correcto (informe per-lead) por el ADR.
+>
+> **Primitiva canónica `MaturityLadder` (la escalera):** contrato tipado desacoplado del modelo del grader (`src/lib/primitives/ladder.ts`, `LadderRung`) + componente self-contained (estilos + motion propios: peldaños suben + count-up) en `src/components/primitives/MaturityLadder.astro`. El informe la consume vía **adapter** (`Level[] + LEVEL_COPY → LadderRung[]`), se removió el motion de la escalera del script de página y la vieja `LevelLadder.astro`. Catálogo de primitivas en `src/components/primitives/README.md`. Patrón replicable por lead magnets futuros (SEO/otros) — un primitive = una SoT, muchos consumers.
+>
+> **Marca:** tokens AXIS copiados al hub (`src/lib/report-tokens.ts` — `axis` + `severityMeta`), duplicación temporal documentada; consolidación a paquete compartido al converger en `efeonce-web`.
+>
+> **Verificación:** `pnpm build` limpio + GVC (`scripts/capture.mjs`) desktop/mobile mirado en cada iteración (frame real, no aserciones ciegas). Fuera de los gates de `greenhouse-eo` (Astro, sin Vuexy/MUI/GVC del portal).
+>
+> **Docs greenhouse-eo actualizados:** ADR `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md` (Delta live + repo de render = `efeonce-think`); TASK-1325 → `complete/` con Delta Slices 2+3; TASK-1324 nota de desbloqueo (destino vivo); `docs/tasks/README.md` sincronizado; `changelog.md`; skill `seo-aeo` (pointer al render live). Repo `efeonce-think`: `README.md` + `src/components/primitives/README.md`.
+>
+> **Follow-ups:** **TASK-1324** (repoint del enlace de los correos al hub — desbloqueada; el correo sigue con link roto hasta hacerlo); **TASK-1327** (Superficie B: landing + embed del form gobernado); **TASK-1326** (control plane multi-repo para gobernar `efeonce-think` desde el portal); convergencia futura en `efeonce-web` (conservar subdominio/URL).
+
 ## Sesion 2026-07-03 - Public Site AEO pipeline proof Forrester - Codex - live
 
 > **Pedido:** en `/aeo-2/`, quitar la línea vertical que aparecía entre las cards de `pipeline`, reemplazar la cita/caso Docebo porque no aportaba a la narrativa AEO y usar el logo Forrester provisto por el operador.

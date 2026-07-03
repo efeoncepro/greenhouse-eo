@@ -1,7 +1,7 @@
 # Greenhouse Public AI Visibility Report — Headless Render Decision V1
 
 > **Tipo:** ADR / Decision record · **Estado:** Accepted (2026-06-28) · **Dominio:** growth · ai-visibility · EPIC-020
-> **Repos:** `efeoncepro/greenhouse-eo` (data owner) · `efeoncepro/efeonce-web` (render) · `efeoncepro/efeonce-public-site-runtime` (WordPress, queda fuera de este flujo)
+> **Repos:** `efeoncepro/greenhouse-eo` (data owner) · `efeoncepro/efeonce-think` (render live — hub de lead magnets, `think.efeoncepro.com`; ver Delta de infra 2026-07-03) · `efeoncepro/efeonce-web` (convergencia futura) · `efeoncepro/efeonce-public-site-runtime` (WordPress, queda fuera de este flujo)
 
 ## Decisión
 
@@ -152,3 +152,13 @@ Para pintar el informe con la identidad AXIS sin bloquear: **copiar los tokens A
 4. **TASK-1327** — landing + embed del form (**B**), self-serve. Task nueva (creada 2026-07-03).
 
 **Hard rule que se mantiene:** Greenhouse = dueño del dato/modelo; el hub = render tonto. Ni scoring ni derivación en Astro. `engineSnapshot` es público (headline), no leak.
+
+### Delta 2026-07-03 (live) — Superficie A desplegada y enterprise (TASK-1325 COMPLETE)
+
+La **Superficie A (render del informe)** está **viva en producción**: `https://think.efeoncepro.com/brand-visibility/r/<token>` → 200 con token real, `noindex`, fetch server-side (token no expuesto), sin re-derivar scoring. DNS resuelto + SSL emitido. Se llevó de skeleton a **acabado enterprise** en loop GVC + skills product-design (4 pasadas: tipografía · motion/microinteracciones · copywriting · SEO/AEO), con narrativa de arriba a abajo (hero gauge navy → evidencia por motor → benchmark → **escalera de madurez** → brecha + qué hacer → detalle + radar → CTA) y motion GSAP robusto (reduced-motion + fail-safe).
+
+**Primitiva canónica del hub — `MaturityLadder` (la "escalera"):** el render de la escalera 5-Be se canonizó como **primitiva reutilizable** del hub: contrato tipado desacoplado del modelo del grader (`src/lib/primitives/ladder.ts`, `LadderRung`) + componente self-contained (estilos + motion propios) en `src/components/primitives/MaturityLadder.astro`; el informe la consume vía adapter (`Level[] + LEVEL_COPY → LadderRung[]`). Patrón replicable por lead magnets futuros (SEO/otros). Catálogo: `efeonce-think/src/components/primitives/README.md`.
+
+**Marca:** los tokens AXIS se copiaron al hub (`efeonce-think/src/lib/report-tokens.ts` — `axis` + `severityMeta`), duplicación temporal por la decisión práctica de arriba; consolidación a paquete compartido al converger en `efeonce-web`.
+
+**Estado del loop:** falta sólo el repoint del enlace de los correos = **TASK-1324** (ahora desbloqueada; la URL final `/brand-visibility/r/<token>` está viva y estable). Superficie B (landing + form) = **TASK-1327**.

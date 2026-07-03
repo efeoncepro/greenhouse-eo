@@ -1,5 +1,28 @@
 # TASK-1325 — Public lead-magnet hub: repo + Vercel + render del informe en think.efeoncepro.com
 
+## Delta 2026-07-03 — Slices 2 + 3 completos y live → TASK COMPLETE
+
+**El hub renderiza el informe end-to-end, enterprise, en producción.** `https://think.efeoncepro.com/brand-visibility/r/<token>` → **200** con un token real, `noindex`, fetch server-side (token no expuesto), sin re-derivar scoring. DNS resuelto + SSL emitido (Slice 3 cerrado).
+
+**Slice 2 — render completo + acabado enterprise (loop GVC + skills product-design):**
+
+- **Narrativa de arriba a abajo** (`src/pages/brand-visibility/r/[token].astro`): hero (gauge navy + veredicto) → evidencia por motor → benchmark competitivo → **la escalera de madurez** → brecha + qué hacer → detalle por dimensión + radar (ECharts tree-shaken) → CTA navy. Concepto B (navy) elegido por el operador.
+- **Motion "se arma"** (GSAP): count-up, gauge arc draw, barras, section reveals — robusto: `prefers-reduced-motion` + fail-safe (nunca deja contenido en blanco si el JS falla).
+- **4 pasadas de calidad secuenciales** (pedido del operador): Tipografía → Motion/microinteracciones (focus-visible, easing tokens) → Copywriting (consistencia es-CL, guía de lectura) → SEO/AEO (OG/Twitter cards para unfurl, `noindex` correcto por ADR, framework 5 Be bien representado). Motores con logos reales (`EngineMark`, monograma fallback, sin emoji).
+- **Footer**: fondo plomo casi negro; eslogan "Empower your Growth" medido con GVC hasta quedar más chico **y** más angosto que el logo.
+- **Jerarquía de la sección "Por qué ocurre"**: chips/badges de severidad + título destacado + score prominente + borde por severidad.
+- **Marca**: tokens AXIS copiados a `src/lib/report-tokens.ts` (`axis` + `severityMeta`) — duplicación temporal documentada (ADR); consolidación a paquete compartido al converger en `efeonce-web`.
+
+**La escalera canonizada como PRIMITIVA canónica del hub (`MaturityLadder`):**
+
+- Contrato tipado desacoplado del modelo del grader: `src/lib/primitives/ladder.ts` (`LadderRung`).
+- `src/components/primitives/MaturityLadder.astro` — presentación pura + self-contained (estilos + motion propios: peldaños suben + count-up, reduced-motion + fail-safe).
+- El informe usa un **adapter** (`Level[] + LEVEL_COPY → LadderRung[]`) + `<MaturityLadder rungs={…} />`; se eliminó el motion de la escalera del script de página y la vieja `LevelLadder.astro`. Doc del catálogo: `src/components/primitives/README.md`. Patrón replicable para lead magnets futuros (SEO/otros).
+
+**Verificado (gates del repo hub):** `pnpm build` limpio + GVC desktop/mobile mirado en cada iteración. Ejecución fuera de los gates de `greenhouse-eo` (Astro + Tailwind, sin Vuexy/MUI).
+
+**Único acceptance restante fuera de esta task:** comunicar/repuntar la URL del correo = **TASK-1324** (sigue to-do; ahora desbloqueada — la URL final `/brand-visibility/r/<token>` está viva y estable).
+
 ## Delta 2026-07-03 — Slice 1 desplegado (repo + Vercel + skeleton + dominio)
 
 **Slice 1 hecho y vivo:**
@@ -19,7 +42,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -32,7 +55,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Slice 1 live (repo+Vercel+deploy+dominio); DNS propagando, SSL pendiente; Slice 2/3 pendientes`
+- Status real: `COMPLETE — hub live enterprise en think.efeoncepro.com/brand-visibility/r/<token> (render + DNS + SSL); escalera canonizada como primitiva MaturityLadder. Follow-up: TASK-1324 (repoint del correo, desbloqueada).`
 - Rank: `TBD`
 - Domain: `growth|platform|public-site`
 - Blocked by: `none`
