@@ -99,8 +99,8 @@ Greenhouse es un app Next.js con login para clientes (`(dashboard)`), pero **ya 
 ## Open questions (deliberadamente no decididas)
 
 1. **Forma de exponer el modelo:** ✅ **Resuelto (TASK-1280, 2026-07-01): extender `GET /report/[token]`** con `model` (variant `publicWeb`) + `modelVersion` + `header` top-level en el payload por defecto (aditivo, back-compat; se conserva el DTO crudo `report`). No se creó endpoint `/model` paralelo ni `?format=model`. Contrato + no-leak cubiertos por `route-contract.test.ts`.
-2. **App del hub:** ✅ **Resuelto (operador, 2026-06-28): `efeonce-web`** sirve `think.efeoncepro.com` (Vercel multi-dominio, un proyecto; reuso total de brand + patrón WP-headless). No se crea repo nuevo.
-3. **Ruta del informe dentro del hub:** `think.efeoncepro.com/ai-visibility/[publicId]` u otra; convención de rutas por lead magnet.
+2. **App del hub:** ✅ **Resuelto — SUPERSEDED (operador, 2026-07-03): repo/proyecto Vercel dedicado `efeoncepro/efeonce-think`** (NO `efeonce-web`; ver "Decisión de infra 2026-07-03" arriba). La premisa 2026-06-28 (`efeonce-web`, "no se crea repo nuevo") quedó reemplazada por el hub dedicado, con convergencia futura en `efeonce-web`.
+3. **Ruta del informe dentro del hub:** ✅ **Resuelto (TASK-1325/1324, 2026-07-03): `think.efeoncepro.com/brand-visibility/r/<token>`**, llave del path = `report_token` (no `[publicId]`). El helper `buildPublicReportUrl` (`src/lib/growth/ai-visibility/hubspot/report-link.ts`) genera esta URL, resuelta por env var `PUBLIC_GRADER_HUB_URL` (default = hub prod); es fuente única del correo + HubSpot `report_url`. Los links viejos `/grader/r/<token>` del portal se recuperan con un redirect puente 307 en `next.config.ts`.
 4. **Landing del grader:** ¿se construye en el hub Astro, o el form sigue en WP posteando al mismo intake? (No bloquea el contrato.)
 
 ## Delta 2026-07-01 — TASK-1280 (contrato headless implementado en Greenhouse)

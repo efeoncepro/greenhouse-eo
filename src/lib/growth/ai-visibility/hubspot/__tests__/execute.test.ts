@@ -20,7 +20,7 @@ vi.mock('../../report/command', async () => {
 })
 vi.mock('../report-link', () => ({
   getLatestReportTokenForRun: vi.fn().mockResolvedValue('tok-123'),
-  buildPublicReportUrl: (token: string) => `https://x/grader/r/${token}`,
+  buildPublicReportUrl: (token: string) => `https://think.efeoncepro.com/brand-visibility/r/${token}`,
 }))
 vi.mock('../crm-client', () => ({ upsertLeadToHubSpot: vi.fn() }))
 

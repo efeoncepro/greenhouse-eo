@@ -14,7 +14,7 @@ const baseProps = {
     importance: 'Limita tu visibilidad en respuestas generativas.',
     action: 'Publica contenidos pilar sobre tus temas clave.'
   },
-  reportUrl: 'https://greenhouse.efeoncepro.com/grader/r/grt-abc',
+  reportUrl: 'https://think.efeoncepro.com/brand-visibility/r/grt-abc',
   attachmentFilename: 'informe-visibilidad-ia-acme.pdf',
   attachmentSizeLabel: '~2 MB'
 }

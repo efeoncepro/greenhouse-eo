@@ -7,7 +7,7 @@ vi.mock('@/lib/growth/ai-visibility/flags', () => ({ isReportEmailDeliveryEnable
 vi.mock('@/lib/growth/ai-visibility/public-intake/store', () => ({ getGraderLeadForHandoff: vi.fn() }))
 vi.mock('@/lib/growth/ai-visibility/hubspot/report-link', () => ({
   getLatestReportTokenForRun: vi.fn(),
-  buildPublicReportUrl: (token: string) => `https://greenhouse.efeoncepro.com/grader/r/${token}`
+  buildPublicReportUrl: (token: string) => `https://think.efeoncepro.com/brand-visibility/r/${token}`
 }))
 vi.mock('@/lib/growth/ai-visibility/report/snapshot', () => ({ readPublicGraderReport: vi.fn() }))
 vi.mock('@/lib/email/delivery', () => ({ sendEmail: vi.fn() }))

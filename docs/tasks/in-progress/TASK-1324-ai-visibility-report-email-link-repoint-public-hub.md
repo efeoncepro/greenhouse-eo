@@ -4,13 +4,40 @@
 
 El destino del repoint ya existe y está vivo: **`https://think.efeoncepro.com/brand-visibility/r/<token>`** responde 200 con token real (render enterprise, `noindex`, fetch server-side). TASK-1325 quedó **complete**. Esta task ya puede ejecutarse: fijar esa URL canónica como fuente única (correo + HubSpot `report_url`), repuntar `buildPublicReportUrl` vía env var dedicada, actualizar el ADR y opcionalmente agregar un redirect puente desde la ruta vieja `greenhouse.efeoncepro.com/grader/r/<token>` (404 hoy). Es el último paso para cerrar el loop del lead magnet (el correo llega con enlace roto hasta que esto se haga).
 
+## Delta 2026-07-03 — Implementación (code complete en develop local, ROLLOUT PENDIENTE)
+
+**Slices 1+2+3 implementados** (develop local, sin push — local-first):
+
+- **Slice 2 (helper):** `buildPublicReportUrl` ([report-link.ts](../../src/lib/growth/ai-visibility/hubspot/report-link.ts)) ahora arma `${PUBLIC_GRADER_HUB_URL||'https://think.efeoncepro.com'}/brand-visibility/r/<token>`. Env var **dedicada** `PUBLIC_GRADER_HUB_URL` (NO `NEXT_PUBLIC_APP_URL`=portal), default-safe = hub prod. Fuente única → correo + HubSpot `report_url` heredan. Docstring actualizado.
+- **Anti-regresión:** `report-link.test.ts` nuevo — default al hub, override por env, normaliza trailing slash, **NUNCA** `greenhouse.efeoncepro.com/grader/r` (cierra el bug class; era el follow-up del §Follow-ups).
+- **Slice 3 (redirect puente):** `next.config.ts` `async redirects()` → `/grader/r/:token` → hub (307, reversible). Recupera los correos YA ENVIADOS con el link roto.
+- Tests consumers + defaults cosméticos actualizados (execute/property-mapper/cross-sell/dispatch-email + email tsx/test + templates.ts).
+- **Slice 1 (doc):** ADR open questions #2/#3 marcadas resueltas/superseded (URL final + env var + redirect); `FEATURE_FLAG_STATE_LEDGER` registra `PUBLIC_GRADER_HUB_URL`.
+
+**Verificado local:** focal 37/37 + broad growth+emails 90 files/626 tests verdes; `pnpm typecheck` limpio; lint de tocados limpio.
+
+**⚠️ Por qué sigue `in-progress` (Runtime Rollout Gate):** el correo del grader se envía desde **producción** (TASK-1321 live). El fix arregla el 404 solo **tras deploy a `main`**. Default-safe = hub prod → NO requiere setear env var en Vercel. Cierre a `complete` cuando: deploy a prod + correo real → clic → informe vivo (no 404) + `report_url` en HubSpot al mismo destino (§Production verification sequence).
+
+## Delta 2026-07-03 — narrativa del informe debe venir del modelo
+
+Durante el polish gráfico del renderer `efeonce-think` se confirmó una regla de contrato: el hub Astro puede **presentar datos medidos o derivados mecánicamente** del `ReportArtifactModel` (`overallScore`, ejes, `engineSnapshot`, `competitiveSov`, `citationInsight`, `levels`, `dimensions`, `primaryGap`, `recommendations`), pero **no debe inventar lecturas ejecutivas hardcodeadas** que luego queden pegadas a informes de otros clientes. Si se quiere una tesis narrativa tipo "lectura ejecutiva", "por qué importa" o "siguiente conversación comercial", esa frase debe salir de Greenhouse como campo gobernado del modelo headless y el renderer debe limitarse a mostrarla.
+
+Contrato sugerido para una task backend/data posterior o delta de esta task si el scope se amplía:
+
+- `model.executiveSummary.title` / `model.executiveSummary.body` — tesis ejecutiva específica del cliente, generada desde evidencia del grader.
+- `model.executiveSummary.highlights[]` — chips narrativos con `{ label, value, severity?, sourceDimension? }`, siempre trazables a scores/dimensiones reales.
+- `model.partialCoverageNote` — explicación del alcance cuando `gate.status = partial`.
+- `model.nextConversationPrompt` — frase comercial corta para el CTA, gobernada desde backend/ops.
+
+Mientras esos campos no existan, el hub sólo debe mostrar labels neutros, chips y resúmenes agrupados a partir de datos presentes.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -23,10 +50,10 @@ El destino del repoint ya existe y está vivo: **`https://think.efeoncepro.com/b
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `In progress — repoint del helper + env var + redirect puente (TASK-1325 desbloqueó el destino)`
 - Rank: `TBD`
 - Domain: `growth|integrations`
-- Blocked by: `TASK-1325 (hub público live en think.efeoncepro.com — repo + proyecto Vercel + DNS)`
+- Blocked by: `none (TASK-1325 complete — hub live en think.efeoncepro.com)`
 - Branch: `task/TASK-1324-ai-visibility-report-email-link-repoint-public-hub`
 - Legacy ID: `none`
 - GitHub Issue: `none`

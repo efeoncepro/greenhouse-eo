@@ -9,7 +9,7 @@ const baseFacts = (overrides: Partial<LeadHandoffFacts> = {}): LeadHandoffFacts 
   lastName: null,
   brandName: 'Acme',
   lastSubmitAt: '2026-06-25T10:00:00.000Z',
-  reportUrl: 'https://greenhouse.efeoncepro.com/grader/r/tok123',
+  reportUrl: 'https://think.efeoncepro.com/brand-visibility/r/tok123',
   report: {
     overallScore: 47,
     scoreVersion: 'ai_visibility_score_v1',
@@ -38,7 +38,7 @@ describe('buildHubSpotLeadHandoffPayload', () => {
     expect(props[AI_VISIBILITY_COMPANY_PROPERTIES.primaryGap]).toBe('entity_clarity')
     expect(props[AI_VISIBILITY_COMPANY_PROPERTIES.recommendedMotion]).toBe('entity_foundation')
     expect(props[AI_VISIBILITY_COMPANY_PROPERTIES.competitorsDetected]).toBe('Globex, Initech')
-    expect(props[AI_VISIBILITY_COMPANY_PROPERTIES.reportUrl]).toBe('https://greenhouse.efeoncepro.com/grader/r/tok123')
+    expect(props[AI_VISIBILITY_COMPANY_PROPERTIES.reportUrl]).toBe('https://think.efeoncepro.com/brand-visibility/r/tok123')
     expect(props[AI_VISIBILITY_COMPANY_PROPERTIES.lastRunAt]).toBe('2026-06-25T09:00:00.000Z')
   })
 

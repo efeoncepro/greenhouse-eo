@@ -1,3 +1,20 @@
+## Sesion 2026-07-03 - TASK-1324 repoint del enlace del correo al hub (code complete, rollout pendiente) - Claude
+
+> **Pedido:** `/implement-task 1324` — el enlace de los correos del AI Visibility Grader apunta a `greenhouse.efeoncepro.com/grader/r/<token>` (404) porque el render migró al hub headless `efeonce-think`. Repuntar el helper a la URL canónica del hub. Local-first en develop, sin push.
+>
+> **Causa raíz:** `buildPublicReportUrl` (`src/lib/growth/ai-visibility/hubspot/report-link.ts`, **fuente única** del link del correo + HubSpot `report_url`) armaba `${NEXT_PUBLIC_APP_URL||portal}/grader/r/<token>` — path que NO existe en el portal (0 páginas `/grader/**`, 0 redirects). Contrato de URL desactualizado tras el ADR headless, no bug de lógica.
+>
+> **Implementado (code complete en develop local, SIN push):**
+> - **Helper repunteado** → `${PUBLIC_GRADER_HUB_URL||'https://think.efeoncepro.com'}/brand-visibility/r/<token>`. Env var **dedicada** `PUBLIC_GRADER_HUB_URL` (NO reusar `NEXT_PUBLIC_APP_URL` = portal), default seguro = hub prod. Correo + HubSpot heredan por ser fuente única.
+> - **Test anti-regresión** nuevo (`__tests__/report-link.test.ts`): default apunta al hub, override por env, normaliza trailing slash, y **NUNCA** retorna `greenhouse.efeoncepro.com/grader/r` (cierra el bug class — follow-up del spec).
+> - **Redirect puente 307** en `next.config.ts`: `/grader/r/:token` → hub. Recupera los correos YA ENVIADOS con el link roto (no solo los futuros). Reversible (revert+redeploy).
+> - Tests consumers + defaults cosméticos de preview actualizados (execute/property-mapper/cross-sell/dispatch-email + email tsx/test + templates.ts).
+> - Docs: ADR (open questions #2/#3 marcadas resueltas/superseded con la URL final + env var + redirect); `FEATURE_FLAG_STATE_LEDGER` (host config `PUBLIC_GRADER_HUB_URL`, default-safe).
+>
+> **Verificado local:** focal 37/37 + broad growth+emails **90 files / 626 tests verdes**; `pnpm typecheck` limpio; lint de tocados limpio; 0 refs residuales `grader/r` en `src/` salvo el comentario del bug + la aserción anti-regresión.
+>
+> **⚠️ Rollout pendiente (Runtime Rollout Gate):** el correo del grader se envía desde **producción** (TASK-1321 live). El fix arregla el 404 solo **tras deploy a `main`**. Hoy queda **code complete en develop local, sin push** (local-first). `PUBLIC_GRADER_HUB_URL` tiene default-safe = hub prod → NO requiere setear env var en Vercel para funcionar (opcional para apuntar a staging del hub). Al desplegar: verificar correo real → clic → informe vivo (no 404) + `report_url` en HubSpot al mismo destino. Lifecycle sigue `in-progress` hasta confirmar el flujo en prod.
+
 ## Sesion 2026-07-03 - Hub público del informe (efeonce-think): render enterprise + escalera canonizada como primitiva - Claude - live
 
 > **Pedido:** el enlace del correo del AI Visibility Grader daba 404; construir el render del informe en `think.efeoncepro.com` (repo/Vercel dedicado `efeonce-think`), llevarlo de crudo a **enterprise** sección por sección en loop GVC con skills product-design, hacer 4 pasadas secuenciales (tipografía → motion/microinteracciones → copywriting → SEO/AEO), y finalmente **canonizar la escalera como primitiva canónica**. Cierre: documentar todo en greenhouse.
