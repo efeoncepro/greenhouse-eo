@@ -1,12 +1,25 @@
 # TASK-1325 — Public lead-magnet hub: repo + Vercel + render del informe en think.efeoncepro.com
 
+## Delta 2026-07-03 — Slice 1 desplegado (repo + Vercel + skeleton + dominio)
+
+**Slice 1 hecho y vivo:**
+
+- **Repo:** [`efeoncepro/efeonce-think`](https://github.com/efeoncepro/efeonce-think) (público) — Astro **7.0.6** + adapter Vercel 11 + React 19 + Tailwind 4, espeja el stack de `efeonce-web`. Commit inicial + `greenhouse.repo.json` (repo gobernado, mirror `sky-efeonce`).
+- **Vercel:** proyecto `efeonce-think` en team **`efeonce-7670142f`** (`prj_F4gvS8jmWjvdJ8cTwM6k60R1XydV`, scope correcto, NO personal) + GitHub conectado → auto-deploy en cada push.
+- **Deploy vivo:** `https://efeonce-think.vercel.app` (HTTP 200, público, sin SSO); ruta SSR `/brand-visibility/r/[token]` responde **404 honesto** para token inválido (prueba el fetch headless a Greenhouse TASK-1280 + noindex).
+- **Dominio:** `think.efeoncepro.com` agregado al proyecto; registro **A → `76.76.21.21`** creado en HostGator y **propagando** (resuelve vía 8.8.8.8). **Pendiente:** emisión automática del SSL por Vercel (asíncrona, minutos).
+
+**Pendiente en esta task:** Slice 2 (render completo del `ReportArtifactModel` con Tailwind + blend AXIS) + Slice 3 (confirmar SSL/DNS live) + decisión de marca compartida.
+
+**Gobierno desde Greenhouse:** el repo nació marcado (`greenhouse.repo.json`), pero el cableado del lado Greenhouse (binding multi-repo + control plane) es **TASK-1326**.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +32,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Slice 1 live (repo+Vercel+deploy+dominio); DNS propagando, SSL pendiente; Slice 2/3 pendientes`
 - Rank: `TBD`
 - Domain: `growth|platform|public-site`
 - Blocked by: `none`
@@ -259,6 +272,7 @@ El resto (report artifact, disclosure matrix, estados, copy es-CL) está descrit
 
 - **TASK-1324** — repoint del enlace de los correos al hub (se toma apenas la URL final `/brand-visibility/r/<token>` esté viva).
 - **Landing `/brand-visibility` + embed del form de intake** — task nueva. El form ya existe gobernado (`fdef-ai-visibility-grader`, formKey `69cd5269…`); la landing lo **embebe** con `<greenhouse-form>` (renderer portable), NO construye un form nuevo. Hereda por construcción validación, consent, Turnstile, telemetry, poll (TASK-1245) y el path submission→outbox→pipeline (fachada `createPublicGraderRunViaFormsEngine`, flag `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED`). Verificar antes: que el grader tenga versión de **render** publicada para el renderer portable (hoy su versión es anchor de submission + resuelta por slug; confirmar el contrato de render). Es superficie aparte del report-render de 1325.
+- **TASK-1326** — cableado de gobierno del lado Greenhouse (binding multi-repo + GitHub Control Plane para `efeonce-think`), para operarlo desde el portal. El repo ya nació marcado (`greenhouse.repo.json`); 1326 cierra el lado Greenhouse.
 - Convergencia del hub dentro de `efeonce-web` (futuro): plegar el hub conservando el subdominio/URL para no romper links ni re-apuntar.
 
 ## Open Questions
