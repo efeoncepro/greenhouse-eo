@@ -27,6 +27,11 @@ type GuardPayload = {
   conversHasMinimalLinkHover: boolean
   conversHasHoverSignal: boolean
   conversHasFinalHoverSignal: boolean
+  conversHasSuccessCardPolish: boolean
+  conversHasSuccessCardCompactSteps: boolean
+  conversHasSuccessCardRecraftPopper: boolean
+  conversHasSuccessCardBorderless: boolean
+  conversHasReadinessCentered: boolean
 }
 
 const expectedHeroansHash = 'e0b951b2456a83578cd9e22005900521'
@@ -113,6 +118,11 @@ $payload = array(
   'conversHasMinimalLinkHover' => strpos($convers_html, 'gh-aeo-link-hover-minimal-v1') !== false,
   'conversHasHoverSignal' => strpos($convers_html, 'gh-aeo-link-hover-signal-v1') !== false,
   'conversHasFinalHoverSignal' => strpos($convers_html, 'gh-aeo-link-hover-signal-final-v1') !== false,
+  'conversHasSuccessCardPolish' => strpos($convers_html, 'gh-aeo-success-card-polish-v1') !== false,
+  'conversHasSuccessCardCompactSteps' => strpos($convers_html, 'gh-aeo-success-card-compact-steps-v1') !== false,
+  'conversHasSuccessCardRecraftPopper' => strpos($convers_html, 'gh-aeo-success-card-recraft-popper-v1') !== false,
+  'conversHasSuccessCardBorderless' => strpos($convers_html, 'gh-aeo-success-card-borderless-v1') !== false,
+  'conversHasReadinessCentered' => strpos($convers_html, 'gh-aeo-readiness-centered-v1') !== false,
 );
 
 echo "${phpStartMarker}\\n";
@@ -196,6 +206,26 @@ const assertPayload = (payload: GuardPayload) => {
 
   if (!payload.conversHasFinalHoverSignal) {
     throw new Error('convers widget is missing the AEO final link hover signal marker')
+  }
+
+  if (!payload.conversHasSuccessCardPolish) {
+    throw new Error('convers widget is missing the AEO success card polish marker')
+  }
+
+  if (!payload.conversHasSuccessCardCompactSteps) {
+    throw new Error('convers widget is missing the AEO success card compact steps marker')
+  }
+
+  if (!payload.conversHasSuccessCardRecraftPopper) {
+    throw new Error('convers widget is missing the AEO success card Recraft party popper marker')
+  }
+
+  if (!payload.conversHasSuccessCardBorderless) {
+    throw new Error('convers widget is missing the AEO success card borderless marker')
+  }
+
+  if (!payload.conversHasReadinessCentered) {
+    throw new Error('convers widget is missing the AEO readiness centered marker')
   }
 }
 

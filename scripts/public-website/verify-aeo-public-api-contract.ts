@@ -55,7 +55,7 @@ const slug = 'efeonce-aeo-diagnostic'
 const formKey = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 const surfaceId = 'fhsf-efeonce-aeo-diagnostic'
 const expectedTurnstileSiteKey = '0x4AAAAAADqwX2R7v-k9pItv'
-const expectSuccessCard = process.argv.includes('--expect-success-card') || process.env.AEO_EXPECT_SUCCESS_CARD === 'true'
+const expectSuccessCard = !process.argv.includes('--no-expect-success-card') && process.env.AEO_EXPECT_SUCCESS_CARD !== 'false'
 
 const fetchJson = async <T>(url: string, init: RequestInit): Promise<{ status: number; headers: Headers; json: T; raw: string }> => {
   const response = await fetch(url, init)
@@ -132,7 +132,7 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
   const legacyFirstName = getField(contract, 'firstName')
 
   if (!fullName) {
-    throw new Error(`${label} is missing fullName field; expected AEO v8 Nombre completo contract`)
+    throw new Error(`${label} is missing fullName field; expected AEO Nombre completo contract`)
   }
 
   if (
@@ -181,6 +181,16 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
 
     if (!success.body && !success.bodyCopyRef) {
       throw new Error(`${label} success card is missing body/bodyCopyRef`)
+    }
+
+    if (
+      success.title !== 'Tu informe de visibilidad va en camino.' ||
+      success.body !== 'Lo estamos preparando y te llegará por correo apenas esté listo.' ||
+      success.supportingNote !== 'Si quieres avanzar antes, en la reunión revisamos oportunidades concretas para mejorar tu visibilidad en IA.' ||
+      !Array.isArray(success.steps) ||
+      success.steps.length !== 0
+    ) {
+      throw new Error(`${label} success card copy drifted: ${JSON.stringify(success)}`)
     }
 
     if (Array.isArray(success.steps) && success.steps.length > 4) {

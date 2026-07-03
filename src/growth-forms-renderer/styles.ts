@@ -30,6 +30,7 @@ export const RENDERER_CSS = `
     --ghf-error: #b32338;
     --ghf-error-bg: #fdecef;
     --ghf-success: #1f9d57;
+    --ghf-celebration: #ffb703;
     --ghf-radius: 8px;
     --ghf-gap: 16px;
     --ghf-focus: #2563eb;
@@ -57,6 +58,7 @@ export const RENDERER_CSS = `
     --ghf-error: #a73b2e;
     --ghf-error-bg: #fff7f5;
     --ghf-success: #17885f;
+    --ghf-celebration: #ffb703;
     --ghf-radius: 12px;
     --ghf-gap: 18px;
     --ghf-focus: #24b8b0;
@@ -80,6 +82,7 @@ export const RENDERER_CSS = `
       --ghf-error: #ff8aa0;
       --ghf-error-bg: #2a151b;
       --ghf-success: #34d399;
+      --ghf-celebration: #ffd166;
       --ghf-field-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
       --ghf-field-shadow-focus: 0 0 0 4px rgba(108, 140, 255, 0.18);
       --ghf-action-shadow: 0 10px 24px rgba(0, 0, 0, 0.34);
@@ -361,10 +364,28 @@ export const RENDERER_CSS = `
   .ghf-error-summary-list a { color: var(--ghf-error); text-underline-offset: 2px; }
 
   /* TASK-1256 Slice 1d — hint "listo para enviar / faltan N". */
-  .ghf-actions-wrap { display: grid; gap: 8px; }
-  .ghf-readiness { margin: 0; font-size: 0.8125rem; color: var(--ghf-muted); display: flex; align-items: center; gap: 6px; }
+  .ghf-actions-wrap { display: grid; gap: 10px; min-width: 0; }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-actions-wrap { justify-items: center; }
+  .ghf-readiness {
+    width: fit-content;
+    max-width: 100%;
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--ghf-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+  }
   .ghf-readiness:empty { display: none; }
-  .ghf-readiness[data-ready="true"] { color: var(--ghf-success); font-weight: 600; }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-readiness {
+    width: min(100%, 420px);
+    margin-inline: auto;
+    justify-self: center;
+  }
+  .ghf-readiness[data-ready="true"] { color: var(--ghf-success); font-weight: 650; }
   .ghf-readiness[data-ready="true"]::before { content: "✓"; font-weight: 700; }
 
   /* TASK-1256 Slice 1d — contador de caracteres. */
@@ -528,18 +549,18 @@ export const RENDERER_CSS = `
     position: relative;
     isolation: isolate;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 14px;
+    justify-items: center;
+    gap: 18px;
     width: 100%;
     min-width: 0;
-    padding: 18px;
-    border: 1px solid color-mix(in srgb, var(--ghf-success) 28%, var(--ghf-border));
-    border-radius: var(--ghf-radius);
-    background:
-      linear-gradient(135deg, color-mix(in srgb, var(--ghf-success) 12%, transparent), transparent 48%),
-      color-mix(in srgb, var(--ghf-bg) 94%, var(--ghf-field-bg));
+    max-width: 640px;
+    margin-inline: auto;
+    padding: 28px 24px;
+    border: 1px solid color-mix(in srgb, var(--ghf-success) 24%, var(--ghf-border));
+    border-radius: max(14px, var(--ghf-radius));
+    background: color-mix(in srgb, var(--ghf-bg) 96%, var(--ghf-field-bg));
     color: var(--ghf-fg);
-    box-shadow: var(--ghf-field-shadow);
+    box-shadow: 0 18px 44px rgba(16, 24, 39, 0.07);
     overflow: hidden;
     transform-origin: 50% 0%;
     animation: ghf-success-card-in 360ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -547,29 +568,14 @@ export const RENDERER_CSS = `
   .ghf-success-card::before {
     content: "";
     position: absolute;
-    inset: 0 18% auto;
-    height: 2px;
+    inset: 0 28% auto;
+    height: 3px;
     border-radius: 999px;
-    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--ghf-success) 72%, white), transparent);
-    opacity: 0.88;
+    background: color-mix(in srgb, var(--ghf-success) 72%, var(--ghf-accent));
+    opacity: 0.72;
     transform: scaleX(0);
     transform-origin: center;
     animation: ghf-success-line 560ms cubic-bezier(0.16, 1, 0.3, 1) 70ms both;
-    z-index: 0;
-  }
-  .ghf-success-card__aura {
-    position: absolute;
-    inset: -32px -22px auto auto;
-    width: min(210px, 58%);
-    aspect-ratio: 1;
-    border-radius: 999px;
-    background:
-      radial-gradient(circle, color-mix(in srgb, var(--ghf-success) 20%, transparent) 0%, transparent 68%),
-      radial-gradient(circle at 42% 38%, color-mix(in srgb, var(--ghf-accent) 12%, transparent), transparent 62%);
-    opacity: 0;
-    transform: translate3d(8px, -8px, 0) scale(0.82);
-    animation: ghf-success-aura 720ms cubic-bezier(0.16, 1, 0.3, 1) 40ms both;
-    pointer-events: none;
     z-index: 0;
   }
   .ghf-success-card__mark,
@@ -578,9 +584,18 @@ export const RENDERER_CSS = `
     z-index: 1;
   }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-success-card {
-    padding: 20px;
-    border-color: color-mix(in srgb, var(--ghf-success) 34%, var(--ghf-border));
-    box-shadow: 0 18px 44px rgba(16, 24, 39, 0.08), 0 1px 0 rgba(255, 255, 255, 0.72) inset;
+    padding: 30px 28px;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-success-card::before {
+    content: none;
+    display: none;
+  }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-success-card:focus-visible {
+    outline: none;
   }
   .ghf-success-card:focus { outline: none; }
   .ghf-success-card:focus-visible {
@@ -592,43 +607,73 @@ export const RENDERER_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
-    margin-block-start: 2px;
-    border-radius: 999px;
-    color: color-mix(in srgb, var(--ghf-success) 82%, white);
-    background:
-      linear-gradient(145deg, color-mix(in srgb, var(--ghf-success) 22%, white), color-mix(in srgb, var(--ghf-success) 16%, transparent)),
-      color-mix(in srgb, var(--ghf-success) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--ghf-success) 42%, white);
-    box-shadow:
-      0 12px 28px color-mix(in srgb, var(--ghf-success) 20%, transparent),
-      0 1px 0 rgba(255, 255, 255, 0.72) inset;
+    width: 88px;
+    height: 88px;
+    margin-block-start: 0;
+    border-radius: 0;
+    color: color-mix(in srgb, var(--ghf-success) 84%, var(--ghf-fg));
+    background: transparent;
+    border: 0;
+    box-shadow: none;
     flex: 0 0 auto;
     animation: ghf-success-mark-land 440ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
   }
   .ghf-success-card__mark::before {
-    content: "";
-    position: absolute;
-    inset: -8px;
-    border-radius: inherit;
-    border: 1px solid color-mix(in srgb, var(--ghf-success) 26%, transparent);
-    opacity: 0;
-    transform: scale(0.58);
-    animation: ghf-success-ring 680ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+    content: none;
   }
   .ghf-success-card__mark-glyph {
     display: inline-flex;
+    width: 88px;
+    height: 88px;
     line-height: 1;
-    font-weight: 800;
-    font-size: 1.02rem;
     transform-origin: center;
     animation: ghf-success-check 320ms cubic-bezier(0.16, 1, 0.3, 1) 210ms both;
   }
+  .ghf-success-card__mark-glyph svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .ghf-success-card__mark-disc {
+    fill: color-mix(in srgb, var(--ghf-success) 14%, var(--ghf-field-bg));
+    stroke: color-mix(in srgb, var(--ghf-success) 74%, var(--ghf-accent));
+    stroke-width: 2.4;
+  }
+  .ghf-success-card__mark-check {
+    stroke: color-mix(in srgb, var(--ghf-success) 72%, var(--ghf-fg));
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .ghf-success-card__spark {
+    stroke: color-mix(in srgb, var(--ghf-accent) 76%, var(--ghf-success));
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  .ghf-success-card__spark--dot {
+    stroke-width: 5;
+  }
+  .ghf-success-card__party-popper-fill {
+    fill: var(--ghf-accent);
+  }
+  .ghf-success-card__party-popper-ribbon {
+    fill: color-mix(in srgb, var(--ghf-fg) 72%, var(--ghf-accent));
+  }
+  .ghf-success-card__party-popper-rim {
+    fill: var(--ghf-success);
+  }
+  .ghf-success-card__party-popper-highlight {
+    fill: var(--ghf-bg);
+  }
+  .ghf-success-card__party-popper-confetti-warm {
+    fill: var(--ghf-celebration);
+  }
   .ghf-success-card__content {
     display: grid;
-    gap: 10px;
+    justify-items: center;
+    gap: 12px;
     min-width: 0;
+    text-align: center;
   }
   .ghf-success-card__content > * {
     animation: ghf-success-content-rise 360ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -646,24 +691,32 @@ export const RENDERER_CSS = `
     margin: 0;
   }
   .ghf-success-card__title {
-    font-size: 1.02rem;
-    line-height: 1.28;
-    font-weight: 750;
+    max-width: 24rem;
+    font-size: clamp(1.18rem, 1rem + 0.55vw, 1.45rem);
+    line-height: 1.22;
+    font-weight: 780;
     color: var(--ghf-fg);
   }
   .ghf-success-card__body,
   .ghf-success-card__step,
   .ghf-success-card__reward-body,
   .ghf-success-card__support {
+    max-width: 32rem;
     font-size: 0.9rem;
     line-height: 1.5;
     color: var(--ghf-muted);
   }
+  .ghf-success-card__body {
+    max-width: 34rem;
+  }
   .ghf-success-card__steps {
     display: grid;
     gap: 8px;
-    margin: 2px 0 0;
-    padding-inline-start: 1.25rem;
+    max-width: 34rem;
+    margin: 4px 0 0;
+    padding: 0;
+    list-style-position: inside;
+    text-align: start;
   }
   .ghf-success-card__step::marker {
     color: var(--ghf-success);
@@ -702,7 +755,10 @@ export const RENDERER_CSS = `
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
+    justify-content: center;
     min-width: 0;
+    width: min(100%, 420px);
+    margin-block-start: 4px;
   }
   .ghf-success-card__action,
   .ghf-success-card__reward-action {
@@ -754,13 +810,16 @@ export const RENDERER_CSS = `
 
   @container (max-width: 420px) {
     .ghf-success-card {
-      grid-template-columns: 1fr;
       gap: 12px;
-      padding: 16px;
+      padding: 22px 16px;
     }
     .ghf-success-card__mark {
-      width: 36px;
-      height: 36px;
+      width: 78px;
+      height: 78px;
+    }
+    .ghf-success-card__mark-glyph {
+      width: 78px;
+      height: 78px;
     }
     .ghf-success-card__actions,
     .ghf-success-card__reward {
@@ -790,11 +849,6 @@ export const RENDERER_CSS = `
     to { opacity: 1; transform: none; filter: none; }
   }
   @keyframes ghf-success-line { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 0.88; } }
-  @keyframes ghf-success-aura {
-    0% { opacity: 0; transform: translate3d(10px, -10px, 0) scale(0.82); }
-    42% { opacity: 0.9; }
-    100% { opacity: 0.72; transform: translate3d(0, 0, 0) scale(1); }
-  }
   @keyframes ghf-success-mark-land {
     0% { opacity: 0.76; transform: translateY(6px) scale(0.74); }
     58% { opacity: 1; transform: translateY(-1px) scale(1.04); }

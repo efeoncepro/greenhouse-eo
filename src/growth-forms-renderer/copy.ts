@@ -85,7 +85,7 @@ const esCL: RendererSystemCopy = {
   successRewardBody: 'Puedes abrirlo ahora sin volver a completar el formulario.',
   errorSummaryTitle: 'Revisa estos campos para continuar',
   fieldsRemaining: count => (count === 1 ? 'Falta 1 campo' : `Faltan ${count} campos`),
-  readyToSend: 'Todo listo para solicitar el diagnóstico',
+  readyToSend: 'Listo: ya puedes solicitar tu diagnóstico',
   draftRestored: 'Recuperamos lo que habías escrito.',
   emailVerifying: 'Verificando correo…',
   emailSuggestion: suggested => `¿Quisiste decir ${suggested}?`,

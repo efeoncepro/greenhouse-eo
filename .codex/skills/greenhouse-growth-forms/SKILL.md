@@ -253,7 +253,8 @@ Two engine capabilities added 2026-07 (TASK-1319/1320/1321) live in the companio
   boundary (bounded strings + `successCardHrefSchema` browser-safe allowlist). Any form can declare
   one; change it via clone→publish→deprecate with `preserveFormVersionFields` (never edit in place),
   and only publish `presentation='success_card'` after the renderer reaches prod (the activation
-  script's runtime guard enforces this).
+  script's runtime guard enforces this). Renderer-level mark/motion are shared; AEO WordPress markers
+  remain host-specific bridge CSS until the runtime bundle carries the source.
 - **AEO grader-on-submit:** the **landing** form `/aeo-2/` (`fdef-efeonce-aeo-diagnostic`, a
   **commercial** intake — **NOT** the grader's own self-serve form `fdef-ai-visibility-grader`) was
   given the capability to auto-run the AEO Grader on submit, via a **sibling** projection

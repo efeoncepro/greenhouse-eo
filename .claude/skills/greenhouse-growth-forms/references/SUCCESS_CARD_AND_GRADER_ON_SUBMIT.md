@@ -67,9 +67,31 @@ El renderer (`src/growth-forms-renderer/`) pinta la card cuando
 `behavior.presentation === 'success_card'`:
 
 - Núcleo: `renderer.ts` → `buildSuccessCard`.
-- Estilos: `styles.ts` → clase `ghf-success-card` (+ tokens `--ghf-*`, ver SKILL.md §Theming).
+- Icono/mark: `renderer.ts` → `buildSuccessMarkGraphic`. El mark vigente es un party-popper SVG
+  inline generado con Recraft V4.1 y normalizado a clases `ghf-success-card__party-popper-*`.
+  **Es transversal del renderer**: cualquier Growth Form que use `presentation='success_card'` lo
+  hereda cuando su host carga un bundle que contenga este renderer.
+- Estilos/motion: `styles.ts` → clase `ghf-success-card` (+ tokens `--ghf-*`, ver SKILL.md
+  §Theming). La entrada de la card, el mark y el contenido viven en el renderer y respetan
+  reduced-motion; también son transversales al bundle. El look chromeless/borderless actual está
+  acotado a `styleVariant=diagnostic_premium`.
 - Copy fallback: `copy.ts` → `successCardTitle` (defaults locale-aware si el contrato no trae título).
 - Sin `presentation='success_card'` (o presentation=inline_message) → mensaje simple histórico.
+
+**Qué quedó transversal vs. AEO-only (2026-07-03):**
+
+- **Transversal en código del renderer:** soporte `presentation='success_card'`, estructura de la
+  card, party-popper SVG, calendar icon en actions `kind='schedule'`, motion/reduced-motion,
+  telemetry allowlisted y estilos base `.ghf-success-card`.
+- **Transversal pero sólo para la variante premium:** en `styleVariant=diagnostic_premium`, la
+  Success Card queda sin marco interno, sin línea superior, sin sombra propia y sin focus frame
+  persistente sobre la card estática; la card visible la debe aportar el host. Si otra variante
+  necesita el mismo tratamiento, graduar el patrón a un token/variant de Success Card en el renderer,
+  no copiar CSS de AEO.
+- **AEO-only:** copy comercial (`Tu informe de visibilidad va en camino.`), CTA HubSpot `Agenda una
+  reunión`, ocultar proof/direct/privacy externos del host, markers live de WordPress
+  `gh-aeo-success-card-*`, `gh-aeo-readiness-centered-v1`, y backups Elementor. Esos overrides son
+  puente runtime para `/aeo-2/` mientras `renderer-latest.js`/host layer alcanzan el source.
 
 **Runtime guard (load-bearing).** Publicar `presentation='success_card'` en una versión **exige que
 el runtime productivo ya tenga el renderer**. El activation script

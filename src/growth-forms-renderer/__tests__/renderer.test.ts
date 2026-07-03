@@ -265,6 +265,28 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(JSON.stringify(actionEvents[0].detail)).not.toContain('submissionId')
   })
 
+  it('does not render fallback success steps when the contract provides an empty steps array', async () => {
+    const contract = staticContractFixture({
+      successBehavior: {
+        kind: 'inline_message',
+        presentation: 'success_card',
+        title: 'Solicitud recibida',
+        body: 'Tu informe va en camino.',
+        steps: [],
+      },
+    })
+
+    const { root } = mountInto(contract)
+
+    fillStaticRequiredFields(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    await vi.waitFor(() => expect(root.querySelector('[data-capture="growth-form-success-card"]')).not.toBeNull())
+
+    expect(root.querySelector('.ghf-success-card__steps')).toBeNull()
+    expect(root.querySelector('.ghf-success-card')?.textContent).not.toContain('Validamos la información enviada.')
+  })
+
   it('blocks submit until required consent is checked', async () => {
     const { root } = mountInto()
 
@@ -674,7 +696,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
     consent.dispatchEvent(new Event('change'))
 
     expect(readiness.getAttribute('data-ready')).toBe('true')
-    expect(readiness.textContent).toBe('Todo listo para solicitar el diagnóstico')
+    expect(readiness.textContent).toBe('Listo: ya puedes solicitar tu diagnóstico')
   })
 
   it('updates the character counter live for maxLength fields', () => {

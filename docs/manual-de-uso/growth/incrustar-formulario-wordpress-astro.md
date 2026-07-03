@@ -171,6 +171,7 @@ estilos de los campos. Esto significa dos cosas:
 `src/growth-forms-renderer/styles.ts`): `--ghf-font`, `--ghf-bg`, `--ghf-fg`,
 `--ghf-muted`, `--ghf-accent` (+`--ghf-accent-contrast`), `--ghf-field-bg`, `--ghf-border`
 (+`--ghf-border-strong`), `--ghf-error` (+`--ghf-error-bg`), `--ghf-success`,
+`--ghf-celebration`,
 `--ghf-radius`, `--ghf-gap`, `--ghf-focus`. El widget Elementor ya expone acento + ancho
 máximo en la pestaña **Estilo**; el resto se ajusta con CSS scoped al contenedor.
 
@@ -205,6 +206,14 @@ token CSS.
 ```html
 <greenhouse-form form-key="<UUID>" surface="<surfaceId>" locale="es-CL" appearance="bare" color-scheme="light"></greenhouse-form>
 ```
+
+**Success Card / Thank-you card:** si la versión publicada declara
+`successBehavior.presentation="success_card"`, el renderer pinta `.ghf-success-card`, el mark
+SVG de celebración tipo party popper, el icono calendario para acciones `schedule`, motion con
+fallback reduced-motion y telemetry allowlisted. El host no debe reimplementar esa card: solo debe
+componerla dentro de su superficie visible, trust/no-JS y layout. Si un host necesita ocultar CTAs
+externos duplicados tras el success, hazlo con CSS/JS scoped al host; si se repite en otro sitio,
+promueve el patrón al renderer antes de copiarlo.
 
 **Identidad estable `form-key` (TASK-1297, recomendado):** además de `form="<slug>"`, el
 renderer acepta `form-key="<UUID>"` — la identidad opaca, estable e inmutable del formulario

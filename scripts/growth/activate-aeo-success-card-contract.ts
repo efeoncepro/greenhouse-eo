@@ -34,9 +34,10 @@ const AEO_FORM_KEY = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 const SUCCESS_CARD_BEHAVIOR = {
   kind: 'inline_message',
   presentation: 'success_card',
-  title: 'Tu informe de visibilidad en IA va en camino',
-  body: 'Recibimos tu solicitud. Lo estamos preparando y te llegará por correo apenas esté listo.',
-  supportingNote: '¿No lo ves en tu bandeja? Revisa tu spam o escríbenos.',
+  title: 'Tu informe de visibilidad va en camino.',
+  body: 'Lo estamos preparando y te llegará por correo apenas esté listo.',
+  supportingNote: 'Si quieres avanzar antes, en la reunión revisamos oportunidades concretas para mejorar tu visibilidad en IA.',
+  steps: [],
   actions: [
     {
       kind: 'schedule',
