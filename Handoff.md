@@ -1,3 +1,13 @@
+## Sesion 2026-07-03 - TASK-1321 AEO — RELEASE A PROD COMPLETO + follow-ups - Claude
+
+> **Release a producción COMPLETO.** Promoción `develop→main` vía PR #138 (squash `release: develop→main 2026-07-03 ... (#138)`, SHA `3c82a51ab`). Orchestrator run `28638765314` → **success**: preflight 12/12 (break-glass acotado a `release_batch_policy` porque `deploy.sh`=cloud_release; los 11 de regresión pasaron limpio), 2 approval gates `Production` aprobados por API, 4 workers Cloud Run + Azure gated OK, Vercel prod READY. **Manifest `released`** (`greenhouse_sync.release_manifests`, sha `3c82a51ab`, completed 01:08).
+>
+> **Thank-you card AEO ARREGLADA (post-release):** la v10 live decía "En 24–48h" (copy viejo) — con el grader vivo el informe llega por correo en minutos. Republicada **v11** (`fver-f3c769ff`, deprecó v10) con copy event-driven validado por ux-writing + copywriting: título "Tu informe de visibilidad en IA va en camino", body "Recibimos tu solicitud. Lo estamos preparando y te llegará por correo apenas esté listo.", CTA "Agenda una conversación" → meetings.hubspot.com. Preservó `diagnostic_premium` + brandName. Vía `activate-aeo-success-card-contract.ts --apply`.
+>
+> **Copilot PR#138 nits:** (1) `successCardHref` sin normalizar → agregado `.trim()` al schema (commit `ca38bae5f`). (2) `viewportGutter` en AdaptiveSidecarLayout → **falso positivo** (`toNumericSpacing` hace `parseFloat || 0`, no crashea). 111 tests focales verdes.
+>
+> **Follow-up conocido (no bloqueante, arquitectural):** el ops-worker es un **servicio Cloud Run compartido staging+prod** (+ una sola DB `greenhouse-pg-dev`). El deploy prod del worker en el orchestrator **skipeó por el drift-check** (compara código, no ENV) → el worker quedó en `GIT_SHA=daf55cb7c` (mismo código que el release, etiqueta distinta = drift cosmético) con **secrets staging** (Resend staging). **Impacto real nulo:** los correos salen de `no-reply@efeoncepro.com` (dominio verificado en AMBAS cuentas Resend; smoke E2E envió OK). El fix robusto = que el drift-check redeploye cuando cambia el ENV (workflow release-critical, mejor como task dedicada). NO se forzó un deploy one-off porque el worker compartido se revierte a staging en el próximo push a develop.
+
 ## Sesion 2026-07-03 - TASK-1321 AEO grader-on-submit - Claude - validado E2E + prod prep (promoción pendiente)
 
 > **Pedido:** implementar el grader-on-submit de `/aeo-2/` (submit → auto-run del AEO Grader → informe por correo + lead HubSpot), y luego "todo activo en prod, avanzar end-to-end sin preguntar".
