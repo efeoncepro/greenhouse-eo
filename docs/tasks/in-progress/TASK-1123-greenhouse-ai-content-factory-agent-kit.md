@@ -672,10 +672,14 @@ implementado).
   (`buildGovernedDraftWriteEval`): private, idempotente por `manifestId`, UTF-8 nowdoc
   (gotcha #2), ownership + Yoast meta, readback JSON parseable; generaliza el método
   del post 250748 (unit-tested). Verificado: dry-run `validation=pass` sin write; gate
-  rehúsa `--send` sin author-id. **Pendiente:** un `--send` live disposable (smoke +
-  trash) para probar el write del orquestador end-to-end — requiere OK del operador
-  (write a producción). El bridge `/v1/drafts` con `authorId` queda como productización
-  futura (hoy writes OFF + `production_deploy_apply` bloqueada → wpcli es la vía).
+  rehúsa `--send` sin author-id. **`--send` live VERIFICADO end-to-end (2026-07-03):**
+  smoke disposable creó el post `250770` (`status=private`, `author_id=1` Julio Reyes,
+  `manifest=greenhouse-cf-smoke-orchestrator`, `owned=1`, 11 bloques, 404 a anónimos),
+  idempotencia confirmada (2ª corrida → `already_exists`), y trash de limpieza
+  (`status=trash`, solo por match de manifest+owned). El write del orquestador queda
+  probado en vivo de punta a punta. El bridge `/v1/drafts` con `authorId` queda como
+  productización futura (hoy writes OFF + `production_deploy_apply` bloqueada → wpcli
+  es la vía sancionada).
 - Doc funcional: `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`.
 
 ## Out of Scope
