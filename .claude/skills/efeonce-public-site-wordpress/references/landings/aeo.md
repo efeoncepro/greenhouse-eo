@@ -55,9 +55,11 @@ Do not reintroduce text-editor eyebrows with lines, pseudo-elements, uppercase, 
 Current approved market copy:
 
 - H2 `marketh`: `El descubrimiento se mudó a la búsqueda con IA. La mayoría de las marcas son invisibles ahí.`
-- Card 2 body: `De los consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir qué comprar — en todas las generaciones.`
-- Card 3 body: `Probabilidad de que los motores de IA repitan la misma lista de marcas en dos respuestas. Sin un sistema, tu aparición es azar.`
-- Bottom statement: `SEO te hacía rankear. AEO decide si los motores de IA te mencionan, te citan y te recomiendan — antes de que exista un clic.`
+- Card 1 body: `<strong class="gh-aeo-card-takeaway">El tráfico que antes llegaba solo ya no está garantizado.</strong>` + `El tráfico orgánico de clientes HubSpot cayó 27% interanual. La búsqueda tradicional ya no alcanza por sí sola.`
+- Card 2 body: `<strong class="gh-aeo-card-takeaway">Tu comprador ya le pregunta a la IA qué elegir.</strong>` + `Uno de cada dos consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir compras.`
+- Card 3 body: `<strong class="gh-aeo-card-takeaway">Aparecer una vez no es una estrategia.</strong>` + `Los motores de IA casi nunca repiten la misma lista de marcas. Sin sistema, tu visibilidad depende del azar.`
+- Bottom statement: `SEO te hacía competir por el ranking. AEO te hace competir por la recomendación: que la IA te entienda, te cite y te elija — antes de que exista un clic.`
+- Visual markers: `gh-aeo-market-card-takeaway-spacing-v1`, `gh-aeo-market-card-polish-no-top-accent-v1`, `gh-aeo-market-card-polish-specificity-v1`, `gh-aeo-market-quote-watermark-v1`. The takeaway renders as a block with a small margin before the proof copy. Metric cards no longer use the teal top accent line; they keep a quiet white gradient, hairline border and softer shadow. Desktop adds a low-opacity SVG closing quote (`”`) as an editorial watermark, positioned mostly to the right of the third card so the closing-quote silhouette stays legible while still sitting behind the card system; keep it clear of the fixed social rail. It is hidden below `1024px`. Mobile 390 uses `height:auto` + `min-height:286px` for `.gh-aeo-metric-card` so source marks stay visible after the added narrative line.
 
 Market source mark contract:
 
@@ -70,14 +72,16 @@ Current approved pipeline copy:
 - H2: `Aparecer en las respuestas de IA no es vanidad. Es pipeline.`
 - Lead: `Cuando tu marca es la que los motores de IA nombran, ganas algo más que visibilidad: ganas la conversación de compra antes que tu competencia. Y el tráfico que llega desde ahí llega más decidido a comprar.`
 - Card 1 body: `Los visitantes que llegan desde motores de IA convierten cerca de 4,4 veces más que los de búsqueda orgánica: llegan pre-calificados por el propio motor.`
-- Card 2 body: `De los leads de Docebo ya provienen del tráfico de IA tras priorizar su visibilidad en motores generativos.`
+- Card 2 body: `Los compradores B2B ya usan IA para investigar, comparar y decidir. La oportunidad es aparecer en esas respuestas antes de que lleguen a ventas.`
 - Bottom statement: `Por eso el AEO no es un experimento de marketing: es un canal de adquisición temprano, con ventaja para quien llega primero.`
 
 Pipeline visual contract:
 
 - Proof cards use compact proof tiles (`gh-aeo-pipeline-compact-proof-tiles-v1`), not the previous giant row-card layout.
 - Semrush source mark must use the real AXIS/primitive SVG logotype inline (`semrush-logotype.svg`, `viewBox="0 0 363 44"`), not local text styled as a wordmark.
-- Docebo remains an inline accessible wordmark; HubSpot uses the SVG served from WordPress.
+- The second proof card uses `Compra B2B` / `94%` and the Forrester 2026 source. The Forrester source mark must use the transparent PNG uploaded to WordPress (`forrester-logo-transparent-*.png`) with `role="img"`/`aria-label="Forrester"` and child `<img alt="">`; do not restore the old Docebo/HubSpot source combo or the `~15%` lead-source proof.
+- The Forrester paragraph has an optical type tune via `.gh-aeo-pipeline-proof-copy-forrester p` (`17px` desktop, `16px` mobile, proportional line-height) because the shorter copy otherwise reads visually larger than the Semrush paragraph even when computed at the same size.
+- The center rail pseudo-element in `.gh-aeo-pipeline::before` stays disabled by the page-scoped `gh-aeo-pipeline-proof-update-v1` CSS marker; do not reintroduce the vertical line between the cards.
 
 Current approved levels copy:
 
