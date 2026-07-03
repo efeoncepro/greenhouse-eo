@@ -1,12 +1,12 @@
+import {
+  escapeGutenbergHtml,
+  renderHeadingBlock,
+  renderYoastTableOfContents,
+  type GutenbergOutlineHeading
+} from './gutenberg-blocks'
 import type { ContentFactoryBrief, ContentFactoryGeneratedDraft } from './contracts'
 
-const escapeHtml = (value: string) =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+const escapeHtml = escapeGutenbergHtml
 
 export const slugifyPublicSiteDraft = (value: string) =>
   value
@@ -35,6 +35,14 @@ const buildPostContent = (brief: ContentFactoryBrief) => {
   const secondaryKeywords = (brief.secondaryKeywords ?? []).slice(0, 4)
   const ctaTarget = sentence(brief.cta.target)
 
+  // Declare the heading outline first so the TOC and the body headings share
+  // identical anchors (built by renderHeadingBlock / renderYoastTableOfContents).
+  const headingTldr: GutenbergOutlineHeading = { level: 2, text: 'TL;DR' }
+  const headingObjective: GutenbergOutlineHeading = { level: 2, text: objective }
+  const headingLanding: GutenbergOutlineHeading = { level: 3, text: 'Como aterrizar la idea' }
+  const headingSignals: GutenbergOutlineHeading = { level: 2, text: 'Senales que conviene revisar' }
+  const outline: GutenbergOutlineHeading[] = [headingTldr, headingObjective, headingLanding, headingSignals]
+
   return [
     '<!-- wp:paragraph -->',
     `<p>${escapeHtml(
@@ -48,9 +56,7 @@ const buildPostContent = (brief: ContentFactoryBrief) => {
     )}</p>`,
     '<!-- /wp:paragraph -->',
     '',
-    '<!-- wp:heading {"level":2} -->',
-    '<h2>TL;DR</h2>',
-    '<!-- /wp:heading -->',
+    renderHeadingBlock(headingTldr),
     '',
     '<!-- wp:list -->',
     '<ul>',
@@ -61,13 +67,9 @@ const buildPostContent = (brief: ContentFactoryBrief) => {
     '</ul>',
     '<!-- /wp:list -->',
     '',
-    '<!-- wp:yoast-seo/table-of-contents -->',
-    '<div class="wp-block-yoast-seo-table-of-contents yoast-table-of-contents"><h2>Tabla de contenidos</h2></div>',
-    '<!-- /wp:yoast-seo/table-of-contents -->',
+    renderYoastTableOfContents(outline),
     '',
-    '<!-- wp:heading {"level":2} -->',
-    `<h2>${escapeHtml(objective)}</h2>`,
-    '<!-- /wp:heading -->',
+    renderHeadingBlock(headingObjective),
     '',
     '<!-- wp:paragraph -->',
     `<p>${escapeHtml(
@@ -75,9 +77,7 @@ const buildPostContent = (brief: ContentFactoryBrief) => {
     )}</p>`,
     '<!-- /wp:paragraph -->',
     '',
-    '<!-- wp:heading {"level":3} -->',
-    '<h3>Como aterrizar la idea</h3>',
-    '<!-- /wp:heading -->',
+    renderHeadingBlock(headingLanding),
     '',
     '<!-- wp:list -->',
     '<ul>',
@@ -94,9 +94,7 @@ const buildPostContent = (brief: ContentFactoryBrief) => {
     )}</p>`,
     '<!-- /wp:paragraph -->',
     '',
-    '<!-- wp:heading {"level":2} -->',
-    '<h2>Senales que conviene revisar</h2>',
-    '<!-- /wp:heading -->',
+    renderHeadingBlock(headingSignals),
     '',
     '<!-- wp:paragraph -->',
     `<p>${escapeHtml(

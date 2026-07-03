@@ -76,11 +76,16 @@ Recommended enrichment:
 
 ### Table of Contents
 
-Use Yoast's block when the draft has multiple H2/H3 sections:
+Use Yoast's block when the draft has multiple H2/H3 sections. The TOC must be
+**populated** — a `<ul>` of anchor links that resolve to the body headings —
+otherwise it renders as a dead heading in the editor (defect that shipped in the
+first live post, 250748). Build it with `renderYoastTableOfContents(outline)`
+from `src/lib/public-site/content-factory/gutenberg-blocks.ts` so the anchors
+always match the headings. Its shape (H3s nest inside their parent H2):
 
 ```html
 <!-- wp:yoast-seo/table-of-contents -->
-<div class="wp-block-yoast-seo-table-of-contents yoast-table-of-contents"><h2>Tabla de contenidos</h2></div>
+<div class="wp-block-yoast-seo-table-of-contents yoast-table-of-contents"><h2>Tabla de contenidos</h2><ul><li><a href="#h-que-cambia-para-el-equipo-comercial" data-level="2">Qué cambia para el equipo comercial</a><ul><li><a href="#h-como-aterrizarlo" data-level="3">Cómo aterrizarlo</a></li></ul></li></ul></div>
 <!-- /wp:yoast-seo/table-of-contents -->
 ```
 
@@ -91,11 +96,18 @@ The TOC should follow the intro/TL;DR and precede the body sections.
 Use H2 for major sections and H3 for children. H4 is allowed only under H3 when
 the depth is truly useful. Do not generate H1.
 
+Every heading must carry `class="wp-block-heading"` and an `id="h-{slug}"` anchor
+(accent-stripped, matching Yoast) so the table of contents can link to it. Build
+headings with `renderHeadingBlock({ level, text })` — never hand-write bare
+`<h2>text</h2>` (unanchored headings break the TOC).
+
 ```html
-<!-- wp:heading {"level":2} -->
-<h2>Qué cambia para el equipo comercial</h2>
+<!-- wp:heading -->
+<h2 class="wp-block-heading" id="h-que-cambia-para-el-equipo-comercial">Qué cambia para el equipo comercial</h2>
 <!-- /wp:heading -->
 ```
+
+H2 omits the `{"level":2}` attr (WordPress default); H3 carries `{"level":3}`.
 
 ### Paragraphs
 

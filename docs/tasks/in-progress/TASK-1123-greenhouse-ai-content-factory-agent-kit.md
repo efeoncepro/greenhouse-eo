@@ -322,6 +322,20 @@ operador desde Notion `38339c2f…`, "I Know Kung Fu / Agent Skills"):
    **Regla:** todo string es-CL al write path va como UTF-8 crudo (nowdoc /
    single-quote / parámetro), NUNCA `\uXXXX`. Aplica al bridge `authorId`/payload.
 
+**Defecto #1 RESUELTO 2026-07-03 (generador + validador + recipe):** se extrajo el
+helper canónico `src/lib/public-site/content-factory/gutenberg-blocks.ts`
+(`renderHeadingBlock` + `renderYoastTableOfContents` + `yoastHeadingAnchor`) que
+emite headings anclados (`class="wp-block-heading" id="h-{slug}"`) + TOC poblado
+(nested `<ul>` con `data-level` links). El planner (`gutenberg-planner.ts`) y el
+catálogo (`gutenberg-pattern-catalog.ts`) ahora lo usan; el validador
+(`gutenberg-validator.ts`) tiene guardrail nuevo (`blogpost_toc_not_populated` +
+`blogpost_toc_headings_unanchored`) que atrapa el TOC roto; recipe corregida.
+Tests: `gutenberg-blocks.test.ts` (nuevo) + guardrail + planner assertions; suite
+41/41 verde, typecheck limpio. Cualquier autor (template o agente) que use estos
+helpers produce un TOC funcional por construcción. **Defecto #2 (UTF-8)** sigue
+como regla del write path (aplica al `authorId`/payload del bridge, aún no
+implementado).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
