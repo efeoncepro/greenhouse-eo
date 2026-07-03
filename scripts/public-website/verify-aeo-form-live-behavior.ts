@@ -22,6 +22,7 @@ const piiNeedles = [
 const fillRequiredFields = async (page: Page, email: string) => {
   await page.locator('.gh-aeo-conversion greenhouse-form [name="fullName"]').fill(email.includes('gmail') ? 'Ana Publica' : 'Julio Empresa')
   await page.locator('.gh-aeo-conversion greenhouse-form [name="email"]').fill(email)
+  await page.locator('.gh-aeo-conversion greenhouse-form [name="brandName"]').fill('Empresa Demo')
   await page.locator('.gh-aeo-conversion greenhouse-form [name="brandWebsite"]').fill('empresa-demo.com')
 }
 
@@ -47,8 +48,8 @@ async function main() {
         contentType: 'application/json',
         body: JSON.stringify(
           email.endsWith('@gmail.com')
-            ? { ok: true, isCorporate: false, quality: 'suspect', reasonCode: 'email_not_corporate' }
-            : { ok: true, isCorporate: true, quality: 'valid', reasonCode: null }
+            ? { outcome: 'ok', syntaxValid: true, isCorporate: false, isDisposable: false, isRoleBased: false, isFreeProvider: true, deliverable: 'unknown', quality: 'suspect', suggestion: null, reasonCode: 'email_not_corporate' }
+            : { outcome: 'ok', syntaxValid: true, isCorporate: true, isDisposable: false, isRoleBased: false, isFreeProvider: false, deliverable: 'unknown', quality: 'verified', suggestion: null, reasonCode: null }
         ),
       })
     })
@@ -146,7 +147,7 @@ async function main() {
     await page.waitForTimeout(250)
     await page.locator('.gh-aeo-conversion greenhouse-form .ghf-btn').click()
     await page.waitForFunction(
-      `Boolean(document.querySelector('.gh-aeo-conversion greenhouse-form .ghf-status--success'))`,
+      `Boolean(document.querySelector('.gh-aeo-conversion greenhouse-form .ghf-success-card, .gh-aeo-conversion greenhouse-form .ghf-status--success'))`,
       null,
       { timeout: 10000 }
     )

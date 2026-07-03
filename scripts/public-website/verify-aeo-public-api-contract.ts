@@ -178,8 +178,16 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
       throw new Error(`${label} success card is missing body/bodyCopyRef`)
     }
 
-    if (!Array.isArray(success.steps) || success.steps.length < 1 || success.steps.length > 4) {
-      throw new Error(`${label} success card steps are ${JSON.stringify(success.steps)}; expected 1-4 bounded steps`)
+    if (Array.isArray(success.steps) && success.steps.length > 4) {
+      throw new Error(`${label} success card steps are ${JSON.stringify(success.steps)}; expected at most 4 bounded steps`)
+    }
+
+    const hasBoundedSteps = Array.isArray(success.steps) && success.steps.length >= 1
+    const hasBoundedActions = Array.isArray(success.actions) && success.actions.length >= 1 && success.actions.length <= 2
+    const hasSupportNote = Boolean(success.supportingNote || success.supportingNoteCopyRef)
+
+    if (!hasBoundedSteps && !hasBoundedActions && !hasSupportNote) {
+      throw new Error(`${label} success card is missing steps/actions/support note`)
     }
 
     if (raw.includes('submissionId') || raw.includes('firstname') || raw.includes('lastname')) {

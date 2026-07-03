@@ -47,7 +47,20 @@ const SUCCESS_CARD_BEHAVIOR = {
   ],
 } as const
 
-const stableJson = (value: unknown): string => JSON.stringify(value)
+const stableJson = (value: unknown): string => {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`
+
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>
+
+    return `{${Object.keys(record)
+      .sort()
+      .map(key => `${JSON.stringify(key)}:${stableJson(record[key])}`)
+      .join(',')}}`
+  }
+
+  return JSON.stringify(value)
+}
 
 const readFileAtRef = (ref: string, filePath: string): string => {
   try {
