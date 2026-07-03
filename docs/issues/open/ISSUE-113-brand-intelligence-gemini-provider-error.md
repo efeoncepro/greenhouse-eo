@@ -40,11 +40,23 @@ Con 1 solo provider, el gate de calidad no computa score → no hay informe → 
 
 **Fix aplicado (2026-07-02):** `deploy.sh` ahora declara + appendea + bindea `PERPLEXITY_API_KEY_SECRET_REF=greenhouse-perplexity-api-key` (espejo de OpenAI/Anthropic; el `ensure_secret_accessor_binding` da secretAccessor a la SA del ops-worker). Toma efecto en el próximo deploy (push develop). Post-deploy: el run tendrá OpenAI + Perplexity (+ Gemini cuando se arregle Vertex) → suficiente para score + informe.
 
-## Pendiente (raíz de Gemini)
+## Raíz de Gemini CONFIRMADA (2026-07-02) — billing/dunning de GCP, NO código
 
-- **Arreglar la credencial/config de Vertex** del provider Gemini en el ops-worker (y ADC local), o
-- decidir si Gemini se **desprioriza/deshabilita** para brand-intelligence (reordenar `BRAND_INTELLIGENCE_PROVIDER_IDS` o gate por flag) mientras Vertex no esté sano — hoy se paga la latencia de intentar Gemini primero en cada lectura antes de caer a OpenAI.
-- Confirmar el error exacto de Vertex (auth vs modelo vs región) revisando Sentry (`domain=growth`, `source=growth_ai_visibility_brand_intelligence`, `provider=gemini`).
+El error crudo de Vertex (capturado corriendo `generateStructuredGemini` directo):
+
+```text
+403 PERMISSION_DENIED: "Lightning dunning decision is deny for project: projects/183008134038"
+```
+
+**"Dunning" = cobranza.** El sistema de riesgo/facturación de Google (`Lightning`) **denegó el acceso a Vertex AI / Generative AI** del proyecto `efeonce-group`. NO es credencial ni región ni modelo — es la **cuenta de billing**:
+
+- La cuenta `billingAccounts/013340-4C7071-668441` figura `open: true` + `billingEnabled: true` en el proyecto → **NO es suspensión total** (Cloud Run, Cloud SQL, Secret Manager, BigQuery siguen sanos).
+- Es un **hold de dunning ESPECÍFICO de Generative AI** (Google gatea la IA generativa más estricto por riesgo de billing): pago vencido / tarjeta rechazada / factura impaga → `deny` solo para Vertex/Gemini.
+- OpenAI + Anthropic no se afectan (usan su propia API key + billing, no el de GCP).
+
+**Acción (operador / finanzas):** revisar la consola **GCP Billing** de la cuenta `013340-4C7071-668441` — facturas vencidas, método de pago (tarjeta vencida/rechazada), alertas de dunning. Resolver el pago desbloquea Vertex/Gemini. No hay fix de código posible.
+
+**Mitigación vigente:** el fallthrough del router (arriba) + Perplexity wireado hacen que brand-intelligence y el grader funcionen sin Gemini (OpenAI/Anthropic/Perplexity). Opcional mientras dure el hold: **despriorizar Gemini** en `BRAND_INTELLIGENCE_PROVIDER_IDS` / requested providers para no pagar la latencia de intentarlo primero y fallar en cada lectura.
 
 ## Verificación de cierre
 
