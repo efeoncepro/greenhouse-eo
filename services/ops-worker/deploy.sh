@@ -333,14 +333,19 @@ else
 fi
 
 # TASK-1234 — AI Visibility Grader async worker (/growth/grader/drain via Cloud Scheduler).
-# El ops-worker es un servicio Cloud Run COMPARTIDO staging+prod → los flags se ramifican por
-# ENV (igual que los secret refs): en `staging` espejan al portal Vercel staging (GRADER +
-# OpenAI/Anthropic/Perplexity/Gemini ON) para que el drain ejecute runs `full` reales; en
-# `production` quedan OFF (el schema greenhouse_growth aún no está migrado en prod — fuera de
-# scope) y el handler de drain hace no-op prod-safe (gate isGraderEnabled, cero queries/Sentry).
-# Los *_API_KEY_SECRET_REF se declaran siempre para que el worker resuelva las API keys
-# server-side (resolveSecret); Gemini usa Vertex via WIF (sin secret, GCP_PROJECT + IAM).
-# Declarativo para que --set-env-vars (destructivo) NO los borre en cada redeploy.
+# El ops-worker es un servicio Cloud Run COMPARTIDO staging+prod, y el backend es UNA sola
+# instancia Postgres (greenhouse-pg-dev) + un solo schema greenhouse_growth compartido por ambos
+# entornos (no hay instancia/DB prod separada — el comentario previo "schema no migrado en prod"
+# era stale). Por eso, tras la directiva del operador (TASK-1321, 2026-07-02: "todo activo en
+# prod"), el bloque `production` ESPEJA a `staging`: el grader stack completo queda ON en ambos
+# (GRADER + OpenAI/Anthropic/Perplexity/Gemini + brand-intelligence + probes + lead-handoff +
+# report-email), de modo que el drain ejecuta runs `full` reales sin regresión de comportamiento
+# entre entornos (lo único que difiere son los *_SECRET_REF, que sí se ramifican por ENV). Gemini
+# quedó ON tras desbloquearse el hold de billing de Vertex (ISSUE-113, verificado en vivo
+# 2026-07-02). Los *_API_KEY_SECRET_REF se declaran siempre para que el worker resuelva las API
+# keys server-side (resolveSecret); Gemini usa Vertex via WIF (sin secret, GCP_PROJECT + IAM).
+# Declarativo para que --set-env-vars (destructivo) NO los borre en cada redeploy. Revert por-flag
+# (<5 min): pasar el env var explícito =false al deploy (p.ej. GROWTH_AI_VISIBILITY_GRADER_ENABLED=false).
 if [ "${ENV}" = "staging" ]; then
   DEFAULT_GROWTH_GRADER_ENABLED="true"
   DEFAULT_GROWTH_OPENAI_ENABLED="true"
@@ -403,27 +408,33 @@ if [ "${ENV}" = "staging" ]; then
   # de abajo appendea el ref + bindea secretAccessor.
   DEFAULT_GOOGLE_KG_KEY_SECRET_REF="greenhouse-google-knowledge-graph-api-key"
 else
-  DEFAULT_GROWTH_GRADER_ENABLED="false"
-  DEFAULT_GROWTH_OPENAI_ENABLED="false"
-  DEFAULT_GROWTH_ANTHROPIC_ENABLED="false"
-  DEFAULT_GROWTH_PERPLEXITY_ENABLED="false"
-  DEFAULT_GROWTH_GEMINI_ENABLED="false"
-  DEFAULT_FORMS_DISPATCH_ENABLED="false"
-  DEFAULT_FORMS_HUBSPOT_ENABLED="false"
-  DEFAULT_GROWTH_LEAD_HANDOFF_ENABLED="false"
-  DEFAULT_GROWTH_REPORT_EMAIL_ENABLED="false"
+  # PRODUCTION — espeja staging (TASK-1321, directiva operador 2026-07-02 "todo activo en prod").
+  # Backend compartido (misma DB + ops-worker), así que producción corre el grader stack completo
+  # igual que staging. Único delta intencional documentado: OPERATOR_SEND y CATEGORY_GUARD quedan
+  # OFF (igual que staging — cross-sell operador gated por el review del prompt brand-aware; el
+  # guard bloquearía categorías free-text y su beneficiario está OFF). Gemini ON (billing Vertex
+  # desbloqueado, ISSUE-113 verificado en vivo 2026-07-02).
+  DEFAULT_GROWTH_GRADER_ENABLED="true"
+  DEFAULT_GROWTH_OPENAI_ENABLED="true"
+  DEFAULT_GROWTH_ANTHROPIC_ENABLED="true"
+  DEFAULT_GROWTH_PERPLEXITY_ENABLED="true"
+  DEFAULT_GROWTH_GEMINI_ENABLED="true"
+  DEFAULT_FORMS_DISPATCH_ENABLED="true"
+  DEFAULT_FORMS_HUBSPOT_ENABLED="true"
+  DEFAULT_GROWTH_LEAD_HANDOFF_ENABLED="true"
+  DEFAULT_GROWTH_REPORT_EMAIL_ENABLED="true"
   DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="false"
-  DEFAULT_GROWTH_GOOGLE_AIO_ENABLED="false"
-  DEFAULT_GROWTH_PROBES_ENABLED="false"
-  DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED="false"
-  DEFAULT_GROWTH_ENTITY_PROBES_ENABLED="false"
-  DEFAULT_GROWTH_REGRADE_ENABLED="false"
-  DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED="true"
-  DEFAULT_GROWTH_BRAND_INTELLIGENCE_ENABLED="false"
+  DEFAULT_GROWTH_GOOGLE_AIO_ENABLED="true"
+  DEFAULT_GROWTH_PROBES_ENABLED="true"
+  DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED="true"
+  DEFAULT_GROWTH_ENTITY_PROBES_ENABLED="true"
+  DEFAULT_GROWTH_REGRADE_ENABLED="true"
+  DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED="false"
+  DEFAULT_GROWTH_BRAND_INTELLIGENCE_ENABLED="true"
   DEFAULT_GROWTH_CATEGORY_GUARD_ENABLED="false"
-  DEFAULT_GROWTH_ARCHETYPE_PROMPTS_ENABLED="false"
-  DEFAULT_GROWTH_PROMPT_AUTHORING_ENABLED="false"
-  DEFAULT_GOOGLE_KG_KEY_SECRET_REF=""
+  DEFAULT_GROWTH_ARCHETYPE_PROMPTS_ENABLED="true"
+  DEFAULT_GROWTH_PROMPT_AUTHORING_ENABLED="true"
+  DEFAULT_GOOGLE_KG_KEY_SECRET_REF="greenhouse-google-knowledge-graph-api-key"
 fi
 GROWTH_AI_VISIBILITY_GRADER_ENABLED="${GROWTH_AI_VISIBILITY_GRADER_ENABLED:-${DEFAULT_GROWTH_GRADER_ENABLED}}"
 GROWTH_AI_VISIBILITY_OPENAI_ENABLED="${GROWTH_AI_VISIBILITY_OPENAI_ENABLED:-${DEFAULT_GROWTH_OPENAI_ENABLED}}"
