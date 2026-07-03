@@ -448,6 +448,129 @@ Iteracion / aprendizaje: el primer intento alineo el modulo al `.page-container`
 - Antes de tocar un modulo "que se queda fijo", verificar si el sticky es `position:sticky` por clase custom (`-sticky-block`) y no el efecto de Elementor Pro; no hay keys `sticky`/`motion_fx` en `_elementor_data`.
 - Cuando un modulo se "pega a los bordes" solo en una pagina, sospechar de clases cuyo CSS esta scopeado a `body.home`/`body.front-page` reusadas en una pagina boxeada, antes de cambiar anchos de Elementor.
 
+## Hero About us (page_id 249770)
+
+La pagina `/about-us-efeonce/` usa un hero Elementor/Ohio full-bleed con fondo
+azul y proof de marcas. El copy vigente se ajusto en vivo el 2026-07-03 para
+que el primer fold presente a Efeonce como agencia-sistema, no como una landing
+generica de marketing.
+
+Selectores/widgets relevantes:
+
+- root de hero: `6e46dcc`;
+- video widget: `e18428a`;
+- eyebrow: `6a1acc3`;
+- H1: `3ab9072`;
+- subhead: `70afd83`;
+- CTA de agenda retirado: `a452380`;
+- proof strip vigente: `abproof`, con marquee `abplogo` y meta pill `abpmeta`;
+- counters previos: `831f50d`; primer counter `10e73af` (reemplazados el
+  2026-07-03).
+
+Copy vigente:
+
+```text
+AGENCIA DE CRECIMIENTO INTEGRADA
+
+El crecimiento real
+no se compra por partes.
+Se orquesta.
+
+Creatividad, medios, CRM, data y tecnología trabajando como un solo sistema.
+Menos proveedores sueltos. Más visibilidad, continuidad y aprendizaje acumulado.
+
+Ver cómo operamos
++90
+Chile · Colombia · México · Perú
+```
+
+Las mutaciones se hicieron por `Document::save()`. Rollback snapshots:
+`_gh_backup_before_about_hero_copy_20260703T042409Z` y
+`_gh_backup_before_about_hero_remove_agenda_cta_20260703T052019Z`. Proteger
+`_thumbnail_id=249769`, `page_header_title_background_type=featured` y
+`page_header_title_background_image=""` en cambios futuros.
+
+El bloque de prueba del hero reutiliza la estructura del componente AEO
+`greenhouse_logo_marquee` + `BrandProofAvatarGroup`, pero no su tratamiento visual
+literal: AEO vive sobre fondo claro y About sobre hero azul oscuro. Por eso About
+agrega una variante page-scoped en
+`ohio-child/assets/css/global-fixes.css` para `body.page-id-249770
+.elementor-element.elementor-element-abproof`: logos en modo claro/ice, pill
+frosted con mayor contraste, respiracion inferior antes del corte a la seccion
+blanca y compaccion mobile para no quedar bajo el widget Ohio fijo. Rollback de
+la mutacion Elementor:
+`_gh_backup_before_about_hero_proof_strip_20260703T043325Z`; backups remotos CSS:
+`global-fixes-before-about-hero-proof-strip-20260703T043541Z.css` y
+`global-fixes-before-about-hero-proof-dark-20260703T043711Z.css`; backup del
+ajuste de respiracion inferior:
+`global-fixes-before-about-hero-proof-bottom-space-20260703T044125Z.css`.
+El ajuste final que retiro el CTA de agenda y reabrio el video en mobile quedo
+en el hash CSS `20e60f44ecda9d2806465f9cb5977370a8b2ae8c96d6a747d9045363576bab3a`
+con backup remoto
+`global-fixes-before-about-hero-remove-agenda-20260703T052056Z.css`.
+
+## Modulo Loop Marketing "Como trabajamos" (About us, page_id 249770)
+
+La pagina `/about-us-efeonce/` reutiliza el patron visual del Home para la seccion
+Loop Marketing (`59385ab`) con clases `lp-container-offset-left` /
+`lp-container-offset-right`. Igual que en Agencia Creativa, esas reglas base
+viven en `Landing Custom CSS.css` scopeadas a `body.home` / `body.front-page`,
+por lo que no aplican en esta pagina.
+
+Sintoma observado (2026-07-03):
+
+- el bloque izquierdo empezaba en `x~=20` en desktop ancho;
+- la columna visual derecha llegaba mas alla del viewport y podia crear overflow
+  horizontal de pagina;
+- el root `59385ab` conservaba fondo full-bleed, que si es intencional.
+
+Correccion versionada en runtime:
+
+```css
+@media (min-width: 1025px) {
+  body.page-id-249770 .elementor-element.elementor-element-59385ab {
+    padding-left: clamp(60px, 4.5vw, 80px);
+    padding-right: clamp(24px, 3vw, 56px);
+    overflow-x: clip;
+  }
+}
+```
+
+La regla mantiene el fondo full-bleed, agrega un gutter editorial izquierdo
+un poco mayor para que el switcher fijo Dark/Light no tape el headline, conserva
+un gutter derecho mas moderado y contiene el overflow del grafico dentro del
+modulo. No alinear al `.page-container` completo salvo nueva decision del
+operador.
+
+## Modulo "Ecosistema tecnologico" (About us, page_id 249770)
+
+La misma landing `/about-us-efeonce/` tiene otra composicion full-bleed donde el
+contenido izquierdo puede quedar bajo el switcher fijo Dark/Light y el buscador
+Ohio. En este caso no se debe mover todo el root porque el texto sticky derecho
+ya esta correctamente alineado.
+
+Selectores relevantes:
+
+- root de seccion: `af43bed`;
+- carril izquierdo de tool-cards: `eb5c55f`;
+- columna derecha: `88b901c`;
+- bloque sticky derecho: `d93f52c`;
+- card afectada de referencia: `9696990` (`HubSpot`).
+
+Correccion versionada en runtime:
+
+```css
+@media (min-width: 1025px) {
+  body.page-id-249770 .elementor-element.elementor-element-af43bed .elementor-element.elementor-element-eb5c55f {
+    padding-left: clamp(60px, 4.5vw, 80px);
+    box-sizing: border-box;
+  }
+}
+```
+
+La regla aplica el gutter solo al carril izquierdo, mantiene intacta la columna
+sticky derecha y no hereda el ajuste en mobile.
+
 ## Franja de logos de clientes (Agencia Creativa, page_id 249582)
 
 La franja "Marcas que confían en Globe" usa cuatro widgets Ohio `ohio_clients_logo` dentro del grid Elementor `a43cacf`. Elementor puede generar reglas por widget con `width` y `height` fijos (`post-249582.css`), y eso deforma logos cuando el asset trae una proporcion/canvas distinto al valor elegido en el editor.

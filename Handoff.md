@@ -14,19 +14,51 @@
 >
 > **Docs:** `FEATURE_FLAG_STATE_LEDGER.md` (fila `GROWTH_AEO_FORM_GRADER_INTAKE` actualizada), `ISSUE-113` documentado, changelog TASK-1321.
 
-## Sesion 2026-07-03 - Public Site About `/about-us-efeonce/` - Codex - fix preparado, no publicado
+## Sesion 2026-07-03 - Public Site About `/about-us-efeonce/` - Codex - live
 
-> **Pedido:** revisar una sección de la landing pública About donde el módulo Loop Marketing quedaba pegado al borde, sospechando que el CSS del Home no aplicaba fuera del Home.
+> **Pedido:** revisar secciones de la landing pública About donde contenido de módulos full-bleed quedaba pegado al borde y luego darle más aire porque el switcher fijo Dark/Light/buscador Ohio tapaba contenido. Importante: la solución NO era quitar el widget.
 >
-> **Diagnóstico:** confirmado. La página live es `https://efeoncepro.com/about-us-efeonce/`, `page_id=249770`, título `About us (Boceto)`. La sección afectada es `59385ab`; usa `lp-container-offset-left/right`, pero las reglas de `Landing Custom CSS.css` están scopeadas a `body.home` / `body.front-page`. En desktop 2048, el bloque izquierdo arrancaba en `x=20` y la columna visual derecha llegaba a `x=2165` con `clientWidth=2048`.
+> **Diagnóstico:** confirmado. Página live `https://efeoncepro.com/about-us-efeonce/`, `page_id=249770`, título `About us (Boceto)`. El módulo Loop Marketing `59385ab` usa `lp-container-offset-left/right`, pero las reglas de `Landing Custom CSS.css` están scopeadas a `body.home` / `body.front-page`. La sección "Ecosistema tecnológico" `af43bed` tiene el mismo patrón de composición full-bleed; el carril izquierdo `eb5c55f` arrancaba bajo el switcher/search mientras el sticky derecho `d93f52c` ya estaba bien alineado. En desktop, el switcher fijo `.elements-bar.left` ocupa aprox. `x=30.7..86.7` en 2048 y `x=21.6..77.6` en 1440.
 >
-> **Cambio preparado en runtime repo:** `../efeonce-public-site-runtime/wp-content/themes/ohio-child/assets/css/global-fixes.css` agrega una regla page-scoped para `body.page-id-249770 .elementor-element.elementor-element-59385ab`: `padding-left/right: clamp(24px, 3vw, 56px)` y `overflow-x: clip` en `min-width:1025px`. Mantiene el fondo full-bleed; no alinea al `.page-container` completo.
+> **Cambio live:** `../efeonce-public-site-runtime/wp-content/themes/ohio-child/assets/css/global-fixes.css` agrega reglas page-scoped en `min-width:1025px`: para `59385ab`, `padding-left: clamp(60px, 4.5vw, 80px)`, `padding-right: clamp(24px, 3vw, 56px)` y `overflow-x: clip`; para `af43bed .eb5c55f`, `padding-left: clamp(60px, 4.5vw, 80px)` + `box-sizing: border-box`. Se subió el archivo a Kinsta, con backups remotos de cada upload, y se purgó Kinsta (`Success: All caches were cleared`). Mantiene los fondos full-bleed, no mueve ni oculta el widget, no alinea al `.page-container` completo y en la segunda sección no toca la columna sticky derecha.
 >
 > **Docs/skills:** registrada la landing en `.codex` y `.claude` `efeonce-public-site-wordpress` (`landing-registry.md` + `landings/about-us-efeonce.md`) y documentado el patrón en `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`.
 >
-> **Evidencia local:** Playwright sobre live con CSS inyectado: desktop 2048 mueve el sticky izquierdo de `x=20` a `x=76`; desktop 1440 queda en `x=63.2`; mobile 390 no cambia porque la regla no aplica. El módulo queda contenido por su root. Residual: la página About aún muestra otros desbordes ajenos a esta sección (`scrollWidth=2053` en viewport 2048 y `443` en mobile 390), por revisar si el operador quiere limpieza integral.
+> **Evidencia live:** hash local y Kinsta de `global-fixes.css` iguales (`dfd15ce58884da727640356740793a0a74ca1d4dbdc57960622f9fddfd5a1ffb`). Playwright sobre la URL live con cache-buster, sin inyectar CSS: Loop Marketing desktop 2048/1440 `overlap=false` y mobile 390 sin heredar gutter; Ecosistema tecnológico desktop 1440 `widget.right=77.6`, `HubSpot.left=106.4`, `overlap=false`, right sticky sin desplazamiento, desktop 1280 `widget.right=75.2`, `HubSpot.left=99.2`, `overlap=false`; mobile 390 conserva `padding-left=20px` del layout base y no hereda el gutter desktop. Capturas: `.captures/about-us-tech-gutter-live-2026-07-03T04-15-54-631Z/`. Residual: la página About aún tiene otros desbordes ajenos a estas secciones en mobile (`pageOverflow=53`), por revisar si el operador pide limpieza integral.
 >
-> **Estado:** no se mutó WordPress/Kinsta ni se purgó cache porque el pedido fue revisar y la skill del sitio público exige aprobación explícita para mutación live. Para publicar: desplegar/sincronizar el archivo `global-fixes.css` del runtime a Kinsta, purgar cache y repetir Playwright/GVC desktop + mobile.
+> **Estado:** live aplicado y verificado. Pendiente solo si se quiere: limpiar overflow móvil no relacionado con este módulo y commitear repo Greenhouse + runtime.
+
+### Hero copy refresh live
+
+> **Pedido:** invocar skills de UI/UX/modern web guidance/UX writing/microcopy para mejorar el hero del About de la agencia y luego "Vamos, ajusta".
+>
+> **Cambio live:** se aplicó por Elementor `Document::save()` en `page_id=249770`, hero root `6e46dcc`: video widget `e18428a` quedó como `Ver cómo operamos`; H1 `3ab9072` quedó `El crecimiento real / no se compra por partes. / Se orquesta.`; bajada `70afd83` quedó enfocada en creatividad, medios, CRM, data y tecnología como sistema operativo de crecimiento; counter `Empresas atendidas` actualizado de `96` a `120+` en los widgets `10e73af` y `0ab179e`. El CTA `Agenda una conversación` se preservó en este paso y fue retirado en el follow-up final del hero.
+>
+> **Rollback/protecciones:** backup meta `_gh_backup_before_about_hero_copy_20260703T042409Z`; protegidos `_thumbnail_id=249769`, `page_header_title_background_type=featured` y `page_header_title_background_image=""`. Kinsta cache purgada.
+>
+> **Evidencia live:** Playwright con cache-buster, sin CSS inyectado: desktop 1440 `h1Text="El crecimiento real / no se compra por partes. / Se orquesta."`, `videoText="Ver cómo operamos"`, `counterText="120+ Empresas atendidas"`, `containsHola=false`, `containsPlayVideo=false`, `pageOverflow=0`, `heroOverflow=0`; mobile 390 confirma los mismos textos y conserva el overflow residual histórico de la página (`53px`). Capturas: `.captures/about-us-hero-copy-live-2026-07-03T04-24-38-950Z/`.
+
+### Hero proof strip replacement live
+
+> **Pedido:** reemplazar el bloque de counters señalado en el hero por el componente usado en AEO `/aeo-2/`.
+>
+> **Cambio live:** se reemplazó el container de counters `831f50d` por el componente AEO `greenhouse_logo_marquee` + `BrandProofAvatarGroup`, clonado desde `whylogo` sin el título AEO. Nuevos ids en About: root `abproof`, marquee `abplogo`, meta pill `abpmeta`. El copy del hero se preservó; el CTA de agenda se retiró después para dejar solo el video.
+>
+> **Adaptación dark:** el operador aclaró que en About el componente vive sobre fondo oscuro. Se agregó skin page-scoped en `../efeonce-public-site-runtime/wp-content/themes/ohio-child/assets/css/global-fixes.css`: logos en modo claro/ice sobre azul, pill frosted con contraste, respiración desktop y safe area mobile. Para no afectar el pill de AEO, todos los overrides quedan bajo `body.page-id-249770 .elementor-element-abproof`; en mobile About se oculta solo el marquee de About y se deja el pill compacto. AEO `/aeo-2/` mantiene su marquee visible y sus medidas base.
+>
+> **Rollback/protecciones:** backup Elementor `_gh_backup_before_about_hero_proof_strip_20260703T043325Z`; protegidos `_thumbnail_id=249769`, `page_header_title_background_type=featured` y `page_header_title_background_image=""`. Backups remotos CSS: `global-fixes-before-about-hero-proof-strip-20260703T043541Z.css`, `global-fixes-before-about-hero-proof-dark-20260703T043711Z.css`, `global-fixes-before-about-hero-proof-bottom-space-20260703T044125Z.css`, `global-fixes-before-about-hero-mobile-safe-20260703T044948Z.css`, `global-fixes-before-about-hero-mobile-safe-tune-20260703T045056Z.css`, `global-fixes-before-about-hero-mobile-pill-only-20260703T045217Z.css` y `global-fixes-before-about-hero-mobile-pill-width-20260703T045332Z.css`. Hash CSS live/local final `181e90eb28299adc2c8465c6c456dd49ac0094bc836632068d837e22e515dbc1`.
+>
+> **Evidencia live:** `.captures/about-aeo-pill-final-width-2026-07-03T04-53-59-023Z/` y corrección de evidencia visual sobre el bloque real de AEO en `.captures/aeo-whylogo-actual-check-2026-07-03T04-56-10-158Z/`. About desktop 1440 `pageOverflow=0`, `logoCount=21`, marquee visible, `ctaOverlap=false`, `fixedOverlaps=[]`; About mobile 390 `pill=334x46`, `ctaOverlap=false`, `fixedOverlaps=[]`, marquee About `display=none` por safe area, conserva overflow residual histórico `53px`. AEO `/aeo-2/` se verificó en `whylogo` (`scrollY=9709` mobile / `5915` desktop), no en el hero: mobile `marquee.display=block`, `pill=334.125x48`, desktop `marquee.display=block`, `pill=404.8125x52`, `pageOverflow=0`. El patrón `BrandProofAvatarGroup` ya tiene segundo consumidor; si vuelve a reutilizarse, conviene graduarlo a widget `greenhouse_brand_proof_group` o a opción gobernada de `greenhouse_logo_marquee`.
+
+### Hero CTA simplification live
+
+> **Pedido:** quitar el botón `Agenda una conversación` del hero y dejar solo el botón de video.
+>
+> **Cambio live:** se removió el nodo Elementor `a452380` por `Document::save()` en `page_id=249770`. El video `e18428a` queda como única acción del hero con texto `Ver cómo operamos`; se reabrió en mobile con CSS page-scoped y se ajustó el margen entre bajada, video y proof pill. El proof mantiene `+90`, no `+120`.
+>
+> **Rollback/protecciones:** backup Elementor `_gh_backup_before_about_hero_remove_agenda_cta_20260703T052019Z`; protegidos `_thumbnail_id=249769`, `page_header_title_background_type=featured` y `page_header_title_background_image=""`. Backup remoto CSS `global-fixes-before-about-hero-remove-agenda-20260703T052056Z.css`; hash CSS live/local final `20e60f44ecda9d2806465f9cb5977370a8b2ae8c96d6a747d9045363576bab3a`.
+>
+> **Evidencia live:** `.captures/about-hero-remove-agenda-final-2026-07-03T05-22-39-176Z/` confirma About desktop 1440 `agendaCount=0`, `videoText="Ver cómo operamos"`, `pageOverflow=0`, proof pill sin solapes visibles; About mobile 390 `agendaCount=0`, video visible y pill compacto `334x46`. Confirmación separada del bloque real de AEO, no el hero: `.captures/aeo-whylogo-confirm-2026-07-03T05-23-48-686Z/`; `whylogo` mantiene `marquee.display=block`, `pillText="+90–Chile · Colombia · México · Perú"` y `pageOverflow=0` en desktop/mobile.
 
 ## Sesion 2026-07-03 - Kortex HubSpot CMS / ANAM chat landing - Codex - live + docs
 
