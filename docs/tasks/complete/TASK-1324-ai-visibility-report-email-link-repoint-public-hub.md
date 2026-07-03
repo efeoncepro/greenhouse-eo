@@ -16,7 +16,14 @@ El destino del repoint ya existe y está vivo: **`https://think.efeoncepro.com/b
 
 **Verificado local:** focal 37/37 + broad growth+emails 90 files/626 tests verdes; `pnpm typecheck` limpio; lint de tocados limpio.
 
-**⚠️ Por qué sigue `in-progress` (Runtime Rollout Gate):** el correo del grader se envía desde **producción** (TASK-1321 live). El fix arregla el 404 solo **tras deploy a `main`**. Default-safe = hub prod → NO requiere setear env var en Vercel. Cierre a `complete` cuando: deploy a prod + correo real → clic → informe vivo (no 404) + `report_url` en HubSpot al mismo destino (§Production verification sequence).
+**✅ RELEASED + verificado en prod (2026-07-03):** promovido develop→main (PR #139, squash SHA `1c8d3f671`) vía el control plane de release (orchestrator run `28683145659` success, manifest → `released`, `/api/auth/health`=200). Verificación live end-to-end:
+- `curl -sI https://greenhouse.efeoncepro.com/grader/r/<token>` → **307** → `https://think.efeoncepro.com/brand-visibility/r/<token>` (redirect puente recupera correos ya enviados).
+- Destino hub → **200** (informe renderiza).
+- `buildPublicReportUrl` (correos nuevos + HubSpot `report_url`) genera la URL directa del hub; `PUBLIC_GRADER_HUB_URL` no requiere setearse (default-safe = hub prod, confirmado funcionando).
+
+El 404 del correo quedó resuelto para links viejos (redirect) y nuevos (URL directa).
+
+**Nota de release (no defecto):** el ops-worker quedó con GIT_SHA `611129dae` (no el target `1c8d3f671`) porque el `ops-worker-deploy` es change-gated y saltó el rebuild (`deploy_needed=false`) al no cambiar ningún worker-runtime-path — comportamiento por diseño documentado en el workflow; el código del worker es idéntico al target. Los otros 3 workers Cloud Run sí quedaron en el target.
 
 ## Delta 2026-07-03 — narrativa del informe debe venir del modelo
 
@@ -37,7 +44,7 @@ Mientras esos campos no existan, el hub sólo debe mostrar labels neutros, chips
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -50,7 +57,7 @@ Mientras esos campos no existan, el hub sólo debe mostrar labels neutros, chips
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `In progress — repoint del helper + env var + redirect puente (TASK-1325 desbloqueó el destino)`
+- Status real: `COMPLETE — released a prod (release develop→main v2, SHA 1c8d3f671, #139). Verificado live: /grader/r/<token> → 307 → hub 200; el 404 del correo resuelto end-to-end.`
 - Rank: `TBD`
 - Domain: `growth|integrations`
 - Blocked by: `none (TASK-1325 complete — hub live en think.efeoncepro.com)`

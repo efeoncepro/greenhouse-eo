@@ -91,6 +91,16 @@ describe('GET /report/[token] — contrato público headless (TASK-1280)', () =>
     expect(Array.isArray(body.report.providerPresence)).toBe(true)
   })
 
+  it('incluye señales public-safe additive en model para el render headless', async () => {
+    const res = await callGet()
+    const body = await res.json()
+
+    expect(body.model.citationSourceBreakdown).toEqual(body.report.citationSourceBreakdown)
+    expect(body.model.categoryTaxonomySummary).toEqual(body.report.categoryTaxonomySummary)
+    expect(body.model.readiness).toEqual(body.report.readiness)
+    expect(body.model.agenticAxisScore).toBeNull()
+  })
+
   it('NUNCA filtra internos: providerFindings/accuracyFindings/narrativa cruda', async () => {
     const res = await callGet()
     const body = await res.json()

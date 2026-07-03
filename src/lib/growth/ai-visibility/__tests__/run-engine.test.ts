@@ -55,10 +55,28 @@ const makeRun = (input: Record<string, unknown>): GraderRunRow => ({
   createdAt: '2026-06-24T00:00:00.000Z'
 })
 
+const executionEvents: string[] = []
+const probeCalls: string[] = []
+const deliveryCalls: string[] = []
+
 // El delivery finalizer (TASK-1245) tiene su propio test; acá se aísla como no-op para mantener
 // el boundary unitario del run-engine (no toca PG/report/snapshot reales).
 vi.mock('../public-delivery/finalize-delivery', () => ({
-  finalizeRunDelivery: async () => null,
+  finalizeRunDelivery: async (run: { runId: string }) => {
+    deliveryCalls.push(run.runId)
+    executionEvents.push(`delivery:${run.runId}`)
+
+    return null
+  },
+}))
+
+vi.mock('../probes/command', () => ({
+  gatherRunProbes: async (runId: string) => {
+    probeCalls.push(runId)
+    executionEvents.push(`probes:${runId}`)
+
+    return { results: [], skippedReason: 'probes_disabled' }
+  },
 }))
 
 // Auto-scoring en la finalización (fix 2026-07-02): el run-engine ahora scorea el run terminal-con-
@@ -164,6 +182,9 @@ beforeEach(() => {
   db.observations = []
   db.insertCalls = []
   scoreCalls.length = 0
+  executionEvents.length = 0
+  probeCalls.length = 0
+  deliveryCalls.length = 0
   runSeq = 0
 })
 
@@ -195,6 +216,18 @@ describe('growth/ai-visibility — executeGraderRun (primitive síncrono)', () =
 
     expect(result.run.status).toBe('partial')
     expect(scoreCalls).toContain(result.run.runId)
+  })
+
+  it('recolecta probes antes de finalizar delivery para que el snapshot pueda incluir readiness', async () => {
+    const result = await executeGraderRun({
+      ...baseInput,
+      adapters: { openai: createFakeProviderAdapter({ provider: 'openai', behavior: 'succeed' }) }
+    })
+
+    expect(result.run.status).toBe('succeeded')
+    expect(probeCalls).toEqual([result.run.runId])
+    expect(deliveryCalls).toEqual([result.run.runId])
+    expect(executionEvents).toEqual([`probes:${result.run.runId}`, `delivery:${result.run.runId}`])
   })
 
   it('NO auto-scorea un run skipped (sin datos que puntuar → delivery unavailable, honesto)', async () => {

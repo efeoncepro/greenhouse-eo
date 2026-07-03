@@ -278,6 +278,25 @@ pnpm staging:request POST /api/admin/growth/ai-visibility/runs/<runId>/review/re
 
 Regla: `review_required` solo publica con aprobación humana sobre la misma `score_version`; `insufficient_data` no se publica nunca.
 
+### Verificar señales del reporte público completo (TASK-1328)
+
+Después de desplegar el cambio de TASK-1328, validar con un **token nuevo** generado post-deploy (los snapshots antiguos son `new-runs-only` por defecto):
+
+```bash
+pnpm staging:request /api/public/growth/ai-visibility/report/<newReportToken> --pretty
+```
+
+Checks mínimos sobre el JSON:
+
+- `model.agenticAxisScore` coincide con `model.readiness.agentic.overallScore` cuando readiness agentic fue medida.
+- `model.levels` mantiene `null` como cobertura/sin dato; `Be Actionable` usa readiness agentic, no el score de percepción.
+- `model.engineSnapshot[]` trae `present` y `resolved`; `resolved=0` se trata como "sin respuestas evaluables", no como "sin mención".
+- `model.citationSourceBreakdown.domains[]` muestra dominios agregados/top-N, sin URLs completas ni texto de providers.
+- `model.categoryTaxonomySummary.status='unknown'` o `categories=[]` no debe forzar narrativa pública.
+- El payload público no contiene `providerFindings`, `accuracyFindings`, prompts, raw provider text, full citation URLs ni reasons internos.
+
+Luego validar el hub `efeonce-think` contra el mismo token: secciones `report-engine-coverage`, `report-source-evidence`, `report-category-association`, `report-readiness` y `report-ladder`, desktop + mobile 390 con `scrollWidth <= clientWidth`.
+
 ## Generar Fix-It Artifacts (TASK-1269) — staging ON, smoke funcional pendiente
 
 Los Fix-It Artifacts se generan on-demand desde un reporte/snapshot existente y los probes del run. No llaman LLM, no escriben en el sitio del prospecto y quedan detrás de `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED`.
