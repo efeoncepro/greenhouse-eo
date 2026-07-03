@@ -63,10 +63,29 @@ La redireccion a `kortex-kappa.vercel.app/login` despues del OAuth no bloquea la
 ## Limites actuales
 
 - El OAuth runtime permite API operations, pero no autentica automaticamente el HubSpot CLI para subir CMS assets.
-- Para `hs upload` / `hs project upload` hacia ANAM se requiere agregar una cuenta CLI con Personal Access Key:
+- Para `hs upload` / `hs project upload` hacia ANAM se requiere una cuenta CLI con Personal Access Key. En la sesion ANAM quedo agregada como cuenta adicional:
 
-```bash
-hs account auth --account anam-19893546
+```text
+anam-19893546 [standard] (19893546)
+Auth Type: personalaccesskey
 ```
 
+- El default CLI se mantuvo en `kortex-dev [standard] (48713323)` para no perder acceso a Efeonce/Kortex.
+- Para operar ANAM usar `--profile anam` o `--account 19893546`.
 - Cualquier publish/schedule/archive/delete requiere aprobacion explicita.
+
+## Landing CMS React publicada
+
+La primera landing ANAM creada por este carril esta documentada en [`anam-chat-landing.md`](anam-chat-landing.md).
+
+Estado final:
+
+```text
+URL publica: https://anam-2.hubspotpagebuilder.com/agente-anam
+Developer Project: kortex-cms-react
+Project ID: 103589049
+Theme UID: kortex-anam-cms-react-theme
+Build live: 19
+```
+
+Limitacion observada: el endpoint `POST /cms/pages/2026-03/landing-pages/{objectId}/draft/push-live` requiere scopes `content` y `content.landing_pages.write`; el PAK usado para Developer Projects no los tenia al momento de la prueba.

@@ -115,6 +115,35 @@ hs project upload --account anam-19893546
 hs project deploy --account anam-19893546
 ```
 
+Para el proyecto CMS React de ANAM se uso perfil explicito para no cambiar el default Kortex/Efeonce:
+
+```bash
+hs project validate --profile anam
+hs project upload --profile anam
+hs project info --account 19893546 --json
+```
+
+Regla: no cambiar el default account de la CLI si el objetivo es solo operar ANAM adicionalmente. Usar perfiles/cuentas explicitas por comando.
+
+## Caso ANAM chat landing
+
+La landing `https://anam-2.hubspotpagebuilder.com/agente-anam` quedo publicada desde Developer Projects / CMS React:
+
+```text
+projectName: kortex-cms-react
+projectId: 103589049
+component UID: kortex-anam-cms-react-theme
+deployedBuildId: 19
+```
+
+Documentacion especifica: [`anam-chat-landing.md`](anam-chat-landing.md).
+
+Lecciones operativas:
+
+- HubSpot puede mostrar `deployedBuildId` nuevo antes de que la pagina publica sirva los assets nuevos; verificar la URL publica buscando `kortex-cms-react/<build>`.
+- La copy visible no debe mencionar `widget de HubSpot`; usar lenguaje de accion del usuario final.
+- El endpoint `draft/push-live` de Pages API requiere scopes `content` y `content.landing_pages.write`; si faltan, el refresh/publicacion debe hacerse desde editor o con un token nuevo autorizado para ese scope.
+
 ## Evidencia esperada de cierre
 
 - Portal y account usados.

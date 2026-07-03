@@ -16,6 +16,7 @@ El objetivo es dejar una ruta segura para investigar, disenar y eventualmente cr
 - [`developer-platform-research.md`](developer-platform-research.md): investigacion de la Developer Platform de HubSpot para landing pages, CMS React, modulos, templates y CLI.
 - [`landing-page-runbook.md`](landing-page-runbook.md): carril seguro para crear landing pages como `DRAFT`, publicar solo con aprobacion y separar API vs CLI.
 - [`anam-portal-access.md`](anam-portal-access.md): estado de acceso OAuth del portal ANAM y capacidades observadas.
+- [`anam-chat-landing.md`](anam-chat-landing.md): landing de contacto ANAM en CMS React, builds, copy, diseno, comandos CLI, verificacion y guardrails.
 
 ## Decision operativa
 
@@ -30,6 +31,7 @@ Hay dos carriles distintos:
    - Usa HubSpot CLI o Developer Projects.
    - Requiere autenticar el CLI contra el portal destino con Personal Access Key.
    - No depende automaticamente del OAuth runtime de Kortex.
+   - Para ANAM, usar el perfil adicional `anam` / cuenta `19893546` sin reemplazar el default Kortex/Efeonce.
 
 ## Regla de seguridad
 
@@ -40,4 +42,3 @@ No publicar, programar publicacion, archivar, borrar ni reemplazar templates en 
 - prueba en `DRAFT`;
 - URL/preview verificada;
 - confirmacion humana explicita.
-

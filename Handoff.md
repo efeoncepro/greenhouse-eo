@@ -1,3 +1,15 @@
+## Sesion 2026-07-03 - Kortex HubSpot CMS / ANAM chat landing - Codex - live + docs
+
+> **Pedido:** crear y cerrar una landing de contacto ANAM en HubSpot CMS React, orientada a contener el chat agent de HubSpot; luego documentar todo en Greenhouse y commitear.
+>
+> **Resultado live:** `https://anam-2.hubspotpagebuilder.com/agente-anam` esta sirviendo `kortex-cms-react/19`. Developer Project `kortex-cms-react`, `projectId=103589049`, `deployedBuildId=19`, component UID `kortex-anam-cms-react-theme`. Se mantuvo el default HubSpot CLI en `kortex-dev [standard] (48713323)` y ANAM quedo como perfil/cuenta adicional (`anam-19893546`, portal `19893546`) para no perder acceso a Efeonce/Kortex.
+>
+> **Producto/UX:** landing funcional para iniciar conversacion, no landing marketing. Copy final evita lenguaje interno (`widget de HubSpot`) y usa CTA `Iniciar chat`; categorias `Cotizar`, `Consultar servicio`, `Enviar requerimiento`, `Revisar seguimiento`; panel derecho `Canal listo para atender`, `Atención guiada`, `Datos protegidos`. Visual final: navy ANAM para titulos/acciones principales, teal como acento, Poppins, footer simple, avatar ejecutivo virtual 3D con logo ANAM.
+>
+> **Evidencia:** `hs project validate --profile anam` verde; `hs project upload --profile anam` desplego build #19; `hs project info --account 19893546 --json` reporto `deployedBuildId=19`; `curl` publico confirmo `kortex-cms-react/19`. Playwright headless desde runtime Codex confirmo `hasNewCopy=true`, `hasOldWidgetCopy=false`, `scrollWidth=clientWidth=1440`. Publish por API (`draft/push-live`) fallo con `403 MISSING_SCOPES` por falta de `content` y `content.landing_pages.write`, pero no quedo pendiente porque la pagina publica ya tomo build #19.
+>
+> **Docs actualizadas:** ficha canonica `docs/architecture/kortex/hubspot-cms/anam-chat-landing.md`, indice/runbook/acceso ANAM, `project_context.md`, `Handoff.md`, `changelog.md`.
+
 ## Sesion 2026-07-02 - Kortex HubSpot CMS / ANAM Content Hub - Codex - docs
 
 > **Pedido:** investigar HubSpot Developer Platform para CMS/landing pages antes de tocar runtime, sumar el aprendizaje a la skill HubSpot existente y abrir carpeta Kortex en Greenhouse si no existia.
