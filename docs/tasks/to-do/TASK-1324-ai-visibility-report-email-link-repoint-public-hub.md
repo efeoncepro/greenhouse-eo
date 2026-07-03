@@ -22,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|integrations`
-- Blocked by: `Hub público live en think.efeoncepro.com (repo + proyecto Vercel + DNS — externo al workspace)`
+- Blocked by: `TASK-1325 (hub público live en think.efeoncepro.com — repo + proyecto Vercel + DNS)`
 - Branch: `task/TASK-1324-ai-visibility-report-email-link-repoint-public-hub`
 - Legacy ID: `none`
 - GitHub Issue: `none`
