@@ -61,6 +61,19 @@ vi.mock('../public-delivery/finalize-delivery', () => ({
   finalizeRunDelivery: async () => null,
 }))
 
+// Auto-scoring en la finalización (fix 2026-07-02): el run-engine ahora scorea el run terminal-con-
+// datos antes de finalizar el delivery. Se aísla como spy para verificar QUÉ runs se scorean sin
+// tocar el scoring engine real. `scoreCalls` registra los runId scoreados.
+const scoreCalls: string[] = []
+
+vi.mock('../scoring/command', () => ({
+  scoreGraderRun: async (input: { runId: string }) => {
+    scoreCalls.push(input.runId)
+
+    return { score: {}, findings: [] }
+  },
+}))
+
 vi.mock('../store', () => ({
   findRunByIdempotencyKey: async (key: string) => db.runsByKey.get(key) ?? null,
   findOrCreateGraderProfile: async () => PROFILE,
@@ -150,6 +163,7 @@ beforeEach(() => {
   db.runsByKey = new Map()
   db.observations = []
   db.insertCalls = []
+  scoreCalls.length = 0
   runSeq = 0
 })
 
@@ -168,6 +182,29 @@ describe('growth/ai-visibility — executeGraderRun (primitive síncrono)', () =
     expect(db.observations).toHaveLength(4)
     expect(result.run.status).toBe('partial')
     expect(result.idempotentHit).toBe(false)
+  })
+
+  it('auto-scorea el run cuando es succeeded/partial (fix: sin esto el path público nunca genera informe)', async () => {
+    const result = await executeGraderRun({
+      ...baseInput,
+      adapters: {
+        openai: createFakeProviderAdapter({ provider: 'openai', behavior: 'succeed' }),
+        anthropic: createFakeProviderAdapter({ provider: 'anthropic', behavior: 'skip' })
+      }
+    })
+
+    expect(result.run.status).toBe('partial')
+    expect(scoreCalls).toContain(result.run.runId)
+  })
+
+  it('NO auto-scorea un run skipped (sin datos que puntuar → delivery unavailable, honesto)', async () => {
+    const result = await executeGraderRun({
+      ...baseInput,
+      adapters: { openai: createFakeProviderAdapter({ provider: 'openai', behavior: 'skip' }) }
+    })
+
+    expect(result.run.status).toBe('skipped')
+    expect(scoreCalls).toHaveLength(0)
   })
 
   it('persiste cada observación INCREMENTALMENTE (un insert por observación)', async () => {
