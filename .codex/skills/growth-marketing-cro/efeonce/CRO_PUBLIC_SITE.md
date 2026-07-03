@@ -14,8 +14,13 @@
 - **Control plane del sitio:** WordPress/Elementor + recalibración hacia Astro
   (`GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`,
   `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`).
-- **Content factory:** `src/lib/public-site/content-factory/**` (gutenberg planner/
-  validator/pattern-catalog) — el motor del content loop de adquisición.
+- **Content factory:** `src/lib/public-site/content-factory/**` — el motor del content
+  loop de adquisición. Pipeline completo y verificado live (Slice 8-9):
+  `ideate` (LLM autónomo) → `revise` (co-creación) → `author` → `validate` →
+  `run --send` (write gobernado `private`, autoría del operador). CLIs
+  `pnpm public-website:content-factory:{ideate,author,run}`. Detalle en la skill
+  owner `efeonce-public-site-wordpress` (`references/content-factory-gutenberg.md`) +
+  `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`.
 - **Comparison table widget:** `docs/documentation/public-site/comparison-table-widget.md`
   — pieza de conversión (comparativa) para páginas de servicio.
 
