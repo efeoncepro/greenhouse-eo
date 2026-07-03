@@ -1,3 +1,15 @@
+## Sesion 2026-07-03 - TASK-1328 AI Visibility report signal completeness - Codex - code complete local
+
+> **Pedido:** invocar skills UI/UX/SEO y ejecutar TASK-1328. Goal confirmado: implementar local-first, sin push ni deploy productivo; Greenhouse como SSOT del modelo y `efeonce-think` como renderer tonto.
+>
+> **Implementado en Greenhouse:** `executeClaimedGraderRun` ahora ejecuta `gatherRunProbes()` antes de `finalizeRunDelivery()`, evitando que snapshots nuevos congelen readiness en null cuando las probes existen. `ReportArtifactModel` expone campos additive public-safe (`readiness`, `citationSourceBreakdown`, `categoryTaxonomySummary`) y mapea `readiness.agentic.overallScore` a `agenticAxisScore` + nivel `Be Actionable`, preservando `null != 0`.
+>
+> **Implementado en `efeonce-think`:** `src/pages/brand-visibility/r/[token].astro` renderiza method/provenance, denominadores por motor `present/resolved`, fuentes citadas por dominio, categoria condicional y readiness/operabilidad desde `model`. Se agregaron markers `report-hero`, `report-readiness`, `report-engine-coverage`, `report-source-evidence`, `report-category-association`, `report-ladder`. `MaturityLadder` no se reescribió.
+>
+> **Evidencia local:** Greenhouse focal Vitest 4 files / 30 tests passed; `pnpm typecheck`, `pnpm lint`, `pnpm ops:lint --changed` passed. `efeonce-think`: `pnpm type-check` + `pnpm build` passed. Capturas locales con fixture public-safe: `/Users/jreye/Documents/efeonce-think/.captures/task1328-report-desktop.png` y `...mobile.png`; Playwright assertion PASS (`scrollWidth=clientWidth` desktop 1440 y mobile 390, markers presentes, no forbidden leak tokens).
+>
+> **Estado de cierre:** `code complete local, rollout pendiente`. No se hizo push, Vercel deploy, worker deploy ni smoke con token productivo por instrucción local-first. TASK-1328 queda en `in-progress/` con `Status real: Code complete local — Greenhouse + efeonce-think; rollout/deploy pendiente`. Política para snapshots existentes: `new-runs-only` por defecto; republish/version bump requiere task/gobierno explícito.
+
 ## Sesion 2026-07-03 - Release develop→main (v2): TASK-1324 + Content Factory + AEO polish — RELEASED - Claude - live
 
 > **Pedido:** pase completo a producción de TASK-1324 (fix del link 404 del correo), siguiendo el control plane de release. Autorización plena del operador para aprobar todo + resolver bugs de raíz.

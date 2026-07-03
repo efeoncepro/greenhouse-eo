@@ -25,9 +25,11 @@ import {
   type ScoreDimensionKey
 } from '@/lib/growth/ai-visibility/scoring/config'
 import type {
+  CategoryTaxonomySummary,
   ClientGraderReport,
   CompetitiveShareOfVoice,
   CitationInsight,
+  CitationSourceBreakdown,
   GraderReport,
   GraderReportAudience,
   GraderReportGate,
@@ -37,6 +39,7 @@ import type {
   PublicGraderReport,
   PublicPrimaryGap,
   PublicReportDimension,
+  PublicReportReadiness,
   PublicReportRecommendation,
   RecommendedMotion,
   ReportHeadline,
@@ -217,8 +220,8 @@ export interface ReportArtifactLevel {
 
 /**
  * Modelo normalizado del informe — superset que los adapters de render consumen.
- * Los campos internal-only (`engineSnapshot`) sólo se pueblan desde `GraderReport`
- * (adminPreview); en el resto de variants quedan `undefined` por construcción.
+ * El modelo público se alimenta de DTOs public-safe; `engineSnapshot` son conteos
+ * por motor y es público-safe. La narrativa cruda de providers no entra a este modelo.
  */
 export interface ReportArtifactModel {
   variant: ReportArtifactVariant
@@ -230,7 +233,7 @@ export interface ReportArtifactModel {
   overallSeverity: GraderReportSeverity
   /** Eje percepción: promedio ponderado de las dimensiones de los niveles de percepción medidos. */
   perceptionAxisScore: number | null
-  /** Eje operabilidad agéntica: null hasta que TASK-1266 lo mida (nunca fabricado). */
+  /** Eje operabilidad agéntica: null si no hubo probes/readiness; nunca fabricado ni mezclado. */
   agenticAxisScore: number | null
   levels: ReportArtifactLevel[]
   dimensions: PublicReportDimension[]
@@ -240,9 +243,12 @@ export interface ReportArtifactModel {
   competitiveSov: CompetitiveShareOfVoice
   sourceTypeSummary: SourceTypeCount[]
   citationInsight: CitationInsight
+  citationSourceBreakdown: CitationSourceBreakdown
+  categoryTaxonomySummary: CategoryTaxonomySummary
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend
+  readiness: PublicReportReadiness | null
   provenance: ReportProvenance
   disclaimer: string
   /** Presencia por motor (conteos) de la marca evaluada — público-safe, con logo + nombre. */
@@ -276,17 +282,23 @@ const weightedAverage = (
   }
 
   if (weightSum === 0) return null
-  
-return Math.round(scoreSum / weightSum)
+
+  return Math.round(scoreSum / weightSum)
 }
 
-const buildLevels = (dimensions: PublicReportDimension[]): ReportArtifactLevel[] =>
+const buildLevels = (
+  dimensions: PublicReportDimension[],
+  readiness: PublicReportReadiness | null
+): ReportArtifactLevel[] =>
   REPORT_LEVEL_IDS.map(id => {
     const dimensionKeys = REPORT_LEVEL_DIMENSIONS[id]
-    const score = weightedAverage(dimensions, dimensionKeys)
 
-    
-return {
+    const score =
+      id === 'actionable'
+        ? readiness?.agentic.overallScore ?? null
+        : weightedAverage(dimensions, dimensionKeys)
+
+    return {
       id,
       axis: REPORT_LEVEL_AXIS[id],
       score,
@@ -319,8 +331,8 @@ const baseModel = (
   overallScore: report.overallScore,
   overallSeverity: report.overallSeverity,
   perceptionAxisScore: perceptionAxisScore(report.dimensions),
-  agenticAxisScore: null,
-  levels: buildLevels(report.dimensions),
+  agenticAxisScore: report.readiness?.agentic.overallScore ?? null,
+  levels: buildLevels(report.dimensions, report.readiness),
   dimensions: report.dimensions,
   primaryGap: report.primaryGap,
   recommendations: report.recommendations,
@@ -328,9 +340,12 @@ const baseModel = (
   competitiveSov: report.competitiveSov,
   sourceTypeSummary: report.sourceTypeSummary,
   citationInsight: report.citationInsight,
+  citationSourceBreakdown: report.citationSourceBreakdown,
+  categoryTaxonomySummary: report.categoryTaxonomySummary,
   sentimentSummary: report.sentimentSummary,
   positionSummary: report.positionSummary,
   trend: report.trend,
+  readiness: report.readiness,
   provenance: report.provenance,
   disclaimer: report.disclaimer,
   // TASK-1252 — presencia por motor (conteos) de la marca evaluada. Público-safe: es la
@@ -370,8 +385,8 @@ return {
     overallScore: report.overallScore,
     overallSeverity: report.overallSeverity,
     perceptionAxisScore: perceptionAxisScore(dimensions),
-    agenticAxisScore: null,
-    levels: buildLevels(dimensions),
+    agenticAxisScore: report.readiness?.agentic.overallScore ?? null,
+    levels: buildLevels(dimensions, report.readiness),
     dimensions,
     primaryGap: report.primaryGap
       ? {
@@ -393,9 +408,12 @@ return {
     competitiveSov: report.competitiveSov,
     sourceTypeSummary: report.sourceTypeSummary,
     citationInsight: report.citationInsight,
+    citationSourceBreakdown: report.citationSourceBreakdown,
+    categoryTaxonomySummary: report.categoryTaxonomySummary,
     sentimentSummary: report.sentimentSummary,
     positionSummary: report.positionSummary,
     trend: report.trend,
+    readiness: report.readiness,
     provenance: report.provenance,
     disclaimer: report.disclaimer,
     engineSnapshot: report.providerPresence

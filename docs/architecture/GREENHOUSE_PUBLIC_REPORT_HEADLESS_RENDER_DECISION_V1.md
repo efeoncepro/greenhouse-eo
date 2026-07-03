@@ -162,3 +162,17 @@ La **Superficie A (render del informe)** está **viva en producción**: `https:/
 **Marca:** los tokens AXIS se copiaron al hub (`efeonce-think/src/lib/report-tokens.ts` — `axis` + `severityMeta`), duplicación temporal por la decisión práctica de arriba; consolidación a paquete compartido al converger en `efeonce-web`.
 
 **Estado del loop:** falta sólo el repoint del enlace de los correos = **TASK-1324** (ahora desbloqueada; la URL final `/brand-visibility/r/<token>` está viva y estable). Superficie B (landing + form) = **TASK-1327**.
+
+## Delta 2026-07-03 — TASK-1328 signal completeness (code complete local, rollout pendiente)
+
+El contrato headless se mantiene como `GET /api/public/growth/ai-visibility/report/[token]` → `{ report, model, modelVersion, header, asOf, expiresAt }`, pero el `model publicWeb` ahora incluye señales public-safe adicionales que el grader ya producía y el render público no mostraba:
+
+- `readiness` como eje ortogonal de operabilidad (`structural` + `agentic`) y `agenticAxisScore`/nivel `Be Actionable` alimentado por `readiness.agentic.overallScore`. El score de percepción no se mezcla con readiness.
+- `citationSourceBreakdown` como evidencia bounded de dominios citados. El hub muestra dominios agregados/top-N, no URLs completas ni texto crudo.
+- `categoryTaxonomySummary` como sección condicional; `unknown` o `categories=[]` no genera narrativa.
+- `engineSnapshot` conserva denominadores `present/resolved` por motor, de forma que `0 resolved` no se confunda con `0 mentions`.
+- `provenance` alimenta una banda metodológica compacta (prompts, providers, corte de evidencia).
+
+La corrección de lifecycle mueve `gatherRunProbes()` antes de `finalizeRunDelivery()` para que snapshots nuevos puedan congelar readiness/probes antes de entregar el token. **Snapshots existentes quedan `new-runs-only` por defecto**: no se republish/version-bump sin una task gobernada que defina alcance, idempotencia y comunicación.
+
+Estado operativo: code complete local en Greenhouse + `efeonce-think`, sin push/deploy. Evidencia local en TASK-1328: focal tests, typecheck/lint, Astro `type-check`/`build`, capturas desktop/mobile y assertion de no-overflow/no-leak. Producción requiere deploy Greenhouse + hub y smoke con token nuevo antes de prometer disponibilidad real.

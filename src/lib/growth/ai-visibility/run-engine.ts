@@ -324,13 +324,16 @@ export const executeClaimedGraderRun = async (
     }
   }
 
+  // TASK-1266 — Probes técnicos read-only del sitio analizado (eje structural/agentic, gated por flag,
+  // default OFF). Best-effort: la readiness NUNCA degrada el run de percepción (gatherRunProbes no lanza).
+  // TASK-1328 — Debe ocurrir ANTES de publicar el snapshot: `finalizeRunDelivery` congela
+  // `PublicGraderReport` en `grader_reports`; si se publica primero, readiness queda `null`
+  // para el token aunque los probes existan justo después.
+  await gatherRunProbes(finalized.runId)
+
   // TASK-1245 — auto-publish del snapshot + materialización del delivery state público (write-side,
   // NO on-read). succeeded/partial publicable → ready; review_required → in_review; resto → unavailable.
   await finalizeRunDelivery(finalized)
-
-  // TASK-1266 — Probes técnicos read-only del sitio analizado (eje structural/agentic, gated por flag,
-  // default OFF). Best-effort: la readiness NUNCA degrada el run de percepción (gatherRunProbes no lanza).
-  await gatherRunProbes(finalized.runId)
 
   return { run: finalized, observations, idempotentHit: false, costGuardTripped }
 }

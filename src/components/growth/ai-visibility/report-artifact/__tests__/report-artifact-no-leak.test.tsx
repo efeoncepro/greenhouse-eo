@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
 import { GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT } from '@/lib/copy/growth'
+import type { PublicGraderReport } from '@/lib/growth/ai-visibility/report'
 
 import AiVisibilityReportArtifact, { type ReportHeader } from '../web/AiVisibilityReportArtifact'
 import AiVisibilityReportPrint from '../print/AiVisibilityReportPrint'
@@ -44,6 +45,45 @@ const INTERNAL_LEAK_STRINGS = [
   'confusión con una marca homónima',
   'Confusión de identidad'
 ]
+
+const PUBLIC_REPORT_WITH_READINESS: PublicGraderReport = {
+  ...SAMPLE_PUBLIC_REPORT,
+  readiness: {
+    scoreVersion: 'ai_readiness_score_v1',
+    structural: {
+      axis: 'structural',
+      overallScore: 58,
+      severity: 'atencion',
+      dimensions: [
+        {
+          key: 'json_ld',
+          label: 'Datos estructurados',
+          score: 58,
+          max: 100,
+          status: 'ok',
+          severity: 'atencion'
+        }
+      ],
+      coverage: { probed: 1, measured: 1 }
+    },
+    agentic: {
+      axis: 'agentic',
+      overallScore: 64,
+      severity: 'atencion',
+      dimensions: [
+        {
+          key: 'well_known_mcp',
+          label: 'MCP discoverability',
+          score: 64,
+          max: 100,
+          status: 'ok',
+          severity: 'atencion'
+        }
+      ],
+      coverage: { probed: 1, measured: 1 }
+    }
+  }
+}
 
 describe('AiVisibilityReportArtifact — no-leak visual', () => {
   it('publicWeb no filtra data internal-only', () => {
@@ -84,6 +124,34 @@ describe('AiVisibilityReportArtifact — no-leak visual', () => {
     expect(container.textContent).toContain(GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT.engineSnapshot.title)
     expect(container.textContent).toContain('Gemini (Google)')
     expect(container.textContent).toContain('Perplexity')
+  })
+
+  it('publicWeb materializa Be Actionable desde readiness agentic sin mezclarlo con percepción', () => {
+    const model = modelFromPublicReport(PUBLIC_REPORT_WITH_READINESS)
+    const actionable = model.levels.find(level => level.id === 'actionable')
+
+    expect(model.agenticAxisScore).toBe(64)
+    expect(actionable).toMatchObject({
+      id: 'actionable',
+      axis: 'agentic',
+      score: 64,
+      status: 'measured',
+      severity: 'atencion'
+    })
+    expect(model.perceptionAxisScore).not.toBe(model.agenticAxisScore)
+    expect(model.overallScore).toBe(SAMPLE_PUBLIC_REPORT.overallScore)
+  })
+
+  it('publicWeb expone señales additive public-safe para el hub sin reasons internos', () => {
+    const model = modelFromPublicReport(PUBLIC_REPORT_WITH_READINESS)
+    const serialized = JSON.stringify(model)
+
+    expect(model.citationSourceBreakdown.domains[0]).toMatchObject({ domain: 'g2.com' })
+    expect(model.categoryTaxonomySummary.status).toBe('mapped')
+    expect(model.readiness?.agentic.overallScore).toBe(64)
+    expect(serialized).not.toContain('razón interna')
+    expect(serialized).not.toContain('providerFindings')
+    expect(serialized).not.toContain('accuracyFindings')
   })
 
   it('print/attachment adapter renderiza público-safe (sin leak, sin trend/engine)', () => {
