@@ -601,6 +601,28 @@ implementado).
 - Evidencia: correr `plan` + `validate` sobre el brief generado → `status=pass`,
   sin tocar WordPress.
 
+#### Slice 8 implementation note — 2026-07-03 (backbone de autoría shipped)
+
+- Estado: `in-progress`. El backbone determinista de la autoría está shipped; la
+  capa LLM de ideación queda como productización.
+- **Primitive de autoría** `src/lib/public-site/content-factory/article-authoring.ts`:
+  `authorGutenbergDraft(spec: GutenbergArticleSpec)` → `contentFactoryGeneratedDraft.v1`.
+  El autor (agente Claude/Codex o LLM futuro) decide el CONTENIDO en una spec
+  tipada (title, seo, intro[], sections[{heading, level, blocks[]}], cta); el
+  primitive garantiza la ESTRUCTURA (headings anclados + TOC poblado vía los
+  helpers canónicos, escaping, slug kebab, observedBlocks, no inventa media).
+  Principio: libertad semántica en la spec, determinismo en el ensamblado → la
+  clase de defecto 250748 no puede reaparecer.
+- **CLI consumer** `pnpm public-website:content-factory:author -- --file spec.json`
+  (Full API Parity: el primitive es canónico, el CLI lo envuelve; no toca WordPress).
+- Tests: `article-authoring.test.ts` re-autora el artículo Kung Fu vía spec →
+  `validate=pass` (reemplaza el Python ad-hoc del primer post manual). Suite
+  content-factory 46/46, typecheck limpio.
+- **Pendiente de Slice 8/9:** la capa `content-factory:ideate` que compone
+  `copywriting` + `digital-marketing` + `seo-aeo` para PRODUCIR la spec/contenido.
+  Hoy la produce el agente in-session (agent-first, como el Kung Fu); la versión
+  LLM-programática (Slice 9) llama `src/lib/ai/*` con los helpers como herramienta.
+
 ### Slice 9 — End-to-End Orchestrator (pegamento del loop)
 
 - Crear el flujo único que encadena `ideate → plan → validate → send-draft →
