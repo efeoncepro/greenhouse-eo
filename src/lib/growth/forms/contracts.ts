@@ -332,6 +332,7 @@ export const isBrowserSafeSuccessHref = (value: string): boolean => {
 
 export const successCardHrefSchema = z
   .string()
+  .trim()
   .max(SUCCESS_HREF_MAX)
   .refine(isBrowserSafeSuccessHref, {
     message: 'href debe ser https (o path same-origin `/`); sin javascript:/data:/non-https externa',
