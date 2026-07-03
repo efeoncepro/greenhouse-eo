@@ -663,9 +663,19 @@ implementado).
 - **Env:** `CONTENT_FACTORY_IDEATION_MODEL` (override de modelo, opcional; default
   `claude-sonnet-4-6`) — NO es un `*_ENABLED` flag, no va al feature-flag ledger.
   Requiere `ANTHROPIC_API_KEY`/`_SECRET_REF` (`greenhouse-anthropic-api-key`).
-- **Pendiente Slice 9 (orquestador de una-sola-llamada + write):** encadenar
-  `ideate → author → send-draft` con la autoría del operador (bridge `authorId`).
-  Hoy el write sigue siendo el paso gobernado manual (post 250748 probado).
+- **Orquestador end-to-end shipped (dry-verificado):**
+  `pnpm public-website:content-factory:run -- [--idea "…" | --spec spec.json] [--send --author-id N]`.
+  Encadena `ideate|spec → author → validate → (send gated)`. DRY por default (produce
+  + valida, NO escribe). `--send` ejecuta el write gobernado solo si `validation=pass`
+  (block ⇒ rehúsa; warning ⇒ exige `--allow-warnings`) y con `--author-id` (tu usuario
+  WP = `post_author`). Write builder puro `draft-write-eval.ts`
+  (`buildGovernedDraftWriteEval`): private, idempotente por `manifestId`, UTF-8 nowdoc
+  (gotcha #2), ownership + Yoast meta, readback JSON parseable; generaliza el método
+  del post 250748 (unit-tested). Verificado: dry-run `validation=pass` sin write; gate
+  rehúsa `--send` sin author-id. **Pendiente:** un `--send` live disposable (smoke +
+  trash) para probar el write del orquestador end-to-end — requiere OK del operador
+  (write a producción). El bridge `/v1/drafts` con `authorId` queda como productización
+  futura (hoy writes OFF + `production_deploy_apply` bloqueada → wpcli es la vía).
 - Doc funcional: `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`.
 
 ## Out of Scope

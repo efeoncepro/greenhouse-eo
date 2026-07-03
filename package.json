@@ -155,6 +155,7 @@
     "public-website:bridge-draft-contract": "tsx scripts/public-website/bridge-draft-contract.ts",
     "public-website:content-factory:author": "tsx scripts/public-website/content-factory-author.ts",
     "public-website:content-factory:ideate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/public-website/content-factory-ideate.ts",
+    "public-website:content-factory:run": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/public-website/content-factory-run.ts",
     "public-website:content-factory:capabilities": "tsx scripts/public-website/content-factory-capabilities.ts",
     "public-website:content-factory:inspect": "tsx scripts/public-website/content-factory-inspect.ts",
     "public-website:content-factory:inspect-post-deep": "tsx scripts/public-website/content-factory-inspect-post-deep.ts",
