@@ -70,6 +70,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-114` | [Preflight batch-policy: falso positivo `requires_break_glass` por divergencia de squash-merge](open/ISSUE-114-release-batch-policy-classifier-squash-divergence-false-positive.md) | CI/local (release preflight) | 2026-07-03 | open (mitigado con bypass + sync merge-base; fix de raíz pendiente) |
 | `ISSUE-113` | [Brand-intelligence: el provider Gemini errora (Vertex) y bloqueaba toda la lectura](open/ISSUE-113-brand-intelligence-gemini-provider-error.md) | local + staging (ops-worker) | 2026-07-02 | open (mitigado: router fallthrough) |
 | `ISSUE-108` | [El color `primary` falla contraste WCAG 4.5:1 como texto (breadcrumb/botón/links) portal-wide](open/ISSUE-108-primary-palette-text-contrast-wcag-fail.md) | staging + production (paleta) | 2026-06-26 | open   |
 | `ISSUE-106` | [CHECK product_catalog_hubspot_trace_consistent bloquea productos inbound de quotes HubSpot](open/ISSUE-106-product-catalog-hubspot-trace-check-blocks-inbound-quote-products.md) | dev/staging data plane | 2026-06-22 | open   |
