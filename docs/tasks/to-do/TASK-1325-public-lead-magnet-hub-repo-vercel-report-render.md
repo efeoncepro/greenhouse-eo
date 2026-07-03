@@ -157,7 +157,7 @@ Reglas obligatorias (guardrails de `greenhouse-eo` que aplican a la coordinació
 
 ## Out of Scope
 
-- **NO** la landing pública `/brand-visibility` ni el form self-serve (Turnstile + poll + consent + GTM) — se difiere a una task nueva coordinada con el intake de **TASK-1321** (evitar dos portones de entrada al pipeline). El objetivo mínimo de 1325 es que **el link del correo abra el informe**.
+- **NO** la landing pública `/brand-visibility` ni el embed del form de intake — se difiere a una task nueva. **El form del grader NO es nuevo:** ya existe gobernado (`fdef-ai-visibility-grader`, formKey `69cd5269-5f97-4d32-99c4-0b23f41aa2f5`, slug `ai-visibility-grader`, surface `fhsf-ai-visibility-grader`, versión publicada v2); el hub sólo lo **embebe** con el renderer portable `<greenhouse-form form-key="69cd5269…">` (mismo patrón que WordPress con el form de AEO servicio). NO confundir con `/aeo-2/` = `fdef-efeonce-aeo-diagnostic` (formKey `b120566a…`), que es el form comercial que TASK-1321 puentea aparte. El objetivo mínimo de 1325 es que **el link del correo abra el informe**.
 - **NO** cambiar el scoring, el modelo, ni el endpoint headless de `greenhouse-eo` (TASK-1280 ya está).
 - **NO** el repoint del enlace de los correos — eso es **TASK-1324** (se destraba con este hub vivo).
 - **NO** la convergencia real dentro de `efeonce-web` — es un follow-up futuro; acá sólo se nace preparado para ella.
@@ -258,10 +258,10 @@ El resto (report artifact, disclosure matrix, estados, copy es-CL) está descrit
 ## Follow-ups
 
 - **TASK-1324** — repoint del enlace de los correos al hub (se toma apenas la URL final `/brand-visibility/r/<token>` esté viva).
-- **Landing `/brand-visibility` + form self-serve** (Turnstile + poll TASK-1245 + consent + GTM) — task nueva a crear cuando se decida el intake del lead magnet (WordPress `/aeo-2/` vs hub `think.`), coordinada con **TASK-1321**. No se construyen dos portones de entrada al pipeline.
+- **Landing `/brand-visibility` + embed del form de intake** — task nueva. El form ya existe gobernado (`fdef-ai-visibility-grader`, formKey `69cd5269…`); la landing lo **embebe** con `<greenhouse-form>` (renderer portable), NO construye un form nuevo. Hereda por construcción validación, consent, Turnstile, telemetry, poll (TASK-1245) y el path submission→outbox→pipeline (fachada `createPublicGraderRunViaFormsEngine`, flag `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED`). Verificar antes: que el grader tenga versión de **render** publicada para el renderer portable (hoy su versión es anchor de submission + resuelta por slug; confirmar el contrato de render). Es superficie aparte del report-render de 1325.
 - Convergencia del hub dentro de `efeonce-web` (futuro): plegar el hub conservando el subdominio/URL para no romper links ni re-apuntar.
 
 ## Open Questions
 
 - **Marca compartida:** ¿paquete compartido npm desde ya, o duplicación temporal documentada? (recomendado: paquete compartido — el merge futuro en `efeonce-web` lo agradece).
-- **Decisión de intake del lead magnet** (para la task del form, no bloquea 1325): ¿el form self-serve vive en WordPress `/aeo-2/` o en el hub `think.`? Se resuelve junto con TASK-1321.
+- ~~Decisión de intake WordPress vs hub~~ **NO aplica:** el form del grader ya existe gobernado (`fdef-ai-visibility-grader`, formKey `69cd5269…`); la task del form solo lo **embebe** en la landing del hub con `<greenhouse-form>`. `/aeo-2/` es el form comercial `fdef-efeonce-aeo-diagnostic` (otro flujo, TASK-1321). Único pendiente real para esa task: confirmar que el grader tiene contrato de **render** publicado para el renderer portable.
