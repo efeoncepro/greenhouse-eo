@@ -6,6 +6,7 @@ Canonical docs:
 
 - `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
 - `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
+- `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`
 - `docs/documentation/public-site/content-factory-golden-examples/README.md`
 - `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`
 - `docs/tasks/in-progress/TASK-1123-greenhouse-ai-content-factory-agent-kit.md`
@@ -97,3 +98,79 @@ pnpm public-website:bridge-draft-contract
 ```
 
 `--send` requires a configured shared secret and approved production/staging rollout. Do not use it as an ad-hoc write path.
+
+## AI-authored pipeline — ideate → author → validate → run (Slice 8-9, LIVE 2026-07-03)
+
+The full authoring pipeline is **built and verified live end-to-end**. It turns an
+idea into a governed, private, operator-authored WordPress post. Canonical docs:
+`docs/documentation/public-site/content-factory-ideation-and-cocreation.md` +
+`gutenberg-post-authoring-recipes.md`.
+
+### The shared canvas: `GutenbergArticleSpec`
+
+One typed artifact, many co-authors (LLM, Claude Code, Codex, Nexa, human). The
+author decides the CONTENT (a spec: `title, slug?, excerpt, seo{title,description},
+intro[], sections[{heading, level(2|3), blocks[]}], cta?`); the assembly guarantees
+the STRUCTURE. `authorGutenbergDraft(spec)` (in `article-authoring.ts`) →
+`contentFactoryGeneratedDraft.v1` with anchored headings + populated Yoast TOC +
+escaping + kebab slug + no invented media. Because assembly is deterministic, the
+dead-TOC / unanchored-heading defect class cannot reappear.
+
+### Two modes (operator requirement)
+
+- **Autonomous** — `ideateArticleSpec(idea, context)` (`article-ideation.ts`,
+  server-only) uses `generateStructuredAnthropic` (canonical `src/lib/ai/`) with
+  Efeonce editorial rules baked in (es-CL tuteo, intro→TOC→H2/H3, ≥3 headings,
+  ≥2 H2, enrichment, **public-data-only, never invents figures/media**, Yoast SEO
+  vars). Verified live (real Claude call → 5×H2 + 2×H3 article, validate=pass).
+- **Co-creation** — `reviseArticleSpec(spec, instruction)` steers an existing spec
+  with an operator instruction, preserving the rest. Verified live (added the
+  requested section, sharpened the CTA). When co-creating in-session, the agent IS
+  the LLM — it produces/edits the spec directly.
+
+### CLIs (non-mutating except `run --send`)
+
+```bash
+pnpm public-website:content-factory:ideate -- --idea "..." [--audience ...] [--out spec.json]
+pnpm public-website:content-factory:ideate -- --revise spec.json --instruction "..."
+pnpm public-website:content-factory:author -- --file spec.json        # spec → draft + validate
+pnpm public-website:content-factory:run    -- --idea "..."            # DRY: ideate→author→validate
+pnpm public-website:content-factory:run    -- --spec spec.json --send --author-id 1  # governed write
+```
+
+### Governed write + authorship
+
+`run --send` is the last-mile write. It is **gated**: refuses unless
+`validation=pass` (block refuses; warning needs `--allow-warnings`) and requires
+`--author-id` (the operator's real WP user). It reuses the sanctioned **wpcli
+eval-file** path (the bridge `/v1/drafts` has writes OFF + `production_deploy_apply`
+is a blocked capability). The pure builder `draft-write-eval.ts`
+(`buildGovernedDraftWriteEval`) creates ONE `post_status=private` post, idempotent
+by `manifestId`, with `post_author` = the operator user (NEVER the service user),
+ownership + Yoast meta, and a JSON readback. es-CL text is embedded as raw UTF-8
+nowdoc — **never `\uXXXX`** (the encoding gotcha that broke the first meta description).
+
+**Operator WP author** = user ID `1` (`jreysgo`, "Julio Reyes"; there is a second
+"Julio Reyes" ID `11` from an import — do NOT use). Service/bridge user = ID `12`
+(`Greenhouse INTEGRATION`, admin with `edit_others_posts` → can set post_author).
+
+### Live evidence
+
+- Post `250748` — the operator's real "I Know Kung Fu" article (private, authored
+  by Julio, TOC fixed in-situ). Publish is the operator's step.
+- Post `250770` — orchestrator `--send` smoke (private, author=Julio, idempotent),
+  trashed after readback (manifest+owned match).
+
+### Hard rules for agents
+
+- **NEVER** hand-write Gutenberg block markup — use `renderHeadingBlock` /
+  `renderYoastTableOfContents` (`gutenberg-blocks.ts`) or `authorGutenbergDraft`.
+- **NEVER** emit a Yoast TOC without populated anchor links + `id="h-{slug}"` headings
+  (the validator now warns: `blogpost_toc_not_populated`, `blogpost_toc_headings_unanchored`).
+- **NEVER** send text to the write path via `JSON.stringify`/`json.dumps` (`\uXXXX`
+  breaks accents in PHP) — raw UTF-8 nowdoc only.
+- **NEVER** set `post_author` to the service user for editorial posts — use the
+  operator's WP user id.
+- **NEVER** publish from the pipeline — the write ends at `private`; publishing is
+  a human step (auto-publish with guardrails is the separate opt-in TASK-1323).
+- **ALWAYS** run `--send` gated on `validation=pass` with an explicit `--author-id`.
