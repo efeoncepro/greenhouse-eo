@@ -135,9 +135,14 @@ const assertRenderContract = (label: string, contract: RenderContract, raw: stri
     throw new Error(`${label} is missing fullName field; expected AEO v8 Nombre completo contract`)
   }
 
-  if (fullName.label !== 'Nombre completo' || fullName.required !== true || fullName.autocomplete !== 'name') {
+  if (
+    fullName.label !== 'Nombre completo' ||
+    fullName.required !== true ||
+    fullName.autocomplete !== 'name' ||
+    fullName.placeholder !== 'ej. María González'
+  ) {
     throw new Error(
-      `${label} fullName field is ${JSON.stringify(fullName)}; expected label Nombre completo, required=true, autocomplete=name`
+      `${label} fullName field is ${JSON.stringify(fullName)}; expected label Nombre completo, required=true, autocomplete=name, placeholder=ej. María González`
     )
   }
 

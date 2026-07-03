@@ -9514,5 +9514,7 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 
 - Se corrigió en vivo el bug visual de los chevrons de los dropdowns premium: al abrir apuntan hacia arriba y al cerrar vuelven hacia abajo, sin quedarse desplazados como esquina. El host AEO incluye el marcador `gh-aeo-calendar-meeting-chevron-v1` como resguardo hasta el próximo release del renderer.
 - El link directo bajo el formulario cambió de `Agenda una conversación` a `Agenda una reunión` y ahora incluye icono decorativo de calendario.
-- Growth Forms AEO publicó v12 `fver-f933f877-c1ff-4e76-9832-2078ca64c6dd`; la Success Card conserva `presentation=success_card` y su acción schedule también usa `Agenda una reunión`.
+- Follow-up: el conjunto `Agenda una reunión` quedó separado del texto previo con flex/gap explícito, icono calendario de 16px y marker live `gh-aeo-meeting-link-spacing-v1`.
+- Follow-up final: `Nombre completo` ahora muestra placeholder `ej. María González`; Growth Forms AEO publicó v13 `fver-1f727049-6600-4d68-8089-1718b9edd54e`. Los links `Agenda una reunión` y `política de privacidad` usan hover navy→teal, sin subrayado, fondo, borde ni sombra; `Agenda una reunión` suma micro-lift del icono calendario (`gh-aeo-link-hover-signal-final-v1`).
+- Growth Forms AEO publicó v12 `fver-f933f877-c1ff-4e76-9832-2078ca64c6dd` y luego v13 `fver-1f727049-6600-4d68-8089-1718b9edd54e`; la Success Card conserva `presentation=success_card` y su acción schedule también usa `Agenda una reunión`.
 - Se corrigió la causa raíz en el renderer para que el transform de focus del select nativo no afecte el icono del combobox premium, y se agregaron assertions de chevron open/closed al behavior gate.

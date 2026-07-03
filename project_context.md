@@ -6054,5 +6054,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Delta 2026-07-03 — AEO Growth Forms meeting CTA + chevron guard
 
 - En `/aeo-2/`, el link directo bajo el formulario debe decir `Agenda una reunión` y usar icono de calendario; no volver a `Agenda una conversación`.
-- La Success Card de AEO usa el mismo label en su acción schedule desde la versión publicada `fver-f933f877-c1ff-4e76-9832-2078ca64c6dd` (v12).
+- Ese link debe mantener separación visual del texto previo: marker `gh-aeo-meeting-link-spacing-v1`, row flex con gap, icono calendario 16px y gap interno icono/texto.
+- El hover de `Agenda una reunión` y `política de privacidad` debe ser visible pero limpio: cambio navy→teal, sin underline, fondo, borde ni sombra. `Agenda una reunión` puede mover/escala sutilmente el icono calendario; reduced-motion lo apaga. Marker final live `gh-aeo-link-hover-signal-final-v1`.
+- La Success Card de AEO usa el mismo label en su acción schedule; versión publicada vigente `fver-1f727049-6600-4d68-8089-1718b9edd54e` (v13) agrega `fullName.placeholder="ej. María González"`.
 - Los chevrons de los dropdowns premium no deben heredar transforms del select nativo: el renderer limita el focus transform al hijo directo, y el host WordPress mantiene el marker `gh-aeo-calendar-meeting-chevron-v1` como resguardo live hasta el próximo release.

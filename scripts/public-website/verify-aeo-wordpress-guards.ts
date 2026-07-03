@@ -22,6 +22,11 @@ type GuardPayload = {
   conversHasTrustCopy: boolean
   conversHasMeetingCopy: boolean
   conversHasChevronOverride: boolean
+  conversHasMeetingLinkSpacing: boolean
+  conversHasModernLinkHover: boolean
+  conversHasMinimalLinkHover: boolean
+  conversHasHoverSignal: boolean
+  conversHasFinalHoverSignal: boolean
 }
 
 const expectedHeroansHash = 'e0b951b2456a83578cd9e22005900521'
@@ -103,6 +108,11 @@ $payload = array(
   'conversHasTrustCopy' => strpos($convers_html, 'Sin costo') !== false && strpos($convers_html, 'Sin compromiso') !== false,
   'conversHasMeetingCopy' => strpos($convers_html, 'Agenda una reunión') !== false && strpos($convers_html, 'Agenda una conversación') === false,
   'conversHasChevronOverride' => strpos($convers_html, 'gh-aeo-calendar-meeting-chevron-v1') !== false,
+  'conversHasMeetingLinkSpacing' => strpos($convers_html, 'gh-aeo-meeting-link-spacing-v1') !== false,
+  'conversHasModernLinkHover' => strpos($convers_html, 'gh-aeo-link-hover-modern-v1') !== false,
+  'conversHasMinimalLinkHover' => strpos($convers_html, 'gh-aeo-link-hover-minimal-v1') !== false,
+  'conversHasHoverSignal' => strpos($convers_html, 'gh-aeo-link-hover-signal-v1') !== false,
+  'conversHasFinalHoverSignal' => strpos($convers_html, 'gh-aeo-link-hover-signal-final-v1') !== false,
 );
 
 echo "${phpStartMarker}\\n";
@@ -166,6 +176,26 @@ const assertPayload = (payload: GuardPayload) => {
 
   if (!payload.conversHasChevronOverride) {
     throw new Error('convers widget is missing the AEO chevron override marker')
+  }
+
+  if (!payload.conversHasMeetingLinkSpacing) {
+    throw new Error('convers widget is missing the AEO meeting link spacing marker')
+  }
+
+  if (!payload.conversHasModernLinkHover) {
+    throw new Error('convers widget is missing the AEO modern link hover marker')
+  }
+
+  if (!payload.conversHasMinimalLinkHover) {
+    throw new Error('convers widget is missing the AEO minimal link hover marker')
+  }
+
+  if (!payload.conversHasHoverSignal) {
+    throw new Error('convers widget is missing the AEO link hover signal marker')
+  }
+
+  if (!payload.conversHasFinalHoverSignal) {
+    throw new Error('convers widget is missing the AEO final link hover signal marker')
   }
 }
 

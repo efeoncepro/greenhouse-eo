@@ -120,6 +120,19 @@ export const RENDERER_CSS = `
     align-items: center;
     min-height: 24px;
     color: var(--ghf-accent);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: color 140ms ease, background-color 140ms ease;
+  }
+  .ghf-help a:hover {
+    color: color-mix(in srgb, var(--ghf-accent) 74%, var(--ghf-fg));
+    background-color: transparent;
+    text-decoration: none;
+  }
+  .ghf-help a:focus-visible {
+    outline: 2px solid var(--ghf-focus);
+    outline-offset: 3px;
+    text-decoration: none;
   }
 
   .ghf-input,
@@ -702,7 +715,7 @@ export const RENDERER_CSS = `
     text-align: center;
     text-decoration: none;
     overflow-wrap: anywhere;
-    transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+    transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease, background-color 160ms ease;
   }
   .ghf-success-card__action-icon {
     display: inline-grid;
@@ -721,7 +734,14 @@ export const RENDERER_CSS = `
   .ghf-success-card__action:hover,
   .ghf-success-card__reward-action:hover {
     filter: saturate(1.04);
+    text-decoration: none;
     transform: translateY(-1px);
+  }
+  .ghf-success-card__action:focus-visible,
+  .ghf-success-card__reward-action:focus-visible {
+    outline: 2px solid var(--ghf-focus);
+    outline-offset: 3px;
+    text-decoration: none;
   }
   .ghf-success-card__action:active,
   .ghf-success-card__reward-action:active {

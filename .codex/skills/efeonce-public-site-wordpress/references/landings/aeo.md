@@ -182,8 +182,8 @@ Identifiers:
 - Form slug: `efeonce-aeo-diagnostic`
 - Form definition: `fdef-efeonce-aeo-diagnostic`
 - Form key: `b120566a-dd1a-43c8-956a-4e0121e805b8`
-- Current published version: `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad` (v7; `style_variant=diagnostic_premium`, declares `copy.submit="Empezar con mi diagnóstico →"`, preserves `ui_policy_json.security.captcha` and aligns premium select placeholders/listboxes)
-- Deprecated versions: v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657`, v1 `fver-efeonce-aeo-diagnostic-v1`
+- Current published version: `fver-1f727049-6600-4d68-8089-1718b9edd54e` (v13; `style_variant=diagnostic_premium`, declares `copy.submit="Empezar con mi diagnóstico →"`, preserves `ui_policy_json.security.captcha`, Success Card and approved placeholders including `fullName.placeholder="ej. María González"`)
+- Deprecated versions: v12 `fver-f933f877-c1ff-4e76-9832-2078ca64c6dd`, v7 `fver-f2f8abde-3b11-42b3-bf78-a309ef7678ad`, v6 `fver-9ec43a66-5372-45b7-829d-2c9e6381e27d`, v5 `fver-70c365c1-ea3b-4e84-b4b3-4fd852f951f4`, v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`, v3 `fver-9507f6a7-431d-4215-a699-9c713328b69b`, v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657`, v1 `fver-efeonce-aeo-diagnostic-v1`
 - Surface: `fhsf-efeonce-aeo-diagnostic`
 - API base: `https://greenhouse.efeoncepro.com`
 - Turnstile site key in render contract: `0x4AAAAAADqwX2R7v-k9pItv`
@@ -192,7 +192,7 @@ Identifiers:
 
 Fields:
 
-- `firstName`
+- `fullName`
 - `email`
 - `brandWebsite`
 - `country`
@@ -233,7 +233,7 @@ Approved conversion copy (2026-07-02 — de-duplicated vs hero/H2; subhead now c
 - `.gh-aeo-growth-form-card` is the only visible card.
 - Do not expose internal kickers such as `Growth Forms · Diagnóstico AEO`.
 - Public card starts directly with the rendered form fields; do not restore the old internal H3 `Solicita tu diagnóstico AEO` unless the operator explicitly asks for it.
-- Direct scheduling link: the visible/fallback form-card CTA uses `Agenda una reunión` with a decorative calendar icon, not `Agenda una conversación` nor the arrow-only treatment. Live marker: `gh-aeo-calendar-meeting-chevron-v1`; rollback backup `_gh_backup_before_aeo_agenda_meeting_chevron_20260703T095511Z`.
+- Direct scheduling link: the visible/fallback form-card CTA uses `Agenda una reunión` with a decorative calendar icon, not `Agenda una conversación` nor the arrow-only treatment. It must be visually separated from the preceding question (`display:flex`, 12px row gap) and the icon/text pair must stay aligned with a 16px calendar icon and 8px internal gap. Hover for this link and `política de privacidad` must not use underline, background, border, or shadow; approved feedback is teal color shift. `Agenda una reunión` may add a subtle calendar icon micro-lift/scale; reduced-motion disables it. Keyboard focus keeps a visible outline. Live markers: `gh-aeo-calendar-meeting-chevron-v1`, `gh-aeo-meeting-link-spacing-v1`, `gh-aeo-link-hover-modern-v1`, `gh-aeo-link-hover-minimal-v1`, `gh-aeo-link-hover-signal-final-v1`; rollback backups `_gh_backup_before_aeo_agenda_meeting_chevron_20260703T095511Z`, `_gh_backup_before_aeo_meeting_link_spacing_20260703T101900Z`, `_gh_backup_before_aeo_link_hover_modern_20260703T103300Z`, `_gh_backup_before_aeo_link_hover_minimal_20260703T104200Z`, `_gh_backup_before_aeo_link_hover_signal_final_20260703T110000Z`.
 - Renderer live layout: desktop pairs short fields/selects (`Nombre` + `Email`, `País` + `Tamaño`) and keeps long intent fields full-width; mobile 390 stacks to one column with no horizontal overflow. Single selects use premium combobox/listbox, not the native OS popup.
 - Premium select chevrons must not inherit the native-select `focus-within` transform. In the AEO host, `gh-aeo-calendar-meeting-chevron-v1` keeps the icon wrapper stable (`transform:none`) and rotates only the chevron pseudo-element; upstream renderer source owns the same root fix.
 
