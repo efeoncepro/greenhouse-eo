@@ -279,6 +279,49 @@ vuelta al menos un draft real.
 - **Scalability:** volumen bajísimo (unidades/semana); costo = LLM por generación,
   sin hot path.
 
+### Slice C — EJECUTADO en vivo (evidencia) 2026-07-03
+
+Primera escritura real end-to-end probada, con contenido real (artículo del
+operador desde Notion `38339c2f…`, "I Know Kung Fu / Agent Skills"):
+
+- **Estado del bridge (verificado read-only):** plugin `greenhouse-wp-bridge`
+  **ACTIVO** en vivo (v0.4.0) — la task decía "no desplegado". `WRITES_ENABLED`
+  = `undefined` (OFF). `production_deploy_apply` es capability bloqueada + editar
+  `wp-config` Kinsta es emergency-only → el flip global de writes del bridge NO
+  es la vía. Se usó la vía sancionada de menor blast-radius (misma que mutaciones
+  AEO Elementor): **write gobernado vía `wpcli eval-file`** (usuario 12
+  `Greenhouse INTEGRATION`, admin con `edit_others_posts`).
+- **Post creado:** id `250748`, `post_status=private` (404 a anónimos, verificado),
+  `post_author=1` (**Julio Reyes**, requisito de autoría cumplido), slug
+  `i-know-kung-fu-agent-skills-momento-matrix-ia-empresarial`, ownership meta
+  `_greenhouse_owned/_greenhouse_manifest_id/_greenhouse_source`.
+- **35 bloques parseados por el propio WordPress** (`parse_blocks`): 20 párrafos,
+  TOC Yoast, 9 headings, lista, 2 pullquotes, quote, separator. Idempotente por
+  `_greenhouse_manifest_id`. Rollback: `wp_trash_post(250748)`.
+- **Usuarios WP resueltos:** autor canónico = ID 1 `jreysgo` (display name
+  corregido `JULIO REYES`→`Julio Reyes`); ID 11 `jreyesi7s1` es un segundo Julio
+  (artefacto import/SSO); ID 12 = usuario de servicio del bridge.
+- **Publish** queda como paso humano (gobernanza): el post está `private`, el
+  operador revisa y publica.
+
+**Dos defectos encontrados en el pipeline (feedback del render real, corregidos in-situ):**
+
+1. **Recipe del TOC de Yoast es defectuosa** (`gutenberg-post-authoring-recipes.md`):
+   el ejemplo produce un bloque `yoast-seo/table-of-contents` con solo
+   `<h2>Tabla de contenidos</h2>` (sin `<ul>` de enlaces) y los headings SIN
+   ancla → el TOC sale vacío/no-funcional y en el editor se lee como un H2 suelto.
+   Formato correcto (verificado contra post real 248398): headings
+   `<h2 class="wp-block-heading" id="h-{slug}">` (prefijo `h-` + slug sin acentos)
+   + TOC con `<ul><li><a href="#h-{slug}" data-level="2">…</a><ul>…H3…</ul></li></ul>`.
+   **Follow-up:** corregir la recipe + hacer que el planner/generador (Slice 8/9)
+   emita headings anclados + TOC poblado.
+2. **UTF-8 en el write path:** embeder strings vía `JSON.stringify`/`json.dumps`
+   (que produce `\uXXXX` ASCII) dentro de un PHP eval-file rompe los acentos
+   (PHP no entiende `\uXXXX` sin `{}`) → la meta description salió `pasu00f3`.
+   El cuerpo/título salieron bien porque usaron nowdoc con UTF-8 crudo.
+   **Regla:** todo string es-CL al write path va como UTF-8 crudo (nowdoc /
+   single-quote / parámetro), NUNCA `\uXXXX`. Aplica al bridge `authorId`/payload.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
