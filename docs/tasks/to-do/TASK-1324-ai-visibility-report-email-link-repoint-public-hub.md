@@ -216,9 +216,11 @@ Reglas obligatorias:
 
 El único cambio de código en `greenhouse-eo` es el helper:
 
+URL final acordada (TASK-1325): **`https://think.efeoncepro.com/brand-visibility/r/<token>`** (repo `efeoncepro/efeonce-think`, llave del path = `report_token`).
+
 ```ts
-// src/lib/growth/ai-visibility/hubspot/report-link.ts  (forma objetivo, ajustar al path final acordado)
-const PUBLIC_REPORT_PATH_PREFIX = '/ai-visibility' // ← path final del hub (Slice 1)
+// src/lib/growth/ai-visibility/hubspot/report-link.ts  (forma objetivo)
+const PUBLIC_REPORT_PATH_PREFIX = '/brand-visibility/r' // ← path final del hub (TASK-1325)
 
 export const buildPublicReportUrl = (reportToken: string): string => {
   const base = (process.env.PUBLIC_GRADER_HUB_URL?.trim() || 'https://think.efeoncepro.com').replace(/\/+$/, '')
@@ -308,6 +310,6 @@ Todo lo demás (correo, HubSpot handoff) hereda el cambio por ser el helper la f
 
 ## Open Questions
 
-- **Host + path final del hub:** ¿`think.efeoncepro.com/ai-visibility/<handle>`? ¿La llave del path es `reportToken` o un `publicId`? (Bloquea Slice 2.)
+- ~~Host + path final del hub~~ **RESUELTO (2026-07-03):** `https://think.efeoncepro.com/brand-visibility/r/<token>`, llave = `report_token` (TASK-1325).
 - **Redirect puente (Slice 3):** ¿cuántos links vivos ya enviados justifican mantenerlos con un 301, o se acepta que mueran?
-- **Timing:** ¿el hub ya está live o esta task espera a que se levante el repo + Vercel + DNS?
+- **Timing:** esta task espera a que TASK-1325 deje la URL final viva (repo + Vercel + DNS + render).

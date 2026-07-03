@@ -44,12 +44,20 @@ El ADR contemplaba montar el hub dentro de `efeonce-web` (la migración Astro de
 
 Sin este hub, TASK-1324 no puede completarse: re-apuntar el correo solo cambiaría un 404 por otro.
 
+**Decisiones fijadas (operador, 2026-07-03):**
+
+- **Repo:** `efeoncepro/efeonce-think` (mapea 1:1 con el subdominio `think.efeoncepro.com`; hermano de `efeonce-web`; hub multi-herramienta — NO nombrarlo `aeo-*`/`grader-*`).
+- **Nombre visible de la herramienta:** "Visibilidad de marca en IA".
+- **Landing (indexable):** `https://think.efeoncepro.com/brand-visibility`.
+- **Informe (noindex, token-gated):** `https://think.efeoncepro.com/brand-visibility/r/<token>` — el segmento `/r/` separa landing pública de informe privado; la llave del path es el `report_token` (256 bits = la autenticación), NUNCA un id enumerable.
+- **Scope acotado a render-only:** esta task NO incluye la landing ni el form self-serve (ver Out of Scope + Follow-ups). El objetivo es desbloquear el enlace de los correos (TASK-1324) rápido y de bajo riesgo.
+
 ## Goal
 
-- Repo de GitHub nuevo (org `efeoncepro`) + proyecto Vercel dedicado (scope `efeonce-7670142f`) para el hub de lead magnets.
-- App desplegada que renderiza el informe del grader por token, consumiendo el endpoint headless de TASK-1280 (fetch server-side, sin CORS, token no expuesto al browser).
+- Repo de GitHub nuevo `efeoncepro/efeonce-think` + proyecto Vercel dedicado (team `efeonce-7670142f`) para el hub de lead magnets.
+- App desplegada que renderiza el informe del grader en `think.efeoncepro.com/brand-visibility/r/<token>`, consumiendo el endpoint headless de TASK-1280 (fetch server-side, sin CORS, token no expuesto al browser).
 - DNS de `think.efeoncepro.com` apuntando al proyecto Vercel, con la URL final del informe fijada y estable.
-- Base lista para que TASK-1324 repunte el enlace de los correos al destino real.
+- Base lista para que TASK-1324 repunte el enlace de los correos al destino real (`.../brand-visibility/r/<token>`).
 - Nacer preparado para converger en `efeonce-web` (stack + marca compartida) sin re-trabajo.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -127,7 +135,7 @@ Reglas obligatorias (guardrails de `greenhouse-eo` que aplican a la coordinació
 
 ### Slice 1 — Repo + proyecto Vercel + skeleton
 
-- Crear repo GitHub en org `efeoncepro` (nombre a definir, p.ej. `efeonce-hub` / `think-efeonce`).
+- Crear repo GitHub `efeoncepro/efeonce-think`.
 - Crear proyecto Vercel **en el team `efeonce-7670142f`** (scope explícito) vinculado a ese repo.
 - Skeleton de app **Astro** (mismo stack que `efeonce-web`, para converger después) con deploy verde en la URL `.vercel.app`.
 - **Decidir la estrategia de marca compartida** (recomendado: paquete compartido con tokens blend AXIS + marca pública, consumible por el hub y por `efeonce-web`; alternativa: duplicación temporal documentada con plan de consolidación).
@@ -142,18 +150,14 @@ Reglas obligatorias (guardrails de `greenhouse-eo` que aplican a la coordinació
 
 ### Slice 3 — URL final + DNS + verificación
 
-- Fijar el **host + path final** del informe (p.ej. `https://think.efeoncepro.com/ai-visibility/<token>`) y qué llave va en el path (`reportToken`).
+- URL final del informe: `https://think.efeoncepro.com/brand-visibility/r/<token>` (llave del path = `report_token`).
 - Configurar el dominio `think.efeoncepro.com` en el proyecto Vercel + registros DNS.
 - Verificar end-to-end con un token real: el informe correcto se ve, sin leaks, `noindex` presente.
-- **Actualizar el ADR** con repo/proyecto/URL final.
-
-### Slice 4 — (Opcional / follow-up) Landing + form self-serve
-
-- Landing del lead magnet + form (reusar `render_contract` del grader / renderer portable si aplica) + Turnstile (site key pública ya provisionada, TASK-1241 Delta) + poll (TASK-1245) + GTM.
-- Puede diferirse: el objetivo mínimo de esta task es que **el link del correo abra el informe**. El form self-serve es la evolución (se cruza con TASK-1321).
+- **Actualizar el ADR** con repo/proyecto/URL final + comunicar la URL a TASK-1324.
 
 ## Out of Scope
 
+- **NO** la landing pública `/brand-visibility` ni el form self-serve (Turnstile + poll + consent + GTM) — se difiere a una task nueva coordinada con el intake de **TASK-1321** (evitar dos portones de entrada al pipeline). El objetivo mínimo de 1325 es que **el link del correo abra el informe**.
 - **NO** cambiar el scoring, el modelo, ni el endpoint headless de `greenhouse-eo` (TASK-1280 ya está).
 - **NO** el repoint del enlace de los correos — eso es **TASK-1324** (se destraba con este hub vivo).
 - **NO** la convergencia real dentro de `efeonce-web` — es un follow-up futuro; acá sólo se nace preparado para ella.
@@ -183,8 +187,7 @@ El resto (report artifact, disclosure matrix, estados, copy es-CL) está descrit
 ### Slice ordering hard rule
 
 - **Slice 1 (repo + Vercel) → Slice 2 (render) → Slice 3 (URL final + DNS).** El DNS se conecta cuando hay algo desplegado que servir.
-- **Slice 3 fija la URL final** — que es la que TASK-1324 va a usar. NO cerrar 1325 sin URL final acordada, o 1324 queda sin destino estable.
-- Slice 4 (form) es independiente y opcional; no bloquea el desbloqueo de 1324.
+- **Slice 3 confirma/despliega la URL final** (`.../brand-visibility/r/<token>`) — que es la que TASK-1324 va a usar. NO cerrar 1325 sin la URL final viva, o 1324 queda sin destino estable.
 
 ### Risk matrix
 
@@ -226,12 +229,12 @@ El resto (report artifact, disclosure matrix, estados, copy es-CL) está descrit
 
 ## Acceptance Criteria
 
-- [ ] Existe repo GitHub nuevo (org `efeoncepro`) + proyecto Vercel dedicado en team `efeonce-7670142f` (verificado, no scope personal).
-- [ ] La app renderiza el informe del grader por token, consumiendo el endpoint de TASK-1280 **server-side** (token no expuesto al browser).
+- [ ] Existe repo GitHub `efeoncepro/efeonce-think` + proyecto Vercel dedicado en team `efeonce-7670142f` (verificado, no scope personal).
+- [ ] La app renderiza el informe del grader por token en `think.efeoncepro.com/brand-visibility/r/<token>`, consumiendo el endpoint de TASK-1280 **server-side** (token no expuesto al browser).
 - [ ] El render NO re-deriva scoring: pinta `model` + `header` tal como los entrega el endpoint.
 - [ ] Estados honestos cubiertos: cargando, listo, token inexistente/expirado (404), error, rate-limit (429).
 - [ ] El informe per-lead responde con `noindex`.
-- [ ] `think.efeoncepro.com` resuelve al proyecto Vercel y la URL final del informe está fijada y documentada.
+- [ ] `think.efeoncepro.com` resuelve al proyecto Vercel y la URL final `/brand-visibility/r/<token>` está viva y documentada.
 - [ ] La estrategia de marca compartida quedó decidida (paquete compartido recomendado) para no crear drift al converger en `efeonce-web`.
 - [ ] El ADR `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md` quedó actualizado (repo/proyecto/URL final).
 - [ ] La URL final fue comunicada a TASK-1324 para el repoint del correo.
@@ -254,13 +257,11 @@ El resto (report artifact, disclosure matrix, estados, copy es-CL) está descrit
 
 ## Follow-ups
 
-- **TASK-1324** — repoint del enlace de los correos al hub (se toma apenas la URL final esté fijada).
+- **TASK-1324** — repoint del enlace de los correos al hub (se toma apenas la URL final `/brand-visibility/r/<token>` esté viva).
+- **Landing `/brand-visibility` + form self-serve** (Turnstile + poll TASK-1245 + consent + GTM) — task nueva a crear cuando se decida el intake del lead magnet (WordPress `/aeo-2/` vs hub `think.`), coordinada con **TASK-1321**. No se construyen dos portones de entrada al pipeline.
 - Convergencia del hub dentro de `efeonce-web` (futuro): plegar el hub conservando el subdominio/URL para no romper links ni re-apuntar.
-- Landing + form self-serve del lead magnet (Slice 4 si se difiere) — se cruza con TASK-1321.
 
 ## Open Questions
 
-- **Nombre del repo/proyecto** del hub.
-- **Marca compartida:** ¿paquete compartido npm desde ya, o duplicación temporal documentada?
-- **URL final del informe:** ¿`think.efeoncepro.com/ai-visibility/<token>`? ¿La llave es `reportToken` o un `publicId`?
-- **¿El form self-serve (Slice 4) entra en esta task o se difiere** a un follow-up / TASK-1321?
+- **Marca compartida:** ¿paquete compartido npm desde ya, o duplicación temporal documentada? (recomendado: paquete compartido — el merge futuro en `efeonce-web` lo agradece).
+- **Decisión de intake del lead magnet** (para la task del form, no bloquea 1325): ¿el form self-serve vive en WordPress `/aeo-2/` o en el hub `think.`? Se resuelve junto con TASK-1321.
