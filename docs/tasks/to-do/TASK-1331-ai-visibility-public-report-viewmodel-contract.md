@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|data`
-- Blocked by: `TASK-1329 complete; TASK-1328 complete`
+- Blocked by: `none`
 - Branch: `task/TASK-1331-ai-visibility-public-report-viewmodel-contract`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -87,6 +87,8 @@ Reglas obligatorias:
 
 ### Depends on
 
+- `TASK-1329` complete
+- `TASK-1328` complete
 - `src/lib/growth/ai-visibility/report/contracts.ts`
 - `src/lib/growth/ai-visibility/report/builder.ts`
 - `src/components/growth/ai-visibility/report-artifact/model.ts`
