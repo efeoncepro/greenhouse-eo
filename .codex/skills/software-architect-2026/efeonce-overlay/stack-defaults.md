@@ -117,6 +117,8 @@ Public marketing site.
 - GA4 Measurement ID
 - Approximate WordPress post count (for Astro static generation strategy)
 
+> **Astro front-end skill:** for any Astro implementation on `efeonce-web` (Astro 6) or the `efeonce-think` AI-Visibility report hub, compose with the **`astro`** skill (`.codex/skills/astro`, targets Astro 7.x). This skill decides the *shape* (reversibility, SSOT, governed contract); `astro` fills the framework *structure* (rendering mode, islands, Content Layer, Actions, adapter/deploy). Handoff contract is documented in both skills.
+
 ### AXIS Design System
 
 Q2 2026 deliverable. Visual source of truth for Greenhouse, Kortex, Verk.

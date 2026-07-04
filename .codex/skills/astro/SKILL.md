@@ -89,10 +89,42 @@ codebase will keep.
 | Visual/component design, tokens, elevation | `modern-ui`, `typography-design` |
 | Form UX (validation timing, error recovery, masks) | `forms-ux` (this skill shows the Astro Actions *mechanism*) |
 | Accessibility floor (WCAG, aria) | `a11y-architect` |
+| **Architecture decisions** (shape, reversibility, SSOT, schema, governed contract) | `arch-architect` (Claude) / `software-architect-2026` (Codex) — see synergy below |
 
 Astro-specific structure (rendering mode, hydration boundary, data flow, adapter,
 route shape) stays **here**. Domain content and cross-framework doctrine go to
-the owner skill. Run this skill first to decide the shape, then defer.
+the owner skill. For *peer / implementation* skills, run this skill first to
+decide the Astro shape, then defer. For *architecture*, the direction inverts —
+see the handoff contract next.
+
+### ⚙️ Architecture synergy — the handoff contract (bidirectional)
+
+The architecture skill (`arch-architect` on Claude, `software-architect-2026` on
+Codex) and this skill are **direct partners**. Split of ownership:
+
+- **Architecture owns the SHAPE** — reversibility / blast-radius, the 4-pillar
+  scoring, SSOT & domain boundaries (the *what-computes-where* line, e.g. the
+  efeonce-think dumb-render boundary), canonical-primitive-vs-new-entity,
+  schema/migration, multi-tenant data exposure, and whether a capability needs a
+  governed contract (Full API Parity). "Static vs SSR" **as a structural call**
+  starts there.
+- **Astro owns the IMPLEMENTATION** — `output`/`prerender` wiring, island
+  boundaries + `client:*`, Content Layer modeling, Actions/endpoints, adapter +
+  deploy, View Transitions, perf/cache wiring.
+
+Who moves first:
+
+| The task smells like… | Run FIRST | Then |
+|---|---|---|
+| "design / model / right architecture / blast radius / reversible / SSOT / new entity / schema / governed write-path / multi-tenant" | **architecture skill** (decide the shape) | come here to implement it in Astro |
+| "which `client:*` / static-or-SSR wiring / model this collection / adapter / route shape" | **this skill** | escalate up **only if** it turns into a shape decision |
+
+**Hand UP to the architecture skill when** an Astro question is really an
+architecture question: the dumb-render / SSOT boundary itself, whether
+efeonce-think should own any logic, a new governed write-path (the AEO grader
+form), multi-tenant data exposure, or a hard-to-reverse structural choice. Decide
+the shape there; implement it here. The architecture skill routes *back* here for
+the Astro specifics — the loop closes on both ends.
 
 ---
 

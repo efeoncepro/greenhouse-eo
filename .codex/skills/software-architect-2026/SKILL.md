@@ -126,6 +126,27 @@ Deliver. If the user has the Efeonce overlay active, also produce a TASK-compati
 
 End with a short "what to verify before implementing" list — things the implementing agent or human should re-check (versions, pricing, integrations) because between architecture and implementation, reality may have moved.
 
+## Compose with the `astro` skill (Astro / static-site / efeonce-think work)
+
+When a design or review touches an **Astro** property — `efeonce-think` (AI
+Visibility report hub), `efeonce-web` (public marketing), or any static/island
+front-end — **compose directly with the `$astro` skill** (`.codex/skills/astro`).
+Bidirectional handoff contract:
+
+- **This skill decides the SHAPE** — reversibility, 4-pillar / one-way-door
+  analysis, SSOT & domain boundaries (the *dumb-render* line: efeonce-think
+  renders, the Greenhouse headless model computes — never invert), canonical
+  primitive vs new entity, schema/migration, multi-tenant exposure, and whether a
+  capability needs a governed contract (Full API Parity — e.g. the AEO grader form
+  as a governed write-path). "Static vs SSR" as a structural call starts here.
+- **The `astro` skill fills the IMPLEMENTATION** — `output`/`prerender`, island
+  boundaries + `client:*`, Content Layer modeling, Astro Actions/endpoints,
+  adapter + deploy, View Transitions, perf/cache wiring.
+
+Flow: decide the shape here → hand to `$astro` for the Astro structure → it hands
+back up if a new shape decision surfaces. The same contract is mirrored on the
+Claude side (`arch-architect` ↔ `astro`).
+
 ## What this skill explicitly does NOT do
 
 - **Does not write production code by default.** It produces decision-grade specs that humans or implementation agents execute. If the user asks Codex to implement after the architecture pass, switch back to the repo's normal implementation workflow and obey `AGENTS.md`.

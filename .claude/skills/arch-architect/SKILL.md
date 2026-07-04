@@ -31,6 +31,29 @@ This overlay pins the Greenhouse decisions so the global skill's "boring tech pr
 - **`docs/architecture/GREENHOUSE_AUTH_RESILIENCE_V1.md`** — TASK-742 7-layer defense template.
 - **`docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`** — Full API parity (UI is a client of governed contracts; Duncan Lennox / HubSpot principle). See pinned decision #16.
 
+## Compose with the `astro` skill (Astro / static-site / efeonce-think work)
+
+When a design or review touches an **Astro** property — `efeonce-think` (the AI
+Visibility report hub), `efeonce-web` (public marketing), or any static/island
+front-end — **compose directly with the `astro` skill**. Bidirectional handoff
+contract:
+
+- **This skill decides the SHAPE** — reversibility / blast-radius, 4-pillar
+  scoring, SSOT & domain boundaries (the *dumb-render* line: efeonce-think
+  renders, the Greenhouse headless model computes — never invert it), canonical
+  primitive vs new entity, schema/migration, multi-tenant exposure, and whether a
+  capability needs a governed contract (Full API Parity — e.g. the AEO grader form
+  as a governed write-path). "Static vs SSR" as a structural call is decided here.
+- **The `astro` skill fills the IMPLEMENTATION** — rendering mode
+  (`output`/`prerender`), island boundaries + `client:*`, Content Layer modeling,
+  Astro Actions/endpoints, adapter + deploy, View Transitions, perf/cache wiring.
+
+Flow: **decide the shape here → hand to `astro` for the Astro-specific structure →
+it hands back up if a new shape decision surfaces.** Don't re-derive Astro
+mechanics here, and don't let the `astro` skill make an SSOT / blast-radius call
+alone. (Codex mirrors this contract: `software-architect-2026` ↔ `astro` under
+`.codex/skills/`.)
+
 ## Pinned decisions (OVERRIDES global arch-architect)
 
 ### 1. Canonical 360 extension is mandatory
