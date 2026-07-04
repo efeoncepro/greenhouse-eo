@@ -402,6 +402,25 @@ return rows[0] ?? null
 export const listHostSurfaces = async (): Promise<FormHostSurfaceRow[]> =>
   query<FormHostSurfaceRow>(`SELECT * FROM greenhouse_growth.form_host_surface ORDER BY created_at DESC`)
 
+/**
+ * TASK-1335 — Unión gobernada de origins para el transporte CORS público.
+ *
+ * SoT único = `form_host_surface`: devuelve los origins DISTINTOS declarados por las
+ * surfaces `active`. Es surface-agnóstico a propósito (el preflight `OPTIONS /submit`
+ * no lleva `surfaceId`, así que el transporte no puede depender de una surface puntual);
+ * la autoridad fina por-surface (origin + slug + surface) sigue server-side en el command.
+ * Lean: solo la columna necesaria, sin traer filas completas al hot path público.
+ */
+export const listActivePublicFormOrigins = async (): Promise<string[]> => {
+  const rows = await query<{ origin: string }>(
+    `SELECT DISTINCT jsonb_array_elements_text(origin_allowlist_json) AS origin
+       FROM greenhouse_growth.form_host_surface
+      WHERE status = 'active'`,
+  )
+
+  return rows.map(row => row.origin).filter((origin): origin is string => typeof origin === 'string' && origin.length > 0)
+}
+
 export const setHostSurfaceStatus = async (
   surfaceId: string,
   status: 'active' | 'paused' | 'archived',

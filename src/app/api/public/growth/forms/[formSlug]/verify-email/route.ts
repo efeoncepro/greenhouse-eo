@@ -28,7 +28,7 @@ export function OPTIONS(request: Request) {
 }
 
 export async function POST(_request: Request, { params }: { params: Promise<{ formSlug: string }> }) {
-  const headers = publicFormsCorsHeaders(_request, METHODS)
+  const headers = await publicFormsCorsHeaders(_request, METHODS)
 
   await params // formSlug no se usa para verificar (la verificación es por email), pero mantiene la ruta consistente.
 

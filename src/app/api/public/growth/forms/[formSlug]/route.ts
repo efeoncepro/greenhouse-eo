@@ -22,7 +22,7 @@ export function OPTIONS(request: Request) {
 }
 
 export async function GET(request: Request, { params }: { params: Promise<{ formSlug: string }> }) {
-  const headers = publicFormsCorsHeaders(request, METHODS)
+  const headers = await publicFormsCorsHeaders(request, METHODS)
 
   if (!isFormsPublicApiEnabled()) {
     return NextResponse.json({ error: 'No disponible.' }, { status: 404, headers })
