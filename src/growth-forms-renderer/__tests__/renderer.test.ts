@@ -433,6 +433,41 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.querySelector('[role="option"][aria-selected="true"]')?.textContent).toBe('1 - 10')
   })
 
+  it('initializes required selects without a blank option to the displayed first option', async () => {
+    const fetchImpl = okFetch()
+
+    const { root } = mountInto(staticContractFixture({
+      styleVariant: 'diagnostic_premium',
+      fields: [
+        {
+          key: 'analysisLanguage',
+          type: 'select',
+          label: 'Idioma del análisis',
+          required: true,
+          options: [
+            { value: 'es-CL', label: 'Español (Chile / LatAm)' },
+            { value: 'en-US', label: 'English (US)' },
+          ],
+        },
+      ],
+      consent: undefined,
+    }), fetchImpl)
+
+    const trigger = root.querySelector<HTMLButtonElement>('[name="analysisLanguage"].ghf-select-trigger')!
+
+    expect(trigger.textContent).toContain('Español (Chile / LatAm)')
+
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    await vi.waitFor(() => expect(fetchImpl).toHaveBeenCalledTimes(1))
+
+    const calls = (fetchImpl as unknown as { mock: { calls: Array<[string, { body: string }]> } }).mock.calls
+    const body = JSON.parse(calls[0][1].body)
+
+    expect(body.fields.analysisLanguage).toBe('es-CL')
+    expect(root.querySelector('[data-ghf-summary]')).toBeNull()
+  })
+
   it('uses contract-provided field required copy when present', () => {
     const { root } = mountInto(staticContractFixture({
       fields: [{ key: 'firstName', type: 'text', label: 'Nombre', required: true }],

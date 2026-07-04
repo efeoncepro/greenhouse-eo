@@ -155,7 +155,15 @@ export class FormRenderer {
     this.telemetry = createTelemetryEmitter(opts.root, this.contract.telemetryPolicy, base)
 
     for (const field of this.contract.fields) {
-      this.values[field.key] = field.type === 'consent' || field.type === 'checkbox' ? false : ''
+      if (field.type === 'consent' || field.type === 'checkbox') {
+        this.values[field.key] = false
+      } else if (field.type === 'multiselect') {
+        this.values[field.key] = []
+      } else if (field.type === 'select' && field.required && !(field.options?.some(option => option.value === '') ?? false)) {
+        this.values[field.key] = field.options?.[0]?.value ?? ''
+      } else {
+        this.values[field.key] = ''
+      }
     }
 
     // Restaura un borrador PII-safe (sin cédula/consent) si existe (TASK-1256 Slice 1d).
