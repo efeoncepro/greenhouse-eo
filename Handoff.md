@@ -1,3 +1,13 @@
+## Sesion 2026-07-04 - TASK-1331 documentation + skills hardening - Codex - docs local
+
+> **Pedido:** documentar en Greenhouse, manual de uso, documentation y skills Codex/Claude relacionadas que el mockup AI Visibility fue promovido a reporte final preservando UI/editorial, pero moviendo la semántica productiva al contrato backend.
+>
+> **Actualizado:** documentación funcional `docs/documentation/growth/ai-visibility-grader.md`, manual/runbook `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md`, ADR headless `docs/architecture/GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`, arquitectura del grader `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` y `project_context.md`. Skills Codex/Claude relacionadas: `greenhouse-mockup-builder`, `greenhouse-qa-release-auditor`, `growth-marketing-cro`, `digital-marketing`; además `seo-aeo` en Codex, que es la copia local disponible para la metodología AEO. No existe espejo `.claude/skills/seo-aeo` dentro de este repo.
+>
+> **Regla canonizada:** el mockup puede definir composición, jerarquía y lenguaje; al promover a runtime final, facts como Share of Model, benchmark, citation totals, readiness, sentiment, dimension highlights y next step deben venir de Greenhouse (`ReportArtifactModel.model.viewFacts`, `modelVersion=1.1.0`). Think sólo renderiza, formatea y conserva fallback para snapshots viejos. Producción no acepta `mock-token`; para smoke final usar token real y validar API no-leak + render 1440/1280/390.
+>
+> **Estado:** docs/skills editados y commiteados localmente en `develop`; no se hizo push remoto por falta de instrucción explícita para este follow-up documental.
+
 ## Sesion 2026-07-04 - TASK-1331 AI Visibility public report view-model contract - Codex - complete released
 
 > **Pedido:** despues de empujar el mockup enterprise de TASK-1329 a `efeonce-think/main`, revisar a profundidad que datos faltan modelar/cablear en backend para que todo lo visible del informe publico venga desde Greenhouse y no desde derivaciones locales del hub.

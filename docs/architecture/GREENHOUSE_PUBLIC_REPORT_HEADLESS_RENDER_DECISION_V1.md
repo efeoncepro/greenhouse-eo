@@ -7,6 +7,8 @@
 
 El **informe en pantalla** del AI Visibility Grader (lead magnet, EPIC-020) **se renderiza nativamente en `efeonce-web` (Astro + Tailwind)**, consumiendo a **Greenhouse como headless**: Greenhouse expone el **modelo render-ready público** (`ReportArtifactModel`, variant `publicWeb`) por API token-gated, y `efeonce-web` lo pinta con su propio stack y marca pública.
 
+> **Estado vigente 2026-07-04:** la decisión de render en `efeonce-web` fue superseded por el hub dedicado `efeoncepro/efeonce-think` (`think.efeoncepro.com`). Se conserva esta sección como historia de la decisión; las reglas de datos siguen vigentes con `efeonce-think` como renderer tonto.
+
 - **NO iframe.** **NO** se reconstruye el scoring/derivación en Astro. **NO** se trae MUI/AXIS al sitio público.
 - El **formulario + landing** del lead magnet viven en `efeonce-web`; postean al intake gobernado de Greenhouse.
 - El **PDF + email** (TASK-1273/1250) y el **portal cliente** (variant `clientPortal`) siguen en Greenhouse/React sin cambio.
@@ -205,10 +207,14 @@ Estado operativo: code complete local, sin push/deploy productivo. Evidencia: te
 
 El payload JSON público suma `runPublicId` (`EO-GRUN-#####`) como metadata de trazabilidad para el render/pantalla/PDF compartido. Es un **display/admin id secuencial**, no un handle de autenticación ni de polling. El token no enumerable (`grt-*`) sigue siendo la única auth del informe público; `runPublicId` sólo sirve para que el lector cite el snapshot auditado sin mostrar el token.
 
-## Delta 2026-07-04 — TASK-1331 view facts contract (code complete local)
+## Delta 2026-07-04 — TASK-1331 view facts contract (released)
 
 El contrato headless sube de `modelVersion=1.0.0` a `1.1.0` con un namespace aditivo `model.viewFacts`, calculado en Greenhouse desde `PublicGraderReport`/`ReportArtifactModel`. El hub `efeonce-think` debe tratar esos campos como facts server-provided y no como semántica local.
 
 `viewFacts` cubre engine coverage/Share of Model, totales globales de citabilidad, benchmark competitivo, sentimiento, readiness, highlights de dimensiones y share facts. La clasificación de citas agrega `citationSourceBreakdown.classificationTotals` global antes del top-N; snapshots viejos degradan esos totales a `null` honesto, sin 500 ni borrar secciones. `levels[]` suma `isNext` para que la decisión "Empieza aquí" también venga del modelo.
 
-Hard rules vigentes: no cambia scoring, pesos, probes, normalizer, provider adapters ni `executeClaimedGraderRun`; el token público sigue siendo la frontera de acceso; no se exponen raw prompts, raw provider answers, URLs completas de citas ni findings internos. Estado operativo: code complete local en Greenhouse + Think, sin release productivo ni smoke con token real hasta confirmación explícita.
+Hard rules vigentes: no cambia scoring, pesos, probes, normalizer, provider adapters ni `executeClaimedGraderRun`; el token público sigue siendo la frontera de acceso; no se exponen raw prompts, raw provider answers, URLs completas de citas ni findings internos.
+
+Estado operativo: Greenhouse PR #141 fue promovido a producción como `4885a5de3ccdbf0457f7248186597b8d6c53da86` mediante Production Release Orchestrator `28697002045` (`released`). Think `50811d0dfd3d45b9d26532ced3d79030fec5bf04` fue pusheado a `main` y Vercel production quedó Ready. Smoke final con token real confirmó `modelVersion="1.1.0"`, `model.viewFacts` presente, `citationTotals.totalCitations=24`, benchmark con filas, render 200 en 1440/1280/390 sin overflow y no-leak (`rawProviderResponse`, `answer_text`, `prompt_text` ausentes).
+
+Regla de promoción mockup → final: el mockup visual puede definir composición, jerarquía y lenguaje, pero ninguna derivación semántica productiva debe vivir en el hub. Si falta un fact, se agrega al contrato Greenhouse; Think sólo renderiza y mantiene compatibilidad honesta con snapshots viejos.

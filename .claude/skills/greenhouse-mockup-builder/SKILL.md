@@ -91,6 +91,19 @@ mock-data limits.
 
 A Greenhouse mockup is approved-quality when future backend work can replace mock data/readers without reinterpreting the visual direction.
 
+## Mockup → Final Runtime Contract
+
+When an approved mockup is promoted to a final user-facing report or runtime surface, preserve the visual/editorial intent but move product semantics into the owning backend contract before calling it final.
+
+For data-heavy reports, dashboards, lead magnets, PDFs or public hubs:
+
+- the mockup may define layout, hierarchy, states, copy direction and interaction;
+- the backend/domain model must own facts, summaries, rankings, score-derived labels, readiness, benchmarks, classification totals and next-step decisions;
+- the renderer may format, compose and keep compatibility fallbacks for old snapshots, but must not derive business semantics from raw DTOs;
+- if a missing field would make the renderer invent interpretation, create/extend the backend view-model first.
+
+AI Visibility precedent (TASK-1331): `efeonce-think` became the final report only after Greenhouse exposed `ReportArtifactModel.model.viewFacts` (`modelVersion=1.1.0`) for Share of Model, citation totals, competitive benchmark, sentiment/readiness/dimension/share facts and `levels[].isNext`. Think is a dumb renderer; Greenhouse remains the source of truth.
+
 ## Figma Implementation Contract (gate)
 
 Al implementar cualquier diseño (especialmente desde Figma), **Figma es intención, no valores literales**. Antes de escribir JSX, correr 2 gates (contrato canónico completo en CLAUDE.md / AGENTS.md → "Figma Implementation Contract"):

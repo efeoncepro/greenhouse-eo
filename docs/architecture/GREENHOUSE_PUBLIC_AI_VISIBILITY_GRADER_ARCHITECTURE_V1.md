@@ -162,6 +162,14 @@ flowchart TB
 | Content execution plan | Future Verk | Not V1. |
 | CRM implementation/advisory plan | Future Kortex | Not V1. |
 
+### Delta 2026-07-04 — TASK-1331 public report final contract
+
+El reporte público user-facing del AI Visibility Grader quedó promovido a final sobre el hub `efeonce-think`: `https://think.efeoncepro.com/brand-visibility/r/<token>`. Greenhouse conserva el source of truth del dato y del view-model público; el hub sólo renderiza.
+
+Contrato vigente: `GET /api/public/growth/ai-visibility/report/[token]` devuelve `modelVersion="1.1.0"` y `model.viewFacts`, con facts server-derived para engine coverage / Share of Model, totales globales de citabilidad, benchmark competitivo, sentimiento, readiness, highlights de dimensiones, share facts y `levels[].isNext`. `citationSourceBreakdown.classificationTotals` conserva totales globales aunque el render muestre top-N.
+
+Invariante arquitectónico: ningún renderer externo (`efeonce-think`, PDF/email, futuro sitio público) debe reconstruir semántica de negocio desde el DTO crudo. Puede formatear y degradar compatibilidad para snapshots viejos, pero si necesita calcular interpretación del informe, el fact falta en Greenhouse. No cambia scoring, pesos, probes, normalizer, provider adapters ni `executeClaimedGraderRun`.
+
 ## 7. Core domain model
 
 The implementation should use the new Growth domain.

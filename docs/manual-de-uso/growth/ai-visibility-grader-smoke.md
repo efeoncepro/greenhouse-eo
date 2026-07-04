@@ -1,7 +1,7 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.11 · **Ultima actualizacion:** 2026-06-29 por Codex (Perplexity ON en ops-worker staging)
+> **Version:** 1.12 · **Ultima actualizacion:** 2026-07-04 por Codex (TASK-1331 reporte público final)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
@@ -14,6 +14,7 @@
 - **Perplexity:** ON en el worker de staging desde 2026-06-29 (`GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=true`, revision `ops-worker-00418-2m6`) y persistido en `services/ops-worker/deploy.sh` con default staging ON / prod OFF. Pendiente recomendado: smoke async low-volume con `onlyProviders:['perplexity']` para confirmar observation nueva drenada por el worker.
 - **Fix-It Artifacts (TASK-1269):** `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` ON en Vercel staging y prod OFF. Pendiente antes de entregar a prospecto/prod: smoke funcional por token público y run admin con reporte real + revisión copy/legal.
 - **Re-grade recurrente (TASK-1270):** staging/develop ON (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`) con Cloud Scheduler `ops-growth-grader-regrade` habilitado diario `0 8 * * *` (`America/Santiago`). Produccion OFF/paused. Smoke manual 2026-06-29 termino `skipped=no_due_profiles` porque no hay perfiles opt-in/due; no hubo costo.
+- **Reporte público final (TASK-1331):** producción ya sirve `modelVersion=1.1.0` con `model.viewFacts`; el hub `efeonce-think` en `https://think.efeoncepro.com/brand-visibility/r/<token>` es el reporte final user-facing. `mock-token` sólo existe localmente; producción exige un token real `grt-*`.
 - **DB auditada:** `greenhouse_growth` tiene 24 runs, 266 observations, 10 scores, 8 reports, 7 reviews, 23 probe results, 1 lead y 1 email dispatch. No hay perfiles org-bound opt-in para re-grade.
 - Verdad live de flags: `vercel env ls`. Estado humano: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
@@ -296,6 +297,48 @@ Checks mínimos sobre el JSON:
 - El payload público no contiene `providerFindings`, `accuracyFindings`, prompts, raw provider text, full citation URLs ni reasons internos.
 
 Luego validar el hub `efeonce-think` contra el mismo token: secciones `report-engine-coverage`, `report-source-evidence`, `report-category-association`, `report-readiness` y `report-ladder`, desktop + mobile 390 con `scrollWidth <= clientWidth`.
+
+### Verificar reporte público final (TASK-1331)
+
+Usa este smoke cuando el cambio toque el contrato headless, el render de `efeonce-think`, email/HubSpot `report_url`, PDF público o una promoción mockup→runtime del informe.
+
+1. Usa un token real de snapshot público. En producción la URL final es:
+
+```text
+https://think.efeoncepro.com/brand-visibility/r/<token-real>
+```
+
+No uses `mock-token` contra producción: sólo sirve para fixture/local.
+
+2. Verifica el payload público de Greenhouse:
+
+```bash
+curl -sS "https://greenhouse.efeoncepro.com/api/public/growth/ai-visibility/report/<token-real>" \
+  | jq '{
+      modelVersion,
+      hasViewFacts: (.model.viewFacts != null),
+      engineCount: (.model.viewFacts.engineCoverage.providers | length),
+      citationTotal: .model.viewFacts.citationTotals.totalCitations,
+      competitorRows: (.model.viewFacts.competitiveBenchmark.rows | length),
+      rawProviderResponseLeak: (tostring | contains("rawProviderResponse")),
+      answerTextLeak: (tostring | contains("answer_text")),
+      promptTextLeak: (tostring | contains("prompt_text"))
+    }'
+```
+
+Esperado para el contrato final: `modelVersion="1.1.0"`, `hasViewFacts=true`, no leaks. En snapshots antiguos, algunos facts pueden degradar a `null` o `engineCount=0`; eso es compatible si no hay 500 y el render muestra ausencia de dato sin inventar.
+
+3. Desde el repo `efeonce-think`, verifica el render final en desktop/laptop/mobile:
+
+```bash
+node scripts/verify-report.mjs \
+  "https://think.efeoncepro.com/brand-visibility/r/<token-real>" \
+  task1331-prod-final
+```
+
+Esperado: HTTP 200 en 1440/1280/390, `scrollWidth == clientWidth`, sin leaks visibles ni claves internas. Si `category` viene `unknown` o sin categorías, la sección de categoría puede no renderizar; eso es correcto.
+
+Regla de diagnóstico: si el render necesita calcular Share of Model, benchmark, readiness, sentimiento, totales de citas o next step localmente, el contrato está incompleto. Agrega el fact en Greenhouse y sólo después simplifica el renderer.
 
 ## Generar Fix-It Artifacts (TASK-1269) — staging ON, smoke funcional pendiente
 

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.20
+> **Version:** 1.21
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1290 — prompts por arquetipo + autoría LLM congelada)
+> **Ultima actualizacion:** 2026-07-04 por Codex (TASK-1331 — reporte público final + view facts server-side)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -149,6 +149,10 @@ Una vez que un análisis tiene puntaje, el sistema arma un **reporte** que tradu
 - **Dos versiones:** una **interna** completa (para ventas/admin, con presencia por motor, reasons y detalle operacional) y una **pública segura** que conserva score, hallazgos, competidores top, presencia por motor agregada, resumen de fuentes/readiness y próximos pasos, con el aviso de que es un diagnóstico muestreado por IA.
 
 **Delta TASK-1328 (code complete local, rollout pendiente):** el modelo público del informe ahora está preparado para mostrar el diagnóstico completo de señales reales: denominadores por motor (`present/resolved`), fuentes citadas por dominio, categoría solo cuando hay datos medidos, provenance/metodología y readiness agentic como `Be Actionable`. La publicación de snapshots nuevos reúne probes antes de finalizar la entrega; los snapshots ya congelados siguen `new-runs-only` por defecto salvo republish/version bump gobernado. El hub `efeonce-think` debe renderizar estas secciones desde `model` sin re-derivar scoring ni exponer prompts, texto crudo, URLs completas o reasons internos.
+
+**Delta TASK-1331 (released 2026-07-04):** el informe público final ya corre sobre el contrato `modelVersion=1.1.0`. Greenhouse agrega `model.viewFacts` como namespace aditivo y server-derived para engine coverage / Share of Model, totales globales de citabilidad, benchmark competitivo, sentimiento, readiness, highlights de dimensiones y share facts. `citationSourceBreakdown.classificationTotals` conserva totales globales aunque el render muestre top-N, y `levels[].isNext` mueve al backend la decisión de "Empieza aquí". El hub `efeonce-think` queda como renderer tonto: puede tener fallbacks de compatibilidad para snapshots viejos, pero no debe volver a calcular semántica de negocio localmente.
+
+Regla dura de promoción mockup → reporte final: si una pieza visible del informe requiere interpretar evidencia, comparar competidores, clasificar citas, resumir readiness o decidir un next step, el dato debe venir de Greenhouse en `ReportArtifactModel`/`model.viewFacts`. Think sólo pinta, formatea y degrada honestamente. No se tocó scoring, pesos, probes, normalizer, provider adapters ni `executeClaimedGraderRun`.
 
 Este reporte ya alimenta el snapshot público, PDF/email, HubSpot y surfaces cliente/admin. La UI pública/portal puede evolucionar, pero el contrato de datos ya existe y se gobierna desde `src/lib/growth/ai-visibility/report/**`.
 
