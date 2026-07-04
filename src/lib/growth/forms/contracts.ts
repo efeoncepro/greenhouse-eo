@@ -435,6 +435,13 @@ export const renderSecuritySchema = z.object({
 })
 export type RenderSecurity = z.infer<typeof renderSecuritySchema>
 
+export const renderStepSchema = z.object({
+  key: z.string(),
+  label: z.string().optional(),
+  fieldKeys: z.array(z.string()),
+})
+export type RenderStep = z.infer<typeof renderStepSchema>
+
 export const renderContractSchema = z.object({
   contractVersion: z.literal(CONTRACT_VERSION),
   form: z.object({
@@ -450,9 +457,7 @@ export const renderContractSchema = z.object({
   composition: z.enum(COMPOSITION_MODES),
   fields: z.array(fieldDefinitionSchema),
   conditions: z.array(fieldConditionSchema).default([]),
-  steps: z
-    .array(z.object({ key: z.string(), label: z.string().optional(), fieldKeys: z.array(z.string()) }))
-    .optional(),
+  steps: z.array(renderStepSchema).optional(),
   copy: z.record(z.string(), z.string()).default({}),
   consent: consentDisplaySchema.optional(),
   successBehavior: successBehaviorSchema,
