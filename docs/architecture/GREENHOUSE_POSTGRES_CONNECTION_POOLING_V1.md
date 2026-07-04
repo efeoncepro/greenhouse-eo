@@ -77,6 +77,17 @@ El cliente canónico `src/lib/postgres/client.ts` ahora agrega una cuarta capa V
 
 Además, los checks de presencia de tablas usan `src/lib/db-health/table-presence.ts` para consultar múltiples tablas en una sola roundtrip, reemplazando el patrón repetitivo `SELECT EXISTS (...)`.
 
+### Delta V1.2 — Idle-session timeout no es pool roto (2026-07-04)
+
+Vercel reportó un burst de errores runtime agrupados por el log `Greenhouse Postgres pool emitted an error; resetting connector state.` con causa `57P05 terminating connection due to idle-session timeout`. Ese evento no indica saturación ni un connector corrupto: es PostgreSQL aplicando la defensa V1 `idle_session_timeout` sobre un cliente que estaba idle.
+
+Contrato vigente del cliente canónico `src/lib/postgres/client.ts`:
+
+- Los códigos `57P0x`, incluido `57P05`, son retryable connection failures cuando aparecen en un path de query/acquisition.
+- Un `pool.on('error')` con `57P05` o mensaje `terminating connection due to idle-session timeout` se trata como **idle disconnect esperado**: node-postgres descarta ese cliente idle y el pool puede abrir otro cuando lo necesite.
+- Ese caso **no** emite `console.error`, **no** adjunta el objeto `Error` como stack trace agrupable por Vercel/Sentry y **no** llama `closeGreenhousePostgres()`. Resetear el pool/Cloud SQL Connector completo ante un cliente idle descartado amplifica reconexiones y convierte una defensa esperada en ruido operativo.
+- Errores de pool no clasificados como idle timeout siguen siendo loud y resetean estado (`pool_error`) para preservar recuperación ante sockets/connector realmente corruptos.
+
 ### V2 (futuro, contingente — TASK-847)
 
 Si reliability signal `runtime.postgres.connection_saturation` alerta sustained > 60% utilización (señal real de demanda creciendo), Greenhouse despliega **PgBouncer en GKE Autopilot** (no Cloud Run — ver caveat abajo) como multiplexer canónico:
@@ -169,6 +180,11 @@ canónico `runGreenhousePostgresQuery()` aplica `GREENHOUSE_POSTGRES_QUERY_CONCU
 NUNCA configurar idle_session_timeout=0 en greenhouse_app o greenhouse_ops roles.
 ALTER ROLE canónico: greenhouse_app=5min, greenhouse_ops=15min.
 
+NUNCA tratar `57P05 terminating connection due to idle-session timeout` emitido
+por `pool.on('error')` como connector roto. Es un cliente idle descartado por la
+defensa server-side; no hacer `console.error` ni reset global del pool para ese
+caso.
+
 NUNCA hacer LISTEN/NOTIFY desde aplicación. Usar outbox pattern canónico (TASK-773).
 Garantiza compatibilidad cuando V2 PgBouncer transaction pooling se deploya.
 
@@ -233,3 +249,4 @@ Cuando reliability signal alerta sustained > 60%:
 - **2026-05-09**: V1 implementación (TASK-845): Slice 1 (ALTER ROLE) aplicado live, saturation 103% → 66%. Slice 3 (runtime-aware pool) commiteado. Defense-in-depth 3 capas activa.
 - **2026-05-09**: Pivot V1 vs V2 documentado. Cloud Run NO soporta PgBouncer (TCP raw incompatible). V2 contingente queda diseñado para GKE Autopilot deployment cuando reliability signal lo justifique. TASK-847 placeholder creada.
 - **2026-05-12**: Delta V1.1 aceptado tras Sentry `/api/admin/reliability`: query concurrency gate + table-presence batch + retry policy que no resetea pool ante capacidad agotada. Saturación observada bajó de 99/97 a 5 conexiones tras cooldown; no se ejecutó restart ni terminación manual de sesiones.
+- **2026-07-04**: Delta V1.2 aceptado tras ruido Vercel por `57P05 idle-session timeout`: el cliente distingue idle disconnect esperado de pool roto, evita `console.error`/reset global en ese caso y mantiene retry para la familia `57P0x`.

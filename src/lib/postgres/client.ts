@@ -66,6 +66,20 @@ const GREENHOUSE_POSTGRES_RETRY_DELAYS_MS = [1_000, 3_000, 7_000] as const
 
 const sleep = (delayMs: number) => new Promise(resolve => setTimeout(resolve, delayMs))
 
+const getGreenhousePostgresErrorCode = (error: Error) =>
+  'code' in error && typeof error.code === 'string' ? error.code : null
+
+export const isGreenhousePostgresIdleSessionTimeoutError = (error: unknown) => {
+  if (!(error instanceof Error)) {
+    return false
+  }
+
+  const code = getGreenhousePostgresErrorCode(error)
+  const message = error.message.toLowerCase()
+
+  return code === '57P05' || message.includes('terminating connection due to idle-session timeout')
+}
+
 const getGreenhousePostgresQueryConcurrencyLimit = () => {
   const config = getGreenhousePostgresConfig()
   const runtimeDefault = isVercelRuntime() ? 2 : 4
@@ -118,10 +132,14 @@ export const isGreenhousePostgresRetryableConnectionError = (error: unknown) => 
     return false
   }
 
-  const code = 'code' in error && typeof error.code === 'string' ? error.code : null
+  const code = getGreenhousePostgresErrorCode(error)
   const message = error.message.toLowerCase()
 
-  if (code && ['08000', '08003', '08006', '53300', '57P01', '57P02', '57P03'].includes(code)) {
+  if (code && ['08000', '08003', '08006', '53300'].includes(code)) {
+    return true
+  }
+
+  if (code?.startsWith('57P0')) {
     return true
   }
 
@@ -148,10 +166,11 @@ const shouldResetGreenhousePostgresPoolAfterRetryableError = (error: unknown) =>
     return true
   }
 
-  const code = 'code' in error && typeof error.code === 'string' ? error.code : null
+  const code = getGreenhousePostgresErrorCode(error)
   const message = error.message.toLowerCase()
 
   if (
+    isGreenhousePostgresIdleSessionTimeoutError(error) ||
     code === '53300' ||
     message.includes('remaining connection slots are reserved') ||
     message.includes('sorry, too many clients already') ||
@@ -181,6 +200,27 @@ const notifyGreenhousePostgresReset = (reason: GreenhousePostgresResetReason) =>
       console.warn('Greenhouse Postgres reset listener failed.', error)
     }
   }
+}
+
+export const handleGreenhousePostgresPoolError = (
+  error: Error,
+  connectionKind: 'connector' | 'direct'
+) => {
+  if (isGreenhousePostgresIdleSessionTimeoutError(error)) {
+    console.info(
+      `Greenhouse Postgres ${connectionKind} pool discarded an idle client after PostgreSQL idle-session timeout; ` +
+      `preserving pool state.`
+    )
+
+    return
+  }
+
+  const stateLabel = connectionKind === 'connector' ? 'connector state' : 'direct connection state'
+
+  console.error(`Greenhouse Postgres pool emitted an error; resetting ${stateLabel}.`, error)
+  void closeGreenhousePostgres({ source: 'pool_error', error }).catch(closeError => {
+    console.error(`Unable to close Greenhouse Postgres after ${connectionKind} pool error.`, closeError)
+  })
 }
 
 /**
@@ -297,10 +337,7 @@ const buildPool = async () => {
     })
 
     pool.on('error', error => {
-      console.error('Greenhouse Postgres pool emitted an error; resetting connector state.', error)
-      void closeGreenhousePostgres({ source: 'pool_error', error }).catch(closeError => {
-        console.error('Unable to close Greenhouse Postgres after pool error.', closeError)
-      })
+      handleGreenhousePostgresPoolError(error, 'connector')
     })
 
     return pool
@@ -314,10 +351,7 @@ const buildPool = async () => {
   })
 
   pool.on('error', error => {
-    console.error('Greenhouse Postgres pool emitted an error; resetting direct connection state.', error)
-    void closeGreenhousePostgres({ source: 'pool_error', error }).catch(closeError => {
-      console.error('Unable to close Greenhouse Postgres after direct pool error.', closeError)
-    })
+    handleGreenhousePostgresPoolError(error, 'direct')
   })
 
   return pool

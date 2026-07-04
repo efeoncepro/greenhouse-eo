@@ -1,3 +1,15 @@
+## Sesion 2026-07-04 - Postgres runtime pool reset noise - Codex - code complete local
+
+> **Pedido:** revisar por qué la grilla de prompts sugería investigar 106 errores runtime de Vercel: `Greenhouse Postgres pool emitted an error; resetting connector state` causados por `57P05 terminating connection due to idle-session timeout`, último visto 2026-07-03.
+>
+> **Causa raíz:** el cierre `57P05` no era pool roto. Era PostgreSQL aplicando la defensa server-side `idle_session_timeout` (TASK-845/846) sobre clientes idle. El listener `pool.on('error')` en `src/lib/postgres/client.ts` trataba cualquier error de cliente idle como fatal: `console.error` + `closeGreenhousePostgres({ source:'pool_error' })`, reseteando pool y Cloud SQL Connector completos. Por eso la lógica reciente seguía ruidosa: el retry/reset path cubría queries y capacidad, pero no distinguía el evento idle esperado emitido por el pool.
+>
+> **Cambio local:** `57P0x` queda retryable por familia; `57P05`/mensaje `terminating connection due to idle-session timeout` se clasifica como idle disconnect esperado. En `pool.on('error')`, ese caso ahora preserva estado, no llama `closeGreenhousePostgres()`, no hace `console.error` y no adjunta stack; los errores no clasificados siguen reseteando. ADR actualizado: `docs/architecture/GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md` Delta V1.2.
+>
+> **Evidencia:** `pnpm exec vitest run src/lib/postgres/client.test.ts` (11/11), `pnpm exec eslint src/lib/postgres/client.ts src/lib/postgres/client.test.ts`, `NODE_OPTIONS=--max-old-space-size=8192 gtimeout 240s pnpm exec tsc --noEmit --pretty false`, `pnpm ops:lint --changed` y `git diff --check` verdes. `pnpm qa:gates --changed --agent codex --runtime --docs` pasó como advisory y recomendó release/runtime smoke antes de declarar producción cerrada.
+>
+> **Pendiente:** no se hizo push, deploy ni release. Para cerrar runtime real: promover por control plane, verificar quiet period en Vercel/Sentry para el fingerprint de `57P05`, y no tocar la TASK-1335 desde este fix salvo autorización explícita.
+
 ## Sesion 2026-07-04 - TASK-1330 AI Visibility report short links - Claude - in-progress (local, sin push)
 
 > **Task:** `docs/tasks/in-progress/TASK-1330-...md` (movida to-do→in-progress). Perfil `backend-data`, migración additive, EPIC-020. Precedida por una revisión arch+product (Delta 2026-07-04 en la task) con 10 ajustes: integrar con `shareFacts.reportUrl` (TASK-1331, no `shareShortUrl`), reusar el generador base62/collision-retry del precedente quote-share, tracking best-effort no bloqueante, honrar expiry del reporte, render-in-place en Think, superficies de error humanas, auto-create en el publish command, índice UNIQUE parcial, flag en el ledger.
