@@ -20,6 +20,7 @@ import {
   destinationPlanEntrySchema,
   fieldDefinitionSchema,
   renderSecuritySchema,
+  renderStepSchema,
   sanitizeRenderCopy,
   successBehaviorSchema,
   telemetryPolicySchema,
@@ -146,6 +147,33 @@ export const compileFormVersion = (
 
   // — Composición —
   const composition = (typeof uiPolicy.composition === 'string' ? uiPolicy.composition : 'static') as CompositionMode
+  const stepParse = renderStepSchema.array().safeParse(uiPolicy.steps)
+  let renderSteps: RenderContract['steps'] | undefined
+
+  if (composition === 'multi_step_light') {
+    if (!stepParse.success || stepParse.data.length === 0) {
+      addWarning({
+        code: 'steps_invalid',
+        dimension: 'policy',
+        message: 'multi_step_light requiere ui_policy.steps validos',
+        blocking: options.forPublication === true,
+      })
+    } else {
+      const knownFieldKeys = new Set(fields.map(field => field.key))
+      const unknownStepFieldKeys = stepParse.data.flatMap(step => step.fieldKeys.filter(key => !knownFieldKeys.has(key)))
+
+      if (unknownStepFieldKeys.length > 0) {
+        addWarning({
+          code: 'steps_unknown_fields',
+          dimension: 'policy',
+          message: `ui_policy.steps referencia campos inexistentes: ${[...new Set(unknownStepFieldKeys)].join(', ')}`,
+          blocking: options.forPublication === true,
+        })
+      } else {
+        renderSteps = stepParse.data
+      }
+    }
+  }
 
   const securityCandidate =
     asObject(uiPolicy.security).captcha !== undefined
@@ -181,6 +209,7 @@ export const compileFormVersion = (
         composition,
         fields,
         conditions: [],
+        steps: renderSteps,
         // TASK-1297 — gate browser-safe del copy público: sólo strings acotados llegan al
         // contrato (descarta nested/no-string/over-length). Antes era un cast crudo: era el
         // único sub-objeto del render contract sin validar (consent/security ya usan safeParse).
