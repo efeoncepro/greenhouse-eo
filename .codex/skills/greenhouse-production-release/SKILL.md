@@ -70,6 +70,7 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 - Never run `git push`, GitHub workflow dispatch, Cloud Run deploy, Vercel promotion, rollback, DB release transition, or approval gate without explicit user approval for that external mutation.
 - Never bypass `production-release.yml` because "the workers already deployed".
 - Never introduce or change a production deploy workflow without updating `src/lib/release/workflow-allowlist.ts`, the orchestrator wiring, tests, docs, and this skill.
+- Never infer that Azure or a worker "skipped" from the workflow name alone. Read the job summary/logs and verify Cloud Run `Ready=True` + `GIT_SHA` or watchdog OK. Azure `no_infra_diff` can be an expected no-op; worker revision drift is never a clean release closure.
 - **Never `git push` to `main` (including hotfixes, doc-only commits, or fixes "that don't affect workers") without immediately dispatching the canonical orchestrator `production-release.yml` with `target_sha=<HEAD del push>`.** Every commit on `main` MUST be tracked by a release manifest. The Vercel auto-deploy on `push:main` is NOT a release — only the manifest in `greenhouse_sync.release_manifests` reflects what production is supposed to be. **Anti-pattern detectado 2026-05-14**: Codex pushó 3 hotfixes directo a main (`982accaf`, `4fe799cf`, `cfea1784`) post un release ajeno; Vercel auto-deployó pero el manifest quedó en el SHA del release anterior → drift cosmético + audit trail roto.
 - **Never cherry-pick to `main` a commit that also exists on `develop`.** Creates duplicate SHAs for the same logical change (caso real 2026-05-14: `fa5258a5/4fe799cf` mismo diff distinto SHA), confuses audit trail, breaks the exact mirror between develop/main. Canonical hotfix path: branch from `main` → fix → PR → merge → orchestrator dispatch → cherry-pick back to develop (not the other direction).
 - **Never assume "hotfix small, no orchestrator needed"** — the rule has zero exceptions outside break-glass. Even a typo fix to `main` requires orchestrator dispatch to keep manifest aligned. If the fix is too trivial for a release manifest, it's too trivial to push to `main` — merge to develop and wait for the next regular release.
@@ -118,13 +119,24 @@ gh workflow run production-release-watchdog.yml --ref main \
   -f fail_on_error=true
 ```
 
-9. **Prender los flags pendientes de este release.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`: por cada feature `code-complete` cuyo flip estaba gated a este release, `vercel env add <FLAG>=true Production` (+ `gcloud run services update ops-worker --update-env-vars ...` si el flag corre en el worker) + redeploy + smoke del flujo en prod + actualizar la fila del ledger (snapshot por environment). El deploy del código no activa nada por sí solo. Si un flag requería su migración en prod, confirmar que entró por este release antes de prenderlo.
-
 9. Verify Cloud Run `GIT_SHA` for mapped services when needed:
    - `ops-worker` in `us-east4`
    - `commercial-cost-worker` in `us-east4`
    - `ico-batch-worker` in `us-east4`
    - `hubspot-greenhouse-integration` in `us-central1`
+10. **Prender los flags pendientes de este release.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`: por cada feature `code-complete` cuyo flip estaba gated a este release, `vercel env add <FLAG>=true Production` (+ `gcloud run services update ops-worker --update-env-vars ...` si el flag corre en el worker) + redeploy + smoke del flujo en prod + actualizar la fila del ledger (snapshot por environment). El deploy del código no activa nada por sí solo. Si un flag requería su migración en prod, confirmar que entró por este release antes de prenderlo.
+
+## Gotchas conocidos del release (verificados 2026-07-03 #139; fix de raíz = ISSUE-114)
+
+El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas reales. No las persigas como bugs; aplicá la mitigación:
+
+1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** `main` (squashes de releases previos) no es ancestro de `develop` → conflictos (docs Handoff/changelog/README/registry y a veces código). **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo — contiene todo `main` por construcción: los squash de `main` son DE commits de `develop`). Verificá: `git log origin/main --not develop` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/` sin cambios de código. Push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
+
+2. **Preflight `release_batch_policy=requires_break_glass` falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (ej. `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirmá el fantasma: `git diff origin/main..target -- <archivo>` = 0 líneas. Post-merge (target = HEAD de `main`) el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
+
+3. **`playwright_smoke` (0 runs) + `ci_green` (aún corriendo) en el squash commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit de `main` no tiene su propio smoke. Con solo *warnings* (sin errors), el preflight marca `readyToDeploy=false` salvo `bypass_preflight_reason` (≥20 chars → activa `--override-batch-policy --bypass-preflight-warnings`). Es el path canónico. **Mejor práctica:** esperá el CI de `main` verde ANTES de re-dispatchar, para que `ci_green` sea genuino y el bypass cubra solo el `playwright_smoke` inevitable. Documentá el motivo real (no genérico) en `bypass_preflight_reason`.
+
+4. **ops-worker puede quedar con GIT_SHA rezagado tras el release — NO es drift.** `ops-worker-deploy` es *change-gated*: si ningún worker-runtime-path cambió desde `EXPECTED_SHA`, salta el rebuild (`deploy_needed=false`) y el servicio conserva el SHA del último deploy que sí tocó código de worker (código idéntico al target, por diseño — ver el step de worker-drift del workflow). **NO** fuerces redeploy para "alinear el label" salvo que el código del worker haya cambiado. Los otros 3 workers sí redeployan al target.
 
 ## What The Orchestrator Owns
 
@@ -167,9 +179,12 @@ LIMIT 5;
    - incomplete orchestrator run
    - direct worker deploy
    - push-triggered partial deploy
+   - workflow no-op/skip that left Cloud Run on an older `GIT_SHA`
    - stale manifest
    - Cloud Run deployment failure
-4. Prefer a fresh orchestrator attempt for the verified target SHA. Use a
+4. Prefer a fresh orchestrator attempt for the verified target SHA. If a
+   worker workflow skipped due to perceived runtime equivalence but watchdog
+   still reports drift, treat it as incomplete closure, not success. Use a
    single worker workflow dispatch only as break-glass when the orchestrator is
    blocked and the user approves the external mutation.
    - For `hubspot-greenhouse-integration`, use:
@@ -186,7 +201,8 @@ gh workflow run hubspot-greenhouse-integration-deploy.yml \
      reports `drift_count=0`. Do not edit `greenhouse_sync.release_manifests`
      by SQL to fix drift.
 5. Re-run watchdog.
-6. Document the incident in `Handoff.md`.
+6. Document the incident in `Handoff.md`, including whether the suspected skip
+   was expected (`no_infra_diff`) or real drift (`worker_revision_drift`).
 
 ## Break-Glass
 

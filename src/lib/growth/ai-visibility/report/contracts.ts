@@ -16,6 +16,7 @@
 
 import { type AccuracyConfidence, type AccuracyFindingKind } from '../accuracy/contracts'
 import { type GrowthAiVisibilityProviderId } from '../contracts'
+import { type GraderEngineSurface } from '../normalization/contracts'
 import { type ProbeAxis, type ProbeKind } from '../probes/contracts'
 import { type ScoreDimensionKey } from '../scoring/config'
 import { type CategoryTaxonomyLevel, type CategoryTaxonomyVersion } from '../taxonomy'
@@ -31,7 +32,7 @@ export const GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION = 'ai_visibility_r
  * del shape → bump MAJOR + render de `efeonce-web` adaptado en el mismo ciclo (ADR
  * `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1`).
  */
-export const GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION = '1.0.0' as const
+export const GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION = '1.1.0' as const
 
 export type GraderReportVersion = typeof GROWTH_AI_VISIBILITY_REPORT_VERSION
 export type RecommendationPackVersion = typeof GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION
@@ -289,6 +290,7 @@ export interface CategoryTaxonomySummary {
 
 export const CITATION_SOURCE_CLASSIFICATIONS = ['own_domain', 'competitor', 'third_party', 'ugc'] as const
 export type CitationSourceClassification = (typeof CITATION_SOURCE_CLASSIFICATIONS)[number]
+export type CitationSourceClassificationTotals = Record<CitationSourceClassification, number>
 
 export const CITATION_SOURCE_BREAKDOWN_REASONS = ['sin_citas_evaluables'] as const
 export type CitationSourceBreakdownReason = (typeof CITATION_SOURCE_BREAKDOWN_REASONS)[number]
@@ -306,7 +308,108 @@ export interface CitationSourceBreakdown {
   domains: CitationSourceDomain[]
   totalCitations: number
   uniqueDomains: number
+  /** Totales globales por clase sobre TODOS los dominios, no sólo `domains` top-N. */
+  classificationTotals?: CitationSourceClassificationTotals
   reason: CitationSourceBreakdownReason | null
+}
+
+// ── Public report view facts (TASK-1331) ────────────────────────────────────
+
+export const PUBLIC_ENGINE_DISPLAY_IDS = ['chatgpt', 'claude', 'gemini', 'perplexity', 'google_ai_overview'] as const
+export type PublicEngineDisplayId = (typeof PUBLIC_ENGINE_DISPLAY_IDS)[number]
+
+export const ENGINE_COVERAGE_STATUSES = [
+  'measured_with_mentions',
+  'measured_without_mentions',
+  'no_response',
+  'not_sampled',
+  'unknown'
+] as const
+export type EngineCoverageStatus = (typeof ENGINE_COVERAGE_STATUSES)[number]
+
+export interface PublicEngineCoverageProvider {
+  providerId: GrowthAiVisibilityProviderId
+  displayId: PublicEngineDisplayId
+  label: string
+  surface: GraderEngineSurface
+  resolved: number | null
+  present: number | null
+  mentionRate: number | null
+  status: EngineCoverageStatus
+}
+
+export interface PublicEngineCoverageSummary {
+  roster: number
+  sampled: number
+  resolved: number
+  present: number
+  shareOfModel: number | null
+  strongestDisplayId: PublicEngineDisplayId | null
+  weakestMeasuredDisplayId: PublicEngineDisplayId | null
+}
+
+export interface PublicCompetitiveBenchmarkRow {
+  name: string
+  mentions: number
+  rank: number
+  isBrand: boolean
+  deltaVsBrand: number
+  sharePct: number | null
+}
+
+export interface PublicReportViewFacts {
+  engineCoverage: {
+    providers: PublicEngineCoverageProvider[]
+    summary: PublicEngineCoverageSummary
+  }
+  citationTotals: {
+    totalCitations: number
+    uniqueDomains: number
+    ownDomainShare: number | null
+    ownDomain: number | null
+    competitor: number | null
+    thirdParty: number | null
+    ugc: number | null
+  }
+  competitiveBenchmark: {
+    totalMentions: number
+    brandShare: number | null
+    brandRank: number | null
+    leaderName: string | null
+    leaderMentions: number | null
+    leaderGap: number | null
+    nextGap: number | null
+    leaderMultiple: number | null
+    rows: PublicCompetitiveBenchmarkRow[]
+  }
+  sentimentFacts: {
+    evaluated: number
+    net: SentimentNet
+    positive: number
+    neutral: number
+    negative: number
+    mixed: number
+  }
+  readinessSummary: {
+    structuralScore: number | null
+    agenticScore: number | null
+    actionGap: number | null
+    structuralCoverage: { measured: number; probed: number } | null
+    agenticCoverage: { measured: number; probed: number } | null
+  }
+  dimensionHighlights: {
+    strengths: Array<{ key: ScoreDimensionKey; label: string; score: number }>
+    critical: Array<{ key: ScoreDimensionKey; label: string; score: number }>
+    unmeasured: Array<{ key: ScoreDimensionKey; label: string }>
+  }
+  shareFacts: {
+    reportUrl: string | null
+    graderUrl: string
+    scoreText: string
+    shareOfModelText: string
+    citabilityText: string
+    providersText: string
+  }
 }
 
 // ── Temporal trend (TASK-1236) ───────────────────────────────────────────────

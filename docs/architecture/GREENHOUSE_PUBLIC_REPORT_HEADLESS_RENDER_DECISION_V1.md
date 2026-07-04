@@ -176,3 +176,39 @@ El contrato headless se mantiene como `GET /api/public/growth/ai-visibility/repo
 La corrección de lifecycle mueve `gatherRunProbes()` antes de `finalizeRunDelivery()` para que snapshots nuevos puedan congelar readiness/probes antes de entregar el token. **Snapshots existentes quedan `new-runs-only` por defecto**: no se republish/version-bump sin una task gobernada que defina alcance, idempotencia y comunicación.
 
 Estado operativo: code complete local en Greenhouse + `efeonce-think`, sin push/deploy. Evidencia local en TASK-1328: focal tests, typecheck/lint, Astro `type-check`/`build`, capturas desktop/mobile y assertion de no-overflow/no-leak. Producción requiere deploy Greenhouse + hub y smoke con token nuevo antes de prometer disponibilidad real.
+
+## Delta 2026-07-03 — TASK-1329 portable PDF download (code complete local)
+
+El informe público del hub `efeonce-think` puede ofrecer una descarga portable del mismo diagnóstico sin convertir al hub en dueño del PDF ni duplicar lógica de render.
+
+Decisión: Greenhouse expone un endpoint público read-only adicional bajo el mismo contrato token-gated:
+
+- `GET /api/public/growth/ai-visibility/report/[token]/pdf`
+
+El endpoint:
+
+- reusa `readPublicGraderReport(token)` como reader de snapshot público;
+- reusa `buildReportHeader(...)` y `buildAiVisibilityReportAttachment(...)`, el renderer PDF ya gobernado por TASK-1273/TASK-1250;
+- devuelve `application/pdf` como attachment;
+- aplica el rate guard público existente para reportes;
+- no modifica `ReportArtifactModel`, scoring, lifecycle del run ni `executeClaimedGraderRun`;
+- no persiste un asset nuevo ni crea short links; aliases cortos persistentes quedan en TASK-1330.
+
+Responsabilidad de superficie:
+
+- Greenhouse sigue siendo dueño del dato, snapshot y PDF public-safe.
+- `efeonce-think` sólo construye el href server-side hacia ese endpoint y pinta una acción secundaria `PDF` en el dock flotante del informe.
+
+Estado operativo: code complete local, sin push/deploy productivo. Evidencia: test de contrato del endpoint (`route-contract.test.ts`) cubre 200 PDF, 429 y 404; `pnpm typecheck` + `pnpm build` verdes en Greenhouse. Think valida `pnpm type-check` + `pnpm build`, `scrollWidth == clientWidth` en 1440/1280/390 y no-leak checks. Caveat local: el mock server de `127.0.0.1:3337` todavía responde JSON para `mock-token/pdf` hasta reiniciar/ajustar ese runtime; la ruta Next real está implementada y testeada.
+
+### Delta menor — display id del run en el informe
+
+El payload JSON público suma `runPublicId` (`EO-GRUN-#####`) como metadata de trazabilidad para el render/pantalla/PDF compartido. Es un **display/admin id secuencial**, no un handle de autenticación ni de polling. El token no enumerable (`grt-*`) sigue siendo la única auth del informe público; `runPublicId` sólo sirve para que el lector cite el snapshot auditado sin mostrar el token.
+
+## Delta 2026-07-04 — TASK-1331 view facts contract (code complete local)
+
+El contrato headless sube de `modelVersion=1.0.0` a `1.1.0` con un namespace aditivo `model.viewFacts`, calculado en Greenhouse desde `PublicGraderReport`/`ReportArtifactModel`. El hub `efeonce-think` debe tratar esos campos como facts server-provided y no como semántica local.
+
+`viewFacts` cubre engine coverage/Share of Model, totales globales de citabilidad, benchmark competitivo, sentimiento, readiness, highlights de dimensiones y share facts. La clasificación de citas agrega `citationSourceBreakdown.classificationTotals` global antes del top-N; snapshots viejos degradan esos totales a `null` honesto, sin 500 ni borrar secciones. `levels[]` suma `isNext` para que la decisión "Empieza aquí" también venga del modelo.
+
+Hard rules vigentes: no cambia scoring, pesos, probes, normalizer, provider adapters ni `executeClaimedGraderRun`; el token público sigue siendo la frontera de acceso; no se exponen raw prompts, raw provider answers, URLs completas de citas ni findings internos. Estado operativo: code complete local en Greenhouse + Think, sin release productivo ni smoke con token real hasta confirmación explícita.

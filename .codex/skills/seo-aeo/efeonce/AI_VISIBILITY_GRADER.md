@@ -17,6 +17,25 @@
 - **Esta skill NO redefine el contrato**: si hay drift, prevalece el doc del
   repo. Acá solo mapeamos conocimiento ↔ producto.
 
+## Render público del informe (live, as-of 2026-07-03)
+
+El informe que ve el lead **NO se renderiza en Greenhouse**: vive en el hub
+público **`efeoncepro/efeonce-think` → `think.efeoncepro.com/brand-visibility/r/<token>`**
+(Astro, fetch server-side del modelo headless, `noindex`, token-gated). Greenhouse
+es el data owner (endpoint `GET /api/public/growth/ai-visibility/report/[token]`,
+TASK-1280); el hub es render tonto (no re-deriva scoring). La **escalera de madurez
+5-Be** de este framework se implementó allí como **primitiva canónica reutilizable**
+`MaturityLadder`. ADR: `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`.
+
+**El enlace del correo + el `report_url` de HubSpot apuntan al hub (TASK-1324, released 2026-07-03).**
+Fuente única = `buildPublicReportUrl` (`src/lib/growth/ai-visibility/hubspot/report-link.ts`): arma
+`${PUBLIC_GRADER_HUB_URL || 'https://think.efeoncepro.com'}/brand-visibility/r/<token>` (env var
+dedicada, default-safe = hub prod; NO reusar `NEXT_PUBLIC_APP_URL` = portal). Un cambio, ambos
+consumers (email + HubSpot) alineados. El path viejo del portal `greenhouse.efeoncepro.com/grader/r/<token>`
+(que daba 404) tiene un **redirect puente 307** en `next.config.ts` para recuperar correos ya enviados.
+Anti-regresión: `report-link.test.ts` afirma que NUNCA vuelve al host/path muerto.
+Tasks: `TASK-1325` (hub, complete) · `TASK-1324` (repoint del enlace, complete/released).
+
 ## Tesis del producto (por qué importa para la skill)
 HubSpot mide *percepción de marca* en answer engines. Efeonce convierte los
 **gaps de visibilidad en IA en un plan operativo** (contenido, CRM, PR, SEO/AEO,

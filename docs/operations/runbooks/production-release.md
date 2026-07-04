@@ -3,7 +3,7 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Source task:** TASK-848 V1 (parcial; V1.1 follow-ups en TASK-850..855)
-> **Last updated:** 2026-05-11
+> **Last updated:** 2026-07-03
 
 Este runbook es el contrato operativo para promover `develop` → `main` y para ejecutar rollback de emergencia.
 
@@ -75,6 +75,13 @@ Flags:
 - `--json`, `--fail-on-error`, `--override-batch-policy`
 
 Output canonico: `ProductionPreflightV1` (versionado `contractVersion='production-preflight.v1'`). Operator decide en base a `readyToDeploy: SI | NO`; en modo `--fail-on-error`, cualquier `readyToDeploy=false` debe fallar el gate.
+
+**Leccion 2026-07-03 (TASK-1328):** si el `target_sha` acaba de llegar a `main`, el preflight puede fallar por carrera de evidencia (`ci_green` o `playwright_smoke` aun corriendo / sin run para ese SHA). Eso no se arregla cambiando el gate ni interpretando que Azure o workers "skippearon". La accion correcta es:
+
+1. Verificar si el check esta `in_progress` o si falta el smoke para el SHA exacto.
+2. Disparar/esperar el smoke o CI faltante.
+3. Reintentar el orquestador solo cuando la evidencia exista.
+4. Si se usa `bypass_preflight_reason`, dejar una razon forense concreta que diga que CI/smoke ya pasaron y que el bloqueo era latencia de GitHub Actions, no un bypass general.
 
 Si por algun motivo el CLI no esta disponible (e.g. local sin checkout, o auth expirada), la tabla manual abajo sirve como fallback documental. **Cualquier check rojo bloquea el release.**
 
@@ -160,6 +167,18 @@ Excepción break-glass:
 - requiere razón escrita, owner humano, rollback explícito y actualización de `Handoff.md`;
 - no permite agregar mejoras no relacionadas.
 
+### 2.3. Gotchas del squash-merge (verificados 2026-07-03 #139; fix de raíz = ISSUE-114)
+
+El flujo de promoción por **squash-merge** hace que `main` (commits squash de releases previos) **no sea ancestro de `develop`**. Eso produce 3 condiciones recurrentes que **NO son fallas reales** — reconocelas y aplicá la mitigación en vez de perseguirlas:
+
+1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** Conflictos en docs (Handoff/changelog/README/registry) y a veces código, porque ambos lados editaron desde una merge-base vieja. **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo: contiene todo `main` por construcción, ya que los squash de `main` son DE commits de `develop`). Verificá `git log origin/main --not develop` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/` sin cambios de código → push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
+
+2. **Preflight `release_batch_policy=requires_break_glass` como falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (típicamente `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirmá el fantasma: `git diff origin/main..target -- <archivo>` = **0 líneas** (idéntico a prod). Post-merge, con `target` = HEAD de `main`, el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
+
+3. **`playwright_smoke` (0 runs) + `ci_green` (aún corriendo) como warnings en el commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit squash de `main` no tiene su propio smoke. Con solo *warnings* (sin errors), el preflight retorna `readyToDeploy=false` salvo `bypass_preflight_reason` (≥20 chars → activa `--override-batch-policy --bypass-preflight-warnings`). **Mejor práctica:** esperá el CI de `main` verde ANTES de re-dispatchar el orchestrator, para que `ci_green` sea genuino y el bypass cubra solo el `playwright_smoke` inevitable. Documentá el motivo real (no genérico).
+
+> El ops-worker que queda con GIT_SHA rezagado tras el release **no es drift** — ver §4.1 (change-gate `deploy_needed=false` cuando el código de worker no cambió).
+
 ## 3. Approval del environment Production
 
 En el flujo canonico se aprueba el job `approval-gate` del workflow
@@ -182,6 +201,12 @@ orquestador. Si aparece un run individual esperando approval para production,
 tratarlo como break-glass o drift operacional: NO asumir que reemplaza el
 orquestador. Validar primero si hay un run `Production Release Orchestrator`
 activo para el mismo `target_sha`.
+
+En el orquestador normal puede haber mas de un approval visible: primero el
+gate `Production Release Orchestrator` y despues jobs gated invocados desde el
+mismo run (por ejemplo Azure). Aprobarlos solo si pertenecen al run activo y al
+`target_sha` esperado. No aprobar approvals obsoletos solo porque el nombre del
+workflow parece relacionado.
 
 Approval desde GitHub UI:
 
@@ -208,8 +233,35 @@ Reason: el concurrency fix Opcion A (TASK-848 Slice 3) cancela pending nuevos cu
 | 4 | Smoke flows críticos | Browser real: login, `/finance/cash-out`, `/agency/operations`, `/admin/operations` |
 | 5 | Reliability signals OK | `/admin/operations` subsystem `Platform Release` debe estar OK |
 | 6 | **Flags pendientes de prender** | Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → **§ Pendientes de acción**: ¿hay flags `*_ENABLED` code-complete cuyo flip estaba gated a este release? Si sí, `vercel env add <FLAG>=true Production` (+ ops-worker si aplica) + redeploy + smoke del flujo + actualizar la fila del ledger. **El deploy del código NO prende los flags** (default OFF); olvidarlo deja la feature invisible en prod (deuda cognitiva). |
+| 7 | Watchdog sin drift | `GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json` debe quedar `aggregateSeverity: ok`; workers esperados: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`. |
 
-### 4.1. HubSpot drift recovery
+### 4.1. Leccion TASK-1328: skip esperado vs drift real
+
+No cerrar un release por intuicion de logs. Hay tres casos distintos:
+
+| Caso | Interpretacion | Cierre permitido |
+|---|---|---|
+| Azure job dice `no_infra_diff` / `no diff` | Skip esperado: el workflow hizo health/gating y no aplico Bicep porque no habia cambios infra. | Si el job termina `success` y no hay health failure. |
+| Worker job dice que no redeploya por runtime-equivalente | Solo es aceptable si Cloud Run ya expone el `target_sha` esperado o el watchdog queda OK. | Si `GIT_SHA` matchea el release y `Ready=True`. |
+| Watchdog reporta `worker_revision_drift` | Drift real o evidencia insuficiente. El release no esta cerrado aunque el orquestador haya terminado. | No; recuperar drift y re-ejecutar watchdog. |
+
+Checklist concreto cuando el operador pregunta si un worker "se skippeo":
+
+```bash
+GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
+
+gcloud run services describe ico-batch-worker \
+  --project=efeonce-group --region=us-east4 \
+  --format="value(status.conditions.filter('type','Ready').extract('status'),spec.template.spec.containers[0].env.filter('name','GIT_SHA').extract('value'))"
+```
+
+Interpretacion:
+
+- `ico-batch-worker` con deploy job ejecutado, health OK, `Ready=True` y watchdog synced = NO fue skippeado.
+- `ops-worker` con workflow que salta deploy por diff runtime pero `GIT_SHA` viejo = drift de release, no exito final.
+- La recuperacion canonica es rerun del orquestador para el mismo `target_sha`; si el orquestador esta bloqueado, usar workflow individual como break-glass aprobado. Direct `gcloud run deploy` local es ultimo recurso break-glass y debe quedar documentado con target SHA, revision, verificacion y watchdog final.
+
+### 4.2. HubSpot drift recovery
 
 Si `platform.release.worker_revision_drift` reporta solo
 `hubspot-greenhouse-integration` drifted y el `target_sha` del ultimo release en
@@ -495,6 +547,7 @@ Regla: `unmatched` debe investigarse, pero no muta releases. `failed` sí es inc
 - **NUNCA** ejecutar rollback sin pasar por `production-rollback.ts` (idempotente, audit-safe).
 - **NUNCA** usar `bypass_preflight` fuera de incident mode con post-mortem comprometido.
 - **NUNCA** rollback manual de Azure Bicep sin `what-if` previo.
+- **NUNCA** asumir que un worker o Azure "skippeo" sin leer el job summary/log y sin verificar Cloud Run `Ready=True` + `GIT_SHA` o watchdog OK. Azure `no_infra_diff` puede ser skip esperado; worker drift nunca es cierre.
 - **SIEMPRE** anotar rollback en `Handoff.md` con razón + post-mortem trigger.
 - **SIEMPRE** verificar reliability signals OK antes Y después de release.
 - **SIEMPRE** revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (**§ Pendientes de acción**) al planear y al cerrar un paso a producción: hay features `code-complete` cuyo flag default-OFF debe **prenderse en prod junto a este release** (a veces + migración/ops-worker). El deploy del código no los activa; saber qué prender se lee del ledger, no de la memoria. Tras prender, actualizar la fila del ledger (snapshot por environment).

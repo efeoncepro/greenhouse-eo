@@ -150,6 +150,15 @@ export const GH_GROWTH_AI_VISIBILITY = {
     manual_import: 'Evidencia cargada'
   } satisfies Record<NormalizedFindingProvider, string>,
 
+  provider_display_label: {
+    openai: 'ChatGPT',
+    anthropic: 'Claude',
+    perplexity: 'Perplexity',
+    gemini: 'Gemini',
+    google_ai_overview: 'Google AI Overview',
+    manual_import: 'Evidencia cargada'
+  } satisfies Record<NormalizedFindingProvider, string>,
+
   // Surfaces del grader — labels canónicas de producto (naming inglés, NO se traduce).
   // Taxonomía + mapping motor→surface viven en normalization/contracts.ts (TASK-1265 delta).
   // `answer_engines` = asistentes conversacionales · `ai_search` = respuesta IA en el SERP.

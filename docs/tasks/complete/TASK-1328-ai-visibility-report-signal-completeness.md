@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,11 +21,11 @@
 - Motion: `docs/ui/motion/TASK-1328-ai-visibility-report-signal-completeness-motion.md`
 - Backend impact: `sync`
 - Epic: `EPIC-020`
-- Status real: `Code complete local — Greenhouse + efeonce-think; rollout/deploy pendiente`
+- Status real: `Complete — Greenhouse + efeonce-think released to production; runtime smoke verified with new public token`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|ui`
 - Blocked by: `none`
-- Branch: `task/TASK-1328-ai-visibility-report-signal-completeness`
+- Branch: `develop -> main via PR #140`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -528,7 +528,11 @@ For the reviewed public token on 2026-07-03:
 - Public route contract: `GET /api/public/growth/ai-visibility/report/[token]` test asserts the additive fields appear in `model` without changing the existing `report`.
 - External hub render: `/Users/jreye/Documents/efeonce-think/src/pages/brand-visibility/r/[token].astro` renders method/provenance, engine `present/resolved`, source domains, category association, readiness and required `data-capture` markers from `model`.
 - Visual evidence: local SSR fixture + Astro route `http://localhost:4321/brand-visibility/r/grt-task-1328`; captures at `/Users/jreye/Documents/efeonce-think/.captures/task1328-report-desktop.png` and `.../task1328-report-mobile.png`; Playwright assertion PASS with `scrollWidth=clientWidth` at desktop 1440 and mobile 390.
-- Closure state: `code complete local, rollout pendiente`. No push, no Vercel deploy, no worker redeploy, no production token smoke by operator constraint.
+- Release evidence: Greenhouse PR #140 merged to `main` at `ef6a130d7382404b06d9dc977e85262374114c2b`; Greenhouse Vercel production deployment `greenhouse-qwypaj6zn-efeonce-7670142f.vercel.app` reached `READY`; Production Release Orchestrator run `28687175070` completed successfully after Playwright smoke and CI/deep checks passed.
+- Worker evidence: `ico-batch-worker` deploy was not skipped. The production release executed its deploy job, health check passed and Cloud Run reported `Ready=True`. Post-release watchdog initially found only `ops-worker` SHA drift; `ops-worker` was redeployed to revision `ops-worker-00451-nfj` with `GIT_SHA=ef6a130d7382404b06d9dc977e85262374114c2b`, after which `pnpm release:watchdog --json` returned `aggregateSeverity: ok` and 4/4 workers synced (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`).
+- External hub evidence: `efeonce-think` commit `f4e0747` was pushed to `main`; Vercel production deployment `efeonce-think-1iycuu8sl-efeonce-7670142f.vercel.app` reached `READY`; canonical URL `https://think.efeoncepro.com/brand-visibility/r/<token>` renders the additive report sections from `ReportArtifactModel`.
+- Production runtime smoke: new run `grun-a6e191f9-6cd9-4761-bf28-65a3dfa1895c`, public id `EO-GRUN-00038`, token `grt-45361f263b724327a4d4b95dc8c04ab624c2946469514712bbdcfccef1364b86`, public URL `https://think.efeoncepro.com/brand-visibility/r/grt-45361f263b724327a4d4b95dc8c04ab624c2946469514712bbdcfccef1364b86`. Public API returned readiness (`agentic=43.8`), engine denominators for 4/4 providers, domain citation evidence and no forbidden raw fields.
+- Visual production evidence: `/Users/jreye/Documents/efeonce-think/.captures/task1328-runtime-desktop.png` and `/Users/jreye/Documents/efeonce-think/.captures/task1328-runtime-mobile.png`; desktop 1440 and mobile 390 had `scrollWidth=clientWidth`, required sections present, no no-leak tokens. `report-category-association` was intentionally absent for this smoke because category status was `unknown` with `categories=[]`.
 
 ## Verification
 
@@ -551,20 +555,25 @@ Executed local evidence:
 - `pnpm typecheck` — passed.
 - `pnpm lint` — passed after sandbox escalation for `tsx` IPC.
 - `pnpm ops:lint --changed` — passed.
+- `pnpm build` — passed before production release.
+- `pnpm design:lint` — passed before production release.
+- `pnpm qa:gates --changed --agent codex --task TASK-1328 --ui --runtime --data` — advisory review completed; no hard failure, conservative runtime evidence warnings were closed by production smoke/watchdog.
+- `pnpm docs:closure-check` — passed before production release; rerun required after final lifecycle move.
+- `pnpm secrets:audit` — blocked locally by missing shell secrets; no secret/env mutation in this task.
 - `/Users/jreye/Documents/efeonce-think`: `pnpm type-check` and `pnpm build` — passed.
 - `/Users/jreye/Documents/efeonce-think`: `node scripts/capture.mjs http://localhost:4321/brand-visibility/r/grt-task-1328 task1328-report` — desktop/mobile HTTP 200 screenshots saved.
 - `/private/tmp/task1328-assert-public-report.mjs http://localhost:4321/brand-visibility/r/grt-task-1328` — PASS, required markers present, no forbidden no-leak tokens, no horizontal overflow.
 
 ## Closing Protocol
 
-- [x] `Lifecycle` del markdown quedo sincronizado con el estado real: sigue `in-progress` porque rollout/deploy quedan pendientes.
-- [x] el archivo vive en la carpeta correcta (`in-progress/`).
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real: `complete` tras release productivo y smoke runtime.
+- [x] el archivo vive en la carpeta correcta (`complete/`).
 - [x] `docs/tasks/README.md` quedo sincronizado con el estado local.
 - [x] `Handoff.md` quedo actualizado con cambios, evidencia, deuda y pendientes.
 - [x] `changelog.md` quedo actualizado con el delta de comportamiento/code-complete.
 - [x] se ejecuto chequeo de impacto cruzado sobre TASK-1324, TASK-1325, TASK-1268, TASK-1269 y TASK-1280 durante discovery/plan.
 - [x] Snapshot recovery decision documented: `new-runs-only` by default; version bump or governed republish remains a future explicit task.
-- [x] External `efeonce-think` deploy URL: pending; no deploy requested. Local evidence used `http://localhost:4321/brand-visibility/r/grt-task-1328`.
+- [x] External `efeonce-think` deploy URL: production `https://think.efeoncepro.com/brand-visibility/r/grt-45361f263b724327a4d4b95dc8c04ab624c2946469514712bbdcfccef1364b86`.
 
 ## Follow-ups
 

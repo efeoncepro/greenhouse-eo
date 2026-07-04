@@ -149,9 +149,25 @@ describe('AiVisibilityReportArtifact — no-leak visual', () => {
     expect(model.citationSourceBreakdown.domains[0]).toMatchObject({ domain: 'g2.com' })
     expect(model.categoryTaxonomySummary.status).toBe('mapped')
     expect(model.readiness?.agentic.overallScore).toBe(64)
+    expect(model.viewFacts.engineCoverage.summary.shareOfModel).toBe(71)
+    expect(model.viewFacts.citationTotals).toMatchObject({
+      ownDomain: 9,
+      competitor: 7,
+      thirdParty: 18,
+      ugc: 11
+    })
+    expect(model.viewFacts.dimensionHighlights.critical).toContainEqual({
+      key: 'citation_quality',
+      label: 'Citation Quality',
+      score: 32
+    })
+    expect(model.levels.filter(level => level.isNext)).toHaveLength(1)
+    expect(model.levels.find(level => level.isNext)?.id).toBe('readable')
     expect(serialized).not.toContain('razón interna')
     expect(serialized).not.toContain('providerFindings')
     expect(serialized).not.toContain('accuracyFindings')
+    expect(serialized).not.toContain('rawEvidencePointer')
+    expect(serialized).not.toContain('providerRequestHash')
   })
 
   it('print/attachment adapter renderiza público-safe (sin leak, sin trend/engine)', () => {

@@ -56,6 +56,7 @@ Respuesta exitosa: `202 { sendId, leadType, idempotentHit }`. El envío del emai
 | `aeo_send_disabled` (409) | Flag OFF | Pide prender `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` (Vercel + ops-worker). |
 | email `sent` pero lead `failed` | La property `aeo_check_result` no existe, o el objeto `leads`/asociación no está disponible | Provisiona la property (ver Rollout); revisa los logs del consumer. El email ya salió; el Lead reintenta. |
 | Señal `operator_send_failed` > 0 | Entrega caída o HubSpot rechazando | Revisa `grader_report_send_log` (estado `failed` + `reason`) + Sentry domain `growth`. |
+| El botón "Abrir informe" del correo / el `report_url` de HubSpot da **404** | Comportamiento viejo (pre-TASK-1324): el link apuntaba a `greenhouse.efeoncepro.com/grader/r/<token>`, ruta inexistente en el portal | **Resuelto (TASK-1324, released 2026-07-03):** el enlace ahora abre el hub `think.efeoncepro.com/brand-visibility/r/<token>`; los correos ya enviados con el link viejo se recuperan con un redirect automático 307. Fuente única `buildPublicReportUrl` (email + HubSpot heredan). Si volviera a dar 404, verifica que `PUBLIC_GRADER_HUB_URL` no apunte al portal por error (default seguro = hub). |
 
 ## Rollout (estado: code complete, pendiente de activación)
 

@@ -111,8 +111,9 @@ Cuando recibes alerta `[ERROR] Worker revision drift — <workflow>`:
      --format="value(spec.template.spec.containers[0].env.filter('name','GIT_SHA').extract('value'))"
    ```
 
-2. **Si difieren**: deploy reciente falló silente o alguien deployó manualmente sin pasar por workflow.
+2. **Si difieren**: deploy reciente falló silente, el workflow salto deploy por creer que el runtime era equivalente, o alguien deployó manualmente sin pasar por workflow.
    - Re-trigger workflow normal del servicio drifted con el SHA canonico del release.
+   - Si el drift aparece despues de un `Production Release Orchestrator` exitoso, no cerrar el release todavia: preferir primero rerun del orquestador para el mismo `target_sha`; usar workflow individual solo como break-glass aprobado si el orquestador queda bloqueado.
    - Para `hubspot-greenhouse-integration`:
      ```bash
      gh workflow run hubspot-greenhouse-integration-deploy.yml \
@@ -124,6 +125,8 @@ Cuando recibes alerta `[ERROR] Worker revision drift — <workflow>`:
    - Verificar que el deploy completa con `gh run watch <run_id>`.
    - Verificar `curl /health`, `curl /contract` y `pnpm release:watchdog --json` con `drift_count=0`.
    - No editar `greenhouse_sync.release_manifests` por SQL para corregir drift.
+
+   Leccion TASK-1328 (2026-07-03): `ico-batch-worker` no estaba skippeado; habia deploy job + health + `Ready=True`. El drift real fue `ops-worker` porque Cloud Run seguia exponiendo el SHA anterior. La conclusion operacional sale del watchdog y del `GIT_SHA` de Cloud Run, no de la intuicion sobre qué jobs "deberian" haber corrido.
 
 3. **Si Cloud Run muestra `unknown`**: worker fue deployado antes de TASK-849 Slice 1 (GIT_SHA injection). Re-deploy el worker via workflow normal — el GIT_SHA se poblará en la nueva revision.
 
