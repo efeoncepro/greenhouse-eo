@@ -21,6 +21,8 @@ vi.mock('../../report/command', async () => {
 vi.mock('../report-link', () => ({
   getLatestReportTokenForRun: vi.fn().mockResolvedValue('tok-123'),
   buildPublicReportUrl: (token: string) => `https://think.efeoncepro.com/brand-visibility/r/${token}`,
+  // TASK-1330 — execute.ts ahora resuelve la URL preferida por run (short-or-long).
+  resolveReportShareUrlForRun: vi.fn().mockResolvedValue('https://think.efeoncepro.com/brand-visibility/r/tok-123'),
 }))
 vi.mock('../crm-client', () => ({ upsertLeadToHubSpot: vi.fn() }))
 
