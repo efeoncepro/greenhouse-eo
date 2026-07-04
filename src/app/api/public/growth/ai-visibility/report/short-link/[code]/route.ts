@@ -2,13 +2,10 @@ import { NextResponse } from 'next/server'
 
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 import { checkPublicReadAllowed } from '@/lib/growth/ai-visibility/public-delivery/read-guard'
-import { buildPublicReportShortUrl } from '@/lib/growth/ai-visibility/public-report-url'
-import { buildPublicReportResponseBody } from '@/lib/growth/ai-visibility/report/public-report-response'
 import {
   resolveAiVisibilityReportShortLink,
   trackAiVisibilityReportShortLinkUse
 } from '@/lib/growth/ai-visibility/report/short-link'
-import { readPublicGraderReport } from '@/lib/growth/ai-visibility/report/snapshot'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 const getClientIp = (request: Request): string | null =>
@@ -17,12 +14,14 @@ const getClientIp = (request: Request): string | null =>
 /**
  * TASK-1330 — `GET /api/public/growth/ai-visibility/report/short-link/[code]`
  *
- * Resuelve un short code a su reporte público y sirve el MISMO payload headless que la ruta del
- * token (assembler compartido) → render-in-place: `efeonce-think` renderiza bajo `/s/<code>` sin
- * que el token largo llegue nunca al browser (se resuelve server-to-server acá). `shareFacts.reportUrl`
- * queda con el URL CORTO. Estados distinguidos: 200 activo · 404 desconocido · 410 revocado/expirado
- * (honra también el expiry del reporte subyacente). Rate-limit volumétrico reusa el read-guard.
- * El tracking de uso es best-effort (no bloquea el resolve).
+ * Resuelve un short code a su reporte y devuelve `{ status: 'active', reportToken }`. Contrato
+ * pensado para **render-in-place** en el hub: `efeonce-think` `/s/[code].astro` resuelve el código
+ * server-side y hace `Astro.rewrite('/brand-visibility/r/<token>')` → el informe se renderiza bajo
+ * `/s/<code>` (la URL corta se conserva en el address bar) reusando la página del token existente
+ * SIN duplicar el render. El token viaja server-to-server (Think SSR) y NUNCA aparece en el browser
+ * ni en el copy compartido. Estados distinguidos: 200 activo · 404 desconocido · 410 revocado/expirado
+ * (honra también el expiry del reporte subyacente). Rate-limit volumétrico reusa el read-guard; el
+ * tracking de uso es best-effort (no bloquea el resolve).
  */
 
 export const dynamic = 'force-dynamic'
@@ -41,28 +40,19 @@ export async function GET(request: Request, { params }: { params: Promise<{ code
       return NextResponse.json({ error: 'Este enlace no existe.' }, { status: 404 })
     }
 
-    if (resolved.status === 'revoked' || resolved.status === 'expired' || !resolved.reportToken) {
-      return NextResponse.json({ error: 'Este enlace expiró o fue revocado.' }, { status: 410 })
-    }
-
-    const snapshot = await readPublicGraderReport(resolved.reportToken)
-
-    if (!snapshot) {
-      // Código activo pero el snapshot ya no está (expirado/borrado): trátalo como link muerto.
+    if (resolved.status !== 'active' || !resolved.reportToken) {
       return NextResponse.json({ error: 'Este enlace expiró o fue revocado.' }, { status: 410 })
     }
 
     // Best-effort, NO bloqueante: nunca convierte el resolve en un write-on-read que falle.
     void trackAiVisibilityReportShortLinkUse(code)
 
-    return NextResponse.json(
-      buildPublicReportResponseBody({ snapshot, reportUrl: buildPublicReportShortUrl(code) })
-    )
+    return NextResponse.json({ status: 'active', reportToken: resolved.reportToken })
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_short_link_route' } })
 
     return NextResponse.json(
-      { error: 'No fue posible cargar el reporte. Intenta de nuevo en unos minutos.' },
+      { error: 'No fue posible resolver el enlace. Intenta de nuevo en unos minutos.' },
       { status: 502 }
     )
   }
