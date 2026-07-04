@@ -68,28 +68,27 @@ TASK-1327 necesita embeber el form gobernado `fdef-ai-visibility-grader` en `thi
 
 ### Diseño del resolver (Slice 1) — decisión de arquitectura
 
-**Elegido: transporte CORS = UNIÓN de `origin_allowlist_json` de las surfaces `active` (SoT =
-`form_host_surface`), cacheada in-memory + baseline de cold-start GOBERNADO POR ENV VAR (cero literal
-hardcodeado en el handler).**
+**Elegido (veredicto arch-architect): transporte CORS = UNIÓN de `origin_allowlist_json` de las surfaces
+`active` (SoT = `form_host_surface`), cacheada in-memory con stale-on-error. SIN literal hardcodeado y
+SIN env var. Una sola fuente de verdad.**
 
-- **SoT único = `form_host_surface`** → mata el drift (objetivo central de la task). Sumar `think` al
+- **SoT ÚNICO = `form_host_surface`** → mata el drift (objetivo central de la task). Sumar `think` al
   grader surface lo mete automáticamente en la unión → el transporte lo permite sin literal en el route
   handler. `efeoncepro.com` sigue en la unión (viene de aeo + lead-gen) → `/aeo-2` sigue con ACAO. **Agregar
-  o quitar un origin = cambio de DATA (DB), NUNCA de código.**
+  o quitar un origin = cambio de DATA (una fila en la DB), NUNCA de código.**
 - **Cache in-memory (TTL ~60-120s) + stale-on-error:** OPTIONS/GET/submit leen del cache, NUNCA bloquean
   en la DB; el preflight (sin `surfaceId`) funciona porque la unión es surface-agnóstica. Refresh lazy/async.
-  Con la DB caída pero cache tibio → se sirve el last-known-good. Esto cubre ~todos los casos.
-- **Baseline de cold-start GOBERNADO POR ENV VAR (no hardcodeado):** para el único hueco que el cache no
-  cubre — instancia serverless en frío + lectura de unión no disponible en ese instante — el resolver
-  siembra el set con `GROWTH_FORMS_PUBLIC_CORS_BASELINE` (env, ej. `https://efeoncepro.com,https://www.efeoncepro.com`,
-  por-environment, auditable, presente desde el arranque sin DB). **NO es un literal en el handler ni la
-  fuente de gobierno** (el gobierno sigue siendo la DB); es config de resiliencia que **desacopla el
-  preflight `OPTIONS` de la DB**. Documentar la env var (no es `*_ENABLED`, pero registrar su propósito).
-- **Nota honesta:** en un outage TOTAL de DB el form ya está roto (el submit necesita la DB para form-def/
-  surface/persistir), así que el baseline no "salva" `/aeo-2` en ese caso — su valor real es mantener el
-  preflight barato y desacoplado de la DB. Alternativa purista aceptable: **sin baseline, solo unión +
-  stale-cache** (el hueco cold-start-durante-outage es benigno porque el form ya no submitea). Elegir en
-  Discovery; el default recomendado es la env var (belt-and-suspenders, preflight DB-independiente).
+  Con la DB caída pero cache tibio → se sirve el last-known-good (cubre los blips reales).
+- **SIN baseline hardcodeado NI env var — decisión de arquitectura, no omisión.** Se evaluó un piso de
+  cold-start (literal, luego env var) y la skill lo DESCARTA: (1) el único hueco que el cache no cubre es
+  "instancia serverless en frío + DB no disponible en ese instante", pero **en ese escenario el form ya
+  está roto** (el submit necesita la DB para form-def/surface/persistir) → el piso cuidaría una puerta de
+  un cuarto ya cerrado (NO es defensa en profundidad real, es decorado); (2) una env var = **segunda
+  fuente** → reintroduce el drift que la task existe para matar (y una env var mal seteada por-environment
+  es otra allowlist mal configurada); (3) es puerta de ida y vuelta → **empezar simple**, sumar el piso
+  SOLO si un incidente real demuestra un caso "CORS falla pero el form sí funciona" (hoy inexistente).
+  Principios: SoT único / anti-drift · defensa en profundidad solo sobre caminos que sobreviven aparte ·
+  reversibilidad → menos mecanismos.
 
 **Invariante de fallo (el corazón del cuidado con `/aeo-2`):** el resolver es **fail-CLOSED para el origin
 desconocido** (unknown → sin ACAO) pero **fail-SAFE para el data source** (DB caída → piso con los origins
@@ -290,9 +289,9 @@ Reglas obligatorias:
 
 - Replace the hardcoded origin set in `src/app/api/public/growth/forms/cors.ts` with the governed resolver
   **decidido en el Delta 2026-07-04**: transporte CORS = UNIÓN de `origin_allowlist_json` de surfaces
-  `active` (SoT `form_host_surface`), cacheada in-memory (TTL ~60-120s, stale-on-error) + **baseline de
-  cold-start GOBERNADO POR ENV VAR** `GROWTH_FORMS_PUBLIC_CORS_BASELINE` (no hardcodeado; desacopla el
-  preflight de la DB). Agregar/quitar un origin = cambio de DATA, nunca de código.
+  `active` (SoT `form_host_surface`), cacheada in-memory (TTL ~60-120s, stale-on-error). **SIN literal
+  hardcodeado y SIN env var** (una sola fuente = la DB). Agregar/quitar un origin = cambio de DATA, nunca
+  de código. (El piso de cold-start se evaluó y se descartó — ver Delta: sería decorado + segunda fuente.)
 - **NO implementar** la opción "surface-aware CORS por request keyed en `surfaceId`" (rompe el preflight
   `OPTIONS` que no lleva `surfaceId` → regresión de `/aeo-2`). Ver Delta.
 - Invariante: **fail-CLOSED para origin desconocido**, **fail-SAFE para el data source** (DB down → piso, nunca unión vacía).
