@@ -51,12 +51,21 @@ exposes the form as a *data contract*:
 - `renderer-latest.js` (the `<greenhouse-form>` web component) is **one consumer**
   of that contract — a convenience widget, not the source of truth.
 
-**What Codex shipped (v0):** embeds only the `<greenhouse-form>` web component via
-the external `renderer-latest.js`. It couples efeonce-think to a *consumer* (the
-renderer), so a script-load failure = dead form + `<noscript>` dead-end. That is the
-screenshot. Governance-correct, resilience-poor.
+**What Codex shipped (and where it stands, 2026-07):** embeds only the
+`<greenhouse-form>` web component via the external `renderer-latest.js`. The renderer
+was since **hardened and now renders the full form correctly** — the original
+screenshot failure is resolved. So this is a **working, parity-satisfying**
+implementation, not a broken one. **Full API Parity is satisfied by the contract
+existing** (schema GET + governed submit) — Nexa / any consumer can operate the form
+via the API regardless of how efeonce-think renders it; the widget-embed does **not**
+violate parity. (An earlier version of this overlay overstated that — corrected here.)
+Its only remaining limitation is structural: the fields live in client-painted DOM,
+not server HTML, so a future renderer/CDN/network failure has no fallback (`<noscript>`
+is a dead-end). That is a **defense-in-depth gap, not a live bug**.
 
-**Canonical shape (C1 — the correct target):**
+**Resilience upgrade (C1) — OPTIONAL now that the renderer works.** Do this if
+renderer failures recur, or if you want zero-JS PE / crawlable fields; otherwise a
+working, hardened widget-embed is a legitimate choice. C1 is not a correctness fix:
 
 1. **Server-render the form from the governed schema.** In the `.astro` fence
    (SSR/build), `fetch` `GET /api/public/growth/forms/{form_key}` and render a
@@ -81,8 +90,9 @@ screenshot. Governance-correct, resilience-poor.
    a widget that may never paint.
 5. The write path stays governed: the client submits, `submitForm` governs (honeypot,
    consent gate, dedupe, async outbox). The public form **enqueues** a grader run; it
-   never computes the grade. Because the contract is data, Nexa / any consumer can
-   operate the same form (Full API Parity) — not just a browser running the widget.
+   never computes the grade. Full API Parity already holds via the contract (Nexa /
+   any consumer can operate the form through the API) — that's true whether efeonce-
+   think renders the widget or a native form, so parity is not a reason to switch.
 6. This is TASK-1327 territory — cross-link the task, don't reinvent the plan.
 
 ## Brand: AXIS tokens are COPIED, not imported
