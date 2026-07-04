@@ -26,7 +26,8 @@ const snapshotState = {
     asOf: '2026-05-20T12:00:00.000Z',
     expiresAt: null as string | null,
     publicReport: SAMPLE_PUBLIC_REPORT,
-    brandName: 'Globe'
+    brandName: 'Globe',
+    runPublicId: 'EO-GRUN-00042'
   } as unknown | null
 }
 
@@ -54,7 +55,8 @@ beforeEach(() => {
     asOf: '2026-05-20T12:00:00.000Z',
     expiresAt: null,
     publicReport: SAMPLE_PUBLIC_REPORT,
-    brandName: 'Globe'
+    brandName: 'Globe',
+    runPublicId: 'EO-GRUN-00042'
   }
 })
 
@@ -77,6 +79,7 @@ describe('GET /report/[token] — contrato público headless (TASK-1280)', () =>
 
     // Back-compat: el DTO crudo + metadata previos intactos.
     expect(body.report.audience).toBe('public')
+    expect(body.runPublicId).toBe('EO-GRUN-00042')
     expect(body.asOf).toBe('2026-05-20T12:00:00.000Z')
     expect(body).toHaveProperty('expiresAt')
   })

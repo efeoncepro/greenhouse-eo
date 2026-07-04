@@ -46,11 +46,13 @@ export interface PublishedSnapshot {
  */
 export interface PublicReportSnapshot extends PublishedSnapshot {
   brandName: string
+  runPublicId: string
 }
 
 type RawSnapshot = {
   report_id: unknown
   run_id: unknown
+  run_public_id?: unknown
   report_token: unknown
   as_of: unknown
   expires_at: unknown
@@ -152,6 +154,7 @@ export const readPublicGraderReport = async (reportToken: string): Promise<Publi
   // válido en 404. NUNCA recompone: sirve el `public_report_json` congelado tal cual.
   const rows = await runGreenhousePostgresQuery<RawSnapshot & { brand_name: unknown }>(
     `SELECT gr.report_id, gr.run_id, gr.report_token, gr.as_of, gr.expires_at, gr.public_report_json,
+            r.public_id AS run_public_id,
             p.brand_name
        FROM greenhouse_growth.grader_reports gr
        JOIN greenhouse_growth.grader_runs r ON r.run_id = gr.run_id
@@ -165,5 +168,5 @@ export const readPublicGraderReport = async (reportToken: string): Promise<Publi
 
   if (!row) return null
 
-  return { ...projectSnapshot(row), brandName: String(row.brand_name) }
+  return { ...projectSnapshot(row), brandName: String(row.brand_name), runPublicId: String(row.run_public_id) }
 }

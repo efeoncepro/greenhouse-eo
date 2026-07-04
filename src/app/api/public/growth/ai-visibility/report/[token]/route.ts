@@ -60,6 +60,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ toke
       model, // render-ready (incluye engineSnapshot público)
       modelVersion: GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION,
       header, // masthead render-ready (org + fecha + período)
+      runPublicId: snapshot.runPublicId, // display/audit id (EO-GRUN-#####), NO auth handle
       asOf: snapshot.asOf,
       expiresAt: snapshot.expiresAt
     })
