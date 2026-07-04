@@ -158,6 +158,54 @@ describe('render_contract — browser-safe', () => {
   })
 })
 
+describe('render_contract — multi_step_light composition', () => {
+  it('serializa steps desde ui_policy para el renderer portable', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({
+        field_schema_json: [
+          { key: 'brandName', type: 'text', required: true },
+          { key: 'email', type: 'email', required: true },
+        ],
+        ui_policy_json: {
+          composition: 'multi_step_light',
+          steps: [
+            { key: 'brand', label: 'Tu marca', fieldKeys: ['brandName'] },
+            { key: 'contact', label: 'Tus datos', fieldKeys: ['email'] },
+          ],
+        },
+      }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(true)
+    expect(result.renderContract?.composition).toBe('multi_step_light')
+    expect(result.renderContract?.steps).toEqual([
+      { key: 'brand', label: 'Tu marca', fieldKeys: ['brandName'] },
+      { key: 'contact', label: 'Tus datos', fieldKeys: ['email'] },
+    ])
+  })
+
+  it('bloquea publicación si un step referencia campos inexistentes', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({
+        field_schema_json: [{ key: 'email', type: 'email', required: true }],
+        ui_policy_json: {
+          composition: 'multi_step_light',
+          steps: [{ key: 'contact', label: 'Tus datos', fieldKeys: ['email', 'missingField'] }],
+        },
+      }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(false)
+    expect(result.blockingReasons.join(' ')).toContain('missingField')
+  })
+})
+
 describe('render_contract — formKey + copy gate (TASK-1297)', () => {
   it('expone formKey (identidad estable) en el render contract', () => {
     const result = compileFormVersion(
