@@ -1,10 +1,19 @@
 # Astro Actions
 
 Type-safe server functions callable from the client **and** from HTML forms with
-progressive enhancement. This is the canonical way to handle the AEO grader form
-and any "client submits data → server does work → returns typed result" flow —
-prefer Actions over hand-rolled `POST` endpoints unless you need a public REST
-contract.
+progressive enhancement. Use Actions for "client submits data → **server logic you
+own** does work → returns typed result" — prefer them over hand-rolled `POST`
+endpoints unless you need a public REST contract.
+
+> ⚠️ **Actions are for logic THIS site owns.** If the form is *governed by another
+> service* that already exposes a contract (a schema endpoint + a submit endpoint —
+> e.g. Greenhouse Growth Forms behind `GET /api/public/growth/forms/{key}` +
+> `POST .../submit`), do **NOT** wrap it in an Astro Action. Wrapping it either forks
+> the governed contract (re-authoring fields/validation) or adds a pointless proxy.
+> Instead: fetch the schema server-side, render a native `<form>` from it, and POST
+> to the governed endpoint. That's the efeonce-think AEO grader form — see
+> `efeonce-overlay.md`. Actions are correct when efeonce-think genuinely owns the
+> server logic (not the AEO case).
 
 ## Define an action
 

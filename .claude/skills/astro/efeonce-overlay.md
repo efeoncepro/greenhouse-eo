@@ -30,28 +30,60 @@ of truth boundary.
   clean seam: Astro validates (Zod) + renders; the model computes. See
   `topics/content-layer.md`.
 
-## The AEO grader form (the thing in the screenshot)
+## The AEO grader form (the thing in the screenshot) — VERIFIED against real code
 
 Context: a public form embed labeled "Formulario gobernado por Greenhouse" that
-failed with "No pudimos cargar el formulario. Intenta de nuevo." — the classic
-client-side-fetch-only failure.
+failed with "No pudimos cargar el formulario. Intenta de nuevo." This section was
+**corrected after auditing the real repos** (efeonce-think + greenhouse-eo, 2026-07)
+— it replaces the earlier "use an Astro Action" advice, which was wrong for this
+governance model.
 
-**Canonical shape:**
+**The SSOT is the governed API contract, NOT the JS renderer.** Greenhouse already
+exposes the form as a *data contract*:
 
-1. It **is an island** — the one genuinely interactive thing on a content page.
-   `client:visible` (below the fold; the hero is the LCP). Not `client:load`.
-2. **Full API Parity**: the form is *governed by Greenhouse*. The form contract
-   is resolved **server-side** (build/request), rendered as a real `<form>`, and
-   the island only enhances UX. Prefer an **Astro Action** (`accept: 'form'`) so
-   it degrades without JS. See `topics/actions.md`.
-3. **NEVER** a form that only exists via a client-side `fetch` of the schema — a
-   failed fetch = the dead-end error we saw. Server-render the shell; hydrate on
-   top.
-4. The write path is governed: the island proposes/submits, Greenhouse governs
-   the action (mirrors the platform's `propose → confirm → execute` doctrine for
-   anything that mutates). The public form enqueues a grader run; it does not
-   compute the grade.
-5. This is TASK-1327 territory — cross-link the task, don't reinvent the plan.
+- `GET /api/public/growth/forms/{form_key}` → the form **contract** (schema/fields).
+- `POST /api/public/growth/forms/{form_key}/submit` → governed submit, owned by the
+  `submitForm` command (honeypot + surface-auth + consent gate + dedupe + async
+  outbox delivery). **Body is JSON only** (`request.json()`), not `formData`.
+- CORS is **data-driven** per surface (`origin_allowlist_json`, fail-closed);
+  `think.efeoncepro.com` is a governed origin. Gated by
+  `GROWTH_FORMS_PUBLIC_API_ENABLED`.
+- `renderer-latest.js` (the `<greenhouse-form>` web component) is **one consumer**
+  of that contract — a convenience widget, not the source of truth.
+
+**What Codex shipped (v0):** embeds only the `<greenhouse-form>` web component via
+the external `renderer-latest.js`. It couples efeonce-think to a *consumer* (the
+renderer), so a script-load failure = dead form + `<noscript>` dead-end. That is the
+screenshot. Governance-correct, resilience-poor.
+
+**Canonical shape (C1 — the correct target):**
+
+1. **Server-render the form from the governed schema.** In the `.astro` fence
+   (SSR/build), `fetch` `GET /api/public/growth/forms/{form_key}` and render a
+   **real `<form>`** from the returned contract. The fields are now server HTML —
+   present even if enhancement JS never runs. This alone kills the "couldn't load
+   the form" failure class.
+2. **Do NOT hand-author fields or validation.** They come from the schema. Writing
+   them locally forks the governed contract (violates Full API Parity / dumb-render).
+   This is why an **Astro Action is the wrong tool here** — an Action is for
+   first-party logic *you own*; this form is owned by Greenhouse. (Actions remain
+   correct for a form whose logic efeonce-think genuinely owns — see
+   `topics/actions.md`.)
+3. **Submit to the governed endpoint.** POST to `/submit` (governed by `submitForm`,
+   CORS already allowlisted). Today that endpoint is **JSON-only**, so submission
+   needs a thin client script (serialize → JSON → POST). Enhance with the
+   `<greenhouse-form>` web component for rich UX + status polling on top.
+4. **Full no-JS PE requires one small governed change:** make `/submit` also accept
+   `application/x-www-form-urlencoded` (parse `formData` → same `submitForm` command).
+   That's the right place for resilience — the governed write-path itself — not a
+   forked native handler in efeonce-think. Until then, C1's degraded state is a
+   *visible working form that needs JS to send*, which is still strictly better than
+   a widget that may never paint.
+5. The write path stays governed: the client submits, `submitForm` governs (honeypot,
+   consent gate, dedupe, async outbox). The public form **enqueues** a grader run; it
+   never computes the grade. Because the contract is data, Nexa / any consumer can
+   operate the same form (Full API Parity) — not just a browser running the widget.
+6. This is TASK-1327 territory — cross-link the task, don't reinvent the plan.
 
 ## Brand: AXIS tokens are COPIED, not imported
 
@@ -108,10 +140,17 @@ client-side-fetch-only failure.
 
 - **NEVER** compute/derive/decide business logic in efeonce-think — dumb render,
   SSOT in the headless model.
-- **NEVER** a client-fetch-only form — server-render the governed form shell +
-  Action, hydrate for UX.
+- **NEVER** couple the form to the JS renderer as if it were the SSOT — the SSOT
+  is the governed API contract (`GET .../forms/{key}` schema + `POST .../submit`).
+  Server-render a real `<form>` from the schema; the `<greenhouse-form>` widget is
+  enhancement, not the source. A renderer-load failure must NOT leave a dead form.
+- **NEVER** hand-author the form's fields/validation in efeonce-think (forks the
+  governed contract) — and **NEVER** reach for an Astro Action here (Actions are for
+  first-party logic you own; this form is owned by Greenhouse). Consume the schema.
 - **NEVER** hardcode brand HEX — AXIS tokens as copied CSS vars; `AxisWordmark`
   never on the public site.
-- **SIEMPRE** treat the form as a governed write path (enqueue a run; Greenhouse
-  governs), and as a `client:visible` island over a real `<form>`.
+- **SIEMPRE** treat the form as a governed write path: submit to `/submit`
+  (governed by `submitForm`; JSON-only today), enqueue a run, Greenhouse governs.
+  Full no-JS PE needs `/submit` to also accept `formData` — harden the endpoint,
+  don't fork a native handler.
 - **SIEMPRE** verify the real frame (GVC) before calling it done.
