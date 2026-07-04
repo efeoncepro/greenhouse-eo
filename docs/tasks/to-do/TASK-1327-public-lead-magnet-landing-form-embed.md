@@ -27,6 +27,21 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-04 — TASK-1335 desbloquea el CORS/surface allowlist de Think
+
+- **TASK-1335 code-complete + data aplicada (dev PG).** El transporte CORS de Growth Forms dejó de ser
+  un literal hardcodeado: ahora es la **unión gobernada de `origin_allowlist_json` de las surfaces
+  `active`** (`src/app/api/public/growth/forms/cors.ts`). La surface `fhsf-ai-visibility-grader` ya
+  incluye `https://think.efeoncepro.com` (migración `20260704131308632_task-1335-...`, additive/idempotente).
+  Con eso `GET`/`OPTIONS`/`POST submit`/`POST verify-email` emiten `Access-Control-Allow-Origin:
+  https://think.efeoncepro.com` **sin ningún workaround local en Think**.
+- **La landing NO carga la preocupación de plataforma.** No agregar hardcode de CORS ni bridge en el
+  repo `efeonce-think`; el origin queda habilitado por DATA gobernada en greenhouse-eo.
+- **Pendiente de rollout para levantar el blocker en runtime:** deploy a staging/producción de
+  greenhouse-eo + aplicar la migración/seed en el PG del target + correr el curl matrix (ACAO para
+  `think`, sigue ACAO para `efeoncepro.com`/`/aeo-2`, sin ACAO para origins desconocidos). Recién
+  entonces `TASK-1335` pasa a `complete` y este blocker queda 100% levantado.
+
 ## Summary
 
 Construir la **Superficie B** del hub: la **landing pública principal `think.efeoncepro.com/brand-visibility`** donde un usuario nuevo deja sus datos para iniciar el lead magnet. **El form NO es nuevo:** ya existe gobernado (`fdef-ai-visibility-grader`, formKey `69cd5269-5f97-4d32-99c4-0b23f41aa2f5`); la landing lo **embebe** con `<greenhouse-form>` (renderer portable), heredando validación, consent, Turnstile, telemetry y el path submission→outbox→pipeline. Cierra el loop self-serve primario: `landing → form → grader async → loader/análisis → reporte en pantalla (Superficie A, TASK-1325)`. El email puede existir como refuerzo/recuperación, pero no es el cierre principal de UX para esta task.

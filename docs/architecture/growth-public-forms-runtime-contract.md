@@ -15,10 +15,35 @@ La autorizacion de surface por `origin_allowlist_json` no reemplaza el contrato 
 - **Autoridad del engine:** form publicado, surface activa, slug permitido, `originAllowed`, consent, honeypot, Turnstile, server validation, rate-limit y destination plan server-only siguen siendo obligatorios.
 - **Secreto y mapping:** el browser nunca recibe destination mapping, portalId, el **HubSpot destination form GUID** (`form_destination.mapping_json.formGuid`), HubSpot property names ni secretos. (Desde TASK-1297, el render contract SÍ expone `form.formKey`: esa es la identidad **pública/opaca de Growth Forms** — NO el HubSpot GUID. Son cosas distintas: `formKey` ≠ HubSpot `formGuid`.)
 
-Allowlist productivo vigente:
+### CORS gobernado — sin literal hardcodeado (TASK-1335)
 
-- `https://efeoncepro.com`
-- `https://www.efeoncepro.com`
+Desde TASK-1335 el transporte CORS **no** tiene un set de origins hardcodeado en el route helper.
+El resolver (`src/app/api/public/growth/forms/cors.ts`) computa el allowlist de transporte como la
+**UNIÓN de `origin_allowlist_json` de las surfaces `active`** de `greenhouse_growth.form_host_surface`
+(SoT único = la DB). Consecuencias:
+
+- **Agregar/quitar un origin permitido = cambio de DATA (una fila en la DB), NUNCA de código.** Sumar
+  un origin a una surface `active` lo mete automáticamente en la unión de transporte. Esto mata el drift
+  entre el transporte CORS y la autoridad real del motor (que era el bug: `GET` respondía `200` pero el
+  browser no recibía ACAO).
+- **Cache in-memory (TTL ~90s) + stale-while-revalidate + stale-on-error.** El hot path público no
+  bloquea en la DB por-request; ante DB caída se sirve el last-known-good. Cold start + DB no disponible
+  → unión vacía (fail-closed) — pero en ese instante el render/submit ya están rotos igual (necesitan la
+  DB), así que degradar a sin-ACAO es honesto, no una regresión nueva.
+- **Invariante de fallo:** fail-CLOSED para el origin desconocido (unknown → sin ACAO); fail-SAFE para
+  el data source (cache last-known-good, nunca unión vacía por un blip de DB).
+- **El transporte es surface-agnóstico (unión), no surface-aware.** El preflight `OPTIONS /submit` no
+  lleva `surfaceId`, así que el transporte no puede depender de una surface puntual; la autoridad fina
+  por-surface (origin + slug + surface) sigue server-side en `submitForm` (doble defensa intacta). Una
+  variante "surface-aware por request" rompería el preflight de TODOS los origins (incluido `/aeo-2`).
+- **Filtro `.local` en producción:** pseudo-origins gobernados en la DB (`shadow.local`) no reciben ACAO
+  bajo `NODE_ENV=production` (inocuo; un browser real nunca los tiene como origin).
+
+Origins gobernados vigentes (derivados de la unión de surfaces `active`, NO de un literal):
+
+- `https://efeoncepro.com`, `https://www.efeoncepro.com` — surfaces `fhsf-efeonce-aeo-diagnostic` (`/aeo-2`) + `fhsf-efeonce-lead-gen-web`.
+- `https://think.efeoncepro.com` — surface `fhsf-ai-visibility-grader` (TASK-1335, habilita el embed del grader en Think).
+- `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`, `https://shadow.local` — surface `fhsf-efeonce-lead-gen-web` (staging/dev; `.local` filtrado en prod).
 
 Smoke live de referencia del primer rollout WordPress AEO:
 
