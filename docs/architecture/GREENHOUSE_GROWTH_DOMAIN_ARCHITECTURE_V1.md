@@ -140,6 +140,29 @@ endpointStatus: legacy_supported
 migrationTarget: date_versioned_forms_submission_api_when_available
 ```
 
+### 6.3 CTA & Popup Engine
+
+The third planned capability in `growth` is the Greenhouse-owned CTA and popup engine for CRO prompts, banners, slide-ins, floating CTAs, embedded prompts and action routing across Greenhouse, the public site, Think and future surfaces.
+
+Ownership:
+
+- `growth` owns CTA definitions, versions, targeting policy, suppression/frequency policy, priority arbitration, render contracts, telemetry policy, exposure/interaction ledger, experiment assignment and action routing.
+- Public-site runtimes, Think and Greenhouse host/render the prompt but do not own CTA policy or conversion evidence.
+- Growth Forms remains the owner of form definitions, validation, consent and submissions. A CTA can open or embed a Growth Form but must not duplicate form schema.
+- HubSpot, GTM/GA and future tracking/warehouse tools are destinations or measurement surfaces, not the CTA engine source of truth.
+- `commercial` consumes qualified handoffs after a CTA action is accepted/promoted into revenue motion.
+
+Canonical placement:
+
+```text
+src/lib/growth/ctas/
+greenhouse_growth.*
+growth.cta.*
+growth.cta.<signal>
+```
+
+The renderer strategy mirrors the Growth Forms precedent: a framework-light host-DOM renderer with thin wrappers for WordPress, Astro, Think and Greenhouse preview. The default is not iframe because host GTM/dataLayer measurement is part of the product contract.
+
 ## 7. Lifecycle: pre-pipeline to commercial handoff
 
 Growth-owned lifecycle:
@@ -196,6 +219,18 @@ Initial planned forms capabilities:
 | `growth.forms.destinations.manage` | Manage destination mappings and adapter settings. |
 | `growth.forms.retry_delivery` | Retry or dead-letter destination attempts. |
 
+Initial planned CTA capabilities:
+
+| Capability | Purpose |
+| --- | --- |
+| `growth.cta.read` | Read CTA definitions, published contracts and performance summaries. |
+| `growth.cta.author` | Create or edit draft CTA versions. |
+| `growth.cta.review` | Review CTA copy, targeting, action and measurement policy before publication. |
+| `growth.cta.publish` | Publish, pause, deprecate or archive CTA versions. |
+| `growth.cta.events.read` | Read exposure, interaction, suppression and action evidence. |
+| `growth.cta.actions.manage` | Manage action routing to Growth Forms, assets, Think tools, meetings or HubSpot handoff. |
+| `growth.cta.experiments.manage` | Manage variant assignment and experiment metadata. |
+
 Do not create these future families until a concrete capability needs them.
 
 ## 9. Data posture
@@ -218,6 +253,8 @@ Default classification:
 - provider responses: evidence artifact with bounded retention;
 - public report: tokenized or otherwise access-controlled artifact unless intentionally published.
 - form submissions: restricted/confidential by default, with consent snapshot and retention policy.
+- CTA telemetry: pseudonymous behavioral evidence by default; no raw PII in browser events, `dataLayer`, `CustomEvent.detail`, logs or query strings.
+- CTA targeting inputs: coarse, consent-aware and allowlisted; raw personal identifiers, inferred sensitive attributes and opaque third-party segments are forbidden in V1.
 
 Growth must avoid storing unnecessary personal data in prompts sent to providers. Brand/company facts are usually enough; personal names/emails should not be sent to AI providers unless a future reviewed use case requires it.
 
@@ -234,6 +271,10 @@ Initial signal families:
 - cost: `growth.ai_visibility.cost_budget_used`;
 - prompt quality: `growth.ai_visibility.prompt_pack_eval_regression`.
 - archetype prompt coverage: `growth.ai_visibility.archetype_coverage_gap` (TASK-1292; cada arquetipo cubre su buyer-intent, steady=0 gaps).
+- CTA render health: `growth.cta.render_error_rate`;
+- CTA measurement health: `growth.cta.event_ingest_error_rate`, `growth.cta.gtm_event_missing`;
+- CTA action health: `growth.cta.action_failed`, `growth.cta.form_handoff_failed`;
+- CTA governance health: `growth.cta.surface_unauthorized_attempt`, `growth.cta.experiment_srm_detected`, `growth.cta.priority_collision`.
 
 The domain should be visible in Ops/Reliability like other first-class Greenhouse modules once runtime work begins.
 
@@ -282,6 +323,8 @@ Revisit this domain boundary if:
 - `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
 - `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_DECISION_V1.md`
 - `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
+- `GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md`
+- `GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
 - `docs/context/02_gtm.md`

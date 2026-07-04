@@ -1,4 +1,20 @@
-## Sesion 2026-07-04 - TASK-1333 AI Visibility categoria/sentiment percibido - Claude - root cause + fix aplicado (rollout parcial)
+## Sesion 2026-07-04 - Growth CTA & Popup Engine architecture - Codex - docs accepted direction
+
+> **Pedido:** modelar el motor enterprise de CTA/pop-up CRO de Greenhouse, similar en clase a HubSpot CTAs pero transversal a Greenhouse, sitio público, Think y futuras surfaces; invocar skills UI/UX/motion/microinteracciones/growth CRO/digital marketing/arquitectura; crear arquitectura y ADR.
+>
+> **Skills invocadas:** `greenhouse-product-ui-architect`, `greenhouse-ux-content-accessibility`, `greenhouse-microinteractions-auditor`, `growth-marketing-cro`, `digital-marketing`, `software-architect-2026`. Se cargaron además módulos relevantes de CRO, measurement, experimentation, martech ops, motion/UI platform, ADR model y referencias de arquitectura/seguridad/observabilidad/cognitive debt.
+>
+> **Resultado:** se creó la capability `growth.cta` como **Accepted direction — no runtime changes yet**. Docs canónicos: `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md` y `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md`. El motor gobierna definitions/versioning/targeting/suppression/priority/action routing/event ledger; renderer portable host-DOM/no-iframe por defecto para preservar GTM `dataLayer`; Growth Forms/ebooks/Think tools/HubSpot Meetings/CRM son actions/destinations, no source of truth. Programa formal creado como `EPIC-023` (`docs/epics/to-do/EPIC-023-growth-cta-popup-cro-engine.md`).
+>
+> **Contratos clave:** TS root futuro `src/lib/growth/ctas/`; APIs futuras `/api/public/growth/ctas/**` y `/api/admin/growth/ctas/**`; admin futuro `/admin/growth/ctas`; capabilities `growth.cta.*`; events/signals `growth.cta.*`; lifecycle `draft -> review -> published -> paused -> deprecated -> archived`; telemetry browser `greenhouse_cta_*` sin PII + ledger server-side; experimentación con hipótesis/MDE/sample-size/guardrails antes de declarar winners.
+>
+> **Docs sincronizados:** `docs/architecture/DECISIONS_INDEX.md`, `docs/architecture/GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`, `docs/epics/EPIC_ID_REGISTRY.md`, `docs/epics/README.md`, `project_context.md`, `Handoff.md`, `changelog.md`.
+>
+> **Pendiente recomendado:** abrir tasks separadas: backend-data foundation; renderer MVP + wrappers; Growth Forms action; asset/Think actions; admin cockpit UI; experimentation layer. Sin migrations, GTM changes, deploy ni runtime.
+
+## Sesion 2026-07-04 - TASK-1333 AI Visibility categoria/sentiment percibido - Claude - COMPLETE (deployado + E2E probado)
+
+> **CIERRE (update):** decisión del operador "hagamos todo lo necesario" → los 3 flags (LLM_EXTRACTION + OPERATOR_SEND + CATEGORY_GUARD) quedaron **persistidos ON en `deploy.sh`** (ambos bloques). Push `46f8e719b` → **Ops Worker Deploy SUCCESS** (rev `ops-worker-00456-qs2` con los 3 ON desde deploy.sh → persist confirmado sobrevive el deploy). **E2E probado:** snapshot público del run real EO-GRUN-00040 → `categoryTaxonomySummary.status='mapped'` (`sector:banking_insurance`, label es/en, sin leak). Task movida a `complete/`. Operacional: snapshots viejos siguen `unknown` (inmutables); runs nuevos producen `mapped`. ⚠️ CATEGORY_GUARD ON bloquea marcas con categoría no resuelta (señal `growth.ai_visibility.profile_category_unresolved`; revert = flag false).
 
 > **Task:** `docs/tasks/in-progress/TASK-1333-...md` (movida to-do→in-progress). Perfil `backend-data`, EPIC-020. La seccion `06 · Categoria percibida` (y sentiment) salia `unknown` en todos los runs reales.
 >

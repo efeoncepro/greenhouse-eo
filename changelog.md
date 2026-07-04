@@ -9584,3 +9584,10 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 - Se creó `TASK-1330` como follow-up backend-data de TASK-1329 para implementar short links persistentes del informe público desde Greenhouse, no desde Astro.
 - Alcance: alias de alta entropía para `grader_reports`, expiración/revocación, audit/usage, endpoint de resolución, fallback al link largo y consumo por correo, HubSpot y share widget Think.
 - El `/r/<token>` de Think queda explícitamente como acortamiento transicional; la capability real será `/s/<code>` o equivalente y no debe habilitarse en producción sin confirmación explícita.
+
+## 2026-07-04 — Growth CTA & Popup Engine architecture accepted direction
+
+- Se creó el ADR `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md` y la arquitectura `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md` para modelar `growth.cta` como motor enterprise de CRO transversal.
+- La decisión fija que Greenhouse owns CTA definitions/versioning/targeting/suppression/priority/action routing/event ledger; GTM/dataLayer es measurement surface; Growth Forms, ebooks, Think tools, HubSpot Meetings/CRM y futuros destinos son actions/destinations, no source of truth.
+- Se creó `EPIC-023` (`docs/epics/to-do/EPIC-023-growth-cta-popup-cro-engine.md`) como programa multi-task y se actualizó `docs/epics/EPIC_ID_REGISTRY.md` + `docs/epics/README.md`.
+- Se actualizó `docs/architecture/DECISIONS_INDEX.md`, `docs/architecture/GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`, `project_context.md` y `Handoff.md`. No hay runtime changes, migrations, GTM changes, tasks ni deploy todavía.
