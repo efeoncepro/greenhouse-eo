@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-020`
-- Status real: `Code-complete Slices 1-3 + docs; rollout pendiente (flag flip staging + smoke + Think /s + prod)`
+- Status real: `Lista/shippeada como capacidad; activacion pendiente solo en cutover productivo (flag GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED + smoke). No bloquea TASK-1327.`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|api`
 - Blocked by: `TASK-1329 complete; TASK-1325 hub live; TASK-1331 complete/released (contrato shareFacts.reportUrl)`
@@ -45,11 +45,13 @@ TASK-1329 agrego una experiencia shareable premium al informe publico, pero solo
 - Mantener compatibilidad con URLs existentes `/brand-visibility/r/<token>`.
 - Registrar uso, expiracion, revocacion y senales operativas proporcionales al riesgo.
 
-## ⚠️ Production Gate — requiere pase a producción para funcionar (rollout pendiente)
+## ⚠️ Production Gate — activacion por flag en el paso a produccion
 
-> **Estado real: code-complete + E2E local verificado, pero la capability NO funciona en producción
-> hasta el pase.** Planificada para ir en un **bundle de release a producción** junto a otras tasks
-> (batch `develop→main` vía release control plane). Hasta entonces queda `in-progress`, NO `complete`.
+> **Estado operativo actualizado por el operador (2026-07-04): la capacidad esta lista/shippeada y no
+> bloquea la landing TASK-1327.** Lo unico pendiente para que los consumers prefieran short links en
+> produccion es prender `GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED=true` durante el paso a produccion y
+> ejecutar el smoke correspondiente. Hasta ese cutover, el URL largo canonico
+> `/brand-visibility/r/<token>` sigue siendo el fallback valido.
 
 **Hecho (local `develop`, sin push):** schema + primitive (migración `20260704110400162_task-1330-...`
 aplicada a `greenhouse-pg-dev` = dev/staging comparten), resolve endpoint `/report/short-link/[code]`
