@@ -6784,6 +6784,18 @@ export interface GreenhouseGrowthGraderReportSendLog {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseGrowthGraderReportShortLinks {
+  created_at: Generated<Timestamp>;
+  created_by_source: Generated<string>;
+  expires_at: Timestamp | null;
+  last_used_at: Timestamp | null;
+  report_id: string;
+  revoked_at: Timestamp | null;
+  revoked_reason: string | null;
+  short_code: string;
+  use_count: Generated<number>;
+}
+
 export interface GreenhouseGrowthGraderRuns {
   assignment_id: string | null;
   cost_attribution: string | null;
@@ -11079,6 +11091,7 @@ export interface DB {
   "greenhouse_growth.grader_report_email_dispatches": GreenhouseGrowthGraderReportEmailDispatches;
   "greenhouse_growth.grader_report_reviews": GreenhouseGrowthGraderReportReviews;
   "greenhouse_growth.grader_report_send_log": GreenhouseGrowthGraderReportSendLog;
+  "greenhouse_growth.grader_report_short_links": GreenhouseGrowthGraderReportShortLinks;
   "greenhouse_growth.grader_reports": GreenhouseGrowthGraderReports;
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
   "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
