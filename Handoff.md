@@ -1,3 +1,31 @@
+## Sesion 2026-07-04 - TASK-1333 AI Visibility categoria/sentiment percibido - Claude - root cause + fix aplicado (rollout parcial)
+
+> **Task:** `docs/tasks/in-progress/TASK-1333-...md` (movida to-do→in-progress). Perfil `backend-data`, EPIC-020. La seccion `06 · Categoria percibida` (y sentiment) salia `unknown` en todos los runs reales.
+>
+> **Root cause (runtime, no hipotesis):** drift worker-vs-Vercel. `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` estaba ON en Vercel (prod/staging/dev) pero **`false` en el Cloud Run `ops-worker`** — que es donde ejecutan los runs async (`ASYNC_EXECUTION` ON). La extraccion de prosa (categoryAssociations + sentimentLabel + messageDrift + brandRank) solo corre si el flag esta en el runtime que ejecuta el run → los 12 runs quedaron con `category_associations` vacio. Taxonomy/mapper/builder ya funcionaban → **cero codigo de pipeline** (el arch review lo predijo).
+>
+> **Fix aplicado:** `gcloud run services update ops-worker` prendio los 3 GROWTH que estaban OFF: `LLM_EXTRACTION_ENABLED`, `OPERATOR_SEND_ENABLED`, `CATEGORY_GUARD_ENABLED` (a pedido del operador "prende todos") — revs `00454-9lb`→`00455-8f7`. **Persistencia:** `services/ops-worker/deploy.sh` linea 444 `LLM_EXTRACTION:-false`→`:-true` (el fix de esta task, para que sobreviva el proximo deploy del worker). ⚠️ `OPERATOR_SEND`+`CATEGORY_GUARD` **NO persistidos en deploy.sh** (siguen `:-false` con gating documentado) → su flip via gcloud es EFIMERO hasta decision explicita del operador.
+>
+> **Evidencia:** run real con extraccion ON (smoke `light`, ~$0.25 c/u): Banco de Chile → `sector:banking_insurance` + sentiment neutral/positive (overall 35.0); Efeonce → `category:digital_agency` (overall 15.7). vs 0 categorias antes. Credencial en el worker (`ANTHROPIC_API_KEY_SECRET_REF`).
+>
+> **Pendiente:** (1) generar un run NUEVO en prod (post-deploy del worker con deploy.sh persistido) y confirmar `status='mapped'` via el endpoint publico real — los 12 snapshots viejos siguen `unknown` (inmutables). (2) Decision operador: persistir OPERATOR_SEND/CATEGORY_GUARD en deploy.sh (override de gating documentado; CATEGORY_GUARD bloquea runs con categoria no resuelta). Docs sincronizados: ledger (Delta 07-04 + regla worker>=Vercel para el path async), task md, registry, README. Local-first, sin push.
+>
+> **Convivencia Codex:** sesion concurrente de Codex toco `src/lib/postgres/client.*`, docs public-site (PRIMITIVES/gutenberg/glitch) + Handoff/changelog. NO stagee/commitee nada de Codex; el unico cambio de codigo mio es `services/ops-worker/deploy.sh`.
+
+## Sesion 2026-07-04 - TASK-1335 Growth Forms public CORS + surface allowlist governance - Claude - code complete local (rollout pendiente)
+
+> **Task:** `docs/tasks/in-progress/TASK-1335-...md` (movida to-do→in-progress). Perfil `backend-data`, EPIC-020. Objetivo: habilitar `<greenhouse-form>` del AI Visibility Grader en `think.efeoncepro.com` **sin romper `efeoncepro.com/aeo-2`**, eliminando el allowlist CORS hardcodeado. Precedida por Delta arch-review (2026-07-04) que fijó el diseño del resolver y descartó la variante peligrosa.
+>
+> **Diseño (arch-architect + growth-forms):** transporte CORS = **unión gobernada** de `origin_allowlist_json` de las surfaces `active` (SoT único = `greenhouse_growth.form_host_surface`), cacheada in-memory (TTL 90s) con stale-while-revalidate + stale-on-error. SIN literal hardcodeado ni env var. fail-CLOSED para origin desconocido, fail-SAFE para el data source. Transporte **surface-agnóstico** (el preflight `OPTIONS` no lleva `surfaceId`) — la autoridad fina por-surface sigue server-side en `submitForm` (doble defensa). Se descartó la variante "surface-aware por request" porque rompería el preflight de TODOS los origins (incl. `/aeo-2`).
+>
+> **Cambios:** `src/lib/growth/forms/store.ts` reader lean `listActivePublicFormOrigins`; `src/app/api/public/growth/forms/cors.ts` resolver async con cache (`publicFormsCorsHeaders`/`publicFormsOptionsResponse` ahora async); 3 route handlers (GET/submit/verify-email) `await` el resolver; filtro `.local` en prod. Migración `20260704131308632_task-1335-...` additive/idempotente: APPEND `https://think.efeoncepro.com` SOLO a `fhsf-ai-visibility-grader` (hoy `[]`), sin tocar aeo-diagnostic ni lead-gen.
+>
+> **Evidencia (dev PG aplicado):** unión post-migración = `[efeoncepro.com, www, think.efeoncepro.com, staging.vercel, shadow.local]`; grader surface `[think]`, aeo-diagnostic `[efeoncepro.com, www]` intacta → `/aeo-2` protegido. 10 tests nuevos (`__tests__/cors.test.ts`) verdes: Think ACAO, no-regresión `/aeo-2`, fail-closed, stale-on-error (DB caída no baja `/aeo-2`/Think), cold+DB error fail-closed, filtro `.local`. Growth suite 215/215; `pnpm local:check` (lint+tsc) verde.
+>
+> **Pendiente (Runtime Rollout Gate — code complete, NO complete):** deploy staging/prod de greenhouse-eo + aplicar migración/seed en el PG del target + curl matrix (ACAO think, sigue ACAO efeoncepro.com, sin ACAO desconocidos, submit sin token = captcha_failed no CORS). Recién ahí pasa a `complete` y se levanta el blocker de TASK-1327. Local-first, sin push.
+>
+> **Nota de convivencia:** sesión concurrente de Codex (Postgres pool noise) tocó `src/lib/postgres/client.ts`, `client.test.ts`, `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md`, `Handoff.md`, `changelog.md`. NO stageé ni commiteé nada de Codex; mis 2 commits (`feat` código + `docs`) usan paths explícitos. Esta entrada de Handoff/changelog queda sin commitear para no barrer el WIP de Codex.
+
 ## Sesion 2026-07-04 - Postgres runtime pool reset noise - Codex - code complete local
 
 > **Pedido:** revisar por qué la grilla de prompts sugería investigar 106 errores runtime de Vercel: `Greenhouse Postgres pool emitted an error; resetting connector state` causados por `57P05 terminating connection due to idle-session timeout`, último visto 2026-07-03.

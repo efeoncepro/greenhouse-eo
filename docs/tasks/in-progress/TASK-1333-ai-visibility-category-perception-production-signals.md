@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -122,6 +122,50 @@ vació después). Si es así, es un fix de idempotencia/timing, NO de scoring.
 Extracción **determinista** de categoría (keyword/entity → taxonomy, sin LLM, sin costo recurrente) como
 camino barato/estable — pero es build nuevo + preguntas de calidad; el diseño intencional es la prose
 extraction (perceived category = lo que la IA dice, no ground truth). No perseguir sin decisión explícita.
+
+## Delta 2026-07-04 — RESUELTO (root cause + fix + evidencia). Slice 1-2 cerrados
+
+**Causa raíz (confirmada en runtime, no hipótesis):** drift **worker-vs-Vercel** del flag
+`GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED`. Estaba **ON en Vercel** (prod/staging/dev, flip 06-30)
+pero **`false` en el Cloud Run `ops-worker`** — que es donde ejecutan los runs async
+(`ASYNC_EXECUTION_ENABLED` ON). La capa de extracción de prosa (que puebla `categoryAssociations` +
+`sentimentLabel` + `messageDriftClaims` + `brandRank`) sólo corre si el flag está en el runtime que
+ejecuta el run. Con el worker OFF, los 12 runs quedaron con `category_associations` vacío → `status=unknown`.
+
+**Confirmación en DB (2026-07-04):** los 12 runs (incl. los del 2026-07-03 post-flip, multi-provider) con
+`with_cats=0`. `ops-worker` env: `GRADER_ENABLED=true`, `ANTHROPIC_ENABLED=true`, `LLM_EXTRACTION_ENABLED=false`.
+
+**Alcance de código = 0 en el pipeline** (el arch review lo predijo). Taxonomy/mapper/builder ya
+funcionaban. El único cambio de repo es persistir el flag en `services/ops-worker/deploy.sh` (línea 444:
+`:-false` → `:-true`) para que el fix sobreviva el próximo deploy del worker.
+
+**Fix aplicado:**
+- `gcloud run services update ops-worker --update-env-vars GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED=true`
+  (rev `00454-9lb`). A pedido del operador ("prende todos") también `OPERATOR_SEND_ENABLED=true` +
+  `CATEGORY_GUARD_ENABLED=true` (rev `00455-8f7`).
+- `deploy.sh` persiste **sólo** `LLM_EXTRACTION:-true` (el fix de esta task). `OPERATOR_SEND` +
+  `CATEGORY_GUARD` quedan `:-false` con gating documentado → su flip vía gcloud es **efímero** hasta
+  decisión explícita del operador de persistirlos (fuera del scope de TASK-1333).
+
+**Evidencia (run real con extracción ON, `light` single-provider, ~$0.25 c/u):**
+| Run | Categoría canónica | Sentiment | Overall |
+|---|---|---|---|
+| Banco de Chile (EO-GRUN-00040) | `sector:banking_insurance` | neutral/positive | 35.0 |
+| Efeonce (EO-GRUN-00039) | `category:digital_agency` | — | 15.7 |
+
+vs. antes: 0 categorías, sentiment `unknown`. Credencial presente en el worker
+(`ANTHROPIC_API_KEY_SECRET_REF`).
+
+**Caveats honestos:** (1) coverage fino en este smoke (light + 1 provider → 12/24 obs skipped → 1
+categoría/run); un run **full multi-provider** en prod da coverage rico (el arch review vio
+`totalSignals=17` en un snapshot bueno). (2) Los 12 snapshots viejos siguen `unknown` (inmutables, por
+diseño); un **token público real** muestra la sección `06` mapeada sólo tras generar un **run NUEVO**
+en el target (operator-driven, no automático). (3) Cost-bearing: 1 call/finding/run (respeta cost-cap).
+(4) Scoring de runs nuevos cambia por evidencia nueva (no fórmula/pesos/versión).
+
+**Estado:** Slice 1 (diagnóstico) + Slice 2 (fix + persist) cerrados. Pendiente para 100%: generar un run
+nuevo en prod (post-deploy del worker con `deploy.sh` persistido) y confirmar `status='mapped'` vía el
+endpoint público real; + decisión del operador sobre persistir OPERATOR_SEND/CATEGORY_GUARD.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
