@@ -48,6 +48,53 @@ Si Think solo funciona con la data mockeada local, la seccion puede verse bien e
 - Verificar desktop/laptop/mobile con no-overflow, no-leak visible y compatibilidad con snapshots viejos.
 - Mantener Think como renderer tonto: sin scoring, sin category inference, sin local taxonomy ownership.
 
+## Delta 2026-07-04 — Arch review (arch-architect): el renderer YA está implementado (y en prod)
+
+> Revisión con `arch-architect` sobre el código real de `efeonce-think` post-`681f1e4`. La task es
+> correcta pero su premisa cambió: **el renderer de Slice 2 ya se implementó** por el commit concurrente
+> de Codex `681f1e4` "feat(report): render category perception states" (token page +271, ReportIcon +45),
+> **ya pusheado a `origin/main` → en producción.** La task se reencuadra de "implementar" a "AUDITAR lo
+> shipped contra el contrato + cerrar gaps + agregar la infra de VERIFICACIÓN que es ahora el valor real".
+
+### Realidad del renderer HOY (verificado en el código)
+
+- **`mapped`** → panel rico: lectura principal + filas con nivel **traducido** (`categoryLevelCopy(cat.level)`
+  → label/helper user-facing, NO el `nodeId`/level crudo), `count` + `share%` bounded (`share = total>0 ?
+  round(count/total*100) : null`; `barWidth = Math.max(6, share)`) → **sin `NaN`, sin ancho negativo**.
+- **`unknown`** → "En cobertura" / "Este corte no trae categoría medible" — honesto, NO inventa categoría.
+- **`needs_review`** → "Revisión requerida" / "Hay señales, pero no son publicables todavía".
+- **legacy/missing** → `showCategorySection = Boolean(categorySummary)` omite la sección si falta el summary.
+- Copy user-facing (industria/sector/oferta/caso de uso/mercado/comprador); nombre de categoría vía
+  `categoryLabel` (es/en), sin `nodeId` visible. → el grueso del no-leak/copy YA está bien.
+
+### Gap real detectado (a corregir en la auditoría)
+
+- **`[token].astro` línea ~1193 muestra `{categorySummary?.ambiguousCount} ambiguas`** (badge). El propio
+  copy guardrail de esta task lista `ambiguousCount` como **label interno prohibido**. Es borderline (está
+  traducido a "N ambiguas"), pero **viola la regla tal como está escrita** → decidir en la auditoría:
+  reemplazar por copy neutro ("señales en revisión") o quitarlo. Ya está en PROD vía `681f1e4`.
+- Reconciliar el **wireframe** (`docs/ui/wireframes/TASK-1334-...`, 160 líneas, existe/robusto) con el
+  renderer shipped — confirmar que describen los MISMOS estados (el renderer se construyó fuera del proceso
+  de la task).
+
+### Reframe del alcance
+
+- **Slice 2 (renderer hardening): ~HECHO** por `681f1e4`. Queda AUDITAR contra el contrato + fix del
+  `ambiguousCount` si se confirma leak + reconciliar con el wireframe. **NO reimplementar de cero.**
+- **Slices 1/3/4 (fixtures + verifier + prueba real) = el VALOR CENTRAL ahora.** Justo el riesgo que la
+  task existe para prevenir se materializó: el renderer se shipeó **mock/ad-hoc, sin fixtures ni verifier**
+  del contrato. La infra de verificación es lo que valida retroactivamente lo que ya está en prod.
+- **Estado de prod HOY: NO roto.** El backend produce `unknown` (ver TASK-1333) → prod muestra el estado
+  honesto "En cobertura". El camino `mapped` en prod queda sin probar hasta que TASK-1333 encienda la
+  extracción → la prueba real de Slice 4 sigue gateada por TASK-1333. La task no es urgente por corrección
+  (prod honesto), sí por completitud/verificación.
+
+### Nota cross-agent
+
+El renderer llegó a prod por el sweep concurrente de Codex (`681f1e4`) sin lifecycle de task, sin fixtures
+ni verifier. No revertir (es funcionalmente correcto + arrastra otras cosas del commit). El cierre correcto
+de TASK-1334 es la **verificación retroactiva**, no un rewrite.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
@@ -253,6 +300,10 @@ Reglas obligatorias:
 - Document how each state should render.
 
 ### Slice 2 — Renderer hardening
+
+> **~HECHO por `681f1e4` (ver Delta 2026-07-04): NO reimplementar de cero.** Este slice pasa a ser
+> AUDITAR lo shipped contra el contrato + (a) corregir el badge `{ambiguousCount} ambiguas` (línea ~1193,
+> viola el copy guardrail; reemplazar por copy neutro o quitar) + (b) reconciliar con el wireframe.
 
 - Add a small defensive presentation normalizer if needed, scoped to Think rendering only.
 - Render mapped categories with bounded percentages and no `NaN`.
