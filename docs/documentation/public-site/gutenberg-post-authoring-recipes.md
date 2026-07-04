@@ -64,7 +64,13 @@ Minimum generated structure:
 
 Recommended enrichment:
 
-- `core/quote` for a clear POV line, claim or principle.
+- `efeoncepro/glitch-drop` for Efeonce's POV inside `Glitch de la semana`
+  once the block exists. Until then, `core/quote` may be used as a temporary
+  visual fallback only when the content is clearly Efeonce commentary rather
+  than an external citation. Contract:
+  `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
+- `core/quote` for actual quotes, strong principles outside the Glitch format,
+  or temporary POV fallback when no custom block is available.
 - `core/pullquote` for a short, high-signal editorial callout when the source
   post already uses highlighted claims or stats.
 - `core/separator` to separate CTA/final reflection from the body.
@@ -137,12 +143,25 @@ Use lists for TL;DR, checklists, steps, tradeoffs and evidence.
 ### Quotes
 
 Use quote blocks for strong POV lines or principles, not decorative pull text.
+For `Glitch de la semana`, prefer the planned `efeoncepro/glitch-drop` block
+for Efeonce's POV; do not model that long-term as an external quote.
 
 ```html
 <!-- wp:quote -->
 <blockquote class="wp-block-quote"><p>La AI aporta valor cuando trabaja con contexto, restricciones y evidencia.</p></blockquote>
 <!-- /wp:quote -->
 ```
+
+### Glitch
+
+Use `Glitch` for Efeonce's editorial POV attached to a news item in the
+weekly Glitch format. It is an aside, not a quote. The target block is
+`efeoncepro/glitch-drop`; until implemented, generated drafts may keep a
+temporary `core/quote` fallback only if the brief explicitly identifies the text
+as Glitch commentary.
+
+Contract:
+`docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 
 ### Pullquotes
 
