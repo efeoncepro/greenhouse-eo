@@ -1,0 +1,7 @@
+interface:
+  display_name: "Astro 7"
+  short_description: "Astro 7 architecture + reference: islands, rendering modes, Content Layer, Actions, routing, deploy — and the efeonce-think public hub."
+  default_prompt: "Use $astro to design or implement Astro 7 work — islands / hydration, rendering modes, Content Collections + Content Layer, Astro Actions, routing, endpoints/middleware, astro:assets, astro:env, View Transitions, route caching, or Vercel/Node deploy — for efeonce-think or any Astro site. Read efeonce-overlay.md first for efeonce-think."
+
+policy:
+  allow_implicit_invocation: true
