@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const queryMock = vi.fn()
 const captureMock = vi.fn()
@@ -14,6 +14,7 @@ vi.mock('@/lib/observability/capture', () => ({
 import {
   ensureAiVisibilityReportShortLink,
   resolveAiVisibilityReportShortLink,
+  resolvePreferredReportUrl,
   revokeAiVisibilityReportShortLink,
   trackAiVisibilityReportShortLinkUse
 } from '@/lib/growth/ai-visibility/report/short-link'
@@ -181,5 +182,40 @@ describe('trackAiVisibilityReportShortLinkUse', () => {
 
     await expect(trackAiVisibilityReportShortLinkUse('AbCd1234EfGh')).resolves.toBeUndefined()
     expect(captureMock).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('resolvePreferredReportUrl (flag-gated)', () => {
+  const FLAG = 'GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED'
+
+  afterEach(() => {
+    delete process.env[FLAG]
+  })
+
+  it('flag OFF → URL larga sin tocar la DB', async () => {
+    delete process.env[FLAG]
+
+    const url = await resolvePreferredReportUrl({ reportId: 'grpt-1', reportToken: 'grt-tok' })
+
+    expect(url).toBe('https://think.efeoncepro.com/brand-visibility/r/grt-tok')
+    expect(queryMock).not.toHaveBeenCalled()
+  })
+
+  it('flag ON + link activo → URL corta', async () => {
+    process.env[FLAG] = 'true'
+    queryMock.mockResolvedValueOnce([linkRow({ short_code: 'AbCd1234EfGh' })])
+
+    const url = await resolvePreferredReportUrl({ reportId: 'grpt-1', reportToken: 'grt-tok' })
+
+    expect(url).toBe('https://think.efeoncepro.com/s/AbCd1234EfGh')
+  })
+
+  it('flag ON + sin link activo → fallback a URL larga', async () => {
+    process.env[FLAG] = 'true'
+    queryMock.mockResolvedValueOnce([])
+
+    const url = await resolvePreferredReportUrl({ reportId: 'grpt-1', reportToken: 'grt-tok' })
+
+    expect(url).toBe('https://think.efeoncepro.com/brand-visibility/r/grt-tok')
   })
 })

@@ -7,9 +7,10 @@ import {
 import type { AiVisibilityReportEmailInsight } from '@/emails/AiVisibilityGraderReportEmail'
 import { sendEmail } from '@/lib/email/delivery'
 import { isReportEmailDeliveryEnabled } from '@/lib/growth/ai-visibility/flags'
-import { buildPublicReportUrl, getLatestReportTokenForRun } from '@/lib/growth/ai-visibility/hubspot/report-link'
+import { getLatestReportTokenForRun } from '@/lib/growth/ai-visibility/hubspot/report-link'
 import { getGraderLeadForHandoff } from '@/lib/growth/ai-visibility/public-intake/store'
 import { buildReportHeader } from '@/lib/growth/ai-visibility/report/report-header'
+import { resolvePreferredReportUrl } from '@/lib/growth/ai-visibility/report/short-link'
 import { readPublicGraderReport } from '@/lib/growth/ai-visibility/report/snapshot'
 import type { GraderReportSeverity } from '@/lib/growth/ai-visibility/report/contracts'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -120,6 +121,9 @@ export const dispatchAiVisibilityReportEmail = async (runId: string): Promise<Re
 
     const attachment = await buildAiVisibilityReportAttachment({ publicReport: snapshot.publicReport, header })
 
+    // TASK-1330 — URL de share preferida (corta si el flag ON + link activo; si no, larga).
+    const reportUrl = await resolvePreferredReportUrl({ reportId: snapshot.reportId, reportToken })
+
     const result = await sendEmail({
       emailType: 'ai_visibility_grader_report',
       domain: 'growth',
@@ -131,7 +135,7 @@ export const dispatchAiVisibilityReportEmail = async (runId: string): Promise<Re
         primaryGapTitle: model.primaryGap?.title ?? null,
         isPartial: gateStatus === 'partial',
         insight: buildInsight(model),
-        reportUrl: buildPublicReportUrl(reportToken),
+        reportUrl,
         attachmentFilename: attachment.filename,
         attachmentSizeLabel: attachment.sizeLabel,
         pdfBuffer: attachment.content,

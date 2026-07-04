@@ -17,6 +17,7 @@ import 'server-only'
  *  - `track` es best-effort: NUNCA bloquea ni hace fallar el resolve del hot path público.
  */
 
+import { buildPublicReportShortUrl, buildPublicReportUrl } from '@/lib/growth/ai-visibility/public-report-url'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { isUniqueViolation, withUniqueShortCode } from '@/lib/shared/short-code'
@@ -228,4 +229,37 @@ export const trackAiVisibilityReportShortLinkUse = async (shortCode: string): Pr
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_short_link_track' } })
   }
+}
+
+// ── Consumer preference (flag-gated short-vs-long) ───────────────────────────
+
+/**
+ * Flag de consumo (default OFF): mientras esté OFF, TODOS los consumers emiten el URL largo. Prender
+ * en staging tras el smoke del resolve; producción solo con release explícito. Registrado en
+ * `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+ */
+export const isAiVisibilityShortLinksEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  env.GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED === 'true'
+
+/** Reader del link activo de un reporte (o null). Expuesto para consumers que resuelven la URL. */
+export const getActiveShortLinkForReport = async (reportId: string): Promise<GraderReportShortLink | null> =>
+  selectActiveByReport(reportId)
+
+/**
+ * URL de share PREFERIDA para un reporte: la CORTA si el flag está ON y existe un link activo; si no,
+ * la LARGA (fallback siempre válido). SSOT de la decisión short-vs-long para TODOS los consumers
+ * (token route, email, HubSpot, operador) → un solo lugar decide, cero drift. Con el flag OFF NO
+ * toca la DB (short-circuit) → sin costo de latencia en el hot path mientras esté apagado.
+ */
+export const resolvePreferredReportUrl = async (input: {
+  reportId: string
+  reportToken: string
+}): Promise<string> => {
+  if (isAiVisibilityShortLinksEnabled()) {
+    const link = await selectActiveByReport(input.reportId)
+
+    if (link) return buildPublicReportShortUrl(link.shortCode)
+  }
+
+  return buildPublicReportUrl(input.reportToken)
 }

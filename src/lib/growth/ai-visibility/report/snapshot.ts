@@ -12,12 +12,30 @@ import 'server-only'
  * (el token ES la auth) respetando `expires_at`. El reporte INTERNO sigue on-read.
  */
 
+import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { isReportReviewApproved } from '../review/queries'
 
 import { readGraderReport } from './command'
 import { type PublicGraderReport } from './contracts'
+import { ensureAiVisibilityReportShortLink } from './short-link'
+
+/**
+ * TASK-1330 — Auto-create idempotente del short link al publicar (best-effort). Que TODO reporte
+ * publicable tenga su alias hace `shareFacts.reportUrl` deterministamente corto cuando el flag esté
+ * ON. Un fallo NUNCA rompe el publish (el link se puede crear luego / en el próximo publish); el
+ * error se observa. Se crea aunque el flag de consumo esté OFF (deploy con tráfico cero).
+ */
+const ensureShortLinkOnPublish = async (reportId: string): Promise<void> => {
+  try {
+    await ensureAiVisibilityReportShortLink({ reportId })
+  } catch (error) {
+    captureWithDomain(error, 'growth', {
+      tags: { source: 'growth_ai_visibility_short_link_ensure_on_publish' }
+    })
+  }
+}
 
 export class GraderSnapshotError extends Error {
   readonly code: string
@@ -121,7 +139,11 @@ export const publishGraderReportSnapshot = async (input: {
   )
 
   if (inserted[0]) {
-    return projectSnapshot(inserted[0])
+    const snapshot = projectSnapshot(inserted[0])
+
+    await ensureShortLinkOnPublish(snapshot.reportId)
+
+    return snapshot
   }
 
   // Conflicto (mismo estado ya publicado): devolver el snapshot INMUTABLE existente
@@ -138,7 +160,11 @@ export const publishGraderReportSnapshot = async (input: {
     throw new GraderSnapshotError('snapshot_persist_failed', 'No fue posible persistir ni recuperar el snapshot.')
   }
 
-  return projectSnapshot(existing[0])
+  const snapshot = projectSnapshot(existing[0])
+
+  await ensureShortLinkOnPublish(snapshot.reportId)
+
+  return snapshot
 }
 
 /**

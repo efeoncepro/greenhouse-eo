@@ -15,7 +15,7 @@ import { GraderReportError, readGraderReport } from '../report/command'
 import { getGraderLeadForHandoff, markGraderLeadHubspotSynced } from '../public-intake/store'
 import { upsertLeadToHubSpot } from './crm-client'
 import { buildHubSpotLeadHandoffPayload, type LeadHandoffFacts } from './property-mapper'
-import { buildPublicReportUrl, getLatestReportTokenForRun } from './report-link'
+import { resolveReportShareUrlForRun } from './report-link'
 
 export type LeadHandoffExecuteStatus = 'succeeded' | 'skipped' | 'failed'
 
@@ -68,7 +68,8 @@ export const executeLeadHandoff = async (runId: string): Promise<LeadHandoffExec
     return skipped(runId, 'not_releasable')
   }
 
-  const reportToken = await getLatestReportTokenForRun(runId)
+  // TASK-1330 — URL de share preferida (corta si el flag ON + link activo; si no, larga; null sin snapshot).
+  const reportUrl = await resolveReportShareUrlForRun(runId)
 
   const facts: LeadHandoffFacts = {
     email: lead.email,
@@ -78,7 +79,7 @@ export const executeLeadHandoff = async (runId: string): Promise<LeadHandoffExec
     lastName: lead.lastName,
     brandName: lead.brandName,
     lastSubmitAt: lead.consentAt,
-    reportUrl: reportToken ? buildPublicReportUrl(reportToken) : null,
+    reportUrl,
     report: {
       overallScore: report.overallScore,
       scoreVersion: report.scoreVersion,
