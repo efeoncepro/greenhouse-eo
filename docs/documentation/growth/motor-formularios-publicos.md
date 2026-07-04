@@ -65,6 +65,11 @@ La landing usa `<greenhouse-form>` en el widget Elementor `convers`. WordPress n
 
 Contrato runtime y CORS: [growth-public-forms-runtime-contract.md](../../architecture/growth-public-forms-runtime-contract.md).
 
+Autorizar un host publico nuevo (por ejemplo `think.efeoncepro.com`) es un cambio de **datos**, no de
+codigo: desde TASK-1335 el transporte CORS es la union gobernada de los origenes de las surfaces activas
+(`form_host_surface`), asi que se agrega el origen a la surface correspondiente y el motor lo permite sin
+tocar el route helper. `efeoncepro.com` (`/aeo-2`) permanece autorizado por su propia surface.
+
 ## Como se muestra el formulario (renderer portable) — TASK-1231
 
 El mismo formulario se ve igual en WordPress, en Astro y en la vista interna de Greenhouse, porque los tres usan **un solo renderer portable**: un componente web `<greenhouse-form>` que Greenhouse sirve como un archivo unico. Cada sitio solo lo "incrusta"; no copia ni cambia el formulario.

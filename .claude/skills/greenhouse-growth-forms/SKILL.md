@@ -275,6 +275,16 @@ Two engine capabilities added 2026-07 (TASK-1319/1320/1321) live in the companio
 
 - CORS/origin/surface are governed by `form_host_surface`. Browser-supplied ids never define
   authorization. Errors are **sanitized** (no SQL/stack/secret/PII).
+- **Governed CORS transport (TASK-1335).** The public route helper `cors.ts` has **no hardcoded
+  origin set**. Transport ACAO = the **UNION of `origin_allowlist_json` across `active` surfaces**
+  (SoT = `form_host_surface`), via `listActivePublicFormOrigins` (store), cached in-memory (TTL ~90s)
+  with stale-while-revalidate + stale-on-error. **Authorizing a new host = adding its origin to the
+  right surface (DATA), never editing the route helper.** Transport is **surface-agnostic** because the
+  `OPTIONS` preflight carries no `surfaceId`; the fine per-surface authority (origin + slug + surface)
+  stays server-side in `submitForm` (double defense). Invariant: fail-CLOSED for unknown origin,
+  fail-SAFE for the data source (last-known-good on DB blip; cold + DB-down → empty union, but the form
+  is already broken then). `publicFormsCorsHeaders`/`publicFormsOptionsResponse` are **async** — route
+  handlers `await` them.
 - The GET payload is the **only** thing the browser sees: it must never contain mapping, destination
   GUID, portal id, secrets, or other submissions. `policy-compiler.ts` + `sanitizeRenderCopy` are the
   leak boundary — there is a no-leak test; keep it green.
@@ -443,6 +453,11 @@ nubox/grader/reliability. Verify with `pnpm release:watchdog --json` (worker GIT
 - **NUNCA** edit a published version in place — clone → publish new → deprecate old.
 - **NUNCA** put unsanitized copy in the render contract — it goes through `sanitizeRenderCopy`.
 - **NUNCA** call HubSpot inline from `submit` — delivery is the async ops-worker dispatcher only.
+- **NUNCA** hardcode a public CORS origin set in the route helper (`cors.ts`) — transport ACAO is the
+  governed UNION of `active` surfaces' `origin_allowlist_json` (TASK-1335). Add a host by appending its
+  origin to a surface (DATA/migration), not code. **NUNCA** make transport CORS surface-aware per request
+  (the `OPTIONS` preflight has no `surfaceId` → it would drop ACAO for every origin, breaking `/aeo-2`).
+  **NUNCA** use `Access-Control-Allow-Origin: *` on submit/render APIs.
 - **NUNCA** re-deliver a `delivered` submission (duplicate lead; not idempotent).
 - **NUNCA** ship form behavior into a single UI/host — extract the governed contract (Full API Parity).
 - **NUNCA** log/telemeter PII; reveal is capability + reason + append-only audit.
