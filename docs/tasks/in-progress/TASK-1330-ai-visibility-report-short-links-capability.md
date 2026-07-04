@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Code-complete Slices 1-3 + docs; rollout pendiente (flag flip staging + smoke + Think /s + prod)`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|api`
 - Blocked by: `TASK-1329 complete; TASK-1325 hub live; TASK-1331 complete/released (contrato shareFacts.reportUrl)`
