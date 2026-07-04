@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -163,9 +163,22 @@ diseño); un **token público real** muestra la sección `06` mapeada sólo tras
 en el target (operator-driven, no automático). (3) Cost-bearing: 1 call/finding/run (respeta cost-cap).
 (4) Scoring de runs nuevos cambia por evidencia nueva (no fórmula/pesos/versión).
 
-**Estado:** Slice 1 (diagnóstico) + Slice 2 (fix + persist) cerrados. Pendiente para 100%: generar un run
-nuevo en prod (post-deploy del worker con `deploy.sh` persistido) y confirmar `status='mapped'` vía el
-endpoint público real; + decisión del operador sobre persistir OPERATOR_SEND/CATEGORY_GUARD.
+**Estado: COMPLETE (2026-07-04).** Todos los slices cerrados:
+- Slice 1 (diagnóstico): root cause = drift worker-vs-Vercel.
+- Slice 2 (fix + persist): 3 flags ON en el worker (live) + persistidos en `deploy.sh` (ambos bloques),
+  a decisión del operador "hagamos todo lo necesario".
+- Slice 3 (no-leak/compat): el payload público expone sólo IDs canónicos + label es/en + counts (verificado);
+  el no-leak test existente cubre raw candidates; snapshots viejos siguen `unknown` sin romper.
+- Slice 4 (E2E visible): **PROBADO** — snapshot publicado del run real `EO-GRUN-00040` →
+  `categoryTaxonomySummary.status='mapped'`, `categories=[{nodeId:'sector:banking_insurance', label:{es:'Banca y seguros',en:'Banking and insurance'}, level:'sector', count:1}]`, `totalSignals=1`, sin raw labels. Token `grt-b095c3a8…`.
+
+**Rollout aplicado:** push develop `46f8e719b` → **Ops Worker Deploy SUCCESS** (rev `ops-worker-00456-qs2`
+con los 3 flags ON desde `deploy.sh` → persist confirmado sobrevive el deploy). Vercel staging + CI verdes.
+
+**Operacional (no es gap):** los 12 snapshots viejos siguen `unknown` (inmutables); cada run NUEVO
+(ejecutado por el worker) ya produce `mapped`. Para un token público prod específico, generar un run
+fresco (disponible ahora). ⚠️ CATEGORY_GUARD ON: una marca cuya categoría no resuelva queda bloqueada
+(`aeo_category_unresolved`); monitor `growth.ai_visibility.profile_category_unresolved`; revert = flag false.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
