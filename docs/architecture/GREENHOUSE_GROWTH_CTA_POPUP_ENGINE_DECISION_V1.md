@@ -165,6 +165,12 @@ Required server-side primitives:
 - Experiment assignment reader/writer — **metadata only in V1**; powered A/B assignment/SRM/guardrail engine deferred (see §Deferred out of V1).
 - Lifecycle command set.
 
+Full API Parity contract:
+
+- Two planes, both contract-first: the **governance/capability plane** (`/api/admin/growth/ctas/**` — author/publish/pause/deprecate/route-config/report) is the target of Full API Parity; the **runtime/data plane** (`/api/public/growth/ctas/**` — render contract + event ingest, anonymous visitors) is a public execution contract, not a Nexa-operable capability.
+- The canonical primitive lives in `src/lib/growth/ctas/` (readers + commands); the admin cockpit is one client. One primitive, many consumers: UI, Nexa, MCP/ecosystem (`api/platform/ecosystem/*`), first-party apps (`api/platform/app/*`), CLI/runbooks, E2E harness — never parallel implementations.
+- Lifecycle writes use the governed-action loop `propose → confirm → execute`; the LLM/agent never mutates directly — mutation happens only at the human confirmation endpoint. Because the governed contract exists at the capability level, Nexa operates the full CTA lifecycle by construction (nothing CTA-specific is built for Nexa).
+
 Trust and consent contract:
 
 - Browser-reported events (`clicked`/`viewed`/`action_completed` from the client) are **directional telemetry, not conversion authority**. Only `server_confirmed` outcomes or Growth Forms server-accepted submissions count toward conversion truth and experiment primary metrics.

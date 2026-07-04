@@ -195,6 +195,21 @@ Do not place this under `public_site`, `commercial`, `platform` or `growth.forms
 
 The versioned runtime contract id is `greenhouse-growth-cta-popup.v1`; `greenhouse-growth-cta-popup-*` is the contract family prefix. Both refer to the same contract lineage.
 
+### 7.1 Full API Parity
+
+The engine is designed as a governed capability, not a UI feature (`GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`, overlay #16). The canonical primitive lives in `src/lib/growth/ctas/` (readers + commands); the admin cockpit is one client of that primitive, never the source of truth.
+
+**Two planes, both contract-first — do not conflate them:**
+
+| Plane | Surface | Consumers | Parity meaning |
+| --- | --- | --- | --- |
+| **Governance / capability plane** | `/api/admin/growth/ctas/**` | Authenticated operators + Nexa + MCP/ecosystem + CLI | Every author/review/publish/pause/deprecate/route-config/report action is a governed command/reader — the target of Full API Parity. |
+| **Runtime / data plane** | `/api/public/growth/ctas/**` | Anonymous public visitors (renderer) | Render-contract read + event ingest. A public execution contract, not a Nexa-operable capability. |
+
+**Governed-action loop for lifecycle writes.** Reads (list CTAs, performance report, eligibility/suppression inspection) are direct reader calls. Writes (author, publish, pause, deprecate, edit targeting/action/priority policy) go through the governed-action loop `propose → confirm → execute`: the LLM/agent **never mutates directly**; it proposes, a human confirms, and mutation happens only at the confirmation endpoint (with command semantics, tenant-safe authz, idempotency, audit/outbox, sanitized errors).
+
+**One primitive, many consumers (never parallel impls).** The same readers/commands serve: (1) the admin cockpit UI, (2) Nexa Agent, (3) MCP/downstream agents via `api/platform/ecosystem/*`, (4) first-party apps via `api/platform/app/*`, (5) CLI/runbooks, (6) the E2E/verification harness. A new consumer class inherits the contract automatically. **Because the governed contract exists at the capability level, Nexa can operate the entire CTA lifecycle by construction — nothing CTA-specific is built for Nexa.**
+
 ## 8. Terminology
 
 | Term | Meaning | Examples |
@@ -643,7 +658,9 @@ Targeting and personalization can drift into sensitive profiling. V1 only allows
 - **SIEMPRE** proveer kill switch global/por-surface que el renderer honra dentro del TTL del contrato (§16.3).
 - **SIEMPRE** cross-check `cta_version ↔ surface_id` en el ingest público y emitir `growth.cta.surface_unauthorized_attempt` ante mismatch (§16.1).
 - **SIEMPRE** mantener paridad preview↔público con un test de contrato (§15), replicando `renderer-contract-parity.test.ts` de Growth Forms.
-- **SIEMPRE** exponer cada capability vía contrato gobernado (Full API Parity): un primitive, muchos consumers (UI, Nexa, MCP, CLI).
+- **SIEMPRE** exponer cada capability vía contrato gobernado (Full API Parity, §7.1): un primitive en `src/lib/growth/ctas/`, muchos consumers (UI, Nexa, MCP, CLI).
+- **NUNCA** poner un write de lifecycle (author/publish/pause/deprecate/route-config) solo dentro de un componente UI; va como command gobernado. El agente/LLM nunca muta directo — loop `propose → confirm → execute`, mutación solo en el endpoint de confirmación humana.
+- **NUNCA** conflar el plano de gobernanza (capabilities Nexa-operables) con el data plane público (render/ingest anónimo); ambos son contratos, pero la parity aplica al primero (§7.1).
 
 ## 21. Delta 2026-07-04 — hardening review
 
