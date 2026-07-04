@@ -171,6 +171,7 @@ El diagnóstico ahora tiene una capa de entregables accionables: **Fix-It Artifa
 Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, pierde su diagnóstico. Por eso, cuando el reporte queda **listo y publicable**, el sistema le **envía el informe a su correo** — un email transaccional (no marketing, no newsletter).
 
 - **Qué recibe:** un correo claro con su **hallazgo principal** (puntuación, brecha principal y un insight prioritario en formato "qué detectamos / por qué importa / qué hacer ahora"), un **botón al informe en línea** (link seguro con expiración) y el **informe completo adjunto en PDF**.
+- **A dónde lleva el botón (TASK-1324):** el enlace abre el informe en el hub público **`think.efeoncepro.com/brand-visibility/r/<token>`** (no en el portal Greenhouse — el render vive en el hub `efeonce-think`). El **mismo enlace** se guarda como `report_url` en HubSpot. Antes apuntaba a una ruta del portal que daba **404**; hoy resuelve al informe real, y los correos ya enviados con el link viejo se recuperan con un redirect automático.
 - **De parte de quién:** el correo viene de **Efeonce** (la agencia), no del portal Greenhouse — es una superficie pública de la agencia, igual que su PDF adjunto.
 - **Cuándo se envía:** automáticamente, en cuanto el análisis se publica (lo dispara la publicación del informe, nunca el solo hecho de que alguien abra el link de estado). Pantalla y email son dos caras del mismo resultado.
 - **Solo con permiso:** se envía **únicamente si el lead aceptó recibirlo** (consent). Nunca a alguien sin consentimiento. El correo del lead se usa solo para esta entrega y para el CRM, **jamás se manda a los motores de IA**.
@@ -179,6 +180,8 @@ Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, p
 - **Seguro de compartir:** el adjunto es la versión **pública** del informe — nunca incluye el texto crudo de los motores, los hallazgos internos de exactitud ni datos privados.
 
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-27 (TASK-1250). Código: `src/lib/growth/ai-visibility/public-delivery/email/**`, template `src/emails/AiVisibilityGraderReportEmail.tsx`. Evento `growth.ai_visibility.report_email_requested` → consumer `growth_ai_visibility_report_email`. **Estado:** staging ON en worker + Vercel y smoke real ya dejó 1 dispatch enviado; producción OFF/gated por TASK-1246. Operación: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
+>
+> Destino del enlace (TASK-1324, released 2026-07-03): fuente única `buildPublicReportUrl` en `src/lib/growth/ai-visibility/hubspot/report-link.ts` → `${PUBLIC_GRADER_HUB_URL || 'https://think.efeoncepro.com'}/brand-visibility/r/<token>` (email + HubSpot `report_url` heredan). Redirect puente 307 del path viejo `/grader/r/<token>` en `next.config.ts`. ADR del render headless: `GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`.
 
 ## Cross-sell del operador — enviar informe + crear Lead (TASK-1279)
 
