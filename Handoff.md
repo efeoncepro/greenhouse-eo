@@ -1,3 +1,22 @@
+## Sesion 2026-07-04 - Release develop→main (batch TASK-1328…1336) + flag short links ON - Claude - RELEASED
+
+> **Pase a producción completo vía release control plane.** El operador pidió commit de TASK-1336 + pase a prod con `/release`. Se promovió `develop→main` (43 commits) — NO solo TASK-1336; el mecanismo promueve todo el branch.
+>
+> **Secuencia ejecutada:**
+> - Commit TASK-1336 (`1db3e177c`) + push develop.
+> - Reconciliación `develop`↔`origin/main` (merge `-X ours`, sin code delta; dedup de copias stale TASK-1330/1331 que el merge re-agregó en lifecycle folders distintos → `d69b38ac2`).
+> - PR #142 develop→main → **squash-merge → `main` HEAD `9818f47d3`**.
+> - Esperar CI develop verde + ventana Vercel 8min + Production deploy del SHA.
+> - Dispatch orchestrator `production-release.yml` (run `28711827375`) con `bypass_preflight_reason` (batch-policy three-dot falso-positivo ISSUE-114 + playwright_smoke inexistente en el squash; smoke verde en 1db3e177c). Operador autorizó el bypass.
+> - Aprobé el gate `production` + el gate Azure (operador autorizó aprobar todos los gates).
+> - **Resultado: orchestrator SUCCESS, manifest → `released`.** 4 workers Cloud Run OK (con su verificación EXPECTED_SHA), Azure no-diff→skip, Vercel READY, **post-release health 200**.
+>
+> **Post-release:**
+> - **Flag `GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED` → ON en Production** (TASK-1330). Verifiqué que Think `/s/[code].astro` está deployado (commit `681f1e4` ancestro del HEAD live de `efeonce-think`) → seguro. `vercel env add …=true Production` + redeploy `greenhouse-k679lwhtg` (tomó alias `greenhouse.efeoncepro.com`, health 200). Ledger actualizado. Pendiente menor: staging/dev para paridad.
+> - **TASK-1336 activation `--apply` DIFERIDA a TASK-1327.** El form del grader (`fdef-ai-visibility-grader`, form_key `69cd5269…`, published v3 `{"kind":"tokenized_report"}`) no está embebido en ninguna landing pública todavía (TASK-1327 es to-do) → publicar v4 con el handoff no tiene consumer aún. El código del handoff YA está en prod (renderer bundle se reconstruye en el build). Dry-run verde: `pnpm growth:forms:activate-grader-tokenized-report`. Aplicar al implementar TASK-1327.
+>
+> **No verificado / notas:** watchdog local degradado (sin `GITHUB_RELEASE_OBSERVER_TOKEN` local; el autoritativo corre en CI). Cloud Run GIT_SHA no leído por gcloud local (formato/ADC), pero cada worker job verificó su EXPECTED_SHA en el orchestrator. ADC de gcloud parece vencida hacia el final de la sesión (queries PG colgaron).
+
 ## Sesion 2026-07-04 - TASK-1336 Growth Forms tokenized_report handoff - Claude - code-complete (rollout pendiente)
 
 > **Task:** `docs/tasks/in-progress/TASK-1336-growth-forms-tokenized-report-success-contract.md` (EPIC-020, backend-data). Objetivo: que el submit del `<greenhouse-form>` del grader entregue al host (Think) un handoff browser-safe hacia el reporte en pantalla, sin polling local ni email como cierre.
