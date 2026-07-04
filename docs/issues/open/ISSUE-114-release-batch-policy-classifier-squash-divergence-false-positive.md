@@ -49,6 +49,12 @@ irreversible, hasta que la merge-base avance.
    release. Esto **avanza la merge-base** al `main` actual, de modo que el three-dot del *próximo*
    release parte de un punto correcto. Es un paliativo de proceso, no el fix del classifier.
 
+**Mitigación documentada operativamente** (para que cualquier agente/operador la reconozca sin re-derivarla):
+skill `greenhouse-production-release` (`.claude` + `.codex`, §"Gotchas conocidos del release"),
+runbook `docs/operations/runbooks/production-release.md` §2.3, manual
+`docs/manual-de-uso/plataforma/release-orchestrator.md` (§Problemas comunes) y doc funcional
+`docs/documentation/plataforma/release-orchestrator.md`.
+
 ## Fix de raíz propuesto (robusto + escalable)
 
 Dos capas complementarias:

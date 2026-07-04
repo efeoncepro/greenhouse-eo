@@ -114,6 +114,18 @@ gh workflow run production-release-watchdog.yml --ref main \
    - `hubspot-greenhouse-integration` in `us-central1`
 10. **Prender los flags pendientes de este release.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`: por cada feature `code-complete` cuyo flip estaba gated a este release, `vercel env add <FLAG>=true Production` (+ `gcloud run services update ops-worker --update-env-vars ...` si el flag corre en el worker) + redeploy + smoke del flujo en prod + actualizar la fila del ledger (snapshot por environment). El deploy del código no activa nada por sí solo. Si un flag requería su migración en prod, confirmar que entró por este release antes de prenderlo.
 
+## Gotchas conocidos del release (verificados 2026-07-03 #139; fix de raíz = ISSUE-114)
+
+El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas reales. No las persigas como bugs; aplicá la mitigación:
+
+1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** `main` (squashes de releases previos) no es ancestro de `develop` → conflictos (docs Handoff/changelog/README/registry y a veces código). **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo — contiene todo `main` por construcción: los squash de `main` son DE commits de `develop`). Verificá: `git log origin/main --not develop` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/` sin cambios de código. Push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
+
+2. **Preflight `release_batch_policy=requires_break_glass` falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (ej. `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirmá el fantasma: `git diff origin/main..target -- <archivo>` = 0 líneas. Post-merge (target = HEAD de `main`) el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
+
+3. **`playwright_smoke` (0 runs) + `ci_green` (aún corriendo) en el squash commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit de `main` no tiene su propio smoke. Con solo *warnings* (sin errors), el preflight marca `readyToDeploy=false` salvo `bypass_preflight_reason` (≥20 chars → activa `--override-batch-policy --bypass-preflight-warnings`). Es el path canónico. **Mejor práctica:** esperá el CI de `main` verde ANTES de re-dispatchar, para que `ci_green` sea genuino y el bypass cubra solo el `playwright_smoke` inevitable. Documentá el motivo real (no genérico) en `bypass_preflight_reason`.
+
+4. **ops-worker puede quedar con GIT_SHA rezagado tras el release — NO es drift.** `ops-worker-deploy` es *change-gated*: si ningún worker-runtime-path cambió desde `EXPECTED_SHA`, salta el rebuild (`deploy_needed=false`) y el servicio conserva el SHA del último deploy que sí tocó código de worker (código idéntico al target, por diseño — ver el step de worker-drift del workflow). **NO** fuerces redeploy para "alinear el label" salvo que el código del worker haya cambiado. Los otros 3 workers sí redeployan al target.
+
 ## What The Orchestrator Owns
 
 `production-release.yml` owns the production release lifecycle:

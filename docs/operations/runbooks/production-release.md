@@ -167,6 +167,18 @@ Excepción break-glass:
 - requiere razón escrita, owner humano, rollback explícito y actualización de `Handoff.md`;
 - no permite agregar mejoras no relacionadas.
 
+### 2.3. Gotchas del squash-merge (verificados 2026-07-03 #139; fix de raíz = ISSUE-114)
+
+El flujo de promoción por **squash-merge** hace que `main` (commits squash de releases previos) **no sea ancestro de `develop`**. Eso produce 3 condiciones recurrentes que **NO son fallas reales** — reconocelas y aplicá la mitigación en vez de perseguirlas:
+
+1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** Conflictos en docs (Handoff/changelog/README/registry) y a veces código, porque ambos lados editaron desde una merge-base vieja. **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo: contiene todo `main` por construcción, ya que los squash de `main` son DE commits de `develop`). Verificá `git log origin/main --not develop` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/` sin cambios de código → push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
+
+2. **Preflight `release_batch_policy=requires_break_glass` como falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (típicamente `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirmá el fantasma: `git diff origin/main..target -- <archivo>` = **0 líneas** (idéntico a prod). Post-merge, con `target` = HEAD de `main`, el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
+
+3. **`playwright_smoke` (0 runs) + `ci_green` (aún corriendo) como warnings en el commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit squash de `main` no tiene su propio smoke. Con solo *warnings* (sin errors), el preflight retorna `readyToDeploy=false` salvo `bypass_preflight_reason` (≥20 chars → activa `--override-batch-policy --bypass-preflight-warnings`). **Mejor práctica:** esperá el CI de `main` verde ANTES de re-dispatchar el orchestrator, para que `ci_green` sea genuino y el bypass cubra solo el `playwright_smoke` inevitable. Documentá el motivo real (no genérico).
+
+> El ops-worker que queda con GIT_SHA rezagado tras el release **no es drift** — ver §4.1 (change-gate `deploy_needed=false` cuando el código de worker no cambió).
+
 ## 3. Approval del environment Production
 
 En el flujo canonico se aprueba el job `approval-gate` del workflow

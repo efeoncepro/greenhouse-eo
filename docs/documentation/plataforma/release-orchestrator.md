@@ -102,6 +102,8 @@ El orquestador es un workflow GitHub Actions, pero el operador casi nunca lo dis
 
 Ninguna interfaz es un motor de release nuevo: las dos terminan corriendo `production-release.yml` y escribiendo en `release_manifests`. La diferencia con disparar el workflow crudo es que el harness **fuerza el orden seguro** (preflight → promoción → orquestador → approval → workers/Vercel/Azure → health → manifest → watchdog → flags del ledger) y exige aprobación humana explícita por cada mutación externa (push, dispatch, approval gate, deploy, flags, rollback). El agente lee y propone; la persona autoriza cada paso.
 
+> **Condiciones esperadas del flujo por squash (no son fallas).** Como cada release se promueve con *squash-merge*, `main` y `develop` divergen. Eso produce señales que parecen errores pero son conocidas: el PR develop→main puede requerir un merge de sincronización, un check de política puede marcar un archivo que **ya está en producción**, y los avisos de smoke/CI del commit fresco de `main` se resuelven con una razón de bypass documentada. El runbook (§2.3) y la skill `greenhouse-production-release` explican cómo reconocerlas y resolverlas paso a paso; el fondo (que el clasificador de política deje de marcar archivos ya desplegados) está registrado en **ISSUE-114**.
+
 ## Roles + permisos
 
 Reusa capabilities ya existentes (least-privilege per TASK-848):
