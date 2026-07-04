@@ -2,7 +2,7 @@
 
 ## 2026-07-04
 
-- **TASK-1331 code complete local — AI Visibility public report view-model contract.** Greenhouse sube el contrato público del informe a `modelVersion=1.1.0` con `model.viewFacts` server-derived para engine coverage/Share of Model, citation totals globales, benchmark competitivo, sentiment/readiness/dimension/share facts y `levels[].isNext`; Think consume esos facts y elimina derivaciones semánticas locales del renderer. Sin cambios de scoring, probes, normalizer ni `executeClaimedGraderRun`. Validado local con Greenhouse lint/typecheck/build, focal/broad/full tests, Think type-check/build y verifier 1440/1280/390; rollout productivo pendiente de confirmación.
+- **TASK-1331 COMPLETE + RELEASED — AI Visibility public report final.** Greenhouse sube el contrato público del informe a `modelVersion=1.1.0` con `model.viewFacts` server-derived para engine coverage/Share of Model, citation totals globales, benchmark competitivo, sentiment/readiness/dimension/share facts y `levels[].isNext`; Think consume esos facts y elimina derivaciones semánticas locales del renderer. Sin cambios de scoring, probes, normalizer ni `executeClaimedGraderRun`. Greenhouse PR #141 (`4885a5de3`) fue promovido por el Production Release Orchestrator (`28697002045`) hasta manifest `released`; Think `50811d0` fue pusheado a `main` y Vercel production quedó Ready. Smoke final con token real: `https://think.efeoncepro.com/brand-visibility/r/<token>` HTTP 200 en 1440/1280/390 sin overflow; API productivo devuelve `modelVersion=1.1.0`, `viewFacts` presente, citation totals/benchmark facts y no leaks (`rawProviderResponse`, `answer_text`, `prompt_text` false). Capturas: `/Users/jreye/Documents/efeonce-think/.captures/task1331-prod-final-*.png`.
 
 ## 2026-07-03
 

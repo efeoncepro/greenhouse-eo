@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,11 +21,11 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-020`
-- Status real: `Code complete local — Greenhouse + Think; rollout pendiente`
+- Status real: `COMPLETE 2026-07-04 — Greenhouse production released + Think production deployed`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|data`
 - Blocked by: `none`
-- Branch: `task/TASK-1331-ai-visibility-public-report-viewmodel-contract`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -146,7 +146,7 @@ Reglas obligatorias:
 - Impacto principal: `reader`
 - Source of truth afectado: `PublicGraderReport` + `ReportArtifactModel` publicWeb adapter
 - Consumidores afectados: `efeonce-think`, public report API, PDF/email copy, future client/public report consumers
-- Runtime target: `local|staging|production`
+- Runtime target: `production`
 
 ### Contract surface
 
@@ -710,7 +710,7 @@ The final implementation may choose narrower field names, but must satisfy the a
 
 - No feature flag expected for additive route/model fields.
 - If Think consumption is included, keep long-field fallbacks for one release.
-- Production enablement follows normal release process; no release from this task without explicit confirmation.
+- Production enablement completed 2026-07-04 after explicit operator confirmation to promote the mockup into the final user-facing report.
 
 ### Rollback plan per slice
 
@@ -755,7 +755,7 @@ The final implementation may choose narrower field names, but must satisfy the a
 - [x] Public route payload no-leak tests cover new fields.
 - [x] The public model version policy is documented; additive minor bump applied if required.
 - [x] No scoring, normalizer, provider adapter, probe or `executeClaimedGraderRun` behavior changes.
-- [x] Docs, lifecycle, handoff and changelog are synchronized for code-complete local.
+- [x] Docs, lifecycle, handoff and changelog are synchronized for production completion.
 
 ## Verification
 
@@ -771,7 +771,12 @@ The final implementation may choose narrower field names, but must satisfy the a
 - Think: `pnpm type-check` — OK (1 existing `document.execCommand` deprecation hint)
 - Think: `pnpm build` — OK
 - Think: `node scripts/verify-report.mjs http://127.0.0.1:4322/brand-visibility/r/mock-token task1331-viewmodel-adoption` — OK in 1440/1280/390; HTTP 200, `scrollWidth == clientWidth`, no internal leak patterns
-- Runtime/env not completed: `pnpm migrate:status` could not connect to local proxy `127.0.0.1:15432`; `pnpm secrets:audit` reports local secrets unconfigured. No migrations or secret/env changes are part of TASK-1331.
+- Greenhouse production: PR #141 `develop -> main` squash merged as `4885a5de3ccdbf0457f7248186597b8d6c53da86`; `main` CI, CI Deep Verification, Task Contract and CLAUDE governance passed.
+- Greenhouse release control plane: `Production Release Orchestrator` run `28697002045` completed success; preflight passed with documented bypass only for the expected `playwright_smoke` warning on the squash SHA, Production approvals applied, Vercel production READY, workers/health passed, and manifest transitioned to `released`.
+- Think production: `/Users/jreye/Documents/efeonce-think` commit `50811d0dfd3d45b9d26532ced3d79030fec5bf04` pushed to `main`; Vercel production deploy `efeonce-think-rmp89p7lv-efeonce-7670142f.vercel.app` Ready.
+- Production runtime smoke: `node scripts/verify-report.mjs https://think.efeoncepro.com/brand-visibility/r/<real-token> task1331-prod-final` — OK in 1440/1280/390; HTTP 200, `scrollWidth == clientWidth`; captures saved under `/Users/jreye/Documents/efeonce-think/.captures/task1331-prod-final-*.png`.
+- Production API smoke: `GET https://greenhouse.efeoncepro.com/api/public/growth/ai-visibility/report/<real-token>` returned `modelVersion: "1.1.0"`, `model.viewFacts` present, `citationTotals.totalCitations=24`, `competitiveBenchmark.rows=1`, and no `rawProviderResponse`, `answer_text` or `prompt_text` leaks.
+- Runtime/env caveat: local `pnpm migrate:status`/`pnpm pg:connect:status` could not complete because local GCP CLI + ADC credentials are expired and require browser reauth. No migrations or secret/env changes are part of TASK-1331; release control plane preflight used CI WIF credentials successfully.
 
 ## Closing Protocol
 
