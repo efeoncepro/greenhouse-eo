@@ -1,0 +1,400 @@
+# TASK-1334 — Think Category Perception Renderer Contract
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P1`
+- Impact: `Alto`
+- Effort: `Medio`
+- Type: `implementation`
+- Execution profile: `ui-ux`
+- UI impact: `layout`
+- UI ready: `yes`
+- Wireframe: `docs/ui/wireframes/TASK-1334-think-category-perception-renderer-contract.md`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `none`
+- Epic: `EPIC-020`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `growth|ai|public-site|ui`
+- Blocked by: `TASK-1331 complete; backend mapped-real-data proof is TASK-1333`
+- Branch: `task/TASK-1334-think-category-perception-renderer-contract`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+Endurece el renderer de `efeonce-think` para que la seccion `06 · Categoria percibida` pinte correctamente lo que Greenhouse ya envia en `categoryTaxonomySummary`, sin derivar semantica local ni depender de mocks. Cubre estados `mapped`, `needs_review`, `unknown`, snapshots viejos/parciales, no-leak visible, responsive y capturas.
+
+## Why This Task Exists
+
+La seccion de categoria ya quedo ajustada visual/editorialmente en el mockup, pero el cierre correcto no es solo que Greenhouse produzca datos reales. Think tambien debe ser capaz de renderizar fielmente el contrato backend existente, incluyendo los casos donde Greenhouse todavia responde `unknown` o donde un snapshot antiguo no trae todos los campos.
+
+Si Think solo funciona con la data mockeada local, la seccion puede verse bien en desarrollo y fallar en produccion: filas vacias, `NaN`, raw labels, copy demasiado tecnico o secciones que desaparecen sin explicacion. Esta task formaliza el lado visible del contrato.
+
+## Goal
+
+- Renderizar `categoryTaxonomySummary` desde Greenhouse tal como viene, con normalizacion defensiva solo para presentacion.
+- Mostrar estado `mapped` con filas claras, nivel traducido, conteos/porcentajes bounded y helpers entendibles.
+- Mostrar estados `unknown`, `needs_review` y legacy/partial sin inventar categoria ni exponer internals.
+- Eliminar cualquier dependencia de mock-only shape; los fixtures locales deben copiar la forma exacta del payload Greenhouse.
+- Verificar desktop/laptop/mobile con no-overflow, no-leak visible y compatibilidad con snapshots viejos.
+- Mantener Think como renderer tonto: sin scoring, sin category inference, sin local taxonomy ownership.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     "Que necesito entender antes de planificar?"
+     El agente lee cada doc referenciado aqui. Si un doc no
+     existe en el repo, reporta antes de continuar.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`
+- `docs/tasks/complete/TASK-1331-ai-visibility-public-report-viewmodel-contract.md`
+- `docs/tasks/to-do/TASK-1333-ai-visibility-category-perception-production-signals.md`
+- `docs/ui/wireframes/TASK-1334-think-category-perception-renderer-contract.md`
+- `/Users/jreye/Documents/efeonce-think/src/pages/brand-visibility/r/[token].astro`
+- `/Users/jreye/Documents/efeonce-think/src/components/primitives/ReportIcon.astro`
+- `/Users/jreye/Documents/efeonce-think/src/components/primitives/README.md`
+- `/Users/jreye/Documents/efeonce-think/scripts/verify-report.mjs`
+
+Reglas obligatorias:
+
+- Greenhouse es source of truth del dato; Think solo renderiza.
+- No inferir categorias desde `brandName`, `websiteUrl`, copy del sitio, prompts, labels o strings raw.
+- No mostrar labels internos como `mid_category`, `service_line`, `adjacent_capability`, `product_or_service`, `canonical signals`.
+- No generar narrativa cuando `status='unknown'`; usar estado honesto.
+- No ocultar errores con filas falsas; si falta data, mostrar fallback seguro u omitir seccion segun contrato.
+- No cambiar backend/data/scoring/probes/normalizer ni endpoint Greenhouse.
+- No hacer deploy productivo sin confirmacion explicita del operador.
+
+## Normative Docs
+
+- `project_context.md`
+- `Handoff.md`
+- `docs/context/00_INDEX.md`
+- `docs/tasks/TASK_UI_UX_ADDENDUM.md`
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
+- `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- `TASK-1331` complete/released: public report contract and Think final renderer exist.
+- Existing Greenhouse `categoryTaxonomySummary` contract in the public API/model.
+- Existing Think category section prototype/local mock.
+
+### Blocks / Impacts
+
+- Complements TASK-1333: once Greenhouse produces real mapped data, Think is ready to show it.
+- Impacts public AI Visibility report route in `efeonce-think`.
+- Does not block TASK-1330 short links or TASK-1332 icon library adapter.
+
+### Files owned
+
+- `docs/tasks/to-do/TASK-1334-think-category-perception-renderer-contract.md`
+- `docs/ui/wireframes/TASK-1334-think-category-perception-renderer-contract.md`
+- `/Users/jreye/Documents/efeonce-think/src/pages/brand-visibility/r/[token].astro`
+- `/Users/jreye/Documents/efeonce-think/src/components/primitives/ReportIcon.astro` only if icon semantics need small consumer-safe mapping
+- `/Users/jreye/Documents/efeonce-think/scripts/verify-report.mjs`
+- `/Users/jreye/Documents/efeonce-think/src/components/primitives/README.md` only if renderer pattern gets documented
+
+## Current Repo State
+
+### Already exists
+
+- Think public report route fetches Greenhouse server-side and renders the final user-facing report.
+- Category section local iteration can show mapped mock data and an honest empty state.
+- Greenhouse already sends `categoryTaxonomySummary` as part of `report`/`model`.
+- TASK-1333 owns making real runs produce mapped category signals when currently unknown.
+
+### Gap
+
+- The renderer contract is not yet formalized as a task: Think must prove it handles the exact backend payload shape, not only injected mock data.
+- The UI must cover `mapped`, `needs_review`, `unknown`, partial/missing field and old snapshot compatibility.
+- Current visual verification must explicitly assert no raw labels, no `NaN`, no fabricated rows and no horizontal overflow.
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-standard`
+- Usuario / rol: public report reader evaluating the credibility and positioning implications of an AI Visibility diagnostic.
+- Momento del flujo: section `06 · Categoria percibida`, after readiness/operability.
+- Resultado perceptible esperado: the reader understands the category frame when measured, and trusts the report when it says the signal is not strong enough.
+- Friccion que debe reducir: confusion from raw taxonomy/status labels, empty numbers, unexplained section disappearance or mock-only behavior.
+- No-goals UX: no backend data creation, no report redesign, no icon system migration, no local category inference.
+
+### Surface & system decision
+
+- Surface: `efeonce-think` public report `/brand-visibility/r/[token]`.
+- Composition Shell: `no aplica` — external Astro public hub, not private Greenhouse portal.
+- Primitive decision: `reuse` — existing Think report section and `ReportIcon`; optional local row extraction only if it reduces duplication.
+- Adaptive density / The Seam: `no aplica` — no private portal card primitive.
+- Floating/Sidecar/Dialog decision: none.
+- Copy source: `local one-off` in Think report; backend facts supply data only.
+- Access impact: `none` — public tokenized report behavior unchanged.
+
+### State inventory
+
+- Default: `mapped` category summary and rows.
+- Loading: Astro SSR; no client loading state inside the rendered report.
+- Empty: `unknown` state with user-facing explanation, not internal taxonomy language.
+- Error: safe fallback/omission; no raw error.
+- Degraded / partial: `needs_review`, missing counts, missing labels or old snapshot.
+- Permission denied: unchanged 404/expired token page behavior.
+- Long content: cap/render rows without page overflow; long labels wrap.
+- Mobile / compact: 390px layout stacks rows cleanly.
+- Keyboard / focus: no new interactive controls expected.
+- Reduced motion: no new motion.
+
+### Interaction contract
+
+- Primary interaction: reading/scanning; no new user action.
+- Hover / focus / active: existing share/download controls unaffected.
+- Pending / disabled: N/A.
+- Escape / click-away: unchanged share dock if present.
+- Focus restore: unchanged.
+- Latency feedback: N/A.
+- Toast / alert behavior: unchanged.
+
+### Motion & microinteractions
+
+- Motion primitive: `none`
+- Enter / exit: no new motion.
+- Layout morph: none.
+- Stagger: none.
+- Timing / easing token: N/A.
+- Reduced-motion fallback: N/A.
+- Non-goal motion: no animated counters or row reveals in this task.
+
+### Implementation mapping
+
+- Route / surface: `/Users/jreye/Documents/efeonce-think/src/pages/brand-visibility/r/[token].astro`
+- Primitive / variant / kind: existing category section; state branches `mapped|needs_review|unknown|legacy`.
+- Component candidates:
+  - `normalizeCategoryTaxonomySummaryForRender` local pure helper if needed.
+  - `categoryLevelPresentation` map for level label/helper/icon.
+  - optional row fragment for repeated category rows.
+- Copy source: local Think report copy.
+- Data reader / command: server-side fetch from Greenhouse public report endpoint.
+- API parity: N/A; read-only rendering of existing backend contract.
+- Access / capability: public tokenized report.
+- States to implement: mapped, needs_review, unknown, partial/legacy, long labels, zero/missing totals, mobile.
+
+### GVC scenario plan
+
+- Scenario file: `/Users/jreye/Documents/efeonce-think/scripts/verify-report.mjs` or new Think-local verifier.
+- Route: local Think route with exact Greenhouse-shaped fixtures for mapped, unknown and legacy/partial category summary.
+- Viewports: `1440x1000`, `1280x900`, `390x844`.
+- Required steps: load each state, capture category section/full page, inspect text and metrics.
+- Required captures: mapped section, unknown/empty section, needs_review/partial if fixture exists, mobile mapped section.
+- Required `data-capture` markers: `report-category-association`; add `report-category-empty`/`report-category-review` if useful.
+- Assertions: no raw labels, no `NaN`, no fabricated rows for unknown, no horizontal overflow, decorative icons hidden.
+- Scroll-width checks: desktop/laptop/mobile 390.
+- Reduced-motion / focus evidence: no new motion; no new focus targets.
+
+### Design decision log
+
+- Decision: create a UI companion task rather than folding this into TASK-1333.
+- Alternatives considered:
+  - Keep only backend TASK-1333: rejected because visible renderer states can still fail or feel unprofessional.
+  - Make TASK-1333 hybrid: rejected because backend data production and public UI rendering deserve separate gates.
+  - Mock category in Think until backend is ready: rejected for production.
+- Why this pattern: Greenhouse owns category facts; Think owns presentation and compatibility.
+- Reuse / extend / new primitive: reuse existing report section; optional tiny helper extraction only.
+- Open risks: fixtures drift from real payload; copy over-explains; backend remains unknown until TASK-1333.
+
+### Visual verification
+
+- GVC scenario: Think-local Playwright/verifier.
+- Viewports: 1440, 1280, 390.
+- Required captures: mapped, unknown, partial/review if available.
+- Required `data-capture` markers: `report-category-association`.
+- Scroll-width check: `scrollWidth === clientWidth`.
+- Accessibility/focus checks: icons decorative, no unlabeled controls.
+- Before/after evidence: current local category screenshots can be used as visual baseline.
+- Known visual debt: icon library upgrade remains TASK-1332.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     "Que construyo exactamente, slice por slice?"
+     El agente solo lee esta zona DESPUES de que el plan este
+     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 1 — Contract fixture matrix
+
+- Capture or define exact Greenhouse-shaped fixtures for:
+  - `mapped` with multiple categories and counts.
+  - `unknown` with empty categories.
+  - `needs_review` with ambiguous/unmapped counters.
+  - legacy/partial missing `categoryTaxonomySummary` or missing optional counters.
+- Ensure fixtures mirror the actual public API shape, not an invented Think-only shape.
+- Document how each state should render.
+
+### Slice 2 — Renderer hardening
+
+- Add a small defensive presentation normalizer if needed, scoped to Think rendering only.
+- Render mapped categories with bounded percentages and no `NaN`.
+- Translate canonical levels to user-facing labels/helpers.
+- Render `unknown` and `needs_review` with professional UX writing and no internal jargon.
+- Keep old snapshot compatibility and safe omission/fallback if the field is missing.
+
+### Slice 3 — Visual and no-leak verifier
+
+- Extend `/Users/jreye/Documents/efeonce-think/scripts/verify-report.mjs` or add a focused verifier for category states.
+- Assert raw backend labels do not appear.
+- Assert category rows only appear when backend data supports them.
+- Assert no horizontal page overflow at 1440/1280/390.
+- Capture mapped and unknown states for review.
+
+### Slice 4 — Backend integration proof
+
+- Test against a real Greenhouse API response that currently returns `unknown`.
+- When TASK-1333 provides a mapped real token, verify the same renderer displays mapped rows without code changes.
+- Document the exact token/test route used for smoke without exposing sensitive tokens in public docs.
+
+## Out of Scope
+
+- No backend changes; TASK-1333 owns category signal generation.
+- No icon library migration; TASK-1332 owns that.
+- No short-link changes; TASK-1330 owns that.
+- No scoring, probes, normalizer, provider adapter or `ReportArtifactModel` derivation changes.
+- No production deploy without explicit operator confirmation.
+
+## Detailed Spec
+
+### Renderer states
+
+| Backend state | Think behavior |
+|---|---|
+| `mapped` + categories | Show section, primary summary, row list, counts/shares and helpers. |
+| `mapped` + empty categories | Degrade to unknown/coverage; do not show empty row list. |
+| `needs_review` | Show cautious state or compact review panel; no raw `ambiguous` label. |
+| `unknown` | Show honest coverage/empty state or omit only if report flow remains coherent. |
+| missing field | Legacy fallback; no crash. |
+| malformed counts | Clamp/bound display; no `NaN`, no negative widths. |
+
+### Copy guardrails
+
+- Use user-facing language: categoria, industria, sector, oferta, caso de uso, mercado, comprador.
+- Avoid internal language: canonical signals, taxonomy nodes, ambiguousCount, unmappedCount, mid_category, service_line.
+- Avoid overclaiming: say the AI "tiende a encuadrar" or "asocia", not that it "define" the brand.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 (fixture matrix) -> Slice 2 (renderer hardening) -> Slice 3 (visual/no-leak verifier) -> Slice 4 (backend integration proof).
+- Slice 2 MUST use exact backend-shaped fixtures from Slice 1.
+- Slice 4 mapped-real proof may wait for TASK-1333 if production currently has only `unknown`.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Think fixture drifts from Greenhouse payload | UI/API contract | medium | derive fixtures from real API samples and route-contract docs | verifier passes mock but fails real token |
+| Section fabricates category for unknown data | public report | low | explicit assertion no rows for unknown | visible fake rows |
+| Raw internal labels leak | public report | medium | forbidden-string assertions | verifier detects raw labels |
+| Mobile overflow from long labels/counts | UI | medium | 390px scroll-width checks and wrapping | scrollWidth > clientWidth |
+| Backend later adds mapped data but UI misreads it | UI/API contract | medium | TASK-1333 integration proof with real mapped token | mapped token still shows empty state |
+
+### Feature flags / cutover
+
+- Sin flag — Think renderer-only change.
+- Deployment to production is the Think Vercel deployment and requires explicit operator confirmation.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1 | Remove/update fixtures/docs. | <10 min | si |
+| Slice 2 | Revert renderer changes in `[token].astro`. | <30 min | si |
+| Slice 3 | Revert verifier changes. | <15 min | si |
+| Slice 4 | Stop rollout or revert Think deploy. | <30 min | si |
+
+### Production verification sequence
+
+1. Run Think `pnpm type-check` and `pnpm build`.
+2. Run local category verifier for mapped/unknown/legacy fixtures.
+3. Test a real Greenhouse token with current payload.
+4. After TASK-1333 maps a real token, smoke the same renderer with mapped backend data.
+5. With explicit approval, push/deploy Think and verify production URL.
+
+### Out-of-band coordination required
+
+- N/A for code implementation.
+- Production deploy requires operator approval.
+- Real mapped token proof may depend on TASK-1333 runtime work.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     "Como compruebo que termine y que actualizo?"
+     El agente ejecuta estos checks al cerrar cada slice y
+     al cerrar la task completa.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] Se declaro `Execution profile: ui-ux` y `UI impact: layout`.
+- [ ] `UI ready` queda `yes` porque wireframe y UI/UX contract tienen implementation mapping, GVC scenario plan y design decision log.
+- [ ] Se declaro `Wireframe: docs/ui/wireframes/TASK-1334-think-category-perception-renderer-contract.md` y el archivo existe.
+- [ ] Think renders `mapped`, `unknown`, `needs_review` and legacy/partial category states without crashing.
+- [ ] Think does not derive, infer or mock production category facts locally.
+- [ ] Raw backend/internal labels do not appear in visible report.
+- [ ] Counts/shares are bounded; no `NaN`, negative progress widths or empty rows.
+- [ ] Desktop/laptop/mobile captures show no horizontal page overflow.
+- [ ] A real Greenhouse `unknown` payload renders an honest state.
+- [ ] When a real mapped token exists from TASK-1333, the same renderer shows the mapped section without code changes.
+
+## Verification
+
+- `pnpm task:lint --task TASK-1334`
+- `pnpm ui:wireframe-check --task TASK-1334`
+- `pnpm ui:readiness-check --task TASK-1334`
+- `pnpm ops:lint --changed`
+- `pnpm docs:closure-check`
+- In `/Users/jreye/Documents/efeonce-think`: `pnpm type-check`
+- In `/Users/jreye/Documents/efeonce-think`: `pnpm build`
+- Think-local Playwright/verifier for category states at 1440/1280/390
+
+## Closing Protocol
+
+- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [ ] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado con el cierre
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento visible del reporte
+- [ ] `/Users/jreye/Documents/efeonce-think/src/components/primitives/README.md` o docs del hub se actualizan si queda un nuevo patrón renderer
+- [ ] se ejecuto chequeo de impacto cruzado sobre TASK-1331, TASK-1332, TASK-1333 y TASK-1330
+
+## Follow-ups
+
+- Si TASK-1333 cambia o amplía el contrato backend, actualizar fixtures/verifier de TASK-1334 en el mismo ciclo.
+- Si la sección se reutiliza en otros lead magnets, extraer una primitive Think separada con task propia.
+
+## Open Questions
+
+- Confirmar durante implementación si `needs_review` debe ser visible o si se degrada a un estado de cobertura más neutro.
+- Confirmar si el section number `06` debe permanecer fijo o derivarse del orden real del reporte si aparecen secciones condicionales nuevas.
