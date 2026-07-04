@@ -7,7 +7,11 @@ import { FormRenderer } from '../renderer'
 import { conditionalContractFixture, multiStepContractFixture, staticContractFixture } from '../fixtures'
 import { resetTurnstileLoaderForTests } from '../turnstile'
 
-const api: RendererApiConfig = { baseUrl: 'https://gh.test', slug: 'ai-visibility-intake', surfaceId: 'wordpress-public' }
+const api: RendererApiConfig = {
+  baseUrl: 'https://gh.test',
+  slug: 'ai-visibility-intake',
+  surfaceId: 'wordpress-public'
+}
 
 const okFetch = (outcome = 'accepted', submissionId = 'sub_1') =>
   vi.fn(async () => new Response(JSON.stringify({ outcome, submissionId }), { status: 202 })) as unknown as typeof fetch
@@ -68,7 +72,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
       api,
       fetchImpl: okFetch(),
       doc: document,
-      hosted: true,
+      hosted: true
     })
 
     renderer.mount()
@@ -163,8 +167,8 @@ describe('growth-forms-renderer · FormRenderer', () => {
     const contract = staticContractFixture({
       successBehavior: {
         kind: 'tokenized_report',
-        tokenizedReport: { statusPathTemplate: '/api/public/growth/ai-visibility/run/{handle}' },
-      },
+        tokenizedReport: { statusPathTemplate: '/api/public/growth/ai-visibility/run/{handle}' }
+      }
     })
 
     const { root } = mountInto(contract, fetchImpl)
@@ -181,7 +185,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
       success_behavior: 'tokenized_report',
       correlation_id: 'fsub-abc-123',
       run_handle: 'fsub-abc-123',
-      status_url: 'https://gh.test/api/public/growth/ai-visibility/run/fsub-abc-123',
+      status_url: 'https://gh.test/api/public/growth/ai-visibility/run/fsub-abc-123'
     })
     // Nunca fuga PII ni reportToken en el handoff.
     expect(JSON.stringify(accepted[0].detail)).not.toContain('lead@brand.com')
@@ -223,7 +227,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
         'success.title': 'Recibimos tu diagnóstico',
         'success.body': 'Tu solicitud quedó registrada. Revisaremos las señales públicas de tu marca.',
         'success.step.review': 'Validamos la información enviada.',
-        'success.step.next': 'Preparamos el siguiente paso.',
+        'success.step.next': 'Preparamos el siguiente paso.'
       },
       successBehavior: {
         kind: 'review_pending',
@@ -231,8 +235,8 @@ describe('growth-forms-renderer · FormRenderer', () => {
         titleCopyRef: 'success.title',
         bodyCopyRef: 'success.body',
         steps: [{ copyRef: 'success.step.review' }, { copyRef: 'success.step.next' }],
-        supportingNote: 'Confirmamos recepción; la entrega a sistemas externos ocurre después.',
-      },
+        supportingNote: 'Confirmamos recepción; la entrega a sistemas externos ocurre después.'
+      }
     })
 
     const { root } = mountInto(contract)
@@ -275,18 +279,18 @@ describe('growth-forms-renderer · FormRenderer', () => {
             kind: 'download',
             label: 'Descargar ebook',
             href: 'https://efeoncepro.com/recursos/aeo.pdf',
-            target: '_blank',
-          },
+            target: '_blank'
+          }
         },
         actions: [
           {
             kind: 'schedule',
             label: 'Agenda una reunión',
             href: 'https://efeoncepro.com/contacto/',
-            target: '_self',
-          },
-        ],
-      },
+            target: '_self'
+          }
+        ]
+      }
     })
 
     const { root } = mountInto(contract)
@@ -305,7 +309,9 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(rewardAction.textContent).toBe('Descargar ebook')
     expect(rewardAction.getAttribute('target')).toBe('_blank')
     expect(rewardAction.getAttribute('rel')).toBe('noopener noreferrer')
-    expect(root.querySelector('[data-capture="growth-form-success-actions"]')?.textContent).toContain('Agenda una reunión')
+    expect(root.querySelector('[data-capture="growth-form-success-actions"]')?.textContent).toContain(
+      'Agenda una reunión'
+    )
     expect(root.querySelector('.ghf-success-card__action .ghf-success-card__action-icon svg')).not.toBeNull()
 
     rewardAction.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
@@ -313,13 +319,13 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(actionEvents[0].detail).toMatchObject({
       event: 'gh_form_success_action_clicked',
       action_kind: 'download',
-      reward_kind: 'ebook',
+      reward_kind: 'ebook'
     })
     expect(assetEvents[0].detail).toMatchObject({
       event: 'gh_form_asset_accessed',
       success_behavior: 'asset_access',
       action_kind: 'download',
-      reward_kind: 'ebook',
+      reward_kind: 'ebook'
     })
     expect(JSON.stringify(actionEvents[0].detail)).not.toContain('lead@brand.com')
     expect(JSON.stringify(actionEvents[0].detail)).not.toContain('submissionId')
@@ -332,8 +338,8 @@ describe('growth-forms-renderer · FormRenderer', () => {
         presentation: 'success_card',
         title: 'Solicitud recibida',
         body: 'Tu informe va en camino.',
-        steps: [],
-      },
+        steps: []
+      }
     })
 
     const { root } = mountInto(contract)
@@ -373,20 +379,22 @@ describe('growth-forms-renderer · FormRenderer', () => {
   })
 
   it('keeps contract-provided blank select placeholders as the first option', () => {
-    const { root } = mountInto(staticContractFixture({
-      fields: [
-        {
-          key: 'country',
-          type: 'select',
-          label: 'País',
-          options: [
-            { value: '', label: 'Selecciona país' },
-            { value: 'CL', label: 'Chile' },
-          ],
-        },
-      ],
-      consent: undefined,
-    }))
+    const { root } = mountInto(
+      staticContractFixture({
+        fields: [
+          {
+            key: 'country',
+            type: 'select',
+            label: 'País',
+            options: [
+              { value: '', label: 'Selecciona país' },
+              { value: 'CL', label: 'Chile' }
+            ]
+          }
+        ],
+        consent: undefined
+      })
+    )
 
     const select = root.querySelector<HTMLSelectElement>('[name="country"]')!
 
@@ -395,22 +403,24 @@ describe('growth-forms-renderer · FormRenderer', () => {
   })
 
   it('renders premium selects as an accessible custom listbox instead of the native popup', () => {
-    const { root } = mountInto(staticContractFixture({
-      styleVariant: 'diagnostic_premium',
-      fields: [
-        {
-          key: 'companySize',
-          type: 'select',
-          label: 'Tamaño de empresa',
-          options: [
-            { value: '', label: 'Selecciona tamaño' },
-            { value: '1-10', label: '1 - 10' },
-            { value: '11-50', label: '11 - 50' },
-          ],
-        },
-      ],
-      consent: undefined,
-    }))
+    const { root } = mountInto(
+      staticContractFixture({
+        styleVariant: 'diagnostic_premium',
+        fields: [
+          {
+            key: 'companySize',
+            type: 'select',
+            label: 'Tamaño de empresa',
+            options: [
+              { value: '', label: 'Selecciona tamaño' },
+              { value: '1-10', label: '1 - 10' },
+              { value: '11-50', label: '11 - 50' }
+            ]
+          }
+        ],
+        consent: undefined
+      })
+    )
 
     const trigger = root.querySelector<HTMLButtonElement>('[name="companySize"].ghf-select-trigger')!
     const list = root.querySelector<HTMLElement>('.ghf-select-list')!
@@ -436,22 +446,25 @@ describe('growth-forms-renderer · FormRenderer', () => {
   it('initializes required selects without a blank option to the displayed first option', async () => {
     const fetchImpl = okFetch()
 
-    const { root } = mountInto(staticContractFixture({
-      styleVariant: 'diagnostic_premium',
-      fields: [
-        {
-          key: 'analysisLanguage',
-          type: 'select',
-          label: 'Idioma del análisis',
-          required: true,
-          options: [
-            { value: 'es-CL', label: 'Español (Chile / LatAm)' },
-            { value: 'en-US', label: 'English (US)' },
-          ],
-        },
-      ],
-      consent: undefined,
-    }), fetchImpl)
+    const { root } = mountInto(
+      staticContractFixture({
+        styleVariant: 'diagnostic_premium',
+        fields: [
+          {
+            key: 'analysisLanguage',
+            type: 'select',
+            label: 'Idioma del análisis',
+            required: true,
+            options: [
+              { value: 'es-CL', label: 'Español (Chile / LatAm)' },
+              { value: 'en-US', label: 'English (US)' }
+            ]
+          }
+        ],
+        consent: undefined
+      }),
+      fetchImpl
+    )
 
     const trigger = root.querySelector<HTMLButtonElement>('[name="analysisLanguage"].ghf-select-trigger')!
 
@@ -469,11 +482,13 @@ describe('growth-forms-renderer · FormRenderer', () => {
   })
 
   it('uses contract-provided field required copy when present', () => {
-    const { root } = mountInto(staticContractFixture({
-      fields: [{ key: 'firstName', type: 'text', label: 'Nombre', required: true }],
-      copy: { 'firstName.error.required': 'Escribe tu nombre para personalizar el diagnóstico.' },
-      consent: undefined,
-    }))
+    const { root } = mountInto(
+      staticContractFixture({
+        fields: [{ key: 'firstName', type: 'text', label: 'Nombre', required: true }],
+        copy: { 'firstName.error.required': 'Escribe tu nombre para personalizar el diagnóstico.' },
+        consent: undefined
+      })
+    )
 
     root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
 
@@ -481,37 +496,112 @@ describe('growth-forms-renderer · FormRenderer', () => {
   })
 
   it('keeps short fields and selects paired while long intent fields span the form', () => {
-    const { root } = mountInto(staticContractFixture({
-      fields: [
-        { key: 'firstName', type: 'text', label: 'Nombre', maxLength: 120 },
-        { key: 'email', type: 'email', label: 'Email' },
-        { key: 'brandWebsite', type: 'url', label: 'Marca / sitio web', maxLength: 240 },
-        { key: 'country', type: 'select', label: 'País', options: [{ value: '', label: 'Selecciona país' }] },
-        { key: 'mainCompetitor', type: 'text', label: 'Principal competidor', maxLength: 200 },
-      ],
-      consent: undefined,
-    }))
+    const { root } = mountInto(
+      staticContractFixture({
+        fields: [
+          { key: 'firstName', type: 'text', label: 'Nombre', maxLength: 120 },
+          { key: 'email', type: 'email', label: 'Email' },
+          { key: 'brandWebsite', type: 'url', label: 'Marca / sitio web', maxLength: 240 },
+          { key: 'country', type: 'select', label: 'País', options: [{ value: '', label: 'Selecciona país' }] },
+          { key: 'mainCompetitor', type: 'text', label: 'Principal competidor', maxLength: 200 }
+        ],
+        consent: undefined
+      })
+    )
 
-    expect(root.querySelector('[name="firstName"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(false)
-    expect(root.querySelector('[name="email"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(false)
-    expect(root.querySelector('[name="brandWebsite"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(true)
-    expect(root.querySelector('[name="country"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(false)
-    expect(root.querySelector('[name="mainCompetitor"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(true)
+    expect(root.querySelector('[name="firstName"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(
+      false
+    )
+    expect(root.querySelector('[name="email"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(
+      false
+    )
+    expect(
+      root.querySelector('[name="brandWebsite"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')
+    ).toBe(true)
+    expect(root.querySelector('[name="country"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')).toBe(
+      false
+    )
+    expect(
+      root.querySelector('[name="mainCompetitor"]')?.closest('.ghf-field')?.classList.contains('ghf-field--full')
+    ).toBe(true)
   })
 
   it('multi_step_light advances per step and preserves data going back', () => {
     const { root } = mountInto(multiStepContractFixture())
 
-    expect(root.querySelector('.ghf-progress')?.textContent).toBe('Paso 1 de 2')
+    expect(root.querySelector('.ghf-progress')?.textContent).toContain('Paso 1 de 2')
+    expect(root.querySelector('.ghf-progress')?.textContent).toContain('2 pasos breves')
+    expect(root.querySelector('.ghf-stepper')?.getAttribute('aria-label')).toBe('Progreso del formulario')
+    expect(root.querySelector('[aria-current="step"]')?.textContent).toContain('Contacto')
     root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'a@b.com'
     root.querySelector<HTMLInputElement>('[name="work_email"]')!.dispatchEvent(new Event('input'))
 
     root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
-    expect(root.querySelector('.ghf-progress')?.textContent).toBe('Paso 2 de 2')
+    expect(root.querySelector('.ghf-progress')?.textContent).toContain('Paso 2 de 2')
 
     // Atrás preserva el dato del paso 1.
     root.querySelector<HTMLButtonElement>('.ghf-btn--ghost')!.click()
     expect(root.querySelector<HTMLInputElement>('[name="work_email"]')!.value).toBe('a@b.com')
+  })
+
+  it('renders a non-PII intake summary for multi-step forms', () => {
+    const { root } = mountInto(multiStepContractFixture())
+
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'lead@brand.com'
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.dispatchEvent(new Event('input'))
+
+    const summary = root.querySelector('.ghf-intake-summary')!
+
+    expect(summary.textContent).toContain('Vista previa del informe')
+    expect(summary.textContent).toContain('Contacto: listo')
+    expect(summary.textContent).not.toContain('lead@brand.com')
+  })
+
+  it('lets users skip an optional middle step without validating empty optional fields', () => {
+    const { root } = mountInto(
+      staticContractFixture({
+        composition: 'multi_step_light',
+        fields: [
+          { key: 'work_email', type: 'email', label: 'Correo', required: true, autocomplete: 'email' },
+          { key: 'competitors', type: 'textarea', label: 'Competidores' },
+          { key: 'brand', type: 'text', label: 'Marca', required: true }
+        ],
+        steps: [
+          { key: 's1', label: 'Contacto', fieldKeys: ['work_email'] },
+          { key: 's2', label: 'Contexto opcional', fieldKeys: ['competitors'] },
+          { key: 's3', label: 'Marca', fieldKeys: ['brand'] }
+        ],
+        consent: undefined
+      })
+    )
+
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'lead@brand.com'
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.dispatchEvent(new Event('input'))
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    expect(root.querySelector('.ghf-progress')?.textContent).toContain('Paso 2 de 3')
+    expect(root.querySelector('[data-ghf-primary]')?.textContent).toContain('Continuar con este contexto')
+
+    root.querySelector<HTMLButtonElement>('.ghf-btn--skip')!.click()
+
+    expect(root.querySelector('.ghf-progress')?.textContent).toContain('Paso 3 de 3')
+    expect(root.querySelector('.ghf-error')).toBeNull()
+  })
+
+  it('uses a native disabled state while a valid submit is pending', () => {
+    const pendingFetch = vi.fn(() => new Promise<Response>(() => undefined)) as unknown as typeof fetch
+    const { root } = mountInto(staticContractFixture({ consent: undefined }), pendingFetch)
+
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'lead@brand.com'
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.dispatchEvent(new Event('input'))
+    root.querySelector<HTMLInputElement>('[name="brand"]')!.value = 'Brand'
+    root.querySelector<HTMLInputElement>('[name="brand"]')!.dispatchEvent(new Event('input'))
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    const primary = root.querySelector<HTMLButtonElement>('[data-ghf-primary]')!
+
+    expect(primary.disabled).toBe(true)
+    expect(primary.getAttribute('aria-disabled')).toBe('true')
   })
 
   it('does not submit when honeypot would be filled by a bot (still posts; server rejects)', async () => {
@@ -645,15 +735,24 @@ describe('growth-forms-renderer · FormRenderer', () => {
         quality: 'verified',
         suggestion: null,
         reasonCode: null,
-        ...over,
+        ...over
       }),
-      { status: 200 },
+      { status: 200 }
     )
 
   const gatedContract = () =>
     staticContractFixture({
-      fields: [{ key: 'work_email', type: 'email', label: 'Correo', required: true, validator: 'corporate_email', autocomplete: 'email' }],
-      consent: undefined,
+      fields: [
+        {
+          key: 'work_email',
+          type: 'email',
+          label: 'Correo',
+          required: true,
+          validator: 'corporate_email',
+          autocomplete: 'email'
+        }
+      ],
+      consent: undefined
     })
 
   const typeEmailAndBlur = (root: HTMLElement, value: string) => {
@@ -671,7 +770,10 @@ describe('growth-forms-renderer · FormRenderer', () => {
       resolveVerify = resolve
     })
 
-    const { root } = mountInto(gatedContract(), routingFetch(() => pending))
+    const { root } = mountInto(
+      gatedContract(),
+      routingFetch(() => pending)
+    )
 
     typeEmailAndBlur(root, 'ana@empresa.com')
 
@@ -687,7 +789,10 @@ describe('growth-forms-renderer · FormRenderer', () => {
   })
 
   it('degrades honest when /verify-email is disabled (flag OFF, 404): no trap', async () => {
-    const { root } = mountInto(gatedContract(), routingFetch(() => new Response(JSON.stringify({ outcome: 'disabled' }), { status: 404 })))
+    const { root } = mountInto(
+      gatedContract(),
+      routingFetch(() => new Response(JSON.stringify({ outcome: 'disabled' }), { status: 404 }))
+    )
 
     typeEmailAndBlur(root, 'ana@empresa.com')
     await flush()
@@ -701,7 +806,14 @@ describe('growth-forms-renderer · FormRenderer', () => {
   it('blocks a corporate-gated field when the verdict says not corporate + offers typo-suggest', async () => {
     const { root } = mountInto(
       gatedContract(),
-      routingFetch(() => okVerdict({ isCorporate: false, quality: 'suspect', reasonCode: 'email_not_corporate', suggestion: 'ana@empresa.com' })),
+      routingFetch(() =>
+        okVerdict({
+          isCorporate: false,
+          quality: 'suspect',
+          reasonCode: 'email_not_corporate',
+          suggestion: 'ana@empresa.com'
+        })
+      )
     )
 
     typeEmailAndBlur(root, 'ana@gmial.com')
@@ -720,12 +832,19 @@ describe('growth-forms-renderer · FormRenderer', () => {
   it('does not block a non-gated email field even if the verdict is not corporate (advisory only)', async () => {
     const contract = staticContractFixture({
       fields: [{ key: 'work_email', type: 'email', label: 'Correo', required: true, autocomplete: 'email' }],
-      consent: undefined,
+      consent: undefined
     })
 
     const { root } = mountInto(
       contract,
-      routingFetch(() => okVerdict({ isCorporate: false, quality: 'suspect', reasonCode: 'email_not_corporate', suggestion: 'ana@gmail.com' })),
+      routingFetch(() =>
+        okVerdict({
+          isCorporate: false,
+          quality: 'suspect',
+          reasonCode: 'email_not_corporate',
+          suggestion: 'ana@gmail.com'
+        })
+      )
     )
 
     typeEmailAndBlur(root, 'ana@gmail.com')
@@ -809,15 +928,15 @@ describe('growth-forms-renderer · FormRenderer', () => {
     // Sembrar un borrador con correo (no-PII regulada) + cédula (PII regulada).
     window.localStorage.setItem(
       'ghf-draft:ai-visibility-intake:fv_demo_1',
-      JSON.stringify({ savedAt: Date.now(), values: { work_email: 'vuelta@empresa.com', national_id: '123456785' } }),
+      JSON.stringify({ savedAt: Date.now(), values: { work_email: 'vuelta@empresa.com', national_id: '123456785' } })
     )
 
     const contract = staticContractFixture({
       fields: [
         { key: 'work_email', type: 'email', label: 'Correo', required: true, autocomplete: 'email' },
-        { key: 'national_id', type: 'national_id', label: 'RUT', validatorParams: { country: 'CL' } },
+        { key: 'national_id', type: 'national_id', label: 'RUT', validatorParams: { country: 'CL' } }
       ],
-      consent: undefined,
+      consent: undefined
     })
 
     const { root } = mountInto(contract)
@@ -835,7 +954,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
     staticContractFixture({
       fields: [
         { key: 'work_email', type: 'email', label: 'Correo', required: true, autocomplete: 'email' },
-        { key: 'brand', type: 'text', label: 'Marca', required: true },
+        { key: 'brand', type: 'text', label: 'Marca', required: true }
       ],
       consent: undefined,
       security: {
@@ -844,9 +963,9 @@ describe('growth-forms-renderer · FormRenderer', () => {
           required: true,
           mode: 'invisible',
           siteKey: 'site-key-public',
-          execution: 'submit',
-        },
-      },
+          execution: 'submit'
+        }
+      }
     })
 
   const fillCaptchaContract = (root: HTMLElement) => {
@@ -887,7 +1006,9 @@ describe('growth-forms-renderer · FormRenderer', () => {
     root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
     await vi.waitFor(() => expect(root.querySelector('[role="status"]')?.textContent).toContain('Listo'))
 
-    const body = JSON.parse((fetchImpl as unknown as { mock: { calls: Array<[string, { body: string }]> } }).mock.calls[0][1].body)
+    const body = JSON.parse(
+      (fetchImpl as unknown as { mock: { calls: Array<[string, { body: string }]> } }).mock.calls[0][1].body
+    )
 
     expect(body.captchaToken).toBe('captcha-token')
     expect(turnstile.render).toHaveBeenCalledTimes(1)
@@ -909,7 +1030,11 @@ describe('growth-forms-renderer · FormRenderer', () => {
 
   it('reuses the same Turnstile widget across failed submit retries', async () => {
     const turnstile = installTurnstile()
-    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ outcome: 'invalid' }), { status: 400 })) as unknown as typeof fetch
+
+    const fetchImpl = vi.fn(
+      async () => new Response(JSON.stringify({ outcome: 'invalid' }), { status: 400 })
+    ) as unknown as typeof fetch
+
     const { root } = mountInto(captchaContract(), fetchImpl)
 
     fillCaptchaContract(root)

@@ -24,7 +24,7 @@ import {
   getFormDefinitionByKey,
   getPublishedVersionBySlug,
   listDestinationsForVersion,
-  listHostSurfaces,
+  listHostSurfaces
 } from '@/lib/growth/forms/store'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
 import { preserveFormVersionFields } from '../lib/preserve-form-version-fields'
@@ -44,18 +44,18 @@ const STEPS = [
   {
     key: 'brand',
     label: 'Tu marca',
-    fieldKeys: ['brandName', 'websiteUrl', 'market', 'locale', 'category'],
+    fieldKeys: ['brandName', 'websiteUrl', 'market', 'locale', 'category']
   },
   {
     key: 'context',
-    label: 'Contexto competitivo',
-    fieldKeys: ['competitorsDeclared', 'industry', 'persona', 'companySize', 'mainChallenge'],
+    label: 'Contexto opcional',
+    fieldKeys: ['competitorsDeclared', 'industry', 'persona', 'companySize', 'mainChallenge']
   },
   {
     key: 'contact',
-    label: 'Tus datos',
-    fieldKeys: ['firstName', 'lastName', 'email', 'consent'],
-  },
+    label: 'Envío del informe',
+    fieldKeys: ['firstName', 'lastName', 'email', 'consent']
+  }
 ] as const
 
 const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
@@ -63,18 +63,18 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
     label: 'Nombre de la marca',
     placeholder: 'ej. Efeonce',
     autocomplete: 'organization',
-    maxLength: 120,
+    maxLength: 120
   },
   websiteUrl: {
     label: 'Sitio web',
     placeholder: 'ej. https://tuempresa.com',
     autocomplete: 'url',
-    inputMode: 'url',
+    inputMode: 'url'
   },
   market: {
     label: 'Mercado principal',
-    placeholder: 'ej. Chile, Mexico, LatAm',
-    maxLength: 80,
+    placeholder: 'ej. Chile, Mexico, LatAm B2B',
+    maxLength: 80
   },
   locale: {
     type: 'select',
@@ -82,76 +82,84 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
     placeholder: 'Selecciona idioma/region',
     options: [
       { value: 'es-CL', label: 'Espanol (Chile / LatAm)' },
-      { value: 'en-US', label: 'Ingles (Estados Unidos)' },
-    ],
+      { value: 'en-US', label: 'Ingles (Estados Unidos)' }
+    ]
   },
   category: {
     label: 'Categoria donde compites',
-    placeholder: 'ej. Agencia de crecimiento, banca, retail',
-    maxLength: 140,
+    placeholder: 'ej. banca, retail, educacion superior',
+    maxLength: 140
   },
   competitorsDeclared: {
     type: 'textarea',
     label: 'Competidores de referencia',
-    placeholder: 'ej. Marca A, Marca B, Marca C',
-    maxLength: 280,
+    placeholder: 'ej. competidor regional, alternativa local, referente global',
+    maxLength: 280
   },
   firstName: {
     label: 'Nombre',
     autocomplete: 'given-name',
-    maxLength: 80,
+    maxLength: 80
   },
   lastName: {
     label: 'Apellido',
     autocomplete: 'family-name',
-    maxLength: 80,
+    maxLength: 80
   },
   email: {
     label: 'Correo corporativo',
     placeholder: 'nombre@empresa.com',
     autocomplete: 'email',
     inputMode: 'email',
-    validator: 'corporate_email',
+    validator: 'corporate_email'
   },
   industry: {
     label: 'Industria',
     placeholder: 'ej. Servicios profesionales, tecnologia, retail',
-    maxLength: 120,
+    maxLength: 120
   },
   persona: {
     label: 'Rol o comprador principal',
     placeholder: 'ej. CMO, founder, gerente comercial',
-    maxLength: 120,
+    maxLength: 120
   },
   companySize: {
     label: 'Tamano de empresa',
     placeholder: 'ej. 51-200 personas',
-    maxLength: 80,
+    maxLength: 80
   },
   mainChallenge: {
     label: 'Que quieres entender o mejorar',
-    placeholder: 'Cuéntanos brevemente que te interesa revisar en la visibilidad de tu marca.',
-    maxLength: 500,
+    placeholder: 'ej. Entender por que mi marca aparece poco en respuestas de IA.',
+    maxLength: 500
   },
   consent: {
-    label: 'Acepto que Efeonce use estos datos para generar y enviarme mi informe.',
-  },
+    label: 'Acepto que Efeonce use estos datos para generar y enviarme mi informe.'
+  }
 }
 
 const COPY_UPDATES: Record<string, string> = {
-  submit: 'Generar mi analisis',
+  submit: 'Generar mi informe',
   'brandName.help': 'Usamos este nombre para buscar menciones y variaciones de tu marca.',
   'websiteUrl.help': 'Opcional, pero ayuda a leer citabilidad y operabilidad del sitio correcto.',
-  'market.help': 'Define el contexto donde la IA deberia entender y comparar tu marca.',
+  'market.help': 'Define el territorio donde la IA deberia entender, citar y comparar tu marca.',
   'locale.help': 'Ajusta el idioma base de lectura del reporte.',
-  'category.help': 'Ayuda a interpretar la categoria correcta, no a forzar un resultado.',
-  'competitorsDeclared.help': 'Opcional: escribe 1 a 3 marcas para orientar la comparacion.',
+  'category.help': 'Ayuda a interpretar la categoria correcta sin forzar un resultado.',
+  'competitorsDeclared.help': 'Opcional: escribe 1 a 3 marcas. Si no las tienes claras, puedes omitir este paso.',
   'email.help': 'Usa tu correo corporativo para recibir y recuperar el informe.',
   'mainChallenge.help': 'Opcional: una frase basta. Evita informacion sensible.',
+  'brandName.error.required': 'Escribe el nombre de la marca para iniciar el analisis.',
+  'market.error.required': 'Indica el mercado donde quieres evaluar la visibilidad.',
+  'locale.error.required': 'Elige el idioma base del informe.',
+  'category.error.required': 'Describe la categoria donde compite tu marca.',
+  'firstName.error.required': 'Escribe tu nombre para identificar la solicitud.',
+  'lastName.error.required': 'Escribe tu apellido para completar tus datos.',
+  'email.error.required': 'Escribe tu correo corporativo para recibir y recuperar el informe.',
+  'consent.error.required': 'Acepta el uso de datos para generar tu informe.'
 }
 
 const SUCCESS_MESSAGE =
-  'Recibimos tu solicitud. Estamos preparando el analisis para mostrarte el reporte en pantalla.'
+  'Solicitud recibida. Estamos consultando motores, citabilidad y contexto competitivo para preparar tu informe en pantalla.'
 
 const asObject = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
@@ -232,14 +240,14 @@ const withPremiumCopy = (copyRefs: unknown): Record<string, unknown> => {
 const withPremiumUiPolicy = (uiPolicy: unknown): Record<string, unknown> => ({
   ...asObject(uiPolicy),
   composition: 'multi_step_light',
-  steps: STEPS,
+  steps: STEPS
 })
 
 const withTokenizedSuccess = (successBehavior: unknown): Record<string, unknown> => ({
   ...asObject(successBehavior),
   kind: 'tokenized_report',
   message: SUCCESS_MESSAGE,
-  tokenizedReport: { statusPathTemplate: STATUS_PATH_TEMPLATE },
+  tokenizedReport: { statusPathTemplate: STATUS_PATH_TEMPLATE }
 })
 
 const main = async (): Promise<void> => {
@@ -298,11 +306,15 @@ const main = async (): Promise<void> => {
   console.log(`  style_variant objetivo: ${STYLE_VARIANT}`)
   console.log(`  composition actual    : ${asObject(current.ui_policy_json).composition ?? 'static'}`)
   console.log('  composition objetivo  : multi_step_light')
-  console.log(`  campos                : ${Array.isArray(current.field_schema_json) ? current.field_schema_json.length : 0}`)
+  console.log(
+    `  campos                : ${Array.isArray(current.field_schema_json) ? current.field_schema_json.length : 0}`
+  )
   console.log(`  destinos              : ${destinations.length}`)
 
   if (alreadyPremium) {
-    console.log('\nIdempotente: la version publicada vigente ya expone el contrato premium/progresivo del grader. Nada que hacer.')
+    console.log(
+      '\nIdempotente: la version publicada vigente ya expone el contrato premium/progresivo del grader. Nada que hacer.'
+    )
 
     return
   }
@@ -336,7 +348,7 @@ const main = async (): Promise<void> => {
     uiPolicy: nextUiPolicy,
     styleVariant: STYLE_VARIANT,
     successBehavior: nextSuccess,
-    createdBy: 'task-1327-grader-premium-intake-activation',
+    createdBy: 'task-1327-grader-premium-intake-activation'
   })
 
   console.log(`\nDraft creado: ${formVersionId}`)
@@ -351,7 +363,7 @@ const main = async (): Promise<void> => {
       deliveryMode: destination.delivery_mode,
       mapping: destination.mapping_json,
       consentRequirements: destination.consent_requirements_json,
-      retryPolicy: destination.retry_policy_json,
+      retryPolicy: destination.retry_policy_json
     })
 
     console.log(`Destino copiado: ${destination.destination_id} -> ${copied.destination_id}`)

@@ -17,7 +17,7 @@ import type {
   RendererSuccessCardAction,
   RendererSuccessCardReward,
   RendererSuccessCardStep,
-  RendererStep,
+  RendererStep
 } from './contract'
 import { isFieldRequired, isFieldVisible, type FieldValues } from './conditions'
 import {
@@ -27,7 +27,7 @@ import {
   parseE164,
   PHONE_COUNTRIES,
   stripNationalDigits,
-  toE164,
+  toE164
 } from './mask'
 import { resolveSystemCopy, type RendererSystemCopy } from './copy'
 import { validateField, validateFields, type FieldErrors } from './validation'
@@ -66,7 +66,7 @@ const el = <K extends keyof HTMLElementTagNameMap>(
   doc: Document,
   tag: K,
   attrs: Record<string, string> = {},
-  text?: string,
+  text?: string
 ): HTMLElementTagNameMap[K] => {
   const node = doc.createElement(tag)
 
@@ -149,7 +149,7 @@ export class FormRenderer {
       locale: this.contract.form.locale,
       ...(this.contract.surfacePolicy.surfaceId ? { surface_id: this.contract.surfacePolicy.surfaceId } : {}),
       ...(this.pageContext.pageUri ? { page_uri: this.pageContext.pageUri } : {}),
-      ...(this.pageContext.pageName ? { page_name: this.pageContext.pageName } : {}),
+      ...(this.pageContext.pageName ? { page_name: this.pageContext.pageName } : {})
     }
 
     this.telemetry = createTelemetryEmitter(opts.root, this.contract.telemetryPolicy, base)
@@ -159,7 +159,11 @@ export class FormRenderer {
         this.values[field.key] = false
       } else if (field.type === 'multiselect') {
         this.values[field.key] = []
-      } else if (field.type === 'select' && field.required && !(field.options?.some(option => option.value === '') ?? false)) {
+      } else if (
+        field.type === 'select' &&
+        field.required &&
+        !(field.options?.some(option => option.value === '') ?? false)
+      ) {
         this.values[field.key] = field.options?.[0]?.value ?? ''
       } else {
         this.values[field.key] = ''
@@ -251,9 +255,7 @@ export class FormRenderer {
     const steps = this.steps
 
     if (steps) {
-      form.appendChild(
-        el(this.doc, 'p', { class: 'ghf-progress', 'aria-live': 'polite' }, this.copy.stepProgress(this.currentStep + 1, steps.length)),
-      )
+      form.appendChild(this.renderStepProgress(steps))
     }
 
     const fieldsWrap = el(this.doc, 'div', { class: 'ghf-fields' })
@@ -266,6 +268,10 @@ export class FormRenderer {
 
     form.appendChild(fieldsWrap)
 
+    if (steps) {
+      form.appendChild(this.renderIntakeSummary(steps))
+    }
+
     if (this.isLastStep()) {
       const consentNode = this.renderConsent()
 
@@ -274,7 +280,13 @@ export class FormRenderer {
 
     // Honeypot anti-bot (oculto, no requerido, autocomplete off).
     const honey = el(this.doc, 'div', { class: 'ghf-honeypot', 'aria-hidden': 'true' })
-    const honeyInput = el(this.doc, 'input', { type: 'text', name: 'company_website', tabindex: '-1', autocomplete: 'off' })
+
+    const honeyInput = el(this.doc, 'input', {
+      type: 'text',
+      name: 'company_website',
+      tabindex: '-1',
+      autocomplete: 'off'
+    })
 
     honeyInput.dataset.ghfHoneypot = 'true'
     honey.appendChild(honeyInput)
@@ -299,6 +311,87 @@ export class FormRenderer {
     this.patchReadinessHint()
   }
 
+  private renderStepProgress(steps: RendererStep[]): HTMLElement {
+    const shell = el(this.doc, 'div', { class: 'ghf-progress-shell' })
+
+    const progress = el(
+      this.doc,
+      'p',
+      { class: 'ghf-progress', 'aria-live': 'polite', tabindex: '-1' },
+      `${this.copy.stepProgress(this.currentStep + 1, steps.length)} · ${this.copy.stepEffort(steps.length)}`
+    )
+
+    const nav = el(this.doc, 'nav', { class: 'ghf-stepper', 'aria-label': this.copy.stepperAria })
+    const list = el(this.doc, 'ol', { class: 'ghf-stepper-list' })
+
+    steps.forEach((step, index) => {
+      const label = step.label?.trim() || this.copy.stepProgress(index + 1, steps.length)
+      const state = index < this.currentStep ? 'complete' : index === this.currentStep ? 'current' : 'upcoming'
+      const item = el(this.doc, 'li', { class: 'ghf-stepper-item', 'data-state': state })
+      const marker = el(this.doc, 'span', { class: 'ghf-stepper-marker', 'aria-hidden': 'true' }, String(index + 1))
+      const text = el(this.doc, 'span', { class: 'ghf-stepper-label' }, label)
+
+      const status =
+        state === 'complete'
+          ? this.copy.stepStatusComplete(label)
+          : state === 'current'
+            ? this.copy.stepStatusCurrent(label)
+            : this.copy.stepStatusUpcoming(label)
+
+      if (state === 'current') item.setAttribute('aria-current', 'step')
+      item.appendChild(marker)
+      item.appendChild(text)
+      item.appendChild(el(this.doc, 'span', { class: 'ghf-sr-only' }, status))
+      list.appendChild(item)
+    })
+
+    nav.appendChild(list)
+    shell.appendChild(progress)
+    shell.appendChild(nav)
+
+    return shell
+  }
+
+  private renderIntakeSummary(steps: RendererStep[]): HTMLElement {
+    const summary = el(this.doc, 'aside', { class: 'ghf-intake-summary', 'aria-label': this.copy.intakeSummaryTitle })
+    const title = el(this.doc, 'p', { class: 'ghf-intake-summary__title' }, this.copy.intakeSummaryTitle)
+    const list = el(this.doc, 'ul', { class: 'ghf-intake-summary__list' })
+
+    for (const step of steps) {
+      const label = step.label?.trim() || step.key
+
+      const visibleFields = this.contract.fields.filter(
+        field => step.fieldKeys.includes(field.key) && field.type !== 'hidden' && isFieldVisible(field, this.values)
+      )
+
+      const requiredFields = visibleFields.filter(field => isFieldRequired(field, this.values))
+      const requiredErrors = validateFields(requiredFields, this.values, this.copy)
+      const hasAnyValue = visibleFields.some(field => !this.isFieldEmpty(field.key))
+      const missingRequired = Object.keys(requiredErrors).length
+
+      const status =
+        requiredFields.length === 0
+          ? hasAnyValue
+            ? this.copy.stepSummaryOptionalAdded(label)
+            : this.copy.stepSummaryOptionalAvailable(label)
+          : missingRequired === 0
+            ? this.copy.stepSummaryComplete(label)
+            : this.copy.stepSummaryPending(label, missingRequired)
+
+      const marker = requiredFields.length === 0 ? (hasAnyValue ? '✓' : '○') : missingRequired === 0 ? '✓' : '•'
+      const item = el(this.doc, 'li', { class: 'ghf-intake-summary__item' })
+
+      item.appendChild(el(this.doc, 'span', { 'aria-hidden': 'true' }, marker))
+      item.appendChild(el(this.doc, 'span', {}, status))
+      list.appendChild(item)
+    }
+
+    summary.appendChild(title)
+    summary.appendChild(list)
+
+    return summary
+  }
+
   private renderField(field: RendererFieldDefinition): HTMLElement {
     const fieldId = `${this.instanceId}-${field.key}`
     const errorId = `${fieldId}-error`
@@ -311,7 +404,7 @@ export class FormRenderer {
     const wrap = el(this.doc, 'div', {
       class: `ghf-field${fullWidth ? ' ghf-field--full' : ''}`,
       'data-invalid': error ? 'true' : 'false',
-      'data-status': this.fieldStatus.get(field.key) ?? 'neutral',
+      'data-status': this.fieldStatus.get(field.key) ?? 'neutral'
     })
 
     const label = this.fieldLabel(field)
@@ -342,7 +435,8 @@ export class FormRenderer {
       const customSelect = control.classList.contains('ghf-select-composite')
 
       controlWrap.appendChild(control)
-      if (field.type === 'select' && !customSelect) controlWrap.appendChild(el(this.doc, 'span', { class: 'ghf-select-icon', 'aria-hidden': 'true' }))
+      if (field.type === 'select' && !customSelect)
+        controlWrap.appendChild(el(this.doc, 'span', { class: 'ghf-select-icon', 'aria-hidden': 'true' }))
       wrap.appendChild(controlWrap)
     } else if (supportsStatusIcon) {
       const controlWrap = el(this.doc, 'div', { class: 'ghf-control' })
@@ -361,7 +455,13 @@ export class FormRenderer {
     // el contrato SR; el contador es ayuda visual). TASK-1256 Slice 1d.
     if (field.maxLength && (field.type === 'text' || field.type === 'textarea')) {
       const current = typeof this.values[field.key] === 'string' ? (this.values[field.key] as string).length : 0
-      const counter = el(this.doc, 'p', { class: 'ghf-counter', 'aria-hidden': 'true' }, `${current} / ${field.maxLength}`)
+
+      const counter = el(
+        this.doc,
+        'p',
+        { class: 'ghf-counter', 'aria-hidden': 'true' },
+        `${current} / ${field.maxLength}`
+      )
 
       counter.dataset.near = current >= field.maxLength * 0.9 ? 'true' : 'false'
       wrap.appendChild(counter)
@@ -371,7 +471,12 @@ export class FormRenderer {
   }
 
   private fieldPrefersFullWidth(field: RendererFieldDefinition): boolean {
-    if (field.type === 'textarea' || field.type === 'multiselect' || field.type === 'checkbox' || field.type === 'consent') {
+    if (
+      field.type === 'textarea' ||
+      field.type === 'multiselect' ||
+      field.type === 'checkbox' ||
+      field.type === 'consent'
+    ) {
       return true
     }
 
@@ -395,7 +500,7 @@ export class FormRenderer {
     field: RendererFieldDefinition,
     fieldId: string,
     required: boolean,
-    describedBy: string,
+    describedBy: string
   ): HTMLElement {
     const common: Record<string, string> = { id: fieldId, name: field.key }
 
@@ -437,9 +542,8 @@ export class FormRenderer {
         }
 
         select.addEventListener('change', () => {
-          this.values[field.key] = field.type === 'multiselect'
-            ? Array.from(select.selectedOptions).map(o => o.value)
-            : select.value
+          this.values[field.key] =
+            field.type === 'multiselect' ? Array.from(select.selectedOptions).map(o => o.value) : select.value
           this.onValueChange(field)
         })
 
@@ -465,7 +569,17 @@ export class FormRenderer {
         return this.renderTelControl(field, common)
 
       default: {
-        const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text'
+        const inputType =
+          field.type === 'number'
+            ? 'number'
+            : field.type === 'date'
+              ? 'date'
+              : field.type === 'email'
+                ? 'email'
+                : field.type === 'url'
+                  ? 'url'
+                  : 'text'
+
         const input = el(this.doc, 'input', { ...common, type: inputType, class: 'ghf-input' })
 
         if (field.maxLength) input.setAttribute('maxlength', String(field.maxLength))
@@ -492,7 +606,10 @@ export class FormRenderer {
 
     return options.map(option => ({
       value: option.value,
-      label: option.copyRef && this.contract.copy?.[option.copyRef] ? this.contract.copy[option.copyRef] : option.label ?? option.value,
+      label:
+        option.copyRef && this.contract.copy?.[option.copyRef]
+          ? this.contract.copy[option.copyRef]
+          : (option.label ?? option.value)
     }))
   }
 
@@ -514,7 +631,7 @@ export class FormRenderer {
       role: 'combobox',
       'aria-haspopup': 'listbox',
       'aria-expanded': 'false',
-      'aria-controls': listId,
+      'aria-controls': listId
     })
 
     const valueText = el(this.doc, 'span', { class: 'ghf-select-value' })
@@ -584,7 +701,7 @@ export class FormRenderer {
         class: 'ghf-select-option',
         role: 'option',
         'aria-selected': index === initialIndex ? 'true' : 'false',
-        'data-value': option.value,
+        'data-value': option.value
       })
 
       item.appendChild(el(this.doc, 'span', { class: 'ghf-select-option-label' }, option.label))
@@ -810,7 +927,7 @@ export class FormRenderer {
           this.patchFieldErrorDom(key)
           this.setFieldStatus(field, 'error')
         }
-      }, FormRenderer.STATUS_ERROR_DEBOUNCE_MS),
+      }, FormRenderer.STATUS_ERROR_DEBOUNCE_MS)
     )
   }
 
@@ -819,7 +936,11 @@ export class FormRenderer {
    * "significativos" (según `isSig`) antes del caret, reformatea, y reubica el caret
    * tras la misma cantidad. Evita el salto de cursor del formateo as-you-type.
    */
-  private applyMaskedLive(input: HTMLInputElement, format: (value: string) => string, isSig: (char: string) => boolean): void {
+  private applyMaskedLive(
+    input: HTMLInputElement,
+    format: (value: string) => string,
+    isSig: (char: string) => boolean
+  ): void {
     const previous = input.value
     const caret = input.selectionStart ?? previous.length
 
@@ -872,6 +993,7 @@ export class FormRenderer {
   /** Llamar tras cualquier edición de campo: refresca hint de listo + guarda borrador. */
   private onFieldEdited(): void {
     this.patchReadinessHint()
+    this.patchIntakeSummary()
     this.scheduleDraftSave()
   }
 
@@ -913,6 +1035,14 @@ export class FormRenderer {
       node.textContent = this.copy.fieldsRemaining(remaining)
       node.dataset.ready = 'false'
     }
+  }
+
+  private patchIntakeSummary(): void {
+    const steps = this.steps
+    const existing = this.opts.root.querySelector<HTMLElement>('.ghf-intake-summary')
+
+    if (!steps || !existing) return
+    existing.replaceWith(this.renderIntakeSummary(steps))
   }
 
   /** Actualiza el contador de caracteres de un campo con `maxLength`. */
@@ -1040,13 +1170,20 @@ export class FormRenderer {
       if (field.type === 'hidden' || !isFieldVisible(field, this.values)) continue
       const error = this.errors[field.key]
 
-      if (error) entries.push({ focusSelector: `[name="${CSS.escape(field.key)}"]`, text: `${this.fieldLabel(field)}: ${error}` })
+      if (error)
+        entries.push({
+          focusSelector: `[name="${CSS.escape(field.key)}"]`,
+          text: `${this.fieldLabel(field)}: ${error}`
+        })
     }
 
     if (this.isLastStep()) {
       for (const box of this.contract.consent?.checkboxes ?? []) {
         if (box.required !== false && this.consentState[box.key] !== true) {
-          entries.push({ focusSelector: `[data-ghf-consent="${CSS.escape(box.key)}"]`, text: `${box.label ?? box.copyRef ?? 'Consentimiento'}: ${this.copy.errors.consentRequired}` })
+          entries.push({
+            focusSelector: `[data-ghf-consent="${CSS.escape(box.key)}"]`,
+            text: `${box.label ?? box.copyRef ?? 'Consentimiento'}: ${this.copy.errors.consentRequired}`
+          })
         }
       }
     }
@@ -1165,7 +1302,13 @@ export class FormRenderer {
 
     if (consent.privacyUrl) {
       const p = el(this.doc, 'p', { class: 'ghf-help' })
-      const a = el(this.doc, 'a', { href: consent.privacyUrl, target: '_blank', rel: 'noopener noreferrer' }, consent.privacyUrl)
+
+      const a = el(
+        this.doc,
+        'a',
+        { href: consent.privacyUrl, target: '_blank', rel: 'noopener noreferrer' },
+        consent.privacyUrl
+      )
 
       p.appendChild(a)
       wrap.appendChild(p)
@@ -1184,13 +1327,16 @@ export class FormRenderer {
       back.addEventListener('click', () => {
         this.currentStep -= 1
         this.errors = {}
+        this.submitAttempted = false
         this.renderForm()
+        this.focusStepHeading()
       })
       actions.appendChild(back)
     }
 
     const isLast = this.isLastStep()
-    const submitLabel = isLast ? this.submitLabel() : this.copy.stepNext
+    const canSkip = this.isCurrentStepSkippable()
+    const submitLabel = isLast ? this.submitLabel() : canSkip ? this.copy.stepNextOptional : this.copy.stepNext
     const primary = el(this.doc, 'button', { type: 'submit', class: 'ghf-btn' })
 
     primary.dataset.ghfPrimary = 'true'
@@ -1203,13 +1349,27 @@ export class FormRenderer {
 
     if (this.submitting) {
       primary.setAttribute('aria-disabled', 'true')
+      primary.setAttribute('disabled', 'disabled')
       this.setPrimaryLabel(primary, this.copy.submitPending)
     } else if (this.isVerifyingAny()) {
       // Una verificación de correo en vuelo deshabilita el submit (UX; no autoridad).
       primary.setAttribute('aria-disabled', 'true')
+      primary.setAttribute('disabled', 'disabled')
     }
 
     actions.appendChild(primary)
+
+    if (canSkip) {
+      const skip = el(
+        this.doc,
+        'button',
+        { type: 'button', class: 'ghf-btn ghf-btn--ghost ghf-btn--skip' },
+        this.copy.stepSkipOptional
+      )
+
+      skip.addEventListener('click', () => this.skipCurrentStep())
+      actions.appendChild(skip)
+    }
 
     // Hint vivo de "campos pendientes / listo para enviar" (TASK-1256 Slice 1d).
     const wrapper = el(this.doc, 'div', { class: 'ghf-actions-wrap' })
@@ -1250,6 +1410,24 @@ export class FormRenderer {
     return !steps || this.currentStep >= steps.length - 1
   }
 
+  private isCurrentStepSkippable(): boolean {
+    if (!this.steps || this.isLastStep()) return false
+
+    const visible = this.fieldsForStep().filter(field => field.type !== 'hidden' && isFieldVisible(field, this.values))
+
+    return visible.length > 0 && visible.every(field => !isFieldRequired(field, this.values))
+  }
+
+  private skipCurrentStep(): void {
+    if (!this.isCurrentStepSkippable()) return
+
+    this.currentStep += 1
+    this.errors = {}
+    this.submitAttempted = false
+    this.renderForm()
+    this.focusStepHeading()
+  }
+
   // ─── State transitions ───────────────────────────────────────────────────---
 
   private maybeStart(): void {
@@ -1264,7 +1442,7 @@ export class FormRenderer {
 
     // Re-render solo si hay condiciones que dependen de este campo (conditional_simple).
     const affectsVisibility = this.contract.fields.some(
-      f => f.visibleWhen?.some(c => c.field === field.key) || f.requiredWhen?.some(c => c.field === field.key),
+      f => f.visibleWhen?.some(c => c.field === field.key) || f.requiredWhen?.some(c => c.field === field.key)
     )
 
     if (this.errors[field.key]) this.revalidateField(field)
@@ -1289,7 +1467,8 @@ export class FormRenderer {
     // Estado reactivo on-blur/submit (Stage 2): error → rojo; válido no-vacío → ✓;
     // vacío → neutro (el "requerido" ya está en `error` si el campo lo es).
     if (error) this.setFieldStatus(field, 'error')
-    else if (!this.isFieldEmpty(field.key)) this.setFieldStatus(field, this.hasMeaningfulValidator(field) ? 'success' : 'neutral')
+    else if (!this.isFieldEmpty(field.key))
+      this.setFieldStatus(field, this.hasMeaningfulValidator(field) ? 'success' : 'neutral')
     else this.setFieldStatus(field, 'neutral')
   }
 
@@ -1376,7 +1555,7 @@ export class FormRenderer {
 
     this.verifyTimers.set(
       field.key,
-      setTimeout(() => void this.runEmailVerify(field), FormRenderer.EMAIL_VERIFY_DEBOUNCE_MS),
+      setTimeout(() => void this.runEmailVerify(field), FormRenderer.EMAIL_VERIFY_DEBOUNCE_MS)
     )
   }
 
@@ -1426,8 +1605,12 @@ export class FormRenderer {
 
       // Gate corporativo: refleja el veredicto del provider (cubre Tier 2 que el
       // validador local no ve). Paridad con el validador local para Tier 1.
-      if (this.isEmailGated(field) && (result.reasonCode === 'email_not_corporate' || result.reasonCode === 'email_disposable')) {
-        this.errors[field.key] = result.reasonCode === 'email_disposable' ? this.copy.errors.disposable : this.copy.errors.corporate
+      if (
+        this.isEmailGated(field) &&
+        (result.reasonCode === 'email_not_corporate' || result.reasonCode === 'email_disposable')
+      ) {
+        this.errors[field.key] =
+          result.reasonCode === 'email_disposable' ? this.copy.errors.disposable : this.copy.errors.corporate
         this.touched.add(field.key)
       }
     }
@@ -1474,7 +1657,10 @@ export class FormRenderer {
 
     if (verifying) {
       if (existingStatus) existingStatus.textContent = this.copy.emailVerifying
-      else wrap.appendChild(el(this.doc, 'p', { class: 'ghf-verify-status', 'aria-live': 'polite' }, this.copy.emailVerifying))
+      else
+        wrap.appendChild(
+          el(this.doc, 'p', { class: 'ghf-verify-status', 'aria-live': 'polite' }, this.copy.emailVerifying)
+        )
     } else {
       existingStatus?.remove()
     }
@@ -1484,7 +1670,13 @@ export class FormRenderer {
 
     if (suggestion && !verifying) {
       if (existingSuggest) existingSuggest.remove()
-      const button = el(this.doc, 'button', { type: 'button', class: 'ghf-verify-suggest' }, this.copy.emailSuggestion(suggestion))
+
+      const button = el(
+        this.doc,
+        'button',
+        { type: 'button', class: 'ghf-verify-suggest' },
+        this.copy.emailSuggestion(suggestion)
+      )
 
       button.addEventListener('click', () => {
         this.values[field.key] = suggestion
@@ -1557,7 +1749,13 @@ export class FormRenderer {
     if (required.length === 0) return null
 
     for (const box of required) {
-      if (this.consentState[box.key] !== true) return this.copy.errors.consentRequired
+      if (this.consentState[box.key] !== true) {
+        return (
+          this.contract.copy?.[`${box.key}.error.required`] ??
+          this.contract.copy?.['consent.error.required'] ??
+          this.copy.errors.consentRequired
+        )
+      }
     }
 
     return null
@@ -1594,16 +1792,18 @@ export class FormRenderer {
       this.api,
       {
         fields: this.collectFieldValues(),
-        consent: this.contract.consent ? consentCheckboxes.length > 0 || (this.contract.consent.checkboxes ?? []).length === 0 : true,
+        consent: this.contract.consent
+          ? consentCheckboxes.length > 0 || (this.contract.consent.checkboxes ?? []).length === 0
+          : true,
         consentCheckboxes,
         honeypot: honey,
         pageUri: this.pageContext.pageUri,
         pageName: this.pageContext.pageName,
         referrer: this.pageContext.referrer,
         formVersionId: this.contract.form.formVersionId,
-        captchaToken,
+        captchaToken
       },
-      this.fetchImpl,
+      this.fetchImpl
     )
 
     this.submitting = false
@@ -1616,7 +1816,7 @@ export class FormRenderer {
         // TASK-1336 — handoff auto-descriptivo del `tokenized_report`: el host recibe el handle
         // público + la URL de status para arrancar el poll (sin hardcodear ruta ni conocer el
         // grader). Sólo cuando el behavior lo declara y hay handle; nunca rompe legacy.
-        ...this.buildTokenizedReportHandoff(result.submissionId),
+        ...this.buildTokenizedReportHandoff(result.submissionId)
       })
       this.clearDraft() // enviado OK → el borrador ya no aplica.
       this.renderSuccess()
@@ -1667,7 +1867,9 @@ export class FormRenderer {
    * `gh_form_submission_accepted`; `{}` (no handoff) si el behavior no lo declara o falta el handle.
    * Mantiene el renderer genérico: no conoce el grader ni hardcodea la ruta de status.
    */
-  private buildTokenizedReportHandoff(submissionId: string | undefined): { run_handle: string; status_url: string } | Record<string, never> {
+  private buildTokenizedReportHandoff(
+    submissionId: string | undefined
+  ): { run_handle: string; status_url: string } | Record<string, never> {
     const behavior = this.contract.successBehavior
     const template = behavior.kind === 'tokenized_report' ? behavior.tokenizedReport?.statusPathTemplate : undefined
 
@@ -1703,11 +1905,17 @@ export class FormRenderer {
       return
     }
 
-    const message = behavior.message
-      ?? (behavior.messageCopyRef ? this.contract.copy?.[behavior.messageCopyRef] : undefined)
-      ?? this.copy.successFallback
+    const message =
+      behavior.message ??
+      (behavior.messageCopyRef ? this.contract.copy?.[behavior.messageCopyRef] : undefined) ??
+      this.copy.successFallback
 
-    const status = el(this.doc, 'div', { class: 'ghf-status ghf-status--success', role: 'status', 'aria-live': 'polite', tabindex: '-1' }, message)
+    const status = el(
+      this.doc,
+      'div',
+      { class: 'ghf-status ghf-status--success', role: 'status', 'aria-live': 'polite', tabindex: '-1' },
+      message
+    )
 
     root.appendChild(status)
     status.focus?.()
@@ -1717,7 +1925,11 @@ export class FormRenderer {
     const title = this.resolveContractCopy(behavior.title, behavior.titleCopyRef, this.copy.successCardTitle)
     const body = this.resolveContractCopy(behavior.body, behavior.bodyCopyRef, this.copy.successCardBody)
     const steps = this.resolveSuccessSteps(behavior.steps)
-    const actions = (behavior.actions ?? []).slice(0, 2).filter(action => this.successActionLabel(action) && action.href)
+
+    const actions = (behavior.actions ?? [])
+      .slice(0, 2)
+      .filter(action => this.successActionLabel(action) && action.href)
+
     const reward = this.buildSuccessReward(behavior.reward)
     const support = this.resolveContractCopy(behavior.supportingNote, behavior.supportingNoteCopyRef)
 
@@ -1726,7 +1938,7 @@ export class FormRenderer {
       role: 'status',
       'aria-live': 'polite',
       tabindex: '-1',
-      'data-capture': 'growth-form-success-card',
+      'data-capture': 'growth-form-success-card'
     })
 
     if (steps.length > 0) card.dataset.hasSteps = 'true'
@@ -1754,7 +1966,10 @@ export class FormRenderer {
     if (reward) content.appendChild(reward)
 
     if (actions.length > 0) {
-      const actionRow = el(this.doc, 'div', { class: 'ghf-success-card__actions', 'data-capture': 'growth-form-success-actions' })
+      const actionRow = el(this.doc, 'div', {
+        class: 'ghf-success-card__actions',
+        'data-capture': 'growth-form-success-actions'
+      })
 
       for (const action of actions) {
         actionRow.appendChild(this.buildSuccessAction(action, 'ghf-success-card__action'))
@@ -1782,48 +1997,48 @@ export class FormRenderer {
     for (const [d, className] of [
       [
         'M 622.344 919.046 C 598.084 919.27 580.154 916.948 561.65 899.439 C 548.133 886.534 540.277 868.799 539.802 850.116 C 538.915 805.812 577.388 773.776 619.612 776.034 C 637.24 776.977 658.204 775.85 676.1 775.81 L 838.957 775.437 L 1260.73 774.662 L 1380.71 774.121 C 1396.11 774.06 1430.86 773.128 1445.16 775.149 C 1460.67 777.385 1475.06 784.521 1486.23 795.515 C 1517.05 826.363 1513.66 880.357 1476.95 905.064 C 1460.11 916.402 1446.89 918.29 1427.05 917.733 C 1412.78 952.236 1398.81 986.861 1385.14 1021.61 C 1378.93 1037.35 1370.02 1058.56 1364.7 1074.45 C 1376.48 1083.8 1388.44 1092.92 1400.58 1101.78 C 1424.47 1119.48 1444.06 1131.92 1448.37 1164.39 C 1452.16 1192.93 1435.59 1220.15 1417.92 1241.49 C 1370 1299.35 1326.18 1333.68 1260.66 1367.67 L 1146.97 1649.29 L 1112.66 1733.67 C 1099.46 1765.96 1093.3 1794.2 1058.43 1809.42 C 1040.94 1817.06 1021.13 1817.37 1003.41 1810.28 C 956.551 1791.11 951.371 1733.42 931.431 1692.35 C 926.797 1682.81 919.024 1656.24 913.059 1649.65 C 888.768 1632.51 859.184 1615.77 834.484 1598.56 C 820.779 1588.78 803.309 1580.74 792.024 1568.15 C 750.306 1521.64 795.56 1470.43 830.796 1438.78 C 783.12 1321.45 736.113 1203.85 689.778 1085.98 L 649.099 983.669 C 641.741 965.049 631.252 936.548 622.344 919.046 z',
-        'ghf-success-card__party-popper-fill',
+        'ghf-success-card__party-popper-fill'
       ],
       [
         'M 1301.26 1190.03 C 1328.05 1163.52 1349.44 1123.31 1359.89 1087.3 C 1360.84 1084.03 1362.4 1076.28 1364.7 1074.45 C 1376.48 1083.8 1388.44 1092.92 1400.58 1101.78 C 1424.47 1119.48 1444.06 1131.92 1448.37 1164.39 C 1452.16 1192.93 1435.59 1220.15 1417.92 1241.49 C 1370 1299.35 1326.18 1333.68 1260.66 1367.67 L 1146.97 1649.29 L 1112.66 1733.67 C 1099.46 1765.96 1093.3 1794.2 1058.43 1809.42 C 1040.94 1817.06 1021.13 1817.37 1003.41 1810.28 C 956.551 1791.11 951.371 1733.42 931.431 1692.35 C 926.797 1682.81 919.024 1656.24 913.059 1649.65 C 888.768 1632.51 859.184 1615.77 834.484 1598.56 C 820.779 1588.78 803.309 1580.74 792.024 1568.15 C 750.306 1521.64 795.56 1470.43 830.796 1438.78 C 877.833 1395.94 932.647 1376.78 989.175 1351.75 C 1041.92 1328.4 1096.71 1305.92 1148.98 1281.87 C 1208.62 1256.01 1255.6 1239.7 1301.26 1190.03 z',
-        'ghf-success-card__party-popper-ribbon',
+        'ghf-success-card__party-popper-ribbon'
       ],
       [
         'M 1229.29 1382.33 C 1232.36 1379.92 1255.63 1370.01 1260.66 1367.67 L 1146.97 1649.29 L 1112.66 1733.67 C 1099.46 1765.96 1093.3 1794.2 1058.43 1809.42 C 1040.94 1817.06 1021.13 1817.37 1003.41 1810.28 C 956.551 1791.11 951.371 1733.42 931.431 1692.35 C 926.797 1682.81 919.024 1656.24 913.059 1649.65 C 913.005 1646.28 909.715 1637.61 908.36 1634.41 C 883.81 1576.34 872.915 1551.78 936.026 1514.59 C 985.116 1485.67 1039.47 1466.81 1091.67 1441.9 C 1136.2 1421.88 1184.35 1401.47 1229.29 1382.33 z',
-        'ghf-success-card__party-popper-fill',
+        'ghf-success-card__party-popper-fill'
       ],
       [
         'M 1229.29 1382.33 L 1230.58 1383.99 C 1228.38 1392.5 1215.44 1422.07 1211.55 1431.63 L 1171.77 1530.46 L 1133.73 1625.61 C 1127.04 1642.26 1116.79 1674.08 1104.49 1685.94 C 1062.22 1726.65 994.205 1682.88 1016.32 1627.99 C 1031.01 1589.32 1047.01 1550.96 1062.44 1512.54 C 1067.99 1498.74 1086 1450.36 1091.67 1441.9 C 1136.2 1421.88 1184.35 1401.47 1229.29 1382.33 z',
-        'ghf-success-card__party-popper-highlight',
+        'ghf-success-card__party-popper-highlight'
       ],
       [
         'M 622.344 919.046 C 598.084 919.27 580.154 916.948 561.65 899.439 C 548.133 886.534 540.277 868.799 539.802 850.116 C 538.915 805.812 577.388 773.776 619.612 776.034 C 637.24 776.977 658.204 775.85 676.1 775.81 L 838.957 775.437 L 1260.73 774.662 L 1380.71 774.121 C 1396.11 774.06 1430.86 773.128 1445.16 775.149 C 1460.67 777.385 1475.06 784.521 1486.23 795.515 C 1517.05 826.363 1513.66 880.357 1476.95 905.064 C 1460.11 916.402 1446.89 918.29 1427.05 917.733 L 622.344 919.046 z',
-        'ghf-success-card__party-popper-rim',
+        'ghf-success-card__party-popper-rim'
       ],
       [
         'M 1148.98 1281.87 C 1147.17 1277.8 1160.61 1247.71 1163.52 1240.33 L 1203.84 1140.66 L 1240.94 1048.06 C 1247.34 1032.08 1253.48 1015.46 1261.1 1000.06 C 1272.64 976.778 1302.53 967.069 1326.44 975.471 C 1339.77 980.222 1350.7 990.035 1356.85 1002.79 C 1361.36 1012.42 1363.02 1023.14 1361.64 1033.69 C 1359.58 1048.61 1346.52 1075.5 1340.87 1090.54 C 1328.65 1123.1 1312.86 1157.45 1301.26 1190.03 C 1255.6 1239.7 1208.62 1256.01 1148.98 1281.87 z',
-        'ghf-success-card__party-popper-highlight',
+        'ghf-success-card__party-popper-highlight'
       ],
       [
         'M 506.123 246.153 C 547.583 243.593 621.006 272.155 658.468 291.409 C 758.342 344.002 833.571 433.71 867.958 541.221 C 871.771 553.197 874.384 564.574 877.328 576.66 C 883.735 602.972 887.926 625.557 874.593 650.558 C 865.124 668.313 851.737 677.919 832.87 683.863 C 793.662 690.322 761.79 662.766 756.933 624.975 C 741.605 505.689 650.313 403.332 531.961 378.35 C 517.345 375.265 499.13 373.958 485.986 366.239 C 456.049 348.658 446.485 304.538 464.351 275.262 C 474.368 258.819 487.955 250.854 506.123 246.153 z',
-        'ghf-success-card__party-popper-ribbon',
+        'ghf-success-card__party-popper-ribbon'
       ],
       [
         'M 1518.77 245.408 C 1533.25 243.86 1547.75 248.114 1559.1 257.24 C 1572.21 267.601 1580.56 284.036 1582.2 300.576 C 1583.23 312.18 1581.23 323.853 1576.39 334.45 C 1561.99 366.66 1536.57 369.393 1506.85 375.588 C 1496.17 377.812 1485.64 380.669 1475.3 384.143 C 1444.9 393.924 1416.3 408.614 1390.65 427.631 C 1332.89 470.673 1291.26 531.856 1272.43 601.375 C 1266.29 624.74 1270.58 643.02 1252.02 664.066 C 1239.42 678.351 1226.76 684.097 1207.95 685.568 C 1192.91 685.074 1180.44 681.862 1168.53 672.033 C 1154.26 660.292 1145.31 643.305 1143.7 624.896 C 1142.38 610.642 1146.38 594.274 1150.03 580.484 C 1167.89 512.899 1202.54 447.689 1247.66 394.464 C 1310.78 320.013 1420.95 254.118 1518.77 245.408 z',
-        'ghf-success-card__party-popper-confetti-warm',
+        'ghf-success-card__party-popper-confetti-warm'
       ],
       [
         'M 952.444 290.243 C 965.224 289.353 978.938 291.133 990 298.034 C 993.905 300.514 997.545 303.387 1000.86 306.608 C 1014.5 319.74 1034.55 343.937 1048.32 358.707 C 1058.23 369.334 1083.91 396.961 1091.55 407.9 C 1096.29 414.546 1099.66 422.062 1101.47 430.015 C 1103.97 441.263 1103.11 452.367 1099.4 463.162 C 1089.84 490.912 1068.87 504.054 1041.61 509.782 C 1007.14 512.055 993.693 499.277 972.103 474.449 C 950.074 449.116 920.388 424.674 900.727 397.757 C 869.484 354.983 902.924 296.958 952.444 290.243 z',
-        'ghf-success-card__party-popper-rim',
+        'ghf-success-card__party-popper-rim'
       ],
       [
         'M 1510.9 498.367 C 1526.93 497.41 1539.27 498.448 1553.46 507.07 C 1568.81 516.456 1579.83 531.534 1584.12 549.015 C 1595.67 597.265 1554.66 621.513 1525.98 652.513 C 1506.07 674.042 1487.53 695.975 1458.41 702.506 C 1442.41 703.885 1429.42 702.074 1415.49 693.645 C 1400.15 684.216 1389.2 669.069 1385.06 651.549 C 1375.97 611.999 1401.9 587.239 1428.49 562.765 C 1454.77 538.586 1475.01 506.457 1510.9 498.367 z',
-        'ghf-success-card__party-popper-confetti-warm',
+        'ghf-success-card__party-popper-confetti-warm'
       ],
       [
         'M 547.098 529.801 C 586.613 524.827 622.751 552.634 628.068 592.105 C 633.385 631.575 605.893 667.954 566.47 673.613 C 526.56 679.342 489.634 651.436 484.251 611.478 C 478.869 571.52 507.095 534.837 547.098 529.801 z',
-        'ghf-success-card__party-popper-ribbon',
-      ],
+        'ghf-success-card__party-popper-ribbon'
+      ]
     ] as const) {
       const path = this.doc.createElementNS('http://www.w3.org/2000/svg', 'path')
 
@@ -1842,7 +2057,11 @@ export class FormRenderer {
 
     const title = this.resolveContractCopy(reward.title, reward.titleCopyRef, this.copy.successRewardTitle)
     const body = this.resolveContractCopy(reward.body, reward.bodyCopyRef, this.copy.successRewardBody)
-    const wrap = el(this.doc, 'div', { class: 'ghf-success-card__reward', 'data-capture': 'growth-form-success-reward' })
+
+    const wrap = el(this.doc, 'div', {
+      class: 'ghf-success-card__reward',
+      'data-capture': 'growth-form-success-reward'
+    })
 
     wrap.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__reward-title' }, title))
     if (body) wrap.appendChild(el(this.doc, 'p', { class: 'ghf-success-card__reward-body' }, body))
@@ -1854,13 +2073,17 @@ export class FormRenderer {
     return wrap
   }
 
-  private buildSuccessAction(action: RendererSuccessCardAction, className: string, rewardKind?: string): HTMLAnchorElement {
+  private buildSuccessAction(
+    action: RendererSuccessCardAction,
+    className: string,
+    rewardKind?: string
+  ): HTMLAnchorElement {
     const label = this.successActionLabel(action) ?? ''
 
     const anchor = el(this.doc, 'a', {
       class: `ghf-btn ${className}`,
       href: action.href ?? '#',
-      target: action.target ?? '_self',
+      target: action.target ?? '_self'
     })
 
     if (action.kind === 'schedule') anchor.appendChild(this.buildCalendarIcon())
@@ -1870,14 +2093,14 @@ export class FormRenderer {
     anchor.addEventListener('click', () => {
       this.telemetry.emit('gh_form_success_action_clicked', {
         action_kind: action.kind,
-        ...(rewardKind ? { reward_kind: rewardKind } : {}),
+        ...(rewardKind ? { reward_kind: rewardKind } : {})
       })
 
       if (action.kind === 'asset_access' || action.kind === 'download') {
         this.telemetry.emit('gh_form_asset_accessed', {
           success_behavior: this.contract.successBehavior.kind,
           action_kind: action.kind,
-          ...(rewardKind ? { reward_kind: rewardKind } : {}),
+          ...(rewardKind ? { reward_kind: rewardKind } : {})
         })
       }
     })
