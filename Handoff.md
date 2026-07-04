@@ -1,3 +1,13 @@
+## Sesion 2026-07-04 - TASK-1331 AI Visibility public report view-model contract - Codex - task creada
+
+> **Pedido:** despues de empujar el mockup enterprise de TASK-1329 a `efeonce-think/main`, revisar a profundidad que datos faltan modelar/cablear en backend para que todo lo visible del informe publico venga desde Greenhouse y no desde derivaciones locales del hub.
+>
+> **Task creada:** `docs/tasks/to-do/TASK-1331-ai-visibility-public-report-viewmodel-contract.md`. Perfil `backend-data`, impacto `reader`, EPIC-020. Scope: endurecer el contrato headless `GET /api/public/growth/ai-visibility/report/[token]`/`ReportArtifactModel` con view facts public-safe para engine coverage/Share of Model, citation totals globales (no top-N), competitive benchmark, sentiment/readiness/dimension/share facts. Regla dura: no scoring, no probes, no normalizer, no `executeClaimedGraderRun`; Think queda como renderer tonto.
+>
+> **Relación con TASK-1330:** `TASK-1330` sigue siendo la capability de short links. `TASK-1331` sólo entrega hechos/contrato del reporte; si el share necesita URL corta real, debe consumir `TASK-1330` y no inventar placeholders en Think.
+>
+> **Checks:** `pnpm task:lint --task TASK-1331` OK, `pnpm ops:lint --changed` OK, `pnpm docs:closure-check` pidió esta nota de handoff.
+
 ## Sesion 2026-07-03 - TASK-1329 AI Visibility report visual/editorial polish - Codex - complete local
 
 > **Pedido:** ejecutar TASK-1329 end-to-end en `develop`, sin release productivo sin confirmacion, invocando skills UI/UX/SEO. El operador pidio acabado "muy serrucho, ahref, nivel enterprise"; se tradujo a lectura de auditoria SEO/AEO enterprise tipo Semrush/Ahrefs sin copiar UI literal ni inventar datos.
