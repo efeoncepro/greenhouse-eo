@@ -60,6 +60,69 @@ Sin esta task, la seccion aprobada queda invisible o en empty state en produccio
 - Mantener compatibilidad con snapshots viejos: `unknown` sigue siendo valido y no debe romper el render.
 - Verificar con route/model tests, no-leak tests, fixtures con categoria mapeada y smoke con un token real o run nuevo.
 
+## Delta 2026-07-04 — Arch review (arch-architect): diagnóstico CONFIRMADO + reframe
+
+> Revisión con `arch-architect` (overlay Greenhouse) sobre código + **DB real** (`greenhouse-pg-dev`). El
+> Slice 1 (diagnóstico) queda esencialmente RESUELTO acá; esto reencuadra el alcance real de la task.
+
+### Diagnóstico confirmado (ya no hipótesis)
+
+- **`categoryAssociations` se pobla SOLO por la capa prose/LLM extraction** (`prose-extraction/router.ts:104`
+  → `if (!isLlmExtractionEnabled()) { return vacío }`; `llm-extraction.ts:67` mapea candidatos → IDs
+  canónicos). El **normalizer determinista NO extrae categorías** (normalizer.ts:192). Flag:
+  `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED`, **default OFF**.
+- **DB real (2026-07-04):** `category_associations` (columna `text[]`) vacío en el **100% de los findings de
+  los 8 runs** (`with_cats=0`); los 8 snapshots públicos → `categoryTaxonomySummary.status=null`. → la
+  extracción estuvo OFF en esos runs.
+- **El mapper + builder + agregación FUNCIONAN:** un snapshot tiene 5 categorías mapeadas +
+  `totalSignals=17`, `ambiguousCount=1` (`sector:marketing_services`, `category:aeo_ai_visibility`, …). → el
+  bloqueo **NO está** en taxonomy/mapper/builder. El builder ya produce `unknown` honesto desde vacío.
+
+### Reframe arquitectónico (lo más importante)
+
+El `unknown` de categoría es un **SÍNTOMA de que la capa de extracción prose/LLM está apagada.** "Hacer
+visible la categoría" = **encender esa capa**, que NO es un fix quirúrgico de categoría:
+
+- **Multi-señal (clave):** el MISMO flag/capa puebla `categoryAssociations` **+ `sentimentLabel` +
+  `messageDriftClaims` + `brandRank`** (normalizer.ts:192). Encenderlo activa/cambia **`category_ownership`,
+  `message_alignment`, sentiment y posición** a la vez → cambio de comportamiento del grader AMPLIO, no
+  "solo categoría".
+- **Cost-bearing:** extracción = una llamada a provider POR finding POR run → **costo recurrente en cada
+  run** (respetar cost-cap + circuit breaker existentes).
+- **Scoring:** dimensiones hoy `null` (excluidas del promedio) pasan a medidas → el **OVERALL score cambia
+  en runs nuevos** (por evidencia nueva, no por fórmula). Discontinuidad honesta con snapshots viejos
+  (congelados/inmutables) → dos bases de score coexistiendo. El operador debe saberlo.
+- **Es una decisión de ROLLOUT (EPIC-020/021), no de código:** el flag ya está **ON en staging / OFF en
+  prod** (FEATURE_FLAG_STATE_LEDGER). La categoría en prod viaja con el **MISMO release develop→main + flip**
+  que el resto del stack del grader — no es un fix aislado que se prende solo.
+
+### Alcance de código REAL (contingente, casi nulo)
+
+El pipeline ya funciona cuando la extracción corre. El código a tocar es **contingente al Discovery con
+extracción ON**: si algunas marcas dan candidatos que no mapean (unmapped/ambiguous alto), **agregar aliases
+de taxonomía CON eval** (no labels one-off). **Prohibido** "arreglar" tocando pipeline/scoring/normalizer o
+mockeando categorías. Si Discovery confirma que basta prender el flag, el Slice 2 de código puede quedar
+VACÍO y la task colapsa a: evidencia en staging + hardening de aliases si hay gaps + gate de rollout.
+
+### Gate de scoring AMPLIADO (hard requirement)
+
+El golden-set eval NO es "categoría cambia category_ownership". Debe cubrir el **delta COMPLETO de encender
+extracción**: `category_ownership` + `message_alignment` + sentiment + position + el recompute del overall.
+Sign-off de score-delta + costo antes del flip productivo. Versión/pesos/fórmula NO cambian.
+
+### Anomalía a confirmar en Slice 1
+
+Hay ≥1 snapshot con categorías baked pero cuyos findings actuales tienen 0 asociaciones (`with_cats=0` en el
+run detrás de ese snapshot). Confirmar si la **re-normalización con flag OFF sobreescribe findings previos
+con vacío** (bug de pipeline distinto del flag — el snapshot congelado retuvo lo mapeado, pero la tabla se
+vació después). Si es así, es un fix de idempotencia/timing, NO de scoring.
+
+### Alternativa (opcional, NO default)
+
+Extracción **determinista** de categoría (keyword/entity → taxonomy, sin LLM, sin costo recurrente) como
+camino barato/estable — pero es build nuevo + preguntas de calidad; el diseño intencional es la prose
+extraction (perceived category = lo que la IA dice, no ground truth). No perseguir sin decisión explícita.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
@@ -442,5 +505,16 @@ Any such rule must live in Greenhouse report/model code, not Think.
 
 ## Open Questions
 
-- El cierre debe confirmar si el camino correcto es activar/fortalecer `llm-extraction.ts`, ampliar taxonomy aliases o corregir persistencia/snapshot timing.
-- Definir si el primer rollout sera `new-runs-only` o si el operador quiere republish/backfill gobernado para tokens ya emitidos.
+> Nota 2026-07-04: el Delta arch de arriba ya CONFIRMÓ el camino: la categoría (y sentiment/messageDrift/
+> rank) dependen de la capa prose/LLM extraction gateada por `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED`
+> (OFF en los runs de la DB). El taxonomy/mapper/builder funcionan. Lo que queda NO es "qué camino", sino
+> las decisiones de rollout de abajo.
+
+- **Rollout/costo/scoring:** ¿el operador aprueba encender la capa de extracción en prod (vía el release de
+  EPIC-020/021) sabiendo que (a) agrega costo de provider por-finding en cada run, y (b) cambia el overall
+  score de runs nuevos —category_ownership + message_alignment + sentiment + position—? Requiere golden-set
+  eval del delta completo + sign-off de costo antes del flip.
+- **new-runs-only vs backfill:** ¿primer rollout `new-runs-only` (snapshots viejos siguen `unknown`, honesto)
+  o el operador quiere un republish/backfill gobernado (task backend-data aparte, dry-run/idempotente)?
+- **Anomalía de re-normalización:** ¿la re-normalización con flag OFF vacía `category_associations` de runs
+  que antes las tenían? Si sí, fix de idempotencia/timing (no de scoring), a confirmar en Slice 1.
