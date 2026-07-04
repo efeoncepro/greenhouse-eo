@@ -1,3 +1,13 @@
+## Sesion 2026-07-04 - TASK-1327 premium Growth Form UX - Codex - code-complete local
+
+> **Scope:** Growth Forms renderer portable + contrato del form `ai-visibility-grader` para que el dock de `think.efeoncepro.com/brand-visibility` mantenga los 14 campos gobernados sin frustrar: stepper con labels de valor, `3 pasos breves`, resumen vivo sin PII, paso 2 opcional con `Omitir por ahora`, CTA contextual `Continuar con este contexto`, placeholders enterprise y validaciones específicas por campo.
+>
+> **Cambios:** `src/growth-forms-renderer/{renderer.ts,copy.ts,styles.ts}` agrega stepper accesible, live summary, skip opcional, disabled nativo durante submit/verificación, contraste corregido en botones ghost/skip y stepper vertical en ancho compacto. `scripts/growth/activate-grader-premium-intake-contract.ts` publica la nueva copy/steps/placeholders por clone→publish→deprecate. `docs/tasks/to-do/TASK-1327-...md` documenta la decisión UX y desbloquea el blocker stale ya verificado en prod.
+>
+> **Evidencia local:** `pnpm codex:task-hook TASK-1327 --develop` OK tras corregir blocker stale; `pnpm vitest run src/growth-forms-renderer/__tests__/renderer.test.ts` 41/41; `pnpm typecheck` OK; `pnpm build` OK (warning preexistente Turbopack en `src/lib/roadmap/work-item-index/reader.ts`); `pnpm task:lint --task TASK-1327` OK; `pnpm ops:lint --changed` OK; GVC `growth-forms-renderer-preview` OK desktop/mobile; probe Playwright+axe del contrato premium 3 pasos OK desktop/mobile (`axeViolations=[]`, botones 52px, foco visible, `scrollWidth == clientWidth`). Capturas: `.captures/task1327-premium-form-ux-a11y/{desktop,mobile}-step2-optional.png`.
+>
+> **Pendiente runtime:** abrir/mergear PR a `main`, esperar deploy Greenhouse prod, correr `pnpm growth:forms:activate-grader-premium-intake -- --apply` con env local gobernado, y smoke real en `https://think.efeoncepro.com/brand-visibility` para confirmar renderer nuevo + contrato vNext. Estado correcto hasta entonces: code-complete local, rollout pendiente.
+
 ## Sesion 2026-07-04 - Release develop→main (batch TASK-1328…1336) + flag short links ON - Claude - RELEASED
 
 > **Pase a producción completo vía release control plane.** El operador pidió commit de TASK-1336 + pase a prod con `/release`. Se promovió `develop→main` (43 commits) — NO solo TASK-1336; el mecanismo promueve todo el branch.
