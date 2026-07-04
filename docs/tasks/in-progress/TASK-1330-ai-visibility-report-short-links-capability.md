@@ -45,6 +45,37 @@ TASK-1329 agrego una experiencia shareable premium al informe publico, pero solo
 - Mantener compatibilidad con URLs existentes `/brand-visibility/r/<token>`.
 - Registrar uso, expiracion, revocacion y senales operativas proporcionales al riesgo.
 
+## ⚠️ Production Gate — requiere pase a producción para funcionar (rollout pendiente)
+
+> **Estado real: code-complete + E2E local verificado, pero la capability NO funciona en producción
+> hasta el pase.** Planificada para ir en un **bundle de release a producción** junto a otras tasks
+> (batch `develop→main` vía release control plane). Hasta entonces queda `in-progress`, NO `complete`.
+
+**Hecho (local `develop`, sin push):** schema + primitive (migración `20260704110400162_task-1330-...`
+aplicada a `greenhouse-pg-dev` = dev/staging comparten), resolve endpoint `/report/short-link/[code]`
+(resolve-to-token), flag `GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED` (OFF, en el ledger), consumers
+(token route / correo / HubSpot con fallback al largo), auto-create idempotente en el publish. Gates
+verdes: `pnpm test` 8776/0, `pnpm build`, `local:check`, smoke LIVE del primitive contra PG real,
+`docs:closure-check`. Think `/s/[code].astro` (render-in-place vía `Astro.rewrite`) + `resolveShortLink`
+implementados y **E2E local verificado** (activo → informe bajo `/s/<code>`; desconocido → 404 de marca).
+
+**Falta para que funcione en PRODUCCIÓN (el pase — no ejecutado):**
+
+1. **Greenhouse `develop→main`** vía release control plane (skill `greenhouse-production-release`):
+   lleva a prod la migración, el resolve endpoint, el auto-create en `publishGraderReportSnapshot` y los consumers.
+2. **Aplicar la migración en la base de PRODUCCIÓN** (vía el control plane; hoy solo está en dev/staging).
+3. **Prender `GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED=true` en Production** (Vercel) + redeploy. Sin esto,
+   `resolvePreferredReportUrl`/`resolveReportShareUrlForRun` devuelven el URL LARGO (fallback) → los short
+   links se crean pero ningún consumer los usa.
+4. **Smoke prod:** ensure un short link de un reporte real → abrir `https://think.efeoncepro.com/s/<code>`
+   → confirmar render-in-place + share copy con el corto; código inválido → 404 de marca.
+
+**Delta cross-agent (2026-07-04):** el lado de Think (`/s/[code].astro` + `resolveShortLink`) ya quedó
+**pusheado a producción** por un commit concurrente de Codex (`681f1e4` en `origin/main` de `efeonce-think`),
+pero es **INERTE**: Greenhouse prod no genera short links ni expone el resolve endpoint hasta el pase (flag
+OFF), así que no existe ninguna URL `/s/<code>` real; hoy `/s/<cualquiera>` en prod → 404 de marca (aditivo,
+no toca `/r/[token]`). **No revertir** (arrastra el WIP legítimo de Codex). La capability real NO está live.
+
 ## Delta 2026-07-04 — Revisión de arquitectura + product design (ajustes)
 
 > Revisión con `arch-architect` (overlay Greenhouse) + `greenhouse-product-ui-architect`. La task
