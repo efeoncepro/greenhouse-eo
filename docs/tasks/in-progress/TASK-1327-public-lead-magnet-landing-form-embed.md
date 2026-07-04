@@ -9,7 +9,27 @@ El contrato del handoff submit→reporte quedó code-complete (TASK-1336). Think
 3. Con `status_url`, hacer poll (respetando `retryAfterSeconds` de la respuesta): `GET` devuelve `{ status, reportToken, message, retryAfterSeconds }` con `status ∈ queued|processing|ready|in_review|unavailable|not_found`. Mostrar loader honesto (sin inventar %), estados finales para `in_review`/`unavailable`.
 4. Cuando `status="ready"`, `reportToken` aparece → navegar a `think.efeoncepro.com/brand-visibility/r/<reportToken>` (el hub ya conoce su path; short link `/s/<code>` cuando el flag esté ON, fallback al largo).
 
-Bloqueos vivos para el smoke browser real desde el origin de Think: **TASK-1335** (CORS/surface allowlist gobernado para `think.efeoncepro.com`) + la activación gobernada del handoff en el form del grader (`pnpm growth:forms:activate-grader-tokenized-report --apply`, dry-run + guard de runtime; requiere el renderer bundle en prod). El contrato transversal vive en `docs/architecture/growth-public-forms-runtime-contract.md` → §Tokenized Report Handoff.
+La implementación local de Think ya puede avanzar contra el contrato code-complete de **TASK-1335** + **TASK-1336**. Lo que sigue pendiente es rollout/smoke browser real desde el origin de Think: activar el handoff en el form del grader (`pnpm growth:forms:activate-grader-tokenized-report --apply`, dry-run + guard de runtime), servir el renderer bundle en prod y desplegar/aplicar CORS de TASK-1335 en staging/prod. El contrato transversal vive en `docs/architecture/growth-public-forms-runtime-contract.md` → §Tokenized Report Handoff.
+
+## Delta 2026-07-04 — implementación local Think code-complete, visual aprobada aplicada
+
+La landing `efeonce-think/src/pages/brand-visibility/index.astro` quedó implementada localmente contra la visual aprobada por el operador (opción 1): hero navy Efeonce | Think, form card gobernado, motores analizados, señales `Presencia/Citabilidad/Categoría percibida/Operabilidad`, preview de módulos del informe, flujo `Del formulario al informe` y marco horizontal `Be Found · Be Readable · Be Correct · Be Actionable · Be Intrinsic`. Se corrigió el desvío anterior donde el framework Be X se había reinterpretado fuera de la banda horizontal aprobada.
+
+Cambios en `efeonce-think`:
+
+- nueva ruta `/brand-visibility` con `<greenhouse-form form-key="69cd5269-5f97-4d32-99c4-0b23f41aa2f5" surface="fhsf-ai-visibility-grader" locale="es-CL" color-scheme="light" appearance="bare">`;
+- listener de `gh_form_submission_accepted` que muestra analysis wait y consume `status_url` gobernado cuando el renderer lo entregue; sin campos locales, sin polling privado, sin fake scores ni porcentajes;
+- `greenhouse.repo.json` registra la surface `/brand-visibility`;
+- `scripts/verify-brand-visibility-landing.mjs` valida desktop/laptop/mobile, overflow, indexability, form gobernado, analysis state sintético y ausencia de datos falsos.
+
+Evidencia local en Think:
+
+- `pnpm type-check` OK (0 errores; sólo hint existente `document.execCommand` deprecated en la ruta de reporte);
+- `pnpm build` OK;
+- `pnpm verify:landing -- http://127.0.0.1:4322/brand-visibility task1327-brand-visibility-approved-static-v4` OK en 1440/1280/390, `scrollWidth == clientWidth`;
+- capturas finales: `/Users/jreye/Documents/efeonce-think/.captures/task1327-brand-visibility-approved-static-v4-desktop-1440.png`, `...-laptop-1280.png`, `...-mobile-390.png`.
+
+Estado de cierre correcto: **code complete local, rollout pendiente**. No se hizo push, deploy ni activación del form v4. El smoke end-to-end real sigue pendiente de: publicar/activar `tokenized_report` en el form del grader, confirmar CORS/runtime productivo de TASK-1335 y probar submit real desde `https://think.efeoncepro.com/brand-visibility` hasta `/brand-visibility/r/<reportToken>`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -17,7 +37,7 @@ Bloqueos vivos para el smoke browser real desde el origin de Think: **TASK-1335*
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -30,11 +50,11 @@ Bloqueos vivos para el smoke browser real desde el origin de Think: **TASK-1335*
 - Motion: `docs/ui/motion/TASK-1327-public-lead-magnet-landing-form-embed-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Code complete local — Think implementation; rollout/smoke pendiente`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms`
-- Blocked by: `CONTRATOS LISTOS (TASK-1335 y TASK-1336 code-complete 2026-07-04): Think ya puede implementar contra el contrato. Falta SOLO rollout para el smoke browser real: activar handoff en el form del grader (pnpm growth:forms:activate-grader-tokenized-report --apply) + renderer bundle en prod + deploy/migración CORS de TASK-1335 en staging/prod`
-- Branch: `task/TASK-1327-public-lead-magnet-landing-form-embed`
+- Blocked by: `none`
+- Branch: `develop` (operator exception via `pnpm codex:task-hook TASK-1327 --develop`; no branch switch)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -48,10 +68,10 @@ Bloqueos vivos para el smoke browser real desde el origin de Think: **TASK-1335*
   https://think.efeoncepro.com` **sin ningún workaround local en Think**.
 - **La landing NO carga la preocupación de plataforma.** No agregar hardcode de CORS ni bridge en el
   repo `efeonce-think`; el origin queda habilitado por DATA gobernada en greenhouse-eo.
-- **Pendiente de rollout para levantar el blocker en runtime:** deploy a staging/producción de
+- **Pendiente de rollout para smoke browser real:** deploy a staging/producción de
   greenhouse-eo + aplicar la migración/seed en el PG del target + correr el curl matrix (ACAO para
   `think`, sigue ACAO para `efeoncepro.com`/`/aeo-2`, sin ACAO para origins desconocidos). Recién
-  entonces `TASK-1335` pasa a `complete` y este blocker queda 100% levantado.
+  entonces `TASK-1335` pasa a `complete` y esta task puede cerrarse con evidencia runtime completa.
 
 ## Summary
 
@@ -76,7 +96,7 @@ Hoy **no existe ninguna superficie pública donde llenar el grader self-serve** 
 
 - `TASK-1325` esta **complete/live**: el hub Think y la Superficie A del reporte (`/brand-visibility/r/<token>`) ya existen, estan shippeados y son la base visual/editorial para esta landing. No es blocker de implementacion.
 - `TASK-1330` esta **lista/shippeada como capacidad de short links**, con activacion de `GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED` pendiente para el paso a produccion. No bloquea TASK-1327: el loop base debe funcionar con la URL canonica larga `/brand-visibility/r/<token>`, y los short links se prenden como mejora de sharing/correo en el cutover.
-- Los blockers vivos para ejecutar esta landing son `TASK-1335` (browser puede cargar/enviar el form desde Think) y `TASK-1336` (submit del form entrega handoff gobernado hacia status/reporte).
+- Los contratos para ejecutar esta landing están code-complete: `TASK-1335` habilita el CORS/surface allowlist gobernado y `TASK-1336` entrega el handoff submit→status→reporte. El cierre operativo completo sigue dependiendo del rollout/smoke real de esos contratos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -195,6 +215,16 @@ Reglas obligatorias:
   - nota breve de alcance/metodología sin bloquear la conversión.
 - El preview del reporte puede usar cards/labels, pero no números, scores ni evidencia simulada.
 - El post-submit debe sentirse diseñado: report skeleton, pasos del análisis, loader honesto y transición al reporte en pantalla. No usar un simple "gracias" plano ni cerrar la experiencia solo con email.
+
+### Form UX decision — progressive premium intake
+
+- El form gobernado actual expone 14 campos de contrato en 3 pasos: `Tu marca` (5), `Contexto competitivo` (5) y `Tus datos` (4). Mantener todos los campos porque alimentan la calidad del reporte, pero evitar que el usuario perciba 14 campos como una sola carga.
+- El paso 2 (`Contexto competitivo`) debe leerse como enriquecimiento opcional, no como bloqueo. UX writing recomendado:
+  - Titulo: `Afina el contexto del análisis`
+  - Subcopy: `Puedes avanzar sin completar esta parte, pero estos datos ayudan a generar un informe más preciso.`
+  - Microcopy junto al CTA: `También puedes continuar sin agregar contexto.`
+- Principio de experiencia: el paso 1 debe generar compromiso rápido con datos de marca; el paso 2 debe aumentar precisión sin frustrar; el paso 3 debe pedir contacto solo cuando el usuario ya entendió el valor del reporte.
+- Cualquier mejora futura debe vivir en el contrato/renderizador de Growth Forms o en copy gobernado del form, no como campos locales en Think.
 
 ### Report-derived landing content contract
 

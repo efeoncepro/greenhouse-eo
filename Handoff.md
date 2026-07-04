@@ -1,3 +1,17 @@
+## Sesion 2026-07-04 - TASK-1327 Think Brand Visibility landing - Codex - code complete local (rollout pendiente)
+
+> **Task:** `docs/tasks/in-progress/TASK-1327-public-lead-magnet-landing-form-embed.md` (EPIC-020, ui-ux). Goal confirmado por el operador; ejecución en `develop` vía `pnpm codex:task-hook TASK-1327 --develop`, sin branch switch, sin subagentes, sin push/deploy.
+>
+> **Implementado en `efeonce-think`:** nueva ruta `src/pages/brand-visibility/index.astro` para `think.efeoncepro.com/brand-visibility`, fiel a la visual aprobada opción 1: hero navy Efeonce | Think, copy `Mide cómo la IA entiende y recomienda tu marca.`, chips de motores, señales Presencia/Citabilidad/Categoría percibida/Operabilidad, card del form gobernado, preview de módulos del informe, flujo de 5 pasos y marco horizontal Be Found/Readable/Correct/Actionable/Intrinsic. Se corrigió el desvío visual señalado por el operador: el framework Be X volvió a la banda horizontal aprobada.
+>
+> **Contrato preservado:** embed real `<greenhouse-form form-key="69cd5269-5f97-4d32-99c4-0b23f41aa2f5" surface="fhsf-ai-visibility-grader" locale="es-CL" color-scheme="light" appearance="bare">`; Think no agrega campos propios, no valida el form, no inventa scores/progreso ni cierra por email. El host escucha `gh_form_submission_accepted`, muestra analysis wait y sólo hace poll si el renderer entrega `status_url` gobernado por TASK-1336.
+>
+> **Cambios auxiliares Think:** `greenhouse.repo.json` registra `/brand-visibility`; `package.json` agrega `verify:landing`; nuevo `scripts/verify-brand-visibility-landing.mjs` valida form gobernado, no fake data, analysis state, indexability y overflow 1440/1280/390.
+>
+> **Evidencia local:** Think `pnpm type-check` OK (0 errores; hint existente `document.execCommand` deprecated en reporte), `pnpm build` OK, `pnpm verify:landing -- http://127.0.0.1:4322/brand-visibility task1327-brand-visibility-approved-static-v4` OK (`scrollWidth == clientWidth` desktop/laptop/mobile). Capturas finales: `/Users/jreye/Documents/efeonce-think/.captures/task1327-brand-visibility-approved-static-v4-desktop-1440.png`, `...-laptop-1280.png`, `...-mobile-390.png`.
+>
+> **Pendiente de cierre operativo:** no se hizo push/deploy ni activación `growth:forms:activate-grader-tokenized-report --apply`. Para pasar a complete: activar/publicar el form con `tokenized_report`, confirmar CORS/runtime productivo de TASK-1335 desde `https://think.efeoncepro.com`, desplegar Think y smoke real submit→status→`/brand-visibility/r/<reportToken>`.
+
 ## Sesion 2026-07-04 - Release develop→main (batch TASK-1328…1336) + flag short links ON - Claude - RELEASED
 
 > **Pase a producción completo vía release control plane.** El operador pidió commit de TASK-1336 + pase a prod con `/release`. Se promovió `develop→main` (43 commits) — NO solo TASK-1336; el mecanismo promueve todo el branch.
