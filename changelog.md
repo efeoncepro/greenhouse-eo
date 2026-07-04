@@ -9546,3 +9546,8 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 
 - Se actualizo el runbook de produccion, playbook de incidentes, watchdog runbook y skills Codex/Claude para no confundir Azure `no_infra_diff` con fallo ni asumir que un worker fue skippeado sin Cloud Run `Ready=True` + `GIT_SHA` o watchdog OK.
 - Se canonizo el caso TASK-1328: el primer preflight fallo por carrera de evidencia CI/smoke; `ico-batch-worker` si deployo; el drift real fue `ops-worker` y el release solo quedo cerrado tras watchdog `aggregateSeverity: ok`.
+
+## 2026-07-03 — TASK-1329 AI Visibility report visual/editorial polish creada
+
+- Se creo la follow-up UI/UX para iterar el acabado visual del informe publico de AI Visibility despues de TASK-1328: jerarquia, densidad, copy, estados, mobile y posible extraccion local de bloques de evidencia reutilizables en `efeonce-think`.
+- La task queda `to-do`, `UI ready: no`, con wireframe registrado y sin alcance backend/model/scoring.
