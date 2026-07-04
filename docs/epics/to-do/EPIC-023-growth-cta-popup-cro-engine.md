@@ -49,13 +49,15 @@ Esto no cabe en una sola task porque cruza backend/data, renderer portable, publ
 
 ## Child Tasks
 
-- `TASK-TBD` — [backend-data] Foundation `growth.cta`: schema, lifecycle, readers/commands, surface bindings, render contract compiler, event ledger and action router skeleton.
-- `TASK-TBD` — [ui-ux/platform] Portable CTA renderer MVP: Web Component/custom element, token layer, accessibility/motion contract, wrappers for WordPress/Think/Astro/Greenhouse preview and GTM/dataLayer events.
-- `TASK-TBD` — [backend-data] Growth Forms action integration: `open_growth_form` / `embed_growth_form`, CTA→form relationship, submission reconciliation and no-PII telemetry.
-- `TASK-TBD` — [backend-data] Asset, Think and HubSpot actions: ebook/guide delivery, Think tool route context, HubSpot Meetings link resolution and bounded HubSpot handoff.
+Sequencing is **vertical-slice-first**, not horizontal-platform-first (Arch §18). Slice 1 proves the whole spine (compile → arbitrate → render → event → action) through the already-named first consumer before generalizing.
+
+- `TASK-TBD` — [hybrid: backend-data + ui-ux, minimal] **Vertical slice**: the AI Visibility report follow-up CTA on the Think report surface, one action (`open_growth_form`), one embedded/banner placement — minimal `cta_definition`/`cta_version` + immutable published contract, server-side arbiter, Tier A conversion ledger, GTM/dataLayer events, one reliability signal, portable Web Component render + GVC/Playwright evidence.
+- `TASK-TBD` — [ui-ux/platform] Second placement + first interruptive (`popup_modal`/`slide_in`) with full a11y/motion/CLS + reduced-motion + focus-trap/return contract, plus a second surface (public WordPress) consuming the same published contract; preview↔public parity test.
+- `TASK-TBD` — [backend-data] Exposure tier + suppression at scale: Tier B exposure ingest (sampled/analytical, not OLTP), visitor-state store, frequency capping, forgeable-ingest defenses (surface cross-check, bot filtering, `trust_level`), global/per-surface kill switch.
+- `TASK-TBD` — [backend-data] Action breadth: `embed_growth_form`, `download_asset`, `book_meeting`, bounded server-side `hubspot_handoff` — no duplicated form schema/validation/consent; no silent CRM mutation.
 - `TASK-TBD` — [ui-ux] Admin cockpit `/admin/growth/ctas`: author/review/publish/pause/report workbench with Composition Shell, Adaptive Sidecar, canonical copy and GVC.
-- `TASK-TBD` — [backend-data] Experimentation layer: stable assignment, mutual exclusion, sample ratio mismatch detection, powered-test metadata and guardrail reporting.
 - `TASK-TBD` — [standard/docs] Operator manual, GTM implementation guide, public-site/Think rollout playbook and QA gates.
+- `TASK-TBD` (deferred, post-V1) — [backend-data] Experimentation layer: stable assignment, mutual exclusion, sample ratio mismatch detection, powered-test metadata and guardrail reporting. **Deferred out of V1** (Arch §18 / ADR §Deferred): built only when public traffic supports a powered test; candidate `growth.experiment` split.
 
 ## Existing Related Work
 
@@ -66,18 +68,25 @@ Esto no cabe en una sola task porque cruza backend/data, renderer portable, publ
 - Public site AEO `/aeo-2/` Growth Forms rollout — proof that portable Growth renderer + WordPress host layer is viable, but CTA prompts must graduate beyond page-local anchors.
 - HubSpot CTAs product behavior — benchmark only; HubSpot is not the source of truth for Greenhouse CTA policy.
 
-## Exit Criteria
+## Exit Criteria (V1)
 
 - [ ] `growth.cta` foundation has canonical readers/commands, lifecycle, immutable published versions, surface binding checks and event/action primitives under `src/lib/growth/ctas/`.
 - [ ] Public render/record APIs and admin APIs exist or are explicitly planned with Full API Parity; no visible workflow is UI-only.
-- [ ] Portable renderer ships at least one embedded/banner placement and one interruptive placement (`popup_modal` or `slide_in`) with keyboard, focus return, close/escape, reduced-motion, mobile and horizontal-scroll evidence.
-- [ ] GTM/dataLayer event taxonomy `greenhouse_cta_*` is documented, no raw PII reaches browser telemetry, and server-side ledger reconciles with host events.
+- [ ] Priority arbitration is **server-side**: the renderer receives the resolved 0–1 interruptive + N non-interruptive placements, never the candidate set or the priority policy.
+- [ ] Portable renderer ships at least one embedded/banner placement and one interruptive placement (`popup_modal` or `slide_in`) with keyboard, focus return, close/escape, reduced-motion, mobile, horizontal-scroll and **anti-CLS/layout-stability** evidence; preview↔public render the same contract (parity test).
+- [ ] Event evidence is **two-tier**: conversion evidence in an audit-grade Postgres ledger; high-volume exposure (`eligible`/`suppressed`/`viewed`) in an analytical/sampled sink, never synchronous OLTP rows.
+- [ ] The public ingest treats browser events as **untrusted**: surface `cta_version↔surface_id` cross-check, rate-limit/idempotency, bot filtering; only `server_confirmed` outcomes feed conversion truth. `consent_source` is recorded and gates tracking/personalization.
+- [ ] A global/per-surface **kill switch** takes a live CTA down within the render-contract cache TTL, without redeploy.
+- [ ] GTM/dataLayer event taxonomy `greenhouse_cta_*` is documented (deliberately distinct from internal `growth.cta.*`), no raw PII reaches browser telemetry, and server-side ledger reconciles with host events.
 - [ ] Growth Forms integration proves CTA→form open/submit relationship without duplicating form schema, validation or consent.
 - [ ] At least one public surface and one Think or Greenhouse surface consume the same published render contract.
 - [ ] Admin cockpit can author/review/publish/pause/report CTAs through commands/readers, not direct table writes.
-- [ ] Experimentation layer blocks or clearly labels underpowered tests; no CTA winner can be declared without primary metric, MDE/sample-size plan, guardrails and SRM check.
-- [ ] Reliability signals for render, ingest, action, GTM, form handoff, unauthorized surface, SRM and priority collisions are registered and visible in the reliability plane.
-- [ ] Functional/operator docs cover authoring, rollout, GTM setup, QA/GVC gates, privacy guardrails and rollback.
+- [ ] Reliability signals for render, ingest error, ingest backpressure, action, GTM, form handoff, unauthorized surface, kill-switch-active and priority collisions are registered and visible in the reliability plane.
+- [ ] Functional/operator docs cover authoring, rollout, GTM setup, QA/GVC gates, privacy/consent guardrails, kill switch and rollback.
+
+## Exit Criteria (deferred, post-V1)
+
+- [ ] Experimentation layer blocks or clearly labels underpowered tests; no CTA winner can be declared without primary metric, MDE/sample-size plan, guardrails and SRM check. **Not required for V1** — built only when public traffic supports a powered test (candidate `growth.experiment` split).
 
 ## Non-goals
 
@@ -91,4 +100,17 @@ Esto no cabe en una sola task porque cruza backend/data, renderer portable, publ
 
 ## Delta 2026-07-04
 
-Epic created after accepting the architecture/ADR for `growth.cta`. Recommended sequencing is backend-data foundation first, then renderer/wrappers, then action integrations, admin cockpit and experimentation. No runtime changes, migrations, GTM changes, tasks or deployments are authorized by this epic alone.
+Epic created after accepting the architecture/ADR for `growth.cta`. No runtime changes, migrations, GTM changes, tasks or deployments are authorized by this epic alone.
+
+## Delta 2026-07-04 — hardening review
+
+Post-creation architecture + product-design review folded into the ADR/spec and this epic:
+
+- Sequencing changed from horizontal-foundation-first to **vertical-slice-first** (real AI Visibility follow-up CTA on Think, end-to-end, before generalizing).
+- **Experimentation deferred out of V1** (underpowered public traffic; premature to build the platform before there is traffic to test).
+- Event evidence split into **two tiers** (audit-grade conversion in PG vs high-volume exposure in analytical/sampled sink) to respect the dual-store.
+- Public ingest hardened as a **forgeable write** (surface cross-check, bot filtering, `trust_level`, server-confirmed-only conversion truth) to protect experiment integrity.
+- **Server-side arbitration**, **visitor-state store**, **consent source-of-truth** and a **global kill switch** made explicit hard requirements.
+- Renderer contract adds **anti-CLS**, mobile-interstitial constraint and **preview↔public parity test**.
+
+Source: `GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md` §21 + `..._DECISION_V1.md`.

@@ -155,13 +155,21 @@ Required server-side primitives:
 - CTA definition/version reader.
 - Targeting and suppression policy compiler.
 - Render contract compiler.
-- Surface registry/embed key verifier.
-- Eligibility and priority arbiter.
-- Exposure/interaction ledger writer.
+- Surface registry/embed key verifier (with `cta_version ↔ surface_id` cross-check on public ingest).
+- Eligibility and priority arbiter (**server-side**; renderer receives the resolved 0–1 interruptive + N non-interruptive, never the candidate set).
+- Visitor-state store (pseudonymous, consent-gated, edge/cache friendly) for dismissal/conversion/frequency-cap state.
+- Two-tier event writers: Tier A conversion evidence ledger (Postgres, audit-grade) + Tier B exposure telemetry (high-volume, analytical/sampled — **not** synchronous OLTP rows).
 - Action router.
-- Experiment assignment reader/writer.
-- Performance report reader.
+- Global/per-surface emergency kill switch honored by the renderer within the contract cache TTL.
+- Performance report reader (conversion metrics computed from server-confirmed outcomes only).
+- Experiment assignment reader/writer — **metadata only in V1**; powered A/B assignment/SRM/guardrail engine deferred (see §Deferred out of V1).
 - Lifecycle command set.
+
+Trust and consent contract:
+
+- Browser-reported events (`clicked`/`viewed`/`action_completed` from the client) are **directional telemetry, not conversion authority**. Only `server_confirmed` outcomes or Growth Forms server-accepted submissions count toward conversion truth and experiment primary metrics.
+- The public ingest is a forgeable write (embed key is not a visitor secret): rate-limit, idempotency, bot filtering and surface cross-check are required.
+- `consent_state` gates tracking/personalization; the event records `consent_source`. CTA exposure telemetry does not inherit a Growth Forms submission consent.
 
 Required actions:
 
@@ -182,6 +190,15 @@ draft -> review -> published -> paused -> deprecated -> archived
 
 Published versions are immutable. Editing a live CTA creates a new version.
 
+## Deferred out of V1
+
+- **Powered experimentation engine.** V1 records variant metadata and emits events, but the stable-assignment / SRM / guardrail / powered-test layer is deferred. Rationale: Efeonce public traffic is likely underpowered for a valid A/B test, and building the experiment platform before there is traffic to test is premature. Until it graduates (candidate `growth.experiment` split), no CTA "winner" may be declared; V1 ships high-confidence CRO changes only.
+- **Full personalization / CDP.** V1 targeting is coarse and consent-aware only (no segmentation platform).
+
+## Reversal / kill switch
+
+Independent of the two-way-door reversibility above, a runtime **global/per-surface kill switch** is a hard requirement: a misbehaving public popup (a11y break, content occlusion, consent incident) must be takeable-down sub-minute via the switch (bounded by the render-contract cache TTL), not via redeploy.
+
 ## Revisit when
 
 - The Tracking Engine becomes accepted/runtime and should absorb part of the event ledger.
@@ -198,3 +215,16 @@ Published versions are immutable. Editing a live CTA creates a new version.
 - `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
+
+## Delta 2026-07-04 — hardening review
+
+Architecture + product-design review after acceptance. The direction stands; the following were made explicit before any implementation task starts (detail in `..._ARCHITECTURE_V1.md` §21):
+
+1. **Two-tier event evidence** — audit-grade conversion in Postgres vs high-volume exposure in an analytical/sampled sink (dual-store alignment).
+2. **Forgeable public ingest** — surface cross-check, bot filtering and `trust_level`; only server-confirmed outcomes are conversion/experiment authority (protects SRM/experiment integrity).
+3. **Server-side arbitration** + pseudonymous **visitor-state store**.
+4. **Consent source-of-truth** (`consent_source`) and a hard-requirement **global kill switch**.
+5. **Anti-CLS / mobile-interstitial constraint / preview↔public parity** in the renderer contract.
+6. **Vertical-slice-first sequencing** and **experimentation deferred out of V1**.
+
+Still no runtime changes, migrations, GTM changes, tasks or deployments authorized.

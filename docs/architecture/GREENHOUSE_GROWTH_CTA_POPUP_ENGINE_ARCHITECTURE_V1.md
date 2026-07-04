@@ -193,6 +193,8 @@ flowchart TB
 
 Do not place this under `public_site`, `commercial`, `platform` or `growth.forms`. Those are consumers/participants.
 
+The versioned runtime contract id is `greenhouse-growth-cta-popup.v1`; `greenhouse-growth-cta-popup-*` is the contract family prefix. Both refer to the same contract lineage.
+
 ## 8. Terminology
 
 | Term | Meaning | Examples |
@@ -274,47 +276,45 @@ Rules:
 - The same CTA can render on multiple surfaces with separate rollout and telemetry.
 - Surface controls where a CTA can render; action policy controls what it can do.
 
-### 9.4 Aggregate: `cta_event`
+### 9.4 Event evidence — two tiers, not one table
 
-Append-only evidence ledger for exposure and interaction.
+CTA events span two very different volume/trust profiles and **must not** live in a single Postgres table. `eligible`, `suppressed` and `viewed` fire on nearly every public pageview (high cardinality, low individual value, browser-reported → untrusted). `clicked`, `action_started`, `action_completed`, `form_submitted` are conversion evidence (low volume, audit-grade). Collapsing both into one synchronous append-only Postgres table breaks the dual-store posture (PG = OLTP, BQ = analytical) and inflates `greenhouse_growth` without bound. This mirrors the Growth Forms decision: the server conversion ledger is authoritative and small; behavioral exposure is analytical.
 
-Event kinds:
+**Tier A — conversion evidence ledger (`cta_conversion_event`, Postgres, audit-grade).**
 
-- `eligible`
-- `suppressed`
-- `viewed`
-- `dismissed`
-- `clicked`
-- `action_started`
-- `action_completed`
-- `form_opened`
-- `form_submitted`
-- `error`
+Low-volume, server-attributable outcomes only. Append-only in `greenhouse_growth`.
+
+Event kinds: `clicked`, `action_started`, `action_completed`, `form_opened`, `form_submitted`, `dismissed`, `error`.
 
 Fields:
 
 - `event_id`
-- `cta_id`
-- `cta_version_id`
-- `surface_id`
-- `page_uri`
-- `placement`
-- `trigger`
-- `variant_id`
-- `action_kind`
-- `visitor_key_hash`
-- `session_key_hash`
-- `consent_state`
-- `utm_json`
-- `referrer_domain`
+- `cta_id`, `cta_version_id`
+- `surface_id`, `page_uri`, `placement`, `trigger`, `variant_id`, `action_kind`
+- `visitor_key_hash`, `session_key_hash`
+- `consent_state`, `consent_source`
+- `utm_json`, `referrer_domain`
+- `trust_level`: `browser_reported | server_confirmed`
 - `event_payload_json` (allowlisted, no raw PII)
 - `created_at`
 
-Rules:
+**Tier B — exposure telemetry (`cta_exposure`, high-volume analytical).**
 
-- Event ledger is append-only.
-- PII is not allowed in browser telemetry or general event payloads.
-- If a Growth Form submission happens, the form submission ledger remains conversion authority; CTA stores the relationship.
+`eligible`, `suppressed`, `viewed` and other exposure signals. These do **not** land synchronously in OLTP Postgres. V1 options, decided at foundation time (do not defer silently):
+
+1. Route through the outbox → BQ analytical sink (preferred if the exposure rate is bounded), OR
+2. Emit into the future Tracking Engine envelope (`greenhouse-tracking-events.v1`) once it is accepted/runtime, OR
+3. Sample and aggregate at the edge/renderer before ingest when raw exposure volume would overwhelm the sink.
+
+Until the Tracking Engine is runtime, V1 owns a thin, rate-limited, **sampled** exposure ingest and writes aggregates, never one PG row per pageview.
+
+Rules (both tiers):
+
+- Both ledgers are append-only; no `UPDATE`/`DELETE` (supersede/aggregate only).
+- PII is never allowed in browser telemetry or any event payload.
+- **Browser-reported events are untrusted for experiment interpretation.** Only `trust_level='server_confirmed'` outcomes (server-confirmed via §9.5 `cta_action_attempt`, or joined to a Growth Forms server-accepted submission) count toward experiment primary metrics and conversion truth. Browser `clicked`/`viewed` are directional telemetry, not conversion authority.
+- If a Growth Form submission happens, the **form submission ledger remains conversion authority**; the CTA stores only the relationship (submission id join).
+- Retention is explicit and different per tier: conversion evidence is long-lived/audit-grade; raw exposure is short-lived and superseded by aggregates.
 
 ### 9.5 Aggregate: `cta_action_attempt`
 
@@ -402,6 +402,10 @@ Priority policy:
 eligibility -> suppression -> mutual exclusion -> priority score -> placement constraints -> render
 ```
 
+**Arbitration is a server-side decision, not a client one.** Following the same reasoning that rejects Alternative D (browser-only policy), the priority arbiter runs in Greenhouse. The renderer asks *"what should show on this surface + route + visitor context?"* and receives the resolved answer: at most **one** interruptive prompt plus N non-interruptive placements. The browser never receives the full candidate set or the priority policy — that would leak targeting logic and drift toward per-surface snippets. The public read endpoint returns the already-arbitrated render contract(s).
+
+**Visitor state store.** Suppression ("already dismissed", "already converted", frequency cap) requires per-visitor state keyed on `visitor_key_hash`/`session_key_hash`. This is a hot public read on every eligibility check, so it must be served fast (edge/cache friendly, short-TTL) and be pseudonymous (hashes only, no PII, consent-gated). It is a first-party, cookie/consent-based state — never a third-party audience segment. Cache TTL is bounded so a paused/killed CTA stops appearing within the kill-switch window (§16).
+
 ## 12. Action routing
 
 Supported action kinds:
@@ -463,11 +467,14 @@ Telemetry rules:
 
 - No raw PII in `dataLayer`, `CustomEvent.detail`, logs or query strings.
 - Event/property names are stable and snake_case.
-- GTM is allowed to trigger analytics/ad tags from events; Greenhouse remains the policy/evidence source.
+- **The two event namespaces are deliberate, not to be "harmonized":** browser/host-facing events use `greenhouse_cta_*` (dataLayer/GTM); internal event, signal and capability keys use `growth.cta.*`. They serve different consumers (host measurement vs internal outbox/policy) and must not be collapsed.
+- **Browser events are directional, not authoritative.** Experiment primary metrics and conversion truth read only server-confirmed outcomes (§9.4). GTM is a measurement/activation surface; Greenhouse remains the policy/evidence source.
 - If `GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md` becomes accepted/runtime, CTA events should route into its envelope instead of inventing a parallel behavioral warehouse.
 - CTA events must reconcile with Growth Forms submission IDs where a CTA opens or embeds a form.
 
 ## 14. Experimentation contract
+
+> **V1 scope:** this contract governs experimentation **when it is built**, which is **deferred out of V1** (§18). V1 records variant metadata and emits events only; the powered assignment/SRM/guardrail engine graduates later (candidate `growth.experiment`). No CTA winner may be declared until then.
 
 The engine may assign variants; it must not overclaim experiment results.
 
@@ -515,6 +522,15 @@ Motion:
 - Reduced motion removes transform/animation and preserves visible state.
 - GSAP is not used for ordinary CTA microinteractions.
 
+Layout stability and Core Web Vitals:
+
+- Injected banners/slide-ins **must not cause layout shift**. Reserve space or animate via `transform`/overlay so the host page CLS is not degraded — the CTA engine shares public surfaces with the SEO/AEO work, which is CLS-sensitive. Reuse the Growth Forms renderer's skeleton anti-CLS precedent (`src/growth-forms-renderer/styles.ts`).
+- **Mobile intrusive-interstitial guideline is a targeting constraint, not just a taste rule.** Interruptive `popup_modal` on mobile is penalized by search engines and hostile to users; exit-intent is desktop-only (§10) and mobile interruptive placements are restricted by policy, dismissible, and never cover essential content, forms or navigation.
+
+Preview parity:
+
+- The admin/preview renderer (MUI `GreenhouseFloatingSurface`) and the public renderer (framework-light Web Component) are two implementations of the same contract. A **render-contract parity test** must assert preview and public render the same governed contract (replicate `src/lib/growth/forms/__tests__/renderer-contract-parity.test.ts`). Preview fidelity must not silently diverge from production.
+
 Accessibility:
 
 - Popup modal uses correct dialog semantics, focus trap, close button, escape dismissal and focus return.
@@ -530,9 +546,26 @@ Accessibility:
 - No secrets, provider mappings or HubSpot internals are sent to the browser.
 - Event ingestion is rate-limited and idempotent where practical.
 - Visitor/session identifiers are pseudonymous hashes; raw identifiers do not enter telemetry.
-- Consent state gates tracking/personalization rules.
-- Retention policy is explicit for event and suppression records.
+- Retention policy is explicit for event and suppression records (per-tier, §9.4).
 - Chile Ley 21.719/GDPR-style posture applies to PII and consent.
+
+### 16.1 The public ingest is a forgeable write — treat it as untrusted
+
+The embed key lives in the browser, so it authenticates the **surface**, not the **visitor**. Anyone can read it and forge `viewed`/`clicked`/`action_completed` events. Left undefended, forged events inflate the ledger and — worse — poison experiment interpretation (fake conversions, broken SRM). Defense in depth:
+
+- The public ingest endpoint validates surface binding, origin allowlist and embed key, and **cross-checks** that the reported `cta_version` actually targets the reported `surface_id` (reject mismatches).
+- Rate-limit and idempotency-key per visitor/session hash; drop implausible bursts.
+- Basic bot/abuse filtering on the ingest path; suspicious traffic is flagged, not counted.
+- **Conversion truth never trusts the browser.** Only `trust_level='server_confirmed'` outcomes (§9.4/§9.5) or Growth Forms server-accepted submissions count as conversions or feed experiment primary metrics. `clicked`/`viewed` remain directional.
+- Signal `growth.cta.surface_unauthorized_attempt` (§17) surfaces forged/unauthorized ingest attempts.
+
+### 16.2 Consent state — source of truth is declared, not implied
+
+`consent_state` gates tracking/personalization rules, but V1 must declare **where consent comes from** (field `consent_source` on events). CTA exposure telemetry has its own consent basis — it does **not** inherit a Growth Forms submission consent (that consent covers form submission, not popup tracking). V1 reads consent from the host consent surface (e.g. GTM consent mode / host CMP) passed explicitly by the wrapper, and records `consent_source`. When consent is absent for a tracking/personalization rule, the rule is suppressed (§11), not silently applied.
+
+### 16.3 Global kill switch (blast-radius control)
+
+A public interruptive-popup engine needs an emergency stop faster than a redeploy. Beyond per-version `paused` and per-surface `paused`, V1 must provide a **global/per-surface emergency disable** that the renderer honors within a bounded window (tied to the render-contract cache TTL, §11). If a CTA breaks accessibility, covers content, or triggers a consent incident on the public site, an operator can take it down sub-minute without shipping code. This is a hard requirement, not an enhancement.
 
 ## 17. Reliability and observability
 
@@ -540,12 +573,14 @@ Initial signals:
 
 - `growth.cta.render_error_rate`
 - `growth.cta.event_ingest_error_rate`
+- `growth.cta.event_ingest_backpressure` (exposure ingest volume vs sink capacity; detects the §9.4 Tier B overflow risk)
 - `growth.cta.action_failed`
-- `growth.cta.surface_unauthorized_attempt`
+- `growth.cta.surface_unauthorized_attempt` (forged/unauthorized ingest, §16.1)
 - `growth.cta.gtm_event_missing`
 - `growth.cta.form_handoff_failed`
 - `growth.cta.experiment_srm_detected`
 - `growth.cta.priority_collision`
+- `growth.cta.kill_switch_active` (steady = 0; non-zero means an emergency disable is live and should be visible, §16.3)
 
 Operational dashboards should answer:
 
@@ -557,14 +592,15 @@ Operational dashboards should answer:
 
 ## 18. MVP sequencing
 
-Recommended split:
+**Vertical slice first, not a horizontal platform.** The self-critique (§19) warns against building the platform before the first user. A pure backend-foundation phase with no visible renderer builds a large speculative surface before a single real CTA renders. Instead, V1 proves **one real CTA end-to-end against the already-named first consumer** (the AI Visibility report follow-up on Think), then widens.
 
-1. **Backend-data foundation:** schema, readers/commands, lifecycle, surface registry, render contract compiler, event ledger, action router skeleton, no visible renderer.
-2. **Renderer MVP:** Web Component + WordPress/Think/Astro wrappers, GTM/dataLayer events, one inline banner and one popup/slide-in placement, GVC/Playwright evidence.
-3. **Growth Forms action:** `open_growth_form` / `embed_growth_form` with relationship to form submission ledger.
-4. **Asset + Think actions:** ebook download and Think tool route with UTM/context.
-5. **Admin cockpit:** `/admin/growth/ctas` for author/review/publish/pause/report, using Composition Shell + sidecar.
-6. **Experimentation:** stable assignment, powered-test guardrails and reports.
+1. **Vertical slice (thin, real):** the AI Visibility report follow-up CTA, on **one** surface (Think report), with **one** action (`open_growth_form`) and **one** embedded/banner placement, end-to-end — minimal `cta_definition`/`cta_version` + published immutable contract, server-side arbitration, Tier A conversion ledger, GTM/dataLayer events, one reliability signal, GVC/Playwright evidence. This forces the whole spine (compile → arbitrate → render → event → action) through a real user path.
+2. **Second placement + interruptive:** add one interruptive placement (`popup_modal` or `slide_in`) with full a11y/motion/CLS contract, and a second surface (public WordPress) consuming the same published contract.
+3. **Exposure tier + suppression at scale:** Tier B exposure ingest (sampled/BQ per §9.4), visitor-state store, frequency capping, kill switch.
+4. **Action breadth:** `embed_growth_form`, `download_asset`, `book_meeting`, bounded `hubspot_handoff`.
+5. **Admin cockpit:** `/admin/growth/ctas` author/review/publish/pause/report, Composition Shell + sidecar, preview-parity test.
+
+**Experimentation is explicitly deferred out of V1.** As §14 concedes, if public traffic is underpowered a powered A/B test is not viable; building the full assignment/SRM/guardrail layer before there is traffic to test is premature. V1 ships high-confidence CRO changes and records variant metadata only; the powered-experiment engine graduates to a later phase (candidate `growth.experiment` split, §19). Until then, no CTA "winner" may be declared.
 
 ## 19. Self-critique
 
@@ -592,7 +628,36 @@ Browser dataLayer pushes can be blocked or misconfigured. Greenhouse needs serve
 
 Targeting and personalization can drift into sensitive profiling. V1 only allows coarse, consent-aware inputs and forbids raw PII/sensitive attributes in targeting.
 
-## 20. Related documents
+## 20. Hard rules (NUNCA / SIEMPRE)
+
+- **NUNCA** almacenar exposición de alto volumen (`eligible`/`suppressed`/`viewed`) como filas OLTP síncronas en Postgres — va a la Tier B analítica/sampleada (§9.4). El ledger PG es solo evidencia de conversión audit-grade.
+- **NUNCA** tratar un evento browser (`clicked`/`viewed`/`action_completed` reportado por el cliente) como verdad de conversión ni como métrica primaria de experimento. Solo `server_confirmed` o submission server-aceptada de Growth Forms cuentan (§9.4/§16.1).
+- **NUNCA** arbitrar prioridad o resolver suppression en el cliente. La arbitración es server-side; el renderer recibe 0–1 interruptivo + N no-interruptivos ya resueltos (§11).
+- **NUNCA** duplicar schema/validación/consent de Growth Forms dentro del motor de CTA — el CTA abre/embebe un form; el form es la autoridad de submit (§12).
+- **NUNCA** enviar secretos, mapeos de provider o internals de HubSpot al browser; el render contract expone solo campos browser-safe.
+- **NUNCA** aplicar una regla de tracking/personalización sin `consent_state` válido y `consent_source` declarado (§16.2).
+- **NUNCA** declarar un "winner" de CTA sin métrica primaria, MDE/sample-size, guardrails y chequeo SRM (§14); experimentación powered está diferida fuera de V1 (§18).
+- **NUNCA** shippear un placement interruptivo sin dialog semantics, focus trap/return, escape, dismissal por teclado, reduced-motion y anti-CLS (§15).
+- **SIEMPRE** proveer kill switch global/por-surface que el renderer honra dentro del TTL del contrato (§16.3).
+- **SIEMPRE** cross-check `cta_version ↔ surface_id` en el ingest público y emitir `growth.cta.surface_unauthorized_attempt` ante mismatch (§16.1).
+- **SIEMPRE** mantener paridad preview↔público con un test de contrato (§15), replicando `renderer-contract-parity.test.ts` de Growth Forms.
+- **SIEMPRE** exponer cada capability vía contrato gobernado (Full API Parity): un primitive, muchos consumers (UI, Nexa, MCP, CLI).
+
+## 21. Delta 2026-07-04 — hardening review
+
+Revisión de arquitectura + product design sobre el ADR/spec aceptados. Cambios incorporados:
+
+- **Event ledger partido en dos tiers** (§9.4): conversión audit-grade en PG vs exposición alto-volumen analítica/sampleada — alinea con el dual-store (PG OLTP / BQ analítico) y cierra el gap de scalability.
+- **Ingest público tratado como write forjable** (§16.1): cross-check version↔surface, bot filtering, y `trust_level` server-confirmed como única autoridad de conversión/experimento — cierra el gap de integridad de experimentos (SRM envenenado).
+- **Arbitración server-side + visitor-state store** explícitos (§11).
+- **Consent SoT declarado** (`consent_source`, §16.2) y **kill switch global** como requisito duro (§16.3).
+- **CLS/anti-shift, constraint de interstitial móvil y test de paridad preview↔público** (§15); señales de backpressure y kill switch (§17).
+- **Secuenciación reescrita a vertical-slice-first** contra el reporte AI Visibility en Think; **experimentación powered diferida fuera de V1** (§18).
+- Namespaces `greenhouse_cta_*` (browser) vs `growth.cta.*` (interno) declarados deliberados (§13); naming de contrato aclarado (§7).
+
+Sin cambios de runtime, migraciones, GTM ni deploy autorizados por esta revisión.
+
+## 22. Related documents
 
 - `GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md`
 - `GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`
