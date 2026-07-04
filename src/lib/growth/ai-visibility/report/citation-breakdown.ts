@@ -11,9 +11,17 @@ import {
   type GrowthAiVisibilityProviderId
 } from '../contracts'
 import { normalizeDomain } from '../observation'
-import { type CitationSourceBreakdown, type CitationSourceClassification } from './contracts'
+import {
+  CITATION_SOURCE_CLASSIFICATIONS,
+  type CitationSourceBreakdown,
+  type CitationSourceClassification,
+  type CitationSourceClassificationTotals
+} from './contracts'
 
 export const CITATION_SOURCE_BREAKDOWN_TOP_N = 10
+
+const emptyClassificationTotals = (): CitationSourceClassificationTotals =>
+  Object.fromEntries(CITATION_SOURCE_CLASSIFICATIONS.map(classification => [classification, 0])) as CitationSourceClassificationTotals
 
 const COMMON_COMPOUND_PUBLIC_SUFFIXES = new Set([
   'co.uk',
@@ -156,10 +164,17 @@ export const buildCitationSourceBreakdown = (input: {
       return a.domain.localeCompare(b.domain)
     })
 
+  const classificationTotals = emptyClassificationTotals()
+
+  for (const domain of domains) {
+    classificationTotals[domain.classification] += domain.count
+  }
+
   return {
     domains: domains.slice(0, limit),
     totalCitations,
     uniqueDomains: byDomain.size,
+    classificationTotals,
     reason: totalCitations === 0 ? 'sin_citas_evaluables' : null
   }
 }
@@ -169,4 +184,3 @@ export const summarizeCitationTargets = (breakdown: CitationSourceBreakdown, lim
     .filter(domain => domain.classification !== 'own_domain')
     .slice(0, Math.max(1, limit))
     .map(domain => domain.domain)
-

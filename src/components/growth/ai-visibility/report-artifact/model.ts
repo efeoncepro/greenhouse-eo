@@ -36,6 +36,7 @@ import type {
   GraderReportSeverity,
   PositionSummary,
   ProviderPresence,
+  PublicReportViewFacts,
   PublicGraderReport,
   PublicPrimaryGap,
   PublicReportDimension,
@@ -48,6 +49,10 @@ import type {
   SentimentSummary,
   SourceTypeCount
 } from '@/lib/growth/ai-visibility/report/contracts'
+import {
+  buildPublicReportViewFacts,
+  type PublicReportViewFactOptions
+} from '@/lib/growth/ai-visibility/report/view-facts'
 
 // ── Variants + audiences ──────────────────────────────────────────────────────
 
@@ -216,6 +221,8 @@ export interface ReportArtifactLevel {
   /** `measured` = tiene ≥1 dimensión con evidencia; `coverage` = aún sin medición. */
   status: 'measured' | 'coverage'
   dimensionKeys: ScoreDimensionKey[]
+  /** Primer nivel no óptimo; server-derived para que el render no decida el "empieza aquí". */
+  isNext: boolean
 }
 
 /**
@@ -253,6 +260,8 @@ export interface ReportArtifactModel {
   disclaimer: string
   /** Presencia por motor (conteos) de la marca evaluada — público-safe, con logo + nombre. */
   engineSnapshot?: ProviderPresence[]
+  /** Facts render-ready public-safe; Greenhouse los deriva, consumers sólo pintan. */
+  viewFacts: PublicReportViewFacts
 }
 
 // ── Derivations ───────────────────────────────────────────────────────────────
@@ -289,8 +298,8 @@ const weightedAverage = (
 const buildLevels = (
   dimensions: PublicReportDimension[],
   readiness: PublicReportReadiness | null
-): ReportArtifactLevel[] =>
-  REPORT_LEVEL_IDS.map(id => {
+): ReportArtifactLevel[] => {
+  const levels: ReportArtifactLevel[] = REPORT_LEVEL_IDS.map(id => {
     const dimensionKeys = REPORT_LEVEL_DIMENSIONS[id]
 
     const score =
@@ -304,9 +313,15 @@ const buildLevels = (
       score,
       severity: severityFromScore(score),
       status: score === null ? 'coverage' : 'measured',
-      dimensionKeys
+      dimensionKeys,
+      isNext: false
     }
   })
+
+  const nextIndex = levels.findIndex(level => level.severity !== 'optimo')
+
+  return levels.map((level, index) => ({ ...level, isNext: index === nextIndex }))
+}
 
 const perceptionAxisScore = (dimensions: PublicReportDimension[]): number | null => {
   const perceptionKeys = REPORT_LEVEL_IDS.filter(id => REPORT_LEVEL_AXIS[id] === 'perception').flatMap(
@@ -321,7 +336,8 @@ return weightedAverage(dimensions, perceptionKeys)
 
 const baseModel = (
   report: PublicGraderReport | ClientGraderReport,
-  variant: ReportArtifactVariant
+  variant: ReportArtifactVariant,
+  viewFactOptions: PublicReportViewFactOptions = {}
 ): ReportArtifactModel => ({
   variant,
   audience: report.audience,
@@ -350,14 +366,16 @@ const baseModel = (
   disclaimer: report.disclaimer,
   // TASK-1252 — presencia por motor (conteos) de la marca evaluada. Público-safe: es la
   // visibilidad del sujeto por canal (el valor del lead magnet), con logo + nombre por motor.
-  engineSnapshot: report.providerPresence
+  engineSnapshot: report.providerPresence,
+  viewFacts: buildPublicReportViewFacts(report, viewFactOptions)
 })
 
 /** publicWeb / attachment ← `PublicGraderReport` (lead magnet, leak-safe por tipo). */
 export const modelFromPublicReport = (
   report: PublicGraderReport,
-  variant: 'publicWeb' | 'attachment' = 'publicWeb'
-): ReportArtifactModel => baseModel(report, variant)
+  variant: 'publicWeb' | 'attachment' = 'publicWeb',
+  viewFactOptions: PublicReportViewFactOptions = {}
+): ReportArtifactModel => baseModel(report, variant, viewFactOptions)
 
 /** clientPortal ← `ClientGraderReport` (set completo de recomendaciones, sin internals de scoring). */
 export const modelFromClientReport = (report: ClientGraderReport): ReportArtifactModel =>
@@ -416,6 +434,7 @@ return {
     readiness: report.readiness,
     provenance: report.provenance,
     disclaimer: report.disclaimer,
-    engineSnapshot: report.providerPresence
+    engineSnapshot: report.providerPresence,
+    viewFacts: buildPublicReportViewFacts(report)
   }
 }

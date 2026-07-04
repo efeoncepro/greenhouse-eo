@@ -52,6 +52,12 @@ describe('growth/ai-visibility — citation source breakdown (TASK-1268)', () =>
 
     expect(breakdown.totalCitations).toBe(5)
     expect(breakdown.uniqueDomains).toBe(4)
+    expect(breakdown.classificationTotals).toEqual({
+      own_domain: 1,
+      competitor: 1,
+      third_party: 2,
+      ugc: 1
+    })
     expect(breakdown.reason).toBeNull()
     expect(breakdown.domains[0]).toEqual({
       domain: 'g2.com',
@@ -91,7 +97,40 @@ describe('growth/ai-visibility — citation source breakdown (TASK-1268)', () =>
       domains: [],
       totalCitations: 0,
       uniqueDomains: 0,
+      classificationTotals: {
+        own_domain: 0,
+        competitor: 0,
+        third_party: 0,
+        ugc: 0
+      },
       reason: 'sin_citas_evaluables'
+    })
+  })
+
+  it('mantiene totales globales aunque el dominio quede fuera del top-N', () => {
+    const breakdown = buildCitationSourceBreakdown({
+      subjectDomain: 'acme.com',
+      competitorsDeclared: ['competitor.com'],
+      limit: 2,
+      observations: [
+        observation({
+          citations: [
+            { url: 'https://g2.com/a', domain: 'g2.com' },
+            { url: 'https://g2.com/b', domain: 'g2.com' },
+            { url: 'https://reddit.com/r/saas', domain: 'reddit.com', sourceType: 'social' },
+            { url: 'https://competitor.com/post', domain: 'competitor.com' },
+            { url: 'https://acme.com/post', domain: 'acme.com' }
+          ]
+        })
+      ]
+    })
+
+    expect(breakdown.domains.map(domain => domain.domain)).toEqual(['g2.com', 'acme.com'])
+    expect(breakdown.classificationTotals).toEqual({
+      own_domain: 1,
+      competitor: 1,
+      third_party: 2,
+      ugc: 1
     })
   })
 
@@ -112,4 +151,3 @@ describe('growth/ai-visibility — citation source breakdown (TASK-1268)', () =>
     expect(summarizeCitationTargets(breakdown)).toEqual(['g2.com', 'reddit.com'])
   })
 })
-

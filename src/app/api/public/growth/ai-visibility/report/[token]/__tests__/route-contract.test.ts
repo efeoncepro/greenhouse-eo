@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SAMPLE_PUBLIC_REPORT } from '@/components/growth/ai-visibility/report-artifact/fixtures'
-import { GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION } from '@/lib/growth/ai-visibility/report/contracts'
+import {
+  GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION,
+  type PublicGraderReport
+} from '@/lib/growth/ai-visibility/report/contracts'
 
 /**
  * TASK-1280 Slice 2 — Test de contrato del PAYLOAD público headless.
@@ -102,6 +105,53 @@ describe('GET /report/[token] — contrato público headless (TASK-1280)', () =>
     expect(body.model.categoryTaxonomySummary).toEqual(body.report.categoryTaxonomySummary)
     expect(body.model.readiness).toEqual(body.report.readiness)
     expect(body.model.agenticAxisScore).toBeNull()
+    expect(body.model.viewFacts.engineCoverage.providers).toHaveLength(5)
+    expect(body.model.viewFacts.engineCoverage.providers.map((provider: { displayId: string }) => provider.displayId)).toEqual([
+      'chatgpt',
+      'claude',
+      'gemini',
+      'perplexity',
+      'google_ai_overview'
+    ])
+    expect(body.model.viewFacts.engineCoverage.summary.shareOfModel).toBe(71)
+    expect(body.model.viewFacts.citationTotals).toMatchObject({
+      totalCitations: 45,
+      uniqueDomains: 4,
+      ownDomainShare: 32,
+      ownDomain: 9,
+      competitor: 7,
+      thirdParty: 18,
+      ugc: 11
+    })
+    expect(body.model.viewFacts.shareFacts.reportUrl).toBe('https://think.efeoncepro.com/brand-visibility/r/grt-deadbeef')
+  })
+
+  it('mantiene compatibilidad con snapshots viejos sin classificationTotals', async () => {
+    const oldPublicReport: PublicGraderReport = structuredClone(SAMPLE_PUBLIC_REPORT)
+
+    delete oldPublicReport.citationSourceBreakdown.classificationTotals
+    snapshotState.value = {
+      reportId: 'grpt-old',
+      runId: 'run-old',
+      reportToken: 'grt-old',
+      asOf: '2026-05-01T12:00:00.000Z',
+      expiresAt: null,
+      publicReport: oldPublicReport,
+      brandName: 'Globe',
+      runPublicId: 'EO-GRUN-00041'
+    }
+
+    const res = await callGet('grt-old')
+    const body = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(body.model.viewFacts.citationTotals).toMatchObject({
+      ownDomainShare: 32,
+      ownDomain: null,
+      competitor: null,
+      thirdParty: null,
+      ugc: null
+    })
   })
 
   it('NUNCA filtra internos: providerFindings/accuracyFindings/narrativa cruda', async () => {
@@ -112,6 +162,8 @@ describe('GET /report/[token] — contrato público headless (TASK-1280)', () =>
     // Claves internal-only que NO existen en PublicGraderReport (no-leak por construcción).
     expect(serialized).not.toContain('providerFindings')
     expect(serialized).not.toContain('accuracyFindings')
+    expect(serialized).not.toContain('rawEvidencePointer')
+    expect(serialized).not.toContain('providerRequestHash')
     // Marcadores de narrativa cruda del run interno (fixture) que NUNCA deben cruzar.
     expect(serialized).not.toContain('INTERNAL')
     expect(serialized).not.toContain('invisible en Perplexity')

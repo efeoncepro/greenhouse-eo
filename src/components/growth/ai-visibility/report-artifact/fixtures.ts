@@ -154,6 +154,12 @@ export const SAMPLE_INTERNAL_REPORT: GraderReport = {
     ],
     totalCitations: 45,
     uniqueDomains: 4,
+    classificationTotals: {
+      own_domain: 9,
+      competitor: 7,
+      third_party: 18,
+      ugc: 11
+    },
     reason: null
   },
   categoryTaxonomySummary: {

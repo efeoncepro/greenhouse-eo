@@ -18,9 +18,7 @@ import 'server-only'
  */
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-
-const PUBLIC_GRADER_HUB_URL_DEFAULT = 'https://think.efeoncepro.com'
-const PUBLIC_REPORT_PATH_PREFIX = '/brand-visibility/r'
+import { buildPublicReportUrl } from '../public-report-url'
 
 /** Token del snapshot público más reciente del run (null si aún no se publicó). */
 export const getLatestReportTokenForRun = async (runId: string): Promise<string | null> => {
@@ -36,9 +34,4 @@ export const getLatestReportTokenForRun = async (runId: string): Promise<string 
   return rows[0]?.report_token ?? null
 }
 
-/** URL pública estable del reporte a partir del token (hub headless `efeonce-think`). */
-export const buildPublicReportUrl = (reportToken: string): string => {
-  const base = (process.env.PUBLIC_GRADER_HUB_URL?.trim() || PUBLIC_GRADER_HUB_URL_DEFAULT).replace(/\/+$/, '')
-
-  return `${base}${PUBLIC_REPORT_PATH_PREFIX}/${reportToken}`
-}
+export { buildPublicReportUrl }

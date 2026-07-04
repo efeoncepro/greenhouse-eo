@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Code complete local — Greenhouse + Think; rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|data`
 - Blocked by: `none`
@@ -332,10 +332,10 @@ el minor habilita feature-detect. Documentar la política en
 2. **`sentiment.unknown`: NO se agrega.** No se toca el DTO por esto; el denominador honesto público
    es `evaluated`. (Queda como posible follow-up si el negocio lo pide.) → El **único** cambio de DTO
    build-time de esta task es `citationSourceBreakdown.classificationTotals` (Slice 3).
-3. **Adopción en Think: SEPARADA.** Esta task construye + prueba el contrato en Greenhouse
-   (backend-data, `UI impact: none`). El swap del consumer en `efeonce-think` (borrar derivaciones
-   locales + consumir facts) es un follow-up `ui-ux/standard`. NO tocar Think hasta que el contract
-   test de la ruta esté verde.
+3. **Adopción en Think: incluida por instrucción del operador.** La decisión inicial era separarla,
+   pero el operador pidió tomar TASK-1331 end-to-end y, si el contrato quedaba listo, adaptar Think
+   en el mismo pase. El swap se limitó a consumir `model.viewFacts`, mantener fallbacks para contratos
+   viejos y eliminar derivaciones semánticas locales sin rediseño visual.
 
 ### 4-pilares
 
@@ -744,44 +744,42 @@ The final implementation may choose narrower field names, but must satisfy the a
 
 ## Acceptance Criteria
 
-- [ ] A section-by-section data map exists in the task plan or docs, covering hero, executive evidence, Share of Model, sentiment, source map, competitive SoV, readiness, ladder, recommendations, dimensions, share widget and PDF/download actions.
-- [ ] `ReportArtifactModel` or a namespaced public view-model exposes canonical engine coverage facts including ChatGPT/OpenAI and Claude/Anthropic mapping.
-- [ ] Share of Model IA is server-derived and Think no longer needs a hardcoded engine roster for the metric.
-- [ ] Citation class totals are global, not derived from displayed top-N domains.
-- [ ] Own-domain share shown in public copy comes from `citationInsight.ownDomainShare` or a server-derived equivalent.
-- [ ] Competitive benchmark facts are server-derived from `competitiveSov` and include rank/gap/multiple/rows.
-- [ ] Sentiment/readiness/dimension/share facts are either server-derived or explicitly marked presentation-only with rationale.
-- [ ] Old public snapshots remain readable; missing new facts degrade to null/empty safe states, not 500.
-- [ ] Public route payload no-leak tests cover new fields.
-- [ ] The public model version policy is documented; additive minor bump applied if required.
-- [ ] No scoring, normalizer, provider adapter, probe or `executeClaimedGraderRun` behavior changes.
-- [ ] Docs, lifecycle, handoff and changelog are synchronized.
+- [x] A section-by-section data map exists in the task plan or docs, covering hero, executive evidence, Share of Model, sentiment, source map, competitive SoV, readiness, ladder, recommendations, dimensions, share widget and PDF/download actions.
+- [x] `ReportArtifactModel` or a namespaced public view-model exposes canonical engine coverage facts including ChatGPT/OpenAI and Claude/Anthropic mapping.
+- [x] Share of Model IA is server-derived and Think no longer needs a hardcoded engine roster for the metric.
+- [x] Citation class totals are global, not derived from displayed top-N domains.
+- [x] Own-domain share shown in public copy comes from `citationInsight.ownDomainShare` or a server-derived equivalent.
+- [x] Competitive benchmark facts are server-derived from `competitiveSov` and include rank/gap/multiple/rows.
+- [x] Sentiment/readiness/dimension/share facts are either server-derived or explicitly marked presentation-only with rationale.
+- [x] Old public snapshots remain readable; missing new facts degrade to null/empty safe states, not 500.
+- [x] Public route payload no-leak tests cover new fields.
+- [x] The public model version policy is documented; additive minor bump applied if required.
+- [x] No scoring, normalizer, provider adapter, probe or `executeClaimedGraderRun` behavior changes.
+- [x] Docs, lifecycle, handoff and changelog are synchronized for code-complete local.
 
 ## Verification
 
-- `pnpm task:lint --task TASK-1331`
-- `pnpm ops:lint --changed`
-- `pnpm docs:closure-check`
-- Public report route contract tests:
-  - `src/app/api/public/growth/ai-visibility/report/[token]/__tests__/route-contract.test.ts`
-- Report/model unit tests for:
-  - engine coverage mapping
-  - citation totals not top-N
-  - competitive benchmark facts
-  - old snapshot compatibility
-  - no-leak payload.
-- If Think adoption is included:
-  - `pnpm type-check` in `/Users/jreye/Documents/efeonce-think`
-  - `pnpm build` in `/Users/jreye/Documents/efeonce-think`
-  - `node scripts/verify-report.mjs <local-url> task1331-viewmodel-adoption`
+- `pnpm task:lint --task TASK-1331` — OK
+- `pnpm ops:lint --changed` — OK
+- `pnpm docs:closure-check` — OK after ADR/changelog/handoff sync
+- `pnpm lint` — OK
+- `pnpm typecheck` — OK
+- `pnpm build` — OK; preexisting Turbopack warning on roadmap reader broad pattern only
+- `pnpm exec vitest run src/lib/growth/ai-visibility/report/__tests__/view-facts.test.ts src/lib/growth/ai-visibility/__tests__/citation-breakdown.test.ts src/components/growth/ai-visibility/report-artifact/__tests__/report-artifact-no-leak.test.tsx 'src/app/api/public/growth/ai-visibility/report/[token]/__tests__/route-contract.test.ts'` — 4 files / 24 tests passed
+- `pnpm exec vitest run src/lib/growth/ai-visibility/report src/components/growth/ai-visibility/report-artifact src/app/api/public/growth/ai-visibility` — 5 files / 27 tests passed
+- `pnpm test` — 1243 files / 8745 tests passed
+- Think: `pnpm type-check` — OK (1 existing `document.execCommand` deprecation hint)
+- Think: `pnpm build` — OK
+- Think: `node scripts/verify-report.mjs http://127.0.0.1:4322/brand-visibility/r/mock-token task1331-viewmodel-adoption` — OK in 1440/1280/390; HTTP 200, `scrollWidth == clientWidth`, no internal leak patterns
+- Runtime/env not completed: `pnpm migrate:status` could not connect to local proxy `127.0.0.1:15432`; `pnpm secrets:audit` reports local secrets unconfigured. No migrations or secret/env changes are part of TASK-1331.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` synchronized with real status.
-- [ ] File moved to correct lifecycle folder.
-- [ ] `docs/tasks/README.md` synchronized.
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
-- [ ] `Handoff.md` updated.
-- [ ] `changelog.md` updated if behavior ships.
-- [ ] Architecture docs updated if the public contract shape changes.
-- [ ] Production rollout state documented; no prod release without explicit confirmation.
+- [x] `Lifecycle` synchronized with real status.
+- [x] File moved to correct lifecycle folder.
+- [x] `docs/tasks/README.md` synchronized.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
+- [x] `Handoff.md` updated.
+- [x] `changelog.md` updated if behavior ships.
+- [x] Architecture docs updated if the public contract shape changes.
+- [x] Production rollout state documented; no prod release without explicit confirmation.
