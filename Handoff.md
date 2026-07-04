@@ -1,3 +1,15 @@
+## Sesion 2026-07-04 - TASK-1334 Think category renderer contract - Codex - COMPLETE deployado
+
+> **Task tomada/cerrada:** `docs/tasks/complete/TASK-1334-think-category-perception-renderer-contract.md`. Perfil `ui-ux`, EPIC-020. El hook inicial bloqueó porque la task seguía declarando blockers `TASK-1331 complete; backend mapped-real-data proof is TASK-1333`.
+>
+> **Desbloqueo documentado:** `TASK-1331` está en `complete/` con release productivo del contrato público `modelVersion=1.1.0`; `TASK-1333` está en `complete/` con deploy del `ops-worker` y prueba E2E real `categoryTaxonomySummary.status='mapped'` para `EO-GRUN-00040`. Durante la ejecución, TASK-1334 se habilitó con `Blocked by: none`, se sincronizaron `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`, y el hook `pnpm codex:task-hook TASK-1334` pasó.
+>
+> **Cambios en `efeonce-think`:** `src/pages/brand-visibility/r/[token].astro` normaliza defensivamente counts/categorías para evitar `NaN`/filas vacías, agrega markers `report-category-mapped|rows|empty|review` + `data-category-status`, y reemplaza el badge visible `N ambiguas` por `N señales en revisión`. `scripts/verify-report.mjs` deja de asumir que `unknown` omite la sección y valida no filas fabricadas/no labels internos/no `NaN`; nuevo `scripts/verify-category-renderer.mjs` cubre fixture matrix `mapped|unknown|needs_review|legacy|malformed` en 1440/1280/390 con capturas. Commit `317853f fix(report): harden category perception renderer` pusheado a `efeonce-think/main`.
+>
+> **Evidencia:** `node scripts/verify-category-renderer.mjs task1334-category-renderer` OK (`.captures/task1334-category-renderer-2026-07-04T14-45-21-556Z/manifest.json`); Think `pnpm type-check` OK (0 errors; hint existente `document.execCommand` deprecated) + `pnpm build` OK; real mapped smoke local contra Greenhouse API real con `EO-GRUN-00040` (token prefix `grt-b095c3a8…`) OK en 1440/1280/390; real unknown smoke con `EO-GRUN-00038` (token prefix `grt-45361f26…`) OK en 1440/1280/390. Rollout: Vercel production `Ready`, deployment `https://efeonce-think-5huriwav0-efeonce-7670142f.vercel.app`, alias `https://think.efeoncepro.com`, deployment id `dpl_3HJdUKw6gxikdYiQJUMYctzHhrzG`. Smoke productivo: mapped `EO-GRUN-00040` y unknown `EO-GRUN-00038` OK en 1440/1280/390, HTTP 200, `scrollWidth == clientWidth`, sin labels internos visibles y sin `NaN`.
+>
+> **Estado:** `COMPLETE 2026-07-04`. TASK-1334 movida a `complete/`, registry/README/changelog sincronizados. No se expusieron tokens completos; solo prefijos documentados.
+
 ## Sesion 2026-07-04 - Growth CTA & Popup Engine architecture - Codex - docs accepted direction
 
 > **Pedido:** modelar el motor enterprise de CTA/pop-up CRO de Greenhouse, similar en clase a HubSpot CTAs pero transversal a Greenhouse, sitio público, Think y futuras surfaces; invocar skills UI/UX/motion/microinteracciones/growth CRO/digital marketing/arquitectura; crear arquitectura y ADR.

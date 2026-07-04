@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `COMPLETE 2026-07-04 — Think production deployed + real mapped/unknown smoke`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|ui`
-- Blocked by: `TASK-1331 complete; backend mapped-real-data proof is TASK-1333`
+- Blocked by: `none`
 - Branch: `task/TASK-1334-think-category-perception-renderer-contract`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -32,6 +32,46 @@
 ## Summary
 
 Endurece el renderer de `efeonce-think` para que la seccion `06 · Categoria percibida` pinte correctamente lo que Greenhouse ya envia en `categoryTaxonomySummary`, sin derivar semantica local ni depender de mocks. Cubre estados `mapped`, `needs_review`, `unknown`, snapshots viejos/parciales, no-leak visible, responsive y capturas.
+
+## Execution Intake — 2026-07-04
+
+- TASK-1331 blocker resolved: `docs/tasks/complete/TASK-1331-ai-visibility-public-report-viewmodel-contract.md` is `Lifecycle: complete`, production released, and documents the final `modelVersion=1.1.0` public report view-model.
+- TASK-1333 blocker resolved: `docs/tasks/complete/TASK-1333-ai-visibility-category-perception-production-signals.md` is `Lifecycle: complete`, documents `ops-worker` rollout, and records real mapped proof for `EO-GRUN-00040` with `categoryTaxonomySummary.status='mapped'`.
+- This task is now executable as the retroactive Think renderer audit + verifier hardening described in the 2026-07-04 arch review, with no backend/scoring/model changes.
+
+## Delta 2026-07-04 — COMPLETE; Think production deployed
+
+**Rollout aplicado en `efeonce-think`:**
+
+- Commit: `317853f fix(report): harden category perception renderer`.
+- Push: `efeonce-think/main` actualizado (`681f1e4..317853f`).
+- Vercel production: `Ready`, target `production`, deployment `https://efeonce-think-5huriwav0-efeonce-7670142f.vercel.app`, alias `https://think.efeoncepro.com`, deployment id `dpl_3HJdUKw6gxikdYiQJUMYctzHhrzG`.
+
+**Evidencia productiva:**
+
+- Mapped real: `EO-GRUN-00040`, token prefix `grt-b095c3a8…`; `node scripts/verify-report.mjs <prod-route-with-token-in-memory> task1334-prod-mapped` OK en `1440x1000`, `1280x900` y `390x844` con HTTP 200, `scrollWidth == clientWidth`, seccion de categoria presente, sin labels internos visibles y sin `NaN`.
+- Unknown real: `EO-GRUN-00038`, token prefix `grt-45361f26…`; `node scripts/verify-report.mjs <prod-route-with-token-in-memory> task1334-prod-unknown` OK en `1440x1000`, `1280x900` y `390x844` con HTTP 200, `scrollWidth == clientWidth`, estado honesto sin filas fabricadas, sin labels internos visibles y sin `NaN`.
+- Capturas productivas gitignored en `efeonce-think/.captures/task1334-prod-mapped-*` y `efeonce-think/.captures/task1334-prod-unknown-*`.
+
+**Estado correcto:** `complete`. Think renderiza `categoryTaxonomySummary` desde Greenhouse como renderer tonto, con fallback honesto para `unknown`/`needs_review`/legacy/malformed y sin cambios backend/scoring/modelo.
+
+## Delta 2026-07-04 — Pre-rollout local proof
+
+**Alcance aplicado en `efeonce-think` antes del push/deploy:**
+
+- Renderer `src/pages/brand-visibility/r/[token].astro`: se reemplazo el badge visible `N ambiguas` por copy publico `N señales en revisión`, se agregaron markers `report-category-mapped|rows|empty|review` + `data-category-status`, y se normalizaron defensivamente counts/categorias para evitar `NaN`, anchos negativos o filas vacias cuando el payload viene parcial/malformado.
+- Verifier general `scripts/verify-report.mjs`: dejo de asumir que `unknown` debe omitir la seccion; ahora valida no filas fabricadas para estados no mapped, no labels internos, no `NaN`, no overflow y no leaks visibles.
+- Nuevo verifier focal `scripts/verify-category-renderer.mjs`: levanta API fixture Greenhouse-shaped + Astro dev local y prueba `mapped`, `unknown`, `needs_review`, `legacy` y `malformed` en `1440x1000`, `1280x900` y `390x844`, con capturas full-page + crop de categoria.
+
+**Evidencia:**
+
+- Fixture matrix local: `node scripts/verify-category-renderer.mjs task1334-category-renderer` OK; manifest `.captures/task1334-category-renderer-2026-07-04T14-45-21-556Z/manifest.json`.
+- Think gates: `pnpm type-check` OK (0 errors; hint existente por `document.execCommand` deprecated), `pnpm build` OK.
+- Real mapped payload: DB confirmo `EO-GRUN-00040`, token prefix `grt-b095c3a8…`, `category_status=mapped`, `category_count=1`; smoke local contra Greenhouse API real + Think local `node scripts/verify-report.mjs <local-route-with-token-in-memory> task1334-real-mapped-local` OK en 1440/1280/390.
+- Real unknown payload: DB confirmo `EO-GRUN-00038`, token prefix `grt-45361f26…`, `category_status=unknown`, `category_count=0`; smoke local contra Greenhouse API real + Think local `node scripts/verify-report.mjs <local-route-with-token-in-memory> task1334-real-unknown-local` OK en 1440/1280/390.
+- Greenhouse task gates: `pnpm task:lint --task TASK-1334`, `pnpm ui:wireframe-check --task TASK-1334`, `pnpm ui:readiness-check --task TASK-1334`, `pnpm ops:lint --changed` OK.
+
+**Estado de este checkpoint:** `code complete local, rollout pendiente`. En ese momento no se hizo push a `efeonce-think/main` ni deploy productivo porque la task prohibia deploy productivo sin confirmacion explicita del operador. El rollout productivo final quedo documentado en el delta de cierre superior.
 
 ## Why This Task Exists
 
@@ -108,7 +148,7 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`
 - `docs/tasks/complete/TASK-1331-ai-visibility-public-report-viewmodel-contract.md`
-- `docs/tasks/to-do/TASK-1333-ai-visibility-category-perception-production-signals.md`
+- `docs/tasks/complete/TASK-1333-ai-visibility-category-perception-production-signals.md`
 - `docs/ui/wireframes/TASK-1334-think-category-perception-renderer-contract.md`
 - `/Users/jreye/Documents/efeonce-think/src/pages/brand-visibility/r/[token].astro`
 - `/Users/jreye/Documents/efeonce-think/src/components/primitives/ReportIcon.astro`
@@ -150,7 +190,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-1334-think-category-perception-renderer-contract.md`
+- `docs/tasks/complete/TASK-1334-think-category-perception-renderer-contract.md`
 - `docs/ui/wireframes/TASK-1334-think-category-perception-renderer-contract.md`
 - `/Users/jreye/Documents/efeonce-think/src/pages/brand-visibility/r/[token].astro`
 - `/Users/jreye/Documents/efeonce-think/src/components/primitives/ReportIcon.astro` only if icon semantics need small consumer-safe mapping
