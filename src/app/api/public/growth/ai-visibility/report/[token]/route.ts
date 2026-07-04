@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server'
 
-import { modelFromPublicReport } from '@/components/growth/ai-visibility/report-artifact/model'
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 import { checkPublicReadAllowed } from '@/lib/growth/ai-visibility/public-delivery/read-guard'
 import { buildPublicReportUrl } from '@/lib/growth/ai-visibility/public-report-url'
-import { GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION } from '@/lib/growth/ai-visibility/report/contracts'
-import { buildReportHeader } from '@/lib/growth/ai-visibility/report/report-header'
+import { buildPublicReportResponseBody } from '@/lib/growth/ai-visibility/report/public-report-response'
 import { readPublicGraderReport } from '@/lib/growth/ai-visibility/report/snapshot'
 import { captureWithDomain } from '@/lib/observability/capture'
 
@@ -51,23 +49,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ toke
       )
     }
 
-    // El builder (`modelFromPublicReport`) es el SSOT único de la derivación; el endpoint
-    // NO recomputa niveles/severidad/gaps. `efeonce-web` consume `model`, no re-deriva.
-    const model = modelFromPublicReport(snapshot.publicReport, 'publicWeb', {
-      reportUrl: buildPublicReportUrl(token)
-    })
-
-    const header = buildReportHeader({ organizationName: snapshot.brandName, asOf: snapshot.asOf })
-
-    return NextResponse.json({
-      report: snapshot.publicReport, // back-compat (DTO crudo público-safe)
-      model, // render-ready (incluye engineSnapshot público)
-      modelVersion: GROWTH_AI_VISIBILITY_PUBLIC_REPORT_MODEL_VERSION,
-      header, // masthead render-ready (org + fecha + período)
-      runPublicId: snapshot.runPublicId, // display/audit id (EO-GRUN-#####), NO auth handle
-      asOf: snapshot.asOf,
-      expiresAt: snapshot.expiresAt
-    })
+    // Assembler compartido (SSOT del body): misma derivación render-ready que la ruta del short
+    // link. `reportUrl` largo acá; la preferencia por el corto (detrás del flag) la aplica el
+    // consumer/publish (TASK-1330 Slice 3). El endpoint NO recomputa scoring.
+    return NextResponse.json(
+      buildPublicReportResponseBody({ snapshot, reportUrl: buildPublicReportUrl(token) })
+    )
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_public_report_route' } })
 
