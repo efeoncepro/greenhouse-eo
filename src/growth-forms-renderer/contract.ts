@@ -140,6 +140,12 @@ export interface RendererSuccessCardStep {
   copyRef?: string
 }
 
+// TASK-1336 — Config del handoff `tokenized_report` (espejo browser-safe de la SoT). El renderer
+// sustituye `{handle}` por el `submissionId` y resuelve la URL absoluta contra su `api.baseUrl`.
+export interface RendererTokenizedReportBehavior {
+  statusPathTemplate: string
+}
+
 export interface RendererSuccessBehavior {
   kind: RendererSuccessKind
   presentation?: RendererSuccessPresentation
@@ -155,6 +161,7 @@ export interface RendererSuccessBehavior {
   supportingNote?: string
   supportingNoteCopyRef?: string
   redirectUrl?: string
+  tokenizedReport?: RendererTokenizedReportBehavior
 }
 
 export interface RendererStep {

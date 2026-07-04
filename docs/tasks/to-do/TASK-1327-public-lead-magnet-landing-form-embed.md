@@ -1,5 +1,16 @@
 # TASK-1327 — Public lead-magnet landing + embed del form gobernado (think.efeoncepro.com/brand-visibility)
 
+## Delta 2026-07-04 — handoff contract listo (desbloqueo parcial por TASK-1336)
+
+El contrato del handoff submit→reporte quedó code-complete (TASK-1336). Think NO inventa polling ni cierra con email: consume el contrato gobernado de Greenhouse (SSOT del submit/status/token). Cómo:
+
+1. Embeber `<greenhouse-form form-key="…" surface="…" locale="es-CL" color-scheme="light">` del grader (`fdef-ai-visibility-grader`, `successBehavior.kind="tokenized_report"`).
+2. Escuchar el `CustomEvent` `gh_form_submission_accepted` en el elemento host. Su `detail` trae, además de `correlation_id`/`success_behavior`, el handoff cuando el form declara el behavior: `run_handle` (handle público del run) y `status_url` (URL absoluta del status endpoint, ya resuelta contra el origen del API). El `detail` **nunca** trae PII ni `reportToken`.
+3. Con `status_url`, hacer poll (respetando `retryAfterSeconds` de la respuesta): `GET` devuelve `{ status, reportToken, message, retryAfterSeconds }` con `status ∈ queued|processing|ready|in_review|unavailable|not_found`. Mostrar loader honesto (sin inventar %), estados finales para `in_review`/`unavailable`.
+4. Cuando `status="ready"`, `reportToken` aparece → navegar a `think.efeoncepro.com/brand-visibility/r/<reportToken>` (el hub ya conoce su path; short link `/s/<code>` cuando el flag esté ON, fallback al largo).
+
+Bloqueos vivos para el smoke browser real desde el origin de Think: **TASK-1335** (CORS/surface allowlist gobernado para `think.efeoncepro.com`) + la activación gobernada del handoff en el form del grader (`pnpm growth:forms:activate-grader-tokenized-report --apply`, dry-run + guard de runtime; requiere el renderer bundle en prod). El contrato transversal vive en `docs/architecture/growth-public-forms-runtime-contract.md` → §Tokenized Report Handoff.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -22,7 +33,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms`
-- Blocked by: `TASK-1335 (Growth Forms CORS/surface allowlist para think.efeoncepro.com) + TASK-1336 (Growth Forms tokenized report success/status contract) + verificar render contract del grader form`
+- Blocked by: `CONTRATOS LISTOS (TASK-1335 y TASK-1336 code-complete 2026-07-04): Think ya puede implementar contra el contrato. Falta SOLO rollout para el smoke browser real: activar handoff en el form del grader (pnpm growth:forms:activate-grader-tokenized-report --apply) + renderer bundle en prod + deploy/migración CORS de TASK-1335 en staging/prod`
 - Branch: `task/TASK-1327-public-lead-magnet-landing-form-embed`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -174,6 +174,12 @@ export const TELEMETRY_ALLOWED_PAYLOAD_KEYS = [
   // TASK-1319 success card capability — clasificadores browser-safe (nunca valores/PII).
   'action_kind',
   'reward_kind',
+  // TASK-1336 tokenized_report handoff — el submit aceptado entrega al host el handle
+  // público del run + la URL de status para arrancar el poll (browser-safe: el handle ya
+  // se expone como submissionId/correlation_id; status_url es la API pública canónica).
+  // NUNCA lleva PII, reportToken (sólo aparece al hacer poll cuando `ready`) ni ids internos.
+  'run_handle',
+  'status_url',
 ] as const
 export type TelemetryAllowedPayloadKey = (typeof TELEMETRY_ALLOWED_PAYLOAD_KEYS)[number]
 
@@ -363,8 +369,41 @@ export const successCardStepSchema = z.object({
   copyRef: z.string().max(120).optional(),
 })
 
+/**
+ * TASK-1336 — Handoff auto-descriptivo del `tokenized_report`. Cuando el submit es aceptado, el
+ * renderer resuelve `statusPathTemplate` sustituyendo `{handle}` por el `submissionId` y se lo
+ * entrega al host (evento `gh_form_submission_accepted` con `run_handle`+`status_url`) para que
+ * arranque el poll SIN hardcodear la ruta ni conocer el dominio del grader (Full API Parity).
+ *
+ * `statusPathTemplate` es browser-safe por construcción: ruta RELATIVA acotada a la superficie
+ * pública (`/api/public/...`) con el placeholder `{handle}`. NUNCA una URL absoluta (evita apuntar
+ * a un origin arbitrario) ni un endpoint privado. El schema es el leak boundary: cruza al browser
+ * tal cual dentro del render contract.
+ */
+export const tokenizedReportBehaviorSchema = z
+  .object({
+    statusPathTemplate: z
+      .string()
+      .min(1)
+      .max(300)
+      .refine(value => value.startsWith('/api/public/'), {
+        message: 'statusPathTemplate debe ser una ruta relativa bajo /api/public/',
+      })
+      .refine(value => !value.includes('//') && !/\s/.test(value), {
+        message: 'statusPathTemplate no puede ser protocol-relative ni contener espacios',
+      })
+      .refine(value => value.includes('{handle}'), {
+        message: 'statusPathTemplate debe contener el placeholder {handle}',
+      }),
+  })
+  .strict()
+export type TokenizedReportBehavior = z.infer<typeof tokenizedReportBehaviorSchema>
+
 export const successBehaviorSchema = z.object({
   kind: z.enum(['inline_message', 'redirect', 'asset_access', 'review_pending', 'tokenized_report']),
+  // TASK-1336 — Config del handoff `tokenized_report` (browser-safe). Opcional: sin él, el kind
+  // `tokenized_report` conserva su comportamiento legacy (success card / mensaje, sin handoff).
+  tokenizedReport: tokenizedReportBehaviorSchema.optional(),
   presentation: z.enum(SUCCESS_PRESENTATIONS).optional(),
   message: z.string().max(2000).optional(),
   messageCopyRef: z.string().optional(),

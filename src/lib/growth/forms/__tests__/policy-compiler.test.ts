@@ -367,6 +367,54 @@ describe('success card capability (TASK-1319)', () => {
   })
 })
 
+describe('tokenized_report handoff (TASK-1336)', () => {
+  const STATUS_TEMPLATE = '/api/public/growth/ai-visibility/run/{handle}'
+
+  it('compila y expone el statusPathTemplate browser-safe en el render contract', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({ success_behavior_json: { kind: 'tokenized_report', tokenizedReport: { statusPathTemplate: STATUS_TEMPLATE } } }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(true)
+    expect(result.renderContract?.successBehavior.kind).toBe('tokenized_report')
+    expect(result.renderContract?.successBehavior.tokenizedReport?.statusPathTemplate).toBe(STATUS_TEMPLATE)
+  })
+
+  it('bloquea publicación si el statusPathTemplate no es browser-safe', () => {
+    for (const statusPathTemplate of [
+      'https://evil.example.com/run/{handle}', // absoluta
+      '//evil.example.com/run/{handle}', // protocol-relative
+      '/api/admin/growth/run/{handle}', // fuera de /api/public/
+      '/api/public/growth/ai-visibility/run/latest', // sin placeholder {handle}
+    ]) {
+      const result = compileFormVersion(
+        definition(),
+        version({ success_behavior_json: { kind: 'tokenized_report', tokenizedReport: { statusPathTemplate } } }),
+        [destination()],
+        { forPublication: true },
+      )
+
+      expect(result.ok, `statusPathTemplate ${statusPathTemplate} debería bloquear`).toBe(false)
+      expect(result.blockingReasons.join(' ')).toContain('success_behavior')
+    }
+  })
+
+  it('el tokenized_report legacy (solo kind, sin handoff) sigue compilando byte-compatible', () => {
+    const result = compileFormVersion(
+      definition(),
+      version({ success_behavior_json: { kind: 'tokenized_report' } }),
+      [destination()],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(true)
+    expect(result.renderContract?.successBehavior).toEqual({ kind: 'tokenized_report' })
+  })
+})
+
 describe('telemetry contract', () => {
   it('las claves prohibidas no se solapan con las permitidas', () => {
     const allowed = new Set<string>(TELEMETRY_ALLOWED_PAYLOAD_KEYS)
@@ -381,6 +429,13 @@ describe('telemetry contract', () => {
 
     expect(allowed.has('action_kind')).toBe(true)
     expect(allowed.has('reward_kind')).toBe(true)
+  })
+
+  it('allowlistea el handoff del tokenized_report (run_handle, status_url) — TASK-1336', () => {
+    const allowed = new Set<string>(TELEMETRY_ALLOWED_PAYLOAD_KEYS)
+
+    expect(allowed.has('run_handle')).toBe(true)
+    expect(allowed.has('status_url')).toBe(true)
   })
 })
 

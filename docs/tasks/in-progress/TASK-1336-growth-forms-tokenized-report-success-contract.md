@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `code-complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|api`
 - Blocked by: `verificar contrato actual tokenized_report + TASK-1335 para smoke browser desde Think`
@@ -30,6 +30,20 @@
 ## Summary
 
 Crear el contrato gobernado que permite que un submit del `<greenhouse-form>` del AI Visibility / Brand Visibility Grader entregue al host publico un camino browser-safe desde `accepted` hasta el reporte en pantalla: `run handle`/`status URL` y, cuando este listo, `reportToken`/`reportUrl` o un `successBehavior` equivalente. TASK-1327 no puede cerrar su UX con un simple email ni con polling inventado en Think: Greenhouse debe seguir siendo SSOT del submit, estado del run, token y URL publica.
+
+## Delta 2026-07-04 — Implementación code-complete (Claude)
+
+Implementado render-contract-driven, sin backend/tabla/handle nuevo (reusa `submissionId` como handle async-safe + `readPublicGraderRunStatus` + `reportToken`):
+
+- **Slice 1 (contrato SoT):** `successBehaviorSchema.tokenizedReport.statusPathTemplate` (browser-safe: ruta relativa bajo `/api/public/` con `{handle}`, validada como leak boundary) + `run_handle`/`status_url` en `TELEMETRY_ALLOWED_PAYLOAD_KEYS`. `contracts.ts`.
+- **Slice 2 (renderer handoff):** espejo `RendererTokenizedReportBehavior` + allowlist + `buildTokenizedReportHandoff()` que resuelve la URL absoluta contra `api.baseUrl` y la emite en `gh_form_submission_accepted` (sólo si el behavior lo declara y hay handle; legacy intacto). `growth-forms-renderer/{contract,telemetry,renderer}.ts`.
+- **Slice 3 (status/report):** reusado tal cual (`readPublicGraderRunStatus` + `GET /run/[handle]` + `reportToken`). Cero código.
+- **Slice 4 (activación):** `scripts/growth/activate-grader-tokenized-report-handoff.ts` + alias `pnpm growth:forms:activate-grader-tokenized-report` (dry-run + guard de runtime, clone→publish→deprecate). **NO aplicado a prod** (requiere confirmación del operador + renderer bundle en prod).
+- **Slice 5 (tests/docs):** +7 tests focales (schema válido/inválido/legacy, allowlist, handoff renderer absoluto + no-leak). Docs: runtime-contract §Tokenized Report Handoff, grader arch Delta, TASK-1327 Delta, project_context, changelog, Handoff.
+
+Gates verdes: `pnpm test` full (8794), `pnpm build`, `pnpm typecheck`, lint touched, `pnpm task:lint --task TASK-1336`, `pnpm docs:closure-check` (0 flags sin registrar). Sin tocar submit route/command, status reader/route, report-url helper, scoring, probes, normalizer ni `executeClaimedGraderRun`.
+
+**Rollout pendiente (por eso Lifecycle sigue `in-progress`):** `--apply` de la activación del handoff en el form del grader + renderer bundle en prod + TASK-1335 (CORS Think) para el smoke browser real submit→poll→ready→report.
 
 ## Program State — No Redescubrir
 
@@ -425,16 +439,16 @@ La forma final puede variar si el runtime ya tiene un contrato equivalente; la a
 
 ## Acceptance Criteria
 
-- [ ] El contrato actual `tokenized_report` queda verificado y documentado: existe y alcanza, o se extiende de forma compatible.
-- [ ] El submit del `<greenhouse-form>` del grader entrega al host un handoff gobernado hacia status/reporte: `runHandle`, `statusUrl`, `reportToken`, `reportUrl` o equivalente.
-- [ ] `accepted` no se trata como `ready`; el state model publico distingue pending, ready y finales honestos.
-- [ ] `GET /api/public/growth/ai-visibility/run/[handle]` se consume como read-only y bounded; `reportToken` solo aparece cuando hay snapshot publicable.
-- [ ] `reportUrl` usa el helper/ruta publica canonica y conduce a `think.efeoncepro.com/brand-visibility/r/<token>` o ruta equivalente aprobada.
-- [ ] Renderer/event payload no contiene PII, prompts, raw provider text, destination mapping, HubSpot internals ni ids internos sensibles.
-- [ ] Legacy success behaviors siguen compatibles y testeados.
-- [ ] `fdef-ai-visibility-grader` queda configurado para el behavior correcto solo mediante publish/config gobernado y reversible.
-- [ ] TASK-1327 queda desbloqueada para implementar loader/análisis/reporte en pantalla sin workaround local.
-- [ ] No se toca scoring, probes, normalizer ni `executeClaimedGraderRun`.
+- [x] El contrato actual `tokenized_report` queda verificado y documentado: existe y alcanza, o se extiende de forma compatible. — extendido additive con `tokenizedReport.statusPathTemplate`.
+- [x] El submit del `<greenhouse-form>` del grader entrega al host un handoff gobernado hacia status/reporte: `runHandle`, `statusUrl`, `reportToken`, `reportUrl` o equivalente. — `run_handle`+`status_url` en el evento `accepted`; `reportToken` vía poll.
+- [x] `accepted` no se trata como `ready`; el state model publico distingue pending, ready y finales honestos. — el handoff es sólo el punto de partida; el status reader distingue estados.
+- [x] `GET /api/public/growth/ai-visibility/run/[handle]` se consume como read-only y bounded; `reportToken` solo aparece cuando hay snapshot publicable. — reusado sin cambios.
+- [x] `reportUrl` usa el helper/ruta publica canonica y conduce a `think.efeoncepro.com/brand-visibility/r/<token>` o ruta equivalente aprobada. — el host arma la ruta con el `reportToken` del poll (hub conoce su path); helper `buildPublicReportUrl` disponible.
+- [x] Renderer/event payload no contiene PII, prompts, raw provider text, destination mapping, HubSpot internals ni ids internos sensibles. — allowlist escalar dura + test no-leak.
+- [x] Legacy success behaviors siguen compatibles y testeados. — `tokenizedReport` opcional; test byte-compatible legacy tokenized_report + inline/redirect/success_card.
+- [~] `fdef-ai-visibility-grader` queda configurado para el behavior correcto solo mediante publish/config gobernado y reversible. — MECANISMO listo (`activate-grader-tokenized-report-handoff.ts`, dry-run + guard); `--apply` pendiente de confirmación del operador + renderer bundle en prod.
+- [~] TASK-1327 queda desbloqueada para implementar loader/análisis/reporte en pantalla sin workaround local. — CONTRATO listo y documentado en TASK-1327; smoke browser real pendiente de rollout (activación + TASK-1335 CORS).
+- [x] No se toca scoring, probes, normalizer ni `executeClaimedGraderRun`.
 
 ## Verification
 

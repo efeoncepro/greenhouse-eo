@@ -170,6 +170,12 @@ Contrato vigente: `GET /api/public/growth/ai-visibility/report/[token]` devuelve
 
 Invariante arquitectónico: ningún renderer externo (`efeonce-think`, PDF/email, futuro sitio público) debe reconstruir semántica de negocio desde el DTO crudo. Puede formatear y degradar compatibilidad para snapshots viejos, pero si necesita calcular interpretación del informe, el fact falta en Greenhouse. No cambia scoring, pesos, probes, normalizer, provider adapters ni `executeClaimedGraderRun`.
 
+### Delta 2026-07-04 — TASK-1336 tokenized_report submit→report handoff (lead magnet)
+
+El lead magnet embebe el form gobernado `fdef-ai-visibility-grader` con `<greenhouse-form>` (EPIC-020). Su `successBehavior.kind="tokenized_report"` quedó cableado a un **handoff auto-descriptivo** para que el host (Think) pase de `accepted` al reporte en pantalla sin polling local ni email como cierre: la config `successBehavior.tokenizedReport.statusPathTemplate` (browser-safe, ruta relativa bajo `/api/public/` con `{handle}`) viaja en el render contract; al aceptar el submit el renderer emite `run_handle` + `status_url` (escalares allowlisted) en el evento `gh_form_submission_accepted`; el host hace poll a `GET /api/public/growth/ai-visibility/run/[handle]` (read-only, bounded) hasta `ready` → `reportToken` → `/brand-visibility/r/<token>`.
+
+Reusa todo el backbone existente (submissionId como handle async-safe, `readPublicGraderRunStatus`, `reportToken`), sin nuevo endpoint, tabla ni handle. El submit NUNCA trae status/token (el run no existe al aceptar). Contrato transversal en `docs/architecture/growth-public-forms-runtime-contract.md` → §Tokenized Report Handoff. Activación gobernada reversible: `pnpm growth:forms:activate-grader-tokenized-report` (dry-run). No toca scoring, probes, normalizer ni `executeClaimedGraderRun`.
+
 ## 7. Core domain model
 
 The implementation should use the new Growth domain.

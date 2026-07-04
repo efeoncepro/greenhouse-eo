@@ -90,6 +90,18 @@ Queda acotado a la variante premium: `style_variant=diagnostic_premium` renderiz
 
 Queda AEO-only y temporal: los markers WordPress `gh-aeo-success-card-polish-v1`, `gh-aeo-success-card-compact-steps-v1`, `gh-aeo-success-card-recraft-popper-v1`, `gh-aeo-success-card-borderless-v1` y `gh-aeo-readiness-centered-v1` son bridge CSS live para `/aeo-2/` hasta que el bundle productivo sirva la fuente actualizada. No son patrón para otros forms.
 
+## Tokenized Report Handoff (TASK-1336)
+
+`successBehavior.kind="tokenized_report"` es una etiqueta de resultado cuyo comportamiento gobernado es un **handoff auto-descriptivo** hacia un reporte servido por token (el lead magnet AI/Brand Visibility). El submit aceptado NO significa reporte listo: entrega al host el punto de partida para hacer poll y navegar cuando esté `ready`, sin que el host hardcodee la ruta ni conozca el dominio del grader (Full API Parity).
+
+Contrato (SoT `successBehaviorSchema` en `src/lib/growth/forms/contracts.ts`, espejo `RendererSuccessBehavior`):
+
+- **Config (render contract, browser-safe):** `successBehavior.tokenizedReport.statusPathTemplate` — una ruta **relativa** acotada a la superficie pública (`/api/public/...`), con el placeholder `{handle}`. El schema es el leak boundary: valida que sea relativa bajo `/api/public/`, no protocol-relative y con `{handle}` (nunca una URL absoluta ni un endpoint privado). Para el grader su valor canónico es `/api/public/growth/ai-visibility/run/{handle}` (status reader de TASK-1245).
+- **Handoff de entrada (evento `gh_form_submission_accepted`):** al aceptar el submit, el renderer sustituye `{handle}` por el `submissionId` (ya devuelto por `/submit`, válido como handle público async-safe) y emite `run_handle` + `status_url` (absoluta contra `api.baseUrl`) en el `CustomEvent`. Son claves **escalares allowlisted** (telemetry allowlist dura); NUNCA un objeto anidado, PII, `reportToken` ni ids internos. Si el behavior no declara `tokenizedReport` (tokenized_report legacy) o no hay `submissionId`, no se emite handoff (compat).
+- **Status/report (polling `GET /api/public/growth/ai-visibility/run/[handle]`):** read-only, bounded (`queued|processing|ready|in_review|unavailable|not_found`). Devuelve `reportToken` SÓLO cuando existe snapshot publicable; el host arma la URL pública del reporte con ese token (`/brand-visibility/r/<token>`). El submit NUNCA trae status/token: el run no existe todavía al aceptar.
+
+Reglas duras: **NUNCA** hardcodear la ruta de status en el renderer genérico (viene de la config `statusPathTemplate`, self-describing). **NUNCA** meter el `reportToken` ni status en la respuesta del submit ni en el handoff (sólo aparece al hacer poll cuando `ready`). **NUNCA** publicar el handoff mutando la versión publicada in-place: `pnpm growth:forms:activate-grader-tokenized-report` (dry-run) clona → publica → deprecara, con guard de runtime.
+
 ## WordPress Ohio Host Layer
 
 El tema Ohio es un host CSS agresivo para controles nativos. El contrato vigente para

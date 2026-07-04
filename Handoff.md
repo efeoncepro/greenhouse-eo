@@ -1,3 +1,19 @@
+## Sesion 2026-07-04 - TASK-1336 Growth Forms tokenized_report handoff - Claude - code-complete (rollout pendiente)
+
+> **Task:** `docs/tasks/in-progress/TASK-1336-growth-forms-tokenized-report-success-contract.md` (EPIC-020, backend-data). Objetivo: que el submit del `<greenhouse-form>` del grader entregue al host (Think) un handoff browser-safe hacia el reporte en pantalla, sin polling local ni email como cierre.
+>
+> **Discovery + arch review confirmados en código real:** el backbone ya existía. El submit ya devuelve `submissionId` (commands.ts:486, route:93); `submission_id` es handle público async-safe (status-reader.ts paths 2+3 → nunca `not_found` tras accepted); `readPublicGraderRunStatus` devuelve `reportToken` sólo en `ready`; el render contract fluye `successBehavior` wholesale al browser (compiler → GET route). El gap: `tokenized_report` era sólo etiqueta sin comportamiento cableado. El canal host es la telemetry (`CustomEvent` con **allowlist escalar dura**) → la nested-object del Detailed Spec era imposible; el handoff va como claves escalares.
+>
+> **Implementado (render-contract-driven, sin backend/tabla/handle nuevo):**
+> - `src/lib/growth/forms/contracts.ts`: `tokenizedReportBehaviorSchema` + `successBehavior.tokenizedReport?` (statusPathTemplate: ruta relativa bajo `/api/public/` con `{handle}`, validada como leak boundary) + `run_handle`/`status_url` en `TELEMETRY_ALLOWED_PAYLOAD_KEYS`.
+> - `src/growth-forms-renderer/{contract.ts,telemetry.ts,renderer.ts}`: espejo `RendererTokenizedReportBehavior`, allowlist espejo, y `buildTokenizedReportHandoff()` que resuelve la URL absoluta contra `api.baseUrl` y la emite en `gh_form_submission_accepted` (sólo si el behavior lo declara y hay handle; legacy intacto).
+> - `scripts/growth/activate-grader-tokenized-report-handoff.ts` (+ alias `pnpm growth:forms:activate-grader-tokenized-report`): dry-run por defecto, guard de runtime, clone→publish→deprecate. NUNCA muta la versión publicada.
+> - Tests: +3 compiler (schema válido/inválido/legacy) + allowlist assertion en policy-compiler.test.ts; +3 renderer (handoff absoluto + no-leak, legacy sin handoff, non-tokenized sin handoff). Docs: runtime-contract §Tokenized Report Handoff, grader arch Delta, TASK-1327 Delta con el contrato para el host.
+>
+> **Sin tocar:** submit route/command, status reader/route, `buildPublicReportUrl`, scoring, probes, normalizer, `executeClaimedGraderRun`.
+>
+> **Rollout pendiente (code-complete, NO operativamente completo):** `--apply` del handoff al form del grader (requiere renderer bundle en prod para el guard) + TASK-1335 (CORS Think) para el smoke browser real submit→poll→ready→report desde el origin de Think. Local-first, sin push.
+
 ## Sesion 2026-07-04 - TASK-1334 Think category renderer contract - Codex - COMPLETE deployado
 
 > **Task tomada/cerrada:** `docs/tasks/complete/TASK-1334-think-category-perception-renderer-contract.md`. Perfil `ui-ux`, EPIC-020. El hook inicial bloqueó porque la task seguía declarando blockers `TASK-1331 complete; backend mapped-real-data proof is TASK-1333`.

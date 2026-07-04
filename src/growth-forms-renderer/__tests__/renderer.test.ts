@@ -157,6 +157,66 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.querySelector('[role="status"]')?.textContent).toContain('Listo')
   })
 
+  it('emits the tokenized_report handoff (run_handle + absolute status_url) on accepted — TASK-1336', async () => {
+    const fetchImpl = okFetch('accepted', 'fsub-abc-123')
+
+    const contract = staticContractFixture({
+      successBehavior: {
+        kind: 'tokenized_report',
+        tokenizedReport: { statusPathTemplate: '/api/public/growth/ai-visibility/run/{handle}' },
+      },
+    })
+
+    const { root } = mountInto(contract, fetchImpl)
+    const accepted: CustomEvent[] = []
+
+    root.addEventListener('gh_form_submission_accepted', event => accepted.push(event as CustomEvent))
+    fillStaticRequiredFields(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    await vi.waitFor(() => expect(accepted).toHaveLength(1))
+
+    expect(accepted[0].detail).toMatchObject({
+      event: 'gh_form_submission_accepted',
+      success_behavior: 'tokenized_report',
+      correlation_id: 'fsub-abc-123',
+      run_handle: 'fsub-abc-123',
+      status_url: 'https://gh.test/api/public/growth/ai-visibility/run/fsub-abc-123',
+    })
+    // Nunca fuga PII ni reportToken en el handoff.
+    expect(JSON.stringify(accepted[0].detail)).not.toContain('lead@brand.com')
+    expect(JSON.stringify(accepted[0].detail)).not.toContain('reportToken')
+  })
+
+  it('does NOT emit a handoff for tokenized_report without statusPathTemplate (legacy compat) — TASK-1336', async () => {
+    const contract = staticContractFixture({ successBehavior: { kind: 'tokenized_report' } })
+    const { root } = mountInto(contract, okFetch('accepted', 'fsub-legacy'))
+    const accepted: CustomEvent[] = []
+
+    root.addEventListener('gh_form_submission_accepted', event => accepted.push(event as CustomEvent))
+    fillStaticRequiredFields(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    await vi.waitFor(() => expect(accepted).toHaveLength(1))
+
+    expect(accepted[0].detail).not.toHaveProperty('run_handle')
+    expect(accepted[0].detail).not.toHaveProperty('status_url')
+  })
+
+  it('does NOT emit a handoff for non-tokenized success behaviors — TASK-1336', async () => {
+    const { root } = mountInto(staticContractFixture(), okFetch('accepted', 'fsub-inline'))
+    const accepted: CustomEvent[] = []
+
+    root.addEventListener('gh_form_submission_accepted', event => accepted.push(event as CustomEvent))
+    fillStaticRequiredFields(root)
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    await vi.waitFor(() => expect(accepted).toHaveLength(1))
+
+    expect(accepted[0].detail).not.toHaveProperty('run_handle')
+    expect(accepted[0].detail).not.toHaveProperty('status_url')
+  })
+
   it('renders a structured success card after accepted and focuses it', async () => {
     const contract = staticContractFixture({
       copy: {
