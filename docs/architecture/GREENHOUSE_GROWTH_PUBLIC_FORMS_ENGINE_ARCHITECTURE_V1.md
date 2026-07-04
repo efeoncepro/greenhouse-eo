@@ -903,6 +903,14 @@ Surface security requirements:
 - telemetry includes `surface_id`, page URI and renderer version;
 - stale/deprecated renderer versions can be warned, paused or blocked by policy.
 
+> **Delta 2026-07-04 (TASK-1335) — governed CORS transport.** "CORS limited to approved origins" is
+> enforced by a **governed resolver, not a hardcoded set**: transport ACAO = the **UNION of
+> `origin_allowlist_json` across `active` surfaces** (SoT = `form_host_surface`), cached in-memory with
+> stale-on-error. Authorizing a new host = appending its origin to the right surface (DATA), never editing
+> the route helper. Transport is **surface-agnostic** (the `OPTIONS` preflight has no `surfaceId`); the
+> per-surface authority stays server-side in `submitForm` (double defense). Canonical detail:
+> [growth-public-forms-runtime-contract.md](growth-public-forms-runtime-contract.md) §"CORS gobernado".
+
 Iframe fallback may be considered only for hostile or highly constrained hosts. It is not the default because it weakens brand integration, responsive behavior, analytics context and accessibility. Any iframe fallback must be explicitly marked `measurement_degraded`, must use an allowlisted `postMessage` bridge to the parent page for the same event schema, must never post raw field values/PII, and must document which GTM measurements cannot be guaranteed.
 
 ### 19.5 Success behavior

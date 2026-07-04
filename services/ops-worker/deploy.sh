@@ -363,11 +363,11 @@ if [ "${ENV}" = "staging" ]; then
   DEFAULT_GROWTH_REPORT_EMAIL_ENABLED="true"
   # TASK-1279 — Cross-sell operador: el WRITE (executeOperatorReportSend → email + Lead HubSpot)
   # corre en este worker (reactive consumer growth_ai_visibility_operator_send, lane ops-reactive-growth).
-  # GATEADO OFF (2026-06-29): el smoke con SKY reveló que el grader genera un diagnóstico FALSO para
-  # marcas no-agencia (prompt pack hardcodeado a ICP Efeonce + taxonomy bypass del HubSpot industry enum).
-  # No se reabilita hasta que el motor de prompts brand-aware valide categoría + modelo de negocio
-  # (EPIC del prompt-generation engine). Ver ISSUE del falso-0.
-  DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="false"
+  # REABILITADO 2026-07-04 (TASK-1333, decisión explícita del operador "prende todos"): el gate original
+  # (falso-0 para marcas no-agencia) quedó cerrado con EPIC-021 (motor brand-aware live, ISSUE-110 resuelto)
+  # → el diagnóstico ya es brand-aware. CATEGORY_GUARD ON (abajo) protege al cross-sell de enviar sobre
+  # categoría no resuelta. Consent gate server-side + dedup HubSpot siguen intactos.
+  DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="true"
   # TASK-1265 — Google AI Overviews / AI Mode provider (DataForSEO). El run async del grader
   # ejecuta en este worker, así que el flag + creds DataForSEO deben vivir acá (no sólo en
   # Vercel) para que los 3 endpoints (public/client-portal/operator) midan AI Overviews.
@@ -390,13 +390,14 @@ if [ "${ENV}" = "staging" ]; then
   # (2026-06-29); prod OFF gated por EPIC-020/release control.
   DEFAULT_GROWTH_REGRADE_ENABLED="true"
   DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED="false"
-  # TASK-1288 — Brand Intelligence (lectura grounded compartida) ON en staging; el guard de
-  # categoría (CATEGORY_GUARD) queda OFF aún en staging: bloquearía el lead magnet público con
-  # categorías free-text no resueltas, y su beneficiario (cross-sell operador) está OFF — se
-  # prende con el review de TASK-1291. La resolución canónica + label en prompts es code-level
-  # (sin flag). Prod OFF (gated EPIC-021/release control).
+  # TASK-1288 — Brand Intelligence (lectura grounded compartida) ON. CATEGORY_GUARD REABILITADO
+  # 2026-07-04 (TASK-1333, decisión del operador): con EPIC-021 (resolución brand-aware grounded live)
+  # la cobertura de categoría subió, y su beneficiario (cross-sell OPERATOR_SEND) quedó ON → el guard
+  # protege calidad (bloquea runs con categoría no resuelta → confirmación humana en vez de diagnóstico
+  # basura). ⚠️ RIESGO RESIDUAL: una marca cuya categoría no resuelva ni con el grounded read queda
+  # bloqueada (`aeo_category_unresolved`); revert = flag a false. Señal: growth.ai_visibility.profile_category_unresolved.
   DEFAULT_GROWTH_BRAND_INTELLIGENCE_ENABLED="true"
-  DEFAULT_GROWTH_CATEGORY_GUARD_ENABLED="false"
+  DEFAULT_GROWTH_CATEGORY_GUARD_ENABLED="true"
   # TASK-1290 — prompts por arquetipo + autoría LLM ON en staging (rollout 2026-06-29). El run usa
   # el baseline del arquetipo del perfil (o el set autorado active) en vez del pack agencia; agencia
   # = v1 bit-for-bit. La autoría LLM es manual (command), no auto-run. Prod OFF (gated EPIC-021/
@@ -410,10 +411,9 @@ if [ "${ENV}" = "staging" ]; then
 else
   # PRODUCTION — espeja staging (TASK-1321, directiva operador 2026-07-02 "todo activo en prod").
   # Backend compartido (misma DB + ops-worker), así que producción corre el grader stack completo
-  # igual que staging. Único delta intencional documentado: OPERATOR_SEND y CATEGORY_GUARD quedan
-  # OFF (igual que staging — cross-sell operador gated por el review del prompt brand-aware; el
-  # guard bloquearía categorías free-text y su beneficiario está OFF). Gemini ON (billing Vertex
-  # desbloqueado, ISSUE-113 verificado en vivo 2026-07-02).
+  # igual que staging. 2026-07-04 (TASK-1333, decisión del operador "hagamos todo lo necesario"):
+  # OPERATOR_SEND y CATEGORY_GUARD pasan a ON también en prod (antes era el único delta OFF) — el gate
+  # brand-aware quedó cerrado con EPIC-021. Gemini ON (billing Vertex desbloqueado, ISSUE-113 2026-07-02).
   DEFAULT_GROWTH_GRADER_ENABLED="true"
   DEFAULT_GROWTH_OPENAI_ENABLED="true"
   DEFAULT_GROWTH_ANTHROPIC_ENABLED="true"
@@ -423,7 +423,7 @@ else
   DEFAULT_FORMS_HUBSPOT_ENABLED="true"
   DEFAULT_GROWTH_LEAD_HANDOFF_ENABLED="true"
   DEFAULT_GROWTH_REPORT_EMAIL_ENABLED="true"
-  DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="false"
+  DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="true"
   DEFAULT_GROWTH_GOOGLE_AIO_ENABLED="true"
   DEFAULT_GROWTH_PROBES_ENABLED="true"
   DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED="true"
@@ -431,7 +431,7 @@ else
   DEFAULT_GROWTH_REGRADE_ENABLED="true"
   DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED="false"
   DEFAULT_GROWTH_BRAND_INTELLIGENCE_ENABLED="true"
-  DEFAULT_GROWTH_CATEGORY_GUARD_ENABLED="false"
+  DEFAULT_GROWTH_CATEGORY_GUARD_ENABLED="true"
   DEFAULT_GROWTH_ARCHETYPE_PROMPTS_ENABLED="true"
   DEFAULT_GROWTH_PROMPT_AUTHORING_ENABLED="true"
   DEFAULT_GOOGLE_KG_KEY_SECRET_REF="greenhouse-google-knowledge-graph-api-key"
@@ -441,7 +441,13 @@ GROWTH_AI_VISIBILITY_OPENAI_ENABLED="${GROWTH_AI_VISIBILITY_OPENAI_ENABLED:-${DE
 GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED="${GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED:-${DEFAULT_GROWTH_ANTHROPIC_ENABLED}}"
 GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED="${GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED:-${DEFAULT_GROWTH_PERPLEXITY_ENABLED}}"
 GROWTH_AI_VISIBILITY_GEMINI_ENABLED="${GROWTH_AI_VISIBILITY_GEMINI_ENABLED:-${DEFAULT_GROWTH_GEMINI_ENABLED}}"
-GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED="${GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED:-false}"
+# TASK-1333 — Extracción de prosa (sentiment + categoryAssociations + messageDrift + brandRank).
+# DUAL-LOCATION: el run async del grader ejecuta en ESTE worker, así que sin el flag acá la
+# extracción queda OFF aunque Vercel la tenga ON → toda categoría/sentiment sale `unknown`
+# (root cause TASK-1333: los 12 runs previos con category_associations vacío). Se persiste ON
+# para espejar el grader-stack completo (directiva "todo activo en prod" 2026-07-02). Cost-bearing
+# (1 call/finding/run) — respeta el cost-cap del router. Requiere ANTHROPIC secret (ya presente).
+GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED="${GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED:-true}"
 GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED="${GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED:-${DEFAULT_GROWTH_LEAD_HANDOFF_ENABLED}}"
 GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED="${GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED:-${DEFAULT_GROWTH_REPORT_EMAIL_ENABLED}}"
 GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED="${GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED:-${DEFAULT_GROWTH_OPERATOR_SEND_ENABLED}}"

@@ -1605,6 +1605,10 @@ export class FormRenderer {
       this.telemetry.emit('gh_form_submission_accepted', {
         ...(result.submissionId ? { correlation_id: result.submissionId } : {}),
         success_behavior: this.contract.successBehavior.kind,
+        // TASK-1336 — handoff auto-descriptivo del `tokenized_report`: el host recibe el handle
+        // público + la URL de status para arrancar el poll (sin hardcodear ruta ni conocer el
+        // grader). Sólo cuando el behavior lo declara y hay handle; nunca rompe legacy.
+        ...this.buildTokenizedReportHandoff(result.submissionId),
       })
       this.clearDraft() // enviado OK → el borrador ya no aplica.
       this.renderSuccess()
@@ -1645,6 +1649,26 @@ export class FormRenderer {
     }
 
     return out
+  }
+
+  /**
+   * TASK-1336 — Handoff `tokenized_report`. Resuelve el `statusPathTemplate` declarado por el
+   * behavior (SoT server-side, browser-safe: ruta relativa bajo `/api/public/` con `{handle}`)
+   * sustituyendo `{handle}` por el `submissionId` y lo absolutiza contra el mismo origen del API
+   * público con el que ya habla el renderer. Devuelve claves escalares allowlisted para el evento
+   * `gh_form_submission_accepted`; `{}` (no handoff) si el behavior no lo declara o falta el handle.
+   * Mantiene el renderer genérico: no conoce el grader ni hardcodea la ruta de status.
+   */
+  private buildTokenizedReportHandoff(submissionId: string | undefined): { run_handle: string; status_url: string } | Record<string, never> {
+    const behavior = this.contract.successBehavior
+    const template = behavior.kind === 'tokenized_report' ? behavior.tokenizedReport?.statusPathTemplate : undefined
+
+    if (!template || !submissionId) return {}
+
+    const path = template.replace('{handle}', encodeURIComponent(submissionId))
+    const statusUrl = `${this.api.baseUrl.replace(/\/$/, '')}${path}`
+
+    return { run_handle: submissionId, status_url: statusUrl }
   }
 
   private renderSuccess(): void {

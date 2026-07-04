@@ -20,6 +20,7 @@ domain risk is high.
 | Access/auth | tests for guards/capabilities, route reachability, live smoke as least-privilege persona, verify both `views` and entitlements/capabilities |
 | Data/schema | migration status, `pnpm migrate:status`, focal DB smoke with `pnpm pg:connect`/canonical script, generated types if schema changed |
 | API/server actions | request/response smoke, auth failure smoke, tenant-safety check, idempotency/audit/outbox proof when writes exist |
+| Public headless report / external renderer | contract smoke for versioned payload, no-leak stringify check, old-snapshot compatibility, renderer smoke at desktop+mobile, verify external URL uses a real token (never prod `mock-token`) |
 | Workers/crons/webhooks | local unit/focal integration, env/secret verification, scheduler/webhook registration evidence, dead-letter/observability path |
 | Finance/payroll | domain auditor skill, real or representative data smoke, reconciliation/readiness checks, accounting/legal invariants |
 | Release/production | production-release skill, `pnpm release:preflight`, orchestrator/watchdog evidence, Vercel READY, Cloud Run SHA checks |
@@ -46,4 +47,5 @@ item is missing:
   Cloud Run, Cloud SQL, Entra, HubSpot, Notion, Teams, or production env.
 - A screenshot is not UI QA until the frame is looked at and assessed.
 - A mock is not runtime evidence unless the task is explicitly mockup-only.
+- A public report mockup is not final until the owning backend provides the semantic view-model facts and the external renderer consumes them without local business derivation.
 - A warning can be accepted only with owner, reason, and withdrawal condition.

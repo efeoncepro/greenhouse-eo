@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Lista/shippeada como capacidad; activacion pendiente solo en cutover productivo (flag GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED + smoke). No bloquea TASK-1327.`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|api`
-- Blocked by: `TASK-1329 complete local; TASK-1325 hub live`
+- Blocked by: `TASK-1329 complete; TASK-1325 hub live; TASK-1331 complete/released (contrato shareFacts.reportUrl)`
 - Branch: `task/TASK-1330-ai-visibility-report-short-links-capability`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -44,6 +44,107 @@ TASK-1329 agrego una experiencia shareable premium al informe publico, pero solo
 - Exponer un contrato consumible por correo, HubSpot handoff y share widget del hub.
 - Mantener compatibilidad con URLs existentes `/brand-visibility/r/<token>`.
 - Registrar uso, expiracion, revocacion y senales operativas proporcionales al riesgo.
+
+## ⚠️ Production Gate — activacion por flag en el paso a produccion
+
+> **Estado operativo actualizado por el operador (2026-07-04): la capacidad esta lista/shippeada y no
+> bloquea la landing TASK-1327.** Lo unico pendiente para que los consumers prefieran short links en
+> produccion es prender `GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED=true` durante el paso a produccion y
+> ejecutar el smoke correspondiente. Hasta ese cutover, el URL largo canonico
+> `/brand-visibility/r/<token>` sigue siendo el fallback valido.
+
+**Hecho (local `develop`, sin push):** schema + primitive (migración `20260704110400162_task-1330-...`
+aplicada a `greenhouse-pg-dev` = dev/staging comparten), resolve endpoint `/report/short-link/[code]`
+(resolve-to-token), flag `GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED` (OFF, en el ledger), consumers
+(token route / correo / HubSpot con fallback al largo), auto-create idempotente en el publish. Gates
+verdes: `pnpm test` 8776/0, `pnpm build`, `local:check`, smoke LIVE del primitive contra PG real,
+`docs:closure-check`. Think `/s/[code].astro` (render-in-place vía `Astro.rewrite`) + `resolveShortLink`
+implementados y **E2E local verificado** (activo → informe bajo `/s/<code>`; desconocido → 404 de marca).
+
+**Falta para que funcione en PRODUCCIÓN (el pase — no ejecutado):**
+
+1. **Greenhouse `develop→main`** vía release control plane (skill `greenhouse-production-release`):
+   lleva a prod la migración, el resolve endpoint, el auto-create en `publishGraderReportSnapshot` y los consumers.
+2. **Aplicar la migración en la base de PRODUCCIÓN** (vía el control plane; hoy solo está en dev/staging).
+3. **Prender `GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED=true` en Production** (Vercel) + redeploy. Sin esto,
+   `resolvePreferredReportUrl`/`resolveReportShareUrlForRun` devuelven el URL LARGO (fallback) → los short
+   links se crean pero ningún consumer los usa.
+4. **Smoke prod:** ensure un short link de un reporte real → abrir `https://think.efeoncepro.com/s/<code>`
+   → confirmar render-in-place + share copy con el corto; código inválido → 404 de marca.
+
+**Delta cross-agent (2026-07-04):** el lado de Think (`/s/[code].astro` + `resolveShortLink`) ya quedó
+**pusheado a producción** por un commit concurrente de Codex (`681f1e4` en `origin/main` de `efeonce-think`),
+pero es **INERTE**: Greenhouse prod no genera short links ni expone el resolve endpoint hasta el pase (flag
+OFF), así que no existe ninguna URL `/s/<code>` real; hoy `/s/<cualquiera>` en prod → 404 de marca (aditivo,
+no toca `/r/[token]`). **No revertir** (arrastra el WIP legítimo de Codex). La capability real NO está live.
+
+## Delta 2026-07-04 — Revisión de arquitectura + product design (ajustes)
+
+> Revisión con `arch-architect` (overlay Greenhouse) + `greenhouse-product-ui-architect`. La task
+> es **sólida y se mantiene** (perfil, alcance, slices). Estos ajustes la corrigen contra el estado
+> real del repo tras el cierre de TASK-1331 y cierran gaps de reuso, product design y escalabilidad.
+
+**Veredicto de la primitiva (¿tercera tabla de short links?):** el **Deep Link Platform**
+(`src/lib/navigation/deep-links/**`, `GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`) es un **resolver
+semántico** (`kind+id+action+audience → href`), **NO un store de códigos cortos** — su propio Delta
+2026-04-30 deja fuera "persistencia nueva / rewrite del carril quote-share". La persistencia de
+códigos vive per-dominio: existe el precedente `greenhouse_commercial.quote_short_links` (TASK-631)
+con helpers en `src/lib/finance/quote-share/`. Por lo tanto `greenhouse_growth.grader_report_short_links`
+es **consistente con el canon** (replica el patrón), NO un primitivo rogue. **Pero** sería la 2.ª tabla
+casi idéntica → el ajuste es **reusar, no copiar** (ver #2) y dejar un **trigger de generalización**:
+cuando aparezca un 3.er consumer, promover a un `short_links` canónico integrado al Deep Link Platform
+(NO refactorizar el flujo comercial de quotes —en producción— dentro de esta task P2: es blast-radius
+que no le toca; two-way-door, se difiere).
+
+**Ajustes (todos aditivos al plan; el executor los incorpora a los slices citados):**
+
+1. **Integrar con el contrato de TASK-1331, NO inventar `shareShortUrl`.** TASK-1331 shippeó
+   `model.viewFacts.shareFacts.reportUrl` y la ruta ya lo cablea vía opción:
+   `modelFromPublicReport(publicReport, 'publicWeb', { reportUrl: buildPublicReportUrl(token) })`
+   ([route.ts:56](../../../src/app/api/public/growth/ai-visibility/report/[token]/route.ts)). El ajuste
+   de Slice 3 es **mínimo**: que la ruta prefiera el **short URL cuando exista** (fallback al largo) al
+   pasar `reportUrl`. **Un solo campo, el server decide short-vs-long.** Eliminar del scope el campo nuevo
+   `shareShortUrl`.
+2. **Reusar el generador + tracking, no copiar** (mata el smell de 2.ª tabla idéntica y la escalabilidad
+   de golpe). `src/lib/finance/quote-share/short-link.ts` ya tiene `randomBytes`+BASE62+`MAX_GENERATION_ATTEMPTS`
+   +`withTransaction` (collision-retry) y `view-tracker.ts` ya es **best-effort ("failures don't block the page
+   render")**. Extraer un helper compartido de code-gen base62 + collision-retry (p.ej. `src/lib/shared/short-code.ts`)
+   que consuman quote y grader; el grader **no reimplementa** la crypto ni el retry.
+3. **Escalabilidad — tracking NO bloqueante en el hot path.** `last_used_at`/`use_count` en un endpoint
+   público de lead magnet (potencial viral) = UPDATE por cada click. El resolve **NUNCA** debe bloquear ni
+   fallar por el tracking: incrementar best-effort/fire-and-forget (patrón `view-tracker.ts` de quote). Nueva
+   fila en el risk matrix.
+4. **Honrar el expiry del REPORTE subyacente, no solo el del short link.** El snapshot reader ya filtra
+   `expires_at` del `grader_reports`. `resolveAiVisibilityReportShortLink` debe devolver 410 si el reporte
+   destino está expirado/ausente aunque el código siga activo (código válido ≠ reporte vivo).
+5. **Product design — el short link debe RENDERIZAR in-place, no redirigir al token largo.** El valor de un
+   short link es una URL **limpia, persistente y bonita**; si `/s/<code>` hace 302 a `/r/<token-largo>`, la URL
+   linda desaparece del address bar al primer click. Canónico: Think `/s/[code].astro` resuelve server-side
+   (code→token vía Greenhouse) y **renderiza el informe bajo `/s/<code>`** (address bar conserva el short URL).
+   El 302 al `/r/<token>` queda como fallback, no como diseño principal. (Ajusta la decisión abierta de Slice 2.)
+6. **Product design — superficies de error humanas en Think.** Unknown(404)/expired·revoked(410) aterrizan a
+   una **persona**. Per `greenhouse-product-ui-architect` (las superficies de error son superficies de producto:
+   voz de marca + recovery), `/s/[code]` debe renderizar un estado con copy es-CL ("este enlace expiró / no
+   existe") + CTA de recuperación ("Generá tu propio informe" → landing del grader), NO un 404 crudo. Contrato
+   HTTP (404/410) se mantiene para consumers máquina.
+7. **Generación en el publish command (determinista), no lazy.** Llamar `ensureAiVisibilityReportShortLink(reportId)`
+   (idempotente) dentro de `publishGraderReportSnapshot` ([snapshot.ts](../../../src/lib/growth/ai-visibility/report/snapshot.ts))
+   para que TODO reporte publicable tenga su short link al publicar y `shareFacts.reportUrl` sea deterministamente
+   corto. (La publish route ya está en Files owned.)
+8. **Registrar el flag en el ledger (gate de cierre).** `GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED` (default OFF)
+   DEBE agregarse a `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` en el MISMO PR; `pnpm docs:closure-check`
+   (`feature-flags-audit --strict`) **bloquea el cierre** si falta.
+9. **Índice UNIQUE parcial para el invariante "un solo link activo por reporte".** No dejarlo solo en app-logic:
+   `CREATE UNIQUE INDEX ... (report_id) WHERE revoked_at IS NULL` (defense-in-depth; diferencia con quote, que
+   permite múltiples códigos por quote+version). Ver Detailed Spec.
+10. **Refrescar dependencias/contexto:** `Blocked by` suma TASK-1331 (completa/released); el share URL ahora
+    se consume vía el contrato `shareFacts` de 1331, no un campo nuevo. `buildPublicReportUrl` sigue siendo la
+    fuente del host (`PUBLIC_GRADER_HUB_URL`); agregar `buildPublicReportShortUrl(code)` hermano con el mismo host.
+
+**4-pilar de los ajustes:** *Safety* — short code = credencial pública de alta entropía + 410/404 sanitizados,
+sin token largo en el copy. *Robustness* — índice UNIQUE parcial + honrar expiry del reporte + idempotencia en publish.
+*Resilience* — tracking best-effort no bloquea el resolve; fallback al link largo si el flag/short link no existe.
+*Scalability* — sin write-on-read síncrono en el hot path; resolve cacheable (código→token es inmutable hasta revoke).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -136,7 +237,7 @@ Reglas obligatorias:
 ### Contract surface
 
 - Contrato existente a respetar: `GET /api/public/growth/ai-visibility/report/[token]`, `buildPublicReportUrl(reportToken)`
-- Contrato nuevo o modificado: short-link command/reader + public resolve endpoint + optional `shareShortUrl` in public report payload/header
+- Contrato nuevo o modificado: short-link command/reader + public resolve endpoint. **NO** se agrega campo nuevo `shareShortUrl` (ver Delta #1): el share URL se sirve por el contrato ya vigente `model.viewFacts.shareFacts.reportUrl` (TASK-1331) — la ruta pasa el short URL cuando existe (fallback largo) vía `viewFactOptions.reportUrl`.
 - Backward compatibility: `compatible`
 - Full API parity: capability lives in server-side command/reader; UI/email/HubSpot consume generated URLs, never build aliases ad hoc.
 
@@ -264,6 +365,12 @@ CREATE TABLE greenhouse_growth.grader_report_short_links (
   use_count integer NOT NULL DEFAULT 0,
   CONSTRAINT grader_report_short_code_format CHECK (short_code ~ '^[a-zA-Z0-9]{10,14}$')
 );
+
+-- Delta #9 — invariante "un solo link activo por reporte" enforced en DB (defense-in-depth),
+-- no solo en app-logic. Difiere de quote (que permite múltiples códigos por quote+version).
+CREATE UNIQUE INDEX grader_report_short_links_active_idx
+  ON greenhouse_growth.grader_report_short_links (report_id)
+  WHERE revoked_at IS NULL;
 ```
 
 Prefer storing `report_id`, not duplicating the raw report token in the alias table. Resolve server-side by joining to `grader_reports`; the browser should only see the short URL until the final report route needs the token internally or the hub can fetch by short code.

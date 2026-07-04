@@ -252,6 +252,13 @@ El catálogo del selector (`InsertableFormCatalogEntryVm.formKey`) ya lo expone.
 - **"Formulario no disponible"**: el formulario no esta publicado, el origen del sitio
   no esta en la allowlist de la surface, o el flag `GROWTH_FORMS_PUBLIC_API_ENABLED`
   esta OFF en ese environment.
+- **El navegador bloquea el fetch por CORS (falta `Access-Control-Allow-Origin`)**: el
+  origen del host cross-origin no esta en ninguna surface `active`. Desde TASK-1335 el
+  transporte CORS es la **union gobernada** de `origin_allowlist_json` de las surfaces
+  `active` (SoT = `greenhouse_growth.form_host_surface`), no un literal en el codigo. Para
+  autorizar un host nuevo se **agrega su origen a la surface correspondiente** (DATA, via
+  migracion/seed additive), NUNCA se edita el route helper. El cambio queda vigente tras el
+  refresh del cache (~90s) o el proximo cold start del runtime.
 - **No carga nada / consola con error de CSP**: el CSP del sitio bloquea el script o la
   API de Greenhouse (ver CSP).
 - **El submit vuelve `captcha_failed`**: si el form declara `security.captcha`, verifica

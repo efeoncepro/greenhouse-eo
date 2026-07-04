@@ -35,6 +35,8 @@ ejecución agéntica supervisada (2026)".
   **`seo-aeo`**. Aquí decides *estar presente* en ese canal y *qué contenido* alimentarlo.
 - En Efeonce el AEO/AI Visibility Grader **mide** esta presencia — es producto, no táctica de
   esta skill (ver `growth-marketing-cro/efeonce/AEO_GRADER_AS_LEAD_MAGNET.md` para el loop).
+- El reporte público final del grader vive en `think.efeoncepro.com/brand-visibility/r/<token>`
+  y debe consumir facts de Greenhouse (`model.viewFacts`), no recalcular semántica en marketing.
 
 ## 4. Gobernanza y brand safety (el gap crítico de 2026)
 

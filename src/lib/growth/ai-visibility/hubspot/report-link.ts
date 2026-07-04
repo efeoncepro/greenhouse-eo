@@ -19,6 +19,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { buildPublicReportUrl } from '../public-report-url'
+import { resolvePreferredReportUrl } from '../report/short-link'
 
 /** Token del snapshot público más reciente del run (null si aún no se publicó). */
 export const getLatestReportTokenForRun = async (runId: string): Promise<string | null> => {
@@ -32,6 +33,37 @@ export const getLatestReportTokenForRun = async (runId: string): Promise<string 
   )
 
   return rows[0]?.report_token ?? null
+}
+
+/** Ref (id + token) del snapshot público más reciente del run — necesario para resolver el short link. */
+export const getLatestPublicReportRefForRun = async (
+  runId: string
+): Promise<{ reportId: string; reportToken: string } | null> => {
+  const rows = await runGreenhousePostgresQuery<{ report_id: string; report_token: string }>(
+    `SELECT report_id, report_token
+       FROM greenhouse_growth.grader_reports
+      WHERE run_id = $1 AND audience = 'public'
+      ORDER BY as_of DESC
+      LIMIT 1`,
+    [runId],
+  )
+
+  const row = rows[0]
+
+  return row ? { reportId: row.report_id, reportToken: row.report_token } : null
+}
+
+/**
+ * TASK-1330 — URL de share PREFERIDA (corta si el flag ON + link activo; si no la larga) para el run.
+ * `null` si aún no hay snapshot público. Fuente única para correo + HubSpot handoff (mismo criterio
+ * que el token route). Con el flag OFF devuelve la larga sin costo extra.
+ */
+export const resolveReportShareUrlForRun = async (runId: string): Promise<string | null> => {
+  const ref = await getLatestPublicReportRefForRun(runId)
+
+  if (!ref) return null
+
+  return resolvePreferredReportUrl({ reportId: ref.reportId, reportToken: ref.reportToken })
 }
 
 export { buildPublicReportUrl }

@@ -11,6 +11,8 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
 import {
   getGreenhousePostgresConfig,
   getGreenhousePostgresMissingConfig,
+  handleGreenhousePostgresPoolError,
+  isGreenhousePostgresIdleSessionTimeoutError,
   isGreenhousePostgresRetryableConnectionError,
   isGreenhousePostgresConfigured,
   onGreenhousePostgresReset,
@@ -63,6 +65,14 @@ describe('postgres secret-manager config', () => {
     expect(
       isGreenhousePostgresRetryableConnectionError(
         Object.assign(
+          new Error('terminating connection due to idle-session timeout'),
+          { code: '57P05' }
+        )
+      )
+    ).toBe(true)
+    expect(
+      isGreenhousePostgresRetryableConnectionError(
+        Object.assign(
           new Error('remaining connection slots are reserved for roles with privileges of the "pg_use_reserved_connections" role'),
           { code: '53300' }
         )
@@ -71,6 +81,43 @@ describe('postgres secret-manager config', () => {
     expect(isGreenhousePostgresRetryableConnectionError(new Error('timeout exceeded when trying to connect'))).toBe(true)
     expect(isGreenhousePostgresRetryableConnectionError(new Error('Cannot use a pool after calling end on the pool'))).toBe(true)
     expect(isGreenhousePostgresRetryableConnectionError(new Error('syntax error at or near "FROM"'))).toBe(false)
+  })
+
+  it('classifies PostgreSQL idle-session timeout as an expected idle disconnect', () => {
+    expect(
+      isGreenhousePostgresIdleSessionTimeoutError(
+        Object.assign(
+          new Error('terminating connection due to idle-session timeout'),
+          { code: '57P05' }
+        )
+      )
+    ).toBe(true)
+    expect(isGreenhousePostgresIdleSessionTimeoutError(new Error('connection terminated unexpectedly'))).toBe(false)
+  })
+
+  it('keeps pool state and avoids error logging when PostgreSQL drops an idle client', () => {
+    const resetListener = vi.fn()
+    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined)
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    onGreenhousePostgresReset(resetListener)
+
+    handleGreenhousePostgresPoolError(
+      Object.assign(
+        new Error('terminating connection due to idle-session timeout'),
+        { code: '57P05' }
+      ),
+      'connector'
+    )
+
+    expect(infoSpy).toHaveBeenCalledWith(
+      'Greenhouse Postgres connector pool discarded an idle client after PostgreSQL idle-session timeout; preserving pool state.'
+    )
+    expect(errorSpy).not.toHaveBeenCalled()
+    expect(resetListener).not.toHaveBeenCalled()
+
+    infoSpy.mockRestore()
+    errorSpy.mockRestore()
   })
 
   describe('runtime-aware pool sizing (TASK-845 Slice 3)', () => {

@@ -38,6 +38,20 @@ pre-pipeline + HubSpot attribution before opportunity).
   `api/client-portal/growth/ai-visibility/{run,report}`; admin
   `api/admin/growth/ai-visibility/*`.
 
+## Reporte público final (TASK-1331)
+
+El reporte que activa el loop ya es la superficie final en
+`think.efeoncepro.com/brand-visibility/r/<token>` y consume el contrato
+Greenhouse `modelVersion=1.1.0`. Los facts que hacen al valor del lead magnet
+vienen de `model.viewFacts`: Share of Model, cobertura por motor, totales de
+citación, benchmark competitivo, sentiment/readiness/dimension/share facts y
+next step.
+
+Para CRO/growth, esto significa: optimiza narrativa, fricción, CTA, atribución y
+seguimiento, pero no recalcules la verdad del informe en el hub o en una landing.
+Si el reporte necesita una lectura nueva para vender mejor el diagnóstico,
+primero convertirla en fact backend public-safe; luego renderizarla.
+
 ## Entitlement PLG: un motor, varias puertas
 
 El grader es **una capability con entitlement por-ORG** (no por rol): público

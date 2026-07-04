@@ -36,6 +36,22 @@ consumers (email + HubSpot) alineados. El path viejo del portal `greenhouse.efeo
 Anti-regresión: `report-link.test.ts` afirma que NUNCA vuelve al host/path muerto.
 Tasks: `TASK-1325` (hub, complete) · `TASK-1324` (repoint del enlace, complete/released).
 
+## Reporte público final: contrato de facts (live, as-of 2026-07-04)
+
+El mockup enterprise del informe se promovió a reporte final user-facing en
+`efeonce-think` sólo después de cerrar TASK-1331: Greenhouse subió el contrato
+público a `modelVersion=1.1.0` y expone `model.viewFacts` como facts
+server-derived. Ese namespace cubre Share of Model / engine coverage, totales
+globales de citas, benchmark competitivo, sentimiento, readiness, highlights de
+dimensiones, share facts y `levels[].isNext`.
+
+Regla para agentes SEO/AEO: no uses el render del hub como fuente de cálculo ni
+reconstruyas semántica del grader en Astro. La metodología vive en esta skill,
+pero el producto final la materializa desde Greenhouse. Si falta un dato para
+explicar la visibilidad, pide/implementa el fact backend; el hub sólo pinta y
+degrada snapshots antiguos honestamente. No tocar scoring/pesos/probes/normalizer
+para ajustes de presentación del informe.
+
 ## Tesis del producto (por qué importa para la skill)
 HubSpot mide *percepción de marca* en answer engines. Efeonce convierte los
 **gaps de visibilidad en IA en un plan operativo** (contenido, CRM, PR, SEO/AEO,
