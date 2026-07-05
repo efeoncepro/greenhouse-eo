@@ -43,6 +43,7 @@
     "ui:flow-check": "node scripts/ci/task-lint.mjs --changed",
     "ui:motion-check": "node scripts/ci/task-lint.mjs --changed",
     "ui:readiness-check": "node scripts/ci/task-lint.mjs --changed",
+    "skills:motion-guard": "node scripts/skills/motion-overlay-guard.mjs",
     "ui:wireframe-check": "node scripts/ci/task-lint.mjs --changed",
     "docs:closure-check": "node scripts/check-documentation-closure.mjs && node scripts/ci/feature-flags-audit.mjs --strict --no-vercel",
     "docs:context-check": "node scripts/check-context-handoff.mjs",
