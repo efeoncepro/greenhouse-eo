@@ -45,6 +45,12 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   autoridad = **guía de contenido en Think**, no página de servicio. El grader es
   el nodo de conversión compartido. Ver [PDR-002](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md).
 
+- **TASK-1343 — Landing SEO `/servicios/posicionamiento-seo`** (to-do, ui-ux):
+  la spoke de conversión bajada a task ejecutable con wireframe + flow + motion
+  robustos (diseño con `seo-aeo`·`commercial-expert`·`copywriting`·`modern-ui`).
+  Reusa el `<greenhouse-form>` + grader (Full API Parity por reuso). UI ready no.
+  Ver `docs/tasks/to-do/TASK-1343-servicios-posicionamiento-seo-landing.md`.
+
 ## Next
 
 - **Crawl vivo** de `efeoncepro.com` (route-ownership matrix): confirmar si
