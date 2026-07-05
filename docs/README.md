@@ -96,6 +96,12 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_DASHBOARD_UX_GAPS_V1.md](ui/GREENHOUSE_DASHBOARD_UX_GAPS_V1.md)
 - [SKY_TENANT_EXECUTIVE_SLICE_V1.md](ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md)
 
+### Public Site (producto)
+
+- [Public Site — Producto (índice)](public-site/README.md)
+- [Product Roadmap del sitio público](public-site/PRODUCT_ROADMAP.md)
+- [Decisiones de producto (PDR)](public-site/decisions/)
+
 ### Roadmap
 
 - [BACKLOG.md](roadmap/BACKLOG.md)

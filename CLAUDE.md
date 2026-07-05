@@ -34,6 +34,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | PostgreSQL (conexión/migraciones/SQL readers) | `greenhouse-postgres` | inline (PostgreSQL Access + Migration markers + SQL gate) |
 | Backend (API routes/stores/outbox/reactive) | `greenhouse-backend` | inline (Full API Parity + canonical error contract + auth helpers) |
 | Secret hygiene / rotación | `greenhouse-secret-hygiene` | inline (Secret Manager Hygiene) |
+| Sitio público (landings/posicionamiento/roadmap del sitio) | `efeonce-public-site-wordpress` + `seo-aeo`/`commercial-expert` | `docs/public-site/` (README índice + PRODUCT_ROADMAP + `decisions/` PDR ≠ ADR) |
 
 ### Business Context Pack
 

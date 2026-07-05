@@ -10,6 +10,7 @@ Regla canonica: `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1
 - Si la decision vive en una spec de dominio, actualizar esa spec y este indice.
 - Si una decision cambia, crear una nueva decision y marcar la anterior como superseded/deprecated donde vive.
 - No duplicar el contenido completo del ADR en esta tabla.
+- **Género hermano (no confundir):** las decisiones de **producto/posicionamiento/GTM del sitio público** viven como **PDR** (Product Decision Records) en [`docs/public-site/`](../public-site/README.md), no acá. Un ADR fija arquitectura (contrato técnico); un PDR fija producto. Cuando un PDR obliga arquitectura, cita el ADR de este índice.
 
 ## Decisiones vigentes
 
