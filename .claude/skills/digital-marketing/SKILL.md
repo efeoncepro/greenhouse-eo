@@ -39,6 +39,8 @@ argument-hint: "[canal/campaña o pregunta específica — ej: 'plan de paid med
 
 # Marketing Digital — Skill operativa 2026
 
+> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
+
 > **Qué es esto.** Una skill de dos manos: **(1) conocimiento experto** del marketing
 > digital por **canales, craft y campañas** al estado del arte 2026, y **(2) capacidad
 > de ejecución** (planear una campaña integrada, estructurar una cuenta de paid media,

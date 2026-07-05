@@ -5,6 +5,8 @@ description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la
 
 # Efeonce Agency — Contexto de negocio para construir Greenhouse
 
+> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
+
 Esta skill es el **router + doctrina destilada** del context pack de negocio de Efeonce Group. Su trabajo: que cualquier agente (Claude o Codex) entienda *para qué existe Greenhouse en el negocio* antes de tocar producto, copy, métricas o estrategia, y sepa **qué archivo canónico leer** según la tarea.
 
 **Fuente de verdad = `docs/context/` (archivos `00`–`14`).** Esta skill NO los reemplaza: los resume y enruta. Ante cualquier conflicto, mandan los docs `docs/context/*` y, sobre arquitectura/runtime/contratos, manda el contrato técnico verificado (regla del `CLAUDE.md`). Empezar siempre por `docs/context/00_INDEX.md`.

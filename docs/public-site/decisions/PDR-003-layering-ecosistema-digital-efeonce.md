@@ -19,17 +19,28 @@ Modelar el ecosistema en dos ejes ortogonales, no en una lista plana. Las
 **superficies** (eje A) consumen las **plataformas** (eje B).
 
 ```text
-EJE A — SUPERFICIES front-of-house  ("cómo el mundo toca a Efeonce", por audiencia)
+EJE A — SUPERFICIES front-of-house  (mapeadas al BOW-TIE: adquisición → experiencia)
 
-  1. Adquisición / comercial-pública   efeoncepro.com                (WP → Astro)
-       └─ atraer y convertir demanda (marketing, servicios, /visibilidad)
+  ── LADO IZQUIERDO: ADQUISICIÓN (un continuo por etapa de funnel) ──
 
-  2. Contenido / autoridad  =  THINK (hub de contenido)   canales: web + email
-       ├─ Editorial:  Marketing con Manzanitas (blog)  ── efeoncepro.com/blog (WP)
-       │                 └─ Glitch: sección de noticias (blogpost + NEWSLETTER
-       │                    semanal — IA, Marketing, Negocios), dentro del blog
-       └─ Interactivo / lead magnets  ─────────────────  think.efeoncepro.com (Astro)
-                 tools (AI Visibility Grader), ebooks, webinars
+  1. Demand GEN + nurturing (top-of-funnel)  =  THINK (hub de contenido · web + email)
+       ├─ Marketing con Manzanitas   (BLOG · marca editorial flagship)
+       │      └─ Glitch              (sección de noticias: blogpost + newsletter
+       │                              semanal — IA, Marketing, Negocios)
+       ├─ AI Visibility Grader       (tool / lead magnet)
+       ├─ Ebooks · Webinars          (lead magnets)
+       └─ los forms capturan usuarios en etapa temprana → base de nurturing
+                          think.efeoncepro.com (Astro) + efeoncepro.com/blog (WP)
+
+  2. Demand CAPTURE + conversión (mid/bottom-funnel)  =  efeoncepro.com  (WP → Astro)
+       └─ marketing, servicios, /visibilidad, contacto — intención comercial
+
+     ⇢ el GRADER es la COSTURA: tool de Think que produce diagnóstico calificado
+       → handoff a comercial (top → bottom del funnel)
+
+  ── KNOT: handoff comercial → HubSpot pipeline (portal 48713323) ──
+
+  ── LADO DERECHO: RETENCIÓN / EXPANSIÓN ──
 
   3. Experiencia  (una capa, DOS caras)
        ├─ Cliente:   portal cliente / sky-efeonce ──▶ experiencia.efeoncepro.com
@@ -45,23 +56,38 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 
 ### Reglas del modelo
 
-- **Superficies por audiencia, no por host.** Una superficie puede correr en
+- **Adquisición es un continuo (bow-tie izquierdo), no una capa única.** Think y
+  el sitio son AMBOS adquisición, diferenciados por **etapa de funnel**: Think =
+  demand *gen* + captura temprana + nurturing (top); sitio = demand *capture* +
+  conversión (mid/bottom). El contenido ES el motor de adquisición top-funnel, no
+  un propósito separado. La capa de experiencia es el **lado derecho** del bow-tie
+  (retención/expansión).
+- **El grader es la costura del funnel.** Tool de Think (top) que produce un
+  diagnóstico calificado y hace handoff a comercial (bottom) → HubSpot pipeline.
+  Es el nodo de conversión compartido (ver [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md)),
+  no una superficie aparte.
+- **Superficies por audiencia/etapa, no por host.** Una superficie puede correr en
   varios hosts/runtimes (ej. contenido = WP `/blog` + Astro `think`); el runtime
   puede converger sin cambiar la capa.
 - **La capa de experiencia tiene dos caras** — cliente (sky → `experiencia.efeoncepro.com`)
   y operador (cockpit Greenhouse). Mismo runtime, audiencias y jobs distintos
   (esto es lo que separa Nexa cliente vs Nexa operador y su navegación).
-- **Think es UN hub de contenido**, no dos superficies que compiten con el blog.
-  Contiene editorial (Marketing con Manzanitas — con **Glitch** como su sección de
-  noticias: blogpost + newsletter semanal) e interactivo (tools/lead magnets). El
-  bloque Gutenberg `efeoncepro/glitch-drop` (TASK-1337) es solo el módulo de
-  render, no la sección. Distribución por **web + email** (newsletter). **Hub de
-  marca ≠ host:** cada pieza tiene UNA URL canónica; el
-  split de runtime actual (blog WP `/blog` vs tools Astro `think`) es válido
-  mientras el canonical esté limpio y no se duplique en el índice. Convergencia a
-  Astro headless prevista en el route-ownership matrix.
-- **El grader es un nodo del eje A capa 2** (contenido/Think), no una superficie
-  aparte — ver [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md).
+- **Think es EL hub de contenido** (destino), con jerarquía de propiedades:
+  `Think (hub) → Marketing con Manzanitas (blog · marca editorial flagship) →
+  Glitch (sección de noticias: blogpost + newsletter semanal, IA/Marketing/
+  Negocios)`, más tools/lead magnets como hermanos del blog (grader, ebooks,
+  webinars). El bloque Gutenberg `efeoncepro/glitch-drop` (TASK-1337) es solo el
+  módulo de render de Glitch, no la sección. Modelo mental = HubSpot (destino con
+  Blog + free tools + newsletter). Distribución por **web + email**. **Hub de
+  marca ≠ host:** cada pieza tiene UNA URL canónica; el split de runtime actual
+  (blog WP `/blog` vs tools Astro `think`) es válido mientras el canonical esté
+  limpio y no se duplique en el índice. Convergencia a Astro headless prevista en
+  el route-ownership matrix.
+- **Naming de marca (default de trabajo, revisable por el operador):** `Think` = el
+  hub/destino (aloja tools + blog + newsletter); `Marketing con Manzanitas` = la
+  marca editorial (el blog) DENTRO de Think. Alternativa si Manzanitas carga más
+  equity: Manzanitas como marca de contenido y Think como host técnico. Decisión
+  de branding pendiente de confirmación.
 - **Kortex vive en el eje B**, no en las capas front-of-house. Es (a) backbone de
   datos comercial/RevOps que alimenta la capa de adquisición (atribución,
   pipeline) y (b) producto vendible del portfolio. Peer system: Greenhouse lo
@@ -78,6 +104,9 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   Ajuste 2 preliminar de la conversación.)
 - **Kortex como cuarta capa front-of-house** — no es audience-facing; es backbone
   horizontal + producto. Forzarlo a vertical rompe el modelo.
+- **Think como capa "de contenido" separada de adquisición** — falso: el contenido
+  es el motor de adquisición top-funnel (demand gen + nurturing). Separarlos
+  esconde que Think captura leads tempranos que alimentan el pipeline comercial.
 
 ## Consecuencias
 
@@ -95,8 +124,11 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   hub de contenido; resolver la coexistencia por canonical URL, no separándolos.
 - **NUNCA** modelar "experiencia" como una sola audiencia — cliente y operador
   son caras distintas.
+- **NUNCA** tratar Think como "solo contenido" desligado de adquisición — es
+  demand gen + nurturing (top-of-funnel); sus forms alimentan el pipeline.
 - **SIEMPRE** que nazca una capacidad, ubicarla primero en el eje correcto
-  (superficie por audiencia vs plataforma/backbone) antes de decidir host/repo.
+  (superficie por audiencia/etapa vs plataforma/backbone) antes de decidir
+  host/repo; si es superficie de mercado, ubicarla por etapa de funnel (bow-tie).
 - **SIEMPRE** alinear con el sibling `GREENHOUSE_REPO_ECOSYSTEM_V1.md` (repos) y
   el contrato de sister platforms cuando la decisión cruce un peer system.
 
@@ -108,3 +140,5 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   `GREENHOUSE_KORTEX_CONTROL_PLANE_READER_V1.md`, `GREENHOUSE_KORTEX_COMMAND_ADAPTER_V1.md`,
   `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`.
 - Glitch/blog: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
+- Think (docs): [`docs/think/README.md`](../../think/README.md).
+- Bow-tie / funnel: skill `commercial-expert` (overlay GH) + `spec/Arquitectura_BowTie_Efeonce_v1_1.md`.
