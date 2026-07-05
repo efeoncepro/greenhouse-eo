@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-07-03 por Codex (AEO `/aeo-2/` Success Card v16 + renderer polish)
+> **Ultima actualizacion:** 2026-07-05 por Codex (Think Brand Visibility `tokenized_report` production handoff)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -35,7 +35,7 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 ## Estado de rollout
 
 - **Staging (`develop`): VIVO** desde 2026-06-25. Los tres flags estan ON: el API publico (`GROWTH_FORMS_PUBLIC_API_ENABLED`), el dispatcher de entrega (`GROWTH_FORMS_DISPATCH_ENABLED`) y el adapter HubSpot real (`GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`). Verificado: el endpoint publico responde el render contract y una submission real llego a un HubSpot test form (200).
-- **Produccion: ACTIVO de forma acotada para AEO `/aeo-2/`.** El primer submit productivo publico usa el form `efeonce-aeo-diagnostic` y, desde TASK-1298 (2026-07-01), el renderer portable `<greenhouse-form>` en WordPress por `form-key`. AEO v16 `fver-bfc40c59-8d95-4d38-8ae5-0da7dc4ab468` declara `style_variant=diagnostic_premium`, Turnstile invisible, CTA `Empezar con mi diagnóstico →`, campo visible `Nombre completo` con placeholder `ej. María González` y split server-side hacia HubSpot `firstname`/`lastname`, los dos dropdowns premium (`País`, `Tamaño de empresa`) y Success Card `presentation="success_card"` con `steps=[]`. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Produccion: ACTIVO de forma acotada para AEO `/aeo-2/` y Think `/brand-visibility`.** AEO usa el form `efeonce-aeo-diagnostic` para HubSpot. Think usa el form `fdef-ai-visibility-grader` con `successBehavior.kind="tokenized_report"`: el submit gobernado persiste la submission y el renderer entrega al host un `status_url`; un consumer reactivo de dominio crea el grader run y el status devuelve el token cuando el reporte esta listo. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Primer form productivo publico — AEO `/aeo-2/`
 
@@ -69,6 +69,30 @@ Autorizar un host publico nuevo (por ejemplo `think.efeoncepro.com`) es un cambi
 codigo: desde TASK-1335 el transporte CORS es la union gobernada de los origenes de las surfaces activas
 (`form_host_surface`), asi que se agrega el origen a la surface correspondiente y el motor lo permite sin
 tocar el route helper. `efeoncepro.com` (`/aeo-2`) permanece autorizado por su propia surface.
+
+## Segundo form productivo publico — Think `/brand-visibility`
+
+La landing `https://think.efeoncepro.com/brand-visibility` usa el mismo renderer portable, pero con
+un comportamiento de exito distinto: `tokenized_report`.
+
+- Form id: `fdef-ai-visibility-grader`.
+- Form key: `69cd5269-5f97-4d32-99c4-0b23f41aa2f5`.
+- Surface: `fhsf-ai-visibility-grader`.
+- API base: `https://greenhouse.efeoncepro.com`.
+- Host: `https://think.efeoncepro.com`.
+- Renderer: `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`.
+
+El sitio Think **no** crea campos locales, no duplica validacion, no maneja consentimiento y no hace un
+proxy CORS. El formulario real vive dentro de `<greenhouse-form>`. Al aceptar el submit, el renderer
+emite `gh_form_submission_accepted` con `run_handle` y `status_url`; Think muestra el loader y hace
+poll a ese status hasta recibir `reportToken`, momento en que abre
+`/brand-visibility/r/<token>`.
+
+Punto importante de operación: el grader run no nace por `form_destination`. Para este form,
+`DESTINATIONS: []` puede ser correcto; el run lo crea el consumer reactivo
+`growth_grader_run_from_submission` al procesar el outbox `growth.forms.submission_accepted`. Si hay
+`form_submission.status=delivered` pero no hay `grader_run`, diagnosticar el consumer/proyección y la
+clasificación de categoría antes de tocar Think.
 
 ## Como se muestra el formulario (renderer portable) — TASK-1231
 

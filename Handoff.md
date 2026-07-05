@@ -1,3 +1,17 @@
+## Sesion 2026-07-05 - cierre documental TASK-1327/TASK-1341 - Codex - documented for new session
+
+> **Objetivo de cierre:** preparar una nueva sesión limpia sin perder lo aprendido. Se documentaron las lecciones de TASK-1327 en skills, manuales, docs funcionales, arquitectura, ledger de flags, changelog, project context y este handoff. Commits previos ya existentes en `develop`: `969da5f1a fix(growth): complete brand visibility form handoff` y `94be60c50 docs(tasks): add DataForSEO AIO runtime guard task`.
+>
+> **Lección canonizada Growth Forms:** `tokenized_report` no es un destination HubSpot. El flujo correcto es: submit gobernado acepta `form_submission` + outbox `growth.forms.submission_accepted`; renderer emite `gh_form_submission_accepted` con `run_handle`/`status_url`; el consumer reactivo `growth_grader_run_from_submission` crea `grader_lead` + `grader_run`; el status público devuelve `reportToken` sólo cuando hay snapshot publicable. `DESTINATIONS: []` puede ser correcto para `fdef-ai-visibility-grader`.
+>
+> **Lección canonizada de diagnóstico:** si el loader queda en cola, no asumir problema de Think. Revisar en orden: browser POST/OPTIONS/Turnstile/CORS → `greenhouse_growth.form_submission` → outbox → consumer/projection → `grader_lead`/`grader_run` → status route CORS. El bug real post-Turnstile fue `category unresolved (node=unknown)` en el consumer, no el host Astro.
+>
+> **Lección canonizada DataForSEO/AIO:** los runs públicos async se ejecutan en `ops-worker`; Vercel env no basta. `google_ai_overview` con `skipped:missing_secret` es drift de configuración del worker y deja el informe `partial` de forma honesta. `skipped:no_ai_overview_block` sí es resultado válido de DataForSEO. TASK-1341 queda como siguiente trabajo formal para guard/preflight + smoke provider-scoped. Claude/Anthropic ausente en public `light` no implica fallo: la policy pública lo excluye por costo/UX.
+>
+> **Lección canonizada loader/motion:** el loader del análisis debe ser overlay de página completa, con aislamiento de viewport para que no se cuelen íconos de secciones inferiores. Si el copy dice Efeonce, mostrar logo/mark; evitar labels/pills sin propósito. Motion GSAP: timeline maestro, varias capas en movimiento, copy por etapas, reduced-motion honesto y transición `ready → abrir informe → reporte`.
+>
+> **Convivencia:** mantener fuera de stage los WIP ajenos/locales detectados en `package.json`, `scripts/ai/generate-image.ts`, `scripts/ai/remove-bg.ts`, `ai-generations/` y `.claude/skills/greenhouse-ai-image-generator/SKILL.md` salvo instrucción explícita. No revertirlos.
+
 ## Sesion 2026-07-05 - TASK-1327 Think Brand Visibility submit->run + loader final - Codex - RELEASED fast path
 
 > **Cierre real del loop submit -> run -> report:** despues del fix Turnstile, el submit humano en `https://think.efeoncepro.com/brand-visibility` si llegaba a Greenhouse y persistia la submission, pero no nacia el grader run. Submission real diagnosticada: `fsub-fdeff78f-6ce2-46b4-abe0-a79608eeff99` (`form_id=fdef-ai-visibility-grader`, `surface_id=fhsf-ai-visibility-grader`, `page_uri=https://think.efeoncepro.com/brand-visibility`, `status=delivered`, `created_at=2026-07-05T07:26:58Z`). El outbox `growth.forms.submission_accepted` estaba publicado; el handler correcto no era un destination de Growth Forms sino el consumer reactivo `growth_grader_run_from_submission`, que fallaba con `Grader run blocked: category unresolved (node=unknown)`. La categoria declarada `Agencia o consultoria de crecimiento` no resolvia a taxonomy canonica antes de llamar `enqueueGraderDiagnostic`.
@@ -14,7 +28,7 @@
 >
 > **Gates:** Greenhouse focal Vitest (projection + taxonomy + CORS route), `pnpm typecheck`, `pnpm build:fast`, `git diff --check`, `pnpm worker:runtime-deps-gate`, `pnpm qa:gates --changed --agent codex --task TASK-1327 --ui --runtime --release --production --security`, `pnpm docs:closure-check`, `pnpm ops:lint --changed`, `pnpm task:lint --task TASK-1327`, `pnpm ui:{wireframe,flow,motion,readiness}-check --task TASK-1327` OK. Think `pnpm type-check` OK (hint historico `document.execCommand`), `pnpm build` OK, verifier productivo OK. `docs:closure-check` dejo warning no bloqueante `architecture_or_adr_check`; no se crea ADR nueva porque el patron arquitectonico no cambio, se cerro la implementacion del contrato existente form submit -> reactive projection -> grader run + status public CORS.
 >
-> **Convivencia:** los worktrees quedan sucios con cambios de esta task y WIP previo/ajeno en Growth Forms/renderer/docs. No se hizo commit ni push desde esta sesion de cierre. No revertir cambios ajenos; si se formaliza, stagear paths explicitos.
+> **Convivencia:** esta entrada quedó escrita antes de los commits posteriores. Addendum Codex: los cambios de código/docs de TASK-1327 y TASK-1341 sí fueron commiteados luego como `969da5f1a` y `94be60c50`; el cierre documental de esta nueva entrada debe stagearse por paths explícitos. No revertir cambios ajenos; si se formaliza, stagear paths explícitos.
 
 ## Sesion 2026-07-05 - TASK-1327 Think Brand Visibility submit fix + release - Codex - RELEASED
 

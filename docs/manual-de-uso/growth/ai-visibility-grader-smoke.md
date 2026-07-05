@@ -1,7 +1,7 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.12 · **Ultima actualizacion:** 2026-07-04 por Codex (TASK-1331 reporte público final)
+> **Version:** 1.13 · **Ultima actualizacion:** 2026-07-05 por Codex (TASK-1327 production handoff + TASK-1341 DataForSEO guard)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
@@ -15,6 +15,8 @@
 - **Fix-It Artifacts (TASK-1269):** `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` ON en Vercel staging y prod OFF. Pendiente antes de entregar a prospecto/prod: smoke funcional por token público y run admin con reporte real + revisión copy/legal.
 - **Re-grade recurrente (TASK-1270):** staging/develop ON (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`) con Cloud Scheduler `ops-growth-grader-regrade` habilitado diario `0 8 * * *` (`America/Santiago`). Produccion OFF/paused. Smoke manual 2026-06-29 termino `skipped=no_due_profiles` porque no hay perfiles opt-in/due; no hubo costo.
 - **Reporte público final (TASK-1331):** producción ya sirve `modelVersion=1.1.0` con `model.viewFacts`; el hub `efeonce-think` en `https://think.efeoncepro.com/brand-visibility/r/<token>` es el reporte final user-facing. `mock-token` sólo existe localmente; producción exige un token real `grt-*`.
+- **Lead magnet Think / Brand Visibility (TASK-1327):** producción ya puede aceptar submit gobernado, crear run por consumer reactivo y abrir el informe por `status_url` desde `https://think.efeoncepro.com/brand-visibility`. Si el loader queda en cola, no asumir UI: revisar `form_submission` → outbox `growth.forms.submission_accepted` → consumer `growth_grader_run_from_submission` → `grader_lead`/`grader_run` → status CORS.
+- **Producción / Google AI Overview (TASK-1341):** el modo público `light` solicita `google_ai_overview`; los reportes del 2026-07-05 pueden quedar `partial` porque el runtime async que ejecuta es Cloud Run `ops-worker`, y la revisión detectó `skipped:missing_secret` por falta de `DATAFORSEO_API_LOGIN` en esa revisión. Vercel env solo no basta. TASK-1341 gobierna el guard/preflight para que AIO no pueda estar ON sin login + password secret ref en el worker.
 - **DB auditada:** `greenhouse_growth` tiene 24 runs, 266 observations, 10 scores, 8 reports, 7 reviews, 23 probe results, 1 lead y 1 email dispatch. No hay perfiles org-bound opt-in para re-grade.
 - Verdad live de flags: `vercel env ls`. Estado humano: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
@@ -59,6 +61,22 @@ pnpm growth:ai-visibility:smoke
 ```
 
 Para una prueba estrictamente local con Secret Manager, define además `GCP_PROJECT=efeonce-group` si tu ADC no trae project por defecto. No incluyas el password DataForSEO en `.env.local`; debe resolverse por `DATAFORSEO_API_PASSWORD_SECRET_REF`.
+
+**Diagnóstico de `google_ai_overview` / DataForSEO en async:** cuando el run se ejecuta por `ops-worker`,
+verifica las env vars del servicio Cloud Run, no sólo Vercel:
+
+```bash
+gcloud run services describe ops-worker \
+  --project=efeonce-group \
+  --region=us-east4 \
+  --format='value(spec.template.spec.containers[0].env)'
+```
+
+En las observations, `status=skipped` + `reason=missing_secret` significa drift de configuración del
+runtime que ejecutó el run. No equivale a "Google no mostró AI Overview". Un `skipped:no_ai_overview_block`
+sí es una degradación honesta válida: DataForSEO respondió, pero no encontró bloque AI Overview para
+esa consulta. Para cerrar TASK-1341, un smoke provider-scoped debe terminar en `succeeded` o
+`skipped:no_ai_overview_block`, nunca en `missing_secret`.
 
 ### 3. Usar el endpoint interno (mismo primitive — apto staging)
 

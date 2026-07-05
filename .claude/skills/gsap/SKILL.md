@@ -190,6 +190,27 @@ Pause or kill off-screen animations.
 
 ---
 
+## Enterprise Async Loader Overlays
+
+For critical waits such as report generation, use a page-level overlay, not a dock-only spinner. The
+overlay should isolate the whole viewport (`position: fixed`, explicit z-index, backdrop/isolation)
+so lower page sections and icons cannot leak through while the system owns the user's attention.
+
+Build a master timeline with labels for entrance, signal loop, stage-copy updates, ready handoff and
+exit. Continuous motion should be distributed across the composition (background scan, cards,
+progress, focal mark, copy/type effect), not concentrated in one tiny moving element. Keep copy calm,
+real and lightly human; avoid exposing raw internal terms unless the user benefits from them.
+
+When the copy says "Efeonce", show the Efeonce mark/logo rather than a plain text pill. Avoid
+decorative bars or floating shapes unless they communicate analysis progress, evidence assembly, or
+handoff state.
+
+Respect `prefers-reduced-motion` with a static staged state and no infinite loops. Animate transform
+and opacity, kill timelines on navigation/unmount, and keep the final ready transition smooth:
+ready state -> premium "report ready/opening" overlay -> route/report entrance.
+
+---
+
 ## References (loaded on demand)
 
 - **[references/effects.md](references/effects.md)** — Drop-in effects: typewriter text, audio visualizer. Read when needing ready-made effect patterns for HyperFrames.

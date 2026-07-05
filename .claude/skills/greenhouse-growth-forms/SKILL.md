@@ -208,6 +208,21 @@ to the widget — subdomains are NOT inherited from the root (verified on `think
 `efeoncepro.com` root did not cover it); and (b) a **real-browser end-to-end smoke on the real surface**
 is the closure gate — curl/tests never exercise Turnstile or cross-origin CORS. Source incident: TASK-1327.
 
+**TASK-1327 tokenized_report production lesson (Think Brand Visibility).** For `tokenized_report`,
+a successful `/submit` is only the first commit. The renderer emits `gh_form_submission_accepted`
+with scalar `run_handle`/`status_url`; a domain reactive consumer must convert the accepted
+submission/outbox event into the domain object. For the grader that consumer is
+`growth_grader_run_from_submission`, which creates `grader_lead` + `grader_run`. Do not add a fake
+`form_destination` just to create the run: `DESTINATIONS: []` can be correct for
+`fdef-ai-visibility-grader` because destinations deliver leads, while the grader run is domain
+projection work. If the loader polls forever, inspect in order: browser POST/OPTIONS/Turnstile →
+`greenhouse_growth.form_submission` → `growth.forms.submission_accepted` outbox → reactive consumer
+logs/result → `grader_lead`/`grader_run` → status route CORS + `reportToken`. The TASK-1327 root
+cause after Turnstile was `category unresolved (node=unknown)` in the consumer, not the Think host.
+Public intake classification must resolve or degrade before enqueue; it must never dead-end a user
+after an accepted submit. Canonical Think form: `formKey=69cd5269-5f97-4d32-99c4-0b23f41aa2f5`,
+`surface=fhsf-ai-visibility-grader`, host `https://think.efeoncepro.com`.
+
 AEO's `pnpm public-website:verify-aeo-live-contract` is the **strict AEO live gate**, not a
 universal tax. New forms should not need `heroans`, AEO WordPress guards, or AEO copy/layout
 assertions unless they live on AEO. If another host/theme breaks the renderer, fix the renderer or

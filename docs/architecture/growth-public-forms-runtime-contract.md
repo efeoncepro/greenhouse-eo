@@ -102,6 +102,29 @@ Contrato (SoT `successBehaviorSchema` en `src/lib/growth/forms/contracts.ts`, es
 
 Reglas duras: **NUNCA** hardcodear la ruta de status en el renderer genérico (viene de la config `statusPathTemplate`, self-describing). **NUNCA** meter el `reportToken` ni status en la respuesta del submit ni en el handoff (sólo aparece al hacer poll cuando `ready`). **NUNCA** publicar el handoff mutando la versión publicada in-place: `pnpm growth:forms:activate-grader-tokenized-report` (dry-run) clona → publica → deprecara, con guard de runtime.
 
+### Delta 2026-07-05 — Think Brand Visibility production handoff (TASK-1327)
+
+El primer rollout real de `tokenized_report` en Think confirmó que el contrato tiene dos commits
+separados:
+
+1. `POST /api/public/growth/forms/{formKey}/submit` acepta la submission, verifica Turnstile y emite
+   el handoff browser-safe (`run_handle`/`status_url`).
+2. El dominio del grader procesa el outbox `growth.forms.submission_accepted` por
+   `growth_grader_run_from_submission` y crea `grader_lead` + `grader_run`; sólo después el status
+   puede avanzar hacia `ready` + `reportToken`.
+
+Por eso `form_destination` no es el mecanismo correcto para crear un grader run. Una versión del form
+con `DESTINATIONS: []` puede ser válida para `fdef-ai-visibility-grader`: el destination entrega leads
+a sistemas externos; el run es trabajo de proyección de dominio. El síntoma "submit delivered pero el
+loader poll-ea para siempre" se diagnostica en este orden: network/Turnstile/CORS del submit →
+`form_submission` → outbox `growth.forms.submission_accepted` → consumer reactivo → `grader_lead` /
+`grader_run` → status route CORS.
+
+La causa raíz TASK-1327 post-Turnstile fue que el consumer fallaba con `category unresolved
+(node=unknown)` para una categoría pública no mapeada. Regla de arquitectura: un intake público
+aceptado no puede terminar en dead-end por clasificación de dominio. La proyección debe resolver con
+taxonomy/fallback grounded o degradar explícitamente y dejar evidencia recuperable.
+
 ## WordPress Ohio Host Layer
 
 El tema Ohio es un host CSS agresivo para controles nativos. El contrato vigente para

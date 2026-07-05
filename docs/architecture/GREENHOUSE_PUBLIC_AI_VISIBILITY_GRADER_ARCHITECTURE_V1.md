@@ -460,6 +460,32 @@ V1 recommended policy:
 | `internal_audit` | OpenAI + Perplexity + Gemini + manual SERP sources later | More evidence and prompt count. |
 | `client_monitor` | Configurable | Recurring tracking after paid/client enablement. |
 
+### Delta 2026-07-05 — production Google AIO/DataForSEO worker drift (TASK-1341)
+
+The Brand Visibility public lead magnet exposed an operational distinction that must remain
+architectural: provider availability is determined by the runtime that executes the run, not by the
+runtime that rendered or accepted the form. Public `light` runs can execute async in Cloud Run
+`ops-worker`; therefore DataForSEO credentials for `google_ai_overview` must exist in `ops-worker`,
+not only in Vercel.
+
+Observed production drift on 2026-07-05: `google_ai_overview` was requested by the public `light`
+policy, but observations degraded as `skipped:missing_secret` because the serving `ops-worker`
+revision lacked `DATAFORSEO_API_LOGIN` while password secret ref configuration existed elsewhere.
+This produced truthful `partial` reports: public delivery can be `ready` while the run/report remains
+partial because one provider skipped honestly. `skipped:no_ai_overview_block` is a valid evidence
+outcome (provider answered, no AIO block); `skipped:missing_secret` is runtime config drift and must
+fail a rollout guard.
+
+TASK-1341 owns the follow-up guard: preflight/deploy must block or loudly warn when
+`GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true` without both `DATAFORSEO_API_LOGIN` and
+`DATAFORSEO_API_PASSWORD_SECRET_REF` in the effective worker environment. A provider-scoped smoke
+must prove `google_ai_overview` ends as `succeeded` or `skipped:no_ai_overview_block`, never
+`missing_secret`.
+
+Related product note: Anthropic/Claude not appearing in a public Brand Visibility report is not, by
+itself, a provider failure. The public `light` policy intentionally excludes Anthropic for cost/UX
+unless the policy is changed; `full`/internal modes can include it.
+
 Provider abstraction must expose:
 
 - `runPrompt(input): ProviderObservation`

@@ -1,7 +1,7 @@
 # Alta de una surface Growth Form (checklist end-to-end)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.0 — 2026-07-05 (Claude)
+> **Version:** 1.1 — 2026-07-05 (Codex, TASK-1327 production lessons)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Contrato runtime:** [docs/architecture/growth-public-forms-runtime-contract.md](../../architecture/growth-public-forms-runtime-contract.md)
 > **Runbook hermano:** [Operar el Motor de Formularios de Growth](operar-motor-formularios.md) · [Incrustar el formulario (WordPress/Astro)](incrustar-formulario-wordpress-astro.md)
@@ -10,7 +10,7 @@
 
 Publicar un Growth Form **en un host/dominio nuevo** sin que se rompa en producción. Existe porque el motor es data-driven (la mayoría de las piezas se hacen por configuración, sin código), **pero** hay pasos por-surface fáciles de olvidar — sobre todo el **hostname de Turnstile** y el **smoke end-to-end en la surface real** — que si faltan dejan el formulario aceptando datos pero **sin generar nada** (síntoma clásico: "el form envía pero nunca llega el resultado").
 
-Caso fuente: `think.efeoncepro.com/brand-visibility` (TASK-1327), donde faltó el hostname de Turnstile + el CORS del status del grader + verificación end-to-end en la surface nueva. Ver §Problemas comunes.
+Caso fuente: `think.efeoncepro.com/brand-visibility` (TASK-1327), donde faltó el hostname de Turnstile, el CORS del status del grader, y luego el submit aceptado no creaba run porque el consumer reactivo fallaba por una categoría no mapeada. Ver §Problemas comunes.
 
 ## Antes de empezar: ¿tu form es Tier 1 o Tier 2?
 
@@ -76,8 +76,8 @@ Además de A–F, un form que dispara pipeline async necesita **wiring de domini
 
 ### G. Wiring del pipeline async
 
-12. **Consumer reactivo submit→objeto de dominio.** Debe existir y estar desplegado el consumer que convierte la submission aceptada en el objeto de dominio (para el grader: `growth_grader_run_from_submission` crea el `grader_run` + materializa el lead). Sin esto, la submission queda `delivered` pero **no nace el run** → el loader hace poll a un run inexistente para siempre.
-13. **Degradación, no dead-end.** El consumer **NUNCA** debe matar la creación del objeto por un dato de dominio irresoluble (ej. `category unresolved, node=unknown`). Debe degradar (crear con default/`unknown` + flag de reclasificación). Un intake público que dead-end-ea al usuario por una categoría no mapeada es un bug de robustez.
+12. **Consumer reactivo submit→objeto de dominio.** Debe existir y estar desplegado el consumer que convierte la submission aceptada en el objeto de dominio (para el grader: `growth_grader_run_from_submission` crea `grader_lead` + `grader_run`). Este paso no es un `form_destination`: una lista `DESTINATIONS: []` puede ser correcta para `tokenized_report` si el run lo crea la proyección de dominio. Sin consumer, la submission queda `delivered` pero **no nace el run** → el loader hace poll a un run inexistente para siempre.
+13. **Degradación, no dead-end.** El consumer **NUNCA** debe matar la creación del objeto por un dato de dominio irresoluble (ej. `category unresolved, node=unknown`). Debe resolver con taxonomy/fallback grounded o degradar de forma explícita y recuperable. Un intake público que dead-end-ea al usuario después de un submit aceptado por una categoría no mapeada es un bug de robustez.
 14. **CORS de las rutas async.** El status-poll y el reporte viven **fuera** de las rutas genéricas del motor (`/api/public/growth/ai-visibility/run/[handle]`, `/report/[token]`), así que su CORS **no lo cubre** el contrato genérico de forms — hay que reflejar ACAO en cada una reusando el helper gobernado (`publicFormsCorsHeaders` / `publicFormsOptionsResponse`), **no** inventar un resolver paralelo.
 15. **Smoke del handoff completo:** submit → objeto creado → pipeline procesa → estado `ready` + token → el browser lee el status (CORS OK) → abre la ruta de reporte.
 
@@ -102,6 +102,7 @@ Además de A–F, un form que dispara pipeline async necesita **wiring de domini
 |---|---|---|
 | "No pudimos enviar tu formulario" (banner al enviar) | Hostname del host no está en el allowlist del widget Turnstile → widget falla client-side, el submit no llega al backend | Agregar el hostname al widget (§D). Propaga en segundos |
 | El form envía pero **nunca llega el resultado** (Tier 2) | (a) El consumer submit→objeto no creó el run (no desplegado / murió por dato irresoluble), y/o (b) el endpoint de status no devuelve CORS → el browser no puede leer el poll | (a) Verificar consumer + degradación (§G12/G13); (b) reflejar ACAO en status/report (§G14) |
+| `form_submission.status=delivered` pero no hay `grader_run` | El submit gobernado persistió bien, pero el outbox/consumer `growth_grader_run_from_submission` no convirtió la submission en run; no se arregla agregando un destination HubSpot | Revisar `growth.forms.submission_accepted`, logs/result del consumer, clasificación de categoría, y reprocesar el evento sólo cuando el runtime esté corregido |
 | El submit llega pero no aparece en HubSpot | Falta la fila `form_destination` o el mapping es inválido | Configurar el destino (§C); revisar retry queue/dead letters en el cockpit |
 | CORS bloquea al browser aunque el submit "funciona" en curl | curl server-to-server no valida CORS; el browser sí. Origin no está en la surface o la ruta no refleja ACAO | Agregar origin a la surface (§B) y/o reflejar ACAO en la ruta (§G14) |
 

@@ -64,6 +64,28 @@ For local dev, set `AGENT_AUTH_BASE_URL` to the localhost URL and use a local st
 
 Use a focused Playwright script when console/network/API evidence is required, but keep `pnpm fe:capture` as the visual artifact producer whenever feasible.
 
+## Public Growth Forms / Web Component Diagnostics
+
+For `<greenhouse-form>` surfaces, capture the browser and backend boundary separately:
+
+1. Browser/network: `GET /api/public/growth/forms/{ref}`, `OPTIONS` + `POST /submit`, Turnstile
+   script/widget calls, and any domain status URL emitted by the form.
+2. Console/custom events: inspect `gh_form_submission_accepted.detail`. For `tokenized_report`,
+   the important browser-safe fields are scalar `run_handle` and `status_url`.
+3. CORS: record endpoint, HTTP status, safe response body, `Access-Control-Allow-Origin`,
+   `Access-Control-Allow-Methods`, and whether the failing request is preflight, submit, or status
+   poll.
+4. Source of truth: if submit is accepted but the loader never reaches ready, query Postgres/outbox
+   before blaming the host. Check `greenhouse_growth.form_submission`,
+   `growth.forms.submission_accepted`, the domain consumer/projection, then `grader_lead` and
+   `grader_run`.
+
+Use a real browser for Turnstile conclusions. A fake `window.turnstile` token is useful only to prove
+the backend boundary fails closed or that CORS/payload shape are correct; it does not prove a human
+production submit will pass Cloudflare. Distinguish clearly between: client-side Turnstile failure
+(submit never reaches backend), accepted submission with missing domain object (consumer/runtime
+gap), and status/report CORS failure (run exists but browser cannot read it).
+
 ## Output Contract
 
 Report:
