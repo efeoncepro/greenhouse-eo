@@ -104,7 +104,13 @@ export const RENDERER_CSS = `
   .ghf-scope *::after { box-sizing: border-box; }
 
   .ghf-form { display: flex; flex-direction: column; gap: var(--ghf-gap); margin: 0; }
-  .ghf-fields { display: grid; grid-template-columns: 1fr; gap: var(--ghf-gap); }
+  .ghf-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--ghf-gap);
+    transform-origin: 50% 0%;
+    animation: ghf-step-surface-in 200ms cubic-bezier(0.2, 0, 0, 1);
+  }
   .ghf-sr-only {
     position: absolute;
     width: 1px;
@@ -583,6 +589,7 @@ export const RENDERER_CSS = `
     font-size: 0.78rem;
     font-weight: 650;
     line-height: 1.2;
+    transition: border-color 160ms cubic-bezier(0.2, 0, 0, 1), background-color 160ms cubic-bezier(0.2, 0, 0, 1), color 160ms cubic-bezier(0.2, 0, 0, 1), transform 160ms cubic-bezier(0.2, 0, 0, 1);
   }
   .ghf-stepper-item[data-state="current"] {
     color: var(--ghf-fg);
@@ -605,6 +612,12 @@ export const RENDERER_CSS = `
     color: currentColor;
     border: 1px solid currentColor;
     font-size: 0.72rem;
+    font-weight: 800;
+    transition: background-color 160ms cubic-bezier(0.2, 0, 0, 1), color 160ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  .ghf-stepper-item[data-state="complete"] .ghf-stepper-marker {
+    background: color-mix(in srgb, var(--ghf-success) 14%, var(--ghf-field-bg));
+    color: var(--ghf-success);
   }
   .ghf-stepper-label {
     min-width: 0;
@@ -612,22 +625,48 @@ export const RENDERER_CSS = `
   }
   @container (max-width: 460px) {
     .ghf-stepper-list {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
       gap: 6px;
     }
     .ghf-stepper-item {
-      border-radius: 14px;
-      justify-content: flex-start;
+      min-height: 38px;
+      padding: 6px;
+      border-radius: 999px;
+      justify-content: center;
     }
     .ghf-stepper-label {
-      overflow-wrap: normal;
-      word-break: normal;
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .ghf-stepper-marker {
+      width: 24px;
+      height: 24px;
+    }
+    .ghf-actions-wrap {
+      width: 100%;
+    }
+    .ghf-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      width: 100%;
+    }
+    .ghf-btn,
+    [data-ghf-style-variant="diagnostic_premium"] .ghf-btn {
+      width: 100%;
+      min-width: 0;
     }
   }
   .ghf-intake-summary {
     display: grid;
-    gap: 10px;
-    padding: 12px 14px;
+    gap: 8px;
+    padding: 10px 12px;
     border: 1px solid color-mix(in srgb, var(--ghf-border) 82%, transparent);
     border-radius: var(--ghf-radius);
     background: color-mix(in srgb, var(--ghf-field-bg) 78%, transparent);
@@ -638,10 +677,16 @@ export const RENDERER_CSS = `
     font-size: 0.8125rem;
     font-weight: 700;
   }
+  .ghf-intake-summary__meta {
+    margin: 0;
+    color: var(--ghf-muted);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
   .ghf-intake-summary__list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     padding: 0;
     margin: 0;
     list-style: none;
@@ -650,9 +695,9 @@ export const RENDERER_CSS = `
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    min-height: 32px;
+    min-height: 28px;
     max-width: 100%;
-    padding: 6px 9px;
+    padding: 5px 8px;
     border: 1px solid var(--ghf-border);
     border-radius: 999px;
     color: var(--ghf-muted);
@@ -978,6 +1023,10 @@ export const RENDERER_CSS = `
   @keyframes ghf-spin { to { transform: rotate(360deg); } }
   @keyframes ghf-pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   @keyframes ghf-fade { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
+  @keyframes ghf-step-surface-in {
+    from { opacity: 0.82; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
   @keyframes ghf-success-card-in {
     from { opacity: 0.88; transform: translateY(10px) scale(0.985); filter: blur(0.5px); }
     72% { filter: blur(0); }

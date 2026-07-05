@@ -54,6 +54,8 @@ export interface RendererSystemCopy {
   stepBack: string
   stepSkipOptional: string
   intakeSummaryTitle: string
+  intakeSummaryProgress: (completed: number, total: number) => string
+  intakeSummaryPrivacy: string
   stepSummaryComplete: (label: string) => string
   stepSummaryOptionalAdded: (label: string) => string
   stepSummaryOptionalAvailable: (label: string) => string
@@ -103,16 +105,19 @@ const esCL: RendererSystemCopy = {
   emailSuggestion: suggested => `¿Quisiste decir ${suggested}?`,
   phoneCountryAria: 'País del teléfono',
   stepProgress: (current, total) => `Paso ${current} de ${total}`,
-  stepEffort: total => `${total} pasos breves`,
+  stepEffort: total => `${total} pantallas breves`,
   stepperAria: 'Progreso del formulario',
   stepStatusComplete: label => `${label}: completado`,
   stepStatusCurrent: label => `${label}: paso actual`,
   stepStatusUpcoming: label => `${label}: pendiente`,
   stepNext: 'Continuar',
-  stepNextOptional: 'Continuar con este contexto',
+  stepNextOptional: 'Continuar',
   stepBack: 'Atrás',
-  stepSkipOptional: 'Omitir por ahora',
-  intakeSummaryTitle: 'Vista previa del informe',
+  stepSkipOptional: 'Omitir contexto',
+  intakeSummaryTitle: 'Informe en preparación',
+  intakeSummaryProgress: (completed, total) =>
+    completed === 1 ? `1 de ${total} etapas lista` : `${completed} de ${total} etapas listas`,
+  intakeSummaryPrivacy: 'Sin valores sensibles visibles.',
   stepSummaryComplete: label => `${label}: listo`,
   stepSummaryOptionalAdded: label => `${label}: contexto agregado`,
   stepSummaryOptionalAvailable: label => `${label}: opcional`,
@@ -175,16 +180,19 @@ const enUS: RendererSystemCopy = {
   emailSuggestion: suggested => `Did you mean ${suggested}?`,
   phoneCountryAria: 'Phone country',
   stepProgress: (current, total) => `Step ${current} of ${total}`,
-  stepEffort: total => `${total} short steps`,
+  stepEffort: total => `${total} short screens`,
   stepperAria: 'Form progress',
   stepStatusComplete: label => `${label}: complete`,
   stepStatusCurrent: label => `${label}: current step`,
   stepStatusUpcoming: label => `${label}: upcoming`,
   stepNext: 'Continue',
-  stepNextOptional: 'Continue with this context',
+  stepNextOptional: 'Continue',
   stepBack: 'Back',
-  stepSkipOptional: 'Skip for now',
-  intakeSummaryTitle: 'Report preview',
+  stepSkipOptional: 'Skip context',
+  intakeSummaryTitle: 'Report in progress',
+  intakeSummaryProgress: (completed, total) =>
+    completed === 1 ? `1 of ${total} stages ready` : `${completed} of ${total} stages ready`,
+  intakeSummaryPrivacy: 'Sensitive values are not shown.',
   stepSummaryComplete: label => `${label}: ready`,
   stepSummaryOptionalAdded: label => `${label}: context added`,
   stepSummaryOptionalAvailable: label => `${label}: optional`,

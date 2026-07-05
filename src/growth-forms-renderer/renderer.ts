@@ -268,7 +268,7 @@ export class FormRenderer {
 
     form.appendChild(fieldsWrap)
 
-    if (steps) {
+    if (steps && this.currentStep > 0) {
       form.appendChild(this.renderIntakeSummary(steps))
     }
 
@@ -313,12 +313,13 @@ export class FormRenderer {
 
   private renderStepProgress(steps: RendererStep[]): HTMLElement {
     const shell = el(this.doc, 'div', { class: 'ghf-progress-shell' })
+    const currentLabel = steps[this.currentStep]?.label?.trim()
 
     const progress = el(
       this.doc,
       'p',
       { class: 'ghf-progress', 'aria-live': 'polite', tabindex: '-1' },
-      `${this.copy.stepProgress(this.currentStep + 1, steps.length)} · ${this.copy.stepEffort(steps.length)}`
+      `${currentLabel ? `${currentLabel} · ` : ''}${this.copy.stepProgress(this.currentStep + 1, steps.length)} · ${this.copy.stepEffort(steps.length)}`
     )
 
     const nav = el(this.doc, 'nav', { class: 'ghf-stepper', 'aria-label': this.copy.stepperAria })
@@ -328,7 +329,14 @@ export class FormRenderer {
       const label = step.label?.trim() || this.copy.stepProgress(index + 1, steps.length)
       const state = index < this.currentStep ? 'complete' : index === this.currentStep ? 'current' : 'upcoming'
       const item = el(this.doc, 'li', { class: 'ghf-stepper-item', 'data-state': state })
-      const marker = el(this.doc, 'span', { class: 'ghf-stepper-marker', 'aria-hidden': 'true' }, String(index + 1))
+
+      const marker = el(
+        this.doc,
+        'span',
+        { class: 'ghf-stepper-marker', 'aria-hidden': 'true' },
+        state === 'complete' ? '✓' : String(index + 1)
+      )
+
       const text = el(this.doc, 'span', { class: 'ghf-stepper-label' }, label)
 
       const status =
@@ -356,6 +364,7 @@ export class FormRenderer {
     const summary = el(this.doc, 'aside', { class: 'ghf-intake-summary', 'aria-label': this.copy.intakeSummaryTitle })
     const title = el(this.doc, 'p', { class: 'ghf-intake-summary__title' }, this.copy.intakeSummaryTitle)
     const list = el(this.doc, 'ul', { class: 'ghf-intake-summary__list' })
+    let completedSteps = 0
 
     for (const step of steps) {
       const label = step.label?.trim() || step.key
@@ -378,6 +387,8 @@ export class FormRenderer {
             ? this.copy.stepSummaryComplete(label)
             : this.copy.stepSummaryPending(label, missingRequired)
 
+      if (requiredFields.length === 0 ? hasAnyValue : missingRequired === 0) completedSteps += 1
+
       const marker = requiredFields.length === 0 ? (hasAnyValue ? '✓' : '○') : missingRequired === 0 ? '✓' : '•'
       const item = el(this.doc, 'li', { class: 'ghf-intake-summary__item' })
 
@@ -387,6 +398,14 @@ export class FormRenderer {
     }
 
     summary.appendChild(title)
+    summary.appendChild(
+      el(
+        this.doc,
+        'p',
+        { class: 'ghf-intake-summary__meta' },
+        `${this.copy.intakeSummaryProgress(completedSteps, steps.length)} · ${this.copy.intakeSummaryPrivacy}`
+      )
+    )
     summary.appendChild(list)
 
     return summary
@@ -453,7 +472,7 @@ export class FormRenderer {
 
     // Contador de caracteres para campos con límite (aria-hidden: el maxlength nativo es
     // el contrato SR; el contador es ayuda visual). TASK-1256 Slice 1d.
-    if (field.maxLength && (field.type === 'text' || field.type === 'textarea')) {
+    if (field.maxLength && field.type === 'textarea') {
       const current = typeof this.values[field.key] === 'string' ? (this.values[field.key] as string).length : 0
 
       const counter = el(
@@ -1638,8 +1657,13 @@ export class FormRenderer {
 
     if (!primary) return
 
-    if (this.isVerifyingAny()) primary.setAttribute('aria-disabled', 'true')
-    else primary.removeAttribute('aria-disabled')
+    if (this.isVerifyingAny()) {
+      primary.setAttribute('aria-disabled', 'true')
+      primary.setAttribute('disabled', 'disabled')
+    } else {
+      primary.removeAttribute('aria-disabled')
+      primary.removeAttribute('disabled')
+    }
   }
 
   /** Inserta/actualiza el indicador "verificando…" + el affordance typo-suggest. */

@@ -530,7 +530,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
     const { root } = mountInto(multiStepContractFixture())
 
     expect(root.querySelector('.ghf-progress')?.textContent).toContain('Paso 1 de 2')
-    expect(root.querySelector('.ghf-progress')?.textContent).toContain('2 pasos breves')
+    expect(root.querySelector('.ghf-progress')?.textContent).toContain('2 pantallas breves')
     expect(root.querySelector('.ghf-stepper')?.getAttribute('aria-label')).toBe('Progreso del formulario')
     expect(root.querySelector('[aria-current="step"]')?.textContent).toContain('Contacto')
     root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'a@b.com'
@@ -544,15 +544,73 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.querySelector<HTMLInputElement>('[name="work_email"]')!.value).toBe('a@b.com')
   })
 
+  it('re-enables the current step action after email verification finishes across a step re-render', async () => {
+    const verifyHandle: { resolve?: () => void } = {}
+
+    const fetchImpl = vi.fn(async (url: string | URL | Request) => {
+      if (String(url).includes('/verify-email')) {
+        return new Promise<Response>(resolve => {
+          verifyHandle.resolve = () =>
+            resolve(
+              new Response(
+                JSON.stringify({
+                  outcome: 'ok',
+                  syntaxValid: true,
+                  isCorporate: true,
+                  isDisposable: false,
+                  isRoleBased: false,
+                  isFreeProvider: false,
+                  deliverable: 'deliverable',
+                  quality: 'verified',
+                  suggestion: null,
+                  reasonCode: null
+                }),
+                { status: 200 }
+              )
+            )
+        })
+      }
+
+      return new Response(JSON.stringify({ outcome: 'accepted', submissionId: 'sub_1' }), { status: 202 })
+    }) as unknown as typeof fetch
+
+    const { root } = mountInto(multiStepContractFixture(), fetchImpl)
+
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'lead@brand.com'
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.dispatchEvent(new Event('input'))
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    expect(root.querySelector('.ghf-progress')?.textContent).toContain('Paso 2 de 2')
+
+    await vi.waitFor(() => expect(verifyHandle.resolve).toBeTypeOf('function'))
+
+    const primary = root.querySelector<HTMLButtonElement>('[data-ghf-primary]')!
+
+    expect(primary.disabled).toBe(true)
+    const completeVerify = verifyHandle.resolve
+
+    expect(completeVerify).toBeTypeOf('function')
+    if (!completeVerify) throw new Error('email verification resolver was not installed')
+    completeVerify()
+
+    await vi.waitFor(() => {
+      expect(primary.disabled).toBe(false)
+      expect(primary.getAttribute('aria-disabled')).toBeNull()
+    })
+  })
+
   it('renders a non-PII intake summary for multi-step forms', () => {
     const { root } = mountInto(multiStepContractFixture())
 
     root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'lead@brand.com'
     root.querySelector<HTMLInputElement>('[name="work_email"]')!.dispatchEvent(new Event('input'))
 
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
     const summary = root.querySelector('.ghf-intake-summary')!
 
-    expect(summary.textContent).toContain('Vista previa del informe')
+    expect(summary.textContent).toContain('Informe en preparación')
+    expect(summary.textContent).toContain('1 de 2 etapas lista')
     expect(summary.textContent).toContain('Contacto: listo')
     expect(summary.textContent).not.toContain('lead@brand.com')
   })
@@ -580,7 +638,8 @@ describe('growth-forms-renderer · FormRenderer', () => {
     root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
 
     expect(root.querySelector('.ghf-progress')?.textContent).toContain('Paso 2 de 3')
-    expect(root.querySelector('[data-ghf-primary]')?.textContent).toContain('Continuar con este contexto')
+    expect(root.querySelector('[data-ghf-primary]')?.textContent).toContain('Continuar')
+    expect(root.querySelector('.ghf-btn--skip')?.textContent).toContain('Omitir contexto')
 
     root.querySelector<HTMLButtonElement>('.ghf-btn--skip')!.click()
 

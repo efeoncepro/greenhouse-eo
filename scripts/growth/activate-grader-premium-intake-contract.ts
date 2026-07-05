@@ -8,7 +8,7 @@ import 'server-only'
  * - preserva validation/namePolicy/emailPolicy, consent, security, policies y destinations
  * - cambia solo el contrato browser-safe del form:
  *   - `style_variant=diagnostic_premium`
- *   - `ui_policy.composition=multi_step_light` con 3 pasos
+ *   - `ui_policy.composition=multi_step_light` con 5 pasos breves, entrega primero
  *   - labels/placeholders/help copy humanos para una experiencia enterprise
  *   - `successBehavior.tokenizedReport.statusPathTemplate` para el handoff Think
  * - publica una version nueva y depreca la anterior.
@@ -42,19 +42,29 @@ const STATUS_PATH_TEMPLATE = '/api/public/growth/ai-visibility/run/{handle}'
 
 const STEPS = [
   {
+    key: 'delivery',
+    label: 'Entrega',
+    fieldKeys: ['firstName', 'lastName', 'email']
+  },
+  {
     key: 'brand',
-    label: 'Tu marca',
-    fieldKeys: ['brandName', 'websiteUrl', 'market', 'locale', 'category']
+    label: 'Marca',
+    fieldKeys: ['brandName', 'websiteUrl']
+  },
+  {
+    key: 'market',
+    label: 'Mercado',
+    fieldKeys: ['market', 'locale', 'category']
   },
   {
     key: 'context',
-    label: 'Contexto opcional',
-    fieldKeys: ['competitorsDeclared', 'industry', 'persona', 'companySize', 'mainChallenge']
+    label: 'Contexto',
+    fieldKeys: ['competitorsDeclared', 'industry']
   },
   {
-    key: 'contact',
-    label: 'Envío del informe',
-    fieldKeys: ['firstName', 'lastName', 'email', 'consent']
+    key: 'refine',
+    label: 'Confirmar',
+    fieldKeys: ['persona', 'companySize', 'mainChallenge', 'consent']
   }
 ] as const
 
@@ -78,16 +88,16 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
   },
   locale: {
     type: 'select',
-    label: 'Idioma del analisis',
-    placeholder: 'Selecciona idioma/region',
+    label: 'Idioma del análisis',
+    placeholder: 'Selecciona idioma/región',
     options: [
-      { value: 'es-CL', label: 'Espanol (Chile / LatAm)' },
-      { value: 'en-US', label: 'Ingles (Estados Unidos)' }
+      { value: 'es-CL', label: 'Español (Chile / LatAm)' },
+      { value: 'en-US', label: 'Inglés (Estados Unidos)' }
     ]
   },
   category: {
-    label: 'Categoria donde compites',
-    placeholder: 'ej. banca, retail, educacion superior',
+    label: 'Categoría donde compites',
+    placeholder: 'ej. banca, retail, educación superior',
     maxLength: 140
   },
   competitorsDeclared: {
@@ -98,11 +108,13 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
   },
   firstName: {
     label: 'Nombre',
+    placeholder: 'ej. Paula',
     autocomplete: 'given-name',
     maxLength: 80
   },
   lastName: {
     label: 'Apellido',
+    placeholder: 'ej. Reyes',
     autocomplete: 'family-name',
     maxLength: 80
   },
@@ -115,7 +127,7 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
   },
   industry: {
     label: 'Industria',
-    placeholder: 'ej. Servicios profesionales, tecnologia, retail',
+    placeholder: 'ej. Servicios profesionales, tecnología, retail',
     maxLength: 120
   },
   persona: {
@@ -124,13 +136,13 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
     maxLength: 120
   },
   companySize: {
-    label: 'Tamano de empresa',
+    label: 'Tamaño de empresa',
     placeholder: 'ej. 51-200 personas',
     maxLength: 80
   },
   mainChallenge: {
-    label: 'Que quieres entender o mejorar',
-    placeholder: 'ej. Entender por que mi marca aparece poco en respuestas de IA.',
+    label: 'Qué quieres entender o mejorar',
+    placeholder: 'ej. Entender por qué mi marca aparece poco en respuestas de IA.',
     maxLength: 500
   },
   consent: {
@@ -140,18 +152,24 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
 
 const COPY_UPDATES: Record<string, string> = {
   submit: 'Generar mi informe',
-  'brandName.help': 'Usamos este nombre para buscar menciones y variaciones de tu marca.',
+  'firstName.help': '',
+  'lastName.help': '',
+  'email.help': 'Mostramos el resultado aquí y dejamos una recuperación segura por correo.',
+  'consent.help': '',
+  'brandName.help': 'Usamos este nombre para buscar menciones y variaciones relevantes.',
   'websiteUrl.help': 'Opcional, pero ayuda a leer citabilidad y operabilidad del sitio correcto.',
-  'market.help': 'Define el territorio donde la IA deberia entender, citar y comparar tu marca.',
+  'market.help': 'Territorio donde la IA debería entender, citar y comparar tu marca.',
   'locale.help': 'Ajusta el idioma base de lectura del reporte.',
-  'category.help': 'Ayuda a interpretar la categoria correcta sin forzar un resultado.',
+  'category.help': 'Ayuda a interpretar la categoría correcta.',
   'competitorsDeclared.help': 'Opcional: escribe 1 a 3 marcas. Si no las tienes claras, puedes omitir este paso.',
-  'email.help': 'Usa tu correo corporativo para recibir y recuperar el informe.',
-  'mainChallenge.help': 'Opcional: una frase basta. Evita informacion sensible.',
-  'brandName.error.required': 'Escribe el nombre de la marca para iniciar el analisis.',
+  'industry.help': 'Opcional: nos ayuda a evitar comparaciones fuera de contexto.',
+  'persona.help': 'Opcional: ajusta el lenguaje del informe a quien tomará decisiones.',
+  'companySize.help': 'Opcional: calibra la recomendación según el tamaño de la organización.',
+  'mainChallenge.help': 'Opcional: una frase basta. Evita información sensible.',
+  'brandName.error.required': 'Escribe el nombre de la marca para iniciar el análisis.',
   'market.error.required': 'Indica el mercado donde quieres evaluar la visibilidad.',
   'locale.error.required': 'Elige el idioma base del informe.',
-  'category.error.required': 'Describe la categoria donde compite tu marca.',
+  'category.error.required': 'Describe la categoría donde compite tu marca.',
   'firstName.error.required': 'Escribe tu nombre para identificar la solicitud.',
   'lastName.error.required': 'Escribe tu apellido para completar tus datos.',
   'email.error.required': 'Escribe tu correo corporativo para recibir y recuperar el informe.',
@@ -322,7 +340,7 @@ const main = async (): Promise<void> => {
   console.log('\nPlan:')
   console.log(`  - Clonar v${current.version}`)
   console.log(`  - Setear style_variant = ${STYLE_VARIANT}`)
-  console.log('  - Setear ui_policy.composition = multi_step_light con 3 pasos')
+  console.log('  - Setear ui_policy.composition = multi_step_light con 5 pasos breves, entrega primero')
   console.log('  - Humanizar labels/placeholders/help copy de los campos del grader')
   console.log('  - Cambiar competitorsDeclared de multiselect sin opciones a textarea opcional')
   console.log('  - Añadir successBehavior.tokenizedReport.statusPathTemplate')
