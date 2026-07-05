@@ -1,3 +1,13 @@
+## Sesion 2026-07-04 - TASK-1337 Glitch Gutenberg block - Claude - in-progress (implementando plugin)
+
+> **Task:** `docs/tasks/in-progress/TASK-1337-glitch-gutenberg-block.md` (public-site, ui-ux/primitive). Diseño visual aprobado por el operador (callout editorial, wordmark, panel navy-tint, cuerpo upright, verde=isotipo). Ejecución local-first en `develop`, sin push, sin branch.
+>
+> **Contexto clave:** la implementación vive en el **repo runtime separado** `/Users/jreye/Documents/efeonce-public-site-runtime` (rail git→Kinsta), NO en greenhouse-eo. Es un plugin WordPress/Gutenberg, no el portal Next.js.
+>
+> **Decisiones de Discovery:** (1) plugin NUEVO `efeonce-editorial-blocks` — ningún plugin existente es de bloques Gutenberg. (2) tone DIFERIDO en V1. (3) enfoque **build-less** (block.json + index.js con globals `wp.*` + render.php + style.css) — el rail deploya archivos crudos a Kinsta, sin build step; y `content` va en el comment delimiter (sin `source:html`) para que un dynamic block con `save:null` no pierda datos ni genere "invalid block".
+>
+> **Rollout gating:** no hay WordPress local (ni wp-env) ni lane de deploy activo (README runtime: "Do not deploy until a Greenhouse release task defines the GitHub→Kinsta lane"). Slice 3 runtime (insert/save/reload en WP real) queda **operator-gated**: se entrega code-complete + runbook manual + intento de smoke con WP Playground.
+
 ## Sesion 2026-07-04 - TASK-1327 Think Brand Visibility landing - Codex - code complete local (rollout pendiente)
 
 > **Task:** `docs/tasks/in-progress/TASK-1327-public-lead-magnet-landing-form-embed.md` (EPIC-020, ui-ux). Goal confirmado por el operador; ejecución en `develop` vía `pnpm codex:task-hook TASK-1327 --develop`, sin branch switch, sin subagentes, sin push/deploy.
