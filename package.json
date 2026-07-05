@@ -191,6 +191,7 @@
     "public-website:wpcli": "tsx scripts/public-website/wpcli-remote.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",
+    "ai:image:rmbg": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/remove-bg.ts",
     "fe:capture": "tsx scripts/frontend/capture.ts",
     "fe:capture:gc": "tsx scripts/frontend/gc.ts",
     "fe:capture:index": "tsx scripts/frontend/index-cmd.ts",

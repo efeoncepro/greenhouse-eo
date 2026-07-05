@@ -1,3 +1,9 @@
+## Sesion 2026-07-05 - AI image tooling reference edits + Nexa fallback characters - Codex - committed
+
+> **Qué queda:** `pnpm ai:image` acepta `--image` repetible para editar una referencia y mantener consistencia de personaje/asset; `pnpm ai:image:rmbg` agrega matting AI local para PNG transparente; skills Codex/Claude `greenhouse-ai-image-generator` documentan el workflow. Nueva bitácora durable `ai-generations/` con `README.md`, `INDEX.md` y el set `2026-07-05_nexa-fallback-characters/`.
+>
+> **Assets:** poses del personaje 3D de Nexa para fallback states de Think (`not-found`, `expired`, `revoked`, `rate-limited`, `error`), con salidas opacas + transparentes y manifest de prompts. Pendiente si se integra en UI: pasar por el hook UI normal, GVC y commit en `efeonce-think`; estos assets quedan como exploración validada, no implementación visible.
+
 ## Sesion 2026-07-05 - cierre documental TASK-1327/TASK-1341 - Codex - documented for new session
 
 > **Objetivo de cierre:** preparar una nueva sesión limpia sin perder lo aprendido. Se documentaron las lecciones de TASK-1327 en skills, manuales, docs funcionales, arquitectura, ledger de flags, changelog, project context y este handoff. Commits previos ya existentes en `develop`: `969da5f1a fix(growth): complete brand visibility form handoff` y `94be60c50 docs(tasks): add DataForSEO AIO runtime guard task`.

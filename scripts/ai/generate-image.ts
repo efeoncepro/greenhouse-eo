@@ -7,8 +7,10 @@ import { spawn } from 'node:child_process'
 import { config as loadEnv } from 'dotenv'
 
 import {
+  editOpenAIImage,
   generateOpenAIImage,
   type OpenAIImageBackground,
+  type OpenAIImageInputFidelity,
   type OpenAIImageModel,
   type OpenAIImageQuality,
   type OpenAIImageSize
@@ -30,10 +32,19 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
  *   pnpm ai:image --prompt-file ./prompt.txt --out public/images/generated/mark.png
  *   pnpm ai:image --batch ./concepts.json   # [{ "filename": "a.png", "prompt": "…" }, …]
  *
+ * Reference EDIT (image-to-image) — canonical path for character/asset consistency:
+ *   pnpm ai:image --image ref.png --prompt "keep this exact character, change only <delta>" --out out.png
+ *   --image can be repeated to pass multiple reference images.
+ *
  * Options (all optional unless noted):
  *   --prompt <text>         Prompt text (required unless --prompt-file or --batch)
  *   --prompt-file <path>    Read the prompt from a file (long prompts)
  *   --batch <path>          JSON array of { filename, prompt } — generates each
+ *   --image <path>          Reference image to EDIT (repeatable). Switches to image-to-image
+ *                           via editOpenAIImage — preserves the reference (identity, style, logo)
+ *                           while the prompt changes only the requested delta.
+ *   --input-fidelity <f>    low | high — how strictly to preserve the reference (edit mode).
+ *                           Only applies to models ≠ gpt-image-2 (e.g. gpt-image-1.5).
  *   --out <path>            Output file path (single prompt). Default: <out-dir>/<slug>-<ts>.png
  *   --out-dir <dir>         Output directory. Default: public/images/generated
  *   --size <WxH>            1024x1024 | 1536x1024 | 1024x1536 | 2048x... (default 1536x1024)
@@ -54,6 +65,8 @@ interface CliArgs {
   prompt?: string
   promptFile?: string
   batch?: string
+  image?: string[]
+  inputFidelity?: OpenAIImageInputFidelity
   out?: string
   outDir?: string
   concept?: string
@@ -76,6 +89,12 @@ const HELP = `Greenhouse AI image CLI — OpenAI gpt-image-2
   pnpm ai:image --prompt-file <path> ...
   pnpm ai:image --batch <json>          # [{ "filename": "a.png", "prompt": "…" }, …]
   pnpm ai:image --concept <loop> --batch <json> [--task TASK-###]   # conceptos del design-loop
+  pnpm ai:image --image <ref.png> --prompt "<delta>" --out <out.png>   # EDIT image-to-image (consistencia)
+
+Edit mode (--image):
+  Edita la imagen de referencia en vez de generar desde cero (editOpenAIImage). Preserva
+  identidad/estilo/logo de la referencia; el prompt cambia SOLO el delta. --image es repetible.
+  --input-fidelity low|high ajusta cuán estricta es la preservación (solo modelos ≠ gpt-image-2).
 
 Concept mode:
   --concept <loop>   Rutea a .captures/concepts/<loop>/ (gitignored, trazable, protegido
@@ -111,6 +130,17 @@ const parseArgs = (argv: string[]): CliArgs => {
         break
       case '--batch':
         args.batch = next()
+        break
+
+      case '--image': {
+        const path = next()
+
+        ;(args.image ??= []).push(path)
+        break
+      }
+
+      case '--input-fidelity':
+        args.inputFidelity = next() as OpenAIImageInputFidelity
         break
       case '--out':
         args.out = next()
@@ -232,18 +262,34 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
   for (let n = 0; n < args.count; n += 1) {
     const target = args.count > 1 ? item.filePath.replace(/\.png$/i, `-${n + 1}.png`) : item.filePath
 
-    process.stdout.write(`→ ${target.replace(process.cwd(), '.')} …\n`)
+    const editing = Boolean(args.image?.length)
 
-    const result = await generateOpenAIImage({
-      prompt: item.prompt,
-      model: args.model,
-      size: args.size,
-      quality: args.quality,
-      background: args.background,
-      format: 'png',
-      numberOfImages: 1,
-      timeoutMs: args.timeoutMs
-    })
+    process.stdout.write(`→ ${target.replace(process.cwd(), '.')}${editing ? ' (edit)' : ''} …\n`)
+
+    const result = editing
+      ? await editOpenAIImage({
+          prompt: item.prompt,
+          image: args.image!.map(p => ({ path: resolvePath(p) })),
+          model: args.model,
+          size: args.size,
+          quality: args.quality,
+          background: args.background,
+          format: 'png',
+          numberOfImages: 1,
+          timeoutMs: args.timeoutMs,
+          ...(args.inputFidelity ? { inputFidelity: args.inputFidelity } : {}),
+          ...(args.background === 'transparent' ? { transparentBackgroundStrategy: 'fallback-to-gpt-image-1.5' as const } : {})
+        })
+      : await generateOpenAIImage({
+          prompt: item.prompt,
+          model: args.model,
+          size: args.size,
+          quality: args.quality,
+          background: args.background,
+          format: 'png',
+          numberOfImages: 1,
+          timeoutMs: args.timeoutMs
+        })
 
     const buffer = Buffer.from(result.imageBytesBase64, 'base64')
 

@@ -1,0 +1,50 @@
+{
+  "run": "nexa-fallback-characters",
+  "date": "2026-07-05",
+  "purpose": "3D Nexa character poses for efeonce-think broken/expired-link fallback screens, one per fallback kind",
+  "engine": {
+    "generate": "OpenAI gpt-image-2 (edit / image-to-image) via `pnpm ai:image --image`",
+    "removeBackground": "local IMG.LY AI matting via `pnpm ai:image:rmbg`",
+    "secretSource": "greenhouse-openai-api-key (Secret Manager, no third-party credits)"
+  },
+  "source": "public/images/illustrations/characters/greenhouse-404.png",
+  "isotypeVector": "public/branding/SVG/isotipo-efeonce-negativo.svg",
+  "promptScaffold": "Keep this EXACT 3D animated character (stylized Pixar-like 3D render) — identical identity, face, big expressive eyes, long dark wavy hair, gold hoop earrings, the same royal-blue hoodie with the same white rocket-in-orbit emblem on the chest, black tailored pants and black high heels, full body, same 3D cartoon style, materials and soft lighting. Change ONLY her pose and expression to: <DELTA>. Same full-body framing, centered. Plain solid white background.",
+  "items": [
+    {
+      "kind": "not-found",
+      "file": "not-found.png",
+      "reused": "public/images/illustrations/characters/greenhouse-404.png",
+      "delta": "(reused source pose) surprised 'whoa', both hands raised",
+      "stateCopy": "No encontramos esta página"
+    },
+    {
+      "kind": "expired",
+      "file": "expired.png",
+      "opaque": "expired_opaque.png",
+      "delta": "warm, empathetic and apologetic — a gentle shrug with both open hands lowered and turned slightly upward, a soft caring half-smile, as if to say 'sorry, this link expired'.",
+      "stateCopy": "Este enlace de informe expiró"
+    },
+    {
+      "kind": "revoked",
+      "file": "revoked.png",
+      "opaque": "revoked_opaque.png",
+      "delta": "calm, serene and reassuring — standing relaxed with one hand gently resting over her heart and the other softly open at her side, a warm gentle closed-mouth smile, as if to say 'no problem, we'll sort it out'.",
+      "stateCopy": "Este enlace fue revocado"
+    },
+    {
+      "kind": "rate-limited",
+      "file": "rate-limited.png",
+      "opaque": "rate-limited_opaque.png",
+      "delta": "patient and friendly — one hand raised in a gentle 'hold on a moment' gesture (palm forward, relaxed), a calm reassuring smile, as if to say 'give it a second'.",
+      "stateCopy": "Demasiadas solicitudes, dale un segundo"
+    },
+    {
+      "kind": "error",
+      "file": "error.png",
+      "opaque": "error_opaque.png",
+      "delta": "a light apologetic 'oops' — one hand gently rubbing the back of her neck, a small awkward but warm friendly smile, slightly raised eyebrows, as if to say 'something broke on our side'.",
+      "stateCopy": "No pudimos cargar, reintenta"
+    }
+  ]
+}

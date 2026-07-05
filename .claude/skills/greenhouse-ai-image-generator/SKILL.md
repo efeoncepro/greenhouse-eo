@@ -54,6 +54,24 @@ pnpm ai:image --concept <loop> [--task TASK-###] --batch concepts.json   # desig
 - The CLI **operates** the model; THIS skill is the **art direction** (brief, composition, finish, palette, QA). Run the skill to write the prompt, then the CLI to generate, then critique + GVC if it lands in UI.
 - **Concepts: use `--concept <loop>`** (optionally `--task TASK-###`) — it auto-routes to `.captures/concepts/<loop>/` (gitignored, **protected from the GVC garbage collector**), writes a traceable `manifest.json`, and surfaces in `pnpm fe:capture:index` grouped by loop. Don't hand-route concepts with `--out`/`--out-dir`, and never commit them.
 
+## Reference edit + character consistency (`--image`)
+
+Canonical path to make **consistent variants** of an existing character/asset (new pose, expression, scene) while preserving its identity, style, and logo — the model edits the reference, it does not re-imagine it.
+
+```bash
+pnpm ai:image --image <ref.png> --prompt "keep this exact <subject>, change ONLY <delta>" --out <out.png>
+#   --image <path>        reference to edit (repeatable) → switches to editOpenAIImage (image-to-image)
+#   --input-fidelity high strict reference preservation (only models ≠ gpt-image-2)
+pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (preserves interior white)
+```
+
+- **Engine verdict (bake-off 2026-07-05):** for identity + logo fidelity on an edit, `gpt-image-2` (this CLI, our OpenAI key, zero third-party credits) wins. `nano_banana_pro` (Higgsfield) is a strong plan B (slightly better face/expression, costs credits). Do NOT use text-to-image or "character" models (e.g. Soul) for consistency — they treat the reference as inspiration and drift to a different subject + mangled logo.
+- **Prompt = identity-lock scaffold + one small delta.** Fix everything (face, hair, outfit, the exact logo, framing, lighting) and change ONLY the requested pose/expression. Big deltas break consistency; small deltas hold it. Anchor every variant to the SAME canonical reference, not to a previous generation.
+- **No engine keeps a logo pixel-exact** (~90% redraw). If the mark must be exact, mask its region and re-stamp the real vector (e.g. `public/branding/SVG/isotipo-efeonce-negativo.svg`) by composition. With `gpt-image-2` the logo is faithful enough that this is optional.
+- **Background:** `gpt-image-2` returns opaque. `pnpm ai:image:rmbg` cuts it to transparent with **AI matting** (soft, professional hair edges) instead of color-key/flood-fill, which leaves "bitten" edges and white halos. Free/local matting; do not spend Higgsfield/Magnific credits on this.
+- **Human-review every variant against the anchor** for identity drift before keeping it.
+- **Log durable generations in `ai-generations/`** (repo, not `.captures/`): one subfolder per run named `YYYY-MM-DD_<semantic>/` with `README.md` (verbatim prompts) + `manifest.json`, plus a row in `ai-generations/INDEX.md`. Worked example: `ai-generations/2026-07-05_nexa-fallback-characters/` — the 3D Nexa character (`public/images/illustrations/characters/greenhouse-*.png`) posed per fallback `kind`.
+
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.
