@@ -9,6 +9,8 @@ overrides: motion-design
 
 Load global `motion-design/SKILL.md` first → then read this overlay → then apply rules. When the global skill and this overlay disagree, **this overlay wins**.
 
+> **Boundary (scope of this skill).** `motion-design` is **UI/interface motion**: transitions, scroll-driven, view transitions, micro-interactions, duration tokens, `prefers-reduced-motion` — output is **code that runs in the browser**. For **cinematic / broadcast video production** (brand film, spot, explainer, title sequence, motion graphics, logo animation, AI video — output is a **rendered video file**), use the `motion-design-studio` skill instead. It directs the AI video pipeline (Higgsfield / Runway / Seedance / Veo / Kling / Magnific) + human craft (AE / Blender / DaVinci).
+
 ## Pinned decisions
 
 ### 1. Duration tokens (canonical scale)
