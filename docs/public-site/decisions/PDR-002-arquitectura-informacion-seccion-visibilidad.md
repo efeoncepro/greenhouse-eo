@@ -74,6 +74,38 @@ think.efeoncepro.com  (hub de lead magnets · Astro)
 | servicios seo / de seo | 70 / 20 | — | — | Hub `/servicios` = SEO-neutro (esperado) |
 | agencia aeo / visibilidad en ia | ~0 | — | — | NO slugear AEO como "visibilidad-en-ia" |
 
+### Alcance regional — el servicio es LATAM-first → EEUU → mundo (Semrush `phrase_all`, 2026-07-05)
+
+El servicio no es Chile-only; se presta a **toda LATAM de inicio, luego EEUU, luego
+el mundo**. El slug/keyword **generaliza**: **"agencia seo" es el head term
+comercial pan-LATAM**, gana en todos los mercados hispanos. Volumen/mes de
+"agencia seo":
+
+| Mercado (es) | Vol/mes | | Mercado | Vol/mes |
+| --- | --- | --- | --- | --- |
+| Ecuador (`ec`) | **3.600** | | Perú (`pe`) | 590 |
+| México (`mx`) | 1.000 | | Argentina (`ar`) | 390 |
+| Chile (`cl`) | 880 | | US hispano (`us`) | 3.600 (CPC $7.33) |
+| Colombia (`co`) | 720 | | España (`es`, ref) | 12.100 |
+
+→ **~8.000+/mes solo LATAM** (≈9× el dato Chile-only). El slug
+`/servicios/posicionamiento-seo` + H1 "agencia seo" **se sostiene en toda LATAM**.
+
+**Fase inglés (EEUU/mundo):** los head terms son **"seo agency" (US 60.500, CPC
+$19)** y **"seo services" (US 60.500, CPC $17)** — volumen enorme pero caro/competido.
+Requiere una **spoke localizada en inglés** (p.ej. `/en/services/seo` o dominio/
+subpath con `hreflang`), **localización real (no traducción máquina)** — es un
+follow-up de fase 2, no esta task. **Brasil** (`br`, ~1.900) es portugués (pt-BR),
+localización aparte de fase posterior.
+
+**Consecuencias de IA/i18n (para la implementación):**
+
+- Copy de la spoke SEO = **es-LATAM neutro** (tuteo, sin voseo, sin chilenismos) —
+  sirve a todo el mercado hispano; NO hardcodear referencias Chile-only.
+- Preparar `hreflang` desde el diseño para no re-migrar al sumar `en-US`.
+- FAQ pan-LATAM (mismo patrón que CL/MX: definicional + objeciones); FAQ inglés
+  (US) tiene su propio set rico de decisión de compra para la fase 2 (mineado).
+
 ### Navegación (las 4 superficies coexisten)
 
 - Global: entrada "Servicios" en nav top → flyout con las spokes.

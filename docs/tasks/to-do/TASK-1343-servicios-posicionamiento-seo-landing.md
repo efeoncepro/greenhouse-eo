@@ -61,7 +61,8 @@ Reglas obligatorias:
 - Hub `/servicios` (NO `/soluciones` — cliché de voz de marca); slug `posicionamiento-seo` (data-backed, no `/visibilidad`).
 - Full API Parity: la única acción de negocio (captura/arranque del grader) YA es contrato gobernado (Growth Forms + grader pipeline). La landing es cliente, NO owner — NO reconstruir el form ni el grader.
 - Un solo nodo grader (una engine, muchos entry points) servido desde `think.efeoncepro.com`; la landing enlaza/embebe, no duplica.
-- Voz: mecanicista, tuteo es-CL, sin "soluciones integrales"/superlativos/promesa-sin-mecanismo; sin manzanitas 🍏 (marca personal de Julio).
+- Voz: mecanicista, tuteo **es-LATAM neutro** (sin voseo, sin chilenismos — el servicio es pan-LATAM: EC/MX/CL/CO/PE/AR), sin "soluciones integrales"/superlativos/promesa-sin-mecanismo; sin manzanitas 🍏 (marca personal de Julio).
+- Alcance regional (PDR-002 §Alcance regional): LATAM-first → EEUU → mundo. "agencia seo" es el head term pan-LATAM (~8.000+/mes). Copy sin referencias Chile-only; **preparar `hreflang` desde el build** para no re-migrar al sumar `en-US` (fase 2). NO traducción máquina.
 - Ejecutar en el sitio público vía la skill `efeonce-public-site-wordpress`; NO usar AXIS/MUI/`src/lib/copy` (eso es portal).
 
 ## Normative Docs
@@ -349,6 +350,7 @@ Cambio aditivo de contenido en el sitio público (nueva ruta), sin runtime de da
 - Guía pillar "Visibilidad en búsqueda e IA" en Think (task de contenido aparte).
 - Página índice del hub `/servicios` si requiere diseño propio.
 - Conectar el diagnóstico del grader con el eje SEO cuando EPIC-022 lo habilite (Search Visibility 360).
+- **Fase 2 internacional**: spoke localizada `en-US` ("seo agency"/"seo services", US 60.500 — mineado) con `hreflang` + localización real (no traducción máquina); FAQ inglés ya mineado en el wireframe. Brasil `pt-BR` fase posterior.
 
 ## Open Questions
 

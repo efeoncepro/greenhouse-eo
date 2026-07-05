@@ -68,7 +68,12 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
 - Cutover del sitio público a **Astro** (tratar como migración: baseline,
   redirects 1:1, paridad de contenido, preservar entidad/schema). Ver ADR Astro
   runtime strategy.
-- Localización multilingüe real (es/en/pt) para el footprint Globe.
+- **Internacionalización del servicio (LATAM-first → EEUU → mundo).** El servicio
+  se presta a toda LATAM de inicio (copy es-LATAM neutro; "agencia seo" = head term
+  pan-LATAM ~8.000+/mes, Semrush), luego EEUU (spoke `en-US`: "seo agency"/"seo
+  services" 60.500/mes, localización real + `hreflang`), luego mundo (Brasil pt-BR
+  aparte). Preparar `hreflang` desde las primeras spokes para no re-migrar. Ver
+  PDR-002 §Alcance regional.
 
 ## Cómo se mantiene
 

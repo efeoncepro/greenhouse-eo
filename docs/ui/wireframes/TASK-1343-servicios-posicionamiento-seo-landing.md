@@ -12,7 +12,7 @@
 
 ## Brief
 
-- Primary user: decisor de marketing (ICP Globe: equipos enterprise) buscando proveedor de SEO — query comercial "agencia seo"/"posicionamiento web".
+- Primary user: decisor de marketing (ICP Globe: equipos enterprise) **en LATAM** (fase 1; luego EEUU/mundo) buscando proveedor de SEO — query comercial pan-LATAM "agencia seo" (EC 3.600 · MX 1.000 · CL 880 · CO 720 · PE 590 · AR 390) / "posicionamiento web".
 - User moment: solution/product-aware (Schwartz) — sabe que necesita SEO, evalúa a quién contratar.
 - Job to be done: entender qué hace Efeonce en SEO, confiar en el método (no commodity), y dar el primer paso de bajo compromiso (diagnóstico).
 - Primary decision signal: "esta agencia tiene método medible y además me prepara para la era de la IA" (diferenciador vs agencia SEO commodity).
@@ -36,7 +36,7 @@
 
 ## Copy Ledger
 
-> Copy es-CL, tuteo, mecanicista (context pack 05). IDs con convención public-site `public_site.servicios.posicionamiento_seo.*` (NO `src/lib/copy`). Wording final se valida con `greenhouse-ux-writing`.
+> Copy **es-LATAM neutro** (tuteo, sin voseo, sin chilenismos — el servicio es pan-LATAM), mecanicista (context pack 05). IDs con convención public-site `public_site.servicios.posicionamiento_seo.*` (NO `src/lib/copy`). Wording final se valida con `greenhouse-ux-writing`. Los ejemplos de abajo son dirección; evitar referencias Chile-only.
 
 | Copy id | Region | Text | Dynamic values | Notes |
 |---|---|---|---|---|
@@ -67,16 +67,18 @@
 
 ## FAQ — Research & Mining (Semrush, as-of 2026-07-05)
 
-> Mining hecho con Semrush `phrase_questions`. **Hallazgo:** el volumen de
-> preguntas SEO en Chile (`cl`) es bajo y mayormente definicional/how-to
-> (top-of-funnel); "agencia seo" no arroja preguntas en CL. Se usó **España
-> (`es`)** como referencia de patrón en el **mismo idioma** (mercado con más
-> volumen) para las preguntas de **decisión de compra** — el buyer chileno tiene
-> el mismo JTBD. Regla del operador: **el FAQ es del SERVICIO que prestamos**
-> (agencia de posicionamiento), no definiciones genéricas. Por eso se combinan 3
-> fuentes: (a) decisión-de-compra mineada (ES), (b) definicional/diagnóstico
-> mineado (CL), (c) objeciones de venta (JOLT) que no tienen volumen de búsqueda
-> pero SON las preguntas reales en la conversación comercial.
+> Mining hecho con Semrush `phrase_questions` a través de **múltiples mercados**
+> (el servicio es LATAM-first → EEUU → mundo; ver PDR-002 §Alcance regional).
+> **Hallazgo:** el volumen de preguntas SEO en español (CL, MX) es bajo y
+> mayormente definicional/how-to (top-of-funnel); "agencia seo" no arroja
+> preguntas en CL. Se usó **España (`es`)** como referencia de patrón en el mismo
+> idioma para las preguntas de **decisión de compra** (el buyer LATAM tiene el
+> mismo JTBD). El **inglés (`us`)** tiene un set rico de decisión de compra para la
+> fase 2 (spoke localizada `en-US`). Regla del operador: **el FAQ es del SERVICIO
+> que prestamos** (agencia de posicionamiento), no definiciones genéricas. Por eso
+> se combinan 3 fuentes: (a) decisión-de-compra mineada (ES, confirmada por US),
+> (b) definicional/diagnóstico mineado (CL/MX), (c) objeciones de venta (JOLT) sin
+> volumen de búsqueda pero reales en la conversación comercial.
 
 ### Datos crudos mineados (queries reales, volumen/mes)
 
@@ -84,14 +86,20 @@
   cómo elegir una agencia seo (50) · qué métricas pedir a agencia de seo (40) ·
   cuál es la mejor agencia seo para ecommerce (30) · cómo contratar una agencia
   seo (20) · por qué contratar una agencia de seo (10) · qué es una agencia de seo.
-- **`cl` — "seo" (definicional):** qué es el marketing seo (30) · por qué es
-  importante el seo (20) · qué es seo y sem en marketing digital (20) · qué es el
-  seo y cómo funciona (10) · cómo funciona el seo.
-- **`cl` — "posicionamiento web/en google" (how-to/diagnóstico, vol. bajo/long-tail):**
+- **`cl`/`mx` — "seo" (definicional):** qué es el seo y cómo funciona (CL 10 / MX 30) ·
+  qué es el marketing seo (CL 30) · por qué es importante el seo (CL 20) · cómo
+  funciona el seo · (MX objeciones) how long does seo take (20) · how much seo cost (20).
+- **`cl` — "posicionamiento web/en google" (how-to/diagnóstico, long-tail):**
   cómo posicionar mi página web en google · cómo funciona el posicionamiento en
   google · por qué no me posiciono en google · cómo mejorar el posicionamiento web.
+- **`us` — "seo agency" (fase 2 inglés, decisión de compra, alto volumen):**
+  what is an seo agency (1.000) · how to choose an seo agency (210) · what do seo
+  agencies do (170) · why hire an seo agency (140) · how much does an seo agency
+  cost (110) · what to expect from an seo agency (110) · best seo agency for
+  manufacturing companies (110, vertical) · what to look for in an seo agency (90) ·
+  *what seo tool for aeo recommendations (70) — AEO ya aparece en las queries.*
 
-### FAQ curado (candidatos a implementar — answer-first, es-CL, mecanicista)
+### FAQ curado (candidatos a implementar — answer-first, es-LATAM neutro, mecanicista)
 
 > Answer capsules 40–60 palabras (citables por IA) → alimentan `JSON-LD FAQPage`.
 > Draft final de respuestas en Slice 2 con `greenhouse-ux-writing`. Sin cifras
@@ -167,7 +175,7 @@
 - Why this pattern: `modern-ui` marketing lane (whitespace editorial, restraint, un acento) + `commercial-expert` Command of the Message (outcome + mecanismo) + `seo-aeo` (keyword en slug/H1, answer capsules, JSON-LD, entity clarity) + `copywriting` (FAB/solution-aware, big idea "que te encuentren, con método").
 - Reuse / extend / new primitive: reuse (patrones marketing + `<greenhouse-form>` + nodo grader). Sin primitive nueva.
 - Open risks: (1) ¿`/servicios` ya existe con contenido? → crawl en Discovery; (2) copy de prueba/casos requiere números reales (no inventar); (3) el runtime (WordPress vs Astro) depende del estado del hub al implementar.
-- Follow-up: sibling `/servicios/aeo` (301 desde `/aeo-2`) + guía pillar "Visibilidad en búsqueda e IA" en Think — tasks aparte.
+- Follow-up: sibling `/servicios/aeo` (301 desde `/aeo-2`) + guía pillar "Visibilidad en búsqueda e IA" en Think — tasks aparte. **Fase 2 internacional:** spoke localizada `en-US` ("seo agency"/"seo services", US 60.500) con `hreflang` + localización real (no traducción máquina); Brasil `pt-BR` fase posterior. Preparar `hreflang` desde el build para no re-migrar.
 
 ## Acceptance Checklist
 
