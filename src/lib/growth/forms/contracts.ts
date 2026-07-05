@@ -225,6 +225,8 @@ export const fieldDefinitionSchema = z.object({
   placeholder: z.string().max(200).optional(),
   required: z.boolean().default(false),
   options: z.array(z.object({ value: z.string(), label: z.string().optional(), copyRef: z.string().optional() })).optional(),
+  freeEntry: z.boolean().optional(),
+  maxItems: z.number().int().positive().max(50).optional(),
   maxLength: z.number().int().positive().max(10_000).optional(),
   autocomplete: z.string().max(40).optional(),
   inputMode: z.string().max(20).optional(),

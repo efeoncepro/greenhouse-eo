@@ -449,6 +449,8 @@ export class FormRenderer {
       checkWrap.appendChild(control)
       checkWrap.appendChild(el(this.doc, 'span', {}, label))
       wrap.appendChild(checkWrap)
+    } else if (control.classList.contains('ghf-tag-input')) {
+      wrap.appendChild(control)
     } else if (field.type === 'select' || field.type === 'multiselect') {
       const controlWrap = el(this.doc, 'div', { class: 'ghf-control ghf-control--select' })
       const customSelect = control.classList.contains('ghf-select-composite')
@@ -547,6 +549,8 @@ export class FormRenderer {
         if (this.usesPremiumSelect()) return this.renderPremiumSelectControl(field, common)
 
       case 'multiselect': {
+        if (field.type === 'multiselect' && field.freeEntry) return this.renderTagMultiSelectControl(field, common)
+
         const select = el(this.doc, 'select', { ...common, class: 'ghf-select' })
 
         if (field.type === 'multiselect') select.setAttribute('multiple', 'multiple')
@@ -768,6 +772,123 @@ export class FormRenderer {
         if (!wrap.contains(this.doc.activeElement)) setOpen(false)
       }, 0)
     })
+
+    return wrap
+  }
+
+  private renderTagMultiSelectControl(field: RendererFieldDefinition, common: Record<string, string>): HTMLElement {
+    const maxItems = Math.max(1, Math.min(field.maxItems ?? 5, 50))
+    const wrap = el(this.doc, 'div', { class: 'ghf-tag-input', 'data-maxed': 'false' })
+    const list = el(this.doc, 'div', { class: 'ghf-tag-list', 'aria-live': 'polite' })
+
+    const input = el(this.doc, 'input', {
+      ...common,
+      type: 'text',
+      class: 'ghf-tag-entry',
+      autocomplete: 'off',
+      inputmode: 'text',
+    })
+
+    if (field.placeholder) input.setAttribute('placeholder', field.placeholder)
+    if (field.maxLength) input.setAttribute('maxlength', String(field.maxLength))
+
+    const currentValues = (): string[] => {
+      const value = this.values[field.key]
+
+      return Array.isArray(value) ? value : []
+    }
+
+    const setValues = (values: string[]) => {
+      this.values[field.key] = values
+      this.touched.add(field.key)
+      this.liveStatus(field)
+      this.onValueChange(field)
+    }
+
+    const renderTags = () => {
+      const values = currentValues()
+
+      list.replaceChildren()
+      wrap.dataset.maxed = values.length >= maxItems ? 'true' : 'false'
+      input.disabled = values.length >= maxItems
+      input.setAttribute('aria-disabled', input.disabled ? 'true' : 'false')
+      input.setAttribute('placeholder', values.length >= maxItems ? `Máximo ${maxItems}` : field.placeholder ?? '')
+
+      values.forEach((value, index) => {
+        const chip = el(this.doc, 'span', { class: 'ghf-tag-chip' })
+        const label = el(this.doc, 'span', { class: 'ghf-tag-label' }, value)
+
+        const remove = el(this.doc, 'button', {
+          type: 'button',
+          class: 'ghf-tag-remove',
+          'aria-label': `Quitar ${value}`,
+        }, '×')
+
+        remove.addEventListener('click', () => {
+          setValues(currentValues().filter((_, itemIndex) => itemIndex !== index))
+          renderTags()
+          input.focus()
+        })
+
+        chip.appendChild(label)
+        chip.appendChild(remove)
+        list.appendChild(chip)
+      })
+    }
+
+    const addTag = (raw: string): boolean => {
+      const next = raw.replace(/,$/, '').trim().replace(/\s+/g, ' ')
+
+      if (!next) return false
+
+      const values = currentValues()
+      const exists = values.some(value => value.toLocaleLowerCase('es-CL') === next.toLocaleLowerCase('es-CL'))
+
+      if (exists || values.length >= maxItems) return false
+
+      setValues([...values, next])
+      input.value = ''
+      renderTags()
+
+      return true
+    }
+
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ',') {
+        event.preventDefault()
+        addTag(input.value)
+      } else if (event.key === 'Backspace' && input.value === '') {
+        const values = currentValues()
+
+        if (values.length > 0) {
+          event.preventDefault()
+          setValues(values.slice(0, -1))
+          renderTags()
+        }
+      }
+    })
+
+    input.addEventListener('input', () => {
+      if (input.value.includes(',')) {
+        const parts = input.value.split(',')
+        const rest = parts.pop() ?? ''
+
+        parts.forEach(part => addTag(part))
+        input.value = rest
+      }
+
+      this.maybeStart()
+      this.onFieldEdited()
+    })
+
+    input.addEventListener('blur', () => {
+      addTag(input.value)
+      this.revalidateField(field)
+    })
+
+    wrap.appendChild(list)
+    wrap.appendChild(input)
+    renderTags()
 
     return wrap
   }

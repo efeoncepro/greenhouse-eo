@@ -70,6 +70,10 @@ export interface RendererFieldDefinition {
   placeholder?: string
   required?: boolean
   options?: RendererFieldOption[]
+  /** Multiselect libre tipo chips/tags. El renderer conserva el valor como string[]. */
+  freeEntry?: boolean
+  /** Límite de items para multiselect/chips. */
+  maxItems?: number
   maxLength?: number
   /** Token WHATWG (`email`, `name`, `tel`, `organization`, …). Lo declara el contract. */
   autocomplete?: string

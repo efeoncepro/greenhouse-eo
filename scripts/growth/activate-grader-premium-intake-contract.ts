@@ -8,8 +8,8 @@ import 'server-only'
  * - preserva validation/namePolicy/emailPolicy, consent, security, policies y destinations
  * - cambia solo el contrato browser-safe del form:
  *   - `style_variant=diagnostic_premium`
- *   - `ui_policy.composition=multi_step_light` con 5 pasos breves, entrega primero
- *   - labels/placeholders/help copy humanos para una experiencia enterprise
+ *   - `ui_policy.composition=multi_step_light` con 5 pantallas breves
+ *   - labels/placeholders/help copy y opciones guiadas para una experiencia enterprise
  *   - `successBehavior.tokenizedReport.statusPathTemplate` para el handoff Think
  * - publica una version nueva y depreca la anterior.
  *
@@ -24,7 +24,7 @@ import {
   getFormDefinitionByKey,
   getPublishedVersionBySlug,
   listDestinationsForVersion,
-  listHostSurfaces
+  listHostSurfaces,
 } from '@/lib/growth/forms/store'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
 import { preserveFormVersionFields } from '../lib/preserve-form-version-fields'
@@ -44,28 +44,28 @@ const STEPS = [
   {
     key: 'delivery',
     label: 'Entrega',
-    fieldKeys: ['firstName', 'lastName', 'email']
+    fieldKeys: ['firstName', 'lastName', 'email'],
   },
   {
     key: 'brand',
     label: 'Marca',
-    fieldKeys: ['brandName', 'websiteUrl']
+    fieldKeys: ['brandName', 'websiteUrl'],
   },
   {
     key: 'market',
     label: 'Mercado',
-    fieldKeys: ['market', 'locale', 'category']
+    fieldKeys: ['market', 'locale', 'category'],
   },
   {
     key: 'context',
     label: 'Contexto',
-    fieldKeys: ['competitorsDeclared', 'industry']
+    fieldKeys: ['competitorsDeclared', 'industry'],
   },
   {
     key: 'refine',
     label: 'Confirmar',
-    fieldKeys: ['persona', 'companySize', 'mainChallenge', 'consent']
-  }
+    fieldKeys: ['persona', 'companySize', 'mainChallenge', 'consent'],
+  },
 ] as const
 
 const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
@@ -73,111 +73,154 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
     label: 'Nombre de la marca',
     placeholder: 'ej. Efeonce',
     autocomplete: 'organization',
-    maxLength: 120
+    maxLength: 120,
   },
   websiteUrl: {
     label: 'Sitio web',
     placeholder: 'ej. https://tuempresa.com',
     autocomplete: 'url',
-    inputMode: 'url'
+    inputMode: 'url',
   },
   market: {
+    type: 'select',
     label: 'Mercado principal',
-    placeholder: 'ej. Chile, Mexico, LatAm B2B',
-    maxLength: 80
+    placeholder: 'Selecciona mercado',
+    options: [
+      { value: 'Chile', label: 'Chile' },
+      { value: 'Mexico', label: 'Mexico' },
+      { value: 'Colombia', label: 'Colombia' },
+      { value: 'Peru', label: 'Peru' },
+      { value: 'LatAm', label: 'LatAm' },
+      { value: 'Estados Unidos', label: 'Estados Unidos' },
+      { value: 'Global', label: 'Global' },
+    ],
   },
   locale: {
     type: 'select',
-    label: 'Idioma del análisis',
-    placeholder: 'Selecciona idioma/región',
+    label: 'Idioma del analisis',
+    placeholder: 'Selecciona idioma/region',
     options: [
-      { value: 'es-CL', label: 'Español (Chile / LatAm)' },
-      { value: 'en-US', label: 'Inglés (Estados Unidos)' }
-    ]
+      { value: 'es-CL', label: 'Espanol (Chile / LatAm)' },
+      { value: 'en-US', label: 'Ingles (Estados Unidos)' },
+    ],
   },
   category: {
-    label: 'Categoría donde compites',
-    placeholder: 'ej. banca, retail, educación superior',
-    maxLength: 140
+    type: 'select',
+    label: 'Categoria donde compites',
+    placeholder: 'Selecciona categoria',
+    options: [
+      { value: 'Agencia o consultoria de crecimiento', label: 'Agencia / consultoria de crecimiento' },
+      { value: 'SaaS o software B2B', label: 'SaaS / software B2B' },
+      { value: 'Retail o ecommerce', label: 'Retail / ecommerce' },
+      { value: 'Banca, seguros o fintech', label: 'Banca / seguros / fintech' },
+      { value: 'Educacion', label: 'Educacion' },
+      { value: 'Salud', label: 'Salud' },
+      { value: 'Turismo u hoteleria', label: 'Turismo / hoteleria' },
+      { value: 'Inmobiliaria o construccion', label: 'Inmobiliaria / construccion' },
+      { value: 'Servicios profesionales', label: 'Servicios profesionales' },
+      { value: 'Consumo masivo', label: 'Consumo masivo' },
+      { value: 'Tecnologia o telecomunicaciones', label: 'Tecnologia / telecomunicaciones' },
+      { value: 'Otra categoria', label: 'Otra categoria' },
+    ],
   },
   competitorsDeclared: {
-    type: 'textarea',
+    type: 'multiselect',
     label: 'Competidores de referencia',
-    placeholder: 'ej. competidor regional, alternativa local, referente global',
-    maxLength: 280
+    placeholder: 'Escribe una marca y presiona Enter',
+    freeEntry: true,
+    maxItems: 5,
+    maxLength: 80,
   },
   firstName: {
     label: 'Nombre',
-    placeholder: 'ej. Paula',
     autocomplete: 'given-name',
-    maxLength: 80
+    maxLength: 80,
   },
   lastName: {
     label: 'Apellido',
-    placeholder: 'ej. Reyes',
     autocomplete: 'family-name',
-    maxLength: 80
+    maxLength: 80,
   },
   email: {
     label: 'Correo corporativo',
     placeholder: 'nombre@empresa.com',
     autocomplete: 'email',
     inputMode: 'email',
-    validator: 'corporate_email'
+    validator: 'corporate_email',
   },
   industry: {
+    type: 'select',
     label: 'Industria',
-    placeholder: 'ej. Servicios profesionales, tecnología, retail',
-    maxLength: 120
+    placeholder: 'Selecciona industria',
+    options: [
+      { value: 'Servicios profesionales', label: 'Servicios profesionales' },
+      { value: 'Tecnologia', label: 'Tecnologia' },
+      { value: 'Retail', label: 'Retail' },
+      { value: 'Finanzas', label: 'Finanzas' },
+      { value: 'Educacion', label: 'Educacion' },
+      { value: 'Salud', label: 'Salud' },
+      { value: 'Manufactura', label: 'Manufactura' },
+      { value: 'Inmobiliaria', label: 'Inmobiliaria' },
+      { value: 'Turismo', label: 'Turismo' },
+      { value: 'Sector publico', label: 'Sector publico' },
+      { value: 'Otra industria', label: 'Otra industria' },
+    ],
   },
   persona: {
-    label: 'Rol o comprador principal',
-    placeholder: 'ej. CMO, founder, gerente comercial',
-    maxLength: 120
+    type: 'select',
+    label: 'Quien usara el informe',
+    placeholder: 'Selecciona rol',
+    options: [
+      { value: 'Direccion general o founder', label: 'Direccion general / founder' },
+      { value: 'Marketing o CMO', label: 'Marketing / CMO' },
+      { value: 'Growth o performance', label: 'Growth / performance' },
+      { value: 'Comercial o ventas', label: 'Comercial / ventas' },
+      { value: 'Comunicaciones o PR', label: 'Comunicaciones / PR' },
+      { value: 'Producto o digital', label: 'Producto / digital' },
+      { value: 'Agencia o consultor', label: 'Agencia / consultor' },
+      { value: 'Otro equipo', label: 'Otro equipo' },
+    ],
   },
   companySize: {
-    label: 'Tamaño de empresa',
-    placeholder: 'ej. 51-200 personas',
-    maxLength: 80
+    type: 'select',
+    label: 'Tamano de empresa',
+    placeholder: 'Selecciona tamano',
+    options: [
+      { value: '1-10 personas', label: '1-10 personas' },
+      { value: '11-50 personas', label: '11-50 personas' },
+      { value: '51-200 personas', label: '51-200 personas' },
+      { value: '201-500 personas', label: '201-500 personas' },
+      { value: '501-1000 personas', label: '501-1000 personas' },
+      { value: 'Mas de 1000 personas', label: 'Mas de 1000 personas' },
+    ],
   },
   mainChallenge: {
-    label: 'Qué quieres entender o mejorar',
-    placeholder: 'ej. Entender por qué mi marca aparece poco en respuestas de IA.',
-    maxLength: 500
+    label: 'Que quieres entender o mejorar',
+    placeholder: 'Cuéntanos brevemente que te interesa revisar en la visibilidad de tu marca.',
+    maxLength: 500,
   },
   consent: {
-    label: 'Acepto que Efeonce use estos datos para generar y enviarme mi informe.'
-  }
+    label: 'Autorizo a Efeonce a usar estos datos para generar mi informe y enviarme el resultado.',
+  },
 }
 
 const COPY_UPDATES: Record<string, string> = {
-  submit: 'Generar mi informe',
-  'firstName.help': '',
-  'lastName.help': '',
-  'email.help': 'Mostramos el resultado aquí y dejamos una recuperación segura por correo.',
-  'consent.help': '',
-  'brandName.help': 'Usamos este nombre para buscar menciones y variaciones relevantes.',
+  submit: 'Generar mi analisis',
+  'brandName.help': 'Usamos este nombre para buscar menciones y variaciones de tu marca.',
   'websiteUrl.help': 'Opcional, pero ayuda a leer citabilidad y operabilidad del sitio correcto.',
-  'market.help': 'Territorio donde la IA debería entender, citar y comparar tu marca.',
+  'market.help': 'Define el contexto donde la IA deberia entender, comparar y citar tu marca.',
   'locale.help': 'Ajusta el idioma base de lectura del reporte.',
-  'category.help': 'Ayuda a interpretar la categoría correcta.',
-  'competitorsDeclared.help': 'Opcional: escribe 1 a 3 marcas. Si no las tienes claras, puedes omitir este paso.',
-  'industry.help': 'Opcional: nos ayuda a evitar comparaciones fuera de contexto.',
-  'persona.help': 'Opcional: ajusta el lenguaje del informe a quien tomará decisiones.',
-  'companySize.help': 'Opcional: calibra la recomendación según el tamaño de la organización.',
-  'mainChallenge.help': 'Opcional: una frase basta. Evita información sensible.',
-  'brandName.error.required': 'Escribe el nombre de la marca para iniciar el análisis.',
-  'market.error.required': 'Indica el mercado donde quieres evaluar la visibilidad.',
-  'locale.error.required': 'Elige el idioma base del informe.',
-  'category.error.required': 'Describe la categoría donde compite tu marca.',
-  'firstName.error.required': 'Escribe tu nombre para identificar la solicitud.',
-  'lastName.error.required': 'Escribe tu apellido para completar tus datos.',
-  'email.error.required': 'Escribe tu correo corporativo para recibir y recuperar el informe.',
-  'consent.error.required': 'Acepta el uso de datos para generar tu informe.'
+  'category.help': 'Evita comparaciones equivocadas: elige la categoria mas cercana a tu competencia real.',
+  'competitorsDeclared.help': 'Opcional: agrega hasta 5 marcas. Usa Enter o coma para crear cada chip.',
+  'industry.help': 'Opcional. Afina el benchmark cuando tu categoria existe en varias industrias.',
+  'persona.help': 'Opcional. Ajusta el lenguaje de recomendaciones al equipo que tomara decisiones.',
+  'companySize.help': 'Opcional. Ayuda a calibrar recomendaciones segun madurez y escala.',
+  'email.help': 'Usa tu correo corporativo para recibir y recuperar el informe.',
+  'mainChallenge.help': 'Opcional: una frase basta. Evita informacion sensible.',
 }
 
 const SUCCESS_MESSAGE =
-  'Solicitud recibida. Estamos consultando motores, citabilidad y contexto competitivo para preparar tu informe en pantalla.'
+  'Recibimos tu solicitud. Estamos preparando el analisis para mostrarte el reporte en pantalla.'
 
 const asObject = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
@@ -214,17 +257,19 @@ const assertProductionRuntimeSupportsPremiumIntake = (): void => {
   const runtimeReady =
     renderer.includes("composition !== 'multi_step_light'") &&
     renderer.includes('buildTokenizedReportHandoff') &&
-    styles.includes('[data-ghf-style-variant="diagnostic_premium"]')
+    renderer.includes('renderTagMultiSelectControl') &&
+    styles.includes('[data-ghf-style-variant="diagnostic_premium"]') &&
+    styles.includes('.ghf-tag-input')
 
   if (runtimeReady) {
-    console.log(`\nRuntime guard: ${PRODUCTION_RUNTIME_REF} supports multi_step_light + premium + tokenized handoff.`)
+    console.log(`\nRuntime guard: ${PRODUCTION_RUNTIME_REF} supports multi_step_light + premium + chips + tokenized handoff.`)
 
     return
   }
 
   const message =
     `Premium grader activation would publish multi_step_light/diagnostic_premium/tokenizedReport, but ${PRODUCTION_RUNTIME_REF} ` +
-    'does not contain the renderer support. Release the code first, or pass --allow-runtime-pending only with an explicit rollback plan.'
+    'does not contain the renderer support for premium chips. Release the code first, or pass --allow-runtime-pending only with an explicit rollback plan.'
 
   if (!ALLOW_RUNTIME_PENDING) {
     console.error(`\nFAIL: ${message}`)
@@ -258,14 +303,14 @@ const withPremiumCopy = (copyRefs: unknown): Record<string, unknown> => {
 const withPremiumUiPolicy = (uiPolicy: unknown): Record<string, unknown> => ({
   ...asObject(uiPolicy),
   composition: 'multi_step_light',
-  steps: STEPS
+  steps: STEPS,
 })
 
 const withTokenizedSuccess = (successBehavior: unknown): Record<string, unknown> => ({
   ...asObject(successBehavior),
   kind: 'tokenized_report',
   message: SUCCESS_MESSAGE,
-  tokenizedReport: { statusPathTemplate: STATUS_PATH_TEMPLATE }
+  tokenizedReport: { statusPathTemplate: STATUS_PATH_TEMPLATE },
 })
 
 const main = async (): Promise<void> => {
@@ -324,15 +369,11 @@ const main = async (): Promise<void> => {
   console.log(`  style_variant objetivo: ${STYLE_VARIANT}`)
   console.log(`  composition actual    : ${asObject(current.ui_policy_json).composition ?? 'static'}`)
   console.log('  composition objetivo  : multi_step_light')
-  console.log(
-    `  campos                : ${Array.isArray(current.field_schema_json) ? current.field_schema_json.length : 0}`
-  )
+  console.log(`  campos                : ${Array.isArray(current.field_schema_json) ? current.field_schema_json.length : 0}`)
   console.log(`  destinos              : ${destinations.length}`)
 
   if (alreadyPremium) {
-    console.log(
-      '\nIdempotente: la version publicada vigente ya expone el contrato premium/progresivo del grader. Nada que hacer.'
-    )
+    console.log('\nIdempotente: la version publicada vigente ya expone el contrato premium/progresivo del grader. Nada que hacer.')
 
     return
   }
@@ -340,9 +381,10 @@ const main = async (): Promise<void> => {
   console.log('\nPlan:')
   console.log(`  - Clonar v${current.version}`)
   console.log(`  - Setear style_variant = ${STYLE_VARIANT}`)
-  console.log('  - Setear ui_policy.composition = multi_step_light con 5 pasos breves, entrega primero')
+  console.log('  - Setear ui_policy.composition = multi_step_light con 5 pantallas breves')
   console.log('  - Humanizar labels/placeholders/help copy de los campos del grader')
-  console.log('  - Cambiar competitorsDeclared de multiselect sin opciones a textarea opcional')
+  console.log('  - Convertir mercado/categoria/industria/rol/tamano en selectores gobernados')
+  console.log('  - Convertir competitorsDeclared en multiselect libre tipo chips')
   console.log('  - Añadir successBehavior.tokenizedReport.statusPathTemplate')
   console.log('  - Preservar validation/emailPolicy, ui_policy.security.captcha, consent y policies')
   console.log(`  - Copiar ${destinations.length} destino(s) de la version vigente`)
@@ -366,7 +408,7 @@ const main = async (): Promise<void> => {
     uiPolicy: nextUiPolicy,
     styleVariant: STYLE_VARIANT,
     successBehavior: nextSuccess,
-    createdBy: 'task-1327-grader-premium-intake-activation'
+    createdBy: 'task-1327-grader-premium-intake-activation',
   })
 
   console.log(`\nDraft creado: ${formVersionId}`)
@@ -381,7 +423,7 @@ const main = async (): Promise<void> => {
       deliveryMode: destination.delivery_mode,
       mapping: destination.mapping_json,
       consentRequirements: destination.consent_requirements_json,
-      retryPolicy: destination.retry_policy_json
+      retryPolicy: destination.retry_policy_json,
     })
 
     console.log(`Destino copiado: ${destination.destination_id} -> ${copied.destination_id}`)

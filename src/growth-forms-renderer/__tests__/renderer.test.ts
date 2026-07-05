@@ -481,6 +481,45 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.querySelector('[data-ghf-summary]')).toBeNull()
   })
 
+  it('renders free-entry multiselect fields as removable chips and submits string arrays', async () => {
+    const fetchImpl = okFetch()
+
+    const { root } = mountInto(staticContractFixture({
+      styleVariant: 'diagnostic_premium',
+      fields: [
+        {
+          key: 'competitorsDeclared',
+          type: 'multiselect',
+          label: 'Competidores de referencia',
+          placeholder: 'Escribe una marca y presiona Enter',
+          freeEntry: true,
+          maxItems: 3,
+        },
+      ],
+      consent: undefined,
+    }), fetchImpl)
+
+    const input = root.querySelector<HTMLInputElement>('[name="competitorsDeclared"].ghf-tag-entry')!
+
+    input.value = 'Marca A'
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true, bubbles: true }))
+    input.value = 'Marca B'
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: ',', cancelable: true, bubbles: true }))
+
+    expect(Array.from(root.querySelectorAll('.ghf-tag-label')).map(node => node.textContent)).toEqual(['Marca A', 'Marca B'])
+
+    root.querySelector<HTMLButtonElement>('.ghf-tag-remove')!.click()
+    expect(Array.from(root.querySelectorAll('.ghf-tag-label')).map(node => node.textContent)).toEqual(['Marca B'])
+
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+    await vi.waitFor(() => expect(fetchImpl).toHaveBeenCalledTimes(1))
+
+    const calls = (fetchImpl as unknown as { mock: { calls: Array<[string, { body: string }]> } }).mock.calls
+    const body = JSON.parse(calls[0][1].body)
+
+    expect(body.fields.competitorsDeclared).toEqual(['Marca B'])
+  })
+
   it('uses contract-provided field required copy when present', () => {
     const { root } = mountInto(
       staticContractFixture({
