@@ -306,12 +306,25 @@ history + rationale).
   preserved; UTF-8 confirmed via isolated `render_block`; the private test post
   was force-deleted (clean rollback). No local WP / no automated deploy lane was
   needed — the governed SSH WP-CLI wrapper reaches the live runtime.
-- **Residual verification (visual, not blocking).** In-editor UI insert/save/
-  reload by a human, and an in-Ohio browser capture (desktop + mobile 390px, no
-  horizontal overflow) with CSS applied. The CSS is scoped + static-validated
-  and the live markup is confirmed; capture on the first real Glitch draft (or
-  a temporary authenticated private post). Runbook:
+- **Theme gotcha — fixed (important).** The Ohio theme hides every bare
+  `<aside>` on single posts with `.single-post aside { display: none !important }`
+  (it treats `<aside>` as a sidebar region). Because the block deliberately uses
+  `<aside>` for semantics, its content was in the DOM but invisible
+  (`offsetHeight: 0`) on the live front-end. Fix: `style.css` forces the block
+  visible with matching `!important` + higher specificity —
+  `.gh-glitch-drop.wp-block-efeoncepro-glitch-drop { display: block !important }`
+  ((0,2,0) beats the theme's (0,1,1)). **Any future editorial `<aside>` block
+  must carry the same defensive override** or it will be hidden by Ohio.
+- **Visual verified live (Playwright, 2026-07-04).** After the fix + Kinsta
+  cache purge, the block renders as designed on efeoncepro.com: `display: block`,
+  `offsetHeight` 0→167, navy-tint panel, wordmark loaded, upright body. Mobile
+  390px: no page horizontal overflow (`scrollWidth === clientWidth === 390`),
+  block visible (width 338px). Runbook:
   `docs/manual-de-uso/public-site/glitch-editorial-block.md`.
+- **Residual (authoring, not code).** In the first live post the editor nested
+  the block inside a leftover `core/quote` and duplicated its text; authors
+  should un-nest the Glitch block to top level and delete the redundant quote.
+  In-editor UI insert/save/reload by a human is the only unautomated check.
 
 ## Sources Consulted
 

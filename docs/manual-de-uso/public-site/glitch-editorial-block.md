@@ -85,6 +85,16 @@ pnpm public-website:wpcli -- --eval-file ./ruta/deactivate.php
 - **El wordmark no aparece:** falta `glitch-mark.svg` o la caché de Kinsta sirve
   CSS viejo. Verifica el archivo y purga caché.
 - **El estilo no aplica en el front-end:** la caché de Kinsta. Purga y revalida.
+- **El bloque no se ve en un post publicado (aunque el HTML lo trae):** el tema
+  Ohio oculta todo `<aside>` en posts individuales
+  (`.single-post aside { display: none !important }`). El bloque ya trae un
+  override defensivo (`.gh-glitch-drop.wp-block-efeoncepro-glitch-drop { display: block !important }`);
+  si un cambio de estilos lo pierde, el bloque desaparece. Tras editar CSS,
+  **redeploy + purgar caché de Kinsta** (el CSS del bloque va inline en el HTML
+  cacheado). Verifica con browser real que `offsetHeight > 0`.
+- **El bloque sale anidado dentro de una cita / duplicado:** en el editor,
+  saca el bloque Glitch fuera del bloque `core/quote` (déjalo a nivel raíz) y
+  borra el quote redundante.
 
 ## Referencias técnicas
 
