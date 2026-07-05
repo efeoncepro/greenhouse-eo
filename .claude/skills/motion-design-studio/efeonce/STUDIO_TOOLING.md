@@ -39,11 +39,30 @@
 - **Rol:** paso de **finish** — subir resolución/detalle de frames e imagen y de **secuencias de video**.
   Tenemos **MCP y API**.
 
-## Vertex (efeonce-group) — modelos Google
+## Vertex (efeonce-group) — Gemini Omni video-gen (VERIFICADO en vivo 2026-07-05)
 
-Gemini Omni + Veo corren en **Vertex del proyecto `efeonce-group`** (ver memoria
-`reference_vertex_gemini_omni_nanobanana_lite`). Gotcha: algunos solo en `us-central1`/`global`. Clientes
-LLM canónicos en `src/lib/ai/*` (no instanciar SDK paralelo en un dominio).
+Gemini Omni + Veo corren en **Vertex del proyecto `efeonce-group`**. Receta **probada generando video real**
+(spot AEO Grader, toma de 10s 720p en ~40s):
+
+- **Región: `global`** — NO `us-central1` (ahí el modelo da `NOT_FOUND`). El atajo de publisher-model falla;
+  usar la **ruta calificada**.
+- **Endpoint:** `POST https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent`
+- **Contrato obligatorio:** `generationConfig.responseModalities: ["TEXT","VIDEO"]` — **ambas**. Sólo `VIDEO`
+  o sólo `TEXT` → `400 "This model requires both text and video response modalities."`
+- **Auth:** ADC (`gcloud auth application-default`) + header **`x-goog-user-project: efeonce-group`** (sin él, `403`).
+- **Payload:** Gemini-style (`contents:[{role:"user",parts:[{text: <prompt cinematográfico>}]}]`), NO `instances`.
+- **Salida:** clip **10s · 1280×720 · 24fps · MP4**, base64 inline en `candidates[].content.parts[].inlineData`
+  (`mimeType video/mp4`). Devuelve también un part de **texto "thinking"** (ignorar). `launchStage: PUBLIC_PREVIEW`.
+- **Costo (as-of 2026-07 — reverificar):** **5.792 tokens de video/seg** de 720p, **$17,50/1M tokens de salida
+  de video** ≈ **$0,10/seg** (~**$1,01 por clip de 10s**; verificado: 57.920 tokens = 5.792 × 10).
+- **Limitación:** sólo **720p** → para acabado broadcast, **upscale** (Magnific / Higgsfield) en el finish.
+- **NO es tool MCP:** es llamada REST a Vertex; usar el cliente canónico `src/lib/ai/*` (no instanciar SDK paralelo).
+  Si ADC expiró: `gcloud auth login` + `application-default login`.
+
+> **Fortaleza vs límite:** Omni entrega tomas cinematográficas de 10s consistentes con buen prompt de arte;
+> como cada `generateContent` es stateless, la **consistencia entre tomas** se logra con dirección de arte
+> idéntica en el prompt (o keyframes/edición conversacional multi-turn). El end-card con **logo/claim reales
+> va en post** (mograph con assets de marca), NO se genera como texto IA (poco fiable).
 
 ## Router de producción (elige la mano correcta)
 
