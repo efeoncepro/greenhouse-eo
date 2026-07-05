@@ -4,7 +4,7 @@ type TurnstileWidgetId = string | number
 
 interface TurnstileRenderOptions {
   sitekey: string
-  size: 'invisible'
+  appearance: 'interaction-only'
   execution: 'execute'
   callback: (token: string) => void
   'error-callback': () => void
@@ -138,7 +138,7 @@ export class TurnstileTokenClient {
     this.api = api
     this.widgetId = api.render(container, {
       sitekey: this.config.siteKey,
-      size: 'invisible',
+      appearance: 'interaction-only',
       execution: 'execute',
       callback: token => this.resolveToken(token),
       'error-callback': () => this.rejectToken(new Error('turnstile_token_failed')),

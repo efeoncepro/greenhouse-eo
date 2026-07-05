@@ -1110,6 +1110,8 @@ describe('growth-forms-renderer · FormRenderer', () => {
 
     expect(body.captchaToken).toBe('captcha-token')
     expect(turnstile.render).toHaveBeenCalledTimes(1)
+    expect(turnstile.render.mock.calls[0]?.[1]).toMatchObject({ appearance: 'interaction-only', execution: 'execute' })
+    expect(turnstile.render.mock.calls[0]?.[1]).not.toHaveProperty('size')
     expect(turnstile.execute).toHaveBeenCalledWith('widget-1')
     expect(turnstile.reset).toHaveBeenCalledWith('widget-1')
   })
