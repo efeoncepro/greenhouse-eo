@@ -271,6 +271,25 @@ Hechos comprobados por nosotros, no inferidos de docs:
 - **launchStage:** `PUBLIC_PREVIEW`.
 - **Prioridad de disponibilidad:** ya operable en Vertex pese a que la comunicación pública lo daba como "coming weeks" — reverifica antes de cablear un cron/pipeline productivo.
 
+### 9.1 Capacidades probadas EN VIVO (no inferidas) — 2026-07-05
+
+| Capacidad | Estado | Cómo se probó |
+|---|---|---|
+| `text_to_video` | ✅ | solo `text` en parts |
+| `image_to_video` (1 referencia) | ✅ | `text` + 1 `inlineData image/png` → continuidad casi idéntica |
+| **Múltiples referencias de imagen (2)** | ✅ | `text` + 2 `inlineData image/png` → mezcló los dos mundos (estadio vacío + lleno) en una toma |
+| Video como referencia / continuación | ✅ | `text` + `inlineData video/mp4` |
+| **Edición de video (video-to-video)** | ✅ | `text`("edita: cámara en órbita + luz de amanecer") + `inlineData video/mp4` → editó el clip existente manteniendo el mundo |
+| **Audio nativo sincronizado + contextual** | ✅ | los MP4 traen pista `aac` **no silente y contextual**: estadio lleno **-15,4 dB** (multitud) vs vacío **-16,8 dB** (ambiente) |
+| **Salida 9:16 vertical** | ✅ | referencia **portrait 720×1280** → salida **720×1280** (el aspect se **infiere de las dimensiones de la referencia**) |
+| Resolución | ⚠️ | siempre lado corto **720p** (720×1280 vertical o 1280×720 horizontal) |
+| Texto/logos/UI legibles | ❌ | los **deforma** (no confiar la exactitud a la IA → overlay real) |
+
+> **Implicaciones de máximo aprovechamiento:** (a) el **audio nativo** sirve como scratch/ambiente sin
+> pedirlo — `audio-studio` lo reemplaza/mejora para el master; (b) **9:16 nativo** con referencia portrait
+> → versiones sociales sin reframe; (c) **edición y multi-referencia** habilitan variaciones e inserción de
+> elementos manteniendo el mundo (continuidad). Mapa completo en `efeonce/GEMINI_OMNI_CAPABILITIES.md`.
+
 Snippet canónico de invocación (curl):
 ```bash
 ACCESS_TOKEN=$(gcloud auth print-access-token)

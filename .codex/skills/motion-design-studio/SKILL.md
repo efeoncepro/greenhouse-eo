@@ -181,5 +181,7 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `ANTIPATTERNS.md` — los errores que arruinan una animación.
 - `workflows/` — **biblioteca viva de recetas creativas validadas** (`README.md` índice + un archivo por
   workflow). Crece con cada producción: cuando algo funciona, se documenta acá.
-- `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, **`GEMINI_OMNI_VERTEX.md`** (contrato +
-  capacidades de Gemini Omni en Vertex, alto detalle), `MOTION_BOUNDARY.md`, `CLIENT_DELIVERY.md`.
+- `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `MOTION_BOUNDARY.md`, `CLIENT_DELIVERY.md`,
+  y el **par Gemini Omni**: **`GEMINI_OMNI_VERTEX.md`** (contrato operativo: endpoint/auth/pricing/gotchas +
+  §9.1 capacidades verificadas en vivo) + **`GEMINI_OMNI_CAPABILITIES.md`** (catálogo a todo nivel + **mapa
+  de sinergia con las skills hermanas** + playbook de máximo aprovechamiento). Léelos al operar/dirigir Omni.
