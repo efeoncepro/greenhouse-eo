@@ -77,6 +77,10 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
    (`SOURCES.md`).
 4. **Si hay que ejecutar** (dirigir/producir/editar/finalizar), abre `efeonce/STUDIO_TOOLING.md`
    y usa el pipeline con las herramientas conectadas + confirmación humana antes de producir/entregar.
+   Para **recetas de producción validadas** (qué combinación funcionó y cómo — reference→Omni enhance,
+   reference-chaining, UI-sin-AE, híbrido), consulta la **biblioteca viva** `workflows/README.md`; el
+   **contrato completo de Gemini Omni en Vertex** está en `efeonce/GEMINI_OMNI_VERTEX.md`. Cuando algo
+   nuevo funcione, **documéntalo en `workflows/`** (es como crece la skill).
 5. **Aterriza a Efeonce** si es marca/canales propios o un cliente Globe:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
 6. **Cierra con un artefacto** de `templates/` (brief, storyboard, animatic/shotlist, prompt sheet,
@@ -175,4 +179,7 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `SOURCES.md` — fuentes + **tabla de volatilidad-por-tema** + matriz de modelos de video IA + `as-of`.
 - `GLOSSARY.md` — vocabulario de motion/cine 2026 (easing, animatic, EDL, LUT, Soul ID, i2v…).
 - `ANTIPATTERNS.md` — los errores que arruinan una animación.
-- `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `MOTION_BOUNDARY.md`, `CLIENT_DELIVERY.md`.
+- `workflows/` — **biblioteca viva de recetas creativas validadas** (`README.md` índice + un archivo por
+  workflow). Crece con cada producción: cuando algo funciona, se documenta acá.
+- `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, **`GEMINI_OMNI_VERTEX.md`** (contrato +
+  capacidades de Gemini Omni en Vertex, alto detalle), `MOTION_BOUNDARY.md`, `CLIENT_DELIVERY.md`.
