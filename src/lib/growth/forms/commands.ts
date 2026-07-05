@@ -300,6 +300,35 @@ export const revalidateAndNormalizeFields = (
 
     if (raw == null || (typeof raw === 'string' && raw.trim() === '')) continue
 
+    if (field.type === 'multiselect') {
+      if (!Array.isArray(raw) && typeof raw !== 'string') {
+        return { ok: false, fieldKey: field.key, reasonCode: 'field_required' }
+      }
+
+      const source = Array.isArray(raw) ? raw : raw.split(',')
+      const values: string[] = []
+      const seen = new Set<string>()
+
+      for (const item of source) {
+        const value = String(item).trim()
+        const key = value.toLocaleLowerCase('es-CL')
+
+        if (!value || seen.has(key)) continue
+
+        if (field.maxLength && value.length > field.maxLength) {
+          return { ok: false, fieldKey: field.key, reasonCode: 'max_length' }
+        }
+
+        if (field.maxItems && values.length >= field.maxItems) break
+
+        seen.add(key)
+        values.push(value)
+      }
+
+      normalized[field.key] = values
+      continue
+    }
+
     const result = validateFieldValue(field, raw)
 
     if (!result.valid && result.reasonCode) {

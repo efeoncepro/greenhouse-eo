@@ -57,4 +57,29 @@ describe('revalidateAndNormalizeFields (autoridad server-side TASK-1253)', () =>
     expect(r.ok).toBe(true)
     if (r.ok) expect(r.normalizedFields.utm_source).toBe('newsletter')
   })
+
+  it('preserva multiselect como string[] normalizado, deduplicado y limitado', () => {
+    const r = revalidateAndNormalizeFields([
+      { key: 'competitorsDeclared', type: 'multiselect', freeEntry: true, maxItems: 3 },
+    ] as unknown as FieldDefinition[], {
+      competitorsDeclared: [' Marca A ', 'Marca B', 'marca a', 'Marca C', 'Marca D'],
+    })
+
+    expect(r.ok).toBe(true)
+
+    if (r.ok) {
+      expect(r.normalizedFields.competitorsDeclared).toEqual(['Marca A', 'Marca B', 'Marca C'])
+    }
+  })
+
+  it('acepta multiselect legacy separado por comas sin colapsarlo a texto', () => {
+    const r = revalidateAndNormalizeFields([
+      { key: 'competitorsDeclared', type: 'multiselect', freeEntry: true },
+    ] as unknown as FieldDefinition[], {
+      competitorsDeclared: 'Marca A, Marca B',
+    })
+
+    expect(r.ok).toBe(true)
+    if (r.ok) expect(r.normalizedFields.competitorsDeclared).toEqual(['Marca A', 'Marca B'])
+  })
 })
