@@ -9,6 +9,13 @@
 > Cierra con `templates/sound-design-brief.md`. Se sincroniza con `modules/02` (timing/tempo/
 > hit points) y `modules/06` (el corte cae donde cae el sonido).
 
+> **Borde con `audio-studio`.** Este módulo cubre el sonido **sincronizado a la imagen** (hit
+> points, sync al corte, LipSync, mezcla a picture). El **craft profundo de audio como pieza
+> propia** — dirección de voz, creación musical/jingle, sonic branding, SFX/foley, producción de
+> podcast, mezcla/mastering al target de loudness, y el pipeline de audio IA (ElevenLabs/Seed
+> Audio/Suno/Udio con sus **licencias**) — vive en la skill **`audio-studio`**. Para producir la VO,
+> la música o los SFX de una pieza, **dirígete a `audio-studio`** y sincroniza el resultado acá.
+
 ---
 
 ## 1. Por qué el sonido decide si un motion se siente pro
