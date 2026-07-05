@@ -42,6 +42,16 @@
 - ❌ **Simular caro cuando un stock element resuelve.** ✅ Gasto gobernado: humo/fuego/polvo pregrabado composited.
 - ❌ **Olvidar que el mejor VFX es invisible.** ✅ Si se nota el efecto, falló.
 
+## Video IA para UI / texto / logos (duras — aprendizaje 2026-07-05)
+
+- ❌ **Generar UI, texto legible, citas, gauges o logos con video IA.** Los modelos los **deforman/inventan**
+  (por eso prompteamos "no text, no logos"). ✅ La UI/producto se hace como **mograph** — mockup HTML/CSS/JS
+  animado + captura Playwright (legible, on-brand, cero créditos). Ver `efeonce/STUDIO_TOOLING.md`.
+- ❌ **Renderizar el logo de marca con IA.** ✅ Overlay del **asset real** (`public/branding/*`) en post.
+- ❌ **Tomas text-to-video independientes** sin activos/POV/transición compartidos → se ven como **escenas
+  sueltas** (caso real: rough cut estadio). ✅ **Reference-chaining**: cada toma usa el último frame de la
+  anterior como `inlineData` de referencia (verificado: sale casi idéntica) + un POV/hilo + transiciones.
+
 ## Boundaries (duras)
 
 - ❌ **Hacer motion de UI runtime acá** (transición, scroll, micro-interacción, view transition, reduced-motion,

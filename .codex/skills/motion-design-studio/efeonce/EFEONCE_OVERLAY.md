@@ -27,6 +27,10 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   skill: dirige el arco, la cámara y el sonido; la consistencia del personaje se ancla con Soul ID/refs.
   Nexa e ilustraciones propietarias (`characters/greenhouse-*.png`) son **obra del equipo creativo**, NO stock.
 - **AXIS** es el design system **interno**; el `AxisWordmark` NUNCA en piezas públicas/marketing.
+- **Assets de logo REALES para overlays/end-cards (usar estos, NO generar con IA):**
+  `public/branding/logo-full.svg` · `logo-full.png` · `logo-negative.svg` (para fondo oscuro) ·
+  `SVG/isotipo-efeonce-negativo.svg` (isotipo) · `pdf/efeonce-wordmark-white.png`. Embeber el asset real
+  (mograph/HTML `<img src>`); el logo se compone en post, nunca lo renderiza un modelo de video.
 - **`DESIGN.md`** es el contrato visual agent-facing; leerlo si la pieza toca UI (pero recuerda: motion de
   UI runtime NO es esta skill).
 

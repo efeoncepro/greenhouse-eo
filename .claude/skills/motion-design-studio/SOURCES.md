@@ -71,7 +71,7 @@
 | **Seedance 2.0 / 2.5** (ByteDance) | briefs detallados, camera moves, **hasta 12–50 refs + audio ref** (fija personaje/producto), 30s/4K (2.5), barato (~$0.06/s) | vivid/alto contraste (menos editorial), físico complejo, texto fino, manos | control por referencias, social punchy, presupuesto ajustado |
 | **Kling 3.0** | **storyboarding multi-shot + Voice Binding** (voz consistente 6 cortes/5 idiomas), económico | control fino | narrativas multi-corte con voz consistente; económico |
 | **Veo 3.1** (Google) | broadcast-ready, frame rate de cine, **sync audio-visual integrado** | precio (~$0.10/s) | entregable de calidad broadcast/cine |
-| **Gemini Omni** (Google, Vertex) | multimodal, edición conversacional multi-turn; **VERIFICADO generando video real en `efeonce-group`** (clip 10s 720p 24fps, ~$0.10/s) | **solo 720p**, región `global`, no MCP (REST) | text/image-to-video en Vertex; **receta verificada en `efeonce/STUDIO_TOOLING.md`** (global + `generateContent` + `responseModalities:[TEXT,VIDEO]` + `x-goog-user-project`) |
+| **Gemini Omni** (Google, Vertex) | multimodal; **VERIFICADO** en `efeonce-group` (video real 10s 720p 24fps, ~$0.10/s) + **referencias/image-to-video OK** (frame previo como `inlineData` → continuidad casi idéntica) | **solo 720p**, región `global`, no MCP (REST), **deforma texto/logos/UI** | text/i2v en Vertex; **reference-chaining** para consistencia; UI/logo NO con IA. Receta en `efeonce/STUDIO_TOOLING.md` |
 | ~~**Sora 2** (OpenAI)~~ | líder en consistencia temporal/física | **API deprecada 2026-03-24, shutdown 2026-09-24** | **NO** basar nada nuevo; sigue accesible vía agregadores (Higgsfield) pero con fecha de muerte |
 
 ### Upscale / enhance / finish

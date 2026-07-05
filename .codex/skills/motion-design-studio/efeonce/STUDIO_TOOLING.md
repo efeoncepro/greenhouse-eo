@@ -59,10 +59,44 @@ Gemini Omni + Veo corren en **Vertex del proyecto `efeonce-group`**. Receta **pr
 - **NO es tool MCP:** es llamada REST a Vertex; usar el cliente canónico `src/lib/ai/*` (no instanciar SDK paralelo).
   Si ADC expiró: `gcloud auth login` + `application-default login`.
 
-> **Fortaleza vs límite:** Omni entrega tomas cinematográficas de 10s consistentes con buen prompt de arte;
-> como cada `generateContent` es stateless, la **consistencia entre tomas** se logra con dirección de arte
-> idéntica en el prompt (o keyframes/edición conversacional multi-turn). El end-card con **logo/claim reales
-> va en post** (mograph con assets de marca), NO se genera como texto IA (poco fiable).
+- **Referencias / image-to-video VERIFICADO (2026-07-05):** Omni **acepta imagen de referencia** en
+  `contents[].parts[].inlineData` (`mimeType image/png` + el `text`). Probado pasando el frame de una toma
+  previa → devolvió una toma **casi idéntica** (mismo mundo/luz/composición). **Esta es la cura de la
+  "desconexión":** encadená las tomas → cada toma usa el **último frame de la anterior como referencia** +
+  el prompt del beat siguiente. Sin eso, tomas text-to-video independientes se ven como escenas sueltas.
+
+> **Fortaleza vs límite:** Omni entrega tomas cinematográficas de 10s; la **consistencia entre tomas** se
+> logra con **reference-chaining** (frame anterior como `inlineData`), no sólo con prompt. El **logo/UI/texto
+> NUNCA se generan con IA** (los deforma) → van en post como **overlay de asset real** (mograph). Diseñá el
+> corte para no necesitar composite in-frame: beats de UI a **pantalla completa**, mundo/humano en **cortes
+> separados**, hilados por transición (pull-back/match-cut).
+
+## UI-heavy motion SIN After Effects (HTML + Playwright) — receta producible
+
+Cuando el motion es **UI/producto** (prompt box, chat, citas, cursor, gauge, dashboards, tipografía legible),
+NO uses video IA (deforma texto/logos). Producible por el agente, legible y on-brand:
+
+1. **Construí un mockup HTML/CSS/JS animado** (timeline con `setTimeout`/CSS): typing, cursor que se mueve y
+   "clickea", burbujas, citas, unfold de ventana, etc. Embebé el **logo real** (`<img src>` a `public/branding/*`).
+2. **Capturá con Playwright** (`recordVideo`, viewport 1280×720): correr el `.mjs` **desde la raíz del repo**
+   (el scratchpad NO resuelve `node_modules` → `ERR_MODULE_NOT_FOUND`; copiá el script a la raíz, corré, borralo).
+3. **webm → mp4** con ffmpeg (`-c:v libx264 -pix_fmt yuv420p -r 24`).
+
+Caso fuente: spot AEO Grader Slice 1 (answer-engine que cita agencias → clic → boleto), 2026-07-05.
+Ventaja: **texto/citas/logos nítidos**, cero costo de créditos IA, control frame-perfect.
+
+### Omni "hazlo más pro" sobre una UI (probado 2026-07-05 — frame Y video de referencia)
+
+Pasar el frame **o el video** de UI a Omni como referencia + "vuélvelo cinematográfico" **SÍ eleva el look**
+(profundidad, glass, glow, cámara, entorno premium; el texto grande del héroe suele quedar legible). **PERO**
+es no-determinista: **deforma el micro-texto y el logo** — en el test los motores salieron "ChatGPT→ChatOFT,
+Perplexity→Pespically, Gemini→Cantnl", "Fechas→Faches", precio 890→850, logo Efeonce fantasmeado. **NUNCA
+confiar la exactitud** (citas/nombres de motores/logo/precio) al output IA.
+
+**Workflow canónico (lo mejor de ambos):** usá el output Omni como **plate cinematográfico de fondo**
+(atmósfera/cámara/profundidad) y **componé encima la UI real crisp** (o los elementos que deben ser exactos:
+pregunta, citas con logos reales, gauge, logo). O mezclá beats: **Omni-enhanced** donde solo importa el texto
+grande (pregunta, thinking, ambiente) + **mograph crisp** donde el micro-texto es el mensaje (citas, gauge, end-card).
 
 ## Router de producción (elige la mano correcta)
 
