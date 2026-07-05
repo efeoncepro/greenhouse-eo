@@ -198,12 +198,14 @@ Reglas obligatorias:
 
 ### Form UX decision — premium progressive intake
 
-- El form actual del grader mantiene sus **14 campos gobernados** y se organiza como **3 pasos breves**:
-  `Tu marca` → `Contexto opcional` → `Envío del informe`.
-- No se reducen campos ni se crean inputs locales en Think. La reducción de fricción ocurre dentro del renderer portable:
-  stepper con nombres de valor, resumen vivo sin PII, paso 2 saltable, botones con targets/focus/disabled accesibles y copy de validación específico por campo.
-- El paso 2 queda explícitamente opcional. El CTA primario dice `Continuar con este contexto` y el affordance secundario dice `Omitir por ahora`; esto conserva data útil para el análisis sin castigar al usuario que todavía no tiene competidores o contexto interno claro.
-- El renderer muestra una `Vista previa del informe` basada en estados de completitud (`listo`, `opcional`, `falta N`), nunca en valores capturados. No debe exponer email, nombre, marca ni competidores en el resumen visual.
+- El form actual del grader mantiene sus **14 campos gobernados** y se organiza como **5 pantallas breves**, no como un formulario largo dentro del dock:
+  `Entrega` → `Marca` → `Mercado` → `Contexto` → `Confirmar`.
+- **La entrega va primero**: la primera pantalla solo pide nombre, apellido y email. Eso comunica de inmediato dónde se recibirá/recuperará el informe y evita que la experiencia arranque con contexto pesado o consentimiento legal antes de mostrar valor.
+- No se reducen campos ni se crean inputs locales en Think. La reducción de fricción ocurre dentro del renderer portable: stepper accesible con label de la pantalla actual, dots compactos en mobile, copy de ayuda más corto, validación después de interacción, targets de botón de 52px, foco visible y sincronización correcta de `disabled`/`aria-disabled` durante verificación async de email.
+- El resumen `Informe en preparación` aparece solo después de la primera pantalla y no muestra valores capturados. Puede indicar progreso de completitud (`N de M señales listas`) y privacidad, pero no debe exponer email, nombre, marca ni competidores.
+- `Contexto` y parte de `Confirmar` conservan campos opcionales para enriquecer el análisis sin castigar al usuario que todavía no tiene competidores, industria o desafío claro. El affordance secundario permitido es de baja fricción (`Omitir contexto`), nunca un cierre alternativo fuera del renderer.
+- El dock de Think debe hospedar el `<greenhouse-form>` sin scroll interno. Si el form crece, el scroll pertenece a la página; el dock puede flotar visualmente entre hero y sección blanca, pero no debe tapar los elementos del hero ni encerrar el formulario en un panel largo.
+- Motion/microinteracciones permitidas: transiciones breves de cambio de pantalla, feedback de estado y affordances de foco/hover que reduzcan incertidumbre. Deben respetar `prefers-reduced-motion` y no convertir el form en una pieza decorativa.
 - El contrato publicado del form debe usar placeholders enterprise concretos (`LatAm B2B`, `educacion superior`, `competidor regional`) y errores calmados con recuperación clara (`Indica el mercado donde quieres evaluar la visibilidad.`), evitando mensajes genéricos como único feedback.
 - El cierre posterior al submit es ceremonial y honesto: `Solicitud recibida. Estamos consultando motores, citabilidad y contexto competitivo para preparar tu informe en pantalla.` El destino principal sigue siendo el reporte en pantalla.
 
