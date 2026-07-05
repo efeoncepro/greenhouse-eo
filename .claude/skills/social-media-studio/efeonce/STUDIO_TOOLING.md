@@ -28,6 +28,25 @@
 Flujo típico: `getBrandSettings` → (produce asset) → `getBestTimeToPostByNetwork` → propone
 calendario en `templates/content-calendar-30d.md` → **el operador aprueba** → `createScheduledPost`.
 
+### Verificado en vivo (as-of 2026-07-05)
+
+Smoke test de lectura OK contra la cuenta real. Notas operativas:
+
+- **Descubre siempre la marca primero.** `getBrandSettings` devuelve la lista con `id`
+  (= `brandId`), `label`, `timezone` y `networksData` (los handles conectados por red).
+  Úsalo para resolver el `brandId` correcto y **no cruzar contenido entre marcas** — hay
+  marcas propias (Efeonce Group) y de clientes (SKY / Sky Perú / Sky Colombia). Nunca
+  asumas un `brandId`; resuélvelo por `label`.
+- **`getBestTimeToPostByNetwork` requiere** `brandId`, `socialNetwork` (`instagram|facebook|
+  twitter|linkedin|youtube|tiktok`), `timezone` (IANA, sale del brand — ej. `America/Santiago`)
+  y ventana `fromDate`/`toDate` en **ISO 8601 con offset** (ej. `2026-07-06T00:00:00-04:00`;
+  Chile en invierno = `-04:00`).
+- **Gotcha `dayOfWeek`**: el retorno usa **1 = lunes … 7 = domingo** (el array llega con el 7
+  primero). No lo confundas con el estándar JS (0 = domingo). Interpreta el `value` como
+  intensidad relativa: a mayor valor, mejor hora.
+- **Cliente correcto = `getBrandSettings` primero, siempre** (repite la regla de
+  `CLIENT_DELIVERY.md`): antes de programar en una marca de cliente, confirma el `brandId`.
+
 ## Higgsfield MCP — producción
 
 - `generate_image` / `generate_video` / `generate_audio` — núcleo de producción.
