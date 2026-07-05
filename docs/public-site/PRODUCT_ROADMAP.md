@@ -38,22 +38,24 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
 - **PDR-001 — Landing SEO complementaria al AEO** (decidido): posicionamiento SEO
   como *cimiento* de la promesa de visibilidad (no commodity), hermana de
   `/aeo-2`. Ver [PDR-001](decisions/PDR-001-seo-landing-complementaria-al-aeo.md).
-- **PDR-002 — Arquitectura de información** (decidida la estructura): pillar-cluster
-  anidado `/visibilidad/{seo,aeo}` + 301 desde `/aeo-2`. El **AI Visibility Grader
-  es un nodo de primera clase** del ecosistema digital Efeonce (servido desde
-  `think.efeoncepro.com`) y el nodo de conversión al que el cluster hace funnel —
-  no un CTA colgado. Ver [PDR-002](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md).
+- **PDR-002 — Arquitectura de información** (decidida, slugs data-backed): hub
+  `/servicios` (no `/soluciones` — cliché de voz) con spokes por keyword real
+  (Semrush CL): `/servicios/posicionamiento-seo` (title→"agencia seo" 880) +
+  `/servicios/aeo` (term 320, uncontested ← 301 desde `/aeo-2`). El pillar de
+  autoridad = **guía de contenido en Think**, no página de servicio. El grader es
+  el nodo de conversión compartido. Ver [PDR-002](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md).
 
 ## Next
 
-- **Inventario de URLs por crawl vivo** de `efeoncepro.com` (exigido por el
-  route-ownership matrix) para fijar el slug final (top-level `/visibilidad` vs
-  `/servicios/visibilidad`) y dimensionar el 301 de `/aeo-2`. Bloquea el build.
+- **Crawl vivo** de `efeoncepro.com` (route-ownership matrix): confirmar si
+  `/servicios` ya existe con contenido propio y el equity de `/aeo-2` para el 301.
+  Los slugs ya están cerrados con datos (Semrush CL); el crawl es confirmación, no
+  bloqueo del diseño.
 - Extender el **nodo grader** del eje AEO al eje SEO (EPIC-022 "Search Visibility
-  360") para que la landing SEO tenga un diagnóstico de producto real detrás, no
-  solo un formulario.
+  360") para que la spoke SEO tenga un diagnóstico de producto real detrás.
 - Bajar PDR-001/PDR-002 a **TASK** bajo EPIC-019 (landing control plane) /
-  EPIC-022 (SEO): pillar + hija SEO + 301, con copy y build.
+  EPIC-022 (SEO): guía pillar en Think + spoke `/servicios/posicionamiento-seo` +
+  301 de `/aeo-2` → `/servicios/aeo`, con copy y build.
 
 ## Later
 
