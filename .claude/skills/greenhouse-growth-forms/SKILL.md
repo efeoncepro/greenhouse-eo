@@ -199,6 +199,15 @@ For a new ordinary Growth Form embed, use a proportional path:
    composition without mutating live, assert `scrollWidth==clientWidth`, and pixel-sample inputs,
    selects and CTA when host CSS could fight native controls.
 
+**New-surface checklist (canonical runbook).** Before declaring a form live on a **new host/domain**,
+follow `docs/manual-de-uso/growth/alta-surface-growth-form-checklist.md`. It splits **Tier 1**
+(config-only: publish → surface+origin/CORS → HubSpot destination → embed → smoke) from **Tier 2**
+(`tokenized_report`/async: adds the domain reactive consumer + status/report CORS + domain-data
+degradation). Two gaps recur and bite in production: (a) the host's **Turnstile hostname** must be added
+to the widget — subdomains are NOT inherited from the root (verified on `think.efeoncepro.com`: the
+`efeoncepro.com` root did not cover it); and (b) a **real-browser end-to-end smoke on the real surface**
+is the closure gate — curl/tests never exercise Turnstile or cross-origin CORS. Source incident: TASK-1327.
+
 AEO's `pnpm public-website:verify-aeo-live-contract` is the **strict AEO live gate**, not a
 universal tax. New forms should not need `heroans`, AEO WordPress guards, or AEO copy/layout
 assertions unless they live on AEO. If another host/theme breaks the renderer, fix the renderer or
