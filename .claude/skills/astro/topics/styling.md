@@ -98,6 +98,10 @@ styles, **or** tokens + Tailwind v4, and stay consistent.
 - **NEVER** use the deprecated `@astrojs/tailwind` integration — use
   `@tailwindcss/vite` (Tailwind v4).
 - **NEVER** hardcode brand HEX in a component — reference a token CSS var.
+- **NEVER** name a component/decorative class like a Tailwind utility (`.p-4`,
+  `.m-2`, `.w-8`, `.gap-1`, `.top-0`…) — it collides with the utility of the same
+  name and silently restyles the element (a `.p-8` particle gets `padding: 2rem`).
+  Prefix distinctively (`.bk`, `.orbit`, `.dot`). See `reference/gotchas.md`.
 - **SIEMPRE** import tokens/reset before component styles (cascade order).
 - For efeonce-think, keep AXIS tokens as a copied SoT file and reference vars —
   see `efeonce-overlay.md`.

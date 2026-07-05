@@ -116,6 +116,19 @@ working, hardened widget-embed is a legitimate choice. C1 is not a correctness f
   New report visuals should follow the same shape: a self-contained primitive
   fed by an adapter that maps the headless DTO → the primitive's props. Don't
   fork scoring or re-derive; adapt the DTO.
+- **`StatusScreen`** (2026-07-05) — ONE primitive intercepts EVERY full-screen
+  state of the hub: `not_found` (404), `gone` (410 expired/revoked),
+  `rate_limited` (429), `error` (5xx), plus the global `404.astro`. Ambient navy
+  hero (orbits + calibrated bokeh depth) + the 3D Nexa character posed per state +
+  display title + CTA. Contract `@lib/primitives/status-screen` (`StatusKind` +
+  `STATUS_CONTENT` = canonical es-CL copy + pose + role + action); the consumer
+  passes `kind` (+ optional copy override for the generic 404). It collapsed the
+  duplicated inline state blocks in `/brand-visibility/r/[token]` and `/s/[code]`.
+  **Pattern to reuse:** one status primitive, NOT per-route error markup — map
+  each HTTP outcome → a `kind` → a branded character pose + copy. `role="status"`
+  for permanent (404/410), `role="alert"` for transient (429/5xx). Character
+  assets live at `public/characters/nexa-<pose>.webp` (transparent AI matting,
+  generated in greenhouse-eo via `pnpm ai:image --image …` edit + `pnpm ai:image:rmbg`).
 
 ## Rendering & deploy defaults for efeonce-think
 

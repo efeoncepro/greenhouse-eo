@@ -63,6 +63,13 @@ Real traps, ranked by how often they bite. Astro-7-specific ones flagged.
   (Tailwind v4, CSS-first config).
 - **Hardcoded brand HEX** → resolve from token CSS vars (AXIS). See
   `efeonce-overlay.md`.
+- **Decorative class named like a Tailwind utility silently mutates** → a
+  component class `.p-0`…`.p-13` (or `.m-2`, `.w-4`, `.gap-1`) COLLIDES with the
+  Tailwind utility of the same name (`p-8` = `padding: 2rem`) and inflates your
+  element. Symptom: tiny 4px particles rendering as big blurred blobs (looked
+  like an accidental "feature" on the StatusScreen bokeh layer, 2026-07-05). Fix:
+  prefix decorative/particle/bokeh classes distinctively (`.bk`, `.orbit`,
+  `.dot`) — never `<letter><number>`.
 
 ## View Transitions
 
