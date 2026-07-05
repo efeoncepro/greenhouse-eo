@@ -27,7 +27,8 @@ entregado como video renderizado.**
 
 - Concepto + narrativa + storyboard + animatic · lenguaje cinematográfico (cámara/lente/luz) · los 12
   principios · motion graphics + tipografía kinética + title sequences · edición/montaje/pacing · sound
-  design + música · color grading + finishing + upscale · **el pipeline de video IA** (selección de modelo,
+  design + música · color grading + finishing + upscale · **VFX/compositing** (keying, roto, tracking,
+  integración CGI, simulaciones, cleanup, AI-VFX) · **el pipeline de video IA** (selección de modelo,
   prompt cinematográfico, keyframes, consistencia de personaje, control de cámara) · orquestación humano/IA/
   híbrido + entrega de video.
 

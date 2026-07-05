@@ -111,7 +111,7 @@ en motion:
 - **Ducking:** baja automáticamente música y ambience bajo la voz (sidechain o keyframes de volumen,
   −4 a −8 dB durante la locución). Sin ducking, la VO pelea con la música y se pierde inteligibilidad.
 - **Rango de niveles guía** (referencia, ajustar a la mezcla): VO/diálogo pico ~−6 a −3 dBFS, música
-  de fondo −18 a −12 dBFS bajo voz, SFX según impacto. Dejá headroom, no clipees.
+  de fondo −18 a −12 dBFS bajo voz, SFX según impacto. Deja headroom, no clipees.
 - **EQ de separación:** haz espacio. Baja los medios de la música (~2-4 kHz) donde vive la voz.
   Filtrá lo que no aporta (high-pass a ambiences, low-cut a SFX finos).
 - **Dinámica sobre volumen:** compresión suave para pegar, pero preservá el contraste

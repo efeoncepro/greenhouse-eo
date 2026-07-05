@@ -12,6 +12,7 @@
 | **Keyframes / stills** | `greenhouse-ai-image-generator` / `design-studio` | frames de inicio/fin para image-to-video |
 | **Producir video IA** | **Higgsfield** (MCP) + `higgsfield-*` skills; Runway/Seedance/Veo/Kling/Omni | generar/animar tomas con control de cámara + personaje |
 | **Producir craft humano** | After Effects (mograph), Blender/C4D (3D), Houdini (FX) | tipo kinética, 3D, VFX de precisión — handoff con spec |
+| **VFX / compositing** | Nuke / Fusion (Resolve) / After Effects; **Mocha** (tracking); **Wonder/Flow Studio** (mocap); **Runway** / **Beeble** (AI-VFX) | keying, roto, matchmove, integración CGI, cleanup (`../modules/11`) |
 | **Editar / montar** | DaVinci Resolve / Premiere | corte, montaje, ritmo (`../modules/06`) |
 | **Sonido** | DAW + LipSync (ElevenLabs vía Higgsfield) | sound design, música, VO, mezcla (`../modules/07`) |
 | **Color / finish** | DaVinci Resolve + **Magnific** (upscale) | grade, LUT, upscale frame-consistent (`../modules/08`) |
@@ -50,7 +51,9 @@ LLM canónicos en `src/lib/ai/*` (no instanciar SDK paralelo en un dominio).
 - **Cine dirigido con beats/coreografía** → Runway Gen-4.5.
 - **Control por referencias / social / económico** → Seedance / Kling.
 - **Broadcast** → Veo 3.1. **Edición conversacional** → Gemini Omni.
-- **Tipo kinética / mograph de precisión / 3D / VFX** → craft humano (AE/Blender/Houdini), handoff con spec.
+- **Tipo kinética / mograph de precisión / 3D** → craft humano (AE/Blender/Houdini), handoff con spec.
+- **VFX / compositing** (keying, roto, tracking/matchmove, integración CGI, simulaciones, cleanup) → craft
+  humano (Nuke/Fusion/AE + Mocha) + AI-VFX (Runway roto, Wonder/Flow mocap, Beeble relight); ver `../modules/11`.
 - **Subir resolución del entregable final** → Magnific (Video Sequence Enhancement).
 - **Keyframes** → `greenhouse-ai-image-generator` / `design-studio`. **Formato por red** → `social-media-studio`.
 

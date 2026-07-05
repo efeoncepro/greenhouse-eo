@@ -33,6 +33,15 @@
   sube calidad de la elegida; upscale final con Magnific.
 - ❌ **Delegar el juicio de marca a la IA.** ✅ IA acelera; el humano dirige, cura y hace el finish.
 
+## VFX y compositing
+
+- ❌ **Composite sin matchear los 7 vectores** (perspectiva/luz/sombra/color/grano/bordes/blur). ✅ El elemento
+  demasiado limpio, sin sombra de contacto o con borde duro delata el efecto (`modules/11`).
+- ❌ **Confiar un roto/key IA sin QC frame-a-frame.** ✅ La IA falla en pelo/oclusión/transiciones; corrige el 20% que se nota.
+- ❌ **Meter CGI sin sombra de contacto ni luz matcheada.** ✅ Flota. Iguala HDRI + sombra + reflejo.
+- ❌ **Simular caro cuando un stock element resuelve.** ✅ Gasto gobernado: humo/fuego/polvo pregrabado composited.
+- ❌ **Olvidar que el mejor VFX es invisible.** ✅ Si se nota el efecto, falló.
+
 ## Boundaries (duras)
 
 - ❌ **Hacer motion de UI runtime acá** (transición, scroll, micro-interacción, view transition, reduced-motion,

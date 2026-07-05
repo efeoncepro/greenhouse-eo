@@ -19,6 +19,8 @@
 | Versiones / pricing / deprecaciones de modelos | **volátil (mensual)** | nº versión, $/s, 4K/8K, duración, shutdowns | 09 |
 | Capacidades de Magnific / Higgsfield MCP | **trimestral** | qué tool/endpoint/feature hace qué | 09, 10, STUDIO_TOOLING |
 | Herramientas de craft (AE/Blender/DaVinci) | **anual** | features nuevas de la app | 05, 06, 08, 10 |
+| VFX craft (compositing/keying/roto/tracking/CGI/sim) | **estable** | — | 11 |
+| Herramientas AI-VFX (roto/track/relight/mocap) | **volátil (mensual)** | qué tool automatiza qué, cuál lidera | 11 |
 | Specs de entrega (loudness, codecs, tamaños) | **semestral** | targets exactos por destino | 08, 10 |
 
 ## Fuentes base (as-of 2026-07)
@@ -49,6 +51,13 @@
 **Craft tools (motion graphics)**
 - Imagine.art — Best Tools for Motion Design 2026 (Traditional & AI) — https://www.imagine.art/blogs/best-tools-for-motion-design
 - ChatCut — 5 Best Motion Graphics Software 2026 — https://chatcut.io/blog/best-motion-graphics-software
+
+**VFX / AI-VFX (compositing, roto, tracking, mocap)**
+- ActionVFX — Top 10 AI Tools Transforming VFX Workflows 2026 — https://www.actionvfx.com/blog/top-10-ai-tools-for-vfx-workflows
+- Autodesk — AI in Visual Effects + Flow Studio (ex Wonder Dynamics) — https://www.autodesk.com/solutions/media-entertainment/ai-visual-effects
+- Boris FX — Mocha Pro (planar tracking) — https://borisfx.com/products/mocha-pro/
+- FXbuddy — AI Rotoscoping 2026 — https://fxbuddy.app/guides/ai-rotoscoping
+- Beeble — Video to VFX (relighting) — https://beeble.ai/
 
 ## Matriz de modelos de VIDEO IA (as-of 2026-07 — SoT; reverificar mensual)
 

@@ -59,3 +59,21 @@
   entre frames, no cada frame aislado).
 - **Chunking**: generar tomas largas en trozos de 5–8s (los modelos fallan >10s) y montarlos.
 - **Character drift**: cuando el rostro/voz de un personaje cambia entre tomas IA; se evita con Soul ID/refs.
+
+## VFX y compositing (ver `modules/11`)
+
+- **Compositing**: combinar múltiples elementos (plates, CGI, título, IA) en una toma creíble. *Node-based*
+  (Nuke/Fusion) para complejo; *layer-based* (After Effects) para mograph/ligero.
+- **Keying / chroma**: extraer un sujeto de un green/blue screen. **Spill suppression** = quitar el verde
+  que rebota en el sujeto. **Light wrap** = envolver el borde con luz del fondo para integrar.
+- **Rotoscoping (roto)**: aislar un elemento sin green screen, frame por frame (o con IA — Roto Brush 2/Runway).
+- **Matte**: la máscara que define qué parte de la imagen se usa.
+- **Tracking / matchmove**: pegar un elemento al movimiento. *2D point* (un punto), *planar* (una superficie,
+  Mocha), *3D camera / matchmove* (reconstruir la cámara para meter 3D).
+- **Integración CGI**: meter 3D creíble en una toma (igualar luz/HDRI, sombra de contacto, reflejo, grano).
+- **Simulación / dynamics**: humo, fuego, fluidos, partículas, cloth, destrucción (Houdini/C4D/Blender).
+- **Stock element**: elemento pregrabado (humo/fuego/polvo) composited con blend modes — alternativa barata a simular.
+- **Cleanup / beauty**: remover rigs, cables, logos, objetos; retoque.
+- **Mocap markerless**: motion capture sin traje, desde 1 cámara (Wonder Dynamics / Autodesk Flow Studio).
+- **Relighting**: cambiar/recuperar la luz de un video en post (Beeble).
+- **VFX invisible**: la regla de oro — el mejor VFX no se nota. Si se ve el efecto, falló.

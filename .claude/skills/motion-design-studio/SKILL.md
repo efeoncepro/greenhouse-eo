@@ -8,7 +8,8 @@ description: >-
   principios de animación a nivel pro, timing/easing/ritmo, lenguaje cinematográfico —
   cámara/lente/luz/composición en movimiento, storyboard→animatic→previs, motion graphics
   + tipografía kinética + title sequences, edición/montaje/pacing, sound design + sync a
-  música, color grading + finishing), y (2) capacidad de ejecución (dirige el pipeline IA
+  música, color grading + finishing, VFX/compositing — keying/roto/tracking/CGI/simulaciones),
+  y (2) capacidad de ejecución (dirige el pipeline IA
   — Higgsfield Cinema Studio/Soul ID vía MCP + Runway Gen-4.5 / Seedance / Veo / Kling /
   Gemini Omni —, integra craft humano AE/Blender/DaVinci, y hace handoff), cerrando el loop
   idear→storyboard→animatic→producir→editar→finalizar→entregar. Es "humano + IA": el craft
@@ -31,7 +32,9 @@ description: >-
   "color grading", "grade", "sound design", "diseño sonoro", "banda sonora", "render",
   "video IA", "AI video", "Higgsfield", "Runway", "Seedance", "Veo", "Kling", "Gemini Omni",
   "image-to-video", "Soul ID", "consistencia de personaje", "After Effects", "Blender",
-  "DaVinci", "reel", "sizzle", "trailer".
+  "DaVinci", "VFX", "efectos visuales", "compositing", "rotoscoping", "roto", "green screen",
+  "chroma", "keying", "tracking", "matchmove", "CGI", "Nuke", "Fusion", "Mocha", "Houdini",
+  "simulación", "matte painting", "reel", "sizzle", "trailer".
 user-invocable: true
 argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el grader', 'storyboard del title sequence de Glitch', 'anima el logo Efeonce', 'qué modelo IA para un spot cinematográfico con personaje consistente', 'audita este motion']"
 ---
@@ -51,10 +54,11 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 > transición de UI, scroll-driven, micro-interacción o view transition → **NO es esta skill** →
 > `motion-design`/`gsap`/`greenhouse-microinteractions-auditor`. Ver §5 y `efeonce/MOTION_BOUNDARY.md`.
 
-> **"Humano + IA" de verdad.** Los módulos **01–08 son craft atemporal** (12 principios,
-> lenguaje de cámara, edición, sonido, grade): aplican igual si anima una persona o si genera
-> una IA. El **módulo 09 es el pipeline IA profesional**; el **10 es la orquestación híbrida**
-> (cuándo humano, cuándo IA, cuándo ambos). El estándar de calidad manda; la herramienta es medio.
+> **"Humano + IA" de verdad.** Los módulos **01–08 y 11 son craft atemporal** (12 principios,
+> lenguaje de cámara, edición, sonido, grade, VFX/compositing): aplican igual si anima una persona
+> o si genera una IA. El **módulo 09 es el pipeline IA profesional**; el **10 es la orquestación
+> híbrida**; el **11 suma VFX/compositing** (craft estable con capa AI-VFX volátil). El estándar de
+> calidad manda; la herramienta es medio.
 
 > **Sello de frescura.** Núcleo verificado **as-of 2026-07**. El **craft** (principios, cámara,
 > edición, sonido, grade) es **estable** y no se reverifica. El **landscape de video IA** es
@@ -68,7 +72,7 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 
 1. **Clasifica la intención** (§2). ¿Es producción cinematográfica/broadcast? Si es motion de UI
    runtime, **delega** (§5) y para.
-2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 10 — carga lo justo.
+2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 11 — carga lo justo.
 3. **Chequea frescura**: si vas a nombrar un modelo IA de video, feature o pipeline, reverifica
    (`SOURCES.md`).
 4. **Si hay que ejecutar** (dirigir/producir/editar/finalizar), abre `efeonce/STUDIO_TOOLING.md`
@@ -90,8 +94,10 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 - ¿Craft fino de **tipografía**? → **`typography-design`** (la tipo kinética lo usa).
 - ¿**Keyframes/stills** para alimentar image-to-video? → **`greenhouse-ai-image-generator`** / `design-studio`.
 - ¿Producir el **video IA** concreto? → **`higgsfield-*`** (esta skill dirige, ellos producen).
+- ¿**VFX / compositing** (keying/green screen, rotoscoping, tracking/matchmove, integración CGI,
+  simulaciones, cleanup, AI-VFX)? → **acá** (`modules/11`).
 - **Todo lo demás de motion cinematográfico** (concepto, storyboard, cámara, ritmo, mograph,
-  title sequence, edición, sonido, grade, pipeline IA, entrega de video) → **acá**.
+  title sequence, edición, sonido, grade, VFX, pipeline IA, entrega de video) → **acá**.
 
 ## 3. Módulos (carga selectiva)
 
@@ -107,6 +113,7 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 | 08 | `modules/08_COLOR_GRADE_FINISH.md` | color grading, LUTs, look dev, finishing, render, entregables |
 | 09 | `modules/09_AI_VIDEO_PIPELINE.md` | dirigir el pipeline IA (modelos, image-to-video, cámara, consistencia) |
 | 10 | `modules/10_PRODUCTION_STUDIO.md` | orquestar humano/IA/híbrido + gasto gobernado + handoff |
+| 11 | `modules/11_VFX_COMPOSITING.md` | compositing, keying, roto, tracking/matchmove, CGI, simulaciones, AI-VFX |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -118,7 +125,8 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   cámara/lente/focal, Soul ID para consistencia de personaje, LipSync — vía MCP), **Runway Gen-4.5**
   (cine dirigido, beats/coreografía de cámara), **Seedance** (refs + camera moves), **Kling** (Voice
   Binding), **Veo** (broadcast), **Gemini Omni** (edición conversacional).
-- **Producir (humano)**: After Effects (mograph), Blender/C4D (3D), Houdini (FX) — handoff con spec.
+- **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
+  (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).
 - **Editar + finalizar**: montaje, sonido, color grade, render, entrega (`modules/06`, `07`, `08`, `10`).
 
 > **Regla dura (director, no dictador).** El estudio **decide y dirige**, pero **producir/renderizar
@@ -160,7 +168,7 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 
 `templates/motion-brief.md` · `storyboard.md` · `animatic-shotlist.md` · `shot-prompt-sheet.md` ·
 `kinetic-type-spec.md` · `edit-decision-list.md` · `sound-design-brief.md` ·
-`motion-delivery-spec.md` · `motion-critique.md`
+`motion-delivery-spec.md` · `motion-critique.md` · `vfx-shot-breakdown.md`
 
 ## 8. Archivos de apoyo
 
