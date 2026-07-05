@@ -97,7 +97,9 @@ export const validateField = (
     return reasonToMessage(result.reasonCode, copy)
   }
 
-  if (field.maxLength && value.length > field.maxLength) {
+  if (field.maxLength && field.type === 'multiselect' && Array.isArray(raw)) {
+    if (raw.some(item => item.length > field.maxLength!)) return copy.errors.maxLength(field.maxLength)
+  } else if (field.maxLength && value.length > field.maxLength) {
     return copy.errors.maxLength(field.maxLength)
   }
 

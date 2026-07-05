@@ -512,7 +512,16 @@ export const CATEGORY_TAXONOMY: CategoryTaxonomy = {
       id: 'category:growth_operating_system',
       level: 'product_service_category',
       label: { es: 'Growth Operating System', en: 'Growth Operating System' },
-      aliases: ['growth operating system', 'growth os', 'asaas', 'agency as a service', 'ecosistema/socio estrategico'],
+      aliases: [
+        'growth operating system',
+        'growth os',
+        'asaas',
+        'agency as a service',
+        'ecosistema/socio estrategico',
+        'agencia o consultoria de crecimiento',
+        'agencia consultoria crecimiento',
+        'consultoria de crecimiento'
+      ],
       parentIds: ['sector:martech', 'sector:revenue_operations'],
       examples: ['ASaaS operating model', 'growth control plane'],
       status: 'active'

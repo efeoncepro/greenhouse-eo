@@ -24,7 +24,7 @@
 |---|---|---|---|---|
 | `/brand-visibility` landing | Entry, lead magnet positioning, form host | First fold pairs editorial thesis, signal preview and form host; later sections add report preview and trust notes. | Form appears immediately after thesis/signal preview; sections stack in the same order. | Think Astro page |
 | `<greenhouse-form>` | Governed data capture and submit | Embedded in a restrained panel, appearance bare, inherits container width with rich loading skeleton. | Full-width form host with stable spacing and visible focus. | Growth Forms renderer |
-| Analysis wait panel | Post-submit wait while grader runs | Replaces/occupies the form lane with report skeleton and steps toward the on-screen report. | Full-width panel below thesis; no fake progress or cramped animation. | Think route-local state |
+| Analysis wait panel | Post-submit wait while grader runs | Replaces the form lane with an enterprise analysis console: status chip, four governed stages, signal scan and live-region copy. | Full-width panel below thesis; no fake progress or cramped animation. | Think route-local state + GSAP |
 | Report screen | Primary completion | The user is redirected or linked to `/brand-visibility/r/<token>` when the governed contract exposes readiness. | Same route, responsive report. | Think report route |
 | Email delivery | Secondary recovery channel | Optional backup/link recovery, not primary UX completion. | Same. | Greenhouse email pipeline |
 | `/brand-visibility/r/[token]` | Private report destination | Existing report renderer, `noindex`. | Existing responsive report. | Think report route |
@@ -34,8 +34,8 @@
 1. Entry: user opens `/brand-visibility`; page is indexable and presents Brand Visibility Grader as the literal offer.
 2. Primary action: user reviews the lead magnet promise and fills the governed `<greenhouse-form>`.
 3. Transition: submit is handled by the renderer; Greenhouse accepts the submission and enqueues the grader path.
-4. Analysis wait: the form lane transitions into a rich analysis panel with report skeleton and steps toward the report. It may display real status only if a governed handle exists.
-5. Completion: when the governed status/token is ready, the page opens or offers `Abrir reporte` for `/brand-visibility/r/<token>`.
+4. Analysis wait: the form lane transitions into a rich analysis console with stage map, signal scan and copy that explains the governed wait. It may display real status only if a governed handle exists.
+5. Completion: when the governed status/token is ready, the page exposes `Abrir informe`, plays a short report-ready overlay, stores a short-lived arrival flag, and opens `/brand-visibility/r/<token>`.
 6. Recovery / exit: if the form cannot load, submit fails or origin authorization fails, the landing shows a safe degraded message and does not expose internals.
 
 ## Report-Aligned Wait Stages
@@ -46,17 +46,11 @@ Estas etapas derivan del reporte actual y sirven para orientar la espera. Solo p
 |---|---|---|---|
 | `accepted` | Form submission accepted | Confirmar que los datos entraron al flujo gobernado. | yes |
 | `queued` | Run creation | Explicar que el análisis se está preparando. | yes |
-| `engines` | Share of Model por motor | Anticipar consulta a motores de respuesta. | yes |
-| `competitive` | Share of Voice competitivo | Anticipar agrupación de menciones frente a competidores. | yes |
-| `citations` | Mapa de citabilidad | Anticipar lectura de fuentes citadas y dominio propio. | yes |
-| `readiness` | Operabilidad del sitio | Anticipar lectura estructural/agentic readiness. | yes |
-| `category` | Categoría percibida | Anticipar clasificación solo si hay evidencia suficiente. | yes |
-| `ladder` | Escalera de visibilidad | Anticipar síntesis en niveles de madurez. | yes |
-| `recommendations` | Brecha prioritaria | Anticipar armado de prioridad operativa. | yes |
+| `processing` | Executive summary / evidence model | Explicar que presencia, citabilidad, categoría y operabilidad se están preparando. | yes |
 | `ready` | Report screen | Abrir o enlazar el reporte privado. | yes |
 | `recovery_email` | Email delivery | Canal secundario si el usuario abandona o necesita recuperar el link. | n/a |
  
-La UI puede enseñar los nombres de estas etapas desde el inicio del wait state, pero no usar checkmarks, porcentajes, motores completados ni "listo" sin status real.
+La UI puede enseñar el mapa de cuatro etapas desde el inicio del wait state, pero no usar checkmarks, porcentajes, motores completados ni "listo" sin status real.
 
 ## Interaction Triggers
 
@@ -78,8 +72,8 @@ La UI puede enseñar los nombres de estas etapas desde el inicio del wait state,
 | form.loading | Renderer script or form contract is resolving. | Component mount | Contract success/error | Stable skeleton; no layout jump. |
 | form.ready | Governed form fields are available. | Contract success | User submits | Host does not duplicate fields or validation. |
 | form.submitting | Renderer is sending data to Greenhouse. | Native submit | Accepted/error | Disable duplicate submits via renderer behavior. |
-| analysis.waiting | Submission accepted and grader is underway. | Renderer success | Ready status/token, error, user exit | Report skeleton + steps toward report; no fake percentages. |
-| analysis.ready | Governed status reports a ready private report link/token. | Status/token reader | User opens report | CTA or redirect to report; only if URL/handle is provided by trusted contract. |
+| analysis.waiting | Submission accepted and grader is underway. | Renderer success | Ready status/token, error, user exit | Analysis console + stage map + signal scan; no fake percentages. |
+| analysis.ready | Governed status reports a ready private report link/token. | Status/token reader | User opens report | CTA plus automatic report-ready overlay/redirect; only if URL/handle is provided by trusted contract. |
 | form.accepted | Submission accepted for async grader. | Renderer success | analysis.waiting | Transitional fallback, not final UX. |
 | form.error | Submission failed or renderer returned safe error. | Renderer error | Retry/edit | Safe copy, no raw stack/API details. |
 | form.denied | Origin/surface is not authorized. | CORS/surface guard failure | TASK-1335/runtime fix | Pre-launch blocker, not acceptable as final. |
@@ -134,7 +128,7 @@ La UI puede enseñar los nombres de estas etapas desde el inicio del wait state,
 - Route: `/brand-visibility`
 - Viewports: 1440, 1280, 390
 - Required steps: load, assert indexable meta, capture entry settled state, wait for form host, keyboard-tab into form, capture form loading/ready, capture submit accepted/analysis wait in controlled safe mode, capture report-ready transition when governed token/status is available, scroll preview/flow/trust, verify no report token is indexed from the landing.
-- Required captures: desktop first fold, form loader, form ready, analysis wait, report-ready/transition, desktop full page, mobile first fold, mobile analysis wait, mobile full page, form accepted/degraded if safely reproducible.
+- Required captures: desktop first fold, form loader, form ready, analysis wait, report-ready overlay/transition, desktop full page, mobile first fold, mobile analysis wait, mobile full page, form accepted/degraded if safely reproducible.
 - Required `data-capture` markers: `brand-visibility-landing`, `brand-visibility-hero`, `brand-visibility-signal-preview`, `brand-visibility-form`, `brand-visibility-form-loader`, `brand-visibility-analysis`, `brand-visibility-report-preview`, `brand-visibility-flow`, `brand-visibility-trust`.
 - Assertions: no horizontal page overflow, no fake metrics/progress, no custom submit endpoint, route registered in `greenhouse.repo.json`, report token route remains noindex.
 - Scroll-width checks: run at desktop and 390px mobile.
@@ -143,7 +137,7 @@ La UI puede enseñar los nombres de estas etapas desde el inicio del wait state,
 
 ## Design Decision Log
 
-- Decision: cross-route flow with a public indexable lead magnet page, governed form, rich analysis wait state and private noindex report destination.
+- Decision: cross-route flow with a public indexable lead magnet page, governed form, rich GSAP analysis wait state, report-ready overlay and private noindex report destination.
 - Alternatives considered: iframe form, local Astro form, instant in-page report generation, marketing-only page before the form, spinner-only success state.
 - Why this pattern: it keeps Greenhouse as SSOT for form/submission/grader and lets Think remain the public renderer/hub while taking the user all the way to the on-screen report.
 - Reuse / extend / new primitive: reuse Growth Forms renderer and existing Think report route; no new primitive.

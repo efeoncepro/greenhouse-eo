@@ -8,8 +8,8 @@ import 'server-only'
  * - preserva validation/namePolicy/emailPolicy, consent, security, policies y destinations
  * - cambia solo el contrato browser-safe del form:
  *   - `style_variant=diagnostic_premium`
- *   - `ui_policy.composition=multi_step_light` con 3 pasos
- *   - labels/placeholders/help copy humanos para una experiencia enterprise
+ *   - `ui_policy.composition=multi_step_light` con 5 pantallas breves
+ *   - labels/placeholders/help copy y opciones guiadas para una experiencia enterprise
  *   - `successBehavior.tokenizedReport.statusPathTemplate` para el handoff Think
  * - publica una version nueva y depreca la anterior.
  *
@@ -39,22 +39,41 @@ const PRODUCTION_RUNTIME_REF = process.env.GREENHOUSE_GRADER_PREMIUM_RUNTIME_REF
 const GRADER_FORM_KEY = '69cd5269-5f97-4d32-99c4-0b23f41aa2f5'
 const STYLE_VARIANT = 'diagnostic_premium'
 const STATUS_PATH_TEMPLATE = '/api/public/growth/ai-visibility/run/{handle}'
+const TURNSTILE_SITE_KEY = '0x4AAAAAADqwX2R7v-k9pItv'
+
+const CAPTCHA_CONFIG = {
+  provider: 'turnstile',
+  required: true,
+  mode: 'invisible',
+  siteKey: TURNSTILE_SITE_KEY,
+  execution: 'submit',
+}
 
 const STEPS = [
   {
+    key: 'delivery',
+    label: 'Entrega',
+    fieldKeys: ['firstName', 'lastName', 'email'],
+  },
+  {
     key: 'brand',
-    label: 'Tu marca',
-    fieldKeys: ['brandName', 'websiteUrl', 'market', 'locale', 'category'],
+    label: 'Marca',
+    fieldKeys: ['brandName', 'websiteUrl'],
+  },
+  {
+    key: 'market',
+    label: 'Mercado',
+    fieldKeys: ['market', 'locale', 'category'],
   },
   {
     key: 'context',
-    label: 'Contexto competitivo',
-    fieldKeys: ['competitorsDeclared', 'industry', 'persona', 'companySize', 'mainChallenge'],
+    label: 'Contexto',
+    fieldKeys: ['competitorsDeclared', 'industry'],
   },
   {
-    key: 'contact',
-    label: 'Tus datos',
-    fieldKeys: ['firstName', 'lastName', 'email', 'consent'],
+    key: 'refine',
+    label: 'Confirmar',
+    fieldKeys: ['persona', 'companySize', 'mainChallenge', 'consent'],
   },
 ] as const
 
@@ -72,9 +91,18 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
     inputMode: 'url',
   },
   market: {
+    type: 'select',
     label: 'Mercado principal',
-    placeholder: 'ej. Chile, Mexico, LatAm',
-    maxLength: 80,
+    placeholder: 'Selecciona mercado',
+    options: [
+      { value: 'Chile', label: 'Chile' },
+      { value: 'Mexico', label: 'Mexico' },
+      { value: 'Colombia', label: 'Colombia' },
+      { value: 'Peru', label: 'Peru' },
+      { value: 'LatAm', label: 'LatAm' },
+      { value: 'Estados Unidos', label: 'Estados Unidos' },
+      { value: 'Global', label: 'Global' },
+    ],
   },
   locale: {
     type: 'select',
@@ -86,15 +114,31 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
     ],
   },
   category: {
+    type: 'select',
     label: 'Categoria donde compites',
-    placeholder: 'ej. Agencia de crecimiento, banca, retail',
-    maxLength: 140,
+    placeholder: 'Selecciona categoria',
+    options: [
+      { value: 'Agencia o consultoria de crecimiento', label: 'Agencia / consultoria de crecimiento' },
+      { value: 'SaaS o software B2B', label: 'SaaS / software B2B' },
+      { value: 'Retail o ecommerce', label: 'Retail / ecommerce' },
+      { value: 'Banca, seguros o fintech', label: 'Banca / seguros / fintech' },
+      { value: 'Educacion', label: 'Educacion' },
+      { value: 'Salud', label: 'Salud' },
+      { value: 'Turismo u hoteleria', label: 'Turismo / hoteleria' },
+      { value: 'Inmobiliaria o construccion', label: 'Inmobiliaria / construccion' },
+      { value: 'Servicios profesionales', label: 'Servicios profesionales' },
+      { value: 'Consumo masivo', label: 'Consumo masivo' },
+      { value: 'Tecnologia o telecomunicaciones', label: 'Tecnologia / telecomunicaciones' },
+      { value: 'Otra categoria', label: 'Otra categoria' },
+    ],
   },
   competitorsDeclared: {
-    type: 'textarea',
+    type: 'multiselect',
     label: 'Competidores de referencia',
-    placeholder: 'ej. Marca A, Marca B, Marca C',
-    maxLength: 280,
+    placeholder: 'Escribe una marca y presiona Enter',
+    freeEntry: true,
+    maxItems: 5,
+    maxLength: 80,
   },
   firstName: {
     label: 'Nombre',
@@ -114,19 +158,50 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
     validator: 'corporate_email',
   },
   industry: {
+    type: 'select',
     label: 'Industria',
-    placeholder: 'ej. Servicios profesionales, tecnologia, retail',
-    maxLength: 120,
+    placeholder: 'Selecciona industria',
+    options: [
+      { value: 'Servicios profesionales', label: 'Servicios profesionales' },
+      { value: 'Tecnologia', label: 'Tecnologia' },
+      { value: 'Retail', label: 'Retail' },
+      { value: 'Finanzas', label: 'Finanzas' },
+      { value: 'Educacion', label: 'Educacion' },
+      { value: 'Salud', label: 'Salud' },
+      { value: 'Manufactura', label: 'Manufactura' },
+      { value: 'Inmobiliaria', label: 'Inmobiliaria' },
+      { value: 'Turismo', label: 'Turismo' },
+      { value: 'Sector publico', label: 'Sector publico' },
+      { value: 'Otra industria', label: 'Otra industria' },
+    ],
   },
   persona: {
-    label: 'Rol o comprador principal',
-    placeholder: 'ej. CMO, founder, gerente comercial',
-    maxLength: 120,
+    type: 'select',
+    label: 'Quien usara el informe',
+    placeholder: 'Selecciona rol',
+    options: [
+      { value: 'Direccion general o founder', label: 'Direccion general / founder' },
+      { value: 'Marketing o CMO', label: 'Marketing / CMO' },
+      { value: 'Growth o performance', label: 'Growth / performance' },
+      { value: 'Comercial o ventas', label: 'Comercial / ventas' },
+      { value: 'Comunicaciones o PR', label: 'Comunicaciones / PR' },
+      { value: 'Producto o digital', label: 'Producto / digital' },
+      { value: 'Agencia o consultor', label: 'Agencia / consultor' },
+      { value: 'Otro equipo', label: 'Otro equipo' },
+    ],
   },
   companySize: {
+    type: 'select',
     label: 'Tamano de empresa',
-    placeholder: 'ej. 51-200 personas',
-    maxLength: 80,
+    placeholder: 'Selecciona tamano',
+    options: [
+      { value: '1-10 personas', label: '1-10 personas' },
+      { value: '11-50 personas', label: '11-50 personas' },
+      { value: '51-200 personas', label: '51-200 personas' },
+      { value: '201-500 personas', label: '201-500 personas' },
+      { value: '501-1000 personas', label: '501-1000 personas' },
+      { value: 'Mas de 1000 personas', label: 'Mas de 1000 personas' },
+    ],
   },
   mainChallenge: {
     label: 'Que quieres entender o mejorar',
@@ -134,7 +209,7 @@ const FIELD_UPDATES: Record<string, Record<string, unknown>> = {
     maxLength: 500,
   },
   consent: {
-    label: 'Acepto que Efeonce use estos datos para generar y enviarme mi informe.',
+    label: 'Autorizo a Efeonce a usar estos datos para generar mi informe y enviarme el resultado.',
   },
 }
 
@@ -142,10 +217,13 @@ const COPY_UPDATES: Record<string, string> = {
   submit: 'Generar mi analisis',
   'brandName.help': 'Usamos este nombre para buscar menciones y variaciones de tu marca.',
   'websiteUrl.help': 'Opcional, pero ayuda a leer citabilidad y operabilidad del sitio correcto.',
-  'market.help': 'Define el contexto donde la IA deberia entender y comparar tu marca.',
+  'market.help': 'Define el contexto donde la IA deberia entender, comparar y citar tu marca.',
   'locale.help': 'Ajusta el idioma base de lectura del reporte.',
-  'category.help': 'Ayuda a interpretar la categoria correcta, no a forzar un resultado.',
-  'competitorsDeclared.help': 'Opcional: escribe 1 a 3 marcas para orientar la comparacion.',
+  'category.help': 'Evita comparaciones equivocadas: elige la categoria mas cercana a tu competencia real.',
+  'competitorsDeclared.help': 'Opcional: agrega hasta 5 marcas. Usa Enter o coma para crear cada chip.',
+  'industry.help': 'Opcional. Afina el benchmark cuando tu categoria existe en varias industrias.',
+  'persona.help': 'Opcional. Ajusta el lenguaje de recomendaciones al equipo que tomara decisiones.',
+  'companySize.help': 'Opcional. Ayuda a calibrar recomendaciones segun madurez y escala.',
   'email.help': 'Usa tu correo corporativo para recibir y recuperar el informe.',
   'mainChallenge.help': 'Opcional: una frase basta. Evita informacion sensible.',
 }
@@ -188,17 +266,19 @@ const assertProductionRuntimeSupportsPremiumIntake = (): void => {
   const runtimeReady =
     renderer.includes("composition !== 'multi_step_light'") &&
     renderer.includes('buildTokenizedReportHandoff') &&
-    styles.includes('[data-ghf-style-variant="diagnostic_premium"]')
+    renderer.includes('renderTagMultiSelectControl') &&
+    styles.includes('[data-ghf-style-variant="diagnostic_premium"]') &&
+    styles.includes('.ghf-tag-input')
 
   if (runtimeReady) {
-    console.log(`\nRuntime guard: ${PRODUCTION_RUNTIME_REF} supports multi_step_light + premium + tokenized handoff.`)
+    console.log(`\nRuntime guard: ${PRODUCTION_RUNTIME_REF} supports multi_step_light + premium + chips + tokenized handoff.`)
 
     return
   }
 
   const message =
     `Premium grader activation would publish multi_step_light/diagnostic_premium/tokenizedReport, but ${PRODUCTION_RUNTIME_REF} ` +
-    'does not contain the renderer support. Release the code first, or pass --allow-runtime-pending only with an explicit rollback plan.'
+    'does not contain the renderer support for premium chips. Release the code first, or pass --allow-runtime-pending only with an explicit rollback plan.'
 
   if (!ALLOW_RUNTIME_PENDING) {
     console.error(`\nFAIL: ${message}`)
@@ -233,6 +313,10 @@ const withPremiumUiPolicy = (uiPolicy: unknown): Record<string, unknown> => ({
   ...asObject(uiPolicy),
   composition: 'multi_step_light',
   steps: STEPS,
+  security: {
+    ...asObject(asObject(uiPolicy).security),
+    captcha: CAPTCHA_CONFIG,
+  },
 })
 
 const withTokenizedSuccess = (successBehavior: unknown): Record<string, unknown> => ({
@@ -310,11 +394,12 @@ const main = async (): Promise<void> => {
   console.log('\nPlan:')
   console.log(`  - Clonar v${current.version}`)
   console.log(`  - Setear style_variant = ${STYLE_VARIANT}`)
-  console.log('  - Setear ui_policy.composition = multi_step_light con 3 pasos')
+  console.log('  - Setear ui_policy.composition = multi_step_light con 5 pantallas breves')
   console.log('  - Humanizar labels/placeholders/help copy de los campos del grader')
-  console.log('  - Cambiar competitorsDeclared de multiselect sin opciones a textarea opcional')
+  console.log('  - Convertir mercado/categoria/industria/rol/tamano en selectores gobernados')
+  console.log('  - Convertir competitorsDeclared en multiselect libre tipo chips')
   console.log('  - Añadir successBehavior.tokenizedReport.statusPathTemplate')
-  console.log('  - Preservar validation/emailPolicy, ui_policy.security.captcha, consent y policies')
+  console.log('  - Preservar validation/emailPolicy, consent y policies; asegurar ui_policy.security.captcha')
   console.log(`  - Copiar ${destinations.length} destino(s) de la version vigente`)
   console.log(`  - Publicar version nueva + deprecar ${current.form_version_id}`)
 

@@ -28,7 +28,7 @@
 | 1b | Signal preview | Dar sensacion enterprise del futuro reporte, sin presentar resultados ni progreso real. | Signal lanes / dimension chips | Static illustrative labels only |
 | 1c | Form host | Contenedor sobrio para el renderer gobernado, con fallback noscript/degraded y skeleton rico. | `<greenhouse-form>` + script loader | Greenhouse Growth Forms |
 | 2 | Report preview | Mostrar continuidad con el informe final sin inventar datos. | Report-preview tiles using Think report visual language | Static illustrative labels only |
-| 3 | Analysis wait panel | Reemplazar el form luego de accepted con report skeleton y pasos hasta mostrar el reporte en pantalla. | Route-local state panel | Renderer success event + governed report handle/token/status |
+| 3 | Analysis wait panel | Reemplazar el form luego de accepted con consola premium de análisis, cuatro etapas, señal visual y handoff al reporte. | Route-local state panel + GSAP | Renderer success event + governed status URL/report token |
 | 4 | How it works | Hacer explicito el loop: landing, form, grader async, loader, report token. | Four-step timeline | Static copy |
 | 5 | Diagnostic scope | Delimitar lo que el informe cubre y lo que no promete. | Method notes / proof strip | Static copy |
 | 6 | Trust / FAQ | Resolver dudas de privacidad, correo corporativo, tiempo y muestra. | FAQ list | Static copy + governed form behavior notes |
@@ -40,8 +40,8 @@ La landing se diseña desde el reporte real actual, no desde una landing genéri
 
 | Reporte actual | Landing pre-submit | Loader/post-submit | Prohibido antes del run |
 |---|---|---|---|
-| Hero navy + gauge | Hero navy/white hybrid con promesa `Brand Visibility Grader` y form visible. | El skeleton puede mostrar un contorno de gauge vacío mientras se arma el reporte. | Score, severidad, fecha, organización, ID. |
-| Resumen ejecutivo | Cuatro promesas compactas: presencia, motores, citabilidad, operabilidad. | Al preparar reporte, mostrar skeleton de executive snapshot. | Porcentajes, motor fuerte/débil, brecha. |
+| Hero navy + gauge | Hero navy/white hybrid con promesa `Brand Visibility Grader` y form visible. | Consola visual con anillos/scan SVG y `Visibilidad IA`, sin número ni severidad. | Score, severidad, fecha, organización, ID. |
+| Resumen ejecutivo | Cuatro promesas compactas: presencia, motores, citabilidad, operabilidad. | Cuatro tarjetas estáticas: Presencia, Citabilidad, Categoría, Operabilidad, todas en preparación. | Porcentajes, motor fuerte/débil, brecha. |
 | SoM por motor | Tira de motores evaluables con logos/nombres. | Etapa `Consultando motores de respuesta`. | Barras y estados por motor. |
 | SoV competitivo | Card "cuota de conversación frente a competidores". | Etapa `Agrupando menciones competitivas`, solo si status real lo permite. | Ranking/líder/brecha. |
 | Tono de mención | Card "cómo te describen cuando apareces". | Skeleton de sentiment sin valores. | Counts, donut, saldo. |
@@ -98,15 +98,16 @@ Orden recomendado en la landing:
 | `think.brandVisibility.landing.steps.2` | 3 | `Greenhouse ejecuta el grader en segundo plano.` | none | SSOT clear. |
 | `think.brandVisibility.landing.steps.3` | 3 | `Ves el avance mientras se prepara el reporte.` | none | Loader / wait state. |
 | `think.brandVisibility.landing.steps.4` | 3 | `Lees el reporte privado en Think.` | none | On-screen completion. |
-| `think.brandVisibility.landing.analysis.title` | 3 | `Estamos preparando tu reporte` | none | Post-submit panel. |
-| `think.brandVisibility.landing.analysis.body` | 3 | `El grader esta revisando senales de presencia, citabilidad, categoria y accionabilidad. Mantente en esta pantalla para abrir el reporte cuando este listo.` | none | No fake timing; screen-first. |
+| `think.brandVisibility.landing.analysis.kicker` | 3 | `Pipeline de análisis` | none | Post-submit panel. |
+| `think.brandVisibility.landing.analysis.title` | 3 | `Estamos construyendo tu informe privado` | none | Post-submit panel. |
+| `think.brandVisibility.landing.analysis.body` | 3 | `Recibimos tu solicitud y estamos esperando el estado gobernado del análisis.` | none | No fake timing; screen-first. |
+| `think.brandVisibility.landing.analysis.assurance` | 3 | `El reporte se abrirá en una ruta privada apenas Greenhouse confirme que está listo.` | none | Trust / wait reassurance. |
 | `think.brandVisibility.landing.analysis.stepAccepted` | 3 | `Solicitud recibida` | none | True after accepted. |
 | `think.brandVisibility.landing.analysis.stepQueued` | 3 | `Analisis en cola` | none | Only mark current if governed status confirms, otherwise static "siguiente". |
-| `think.brandVisibility.landing.analysis.stepEngines` | 3 | `Consultando motores` | none | Narrative only unless status confirms. |
-| `think.brandVisibility.landing.analysis.stepCitations` | 3 | `Mapeando citabilidad` | none | Narrative only unless status confirms. |
-| `think.brandVisibility.landing.analysis.stepReadiness` | 3 | `Revisando operabilidad` | none | Narrative only unless status confirms. |
-| `think.brandVisibility.landing.analysis.stepReport` | 3 | `Reporte privado en pantalla` | none | Primary handoff. |
+| `think.brandVisibility.landing.analysis.stepProcessing` | 3 | `Señales en preparación` | none | Current only when governed status is processing. |
+| `think.brandVisibility.landing.analysis.stepReport` | 3 | `Reporte privado` | none | Primary handoff. |
 | `think.brandVisibility.landing.analysis.readyCta` | 3 | `Abrir informe` | report URL if governed | Conditional only. |
+| `think.brandVisibility.landing.analysis.readyOverlay` | 3 | `Abriendo tu informe privado` | report URL if governed | Transition overlay copy. |
 | `think.brandVisibility.landing.trust.sample` | 4 | `El analisis usa una muestra acotada de prompts y motores. No reemplaza una auditoria completa ni garantiza posicionamiento.` | none | Legal/expectation safety. |
 | `think.brandVisibility.landing.faq.email.title` | 5 | `Por que pedimos correo corporativo` | none | Mirrors governed gate. |
 | `think.brandVisibility.landing.faq.email.body` | 5 | `El informe esta pensado para marcas y equipos reales. El form puede rechazar correos personales o temporales.` | none | Avoids surprise. |
@@ -124,8 +125,8 @@ Orden recomendado en la landing:
 | error | `No pudimos cargar el formulario` | `Intenta recargar la pagina. Si persiste, usa el contacto publico de Efeonce.` | `Reintentar` | Do not leak API/CORS details. |
 | denied | `Este formulario no esta disponible desde este origen` | `La superficie publica aun no esta autorizada para este form.` | none | Pre-launch/degraded evidence; should be blocked by TASK-1335. |
 | submitting | `Enviando solicitud` | `Estamos validando el form gobernado antes de iniciar el analisis.` | none | Renderer owns duplicate-submit prevention. |
-| analysis_wait | `Estamos preparando tu reporte` | `El grader revisa senales de presencia, citabilidad, categoria y accionabilidad. Mantente en esta pantalla para abrir el reporte cuando este listo.` | `Seguir esperando` | Rich post-submit state; no fake percentages. |
-| report_ready | `Tu informe esta listo` | `Puedes abrir el reporte privado en Think.` | `Abrir informe` | Only if a governed handle/status returns a report URL. |
+| analysis_wait | `Estamos construyendo tu informe privado` | `Recibimos tu solicitud y estamos esperando el estado gobernado del análisis.` | none | Rich post-submit state; no fake percentages. |
+| report_ready | `Tu informe privado está listo para abrirse en Think.` | `Estamos preparando una transición segura hacia el reporte.` | `Abrir informe` | Only if a governed handle/status returns a report URL. |
 | accepted | `Recibimos tu solicitud` | `El grader iniciara el analisis. Si no podemos mantener la espera en pantalla, te daremos una recuperacion segura.` | `Volver al inicio` | Fallback only, not desired final UX. |
 
 ## Accessibility Contract
@@ -142,7 +143,7 @@ Orden recomendado en la landing:
 - Route / surface: `efeonce-think` route `/brand-visibility` (`think.efeoncepro.com/brand-visibility`), public and indexable.
 - Primitives: Think `BaseLayout`; existing Think report visual language; governed `<greenhouse-form>`.
 - Variants / kinds: no Greenhouse MUI primitive. The web component uses `appearance="bare"` to inherit the public landing container.
-- Component candidates: Astro page `src/pages/brand-visibility/index.astro`; route-local `SignalPreview`, `FormLoadState`, `AnalysisWaitPanel` components if useful; optional local presentational components only if they do not duplicate the form renderer.
+- Component candidates: Astro page `src/pages/brand-visibility/index.astro`; route-local `BrandVisibilityFormDock.astro` owns the governed form host, analysis console, polling status messages and report-ready overlay; optional local presentational components only if they do not duplicate the form renderer.
 - Copy source: local Think landing copy module or constants near the route; avoid scattering reusable copy inside JSX/Astro markup.
 - Data reader / command: none in Think for submit. Report/status reader required for on-screen completion, but only through a governed handle/token returned by the renderer or public grader contract.
 - API parity: no local submit endpoint, no local validation, no local consent/Turnstile. The only command path is the governed form renderer.
@@ -156,8 +157,8 @@ Orden recomendado en la landing:
 - Scenario file: `scripts/frontend/scenarios/think-brand-visibility-landing.scenario.ts` or equivalent Think Playwright capture if GVC cannot target the external repo directly.
 - Route: `/brand-visibility` on local Think and staging/prod after deployment.
 - Viewports: desktop 1440, laptop 1280, mobile 390.
-- Required steps: load page, confirm meta indexability, capture entry settled state, wait for `<greenhouse-form>`, verify first fold contains lead magnet thesis + signal preview + form host, capture form loader/ready, capture analysis wait in controlled safe mode, capture transition to report when governed token/status is available, scroll through preview/flow/FAQ, trigger degraded state only in controlled local scenario if supported.
-- Required captures: first fold desktop, form loader, form ready, analysis wait, full page desktop, first fold mobile, mobile analysis wait, full page mobile, accepted/degraded state if reachable without fake production submission.
+- Required steps: load page, confirm meta indexability, capture entry settled state, wait for `<greenhouse-form>`, verify first fold contains lead magnet thesis + signal preview + form host, capture form loader/ready, capture analysis wait in controlled safe mode, capture report-ready overlay when governed token/status is available, scroll through preview/flow/FAQ, trigger degraded state only in controlled local scenario if supported.
+- Required captures: first fold desktop, form loader, form ready, analysis wait, report-ready overlay, full page desktop, first fold mobile, mobile analysis wait, full page mobile, accepted/degraded state if reachable without fake production submission.
 - Required `data-capture` markers: `brand-visibility-landing`, `brand-visibility-hero`, `brand-visibility-signal-preview`, `brand-visibility-form`, `brand-visibility-form-loader`, `brand-visibility-analysis`, `brand-visibility-report-preview`, `brand-visibility-flow`, `brand-visibility-trust`.
 - Assertions: no fake scores, no fake progress, no local form fields outside `<greenhouse-form>`, script loads from Greenhouse, route is indexable, report token route remains noindex.
 - Scroll-width checks: `document.documentElement.scrollWidth <= document.documentElement.clientWidth` at 1440 and 390.
@@ -166,7 +167,7 @@ Orden recomendado en la landing:
 
 ## Design Decision Log
 
-- Decision: first viewport combines lead magnet thesis, signal preview and form host; only after submit does it transition into an enterprise analysis wait panel and then the report.
+- Decision: first viewport combines lead magnet thesis, signal preview and form host; only after submit does it transition into a GSAP-orchestrated enterprise analysis console, report-ready overlay and then the report.
 - Alternatives considered: generic marketing hero above the fold; custom-built form; iframe embed; fake preview scores; spinner-only success.
 - Why this pattern: the page is the entry to the lead magnet; credibility belongs before submit, diagnosis/report belongs after the governed run.
 - Reuse / extend / new primitive: reuse Think shell/report language and Growth Forms renderer; do not create a new Greenhouse primitive.

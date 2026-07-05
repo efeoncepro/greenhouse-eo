@@ -171,20 +171,21 @@ export const RENDERER_CSS = `
   .ghf-textarea:focus-visible,
   .ghf-select:focus-visible,
   .ghf-tel-country:focus-visible,
-  .ghf-check input:focus-visible,
   .ghf-btn:focus-visible {
     outline: 2px solid var(--ghf-focus);
     outline-offset: 2px;
   }
   .ghf-input:focus-visible,
   .ghf-textarea:focus-visible,
-  .ghf-select:focus-visible {
+  .ghf-select:focus-visible,
+  .ghf-tag-input:focus-within {
     box-shadow: var(--ghf-field-shadow-focus);
   }
 
   .ghf-field[data-invalid="true"] .ghf-input,
   .ghf-field[data-invalid="true"] .ghf-textarea,
-  .ghf-field[data-invalid="true"] .ghf-select {
+  .ghf-field[data-invalid="true"] .ghf-select,
+  .ghf-field[data-invalid="true"] .ghf-tag-input {
     border-color: var(--ghf-error);
     background: var(--ghf-field-bg);
     box-shadow: 0 0 0 3px rgba(179, 35, 56, 0.10);
@@ -331,6 +332,87 @@ export const RENDERER_CSS = `
     color: var(--ghf-accent-contrast);
     font-weight: 700;
   }
+
+  .ghf-tag-input {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 44px;
+    width: 100%;
+    padding: 8px 10px;
+    color: var(--ghf-fg);
+    background: var(--ghf-field-bg);
+    border: 1px solid var(--ghf-border);
+    border-radius: var(--ghf-radius);
+    box-shadow: var(--ghf-field-shadow);
+    transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+  }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-tag-input {
+    min-height: 52px;
+    padding: 10px 12px;
+    border-radius: var(--ghf-radius);
+  }
+  .ghf-tag-input:hover { border-color: var(--ghf-border-strong); }
+  .ghf-tag-list { display: contents; }
+  .ghf-tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    min-height: 32px;
+    padding: 5px 6px 5px 11px;
+    border: 1px solid color-mix(in srgb, var(--ghf-accent) 36%, var(--ghf-border));
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--ghf-fg) 86%, var(--ghf-accent));
+    background: color-mix(in srgb, var(--ghf-accent) 9%, var(--ghf-field-bg));
+    font-size: 0.875rem;
+    line-height: 1.2;
+  }
+  .ghf-tag-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .ghf-tag-remove {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 24px;
+    block-size: 24px;
+    border: 0;
+    border-radius: 999px;
+    color: var(--ghf-muted);
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    font-size: 1rem;
+    line-height: 1;
+    transition: color 140ms ease, background-color 140ms ease, transform 140ms ease;
+  }
+  .ghf-tag-remove:hover {
+    color: var(--ghf-fg);
+    background: color-mix(in srgb, var(--ghf-accent) 14%, transparent);
+  }
+  .ghf-tag-remove:focus-visible {
+    outline: 2px solid var(--ghf-focus);
+    outline-offset: 2px;
+  }
+  .ghf-tag-entry {
+    flex: 1 1 12rem;
+    min-width: min(100%, 12rem);
+    min-height: 32px;
+    padding: 4px 2px;
+    border: 0;
+    outline: 0;
+    color: var(--ghf-fg);
+    background: transparent;
+    font: inherit;
+    line-height: 1.4;
+  }
+  .ghf-tag-entry::placeholder {
+    color: color-mix(in srgb, var(--ghf-muted) 78%, transparent);
+  }
+  .ghf-tag-entry:disabled { cursor: not-allowed; }
+
   .ghf-field[data-status="success"] .ghf-status-icon { display: block; color: var(--ghf-success); }
   .ghf-field[data-status="success"] .ghf-status-icon::before { content: "✓"; font-weight: 700; }
   .ghf-field[data-status="success"] .ghf-input { border-color: var(--ghf-success); padding-right: 36px; }
@@ -411,13 +493,86 @@ export const RENDERER_CSS = `
   .ghf-tel-input { flex: 1 1 auto; min-width: 0; }
   .ghf-field[data-invalid="true"] .ghf-tel-country { border-color: var(--ghf-error); }
 
-  .ghf-check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
-  .ghf-check input { width: 24px; height: 24px; flex: 0 0 auto; accent-color: var(--ghf-accent); }
-  .ghf-check span { font-size: 0.875rem; line-height: 1.45; }
+  .ghf-check {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid var(--ghf-border);
+    border-radius: var(--ghf-radius);
+    background: color-mix(in srgb, var(--ghf-field-bg) 94%, var(--ghf-accent));
+    cursor: pointer;
+    transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+  }
+  .ghf-check:hover {
+    border-color: var(--ghf-border-strong);
+    background: color-mix(in srgb, var(--ghf-field-bg) 90%, var(--ghf-accent));
+  }
+  .ghf-check input {
+    position: absolute;
+    inset-block-start: 12px;
+    inset-inline-start: 14px;
+    z-index: 1;
+    inline-size: 24px;
+    block-size: 24px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .ghf-check span {
+    position: relative;
+    min-height: 24px;
+    padding-inline-start: 36px;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: var(--ghf-fg);
+  }
+  .ghf-check span::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: 24px;
+    block-size: 24px;
+    border: 1.5px solid var(--ghf-border-strong);
+    border-radius: 7px;
+    background: var(--ghf-field-bg);
+    box-shadow: var(--ghf-field-shadow);
+    transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+  }
+  .ghf-check span::after {
+    content: "";
+    position: absolute;
+    display: none;
+    inset-block-start: 4px;
+    inset-inline-start: 9px;
+    inline-size: 6px;
+    block-size: 12px;
+    border: solid var(--ghf-accent-contrast);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .ghf-check input:checked + span::before {
+    border-color: var(--ghf-accent);
+    background: var(--ghf-accent);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--ghf-accent) 28%, transparent);
+  }
+  .ghf-check input:checked + span::after { display: block; }
+  .ghf-check input:focus-visible + span::before {
+    outline: 2px solid var(--ghf-focus);
+    outline-offset: 3px;
+  }
   .ghf-check a { color: var(--ghf-accent); }
 
   .ghf-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-  [data-ghf-style-variant="diagnostic_premium"] .ghf-actions { justify-content: center; }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-actions {
+    width: min(100%, 560px);
+    justify-content: center;
+    align-items: center;
+  }
   .ghf-btn {
     font: inherit; font-weight: 600;
     min-height: 44px; padding: 10px 20px;
@@ -433,10 +588,19 @@ export const RENDERER_CSS = `
     justify-content: center;
     gap: 10px;
     min-height: 52px;
-    min-width: min(100%, 420px);
+    min-width: 0;
     padding: 13px 26px;
     font-weight: 700;
     letter-spacing: 0 !important;
+  }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-actions .ghf-btn:not(.ghf-btn--ghost) {
+    flex: 1 1 300px;
+    max-width: 380px;
+  }
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-actions .ghf-btn--ghost {
+    flex: 0 0 auto;
+    min-width: 112px;
+    box-shadow: 0 8px 18px rgba(16, 24, 39, 0.06);
   }
   .ghf-btn-arrow {
     display: inline-block;
@@ -449,6 +613,20 @@ export const RENDERER_CSS = `
   .ghf-btn[aria-disabled="true"] { opacity: 0.7; cursor: progress; }
   .ghf-btn--ghost { background: transparent; color: var(--ghf-accent); border-color: var(--ghf-border-strong); }
 
+  @container (max-width: 520px) {
+    [data-ghf-style-variant="diagnostic_premium"] .ghf-actions {
+      width: 100%;
+      align-items: stretch;
+    }
+    [data-ghf-style-variant="diagnostic_premium"] .ghf-actions .ghf-btn,
+    [data-ghf-style-variant="diagnostic_premium"] .ghf-actions .ghf-btn--ghost,
+    [data-ghf-style-variant="diagnostic_premium"] .ghf-actions .ghf-btn:not(.ghf-btn--ghost) {
+      flex: 1 1 100%;
+      width: 100%;
+      max-width: none;
+    }
+  }
+
   /* TASK-1298 — hostile-host hardening.
      WordPress/Ohio can apply aggressive input/select/button declarations (including
      background images on selects and default dark button skins). These rules keep the
@@ -456,9 +634,11 @@ export const RENDERER_CSS = `
   greenhouse-form .ghf-form .ghf-input,
   greenhouse-form .ghf-form .ghf-textarea,
   greenhouse-form .ghf-form .ghf-select,
+  greenhouse-form .ghf-form .ghf-tag-input,
   .ghf-scope .ghf-form .ghf-input,
   .ghf-scope .ghf-form .ghf-textarea,
-  .ghf-scope .ghf-form .ghf-select {
+  .ghf-scope .ghf-form .ghf-select,
+  .ghf-scope .ghf-form .ghf-tag-input {
     font: inherit !important;
     color: var(--ghf-fg) !important;
     background: var(--ghf-field-bg) !important;
@@ -472,18 +652,22 @@ export const RENDERER_CSS = `
   greenhouse-form .ghf-form .ghf-input:focus-visible,
   greenhouse-form .ghf-form .ghf-textarea:focus-visible,
   greenhouse-form .ghf-form .ghf-select:focus-visible,
+  greenhouse-form .ghf-form .ghf-tag-input:focus-within,
   .ghf-scope .ghf-form .ghf-input:focus-visible,
   .ghf-scope .ghf-form .ghf-textarea:focus-visible,
-  .ghf-scope .ghf-form .ghf-select:focus-visible {
+  .ghf-scope .ghf-form .ghf-select:focus-visible,
+  .ghf-scope .ghf-form .ghf-tag-input:focus-within {
     box-shadow: var(--ghf-field-shadow-focus) !important;
   }
 
   greenhouse-form .ghf-form .ghf-field[data-invalid="true"] .ghf-input,
   greenhouse-form .ghf-form .ghf-field[data-invalid="true"] .ghf-textarea,
   greenhouse-form .ghf-form .ghf-field[data-invalid="true"] .ghf-select,
+  greenhouse-form .ghf-form .ghf-field[data-invalid="true"] .ghf-tag-input,
   .ghf-scope .ghf-form .ghf-field[data-invalid="true"] .ghf-input,
   .ghf-scope .ghf-form .ghf-field[data-invalid="true"] .ghf-textarea,
-  .ghf-scope .ghf-form .ghf-field[data-invalid="true"] .ghf-select {
+  .ghf-scope .ghf-form .ghf-field[data-invalid="true"] .ghf-select,
+  .ghf-scope .ghf-form .ghf-field[data-invalid="true"] .ghf-tag-input {
     border-color: var(--ghf-error) !important;
     background-color: var(--ghf-field-bg) !important;
     box-shadow: 0 0 0 3px rgba(179, 35, 56, 0.10) !important;
@@ -495,6 +679,18 @@ export const RENDERER_CSS = `
   .ghf-scope .ghf-form .ghf-tel-country {
     background-image: none !important;
     background-repeat: no-repeat !important;
+    text-transform: none !important;
+  }
+
+  greenhouse-form .ghf-form .ghf-tag-entry,
+  .ghf-scope .ghf-form .ghf-tag-entry {
+    font: inherit !important;
+    color: var(--ghf-fg) !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    letter-spacing: normal !important;
     text-transform: none !important;
   }
 
@@ -877,7 +1073,7 @@ export const RENDERER_CSS = `
   }
 
   @media (forced-colors: active) {
-    .ghf-input, .ghf-textarea, .ghf-select { border-color: ButtonText; }
+    .ghf-input, .ghf-textarea, .ghf-select, .ghf-tag-input, .ghf-check { border-color: ButtonText; }
     .ghf-btn { border-color: ButtonText; }
     .ghf-field[data-invalid="true"] .ghf-input { border-color: Mark; }
     .ghf-success-card,

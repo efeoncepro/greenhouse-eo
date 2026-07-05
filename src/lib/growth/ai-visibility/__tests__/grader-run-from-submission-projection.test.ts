@@ -10,11 +10,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const state = {
   submission: null as Record<string, unknown> | null,
   existingLead: null as string | null,
+  category: null as
+    | { nodeId: string; label: { es: string; en: string }; confidence: number; businessModel: string | null }
+    | null,
 }
 
 const spies = {
   enqueue: vi.fn(),
   insertLead: vi.fn(),
+  resolveCategory: vi.fn(),
 }
 
 vi.mock('@/lib/growth/ai-visibility/public-intake/forms-engine-binding', () => ({
@@ -42,6 +46,14 @@ vi.mock('@/lib/growth/ai-visibility/commands', () => ({
   },
 }))
 
+vi.mock('@/lib/growth/ai-visibility/brand-intelligence/resolve-public-brand-category', () => ({
+  resolvePublicBrandCategory: async (input: unknown) => {
+    spies.resolveCategory(input)
+
+    return state.category
+  },
+}))
+
 const graderSubmission = () => ({
   submission_id: 'fsub-1',
   form_id: 'fdef-ai-visibility-grader',
@@ -51,7 +63,7 @@ const graderSubmission = () => ({
     websiteUrl: 'https://efeoncepro.com',
     market: 'CL',
     locale: 'es-CL',
-    category: 'agencia',
+    category: 'Agencia o consultoria de crecimiento',
     competitorsDeclared: ['Acme'],
     email: 'prospecto@empresa.com',
     firstName: 'Ana',
@@ -66,8 +78,10 @@ const graderSubmission = () => ({
 beforeEach(() => {
   state.submission = graderSubmission()
   state.existingLead = null
+  state.category = null
   spies.enqueue.mockClear()
   spies.insertLead.mockClear()
+  spies.resolveCategory.mockClear()
 })
 
 describe('TASK-1251 — growthGraderRunFromSubmissionProjection', () => {
@@ -94,6 +108,11 @@ describe('TASK-1251 — growthGraderRunFromSubmissionProjection', () => {
     expect(enqueueArg.runKind).toBe('public_diagnostic')
     expect(enqueueArg.mode).toBe('light')
     expect(enqueueArg.idempotencyKey).toBe('fsub-1')
+    expect(enqueueArg.category).toBe('Growth Operating System')
+    expect(enqueueArg.categoryNodeId).toBe('category:growth_operating_system')
+    expect(enqueueArg.categoryConfidence).toBeGreaterThanOrEqual(0.5)
+    expect(enqueueArg.businessModel).toBe('b2b_service_provider')
+    expect(spies.resolveCategory).not.toHaveBeenCalled()
 
     expect(spies.insertLead).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -136,5 +155,42 @@ describe('TASK-1251 — growthGraderRunFromSubmissionProjection', () => {
       growthGraderRunFromSubmissionProjection.refresh({ entityType: 'growth_form_submission', entityId: 'fsub-1' }, {}),
     ).rejects.toThrow()
     expect(spies.insertLead).not.toHaveBeenCalled()
+  })
+
+  it('fallback: si la categoría declarada no mapea, usa brand-intelligence grounded antes del enqueue', async () => {
+    state.submission = {
+      ...graderSubmission(),
+      normalized_fields_json: {
+        ...(graderSubmission().normalized_fields_json as Record<string, unknown>),
+        category: 'Otra categoria',
+        industry: 'Otra industria',
+      },
+    }
+    state.category = {
+      nodeId: 'category:digital_agency',
+      label: { es: 'Agencia digital', en: 'Digital agency' },
+      confidence: 0.86,
+      businessModel: 'b2b_service_provider',
+    }
+
+    const { growthGraderRunFromSubmissionProjection } = await import('../../../sync/projections/growth-grader-run-from-submission')
+
+    await growthGraderRunFromSubmissionProjection.refresh({ entityType: 'growth_form_submission', entityId: 'fsub-1' }, {})
+
+    expect(spies.resolveCategory).toHaveBeenCalledWith(
+      expect.objectContaining({
+        brandName: 'Efeonce',
+        websiteUrl: 'https://efeoncepro.com',
+        hubspotIndustry: 'Otra industria',
+        telemetry: { submissionId: 'fsub-1' },
+      }),
+    )
+    expect(spies.enqueue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        category: 'Agencia digital',
+        categoryNodeId: 'category:digital_agency',
+        categoryConfidence: 0.86,
+      }),
+    )
   })
 })

@@ -21,7 +21,14 @@ import 'server-only'
 
 import { FORM_SUBMISSION_ACCEPTED_EVENT } from '@/lib/growth/forms/contracts'
 import { getSubmissionById } from '@/lib/growth/forms/store'
+import { resolvePublicBrandCategory } from '@/lib/growth/ai-visibility/brand-intelligence/resolve-public-brand-category'
 import { enqueueGraderDiagnostic } from '@/lib/growth/ai-visibility/commands'
+import {
+  CATEGORY_CONFIDENT_THRESHOLD,
+  UNKNOWN_CATEGORY_NODE_ID,
+  classifyBusinessModel,
+  resolveCanonicalCategory,
+} from '@/lib/growth/ai-visibility/taxonomy'
 import {
   GRADER_FORM_ID,
 } from '@/lib/growth/ai-visibility/public-intake/forms-engine-binding'
@@ -35,6 +42,66 @@ const asString = (value: unknown): string | null =>
 
 const asStringArray = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : []
+
+const resolveSubmissionCategory = async ({
+  brandName,
+  websiteUrl,
+  category,
+  industry,
+  submissionId,
+}: {
+  brandName: string
+  websiteUrl: string | null
+  category: string
+  industry: string | null
+  submissionId: string
+}): Promise<{
+  category: string
+  categoryNodeId: string
+  categoryLabel: string
+  categoryConfidence: number
+  businessModel: string | null
+} | null> => {
+  const deterministic = resolveCanonicalCategory({
+    industry: category,
+    freeTextCandidates: industry ? [industry] : [],
+  })
+
+  if (
+    deterministic.nodeId !== UNKNOWN_CATEGORY_NODE_ID &&
+    deterministic.label &&
+    deterministic.confidence >= CATEGORY_CONFIDENT_THRESHOLD
+  ) {
+    const businessModel = classifyBusinessModel({ categoryNodeId: deterministic.nodeId })
+
+    return {
+      category: deterministic.label.es,
+      categoryNodeId: deterministic.nodeId,
+      categoryLabel: deterministic.label.es,
+      categoryConfidence: deterministic.confidence,
+      businessModel: businessModel.businessModel === 'unknown' ? null : businessModel.businessModel,
+    }
+  }
+
+  if (!websiteUrl) return null
+
+  const grounded = await resolvePublicBrandCategory({
+    brandName,
+    websiteUrl,
+    hubspotIndustry: industry ?? category,
+    telemetry: { submissionId },
+  })
+
+  if (!grounded) return null
+
+  return {
+    category: grounded.label.es,
+    categoryNodeId: grounded.nodeId,
+    categoryLabel: grounded.label.es,
+    categoryConfidence: grounded.confidence,
+    businessModel: grounded.businessModel,
+  }
+}
 
 export const growthGraderRunFromSubmissionProjection: ProjectionDefinition = {
   name: 'growth_grader_run_from_submission',
@@ -94,6 +161,19 @@ export const growthGraderRunFromSubmissionProjection: ProjectionDefinition = {
     }
 
     const websiteUrl = asString(fields.websiteUrl)
+
+    const resolvedCategory = await resolveSubmissionCategory({
+      brandName,
+      websiteUrl,
+      category,
+      industry: asString(fields.industry),
+      submissionId,
+    })
+
+    if (!resolvedCategory) {
+      return `grader_run_from_submission skip: submission ${submissionId} categoría no resuelta → sin run`
+    }
+
     const competitorsDeclared = asStringArray(fields.competitorsDeclared)
 
     // Encolar el run (EMAIL NUNCA acá). Idempotente por submissionId.
@@ -102,7 +182,11 @@ export const growthGraderRunFromSubmissionProjection: ProjectionDefinition = {
       websiteUrl,
       market,
       locale,
-      category,
+      category: resolvedCategory.category,
+      categoryNodeId: resolvedCategory.categoryNodeId,
+      categoryLabel: resolvedCategory.categoryLabel,
+      categoryConfidence: resolvedCategory.categoryConfidence,
+      businessModel: resolvedCategory.businessModel,
       competitorsDeclared,
       mode: 'light',
       runKind: 'public_diagnostic',
@@ -119,7 +203,7 @@ export const growthGraderRunFromSubmissionProjection: ProjectionDefinition = {
       brandName,
       websiteUrl,
       market,
-      category,
+      category: resolvedCategory.category,
       industry: asString(fields.industry),
       persona: asString(fields.persona),
       companySize: asString(fields.companySize),

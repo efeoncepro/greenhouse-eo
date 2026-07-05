@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/public/growth/forms/cors'
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 import { checkPublicReadAllowed } from '@/lib/growth/ai-visibility/public-delivery/read-guard'
 import { readPublicGraderRunStatus } from '@/lib/growth/ai-visibility/public-delivery/status-reader'
@@ -22,13 +23,20 @@ const getClientIp = (request: Request): string | null =>
  */
 export const dynamic = 'force-dynamic'
 
+const METHODS = 'GET, OPTIONS'
+
+export function OPTIONS(request: Request) {
+  return publicFormsOptionsResponse(request, METHODS)
+}
+
 export async function GET(request: Request, { params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params
+  const headers = await publicFormsCorsHeaders(request, METHODS)
 
   try {
     // Rate-limit proporcional por IP (sin gasto LLM). El handle no enumerable es la protección de fondo.
     if (!(await checkPublicReadAllowed(getClientIp(request), 'status'))) {
-      return NextResponse.json({ error: GH_GROWTH_AI_VISIBILITY.public_read_rate_limited }, { status: 429 })
+      return NextResponse.json({ error: GH_GROWTH_AI_VISIBILITY.public_read_rate_limited }, { status: 429, headers })
     }
 
     const status = await readPublicGraderRunStatus(handle)
@@ -40,14 +48,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ hand
         message: status.reason,
         retryAfterSeconds: status.retryAfterSeconds,
       },
-      { status: status.status === 'not_found' ? 404 : 200 },
+      { status: status.status === 'not_found' ? 404 : 200, headers },
     )
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_public_run_status_route' } })
 
     return NextResponse.json(
       { error: 'No fue posible consultar el estado. Intenta de nuevo en unos minutos.' },
-      { status: 502 },
+      { status: 502, headers },
     )
   }
 }
