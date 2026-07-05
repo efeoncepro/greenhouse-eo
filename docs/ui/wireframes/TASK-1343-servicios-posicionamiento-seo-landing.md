@@ -63,7 +63,54 @@
 | `…faq.h2` | 8 | Preguntas frecuentes | — | JSON-LD FAQPage |
 | `…final.h2` | 9 | Empieza por saber dónde estás | — | cierre |
 
-> Copy pendiente de draft final (validar con `greenhouse-ux-writing`): pilares con métrica real, textos de prueba/casos, ítems FAQ (poblar con `phrase_questions` Semrush CL), "cómo trabajamos". NO inventar cifras de resultados sin caso real (regla de voz: prueba > hype).
+> Copy pendiente de draft final (validar con `greenhouse-ux-writing`): pilares con métrica real, textos de prueba/casos, "cómo trabajamos". NO inventar cifras de resultados sin caso real (regla de voz: prueba > hype). El FAQ ya tiene research/mining hecho → ver sección **FAQ — Research & Mining** abajo.
+
+## FAQ — Research & Mining (Semrush, as-of 2026-07-05)
+
+> Mining hecho con Semrush `phrase_questions`. **Hallazgo:** el volumen de
+> preguntas SEO en Chile (`cl`) es bajo y mayormente definicional/how-to
+> (top-of-funnel); "agencia seo" no arroja preguntas en CL. Se usó **España
+> (`es`)** como referencia de patrón en el **mismo idioma** (mercado con más
+> volumen) para las preguntas de **decisión de compra** — el buyer chileno tiene
+> el mismo JTBD. Regla del operador: **el FAQ es del SERVICIO que prestamos**
+> (agencia de posicionamiento), no definiciones genéricas. Por eso se combinan 3
+> fuentes: (a) decisión-de-compra mineada (ES), (b) definicional/diagnóstico
+> mineado (CL), (c) objeciones de venta (JOLT) que no tienen volumen de búsqueda
+> pero SON las preguntas reales en la conversación comercial.
+
+### Datos crudos mineados (queries reales, volumen/mes)
+
+- **`es` — "agencia seo" (decisión de compra, alta relevancia de servicio):**
+  cómo elegir una agencia seo (50) · qué métricas pedir a agencia de seo (40) ·
+  cuál es la mejor agencia seo para ecommerce (30) · cómo contratar una agencia
+  seo (20) · por qué contratar una agencia de seo (10) · qué es una agencia de seo.
+- **`cl` — "seo" (definicional):** qué es el marketing seo (30) · por qué es
+  importante el seo (20) · qué es seo y sem en marketing digital (20) · qué es el
+  seo y cómo funciona (10) · cómo funciona el seo.
+- **`cl` — "posicionamiento web/en google" (how-to/diagnóstico, vol. bajo/long-tail):**
+  cómo posicionar mi página web en google · cómo funciona el posicionamiento en
+  google · por qué no me posiciono en google · cómo mejorar el posicionamiento web.
+
+### FAQ curado (candidatos a implementar — answer-first, es-CL, mecanicista)
+
+> Answer capsules 40–60 palabras (citables por IA) → alimentan `JSON-LD FAQPage`.
+> Draft final de respuestas en Slice 2 con `greenhouse-ux-writing`. Sin cifras
+> inventadas; sin precio commodity.
+
+| # | Pregunta (es-CL) | Fuente | Dirección de respuesta |
+|---|---|---|---|
+| 1 | ¿Cómo elijo una agencia de SEO? | mined ES (50) | Qué mirar: método medible + transparencia + casos reales; desconfía de quien promete el #1. |
+| 2 | ¿Qué métricas debo exigirle a una agencia SEO? | mined ES (40) | Tráfico orgánico calificado, posiciones, conversiones, share of voice — y visibilidad en IA. No vanity metrics. |
+| 3 | ¿Cuánto tarda el SEO en dar resultados? | objeción JOLT | Honesto: primeros movimientos en semanas, resultados sólidos en 3–6 meses; depende del punto de partida (lo diagnostica el grader). |
+| 4 | ¿Cuánto cuesta el posicionamiento SEO? | objeción JOLT | Framing valor/alcance, sin "desde $X" (repele al ICP); depende del estado actual y objetivo. |
+| 5 | ¿SEO o Google Ads? | objeción JOLT | Complementarios: Ads es grifo (pagas y aparece), SEO es activo compuesto que baja el costo de adquisición en el tiempo. |
+| 6 | ¿El SEO sigue sirviendo con la IA y los AI Overviews? | objeción JOLT + diferenciador | Sí, y más: el cimiento SEO es lo que te hace citable por la IA. Puente a `/servicios/aeo`. |
+| 7 | ¿Por qué no aparezco en Google? | mined CL | Causas típicas (técnico/contenido/entidad) → gancho al diagnóstico (grader). |
+| 8 | ¿Por qué es importante el SEO para mi empresa? | mined CL (20) | Demanda de alta intención + activo propio vs alquilar tráfico. |
+| 9 | ¿Trabajan con mi industria / mi CMS? | objeción JOLT | Sí; el método (técnico+contenido+entidad) aplica transversal; ejemplos por vertical. |
+
+> Nota: #6 es el puente al AEO (diferenciador); #3 y #7 son ganchos naturales al
+> grader. Ordenar el acordeón por relevancia comercial, no por volumen.
 
 ## State Copy
 
