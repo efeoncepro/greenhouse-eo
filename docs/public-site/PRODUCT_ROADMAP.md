@@ -20,6 +20,10 @@ superficies se ordenan por los 5 niveles — **Be Found · Readable · Correct �
 Actionable · Intrinsic**. SEO cubre el cimiento (Found/Readable); AEO cubre el
 filo (Correct/Actionable/Intrinsic).
 
+El sitio público es la **capa de adquisición** del ecosistema digital Efeonce
+(modelo de capas en [PDR-003](decisions/PDR-003-layering-ecosistema-digital-efeonce.md):
+adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kortex/Verk).
+
 ## Estado actual (baseline)
 
 | Superficie | Estado | Rol | Fuente |

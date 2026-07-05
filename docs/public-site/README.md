@@ -34,6 +34,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   decisiones de producto/posicionamiento, más blando que un ADR.
   - [PDR-001 — Landing SEO complementaria al AEO](decisions/PDR-001-seo-landing-complementaria-al-aeo.md)
   - [PDR-002 — Arquitectura de información de la sección de visibilidad](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md)
+  - [PDR-003 — Layering del ecosistema digital Efeonce](decisions/PDR-003-layering-ecosistema-digital-efeonce.md)
 
 ## Contexto canónico (fuentes que este espacio NO reimplementa)
 
