@@ -146,7 +146,7 @@ mide cada canal. Nunca saltes a "hagamos TikTok" sin objetivo/audiencia/mensaje.
 | Posicionamiento en digital, **arquitectura de mensaje**, sistema de marca online, awareness, brand vs performance | `modules/01_BRAND_MESSAGING.md` |
 | **Content marketing**: estrategia editorial, formatos, distribución, repurposing, thought leadership, content-led demand, GEO como canal | `modules/02_CONTENT_MARKETING.md` |
 | **Paid media / performance advertising**: Google/Meta/LinkedIn/TikTok, PMax/Advantage+, programmatic, retargeting, cuentas, bidding, presupuesto, creative testing, signal loss, IA | `modules/03_PAID_MEDIA.md` ⭐ |
-| **Social orgánico + comunidad**: estrategia por plataforma, calendario, comunidad, UGC, creator/influencer, dark social | `modules/04_ORGANIC_SOCIAL_COMMUNITY.md` |
+| **Social orgánico + comunidad** (nivel canal/estrategia): rol de social en el mix, calendario dentro de la campaña integrada | `modules/04_ORGANIC_SOCIAL_COMMUNITY.md` — para **ejecución profunda por red** (algoritmos/formatos/comunidad/creator/social commerce/producción + programar con Metricool) → skill **`social-media-studio`** |
 | **Creatividad y video**: creative strategy, creative-as-targeting, hooks, formatos, video-first, UGC ads, IA creativa | `modules/05_CREATIVE_VIDEO.md` |
 | **Email marketing / automation como canal**: newsletters, campañas, nurture/drip, segmentación, MAP | `modules/06_EMAIL_MARKETING_AUTOMATION.md` |
 | **Campañas integradas / GTM launches**: orquestación multicanal, messaging architecture, calendarios, presupuesto, PR digital, influencer, **ABM** | `modules/07_INTEGRATED_CAMPAIGNS.md` |
