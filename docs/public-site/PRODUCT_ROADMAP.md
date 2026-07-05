@@ -23,7 +23,7 @@ filo (Correct/Actionable/Intrinsic).
 ## Estado actual (baseline)
 
 | Superficie | Estado | Rol | Fuente |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `/aeo-2` (servicio AEO) | Live | Filo / diferenciador | EPIC-020 · skill `efeonce-public-site-wordpress` |
 | AI Visibility Grader (lead magnet) | Motor robusto (eje AEO); hub en `think.efeoncepro.com` | Gancho compartido | EPIC-020 · grader architecture |
 | Programa SEO (Search Visibility 360) | Planificado (ADR Accepted, tasks fundacionales) | Motor de datos SEO | EPIC-022 |
@@ -31,20 +31,25 @@ filo (Correct/Actionable/Intrinsic).
 
 ## Now
 
-- **PDR-001 — Landing SEO complementaria al AEO.** Decidido el posicionamiento:
-  landing SEO como *cimiento* de la promesa de visibilidad (no commodity),
-  hermana de `/aeo-2`, con el grader como gancho compartido. Siguiente paso
-  abierto: arquitectura de información (¿pillar `/visibilidad` con hijas, o dos
-  landings hermanas?). Ver [PDR-001](decisions/PDR-001-seo-landing-complementaria-al-aeo.md).
+- **PDR-001 — Landing SEO complementaria al AEO** (decidido): posicionamiento SEO
+  como *cimiento* de la promesa de visibilidad (no commodity), hermana de
+  `/aeo-2`. Ver [PDR-001](decisions/PDR-001-seo-landing-complementaria-al-aeo.md).
+- **PDR-002 — Arquitectura de información** (decidida la estructura): pillar-cluster
+  anidado `/visibilidad/{seo,aeo}` + 301 desde `/aeo-2`. El **AI Visibility Grader
+  es un nodo de primera clase** del ecosistema digital Efeonce (servido desde
+  `think.efeoncepro.com`) y el nodo de conversión al que el cluster hace funnel —
+  no un CTA colgado. Ver [PDR-002](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md).
 
 ## Next
 
-- Definir la **arquitectura de información** de la sección de servicios de
-  visibilidad (URLs + qué va en cada página + dónde entra el grader). Bloquea el
-  copy y el build de la landing SEO.
-- Extender el **lead magnet** del eje AEO al eje SEO (EPIC-022 "Search Visibility
+- **Inventario de URLs por crawl vivo** de `efeoncepro.com` (exigido por el
+  route-ownership matrix) para fijar el slug final (top-level `/visibilidad` vs
+  `/servicios/visibilidad`) y dimensionar el 301 de `/aeo-2`. Bloquea el build.
+- Extender el **nodo grader** del eje AEO al eje SEO (EPIC-022 "Search Visibility
   360") para que la landing SEO tenga un diagnóstico de producto real detrás, no
   solo un formulario.
+- Bajar PDR-001/PDR-002 a **TASK** bajo EPIC-019 (landing control plane) /
+  EPIC-022 (SEO): pillar + hija SEO + 301, con copy y build.
 
 ## Later
 

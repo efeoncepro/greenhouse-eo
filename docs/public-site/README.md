@@ -16,7 +16,7 @@ ejecutan y por qué. Es la capa narrativa que ata los EPICs, los ADR de
 arquitectura y las skills en una sola historia de producto.
 
 | Sí vive acá | NO vive acá → va a |
-|---|---|
+| --- | --- |
 | Decisiones de producto/posicionamiento/GTM del sitio (PDR) | Decisiones de **arquitectura** (contratos técnicos) → `architecture/DECISIONS_INDEX.md` (ADR) |
 | Roadmap/secuencia de ejecución del sitio (now/next/later) | Programas de trabajo ejecutables → `docs/epics/` (EPIC-###) |
 | El "por qué" comercial de cada superficie | Unidades ejecutables → `docs/tasks/` (TASK-###) |
@@ -33,6 +33,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 - **[decisions/](decisions/)** — Product Decision Records (PDR). Log de
   decisiones de producto/posicionamiento, más blando que un ADR.
   - [PDR-001 — Landing SEO complementaria al AEO](decisions/PDR-001-seo-landing-complementaria-al-aeo.md)
+  - [PDR-002 — Arquitectura de información de la sección de visibilidad](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md)
 
 ## Contexto canónico (fuentes que este espacio NO reimplementa)
 
