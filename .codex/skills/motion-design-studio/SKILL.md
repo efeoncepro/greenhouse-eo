@@ -181,6 +181,9 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `ANTIPATTERNS.md` — los errores que arruinan una animación.
 - `workflows/` — **biblioteca viva de recetas creativas validadas** (`README.md` índice + un archivo por
   workflow). Crece con cada producción: cuando algo funciona, se documenta acá.
+- `spot-studio/SPOT_STUDIO.md` — **sistema de producción de spots** (IA + humano): pipeline por etapas +
+  gates que garantizan el acabado final + lanes (UI-crisp/Omni/product-real) + checklists (animatic gate,
+  finish pre-flight) + 4 pilares. Léelo al producir un **spot/brand film completo** (no una toma suelta).
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `MOTION_BOUNDARY.md`, `CLIENT_DELIVERY.md`,
   y el **par Gemini Omni**: **`GEMINI_OMNI_VERTEX.md`** (contrato operativo: endpoint/auth/pricing/gotchas +
   §9.1 capacidades verificadas en vivo) + **`GEMINI_OMNI_CAPABILITIES.md`** (catálogo a todo nivel + **mapa
