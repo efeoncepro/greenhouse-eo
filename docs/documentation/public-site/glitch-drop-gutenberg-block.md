@@ -193,6 +193,37 @@ The block should feel like an editorial aside, not an external quote:
 - motion is not required in V1. If introduced later, guard with
   `prefers-reduced-motion`.
 
+### Approved visual direction (TASK-1337, operator-approved 2026-07-04)
+
+Canonical visual spec: `docs/ui/wireframes/TASK-1337-glitch-gutenberg-block.md`
+(`## Visual Design Spec` + `## Motion`). Implementation follows it; the summary
+below is the load-bearing subset.
+
+- Pattern: an editorial callout (GitHub `Note` / Stripe callout family), not a
+  quote and not a promo widget. Strip citation codes (quotation mark, italic
+  body, centered pull-text, bare rule, `— source`); apply authored-annotation
+  codes.
+- `.gh-glitch-drop__label` renders the **brand wordmark** (`glitch-light.svg`) at
+  eyebrow scale (~18–20px tall), not plain text. The consuming runtime is
+  WordPress, so copy the SVG into the plugin (`efeonce-editorial-blocks/**`) and
+  keep the visible/accessible name `Glitch`.
+- Surface: faint navy-tinted panel — `color-mix(in oklch, #022a4e, white 95%)`
+  (≈`#f1f4f7`). No gradient, no heavy shadow. `border-radius: 12px`, padding
+  `20–24px` desktop / `16px` mobile, vertical margin `~32px`.
+- Accent: `3px` left bar in navy `#022a4e` (or navy @ 60–70%).
+- Color a11y (hard rule): Glitch green `#6ec207` is ~2.25:1 on white — below the
+  4.5:1 text floor and the 3:1 UI-component floor. Use it **only as the isotype
+  inside the wordmark**, never for text, borders, separators or state. Navy ink
+  + panel tint carry all functional separation.
+- Body: `.gh-glitch-drop__content` is upright regular `400` (never italic), at
+  the Ohio blog body size or one step up (~18px) — it is primary content, not a
+  footnote. `line-height: 1.5–1.6`, left-aligned.
+- Tone variants (`insight|risk|opportunity|operator`): deferred in V1; if added
+  later, change only a small secondary signal, never the whole card color, and
+  never as the only cue.
+- Dark context: swap to `glitch-dark.svg` (white wordmark) on a solid-navy
+  surface; ship light in V1 (Ohio blog is light).
+
 ## Migration Strategy
 
 Recommended rollout:

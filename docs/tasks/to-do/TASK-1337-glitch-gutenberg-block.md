@@ -15,13 +15,13 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `primitive`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1337-glitch-gutenberg-block.md`
 - Flow: `none`
 - Motion: `docs/ui/motion/TASK-1337-glitch-gutenberg-block-motion.md`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Diseno aprobado`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `none`
@@ -116,6 +116,7 @@ Reglas obligatorias:
 
 ### Already exists
 
+- The visual design is operator-approved (2026-07-04): editorial callout pattern, wordmark label, upright body, navy accent + navy-tint panel, green as isotype-only. Full spec in the wireframe `## Visual Design Spec` + `## Motion`; verified against an Artifact comparison preview (core/quote vs Glitch, desktop + 390px). Implementation must follow that spec, not re-decide it.
 - The functional/technical block contract exists at `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 - The public-site primitive registry includes planned primitive `Glitch`.
 - Gutenberg authoring recipes now treat `efeoncepro/glitch-drop` as the target for Efeonce POV in `Glitch de la semana`.

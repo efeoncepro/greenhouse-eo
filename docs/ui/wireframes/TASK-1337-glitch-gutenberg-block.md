@@ -2,7 +2,8 @@
 
 ## Meta
 
-- Status: `draft`
+- Status: `approved`
+- Approval: operator-approved 2026-07-04 via Artifact comparison preview (core/quote vs Glitch, desktop + mobile 390px); design grounded in `modern-ui` + `typography-design`.
 - Owner task: `TASK-1337`
 - Motion contract: `docs/ui/motion/TASK-1337-glitch-gutenberg-block-motion.md`
 - Product Design asset: `none`
