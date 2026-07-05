@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1337-glitch-gutenberg-block-motion.md`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseno aprobado`
+- Status real: `Live-verified (plugin activo en prod); pendiente captura visual en Ohio`
 - Rank: `TBD`
 - Domain: `public-site|content|ui`
 - Blocked by: `none`
@@ -32,6 +32,14 @@
 ## Summary
 
 Implementar un bloque Gutenberg propio para el POV editorial de `Glitch de la semana`: visible como **Glitch**, técnico como `efeoncepro/glitch-drop`. El bloque reemplaza el uso semánticamente incorrecto de `core/quote` para comentarios de Efeonce, sin migrar posts históricos en V1.
+
+## Delta 2026-07-04 — Implementación + verificación live
+
+- **Slices 1–2 (scaffold + bloque):** plugin nuevo build-less `efeonce-editorial-blocks` en el runtime repo (`wp-content/plugins/efeonce-editorial-blocks/`), block `efeoncepro/glitch-drop` (`block.json` apiVersion 3 dynamic + `index.js` con globals `wp.*` + `render.php` `aside` + `style.css` scoped + `glitch-mark.svg` byte-exacto). Commit runtime repo `76d629e`.
+- **Slice 3 (verificación):** estática (php -l, block.json schema, node --check, render harness 10/10) **+ LIVE**: desplegado a Kinsta y activado en producción efeoncepro.com (WP 7.0), verificado end-to-end por WP-CLI gobernado — registrado, `parse_blocks` sin invalid block, `do_blocks` rinde `aside` con `aria-label` y sin `blockquote`, UTF-8 OK, post privado de prueba borrado (rollback limpio). Autorizado por el operador.
+- **Slice 4 (docs):** contrato (§Implementation as-built), PRIMITIVES (`canonical/block`), manual `docs/manual-de-uso/public-site/glitch-editorial-block.md`.
+- **Residual no bloqueante:** captura visual en el contexto Ohio (desktop + 390px, sin overflow) con CSS aplicado, e insert/save/reload en la UI del editor por un humano. El markup live ya está confirmado y el CSS es scoped + validado.
+- **Open Questions resueltas:** Q1 → plugin NUEVO `efeonce-editorial-blocks` (ningún plugin existente es de bloques Gutenberg). Q2 → `tone` DIFERIDO en V1 (restraint; decisión de diseño aprobada).
 
 ## Why This Task Exists
 

@@ -252,6 +252,67 @@ Before calling V1 ready:
 - Existing quote/freeform blocks in old posts are not broken.
 - Kinsta cache purge and rollback path are known before any live plugin change.
 
+## Implementation (as-built, V1 — TASK-1337, 2026-07-04)
+
+The block was implemented in the public-site runtime repo. This section is the
+authoritative as-built contract; where it differs from the earlier
+recommendations above, the as-built wins (the recommendations are kept for
+history + rationale).
+
+- Plugin: **new** `efeonce-editorial-blocks` (dedicated editorial-blocks
+  plugin — no existing plugin is a Gutenberg-blocks host; `eo-elementor-widgets`
+  is Elementor). Path in runtime repo:
+  `wp-content/plugins/efeonce-editorial-blocks/`.
+- Block source: `src/glitch-drop/` → `block.json`, `index.js`, `render.php`,
+  `style.css`, `glitch-mark.svg`. Registered server-side via
+  `register_block_type( __DIR__ . '/src/glitch-drop' )` on `init`.
+- **Build-less on purpose.** The runtime is a raw-file deploy rail to Kinsta with
+  no bundler step, so `index.js` is hand-authored against the `wp.*` globals
+  (`wp.blocks`, `wp.blockEditor`, `wp.element`, `wp.i18n`) — no JSX, no
+  `@wordpress/scripts`. This matches the repo convention (PHP + raw assets) and
+  avoids committing/serving compiled artifacts that nothing rebuilds on deploy.
+- **`content` has no `source`** (stored in the block comment delimiter), not the
+  earlier `source: html` suggestion. Reason: the block is **dynamic**
+  (`save() => null`, `render.php` owns markup). A dynamic block with
+  `source: html` + `save: null` would have no saved markup to read the source
+  from and would lose the content. Delimiter storage persists the content and
+  reloads without an "Invalid block" warning.
+- **`tone` deferred** (not in `block.json`). Restraint: no second accent /
+  variant without clear semantics in V1.
+- **Single `style.css`** referenced as `"style"` (loads in both the editor
+  iframe and the front-end), not separate `editorStyle`/`style`. One scoped
+  ruleset under `.gh-glitch-drop`; never targets `blockquote`.
+- **Label = wordmark via CSS.** `.gh-glitch-drop__label` is image-replaced with
+  `glitch-mark.svg` (`background: url(./glitch-mark.svg)`), the literal `Glitch`
+  text kept in the DOM for resilience and `aria-hidden="true"` in markup (the
+  `<aside>` carries `aria-label`). One rule works in editor + front-end; no JS
+  URL plumbing, no PHP SVG string. `glitch-mark.svg` is a byte-exact copy of
+  `greenhouse-eo/public/branding/glitch/glitch-light.svg`.
+- **`aria-label` appended explicitly** on the `<aside>` (outside
+  `get_block_wrapper_attributes()`) so it is present regardless of the helper's
+  attribute-merge behaviour across WP versions.
+- Verified (static): `php -l`, `block.json` schema, `node --check index.js`, SVG
+  well-formed, and a deterministic render harness (10 checks — `<aside>` not
+  `<blockquote>`, canonical + `gh-glitch-drop` classes, `aria-label`, label
+  `aria-hidden`, content preserved, empty-content guard, custom label).
+- **Verified (live, operator-approved 2026-07-04).** Deployed to Kinsta
+  (`wp-content/plugins/efeonce-editorial-blocks/`, byte-exact) and **activated**
+  on production efeoncepro.com (WP **7.0**, PHP 8.2), then verified end-to-end
+  via governed WP-CLI (`pnpm public-website:wpcli`): block registered (title
+  `Glitch`, render_callback + editorScript + style handles wired); a private
+  test post parsed with `parse_blocks` as recognized (**no invalid block**),
+  `has_block` true; `do_blocks` rendered the semantic `<aside>` with
+  `aria-label="Glitch"`, `.gh-glitch-drop`, **no `<blockquote>`**, content
+  preserved; UTF-8 confirmed via isolated `render_block`; the private test post
+  was force-deleted (clean rollback). No local WP / no automated deploy lane was
+  needed — the governed SSH WP-CLI wrapper reaches the live runtime.
+- **Residual verification (visual, not blocking).** In-editor UI insert/save/
+  reload by a human, and an in-Ohio browser capture (desktop + mobile 390px, no
+  horizontal overflow) with CSS applied. The CSS is scoped + static-validated
+  and the live markup is confirmed; capture on the first real Glitch draft (or
+  a temporary authenticated private post). Runbook:
+  `docs/manual-de-uso/public-site/glitch-editorial-block.md`.
+
 ## Sources Consulted
 
 - WordPress Block Editor Handbook: `block.json` metadata.

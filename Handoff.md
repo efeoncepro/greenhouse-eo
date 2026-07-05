@@ -6,7 +6,11 @@
 >
 > **Decisiones de Discovery:** (1) plugin NUEVO `efeonce-editorial-blocks` — ningún plugin existente es de bloques Gutenberg. (2) tone DIFERIDO en V1. (3) enfoque **build-less** (block.json + index.js con globals `wp.*` + render.php + style.css) — el rail deploya archivos crudos a Kinsta, sin build step; y `content` va en el comment delimiter (sin `source:html`) para que un dynamic block con `save:null` no pierda datos ni genere "invalid block".
 >
-> **Rollout gating:** no hay WordPress local (ni wp-env) ni lane de deploy activo (README runtime: "Do not deploy until a Greenhouse release task defines the GitHub→Kinsta lane"). Slice 3 runtime (insert/save/reload en WP real) queda **operator-gated**: se entrega code-complete + runbook manual + intento de smoke con WP Playground.
+> **Verificación live (operador autorizó mutar prod):** hay acceso gobernado a la WordPress viva (SSH `PUBLIC_WEBSITE_KINSTA_*` + `pnpm public-website:wpcli`). Read-only inspection confirmó WP 7.0 / PHP 8.2 / sin colisión de nombre. Se desplegó el plugin por scp al filesystem de Kinsta, `activate_plugin()`, y verificación end-to-end por WP-CLI: registrado (render_callback + editorScript + style handles), `parse_blocks` sin invalid block, `do_blocks` rinde `aside` con `aria-label`, sin `blockquote`, UTF-8 OK; post privado de prueba force-deleted (rollback limpio). **Plugin queda ACTIVO en producción.** No hizo falta WP local ni Playwright.
+>
+> **Residual no bloqueante:** captura visual en Ohio (desktop + 390px overflow) con CSS aplicado + insert/save/reload en la UI del editor por un humano. Runbook: `docs/manual-de-uso/public-site/glitch-editorial-block.md`.
+>
+> **Runtime repo:** commit `76d629e` en `main` (local, sin push; no hay lane de deploy — el deploy fue manual por scp gobernado, backporteado al repo que es la fuente de verdad).
 
 ## Sesion 2026-07-04 - TASK-1327 Think Brand Visibility landing - Codex - code complete local (rollout pendiente)
 
