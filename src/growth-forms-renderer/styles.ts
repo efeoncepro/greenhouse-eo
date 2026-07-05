@@ -586,7 +586,7 @@ export const RENDERER_CSS = `
 
   .ghf-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-actions {
-    width: min(100%, 560px);
+    width: min(100%, 720px);
     justify-content: center;
     align-items: center;
   }
@@ -611,7 +611,7 @@ export const RENDERER_CSS = `
     letter-spacing: 0 !important;
   }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-actions .ghf-btn:not(.ghf-btn--ghost) {
-    flex: 1 1 300px;
+    flex: 1 1 260px;
     max-width: 380px;
   }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-actions .ghf-btn--ghost {
