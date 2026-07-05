@@ -102,6 +102,13 @@ Indice maestro de la documentacion no operativa del repo.
 - [Product Roadmap del sitio público](public-site/PRODUCT_ROADMAP.md)
 - [Decisiones de producto (PDR)](public-site/decisions/)
 
+### Think
+
+- [Think Docs - índice](think/README.md)
+- [Think UI Patterns Architecture](think/architecture-ui-patterns.md)
+- [Brand Visibility Landing](think/brand-visibility-landing.md)
+- [Manual para reutilizar patrones UI Think](think/reuse-ui-patterns-manual.md)
+
 ### Roadmap
 
 - [BACKLOG.md](roadmap/BACKLOG.md)

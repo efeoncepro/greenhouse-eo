@@ -1,3 +1,11 @@
+## Sesion 2026-07-05 - Think UI pattern docs - Codex - documented local
+
+> **Qué queda:** nueva carpeta `docs/think/` como paquete documental del satelite publico Think. Incluye indice, arquitectura de patrones UI, documento funcional de la landing Brand Visibility y manual para reutilizar el patron sin romper contratos Greenhouse.
+>
+> **Patron canonizado:** landing publica con hero inmersivo, asset/animacion principal protegida, form dock gobernado por Growth Forms, framework Efeonce por capas (`Be Found`, `Be Readable`, `Be Correct`, `Be Actionable`, `Be Intrinsic`), preview de informe y copy SEO/AEO equilibrado. Regla dura: Think presenta; Greenhouse calcula. No crear form local, proxy CORS, validacion, consentimiento ni submit paralelo en Think.
+>
+> **Verificacion:** `pnpm docs:closure-check` OK, `git diff --check` OK y `pnpm docs:context-check` OK con warnings historicos no bloqueantes por tamano de `Handoff.md`. No hay cambio runtime ni deploy.
+
 ## Sesion 2026-07-05 - AI image tooling reference edits + Nexa fallback characters - Codex - committed
 
 > **Qué queda:** `pnpm ai:image` acepta `--image` repetible para editar una referencia y mantener consistencia de personaje/asset; `pnpm ai:image:rmbg` agrega matting AI local para PNG transparente; skills Codex/Claude `greenhouse-ai-image-generator` documentan el workflow. Nueva bitácora durable `ai-generations/` con `README.md`, `INDEX.md` y el set `2026-07-05_nexa-fallback-characters/`.
