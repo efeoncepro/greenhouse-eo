@@ -121,6 +121,9 @@ Reglas obligatorias:
 - Gutenberg authoring recipes now treat `efeoncepro/glitch-drop` as the target for Efeonce POV in `Glitch de la semana`.
 - The local WordPress runtime has plugin roots under `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins`.
 - Current runtime plugins observed locally: `eo-elementor-widgets`, `eo-headless-content`, `eo-vibe-coding-api`, `greenhouse-wp-bridge`.
+- Los logos de marca `Glitch` (wordmark) ya están disponibles en el repo, listos para consumir por el bloque:
+  - `public/branding/glitch/glitch-dark.svg` — wordmark en blanco (`#fff`) + isotipo verde (`#6ec207`), para **fondos oscuros**.
+  - `public/branding/glitch/glitch-light.svg` — wordmark en navy (`#022a4e`) + isotipo verde (`#6ec207`), para **fondos claros**.
 
 ### Gap
 
@@ -288,6 +291,21 @@ Reglas obligatorias:
 ## Detailed Spec
 
 Use `docs/documentation/public-site/glitch-drop-gutenberg-block.md` as the source contract.
+
+### Brand assets disponibles
+
+Los logos de `Glitch` ya están guardados en el repo y quedan disponibles para el bloque (label/branding del `aside`):
+
+| Archivo | Variante | Uso |
+|---|---|---|
+| `public/branding/glitch/glitch-dark.svg` | wordmark blanco + isotipo verde | fondos oscuros |
+| `public/branding/glitch/glitch-light.svg` | wordmark navy + isotipo verde | fondos claros |
+
+Notas para Discovery/implementación:
+
+- Son SVG vectoriales (sin cambios en paths ni colores respecto al original entregado por el operador).
+- Los dos son la misma marca en dos variantes por contraste de fondo; el bloque debe elegir la variante según el tema del contexto donde se renderice (Ohio/blog light vs. eventual dark).
+- El runtime consumidor es WordPress, no el portal Greenhouse: si el bloque necesita el asset servido desde el runtime público, copiar/publicar el SVG dentro del plugin (`efeonce-editorial-blocks/**`) durante la implementación en vez de referenciar `public/` de greenhouse-eo, y dejar documentado de dónde salió (esta task).
 
 Target content model:
 
