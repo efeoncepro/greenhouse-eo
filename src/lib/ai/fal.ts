@@ -117,8 +117,19 @@ export const runFalModel = async <TOutput = unknown>(params: {
     return fail(submitResponse.status, null, 'fal.ai no devolvió request_id al encolar el trabajo.')
   }
 
-  const statusUrl = `${FAL_QUEUE_BASE_URL}/${model}/requests/${requestId}/status`
-  const resultUrl = `${FAL_QUEUE_BASE_URL}/${model}/requests/${requestId}`
+  // fal returns the canonical polling URLs in the submit response. For models with a sub-path
+  // (e.g. `fal-ai/flux/schnell`) these resolve to the PARENT app (`fal-ai/flux/requests/...`),
+  // so reconstructing from `model` yields a 405. Always prefer fal's URLs; reconstruct only as
+  // a last-resort fallback for the flat-slug case.
+  const statusUrl =
+    typeof submitBody?.status_url === 'string'
+      ? submitBody.status_url
+      : `${FAL_QUEUE_BASE_URL}/${model}/requests/${requestId}/status`
+
+  const resultUrl =
+    typeof submitBody?.response_url === 'string'
+      ? submitBody.response_url
+      : `${FAL_QUEUE_BASE_URL}/${model}/requests/${requestId}`
 
   // 2. Poll status until COMPLETED / failure / timeout.
   while (Date.now() - started < pollTimeoutMs) {
