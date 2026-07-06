@@ -103,6 +103,21 @@ export const isContractType = (value: unknown): value is ContractType =>
 export const isInternationalInternalContractType = (contractType: ContractType | string | null | undefined) =>
   normalizeContractType(contractType) === 'international_internal'
 
+/**
+ * Chile dependent labor regime (subordination + jornada): `indefinido` / `plazo_fijo`.
+ *
+ * Fuente de verdad para decidir si aplican las mecánicas estatutarias Chile
+ * atadas a la jornada/asistencia (p. ej. exigir señal de asistencia diaria para
+ * calcular nómina). Régimenes internacionales (`contractor`/`eor`/`international_internal`)
+ * y `honorarios` NO son dependientes Chile y no usan esas mecánicas —
+ * ver `SCHEDULE_DEFAULTS` (`overridable: true` fuera de Chile dependiente).
+ */
+export const isChileDependentContract = (contractType: ContractType | string | null | undefined) => {
+  const normalized = normalizeContractType(contractType)
+
+  return normalized === 'indefinido' || normalized === 'plazo_fijo'
+}
+
 export const normalizeLegalReviewReference = (value: unknown) => {
   const normalized = typeof value === 'string' ? value.trim() : ''
 

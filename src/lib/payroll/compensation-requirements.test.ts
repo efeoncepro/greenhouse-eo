@@ -43,48 +43,52 @@ describe('compensation requirements', () => {
     ).toBe(false)
   })
 
-  it('requires attendance only when attendance can change the payroll amount', () => {
+  it('requires attendance only for Chile dependent regime, regardless of the schedule flag', () => {
+    // El régimen es autoritativo: solo indefinido/plazo_fijo (dependiente Chile)
+    // exigen señal de asistencia; el resto nunca, sin importar scheduleRequired.
+    const cases: Array<{
+      contractType: 'indefinido' | 'plazo_fijo' | 'honorarios' | 'contractor' | 'eor' | 'international_internal'
+      payRegime: 'chile' | 'international'
+      payrollVia: 'internal' | 'deel'
+      expected: boolean
+    }> = [
+      { contractType: 'indefinido', payRegime: 'chile', payrollVia: 'internal', expected: true },
+      { contractType: 'plazo_fijo', payRegime: 'chile', payrollVia: 'internal', expected: true },
+      { contractType: 'honorarios', payRegime: 'chile', payrollVia: 'internal', expected: false },
+      { contractType: 'contractor', payRegime: 'international', payrollVia: 'deel', expected: false },
+      { contractType: 'eor', payRegime: 'international', payrollVia: 'deel', expected: false },
+      { contractType: 'international_internal', payRegime: 'international', payrollVia: 'internal', expected: false }
+    ]
+
+    for (const { contractType, payRegime, payrollVia, expected } of cases) {
+      for (const scheduleRequired of [true, false, undefined]) {
+        expect(
+          requiresPayrollAttendanceSignal({
+            bonusOtdMax: 0,
+            bonusRpaMax: 0,
+            contractType,
+            payRegime,
+            payrollVia,
+            scheduleRequired
+          }),
+          `${contractType} / scheduleRequired=${scheduleRequired}`
+        ).toBe(expected)
+      }
+    }
+  })
+
+  it('does not require attendance for international_internal even when daily_required forced the schedule flag on (ISSUE-115)', () => {
+    // Regresión directa del incidente: colaborador international_internal con
+    // members.daily_required=true → scheduleRequired=true, pero su régimen no usa
+    // asistencia Chile, así que NO debe bloquear la nómina.
     expect(
       requiresPayrollAttendanceSignal({
         bonusOtdMax: 0,
         bonusRpaMax: 0,
-        contractType: 'indefinido',
-        payRegime: 'chile',
-        payrollVia: 'internal',
-        scheduleRequired: true
-      })
-    ).toBe(true)
-
-    expect(
-      requiresPayrollAttendanceSignal({
-        bonusOtdMax: 175,
-        bonusRpaMax: 50,
-        contractType: 'indefinido',
+        contractType: 'international_internal',
         payRegime: 'international',
-        payrollVia: 'deel',
-        scheduleRequired: true
-      })
-    ).toBe(false)
-
-    expect(
-      requiresPayrollAttendanceSignal({
-        bonusOtdMax: 0,
-        bonusRpaMax: 0,
-        contractType: 'honorarios',
-        payRegime: 'chile',
         payrollVia: 'internal',
         scheduleRequired: true
-      })
-    ).toBe(false)
-
-    expect(
-      requiresPayrollAttendanceSignal({
-        bonusOtdMax: 0,
-        bonusRpaMax: 0,
-        contractType: 'indefinido',
-        payRegime: 'international',
-        payrollVia: 'internal',
-        scheduleRequired: false
       })
     ).toBe(false)
   })
