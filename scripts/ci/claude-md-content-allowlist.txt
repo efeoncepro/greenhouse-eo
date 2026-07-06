@@ -41,3 +41,11 @@
 # conserva la intencion como `pnpm typecheck` y advierte no usar el comando bare.
 - **Type check:** `npx tsc --noEmit`
 - Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `npx tsc --noEmit`
+
+# 2026-07-06: la linea del Azure CLI se reformulo para recuperar ~18 tokens de
+# presupuesto (headroom para el pointer nuevo "MCP creativos / de diseño"). El
+# tenant ID se mencionaba DOS veces en la misma vinieta; se elimino el duplicado.
+# Todo el contenido operativo (tenant ID, subscription ID, comandos, proposito)
+# se conserva verbatim en la version viva ("...tenant Microsoft de Efeonce a80bf...").
+# Reword legitimo, no drop.
+- **Azure CLI (`az`)**: autenticado contra el tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4` de Efeonce. Se usa para gestionar Azure AD App Registrations (redirect URIs, client secrets, tenant config), Bot Service, Logic Apps, Resource Groups, etc. Comandos canónicos: `az ad app show --id <client-id>`, `az ad app update`, `az ad app credential reset`, `az ad sp show`. Tenant ID Microsoft de Efeonce: `a80bf6c1-7c45-4d70-b043-51389622a0e4`. Subscription ID: `e1cfff3e-8c21-4170-8b28-ad083b741266`.

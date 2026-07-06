@@ -31,6 +31,7 @@ type Target = {
   label: string
   remotePath: string
   required: boolean
+  kind?: 'directory' | 'file'
 }
 
 type ManifestFile = {
@@ -79,6 +80,12 @@ const TARGETS: Target[] = [
     label: 'Ohio HubSpot form styler plugin',
     remotePath: 'wp-content/plugins/ohio-hubspot-form-styler',
     required: false
+  },
+  {
+    label: 'Efeonce admin memory guard mu-plugin',
+    remotePath: 'wp-content/mu-plugins/efeonce-admin-memory-guard.php',
+    required: false,
+    kind: 'file'
   }
 ]
 
@@ -261,7 +268,9 @@ return
   const missingTargets: Target[] = []
 
   for (const target of TARGETS) {
-    const testCommand = `test -e ${shellQuote(join(wordpressPath, target.remotePath))}`
+    const targetKind = target.kind ?? 'directory'
+    const testOperator = targetKind === 'file' ? '-f' : '-d'
+    const testCommand = `test ${testOperator} ${shellQuote(join(wordpressPath, target.remotePath))}`
 
     try {
       execFileSync('ssh', [...sshArgs, sshTarget, testCommand], { stdio: 'ignore' })
@@ -270,26 +279,32 @@ return
       missingTargets.push(target)
 
       if (target.required) {
-        throw new Error(`Required target is missing on Kinsta: ${target.remotePath}`)
+        throw new Error(`Required ${targetKind} target is missing on Kinsta: ${target.remotePath}`)
       }
     }
   }
 
   for (const target of foundTargets) {
+    const targetKind = target.kind ?? 'directory'
     const localTarget = join(codeRoot, target.remotePath)
 
     mkdirSync(dirname(localTarget), { recursive: true })
 
-    const remoteSource = `${sshTarget}:${join(wordpressPath, target.remotePath)}/`
+    const remoteSource =
+      targetKind === 'file'
+        ? `${sshTarget}:${join(wordpressPath, target.remotePath)}`
+        : `${sshTarget}:${join(wordpressPath, target.remotePath)}/`
+
+    const localDestination = targetKind === 'file' ? localTarget : `${localTarget}/`
 
     const rsyncArgs = [
       '-az',
-      '--delete',
+      ...(targetKind === 'directory' ? ['--delete'] : []),
       ...EXCLUDE_PATTERNS.flatMap(pattern => ['--exclude', pattern]),
       '-e',
       rsyncShell,
       remoteSource,
-      `${localTarget}/`
+      localDestination
     ]
 
     execFileSync('rsync', rsyncArgs, { stdio: 'inherit' })
@@ -309,11 +324,13 @@ return
     targets: {
       found: foundTargets.map(target => ({
         label: target.label,
-        remotePath: target.remotePath
+        remotePath: target.remotePath,
+        kind: target.kind ?? 'directory'
       })),
       missing: missingTargets.map(target => ({
         label: target.label,
-        remotePath: target.remotePath
+        remotePath: target.remotePath,
+        kind: target.kind ?? 'directory'
       }))
     },
     excludes: EXCLUDE_PATTERNS,

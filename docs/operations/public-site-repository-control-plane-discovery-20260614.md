@@ -96,6 +96,7 @@ Behavior:
 - Writes `manifest.json` with found/missing targets, excludes, file count and per-file SHA-256.
 - Excludes `.git/`, `node_modules/`, `vendor/`, logs, `*.bak`, `*.bak-*`, `.DS_Store` and editor temp files.
 - Does not mutate Kinsta, WordPress, GitHub or Vercel.
+- Supports governed directory targets and exact file targets; as of 2026-07-06 this includes the durable admin guard `wp-content/mu-plugins/efeonce-admin-memory-guard.php` without importing all `mu-plugins`.
 
 First successful export in this session:
 
@@ -160,6 +161,7 @@ The following was the decision path that led to it:
    - `wp-content/plugins/eo-headless-content`
    - `wp-content/plugins/eo-vibe-coding-api`
    - future `wp-content/plugins/greenhouse-wp-bridge`
+   - exact operational mu-plugins explicitly listed in the binding, currently `wp-content/mu-plugins/efeonce-admin-memory-guard.php`
 3. Exclude generated/runtime-only artifacts:
    - WordPress uploads
    - Kinsta backups

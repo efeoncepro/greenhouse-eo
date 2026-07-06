@@ -213,7 +213,13 @@ export const listPublicSiteRepoFiles = (
     }
 
     if (!entry.isFile()) continue
-    if (governedPaths.length > 0 && !governedPaths.some(path => normalizedRelative.startsWith(`${path}/`))) continue
+
+    if (
+      governedPaths.length > 0 &&
+      !governedPaths.some(path => normalizedRelative === path || normalizedRelative.startsWith(`${path}/`))
+    ) {
+      continue
+    }
 
     const hash = hashPublicSiteFile(absolutePath)
 
