@@ -163,7 +163,7 @@ export const buildPayrollPeriodReadiness = ({
     blockingIssues,
     warnings,
     deadline: {
-      lastBusinessDay: deadline.lastBusinessDay,
+      deadlineDate: deadline.deadlineDate,
       isDue: deadline.isDue,
       isOverdue: deadline.isOverdue,
       calculatedOnTime: deadline.calculatedOnTime,

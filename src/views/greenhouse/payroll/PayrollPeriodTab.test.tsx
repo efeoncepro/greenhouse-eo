@@ -56,7 +56,7 @@ describe('PayrollPeriodTab readiness', () => {
               }
             ],
             deadline: {
-              lastBusinessDay: '2026-03-31',
+              deadlineDate: '2026-04-07',
               isDue: false,
               isOverdue: true,
               calculatedOnTime: null,
@@ -151,7 +151,7 @@ describe('PayrollPeriodTab readiness', () => {
             }
           ],
           deadline: {
-            lastBusinessDay: '2026-03-31',
+            deadlineDate: '2026-04-07',
             isDue: false,
             isOverdue: true,
             calculatedOnTime: null,

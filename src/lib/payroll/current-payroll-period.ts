@@ -15,7 +15,7 @@ const toPeriodMonthKey = (period: PayrollPeriod) => `${period.year}-${String(per
 export interface PayrollCalculationDeadlineStatus {
   deadlineDate: string
   isDue: boolean
-  isLastBusinessDay: boolean
+  isDeadlineDay: boolean
   calculatedOnTime: boolean | null
   state: PayrollCalculationDeadlineState
   blocksCalculation: boolean
@@ -236,9 +236,9 @@ export const getPayrollCalculationDeadlineStatus = (
   const deadline = resolvePayrollCalculationDeadline(period, referenceDate, normalizedOptions)
 
   return {
-    deadlineDate: deadline.lastBusinessDay,
+    deadlineDate: deadline.deadlineDate,
     isDue: deadline.isDue,
-    isLastBusinessDay: deadline.isLastBusinessDay,
+    isDeadlineDay: deadline.isDeadlineDay,
     calculatedOnTime: deadline.calculatedOnTime,
     state: deadline.state,
     blocksCalculation: deadline.blocksCalculation

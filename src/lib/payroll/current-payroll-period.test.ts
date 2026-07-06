@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import type { PayrollPeriod } from '@/types/payroll'
 
+import { getNthBusinessDayOfMonth } from '@/lib/calendar/operational-calendar'
+
 import {
   getActivePayrollPeriods,
   getCurrentPayrollPeriod,
@@ -96,25 +98,29 @@ describe('current-payroll-period helpers', () => {
     expect(current?.periodId).toBe('2026-03')
   })
 
-  it('computes deadline state for an uncalculated period on its last business day', () => {
+  it('computes due-today on the deadline day (Nth business day of the following month)', () => {
+    // Período marzo → deadline = 5.º día hábil de abril (close window Efeonce).
+    const aprilDeadline = getNthBusinessDayOfMonth(2026, 4, 5)
+
     const status = getPayrollCalculationDeadlineStatus(
       buildPeriod('2026-03', 'draft'),
-      '2026-03-31T15:00:00.000Z'
+      `${aprilDeadline}T15:00:00.000Z`
     )
 
-    expect(status.deadlineDate).toBe('2026-03-31')
+    expect(status.deadlineDate).toBe(aprilDeadline)
     expect(status.isDue).toBe(true)
     expect(status.state).toBe('due_today')
     expect(status.blocksCalculation).toBe(false)
   })
 
   it('keeps an overdue draft as manually calculable instead of blocked', () => {
+    // Período mayo → deadline = 5.º día hábil de junio; el 20 de junio ya pasó.
     const status = getPayrollCalculationDeadlineStatus(
       buildPeriod('2026-05', 'draft'),
-      '2026-05-31T15:00:00.000Z'
+      '2026-06-20T15:00:00.000Z'
     )
 
-    expect(status.deadlineDate).toBe('2026-05-29')
+    expect(status.deadlineDate).toBe(getNthBusinessDayOfMonth(2026, 6, 5))
     expect(status.isDue).toBe(false)
     expect(status.state).toBe('overdue_allowed')
     expect(status.blocksCalculation).toBe(false)

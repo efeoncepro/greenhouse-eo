@@ -358,7 +358,7 @@ export interface PayrollCalculationReadiness {
   blockingIssues: PayrollReadinessIssue[]
   warnings: PayrollReadinessIssue[]
   deadline: {
-    lastBusinessDay: string
+    deadlineDate: string
     isDue: boolean
     isOverdue: boolean
     calculatedOnTime: boolean | null

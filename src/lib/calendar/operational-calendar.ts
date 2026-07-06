@@ -377,6 +377,56 @@ export const getLastBusinessDayOfMonth = (
   return candidate.key
 }
 
+/**
+ * Returns the date key (`YYYY-MM-DD`) of the `n`-th business day of the given
+ * month, skipping weekends + holidays (Nager + persisted overrides) in the
+ * operational timezone. `n` must be a positive integer (1 = first business day).
+ *
+ * Canonical "first N business days of the month" primitive — reused by the
+ * payroll calculation deadline (Efeonce paga dentro de los primeros N días
+ * hábiles posteriores al cierre de mes; N = `closeWindowBusinessDays`). If `n`
+ * exceeds the business days in the month, clamps to the last business day.
+ * NEVER reimplement business-day arithmetic locally; compose this helper.
+ */
+export const getNthBusinessDayOfMonth = (
+  year: number,
+  month: number,
+  n: number,
+  options?: OperationalCalendarContextInput | null
+) => {
+  if (!Number.isInteger(year) || year < 1900 || year > 9999) {
+    throw new RangeError(`Invalid year: ${year}`)
+  }
+
+  if (!Number.isInteger(month) || month < 1 || month > 12) {
+    throw new RangeError(`Invalid month: ${month}`)
+  }
+
+  if (!Number.isInteger(n) || n < 1) {
+    throw new RangeError('n must be a positive integer.')
+  }
+
+  const context = resolveOperationalCalendarContext(options ?? null, null, null)
+
+  let candidate = buildCalendarDateParts(year, month, 1)
+  let count = 0
+
+  while (candidate.month === month) {
+    if (isBusinessCalendarDate(candidate, context)) {
+      count++
+
+      if (count === n) {
+        return candidate.key
+      }
+    }
+
+    candidate = addCalendarDays(candidate, 1)
+  }
+
+  // n exceeds the business days available in the month → clamp to the last one.
+  return getLastBusinessDayOfMonth(year, month, context)
+}
+
 export const isLastBusinessDayOfMonth = (
   referenceDate: DateLike,
   options?: OperationalCalendarContextInput | null

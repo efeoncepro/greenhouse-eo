@@ -907,7 +907,7 @@ const PayrollPeriodTab = ({
               <Alert severity={calculationDeadlineSeverity}>
                 {GH_PAYROLL_CALCULATION_DEADLINE.deadlineLabel}:
                 {' '}
-                {calculationDeadline?.lastBusinessDay ?? 'Sin definir'}
+                {calculationDeadline?.deadlineDate ?? 'Sin definir'}
                 {' · '}
                 {GH_PAYROLL_CALCULATION_DEADLINE.operationalStateLabel}:
                 {' '}

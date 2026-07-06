@@ -5,6 +5,7 @@ import {
   countBusinessDays,
   DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
   getLastBusinessDayOfMonth,
+  getNthBusinessDayOfMonth,
   getOperationalDateKey,
   getOperationalFiscalPeriod,
   getOperationalPayrollMonth,
@@ -125,6 +126,26 @@ describe('operational-calendar', () => {
     })
 
     expect(lastBusinessDay).toBe('2026-05-28')
+  })
+
+  it('resolves the Nth business day of a month skipping weekends and local holidays', () => {
+    // Junio 2026: 1 Lun, 2 Mar, 3 Mié, 4 Jue, 5 Vie → 5.º día hábil = 2026-06-05.
+    expect(getNthBusinessDayOfMonth(2026, 6, 5, {
+      timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE
+    })).toBe('2026-06-05')
+
+    // Con feriado el viernes 3: 1(1), 2(2), [3 feriado], 6(3), 7(4), 8(5) → 2026-07-08.
+    expect(getNthBusinessDayOfMonth(2026, 7, 5, {
+      timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
+      holidayDates: ['2026-07-03']
+    })).toBe('2026-07-08')
+
+    // n mayor que los días hábiles del mes → clamp al último día hábil.
+    expect(getNthBusinessDayOfMonth(2026, 6, 999, {
+      timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE
+    })).toBe(getLastBusinessDayOfMonth(2026, 6, {
+      timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE
+    }))
   })
 
   it('detects when a date is the last business day of the month', () => {

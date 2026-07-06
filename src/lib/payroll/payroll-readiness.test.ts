@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import type { PayrollPeriod } from '@/types/payroll'
 
+import { getNthBusinessDayOfMonth } from '@/lib/calendar/operational-calendar'
+
 import { buildPayrollPeriodReadiness } from './payroll-readiness'
 
 const attendanceDiagnostics = {
@@ -89,7 +91,8 @@ describe('buildPayrollPeriodReadiness', () => {
     expect(readiness.blockingIssues).toHaveLength(0)
     expect(readiness.warnings).toHaveLength(0)
     expect(readiness.attendanceDiagnostics.blocking).toBe(false)
-    expect(readiness.calculation.deadline.lastBusinessDay).toBe('2026-03-31')
+    // El deadline del período de marzo es el 5.º día hábil de abril (close window Efeonce).
+    expect(readiness.calculation.deadline.deadlineDate).toBe(getNthBusinessDayOfMonth(2026, 4, 5))
   })
 
   it('keeps compensation gaps as warnings and escalates missing required KPI/attendance to blockers', () => {
@@ -270,10 +273,11 @@ describe('buildPayrollPeriodReadiness', () => {
       missingKpiMemberIds: [],
       missingAttendanceMemberIds: [],
       attendanceDiagnostics,
-      referenceDate: '2026-04-02'
+      // Después del 5.º día hábil de abril (deadline del período de marzo).
+      referenceDate: '2026-04-20'
     })
 
-    expect(readiness.calculation.deadline.lastBusinessDay).toBe('2026-03-31')
+    expect(readiness.calculation.deadline.deadlineDate).toBe(getNthBusinessDayOfMonth(2026, 4, 5))
     expect(readiness.calculation.deadline.isDue).toBe(false)
     expect(readiness.calculation.deadline.isOverdue).toBe(true)
     expect(readiness.calculation.deadline.calculatedOnTime).toBeNull()
