@@ -69,7 +69,7 @@ Ademas de Imagen/OpenAI (imagen) y Higgsfield (vectores), Greenhouse tiene acces
 
 - **Para que sirve:** producir contenido media de mayor variedad (sobre todo **video**) que los motores de imagen actuales no cubren, para piezas de marketing, campanas y exploracion visual.
 - **Como se usa:** de forma programatica, con un cliente interno unico. El contenido se genera fuera del portal y se **sube** por el flujo normal de assets — no se genera en tiempo real para los usuarios del producto.
-- **Estado actual (2026-07-06):** el acceso esta **preparado a nivel de codigo** (cliente listo) pero la llave de acceso todavia no esta cargada de forma permanente. Antes del primer uso real hay que dejar la llave configurada en el entorno.
+- **Estado actual (2026-07-06):** el acceso esta **listo y la llave quedo guardada** de forma segura (en el gestor de secretos). Se verifico que el sistema la lee bien, pero la cuenta de Fal.ai todavia aparece **sin saldo disponible** (la recarga aun no se refleja), asi que las generaciones reales estan **bloqueadas hasta que la cuenta tenga saldo activo**. La llave es temporal (se rotara mas adelante).
 - **Costo:** se paga por segundo de video segun el modelo (ejemplo: un clip corto economico ronda los US$0.36; uno de mayor calidad, varios dolares). Siempre revisar el precio del modelo en `fal.ai/models` antes de generar.
 
 > Detalle tecnico: ver [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) para la API del generador, system prompts, contrato SVG, endpoints internos y la seccion "Fal.ai — agregador de generacion media".
