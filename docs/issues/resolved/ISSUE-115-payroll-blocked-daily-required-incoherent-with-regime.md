@@ -46,14 +46,22 @@ Descartados en Discovery (habrían operado sobre data válida): write-path guard
 - Nuevo caso en `src/lib/payroll/payroll-readiness.test.ts`: `international_internal` + `daily_required=true` + `attendance_daily` vacía ⇒ `calculation.ready = true`.
 - `getPayrollPeriodReadiness('2026-06')` contra PG post-fix ⇒ `blockingIssues = []`, botón **Calcular** habilitado.
 - `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde (no regresión en payroll/finiquito).
-- Reliability signal `payroll.contract.schedule_regime_mismatch` en `0` post-backfill.
+
+## Resuelto
+
+**2026-07-06** por TASK-1347 (Slices 1+2). Verificación:
+
+- `getPayrollPeriodReadiness('2026-06')` contra PG real ⇒ `calculation.ready = true`, `blockingIssues = []` (solo persiste el warning esperado `missing_compensation` de Julio Reyes). El botón **Calcular** queda habilitado.
+- `pnpm vitest run src/lib/payroll` (536) + `src/lib/workforce/offboarding` (34) verdes; `pnpm test` full (8806, 0 fallos); `pnpm build` exit 0; `pnpm typecheck` 0.
+- Tests de regresión directos del incidente en `compensation-requirements.test.ts` (6 contract types × scheduleRequired + caso `international_internal` + `daily_required=true`).
+- Fix code-only en `develop` (commits `545982175` Slice 1 + `67a32fddf` Slice 2). Deploy vía push a `develop` (staging). Sin migración/flag/backfill.
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 
-- TASK-1347 — fix robusto en 4 capas (owner de la solución).
+- TASK-1347 — owner de la solución (recalibrada a 2 capas en Discovery: predicado régimen-scoped + read mapper coherente con `SCHEDULE_DEFAULTS.overridable`).
 - `docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` (§`International Internal contract type`).
-- Riesgo latente: `greenhouse.attendance_daily` vacía (integración Teams no poblando) — candidato a issue de verificación propio.
+- Riesgo latente (follow-up en TASK-005): `greenhouse.attendance_daily` vacía (integración Teams no poblando) — trabajadores dependientes Chile con jornada bloquearían la nómina cuando entren a un período.

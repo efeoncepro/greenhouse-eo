@@ -1,5 +1,9 @@
 # CODEX TASK — HRIS Fase 2A: Expense Reports (Gastos y Reembolsos)
 
+## Delta 2026-07-06
+
+- TASK-1347 endureció la derivación de `scheduleRequired`: el read mapper de compensación ahora rutea por `resolveScheduleRequired` honrando `SCHEDULE_DEFAULTS.overridable` (antes un `daily_required` crudo bypaseaba la política). `daily_required` sigue siendo el backing field canónico; una policy futura de gastos que dependa de presencialidad debe leerla vía `resolveScheduleRequired`/`isChileDependentContract`, no del booleano crudo.
+
 ## Delta 2026-04-01
 
 - `TASK-026` ya quedó cerrada y esta lane debe consumir el contrato canónico desde `greenhouse_core.members`, no desde snapshots de payroll ni heurísticas de `employment_type`.

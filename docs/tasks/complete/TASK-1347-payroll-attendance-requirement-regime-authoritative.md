@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `En ejecucion`
+- Status real: `Complete — code + runtime verificado (readiness 2026-06 ready); deploy via push develop`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -266,13 +266,13 @@ Sin flag — el cambio es aditivo/seguro (solo reduce falsos requerimientos de a
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla).
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`).
-- [ ] `docs/tasks/README.md` sincronizado con el cierre.
-- [ ] `Handoff.md` actualizado con lo implementado y verificado.
-- [ ] `changelog.md` actualizado (cambio de comportamiento: régimen autoritativo sobre asistencia).
-- [ ] chequeo de impacto cruzado sobre tasks payroll/workforce afectadas.
-- [ ] ISSUE-115 movido a `docs/issues/resolved/` + tracker actualizado.
+- [x] `Lifecycle` del markdown sincronizado con el estado real (`complete`).
+- [x] el archivo vive en la carpeta correcta (`complete/`).
+- [x] `docs/tasks/README.md` sincronizado con el cierre.
+- [ ] `Handoff.md` actualizado — **entrada redactada, commit diferido** (Handoff tiene WIP activo de Codex/TASK-1345; se comitea junto con ese lote para no arrastrar su WIP).
+- [ ] `changelog.md` actualizado — **entrada redactada, commit diferido** (misma razón: WIP Codex).
+- [x] chequeo de impacto cruzado sobre tasks payroll/workforce afectadas (sin tasks `to-do/` que referencien `requiresPayrollAttendanceSignal`/`daily_required`; verificado).
+- [x] ISSUE-115 movido a `docs/issues/resolved/` + tracker actualizado.
 
 ## Follow-ups
 

@@ -1,5 +1,10 @@
 # CODEX TASK — HR Payroll Attendance/Leave Work Entries Hardening (v1)
 
+## Delta 2026-07-06
+
+- TASK-1347 (cierra ISSUE-115) reencuadró **quién** requiere señal de asistencia: `requiresPayrollAttendanceSignal` ahora es allowlist régimen-scoped (`isChileDependentContract` = `indefinido`/`plazo_fijo`); régimenes internacionales/honorarios ya NO la exigen. Esto **acota el alcance de esta task**: la recombinación `attendance_daily + leave_requests` solo condiciona el pago de dependientes Chile.
+- Riesgo latente confirmado en runtime (2026-07-06): `greenhouse.attendance_daily` está **vacía** (0 filas en todo el proyecto). Cuando entre un trabajador dependiente Chile con jornada a un período, la nómina se bloqueará por `missing_attendance_signal` hasta que exista fuente de asistencia (integración Teams o captura manual). Esta task es el owner natural de esa fuente.
+
 ## Delta 2026-03-31
 
 - `leave` ya no debe tratarse como input crudo basado en `requested_days` entregado por el caller.
