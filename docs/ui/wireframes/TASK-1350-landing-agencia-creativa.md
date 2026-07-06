@@ -12,9 +12,9 @@
 
 ## Brief
 
-- Primary user: decisor de marketing evaluando si Efeonce es su agencia creativa; frío→tibio.
+- Primary user: **Director/Gerente de Marketing de una empresa mid-market o enterprise** con equipo creativo in-house; evalúa a Efeonce como partner de producción; frío→tibio. (Sponsor: CMO/CEO; validador: Compras.)
 - User moment: descubrimiento (orgánico/AEO/pauta/referido); primeros 10 segundos definen si sigue leyendo.
-- Job to be done: "necesito una agencia creativa que no sea una caja negra — que produzca nivel y que yo pueda ver operar y medir".
+- Job to be done: "mi equipo no da abasto con el volumen de piezas que el negocio pide; necesito capacidad de producción creativa de nivel que me deje escalar **sin perder control ni visibilidad** — un partner, no un reemplazo, y no una caja negra".
 - Primary decision signal: "esta agencia opera la creatividad como sistema medible con visibilidad total, y la propia página lo demuestra con craft" → agenda una reunión.
 - Non-goals: no es self-serve, no vende un servicio puntual, no expone el portal ni datos de cliente, no lidera con siglas.
 
@@ -44,12 +44,14 @@ Copy es-CL, tuteo, beneficios antes que siglas, lidera Efeonce. Strings iniciale
 |---|---|---|---|---|
 | `publicsite.agencia-creativa.hero.h1` | 1 | Creatividad que puedes ver operar en tiempo real. | — | H1; sin siglas; lidera beneficio |
 | `publicsite.agencia-creativa.hero.subhead` | 1 | Concepto, contenido y producción audiovisual, operados como un solo sistema medible. Con visibilidad total. | — | descriptor |
+| `publicsite.agencia-creativa.hero.positioning` | 1 | Tu equipo dirige. Nosotros producimos a escala. Y lo ves todo. | — | línea unificadora (partner + escala + transparencia) |
 | `publicsite.agencia-creativa.hero.cta_primary` | 1 | Agenda una reunión | — | CTA primario (repetido) |
 | `publicsite.agencia-creativa.hero.cta_secondary` | 1 | Mira cómo medimos | — | ancla al bloque 6 |
 | `publicsite.agencia-creativa.trust.stats` | 2 | 120+ empresas · 4 países · 80% de renovación · HubSpot Solutions Partner | — | cifras del doc de autoridad; no inflar |
 | `publicsite.agencia-creativa.problem.title` | 3 | Tu marketing tiene muchas piezas y ningún sistema. | — | nombra la fragmentación |
-| `publicsite.agencia-creativa.problem.body` | 3 | Una agencia hace la marca, otra los ads, otra el sitio — y nadie conecta nada. Y del trabajo creativo, "te mandan el reporte el viernes". | — | enemigo = fragmentación + caja negra |
-| `publicsite.agencia-creativa.how.title` | 4 | Tu marketing deja de ser gasto y se vuelve inversión que se acumula. | — | Loop Marketing como beneficio |
+| `publicsite.agencia-creativa.problem.body` | 3 | Tu equipo tiene más pedidos de los que puede producir. Y al tercerizar, aparece la caja negra: "te mandan el reporte el viernes". | — | pain = capacidad + caja negra |
+| `publicsite.agencia-creativa.how.title` | 4 | Somos la capacidad de producción de tu equipo. Ustedes dirigen; nosotros escalamos. | — | partner, no reemplazo |
+| `publicsite.agencia-creativa.how.body` | 4 | Tu marketing deja de ser gasto y se vuelve inversión que se acumula. | — | Loop Marketing como beneficio |
 | `publicsite.agencia-creativa.services.title` | 5 | Lo que hacemos | — | capability creativa |
 | `publicsite.agencia-creativa.services.items` | 5 | Identidad y concepto · Contenido full-funnel · Producción audiovisual · Campañas | — | Globe Studio como motor de producción |
 | `publicsite.agencia-creativa.diff.title` | 6 | Otras agencias te mandan el reporte. Nosotros te damos el tablero. | — | el diferenciador |

@@ -29,7 +29,7 @@
 
 ## Summary
 
-Landing pública de la capability creativa de Efeonce (`efeoncepro.com`, WordPress **code-custom**, NO Elementor), posicionada como **"la agencia creativa que puedes ver operar en tiempo real"**. Concepto de ejecución **Design Engineer** = arte + color + ingeniería: assets art-dirigidos producidos con el stack IA propio (fal.ai / Higgsfield / Magnific / Adobe CC), montados como experiencia performante e interactiva. Lidera la masterbrand **Efeonce**; CTA primario **"Agenda una reunión"** (HubSpot Meetings). El diferenciador es un bloque de **operaciones creativas medibles** (ICO) — el mismo claim de transparencia que Greenhouse entrega.
+Landing pública de la capability creativa de Efeonce (`efeoncepro.com`, WordPress **code-custom**, NO Elementor), posicionada como **"la agencia creativa que puedes ver operar en tiempo real"**. **Comprador = los departamentos de marketing y/o equipos creativos in-house de empresas mid-market y enterprise**; Efeonce NO los reemplaza: es **la capacidad de producción creativa que les permite escalar** su output sin sumar headcount y sin perder control ni visibilidad ("tu equipo dirige, nosotros producimos a escala, y lo ves todo"). Concepto de ejecución **Design Engineer** = arte + color + ingeniería: assets art-dirigidos producidos con el stack IA propio (fal.ai / Higgsfield / Magnific / Adobe CC), montados como experiencia performante e interactiva. Lidera la masterbrand **Efeonce**; CTA primario **"Agenda una reunión"** (HubSpot Meetings). El diferenciador es un bloque de **operaciones creativas medibles** (ICO) — el mismo claim de transparencia que Greenhouse entrega.
 
 ## Why This Task Exists
 
@@ -37,7 +37,7 @@ El 68% de los compradores B2B dice que todas las agencias suenan igual (`docs/co
 
 ## Goal
 
-- Publicar una landing de agencia creativa en `efeoncepro.com` que lidere con Efeonce, posicione "creatividad operada como sistema medible" y convierta a **"Agenda una reunión"** (HubSpot Meetings) con atribución UTM.
+- Publicar una landing de agencia creativa en `efeoncepro.com` que lidere con Efeonce, posicione a Efeonce como **la capacidad de producción creativa que escala el output del equipo de marketing in-house** (partner, no reemplazo) "operada como sistema medible con visibilidad total", y convierta a **"Agenda una reunión"** (HubSpot Meetings) con atribución UTM.
 - Que la ejecución **pruebe** el concepto Design Engineer: art direction real (assets producidos con el stack IA propio), motion con intención, performance (CWV) impecable y accesibilidad — construida a mano en un theme custom, no en Elementor.
 - Incluir el bloque diferenciador de **operaciones creativas medibles** (menos rondas / más piezas bien a la primera / ciclo más corto → Revenue Enabled) como componente vivo, no imagen estática.
 - Dejar la superficie indexable + citable (SEO/AEO: schema, answer capsules) y medible (conversión + GA4/GSC).
@@ -111,10 +111,10 @@ Reglas obligatorias:
 ### Experience brief
 
 - UI rigor: `ui-standard`
-- Usuario / rol: decisor de marketing (CMO / Director de Marketing) + sponsor de presupuesto (CEO/Gerente General) + validador (Compras). Visitante público, no autenticado.
-- Momento del flujo: descubrimiento (orgánico/AEO/pauta/referido) evaluando si Efeonce es la agencia creativa; primer contacto frío→tibio.
-- Resultado perceptible esperado: entiende en <10s que Efeonce hace creatividad **operada como sistema medible con visibilidad total** y que la propia landing prueba craft técnico; agenda una reunión.
-- Friccion que debe reducir: la percepción "todas las agencias suenan/se ven igual" y la desconfianza de "creatividad = caja negra".
+- Usuario / rol: **departamento de marketing y/o equipo creativo in-house** de una empresa **mid-market o enterprise** — el decisor típico es el Director/Gerente de Marketing (comprador), con CMO/CEO como sponsor y Compras como validador. Ya tienen equipo interno; buscan un partner de producción, no un reemplazo. Visitante público, no autenticado.
+- Momento del flujo: descubrimiento (orgánico/AEO/pauta/referido) evaluando si Efeonce es el partner creativo; primer contacto frío→tibio.
+- Resultado perceptible esperado: entiende en <10s que Efeonce es **la capacidad de producción creativa que escala su output** (partner, no reemplazo), **operada como sistema medible con visibilidad total**, y que la propia landing prueba craft técnico; agenda una reunión.
+- Friccion que debe reducir: (a) "todas las agencias suenan/se ven igual"; (b) la desconfianza de "creatividad = caja negra"; (c) el miedo del equipo in-house a **perder control/visibilidad** al tercerizar producción.
 - No-goals UX: no es self-serve, no es checkout, no expone el portal Greenhouse ni datos de cliente; no vende un servicio puntual (eso son otras landings).
 
 ### Surface & system decision
@@ -253,9 +253,9 @@ Estructura canónica de la página (jerarquía de conversión; detalle de region
 
 1. Hero — claim + media art-dirigido + CTA "Agenda una reunión" (+ secundario "Mira cómo medimos").
 2. Barra de prueba — logos + `120+ empresas · 4 países · 80% renovación · HubSpot Solutions Partner`.
-3. El problema — fragmentación + caja negra.
-4. Cómo trabajamos — Loop Marketing como beneficio ("gasto → inversión que se acumula").
-5. Qué hacemos — capability creativa (identidad, contenido full-funnel, audiovisual Globe Studio, campañas).
+3. El problema — el equipo de marketing in-house no da abasto (demanda de piezas > capacidad) + fragmentación + caja negra al tercerizar.
+4. Cómo trabajamos contigo — **partner de producción, no reemplazo**: "tu equipo dirige, nosotros producimos a escala, y lo ves todo". Loop Marketing como beneficio ("gasto → inversión que se acumula").
+5. Qué hacemos — capacidad de producción creativa que escala el output del equipo: identidad, contenido full-funnel, audiovisual (Globe Studio), campañas.
 6. ⭐ Diferenciador medible — operaciones creativas (menos rondas / más bien a la primera / ciclo más corto → Revenue Enabled) como bloque vivo (island).
 7. Motor de producción IA — Multi-Model AI Studio + "cómo está hecho" (los propios assets como portfolio).
 8. Casos — Sky (+127% tráfico orgánico), Bresler (+180% ventas digitales), Berel (retainer SEO+AEO).
