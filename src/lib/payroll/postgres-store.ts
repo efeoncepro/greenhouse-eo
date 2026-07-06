@@ -485,7 +485,7 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
     unemploymentRate: toNumber(row.unemployment_rate),
     contractType,
     payrollVia: normalizePayrollVia(row.payroll_via, contractType),
-    scheduleRequired: row.daily_required ?? resolveScheduleRequired({ contractType }),
+    scheduleRequired: resolveScheduleRequired({ contractType, scheduleRequired: row.daily_required }),
     deelContractId: normalizeNullableString(row.deel_contract_id),
     hasApv: Boolean(row.has_apv),
     apvAmount: toNumber(row.apv_amount),
