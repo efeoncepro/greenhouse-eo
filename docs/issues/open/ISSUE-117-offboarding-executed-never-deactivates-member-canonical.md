@@ -45,10 +45,11 @@ Es decir: aunque un offboarding llegue a `executed`, el colaborador permanece "a
 
 ## Impacto
 
-- **Privacidad/operacional (gatillo de este issue)**: ex-colaboradores entraban al roster de avisos de nómina 1:1. En este caso NO se les envió porque el cruce contra Entra los descartó (sus cuentas ya no existen), pero cualquier consumidor que confíe solo en `members.active` sin verificar Entra los incluiría.
-- **Nómina**: personas desvinculadas siguen siendo "workforce activo" → riesgo de aparecer como candidatas de cálculo/pago si no las filtra otra capa.
+- **Pago incorrecto CONFIRMADO (2026-07-06)**: **Felipe Zurita** (honorarios, deprovisionado en Entra el 2026-06-10) fue incluido en el cálculo de nómina del período **2026-06** corrido hoy, con `payroll_entries` **gross 650.000 / neto 550.875 / retención SII 99.125**, período ya `status=exported`. Su mayo (parcial) fue 201.190; junio salió **completo sin prorratear la salida**. Causa directa: su único caso de offboarding es el stub SCIM `identity_only`/`informational` en `needs_review` (nunca ejecutado, sin `last_working_day`), así que `closeFuturePayrollEligibility` jamás corrió y el resolver de exit-eligibility no tenía nada que excluir. **El bug SÍ movió dinero, no solo rosters.**
+- **Privacidad/operacional (gatillo original)**: ex-colaboradores entraban al roster de avisos de nómina 1:1. No se les envió porque el cruce contra Entra los descartó, pero cualquier consumidor que confíe solo en `members.active` los incluiría.
+- **Nómina (sistémico)**: **toda** persona deprovisionada por SCIM cuyo caso quede en `needs_review` sin acción humana sigue siendo honorario/colaborador plenamente activo → se le calcula y paga hasta que alguien accione el caso manualmente. No hay gate que bloquee/marque la nómina ante una salida sin resolver.
 - **360 / People / reporting**: headcount y directorios inflados con gente que ya salió.
-- **Drift silencioso**: no hay señal que detecte "member `active=true` con offboarding `executed`" ni "member ausente de Entra pero `active=true`".
+- **Drift silencioso**: no hay señal que detecte "member `active=true` con offboarding `executed`", "member ausente de Entra pero `active=true`", ni "caso de salida `needs_review` de un member que entra a la nómina".
 
 ## Solución
 
