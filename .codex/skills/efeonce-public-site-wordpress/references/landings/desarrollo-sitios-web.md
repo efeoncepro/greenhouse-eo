@@ -24,13 +24,30 @@
 - Results/proof section: `proof proof-premium` with `data-capture="results-proof"` and CSS marker `task-1345-proof-premium-v1`; presents published proof as an evidence system, not a generic case gallery. It preserves the existing Ghamadent `+52%`, Sky Airlines `+127%`, and AI "en validación" claims, but adds guardrails: data, context, authorization, baseline, signal, likely cause and next cycle. Do not add fake metrics or publish AI results without authorization/evidence.
 - Enterprise control section: `close close-premium` with `data-capture="enterprise-control"` and CSS marker `task-1345-close-premium-v1`; presents scale/control as a delivery control plane plus three comparable engagement models. CTA links stay pointed to `#cotizar`. Keep it framed as governance, security, traceability and operating model clarity, not as vague "enterprise-grade" decoration.
 - FAQ section: `faq faq-premium` with `data-capture="faq-premium"` and CSS marker `task-1345-faq-premium-v1`; uses native `<details name="task1345-faq">` / `<summary>` disclosure for keyboard-accessible exclusive accordion behavior, plus a diagnostic brief panel. The accordion shell is intentionally transparent so the rows do not read as "card on card". FAQPage JSON-LD must match the five visible questions exactly; do not add ranking guarantees or unverified SEO/AEO claims.
+- Final conversion section: `final final-premium final-growth-form` with `id="cotizar"`, `data-capture="final-growth-form"` and CSS marker `task-1345-final-growth-form-v1`; embeds the real Growth Form renderer, not a fake/static form. Keep the premium split: architecture/trust copy on the left, `diagnostic_premium` Growth Form on the right. Desktop uses a widened shell plus balanced, slightly smaller H2 so `Construyamos` does not break mid-word; do not narrow the wrap back to 1240px without checking desktop composition. Mobile intentionally gives the form panel extra right gutter so the fixed Ohio switcher does not cover critical fields; do not solve that by editing global widgets, header or wrappers.
 - Do not reintroduce Wave branding, Wave copy, or raw Velo artifact naming.
 - Source inspiration: TASK-1345 wireframe/flow/motion and Velo/v11 HTML as blueprint only.
-- Primary CTA: `/contacto/` fallback with UTM:
-  - `utm_source=landing_desarrollo_sitios_web`
-  - `utm_medium=web`
-  - `utm_campaign=task_1345`
-- No dedicated Growth Form exists yet. Keep the contact fallback until Growth Forms/HubSpot/Meetings/WhatsApp is explicitly approved.
+- Primary conversion CTAs point to `#cotizar`. `/contacto/` remains available only as general navigation/fallback from no-script or success actions.
+
+## Growth Form
+
+- Slug: `efeonce-desarrollo-web-cotizacion`
+- Name: `Efeonce · Cotización desarrollo de sitios web`
+- Form ID: `fdef-35169368-ae4b-4403-9735-9a79a8d93822`
+- Form key: `00231d6c-e1a0-4857-ae5b-a27262ae8b69`
+- Current published version: v2, `fver-6fc638de-5948-407d-be0b-31954fe29877`
+- Previous version: v1, `fver-b799aecc-095b-4c04-800d-b670945f444d`
+- Host surface: `fhsf-2d4b97ad-7076-4958-8e0f-daf1c995e430`
+- Public API base: `https://greenhouse.efeoncepro.com/api/public/growth/forms/`
+- Renderer: `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`
+- Style variant: `diagnostic_premium`
+- Fields: `fullName`, `email`, `companyName`, `website`, `companySize`, `projectStage`, `objective`
+- Consent: required checkbox `contact_permission`, privacy URL `https://efeoncepro.com/politica-de-privacidad/`
+- Security: Turnstile invisible required, public site key `0x4AAAAAADqwX2R7v-k9pItv`; POST must fail closed without `captchaToken`.
+- Email gate: corporate email policy on `email`, mode `block_field`.
+- Name policy: splits `fullName` into `firstName` / `lastName`.
+- Success behavior: inline `success_card`, visitor-facing support copy only; do not expose internal WordPress/Growth Forms implementation details in the success state.
+- Destination policy: one HubSpot-shaped destination is copied for parity, but delivery mode remains `disabled`; direct HubSpot delivery is gated by TASK-1264/operator cutover. Accepted submissions are still governed by Greenhouse Growth Forms.
 
 ## SEO
 
@@ -92,6 +109,9 @@ Backups before TASK-1345 live mutations:
 - `_gh_backup_before_task1345_faq_premium_v1_20260706T092810Z`
 - `_gh_backup_before_task1345_faq_premium_v1_20260706T092952Z`
 - `_gh_backup_before_task1345_faq_premium_v1_20260706T093121Z`
+- `_gh_backup_before_task1345_final_growth_form_v1_20260706T100740Z`
+- `_gh_backup_before_task1345_final_growth_form_v1_20260706T101437Z`
+- `_gh_backup_before_task1345_final_growth_form_v1_20260706T103022Z`
 
 After rollback, purge Kinsta cache and re-check robots/canonical.
 
@@ -115,12 +135,13 @@ After rollback, purge Kinsta cache and re-check robots/canonical.
 - Latest results/proof update: `proof-premium` live with CSS marker `task-1345-proof-premium-v1`; Playwright verifies desktop/mobile 390 `overflow=0`, native Ohio header, no `with-spacer`, no `with-breadcrumbs`, 3 proof cards, 4 evidence ledger rows, 3 platform partner pills, no custom header/wrapper selector hits, and reduced-motion transitions disabled. Elementor source check returns `elementHits=[]` and `pageSettingsHits=[]`. Captures: `.captures/task-1345-proof-premium-v1/`.
 - Latest enterprise control update: `close-premium` live with CSS marker `task-1345-close-premium-v1`; Playwright verifies desktop/mobile 390 `overflow=0`, native Ohio header, no `with-spacer`, no `with-breadcrumbs`, 4 control signals, 4 delivery plane rows, 3 engagement model cards, 3 CTAs to `#cotizar`, no custom header/wrapper selector hits, and reduced-motion transitions/ambient pulse disabled. Elementor source check returns `elementHits=[]` and `pageSettingsHits=[]`. Captures: `.captures/task-1345-close-premium-v1/`.
 - Latest FAQ update: `faq-premium` live with CSS marker `task-1345-faq-premium-v1`; Playwright verifies clean desktop/mobile 390 `overflow=0`, native Ohio header, no `with-spacer`, no `with-breadcrumbs`, 5 native disclosure items, one open item by `name` accordion behavior, 4 diagnostic brief items, visible FAQ questions equal FAQPage JSON-LD questions, no custom header/wrapper selector hits, and reduced-motion transitions/reveal animation disabled. Screenshot capture after Playwright's element screenshot can expose Ohio's hidden wide submenu as a known false positive; the pre-screenshot `cleanViewport` is the section/page overflow truth. Elementor source check returns `elementHits=[]` and `pageSettingsHits=[]`. Captures: `.captures/task-1345-faq-premium-v1/`.
+- Latest final Growth Form update: `final-growth-form` live with CSS marker `task-1345-final-growth-form-v1`; Elementor source check returns `elementHits=[]` and `pageSettingsHits=[]`, and the final widget contains `<greenhouse-form form-key="00231d6c-e1a0-4857-ae5b-a27262ae8b69" surface="fhsf-2d4b97ad-7076-4958-8e0f-daf1c995e430" locale="es-CL" color-scheme="light" appearance="bare">`. Public API with `Origin: https://efeoncepro.com` returns v2 (`fver-6fc638de-5948-407d-be0b-31954fe29877`) and CORS `access-control-allow-origin: https://efeoncepro.com`; OPTIONS submit returns 204 with `POST, OPTIONS`. POST without Turnstile token returns 403 `captcha_failed/missing_token` and submission counts remain `{"total":"0","accepted":"0","rejected":"0"}`. Playwright verifies desktop/mobile 390/reduced `overflow=0`, native Ohio header, no `with-spacer`, no `with-breadcrumbs`, renderer mounted, no fake `.formcard` fields, no public internal copy (`Growth Forms`/`WordPress`), premium trust copy present, select listbox opens within viewport, client validation renders before captcha, and reduced-motion transitions are disabled. Desktop screenshot verifies the final H2 no longer splits `Construyamos` mid-word after the widened shell/type scale adjustment. Captures: `.captures/task-1345-final-growth-form-v3/`.
 
 ## Known Follow-ups
 
 - Decide whether final IA should keep `/desarrollo-sitios-web/` or migrate to `/servicios/diseno-desarrollo-web/` with redirect/canonical.
 - Resolve `/diseno-web/` legacy ownership.
-- Create dedicated conversion primitive.
 - Add durable GVC scenario if the landing enters recurring visual governance.
 - Run Rich Results Test and Search Console after indexing.
-- Next unpolished section: `section.final` / "Construyamos el motor, no solo el sitio." (`id="cotizar"`).
+- HubSpot direct delivery cutover remains gated by TASK-1264/operator approval; do not flip the destination from `disabled` without a separate rollout.
+- Run a real accepted submission only with operator approval because it creates a live Greenhouse submission/lead record.
