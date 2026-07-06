@@ -65,16 +65,21 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`
-- `docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` (§offboarding closure completeness, §workforce exit payroll eligibility)
+- `docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` (§offboarding closure completeness, §workforce exit payroll eligibility, §payroll participation window)
+- `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` + `docs/architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`
 - `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` (§SCIM provisioning/deprovisioning, §session access lifecycle)
+- `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (boundary contractor payables ↔ closure `contractor_closure`, NUNCA finiquito)
 - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` (reliability signals)
-- `docs/architecture/GREENHOUSE_CANONICAL_PATTERNS_V1.md` (state-machine+CHECK+audit; outbox+reactive; flag default-OFF+shadow+flip)
+- `docs/architecture/GREENHOUSE_CANONICAL_PATTERNS_V1.md` (state-machine+CHECK+audit; outbox+reactive; VIEW/helper/signal; SSOT; flag default-OFF+shadow+flip)
 
 Reglas obligatorias:
 
-- Skill MANDATORIA `greenhouse-payroll-auditor` antes de tocar payroll/offboarding/exit eligibility.
+- Skill MANDATORIA `greenhouse-payroll-auditor` antes de tocar payroll/offboarding/exit eligibility. Revisión de arquitectura con `arch-architect` (4-pillar) y del boundary financiero con `greenhouse-finance-accounting-operator`.
 - **NUNCA** escribir `greenhouse_core.members.active/status` con un `UPDATE` suelto: modelar un command auditado canónico (transacción única: member + audit/event).
-- **Boundary duro:** este dominio no recalcula ni muta `payroll_entries`/`compensation_versions`/`final_settlements`; solo consume el resultado del offboarding y desactiva el member. Mantener `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde como gate.
+- **Clasificar antes de actuar (payroll invariant).** La desactivación del member es uniforme, pero la *preservación del pago final* es lane-específica: `external_payroll`/Deel/EOR → Greenhouse NO paga (Deel/EOR liquida; no hay payout que preservar); lanes internas (`indefinido`/`plazo_fijo`/`honorarios`/`international_internal`) → puede haber payout/settlement interno del período de salida que NO se debe perder. Reusar `rule_lane` del caso (ya resuelto), no re-derivar por heurística.
+- **La inclusión de payroll/payout NO se decide por `members.active` crudo.** La autoridad canónica es `resolveExitEligibilityForMembers` (`src/lib/payroll/exit-eligibility/index.ts`) + participation-window (`src/lib/payroll/participation-window/`), keyeada por `last_working_day`. La task DEBE (a) verificar que ese resolver es independiente de `members.active` y mantenerlo así, y (b) escribir `contract_end_date`/status coherente con `last_working_day` del caso.
+- **Boundary duro:** este dominio no recalcula ni muta `payroll_entries`/`compensation_versions`/`final_settlements`/`contractor_payables`; solo consume el resultado del offboarding y desactiva el member. Mantener `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde como gate.
+- **Finanzas (SoD + append-only):** desactivar el member NUNCA orfana una obligación abierta con la persona (contractor payable / final settlement / honorario pendiente) ni borra su historia (soft flag, NUNCA delete) — la atribución de costo/`member loaded cost` histórica debe sobrevivir. Cruzar `greenhouse_hr.contractor_payables` abiertos antes de desactivar.
 - Backfill por el command canónico + dry-run/apply allowlist, **NUNCA** SQL manual.
 - Flag default-OFF + shadow en staging + flip post-smoke (patrón canónico).
 
@@ -90,7 +95,9 @@ Reglas obligatorias:
 - `greenhouse_hr.work_relationship_offboarding_cases` (+ `_events`) — SoT del caso
 - `src/lib/workforce/offboarding/store.ts` (`updateOffboardingCaseStatus`, `closeFuturePayrollEligibility`)
 - `src/lib/workforce/offboarding/lane.ts` (resolución de `ruleLane` + `greenhouseExecutionMode`)
-- `GREENHOUSE_EVENT_CATALOG_V1.md` — registrar evento nuevo si se emite `member.deactivated`/equivalente
+- `src/lib/payroll/exit-eligibility/index.ts` (`resolveExitEligibilityForMembers`) + `src/lib/payroll/participation-window/` — autoridad de inclusión de payroll; verificar independencia de `members.active`
+- `src/lib/contractor-engagements/payables/store.ts` — cruce de payables abiertos (no orfanar)
+- `GREENHOUSE_EVENT_CATALOG_V1.md` — registrar evento nuevo `member.deactivated_by_offboarding`/equivalente + wiring a reactive consumers (360 facets / serving cache / BQ)
 
 ### Blocks / Impacts
 
@@ -120,6 +127,7 @@ Reglas obligatorias:
 
 - El executor no escribe `greenhouse_core.members` (active/status) → member sigue activo tras `executed`
 - No hay command canónico de desactivación de member por offboarding
+- **Causa raíz arquitectónica (SSOT):** `members.active` se usa como si fuera la fuente de verdad de "workforce activo", pero es un projection que **nada mantiene**. Los consumers de roster/360/people hand-rollean `WHERE active=true` (ej. el roster hardcodeado del CLI `teams:payment-announcement`). Falta un reader canónico derivado `resolveActiveWorkforceMembers()`/`isMemberActiveWorkforce()` que componga lifecycle del member + offboarding + presencia en Entra. (payroll SÍ usa el resolver de exit-eligibility, no `active` crudo — por eso el bug filtró a rosters, no a nómina.)
 - Política SCIM `identity_only` no desactiva ni reconcilia
 - Bajas de Entra sin caso (Maggie) no se detectan ni cierran
 - No hay reliability signal para el drift
@@ -147,7 +155,10 @@ Reglas obligatorias:
 - Entidades/tablas/views afectadas: `greenhouse_core.members`, `greenhouse_hr.work_relationship_offboarding_cases` (+ `_events`)
 - Invariantes que no se pueden romper:
   - Una transición `→ executed` de una lane que desactiva DEBE dejar `members.active=false` + `status` de salida en la MISMA transacción (o abortar completa).
-  - **NUNCA** mutar `payroll_entries`/`compensation_versions`/`final_settlements` desde esta task.
+  - **NUNCA** mutar `payroll_entries`/`compensation_versions`/`final_settlements`/`contractor_payables` desde esta task.
+  - **La inclusión de payroll/payout del período de salida NO puede depender de `members.active`**: sigue gobernada por `resolveExitEligibilityForMembers` + participation-window (keyed por `last_working_day`). Desactivar el member NUNCA deja sin su pago final (parcial) a quien salió a mitad de período.
+  - Desactivar el member NUNCA orfana una obligación abierta con la persona (contractor payable / final settlement / honorario) ni borra su historia; la atribución de costo histórica (`member loaded cost`) sobrevive (soft flag, NUNCA delete).
+  - `members.active` es un **projection mantenido** (SSOT del lifecycle vía el writeback), NO la fuente de verdad de "workforce activo para operar"; los consumers deben migrar a un reader canónico derivado (ver Gap + Follow-ups), no hand-rollear `WHERE active=true`.
   - El command es idempotente: reejecutar sobre un member ya inactivo no falla ni duplica auditoría.
   - Backfill append-only en auditoría; nunca borra filas.
 - Tenant/space boundary: member resuelto desde el caso (`member_id` del `offboarding_case`); no cross-tenant.
@@ -200,10 +211,16 @@ Reglas obligatorias:
 
 ### Slice 1 — Command canónico de desactivación de member + writeback en el executor (flag OFF)
 
-- Command `deactivateMemberForOffboarding` en `src/lib/workforce/offboarding/member-lifecycle.ts` `[verificar]`: dado un caso `executed`, marca `greenhouse_core.members` (`active=false`, `status` de salida, `contract_end_date`/último día laboral) + audit/event, idempotente, dentro de tx.
+- Command `deactivateMemberForOffboarding` en `src/lib/workforce/offboarding/member-lifecycle.ts` `[verificar]`: dado un caso `executed`, marca `greenhouse_core.members` (`active=false`, `status` de salida, `contract_end_date`/último día laboral coherente con `last_working_day`) + audit + **outbox event `member.deactivated_by_offboarding`** (wiring a reactive consumers 360/serving/BQ), idempotente, dentro de tx.
 - Cablearlo en `updateOffboardingCaseStatus` (transición `→ executed`) dentro de la MISMA `withTransaction`, gateado por `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (default OFF).
-- Aplica a lanes `full` y `partial` (incl. `external_payroll`/Deel: Greenhouse es el 360, desactiva el member aunque Deel haga la baja real).
-- Tests focales del command (idempotencia, tx-atómica, lanes).
+- Aplica a lanes `full` y `partial` (incl. `external_payroll`/Deel: Greenhouse es el 360, desactiva el member aunque Deel/EOR haga la baja real).
+- **Gate de no-regresión payroll:** verificar (test + lectura de código) que `resolveExitEligibilityForMembers` + participation-window NO dependen de `members.active` → el pago final del período de salida se preserva. Si algún consumer de payroll/payout dependiera de `active`, es blocker previo al flip.
+- Tests focales del command (idempotencia, tx-atómica, lanes, coherencia `contract_end_date`↔`last_working_day`).
+
+### Slice 1b — Auditoría de consumers de `members.active` (roster/360/people) + reader canónico
+
+- Inventariar consumers que hand-rollean `WHERE members.active=true` para "workforce activo" (roster CLI `teams:payment-announcement`, people directory, account/person 360, candidatos).
+- Introducir reader canónico `resolveActiveWorkforceMembers()`/`isMemberActiveWorkforce()` en `src/lib/**` que componga lifecycle del member + offboarding + (opcional) presencia en Entra. Migrar al menos el roster de `teams:payment-announcement` a este reader (cierra el gatillo original del bug). El resto puede quedar como follow-up declarado.
 
 ### Slice 2 — Política del lane SCIM `identity_only` / `informational`
 
@@ -236,6 +253,8 @@ Reglas obligatorias:
 
 Referencia canónica: `docs/issues/open/ISSUE-117-...`. El corazón es cerrar el hueco de writeback: hoy `updateOffboardingCaseStatus` (store.ts:926-999) transiciona el caso a `executed` sin tocar `members`. El command nuevo debe correr en esa misma transacción para preservar atomicidad (caso executed ⇔ member inactivo). El valor de `members.status` de salida debe confirmarse contra el dominio real de la columna (`information_schema` / CHECK constraint) — `[verificar]` durante Discovery; no inventar un literal.
 
+**Decisión de arquitectura — defensa en profundidad SIN trigger duro (arch-architect):** las capas son (1) app guard = el command en la tx `executed`, (2) detective = reliability signal de drift, (3) audit append-only + outbox event, (4) backfill gobernado. **Se descarta a propósito un trigger/CHECK duro "caso executed ⇒ member inactivo"** porque colisiona con la ventana de participación de payroll: un member puede estar legítimamente `active` durante el período de salida hasta liquidar su pago final. Un constraint rígido bloquearía ese estado válido. Por eso la consistencia se mantiene por command + señal (detective), no por constraint (preventive). Es la misma razón por la que `members.active` NO puede ser el predicado de inclusión de payroll.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -250,8 +269,10 @@ Referencia canónica: `docs/issues/open/ISSUE-117-...`. El corazón es cerrar el
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
+| **Apagar `active` deja sin su pago final (parcial) a quien salió a mitad de período** | payroll | medium | inclusión sigue por `resolveExitEligibilityForMembers` + participation-window (NO `active`); gate de no-regresión Slice 1; lane-aware (Deel no tiene payout Greenhouse) | `workforce.offboarding.executed_member_still_active` + tests payroll |
 | Desactivar un member que NO debía (falso positivo de lane/backfill) | identity | medium | flag OFF + shadow staging + backfill allowlist explícita + command idempotente y reversible | `identity.workforce.active_member_absent_from_entra` |
 | Writeback rompe la atomicidad de la tx `executed` (deja caso executed pero member intacto, o viceversa) | payroll/identity | low | mismo `withTransaction`; test de rollback de tx | `workforce.offboarding.executed_member_still_active` |
+| Orfanar obligación abierta (contractor payable / final settlement / honorario) al desactivar | finance/contractor | medium | cruce de `contractor_payables` abiertos antes de desactivar; soft flag (nunca delete); historia de costo sobrevive | payable abierto de member inactivo (detector/log) |
 | Tocar por error payroll/finiquito | payroll | low | boundary duro + gate `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde | tests en rojo (CI) |
 | Política SCIM escala de más y desactiva por una desactivación transitoria de Entra | identity/SCIM | medium | decisión explícita con People Ops + no-op default hasta confirmar; detector antes que auto-desactivación | `identity.workforce.active_member_absent_from_entra` |
 | Valor de `members.status` inválido para el dominio de la columna | migration/identity | low | `[verificar]` enum/CHECK en Discovery antes de escribir | error de constraint (CI/staging) |
@@ -291,9 +312,11 @@ Referencia canónica: `docs/issues/open/ISSUE-117-...`. El corazón es cerrar el
 
 ## Acceptance Criteria
 
-- [ ] Un offboarding que llega a `executed` (lane `full`/`partial`) deja `greenhouse_core.members.active=false` + `status` de salida en la misma transacción (verificado en staging con un caso de prueba).
-- [ ] El command de desactivación es idempotente (reejecutar no falla ni duplica auditoría) y emite audit/event canónico.
-- [ ] Ningún path de esta task muta `payroll_entries`/`compensation_versions`/`final_settlements`; `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde.
+- [ ] Un offboarding que llega a `executed` (lane `full`/`partial`) deja `greenhouse_core.members.active=false` + `status` de salida + `contract_end_date` coherente con `last_working_day`, en la misma transacción (verificado en staging con un caso de prueba).
+- [ ] El command de desactivación es idempotente (reejecutar no falla ni duplica auditoría) y emite audit + outbox event `member.deactivated_by_offboarding`.
+- [ ] Verificado (test + código) que `resolveExitEligibilityForMembers` + participation-window NO dependen de `members.active` → el pago final del período de salida se preserva; ningún consumer de payroll/payout dropea a quien salió a mitad de período.
+- [ ] Ningún path de esta task muta `payroll_entries`/`compensation_versions`/`final_settlements`/`contractor_payables`; `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde.
+- [ ] Desactivar el member no orfana obligaciones abiertas (cruce `contractor_payables`) ni borra historia de costo (soft flag); reader canónico `resolveActiveWorkforceMembers()` existe y el roster de `teams:payment-announcement` lo consume (deja de hand-rollear `active=true`).
 - [ ] Política SCIM `identity_only` implementada y documentada (escala o no-op explícito + reconciliación).
 - [ ] Detector de members activos ausentes de Entra existe y levanta el caso Maggie.
 - [ ] Signals `workforce.offboarding.executed_member_still_active` y `identity.workforce.active_member_absent_from_entra` registrados y en 0 tras backfill.
@@ -324,7 +347,17 @@ Referencia canónica: `docs/issues/open/ISSUE-117-...`. El corazón es cerrar el
 ## Follow-ups
 
 - Posible UI/Nexa consumer para "desactivar/reactivar member" gobernado (Full API Parity) si emerge necesidad operativa.
-- Auditoría de otros readers de "workforce activo" que confían solo en `members.active` sin cruzar Entra.
+- Migrar el resto de consumers de "workforce activo" (people directory, account/person 360, candidatos) al reader canónico `resolveActiveWorkforceMembers()` (Slice 1b migra solo el roster gatillo; el resto queda como sweep declarado).
+- Evaluar `members.status` como state machine canónica con transiciones declaradas + audit log dedicado si hoy es free-text (arch: state-machine+CHECK+audit trio).
+
+## Delta 2026-07-06 — revisión tri-skill (payroll + arquitectura + finanzas)
+
+Revisado en profundidad con `greenhouse-payroll-auditor`, `arch-architect` (4-pillar) y `greenhouse-finance-accounting-operator`. Ajustes incorporados:
+
+- **Payroll (corrección de supuesto):** la inclusión de payroll/payout NO se decide por `members.active` (el grep de `active=true` en readers de payroll salió vacío; usan `resolveExitEligibilityForMembers` + participation-window). Por eso el bug filtró a **rosters**, no a nómina. Añadido gate de no-regresión (Slice 1) + invariante lane-aware de preservación del pago final (Deel/EOR sin payout Greenhouse vs lanes internas con settlement a preservar).
+- **Arquitectura (SSOT + defensa en profundidad):** identificada la causa raíz de fondo — `members.active` es un projection no-mantenido usado como SSOT de "workforce activo". Añadido: reader canónico `resolveActiveWorkforceMembers()` (Slice 1b) + outbox event a reactive consumers (360/serving/BQ) + decisión explícita de **NO usar trigger duro** (colisiona con la ventana de participación de payroll) → consistencia por command+señal, no por constraint.
+- **Finanzas (boundary + append-only):** invariante de no orfanar obligaciones abiertas (contractor payables / final settlement / honorario) al desactivar; historia de costo (`member loaded cost`) sobrevive (soft flag, NUNCA delete); cruce de `contractor_payables` abiertos. Boundary contractor closure ≠ finiquito respetado.
+- **4-pillar (arch-architect):** Safety = flag OFF + allowlist + capability existente del executor; Robustness = tx atómica + idempotencia + preservación de pago final; Resilience = outbox/reactive + 2 signals + backfill reversible; Scalability = command reusable (Full API Parity) sin lógica duplicada por consumer.
 
 ## Open Questions
 

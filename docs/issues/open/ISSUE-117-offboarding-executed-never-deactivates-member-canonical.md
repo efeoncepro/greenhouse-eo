@@ -69,6 +69,16 @@ Requiere task(s) de implementación (dominio Payroll/Workforce, EPIC offboarding
 - Signals `workforce.offboarding.executed_member_still_active` y `identity.workforce.active_member_absent_from_entra` en `0`.
 - `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde (gate de no-regresión del dominio).
 
+## Delta 2026-07-06 — refinamiento tri-skill (payroll + arquitectura + finanzas)
+
+Revisado con `greenhouse-payroll-auditor` + `arch-architect` + `greenhouse-finance-accounting-operator` al crear la remediación (TASK-1349):
+
+- **Corrección:** la inclusión de payroll NO depende de `members.active` (usa `resolveExitEligibilityForMembers` + participation-window); por eso el drift filtró a **rosters/360**, no a la nómina. El fix debe preservar el pago final (parcial) de quien salió a mitad de período — la inclusión sigue por el resolver, no por `active`.
+- **Causa raíz de fondo:** `members.active` es un projection no-mantenido usado como SSOT de "workforce activo"; la dirección canónica es un reader derivado `resolveActiveWorkforceMembers()` + mantener la columna honesta por writeback. Se descarta trigger duro (colisiona con la ventana de participación de payroll) → consistencia por command+señal.
+- **Finanzas:** desactivar NUNCA orfana obligaciones abiertas (contractor payable / final settlement) ni borra historia de costo (soft flag).
+
+Remediación: **TASK-1349** (`docs/tasks/to-do/TASK-1349-offboarding-member-lifecycle-writeback.md`).
+
 ## Estado
 
 open
