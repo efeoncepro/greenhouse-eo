@@ -26,7 +26,24 @@ type CliOptions = {
   triggeredBy: string
 }
 
+// Roster verificado contra Microsoft Entra + greenhouse_core.members el 2026-07-06.
+// Solo personas de Efeonce con cuenta ACTIVA en Entra (el bot crea el 1:1 con el
+// Entra Object ID = members.azure_oid; no se requiere un Teams id `29:...`).
+// Excluidos a propósito:
+//   - Julio Reyes (operador), Valentina Hoyos (pedido explícito del operador).
+//   - María Camila Hoyos y Maggie Borralles: desvinculadas, ya no están en Entra
+//     (siguen active=true en la DB — drift de offboarding pendiente para People Ops).
+//   - Felipe Zurita: fuera, ya no está en Entra.
+//   - Luis Reyes: active honorarios en la DB pero SIN cuenta en Entra → el bot no
+//     puede crearle chat 1:1 (avisar por otro canal o provisionar en Entra).
 const recipients: Recipient[] = [
+  {
+    memberId: 'andres-carlosama',
+    displayName: 'Andrés Carlosama',
+    firstName: 'Andrés',
+    aadObjectId: '1e1053db-eb2c-4ac4-877e-87ddbb828a5a',
+    messageType: 'nomina'
+  },
   {
     memberId: 'daniela-ferreira',
     displayName: 'Daniela Ferreira',
@@ -42,25 +59,18 @@ const recipients: Recipient[] = [
     messageType: 'nomina'
   },
   {
-    memberId: 'andres-carlosama',
-    displayName: 'Andres Carlosama',
-    firstName: 'Andres',
-    aadObjectId: '1e1053db-eb2c-4ac4-877e-87ddbb828a5a',
+    memberId: 'humberly-henriquez',
+    displayName: 'Humberly Henriquez',
+    firstName: 'Humberly',
+    aadObjectId: '2041f234-c5d4-4a79-9849-0278c7176438',
+    messageType: 'honorarios'
+  },
+  {
+    memberId: '7da60123-3e54-4db9-9dd0-1962f69073a2',
+    displayName: 'Maria Fernanda Gonzalez',
+    firstName: 'María Fernanda',
+    aadObjectId: '6a6bcc6d-95a6-4a6b-be3f-536ea2b79e9c',
     messageType: 'nomina'
-  },
-  {
-    memberId: 'valentina-hoyos',
-    displayName: 'Valentina Hoyos',
-    firstName: 'Valentina',
-    aadObjectId: 'f60d5730-1aab-45ec-a435-45ffe8be6f54',
-    messageType: 'honorarios'
-  },
-  {
-    memberId: 'e603fade-b262-43d3-896f-09f04dd6ddd7',
-    displayName: 'Felipe Zurita',
-    firstName: 'Felipe',
-    aadObjectId: 'ec1b7fd0-87c9-43cd-a46f-1e8c37297258',
-    messageType: 'honorarios'
   }
 ]
 

@@ -192,6 +192,67 @@ void (async () => {
 '
 ```
 
+## Payment Announcements 1:1 (nómina / honorarios)
+
+There is a **dedicated CLI** for 1:1 "payment done" cards to the team via the TeamBot — separate from `teams:announce` (which only targets group/channel destinations `eo-team` / release channel and CANNOT DM). Use this for "avísale al equipo que su nómina/honorarios ya se depositó".
+
+- CLI: `pnpm teams:payment-announcement --period YYYY-MM --dry-run` → then `--yes` to send.
+- Script: `scripts/send-payroll-payment-teams-announcements.ts` (roster is **hardcoded** in the `recipients` array — keep it current).
+- Two card variants by `messageType`: `nomina` → "Pago de nómina realizado ✅" + CTA `/my/payroll`; `honorarios` → "Pago de honorarios realizado ✅" + CTA `/my/contractor`.
+- Built-in **duplicate protection per `--period`** (audit rows `teams-payment-*` in `greenhouse_sync.source_sync_runs`, `source_system='teams_notification'`). Re-running the same period skips already-sent people. Use `--allow-duplicate` to override.
+- `--dry-run` and `--yes` are mutually exclusive; a real send requires `--yes`.
+
+### 1:1 identity: Entra Object ID, NOT a Teams `29:` id
+
+The 1:1 create (`getOrCreateOneOnOneChat` → `POST {serviceUrl}/v3/conversations` with `members:[{ id }]` + `tenantId`) takes the **Microsoft Entra Object ID** as `recipient_user_id`. This is `members.azure_oid` (== `client_users.microsoft_oid` in most cases). **You do NOT need a separate Teams messaging id (`29:...`).** `members.teams_user_id` is usually `null` and is not required for this proactive-DM path. The recipient must exist and be `accountEnabled=true` in the Efeonce Entra tenant, or the send fails `recipient_not_in_tenant`.
+
+### Rebuilding the roster (don't trust the hardcoded list)
+
+The hardcoded `recipients` drifts (people leave / join). To rebuild it, query the source of truth + verify against Entra:
+
+1. **Active workforce from PG** — `greenhouse_core.members` already has everything (no extra joins needed for identity):
+
+```bash
+pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs -e '
+void (async () => {
+  const { loadGreenhouseToolEnv } = await import("./scripts/lib/load-greenhouse-tool-env");
+  loadGreenhouseToolEnv();
+  const pg = await import("./src/lib/postgres/client");
+  try {
+    const rows = await pg.runGreenhousePostgresQuery(
+      "select member_id, display_name, first_name, primary_email, contract_type, pay_regime, payroll_via, azure_oid, teams_user_id from greenhouse_core.members where active=true and coalesce(is_demo,false)=false order by contract_type, display_name"
+    );
+    console.log(JSON.stringify(rows, null, 2));
+  } finally { await pg.closeGreenhousePostgres(); }
+})().catch(e => { console.error(e instanceof Error ? e.message : String(e)); process.exitCode = 1; });
+'
+```
+
+   - Classify `messageType`: `contract_type='honorarios'` (chile/internal) → `honorarios`; employees (`indefinido`, `international_internal`) and Deel contractors (per operator preference 2026-07-06) → `nomina`. Confirm the Deel-contractor mapping with the operator — it changes the CTA/wording.
+   - Exclude the operator (self) and anyone the operator names.
+
+2. **Verify each `azure_oid` against Microsoft Entra** (authoritative; the PG `azure_oid` can be stale, and a fired person can stay `active=true` in PG — offboarding drift). List real tenant humans:
+
+```bash
+az rest --method GET --url "https://graph.microsoft.com/v1.0/users?\$select=id,displayName,userPrincipalName,accountEnabled&\$top=200"
+```
+
+   The Efeonce tenant (~25 objects) mixes shared mailboxes/groups (`Comercial`, `Developers`, `Finanzas`, `People`, `Soporte`, `Talento`…) and **external Globe client guests** (Sky Airline `*_skyairline.com#EXT#`, Berel `*_berel.com#EXT#`). **Never** send payroll DMs to shared mailboxes or client guests — only individual `@efeoncepro.com` staff. If a person is `active` in PG but absent from Entra, the bot cannot DM them (flag for People Ops / other channel).
+
+### Roster snapshot verified 2026-07-06 (period 2026-06)
+
+Sent nómina/honorarios 1:1 to the 5 reachable Efeonce staff. Keep as reference; re-verify before reuse.
+
+| Persona | member_id | messageType | Entra Object ID (azure_oid) |
+|---|---|---|---|
+| Andrés Carlosama | `andres-carlosama` | nomina | `1e1053db-eb2c-4ac4-877e-87ddbb828a5a` |
+| Daniela Ferreira | `daniela-ferreira` | nomina | `e4c8ddee-74e0-43ec-846c-c0379e1bdaff` |
+| Melkin Hernandez | `melkin-hernandez` | nomina | `76a1194f-f999-4bdf-9aaa-3f8d08936082` |
+| Humberly Henriquez | `humberly-henriquez` | honorarios | `2041f234-c5d4-4a79-9849-0278c7176438` |
+| Maria Fernanda Gonzalez | `7da60123-3e54-4db9-9dd0-1962f69073a2` | nomina | `6a6bcc6d-95a6-4a6b-be3f-536ea2b79e9c` |
+
+Excluded / not reachable at that time: **Valentina Hoyos** (operator excluded), **Julio Reyes** (operator/self), **Luis Reyes** (active honorarios in PG but no Entra account → cannot DM), **María Camila Hoyos** + **Maggie Borralles** (terminated; still `active=true` in PG — offboarding drift), **Felipe Zurita** (gone). The old hardcoded roster (Daniela/Melkin/Andres=nomina, Valentina/Felipe=honorarios) was stale — do not trust it.
+
 ## Troubleshooting
 
 - **Card duplicated with a text bubble above it:** `activity.text` was sent along with the card. Remove `activity.text`.
