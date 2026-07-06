@@ -10,6 +10,7 @@ canonical docs or WordPress runtime inspection.
 | About us | `https://efeoncepro.com/about-us-efeonce/` | `249770` | publish | `landings/about-us-efeonce.md` | Loop Marketing module reuses home `lp-container-offset-*`; protect full-bleed section, add only restrained page-scoped gutter |
 | Desarrollo de sitios web | `https://efeoncepro.com/desarrollo-sitios-web/` | `250816` | publish | `landings/desarrollo-sitios-web.md` | TASK-1345 live v1; Elementor document with AEO-style native Ohio hero + premium Hero Factory visual v14 in `wdvis` on the native hero gradient; premium sections through `final-growth-form`; Growth Form `efeonce-desarrollo-web-cotizacion` v2 + Turnstile; no Wave/sweep/scan/local animation background/header overrides; no header/wrapper overrides |
 | HubSpot Services | `https://efeoncepro.com/servicios-contratar-hubspot/` | `244079` | publish | `landings/hubspot-services.md` | Protect Ohio headline featured image `248703`; partner proof legacy sections; headline display helper |
+| Posicionamiento SEO | `https://efeoncepro.com/servicios/posicionamiento-seo/` | `251078` | publish | `landings/posicionamiento-seo.md` | TASK-1343 Claude Design artifact; Elementor default template with native Ohio `header-3` light-background variant; preserve keyword marquee + scroll reveal motion; no `elementor_canvas`, no custom sticky header, no forced dark hero; CTA to Think Brand Visibility |
 
 ## Registration Rules
 
