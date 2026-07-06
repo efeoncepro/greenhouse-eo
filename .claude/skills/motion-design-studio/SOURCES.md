@@ -23,6 +23,10 @@
 | Herramientas AI-VFX (roto/track/relight/mocap) | **volátil (mensual)** | qué tool automatiza qué, cuál lidera | 11 |
 | Specs de entrega (loudness, codecs, tamaños) | **semestral** | targets exactos por destino | 08, 10 |
 
+## Acceso programático — Fal.ai API (desde 2026-07-06)
+
+Además del MCP Higgsfield (interactivo), Greenhouse tiene un **path API a Fal.ai** — agregador que frontea los mismos modelos de video (Seedance 2.0, Kling v3, PixVerse, Veo, Grok Imagine, Gemini Omni, Runway, Luma Ray, Hailuo, Wan…) con una sola API. Cliente canónico: `src/lib/ai/fal.ts` → `runFalModel({ model, input })` (submit+poll; pasás el slug fal, ej. `bytedance/seedance-2.0/mini/image-to-video`). Secreto server-side `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF` — **nunca** hardcodear la key. **Producción out-of-band** (generar + subir por uploader; NO runtime del producto). Pricing por-segundo público en `fal.ai/models` (verificar antes de correr; es volátil). Contrato completo: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+
 ## Fuentes base (as-of 2026-07)
 
 **Tendencias motion / animación 2026**

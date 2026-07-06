@@ -21,6 +21,10 @@
 | Pricing de modelos IA | **volátil (mensual)** | $/min, tiers | 10 |
 | Capacidades MCP (Higgsfield/Adobe audio) | **trimestral** | qué tool hace qué | 10, STUDIO_TOOLING |
 
+## Acceso programático — Fal.ai API (desde 2026-07-06)
+
+Además de ElevenLabs MCP, Greenhouse tiene un **path API a Fal.ai** — agregador que también hostea modelos de audio (TTS, música, SFX) junto a imagen/video. Cliente canónico `src/lib/ai/fal.ts` (`runFalModel({ model, input })`, pasás el slug fal). **Ojo con LICENCIAMIENTO** (regla dura de esta skill): el modelo hosteado en fal conserva su propia licencia comercial — verificarla igual que si lo corrieras directo, fal no la cambia. Secreto server-side `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF`, nunca hardcodear; producción out-of-band. Contrato: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+
 ## Fuentes base (as-of 2026-07)
 
 **Música IA + licencia**

@@ -81,6 +81,15 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 - Use `generateAnimation()` for small SVG/CSS animations, not raster image generation.
 - Use any native image generation tool only for exploratory artifacts or when the user asks for an image in chat rather than a repo asset.
 
+## Fal.ai API (video + media aggregator, out-of-band)
+
+Fal.ai is a programmatic media-generation aggregator — one API fronts many models: **video** (Seedance 2.0, Kling v3, PixVerse, Veo, Grok Imagine, Gemini Omni, Runway, Luma Ray, Hailuo, Wan…), **image** (flux, krea), **audio**, **3D**. Canonical client: `src/lib/ai/fal.ts` — `runFalModel({ model, input })` submits to the fal queue and polls to completion; model-agnostic (pass the fal slug, e.g. `bytedance/seedance-2.0/mini/image-to-video`). Secret resolves server-side via `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF` — never hardcode the `<id>:<secret>` key.
+
+- **Out-of-band, NOT runtime** (same rule as Higgsfield): generate here + upload via the canonical uploader; never wire fal into a product runtime flow (runtime image path stays `src/lib/ai/image-generator.ts`).
+- **Video is the headline** — for video art direction / model choice use `motion-design-studio`; audio → `audio-studio`; model/aesthetic pick → `design-studio`. THIS skill covers still-image asset craft.
+- **Pricing is per-second, public on each model page** (verify at fal.ai/models first): e.g. Seedance 2.0 Standard ~$0.3024/s, Fast ~$0.2419/s, Mini 480p ~$0.0721/s. Audio included free.
+- **State (2026-07-06): scaffolded, no key persisted yet.** Account funded (~$20) but key is temporary/rotation-pending. Provision `FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key` before the first real call. Full contract: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+
 ## Workflow
 
 1. Normalize the asset brief: target surface, audience, final size, format, alpha needs, style, constraints, and whether it is exploratory or repo-bound.
