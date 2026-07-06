@@ -51,6 +51,16 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   Reusa el `<greenhouse-form>` + grader (Full API Parity por reuso). UI ready no.
   Ver `docs/tasks/to-do/TASK-1343-servicios-posicionamiento-seo-landing.md`.
 
+- **PDR-004 — Landing "Agencia Creativa"** (posicionamiento decidido) + **TASK-1350**
+  (to-do, ui-ux/flow, UI ready no): posiciona la **capability creativa** (Globe) como
+  partner de producción que **escala** el output de equipos de marketing in-house
+  (mid-market/enterprise), con **Time-to-Market medible** (cadena ICO) como ventaja
+  competitiva y ejecución **Design Engineer** (arte+color+ingeniería, assets con el
+  stack IA propio) en WordPress code-custom. CTA "Agenda una reunión". Lidera Efeonce.
+  Ver [PDR-004](decisions/PDR-004-landing-agencia-creativa-posicionamiento.md) +
+  `docs/tasks/to-do/TASK-1350-landing-agencia-creativa.md`. Pendiente: dirección de
+  arte del hero + contrato de Motion antes de `UI ready: yes`.
+
 ## Next
 
 - **Crawl vivo** de `efeoncepro.com` (route-ownership matrix): confirmar si

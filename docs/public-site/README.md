@@ -35,6 +35,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   - [PDR-001 — Landing SEO complementaria al AEO](decisions/PDR-001-seo-landing-complementaria-al-aeo.md)
   - [PDR-002 — Arquitectura de información de la sección de visibilidad](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md)
   - [PDR-003 — Layering del ecosistema digital Efeonce](decisions/PDR-003-layering-ecosistema-digital-efeonce.md)
+  - [PDR-004 — Posicionamiento de la landing "Agencia Creativa"](decisions/PDR-004-landing-agencia-creativa-posicionamiento.md)
 
 ## Contexto canónico (fuentes que este espacio NO reimplementa)
 
