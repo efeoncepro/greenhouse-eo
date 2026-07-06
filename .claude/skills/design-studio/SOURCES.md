@@ -21,7 +21,7 @@
 
 ## Acceso programático — Fal.ai API (desde 2026-07-06)
 
-Path de producción adicional a los MCP (Higgsfield/Firefly/Magnific): **Fal.ai** — agregador que frontea muchos modelos de imagen (flux, krea) y video (Seedance, Kling, Veo, PixVerse…) con una sola API. Al dirigir y elegir modelo, considerá fal como opción de producción vía el cliente canónico `src/lib/ai/fal.ts` (`runFalModel`). **Out-of-band** (generar + subir por uploader, NO runtime); secreto server-side `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF`, nunca hardcodear. Pricing público por modelo en `fal.ai/models`. Contrato: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+Path de producción adicional a los MCP (Higgsfield/Firefly/Magnific): **Fal.ai** — agregador que frontea muchos modelos de imagen (flux, krea) y video (Seedance, Kling, Veo, PixVerse…) con una sola API. Al dirigir y elegir modelo, considerá fal como opción de producción vía el cliente canónico `src/lib/ai/fal.ts` (`runFalModel`). **Out-of-band** (generar + subir por uploader, NO runtime); secreto server-side `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF`, nunca hardcodear. Pricing público por modelo en `fal.ai/models`. Catálogo completo de modelos + slugs (imagen/edit/upscale/video/3D/…): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`. Contrato: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
 
 ## Fuentes base (as-of 2026-07)
 
