@@ -34,6 +34,10 @@ Use this reference for any Efeonce public landing page on WordPress/Ohio/Element
 6. **Mutate minimally**
    - Use semantic `gh-*` classes for Greenhouse-recognizable modules.
    - Prefer Ohio/Elementor native widgets and controls before custom CSS.
+   - For dark or light bands under Ohio's fixed lateral widgets, use Ohio's native section scheme classes on the actual section/root element before styling the widgets directly:
+     `clb__dark_section`, `clb__light_section`, or `clb__dark_section_fixed`.
+     Ohio's runtime observes those classes and toggles `.dynamic-typo` surfaces such as `.elements-bar`, `.social-bar`, color switcher, search/scroll controls, and header dynamic typography between `light-typo` and `dark-typo`.
+     Do not force lateral widget contrast with custom `.elements-bar`, `.social-bar`, `.color-switcher`, header, wrapper, or runtime scroll scripts unless the native mechanism is proven unavailable.
    - Do not introduce global selectors for local page rhythm, cards, badges, or hero fixes.
 
 7. **Purge and verify**
