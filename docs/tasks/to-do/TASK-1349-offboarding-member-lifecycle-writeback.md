@@ -9,7 +9,7 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P0`
+- Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
@@ -31,7 +31,7 @@
 
 ## Summary
 
-El executor de offboarding cierra elegibilidad de nómina y revoca acceso, pero **nunca desactiva el registro canónico `greenhouse_core.members`** (no hay ningún code path en el repo que ponga `members.active=false` ni un `status` de salida, en ninguna lane). Peor: cuando la baja llega solo por SCIM (`identity_only`/`informational`), el caso queda en `needs_review` sin ejecutar, así que `closeFuturePayrollEligibility` **jamás corre** y la persona sigue siendo colaborador/honorario plenamente activo → **se le calcula y paga nómina**. Impacto confirmado 2026-07-06: Felipe Zurita (deprovisionado en Entra 2026-06-10, caso en `needs_review`) recibió honorarios completos de junio (gross 650.000, período `exported`). Esta task cierra el bug (ISSUE-117): agrega el writeback canónico del ciclo de vida al ejecutar el offboarding, **un gate de readiness de nómina ante salida sin resolver (mitigación P0)**, define la política SCIM `identity_only`, detecta bajas de Entra sin caso, agrega reliability signals y hace backfill de los casos ya rotos.
+El executor de offboarding cierra elegibilidad de nómina y revoca acceso, pero **nunca desactiva el registro canónico `greenhouse_core.members`** (no hay ningún code path en el repo que ponga `members.active=false` ni un `status` de salida, en ninguna lane). Peor: cuando la baja llega solo por SCIM (`identity_only`/`informational`), el caso queda en `needs_review` sin ejecutar, así que `closeFuturePayrollEligibility` **jamás corre** y la persona sigue siendo colaborador/honorario plenamente activo → **se le calcula y exporta nómina**. Cuasi-incidente 2026-07-06: Felipe Zurita (deprovisionado en Entra 2026-06-10, caso en `needs_review`) fue calculado y exportado en junio (gross 650.000); **no se pagó porque el equipo lo retuvo a mano sabiendo que ya no estaba** (near miss — el último control fue conocimiento tribal, no el sistema). Esta task cierra el bug (ISSUE-117): agrega el writeback canónico del ciclo de vida al ejecutar el offboarding, **un gate de readiness de nómina ante salida sin resolver (mitigación P0)**, define la política SCIM `identity_only`, detecta bajas de Entra sin caso, agrega reliability signals y hace backfill de los casos ya rotos.
 
 ## Why This Task Exists
 
@@ -367,9 +367,9 @@ Revisado en profundidad con `greenhouse-payroll-auditor`, `arch-architect` (4-pi
 - **Finanzas (boundary + append-only):** invariante de no orfanar obligaciones abiertas (contractor payables / final settlement / honorario) al desactivar; historia de costo (`member loaded cost`) sobrevive (soft flag, NUNCA delete); cruce de `contractor_payables` abiertos. Boundary contractor closure ≠ finiquito respetado.
 - **4-pillar (arch-architect):** Safety = flag OFF + allowlist + capability existente del executor; Robustness = tx atómica + idempotencia + preservación de pago final; Resilience = outbox/reactive + 3 signals + backfill reversible; Scalability = command reusable (Full API Parity) sin lógica duplicada por consumer.
 
-## Delta 2026-07-06 (2) — impacto en pagos CONFIRMADO → P0 + Slice 0
+## Delta 2026-07-06 (2) — cuasi-incidente de pago (near miss) → Slice 0
 
-El operador reportó y se verificó en PG que el bug **movió dinero**: Felipe Zurita (honorarios, deprovisionado en Entra 2026-06-10, caso de offboarding en `needs_review` sin ejecutar) recibió `payroll_entries` de junio 2026 por **gross 650.000 / neto 550.875**, período `exported`, calculado hoy 2026-07-06. Su único "offboarding" nunca corrió `closeFuturePayrollEligibility` ni fijó `last_working_day`, así que el cálculo lo tomó como honorario plenamente activo. Ajustes: (1) **Priority P1 → P0**; (2) nueva **Slice 0** (gate/señal de readiness de nómina ante salida sin resolver) como mitigación de bajo blast-radius que puede shipear primero y detener el pago silencioso a deprovisionados; (3) tercer signal `payroll.readiness.member_with_unresolved_exit`. El agujero sistémico: cualquier persona deprovisionada por SCIM cuyo caso quede en `needs_review` sigue cobrando hasta que un humano lo accione.
+Se verificó en PG que el bug **llegó a generar y exportar** el pago: Felipe Zurita (honorarios, deprovisionado en Entra 2026-06-10, caso de offboarding en `needs_review` sin ejecutar) tiene `payroll_entries` de junio 2026 por **gross 650.000 / neto 550.875**, período `exported`, calculado el 2026-07-06. **No se perdió dinero: el equipo lo retuvo manualmente porque sabía que ya no estaba** — el último control fue conocimiento tribal, no el sistema. Su único "offboarding" nunca corrió `closeFuturePayrollEligibility` ni fijó `last_working_day`, así que el cálculo lo tomó como honorario plenamente activo. Ajustes: (1) nueva **Slice 0** (gate/señal de readiness de nómina ante salida sin resolver) como mitigación de bajo blast-radius que puede shipear primero y reemplazar el control tribal por uno del sistema; (2) tercer signal `payroll.readiness.member_with_unresolved_exit`. **Priority se mantiene P1** (no hubo pérdida; la red de seguridad humana sostuvo), pero el control gap es real y sistémico: cualquier persona deprovisionada por SCIM cuyo caso quede en `needs_review` seguiría siendo calculada/exportada hasta que un humano lo note. Subir a P0 si se considera inaceptable depender de conocimiento tribal en payroll.
 
 ## Open Questions
 
