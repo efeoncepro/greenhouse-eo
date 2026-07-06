@@ -273,6 +273,7 @@ Zero dependencias nuevas.
 - **Producción out-of-band, NO runtime** (misma regla que Higgsfield): generar acá + **subir el asset por el uploader canónico**; **NUNCA** cablear fal a un flujo runtime del producto — el entrypoint runtime de imagen sigue siendo `src/lib/ai/image-generator.ts` (OpenAI/Imagen).
 - **Dirección de arte por dominio:** video → skill `motion-design-studio`; audio → `audio-studio`; elección de modelo/estética → `design-studio`; still images de UI/marca → `greenhouse-ai-image-generator`. El cliente opera el modelo; las skills aportan brief/composición/QA.
 - **Pricing público por-segundo en la página del modelo** (verificar en `fal.ai/models` antes de correr — es volátil): ej. Seedance 2.0 Standard ~US$0.3024/s (10s ≈US$3.02, hasta 1080p), Fast ~US$0.2419/s (hasta 720p), Mini 480p ~US$0.0721/s (~US$0.36 los 5s). Audio incluido sin costo extra. El costo es lineal (`$/s × duración`); resolución y duración lo suben proporcionalmente.
+- **Catálogo completo de modelos y capacidades:** `GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` — las 13 categorías (imagen, edición, upscale, bg-removal, video t2v/i2v/v2v, TTS, música/SFX, STT/voice, 3D, LLM, training) con slugs verificados 2026-07-06.
 
 ### AI providers — texto/LLM (Gemini, Anthropic, OpenAI) — desde 2026-06-05
 
