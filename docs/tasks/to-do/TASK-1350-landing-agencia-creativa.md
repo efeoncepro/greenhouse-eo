@@ -39,7 +39,7 @@ El 68% de los compradores B2B dice que todas las agencias suenan igual (`docs/co
 
 - Publicar una landing de agencia creativa en `efeoncepro.com` que lidere con Efeonce, posicione a Efeonce como **la capacidad de producción creativa que escala el output del equipo de marketing in-house** (partner, no reemplazo) "operada como sistema medible con visibilidad total", y convierta a **"Agenda una reunión"** (HubSpot Meetings) con atribución UTM.
 - Que la ejecución **pruebe** el concepto Design Engineer: art direction real (assets producidos con el stack IA propio), motion con intención, performance (CWV) impecable y accesibilidad — construida a mano en un theme custom, no en Elementor.
-- Incluir el bloque diferenciador de **operaciones creativas medibles** (menos rondas / más piezas bien a la primera / ciclo más corto → Revenue Enabled) como componente vivo, no imagen estática.
+- Incluir el bloque diferenciador de **operaciones creativas medibles** con el **Time-to-Market como titular** (más piezas bien a la primera + menos rondas → ciclo más corto → llegas antes al mercado → Revenue Enabled) como componente vivo, no imagen estática — la ventaja competitiva es producir más rápido sin perder calidad, **probado con el número**.
 - Dejar la superficie indexable + citable (SEO/AEO: schema, answer capsules) y medible (conversión + GA4/GSC).
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -256,7 +256,7 @@ Estructura canónica de la página (jerarquía de conversión; detalle de region
 3. El problema — el equipo de marketing in-house no da abasto (demanda de piezas > capacidad) + fragmentación + caja negra al tercerizar.
 4. Cómo trabajamos contigo — **partner de producción, no reemplazo**: "tu equipo dirige, nosotros producimos a escala, y lo ves todo". Loop Marketing como beneficio ("gasto → inversión que se acumula").
 5. Qué hacemos — capacidad de producción creativa que escala el output del equipo: identidad, contenido full-funnel, audiovisual (Globe Studio), campañas.
-6. ⭐ Diferenciador medible — operaciones creativas (menos rondas / más bien a la primera / ciclo más corto → Revenue Enabled) como bloque vivo (island).
+6. ⭐ Diferenciador medible — **la ventaja competitiva es el Time-to-Market probado**: más piezas bien a la primera (FTR = calidad, guardrail de la velocidad) + menos rondas (RpA) → ciclo más corto → **llegas antes al mercado (TTM)** → Revenue Enabled. TTM es el **titular** de la cadena; el bloque vivo (island) lo muestra como número, no como promesa. "Producir más rápido sin perder calidad" no se afirma: se mide y se ve.
 7. Motor de producción IA — Multi-Model AI Studio + "cómo está hecho" (los propios assets como portfolio).
 8. Casos — Sky (+127% tráfico orgánico), Bresler (+180% ventas digitales), Berel (retainer SEO+AEO).
 9. Ecosistema / switching cost — Greenhouse como prueba de la transparencia.

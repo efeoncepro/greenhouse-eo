@@ -54,10 +54,12 @@ Copy es-CL, tuteo, beneficios antes que siglas, lidera Efeonce. Strings iniciale
 | `publicsite.agencia-creativa.how.body` | 4 | Tu marketing deja de ser gasto y se vuelve inversión que se acumula. | — | Loop Marketing como beneficio |
 | `publicsite.agencia-creativa.services.title` | 5 | Lo que hacemos | — | capability creativa |
 | `publicsite.agencia-creativa.services.items` | 5 | Identidad y concepto · Contenido full-funnel · Producción audiovisual · Campañas | — | Globe Studio como motor de producción |
-| `publicsite.agencia-creativa.diff.title` | 6 | Otras agencias te mandan el reporte. Nosotros te damos el tablero. | — | el diferenciador |
+| `publicsite.agencia-creativa.diff.title` | 6 | Producir más rápido, sin bajar la calidad. Y con el número para probarlo. | — | titular = TTM probado |
+| `publicsite.agencia-creativa.diff.subtitle` | 6 | Otras agencias te mandan el reporte. Nosotros te damos el tablero. | — | transparencia |
+| `publicsite.agencia-creativa.diff.metric_ttm` | 6 | Llegas antes al mercado | valor ilustrativo | **TTM = titular / outcome de negocio** |
+| `publicsite.agencia-creativa.diff.metric_ftr` | 6 | Más piezas bien a la primera | valor ilustrativo | FTR = calidad, guardrail de la velocidad |
 | `publicsite.agencia-creativa.diff.metric_rounds` | 6 | Menos rondas de revisión por entregable | valor ilustrativo | RpA como beneficio |
-| `publicsite.agencia-creativa.diff.metric_ftr` | 6 | Más piezas bien a la primera | valor ilustrativo | FTR como beneficio |
-| `publicsite.agencia-creativa.diff.metric_cycle` | 6 | Ciclo de producción más corto | valor ilustrativo | Cycle Time → Time-to-Market |
+| `publicsite.agencia-creativa.diff.metric_cycle` | 6 | Ciclo de producción más corto | valor ilustrativo | Cycle Time (el "cómo" del TTM) |
 | `publicsite.agencia-creativa.diff.disclaimer` | 6 | Cifras ilustrativas del modelo de operación. | — | honestidad: no live del portal |
 | `publicsite.agencia-creativa.aistudio.title` | 7 | IA con estándar de marca, no IA suelta. | — | Multi-Model AI Studio + gobernanza |
 | `publicsite.agencia-creativa.cases.title` | 8 | Lo que producimos, con resultados | — | solo casos citables |
