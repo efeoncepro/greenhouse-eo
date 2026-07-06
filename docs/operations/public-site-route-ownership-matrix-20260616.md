@@ -21,6 +21,8 @@ This matrix is a planning artifact. It does not change DNS, Vercel, Kinsta or Wo
 |---|---|---|---|---|
 | `/` | WordPress/Kinsta | Astro/Vercel | Cut over only with core-page parity | No placeholder/scaffold; canonical apex only |
 | `/servicio-*`, `/servicios-*`, service pages | WordPress/Elementor | Astro/Vercel | First coded landing pilot after SEO foundation | Same-domain only; no indexable subdomain |
+| `/servicios/` | WordPress/Elementor | Astro/Vercel | Live as minimal parent page for nested service URLs | Expand into editorial services hub before heavy internal linking |
+| `/servicios/posicionamiento-seo/` | WordPress/Elementor | Astro/Vercel | Live SEO service landing (TASK-1343) | Canonical same-domain; CTA to Think Brand Visibility; preserve Ohio widgets until redesign decision |
 | Business cases / campaign pages | WordPress/Elementor or absent | Astro/Vercel | New pages start as Vercel previews, noindex until approved | HubSpot attribution and canonical required |
 | `/blog` | WordPress/Kinsta | Astro/Vercel rendering WordPress content | Do not cut over until blog listing/card/meta parity exists | Sitemap/canonical must not duplicate WordPress-rendered listing |
 | Blog posts | WordPress Gutenberg content | Astro/Vercel rendering WordPress content | Headless render preferred; proxy only temporary and gated | Preserve Yoast/meta/schema or deliberate replacement |

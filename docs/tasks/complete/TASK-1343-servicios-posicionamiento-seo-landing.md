@@ -8,20 +8,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1343-servicios-posicionamiento-seo-landing.md`
 - Flow: `docs/ui/flows/TASK-1343-servicios-posicionamiento-seo-landing-flow.md`
 - Motion: `docs/ui/motion/TASK-1343-servicios-posicionamiento-seo-landing-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-019`
-- Status real: `Diseno`
+- Status real: `Publicado en WordPress`
 - Rank: `TBD`
 - Domain: `public-site`
 - Blocked by: `none`
@@ -325,13 +325,34 @@ Cambio aditivo de contenido en el sitio público (nueva ruta), sin runtime de da
 
 ## Verification
 
+### 2026-07-06 — Live WordPress rollout
+
+Nota de scope: el operador corrigió explícitamente que la landing aprobada era el artefacto de Claude Design, no el blueprint original de esta task. La implementación final respeta ese diseño aprobado: el `<h1>` queda como `Que te encuentren en Google, y que la IA no te ignore.`; el targeting SEO vive en title/meta, schema, copy, FAQ y secciones.
+
+- Publicado en WordPress/Elementor vía `Document::save()` en `https://efeoncepro.com/servicios/posicionamiento-seo/`.
+- WordPress page ID: `251078`; parent `/servicios/` creado como página mínima ID `251077`.
+- Backup meta final: `_gh_backup_before_task1343_seo_landing_20260706T210238Z`.
+- CTA primario apunta a `https://think.efeoncepro.com/brand-visibility?utm_source=efeoncepro&utm_medium=landing&utm_campaign=posicionamiento-seo`.
+- Puente AEO apunta a `/aeo-2/` mientras el sibling `/servicios/aeo` queda como follow-up.
+- No se reconstruyó el form ni el grader; el primer release usa link al nodo Think existente.
+- Kinsta cache purgada con `wp kinsta cache purge --all`.
+- Corrección post-feedback del operador: widgets Ohio visibles; font de Tabler Icons restaurada (`138` iconos, `invalidIcons=[]`).
+
+Evidencia:
+
 - `pnpm task:lint --task TASK-1343`
-- `pnpm ui:wireframe-check --task TASK-1343`
-- `pnpm ui:flow-check --task TASK-1343`
-- `pnpm ui:motion-check --task TASK-1343`
-- `pnpm fe:capture public-servicios-posicionamiento-seo --env=<preview> --gif` (desktop + mobile + reduced-motion)
-- Google Rich Results Test (JSON-LD) + Search Console (indexación) sobre la URL productiva
-- Validación manual del embed del form (submit real de prueba) o del fallback link
+- `pnpm ops:lint --changed`
+- `pnpm qa:gates --changed --agent codex --task TASK-1343 --ui --runtime --production` (advisory; evidencia visual/runtime abajo)
+- Playwright live: `.captures/task1343-seo-live-user-correction-2026-07-06T21-03-13-511Z/`
+- Desktop `1440`: `scrollWidth=1440`, `clientWidth=1440`, `errors=[]`, widgets Ohio visibles, `invalidIcons=[]`.
+- Mobile `390`: `scrollWidth=390`, `clientWidth=390`, `errors=[]`, widgets Ohio visibles, `invalidIcons=[]`.
+- HTTP: `/servicios/posicionamiento-seo/`, `/servicios/`, `/aeo-2/` y `https://think.efeoncepro.com/brand-visibility` responden `200`.
+
+Pendiente no bloqueante:
+
+- Convertir `/servicios/` desde página mínima a hub editorial propio.
+- Crear sibling `/servicios/aeo` + 301 desde `/aeo-2` cuando se ejecute la task correspondiente.
+- Si se quiere embed real del `<greenhouse-form>` dentro de esta landing, coordinar CORS/surface allowlist y Growth Forms; el release actual usa fallback link aprobado a Think.
 
 ## Closing Protocol
 

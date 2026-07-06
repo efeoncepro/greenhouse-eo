@@ -9647,3 +9647,10 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 - Se quitó del hero el row `Tu sitio queda legible para SEO/AEO/IA`.
 - Tras validar que `HubSpot Solutions Partner` no funcionaba visualmente en este hero oscuro, se retiró también del hero y se dejó sólo el proof de marcas/países estilo AEO en una cápsula compacta dark-hero.
 - Publicado vía Elementor `Document::save()` con backup final `_gh_backup_before_task1345_hero_proof_brand_only_v4_20260706T201443Z`; Kinsta cache purgada. Playwright desktop `1440x1100` y mobile `390x1000`: `scrollDelta=0`, `hasHubspotNode=false`, `hasOldProofMarkers=false`, sin `with-spacer`, sin breadcrumbs y sin selectores prohibidos de header/wrapper.
+
+## 2026-07-06 — Public Site `/servicios/posicionamiento-seo/`: SEO landing publicada
+
+- Se publicó la landing pública de SEO en WordPress/Elementor desde el Claude Design aprobado: page ID `251078`, parent `/servicios/` ID `251077`, ruta `https://efeoncepro.com/servicios/posicionamiento-seo/`.
+- El CTA principal entrega al nodo Think Brand Visibility con UTM; el puente AEO apunta a `/aeo-2/`; metadata Yoast, canonical y schema quedaron live. No se reconstruyó el form/grader.
+- Se preservaron los widgets Ohio por feedback del operador y se corrigieron los iconos Tabler que estaban siendo pisados por el override tipográfico.
+- Verificación live desktop 1440 + mobile 390: sin overflow, sin errores JS, widgets Ohio visibles, `138` iconos válidos, Kinsta cache purgada.
