@@ -34,14 +34,12 @@ Como consecuencia, el reader exige `hasAttendanceSignal` desde BigQuery `greenho
 
 ## Solución
 
-Fix robusto en 4 capas (defense-in-depth), formalizado como **TASK-1347** (`backend-data`, `backend-critical`):
+Formalizada como **TASK-1347** (`backend-data`, `reader`). El diseño se **recalibró en Discovery** (2026-07-06): existe la política canónica `SCHEDULE_DEFAULTS` (`src/types/hr-contracts.ts:57`) donde `daily_required` es `overridable: true` para régimenes internacionales → ese flag es data **válida**, no incoherente. Por eso el fix robusto se reduce a corregir el **primitive** (no mutar data válida ni detectarla):
 
-1. **Derivación:** reescribir `requiresPayrollAttendanceSignal` como allowlist positivo anclado al régimen dependiente Chile. El flag `daily_required` deja de tener dientes fuera de Chile.
-2. **Write-path guard:** rechazar (422 canónico) `daily_required=true` cuando el contractType no es dependiente Chile.
-3. **Normalización de data existente:** migration/backfill que corrige filas incoherentes (`daily_required=true` en régimen no-Chile → `false`), incluida Maria Fernanda.
-4. **Detector de drift:** reliability signal `payroll.contract.schedule_regime_mismatch` (steady=0) que barre toda la población.
+1. **Predicado régimen-scoped (core + unblock):** reescribir `requiresPayrollAttendanceSignal` como allowlist positivo anclado al régimen dependiente Chile (`isChileDependentContract` = `indefinido`/`plazo_fijo`). La asistencia diaria solo aplica en régimen Chile; ningún `daily_required`/`scheduleRequired` la habilita fuera de Chile. Régimenes internacionales nuevos default a "no requiere" (fail-safe, escalable).
+2. **Read mapper coherente (no parche):** corregir `postgres-store.ts:488` para rutear por `resolveScheduleRequired({ contractType, scheduleRequired: row.daily_required })` (como ya hacen el write path y el BQ mapper), honrando `SCHEDULE_DEFAULTS.overridable` — cierra el smell de precedencia invertida.
 
-Mitigación inmediata (si se necesita desbloquear antes del merge): poner `daily_required=false` en Maria Fernanda vía el path gobernado de contrato — temporal, cuya condición de retiro es que la Capa 1 quede mergeada. Queda subsumida por el backfill de la Capa 3.
+Descartados en Discovery (habrían operado sobre data válida): write-path guard que rechaza `daily_required=true` en régimen internacional, migration/backfill de normalización, y reliability signal de drift. **Maria Fernanda (`7da60123`) NO necesita data-fix** — tras la Capa 1 su flag es payroll-irrelevante. Los tests unitarios exhaustivos reemplazan al detector como guardrail de regresión.
 
 ## Verificación
 

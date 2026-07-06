@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,9 +17,9 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `migration`
+- Backend impact: `reader`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `En ejecucion`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -112,51 +112,51 @@ Reglas obligatorias:
 
 ### Backend/data brief
 
-- Backend rigor: `backend-critical`
-- Impacto principal: `migration`
-- Source of truth afectado: `greenhouse_core.members.daily_required` + predicado `requiresPayrollAttendanceSignal` (payroll readiness/calculate)
-- Consumidores afectados: `payroll readiness reader, calculate-payroll, UI Nómina mensual, reliability dashboard`
-- Runtime target: `staging` → `production`
+- Backend rigor: `backend-standard`
+- Impacto principal: `reader`
+- Source of truth afectado: predicado `requiresPayrollAttendanceSignal` + derivación `scheduleRequired` (régimen de contrato como fuente de verdad; `SCHEDULE_DEFAULTS` en `hr-contracts.ts`)
+- Consumidores afectados: `payroll readiness reader, calculate-payroll, project-payroll, UI Nómina mensual`
+- Runtime target: `staging` → `production` (code-only)
 
 ### Contract surface
 
-- Contrato existente a respetar: `getPayrollPeriodReadiness` (shape `PayrollPeriodReadiness`), `calculatePayroll`, error canónico `canonicalErrorResponse`.
-- Contrato nuevo o modificado: predicado `requiresPayrollAttendanceSignal` (allowlist positivo); guard de write en el command de contrato; reliability signal `payroll.contract.schedule_regime_mismatch`.
+- Contrato existente a respetar: `getPayrollPeriodReadiness` (shape `PayrollPeriodReadiness`), `calculatePayroll`, `resolveScheduleRequired` + `SCHEDULE_DEFAULTS` (hr-contracts.ts).
+- Contrato nuevo o modificado: predicado `requiresPayrollAttendanceSignal` (allowlist régimen-scoped) + helper `isChileDependentContract`; read mapper `postgres-store.ts:488` ruteado por `resolveScheduleRequired`.
 - Backward compatibility: `compatible` (el cambio solo *reduce* falsos requerimientos de asistencia; los dependientes Chile mantienen su comportamiento).
-- Full API parity: la regla vive en el primitive `src/lib/payroll/**`, consumida por UI y readers; el guard es command-level, no UI-level.
+- Full API parity: la regla vive en el primitive `src/lib/payroll/**` + `src/types/hr-contracts.ts`, consumida por readers y UI; un único predicado, muchos consumers.
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `greenhouse_core.members`, `greenhouse_payroll.compensation_versions` (lectura).
+- Entidades/tablas/views afectadas: ninguna mutación; solo lectura de `greenhouse_payroll.compensation_versions` + `greenhouse_core.members.daily_required`.
 - Invariantes que no se pueden romper:
-  - Asistencia diaria se exige solo a `indefinido`/`plazo_fijo` (dependiente Chile) con `scheduleRequired !== false`.
-  - `daily_required = true` solo es válido en régimen dependiente Chile.
-  - No aplicar deducciones/estatutos Chile a `international_internal` (invariante de dominio existente).
+  - Asistencia diaria se exige solo a régimen dependiente Chile (`indefinido`/`plazo_fijo`).
+  - `SCHEDULE_DEFAULTS.overridable` es autoritativo sobre `daily_required` en la derivación de `scheduleRequired`.
+  - No aplicar deducciones/estatutos/mecánicas de asistencia Chile a `international_internal` (invariante de dominio existente).
 - Tenant/space boundary: payroll opera sobre members activos; sin cambio de boundary.
-- Idempotency/concurrency: backfill idempotente (`WHERE daily_required = true AND contract no-Chile`); guard sincrónico en el command.
-- Audit/outbox/history: el backfill queda registrado en el commit + migration; el guard emite error canónico; el drift se observa vía reliability signal (append-only en su tabla de runs).
+- Idempotency/concurrency: `N/A` — sin writes, sin migración, cambio de lógica puro.
+- Audit/outbox/history: `N/A` — no hay mutación de estado.
 
 ### Migration, backfill and rollout
 
-- Migration posture: `backfill` (normaliza `daily_required` incoherente) — additive, no destructiva.
-- Default state: `enabled with rationale` (el fix de derivación es seguro/aditivo; sin flag — reduce falsos blockers).
-- Backfill plan: dry-run (SELECT de filas afectadas) → apply (UPDATE acotado a régimen no-Chile) → verify count 0 restante. Batch chico (población pequeña).
-- Rollback path: revert PR del código; el backfill es reversible por naturaleza (los valores previos se pueden restaurar si se requiere, pero `true` en régimen no-Chile era el estado inválido).
-- External coordination: `N/A — repo-only change` (sin secrets/env/provider). Sign-off HR recomendado por ser dominio payroll.
+- Migration posture: `none` (cambio code-only; sin DDL ni data mutation).
+- Default state: `enabled with rationale` (aditivo/seguro; solo reduce falsos blockers de asistencia; sin flag).
+- Backfill plan: `N/A` — la data `daily_required=true` en régimen internacional es válida (`overridable`), no se normaliza.
+- Rollback path: revert PR + redeploy (<10 min).
+- External coordination: `N/A — repo-only change`. Sign-off HR recomendado por ser dominio payroll.
 
 ### Security and access
 
-- Auth/access gate: el command de contrato ya está detrás de capability/rol HR; sin cambio de gate.
-- Sensitive data posture: `payroll` — no loggear PII; el detector reporta `member_id` + régimen, no datos sensibles.
-- Error contract: guard de write usa `canonicalErrorResponse` (código nuevo, ej. `daily_required_incompatible_with_regime`).
-- Abuse/rate-limit posture: `N/A` — mutación gobernada interna.
+- Auth/access gate: sin cambio — no se agregan endpoints ni commands.
+- Sensitive data posture: `payroll` — no loggear PII; el fix es lógica pura.
+- Error contract: sin nuevos errores client-facing (no hay write guard nuevo).
+- Abuse/rate-limit posture: `N/A`.
 
 ### Runtime evidence
 
 - Local checks: `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding`, `pnpm exec eslint src/lib/payroll`, `pnpm typecheck`.
-- DB/runtime checks: `getPayrollPeriodReadiness('2026-06')` contra PG (script tsx) ⇒ `blockingIssues = []`; verificar migration con SELECT post-apply.
+- DB/runtime checks: `getPayrollPeriodReadiness('2026-06')` contra PG (script tsx) ⇒ `blockingIssues = []`.
 - Integration checks: `N/A`.
-- Reliability signals/logs: `payroll.contract.schedule_regime_mismatch` en `0` post-backfill.
+- Reliability signals/logs: `N/A` (sin signal nuevo).
 - Production verification sequence: ver §Rollout Plan.
 
 ### Acceptance criteria additions
@@ -179,78 +179,69 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Derivación régimen-autoritativa (unblock)
+> **Recalibrado en Discovery (ver `## Delta 2026-07-06`).** El diseño original de 4 capas (guard + backfill + detector) asumía que `daily_required=true` en régimen internacional era data *incoherente*. Discovery encontró la política canónica `SCHEDULE_DEFAULTS` (hr-contracts.ts:57) donde ese flag es `overridable: true` para régimenes internacionales → es data **válida**, no incoherente. Por eso el fix robusto se reduce a corregir el **primitive** (predicado régimen-scoped + read mapper que honra la política), sin mutar data válida ni agregar detectores sobre data válida.
 
-- Reescribir `requiresPayrollAttendanceSignal` como allowlist positivo: `isChileDependentContract(contractType) && scheduleRequired !== false`, con `isChileDependentContract = contractType === 'indefinido' || contractType === 'plazo_fijo'`.
-- Aplicar el mismo predicado en `calculate-payroll.ts` (o extraer al helper compartido para que ambos consumers lo usen).
-- Test de regresión en `payroll-readiness.test.ts`: `international_internal` + `daily_required=true` + `attendance_daily` vacía ⇒ `calculation.ready = true`; y un `indefinido` con `scheduleRequired` sin señal sigue bloqueando.
+### Slice 1 — Predicado de asistencia régimen-scoped (core fix + unblock)
 
-### Slice 2 — Write-path guard (prevención)
+- Agregar helper canónico `isChileDependentContract(contractType)` (= `indefinido | plazo_fijo`) en `src/types/hr-contracts.ts`, junto a `CONTRACT_DERIVATIONS`/`SCHEDULE_DEFAULTS`.
+- Reescribir `requiresPayrollAttendanceSignal` como allowlist positivo anclado al régimen: `isChileDependentContract(contractType)`. La asistencia diaria solo afecta el pago en régimen dependiente Chile; ningún `daily_required`/`scheduleRequired` la habilita fuera de Chile. Régimenes internacionales nuevos default a "no requiere" (fail-safe, escalable).
+- El helper es consumido por los 3 callsites existentes sin cambios (payroll-readiness.ts:293, calculate-payroll.ts:528, project-payroll.ts:266) — todos se benefician del mismo predicado.
+- Tests exhaustivos en `compensation-requirements.test.ts`: los 6 contract types × `scheduleRequired` true/false/undefined ⇒ solo `indefinido`/`plazo_fijo` requieren asistencia. Regresión en `payroll-readiness.test.ts`: `international_internal` + `daily_required=true` + `attendance_daily` vacía ⇒ `calculation.ready = true`.
 
-- En el command que setea `daily_required` (`postgres-store.ts`), rechazar `daily_required = true` cuando el contractType no es dependiente Chile, con `canonicalErrorResponse` (código nuevo).
-- Coverage del guard (rechaza incoherente, permite Chile dependiente).
+### Slice 2 — Read mapper honra la política `overridable` (coherencia / no parche)
 
-### Slice 3 — Normalización de data existente (backfill)
-
-- Migration `-- Up Migration` con marker + bloque `DO` de verificación: `UPDATE greenhouse_core.members SET daily_required = false` para members cuyo contractType vigente no es dependiente Chile y tienen `daily_required = true`.
-- Verify post-apply: count de filas incoherentes = 0 (incluye Maria Fernanda `7da60123`).
-
-### Slice 4 — Detector de drift (resiliencia)
-
-- Reliability signal `payroll.contract.schedule_regime_mismatch` (steady=0) que lista members con `daily_required=true` en régimen no-Chile. Registrar en `/admin/operations`.
+- Corregir el read mapper `mapCompensation` en `postgres-store.ts:488`: reemplazar el bypass `row.daily_required ?? resolveScheduleRequired({ contractType })` por `resolveScheduleRequired({ contractType, scheduleRequired: row.daily_required })`, de modo que la política `SCHEDULE_DEFAULTS.overridable` sea autoritativa (igual que el write path `resolveMemberContractForCompensation:733` y el BQ mapper `get-compensation.ts:238` ya lo hacen). Cierra el smell de precedencia invertida donde un flag crudo le ganaba al resolver canónico.
+- Nota: sin efecto de runtime hoy (ningún calculador consume `scheduleRequired`; su único consumer funcional era el predicado, ahora régimen-scoped), pero elimina el trap latente para el día que aparezca un dependiente Chile con `daily_required` inconsistente.
 
 ## Out of Scope
 
-- Poblar `greenhouse.attendance_daily` / integración de asistencia Teams (riesgo latente separado — candidato a issue propio).
+- **Write-path guard / migration-backfill / reliability signal** (diseño original): eliminados en Discovery — la data `daily_required=true` en régimen internacional es válida (`overridable: true`), no incoherente; no se justifica rechazarla, mutarla ni detectarla. Maria Fernanda (`7da60123`) NO necesita data-fix.
+- Poblar `greenhouse.attendance_daily` / integración de asistencia Teams (riesgo latente separado — ver Follow-ups).
 - Cambiar el cálculo de deducciones, gratificación o retención SII.
-- Cambiar el requisito de KPI ICO (`requiresPayrollKpi`) — es ortogonal y correcto.
+- Cambiar el requisito de KPI ICO (`requiresPayrollKpi`) — ortogonal y correcto.
+- Remover el campo `scheduleRequired` de `CompensationVersion` (quedó sin consumer funcional tras Slice 1, pero removerlo es refactor aparte con riesgo).
 - UI: no se cambia el banner de readiness ni se agrega naming del colaborador bloqueante (posible follow-up UX).
 
 ## Detailed Spec
 
-Ver ISSUE-115 para la cadena causal completa con evidencia runtime (reader real, `attendance_daily` vacía, comparación Maggie vs Maria Fernanda). El principio rector: **el régimen de contrato es la fuente de verdad de si la asistencia afecta el pago; `daily_required` solo modula dentro de un régimen que la soporta.** El predicado pasa de denylist (`!= honorarios && != deel`) a allowlist (`isChileDependentContract && scheduleRequired !== false`), de modo que régimenes internacionales nuevos default a "no requiere asistencia" (fail-safe, escalable).
+Ver ISSUE-115 para la cadena causal completa con evidencia runtime (reader real, `attendance_daily` vacía, comparación Maggie vs Maria Fernanda). El principio rector: **el régimen de contrato es la fuente de verdad de si la asistencia afecta el pago; `daily_required` solo modula dentro de un régimen que la política declara `overridable`.** El predicado pasa de denylist (`!= honorarios && != deel && scheduleRequired !== false`) a allowlist régimen-scoped (`isChileDependentContract`), de modo que régimenes internacionales (presentes y futuros) default a "no requiere asistencia".
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- Slice 1 (derivación) ship primero — es el unblock y es seguro/aditivo.
-- Slice 2 (guard) → Slice 3 (backfill): el guard debe existir antes o junto con el backfill para que la re-entrada no reintroduzca data incoherente.
-- Slice 4 (detector) corre después de Slice 3 para que arranque en steady=0. Puede ir en el mismo PR o siguiente.
+- Slice 1 (predicado) es el unblock y es seguro/aditivo — ship primero.
+- Slice 2 (read mapper coherencia) es independiente e inerte hoy; puede ir en el mismo PR después de Slice 1.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| El allowlist excluye por error a un dependiente Chile real y su nómina no exige asistencia | payroll | low | test cubre `indefinido` sigue exigiendo; gate `vitest run src/lib/payroll` | falla de test / readiness no bloquea a Chile dependiente |
-| El backfill toca filas que no debía (régimen mal resuelto) | migration / payroll | low | dry-run SELECT + WHERE acotado por contractType vigente + verify post-apply | count post-apply ≠ 0 |
-| El guard rompe un write legítimo de `daily_required` en Chile | command | low | guard solo rechaza `true` en no-Chile; coverage explícito | error canónico inesperado en logs |
+| El allowlist excluye por error a un dependiente Chile real y su nómina no exige asistencia | payroll | low | tests cubren `indefinido`/`plazo_fijo` siguen exigiendo; gate `vitest run src/lib/payroll` | falla de test / readiness no bloquea a Chile dependiente |
+| Régimen internacional con pago dependiente de asistencia queda sin exigirla | payroll | low | por diseño de dominio no aplican mecánicas de asistencia Chile a régimen internacional (invariante `international_internal`) | N/A — comportamiento correcto del régimen |
 | Regresión en finiquito/offboarding por tocar predicado compartido | payroll | low | gate `vitest run src/lib/payroll src/lib/workforce/offboarding` verde | rojo en suite offboarding |
 
 ### Feature flags / cutover
 
-Sin flag — el cambio de derivación es aditivo/seguro (solo reduce falsos requerimientos de asistencia; los dependientes Chile mantienen su gate). Revert = revert PR + redeploy. Si se prefiere gradualidad, el guard (Slice 2) puede quedar en modo warn antes de 422; declararlo en el plan del agente.
+Sin flag — el cambio es aditivo/seguro (solo reduce falsos requerimientos de asistencia; los dependientes Chile mantienen su gate). Revert = revert PR + redeploy (<10 min). No hay migración ni data mutation, por lo que el cutover es inmediato y sin backfill.
 
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
 | Slice 1 | revert PR + redeploy | <10 min | si |
-| Slice 2 | revert PR (guard) + redeploy | <10 min | si |
-| Slice 3 | migration inversa restaura valores previos si se snapshotea antes del apply; el estado `true` en no-Chile era inválido | <15 min | parcial |
-| Slice 4 | signal read-only; revert PR | <10 min | si |
+| Slice 2 | revert PR + redeploy | <10 min | si |
 
 ### Production verification sequence
 
 1. Local: `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` + `pnpm typecheck` verdes.
-2. Local/staging: `getPayrollPeriodReadiness('2026-06')` contra PG ⇒ `blockingIssues = []`.
-3. Staging: `pnpm migrate:up` + verify count filas incoherentes = 0.
-4. Staging: readiness `2026-06` + **Calcular** habilitado (agent auth + GVC/curl).
-5. Producción: repetir migrate + verify + readiness. Monitor signal `schedule_regime_mismatch` = 0 durante 7d.
+2. Local: `getPayrollPeriodReadiness('2026-06')` contra PG (script tsx) ⇒ `blockingIssues = []`.
+3. `pnpm test` full + `pnpm build` (gate de cierre).
+4. Deploy code (sin migración ni backfill). Post-deploy: readiness `2026-06` + **Calcular** habilitado (agent auth + curl/GVC).
 
 ### Out-of-band coordination required
 
-`N/A — repo-only change`. Sign-off HR recomendado por ser payroll (comunicar que `international_internal` deja de requerir asistencia diaria — es el comportamiento correcto de su régimen).
+`N/A — repo-only change` (sin migración, sin backfill, sin flags/env). Sign-off HR recomendado por ser payroll (comunicar que `international_internal` deja de requerir asistencia diaria — es el comportamiento correcto de su régimen).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -258,11 +249,10 @@ Sin flag — el cambio de derivación es aditivo/seguro (solo reduce falsos requ
 
 ## Acceptance Criteria
 
-- [ ] `requiresPayrollAttendanceSignal` exige asistencia solo para `indefinido`/`plazo_fijo` con `scheduleRequired !== false`; ningún `daily_required` la habilita fuera de Chile.
-- [ ] El mismo predicado se aplica en `calculate-payroll.ts` (o vía helper compartido) — sin divergencia entre readiness y calculate.
-- [ ] El write-path rechaza `daily_required = true` en régimen no-Chile con error canónico.
-- [ ] Migration normaliza las filas incoherentes; verify post-apply = 0 (incluida `7da60123`).
-- [ ] Reliability signal `payroll.contract.schedule_regime_mismatch` existe y reporta 0 post-backfill.
+- [ ] `requiresPayrollAttendanceSignal` exige asistencia solo para régimen dependiente Chile (`indefinido`/`plazo_fijo`); ningún `daily_required`/`scheduleRequired` la habilita fuera de Chile.
+- [ ] Existe el helper canónico `isChileDependentContract` en `src/types/hr-contracts.ts` y es la única definición del predicado de régimen dependiente Chile usada por el módulo.
+- [ ] El read mapper `postgres-store.ts:488` usa `resolveScheduleRequired({ contractType, scheduleRequired: row.daily_required })` (sin el bypass `??`), honrando `SCHEDULE_DEFAULTS.overridable`.
+- [ ] Tests: los 6 contract types × `scheduleRequired` true/false/undefined ⇒ solo `indefinido`/`plazo_fijo` requieren asistencia; regresión `international_internal` + `daily_required=true` ⇒ readiness ready.
 - [ ] `getPayrollPeriodReadiness('2026-06')` ⇒ `blockingIssues = []` y **Calcular** habilitado.
 - [ ] `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde (sin regresión finiquito/offboarding).
 
@@ -270,9 +260,9 @@ Sin flag — el cambio de derivación es aditivo/seguro (solo reduce falsos requ
 
 - `pnpm lint`
 - `pnpm typecheck`
-- `pnpm test` (foco: `src/lib/payroll`, `src/lib/workforce/offboarding`)
-- Script tsx: `getPayrollPeriodReadiness('2026-06')` contra PG (proxy/connector) ⇒ readiness ready.
-- `pnpm migrate:up` + SELECT verify de filas incoherentes = 0.
+- `pnpm test` (foco: `src/lib/payroll`, `src/lib/workforce/offboarding`) + full suite como gate de cierre
+- `pnpm build`
+- Script tsx: `getPayrollPeriodReadiness('2026-06')` contra PG (connector) ⇒ readiness ready.
 
 ## Closing Protocol
 
@@ -291,5 +281,12 @@ Sin flag — el cambio de derivación es aditivo/seguro (solo reduce falsos requ
 
 ## Open Questions
 
-- Confirmar durante Discovery el nombre exacto del command que muta `daily_required` y su ruta de autorización.
-- Confirmar el path/patrón canónico del reliability signal (`src/lib/reliability/queries/**`) para nombrar el archivo del detector.
+- Resueltas en Discovery — ver `## Delta 2026-07-06`.
+
+## Delta 2026-07-06
+
+Discovery recalibró el diseño (FASE 2, supuesto invalidado):
+
+- **Supuesto original:** `daily_required=true` en régimen internacional es data incoherente → guard + backfill + reliability signal.
+- **Realidad (verificada):** existe política canónica `SCHEDULE_DEFAULTS` (`src/types/hr-contracts.ts:57`) con `overridable: true` para `honorarios`/`contractor`/`eor`/`international_internal` → `daily_required=true` ahí es **válido**. Además el write path (`resolveMemberContractForCompensation:733`) y el BQ mapper (`get-compensation.ts:238`) ya honran la política; solo el read mapper PG (`postgres-store.ts:488`) tenía el bypass `??`. Data real: 0 trabajadores dependientes Chile hoy; `daily_required=true` presente también en 2 contractor + 1 honorarios (validado, no bloquean porque el denylist los excluía). Solo `international_internal` se colaba.
+- **Efecto en scope:** eliminados el write-path guard, la migration/backfill y el reliability signal (habrían rechazado/mutado/detectado data válida — over-engineering). Maria Fernanda (`7da60123`) NO necesita data-fix. El fix robusto queda en el primitive: predicado régimen-scoped (Slice 1) + read mapper coherente con la política (Slice 2). `Backend impact` recalibrado `migration → reader`; sin flag, sin migración.
