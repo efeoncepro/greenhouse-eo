@@ -8,6 +8,7 @@ canonical docs or WordPress runtime inspection.
 | AEO | `https://efeoncepro.com/aeo-2/` | `250265` | publish | `landings/aeo.md` | Do not touch Home `2791`; do not revive old `/aeo` `250255`; protect `heroans`; Growth Forms renderer + Turnstile; live contract gate |
 | Agencia Creativa | `https://efeoncepro.com/agencia-creativa/` | `249582` | publish | `landings/agencia-creativa.md` | Protect featured hero `_thumbnail_id=249672`; sticky-scroll edge gutter; comparison table widget |
 | About us | `https://efeoncepro.com/about-us-efeonce/` | `249770` | publish | `landings/about-us-efeonce.md` | Loop Marketing module reuses home `lp-container-offset-*`; protect full-bleed section, add only restrained page-scoped gutter |
+| Desarrollo de sitios web | `https://efeoncepro.com/desarrollo-sitios-web/` | `250816` | publish | `landings/desarrollo-sitios-web.md` | TASK-1345 live v1; Elementor document with AEO-style native Ohio hero + premium Hero Factory visual v14 in `wdvis` on the native hero gradient; premium sections through `faq-premium`; no Wave/sweep/scan/local animation background/header overrides; preserve `/contacto/` UTM fallback until a dedicated Growth Form exists |
 | HubSpot Services | `https://efeoncepro.com/servicios-contratar-hubspot/` | `244079` | publish | `landings/hubspot-services.md` | Protect Ohio headline featured image `248703`; partner proof legacy sections; headline display helper |
 
 ## Registration Rules

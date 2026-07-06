@@ -1,10 +1,10 @@
-# TASK-1345 — Wave diseno y desarrollo web Flow Contract
+# TASK-1345 — Desarrollo de sitios web Flow Contract
 
 ## Meta
 
 - Status: `draft`
-- Owner task: `TASK-1345 — Landing publica Wave: diseno y desarrollo web`
-- Related wireframe: [docs/ui/wireframes/TASK-1345-wave-diseno-desarrollo-web-landing.md](../wireframes/TASK-1345-wave-diseno-desarrollo-web-landing.md)
+- Owner task: `TASK-1345 — Landing publica: desarrollo de sitios web`
+- Related wireframe: [docs/ui/wireframes/TASK-1345-desarrollo-sitios-web-landing.md](../wireframes/TASK-1345-desarrollo-sitios-web-landing.md)
 - Intended route / surface: `efeoncepro.com/servicios/diseno-desarrollo-web/` propuesta
 - Flow type: `multi-surface` (landing -> form/contacto gobernado -> HubSpot/Meetings/WhatsApp; interlinks a servicios relacionados)
 - Primary primitives: patrones marketing public-site + conversion primitive gobernado `[verificar]`
@@ -13,7 +13,7 @@
 ## Flow Brief
 
 - Primary user: decisor que evalua renovar o construir un sitio web comercial.
-- Entry moment: busqueda organica, nav, anuncio, Wave Hub o interlink desde AEO/SEO/Globe/Home.
+- Entry moment: busqueda organica, nav, anuncio, hub de servicios o interlink desde AEO/SEO/Globe/Home.
 - Successful outcome: usuario pide cotizacion o agenda/contacta por canal secundario; lead queda trazable en el pipeline gobernado.
 - Primary decision/action: click en "Quiero cotizar".
 - Non-goals: no calcula precio automaticamente; no ejecuta un diagnostico AI Visibility; no reconstruye HubSpot.
@@ -26,7 +26,7 @@
 | Conversion form/contacto | Captura de cotizacion | Inline/embedded en region 11 | Full-width, labels visibles | Growth Forms / HubSpot / Meetings `[verificar]` |
 | HubSpot/CRM | Registro comercial | Invisible para usuario | Invisible para usuario | integration existente |
 | WhatsApp/Meetings | Salida secundaria | Link externo/embedded booking | Link externo/booking | canal existente `[verificar]` |
-| Related services | Interlinks AEO/SEO/CRM/Think/Wave/Loop | Links contextuales + modulo bajo FAQ | Links stack | paginas publicas |
+| Related services | Interlinks AEO/SEO/CRM/Think/Loop | Links contextuales + modulo bajo FAQ | Links stack | paginas publicas |
 
 ## Flow Map
 
@@ -50,7 +50,7 @@
 | Click "Prefiero agendar una llamada" | Hero/form | Meetings/contacto | Enter/Space | destino real `[verificar]` |
 | Click WhatsApp | Form/fallback | WhatsApp | Enter/Space | secundario |
 | Click "Producir a escala" | Segmentacion | Form con contexto o scroll | Enter/Space | preselect si form soporta metadata |
-| Click interlink contextual | Body/related | AEO/SEO/CRM/Think/Wave/Loop | Enter/Space | no abrir modal |
+| Click interlink contextual | Body/related | AEO/SEO/CRM/Think/Loop | Enter/Space | no abrir modal |
 | Toggle FAQ | FAQ | Expand/collapse | Enter/Space | acordeon accesible |
 
 ## State Machine
@@ -98,7 +98,7 @@
 - Cache / invalidation: cache del sitio publico; purgar en publish.
 - Audit / signals: heredados de HubSpot/Growth Forms/Meetings segun canal elegido.
 - Tenant / access boundary: publico; cualquier PII viaja por el canal gobernado.
-- Form metadata recommended: `source=wave_web_landing`, `service=diseno_desarrollo_web`, `selected_job` si aplica.
+- Form metadata recommended: `source=web_development_landing`, `service=diseno_desarrollo_web`, `selected_job` si aplica.
 
 ## Failure Paths
 
@@ -115,12 +115,12 @@
 ## GVC Scenario Plan
 
 - Scenario: landing -> CTA principal -> form/fallback + FAQ + secondary path.
-- Scenario file: `scripts/frontend/scenarios/public-wave-diseno-desarrollo-web.capture.txt`
+- Scenario file: `scripts/frontend/scenarios/public-desarrollo-sitios-web.capture.txt`
 - Route: preview/staging de la landing publica.
 - Viewports: desktop 1440 + mobile 390.
 - Required steps: cargar; click CTA hero; validar foco/form; abrir FAQ; click segment card; validar secondary CTA visible; revisar related module.
 - Required captures: hero, form/fallback, FAQ abierto, related services.
-- Required `data-capture` markers: `hero`, `idd`, `segments`, `faq`, `conversion-form`.
+- Required `data-capture` markers: `hero`, `method`, `two-visitors`, `segments`, `faq`, `conversion-form`.
 - Assertions: CTA accionable; no `href="#"`; sin scroll horizontal; form/fallback visible; H1 unico.
 - Scroll-width checks: `scrollWidth <= clientWidth` en ambos viewports.
 - Accessibility/focus checks: focus ring visible; heading order; FAQ keyboard.
@@ -132,7 +132,7 @@
 - Decision: no hay modal/sidecar; la landing debe poder leerse, compartirse e indexarse como documento publico.
 - Decision: la captura no se implementa localmente; se entrega a un canal gobernado.
 - Decision: related services bajo FAQ porque el usuario ya resolvio objeciones antes de explorar otros servicios.
-- Alternatives considered: muchos CTAs a servicios antes del form (riesgo fuga), form JS local del HTML v11 (no gobernado), agenda como CTA primario (menos alineada a cotizacion).
+- Alternatives considered: muchos CTAs a servicios antes del form (riesgo fuga), form JS local del HTML Velo/v11 (no gobernado), agenda como CTA primario (menos alineada a cotizacion).
 - Reuse / extend / new primitive: reuse.
 - Open risks: form/canal final, URLs de related services, route ownership legacy.
 

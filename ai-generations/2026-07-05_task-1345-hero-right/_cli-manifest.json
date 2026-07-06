@@ -1,0 +1,14 @@
+{
+  "kind": "concept",
+  "loop": "task-1345-hero-right",
+  "task": "TASK-1345",
+  "model": "gpt-image-2",
+  "generatedAt": "2026-07-05T21:13:12.757Z",
+  "actor": "user:jreye",
+  "items": [
+    {
+      "file": "right-side-hero-key-visual-for-a-premium-1783285714.png",
+      "prompt": "Right-side hero key visual for a premium B2B web design & development agency landing page with a dark two-column hero. A single, self-contained focal composition designed to blend into a deep navy hero background and to serve as the base frame for a later image-to-video motion.\n\nSUBJECT: a glossy, floating modern website surface — an abstract browser/app panel built from clean UI content blocks (a top bar, image tiles, a stat card, list rows), with NO readable text and NO logos. The surface is being \"read\" simultaneously by two kinds of visitor. On the warm side, a soft human-presence glow suggests a person's gaze and attention. On the technical side, a luminous teal scanning sweep passes across the surface, plus a delicate structured-data lattice and thin connective data-lines that flow outward to a few small glowing nodes representing search engines, AI models and autonomous agents. Fine particles drift along the data-lines, conveying live signal.\n\nSTYLE: hyperreal, cinematic, premium technology aesthetic (Stripe / Linear / Vercel energy), glassy and slightly waxy materials, layered depth, subtle film grain, engineered and trustworthy — infrastructure, not decoration.\n\nCOMPOSITION: focal object placed centered-right with calm negative space on the left, shallow depth of field, a soft volumetric teal glow blooming in the upper-right corner.\n\nLIGHTING: dark studio environment, cool key light, teal rim light on the panel edges, a restrained warm coral accent light from the human side.\n\nPALETTE: deep navy #022A4E fading to azure #023C70 as the gradient background, teal #2EC4B6 as the dominant energy and data accent, coral #FF6B5B as a small warm secondary accent, cool white highlights.\n\nBACKGROUND: opaque dark navy-to-azure gradient with light atmospheric haze, matching the hero, leaving quiet room for animation.\n\nCONSTRAINTS: no text, no letters, no numbers, no watermarks, no real brand logos, no detailed human faces (only implied presence), no cluttered UI, subject fully in frame and uncropped, professional and confident, not playful or cartoonish.\n\nOUTPUT: high-quality square hero visual, crisp focal subject, cinematic finish."
+    }
+  ]
+}

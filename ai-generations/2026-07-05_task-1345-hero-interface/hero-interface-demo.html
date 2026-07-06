@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TASK-1345 — Hero interface (SVG + GSAP) demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --navy:#022A4E; --azure:#023C70; --teal:#2EC4B6; --coral:#FF6B5B;
+    --line:rgba(255,255,255,.12); --ink:#eaf2f8; --muted:rgba(234,242,248,.62);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Geist',system-ui,sans-serif;background:#02203c;color:var(--ink);
+       min-height:100vh;display:grid;place-items:center;padding:40px}
+  /* replica del hero: navy en degradado + glow teal arriba-derecha */
+  .hero{position:relative;width:min(1180px,100%);border-radius:20px;overflow:hidden;
+        background:linear-gradient(160deg,var(--navy),var(--azure));
+        display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:56px;min-height:620px;align-items:center}
+  .hero::after{content:"";position:absolute;right:-8%;top:-30%;width:620px;height:620px;
+        background:radial-gradient(circle,rgba(46,196,182,.20),transparent 60%);pointer-events:none}
+  /* columna izquierda (mock del copy real, solo para contexto) */
+  .left{position:relative;z-index:2}
+  .pill{display:inline-block;font-family:'Poppins';font-weight:600;font-size:.72rem;letter-spacing:.1em;
+        text-transform:uppercase;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:.5rem 1rem;margin-bottom:1.4rem}
+  .left h1{font-family:'Poppins';font-weight:700;font-size:clamp(2rem,3.6vw,3rem);line-height:1.1;letter-spacing:-.01em;margin-bottom:1.2rem}
+  .left h1 em{font-style:normal;color:var(--teal)}
+  .left p{color:var(--muted);font-size:1.02rem;max-width:44ch;margin-bottom:1.6rem}
+  .cta{display:inline-flex;align-items:center;gap:.6rem;font-family:'Poppins';font-weight:600;
+       background:var(--teal);color:var(--navy);padding:.9rem 1.5rem;border-radius:10px}
+
+  /* ── columna derecha: STACK DE INTERFAZ (el hero visual) ── */
+  .stage{position:relative;z-index:2;height:520px}
+  .card{position:absolute;background:rgba(6,30,54,.82);border:1px solid var(--line);
+        border-radius:16px;backdrop-filter:blur(6px);box-shadow:0 24px 60px rgba(0,0,0,.35)}
+
+  /* panel de sitio detrás */
+  .site{inset:56px 8px 96px 40px;border-color:rgba(255,255,255,.08);opacity:.9}
+  .site .bar{height:34px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px;padding:0 14px}
+  .site .bar i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}
+  .site .body{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .site .tile{height:70px;border-radius:8px;background:linear-gradient(120deg,var(--azure),rgba(46,196,182,.35))}
+  .site .tile.wide{grid-column:1/-1;height:44px;background:linear-gradient(90deg,rgba(255,255,255,.10),transparent)}
+  .site .ln{height:8px;border-radius:4px;background:rgba(255,255,255,.12)}
+  .site .ln.s{width:60%}
+
+  /* card AI engine (anchor) */
+  .ai{left:0;top:8px;width:70%;border-color:rgba(46,196,182,.55);box-shadow:0 24px 70px rgba(0,0,0,.45),0 0 0 1px rgba(46,196,182,.15)}
+  .ai .head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .ai .head .dots{display:flex;gap:6px}
+  .ai .head .dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3)}
+  .ai .head .dots i:first-child{background:var(--teal)}
+  .ai .head .lbl{font-family:'Poppins';font-size:.74rem;color:var(--muted);letter-spacing:.04em}
+  .ai .prompt{margin:16px 18px;background:rgba(2,60,112,.55);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .ai .prompt .k{font-family:'Poppins';font-size:.64rem;letter-spacing:.14em;color:var(--teal);text-transform:uppercase;display:block;margin-bottom:6px}
+  .ai .prompt .q{font-size:.9rem;line-height:1.5;min-height:2.7em}
+  .ai .prompt .q .caret{display:inline-block;width:2px;height:1em;background:var(--teal);transform:translateY(2px);margin-left:2px}
+  .ai .ans{font-family:'Poppins';font-size:.72rem;color:var(--muted);margin:6px 18px 8px}
+  .ai .rows{padding:0 18px;display:flex;flex-direction:column;gap:10px}
+  .ai .row{display:flex;align-items:center;gap:10px}
+  .ai .row .n{font-family:'Poppins';font-weight:600;font-size:.8rem;color:var(--muted);width:14px}
+  .ai .row .track{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
+  .ai .row .fill{height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--teal),#7fe3d8);transform-origin:left}
+  .ai .brand{margin:14px 18px 18px;border:1px dashed var(--coral);border-radius:10px;padding:10px 14px;
+        display:flex;align-items:center;gap:8px;font-family:'Poppins';font-weight:600;font-size:.84rem;color:#ffd9d2}
+  .ai .brand b{color:var(--coral)}
+  .ai .brand .chk{width:18px;height:18px;border-radius:50%;background:var(--coral);color:var(--navy);display:grid;place-items:center;font-size:.7rem}
+
+  /* chip flotante Performance */
+  .perf{right:-6px;bottom:2px;width:210px;padding:14px 16px;border-color:rgba(46,196,182,.4)}
+  .perf .t{font-family:'Poppins';font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .perf .row{display:flex;align-items:center;gap:12px}
+  .perf .num{font-family:'Poppins';font-weight:700;font-size:1.9rem;color:var(--teal);line-height:1}
+  .perf svg{display:block}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+  @media(max-width:820px){ .hero{grid-template-columns:1fr} .left{display:none} }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div class="left">
+      <span class="pill">Diseño y desarrollo web · AI-ready</span>
+      <h1>Diseñamos sitios web de <em>alto rendimiento</em> para humanos y agentes.</h1>
+      <p>Rápidos, medibles y listos para convertir. Legibles para SEO, AEO e IA.</p>
+      <span class="cta">↗ Quiero cotizar mi sitio</span>
+    </div>
+
+    <div class="stage">
+      <!-- panel de sitio detrás -->
+      <div class="card site" data-el="site">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="body">
+          <div class="tile wide"></div>
+          <div class="tile"></div><div class="tile"></div>
+          <div class="ln"></div><div class="ln s"></div>
+        </div>
+      </div>
+
+      <!-- card AI engine -->
+      <div class="card ai" data-el="ai">
+        <div class="head">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <span class="lbl">AI engine</span>
+        </div>
+        <div class="prompt">
+          <span class="k">Prompt</span>
+          <div class="q"><span id="typed"></span><span class="caret" id="caret"></span></div>
+        </div>
+        <div class="ans">Respuesta · proveedores citados</div>
+        <div class="rows">
+          <div class="row"><span class="n">1</span><span class="track"><span class="fill" data-w="86"></span></span></div>
+          <div class="row"><span class="n">2</span><span class="track"><span class="fill" data-w="68"></span></span></div>
+          <div class="row"><span class="n">3</span><span class="track"><span class="fill" data-w="54"></span></span></div>
+        </div>
+        <div class="brand" data-el="brand"><span class="chk">✓</span><b>Tu marca</b> aparece citada</div>
+      </div>
+
+      <!-- chip Performance -->
+      <div class="card perf" data-el="perf">
+        <div class="t">Performance</div>
+        <div class="row">
+          <span class="num"><span id="score">0</span></span>
+          <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
+            <path id="spark" d="M2 34 L24 30 L46 32 L68 20 L90 22 L118 6" stroke="#2EC4B6" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round"
+                  stroke-dasharray="200" stroke-dashoffset="200"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const PROMPT = '¿Cuáles son las mejores opciones para desarrollar un sitio web AI-ready en LatAm?';
+  const typed = document.getElementById('typed');
+  const caret = document.getElementById('caret');
+  const scoreEl = document.getElementById('score');
+
+  function setFinal(){
+    typed.textContent = PROMPT; caret.style.opacity = 0;
+    document.querySelectorAll('.fill').forEach(f => f.style.width = f.dataset.w + '%');
+    scoreEl.textContent = '98';
+    document.getElementById('spark').style.strokeDashoffset = 0;
+    gsap.set(['[data-el=site]','[data-el=ai]','[data-el=perf]'], {opacity:1, y:0});
+  }
+
+  if (reduce || !window.gsap){ setFinal(); }
+  else {
+    gsap.set(caret,{opacity:1});
+    gsap.to(caret,{opacity:0,repeat:-1,yoyo:true,duration:.5,ease:'steps(1)'});
+
+    function build(){
+      const tl = gsap.timeline({repeat:-1, repeatDelay:2.2, defaults:{ease:'power3.out'}});
+      // entrada en stack
+      tl.from('[data-el=site]',{opacity:0,y:24,duration:.6})
+        .from('[data-el=ai]',{opacity:0,y:20,duration:.6},'-=.35')
+        .from('[data-el=perf]',{opacity:0,y:16,scale:.96,duration:.5},'-=.3');
+      // typing del prompt
+      tl.to({i:0},{i:PROMPT.length,duration:1.5,ease:'none',
+              onUpdate:function(){ typed.textContent = PROMPT.slice(0, Math.round(this.targets()[0].i)); }},'-=.1');
+      // performance: gauge + sparkline
+      tl.to('#spark',{strokeDashoffset:0,duration:1,ease:'power2.inOut'},'-=1.2')
+        .to({v:0},{v:98,duration:1,ease:'power2.out',snap:{v:1},
+              onUpdate:function(){ scoreEl.textContent = Math.round(this.targets()[0].v); }},'<');
+      // respuesta: barras en stagger
+      tl.to('.fill',{width:(i,t)=>t.dataset.w+'%',duration:.7,stagger:.14,ease:'power2.out'},'-=.4');
+      // pulso de marca
+      tl.fromTo('[data-el=brand]',{boxShadow:'0 0 0 0 rgba(255,107,91,0)'},
+              {boxShadow:'0 0 0 6px rgba(255,107,91,.18)',duration:.5,yoyo:true,repeat:3},'-=.1');
+      // flotación continua de las cards
+      gsap.to('[data-el=ai]',{y:'-=6',duration:3,ease:'sine.inOut',repeat:-1,yoyo:true});
+      gsap.to('[data-el=perf]',{y:'-=8',duration:3.6,ease:'sine.inOut',repeat:-1,yoyo:true,delay:.4});
+    }
+    window.addEventListener('load', build);
+  }
+</script>
+</body>
+</html>

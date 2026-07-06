@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TASK-1345 — Hero "Landing Factory" (SVG + GSAP)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --navy:#022A4E; --azure:#023C70; --teal:#2EC4B6; --coral:#FF6B5B;
+    --line:rgba(255,255,255,.12); --ink:#eaf2f8; --muted:rgba(234,242,248,.6);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Geist',system-ui,sans-serif;background:#02203c;color:var(--ink);min-height:100vh;display:grid;place-items:center;padding:40px}
+  .hero{position:relative;width:min(1180px,100%);border-radius:20px;overflow:hidden;
+        background:linear-gradient(160deg,var(--navy),var(--azure));
+        display:grid;grid-template-columns:1.02fr 1fr;gap:24px;padding:56px;min-height:660px;align-items:center}
+  .hero::after{content:"";position:absolute;right:-8%;top:-30%;width:640px;height:640px;
+        background:radial-gradient(circle,rgba(46,196,182,.18),transparent 60%);pointer-events:none}
+  .left{position:relative;z-index:2}
+  .pill{display:inline-block;font-family:'Poppins';font-weight:600;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:.5rem 1rem;margin-bottom:1.4rem}
+  .left h1{font-family:'Poppins';font-weight:700;font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.1;letter-spacing:-.01em;margin-bottom:1.1rem}
+  .left h1 em{font-style:normal;color:var(--teal)}
+  .left p{color:var(--muted);font-size:1rem;max-width:42ch;margin-bottom:1.5rem}
+  .cta{display:inline-flex;align-items:center;gap:.6rem;font-family:'Poppins';font-weight:600;background:var(--teal);color:var(--navy);padding:.9rem 1.5rem;border-radius:10px}
+
+  /* ── STAGE: Landing Factory ── */
+  .stage{position:relative;z-index:2;height:560px}
+  svg.wires{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+
+  .node{position:absolute;background:rgba(6,30,54,.85);border:1px solid var(--line);border-radius:14px;backdrop-filter:blur(6px)}
+
+  /* motor IDD (arriba) */
+  .engine{top:0;left:6%;width:74%;padding:14px 16px;border-color:rgba(46,196,182,.5);box-shadow:0 18px 50px rgba(0,0,0,.4)}
+  .engine .lbl{font-family:'Poppins';font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+  .engine .duo{display:flex;align-items:center;gap:14px}
+  .engine .who{display:flex;align-items:center;gap:8px;font-family:'Poppins';font-weight:600;font-size:.82rem}
+  .engine .who small{display:block;font-family:'Geist';font-weight:400;font-size:.68rem;color:var(--muted)}
+  .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none}
+  .ic.human{background:rgba(255,107,91,.16);color:var(--coral)}
+  .ic.agent{background:rgba(46,196,182,.16);color:var(--teal)}
+  .engine .plus{color:var(--muted);font-weight:700}
+  #gear{transform-origin:center;transform-box:fill-box}
+
+  /* mini-site card (producto en la cinta) */
+  .site{width:150px;border-radius:12px;background:rgba(9,34,61,.95);border:1px solid var(--line);overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.4)}
+  .site .top{height:22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:5px;padding:0 10px}
+  .site .top i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.28)}
+  .site .top i:first-child{background:var(--teal)}
+  .site .in{padding:10px;display:grid;gap:7px}
+  .site .hb{height:20px;border-radius:5px;background:linear-gradient(90deg,rgba(46,196,182,.4),transparent)}
+  .site .tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .site .tiles span{height:26px;border-radius:5px;background:linear-gradient(120deg,var(--azure),rgba(46,196,182,.3))}
+  .site .ln{height:6px;border-radius:3px;background:rgba(255,255,255,.14)}
+  .site .ln.s{width:62%}
+
+  .belt-card{position:absolute;left:0;top:0}  /* animadas por GSAP */
+
+  /* sitio entregado (grande, abajo-derecha) */
+  .delivered{position:absolute;right:2%;bottom:2%;width:186px;z-index:3}
+  .delivered .site{width:186px;border-color:rgba(46,196,182,.55);box-shadow:0 22px 60px rgba(0,0,0,.5),0 0 0 1px rgba(46,196,182,.14)}
+  .tag{position:absolute;display:flex;align-items:center;gap:7px;font-family:'Poppins';font-weight:600;font-size:.74rem;
+       background:rgba(6,30,54,.92);border:1px solid var(--line);border-radius:999px;padding:6px 11px;white-space:nowrap}
+  .tag small{font-family:'Geist';font-weight:400;color:var(--muted);font-size:.66rem}
+  .tag.human{left:-96px;top:16px;border-color:rgba(255,107,91,.45)}
+  .tag.human .d{color:var(--coral)}
+  .tag.agent{left:-104px;bottom:24px;border-color:rgba(46,196,182,.45)}
+  .tag.agent .d{color:var(--teal)}
+
+  /* contador de escala */
+  .scale{position:absolute;left:6%;bottom:8%;font-family:'Poppins';font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .scale b{color:var(--ink);font-weight:600}
+  .scale .bars{display:flex;gap:3px}
+  .scale .bars i{width:6px;height:14px;border-radius:2px;background:var(--teal);opacity:.35}
+
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+  @media(max-width:820px){ .hero{grid-template-columns:1fr} .left{display:none} }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div class="left">
+      <span class="pill">Diseño y desarrollo web · AI-ready</span>
+      <h1>Sitios web de <em>alto rendimiento</em>, a escala, para humanos y agentes.</h1>
+      <p>Una fábrica de producción digital operada con Intelligence-Driven Development.</p>
+      <span class="cta">↗ Quiero cotizar mi sitio</span>
+    </div>
+
+    <div class="stage">
+      <!-- cableado cinta -->
+      <svg class="wires" viewBox="0 0 480 560" preserveAspectRatio="none">
+        <path id="belt" d="M120 92 C 200 170, 120 300, 300 470" fill="none"
+              stroke="rgba(46,196,182,.35)" stroke-width="2" stroke-dasharray="6 8"/>
+      </svg>
+
+      <!-- MOTOR IDD -->
+      <div class="node engine" data-el="engine">
+        <div class="lbl">Motor · Intelligence-Driven Development</div>
+        <div class="duo">
+          <div class="who">
+            <span class="ic human">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6z"/></svg>
+            </span>
+            <span>Arquitecto<small>humano · dirige</small></span>
+          </div>
+          <span class="plus">+</span>
+          <div class="who">
+            <span class="ic agent">
+              <svg id="gear" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm9 4l-2-1 1-2-2-2-2 1-1-2h-3l-1 2-2-1-2 2 1 2-2 1v3l2 1-1 2 2 2 2-1 1 2h3l1-2 2 1 2-2-1-2 2-1z"/></svg>
+            </span>
+            <span>Agentes IA<small>construyen</small></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SITIOS EN LA CINTA (clonadas por JS) -->
+      <div class="belt-card" data-belt>
+        <div class="site"><div class="top"><i></i><i></i><i></i></div><div class="in"><div class="hb"></div><div class="tiles"><span></span><span></span></div><div class="ln"></div><div class="ln s"></div></div></div>
+      </div>
+
+      <!-- SITIO ENTREGADO -->
+      <div class="delivered" data-el="delivered">
+        <div class="site"><div class="top"><i></i><i></i><i></i></div><div class="in"><div class="hb"></div><div class="tiles"><span></span><span></span></div><div class="ln"></div><div class="ln s"></div></div></div>
+        <div class="tag human" data-tag><span class="d">◉</span> Humano <small>ve · siente</small></div>
+        <div class="tag agent" data-tag><span class="d">⛭</span> Agente <small>lee · decide</small></div>
+      </div>
+
+      <!-- CONTADOR ESCALA -->
+      <div class="scale" data-el="scale"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span> calidad <b>consistente</b> · a escala</div>
+    </div>
+  </div>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stage = document.querySelector('.stage');
+  const belt = document.getElementById('belt');
+  const proto = document.querySelector('[data-belt]');
+
+  // posiciona un elemento sobre el path de la cinta (0..1)
+  function ptAt(t){
+    const L = belt.getTotalLength();
+    const svg = document.querySelector('svg.wires');
+    const p = belt.getPointAtLength(t*L);
+    // mapear viewBox 480x560 → tamaño real del stage
+    const r = stage.getBoundingClientRect();
+    return { x: (p.x/480)*r.width - 75, y: (p.y/560)*r.height - 44 };
+  }
+
+  function setFinal(){
+    gsap.set('[data-el=engine],[data-el=delivered],[data-el=scale]',{opacity:1,y:0});
+    // deja 3 sitios repartidos en la cinta
+    [0.25,0.5,0.75].forEach(t=>{ const c=proto.cloneNode(true); const p=ptAt(t);
+      gsap.set(c,{x:p.x,y:p.y,scale:.9,opacity:1}); stage.appendChild(c); });
+    proto.style.display='none';
+    gsap.set('.scale .bars i',{opacity:.9});
+    gsap.set('[data-tag]',{opacity:1});
+  }
+
+  if (reduce || !window.gsap){ setFinal(); }
+  else {
+    proto.style.display='none';
+    window.addEventListener('load',()=>{
+      // entrada
+      gsap.from('[data-el=engine]',{opacity:0,y:-16,duration:.6,ease:'power3.out'});
+      gsap.from('[data-el=delivered]',{opacity:0,y:16,duration:.6,delay:.2,ease:'power3.out'});
+      gsap.set('[data-tag]',{opacity:0});
+      // gear girando
+      gsap.to('#gear',{rotation:360,transformOrigin:'50% 50%',repeat:-1,duration:6,ease:'none'});
+
+      // producción continua: spawnea cards que viajan la cinta
+      let count=0;
+      function spawn(){
+        const c = proto.cloneNode(true); c.style.display=''; stage.appendChild(c);
+        const p0=ptAt(0); gsap.set(c,{x:p0.x,y:p0.y,scale:.55,opacity:0});
+        gsap.timeline({onComplete:()=>c.remove()})
+          .to(c,{opacity:1,scale:.8,duration:.4,ease:'power2.out'})
+          .to(c,{duration:2.4,ease:'power1.inOut',
+                 motionPath:false,
+                 onUpdate:function(){ const t=this.progress(); const p=ptAt(0.05+t*0.82);
+                    gsap.set(c,{x:p.x,y:p.y}); }},'<')
+          .to(c,{opacity:0,scale:.6,duration:.35,ease:'power2.in'},'-=.35')
+          .add(()=>pingDelivery(),'-=.5');
+        // barra de escala se ilumina
+        const bars=document.querySelectorAll('.scale .bars i');
+        gsap.to(bars[count%bars.length],{opacity:.9,duration:.3,yoyo:true,repeat:1});
+        count++;
+      }
+      function pingDelivery(){
+        gsap.fromTo('[data-el=delivered] .site',{boxShadow:'0 22px 60px rgba(0,0,0,.5),0 0 0 1px rgba(46,196,182,.14)'},
+          {boxShadow:'0 22px 60px rgba(0,0,0,.5),0 0 0 3px rgba(46,196,182,.5)',duration:.35,yoyo:true,repeat:1,ease:'power2.out'});
+        gsap.fromTo('.tag.human',{opacity:.35,x:'+=6'},{opacity:1,x:'-=6',duration:.5,ease:'power2.out'});
+        gsap.fromTo('.tag.agent',{opacity:.35,x:'+=6'},{opacity:1,x:'-=6',duration:.5,delay:.12,ease:'power2.out'});
+      }
+      gsap.delayedCall(.6,()=>{ spawn(); setInterval(spawn,1500); });
+    });
+  }
+</script>
+</body>
+</html>

@@ -28,6 +28,27 @@ Secciones raiz actuales:
 
 El contenido usa contenedores/widgets Elementor y widgets Ohio cuando aplica (`ohio_heading`, `ohio_button`, `ohio_badge`). La pagina incluye schema JSON-LD `ProfessionalService` + `FAQPage`, Yoast title/metadescription/canonical y CSS page-scoped en `_elementor_page_settings.custom_css`.
 
+## URL, canonical y metadata SEO
+
+Revision operativa 2026-07-05:
+
+- WordPress usa `permalink_structure="/%category%/%postname%/"`, por lo que los posts viven bajo categoria, pero las paginas viven por jerarquia de paginas.
+- La landing viva es la pagina `250265`, slug `aeo-2`, canonical actual `https://efeoncepro.com/aeo-2/`.
+- La pagina vieja `/aeo` (`postId=250255`) esta en papelera como `aeo__trashed`; no revivirla.
+- `/aeo/` puede resolver como archivo de categoria por las reglas de rewrite de WordPress, pero su canonical es el archivo de categoria `https://efeoncepro.com/category/loop-marketing/aeo/`. No usar `/aeo/` como destino canonical final salvo que se haga una decision explicita distinta al PDR vigente.
+- Decision de producto/SEO vigente: [PDR-002](../../public-site/decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md) fija el destino final de la spoke AEO como `/servicios/aeo`, con `301` desde `/aeo-2`. `/aeo/` puede quedar como vanity redirect opcional hacia `/servicios/aeo`, pero no como canonical principal.
+- Antes de mover URL: capturar inventario vivo, title, metadescription, canonical, OG/Twitter, schema, sitemap entry, form IDs/UTM, `heroans` hash y estado del formulario; registrar redirect map segun [route ownership matrix](../../operations/public-site-route-ownership-matrix-20260616.md).
+- Despues de mover URL: verificar `301 /aeo-2/ -> /servicios/aeo/`, canonical/OG a la nueva URL, sitemap, Search Console inspection plan, escritorio/mobile 390, `scrollWidth == clientWidth`, y gates AEO (`pnpm public-website:verify-aeo-live-contract`).
+
+Metadata live actualizada 2026-07-05:
+
+- Backup de rollback: `_gh_backup_before_aeo_seo_meta_20260705T201153Z`.
+- Yoast title: `AEO para LatAm | Que la IA recomiende tu marca | Efeonce` (56 caracteres).
+- Yoast metadescription: `AEO para marcas en LatAm: hacemos que ChatGPT, Gemini, Perplexity y Copilot entiendan, citen y recomienden tu marca. Diagnóstico gratis en 24-48h.` (146 caracteres).
+- Open Graph/Twitter title y description estan definidos explicitamente para evitar el fallback anterior `og:title=AEO`.
+- `post_excerpt`: `Servicio AEO para marcas en LatAm: medimos tu visibilidad en motores de IA y operamos un plan para que te entiendan, citen y recomienden.`
+- Deuda vigente: `og:image` sigue cayendo a un asset tecnico de engine (`engine-gpt.png`) servido por `http://`. En el siguiente ajuste SEO/social, usar una imagen social `https://` propia de la landing.
+
 ## Hero actual
 
 Elementos clave:

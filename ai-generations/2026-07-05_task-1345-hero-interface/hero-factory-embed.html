@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TASK-1345 — Factory embed (self-contained, no deps)</title>
+<style>
+  /* solo para el test local: mock del hero navy + columnas */
+  body{margin:0;background:linear-gradient(160deg,#022A4E,#023C70);min-height:100vh;
+       font-family:system-ui,'Segoe UI',sans-serif;color:#eaf2f8;display:grid;place-items:center;padding:40px}
+  .mock{width:min(1180px,100%);display:grid;grid-template-columns:1.05fr 1fr;gap:24px;align-items:center}
+  .mock .l h1{font-size:clamp(1.9rem,3.4vw,3rem);font-weight:800;line-height:1.08;margin:0 0 1rem}
+  .mock .l h1 em{font-style:normal;color:#2EC4B6}
+  .mock .l p{color:rgba(234,242,248,.62);max-width:40ch}
+</style>
+</head>
+<body>
+  <div class="mock">
+    <div class="l">
+      <h1>Diseñamos sitios web de <em>alto rendimiento</em> para humanos y agentes.</h1>
+      <p>(columna izquierda real del hero — solo contexto)</p>
+    </div>
+
+    <!-- ═══════ INICIO BLOQUE EMBEBIBLE (esto va en el widget HTML de wdvis) ═══════ -->
+    <div class="ghf-slot">
+      <style>
+      .ghf-slot{ --teal:#2EC4B6; --coral:#FF6B5B; --line:rgba(255,255,255,.12); --muted:rgba(234,242,248,.6); --ink:#eaf2f8;
+        position:relative; width:100%; display:flex; justify-content:center; }
+      .ghf{ position:relative; width:440px; height:470px; transform-origin:top center; font-family:inherit }
+      .ghf *{ box-sizing:border-box }
+
+      /* atmósfera */
+      .ghf-floor{position:absolute;left:-15%;right:-15%;bottom:-6%;height:56%;z-index:0;pointer-events:none;
+        background-image:linear-gradient(rgba(46,196,182,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(46,196,182,.13) 1px,transparent 1px);
+        background-size:38px 38px;transform:perspective(560px) rotateX(64deg);transform-origin:bottom center;
+        -webkit-mask-image:radial-gradient(ellipse at 55% 0%,#000,transparent 72%);mask-image:radial-gradient(ellipse at 55% 0%,#000,transparent 72%);opacity:.7}
+      .ghf-glow{position:absolute;right:-14%;top:-16%;width:360px;height:360px;z-index:0;pointer-events:none;
+        background:radial-gradient(circle,rgba(46,196,182,.20),transparent 60%)}
+      .ghf-sweep{position:absolute;inset:0;z-index:4;pointer-events:none;mix-blend-mode:screen;
+        background:linear-gradient(115deg,transparent 42%,rgba(46,196,182,.10) 50%,transparent 58%);animation:ghf-sweep 7s ease-in-out infinite}
+      @keyframes ghf-sweep{0%{transform:translateX(-40%)}100%{transform:translateX(120%)}}
+      .ghf-grain{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+      /* muro de escala */
+      .ghf-wall{position:absolute;right:0;top:0;width:190px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;z-index:1}
+      .ghf-cell{height:40px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:rgba(9,34,61,.5);position:relative;overflow:hidden;opacity:.26;transition:opacity .35s,box-shadow .35s}
+      .ghf-cell::before{content:"";position:absolute;left:7px;right:7px;top:7px;height:5px;border-radius:3px;background:rgba(46,196,182,.5)}
+      .ghf-cell::after{content:"";position:absolute;left:7px;width:58%;bottom:8px;height:3px;border-radius:2px;background:rgba(255,255,255,.15)}
+      .ghf-cell.on{opacity:1;border-color:rgba(46,196,182,.4);box-shadow:0 0 0 1px rgba(46,196,182,.2)}
+      .ghf-wall.full{filter:drop-shadow(0 0 9px rgba(46,196,182,.5))}
+
+      /* motor IDD */
+      .ghf-engine{position:absolute;top:2px;left:0;width:66%;padding:13px 15px;z-index:3;border-radius:13px;
+        background:rgba(6,30,54,.85);border:1px solid rgba(46,196,182,.5);box-shadow:0 16px 44px rgba(0,0,0,.45)}
+      .ghf-engine .lbl{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--teal);margin-bottom:9px;font-weight:600;display:flex;align-items:center;gap:7px}
+      .ghf-spec{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);animation:ghf-spec 1s ease-in-out infinite}
+      @keyframes ghf-spec{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.7);opacity:.4}}
+      .ghf-duo{display:flex;align-items:center;gap:10px}
+      .ghf-who{display:flex;align-items:center;gap:7px;font-weight:600;font-size:11.5px}
+      .ghf-who small{display:block;font-weight:400;font-size:9.5px;color:var(--muted)}
+      .ghf-ic{width:31px;height:31px;border-radius:8px;display:grid;place-items:center;flex:none}
+      .ghf-ic.h{background:rgba(255,107,91,.16);color:var(--coral)}
+      .ghf-ic.a{background:rgba(46,196,182,.16);color:var(--teal)}
+      .ghf-gear{animation:ghf-spin 6s linear infinite;transform-origin:50% 50%}
+      @keyframes ghf-spin{to{transform:rotate(360deg)}}
+      .ghf-plus{color:var(--muted);font-weight:700}
+
+      /* mini-site (cinta + entregado) */
+      .ghf-mini{border-radius:11px;background:rgba(9,34,61,.95);border:1px solid var(--line);overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,.42)}
+      .ghf-mini .bar{height:19px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:5px;padding:0 9px}
+      .ghf-mini .bar i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.28)}
+      .ghf-mini .bar i:first-child{background:var(--teal)}
+      .ghf-mini .in{padding:9px;display:grid;gap:6px}
+      .ghf-mini .hb{height:17px;border-radius:4px;background:linear-gradient(90deg,rgba(46,196,182,.45),transparent)}
+      .ghf-mini .tiles{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+      .ghf-mini .tiles span{height:22px;border-radius:4px;background:linear-gradient(120deg,#023C70,rgba(46,196,182,.32))}
+      .ghf-mini .ln{height:5px;border-radius:3px;background:rgba(255,255,255,.14)}
+      .ghf-mini .ln.s{width:60%}
+
+      /* card viajando por la cinta */
+      .ghf-card{position:absolute;left:0;top:0;width:140px;z-index:2;animation:ghf-travel 2.4s cubic-bezier(.45,0,.35,1) forwards}
+      @keyframes ghf-travel{
+        0%{transform:translate(6px,74px) scale(.5);opacity:0}
+        14%{transform:translate(26px,104px) scale(.8);opacity:1}
+        86%{transform:translate(232px,300px) scale(.8);opacity:1}
+        100%{transform:translate(244px,320px) scale(.6);opacity:0}}
+      .ghf-card .bar i,.ghf-card .hb,.ghf-card .tiles span,.ghf-card .ln{animation:ghf-assemble .34s ease both}
+      .ghf-card .hb{animation-delay:.05s}.ghf-card .tiles span{animation-delay:.12s}.ghf-card .ln{animation-delay:.18s}
+      @keyframes ghf-assemble{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+
+      /* sitio entregado */
+      .ghf-deliv{position:absolute;right:2px;bottom:6px;width:176px;z-index:3;animation:ghf-float 3.4s ease-in-out infinite}
+      @keyframes ghf-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+      .ghf-deliv .ghf-mini{border-color:rgba(46,196,182,.55);animation:ghf-recv 1.3s ease-in-out infinite}
+      @keyframes ghf-recv{0%,72%{box-shadow:0 18px 50px rgba(0,0,0,.5),0 0 0 1px rgba(46,196,182,.14)}
+        82%{box-shadow:0 18px 50px rgba(0,0,0,.5),0 0 0 3px rgba(46,196,182,.55)}
+        100%{box-shadow:0 18px 50px rgba(0,0,0,.5),0 0 0 1px rgba(46,196,182,.14)}}
+      .ghf-scanwrap{position:absolute;inset:0;border-radius:11px;overflow:hidden;pointer-events:none}
+      .ghf-scan{position:absolute;left:0;right:0;height:32px}
+      .ghf-scan.h{background:linear-gradient(180deg,transparent,rgba(255,107,91,.5),transparent);animation:ghf-scan 1.3s ease-in infinite}
+      .ghf-scan.a{background:linear-gradient(180deg,transparent,rgba(46,196,182,.55),transparent);animation:ghf-scan 1.3s ease-in infinite .14s}
+      @keyframes ghf-scan{0%,68%{opacity:0;transform:translateY(-34px)}70%{opacity:0}80%{opacity:1}92%{opacity:1;transform:translateY(150px)}96%,100%{opacity:0}}
+      .ghf-tag{position:absolute;display:flex;align-items:center;gap:6px;font-weight:600;font-size:11px;
+        background:rgba(6,30,54,.94);border:1px solid var(--line);border-radius:999px;padding:5px 10px;white-space:nowrap}
+      .ghf-tag small{font-weight:400;color:var(--muted);font-size:9.5px}
+      .ghf-tag .chk{width:14px;height:14px;border-radius:50%;display:grid;place-items:center;font-size:8px;color:#022A4E}
+      .ghf-tag.h{left:-96px;top:12px;border-color:rgba(255,107,91,.45);animation:ghf-pop 1.3s ease-in-out infinite}
+      .ghf-tag.h .chk{background:var(--coral)}
+      .ghf-tag.a{left:-104px;bottom:18px;border-color:rgba(46,196,182,.45);animation:ghf-pop 1.3s ease-in-out infinite .12s}
+      .ghf-tag.a .chk{background:var(--teal)}
+      @keyframes ghf-pop{0%,74%{transform:scale(1)}82%{transform:scale(1.06)}100%{transform:scale(1)}}
+
+      .ghf-scale{position:absolute;left:0;bottom:-6px;font-size:11px;color:var(--muted);z-index:3}
+      .ghf-scale b{color:var(--ink);font-weight:600}
+
+      @media (prefers-reduced-motion: reduce){
+        .ghf *{animation:none!important}
+        .ghf-scan{opacity:0}
+      }
+      </style>
+
+      <div class="ghf" data-ghf>
+        <div class="ghf-floor"></div>
+        <div class="ghf-glow"></div>
+
+        <div class="ghf-wall" data-wall>
+          <div class="ghf-cell"></div><div class="ghf-cell"></div><div class="ghf-cell"></div>
+          <div class="ghf-cell"></div><div class="ghf-cell"></div><div class="ghf-cell"></div>
+          <div class="ghf-cell"></div><div class="ghf-cell"></div><div class="ghf-cell"></div>
+        </div>
+
+        <div class="ghf-engine">
+          <div class="lbl"><span class="ghf-spec"></span> Motor · Intelligence-Driven Development</div>
+          <div class="ghf-duo">
+            <div class="ghf-who"><span class="ghf-ic h"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6z"/></svg></span><span>Arquitecto<small>humano · dirige</small></span></div>
+            <span class="ghf-plus">+</span>
+            <div class="ghf-who"><span class="ghf-ic a"><svg class="ghf-gear" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm9 4l-2-1 1-2-2-2-2 1-1-2h-3l-1 2-2-1-2 2 1 2-2 1v3l2 1-1 2 2 2 2-1 1 2h3l1-2 2 1 2-2-1-2 2-1z"/></svg></span><span>Agentes IA<small>construyen</small></span></div>
+          </div>
+        </div>
+
+        <div class="ghf-deliv">
+          <div class="ghf-mini"><div class="bar"><i></i><i></i><i></i></div><div class="in"><div class="hb"></div><div class="tiles"><span></span><span></span></div><div class="ln"></div><div class="ln s"></div></div>
+            <div class="ghf-scanwrap"><div class="ghf-scan h"></div><div class="ghf-scan a"></div></div>
+          </div>
+          <div class="ghf-tag h"><span class="chk">✓</span> Humano <small>ve · siente</small></div>
+          <div class="ghf-tag a"><span class="chk">✓</span> Agente <small>lee · decide</small></div>
+        </div>
+
+        <div class="ghf-scale">producción continua · calidad <b>consistente</b></div>
+      </div>
+
+      <script>
+      (function(){
+        var slot = document.currentScript.closest('.ghf-slot') || document;
+        var root = slot.querySelector('[data-ghf]');
+        if(!root) return;
+        var wall = root.querySelector('[data-wall]');
+        var cells = wall ? [].slice.call(wall.querySelectorAll('.ghf-cell')) : [];
+        var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // escalar el bloque fijo (440x470) al ancho del slot
+        function fit(){
+          var w = slot.clientWidth || 440;
+          var s = Math.min(1, w/440);
+          root.style.transform = 'scale('+s+')';
+          slot.style.height = (470*s)+'px';
+        }
+        fit(); addEventListener('resize', fit);
+
+        if(reduce){ cells.slice(0,6).forEach(function(c){c.classList.add('on');}); return; }
+
+        // plantilla de mini-site
+        var siteHTML = '<div class="ghf-mini"><div class="bar"><i></i><i></i><i></i></div><div class="in"><div class="hb"></div><div class="tiles"><span></span><span></span></div><div class="ln"></div><div class="ln s"></div></div></div>';
+        var n = 0;
+        function spawn(){
+          if(document.hidden) return;
+          var card = document.createElement('div');
+          card.className = 'ghf-card';
+          card.innerHTML = siteHTML;
+          root.appendChild(card);
+          card.addEventListener('animationend', function(e){ if(e.animationName==='ghf-travel') card.remove(); });
+          // muro de escala
+          if(cells.length){
+            var cell = cells[n % cells.length];
+            cell.classList.add('on');
+            if(n % cells.length === cells.length-1){
+              wall.classList.add('full');
+              setTimeout(function(){ wall.classList.remove('full'); cells.forEach(function(c){c.classList.remove('on');}); }, 700);
+            }
+          }
+          n++;
+        }
+        spawn(); setInterval(spawn, 1300);
+      })();
+      </script>
+    </div>
+    <!-- ═══════ FIN BLOQUE EMBEBIBLE ═══════ -->
+  </div>
+</body>
+</html>
