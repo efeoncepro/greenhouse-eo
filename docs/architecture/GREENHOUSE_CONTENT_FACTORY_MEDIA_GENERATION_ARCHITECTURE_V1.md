@@ -203,6 +203,7 @@ Vertex directo es **~1.7–2.5× más barato** al volumen (es el precio crudo de
 ## 13. Related documents
 
 - ADR: `GREENHOUSE_CONTENT_FACTORY_MEDIA_GENERATION_DECISION_V1.md` (la decisión).
+- **Capa de orquestación:** `GREENHOUSE_CREATIVE_FLOW_STUDIO_DECISION_V1.md` — el Creative Flow Studio compone N generaciones de este foundry en un pipeline visual node-based (DAG). Cada nodo generativo del flow = un `generation_jobs` de este primitive; el flow orquesta, el foundry genera.
 - `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` — carril de imagen interno de dev (semilla, convive).
 - `docs/tasks/in-progress/TASK-1123-*.md` — Content Factory editorial (plano hermano, EPIC-019).
 - `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — UI/Nexa/MCP como consumers del mismo contrato.

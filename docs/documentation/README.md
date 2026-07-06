@@ -148,6 +148,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 - [AI Tooling, Content y Assets end-to-end](ai-tooling/ai-tooling-content-assets-end-to-end.md) — catalogo de herramientas IA, licencias, wallets, credit ledger y generacion interna de assets/contenido, con frontera clara frente a Public Site Content Factory y publicaciones.
 - [Generador Visual de Assets con IA](ai-tooling/generador-visual-assets.md) — generacion de imagenes (Imagen 4) y animaciones SVG (Gemini) para enriquecer interfaces, banners de perfil por categoria
+- [Estudio de Flujos Creativos](ai-tooling/estudio-de-flujos-creativos.md) — lienzo node-based (tipo Higgsfield/ComfyUI) para orquestar producciones de media encadenando pasos (imagen → video → audio → reframe); coordina el motor de generacion, no genera por si mismo; control de gasto a nivel del flujo completo. Propuesta (no construido); ver ADR Creative Flow Studio.
 
 ---
 
