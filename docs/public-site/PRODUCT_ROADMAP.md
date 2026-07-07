@@ -73,6 +73,30 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   `docs/tasks/to-do/TASK-1351-landing-redes-sociales.md`. Pendiente: dirección de arte
   del muro social + contrato de Motion + wireframe/flow antes de `UI ready: yes`.
 
+- **PDR-006 — Landing "HubSpot" (Agentic Customer Platform + partnership)** (posicionamiento
+  decidido) + **TASK-1352** (ui-ux, UI ready no): **reposiciona la página existente
+  `/servicios-contratar-hubspot/`** (id `244079`) del relato "compra e implementa un CRM" al de
+  **plataforma agéntica operada con software propio**. Ángulo teach-first ("HubSpot dejó de ser un
+  CRM: hay que arquitecturarla, poblarla con datos limpios y gobernar a los agentes"); arco de las
+  **4 capas de CRM Solutions** (licencia → implementación → managed ops → intelligence); diferenciador
+  = **Kortex** (deployment programático trazable, "capacidad que ningún competidor LATAM replica").
+  **No es spoke SEO** (la demanda de partner HubSpot es mínima en todo el bloque hispano — Semrush:
+  `hubspot partner` MX 30 / CO 110 / ES 170 / CL 20; la categoría `crm`/`hubspot` sí es masiva → Think);
+  su embudo es co-sell (PDM) + Solutions Directory + directo + cross-sell. Oferta de dos escalones
+  ("Agenda una reunión" + "Solicita un diagnóstico de tu portal HubSpot"). Proof point: **Kortex validado y en el
+  HubSpot Marketplace**. **Alcance pan-hispano** (es-LATAM neutro, `hreflang`-ready). Lidera Efeonce. Ver
+  [PDR-006](decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md). Pendiente de ejecución:
+  wireframe/flow/motion + confirmar resultados HubSpot/CRM citables + link al listing del Marketplace antes de `UI ready: yes`.
+
+- **PDR-007 + EPIC-024 — "HubSpot Portal Grader"** (posicionamiento + programa decididos): el
+  "diagnóstico de portal HubSpot" de PDR-006 se construye como **lead magnet propio** con motor en
+  Kortex, contrato gobernado en Greenhouse (`growth.hubspot_portal`) y superficie headless en Think —
+  modelo híbrido de dos puertas (self-assessment público sin OAuth = **Fase 1**; auditoría conectada
+  OAuth = **Fase 2** gateada). Espeja el AI Visibility Grader (EPIC-020) con motor distinto (peer
+  Kortex). ADR: `GREENHOUSE_HUBSPOT_PORTAL_GRADER_DECISION_V1.md`. Ver
+  [PDR-007](decisions/PDR-007-hubspot-portal-grader-lead-magnet.md) + `docs/epics/to-do/EPIC-024-hubspot-portal-grader.md`.
+  Child tasks desde `TASK-1353` (Fase 1 primero; no depende del cutover prod de Kortex).
+
 ## Next
 
 - **Guía pillar "community manager" en Think** (PDR-005 §Consecuencias): captura el

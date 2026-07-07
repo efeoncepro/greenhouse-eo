@@ -37,7 +37,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-021` | `to-do` | `docs/epics/to-do/EPIC-021-aeo-brand-aware-prompt-generation-engine.md` |
 | `EPIC-022` | `to-do` | `docs/epics/to-do/EPIC-022-growth-seo-search-visibility-360-module.md` |
 | `EPIC-023` | `to-do` | `docs/epics/to-do/EPIC-023-growth-cta-popup-cro-engine.md` |
+| `EPIC-024` | `to-do` | `docs/epics/to-do/EPIC-024-hubspot-portal-grader.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-024`
+- `EPIC-025`
