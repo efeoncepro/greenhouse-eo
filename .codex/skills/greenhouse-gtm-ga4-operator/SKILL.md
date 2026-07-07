@@ -72,6 +72,16 @@ Diagnóstico "no llega a GA4" → el **diagnostic ladder del doc `06 §6`** (dat
 6. **Verificar**: `scripts/ga4/realtime-events.ts 486264460` → enviar el evento en el sitio → confirmar que aparece (`generate_lead`, con `form_slug` como parámetro/custom dimension).
 7. **GA4 Admin**: marcar `generate_lead` como key event + registrar `form_slug`/`form_kind`/`surface_id` como custom dimensions (`docs/reference/measurement-gtm-ga4/07-ga4-admin-api-ops.md`).
 
+## Capa de robustez (comandos — NO despliegan)
+
+Estrategia de deployment: **build agéntico primario + capa delgada** (ADR `GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1` — NO IaC declarativo; GTM no mergea). Comandos:
+
+- **`pnpm gtm:snapshot`** — exporta el config live del container a `docs/reference/measurement-gtm-ga4/container-snapshot.json` (diff revisable en git). **Correr tras cada publish** para que git refleje el live. `pnpm gtm:snapshot --check` = detección de drift (live vs snapshot commiteado), exit 1 (CI).
+- **`pnpm measurement:smoke`** — verifica EN VIVO que la medición funciona en los hosts/eventos clave (Playwright `/g/collect`: page_view en efeoncepro.com + think, generate_lead en submit). Atrapa regresiones (Site Kit, drift, consent).
+- **`pnpm growth:forms-tracking-audit`** — forms published+active de la DB vs `TRACKING-PLAN.md`; lista los live sin fila (drift del registro).
+
+Escalar a pipeline declarativo SOLO si: tags custom no-genéricos explotan / humanos click-opsean el container / N containers de clientes (ADR §"Cuándo revisitar").
+
 ## References
 
 Todo el conocimiento vive en la carpeta canónica `docs/reference/measurement-gtm-ga4/` (una sola copia — la leen Claude, Codex, humanos y Nexa). Esta skill NO duplica; apunta:

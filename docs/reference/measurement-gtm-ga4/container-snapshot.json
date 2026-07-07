@@ -1,0 +1,216 @@
+{
+  "name": "think GA4 config (hostname-gated)",
+  "tags": [
+    {
+      "name": "GA4 Config - think (hostname-gated)",
+      "type": "googtag",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "tagId",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "14"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "GA4 Event - generate_lead",
+      "type": "gaawe",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_kind"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_kind}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "surface_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - surface_id}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "generate_lead"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "11"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "name": "CE - gh_form_submission_accepted",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "gh_form_submission_accepted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PV - think hostname",
+      "type": "pageview",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Page Hostname}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "think.efeoncepro.com"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variables": [
+    {
+      "name": "DLV - form_kind",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "form_kind"
+        }
+      ]
+    },
+    {
+      "name": "DLV - form_slug",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "form_slug"
+        }
+      ]
+    },
+    {
+      "name": "DLV - surface_id",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "surface_id"
+        }
+      ]
+    }
+  ],
+  "builtInVariables": [
+    "event",
+    "pageHostname",
+    "pagePath",
+    "pageUrl",
+    "referrer"
+  ]
+}
