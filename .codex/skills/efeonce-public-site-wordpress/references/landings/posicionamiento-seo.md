@@ -19,10 +19,11 @@
 - Do not publish a custom footer inside `.gh-seo-landing`; the page uses the native Ohio footer `#colophon` after the final CTA.
 - Display title tracking follows the approved AEO/desarrollo pattern and must be preserved: H1/H2 display titles and the large module H3 titles in `Qué incluye` (`h3[style*="font-size:1.95rem"]`) compute `letter-spacing:-0.045em`, and nested accent spans inside H1/H2 inherit the parent tracking. Do not add span-level `letter-spacing:normal` to title accents such as `IA no te ignore` or `exige`; do not apply this compact display tracking to body, chips, labels, small cards, or proof text.
 - The hero `Indexado` floating badge uses the local Greenhouse Google SVG asset (`public/images/greenhouse/SVG/icon-google.svg`) inlined as `.gh-google-logo-mark`; do not replace it with monochrome `ti-brand-google`.
-- The E-E-A-T weight panel uses real local brand assets, not generic Tabler glyphs: `.gh-google-dark-mark` wraps the local multicolor Google SVG (`public/images/greenhouse/SVG/icon-google.svg`) on a dark-compatible support, and `.gh-chatgpt-mark` wraps the local GPT isotype (`public/images/logos/axis/gpt-isotype.svg`). Do not replace these with `simple-icons`, `ti-brand-google`, or `ti-sparkles`.
+- The E-E-A-T weight panel uses real local brand assets in consistent 24px badges, not generic Tabler glyphs or tiny favicon-like marks: `.gh-google-dark-mark.gh-eeat-brand-badge` wraps the local multicolor Google SVG (`public/images/greenhouse/SVG/icon-google.svg`) at 15px on a light dark-compatible badge, and `.gh-chatgpt-mark.gh-eeat-brand-badge` wraps the local GPT isotype (`public/images/logos/axis/gpt-isotype.svg`) at 15px on a green dark-compatible badge. Do not replace these with `simple-icons`, `ti-brand-google`, `ti-sparkles`, or mixed-size inline icons.
 - Named answer-engine/brand markers use real local SVG assets: `.gh-ai-engine-chip-*`, `.gh-ai-citation-*`, `.gh-bridge-google-white-mark`, and `.gh-bridge-chatgpt-mark`. Google uses the local Google SVG (multicolor, or all-white only in the dark bridge), ChatGPT uses the local GPT isotype, and Perplexity uses the local Perplexity isotype (`public/images/logos/axis/perplexity-icon.svg`). Do not use `ti-brand-openai`, `ti-brand-google`, or `ti-sparkles` where a named engine/brand is visible.
 - In the comparison card (`[data-capture="comparativa"]`), the right-card header uses the local full Efeonce logo SVG (`public/branding/logo-full.svg`) inline as `.gh-comparison-efeonce-logo`, followed by visible text `· método medible`. Do not reintroduce the plant icon or the visible text `Efeonce · método medible`.
 - In the Greenhouse dashboard section, the platform pill uses the local blue Greenhouse logotype (`public/images/greenhouse/SVG/greenhouse-blue.svg`) as `.gh-greenhouse-logotype-pill`, and the dashboard browser chrome uses the local white Greenhouse isotype (`public/images/greenhouse/SVG/negative-isotipo.svg`) as `.gh-greenhouse-isotype-badge`. Do not reintroduce `ti-plant-2` or plain-text-only Greenhouse branding in those marked positions.
+- CTA/button interaction is governed by the page-scoped marker `task-1343-cta-hover-system-v1`: `.btn-primary`, `.btn-ghost`, `.btn-light`, and `.lnk` must keep explicit hover/focus/active color, background, border, arrow, and reduced-motion states inside `.gh-seo-landing`. Do not rely on inline Elementor styles or Ohio/global anchor hover for CTA state.
 - Primary CTA points to `https://think.efeoncepro.com/brand-visibility?utm_source=efeoncepro&utm_medium=landing&utm_campaign=posicionamiento-seo`.
 - AEO bridge points to `/aeo-2/` until the sibling `/servicios/aeo` and redirect are governed separately.
 - The page does not embed a live Growth Form yet; it links to the existing Think grader node.
@@ -72,6 +73,9 @@
 - Latest backup before removing the custom in-landing footer: `_gh_backup_before_task1343_seo_landing_20260706T214316Z`.
 - Latest backup before marquee + scroll-motion parity patch: `_gh_backup_before_task1343_seo_landing_20260706T213858Z`.
 - Latest backup before gutter/full-bleed polish: `_gh_backup_before_task1343_seo_landing_20260706T212903Z`.
+- Latest backup before converting the commercial proof block into an editorial evidence band: `_gh_backup_before_task1343_seo_landing_20260706T235206Z`.
+- Earlier backup before moving the commercial proof block into the narrative proof lane: `_gh_backup_before_task1343_seo_landing_20260706T234109Z`.
+- Latest backup before the CTA hover/focus system fix: `_gh_backup_before_task1343_seo_landing_20260707T000629Z`.
 - Earlier native-header polish backup: `_gh_backup_before_task1343_seo_landing_20260706T212034Z`.
 - Earlier publish backups include `_gh_backup_before_task1343_seo_landing_20260706T210238Z`, `_gh_backup_before_task1343_seo_landing_20260706T211508Z`, `_gh_backup_before_task1343_seo_landing_20260706T211805Z`, and `_gh_backup_before_task1343_seo_landing_20260706T211926Z`.
 - After rollback or mutation, purge Kinsta cache and verify desktop/mobile.
@@ -82,7 +86,9 @@
 - Latest global brand-logo audit: `.captures/task1343-seo-brand-logo-audit-2026-07-06T22-22-03-192Z/`.
 - Latest bridge Google/ChatGPT verification: `.captures/task1343-seo-bridge-ai-icons-2026-07-06T22-16-47-922Z/`.
 - Latest comparison card Efeonce logo verification: `.captures/task1343-seo-comparison-efeonce-logo-final-2026-07-06T22-04-31-801Z/`.
-- Latest E-E-A-T Google/GPT asset verification: `.captures/task1343-seo-eeat-google-chatgpt-assets-2026-07-06T21-56-52-259Z/`.
+- Latest E-E-A-T Google/GPT badge verification: `.captures/task1343-seo-eeat-brand-badges-2026-07-06T22-55-10-532Z/`.
+- Latest CTA/proof/Greenhouse polish verification: `.captures/task1343-seo-final-polish-2026-07-06T23-29-34-593Z/` plus final mobile badge check `.captures/task1343-seo-final-check-2026-07-06T23-31-49-943Z/`; latest proof narrative reflow: `.captures/task1343-seo-commercial-proof-reflow-2026-07-06T23-41-50-507Z/`; latest editorial evidence-band redesign: `.captures/task1343-seo-commercial-proof-editorial-2026-07-06T23-52-56-893Z/`.
+- Latest CTA hover/focus audit: `.captures/task1343-seo-cta-hover-system-final-2026-07-07T00-07-18-007Z/`.
 - Latest Google badge SVG verification: `.captures/task1343-seo-google-logo-badge-2026-07-06T21-47-03-175Z/`.
 - Latest custom-footer removal verification: `.captures/task1343-seo-remove-custom-footer-2026-07-06T21-43-47-560Z/`.
 - Latest marquee + scroll-motion verification: `.captures/task1343-seo-marquee-motion-2026-07-06T21-39-37-247Z/`.
@@ -123,14 +129,30 @@
   - SVG paths include Google colors `#4285F4`, `#34A853`, `#FBBC05`, and `#EB4335`.
   - `.floaty .ti-brand-google` count is `0`.
 - E-E-A-T brand asset checks:
-  - `.gh-google-dark-mark svg` exists in `En SEO clásico`, uses viewBox `0 0 256 262`, and includes Google fills `#4285F4`, `#34A853`, `#FBBC05`, and `#EB4335`.
-  - `.gh-chatgpt-mark svg` exists in `En AEO / IA` and uses the local GPT isotype viewBox `0 0 45.9894 47.0006`.
+  - `.gh-google-dark-mark.gh-eeat-brand-badge` exists in `En SEO clásico`, computes `24px` square, wraps a `15px` local Google SVG with viewBox `0 0 256 262`, and includes Google fills `#4285F4`, `#34A853`, `#FBBC05`, and `#EB4335`.
+  - `.gh-chatgpt-mark.gh-eeat-brand-badge` exists in `En AEO / IA`, computes `24px` square, wraps a `15px` local GPT isotype with viewBox `0 0 45.9894 47.0006`, and uses the dark-compatible `--fill-0:#f3ffe3` variant.
   - The old E-E-A-T row glyphs are absent: `seoOldGoogleIcon=false`, `aeoOldSparkleIcon=false`, and the temporary simple-icons Google path is not present.
 - Global brand-logo audit checks:
   - `i.ti-brand-google=0` and `i.ti-brand-openai=0` inside `.gh-seo-landing`.
   - Named brand wrappers have the expected real SVGs: hero Google, E-E-A-T Google/GPT, AI engine chips ChatGPT/Perplexity/Google, dashboard citation rows ChatGPT/Perplexity/Google, SEO/AEO bridge Google-white/GPT, Greenhouse logotype/isotype, and Efeonce comparison logo.
   - Brand-specific wrappers have no stale sparkles: `.gh-ai-engine-chip-perplexity`, `.gh-ai-citation-perplexity`, `.gh-chatgpt-mark`, and `.gh-bridge-chatgpt-mark` all report `0`.
   - Generic `ti-sparkles` remains allowed only for non-brand conceptual IA markers such as `visibilidad en IA` or `Citabilidad en IA`.
+- CTA/proof/Greenhouse polish checks:
+  - Final backup: `_gh_backup_before_task1343_seo_landing_20260706T234109Z`.
+  - The hero secondary CTA `Habla con el equipo` and the Greenhouse support link point to `mailto:hola@efeoncepro.com?subject=Diagn%C3%B3stico%20SEO%20Efeonce`.
+  - `Ver AEO` remains the only CTA pointing to `https://efeoncepro.com/aeo-2/`; diagnostic CTAs point to `#grader` or the Think Brand Visibility URL with SEO UTM.
+  - `[data-capture="commercial-proof"].gh-commercial-proof` sits in the proof narrative lane after `[data-capture="prueba"]` and before `[data-capture="plataforma"]`, not under the hero/marquee; it uses real local public-site proof logos from `docs/assets/public-site/aeo-brand-logos/` (`sky`, `anam`, `berel`, `carozzi`, `bresler`, `marca-chile`) and does not invent performance metrics.
+  - The commercial proof block is an editorial evidence band, not a contained card: `.gh-proof-shell` must remain transparent with no border, no radius, and no shadow; logos live in `.gh-proof-wall` with hairline dividers; the three proof points live in `.gh-proof-ledger` as an open ledger row/stack, not boxed metric cards.
+  - The visible proof copy is `Evidencia del método` / `La diferencia se demuestra cuando puedes auditar el trabajo.`; do not restore the old `Prueba comercial` / `No vendemos humo de ranking...` copy in this position.
+  - Mobile hero is compacted without changing desktop: height reduced to `1126px` at `390px`, the fixed `.mcta` computes `opacity=0`/`pointer-events=none` at top and becomes `.is-visible` after scroll.
+  - Greenhouse section has a live-report badge, a new operating row (`.gh-greenhouse-operating-row`) and CTA `Diagnostica tu baseline`; mobile badge sits in the dashboard chrome and no longer covers the dashboard title.
+  - Microtext contrast is hardened for the low-contrast inline colors `#9a98a4`, `#8a8894`, `#b0aeba`, and selected dark-section secondary text.
+  - Final live checks: desktop/mobile `commercial-proof` order is `prueba -> commercial-proof -> plataforma`, desktop `scrollWidth=clientWidth=1440`, mobile `scrollWidth=clientWidth=390`, `.gh-proof-shell` computes transparent background, `borderTop=0px`, `borderRadius=0px`, `boxShadow=none`, `.gh-proof-wall` has top/bottom hairlines, `proofLogoCount=6`, and console errors `[]`.
+- CTA hover/focus checks:
+  - `task-1343-cta-hover-system-v1` exists in the live HTML.
+  - Desktop `1440` and mobile `390` audit all visible `.gh-seo-landing a.btn` and `.gh-seo-landing a.lnk`; `failures=[]`, `consoleErrors=[]`, `scrollWidth==clientWidth`.
+  - `.btn-primary:hover` keeps white text over a blue gradient; `.btn-ghost:hover` keeps blue text over pale blue; `.btn-light:hover` flips to white background with blue text so dark-section CTAs such as `Ver AEO` never become white-on-white; `.lnk:hover` receives a visible underline.
+  - Reduced motion keeps the color/background feedback but computes `transform:none` and near-zero transition duration.
 - Comparison card logo checks:
   - `.gh-comparison-efeonce-logo svg` exists with viewBox `0 0 837.07 196.68`.
   - The SVG has no internal `<style>` node; paths use direct fill `#023c70`.
