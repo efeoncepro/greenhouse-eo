@@ -30,6 +30,7 @@ hold business logic, mapping, secrets or PII.
 - Destinations + dispatch (HubSpot secure-submit, retries, dead-letter), reliability signals.
 - Security/PII (Turnstile, email verification, rate limits, PII encryption, reveal audit, telemetry allowlist).
 - Telemetry/measurement: the `gh_form_*` dataLayer/GTM events + parameter allowlist + how to name a new event → canonical reference `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; the `gh_form_*` family is its live example). SoT of the event vocabulary: `src/lib/growth/forms/contracts.ts → GTM_EVENT_NAMES`.
+  - **MANDATORY:** before creating a form and when publishing one, **read** `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md` (reuse before minting) and **register/update its row** there with its tagging status (page/surface, dataLayer yes/no, GA4 event, key event, `✅ tagged` / `⏳ pending`). A measurable form is not "done" while its row is `⏳ pending` — leave it recorded, never omitted.
 - Embedding a form on a host (WordPress/Elementor, Astro), theming a form into a host card.
 - The **Success Card / thank-you card** (`success_behavior_json`, `presentation='success_card'`) or the
   **AEO grader-on-submit** capability of `/aeo-2/` → companion `references/SUCCESS_CARD_AND_GRADER_ON_SUBMIT.md`.

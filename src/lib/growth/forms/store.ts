@@ -138,6 +138,12 @@ export interface InsertFormDefinitionInput {
   createdBy?: string | null
 }
 
+/**
+ * ⚠️ Al crear/publicar un form: registrar su fila en la capa de medición —
+ * `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md` (slug, página/surface, evento
+ * GA4 destino, key event, estado de tagging). La DB es SoT de la definición; el
+ * tracking plan es SoT de la capa de medición/tagging (que la DB no tiene).
+ */
 export const insertFormDefinition = async (input: InsertFormDefinitionInput): Promise<FormDefinitionRow> => {
   const rows = await query<FormDefinitionRow>(
     `INSERT INTO greenhouse_growth.form_definition

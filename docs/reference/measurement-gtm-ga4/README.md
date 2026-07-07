@@ -11,6 +11,7 @@ Al instrumentar, medir, taggear o razonar sobre eventos/conversiones de cualquie
 
 | Doc | Qué cubre |
 |---|---|
+| **[TRACKING-PLAN.md](TRACKING-PLAN.md)** | **Registro vivo OBLIGATORIO** de forms & CTAs con su estado de tagging. Leer antes de crear un form/CTA; registrar su fila al crearlo (taggeado o no). |
 | **[04-greenhouse-gh-event-convention.md](04-greenhouse-gh-event-convention.md)** | **Empezar aquí.** House style `gh_<object>_<action>`, coordenadas reales (`GTM-NGHPGRLZ`, GA4 `486264460`), regla de decisión GA4-recomendado vs `gh_` + tabla de mapeo, allowlist/PII, naming GTM, loop de verificación, gobernanza. |
 | [01-ga4-event-model.md](01-ga4-event-model.md) | GA4: 4 tipos de evento, recomendados por vertical, reglas de naming + límites duros (nombres/prefijos reservados verbatim), key events, custom dimensions, Measurement Protocol. |
 | [02-gtm-and-datalayer.md](02-gtm-and-datalayer.md) | GTM: conceptos, web vs server-side, dataLayer en profundidad, tags/triggers/variables, consent mode v2, convenciones de naming de entidades. |

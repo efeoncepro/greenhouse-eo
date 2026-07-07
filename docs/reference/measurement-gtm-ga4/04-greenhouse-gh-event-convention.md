@@ -124,6 +124,7 @@ Versiones: siempre **nombre + descripción** (bulleted). Workspaces: `<feature> 
 
 ## 7. Gobernanza (cerrar el único gap — `03 §7.3`)
 
+- **Registro OBLIGATORIO de forms/CTAs:** [`TRACKING-PLAN.md`](TRACKING-PLAN.md) — leer antes de crear un form/CTA; registrar su fila (taggeado o no) al crearlo. SoT de la capa de medición (qué evento emite, mapeo GA4, key event, estado de tagging) que la DB no tiene. Enforcement: hard rule en la skill `greenhouse-growth-forms` + puntero en `src/lib/growth/forms/store.ts`.
 - **SoT del vocabulario:** `GTM_EVENT_NAMES` + `TELEMETRY_ALLOWED_PAYLOAD_KEYS` en `src/lib/growth/forms/contracts.ts`. Un evento/param nuevo se agrega AHÍ primero (registry Tier 1 en código), con su espejo en el renderer.
 - **Regla de revisión:** nombre nuevo pasa por la gramática `gh_<object>_<action>` + verbo del vocabulario controlado + regla §3 (¿existe recomendado GA4?). Si difiere solo por un valor de otro evento → es parámetro, no evento.
 - **Deprecar, no renombrar** un evento vivo (romper una serie temporal). Correr ambos, migrar dashboards, luego deprecar.
