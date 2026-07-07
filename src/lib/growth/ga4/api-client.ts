@@ -65,13 +65,16 @@ export class Ga4AdminClient {
     }>(GA4_ADMIN_API_BASE, this.tokens, 'accountSummaries')
 
     return (body.accountSummaries ?? [])
-      .filter((a): a is { account: string } => typeof a.account === 'string')
+      .filter(
+        (a): a is { account: string; displayName?: string; propertySummaries?: Array<{ property?: string; displayName?: string; parent?: string }> } =>
+          typeof a.account === 'string'
+      )
       .map(a => ({
         account: a.account,
         accountId: a.account.replace(/^accountSummaries\//, '').replace(/^accounts\//, ''),
         displayName: a.displayName ?? '',
         properties: (a.propertySummaries ?? [])
-          .filter((p): p is { property: string } => typeof p.property === 'string')
+          .filter((p): p is { property: string; displayName?: string; parent?: string } => typeof p.property === 'string')
           .map(p => ({
             property: p.property,
             propertyId: p.property.replace(/^properties\//, ''),

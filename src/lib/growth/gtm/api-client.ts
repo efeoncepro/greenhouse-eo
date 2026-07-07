@@ -87,7 +87,7 @@ export class GtmApiClient {
     }>('accounts')
 
     return (body.account ?? [])
-      .filter((a): a is { accountId: string } => typeof a.accountId === 'string')
+      .filter((a): a is { accountId: string; name?: string; path?: string } => typeof a.accountId === 'string')
       .map(a => ({ accountId: a.accountId, name: a.name ?? '', path: a.path ?? `accounts/${a.accountId}` }))
   }
 
@@ -104,8 +104,9 @@ export class GtmApiClient {
     }>(`accounts/${accountId}/containers`)
 
     return (body.container ?? [])
-      .filter((c): c is { accountId: string; containerId: string } =>
-        typeof c.accountId === 'string' && typeof c.containerId === 'string'
+      .filter(
+        (c): c is { accountId: string; containerId: string; name?: string; publicId?: string; usageContext?: string[]; path?: string } =>
+          typeof c.accountId === 'string' && typeof c.containerId === 'string'
       )
       .map(c => ({
         accountId: c.accountId,
@@ -123,7 +124,7 @@ export class GtmApiClient {
     }>(`accounts/${accountId}/containers/${containerId}/workspaces`)
 
     return (body.workspace ?? [])
-      .filter((w): w is { workspaceId: string } => typeof w.workspaceId === 'string')
+      .filter((w): w is { accountId?: string; containerId?: string; workspaceId: string; name?: string; path?: string } => typeof w.workspaceId === 'string')
       .map(w => ({
         accountId,
         containerId,
@@ -139,7 +140,7 @@ export class GtmApiClient {
     }>(`accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}/tags`)
 
     return (body.tag ?? [])
-      .filter((t): t is { tagId: string } => typeof t.tagId === 'string')
+      .filter((t): t is { tagId: string; name?: string; type?: string; path?: string } => typeof t.tagId === 'string')
       .map(t => ({ tagId: t.tagId, name: t.name ?? '', type: t.type ?? '', path: t.path ?? '' }))
   }
 
