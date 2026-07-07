@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-07-07 — Tagging de think.efeoncepro.com (subdominio, propiedad unificada, sin doble conteo)
+
+**Qué:** medir `think.efeoncepro.com` (hub Astro, repo `efeonce-think`) con la **MISMA propiedad GA4** (`486264460` / `G-KYPPY57M14`) que efeoncepro.com — funnel unificado (subdominio = mismo stream; NO crear stream/propiedad aparte).
+
+- **Snippet:** instalar el container `GTM-NGHPGRLZ` (head + noscript) en `src/layouts/BaseLayout.astro` de `efeonce-think`. **Cross-repo → rama + PR** (`efeonce-think#10`), NUNCA push directo a `main` (auto-deploy Vercel); merge tras preview verde.
+- **page_view sin doble conteo:** el sitio WP ya hace page_view por **Site Kit** (`GT-KV5CNNKQ`). Si se pone un GA4 Config global en el container, **duplica**. Solución: **GA4 Config (`googtag`) gateado por hostname** — trigger `pageview` con filtro `{{Page Hostname}} equals think.efeoncepro.com`. Así dispara SOLO en think; en efeoncepro.com no (Site Kit sigue siendo la única fuente). Verificado: efeoncepro.com = 1 page_view a G-KYPPY57M14; think = 1 page_view a G-KYPPY57M14.
+- **El `googtag` mide todo solo:** page_view + session_start + user_engagement + Enhanced Measurement (scroll/outbound/etc.) automáticamente. Enhanced Measurement es config **a nivel de stream** → think hereda los toggles del mismo stream, cero config por evento.
+- **Conversiones gratis:** el form dock de think usa `<greenhouse-form>` (renderer gobernado) que ya emite `gh_form_submission_accepted` → el tag genérico `generate_lead` funciona en think por construcción, sin tocar nada.
+- Container v3 publicado (generate_lead + GA4 Config think). Verificado con Playwright (`/g/collect en=page_view tid=G-KYPPY57M14` en think; sin doble conteo en WP).
+
+**Patrón reusable:** para sumar cualquier subdominio/host propio a la misma propiedad → snippet GTM en ese host + GA4 Config gateado por hostname en el container (si el host no tiene ya otra fuente de page_view). Un solo container, una sola propiedad, cero doble conteo.
+
 ## 2026-07-07 — Primer tag productivo: `generate_lead` para todos los Growth Forms
 
 **Qué se construyó (por API v2, gobernado):** un pipeline **genérico** que capta el submit confirmado de CUALQUIER form y lo manda a GA4 como `generate_lead`, distinguiendo el form por parámetro.

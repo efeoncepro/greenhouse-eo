@@ -27,6 +27,7 @@ For **event naming / taxonomy / the gh_ house style** → `docs/reference/measur
 | GTM contenedor live | `GTM-NGHPGRLZ` · account `6291647045` · container `218104216` · workspace **Default (id=2)** |
 | GTM Google tag (config) actual | type `googtag`, `tagId=G-KYPPY57M14` (firing All Pages) |
 | GA4 propiedad | `efeoncepro.com` · propertyId `486264460` · account GA4 `252968286` |
+| Hosts medidos (misma propiedad) | `efeoncepro.com` (page_view vía Site Kit) + `think.efeoncepro.com` (page_view vía GA4 Config gateado por hostname en el container; snippet GTM en `efeonce-think` repo). Subdominio = mismo stream, funnel unificado. |
 | Google tag del sitio (Site Kit) | `GT-KV5CNNKQ` (separado del GTM) |
 | Service account | `greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com` |
 | Clientes de código | `src/lib/growth/gtm/api-client.ts` (`GtmApiClient`) · `src/lib/growth/ga4/api-client.ts` |
