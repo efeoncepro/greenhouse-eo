@@ -39,6 +39,8 @@ Use this reference for any Efeonce public landing page on WordPress/Ohio/Element
      Ohio's runtime observes those classes and toggles `.dynamic-typo` surfaces such as `.elements-bar`, `.social-bar`, color switcher, search/scroll controls, and header dynamic typography between `light-typo` and `dark-typo`.
      Do not force lateral widget contrast with custom `.elements-bar`, `.social-bar`, `.color-switcher`, header, wrapper, or runtime scroll scripts unless the native mechanism is proven unavailable.
    - Do not introduce global selectors for local page rhythm, cards, badges, or hero fixes.
+   - For Home-like sticky editorial lanes, prefer Ohio's native `-sticky-block` pattern over Elementor Pro sticky effects:
+     apply `-sticky-block` to the lane/column itself, give that lane viewport height, center the inner content, keep page wrappers `overflow:visible`, and make the lane static on mobile. Do not place sticky only on a small inner node, and do not leave an ancestor such as `.site-content` with `overflow-y:auto`; it becomes the sticky scroll container. Verify active sticky samples and the final stop with Playwright.
 
 7. **Purge and verify**
    - Purge Kinsta cache after live mutations.

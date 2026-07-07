@@ -545,6 +545,12 @@ export class FormRenderer {
       open = next
       trigger.setAttribute('aria-expanded', open ? 'true' : 'false')
       wrap.dataset.open = open ? 'true' : 'false'
+      const fieldWrap = wrap.closest('.ghf-field')
+
+      if (fieldWrap) {
+        if (open) fieldWrap.setAttribute('data-overlay-open', 'true')
+        else fieldWrap.removeAttribute('data-overlay-open')
+      }
 
       if (open) {
         list.hidden = false

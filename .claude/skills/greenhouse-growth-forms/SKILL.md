@@ -255,6 +255,15 @@ WordPress CSS surgery. The current AEO premium variant is `styleVariant=diagnost
 by renderer tokens, a custom single-select combobox/listbox (no OS-native popup for premium selects),
 CTA motion and field-level copy in the contract.
 
+- Premium select overlay contract (TASK-1343): the renderer owns overlay stacking, not the
+  WordPress host. When a premium select opens, `renderer.ts` marks the closest `.ghf-field` with
+  `data-overlay-open="true"`, `styles.ts` raises `.ghf-field:focus-within` and
+  `.ghf-field[data-overlay-open="true"]`, and `.ghf-select-list` sits above following grid rows.
+  Selected/hover options use `--ghf-fg`, not `--ghf-accent-contrast`, because white-on-mint can be
+  unreadable. Hosts may add section chrome, but should not rebuild or page-scope this listbox
+  behavior. Verification: open the dropdown in the real host and assert `aria-expanded=true`, list
+  visible, top option is the `elementFromPoint`, selected text is dark, no overflow, and
+  reduced-motion remains honest.
 - Publish or change premium visuals through a new form version (`style_variant` + copy/labels),
   never by editing a published version in-place.
 - AEO helper: `pnpm growth:forms:activate-aeo-premium` (dry-run) and

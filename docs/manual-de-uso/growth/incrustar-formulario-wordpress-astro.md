@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.4 — 2026-07-01 (Codex, Ohio child theme Growth Forms host layer)
+> **Version:** 1.5 — 2026-07-07 (Codex, SEO Growth Form overlay/sticky learnings)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -96,7 +96,9 @@ Regla operativa:
    `releaseSafety.fullRepoDeploySafe=false` o `eo-elementor-widgets` aparece como
    `repo_pending_release`, no lo mezcles en el rollout del child theme.
 4. Validar con desktop + mobile 390, `scrollWidth == clientWidth`, dropdown abierto,
-   foco/ARIA y la prueba publica/fail-closed que aplique al formulario.
+   foco/ARIA y la prueba publica/fail-closed que aplique al formulario. Para selects
+   premium, abrir al menos un dropdown y confirmar que el menu queda arriba de las filas
+   siguientes, la opcion selected/hover mantiene texto oscuro legible y no aparece overflow.
 
 ### Configurar el catálogo del selector (una vez por sitio)
 
@@ -215,6 +217,13 @@ componerla dentro de su superficie visible, trust/no-JS y layout. Si un host nec
 externos duplicados tras el success, hazlo con CSS/JS scoped al host; si se repite en otro sitio,
 promueve el patrón al renderer antes de copiarlo.
 
+**Dropdown premium / listbox:** los selects custom del renderer son parte del contrato Growth Forms,
+no del host. Cuando un select se abre, el renderer marca el field con `data-overlay-open="true"` y
+eleva `.ghf-select-list` para que no quede atrapada debajo de otros campos o filas del grid. No
+soluciones un dropdown enterrado con CSS page-scoped en WordPress; primero corrige el renderer o la
+capa compartida Ohio. El smoke visual debe probar `aria-expanded="true"`, menu visible, selected/hover
+legible y `scrollWidth == clientWidth`.
+
 **Identidad estable `form-key` (TASK-1297, recomendado):** además de `form="<slug>"`, el
 renderer acepta `form-key="<UUID>"` — la identidad opaca, estable e inmutable del formulario
 (no cambia por nueva versión, rename de slug ni nuevo surface). Preferila sobre `slug` para
@@ -243,6 +252,8 @@ El catálogo del selector (`InsertableFormCatalogEntryVm.formKey`) ya lo expone.
 - **No** apuntes a un canal `stable` antes de aprobar el smoke; deja `preview`/`beta`.
 - **No** copies el bundle del renderer al sitio: siempre se carga desde Greenhouse
   (asi todos los sitios quedan en la misma version).
+- **No** arregles dropdowns premium con `z-index` local de una landing: el overlay/listbox vive en
+  el renderer y debe quedar reusable para todos los hosts.
 - **No** restaures el bridge AEO `/aeo-2/` salvo rollback explicito del operador usando
   el backup documentado. Cualquier cambio futuro sobre AEO exige backup Elementor,
   protección del hero y `pnpm public-website:verify-aeo-live-contract`.
@@ -266,6 +277,9 @@ El catálogo del selector (`InsertableFormCatalogEntryVm.formKey`) ya lo expone.
   server-side `TURNSTILE_SECRET` este configurado en el environment de Greenhouse.
 - **Autocompletar no funciona**: revisa que el formulario publicado declare
   `autocomplete`/`inputMode` por campo (vienen del render_contract).
+- **El desplegable se mete debajo de otro campo o se ve con contraste raro**: confirma que el bundle
+  del renderer incluye el contrato `data-overlay-open` y que el host no esta anulando `.ghf-field` /
+  `.ghf-select-list`. La solucion correcta es shared renderer/host layer, no CSS local de pagina.
 
 ## CSP
 

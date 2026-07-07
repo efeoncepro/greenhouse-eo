@@ -72,7 +72,9 @@ is evidence, not automatic authorization for a full production deploy.
    `eo-elementor-widgets` under `classificationCounts.repo_pending_release`, do not deploy it as
    collateral in a child-theme CSS rollout; it needs its own plugin release decision.
 3. Validate by injection or staging before Kinsta mutation: desktop + mobile 390, dropdown
-   open, `scrollWidth==clientWidth`, focus/ARIA and relevant captcha/email-gate smoke.
+   open, `scrollWidth==clientWidth`, focus/ARIA and relevant captcha/email-gate smoke. Premium
+   dropdown stacking is renderer-owned (`data-overlay-open` on the active `.ghf-field`); do not fix
+   buried listboxes with one-off page CSS.
 4. After a live child-theme update, purge Kinsta and run the landing gate. AEO uses
    `pnpm public-website:verify-aeo-live-contract`.
 
@@ -87,7 +89,9 @@ For non-AEO embeds, the widget/minimal host should be routine:
    mobile 390 screenshots.
 4. If the host theme can override native controls, reuse the TASK-1298 visual pattern: assert
    fields/selects/CTA by computed styles **and** pixel-sample real control boxes in the PNG.
-5. Fix renderer/shared host adapter issues globally before adding one-off page CSS.
+5. For premium custom selects, open the listbox and assert `aria-expanded=true`, the top option is
+   actually above following fields, selected/hover text stays dark and `scrollWidth==clientWidth`.
+6. Fix renderer/shared host adapter issues globally before adding one-off page CSS.
 
 ## Verification
 

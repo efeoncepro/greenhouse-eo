@@ -150,6 +150,26 @@ Responsabilidad de la capa:
   `input/select/button` de Ohio;
 - reduced-motion defensivo solo dentro del host.
 
+### Premium select/listbox overlay contract (TASK-1343)
+
+Los selects premium (`style_variant=diagnostic_premium` y variantes equivalentes) resuelven el
+stacking del listbox dentro del renderer portable, no en la landing. Cuando el usuario abre un
+select, `src/growth-forms-renderer/renderer.ts` marca el `.ghf-field` activo con
+`data-overlay-open="true"`; `styles.ts` eleva `.ghf-field:focus-within`,
+`.ghf-field[data-overlay-open="true"]` y `.ghf-select-list` para que el menu quede por encima de las
+filas siguientes del grid, incluso dentro de cards WordPress/Ohio.
+
+Reglas de contrato:
+
+- el host puede proveer chrome, layout, sticky lanes o tokens, pero no debe reconstruir el listbox ni
+  resolver este bug con CSS page-scoped;
+- el estado activo conserva `aria-expanded`, `role="listbox"`/`role="option"` y foco de teclado;
+- las opciones selected/hover usan texto oscuro (`--ghf-fg`) sobre el fondo mint/premium; no usar
+  `--ghf-accent-contrast` porque puede producir blanco sobre claro;
+- el gate visual de cualquier host real debe abrir al menos un dropdown y comprobar que la opcion
+  superior sea el elemento bajo el punto de prueba (`elementFromPoint`), que no haya overflow
+  horizontal y que reduced-motion siga degradando honestamente.
+
 No responsabilidad de la capa:
 
 - identidad, version, fields, validacion, condiciones, copy, Turnstile, submit,

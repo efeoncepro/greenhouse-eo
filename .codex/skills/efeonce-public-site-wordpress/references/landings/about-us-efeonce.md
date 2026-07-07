@@ -59,6 +59,11 @@ Section/container:
 - Left sticky/content column: `71bbc33` with sticky block `2fcd7e0`
 - Right Loop Marketing visual column: `8f7bb85` with graphic wrapper `1349f4b`
 
+Sticky behavior follows the shared Home/Ohio `-sticky-block` pattern documented
+in `../landing-workflow.md`: keep sticky on the lane/column, avoid Elementor Pro
+sticky effects for this module, and verify ancestor overflow before changing
+layout.
+
 This module reuses the same home/front-page `lp-container-offset-left` and
 `lp-container-offset-right` pattern. The source offset rules in
 `Landing Custom CSS.css` are scoped to `body.home` / `body.front-page`, so they
@@ -93,6 +98,10 @@ Section/container:
 - Left tool-card lane: `eb5c55f`
 - Right sticky content column: `88b901c` with sticky block `d93f52c`
 - Example affected card: `9696990` (`HubSpot`)
+
+The right explanation column is another consumer of the shared Home/Ohio
+`-sticky-block` pattern; preserve the sticky column and solve overlap/gutters
+around it rather than replacing the sticky mechanism.
 
 This section has the same off-home full-bleed reuse issue, but the accepted fix
 is narrower than the Loop Marketing module. The right sticky explanation is

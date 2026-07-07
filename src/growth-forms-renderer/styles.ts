@@ -112,7 +112,9 @@ export const RENDERER_CSS = `
     .ghf-field--full { grid-column: 1 / -1; }
   }
 
-  .ghf-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .ghf-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; z-index: 0; }
+  .ghf-field:focus-within { z-index: 40; }
+  .ghf-field[data-overlay-open="true"] { z-index: 80; }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-field { gap: 8px; }
   .ghf-label { font-size: 0.875rem; font-weight: 600; line-height: 1.3; color: var(--ghf-fg); }
   .ghf-required { color: var(--ghf-error); margin-inline-start: 2px; }
@@ -236,6 +238,9 @@ export const RENDERER_CSS = `
     position: relative;
     min-width: 0;
   }
+  .ghf-select-composite[data-open="true"] {
+    z-index: 1;
+  }
   .ghf-select-trigger {
     display: flex;
     align-items: center;
@@ -286,7 +291,7 @@ export const RENDERER_CSS = `
   }
   .ghf-select-list {
     position: absolute;
-    z-index: 30;
+    z-index: 90;
     inset-inline: 0;
     top: calc(100% + 8px);
     display: grid;
@@ -325,11 +330,11 @@ export const RENDERER_CSS = `
   .ghf-select-option:hover,
   .ghf-select-option[data-active="true"] {
     background: rgba(54, 200, 191, 0.12);
-    color: var(--ghf-accent-contrast);
+    color: var(--ghf-fg);
   }
   .ghf-select-option[aria-selected="true"] {
     background: rgba(54, 200, 191, 0.18);
-    color: var(--ghf-accent-contrast);
+    color: var(--ghf-fg);
     font-weight: 700;
   }
 

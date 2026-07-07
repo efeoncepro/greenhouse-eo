@@ -38,7 +38,7 @@ Section/container:
 
 Sticky behavior is CSS `position:sticky`, not Elementor Pro Sticky motion effects.
 
-Class `-sticky-block` in `Landing Custom CSS.css` owns sticky positioning.
+Class `-sticky-block` from Ohio theme `style.css` owns sticky positioning.
 
 `lp-container-offset-left/right` rules are home/front-page-scoped and inert off Home. For this page, the accepted fix is a restrained page-scoped gutter, not full `.page-container` alignment.
 

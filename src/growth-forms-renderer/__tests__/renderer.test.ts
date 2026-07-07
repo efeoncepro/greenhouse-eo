@@ -418,11 +418,13 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(trigger.getAttribute('role')).toBe('combobox')
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(list.hidden).toBe(true)
+    expect(trigger.closest('.ghf-field')?.hasAttribute('data-overlay-open')).toBe(false)
 
     trigger.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
     expect(list.hidden).toBe(false)
+    expect(trigger.closest('.ghf-field')?.getAttribute('data-overlay-open')).toBe('true')
     expect(root.querySelectorAll('[role="option"]')).toHaveLength(3)
 
     trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
@@ -430,6 +432,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
 
     expect(trigger.textContent).toContain('1 - 10')
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(trigger.closest('.ghf-field')?.hasAttribute('data-overlay-open')).toBe(false)
     expect(root.querySelector('[role="option"][aria-selected="true"]')?.textContent).toBe('1 - 10')
   })
 

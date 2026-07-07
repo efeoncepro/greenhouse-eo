@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-07-05 por Codex (Think Brand Visibility `tokenized_report` production handoff)
+> **Ultima actualizacion:** 2026-07-07 por Codex (SEO Growth Form premium select overlay + WordPress host pattern)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -106,6 +106,11 @@ El mismo formulario se ve igual en WordPress, en Astro y en la vista interna de 
 - **Como se incrusta:** en WordPress hay un widget de Elementor ("Greenhouse Growth Form"); en Astro un componente; ambos piden el formulario por su identidad. Paso a paso en el [manual de incrustacion](../../manual-de-uso/growth/incrustar-formulario-wordpress-astro.md).
 - **Identidad estable `form-key` (TASK-1297):** cada formulario tiene una identidad propia, opaca e inmutable (un `form_key` tipo UUID) que no cambia aunque se publique una versión nueva, se renombre el slug o se muestre en otro sitio. Es la forma recomendada de referenciarlo en embeds y mutaciones (el slug queda como alias legible). Es pública/opaca y **nunca** es el identificador de destino de HubSpot. El renderer también acepta `appearance="bare"` para integrarse dentro de una tarjeta del sitio sin "tarjeta sobre tarjeta", y el texto del botón puede venir del formulario publicado (`copy.submit`) en vez de un default genérico.
 - **Success Card transversal:** si el contrato publicado declara `successBehavior.presentation="success_card"`, el renderer pinta la card con estructura, mark SVG de celebración, icono calendario para acciones de agenda, motion/reduced-motion y telemetry sin PII. Los overrides live `gh-aeo-success-card-*` y el ocultamiento del footer externo son un puente específico de AEO/WordPress; no se copian a otros forms sin promover antes el patrón al renderer.
+- **Selects premium sin CSS local:** los desplegables premium resuelven su overlay dentro del
+  renderer. Al abrirse, el field activo recibe `data-overlay-open="true"` y la lista queda por
+  encima de las filas siguientes del grid; las opciones selected/hover mantienen texto oscuro
+  legible. Si un host como Ohio vuelve a enterrar un dropdown, se corrige en
+  `src/growth-forms-renderer/**` o en la capa compartida de host, no con CSS de una landing.
 
 ## Cockpit operativo — TASK-1232
 

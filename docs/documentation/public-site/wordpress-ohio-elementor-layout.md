@@ -418,7 +418,7 @@ La seccion `7489ca6` de `/agencia-creativa/` es un row full-bleed dividido en do
 - **Izquierda `49d5a98` (63%)** — scrollea: ilustracion + titulo "Cada ciclo mejora el siguiente" + los 7 pasos del proceso (widgets `ohio_service_table`) + dos cards de intro.
 - **Derecha `97e545e` (37%)** — se queda fija: bloque "CÓMO TRABAJAMOS / La diferencia no es…".
 
-El "se queda fija" NO es el efecto Sticky de Elementor Pro: es `position: sticky; top:0` aplicado por la clase custom `-sticky-block` (definida en `Landing Custom CSS.css`) sobre `d0ef9a7` (bloque derecho) y `e6facfa` (ilustracion izquierda). Los pasos y las cards no son sticky, por eso recorren mientras la derecha permanece anclada.
+El "se queda fija" NO es el efecto Sticky de Elementor Pro: es `position: sticky; top:0` aplicado por la clase `-sticky-block` (regla servida por el `style.css` del theme Ohio) sobre `d0ef9a7` (bloque derecho) y `e6facfa` (ilustracion izquierda). Los pasos y las cards no son sticky, por eso recorren mientras la derecha permanece anclada.
 
 ### Por que se veia "pegada a los bordes" (gotcha home vs pagina boxeada)
 
@@ -447,6 +447,109 @@ Iteracion / aprendizaje: el primer intento alineo el modulo al `.page-container`
 
 - Antes de tocar un modulo "que se queda fijo", verificar si el sticky es `position:sticky` por clase custom (`-sticky-block`) y no el efecto de Elementor Pro; no hay keys `sticky`/`motion_fx` en `_elementor_data`.
 - Cuando un modulo se "pega a los bordes" solo en una pagina, sospechar de clases cuyo CSS esta scopeado a `body.home`/`body.front-page` reusadas en una pagina boxeada, antes de cambiar anchos de Elementor.
+
+## Patron reutilizable: sticky editorial lane
+
+Este patron aplica cuando una landing tiene una columna editorial corta que debe acompanar una columna larga de contenido, cards, formulario o pasos. Ejemplos ya verificados:
+
+- Home: modulos sticky-scroll con `.-sticky-block`.
+- `/agencia-creativa/`: "Como trabajamos".
+- `/about-us-efeonce/`: Loop Marketing / Ecosistema tecnologico.
+- `/servicios/posicionamiento-seo/`: columna izquierda del Growth Form SEO (`#grader`).
+
+### Regla base de Ohio
+
+Ohio ya trae la mecanica desktop:
+
+```css
+@media screen and (min-width: 769px) {
+  .-sticky-block,
+  .-sticky-block > .vc_column-inner > .wpb_wrapper {
+    z-index: 2;
+    top: 0;
+    position: sticky !important;
+  }
+}
+```
+
+Usar esa clase cuando se quiera reproducir el patron visual del Home. No usar `motion_fx`/Sticky de Elementor Pro para este caso salvo que el modulo ya dependa explicitamente de ese sistema.
+
+### Geometria correcta
+
+El sticky debe aplicarse a la **lane/columna completa**, no a un inner pequeno. La lane debe tener altura de viewport y el contenido interno se centra dentro de esa lane:
+
+```css
+.landing .sticky-lane.-sticky-block {
+  align-self: start;
+  display: flex;
+  height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px));
+  min-height: 680px;
+  position: sticky !important;
+  top: var(--wp-admin--admin-bar--height, 0px);
+  z-index: 2;
+}
+
+.landing .sticky-lane-inner {
+  align-self: center;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .landing .sticky-lane.-sticky-block {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    position: relative !important;
+    top: auto !important;
+  }
+}
+```
+
+El sticky debe "acompanar" mientras la columna larga scrollea y soltarse al llegar al final del shell/form. Si el bloque sticky mide mas que el viewport o se estira hasta la altura completa del formulario, no se vera fijo.
+
+### Ancestros y overflow
+
+`position: sticky` falla o se comporta como normal si un ancestro crea un scroll container accidental. Antes de declarar que "sticky no funciona", medir la cadena de padres con Playwright:
+
+- `overflow-x/overflow-y`;
+- `transform`;
+- `contain`;
+- altura de la lane sticky vs viewport;
+- top/bottom del shell y de la columna larga.
+
+En la landing SEO, el bug venia de un `<main class="gh-seo-landing site-content">`: la clase `site-content` heredaba `overflow-x:hidden; overflow-y:auto`, convirtiendose en scroll container y neutralizando el sticky. El fix correcto fue quitar esa clase del wrapper de la landing y neutralizar overflow solo en los wrappers de la pagina:
+
+```css
+body.page-id-251078 .elementor.elementor-251078,
+body.page-id-251078 .elementor-element-seo1343,
+.gh-seo-landing {
+  overflow: visible !important;
+}
+```
+
+Hacer esto siempre page-scoped. No tocar globalmente `body`, `.site-content`, `.page-container`, header, footer ni widgets Ohio.
+
+### Gutters off-Home
+
+`lp-container-offset-left/right` no es parte del contrato sticky: es una ayuda de offset del Home y sus reglas viven scopeadas a `body.home`/`body.front-page`. Si se reutiliza el patron en una pagina interior, agregar gutter page-scoped moderado al modulo, no cambiar las reglas del Home ni alinear todo al `.page-container` si el bloque debe conservar lectura full-bleed.
+
+### Gate de verificacion
+
+Para desktop:
+
+- clase `-sticky-block` presente;
+- computed `position=sticky`;
+- ancestros relevantes `overflow=visible/visible`;
+- durante scroll medio, la lane conserva `top≈0`;
+- al final, la lane se suelta y su `bottom` no sobrepasa el `shellBottom`/`formBottom`;
+- `scrollWidth == clientWidth`;
+- widgets Ohio siguen visibles.
+
+Para mobile `390px`:
+
+- lane vuelve a flujo normal (`position:relative|static`);
+- no tapa campos, CTAs ni consentimiento;
+- `scrollWidth == clientWidth`.
 
 ## Hero About us (page_id 249770)
 

@@ -1,7 +1,7 @@
 # Public Site — Playbook de landings Ohio + Elementor
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-14 por Codex
 > **Dominio:** Public Site
 > **Inventario relacionado:** [Inventario Ohio + Elementor](../../documentation/public-site/wordpress-ohio-elementor-widget-inventory.md)
@@ -38,6 +38,7 @@ Guiar a agentes y operadores para crear o ajustar landings de `efeoncepro.com` u
 | Contenido pegado a los bordes dentro de fondo full-width | `layout`, `content_width`, padding/gap de section/container | Para legacy section: `layout=boxed` + `content_width`. Para container: width/content controls equivalentes. |
 | Franja entre hero y contenido | `page_breadcrumbs_visibility`, `page_add_top_padding`, template WordPress | Ajustar meta Ohio antes de CSS. |
 | Linea lateral en full-width | `page_full_width_margins_size`, `--clb-grid-gutter`, wrapper | Alinear meta Ohio con gutter real. |
+| Columna editorial que debe acompanar un formulario/cards largos | `-sticky-block`, overflow de ancestros, altura de lane | Usar sticky editorial lane nativo de Ohio; no Elementor Pro Sticky. |
 | Header/sidebar cambia color al cruzar secciones oscuras | `page_header_menu_style`, `.light-typo`, body classes | Evitar global. Solo page-scoped si el rail visual permanece claro. |
 | Boton con hover incorrecto | Settings del widget (`ohio_button` o Elementor `button`) | Ajustar colores/hover del widget. CSS page-scoped solo si el control no existe. |
 | Formulario no atribuye bien | Widget `hubspot-form` / CF7 + HubSpot mapping | Confirmar form ID, portal, UTM, campana y fallback. |
@@ -149,6 +150,25 @@ Para legacy sections con fondo full-width y contenido pegado:
 ```
 
 Este patron ya fue aplicado en `page_id=244079` para el modulo `gh-section-hubspot-partner-proof`.
+
+## Pattern: sticky editorial lane
+
+Cuando una landing necesite que una columna corta acompane el scroll de una
+columna larga, reusar el patron de Home/Ohio:
+
+- clase `-sticky-block` en la lane/columna completa;
+- lane con altura de viewport y contenido interno centrado;
+- wrappers page-scoped con `overflow:visible`;
+- mobile en flujo normal;
+- verificacion desktop con muestras activas y release al final;
+- verificacion mobile 390px sin overlay ni overflow.
+
+No usar `motion_fx`/Elementor Pro Sticky para este caso salvo que el modulo ya
+dependa de ese sistema. Si falla, auditar ancestros: `site-content` con
+`overflow-y:auto` puede convertir la landing en scroll container y neutralizar
+sticky.
+
+Referencia completa: [sticky editorial lane](../../documentation/public-site/wordpress-ohio-elementor-layout.md#patron-reutilizable-sticky-editorial-lane).
 
 ## Anchors semanticos Greenhouse
 

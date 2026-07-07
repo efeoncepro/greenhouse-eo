@@ -24,9 +24,13 @@
 - In the comparison card (`[data-capture="comparativa"]`), the right-card header uses the local full Efeonce logo SVG (`public/branding/logo-full.svg`) inline as `.gh-comparison-efeonce-logo`, followed by visible text `· método medible`. Do not reintroduce the plant icon or the visible text `Efeonce · método medible`.
 - In the Greenhouse dashboard section, the platform pill uses the local blue Greenhouse logotype (`public/images/greenhouse/SVG/greenhouse-blue.svg`) as `.gh-greenhouse-logotype-pill`, and the dashboard browser chrome uses the local white Greenhouse isotype (`public/images/greenhouse/SVG/negative-isotipo.svg`) as `.gh-greenhouse-isotype-badge`. Do not reintroduce `ti-plant-2` or plain-text-only Greenhouse branding in those marked positions.
 - CTA/button interaction is governed by the page-scoped marker `task-1343-cta-hover-system-v1`: `.btn-primary`, `.btn-ghost`, `.btn-light`, and `.lnk` must keep explicit hover/focus/active color, background, border, arrow, and reduced-motion states inside `.gh-seo-landing`. Do not rely on inline Elementor styles or Ohio/global anchor hover for CTA state.
-- Primary CTA points to `https://think.efeoncepro.com/brand-visibility?utm_source=efeoncepro&utm_medium=landing&utm_campaign=posicionamiento-seo`.
+- Primary diagnostic CTAs point to the in-page Growth Form section `#grader`.
 - AEO bridge points to `/aeo-2/` until the sibling `/servicios/aeo` and redirect are governed separately.
-- The page does not embed a live Growth Form yet; it links to the existing Think grader node.
+- The page embeds the live Growth Form `efeonce-seo-diagnostic` via `<greenhouse-form form-key="7772dcf4-e2ca-4f5b-b386-2db92659b050" surface="fhsf-48a4b95f-5f2a-453a-88d7-af3257e7c417" locale="es-CL" color-scheme="light" appearance="bare">`.
+- Growth Form published contract: `formId=fdef-3d065f54-42b4-4964-9216-6fefae7cc765`, `formVersionId=fver-af974bcd-2e20-45ea-9c3e-a897eeb27d2e`, version `3`, `styleVariant=diagnostic_premium`, `captchaRequired=true`, 11 visible capture fields (`fullName`, `email`, `companyName`, `website`, `role`, `targetMarket`, `mainGoal`, `seoCurrentState`, `monthlyInvestmentRange`, `projectTimeline`, `context`), HubSpot destination shape copied with delivery mode `disabled` until cutover. The `website` field remains intentionally `type=text` + `inputMode=url` + `validator=url` + `maxLength=160` so desktop renders `Empresa` and `Sitio web a diagnosticar` in the same row while preserving URL validation and mobile URL keyboard. V3 removes the separate optional `cmsPlatform` select and absorbs CMS/plataforma context into the textarea placeholder, adds useful helper copy under `Nombre completo` and `Empresa`, removes redundant select helpers, hides visual character counters on the SEO landing host, and darkens CTA gradients so white submit text has accessible contrast.
+- Growth Form host visual/motion contract: keep page-scoped marker `task-1343-seo-growth-form-motion-v1`. `#grader.gh-seo-diagnostic` owns a light diagnostic station with orbit/halo, staggered `is-in-view` reveal, proof/meta microinteractions, host card hover/focus-within lift, renderer-ready marker `.gh-form-ready[data-form-ready="true"]`, status pills in the host header, field hover/focus polish, explicit select/listbox overlay stacking (`z-index` on the active field/listbox) and readable selected-option contrast, plus reduced-motion static behavior (`cardTransform=none`, field animations off). Do not move this section chrome into the Growth Forms render contract; WordPress owns the section chrome, Greenhouse owns fields/validation/submission. The shared renderer also marks active select fields with `data-overlay-open="true"` for future releases.
+- Growth Form sticky editorial lane contract: keep page-scoped marker `task-1343-seo-growth-form-sticky-copy-v1`. The left copy column in `#grader` intentionally reuses Ohio/Home's native `-sticky-block` pattern: sticky applies to `.gh-seo-diagnostic-copy.-sticky-block` (the full lane), not to a small inner wrapper; desktop lane height is viewport-sized (`height:calc(100dvh - var(--wp-admin--admin-bar--height,0px))`, `min-height:680px`) with `.gh-seo-diagnostic-copy-inner` centered inside; mobile `<=900px` returns the lane to normal flow. Ancestors must stay `overflow:visible`; in this landing the wrapper must not use `class="site-content"` because that inherited `overflow-y:auto` and broke sticky. Keep the page-scoped overflow guard on `body.page-id-251078 .elementor.elementor-251078`, `body.page-id-251078 .elementor-element-seo1343`, and `.gh-seo-landing`. Verify desktop with two active samples where lane `top≈0` while the form scrolls, plus one end sample where the lane releases at `shellBottom/formBottom`; verify mobile stays static.
+- The Growth Form sits after `[data-capture="bridge"]` and before `[data-capture="faq"]`; the mobile sticky `.mcta` must hide before/inside `#grader` so it never covers form fields or consent.
 - Yoast title/canonical/meta description and JSON-LD `Organization`, `Service`, `BreadcrumbList`, and `FAQPage` are published.
 
 ## Header Contract
@@ -75,6 +79,13 @@
 - Latest backup before gutter/full-bleed polish: `_gh_backup_before_task1343_seo_landing_20260706T212903Z`.
 - Latest backup before converting the commercial proof block into an editorial evidence band: `_gh_backup_before_task1343_seo_landing_20260706T235206Z`.
 - Earlier backup before moving the commercial proof block into the narrative proof lane: `_gh_backup_before_task1343_seo_landing_20260706T234109Z`.
+- Latest backup before the SEO Growth Form v3 UX/a11y + CTA contrast polish: `_gh_backup_before_task1343_seo_landing_20260707T013432Z`.
+- Latest backup before the SEO Growth Form sticky editorial lane fix: `_gh_backup_before_task1343_seo_landing_20260707T063508Z`.
+- Latest backup before the SEO Growth Form dropdown overlay/contrast fix: `_gh_backup_before_task1343_seo_landing_20260707T055455Z`.
+- Latest backup before the SEO Growth Form section motion/visual integration pass: `_gh_backup_before_task1343_seo_landing_20260707T053404Z`.
+- Earlier backup before the first v3 form host polish pass: `_gh_backup_before_task1343_seo_landing_20260707T012338Z`.
+- Earlier backup before the SEO Growth Form embed + sticky CTA guard: `_gh_backup_before_task1343_seo_landing_20260707T004830Z`.
+- Earlier backup before the first SEO Growth Form publish: `_gh_backup_before_task1343_seo_landing_20260707T004313Z`.
 - Latest backup before the CTA hover/focus system fix: `_gh_backup_before_task1343_seo_landing_20260707T000629Z`.
 - Earlier native-header polish backup: `_gh_backup_before_task1343_seo_landing_20260706T212034Z`.
 - Earlier publish backups include `_gh_backup_before_task1343_seo_landing_20260706T210238Z`, `_gh_backup_before_task1343_seo_landing_20260706T211508Z`, `_gh_backup_before_task1343_seo_landing_20260706T211805Z`, and `_gh_backup_before_task1343_seo_landing_20260706T211926Z`.
@@ -89,6 +100,11 @@
 - Latest E-E-A-T Google/GPT badge verification: `.captures/task1343-seo-eeat-brand-badges-2026-07-06T22-55-10-532Z/`.
 - Latest CTA/proof/Greenhouse polish verification: `.captures/task1343-seo-final-polish-2026-07-06T23-29-34-593Z/` plus final mobile badge check `.captures/task1343-seo-final-check-2026-07-06T23-31-49-943Z/`; latest proof narrative reflow: `.captures/task1343-seo-commercial-proof-reflow-2026-07-06T23-41-50-507Z/`; latest editorial evidence-band redesign: `.captures/task1343-seo-commercial-proof-editorial-2026-07-06T23-52-56-893Z/`.
 - Latest CTA hover/focus audit: `.captures/task1343-seo-cta-hover-system-final-2026-07-07T00-07-18-007Z/`.
+- Latest SEO Growth Form sticky editorial lane verification: `.captures/task1343-seo-growth-form-motion-v1-2026-07-07T06-39-59-496Z/`.
+- Latest SEO Growth Form section motion + dropdown overlay verification: `.captures/task1343-seo-growth-form-motion-v1-2026-07-07T05-55-19-456Z/`.
+- Earlier SEO Growth Form section motion verification: `.captures/task1343-seo-growth-form-motion-v1-2026-07-07T05-34-40-531Z/`.
+- Earlier SEO Growth Form v3 verification: `.captures/task1343-seo-growth-form-v3-2026-07-07T01-35-20-839Z/`.
+- Earlier SEO Growth Form embed verification: `.captures/task1343-seo-growth-form-2026-07-07T01-00-37-435Z/`.
 - Latest Google badge SVG verification: `.captures/task1343-seo-google-logo-badge-2026-07-06T21-47-03-175Z/`.
 - Latest custom-footer removal verification: `.captures/task1343-seo-remove-custom-footer-2026-07-06T21-43-47-560Z/`.
 - Latest marquee + scroll-motion verification: `.captures/task1343-seo-marquee-motion-2026-07-06T21-39-37-247Z/`.
@@ -140,7 +156,7 @@
 - CTA/proof/Greenhouse polish checks:
   - Final backup: `_gh_backup_before_task1343_seo_landing_20260706T234109Z`.
   - The hero secondary CTA `Habla con el equipo` and the Greenhouse support link point to `mailto:hola@efeoncepro.com?subject=Diagn%C3%B3stico%20SEO%20Efeonce`.
-  - `Ver AEO` remains the only CTA pointing to `https://efeoncepro.com/aeo-2/`; diagnostic CTAs point to `#grader` or the Think Brand Visibility URL with SEO UTM.
+  - `Ver AEO` remains the only CTA pointing to `https://efeoncepro.com/aeo-2/`; diagnostic CTAs point to `#grader`.
   - `[data-capture="commercial-proof"].gh-commercial-proof` sits in the proof narrative lane after `[data-capture="prueba"]` and before `[data-capture="plataforma"]`, not under the hero/marquee; it uses real local public-site proof logos from `docs/assets/public-site/aeo-brand-logos/` (`sky`, `anam`, `berel`, `carozzi`, `bresler`, `marca-chile`) and does not invent performance metrics.
   - The commercial proof block is an editorial evidence band, not a contained card: `.gh-proof-shell` must remain transparent with no border, no radius, and no shadow; logos live in `.gh-proof-wall` with hairline dividers; the three proof points live in `.gh-proof-ledger` as an open ledger row/stack, not boxed metric cards.
   - The visible proof copy is `Evidencia del método` / `La diferencia se demuestra cuando puedes auditar el trabajo.`; do not restore the old `Prueba comercial` / `No vendemos humo de ranking...` copy in this position.
@@ -153,6 +169,16 @@
   - Desktop `1440` and mobile `390` audit all visible `.gh-seo-landing a.btn` and `.gh-seo-landing a.lnk`; `failures=[]`, `consoleErrors=[]`, `scrollWidth==clientWidth`.
   - `.btn-primary:hover` keeps white text over a blue gradient; `.btn-ghost:hover` keeps blue text over pale blue; `.btn-light:hover` flips to white background with blue text so dark-section CTAs such as `Ver AEO` never become white-on-white; `.lnk:hover` receives a visible underline.
   - Reduced motion keeps the color/background feedback but computes `transform:none` and near-zero transition duration.
+- SEO Growth Form checks:
+  - Live HTML contains exactly one `<greenhouse-form>` with `form-key="7772dcf4-e2ca-4f5b-b386-2db92659b050"` and `surface="fhsf-48a4b95f-5f2a-453a-88d7-af3257e7c417"`.
+  - Live HTML loads `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js` and contains the sticky CTA gate variable `graderThreshold`.
+  - Public render API with `Origin: https://efeoncepro.com` returns `200`, CORS `access-control-allow-origin:https://efeoncepro.com`, slug `efeonce-seo-diagnostic`, version `3`, `styleVariant=diagnostic_premium`, 11 capture fields, captcha required, submit copy `Solicitar diagnóstico SEO →`, helper copy for `fullName`/`companyName`, no `cmsPlatform`, and the expected surface.
+  - Desktop `1440`: `Empresa` and `Sitio web a diagnosticar` share the same form row (`sameRow=true`), `websiteFullWidthClass=false`, and the website input exposes `type=text`, `inputmode=url`, `maxlength=160`; `Rango de inversión mensual pensado` and `Cuándo quieres avanzar` share a row; mobile `390` stacks the same fields (`stacked=true`).
+  - CTA submit computes white text on a darker blue gradient (`#0264bd` → `#0871c8` → `#075ba8`), visual counters are hidden (`visibleCounters=0`), and select helper text is reduced to avoid idle whitespace.
+  - Form section motion/interaction checks: live HTML contains `task-1343-seo-growth-form-motion-v1`; after scrolling, `#grader` gets `.is-in-view`, the card gets `.gh-form-ready[data-form-ready="true"]`, `.gh-seo-diagnostic-orbit` exists, status pills count is `3`, form card pseudo-overlay is present, card hover computes `translateY(-3px)`, focus-within is true when focusing `fullName`, and reduced-motion keeps `cardTransform=none`, `fieldAnimationName=none`, `overflow=0`.
+  - Select/listbox overlay checks: opening `mainGoal` yields `expanded=true`, `listVisible=true`, active field `z-index=90`, list `z-index=120`, `elementFromPoint` on the first option resolves inside `.ghf-select-list`, and selected option color is dark (`rgb(15, 33, 53)`) instead of white-on-mint. Visual evidence: `desktop-1440-mainGoal-open-visible.png` in the latest capture folder.
+  - Public submit API without Turnstile token returns `403` with `{"outcome":"captcha_failed","message":"missing_token"}`.
+  - Playwright live desktop `1440` and mobile `390`: renderer mounted, 11 labels, 6 select triggers, first select opens, submit label `Solicitar diagnóstico SEO`, diagnostic CTAs all `href="#grader"`, old Think links `0`, no internal `Growth Forms`/`WordPress solo` copy, order `bridge -> grader -> faq`, Ohio widgets present, sticky CTA hidden at `#grader`, `scrollWidth==clientWidth`, console errors `[]`, request failures `[]`.
 - Comparison card logo checks:
   - `.gh-comparison-efeonce-logo svg` exists with viewBox `0 0 837.07 196.68`.
   - The SVG has no internal `<style>` node; paths use direct fill `#023c70`.
@@ -166,4 +192,4 @@
 
 - Build `/servicios/` into a real hub instead of the current minimal parent page.
 - Create sibling `/servicios/aeo` and govern a `301` from `/aeo-2/` in a separate task.
-- If embedding the real `<greenhouse-form>` later, coordinate Growth Forms CORS/surface allowlist and submit testing as a separate rollout.
+- HubSpot delivery for `efeonce-seo-diagnostic` is still intentionally `disabled`; coordinate dispatcher/destination cutover before promising CRM delivery from this form.

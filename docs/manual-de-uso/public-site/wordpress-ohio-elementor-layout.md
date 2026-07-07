@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.0
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-06-23 por Codex
+> **Ultima actualizacion:** 2026-07-07 por Codex
 > **Modulo:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Pagina de referencia:** `/blog` (`page_id=18456`)
@@ -73,6 +73,32 @@ getComputedStyle(document.documentElement).getPropertyValue('--clb-grid-gutter')
 ```
 
 3. Si el residuo lateral equivale a la diferencia entre `page_full_width_margins_size` y `--clb-grid-gutter`, corrige el meta de pagina en vez de mover footer/sidebar global.
+
+## Pattern: sticky editorial lane
+
+Para landings con una columna editorial corta que debe acompanar una columna
+larga (formulario, pasos o cards), usar primero el patron nativo de Ohio:
+`-sticky-block`.
+
+Contrato operativo:
+
+- aplicar `-sticky-block` a la lane/columna completa, no a un inner pequeno;
+- dar a la lane altura de viewport y centrar el contenido interno;
+- mantener ancestros `overflow:visible`;
+- hacer la lane estatica en mobile;
+- verificar que acompana el scroll medio y se suelta al llegar al final del
+  shell/form.
+
+El sticky de este patron no es Elementor Pro Sticky ni `motion_fx`. Es
+`position:sticky` servido por Ohio. Si no funciona, revisar primero si algun
+ancestro creo un scroll container accidental (`overflow-y:auto|scroll`,
+`overflow:hidden`, `transform` o `contain`). Caso fuente: en la landing SEO
+`/servicios/posicionamiento-seo/`, `<main class="gh-seo-landing site-content">`
+heredaba `overflow-y:auto` y rompia el sticky; el fix fue remover
+`site-content` del wrapper de la landing y dejar una guarda page-scoped de
+`overflow:visible`.
+
+Referencia larga: [Patron reutilizable: sticky editorial lane](../../documentation/public-site/wordpress-ohio-elementor-layout.md#patron-reutilizable-sticky-editorial-lane).
 
 ## Fix aplicado el 2026-06-14
 
