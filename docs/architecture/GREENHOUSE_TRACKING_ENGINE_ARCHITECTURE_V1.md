@@ -383,7 +383,8 @@ Revisit this draft when:
 | --- | --- |
 | Cuenta | **Efeonce Global** · `accountId=6291647045` |
 | Contenedor live | **efeoncepro** · `GTM-NGHPGRLZ` · `containerId=218104216` (el instalado en `efeoncepro.com`, verificado en el HTML) |
-| GA4 destino | Google tag `GT-KV5CNNKQ` |
+| GA4 propiedad | **efeoncepro.com** · `propertyId=486264460` · cuenta GA4 Efeonce `252968286` · Google tag `GT-KV5CNNKQ`. El SA ya es Viewer → lectura por Data API verificada (realtime `page_view`/`session_start` 2026-07-07). |
+| GA4 verificación | `scripts/ga4/realtime-events.ts <propertyId>` — conteo de eventos en tiempo real (la herramienta para confirmar que un evento disparado en el sitio llega a GA4). |
 
 Todo tag/trigger/variable de superficies del sitio público se construye en **`GTM-NGHPGRLZ`** (cuenta `6291647045`), NO en el duplicado huérfano `GTM-NS3RNNCD` de la cuenta `6068297031` (ese no está instalado en el sitio → cualquier tag ahí no dispara; cleanup pendiente, no bloqueante).
 
@@ -431,6 +432,6 @@ Elegir 1 opción, documentarla, y recién ahí construir tags. Mientras esto sig
 - ~~Resolver §19.3 (decisión de contenedor canónico)~~ ✅ RESUELTO — canónico = `GTM-NGHPGRLZ` (cuenta `6291647045`).
 - Definir la familia de eventos `gh_cta_*` en la SoT (mirror de `GTM_EVENT_NAMES`) para CTAs/botones.
 - Tags GTM que escuchen `gh_form_*` / `gh_cta_*` → GA4 (`GT-KV5CNNKQ`) + destinos, gestionados como código vía `GtmApiClient` sobre `GTM-NGHPGRLZ`.
-- GA4: agregar el SA en la propiedad (`Admin → Property Access Management`) + cliente Data/Admin.
+- ~~GA4: agregar el SA en la propiedad + cliente Data/Admin~~ ✅ HECHO — SA Viewer en `efeoncepro.com` (`486264460`); clientes `src/lib/growth/ga4/` + `scripts/ga4/{verify-connection,realtime-events}.ts`; lectura realtime verificada.
 - Cleanup (no bloqueante): consolidar/retirar el duplicado `GTM-NS3RNNCD` de la cuenta `6068297031`.
 - Runtime portal (Vercel/WIF) + acción gobernada Nexa (write/publish = propose→confirm→execute) si esto pasa a ser capability del portal.
