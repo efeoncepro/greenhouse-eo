@@ -32,12 +32,27 @@ For **event naming / taxonomy / the gh_ house style** → `docs/reference/measur
 | Clientes de código | `src/lib/growth/gtm/api-client.ts` (`GtmApiClient`) · `src/lib/growth/ga4/api-client.ts` |
 | Verificar en vivo | `scripts/ga4/realtime-events.ts 486264460` · `scripts/gtm/verify-connection.ts` |
 
-> **⚠️ Verificar SIEMPRE el Measurement ID destino.** El sitio tiene DOS ids GA4-ish (`G-KYPPY57M14` en el GTM, `GT-KV5CNNKQ` de Site Kit). Antes de crear un GA4 Event tag, confirmar **qué measurement ID pertenece a la propiedad `486264460`** por la Admin API (`properties/486264460/dataStreams`) — si mandás al id equivocado, el evento no aparece en la propiedad que medimos. Ver `references/ga4-admin-api-ops.md`.
+> **⚠️ Verificar SIEMPRE el Measurement ID destino.** El sitio tiene DOS ids GA4-ish (`G-KYPPY57M14` en el GTM, `GT-KV5CNNKQ` de Site Kit). Antes de crear un GA4 Event tag, confirmar **qué measurement ID pertenece a la propiedad `486264460`** por la Admin API (`properties/486264460/dataStreams`) — si mandás al id equivocado, el evento no aparece en la propiedad que medimos. Ver `docs/reference/measurement-gtm-ga4/07-ga4-admin-api-ops.md`.
+
+## Metodología — cómo decidir el camino (árbol de decisión)
+
+Ante una tarea de medición, seguir este árbol; NO improvisar el camino:
+
+1. **¿Qué se quiere medir?** submit de form · click de CTA · vista · conversión.
+2. **¿El evento ya se emite al dataLayer?** Forms SÍ (`gh_form_*`, default true). CTAs → falta la familia `gh_cta_*` (definir primero en la SoT `src/lib/growth/forms/contracts.ts`). Verificar con `curl gtm.js | grep` o el renderer telemetry.
+3. **¿Existe un evento recomendado GA4 que calce?** (lead → `generate_lead`; signup → `sign_up`). Sí → usar ese verbatim (hereda key events/predictivos). No → custom `gh_<object>_<action>`. Regla completa: doc `04`.
+4. **¿Ya hay un tag genérico que lo cubra?** Un solo GA4 Event tag + parámetro de identidad (`form_slug`) cubre N superficies — **reusar antes de crear**. Ver `TRACKING-PLAN.md`.
+5. **Construir** con el Workflow gobernado (abajo) usando los shapes verificados del doc `05`.
+6. **Verificar** que LLEGA a GA4: verification tiers del doc `06 §3` + **LEARNINGS §7b (consent granted + lag del Data API)**. La prueba dura es el `/g/collect`, la confirmación es el evento en realtime.
+7. **Cerrar**: registrar la fila en `TRACKING-PLAN.md` + anotar cualquier gotcha nuevo en `LEARNINGS.md`.
+
+Diagnóstico "no llega a GA4" → el **diagnostic ladder del doc `06 §6`** (dataLayer → Preview → `/g/collect` → DebugView → realtime; el primer eslabón que rompe nombra la falla).
 
 ## Hard Rules (acción gobernada)
 
+- **SIEMPRE leer `docs/reference/measurement-gtm-ga4/LEARNINGS.md` + el doc `05` (shapes) ANTES de construir un tag.** Los gotchas verificados (`measurementIdOverride` no tagReference, scope `quick_preview`, consent en verificación, branch-from-version) evitan repetir errores ya pagados.
 - **NUNCA publicar a `GTM-NGHPGRLZ` sin (a) preview/Tag Assistant, (b) confirmación humana explícita en el turno.** Construir en el **workspace** es seguro (no toca el sitio); `create_version` + `publish` es la ÚNICA mutación live y requiere OK. Si lo opera un agente, es `propose → confirm → execute` (el humano confirma antes del publish).
-- **NUNCA hand-writear el bloque `gaawe` de memoria a ciegas.** Usar las plantillas verificadas de `references/gtm-api-tag-shapes.md`; la API valida al crear en el workspace (un shape malo falla en el `POST`, no en producción) — crear, hacer `GET` de vuelta, confirmar shape.
+- **NUNCA hand-writear el bloque `gaawe` de memoria a ciegas.** Usar las plantillas verificadas de `docs/reference/measurement-gtm-ga4/05-gtm-api-v2-tag-shapes.md`; la API valida al crear en el workspace (un shape malo falla en el `POST`, no en producción) — crear, hacer `GET` de vuelta, confirmar shape.
 - **NUNCA taggear el contenedor equivocado.** Solo `GTM-NGHPGRLZ` (218104216) dispara en el sitio. `GTM-NS3RNNCD` es un duplicado huérfano.
 - **SIEMPRE registrar en `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`** el estado de tagging del form/CTA (obligación espejada en la skill `greenhouse-growth-forms`).
 - **NUNCA PII ni valores crudos** en parámetros de eventos (allowlist `src/lib/growth/forms/contracts.ts`); registrar un parámetro como custom dimension en GA4 para poder reportarlo.
@@ -47,12 +62,12 @@ For **event naming / taxonomy / the gh_ house style** → `docs/reference/measur
 ## Workflow gobernado (crear un tag end-to-end)
 
 1. **Verificar** measurement ID de la propiedad (`486264460`) + que el contenedor correcto está live (`curl efeoncepro.com | grep GTM-`).
-2. **Construir en el workspace** (id=2) vía `GtmApiClient`, en orden: **Variables** (`dlv – form_slug`…) → **Trigger** (`CE – gh_form_submission_accepted`) → **GA4 Event tag** (`gaawe`, referencia el `firingTriggerId`). Shapes exactos en `references/gtm-api-tag-shapes.md`.
+2. **Construir en el workspace** (id=2) vía `GtmApiClient`, en orden: **Variables** (`dlv – form_slug`…) → **Trigger** (`CE – gh_form_submission_accepted`) → **GA4 Event tag** (`gaawe`, referencia el `firingTriggerId`). Shapes exactos en `docs/reference/measurement-gtm-ga4/05-gtm-api-v2-tag-shapes.md`.
 3. **`GET` de vuelta** cada recurso creado → confirmar shape/fingerprint. **Preview** (Tag Assistant) sobre el sitio.
 4. **Confirmar con el humano** el diff antes de publicar.
 5. **`create_version`** (nombre + notas) → **`publish`**. Registrar la fila en el TRACKING-PLAN.
 6. **Verificar**: `scripts/ga4/realtime-events.ts 486264460` → enviar el evento en el sitio → confirmar que aparece (`generate_lead`, con `form_slug` como parámetro/custom dimension).
-7. **GA4 Admin**: marcar `generate_lead` como key event + registrar `form_slug`/`form_kind`/`surface_id` como custom dimensions (`references/ga4-admin-api-ops.md`).
+7. **GA4 Admin**: marcar `generate_lead` como key event + registrar `form_slug`/`form_kind`/`surface_id` como custom dimensions (`docs/reference/measurement-gtm-ga4/07-ga4-admin-api-ops.md`).
 
 ## References
 

@@ -190,6 +190,103 @@ export class GtmApiClient {
       { method: 'POST' }
     )
   }
+
+  // ---- Build helpers (workspace-scoped, no publican) --------------------------
+  // Orden canónico al construir un tag: createWorkspace → createVariable(s) →
+  // createTrigger → createTag(firingTriggerId) → quickPreview (assert compilerError=false)
+  // → createVersion → [confirmación humana] → publishVersion. Shapes: doc 05.
+
+  /** Crea un workspace nuevo (feature-branch descartable). Requiere edit.containers. */
+  async createWorkspace(
+    accountId: string,
+    containerId: string,
+    options: { name: string; description?: string }
+  ): Promise<{ workspaceId: string; path: string; name: string }> {
+    const body = await this.request<{ workspaceId?: string; path?: string; name?: string }>(
+      `accounts/${accountId}/containers/${containerId}/workspaces`,
+      { method: 'POST', body: JSON.stringify(options) }
+    )
+
+    return { workspaceId: body.workspaceId ?? '', path: body.path ?? '', name: body.name ?? '' }
+  }
+
+  /** Crea una variable en un workspace (borrador). Requiere edit.containers. */
+  async createVariable(
+    accountId: string,
+    containerId: string,
+    workspaceId: string,
+    variable: Record<string, unknown>
+  ): Promise<{ variableId: string; name: string; type: string; path: string }> {
+    const body = await this.request<{ variableId?: string; name?: string; type?: string; path?: string }>(
+      `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}/variables`,
+      { method: 'POST', body: JSON.stringify(variable) }
+    )
+
+    return { variableId: body.variableId ?? '', name: body.name ?? '', type: body.type ?? '', path: body.path ?? '' }
+  }
+
+  /** Crea un trigger en un workspace (borrador). Requiere edit.containers. */
+  async createTrigger(
+    accountId: string,
+    containerId: string,
+    workspaceId: string,
+    trigger: Record<string, unknown>
+  ): Promise<{ triggerId: string; name: string; type: string; path: string }> {
+    const body = await this.request<{ triggerId?: string; name?: string; type?: string; path?: string }>(
+      `accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}/triggers`,
+      { method: 'POST', body: JSON.stringify(trigger) }
+    )
+
+    return { triggerId: body.triggerId ?? '', name: body.name ?? '', type: body.type ?? '', path: body.path ?? '' }
+  }
+
+  /**
+   * Compila el workspace SIN versionar ni publicar. `compilerError=true` = NO versionar.
+   * Requiere scope `edit.containerversions` (NO basta edit.containers — ver LEARNINGS §2).
+   */
+  async quickPreview(
+    accountId: string,
+    containerId: string,
+    workspaceId: string
+  ): Promise<{ compilerError: boolean; syncStatusOk: boolean }> {
+    const body = await this.request<{
+      compilerError?: boolean
+      syncStatus?: { mergeConflict?: boolean; syncError?: boolean }
+    }>(`accounts/${accountId}/containers/${containerId}/workspaces/${workspaceId}:quick_preview`, {
+      method: 'POST',
+      body: JSON.stringify({})
+    })
+
+    return {
+      compilerError: Boolean(body.compilerError),
+      syncStatusOk: !body.syncStatus?.mergeConflict && !body.syncStatus?.syncError
+    }
+  }
+
+  /**
+   * Versión LIVE del contenedor. Usar SIEMPRE post-publish para confirmar que no se cayó
+   * nada (ver LEARNINGS §3). Devuelve los nombres de tags/triggers/variables live.
+   */
+  async getLiveVersion(
+    accountId: string,
+    containerId: string
+  ): Promise<{ versionId: string; name: string; tagNames: string[]; triggerNames: string[]; variableNames: string[] }> {
+    const body = await this.request<{
+      containerVersionId?: string
+      name?: string
+      tag?: Array<{ name?: string }>
+      trigger?: Array<{ name?: string }>
+      variable?: Array<{ name?: string }>
+    }>(`accounts/${accountId}/containers/${containerId}/versions:live`)
+
+    return {
+      versionId: body.containerVersionId ?? '',
+      name: body.name ?? '',
+      tagNames: (body.tag ?? []).map(t => t.name ?? ''),
+      triggerNames: (body.trigger ?? []).map(t => t.name ?? ''),
+      variableNames: (body.variable ?? []).map(v => v.name ?? '')
+    }
+  }
 }
 
 /** Fábrica para el contenedor de Efeonce (service account). */
