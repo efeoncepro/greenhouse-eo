@@ -61,8 +61,24 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   `docs/tasks/to-do/TASK-1350-landing-agencia-creativa.md`. Pendiente: dirección de
   arte del hero + contrato de Motion antes de `UI ready: yes`.
 
+- **PDR-005 — Landing "Redes Sociales"** (posicionamiento decidido) + **TASK-1351**
+  (to-do, ui-ux, UI ready no): spoke de servicio `/servicios/redes-sociales` para la
+  gestión de redes (Community · Creators/Influencers · Trendjacking · Reels · social
+  listening) bajo el paraguas creativo (`PDR-004`). Ángulo **outcome + craft moderno +
+  prueba** (no "manejamos tus redes"); build spoke Ohio + sección firma "muro social
+  vivo"; oferta de dos escalones ("Agenda una reunión" + "Pide una auditoría de tus
+  redes"). Head term comercial "agencia de redes sociales" (Semrush CL 170); "community
+  manager" (4.400, job/how-to) → guía pillar en Think. Lidera Efeonce.
+  Ver [PDR-005](decisions/PDR-005-landing-redes-sociales-posicionamiento.md) +
+  `docs/tasks/to-do/TASK-1351-landing-redes-sociales.md`. Pendiente: dirección de arte
+  del muro social + contrato de Motion + wireframe/flow antes de `UI ready: yes`.
+
 ## Next
 
+- **Guía pillar "community manager" en Think** (PDR-005 §Consecuencias): captura el
+  término de alto volumen e intención job/how-to (Semrush CL 4.400/mes) como autoridad
+  top-of-funnel que enlaza a la spoke `/servicios/redes-sociales`. TASK aparte bajo el
+  eje Think/EPIC-020; no bloquea el diseño de la landing.
 - **Crawl vivo** de `efeoncepro.com` (route-ownership matrix): confirmar si
   `/servicios` ya existe con contenido propio y el equity de `/aeo-2` para el 301.
   Los slugs ya están cerrados con datos (Semrush CL); el crawl es confirmación, no
