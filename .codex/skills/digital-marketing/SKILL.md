@@ -39,6 +39,8 @@ argument-hint: "[canal/campaña o pregunta específica — ej: 'plan de paid med
 
 # Marketing Digital — Skill operativa 2026
 
+> **📊 Medición GTM/GA4 — reference canónico.** Para martech/tag management, taxonomía UTM, medición de campañas y eventos: la documentación completa de Google Tag Manager + GA4 + naming + la house style `gh_<object>_<action>` de Efeonce vive en **`docs/reference/measurement-gtm-ga4/`** (canónica, dueña = skill `growth-marketing-cro`). Cargarlo al taggear/medir. Empezar por `04-greenhouse-gh-event-convention.md`.
+
 > **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
 
 > **Qué es esto.** Una skill de dos manos: **(1) conocimiento experto** del marketing

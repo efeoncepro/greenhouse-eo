@@ -37,6 +37,7 @@ Read the minimal set:
 | New or unregistered landing | `references/landing-workflow.md` + `references/landing-registry.md` |
 | Elementor mutation / page-scoped CSS | `references/elementor-mutation.md` |
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
+| Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
