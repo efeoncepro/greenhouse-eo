@@ -372,3 +372,65 @@ Revisit this draft when:
 - HubSpot changes tracking/forms APIs materially;
 - public site migrates from WordPress/Kinsta to Astro/Vercel for the target surfaces.
 
+## 19. Delta 2026-07-07 — Conexión de gestión GTM + mandato "todo instrumentado" + drift de contenedor
+
+> Owner: Product / Growth / Marketing Ops · Fecha: 2026-07-07
+> Estado: **conexión de gestión OPERATIVA (verificada e2e)** · mandato ACEPTADO · drift de contenedor **RESUELTO** (SA con acceso al contenedor live; queda cleanup del duplicado)
+
+### Contenedor canónico para tagging (usar SIEMPRE este)
+
+| | |
+| --- | --- |
+| Cuenta | **Efeonce Global** · `accountId=6291647045` |
+| Contenedor live | **efeoncepro** · `GTM-NGHPGRLZ` · `containerId=218104216` (el instalado en `efeoncepro.com`, verificado en el HTML) |
+| GA4 destino | Google tag `GT-KV5CNNKQ` |
+
+Todo tag/trigger/variable de superficies del sitio público se construye en **`GTM-NGHPGRLZ`** (cuenta `6291647045`), NO en el duplicado huérfano `GTM-NS3RNNCD` de la cuenta `6068297031` (ese no está instalado en el sitio → cualquier tag ahí no dispara; cleanup pendiente, no bloqueante).
+
+### 19.1 Qué se conectó (mecanismo, no reemplazo)
+
+Se habilitó una **conexión programática de gestión de Google Tag Manager** (Tag Manager API v2) y de GA4 (Admin + Data) para `efeonce-group`. Esto NO cambia la decisión de §1 (GTM/GA siguen siendo superficie de medición y destino/consumer, NO source of truth). Lo que agrega es la capacidad de **gestionar y versionar la configuración de GTM como código** (crear/editar/publicar tags, triggers y variables por API), en vez de solo a mano en la UI.
+
+| Pieza | Valor |
+| --- | --- |
+| Service account | `greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com` (acceso nivel cuenta, permiso Publish en GTM) |
+| APIs habilitadas | `tagmanager.googleapis.com`, `analyticsadmin.googleapis.com`, `analyticsdata.googleapis.com` |
+| Código canónico | `src/lib/growth/gtm/` — `contracts.ts` (scopes + `GtmTokenProvider` inyectable) + `api-client.ts` (`GtmApiClient` REST v2) |
+| Verificación | `scripts/gtm/verify-connection.ts` (impersonación del SA vía `Impersonated` + rol Token Creator; sin keys en disco) |
+| Auth gotcha | Los scopes GTM/Analytics son **sensibles** → el OAuth client compartido de `gcloud` NO los puede pedir en login de usuario (pantalla "aplicación bloqueada"). La vía es **service account**. Detalle en memoria `reference_gtm_ga4_service_account_connection`. |
+
+Diseño clave: el mismo `GtmApiClient` opera el GTM de Efeonce (token de SA) y, a futuro, contenedores de clientes Globe (token OAuth per-org, mirror de `src/lib/growth/search-console/`). Solo cambia el token provider.
+
+### 19.2 Mandato: toda superficie de adquisición nace instrumentada
+
+**Regla de producto (aceptada):** toda superficie que construyamos en el sitio público — Growth Forms, **CTAs/botones**, landings, lead magnets, cualquier elemento con intención comercial — **debe nacer emitiendo su evento `dataLayer` gobernado + tener su tag en GTM**, para que sea medible desde el día uno. "Se construyó" no es "se puede medir": si no emite evento y no tiene tag, la capability está incompleta.
+
+Esto **extiende** el precedente que ya existe en Growth Forms (§2.2): el renderer ya emite `gh_form_*` a `dataLayer` con allowlist dura (`src/growth-forms-renderer/telemetry.ts`, taxonomía en `src/lib/growth/forms/contracts.ts` → `GTM_EVENT_NAMES`). El mandato lo lleva de "solo forms" a "toda superficie". Los CTAs/botones necesitan su propia familia de eventos gobernada (p.ej. `gh_cta_viewed` / `gh_cta_clicked`) siguiendo el MISMO contrato: allowlist de payload, cero PII/valores crudos, nombres versionados en la SoT.
+
+Sigue vigente el hard boundary de §3: `behavioral tracking != conversion ledger != CRM attribution`. GTM mide comportamiento; el ledger de submissions sigue siendo la verdad de conversión.
+
+### 19.3 ⚠️ Drift de contenedor — BLOQUEANTE para medir en prod
+
+Hallazgo 2026-07-07: **el contenedor que gestionamos ≠ el instalado en la web live.**
+
+| Dónde | Contenedor/tag |
+| --- | --- |
+| Instalado hoy en `https://efeoncepro.com/` (verificado por `curl`) | GTM **`GTM-NGHPGRLZ`** + Google tag **`GT-KV5CNNKQ`** (gtag/Site Kit) |
+| Visible/gestionable por el SA (cuenta Efeonce `6068297031`) | `efeoncepro.com → GTM-NS3RNNCD` · `www.efeonce.cl → GTM-MVR49F9` · `Efeonce Server → GTM-K2X4ZTTK` (server-side) |
+
+`GTM-NGHPGRLZ` **no está** en la cuenta `6068297031` → vive en otra cuenta GTM (probablemente gestionada por marketing ops / WordPress Site Kit). **Si taggeamos `GTM-NS3RNNCD` por API, esos tags NO disparan en el sitio live** (que corre `GTM-NGHPGRLZ`). Reconciliación obligatoria ANTES de cualquier trabajo de tagging productivo — opciones:
+
+1. Instalar `GTM-NS3RNNCD` (el que gestionamos) en el sitio y retirar `GTM-NGHPGRLZ`; o
+2. Agregar el SA a la cuenta que posee `GTM-NGHPGRLZ` y gestionar ese; o
+3. Consolidar a un único contenedor canónico por superficie.
+
+Elegir 1 opción, documentarla, y recién ahí construir tags. Mientras esto siga abierto, cualquier "medición vía GTM" en prod es ilusoria.
+
+### 19.4 Próximo trabajo (cuando se retome)
+
+- ~~Resolver §19.3 (decisión de contenedor canónico)~~ ✅ RESUELTO — canónico = `GTM-NGHPGRLZ` (cuenta `6291647045`).
+- Definir la familia de eventos `gh_cta_*` en la SoT (mirror de `GTM_EVENT_NAMES`) para CTAs/botones.
+- Tags GTM que escuchen `gh_form_*` / `gh_cta_*` → GA4 (`GT-KV5CNNKQ`) + destinos, gestionados como código vía `GtmApiClient` sobre `GTM-NGHPGRLZ`.
+- GA4: agregar el SA en la propiedad (`Admin → Property Access Management`) + cliente Data/Admin.
+- Cleanup (no bloqueante): consolidar/retirar el duplicado `GTM-NS3RNNCD` de la cuenta `6068297031`.
+- Runtime portal (Vercel/WIF) + acción gobernada Nexa (write/publish = propose→confirm→execute) si esto pasa a ser capability del portal.
