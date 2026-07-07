@@ -35,7 +35,6 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Backend (API routes/stores/outbox/reactive) | `greenhouse-backend` | inline (Full API Parity + canonical error contract + auth helpers) |
 | Secret hygiene / rotación | `greenhouse-secret-hygiene` | inline (Secret Manager Hygiene) |
 | Sitio público (landings/posicionamiento/roadmap del sitio) | `efeonce-public-site-wordpress` + `seo-aeo`/`commercial-expert` | `docs/public-site/` (README índice + PRODUCT_ROADMAP + `decisions/` PDR ≠ ADR) |
-| Medición/tagging GTM+GA4 (`src/lib/growth/{gtm,ga4}/**`, eventos `gh_*`, tags/triggers/variables, custom dimensions) | `greenhouse-gtm-ga4-operator` (+`growth-marketing-cro`) | `docs/reference/measurement-gtm-ga4/` (README + 01-07 + `TRACKING-PLAN.md`) |
 
 ### Business Context Pack
 
