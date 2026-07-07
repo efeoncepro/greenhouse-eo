@@ -26,14 +26,14 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 
 | Slug | Kind | Nombre | Página / surface | Emite dataLayer | Evento GTM → GA4 | Key event | Tagging | Notas |
 |---|---|---|---|---|---|---|---|---|
-| `efeonce-aeo-diagnostic` | diagnostic_intake | Diagnóstico AEO | `/aeo-2/` (servicio AEO) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ pendiente | Form comercial AEO → HubSpot. |
-| `ai-visibility-grader` | diagnostic_intake | AI Visibility Grader | grader (lead magnet self-serve) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ pendiente | Lead magnet del grader. |
-| `efeonce-seo-diagnostic` | diagnostic_intake | Diagnóstico SEO | landing SEO (agencia SEO) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ pendiente | Form comercial SEO. |
-| `efeonce-desarrollo-web-cotizacion` | quote_request | Cotización desarrollo web | landing desarrollo web | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ pendiente | 2 versiones publicadas. |
-| `efeonce-lead-gen-web` | lead_magnet | Lead Gen — Web (diseño de sitios) | landing diseño web | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ pendiente | — |
+| `efeonce-aeo-diagnostic` | diagnostic_intake | Diagnóstico AEO | `/aeo-2/` (servicio AEO) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | Form comercial AEO → HubSpot. |
+| `ai-visibility-grader` | diagnostic_intake | AI Visibility Grader | grader (lead magnet self-serve) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | Lead magnet del grader. |
+| `efeonce-seo-diagnostic` | diagnostic_intake | Diagnóstico SEO | landing SEO (agencia SEO) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | Form comercial SEO. |
+| `efeonce-desarrollo-web-cotizacion` | quote_request | Cotización desarrollo web | landing desarrollo web | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | 2 versiones publicadas. |
+| `efeonce-lead-gen-web` | lead_magnet | Lead Gen — Web (diseño de sitios) | landing diseño web | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | — |
 
 > **Página/surface** arriba es inferida por slug/nombre — confirmar el `surface_id` real del embed al taggear (viaja en el evento).
-> **Estado global (2026-07-07):** ningún form taggeado aún. El pipeline es **genérico**: un solo trigger `CE – gh_form_submission_accepted` + un GA4 Event tag → `generate_lead` cubre TODOS los forms; se distinguen por el parámetro `form_slug`. Al construirlo, pasan todos a `✅` de una.
+> **Estado global (2026-07-07): LIVE.** Pipeline **genérico** publicado en `GTM-NGHPGRLZ` v2: trigger `CE - gh_form_submission_accepted` + tag `GA4 Event - generate_lead` (`measurementIdOverride=G-KYPPY57M14`) con params `form_slug`/`form_kind`/`surface_id`. Cubre TODOS los forms; se distinguen por `form_slug`. GA4: custom dimensions `form_slug`/`form_kind`/`surface_id` + key event `generate_lead` registrados. Verificado con Playwright (`/g/collect?...en=generate_lead`). Un form nuevo queda medido al publicarse, sin tocar GTM. Detalle + gotchas: [`LEARNINGS.md`](LEARNINGS.md).
 
 ### Smoke-tests / drafts (NO son producción — candidatos a archivar)
 
