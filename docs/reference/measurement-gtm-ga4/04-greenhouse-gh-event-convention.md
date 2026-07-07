@@ -86,6 +86,21 @@ GA4 publica un **vocabulario de eventos recomendados** (`generate_lead`, `sign_u
 
 ---
 
+## 3b. ¿Event o Key event? (criterio canónico)
+
+Un **key event** (GA4 Admin API `keyEvents`) NO es un tipo de evento distinto — es un **flag** que se le pone a un event que representa una **conversión / resultado de negocio**. Criterio:
+
+- **Se emite como `event`** todo lo que sea comportamiento, engagement o paso de funnel: `page_view`, `scroll`, `gh_cta_clicked`, `gh_cta_viewed`, `gh_form_viewed`, `gh_form_started`, `gh_form_submitted` (intent), video, download.
+- **Se marca `key event` SOLO** si es un resultado de negocio que se optimiza/reporta como conversión: `generate_lead`, `sign_up`, `purchase`, `qualify_lead`, `demo_requested`. Es el **éxito** de un funnel, no un paso intermedio.
+
+**Reglas duras:**
+1. **Un clic de botón/CTA = event, NUNCA key event** por defecto (es señal mid-funnel). Excepción única: si ese clic *ES* la conversión final (ej. "llamar ahora" sin formulario). El criterio es el **significado de negocio, no el tipo de interacción**.
+2. Test: *"¿lo reportarías como conversión a un stakeholder / lo optimizarías en Google Ads?"* sí → key event; no → event.
+3. El key event suele ser el **outcome confirmado por servidor** (`gh_form_submission_accepted` → `generate_lead`), no el intent (`gh_form_submitted`).
+4. GA4 limita a **30 key events por propiedad** → son escasos; reservar para conversiones reales. `page_view`/`scroll`/clicks NUNCA los gastan.
+
+Marcar/desmarcar es 100% por API (`POST/DELETE properties/{id}/keyEvents` — ver `07-ga4-admin-api-ops.md §3`); NO es config del tag en GTM.
+
 ## 4. Payload: allowlist + cero PII
 
 Regla dura (ya enforced en `src/growth-forms-renderer/telemetry.ts` → `RENDERER_ALLOWED_PAYLOAD_KEYS` / `src/lib/growth/forms/contracts.ts` → `TELEMETRY_ALLOWED_PAYLOAD_KEYS`): **solo claves del allowlist cruzan al browser; jamás PII, valores crudos, internals de HubSpot, URLs privadas ni tokens.** Cualquier clave fuera del allowlist se descarta en la frontera.

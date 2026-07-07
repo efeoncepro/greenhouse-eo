@@ -58,6 +58,7 @@ Diagnóstico "no llega a GA4" → el **diagnostic ladder del doc `06 §6`** (dat
 - **NUNCA PII ni valores crudos** en parámetros de eventos (allowlist `src/lib/growth/forms/contracts.ts`); registrar un parámetro como custom dimension en GA4 para poder reportarlo.
 - **Preferir el evento recomendado GA4** cuando existe (submit de lead → `generate_lead`, hereda key events/predictivos); custom `gh_` solo cuando no hay equivalente (regla en `docs/reference/measurement-gtm-ga4/04`).
 - **Un evento genérico + parámetro de identidad** (`form_slug`), NO un tag por form. Un solo GA4 Event tag cubre todos los forms.
+- **NUNCA marcar como key event un click/scroll/view/paso de funnel** (`gh_cta_clicked`, `gh_form_started`, `page_view`…). Key event SOLO para conversiones reales de negocio (`generate_lead`, `sign_up`, `purchase`). Criterio canónico: doc `04 §3b`. (GA4 limita a 30 key events/propiedad — son escasos.)
 
 ## Workflow gobernado (crear un tag end-to-end)
 

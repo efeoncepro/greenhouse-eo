@@ -37,7 +37,7 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 
 ### Smoke-tests / drafts (NO son producción — candidatos a archivar)
 
-`live-hs-1782380033`, `live-hs-1782379959`, `sm-hsbad-1782379602`, `sm-hsoff-1782379602`, `smoke-b-1782377074`, `smoke-test-1782376321` (publicados, artefactos de smoke) · drafts: `builder-smoke-1256-*`, `sm-hsbad/off-1782379551`, `smoke-hs-bad/off-*`, `gate-demo-1254*`. **No taggear.** Archivar como limpieza (`status='archived'`).
+`live-hs-1782380033`, `live-hs-1782379959`, `sm-hsbad-1782379602`, `sm-hsoff-1782379602`, `smoke-b-1782377074`, `smoke-test-1782376321`, `sm-hsbad/off-1782379551`, `smoke-hs-bad/off-*`, `builder-smoke-1256-*` → **ARCHIVADOS 2026-07-07** (`status='archived'`, 11 forms). Los `gate-demo-1254*` quedan como demos (no archivados). **No taggear.**
 
 ---
 
