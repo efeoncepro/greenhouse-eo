@@ -97,6 +97,23 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   [PDR-007](decisions/PDR-007-hubspot-portal-grader-lead-magnet.md) + `docs/epics/to-do/EPIC-024-hubspot-portal-grader.md`.
   Child tasks desde `TASK-1353` (Fase 1 primero; no depende del cutover prod de Kortex).
 
+- **PDR-008 — Landing "Agencia" (`/agencia`)** (posicionamiento + IA decididos) + **TASK-1358**
+  (to-do, ui-ux/flow, UI ready no): el **pillar de categoría** que faltaba — hoy el sitio solo tiene
+  spokes de servicio + about-us, sin puerta comercial para la demanda de categoría completa. Resuelve
+  la falsa dicotomía *growth-partner vs agencia-digital* con las **dos capas** de [PDR-002](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md):
+  **posiciona** como growth partner con software propio + visibilidad total (NO "agencia digital"
+  commodity, doctrina `09:53`) pero **captura** la demanda de categoría en la capa SEO — Semrush CL
+  "agencia de marketing digital" 720 / "agencia de marketing" 1.000 / "partner de crecimiento" ~0 (0
+  búsquedas = gran promesa, pésimo slug). Slug `/agencia` con head-term en `<title>`/H1 + remate reframe
+  *no-es-X-es-Y*; full-service como **un solo motor** incl. **performance marketing** (capability listada,
+  no cabecera: cluster performance ≤480) + creatividad/contenido + web/CRM/infra + data; audiencia
+  mid-market/enterprise; casos citables (Sky/Bresler/Berel/SSilva, NUNCA GEA); reparte hacia las spokes
+  `/servicios/*` y enlaza el about-us (E-E-A-T) + el grader. Distinto de `/servicios` (hub navegacional)
+  y del about-us (identidad). es-LATAM neutro `hreflang`-ready (pan-hispano, LATAM-first→EEUU→mundo).
+  Ver [PDR-008](decisions/PDR-008-landing-agencia-marketing-digital-posicionamiento.md) +
+  `docs/tasks/to-do/TASK-1358-landing-agencia.md`. Pendiente: art direction del hero + contrato de Motion +
+  decisión del mecanismo del CTA "Agenda una reunión" (growth-form gobernado vs HubSpot Meetings) antes de `UI ready: yes`.
+
 ## Next
 
 - **Guía pillar "community manager" en Think** (PDR-005 §Consecuencias): captura el

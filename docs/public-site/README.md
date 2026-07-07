@@ -39,6 +39,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   - [PDR-005 — Posicionamiento de la landing "Redes Sociales"](decisions/PDR-005-landing-redes-sociales-posicionamiento.md)
   - [PDR-006 — Posicionamiento de la landing "HubSpot" (Agentic Customer Platform + partnership)](decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md)
   - [PDR-007 — Posicionamiento del "HubSpot Portal Grader" (lead magnet + gancho a la venta)](decisions/PDR-007-hubspot-portal-grader-lead-magnet.md)
+  - [PDR-008 — Posicionamiento de la landing "Agencia" (`/agencia`)](decisions/PDR-008-landing-agencia-marketing-digital-posicionamiento.md)
 
 ## Contexto canónico (fuentes que este espacio NO reimplementa)
 
