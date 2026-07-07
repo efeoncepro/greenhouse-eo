@@ -16,6 +16,9 @@ Al instrumentar, medir, taggear o razonar sobre eventos/conversiones de cualquie
 | [01-ga4-event-model.md](01-ga4-event-model.md) | GA4: 4 tipos de evento, recomendados por vertical, reglas de naming + límites duros (nombres/prefijos reservados verbatim), key events, custom dimensions, Measurement Protocol. |
 | [02-gtm-and-datalayer.md](02-gtm-and-datalayer.md) | GTM: conceptos, web vs server-side, dataLayer en profundidad, tags/triggers/variables, consent mode v2, convenciones de naming de entidades. |
 | [03-event-naming-taxonomy.md](03-event-naming-taxonomy.md) | Marco object–action, casing, anti-explosión (parámetros > eventos), UTM, gobernanza/tracking plan, evaluación de la convención `gh_`. |
+| **[05-gtm-api-v2-tag-shapes.md](05-gtm-api-v2-tag-shapes.md)** | **Operador.** JSON exacto de la API v2 para crear tags/triggers/variables (`gaawe`, `customEvent`, `v`…) + workflow versions/publish. Usado por la skill `greenhouse-gtm-ga4-operator`. |
+| [06-gtm-tagging-as-code-and-ops.md](06-gtm-tagging-as-code-and-ops.md) | Operador. Container-as-code, deploy seguro, verificación, gobernanza, sGTM, diagnóstico "event not showing in GA4". |
+| [07-ga4-admin-api-ops.md](07-ga4-admin-api-ops.md) | Operador. GA4 Admin API: measurement ID, custom dimensions, key events, MP secrets, blueprint lead-gen. |
 
 ## Regla de una línea
 
