@@ -60,6 +60,7 @@ Diagnóstico "no llega a GA4" → el **diagnostic ladder del doc `06 §6`** (dat
 - **Preferir el evento recomendado GA4** cuando existe (submit de lead → `generate_lead`, hereda key events/predictivos); custom `gh_` solo cuando no hay equivalente (regla en `docs/reference/measurement-gtm-ga4/04`).
 - **Un evento genérico + parámetro de identidad** (`form_slug`), NO un tag por form. Un solo GA4 Event tag cubre todos los forms.
 - **NUNCA marcar como key event un click/scroll/view/paso de funnel** (`gh_cta_clicked`, `gh_form_started`, `page_view`…). Key event SOLO para conversiones reales de negocio (`generate_lead`, `sign_up`, `purchase`). Criterio canónico: doc `04 §3b`. (GA4 limita a 30 key events/propiedad — son escasos.)
+- **SIEMPRE que se sume un host/sitio nuevo del ecosistema** (subdominio, Astro/WP, microsite) → **instalar el tag GA4** desde su nacimiento: snippet `GTM-NGHPGRLZ` + (si no tiene otra fuente de page_view) GA4 Config gateado por hostname, **misma propiedad `486264460`** (NUNCA stream/propiedad aparte por subdominio propio). Registrar en Tracking Engine §19.5 + verificar sin doble conteo. **Un host sin tag GA4 = superficie incompleta** (mandato §19.2). Cross-repo: rama+PR. En Astro, `is:inline` va SOLO en `<script>`, NUNCA en `<noscript>`.
 
 ## Workflow gobernado (crear un tag end-to-end)
 

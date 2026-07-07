@@ -410,6 +410,8 @@ Esto **extiende** el precedente que ya existe en Growth Forms (§2.2): el render
 
 Sigue vigente el hard boundary de §3: `behavioral tracking != conversion ledger != CRM attribution`. GTM mide comportamiento; el ledger de submissions sigue siendo la verdad de conversión.
 
+**Extensión a HOSTS/sitios (mandato duro, 2026-07-07):** el mandato aplica también a **todo host/dominio nuevo del ecosistema** (subdominios, sitios Astro/WP, microsites, landings en dominio propio). **Un host nuevo NACE con el tag de GA4** — snippet `GTM-NGHPGRLZ` (head + noscript) + (si el host no tiene ya otra fuente de page_view como Site Kit) un **GA4 Config gateado por hostname** en el container, **misma propiedad `486264460`** (funnel unificado; **NUNCA** crear stream/propiedad aparte por un subdominio propio). Patrón reusable + registro de hosts en §19.5. **Un host sin tag GA4 = superficie incompleta.** Enforcement: hard rule en la skill `greenhouse-gtm-ga4-operator` + `.claude/rules/measurement-gtm-ga4.md`; el "cómo" en `docs/reference/measurement-gtm-ga4/LEARNINGS.md`.
+
 ### 19.3 ⚠️ Drift de contenedor — BLOQUEANTE para medir en prod
 
 Hallazgo 2026-07-07: **el contenedor que gestionamos ≠ el instalado en la web live.**
@@ -435,3 +437,12 @@ Elegir 1 opción, documentarla, y recién ahí construir tags. Mientras esto sig
 - ~~GA4: agregar el SA en la propiedad + cliente Data/Admin~~ ✅ HECHO — SA Viewer en `efeoncepro.com` (`486264460`); clientes `src/lib/growth/ga4/` + `scripts/ga4/{verify-connection,realtime-events}.ts`; lectura realtime verificada.
 - Cleanup (no bloqueante): consolidar/retirar el duplicado `GTM-NS3RNNCD` de la cuenta `6068297031`.
 - Runtime portal (Vercel/WIF) + acción gobernada Nexa (write/publish = propose→confirm→execute) si esto pasa a ser capability del portal.
+
+### 19.5 Hosts medidos (registro — actualizar al sumar un host)
+
+| Host | Snippet GTM | page_view | Estado |
+|---|---|---|---|
+| `efeoncepro.com` (WordPress) | `GTM-NGHPGRLZ` | Site Kit (`GT-KV5CNNKQ` → `G-KYPPY57M14`) | ✅ live |
+| `think.efeoncepro.com` (Astro, repo `efeonce-think`) | `GTM-NGHPGRLZ` | GA4 Config gateado por hostname (`G-KYPPY57M14`) | ✅ live (2026-07-07) |
+
+Todos a la **misma propiedad GA4 `486264460`** (funnel unificado). **Al sumar un host nuevo (mandato §19.2):** (1) instalar el snippet `GTM-NGHPGRLZ` en ese host; (2) si el host NO tiene otra fuente de page_view, agregar un GA4 Config gateado por hostname en el container (workspace → preview → confirmación → publish); (3) agregar la fila aquí; (4) verificar con Playwright (`/g/collect en=page_view tid=G-KYPPY57M14`, sin doble conteo). Patrón + gotchas (incl. cross-repo vía rama+PR; en Astro `is:inline` va SOLO en `<script>`, NUNCA en `<noscript>`): `docs/reference/measurement-gtm-ga4/LEARNINGS.md`.

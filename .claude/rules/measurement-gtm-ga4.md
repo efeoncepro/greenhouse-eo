@@ -15,4 +15,5 @@ Reglas duras (detalle en la skill + doc `04`/`05`):
 - **NUNCA** marcar como key event un click/scroll/view/paso de funnel — solo conversiones reales de negocio (`generate_lead`/`sign_up`/`purchase`; criterio doc `04 §3b`; GA4 limita a 30/propiedad).
 - **NUNCA** taggear el contenedor equivocado (solo `GTM-NGHPGRLZ` 218104216 dispara; `GTM-NS3RNNCD` es duplicado huérfano) ni PII/valores crudos en parámetros (allowlist en `contracts.ts`).
 - **SIEMPRE** un evento genérico + parámetro de identidad (`form_slug`/`cta_id`), NO un tag por superficie; y registrar el form/CTA en `TRACKING-PLAN.md`.
+- **SIEMPRE que se sume un host/sitio nuevo** (subdominio, Astro/WP, microsite) → instalar el tag GA4 (snippet `GTM-NGHPGRLZ` + GA4 Config gateado por hostname si no hay otra fuente de page_view), **misma propiedad `486264460`**, registrar en Tracking Engine §19.5, verificar sin doble conteo. Un host sin tag = superficie incompleta (mandato §19.2). Cross-repo = rama+PR.
 - **Coordenadas:** GTM `GTM-NGHPGRLZ` (account `6291647045`, container `218104216`) · GA4 propiedad `486264460` / `G-KYPPY57M14` · hosts medidos: `efeoncepro.com` + `think.efeoncepro.com` (misma propiedad).

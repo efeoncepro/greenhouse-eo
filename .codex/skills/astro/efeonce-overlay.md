@@ -151,6 +151,13 @@ working, hardened widget-embed is a legitimate choice. C1 is not a correctness f
 - E2E the form's progressive enhancement: it must work with JS disabled.
 - Enterprise-modern finish at the current year, verified in a loop.
 
+## Analytics / GA4 (medición)
+
+efeonce-think mide con la **misma propiedad GA4** que efeoncepro.com (funnel unificado; subdominio = mismo stream, `486264460`). El snippet **GTM (`GTM-NGHPGRLZ`)** vive en `BaseLayout.astro`: `<script is:inline>` con el loader en `<head>` (`is:inline` SÍ — evita que Astro bundlee el snippet) + `<noscript>` **SIN** `is:inline` (esa directiva es solo para `<script>`/`<style>`; en `<noscript>` Astro 7 estricto puede colarla como atributo raro — flag de Copilot, fix PR #11). El `page_view` lo dispara un GA4 Config gateado por hostname DENTRO del container (no en el sitio Astro); los `<greenhouse-form>` ya emiten `gh_form_*` → conversiones medidas por construcción.
+
+- **SIEMPRE** que se sume un host/sitio nuevo del ecosistema → hereda/instala el tag GA4 (mandato Tracking Engine §19.2/§19.5). Contrato + patrón + gotchas: `greenhouse-eo/docs/reference/measurement-gtm-ga4/` + skill `greenhouse-gtm-ga4-operator`.
+- **NUNCA** `is:inline` en `<noscript>` (solo `<script>`/`<style>`).
+
 ## Cross-links
 
 - `[[TASK-1327]]` public lead-magnet landing + form embed

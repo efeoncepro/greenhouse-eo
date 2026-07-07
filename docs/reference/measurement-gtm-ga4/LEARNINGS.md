@@ -14,7 +14,9 @@
 - **Conversiones gratis:** el form dock de think usa `<greenhouse-form>` (renderer gobernado) que ya emite `gh_form_submission_accepted` → el tag genérico `generate_lead` funciona en think por construcción, sin tocar nada.
 - Container v3 publicado (generate_lead + GA4 Config think). Verificado con Playwright (`/g/collect en=page_view tid=G-KYPPY57M14` en think; sin doble conteo en WP).
 
-**Patrón reusable:** para sumar cualquier subdominio/host propio a la misma propiedad → snippet GTM en ese host + GA4 Config gateado por hostname en el container (si el host no tiene ya otra fuente de page_view). Un solo container, una sola propiedad, cero doble conteo.
+- **Gotcha Astro (`is:inline`):** el snippet GTM en Astro va con `is:inline` SOLO en el `<script>` del loader (correcto/necesario — evita que Astro lo bundlee). En el `<noscript>` **NO** (`is:inline` es directiva para `<script>`/`<style>`; en `<noscript>` no aplica y Astro 7 estricto puede colarla como atributo extraño). Copilot lo flageó en el PR; validado con skills `astro` + `arch-architect` (fix PR #11). Regla: `is:inline` solo en `<script>`/`<style>`.
+
+**Patrón reusable:** para sumar cualquier subdominio/host propio a la misma propiedad → snippet GTM en ese host + GA4 Config gateado por hostname en el container (si el host no tiene ya otra fuente de page_view). Un solo container, una sola propiedad, cero doble conteo. Cross-repo → rama+PR (NUNCA push directo a main con auto-deploy). Es el **mandato §19.2/§19.5 del Tracking Engine**: todo host nuevo nace con el tag GA4.
 
 ## 2026-07-07 — Primer tag productivo: `generate_lead` para todos los Growth Forms
 
