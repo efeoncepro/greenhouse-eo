@@ -57,6 +57,38 @@ window.elementorFrontendConfig?.post?.featuredImage
 
 Caso fuente: en `/agencia-creativa/` (`page_id=249582`), la imagen destacada estaba activa antes del cambio del widget `greenhouse_comparison_table`, pero un guardado Elementor dejo `_thumbnail_id` vacio. El valor correcto restaurado fue `attachment_id=249672` (`EO_Landing-GiroAgencia.webp`). El asset de OpenGraph `249740` era parecido, pero incorrecto para el hero porque trae logo/texto integrado.
 
+## Escoger la variante de header Ohio
+
+Antes de cambiar colores del header, identifica que variante aplica. No lo
+resuelvas con CSS global sobre `#masthead`.
+
+| Caso | Usar | Metas/clases clave |
+| --- | --- | --- |
+| Hero oscuro/navy en primer viewport | `header-3` overlay oscuro | body `with-header-3`, `#masthead.header-3`, primera seccion `clb__dark_section`, `page_header_logo_style=light_variant`, `page_header_menu_style=inherit`, `page_header_menu_style_settings=custom`, `page_header_menu_text_typo={"color":"rgba(255,255,255,0.75)"}` como string JSON. |
+| Hero claro/blanco en primer viewport | `header-3` claro/inherit | body `with-header-3`, `page_header_logo_style=inherit`, `page_header_menu_style=inherit`, `page_header_menu_style_settings=inherit`, sin `page_header_menu_text_typo` y sin `clb__dark_section`. |
+| Rail lateral fijo | `with-header-sidebar` | body `with-header-sidebar`, `#masthead.header-sidebar`; fixes solo page-scoped si `.light-typo` lava el rail. |
+| Hero/headline nativo de Ohio | Page headline `featured` | `.page-headline`, `page_header_title_background_type=featured`, `_thumbnail_id` protegido. |
+
+Para el caso oscuro, valida first paint/no-JS. Si el menu carga oscuro y luego
+se pone blanco, la variante/meta no esta bien aunque el estado final parezca
+correcto. Incidente fuente: `/agencia-creativa-v2/` tenia
+`page_header_menu_text_typo` como array PHP; se corrigio guardandolo como string
+JSON exacto y se verifico en
+`.captures/task1350-header-first-paint-2026-07-07T09-11-03-691Z/`.
+
+Comando de inspeccion recomendado:
+
+```bash
+pnpm public-website:wpcli -- --eval-file ./tmp/<inspect-header>.php --wp-user 12
+```
+
+El inspector debe listar: `_wp_page_template`, `page_header_logo_style`,
+`page_header_menu_style`, `page_header_menu_style_settings`,
+`page_header_menu_text_typo`, `page_header_title_visibility`,
+`page_breadcrumbs_visibility`, `page_add_wrapper`, `page_add_top_padding`,
+`page_full_width_margins_size`, clases del `body`, clase de `#masthead` y
+clases del primer contenedor Elementor.
+
 ## Diagnostico rapido
 
 1. Verifica que la pagina afectada use Ohio con sidebar:

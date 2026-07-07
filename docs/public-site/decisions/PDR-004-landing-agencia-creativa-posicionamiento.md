@@ -3,7 +3,7 @@
 > **Tipo:** Product Decision Record (posicionamiento/GTM de una superficie del sitio público).
 > **Estado:** Accepted (posicionamiento) — sesión de diseño con el operador, 2026-07-06.
 > **Skills:** `commercial-expert`, `efeonce-agency`, `growth-marketing-cro`, `seo-aeo`, `digital-marketing`, `design-studio`, `product-design-loop`.
-> **Ejecución:** [`TASK-1350`](../../tasks/to-do/TASK-1350-landing-agencia-creativa.md) (+ [wireframe](../../ui/wireframes/TASK-1350-landing-agencia-creativa.md) + [flow](../../ui/flows/TASK-1350-landing-agencia-creativa-flow.md)). Epic: `EPIC-019`.
+> **Ejecución:** [`TASK-1350`](../../tasks/to-do/TASK-1350-landing-agencia-creativa.md) (+ [wireframe](../../ui/wireframes/TASK-1350-landing-agencia-creativa.md) + [flow](../../ui/flows/TASK-1350-landing-agencia-creativa-flow.md)). Epic: `EPIC-019`. Delta operador 2026-07-07: primer candidato live en WordPress + Elementor modular widgets en `/agencia-creativa-v2/`; el posicionamiento de este PDR se mantiene.
 > **No-duplicación:** el sustrato estratégico ya vive en el context pack — este PDR **cita**, no copia: `docs/context/07_ico.md` (cadena de eficiencia → TTM), `docs/context/09_marca-agencia.md` (masterbrand + messaging por audiencia), `docs/context/13_icp-buyer-personas-jtbd.md` (Globe ICP1 "Escalar producción" + ICP3 "Ejecución a escala").
 
 ## Contexto
@@ -28,7 +28,7 @@ La ventaja no es "somos rápidos" (commodity); es **producir más rápido sin pe
 
 ### 3. Ejecución "Design Engineer" (arte + color + ingeniería)
 
-El **medio es el mensaje**: la landing debe *probar* craft técnico, no describirlo. Concepto = **arte + color + ingeniería**: assets art-dirigidos producidos con el **stack IA propio** (`fal.ai` / Higgsfield / Magnific / Adobe CC — ver [catálogo fal.ai](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md)), montados como experiencia performante e interactiva. Build **WordPress code-custom** (theme + bundle Vite para islands), **NO Elementor** (contradice el mensaje). Disciplina: art direction primero (evitar "AI slop"), color tokenizado, performance (CWV) como señal de craft, `prefers-reduced-motion` + contraste AA.
+El **medio es el mensaje**: la landing debe *probar* craft técnico, no describirlo. Concepto = **arte + color + ingeniería**: assets art-dirigidos producidos con el **stack IA propio** (`fal.ai` / Higgsfield / Magnific / Adobe CC — ver [catálogo fal.ai](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md)), montados como experiencia performante e interactiva. Decisión original 2026-07-06: build **WordPress code-custom** (theme + bundle Vite para islands), **NO Elementor**. Delta operador 2026-07-07: para implementar el diseño aprobado en `~/Documents/Creative/Ejecución de task 1350/`, el primer candidato se construye en WordPress con **Elementor por módulos/widgets propios**, no como HTML gigante. La fuente de diseño es el HTML rico aprobado (`TASK-1350 Landing Agencia Creativa.dc.html`), no los screenshots iterativos. Disciplina vigente: preservar craft/layout/motion desde widgets gobernados, art direction primero (evitar "AI slop"), color tokenizado, performance como señal de craft, `prefers-reduced-motion` + contraste AA. Evidencia del candidato: contrato de motion `docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md`, Playwright live desktop/mobile/reduced-motion y auditoría computada de colores fuente, keyframes, hover states y reduced-motion.
 
 ### 4. Marca y conversión
 
@@ -46,5 +46,5 @@ El **medio es el mensaje**: la landing debe *probar* craft técnico, no describi
 
 - No es self-serve, no expone el portal ni datos de cliente, no vende un servicio puntual (esos son otras landings del EPIC-019).
 - No lidera con "somos ágiles/rápidos" sin la prueba medible.
-- No migra a Astro ni cambia de host (decisión = WP code-custom).
+- No migra a Astro ni cambia de host. El candidato 2026-07-07 queda en WP/Elementor modular por override explícito del operador; una variante code-custom futura requeriría nueva decisión de ejecución.
 - No genera logos de operating-entity por IA.

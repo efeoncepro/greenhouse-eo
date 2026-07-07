@@ -16,10 +16,10 @@
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1350-landing-agencia-creativa.md`
 - Flow: `docs/ui/flows/TASK-1350-landing-agencia-creativa-flow.md`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-019`
-- Status real: `Diseno`
+- Status real: `Live candidate en /agencia-creativa-v2 noindex`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -29,7 +29,11 @@
 
 ## Summary
 
-Landing pública de la capability creativa de Efeonce (`efeoncepro.com`, WordPress **code-custom**, NO Elementor), posicionada como **"la agencia creativa que puedes ver operar en tiempo real"**. **Comprador = los departamentos de marketing y/o equipos creativos in-house de empresas mid-market y enterprise**; Efeonce NO los reemplaza: es **la capacidad de producción creativa que les permite escalar** su output sin sumar headcount y sin perder control ni visibilidad ("tu equipo dirige, nosotros producimos a escala, y lo ves todo"). Concepto de ejecución **Design Engineer** = arte + color + ingeniería: assets art-dirigidos producidos con el stack IA propio (fal.ai / Higgsfield / Magnific / Adobe CC), montados como experiencia performante e interactiva. Lidera la masterbrand **Efeonce**; CTA primario **"Agenda una reunión"** (HubSpot Meetings). El diferenciador es un bloque de **operaciones creativas medibles** (ICO) — el mismo claim de transparencia que Greenhouse entrega.
+Landing pública de la capability creativa de Efeonce (`efeoncepro.com`), posicionada como **"la agencia creativa que puedes ver operar en tiempo real"**. **Comprador = los departamentos de marketing y/o equipos creativos in-house de empresas mid-market y enterprise**; Efeonce NO los reemplaza: es **la capacidad de producción creativa que les permite escalar** su output sin sumar headcount y sin perder control ni visibilidad ("tu equipo dirige, nosotros producimos a escala, y lo ves todo"). Concepto de ejecución **Design Engineer** = arte + color + ingeniería: assets art-dirigidos producidos con el stack IA propio (fal.ai / Higgsfield / Magnific / Adobe CC), montados como experiencia performante e interactiva. Lidera la masterbrand **Efeonce**; CTA primario **"Agenda una reunión"** (HubSpot Meetings). El diferenciador es un bloque de **operaciones creativas medibles** (ICO) — el mismo claim de transparencia que Greenhouse entrega.
+
+### Runtime delta 2026-07-07 — operador override
+
+La task nació con dirección `WordPress code-custom, NO Elementor`, pero el operador cambió explícitamente el contrato de ejecución para la implementación real: **WordPress + Elementor por módulos/widgets propios**, evitando un único widget HTML gigante. Fuente de verdad del diseño: `~/Documents/Creative/Ejecución de task 1350/TASK-1350 Landing Agencia Creativa.dc.html`; los screenshots de `Creative/` son iteraciones y no deben tratarse como source of truth. Estado live candidato: `https://efeoncepro.com/agencia-creativa-v2/` (`postId=251279`), publicado con `noindex` hasta decidir redirección/cutover desde `/agencia-creativa/`. Delta de fidelidad 2026-07-07: se reforzaron microinteracciones de fábrica/servicios/bento, se creó el contrato de motion, se restauró la coreografía scroll-bound de backlog/proceso y la auditoría Playwright confirmó colores fuente, keyframes activos, hover states y reduced-motion honesto.
 
 ## Why This Task Exists
 
@@ -38,7 +42,7 @@ El 68% de los compradores B2B dice que todas las agencias suenan igual (`docs/co
 ## Goal
 
 - Publicar una landing de agencia creativa en `efeoncepro.com` que lidere con Efeonce, posicione a Efeonce como **la capacidad de producción creativa que escala el output del equipo de marketing in-house** (partner, no reemplazo) "operada como sistema medible con visibilidad total", y convierta a **"Agenda una reunión"** (HubSpot Meetings) con atribución UTM.
-- Que la ejecución **pruebe** el concepto Design Engineer: art direction real (assets producidos con el stack IA propio), motion con intención, performance (CWV) impecable y accesibilidad — construida a mano en un theme custom, no en Elementor.
+- Que la ejecución **pruebe** el concepto Design Engineer: art direction real, motion con intención, performance y accesibilidad. Para el candidato live 2026-07-07, esto se resuelve con widgets Elementor custom gobernados en `eo-elementor-widgets` por instrucción explícita del operador.
 - Incluir el bloque diferenciador de **operaciones creativas medibles** con el **Time-to-Market como titular** (más piezas bien a la primera + menos rondas → ciclo más corto → llegas antes al mercado → Revenue Enabled) como componente vivo, no imagen estática — la ventaja competitiva es producir más rápido sin perder calidad, **probado con el número**.
 - Dejar la superficie indexable + citable (SEO/AEO: schema, answer capsules) y medible (conversión + GA4/GSC).
 
@@ -61,7 +65,7 @@ Reglas obligatorias:
 
 - **Lidera Efeonce** (masterbrand). Globe/Reach/Wave nunca solos; Globe Studio solo como "| Efeonce". No exponer las capabilities como proveedores separados.
 - **Beneficios antes que siglas.** ICO/RpA/FTR solo en el bloque de prueba/procurement, nunca en el hero. Tuteo ("tú"), sin voseo.
-- **Solo casos citables:** Sky Airlines, Bresler, Pinturas Berel, SSilva. **NUNCA GEA Grupo** ni métricas inventadas. No inflar cifras; usar las del doc de autoridad (`120+ empresas`, `80% renovación`).
+- **Solo casos citables:** Sky Airlines, Bresler, Pinturas Berel, SSilva. **NUNCA GEA Grupo** ni métricas inventadas. No inflar cifras; para la barra de prueba de Creative V2 usar `+90 empresas` + países visibles, no el claim largo `120+ / 4 países / 80% / HubSpot`.
 - **Assets IA producidos con el stack propio y gobernados:** dirección de arte con `design-studio`; generación con `fal.ai` (`GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`) / Higgsfield / Magnific; terminación Adobe. Producción **out-of-band** (no runtime del producto); paleta tokenizada, no HEX inventados; nunca logos de operating-entity generados por IA.
 - **Design Engineer bar:** performance (LCP/INP) es señal de craft, no opcional; motion respeta `prefers-reduced-motion` (WCAG 2.3.3); contraste de texto sobre media (WCAG 1.4.3).
 
@@ -104,7 +108,7 @@ Reglas obligatorias:
 - No existe una landing de la **capability creativa** con posicionamiento de marca (hoy solo landings de servicio puntual).
 - No existe la dirección de arte del hero ni los assets (a producir).
 - No existe el componente vivo de "operaciones creativas medibles" para la web pública.
-- El contrato de Motion (art+color+ingeniería, GSAP, video de frontera + reduced-motion) aún no está escrito — es follow-up obligatorio antes de `UI ready: yes`.
+- El contrato de Motion de la candidata Elementor ya existe en `docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md`; el cutover sigue pendiente de aprobación del operador y de verificación final post-redirección.
 
 ## UI/UX Contract
 
@@ -119,9 +123,9 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: página pública nueva en `efeoncepro.com` (WordPress code-custom; theme partial + bundle Vite para hero/islands). No es ruta del portal Greenhouse.
+- Surface: página pública nueva en `efeoncepro.com`. Candidato live 2026-07-07: WordPress + Elementor modular custom widgets en `/agencia-creativa-v2/`; no es ruta del portal Greenhouse.
 - Composition Shell: `no aplica` — es sitio público WordPress, no el shell del portal (contratos UI Platform de Greenhouse no aplican; el "sistema" acá es el theme + tokens de marca Efeonce).
-- Primitive decision: `new (one-off público)` — secciones/bloques del theme custom, NO primitives del design system del portal; el bloque de métricas reusa el lenguaje visual del producto pero es implementación pública independiente.
+- Primitive decision: `new public-site widget` — widget Elementor `greenhouse_creative_landing_module` en `eo-elementor-widgets`, instanciado una vez por módulo para evitar HTML monolítico. No usa primitives del portal; el bloque de métricas reusa el lenguaje visual del producto como implementación pública independiente.
 - Adaptive density / The Seam: `no aplica`.
 - Floating/Sidecar/Dialog decision: modal/embed de HubSpot Meetings para el booking (o sección dedicada); ver Flow.
 - Copy source: contenido de página WordPress (es-CL), redactado/validado con `greenhouse-ux-writing` + `docs/context/05_voz-tono-estilo.md` + `09_marca-agencia.md`. No `src/lib/copy/*` (no es portal).
@@ -152,18 +156,18 @@ Reglas obligatorias:
 
 ### Motion & microinteractions
 
-- Motion primitive: `CSS + GSAP` (theme público; scroll-driven/reveal/number-tickers) — **detalle canónico pendiente en el contrato de Motion** (`docs/ui/motion/TASK-1350-...-motion.md`, follow-up obligatorio antes de `UI ready: yes`).
+- Motion primitive: `CSS + JS scoped` dentro del widget público Elementor `greenhouse_creative_landing_module`; contrato canónico en `docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md`.
 - Enter / exit: reveals on-scroll por sección (stagger), number-tickers en el bloque de métricas.
 - Layout morph: transiciones de sección; hover tactile en cards.
 - Stagger: sí, en grillas de capability y casos.
-- Timing / easing token: definir en el contrato de Motion (tokens de marca Efeonce, no magic numbers).
+- Timing / easing token: fuente-mapeado desde el HTML aprobado y documentado en el contrato de Motion; futura extracción puede mapearlo a tokens compartidos del sitio público.
 - Reduced-motion fallback: obligatorio (ver State inventory).
 - Non-goal motion: nada que dañe CWV/INP ni que distraiga del claim; sin autoplay con sonido.
 
 ### Implementation mapping
 
-- Route / surface: nueva página WordPress `efeoncepro.com/<slug>` `[slug a definir: p.ej. /agencia-creativa/ — verificar IA/SEO]`; theme partial + bundle Vite (hero/islands).
-- Primitive / variant / kind: bloques de theme custom (no design system del portal).
+- Route / surface: candidato live WordPress `https://efeoncepro.com/agencia-creativa-v2/` (`postId=251279`, `noindex` hasta cutover). La página canónica `/agencia-creativa/` (`postId=249582`) no se tocó.
+- Primitive / variant / kind: public-site Elementor widget `greenhouse_creative_landing_module`, módulos `hero`, `trust`, `problem`, `workflow`, `services`, `ai_engine`, `metrics`, `work`, `cases`, `testimonial`, `ecosystem`, `process`, `cta`, `faq`.
 - Component candidates: hero art-dirigido, trust bar, secciones de contenido, **bloque vivo de métricas** (island), grilla de casos, embed de Meetings, FAQ.
 - Copy source: contenido WP es-CL (validado `greenhouse-ux-writing`).
 - Data reader / command: **ninguno de Greenhouse** — conversión vía HubSpot Meetings/Forms existentes (reuse). Métricas del bloque diferenciador = cifras curadas/ilustrativas, no readers live del portal (declararlo honesto en copy).
@@ -201,7 +205,7 @@ Reglas obligatorias:
 - Scroll-width check: sí.
 - Accessibility/focus checks: sí (teclado, foco, contraste AA).
 - Before/after evidence: N/A (superficie nueva).
-- Known visual debt: dirección de arte + assets del hero y contrato de Motion pendientes (bloquean `UI ready: yes`).
+- Known visual debt: cutover/redirección y verificación final post-cutover pendientes; la candidata mantiene `noindex` hasta aprobación.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -226,9 +230,9 @@ Reglas obligatorias:
 - Redactar el copy completo (hero, secciones, FAQ answer-capsules, estados) con `greenhouse-ux-writing`, liderando Efeonce, beneficios antes que siglas, tuteo; solo casos citables.
 - Escribir `docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md` (tokens de timing/easing, scroll reveals, number-tickers, reduced-motion) con `motion-design`/`motion-design-studio`.
 
-### Slice 3 — Build WordPress code-custom
+### Slice 3 — Build WordPress Elementor modular (operator override 2026-07-07)
 
-- Theme partial + plantilla de página custom (no Elementor) + bundle Vite para hero e islands (bloque de métricas vivo).
+- Widget propio en `eo-elementor-widgets` + assets CSS/JS versionados por `filemtime()`, con un widget por módulo de la landing.
 - Implementar secciones, estados (loading/error/degraded/mobile/reduced-motion), motion tokenizado, CTA "Agenda una reunión" → HubSpot Meetings con UTM.
 - SEO/AEO: JSON-LD (`Organization`/`Service`/`FAQPage`/`BreadcrumbList`), Yoast/canonical, answer capsules; performance budget (LCP/INP).
 
@@ -252,7 +256,7 @@ Reglas obligatorias:
 Estructura canónica de la página (jerarquía de conversión; detalle de regiones y copy en el wireframe; detalle de transiciones/booking en el flow):
 
 1. Hero — claim + media art-dirigido + CTA "Agenda una reunión" (+ secundario "Mira cómo medimos").
-2. Barra de prueba — logos + `120+ empresas · 4 países · 80% renovación · HubSpot Solutions Partner`.
+2. Barra de prueba — países `Chile · Colombia · México · Perú`, chip `+90 empresas` y marquee de logos a color.
 3. El problema — el equipo de marketing in-house no da abasto (demanda de piezas > capacidad) + fragmentación + caja negra al tercerizar.
 4. Cómo trabajamos contigo — **partner de producción, no reemplazo**: "tu equipo dirige, nosotros producimos a escala, y lo ves todo". Loop Marketing como beneficio ("gasto → inversión que se acumula").
 5. Qué hacemos — capacidad de producción creativa que escala el output del equipo: identidad, contenido full-funnel, audiovisual (Globe Studio), campañas.
@@ -285,7 +289,7 @@ Cambio **aditivo, público, sin runtime de producto Greenhouse**: publicación d
 
 ### Feature flags / cutover
 
-Sin flag — additive, immediate cutover. Es una página pública nueva; el "cutover" es publicarla en WordPress (borrador → publicada). Revert = despublicar la página (inmediato, reversible). No hay flag de producto porque no toca runtime de Greenhouse.
+Sin flag de producto. Candidato live additive en `/agencia-creativa-v2/` con `noindex, follow`; `/agencia-creativa/` queda intacta hasta que el operador apruebe redirección/cutover. Revert = despublicar la candidata o restaurar backups Elementor/post meta.
 
 ### Rollback plan per slice
 
@@ -316,16 +320,42 @@ Sin flag — additive, immediate cutover. Es una página pública nueva; el "cut
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, `Backend impact: none`.
-- [ ] `UI ready` permanece `no` hasta tener dirección de arte aprobada + contrato de Motion + design decision log; solo entonces pasa a `yes` con `pnpm task:lint --task TASK-1350` sin findings.
-- [ ] Existe `docs/ui/wireframes/TASK-1350-landing-agencia-creativa.md` (declarado en Status).
-- [ ] Existe `docs/ui/flows/TASK-1350-landing-agencia-creativa-flow.md` (declarado en Status).
+### Evidence 2026-07-07 live candidate
+
+- [x] Nueva URL creada sin tocar `/agencia-creativa/`: `https://efeoncepro.com/agencia-creativa-v2/` (`postId=251279`, `publish`, `noindex`).
+- [x] Implementación modular: árbol Elementor verificado con 14 widgets `greenhouse_creative_landing_module` y `0` widgets HTML.
+- [x] Header/footer nativos Efeonce/Ohio preservados; header/footer del HTML fuente no publicados.
+- [x] Header dark nativo Ohio aplicado como Home/AEO: root Elementor `ghcroot` conserva `clb__dark_section`, `#masthead.header-3` recibe `light-typo`, `page_header_menu_text_typo` queda como JSON string `{"color":"rgba(255,255,255,0.75)"}` y el menú desktop computa claro desde first paint/no-JS sin CSS de header forzado.
+- [x] Rail superior del hero bajado bajo el header Ohio: `.ghc-hero-wrap` top padding `clamp(140px, 10vw, 184px)` con gap medido `35px` desktop 1440, `45px` wide 2048 y `31px` mobile 390.
+- [x] Statement del hero alineado al HTML fuente: copy en `<span>` flexible + barra `<i aria-hidden>` flush-right al borde del pill, no pseudo-element junto al texto.
+- [x] Runtime prototipo removido: sin `x-import`, `sc-if`, `image-slot`, `_ds_bundle`, `support.js` ni `text/x-dc`.
+- [x] SEO base de candidata: Yoast title/metadescription/excerpt/focus keyphrase/OG/Twitter/FAQPage JSON-LD; `noindex` activo hasta cutover.
+- [x] Verificación Playwright live desktop `1440`, mobile `390` y reduced-motion: HTTP `200`, consola sin errores, `scrollWidth == clientWidth`, CSS/JS del widget cargados, HubSpot Meetings con UTM, `prefers-reduced-motion` honrado.
+- [x] Auditoría de fidelidad motion/microinteractions: colores fuente `#04263f`, `#fb7a00`, `#5145e0`, `#0375db`; keyframes `fabRise`, `fabBars`, `ghcCursor`, `ghcMarquee`; hover de servicios/bento; reduced-motion con `animationName=none`.
+- [x] Scroll-bound motion restaurado contra el HTML aprobado: `backlogFill`, `procFill` y `procToken` ya no corren desde page load; esperan `[data-ghc-reveal].is-in`, se animan al entrar al viewport y quedan final/static bajo reduced-motion. Backup remoto: `/www/efeoncegroup_752/public/wp-content/plugins/eo-elementor-widgets/assets/css/creative-landing-before-scroll-motion-fix-20260707T104605Z.css`.
+- [x] CTA hover/focus reparado y auditado: Ohio/global ya no puede inyectar fondo blanco sobre `Agenda una reunión` ni sobre `Mira cómo medimos`; primary/secondary/fallback links tienen estados idle/hover/focus/active/reduced-motion page-scoped. Backup remoto: `/www/efeoncegroup_752/public/wp-content/plugins/eo-elementor-widgets/assets/css/creative-landing-before-cta-hover-20260707T110557Z.css`; evidencia `.captures/task1350-cta-hover-audit-after/` (`failures=0`, `consoleErrors=0`, mobile overflow `0`, reduced-motion failures `0`).
+- [x] Trust strip actualizado con el marquee de logos de AEO: reutiliza la primitiva `greenhouse_logo_marquee` dentro de `greenhouse_creative_landing_module`, 7 logos únicos a color (`filter=none`), 3 sets idénticos, hover pause, edge fade compacto y reduced-motion sin animación ni sets duplicados. Backups remotos: `class-eo-creative-landing-module-widget-before-trust-logo-marquee-20260707T112826Z.php`, `creative-landing-before-trust-logo-marquee-20260707T112826Z.css`, `creative-landing-before-trust-logo-marquee-reduced-motion-20260707T113012Z.css`; evidencia `.captures/task1350-trust-logo-marquee-2026-07-07T11-31-00Z/` (`firstSetCount=7`, `animationName=gh-logo-marquee-scroll`, `hoverState=paused`, desktop/mobile overflow `0`).
+- [x] Gutter blanco lateral corregido: `.gh-creative-elementor-shell` y `.gh-creative` computan `left=0` en desktop `1440`, wide `2048` y mobile `390`; edge pixels resuelven al fondo de la sección y `scrollWidth == clientWidth`.
+- [x] Evidencia final post-header: `.captures/task1350-header-variant-2026-07-07T08-23-24-152Z/`, `.captures/task1350-header-first-paint-2026-07-07T09-11-03-691Z/` y `.captures/task1350-creative-v2-2026-07-07T09-11-03-691Z/`.
+- [x] Evidencia final post-hero-offset: `.captures/task1350-hero-offset-2026-07-07T08-28-52-018Z/` y `.captures/task1350-creative-v2-2026-07-07T08-29-15-615Z/`.
+- [x] Evidencia final post-statement-parity: `.captures/task1350-statement-bar-2026-07-07T08-33-07-290Z/` y `.captures/task1350-creative-v2-2026-07-07T08-33-34-683Z/`.
+- [x] Evidencia final post-services-marquee: `.captures/task1350-services-marquee-colors-2026-07-07T08-46-12-064Z/`.
+- [x] Evidencia final post-service-card-motion: `.captures/task1350-service-card-motion-2026-07-07T08-45-47-960Z/`.
+- [x] Evidencia final post-brand-logos: `.captures/task1350-brand-logos-2026-07-07T08-51-39-289Z/`.
+- [x] Smoke completo vigente post-brand-logos: `.captures/task1350-creative-v2-2026-07-07T08-52-05-854Z/`.
+- [x] Evidencia final post-metrics-wrap: `.captures/task1350-metrics-wrap-2026-07-07T08-59-44-613Z/` y `.captures/task1350-creative-v2-2026-07-07T09-00-15-263Z/`.
+- [x] Playbook de headers Ohio documentado para evitar drift futuro: `docs/documentation/public-site/wordpress-ohio-elementor-layout.md#playbook-variantes-de-header-ohio`, runbook relacionado y skills Codex/Claude `efeonce-public-site-wordpress`.
+
+- [x] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, `Backend impact: none`.
+- [ ] `UI ready` permanece `no` hasta aprobación de cutover/redirección, revisión final de dirección de arte y `pnpm task:lint --task TASK-1350` sin findings.
+- [x] Existe `docs/ui/wireframes/TASK-1350-landing-agencia-creativa.md` (declarado en Status).
+- [x] Existe `docs/ui/flows/TASK-1350-landing-agencia-creativa-flow.md` (declarado en Status).
 - [ ] La landing lidera **Efeonce** (no Globe/Reach/Wave sueltos) y el hero no usa siglas.
 - [ ] CTA primario = **"Agenda una reunión"** → HubSpot Meetings con UTM; fallback si el embed falla.
 - [ ] Bloque diferenciador de operaciones creativas medibles presente (cifras honestas/ilustrativas, no live del portal).
 - [ ] Solo casos citables (Sky/Bresler/Berel/SSilva); ninguna métrica de GEA; cifras coherentes con el doc de autoridad.
 - [ ] Assets producidos con el stack IA propio (fal.ai/Higgsfield/Magnific/Adobe), art-dirigidos, color tokenizado; sin logos de operating-entity generados por IA.
-- [ ] Motion respeta `prefers-reduced-motion`; contraste de texto AA sobre media; sin scroll horizontal desktop/390.
+- [x] Motion respeta `prefers-reduced-motion`; sin scroll horizontal desktop/390 en candidata live.
 - [ ] CWV dentro de budget (LCP/INP) verificado en live.
 - [ ] SEO/AEO: JSON-LD válido (`Organization`/`Service`/`FAQPage`/`BreadcrumbList`), canonical/Yoast, answer capsules en el FAQ.
 - [ ] Conversión instrumentada (UTM + GA4 events) y registrada en HubSpot.
@@ -347,12 +377,12 @@ Sin flag — additive, immediate cutover. Es una página pública nueva; el "cut
 - [ ] `Handoff.md` actualizado.
 - [ ] `changelog.md` actualizado si cambia comportamiento/estructura visible.
 - [ ] chequeo de impacto cruzado (EPIC-019, docs/public-site/PRODUCT_ROADMAP).
-- [ ] Contrato de Motion (`docs/ui/motion/TASK-1350-...-motion.md`) creado y declarado en Status antes de `UI ready: yes`.
+- [x] Contrato de Motion (`docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md`) creado y declarado en Status.
 - [ ] Triple documentación proporcional (técnica/funcional/manual o delta según aplique) + registro en `docs/public-site/`.
 
 ## Follow-ups
 
-- **Motion contract** `docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md` (obligatorio antes de `UI ready: yes`; el usuario pidió task+wireframe+flow primero — Motion es el siguiente artefacto).
+- **Motion contract** `docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md` (creado para la candidata live; actualizar si el operador pide una variante post-cutover).
 - Definir slug/URL canónico y registro SEO (posible hub `/servicios/` o `/agencia-creativa/`).
 - Posible V2: conectar el bloque diferenciador a métricas reales (con su propio contrato de datos) — hoy fuera de scope.
 - Variantes de campaña/pauta (Reach) y medición de Share of Voice IA (AEO) como seguimiento de digital-marketing.

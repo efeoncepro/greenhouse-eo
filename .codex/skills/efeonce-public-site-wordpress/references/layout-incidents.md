@@ -26,6 +26,16 @@ See `references/landings/hubspot-services.md`.
 
 See `references/landings/agencia-creativa.md`.
 
+## Agencia Creativa V2 Candidate
+
+- Page id: `251279`
+- The left white gutter came from Ohio desktop CSS:
+  `.elementor-page .page-container.-full-w .elementor > .e-con-full.e-parent { left: calc((var(--clb-container-side-gutter) - var(--clb-grid-gutter)) * -1) !important; }`
+  which computed to `left:16px` on the Elementor root container.
+- Fix is page-scoped Elementor custom CSS on `body.page-id-251279`, not a global Ohio patch:
+  neutralize `.page-container.-full-w` padding/background, then override the same root selector with enough specificity so `.gh-creative-elementor-shell` computes `left=0`, `right=viewport`, `min-width=100vw`.
+- Verify with Playwright computed styles at desktop/wide/mobile: shell and `.gh-creative` `left=0`, `scrollWidth==clientWidth`, edge pixels resolve to the section background.
+
 ## General Lesson
 
 Several visual seams are Ohio page/meta issues, not global CSS problems.

@@ -24,7 +24,7 @@
 |---|---|---|---|---|
 | 0 | Header / nav | Marca Efeonce + nav mínima + CTA "Agenda una reunión" (sticky) | header del theme custom | estático |
 | 1 | Hero | Claim + subhead + media art-dirigido (poster+video lazy) + CTA primario + secundario | hero island (Vite) | asset producido (Slice 1) |
-| 2 | Trust bar | Logos de clientes + proof stats | banda estática | curado |
+| 2 | Trust bar | Logos de clientes + proof stats | `greenhouse_logo_marquee` AEO skin creativo | curado |
 | 3 | El problema | Nombrar fragmentación + caja negra | sección de contenido | estático |
 | 4 | Cómo trabajamos | Loop Marketing como beneficio ("gasto → inversión que se acumula") | sección + diagrama sutil | estático |
 | 5 | Qué hacemos | Capability creativa: identidad, contenido full-funnel, audiovisual (Globe Studio), campañas | grilla de servicios | estático |
@@ -47,7 +47,8 @@ Copy es-CL, tuteo, beneficios antes que siglas, lidera Efeonce. Strings iniciale
 | `publicsite.agencia-creativa.hero.positioning` | 1 | Tu equipo dirige. Nosotros producimos a escala. Y lo ves todo. | — | línea unificadora (partner + escala + transparencia) |
 | `publicsite.agencia-creativa.hero.cta_primary` | 1 | Agenda una reunión | — | CTA primario (repetido) |
 | `publicsite.agencia-creativa.hero.cta_secondary` | 1 | Mira cómo medimos | — | ancla al bloque 6 |
-| `publicsite.agencia-creativa.trust.stats` | 2 | 120+ empresas · 4 países · 80% de renovación · HubSpot Solutions Partner | — | cifras del doc de autoridad; no inflar |
+| `publicsite.agencia-creativa.trust.countries` | 2 | Chile · Colombia · México · Perú | — | proof regional compacto; patrón AEO con globo plano |
+| `publicsite.agencia-creativa.trust.company_count` | 2 | +90 empresas | — | chip de prueba junto a países; no restaurar `120+`, `4 países`, `80% renovación` ni HubSpot en este strip |
 | `publicsite.agencia-creativa.problem.title` | 3 | Tu marketing tiene muchas piezas y ningún sistema. | — | nombra la fragmentación |
 | `publicsite.agencia-creativa.problem.body` | 3 | Tu equipo tiene más pedidos de los que puede producir. Y al tercerizar, aparece la caja negra: "te mandan el reporte el viernes". | — | pain = capacidad + caja negra |
 | `publicsite.agencia-creativa.how.title` | 4 | Somos la capacidad de producción de tu equipo. Ustedes dirigen; nosotros escalamos. | — | partner, no reemplazo |

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional
 > **Version:** 1.0
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-06-23 por Claude
+> **Ultima actualizacion:** 2026-07-07 por Codex
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime:** WordPress en Kinsta, theme `ohio-child` sobre `ohio`, Elementor / Elementor Pro
@@ -35,6 +35,69 @@ En paginas con Ohio `with-header-sidebar`, el sitio reserva una franja lateral f
 Las secciones Elementor full-width deben alinearse visualmente con el contenido principal, pre-footer y footer sin dejar lineas residuales entre el rail lateral y el contenido. El fix correcto debe respetar la reserva del sidebar de Ohio en vez de pintar por debajo de el.
 
 El hero del home y sus fondos/motion no son parte de este contrato de `/blog`; cualquier cambio al hero debe tratarse como ajuste separado y validarse visualmente aparte.
+
+## Playbook: variantes de header Ohio
+
+Antes de tocar un header del Public Site, no partir desde el screenshot. Primero
+identificar el tipo real que Ohio esta renderizando:
+
+- clases del `body` (`with-header-*`, `with-header-sidebar`,
+  `elementor-template-canvas`, `with-spacer`);
+- existencia y clase de `#masthead` (`header-3`, `header-sidebar`, etc.);
+- metas Ohio de la pagina (`page_header_*`, `page_add_*`,
+  `page_breadcrumbs_visibility`);
+- primera seccion/contenedor Elementor y sus clases de esquema
+  (`clb__dark_section`, `clb__light_section`, `clb__dark_section_fixed`);
+- color computado del menu/logo en first paint/no-JS y despues de JS.
+
+### Matriz vigente
+
+| Variante | Cuando aplica | Senales esperadas | No hacer |
+| --- | --- | --- | --- |
+| `header-3` overlay sobre hero oscuro | Home-like landings cuyo primer viewport es navy/oscuro: Home, `/aeo-2/`, `/desarrollo-sitios-web/`, candidata `/agencia-creativa-v2/`. | `_wp_page_template=default`, Elementor `page_layout=default`, body `with-header-3`, sin `elementor-template-canvas`, `#masthead.header-3` absoluto, primera seccion con `clb__dark_section`, `page_header_logo_style=light_variant`, `page_header_menu_style=inherit`, `page_header_menu_style_settings=custom`, `page_header_menu_text_typo` equivalente a menu claro. | No recolorear `#masthead` por CSS. No publicar header HTML del mockup. No asumir que `light-typo` basta si el first paint sale oscuro. |
+| `header-3` sobre hero claro | Landings cuyo primer viewport es claro/blanco y deben mostrar logo azul + nav oscuro, como `/servicios/posicionamiento-seo/`. | `_wp_page_template=default`, body `with-header-3`, `#masthead.header-3` absoluto, `page_header_logo_style=inherit`, `page_header_menu_style=inherit`, `page_header_menu_style_settings=inherit`, sin override `page_header_menu_text_typo`, sin `clb__dark_section` en el hero claro. | No copiar el header oscuro de AEO/desarrollo solo por consistencia visual. No forzar `light_variant`, `light-typo` ni oscurecer el hero para resolver contraste. |
+| `with-header-sidebar` | Paginas legacy/editoriales con rail lateral fijo, como `/blog`. | body con `with-header-sidebar` y un estilo `with-header-5/6/7`; `#masthead.header-sidebar`; rail visual independiente del canvas Elementor. | No parchear globalmente `.light-typo`, `#masthead` ni el logo. Si una seccion oscura lava el rail, el fix debe ser page-scoped y respetar que el rail puede seguir sobre fondo claro. |
+| Page headline Ohio (`featured`) | Paginas que usan el headline/hero nativo de Ohio, no un hero Elementor puro. Ejemplos historicos: `/agencia-creativa/`, HubSpot services. | `.page-headline`, `page_header_title_background_type=featured`, `_thumbnail_id` con el asset real del fondo. | No buscar el fondo en widgets Elementor. No perder `_thumbnail_id` en `Document::save()`. No confundir OpenGraph/logo inline con background hero. |
+| Elementor Canvas / header custom | Solo para casos explicitamente aprobados donde se quiere remover el theme chrome. | body `elementor-template-canvas`; ausencia de `#masthead`/footer Ohio. | No usarlo para landings que deben conservar header/footer Efeonce. Es una fuente comun de franjas blancas, header duplicado y perdida de widgets Ohio. |
+
+### Trampa de serializacion del menu claro
+
+En `header-3` sobre hero oscuro, el menu debe salir claro desde el primer
+paint, antes de que Ohio JS agregue clases dinamicas como `light-typo`.
+El estado final blanco no es suficiente.
+
+El caso confirmado el 2026-07-07 en `/agencia-creativa-v2/`: la pagina tenia
+`clb__dark_section`, `light_variant` y terminaba con menu blanco despues de JS,
+pero el first paint/no-JS mostraba letras oscuras. La causa era
+`page_header_menu_text_typo` guardado como array PHP. Al normalizarlo al mismo
+formato first-paint seguro de AEO:
+
+```text
+page_header_menu_text_typo={"color":"rgba(255,255,255,0.75)"}
+```
+
+como string JSON, Ohio volvio a emitir el color claro inicial. Backup:
+`_gh_backup_before_task1350_header_typo_meta_20260707T091025Z`.
+Evidencia:
+`.captures/task1350-header-first-paint-2026-07-07T09-11-03-691Z/`.
+
+Regla: para una landing nueva con hero oscuro, copiar el contrato de AEO o de
+`/agencia-creativa-v2/` ya verificado, no una mezcla de metas. Si
+`get_post_meta()` devuelve un array por unserialize, no asumir que esta bien:
+probar first paint/no-JS y revisar el CSS inicial emitido por Ohio.
+
+### Checklist operativo antes de "arreglar" un header
+
+1. Confirmar si el contenido necesita header oscuro o claro segun el fondo del
+   primer viewport.
+2. Verificar que la pagina no este en `elementor_canvas` si debe conservar el
+   chrome Efeonce.
+3. Comparar metas Ohio contra una pagina referencia del mismo tipo.
+4. Confirmar que la primera seccion tiene la clase de esquema correcta.
+5. Medir menu/logo en no-JS o bloqueando JS, y de nuevo despues de JS.
+6. Ajustar separacion del hero con padding page/widget-scoped; no mover el
+   masthead global.
+7. Documentar backup, cache purge y captura desktop/mobile.
 
 ## Incidente 2026-06-14: `/blog`
 
