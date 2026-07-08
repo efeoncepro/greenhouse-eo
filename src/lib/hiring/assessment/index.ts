@@ -3,4 +3,5 @@
 
 export * from './store'
 export * from './instances'
+export * from './scoring'
 export type * from '@/types/hiring-assessment'
