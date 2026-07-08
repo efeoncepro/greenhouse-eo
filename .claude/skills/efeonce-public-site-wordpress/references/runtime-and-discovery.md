@@ -33,8 +33,8 @@ mutate the menu during discovery.
 - WordPress uses the classic menu model here, not a block-theme
   `wp_navigation` source of truth.
 - Active location: `primary`.
-- Current menu term: `61` (`Menu 1`, slug `menu-1`, observed `count=23`
-  after the Redes Sociales menu item was added on 2026-07-07).
+- Current menu term: `61` (`Menu 1`, slug `menu-1`, observed `count=25`
+  after the 2026-07-08 visibility/creative menu update).
 - Ohio renders the same menu in desktop `nav#site-navigation ul#menu-primary`
   and mobile `ul#mobile-menu`.
 - REST exposes `/wp/v2/menu-items`, `/wp/v2/menus` and
@@ -57,15 +57,33 @@ Confirmed parent IDs:
 - `Estrategia & Posicionamiento`: `244255`, parent `242525`;
 - `Experiencia Personalizada`: `248605`, parent `242525`;
 - `Crecimiento Multicanal`: `248606`, parent `242525`;
+- `Visibilidad`: `248628`, parent `242525`;
 - `Servicios Destacados`: `248629`, parent `242525`;
 - `Recursos`: `242524`.
 
 Confirmed live service item:
 
+- `Producción Creativa`: item `251313`, parent `244255`
+  (`Estrategia & Posicionamiento`), `type=post_type`, `object=page`,
+  `object_id=251279`, URL `https://efeoncepro.com/agencia-creativa-v2/`.
+- `Diseño & Desarrollo Web`: item `242916`, parent `248605`
+  (`Experiencia Personalizada`), `type=post_type`, `object=page`,
+  `object_id=250816`, URL `https://efeoncepro.com/desarrollo-sitios-web/`.
+- `Posicionamiento SEO`: item `251312`, parent `248628` (`Visibilidad`),
+  `type=post_type`, `object=page`, `object_id=251078`, URL
+  `https://efeoncepro.com/servicios/posicionamiento-seo/`.
+- `AEO (AI Engine Optimization)`: item `250691`, parent `248628`
+  (`Visibilidad`), `type=post_type`, `object=page`, `object_id=250265`,
+  URL `https://efeoncepro.com/aeo-2/`.
 - `Redes Sociales`: item `251311`, parent `248629` (`Servicios Destacados`),
   `type=post_type`, `object=page`, `object_id=251300`, URL
   `https://efeoncepro.com/servicios/redes-sociales/`. Rollback snapshot option:
   `_gh_backup_before_menu_social_20260707T205950Z`.
+
+2026-07-08 rollback snapshot for the visibility/creative menu update:
+WP option `gh_backup_before_public_menu_visibility_creative_v2_20260708T154302Z`
+and post meta `_gh_backup_before_public_menu_visibility_creative_v2_20260708T154302Z`
+on page `251279`.
 
 Operational learning from the 2026-07-07 menu write:
 

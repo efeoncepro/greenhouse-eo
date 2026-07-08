@@ -217,10 +217,13 @@ pnpm public-website:wpcli -- --eval-file ./tmp/<inspect-menu>.php --wp-user 12
 
 El inspector debe leer `get_registered_nav_menus()`,
 `get_nav_menu_locations()`, `wp_get_nav_menu_object(61)` y
-`wp_get_nav_menu_items(61)`. Estado observado el 2026-07-07: location
+`wp_get_nav_menu_items(61)`. Estado observado el 2026-07-08: location
 `primary` -> menu term `61` (`Menu 1`), render desktop `#menu-primary` y
-mobile `#mobile-menu`. Despues del alta aprobada de Redes Sociales, el menu
-tiene `count=23` y el item `251311` cuelga de `Servicios Destacados` (`248629`).
+mobile `#mobile-menu`. Despues del update de Visibilidad/Produccion Creativa,
+el menu tiene `count=25`: `Visibilidad` es el item `248628`, `Posicionamiento SEO`
+es `251312`, `AEO` es `250691`, `Produccion Creativa` es `251313`,
+`Diseno & Desarrollo Web` apunta al page `250816`, y `Redes Sociales` sigue en
+`Servicios Destacados` (`248629`) como item `251311`.
 
 2. Hacer snapshot de rollback antes de escribir. Guardar por lo menos:
    `term_id`, `name`, `slug`, location, todos los items con `ID`, `title`,

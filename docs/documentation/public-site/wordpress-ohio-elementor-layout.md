@@ -103,8 +103,8 @@ probar first paint/no-JS y revisar el CSS inicial emitido por Ohio.
 
 El sitio publico usa menu clasico de WordPress, no `wp_navigation` de block
 theme. El theme activo `ohio-child` registra la ubicacion `primary`; en la
-inspeccion del 2026-07-07 esa ubicacion apunta al termino `nav_menu` `61`
-(`Menu 1`, slug `menu-1`, `count=23` tras agregar Redes Sociales). Ohio lo renderiza dos veces desde la
+inspeccion vigente del 2026-07-08 esa ubicacion apunta al termino `nav_menu` `61`
+(`Menu 1`, slug `menu-1`, `count=25` tras el update de Visibilidad/Produccion Creativa). Ohio lo renderiza dos veces desde la
 misma fuente: desktop en `nav#site-navigation ul#menu-primary` y mobile en
 `ul#mobile-menu`.
 
@@ -131,13 +131,19 @@ Items confirmados como secciones custom de primer/segundo nivel:
 | Estrategia & Posicionamiento | `244255` | `242525` | custom | `#` |
 | Experiencia Personalizada | `248605` | `242525` | custom | `#` |
 | Crecimiento Multicanal | `248606` | `242525` | custom | `#` |
+| Visibilidad | `248628` | `242525` | custom | `#` |
 | Servicios Destacados | `248629` | `242525` | custom | `#` |
+| Produccion Creativa | `251313` | `244255` | post_type/page `251279` | `/agencia-creativa-v2/` |
+| Diseno & Desarrollo Web | `242916` | `248605` | post_type/page `250816` | `/desarrollo-sitios-web/` |
+| Posicionamiento SEO | `251312` | `248628` | post_type/page `251078` | `/servicios/posicionamiento-seo/` |
+| AEO (AI Engine Optimization) | `250691` | `248628` | post_type/page `250265` | `/aeo-2/` |
 | Redes Sociales | `251311` | `248629` | post_type/page `251300` | `/servicios/redes-sociales/` |
 | Recursos | `242524` | `0` | custom | `#` |
 
-Ejemplo confirmado de item de pagina: `AEO (AI Engine Optimization)` es el
-item `250691`, tipo `post_type`, objeto `page`, `object_id=250265`, parent
-`248629`; su URL publica `/aeo-2/` la resuelve WordPress desde el permalink.
+Rollback snapshot del update 2026-07-08: option
+`gh_backup_before_public_menu_visibility_creative_v2_20260708T154302Z` y post
+meta `_gh_backup_before_public_menu_visibility_creative_v2_20260708T154302Z`
+en page `251279`.
 
 Regla operativa: no agregar ni editar menu por SQL ni editando HTML del
 masthead. Para futuras mutaciones, primero snapshot del menu (`wp_get_nav_menus`,
