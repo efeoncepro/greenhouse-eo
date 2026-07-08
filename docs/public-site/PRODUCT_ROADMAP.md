@@ -110,6 +110,17 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   existente `/about-us-efeonce/` (249770), pendiente de su propio PDR + task. Ver
   [PDR-010](decisions/PDR-010-home-es-el-pitch-agencia-se-pliega.md).
 
+- **PDR-011 — About Us: página de identidad (Golden Circle)** (decidido, 2026-07-08) + **TASK-1369**
+  (to-do, ui-ux, UI ready no): reconstruye `/about-us-efeonce/` (249770 → sugerido `/nosotros`) como
+  **Golden Circle (Why→How→What)** liderando el **Why de marca** recién articulado (*no te entregamos
+  crecimiento, lo construimos contigo —y te dejamos más capaz de sostenerlo*; SSOT
+  `docs/context/09_marca-agencia.md` → §El Golden Circle de Efeonce). Es identidad/E-E-A-T, **no un pitch**
+  (la Home es el pitch, PDR-010): cuenta el sistema completo —capabilities descriptivas (NUNCA sub-marcas),
+  método Loop/ICO, software propio— a fondo como identidad. **Supersede TASK-1322** (refresh de copy ligero
+  cuya premisa "mantener el hero" quedó obsoleta). Bloqueada por **bios reales del equipo + dirección de
+  arte del hero**. Ver [PDR-011](decisions/PDR-011-about-us-identidad-golden-circle.md) +
+  `docs/tasks/to-do/TASK-1369-about-us-identidad.md`.
+
 - **PDR-008 — Landing "Agencia" (`/agencia`)** (posicionamiento + IA decididos; **§IA refinada por PDR-010**
   — el pitch vive en la Home, no en `/agencia`) + **TASK-1358** (to-do, reorientada a rework de la Home):
   el **pillar de categoría** que faltaba — hoy el sitio solo tiene

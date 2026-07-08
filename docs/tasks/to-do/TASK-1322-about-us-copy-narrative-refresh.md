@@ -1,5 +1,9 @@
 # TASK-1322 — About Us Copy Narrative Refresh
 
+## Delta 2026-07-08 — superseded por TASK-1369
+
+Esta task era un **refresh de copy ligero** que mantenía el hero actual y no rediseñaba la página. Esa premisa quedó **obsoleta**: [PDR-010](../../public-site/decisions/PDR-010-home-es-el-pitch-agencia-se-pliega.md) movió el pitch a la Home y definió el About Us como página de **identidad**, y [PDR-011](../../public-site/decisions/PDR-011-about-us-identidad-golden-circle.md) lo reconstruye como **Golden Circle (Why→How→What)** liderando el **Why de marca** recién articulado (SSOT `docs/context/09_marca-agencia.md`) — lo que **cambia el hero** ("No te entregamos crecimiento. Lo construimos contigo."), no lo mantiene. El trabajo del About Us vive ahora en **[`TASK-1369`](TASK-1369-about-us-identidad.md)** (que absorbe el scope de copy de esta task). **Recomendación: cerrar esta task como superseded** (no ejecutar en paralelo — mismo archivo `/about-us-efeonce/`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
