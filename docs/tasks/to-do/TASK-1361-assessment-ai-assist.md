@@ -53,6 +53,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_NEXA_ARCHITECTURE_V1.md` (runtime de acción gobernada `propose → confirm → execute`)
 - `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` (§providers LLM — cliente canónico `src/lib/ai/`)
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
+- `src/lib/growth/ai-visibility/**` — **precedente canónico** de "capa de dominio con LLM estructurado gobernado, fuera de Nexa" (ver §Detailed Spec → Frontera Nexa vs dominio); espejar su forma (`commands.ts`/`contracts.ts`/`accuracy/`).
 
 Reglas obligatorias:
 
@@ -95,8 +96,9 @@ Reglas obligatorias:
 ### Already exists
 
 - Motor de assessment (TASK-1360): banco de preguntas + respuestas + scoring humano + rollup.
-- Helpers LLM estructurados canónicos en `src/lib/ai/*` `[verificar]`.
-- Runtime de acción gobernada (Nexa) `propose → confirm → execute`.
+- Helpers LLM estructurados canónicos en `src/lib/ai/*` (`generateStructuredAnthropic`/`generateStructuredGemini`/`generateStructuredOpenAI` — **verificado**). Es la infra compartida; NO instanciar SDK propio.
+- **AEO grader `src/lib/growth/ai-visibility/**` (verificado): el patrón "capa de dominio con LLM estructurado gobernado" ya resuelto y en producción, fuera de Nexa.** Es el molde de TASK-1361.
+- Runtime de acción gobernada de Nexa `propose → confirm → execute` (`resolveNexaActionProposal` en `nexa-tools.ts`): opera capabilities de parity vía tool-calling conversacional. Es el consumer-por-construcción, NO donde se construye este AI assist.
 
 ### Gap
 
@@ -169,7 +171,7 @@ Reglas obligatorias:
 - [ ] Modelada como command (proponer) + command de confirmación (write), no click-handler.
 - [ ] Read = readers de propuestas; write (confirm) = command con capability + idempotencia + outbox + errores canónicos.
 - [ ] Capability `hiring.assessment.ai_assist` + grant a rol real + coverage test mismo PR.
-- [ ] Camino programático: `/api/hiring/assessments/ai/**`; Nexa opera vía propose→confirm por construcción.
+- [ ] Camino programático: `/api/hiring/assessments/ai/**`; Nexa opera vía propose→confirm por construcción. **Registrar los commands (`proposeScoreForResponse`/`proposeQuestionsForCompetency`/`confirmAiProposal`) como actionKeys de parity** (`resolveNexaActionProposal`) para que Nexa los opere desde el chat — es consecuencia de la parity, NO integración Nexa-específica ni lógica hiring dentro de Nexa.
 - [ ] Write apto para `propose → confirm → execute` (es literalmente el patrón).
 - [ ] Un primitive, muchos consumers sin lógica duplicada.
 - [ ] Parity check = SÍ.
@@ -231,6 +233,24 @@ Reglas de esta decisión:
 - **Sonnet 5 es el default de arranque para grading, no un veredicto cerrado**: el eval baseline (Slice 4) decide empíricamente cuál grader correlaciona mejor con la corrección del SME. Si otro provider gana el eval, se swappea por el seam sin tocar el contrato.
 - Gemini Omni/Vertex se reserva para multimodal; acá es texto→estructura puro, no aplica.
 - El secreto del provider se resuelve server-side (`greenhouse-*-api-key` / `*_SECRET_REF`); nunca hardcodear la key.
+
+### Frontera Nexa vs dominio (decisión 2026-07-08, análisis `arch-architect` + `greenhouse-nexa-conversational`)
+
+Se evaluó si este AI assist debía ser **una capability que Nexa opera con su motor** en vez de una capa de dominio propia (para no reinventar). **Veredicto: capa de dominio hiring propia que consume la infra LLM compartida — NO un tool del motor conversacional de Nexa.** El instinto de "no reinventar el motor" es correcto, pero el motor a reusar es el **provider layer + el patrón gobernado**, no el engine de chat de Nexa.
+
+**Precedente canónico:** `src/lib/growth/ai-visibility/**` (el AEO grader) YA es exactamente este patrón resuelto — scoring con LLM estructurado que consume `src/lib/ai/*` **directo** (`generateStructured*`), con sus propios `commands.ts`/`contracts.ts`/`accuracy/` (eval), **fuera de Nexa**. TASK-1361 lo espeja; NO inventa una forma nueva.
+
+Frontera en 3 capas:
+
+| Capa | Qué | Dónde | Reinventar |
+|---|---|---|---|
+| **Infra compartida** | `generateStructured{Anthropic,Gemini}` + patrón "IA propone / contrato gobierna" | `src/lib/ai/*` + patrón AEO grader | NO — reusar tal cual |
+| **Dominio hiring** | rúbricas de competencias, qué es una buena pregunta, ledger `hiring_assessment_ai_proposal` (propose→confirm de *contenido*) | `src/lib/hiring/assessment/ai/**` | SÍ — Nexa no sabe de rúbricas |
+| **Nexa por construcción** | operar la capability desde el chat ("proponé un puntaje para la respuesta X") | Nexa registra el actionKey vía Full API Parity | NO — sale gratis cuando la capability existe |
+
+**Por qué NO rutear por `NexaService.generateResponse`:** es *wrong shape*. Envolvería una tarea batch (una llamada estructurada, sin retrieval, sin conversación, sin citas) en la maquinaria de un turno de chat — system prompt versionado, `history.slice(-10)`, persistencia a `nexa_messages`, telemetría de turno, coreografía de 11 estados. El consumer primario tampoco es un chat: es el botón "sugerir puntaje" del desk (TASK-1363) llamando a `/api/hiring/assessments/ai/score/propose`. Además `hiring_assessment_ai_proposal` NO duplica el action-registry de Nexa: Nexa propone *qué capability invocar con qué args*; hiring propone *contenido generado* (borrador de pregunta / score) — ejes distintos.
+
+**El pago de parity (North Star Nexa):** en cuanto los commands `proposeScoreForResponse`/`proposeQuestionsForCompetency`/`confirmAiProposal` existen como capabilities gobernadas con contrato, Nexa las registra como **actionKeys** (`resolveNexaActionProposal`, `nexa-tools.ts`) y un reclutador las opera desde el chat con el MISMO loop propose→confirm de Nexa — **cero código hiring dentro de Nexa**. Declarar esa registración en la Definition of Done (no construir integración Nexa-específica; es consecuencia de la parity).
 
 ## Rollout Plan & Risk Matrix
 
