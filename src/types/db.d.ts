@@ -7003,6 +7003,26 @@ export interface GreenhouseHiringHiringAssessment {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHiringHiringAssessmentAiProposal {
+  confirmed_at: Timestamp | null;
+  confirmed_by: string | null;
+  confirmed_ref: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  decision_note: string | null;
+  input_digest: string | null;
+  kind: string;
+  model: string;
+  prompt_version: string;
+  proposal_id: Generated<string>;
+  proposed_json: Generated<Json>;
+  provider: string;
+  status: Generated<string>;
+  target_ref: string;
+  updated_at: Generated<Timestamp>;
+  usage_json: Generated<Json>;
+}
+
 export interface GreenhouseHiringHiringAssessmentResponse {
   answer_json: Generated<Json>;
   assessment_id: string;
@@ -11314,6 +11334,7 @@ export interface DB {
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
   "greenhouse_hiring.hiring_assessment": GreenhouseHiringHiringAssessment;
+  "greenhouse_hiring.hiring_assessment_ai_proposal": GreenhouseHiringHiringAssessmentAiProposal;
   "greenhouse_hiring.hiring_assessment_response": GreenhouseHiringHiringAssessmentResponse;
   "greenhouse_hiring.hiring_assessment_template": GreenhouseHiringHiringAssessmentTemplate;
   "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;

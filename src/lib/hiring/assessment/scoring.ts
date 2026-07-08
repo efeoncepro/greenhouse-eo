@@ -141,17 +141,23 @@ export const recordHumanScore = async (
   responseId: string,
   score: number,
   scorerUserId: string,
+  // TASK-1361 — client opcional para que el confirm de una sugerencia IA sea atómico
+  // (marcar la propuesta confirmed + aplicar el score en la misma tx).
+  client?: RollupClient,
 ): Promise<void> => {
   if (!Number.isFinite(score) || score < 0 || score > 100) {
     throw new HiringValidationError('El puntaje debe estar entre 0 y 100.', 'assessment_invalid_score', 400)
   }
 
-  const rows = await runGreenhousePostgresQuery(
-    `UPDATE greenhouse_hiring.hiring_assessment_response
+  const text = `UPDATE greenhouse_hiring.hiring_assessment_response
      SET human_score = $1, needs_human_rating = FALSE, scored_by = $2, scored_at = NOW()
-     WHERE response_id = $3 RETURNING response_id`,
-    [score, scorerUserId, responseId],
-  )
+     WHERE response_id = $3 RETURNING response_id`
+
+  const values = [score, scorerUserId, responseId]
+
+  const rows = client
+    ? (await client.query(text, values)).rows
+    : await runGreenhousePostgresQuery(text, values)
 
   if (!rows[0]) throw new HiringNotFoundError('La respuesta no existe.', 'assessment_response_not_found')
 }

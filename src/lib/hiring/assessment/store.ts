@@ -265,13 +265,19 @@ export const listQuestions = async (filters: ListQuestionFilters = {}): Promise<
 return rows.map(normalizeQuestion)
 }
 
-export const createQuestion = async (input: CreateQuestionInput, actorUserId: string | null): Promise<Question> => {
+export const createQuestion = async (
+  input: CreateQuestionInput,
+  actorUserId: string | null,
+  // TASK-1361 — client opcional para que el confirm de un borrador IA sea atómico (marcar la
+  // propuesta confirmed + crear la pregunta en la misma tx). Sin client abre su propia tx.
+  externalClient: PoolClient | null = null,
+): Promise<Question> => {
   const competencyKey = assertNonEmpty(input.competencyKey, 'competencyKey')
   const level = assertEnum(input.level, QUESTION_LEVELS, 'level')
   const type = assertEnum(input.type, QUESTION_TYPES, 'type')
   const prompt = assertNonEmpty(input.prompt, 'prompt')
 
-  return withGreenhousePostgresTransaction(async (client) => {
+  const run = async (client: PoolClient): Promise<Question> => {
     const competencyId = await resolveCompetencyId(client, competencyKey)
 
     const rows = await runQuery<QuestionRow>(
@@ -294,7 +300,9 @@ export const createQuestion = async (input: CreateQuestionInput, actorUserId: st
 
     // Nace 'draft' (SME gate). Sin evento de dominio (contenido, no aggregate de negocio).
     return normalizeQuestion(rows[0])
-  })
+  }
+
+  return externalClient ? run(externalClient) : withGreenhousePostgresTransaction(run)
 }
 
 const QUESTION_STATUS_TRANSITIONS: Record<QuestionStatus, QuestionStatus[]> = {

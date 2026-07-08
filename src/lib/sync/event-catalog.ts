@@ -242,7 +242,10 @@ export const AGGREGATE_TYPES = {
   // TASK-1360 — Assessment Engine. Identities: template_id ('atpl-{uuid}'),
   // assessment_id ('asmt-{uuid}').
   hiringAssessmentTemplate: 'hiring_assessment_template',
-  hiringAssessment: 'hiring_assessment'
+  hiringAssessment: 'hiring_assessment',
+
+  // TASK-1361 — Assessment AI Assist. Identity: proposal_id ('aip-{uuid}').
+  hiringAssessmentAiProposal: 'hiring_assessment_ai_proposal'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -1099,7 +1102,11 @@ export const EVENT_TYPES = {
   hiringAssessmentAssigned: 'hiring.assessment.assigned',
   hiringAssessmentSubmitted: 'hiring.assessment.submitted',
   hiringAssessmentScored: 'hiring.assessment.scored',
-  hiringCompetencyResultUpdated: 'hiring.competency_result.updated'
+  hiringCompetencyResultUpdated: 'hiring.competency_result.updated',
+
+  // TASK-1361 — Assessment AI Assist. propose→confirm (audit/observabilidad, sin consumer reactivo V1).
+  hiringAssessmentAiProposed: 'hiring.assessment.ai_proposed',
+  hiringAssessmentAiConfirmed: 'hiring.assessment.ai_confirmed'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
