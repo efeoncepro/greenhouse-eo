@@ -198,6 +198,22 @@ When designing any capability, this skill must:
 
 This composes with #5 (read vs write separation): the read API serves shape+latency for many clients; the write command serves correctness+audit. Source: `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` (§North Star + §Canonical consumers) + `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`.
 
+### 17. Frontend surfaces — routing, i18n, public pages, caching (VERIFIED 2026-07-08)
+
+Front-end architecture facts of THIS repo. Verify against these before proposing a routing/i18n/caching shape — do NOT reason from Next.js generic defaults.
+
+- **i18n is REAL and BILINGUAL (`es-CL` + `en-US`) — but COOKIE/HEADER-based, NOT URL-segment.** The repo uses **`next-intl` (`^4.11.0`)** configured via `src/i18n/request.ts` → `resolveLocaleFromRequest({ userLocale: session.user.effectiveLocale, cookieLocale: cookies['gh_locale'], acceptLanguage })`. **There is NO `[lang]`/`[locale]` URL segment and NO locale-routing middleware.** `SUPPORTED_LOCALES = ['es-CL','en-US']` (`src/i18n/locales.ts`).
+  - **NEVER propose `src/app/[lang]/...`** — it does not exist and adding a `[lang]` root segment is a one-way door across all routing.
+  - A server component reads the locale with **`const locale = (await getLocale()) as Locale`** (`next-intl/server`) and pulls copy via **`getMicrocopy(locale).<namespace>`**. Reference page: `src/app/(blank-layout-pages)/coming-soon/page.tsx`.
+  - Copy lives in **per-locale dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/<namespace>.ts`** (public API `getMicrocopy(locale)` from `@/lib/copy`), NOT a single `es-CL` file. A new surface's copy is a **new namespace present in BOTH locales**. (`greenhouse-ux-writing` owns the strings; this is the architecture of where they live.)
+  - **Any new user-facing surface is bilingual by construction** — never scope a surface "es-CL only" or defer i18n; the machinery already exists. `hreflang`/per-URL-locale SEO does NOT apply (one URL per page, locale varies by cookie/header; the crawler indexes the resolved default locale).
+- **Public (no-session) surfaces:** the canonical home is **`src/app/public/**`** (e.g. `src/app/public/quote/[quotationId]/[versionNumber]/[token]/page.tsx`) or the **`(blank-layout-pages)`** route group. The authenticated app is the **`(dashboard)`** route group. NEVER invent a new top-level public routing scheme; extend `src/app/public/**` or `(blank-layout-pages)`. Public API routes live under `src/app/api/public/**`.
+- **Caching / read-path scalability (CQRS-lite for read surfaces):** a public, indexable page that reads DB data must be **RSC + ISR** (`export const revalidate`) with **on-demand `revalidatePath(...)`** fired by the write that changes the data (e.g. a publish command) — **never `force-dynamic`** for a cacheable public listing (that hits PG on every bot/candidate request and doesn't absorb traffic). `force-dynamic` is correct only for token-gated/personalized public pages (the existing `public/quote` is `force-dynamic` because it's per-token). This is the read-vs-write separation (#5) applied to the edge: cached read path, governed write path.
+- **Route reachability gate** (`route-reachability-manifest.ts`, TASK-982) applies to **`(dashboard)/**` pages only** — public/auth routes are out of its scope. Don't cite it for a public surface.
+- **RSC vs client boundary:** default to **RSC** for read/display (SEO, cacheable, server-fetched); make **client components** only for genuine interactivity (forms, Turnstile, client-side filtering over already-fetched data). A public form posts to the existing governed **public API endpoint via client fetch** (one contract, many consumers — Full API Parity, #16), not a bespoke Server Action, when the endpoint already exists.
+
+**Source of the correction:** a careers-landing (TASK-354) review first wrongly added `[lang]` URL routing, then wrongly "corrected" to es-CL-only. Both wrong: no URL segment, but real bilingual cookie/header i18n. Pinned here so it doesn't recur.
+
 ## Greenhouse-canonical patterns inventory
 
 When designing in this repo, the 3-most-relevant-patterns step (from the global skill's investigation protocol) starts with this set:
