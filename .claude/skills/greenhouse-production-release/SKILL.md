@@ -126,6 +126,14 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
 
 4. **ops-worker puede quedar con GIT_SHA rezagado tras el release — NO es drift.** `ops-worker-deploy` es *change-gated*: si ningún worker-runtime-path cambió desde `EXPECTED_SHA`, salta el rebuild (`deploy_needed=false`) y el servicio conserva el SHA del último deploy que sí tocó código de worker (código idéntico al target, por diseño — ver el step de worker-drift del workflow). **NO** fuerces redeploy para "alinear el label" salvo que el código del worker haya cambiado. Los otros 3 workers sí redeployan al target.
 
+5. **Vercel Ignored Build Step no aplica a production/main.** Desde 2026-07-08,
+   `vercel.json` puede cancelar builds docs-only de `develop`/previews mediante
+   `scripts/ci/vercel-ignore-build.mjs`, pero **main/Production queda
+   excluido** porque `production-release.yml` espera un deployment Vercel
+   `READY` para el `target_sha`. Si un release futuro quiere ahorrar builds
+   docs-only en `main`, primero debe modelar explícitamente un estado
+   `vercel_skipped` en el release control plane, runbooks y watchdog.
+
 ## What The Orchestrator Owns
 
 `production-release.yml` owns the production release lifecycle:

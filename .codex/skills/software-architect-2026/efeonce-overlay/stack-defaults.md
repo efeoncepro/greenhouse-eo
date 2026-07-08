@@ -53,7 +53,7 @@ The flagship internal platform. Most opinionated stack.
 | Notifications | `greenhouse_notifications` schema; SSE for real-time; Resend for email | |
 | AI (Nexa) | Vertex AI (Gemini 2.5 Flash) | NOT Anthropic |
 | Observability | OTel → backend (TBD per ADR) | |
-| Cron / scheduled work | Cloud Scheduler + Cloud Run for heavy; Vercel crons (13 of them) for light | Ignored Build Step limits builds to `main` and `develop` branches |
+| Cron / scheduled work | Cloud Scheduler + Cloud Run for heavy; Vercel crons (13 of them) for light | Vercel Ignored Build Step skips proven docs-only non-production builds; `main` still builds for release evidence |
 | Domain schemas | `greenhouse_core`, `greenhouse_hr`, `greenhouse_payroll`, `greenhouse_finance`, `greenhouse_delivery`, `greenhouse_crm`, `greenhouse_serving`, `greenhouse_sync`, `greenhouse_ai`, `greenhouse_notifications`, `greenhouse_audit` | |
 
 #### Pipeline schedule

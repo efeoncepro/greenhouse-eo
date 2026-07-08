@@ -26,6 +26,7 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
 - env vars and local sync
 - deployment inspection and logs
 - protected preview access
+- ignored-build / docs-only skip diagnostics
 - staged production deploys, promote, and rollback
 - Vercel MCP setup for agent workflows
 
@@ -33,6 +34,12 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
 
 - Prefer explicit `--scope` when there is any ambiguity about which Vercel team you are operating in.
 - Treat `.vercel/` as project state. Re-link deliberately; do not casually overwrite it.
+- `greenhouse-eo` uses `vercel.json` `ignoreCommand` through `scripts/ci/vercel-ignore-build.mjs`.
+  Treat `Canceled by Ignored Build Step` as expected for safe docs-only commits
+  on `develop`, staging previews, and branch previews; inspect logs before
+  calling it a failed deployment.
+- Production / `main` is intentionally excluded from docs-only Vercel skipping
+  until the release orchestrator models a skipped Vercel deployment explicitly.
 - Do not use `vercel alias` as the default production promotion mechanism. Prefer `vercel --prod --skip-domain`, `vercel promote`, and `vercel rollback`.
 - If a protected deployment returns `401` or a Vercel auth page, do not guess. Use `vercel curl`, Vercel MCP, or a valid protection bypass secret.
 - Before trusting a Preview deployment for QA, verify the branch-scoped env vars that the runtime actually needs. In this repo, the minimum recurring set is:
@@ -130,6 +137,18 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
 - `git branch --show-current`
 - `vercel logs --branch <branch> --environment preview --since 24h`
 - `vercel inspect <deployment-url>` once the candidate deployment is identified
+
+### Verify an ignored docs-only deployment
+- Find the commit status:
+  - `gh api repos/efeoncepro/greenhouse-eo/commits/<sha>/status --jq '.statuses[] | select(.context=="Vercel")'`
+- Inspect the canceled deployment:
+  - `vercel inspect <deployment-url> --scope efeonce-7670142f --logs`
+- Expected logs:
+  - `[vercel-ignore-build] Decision: skip`
+  - `The Deployment has been canceled as a result of running the command defined in the "Ignored Build Step" setting.`
+- If the script logs `Continuing build`, that is fail-open behavior. Check
+  whether the diff included deploy-affecting paths, missing comparison SHAs, or
+  a production target.
 
 ### Validate a protected preview domain
 - try `vercel curl https://preview-domain`

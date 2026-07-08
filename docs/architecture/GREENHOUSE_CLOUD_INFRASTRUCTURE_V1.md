@@ -796,6 +796,38 @@ Un cron debe migrar a Cloud Run cuando cumple **2 o más** de:
 | Framework           | Next.js **16.1** with Turbopack     |
 | Build system        | Vercel (automatic deploys from Git) |
 
+### Delta 2026-07-08 — Vercel docs-only ignored build step
+
+`vercel.json` declara `ignoreCommand: "node scripts/ci/vercel-ignore-build.mjs"`
+para cortar builds Vercel cuando el diff Git-triggered es demostrablemente
+docs-only o contexto local de agentes. El comando usa `VERCEL_GIT_PREVIOUS_SHA`
+vs `VERCEL_GIT_COMMIT_SHA`, que Vercel expone para Ignored Build Step, y respeta
+la semántica oficial: exit `0` cancela/ignora el build; exit `1` continúa.
+
+Contrato vigente:
+
+- Se puede ignorar un build en `develop`, custom staging y branch previews si
+  todos los paths cambiados son documentación segura (`docs/**`, root docs,
+  Markdown suelto, `.codex/**`, `.claude/**`, `.agents/**`).
+- Cualquier path desconocido o no-doc continúa el build. Esto cubre, por
+  fail-open, `src/**`, `app/**`, `public/**`, `package.json`, lockfiles,
+  `vercel.json`, `.github/workflows/**`, `services/ops-worker/**`, scripts,
+  env/config, migrations y cualquier superficie runtime.
+- Docs de control de release/deploy se tratan como deploy-affecting aunque sean
+  Markdown: release control plane, runbooks de production release/watchdog,
+  preflight/orchestrator manual y feature-flag ledger.
+- Si falta el SHA base/head, el clone shallow de Vercel no contiene el commit de
+  comparación o `git diff` falla, el comando continúa el build.
+- `main`/Production no se ignora por ahora. El orquestador
+  `production-release.yml` todavía espera un deployment Vercel `READY` para el
+  `target_sha`; habilitar skip docs-only en production requiere primero modelar
+  explícitamente el estado `vercel_skipped` en el release control plane.
+- GitHub Actions mantiene el mismo criterio docs-only en los workflows de
+  feedback/build generales: `ci.yml`, `ci-deep.yml` y `reliability-verify.yml`
+  ignoran `docs/**`, Markdown, `.codex/**`, `.claude/**` y `.agents/**`.
+  Workflows especializados por contrato (`task-contract`, `design-contract`,
+  `claude-md-governance`, etc.) conservan sus propios triggers.
+
 ### Deployment Notes
 
 - El branch preview actual validado para `TASK-096` es `feature/codex-task-096-wif-baseline`.

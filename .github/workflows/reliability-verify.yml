@@ -10,6 +10,7 @@ on:
       - 'docs/**'
       - '.claude/**'
       - '.codex/**'
+      - '.agents/**'
   workflow_dispatch:
     inputs:
       base_ref:

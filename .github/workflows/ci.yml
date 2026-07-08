@@ -8,6 +8,7 @@ on:
       - 'docs/**'
       - '.claude/**'
       - '.codex/**'
+      - '.agents/**'
   push:
     branches:
       - main
@@ -17,6 +18,7 @@ on:
       - 'docs/**'
       - '.claude/**'
       - '.codex/**'
+      - '.agents/**'
 
 concurrency:
   # Vibe-coding produces many superseded commits in minutes. Keep the latest

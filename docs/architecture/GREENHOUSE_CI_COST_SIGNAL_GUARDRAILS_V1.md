@@ -6,11 +6,11 @@
 > **Scope:** GitHub Actions workflows, local-first development, release gates, cost observability
 > **Reversibility:** two-way
 > **Confidence:** high for gate taxonomy; medium for budget API automation because GitHub Budgets REST is public preview
-> **Validated as of:** 2026-05-24 against repo workflows and GitHub official docs
+> **Validated as of:** 2026-07-08 against repo workflows, GitHub official docs, Vercel Ignored Build Step smoke
 
 ## Context
 
-Greenhouse uses Vibe Coding heavily. The platform needs early feedback because defects previously arrived too late in production, but repeated pushes to `develop` and PR branches can burn GitHub Actions minutes on superseded work.
+Greenhouse uses Vibe Coding heavily. The platform needs early feedback because defects previously arrived too late in production, but repeated pushes to `develop` and PR branches can burn GitHub Actions minutes and Vercel build spend on superseded work.
 
 GitHub Billing Usage shows the official invoice-level view. It does not attribute cost by workflow/job. The Actions Runs/Jobs APIs provide enough timestamps for a reproducible estimate of workflow/job hotspots, but that estimate is not the bill.
 
@@ -27,6 +27,7 @@ The platform uses five lanes:
 | `e2e smoke` | Runtime confidence on critical surfaces | Path-aware; must run for auth, layout, navigation, admin, payroll, reliability and API-critical changes. |
 | `release gate` | Production evidence and rollback readiness | Never relaxed for cost. Main/release runs are not cancelled for latest-only optimization. |
 | `scheduled/deep` | Backstop and drift detection | Runs away from the human iteration loop; can be latest-only if each run is a snapshot. |
+| `ignored docs-only deploy` | Avoid paid Vercel builds with no runtime/ops effect | Vercel may cancel proven docs-only builds on non-production refs; fail-open on uncertainty. |
 
 `latest commit wins` applies to PR/develop only. It does not apply to `main` or production release evidence.
 
@@ -44,6 +45,16 @@ Remote CI is integration/release evidence, not the exploratory workbench.
 - `pnpm actions:cost:audit` is the repo-local workflow/job hotspot report.
 - `src/lib/cloud/github-billing.ts:getGitHubBillingOverview` remains the official GitHub Billing reader.
 - `.github/workflows/ci.yml` and `.github/workflows/playwright.yml` may skip docs-only changes when specialized gates cover those docs.
+- Vercel `ignoreCommand` runs `node scripts/ci/vercel-ignore-build.mjs`. It may
+  cancel builds for safe docs/local-agent-only diffs on `develop`, staging
+  previews and branch previews. It must continue the build for runtime,
+  workflow, config, migration, scripts, deploy-control docs, unknown paths,
+  missing comparison SHAs, and all `main`/Production deployments.
+- Remote smoke 2026-07-08: guard commit
+  `685c33a76e7857a24eff070b75c1c2853f7a333b` built READY; follow-up docs-only
+  commit `7cb31e34e0fd380b3fbba97238f143b087d88748` returned GitHub/Vercel
+  `success` with description `Canceled by Ignored Build Step` and logs
+  `[vercel-ignore-build] Decision: skip`.
 - `CI` keeps lint, typecheck and test results in the frequent lane. Coverage moves to `CI Deep Verification` on `main`, manual dispatch and weekly scheduled backstop. `pnpm build` remains a GitHub gate for PRs, `main` and manual checkpoints; `push:develop` relies on Vercel's deployment build to avoid duplicate paid build minutes.
 - `CI` may cache deterministic lint/build-support artifacts such as `.eslintcache` when cache miss only affects runtime cost and never changes the check set.
 - Playwright smoke on `develop` is path-aware for UI/runtime/auth/admin/payroll/reliability/API-critical paths.
@@ -89,3 +100,5 @@ Rejected. Billing Usage is official for gross/net spend but cannot explain which
 - GitHub Actions workflow syntax: `concurrency`, `paths-ignore`.
 - GitHub Actions billing: minutes are billed to the repository owner; Linux 2-core baseline is `actions_linux` at USD 0.006/min as of 2026-05-24.
 - GitHub Budgets REST API: organization budget endpoints require admin/billing-manager level permissions and are public preview as of 2026-05-24.
+- Vercel `vercel.json` `ignoreCommand` and system env vars
+  `VERCEL_GIT_PREVIOUS_SHA` / `VERCEL_GIT_COMMIT_SHA`.

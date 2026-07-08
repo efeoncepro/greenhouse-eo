@@ -16,6 +16,14 @@ Use this file when the task needs exact command behavior or current official gui
   - https://vercel.com/docs/cli/deploying-from-cli
   - default deploys, staged production via `vercel --prod --skip-domain`, promote path
 
+- Ignored Build Step / project config
+  - https://vercel.com/docs/project-configuration/vercel-json#ignorecommand
+  - `ignoreCommand` exit `0` cancels the build; non-zero continues it
+
+- System environment variables
+  - https://vercel.com/docs/environment-variables/system-environment-variables
+  - `VERCEL_GIT_COMMIT_SHA`, `VERCEL_GIT_PREVIOUS_SHA`, `VERCEL_GIT_COMMIT_REF`, `VERCEL_ENV`, `VERCEL_TARGET_ENV`
+
 - `vercel env`
   - https://vercel.com/docs/cli/env
   - env CRUD, branch-specific preview vars, `env pull`, `env run`
@@ -75,3 +83,6 @@ Use this file when the task needs exact command behavior or current official gui
 - Use `vercel logs --branch <branch>` or `--deployment <url>` to avoid reading the wrong deployment.
 - Use `--scope <team-slug>` whenever there is any doubt about which team is active.
 - Protected deployments require auth, `vercel curl`, Vercel MCP, or a bypass secret. A plain `curl` returning `401` is not enough evidence about the app itself.
+- A deployment canceled by Ignored Build Step can still report a successful
+  GitHub commit status. Inspect logs to distinguish intentional skip from build
+  failure.

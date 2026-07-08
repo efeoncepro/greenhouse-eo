@@ -16,6 +16,27 @@ Use this file for repo-specific Vercel behavior. Treat `AGENTS.md`, `project_con
   - branch previews
   - should use Vercel `Preview`
 
+## Ignored build policy
+
+- `vercel.json` runs `node scripts/ci/vercel-ignore-build.mjs` as the Vercel
+  Ignored Build Step.
+- The command may cancel builds for `develop`, staging/custom previews and
+  branch previews when the diff is only safe docs or local agent context:
+  `docs/**`, root docs, Markdown files, `.codex/**`, `.claude/**`, `.agents/**`.
+- It always continues the build for unknown/runtime/operations paths, including
+  `src/**`, `app/**`, `public/**`, package/lockfiles, workflows, scripts,
+  migrations, config/env, `services/ops-worker/**`, and release/deploy-control
+  docs.
+- It fails open when comparison SHAs are unavailable.
+- `main`/Production is deliberately not skipped because
+  `production-release.yml` still waits for a Vercel `READY` deployment for the
+  release `target_sha`.
+- Verified smoke (2026-07-08): branch
+  `codex/vercel-docs-only-skip-smoke-20260708`, guard commit
+  `685c33a76e7857a24eff070b75c1c2853f7a333b` built READY; docs-only commit
+  `7cb31e34e0fd380b3fbba97238f143b087d88748` was `CANCELED` with GitHub/Vercel
+  description `Canceled by Ignored Build Step`.
+
 ## Domain intent
 
 - `greenhouse.efeoncepro.com`
