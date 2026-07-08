@@ -1,3 +1,10 @@
+## Sesion 2026-07-08 - HubSpot Scheduler native booking PDR + TASK-1366 - Codex - DOCS
+
+> **Decision documentada:** se creó `docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md` para fijar que el iframe oficial de HubSpot Meetings sigue como fallback seguro, pero que el camino preferido a validar es UI propia + HubSpot Scheduler API server-side sobre `agenda-discovery`. No hay cutover runtime ni inserción en landings en esta pasada.
+> **Task creada:** `docs/tasks/to-do/TASK-1366-hubspot-scheduler-booking-equivalence.md` (EPIC-023, P1, backend-data/integration, UI impact none) define el spike con alto detalle: inventario Scheduler/CRM Meetings/Forms API, availability read, booking smoke con email/slot aprobados, verificación de `isOffline=false`, `calendarEventId`, Teams URL/ID, invite, calendario, HubSpot contact/timeline/meeting object, cancel/reschedule y análisis de `hubspotutk`/UTM/content tracking. La task exige veredicto `pass|conditional pass|fail` antes de abrir adapter nativo o hardening del iframe.
+> **Transversalidad:** el mecanismo "Agenda una reunión" queda tratado como primitive/action común para `efeoncepro.com`, `think.efeoncepro.com` y Growth CTA engine (`EPIC-023`), no como decisión por landing. `HubSpotMeetingEmbed` queda explícitamente como fallback en `docs/architecture/public-site/PRIMITIVES.md`.
+> **Docs sincronizados:** índice PDR (`docs/public-site/README.md`), roadmap público (`docs/public-site/PRODUCT_ROADMAP.md`), registry de primitives, registry/index de tasks (`TASK_ID_REGISTRY.md` + `docs/tasks/README.md`), `project_context.md`, `changelog.md` y este handoff. Pendiente de ejecución futura: confirmar email/slot/organizer de prueba antes de cualquier booking real.
+
 ## Sesion 2026-07-08 - TASK-1360 Assessment Engine implementación - Claude - complete (code)
 
 > **Task:** `TASK-1360` (Assessment Engine foundation, EPIC-011) **complete** (code). Trabajo **local-first en `develop`, sin push**. 5 slices + cierre. Backend-data: motor de evaluación por competencias en `greenhouse_hiring`.

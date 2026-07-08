@@ -45,6 +45,7 @@ gh_form_success_action_clicked
 | Superficie | Eventos `gh_` | Params propios (sumados al allowlist base) |
 |---|---|---|
 | **CTA / botón** | `gh_cta_viewed`, `gh_cta_clicked` | `cta_id`, `cta_kind`, `cta_location`, `cta_variant`, `destination_id` |
+| **Meeting embed** | `gh_meeting_embed_viewed`, `gh_meeting_embed_loaded`, `gh_meeting_embed_failed` | `surface_id`, `surface_kind`, `destination_id`, `meeting_provider`, `reason_class` |
 | Página | `gh_page_viewed` | `page_uri`, `page_type` |
 | Scroll | `gh_scroll_depth_reached` | `percent` (enum 25/50/75/90/100) |
 | Descarga | `gh_file_downloaded` | `file_id`, `file_kind` |
@@ -105,7 +106,9 @@ Marcar/desmarcar es 100% por API (`POST/DELETE properties/{id}/keyEvents` — ve
 
 Regla dura (ya enforced en `src/growth-forms-renderer/telemetry.ts` → `RENDERER_ALLOWED_PAYLOAD_KEYS` / `src/lib/growth/forms/contracts.ts` → `TELEMETRY_ALLOWED_PAYLOAD_KEYS`): **solo claves del allowlist cruzan al browser; jamás PII, valores crudos, internals de HubSpot, URLs privadas ni tokens.** Cualquier clave fuera del allowlist se descarta en la frontera.
 
-Allowlist base vigente (extender aquí al sumar familias): `form_id, form_key, form_slug, form_version_id, form_kind, surface_id, surface_kind, renderer_version, contract_version, page_uri, page_name, referrer, locale, utm_source, utm_medium, utm_campaign, correlation_id, reason_class, success_behavior, destination_kind, action_kind, reward_kind, run_handle, status_url`.
+Allowlist base vigente (extender aquí al sumar familias): `form_id, form_key, form_slug, form_version_id, form_kind, surface_id, surface_kind, renderer_version, contract_version, page_uri, page_name, referrer, locale, utm_source, utm_medium, utm_campaign, utm_content, utm_term, correlation_id, reason_class, success_behavior, destination_kind, destination_id, action_kind, reward_kind, run_handle, status_url, cta_id, cta_kind, cta_location, cta_variant, meeting_provider`.
+
+Rutas públicas con identificadores privados o semi-privados deben redactarse antes de poblar `page_uri`. Ejemplo vigente: Think reporta `/brand-visibility/r/[token]` en eventos de CTA/Meeting, no el token real de un informe privado.
 
 Para GA4: recordar que un parámetro custom **no reporta** hasta registrarlo como **custom dimension** en la propiedad (`01 §6`). Registrar los keys que quieras ver en reportes (`cta_location`, `form_kind`, etc.).
 

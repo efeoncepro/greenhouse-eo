@@ -48,7 +48,18 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 
 | CTA id | Kind | Ubicación (page + location) | Emite dataLayer | Evento GTM → GA4 | Key event | Tagging | Notas |
 |---|---|---|---|---|---|---|---|
-| _(sin CTAs instrumentados aún)_ | | | | | | | |
+| `social_meeting_hero_primary` | meeting_booking | `/servicios/redes-sociales/` · `hero_primary` | ✅ `dataLayer` | `gh_cta_clicked` → pendiente de tag GA4 | no | ⏳ pendiente | Abre el panel inline de HubSpot Meetings; fallback href directo si JS no carga. |
+| `social_meeting_final_primary` | meeting_booking | `/servicios/redes-sociales/` · `final_primary` | ✅ `dataLayer` | `gh_cta_clicked` → pendiente de tag GA4 | no | ⏳ pendiente | CTA principal de la sección final. |
+| `social_meeting_sticky_primary` | meeting_booking | `/servicios/redes-sociales/` · `sticky_primary` | ✅ `dataLayer` | `gh_cta_clicked` → pendiente de tag GA4 | no | ⏳ pendiente | Sticky CTA desktop; mobile se oculta por contrato de la landing. |
+| `social_meeting_audit_fallback` | meeting_booking | `/servicios/redes-sociales/` · `audit_fallback` | ✅ `dataLayer` | `gh_cta_clicked` → pendiente de tag GA4 | no | ⏳ pendiente | Fallback visible si el Growth Form no renderiza. |
+| `social_meeting_tab` | meeting_booking | `/servicios/redes-sociales/` · `final_cta` | ✅ `dataLayer` | `gh_cta_clicked` → pendiente de tag GA4 | no | ⏳ pendiente | Tab que cambia de Auditoría a Reunión. |
+| `social_meeting_direct_fallback` | meeting_booking | `/servicios/redes-sociales/` · `meeting_embed` | ✅ `dataLayer` | `gh_cta_clicked` → pendiente de tag GA4 | no | ⏳ pendiente | Link directo a HubSpot si el iframe no aparece o el usuario prefiere nueva pestaña. |
+
+## Meeting embeds
+
+| Surface id | Kind | Página / ubicación | Emite dataLayer | Evento GTM → GA4 | Key event | Tagging | Notas |
+|---|---|---|---|---|---|---|---|
+| `social_meeting_embed` | hubspot_meetings_embed | `/servicios/redes-sociales/` · sección final CTA | ✅ `dataLayer` | `gh_meeting_embed_viewed`, `gh_meeting_embed_loaded`, `gh_meeting_embed_failed` → pendiente de tags GA4 | no | ⏳ pendiente | El iframe se lazy-load al abrir Reunión. Los UTMs de campaña viajan por la query de la página; `dataLayer` conserva CTA/surface sin PII. |
 
 ---
 

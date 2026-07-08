@@ -118,6 +118,14 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   `docs/tasks/to-do/TASK-1358-landing-agencia.md`. Pendiente: art direction del hero + contrato de Motion +
   decisión del mecanismo del CTA "Agenda una reunión" (growth-form gobernado vs HubSpot Meetings) antes de `UI ready: yes`.
 
+- **PDR-009 + TASK-1366 — mecanismo transversal "Agenda una reunión"** (decisión de validación):
+  antes de reemplazar el iframe oficial de HubSpot Meetings, Greenhouse debe probar si una UI propia puede
+  reservar por HubSpot Scheduler API conservando side effects nativos: calendario Office 365, Teams, invitación
+  al invitado, contacto/timeline/meeting en HubSpot y atribución medible sin PII en `dataLayer`. La implementación
+  live de `/servicios/redes-sociales/` queda como fallback seguro mientras se ejecuta el spike. Ver
+  [PDR-009](decisions/PDR-009-hubspot-scheduler-native-booking.md) +
+  `docs/tasks/to-do/TASK-1366-hubspot-scheduler-booking-equivalence.md`.
+
 ## Next
 
 - **Guía pillar "community manager" en Think** (PDR-005 §Consecuencias): captura el
