@@ -1,3 +1,9 @@
+## Sesion 2026-07-08 - TASK-1361 Assessment AI Assist implementación - Claude - in-progress
+
+> **Task:** `TASK-1361` (Assessment AI Assist, EPIC-011) movida a `in-progress`. **Local-first en `develop`, sin push.** Backend-data: capa IA gobernada sobre el motor de assessment (TASK-1360). Genera preguntas por competencia+nivel (Gemini Flash, el SME gatea) + propone puntaje para respuestas `open_text`/`situational` (Claude Sonnet 5, defensibilidad AI-Act); patrón `propose → confirm`, la IA nunca escribe. **NO es un tool de Nexa** — capa de dominio que espeja el AEO grader (`src/lib/growth/ai-visibility/**`), consume `src/lib/ai/*`, y Nexa la opera por construcción vía parity actionKeys.
+> **Open Questions resueltas (intake):** provider = split Sonnet 5 grading / Flash generación (seam de config); eval baseline = dataset versionado en repo (`__fixtures__/eval-baseline-scoring.json`, curado tipo-SME porque TASK-1360 no tiene data graded productiva aún), corrido por script `pnpm tsx`, no test de CI que llame al provider.
+> **Slices:** 1 proposal store + governed write · 2 question gen (propose) · 3 response scoring (propose) · 4 eval baseline + flag OFF `HIRING_ASSESSMENT_AI_ENABLED` · 5 capability `hiring.assessment.ai_assist` + API `/api/hiring/assessments/ai/**` + events + parity actionKeys. Flag default OFF; sin eval verde no shippea el scoring.
+
 ## Sesion 2026-07-08 - HubSpot Scheduler native booking PDR + TASK-1366 - Codex - DOCS
 
 > **Decision documentada:** se creó `docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md` para fijar que el iframe oficial de HubSpot Meetings sigue como fallback seguro, pero que el camino preferido a validar es UI propia + HubSpot Scheduler API server-side sobre `agenda-discovery`. No hay cutover runtime ni inserción en landings en esta pasada.

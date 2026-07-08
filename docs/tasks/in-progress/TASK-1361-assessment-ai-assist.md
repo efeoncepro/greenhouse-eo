@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Alto`
@@ -334,4 +334,4 @@ Frontera en 3 capas:
 ## Open Questions
 
 - ~~¿Qué provider LLM por defecto para scoring de assessment?~~ **RESUELTO 2026-07-08** (ver §Detailed Spec → Selección de provider/modelo): split por sub-tarea — **grading = Claude Sonnet 5** (`generateStructuredAnthropic`, calidad/defensibilidad AI-Act) + **generación de preguntas = Gemini Flash/Haiku 4.5** (`generateStructuredGemini`, barato, el SME gatea). Provider como seam de config; Sonnet 5 es default de arranque, el eval baseline (Slice 4) lo confirma o swappea.
-- ¿El eval baseline se versiona como dataset en el repo o vive en un artefacto externo? Preferir dataset versionado pequeño + evidencia de corrida.
+- ~~¿El eval baseline se versiona como dataset en el repo o vive en un artefacto externo?~~ **RESUELTO 2026-07-08** (intake): **dataset versionado pequeño en el repo** (`src/lib/hiring/assessment/ai/__fixtures__/eval-baseline-scoring.json` — tuplas `{competencyKey, level, prompt, rubric, candidateAnswer, humanReferenceScore, note}` curadas). Rationale: (a) TASK-1360 shippeó el engine SIN data productiva graded todavía (ningún candidato rindió) → el baseline NO puede usar producción; debe ser un set curado tipo-SME; (b) versionado = reproducible en local/CI e inspeccionable (git es el historial); (c) chico = revisable por un humano. El eval corre como script `pnpm tsx` que mide correlación IA↔referencia + emite evidencia (NO test de CI que llame al provider — costo/no-determinismo; el gate de CI valida el parseo estructurado con provider mockeado). Cuando exista data real graded (post TASK-1363 en uso), el dataset se amplía con casos reales anonimizados.
