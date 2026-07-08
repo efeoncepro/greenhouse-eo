@@ -329,6 +329,8 @@ type CandidateFacetRow = {
   retention_policy: unknown
   source_attribution: unknown
   verification_signals_json: unknown
+  portfolio_url: unknown
+  linkedin_url: unknown
   status: unknown
   notes: unknown
   created_by: unknown
@@ -354,6 +356,8 @@ const normalizeCandidateFacet = (row: CandidateFacetRow): CandidateFacet => ({
   retentionPolicy: toNullableStr(row.retention_policy),
   sourceAttribution: toNullableStr(row.source_attribution),
   verificationSignals: toJsonObject(row.verification_signals_json),
+  portfolioUrl: toNullableStr(row.portfolio_url),
+  linkedinUrl: toNullableStr(row.linkedin_url),
   status: toStr(row.status) as CandidateFacet['status'],
   notes: toNullableStr(row.notes),
   createdBy: toNullableStr(row.created_by),
@@ -436,8 +440,8 @@ const HIRING_OPENING_COLUMNS = `
 const CANDIDATE_FACET_COLUMNS = `
   candidate_facet_id, public_id, identity_profile_id, member_id, source, readiness, availability,
   seniority, expected_rate, expected_rate_currency, rate_band, consent_status, consent_policy_version,
-  consent_captured_at, retention_policy, source_attribution, verification_signals_json, status, notes,
-  created_by, created_at, updated_at`
+  consent_captured_at, retention_policy, source_attribution, verification_signals_json, portfolio_url,
+  linkedin_url, status, notes, created_by, created_at, updated_at`
 
 const HIRING_APPLICATION_COLUMNS = `
   application_id, public_id, opening_id, identity_profile_id, candidate_facet_id, owner_user_id, stage,
@@ -951,8 +955,8 @@ export const reconcileCandidateFacet = async (
       `INSERT INTO greenhouse_hiring.candidate_facet (
          identity_profile_id, member_id, source, readiness, availability, seniority, expected_rate,
          expected_rate_currency, rate_band, consent_status, consent_policy_version, consent_captured_at,
-         retention_policy, source_attribution, notes, created_by
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+         retention_policy, source_attribution, portfolio_url, linkedin_url, notes, created_by
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
        ON CONFLICT (identity_profile_id) DO UPDATE SET
          member_id = COALESCE(EXCLUDED.member_id, greenhouse_hiring.candidate_facet.member_id),
          source = EXCLUDED.source,
@@ -967,6 +971,8 @@ export const reconcileCandidateFacet = async (
          consent_captured_at = COALESCE(EXCLUDED.consent_captured_at, greenhouse_hiring.candidate_facet.consent_captured_at),
          retention_policy = COALESCE(EXCLUDED.retention_policy, greenhouse_hiring.candidate_facet.retention_policy),
          source_attribution = COALESCE(EXCLUDED.source_attribution, greenhouse_hiring.candidate_facet.source_attribution),
+         portfolio_url = COALESCE(EXCLUDED.portfolio_url, greenhouse_hiring.candidate_facet.portfolio_url),
+         linkedin_url = COALESCE(EXCLUDED.linkedin_url, greenhouse_hiring.candidate_facet.linkedin_url),
          notes = COALESCE(EXCLUDED.notes, greenhouse_hiring.candidate_facet.notes)
        RETURNING ${CANDIDATE_FACET_COLUMNS}`,
       [
@@ -984,6 +990,8 @@ export const reconcileCandidateFacet = async (
         input.consentCapturedAt ?? null,
         input.retentionPolicy ?? null,
         input.sourceAttribution ?? null,
+        input.portfolioUrl ?? null,
+        input.linkedinUrl ?? null,
         input.notes ?? null,
         actorUserId,
       ],

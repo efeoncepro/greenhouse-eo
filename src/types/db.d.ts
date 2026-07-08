@@ -6942,8 +6942,10 @@ export interface GreenhouseHiringCandidateFacet {
   expected_rate: Numeric | null;
   expected_rate_currency: string | null;
   identity_profile_id: string;
+  linkedin_url: string | null;
   member_id: string | null;
   notes: string | null;
+  portfolio_url: string | null;
   public_id: Generated<string>;
   rate_band: string | null;
   readiness: Generated<string>;
@@ -6983,6 +6985,15 @@ export interface GreenhouseHiringHiringApplication {
   stage: Generated<string>;
   tentative_start_date: Timestamp | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringApplicationIntakeEvents {
+  created_at: Generated<Timestamp>;
+  email_hash: string | null;
+  event_id: Generated<string>;
+  ip_hash: string | null;
+  opening_public_id: string | null;
+  outcome: string;
 }
 
 export interface GreenhouseHiringHiringAssessment {
@@ -11333,6 +11344,7 @@ export interface DB {
   "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
+  "greenhouse_hiring.hiring_application_intake_events": GreenhouseHiringHiringApplicationIntakeEvents;
   "greenhouse_hiring.hiring_assessment": GreenhouseHiringHiringAssessment;
   "greenhouse_hiring.hiring_assessment_ai_proposal": GreenhouseHiringHiringAssessmentAiProposal;
   "greenhouse_hiring.hiring_assessment_response": GreenhouseHiringHiringAssessmentResponse;

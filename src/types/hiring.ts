@@ -188,6 +188,8 @@ export interface CandidateFacet {
   retentionPolicy: string | null
   sourceAttribution: string | null
   verificationSignals: Record<string, unknown>
+  portfolioUrl: string | null
+  linkedinUrl: string | null
   status: CandidateFacetStatus
   notes: string | null
   createdBy: string | null
@@ -340,6 +342,8 @@ export interface ReconcileCandidateFacetInput {
   consentCapturedAt?: string | null
   retentionPolicy?: string | null
   sourceAttribution?: string | null
+  portfolioUrl?: string | null
+  linkedinUrl?: string | null
   memberId?: string | null
   notes?: string | null
 }

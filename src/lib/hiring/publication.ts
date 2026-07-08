@@ -103,8 +103,25 @@ export const getPublicOpeningByPublicId = async (publicId: string): Promise<Publ
     [publicId],
   )
 
-  
+
 return rows[0] ? normalizePublicOpeningRow(rows[0]) : null
+}
+
+/**
+ * TASK-1367 — Resuelve el `opening_id` INTERNO de un opening publicado a partir de su `public_id`.
+ * El payload público NO expone el id interno; el apply intake lo necesita para `createHiringApplication`.
+ * Aplica el MISMO gate de publicación (`published` + `public_listed`) → devuelve null si no está abierto
+ * (el caller lo trata como 404 "vacante no disponible"). No expone nada más del opening.
+ */
+export const resolvePublishedOpeningIdByPublicId = async (publicId: string): Promise<string | null> => {
+  const rows = await runGreenhousePostgresQuery<{ opening_id: string }>(
+    `SELECT opening_id FROM greenhouse_hiring.hiring_opening
+     WHERE public_id = $1 AND publication_status = 'published' AND visibility = 'public_listed' LIMIT 1`,
+    [publicId],
+  )
+
+
+return rows[0]?.opening_id ?? null
 }
 
 const RETURN_OPENING = `opening_id, public_id, publication_status, visibility, status, published_at, public_title`
