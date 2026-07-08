@@ -10,6 +10,12 @@ La voz de Efeonce **no nace de adjetivos genéricos** ("profesional y cercano") 
 **creencias específicas sobre el mercado**. Todo texto debe poder rastrearse a una de las 7
 creencias contrarias. Si tu copy podría ser de cualquier agencia, no tiene la voz.
 
+## El Why (de dónde nacen las creencias)
+
+Debajo de las 7 creencias hay **un Why de marca** que ordena todo: ***No te entregamos crecimiento. Lo construimos contigo —y te dejamos más capaz de sostenerlo.*** El crecimiento se **co-construye** (co-creación), se **educa** (te hacemos más capaz, no dependiente) y es **integral** (nace de la relación que compone, no del número). Casi todo copy de marca Efeonce puede leerse como este Why tensionado contra el status quo de la industria. Comunicación inside-out (Sinek): abre por el Why, no por el What.
+
+**Regla de craft anti-humo:** "co-creación", "integralidad", "partner" son palabras de agencia commodity si van solas. **Nunca escribas el Why sin su mecanismo al lado** (el login, el grader, el número, el ciclo) — es la misma "obsesión por la prueba" de la personalidad. **SSOT del Why:** `docs/context/09_marca-agencia.md` → §El Golden Circle de Efeonce.
+
 ## Las 7 creencias contrarias (el ADN narrativo)
 
 1. **El marketing sin sistema es caro accidentalmente.** El problema no es creatividad ni

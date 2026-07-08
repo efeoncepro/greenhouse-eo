@@ -8,6 +8,8 @@ La voz de Efeonce no nace de adjetivos genéricos ("profesional y cercano") sino
 
 ## Las 7 creencias contrarias (el ADN narrativo)
 
+> Estas 7 creencias son el **ADN narrativo que sirve al Why de Efeonce** (*no te entregamos crecimiento, lo construimos contigo*): el Why es el centro del Golden Circle; las creencias son cómo ese Why ve el mundo. Las #3 (vanity metrics), #5 (creatividad medida) y #7 (transparencia = mínimo) son las que más directamente sostienen la co-creación, la educación y la integralidad del Why. **SSOT del Why:** `09_marca-agencia.md` → §El Golden Circle de Efeonce.
+
 1. **El marketing sin sistema es caro accidentalmente.** El problema no es creatividad ni presupuesto: es arquitectura.
 2. **La integración real es operativa, no organizacional.** Estar bajo un mismo holding es cohabitación; integración es que los datos de Evolve alimenten el brief de Express sin copy-paste humano.
 3. **Las vanity metrics son un acuerdo de silencio entre agencia y cliente.** Efeonce rompe ese pacto.

@@ -35,6 +35,25 @@ Greenhouse existe para **tres ejes**. Si una feature no mueve al menos uno, no e
 
 ---
 
+## El Why de Efeonce (Golden Circle)
+
+Antes del North Star de producto está el **Why de marca** — la creencia de la que cuelga todo (Home, About Us, cómo opera Greenhouse). Comunicación inside-out (Sinek): **Why → How → What**, nunca al revés.
+
+**No te entregamos crecimiento. Lo construimos contigo —y te dejamos más capaz de sostenerlo.**
+
+El crecimiento no se entrega: se **co-construye**. Tres pilares (una creencia):
+- **Co-creación** — el cliente opera con nosotros en vivo, no recibe entregables.
+- **Educación** — lo hacemos más capaz, no dependiente; y un cliente más capaz da mejores briefs → BCS↑→FTR↑→RpA↓, así **educar mejora el trabajo** (no es caridad).
+- **Integralidad** — el crecimiento nace de la relación que compone ciclo a ciclo, no del número aislado (los números son resultado, no origen).
+
+- **How (lo que lo prueba):** un solo cerebro (capabilities integradas) · transparencia como piso (login, no PDF) · método (Loop + ICO) · medición honesta (Revenue Enabled) · software propio (Greenhouse/Kortex/Verk) · educación como sistema (Think).
+- **Regla dura anti-humo:** "co-creación/integralidad/partner" son palabras de agencia commodity si van solas. **Nunca el Why sin su mecanismo** (el login, el grader, el número, el ciclo).
+- **Reconciliación ASaaS:** el switching cost se gana haciendo al cliente **más capaz + guardándole su historial** (capacidad + memoria), NO por dependencia/opacidad.
+
+> **SSOT:** `docs/context/09_marca-agencia.md` → §El Golden Circle de Efeonce. Este es el destilado; ahí el detalle completo.
+
+---
+
 ## Filtro de decisión para una feature nueva
 
 Antes de construir, poder responder **sí a ≥1 verde** y **no a todas las rojas**:

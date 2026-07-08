@@ -8,6 +8,49 @@ Los CMOs recuerdan espontáneamente 6–7 agencias por mercado (SCOPEN). Si no e
 
 ---
 
+## El Golden Circle de Efeonce (Why · How · What)
+
+> El centro de la marca. Todo lo demás en este doc —arquitectura, sistema verbal, posicionamiento, messaging— **cuelga de aquí**. Comunicamos de adentro hacia afuera (Sinek, *Start With Why*): primero el **Why** (la creencia), después el **How** (el sistema), al final el **What** (las capabilities). Nunca al revés — *la gente no compra lo que haces, compra por qué lo haces.* El Why le habla al decisor (cerebro límbico) antes que cualquier feature.
+
+### WHY — la creencia (el centro)
+
+**No te entregamos crecimiento. Lo construimos contigo —y te dejamos más capaz de sostenerlo.**
+
+El crecimiento no se entrega: se **co-construye**. No nace de los números ni del paquete de entregables —nace de *cómo trabajamos juntos*: con transparencia total, educándote en el proceso, y sumando cada ciclo sobre el anterior. Un cliente que crece con nosotros sale **más capaz, no más dependiente**.
+
+Es una creencia sobre la **naturaleza del crecimiento y de la sociedad con un cliente**, no una feature. Tres pilares, una sola creencia:
+
+1. **Co-creación, no entrega.** El cliente no "recibe entregables": **opera con nosotros, en vivo**. La experiencia de construir juntos es parte del producto, no un extra. → *Prueba (no promesa):* el login a su operación en tiempo real (`03`/`04`, transparencia de Greenhouse).
+2. **Educar es responsabilidad de experto, no opción.** Como expertos, educamos —al mercado y al cliente. *Un experto que no te enseña, te vuelve dependiente; nosotros preferimos hacerte mejor.* Y hacerte mejor **mejora el trabajo**: mejores briefs → BCS↑ → FTR↑ → RpA↓ → ciclo↓ → más crecimiento (cadena ICO, `07`). La generosidad intelectual es prueba de capacidad *y* es eficiente. → *Prueba:* Think (blog/newsletter/graders) educa al mercado; el protocolo de transparencia + los frameworks compartidos educan al cliente.
+3. **El crecimiento es integral, no numérico.** No nace del gráfico que sube: nace de la **relación completa que compone** —creatividad, datos, medios, tecnología y una sociedad que aprende— ciclo a ciclo. Los números son el resultado, no el origen. → *Prueba:* Loop Marketing (crecimiento compuesto); Revenue Enabled sobre la relación, no vanity metrics (creencia contraria #3, `05`).
+
+### HOW — cómo lo hacemos real (el mecanismo que lo prueba)
+
+El Why sin mecanismo es humo de agencia. Cada faceta se sostiene en algo concreto:
+
+- **Un solo sistema, un solo cerebro** — capabilities integradas con contexto compartido; la fragmentación es el enemigo (ver Posicionamiento, abajo).
+- **Transparencia como piso** — login a tu operación en vivo, no un PDF el viernes. Así la co-creación es real, no un eslogan.
+- **Método** — Loop Marketing (el crecimiento compuesto, ningún trimestre desde cero) + ICO (medir cada pieza en vivo).
+- **Medición honesta** — Revenue Enabled: la creatividad medida se **defiende**; nada de vanity.
+- **Software propio** — Greenhouse/Kortex/Verk: donde el servicio se ejecuta, se hace visible y guarda tu historial.
+- **Educación como sistema** — Think educa al mercado; el protocolo de transparencia + los frameworks compartidos educan al cliente.
+
+### WHAT — lo tangible
+
+Las cuatro capabilities (creatividad y contenido · estrategia y crecimiento · medios y amplificación · infraestructura y medición), las tres plataformas de software y los casos con dato. El What es la **consecuencia** del Why, no el punto de partida.
+
+### Disciplina anti-humo (regla dura de esta creencia)
+
+"Co-creación", "integralidad", "experiencia increíble", "partner" son **exactamente** las palabras que una agencia commodity usa vacías. Efeonce solo se las gana **encadenando siempre el Why a su mecanismo**. Nunca decir "co-creamos / te acompañamos / experiencia integral" sin la prueba concreta al lado (el login, el grader, el número, el ciclo). Prohibidos **sin mecanismo**: *"acompañamiento integral", "experiencia 360", "somos tu partner"* (coherente con los don'ts de voz de `05`).
+
+### Reconciliación con el modelo ASaaS (insight load-bearing)
+
+El **switching cost NO nace de dejar al cliente dependiente y a oscuras** (el juego de la agencia tradicional), sino de **hacerlo más capaz y guardarle su historial acumulado**. Retenemos por **capacidad + memoria, no por opacidad**. Educar al cliente y subir el switching cost no se contradicen: un cliente más capaz da mejores briefs, co-crea mejor, y su historial en las plataformas lo ata **por valor, no como rehén**. (Ver `14`.)
+
+> **Este bloque es el SSOT del Why/Golden Circle de Efeonce.** El resto de los docs (`01`, `05`, `10`, `14`) y la skill `efeonce-agency` lo **citan**, no lo recopian. Si difieren, manda este bloque.
+
+---
+
 ## Arquitectura de marca: masterbrand con capabilities
 
 Una sola marca lidera toda la comunicación externa. Las antiguas sub-marcas se reposicionan como **capabilities** (áreas de expertise internas), no marcas independientes.
@@ -45,6 +88,8 @@ Las 4 capas verbales (en secuencia natural de conversación):
 | Claim de posicionamiento | *El crecimiento real no se compra por partes. Se orquesta.* | Abre conversaciones. Hero de web, primer slide. |
 | Descriptor | *Creatividad, datos y tecnología como un solo motor.* | Responde "¿qué hacen exactamente?". |
 | Tesis editorial | *El marketing lineal está roto. El crecimiento real es compuesto.* | Thought leadership. |
+
+> Estas cuatro capas son **How/What** (cómo se dice el sistema). Todas cuelgan del **Why** de arriba (*no te entregamos crecimiento, lo construimos contigo*). El claim *"se orquesta"* es el **How** hecho frase —el mecanismo—, no el Why. Al abrir una conversación, el Why va primero; "se orquesta" lo aterriza.
 
 ---
 

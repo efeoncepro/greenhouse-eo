@@ -17,6 +17,8 @@
 | **Switching cost creciente** | Cuanto más se usa, más caro e ilógico cambiarse | **Es el North Star.** Cada dato acumulado lo refuerza |
 | **Monetización recurrente** | Fee mensual predecible, lógica de suscripción | Habilita el tier pricing (abajo) |
 
+> **El switching cost se gana haciendo al cliente más capaz, no más dependiente.** La agencia tradicional retiene por **opacidad** (no te enseño, no ves, cuesta irte). Efeonce retiene por **capacidad + memoria**: te educamos (co-creas mejor, das mejores briefs → mejor trabajo, cadena ICO) y tu historial acumulado en las plataformas te ata **por valor, no como rehén**. Educar al cliente y subir el switching cost **no se contradicen: se refuerzan.** Este insight es parte del **Why** de Efeonce — SSOT en `09_marca-agencia.md` → §El Golden Circle (Reconciliación con el modelo ASaaS).
+
 ---
 
 ## Estado real (recalibrado) — esto es lo que cambió

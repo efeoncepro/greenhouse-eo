@@ -12,6 +12,16 @@ Operación legal: Efeonce Group SpA. Presencia: **Chile, Colombia, México, Per�
 
 ---
 
+## El Why — por qué existimos
+
+**No te entregamos crecimiento. Lo construimos contigo —y te dejamos más capaz de sostenerlo.**
+
+El crecimiento no se entrega: se **co-construye**. No nace de los números ni de los entregables, sino de *cómo trabajamos juntos* —con transparencia, educándote y sumando cada ciclo. Un cliente que crece con nosotros sale **más capaz, no más dependiente**. Tres pilares: **co-creación** (operas con nosotros en vivo), **educación** (te hacemos mejor, no dependiente) e **integralidad** (el crecimiento nace de la relación completa, no del gráfico).
+
+> El Why completo (Golden Circle Why·How·What, los mecanismos que lo prueban, la disciplina anti-humo y la reconciliación con el switching cost ASaaS) es SSOT en **`09_marca-agencia.md` → §El Golden Circle de Efeonce**. Esto es el resumen.
+
+---
+
 ## Loop Marketing: el framework base
 
 Loop Marketing es el framework estratégico (impulsado por HubSpot como sucesor del funnel y el flywheel) que estructura el marketing como un ciclo continuo de cuatro fases. **El funnel asume que la gente hace fila; no la hace.** El consumidor circula, y el sistema que lo sirve circula con él. Cada ciclo construye sobre el anterior: ningún trimestre empieza de cero.

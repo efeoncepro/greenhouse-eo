@@ -17,6 +17,8 @@ Un *greenhouse* es un espacio de condiciones controladas para que algo crezca. A
 
 > Principio central: *la experiencia de marca no es lo que decimos que somos; es lo que el cliente vive cuando trabaja con nosotros.* Greenhouse convierte lo que hoy es accidental (buena operación) en sistema reproducible **sin depender del instinto del founder**. Cada feature que sistematiza un "momento de marca" reduce esa dependencia.
 
+> **Esta experiencia ES el Why de Efeonce hecho vivencia.** "Ver todo, entender todo, mejorar cada ciclo" es exactamente la creencia central (*no te entregamos crecimiento, lo construimos contigo*): el crecimiento se **co-construye** (operas con nosotros en vivo, no recibes un reporte), se **educa** (entiendes, no solo recibes) y es **integral** (cada ciclo compone sobre el anterior). Cada mejora de experiencia en Greenhouse es una prueba del Why, no un adorno. SSOT del Why: `09_marca-agencia.md` → §El Golden Circle de Efeonce.
+
 ---
 
 ## El journey: 8 fases + 2 transversales, mapeadas a módulos

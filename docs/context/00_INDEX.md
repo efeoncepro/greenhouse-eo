@@ -52,6 +52,8 @@ El cliente ve su operación en tiempo real: qué pasa, cuándo pasa y dónde est
 ### Eje 3 — Revenue Enabled
 Todo lo que mostramos debe poder conectarse —directa o indirectamente— con impacto en el negocio del cliente (pipeline, revenue, NRR), no con vanity metrics. La inteligencia financiera y las métricas ICO existen para alimentar esa cadena causal. **Medimos lo que defiende presupuesto, no lo que decora un slide.**
 
+> **Detrás de estos tres ejes hay un Why de marca:** *no te entregamos crecimiento, lo construimos contigo —y te dejamos más capaz de sostenerlo* (co-creación · educación · integralidad). Los tres ejes son el How/What de ese Why en producto: el switching cost se gana haciendo al cliente más capaz (no dependiente), la transparencia hace real la co-creación, y Revenue Enabled prueba que el crecimiento es integral. SSOT del Why: `09_marca-agencia.md` → §El Golden Circle de Efeonce.
+
 ---
 
 ## Filtro de decisión para una feature nueva
