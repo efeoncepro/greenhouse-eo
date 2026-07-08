@@ -2,4 +2,5 @@
 // Arch: GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md §Delta 2026-07-08.
 
 export * from './store'
+export * from './instances'
 export type * from '@/types/hiring-assessment'
