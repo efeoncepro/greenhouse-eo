@@ -1,0 +1,93 @@
+# EPIC-011 — Hiring / ATS Master UI Flow
+
+## Meta
+
+- Epic: `EPIC-011` (Hiring / ATS Canonical Program)
+- Tipo: **Master UI flow** (program-level; las superficies son nodos de este flujo, no pantallas aisladas)
+- Owner de diseño: info-architecture (lead) + `greenhouse-ux` + `state-design` + `greenhouse-ux-writing`
+- Estado: `draft` (vivo — se amplía a medida que cada surface se autora)
+- Creado: 2026-07-08
+- Superficies participantes (una por task): `TASK-354` (careers pública) · `TASK-355` (hiring desk interno) · `TASK-1363` (assessment taking + review) · `TASK-1362` (doc capture) · `TASK-356` (handoff/decision) · `TASK-770` (activación HRIS)
+- Contratos de datos backend: `TASK-353` (foundation), `TASK-1360` (assessment engine), `TASK-1361` (assessment AI assist), `TASK-1367` (careers apply intake service)
+
+## Un solo modelo → muchas superficies
+
+El dominio `Hiring / ATS` (schema `greenhouse_hiring`) es **un solo modelo canónico** que se renderiza en superficies distintas según el actor. Ninguna superficie inventa su propio pipeline de candidatos. La cadena de agregados (TASK-353) es la espina dorsal:
+
+```
+talent_demand ──▶ hiring_opening ──(publish)──▶ [público] ──apply──▶ candidate_facet ──▶ hiring_application
+                                                                                              │
+                                             assessment (TASK-1360/1361) ◀────────────────────┤
+                                                                                              │
+                                             hiring_evaluation / scorecard ◀──────────────────┤
+                                                                                              ▼
+                                                                        decision/handoff (TASK-356) ──▶ member (TASK-770)
+```
+
+- **Person-first:** un candidato es una `Person` (`greenhouse_core.identity_profiles`) con una `candidate_facet` (UNIQUE por persona). Una persona = una faceta; nunca un pipeline paralelo.
+- **Full API Parity:** cada superficie es un **cliente delgado** de commands/readers server-side. La UI no es source of truth; consume el contrato gobernado. Nexa opera lo mismo por construcción.
+
+## Actores y su puerta
+
+| Actor | Superficie | Route group | Qué hace | Task |
+|---|---|---|---|---|
+| **Candidato** (público, sin sesión) | Careers pública | público (sin auth) | Ve vacantes, postula, rinde el test tokenizado | 354 · 1363 (taking) |
+| **Reclutador / Hiring manager** (interno) | Hiring desk | `internal` | Publica vacante, revisa postulantes, asigna test, corrige/confirma puntaje, decide | 355 · 1363 (review) · 356 |
+| **SME** (interno) | Desk (banco de preguntas) | `internal` | Aprueba preguntas del banco (gate `draft→active`) incl. borradores IA | 355 · 1361 |
+| **People Ops / HRIS** (interno) | Activación | `internal` | Convierte el hire en colaborador activo | 770 |
+| **Nexa** (agente) | Conversational | — | Opera los mismos commands por parity (propose→confirm) | transversal |
+
+## Flow map cross-surface (el journey completo)
+
+```
+[INTERNO] Desk: crear demanda ▶ crear opening ▶ PUBLICAR (355)
+                                                      │
+                                                      ▼
+[PÚBLICO]  Careers: listing ▶ detalle de vacante ▶ apply form ▶ confirmación genérica (354)
+                                                      │  (crea Person→facet→application, source=public_careers)
+                                                      ▼
+[INTERNO] Desk: bandeja de postulantes ▶ ficha del candidato (355)
+                                                      │  reclutador asigna assessment (TASK-1360)
+                                                      ▼
+[PÚBLICO]  Assessment taking: link tokenizado single-use ▶ rinde el test (1363 taking)
+                                                      │  submit → auto-score objetivo + cola humana
+                                                      ▼
+[INTERNO] Desk/Review: scorecard por competencia ▶ (IA sugiere puntaje, humano confirma — 1361) ▶ decisión (1363 review · 356)
+                                                      │
+                                                      ▼
+[INTERNO] Activación: hire → colaborador activo vía HRIS/People (770)
+```
+
+## Nodos y su contrato de UI (resumen; el detalle vive en el flow de cada task)
+
+| Nodo | Superficie | Estados clave | Reader/Command | Task |
+|---|---|---|---|---|
+| **N1 Listing público** | Careers | loading · lista · vacía (sin vacantes) · error | `listPublicOpenings()` | 354 |
+| **N2 Detalle vacante** | Careers | detalle · 404 (opening no publicado) | `getPublicOpeningByPublicId` | 354 |
+| **N3 Apply form** | Careers | idle · validación inline · enviando · confirmación genérica · rate-limited · error | `submitPublicHiringApplication` (1367) | 354 |
+| **N4 Bandeja postulantes** | Desk | loading · lista+filtros · vacía · error | readers de applications (355) | 355 |
+| **N5 Ficha candidato** | Desk | detalle · tabs (perfil/assessment/docs/decisión) | readers 360 + assessment | 355 |
+| **N6 Asignar test** | Desk | picker plantilla · asignado (token generado) | `assignCandidateTest` (1360) | 355/1363 |
+| **N7 Rendición test** | Assessment taking (público) | token válido/expirado/consumido · en progreso · enviado | `resolveAssessmentByToken` + `saveResponse` + `submitAssessment` (1360) | 1363 |
+| **N8 Review scorecard** | Desk | pendiente corrección · IA sugerida (confirmar/editar) · scored | `finalizeAssessment` + `confirmAiProposal` (1361) | 1363/1361 |
+| **N9 Decisión/handoff** | Desk | decisión · handoff emitido | commands de decisión (356) | 356 |
+
+## Reglas transversales del sistema (heredadas por cada superficie)
+
+- **Público nunca ve interno:** el candidato solo ve el payload allowlist (`PublicOpeningPayload`); NUNCA scores, estado interno, dedupe, ni si ya existía la persona. La confirmación de apply es genérica y segura.
+- **Sensibles nunca cruzan al público:** `answer_key`/`rubric` del banco nunca viajan al candidato (allowlist `buildPublicQuestion`); el token de assessment es single-use.
+- **Consentimiento + attribution:** todo apply persiste consentimiento explícito + `source='public_careers'` + versión de copy/legal.
+- **IA propone, humano confirma:** las sugerencias de la IA (preguntas / puntajes, TASK-1361) nunca se aplican solas; el humano confirma en el desk.
+- **es-CL + a11y:** copy es-CL desde `src/lib/copy/*`; WCAG 2.2 AA; `scrollWidth==clientWidth` en desktop + 390px; reduced-motion.
+- **Shell tokenizado reusable:** el shell público sin sesión que construye TASK-354 (para el apply) es el mismo patrón que 1363 reusa para `/assessment/[token]`. Diseñarlo reusable.
+
+## Design Decision Log (nivel programa)
+
+- **DDL-1 (backend antes que UI):** cada superficie se parte en su contrato backend-data (foundation) + su consumer ui-ux. 354 = careers UI, consume el service backend TASK-1367. Razón: Full API Parity + Task Authoring Contract.
+- **DDL-2 (un shell público, dos usos):** el shell público sin sesión se diseña una vez (careers apply) y se reusa (assessment taking). Evita dos sistemas de layout público paralelos.
+- **DDL-3 (person-first en toda superficie):** ninguna surface crea identidad paralela; toda entrada de candidato reconcilia `Person → candidate_facet → application`.
+- **DDL-4 (Nexa por construcción):** no se diseña UI "Nexa-específica"; si el command existe (parity), Nexa lo opera con su propio loop.
+
+## Cómo se amplía este doc
+
+Cada task de superficie (354/355/1363/356/770) declara en su `Flow` qué nodo(s) de este master implementa, y deja un `## Delta` acá si agrega/cambia un nodo o una regla transversal. Este flow NO reemplaza el flow por-surface; es el mapa del sistema que los conecta.

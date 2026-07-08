@@ -1,18 +1,11 @@
-# TASK-354 — Public Careers Landing & Apply Intake
+# TASK-354 — Public Careers Landing
 
-## Delta 2026-07-08
+## Delta 2026-07-08 (split UI/backend)
 
-- **La carga de archivos (CV/portafolio-archivo) es de `TASK-1362` (Candidate Document Capture), NO de esta task.** 1362  owns los contextos de asset hiring (`hiring_application_cv`/`hiring_candidate_portfolio_file`), el `canAccessHiringAsset` y la quarantine/scan. → Sacar de `Files owned` de 354: `src/types/assets.ts`, `src/lib/storage/greenhouse-assets.ts`, `src/app/api/assets/private/route.ts` (evita colisión de ownership). 354 V1 sigue siendo **links-only** (portafolio como enlace en `candidate_facet`); el upload de archivo se habilita cuando 1362 shippee su Slice 4 (scan). `Blocked by` efectivo si se quiere upload: `TASK-353` (+ `TASK-1362` para archivos).
-- **Relación con el Assessment (TASK-1363):** el **shell público tokenizado** que construye esta task es el patrón que 1363 reutiliza para la rendición del test (`/assessment/[token]`). No es dependencia dura, pero conviene diseñar el shell reusable. El test NO se dispara en el apply (se envía después desde el desk).
-- **Formato:** esta spec es de plantilla vieja (sin `Execution profile`/`UI impact`/`UI ready`/`Backend impact`). Es un **híbrido UI (careers) + backend (apply service)** → al tomarla, partir en `backend-data` (apply service + schema `zod` + reconciliación) + `ui-ux` (careers, con `Wireframe`/`Flow`), o justificar el híbrido; declarar los contratos de UI antes de `UI ready`.
-
-## Delta 2026-07-07
-
-- **Desbloqueada:** `TASK-353` (foundation) completa. El runtime real existe — NO uses mocks. Contratos a consumir:
-  - Listado/detalle público: `listPublicOpenings()` / `getPublicOpeningByPublicId(publicId)` (`src/lib/hiring/publication.ts`). Devuelven **solo** el payload allowlist (`PublicOpeningPayload`); NUNCA leas columnas internas del opening.
-  - Apply: reconciliá/creá la **Person** primero (`identity_profiles`), luego `reconcileCandidateFacet({ identityProfileId, source: 'public_careers', consent* })` y `createHiringApplication({ openingId, identityProfileId, candidateFacetId, source: 'public_careers', dedupeFingerprint })`. `candidate_facet.identity_profile_id` es **NOT NULL + UNIQUE** → una Person = una faceta.
-  - Dedupe: `hiring_application` tiene `UNIQUE(opening_id, identity_profile_id)` (409 desde el store) + columna `dedupe_fingerprint` para tu idempotency key.
-  - Errores: `toHiringErrorResponse` / `hiringInvalidBodyResponse` (`src/lib/hiring/error-response.ts`), es-CL safe.
+- **Task partida por Execution profile** (Task Authoring Contract + task-planner): el *apply intake service* (endpoint público + validación + reconciliación Person→facet→application + dedupe/idempotency + consent + anti-abuse) se movió a **`TASK-1367` (backend-data)**. Esta task queda como la **careers UI** (`ui-ux`): listing + detalle + apply form, **cliente delgado** del service de 1367. `Blocked by` ahora incluye `TASK-1367`.
+- **Docs de diseño creados (robustos, no stubs):** `docs/ui/wireframes/TASK-354-public-careers-landing.md`, `docs/ui/flows/TASK-354-public-careers-landing-flow.md`, y el **master UI flow del programa** `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md` (esta surface = nodos N1/N2/N3).
+- **V1 links-only:** portafolio/LinkedIn como enlace; el upload de archivo (CV) es `TASK-1362`. El shell público sin sesión se diseña reusable para `/assessment/[token]` (TASK-1363).
+- El apply **NO** dispara el test (se envía después desde el desk, TASK-355/1363).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -25,35 +18,35 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
+- Execution profile: `ui-ux`
+- UI impact: `flow`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-354-public-careers-landing.md`
+- Flow: `docs/ui/flows/TASK-354-public-careers-landing-flow.md`
+- Motion: `docs/ui/motion/TASK-354-public-careers-landing-motion.md`
+- Backend impact: `none`
 - Epic: `EPIC-011`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-353`
-- Branch: `task/TASK-354-public-careers-landing-apply-intake`
+- Blocked by: `TASK-1367`
+- Branch: `task/TASK-354-public-careers-landing`
 - Legacy ID: `follow-on de GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1`
 - GitHub Issue: `none`
 
 ## Summary
 
-Crear la landing pública de vacantes de Efeonce/Greenhouse con listing, detail y apply flow, conectada al mismo dominio `Hiring / ATS` y sin abrir un pipeline paralelo de candidatos.
+La landing pública de vacantes de Efeonce: listing de openings publicados, detalle por vacante y formulario de postulación, como **cliente delgado** del apply intake service (TASK-1367) y del publication contract (TASK-353). Es la puerta de entrada visible de candidatos al dominio `Hiring / ATS`, sin abrir un pipeline paralelo.
 
 ## Why This Task Exists
 
-La nueva arquitectura ya exige una entrada pública para candidatos, pero hoy el repo no tiene:
-
-- listado público de openings
-- detalle público de vacante
-- formulario de postulación
-- intake público hacia `Person`, `CandidateFacet` y `HiringApplication`
-
-Sin esta surface, el ATS seguiría siendo solo desk interno y la adquisición de talento continuaría fuera del contrato canónico.
+TASK-353 dejó la foundation + el payload público (`PublicOpeningPayload`) y TASK-1367 expone el apply service, pero **no existe ninguna superficie pública** donde un candidato descubra una vacante y postule. Sin esta UI, el ATS no tiene cara externa y 1360/1361 no reciben candidatos por el canal público. La UI se separa del backend (Full API Parity: la pantalla es cliente de commands/readers gobernados).
 
 ## Goal
 
-- Publicar una landing pública de vacantes con discovery básico
-- Permitir postulación pública hacia el pipeline interno
-- Respetar privacidad, consentimiento y guardrails mínimos de abuso
+- Renderizar listing + detalle público consumiendo SOLO el payload allowlist (nunca columnas internas).
+- Entregar un apply form accesible (es-CL, links-only V1) que postee al service de TASK-1367 con confirmación genérica y segura.
+- Diseñar el shell público sin sesión reusable para `/assessment/[token]` (TASK-1363).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -63,80 +56,112 @@ Sin esta surface, el ATS seguiría siendo solo desk interno y la adquisición de
 
 Revisar y respetar:
 
-- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
-- `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
-- `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
-- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
-- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
-- `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
-- `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
-- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md` (master flow — esta surface = N1/N2/N3)
+- `docs/ui/wireframes/TASK-354-public-careers-landing.md` + `docs/ui/flows/TASK-354-public-careers-landing-flow.md` (contrato de diseño)
+- `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (publication contract allowlist)
+- `DESIGN.md` + tokens AXIS + `src/config/efeonce-brand.ts` (marca **Efeonce**, no Greenhouse — careers es institucional/externo)
+- `docs/architecture/ui-platform/README.md` (primitives + patterns)
 
 Reglas obligatorias:
 
-- la landing pública es un lens del `HiringOpening`, no un módulo paralelo
-- no exponer score, owners internos, economics internos, risk ni notas privadas
-- el apply flow debe crear o reconciliar `Person`, `CandidateFacet` y `HiringApplication`
-- la primera iteración debe ser centralizada y de marca Efeonce, no multi-tenant por cliente
-- El endpoint público de apply debe ser deny-by-default: rate limit, validación estricta, consentimiento obligatorio, sanitización, almacenamiento privado y respuesta sin detalles internos.
-- Greenhouse ya tiene storage privado GCP para assets (`GREENHOUSE_PRIVATE_ASSETS_BUCKET`, `greenhouse_core.assets`, `/api/assets/private`). Hiring debe reutilizar esa capability y no crear buckets, helpers ni uploaders paralelos.
-- No usar uploads públicos directos de CV en V1 salvo que se extienda el asset pipeline existente con contextos Hiring, allowlist de MIME/tamaño, antivirus/scan o quarantine, y URLs no públicas.
-- El submit público no crea `member`, `user`, `assignment` ni `placement`.
-- El formulario público debe usar `React Hook Form` + schema `zod` compartido entre cliente y API; no duplicar validación a mano.
-- El route handler público debe delegar en un service de dominio idempotente; no persistir lógica de reconciliación directamente dentro del handler.
+- Consumir SOLO `PublicOpeningPayload` (allowlist); NUNCA leer columnas internas del opening.
+- El apply postea a `submitPublicHiringApplication` (TASK-1367); la UI NO reconcilia Person/facet/application en el cliente.
+- Copy 100% desde `src/lib/copy/careers.ts` (nuevo), es-CL tuteo neutro (validar con `greenhouse-ux-writing`); 0 literals en JSX.
+- Tokens `theme.palette.*`/`theme.axis.*` + variantes tipográficas; sin HEX/px/`fontSize` inline. Marca Efeonce (logo + eslogan institucional), no la app.
+- Confirmación + fallas **genéricas** (superficie pública hostil): nunca revelar dedupe/estado interno/existencia previa/PII.
+- WCAG 2.2 AA; `scrollWidth==clientWidth` en desktop + 390px; `prefers-reduced-motion`.
 
 ## Normative Docs
 
-- `project_context.md`
-- `Handoff.md`
-- `docs/research/RESEARCH-003-hiring-desk-reactive-ecosystem.md`
-- `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+- `docs/tasks/to-do/TASK-1367-careers-apply-intake-service.md` (el service que consume)
+- `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md`
+- `docs/tasks/TASK_UI_UX_ADDENDUM.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- `TASK-353`
-- `src/lib/storage/greenhouse-assets.ts`
-- `src/app/api/assets/private/route.ts`
-- `src/app`
-- `src/views/greenhouse`
+- `TASK-1367` (apply intake service — `submitPublicHiringApplication`, `POST /api/public/hiring/applications`)
+- `TASK-353` (`listPublicOpenings` / `getPublicOpeningByPublicId`, publication contract)
+- Shell/foundation UI compartida (`src/app`, `src/components/greenhouse`)
+- Product-design skills (info-architecture lead + state-design + forms-ux + greenhouse-ux-writing + modern-ui + a11y-architect)
 
 ### Blocks / Impacts
 
-- visibilidad externa del ATS
-- source attribution `public_careers`
-- futura analítica de conversión de careers
+- Visibilidad externa del ATS
+- Reusa el shell público para TASK-1363 (`/assessment/[token]`)
+- Analítica futura de conversión de careers
 
 ### Files owned
 
-- `src/app/[lang]/careers/**` o ruta pública equivalente definida en Discovery
-- `src/app/api/public/hiring/**`
+- `src/app/[lang]/careers/**` (rutas públicas)
 - `src/views/greenhouse/careers/**`
-- `src/components/greenhouse/careers/**`
-- `src/lib/hiring/public-careers/**`
-- `src/lib/hiring/public-careers/schema.ts`
-- `src/lib/hiring/public-careers/submit-application.ts`
-- `src/types/assets.ts` solo si se agregan contextos `hiring_application_draft` / `hiring_application`
-- `src/lib/storage/greenhouse-assets.ts` solo para registrar contextos Hiring sobre el bucket privado existente
-- `src/app/api/assets/private/route.ts` solo si el upload privado existente necesita aceptar el nuevo contexto Hiring
-- `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+- `src/components/greenhouse/careers/**` (VacancyCard, shell público reusable, apply form)
+- `src/lib/copy/careers.ts` (copy es-CL)
+- (consume, NO owns) `src/lib/hiring/publication.ts` (readers) + el endpoint de TASK-1367
 
 ## Current Repo State
 
 ### Already exists
 
-- App Router y foundation UI compartida en `src/app` y `src/components/greenhouse`
-- platform shared de assets/attachments:
-  - `src/lib/storage/greenhouse-assets.ts`
-  - `src/app/api/assets/private/route.ts`
-- patrones Vuexy/MUI ya estudiados para listados, tabs, drawers y kanban en `full-version`
+- App Router + foundation UI compartida (`src/app`, `src/components/greenhouse`), patrones Vuexy/MUI para listados/cards/forms.
+- Publication contract + readers públicos (TASK-353): `listPublicOpenings`, `getPublicOpeningByPublicId` → `PublicOpeningPayload`.
+- `react-hook-form`, `GreenhouseDatePicker`, `CustomTextField`, `CustomChip` como primitives disponibles.
+- `EfeonceSlogan` / marca Efeonce SSOT (`src/config/efeonce-brand.ts`).
 
 ### Gap
 
-- no existe ninguna surface pública de careers
-- no existe apply flow conectado al dominio `Hiring / ATS`
-- no existe source público canónico de postulaciones
+- No existe ninguna surface pública de careers (listing/detalle/apply).
+- No existe el shell público sin sesión reusable.
+- No existe `src/lib/copy/careers.ts`.
+
+## UI/UX Contract
+
+### Experience brief
+
+- **Rigor:** `ui-standard`.
+- Un candidato externo (sin sesión) descubre vacantes de Efeonce, lee una y postula en < 2 min. La experiencia transmite marca sólida + confianza de datos (consentimiento claro), sin fricción y sin filtrar nada interno. Marca **Efeonce** institucional.
+
+### Surface & system decision
+
+- 3 nodos: **N1 listing** (`/[lang]/careers`), **N2 detalle** (`/[lang]/careers/[publicId]`), **N3 apply** (sección/step). Ver master flow EPIC-011.
+- Shell público sin sesión **nuevo y reusable** (lo reusa 1363). Primitive lookup: Greenhouse primitive → Vuexy `Custom*` → MUI (no inventar).
+- No es `ui-platform` (no crea Design System nuevo), pero el shell público es reusable → documentarlo como patrón en `ui-platform/PATTERNS.md` al implementar.
+
+### State inventory
+
+Los 9 estados del wireframe: listing (loading/loaded/empty-zero/empty-filtered/error), detalle (detail/404), apply (idle/validando-inline/enviando/success-genérico/rate-limited/validation-error/server-error). `success` es terminal y genérico. Detalle en `docs/ui/wireframes/TASK-354-public-careers-landing.md` → State Copy.
+
+### Interaction contract
+
+- Buscar/filtrar client-side (debounced) sobre el payload; click card→detalle; "Postular"→form; submit idempotente (dedupe en el service) → mismo success en doble submit; consent obligatorio para habilitar submit; validación inline sin limpiar el form en error. Detalle en el Flow.
+
+### Motion & microinteractions
+
+- Motion trivial (reveal de cards, hover, estados de submit) — `UI impact: flow`, no `motion`. Todo detrás de `prefers-reduced-motion`. Sin motion no-trivial → sin doc de motion dedicado. Si al implementar emerge motion no-trivial, crear `docs/ui/motion/TASK-354-*.md` y declararlo.
+
+### Implementation mapping
+
+Ver la tabla completa en el wireframe (§Implementation Mapping): VacancyCard = Card outlined + `CustomChip`; filtros = `CustomTextField`(+select); apply = `react-hook-form` + `CustomTextField` + checkbox consent; readers `listPublicOpenings`/`getPublicOpeningByPublicId`; command `submitPublicHiringApplication` (1367). Tokens AXIS; copy `src/lib/copy/careers.ts`.
+
+### GVC scenario plan
+
+- `careers-listing` (loaded/empty-zero/empty-filtered/error), `careers-detail` (detalle/404), `careers-apply` (idle→validando→enviando→success→rate-limited).
+- GVC desktop 1440 + mobile 390 obligatorio (`ui-standard`); `scrollWidth==clientWidth`; consola limpia; reduced-motion; foco cross-surface correcto. Datos: opening publicado real sembrado en staging.
+
+### Design decision log
+
+- Marca Efeonce (no Greenhouse); links-only V1 (upload = 1362); confirmación genérica terminal; shell público reusable (DDL-2 master); filtrado client-side V1; locale-aware `hreflang`-ready. Detalle en wireframe + flow.
+
+### Visual verification
+
+- `pnpm fe:capture` en loop hasta enterprise (desktop+mobile), frames mirados. `pnpm ui:wireframe-check --task TASK-354` + `pnpm ui:flow-check --task TASK-354` verdes. 2 gates Figma si se toca token/primitive.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -144,78 +169,71 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Public vacancies listing and detail
+### Slice 1 — Shell público + listing (N1)
 
-- Materializar listing público de vacantes
-- Materializar detail público por opening publicado
-- Incluir filtros y discovery básicos según el payload público ya definido en `TASK-353`
+- Shell público sin sesión reusable (header/footer Efeonce) + ruta `/[lang]/careers`.
+- Listing de openings publicados (`listPublicOpenings`) con VacancyCard + filtros client-side (búsqueda/área/modalidad).
+- Estados: loading (skeletons), empty-zero, empty-filtered, error. Copy `src/lib/copy/careers.ts`.
 
-### Slice 2 — Public apply flow
+### Slice 2 — Detalle (N2)
 
-- Crear formulario de postulación pública
-- Construir el form con `React Hook Form` y componentes MUI/Vuexy existentes.
-- Definir un schema `zod` compartido para campos, normalización y mensajes de error seguros.
-- Permitir links/portfolio y metadata básica de disponibilidad desde V1.
-- No habilitar upload directo de CV por defecto; si se habilita, debe usar la capability privada existente (`greenhouse_core.assets` + bucket GCP privado), límites de tamaño/MIME, quarantine/scan o compensating control documentado.
-- Reconciliar submit contra `Person`, `CandidateFacet` y `HiringApplication`
-- Persistir consentimiento explícito, source attribution `public_careers`, retention policy y versión de copy/legal aceptada.
-- Responder al postulante con un mensaje genérico y seguro, sin revelar dedupe, scores, estado interno ni existencia previa de la persona.
-- Usar idempotency key o dedupe determinístico por `openingId + normalizedEmail + window` para evitar aplicaciones duplicadas por retry/doble submit.
-- Mantener scoring, emails, revisión y handoff fuera del submit síncrono; esos efectos deben salir por eventos/jobs posteriores.
+- Ruta `/[lang]/careers/[publicId]` con detalle desde `getPublicOpeningByPublicId` (allowlist). Estado 404 para opening no publicado. CTA "Postular".
 
-### Slice 3 — Guardrails mínimos
+### Slice 3 — Apply form (N3)
 
-- Agregar consentimiento explícito
-- Agregar protección mínima anti-spam/rate limiting según la capacidad real del repo
-- Confirmar que los assets subidos por postulantes no queden expuestos públicamente
-- Si se aceptan CV/portfolio como archivo, agregar contextos `hiring_application_draft` y `hiring_application` al registry de assets existente, con retention class dedicada o `document_vault` si se justifica.
-- Confirmar que `canTenantAccessAsset` o el reader interno equivalente solo permite lectura a usuarios con capability Hiring explícita.
-- Sanitizar texto libre y URLs antes de persistir o mostrar internamente.
-- Registrar eventos/audit trail mínimos para submit, dedupe y rechazo por abuso sin guardar payload sensible innecesario.
-- Usar `captureWithDomain(err, 'hiring')` o patrón equivalente de observabilidad y devolver errores públicos genéricos.
+- Form `react-hook-form` (nombre/apellido/email/teléfono/portafolio-link/LinkedIn-link/disponibilidad/mensaje/consent) que postea a `submitPublicHiringApplication` (1367).
+- Estados: idle/validando-inline/enviando/success-genérico/rate-limited/error. Confirmación genérica. a11y del form (labels reales, consent accesible, error anunciado).
 
-### Slice 3.5 — Public submit API contract
+### Slice 4 — GVC + verificación visual
 
-- Endpoint recomendado: `POST /api/public/hiring/applications`.
-- El route handler debe:
-  - parsear `request.json()` o `multipart/form-data` según el alcance real de assets
-  - validar con el schema `zod` compartido
-  - aplicar rate limit y anti-abuse antes de persistir
-  - llamar `submitPublicHiringApplication()`
-  - responder `202` o `201` con payload genérico sin IDs internos sensibles
-- El service `submitPublicHiringApplication()` debe ejecutar la transacción de reconciliación y persistencia.
-- El service debe ser idempotente y seguro ante retries.
-
-### Slice 4 — Public privacy/read model
-
-- Consumir solo el publication contract allowlist de `TASK-353`.
-- Verificar que listing/detail nunca renderizan campos internos de `TalentDemand` ni `HiringOpening`.
-- Definir copy pública clara sobre tratamiento de datos, tiempos esperados y contacto.
+- Scenarios GVC (listing/detalle/apply) desktop+mobile; loop hasta enterprise; `scrollWidth==clientWidth`; consola limpia. Registrar el shell público como patrón en `ui-platform/PATTERNS.md`.
 
 ## Out of Scope
 
-- desk interno del ATS
-- publicación/aprobación interna de openings
-- micrositios por tenant o por cliente
-- scorecards de evaluación
-- email nurturing o marketing automation
+- El apply intake service (backend) — TASK-1367.
+- Upload de archivo CV — TASK-1362 (V1 links-only).
+- Assessment (envío/rendición) — TASK-1363; el apply no dispara el test.
+- Desk interno — TASK-355.
 
 ## Detailed Spec
 
-La UX pública debe priorizar:
+Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño; no freehand). La UI es cliente delgado: readers de 353 + command de 1367. El shell público se diseña reusable para 1363. Copy productivo en `src/lib/copy/careers.ts` (es-CL). Marca Efeonce vía SSOT.
 
-- claridad del opening
-- discovery simple
-- apply flow corto pero suficiente
-- copy humana y sin jerga interna
+## Rollout Plan & Risk Matrix
 
-La task debe verificar explícitamente:
+### Slice ordering hard rule
 
-- qué rutas públicas del `App Router` se usarán
-- cómo se protegerá el endpoint de apply
-- cómo se almacenará y autorizará el CV/portfolio usando la capability shared de assets ya existente en GCP
-- cómo se comparte el schema `zod` entre form, route y tests
-- cómo se implementa idempotencia del submit público
+- Slice 1 (shell+listing) → Slice 2 (detalle) → Slice 3 (apply) → Slice 4 (GVC). El apply (Slice 3) requiere que TASK-1367 esté shippeado (blocked by).
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Fuga de estado interno en la UI | privacy | medium | Consumir solo `PublicOpeningPayload`; confirmación genérica; test anti-leak | revisión de payloads/GVC |
+| Overflow horizontal mobile | UI | medium | `scrollWidth==clientWidth` en GVC 390px; contención | GVC frame |
+| Copy hardcodeado / marca equivocada | UI/brand | low | Copy en `careers.ts` + marca Efeonce SSOT; lint `no-untokenized-copy` | lint/GVC |
+| Form inaccesible (consent/labels) | a11y | medium | Labels reales + consent accesible + axe; error anunciado | axe/GVC |
+
+### Feature flags / cutover
+
+- Sin flag propio de UI (la exposición pública del endpoint la gobierna TASK-1367). La ruta careers puede quedar noindex hasta sign-off de contenido/legal si se decide. Additive; revert por PR.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1-4 | revert PR (rutas/vistas additive) | <10 min | si |
+
+### Production verification sequence
+
+1. Deploy staging + sembrar un opening publicado real (via 355/353).
+2. GVC careers-listing/detail/apply desktop+mobile mirados; `scrollWidth==clientWidth`; consola limpia.
+3. Postular de punta a punta contra staging → verificar application creada (por el service 1367) + confirmación genérica.
+4. Repetir en prod vía release pipeline.
+
+### Out-of-band coordination required
+
+- Contenido/legal del aviso de privacidad + versión de copy/consent (coordinar con 1367 que lo persiste).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -223,42 +241,42 @@ La task debe verificar explícitamente:
 
 ## Acceptance Criteria
 
-- [ ] Existe una landing pública de vacantes con listing y detail conectados al publication contract real del opening
-- [ ] Existe un apply flow público que crea o reconcilia `Person`, `CandidateFacet` y `HiringApplication`
-- [ ] La surface pública no expone metadata interna del ATS y aplica guardrails mínimos de consentimiento/abuso
-- [ ] El apply flow no habilita upload público inseguro ni expone storage público de CV/portfolio
-- [ ] Cualquier CV/portfolio como archivo reutiliza `GREENHOUSE_PRIVATE_ASSETS_BUCKET` + `greenhouse_core.assets` y no crea storage paralelo
-- [ ] El endpoint público aplica rate limiting, validación estricta y respuesta segura sin leaks de dedupe/estado interno
-- [ ] El form usa `React Hook Form` + schema `zod` compartido con la API
-- [ ] El submit público es idempotente y delega en service de dominio, no en lógica inline del route handler
-- [ ] Scoring, emails, revisión y handoff no bloquean el submit público
+- [ ] Listing/detalle consumen SOLO `PublicOpeningPayload`; 0 columnas internas.
+- [ ] Apply postea a `submitPublicHiringApplication` (1367); 0 reconciliación en cliente.
+- [ ] Los 9 estados del State Copy existen (incluye vacío, 404, rate-limited, validación, error genérico).
+- [ ] Confirmación + fallas genéricas (no filtran dedupe/estado/PII).
+- [ ] Copy 100% desde `src/lib/copy/careers.ts` es-CL; 0 literals; marca Efeonce (no Greenhouse).
+- [ ] a11y WCAG 2.2 AA (labels reales, consent accesible, focus cross-surface, reflow 320/200%, reduced-motion).
+- [ ] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia.
+- [ ] Shell público documentado como patrón reusable (para 1363).
+- [ ] `UI ready: yes` solo cuando lo anterior + `pnpm task:lint --task TASK-354` sin findings.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test`
-- Validación manual del flujo público end-to-end: listing -> detail -> apply
-- Test unitario del schema `zod` para inputs válidos, inválidos, URLs sospechosas y consentimiento faltante
-- Test unitario del service para idempotencia por retry/doble submit
-- Prueba negativa: payload malicioso/spam/rate limit no crea application válida ni filtra errores internos
-- Prueba negativa: opening no publicado no aparece en listing/detail público
-- Prueba negativa: asset privado de una postulación no se descarga sin sesión/capability interna autorizada
+- `pnpm ui:wireframe-check --task TASK-354`
+- `pnpm ui:flow-check --task TASK-354`
+- `pnpm local:check:ui`
+- `pnpm fe:capture` (GVC desktop+mobile, frames mirados)
+- `pnpm task:lint --task TASK-354`
 
 ## Closing Protocol
 
-- [ ] Verificar con browser que la landing pública no renderiza fields internos del opening
-- [ ] Dejar en `Handoff.md` cualquier decisión sobre captcha/rate limiting o upload público que condicione la siguiente iteración
+- [ ] `Lifecycle` sincronizado
+- [ ] archivo en la carpeta correcta
+- [ ] `docs/tasks/README.md` sincronizado
+- [ ] `Handoff.md` + `changelog.md` actualizados
+- [ ] `## Delta` en el master flow si cambia un nodo/regla
+- [ ] doc funcional (`docs/documentation/`) + manual (`docs/manual-de-uso/`) si aplica
+- [ ] `ui-platform/PATTERNS.md` con el shell público reusable
 
 ## Follow-ups
 
-- analytics de conversión de careers
-- follow-on de branded pages por practice o cliente si el negocio realmente lo pide
+- `TASK-1362` doc capture → upload de CV como archivo (V2 del apply).
+- `TASK-1363` reusa el shell público para `/assessment/[token]`.
+- Endpoint de búsqueda dedicado si crece el volumen de vacantes.
+- "Avísame de nuevas vacantes" (talent pool) como follow-up de engagement.
 
-## Resolved Open Questions
+## Open Questions
 
-- V1 usa links/portfolio como default y no requiere upload directo de CV.
-- Upload directo de CV solo se permite si el slice extiende la plataforma privada existente (`GREENHOUSE_PRIVATE_ASSETS_BUCKET`, `greenhouse_core.assets`, `/api/assets/private`) con contextos Hiring, allowlist de MIME/tamaño, quarantine/scan o compensating control explícito, y autorización interna para lectura posterior.
-- La landing pública es centralizada Efeonce/Greenhouse. Branding por cliente/practice queda fuera de V1.
-- El form V1 usa `React Hook Form` + `zod` compartido. Esto es la opción canónica porque ya existe en dependencias del repo, permite validación cliente/servidor consistente y evita validación duplicada.
-- El submit público es idempotente y delega en `src/lib/hiring/public-careers/submit-application.ts`. El route handler solo orquesta validación, anti-abuse, llamada al service y respuesta segura.
+- ¿La ruta careers arranca noindex hasta sign-off de contenido/legal, o indexable desde V1? Decidir con el operador.
+- ¿Filtros de discovery V1 = área + modalidad, o algo más? Confirmar contra el payload real de `PublicOpeningPayload`.
