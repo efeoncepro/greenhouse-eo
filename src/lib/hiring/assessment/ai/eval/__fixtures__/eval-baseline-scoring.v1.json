@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "version": "v1",
+    "status": "curado tipo-SME (TASK-1360/1361 no tiene data graded productiva aún — se amplía con casos reales anonimizados post-uso)",
+    "scale": "0-100",
+    "purpose": "eval baseline: mide correlación IA↔referencia humana antes de habilitar el flag (Runtime Rollout Completion Gate)",
+    "toleranceBand": 15
+  },
+  "cases": [
+    {
+      "id": "leadership-strong",
+      "competencyKey": "leadership",
+      "competencyName": "Liderazgo",
+      "level": "intermedio",
+      "questionPrompt": "Un miembro de tu equipo entrega tarde de forma recurrente y afecta al cliente. ¿Cómo lo manejas?",
+      "rubric": { "criteria": ["conversación directa 1:1", "diagnóstico de causa raíz", "plan con seguimiento", "escalamiento responsable"] },
+      "candidateAnswer": "Primero tendría una conversación 1:1 para entender qué está pasando (carga, bloqueos, claridad de expectativas). Acordaríamos un plan concreto con fechas y checkpoints, y le daría apoyo si el problema es de capacidad. Si tras el seguimiento no mejora, escalo con evidencia a mi líder y documento el impacto al cliente.",
+      "humanReferenceScore": 88
+    },
+    {
+      "id": "leadership-weak",
+      "competencyKey": "leadership",
+      "competencyName": "Liderazgo",
+      "level": "intermedio",
+      "questionPrompt": "Un miembro de tu equipo entrega tarde de forma recurrente y afecta al cliente. ¿Cómo lo manejas?",
+      "rubric": { "criteria": ["conversación directa 1:1", "diagnóstico de causa raíz", "plan con seguimiento", "escalamiento responsable"] },
+      "candidateAnswer": "Le diría que se ponga las pilas y que si sigue así va a tener problemas.",
+      "humanReferenceScore": 25
+    },
+    {
+      "id": "copywriting-strong",
+      "competencyKey": "copywriting",
+      "competencyName": "Copywriting",
+      "level": "intermedio",
+      "questionPrompt": "Reescribe este mensaje para que sea claro y accionable: 'Le informamos que su solicitud fue procesada.'",
+      "rubric": { "criteria": ["claridad", "tono cercano", "próxima acción explícita"] },
+      "candidateAnswer": "¡Listo! Procesamos tu solicitud. El siguiente paso es revisar tu correo: te enviamos el detalle y el enlace para confirmar. Si algo no cuadra, respóndenos y lo resolvemos.",
+      "humanReferenceScore": 85
+    },
+    {
+      "id": "copywriting-mid",
+      "competencyKey": "copywriting",
+      "competencyName": "Copywriting",
+      "level": "intermedio",
+      "questionPrompt": "Reescribe este mensaje para que sea claro y accionable: 'Le informamos que su solicitud fue procesada.'",
+      "rubric": { "criteria": ["claridad", "tono cercano", "próxima acción explícita"] },
+      "candidateAnswer": "Tu solicitud fue procesada correctamente. Gracias por tu preferencia.",
+      "humanReferenceScore": 50
+    },
+    {
+      "id": "client-comm-strong",
+      "competencyKey": "client_relationship_comm",
+      "competencyName": "Relación con cliente y comunicación",
+      "level": "intermedio",
+      "questionPrompt": "El cliente está molesto porque una campaña no rindió como esperaba. Escribe cómo abrirías la conversación.",
+      "rubric": { "criteria": ["reconoce la molestia", "datos sin excusas", "propuesta concreta", "mantiene la relación"] },
+      "candidateAnswer": "Entiendo tu frustración y la comparto: no llegamos a la meta de esta campaña. Te traje el desglose de qué funcionó y qué no, y una propuesta de ajuste para el próximo ciclo con dos escenarios. Quiero que salgamos de esta reunión con un plan claro; ¿lo revisamos juntos?",
+      "humanReferenceScore": 90
+    },
+    {
+      "id": "client-comm-weak",
+      "competencyKey": "client_relationship_comm",
+      "competencyName": "Relación con cliente y comunicación",
+      "level": "intermedio",
+      "questionPrompt": "El cliente está molesto porque una campaña no rindió como esperaba. Escribe cómo abrirías la conversación.",
+      "rubric": { "criteria": ["reconoce la molestia", "datos sin excusas", "propuesta concreta", "mantiene la relación"] },
+      "candidateAnswer": "La verdad el mercado estuvo difícil y el algoritmo cambió, no fue culpa nuestra.",
+      "humanReferenceScore": 20
+    }
+  ]
+}
