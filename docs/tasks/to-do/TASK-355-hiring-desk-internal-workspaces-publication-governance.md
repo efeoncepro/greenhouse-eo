@@ -202,7 +202,7 @@ Ver wireframe §Implementation Mapping: shell=`CompositionShell`; Demand=tabla (
 - `hiring_application.decision`/`decision_at`/`decision_by`/`selected_destination`/`tentative_start_date`/`expected_legal_entity`/`expected_context`/`prerequisites_snapshot_json` (existen). Reason estructurado: `[verificar]` si hay columna o se usa `explainability_json`/nueva columna additive.
 - Invariantes: decisión NUNCA auto (siempre humano); state-machine de decisión (¿re-decidir? supersede/append audit); el scorecard es advisory, no gate; PII masked/reveal con capability+reason+audit.
 - Idempotency/concurrency: decide idempotente por `application_id` + estado; audit/outbox en la misma tx.
-- Audit/outbox: evento `hiring.application.decided` `[verificar en EVENT_CATALOG]`.
+- Audit/outbox: evento **`hiring.application.decided` v1** (NO existe hoy — hoy 353 solo emite `hiring.application.stage_changed`). Es el **seam con TASK-356**: lo registra 356 en `event-catalog.ts` (dueño del dominio reactivo de handoff), lo **emite** este command (355) en la misma tx vía `publishOutboxEvent(event, client)`; 356 lo consume para materializar el `HiringHandoff`. El consumer de 356 shippea dormido hasta que 355 emita → sin hard-dependency de runtime. Disparar el handoff SOLO con `hiring.application.decided`, nunca con `stage_changed`.
 
 ### Migration, backfill and rollout
 
