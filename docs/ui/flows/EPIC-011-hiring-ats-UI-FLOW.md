@@ -34,7 +34,7 @@ talent_demand ──▶ hiring_opening ──(publish)──▶ [público] ─�
 | **Candidato** (público, sin sesión) | Careers pública | público (sin auth) | Ve vacantes, postula, rinde el test tokenizado | 354 · 1363 (taking) |
 | **Reclutador / Hiring manager** (interno) | Hiring desk | `internal` | Publica vacante, revisa postulantes, asigna test, corrige/confirma puntaje, decide | 355 · 1363 (review) · 356 |
 | **SME** (interno) | Desk (banco de preguntas) | `internal` | Aprueba preguntas del banco (gate `draft→active`) incl. borradores IA | 355 · 1361 |
-| **People Ops / HRIS** (interno) | Activación | `internal` | Convierte el hire en colaborador activo | 770 |
+| **People Ops / HRIS** (interno) | Activación lane ("Contrataciones listas") | `internal` | Convierte el hire en colaborador activo (UI = 1368, cliente delgado del bridge backend 770) | 1368 / 770 |
 | **Nexa** (agente) | Conversational | — | Opera los mismos commands por parity (propose→confirm) | transversal |
 
 ## Flow map cross-surface (el journey completo)

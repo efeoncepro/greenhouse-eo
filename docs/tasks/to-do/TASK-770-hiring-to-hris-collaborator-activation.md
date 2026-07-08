@@ -1,14 +1,31 @@
-# TASK-770 — Hiring to HRIS Collaborator Activation
+# TASK-770 — Hiring to HRIS Collaborator Activation (backend-data)
+
+## Delta 2026-07-08 (v2) — Revisión 3-lentes + split UI + reframe "bridge, no subsistema"
+
+Revisada con `arch-architect` (dominante — toca creación de `member`/identity, la superficie del incidente 2026-06-01) + `greenhouse-talent-people-operator` + product-design. Hechos verificados contra el repo real. **Reframe central: 770 es un BRIDGE que reusa la maquinaria de activación workforce existente, NO un subsistema nuevo.** Ajustes:
+
+- **SPLIT (decisión operador 2026-07-08):** 770 queda **backend-data (backend-critical)** = el bridge de activación (contrato + creación/promoción de member + onboarding + API + eventos + cola-consumer + señal). La **activation lane UI** (viejo Slice 5) se mueve a **TASK-1368** (ui-ux, blocked by 770, alineada al mockup aprobado de TASK-763). Patrón 354(UI)/1367(backend).
+- **REUSAR, no reconstruir** (todo esto ya existe):
+  - Readiness: **`resolveWorkforceActivationReadiness`** (`src/lib/workforce/activation/readiness.ts`) + `isWorkforceActivationReadinessGuardEnabled()` + 409 `activation_readiness_blocked` + override cap `workforce.member.activation_readiness.override`. NO inventar un readiness schema paralelo (viejo Slice 1).
+  - Intake/activación: **`completeWorkforceMemberIntake`** (`src/lib/workforce/intake/complete-intake.ts`, `pending_intake→completed`, cap `workforce.member.complete_intake`, `FOR UPDATE`) — **ya abre el onboarding case** (`ensureActivatedOnboardingCaseForMember`).
+  - Onboarding = **DOS subsistemas, no confundir:** (A) HR checklist templates/instances `createOnboardingInstance` (`src/lib/hr-onboarding/store.ts`, TASK-030 complete) + `ensureOnboardingChecklistForMemberEvent`; (B) work-relationship onboarding **case** `ensureActivatedOnboardingCaseForMember` (`src/lib/workforce/onboarding/store.ts`), que es el que dispara la activación. Usar (B) para el case de activación; (A) para el checklist.
+  - Legal readiness: **`assessPersonLegalReadiness({useCase:'document_render_onboarding_contract'})`** (TASK-784) para el tramo legal, NO reimplementar.
+- **Creación de member — el corazón crítico (2 hallazgos duros):**
+  1. Existe el primitive atómico `provisionInternalCollaboratorFromScim` (`src/lib/scim/provisioning-internal-collaborator.ts:507`) con cascade D-2 (profile_id→azure_oid→email→INSERT) anti-duplicación, **pero es SCIM-shaped (exige `externalId`/Entra) y nace el member `active=TRUE, workforce_intake_status='pending_intake'`.** Un hire de careers **no tiene Azure** y **no debe nacer activo**. → 770 necesita un **core source-neutral** (extraído del primitive o hermano) que cree el member sobre el mismo `identity_profile_id`, **no activo**, en `pending_intake`, y **discoverable por la cascade D-2** (para que si luego llega Entra, el SCIM lo enlace por profile_id sin duplicar — el dominio del incidente 2026-06-01).
+  2. **`members.active` y `members.status` son columnas GENERATED** → **NUNCA** `UPDATE members SET active=true`. La activación se maneja por las columnas fuente / el path `completeWorkforceMemberIntake`, no por escritura directa.
+- **Capabilities — no proliferar.** Las 5 `hr.hiring_activation.*` propuestas duplican `workforce.member.*` existentes. **Reusar** `workforce.member.complete_intake`, `workforce.member.activation_readiness.read/override`, `hr.onboarding_instance`. Agregar como MUCHO **1** cap nueva para el triage de la cola (`hiring.activation.review`) + grant mismo PR (coverage TASK-873).
+- **Home canónico = `src/lib/workforce/**`** (donde vive intake/activation), NO `src/lib/hr-core/hiring-activation/**` (hr-core = leave/attendance/departments). Más `src/lib/hiring/handoff/**` solo para reader/mark-completed.
+- **Señal deconflictada con 356:** 356 owns `hiring.internal_hire_awaiting_onboarding` (aprobado SIN member). La de 770 (member creado pero intake atascado en `pending_intake`/`in_review`) va en namespace **`workforce.*`** (módulo que ya existe; prior art `identity.workforce.unlinked_internal_user` / `workforce.scim_members_pending_profile_completion`). NO reusar la señal de hiring.
+- **Eventos:** el lifecycle ya emite `member.created`, `workforce.member.intake_completed`, `work_relationship_onboarding_case.*`, `hr.onboarding.instance_created`. 770 NO duplica esos; agrega solo los eventos-puente que falten (`hiring.activation.linked` / `hiring.activation.completed`).
 
 ## Delta 2026-07-08
 
-- **Blockers recalibrados:** `TASK-353` y `TASK-030` ya están **complete** (viven en `docs/tasks/complete/`). El **único blocker vivo es `TASK-356`** (handoff). Las rutas en `Depends on`/`Normative Docs`/`Already exists` que apuntan a `to-do/TASK-353-…`, `to-do/TASK-030-…`, `to-do/TASK-763-…` están **stale** → los tres viven en `complete/`.
-- **Foundation real disponible:** `greenhouse_hiring` + `hiring_application` (con snapshot de handoff embebido) existen; `candidate_facet.identity_profile_id` es la raíz (candidato→member sobre el MISMO `identity_profile_id`, sin duplicar persona).
-- **Co-ownership con TASK-356 — resolver antes de tomar en paralelo:** ambas tocan `src/lib/hiring/handoff/**` + `src/lib/person-360/**`, y la **cola `internal_hire_ready_for_onboarding`** aparece en el Slice 3.5 de 356 (que la produce) y en 770 (que la consume). **Decisión canónica:** **TASK-356 es dueña del contrato de la cola** (la produce como read-model/outbox); **TASK-770 la consume**, no la redefine. 770 solo owns el lado HRIS/People (crear/promover `member` + onboarding + readiness).
+- **Blockers recalibrados:** `TASK-353` y `TASK-030` ya están **complete**. El **único blocker vivo es `TASK-356`** (produce la cola/contrato `internal_hire_ready_for_onboarding`). Rutas stale a `to-do/TASK-353`, `to-do/TASK-030`, `to-do/TASK-763` → los tres viven en `complete/`.
+- **Foundation real disponible:** `greenhouse_hiring` + `hiring_application` (snapshot de handoff embebido); `candidate_facet.identity_profile_id` es la raíz.
+- **Co-ownership con TASK-356:** **356 es dueña del contrato de la cola** `internal_hire_ready_for_onboarding` (la produce como read-model); **770 la consume**, no la redefine.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
-     "Que task es y puedo tomarla?"
-     Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
@@ -18,36 +35,37 @@
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- UI ready: `n/a`
+- Backend impact: `command`
 - Epic: `EPIC-011`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-353`, `TASK-356`, `TASK-030`
+- Blocked by: `TASK-356`
 - Branch: `task/TASK-770-hiring-to-hris-collaborator-activation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Cierra el loop operacional de Hiring: toma un `HiringHandoff` `internal_hire` aprobado, permite a HRIS/People crear o promover la faceta `member` sobre el mismo `identity_profile_id`, abre onboarding y activa al colaborador solo cuando los checks de readiness quedan completos.
+Cierra el loop operacional de Hiring como **bridge backend-data**: consume la cola `internal_hire_ready_for_onboarding` (TASK-356), crea/promueve la faceta `member` sobre el mismo `identity_profile_id` (source-neutral, no activa, `pending_intake`) **reusando la maquinaria workforce existente** (readiness + intake completion + onboarding case), y marca el `HiringHandoff` `completed` con referencias downstream reales. La **UI** de la lane vive en **TASK-1368**.
 
 ## Why This Task Exists
 
-`TASK-356` deja el handoff explícito y auditable, pero no debe activar colaboradores por sí sola. Sin esta task, el programa Hiring/ATS queda incompleto: una application puede quedar `selected` y el handoff puede quedar aprobado, pero no existe un carril robusto, seguro e idempotente para convertir esa selección en colaborador activo sin duplicar persona, saltarse onboarding o crear payroll/access truth demasiado temprano.
+`TASK-356` deja el handoff explícito y auditable pero NO activa colaboradores. Sin 770, una application puede quedar `selected` y el handoff `approved`, pero no existe un carril robusto/idempotente/seguro para convertir esa selección en colaborador sin duplicar persona, saltarse onboarding o crear payroll/access truth demasiado temprano. 770 es el **puente gobernado** entre el handoff y la maquinaria de activación workforce que ya existe.
 
 ## Goal
 
-- Crear el bridge HRIS/People que consume handoffs `internal_hire` aprobados.
-- Crear/promover `member` sobre el mismo `identity_profile_id` sin duplicar identidad.
-- Abrir onboarding desde el runtime HRIS existente.
-- Activar colaborador solo después de readiness: datos legales, fecha de ingreso, manager, contrato, acceso y payroll readiness mínimo.
-- Dejar trazabilidad completa entre `HiringApplication`, `HiringHandoff`, `member` y onboarding.
+- Consumir handoffs `internal_hire` aprobados (cola de 356).
+- Crear/promover `member` sobre el mismo `identity_profile_id` (source-neutral, no activo, `pending_intake`) sin duplicar identidad, discoverable por la cascade D-2 del SCIM.
+- Enganchar la maquinaria workforce existente (readiness + intake completion + onboarding case), NO reconstruirla.
+- Activar colaborador solo cuando readiness queda completo (vía el path existente), nunca por escritura directa a `members.active` (columna GENERATED).
+- Dejar trazabilidad completa `HiringApplication ↔ HiringHandoff ↔ member ↔ onboarding`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
-     "Que necesito entender antes de planificar?"
-     El agente lee cada doc referenciado aqui. Si un doc no
-     existe en el repo, reporta antes de continuar.
      ═══════════════════════════════════════════════════════════ -->
 
 ## Architecture Alignment
@@ -61,50 +79,54 @@ Revisar y respetar:
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
 - `docs/architecture/GREENHOUSE_WORKFORCE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` (**SCIM Internal Collaborator Provisioning invariants, TASK-872** — el contrato de creación de member que 770 debe honrar)
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
 
 Reglas obligatorias:
 
 - Hiring selecciona y entrega; HRIS/People convierte en colaborador.
-- No crear una segunda persona. La creación/promoción de `member` debe usar el mismo `identity_profile_id` del `CandidateFacet`/`HiringApplication`.
-- No activar `member.active = true` como efecto automático de `application.selected`.
-- No crear payroll truth, compensación definitiva ni accesos productivos desde Hiring.
-- La conversión debe ser idempotente: reintentos no duplican `member`, onboarding, relaciones legales ni eventos.
-- La conversión debe fallar cerrado ante identidad ambigua, `member` activo incompatible, legal entity faltante, fecha de ingreso inválida, contrato incompleto o readiness bloqueada.
-- Onboarding es un paso obligatorio entre selección y colaborador activo, salvo excepción explícita y auditada.
-- El estado `active` del colaborador es ownership HRIS/People, no Hiring.
+- **No crear una segunda persona.** El `member` se crea/promueve sobre el mismo `identity_profile_id` del `CandidateFacet`/`HiringApplication`, y **discoverable por la cascade D-2** del SCIM (para no duplicar cuando llegue Entra).
+- **No `UPDATE members SET active=true`** (columna GENERATED). La activación pasa por `completeWorkforceMemberIntake` / las columnas fuente.
+- **REUSAR** `resolveWorkforceActivationReadiness`, `completeWorkforceMemberIntake`, `ensureActivatedOnboardingCaseForMember`, `createOnboardingInstance`, `assessPersonLegalReadiness`. NO reimplementar readiness/onboarding.
+- No crear payroll truth, compensación definitiva ni accesos productivos desde Hiring. El member nace `pending_intake` → excluido del payroll gate por construcción.
+- Idempotente: reintentos no duplican `member`, onboarding, relaciones ni eventos.
+- Falla cerrado ante identidad ambigua, `member` activo incompatible (`MemberIdentityDriftError`), legal entity faltante, fecha inválida, contrato incompleto o readiness bloqueada.
+- Onboarding es paso obligatorio entre selección y activo, salvo excepción explícita y auditada.
+- El estado `active` es ownership HRIS/People (vía el path existente), no Hiring.
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-030-hris-onboarding-offboarding.md`
-- `docs/tasks/to-do/TASK-353-hiring-ats-domain-foundation.md`
+- `docs/tasks/complete/TASK-030-hris-onboarding-offboarding.md`
+- `docs/tasks/complete/TASK-353-hiring-ats-domain-foundation.md`
 - `docs/tasks/to-do/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md`
-- `docs/tasks/to-do/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption.md`
+- `docs/tasks/complete/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption.md` (mockup aprobado que guía la UI — implementada en TASK-1368)
+- `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- `TASK-353` para foundation de `HiringApplication`, `CandidateFacet` y schema `greenhouse_hiring`.
-- `TASK-356` para `HiringHandoff` aprobado y eventos/señales `hiring.*`.
-- `TASK-030` para runtime de onboarding/templates/instances.
-- `greenhouse_core.identity_profiles` como raíz humana canónica.
-- `greenhouse_core.members` como faceta operativa de colaborador.
+- `TASK-356` para `HiringHandoff` aprobado + la cola `internal_hire_ready_for_onboarding` (contrato).
+- Maquinaria workforce existente: `src/lib/workforce/activation/readiness.ts`, `src/lib/workforce/intake/complete-intake.ts`, `src/lib/workforce/onboarding/store.ts`.
+- `src/lib/hr-onboarding/store.ts` (`createOnboardingInstance`, TASK-030).
+- `src/lib/scim/provisioning-internal-collaborator.ts` (cascade D-2 / core de member a extraer/reusar).
+- `src/lib/person-legal-profile/` (`assessPersonLegalReadiness`).
+- `greenhouse_core.identity_profiles` (raíz humana) + `greenhouse_core.members` (faceta operativa).
 
 ### Blocks / Impacts
 
-- Completa el programa Hiring/ATS end-to-end para casos `internal_hire`.
-- Impacta `People`, `HRIS`, `Lifecycle / Onboarding`, `Person 360`, Identity/Access y Payroll readiness.
-- Desbloquea que `TASK-763` muestre lifecycle real desde seleccionado hasta onboarding/activo.
+- **`TASK-1368`** (ui-ux): la activation lane UI que consume los readers/commands de 770.
+- Completa el programa Hiring/ATS end-to-end para `internal_hire`.
+- Impacta People, HRIS, Lifecycle/Onboarding, Person 360, Identity/Access y payroll readiness (indirecto).
 
 ### Files owned
 
-- `migrations/<ts>_task-770-hiring-to-hris-collaborator-activation.sql`
-- `src/lib/hr-core/hiring-activation/**`
-- `src/app/api/hr/hiring-activation/**`
+- `migrations/<ts>_task-770-hiring-to-hris-collaborator-activation.sql` (mapping table de activation-request, additive)
+- `src/lib/workforce/hiring-activation/**` (bridge: consumer de cola + service de activación)
+- `src/lib/scim/**` solo para extraer el core source-neutral de creación de member (si se refactoriza el primitive)
+- `src/app/api/hr/hiring-activation/**` (API interna)
 - `src/lib/hiring/handoff/**` solo para readers/mark-completed del handoff
 - `src/lib/person-360/**` solo para readers derivados del journey
-- `src/views/greenhouse/hr-onboarding/**` solo si se agrega cola/CTA de activación
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
@@ -113,228 +135,236 @@ Reglas obligatorias:
 
 ## Current Repo State
 
-### Already exists
+### Already exists (verificado 2026-07-08)
 
-- Hiring/ATS architecture and task program:
-  - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
-  - `docs/tasks/to-do/TASK-352-hiring-ats-canonical-program.md`
-  - `docs/tasks/to-do/TASK-353-hiring-ats-domain-foundation.md`
-  - `docs/tasks/to-do/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md`
-- Person identity contract:
-  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
-- HRIS onboarding architecture/task:
-  - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
-  - `docs/tasks/to-do/TASK-030-hris-onboarding-offboarding.md`
-- Runtime foundations:
-  - `src/lib/hr-core/service.ts`
-  - `src/types/hr-core.ts`
-  - `greenhouse_core.members`
+- **Creación de member atómica:** `provisionInternalCollaboratorFromScim` (`src/lib/scim/provisioning-internal-collaborator.ts:507`) — `withTransaction`, cascade D-2, `MemberIdentityDriftError` (no auto-merge), member nace `active=TRUE, workforce_intake_status='pending_intake'` (SCIM-shaped).
+- **Schema `members`:** `workforce_intake_status` CHECK `('pending_intake','in_review','completed')`; `active`/`status` **GENERATED**; `azure_oid` nullable (member puede existir sin Azure); `identity_profile_id`, `hire_date`, `efeonce_start_date`, `contract_type` (generated).
+- **Intake/activación:** `completeWorkforceMemberIntake` (`src/lib/workforce/intake/complete-intake.ts:38`) + `resolveWorkforceActivationReadiness` (`src/lib/workforce/activation/readiness.ts:559`) + flag guard + 409 `activation_readiness_blocked` + override cap.
+- **Onboarding:** (A) `createOnboardingInstance` (`src/lib/hr-onboarding/store.ts:637`, TASK-030 complete) + `ensureOnboardingChecklistForMemberEvent`; (B) `ensureActivatedOnboardingCaseForMember` (`src/lib/workforce/onboarding/store.ts:614`). Evento `hr.onboarding.instance_created` existe (`event-catalog.ts:282`); case-level `work_relationship_onboarding_case.*` (:310-315).
+- **Legal readiness:** `assessPersonLegalReadiness` con caso `document_render_onboarding_contract` (TASK-784).
+- **Capabilities:** `workforce.member.complete_intake`, `workforce.member.activation_readiness.read/override`, `hr.onboarding_instance` existen.
+- **UI existente:** `src/views/greenhouse/hr-onboarding/HrOnboardingView.tsx` + rutas `(dashboard)/hr/onboarding`, `(dashboard)/hr/workforce/activation` → **TASK-1368 extiende esto**, no greenfield.
 
 ### Gap
 
-- No existe una cola HRIS/People explícita para handoffs `internal_hire` aprobados.
-- No existe service idempotente `activateHiringHandoffAsCollaborator` o equivalente.
-- No existe contrato runtime que cree/promueva `member` sobre el mismo `identity_profile_id` y abra onboarding como parte de una misma transición auditada.
-- No existe readiness gate que impida activar colaborador si faltan legal entity, contrato, fecha de ingreso, manager, acceso o payroll readiness mínimo.
+- No existe consumer del contrato de cola `internal_hire_ready_for_onboarding` (356) hacia la maquinaria workforce.
+- No existe el bridge/service `activateHiringHandoffAsCollaborator` (source-neutral, idempotente) que cree el member no-activo `pending_intake` y lo enganche a intake/onboarding.
+- No existe el mapping durable `hiring_handoff_id ↔ member_id ↔ onboarding_case/instance ↔ activation state`.
+- No existe cap de triage de la cola ni señal `workforce.*` de activación atascada.
+- No existe el mark-completed del handoff con referencias downstream reales.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     El agente que toma esta task ejecuta Discovery y produce
-     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ZONE 2 — PLAN MODE (lo llena el agente que toma la task)
      ═══════════════════════════════════════════════════════════ -->
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
-     "Que construyo exactamente, slice por slice?"
-     El agente solo lee esta zona DESPUES de que el plan este
-     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
      ═══════════════════════════════════════════════════════════ -->
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical` (crea/promueve `member`/identity — superficie del incidente 2026-06-01; migración additive + capability + payroll-adjacent boundary)
+- Impacto principal: `command` (bridge de activación) + `migration` (mapping table) + `reader` (cola/journey) + `api`
+- Source of truth afectado: `greenhouse_core.members` (SSOT de la faceta — 770 crea/promueve vía core canónico, NO INSERT ad hoc) + `greenhouse_hiring.hiring_handoff` (356, se lee/mark-completed) + una tabla nueva de mapping de activation-request
+- Consumidores afectados: TASK-1368 (UI), Person 360/People readers, Nexa (por parity), la maquinaria workforce (intake/onboarding)
+- Runtime target: `staging`/`production` (flag-gated) + `worker` (si el consumo de cola es reactivo)
+
+### Contract surface
+
+- Contrato existente a respetar: `provisionInternalCollaboratorFromScim` (cascade D-2 / core member), `completeWorkforceMemberIntake`, `resolveWorkforceActivationReadiness`, `ensureActivatedOnboardingCaseForMember`, `createOnboardingInstance`, `assessPersonLegalReadiness`, contrato de cola `internal_hire_ready_for_onboarding` (356). Boundary Hiring↛payroll/compensation.
+- Contrato nuevo o modificado:
+  - **Service:** `activateHiringHandoffAsCollaborator({hiringHandoffId, actorUserId, ...})` (source-neutral, idempotente) en `src/lib/workforce/hiring-activation/**`.
+  - **Member core source-neutral:** extraer/reusar el core de materialización de member (member + person_membership + role assignment + `pending_intake`, no-activo) de `provisionInternalCollaboratorFromScim` para que Hiring y SCIM compartan un solo primitive.
+  - **Readers:** `listHiringActivationQueue()` (consume la cola 356), `getHiringActivationDetail(id)`, `getHiringJourneyForPerson(identityProfileId)`.
+  - **API:** `POST /api/hr/hiring-activation/[id]/(review|create-member|open-onboarding|complete)`.
+  - **Eventos puente (solo los que falten):** `hiring.activation.linked`, `hiring.activation.completed` v1.
+  - **Reliability signal:** `workforce.hiring_activation_stuck` (member creado, intake/onboarding atascado tras ventana).
+- Backward compatibility: `gated` (flag `HIRING_ACTIVATION_ENABLED` default OFF). Additive.
+- Full API parity: activación = command gobernado (capability), consumido por UI (1368) + Nexa (propose→confirm) por construcción.
+
+### Data model and invariants
+
+- Entidades/tablas afectadas: nueva `greenhouse_hr.hiring_activation_request` (mapping durable: `hiring_handoff_id` UNIQUE, `identity_profile_id`, `candidate_facet_id`, `hiring_application_id`, `member_id`, `onboarding_case_id`/`onboarding_instance_id`, `state`, blockers) + audit. Lee/escribe `members` **solo vía core canónico**. Lee `hiring_handoff` (356), marca `completed`.
+- Invariantes:
+  - **Un member por persona:** creación/promoción sobre el mismo `identity_profile_id`; cascade D-2 evita duplicado; `MemberIdentityDriftError` bloquea merge ambiguo.
+  - **Member nace no-activo `pending_intake`** (excluido del payroll gate); NUNCA `UPDATE active=true` directo (GENERATED).
+  - **Activación por el path existente:** `completeWorkforceMemberIntake` / readiness resolver; 770 no reimplementa la transición a activo.
+  - **Idempotencia:** key `hiring_handoff_id + identity_profile_id`; claim atómico (`FOR UPDATE`); reintento retorna el request existente; member compatible → enlaza, incompatible → bloquea.
+  - **Boundary:** NUNCA escribe `payroll_*`/`compensation_versions`/`final_settlements`; `hire_date` desde el handoff revisado, no desde la application sin aprobar.
+- Tenant/space boundary: hereda scope del handoff/opening.
+- Idempotency/concurrency: claim atómico + idempotency key; el consumo de cola respeta `outbox_reactive_log` si es reactivo.
+- Audit/outbox/history: audit append-only por transición + eventos puente + mark `hiring_handoff.completed` con `member_id`/`onboarding_*` reales.
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive` (mapping table + audit, marker `-- Up Migration`, DO block anti pre-up-marker, GRANTs, Down solo DROP). `db.d.ts` en el mismo commit.
+- Default state: `flag OFF` (`HIRING_ACTIVATION_ENABLED`) hasta shadow verde en staging con un `internal_hire` real; registrar en `FEATURE_FLAG_STATE_LEDGER.md`.
+- Backfill plan: `none` V1 (nace con el flujo).
+- Rollback path: flag off → revert PR → reverse migration (DROP additive). El member creado se supersede/queda en estado previo (no delete).
+- External coordination: env `HIRING_ACTIVATION_ENABLED` (staging/prod) + sign-off People/HRIS antes de activar en prod + depende del contrato de cola de 356.
+
+### Security and access
+
+- Auth/access gate: `session` + capabilities **reusadas** `workforce.member.complete_intake` / `workforce.member.activation_readiness.*` / `hr.onboarding_instance` + a lo sumo **1 nueva** `hiring.activation.review` (triage de cola) + grant a rol real (`hr_manager`/`hr_payroll`) mismo PR (coverage guard).
+- Sensitive data posture: PII masked/reveal con capability+reason+audit (reusar person-legal-profile readers); NUNCA `value_full` en logs/eventos.
+- Error contract: `canonicalErrorResponse` es-CL + `captureWithDomain(err,'workforce'|'identity',...)`.
+- Abuse/rate-limit posture: `N/A` (superficie interna gobernada por capability).
+
+### Runtime evidence
+
+- Local: `pnpm test` (idempotencia, drift negativo, template faltante bloquea, member nace pending_intake no-activo, boundary NO payroll) + lint + tsc + build.
+- DB/runtime: `pnpm migrate:up` + `information_schema` verify; smoke contra PG real: handoff `internal_hire` aprobado → 1 member sobre el mismo `identity_profile_id`, `pending_intake`, onboarding case abierto, payroll/access NO activos; replay → sin duplicado; verify cascade D-2 no duplica si aparece azure_oid después.
+- Integration: `pnpm staging:request` readers de cola; shadow con caso real.
+- Reliability: `workforce.hiring_activation_stuck` steady=0; `identity.scim.users_without_member` sin drift nuevo.
+- Production verification sequence: flag OFF deploy → verify readers → flip staging + caso real → member no-activo + onboarding + idempotencia → sign-off HRIS → flip prod con cooldown.
+
+### Acceptance criteria additions
+
+- [ ] SSOT (`members` vía core canónico + `hiring_activation_request`), contract surface (service/readers/API/eventos/signal) y consumers (1368/360/Nexa) nombrados con paths reales.
+- [ ] Invariantes (un-member-por-persona vía D-2, nace `pending_intake` no-activo, activación vía path existente, boundary NO-payroll) explícitos; idempotencia con claim atómico.
+- [ ] Reusa readiness/intake/onboarding/legal existentes (no reimplementa); capabilities reusadas + ≤1 nueva con grant mismo PR.
+- [ ] Migration additive + flag OFF + rollback explícito.
+- [ ] Evidencia DB/worker (member no-activo + onboarding + replay + señal steady).
+
+## Capability Definition of Done — Full API Parity gate
+
+- [ ] Lógica en el primitive (`src/lib/workforce/hiring-activation/**`), NO en UI (la UI es 1368).
+- [ ] Modelada como command/aggregate (`activateHiringHandoffAsCollaborator`), no click-handler.
+- [ ] Read (`listHiringActivationQueue`/`getHiringJourneyForPerson`) + write (command con semantics + auth fina + idempotencia + audit/outbox + errores canónicos).
+- [ ] Capability nueva (≤1) + grant mismo PR (coverage test).
+- [ ] Camino programático: `POST /api/hr/hiring-activation/*` + reader para 1368; Nexa por parity.
+- [ ] Write apto para propose→confirm→execute.
+- [ ] Un primitive, muchos consumers (1368 UI, Person 360, Nexa) — cero lógica duplicada; el member core es compartido con SCIM.
+- [ ] Parity check = SÍ.
 
 ## Scope
 
-### Slice 1 — Activation contract + readiness schema
+### Slice 1 — Activation-request mapping + estado (migration additive)
 
-- Crear un contrato runtime para activation requests derivadas de `HiringHandoff`.
-- Persistir mapping durable entre `hiring_handoff_id`, `identity_profile_id`, `candidate_facet_id`, `hiring_application_id`, `member_id`, `onboarding_instance_id` y estado de activación.
-- Estados V1: `pending_hr_review`, `blocked`, `member_created`, `onboarding_open`, `ready_to_activate`, `active`, `cancelled`.
-- Guardar blockers auditables: identidad ambigua, member incompatible, legal entity faltante, manager faltante, start date inválida, template onboarding faltante, payroll readiness faltante.
+- `CREATE TABLE greenhouse_hr.hiring_activation_request` (mapping durable + estado + blockers auditables) + audit append-only. NO redefinir readiness (se reusa el resolver workforce).
+- Estados V1: `pending_hr_review`, `blocked`, `member_created`, `onboarding_open`, `ready_to_activate`, `active`, `cancelled` (derivados del/alineados al lifecycle workforce existente, no un state-machine paralelo de member).
 
-### Slice 2 — Idempotent member create/promote service
+### Slice 2 — Source-neutral member create/promote + service idempotente
 
-- Implementar `activateHiringHandoffAsCollaborator()` o nombre equivalente en `src/lib/hr-core/hiring-activation/**`.
-- Resolver la persona desde `identity_profile_id`.
-- Si ya existe `member` compatible, enlazarlo sin duplicar.
-- Si no existe `member`, crear faceta `member` en estado `pre_onboarding` u `onboarding`.
-- Persistir `hire_date` / fecha de ingreso desde el handoff revisado, no desde la application sin aprobar.
-- No marcar `active=true` hasta que readiness y onboarding permitan la transición.
-- Ejecutar en transacción con locks/idempotency key para evitar doble creación por retries o doble click.
+- Extraer/reusar el **core source-neutral** de materialización de member (de `provisionInternalCollaboratorFromScim`): crea/promueve `member` sobre `identity_profile_id`, **no-activo `pending_intake`**, discoverable por cascade D-2.
+- `activateHiringHandoffAsCollaborator()` en `src/lib/workforce/hiring-activation/**`: resolver persona → member compatible (enlazar) | crear (core) → persistir mapping. Tx + claim atómico + idempotency key. `hire_date` desde el handoff revisado.
+- **NUNCA** `UPDATE members SET active=true`.
 
-### Slice 3 — Onboarding bridge
+### Slice 3 — Onboarding bridge (reusa runtime existente)
 
-- Crear instancia de onboarding usando el runtime de `TASK-030`.
-- Elegir template por legal entity, relationship/contract type, país/régimen y modalidad.
-- Si no existe template aplicable, bloquear con razón auditada en vez de activar.
-- Enlazar `onboarding_instance_id` al activation request y al `HiringHandoff`.
-- Emitir evento `hr.onboarding.instance_created` si el catálogo/event runtime lo requiere.
+- Abrir el onboarding **case** vía `ensureActivatedOnboardingCaseForMember` (B) y/o el **checklist** vía `createOnboardingInstance` (A, TASK-030), eligiendo template por legal entity/contract type/país/modalidad. Si no hay template aplicable → `blocked` con razón auditada.
+- Enlazar `onboarding_case_id`/`onboarding_instance_id` al request y al handoff. Reusar los eventos existentes (`hr.onboarding.instance_created`, `work_relationship_onboarding_case.*`).
 
-### Slice 4 — HRIS activation queue + API
+### Slice 4 — HRIS activation API + readiness reuse
 
-- Crear API interna para listar handoffs `internal_hire` aprobados pendientes de activación.
-- Crear API para revisar/aprobar creación/promoción de `member`.
-- Crear API para marcar readiness y activar colaborador cuando corresponda.
-- Proteger todo con capabilities granulares:
-  - `hr.hiring_activation.read`
-  - `hr.hiring_activation.review`
-  - `hr.hiring_activation.create_member`
-  - `hr.hiring_activation.activate`
-  - `hr.hiring_activation.cancel`
-- No exponer PII sensible a usuarios sin capability explícita.
+- API interna: `listHiringActivationQueue` (consume cola 356), `review`, `create-member`, `open-onboarding`, `complete`.
+- **Reusar** `resolveWorkforceActivationReadiness` para el gate + `assessPersonLegalReadiness('document_render_onboarding_contract')` para legal. NO reimplementar.
+- Capabilities: reusar `workforce.member.*` + `hr.onboarding_instance`; agregar ≤1 `hiring.activation.review` + grant mismo PR.
 
-### Slice 5 — UI HRIS/People activation lane
+### Slice 5 — Eventos, señal y audit (mark handoff completed)
 
-- Agregar una cola en `HR > Lifecycle / Onboarding` o surface HR equivalente para `Contrataciones listas`.
-- Mostrar el journey: selected application -> handoff approved -> member/onboarding -> active.
-- Permitir resolver blockers con CTAs claros y auditables.
-- People 360 debe mostrar el estado derivado sin duplicar cards: candidato seleccionado, onboarding abierto, colaborador activo.
+- Eventos puente `hiring.activation.linked`/`completed` v1 (solo los que falten; no duplicar `member.created`/`workforce.member.intake_completed`).
+- Marcar `HiringHandoff` `completed` solo con `member_id`/`onboarding_*` reales.
+- Señal `workforce.hiring_activation_stuck` (namespace workforce, no hiring) + audit por transición.
 
-### Slice 6 — Events, reliability and audit
-
-- Publicar eventos versionados:
-  - `hr.hiring_activation.created`
-  - `hr.hiring_activation.member_created`
-  - `hr.hiring_activation.onboarding_opened`
-  - `hr.hiring_activation.activated`
-  - `hr.hiring_activation.blocked`
-  - `hr.hiring_activation.cancelled`
-- Marcar `HiringHandoff` `completed` solo cuando HRIS/People confirma downstream y deja referencia a `member_id` / `onboarding_instance_id`.
-- Agregar reliability signal para handoffs `internal_hire` aprobados que no avanzan después de una ventana configurable.
-- Agregar audit trail por cada transición.
+> **NOTA (split):** el viejo Slice 5 "UI HRIS/People activation lane" se movió a **TASK-1368** (ui-ux, alineada al mockup 763, extiende `HrOnboardingView`/`hr/workforce/activation`).
 
 ## Out of Scope
 
-- No construir el ATS foundation; eso vive en `TASK-353`.
-- No construir la landing pública ni apply form; eso vive en `TASK-354`.
-- No construir el Hiring Desk; eso vive en `TASK-355`.
-- No reemplazar todo el runtime de onboarding; se consume `TASK-030`.
-- No calcular payroll ni crear compensation truth definitiva.
-- No crear placement Staff Augmentation; ese destino queda cubierto por el bridge de `TASK-356` y follow-ons Staff Aug si aplica.
-- No activar accesos productivos automáticamente sin readiness/approval explícito.
+- **La activation lane UI → `TASK-1368`.**
+- ATS foundation (353), careers pública (354), Hiring Desk (355), reacción/handoff (356).
+- Reemplazar el runtime de onboarding (se consume TASK-030) o el de intake/activación workforce (se reusa).
+- Calcular payroll / crear compensation truth.
+- Crear placement Staff Augmentation (bridge de 356).
+- Activar accesos productivos sin readiness/approval.
 
 ## Detailed Spec
 
 Flujo canónico V1:
 
-`HiringApplication selected -> HiringHandoff approved(internal_hire) -> HRIS activation queue -> HR review -> member created/promoted(pre_onboarding/onboarding) -> onboarding instance opened -> readiness complete -> member active -> HiringHandoff completed`
+`HiringHandoff approved(internal_hire) [cola 356] → hiring_activation_request(pending_hr_review) → HR review → member creado/promovido(pending_intake, NO activo, core source-neutral) → onboarding case/instance abierto → resolveWorkforceActivationReadiness OK → completeWorkforceMemberIntake (activa por el path existente) → HiringHandoff completed`
 
-Readiness mínima antes de `active`:
+Readiness (reusar `resolveWorkforceActivationReadiness` + `assessPersonLegalReadiness`): `identity_profile_id` no ambiguo · member compatible · legal entity/relationship · `hire_date` · manager · onboarding abierto o excepción auditada · contract/payroll readiness · access readiness o diferido.
 
-- `identity_profile_id` resuelto y no ambiguo
-- `member_id` compatible creado o enlazado
-- legal entity / relationship context confirmado
-- `hire_date` confirmada
-- manager/reporter confirmado si aplica
-- onboarding instance creada o excepción auditada
-- contract/payroll readiness mínimo confirmado por HRIS/Payroll owner
-- access readiness confirmado o explícitamente diferido
-
-Idempotency:
-
-- La key recomendada es `hiring_handoff_id + identity_profile_id + destination`.
-- Reintentos deben retornar el activation request existente.
-- Si hay `member` compatible existente, enlazar y continuar; si hay `member` incompatible, bloquear.
-
-Estados:
-
-- `pending_hr_review`: handoff aprobado esperando HR.
-- `blocked`: faltan datos o hay conflicto.
-- `member_created`: member creado/enlazado, aún no onboarding.
-- `onboarding_open`: onboarding activo.
-- `ready_to_activate`: readiness completa, falta confirmación final.
-- `active`: colaborador activo.
-- `cancelled`: activación cancelada sin activar colaborador.
+Idempotency: key `hiring_handoff_id + identity_profile_id`; reintento retorna el request existente; member compatible → enlaza, incompatible → `blocked` (`MemberIdentityDriftError`).
 
 ## Rollout Plan & Risk Matrix
 
-Sección canónica (agregada 2026-07-08 en la auditoría; 770 predataba esta sección). Task crítica: toca `member`/identity/onboarding/HRIS — la matriz es load-bearing.
-
 ### Slice ordering hard rule
 
-- El único blocker vivo es `TASK-356` (produce la cola/contrato `internal_hire_ready_for_onboarding`). NO tomar 770 antes de que 356 exponga ese contrato.
-- Orden interno: consumir handoff aprobado → crear/promover `member` sobre el mismo `identity_profile_id` (idempotente) → abrir onboarding → readiness checks → activar. **NUNCA** activar `member`/access/payroll antes de readiness completa.
+- Único blocker vivo `TASK-356` (contrato de cola). Orden: consumir cola → crear member no-activo (core) → onboarding → readiness (reuse) → activar por path existente. **NUNCA** activar member/access/payroll antes de readiness ni por `UPDATE active=true`.
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+| Riesgo | Sistema | Prob | Mitigation | Signal |
 |---|---|---|---|---|
-| Persona duplicada (member paralelo en vez de faceta sobre el mismo profile) | identity | medium | crear member sobre el `identity_profile_id` del candidato; guard de unicidad | drift person-360 |
-| Activación prematura (payroll/access antes de readiness) | payroll / identity | high | state machine con `ready_to_activate` obligatorio antes de `active`; gate | member activo sin readiness |
-| Reintento del handoff duplica member/onboarding | hris | medium | idempotencia por handoff id + claim atómico | doble member/onboarding |
-| Co-ownership de la cola con 356 | data | low | 356 dueña del contrato; 770 solo consume | ambigüedad de owner |
+| Persona/member duplicado | identity | media | crear sobre `identity_profile_id`; cascade D-2; drift throw | `identity.scim.users_without_member` / person-360 |
+| Activación prematura (payroll/access antes de readiness) | payroll/identity | alta | member nace `pending_intake`; activar solo vía `completeWorkforceMemberIntake` + readiness gate | member activo sin readiness |
+| Escritura directa a `active` (GENERATED) | data | media | prohibido; usar path existente; test negativo | build/test |
+| Reintento duplica member/onboarding | hris | media | idempotencia key + claim atómico | doble member/onboarding |
+| Reinventar readiness/onboarding | arch | media | reuse obligatorio de primitives workforce | review |
+| Co-ownership cola con 356 | data | baja | 356 dueña del contrato; 770 consume | ambigüedad owner |
 
 ### Feature flags / cutover
 
-- Flag de activación (`*_ENABLED` default OFF) hasta shadow verde en staging con un caso `internal_hire` real; registrar en `FEATURE_FLAG_STATE_LEDGER.md`. Cutover = flip post-smoke.
+- `HIRING_ACTIVATION_ENABLED` default OFF hasta shadow verde en staging con un `internal_hire` real; registrar en `FEATURE_FLAG_STATE_LEDGER.md`. Cutover = flip post-smoke.
 
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| member/onboarding create | revertir la transición de state + flag off; member queda en estado previo (supersede, no delete) | <15 min | parcial |
-| activación | flag off + no activar; readiness queda pendiente | <10 min | si |
+| 1 migration | reverse (DROP additive) | ~min | Sí |
+| 2 member create | flag off; member queda `pending_intake` (supersede, no delete) | <15 min | parcial |
+| 3-4 onboarding/API | revert PR + flag off | <10 min | Sí |
+| 5 eventos/señal | revert PR (additive) | ~min | Sí |
 
 ### Production verification sequence
 
-1. Staging: handoff `internal_hire` aprobado (TASK-356) → activación con flag ON → verify member creado sobre el mismo `identity_profile_id`, onboarding abierto, payroll/access NO activos hasta readiness.
-2. Verify idempotencia (reintento no duplica).
-3. Prod con cooldown + monitoreo de signals.
+1. Staging flag ON: handoff `internal_hire` aprobado (356) → member creado sobre el mismo `identity_profile_id`, `pending_intake`, onboarding abierto, payroll/access NO activos.
+2. Verify idempotencia (reintento no duplica) + cascade D-2 (azure_oid tardío no duplica).
+3. Prod con cooldown + monitoreo de señales.
 
 ### Out-of-band coordination required
 
-- Coordinación con People/HRIS (onboarding real) + sign-off antes de activar colaboradores en prod. Depende del contrato de cola de TASK-356.
+- People/HRIS sign-off antes de activar en prod. Depende del contrato de cola de 356.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
-     "Como compruebo que termine y que actualizo?"
-     El agente ejecuta estos checks al cerrar cada slice y
-     al cerrar la task completa.
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
 
-- [ ] Un `HiringHandoff` `internal_hire` aprobado aparece en cola HRIS/People de activación.
-- [ ] HRIS/People puede crear/promover un único `member` sobre el mismo `identity_profile_id`.
-- [ ] Reintentar la activación no duplica `member`, onboarding ni eventos.
-- [ ] La activación queda bloqueada si hay identidad ambigua, `member` incompatible o datos legales mínimos faltantes.
-- [ ] Se abre onboarding antes de activar colaborador, salvo excepción explícita y auditada.
-- [ ] `member.active=true` solo ocurre después de readiness y confirmación HRIS/People.
-- [ ] `HiringHandoff` se marca `completed` solo con referencias downstream reales.
-- [ ] People 360 muestra el journey sin crear identidad paralela.
+- [ ] Un `HiringHandoff` `internal_hire` aprobado aparece en la cola de activación (consumiendo el contrato de 356).
+- [ ] Se crea/promueve un único `member` sobre el mismo `identity_profile_id`, **no activo, `pending_intake`**, vía el core source-neutral (no INSERT ad hoc), discoverable por cascade D-2.
+- [ ] Reintentar la activación no duplica `member`, onboarding ni eventos (idempotencia + claim atómico).
+- [ ] Bloquea ante identidad ambigua, `member` incompatible (`MemberIdentityDriftError`) o datos legales mínimos faltantes.
+- [ ] Se abre onboarding (case/instance reusando runtime existente) antes de activar, salvo excepción auditada.
+- [ ] `member` activo solo vía `completeWorkforceMemberIntake` + readiness (`resolveWorkforceActivationReadiness`), NUNCA `UPDATE active=true`.
+- [ ] `HiringHandoff` `completed` solo con `member_id`/`onboarding_*` reales.
+- [ ] Capabilities reusadas + ≤1 nueva con grant mismo PR; señal `workforce.hiring_activation_stuck` steady=0.
+- [ ] People 360 muestra el journey sin identidad paralela.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test`
-- Test unitario del service de activación idempotente.
-- Test negativo de identidad ambigua / member incompatible.
-- Test negativo de template onboarding faltante.
-- Test de transición `pending_hr_review -> member_created -> onboarding_open -> active`.
-- Validación manual del flujo end-to-end desde handoff `internal_hire` aprobado hasta colaborador activo.
+- `pnpm lint` · `pnpm tsc --noEmit` · `pnpm test` (full) · `pnpm build` · `pnpm migrate:up` + verify
+- Test idempotente del service; negativo de identidad ambigua/member incompatible; negativo de template faltante; negativo de boundary (NO escribe payroll/compensation); test de que el member nace `pending_intake` no-activo
+- Smoke PG real end-to-end handoff→member→onboarding; replay sin duplicado
+- `pnpm qa:gates --changed` + `pnpm docs:closure-check`
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` y `Greenhouse_HRIS_Architecture_v1.md` tienen delta si cambia contrato
-- [ ] `EVENT_CATALOG` actualizado si se agregan eventos `hr.hiring_activation.*`
-- [ ] documentación funcional y manual de uso HR actualizados
+- [ ] `Lifecycle`/carpeta sincronizados; `README.md`; `Handoff.md`; `changelog.md`
+- [ ] `## Delta` a `TASK-1368` (consume readers/commands de 770) y a `TASK-356` si cambian supuestos de la cola
+- [ ] `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` + `Greenhouse_HRIS_Architecture_v1.md` con delta
+- [ ] `EVENT_CATALOG` actualizado si se agregan eventos `hiring.activation.*`
+- [ ] `FEATURE_FLAG_STATE_LEDGER.md` con la fila del flag
+- [ ] doc funcional + manual HR actualizados; Runtime Rollout Completion Gate (flag/redeploy) reportado
 
 ## Follow-ups
 
+- **`TASK-1368`** — activation lane UI (ui-ux, blocked by 770, mockup 763).
 - Automatización parcial de access provisioning post-readiness.
-- Staff Augmentation activation lane para destino `staff_augmentation` si necesita cierre simétrico.
-- Analytics de time-to-hire y time-to-active desde `HiringApplication` hasta `member.active`.
+- Staff Augmentation activation lane para destino `staff_augmentation` (simétrico), si aplica.
+- Analytics time-to-hire / time-to-active desde `HiringApplication` hasta `member` activo.
