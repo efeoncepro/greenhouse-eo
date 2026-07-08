@@ -1,5 +1,13 @@
 # TASK-1367 — Careers Apply Intake Service
 
+## Delta 2026-07-08 (recalibración post-Discovery)
+
+- **Atomicidad recalibrada:** Person (`createIdentityProfile`, `account-360`, email-first) + `reconcileCandidateFacet` + `createHiringApplication` son **3 commits separados** (ninguna función acepta client externo). Diseño real = **multi-step IDEMPOTENTE** (reconcile por email + upsert por `identity_profile_id` + dedupe `UNIQUE(opening_id, identity_profile_id)` → retry seguro), NO single-transaction. La concurrencia la resuelve el UNIQUE (→ 409 → success genérico).
+- **Backend impact `api` → `migration`:** (a) NO existe columna de portafolio/LinkedIn en `candidate_facet` → additive `portfolio_url`/`linkedin_url` + extender `reconcileCandidateFacet`; (b) el rate-limit necesita contar ventanas por `email_hash`/`ip_hash` → tabla append-only `hiring_application_intake_events` (mirror del grader). **consent + source columns YA EXISTEN** (sin migración de consent).
+- **Gap reader:** `getPublicOpeningByPublicId` NO expone el `opening_id` interno (que `createHiringApplication` necesita) → agregar reader `resolvePublishedOpeningIdByPublicId` (published-gated).
+- **Reuso confirmado:** shared security core `src/lib/growth/public-submission/{abuse-guard,captcha}` (`decideAbuse`, `turnstileCaptchaVerifier`, `hashIdentifier`) + validador puro estilo grader + respuesta genérica (duplicado = mismo success 202).
+- **Flag confirmado:** `HIRING_PUBLIC_APPLICATIONS_ENABLED` default OFF (404 invisible, mirror public-intake) + Turnstile requerido (fail-closed en prod).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -17,7 +25,7 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `api`
+- Backend impact: `migration`
 - Epic: `EPIC-011`
 - Status real: `Diseno`
 - Rank: `TBD`
