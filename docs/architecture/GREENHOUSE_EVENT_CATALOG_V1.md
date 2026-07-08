@@ -1180,3 +1180,12 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | `hiring.competency_result.updated` | v1 | `hiring_assessment` | `finalizeAssessment` (rollup por competencia) | — |
 
 **Payload v1**: ids + estado (status/method/score agregado), **sin `answer_key`/`rubric` ni respuestas del candidato** (detalle se re-lee del aggregate con capability). Emitidos transaccionalmente con el write. **Sin consumer reactivo en V1** (audit/observabilidad); el score que rueda a `hiring_application` es un rollup determinístico in-tx (helper único `rollupCompetencyResultsToApplication`), no un consumer. Aggregate types nuevos: `hiring_assessment_template`, `hiring_assessment` (`AGGREGATE_TYPES` en `src/lib/sync/event-catalog.ts`). Dominio de observabilidad: `captureWithDomain(err, 'hiring', …)`.
+
+## Delta 2026-07-08 — TASK-1361: `hiring.assessment.ai_proposed` + `hiring.assessment.ai_confirmed` (Assessment AI Assist)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `hiring.assessment.ai_proposed` | v1 | `hiring_assessment_ai_proposal` | `createAiProposal` (`src/lib/hiring/assessment/ai/proposal-store.ts`) — vía `proposeQuestionsForCompetency` / `proposeScoreForResponse` | — |
+| `hiring.assessment.ai_confirmed` | v1 | `hiring_assessment_ai_proposal` | `confirmAiProposal` (`ai/confirm.ts`) — decisión humana confirm/reject | — |
+
+**Payload v1**: `proposalId` + `kind` (`question_draft`/`response_score`) + `targetRef` + provider/model + decisión/estado, **sin la salida cruda del LLM ni respuestas del candidato** (evidencia sensible se re-lee del ledger). Emitidos transaccionalmente (propose en su tx; confirm en la misma tx que aplica `createQuestion`/`recordHumanScore`). **Sin consumer reactivo en V1** (audit/observabilidad del loop propose→confirm). Aggregate type nuevo: `hiring_assessment_ai_proposal`. Boundary: la IA PROPONE (evidencia); el `ai_confirmed` es el único que refleja una mutación aplicada por un humano. `captureWithDomain(err, 'hiring', …)`.

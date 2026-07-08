@@ -171,7 +171,8 @@ Reglas obligatorias:
 - [ ] Modelada como command (proponer) + command de confirmación (write), no click-handler.
 - [ ] Read = readers de propuestas; write (confirm) = command con capability + idempotencia + outbox + errores canónicos.
 - [ ] Capability `hiring.assessment.ai_assist` + grant a rol real + coverage test mismo PR.
-- [ ] Camino programático: `/api/hiring/assessments/ai/**`; Nexa opera vía propose→confirm por construcción. **Registrar los commands (`proposeScoreForResponse`/`proposeQuestionsForCompetency`/`confirmAiProposal`) como actionKeys de parity** (`resolveNexaActionProposal`) para que Nexa los opere desde el chat — es consecuencia de la parity, NO integración Nexa-específica ni lógica hiring dentro de Nexa.
+- [x] Camino programático: `/api/hiring/assessments/ai/**` (propose questions/score + list + confirm), commands en `src/lib/hiring/assessment/ai/**`. Parity satisfecha **a nivel de capability/contrato gobernado** (commands + rutas + capability `hiring.assessment.ai_assist`).
+- [ ] **DEFERIDO a follow-up:** registrar `confirmAiProposal` como **actionKey** de Nexa (`NEXA_ACTION_REGISTRY`) para operarlo desde el chat. Rationale: el registro requiere un `NexaActionDefinition` completo (Zod schema + preview builder + confirm-endpoint del framework de acciones de Nexa) — cada acción existente (`author_quote`) fue su propia task (TASK-1212); el feature está flag-OFF y sin UI aún (TASK-1363). La parity de fondo ya está (el contrato existe); el wiring del actionKey es un adaptador delgado follow-up, NO lógica hiring dentro de Nexa. Ver Follow-ups.
 - [ ] Write apto para `propose → confirm → execute` (es literalmente el patrón).
 - [ ] Un primitive, muchos consumers sin lógica duplicada.
 - [ ] Parity check = SÍ.
@@ -330,6 +331,7 @@ Frontera en 3 capas:
 
 ## Follow-ups
 
+- **Nexa actionKey `confirm_assessment_ai_proposal`** (own task, espeja TASK-1212 `author_quote`): registrar `confirmAiProposal` en `NEXA_ACTION_REGISTRY` (`NexaActionDefinition` + Zod input + preview builder + confirm-endpoint) para que un reclutador opere el confirm desde el chat de Nexa. Gateado por `NEXA_ACTION_RUNTIME_ENABLED` + `HIRING_ASSESSMENT_AI_ENABLED`. La parity de fondo ya existe (capability + contrato); esto es el wiring del consumer conversacional.
 - Fine-tune/prompt-iteration del scoring IA según drift del eval.
 - Extensión a generación de plantillas completas por cargo (no solo preguntas sueltas).
 

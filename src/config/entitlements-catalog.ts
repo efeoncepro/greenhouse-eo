@@ -2114,7 +2114,10 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // plantillas/preguntas + asignar instancias. score: registrar/corregir puntaje humano + finalizar.
   { key: 'hiring.assessment.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.assessment.author', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
-  { key: 'hiring.assessment.score', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' }
+  { key: 'hiring.assessment.score', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1361 — AI assist: proponer borradores de pregunta / sugerencias de puntaje (propose→confirm).
+  // Solo PROPONE; el confirm reusa author (pregunta) / score (respuesta). El LLM nunca escribe.
+  { key: 'hiring.assessment.ai_assist', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

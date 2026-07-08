@@ -475,6 +475,10 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     for (const action of ['create', 'update'] as const) {
       addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.author', action, scope: 'tenant', source: hiringSource })
     }
+
+    // TASK-1361 — AI assist (proponer borradores/sugerencias) al mismo tier operador; el confirm
+    // reusa author/score, así que quien puede autorar el banco puede pedir propuestas IA.
+    addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.ai_assist', action: 'execute', scope: 'tenant', source: hiringSource })
   }
 
   // TASK-353 — publish/decide: verbos de gobernanza consecuentes (execute). Least-privilege:
