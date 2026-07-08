@@ -237,7 +237,12 @@ export const AGGREGATE_TYPES = {
   talentDemand: 'talent_demand',
   hiringOpening: 'hiring_opening',
   hiringCandidateFacet: 'hiring_candidate_facet',
-  hiringApplication: 'hiring_application'
+  hiringApplication: 'hiring_application',
+
+  // TASK-1360 — Assessment Engine. Identities: template_id ('atpl-{uuid}'),
+  // assessment_id ('asmt-{uuid}').
+  hiringAssessmentTemplate: 'hiring_assessment_template',
+  hiringAssessment: 'hiring_assessment'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -1087,7 +1092,14 @@ export const EVENT_TYPES = {
   hiringCandidateFacetCreated: 'hiring.candidate_facet.created',
   hiringCandidateFacetUpdated: 'hiring.candidate_facet.updated',
   hiringApplicationCreated: 'hiring.application.created',
-  hiringApplicationStageChanged: 'hiring.application.stage_changed'
+  hiringApplicationStageChanged: 'hiring.application.stage_changed',
+
+  // TASK-1360 — Assessment Engine. Sin consumer reactivo en V1 (audit/observabilidad).
+  hiringAssessmentTemplateCreated: 'hiring.assessment.template_created',
+  hiringAssessmentAssigned: 'hiring.assessment.assigned',
+  hiringAssessmentSubmitted: 'hiring.assessment.submitted',
+  hiringAssessmentScored: 'hiring.assessment.scored',
+  hiringCompetencyResultUpdated: 'hiring.competency_result.updated'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
