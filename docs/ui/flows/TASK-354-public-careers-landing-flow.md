@@ -5,7 +5,7 @@
 - Task: `TASK-354`
 - Master flow: `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md` — esta superficie implementa **N0 (attract) · N1 (listing) · N2 (detalle) · N3 (apply form)** (+ N4 nurture/talent-pool como follow-up).
 - Wireframe: `docs/ui/wireframes/TASK-354-public-careers-landing.md` · Motion: `docs/ui/motion/TASK-354-public-careers-landing-motion.md`
-- Route group: público (sin sesión), locale-aware `[lang]`
+- Route group: público (sin sesión) — ruta `src/app/public/careers/**` (NO `[lang]`); locale-aware BILINGÜE (es-CL + en-US) vía next-intl (cookie `gh_locale` + Accept-Language, sin segmento de URL). Copy vía `getMicrocopy(locale)`
 - Estado: `draft` (UI ready: no)
 
 ## Flow Brief
@@ -16,9 +16,9 @@ El candidato entra por careers, **entiende por qué Efeonce** (attract), descubr
 
 | Surface | Ruta | Tipo | Nodo |
 |---|---|---|---|
-| Careers home (attract + listing) | `/[lang]/careers` | público | N0 + N1 |
-| Detalle | `/[lang]/careers/[publicId]` | público | N2 |
-| Apply | sección/step del detalle o `/[lang]/careers/[publicId]/apply` | público | N3 |
+| Careers home (attract + listing) | `/careers` | público | N0 + N1 |
+| Detalle | `/careers/[publicId]` | público | N2 |
+| Apply | sección/step del detalle o `/careers/[publicId]/apply` | público | N3 |
 | Talent pool (nurture) | sección del home | público | N4 (follow-up) |
 | (downstream) Desk bandeja | `internal` (TASK-355) | interno | N4-desk — recibe la application creada |
 
@@ -64,10 +64,12 @@ apply:    idle → validating(inline 3-stage) → submitting → (accepted | rat
 
 ## Routing Contract
 
-- `/[lang]/careers` — attract + listing. SSR/ISR del payload público (cacheable; sin datos sensibles).
-- `/[lang]/careers/[publicId]` — detalle por `public_id` del opening. 404 si no está publicado.
-- Apply: preferir sección del detalle (menos navegación) o `/apply` como step. Deep-link al form vía ancla.
-- `[lang]` locale-aware (`hreflang`-ready) — clientes/candidatos internacionales (Efeonce contrata nacional + global).
+- **Ruta = `src/app/public/careers/**`** (patrón público canónico, espeja `src/app/public/quote/**`). NO `[lang]` (no hay i18n routing en el app; one-way door).
+- `/careers` — attract + listing. **RSC + ISR** (`export const revalidate` ~300s) con **`revalidatePath('/public/careers')` on-demand** desde el publish/unpublish de TASK-355. NUNCA `force-dynamic` (una careers indexable no puede pegarle a PG en cada hit). Cacheable, sin datos sensibles.
+- `/careers/[publicId]` — detalle por `public_id`, RSC + ISR. 404 si no está publicado.
+- Apply form = **client component** (Turnstile + validación + `client fetch` al endpoint 1367). El resto (listing/detalle) = RSC.
+- **`noindex` hasta apply live** (`HIRING_PUBLIC_APPLICATIONS_ENABLED` ON en 1367): no indexar una página cuyo "Postular" devuelve 404. Al prender el apply, quitar el noindex (coordinar 354↔1367).
+- BILINGÜE es-CL + en-US vía next-intl (cookie `gh_locale` + Accept-Language); el server component resuelve `getLocale()`; sin segmento de URL `[lang]`. `hreflang` por-URL no aplica (una URL por página, locale por cookie/header).
 - **NUNCA** exponer ids internos del opening en la URL (solo `public_id`).
 
 ## Focus & Accessibility
@@ -127,6 +129,6 @@ apply:    idle → validating(inline 3-stage) → submitting → (accepted | rat
 - [ ] Validación 3-stage + submit enabled + foco al 1er error + no limpia el form en error.
 - [ ] Dedupe/idempotency → doble submit = mismo `accepted`, sin duplicar application.
 - [ ] Confirmación + fallas genéricas (no filtran estado interno/PII/dedupe).
-- [ ] Routing con `public_id` (nunca id interno) + `[lang]`.
+- [ ] Routing con `public_id` (nunca id interno); ruta `src/app/public/careers/**` (NO `[lang]`).
 - [ ] a11y (foco cross-surface + 1er error, consent, reflow, reduced-motion) + GVC desktop+mobile.
 - [ ] `## Delta` en el master flow si cambia un nodo/regla transversal.

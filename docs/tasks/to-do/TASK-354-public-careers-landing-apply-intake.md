@@ -1,5 +1,16 @@
 # TASK-354 — Public Careers Landing
 
+## Delta 2026-07-08 (revisión de arquitectura — `arch-architect`, 4 pilares)
+
+Gaps arquitectónicos cerrados antes de implementar:
+
+- **Routing + i18n (corregido 2026-07-08):** el app SÍ tiene i18n real **bilingüe (`es-CL` + `en-US`)** — pero **next-intl basado en cookie `gh_locale` + Accept-Language, NO por segmento de URL `[lang]`** (`src/i18n/request.ts`, `resolveLocaleFromRequest`). → **Ruta = `src/app/public/careers/**`** (sin `[lang]`, patrón público canónico) **Y locale-aware bilingüe** por construcción: el server component resuelve `const locale = await getLocale()` (`next-intl/server`) y consume `getMicrocopy(locale).careers`. Careers es **es-CL + en-US** (atrae talento nacional + internacional), NO es-CL-only ni follow-up. `hreflang` por-URL no aplica (i18n es cookie/header, una URL por página; SEO indexa el locale por defecto). Copy en dictionaries por-locale `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts` (namespace nuevo), NO un `careers.ts` suelto.
+- **Scalability — caching:** una careers pública indexable puede recibir tráfico (SEO/bots). **NO `force-dynamic`** (cada hit = query a PG). → Read path = **SSR + ISR** (`export const revalidate`) con **revalidación on-demand** (`revalidatePath('/public/careers')`) disparada por el publish/unpublish de TASK-355. CQRS-lite: read cacheado separado del write (apply API).
+- **Safety — defense-in-depth del payload:** (a) `buildPublicOpeningPayload` choke point único (353), (b) tipo TS en la frontera del componente (solo `PublicOpeningPayload`, nunca `HiringOpening`), (c) NUNCA importar un reader interno en `src/app/public/careers/**`.
+- **Rollout coupling:** la careers arranca **`noindex`** hasta que el apply esté live end-to-end (`HIRING_PUBLIC_APPLICATIONS_ENABLED` ON en 1367) — no indexar una página cuyo "Postular" devuelve 404. Resuelve la Open Question de indexación.
+- **RSC/client:** listing + detalle = **RSC** (fetch server, cacheable, SEO); filtros + apply form = **client** (Turnstile + validación). El submit postea al endpoint de 1367 vía **client fetch** (no Server Action) — el contrato ya existe (Full API Parity: UI + WebMCP comparten endpoint).
+- **Resilience:** el read público degrada honesto (error boundary + estado de error, nunca 500 en blanco) + `captureWithDomain(err, 'hiring')`.
+
 ## Delta 2026-07-08 (revisión product-design + talent)
 
 Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-writing` (+ `greenhouse-ux`/`state-design`/`a11y-architect`). Gaps cerrados en wireframe/flow/motion + spec:
@@ -56,7 +67,7 @@ TASK-353 dejó la foundation + el payload público (`PublicOpeningPayload`) y TA
 ## Goal
 
 - Renderizar listing + detalle público consumiendo SOLO el payload allowlist (nunca columnas internas).
-- Entregar un apply form accesible (es-CL, links-only V1) que postee al service de TASK-1367 con confirmación genérica y segura.
+- Entregar un apply form accesible (bilingüe es-CL + en-US vía next-intl, links-only V1) que postee al service de TASK-1367 con confirmación genérica y segura.
 - Diseñar el shell público sin sesión reusable para `/assessment/[token]` (TASK-1363).
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -75,9 +86,13 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- Consumir SOLO `PublicOpeningPayload` (allowlist); NUNCA leer columnas internas del opening.
-- El apply postea a `submitPublicHiringApplication` (TASK-1367); la UI NO reconcilia Person/facet/application en el cliente.
-- Copy 100% desde `src/lib/copy/careers.ts` (nuevo), es-CL tuteo neutro (validar con `greenhouse-ux-writing`); 0 literals en JSX.
+- **Ruta canónica `src/app/public/careers/**`** (espeja `src/app/public/quote/**`). NUNCA `src/app/[lang]/careers` (el i18n es cookie/header vía next-intl, NO por URL; agregar `[lang]` es one-way door). La página es BILINGÜE (es-CL + en-US) vía `getLocale()` + `getMicrocopy(locale)`.
+- **Read path cacheado (ISR):** listing + detalle en RSC con `export const revalidate` + `revalidatePath('/public/careers')` on-demand desde el publish de 355. NUNCA `force-dynamic` para el listing público (no absorbe tráfico).
+- **Defense-in-depth del payload:** consumir SOLO `PublicOpeningPayload` (allowlist `buildPublicOpeningPayload`, choke point de 353); el tipo TS en la frontera del componente debe ser `PublicOpeningPayload`; NUNCA importar un reader interno del opening en `src/app/public/careers/**`.
+- **`noindex` hasta apply live:** no indexar la careers hasta que `HIRING_PUBLIC_APPLICATIONS_ENABLED` esté ON (coordinar con 1367) — no indexar una página cuyo "Postular" es 404.
+- El apply postea a `POST /api/public/hiring/applications` (TASK-1367) vía **client fetch** con `captchaToken`; la UI NO reconcilia Person/facet/application en el cliente.
+- **RSC/client:** listing/detalle = RSC (server, cacheable); filtros + apply form = client. Read falla → degradación honesta (error boundary + estado de error, nunca 500) + `captureWithDomain(err, 'hiring')`.
+- Copy 100% desde `getMicrocopy(locale).careers` (dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts`, es-CL + en-US) (nuevo), bilingüe es-CL + en-US, tuteo neutro (validar con `greenhouse-ux-writing`); 0 literals en JSX.
 - Tokens `theme.palette.*`/`theme.axis.*` + variantes tipográficas; sin HEX/px/`fontSize` inline. Marca Efeonce (logo + eslogan institucional), no la app.
 - Confirmación + fallas **genéricas** (superficie pública hostil): nunca revelar dedupe/estado interno/existencia previa/PII.
 - WCAG 2.2 AA; `scrollWidth==clientWidth` en desktop + 390px; `prefers-reduced-motion`.
@@ -105,11 +120,12 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/app/[lang]/careers/**` (rutas públicas)
+- `src/app/public/careers/**` (rutas públicas — patrón `src/app/public/**`; NO `[lang]`. El slug URL exacto — `/public/careers` vs un `src/app/careers/` raíz para `/careers` limpio — lo decide Discovery; NUNCA `[lang]`)
 - `src/views/greenhouse/careers/**`
 - `src/components/greenhouse/careers/**` (VacancyCard, shell público reusable, apply form)
-- `src/lib/copy/careers.ts` (copy es-CL)
-- (consume, NO owns) `src/lib/hiring/publication.ts` (readers) + el endpoint de TASK-1367
+- `getMicrocopy(locale).careers` (dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts`, es-CL + en-US) (copy es-CL)
+- (consume, NO owns) `src/lib/hiring/publication.ts` (readers — allowlist) + el endpoint de TASK-1367
+- (extiende, coordina) el publish de TASK-355 debe llamar `revalidatePath` de la careers on-demand
 
 ## Current Repo State
 
@@ -124,7 +140,7 @@ Reglas obligatorias:
 
 - No existe ninguna surface pública de careers (listing/detalle/apply).
 - No existe el shell público sin sesión reusable.
-- No existe `src/lib/copy/careers.ts`.
+- No existe `getMicrocopy(locale).careers` (dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts`, es-CL + en-US).
 
 ## UI/UX Contract
 
@@ -135,7 +151,7 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- 4 nodos: **N0 attract** (hero + pilares de marca + stepper de proceso, en `/[lang]/careers`), **N1 listing** (mismo home), **N2 detalle** (`/[lang]/careers/[publicId]`), **N3 apply** (sección/step). N4 nurture (talent pool) = follow-up. Ver master flow EPIC-011.
+- 4 nodos: **N0 attract** (hero + pilares de marca + stepper de proceso, en `/careers`), **N1 listing** (mismo home), **N2 detalle** (`/careers/[publicId]`), **N3 apply** (sección/step). N4 nurture (talent pool) = follow-up. Ver master flow EPIC-011.
 - Shell público sin sesión **nuevo y reusable** (lo reusa 1363). Primitive lookup: Greenhouse primitive → Vuexy `Custom*` → MUI (no inventar).
 - No es `ui-platform` (no crea Design System nuevo), pero el shell público es reusable → documentarlo como patrón en `ui-platform/PATTERNS.md` al implementar.
 
@@ -155,7 +171,7 @@ Los 10 estados del wireframe: listing (loading/loaded/empty-zero[+talent-pool]/e
 
 ### Implementation mapping
 
-Ver la tabla completa en el wireframe (§Implementation Mapping): VacancyCard = Card outlined + `CustomChip`; filtros = `CustomTextField`(+select); apply = `react-hook-form` + `CustomTextField` + checkbox consent; readers `listPublicOpenings`/`getPublicOpeningByPublicId`; command `submitPublicHiringApplication` (1367). Tokens AXIS; copy `src/lib/copy/careers.ts`.
+Ver la tabla completa en el wireframe (§Implementation Mapping): VacancyCard = Card outlined + `CustomChip`; filtros = `CustomTextField`(+select); apply = `react-hook-form` + `CustomTextField` + checkbox consent; readers `listPublicOpenings`/`getPublicOpeningByPublicId`; command `submitPublicHiringApplication` (1367). Tokens AXIS; copy `getMicrocopy(locale).careers` (dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts`, es-CL + en-US).
 
 ### GVC scenario plan
 
@@ -184,14 +200,14 @@ Ver la tabla completa en el wireframe (§Implementation Mapping): VacancyCard = 
 
 ### Slice 1 — Shell público + attract (N0) + listing (N1)
 
-- Shell público sin sesión reusable (header/footer Efeonce) + ruta `/[lang]/careers`.
+- Shell público sin sesión reusable (header/footer Efeonce) + ruta `/careers`.
 - **Attract (N0):** hero de employer brand + 3 pilares ("por qué Efeonce") + stepper "cómo es el proceso" (transparencia). NO es solo un listado — la página atrae talento (`greenhouse-talent-people-operator`).
 - Listing de openings publicados (`listPublicOpenings`) con VacancyCard **skills-forward** (chips de competencias clave) + filtros client-side (búsqueda/área/modalidad, debounce 200–300ms, URL search params).
-- Estados: loading (skeletons), empty-zero (+ CTA talent pool), empty-filtered, error. Copy `src/lib/copy/careers.ts`.
+- Estados: loading (skeletons), empty-zero (+ CTA talent pool), empty-filtered, error. Copy `getMicrocopy(locale).careers` (dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts`, es-CL + en-US).
 
 ### Slice 2 — Detalle (N2)
 
-- Ruta `/[lang]/careers/[publicId]` con detalle desde `getPublicOpeningByPublicId` (allowlist): descripción + **competencias clave** (chips, enlaza al assessment engine) + **cómo es el proceso** + **señal de compensación** ("se conversa en el proceso" si el payload no trae rango; si trae, mostrarlo — pay-transparency). Estado 404. CTA "Postular a esta vacante".
+- Ruta `/careers/[publicId]` con detalle desde `getPublicOpeningByPublicId` (allowlist): descripción + **competencias clave** (chips, enlaza al assessment engine) + **cómo es el proceso** + **señal de compensación** ("se conversa en el proceso" si el payload no trae rango; si trae, mostrarlo — pay-transparency). Estado 404. CTA "Postular a esta vacante".
 
 ### Slice 3 — Apply form (N3) — forms-ux floor
 
@@ -216,7 +232,7 @@ Ver la tabla completa en el wireframe (§Implementation Mapping): VacancyCard = 
 
 ## Detailed Spec
 
-Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño; no freehand). La UI es cliente delgado: readers de 353 + command de 1367. El shell público se diseña reusable para 1363. Copy productivo en `src/lib/copy/careers.ts` (es-CL). Marca Efeonce vía SSOT.
+Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño; no freehand). La UI es cliente delgado: readers de 353 + command de 1367. El shell público se diseña reusable para 1363. Copy productivo en `getMicrocopy(locale).careers` (dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts`, es-CL + en-US) (es-CL). Marca Efeonce vía SSOT.
 
 ## Rollout Plan & Risk Matrix
 
@@ -232,6 +248,10 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 | Overflow horizontal mobile | UI | medium | `scrollWidth==clientWidth` en GVC 390px; contención | GVC frame |
 | Copy hardcodeado / marca equivocada | UI/brand | low | Copy en `careers.ts` + marca Efeonce SSOT; lint `no-untokenized-copy` | lint/GVC |
 | Form inaccesible (consent/labels) | a11y | medium | Labels reales + consent accesible + axe; error anunciado | axe/GVC |
+| **Public page `force-dynamic` → PG por hit (no absorbe tráfico)** | scalability | medium | RSC + ISR (`revalidate`) + `revalidatePath` on-publish; NUNCA force-dynamic el listing | latencia/carga PG bajo tráfico |
+| **Indexar careers con apply 404** (flag OFF) | SEO/rollout | medium | `noindex` hasta `HIRING_PUBLIC_APPLICATIONS_ENABLED` ON; coordinar 354↔1367 | página indexada con CTA roto |
+| **`[lang]` one-way door** (routing i18n inexistente) | architecture | low | Ruta `src/app/public/careers/**`; i18n = ADR app-wide follow-up | — |
+| Read público falla (PG blip) → 500 en blanco | resilience | low | Error boundary + estado de error honesto + `captureWithDomain('hiring')` | error rate del read |
 
 ### Feature flags / cutover
 
@@ -260,6 +280,8 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 
 ## Acceptance Criteria
 
+- [ ] **Ruta `src/app/public/careers/**`** (patrón público canónico); NUNCA `[lang]`. Listing/detalle = **RSC + ISR** (`revalidate` + `revalidatePath` on-publish desde 355); NO `force-dynamic`. Apply = client component.
+- [ ] **`noindex`** hasta que el apply esté live (`HIRING_PUBLIC_APPLICATIONS_ENABLED` ON); read público con error boundary + degradación honesta (nunca 500) + `captureWithDomain('hiring')`.
 - [ ] **Attract (N0)** presente: hero de employer brand + pilares "por qué Efeonce" + stepper "cómo es el proceso" — la página atrae, no solo lista.
 - [ ] Listing/detalle consumen SOLO `PublicOpeningPayload`; 0 columnas internas; **skills-forward** (chips de competencias).
 - [ ] Detalle muestra competencias + cómo es el proceso + **señal de compensación** (rango si el payload lo trae, si no "se conversa en el proceso").
@@ -267,7 +289,7 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 - [ ] **Form floor forms-ux:** single column (Nombre/Apellido pareado), label sobre input, `autocomplete`+`inputmode` por campo, validación 3-stage, error inline 4-elementos, submit **ENABLED** (no disabled-por-consent), preservar datos en error, foco al 1er error, no autofocus, "(opcional)" en la minoría, paste tolerante.
 - [ ] Los 10 estados del State Copy existen (incluye vacío+talent-pool, 404, rate-limited, captcha-failed, validación con error-copy por campo, error genérico).
 - [ ] Confirmación + fallas genéricas (no filtran dedupe/estado/PII).
-- [ ] Copy 100% desde `src/lib/copy/careers.ts` es-CL; 0 literals; consent referencia el aviso de privacidad (Ley 21.719); marca Efeonce (no Greenhouse).
+- [ ] Copy 100% vía `getMicrocopy(locale).careers` (bilingüe es-CL + en-US (dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts`, es-CL + en-US) es-CL); 0 literals; consent referencia el aviso de privacidad (Ley 21.719); marca Efeonce (no Greenhouse).
 - [ ] NUNCA se piden documentos de identidad ni datos proxy de clase protegida (edad/género/foto) en el apply público (fairness).
 - [ ] a11y WCAG 2.2 AA (labels reales, consent accesible, focus cross-surface + 1er error, reflow 320/200%, reduced-motion).
 - [ ] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia.

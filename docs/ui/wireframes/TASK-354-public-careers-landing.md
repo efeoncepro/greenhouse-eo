@@ -6,7 +6,7 @@
 - Superficie: Careers pública (sin sesión) — **attract** (employer brand) + listing + detalle + apply form
 - Nodos del master flow: N0 (attract/hero+brand) · N1 (listing) · N2 (detalle) · N3 (apply form) — ver `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md`
 - UI rigor: `ui-standard`
-- Route group: público (sin auth), locale-aware `[lang]`
+- Route group: público (sin auth) — ruta `src/app/public/careers/**` (NO `[lang]`); locale-aware BILINGÜE (es-CL + en-US) vía next-intl (cookie `gh_locale` + Accept-Language, sin segmento de URL). Copy vía `getMicrocopy(locale)`
 - Marca: **Efeonce** (institucional/externo — es careers público, no la app Greenhouse). Logo Efeonce, no Greenhouse.
 - Estado: `draft` (UI ready: no — falta loop GVC con la ruta real)
 - Skills revisadas: `greenhouse-talent-people-operator` (candidate experience + fairness) · `forms-ux` (apply floor) · `greenhouse-ux-writing` (copy es-CL) · `greenhouse-ux` · `state-design` · `a11y-architect`
@@ -17,7 +17,7 @@ La cara pública del ATS: no un listado de vacantes, sino una **experiencia de a
 
 ## Layout Skeleton
 
-### Surface A — Careers home (`/[lang]/careers`) = Attract (N0) + Listing (N1)
+### Surface A — Careers home (`/careers`) = Attract (N0) + Listing (N1)
 
 ```
 ┌───────────────────────────────────────────────────────────┐
@@ -49,7 +49,7 @@ La cara pública del ATS: no un listado de vacantes, sino una **experiencia de a
 └───────────────────────────────────────────────────────────┘
 ```
 
-### Surface B — Detalle (`/[lang]/careers/[publicId]`)
+### Surface B — Detalle (`/careers/[publicId]`)
 
 ```
 ┌───────────────────────────────────────────────────────────┐
@@ -221,7 +221,7 @@ Todo el copy visible vive en `src/lib/copy/` (dominio nuevo `careers.ts`), es-CL
 - [ ] **Form floor forms-ux:** single column (name/apellido pareado), label sobre input, `autocomplete`+`inputmode` por campo, validación 3-stage, error inline 4-elementos, submit ENABLED (no disabled-por-consent), paste tolerante, foco al 1er error, no autofocus, "(opcional)" en la minoría.
 - [ ] Los 10 estados del State Copy existen (incluye vacío+talent-pool, 404, rate-limited, captcha-failed, validación, error).
 - [ ] Confirmación genérica — no filtra dedupe/estado/PII.
-- [ ] Copy 100% desde `src/lib/copy/careers.ts` es-CL; 0 literals; consent referencia aviso de privacidad (Ley 21.719).
+- [ ] Copy 100% vía `getMicrocopy(locale).careers` (bilingüe es-CL + en-US (dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts`, es-CL + en-US) es-CL); 0 literals; consent referencia aviso de privacidad (Ley 21.719).
 - [ ] a11y: labels reales, focus+1er-error, consent accesible, reflow 320/200%, reduced-motion.
 - [ ] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia.
 - [ ] Marca Efeonce (no Greenhouse) en header/footer.
