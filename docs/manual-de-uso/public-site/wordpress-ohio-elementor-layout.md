@@ -304,6 +304,40 @@ asignado a `Primary` -> `Custom Links` -> URL + texto -> ubicar jerarquia ->
 guardar. Para agentes, usar este camino solo como referencia del modelo; el
 camino gobernado es WP-CLI/API con snapshot y verificacion.
 
+### Enriquecer visualmente el mega menu
+
+El menu `Soluciones` ya usa el wide/mega menu nativo de Ohio. No hace falta
+crear un header Elementor ni instalar un mega-menu plugin para la primera
+iteracion.
+
+Opciones disponibles en `Apariencia > Menus > Menu 1`:
+
+- `Enable wide menu`: guardado como `ohio_wide_menu_enabled`;
+- `Upload Image`: guardado como `icon_img`;
+- `Description`: campo nativo de WordPress que se guarda en `post_excerpt`.
+
+Estado observado el 2026-07-08: `Soluciones` (`242525`) tiene wide menu activo,
+el panel desktop mide aprox. `1397x201px` y contiene seis columnas. No hay
+imagenes ni descripciones cargadas todavia. En mobile, `Menu Images` esta activo
+y `Menu Descriptions` esta desactivado.
+
+Recomendacion operativa:
+
+1. Empezar con imagenes/iconos livianos y descripciones de una linea en las
+   columnas existentes, no con una card extra en `Soluciones`.
+2. Priorizar columnas o servicios: `Produccion Creativa`, AEO, SEO,
+   `Diseno & Desarrollo Web`, `Redes Sociales`, `Visibilidad`, `HubSpot`.
+3. No agregar imagen/descripcion al padre `Soluciones` sin probar layout:
+   Ohio agrega una columna extra al panel y puede apretar las seis columnas
+   actuales.
+4. Antes de guardar, snapshot de `icon_img`, `post_excerpt`,
+   `ohio_wide_menu_enabled` y metas `_menu_item_*`.
+5. Despues de guardar, purgar cache y verificar desktop hover, mobile menu,
+   teclado/focus y `document.documentElement.scrollWidth === clientWidth`.
+
+Un mega menu custom con card editorial, imagen hero o layout distinto debe
+plantearse como cambio de child theme/runtime, no como edicion casual de menu.
+
 ## Fix aplicado el 2026-06-14
 
 ### `/blog`

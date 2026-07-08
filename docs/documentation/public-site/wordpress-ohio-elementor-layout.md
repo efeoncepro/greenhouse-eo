@@ -122,6 +122,9 @@ clasico es:
 - `_menu_item_url` solo gobierna links custom (`_menu_item_type=custom`,
   `_menu_item_object=custom`). En items de pagina, la URL sale del permalink
   del objeto y `_menu_item_url` normalmente queda vacio.
+- Ohio agrega metas visuales por item: `ohio_wide_menu_enabled` e `icon_img`.
+  La descripcion del item (`post_excerpt`, visible en WP Admin si se activa
+  `Description` en Screen Options) se usa como descripcion/subtitulo del menu.
 
 Items confirmados como secciones custom de primer/segundo nivel:
 
@@ -144,6 +147,47 @@ Rollback snapshot del update 2026-07-08: option
 `gh_backup_before_public_menu_visibility_creative_v2_20260708T154302Z` y post
 meta `_gh_backup_before_public_menu_visibility_creative_v2_20260708T154302Z`
 en page `251279`.
+
+### Mega menu visual de Ohio
+
+La auditoria read-only del 2026-07-08 confirma que el mega menu no depende de
+Elementor ni de un plugin tercero. Lo provee el parent theme Ohio:
+
+- `ohio/inc/menu/mega_menu.php` registra los campos de admin;
+- `ohio/inc/menu/front_mega_menu_walker.php` renderiza el frontend;
+- `ohio/style.css` estiliza `.sub-menu-wide`, `.wide-menu-image`,
+  `.wide-menu-description` y `.menu-link-icon-image`.
+
+Estado observado:
+
+- `Soluciones` (`item 242525`) ya tiene `ohio_wide_menu_enabled=1`;
+- el frontend renderiza `ul.menu-depth-1.sub-menu.sub-menu-wide`;
+- medicion desktop 1440: panel aprox. `1397x201px`, seis columnas de aprox.
+  `216x161px`, sin overflow horizontal;
+- no hay imagenes ni descripciones renderizadas todavia (`icon_img` vacio en
+  todos los items);
+- opciones mobile Ohio: `Menu Images=true`, `Menu Descriptions=false`.
+
+Regla de composicion:
+
+- No agregar primero imagen/descripcion al padre `Soluciones`: Ohio crea una
+  columna extra `li.wide-menu-parent-meta` y el panel actual ya usa seis
+  columnas.
+- Para una primera iteracion, usar la via nativa: `icon_img` liviano y
+  `post_excerpt` corto en las columnas depth-1 (`Estrategia`,
+  `Experiencia`, `Crecimiento`, `Visibilidad`, `Servicios Destacados`,
+  `HubSpot`) y/o en servicios prioritarios (`Produccion Creativa`, AEO, SEO,
+  Web, Redes).
+- Si un item dentro del wide menu tiene `icon_img`/descripcion, Ohio lo renderiza
+  bajo la columna; si un item no-wide tiene `icon_img`, se muestra como icono
+  pequeno junto al link.
+- Los campos mas ambiciosos existen comentados/no expuestos en el parent theme
+  (`ohio_mega_menu_image`, background position/repeat, full-width menu). No
+  depender de ellos sin cambio gobernado en child theme/runtime.
+
+Antes de publicar cualquier enriquecimiento visual del mega menu: snapshot de
+`icon_img`, `post_excerpt`, `ohio_wide_menu_enabled` y metas `_menu_item_*`,
+prueba desktop hover, mobile menu, teclado/focus y medicion `scrollWidth`.
 
 Regla operativa: no agregar ni editar menu por SQL ni editando HTML del
 masthead. Para futuras mutaciones, primero snapshot del menu (`wp_get_nav_menus`,

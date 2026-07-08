@@ -39,6 +39,8 @@ mutate the menu during discovery.
   and mobile `ul#mobile-menu`.
 - REST exposes `/wp/v2/menu-items`, `/wp/v2/menus` and
   `/wp/v2/menu-locations`, but prefer WP-CLI/PHP core for governed writes.
+- Ohio provides native mega-menu support in the parent theme. Do not assume a
+  third-party mega-menu plugin or Elementor header owns this surface.
 
 Storage model:
 
@@ -50,6 +52,9 @@ Storage model:
 - type/object = `_menu_item_type`, `_menu_item_object`,
   `_menu_item_object_id`;
 - custom URL = `_menu_item_url` only when `_menu_item_type=custom`.
+- Ohio visual meta on each menu item: `ohio_wide_menu_enabled` and `icon_img`.
+  The WordPress menu item description (`post_excerpt`) is used by Ohio as menu
+  description/subtitle text.
 
 Confirmed parent IDs:
 
@@ -84,6 +89,45 @@ Confirmed live service item:
 WP option `gh_backup_before_public_menu_visibility_creative_v2_20260708T154302Z`
 and post meta `_gh_backup_before_public_menu_visibility_creative_v2_20260708T154302Z`
 on page `251279`.
+
+## Ohio Wide/Mega Menu Visual Enrichment
+
+Read-only audit 2026-07-08 found:
+
+- `Soluciones` (`item 242525`) already has `ohio_wide_menu_enabled=1`; frontend
+  renders `ul.menu-depth-1.sub-menu.sub-menu-wide`.
+- Current desktop 1440 render: wide panel around `1397x201px`, six columns of
+  about `216x161px`, `scrollOverflow=0`.
+- No live `icon_img`, `.wide-menu-image`, `.wide-menu-description`, or
+  `.menu-link-icon-image` is currently rendered.
+- Ohio parent theme owner: `ohio/inc/menu/mega_menu.php` registers the menu
+  fields; `ohio/inc/menu/front_mega_menu_walker.php` renders them; `ohio/style.css`
+  owns `.sub-menu-wide`, `.wide-menu-image`, `.wide-menu-description`, and
+  `.menu-link-icon-image`.
+- If a top-level wide item such as `Soluciones` has `icon_img` or description,
+  Ohio injects an extra `li.wide-menu-parent-meta` at the start of the wide
+  panel. With the current six-column panel, avoid this until layout is tested.
+- If a depth-1 item inside the wide panel has `icon_img` or description, Ohio
+  renders image/description under that column. If a non-wide menu item has
+  `icon_img`, Ohio renders it as a small `.menu-link-icon-image` next to the
+  link.
+- Mobile option state observed: `Menu Images=true`, `Menu Descriptions=false`;
+  images may appear on mobile, descriptions stay hidden unless that global Ohio
+  option is changed.
+- Some more ambitious Ohio fields exist in code but are not exposed in the
+  active options array (`ohio_mega_menu_image`, background position/repeat,
+  full-width menu). Do not depend on them without a governed child-theme/code
+  change.
+
+Recommended first iteration: use the native Ohio model before building a custom
+mega menu. Add lightweight `icon_img` assets and short `post_excerpt`
+descriptions to the existing depth-1 category columns (`Estrategia`,
+`Experiencia`, `Crecimiento`, `Visibilidad`, `Servicios Destacados`, `HubSpot`)
+and/or priority service links (`Producción Creativa`, AEO, SEO, Web, Redes).
+Do not add a parent `Soluciones` hero image/card first, because it creates an
+extra column. For any visual enrichment, snapshot `icon_img`, `post_excerpt`,
+`ohio_wide_menu_enabled`, core `_menu_item_*` metas, then verify desktop hover,
+mobile menu, keyboard/focus behavior, and page `scrollWidth`.
 
 Operational learning from the 2026-07-07 menu write:
 

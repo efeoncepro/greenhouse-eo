@@ -1,3 +1,10 @@
+## Sesion 2026-07-08 - Public Site mega menu Ohio audit docs - Codex - docs-only
+
+> **Cambio:** documentada auditoria read-only del mega menu de `efeoncepro.com` sin modificar WordPress. `Soluciones` (`item 242525`) ya usa wide menu nativo de Ohio (`ohio_wide_menu_enabled=1`); todos los `nav_menu_item` tienen metas `icon_img` + `ohio_wide_menu_enabled`, y `post_excerpt` alimenta descripcion/subtitulo.
+> **Hallazgo:** panel desktop 1440 aprox. `1397x201px`, 6 columnas de aprox. `216x161px`, `scrollOverflow=0`, sin imagenes/descripciones renderizadas hoy. Mobile: `Menu Images=true`, `Menu Descriptions=false`. Ohio renderiza desde `ohio/inc/menu/mega_menu.php`, `front_mega_menu_walker.php` y `style.css`.
+> **Recomendacion canonizada:** primera iteracion nativa Ohio: iconos/imagenes livianas + descripciones cortas en columnas/items existentes. No poner imagen/descripcion en el padre `Soluciones` primero, porque Ohio agrega una columna extra `wide-menu-parent-meta`; una card editorial custom debe ser cambio gobernado de child theme/runtime con smoke desktop/mobile/focus/overflow.
+> **Docs actualizados:** skill Codex/Claude `efeonce-public-site-wordpress/references/runtime-and-discovery.md`, `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`, `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md`, `docs/operations/discovery-public-website-wordpress-20260614.md`, `project_context.md`, `changelog.md`.
+
 ## Sesion 2026-07-08 - TASK-1367 Careers Apply Intake Service - Claude - complete (code)
 
 > **Task:** `TASK-1367` (Careers Apply Intake Service, EPIC-011, split backend de TASK-354) **complete** (code). **Local-first en `develop`, sin push.** 3 slices + cierre. Endpoint público `POST /api/public/hiring/applications` + `submitPublicHiringApplication` → Person→candidate_facet→hiring_application.

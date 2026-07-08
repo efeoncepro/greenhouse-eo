@@ -242,6 +242,31 @@ Operational lessons from the successful Redes Sociales write:
 - Verification must inspect the rendered desktop and mobile menus
   (`#menu-primary`, `#mobile-menu`), not only WordPress data.
 
+## Discovery delta 2026-07-08: Ohio wide menu visual options
+
+Read-only follow-up after the `Visibilidad` / `Produccion Creativa` menu update
+found the active visual surface for the mega menu:
+
+- Current location remains `primary -> nav_menu 61` (`Menu 1`), now `count=25`.
+- `Soluciones` (`item 242525`) has `ohio_wide_menu_enabled=1`, so Ohio renders
+  `ul.menu-depth-1.sub-menu.sub-menu-wide`.
+- All `nav_menu_item` posts carry Ohio visual metas `ohio_wide_menu_enabled`
+  and `icon_img`; the menu item description is stored in `post_excerpt`.
+- Desktop 1440 measurement: the `Soluciones` wide panel is about `1397x201px`
+  with six columns of about `216x161px`, no horizontal overflow.
+- No images/descriptions render today because `icon_img` and descriptions are
+  empty.
+- Mobile Ohio options observed: `Menu Images=true`, `Menu Descriptions=false`.
+- Parent theme owner is Ohio, not Elementor: `ohio/inc/menu/mega_menu.php`,
+  `ohio/inc/menu/front_mega_menu_walker.php`, and `ohio/style.css`.
+
+Operational recommendation: first use Ohio native `icon_img` + short
+`post_excerpt` descriptions on existing depth-1 columns and priority service
+links. Do not put an image/description on parent `Soluciones` first: Ohio
+injects an extra `wide-menu-parent-meta` column, which could squeeze the current
+six-column layout. A custom editorial card/hero inside the menu should be a
+governed child-theme/runtime change with desktop/mobile/focus/overflow checks.
+
 ## Discovery delta 2026-07-08: landing media asset rollout
 
 The Redes Sociales wall asset rollout added an operational pattern for public
