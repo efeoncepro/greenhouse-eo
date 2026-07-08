@@ -1,5 +1,13 @@
 # TASK-354 — Public Careers Landing & Apply Intake
 
+## Delta 2026-07-07
+
+- **Desbloqueada:** `TASK-353` (foundation) completa. El runtime real existe — NO uses mocks. Contratos a consumir:
+  - Listado/detalle público: `listPublicOpenings()` / `getPublicOpeningByPublicId(publicId)` (`src/lib/hiring/publication.ts`). Devuelven **solo** el payload allowlist (`PublicOpeningPayload`); NUNCA leas columnas internas del opening.
+  - Apply: reconciliá/creá la **Person** primero (`identity_profiles`), luego `reconcileCandidateFacet({ identityProfileId, source: 'public_careers', consent* })` y `createHiringApplication({ openingId, identityProfileId, candidateFacetId, source: 'public_careers', dedupeFingerprint })`. `candidate_facet.identity_profile_id` es **NOT NULL + UNIQUE** → una Person = una faceta.
+  - Dedupe: `hiring_application` tiene `UNIQUE(opening_id, identity_profile_id)` (409 desde el store) + columna `dedupe_fingerprint` para tu idempotency key.
+  - Errores: `toHiringErrorResponse` / `hiringInvalidBodyResponse` (`src/lib/hiring/error-response.ts`), es-CL safe.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

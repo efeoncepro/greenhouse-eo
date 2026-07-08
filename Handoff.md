@@ -1,10 +1,14 @@
-## Sesion 2026-07-07 - TASK-353 Hiring/ATS Domain Foundation - Claude - discovery + checkpoint
+## Sesion 2026-07-07 - TASK-353 Hiring/ATS Domain Foundation - Claude - COMPLETE (local-first)
 
-> **Task:** `TASK-353` (Hiring/ATS Domain Foundation, EPIC-011). Movida a `in-progress`. Trabajo **local-first en `develop`, sin push**.
-> **Objetivo:** foundation transaccional del dominio `Hiring / ATS` — schema nuevo `greenhouse_hiring` (aggregates `TalentDemand`, `HiringOpening`, `CandidateFacet`, `HiringApplication` + snapshot de decisión/handoff), service layer, API routes internas base, publication contract público allowlist, 8 capabilities V1 + grants + views seed.
-> **Arquitectura fuente:** `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (canónica).
-> **Discovery completado:** patrones canónicos a reutilizar mapeados — store SQL-crudo (`staff-augmentation/store.ts`, `contractor-engagements/store.ts` split store/state-machine/types/errors), migración schema-nuevo (`20260625081014196_task-1229-growth-forms-engine-schema.sql`), entitlements catalog + runtime grant + capability-grant-coverage guard, VIEW_REGISTRY + seed migration (TASK-827), outbox `publishOutboxEvent` + event-catalog, API route dual-gate (`roadmap/work-items/route.ts`), person reconciliation (`resolvePersonIdentifier`, `identity_profiles.profile_id`).
-> **Estado:** en checkpoint humano pre-implementación (P1 + blast alto = schema nuevo de dominio). Plan de slices presentado, esperando aprobación antes de escribir migración.
+> **Task:** `TASK-353` (Hiring/ATS Domain Foundation, EPIC-011) → **`complete`** (local-first en `develop`, **sin push** — esperar señal del operador para promover). Desbloquea TASK-354 (careers público) + TASK-355 (desk interno) sobre runtime real.
+> **Entregado (4 slices, 4 commits):**
+> - **Slice 1** — migración `20260707235655376_task-353-hiring-ats-domain-foundation.sql`: schema `greenhouse_hiring` con 4 tablas (`talent_demand`, `hiring_opening`, `candidate_facet`, `hiring_application`), enums CHECK, FKs, índices, DO block anti pre-up-marker, GRANTs a 3 roles. Aplicada a PG dev + `db.d.ts` regenerado.
+> - **Slice 2** — `src/lib/hiring/{types,errors,store}` + `src/types/hiring.ts`: readers + writers CRUD, reconciliación person-first (upsert por `identity_profile_id`), dedupe estructural, outbox v1 transaccional.
+> - **Slice 3** — `src/lib/hiring/publication.ts`: `buildPublicOpeningPayload` allowlist-only (+ test anti-leak) + `publishOpening`/`unpublishOpening` + `listPublicOpenings`.
+> - **Slice 4** — `/api/hiring/**` (8 routes dual-gate) + 8 capabilities (catálogo + runtime grants + seed `capabilities_registry` `20260708001439743`). Dominio `hiring` en `captureWithDomain`.
+> **Verificación:** smoke real contra PG dev (cadena completa + dedupe 409 + publish guard 422 + COALESCE upsert preserva datos); `pnpm test` full (8813 pass, 0 fail); `pnpm build` OK (8 rutas registradas); lint + typecheck + `pg:doctor` + grant-coverage verdes.
+> **Decisiones de schema/contrato que condicionan TASK-354/355/356:** (a) `candidate_facet.identity_profile_id` es NOT NULL + UNIQUE → TASK-354 debe crear/reconciliar la Person ANTES de la faceta; (b) publication = columnas `public_*` en la misma fila del opening, allowlist vía `buildPublicOpeningPayload` (TASK-354 consume esto, NUNCA lee columnas internas); (c) decisión/handoff = snapshot embebido en `hiring_application` (TASK-356 lee estos campos para crear `HiringHandoff`); (d) `hiring.application.decide` seedeada/grantada pero su endpoint llega en TASK-355.
+> **Pendiente (no bloqueante, difierido explícito):** views del desk (`agency.hiring.*`) + su seed migration → TASK-355 (con rutas reales, para no violar reachability). Migración corre en staging/prod vía release pipeline al promover (local-first, sin push).
 
 ## Sesion 2026-07-07 - Medición GTM/GA4 - Claude - dominio conectado + verificado
 

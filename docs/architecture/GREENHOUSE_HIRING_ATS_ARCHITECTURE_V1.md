@@ -849,3 +849,30 @@ Pero no conviene arrancar con micrositios por tenant como requisito base del dom
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
 - `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
+
+## Delta 2026-07-07 — TASK-353: Domain foundation implementada (schema `greenhouse_hiring`)
+
+La foundation transaccional del dominio quedó materializada (local-first, verificada contra PG dev). Schema nuevo **`greenhouse_hiring`** con 4 aggregates:
+
+- **`talent_demand`** (`demand_id` `tdmn-{uuid}`, `public_id` `EO-TDM-####`) — objeto raíz. `stakeholder_type` (internal/client) × `engagement_type` (on_demand/on_going) × `fulfillment_mode` (5) × `demand_origin` (6); contexto comercial nullable (`organization_id` FK, `space_id` FK, `client_id`, `business_unit`, `service_id`) + refs pre-canonización (`prospect_ref`/`deal_ref`/`external_account_ref`/`requested_company_name`); intención de cobertura (`requested_role`, `requested_seats`, `requested_skills[]`, `target_start_date`, `priority`, bands); `status` (9-state lifecycle).
+- **`hiring_opening`** (`opening_id` `opng-{uuid}`, `EO-OPN-####`) — deriva de `talent_demand` (FK RESTRICT). Truth interna (`internal_title`, `budget_band`, `rate_band`, `risk_notes`, `internal_notes`, `owner_user_id`) **separada** del payload público allowlist (`public_title`, `public_summary`, `public_description`, `public_requirements`, `public_nice_to_have`, `public_location_mode`, `public_employment_mode`, `public_seniority`, `public_process_notes`, `apply_url`). `visibility` (3) + `publication_status` (5) + `status` (6).
+- **`candidate_facet`** (`candidate_facet_id` `cndf-{uuid}`, `EO-CND-####`) — **person-first**: FK `identity_profile_id → greenhouse_core.identity_profiles(profile_id)` **UNIQUE** (una Person = a lo más una faceta). `source` (7), `readiness` (5), `expected_rate`, consent/retención, `verification_signals_json`. NO existe root `candidates`.
+- **`hiring_application`** (`application_id` `happ-{uuid}`, `EO-APP-####`) — unidad del pipeline. FKs a `hiring_opening` + `identity_profile_id` + `candidate_facet_id`; **UNIQUE(opening_id, identity_profile_id)** (dedupe estructural). `stage` (13-state), score/match_score, `blocking_issues[]`, `dedupe_fingerprint` (apply idempotente TASK-354); **snapshot de decisión embebido** (`decision`, `decision_at`, `decision_by`) + **snapshot de handoff** (`selected_destination`, `tentative_start_date`, `expected_legal_entity`, `expected_context`, `prerequisites_snapshot_json`) para TASK-356 — sin crear `member`/`assignment`/`placement`.
+
+**Boundary respetado:** esta task NO escribe `member`/`assignment`/`placement`/payroll/compensation truth. Compensation/rate son propuesta/snapshot.
+
+**Store canónico:** `src/lib/hiring/` (SQL crudo parametrizado + normalizadores + `HiringValidationError`; cada write publica outbox event v1 en la misma tx). Publication contract: `buildPublicOpeningPayload()` allowlist-only (test anti-leak) + `publishOpening`/`unpublishOpening` + `listPublicOpenings`/`getPublicOpeningByPublicId` (consumidos por TASK-354).
+
+**API baseline interna:** `/api/hiring/{demands,openings,candidate-facets,applications}` (+ `openings/[id]/publish`), dual-gate `requireInternalTenantContext` + `can()`.
+
+**Capabilities V1 (8, seedeadas en `capabilities_registry` + grants en `runtime.ts`):** `hiring.demand.{read,write}`, `hiring.opening.{read,write,publish}`, `hiring.application.{read,write,decide}`. Grant: internal ∪ EFEONCE_ADMIN ∪ HR_MANAGER ∪ EFEONCE_OPERATIONS (∪ EFEONCE_ACCOUNT en read/write; publish/decide least-privilege sin comercial). NUNCA `client_*`. `hiring.application.decide` queda seedeada/grantada ahora y su endpoint dedicado llega con el desk interno (TASK-355).
+
+**Views (pendiente TASK-355):** los viewCodes del desk (`agency.hiring`, `agency.hiring.demand`, `agency.hiring.pipeline`, `agency.hiring.publication`, `agency.hiring.application_detail`) se seedean en `VIEW_REGISTRY` + migración `role_view_assignments` **junto con las rutas reales** en TASK-355 (seedear un viewCode sin ruta alcanzable violaría la governance de reachability + `role_view_fallback`).
+
+### Invariantes operativos para agentes — Hiring / ATS foundation
+
+- **NUNCA** crear un root paralelo `candidates`; el candidato vive como `candidate_facet` anclada a `identity_profile_id` (UNIQUE). La creación/reconciliación de Person desde contacto crudo es el apply público (TASK-354), no este dominio.
+- **NUNCA** exponer un campo interno del opening al público fuera de `buildPublicOpeningPayload()` (allowlist-only). Agregar un campo público = extender esa función + su test anti-leak.
+- **NUNCA** escribir `member`/`assignment`/`placement`/payroll/compensation desde `src/lib/hiring/**`. El handoff downstream es explícito (TASK-356), no side effect.
+- **NUNCA** publicar un opening sin `public_title` (guard 422 en `publishOpening`).
+- **SIEMPRE** publicar el outbox event en la misma tx que el write del aggregate (patrón del store); `captureWithDomain(err, 'hiring', …)` para observabilidad.

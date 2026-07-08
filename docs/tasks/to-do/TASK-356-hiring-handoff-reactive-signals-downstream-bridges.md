@@ -1,5 +1,12 @@
 # TASK-356 — Hiring Handoff, Reactive Signals & Downstream Bridges
 
+## Delta 2026-07-07
+
+- **Desbloqueada (foundation):** `TASK-353` completa. Ya existe:
+  - **Snapshot de handoff embebido** en `hiring_application`: `decision`, `selected_destination` (= fulfillment_mode), `tentative_start_date`, `expected_legal_entity`, `expected_context`, `prerequisites_snapshot_json`. Leé esos para crear `HiringHandoff` — la Person es `identity_profile_id` (no dupliques identidad).
+  - **Outbox events v1 ya emitidos** por el store (`talent_demand.*`, `hiring.opening.*` incl. published/unpublished, `hiring.candidate_facet.*`, `hiring.application.*`) — **sin consumer reactivo todavía**. Vos construís el consumer reactivo + las señales `hiring.signal.*` + el `HiringHandoff` como aggregate propio. Aggregate/event types en `src/lib/sync/event-catalog.ts`.
+  - **Boundary duro (respetá):** Hiring NO crea `member`/`assignment`/`placement`/payroll. El `internal_hire` → colaborador activo lo cierra `TASK-770` bajo HRIS/People, no acá.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

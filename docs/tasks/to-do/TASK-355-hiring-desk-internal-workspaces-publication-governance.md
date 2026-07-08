@@ -1,5 +1,12 @@
 # TASK-355 — Hiring Desk Internal Workspaces & Publication Governance
 
+## Delta 2026-07-07
+
+- **Desbloqueada:** `TASK-353` (foundation) completa. Readers/commands + 8 capabilities + API `/api/hiring/**` ya existen (consumí esos, no logica paralela).
+- **Views: te toca a vos.** TASK-353 NO seedeó los viewCodes del desk (`agency.hiring`, `agency.hiring.demand`, `agency.hiring.pipeline`, `agency.hiring.publication`, `agency.hiring.application_detail`) a propósito — seedear un viewCode sin ruta alcanzable viola la governance de reachability + dispara `role_view_fallback`. Vos creás las rutas reales `(dashboard)` **y** el seed `VIEW_REGISTRY` TS + migración `view_registry`/`role_view_assignments` en el mismo PR (patrón TASK-827), + `route-reachability-manifest`.
+- **`hiring.application.decide`:** capability ya seedeada + grantada (least-privilege, sin comercial), pero su **endpoint dedicado de decisión** (setear `decision` + snapshot de handoff en `hiring_application`) lo construís vos acá. Los campos ya existen en el schema (`decision`, `decision_at`, `decision_by`, `selected_destination`, `tentative_start_date`, `expected_legal_entity`, `expected_context`, `prerequisites_snapshot_json`).
+- El kanban mueve `HiringApplication` (unidad del pipeline). Publication Desk usa `buildPublicOpeningPayload` para el diff interno↔público.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

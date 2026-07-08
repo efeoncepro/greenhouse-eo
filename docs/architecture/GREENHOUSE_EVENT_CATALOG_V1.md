@@ -1156,3 +1156,15 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | `growth.ai_visibility.business_model_overridden` | v1      | `growth_ai_visibility_business_model` (`profile_id`) | command gobernado `overrideProfileBusinessModel` (operador Growth/AM · Nexa vía propose→confirm→execute) | (futuro) re-derivación de prompts / QBR digest — sin consumer reactivo en V1 |
 
 **Payload v1**: `{ schemaVersion: 1, profileId, organizationId, fromBusinessModel, toBusinessModel, updatedBy, reason }` — sin PII (ids + enum de modelo de negocio + user id + texto operativo). Emitido **transaccionalmente** (mismo `withGreenhousePostgresTransaction` que el `UPDATE grader_profiles` + el `INSERT grader_business_model_history` append-only), NUNCA best-effort fuera de la tx. Sólo en cambio real: la idempotencia no-op (mismo valor ya como `operator_override`) NO emite. El override fija `business_model_source='operator_override'` + `confidence=1.0` (human-asserted). `business_model` es el eje de buyer-intent ortogonal a la categoría que TASK-1290 consume para elegir el framing de los prompts (cierra ISSUE-110). Aún sin ProjectionDefinition (no hay consumer reactivo en V1). Signal: `growth.ai_visibility.profile_business_model_unresolved`.
+
+## Delta 2026-07-07 — TASK-353: `talent_demand.*` + `hiring.*` (Hiring / ATS domain foundation)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `talent_demand.created` / `talent_demand.updated` / `talent_demand.status_changed` | v1 | `talent_demand` (`demand_id` `tdmn-{uuid}`) | store `createTalentDemand` / `updateTalentDemand` | — (audit/observabilidad V1; reactividad downstream en TASK-356) |
+| `hiring.opening.created` / `hiring.opening.updated` / `hiring.opening.status_changed` | v1 | `hiring_opening` (`opening_id` `opng-{uuid}`) | store `createHiringOpening` / `updateHiringOpening` | — |
+| `hiring.opening.published` / `hiring.opening.unpublished` | v1 | `hiring_opening` | `publishOpening` / `unpublishOpening` (publication contract) | — |
+| `hiring.candidate_facet.created` / `hiring.candidate_facet.updated` | v1 | `hiring_candidate_facet` (`candidate_facet_id` `cndf-{uuid}`) | store `reconcileCandidateFacet` (upsert person-first) | — |
+| `hiring.application.created` / `hiring.application.stage_changed` | v1 | `hiring_application` (`application_id` `happ-{uuid}`) | store `createHiringApplication` / `updateHiringApplicationStage` | — |
+
+**Payload v1**: ids + campos de estado (status/stage/source), sin PII (el detalle se re-lee del aggregate en `greenhouse_hiring.*`). Emitidos **transaccionalmente** en el mismo `withGreenhousePostgresTransaction` que el write del aggregate (nunca best-effort fuera de la tx). **Sin consumer reactivo en V1** (audit/observabilidad del dominio): el `HiringHandoff` explícito + las proyecciones/señales reactivas (`hiring.signal.*`, promoción a `member`) llegan en TASK-356. Aggregate types nuevos: `talent_demand`, `hiring_opening`, `hiring_candidate_facet`, `hiring_application` (`AGGREGATE_TYPES` en `src/lib/sync/event-catalog.ts`). Dominio de observabilidad: `captureWithDomain(err, 'hiring', …)`.
