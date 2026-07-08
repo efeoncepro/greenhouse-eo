@@ -2109,7 +2109,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'hiring.opening.publish', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.write', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
-  { key: 'hiring.application.decide', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' }
+  { key: 'hiring.application.decide', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1360 — Assessment Engine. read: catálogo/plantillas/instancias + scorecard. author: crear
+  // plantillas/preguntas + asignar instancias. score: registrar/corregir puntaje humano + finalizar.
+  { key: 'hiring.assessment.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.assessment.author', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.assessment.score', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

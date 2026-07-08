@@ -467,6 +467,14 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         addEntitlement(entries, { module: 'hiring', capability, action, scope: 'tenant', source: hiringSource })
       }
     }
+
+    // TASK-1360 — Assessment: read (catálogo/plantillas/scorecard) + author (crear preguntas/
+    // plantillas + asignar instancias) al mismo tier operador.
+    addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.read', action: 'read', scope: 'tenant', source: hiringSource })
+
+    for (const action of ['create', 'update'] as const) {
+      addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.author', action, scope: 'tenant', source: hiringSource })
+    }
   }
 
   // TASK-353 — publish/decide: verbos de gobernanza consecuentes (execute). Least-privilege:
@@ -479,7 +487,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   ) {
     const hiringGovSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
 
-    for (const capability of ['hiring.opening.publish', 'hiring.application.decide'] as const) {
+    for (const capability of ['hiring.opening.publish', 'hiring.application.decide', 'hiring.assessment.score'] as const) {
       addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: hiringGovSource })
     }
   }
