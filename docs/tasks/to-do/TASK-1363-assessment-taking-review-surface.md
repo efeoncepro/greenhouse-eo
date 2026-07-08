@@ -1,5 +1,15 @@
 # TASK-1363 — Assessment Taking + Review Surface
 
+## Delta 2026-07-08 — Revisión 3-lentes (arch-architect + talent/people-ops + product-design)
+
+Hechos verificados contra el repo real. Ajustes:
+
+- **Blockers recalibrados (positivo):** **`TASK-1360` (motor) y `TASK-1361` (AI assist) están COMPLETE.** El motor EXISTE y expone el contrato real: `resolveAssessmentByToken` (single-use — *"Solo si sigue rendible"*), `saveResponse`, `submitAssessment`, `buildPublicQuestion` (allowlist server-side — **el answer-key NUNCA viaja al candidato, ya enforced**), `finalizeAssessment` (scoring/rollup), `assignCandidateTest`. 1363 es un **consumer delgado de un motor listo**, no bloqueado por él. Blockers vivos reales: **354** (shell público) + **355** (Application 360 host del scorecard). La sección "Pendiente (blocked-by, NO existe)" quedó **stale** → corregida.
+- **Routing `[lang]` MAL → `src/app/public/**`.** El dashboard/público NO usa segmento `[lang]` (next-intl cookie/header; ver overlay arch §17). Candidato = **`src/app/public/assessment/[token]/**`** (URL `/assessment/[token]`), bilingüe es-CL + en-US vía `getMicrocopy(locale)`. **DDL-2 del master flow:** reusa el **mismo shell público tokenizado** que 354 construye para el apply (un shell, dos usos) — no un layout público paralelo.
+- **Accommodations EN SCOPE (no follow-up):** el motor ya persiste **`accommodations_json`** en la instancia. La superficie de rendición **debe honrar** las accommodations (tiempo extendido, accesibilidad) desde V1 — es fairness + EU AI Act (no desventajar a quien necesita accommodation), no una mejora futura.
+- **Anti-anclaje en el review (fairness):** en la corrección interna, mostrar la **rúbrica + la respuesta primero**, y la sugerencia IA (1361) **después/colapsada** (independent-before-debrief), para que el corrector no ancle en el score IA. IA propone → humano confirma; el scorecard es advisory, nunca veredicto binario.
+- **Motion declarado:** la rendición tiene un **countdown timer** (feedback temporal que afecta confianza) + transiciones de pregunta + estados de aviso de tiempo → motion real (no decorativa) → se crea `docs/ui/motion/TASK-1363-assessment-taking-review-surface-motion.md` y se declara `Motion`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -16,13 +26,13 @@
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1363-assessment-taking-review-surface.md`
 - Flow: `docs/ui/flows/TASK-1363-assessment-taking-review-surface-flow.md`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-1363-assessment-taking-review-surface-motion.md`
 - Backend impact: `api`
 - Epic: `EPIC-011`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-1360`, `TASK-354`, `TASK-355`
+- Blocked by: `TASK-354`, `TASK-355`
 - Branch: `task/TASK-1363-assessment-taking-review-surface`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -59,6 +69,9 @@ Reglas obligatorias:
 - El payload que ve el candidato NUNCA incluye `answer_key_json`/`rubric_json` (allowlist server-side, TASK-1360).
 - Token de acceso single-use + tiempo límite; una sola rendición; sin re-abrir tras submit.
 - El scorecard es advisory (input a decisión humana), NUNCA auto-rechaza ni muestra un veredicto binario de contratación.
+- **Accommodations:** la rendición debe honrar `accommodations_json` de la instancia (tiempo extendido, accesibilidad) desde V1 — fairness + EU AI Act. NUNCA ignorar la accommodation configurada.
+- **Anti-anclaje en el review:** mostrar rúbrica + respuesta ANTES que la sugerencia IA (1361); la sugerencia va después/colapsada (independent-before-debrief). IA propone → humano confirma.
+- **Routing:** `src/app/public/assessment/[token]/**` (NUNCA `[lang]`); bilingüe vía `getMicrocopy(locale)`; reusa el shell público de TASK-354 (DDL-2).
 - Composition Shell + primitives canónicas (no inventar grids/inputs ad hoc); copy es-CL desde `src/lib/copy/*`.
 - `UI ready: no` hasta que el product-design loop entregue dirección visual + wireframe/flow completos + GVC desktop+mobile.
 
@@ -85,27 +98,27 @@ Reglas obligatorias:
 
 - `docs/ui/wireframes/TASK-1363-assessment-taking-review-surface.md`
 - `docs/ui/flows/TASK-1363-assessment-taking-review-surface-flow.md`
-- `src/app/[lang]/assessment/**` (candidate-facing tokenizado) `[verificar ruta en Discovery]`
+- `src/app/public/assessment/[token]/**` (candidate-facing tokenizado; NO `[lang]` — reusa el shell público de TASK-354, DDL-2)
 - `src/views/greenhouse/hiring/assessment/**`
 - `src/components/greenhouse/hiring/assessment/**`
 - `src/lib/copy/hiring.ts` (copy del assessment)
 
 ## Current Repo State
 
-### Already exists
+### Already exists (verificado 2026-07-08)
 
 - Foundation Hiring/ATS (TASK-353, ✓ complete): `greenhouse_hiring` + store `src/lib/hiring/**` + API `/api/hiring/**` + capabilities `hiring.*`.
+- **Motor de assessment (TASK-1360 + TASK-1361, ✓ COMPLETE):** contrato real en `src/lib/hiring/assessment/**` — `resolveAssessmentByToken` (single-use), `saveResponse`, `submitAssessment`, `buildPublicQuestion` (allowlist anti answer-key), `finalizeAssessment` (scoring/rollup), `assignCandidateTest`, `time_limit_minutes`, **`accommodations_json`**; capabilities `hiring.assessment.read/author/score/ai_assist` sembradas + granteadas.
 - Primitives UI Platform (Composition Shell, inputs canónicos, drawer/sidecar).
 
-### Pendiente (blocked-by, NO existe todavía)
+### Pendiente (blocked-by vivos, NO existen todavía)
 
-- Motor de assessment (TASK-1360, `to-do`): readers/commands + contrato de token + scoring/rollup + capabilities `hiring.assessment.*`.
-- Shell público tokenizado (TASK-354, `to-do`) — host de la rendición.
+- Shell público tokenizado (TASK-354, `to-do`) — host de la rendición (DDL-2: mismo shell del apply).
 - Application 360 (TASK-355, `to-do`) — host del scorecard/review.
 
 ### Gap
 
-- No existe superficie de rendición del candidato.
+- No existe superficie de rendición del candidato (la envoltura `GET/POST /api/public/assessment/[token]` + UI que consume el motor listo).
 - No existe cola de corrección ni render del scorecard en el desk.
 - No existe dirección visual aprobada (product-design loop pendiente).
 
@@ -205,13 +218,14 @@ Reglas obligatorias:
 
 ### Slice 2 — Candidate taking surface (tokenized)
 
-- Endpoints `GET/POST /api/public/assessment/[token]` (token single-use + tiempo + rate-limit) envolviendo commands de TASK-1360.
-- Surface candidate-facing: instrucciones + consentimiento → preguntas con timer + autosave → submit irreversible → confirmación. Sin answer-key en el payload.
+- Endpoints `GET/POST /api/public/assessment/[token]` (token single-use + tiempo + rate-limit) envolviendo `resolveAssessmentByToken`/`saveResponse`/`submitAssessment` (motor listo, TASK-1360). Payload vía `buildPublicQuestion` (allowlist — sin answer-key).
+- Surface candidate-facing en `src/app/public/assessment/[token]/**` (shell de 354, NO `[lang]`, bilingüe): instrucciones + consentimiento → preguntas con timer + autosave → submit irreversible → confirmación.
+- **Honrar `accommodations_json`** (tiempo extendido / accesibilidad) al calcular el timer y la UX.
 
 ### Slice 3 — Internal review surface
 
-- Cola de corrección de respuestas abiertas (rúbrica lado a lado; confirmar/ajustar score; confirmar sugerencia IA si TASK-1361 habilitada).
-- Scorecard por competencia embebido en Application 360 (TASK-355), advisory.
+- Cola de corrección de respuestas abiertas (rúbrica + respuesta primero; sugerencia IA de 1361 **después/colapsada** — anti-anclaje; confirmar/ajustar score vía `finalizeAssessment`).
+- Scorecard por competencia embebido en Application 360 (TASK-355), advisory (sin veredicto binario).
 
 ### Slice 4 — GVC verification
 
@@ -275,7 +289,9 @@ La rendición candidate-facing reutiliza el patrón de shell público tokenizado
 - [ ] El candidato rinde el test desde un link tokenizado single-use con tiempo límite; no puede re-rendir tras submit.
 - [ ] El payload candidate-facing NUNCA incluye answer-key/rubric (test anti-leak verde).
 - [ ] El reclutador corrige respuestas abiertas con rúbrica y el resultado rueda al scorecard (vía commands de TASK-1360).
-- [ ] El scorecard por competencia se ve en Application 360, advisory (sin veredicto binario de contratación).
+- [ ] El scorecard por competencia se ve en Application 360, advisory (sin veredicto binario de contratación); la sugerencia IA (1361) arranca colapsada (anti-anclaje).
+- [ ] La rendición honra `accommodations_json` (tiempo extendido / accesibilidad) de la instancia.
+- [ ] Ruta candidato `src/app/public/assessment/[token]/**` (NO `[lang]`), bilingüe, reusa el shell público de 354.
 - [ ] `UI ready` permanece `no` hasta implementation mapping + GVC scenario plan + design decision log; `yes` solo con `pnpm task:lint --task TASK-1363` sin findings.
 - [ ] GVC desktop + mobile de rendición + scorecard mirada; sin overflow horizontal ni errores de consola.
 
@@ -286,6 +302,7 @@ La rendición candidate-facing reutiliza el patrón de shell público tokenizado
 - `pnpm test`
 - `pnpm ui:wireframe-check --task TASK-1363`
 - `pnpm ui:flow-check --task TASK-1363`
+- `pnpm ui:motion-check --task TASK-1363`
 - `pnpm fe:capture` (GVC desktop + mobile) en loop
 - Smoke tokenizado + anti-leak
 

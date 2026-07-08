@@ -5,7 +5,7 @@
 - Status: `draft`
 - Owner task: `TASK-1363 — Assessment Taking + Review Surface`
 - Related wireframe: [docs/ui/wireframes/TASK-1363-assessment-taking-review-surface.md](../wireframes/TASK-1363-assessment-taking-review-surface.md)
-- Intended route / surface: candidate = `/[lang]/assessment/[token]` (público, fuera del dashboard); interno = Application 360 del desk (`(dashboard)/agency/hiring/applications/[id]`, tab `Evaluación`)
+- Intended route / surface: candidate = `src/app/public/assessment/[token]/**` (URL `/assessment/[token]`, público, fuera del dashboard, NO `[lang]`, bilingüe vía `getMicrocopy`, reusa el shell público de 354/DDL-2); interno = Application 360 del desk (`(dashboard)/agency/hiring/applications/[id]`, tab `Evaluación`)
 - Flow type: `multi-surface` (público tokenizado → desk interno; nodo del master flow del programa Hiring)
 - Primary primitives: `CompositionShell` (desk), shell público tokenizado (patrón TASK-354), `CustomTextField`/radios/`CustomChip` (respuestas), barra de progreso wizard, scorecard = barras horizontales por competencia
 - Copy source: `src/lib/copy/hiring.ts` (es-CL, tuteo)
@@ -72,7 +72,7 @@
 ## Routing Contract
 
 - Route changes: candidato `path` (`/assessment/[token]`); interno `query` (tab `?tab=evaluacion`) + drawer `query` (`?rate=<responseId>`)
-- Canonical URL: `/[lang]/assessment/[token]` (candidato); `/agency/hiring/applications/[id]?tab=evaluacion` (interno)
+- Canonical URL: `/assessment/[token]` (candidato, `src/app/public/assessment/[token]/**`, NO `[lang]`, bilingüe vía `getMicrocopy`); `/agency/hiring/applications/[id]?tab=evaluacion` (interno)
 - Deep-link behavior: el token es la credencial; el tab/drawer interno son deep-linkeables con capability
 - Back button behavior: candidato — back no re-abre un test enviado (`submitted`/`expired` son terminales); interno — cierra drawer, mantiene tab
 - Reload behavior: candidato — recarga re-valida token y reanuda desde `in_progress` con lo autosaveado; interno — re-fetch del scorecard

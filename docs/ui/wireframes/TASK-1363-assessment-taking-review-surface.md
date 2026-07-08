@@ -85,7 +85,7 @@
 
 ## Implementation Mapping
 
-- Route / surface: candidato `/[lang]/assessment/[token]`; interno `(dashboard)/agency/hiring/applications/[id]` tab `Evaluación`
+- Route / surface: candidato `src/app/public/assessment/[token]/**` (URL `/assessment/[token]`, NO `[lang]`, bilingüe vía `getMicrocopy`, shell de 354/DDL-2); interno `(dashboard)/agency/hiring/applications/[id]` tab `Evaluación`
 - Primitives: shell público tokenizado (TASK-354), `CompositionShell`, drawer/Adaptive Sidecar, barras horizontales (Recharts/`AppRecharts` o barras MUI), timer accesible
 - Variants / kinds: scorecard bar = tono semáforo por competencia (`success/warning/error` como estado, no color-only)
 - Component candidates: `CustomTextField`, radios/checkbox nativos, `CustomChip`, progress indicator, `EmptyState`
