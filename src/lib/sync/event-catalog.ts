@@ -229,7 +229,15 @@ export const AGGREGATE_TYPES = {
 
   // TASK-1171 Slice 3 — Activación gobernada del sync Notion->ICO de un cliente.
   // Aggregate identity = source_id ('sns-{uuid}') de greenhouse_core.space_notion_sources.
-  spaceNotionSource: 'space_notion_source'
+  spaceNotionSource: 'space_notion_source',
+
+  // TASK-353 — Hiring / ATS domain foundation (GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1).
+  // Identities: demand_id ('tdmn-{uuid}'), opening_id ('opng-{uuid}'),
+  // candidate_facet_id ('cndf-{uuid}'), application_id ('happ-{uuid}').
+  talentDemand: 'talent_demand',
+  hiringOpening: 'hiring_opening',
+  hiringCandidateFacet: 'hiring_candidate_facet',
+  hiringApplication: 'hiring_application'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -1064,7 +1072,22 @@ export const EVENT_TYPES = {
   // TASK-1171 Slice 3 — Sync Notion->ICO de un cliente activado vía command gobernado.
   // aggregate_type = space_notion_source, aggregate_id = source_id. Sin consumer
   // reactivo en V1 (audit/observabilidad del onboarding ICO).
-  spaceNotionSourceIcoSyncEnabled: 'space_notion_source.ico_sync_enabled'
+  spaceNotionSourceIcoSyncEnabled: 'space_notion_source.ico_sync_enabled',
+
+  // TASK-353 — Hiring / ATS foundation. Sin consumer reactivo en V1 (audit/observabilidad;
+  // el handoff + reactividad profunda downstream llegan en TASK-356).
+  talentDemandCreated: 'talent_demand.created',
+  talentDemandUpdated: 'talent_demand.updated',
+  talentDemandStatusChanged: 'talent_demand.status_changed',
+  hiringOpeningCreated: 'hiring.opening.created',
+  hiringOpeningUpdated: 'hiring.opening.updated',
+  hiringOpeningStatusChanged: 'hiring.opening.status_changed',
+  hiringOpeningPublished: 'hiring.opening.published',
+  hiringOpeningUnpublished: 'hiring.opening.unpublished',
+  hiringCandidateFacetCreated: 'hiring.candidate_facet.created',
+  hiringCandidateFacetUpdated: 'hiring.candidate_facet.updated',
+  hiringApplicationCreated: 'hiring.application.created',
+  hiringApplicationStageChanged: 'hiring.application.stage_changed'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
