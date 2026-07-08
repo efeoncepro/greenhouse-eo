@@ -6931,6 +6931,127 @@ export interface GreenhouseGrowthSearchConsoleOauthStates {
   state_id: Generated<string>;
 }
 
+export interface GreenhouseHiringCandidateFacet {
+  availability: string | null;
+  candidate_facet_id: Generated<string>;
+  consent_captured_at: Timestamp | null;
+  consent_policy_version: string | null;
+  consent_status: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  expected_rate: Numeric | null;
+  expected_rate_currency: string | null;
+  identity_profile_id: string;
+  member_id: string | null;
+  notes: string | null;
+  public_id: Generated<string>;
+  rate_band: string | null;
+  readiness: Generated<string>;
+  retention_policy: string | null;
+  seniority: string | null;
+  source: Generated<string>;
+  source_attribution: string | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  verification_signals_json: Generated<Json>;
+}
+
+export interface GreenhouseHiringHiringApplication {
+  application_id: Generated<string>;
+  blocking_issues: Generated<string[]>;
+  candidate_facet_id: string;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  decision: string | null;
+  decision_at: Timestamp | null;
+  decision_by: string | null;
+  dedupe_fingerprint: string | null;
+  expected_context: string | null;
+  expected_legal_entity: string | null;
+  explainability_json: Generated<Json>;
+  identity_profile_id: string;
+  match_score: Numeric | null;
+  next_step_at: Timestamp | null;
+  notes: string | null;
+  opening_id: string;
+  owner_user_id: string | null;
+  prerequisites_snapshot_json: Generated<Json>;
+  public_id: Generated<string>;
+  score: Numeric | null;
+  selected_destination: string | null;
+  source: Generated<string>;
+  stage: Generated<string>;
+  tentative_start_date: Timestamp | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringOpening {
+  apply_url: string | null;
+  budget_band: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  demand_id: string;
+  internal_notes: string | null;
+  internal_title: string;
+  opening_id: Generated<string>;
+  organization_id: string | null;
+  owner_user_id: string | null;
+  public_description: string | null;
+  public_employment_mode: string | null;
+  public_id: Generated<string>;
+  public_location_mode: string | null;
+  public_nice_to_have: string | null;
+  public_process_notes: string | null;
+  public_requirements: string | null;
+  public_seniority: string | null;
+  public_summary: string | null;
+  public_title: string | null;
+  publication_status: Generated<string>;
+  published_at: Timestamp | null;
+  rate_band: string | null;
+  requested_seats: Generated<number>;
+  risk_notes: string | null;
+  seniority: string | null;
+  space_id: string | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  visibility: Generated<string>;
+}
+
+export interface GreenhouseHiringTalentDemand {
+  budget_band: string | null;
+  business_unit: string | null;
+  client_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  deal_ref: string | null;
+  demand_id: Generated<string>;
+  demand_origin: string;
+  duration: string | null;
+  engagement_type: string;
+  external_account_ref: string | null;
+  fulfillment_mode: string;
+  language: string | null;
+  notes: string | null;
+  organization_id: string | null;
+  owner_user_id: string | null;
+  priority: Generated<string>;
+  prospect_ref: string | null;
+  public_id: Generated<string>;
+  rate_band: string | null;
+  requested_company_name: string | null;
+  requested_role: string;
+  requested_seats: Generated<number>;
+  requested_skills: Generated<string[]>;
+  service_id: string | null;
+  space_id: string | null;
+  stakeholder_type: string;
+  status: Generated<string>;
+  target_start_date: Timestamp | null;
+  timezone: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHrContractorEngagementEvents {
   actor_user_id: string | null;
   contractor_engagement_id: string;
@@ -11101,6 +11222,10 @@ export interface DB {
   "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;
   "greenhouse_growth.search_console_connections": GreenhouseGrowthSearchConsoleConnections;
   "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
+  "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
+  "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
+  "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
+  "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
   "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
   "greenhouse_hr.contractor_invoice_assets": GreenhouseHrContractorInvoiceAssets;
