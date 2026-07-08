@@ -1168,3 +1168,15 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | `hiring.application.created` / `hiring.application.stage_changed` | v1 | `hiring_application` (`application_id` `happ-{uuid}`) | store `createHiringApplication` / `updateHiringApplicationStage` | — |
 
 **Payload v1**: ids + campos de estado (status/stage/source), sin PII (el detalle se re-lee del aggregate en `greenhouse_hiring.*`). Emitidos **transaccionalmente** en el mismo `withGreenhousePostgresTransaction` que el write del aggregate (nunca best-effort fuera de la tx). **Sin consumer reactivo en V1** (audit/observabilidad del dominio): el `HiringHandoff` explícito + las proyecciones/señales reactivas (`hiring.signal.*`, promoción a `member`) llegan en TASK-356. Aggregate types nuevos: `talent_demand`, `hiring_opening`, `hiring_candidate_facet`, `hiring_application` (`AGGREGATE_TYPES` en `src/lib/sync/event-catalog.ts`). Dominio de observabilidad: `captureWithDomain(err, 'hiring', …)`.
+
+## Delta 2026-07-08 — TASK-1360: `hiring.assessment.*` + `hiring.competency_result.updated` (Assessment Engine)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `hiring.assessment.template_created` | v1 | `hiring_assessment_template` | `createTemplate` (`src/lib/hiring/assessment/store.ts`) | — |
+| `hiring.assessment.assigned` | v1 | `hiring_assessment` | `assignCandidateTest` / `assignInterviewerScorecard` (`instances.ts`) | — |
+| `hiring.assessment.submitted` | v1 | `hiring_assessment` | `submitAssessment` (`scoring.ts`) | — |
+| `hiring.assessment.scored` | v1 | `hiring_assessment` | `finalizeAssessment` (`scoring.ts`) | — |
+| `hiring.competency_result.updated` | v1 | `hiring_assessment` | `finalizeAssessment` (rollup por competencia) | — |
+
+**Payload v1**: ids + estado (status/method/score agregado), **sin `answer_key`/`rubric` ni respuestas del candidato** (detalle se re-lee del aggregate con capability). Emitidos transaccionalmente con el write. **Sin consumer reactivo en V1** (audit/observabilidad); el score que rueda a `hiring_application` es un rollup determinístico in-tx (helper único `rollupCompetencyResultsToApplication`), no un consumer. Aggregate types nuevos: `hiring_assessment_template`, `hiring_assessment` (`AGGREGATE_TYPES` en `src/lib/sync/event-catalog.ts`). Dominio de observabilidad: `captureWithDomain(err, 'hiring', …)`.

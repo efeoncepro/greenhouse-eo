@@ -910,3 +910,15 @@ Modelo canónico (schema `greenhouse_hiring`):
 - **NUNCA** anclar un asset/identity-doc de candidato por `member_id` (usar `identity_profile_id`/`candidate_facet_id`/`application_id`).
 - **NUNCA** IA que puntúa como verdad final: `propose → confirm` (humano confirma) + eval baseline (TASK-1361).
 - **SIEMPRE** reutilizar `person_identity_documents` para identidad (no crear tabla de docs de identidad en `greenhouse_hiring`).
+
+### As-built — TASK-1360 Assessment Engine (2026-07-08, engine completo)
+
+El engine (no la UI, no la IA) quedó implementado tal como el diseño de arriba. Estado real: **code complete; rollout de migraciones a staging/prod pendiente vía release pipeline** (aplicadas en dev).
+
+- **7 tablas** en `greenhouse_hiring` (reusan `touch_updated_at()`, marker `-- Up Migration` + DO block anti pre-up-marker): `hiring_competency` (`key` UNIQUE, `category` CHECK), `hiring_question` (`answer_key_json`/`rubric_json` sensibles, `status` `draft|sme_review|active|retired` — nace `draft`, gate SME), `hiring_assessment_template`, `hiring_assessment_template_module` (`weight`, `target_level` nullable, UNIQUE `(template,competency)`), `hiring_assessment` (`public_id` `EO-ASM-####`, `method` `candidate_test|interviewer_scorecard`, `access_token_hash` sha256 single-use, `accommodations_json`, estados `assigned→sent→in_progress→submitted→scored|expired`), `hiring_assessment_response` (`auto_score` + `needs_human_rating` + `human_score`), `hiring_competency_result` (UNIQUE `(assessment,competency)`).
+- **Seeds**: 16 competencias (9 skill · 4 attitudinal · 3 aptitude) + plantilla `atpl-account-manager-l2` (9 módulos, weight=100).
+- **Dominio** `src/lib/hiring/assessment/**`: `store.ts` (catálogo/banco/plantillas + `buildPublicQuestion` allowlist sin `answer_key`), `instances.ts` (asignar/rendir + token hash nunca en view model + anti-anclaje del scorecard), `scoring.ts` (`computeObjectiveScore` PURA 0-100 + `rollupCompetencyResultsToApplication` helper único ponderado, ADVISORY sobre `hiring_application`).
+- **3 capabilities** `hiring.assessment.{read,author,score}` (catálogo + runtime grants + `capabilities_registry` seed, mismo PR; guard `capability-grant-coverage.test.ts` verde). read+author → tier operador; score → tier gobernanza (`execute`), NUNCA `client_*`.
+- **7 rutas** internas `/api/hiring/assessments/**` (competencies · questions · templates · assign+list · `[id]` · `[id]/score`), dual-gate + `toHiringErrorResponse` es-CL.
+- **Eventos** `hiring.assessment.{template_created,assigned,submitted,scored}` + `hiring.competency_result.updated` (aggregate types en `event-catalog`).
+- Divergencia menor vs diseño: `hiring_assessment_response` agrega `human_score` explícito (además de `auto_score` + `needs_human_rating`) para separar puntaje objetivo del corregido por humano. Sin otra divergencia estructural.
