@@ -52,6 +52,8 @@ El crecimiento no se entrega: se **co-construye**. Tres pilares (una creencia):
 
 > **SSOT:** `docs/context/09_marca-agencia.md` → §El Golden Circle de Efeonce. Este es el destilado; ahí el detalle completo.
 
+**El Why como VISIÓN DE PRODUCTO (la frontera a alcanzar).** El Why no es solo copy de marca: es el **norte del producto Greenhouse**. Hoy el producto cumple bien la cara de *ver* (transparencia ~90%), pero las caras de **co-crear** (el cliente *actúa*: aprueba/pide/brifea — hoy el portal cliente es casi todo `.read`, gap #1 self-service ~55%; la aprobación de entregables aún vive fuera, en Frame.io/Notion/email) y **educar** (hacer al cliente *más capaz*: Nexa Insights cerrado al tenant externo, Nexa como Q&A con flags coach default-OFF, cero señal de capacidad longitudinal del cliente) están **sin construir para el cliente**. Cerrarlas = que el Why se **viva**, no solo se declare. **Al priorizar features, esta es la dirección de producto:** acercar al cliente a *actuar* y *volverse más capaz* dentro del portal, no solo a mirar. Programa: **EPIC-025** (`docs/epics/to-do/EPIC-025-vivir-el-why-cocreacion-educacion-cliente.md`) — epic de *extensión* (reusa la plantilla del AEO run gobernado TASK-1277 + Nexa Insights; Full API Parity), no de invención.
+
 ---
 
 ## Filtro de decisión para una feature nueva
