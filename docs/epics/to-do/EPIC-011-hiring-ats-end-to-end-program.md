@@ -91,6 +91,8 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1361` — **Assessment AI Assist**: governed AI question generation + AI-proposed scoring of open/situational answers (propose → confirm, human confirms; eval baseline). `backend-data`. Blocked by `TASK-1360`.
 - `TASK-1362` — **Candidate Document Capture**: hiring asset contexts (CV/portfolio) on the private assets platform + candidate identity-document linking (reuse `person_identity_documents` masked/reveal) + upload quarantine/scan for public uploads. `backend-data`. Blocked by `TASK-353`.
 - `TASK-1363` — **Assessment Taking + Review Surface**: candidate-facing remote tokenized test-taking + internal rating/review surface in the desk. `ui-ux`. Blocked by `TASK-1360` (+ product-design loop).
+- `TASK-1364` — **Assessment Validity Feedback Loop**: link assessment score → real hire outcome (quality-of-hire 90d/6m) to measure predictive validity; read-only, advisory, feeds EU AI-Act technical documentation. `backend-data`. Blocked by `TASK-1360`. (From the `greenhouse-talent-people-operator` review of TASK-1360 — validity gap.)
+- `TASK-1365` — **Adverse-Impact & Fairness Monitoring**: privacy-safe aggregate monitoring of selection rates across groups (4/5ths) + drift; voluntary self-ID separated from the decision; observes, never adjusts; required for EU AI-Act bias testing. `backend-data`. Blocked by `TASK-1360`. (From the `greenhouse-talent-people-operator` review — fairness gap.)
 
 ## Existing Related Work
 

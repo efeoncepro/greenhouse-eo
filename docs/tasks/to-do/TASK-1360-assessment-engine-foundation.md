@@ -200,20 +200,23 @@ Reglas obligatorias:
 
 ### Slice 1 — Competency catalog + question bank
 
-- Migración: `hiring_competency` (`competency_id`, `key` UNIQUE, `name`, `category` CHECK `attitudinal|aptitude|skill`, `description`, `status`) + `hiring_question` (`question_id`, `competency_id` FK, `level` CHECK `nociones|intermedio|avanzado`, `type` CHECK `single_choice|multi_choice|likert|situational|open_text`, `prompt`, `options_json`, `answer_key_json`, `rubric_json`, `status`).
-- Seed de competencias reales: SEO, copywriting, project_management, community_management, leadership, vendor_management (skill) + ownership, communication, collaboration (attitudinal) + numerical, verbal, logical (aptitude).
+- Migración: `hiring_competency` (`competency_id`, `key` UNIQUE, `name`, `category` CHECK `attitudinal|aptitude|skill`, `description`, `status`) + `hiring_question` (`question_id`, `competency_id` FK, `level` CHECK `nociones|intermedio|avanzado`, `type` CHECK `single_choice|multi_choice|likert|situational|open_text`, `prompt`, `options_json`, `answer_key_json`, `rubric_json`, `status` CHECK incluye `draft|sme_review|active|retired`).
+- Seed de competencias reales (revisado con `greenhouse-talent-people-operator`): **skill** — SEO, copywriting, project_management, community_management, leadership, vendor_management, **client_relationship_comm** (relación con cliente + comunicación), **commercial_acumen** (crecimiento de cuenta / upsell), **delivery_coordination**; **attitudinal** — ownership, communication, collaboration, **composure_pressure** (compostura bajo presión del cliente); **aptitude** — numerical, verbal, logical. (Las 5 competencias AM `client_relationship_comm`/`commercial_acumen`/`delivery_coordination`/`ownership`/`composure_pressure` son el backbone real del Account Manager — ver plantilla en Slice 2.)
+- **Política de tipo por defecto (validez, Sackett 2022 — work sample > MCQ):** para una `skill` a nivel `intermedio`/`avanzado` el tipo por defecto es **work-sample/situational** (`open_text`/`situational`), NO `single_choice`. El MCQ (`single/multi_choice`) se reserva para `nociones`/conocimiento factual. El `likert` actitudinal se auto-reporta (deseabilidad social) → **triangular siempre con un `situational` (SJT)** de la misma competencia.
+- **Gate de gobernanza de contenido (SME):** una pregunta nace `draft` → requiere revisión de experto (SME) por competencia → `active`. Un banco de preguntas sin validar = test inválido. El gate SME se cruza con TASK-1361 (la IA propone, un SME confirma antes de `active`).
 - Reader masked (sin `answer_key_json`) + reader interno full (con capability).
 
 ### Slice 2 — Assessment templates + composition
 
 - Migración: `hiring_assessment_template` (`template_id`, `name`, `role_hint`, `status`) + `hiring_assessment_template_module` (`template_id` FK, `competency_id` FK, `target_level`, `weight`).
 - Command para crear/editar plantilla + módulos (capability `hiring.assessment.author`).
-- Seed: plantilla "Account Manager L2" = SEO@nociones(15) + copywriting@intermedio(25) + leadership@intermedio(25) + vendor_management@nociones(15) + attitudinal(20).
+- Seed: plantilla **"Account Manager L2"** (revisada con `greenhouse-talent-people-operator` — el rol es principalmente relación/comercial/coordinación; los 4 skills pedidos son conocimiento de apoyo, 38% combinado): `client_relationship_comm@intermedio(20)` + `commercial_acumen@intermedio(15)` + `copywriting@intermedio(12, work-sample)` + `leadership@intermedio(10, SJT+entrevista)` + `ownership@attitudinal(10, SJT)` + `composure_pressure@attitudinal(10, SJT)` + `seo@nociones(8)` + `vendor_management@nociones(8)` + `delivery_coordination@intermedio(7)` = 100. Work sample integrado recomendado (un caso de cliente que toca comunicación+copy+SEO+vendor+ownership a la vez) documentado en el brief de la vacante.
 
 ### Slice 3 — Assessment instance + responses
 
-- Migración: `hiring_assessment` (`assessment_id`, `application_id` FK, `template_id` FK nullable, `method` CHECK `candidate_test|interviewer_scorecard`, `evaluator_user_id` nullable, `status` CHECK `assigned|sent|in_progress|submitted|scored|expired`, `access_token_hash` nullable, `time_limit_minutes` nullable, `started_at`, `submitted_at`) + `hiring_assessment_response` (`response_id`, `assessment_id` FK, `question_id` FK nullable, `competency_id` FK, `answer_json`, `auto_score`, `needs_human_rating`).
+- Migración: `hiring_assessment` (`assessment_id`, `application_id` FK, `template_id` FK nullable, `method` CHECK `candidate_test|interviewer_scorecard`, `evaluator_user_id` nullable, `status` CHECK `assigned|sent|in_progress|submitted|scored|expired`, `access_token_hash` nullable, `time_limit_minutes` nullable, **`accommodations_json`** (tiempo extra / formato accesible), `started_at`, `submitted_at`) + `hiring_assessment_response` (`response_id`, `assessment_id` FK, `question_id` FK nullable, `competency_id` FK, `answer_json`, `auto_score`, `needs_human_rating`).
 - Commands: asignar instancia (idempotente por application+template abierta), registrar respuestas (submit atómico), token single-use para el modo remoto.
+- **Anti-anclaje del scorecard humano (`interviewer_scorecard`):** un evaluador NO puede ver los ratings de otros evaluadores de la misma application hasta haber enviado el suyo (independiente antes del debrief — reduce anchoring/groupthink, sube validez). Enforce en el reader (filtra ratings ajenos mientras el propio esté abierto).
 
 ### Slice 4 — Scoring + competency-result rollup
 
@@ -242,6 +245,16 @@ El detalle de schema por tabla, enums y el ejemplo Account Manager viven en `EPI
 - Migración con marker `-- Up Migration`, DO block anti pre-up-marker, GRANTs a los 3 roles DB, DDL solo en Up.
 - El rollup a `hiring_application` es un helper único (`rollupCompetencyResultsToApplication`); ningún callsite recomputa el score.
 - `answer_key_json` NUNCA en el reader candidate-facing ni en el payload de la instancia enviada; test anti-leak obligatorio (mirror de `publication.test.ts`).
+
+### Refinamientos de validez/fairness (revisión `greenhouse-talent-people-operator`, 2026)
+
+- **Work-sample-first** para `skill@intermedio+` (default `open_text`/`situational`, no MCQ) — la entrevista estructurada + work sample son los predictores más fuertes (Sackett, Zhang, Berry & Lievens 2022, que revisó Schmidt-Hunter). MCQ solo para `nociones`/conocimiento factual.
+- **SME content gate**: pregunta `draft → sme_review → active`; nada entra al banco activo sin revisión de experto (cruza con TASK-1361 propose→confirm).
+- **Independent-before-debrief** en el scorecard humano (anti-anclaje).
+- **Likert triangulado con SJT** (deseabilidad social del auto-reporte).
+- **Accommodations** por instancia (tiempo extra / formato accesible) — accesibilidad del test (WCAG, compone con `a11y-architect`).
+- **AI-Act awareness**: como el scoring puede asistirse con IA (TASK-1361), el eval baseline + audit trail de este engine alimentan la documentación técnica exigida (hiring-AI = alto riesgo desde 2-ago-2026). El score es SIEMPRE advisory; el humano decide (human oversight).
+- **Loop de validez y fairness monitoring** quedan como tasks follow-up (ver Follow-ups): el engine debe dejar los datos (scores + outcome-linkable + audit) para que esas capacidades se construyan encima.
 
 ## Rollout Plan & Risk Matrix
 
@@ -321,7 +334,9 @@ El detalle de schema por tabla, enums y el ejemplo Account Manager viven en `EPI
 
 - `TASK-1361` (AI assist sobre el banco/respuestas)
 - `TASK-1363` (superficie de rendición + review)
-- Banco de preguntas real por competencia (contenido) — puede requerir input de expertos por skill
+- `TASK-1364` (validity feedback loop: assessment score → quality-of-hire a 90d/6m) — cierra el loop "¿el test predice?"
+- `TASK-1365` (adverse-impact & fairness monitoring: tasas de selección por grupo + drift) — requisito de bias testing del EU AI Act
+- Banco de preguntas real por competencia (contenido, work-sample-first) — requiere SME por skill (gate `sme_review`)
 
 ## Open Questions
 

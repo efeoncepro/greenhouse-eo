@@ -1,0 +1,277 @@
+# TASK-1364 — Assessment Validity Feedback Loop
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P2`
+- Impact: `Medio`
+- Effort: `Medio`
+- Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `reader`
+- Epic: `EPIC-011`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `agency`
+- Blocked by: `TASK-1360`
+- Branch: `task/TASK-1364-assessment-validity-feedback-loop`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+Cerrar el loop "¿el assessment realmente predice?": enlazar el score por competencia de una postulación con el **outcome real del hire** (quality-of-hire a 90 días / 6 meses) para medir la validez predictiva del test. Sin este loop no sabemos si el motor de assessment funciona — y con el EU AI Act, esa evidencia de validez es parte de la documentación técnica exigida para hiring-AI.
+
+## Why This Task Exists
+
+TASK-1360 calcula scores pero no verifica si predicen desempeño. Un test puede parecer riguroso y no predecir nada (o peor, discriminar sin señal válida). La disciplina de selección exige un **loop de validez**: comparar el score de assessment de los contratados contra su desempeño posterior. Es también el sustento de defensibilidad (job-relatedness) y un input del bias testing del AI Act.
+
+## Goal
+
+- Enlazar `hiring_application` (con su score/competency results) al `member` resultante y a una señal de desempeño temprana (90d/6m).
+- Exponer un reader de validez: correlación score↔outcome por competencia/plantilla, con muestra suficiente.
+- Dejar la evidencia de validez auditable (documentación técnica AI-Act).
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (§Assessment)
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` (person-first: candidate → member sobre el mismo `identity_profile_id`)
+- `docs/tasks/to-do/TASK-1360-assessment-engine-foundation.md`
+
+Reglas obligatorias:
+
+- El loop es **read/analítico**: NUNCA reescribe scores ni decide nada; produce evidencia de validez.
+- El outcome de desempeño se consume de la fuente canónica (performance/HRIS/ICO), NUNCA se inventa (misma disciplina que payroll: métricas no inline).
+- Muestra insuficiente = degradar honesto ("evidencia insuficiente"), nunca reportar una correlación con n pequeño como si fuera concluyente.
+- El score de assessment sigue siendo advisory; este loop NO lo convierte en gate.
+
+## Normative Docs
+
+- `docs/tasks/to-do/TASK-770-hiring-to-hris-collaborator-activation.md` (candidate→member)
+- `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- `TASK-1360` (scores + `hiring_competency_result`)
+- `TASK-770` (member activation — cierra `hiring_application` → `member`) `[verificar]`
+- Señal de desempeño temprana (performance evals `greenhouse_hr.eval_*` / ICO / onboarding readiness) `[verificar cuál es la fuente canónica en Discovery]`
+
+### Blocks / Impacts
+
+- `TASK-1365` (fairness monitoring puede reusar el mismo join score↔outcome)
+- Mejora iterativa del banco de preguntas (retirar preguntas sin poder predictivo)
+
+### Files owned
+
+- `src/lib/hiring/assessment/validity/**`
+- `src/app/api/hiring/assessments/validity/**` (reader interno)
+- `migrations/<ts>_task-1364-assessment-outcome-link.sql` (si hace falta materializar el join)
+- `src/types/db.d.ts`
+
+## Current Repo State
+
+### Already exists
+
+- Motor de assessment (TASK-1360): scores + competency results + rollup al application.
+- Cadena candidate→member sobre `identity_profile_id` (TASK-770).
+- Performance evals HR + ICO como posibles fuentes de outcome.
+
+### Gap
+
+- No hay enlace score↔outcome ni medición de validez predictiva.
+- No hay evidencia de validez para la documentación técnica AI-Act.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-standard`
+- Impacto principal: `reader`
+- Source of truth afectado: nuevo read model `assessment_validity` (join `hiring_competency_result` × outcome de desempeño); no muta scores
+- Consumidores afectados: people-ops (reader interno), TASK-1365, gobernanza del banco
+- Runtime target: `local` → `staging` → `production`
+
+### Contract surface
+
+- Contrato existente a respetar: `hiring_application`/`hiring_competency_result` (TASK-1360), fuente de performance canónica
+- Contrato nuevo: reader `getAssessmentValidity(templateId|competencyId, window)` + ruta interna
+- Backward compatibility: `compatible` (read-only, additive)
+- Full API parity: la validez vive como reader canónico; UI/Nexa lo consumen
+
+### Data model and invariants
+
+- Entidades afectadas: read model / VIEW `assessment_validity` (score por competencia × outcome × muestra)
+- Invariantes:
+  - read-only; NUNCA reescribe scores ni convierte el score en gate
+  - outcome de la fuente canónica, nunca inline
+  - muestra < umbral → "evidencia insuficiente" (honest degradation), no correlación espuria
+- Tenant/space boundary: interno; capability `hiring.assessment.read`
+- Idempotency/concurrency: read-only
+- Audit/outbox/history: la evidencia de validez es append-only/auditable (documentación AI-Act)
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive|view refresh` (materializar el join si hace falta; sino solo reader)
+- Default state: `read-only`
+- Backfill plan: `none` (histórico se lee de los datos existentes)
+- Rollback path: `revert PR` / drop view
+- External coordination: `none`
+
+### Security and access
+
+- Auth/access gate: capability `hiring.assessment.read` (interno); NUNCA `client_*`
+- Sensitive data posture: agregados; sin exponer PII per-candidato en el reporte de validez
+- Error contract: `toHiringErrorResponse` + `captureWithDomain(err, 'hiring')`
+- Abuse/rate-limit posture: N/A (reader interno)
+
+### Runtime evidence
+
+- Local checks: test del reader con muestra suficiente vs insuficiente (degradación honesta)
+- DB/runtime checks: smoke del join score↔outcome contra PG dev
+- Integration checks: N/A
+- Reliability signals/logs: opcional signal "assessment.validity.insufficient_sample"
+- Production verification sequence: migrate/view staging → reader smoke → prod
+
+### Acceptance criteria additions
+
+- [ ] Source of truth (join score↔outcome) + contract surface + consumers nombrados.
+- [ ] Invariante read-only / no-gate / outcome-canónico explícito y con test.
+- [ ] Degradación honesta con muestra insuficiente.
+- [ ] Evidencia DB del join contra PG real.
+- [ ] Sin PII per-candidato en el reporte agregado.
+
+## Capability Definition of Done — Full API Parity gate
+
+- [ ] Lógica en `src/lib/hiring/assessment/validity/**`, no en UI.
+- [ ] Modelado como reader canónico; sin write.
+- [ ] Read expuesto como recurso; sin command (read-only).
+- [ ] Reusa capability `hiring.assessment.read`; sin capability nueva (o grant + coverage si se agrega).
+- [ ] Camino programático: `/api/hiring/assessments/validity/**`; Nexa por construcción.
+- [ ] N/A write (no muta).
+- [ ] Un reader, muchos consumers.
+- [ ] Parity check = SÍ.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 1 — Score↔outcome link
+
+- Resolver el join: `hiring_application` (score + competency results) → `member` (vía `identity_profile_id`, TASK-770) → señal de desempeño temprana (fuente canónica).
+- Materializar como VIEW/read model si el join es caro.
+
+### Slice 2 — Validity reader
+
+- `getAssessmentValidity(templateId|competencyId, window)`: correlación score↔outcome por competencia/plantilla + tamaño de muestra + verdict (`válido` / `evidencia insuficiente`).
+- Ruta interna `/api/hiring/assessments/validity/**` (capability-gated).
+
+### Slice 3 — Audit / AI-Act evidence
+
+- Persistir/exponer la evidencia de validez de forma auditable (documentación técnica AI-Act). Opcional signal de muestra insuficiente.
+
+## Out of Scope
+
+- El motor de assessment (TASK-1360).
+- Fairness/adverse-impact (TASK-1365).
+- Convertir el score en gate de decisión (prohibido — sigue advisory).
+
+## Detailed Spec
+
+Reusar el patrón de readers analíticos del repo (person-360 facets / ICO). El outcome de desempeño debe salir de la fuente canónica identificada en Discovery (performance evals HR, ICO, o onboarding readiness) — NUNCA inline. La correlación es evidencia, no un umbral automático.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 (join) → Slice 2 (reader) → Slice 3 (audit/evidence). El reader no existe sin el join.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Correlación espuria con n pequeño reportada como concluyente | data | medium | umbral de muestra + verdict "insuficiente" + test | reporte muestra n |
+| El loop se usa para convertir score en gate | hiring / legal | low | invariante read-only/advisory documentado + sin write | review |
+| Outcome inventado/inline en vez de canónico | data | low | consumir fuente canónica; test | drift vs fuente |
+
+### Feature flags / cutover
+
+- Sin flag — read-only additive. Razón: no muta estado ni decide; solo lee.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1-3 | revert PR / drop view | <10 min | si |
+
+### Production verification sequence
+
+1. Migrate/view staging + verify join.
+2. Reader smoke (muestra suficiente vs insuficiente).
+3. Prod vía release pipeline.
+
+### Out-of-band coordination required
+
+- N/A — repo-only.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] Existe el join score↔outcome (application→member→desempeño) sobre el mismo `identity_profile_id`.
+- [ ] `getAssessmentValidity` reporta correlación por competencia/plantilla + muestra + verdict, con degradación honesta si n es bajo.
+- [ ] El reader es read-only; NUNCA reescribe scores ni convierte el score en gate.
+- [ ] El outcome sale de la fuente canónica, no inline.
+- [ ] La evidencia de validez queda auditable (documentación AI-Act); sin PII per-candidato en agregados.
+
+## Verification
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- Smoke DB del join contra PG dev
+
+## Closing Protocol
+
+- [ ] `Lifecycle` sincronizado
+- [ ] archivo en la carpeta correcta
+- [ ] `docs/tasks/README.md` sincronizado
+- [ ] `Handoff.md` actualizado
+- [ ] `changelog.md` actualizado
+- [ ] chequeo de impacto cruzado (TASK-1360/1365)
+
+## Follow-ups
+
+- Retiro automático de preguntas sin poder predictivo (mejora del banco).
+- Dashboard de validez para people-ops.
+
+## Open Questions
+
+- ¿Cuál es la señal de desempeño temprana canónica (performance evals HR vs ICO vs onboarding readiness)? Resolver en Discovery.
+- ¿Umbral mínimo de muestra para reportar validez? Definir con criterio estadístico simple (n mínimo).
