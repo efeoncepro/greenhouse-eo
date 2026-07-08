@@ -1,7 +1,12 @@
-## Sesion 2026-07-08 - TASK-1367 Careers Apply Intake Service - Claude - in-progress
+## Sesion 2026-07-08 - TASK-1367 Careers Apply Intake Service - Claude - complete (code)
 
-> **Task:** `TASK-1367` (Careers Apply Intake Service, EPIC-011, split backend de TASK-354) movida a `in-progress`. **Local-first en `develop`, sin push.** Backend-data: endpoint público `POST /api/public/hiring/applications` + `submitPublicHiringApplication` → reconcilia Person→candidate_facet→hiring_application (contratos de TASK-353), dedupe/idempotency, consent + `source=public_careers`, anti-abuse, respuesta genérica segura, efectos pesados async. V1 links-only (upload=TASK-1362). Desbloquea TASK-354 (careers UI).
-> **Slices:** 1 validation schema (assertion functions, NO Zod) + dedupe · 2 submit command (reconciliación atómica) · 3 endpoint público + anti-abuse (patrón public-intake). Open Questions (consent columns / flag / captcha) se resuelven en Discovery contra el schema real.
+> **Task:** `TASK-1367` (Careers Apply Intake Service, EPIC-011, split backend de TASK-354) **complete** (code). **Local-first en `develop`, sin push.** 3 slices + cierre. Endpoint público `POST /api/public/hiring/applications` + `submitPublicHiringApplication` → Person→candidate_facet→hiring_application.
+> **Implementado:** migración additive (`candidate_facet.portfolio_url`/`linkedin_url` + tabla `hiring_application_intake_events`) · dominio `src/lib/hiring/public-careers/**` (schema puro NO-Zod, submit command, abuse-guard, config/flag) · reader `resolvePublishedOpeningIdByPublicId` + `reconcileCandidateFacet` extendido (links) · endpoint con Turnstile + rate-limit + respuestas genéricas.
+> **Diseño clave:** MULTI-STEP IDEMPOTENTE (3 commits, NO single-transaction — las funciones de 353 no aceptan client externo; retry seguro por reconcile-email + upsert + dedupe UNIQUE). Duplicado → mismo `accepted` genérico. Reusa el shared security core (`turnstileCaptchaVerifier`/`decideAbuse`/`hashIdentifier`).
+> **Gates:** typecheck + lint + full test + build + flags:audit verdes; live tests (chain completo + dedupe + not_open + migración) contra PG. Migración aplicada en **dev**; staging/prod vía release pipeline.
+> **Flag `HIRING_PUBLIC_APPLICATIONS_ENABLED` default OFF** (404 invisible) — cutover requiere `TURNSTILE_SECRET` + sign-off consent (Ley 21.719), coordinado con TASK-354.
+> **Recalibración post-Discovery:** Backend impact api→migration; atomicidad multi-step; reader public_id→opening_id agregado. **Desbloquea TASK-354 (careers UI).**
+> **Commits develop (sin push):** intake + recalibración + Slices 1-3 + cierre. Docs: arch as-built + flag ledger + changelog.
 
 ## Sesion 2026-07-08 - Public Site menu Visibilidad + Agencia Creativa V2 index - Codex - LIVE
 

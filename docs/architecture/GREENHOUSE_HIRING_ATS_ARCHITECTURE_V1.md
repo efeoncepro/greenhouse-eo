@@ -934,3 +934,13 @@ La capa IA (generar preguntas + sugerir puntaje, `propose → confirm`) quedó i
 - **Eventos** `hiring.assessment.ai_proposed` + `ai_confirmed` (aggregate `hiring_assessment_ai_proposal`).
 - **Flag** `HIRING_ASSESSMENT_AI_ENABLED` default OFF (gatea solo los propose paths; el confirm/read de la cola no). Eval de cutover: `scripts/hiring/assessment-scoring-eval.ts`.
 - **Parity:** satisfecha a nivel capability/contrato gobernado; el registro del actionKey de Nexa (para operar el confirm desde el chat) queda como **follow-up** (requiere `NexaActionDefinition` completo; espeja TASK-1212 `author_quote`).
+
+### As-built — TASK-1367 Careers Apply Intake Service (2026-07-08, split backend de TASK-354)
+
+La puerta de entrada pública de candidatos (el service backend; la careers UI es TASK-354). Estado real: **code complete + flag OFF; migración additive aplicada en dev, rollout staging/prod vía release pipeline; requiere `TURNSTILE_SECRET` + sign-off consent (Ley 21.719) antes del flip.**
+
+- **Migración additive:** `candidate_facet.portfolio_url`/`linkedin_url` (V1 links-only; el upload de archivo es TASK-1362) + tabla append-only `hiring_application_intake_events` (ventanas de rate-limit por `email_hash`/`ip_hash` + audit SIN PII cruda). consent/source columns ya existían (TASK-353).
+- **Dominio** `src/lib/hiring/public-careers/**`: `schema.ts` (`parsePublicHiringApplication` PURO, single SoT, NO Zod — consent obligatorio + email + URLs https browser-safe), `submit-application.ts` (`submitPublicHiringApplication`), `abuse-guard.ts` (rate-limit + intake events), `config.ts` (flag + salts + límites). Reader nuevo `resolvePublishedOpeningIdByPublicId` (published-gated) + `reconcileCandidateFacet` extendido para los links.
+- **Flujo (MULTI-STEP IDEMPOTENTE, no single-transaction):** resolver `opening_id` interno (gated) → reconcile Person (`createIdentityProfile` email-first) → `candidate_facet` (source=`public_careers`, consent granted, links) → `hiring_application` (dedupe `UNIQUE(opening_id, identity_profile_id)`). Los 3 son commits separados; el retry es seguro (reconcile por email + upsert por identity_profile_id + dedupe UNIQUE). Efectos pesados (scoring/email/handoff) async, NO en el submit.
+- **Endpoint** `POST /api/public/hiring/applications` (público, sin sesión, gate=anti-abuse no capability): flag → parse → Turnstile → rate-limit → validación → submit. **Respuestas SIEMPRE genéricas** (duplicado → mismo `accepted` 202; nunca revela dedupe/estado/existencia previa/PII). Reusa el shared security core `src/lib/growth/public-submission/*`.
+- **Flag** `HIRING_PUBLIC_APPLICATIONS_ENABLED` default OFF (404 invisible). Consumer: careers UI (TASK-354).
