@@ -220,19 +220,21 @@ Reutilizar el patrón de scoring IA gobernado del AI Visibility grader (`src/lib
 
 ### Selección de provider/modelo (decisión 2026-07-08)
 
-No se elige **un solo modelo para todo**: las dos sub-tareas tienen exigencias distintas. El `model` viaja en cada `hiring_assessment_ai_proposal` (trazabilidad), y el provider es un **seam de config** detrás del router interno (`src/lib/ai/*`, TASK-1085) — jamás hardcodeado; swappear el modelo no cambia el `propose → confirm`.
+No se elige **un solo modelo para todo**: las dos sub-tareas tienen exigencias distintas. El `model` viaja en cada `hiring_assessment_ai_proposal` (trazabilidad), y el provider es un **seam de config** (domain `config.ts` que resuelve el modelo desde env var con default, espejo de `src/lib/workforce/contracting/ai/config.ts`) — jamás hardcodeado; swappear el modelo no cambia el `propose → confirm`.
 
-| Sub-tarea | Modelo por defecto | Helper | Rationale |
+| Sub-tarea | Modelo por defecto (id real verificado) | Helper | Rationale |
 |---|---|---|---|
-| **Corrección propuesta** de `open_text`/`situational` (grading contra rúbrica) | **Claude Sonnet 5** (`claude-sonnet-5`) | `generateStructuredAnthropic` | Es lo legalmente sensible (hiring-AI = alto riesgo EU AI Act; el output alimenta una decisión sobre una persona). Prioriza consistencia siguiendo rúbrica + juicio defendible sobre ahorro marginal (volumen por run bajo). |
-| **Generación** de preguntas por competencia+nivel | **Gemini Flash** (o **Haiku 4.5**) | `generateStructuredGemini` | Un SME humano las gatea igual (`draft→sme_review→active` de TASK-1360), así que costo/latencia > perfección; el error se atrapa en el gate SME. |
+| **Corrección propuesta** de `open_text`/`situational` (grading contra rúbrica) | **Claude Sonnet** `claude-sonnet-4-6` (env `HIRING_ASSESSMENT_AI_SCORING_MODEL`) | `generateStructuredAnthropic` | Es lo legalmente sensible (hiring-AI = alto riesgo EU AI Act; el output alimenta una decisión sobre una persona). Prioriza consistencia siguiendo rúbrica + juicio defendible sobre ahorro marginal (volumen por run bajo). |
+| **Generación** de preguntas por competencia+nivel | **Gemini flash-lite** `gemini-2.5-flash-lite` (default del helper, `model: undefined`) | `generateStructuredGemini` | Un SME humano las gatea igual (`draft→sme_review→active` de TASK-1360), así que costo/latencia > perfección; el error se atrapa en el gate SME. |
+
+> **Corrección de model-id (verificado en discovery):** el id real del tier de calidad es **`claude-sonnet-4-6`** (NO `claude-sonnet-5`, que no existe en `src/config/nexa-models.ts` ni en ningún caller real; el doc previo lo nombró mal). El tier barato de Gemini es **`gemini-2.5-flash-lite`** (`GEMINI_STRUCTURED_DEFAULT_MODEL`). Haiku (`claude-haiku-4-5-20251001`) es una alternativa válida para generación si se prefiere quedarse en Anthropic.
 
 Reglas de esta decisión:
 
 - **Un solo grader en producción** (no ensemble) para que el eval baseline y la documentación técnica del EU AI Act tengan un baseline claro que monitorear por drift.
-- **Sonnet 5 es el default de arranque para grading, no un veredicto cerrado**: el eval baseline (Slice 4) decide empíricamente cuál grader correlaciona mejor con la corrección del SME. Si otro provider gana el eval, se swappea por el seam sin tocar el contrato.
-- Gemini Omni/Vertex se reserva para multimodal; acá es texto→estructura puro, no aplica.
-- El secreto del provider se resuelve server-side (`greenhouse-*-api-key` / `*_SECRET_REF`); nunca hardcodear la key.
+- **`claude-sonnet-4-6` es el default de arranque para grading, no un veredicto cerrado**: el eval baseline (Slice 4) decide empíricamente cuál grader correlaciona mejor con la corrección del SME. Si otro provider gana el eval, se swappea por el env var sin tocar el contrato.
+- Anthropic resuelve el secreto server-side (`greenhouse-anthropic-api-key` vía `resolveSecret`, gate con `isAnthropicConfigured()`); Gemini usa Vertex ADC (sin API key, gate con `isGeminiConfigured()`). Nunca hardcodear credenciales. Gemini Omni/Vertex multimodal no aplica (acá es texto→estructura).
+- **JSON Schema, no zod** (ambos helpers): Anthropic vía `inputSchema`+`toolName`, Gemini vía `jsonSchema`+`responseJsonSchema`. `temperature` baja (0–0.2).
 
 ### Frontera Nexa vs dominio (decisión 2026-07-08, análisis `arch-architect` + `greenhouse-nexa-conversational`)
 
