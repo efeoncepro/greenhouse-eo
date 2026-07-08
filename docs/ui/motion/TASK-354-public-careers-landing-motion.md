@@ -23,12 +23,15 @@ El movimiento en careers es **funcional, no decorativo**: confirma carga, jerarq
 | M5 | Botón submit | Estado de carga (spinner inline) durante el envío | Apply submitting |
 | M6 | Confirmación genérica | Aparición del mensaje de éxito | Apply success |
 | M7 | Errores inline | Aparición del mensaje de error por campo | Validación |
+| M8 | Attract (N0): hero + pilares + stepper de proceso | Aparición suave al entrar (opacidad/leve subida), stepper sin auto-avance | Careers home load |
+| — | Turnstile widget / consent | SIN motion propio (el widget maneja lo suyo; el checkbox no anima) | Apply |
 
 ## Microinteraction States
 
 - **Hover/focus (M2):** realce sutil de la card (elevación tokenizada); focus visible ≥2px 3:1 SIEMPRE presente (no depende del efecto).
-- **Submitting (M5):** botón deshabilitado + spinner inline; campos readonly; sin doble submit.
+- **Submitting (M5):** botón en estado de carga ("Enviando…") + spinner inline; campos readonly; sin doble submit. El botón NO se deshabilita por validación (forms-ux); solo durante el envío en curso.
 - **Success (M6):** el mensaje genérico aparece; foco se mueve a él (`role="status"`).
+- **Attract (M8):** el stepper de proceso es estático (no auto-avanza ni sugiere pasos automáticos); solo aparición al entrar en viewport.
 
 ## Transition Specs
 

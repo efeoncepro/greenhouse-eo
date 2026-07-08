@@ -1,5 +1,16 @@
 # TASK-354 — Public Careers Landing
 
+## Delta 2026-07-08 (revisión product-design + talent)
+
+Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-writing` (+ `greenhouse-ux`/`state-design`/`a11y-architect`). Gaps cerrados en wireframe/flow/motion + spec:
+
+- **Attract (N0) agregado** — la careers deja de ser "un listado": hero de employer brand + 3 pilares "por qué Efeonce" + stepper "cómo es el proceso" (transparencia = reduce ansiedad + defendible). Careers-as-funnel attract→convert→apply→nurture.
+- **Detalle skills-forward** — competencias clave (chips, enlazan al assessment engine) + cómo es el proceso + **señal de compensación** (rango si el payload lo trae; si no, "se conversa en el proceso" — pay-transparency 2026).
+- **Apply form → floor forms-ux completo** — `autocomplete`+`inputmode` por campo (estaba ausente, crítico), **submit ENABLED** (corrige "disabled por consent" → validar al click), validación 3-stage, foco al 1er error, paste tolerante, no-autofocus, "(opcional)" en la minoría, **Turnstile widget** (el backend 1367 exige `captchaToken`, faltaba en el diseño).
+- **Copy es-CL enriquecido** — consent referencia el aviso de privacidad (Ley 21.719), error-copy por campo ("qué pasó + cómo se arregla"), labels noun-based, gender-inclusive.
+- **Fairness/AI-Act** — nunca ID docs ni datos proxy de clase protegida en el apply público; sin scoring IA en el intake (ya se cumplía, ahora explícito en Acceptance).
+- **Nurture (N4)** — talent pool "Avísame" en el empty-state (V1 affordance; wiring backend = follow-up).
+
 ## Delta 2026-07-08 (split UI/backend)
 
 - **Task partida por Execution profile** (Task Authoring Contract + task-planner): el *apply intake service* (endpoint público + validación + reconciliación Person→facet→application + dedupe/idempotency + consent + anti-abuse) se movió a **`TASK-1367` (backend-data)**. Esta task queda como la **careers UI** (`ui-ux`): listing + detalle + apply form, **cliente delgado** del service de 1367. `Blocked by` ahora incluye `TASK-1367`.
@@ -120,21 +131,23 @@ Reglas obligatorias:
 ### Experience brief
 
 - **Rigor:** `ui-standard`.
-- Un candidato externo (sin sesión) descubre vacantes de Efeonce, lee una y postula en < 2 min. La experiencia transmite marca sólida + confianza de datos (consentimiento claro), sin fricción y sin filtrar nada interno. Marca **Efeonce** institucional.
+- Un candidato externo (sin sesión) **entiende por qué Efeonce** (employer brand + cómo es el proceso), descubre una vacante, la lee (competencias + proceso) y postula en < 2 min. Careers-as-funnel: **attract → convert → apply → nurture** — la página atrae talento, no es solo un listado. Marca sólida + confianza de datos (consentimiento claro), sin fricción, sin filtrar nada interno. Marca **Efeonce** institucional. Diseñar para una workforce multi-generacional (claro + accesible, no gimmick).
 
 ### Surface & system decision
 
-- 3 nodos: **N1 listing** (`/[lang]/careers`), **N2 detalle** (`/[lang]/careers/[publicId]`), **N3 apply** (sección/step). Ver master flow EPIC-011.
+- 4 nodos: **N0 attract** (hero + pilares de marca + stepper de proceso, en `/[lang]/careers`), **N1 listing** (mismo home), **N2 detalle** (`/[lang]/careers/[publicId]`), **N3 apply** (sección/step). N4 nurture (talent pool) = follow-up. Ver master flow EPIC-011.
 - Shell público sin sesión **nuevo y reusable** (lo reusa 1363). Primitive lookup: Greenhouse primitive → Vuexy `Custom*` → MUI (no inventar).
 - No es `ui-platform` (no crea Design System nuevo), pero el shell público es reusable → documentarlo como patrón en `ui-platform/PATTERNS.md` al implementar.
 
 ### State inventory
 
-Los 9 estados del wireframe: listing (loading/loaded/empty-zero/empty-filtered/error), detalle (detail/404), apply (idle/validando-inline/enviando/success-genérico/rate-limited/validation-error/server-error). `success` es terminal y genérico. Detalle en `docs/ui/wireframes/TASK-354-public-careers-landing.md` → State Copy.
+Los 10 estados del wireframe: listing (loading/loaded/empty-zero[+talent-pool]/empty-filtered/error), detalle (detail/404), apply (idle/validando-inline/enviando/accepted-genérico/rate-limited/captcha-failed/validation-error/server-error). `accepted` es terminal y genérico. Detalle + error-copy por campo en `docs/ui/wireframes/TASK-354-public-careers-landing.md` → State Copy + Error Copy.
 
-### Interaction contract
+### Interaction contract (forms-ux floor obligatorio)
 
-- Buscar/filtrar client-side (debounced) sobre el payload; click card→detalle; "Postular"→form; submit idempotente (dedupe en el service) → mismo success en doble submit; consent obligatorio para habilitar submit; validación inline sin limpiar el form en error. Detalle en el Flow.
+- Buscar/filtrar client-side (debounced 200–300ms, URL search params); click card→detalle; "Postular"→form.
+- **Apply form (forms-ux):** single column (Nombre/Apellido pareado), label sobre input, `autocomplete`+`inputmode` por campo, validación **3-stage** (silencio→blur→fix-on-change→server-confirm), error inline 4-elementos, **submit ENABLED** (validar al click, foco al 1er error, NO deshabilitar por consent), preservar datos en error, NO autofocus, "(opcional)" en la minoría, paste tolerante (teléfono), **Turnstile** (pasa `captchaToken` a 1367).
+- Submit idempotente (dedupe en el service) → mismo `accepted` genérico en doble submit. Detalle en el Flow + wireframe §Implementation Mapping (contrato de campos).
 
 ### Motion & microinteractions
 
@@ -169,24 +182,30 @@ Ver la tabla completa en el wireframe (§Implementation Mapping): VacancyCard = 
 
 ## Scope
 
-### Slice 1 — Shell público + listing (N1)
+### Slice 1 — Shell público + attract (N0) + listing (N1)
 
 - Shell público sin sesión reusable (header/footer Efeonce) + ruta `/[lang]/careers`.
-- Listing de openings publicados (`listPublicOpenings`) con VacancyCard + filtros client-side (búsqueda/área/modalidad).
-- Estados: loading (skeletons), empty-zero, empty-filtered, error. Copy `src/lib/copy/careers.ts`.
+- **Attract (N0):** hero de employer brand + 3 pilares ("por qué Efeonce") + stepper "cómo es el proceso" (transparencia). NO es solo un listado — la página atrae talento (`greenhouse-talent-people-operator`).
+- Listing de openings publicados (`listPublicOpenings`) con VacancyCard **skills-forward** (chips de competencias clave) + filtros client-side (búsqueda/área/modalidad, debounce 200–300ms, URL search params).
+- Estados: loading (skeletons), empty-zero (+ CTA talent pool), empty-filtered, error. Copy `src/lib/copy/careers.ts`.
 
 ### Slice 2 — Detalle (N2)
 
-- Ruta `/[lang]/careers/[publicId]` con detalle desde `getPublicOpeningByPublicId` (allowlist). Estado 404 para opening no publicado. CTA "Postular".
+- Ruta `/[lang]/careers/[publicId]` con detalle desde `getPublicOpeningByPublicId` (allowlist): descripción + **competencias clave** (chips, enlaza al assessment engine) + **cómo es el proceso** + **señal de compensación** ("se conversa en el proceso" si el payload no trae rango; si trae, mostrarlo — pay-transparency). Estado 404. CTA "Postular a esta vacante".
 
-### Slice 3 — Apply form (N3)
+### Slice 3 — Apply form (N3) — forms-ux floor
 
-- Form `react-hook-form` (nombre/apellido/email/teléfono/portafolio-link/LinkedIn-link/disponibilidad/mensaje/consent) que postea a `submitPublicHiringApplication` (1367).
-- Estados: idle/validando-inline/enviando/success-genérico/rate-limited/error. Confirmación genérica. a11y del form (labels reales, consent accesible, error anunciado).
+- Form (`react-hook-form` o `useActionState`): Nombre/Apellido (fila pareada) · Correo · Teléfono (opcional) · Portafolio-link (opcional) · LinkedIn-link (opcional) · Disponibilidad (opcional) · Mensaje (opcional) · Consent · **Turnstile widget**. Postea a `POST /api/public/hiring/applications` (1367) con `captchaToken`.
+- **Floor forms-ux (obligatorio):** single column, label sobre input, `autocomplete`+`inputmode` por campo (ver wireframe §Implementation Mapping), validación 3-stage (silencio→blur→fix-on-change→server-confirm), error inline 4-elementos (`aria-invalid`+`aria-describedby`+`role=alert`), submit **ENABLED** (validar al click, NO deshabilitar por consent), preservar datos en error, foco al primer error, NO autofocus, "(opcional)" en la minoría, paste tolerante (teléfono).
+- Estados: idle/validando-inline/enviando/accepted-genérico/rate-limited/captcha-failed/validación/error. Confirmación genérica (nunca revela dedupe/estado/PII). Consent referencia el aviso de privacidad (Ley 21.719).
 
 ### Slice 4 — GVC + verificación visual
 
-- Scenarios GVC (listing/detalle/apply) desktop+mobile; loop hasta enterprise; `scrollWidth==clientWidth`; consola limpia. Registrar el shell público como patrón en `ui-platform/PATTERNS.md`.
+- Scenarios GVC (careers-home[attract+listing]/detalle/apply) desktop+mobile; loop hasta enterprise; `scrollWidth==clientWidth`; consola limpia; foco al 1er error. Registrar el shell público como patrón en `ui-platform/PATTERNS.md`.
+
+### Slice 5 (follow-up) — Talent pool / nurture (N4)
+
+- "Avísame de nuevas vacantes" (captura de email para talent pool). Requiere backend propio (no V1) — dejar el affordance en el empty-state y diferir el wiring. Documentar como follow-up si no entra en V1.
 
 ## Out of Scope
 
@@ -241,12 +260,16 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 
 ## Acceptance Criteria
 
-- [ ] Listing/detalle consumen SOLO `PublicOpeningPayload`; 0 columnas internas.
-- [ ] Apply postea a `submitPublicHiringApplication` (1367); 0 reconciliación en cliente.
-- [ ] Los 9 estados del State Copy existen (incluye vacío, 404, rate-limited, validación, error genérico).
+- [ ] **Attract (N0)** presente: hero de employer brand + pilares "por qué Efeonce" + stepper "cómo es el proceso" — la página atrae, no solo lista.
+- [ ] Listing/detalle consumen SOLO `PublicOpeningPayload`; 0 columnas internas; **skills-forward** (chips de competencias).
+- [ ] Detalle muestra competencias + cómo es el proceso + **señal de compensación** (rango si el payload lo trae, si no "se conversa en el proceso").
+- [ ] Apply postea a `POST /api/public/hiring/applications` (1367) con **`captchaToken` (Turnstile)**; 0 reconciliación en cliente.
+- [ ] **Form floor forms-ux:** single column (Nombre/Apellido pareado), label sobre input, `autocomplete`+`inputmode` por campo, validación 3-stage, error inline 4-elementos, submit **ENABLED** (no disabled-por-consent), preservar datos en error, foco al 1er error, no autofocus, "(opcional)" en la minoría, paste tolerante.
+- [ ] Los 10 estados del State Copy existen (incluye vacío+talent-pool, 404, rate-limited, captcha-failed, validación con error-copy por campo, error genérico).
 - [ ] Confirmación + fallas genéricas (no filtran dedupe/estado/PII).
-- [ ] Copy 100% desde `src/lib/copy/careers.ts` es-CL; 0 literals; marca Efeonce (no Greenhouse).
-- [ ] a11y WCAG 2.2 AA (labels reales, consent accesible, focus cross-surface, reflow 320/200%, reduced-motion).
+- [ ] Copy 100% desde `src/lib/copy/careers.ts` es-CL; 0 literals; consent referencia el aviso de privacidad (Ley 21.719); marca Efeonce (no Greenhouse).
+- [ ] NUNCA se piden documentos de identidad ni datos proxy de clase protegida (edad/género/foto) en el apply público (fairness).
+- [ ] a11y WCAG 2.2 AA (labels reales, consent accesible, focus cross-surface + 1er error, reflow 320/200%, reduced-motion).
 - [ ] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia.
 - [ ] Shell público documentado como patrón reusable (para 1363).
 - [ ] `UI ready: yes` solo cuando lo anterior + `pnpm task:lint --task TASK-354` sin findings.
