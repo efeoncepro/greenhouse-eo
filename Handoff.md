@@ -1,3 +1,8 @@
+## Sesion 2026-07-08 - TASK-1367 Careers Apply Intake Service - Claude - in-progress
+
+> **Task:** `TASK-1367` (Careers Apply Intake Service, EPIC-011, split backend de TASK-354) movida a `in-progress`. **Local-first en `develop`, sin push.** Backend-data: endpoint público `POST /api/public/hiring/applications` + `submitPublicHiringApplication` → reconcilia Person→candidate_facet→hiring_application (contratos de TASK-353), dedupe/idempotency, consent + `source=public_careers`, anti-abuse, respuesta genérica segura, efectos pesados async. V1 links-only (upload=TASK-1362). Desbloquea TASK-354 (careers UI).
+> **Slices:** 1 validation schema (assertion functions, NO Zod) + dedupe · 2 submit command (reconciliación atómica) · 3 endpoint público + anti-abuse (patrón public-intake). Open Questions (consent columns / flag / captcha) se resuelven en Discovery contra el schema real.
+
 ## Sesion 2026-07-08 - Public Site menu Visibilidad + Agencia Creativa V2 index - Codex - LIVE
 
 > **Cambio live:** `efeoncepro.com` actualiza el menú clásico WordPress/Ohio (`primary`, term `61`, `Menu 1`) según la IA aprobada por el operador. `Optimización Continua` ahora es `Visibilidad` (`item 248628`); `Posicionamiento SEO` se agregó como `item 251312` bajo `Visibilidad`; `AEO` (`item 250691`) se movió bajo `Visibilidad`; `Diseño & Desarrollo Web` (`item 242916`) ahora apunta al page `250816` `/desarrollo-sitios-web/`; `Producción Creativa` se agregó como `item 251313` bajo `Estrategia & Posicionamiento`, apuntando al page `251279` `/agencia-creativa-v2/`. Se mantiene también `/agencia-creativa/` como `Agencia Creativa`; no se hizo redirect legacy.
