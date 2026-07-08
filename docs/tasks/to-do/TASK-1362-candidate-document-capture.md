@@ -1,5 +1,14 @@
 # TASK-1362 — Candidate Document Capture
 
+## Delta 2026-07-08 — Revisión 3-lentes (arch-architect + talent/people-ops + product-design)
+
+Hechos verificados contra el repo real. La task está bien encuadrada (reusar, no recrear); ajustes:
+
+- **Sustrato confirmado real:** `createPrivatePendingAsset`/`attachAssetToAggregate`/`canTenantAccessAsset`/`downloadPrivateAsset` existen en `src/lib/storage/greenhouse-assets.ts`; `CONTEXT_RETENTION_CLASS`/`CONTEXT_PREFIX` son `Record<GreenhouseAssetContext, …>` exhaustivos (la red anti-olvido de authz es real). `person_identity_documents.evidence_asset_id` existe (migración TASK-784, FK a `greenhouse_core.assets`). El enfoque reuse-not-recreate está bien fundado.
+- **OVERLAP con TASK-1367 (complete) — recalibrar Slice 2:** `candidate_facet` **YA tiene `portfolio_url` + `linkedin_url`** (los agregó 1367 en el apply intake). El Slice 2 proponía una columna nueva `portfolio_links` → **drift redundante**. El portafolio-**enlace** ya está resuelto (1367). 1362 owns el portafolio-**archivo** (asset context `hiring_candidate_portfolio_file`) + el **resolver unificado** de documentos del candidato. **NO** agregar `portfolio_links` salvo que se justifique explícitamente soportar *múltiples* enlaces (1367 da uno + LinkedIn); si se justifica, es una decisión declarada, no una segunda columna silenciosa.
+- **Scan/quarantine net-new confirmado:** no existe scan de malware de assets. El único patrón de quarantine en el repo es `context_document_quarantine` (dominio `structured-context`) — reusable como **referencia de forma** del registro de quarantine, pero el escaneo antivirus real (ClamAV/GCP) es net-new (sigue siendo la Open Question + el mayor riesgo). `backend-critical` + gatear el upload público de 354 detrás del Slice 4 es correcto.
+- **Retención/borrado de PII de candidatos rechazados (elevar de follow-up a riesgo):** guardar CV/identidad de personas que NO se contrataron es una obligación de protección de datos (Ley 21.719) — dejar la policy de retención/borrado como invariante declarado + riesgo, no solo follow-up.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -71,6 +80,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-353` (`candidate_facet`, `hiring_application`)
+- `TASK-1367` (complete) — ya agregó `candidate_facet.portfolio_url`/`linkedin_url`; 1362 los consume, NO los duplica
 - `src/lib/storage/greenhouse-assets.ts` (plataforma de assets privados)
 - `src/app/api/assets/private/route.ts` + `src/app/api/assets/private/[assetId]/route.ts`
 - `src/types/assets.ts` (`GreenhouseAssetContext` + mapas por-contexto)
@@ -88,8 +98,8 @@ Reglas obligatorias:
 - `src/lib/storage/greenhouse-assets.ts` (solo agregar los contextos a los 3 mapas + `canAccessHiringAsset`)
 - `src/app/api/assets/private/route.ts` (solo agregar los contextos a la allowlist + guard)
 - `src/lib/hiring/documents/**` (helpers hiring-aware: linkear asset a application/facet, resolver docs de un candidato)
-- `migrations/<ts>_task-1362-candidate-facet-portfolio-links.sql` (campo portafolio-enlace + wiring quarantine si aplica)
-- `src/lib/storage/asset-scan/**` (quarantine/scan — net-new)
+- `migrations/<ts>_task-1362-candidate-document-scan.sql` (wiring quarantine/scan; **NO** columna portafolio — ya existe por 1367, salvo justificar array multi-enlace)
+- `src/lib/storage/asset-scan/**` (quarantine/scan — net-new; referencia de forma: patrón `context_document_quarantine` de `structured-context`)
 - `src/types/db.d.ts`
 
 ## Current Repo State
@@ -126,12 +136,13 @@ Reglas obligatorias:
 
 ### Data model and invariants
 
-- Entidades/tablas afectadas: `greenhouse_core.assets` (nuevos contextos), `candidate_facet` (columna `portfolio_links`), `person_identity_documents` (linking, sin cambio estructural)
+- Entidades/tablas afectadas: `greenhouse_core.assets` (nuevos contextos), `candidate_facet` (**reusa `portfolio_url`/`linkedin_url` de 1367 — NO columna nueva**), `person_identity_documents` (linking, sin cambio estructural)
 - Invariantes que no se pueden romper:
   - candidato se ancla por `identity_profile_id`/`candidate_facet_id`/`application_id`, NUNCA `member_id`
   - `value_full` de identity docs nunca se loggea ni sale sin reveal (capability + reason + audit)
   - identity docs NO se piden en el apply público (post-decisión)
   - uploads públicos pasan por quarantine/scan antes de quedar `attached`
+  - **retención/borrado:** los documentos de candidatos NO contratados/rechazados están sujetos a policy de retención (Ley 21.719); definir borrado/expiración auditable — no acumular PII de personas fuera del proceso indefinidamente
 - Tenant/space boundary: `canAccessHiringAsset` autoriza por capability hiring + ownership del candidato; identity docs por capability HR
 - Idempotency/concurrency: upload 2-fases existente (pending → attached); dedup por hash; scan idempotente
 - Audit/outbox/history: `asset_access_log` (existe) + audit de identity docs (existe); evento `hiring.document.attached`
@@ -196,10 +207,10 @@ Reglas obligatorias:
 - `canAccessHiringAsset` (ancla por `application_id`/`candidate_facet_id`/`identity_profile_id`; capability hiring; niega `client_*`).
 - Helpers `src/lib/hiring/documents/**` para attach/resolve.
 
-### Slice 2 — Portfolio links + candidate document resolver
+### Slice 2 — Candidate document resolver (portafolio-enlace ya existe)
 
-- Migración: columna `portfolio_links` (JSONB/TEXT[]) en `candidate_facet`.
-- Reader que resuelve todos los documentos de un candidato (CV assets + portafolio links + identity docs masked).
+- **NO agregar columna nueva:** `candidate_facet.portfolio_url` + `linkedin_url` ya existen (TASK-1367, complete). El resolver los consume tal cual. Solo agregar una columna nueva si Discovery justifica *múltiples* portafolio-enlaces (array) — decisión declarada, no drift silencioso.
+- Reader unificado que resuelve todos los documentos de un candidato: CV/portafolio-**archivo** (assets), portafolio/LinkedIn-**enlace** (`portfolio_url`/`linkedin_url` de 1367), identity docs (masked).
 
 ### Slice 3 — Identity document linking (post-decisión)
 
@@ -236,6 +247,8 @@ Los mapas por-contexto de `greenhouse-assets.ts` son `Record` exhaustivos sobre 
 | `value_full` de identidad filtrado | identity / PII | low | Reuso masked/reveal + capability + audit; nunca loggear | audit de reveal; captureWithDomain |
 | Malware subido por el path público | security | medium | Quarantine/scan antes de attach + allowlist MIME | signal scan/quarantine |
 | Identity docs pedidos en el apply público (compliance) | legal | medium | Guardrail: path de identidad separado del apply | review del apply flow |
+| PII de candidatos rechazados acumulada sin retención (Ley 21.719) | legal / data | medium | Policy de retención/borrado auditable de docs de no-contratados | doc de retención + signal de expiración |
+| Segunda columna de portafolio (drift vs 1367) | data | medium | Reusar `portfolio_url`/`linkedin_url` de 1367; columna nueva solo si multi-enlace justificado | review de migración |
 
 ### Feature flags / cutover
 
@@ -245,13 +258,13 @@ Los mapas por-contexto de `greenhouse-assets.ts` son `Record` exhaustivos sobre 
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1-2 | revert PR + drop columna portafolio (additive) | <15 min | si |
+| Slice 1-2 | revert PR (contextos additive; sin columna nueva — reusa 1367) | <15 min | si |
 | Slice 3 | revert wiring (identity docs siguen siendo de la legal profile) | <10 min | si |
 | Slice 4 | deshabilitar upload público (compensating control) | <10 min | si |
 
 ### Production verification sequence
 
-1. Migrate staging + verify columna portafolio + contextos.
+1. Migrate staging + verify contextos hiring (portafolio-enlace ya existe por 1367).
 2. Smoke: subir CV pending → attach a application → download con capability → negar sin capability y a `client_*`.
 3. Smoke identity: enlazar doc → masked por default → reveal exige capability + reason + audit.
 4. Smoke scan: archivo limpio pasa, archivo marcado queda quarantined.
@@ -269,7 +282,8 @@ Los mapas por-contexto de `greenhouse-assets.ts` son `Record` exhaustivos sobre 
 
 - [ ] CV/muestras se suben como assets privados anclados por `application_id`/`candidate_facet_id`/`identity_profile_id` (NUNCA `member_id`).
 - [ ] `canAccessHiringAsset` autoriza por capability hiring + ownership y niega `client_*`; test verde.
-- [ ] `candidate_facet` tiene portafolio-enlace; existe un resolver que devuelve todos los documentos de un candidato (CV + portafolio + identidad masked).
+- [ ] Existe un resolver unificado que devuelve todos los documentos de un candidato (CV/portafolio-archivo assets + `portfolio_url`/`linkedin_url` de 1367 + identidad masked); NO se agrega columna de portafolio nueva salvo justificación de multi-enlace.
+- [ ] La policy de retención/borrado de documentos de candidatos no contratados queda definida (o declarada como follow-up con owner + condición), no PII acumulada indefinidamente.
 - [ ] Documento de identidad reutiliza `person_identity_documents` con masked/reveal + capability `person.legal_profile.reveal_sensitive` + audit; NO se pide en el apply público.
 - [ ] Uploads públicos pasan por quarantine/scan antes de quedar attached; signal de quarantine.
 - [ ] Sin leak de `value_full`; errores canónicos es-CL; respuesta pública genérica.
