@@ -79,11 +79,18 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 ## Child Tasks
 
 - `TASK-352` — Program umbrella and coordination for Hiring / ATS.
-- `TASK-353` — Domain foundation: aggregates, schema, services, API baseline and publication contract.
+- `TASK-353` — Domain foundation: aggregates, schema, services, API baseline and publication contract. **✓ complete (2026-07-07).**
 - `TASK-354` — Public careers landing and apply intake.
 - `TASK-355` — Internal Hiring Desk, pipeline and publication governance.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
+
+### Assessment + Candidate Intake extension (Delta 2026-07-08)
+
+- `TASK-1360` — **Assessment Engine foundation**: competency catalog + question bank + assessment templates + candidate test instances + interviewer scorecards, objective + human scoring, competency-result rollup into `hiring_application`. Seeds the real competencies (SEO, copywriting, project management, community management, leadership, vendor management + attitudinal + aptitude) and the first Account Manager template. `backend-data`. Blocked by `TASK-353`.
+- `TASK-1361` — **Assessment AI Assist**: governed AI question generation + AI-proposed scoring of open/situational answers (propose → confirm, human confirms; eval baseline). `backend-data`. Blocked by `TASK-1360`.
+- `TASK-1362` — **Candidate Document Capture**: hiring asset contexts (CV/portfolio) on the private assets platform + candidate identity-document linking (reuse `person_identity_documents` masked/reveal) + upload quarantine/scan for public uploads. `backend-data`. Blocked by `TASK-353`.
+- `TASK-1363` — **Assessment Taking + Review Surface**: candidate-facing remote tokenized test-taking + internal rating/review surface in the desk. `ui-ux`. Blocked by `TASK-1360` (+ product-design loop).
 
 ## Existing Related Work
 
@@ -128,3 +135,41 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 ## Delta 2026-05-03
 
 - Epic created to make the execution sequence explicit after `TASK-770` was added as the missing closure from selected candidate to active collaborator.
+
+## Delta 2026-07-08 — Assessment (candidate testing) + Document Capture design
+
+Operator requirement: el dominio necesita (1) **tests que rinde el candidato** — actitudinales, de aptitud/capacidad, y de conocimiento por skill (SEO, project management, community management, copywriting, liderazgo, vendor management) — y (2) **carga de documentos** (CV, enlace de portafolio, documento de identidad). Caso vivo que fuerza el diseño: vacante de **Account Manager** que exige nociones de SEO + copywriting + liderazgo + vendor management.
+
+### El "Assessment" son dos mecanismos, un modelo de competencias
+
+- **Test que rinde el candidato** (nuevo): un cuestionario versionado con answer-key + scoring + mapeo a competencias, que el candidato responde remoto (link tokenizado single-use + tiempo límite).
+- **Scorecard humano de entrevista** (`HiringEvaluation`, ya anticipado en la arquitectura): un entrevistador registra ratings por competencia tras la entrevista.
+- Ambos producen **resultados por competencia** que ruedan hacia `hiring_application.score` / `match_score` / `explainability_json` (SSOT del número headline sigue en la postulación).
+
+### Modelo por competencias (composición, no tests hardcodeados)
+
+- **Catálogo de competencias** reutilizable, con dos ejes **ortogonales** (nunca en un solo enum): `category` (`attitudinal` | `aptitude` | `skill`) × `level` (`nociones` | `intermedio` | `avanzado`).
+- **Banco de preguntas** por competencia+nivel, con `type` (`single_choice` | `multi_choice` | `likert` | `situational` | `open_text`). `single/multi` y `likert` = auto-corregidas; `situational`/`open_text` = corrección humana (o IA-propuesta, TASK-1361). La `answer_key` es sensible: se guarda separada y NUNCA viaja en el payload que ve el candidato (misma disciplina allowlist que el opening público de TASK-353).
+- **Plantilla de test** = composición de módulos `competencia + nivel objetivo + peso`. Ejemplo Account Manager: SEO@nociones(15%) + Copywriting@intermedio(25%) + Liderazgo@intermedio(25%) + Vendor@nociones(15%) + Actitudinal(20%). Reutilizable en cada vacante equivalente.
+- **Instancia de test** = plantilla enganchada a una `hiring_application` → candidato rinde → auto-score objetivo + cola de corrección humana → scorecard por competencia.
+
+### Carga de documentos — reutilizar, no crear buckets
+
+- **CV / portafolio (archivo)** → plataforma de assets privados existente (`greenhouse_core.assets` + `GREENHOUSE_PRIVATE_ASSETS_BUCKET`), con **contextos hiring nuevos** anclados por `application_id`/`candidate_facet_id`/`identity_profile_id` (el candidato NO tiene `member`). Portafolio como enlace = campo en `candidate_facet`.
+- **Documento de identidad (cédula/RUT/pasaporte)** → **reutiliza `greenhouse_core.person_identity_documents`** (TASK-784), anclado al `identity_profile_id` del candidato, con el patrón enmascarado/revelar + capability HR `person.legal_profile.reveal_sensitive` + auditoría. Un reclutador ve enmascarado; revelar exige capability + razón + audit (mismo rigor que la PII de un empleado). La imagen escaneada va a assets como `evidence_asset_id`.
+- **Timing/compliance:** identity docs se capturan **post-decisión** (cerca de la oferta/handoff), NO en el apply público. CV/portafolio sí en el apply.
+- **Gap:** la plataforma de assets **no tiene quarantine/scan** hoy → net-new para uploads públicos (TASK-1362).
+
+### Boundaries duros (arch + payroll)
+
+- El score de assessment es **hiring-interno y ortogonal a payroll/ICO/bonus**: mide al candidato, NUNCA es KPI de delivery ni elegibilidad de bono.
+- Los tests son **input a una decisión humana, NUNCA deciden solos** (no auto-rechazan) — defensibilidad legal + fairness.
+- IA en scoring/generación: **propone, un humano confirma** (governed action runtime), con eval baseline. Nunca puntúa como verdad final.
+
+### Secuencia actualizada
+
+`353 (✓) → 354 + 355 + 1360 + 1362 (paralelo tras foundation) → 1361 (tras 1360) → 1363 (tras 1360 + product-design) → 356 → 770`
+
+### Supersede de non-goal
+
+El non-goal "No AI scoring/evaluation automation in the first pass" se **refina**: la evaluación (assessment) entra como capability propia; el scoring IA es gobernado (propose→confirm + eval), no automatización que decide. No se relaja el boundary de "no auto-reject".

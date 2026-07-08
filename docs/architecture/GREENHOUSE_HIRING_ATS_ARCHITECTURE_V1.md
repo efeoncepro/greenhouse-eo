@@ -876,3 +876,37 @@ La foundation transaccional del dominio quedó materializada (local-first, verif
 - **NUNCA** escribir `member`/`assignment`/`placement`/payroll/compensation desde `src/lib/hiring/**`. El handoff downstream es explícito (TASK-356), no side effect.
 - **NUNCA** publicar un opening sin `public_title` (guard 422 en `publishOpening`).
 - **SIEMPRE** publicar el outbox event en la misma tx que el write del aggregate (patrón del store); `captureWithDomain(err, 'hiring', …)` para observabilidad.
+
+## Delta 2026-07-08 — Assessment (competency testing) + Candidate Document Capture
+
+Extensión del dominio con dos capacidades pedidas por operación: **tests que rinde el candidato** y **carga de documentos**. Programa de tasks: `TASK-1360` (engine), `TASK-1361` (AI assist), `TASK-1362` (doc capture), `TASK-1363` (taking/review UI). Diseño detallado + ejemplo Account Manager en `EPIC-011 → Delta 2026-07-08`.
+
+### Assessment = dos mecanismos sobre un modelo de competencias
+
+El objeto canónico `HiringEvaluation` (ya nombrado arriba) se generaliza a **assessment** con dos métodos que producen el mismo output (resultados por competencia):
+
+- `candidate_test` — cuestionario versionado con answer-key + scoring que el candidato rinde (remoto, tokenizado).
+- `interviewer_scorecard` — un evaluador humano registra ratings por competencia.
+
+Modelo canónico (schema `greenhouse_hiring`):
+
+- **Competency catalog** — reutilizable, agnóstico de cargo. Dos ejes **ortogonales** (NUNCA en un solo enum): `category` (`attitudinal` | `aptitude` | `skill`) × `level` (`nociones` | `intermedio` | `avanzado`).
+- **Question bank** — por competencia+nivel, `type` ∈ `single_choice`|`multi_choice`|`likert`|`situational`|`open_text`. `answer_key`/`rubric` **sensible**: se persiste separada de lo que ve el candidato (misma disciplina allowlist que el opening público). Objetivo (`single/multi/likert`) auto-corregido; `situational`/`open_text` corrección humana (o IA-propuesta, TASK-1361).
+- **Assessment template** — composición de módulos `competencia + nivel objetivo + peso` (ej. "Account Manager L2"). Reutilizable por vacante.
+- **Assessment instance** — plantilla ⨯ `hiring_application` → estados `assigned → sent → in_progress → submitted → scored | expired`; token single-use + tiempo límite para el modo remoto.
+- **Response** + **competency result** — respuestas por pregunta; resultado por competencia + overall que **rueda hacia** `hiring_application.score` / `match_score` / `explainability_json` (SSOT del headline en la postulación; el assessment es el detalle que lo alimenta).
+
+### Document capture — reutilización, no plataformas nuevas
+
+- **CV / portafolio (archivo)**: plataforma de assets privados existente (`greenhouse_core.assets` + `GREENHOUSE_PRIVATE_ASSETS_BUCKET`), contextos hiring nuevos anclados por `application_id`/`candidate_facet_id`/`identity_profile_id` (el candidato NO tiene `member` → NO anclar por member). Portafolio-enlace = campo en `candidate_facet`.
+- **Documento de identidad**: reutiliza `greenhouse_core.person_identity_documents` (TASK-784) anclado al `identity_profile_id` del candidato, patrón enmascarado/revelar + capability `person.legal_profile.reveal_sensitive` + audit; imagen escaneada como `evidence_asset_id`. Capturado **post-decisión** (no en apply público).
+- Net-new: **quarantine/scan** de uploads públicos (no existe en la plataforma de assets hoy).
+
+### Invariantes operativos para agentes — Assessment + Doc Capture
+
+- **NUNCA** exponer `answer_key`/`rubric` en el payload que ve el candidato (allowlist como el opening público).
+- **NUNCA** mezclar `category` y `level` en un solo enum (ejes ortogonales).
+- **NUNCA** dejar que un score de assessment alimente payroll/ICO/bonus, ni que auto-rechace una postulación — es input a decisión humana.
+- **NUNCA** anclar un asset/identity-doc de candidato por `member_id` (usar `identity_profile_id`/`candidate_facet_id`/`application_id`).
+- **NUNCA** IA que puntúa como verdad final: `propose → confirm` (humano confirma) + eval baseline (TASK-1361).
+- **SIEMPRE** reutilizar `person_identity_documents` para identidad (no crear tabla de docs de identidad en `greenhouse_hiring`).

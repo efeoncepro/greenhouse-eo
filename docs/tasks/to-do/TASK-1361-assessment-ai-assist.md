@@ -1,0 +1,300 @@
+# TASK-1361 — Assessment AI Assist
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P2`
+- Impact: `Medio`
+- Effort: `Alto`
+- Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `api`
+- Epic: `EPIC-011`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `agency`
+- Blocked by: `TASK-1360`
+- Branch: `task/TASK-1361-assessment-ai-assist`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+Capa IA gobernada sobre el motor de assessment (TASK-1360): generación asistida de preguntas por competencia+nivel y corrección **propuesta** de respuestas `open_text`/`situational`. La IA propone, un humano confirma — nunca puntúa como verdad final ni auto-rechaza. Acelera armar el banco de preguntas y correr correcciones sin comprometer defensibilidad.
+
+## Why This Task Exists
+
+TASK-1360 deja el banco de preguntas y las respuestas abiertas como trabajo humano. Armar preguntas por skill (SEO, copywriting, liderazgo, vendor management…) y corregir respuestas abiertas a mano no escala. La IA puede acelerar ambos, pero sin gobernanza se vuelve un juez opaco que decide contrataciones. Este task introduce el asistente IA respetando el runtime de acción gobernada (`propose → confirm → execute`) y la regla de eval-driven AI: nada de scoring IA sin baseline.
+
+## Goal
+
+- Generar borradores de preguntas por competencia+nivel que un humano revisa/aprueba antes de entrar al banco.
+- Proponer un score + justificación para respuestas `open_text`/`situational`, que un humano confirma o corrige.
+- Dejar eval baseline + flag OFF para cutover controlado.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (§`Delta 2026-07-08 — Assessment`)
+- `docs/architecture/GREENHOUSE_NEXA_ARCHITECTURE_V1.md` (runtime de acción gobernada `propose → confirm → execute`)
+- `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` (§providers LLM — cliente canónico `src/lib/ai/`)
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
+
+Reglas obligatorias:
+
+- La IA **propone**, un humano **confirma**: el LLM NUNCA escribe el score final ni aprueba una pregunta directo. La mutación ocurre solo en el endpoint de confirmación humana.
+- NUNCA instanciar un SDK LLM paralelo dentro del dominio: usar los helpers estructurados canónicos de `src/lib/ai/*` (`generateStructured{Anthropic,OpenAI,Gemini}`).
+- Eval baseline obligatorio antes de cutover; sin baseline, el scoring IA no shippea.
+- Flag default OFF; el score IA propuesto es visible como sugerencia, nunca como resultado canónico hasta confirmación.
+- El boundary de TASK-1360 se mantiene: score ortogonal a payroll/ICO, nunca auto-reject.
+
+## Normative Docs
+
+- `docs/tasks/to-do/TASK-1360-assessment-engine-foundation.md`
+- `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md` (§`Delta 2026-07-08`)
+
+## Dependencies & Impact
+
+### Depends on
+
+- `TASK-1360` (banco de preguntas `hiring_question`, respuestas `hiring_assessment_response`, scoring humano)
+- `src/lib/ai/*` (helpers LLM estructurados canónicos) `[verificar]`
+- `src/lib/ai/eval/**` o patrón de eval baseline existente `[verificar]`
+
+### Blocks / Impacts
+
+- `TASK-1363` (la UI de review muestra la sugerencia IA + botón confirmar)
+
+### Files owned
+
+- `src/lib/hiring/assessment/ai/**`
+- `src/app/api/hiring/assessments/ai/**`
+- `migrations/<ts>_task-1361-assessment-ai-proposals.sql` (tabla de propuestas IA + confirmación)
+- `src/config/entitlements-catalog.ts` (capability `hiring.assessment.ai_assist`)
+- `src/lib/entitlements/runtime.ts` (grant)
+- `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (registrar el flag)
+- `src/types/db.d.ts`
+
+## Current Repo State
+
+### Already exists
+
+- Motor de assessment (TASK-1360): banco de preguntas + respuestas + scoring humano + rollup.
+- Helpers LLM estructurados canónicos en `src/lib/ai/*` `[verificar]`.
+- Runtime de acción gobernada (Nexa) `propose → confirm → execute`.
+
+### Gap
+
+- No hay generación asistida de preguntas.
+- No hay corrección IA propuesta de respuestas abiertas.
+- No hay eval baseline para scoring de assessment.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical` (scoring IA que afecta decisiones de contratación; requiere eval + gobernanza)
+- Impacto principal: `api`
+- Source of truth afectado: banco de preguntas (TASK-1360) + nueva tabla `hiring_assessment_ai_proposal` (propuesta + estado de confirmación)
+- Consumidores afectados: UI review (TASK-1363), operador humano
+- Runtime target: `local` → `staging` → `production`
+
+### Contract surface
+
+- Contrato existente a respetar: commands/readers de TASK-1360; helpers `src/lib/ai/*`; runtime de acción gobernada
+- Contrato nuevo: `proposeQuestionsForCompetency`, `proposeScoreForResponse` (generan propuesta), `confirmAiProposal` (mutación humana); rutas `/api/hiring/assessments/ai/**`
+- Backward compatibility: `gated` (flag OFF default)
+- Full API parity: la propuesta IA es un command gobernado; la confirmación es el único write. Nexa opera por construcción (no integración Nexa-específica)
+
+### Data model and invariants
+
+- Entidades/tablas afectadas: `greenhouse_hiring.hiring_assessment_ai_proposal` (`proposal_id`, `kind` `question_draft|response_score`, `target_ref`, `proposed_json`, `model`, `status` `proposed|confirmed|rejected`, `confirmed_by`, `confirmed_at`)
+- Invariantes que no se pueden romper:
+  - la propuesta IA NUNCA muta el banco/score directo; solo `confirmAiProposal` (humano) aplica
+  - toda propuesta registra el `model` + inputs para trazabilidad
+  - el score IA propuesto no cuenta en el rollup hasta confirmación
+- Tenant/space boundary: heredado del assessment/application
+- Idempotency/concurrency: propuestas append-only; confirmación idempotente por `proposal_id`
+- Audit/outbox/history: evento `hiring.assessment.ai_proposed` + `hiring.assessment.ai_confirmed`; propuestas append-only
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive` (tabla de propuestas)
+- Default state: `flag OFF` (`HIRING_ASSESSMENT_AI_ENABLED`)
+- Backfill plan: `none`
+- Rollback path: `flag off` + revert PR + tabla drop (additive)
+- External coordination: verificar secret del provider LLM ya configurado (`greenhouse-*-api-key`); sin coordinación nueva
+
+### Security and access
+
+- Auth/access gate: capability `hiring.assessment.ai_assist` (proponer) + `hiring.assessment.author`/`score` (confirmar, ya de TASK-1360). Grant a roles internos reales, NUNCA `client_*`
+- Sensitive data posture: respuestas de candidatos (PII moderada) van al LLM — declarar en el flag/rollout; no enviar identity docs ni PII sensible al provider
+- Error contract: `toHiringErrorResponse` + `captureWithDomain(err, 'hiring')`; degradar si el provider falla (la corrección humana sigue disponible)
+- Abuse/rate-limit posture: quota de llamadas IA por operador/período; el gasto va gobernado
+
+### Runtime evidence
+
+- Local checks: unit tests del parse de la propuesta estructurada + test de que la propuesta NO muta banco/score sin confirmación
+- DB/runtime checks: smoke contra PG dev (proponer → confirmar → verificar mutación solo post-confirm)
+- Integration checks: smoke real contra el provider LLM (una generación + una corrección) con evidencia
+- Reliability signals/logs: outbox `hiring.assessment.ai_*`; signal de fallo de provider
+- Production verification sequence: eval baseline verde → flag ON staging → smoke → flag ON prod
+
+### Acceptance criteria additions
+
+- [ ] Source of truth + contract surface + consumers nombrados con paths reales.
+- [ ] Invariante "IA propone, humano confirma" explícito y con test (no mutación sin confirmación).
+- [ ] Flag OFF default + registrado en el ledger; rollback por flag.
+- [ ] Eval baseline ejecutado con evidencia antes de cutover.
+- [ ] Canonical errors + degradación si el provider falla + sin leak de PII sensible al LLM.
+
+## Capability Definition of Done — Full API Parity gate
+
+- [ ] Lógica en `src/lib/hiring/assessment/ai/**`, no en UI.
+- [ ] Modelada como command (proponer) + command de confirmación (write), no click-handler.
+- [ ] Read = readers de propuestas; write (confirm) = command con capability + idempotencia + outbox + errores canónicos.
+- [ ] Capability `hiring.assessment.ai_assist` + grant a rol real + coverage test mismo PR.
+- [ ] Camino programático: `/api/hiring/assessments/ai/**`; Nexa opera vía propose→confirm por construcción.
+- [ ] Write apto para `propose → confirm → execute` (es literalmente el patrón).
+- [ ] Un primitive, muchos consumers sin lógica duplicada.
+- [ ] Parity check = SÍ.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 1 — Proposal store + governed write
+
+- Migración `hiring_assessment_ai_proposal` (append-only + estado de confirmación).
+- Command `confirmAiProposal` (único write que aplica al banco/score), capability-gated + outbox.
+
+### Slice 2 — Question generation (propose)
+
+- `proposeQuestionsForCompetency(competencyKey, level, count)` usando `generateStructured*` de `src/lib/ai/*`; guarda propuestas `question_draft`.
+- Endpoint `/api/hiring/assessments/ai/questions/propose` (capability `hiring.assessment.ai_assist`).
+
+### Slice 3 — Response scoring (propose)
+
+- `proposeScoreForResponse(responseId)` para `open_text`/`situational`, con score + justificación estructurada.
+- La propuesta se muestra como sugerencia; el score canónico solo se aplica vía la cola de corrección humana de TASK-1360 (confirmación).
+
+### Slice 4 — Eval baseline + flag
+
+- Eval baseline: dataset de respuestas con score humano de referencia; medir correlación IA↔humano antes de habilitar.
+- Flag `HIRING_ASSESSMENT_AI_ENABLED` default OFF + registro en el ledger.
+
+## Out of Scope
+
+- El motor de assessment base (TASK-1360).
+- UI de review con el botón confirmar (TASK-1363).
+- Auto-scoring sin confirmación humana (prohibido por diseño).
+
+## Detailed Spec
+
+Reutilizar el patrón de scoring IA gobernado del AI Visibility grader (`src/lib/growth/ai-visibility/**`) como referencia de "IA propone, contrato gobierna" `[verificar]`. La propuesta estructurada usa `generateStructured*`; el schema de salida fuerza `{score, rationale, perCriterion?}`. La confirmación humana es el único path que toca el rollup canónico de TASK-1360.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 (proposal store + governed write) → Slice 2/3 (propose paths, pueden ir en paralelo) → Slice 4 (eval + flag, gate final antes de cutover).
+- Slice 4 (eval baseline) MUST ship antes de habilitar el flag en cualquier ambiente productivo.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| IA puntúa como verdad final (sin humano) | identity / hiring | medium | Invariante propose→confirm + test de no-mutación; único write = confirm | test rojo; auditoría de proposals no confirmadas |
+| PII sensible enviada al provider LLM | identity / PII | medium | Allowlist de campos al prompt; nunca identity docs; redacción | revisión de payloads; captureWithDomain |
+| Scoring IA sesgado / no defensible | hiring / legal | medium | Eval baseline + humano confirma + assessment sigue siendo advisory | correlación IA↔humano baja en eval |
+| Gasto LLM descontrolado | cost | low | Quota por operador + flag OFF default | dashboard de gasto AI |
+
+### Feature flags / cutover
+
+- Env var `HIRING_ASSESSMENT_AI_ENABLED` (default `false`). Flip a `true` solo post eval baseline verde. Revert: flag a `false` + redeploy (<5 min). Registrar en `FEATURE_FLAG_STATE_LEDGER.md`.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1 | drop tabla proposals + revert PR | <10 min | si |
+| Slice 2-3 | flag off (propose deja de ofrecerse) | <5 min | si |
+| Slice 4 | flag off | <5 min | si |
+
+### Production verification sequence
+
+1. Migrate staging + verify tabla proposals.
+2. Deploy con flag OFF + verify que no se ofrece IA.
+3. Correr eval baseline staging + verify correlación aceptable con evidencia.
+4. Flag ON staging + smoke propose→confirm + verify mutación solo post-confirm.
+5. Repetir en prod con cooldown.
+
+### Out-of-band coordination required
+
+- Verificar secret del provider LLM configurado (`greenhouse-*-api-key`); si falta, coordinar rotación/publicación antes del flag ON.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] Existe `hiring_assessment_ai_proposal` append-only con estado de confirmación.
+- [ ] La generación de preguntas produce borradores que NO entran al banco sin confirmación humana.
+- [ ] La corrección IA de respuestas produce una sugerencia que NO cuenta en el rollup hasta confirmación.
+- [ ] `confirmAiProposal` es el único write que aplica; capability-gated + outbox + test de no-mutación previa.
+- [ ] Eval baseline ejecutado con evidencia de correlación IA↔humano antes de habilitar el flag.
+- [ ] Flag `HIRING_ASSESSMENT_AI_ENABLED` default OFF + registrado en el ledger.
+- [ ] Sin PII sensible (identity docs) enviada al provider; errores canónicos + degradación si el provider falla.
+
+## Verification
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm flags:audit --strict --no-vercel` (flag registrado)
+- Smoke provider LLM real (una generación + una corrección) con evidencia
+- Smoke DB: propose → confirm → verificar mutación solo post-confirm
+
+## Closing Protocol
+
+- [ ] `Lifecycle` sincronizado
+- [ ] archivo en la carpeta correcta
+- [ ] `docs/tasks/README.md` sincronizado
+- [ ] `Handoff.md` actualizado
+- [ ] `changelog.md` actualizado
+- [ ] chequeo de impacto cruzado (TASK-1363)
+- [ ] flag registrado en `FEATURE_FLAG_STATE_LEDGER.md`
+- [ ] `GREENHOUSE_EVENT_CATALOG_V1.md` delta con `hiring.assessment.ai_*`
+
+## Follow-ups
+
+- Fine-tune/prompt-iteration del scoring IA según drift del eval.
+- Extensión a generación de plantillas completas por cargo (no solo preguntas sueltas).
+
+## Open Questions
+
+- ¿Qué provider LLM por defecto para scoring de assessment (Gemini/Vertex vs Anthropic vs OpenAI)? Resolver en Discovery según `src/lib/ai/*` disponible + costo.
+- ¿El eval baseline se versiona como dataset en el repo o vive en un artefacto externo? Preferir dataset versionado pequeño + evidencia de corrida.
