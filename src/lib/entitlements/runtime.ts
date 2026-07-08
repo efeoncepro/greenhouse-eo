@@ -439,6 +439,51 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-353 — Hiring / ATS domain foundation. Operación interna del dominio de fulfillment
+  // de talento. Reclutamiento vive entre agency/hr/people: los operadores reales son internal
+  // ∪ EFEONCE_ADMIN ∪ HR_MANAGER ∪ EFEONCE_OPERATIONS (∪ EFEONCE_ACCOUNT para read/write, ya que
+  // comercial abre demanda de staffing). Los `client_*` NUNCA operan Hiring. Cada capability
+  // nace gobernada (Full API Parity): un primitive, muchos consumers (desk interno, careers
+  // público, Nexa/MCP, CLI) sobre los mismos commands/readers.
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
+  ) {
+    const hiringSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    const HIRING_READ_CAPS = ['hiring.demand.read', 'hiring.opening.read', 'hiring.application.read'] as const
+
+    for (const capability of HIRING_READ_CAPS) {
+      addEntitlement(entries, { module: 'hiring', capability, action: 'read', scope: 'tenant', source: hiringSource })
+    }
+
+    const HIRING_WRITE_CAPS = ['hiring.demand.write', 'hiring.opening.write', 'hiring.application.write'] as const
+
+    for (const capability of HIRING_WRITE_CAPS) {
+      for (const action of ['create', 'update'] as const) {
+        addEntitlement(entries, { module: 'hiring', capability, action, scope: 'tenant', source: hiringSource })
+      }
+    }
+  }
+
+  // TASK-353 — publish/decide: verbos de gobernanza consecuentes (execute). Least-privilege:
+  // sin EFEONCE_ACCOUNT (comercial abre demanda pero no publica vacantes ni decide contratación).
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    const hiringGovSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    for (const capability of ['hiring.opening.publish', 'hiring.application.decide'] as const) {
+      addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: hiringGovSource })
+    }
+  }
+
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'people') ? 'route_group' : 'authorized_view'
 

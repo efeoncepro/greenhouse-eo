@@ -71,6 +71,7 @@ export type CaptureDomain =
   | 'platform' // TASK-1120 — Design System/platform governance surfaces and signals
   | 'roadmap' // TASK-1152 — Roadmap work item index reader (Markdown SSOT, read-only)
   | 'growth' // TASK-1226 — Growth domain (AI Visibility Grader provider adapters, runs, observations)
+  | 'hiring' // TASK-353 — Hiring / ATS domain (talent demand, openings, candidate facets, applications)
 
 export interface CaptureOptions {
   /** Free-form structured context. Ends up in Sentry's `Additional Data`. */

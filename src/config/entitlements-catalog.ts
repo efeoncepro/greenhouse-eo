@@ -53,7 +53,12 @@ export const ENTITLEMENT_MODULES = [
   // pre-pipeline diagnostic). Distinto de `commercial` (consume handoffs
   // calificados) y de `public_site` (host surface). V1: AI Visibility Grader
   // (growth.ai_visibility.run.execute + growth.ai_visibility.observation.read).
-  'growth'
+  'growth',
+  // TASK-353 — namespace del dominio Hiring / ATS (fulfillment de talento:
+  // TalentDemand → HiringOpening → CandidateFacet → HiringApplication → handoff).
+  // Distinto de `hr` (persona ya incorporada), `people` (directorio) y `agency`
+  // (staff augmentation vendido). 8 capabilities: hiring.{demand,opening,application}.*.
+  'hiring'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -2092,7 +2097,19 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // canónica `execute` (verbo de gobernanza: connect/disconnect son commands; el LLM
   // nunca conecta directo). Grant set operador (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT
   // ∪ EFEONCE_OPERATIONS ∪ AI_TOOLING_ADMIN) en runtime.ts mismo PR.
-  { key: 'growth.search_console.connect', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' }
+  { key: 'growth.search_console.connect', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-353 — Hiring / ATS domain foundation. 8 capabilities V1 del dominio de
+  // fulfillment de talento. `publish` y `decide` se modelan como verbo `execute`
+  // (gobernanza: publicar un opening / decidir una postulación son commands, no CRUD).
+  // Grants a roles internos reales en runtime.ts mismo PR (NUNCA client_*).
+  { key: 'hiring.demand.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.demand.write', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.opening.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.opening.write', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.opening.publish', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.application.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.application.write', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.application.decide', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]
