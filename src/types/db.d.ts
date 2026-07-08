@@ -6985,6 +6985,80 @@ export interface GreenhouseHiringHiringApplication {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHiringHiringAssessment {
+  access_token_hash: string | null;
+  accommodations_json: Generated<Json>;
+  application_id: string;
+  assessment_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  evaluator_user_id: string | null;
+  method: Generated<string>;
+  public_id: Generated<string>;
+  started_at: Timestamp | null;
+  status: Generated<string>;
+  submitted_at: Timestamp | null;
+  template_id: string | null;
+  time_limit_minutes: number | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentResponse {
+  answer_json: Generated<Json>;
+  assessment_id: string;
+  auto_score: Numeric | null;
+  competency_id: string;
+  created_at: Generated<Timestamp>;
+  human_score: Numeric | null;
+  needs_human_rating: Generated<boolean>;
+  question_id: string | null;
+  response_id: Generated<string>;
+  scored_at: Timestamp | null;
+  scored_by: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentTemplate {
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  name: string;
+  role_hint: string | null;
+  status: Generated<string>;
+  template_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentTemplateModule {
+  competency_id: string;
+  created_at: Generated<Timestamp>;
+  module_id: Generated<string>;
+  target_level: string | null;
+  template_id: string;
+  weight: Generated<Numeric>;
+}
+
+export interface GreenhouseHiringHiringCompetency {
+  category: string;
+  competency_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  description: string | null;
+  key: string;
+  name: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringCompetencyResult {
+  assessment_id: string;
+  competency_id: string;
+  created_at: Generated<Timestamp>;
+  level_achieved: string | null;
+  result_id: Generated<string>;
+  score: Generated<Numeric>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHiringHiringOpening {
   apply_url: string | null;
   budget_band: string | null;
@@ -7016,6 +7090,21 @@ export interface GreenhouseHiringHiringOpening {
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
   visibility: Generated<string>;
+}
+
+export interface GreenhouseHiringHiringQuestion {
+  answer_key_json: Generated<Json>;
+  competency_id: string;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  level: string;
+  options_json: Generated<Json>;
+  prompt: string;
+  question_id: Generated<string>;
+  rubric_json: Generated<Json>;
+  status: Generated<string>;
+  type: string;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseHiringTalentDemand {
@@ -11224,7 +11313,14 @@ export interface DB {
   "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
+  "greenhouse_hiring.hiring_assessment": GreenhouseHiringHiringAssessment;
+  "greenhouse_hiring.hiring_assessment_response": GreenhouseHiringHiringAssessmentResponse;
+  "greenhouse_hiring.hiring_assessment_template": GreenhouseHiringHiringAssessmentTemplate;
+  "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;
+  "greenhouse_hiring.hiring_competency": GreenhouseHiringHiringCompetency;
+  "greenhouse_hiring.hiring_competency_result": GreenhouseHiringHiringCompetencyResult;
   "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
+  "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
   "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
