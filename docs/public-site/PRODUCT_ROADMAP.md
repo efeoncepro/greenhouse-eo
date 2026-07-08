@@ -101,8 +101,18 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   [PDR-007](decisions/PDR-007-hubspot-portal-grader-lead-magnet.md) + `docs/epics/to-do/EPIC-024-hubspot-portal-grader.md`.
   Child tasks desde `TASK-1353` (Fase 1 primero; no depende del cutover prod de Kortex).
 
-- **PDR-008 — Landing "Agencia" (`/agencia`)** (posicionamiento + IA decididos) + **TASK-1358**
-  (to-do, ui-ux/flow, UI ready no): el **pillar de categoría** que faltaba — hoy el sitio solo tiene
+- **PDR-010 — La Home ES el pitch; `/agencia` se pliega; About Us es el gap** (decidido, 2026-07-08):
+  al escribir el copy quedó claro que el pitch de `/agencia` y el de la Home son el mismo discurso —una
+  agencia tiene un solo trabajo de venta arriba del embudo. **`/agencia` NO se construye como página
+  separada; su contenido es la Home** (que absorbe el head term "agencia de marketing digital" en title/H1
+  + reencuadre + repartición a spokes). **TASK-1358 se reorienta** a rework de la Home. El material de
+  identidad (4 unidades, ICO, ecosistema) se mueve al **About Us** — el gap real ahora, sobre la página
+  existente `/about-us-efeonce/` (249770), pendiente de su propio PDR + task. Ver
+  [PDR-010](decisions/PDR-010-home-es-el-pitch-agencia-se-pliega.md).
+
+- **PDR-008 — Landing "Agencia" (`/agencia`)** (posicionamiento + IA decididos; **§IA refinada por PDR-010**
+  — el pitch vive en la Home, no en `/agencia`) + **TASK-1358** (to-do, reorientada a rework de la Home):
+  el **pillar de categoría** que faltaba — hoy el sitio solo tiene
   spokes de servicio + about-us, sin puerta comercial para la demanda de categoría completa. Resuelve
   la falsa dicotomía *growth-partner vs agencia-digital* con las **dos capas** de [PDR-002](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md):
   **posiciona** como growth partner con software propio + visibilidad total (NO "agencia digital"
