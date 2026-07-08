@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-08T04:41:18.687Z",
+  "completedAt": "2026-07-08T04:42:04.994Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "slotId": "muro-c4",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/prompts/muro-c4.md",
+  "reference": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-c4-ref-720x1280.png",
+  "masterPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-c4-finale-living-omni-master.mp4",
+  "outputBytes": 2190394,
+  "videoMimeType": "video/mp4",
+  "usageMetadata": {
+    "promptTokenCount": 2432,
+    "candidatesTokenCount": 57920,
+    "totalTokenCount": 60695,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 412
+      },
+      {
+        "modality": "IMAGE",
+        "tokenCount": 2020
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 57920
+      }
+    ],
+    "thoughtsTokenCount": 343
+  },
+  "responseText": "**Creating a Dynamic Visual**\n\nI'm focused on transforming the macaw mural into a captivating short-form video. It begins with a static hold, then transitions into a swirling vortex animation of the macaws, enhanced by camera movement and floating glass shards. The final composition will loop seamlessly, with subtle movements to maintain realism. Cinematic effects include depth of field, natural motion blur, and a teal-to-gold color grade. The audio will synchronize with synths, wind, and crystalline sounds.\n\n\n"
+}

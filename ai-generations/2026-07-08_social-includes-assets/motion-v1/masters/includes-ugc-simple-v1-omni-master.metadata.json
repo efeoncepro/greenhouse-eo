@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-08T05:30:19.482Z",
+  "completedAt": "2026-07-08T05:30:57.288Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "shotId": "ugc",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-includes-assets/motion-v1/prompts/ugc.md",
+  "reference": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-includes-assets/motion-v1/refs/ugc-ref-1280x720.png",
+  "masterPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-includes-assets/motion-v1/masters/includes-ugc-simple-v1-omni-master.mp4",
+  "outputBytes": 1213717,
+  "videoMimeType": "video/mp4",
+  "usageMetadata": {
+    "promptTokenCount": 2370,
+    "candidatesTokenCount": 28960,
+    "totalTokenCount": 31406,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 2020
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 350
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 28960
+      }
+    ],
+    "thoughtsTokenCount": 76
+  },
+  "responseText": "**Generating Detailed Instructions for Production**\n\nI'm focused on creating a comprehensive prompt. This prompt will transform the user's concept for social media content into a clear, frame-by-frame guide, incorporating timing, actions, camera movements, and the defined aesthetics. The image will serve as the template for the character and mural.\n\n\n"
+}

@@ -1,0 +1,401 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-07-08T09:09:46.448Z",
+  "run": "ai-generations/2026-07-08_social-wall-assets",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-08_social-wall-assets",
+  "totalBytes": 55002898,
+  "fileCount": 65,
+  "files": [
+    {
+      "path": "contact-sheet.jpg",
+      "sizeBytes": 130206,
+      "sha256": "4bd90ed1e569e20e1182063d981c96ae4de0cc3fccd1f6c9f1b01b926bcda808",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/contact-sheet.jpg"
+    },
+    {
+      "path": "motion-v2/muro-a1-reel-cover-motion-frame.jpg",
+      "sizeBytes": 54896,
+      "sha256": "8b17c285604d87b0874ad15f8ab75d491a605e11e2050e49ee3409b074635afe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-a1-reel-cover-motion-frame.jpg"
+    },
+    {
+      "path": "motion-v2/muro-a1-reel-cover-motion.mp4",
+      "sizeBytes": 220446,
+      "sha256": "4a75ae9837014d7e803cc4db6c9751b6835e52577cd5afd2a8b6652ebe5f8c7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-a1-reel-cover-motion.mp4"
+    },
+    {
+      "path": "motion-v2/muro-a1-reel-cover-motion.webm",
+      "sizeBytes": 257577,
+      "sha256": "26e8c55aa4a8f5433698fa5bf441644873f8631a2141195b96a6820bc063376d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-a1-reel-cover-motion.webm"
+    },
+    {
+      "path": "motion-v2/muro-a4-creator-collaboration-motion-frame.jpg",
+      "sizeBytes": 33125,
+      "sha256": "b7e5547eace796fe7007c446f12a645bdcf413befcbd28a2c705e1cac74c1c70",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-a4-creator-collaboration-motion-frame.jpg"
+    },
+    {
+      "path": "motion-v2/muro-a4-creator-collaboration-motion.mp4",
+      "sizeBytes": 116002,
+      "sha256": "1675bbbb3daf88cd95780ddfe44c4742e34aae9f9a23ebf832ee7377a72bfb20",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-a4-creator-collaboration-motion.mp4"
+    },
+    {
+      "path": "motion-v2/muro-a4-creator-collaboration-motion.webm",
+      "sizeBytes": 97870,
+      "sha256": "9bfbf3f08aab34baf68a4135a5bba93b2bfebb8c58a2be87d9a6cae0bf871e71",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-a4-creator-collaboration-motion.webm"
+    },
+    {
+      "path": "motion-v2/muro-b2-story-frame-motion-frame.jpg",
+      "sizeBytes": 42682,
+      "sha256": "7dae5f693ca0b51e7691174c6d61c0210d8d84ed9fe84379c9eeb51f313dc9ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-b2-story-frame-motion-frame.jpg"
+    },
+    {
+      "path": "motion-v2/muro-b2-story-frame-motion.mp4",
+      "sizeBytes": 143678,
+      "sha256": "cb62c1587cb31736735d98b7c4a054ded6e18cdbbfa57969a7a2fdf0c9f91881",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-b2-story-frame-motion.mp4"
+    },
+    {
+      "path": "motion-v2/muro-b2-story-frame-motion.webm",
+      "sizeBytes": 138648,
+      "sha256": "183211ba5ca4dbfe4c887def2aa1555b8bc5c161e807810b1a1105c3149f3ef7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-b2-story-frame-motion.webm"
+    },
+    {
+      "path": "motion-v2/muro-b3-trend-reel-cover-motion-frame.jpg",
+      "sizeBytes": 54482,
+      "sha256": "f5ee6b4be901e10107ca38f04131c6cfb0c07bda8a1f5d19a63c7206f0fd9c1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-b3-trend-reel-cover-motion-frame.jpg"
+    },
+    {
+      "path": "motion-v2/muro-b3-trend-reel-cover-motion.mp4",
+      "sizeBytes": 223022,
+      "sha256": "95965ebd1f2b04bdedd7468f23d18a1fbb5949d6d2898e8a620931bdfb4a89cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-b3-trend-reel-cover-motion.mp4"
+    },
+    {
+      "path": "motion-v2/muro-b3-trend-reel-cover-motion.webm",
+      "sizeBytes": 219709,
+      "sha256": "94441f62a05f9493fbaae5729f9b00d19c0ccec8cbd48ebc1fde62ec8ecf0bc5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-b3-trend-reel-cover-motion.webm"
+    },
+    {
+      "path": "motion-v2/muro-c1-ugc-clip-motion-frame.jpg",
+      "sizeBytes": 33944,
+      "sha256": "991f5b577a665134dfd475c89d5b92dbc4628d1315ba6dfcba0b7ec4d36aa371",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-c1-ugc-clip-motion-frame.jpg"
+    },
+    {
+      "path": "motion-v2/muro-c1-ugc-clip-motion.mp4",
+      "sizeBytes": 111994,
+      "sha256": "c2b285029190b4ecee3e3ba98273b4a2fd8d5cb62e5097962960e56fb00c538f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-c1-ugc-clip-motion.mp4"
+    },
+    {
+      "path": "motion-v2/muro-c1-ugc-clip-motion.webm",
+      "sizeBytes": 90995,
+      "sha256": "a9f7a84baf82501b588715800a236dbef6f6f64416655aaf376608a85cec0918",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-c1-ugc-clip-motion.webm"
+    },
+    {
+      "path": "motion-v2/muro-c4-reel-finale-cover-motion-frame.jpg",
+      "sizeBytes": 52646,
+      "sha256": "9d7262ae7aab02942298848ba0c8cb67832e9fd5d4cf32b5c379cedf360335f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-c4-reel-finale-cover-motion-frame.jpg"
+    },
+    {
+      "path": "motion-v2/muro-c4-reel-finale-cover-motion.mp4",
+      "sizeBytes": 219663,
+      "sha256": "7d31156bad18dc6cc876c5b32376779c1fabde4b3e47a1f7b1759c9eed8c6d37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-c4-reel-finale-cover-motion.mp4"
+    },
+    {
+      "path": "motion-v2/muro-c4-reel-finale-cover-motion.webm",
+      "sizeBytes": 227000,
+      "sha256": "f42678a3fc0547a258dc2c0470a8246968e789a8386d86227c502f0019704937",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/muro-c4-reel-finale-cover-motion.webm"
+    },
+    {
+      "path": "motion-v2/wall-motion-v2-contact-sheet.jpg",
+      "sizeBytes": 72191,
+      "sha256": "bfdcfa7471e708df7b4d66baa73d26d8dbed95b48f916099e9f0fbf20a60a094",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v2/wall-motion-v2-contact-sheet.jpg"
+    },
+    {
+      "path": "motion-v3/exports/muro-a1-reel-living-poster.jpg",
+      "sizeBytes": 60518,
+      "sha256": "fae7db58dc133c80fe8d72557e5e930c6a464891d80a41597d216699ba7c407a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-a1-reel-living-poster.jpg"
+    },
+    {
+      "path": "motion-v3/exports/muro-a1-reel-living.mp4",
+      "sizeBytes": 572896,
+      "sha256": "d78492015dcfbf5a64b331c26afd4ef6c208a9b0b08422a196cae11bbc312251",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-a1-reel-living.mp4"
+    },
+    {
+      "path": "motion-v3/exports/muro-a1-reel-living.webm",
+      "sizeBytes": 542302,
+      "sha256": "0c326d2e0da8bc9bf3da7c86524ac3f8b2b99e891a19516a0f411584d4d573b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-a1-reel-living.webm"
+    },
+    {
+      "path": "motion-v3/exports/muro-a4-creator-living-poster.jpg",
+      "sizeBytes": 48094,
+      "sha256": "8bf22c1ada772a0cf85fa229a96286d55179e5dc7f80e08306cee4598fe315e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-a4-creator-living-poster.jpg"
+    },
+    {
+      "path": "motion-v3/exports/muro-a4-creator-living.mp4",
+      "sizeBytes": 329577,
+      "sha256": "413ce9f805e542c4580183793f217bb601ca4350b66b7f30483d9e3e4b8869e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-a4-creator-living.mp4"
+    },
+    {
+      "path": "motion-v3/exports/muro-a4-creator-living.webm",
+      "sizeBytes": 266581,
+      "sha256": "9356649e1ec93d1f464e9693b5e71018e1a02263206583286797d97d6517fcb1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-a4-creator-living.webm"
+    },
+    {
+      "path": "motion-v3/exports/muro-b2-story-living-poster.jpg",
+      "sizeBytes": 44982,
+      "sha256": "3a4cedda46dfae5d34b7d9cc0f9e1bf21cd1695f445ae45c56a62d4cef50ce47",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-b2-story-living-poster.jpg"
+    },
+    {
+      "path": "motion-v3/exports/muro-b2-story-living.mp4",
+      "sizeBytes": 523006,
+      "sha256": "eb99c9f9b7e0db5a520b89c891874073e4c2ac5a01504042d3d6b9bb166e55fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-b2-story-living.mp4"
+    },
+    {
+      "path": "motion-v3/exports/muro-b2-story-living.webm",
+      "sizeBytes": 485032,
+      "sha256": "5010c043e64729279f79884cd1690f36f55a55c319ae39b70e3761fe19319f68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-b2-story-living.webm"
+    },
+    {
+      "path": "motion-v3/exports/muro-b3-trend-living-poster.jpg",
+      "sizeBytes": 43245,
+      "sha256": "060fd68cdcd00aff888034a0d40b09726c010a090bd0b33718761e148f7737f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-b3-trend-living-poster.jpg"
+    },
+    {
+      "path": "motion-v3/exports/muro-b3-trend-living.mp4",
+      "sizeBytes": 527977,
+      "sha256": "e5679d1a1d8f32985a1633dcf25b3ff697bab9c9e440f6cc0f885d0bc3e0af6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-b3-trend-living.mp4"
+    },
+    {
+      "path": "motion-v3/exports/muro-b3-trend-living.webm",
+      "sizeBytes": 471224,
+      "sha256": "c4df75c22b04465d976357ffc18e9c645a946fcbf3e1ec00b71f284140cb67f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-b3-trend-living.webm"
+    },
+    {
+      "path": "motion-v3/exports/muro-c1-ugc-living-poster.jpg",
+      "sizeBytes": 45175,
+      "sha256": "2c5e155926e5423273ab11abb2b4fdffb692c42001167b69abfab4c65ceb8793",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-c1-ugc-living-poster.jpg"
+    },
+    {
+      "path": "motion-v3/exports/muro-c1-ugc-living.mp4",
+      "sizeBytes": 409688,
+      "sha256": "15e3eb10672edb40ed2121f818b924a0884b0100f09fea3a9bed9416168afdb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-c1-ugc-living.mp4"
+    },
+    {
+      "path": "motion-v3/exports/muro-c1-ugc-living.webm",
+      "sizeBytes": 345727,
+      "sha256": "c2412d3a5867488b82144c49d3f94132e58afeaa936b0305e675be2f258fcffe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-c1-ugc-living.webm"
+    },
+    {
+      "path": "motion-v3/exports/muro-c4-finale-living-poster.jpg",
+      "sizeBytes": 46195,
+      "sha256": "021d88c11b732ca05cb52f0266ac4bd83e236d241e257e489de8405d0ec38233",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-c4-finale-living-poster.jpg"
+    },
+    {
+      "path": "motion-v3/exports/muro-c4-finale-living.mp4",
+      "sizeBytes": 900555,
+      "sha256": "94ee8aea852b96d9a425936b35f3fa959ebeb14acb6eb861e4ad22351f22d2f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-c4-finale-living.mp4"
+    },
+    {
+      "path": "motion-v3/exports/muro-c4-finale-living.webm",
+      "sizeBytes": 887103,
+      "sha256": "5e216ce1357cac4df3cdf0b32e895352bb55b778587421864c68c9725283efb9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/exports/muro-c4-finale-living.webm"
+    },
+    {
+      "path": "motion-v3/masters/muro-a1-reel-living-omni-master.mp4",
+      "sizeBytes": 2457756,
+      "sha256": "76ac44cd379ba81ea8e95bc78529cf9280df4ea54fc16eaa19bc481dfb2c2ad0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-a1-reel-living-omni-master.mp4"
+    },
+    {
+      "path": "motion-v3/masters/muro-a4-creator-living-omni-master.mp4",
+      "sizeBytes": 2547440,
+      "sha256": "e64e63ec33cba6b0eb51dbda8380047cebc13a276f13e13c665c180e3944c080",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-a4-creator-living-omni-master.mp4"
+    },
+    {
+      "path": "motion-v3/masters/muro-b2-story-living-omni-master.mp4",
+      "sizeBytes": 2402432,
+      "sha256": "b3ba825389963cb73ec08b09e97ea35c4841fd0725e9e8c0d02b597da0523504",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-b2-story-living-omni-master.mp4"
+    },
+    {
+      "path": "motion-v3/masters/muro-b3-trend-living-omni-master.mp4",
+      "sizeBytes": 2367386,
+      "sha256": "1ae00e36ca357a1d501ebb27c898ec08e0141c51f9ead3c5bee7496c48adef79",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-b3-trend-living-omni-master.mp4"
+    },
+    {
+      "path": "motion-v3/masters/muro-c1-ugc-living-omni-master.mp4",
+      "sizeBytes": 2554222,
+      "sha256": "2869450a7f9e8344e4b01ef3bf6956915046d9783e5ad8fe7967349acced28a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-c1-ugc-living-omni-master.mp4"
+    },
+    {
+      "path": "motion-v3/masters/muro-c4-finale-living-omni-master.mp4",
+      "sizeBytes": 2190394,
+      "sha256": "0019ccb0194e3482b3a79cb4f7e9f63d957cb57da1e6fbcad26906b9af18195c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-c4-finale-living-omni-master.mp4"
+    },
+    {
+      "path": "motion-v3/refs/muro-a1-ref-720x1280.png",
+      "sizeBytes": 1698830,
+      "sha256": "bbc6702a81d550fc3ad881d416850187b96a331b9c5b6d440853ebffab98453c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-a1-ref-720x1280.png"
+    },
+    {
+      "path": "motion-v3/refs/muro-a4-ref-720x1280.png",
+      "sizeBytes": 1273815,
+      "sha256": "6e7c980f82bcda4e1895b99eaf511d9eb29240a1689575257f5177f8420755a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-a4-ref-720x1280.png"
+    },
+    {
+      "path": "motion-v3/refs/muro-b2-ref-720x1280.png",
+      "sizeBytes": 1580149,
+      "sha256": "575c36431f2c199883374af0d9726c61e92716c71ad2da55eda54b5142aa90c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-b2-ref-720x1280.png"
+    },
+    {
+      "path": "motion-v3/refs/muro-b3-ref-720x1280.png",
+      "sizeBytes": 1767619,
+      "sha256": "5956a6398d827a01a31c6769772a912ac3325cd4073c178c334aa1883c80c854",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-b3-ref-720x1280.png"
+    },
+    {
+      "path": "motion-v3/refs/muro-c1-ref-720x1280.png",
+      "sizeBytes": 1370385,
+      "sha256": "36c01694944907fdc835446e5b72503759305561e386666ca4a518e807d98ba2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-c1-ref-720x1280.png"
+    },
+    {
+      "path": "motion-v3/refs/muro-c4-ref-720x1280.png",
+      "sizeBytes": 1681022,
+      "sha256": "e7ef8de8318edaefaa134cf399fb471917b0e1078922cd73462c6f061e9ca7a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-c4-ref-720x1280.png"
+    },
+    {
+      "path": "motion-v3/review/muro-a1-reel-living-contact.jpg",
+      "sizeBytes": 46299,
+      "sha256": "fb99da3a978dbc1909c61a250885c35cb22ab0477d6b668fe4451dd716c73438",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/review/muro-a1-reel-living-contact.jpg"
+    },
+    {
+      "path": "motion-v3/review/muro-a4-creator-living-contact.jpg",
+      "sizeBytes": 46014,
+      "sha256": "463957bcde0433e86207ed5266d6da129a3b73f1503b1e209612b9de979f14c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/review/muro-a4-creator-living-contact.jpg"
+    },
+    {
+      "path": "motion-v3/review/muro-b2-story-living-contact.jpg",
+      "sizeBytes": 49119,
+      "sha256": "ee385032d1611765224ac2157d0b2b7136455f4bcdd2dfb5e34c324535b077a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/review/muro-b2-story-living-contact.jpg"
+    },
+    {
+      "path": "motion-v3/review/muro-b3-trend-living-contact.jpg",
+      "sizeBytes": 37225,
+      "sha256": "9be3d09b02dc33075726c35ef6e169f77c5e8f4f7356835c0563099bc6cbe44f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/review/muro-b3-trend-living-contact.jpg"
+    },
+    {
+      "path": "motion-v3/review/muro-c1-ugc-living-contact.jpg",
+      "sizeBytes": 41469,
+      "sha256": "c3e5807f2ec207e0a95c94f90f7de501b0cb3a03386e5819b6851ef5c4e404e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/review/muro-c1-ugc-living-contact.jpg"
+    },
+    {
+      "path": "motion-v3/review/muro-c4-finale-living-contact.jpg",
+      "sizeBytes": 44491,
+      "sha256": "10be289734e5c9bc89bda92ed64cc3d6ff56d65587ed88a1363c62b7ed827a08",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/review/muro-c4-finale-living-contact.jpg"
+    },
+    {
+      "path": "motion-v3/review/wall-motion-v3-living-contact-sheet.jpg",
+      "sizeBytes": 208711,
+      "sha256": "8bccdc2886a68c51960ee8f090bb0bc6d1764c825bfdf7c3d868a7aa9492a398",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/motion-v3/review/wall-motion-v3-living-contact-sheet.jpg"
+    },
+    {
+      "path": "muro-a1-reel-cover.png",
+      "sizeBytes": 2893103,
+      "sha256": "6f8f0471c1a44ede138415ab3440509509872f379f265f16afd39ef873655c41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/muro-a1-reel-cover.png"
+    },
+    {
+      "path": "muro-a3-carousel-piece.png",
+      "sizeBytes": 2678758,
+      "sha256": "823c3aa0e23b6c6550b64078a014d946ef696acafcc7a9b0aa763489d2a759a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/muro-a3-carousel-piece.png"
+    },
+    {
+      "path": "muro-a4-creator-collaboration.png",
+      "sizeBytes": 2233175,
+      "sha256": "ad3e1d30f9484dddee3410d2d73495d27c81ef83a5716049122a223a0e568835",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/muro-a4-creator-collaboration.png"
+    },
+    {
+      "path": "muro-b2-story-frame.png",
+      "sizeBytes": 2660592,
+      "sha256": "4bc444cdd94ab4f3d829c019ca899c3cb18755ea0d7aa4eee9c4b27288b4554d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/muro-b2-story-frame.png"
+    },
+    {
+      "path": "muro-b3-trend-reel-cover.png",
+      "sizeBytes": 2981658,
+      "sha256": "523fb095613c81ff79e812dda8109607144a4c6545faf242bcfe19afbb64f10e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/muro-b3-trend-reel-cover.png"
+    },
+    {
+      "path": "muro-c1-ugc-clip-still.png",
+      "sizeBytes": 2411891,
+      "sha256": "8ffa0a1687a68048823112626b3860a29c4754bda369c3211c4f15ae5889b9c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/muro-c1-ugc-clip-still.png"
+    },
+    {
+      "path": "muro-c2-editorial-post.png",
+      "sizeBytes": 2898306,
+      "sha256": "936a327ec686f52d83122058e25f3c32a8a024d480b7fda1b509750568e0632b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/muro-c2-editorial-post.png"
+    },
+    {
+      "path": "muro-c4-reel-finale-cover.png",
+      "sizeBytes": 2789984,
+      "sha256": "d31b0d2181b166e7a9ea6da14cd57d7a1b0bff867daa6acfe2037e08a5c8daa6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_social-wall-assets/muro-c4-reel-finale-cover.png"
+    }
+  ]
+}

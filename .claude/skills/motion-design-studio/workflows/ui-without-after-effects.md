@@ -25,7 +25,8 @@ legible), **NO uses video IA** (deforma texto/logos). Construye un **mockup HTML
    `context.close()` (flushea el webm).
 3. **Córrelo DESDE LA RAÍZ DEL REPO** (gotcha: el scratchpad NO resuelve `node_modules` →
    `ERR_MODULE_NOT_FOUND`; copia el `.mjs` a la raíz, `node _cap.mjs`, bórralo). Playwright ya está instalado.
-4. **webm → mp4:** `ffmpeg -i <webm> -c:v libx264 -pix_fmt yuv420p -r 24 out.mp4`.
+4. **Empaquetado web:** `pnpm media:web-video -- --input <webm> --out-dir <dir> --stem <name>`.
+   Genera WebM + MP4 fallback + poster; ver `docs/operations/web-media-delivery-tooling.md`.
 5. (Opcional) sube el look con `reference-video-to-omni.md` (pasas este mp4 a Omni) — pero la versión crisp
    es la que aporta la **exactitud** en el híbrido.
 

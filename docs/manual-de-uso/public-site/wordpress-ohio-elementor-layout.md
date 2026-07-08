@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.0
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-07-07 por Codex
+> **Ultima actualizacion:** 2026-07-08 por Codex
 > **Modulo:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Pagina de referencia:** `/blog` (`page_id=18456`)
@@ -131,6 +131,175 @@ heredaba `overflow-y:auto` y rompia el sticky; el fix fue remover
 `overflow:visible`.
 
 Referencia larga: [Patron reutilizable: sticky editorial lane](../../documentation/public-site/wordpress-ohio-elementor-layout.md#patron-reutilizable-sticky-editorial-lane).
+
+## Producir assets AI para placeholders de landing
+
+Usa este flujo cuando el operador pida poblar un placeholder visual de una
+landing publica, por ejemplo `Reel`, `Historia`, `Carrusel`, `Post`, `UGC` o un
+hero. No publiques assets sueltos sin mapearlos al contrato del widget.
+
+1. Identifica el contrato del placeholder:
+   - URL y `postId`;
+   - widget/slot;
+   - `data-image-slot`, `data-media-kind` o selector estable;
+   - altura/crop real en desktop y mobile;
+   - si el contenedor ya tiene motion.
+
+2. Decide imagen vs video:
+   - si el bloque ya se mueve o muestra muchos slots simultaneos, preferir WebP
+     premium como cover/frame;
+   - si el asset es foco hero, generar video con WebM/MP4/poster y verificar
+     autoplay/muted/loop/playsInline;
+   - no usar multiples videos simultaneos como default por peso y decodificacion.
+
+3. Produce fuentes en `ai-generations/` con README y batch prompts:
+
+```bash
+gtimeout 1200s pnpm ai:image \
+  --batch ai-generations/<run>/portrait-batch.json \
+  --out-dir ai-generations/<run> \
+  --size 1024x1536 \
+  --quality high \
+  --model gpt-image-2 \
+  --timeout 420000
+```
+
+4. Revisa como sistema, no pieza aislada:
+   - contact sheet;
+   - ausencia de logos/textos falsos;
+   - coherencia de campana;
+   - legibilidad bajo pills/overlays;
+   - crops en mobile.
+
+5. Convierte a WebP con `cwebp`:
+
+```bash
+cwebp -quiet -q 82 -m 6 -resize 800 0 source.png -o output.webp
+```
+
+No asumir que `ffmpeg` local trae `libwebp`; en la sesion de Redes Sociales
+2026-07-08 no lo traia. `sips` tampoco escribio WebP.
+
+6. Integra en el runtime:
+   - preferir un registry en PHP/JS por slot con fallback;
+   - mantener labels, pills, `aria-label` y estructura original;
+   - agregar `object-fit/object-position` por slot;
+   - agregar reduced-motion si hay hover zoom/parallax.
+
+7. Deploy scoped:
+   - backup remoto antes de subir;
+   - subir solo widget/CSS/assets necesarios;
+   - correr `php -l` remoto si hay PHP;
+   - reset OPcache/cache y purge Kinsta.
+
+8. Verifica:
+   - Playwright desktop `1440` y mobile `390`;
+   - `scrollWidth == clientWidth`;
+   - assets directos `200 image/webp`;
+   - conteo de assets esperado en DOM;
+   - si la captura larga mobile muestra blanks pero los assets reportan
+     `complete=true`, hacer probe slot-by-slot con scroll/decode antes de
+     diagnosticar falso fallo.
+
+Caso fuente completo:
+`docs/operations/public-site-social-wall-media-production-20260708.md`.
+
+## Agregar una URL al menu principal
+
+No agregar items al menu mientras solo se esta haciendo discovery. Cuando el
+operador pida explicitamente agregar una URL, el camino seguro es:
+
+1. Identificar el menu vivo y su ubicacion:
+
+```bash
+pnpm public-website:wpcli -- --eval-file ./tmp/<inspect-menu>.php --wp-user 12
+```
+
+El inspector debe leer `get_registered_nav_menus()`,
+`get_nav_menu_locations()`, `wp_get_nav_menu_object(61)` y
+`wp_get_nav_menu_items(61)`. Estado observado el 2026-07-07: location
+`primary` -> menu term `61` (`Menu 1`), render desktop `#menu-primary` y
+mobile `#mobile-menu`. Despues del alta aprobada de Redes Sociales, el menu
+tiene `count=23` y el item `251311` cuelga de `Servicios Destacados` (`248629`).
+
+2. Hacer snapshot de rollback antes de escribir. Guardar por lo menos:
+   `term_id`, `name`, `slug`, location, todos los items con `ID`, `title`,
+   `menu_order`, `menu_item_parent`, `type`, `object`, `object_id`, `url`,
+   `target`, `classes`, `xfn`.
+
+3. Para un link custom, usar API core desde WP-CLI wrapper, no SQL:
+
+```php
+$parent_item_id = 248629; // Servicios Destacados; elegir desde el snapshot.
+
+wp_update_nav_menu_item(61, 0, [
+    'menu-item-title' => 'Texto del menu',
+    'menu-item-url' => 'https://efeoncepro.com/ruta/',
+    'menu-item-type' => 'custom',
+    'menu-item-status' => 'publish',
+    'menu-item-parent-id' => $parent_item_id,
+]);
+```
+
+El equivalente WP-CLI oficial, si se usa de forma directa en el servidor, es:
+
+```bash
+PARENT_ITEM_ID=248629
+wp menu item add-custom 61 "Texto del menu" "https://efeoncepro.com/ruta/" --parent-id="$PARENT_ITEM_ID"
+```
+
+Para enlazar una pagina WordPress existente, preferir un item `post_type` con
+`object=page` y `object_id=<PAGE_ID>` para que la URL siga el permalink del
+objeto; no duplicar una URL manual si el destino es una pagina del sitio.
+Antes de insertar, comparar contra los items existentes por texto normalizado,
+URL/permalink, `object_id` y parent para evitar duplicados dentro del dropdown.
+En el wrapper de este repo, usar scripts `--eval-file`; no asumir que comandos
+WP-CLI crudos como `wp option get` o `wp post get` pasan intactos por
+`pnpm public-website:wpcli`.
+
+Ejemplo para pagina WordPress:
+
+```php
+$page_id = 251300;
+$parent_item_id = 248629; // Servicios Destacados; elegir desde el snapshot.
+
+wp_update_nav_menu_item(61, 0, [
+    'menu-item-title' => 'Redes Sociales',
+    'menu-item-type' => 'post_type',
+    'menu-item-object' => 'page',
+    'menu-item-object-id' => $page_id,
+    'menu-item-status' => 'publish',
+    'menu-item-parent-id' => $parent_item_id,
+]);
+```
+
+4. Purgar y verificar:
+
+```bash
+wp kinsta cache purge --all
+```
+
+No llamar `clean_nav_menu_cache()` desde scripts `--eval-file`; no es una
+funcion publica segura en este runtime. `wp_update_nav_menu_item()` hace la
+invalidacion core y el cierre operativo es purge de Kinsta/cache flush +
+verificacion visual/DOM.
+
+En navegador, revisar desktop y mobile:
+
+```js
+[...document.querySelectorAll('#menu-primary a')].map(a => [a.textContent.trim(), a.href])
+[...document.querySelectorAll('#mobile-menu a')].map(a => [a.textContent.trim(), a.href])
+```
+
+5. Revisar que el nuevo item no rompa dropdowns, overflow, jerarquia visual ni
+tracking del header. Si el item entra bajo `Soluciones`, usar el parent
+confirmado `242525`; si entra bajo `Servicios Destacados`, usar `248629`; si
+entra bajo otra seccion, descubrir el parent en el snapshot antes de escribir.
+
+Ruta manual equivalente: `wp-admin/nav-menus.php` -> seleccionar `Menu 1`
+asignado a `Primary` -> `Custom Links` -> URL + texto -> ubicar jerarquia ->
+guardar. Para agentes, usar este camino solo como referencia del modelo; el
+camino gobernado es WP-CLI/API con snapshot y verificacion.
 
 ## Fix aplicado el 2026-06-14
 

@@ -15,6 +15,7 @@ build
 tmp
 artifacts
 videos
+ai-generations
 test-results
 tsconfig.tsbuildinfo
 .env

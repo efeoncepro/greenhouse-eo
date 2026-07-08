@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-08T04:39:29.542Z",
+  "completedAt": "2026-07-08T04:40:19.723Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "slotId": "muro-b2",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/prompts/muro-b2.md",
+  "reference": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-b2-ref-720x1280.png",
+  "masterPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-b2-story-living-omni-master.mp4",
+  "outputBytes": 2402432,
+  "videoMimeType": "video/mp4",
+  "usageMetadata": {
+    "promptTokenCount": 2425,
+    "candidatesTokenCount": 57920,
+    "totalTokenCount": 60756,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 2020
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 405
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 57920
+      }
+    ],
+    "thoughtsTokenCount": 411
+  },
+  "responseText": "**Bringing Image to Life**\n\nI'm focused on transforming an image into a dynamic short-form video. I plan to simulate natural handheld movements, introduce subtle reflections on the phone screen and incorporate gentle environmental motion to animate the scene. This will involve establishing the shot, introducing small human adjustments and external stimuli, and then settling back into the initial composition, all while maintaining a 9:16 aspect ratio at 24fps with cinematic color grading. Adding appropriate sound design will further enhance the real-world feel.\n\n\n"
+}

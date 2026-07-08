@@ -37,6 +37,12 @@ Route by intent even if repo kind is broad (like `wp-site`):
   - Route → `wp-rest-api`.
 - **WP-CLI / wp-cli.yml / commands**
   - Route → `wp-wpcli-and-ops`.
+- **Navigation menus / menu item URLs / wp_nav_menu / nav_menu_item**
+  - Route → `wp-wpcli-and-ops` for operational changes; use `wp-rest-api`
+    only when the user explicitly needs a REST automation. Classic menus are
+    stored as `nav_menu` terms plus `nav_menu_item` posts. A custom URL lives
+    in `_menu_item_url` only for `_menu_item_type=custom`; page/post items
+    should usually point at `object_id` so WordPress resolves the permalink.
 - **Build tooling / @wordpress/scripts / webpack / Vite / npm scripts**
   - Route → `wp-build-tooling` (planned).
 - **Testing / PHPUnit / wp-env / Playwright**

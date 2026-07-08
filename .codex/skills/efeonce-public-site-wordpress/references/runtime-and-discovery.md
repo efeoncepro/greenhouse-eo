@@ -18,6 +18,116 @@ Use this reference for public-site inventory, bridge inspection, runtime repo bi
 - Kinsta staging availability remains unconfirmed from repo automation. Kinsta docs describe Standard Staging as generally available unless plan-restricted and Premium Staging as paid add-on; verify account state before depending on it.
 - Effective visual foundation observed: brand blue `#023c70` family, body `Inter`, headings/buttons `DM Sans`, grid gutter `1rem`, container width `86vw`, footer background `#161519`.
 - Elementor active kit can expose default Elementor colors/fonts; always verify computed runtime styles.
+- Custom Elementor widget media packages that are part of a widget contract can
+  live under `eo-elementor-widgets/assets/...` instead of WordPress Media
+  Library, but they must be mapped by semantic slot id in code, backed up
+  before Kinsta upload, and verified as direct public assets. Current example:
+  Redes Sociales wall assets v1 under `assets/img/social/wall/v1/`; full note
+  `docs/operations/public-site-social-wall-media-production-20260708.md`.
+
+## Classic Navigation Menu Facts
+
+Use this when the user asks how to add a URL to the public-site menu. Do not
+mutate the menu during discovery.
+
+- WordPress uses the classic menu model here, not a block-theme
+  `wp_navigation` source of truth.
+- Active location: `primary`.
+- Current menu term: `61` (`Menu 1`, slug `menu-1`, observed `count=23`
+  after the Redes Sociales menu item was added on 2026-07-07).
+- Ohio renders the same menu in desktop `nav#site-navigation ul#menu-primary`
+  and mobile `ul#mobile-menu`.
+- REST exposes `/wp/v2/menu-items`, `/wp/v2/menus` and
+  `/wp/v2/menu-locations`, but prefer WP-CLI/PHP core for governed writes.
+
+Storage model:
+
+- menu container = `nav_menu` taxonomy term;
+- item = `post_type=nav_menu_item`;
+- membership = term relationship to the `nav_menu` term;
+- label = `post_title`; order = `menu_order`; title attr = `post_excerpt`;
+- parent = `_menu_item_menu_item_parent`;
+- type/object = `_menu_item_type`, `_menu_item_object`,
+  `_menu_item_object_id`;
+- custom URL = `_menu_item_url` only when `_menu_item_type=custom`.
+
+Confirmed parent IDs:
+
+- `Soluciones`: `242525`;
+- `Estrategia & Posicionamiento`: `244255`, parent `242525`;
+- `Experiencia Personalizada`: `248605`, parent `242525`;
+- `Crecimiento Multicanal`: `248606`, parent `242525`;
+- `Servicios Destacados`: `248629`, parent `242525`;
+- `Recursos`: `242524`.
+
+Confirmed live service item:
+
+- `Redes Sociales`: item `251311`, parent `248629` (`Servicios Destacados`),
+  `type=post_type`, `object=page`, `object_id=251300`, URL
+  `https://efeoncepro.com/servicios/redes-sociales/`. Rollback snapshot option:
+  `_gh_backup_before_menu_social_20260707T205950Z`.
+
+Operational learning from the 2026-07-07 menu write:
+
+- "Assigning a URL to the menu" means creating/updating a `nav_menu_item`, not
+  editing the Ohio masthead, Elementor header HTML, or `wp_navigation`.
+- Discover the live menu every time with `get_registered_nav_menus()`,
+  `get_nav_menu_locations()`, `wp_get_nav_menu_object($term_id)` and
+  `wp_get_nav_menu_items($term_id)`. Do not assume menu term `61` without a
+  current snapshot.
+- Preflight duplicates by normalized label, `object_id`, URL/permalink and
+  parent item. The same page can otherwise be inserted twice under a dropdown.
+- If the destination is a WordPress page, create a `post_type` item
+  (`menu-item-type=post_type`, `menu-item-object=page`,
+  `menu-item-object-id=<PAGE_ID>`). The visible URL then follows the page
+  permalink; `_menu_item_url` is not the source of truth for this item type.
+- Use `custom` only for external URLs, anchors, or internal URLs that are not a
+  WordPress object.
+- Set `menu-item-parent-id` from the discovered parent item (`248629` for
+  `Servicios Destacados`) and set/verify `menu_order` when sibling order
+  matters.
+- The repo wrapper accepts the governed `--eval-file` flow; do not rely on raw
+  WP-CLI subcommands being passed through by `pnpm public-website:wpcli`.
+- Do not call `clean_nav_menu_cache()` in eval scripts; it is not a safe public
+  function in this runtime. Let `wp_update_nav_menu_item()` perform core cache
+  invalidation, then run `wp cache flush` or `wp kinsta cache purge --all`.
+- Verify the rendered DOM, not only DB state: desktop `#menu-primary`, mobile
+  `#mobile-menu`, correct parent label, no duplicate anchors, no overflow.
+
+For a future custom URL write, snapshot `wp_get_nav_menu_items(61)` and metas
+first, then use:
+
+```php
+$parent_item_id = 248629; // Servicios Destacados; choose from snapshot.
+
+wp_update_nav_menu_item(61, 0, [
+    'menu-item-title' => 'Texto del menu',
+    'menu-item-url' => 'https://efeoncepro.com/ruta/',
+    'menu-item-type' => 'custom',
+    'menu-item-status' => 'publish',
+    'menu-item-parent-id' => $parent_item_id,
+]);
+```
+
+For a WordPress page destination, prefer a `post_type` menu item with
+`object=page` and `object_id=<PAGE_ID>` so the URL follows the permalink:
+
+```php
+$page_id = 251300;
+$parent_item_id = 248629; // Servicios Destacados; choose from snapshot.
+
+wp_update_nav_menu_item(61, 0, [
+    'menu-item-title' => 'Redes Sociales',
+    'menu-item-type' => 'post_type',
+    'menu-item-object' => 'page',
+    'menu-item-object-id' => $page_id,
+    'menu-item-status' => 'publish',
+    'menu-item-parent-id' => $parent_item_id,
+]);
+```
+
+After any menu write: `wp kinsta cache purge --all`, verify `#menu-primary` and
+`#mobile-menu`, and check dropdown/overflow behavior.
 
 ## Runtime Repo Binding
 

@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-08T04:37:42.878Z",
+  "completedAt": "2026-07-08T04:38:29.468Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "slotId": "muro-a1",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/prompts/muro-a1.md",
+  "reference": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-a1-ref-720x1280.png",
+  "masterPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-a1-reel-living-omni-master.mp4",
+  "outputBytes": 2457756,
+  "videoMimeType": "video/mp4",
+  "usageMetadata": {
+    "promptTokenCount": 2443,
+    "candidatesTokenCount": 57920,
+    "totalTokenCount": 60574,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 2020
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 423
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 57920
+      }
+    ],
+    "thoughtsTokenCount": 211
+  },
+  "responseText": "**Visualizing Animated Sequence Creation**\n\nI will animate a mural, focusing on the macaw's wing. The animation will begin with subtle camera movements and dust. Then, the wing feathers will flex outward with overlapping timing and shadow shifts, before settling back. This breathing and flexing action will repeat, alongside a slow camera push-in. I will add depth with foreground elements, and apply motion blur, film grain, and realistic ambient audio with synchronized sound effects.\n\n\n"
+}

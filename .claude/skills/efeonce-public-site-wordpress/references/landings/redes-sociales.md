@@ -1,0 +1,340 @@
+# Landing: Redes Sociales `/servicios/redes-sociales/`
+
+## Identity
+
+- URL: `https://efeoncepro.com/servicios/redes-sociales/`
+- WordPress `postId`: `251300`
+- Parent page: `/servicios/`, `postId=251077`
+- Title: `Redes Sociales`
+- Status: `publish`, `noindex, follow` until operator approves indexing/cutover.
+- Owning task context: `TASK-1351` / direct public-site execution.
+- Runtime rail: WordPress/Kinsta, Elementor document saved with `Document::save()`.
+- Source of truth: approved final Claude Design HTML at `/Users/jreye/Documents/social/Task 1351 execution/Redes Sociales.dc.html`.
+
+## Navigation
+
+- Live menu item added on 2026-07-07:
+  - Menu term: `61` (`Menu 1`), location `primary`.
+  - Item ID: `251311`.
+  - Label: `Redes Sociales`.
+  - Parent: `248629` (`Servicios Destacados`, under `Soluciones`).
+  - Type: `post_type`, object `page`, object ID `251300`.
+  - URL: `https://efeoncepro.com/servicios/redes-sociales/`.
+  - Rollback snapshot option: `_gh_backup_before_menu_social_20260707T205950Z`.
+- Verified after Kinsta purge: home desktop `#menu-primary` and mobile
+  `#mobile-menu` each render exactly one `Redes Sociales` item under
+  `Servicios Destacados`, with no page overflow.
+
+## Published Contract
+
+- Use the final HTML artifact, not captures/screenshots. Captures under `~/Documents/social` are iteration outputs and must not drive rebuilds.
+- Header/footer are native Efeonce/Ohio only. Do not publish the prototype masthead, sticky custom nav, or prototype footer from the HTML source.
+- The landing is intentionally modular in Elementor. It uses 12 separate Elementor widgets, not one monolithic HTML widget and not a single module-switch widget.
+- The page shell keeps the dark Ohio header affordance with root classes `gh-social-elementor-shell clb__dark_section`.
+- Preserve all final HTML narrative sections as individual Elementor widgets:
+  - `greenhouse_social_hero`: hero and primary CTAs.
+  - `greenhouse_social_trust`: trust/logo strip.
+  - `greenhouse_social_stakes`: strategic stakes/problem.
+  - `greenhouse_social_includes`: "Qué incluye" service tabs/cards with 8 rich right-side scenes from the final HTML source.
+  - `greenhouse_social_wall`: live social/content wall.
+  - `greenhouse_social_creators`: creator network section from the final HTML source.
+  - `greenhouse_social_metrics`: measurement/reporting section.
+  - `greenhouse_social_greenhouse`: full Greenhouse dashboard section from the final HTML source.
+  - `greenhouse_social_bridge`: ecosystem/sistema completo bridge.
+  - `greenhouse_social_proof`: proof/cases.
+  - `greenhouse_social_faq`: FAQ plus page-scoped FAQ JSON-LD.
+  - `greenhouse_social_cta`: final CTA and Growth Form audit.
+- Sticky/mobile CTA is an enhancement owned by `social-landing.js`; it must not cover the final form on mobile.
+- Final CTA/form sticky lane: `greenhouse_social_cta` intentionally mirrors the SEO sticky editorial lane pattern on desktop. `.ghs-cta-copy` must keep `-sticky-block` plus `data-ghs-sticky-lane="cta-copy"`, with page-scoped sticky top `clamp(88px, 12vh, 132px)`, visible overflow on `.ghs-cta`/`.ghs-cta-grid`, and static/relative behavior under `980px`. Do not use Elementor Pro sticky effects, and do not make this a full `100vh` lane unless the form length changes enough to justify it; the current natural-height sticky preserves alignment and releases before the Ohio footer.
+- Reveal motion is section/element driven by `data-ghs-reveal`; reduced-motion and mobile fallback must reveal content statically, never leave blank bands.
+- UTM preservation lives in `social-landing.js` and should keep existing visitor UTM values on HubSpot meeting links.
+- Typography guardrail: Ohio/Elementor can leak theme tracking into the landing. The `.gh-social` root must reset inherited tracking to `letter-spacing:0`; H1/H2 display titles and their accent spans must compute the approved compact public-site tracking `letter-spacing:-0.045em`; subtitles, section copy, FAQ answers/summaries, proof text, internal cards and form helper copy must stay `normal/0`. Uppercase kickers, pills and small labels may keep their intentional positive tracking. Verify computed style in desktop and mobile, not static CSS only.
+- Hero visual/motion guardrail: do not reduce the hero visual to a static phone/image and do not reintroduce the busy internal bars/play overlay. The approved source visual is a clean dark reel/phone mockup with a full dark placeholder (`Reel o render 3D — arrastra tu pieza`), top `Reel` pill, white `1.2M reproducciones` chip, one-line green `+2.4K guardados hoy` chip, right social rail, bottom optimization copy/playbar, and frosted `creadores activos` chip with three ring avatars. Those three mini avatars must show real/fictitious creator portrait crops using existing WebP creator assets, not abstract gradient circles. Keep the mini avatar crop forgiving across browser zoom/DPR: group span `100px`, avatar ring `2px`, overlap no stronger than `-4px`, and headroom-friendly crops around `104/108/106%` with vertical positions `28/31/31%`; do not return to aggressive `124%+` crops near `45%`, which can cut heads in some browsers. The final HTML uses `data-hero-tilt`; the Elementor widget must preserve the equivalent `data-ghs-hero-tilt data-hero-tilt`, mouse/pen pointer tilt, scroll/pointer parallax variables, floating chips, `data-ghs-hero-likes data-hero-likes` counter pulse, heart beat, animated playbar, and reduced-motion fallback where decorative motion stops.
+- Hero/trust seam guardrail: the boundary between the dark hero and the white trust/logo strip must not show a stray blue line. Keep the CSS-only seam treatment where `.ghs-trust` overlaps the hero by `2px` and paints a white `::before` cover at the top. Because `.ghs-hero-bg` moves with parallax, it must also keep a bleed/overscan inset (`inset:-24px`) so the transform cannot expose the base navy hero background as a bottom strip. Do not solve this by changing the hero height, adding a visible border, or moving logo content.
+- Stakes section guardrail: do not shorten or reframe `El punto de partida`. The widget must preserve the full source paragraph ending in `medición que llega al negocio`, the two-card contrast (`El enfoque commodity` vs. Efeonce `Así lo trabajamos`), all 8 source bullet texts without extra punctuation, the Efeonce negative logo + divider in the navy card header, and the source-like layout rhythm: `.ghs-stakes .ghs-wrap` max `1100px`, desktop title constrained so it resolves as a 3-line headline, mobile title readable in 2 lines, and no generic icon-only label inside the Efeonce card.
+- Includes section guardrail: do not replace the right-side explorer with a generic icon/title/copy/meter card. The final HTML composition has 8 distinct scenes: `REC · en terreno` content studio, AI variants grid, UGC card stack, community chat, unified inbox/SLA, creator collaboration, trend chart, and listening/sentiment cloud. The left copy must include the full source paragraph ending in `marca y demanda, no vanidad`.
+- Wall section guardrail: do not replace the approved social wall with generic social cards. The widget must preserve the final HTML wall structure: `data-muro-mask`, three `data-muro-col` columns, 8 slot-equivalent pieces (`muro-a1`, `muro-a3`, `muro-a4`, `muro-b2`, `muro-b3`, `muro-c1`, `muro-c2`, `muro-c4`), exact labels/placeholders (`Reel — arrastra tu portada`, `Carrusel — arrastra una pieza`, `Colaboración con creador`, `Historia — arrastra un frame`, `UGC — arrastra un clip`, `Post — arrastra una pieza`), platform badges, hover lift, and hover/focus pause. Prototype `image-slot` is translated into local `[data-image-slot]` slots with `data-media-kind`; when an approved asset is present, render it and keep the upload placeholder only as fallback. Current live package is hybrid: static formats remain fictional WebP campaign samples under `assets/img/social/wall/v1/` (`Carrusel`, `Post`), while footage-native formats use short living clips under `assets/video/social/wall/v3/` (`Reel`, `Historia`, `UGC`, `Creador`). Do not replace them with stock, client logos, fake text, generic gradients, or camera-pan-only still animations. "Alive" means contextual action native to the format: UGC needs a living person/phone/handheld micro-motion; Historia needs hand/phone/reflection context; Creador needs BTS production movement; Reel needs a body/art/VFX beat with anticipation, arcs, follow-through and settle. Motion must feel liquid: three desktop rails remain visible, use compositor-only phase-offset sine travel, alternate direction over time, and pause/resume without resetting time or jumping. Mobile stacks all three columns; do not hide columns with `display:none`.
+- Metrics section guardrail: do not return to the three-card/waveform reinterpretation. The final HTML metrics section has kicker `Transparencia`, source paragraph about tablero ejecutivo/KPIs, four metric cards with counters `5×`, `38 s`, `70%`, `2 sem`, and the illustrative disclaimer about share of voice/demanda influida/brand lift.
+- Greenhouse section guardrail: do not replace the approved dashboard with a compact illustrative card. The widget must render the full dashboard composition from the HTML final: Greenhouse topbar/logo, live/client pills, module sidebar, `Social media` toolbar, four KPI cards, `Rendimiento por canal`, `Top posts`, `De social a negocio`, `Revenue influido`, and the illustrative note. The prototype `image-slot` elements are intentionally translated into local CSS thumbnail placeholders so no prototype runtime bundle is required.
+- Bridge section guardrail: do not flatten `El sistema completo` into a linear chip row. The final HTML bridge is a radial system map with `data-system-stage`, animated SVG `data-system-links`, center hub `Redes sociales / estás aquí`, four `data-nodepos` nodes (`Agencia creativa`, `Posicionamiento SEO`, `Desarrollo de sitios web`, `Guía: community manager`), hover/focus line emphasis, and compact mobile layout.
+- Proof section guardrail: preserve the source wording including `no capturas fuera de lugar` and the testimonial placeholder/avatar treatment. Do not shorten the cases intro back to the earlier NDA-only sentence.
+- Creators section guardrail: do not collapse this section back to platform icons only. The final HTML composition is centered heading, three chips (`Verificación de brand-safety`, `Contratos y derechos de uso`, `Medición por aporte al negocio`), five creator profiles with Instagram-story-style gradient rings/network badges/handles/vertical metadata, and the illustrative note about brand-safety and measuring contribution instead of flat fees. The prototype `image-slot` elements are translated into fictitious generated creator portraits, not real influencers or stock people. Preserve the five WebP assets under `assets/img/social/creators/` (`creator-laura-makes.webp`, `creator-dani-eats.webp`, `creator-techconjuan.webp`, `creator-sofi-fit.webp`, `creator-marco-viaja.webp`), the initials fallback, network badges, outer gradient rings, white inner cushion, clean circular portraits, and subtle avatar hover zoom/reduced-motion behavior. Do not draw the prototype dashed/drop-zone ring over loaded portrait images; that dotted treatment belongs only to empty/editable placeholders. Avatar framing is art-directed per profile, not only by the base `soft`/`deeper` presets: keep the profile-specific optical-center CSS overrides (`nth-child`) so eyes/nose/smile sit in the circle's visual center without exposing top gaps or losing creator context.
+
+## Growth Form
+
+- The landing embeds the governed Growth Form `efeonce-social-audit`.
+- Contract:
+  - `formId=fdef-320d3c89-cc39-4f53-8a42-4d348c8f5d7f`
+  - `formKey=f83cb310-2477-4776-adb0-57fb07e95594`
+  - `formVersionId=fver-ad42eac3-6ebe-47d7-b602-ba0a2a7523e6`
+  - version `1`
+  - surface `fhsf-cb40ce69-97a0-4a3a-8e0a-8e62dfc46c22`
+  - `styleVariant=diagnostic_premium`
+  - `captchaRequired=true`
+  - HubSpot destination shape present with delivery mode `disabled` until operator cutover.
+- Visible fields mirror the approved HTML form: `fullName`, `role`, `email`, `companyName`, `brandPresence`, `primaryObjective`.
+- Public render API with `Origin: https://efeoncepro.com` must return `200`, CORS for the public site, the expected surface, Turnstile requirement, and the six capture fields above.
+- Host CSS guardrail: keep the renderer-owned form semantics, but isolate the form from `.ghs-audit-card p` so Growth Forms helper/counter text is not enlarged by the CTA card copy styles. Idle character counters must not appear as floating paragraphs; they stay hidden until focus/value/near-limit and render at small utility scale. `primaryObjective` must span the full form width on desktop/mobile so the selected option is not truncated.
+
+## SEO Metadata
+
+- SEO pass applied on 2026-07-07 with the `seo-aeo` skill while preserving `publish + noindex, follow`.
+- Yoast title: `Agencia de redes sociales para marcas en crecimiento | Efeonce` (`62` chars).
+- Yoast meta description: `Operamos tus redes como motor de marca y demanda: contenido, creadores, social care y reporting en Greenhouse. Agenda una reunión o auditoría gratis.` (`149` chars).
+- Focus keyphrase: `agencia de redes sociales`.
+- Canonical is stored in Yoast as `https://efeoncepro.com/servicios/redes-sociales/`. Yoast intentionally does not print a canonical link while `_yoast_wpseo_meta-robots-noindex=1`; do not force a manual canonical until the operator approves indexing/cutover.
+- Robots remain `noindex, follow`; do not remove noindex without explicit operator approval.
+- OG/Twitter:
+  - title matches the Yoast title.
+  - description: `Redes que construyen marca y demanda, no solo feed: contenido, creadores, social care, reporting y una capa operativa en Greenhouse.`
+  - image attachment `251309`: `https://efeoncepro.com/wp-content/uploads/2026/07/efeonce-redes-sociales-og-20260707.png`, generated from the live hero first viewport and registered as the page featured image only so Yoast `primaryImageOfPage`/social tags use the correct 1200×630 raster. It must not appear as visible body content.
+- JSON-LD contract:
+  - Yoast emits `WebPage`, `ImageObject`, `BreadcrumbList`, `WebSite`, `Organization`.
+  - `greenhouse_social_faq` emits page-scoped `Service` + `FAQPage`.
+  - `Service` must keep `@id=https://efeoncepro.com/servicios/redes-sociales/#service`, `mainEntityOfPage`, B2B audience, 5 service types, LATAM area served nodes, `OfferCatalog` capabilities, and `potentialAction` pointing to `#auditoria`.
+  - `FAQPage` must keep 9 visible FAQ questions and `mainEntityOfPage`.
+
+## Runtime Files
+
+- Runtime repo: `/Users/jreye/Documents/efeonce-public-site-runtime`.
+- Plugin: `wp-content/plugins/eo-elementor-widgets`, version `0.12.0`.
+- Main widget files:
+  - `includes/widgets/class-eo-social-landing-base.php`
+  - `includes/widgets/class-eo-social-landing-widgets.php`
+  - `assets/css/social-landing.css`
+  - `assets/js/social-landing.js`
+  - `assets/img/social/greenhouse-full.svg`
+  - `assets/img/social/creators/*.webp`
+- Current hero video package, deployed 2026-07-08 UTC:
+  - Concept: `El mural que alza vuelo` / artistic social-first macaw mural, not an airline or explainer spot.
+  - Keyframes: `gpt-image-2`, stored under `/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-07_mural-guacamayas-hero/`.
+  - Motion master: Google Cloud Vertex `gemini-omni-flash-preview`, local master only under `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets/assets/video/social/art-macaws/v1/art-macaws-v1-omni-master.mp4`.
+  - Public assets: `assets/video/social/art-macaws/v1/art-macaws-v1-web-small.webm` (`432x768`, VP9, no audio, ~904 KiB), `art-macaws-v1-lite.mp4` (`540x960`, H.264 fallback, no audio, ~1.5 MiB), and `art-macaws-v1-poster.jpg`.
+  - Hero widget points only to the public WebM/MP4/poster; do not deploy the Omni metadata JSON.
+- Current wall asset package, deployed 2026-07-08 UTC:
+  - Concept: premium fictional social campaign wall, connected to the macaw mural art direction but formatted as produced social artifacts.
+  - Generation source: `gpt-image-2`, stored under `/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/`.
+  - Static public assets: `assets/img/social/wall/v1/*.webp` (`muro-a3-carousel-piece.webp`, `muro-c2-editorial-post.webp` remain live as static Carrusel/Post; earlier stills are preserved as source/poster context), total v1 image package ~940 KiB.
+  - Living motion package: Gemini Omni/Vertex `gemini-omni-flash-preview`, script `ai-generations/2026-07-08_social-wall-assets/render-omni-motion-v3.mjs`, prompts/refs/masters under `ai-generations/2026-07-08_social-wall-assets/motion-v3/`, review sheet `motion-v3/review/wall-motion-v3-living-contact-sheet.jpg`.
+  - Public video assets: `assets/video/social/wall/v3/` with six stems (`muro-a1-reel-living`, `muro-a4-creator-living`, `muro-b2-story-living`, `muro-b3-trend-living`, `muro-c1-ugc-living`, `muro-c4-finale-living`), each as WebM + MP4 fallback + JPG poster; runtime package ~6.4 MiB including fallbacks/posters.
+  - Widget maps assets by slot in `get_wall_tile_asset()` and renders `<video>` for slots with WebM/MP4, `<img>` for static slots, placeholders only if an asset is missing.
+  - Video behavior lives in `social-landing.js`: visible videos play, offscreen pause, hover/focus pauses the whole wall, `prefers-reduced-motion` removes autoplay and resets video time.
+  - Full operational learning and reproduction note: `docs/operations/public-site-social-wall-media-production-20260708.md`.
+- Current includes media package, deployed 2026-07-08 UTC:
+  - Generation source: `/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-includes-assets/`.
+  - Public image assets: `assets/img/social/includes/v1/include-ai-generating-01.webp`, `include-ai-generating-02.webp`, `include-ai-generating-03.webp`.
+  - Public video assets: `assets/video/social/includes/v1/includes-studio-production-v1.webm|mp4|poster.jpg` and `includes-ugc-simple-v1.webm|mp4|poster.jpg`.
+  - AI variant grid guardrail: only cells 1/3/5 are generated images; cells 2/4/6 remain shimmer/process cells so the module still reads as "AI generating variants".
+  - Video behavior uses the shared inline video controller in `social-landing.js`; respect reduced-motion.
+- Reusable web media tooling:
+  - Use `pnpm media:web-video` for WebM + MP4 fallback + poster.
+  - Use `pnpm media:webp` for WebP via `cwebp`.
+  - Canonical runbook: `docs/operations/web-media-delivery-tooling.md`.
+- Loader registers all 12 widget classes plus `eo-social-landing` CSS/JS handles and the Growth Forms renderer dependency.
+
+## Rollback
+
+- WordPress page backups:
+  - `_gh_backup_before_task1351_social_landing_20260707T135520Z`
+  - `_gh_backup_before_task1351_social_landing_20260707T140035Z`
+  - `_gh_backup_before_task1351_social_seo_20260707T201543Z`
+  - `_gh_backup_before_task1351_social_seo_20260707T201857Z`
+- Remote runtime backups:
+  - `/tmp/eo-elementor-widgets-task1351-20260707T135250Z`
+  - `/tmp/eo-social-base-hotfix-20260707T135508Z.php`
+  - `/tmp/eo-social-base-surface-20260707T140028Z.php`
+  - `/tmp/eo-social-assets-20260707T140233Z`
+  - `/tmp/eo-social-js-reveal-20260707T140442Z.js`
+  - `/tmp/eo-social-css-mobile-reveal-20260707T140542Z.css`
+  - `/tmp/eo-social-greenhouse-dashboard-20260707T142341Z.tar.gz`
+  - `/tmp/eo-social-greenhouse-dashboard-css-mobile-20260707T142449Z.css`
+  - `/tmp/eo-social-creators-html-parity-20260707T143101Z.tar.gz`
+  - `/tmp/eo-social-includes-html-parity-20260707T144105Z.tar.gz`
+- Current live runtime snapshot after the hero motion parity pass:
+  - `/tmp/eo-social-hero-motion-current-20260707T145335Z.tar.gz`
+- Later focal parity backups:
+  - `/tmp/eo-social-metrics-bridge-proof-html-parity-20260707T150548Z.tar.gz`
+  - `/tmp/eo-social-wall-html-parity-20260707T151456Z.tar.gz`
+- Typography rollback backup:
+  - `/tmp/eo-social-letter-spacing-20260707T152919Z.tar.gz`
+- Creator portraits rollback backup:
+  - `/tmp/eo-social-creator-portraits-20260707T154317Z.tar.gz`
+  - `/tmp/eo-social-creator-portraits-crop-20260707T154843Z.tar.gz`
+  - `/tmp/eo-social-creator-avatar-position-20260707T160234Z.tar.gz`
+- Creator optical-center rollback backup:
+  - `/tmp/eo-social-creator-optical-center-20260707T174034Z.tar.gz`
+- Rejected creator dashed ring rollback backup:
+  - `/tmp/eo-social-creator-story-ring-20260707T164535Z.css`
+- Clean creator story ring rollback backup:
+  - `/tmp/eo-social-creator-story-ring-clean-20260707T164903Z.css`
+- Growth Form polish rollback backup:
+  - `/tmp/eo-social-form-polish-20260707T162654Z.tar.gz`
+- CTA sticky lane rollback backup:
+  - `/tmp/eo-social-cta-sticky-lane-20260707T182439Z.tar.gz`
+- Liquid wall rails rollback backup:
+  - `/tmp/eo-social-wall-liquid-rails-20260707T163722Z.tar.gz`
+- Stakes HTML parity rollback backups:
+  - `/tmp/eo-social-stakes-html-parity-20260707T165416Z.tar.gz`
+  - `/tmp/eo-social-stakes-width-rhythm-20260707T165656Z.css`
+  - `/tmp/eo-social-stakes-title-rhythm-20260707T165831Z.css`
+  - `/tmp/eo-social-stakes-title-rhythm-final-20260707T165937Z.css`
+- Hero visual polish rollback backups:
+  - `/tmp/eo-social-hero-visual-polish-20260707T171109Z.tar.gz`
+  - `/tmp/eo-social-hero-visual-css-refine-20260707T171424Z.tar.gz`
+  - `/tmp/eo-social-hero-visual-mobile-refine-20260707T171643Z.tar.gz`
+  - `/tmp/eo-social-hero-visual-js-pointer-20260707T171810Z.tar.gz`
+- Hero mini creator faces rollback backup:
+  - `/tmp/eo-social-hero-creator-faces-20260707T175447Z.tar.gz`
+  - `/tmp/eo-social-hero-creator-faces-spacing-20260707T180640Z.tar.gz`
+  - `/tmp/eo-social-hero-creator-faces-headroom-20260707T181305Z.tar.gz`
+- Hero/trust seam rollback backup:
+  - `/tmp/eo-social-blue-line-seam-20260707T172937Z.tar.gz`
+  - `/tmp/eo-social-hero-bg-overscan-20260707T183754Z.css`
+- SEO/schema rollback backup:
+  - `/tmp/eo-social-seo-schema-20260707T201526Z.php`
+- Hero art macaws v1 rollback backup:
+  - `/tmp/eo-social-art-macaws-before-20260708T002902Z.tar.gz`
+- Wall assets v1 rollback backup:
+  - `/tmp/eo-social-wall-assets-before-20260708T011949Z.tar.gz`
+- Wall living motion v3 rollback backup:
+  - `/tmp/eo-social-wall-living-v3-before-20260708T044424Z.tar.gz`
+- After rollback or mutation, purge Kinsta cache and verify desktop/mobile.
+
+## Verification
+
+- WP-CLI registration check: plugin version `0.12.0`, all 12 widgets registered, `eo-social-landing` CSS/JS registered, Growth Forms renderer registered.
+- Elementor structure check: root count `1`, widget count `12`, widget names match the section list, `hasMonolith=false`, root classes include `gh-social-elementor-shell clb__dark_section`, status `publish`, Yoast noindex enabled.
+- Playwright live check desktop `1440` and mobile `390`: HTTP `200`, native `#masthead` and `#colophon` detected, no prototype runtime bundle, no page overflow (`scrollWidth == clientWidth`), all 12 modules present, all sections visible, FAQ JSON-LD present, Growth Form present.
+- Stakes parity evidence:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-stakes-html-parity-final/desktop1440-stakes.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-stakes-html-parity-final/mobile390-stakes.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-stakes-html-parity-final/summary.json`
+- Hero art macaws v1 live verification, 2026-07-08 UTC:
+  - `curl` asset checks: WebM `200 video/webm content-length=926002`; MP4 `200 video/mp4 content-length=1617956`.
+  - HTML cache-bust probe confirms `art-macaws/v1` poster/WebM/MP4 and no `travel-warp` source.
+  - Playwright verifier: `/Users/jreye/Documents/greenhouse-eo/tmp/verify-social-hero-art-macaws-v1.mjs`.
+  - Captures: `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/social-hero-art-macaws-v1/desktop-1440.png` and `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/social-hero-art-macaws-v1/mobile-390.png`.
+  - Result: desktop `1440` and mobile `390` passed autoplay/muted/loop/playsInline, video time advancing, `scrollWidth == clientWidth`, no console errors, no old `travel-warp` path.
+- Wall assets v1 live verification, 2026-07-08 UTC:
+  - Playwright verifier: `/Users/jreye/Documents/greenhouse-eo/tmp/verify-social-wall-assets-v1.mjs`.
+  - Captures: `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/social-wall-assets-v1/desktop-1440-wall.png`, `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/social-wall-assets-v1/mobile-390-wall.png`, and slot-by-slot mobile captures under `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/social-wall-assets-v1/slots/`.
+  - Result: desktop `1440` and mobile `390` loaded 8/8 `.ghs-image-slot-media` assets from `/assets/img/social/wall/v1/`, `scrollWidth == clientWidth`, no console errors. Slot-by-slot mobile probe confirmed lazy-loaded assets paint correctly when each slot enters the viewport.
+- Wall living motion v3 live verification, 2026-07-08 UTC:
+  - Playwright verifier: `/Users/jreye/Documents/greenhouse-eo/tmp/verify-social-wall-motion-v3.mjs`.
+  - Captures: `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/social-wall-motion-v3/desktop-1440-wall-motion-v3.png`, `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/social-wall-motion-v3/mobile-390-wall-motion-v3.png`, summary `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/social-wall-motion-v3/summary.json`.
+  - Result: `ok=true`; desktop `1440` and mobile `390` confirmed `mediaCount=8`, `videoCount=6`, `staticImageCount=2`, video sources from `/assets/video/social/wall/v3/` with WebM+MP4+poster, playback advancing including loop wrap, desktop hover pause, reduced-motion paused/autoplay removed/currentTime `0`, no console errors, and `scrollWidth == clientWidth`.
+- Stakes live probe: desktop `1440` and mobile `390` confirmed full source paragraph, all 4 commodity bullets, all 4 Efeonce bullets, Efeonce negative logo loaded (`naturalWidth=300`), no old generic `.ghs-card-label` inside the navy card, wrapper `1100px`, desktop title `3` lines, mobile title `2` lines, console clean, and `scrollWidth==clientWidth`; request failures were analytics/ads endpoints aborted by headless Chrome only.
+- Latest reviewed captures:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-live-desktop.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-live-mobile390.png`
+- Greenhouse dashboard correction captures:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-greenhouse-dashboard-fix-v2/desktop-greenhouse.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-greenhouse-dashboard-fix-v2/mobile390-greenhouse.png`
+- Greenhouse dashboard live probe: desktop `1440` and mobile `390` confirmed `.ghs-greenhouse-app`, no old `.ghs-dashboard-grid`, `sidebarIcons=5`, `kpiCards=4`, `dashboardPanels=2`, `Rendimiento por canal`, `Top posts`, `Revenue influido`, loaded `greenhouse-full.svg`, and `scrollWidth==clientWidth`.
+- Creators correction captures:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creators-html-parity/desktop-full-creators.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creators-html-parity/mobile390-full-creators.png`
+- Creators live probe: desktop `1440` and mobile `390` confirmed 5 `.ghs-creator-profile` cards, 3 chips, 5 network badges, final note present, active reveal state, `h2Color=rgb(11,31,48)`, and `scrollWidth==clientWidth`.
+- Includes correction captures:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-includes-html-parity/desktop-final-includes.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-includes-html-parity/mobile390-copy-final-includes.png`
+- Includes live probe: desktop `1440` and mobile `390` confirmed 8 `.ghs-scene-rich` scenes, old `.ghs-scene-body=0`, old `.ghs-scene-browser=0`, all tab clicks activate the expected scene labels, source texts present (`REC · en terreno`, `Generando variantes`, `@cliente.real`, `Bandeja unificada`, `@creador × tu marca`, `En tendencia`, `Escuchando tu categoría`), full source paragraph restored, active tab description unclipped on mobile, and `scrollWidth==clientWidth`.
+- Hero motion parity captures:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-hero-motion-parity/desktop-hero.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-hero-motion-parity/mobile390-hero.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-hero-motion-parity/probe.json`
+- Hero motion live probe: desktop `1440` confirmed `data-ghs-hero-tilt`, pointer tilt transform changed, parallax CSS variables changed on pointer and scroll, `data-ghs-hero-likes` counter advanced, heart beat, animated playbar and floating chip animations active, reduced-motion disables decorative animation, console clean, and desktop/mobile `scrollWidth==clientWidth`.
+- Hero visual polish evidence:
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-visual-polish-final-v4/desktop1440-hero.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-visual-polish-final-v4/mobile390-hero.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-visual-polish-final-v4/metrics.json`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-visual-polish-final-v4/pointer-debug.json`
+- Hero visual polish live probe: desktop/mobile confirmed clean full-phone canvas (`inset=0`), no `.ghs-hero-play`, no `.ghs-reel-line`, one-line saves chip, `42.1K` initial social counter, three creator ring avatars, desktop visual canvas `480px` with centered `360px` phone, mobile chip text untruncated, scroll parallax active, mouse tilt changing to `rotateX(1.95deg) rotateY(2.86deg)`, and desktop/mobile `scrollWidth==clientWidth`. Headless request failures were analytics/ads aborts only.
+- Hero mini creator faces evidence:
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-creator-faces-final/desktop1440-chip.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-creator-faces-final/mobile390-chip.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-creator-faces-final/summary.json`
+- Hero mini creator faces live probe: desktop `1440` and mobile `390` confirmed production CSS version `social-landing.css?ver=1783446888`, three mini avatars at `36px`, background images `creator-laura-makes.webp`, `creator-dani-eats.webp`, `creator-sofi-fit.webp`, expected ring colors, chip dimensions stable, and `scrollWidth==clientWidth`. Headless request failures were analytics/ads aborts only.
+- Hero mini creator headroom evidence:
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-chip-headroom-final/desktop1440-dpr1-chip.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-chip-headroom-final/desktop1440-dpr3-chip.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-chip-headroom-final/mobile390-dpr2-chip.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-chip-headroom-final/summary.json`
+- Hero mini creator headroom live probe: desktop DPR1, desktop DPR3 and mobile DPR2 confirmed production CSS version `social-landing.css?ver=1783447986`, span `100px`, overlap `-4px`, ring `2px`, background sizes `104/108/106%`, positions `28/31/31%`, three expected WebP images, no console errors, and `scrollWidth==clientWidth`.
+- Hero/trust seam evidence:
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-blue-line-seam-final/desktop-1440-seam-scrolled.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-blue-line-seam-final/mobile-390-seam-scrolled.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-blue-line-seam-final/report.json`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-blue-line-seam-final/followup-report.json`
+- Hero/trust seam live probe: desktop `1440` and mobile `390` confirmed `.ghs-trust` `margin-top:-2px`, white `::before` height `2px`, `heroTrustOverlap=2`, pure white pixels at `trustTop`, no page overflow (`scrollWidth==clientWidth`), and no landing-blocking console errors. Headless request failures were analytics/ads aborts only.
+- Hero background overscan follow-up evidence:
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-trust-line-overscan-final/desktop1440-seam-final.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-trust-line-overscan-final/mobile390-seam-final.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-hero-trust-line-overscan-final/summary.json`
+- Hero background overscan live probe: production CSS version `social-landing.css?ver=1783449475` confirmed `.ghs-hero-bg` computes `inset:-24px`; desktop sample had hero bottom `822.15625` and background bottom `835.06625`, mobile had hero bottom `821.78125` and background bottom `828.54125`, preserving `.ghs-trust` overlap `-2px`, no console errors, and `scrollWidth==clientWidth`.
+- SEO final evidence:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-social-seo-final/head-schema.json`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-social-seo-final/og-image.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-social-seo-final/desktop1440-seo-visual.png`
+- SEO live probe: desktop `1440` confirmed title/metadescription/OG/Twitter values, robots `noindex, follow`, stored Yoast canonical, no printed canonical while noindex, `primaryImageOfPage` using `efeonce-redes-sociales-og-20260707.png` at `1200x630`, visible body instances of OG image `0`, enriched `Service` with `hasOfferCatalog=true`, `potentialAction=Solicitar auditoría de redes sociales`, 5 `areaServed` nodes, 5 `serviceType` values, FAQ count `9`, no console errors, and `scrollWidth==clientWidth`.
+- Metrics/bridge/proof parity evidence:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-metrics-bridge-proof-html-parity-clean/desktop1440-metrics.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-metrics-bridge-proof-html-parity-clean/desktop1440-bridge.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-metrics-bridge-proof-html-parity-clean/desktop1440-proof.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-metrics-bridge-proof-html-parity-clean/mobile390-metrics.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-metrics-bridge-proof-html-parity-clean/mobile390-bridge.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-metrics-bridge-proof-html-parity-clean/mobile390-proof.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-metrics-bridge-proof-html-parity-clean/probe.json`
+- Metrics/bridge/proof live probe: public DOM confirmed `data-count=4`, `data-system-stage=1`, `data-system-links=1`, `data-nodepos=4`, all source texts present, counters resolved to `5×`, `38 s`, `70%`, `2 sem`, bridge line animation `ghsDash`, hub ring animation `ghsRing`, focus line emphasis active, mobile bridge compact (`svgDisplay=none`), proof phrase `no capturas fuera de lugar`, console clean, and final desktop/mobile `scrollWidth==clientWidth` with native masthead closed.
+- Wall parity evidence:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-wall-html-parity/desktop1440-wall.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-wall-html-parity/mobile390-wall.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-wall-html-parity/probe.json`
+- Wall live probe: desktop/mobile confirmed `slotCount=8`, `data-muro-col=3`, `data-ghs-wall-col=3`, all source placeholders present, desktop `visibleCols=3`, mobile `visibleCols=1`, no overflow, console clean, and desktop auto-scroll paused on `mouseenter` then resumed on `mouseleave` by transform checks.
+- Liquid wall rails evidence:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-wall-liquid-rails-final/desktop1440-wall.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-wall-liquid-rails-final/mobile390-wall.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-wall-liquid-rails-final/summary.json`
+- Liquid wall rails live probe: desktop `1440` and mobile `390` confirmed production CSS/JS patches loaded, `cols=3`, `slots=8`, `inners=8`, `notes=4`, all expected `data-media-kind` values, desktop `motionChanged=[true,true,true]`, desktop directions sampled as alternating rail transforms, hover pause held transforms exactly (`pauseHeld=true`), resume changed transforms (`resumedChanged=true`), mobile keeps all three columns stacked instead of hidden, and `scrollWidth==clientWidth`.
+- Typography evidence:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-social-letter-spacing-fix/desktop1440-letter-spacing.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-social-letter-spacing-fix/mobile390-letter-spacing.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-social-letter-spacing-fix/probe.json`
+- Typography live probe: desktop `1440` and mobile `390` confirmed `failureCount=0`, H1/H2 display titles and accent spans compute `letter-spacing:-0.045em`, hero/section subtitles and paragraph copy compute `normal/0`, kickers preserve positive `0.14em`, and `scrollWidth==clientWidth`.
+- Creator portraits evidence:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creator-avatar-position-final/desktop1440-creators-section.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creator-avatar-position-final/desktop1440-creator-row.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creator-avatar-position-final/desktop1440-creator-row-hover-tech.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creator-avatar-position-final/mobile390-creators-section.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creator-avatar-position-final/mobile390-creator-row.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creator-avatar-position-final/probe.json`
+- Creator portraits live probe: desktop `1440` and mobile `390` confirmed 5 `.ghs-creator-profile` cards, 2 `crop-soft` avatars, 3 `crop-deeper` avatars, 5 WebP avatar images returning `200` as `image/webp`, each loaded at `1024x1024`, initials fallback hidden while images load, no overflow, and desktop hover zoom preserved on the art-directed crop (`1.24 -> 1.295` for `@techconjuan`).
+- Creator optical-center evidence:
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-creator-optical-center-final/desktop1440-creator-stack.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-creator-optical-center-final/mobile390-creator-stack.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-creator-optical-center-final/summary.json`
+- Creator optical-center live probe: desktop `1440` and mobile `390` confirmed production CSS version `social-landing.css?ver=1783446035`, five profile-specific offsets (`15%`, `16%`, `16.5%`, `15%`, `16%`), scales `1.34–1.37`, five WebP images loaded at `1024x1024`, top/bottom coverage preserved for every circle, and `scrollWidth==clientWidth`.
+- Clean creator story ring evidence:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creator-story-ring-clean-final/desktop1440-creator-row.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creator-story-ring-clean-final/mobile390-creator-row.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-creator-story-ring-clean-final/summary.json`
+- Clean creator story ring live probe: desktop `1440` and mobile `390` confirmed 5 profiles, 5 images loaded, outer gradient ring remains, no dashed `::before` overlay over loaded portrait images, image shade layer remains, and `scrollWidth==clientWidth`.
+- Final Growth Form polish evidence:
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-social-form-polish-final/desktop1440-audit-form-clean.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-social-form-polish-final/mobile390-audit-form-clean.png`
+  - `/Users/jreye/Documents/greenhouse-eo/.captures/task1351-social-form-polish-final/summary.json`
+- Final Growth Form live probe: production CSS contains the form patch, desktop `1440` and mobile `390` confirmed idle `visibleCounters=0`, focused counter utility size `11.52px`, `primaryObjective` trigger width equals form width, select list opens at full width, card background white, and `scrollWidth==clientWidth`.
+- CTA sticky scroll evidence:
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-cta-sticky-scroll-final/desktop1440-entry.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-cta-sticky-scroll-final/desktop1440-active.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-cta-sticky-scroll-final/desktop1440-release.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-cta-sticky-scroll-final/mobile390-entry.png`
+  - `/Users/jreye/Documents/efeonce-public-site-runtime/.captures/task1351-cta-sticky-scroll-final/summary.json`
+- CTA sticky scroll live probe: production CSS version `social-landing.css?ver=1783448680` and live HTML confirmed `.ghs-cta-copy -sticky-block` with `data-ghs-sticky-lane="cta-copy"`, desktop `position:sticky`, `top:132px`, stable active sample while the form scrolled, release before the footer, mobile `position:relative`, no console errors, and `scrollWidth==clientWidth`.
+- Observed browser warning: Chrome headless WebGL `ReadPixels` performance warning only; no landing JavaScript or request failures blocking render.
+
+## Follow-Ups
+
+- Decide indexing/cutover: remove noindex and validate canonical/search metadata only after operator approval.
+- Decide HubSpot direct delivery cutover for `efeonce-social-audit`; current delivery mode is intentionally `disabled`.
+- If visual polish continues, compare against the final HTML source sections, not against iteration captures.

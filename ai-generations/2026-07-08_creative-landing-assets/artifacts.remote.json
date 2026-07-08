@@ -1,0 +1,107 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-07-08T09:06:37.925Z",
+  "run": "ai-generations/2026-07-08_creative-landing-assets",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-08_creative-landing-assets",
+  "totalBytes": 22178826,
+  "fileCount": 16,
+  "files": [
+    {
+      "path": "creative-case-berel-content.png",
+      "sizeBytes": 2536816,
+      "sha256": "93b772819489adfdddf828143237be3455f8fc21b37b1b55f659bf3dffb283c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/creative-case-berel-content.png"
+    },
+    {
+      "path": "creative-case-bresler-commerce.png",
+      "sizeBytes": 2170279,
+      "sha256": "992de4782b90d721db8aa324cb65191cffaf9ce13e1277aed4bc6da2bd8136aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/creative-case-bresler-commerce.png"
+    },
+    {
+      "path": "creative-case-sky-airlines.png",
+      "sizeBytes": 2074979,
+      "sha256": "64e07a79d4a4f71bccac4d76c2994dd4272147da1ae21e8306904548ae1ad456",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/creative-case-sky-airlines.png"
+    },
+    {
+      "path": "creative-engine-final-output.png",
+      "sizeBytes": 1995794,
+      "sha256": "0b02f84ddb7ccc496e6cc3d9485a6aad325acb18d6e72ddb259112ecc3b6d6b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/creative-engine-final-output.png"
+    },
+    {
+      "path": "creative-work-full-funnel-campaign.png",
+      "sizeBytes": 1858061,
+      "sha256": "4712f8d3bf3a732d52601f5926233b183c3f3ea75514dbe89a9703dbf1dbc5c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/creative-work-full-funnel-campaign.png"
+    },
+    {
+      "path": "creative-work-key-visual-campaign.png",
+      "sizeBytes": 2133353,
+      "sha256": "8350c6ac495a7a9a6b7954004ce4a20036d296123d3c5177232702128699c020",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/creative-work-key-visual-campaign.png"
+    },
+    {
+      "path": "creative-work-product-prototype.png",
+      "sizeBytes": 1652890,
+      "sha256": "04afe0d12233e43cf472844b75fcb343c3d62ca2ff49404542dd1a422a8f30de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/creative-work-product-prototype.png"
+    },
+    {
+      "path": "creative-work-social-system.png",
+      "sizeBytes": 2453476,
+      "sha256": "0faf2de9875d5bfa1c536165e83f694e26daa453e2955281e53b223e4629b29f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/creative-work-social-system.png"
+    },
+    {
+      "path": "creative-work-spot-ref.png",
+      "sizeBytes": 1914450,
+      "sha256": "0d21b6bd3b1f40ac5845b111b170278f7aadfd66f98e0b7a519e0e10be4d80c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/creative-work-spot-ref.png"
+    },
+    {
+      "path": "motion-v1/exports/creative-work-spot-v1-poster.jpg",
+      "sizeBytes": 37566,
+      "sha256": "9ec113a684a95e3b2c06dfac3fcb45d2bf621138e1df8a7642b180432ac1e5d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/motion-v1/exports/creative-work-spot-v1-poster.jpg"
+    },
+    {
+      "path": "motion-v1/exports/creative-work-spot-v1.mp4",
+      "sizeBytes": 479619,
+      "sha256": "c63b7dfcae0c21a45cbc2c6a53d6414789487c9ccce85ba3fedf8b6858c0d468",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/motion-v1/exports/creative-work-spot-v1.mp4"
+    },
+    {
+      "path": "motion-v1/exports/creative-work-spot-v1.webm",
+      "sizeBytes": 319559,
+      "sha256": "ed02899ff97937ecd2c7e20cd86458655fc5360dc7c0f30d8f770ea372e0fea2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/motion-v1/exports/creative-work-spot-v1.webm"
+    },
+    {
+      "path": "motion-v1/masters/creative-work-spot-v1-omni-master.mp4",
+      "sizeBytes": 1280364,
+      "sha256": "46bc0e3d85e83eaf0afdf99dd9dc56aa17c987480c0335c5ffc2ed06be686a01",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/motion-v1/masters/creative-work-spot-v1-omni-master.mp4"
+    },
+    {
+      "path": "motion-v1/refs/creative-work-spot-ref-1280x720.png",
+      "sizeBytes": 1078337,
+      "sha256": "b1a1535a64d551a34e4dd9cbe7f1b8f099e596dbab374c7303d51016838fab7f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/motion-v1/refs/creative-work-spot-ref-1280x720.png"
+    },
+    {
+      "path": "motion-v1/review/creative-work-spot-v1-contact-sheet.jpg",
+      "sizeBytes": 31875,
+      "sha256": "55798a463f3f239340f678e7cceb6468293c177ffaa8597c1d39a37df0dbdcc7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/motion-v1/review/creative-work-spot-v1-contact-sheet.jpg"
+    },
+    {
+      "path": "review/creative-placeholders-contact-sheet.jpg",
+      "sizeBytes": 161408,
+      "sha256": "f1c6b899483977d98e85e62886c8a42db8ceee17707d39cc64ae844c6094ff1f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-08_creative-landing-assets/review/creative-placeholders-contact-sheet.jpg"
+    }
+  ]
+}

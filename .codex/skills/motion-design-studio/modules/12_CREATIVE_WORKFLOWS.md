@@ -64,8 +64,9 @@ consistentes (probado: la referencia salió casi idéntica). Es la cura de la "d
 
 UI/producto (prompt box, chat, citas, cursor, gauge) **NO con video IA** (deforma texto/logos). Mockup
 HTML/CSS/JS animado (timeline `setTimeout`/CSS) con **logo real embebido** → captura Playwright
-(`recordVideo` 1280×720, **correr el `.mjs` desde la raíz del repo**, webm→mp4). Legible, on-brand, cero
-créditos, frame-perfect. Detalle en `efeonce/STUDIO_TOOLING.md`.
+(`recordVideo` 1280×720, **correr el `.mjs` desde la raíz del repo**) → empaquetado con
+`pnpm media:web-video` si va a web. Legible, on-brand, cero créditos, frame-perfect. Detalle en
+`efeonce/STUDIO_TOOLING.md`.
 
 ## Workflow D — "Híbrido mundo-IA + UI real compuesta" (el spot completo)
 

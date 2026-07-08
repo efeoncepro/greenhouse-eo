@@ -40,6 +40,11 @@ Use this reference for any Efeonce public landing page on WordPress/Ohio/Element
      Do not force lateral widget contrast with custom `.elements-bar`, `.social-bar`, `.color-switcher`, header, wrapper, or runtime scroll scripts unless the native mechanism is proven unavailable.
    - For Ohio headers, choose the variant from the first viewport background and verified page metas, not from screenshots: dark hero uses the `header-3` dark overlay contract (`light_variant`, `custom` menu settings, first/root `clb__dark_section`, and `page_header_menu_text_typo` stored as JSON string for first paint); light hero uses the inherit/light-background contract with no dark-section trigger. See `docs/documentation/public-site/wordpress-ohio-elementor-layout.md#playbook-variantes-de-header-ohio`.
    - Do not introduce global selectors for local page rhythm, cards, badges, or hero fixes.
+   - For AI-generated visual assets inside widget placeholders, map the asset
+     by semantic slot id and keep the placeholder as fallback. Prefer optimized
+     WebP covers/frames when the parent component already supplies motion; do
+     not default to multiple autoplay videos just because a slot is labelled
+     `Reel` or `Historia`.
    - For Home-like sticky editorial lanes, prefer Ohio's native `-sticky-block` pattern over Elementor Pro sticky effects:
      apply `-sticky-block` to the lane/column itself, give that lane viewport height, center the inner content, keep page wrappers `overflow:visible`, and make the lane static on mobile. Do not place sticky only on a small inner node, and do not leave an ancestor such as `.site-content` with `overflow-y:auto`; it becomes the sticky scroll container. Verify active sticky samples and the final stop with Playwright.
 
@@ -48,6 +53,9 @@ Use this reference for any Efeonce public landing page on WordPress/Ohio/Element
    - Verify desktop and mobile 390px.
    - Check `scrollWidth == clientWidth` or report exact overflow.
    - For UI/copy changes, inspect computed typography, spacing, overlaps, hover/focus/reduced-motion where relevant.
+   - For lazy-loaded media, verify both the long section capture and
+     slot-by-slot viewport paint when the screenshot looks blank but the DOM
+     reports loaded images.
    - For forms, verify validation states and that no unintended lead/submission is created.
 
 8. **Close**

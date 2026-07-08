@@ -61,17 +61,21 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   `docs/tasks/to-do/TASK-1350-landing-agencia-creativa.md`. Pendiente: dirección de
   arte del hero + contrato de Motion antes de `UI ready: yes`.
 
-- **PDR-005 — Landing "Redes Sociales"** (posicionamiento decidido) + **TASK-1351**
-  (to-do, ui-ux, UI ready no): spoke de servicio `/servicios/redes-sociales` para la
-  gestión de redes (Community · Creators/Influencers · Trendjacking · Reels · social
-  listening) bajo el paraguas creativo (`PDR-004`). Ángulo **outcome + craft moderno +
-  prueba** (no "manejamos tus redes"); build spoke Ohio + sección firma "muro social
-  vivo"; oferta de dos escalones ("Agenda una reunión" + "Pide una auditoría de tus
-  redes"). Head term comercial "agencia de redes sociales" (Semrush CL 170); "community
-  manager" (4.400, job/how-to) → guía pillar en Think. Lidera Efeonce.
-  Ver [PDR-005](decisions/PDR-005-landing-redes-sociales-posicionamiento.md) +
-  `docs/tasks/to-do/TASK-1351-landing-redes-sociales.md`. Pendiente: dirección de arte
-  del muro social + contrato de Motion + wireframe/flow antes de `UI ready: yes`.
+- **PDR-005 — Landing "Redes Sociales"** (posicionamiento decidido; v1 live/noindex) +
+  **TASK-1351** (formalmente `to-do`, ui-ux, UI ready no hasta cierre de lifecycle):
+  spoke de servicio `/servicios/redes-sociales` para la gestión de redes (Community ·
+  Creators/Influencers · Trendjacking · Reels · social listening) bajo el paraguas
+  creativo (`PDR-004`). Ángulo **outcome + craft moderno + prueba** (no "manejamos tus
+  redes"); build spoke Ohio + sección firma "muro social vivo"; oferta de dos escalones
+  ("Agenda una reunión" + "Pide una auditoría de tus redes"). Head term comercial
+  "agencia de redes sociales" (Semrush CL 170); "community manager" (4.400, job/how-to)
+  → guía pillar en Think. Estado runtime: página WordPress `251300` publicada con
+  `noindex`, hero artístico `El mural que alza vuelo` y muro social con 8 assets WebP
+  premium ficticios. Pendiente: aprobar indexación/canonical, cutover HubSpot delivery,
+  cierre formal de TASK-1351 y guía pillar Think.
+  Ver [PDR-005](decisions/PDR-005-landing-redes-sociales-posicionamiento.md),
+  `docs/tasks/to-do/TASK-1351-landing-redes-sociales.md` y
+  `docs/operations/public-site-social-wall-media-production-20260708.md`.
 
 - **PDR-006 — Landing "HubSpot" (Agentic Customer Platform + partnership)** (posicionamiento
   decidido) + **TASK-1352** (ui-ux, UI ready no): **reposiciona la página existente

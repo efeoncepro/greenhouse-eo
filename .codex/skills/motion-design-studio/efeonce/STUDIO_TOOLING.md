@@ -80,7 +80,9 @@ NO uses video IA (deforma texto/logos). Producible por el agente, legible y on-b
    "clickea", burbujas, citas, unfold de ventana, etc. Embebé el **logo real** (`<img src>` a `public/branding/*`).
 2. **Capturá con Playwright** (`recordVideo`, viewport 1280×720): correr el `.mjs` **desde la raíz del repo**
    (el scratchpad NO resuelve `node_modules` → `ERR_MODULE_NOT_FOUND`; copiá el script a la raíz, corré, borralo).
-3. **webm → mp4** con ffmpeg (`-c:v libx264 -pix_fmt yuv420p -r 24`).
+3. **Empaquetado web** con `pnpm media:web-video` cuando el resultado vaya a
+   un sitio/landing: genera WebM + MP4 fallback + poster. Runbook:
+   `docs/operations/web-media-delivery-tooling.md`.
 
 Caso fuente: spot AEO Grader Slice 1 (answer-engine que cita agencias → clic → boleto), 2026-07-05.
 Ventaja: **texto/citas/logos nítidos**, cero costo de créditos IA, control frame-perfect.

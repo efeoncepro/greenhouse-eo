@@ -3,7 +3,7 @@
 > **Tipo:** Product Decision Record (posicionamiento/GTM de una superficie del sitio público).
 > **Estado:** Accepted (posicionamiento) — sesión de diseño con el operador, 2026-07-06.
 > **Skills:** `social-media-studio`, `growth-marketing-cro`, `digital-marketing`, `product-design-loop`, `commercial-expert`, `efeonce-agency`, `seo-aeo`, `efeonce-public-site-wordpress`.
-> **Ejecución:** [`TASK-1351`](../../tasks/to-do/TASK-1351-landing-redes-sociales.md) (spoke de servicio). Epic: `EPIC-019`. Guía pillar "community manager" en Think = follow-up (ver §Consecuencias).
+> **Ejecución:** [`TASK-1351`](../../tasks/to-do/TASK-1351-landing-redes-sociales.md) (spoke de servicio; v1 live/noindex en WordPress page `251300`, cierre formal de lifecycle pendiente). Epic: `EPIC-019`. Guía pillar "community manager" en Think = follow-up (ver §Consecuencias).
 > **No-duplicación:** el sustrato estratégico vive en el context pack y en PDR-004 — este PDR **cita**, no copia: `docs/context/09_marca-agencia.md` (masterbrand Efeonce; Globe = Creatividad/Contenido, Reach = Amplificación), `docs/context/07_ico.md` (cadena de eficiencia → outcome medible), `docs/context/13_icp-buyer-personas-jtbd.md` (Globe ICP), [PDR-004](PDR-004-landing-agencia-creativa-posicionamiento.md) (paraguas creativo + doctrina de marca/CTA/prueba), [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md) (patrón hub `/servicios` + spoke por keyword real; pillar de autoridad va a Think).
 
 ## Contexto
@@ -54,6 +54,14 @@ Build en el patrón de la familia de spokes (`posicionamiento-seo`/`desarrollo-s
 - **Follow-up de contenido (Think):** guía pillar "community manager" (4.400/mes, intención job/how-to) como autoridad top-of-funnel que enlaza a la spoke — bajar a TASK aparte bajo el eje Think/EPIC-020, no bloquea el diseño de la landing.
 - **Gap a resolver en ejecución:** confirmar qué resultados sociales citables existen; si no, cifras ilustrativas declaradas.
 - Coherencia con el paraguas creativo (`PDR-004`): la spoke social es una capability *dentro* de la agencia creativa, no una marca paralela.
+
+## Execution delta 2026-07-08
+
+- La página `/servicios/redes-sociales/` existe como WordPress page `251300`, publicada con `noindex` mientras se aprueba el cutover SEO/canonical.
+- La dirección artística aprobada para el hero pivotó desde la metáfora de viaje/warp a un concepto más social-first: **"El mural que alza vuelo"**, una guacamaya azul/verde de mural urbano que cobra vida. El master web vive en el runtime como paquete `assets/video/social/art-macaws/v1/`.
+- La sección firma "muro social vivo" quedó poblada con 8 assets WebP ficticios premium (`assets/img/social/wall/v1/`) mapeados por slot semántico, no como backgrounds CSS opacos.
+- Aprendizaje operativo canonizado: en un muro ya animado, los placeholders `Reel`/`Historia`/`UGC` no obligan a video; WebP tipo cover/frame puede entregar mejor performance, control visual y QA mobile. Nota completa: `docs/operations/public-site-social-wall-media-production-20260708.md`.
+- La decisión de producto no cambia: la landing sigue siendo outcome + craft moderno + prueba. El video/los assets son evidencia visual de craft, no una nueva marca ni una campaña real atribuida a cliente.
 
 ## Alternativas descartadas
 

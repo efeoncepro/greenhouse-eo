@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-08T05:29:37.261Z",
+  "completedAt": "2026-07-08T05:30:16.961Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "shotId": "studio",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-includes-assets/motion-v1/prompts/studio.md",
+  "reference": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-includes-assets/motion-v1/refs/studio-ref-1280x720.png",
+  "masterPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-includes-assets/motion-v1/masters/includes-studio-production-v1-omni-master.mp4",
+  "outputBytes": 1136841,
+  "videoMimeType": "video/mp4",
+  "usageMetadata": {
+    "promptTokenCount": 2394,
+    "candidatesTokenCount": 28960,
+    "totalTokenCount": 31624,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 374
+      },
+      {
+        "modality": "IMAGE",
+        "tokenCount": 2020
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 28960
+      }
+    ],
+    "thoughtsTokenCount": 270
+  },
+  "responseText": "**Conceptualizing a Production Video**\n\nI will create a video that expands on the provided image, showing a production studio in action. It will begin with a static shot, followed by the crew starting production. Subtle movements and lighting adjustments will enhance realism. The camera will slowly move inward with a parallax effect, and the color palette and film grain will give it a high-quality feel.\n\n\n"
+}

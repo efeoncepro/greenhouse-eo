@@ -77,6 +77,19 @@ src/assets/iconify-icons/generated-icons.css
 # Local generated video projects / HyperFrames pilots. Persist approved outputs
 # via canonical asset storage, not git.
 /videos/
+
+# AI generation binary outputs are local/workspace artifacts, not source.
+# Keep manifests, prompts, scripts and docs in git; publish approved web assets
+# to the runtime/CDN or external artifact storage.
+/ai-generations/**/*.png
+/ai-generations/**/*.jpg
+/ai-generations/**/*.jpeg
+/ai-generations/**/*.webp
+/ai-generations/**/*.gif
+/ai-generations/**/*.mp4
+/ai-generations/**/*.webm
+/ai-generations/**/*.mov
+/ai-generations/**/*.m4v
 # Legacy AI skill artifacts (not the src/lib/ai/ module which is tracked)
 
 

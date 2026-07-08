@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-08T04:36:21.854Z",
+  "completedAt": "2026-07-08T04:37:14.181Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "slotId": "muro-c1",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/prompts/muro-c1.md",
+  "reference": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-c1-ref-720x1280.png",
+  "masterPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-c1-ugc-living-omni-master.mp4",
+  "outputBytes": 2554222,
+  "videoMimeType": "video/mp4",
+  "usageMetadata": {
+    "promptTokenCount": 2467,
+    "candidatesTokenCount": 57920,
+    "totalTokenCount": 60744,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 447
+      },
+      {
+        "modality": "IMAGE",
+        "tokenCount": 2020
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 57920
+      }
+    ],
+    "thoughtsTokenCount": 357
+  },
+  "responseText": "**Developing Dynamic Animation Sequences**\n\nI'm focusing on animating a still image to mimic a genuine social media clip. I'll animate the woman in a selfie-style shot with handheld camera movements, and incorporate subtle film grain and color grading. The animation will begin with her breathing and a brief head tilt. Then, the animation will show a laugh and end with her smiling at the camera, with head turns and glances to bring out a natural feel. I'll add sound design elements like ambient outdoor sound and natural breathing.\n\n\n"
+}

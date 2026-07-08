@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-08T06:17:16.552Z",
+  "completedAt": "2026-07-08T06:18:00.580Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "shotId": "creative-work-spot",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_creative-landing-assets/motion-v1/prompts/creative-work-spot.md",
+  "reference": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_creative-landing-assets/motion-v1/refs/creative-work-spot-ref-1280x720.png",
+  "masterPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_creative-landing-assets/motion-v1/masters/creative-work-spot-v1-omni-master.mp4",
+  "outputBytes": 1280364,
+  "videoMimeType": "video/mp4",
+  "usageMetadata": {
+    "promptTokenCount": 2336,
+    "candidatesTokenCount": 28960,
+    "totalTokenCount": 31538,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 2020
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 316
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 28960
+      }
+    ],
+    "thoughtsTokenCount": 242
+  },
+  "responseText": "**Constructing a Visual Narrative**\n\nI will create a dynamic video. The scene will begin with a hold, followed by a slow dolly push. Simulated light sweeps, realistic lens breathing, and motion blur will be incorporated. The camera will then settle on the product. A matching audio track will be added.\n\n\n"
+}

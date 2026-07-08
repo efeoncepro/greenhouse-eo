@@ -82,6 +82,35 @@ lo pulido-genérico se lee como spam. Doctrina:
   fondos/b-roll, upscaling, subtítulos, versionado por red. **Dónde resta:** falsos testimonios,
   "creadores" sintéticos sin disclosure, review de producto actuado por IA (ver módulos 06/08).
 
+### Living beat vs moving still (aprendizaje validado 2026-07-08)
+
+Para assets sociales generados con IA, especialmente en sitios/decks que muestran
+"trabajo producido", **no confundas movimiento con vida**.
+
+Patrón rechazado: tomar una imagen premium y agregar pan/zoom/glint/partículas.
+Aunque técnicamente se mueva, se lee como poster animado y no como formato social
+vivo.
+
+Patrón aceptado: cada formato que promete footage debe tener una micro-escena
+nativa del formato:
+
+| Formato | Señal de vida mínima |
+|---|---|
+| **UGC** | persona que parpadea/ríe/respira, brazo de selfie, imperfección de cámara, parallax de teléfono |
+| **Historia** | mano/teléfono/reflejo, inclinación humana, screen/mural con profundidad |
+| **Creador/BTS** | ajuste de encuadre, gimbal/phone, gesto de aprobación, sujeto o set en background |
+| **Reel/trend** | cuerpo con contacto real, arco de brazo/paso, reacción de luz/mural, pose final legible |
+| **Post/Carrusel** | puede quedarse estático si su job es editorial; no lo animes por obligación |
+
+Regla de producción: si el placeholder dice `UGC`, `Reel`, `Historia` o
+`Creador`, el prompt debe nombrar comportamientos físicos y sociales
+específicos, no sólo adjetivos como "cinematic". Para el workflow probado con
+Gemini Omni/Vertex, ver `motion-design-studio/workflows/living-social-wall-clips.md`.
+
+Para entrega en sitio/landing, no recrees comandos de conversión: usa
+`pnpm media:web-video` para WebM + MP4 fallback + poster y `pnpm media:webp`
+para WebP. Runbook: `docs/operations/web-media-delivery-tooling.md`.
+
 **Checklist de disclosure antes de publicar:**
 - [ ] ¿Un espectador razonable podría confundir esto con contenido real/humano? → si sí, etiqueta.
 - [ ] ¿Cumple la política de disclosure de IA de la plataforma vigente? (reverifica, es volátil)

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional
 > **Version:** 1.0
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-07-07 por Codex
+> **Ultima actualizacion:** 2026-07-08 por Codex
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime:** WordPress en Kinsta, theme `ohio-child` sobre `ohio`, Elementor / Elementor Pro
@@ -98,6 +98,96 @@ probar first paint/no-JS y revisar el CSS inicial emitido por Ohio.
 6. Ajustar separacion del hero con padding page/widget-scoped; no mover el
    masthead global.
 7. Documentar backup, cache purge y captura desktop/mobile.
+
+## Contrato: menu principal WordPress/Ohio
+
+El sitio publico usa menu clasico de WordPress, no `wp_navigation` de block
+theme. El theme activo `ohio-child` registra la ubicacion `primary`; en la
+inspeccion del 2026-07-07 esa ubicacion apunta al termino `nav_menu` `61`
+(`Menu 1`, slug `menu-1`, `count=23` tras agregar Redes Sociales). Ohio lo renderiza dos veces desde la
+misma fuente: desktop en `nav#site-navigation ul#menu-primary` y mobile en
+`ul#mobile-menu`.
+
+En WordPress, una URL de menu no vive en el template del header. El modelo
+clasico es:
+
+- el menu es un termino de taxonomia `nav_menu`;
+- cada item es un post `post_type=nav_menu_item`;
+- la pertenencia item-menu es una relacion con el termino `nav_menu`;
+- `post_title` es el label visible, `menu_order` define orden y
+  `post_excerpt` guarda el title attribute;
+- `_menu_item_menu_item_parent` define jerarquia;
+- `_menu_item_type`, `_menu_item_object`, `_menu_item_object_id` definen si el
+  item apunta a una pagina/post u objeto WordPress;
+- `_menu_item_url` solo gobierna links custom (`_menu_item_type=custom`,
+  `_menu_item_object=custom`). En items de pagina, la URL sale del permalink
+  del objeto y `_menu_item_url` normalmente queda vacio.
+
+Items confirmados como secciones custom de primer/segundo nivel:
+
+| Label | Item ID | Parent | Tipo | URL |
+| --- | ---: | ---: | --- | --- |
+| Soluciones | `242525` | `0` | custom | `#` |
+| Estrategia & Posicionamiento | `244255` | `242525` | custom | `#` |
+| Experiencia Personalizada | `248605` | `242525` | custom | `#` |
+| Crecimiento Multicanal | `248606` | `242525` | custom | `#` |
+| Servicios Destacados | `248629` | `242525` | custom | `#` |
+| Redes Sociales | `251311` | `248629` | post_type/page `251300` | `/servicios/redes-sociales/` |
+| Recursos | `242524` | `0` | custom | `#` |
+
+Ejemplo confirmado de item de pagina: `AEO (AI Engine Optimization)` es el
+item `250691`, tipo `post_type`, objeto `page`, `object_id=250265`, parent
+`248629`; su URL publica `/aeo-2/` la resuelve WordPress desde el permalink.
+
+Regla operativa: no agregar ni editar menu por SQL ni editando HTML del
+masthead. Para futuras mutaciones, primero snapshot del menu (`wp_get_nav_menus`,
+`get_nav_menu_locations`, `wp_get_nav_menu_items(61)` y metas de cada item),
+luego mutacion con API core (`wp_update_nav_menu_item`) o WP-CLI oficial, purge
+Kinsta y verificacion desktop + mobile.
+
+Aprendizaje de la escritura real de Redes Sociales: si el destino es una pagina
+WordPress, el item correcto es `post_type/page` con `object_id` de la pagina,
+no un link `custom` con la URL copiada a mano. Asi el menu sigue el permalink
+si la ruta cambia. Antes de escribir hay que revisar duplicados por label,
+permalink/URL, `object_id` y parent. En este repo, el camino confiable es
+`pnpm public-website:wpcli -- --eval-file ...`; no asumir que subcomandos
+crudos de WP-CLI pasan por el wrapper. Despues de `wp_update_nav_menu_item()`,
+no llamar `clean_nav_menu_cache()`; purgar con Kinsta/cache flush y validar el
+DOM en `#menu-primary` y `#mobile-menu`.
+
+## Patron: assets AI para placeholders de landing
+
+Cuando un widget publico trae placeholders visuales de formato social, video,
+carrusel, post, UGC o hero, no se debe rellenar el hueco con una imagen
+generica ni interpretar literalmente que todo placeholder `Reel` necesita un
+archivo de video. La decision debe partir de la funcion del bloque:
+
+- si el contenedor ya aporta motion, como el muro `Muestra de trabajo` de
+  Redes Sociales con `data-muro-col`, una familia de WebP premium puede dar mas
+  calidad percibida con menos peso que multiples videos simultaneos;
+- si el placeholder es el foco del primer viewport o una pieza hero, un video
+  o micro-loop puede justificarse, pero debe tener WebM/MP4/poster, fallback y
+  verificacion de autoplay/reduced-motion;
+- si el bloque simula trabajo de portafolio, usar casos ficticios o aprobados;
+  no quemar logos, claims, textos legibles ni marcas de clientes sin derechos
+  confirmados.
+
+El flujo validado en `/servicios/redes-sociales/` el 2026-07-08 fue:
+
+1. Mapear cada slot por `data-image-slot` y proposito de formato.
+2. Definir una direccion visual compartida para que el bloque se lea como una
+   campana, no como una galeria.
+3. Generar fuentes con `pnpm ai:image` / `gpt-image-2` en `ai-generations/`.
+4. Revisar las piezas como sistema con contact sheet antes de publicar.
+5. Convertir con `cwebp`; en este entorno no asumir `ffmpeg -c:v libwebp` ni
+   `sips -s format webp`.
+6. Publicar assets bajo el plugin runtime y mapearlos desde el widget con un
+   registro por slot y fallback, no solo con fondos CSS invisibles.
+7. Verificar desktop/mobile, assets directos `200`, `scrollWidth==clientWidth`
+   y paint real de lazy-load slot por slot cuando la captura larga sea ambigua.
+
+Nota operativa completa:
+`docs/operations/public-site-social-wall-media-production-20260708.md`.
 
 ## Incidente 2026-06-14: `/blog`
 

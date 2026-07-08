@@ -1,0 +1,41 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-07-08T09:05:55.012Z",
+  "run": "ai-generations/2026-07-07_mural-guacamayas-hero",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-07_mural-guacamayas-hero",
+  "totalBytes": 9331818,
+  "fileCount": 5,
+  "files": [
+    {
+      "path": "keyframe-01-eye.png",
+      "sizeBytes": 3022330,
+      "sha256": "b60a36eb694fde49b8ccd9d2eaf3d87c13b06a6ff243208cf34337542776c806",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-07_mural-guacamayas-hero/keyframe-01-eye.png"
+    },
+    {
+      "path": "keyframe-02-wing-breakout.png",
+      "sizeBytes": 2722749,
+      "sha256": "5810c6e6bb8d76392808a62088bdc5cd929248de1063da2fff6fc3487f160f46",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-07_mural-guacamayas-hero/keyframe-02-wing-breakout.png"
+    },
+    {
+      "path": "keyframe-03-flight-trails.png",
+      "sizeBytes": 3105114,
+      "sha256": "7f53ecc7c377fd298102dfc9d4f1764cd66fe862484ec7a2ad10b66dda535093",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-07_mural-guacamayas-hero/keyframe-03-flight-trails.png"
+    },
+    {
+      "path": "review/art-macaws-v1-contact-sheet.jpg",
+      "sizeBytes": 244602,
+      "sha256": "ff849d099f0a2f6ee497d9faf0075700170227ab0f75279987a54390f901577d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-07_mural-guacamayas-hero/review/art-macaws-v1-contact-sheet.jpg"
+    },
+    {
+      "path": "review/art-macaws-v1-web-contact-sheet.jpg",
+      "sizeBytes": 237023,
+      "sha256": "743f76d6e0820b832c212b4de6b66e520f92caf170f9e8102a6cdb78470e3913",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-07_mural-guacamayas-hero/review/art-macaws-v1-web-contact-sheet.jpg"
+    }
+  ]
+}

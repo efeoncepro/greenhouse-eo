@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1351-landing-redes-sociales-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-019`
-- Status real: `Diseno`
+- Status real: `Live noindex v1; cierre formal pendiente`
 - Rank: `TBD`
 - Domain: `public-site`
 - Blocked by: `none`
@@ -83,7 +83,7 @@ Reglas obligatorias:
 - HubSpot Meetings link + UTM — existente (patrón CTA de PDR-004/Agencia Creativa) `[verificar]` el link canónico.
 - CORS / surface-allowlist del form para el origin `efeoncepro.com/servicios/*` — `[verificar]` cubierto (TASK-1335 lo cubrió para la spoke SEO; el origin `/servicios/*` debería estar cubierto).
 - Hub `/servicios` — existente como página mínima (creado en TASK-1343, ID `251077`); esta task cuelga la spoke bajo él.
-- Assets del muro social vivo (art direction) — **pendiente**; bloquea `UI ready: yes`.
+- Assets del muro social vivo (art direction) — v1 producido y publicado: hero artístico `El mural que alza vuelo` + 8 WebP del muro social; el cierre formal de task sigue pendiente de lifecycle/cutover.
 
 ### Blocks / Impacts
 
@@ -109,12 +109,14 @@ Reglas obligatorias:
 - Landings hermanas `/servicios/posicionamiento-seo` (TASK-1343) y `/desarrollo-sitios-web` (TASK-1345) como referencia de patrón spoke.
 - Hub `/servicios` como página mínima (ID `251077`).
 - Datos de keyword Semrush CL (en PDR-005).
+- Página WordPress `251300` live/noindex en `/servicios/redes-sociales/`, con native Efeonce/Ohio masthead/footer, widget modular `eo-elementor-widgets`, hero artístico `assets/video/social/art-macaws/v1/` y muro social con 8 WebP bajo `assets/img/social/wall/v1/`.
+- Landing registry y landing ref creados para Codex/Claude; aprendizaje de assets documentado en `docs/operations/public-site-social-wall-media-production-20260708.md`.
 
 ### Gap
 
-- No existe la página `/servicios/redes-sociales`.
+- El lifecycle formal de TASK-1351 sigue sin cerrarse/moverse; el runtime está live/noindex, pero la task debe pasar por cierre gobernado antes de marcarse `complete`.
 - Copy final (los 5 bloques con su answer capsule, prueba/casos con números reales, FAQ) sin draftear; FAQ pendiente de poblar con `phrase_questions` Semrush CL (seed "gestión de redes sociales"/"community manager").
-- Dirección de arte del muro social vivo sin producir (assets con stack IA propio).
+- Dirección de arte del muro social vivo producida en v1; cualquier nueva iteración es polish/follow-up, no bloqueo de existencia.
 - JSON-LD (Service/Organization/FAQPage/BreadcrumbList) no implementado para esta ruta.
 - Form `efeonce-social-audit` (config de instance) sin crear; entregable operativo de la auditoría sin definir.
 
@@ -335,7 +337,7 @@ Cambio aditivo de contenido en el sitio público (nueva ruta), sin runtime de da
 - [ ] FAQ poblado con queries reales (Semrush `phrase_questions` CL).
 - [ ] Internal links a `/agencia-creativa`, servicios hermanos y guía pillar en Think presentes.
 - [ ] GVC desktop + mobile capturado y mirado; sin scroll horizontal (1440 y 390px); reduced-motion respeta el contenido; muro en movimiento evidenciado en 2+ frames.
-- [ ] `UI ready` sigue `no` hasta que wireframe + `## UI/UX Contract` tengan implementation mapping, GVC scenario plan y design decision log **y** exista la dirección de arte del muro social; si pasa a `yes`, `pnpm task:lint --task TASK-1351` queda sin findings.
+- [ ] `UI ready` sigue `no` hasta que el cierre formal valide implementation mapping, GVC scenario plan, design decision log, dirección de arte v1 y cutover pendiente; si pasa a `yes`, `pnpm task:lint --task TASK-1351` queda sin findings.
 - [ ] `Wireframe`, `Flow` y `Motion` declarados y los archivos existen.
 - [ ] Ruta registrada en el route-ownership matrix + fila en el landing registry + landing file `references/landings/redes-sociales.md`.
 

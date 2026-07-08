@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-08T04:40:22.617Z",
+  "completedAt": "2026-07-08T04:41:15.532Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "slotId": "muro-b3",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/prompts/muro-b3.md",
+  "reference": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/refs/muro-b3-ref-720x1280.png",
+  "masterPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-08_social-wall-assets/motion-v3/masters/muro-b3-trend-living-omni-master.mp4",
+  "outputBytes": 2367386,
+  "videoMimeType": "video/mp4",
+  "usageMetadata": {
+    "promptTokenCount": 2444,
+    "candidatesTokenCount": 57920,
+    "totalTokenCount": 60778,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 2020
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 424
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 57920
+      }
+    ],
+    "thoughtsTokenCount": 414
+  },
+  "responseText": "**Orchestrating a Dynamic Scene**\n\nI'm focused on bringing the image to life. I will animate the character's movement with a dynamic step and arm sweep. The mural will bloom with light, with lens flares reacting to the action. I'll incorporate natural motion blur, a shallow depth of field, and a teal-to-gold color palette. I'll add ambient sounds and ensure a 9:16 aspect ratio.\n\n\n"
+}

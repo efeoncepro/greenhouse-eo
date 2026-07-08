@@ -26,6 +26,7 @@
 | **Reference-Chaining** | que varias tomas IA NO se vean desconectadas (continuidad) | **validado** 2026-07-05 | `reference-chaining.md` |
 | **UI-heavy sin After Effects** | UI/texto/citas/gauge legibles y exactos (mograph HTML + Playwright) | **validado** 2026-07-05 | `ui-without-after-effects.md` |
 | **Híbrido mundo-IA + UI real** | spot completo: mundo IA + producto crisp compuesto | **validado (patrón)** | `hybrid-world-plus-ui.md` |
+| **Living Social Wall Clips** | micro-clips vivos por formato social (UGC/Reel/Historia/Creador) sin caer en pan/zoom de stills | **validado** 2026-07-08 | `living-social-wall-clips.md` |
 
 ## Estructura estándar de un workflow
 

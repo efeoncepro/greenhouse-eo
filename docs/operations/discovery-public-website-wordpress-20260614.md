@@ -167,6 +167,108 @@
 | wp_template | Plantillas | templates |
 | wp_template_part | Partes de plantilla | template-parts |
 
+## Discovery delta 2026-07-07: classic navigation menu
+
+Read-only discovery for how WordPress stores and renders a URL in the public
+site menu found:
+
+- WordPress version observed by WP-CLI: `7.0`.
+- Active theme: `ohio-child`; parent `ohio`.
+- Registered nav menus: `primary => Primary`.
+- Theme mod `nav_menu_locations.primary = 61`.
+- Menu term `61`: `Menu 1`, slug `menu-1`, `count=23` after the
+  2026-07-07 Redes Sociales menu item addition.
+- Frontend desktop render: `nav#site-navigation ul#menu-primary` with 23
+  anchors.
+- Frontend mobile render: `ul#mobile-menu` with the same 23 anchors.
+- REST advertises `/wp/v2/menu-items`, `/wp/v2/menus`,
+  `/wp/v2/menu-locations` and `/wp/v2/navigation`.
+
+Storage model for classic menus:
+
+- menu container: taxonomy term `nav_menu`;
+- item: post `post_type=nav_menu_item`;
+- item order: `menu_order`;
+- visible label: `post_title`;
+- title attribute: `post_excerpt`;
+- parent hierarchy: `_menu_item_menu_item_parent`;
+- item type/object: `_menu_item_type`, `_menu_item_object`,
+  `_menu_item_object_id`;
+- custom URL: `_menu_item_url` only for custom items.
+
+Confirmed section/header item IDs:
+
+| Label | Item ID | Parent | Type | URL |
+| --- | ---: | ---: | --- | --- |
+| Soluciones | `242525` | `0` | custom | `#` |
+| Estrategia & Posicionamiento | `244255` | `242525` | custom | `#` |
+| Experiencia Personalizada | `248605` | `242525` | custom | `#` |
+| Crecimiento Multicanal | `248606` | `242525` | custom | `#` |
+| Servicios Destacados | `248629` | `242525` | custom | `#` |
+| Redes Sociales | `251311` | `248629` | post_type/page `251300` | `/servicios/redes-sociales/` |
+| Recursos | `242524` | `0` | custom | `#` |
+
+Confirmed page item example: `AEO (AI Engine Optimization)` is menu item
+`250691`, `type=post_type`, `object=page`, `object_id=250265`, parent
+`248629`, public URL `/aeo-2/`.
+
+Confirmed mutation follow-up: `Redes Sociales` was added as item `251311`,
+`type=post_type`, `object=page`, `object_id=251300`, parent `248629`
+(`Servicios Destacados`). Backup option before write:
+`_gh_backup_before_menu_social_20260707T205950Z`.
+
+Initial discovery did not mutate the menu. The 2026-07-07 follow-up above did
+add the approved service item. Future writes should snapshot the menu first,
+use `wp_update_nav_menu_item()` or the official WP-CLI menu item commands,
+purge Kinsta and verify both desktop/mobile menu renders.
+
+Operational lessons from the successful Redes Sociales write:
+
+- A menu URL is not stored in Ohio header markup. It is represented as a
+  `nav_menu_item` post attached to the `nav_menu` term.
+- For a WordPress page, prefer a `post_type` item with
+  `menu-item-object=page` and `menu-item-object-id=<PAGE_ID>`. The href is then
+  resolved from the page permalink. `_menu_item_url` is authoritative only for
+  `custom` menu items.
+- Before insert/update, normalize and compare existing items by label,
+  URL/permalink, `object_id` and parent. This prevents duplicate service items
+  under the same dropdown.
+- The safe agent path in this repo is the WP-CLI wrapper with `--eval-file`;
+  raw `wp option get` / `wp post get` style subcommands are not guaranteed to
+  pass through that wrapper.
+- Avoid calling `clean_nav_menu_cache()` from eval scripts. It is not a stable
+  public runtime function here. Rely on `wp_update_nav_menu_item()`, then purge
+  cache with `wp cache flush` / `wp kinsta cache purge --all`.
+- Verification must inspect the rendered desktop and mobile menus
+  (`#menu-primary`, `#mobile-menu`), not only WordPress data.
+
+## Discovery delta 2026-07-08: landing media asset rollout
+
+The Redes Sociales wall asset rollout added an operational pattern for public
+landing media that lives outside the WordPress media library:
+
+- For custom Elementor widgets in `eo-elementor-widgets`, small owned media
+  packages can live under the plugin runtime when they are part of the widget
+  contract and not editorial WordPress uploads.
+- The widget should map assets by semantic slot id (`muro-a1`, `muro-a3`,
+  etc.) and keep the original placeholder as fallback. This keeps the DOM
+  measurable and prevents hidden CSS-only backgrounds from becoming the only
+  source of truth.
+- For animated walls, still WebP covers/frames can be the correct artifact
+  even when the visible label is `Reel`, `Historia` or `UGC`; the parent wall
+  already supplies motion.
+- In this local environment, `cwebp` is the reliable WebP conversion path.
+  `ffmpeg` may not include `libwebp`, and `sips` may not write WebP.
+- Long mobile screenshots can mislead with lazy-loaded media. If Playwright
+  reports `complete=true` but a long stitched capture looks blank/dark, run a
+  slot-by-slot scroll/decode capture before changing production CSS.
+- Kinsta file deploys for this pattern must remain scoped: remote tar backup,
+  upload exact widget/CSS/assets, remote `php -l`, OPcache/cache reset, Kinsta
+  purge, then live desktop/mobile verification.
+
+Canonical note for this session:
+`docs/operations/public-site-social-wall-media-production-20260708.md`.
+
 ### Authenticated Plugins Endpoint
 
 | Plugin | Status | Name | Version |
