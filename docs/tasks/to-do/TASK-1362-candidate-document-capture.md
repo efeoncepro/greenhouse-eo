@@ -74,7 +74,7 @@ Reglas obligatorias:
 - `src/lib/storage/greenhouse-assets.ts` (plataforma de assets privados)
 - `src/app/api/assets/private/route.ts` + `src/app/api/assets/private/[assetId]/route.ts`
 - `src/types/assets.ts` (`GreenhouseAssetContext` + mapas por-contexto)
-- `greenhouse_core.person_identity_documents` + `src/lib/person-legal-profile/**` (TASK-784) `[verificar]`
+- `greenhouse_core.person_identity_documents` + `src/lib/person-legal-profile/**` (TASK-784 — complete)
 
 ### Blocks / Impacts
 
@@ -97,7 +97,7 @@ Reglas obligatorias:
 ### Already exists
 
 - Plataforma de assets privados: `createPrivatePendingAsset` / `attachAssetToAggregate` / `canTenantAccessAsset` / `downloadPrivateAsset`, bucket `GREENHOUSE_PRIVATE_ASSETS_BUCKET`, allowlist MIME/tamaño + dedup por hash + `asset_access_log` append-only.
-- `person_identity_documents` (TASK-784) anclado a `identity_profile_id`, masked/reveal + capability `person.legal_profile.reveal_sensitive` + audit, con `evidence_asset_id` → assets `[verificar]`.
+- `person_identity_documents` (TASK-784 — complete, store `src/lib/person-legal-profile/**`) anclado a `identity_profile_id`, masked/reveal + capability `person.legal_profile.reveal_sensitive` + audit, con `evidence_asset_id` → assets.
 - `candidate_facet` con columnas de consentimiento (TASK-353).
 
 ### Gap

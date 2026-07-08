@@ -1,5 +1,12 @@
 # TASK-355 — Hiring Desk Internal Workspaces & Publication Governance
 
+## Delta 2026-07-08
+
+- **El Application 360 ahora hospeda el Assessment.** El motor de assessment por competencias (TASK-1360) + su superficie de review (TASK-1363) se **embeben en el Application 360** de esta task: el **scorecard por competencia** (advisory, nunca auto-rechaza) + la **cola de corrección de respuestas abiertas** aparecen como un tab/bloque del 360. La "evaluations" genérica del Slice 2 se concreta en eso. `Out of Scope` "IA evaluativa" se refina: la IA existe (TASK-1361) pero **propone, un humano confirma** — 355 muestra la sugerencia + botón confirmar, no la construye. Dependencia bidireccional real con TASK-1363 (que dice embeberse en el 360 de 355).
+- **Documentos del candidato:** el 360 muestra CV/portafolio/identidad vía el **resolver de TASK-1362** (assets privados + `person_identity_documents` masked/reveal), no lógica propia. La identidad es masked por default; revelar exige capability `person.legal_profile.reveal_sensitive` + razón + audit.
+- **Endpoint de decisión (`hiring.application.decide`):** lo construye esta task (la capability ya está seedeada/grantada por 353) — setea `decision` + snapshot de handoff en `hiring_application` (los campos existen). Alimenta a TASK-356 (handoff).
+- **Formato + contratos UI:** spec de plantilla vieja (sin `Execution profile`/`UI impact`/`UI ready`/`Wireframe`/`Flow`). Es una task **`ui-platform`** grande (kanban + 360 + publication desk) → al tomarla, migrar a formato nuevo y crear los contratos de UI robustos (wireframe/flow, como TASK-1363) antes de `UI ready`.
+
 ## Delta 2026-07-07
 
 - **Desbloqueada:** `TASK-353` (foundation) completa. Readers/commands + 8 capabilities + API `/api/hiring/**` ya existen (consumí esos, no logica paralela).

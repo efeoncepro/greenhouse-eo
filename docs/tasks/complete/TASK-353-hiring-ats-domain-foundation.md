@@ -1,5 +1,10 @@
 # TASK-353 — Hiring / ATS Domain Foundation
 
+## Delta 2026-07-08 (post-cierre — auditoría)
+
+- **Test de regresión del store agregado:** `src/lib/hiring/store.live.test.ts` (live PG, skip-gated sin PG) cubre la semántica SQL que antes solo se había smoke-verificado: upsert `ON CONFLICT ... COALESCE` de `reconcileCandidateFacet`, dedupe estructural 409, guard de publish 422 y el toggle de listado público. Cierra el gap de "sin guard de regresión" detectado en la auditoría (disciplina SQL embebido ISSUE-071/893).
+- **Doc funcional + manual diferidos (Platform Documentation Protocol):** `docs/documentation/` y `docs/manual-de-uso/` de Hiring NO se crearon en 353 a propósito — la foundation no tiene comportamiento visible/operable todavía. Se crean con la primera superficie de usuario (**TASK-354** careers público / **TASK-355** desk interno). La doc técnica (arquitectura + EVENT_CATALOG) sí quedó al cierre.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

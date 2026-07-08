@@ -1,5 +1,10 @@
 # TASK-770 — Hiring to HRIS Collaborator Activation
 
+## Delta 2026-07-08
+
+- **Blockers recalibrados:** `TASK-353` y `TASK-030` ya están **complete** (viven en `docs/tasks/complete/`). El **único blocker vivo es `TASK-356`** (handoff). Las rutas en `Depends on`/`Normative Docs`/`Already exists` que apuntan a `to-do/TASK-353-…`, `to-do/TASK-030-…`, `to-do/TASK-763-…` están **stale** → los tres viven en `complete/`.
+- **Foundation real disponible:** `greenhouse_hiring` + `hiring_application` (con snapshot de handoff embebido) existen; `candidate_facet.identity_profile_id` es la raíz (candidato→member sobre el MISMO `identity_profile_id`, sin duplicar persona).
+- **Co-ownership con TASK-356 — resolver antes de tomar en paralelo:** ambas tocan `src/lib/hiring/handoff/**` + `src/lib/person-360/**`, y la **cola `internal_hire_ready_for_onboarding`** aparece en el Slice 3.5 de 356 (que la produce) y en 770 (que la consume). **Decisión canónica:** **TASK-356 es dueña del contrato de la cola** (la produce como read-model/outbox); **TASK-770 la consume**, no la redefine. 770 solo owns el lado HRIS/People (crear/promover `member` + onboarding + readiness).
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -247,6 +252,45 @@ Estados:
 - `ready_to_activate`: readiness completa, falta confirmación final.
 - `active`: colaborador activo.
 - `cancelled`: activación cancelada sin activar colaborador.
+
+## Rollout Plan & Risk Matrix
+
+Sección canónica (agregada 2026-07-08 en la auditoría; 770 predataba esta sección). Task crítica: toca `member`/identity/onboarding/HRIS — la matriz es load-bearing.
+
+### Slice ordering hard rule
+
+- El único blocker vivo es `TASK-356` (produce la cola/contrato `internal_hire_ready_for_onboarding`). NO tomar 770 antes de que 356 exponga ese contrato.
+- Orden interno: consumir handoff aprobado → crear/promover `member` sobre el mismo `identity_profile_id` (idempotente) → abrir onboarding → readiness checks → activar. **NUNCA** activar `member`/access/payroll antes de readiness completa.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Persona duplicada (member paralelo en vez de faceta sobre el mismo profile) | identity | medium | crear member sobre el `identity_profile_id` del candidato; guard de unicidad | drift person-360 |
+| Activación prematura (payroll/access antes de readiness) | payroll / identity | high | state machine con `ready_to_activate` obligatorio antes de `active`; gate | member activo sin readiness |
+| Reintento del handoff duplica member/onboarding | hris | medium | idempotencia por handoff id + claim atómico | doble member/onboarding |
+| Co-ownership de la cola con 356 | data | low | 356 dueña del contrato; 770 solo consume | ambigüedad de owner |
+
+### Feature flags / cutover
+
+- Flag de activación (`*_ENABLED` default OFF) hasta shadow verde en staging con un caso `internal_hire` real; registrar en `FEATURE_FLAG_STATE_LEDGER.md`. Cutover = flip post-smoke.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| member/onboarding create | revertir la transición de state + flag off; member queda en estado previo (supersede, no delete) | <15 min | parcial |
+| activación | flag off + no activar; readiness queda pendiente | <10 min | si |
+
+### Production verification sequence
+
+1. Staging: handoff `internal_hire` aprobado (TASK-356) → activación con flag ON → verify member creado sobre el mismo `identity_profile_id`, onboarding abierto, payroll/access NO activos hasta readiness.
+2. Verify idempotencia (reintento no duplica).
+3. Prod con cooldown + monitoreo de signals.
+
+### Out-of-band coordination required
+
+- Coordinación con People/HRIS (onboarding real) + sign-off antes de activar colaboradores en prod. Depende del contrato de cola de TASK-356.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

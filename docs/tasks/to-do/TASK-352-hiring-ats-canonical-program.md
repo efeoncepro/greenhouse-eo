@@ -1,5 +1,12 @@
 # TASK-352 — Hiring / ATS Canonical Program
 
+## Delta 2026-07-08
+
+- **Source-of-truth del programa = `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md`.** El epic gobierna la secuencia, los gates y la lista completa de child tasks (incluidas las nuevas). Esta umbrella queda como puntero histórico; ante divergencia, **prevalece EPIC-011**.
+- **Estado real (recalibración):** `TASK-353` (foundation) ya está **complete** — el schema `greenhouse_hiring`, el store `src/lib/hiring/**`, la API `/api/hiring/**` y las 8 capabilities `hiring.*` **YA EXISTEN**. Las secciones `Current Repo State > Already exists`/`Gap` y el Slice 1 de abajo describen 353 en futuro y están **desactualizadas** (leerlas como historia).
+- **Child tasks reales del programa** (fuente: EPIC-011): `352` (esta umbrella) · `353` ✓ · `354` careers público · `355` desk interno · `356` handoff/reactividad · `770` activación HRIS · **extensión Assessment + Doc Capture**: `1360` engine · `1361` AI assist · `1362` document capture · `1363` taking/review UI · `1364` validity loop · `1365` fairness monitor.
+- **Auditoría 2026-07-08:** el drift de esta umbrella (stale + `Files owned` sin 1360-1365) queda resuelto apuntando a EPIC-011; no se re-lista todo acá para evitar doble SoT.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

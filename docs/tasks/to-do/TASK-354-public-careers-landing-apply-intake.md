@@ -1,5 +1,11 @@
 # TASK-354 — Public Careers Landing & Apply Intake
 
+## Delta 2026-07-08
+
+- **La carga de archivos (CV/portafolio-archivo) es de `TASK-1362` (Candidate Document Capture), NO de esta task.** 1362  owns los contextos de asset hiring (`hiring_application_cv`/`hiring_candidate_portfolio_file`), el `canAccessHiringAsset` y la quarantine/scan. → Sacar de `Files owned` de 354: `src/types/assets.ts`, `src/lib/storage/greenhouse-assets.ts`, `src/app/api/assets/private/route.ts` (evita colisión de ownership). 354 V1 sigue siendo **links-only** (portafolio como enlace en `candidate_facet`); el upload de archivo se habilita cuando 1362 shippee su Slice 4 (scan). `Blocked by` efectivo si se quiere upload: `TASK-353` (+ `TASK-1362` para archivos).
+- **Relación con el Assessment (TASK-1363):** el **shell público tokenizado** que construye esta task es el patrón que 1363 reutiliza para la rendición del test (`/assessment/[token]`). No es dependencia dura, pero conviene diseñar el shell reusable. El test NO se dispara en el apply (se envía después desde el desk).
+- **Formato:** esta spec es de plantilla vieja (sin `Execution profile`/`UI impact`/`UI ready`/`Backend impact`). Es un **híbrido UI (careers) + backend (apply service)** → al tomarla, partir en `backend-data` (apply service + schema `zod` + reconciliación) + `ui-ux` (careers, con `Wireframe`/`Flow`), o justificar el híbrido; declarar los contratos de UI antes de `UI ready`.
+
 ## Delta 2026-07-07
 
 - **Desbloqueada:** `TASK-353` (foundation) completa. El runtime real existe — NO uses mocks. Contratos a consumir:

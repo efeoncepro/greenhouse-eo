@@ -22,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-1360`
+- Blocked by: `TASK-1360`, `TASK-354`, `TASK-355`
 - Branch: `task/TASK-1363-assessment-taking-review-surface`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -94,9 +94,14 @@ Reglas obligatorias:
 
 ### Already exists
 
-- Motor de assessment (TASK-1360): readers/commands + contrato de token + scoring/rollup.
-- Shell público tokenizado (TASK-354) + Application 360 (TASK-355) como hosts.
-- Primitives UI Platform (Composition Shell, inputs canónicos).
+- Foundation Hiring/ATS (TASK-353, ✓ complete): `greenhouse_hiring` + store `src/lib/hiring/**` + API `/api/hiring/**` + capabilities `hiring.*`.
+- Primitives UI Platform (Composition Shell, inputs canónicos, drawer/sidecar).
+
+### Pendiente (blocked-by, NO existe todavía)
+
+- Motor de assessment (TASK-1360, `to-do`): readers/commands + contrato de token + scoring/rollup + capabilities `hiring.assessment.*`.
+- Shell público tokenizado (TASK-354, `to-do`) — host de la rendición.
+- Application 360 (TASK-355, `to-do`) — host del scorecard/review.
 
 ### Gap
 
