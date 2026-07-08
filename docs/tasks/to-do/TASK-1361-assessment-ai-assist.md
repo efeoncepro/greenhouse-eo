@@ -58,6 +58,7 @@ Reglas obligatorias:
 
 - La IA **propone**, un humano **confirma**: el LLM NUNCA escribe el score final ni aprueba una pregunta directo. La mutación ocurre solo en el endpoint de confirmación humana.
 - NUNCA instanciar un SDK LLM paralelo dentro del dominio: usar los helpers estructurados canónicos de `src/lib/ai/*` (`generateStructured{Anthropic,OpenAI,Gemini}`).
+- Modelo por sub-tarea (decisión 2026-07-08, ver §Detailed Spec): **grading = Claude Sonnet 5** (defensibilidad AI-Act), **generación de preguntas = Gemini Flash/Haiku 4.5** (barato, el SME gatea). Provider como seam de config, jamás hardcodeado; el eval baseline confirma el default.
 - Eval baseline obligatorio antes de cutover; sin baseline, el scoring IA no shippea.
 - Flag default OFF; el score IA propuesto es visible como sugerencia, nunca como resultado canónico hasta confirmación.
 - El boundary de TASK-1360 se mantiene: score ortogonal a payroll/ICO, nunca auto-reject.
@@ -192,12 +193,12 @@ Reglas obligatorias:
 
 ### Slice 2 — Question generation (propose)
 
-- `proposeQuestionsForCompetency(competencyKey, level, count)` usando `generateStructured*` de `src/lib/ai/*`; guarda propuestas `question_draft`.
+- `proposeQuestionsForCompetency(competencyKey, level, count)` usando `generateStructuredGemini` (tier barato — Gemini Flash / Haiku 4.5, ver §Selección de provider/modelo) de `src/lib/ai/*`; guarda propuestas `question_draft`. El SME las gatea igual.
 - Endpoint `/api/hiring/assessments/ai/questions/propose` (capability `hiring.assessment.ai_assist`).
 
 ### Slice 3 — Response scoring (propose)
 
-- `proposeScoreForResponse(responseId)` para `open_text`/`situational`, con score + justificación estructurada.
+- `proposeScoreForResponse(responseId)` para `open_text`/`situational`, con score + justificación estructurada, usando `generateStructuredAnthropic` (Claude Sonnet 5, tier calidad/defensibilidad — ver §Selección de provider/modelo).
 - La propuesta se muestra como sugerencia; el score canónico solo se aplica vía la cola de corrección humana de TASK-1360 (confirmación).
 
 ### Slice 4 — Eval baseline + flag
@@ -214,6 +215,22 @@ Reglas obligatorias:
 ## Detailed Spec
 
 Reutilizar el patrón de scoring IA gobernado del AI Visibility grader (`src/lib/growth/ai-visibility/**`) como referencia de "IA propone, contrato gobierna" `[verificar]`. La propuesta estructurada usa `generateStructured*`; el schema de salida fuerza `{score, rationale, perCriterion?}`. La confirmación humana es el único path que toca el rollup canónico de TASK-1360.
+
+### Selección de provider/modelo (decisión 2026-07-08)
+
+No se elige **un solo modelo para todo**: las dos sub-tareas tienen exigencias distintas. El `model` viaja en cada `hiring_assessment_ai_proposal` (trazabilidad), y el provider es un **seam de config** detrás del router interno (`src/lib/ai/*`, TASK-1085) — jamás hardcodeado; swappear el modelo no cambia el `propose → confirm`.
+
+| Sub-tarea | Modelo por defecto | Helper | Rationale |
+|---|---|---|---|
+| **Corrección propuesta** de `open_text`/`situational` (grading contra rúbrica) | **Claude Sonnet 5** (`claude-sonnet-5`) | `generateStructuredAnthropic` | Es lo legalmente sensible (hiring-AI = alto riesgo EU AI Act; el output alimenta una decisión sobre una persona). Prioriza consistencia siguiendo rúbrica + juicio defendible sobre ahorro marginal (volumen por run bajo). |
+| **Generación** de preguntas por competencia+nivel | **Gemini Flash** (o **Haiku 4.5**) | `generateStructuredGemini` | Un SME humano las gatea igual (`draft→sme_review→active` de TASK-1360), así que costo/latencia > perfección; el error se atrapa en el gate SME. |
+
+Reglas de esta decisión:
+
+- **Un solo grader en producción** (no ensemble) para que el eval baseline y la documentación técnica del EU AI Act tengan un baseline claro que monitorear por drift.
+- **Sonnet 5 es el default de arranque para grading, no un veredicto cerrado**: el eval baseline (Slice 4) decide empíricamente cuál grader correlaciona mejor con la corrección del SME. Si otro provider gana el eval, se swappea por el seam sin tocar el contrato.
+- Gemini Omni/Vertex se reserva para multimodal; acá es texto→estructura puro, no aplica.
+- El secreto del provider se resuelve server-side (`greenhouse-*-api-key` / `*_SECRET_REF`); nunca hardcodear la key.
 
 ## Rollout Plan & Risk Matrix
 
@@ -296,5 +313,5 @@ Reutilizar el patrón de scoring IA gobernado del AI Visibility grader (`src/lib
 
 ## Open Questions
 
-- ¿Qué provider LLM por defecto para scoring de assessment (Gemini/Vertex vs Anthropic vs OpenAI)? Resolver en Discovery según `src/lib/ai/*` disponible + costo.
+- ~~¿Qué provider LLM por defecto para scoring de assessment?~~ **RESUELTO 2026-07-08** (ver §Detailed Spec → Selección de provider/modelo): split por sub-tarea — **grading = Claude Sonnet 5** (`generateStructuredAnthropic`, calidad/defensibilidad AI-Act) + **generación de preguntas = Gemini Flash/Haiku 4.5** (`generateStructuredGemini`, barato, el SME gatea). Provider como seam de config; Sonnet 5 es default de arranque, el eval baseline (Slice 4) lo confirma o swappea.
 - ¿El eval baseline se versiona como dataset en el repo o vive en un artefacto externo? Preferir dataset versionado pequeño + evidencia de corrida.
