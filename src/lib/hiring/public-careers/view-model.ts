@@ -61,6 +61,25 @@ const firstTermIndex = (text: string, terms: string[]): number => {
   return indexes.length ? Math.min(...indexes) : -1
 }
 
+const isLegacyRemoteRegionLabel = (normalized: string): boolean => {
+  const token = normalized.replace(/[^a-z0-9]+/g, ' ').trim()
+
+  return [
+    'latam',
+    'latinoamerica',
+    'latin america',
+    'america latina',
+    'global',
+    'worldwide',
+    'mundo',
+    'chile',
+    'colombia',
+    'mexico',
+    'peru',
+    'argentina',
+  ].includes(token)
+}
+
 const splitParagraphs = (value: string | null | undefined, fallback: string): string[] => {
   const source = value?.trim()
 
@@ -242,6 +261,10 @@ const resolveModality = (
     return { label: normalized.includes('onsite') || normalized.includes('office') ? 'Onsite' : 'Presencial', kind: 'onsite', icon: 'tabler-building' }
   }
 
+  if (isLegacyRemoteRegionLabel(normalized)) {
+    return { label: 'Remoto', kind: 'remote', icon: 'tabler-world' }
+  }
+
   return { label, kind: 'flexible', icon: 'tabler-adjustments-horizontal' }
 }
 
@@ -309,22 +332,26 @@ const deriveSkillChips = (opening: PublicOpeningPayload, copy: CareersCopy): str
 
   const canonicalRules: Array<{ label: string; terms: string[] }> = [
     { label: 'SEO', terms: ['seo', 'organic', 'organico', 'keywords', 'on-page', 'search'] },
-    { label: 'Marketing generalista', terms: ['marketing generalista', 'marketing digital', 'campaign', 'campana', 'funnel'] },
+    { label: 'Account management', terms: ['account management', 'cuentas', 'account manager', 'relacion diaria con clientes'] },
+    { label: 'Marketing generalista', terms: ['marketing generalista', 'marketing digital', 'marketing', 'campaign', 'campana', 'funnel'] },
     { label: 'Vendor management', terms: ['vendor', 'proveedor', 'proveedores', 'especialistas externos'] },
     { label: 'Comunicación con clientes', terms: ['cliente', 'clientes', 'stakeholder', 'stakeholders', 'comunicacion'] },
-    { label: 'Liderazgo operativo', terms: ['liderazgo', 'ownership', 'priorizar', 'riesgos', 'operativo'] },
-    { label: 'Account management', terms: ['account management', 'cuentas', 'account manager'] },
+    { label: 'Liderazgo operativo', terms: ['liderazgo', 'ownership', 'priorizar', 'prioridades', 'riesgos', 'coordinar especialistas', 'operativo'] },
     { label: 'Growth', terms: ['growth', 'crecimiento', 'cro'] },
     { label: 'Performance marketing', terms: ['performance', 'paid media', 'ads', 'medios'] },
     { label: 'Contenido', terms: ['contenido', 'content'] },
+    { label: 'HubSpot', terms: ['hubspot'] },
     { label: 'Automatización', terms: ['automatizacion', 'automation'] },
+    { label: 'TypeScript', terms: ['typescript'] },
+    { label: 'React', terms: ['react'] },
+    { label: 'PostgreSQL', terms: ['postgresql', 'postgres'] },
   ]
 
   const addChip = (rawChip: string): void => {
     const chip = cleanText(rawChip).replace(/\.$/, '')
     const key = normalizeText(chip)
 
-    if (!chip || chip.length > MAX_CHIP_LENGTH || seen.has(key)) return
+    if (!chip || chip.length > MAX_CHIP_LENGTH || seen.has(key) || chips.length >= MAX_CHIPS) return
 
     seen.add(key)
     chips.push(chip)
@@ -338,10 +365,18 @@ const deriveSkillChips = (opening: PublicOpeningPayload, copy: CareersCopy): str
     if (chips.length >= MAX_CHIPS) break
   }
 
+  if (chips.length >= MAX_CHIPS) return chips.slice(0, MAX_CHIPS)
+
   for (const candidate of candidates) {
     const shortened = cleanText(candidate)
       .replace(/^(experiencia|experience|dominio|manejo|conocimiento|knowledge)\s+(en|with|of)\s+/i, '')
       .replace(/\.$/, '')
+
+    const normalizedShortened = normalizeText(shortened)
+
+    if (/^(experiencia|experience|nociones|capacidad|familiaridad|conocimiento|dominio|manejo)\b/.test(normalizedShortened)) {
+      continue
+    }
 
     const beforeSeparator = shortened.split(/[:;,]/)[0] ?? shortened
     const words = beforeSeparator.split(/\s+/)

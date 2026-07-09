@@ -153,6 +153,49 @@ describe('careers public view model', () => {
     expect(JSON.stringify(vm)).not.toContain('híbrido según')
   })
 
+  it('does not render a legacy remote region as the modality', () => {
+    const vm = buildCareersOpeningViewModel(
+      {
+        ...opening,
+        locationMode: 'LATAM',
+        workMode: null,
+        hiringRegion: null,
+      },
+      copy,
+    )
+
+    expect(vm.location).toBe('LATAM')
+    expect(vm.modality).toBe('Remoto')
+    expect(vm.modalityKind).toBe('remote')
+    expect(vm.location).not.toBe(vm.modality)
+  })
+
+  it('keeps legacy Account Manager chips canonical instead of rendering prose snippets', () => {
+    const vm = buildCareersOpeningViewModel(
+      {
+        ...opening,
+        title: 'Account Manager / Especialista en Marketing',
+        summary: 'Lidera cuentas de crecimiento combinando criterio operativo, marketing generalista y coordinación de especialistas.',
+        locationMode: 'LATAM',
+        workMode: null,
+        hiringRegion: null,
+        skillTags: [],
+        requirements:
+          'Experiencia operando cuentas, proyectos o clientes de marketing digital.\nNociones prácticas de SEO, contenido, performance o growth.\nCapacidad de ordenar prioridades, levantar riesgos y coordinar especialistas.',
+        niceToHave:
+          'Experiencia en agencia, consultora o equipos de crecimiento.\nFamiliaridad con HubSpot, analytics, paid media o automatización.',
+      },
+      copy,
+    )
+
+    expect(vm.modality).toBe('Remoto')
+    expect(vm.location).toBe('LATAM')
+    expect(vm.skillChips).toEqual(['Account management', 'SEO', 'Liderazgo operativo', 'Growth'])
+    expect(vm.skillChips.join(' ')).not.toContain('Experiencia operando')
+    expect(vm.skillChips.join(' ')).not.toContain('Nociones prácticas')
+    expect(vm.skillChips.join(' ')).not.toContain('Capacidad de ordenar')
+  })
+
   it('keeps a real location for hybrid roles', () => {
     const vm = buildCareersOpeningViewModel(
       {
