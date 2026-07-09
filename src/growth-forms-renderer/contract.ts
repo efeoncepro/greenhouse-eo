@@ -150,6 +150,12 @@ export interface RendererTokenizedReportBehavior {
   statusPathTemplate: string
 }
 
+// TASK-1375 — Config del handoff de descarga GATED de asset (espejo browser-safe de la SoT). El
+// renderer sustituye `{handle}` por el `submissionId` y emite `download_url` en el evento accepted.
+export interface RendererAssetDownloadBehavior {
+  downloadPathTemplate: string
+}
+
 export interface RendererSuccessBehavior {
   kind: RendererSuccessKind
   presentation?: RendererSuccessPresentation
@@ -166,6 +172,7 @@ export interface RendererSuccessBehavior {
   supportingNoteCopyRef?: string
   redirectUrl?: string
   tokenizedReport?: RendererTokenizedReportBehavior
+  assetDownload?: RendererAssetDownloadBehavior
 }
 
 export interface RendererStep {

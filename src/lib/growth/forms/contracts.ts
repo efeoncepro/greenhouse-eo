@@ -180,6 +180,10 @@ export const TELEMETRY_ALLOWED_PAYLOAD_KEYS = [
   // NUNCA lleva PII, reportToken (sólo aparece al hacer poll cuando `ready`) ni ids internos.
   'run_handle',
   'status_url',
+  // TASK-1375 asset download handoff — URL pública GATED de descarga del asset (ebook) con el
+  // handle (submissionId) ya embebido. browser-safe: es la API pública canónica; sin form
+  // completado no hay handle. NUNCA lleva object_name, bucket ni signed-URL.
+  'download_url',
 ] as const
 export type TelemetryAllowedPayloadKey = (typeof TELEMETRY_ALLOWED_PAYLOAD_KEYS)[number]
 
@@ -401,11 +405,40 @@ export const tokenizedReportBehaviorSchema = z
   .strict()
 export type TokenizedReportBehavior = z.infer<typeof tokenizedReportBehaviorSchema>
 
+/**
+ * TASK-1375 — Config del handoff de descarga GATED de asset (ebook lead magnet). Espejo del
+ * `tokenizedReportBehaviorSchema`: `downloadPathTemplate` es una ruta relativa bajo /api/public/
+ * con `{handle}` (browser-safe; el handle = submissionId ya cruza al browser). El renderer
+ * sustituye `{handle}` y emite `download_url` para la descarga on-screen post-submit. El
+ * object_name/bucket NUNCA cruzan (server-only en `form_asset`). Es el leak boundary.
+ */
+export const assetDownloadBehaviorSchema = z
+  .object({
+    downloadPathTemplate: z
+      .string()
+      .min(1)
+      .max(300)
+      .refine(value => value.startsWith('/api/public/'), {
+        message: 'downloadPathTemplate debe ser una ruta relativa bajo /api/public/',
+      })
+      .refine(value => !value.includes('//') && !/\s/.test(value), {
+        message: 'downloadPathTemplate no puede ser protocol-relative ni contener espacios',
+      })
+      .refine(value => value.includes('{handle}'), {
+        message: 'downloadPathTemplate debe contener el placeholder {handle}',
+      }),
+  })
+  .strict()
+export type AssetDownloadBehavior = z.infer<typeof assetDownloadBehaviorSchema>
+
 export const successBehaviorSchema = z.object({
   kind: z.enum(['inline_message', 'redirect', 'asset_access', 'review_pending', 'tokenized_report']),
   // TASK-1336 — Config del handoff `tokenized_report` (browser-safe). Opcional: sin él, el kind
   // `tokenized_report` conserva su comportamiento legacy (success card / mensaje, sin handoff).
   tokenizedReport: tokenizedReportBehaviorSchema.optional(),
+  // TASK-1375 — Config del handoff de descarga GATED del asset (browser-safe). Cuando el kind es
+  // `asset_access` y esto está presente, el renderer emite `download_url` en el evento accepted.
+  assetDownload: assetDownloadBehaviorSchema.optional(),
   presentation: z.enum(SUCCESS_PRESENTATIONS).optional(),
   message: z.string().max(2000).optional(),
   messageCopyRef: z.string().optional(),
