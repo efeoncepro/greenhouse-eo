@@ -40,6 +40,7 @@
     "qa:gates": "node scripts/qa-gates.mjs",
     "task:lint": "node scripts/ci/task-lint.mjs",
     "task:lint:test": "node scripts/ci/__tests__/task-lint.test.mjs",
+    "hiring:publish-vacancy": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/publish-vacancy.ts",
     "ui:flow-check": "node scripts/ci/task-lint.mjs --changed",
     "ui:motion-check": "node scripts/ci/task-lint.mjs --changed",
     "ui:readiness-check": "node scripts/ci/task-lint.mjs --changed",

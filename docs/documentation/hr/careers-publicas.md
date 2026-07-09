@@ -49,22 +49,82 @@ fuente autoritativa de escritura sigue siendo Hiring. Un adapter Growth
 Forms→Hiring puede abrirse como backend-data follow-up si se quiere mover el
 ledger de submit al dominio Growth Forms.
 
+El Banco de Talento sigue la misma regla: si captura datos no puede ser solo
+decoracion visual. Debe tener un contrato Growth Forms propio o un command Hiring
+equivalente con consentimiento, captcha/rate-limit, telemetria y respuesta
+generica.
+
 ## Operación de vacantes reales
 
 Una vacante pública nace en el dominio Hiring:
 
 ```text
-createTalentDemand -> createHiringOpening -> updateHiringOpening -> publishOpening
+publishHiringVacancyFromBrief
+  -> createTalentDemand
+  -> createHiringOpening
+  -> updateHiringOpening
+  -> publishOpening
 ```
+
+El operador vive en `src/lib/hiring/vacancy-publication-operator.ts`, expone
+`dryRun|execute|publish`, tiene CLI `pnpm hiring:publish-vacancy` y endpoint
+interno `POST /api/hiring/vacancy-publications`. El CLI/API consumen el mismo
+command; no hay implementaciones paralelas.
 
 La UI de careers no inventa vacantes ni persiste estado paralelo. El cierre
 operativo debe registrar el demand `public_id`, opening `public_id`, ruta de
 detalle y ruta de apply. Ejemplo live: `EO-TDM-0012` / `EO-OPN-0009`, Account
 Manager / Especialista en Marketing.
 
-Si el opening debe quedar visible en production, la publicación se coordina con
-el release control plane: flags (`HIRING_PUBLIC_APPLICATIONS_ENABLED`,
-Turnstile), deploy, smoke del detalle/apply, watchdog y manifest.
+La oferta debe separar `Ubicacion` y `Modalidad` como datos de dominio:
+
+- `Modalidad`: una sola de `Remoto`, `Hibrido` o `Presencial`.
+- `Ubicacion`: region de contratacion para remoto (`LATAM`, `Global`, `Chile`,
+  etc.) o ciudad/pais/oficina real para hibrido/presencial.
+- `Remoto / hibrido segun acuerdo` no es un valor publicable. Si aparece en
+  datos legacy, el renderer puede degradar defensivamente; el publish nuevo debe
+  venir desde API/operator con campos estructurados.
+- `Área` y chips de competencias vienen de `public_area` y
+  `public_skill_tags`; la inferencia desde copy queda solo como fallback legacy.
+- `public_compensation_band` queda disponible como campo estructurado opcional,
+  no publish-required hasta cerrar governance de bandas.
+
+Si careers ya esta live y los flags/Turnstile estan configurados, publicar otro
+opening visible en production es solo un write gobernado de Hiring. No debe
+pasar por un release de codigo.
+
+El release control plane entra solo cuando cambia el runtime: codigo de
+careers/apply, migraciones/schema, flags/env vars, infraestructura, renderer
+publico, contratos de Growth Forms/Hiring o smoke de cutover inicial.
+
+## Full API Parity
+
+El proceso queda con paridad programatica para publicar y recibir postulaciones:
+
+- `POST /api/hiring/vacancy-publications` opera un brief completo con
+  `dryRun|execute|publish`.
+- `pnpm hiring:publish-vacancy --file <brief.json>` usa el mismo command.
+- `POST /api/hiring/demands` crea demands.
+- `POST /api/hiring/openings` crea openings.
+- `PATCH /api/hiring/openings/{openingId}` actualiza truth interna y payload
+  publico.
+- `POST /api/hiring/openings/{openingId}/publish` publica el opening.
+- `DELETE /api/hiring/openings/{openingId}/publish?mode=paused|closed`
+  despublica el opening.
+- `POST /api/public/hiring/applications` recibe postulaciones publicas.
+
+Los endpoints internos tienen doble gate: tenant interno + capability
+`hiring.demand.write`, `hiring.opening.write` o `hiring.opening.publish`. El
+endpoint publico no requiere sesion, pero en produccion exige Turnstile y falla
+cerrado con `captcha_failed` si no hay token valido.
+
+El submit publico acepta JSON o `multipart/form-data`. Cuando incluye `cvFile`,
+el PDF se guarda en `greenhouse_core.assets` como asset privado
+`hiring_application_cv` y queda adjunto a la `hiring_application`.
+
+Esto significa que publicar otra vacante no necesita tocar codigo ni deploy. El
+wrapper de operador/CLI ya existe localmente; un futuro Publication Desk o Nexa
+action deben envolver ese command, no reimplementar payloads.
 
 ## Banco de Talento
 

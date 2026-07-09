@@ -2,7 +2,19 @@
 
 ## 2026-07-09
 
+- **TASK-1371 Hiring Vacancy Publication Operator Command creada.** Se registró la task backend-data para convertir la publicación de vacantes en una operación programática robusta: command/orchestrator `dryRun|execute|publish`, idempotencia, composición de writers Hiring existentes, salida con IDs/URLs/warnings/timings y superficies CLI/API interna/Nexa-ready. Objetivo explícito: cero release, cero SQL manual y cero UI-only flow por cada vacante nueva.
+
+- **Careers UI — modalidad y ubicación pública corregidas.** La proyección pública separa `Ubicación` de `Modalidad`: cargos remotos muestran región de contratación (`LATAM` por defecto, o `Global`/región aprobada), cargos híbridos deben definir ubicación real, y textos ambiguos tipo `Remoto / híbrido según acuerdo` se normalizan antes de llegar a la card/detalle. También se reforzó el recipe de oferta laboral en la skill de talento para impedir publicar modalidades ambiguas.
+
+- **Careers UI — marquee del hero sin vacío en viewports anchos.** El carrusel inferior del hero ahora usa segmentos duplicados de ancho mínimo `100vw` y un `data-capture` estable (`careers-home-marquee`), evitando que la animación llegue a un tramo sin palabras antes de reiniciar. Verificado localmente en `/public/careers` a 2048px durante más de un ciclo y en mobile 390 sin overflow.
+
+- **Careers UI — extractor de responsabilidades corregido tras review Copilot.** `extractResponsibilityItems` ya no reintroduce el heading `Responsabilidades` cuando el fallback no encuentra bullets tradicionales: ahora scopea al bloque posterior al heading, corta antes de secciones vecinas y acepta items planos, numerados o con guion largo. Test de regresión agregado.
+
+- **Careers publish API parity + submit smoke.** Se documentó el proceso escalable para publicar vacantes por API/commands Hiring (`POST /api/hiring/demands`, `POST /api/hiring/openings`, `PATCH /api/hiring/openings/{id}`, `POST/DELETE /api/hiring/openings/{id}/publish`) y se confirmó que una vacante nueva no requiere release si runtime/flags/Turnstile ya están live. Smoke público: Turnstile bloqueó automatización headless y el endpoint sin token respondió `403 captcha_failed` (fail-closed). Smoke canónico server-side contra `EO-OPN-0009`: `submitPublicHiringApplication` creó `EO-APP-0007` con `source=public_careers`, consent `granted`, stage `sourced` y CV PDF adjunto como asset privado `hiring_application_cv`.
+
 - **Release/careers operating learning canonizado.** Se actualizaron runbooks/manuales/docs de Production Release Orchestrator y Watchdog, el playbook de incidentes, arquitectura release, flag ledger y skills Codex/Claude (`greenhouse-production-release`, `greenhouse-talent-people-operator`) para no redescubrir condiciones comunes: leer playbook antes de production, medir fases sin abrir loops exploratorios, tratar `ops-worker` change-gated como residual si el diff runtime esta vacio, cerrar transiciones finales atascadas solo por CLI canonico auditado, crear vacantes reales por writers de Hiring y exigir Growth Forms/Hiring command para Banco de Talento si captura leads.
+
+- **Careers operating model escalable.** Se corrigio la regla documental: publicar una nueva vacante real no requiere production release si `/public/careers` + apply ya estan live y flags/Turnstile estan configurados. Es una operacion de negocio/data en Hiring. El release control plane solo aplica cuando cambia runtime/configuracion: codigo, schema/migrations, flags/env vars, infraestructura, renderer publico, contrato de apply o cutover inicial.
 
 - **Production Release Timing Ledger — eficiencia por agente.** Se creo `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` y se volvio obligatorio en runbook, manual, arquitectura, playbook y skills Codex/Claude. El KPI principal es **tiempo agente end-to-end** (revisar, analizar, preparar, ejecutar, diagnosticar, documentar y responder), no `workflow` ni `manifest elapsed`. Se sembraron los releases TASK-354 del 2026-07-09: el release inicial tuvo workflow 12m14s/manifest 10m09s; el release acoplado PR #151 tuvo workflow 26m47s/manifest 21m50s/runtime verde 13m04s, pero tiempo agente no medido formalmente y estimado por operador en >=2h.
 
@@ -9772,3 +9784,9 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 - El CTA principal entrega al nodo Think Brand Visibility con UTM; el puente AEO apunta a `/aeo-2/`; metadata Yoast, canonical y schema quedaron live. No se reconstruyó el form/grader.
 - Se preservaron los widgets Ohio por feedback del operador y se corrigieron los iconos Tabler que estaban siendo pisados por el override tipográfico.
 - Verificación live desktop 1440 + mobile 390: sin overflow, sin errores JS, widgets Ohio visibles, `138` iconos válidos, Kinsta cache purgada.
+## 2026-07-09 — TASK-1371 Hiring vacancy publication operator
+
+- `TASK-1371` pasa a `in-progress` e introduce el operador backend-data `publishHiringVacancyFromBrief` con modos `dryRun|execute|publish`, CLI `pnpm hiring:publish-vacancy` y endpoint interno `POST /api/hiring/vacancy-publications`.
+- `hiring_opening` gana campos publicos estructurados (`public_work_mode`, region/ubicacion, `public_area`, `public_skill_tags`, `public_compensation_band`) y `publishOpening` bloquea vacantes sin estructura publica minima.
+- Careers ahora prefiere `PublicOpeningPayload` estructurado para area, modalidad, ubicacion y chips; la heuristica queda como fallback legacy.
+- Verificacion local: tests focales Hiring/Careers verdes, lint focal verde, typecheck verde y CLI dry-run Account Manager verde. Smoke DB execute/publish pendiente porque el proxy local Cloud SQL no estaba levantado (`127.0.0.1:15432`).

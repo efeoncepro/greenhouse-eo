@@ -347,8 +347,15 @@
   box-shadow: 0 12px 26px rgba(0, 36, 63, 0.2);
 }
 
+.root .buttonPrimary,
+.root a.buttonPrimary,
+.root .buttonPrimary:visited {
+  color: #ffffff;
+}
+
 .buttonPrimary:hover {
   background: var(--primary-dark);
+  color: #ffffff;
   box-shadow: 0 16px 32px rgba(0, 36, 63, 0.26), 0 5px 12px rgba(0, 36, 63, 0.14);
   text-decoration: none;
 }
@@ -434,23 +441,33 @@
 }
 
 .marqueeTrack {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  inline-size: max-content;
   white-space: nowrap;
-  padding-block: 14px;
   color: rgba(0, 36, 63, 0.34);
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 800;
   text-transform: uppercase;
   animation: marquee 26s linear infinite;
+  will-change: transform;
+}
+
+.marqueeSegment {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex: 0 0 auto;
+  min-inline-size: 100vw;
+  padding-block: 14px;
 }
 
 .marqueeItem {
   display: inline-flex;
   align-items: center;
   gap: 20px;
-  padding-inline: 20px 0;
+  padding-inline: 20px;
 }
 
 .marqueeItem i {
@@ -776,6 +793,7 @@
   inset-block-start: 50%;
   transform: translateY(-50%);
   color: var(--text-secondary);
+  font-size: 18px;
   pointer-events: none;
 }
 
@@ -804,6 +822,33 @@
   padding-inline-start: 38px;
 }
 
+.phoneControl {
+  display: grid;
+  grid-template-columns: minmax(112px, 0.28fr) minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+}
+
+.phoneCountry {
+  min-height: 42px;
+  width: 100%;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1.45;
+  outline: none;
+  padding: 10px 8px;
+  transition: border-color var(--motion-short) var(--ease-standard), box-shadow var(--motion-short) var(--ease-standard);
+}
+
+.phoneInput {
+  min-width: 0;
+}
+
 .textarea {
   min-height: 96px;
   padding: 10px 12px;
@@ -812,6 +857,7 @@
 
 .input:focus,
 .select:focus,
+.phoneCountry:focus,
 .textarea:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(3, 117, 219, 0.14);
@@ -819,6 +865,7 @@
 
 .input[aria-invalid="true"],
 .select[aria-invalid="true"],
+.phoneCountry[aria-invalid="true"],
 .textarea[aria-invalid="true"] {
   border-color: var(--error-ink);
 }
@@ -927,14 +974,22 @@
 .cardFooter,
 .summaryRow {
   display: flex;
-  align-items: center;
   gap: 12px;
+}
+
+.cardMeta,
+.cardFooter {
+  align-items: center;
 }
 
 .cardTop,
 .cardFooter,
 .summaryRow {
   justify-content: space-between;
+}
+
+.cardTop {
+  align-items: flex-start;
 }
 
 .areaText {
@@ -958,11 +1013,13 @@
   border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 800;
-  white-space: nowrap;
+  line-height: 1.25;
 }
 
 .modalityChip {
   padding: 4px 10px;
+  max-width: min(100%, 280px);
+  white-space: normal;
 }
 
 .modalityRemote {
@@ -994,11 +1051,14 @@
 }
 
 .skillChip {
-  padding: 4px 10px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--surface-alt);
-  color: var(--text-secondary);
+  max-width: 100%;
+  padding: 5px 10px;
+  border: 1px solid rgba(0, 64, 112, 0.16);
+  border-radius: var(--radius-md);
+  background: rgba(215, 233, 249, 0.52);
+  color: var(--brand-navy);
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .cardFooter {
@@ -1434,8 +1494,9 @@
 }
 
 .timelineList {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1443,35 +1504,34 @@
 
 .timelineItem {
   position: relative;
-  display: grid;
-  grid-template-columns: 38px 1fr;
-  gap: 14px;
-  padding-bottom: 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
 }
 
 .timelineItem:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  inset-inline-start: 18px;
-  inset-block-start: 40px;
-  inset-block-end: -2px;
-  width: 2px;
-  background: var(--border-subtle);
+  content: none;
 }
 
 .timelineMarker {
   position: relative;
   z-index: 1;
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
   background: var(--brand-navy);
   color: #ffffff;
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 800;
 }
 
@@ -1483,7 +1543,8 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  padding-top: 6px;
+  min-width: 0;
+  padding-top: 1px;
 }
 
 .timelineText strong {
@@ -1540,6 +1601,7 @@
 }
 
 .summaryRow {
+  align-items: flex-start;
   color: var(--text-secondary);
   font-size: 0.8125rem;
 }
@@ -1548,6 +1610,7 @@
   color: var(--text-primary);
   font-weight: 800;
   text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .summaryDivider {
@@ -1867,6 +1930,7 @@
   background: var(--surface);
   color: #ffffff;
   flex: 0 0 auto;
+  pointer-events: none;
 }
 
 .consentInput:checked + .consentBox {
@@ -2224,6 +2288,10 @@
     flex-basis: 100%;
   }
 
+  .timelineList {
+    grid-template-columns: 1fr;
+  }
+
   .talentBand {
     padding: 28px 22px;
   }
@@ -2235,6 +2303,10 @@
   .applyHeroInner,
   .formCard {
     padding: 22px;
+  }
+
+  .phoneControl {
+    grid-template-columns: minmax(102px, 0.32fr) minmax(0, 1fr);
   }
 
   .footerInner {

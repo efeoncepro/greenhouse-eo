@@ -1,3 +1,53 @@
+## Sesion 2026-07-09 - TASK-1371 execution intake - Codex - backend-data
+
+> **Pedido:** ejecutar `TASK-1371` para crear el operador programatico de publicacion de vacantes.
+>
+> **Goal confirmado:** code-complete local en el checkout actual, **mantente en `develop`**, sin subagentes ni worktree. No publicar vacante real en produccion ni hacer release sin confirmacion explicita; si falta rollout/staging/prod smoke, cerrar como `code complete, rollout pendiente`.
+>
+> **Ownership:** `TASK-1371` movida a `docs/tasks/in-progress/` y registry actualizado. El worktree ya estaba deliberadamente sucio por cambios previos de Careers/Growth Forms/tasks/skills; no revertir ni stagear cambios ajenos.
+>
+> **Discovery inicial:** writers `createTalentDemand`/`createHiringOpening`/`updateHiringOpening`/`publishOpening` existen; `publishOpening` solo bloquea `public_title`; `hiring_opening` solo tiene `public_location_mode` legacy, sin campos estructurados. El command debe reusar `src/lib/api-platform/core/commands.ts` + `idempotency.ts` para audit/idempotencia y superseder la heuristica interina de Careers con campos estructurados.
+
+## Sesion 2026-07-09 - Careers UI polish + talent offer recipe - Codex - UI/skills
+
+> **Pedido:** corregir defectos visuales de careers (CTA negro sobre azul, chips/competencias/card/proceso) y hacer que la skill de talento provea un recipe de oferta laboral con inbound recruiting.
+>
+> **UI corregida:** `src/components/greenhouse/careers/careers.module.css` ahora fuerza texto blanco en `.buttonPrimary` aunque sea link dentro de `.root`, convierte chips de competencias en badges publicos legibles, permite wrapping seguro del chip de modalidad, presenta el proceso del detalle como grid 2x2 responsive y corrige el marquee inferior del hero para que no deje una franja larga sin palabras en viewports anchos.
+>
+> **Guardrail publico:** `src/lib/hiring/public-careers/view-model.ts` ahora deriva chips cortos/canonicos para oferta publica, separa `Ubicacion` de `Modalidad`, normaliza modalidades ambiguas a una etiqueta unica (`Remoto`/`Hibrido`/`Presencial`) y filtra notas internas del proceso (`assessment template`, `L2`, `scorecard`, etc.). Para remoto, ubicacion muestra region de contratacion (`LATAM` por defecto, o `Global`/region aprobada); para hibrido, la oferta debe definir ciudad/pais u oficina. La vacante `EO-OPN-0009` deja de mostrar el texto interno de assessment y ya no expone `Remoto / hibrido segun pais y acuerdo`. Se corrigio ademas el bug reportado por Copilot: el fallback de `extractResponsibilityItems` ya no vuelve a parsear el texto completo si encontro heading `Responsabilidades`; ahora usa solo el bloque scoped, corta antes de headings vecinos (`Requisitos`, etc.) y acepta items planos, numerados o con en dash.
+>
+> **Skill de talento:** se agrego `templates/job-offer-recipe.md` en Codex/Claude y se enlazo desde `greenhouse-talent-people-operator` + `references/talent-acquisition.md` + `templates/job-brief.md`. El recipe separa brief interno de oferta publica e incluye candidate promise, mission, success outcomes, must-have vs nice-to-have, competencias evaluadas, proceso publico, transparencia de compensacion/ubicacion, regla de modalidad unica + region/ubicacion obligatoria segun remoto/hibrido, e inbound funnel attract→convert→nurture→delight.
+>
+> **Verificacion local:** `pnpm test src/lib/hiring/public-careers/view-model.test.ts` verde (9 tests, incluye regresion Copilot de responsabilidades); `pnpm exec eslint src/lib/hiring/public-careers/view-model.ts src/lib/hiring/public-careers/view-model.test.ts src/components/greenhouse/careers/CareersDetailView.tsx src/components/greenhouse/careers/CareersHomeClient.tsx` verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` verde. Playwright local desktop 1440/mobile 390 contra `/public/careers/EO-OPN-0009` y listing: CTA `rgb(255,255,255)` sobre `rgb(3,117,219)`, sin `assessment template`, sin `segun acuerdo`, `Ubicacion=LATAM`, `Modalidad=Remoto`, chips de competencias sin overflow, timeline grid, `scrollWidth == clientWidth`. Marquee verificado en `/public/careers` a viewport 2048 durante 28s: 12-14 nodos visibles, max gap 189px, sin overflow; mobile 390: 7 nodos visibles, sin overflow.
+
+## Sesion 2026-07-09 - TASK-1371/1372/1373 Hiring publication + Growth Forms apply - Codex - task creation
+
+> **Pedido:** crear una task para evitar que cada agente tenga que pasar por release/SQL/manualidad al publicar una vacante.
+>
+> **TASK-1371 creada/endurecida:** `docs/tasks/to-do/TASK-1371-hiring-vacancy-publication-operator-command.md` define un backend-data operator para publicar vacantes desde un brief aprobado, pero ya no queda como "solo command": incluye migracion aditiva de campos publicos estructurados del opening (`publicArea`/department, `workMode`, `hiringRegion`, ubicacion hibrida/presencial, `publicSkillTags`/competencias), publish guards y compatibilidad derivada para `publicLocationMode`. `area=Marketing` no debe volver a inferirse desde copy en Careers; debe nacer desde API/data.
+>
+> **TASK-1372 creada:** `docs/tasks/to-do/TASK-1372-growth-forms-application-upload-ats-destination.md` define la foundation para que Growth Forms soporte archivo/CV privado y destination adapter Hiring/ATS para `formKind='application'`. Esto evita que Careers mantenga un form custom como write path especial.
+>
+> **TASK-1373 creada:** `docs/tasks/to-do/TASK-1373-careers-native-growth-form-apply.md` migra `/public/careers/[publicId]/apply` al renderer nativo `<greenhouse-form>`, preservando alta fidelidad al HTML Careers, iconos, telefono internacional, CV upload, estados y submit Growth Forms -> ATS. Wireframe: `docs/ui/wireframes/TASK-1373-careers-native-growth-form.md`; Flow: `docs/ui/flows/TASK-1373-careers-native-growth-form-flow.md`.
+>
+> **Registro:** `docs/tasks/TASK_ID_REGISTRY.md` registra `TASK-1371`/`TASK-1372`/`TASK-1373` y `docs/tasks/README.md` avanza el siguiente ID a `TASK-1374`.
+>
+> **Verificacion:** `pnpm task:lint --task TASK-1371`, `pnpm task:lint --task TASK-1372`, `pnpm task:lint --task TASK-1373`, `pnpm ui:wireframe-check --task TASK-1373`, `pnpm ui:flow-check --task TASK-1373` y `pnpm ops:lint --changed` verdes (`errors=0`, `warnings=0`). Queda pendiente implementar las tasks; esto no cambia runtime.
+
+## Sesion 2026-07-09 - Careers publish API parity + submit smoke - Codex - docs/runtime evidence
+
+> **Pedido:** documentar como publicar la vacante, confirmar Full API Parity y enviar un submit para probar el flujo end-to-end.
+>
+> **API parity confirmado:** publicar vacantes no depende de una pantalla ni de SQL. Endpoints internos disponibles: `POST /api/hiring/demands`, `POST /api/hiring/openings`, `PATCH /api/hiring/openings/{openingId}`, `POST /api/hiring/openings/{openingId}/publish` y `DELETE /api/hiring/openings/{openingId}/publish?mode=paused|closed`, todos con tenant interno + capability. El submit publico vive en `POST /api/public/hiring/applications` y consume el command `submitPublicHiringApplication`.
+>
+> **Documentacion actualizada:** `docs/manual-de-uso/hr/operar-careers-publicas.md`, `docs/documentation/hr/careers-publicas.md` y las referencias runtime de `greenhouse-talent-people-operator` Codex/Claude ahora explican el proceso de publicacion por API, cuando NO corresponde release, el contrato del submit publico, el criterio de Banco de Talento y el smoke E2E recomendado. Follow-up escalable sugerido: wrapper operador/CLI/Nexa sobre los mismos commands/endpoints, no release por vacante.
+>
+> **Smoke publico:** browser Playwright sobre `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009/apply` completo formulario QA + CV, pero Turnstile no entrego token en Chromium headless; no hubo POST al endpoint. `curl` directo a `POST /api/public/hiring/applications` sin token respondio `403 captcha_failed`, confirmando fail-closed en produccion.
+>
+> **Submit canónico ejecutado:** para probar persistencia E2E sin debilitar Turnstile, se ejecuto el command server-side `submitPublicHiringApplication` contra la vacante live `EO-OPN-0009` con candidato QA `qa.careers+20260709080556.domain-submit@efeonce.org` y CV PDF temporal. Resultado: `outcome='accepted'`, application `EO-APP-0007` / `happ-aa9857b4-ffce-471b-85ba-5af81804aac8`, `source='public_careers'`, `stage='sourced'`, candidate facet `cndf-1c86e66f-e89d-40bf-87ef-ef9b1616b948`, consent `granted`.
+>
+> **CV verificado:** asset privado `asset-0ba05fe2-1914-46e4-bb0d-27e513caddaf` quedo `status='attached'`, `owner_aggregate_type='hiring_application_cv'`, `owner_aggregate_id='happ-aa9857b4-ffce-471b-85ba-5af81804aac8'`, `mime_type='application/pdf'`, metadata `openingPublicId='EO-OPN-0009'`, `source='public_careers'`, `scanStatus='not_scanned_pdf_only_v1'`.
+
 ## Sesion 2026-07-09 - Release/careers learning canonizado - Codex - docs/skills
 
 > **Pedido:** documentar el aprendizaje operativo de TASK-354/careers + vacante Account Manager, incluyendo manuales, documentacion y skills de talento.
@@ -7,6 +57,8 @@
 > **Timing ledger agregado:** por instruccion del operador se creo `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`. Regla: cada agente debe iniciar cronometro al tomar la primera accion de release, incluyendo revisar/analizar/preparar, y registrar fecha, agente, release ID, run ID, SHA, **tiempo agente E2E como KPI principal**, workflow, manifest, runtime verde, fases, bloqueo y aprendizaje. Se sembraron dos entradas 2026-07-09: release inicial TASK-354 (`433cfa2b0fd3...`, run `28991488376`, workflow 12m14s, manifest 10m09s, runtime verde 11m05s) y release acoplado PR #151 (`915be02a...`, run `28999468657`, workflow 26m47s, manifest 21m50s, runtime verde 13m04s, agente E2E no medido formalmente; **operador estima >=2h**). Importante: 21m50s NO mide lo que tardo Codex; solo mide el manifest.
 >
 > **Talent/careers:** se actualizo `greenhouse-talent-people-operator` (Codex/Claude), su referencia runtime, manual de careers publicas y documentacion HR para dejar claro que una vacante real nace por writers de Hiring (`createTalentDemand` -> `createHiringOpening` -> `updateHiringOpening` -> `publishOpening`), que se deben registrar demand/opening public IDs y URLs, y que Banco de Talento solo puede ser decorativo si no captura datos; si captura leads, debe ser Growth Form/Hiring command gobernado.
+>
+> **Correccion de escalabilidad:** publicar otra vacante real NO debe pasar por todo el release control plane si careers/apply ya estan live y los flags/Turnstile estan configurados. Es una operacion de negocio/data en Hiring. Release solo aplica cuando cambia runtime/config: codigo, schema/migration, flags/env vars, infraestructura, renderer publico, contrato de apply o cutover inicial.
 >
 > **Caso real registrado:** Account Manager / Especialista en Marketing quedo como demand `EO-TDM-0012`, opening `EO-OPN-0009`, detalle `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009` y apply `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009/apply`. El release 2026-07-09 tuvo runtime verde; `ops-worker` residual se trata como label drift si `git diff` runtime entre Cloud Run SHA y target esta vacio.
 

@@ -41,13 +41,43 @@ Listing/detail must consume `PublicOpeningPayload` only. Apply must use the
 Growth Forms compatible contract (`efeonce-careers-application`) but the
 authoritative write remains Hiring (`POST /api/public/hiring/applications`).
 
+Full API Parity is already present for the current vacancy workflow:
+
+- `POST /api/hiring/demands` -> `createTalentDemand`.
+- `POST /api/hiring/openings` -> `createHiringOpening`.
+- `PATCH /api/hiring/openings/{openingId}` -> `updateHiringOpening`.
+- `POST /api/hiring/openings/{openingId}/publish` -> `publishOpening`.
+- `DELETE /api/hiring/openings/{openingId}/publish?mode=paused|closed` ->
+  `unpublishOpening`.
+- `POST /api/public/hiring/applications` -> `submitPublicHiringApplication`
+  (public, Turnstile-gated in production, JSON or multipart with `cvFile`).
+
+Do not answer that a new release is required just because an agent wants to
+publish a vacancy. If the runtime is already live, use the API/commands above.
+Preferred operator path after TASK-1371 is the governed wrapper over those same
+commands: `publishHiringVacancyFromBrief`, `POST /api/hiring/vacancy-publications`
+and `pnpm hiring:publish-vacancy`. This replaces one-off SQL scripts, ad-hoc
+payloads and production releases as the normal vacancy publication path.
+
+Location/modality rule for public offers: agents must not author a single free
+text string such as "remote / hybrid by agreement". Vacancy creation must carry
+structured fields (`workMode`, `hiringRegion`, `officeLocation/cityCountry`).
+Remote roles publish a hiring region (`LATAM`, `Global`, `Chile`, etc.) as
+location; hybrid/onsite roles require a real city/country/office. Any legacy
+`publicLocationMode` string must be derived from those fields, not invented as
+candidate-facing copy.
+
 Talent Pool / Banco de Talento rule: if the surface only illustrates employer
 brand, mark it explicitly as decorative. If it captures emails/CVs/interest, it
 must be a real Growth Form or Hiring command with consent, captcha/rate-limit,
 generic success/dedupe state and a documented owner.
 
-Do not turn vacancy creation into release recovery. If production publication,
-flags or smoke are needed, compose with `greenhouse-production-release`.
+Do not turn vacancy creation into release recovery. After the careers runtime is
+live and flags/Turnstile are configured, publishing a new vacancy is a Hiring
+business-data operation and **does not require a production release**. Compose
+with `greenhouse-production-release` only when the request changes code,
+schema/migrations, flags/env vars, infrastructure, public renderer, apply
+contract, or initial cutover smoke.
 
 ## Person model (never duplicate a human)
 

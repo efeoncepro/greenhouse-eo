@@ -1,6 +1,7 @@
 # Job Brief / Scorecard template
 
 Fill with the hiring manager at intake. This is the contract that seeds sourcing + the assessment.
+After this exists, use `templates/job-offer-recipe.md` to turn the internal brief into a public vacancy with inbound recruiting.
 
 ## Role
 

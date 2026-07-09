@@ -61,6 +61,22 @@ export type HiringOpeningPublicationStatus = (typeof HIRING_OPENING_PUBLICATION_
 export const HIRING_OPENING_STATUSES = ['draft', 'active', 'paused', 'filled', 'cancelled', 'closed'] as const
 export type HiringOpeningStatus = (typeof HIRING_OPENING_STATUSES)[number]
 
+export const HIRING_PUBLIC_WORK_MODES = ['remote', 'hybrid', 'onsite'] as const
+export type HiringPublicWorkMode = (typeof HIRING_PUBLIC_WORK_MODES)[number]
+
+export const HIRING_PUBLIC_AREAS = [
+  'Marketing',
+  'Growth',
+  'Creative',
+  'Technology',
+  'Operations',
+  'People',
+  'Finance',
+  'Sales',
+  'Strategy',
+] as const
+export type HiringPublicArea = (typeof HIRING_PUBLIC_AREAS)[number]
+
 export const CANDIDATE_SOURCES = [
   'public_careers',
   'manual',
@@ -159,6 +175,15 @@ export interface HiringOpening {
   publicRequirements: string | null
   publicNiceToHave: string | null
   publicLocationMode: string | null
+  publicWorkMode: HiringPublicWorkMode | null
+  publicHiringRegion: string | null
+  publicCity: string | null
+  publicCountry: string | null
+  publicOfficeLocation: string | null
+  publicArea: string | null
+  publicSkillTags: string[]
+  publicCompensationBand: string | null
+  publicationSourceRef: string | null
   publicEmploymentMode: string | null
   publicSeniority: string | null
   publicProcessNotes: string | null
@@ -237,6 +262,14 @@ export interface PublicOpeningPayload {
   requirements: string | null
   niceToHave: string | null
   locationMode: string | null
+  workMode: HiringPublicWorkMode | null
+  hiringRegion: string | null
+  city: string | null
+  country: string | null
+  officeLocation: string | null
+  area: string | null
+  skillTags: string[]
+  compensationBand: string | null
   employmentMode: string | null
   seniority: string | null
   processNotes: string | null
@@ -322,6 +355,15 @@ export interface UpdateHiringOpeningInput {
   publicRequirements?: string | null
   publicNiceToHave?: string | null
   publicLocationMode?: string | null
+  publicWorkMode?: HiringPublicWorkMode | null
+  publicHiringRegion?: string | null
+  publicCity?: string | null
+  publicCountry?: string | null
+  publicOfficeLocation?: string | null
+  publicArea?: string | null
+  publicSkillTags?: string[]
+  publicCompensationBand?: string | null
+  publicationSourceRef?: string | null
   publicEmploymentMode?: string | null
   publicSeniority?: string | null
   publicProcessNotes?: string | null

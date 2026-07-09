@@ -1,6 +1,8 @@
 // TASK-1367 — Validación PURA del payload de postulación pública (single source of truth,
 // estilo grader public-intake, NO Zod). Sin IO. Normaliza email + valida URLs browser-safe.
 
+import { validateE164PhoneValue } from '@/lib/growth/forms/validators/phone'
+
 export interface PublicHiringApplicationInput {
   openingPublicId: string
   firstName: string
@@ -73,10 +75,15 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
 
   const portfolioRaw = asTrimmed(body.portfolioUrl, MAX_URL)
   const linkedinRaw = asTrimmed(body.linkedinUrl, MAX_URL)
+  const phoneRaw = asTrimmed(body.phone, MAX_NAME)
 
   // URLs opcionales: si vienen, DEBEN ser https browser-safe (rechazo javascript:/data:).
   if (portfolioRaw && !isSafeHttpUrl(portfolioRaw)) return null
   if (linkedinRaw && !isSafeHttpUrl(linkedinRaw)) return null
+
+  const phoneResult = phoneRaw ? validateE164PhoneValue(phoneRaw, { country: 'CL' }) : null
+
+  if (phoneResult && !phoneResult.valid) return null
 
   return {
     openingPublicId,
@@ -84,7 +91,7 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
     lastName,
     fullName: `${firstName} ${lastName}`.trim(),
     email,
-    phone: asTrimmed(body.phone, MAX_NAME) || null,
+    phone: phoneResult ? String(phoneResult.normalized) : null,
     portfolioUrl: portfolioRaw || null,
     linkedinUrl: linkedinRaw || null,
     availability: asTrimmed(body.availability, MAX_NAME) || null,

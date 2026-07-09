@@ -18,6 +18,7 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | Trigger | Lane |
 |---|---|
 | "open a vacancy / define the role / job brief" | Talent acquisition — intake + scorecard |
+| "redact a public vacancy / oferta laboral / job posting" | Job offer recipe + inbound recruiting |
 | "source candidates / head hunt / find a senior X" | Sourcing + executive search |
 | "inbound recruiting / careers / employer brand / talent pool" | Inbound + candidate experience |
 | "design the test / interview / competency assessment / rubric" | Assessment + structured interviewing |
@@ -60,7 +61,7 @@ Recruiting fashion changes; **selection validity** is measured. Teach the 2026-c
 7. **Workforce planning & org design** → `references/workforce-planning.md`. Headcount, build/buy/borrow, capacity gap → TalentDemand, agency org shapes, ICO synergy.
 8. **Generations & 2026 trends** → `references/generations-trends-2026.md`. Boomer→Gen Alpha profiles, how attraction/assessment/retention change per generation, and the transversal 2026 trends.
 
-Greenhouse runtime binding (domain, code paths, invariants) → `references/greenhouse-runtime.md`. Templates (scorecard, job brief, sourcing map, interview guide) → `templates/`.
+Greenhouse runtime binding (domain, code paths, invariants) → `references/greenhouse-runtime.md`. Templates (scorecard, job brief, job offer recipe with inbound recruiting, sourcing map, interview guide) → `templates/`.
 
 ## Synergies (compose, don't duplicate)
 
@@ -75,7 +76,7 @@ Greenhouse runtime binding (domain, code paths, invariants) → `references/gree
 | `seo-aeo` / `commercial-expert` | Inbound recruiting = careers attracts + ranks; employer brand = GTM for talent. |
 | `greenhouse-nexa-conversational` | Operate hiring/assessment from conversation via Full API Parity (propose→confirm). |
 | `efeonce-agency` + `docs/context/` | Real agency roles (Account, Design, Media, Strategy, Dev), ASaaS model, Globe clients. |
-| `greenhouse-production-release` | Public careers rollout, flags, production smoke and release closure. Talent owns the role/intake/publication contract; release owns promotion, flags, watchdog and manifest closure. |
+| `greenhouse-production-release` | Public careers runtime rollout, flags, production smoke and release closure when code/config changes. Talent owns normal vacancy creation/publication as Hiring data; release is not required for each new vacancy. |
 
 ## Efeonce Operating Code (culture is evidence, not vibes)
 
@@ -105,6 +106,7 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 - **NEVER** treat AI output as truth: **propose → a human confirms**, with an eval baseline (mirrors the Greenhouse assessment AI design).
 - **NEVER** collect candidate identity documents at the public apply stage; capture post-decision, and treat candidate PII with the same masked/reveal/audit rigor as an employee's.
 - **NEVER** create/open/publish a Greenhouse vacancy by SQL or ad hoc UI state. Use Hiring writers (`createTalentDemand` → `createHiringOpening` → `updateHiringOpening` → `publishOpening`) and record `public_id`, public URL and apply URL.
+- **NEVER** escalate normal vacancy publication to a production release when careers runtime is already live and flags are configured. Release only for code, schema, flags/env, infra, renderer or apply-contract changes.
 - **NEVER** leave a Talent Pool / Banco de Talento surface decorative if it captures leads. It must be backed by Growth Forms or a Hiring command, with consent, captcha/rate-limit and generic success state.
 - **NEVER** reason from a pre-2024 base for trends/law/validity — cite the 2026 landscape and the 2022 validity revision.
 - **SIEMPRE** design for a **multigenerational** workforce (don't optimize a process only for one cohort).

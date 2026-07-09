@@ -11,8 +11,22 @@ Confirma:
 
 ## Crear y publicar una vacante real
 
-No crear vacantes por SQL ni editando estado visual. La secuencia canonica vive
-en Hiring:
+No crear vacantes por SQL ni editando estado visual. El camino operativo
+preferido es el operador estructurado de Hiring:
+
+```bash
+pnpm hiring:publish-vacancy --file scripts/hiring/fixtures/account-manager-vacancy-brief.example.json --dry-run
+pnpm hiring:publish-vacancy --file <brief.json> --execute --idempotency-key <key>
+pnpm hiring:publish-vacancy --file <brief.json> --publish --idempotency-key <key>
+```
+
+También existe el endpoint interno `POST /api/hiring/vacancy-publications` para
+Nexa, Hiring Desk o agentes autorizados. `dryRun` es el default y no escribe
+estado; `execute` crea/reutiliza draft; `publish` publica solo si pasan los
+guards. `execute`/`publish` requieren `idempotencyKey` o header
+`Idempotency-Key`.
+
+El operador compone la secuencia canonica de Hiring:
 
 1. Crear demand con `createTalentDemand`.
 2. Crear opening con `createHiringOpening`.
@@ -22,15 +36,80 @@ en Hiring:
 5. Registrar en el cierre: `demand.public_id`, `opening.public_id`, URL de
    detalle y URL de apply.
 
+La modalidad y la ubicación deben nacer como datos estructurados de la oferta,
+no como frase libre escrita por un agente. Regla operativa:
+
+- `workMode`: `remote`, `hybrid` u `onsite`.
+- Si `workMode=remote`, definir region de contratacion (`LATAM`, `Global`,
+  `Chile` u otra region aprobada). La UI muestra esa region como ubicación.
+- Si `workMode=hybrid` u `onsite`, definir ciudad/pais/oficina real. No publicar
+  un cargo hibrido sin ubicacion.
+- No usar textos ambiguos como `remoto / hibrido segun acuerdo`; deben bloquear
+  el publish o quedar como warning de `dryRun` hasta elegir una modalidad.
+- `publicArea` debe venir de allowlist aprobada.
+- `publicSkillTags` alimenta chips publicos; Careers no debe inferirlos desde
+  requisitos/copy salvo fallback legacy.
+- `publicCompensationBand` existe como campo estructurado opcional. No es
+  obligatorio para publish hasta que finance/payroll/legal definan bandas
+  aprobadas y su governance.
+
 Ejemplo real: `Account Manager / Especialista en Marketing` quedó como demand
 `EO-TDM-0012` y opening `EO-OPN-0009`:
 
 - `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009`
 - `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009/apply`
 
-Si la publicación va a producción, usar `greenhouse-production-release` para
-flags, promoción, smoke, watchdog y cierre de manifest. La skill de talento
-define el rol y el contrato de Hiring; no reemplaza el release control plane.
+Publicar una vacante nueva **NO requiere release** si el runtime de careers ya
+esta desplegado y `HIRING_PUBLIC_APPLICATIONS_ENABLED`/Turnstile estan en el
+estado correcto. Es una operacion de negocio/data del dominio Hiring.
+
+Usar `greenhouse-production-release` solo cuando el trabajo tambien cambie
+codigo, migraciones/schema, flags/env vars, infraestructura, renderer publico o
+contratos de apply. La skill de talento define el rol y el contrato de Hiring;
+release solo gobierna cambios de runtime/configuracion.
+
+## Publicar por API (Full API Parity)
+
+La publicacion de vacantes tiene paridad programatica. La UI interna, Nexa, un
+agente o un script operativo deben llamar el operador `dryRun|execute|publish`
+o los mismos writers/readers de Hiring; ningun paso depende exclusivamente de
+una pantalla.
+
+Endpoint/CLI preferidos:
+
+1. `POST /api/hiring/vacancy-publications` con body estructurado y modo
+   `dryRun|execute|publish`.
+2. `pnpm hiring:publish-vacancy --file <brief.json> --dry-run|--execute|--publish`.
+
+Endpoints base disponibles si se necesita operar manualmente el dominio:
+
+1. `POST /api/hiring/demands` crea el `talent_demand`.
+2. `POST /api/hiring/openings` crea el `hiring_opening` derivado del demand.
+3. `PATCH /api/hiring/openings/{openingId}` completa titulo publico, resumen,
+   descripcion, responsabilidades, requisitos, skills, proceso, visibilidad y
+   metadatos publicos estructurados. El payload legacy `public_location_mode`
+   debe derivarse desde `workMode + hiringRegion/officeLocation`; no escribirlo
+   como copy manual.
+4. `POST /api/hiring/openings/{openingId}/publish` publica el opening.
+5. `DELETE /api/hiring/openings/{openingId}/publish?mode=paused|closed`
+   despublica sin tocar SQL.
+
+Los endpoints son internos y requieren tenant + capabilities:
+
+- `hiring.demand.write`
+- `hiring.opening.write`
+- `hiring.opening.publish`
+
+Verificacion minima despues de publicar:
+
+1. `GET /api/hiring/openings/{openingId}` confirma el estado interno.
+2. Abrir `/public/careers/{openingPublicId}`.
+3. Abrir `/public/careers/{openingPublicId}/apply`.
+4. Registrar en handoff `demand.public_id`, `opening.public_id`, detalle y apply.
+
+Si un agente no tiene sesion/capability para llamar la API, no debe saltar a SQL:
+debe usar el command server-side canonico de Hiring en contexto autenticado o
+pedir la ejecucion a un operador con permisos.
 
 ## Verificar rutas
 
@@ -54,6 +133,17 @@ define el rol y el contrato de Hiring; no reemplaza el release control plane.
 6. Envía.
 7. La respuesta visible debe ser genérica, tanto para envío aceptado como para
    dedupe seguro.
+
+Contrato programatico del submit:
+
+- `POST /api/public/hiring/applications` es publico y no requiere sesion.
+- En produccion exige Turnstile; sin token valido responde `403 captcha_failed`.
+- Acepta JSON sin CV o `multipart/form-data` con `cvFile`.
+- El CV opcional debe ser PDF, maximo 10 MB, y queda como asset privado
+  `hiring_application_cv`.
+- El command autoritativo es `submitPublicHiringApplication`: resuelve opening
+  publicado, reconcilia Person por email, upsertea `candidate_facet`, crea o
+  dedupea `hiring_application` y devuelve siempre una respuesta publica generica.
 
 No pedir documentos de identidad ni datos personales sensibles en el apply
 público. TASK-1362 queda para document capture completo, scan/quarantine y
@@ -104,3 +194,25 @@ Un bloque de Banco de Talento puede ser decorativo solo si no captura datos. Si
 recibe email, CV o interés general, debe ser un Growth Form o comando Hiring
 real con consentimiento, captcha/rate-limit, success genérico y dedupe seguro.
 No dejar un formulario visual sin backend gobernado.
+
+Si el Banco de Talento usa Growth Forms, debe tener `formKind`/slug/version
+propios y destination/submit contract documentado. Si se decide escribir directo
+en Hiring, debe crear o reconciliar Person + `candidate_facet` como talento
+general, no esconder leads en una tabla auxiliar ni en un webhook unico.
+
+## Smoke E2E recomendado
+
+Para cerrar una publicacion real:
+
+1. Probar browser en `/public/careers/{openingPublicId}/apply` con un candidato
+   QA identificable.
+2. Si Turnstile bloquea automatizacion headless, no apagar captcha. Registrar
+   que el browser quedo fail-closed y probar el command server-side canonico.
+3. Verificar en base:
+   - `hiring_application.public_id`
+   - `source='public_careers'`
+   - `stage='sourced'`
+   - `candidate_facet.consent_status='granted'`
+   - asset `hiring_application_cv` si se envio PDF
+4. Probar dedupe reintentando el mismo email/opening si el caso lo requiere; la
+   respuesta publica debe seguir siendo generica y no duplicar la application.

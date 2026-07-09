@@ -18,7 +18,7 @@ Hechos verificados contra el repo real. Task bien encuadrada (Full API Parity: u
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -235,6 +235,24 @@ Reglas obligatorias:
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Discovery 2026-07-09
+
+- Hook Codex ejecutado: `pnpm codex:task-hook TASK-1371 --develop`.
+- Goal confirmado por operador: ejecutar en el checkout actual, mantenerse en `develop`, sin subagentes ni worktree, sin publish real ni release sin confirmacion explicita.
+- Reuso validado: `createTalentDemand`, `createHiringOpening`, `updateHiringOpening` y `publishOpening` son el sustrato correcto; el operador nuevo no escribe tablas de negocio directo.
+- Idempotencia/audit: se reutiliza el ledger canonico de API Platform (`executeApiPlatformCommand`), sin store propio paralelo.
+- Gap runtime confirmado: `hiring_opening` necesitaba campos publicos estructurados; `publicLocationMode` queda legacy/transicional.
+- Alcance de compensacion: se agrega `publicCompensationBand` opcional y warning operativo; no queda como publish guard obligatorio hasta governance posterior.
+
+## Implementation Plan 2026-07-09
+
+1. Agregar migracion aditiva con campos publicos estructurados y backfill de `EO-OPN-0009`.
+2. Extender tipos/store/readers/public payload y publish guards para que Careers use source of truth estructurado antes que inferencia.
+3. Implementar `publishHiringVacancyFromBrief` con `dryRun|execute|publish`, idempotencia canonica, warnings, timings y salida estable.
+4. Exponer wrappers programaticos: endpoint interno y CLI `pnpm hiring:publish-vacancy`.
+5. Actualizar manuales, documentacion HR, arquitectura Hiring/ATS, epic y skill de talento.
+6. Cerrar como `code complete, rollout pendiente` si Cloud SQL/migracion/smoke real no quedan aplicados en esta sesion.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
@@ -424,16 +442,16 @@ La solucion aceptable tiene una primitive server-side unica. La CLI, endpoint in
 
 ## Acceptance Criteria
 
-- [ ] Existe un command/orchestrator server-side unico para publicar vacantes desde brief, con `dryRun`, `execute` y `publish`.
-- [ ] El flujo compone writers/readers de Hiring existentes y no escribe tablas directas desde CLI.
-- [ ] La idempotencia evita duplicados en retry y devuelve IDs existentes cuando corresponde.
-- [ ] `publicArea`/`publicDepartment`, `workMode`, `hiringRegion`, `officeLocation/cityCountry`, `employmentMode`, `seniority` y `skillTags`/`competencyTags` nacen como campos estructurados del command/API; no se escriben a mano como copy libre ni se infieren en el renderer.
-- [ ] `publish` bloquea cargos hibridos/presenciales sin ubicacion real y cargos remotos sin region aprobada (`LATAM`, `Global`, `Chile`, etc.).
-- [ ] `publish` bloquea cargos sin area/departamento publico aprobado.
-- [ ] La salida incluye IDs, public IDs, status, URLs, warnings y timings por paso.
-- [ ] La CLI o endpoint programatico permite a un agente publicar una vacante sin release, SQL ni UI manual.
-- [ ] El camino queda documentado en manual HR, documentacion Careers y skill de talento.
-- [ ] Hay evidencia de dry-run y execute/publish controlado; si production queda fuera, se declara explicitamente.
+- [x] Existe un command/orchestrator server-side unico para publicar vacantes desde brief, con `dryRun`, `execute` y `publish`.
+- [x] El flujo compone writers/readers de Hiring existentes y no escribe tablas directas desde CLI.
+- [x] La idempotencia evita duplicados en retry y devuelve IDs existentes cuando corresponde.
+- [x] `publicArea`/`publicDepartment`, `workMode`, `hiringRegion`, `officeLocation/cityCountry`, `employmentMode`, `seniority` y `skillTags`/`competencyTags` nacen como campos estructurados del command/API; no se escriben a mano como copy libre ni se infieren en el renderer.
+- [x] `publish` bloquea cargos hibridos/presenciales sin ubicacion real y cargos remotos sin region aprobada (`LATAM`, `Global`, `Chile`, etc.).
+- [x] `publish` bloquea cargos sin area/departamento publico aprobado.
+- [x] La salida incluye IDs, public IDs, status, URLs, warnings y timings por paso.
+- [x] La CLI o endpoint programatico permite a un agente publicar una vacante sin release, SQL ni UI manual.
+- [x] El camino queda documentado en manual HR, documentacion Careers y skill de talento.
+- [ ] Hay evidencia de dry-run y execute/publish controlado; si production queda fuera, se declara explicitamente. `dryRun` local verde; `execute/publish` real queda pendiente hasta aplicar migracion/levantar Cloud SQL Proxy en un entorno seguro.
 
 ## Verification
 
@@ -444,6 +462,20 @@ La solucion aceptable tiene una primitive server-side unica. La CLI, endpoint in
 - Tests focales de `src/lib/hiring/**` para dry-run, idempotencia, publish guard y canonical errors.
 - Smoke CLI/API con fixture de vacante Account Manager.
 - Verificacion runtime de URL publica cuando se ejecute `publish`.
+
+## Evidence 2026-07-09
+
+- `pnpm test src/lib/hiring/vacancy-publication-operator.test.ts src/lib/hiring/publication.test.ts src/lib/hiring/public-careers/view-model.test.ts` — verde.
+- `pnpm exec eslint src/lib/hiring/vacancy-publication-operator.ts src/lib/hiring/vacancy-publication-operator.test.ts src/lib/hiring/publication.ts src/lib/hiring/publication.test.ts src/lib/hiring/public-careers/view-model.ts src/lib/hiring/public-careers/view-model.test.ts src/app/api/hiring/vacancy-publications/route.ts scripts/hiring/publish-vacancy.ts` — verde.
+- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` — verde.
+- `pnpm hiring:publish-vacancy --file scripts/hiring/fixtures/account-manager-vacancy-brief.example.json --dry-run` — verde; preview valido con warning `public_compensation_band_not_set`.
+- `pnpm migrate:status` — no completado: Cloud SQL Proxy local no estaba levantado (`ECONNREFUSED 127.0.0.1:15432`). No se hizo smoke DB mutante ni publish real.
+
+## Closure State 2026-07-09
+
+- Estado: `code complete, rollout pendiente`.
+- Motivo: el codigo, contrato, docs y dry-run local estan implementados, pero la migracion aditiva no fue aplicada/verificada contra Cloud SQL y falta smoke `execute/publish` en entorno seguro.
+- Siguiente paso operativo: levantar conexion canonica (`pnpm pg:connect:status` / flujo de migracion aprobado), aplicar/verificar migracion y ejecutar smoke no productivo con fixture antes de mover esta task a `complete/`.
 
 ## Closing Protocol
 

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
+import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
 
@@ -29,6 +30,13 @@ export const toHiringErrorResponse = (
 
   if (error instanceof HiringNotFoundError) {
     return NextResponse.json({ error: error.message, code: error.code, actionable: false }, { status: 404 })
+  }
+
+  if (error instanceof ApiPlatformError) {
+    return NextResponse.json(
+      { error: 'No se pudo completar el command de Hiring.', code: error.errorCode, actionable: false },
+      { status: error.statusCode },
+    )
   }
 
   captureWithDomain(error, 'hiring', { tags: { source: `hiring:${source}` } })

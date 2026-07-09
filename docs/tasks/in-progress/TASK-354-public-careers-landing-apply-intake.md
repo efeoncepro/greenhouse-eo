@@ -353,6 +353,15 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 - [x] doc funcional (`docs/documentation/`) + manual (`docs/manual-de-uso/`) si aplica
 - [x] `ui-platform/PATTERNS.md` con el shell público reusable
 
+## Delta 2026-07-09 — UI polish + public offer guardrail
+
+- Se corrigio contraste del CTA `Postular a esta vacante` en links `.buttonPrimary`: `.root a { color: inherit }` ganaba especificidad y dejaba texto oscuro sobre azul. El CTA ahora conserva `color: #ffffff` en default/visited/hover.
+- Se corrigio la presentacion de competencias en listado y detalle: chips publicos cortos/canonicos (`Account management`, `Marketing generalista`, `SEO`, `Vendor management`) en lugar de fragmentos largos o truncados desde requisitos.
+- Se corrigio la modalidad publica: textos ambiguos como `Remoto / hibrido segun pais y acuerdo` se normalizan a una modalidad unica (`Remoto` o `Hibrido`). `Ubicacion` queda como region/ciudad: para remoto usa region de contratacion (`LATAM` por defecto o `Global`/region aprobada); para hibrido debe existir ciudad/pais u oficina real.
+- Se corrigio el detalle `Como es el proceso`: notas internas con `assessment template`, `L2`, `scorecard` o lenguaje interno se filtran y se reemplazan por copy candidato-facing. Nunca exponer IDs/niveles/template internos al candidato.
+- Se compacto la card de proceso del detalle a grid 2x2 responsive para eliminar el vacio visual y mejorar escaneo.
+- Verificacion local: `pnpm test src/lib/hiring/public-careers/view-model.test.ts`, `pnpm exec eslint ...`, `pnpm exec tsc --noEmit --pretty false`; Playwright desktop 1440/mobile 390 en `EO-OPN-0009` confirma CTA blanco sobre azul, sin nota interna ni modalidad ambigua, `Ubicacion=LATAM`, `Modalidad=Remoto`, chips sin overflow, timeline grid y `scrollWidth == clientWidth`.
+
 ## Follow-ups
 
 - `TASK-1362` doc capture → portfolio-file, identity docs, resolver documental unificado y scan/quarantine formal.

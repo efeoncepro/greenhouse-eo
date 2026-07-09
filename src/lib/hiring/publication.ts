@@ -27,6 +27,14 @@ export const buildPublicOpeningPayload = (opening: HiringOpening): PublicOpening
   requirements: opening.publicRequirements,
   niceToHave: opening.publicNiceToHave,
   locationMode: opening.publicLocationMode,
+  workMode: opening.publicWorkMode,
+  hiringRegion: opening.publicHiringRegion,
+  city: opening.publicCity,
+  country: opening.publicCountry,
+  officeLocation: opening.publicOfficeLocation,
+  area: opening.publicArea,
+  skillTags: opening.publicSkillTags,
+  compensationBand: opening.publicCompensationBand,
   employmentMode: opening.publicEmploymentMode,
   seniority: opening.publicSeniority ?? opening.seniority,
   processNotes: opening.publicProcessNotes,
@@ -37,7 +45,9 @@ export const buildPublicOpeningPayload = (opening: HiringOpening): PublicOpening
 // Columnas públicas allowlist para readers directos (no seleccionamos las internas).
 const PUBLIC_OPENING_SELECT = `
   public_id, public_title, internal_title, public_summary, public_description, public_requirements,
-  public_nice_to_have, public_location_mode, public_employment_mode, public_seniority, seniority,
+  public_nice_to_have, public_location_mode, public_work_mode, public_hiring_region, public_city,
+  public_country, public_office_location, public_area, public_skill_tags, public_compensation_band,
+  public_employment_mode, public_seniority, seniority,
   public_process_notes, apply_url, published_at`
 
 type PublicOpeningRow = {
@@ -49,6 +59,14 @@ type PublicOpeningRow = {
   public_requirements: unknown
   public_nice_to_have: unknown
   public_location_mode: unknown
+  public_work_mode: unknown
+  public_hiring_region: unknown
+  public_city: unknown
+  public_country: unknown
+  public_office_location: unknown
+  public_area: unknown
+  public_skill_tags: unknown
+  public_compensation_band: unknown
   public_employment_mode: unknown
   public_seniority: unknown
   seniority: unknown
@@ -60,6 +78,7 @@ type PublicOpeningRow = {
 const str = (v: unknown): string => (v == null ? '' : String(v))
 const nstr = (v: unknown): string | null => (v == null ? null : String(v))
 const ts = (v: unknown): string | null => (v == null ? null : v instanceof Date ? v.toISOString() : String(v))
+const arr = (v: unknown): string[] => (Array.isArray(v) ? v.map(item => String(item)).filter(Boolean) : [])
 
 const normalizePublicOpeningRow = (row: PublicOpeningRow): PublicOpeningPayload => ({
   publicId: str(row.public_id),
@@ -69,6 +88,14 @@ const normalizePublicOpeningRow = (row: PublicOpeningRow): PublicOpeningPayload 
   requirements: nstr(row.public_requirements),
   niceToHave: nstr(row.public_nice_to_have),
   locationMode: nstr(row.public_location_mode),
+  workMode: (nstr(row.public_work_mode) as PublicOpeningPayload['workMode']) ?? null,
+  hiringRegion: nstr(row.public_hiring_region),
+  city: nstr(row.public_city),
+  country: nstr(row.public_country),
+  officeLocation: nstr(row.public_office_location),
+  area: nstr(row.public_area),
+  skillTags: arr(row.public_skill_tags),
+  compensationBand: nstr(row.public_compensation_band),
   employmentMode: nstr(row.public_employment_mode),
   seniority: nstr(row.public_seniority) ?? nstr(row.seniority),
   processNotes: nstr(row.public_process_notes),
@@ -126,6 +153,47 @@ return rows[0]?.opening_id ?? null
 
 const RETURN_OPENING = `opening_id, public_id, publication_status, visibility, status, published_at, public_title`
 
+const validatePublishableOpening = (row: {
+  public_title: string | null
+  public_summary: string | null
+  public_description: string | null
+  public_work_mode: string | null
+  public_hiring_region: string | null
+  public_city: string | null
+  public_country: string | null
+  public_office_location: string | null
+  public_area: string | null
+  public_skill_tags: string[] | null
+}) => {
+  const missing: string[] = []
+
+  if (!row.public_title?.trim()) missing.push('publicTitle')
+  if (!row.public_summary?.trim()) missing.push('publicSummary')
+  if (!row.public_description?.trim()) missing.push('publicDescription')
+  if (!row.public_area?.trim()) missing.push('publicArea')
+  if (!row.public_work_mode?.trim()) missing.push('publicWorkMode')
+  if (!row.public_skill_tags?.length) missing.push('publicSkillTags')
+
+  if (row.public_work_mode === 'remote' && !row.public_hiring_region?.trim()) missing.push('publicHiringRegion')
+
+  if (
+    (row.public_work_mode === 'hybrid' || row.public_work_mode === 'onsite') &&
+    !row.public_office_location?.trim() &&
+    (!row.public_city?.trim() || !row.public_country?.trim())
+  ) {
+    missing.push('publicOfficeLocation|publicCity+publicCountry')
+  }
+
+  if (missing.length) {
+    throw new HiringValidationError(
+      'No se puede publicar un opening sin campos públicos estructurados completos.',
+      'hiring_opening_missing_public_structured_fields',
+      422,
+      { missing },
+    )
+  }
+}
+
 /**
  * Publica un opening: exige `public_title` presente (no se publica una vacante vacía), pone
  * `publication_status='published'`, `visibility='public_listed'`, `published_at=NOW()` y
@@ -137,21 +205,28 @@ export const publishOpening = async (
 ): Promise<{ openingId: string; publicId: string; publishedAt: string | null }> => {
   return withGreenhousePostgresTransaction(async (client) => {
     const current = await client.query(
-      `SELECT public_title, publication_status FROM greenhouse_hiring.hiring_opening WHERE opening_id = $1 LIMIT 1`,
+      `SELECT public_title, public_summary, public_description, public_work_mode, public_hiring_region,
+              public_city, public_country, public_office_location, public_area, public_skill_tags, publication_status
+       FROM greenhouse_hiring.hiring_opening WHERE opening_id = $1 LIMIT 1`,
       [openingId],
     )
 
-    const row = current.rows[0] as { public_title: string | null; publication_status: string } | undefined
+    const row = current.rows[0] as {
+      public_title: string | null
+      public_summary: string | null
+      public_description: string | null
+      public_work_mode: string | null
+      public_hiring_region: string | null
+      public_city: string | null
+      public_country: string | null
+      public_office_location: string | null
+      public_area: string | null
+      public_skill_tags: string[] | null
+      publication_status: string
+    } | undefined
 
     if (!row) throw new HiringNotFoundError('El opening no existe.', 'hiring_opening_not_found')
-
-    if (!row.public_title || row.public_title.trim().length === 0) {
-      throw new HiringValidationError(
-        'No se puede publicar un opening sin título público. Completa el payload público primero.',
-        'hiring_opening_missing_public_copy',
-        422,
-      )
-    }
+    validatePublishableOpening(row)
 
     const updated = await client.query(
       `UPDATE greenhouse_hiring.hiring_opening

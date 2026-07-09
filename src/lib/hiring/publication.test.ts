@@ -26,6 +26,15 @@ const internalOpening: HiringOpening = {
   publicRequirements: '5+ años de experiencia',
   publicNiceToHave: 'Portafolio en motion',
   publicLocationMode: 'remoto',
+  publicWorkMode: 'remote',
+  publicHiringRegion: 'LATAM',
+  publicCity: null,
+  publicCountry: null,
+  publicOfficeLocation: null,
+  publicArea: 'Creative',
+  publicSkillTags: ['Diseño', 'Figma'],
+  publicCompensationBand: null,
+  publicationSourceRef: 'brief-1',
   publicEmploymentMode: 'full_time',
   publicSeniority: 'Senior',
   publicProcessNotes: '3 etapas',
@@ -59,15 +68,23 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
         'applyUrl',
         'description',
         'employmentMode',
+        'area',
+        'city',
+        'compensationBand',
+        'country',
+        'hiringRegion',
         'locationMode',
         'niceToHave',
+        'officeLocation',
         'processNotes',
         'publicId',
         'publishedAt',
         'requirements',
         'seniority',
+        'skillTags',
         'summary',
         'title',
+        'workMode',
       ].sort(),
     )
   })
@@ -76,6 +93,10 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
     const payload = buildPublicOpeningPayload(internalOpening)
 
     expect(payload.title).toBe('Diseñador/a Senior')
+    expect(payload.workMode).toBe('remote')
+    expect(payload.hiringRegion).toBe('LATAM')
+    expect(payload.area).toBe('Creative')
+    expect(payload.skillTags).toEqual(['Diseño', 'Figma'])
   })
 
   it('cae al título interno solo si no hay público (openings legacy)', () => {

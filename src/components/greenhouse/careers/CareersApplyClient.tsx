@@ -17,10 +17,19 @@ import Link from 'next/link'
 
 import { EFEONCE_URL_HTTPS } from '@/config/efeonce-brand'
 import type { RenderContract } from '@/growth-forms-renderer/contract'
+import {
+  formatNationalPhoneDisplay,
+  nationalFromStored,
+  parseE164,
+  PHONE_COUNTRIES,
+  stripNationalDigits,
+  toE164,
+} from '@/growth-forms-renderer/mask'
 import { createTelemetryEmitter, type TelemetryEmitter } from '@/growth-forms-renderer/telemetry'
 import { TurnstileTokenClient } from '@/growth-forms-renderer/turnstile'
 import { RENDERER_VERSION } from '@/growth-forms-renderer/version'
 import type { CareersCopy } from '@/lib/copy'
+import { validateE164PhoneValue } from '@/lib/growth/forms/validators/phone'
 import {
   PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES,
   formatPublicCareersCvFileSize,
@@ -72,6 +81,7 @@ const FIELD_ORDER: Array<ApplicationField | 'captcha'> = [
   'firstName',
   'lastName',
   'email',
+  'phone',
   'portfolioUrl',
   'linkedinUrl',
   'consent',
@@ -80,6 +90,13 @@ const FIELD_ORDER: Array<ApplicationField | 'captcha'> = [
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const CV_ACCEPT = PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES.join(',')
+const DEFAULT_PHONE_COUNTRY = 'CL'
+
+const resolvePhoneCountry = (contract: RenderContract): string =>
+  (
+    contract.fields.find(field => field.key === 'phone')?.validatorParams?.country ??
+    DEFAULT_PHONE_COUNTRY
+  ).toUpperCase()
 
 const isHttpsUrl = (value: string): boolean => {
   const trimmed = value.trim()
@@ -112,6 +129,7 @@ const resolveServerError = (copy: CareersCopy, outcome: unknown, status: number)
 export const CareersApplyClient = ({ copy, formContract, opening }: CareersApplyClientProps) => {
   const turnstileSiteKey = formContract.security?.captcha?.siteKey ?? null
   const [values, setValues] = useState<ApplicationFormValues>(INITIAL_VALUES)
+  const [phoneCountry, setPhoneCountry] = useState(() => resolvePhoneCountry(formContract))
   const [errors, setErrors] = useState<ApplicationErrors>({})
   const [cvFile, setCvFile] = useState<File | null>(null)
   const [isCvDragActive, setIsCvDragActive] = useState(false)
@@ -264,6 +282,13 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
     if (!values.lastName.trim()) nextErrors.lastName = copy.apply.errors.lastName
     if (!email) nextErrors.email = copy.apply.errors.emailRequired
     else if (!EMAIL_RE.test(email)) nextErrors.email = copy.apply.errors.emailInvalid
+
+    if (values.phone.trim()) {
+      const phoneResult = validateE164PhoneValue(values.phone, { country: phoneCountry })
+
+      if (!phoneResult.valid) nextErrors.phone = copy.apply.errors.phoneInvalid
+    }
+
     if (!isHttpsUrl(values.portfolioUrl)) nextErrors.portfolioUrl = copy.apply.errors.urlInvalid
     if (!isHttpsUrl(values.linkedinUrl)) nextErrors.linkedinUrl = copy.apply.errors.urlInvalid
     if (!values.consent) nextErrors.consent = copy.apply.errors.consent
@@ -463,14 +488,6 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
         </div>
       </section>
 
-      <div className={`${styles.alert} ${styles.alertInfo}`}>
-        <i className='tabler-shield-lock' aria-hidden='true' />
-        <span>
-          <strong>{copy.apply.alertTitle}</strong>
-          {copy.apply.alertBody}
-        </span>
-      </div>
-
       {submitState === 'invalid' && (errors.server || Object.keys(errors).length > 0) ? (
         <div className={`${styles.alert} ${styles.alertError}`} ref={invalidSummaryRef} tabIndex={-1} role='alert'>
           <i className='tabler-alert-triangle' aria-hidden='true' />
@@ -498,6 +515,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
               autoComplete='given-name'
               error={errors.firstName}
               field='firstName'
+              icon='tabler-user'
               label={copy.apply.fields.firstName}
               onChange={setValue}
               requiredLabel={copy.aria.required}
@@ -507,6 +525,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
               autoComplete='family-name'
               error={errors.lastName}
               field='lastName'
+              icon='tabler-user'
               label={copy.apply.fields.lastName}
               onChange={setValue}
               requiredLabel={copy.aria.required}
@@ -517,6 +536,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
             autoComplete='email'
             error={errors.email}
             field='email'
+            icon='tabler-mail'
             inputMode='email'
             label={copy.apply.fields.email}
             onChange={setValue}
@@ -525,15 +545,15 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
             type='email'
             value={values.email}
           />
-          <TextField
-            autoComplete='tel'
-            field='phone'
-            inputMode='tel'
+          <PhoneField
+            country={phoneCountry}
+            error={errors.phone}
             label={copy.apply.fields.phone}
+            onCountryChange={setPhoneCountry}
             onChange={setValue}
             placeholder={copy.apply.placeholders.phone}
-            type='tel'
             value={values.phone}
+            countryAriaLabel={copy.apply.phoneCountryAria}
           />
         </FormSection>
 
@@ -542,6 +562,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
             autoComplete='url'
             error={errors.portfolioUrl}
             field='portfolioUrl'
+            icon='tabler-link'
             inputMode='url'
             label={copy.apply.fields.portfolio}
             onChange={setValue}
@@ -553,6 +574,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
             autoComplete='url'
             error={errors.linkedinUrl}
             field='linkedinUrl'
+            icon='tabler-brand-linkedin'
             inputMode='url'
             label={copy.apply.fields.linkedin}
             onChange={setValue}
@@ -715,6 +737,7 @@ const TextField = ({
   autoComplete,
   error,
   field,
+  icon,
   inputMode,
   label,
   onChange,
@@ -726,6 +749,7 @@ const TextField = ({
   autoComplete?: string
   error?: string
   field: ApplicationField
+  icon?: string
   inputMode?: HTMLAttributes<HTMLInputElement>['inputMode']
   label: string
   onChange: (field: ApplicationField, value: string) => void
@@ -739,19 +763,22 @@ const TextField = ({
       {label}
       {requiredLabel ? <span className={styles.visuallyHidden}> {requiredLabel}</span> : null}
     </label>
-    <input
-      autoComplete={autoComplete}
-      className={styles.input}
-      id={fieldId(field)}
-      inputMode={inputMode}
-      name={field}
-      placeholder={placeholder}
-      type={type}
-      value={value}
-      onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.value)}
-      aria-describedby={error ? errorId(field) : undefined}
-      aria-invalid={Boolean(error)}
-    />
+    <span className={styles.fieldShell}>
+      {icon ? <i className={`${icon} ${styles.fieldIcon}`} aria-hidden='true' /> : null}
+      <input
+        autoComplete={autoComplete}
+        className={`${styles.input} ${icon ? styles.inputWithIcon : ''}`}
+        id={fieldId(field)}
+        inputMode={inputMode}
+        name={field}
+        placeholder={placeholder}
+        type={type}
+        value={value}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(field, event.target.value)}
+        aria-describedby={error ? errorId(field) : undefined}
+        aria-invalid={Boolean(error)}
+      />
+    </span>
     {error ? (
       <span className={styles.errorText} id={errorId(field)}>
         <i className='tabler-alert-circle' aria-hidden='true' />
@@ -760,6 +787,93 @@ const TextField = ({
     ) : null}
   </div>
 )
+
+const PhoneField = ({
+  country,
+  countryAriaLabel,
+  error,
+  label,
+  onChange,
+  onCountryChange,
+  placeholder,
+  value,
+}: {
+  country: string
+  countryAriaLabel: string
+  error?: string
+  label: string
+  onChange: (field: ApplicationField, value: string) => void
+  onCountryChange: (country: string) => void
+  placeholder?: string
+  value: string
+}) => {
+  const national = nationalFromStored(value, country)
+  const displayValue = national ? formatNationalPhoneDisplay(national, country) : ''
+
+  const updateStored = (nextCountry: string, nextNational: string) => {
+    onChange('phone', toE164(nextCountry, nextNational))
+  }
+
+  return (
+    <div className={styles.field}>
+      <label className={styles.label} htmlFor={fieldId('phone')}>
+        {label}
+      </label>
+      <div className={styles.phoneControl}>
+        <select
+          aria-label={countryAriaLabel}
+          className={styles.phoneCountry}
+          value={country}
+          onChange={event => {
+            const nextCountry = event.target.value.toUpperCase()
+
+            onCountryChange(nextCountry)
+            updateStored(nextCountry, national)
+          }}
+        >
+          {PHONE_COUNTRIES.map(option => (
+            <option key={option.code} value={option.code}>
+              {option.flag} +{option.callingCode}
+            </option>
+          ))}
+        </select>
+        <span className={styles.fieldShell}>
+          <i className={`tabler-phone ${styles.fieldIcon}`} aria-hidden='true' />
+          <input
+            autoComplete='tel'
+            className={`${styles.input} ${styles.inputWithIcon} ${styles.phoneInput}`}
+            id={fieldId('phone')}
+            inputMode='tel'
+            name='phone'
+            placeholder={placeholder}
+            type='tel'
+            value={displayValue}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              const parsed = parseE164(event.target.value)
+
+              if (parsed) {
+                onCountryChange(parsed.country)
+                onChange('phone', toE164(parsed.country, parsed.national))
+
+                return
+              }
+
+              updateStored(country, stripNationalDigits(event.target.value))
+            }}
+            aria-describedby={error ? errorId('phone') : undefined}
+            aria-invalid={Boolean(error)}
+          />
+        </span>
+      </div>
+      {error ? (
+        <span className={styles.errorText} id={errorId('phone')}>
+          <i className='tabler-alert-circle' aria-hidden='true' />
+          {error}
+        </span>
+      ) : null}
+    </div>
+  )
+}
 
 const TextAreaField = ({
   field,
