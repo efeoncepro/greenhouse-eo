@@ -9,6 +9,29 @@ Confirma:
 - Turnstile y consentimiento están aprobados para el ambiente objetivo;
 - la ruta pública que vas a probar corresponde al ambiente correcto.
 
+## Crear y publicar una vacante real
+
+No crear vacantes por SQL ni editando estado visual. La secuencia canonica vive
+en Hiring:
+
+1. Crear demand con `createTalentDemand`.
+2. Crear opening con `createHiringOpening`.
+3. Completar copy, requisitos, skills, proceso y visibilidad con
+   `updateHiringOpening`.
+4. Publicar con `publishOpening`.
+5. Registrar en el cierre: `demand.public_id`, `opening.public_id`, URL de
+   detalle y URL de apply.
+
+Ejemplo real: `Account Manager / Especialista en Marketing` quedó como demand
+`EO-TDM-0012` y opening `EO-OPN-0009`:
+
+- `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009`
+- `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009/apply`
+
+Si la publicación va a producción, usar `greenhouse-production-release` para
+flags, promoción, smoke, watchdog y cierre de manifest. La skill de talento
+define el rol y el contrato de Hiring; no reemplaza el release control plane.
+
 ## Verificar rutas
 
 1. Abre `/public/careers`.
@@ -74,3 +97,10 @@ y el namespace copy `careers`.
 
 Para desactivar recepción pública sin revertir UI, mantener
 `HIRING_PUBLIC_APPLICATIONS_ENABLED` apagado y conservar `noindex`.
+
+## Banco de Talento
+
+Un bloque de Banco de Talento puede ser decorativo solo si no captura datos. Si
+recibe email, CV o interés general, debe ser un Growth Form o comando Hiring
+real con consentimiento, captcha/rate-limit, success genérico y dedupe seguro.
+No dejar un formulario visual sin backend gobernado.

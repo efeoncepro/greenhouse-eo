@@ -219,6 +219,36 @@ Prefijar con un contexto explícito (`DEPLOY_UID`, `BUILD_PPID`, etc.) o usar mi
 - Si `pnpm release:watchdog --json` reporta `worker_revision_drift`, el release no esta cerrado aunque el orquestador haya terminado.
 - Ante duda operacional, mirar job summary/log + Cloud Run `Ready=True` + `GIT_SHA`; no inferir desde el nombre del job.
 
+### 8. Leer tarde el playbook y redescubrir condiciones comunes
+
+**Caso real (2026-07-09, TASK-354 / Account Manager opening):** el release
+estaba autorizado como acoplado, runtime terminó sano y la transición final se
+atascó por cola de runner. El agente invirtió tiempo persiguiendo
+`ops-worker`/watchdog y condiciones ya documentadas en vez de aplicar primero
+la skill/runbook de release. El operador lo señaló correctamente: approvals,
+workers lentos, `ops-worker` change-gated y queue final son condiciones comunes
+del camino de producción.
+
+**Regla**:
+
+- Antes de cualquier paso a producción, leer la skill
+  `greenhouse-production-release`, este playbook, el runbook de producción y el
+  runbook de watchdog.
+- Si el único drift es `ops-worker`, validar diff runtime entre el `GIT_SHA` de
+  Cloud Run y el `target_sha`. Si no hay archivos, no redeployar por etiqueta.
+- Si `transition-released` queda queued tras runtime verde, no usar SQL: esperar
+  o, con aprobación explícita, cerrar con
+  `pnpm release:orchestrator-transition-state` y razón auditada.
+- Si el operador pidió medir tiempos, registrar cada fase sin convertir la
+  medición en investigación nueva.
+- Todo cierre de release debe actualizar
+  `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha,
+  release ID, run ID, SHA y tiempos. El KPI principal es el tiempo agente
+  end-to-end, incluyendo revisar, analizar, ejecutar, diagnosticar, documentar y
+  responder; workflow/manifest son submetricas tecnicas. Si no hubo cronometro
+  formal, registrar `no medido formalmente` + estimacion del operador si existe,
+  y corregir el proceso para el siguiente release.
+
 ---
 
 ## Decisión: ¿cuándo eliminar / relajar el preflight?

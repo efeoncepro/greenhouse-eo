@@ -3,7 +3,7 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md) §2.9
 > **Source task:** TASK-849
-> **Last updated:** 2026-05-24
+> **Last updated:** 2026-07-09
 
 Este runbook opera el watchdog que detecta y alerta temprano sobre approvals obsoletos de Production, runs productivos sin jobs y drift de deploy de workers.
 
@@ -42,6 +42,10 @@ Sin blockers detectados. Los 3 signals están en steady state. Operador no neces
 - **stale_approval >24h**: aprobación lleva un día completo sin acción. Operador debe revisar y decidir cancel/approve.
 - **pending_without_jobs >30min**: bug clase concurrency deadlock. Cancelar el run viejo bloqueante (ver §4 Stale approval recovery).
 - **worker_revision_drift confirmado**: revision Cloud Run no matchea el último deploy verde. Investigar deploy fallido o manual deployment.
+  - Excepción conocida: si el único hallazgo es `ops-worker`, el workflow
+    declaró `deploy_needed=false`, Cloud Run está `Ready=True` y el diff de
+    rutas runtime entre `GIT_SHA` servido y `target_sha` es vacío, tratarlo como
+    residual de label por change-gate. No redeployar solo para alinear el SHA.
 
 ### `critical`
 - **stale_approval >7d**: aprobación abandonada. Cancelar inmediatamente. Es el síntoma del incidente histórico 2026-04-26 → 2026-05-09.
@@ -112,6 +116,18 @@ Cuando recibes alerta `[ERROR] Worker revision drift — <workflow>`:
    ```
 
 2. **Si difieren**: deploy reciente falló silente, el workflow salto deploy por creer que el runtime era equivalente, o alguien deployó manualmente sin pasar por workflow.
+   - Antes de re-disparar nada, comprobar si es el caso conocido
+     `ops-worker` change-gated:
+     ```bash
+     git diff --name-only <cloud_run_git_sha> <release_target_sha> -- \
+       package.json pnpm-lock.yaml tsconfig.json \
+       services/ops-worker scripts/ops-worker src/lib/ops src/lib/release
+     ```
+   - Si el diff no devuelve archivos, el run summary muestra
+     `deploy_needed=false` y Cloud Run esta `Ready=True`, **parar**: no hay
+     cambio runtime pendiente. Documentar el residual en `Handoff.md` y en el
+     cierre del release. Este es un falso positivo operacional de la lectura V1
+     del watchdog, no una razón para quemar otro deploy.
    - Re-trigger workflow normal del servicio drifted con el SHA canonico del release.
    - Si el drift aparece despues de un `Production Release Orchestrator` exitoso, no cerrar el release todavia: preferir primero rerun del orquestador para el mismo `target_sha`; usar workflow individual solo como break-glass aprobado si el orquestador queda bloqueado.
    - Para `hubspot-greenhouse-integration`:

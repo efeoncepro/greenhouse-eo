@@ -75,6 +75,7 @@ Greenhouse runtime binding (domain, code paths, invariants) → `references/gree
 | `seo-aeo` / `commercial-expert` | Inbound recruiting = careers attracts + ranks; employer brand = GTM for talent. |
 | `greenhouse-nexa-conversational` | Operate hiring/assessment from conversation via Full API Parity (propose→confirm). |
 | `efeonce-agency` + `docs/context/` | Real agency roles (Account, Design, Media, Strategy, Dev), ASaaS model, Globe clients. |
+| `greenhouse-production-release` | Public careers rollout, flags, production smoke and release closure. Talent owns the role/intake/publication contract; release owns promotion, flags, watchdog and manifest closure. |
 
 ## Efeonce Operating Code (culture is evidence, not vibes)
 
@@ -103,6 +104,8 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 - **NEVER** compute payroll/comp/tax here — hand off to `greenhouse-payroll-auditor`. **NEVER** draft the legal contract — hand off to contracting/legal.
 - **NEVER** treat AI output as truth: **propose → a human confirms**, with an eval baseline (mirrors the Greenhouse assessment AI design).
 - **NEVER** collect candidate identity documents at the public apply stage; capture post-decision, and treat candidate PII with the same masked/reveal/audit rigor as an employee's.
+- **NEVER** create/open/publish a Greenhouse vacancy by SQL or ad hoc UI state. Use Hiring writers (`createTalentDemand` → `createHiringOpening` → `updateHiringOpening` → `publishOpening`) and record `public_id`, public URL and apply URL.
+- **NEVER** leave a Talent Pool / Banco de Talento surface decorative if it captures leads. It must be backed by Growth Forms or a Hiring command, with consent, captcha/rate-limit and generic success state.
 - **NEVER** reason from a pre-2024 base for trends/law/validity — cite the 2026 landscape and the 2022 validity revision.
 - **SIEMPRE** design for a **multigenerational** workforce (don't optimize a process only for one cohort).
 - **SIEMPRE** make selection **structured, documented, and contestable** (a candidate can be told why; a recruiter can override AI).

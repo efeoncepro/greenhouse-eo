@@ -49,6 +49,31 @@ fuente autoritativa de escritura sigue siendo Hiring. Un adapter Growth
 Forms→Hiring puede abrirse como backend-data follow-up si se quiere mover el
 ledger de submit al dominio Growth Forms.
 
+## Operación de vacantes reales
+
+Una vacante pública nace en el dominio Hiring:
+
+```text
+createTalentDemand -> createHiringOpening -> updateHiringOpening -> publishOpening
+```
+
+La UI de careers no inventa vacantes ni persiste estado paralelo. El cierre
+operativo debe registrar el demand `public_id`, opening `public_id`, ruta de
+detalle y ruta de apply. Ejemplo live: `EO-TDM-0012` / `EO-OPN-0009`, Account
+Manager / Especialista en Marketing.
+
+Si el opening debe quedar visible en production, la publicación se coordina con
+el release control plane: flags (`HIRING_PUBLIC_APPLICATIONS_ENABLED`,
+Turnstile), deploy, smoke del detalle/apply, watchdog y manifest.
+
+## Banco de Talento
+
+Banco de Talento no debe quedar ambiguo. Si es solo contenido visual de employer
+brand, se documenta como decorativo. Si captura candidatos generales, se opera
+como Growth Form o comando Hiring con consentimiento, captcha/rate-limit,
+telemetría y respuesta genérica. El diseño no puede ser la única fuente de
+captura.
+
 ## Estados principales
 
 - home con vacantes publicadas;

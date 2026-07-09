@@ -1,3 +1,15 @@
+## Sesion 2026-07-09 - Release/careers learning canonizado - Codex - docs/skills
+
+> **Pedido:** documentar el aprendizaje operativo de TASK-354/careers + vacante Account Manager, incluyendo manuales, documentacion y skills de talento.
+>
+> **Aprendizaje canonizado:** el release acoplado no debia convertirse en investigacion abierta de condiciones comunes. Se actualizo `greenhouse-production-release` (Codex/Claude), arquitectura release, runbook de produccion, playbook de incidentes, manual/doc del orquestador, manual/doc del watchdog y flag ledger para obligar a leer playbook antes de production, medir fases sin perseguir cada latencia, reconocer `ops-worker` change-gated cuando el diff runtime esta vacio, y cerrar `transition-released` queued/stale solo con CLI canonico + razon auditada, nunca SQL.
+>
+> **Timing ledger agregado:** por instruccion del operador se creo `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`. Regla: cada agente debe iniciar cronometro al tomar la primera accion de release, incluyendo revisar/analizar/preparar, y registrar fecha, agente, release ID, run ID, SHA, **tiempo agente E2E como KPI principal**, workflow, manifest, runtime verde, fases, bloqueo y aprendizaje. Se sembraron dos entradas 2026-07-09: release inicial TASK-354 (`433cfa2b0fd3...`, run `28991488376`, workflow 12m14s, manifest 10m09s, runtime verde 11m05s) y release acoplado PR #151 (`915be02a...`, run `28999468657`, workflow 26m47s, manifest 21m50s, runtime verde 13m04s, agente E2E no medido formalmente; **operador estima >=2h**). Importante: 21m50s NO mide lo que tardo Codex; solo mide el manifest.
+>
+> **Talent/careers:** se actualizo `greenhouse-talent-people-operator` (Codex/Claude), su referencia runtime, manual de careers publicas y documentacion HR para dejar claro que una vacante real nace por writers de Hiring (`createTalentDemand` -> `createHiringOpening` -> `updateHiringOpening` -> `publishOpening`), que se deben registrar demand/opening public IDs y URLs, y que Banco de Talento solo puede ser decorativo si no captura datos; si captura leads, debe ser Growth Form/Hiring command gobernado.
+>
+> **Caso real registrado:** Account Manager / Especialista en Marketing quedo como demand `EO-TDM-0012`, opening `EO-OPN-0009`, detalle `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009` y apply `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009/apply`. El release 2026-07-09 tuvo runtime verde; `ops-worker` residual se trata como label drift si `git diff` runtime entre Cloud Run SHA y target esta vacio.
+
 ## Sesion 2026-07-09 - Home public site audit -> PDR hardening - Codex - docs
 
 > **Pedido:** ajustar los PDR correspondientes tras evaluar si el Home actual refleja el Why, Experiencia Efeonce y Growth Operating System.

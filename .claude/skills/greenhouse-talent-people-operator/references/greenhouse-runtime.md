@@ -21,6 +21,34 @@ Load whenever the work happens *inside* the Greenhouse repo (not pure advisory).
 - `TASK-1362` Candidate Document Capture — CV/portfolio on the **private assets platform** (reuse, don't build buckets); **identity docs reuse `person_identity_documents`** (masked/reveal + capability `person.legal_profile.reveal_sensitive` + audit), captured **post-decision**; quarantine/scan for public uploads.
 - `TASK-1363` Assessment Taking + Review Surface — candidate takes the test via a **public tokenized Greenhouse link** (`/assessment/[token]`, single-use, time-limited); internal review in Application 360. `UI ready: no` until product-design loop.
 
+## Public careers / vacancy publication contract
+
+When the work is "create/open/publish a vacancy" inside Greenhouse, operate the
+Hiring domain, not the database:
+
+1. `createTalentDemand` creates the demand root.
+2. `createHiringOpening` derives the opening from that demand.
+3. `updateHiringOpening` fills role copy, requirements, skills, process,
+   visibility and publication metadata.
+4. `publishOpening` makes it public-listed and produces the public `opening_id`.
+
+Record in the response and handoff: demand `public_id`, opening `public_id`,
+production detail URL and apply URL. Example from the 2026-07-09 Account Manager
+release: demand `EO-TDM-0012`, opening `EO-OPN-0009`,
+`/public/careers/EO-OPN-0009`, `/public/careers/EO-OPN-0009/apply`.
+
+Listing/detail must consume `PublicOpeningPayload` only. Apply must use the
+Growth Forms compatible contract (`efeonce-careers-application`) but the
+authoritative write remains Hiring (`POST /api/public/hiring/applications`).
+
+Talent Pool / Banco de Talento rule: if the surface only illustrates employer
+brand, mark it explicitly as decorative. If it captures emails/CVs/interest, it
+must be a real Growth Form or Hiring command with consent, captcha/rate-limit,
+generic success/dedupe state and a documented owner.
+
+Do not turn vacancy creation into release recovery. If production publication,
+flags or smoke are needed, compose with `greenhouse-production-release`.
+
 ## Person model (never duplicate a human)
 
 - Root: `greenhouse_core.identity_profiles` (`profile_id`). A candidate is a **Person with a `candidate_facet`**, not a separate record. Reconcile with `resolvePersonIdentifier`.

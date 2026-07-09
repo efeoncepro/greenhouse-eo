@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador)
 > **Version:** 1.1
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-06-30 por Claude
+> **Ultima actualizacion:** 2026-07-09 por Codex
 > **Documentacion tecnica:** [CLAUDE.md §Production Release Orchestrator invariants (TASK-851)](../../../CLAUDE.md), [Spec TASK-851](../../tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Production Release Orchestrator
@@ -14,6 +14,15 @@ El orquestador (`production-release.yml`) hace los 8 pasos en una sola corrida, 
 
 ## Antes de empezar
 
+- Si eres agente, primero carga `greenhouse-production-release` y relee el
+  runbook. Muchas señales del release son comunes: no abras una investigación
+  nueva para approvals, warnings del squash commit, workers lentos,
+  `no_infra_diff`, `ops-worker` change-gated o runner queue final.
+- Si eres agente, abre cronómetro en la primera acción de release, incluyendo
+  revisar/analizar. Antes de cerrar, registra tiempos en
+  `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`: agente, fecha,
+  release ID, run ID, SHA, **tiempo agente end-to-end** como KPI principal,
+  workflow, manifest, runtime verde, fases y bloqueo principal.
 - El SHA target debe estar **ya pusheado a `main`** (Vercel deploys automáticamente al push; el orquestador espera el READY).
 - Tener capability `platform.release.execute` (EFEONCE_ADMIN o DEVOPS_OPERATOR).
 - Si vas a usar `bypass_preflight_reason`: además capability `platform.release.bypass_preflight` (EFEONCE_ADMIN solo) + reason >= 20 chars con post-mortem comprometido.
@@ -125,7 +134,8 @@ Codex **no usa archivos de slash command** `.md`. Sus alias slash (`/implement-t
 | `release_batch_policy=requires_break_glass` señalando `deploy.sh` u otro archivo **que no cambió** en este release | Falso positivo por divergencia squash-merge (classifier three-dot resucita archivos ya en prod) — ISSUE-114 | Confirmá el fantasma: `git diff origin/main..target -- <archivo>` = 0 líneas. Post-merge (target=HEAD de main) el batch-policy pasa solo; para el preflight pre-PR usá `bypass_preflight_reason` documentado |
 | `gh pr merge` develop→main falla: "merge commit cannot be cleanly created" | Divergencia squash (main no es ancestro de develop; ambos editaron docs/código desde una merge-base vieja) | En `develop`: `git merge origin/main -X ours --no-edit` (develop autoritativo) → verificá `git log origin/main --not develop` vacío + código intacto → push develop → el PR queda MERGEABLE. NUNCA cherry-pick a main |
 | `preflight` marca `readyToDeploy=false` con **solo warnings** `playwright_smoke` (0 runs) / `ci_green` (aún corriendo) | El smoke/CI corren en `develop` (ya verdes); el commit squash fresco de `main` no tiene su propio run | Esperá el CI de `main` verde y re-dispatchá con `bypass_preflight_reason` documentado (baja los warnings sin errors). Es el path canónico de estos releases |
-| Tras el release, un worker Cloud Run (típico: ops-worker) quedó con un GIT_SHA **anterior** al target | **No es drift**: `ops-worker-deploy` es change-gated y saltó el rebuild (`deploy_needed=false`) porque ningún archivo del worker cambió — código idéntico al target | No forzar redeploy salvo que el código del worker haya cambiado. Ver runbook §4.1 |
+| Tras el release, `ops-worker` quedó con un GIT_SHA **anterior** al target | Normal si `ops-worker-deploy` saltó el rebuild (`deploy_needed=false`) y el diff de rutas runtime entre Cloud Run y target es vacío | No forzar redeploy solo para alinear el label. Documentar el residual y ver runbook §4.1.1 |
+| `transition-released` queda queued/stale después de runtime verde | GitHub Actions runner/concurrency quedó atascado al final, no necesariamente el runtime | No usar SQL. Si health/smoke/watchdog aplicable están verificados y el operador aprueba, cerrar con `pnpm release:orchestrator-transition-state --release-id=<id> --to-state=released --reason=<razon>` y documentar run/release/evidencia |
 | `record-started` falla con "release ya activo en main" | Otro release en `preflight|ready|deploying|verifying` | Esperar terminación o abortar manualmente via `pnpm release:orchestrator-transition-state --to-state=aborted` |
 | Worker deploy falla con "GIT_SHA mismatch" | Cloud Build cache stale, tag drift, deploy aborted mid-flight | Re-run el workflow; si persiste investigar Cloud Build console |
 | `wait-vercel` timeout 900s | Vercel deploy lento o no triggered | Verificar `vercel ls greenhouse-eo --target=production`; si no hay deployment, push manual a main |

@@ -32,6 +32,7 @@ Read only what the task needs, in this order:
 - **`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — OBLIGATORIO si el orchestrator falló (no chasees el gate; lee el JSON output como diagnóstico)**
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`
 - **`docs/operations/FEATURE_FLAG_STATE_LEDGER.md` — OBLIGATORIO en TODO paso a producción. Lee la `§ Pendientes de acción`: hay features `code-complete` cuyo flag default-OFF debe prenderse en prod junto a este release (a veces + migración/ops-worker). El deploy del código NO los activa — qué prender se lee de acá, no de la memoria.**
+- **`docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` — OBLIGATORIO al cerrar TODO paso a producción. Registra agente, fecha, release ID, run ID, target SHA y tiempos.**
 - `docs/operations/runbooks/production-release.md`
 - `docs/manual-de-uso/plataforma/release-orchestrator.md`
 - `.github/workflows/production-release.yml`
@@ -59,6 +60,8 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 - Never bypass `production-release.yml` because "the workers already deployed".
 - Never introduce or change a production deploy workflow without updating `src/lib/release/workflow-allowlist.ts`, the orchestrator wiring, tests, docs, and this skill.
 - Never infer that Azure or a worker "skipped" from the workflow name alone. Read the job summary/logs and verify Cloud Run `Ready=True` + `GIT_SHA` or watchdog OK. Azure `no_infra_diff` can be an expected no-op; worker revision drift is never a clean release closure.
+- Never rediscover common release conditions as if they were new incidents. Approvals, CI/smoke warnings on fresh squash commits, worker latency, Azure `no_infra_diff`, `ops-worker` change-gated no-op, and final transition runner queue are documented in the runbooks. If the user asks to measure timings, record phase durations while following the playbook.
+- Never close a production release without updating `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`. The primary KPI is **agent end-to-end elapsed**, not manifest/workflow elapsed. Start the timer at the first release-related action, including reading, reviewing and analyzing. Required fields: agent name, date, release ID, orchestrator run ID, target SHA, agent E2E elapsed, phase breakdown, workflow elapsed, manifest elapsed, runtime-green elapsed, main blocker and learning.
 - **Never `git push` to `main` (including hotfixes, doc-only commits, or fixes "that don't affect workers") without immediately dispatching the canonical orchestrator `production-release.yml` with `target_sha=<HEAD del push>`.** Every commit on `main` MUST be tracked by a release manifest. The Vercel auto-deploy on `push:main` is NOT a release — only the manifest in `greenhouse_sync.release_manifests` reflects what production is supposed to be. **Anti-pattern detectado 2026-05-14**: Codex pushó 3 hotfixes directo a main (`982accaf`, `4fe799cf`, `cfea1784`) post un release ajeno; Vercel auto-deployó pero el manifest quedó en el SHA del release anterior → drift cosmético + audit trail roto.
 - **Never cherry-pick to `main` a commit that also exists on `develop`.** Creates duplicate SHAs for the same logical change (caso real 2026-05-14: `fa5258a5/4fe799cf` mismo diff distinto SHA), confuses audit trail, breaks the exact mirror between develop/main. Canonical hotfix path: branch from `main` → fix → PR → merge → orchestrator dispatch → cherry-pick back to develop (not the other direction).
 - **Never assume "hotfix small, no orchestrator needed"** — the rule has zero exceptions outside break-glass. Even a typo fix to `main` requires orchestrator dispatch to keep manifest aligned. If the fix is too trivial for a release manifest, it's too trivial to push to `main` — merge to develop and wait for the next regular release.
@@ -68,6 +71,7 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 
 The normal release path is:
 
+0. Start an agent E2E release timer and prepare the timing-ledger row. Reading, review, analysis and preparation count.
 1. Confirm current branch, remotes, and dirty worktree.
 2. Confirm `develop` is green and no unrelated local changes will be included.
 3. Run or inspect release preflight:
@@ -113,6 +117,7 @@ gh workflow run production-release-watchdog.yml --ref main \
    - `ico-batch-worker` in `us-east4`
    - `hubspot-greenhouse-integration` in `us-central1`
 10. **Prender los flags pendientes de este release.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`: por cada feature `code-complete` cuyo flip estaba gated a este release, `vercel env add <FLAG>=true Production` (+ `gcloud run services update ops-worker --update-env-vars ...` si el flag corre en el worker) + redeploy + smoke del flujo en prod + actualizar la fila del ledger (snapshot por environment). El deploy del código no activa nada por sí solo. Si un flag requería su migración en prod, confirmar que entró por este release antes de prenderlo.
+11. **Registrar tiempos del release.** Actualizar `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release ID, run ID, target SHA, agent E2E elapsed como KPI principal, desglose de fases, workflow elapsed, manifest elapsed, runtime-green elapsed, blocker principal y aprendizaje.
 
 ## Gotchas conocidos del release (verificados 2026-07-03 #139; fix de raíz = ISSUE-114)
 
@@ -124,7 +129,7 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
 
 3. **`playwright_smoke` (0 runs) + `ci_green` (aún corriendo) en el squash commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit de `main` no tiene su propio smoke. Con solo *warnings* (sin errors), el preflight marca `readyToDeploy=false` salvo `bypass_preflight_reason` (≥20 chars → activa `--override-batch-policy --bypass-preflight-warnings`). Es el path canónico. **Mejor práctica:** esperá el CI de `main` verde ANTES de re-dispatchar, para que `ci_green` sea genuino y el bypass cubra solo el `playwright_smoke` inevitable. Documentá el motivo real (no genérico) en `bypass_preflight_reason`.
 
-4. **ops-worker puede quedar con GIT_SHA rezagado tras el release — NO es drift.** `ops-worker-deploy` es *change-gated*: si ningún worker-runtime-path cambió desde `EXPECTED_SHA`, salta el rebuild (`deploy_needed=false`) y el servicio conserva el SHA del último deploy que sí tocó código de worker (código idéntico al target, por diseño — ver el step de worker-drift del workflow). **NO** fuerces redeploy para "alinear el label" salvo que el código del worker haya cambiado. Los otros 3 workers sí redeployan al target.
+4. **ops-worker puede quedar con GIT_SHA rezagado tras el release — NO es drift si el diff runtime está vacío.** `ops-worker-deploy` es *change-gated*: si ningún worker-runtime-path cambió desde `EXPECTED_SHA`, salta el rebuild (`deploy_needed=false`) y el servicio conserva el SHA del último deploy que sí tocó código de worker (código idéntico al target, por diseño — ver el step de worker-drift del workflow). Si el watchdog final marca solo `ops-worker`, comparar Cloud Run `GIT_SHA` contra `target_sha` en rutas runtime; si `git diff --name-only <cloud_run_git_sha> <target_sha> -- package.json pnpm-lock.yaml tsconfig.json services/ops-worker scripts/ops-worker src/lib/ops src/lib/release` no devuelve archivos y Cloud Run está `Ready=True`, parar: documenta residual de label y **NO** fuerces redeploy para "alinear el label". Los otros 3 workers sí redeployan al target.
 
 5. **Vercel Ignored Build Step no aplica a production/main.** Desde 2026-07-08,
    `vercel.json` puede cancelar builds docs-only de `develop`/previews mediante
@@ -199,6 +204,12 @@ gh workflow run hubspot-greenhouse-integration-deploy.yml \
 5. Re-run watchdog.
 6. Document the incident in `Handoff.md`, including whether the suspected skip
    was expected (`no_infra_diff`) or real drift (`worker_revision_drift`).
+
+If `transition-released` is queued/stale after workers, Vercel READY, health and
+smoke are verified green, never patch the DB. Wait for the runner or, with
+explicit approval, use `pnpm release:orchestrator-transition-state` with the
+release ID and a forensic reason. This preserves the state machine, audit row
+and outbox.
 
 ## Break-Glass
 

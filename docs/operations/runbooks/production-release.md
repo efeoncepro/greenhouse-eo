@@ -3,9 +3,41 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Source task:** TASK-848 V1 (parcial; V1.1 follow-ups en TASK-850..855)
-> **Last updated:** 2026-07-03
+> **Last updated:** 2026-07-09
+> **Timing ledger:** [PRODUCTION_RELEASE_TIMING_LEDGER.md](../PRODUCTION_RELEASE_TIMING_LEDGER.md)
 
 Este runbook es el contrato operativo para promover `develop` → `main` y para ejecutar rollback de emergencia.
+
+## 0. Disciplina para agentes: no redescubrir el release
+
+Antes de tocar PRs, flags, approvals, workflows o manifests de production, el
+agente debe cargar la skill `greenhouse-production-release` y releer este
+runbook, el playbook de incidentes y la spec del control plane. El objetivo es
+operar el camino canónico, no investigar de cero condiciones que ya son parte
+normal del release.
+
+Condiciones comunes que se deben reconocer sin abrir bucles exploratorios:
+
+- approvals del environment `Production` pertenecientes al orquestador activo;
+- CI/smoke warnings del squash commit fresco de `main`;
+- workers que tardan 7-10 min mientras Cloud Run queda `Ready=True`;
+- Azure `no_infra_diff`;
+- `ops-worker` con `deploy_needed=false` por diff runtime vacío;
+- `transition-released` esperando runner después de que runtime y health ya
+  están verdes.
+
+Si el operador pide medir tiempos, medirlos como telemetría de operación:
+preflight, PR/merge, dispatch, approval, workers, Vercel READY, health,
+transition final, watchdog y flags. Medir no autoriza perseguir cada latencia
+como incidente.
+
+Todo agente que ejecute, recupere o cierre un release debe iniciar un timer en
+su primera accion de release, incluyendo revisar, leer playbook, analizar y
+preparar. La metrica principal es **tiempo agente end-to-end**, no
+`release_manifests.completed_at - started_at`. Antes del cierre debe actualizar
+`docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release
+ID, run ID, target SHA, tiempo agente E2E, workflow elapsed, manifest elapsed,
+runtime-green elapsed, desglose de fases, bloqueo principal y aprendizaje.
 
 ## 1. Decision tree (flujo normal canonico)
 
@@ -233,7 +265,8 @@ Reason: el concurrency fix Opcion A (TASK-848 Slice 3) cancela pending nuevos cu
 | 4 | Smoke flows críticos | Browser real: login, `/finance/cash-out`, `/agency/operations`, `/admin/operations` |
 | 5 | Reliability signals OK | `/admin/operations` subsystem `Platform Release` debe estar OK |
 | 6 | **Flags pendientes de prender** | Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → **§ Pendientes de acción**: ¿hay flags `*_ENABLED` code-complete cuyo flip estaba gated a este release? Si sí, `vercel env add <FLAG>=true Production` (+ ops-worker si aplica) + redeploy + smoke del flujo + actualizar la fila del ledger. **El deploy del código NO prende los flags** (default OFF); olvidarlo deja la feature invisible en prod (deuda cognitiva). |
-| 7 | Watchdog sin drift | `GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json` debe quedar `aggregateSeverity: ok`; workers esperados: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`. |
+| 7 | Watchdog sin drift real | `GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json` debe quedar `aggregateSeverity: ok`; workers esperados: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`. Excepcion V1: si solo `ops-worker` reporta drift pero el diff runtime Cloud Run SHA → target es vacio y `deploy_needed=false`, documentar residual de label y no redeployar. |
+| 8 | Timing ledger actualizado | Agregar/actualizar fila en `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release ID, run ID, SHA, **tiempo agente E2E** (principal), subtiempos técnicos, desglose por fase, bloqueo principal y aprendizaje. |
 
 ### 4.1. Leccion TASK-1328: skip esperado vs drift real
 
@@ -242,7 +275,7 @@ No cerrar un release por intuicion de logs. Hay tres casos distintos:
 | Caso | Interpretacion | Cierre permitido |
 |---|---|---|
 | Azure job dice `no_infra_diff` / `no diff` | Skip esperado: el workflow hizo health/gating y no aplico Bicep porque no habia cambios infra. | Si el job termina `success` y no hay health failure. |
-| Worker job dice que no redeploya por runtime-equivalente | Solo es aceptable si Cloud Run ya expone el `target_sha` esperado o el watchdog queda OK. | Si `GIT_SHA` matchea el release y `Ready=True`. |
+| Worker job dice que no redeploya por runtime-equivalente | Skip esperado solo si el diff de rutas runtime entre el SHA servido y el `target_sha` es vacío. Caso tipico: `ops-worker` change-gated. | Si `Ready=True`, el diff runtime es vacío y queda documentado como residual de label, aunque el watchdog V1 siga marcando drift. |
 | Watchdog reporta `worker_revision_drift` | Drift real o evidencia insuficiente. El release no esta cerrado aunque el orquestador haya terminado. | No; recuperar drift y re-ejecutar watchdog. |
 
 Checklist concreto cuando el operador pregunta si un worker "se skippeo":
@@ -258,8 +291,47 @@ gcloud run services describe ico-batch-worker \
 Interpretacion:
 
 - `ico-batch-worker` con deploy job ejecutado, health OK, `Ready=True` y watchdog synced = NO fue skippeado.
-- `ops-worker` con workflow que salta deploy por diff runtime pero `GIT_SHA` viejo = drift de release, no exito final.
-- La recuperacion canonica es rerun del orquestador para el mismo `target_sha`; si el orquestador esta bloqueado, usar workflow individual como break-glass aprobado. Direct `gcloud run deploy` local es ultimo recurso break-glass y debe quedar documentado con target SHA, revision, verificacion y watchdog final.
+- `ops-worker` con workflow que salta deploy por diff runtime y `GIT_SHA` viejo puede ser cierre valido si la comparacion de rutas runtime demuestra que el servicio servido es equivalente al target. No forzar redeploy solo para alinear el label.
+- La recuperacion canonica para drift real es rerun del orquestador para el mismo `target_sha`; si el orquestador esta bloqueado, usar workflow individual como break-glass aprobado. Direct `gcloud run deploy` local es ultimo recurso break-glass y debe quedar documentado con target SHA, revision, verificacion y watchdog final.
+
+### 4.1.1. Excepcion conocida: `ops-worker` change-gated
+
+`ops-worker` puede conservar en Cloud Run un `GIT_SHA` anterior aunque el
+release sea runtime-equivalente. Antes de re-disparar workflows individuales,
+comparar el SHA servido por Cloud Run contra el target del release solo en las
+rutas runtime del worker:
+
+```bash
+git diff --name-only <cloud_run_git_sha> <release_target_sha> -- \
+  package.json pnpm-lock.yaml tsconfig.json \
+  services/ops-worker scripts/ops-worker src/lib/ops src/lib/release
+```
+
+Si el comando no devuelve archivos, el workflow summary indica
+`deploy_needed=false`, Cloud Run esta `Ready=True` y el resto del release esta
+verde, tratarlo como **residual de label por change-gate**, no como incidente.
+Documentar el hallazgo en `Handoff.md` y no gastar otra corrida para empujar una
+revision identica.
+
+### 4.1.2. Transition final en cola tras runtime verde
+
+Si `transition-released` queda queued o sin runner despues de que workers,
+Vercel READY, health y smoke productivo ya estan verdes, no editar
+`greenhouse_sync.release_manifests` por SQL. Opciones:
+
+1. Esperar si el runner avanza dentro de la ventana normal.
+2. Cancelar el run obsoleto si GitHub Actions quedo atascado.
+3. Con aprobacion explicita del operador, cerrar por el CLI canonico:
+
+```bash
+pnpm release:orchestrator-transition-state \
+  --release-id=<release_id> \
+  --to-state=released \
+  --reason="Runtime verified green; GitHub transition job queued/stale"
+```
+
+Esa ruta es contingencia documentada, no parche: conserva state machine, audit
+row y outbox. Registrar run ID, release ID, motivo y evidencias de salud.
 
 ### 4.2. HubSpot drift recovery
 
