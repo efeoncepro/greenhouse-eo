@@ -55,6 +55,7 @@ export type MicrocopyNamespace =
   | 'feedback' // Toasts, snackbars, confirmaciones genéricas
   | 'time' // Formatos de tiempo relativo: hace X minutos, ayer, etc.
   | 'emails' // Copy institucional compartido por templates y notification delivery
+  | 'careers' // TASK-354: Careers pública Efeonce (attract, listing, detail, apply)
 
 /**
  * Estructura raíz de un dictionary completo por locale.
@@ -75,6 +76,219 @@ export interface MicrocopyDictionary {
   feedback: FeedbackCopy
   time: TimeCopy
   emails: EmailsCopy
+  careers: CareersCopy
+}
+
+export interface CareersCopy {
+  metadata: {
+    title: string
+    description: string
+  }
+  header: {
+    logoAlt: string
+    tagline: string
+    backToJobs: string
+    backToDetail: string
+    localeTitle: string
+  }
+  hero: {
+    hiringBadgePrefix: string
+    hiringBadgeSuffixSingular: string
+    hiringBadgeSuffixPlural: string
+    titleAccent: string
+    titleRest: string
+    subtitle: string
+    primaryCta: string
+    processCta: string
+    proof: string
+  }
+  marquee: string[]
+  manifesto: {
+    eyebrow: string
+    titlePrefix: string
+    titleMark: string
+    titleSuffix: string
+    chips: string[]
+    proofMuted: string
+    proofStrong: string
+    bodyPrefix: string
+    bodyStrong: string
+    bodySuffix: string
+    cta: string
+  }
+  pillars: {
+    eyebrow: string
+    title: string
+    subtitle: string
+    items: Array<{
+      title: string
+      body: string
+      icon: string
+    }>
+  }
+  listing: {
+    eyebrow: string
+    title: string
+    subtitle: string
+    resultCountLabel: string
+    searchPlaceholder: string
+    areaLabel: string
+    modalityLabel: string
+    all: string
+    clearFilters: string
+    loadingTitle: string
+    errorTitle: string
+    errorBody: string
+    retry: string
+    emptyZeroTitle: string
+    emptyZeroBody: string
+    emptyFilteredTitle: string
+    emptyFilteredBody: string
+    cardCta: string
+  }
+  process: {
+    eyebrow: string
+    title: string
+    subtitle: string
+    steps: Array<{
+      title: string
+      body: string
+      icon: string
+    }>
+  }
+  talentPool: {
+    eyebrow: string
+    title: string
+    body: string
+    namePlaceholder: string
+    emailPlaceholder: string
+    cta: string
+    successPrefix: string
+    successSuffix: string
+    privacy: string
+  }
+  detail: {
+    applyCta: string
+    timeHint: string
+    descriptionTitle: string
+    responsibilitiesTitle: string
+    requirementsTitle: string
+    niceToHaveTitle: string
+    skillsTitle: string
+    skillsHint: string
+    processTitle: string
+    compensationTitle: string
+    compensationFallback: string
+    summaryTitle: string
+    labels: {
+      area: string
+      location: string
+      modality: string
+      seniority: string
+      employment: string
+    }
+    unavailableTitle: string
+    unavailableBody: string
+    unavailableCta: string
+  }
+  apply: {
+    eyebrow: string
+    titleTemplate: string
+    intro: string
+    optionalWord: string
+    alertTitle: string
+    alertBody: string
+    invalidSummaryTitle: string
+    invalidSummaryBody: string
+    progressLabel: string
+    sections: {
+      personal: string
+      profile: string
+      message: string
+    }
+    fields: {
+      firstName: string
+      lastName: string
+      email: string
+      phone: string
+      portfolio: string
+      linkedin: string
+      availability: string
+      message: string
+    }
+    placeholders: {
+      email: string
+      phone: string
+      portfolio: string
+      linkedin: string
+      availability: string
+      message: string
+    }
+    availabilityOptions: string[]
+    cv: {
+      label: string
+      title: string
+      body: string
+    }
+    consent: {
+      title: string
+      bodyPrefix: string
+      link: string
+      bodySuffix: string
+    }
+    captcha: {
+      verifiedTitle: string
+      verifiedBody: string
+      failedTitle: string
+      failedBody: string
+      brand: string
+      pendingTitle: string
+    }
+    submit: string
+    submitting: string
+    successTitle: string
+    successBody: string
+    moreJobs: string
+    disclosure: string
+    errors: {
+      firstName: string
+      lastName: string
+      emailRequired: string
+      emailInvalid: string
+      urlInvalid: string
+      consent: string
+      captcha: string
+      invalid: string
+      rateLimited: string
+      captchaFailed: string
+      notOpen: string
+      server: string
+    }
+  }
+  footer: {
+    privacy: string
+    terms: string
+    website: string
+  }
+  aria: {
+    skipToContent: string
+    openingCardTemplate: string
+    listingRegion: string
+    talentPool: string
+    formStatus: string
+    required: string
+  }
+  fallbacks: {
+    area: string
+    location: string
+    modality: string
+    employment: string
+    seniority: string
+    summary: string
+    skill: string
+    responsibility: string
+    requirement: string
+  }
 }
 
 /**

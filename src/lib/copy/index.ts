@@ -117,6 +117,7 @@ export const buildStatusMap = <const TDefinition extends Record<string, StatusMa
 export type {
   ActionsCopy,
   AriaCopy,
+  CareersCopy,
   EmptyCopy,
   EmailsCopy,
   ErrorsCopy,

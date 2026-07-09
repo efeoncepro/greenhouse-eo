@@ -187,6 +187,59 @@ import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
   `design-system-breadcrumbs`.
 
 
+## Public Anonymous Surface Shell Pattern
+
+Usar este patrón para superficies públicas sin sesión donde una persona externa
+debe leer una oferta, completar un formulario o avanzar en un flujo tokenizado
+sin entrar al portal autenticado.
+
+### Taxonomía
+
+- **Pattern:** `Public Anonymous Surface Shell`.
+- **Primer runtime:** `CareersPublicShell` en
+  `src/components/greenhouse/careers/`.
+- **Rutas iniciales:** `/public/careers`, `/public/careers/[publicId]`,
+  `/public/careers/[publicId]/apply`.
+- **Futuros consumers previstos:** assessment público tokenizado
+  (`/assessment/[token]`) y otras superficies de intake sin sesión.
+
+### Cuándo usarlo
+
+Usar cuando la superficie:
+
+- es pública o tokenizada;
+- no debe montar navegación del portal interno;
+- necesita marca Efeonce institucional, estado de locale y footer legal;
+- consume readers/commands server-side gobernados en vez de escribir datos desde
+  el cliente.
+
+No usarlo para vistas autenticadas, workbenches internos, dashboards de cliente
+ni páginas del Design System. Es un shell público, no un reemplazo de
+`CompositionShell` para producto interno.
+
+### Reglas de composición
+
+- Header y footer usan marca Efeonce; no exponer Greenhouse como producto interno.
+- La ruta conserva `main#gh-main`, skip link y back navigation explícita cuando
+  hay jerarquía pública.
+- El contenido de negocio vive en componentes de dominio y debe consumir payloads
+  allowlist. En Careers, listing/detail consumen `PublicOpeningPayload`; el apply
+  postea al command público de Hiring.
+- Copy visible vive en `src/lib/copy/*`; el shell recibe `copy`/`locale`.
+- Formularios públicos deben usar confirmación y error genéricos cuando el dominio
+  pueda filtrar existencia, dedupe, PII o estado interno.
+- GVC mínimo: home/detail/apply desktop y mobile 390, consola limpia y
+  `scrollWidth == clientWidth`.
+
+### Evidencia viva
+
+- TASK-354: `/public/careers/**`.
+- GVC local:
+  `.captures/2026-07-09T00-50-00_inline-public-careers`,
+  `.captures/2026-07-09T00-50-13_inline-public-careers-eo-opn-0006` y
+  `.captures/2026-07-09T00-50-13_inline-public-careers-eo-opn-0006-apply`.
+
+
 ## Progressive Disclosure Pattern (TASK-237)
 
 Para vistas data-dense con más de 10 tarjetas en scroll vertical, usar **Accordion colapsable** para agrupar secciones secundarias:

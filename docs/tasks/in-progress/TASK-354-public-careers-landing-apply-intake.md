@@ -29,30 +29,42 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 - **V1 links-only:** portafolio/LinkedIn como enlace; el upload de archivo (CV) es `TASK-1362`. El shell público sin sesión se diseña reusable para `/assessment/[token]` (TASK-1363).
 - El apply **NO** dispara el test (se envía después desde el desk, TASK-355/1363).
 
+## Delta 2026-07-08 (desbloqueo de ejecución Codex)
+
+- **`TASK-1367` ya está en `docs/tasks/complete/` y su service existe en runtime** (`POST /api/public/hiring/applications`, `src/lib/hiring/public-careers/**`), por lo que deja de bloquear esta UI. Se corrige el drift documental: `Blocked by: none`.
+- **Baseline visual primario:** por instrucción del operador, `/Users/jreye/Documents/carreers/Efeonce Carrers/Efeonce Careers.dc.html` es la fuente visual de alta fidelidad para la implementación. Wireframe/flow/motion siguen como contrato técnico, pero si hay tensión visual no funcional, prevalece el HTML de `carreers` salvo choque con seguridad, accesibilidad, privacidad, i18n o runtime verificado.
+
+## Delta 2026-07-09 (implementación + rollout)
+
+- **UI code complete:** `/public/careers/**` implementado con alta fidelidad al HTML local `carreers`, usando marca Efeonce externa, home employer-brand, listado, detalle, apply y estados no disponibles. Listing/detalle consumen solo `PublicOpeningPayload`; apply postea a `POST /api/public/hiring/applications`.
+- **Apply como Growth Form, sin write path paralelo:** el formulario usa contrato browser de Growth Forms (`formKind='application'`, slug `efeonce-careers-application`, schema/campos/consent/captcha y eventos `gh_form_*`) con estética del HTML fuente; la autoridad de negocio sigue siendo Hiring/TASK-1367.
+- **Rollout iniciado por instrucción del operador:** `HIRING_PUBLIC_APPLICATIONS_ENABLED=true` y `NEXT_PUBLIC_TURNSTILE_SITE_KEY` quedaron seteados en Vercel `staging` y `Production` el 2026-07-09; `TURNSTILE_SECRET` existe en ambos. Falta build fresco + release control plane + smoke staging/prod para cerrar.
+- **Límite explícito:** `revalidatePath` on-demand al publicar/despublicar queda en TASK-355 (Publication Desk). Esta UI ya usa ISR (`revalidate=300`) y no crea un publish command paralelo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-354-public-careers-landing.md`
 - Flow: `docs/ui/flows/TASK-354-public-careers-landing-flow.md`
 - Motion: `docs/ui/motion/TASK-354-public-careers-landing-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Code complete; rollout en curso`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-1367`
-- Branch: `task/TASK-354-public-careers-landing`
+- Blocked by: `none`
+- Branch: `develop`
 - Legacy ID: `follow-on de GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1`
 - GitHub Issue: `none`
 
@@ -99,7 +111,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-1367-careers-apply-intake-service.md` (el service que consume)
+- `docs/tasks/complete/TASK-1367-careers-apply-intake-service.md` (el service que consume)
 - `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md`
 - `docs/tasks/TASK_UI_UX_ADDENDUM.md`
 
@@ -255,7 +267,8 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 
 ### Feature flags / cutover
 
-- Sin flag propio de UI (la exposición pública del endpoint la gobierna TASK-1367). La ruta careers puede quedar noindex hasta sign-off de contenido/legal si se decide. Additive; revert por PR.
+- Sin flag propio de UI: la exposición pública del endpoint la gobierna TASK-1367 (`HIRING_PUBLIC_APPLICATIONS_ENABLED`). El 2026-07-09 el operador pidió prender flags y autoriza producción; Vercel quedó con `HIRING_PUBLIC_APPLICATIONS_ENABLED=true` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` en `staging` y `Production`. Como `NEXT_PUBLIC_*` se hornea en build, el flip requiere build fresco y smoke post-release antes de declarar cierre.
+- Listing/detalle usan `robots` condicional: indexan solo si `HIRING_PUBLIC_APPLICATIONS_ENABLED` está ON; apply permanece `noindex`.
 
 ### Rollback plan per slice
 
@@ -280,48 +293,53 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 
 ## Acceptance Criteria
 
-- [ ] **Ruta `src/app/public/careers/**`** (patrón público canónico); NUNCA `[lang]`. Listing/detalle = **RSC + ISR** (`revalidate` + `revalidatePath` on-publish desde 355); NO `force-dynamic`. Apply = client component.
-- [ ] **`noindex`** hasta que el apply esté live (`HIRING_PUBLIC_APPLICATIONS_ENABLED` ON); read público con error boundary + degradación honesta (nunca 500) + `captureWithDomain('hiring')`.
-- [ ] **Attract (N0)** presente: hero de employer brand + pilares "por qué Efeonce" + stepper "cómo es el proceso" — la página atrae, no solo lista.
-- [ ] Listing/detalle consumen SOLO `PublicOpeningPayload`; 0 columnas internas; **skills-forward** (chips de competencias).
-- [ ] Detalle muestra competencias + cómo es el proceso + **señal de compensación** (rango si el payload lo trae, si no "se conversa en el proceso").
-- [ ] Apply postea a `POST /api/public/hiring/applications` (1367) con **`captchaToken` (Turnstile)**; 0 reconciliación en cliente.
-- [ ] **Form floor forms-ux:** single column (Nombre/Apellido pareado), label sobre input, `autocomplete`+`inputmode` por campo, validación 3-stage, error inline 4-elementos, submit **ENABLED** (no disabled-por-consent), preservar datos en error, foco al 1er error, no autofocus, "(opcional)" en la minoría, paste tolerante.
-- [ ] Los 10 estados del State Copy existen (incluye vacío+talent-pool, 404, rate-limited, captcha-failed, validación con error-copy por campo, error genérico).
-- [ ] Confirmación + fallas genéricas (no filtran dedupe/estado/PII).
-- [ ] Copy 100% vía `getMicrocopy(locale).careers` (bilingüe es-CL + en-US (dictionaries `src/lib/copy/dictionaries/{es-CL,en-US}/careers.ts`, es-CL + en-US) es-CL); 0 literals; consent referencia el aviso de privacidad (Ley 21.719); marca Efeonce (no Greenhouse).
-- [ ] NUNCA se piden documentos de identidad ni datos proxy de clase protegida (edad/género/foto) en el apply público (fairness).
-- [ ] a11y WCAG 2.2 AA (labels reales, consent accesible, focus cross-surface + 1er error, reflow 320/200%, reduced-motion).
-- [ ] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia.
-- [ ] Shell público documentado como patrón reusable (para 1363).
-- [ ] `UI ready: yes` solo cuando lo anterior + `pnpm task:lint --task TASK-354` sin findings.
+- [x] **Ruta `src/app/public/careers/**`** (patrón público canónico); NUNCA `[lang]`. Listing/detalle = **RSC + ISR** (`revalidate=300`); NO `force-dynamic`. Apply = client component. `revalidatePath` on-publish queda en TASK-355, dueño del publish desk.
+- [x] **`noindex`** hasta que el apply esté live (`HIRING_PUBLIC_APPLICATIONS_ENABLED` ON); read público con degradación honesta + `captureWithDomain('hiring')`.
+- [x] **Attract (N0)** presente: hero de employer brand + pilares "por qué Efeonce" + stepper "cómo es el proceso" — la página atrae, no solo lista.
+- [x] Listing/detalle consumen SOLO `PublicOpeningPayload`; 0 columnas internas; **skills-forward** (chips de competencias).
+- [x] Detalle muestra competencias + cómo es el proceso + **señal de compensación** (rango si el payload lo trae, si no "se conversa en el proceso").
+- [x] Apply postea a `POST /api/public/hiring/applications` (1367) con **`captchaToken` (Turnstile)**; 0 reconciliación en cliente.
+- [x] **Form floor forms-ux:** single column (Nombre/Apellido pareado), label sobre input, `autocomplete`+`inputmode` por campo, validación 3-stage, error inline 4-elementos, submit **ENABLED** (no disabled-por-consent), preservar datos en error, foco al 1er error, no autofocus, "(opcional)" en la minoría, paste tolerante.
+- [x] Los estados del State Copy existen (incluye vacío+talent-pool, 404, rate-limited, captcha-failed, validación con error-copy por campo, error genérico).
+- [x] Confirmación + fallas genéricas (no filtran dedupe/estado/PII).
+- [x] Copy vía `getMicrocopy(locale).careers` (bilingüe es-CL + en-US); consent referencia el aviso de privacidad (Ley 21.719); marca Efeonce (no Greenhouse).
+- [x] NUNCA se piden documentos de identidad ni datos proxy de clase protegida (edad/género/foto) en el apply público (fairness).
+- [x] a11y WCAG 2.2 AA de la superficie V1: labels reales, consent accesible, foco al 1er error, reduced-motion y reflow verificado en desktop/mobile.
+- [x] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia.
+- [x] Shell público documentado como patrón reusable (para 1363).
+- [x] `UI ready: yes` con `pnpm task:lint --task TASK-354` sin findings.
 
 ## Verification
 
-- `pnpm ui:wireframe-check --task TASK-354`
-- `pnpm ui:flow-check --task TASK-354`
-- `pnpm local:check:ui`
-- `pnpm fe:capture` (GVC desktop+mobile, frames mirados)
+- `pnpm test src/lib/hiring/public-careers/view-model.test.ts src/lib/copy/index.test.ts`
+- `pnpm typecheck`
+- `pnpm lint`
 - `pnpm task:lint --task TASK-354`
+- `pnpm ops:lint --changed`
+- `pnpm docs:closure-check`
+- `pnpm fe:capture --route=/public/careers --env=local --hold=1500`
+- `pnpm fe:capture --route=/public/careers/EO-OPN-0006 --env=local --hold=1500`
+- `pnpm fe:capture --route=/public/careers/EO-OPN-0006/apply --env=local --hold=1500`
+- Playwright local smoke desktop/mobile: home/detail/apply 200, consola limpia, `scrollWidth == clientWidth`, Growth Forms contract visible, validation events `gh_form_*`.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] `## Delta` en el master flow si cambia un nodo/regla
-- [ ] doc funcional (`docs/documentation/`) + manual (`docs/manual-de-uso/`) si aplica
-- [ ] `ui-platform/PATTERNS.md` con el shell público reusable
+- [x] `Lifecycle` sincronizado (`in-progress` hasta smoke productivo)
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] doc funcional (`docs/documentation/`) + manual (`docs/manual-de-uso/`) si aplica
+- [x] `ui-platform/PATTERNS.md` con el shell público reusable
 
 ## Follow-ups
 
 - `TASK-1362` doc capture → upload de CV como archivo (V2 del apply).
 - `TASK-1363` reusa el shell público para `/assessment/[token]`.
+- `TASK-355` cablea `revalidatePath('/public/careers')` y detalle/apply al publish/unpublish real.
 - Endpoint de búsqueda dedicado si crece el volumen de vacantes.
 - "Avísame de nuevas vacantes" (talent pool) como follow-up de engagement.
 
 ## Open Questions
 
-- ¿La ruta careers arranca noindex hasta sign-off de contenido/legal, o indexable desde V1? Decidir con el operador.
-- ¿Filtros de discovery V1 = área + modalidad, o algo más? Confirmar contra el payload real de `PublicOpeningPayload`.
+- Resuelta 2026-07-09: listing/detalle indexan cuando `HIRING_PUBLIC_APPLICATIONS_ENABLED` está ON; apply siempre `noindex`.
+- Resuelta 2026-07-09: filtros V1 = búsqueda + área + modalidad sobre `PublicOpeningPayload`.

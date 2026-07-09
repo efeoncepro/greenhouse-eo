@@ -7,6 +7,15 @@
 
 ---
 
+## Delta 2026-07-09 — Public Anonymous Surface Shell Pattern (TASK-354)
+
+Se documenta el patrón `Public Anonymous Surface Shell` para superficies públicas
+sin sesión: marca Efeonce institucional, skip link, locale visible, footer legal
+y back navigation pública, sin montar navegación interna del portal. El primer
+runtime es `CareersPublicShell` en `/public/careers/**`; futuros consumers
+previstos incluyen assessment público tokenizado. Contrato vigente:
+[`PATTERNS.md`](./PATTERNS.md#public-anonymous-surface-shell-pattern).
+
 ## Delta 2026-06-21 — Adaptive Sidecar main inset opt-in
 
 `AdaptiveSidecarLayout` agrega `inlineMainPadding` como safe area opt-in para el slot main cuando el sidecar se renderiza inline/push y el layout crea una card madre con borde. El default es `0`, por lo que los adopters existentes quedan byte-identicos; consumers densos como `/finance/quotes` pueden pasar su gutter canónico para evitar que headers o contenido principal queden pegados al borde al abrir un preview. GVC: `.captures/2026-06-21T19-04-32_finance-quotes-pipeline`.
