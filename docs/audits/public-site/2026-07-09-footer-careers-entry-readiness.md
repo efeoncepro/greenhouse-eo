@@ -27,7 +27,7 @@ Mutation:
   - URL: `https://greenhouse.efeoncepro.com/public/careers`
   - Target: `_blank`
   - Rel: `noopener noreferrer`
-- Kept `people@efeoncepro.com` as the secondary contact channel.
+- Initially kept `people@efeoncepro.com` as the secondary contact channel.
 
 Rollback snapshot:
 
@@ -59,6 +59,59 @@ Verification after mutation:
 Rollback procedure:
 
 1. Read `gh_backup_before_footer_careers_link_20260709T122602Z`.
+2. Restore the saved `widget_block_target_before` payload into `widget_block[31]`.
+3. Flush WordPress cache and purge Kinsta cache.
+4. Re-run the footer browser audit on Home and at least one service landing, desktop `1440` + mobile `390`.
+
+## Live Follow-Up Applied - 2026-07-09
+
+Status: applied after operator approval.
+
+Reason:
+
+- The operator decided footer recruiting should be handled only through Careers, not by public email.
+
+Mutation:
+
+- Updated only `widget_block[31]`, rendered under `ohio-sidebar-footer-3`.
+- Removed the paragraph `O escribenos a people@efeoncepro.com`.
+- Kept the Careers CTA as the only recruiting/application path:
+  - Label: `Ver vacantes y postular`
+  - URL: `https://greenhouse.efeoncepro.com/public/careers`
+  - Target: `_blank`
+  - Rel: `noopener noreferrer`
+
+Rollback snapshot:
+
+- WordPress option: `gh_backup_before_footer_careers_email_removal_20260709T123047Z`
+- Snapshot includes `ohio-sidebar-footer-3`, `widget_block[31]`, and `widget_block[32]` before email removal.
+
+Cache:
+
+- `wp cache flush`: success.
+- `wp kinsta cache purge --all`: success.
+
+Verification after follow-up:
+
+- Browser audit artifact: `.captures/public-footer-careers-email-removed-20260709T1230/footer-careers-email-removed-audit.json`.
+- Screenshots:
+  - `.captures/public-footer-careers-email-removed-20260709T1230/home-desktop1440-footer.png`
+  - `.captures/public-footer-careers-email-removed-20260709T1230/home-mobile390-footer.png`
+  - `.captures/public-footer-careers-email-removed-20260709T1230/seo-desktop1440-footer.png`
+  - `.captures/public-footer-careers-email-removed-20260709T1230/seo-mobile390-footer.png`
+- Home + SEO landing passed desktop `1440` and mobile `390` checks:
+  - one Careers link only;
+  - link visible;
+  - expected label;
+  - expected target/rel;
+  - `people@efeoncepro.com` absent from footer;
+  - email helper copy absent from footer;
+  - `scrollWidth === clientWidth`;
+  - footer still renders as `footer#colophon.site-footer`.
+
+Rollback procedure:
+
+1. Read `gh_backup_before_footer_careers_email_removal_20260709T123047Z`.
 2. Restore the saved `widget_block_target_before` payload into `widget_block[31]`.
 3. Flush WordPress cache and purge Kinsta cache.
 4. Re-run the footer browser audit on Home and at least one service landing, desktop `1440` + mobile `390`.
@@ -165,7 +218,7 @@ Footer column/content observed in browser:
 - `Recursos` column with Ohio/demo/template links.
 - Newsletter block headed `Subscribete a nuestro newsletter`.
 - Careers-adjacent block headed `Unete a nuestro equipo`.
-- Text: `¿Te interesa trabajar con nosotros?people@efeoncepro.com`.
+- Recruiting block now shows the question `¿Te interesa trabajar con nosotros?` plus the Careers CTA only.
 - Scroll-to-top control.
 - Copyright: `© 2018-2026 Efeonce Group SpA. | Todos los derechos reservados | Hablemos`.
 - Legal links: `Privacy & Cookie Policy` and `Terms of Service`.

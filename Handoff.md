@@ -1,3 +1,13 @@
+## Sesion 2026-07-09 - Public Site footer Careers-only path - Codex
+
+> **Pedido:** quitar el correo del footer para que postulaciones y consulta de vacantes se manejen por Careers.
+>
+> **Cambio live:** se actualizo solo `widget_block[31]` dentro de `ohio-sidebar-footer-3`. Se removio el parrafo `O escribenos a people@efeoncepro.com`; queda solo la pregunta `¿Te interesa trabajar con nosotros?` y el CTA `Ver vacantes y postular` -> `https://greenhouse.efeoncepro.com/public/careers`, `target="_blank"`, `rel="noopener noreferrer"`.
+>
+> **Rollback:** snapshot WordPress `gh_backup_before_footer_careers_email_removal_20260709T123047Z` con `ohio-sidebar-footer-3`, `widget_block[31]` y `widget_block[32]` previos a quitar el correo. Para revertir: restaurar `widget_block_target_before` en `widget_block[31]`, flush WP cache, purge Kinsta y repetir browser audit.
+>
+> **Cache/verificacion:** `wp cache flush` y `wp kinsta cache purge --all` OK. Browser audit OK en Home + SEO desktop1440/mobile390: link unico visible, label correcto, target/rel correctos, `people@efeoncepro.com` ausente, helper de email ausente, `scrollWidth == clientWidth`. Evidencia: `.captures/public-footer-careers-email-removed-20260709T1230/`.
+
 ## Sesion 2026-07-09 - Public Site footer Careers CTA live - Codex
 
 > **Pedido:** despues de commitear la auditoria, agregar en el footer publico un enlace/boton a Careers para que las personas puedan ver vacantes y postular.
