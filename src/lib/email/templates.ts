@@ -1,6 +1,7 @@
 import 'server-only'
 
 import AiVisibilityGraderReportEmail, { type AiVisibilityReportEmailInsight } from '@/emails/AiVisibilityGraderReportEmail'
+import EbookDeliveryEmail from '@/emails/EbookDeliveryEmail'
 import InvitationEmail from '@/emails/InvitationEmail'
 import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
 import LeaveRequestPendingReviewEmail from '@/emails/LeaveRequestPendingReviewEmail'
@@ -1589,4 +1590,82 @@ registerPreviewMeta('ai_visibility_grader_report', {
     { key: 'attachmentSizeLabel', label: 'Tamaño del adjunto', type: 'text' },
     { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
   ]
+})
+
+// ── TASK-1375 — Entrega del ebook lead magnet (respaldo del download on-screen) ──────────
+// GENÉRICO: sirve para CUALQUIER ebook. El contenido (título, bajada, puente) lo pasa el
+// consumer desde el `success_behavior` del propio form, no está hardcodeado por ebook.
+interface EbookDeliveryEmailContext extends EmailTemplateContext {
+  recipientName?: string
+  ebookTitle: string
+  ebookTagline?: string
+  downloadUrl: string
+  bridgeLabel?: string
+  bridgeUrl?: string
+  locale?: 'es' | 'en'
+}
+
+const buildEbookDeliveryPlainText = (context: EbookDeliveryEmailContext) => {
+  const isEn = context.locale === 'en'
+  const first = context.recipientName?.split(' ')[0]
+
+  return [
+    isEn ? (first ? `Hi ${first},` : 'Hi,') : first ? `Hola ${first},` : 'Hola,',
+    '',
+    isEn
+      ? `Thanks for downloading «${context.ebookTitle}». Download it here:`
+      : `Gracias por descargar «${context.ebookTitle}». Descárgalo aquí:`,
+    context.downloadUrl,
+    ...(context.bridgeUrl
+      ? ['', isEn ? `${context.bridgeLabel ?? 'Next step'}:` : `${context.bridgeLabel ?? 'El siguiente paso'}:`, context.bridgeUrl]
+      : []),
+    '',
+    '— Efeonce · efeoncepro.com',
+  ]
+    .filter(Boolean)
+    .join('\n')
+}
+
+registerTemplate('growth_ebook_delivery', (context: EbookDeliveryEmailContext) => {
+  const isEn = context.locale === 'en'
+
+  return {
+    subject: isEn ? `Your ebook: ${context.ebookTitle} — Efeonce` : `Tu ebook: ${context.ebookTitle} — Efeonce`,
+    react: EbookDeliveryEmail({
+      recipientName: context.recipientName,
+      ebookTitle: context.ebookTitle,
+      ebookTagline: context.ebookTagline,
+      downloadUrl: context.downloadUrl,
+      bridgeLabel: context.bridgeLabel,
+      bridgeUrl: context.bridgeUrl,
+      locale: context.locale ?? 'es',
+    }),
+    text: buildEbookDeliveryPlainText(context),
+  }
+})
+
+registerPreviewMeta('growth_ebook_delivery', {
+  label: 'Entrega de ebook (lead magnet Efeonce)',
+  description:
+    'Respaldo por email de la descarga de CUALQUIER ebook: confirmación + link GATED de descarga (tokenizado por submission) + puente. El contenido viene del success_behavior del form. Marca Efeonce (agencia).',
+  domain: 'growth',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    ebookTitle: 'El fin de la web',
+    ebookTagline: 'Marketing digital + IA. Léelo en 20 minutos, aplícalo esta semana.',
+    downloadUrl: 'https://greenhouse.efeoncepro.com/api/public/growth/forms/efeonce-web-agentica-ebook/asset/fsub-preview',
+    bridgeLabel: 'Medir mi visibilidad',
+    bridgeUrl: 'https://think.efeoncepro.com/brand-visibility',
+    locale: 'es',
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'ebookTitle', label: 'Título del ebook', type: 'text' },
+    { key: 'ebookTagline', label: 'Bajada del ebook', type: 'text' },
+    { key: 'downloadUrl', label: 'URL de descarga (gated)', type: 'text' },
+    { key: 'bridgeLabel', label: 'Texto del puente', type: 'text' },
+    { key: 'bridgeUrl', label: 'URL del puente', type: 'text' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
+  ],
 })

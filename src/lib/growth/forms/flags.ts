@@ -12,12 +12,18 @@ export const GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_FLAG = 'GROWTH_FORMS_HUBSPOT_SEC
 export const GROWTH_FORMS_SERVER_VALIDATION_FLAG = 'GROWTH_FORMS_SERVER_VALIDATION_ENABLED'
 export const GROWTH_FORMS_EMAIL_VERIFICATION_FLAG = 'GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED'
 export const GROWTH_FORMS_PII_ENCRYPTION_FLAG = 'GROWTH_FORMS_PII_ENCRYPTION_ENABLED'
+/** TASK-1375 — email de respaldo del ebook (consumer reactivo `growth_ebook_delivery`). ops-worker. */
+export const GROWTH_EBOOK_EMAIL_DELIVERY_FLAG = 'GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 /** Kill switch del API público de forms. Default OFF. */
 export const isFormsPublicApiEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_PUBLIC_API_FLAG])
+
+/** Kill switch del email de respaldo del ebook. Default OFF → sólo descarga on-screen. */
+export const isEbookEmailDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_EBOOK_EMAIL_DELIVERY_FLAG])
 
 /**
  * Gate del endpoint de catálogo externo de forms insertables (TASK-1258), consumido
