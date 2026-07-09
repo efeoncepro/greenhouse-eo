@@ -40,7 +40,7 @@ TASK-1374 re-autora la landing del ebook como página Astro nativa, pero el form
 - Growth Form del ebook publicado con `form_key` estable, campos (nombre, email, rol opcional), consent y success card ("Te enviamos el ebook a tu email" / descarga).
 - Surface `fhsf-web-agentica-ebook` con `think.efeoncepro.com` en `origin_allowlist_json` (CORS gobernado, TASK-1335) + Turnstile hostname verificado.
 - Destination HubSpot para entregar el lead (nombre/email/rol) a CRM, con property mapping.
-- Mecanismo de **entrega del ebook** definido e implementado (success card con link de descarga y/o consumer reactivo de email sobre `submission_accepted`).
+- **Entrega gated post-submit:** descarga tokenizada del PDF (bucket privado + token del handoff + ruta gobernada con signed URL) que solo funciona tras completar el form, + email de respaldo con el mismo link.
 - Fila registrada en el TRACKING-PLAN de medición; smoke `GET` por `formKey` + `/submit` fail-closed verdes.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -195,10 +195,13 @@ Reglas obligatorias:
 - Verificar/añadir el hostname `think.efeoncepro.com` en el widget Turnstile.
 - Mint embed key si aplica.
 
-### Slice 3 — Entrega del ebook
+### Slice 3 — Entrega del ebook (descarga GATED post-submit + email de respaldo)
 
-- Implementar el mecanismo elegido (ver Open Questions): success card con link de descarga al PDF hosteado, y/o consumer reactivo `growth_ebook_delivery_from_submission` que envía el ebook por email (patrón `growth_grader_run_from_submission`, sin destination falso).
-- Probar la entrega real (descarga y/o email).
+- Subir el PDF a `GREENHOUSE_PRIVATE_ASSETS_BUCKET` vía el helper canónico (`greenhouse-assets.ts`); NUNCA público, NUNCA commiteado al repo.
+- Emitir un **token de descarga** ligado a la submission en el handoff post-submit (patrón tokenized del grader; el success card NO puede llevar el link porque viaja en el contrato antes del submit).
+- Ruta pública gobernada `/api/public/growth/forms/.../asset/[token]` que valida el token (submission aceptada, no expirado, uso acotado) y devuelve un signed URL de corta expiración o stremea el PDF desde el bucket privado.
+- Consumer reactivo de email de respaldo sobre `submission_accepted` que envía el mismo link (patrón `growth_grader_run_from_submission`, sin destination falso).
+- Probar la entrega real: descarga en pantalla post-submit + email; verificar que sin submit no hay token ni descarga.
 
 ### Slice 4 — Destination HubSpot (lead)
 
@@ -303,8 +306,10 @@ Seguir el runbook `docs/manual-de-uso/growth/alta-surface-growth-form-checklist.
 - Producción del ebook PDF (contenido).
 - Si emerge un segundo lead magnet de contenido, generalizar el patrón "success-card + entrega de asset".
 
+- **Mecanismo de entrega del ebook — RESUELTO (operador): descarga GATED post-submit + email de respaldo.** El ebook se baja SOLO después de completar el form. PDF en `GREENHOUSE_PRIVATE_ASSETS_BUCKET` (nunca público). El submit gobernado emite un **token de descarga** ligado a la submission (patrón tokenized handoff del grader, `gh_form_submission_accepted` lleva el handle escalar). La landing dispara la descarga inmediata en pantalla con ese token → ruta gobernada `/api/public/growth/forms/.../asset/[token]` valida y devuelve un signed URL de corta expiración (o stremea) desde el bucket privado. El success card **NO** puede llevar el link (viaja en el contrato antes del submit = visible sin llenar) → la entrega va por el handoff post-submit. Además, email de respaldo con el mismo link. NUNCA bucket público ni URL estática compartible.
+
 ## Open Questions
 
-- **Mecanismo de entrega del ebook:** ¿success card con link de descarga directo al PDF (más liviano, sin infra de email) y/o consumer reactivo que lo envía por email? El copy del PR dice "te enviamos el ebook a tu email" → sugiere email; pero descarga inmediata + email de respaldo es lo más robusto. Decidir en Discovery.
 - **Política de email:** ¿corporate-only (como el grader) o cualquier email válido? Para un ebook de contenido amplio, exigir corporate mata leads de consumo. Sugerencia: cualquier email válido, quizá bloquear disposable.
+- **Success contract:** confirmar en Discovery si el `tokenized_report` handoff (TASK-1336) se generaliza a un `tokenized_asset` (descarga) o si se agrega un success behavior nuevo para asset download.
 - **Epic:** `EPIC-019` por defecto (público); confirmar si va al epic del hub Think.
