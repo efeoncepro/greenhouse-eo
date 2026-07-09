@@ -44,8 +44,22 @@ export interface RendererSystemCopy {
   /** aria-label del selector de país del teléfono internacional. */
   phoneCountryAria: string
   stepProgress: (current: number, total: number) => string
+  stepEffort: (total: number) => string
+  stepperAria: string
+  stepStatusComplete: (label: string) => string
+  stepStatusCurrent: (label: string) => string
+  stepStatusUpcoming: (label: string) => string
   stepNext: string
+  stepNextOptional: string
   stepBack: string
+  stepSkipOptional: string
+  intakeSummaryTitle: string
+  intakeSummaryProgress: (completed: number, total: number) => string
+  intakeSummaryPrivacy: string
+  stepSummaryComplete: (label: string) => string
+  stepSummaryOptionalAdded: (label: string) => string
+  stepSummaryOptionalAvailable: (label: string) => string
+  stepSummaryPending: (label: string, count: number) => string
   validationSummary: (count: number) => string
   errors: {
     required: string
@@ -79,7 +93,7 @@ const esCL: RendererSystemCopy = {
   successCardSteps: [
     'Validamos la información enviada.',
     'Revisamos el contexto de tu marca.',
-    'Te proponemos el siguiente paso.',
+    'Te proponemos el siguiente paso.'
   ],
   successRewardTitle: 'Te dejamos un recurso para empezar',
   successRewardBody: 'Puedes abrirlo ahora sin volver a completar el formulario.',
@@ -91,8 +105,23 @@ const esCL: RendererSystemCopy = {
   emailSuggestion: suggested => `¿Quisiste decir ${suggested}?`,
   phoneCountryAria: 'País del teléfono',
   stepProgress: (current, total) => `Paso ${current} de ${total}`,
+  stepEffort: total => `${total} pantallas breves`,
+  stepperAria: 'Progreso del formulario',
+  stepStatusComplete: label => `${label}: completado`,
+  stepStatusCurrent: label => `${label}: paso actual`,
+  stepStatusUpcoming: label => `${label}: pendiente`,
   stepNext: 'Continuar',
+  stepNextOptional: 'Continuar',
   stepBack: 'Atrás',
+  stepSkipOptional: 'Omitir contexto',
+  intakeSummaryTitle: 'Informe en preparación',
+  intakeSummaryProgress: (completed, total) =>
+    completed === 1 ? `1 de ${total} etapas lista` : `${completed} de ${total} etapas listas`,
+  intakeSummaryPrivacy: 'Sin valores sensibles visibles.',
+  stepSummaryComplete: label => `${label}: listo`,
+  stepSummaryOptionalAdded: label => `${label}: contexto agregado`,
+  stepSummaryOptionalAvailable: label => `${label}: opcional`,
+  stepSummaryPending: (label, count) => `${label}: falta${count === 1 ? '' : 'n'} ${count}`,
   validationSummary: count =>
     count === 1 ? 'Revisa 1 campo para continuar.' : `Revisa ${count} campos para continuar.`,
   errors: {
@@ -106,7 +135,7 @@ const esCL: RendererSystemCopy = {
     corporate: 'Usa el correo de tu empresa, no uno personal (ej. nombre@tuempresa.com).',
     disposable: 'Este correo es temporal. Usa tu correo de empresa para continuar.',
     maxLength: max => `Máximo ${max} caracteres.`,
-    consentRequired: 'Necesitas aceptar para continuar.',
+    consentRequired: 'Necesitas aceptar para continuar.'
   },
   submitByKind: {
     subscribe: 'Suscribirme',
@@ -119,8 +148,8 @@ const esCL: RendererSystemCopy = {
     event_registration: 'Reservar mi lugar',
     survey: 'Enviar respuestas',
     preference: 'Guardar preferencias',
-    application: 'Enviar postulación',
-  },
+    application: 'Enviar postulación'
+  }
 }
 
 const enUS: RendererSystemCopy = {
@@ -139,7 +168,7 @@ const enUS: RendererSystemCopy = {
   successCardSteps: [
     'We validate the information you sent.',
     'We review your brand context.',
-    'We suggest the next step.',
+    'We suggest the next step.'
   ],
   successRewardTitle: 'Here is a resource to get started',
   successRewardBody: 'You can open it now without completing the form again.',
@@ -151,10 +180,24 @@ const enUS: RendererSystemCopy = {
   emailSuggestion: suggested => `Did you mean ${suggested}?`,
   phoneCountryAria: 'Phone country',
   stepProgress: (current, total) => `Step ${current} of ${total}`,
+  stepEffort: total => `${total} short screens`,
+  stepperAria: 'Form progress',
+  stepStatusComplete: label => `${label}: complete`,
+  stepStatusCurrent: label => `${label}: current step`,
+  stepStatusUpcoming: label => `${label}: upcoming`,
   stepNext: 'Continue',
+  stepNextOptional: 'Continue',
   stepBack: 'Back',
-  validationSummary: count =>
-    count === 1 ? 'Check 1 field to continue.' : `Check ${count} fields to continue.`,
+  stepSkipOptional: 'Skip context',
+  intakeSummaryTitle: 'Report in progress',
+  intakeSummaryProgress: (completed, total) =>
+    completed === 1 ? `1 of ${total} stages ready` : `${completed} of ${total} stages ready`,
+  intakeSummaryPrivacy: 'Sensitive values are not shown.',
+  stepSummaryComplete: label => `${label}: ready`,
+  stepSummaryOptionalAdded: label => `${label}: context added`,
+  stepSummaryOptionalAvailable: label => `${label}: optional`,
+  stepSummaryPending: (label, count) => `${label}: ${count} left`,
+  validationSummary: count => (count === 1 ? 'Check 1 field to continue.' : `Check ${count} fields to continue.`),
   errors: {
     required: 'Please complete this field to continue.',
     email: 'Enter a valid email (e.g. name@company.com).',
@@ -166,7 +209,7 @@ const enUS: RendererSystemCopy = {
     corporate: 'Use your company email, not a personal one (e.g. name@yourcompany.com).',
     disposable: 'This is a temporary email. Use your company email to continue.',
     maxLength: max => `${max} characters max.`,
-    consentRequired: 'You need to accept to continue.',
+    consentRequired: 'You need to accept to continue.'
   },
   submitByKind: {
     subscribe: 'Subscribe',
@@ -179,8 +222,8 @@ const enUS: RendererSystemCopy = {
     event_registration: 'Reserve my spot',
     survey: 'Send answers',
     preference: 'Save preferences',
-    application: 'Send application',
-  },
+    application: 'Send application'
+  }
 }
 
 const TABLES: Record<string, RendererSystemCopy> = { 'es-CL': esCL, es: esCL, 'en-US': enUS, en: enUS }

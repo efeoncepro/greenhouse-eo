@@ -65,7 +65,7 @@ Estado de cierre correcto: **code complete local, rollout pendiente**. No se hiz
   `active`** (`src/app/api/public/growth/forms/cors.ts`). La surface `fhsf-ai-visibility-grader` ya
   incluye `https://think.efeoncepro.com` (migración `20260704131308632_task-1335-...`, additive/idempotente).
   Con eso `GET`/`OPTIONS`/`POST submit`/`POST verify-email` emiten `Access-Control-Allow-Origin:
-  https://think.efeoncepro.com` **sin ningún workaround local en Think**.
+https://think.efeoncepro.com` **sin ningún workaround local en Think**.
 - **La landing NO carga la preocupación de plataforma.** No agregar hardcode de CORS ni bridge en el
   repo `efeonce-think`; el origin queda habilitado por DATA gobernada en greenhouse-eo.
 - **Pendiente de rollout para smoke browser real:** deploy a staging/producción de
@@ -189,18 +189,18 @@ Reglas obligatorias:
 
 ### State inventory
 
-| State | Requirement |
-|---|---|
-| `landing.ready` | Primera pantalla vende el lead magnet + form host; no hero vacío ni diagnóstico fingido. |
-| `form.loading` | Skeleton/host estable mientras carga el renderer/contract. |
-| `form.ready` | El form gobernado dibuja los campos; la landing no agrega campos propios. |
-| `form.submitting` | Submit/disabled/validación los controla el renderer. |
-| `analysis.waiting` | Estado rico post-submit con report skeleton y pasos de análisis; sin fake progress si no hay status real. |
-| `analysis.ready` | El contrato gobernado entrega token/URL listo y la UI abre o enlaza el reporte en pantalla. |
-| `form.accepted` | Estado transitorio hacia `analysis.waiting`, no cierre final tipo gracias/email. |
-| `form.error` | Mensaje seguro sin filtrar CORS/API/stack traces. |
-| `form.denied` | Estado bloqueante pre-launch si TASK-1335 no está resuelto; no se parchea en Think. |
-| `report.opened` | Usuario llega a `/brand-visibility/r/<token>` o surface equivalente de reporte en pantalla; la ruta sigue noindex. |
+| State              | Requirement                                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `landing.ready`    | Primera pantalla vende el lead magnet + form host; no hero vacío ni diagnóstico fingido.                           |
+| `form.loading`     | Skeleton/host estable mientras carga el renderer/contract.                                                         |
+| `form.ready`       | El form gobernado dibuja los campos; la landing no agrega campos propios.                                          |
+| `form.submitting`  | Submit/disabled/validación los controla el renderer.                                                               |
+| `analysis.waiting` | Estado rico post-submit con report skeleton y pasos de análisis; sin fake progress si no hay status real.          |
+| `analysis.ready`   | El contrato gobernado entrega token/URL listo y la UI abre o enlaza el reporte en pantalla.                        |
+| `form.accepted`    | Estado transitorio hacia `analysis.waiting`, no cierre final tipo gracias/email.                                   |
+| `form.error`       | Mensaje seguro sin filtrar CORS/API/stack traces.                                                                  |
+| `form.denied`      | Estado bloqueante pre-launch si TASK-1335 no está resuelto; no se parchea en Think.                                |
+| `report.opened`    | Usuario llega a `/brand-visibility/r/<token>` o surface equivalente de reporte en pantalla; la ruta sigue noindex. |
 
 ### Copy and content contract
 
@@ -230,20 +230,20 @@ Reglas obligatorias:
 
 Fuente revisada: reporte actual de Think en `efeonce-think/src/pages/brand-visibility/r/[token].astro` + capturas finales TASK-1331 (`task1331-final-local-desktop-1440.png`, `task1331-final-local-mobile-390.png`). La landing debe anticipar la experiencia del reporte sin renderizar resultados antes de que exista el run.
 
-| Bloque actual del reporte | Qué debe llevar la landing | Qué NO puede mostrar pre-submit |
-|---|---|---|
-| Hero navy con marca Efeonce, score, organización, fecha y estado | Hero premium con Efeonce/Think, nombre literal `Brand Visibility Grader`, promesa clara del análisis y form visible. Debe sentirse como la puerta del mismo producto visual. | Score, severidad, organización analizada, fecha de evidencia, run ID o badges de resultado. |
-| Resumen ejecutivo de evidencia | Preview de "lo que mediremos": presencia, motores, citabilidad, capacidad de acción. Usar lenguaje de reporte, no métricas. | `58/100`, porcentajes, "motor con mejor presencia", "mayor brecha" o cualquier lectura específica. |
-| Share of Model por motor | Módulo preview de motores muestreados: ChatGPT, Gemini, Claude, Perplexity, Google AI Overview/AI Mode según roster real. | Barras con porcentajes, menciones/respuestas resueltas, estado por motor. |
-| Share of Voice competitivo | Explicar que el reporte compara cuota de conversación frente a competidores cuando hay evidencia suficiente. | Ranking de competidores, líder, brechas, múltiplos o nombres no derivados de un run. |
-| Tono de mención | Explicar que el análisis distingue menciones favorables, neutrales, mixtas o negativas si hay muestra calificable. | Donut/saldo con valores, counts o afirmaciones de tono. |
-| Mapa de citabilidad | Prometer mapa de fuentes agregadas: sitio propio, terceros, UGC/comunidad y competidores. | Dominios, porcentajes de citabilidad propia, citas totales, URLs completas o proveedor/raw text. |
-| Operabilidad del sitio | Anticipar el eje "te pueden usar, no solo citar": lectura estructural y agentic readiness. | Puntajes de base técnica, capacidad de acción, brechas o pruebas completadas. |
-| Categoría percibida | Explicar que el reporte puede leer industria, sector, oferta, caso de uso, mercado y comprador cuando existe evidencia. | Categoría detectada, señales totales, ambigüedades o narrativa inferida. |
-| Escalera de visibilidad | Mostrar el framework de 5 niveles como marco educativo: Be Found, Readable, Correct, Actionable, Intrinsic. | Peldaño actual, score por nivel, "Empieza aquí" o severidad del usuario. |
-| Brecha prioritaria y recomendaciones | Explicar que el reporte termina con una prioridad operativa y secuencia de acciones. | Recomendaciones concretas, prioridad, severidad o claims personalizados. |
-| Detalle técnico/radar | Mencionar que el reporte explica qué sostiene el puntaje con dimensiones medibles. | Radar, dimension scores, fortalezas/brechas específicas o "sin dato" por dimensión. |
-| Share/PDF/CTA final | Anticipar que el reporte se puede compartir/guardar cuando esté listo. | Share copy personalizada, PDF link, short link o CTA con token antes del run. |
+| Bloque actual del reporte                                        | Qué debe llevar la landing                                                                                                                                                   | Qué NO puede mostrar pre-submit                                                                    |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Hero navy con marca Efeonce, score, organización, fecha y estado | Hero premium con Efeonce/Think, nombre literal `Brand Visibility Grader`, promesa clara del análisis y form visible. Debe sentirse como la puerta del mismo producto visual. | Score, severidad, organización analizada, fecha de evidencia, run ID o badges de resultado.        |
+| Resumen ejecutivo de evidencia                                   | Preview de "lo que mediremos": presencia, motores, citabilidad, capacidad de acción. Usar lenguaje de reporte, no métricas.                                                  | `58/100`, porcentajes, "motor con mejor presencia", "mayor brecha" o cualquier lectura específica. |
+| Share of Model por motor                                         | Módulo preview de motores muestreados: ChatGPT, Gemini, Claude, Perplexity, Google AI Overview/AI Mode según roster real.                                                    | Barras con porcentajes, menciones/respuestas resueltas, estado por motor.                          |
+| Share of Voice competitivo                                       | Explicar que el reporte compara cuota de conversación frente a competidores cuando hay evidencia suficiente.                                                                 | Ranking de competidores, líder, brechas, múltiplos o nombres no derivados de un run.               |
+| Tono de mención                                                  | Explicar que el análisis distingue menciones favorables, neutrales, mixtas o negativas si hay muestra calificable.                                                           | Donut/saldo con valores, counts o afirmaciones de tono.                                            |
+| Mapa de citabilidad                                              | Prometer mapa de fuentes agregadas: sitio propio, terceros, UGC/comunidad y competidores.                                                                                    | Dominios, porcentajes de citabilidad propia, citas totales, URLs completas o proveedor/raw text.   |
+| Operabilidad del sitio                                           | Anticipar el eje "te pueden usar, no solo citar": lectura estructural y agentic readiness.                                                                                   | Puntajes de base técnica, capacidad de acción, brechas o pruebas completadas.                      |
+| Categoría percibida                                              | Explicar que el reporte puede leer industria, sector, oferta, caso de uso, mercado y comprador cuando existe evidencia.                                                      | Categoría detectada, señales totales, ambigüedades o narrativa inferida.                           |
+| Escalera de visibilidad                                          | Mostrar el framework de 5 niveles como marco educativo: Be Found, Readable, Correct, Actionable, Intrinsic.                                                                  | Peldaño actual, score por nivel, "Empieza aquí" o severidad del usuario.                           |
+| Brecha prioritaria y recomendaciones                             | Explicar que el reporte termina con una prioridad operativa y secuencia de acciones.                                                                                         | Recomendaciones concretas, prioridad, severidad o claims personalizados.                           |
+| Detalle técnico/radar                                            | Mencionar que el reporte explica qué sostiene el puntaje con dimensiones medibles.                                                                                           | Radar, dimension scores, fortalezas/brechas específicas o "sin dato" por dimensión.                |
+| Share/PDF/CTA final                                              | Anticipar que el reporte se puede compartir/guardar cuando esté listo.                                                                                                       | Share copy personalizada, PDF link, short link o CTA con token antes del run.                      |
 
 La landing debe ordenar esos contenidos como una experiencia de conversión, no como una réplica larga del reporte:
 
@@ -371,15 +371,15 @@ La implementación debe incluir fallback `noscript`/degraded alrededor del host,
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
-|---|---|---|---|---|
-| El grader form no tiene render contract publicado | growth / forms | medium | Slice 1 lo verifica/publica antes del embed | `<greenhouse-form>` vacío |
-| CORS/surface allowlist bloquea `think.efeoncepro.com` | growth / public-site | high | Resolver TASK-1335 antes del launch; no bridge local | consola del browser / falta de ACAO |
-| Landing se siente separada del reporte | product / public-site | medium | Usar wireframe, reporte actual y GVC antes de implementar | primera pantalla generica |
-| Experiencia rica inventa progreso o datos | product / trust | medium | Motion/flow permiten skeleton narrativo, pero solo statuses reales si hay handle gobernado | progreso falso / claims no respaldados |
-| Flujo cierra por email en vez de reporte en pantalla | product / conversion | high | Completar TASK-1336 y requerir handle/token/redirect gobernado como parte de Discovery | success "te avisamos por email" como cierre final |
-| Motion degrada performance o accesibilidad | public-site / SEO | medium | CSS compositor-only, reduced-motion, LCP/INP check y GVC mobile | INP alto / foco perdido |
-| Dos intakes (hub + `/aeo-2/`) divergen | growth | low | Ambos usan el pipeline gobernado; no duplicar lógica | conteos de runs |
+| Riesgo                                                | Sistema               | Probabilidad | Mitigation                                                                                 | Signal de alerta                                  |
+| ----------------------------------------------------- | --------------------- | ------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| El grader form no tiene render contract publicado     | growth / forms        | medium       | Slice 1 lo verifica/publica antes del embed                                                | `<greenhouse-form>` vacío                         |
+| CORS/surface allowlist bloquea `think.efeoncepro.com` | growth / public-site  | high         | Resolver TASK-1335 antes del launch; no bridge local                                       | consola del browser / falta de ACAO               |
+| Landing se siente separada del reporte                | product / public-site | medium       | Usar wireframe, reporte actual y GVC antes de implementar                                  | primera pantalla generica                         |
+| Experiencia rica inventa progreso o datos             | product / trust       | medium       | Motion/flow permiten skeleton narrativo, pero solo statuses reales si hay handle gobernado | progreso falso / claims no respaldados            |
+| Flujo cierra por email en vez de reporte en pantalla  | product / conversion  | high         | Completar TASK-1336 y requerir handle/token/redirect gobernado como parte de Discovery     | success "te avisamos por email" como cierre final |
+| Motion degrada performance o accesibilidad            | public-site / SEO     | medium       | CSS compositor-only, reduced-motion, LCP/INP check y GVC mobile                            | INP alto / foco perdido                           |
+| Dos intakes (hub + `/aeo-2/`) divergen                | growth                | low          | Ambos usan el pipeline gobernado; no duplicar lógica                                       | conteos de runs                                   |
 
 ### Feature flags / cutover
 
@@ -388,12 +388,12 @@ La implementación debe incluir fallback `noscript`/degraded alrededor del host,
 
 ### Rollback plan per slice
 
-| Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
-| Slice 0 | revertir docs/readiness | <5 min | sí |
-| Slice 1 | no publicar / revert versión de render o no activar origin | <10 min | sí |
-| Slice 2 | despublicar la ruta en el repo del hub | <5 min | sí |
-| Slice 3 | quitar el poll / volver a confirmación event-driven | <5 min | sí |
+| Slice   | Rollback                                                   | Tiempo  | Reversible? |
+| ------- | ---------------------------------------------------------- | ------- | ----------- |
+| Slice 0 | revertir docs/readiness                                    | <5 min  | sí          |
+| Slice 1 | no publicar / revert versión de render o no activar origin | <10 min | sí          |
+| Slice 2 | despublicar la ruta en el repo del hub                     | <5 min  | sí          |
+| Slice 3 | quitar el poll / volver a confirmación event-driven        | <5 min  | sí          |
 
 ### Production verification sequence
 
