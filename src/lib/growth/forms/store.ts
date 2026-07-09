@@ -391,12 +391,15 @@ export interface UpsertHostSurfaceInput {
 
 export const insertHostSurface = async (input: UpsertHostSurfaceInput): Promise<FormHostSurfaceRow> => {
   const rows = await query<FormHostSurfaceRow>(
+    // TASK-1375 — honra `surfaceId` si viene (id estable p.ej. `fhsf-web-agentica-ebook`); si no,
+    // usa el DEFAULT (`fhsf-` || gen_random_uuid()). Aditivo/backward-compatible.
     `INSERT INTO greenhouse_growth.form_host_surface (
-       surface_kind, surface_name, origin_allowlist_json, allowed_form_slugs_json,
+       surface_id, surface_kind, surface_name, origin_allowlist_json, allowed_form_slugs_json,
        embed_key_id, embed_key_hash, renderer_channel, csp_requirements_json, status)
-     VALUES ($1, $2, $3::jsonb, $4::jsonb, $5, $6, COALESCE($7,'stable'), $8::jsonb, COALESCE($9,'active'))
+     VALUES (COALESCE($1, 'fhsf-' || gen_random_uuid()::text), $2, $3, $4::jsonb, $5::jsonb, $6, $7, COALESCE($8,'stable'), $9::jsonb, COALESCE($10,'active'))
      RETURNING *`,
     [
+      input.surfaceId ?? null,
       input.surfaceKind,
       input.surfaceName,
       JSON.stringify(input.originAllowlist),
@@ -409,7 +412,7 @@ export const insertHostSurface = async (input: UpsertHostSurfaceInput): Promise<
     ],
   )
 
-  
+
 return rows[0]
 }
 
@@ -608,6 +611,46 @@ export const getActiveFormAsset = async (formId: string): Promise<FormAssetRow |
 
   return rows[0] ?? null
 }
+
+export interface UpsertFormAssetInput {
+  formId: string
+  objectName: string
+  fileName: string
+  assetKind?: string
+  contentType?: string
+  ttlHours?: number
+}
+
+/**
+ * TASK-1375 — Registra/reemplaza el asset entregable activo de un form (write gobernado).
+ * Desactiva el asset activo previo (append-friendly; el índice parcial exige uno activo por
+ * form) e inserta el nuevo. SERVER-ONLY: `object_name` nunca cruza al render contract.
+ */
+export const upsertActiveFormAsset = async (input: UpsertFormAssetInput): Promise<FormAssetRow> =>
+  withTransaction(async tx => {
+    await tx.query(
+      `UPDATE greenhouse_growth.form_asset SET active = false, updated_at = NOW()
+        WHERE form_id = $1 AND active`,
+      [input.formId],
+    )
+
+    const rows = await tx.query<FormAssetRow>(
+      `INSERT INTO greenhouse_growth.form_asset
+         (form_id, asset_kind, object_name, file_name, content_type, ttl_hours, active)
+       VALUES ($1, COALESCE($2,'ebook'), $3, $4, COALESCE($5,'application/pdf'), COALESCE($6,72), true)
+       RETURNING *`,
+      [
+        input.formId,
+        input.assetKind ?? null,
+        input.objectName,
+        input.fileName,
+        input.contentType ?? null,
+        input.ttlHours ?? null,
+      ],
+    )
+
+    return rows.rows[0]
+  })
 
 export const listSubmissions = async (opts: { formId?: string; limit?: number } = {}): Promise<FormSubmissionRow[]> => {
   const limit = Math.min(Math.max(opts.limit ?? 100, 1), 500)
