@@ -351,6 +351,18 @@ Puntos clave de implementación:
 - Confirmar el **Epic** correcto (EPIC-019 público vs epic del hub Think) — ver Open Questions.
 - Evaluar convergencia futura Think → `efeonce-web` (misma marca/URL final) para esta landing.
 
+## Delta 2026-07-09 — landing implementada (code-complete local, rollout pendiente)
+
+Landing `/web-agentica` construida nativa en `efeonce-think` (commit local, NO pusheado — push a `main` = deploy prod, y el form vive en staging):
+
+- **Archivos** (`efeonce-think`): `src/pages/web-agentica/index.astro`, `src/components/WebAgenticaFormDock.astro`, teal tokenizado en `src/lib/report-tokens.ts` (`#36c8bf`, la firma de brand-visibility), surface en `greenhouse.repo.json`.
+- **SEO+GTM**: `BaseLayout` (title/description/canonical/OG/**GTM**/favicon) + JSON-LD `WebPage`+`FAQPage`. **Navy + Teal** (AXIS accent + teal), Geist/Poppins. Cero DM Sans / `_ds/` foráneo (re-autoría, no el export).
+- **Secciones**: hero navy+teal (H1 "El **fin** de la web"), stats (con fuentes), tesis, "cinco actos", audiencia, FAQ accordion, footer.
+- **Form + descarga**: embebe `<greenhouse-form form-key=db1e254c… surface=fhsf-web-agentica-ebook>`; al aceptarse el submit dispara la **descarga gated on-screen** con el `download_url` del handoff (`gh_form_submission_accepted`, TASK-1375) + **thank-you inline** (NO overlay) con "Descargar de nuevo" + puente al grader.
+- **Verificado**: `pnpm build` + `pnpm type-check` verdes; GVC desktop 1440 + mobile 390 **mirado** (navy+teal enterprise); `scrollWidth==clientWidth` (sin overflow). El form muestra su fallback honesto offline (sin API) — en staging con el form + API renderiza los campos.
+
+**Rollout pendiente (NO operativamente completo):** push de efeonce-think a `main` (deploy prod) — hacer junto con el rollout prod de TASK-1375 (form en prod DB, PDF en bucket prod, flags, deploy `renderer-latest.js` + ops-worker); **smoke real end-to-end** desde el origin (Turnstile + CORS): submit → llega email + descarga on-screen. Para probar en staging: apuntar `GREENHOUSE_API_BASE` a staging + `pnpm dev`.
+
 ## Delta 2026-07-09 (thank-you + email)
 
 - **Thank-you post-descarga (analizado con state-design/forms-ux/modern-ui/ux-writing):** **tarjeta inline** que reemplaza el form (NO overlay/modal). Anatomía: confirmación honesta (descarga + email) + recuperación "Descargar de nuevo" (gated con el token del handoff, la landing lo pinta) + un solo next step (puente al grader `/brand-visibility`). El success_card gobernado del form es el baseline (TASK-1375); la landing enriquece con el token. Copy en el ledger del wireframe (`form.success.*`). Foco al título del panel + `role=status`.
