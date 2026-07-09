@@ -7101,24 +7101,51 @@ export interface GreenhouseHiringHiringOpening {
   opening_id: Generated<string>;
   organization_id: string | null;
   owner_user_id: string | null;
+  /**
+   * TASK-1371: public department/area allowlisted by the vacancy publication operator.
+   */
+  public_area: string | null;
+  /**
+   * TASK-1371: public city for hybrid/onsite roles when applicable.
+   */
+  public_city: string | null;
+  /**
+   * TASK-1371: optional public compensation band. Not publish-required until finance/payroll/legal approves band governance.
+   */
+  public_compensation_band: string | null;
+  /**
+   * TASK-1371: public country for hybrid/onsite roles when applicable.
+   */
+  public_country: string | null;
   public_description: string | null;
   public_employment_mode: string | null;
-  public_area: string | null;
-  public_city: string | null;
-  public_compensation_band: string | null;
-  public_country: string | null;
+  /**
+   * TASK-1371: public hiring region shown as location for remote roles, e.g. LATAM, Global, Chile.
+   */
   public_hiring_region: string | null;
   public_id: Generated<string>;
   public_location_mode: string | null;
   public_nice_to_have: string | null;
+  /**
+   * TASK-1371: public office/location label for hybrid/onsite roles when applicable.
+   */
   public_office_location: string | null;
   public_process_notes: string | null;
   public_requirements: string | null;
   public_seniority: string | null;
+  /**
+   * TASK-1371: public skill/competency chips for Careers. Source of truth; no renderer inference from prose.
+   */
   public_skill_tags: Generated<string[]>;
   public_summary: string | null;
   public_title: string | null;
+  /**
+   * TASK-1371: public structured work mode for Careers. One of remote|hybrid|onsite; replaces ambiguous public_location_mode authoring.
+   */
   public_work_mode: string | null;
+  /**
+   * TASK-1371: internal operator/source reference used to reuse a draft/opening when the same approved brief is retried.
+   */
   publication_source_ref: string | null;
   publication_status: Generated<string>;
   published_at: Timestamp | null;

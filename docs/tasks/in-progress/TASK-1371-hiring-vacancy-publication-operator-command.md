@@ -451,7 +451,7 @@ La solucion aceptable tiene una primitive server-side unica. La CLI, endpoint in
 - [x] La salida incluye IDs, public IDs, status, URLs, warnings y timings por paso.
 - [x] La CLI o endpoint programatico permite a un agente publicar una vacante sin release, SQL ni UI manual.
 - [x] El camino queda documentado en manual HR, documentacion Careers y skill de talento.
-- [ ] Hay evidencia de dry-run y execute/publish controlado; si production queda fuera, se declara explicitamente. `dryRun` local verde; `execute/publish` real queda pendiente hasta aplicar migracion/levantar Cloud SQL Proxy en un entorno seguro.
+- [x] Hay evidencia de dry-run y execute/publish controlado; si production queda fuera, se declara explicitamente. `dryRun` local verde; smoke `publish` runtime verde reutilizando `EO-OPN-0009` por `publication_source_ref` sin crear demanda/opening nuevos.
 
 ## Verification
 
@@ -466,16 +466,22 @@ La solucion aceptable tiene una primitive server-side unica. La CLI, endpoint in
 ## Evidence 2026-07-09
 
 - `pnpm test src/lib/hiring/vacancy-publication-operator.test.ts src/lib/hiring/publication.test.ts src/lib/hiring/public-careers/view-model.test.ts` — verde.
+- `pnpm test` — verde: 1258 test files passed, 23 skipped; 8868 tests passed, 126 skipped.
 - `pnpm exec eslint src/lib/hiring/vacancy-publication-operator.ts src/lib/hiring/vacancy-publication-operator.test.ts src/lib/hiring/publication.ts src/lib/hiring/publication.test.ts src/lib/hiring/public-careers/view-model.ts src/lib/hiring/public-careers/view-model.test.ts src/app/api/hiring/vacancy-publications/route.ts scripts/hiring/publish-vacancy.ts` — verde.
 - `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` — verde.
+- `pnpm build` — verde; warning no bloqueante existente de Turbopack en `src/lib/roadmap/work-item-index/reader.ts` por patron amplio.
 - `pnpm hiring:publish-vacancy --file scripts/hiring/fixtures/account-manager-vacancy-brief.example.json --dry-run` — verde; preview valido con warning `public_compensation_band_not_set`.
-- `pnpm migrate:status` — no completado: Cloud SQL Proxy local no estaba levantado (`ECONNREFUSED 127.0.0.1:15432`). No se hizo smoke DB mutante ni publish real.
+- `gtimeout 180s pnpm pg:connect:migrate` — verde: aplico `20260709182000000_task-1371-hiring-opening-public-structured-fields` y `20260709183000000_task-1371-account-manager-legacy-location-backfill`.
+- `gtimeout 90s pnpm pg:connect:status` — verde: `No migrations to run!`.
+- `pnpm hiring:publish-vacancy --file scripts/hiring/fixtures/account-manager-vacancy-brief.example.json --publish` con Cloud SQL Proxy — smoke runtime verde: `outcome=duplicate`, `openingPublicId=EO-OPN-0009`, `status=published`, pasos `lookup_existing_opening`, `update_public_opening_projection`, `publish_opening`; no creo demanda/opening nuevos.
+- Query DB post-smoke — verde: `EO-OPN-0009` quedo `publication_status=published`, `visibility=public_listed`, `public_area=Marketing`, `public_work_mode=remote`, `public_hiring_region=LATAM`, `public_location_mode=LATAM`, `publication_source_ref=job-brief-account-manager-marketing-20260709`.
+- `curl -I https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009` — verde: `HTTP/2 200`.
 
 ## Closure State 2026-07-09
 
-- Estado: `code complete, rollout pendiente`.
-- Motivo: el codigo, contrato, docs y dry-run local estan implementados, pero la migracion aditiva no fue aplicada/verificada contra Cloud SQL y falta smoke `execute/publish` en entorno seguro.
-- Siguiente paso operativo: levantar conexion canonica (`pnpm pg:connect:status` / flujo de migracion aprobado), aplicar/verificar migracion y ejecutar smoke no productivo con fixture antes de mover esta task a `complete/`.
+- Estado: `in-progress`, con implementacion, migraciones y smoke runtime local/Cloud SQL verificados.
+- Motivo de no cierre: por instruccion operativa, no mover a `complete/` en este corte; queda lista para revision/commit/release posterior.
+- Nota `publicLocationMode`: para remoto se setea intencionalmente a `LATAM` como fallback legacy de ubicacion. La modalidad canonica ya no vive ahi: vive en `public_work_mode='remote'`.
 
 ## Closing Protocol
 

@@ -37,7 +37,12 @@ SET public_area = COALESCE(public_area, 'Marketing'),
       WHEN cardinality(public_skill_tags) = 0 THEN ARRAY['SEO', 'Copywriting', 'Liderazgo operativo', 'Vendor management', 'Marketing']
       ELSE public_skill_tags
     END,
-    public_location_mode = COALESCE(public_location_mode, 'LATAM')
+    -- Intentional compatibility: despite the legacy name, Careers historically
+    -- used public_location_mode as a mixed location/modality string. Structured
+    -- modality now lives in public_work_mode; remote legacy fallback stores the
+    -- public hiring region.
+    public_location_mode = COALESCE(public_hiring_region, 'LATAM'),
+    publication_source_ref = COALESCE(publication_source_ref, 'job-brief-account-manager-marketing-20260709')
 WHERE public_id = 'EO-OPN-0009';
 
 COMMENT ON COLUMN greenhouse_hiring.hiring_opening.public_work_mode IS
@@ -62,6 +67,70 @@ COMMENT ON COLUMN greenhouse_hiring.hiring_opening.publication_source_ref IS
 CREATE UNIQUE INDEX IF NOT EXISTS hiring_opening_publication_source_ref_uniq
   ON greenhouse_hiring.hiring_opening (publication_source_ref)
   WHERE publication_source_ref IS NOT NULL;
+
+-- Anti pre-up-marker bug guard (ISSUE-068): aborta si las columnas, constraint,
+-- indice o backfill canonico no quedaron aplicados.
+DO $$
+DECLARE
+  col_count INTEGER;
+  constraint_count INTEGER;
+  index_count INTEGER;
+  account_manager_count INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO col_count
+  FROM information_schema.columns
+  WHERE table_schema = 'greenhouse_hiring'
+    AND table_name = 'hiring_opening'
+    AND column_name IN (
+      'public_work_mode',
+      'public_hiring_region',
+      'public_city',
+      'public_country',
+      'public_office_location',
+      'public_area',
+      'public_skill_tags',
+      'public_compensation_band',
+      'publication_source_ref'
+    );
+
+  IF col_count <> 9 THEN
+    RAISE EXCEPTION 'TASK-1371 anti pre-up-marker: expected 9 public structured columns, got %. Migration markers may be inverted.', col_count;
+  END IF;
+
+  SELECT COUNT(*) INTO constraint_count
+  FROM pg_constraint
+  WHERE conname = 'hiring_opening_public_work_mode_check'
+    AND conrelid = 'greenhouse_hiring.hiring_opening'::regclass;
+
+  IF constraint_count <> 1 THEN
+    RAISE EXCEPTION 'TASK-1371 anti pre-up-marker: public work mode check constraint missing.';
+  END IF;
+
+  SELECT COUNT(*) INTO index_count
+  FROM pg_indexes
+  WHERE schemaname = 'greenhouse_hiring'
+    AND tablename = 'hiring_opening'
+    AND indexname = 'hiring_opening_publication_source_ref_uniq';
+
+  IF index_count <> 1 THEN
+    RAISE EXCEPTION 'TASK-1371 anti pre-up-marker: publication_source_ref unique index missing.';
+  END IF;
+
+  SELECT COUNT(*) INTO account_manager_count
+  FROM greenhouse_hiring.hiring_opening
+  WHERE public_id = 'EO-OPN-0009'
+    AND public_area = 'Marketing'
+    AND public_work_mode = 'remote'
+    AND public_hiring_region = 'LATAM'
+    AND public_location_mode = 'LATAM'
+    AND publication_source_ref = 'job-brief-account-manager-marketing-20260709'
+    AND public_skill_tags @> ARRAY['SEO', 'Vendor management', 'Marketing']::TEXT[];
+
+  IF account_manager_count <> 1 THEN
+    RAISE EXCEPTION 'TASK-1371 anti pre-up-marker: Account Manager structured public backfill missing or ambiguous.';
+  END IF;
+END
+$$;
 
 -- Down Migration
 

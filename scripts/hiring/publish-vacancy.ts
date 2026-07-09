@@ -3,6 +3,8 @@ import { resolve } from 'node:path'
 
 import { executeHiringVacancyPublicationCommand } from '@/lib/hiring/vacancy-publication-operator'
 
+import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
+
 type CliArgs = {
   file: string | null
   mode: 'dryRun' | 'execute' | 'publish'
@@ -59,6 +61,11 @@ const main = async () => {
   const mode = args.mode
   const idempotencyKey = args.idempotencyKey ?? (typeof brief.idempotencyKey === 'string' ? brief.idempotencyKey : null)
   const headers = new Headers()
+
+  if (mode !== 'dryRun') {
+    loadGreenhouseToolEnv()
+    applyGreenhousePostgresProfile('ops')
+  }
 
   if (idempotencyKey) headers.set('idempotency-key', idempotencyKey)
 
