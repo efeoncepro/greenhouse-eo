@@ -84,10 +84,40 @@ const splitList = (value: string | null | undefined): string[] => {
     .slice(0, MAX_LIST_ITEMS)
 }
 
+const extractResponsibilityItems = (value: string | null | undefined): string[] => {
+  if (!value?.trim()) return []
+
+  const lines = value
+    .split(/\r?\n/g)
+    .map(line => line.trim())
+    .filter(Boolean)
+
+  const headingIndex = lines.findIndex(line => normalizeText(cleanText(line)).startsWith('responsabilidades'))
+  const scopedLines = headingIndex >= 0 ? lines.slice(headingIndex + 1) : lines
+
+  const bulletItems = scopedLines
+    .filter(line => /^[\s\-*•·]+/.test(line))
+    .map(cleanText)
+    .filter(Boolean)
+
+  if (bulletItems.length) return bulletItems.slice(0, 4)
+
+  return splitList(value).slice(0, 4)
+}
+
+const weightedSourceText = (opening: PublicOpeningPayload): Array<{ text: string; weight: number }> => [
+  { text: opening.title, weight: 8 },
+  { text: opening.summary ?? '', weight: 6 },
+  { text: opening.requirements ?? '', weight: 4 },
+  { text: opening.description ?? '', weight: 3 },
+  { text: opening.niceToHave ?? '', weight: 1 },
+]
+
 const inferArea = (opening: PublicOpeningPayload, copy: CareersCopy): string => {
-  const text = normalizeText(
-    [opening.title, opening.summary, opening.description, opening.requirements, opening.niceToHave].filter(Boolean).join(' '),
-  )
+  const sources = weightedSourceText(opening).map(source => ({
+    ...source,
+    text: normalizeText(source.text),
+  }))
 
   const rules = [
     { label: copy.marquee[0] ?? copy.fallbacks.area, terms: ['disen', 'design', 'figma', 'ux', 'ui', 'producto'] },
@@ -101,7 +131,21 @@ const inferArea = (opening: PublicOpeningPayload, copy: CareersCopy): string => 
     { label: copy.marquee[5] ?? copy.fallbacks.area, terms: ['data', 'datos', 'analytics', 'sql', 'bigquery', 'analista'] },
   ]
 
-  return rules.find(rule => rule.terms.some(term => containsAreaTerm(text, term)))?.label ?? copy.fallbacks.area
+  let winner: { label: string; score: number } | null = null
+
+  for (const rule of rules) {
+    const score = sources.reduce((total, source) => {
+      const sourceScore = rule.terms.some(term => containsAreaTerm(source.text, term)) ? source.weight : 0
+
+      return total + sourceScore
+    }, 0)
+
+    if (score > (winner?.score ?? 0)) {
+      winner = { label: rule.label, score }
+    }
+  }
+
+  return winner?.label ?? copy.fallbacks.area
 }
 
 const resolveModality = (
@@ -170,7 +214,7 @@ export const buildCareersOpeningViewModel = (
 ): CareersOpeningViewModel => {
   const modality = resolveModality(opening.locationMode, copy.fallbacks.modality)
   const descriptionParagraphs = splitParagraphs(opening.description, opening.summary ?? copy.fallbacks.summary)
-  const responsibilityItems = splitList(opening.description).slice(0, 4)
+  const responsibilityItems = extractResponsibilityItems(opening.description)
   const requirementItems = splitList(opening.requirements)
 
   return {

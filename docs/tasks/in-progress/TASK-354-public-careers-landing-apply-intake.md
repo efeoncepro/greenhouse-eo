@@ -41,8 +41,9 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 - **CV con Greenhouse uploader/asset pipeline:** el apply público acepta un PDF opcional y lo adjunta como asset privado a `hiring_application` usando `createPrivatePendingAsset` + `attachAssetToAggregate`. No usa el endpoint privado del componente autenticado en browser público.
 - **GVC runtime formalizado:** se agregó `scripts/frontend/scenarios/task354-careers-runtime-audit.scenario.ts` para capturar home/listing/detalle/apply/uploader en desktop 1440 + mobile 390 con gates layout/runtime/keyboard/reduced-motion. El loop detectó targets tocables pequeños y se corrigieron brand/footer/privacy links en `careers.module.css`.
 - **Paridad HTML verificada:** comparación Playwright + `sharp` contra `/Users/jreye/Documents/carreers/Efeonce Carrers/Efeonce Careers.dc.html` en desktop 1440 y mobile 390. La diferencia visual esperada es contenido runtime (1 opening seed) vs baseline estático (6 openings) y ausencia del overlay de revisión del HTML.
-- **Rollout iniciado por instrucción del operador:** `HIRING_PUBLIC_APPLICATIONS_ENABLED=true` y `NEXT_PUBLIC_TURNSTILE_SITE_KEY` quedaron seteados en Vercel `staging` y `Production` el 2026-07-09; `TURNSTILE_SECRET` existe en ambos. Falta build fresco + release control plane + smoke staging/prod para cerrar.
-- **Release control plane:** el preflight contra `develop`/`main` queda bloqueado por `release_batch_policy` (`split_batch`: 787 archivos, dominios sensibles `payroll + auth_access + cloud_release + db_migrations`). No es blocker de código TASK-354, pero impide declarar producción cerrada sin dividir batch o aprobar marker `[release-coupled: reason]`.
+- **Rollout/release completado por autorización explícita del operador:** `HIRING_PUBLIC_APPLICATIONS_ENABLED=true` y `NEXT_PUBLIC_TURNSTILE_SITE_KEY` quedaron seteados en Vercel `staging` y `Production` el 2026-07-09; `TURNSTILE_SECRET` existe en ambos. El operador autorizó el release acoplado y `production-release.yml` run `28991488376` terminó `success`, promoviendo `433cfa2b0fd3` a producción con Vercel READY y manifest `released`.
+- **Smoke productivo parcial:** `/api/auth/health` respondió 200 `overallStatus=ready` y `/public/careers` respondió 200 con release `433cfa2b0fd3`. El 2026-07-09 se publicó el opening real `EO-OPN-0009` (`Account Manager / Especialista en Marketing`) vía writers canónicos de Hiring; `/public/careers/EO-OPN-0009` responde 200. Pendiente: release del fix robusto de inferencia de área/responsabilidades y smoke submit/dedupe con browser/Turnstile.
+- **Release residual documentado:** el watchdog reporta drift sólo para `ops-worker` (`bba072bf` vs `433cfa2b0fd3`), pero el job del orquestador lo saltó porque los paths runtime del worker no cambiaron; diff runtime vacío. No forzar redeploy salvo cambio real del worker.
 - **Límite explícito:** `revalidatePath` on-demand al publicar/despublicar queda en TASK-355 (Publication Desk). Esta UI ya usa ISR (`revalidate=300`) y no crea un publish command paralelo.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -64,7 +65,7 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 - Motion: `docs/ui/motion/TASK-354-public-careers-landing-motion.md`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Code complete; rollout pendiente por release_batch_policy`
+- Status real: `Code complete; production route live; opening real EO-OPN-0009 publicado; submit smoke pendiente`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`
