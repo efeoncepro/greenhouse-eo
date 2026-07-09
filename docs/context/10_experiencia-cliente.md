@@ -1,6 +1,26 @@
-# 10 · Experiencia de Cliente (Greenhouse como sistema de experiencia)
+# 10 · Experiencia de Cliente (Experiencia Efeonce + Greenhouse)
 
-> Greenhouse no es solo un portal de métricas: es **el sistema de experiencia de cliente de Efeonce**. Este archivo define qué debe *vivir* el cliente en cada fase y qué módulo del portal lo soporta. Es la guía para que las features sirvan a la experiencia, no solo a la función.
+> La **Experiencia Efeonce** es la vivencia completa de entrar al ecosistema de crecimiento de Efeonce. Greenhouse no es solo un portal de métricas: es el **sistema operativo/command center** que vuelve esa experiencia visible, medible y repetible. Este archivo define qué debe *vivir* el cliente en cada fase y qué módulo, ritual o superficie lo soporta. Es la guía para que las features sirvan a la experiencia, no solo a la función.
+
+## Experiencia Efeonce: la promesa completa
+
+Un cliente no solo "entra a una agencia". Al contratar Efeonce, compra su entrada a un **ecosistema de crecimiento**: operación, software, metodología, contenido, aprendizaje, red y acceso a inteligencia acumulada.
+
+La experiencia tiene cinco capas:
+
+| Capa | Qué recibe el cliente | Mecanismo |
+|---|---|---|
+| **Operación** | Un equipo que ejecuta y orquesta crecimiento ciclo a ciclo. | Director de Cuenta, Loop Marketing, ICO, rituals de delivery. |
+| **Software** | Visibilidad y memoria del trabajo. | Greenhouse, Kortex y Verk según alcance. |
+| **Aprendizaje** | Un cliente más capaz, no más dependiente. | Think, blog `efeoncepro.com/blog`, tools, ebooks, webinars, podcast, YouTube, canales sociales y sesiones con el equipo. |
+| **Red** | Acceso progresivo a comunidad, networking y benchmarks. | Newsletter, eventos/webinars, futuro advisory/client community y aprendizajes cruzados seguros. |
+| **Memoria** | Historial, contexto y señales que hacen que cada ciclo parta más adelante. | Account 360, ICO historial, reportes ejecutivos, "Tu año con Efeonce". |
+
+**Regla de producto:** Greenhouse no debe intentar reemplazar todas las superficies de la Experiencia Efeonce. Debe conectarlas, hacerlas visibles y convertirlas en memoria. Si el cliente consume un webinar, usa una tool, asiste a una sesión o participa en networking, eso puede convertirse en señal de madurez, interés, educación o expansión; no debe quedar como actividad aislada.
+
+**Regla de marca:** no vender "experiencia 360" como frase genérica. Decirlo con mecanismo: *entras a un ecosistema donde ves tu operación, aprendes con contenido y herramientas, accedes a una red, y cada ciclo queda registrado para crecer mejor el siguiente mes.*
+
+**Nexa dentro de la experiencia:** Nexa es la presencia inteligente de ese ecosistema. No es un bot: es alguien más del equipo Efeonce leyendo el sistema contigo. Tiene rostro y branding propio: el rostro construye presencia/persona; el Nexa Mark construye invocación, firma y acción. En la experiencia cliente debe aparecer cuando pueda explicar, orientar, advertir, sintetizar o acompañar una acción con evidencia; nunca como adorno.
 
 ## La metáfora (y por qué importa para producto)
 
@@ -36,7 +56,7 @@ Esta es la tabla más importante para un agente de producto: conecta cada moment
 | 7 | **Referral y evangelismo** | Captura de testimonios en momentos de impacto | Human-driven. El portal no interviene directamente. | — |
 | 8 | **Offboarding** | Cierre profesional con respeto | Se desactiva acceso. Se genera reporte final con datos históricos como entregable de cierre. | Admin (desactivar tenant) + Export |
 | T1 | **Stakeholder invisible** | Artefactos ejecutivos compartibles | Generados desde el portal con datos reales, legibles sin contexto adicional (un CFO/CEO los evalúa directo). | Inteligencia Financiera |
-| T2 | **Comunidad de clientes** | Newsletter + sesión anual | Human-driven hoy. Futuro (2027): benchmarks anónimos cross-tenant en el portal. | — (roadmap) |
+| T2 | **Comunidad de clientes** | Aprendizaje + networking + benchmarks | Human-driven hoy: newsletter, blog, Think tools, YouTube, sociales, ebooks, webinars y futuro podcast. Futuro: comunidad/advisory, sesiones de clientes y benchmarks anónimos cross-tenant en el portal. | — (roadmap) |
 
 ---
 
@@ -48,6 +68,7 @@ Cuatro momentos del journey **son features de Greenhouse**, no actividades offli
 2. **Feedback Review en vivo** — revisar métricas juntos *dentro* del portal, no en un PPT. Requiere que los datos estén presentables y confiables en tiempo real.
 3. **"Tu año con Efeonce"** — reporte de renovación autogenerado desde Account 360 + ICO historial + Person 360. Artefacto de máximo switching cost: hace visible el valor acumulado.
 4. **Protocolo de transparencia con datos** — en momentos de tensión, el portal muestra Stuck Assets / Cycle Time / OTD% caído. La feature convierte una conversación incómoda en una basada en hechos.
+5. **Ecosystem Learning Layer** — la experiencia educativa del cliente no vive solo en llamadas. Blog, Think tools, YouTube, sociales, ebooks, webinars y futuro podcast deben poder alimentar onboarding, expansión y madurez del cliente. El producto no reemplaza esos canales; los conecta con el Account 360 cuando exista señal útil.
 
 ---
 
@@ -60,6 +81,7 @@ Cuatro momentos del journey **son features de Greenhouse**, no actividades offli
 | Feedback Review desde portal | % de reviews ejecutadas con datos del portal en vivo | 100% a partir de Q3 |
 | Cross-sell detectado por Pulse | Oportunidades de expansión identificadas por Pulse | 1/cuenta/trimestre |
 | NPS post-onboarding | Satisfacción en primeras 4 semanas | 8+/10 |
+| Participación en aprendizaje | Consumo o asistencia a contenidos/tools/eventos relevantes por cuenta | Señal para onboarding, expansión y health |
 
 > Estas métricas conectan directo con los KPIs comerciales de `08`. "Login activo 0%→100%" es el objetivo de producto más concreto del 2026.
 
@@ -78,6 +100,7 @@ El pitch de la experiencia parte del dolor reconocible —"no sabes el estado de
 | Evolución | Cada trimestre desde cero | Cada mes mejor; el sistema acumula inteligencia |
 | Valor acumulado | Sin registro claro | "Tu año con Efeonce" compartible |
 | Switching cost | Bajo, relacional | Alto: datos + proceso + IA + historial en el portal |
+| Aprendizaje y red | Depende del ejecutivo de turno | Ecosistema activo: contenido, tools, webinars, podcast, comunidad y benchmarks |
 
 > ⚠️ Naming canónico: **"Greenhouse"** (nunca "Greenhouse EO") y **"Rounds per Asset"** (nunca "Reviews per Asset") — ver `06`. Si un documento o superficie legacy usa los nombres viejos, alinear al canónico; el estado vivo del rótulo en runtime/UI no se fija aquí (verificar contra el SoT).
 

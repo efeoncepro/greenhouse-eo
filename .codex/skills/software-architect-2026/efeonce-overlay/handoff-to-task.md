@@ -170,7 +170,7 @@ These terms stay in English (don't translate):
 - Patterns: strangler fig, expand-and-contract, branch by abstraction, dual-write, RLS, RBAC
 - AI: prompt, eval, agent, tool call, autonomy tier, MCP, RAG, embedding, context window
 - Observability: span, trace, baggage, OTel, SLO, p95, DORA
-- Efeonce-specific: ICO Engine, RpA, OTD%, FTR%, FTE, Surround, Praxis, IDD, Nested Loops, SOLVE
+- Efeonce-specific: ICO Engine, RpA, OTD%, FTR%, FTE, Surround, Praxis, IDD, Nested Loops, Surround Discovery S4 (SOLVE as stage, not standalone methodology)
 - Roles: admin, owner, viewer, editor, contractor
 
 These terms typically translate:

@@ -25,6 +25,7 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | "hire abroad / remote / contractor vs EOR / which country" | Global hiring (with payroll/legal boundary) |
 | "onboarding / ramp / development / career path" | People development |
 | "engagement / burnout / wellbeing / retention / flight risk" | Engagement + wellbeing |
+| "cultura / operating code / performance review / valores en equipo" | Efeonce Operating Code + People development |
 | "headcount / capacity gap / build vs buy vs borrow / org design" | Workforce planning |
 | any of the above **inside Greenhouse** (Hiring/ATS, assessment engine) | + load `references/greenhouse-runtime.md` |
 
@@ -75,11 +76,30 @@ Greenhouse runtime binding (domain, code paths, invariants) → `references/gree
 | `greenhouse-nexa-conversational` | Operate hiring/assessment from conversation via Full API Parity (propose→confirm). |
 | `efeonce-agency` + `docs/context/` | Real agency roles (Account, Design, Media, Strategy, Dev), ASaaS model, Globe clients. |
 
+## Efeonce Operating Code (culture is evidence, not vibes)
+
+When the work touches hiring, onboarding, performance, rituals, engagement or team culture, load `docs/operations/EFEONCE_OPERATING_CODE_V1.md`.
+
+Core rule:
+
+> In Efeonce, value the people who leave the client more capable, leave the system with more memory, and connect their work to real growth.
+
+Apply it as observable behavior, not "culture fit":
+
+- **Transparency:** shows status, risks and decisions with context.
+- **Education:** raises client/team judgment.
+- **Memory:** leaves reusable learning, data, templates, playbooks or assets.
+- **Impact:** connects work to business, efficiency or decision quality.
+- **System:** reduces fragmentation and improves the operating backbone.
+
+Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onboarding-performance.md` for interview questions, onboarding and performance calibration.
+
 ## Hard rules (anti-regression, fairness + legality first)
 
 - **NEVER** let an assessment/interview score auto-reject or auto-hire. It is **input to a human decision** (AI-Act human-oversight; also the Greenhouse invariant).
 - **NEVER** use — or recommend — emotion recognition, facial/voice "personality" inference, or social scoring of candidates (AI-Act prohibited + indefensible).
 - **NEVER** design a selection step that isn't **job-related and validity-oriented**; avoid anything that is a proxy for a protected class (adverse impact). Prefer structured interviews + work samples over unstructured "culture fit".
+- **NEVER** use "culture fit" as vague affinity. If evaluating Operating Code alignment, tie it to job-related evidence: transparency, education, memory, impact and system behavior.
 - **NEVER** compute payroll/comp/tax here — hand off to `greenhouse-payroll-auditor`. **NEVER** draft the legal contract — hand off to contracting/legal.
 - **NEVER** treat AI output as truth: **propose → a human confirms**, with an eval baseline (mirrors the Greenhouse assessment AI design).
 - **NEVER** collect candidate identity documents at the public apply stage; capture post-decision, and treat candidate PII with the same masked/reveal/audit rigor as an employee's.
@@ -94,6 +114,7 @@ Greenhouse runtime binding (domain, code paths, invariants) → `references/gree
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (domain + assessment deltas)
 - The active `EPIC-011` + `TASK-1360..1363` specs (assessment engine + surfaces)
 - `docs/context/` business pack (voice, ICO, agency, HubSpot) when the work touches brand/roles/metrics
+- `docs/operations/EFEONCE_OPERATING_CODE_V1.md` when the work touches culture, onboarding, performance or Efeonce-specific hiring
 - `references/greenhouse-runtime.md` (this skill) for code paths + invariants
 
 ## Output format

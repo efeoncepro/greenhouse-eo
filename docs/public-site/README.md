@@ -41,6 +41,9 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   - [PDR-007 — Posicionamiento del "HubSpot Portal Grader" (lead magnet + gancho a la venta)](decisions/PDR-007-hubspot-portal-grader-lead-magnet.md)
   - [PDR-008 — Posicionamiento de la landing "Agencia" (`/agencia`)](decisions/PDR-008-landing-agencia-marketing-digital-posicionamiento.md)
   - [PDR-009 — Booking nativo con HubSpot Scheduler API](decisions/PDR-009-hubspot-scheduler-native-booking.md)
+  - [PDR-010 — La Home es el pitch; `/agencia` se pliega](decisions/PDR-010-home-es-el-pitch-agencia-se-pliega.md)
+  - [PDR-011 — About Us como identidad Golden Circle](decisions/PDR-011-about-us-identidad-golden-circle.md)
+  - [PDR-012 — Growth Operating System como posicionamiento global](decisions/PDR-012-growth-operating-system-global-positioning.md)
 
 ## Contexto canónico (fuentes que este espacio NO reimplementa)
 

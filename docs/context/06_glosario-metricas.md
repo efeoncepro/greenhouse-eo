@@ -223,8 +223,9 @@ La visibilidad se escala por tier (alineado con el modelo ASaaS). **Directamente
 | **ASaaS** | Agency Service as a Software. | — |
 | **AEO** | **AI Engine Optimization** | Posicionamiento en motores de IA (ChatGPT, Claude, Perplexity, Gemini). **No** "Answer Engine Optimization". Medición: Otterly.ai. |
 | **IDD** | Intelligence-Driven Development | Metodología propietaria de Wave. |
-| **SOLVE** | Framework de medición y accountability. | 4ª fase del motor S⁴. |
 | **CVR** | Creative Velocity Review | Rito trimestral donde se presenta Revenue Enabled al cliente. |
+
+> **Regla dura:** `SOLVE` no se documenta ni se nombra como metodología separada. Es la 4ª etapa del motor **S⁴** de **Surround Discovery™**.
 
 ---
 

@@ -24,6 +24,11 @@ El sitio público es la **capa de adquisición** del ecosistema digital Efeonce
 (modelo de capas en [PDR-003](decisions/PDR-003-layering-ecosistema-digital-efeonce.md):
 adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kortex/Verk).
 
+La categoría pública queda fijada por [PDR-012](decisions/PDR-012-growth-operating-system-global-positioning.md):
+**Growth Operating System / ASaaS**, LATAM-first y global-ready. La Home debe vender
+el sistema; About Us debe explicar el Why; cada spoke de servicio debe demostrar una
+capability dentro del sistema, no presentarse como agencia suelta.
+
 ## Estado actual (baseline)
 
 | Superficie | Estado | Rol | Fuente |

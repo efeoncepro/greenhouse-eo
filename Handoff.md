@@ -1,3 +1,59 @@
+## Sesion 2026-07-09 - Nexa Voice System V1 - Codex - docs/skills
+
+> **Pedido:** definir Nexa Voice de forma meticulosa y rigurosa, no solo confirmar que existia una base.
+>
+> **Implementado:** nuevo canon `docs/architecture/nexa-intelligence/voice/nexa-voice-system-v1.md`. Tesis: **Nexa habla como criterio tranquilo en movimiento: entiende el sistema, mira la evidencia y ayuda a actuar mejor.** El sistema define relacion Efeonce/Greenhouse/Nexa, las **4 A** (`Aclara`, `Acompaña`, `Advierte`, `Activa`), personalidad verbal, anatomia de turno, modos conversacionales, sintaxis, fraseologia propia, frases prohibidas, limite de humanidad, voz por estado, relacion con rostro/Nexa Mark/Sender/Presence/Glow y QA de voz.
+>
+> **Docs sincronizados:** `docs/architecture/nexa-intelligence/manifest.json`, `README.md`, `voice/README.md`, `voice/voice-tone-style-personality.md`, `docs/context/05_voz-tono-estilo.md`, `.codex/skills/greenhouse-nexa-conversational/SKILL.md`, `.claude/skills/greenhouse-nexa-conversational/SKILL.md`, `project_context.md`, `changelog.md`. Se corrigio `docs/architecture/nexa-intelligence/system-prompt/current.md` de `v2.3.0` a `v2.4.0` para reflejar el codigo real.
+>
+> **Task creada:** `docs/tasks/to-do/TASK-1370-nexa-voice-v1-runtime-alignment.md` deja el trabajo runtime como backlog gobernado: actualizar `voiceContract`/prompt V2 con Nexa Voice V1, 4 A, fraseologia, limite de humanidad, bump clase `voice`, snapshot y QA matrix. No cambia runtime todavia.
+>
+> **Caveat:** no se toco `src/lib/nexa/nexa-system-prompt.ts`; el runtime prompt actual queda parcialmente alineado. Implementar Nexa Voice V1 literalmente en el chat requiere cambio clase `voice`: bump de `NEXA_SYSTEM_PROMPT_V2_VERSION`, entrada en `NEXA_PROMPT_GOVERNANCE`, snapshot actualizado y QA matrix.
+
+## Sesion 2026-07-09 - Nexa Identity Canon V1 - Codex - docs/skills
+
+> **Pedido:** documentar que Nexa no es un chatbot generico: es alguien mas del equipo Efeonce, personificacion del Why, con nombre, personalidad, origen, rostro y branding propio. El operador aclaro que el rostro ya esta en el reporte/chat y que Nexa tiene Nexa Mark dentro del repo.
+>
+> **Implementado:** se agrego/cerro `docs/architecture/nexa-intelligence/voice/nexa-identity-canon.md` y se registro como capa de voz en `docs/architecture/nexa-intelligence/manifest.json`, `voice/README.md` y `README.md`. El canon define tesis, rol, personalidad, patron conversacional, reglas duras, rostro, branding, origen narrativo inicial y frase interna: "Nexa es la inteligencia tranquila de Efeonce: alguien del equipo que lee el sistema contigo y te ayuda a actuar mejor."
+>
+> **Rostro/branding localizados:** `NexaFace` usa `NEXA_FACE_SRC='/images/avatar-nexa/nexa-face.webp'`; el asset aprobado vive en `public/images/avatar-nexa/nexa-face.webp`. Assets relacionados: `public/images/avatar-nexa/nexa-avatar.png` y legacy `public/images/greenhouse/nexa/nexa-avatar.png`. Branding: `GreenhouseNexaBrandMark` + `public/images/nexa-mark/*`; unidad minima arco + sparkle, no `tabler-sparkles` suelto. Conversacion: `NexaSenderMark` por-mensaje y `NexaPresenceMark` online/pensando. Interaccion: `NexaGlowBorder`, `GreenhouseShinyBorder palette='nexa'` y spectrum Nexa.
+>
+> **Docs/skills sincronizados:** `.codex/skills/greenhouse-nexa-conversational/SKILL.md`, `.claude/skills/greenhouse-nexa-conversational/SKILL.md`, `docs/context/09_marca-agencia.md`, `docs/context/10_experiencia-cliente.md`, `project_context.md` y `changelog.md`.
+>
+> **Caveat:** no se cambio el runtime prompt de `src/lib/nexa/nexa-system-prompt.ts`; si se decide que Nexa debe verbalizar literalmente esta identidad en produccion, corresponde bump de prompt versionado + snapshot/gates.
+
+## Sesion 2026-07-09 - Brand Voice v1.1 ajustado a Experiencia Efeonce - Codex - docs/skills
+
+> **Cambio:** se actualizo `docs/context/05_voz-tono-estilo.md` como Brand Voice v1.1. Nueva creencia narrativa: **el cliente no contrata entregables; entra a un ecosistema que lo vuelve mas capaz**. Se agrego personalidad `educador exigente / anfitrion de crecimiento`, tono para thought leadership/aprendizaje/comunidad, ejemplo de microcopy y regla anti-humo para no usar "experiencia 360", "ecosistema integral", "comunidad exclusiva", "aprendizaje transformador" o "partner estratégico" sin mecanismo.
+> **Docs/skills sincronizados:** `docs/context/09_marca-agencia.md`, skills `efeonce-agency` Codex/Claude, `project_context.md` y `changelog.md`.
+> **Verificacion:** `pnpm docs:closure-check` verde (warnings 0; feature flags audit sin faltantes) y `pnpm docs:context-check` sin errores (solo warnings historicos por tamano de `Handoff.md`). No hubo cambios runtime.
+
+## Sesion 2026-07-09 - Experiencia Efeonce canonizada como ecosistema de crecimiento - Codex - docs/skills
+
+> **Decision documentada:** por instruccion del operador, la **Experiencia Efeonce** queda definida como entrada del cliente a un ecosistema de crecimiento, no solo a una agencia ni solo a un portal. Capas: operacion, software, aprendizaje, red/networking y memoria. Greenhouse es el command center que conecta, visibiliza y acumula esa experiencia; no sustituye Think, blog `efeoncepro.com/blog`, YouTube, sociales, ebooks, webinars ni futuro podcast.
+> **Docs actualizados:** SSOT `docs/context/10_experiencia-cliente.md`; contexto `00`, `01`, `09`, `14`; PDR-003 layering de ecosistema digital; skills `efeonce-agency` Codex/Claude; `project_context.md`; `changelog.md`.
+> **Verificacion:** `pnpm docs:closure-check` verde (warnings 0; feature flags audit sin faltantes) y `pnpm docs:context-check` sin errores (solo warnings historicos por tamano de `Handoff.md`). No hubo cambios runtime.
+
+## Sesion 2026-07-09 - SOLVE corregido como etapa de Surround Discovery - Codex - docs/skills
+
+> **Correccion de memoria:** por instruccion del operador, `SOLVE` queda eliminado como metodologia/framework independiente. `SOLVE` es solamente la 4ª etapa del motor **S⁴** dentro de **Surround Discovery™** (`SENSE → SHAPE → SURFACE → SOLVE`).
+> **Docs corregidos:** `docs/context/01_quienes-somos.md`, `docs/context/03_ecosistema-producto.md`, `docs/context/06_glosario-metricas.md`, `docs/context/09_marca-agencia.md`. Si se crea `docs/methodologies/`, NO crear `solve.md`; documentar SOLVE dentro de `surround-discovery.md`.
+> **Verificacion:** `pnpm docs:closure-check` verde (warnings 0; feature flags audit sin faltantes). No hubo cambios runtime.
+
+## Sesion 2026-07-09 - Efeonce Operating Code V1 - Codex - docs/skills
+
+> **Contrato creado:** se documento `docs/operations/EFEONCE_OPERATING_CODE_V1.md` como canon cultural interno para impregnar el Why en comportamiento observable. Regla: en Efeonce se valora a quien deja al cliente mas capaz, deja el sistema con mas memoria y conecta su trabajo con crecimiento real.
+> **People/Talent:** se agrego `docs/documentation/hr/efeonce-operating-code-hiring-onboarding-performance.md` para aplicar el code en hiring, onboarding, performance y rituales. La skill `greenhouse-talent-people-operator` (Codex/Claude) y sus templates `job-brief`/`scorecard` ahora evaluan transparencia, educacion, memoria, impacto y sistema con evidencia job-related, no "culture fit" vago.
+> **Contexto/marca:** `docs/context/00_INDEX.md`, `01_quienes-somos.md`, `09_marca-agencia.md` y skills `efeonce-agency` Codex/Claude apuntan al Operating Code como bajada interna del Why.
+> **Verificacion:** `pnpm docs:closure-check` verde (warnings 0; feature flags audit sin faltantes) y `pnpm docs:context-check` sin errores (solo warnings historicos por tamano de `Handoff.md`). No hubo cambios runtime.
+
+## Sesion 2026-07-09 - Efeonce Growth Operating System global positioning - Codex - docs/skills
+
+> **Decision documentada:** por instrucción del operador, se canonizó la lectura estratégica de que el Why de Efeonce (`No te entregamos crecimiento. Lo construimos contigo —y te dejamos más capaz de sostenerlo`) es diferenciador fuerte sólo si se prueba con mecanismo. La categoría pública/GTM queda como **Growth Operating System / ASaaS**, **LATAM-first, no LATAM-limited**: construir reconocimiento grande en LATAM desde el inicio, pero preparado para EEUU hispano, mercados en inglés y otros mercados internacionales.
+> **Diferenciador:** no es "co-creación" como claim ni "AI agency" como moda; es **co-creación convertida en software, método, datos y memoria acumulada**: Greenhouse/Kortex/Verk + Loop/ICO + Revenue Enabled + historial/capacidad del cliente.
+> **Docs actualizados:** SSOT marca `docs/context/09_marca-agencia.md`; contexto `00`, `01`, `02`, `08`, `14`; nuevo `docs/public-site/decisions/PDR-012-growth-operating-system-global-positioning.md`; índice/roadmap público; mirrors `.codex/skills/efeonce-agency/SKILL.md` y `.claude/skills/efeonce-agency/SKILL.md`; `project_context.md` y `changelog.md`.
+> **Verificación:** `pnpm docs:closure-check` verde (warnings 0; feature flags audit sin faltantes). No hubo cambios runtime.
+
 ## Sesion 2026-07-09 - Careers Account Manager opening + area inference fix - Codex - runtime/code
 
 > **Vacante creada:** por instrucción del operador se creó una vacante real `Account Manager / Especialista en Marketing` usando writers canónicos de Hiring (`createTalentDemand` → `createHiringOpening` → `updateHiringOpening` → `publishOpening`), no SQL directo. Demand `EO-TDM-0012`; opening público `EO-OPN-0009`; estado `active`, `publication_status='published'`, `visibility='public_listed'`, `published_at=2026-07-09T05:36:10.375Z`. Public detail live: `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009`; apply href: `/public/careers/EO-OPN-0009/apply`.

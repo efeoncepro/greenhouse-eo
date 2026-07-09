@@ -23,10 +23,23 @@ One scorecard per role, filled per candidate from evidence (assessment + structu
 - Gaps / risks:
 - Missing evidence (not tested):
 
+## Efeonce Operating Code evidence
+
+Use `docs/operations/EFEONCE_OPERATING_CODE_V1.md`. Score only from evidence; this is not vague "culture fit".
+
+| Behavior | Score (1–5) | Evidence |
+|---|---:|---|
+| Transparency: shows state, risks and decisions with context |  |  |
+| Education: raises client/team judgment |  |  |
+| Memory: leaves reusable learning, data or assets |  |  |
+| Impact: connects work to business or decision quality |  |  |
+| System: reduces fragmentation across capabilities/tools |  |  |
+
 ## Bias check
 
 - [ ] Ratings tied to anchors, not gut / vibe
 - [ ] No "culture fit" as a proxy; no protected-class inference
+- [ ] Operating Code evidence is job-related and specific
 - [ ] Independent scores captured before debrief
 
 ## Recommendation (ADVISORY — human decides)

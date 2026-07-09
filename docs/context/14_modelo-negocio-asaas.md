@@ -4,7 +4,9 @@
 
 ## Qué es ASaaS
 
-**Agency Service as a Software** invierte la lógica del SaaS. Un SaaS empaqueta software como servicio; el ASaaS empaqueta **el servicio de agencia como si fuera un producto de software**. El cliente no contrata horas ni entregables: **accede a un sistema** —login, dashboards, datos en tiempo real, valor acumulativo— donde el servicio humano opera por debajo como motor, no como interfaz. La premisa: la agencia del futuro compite más contra herramientas de software que contra otras agencias.
+**Agency Service as a Software** invierte la lógica del SaaS. Un SaaS empaqueta software como servicio; el ASaaS empaqueta **el servicio de agencia como si fuera un producto de software**. El cliente no contrata horas ni entregables: **accede a un sistema** —login, dashboards, datos en tiempo real, aprendizaje, red, valor acumulativo— donde el servicio humano opera por debajo como motor, no como interfaz. La premisa: la agencia del futuro compite más contra herramientas de software que contra otras agencias.
+
+Como posicionamiento de escala, ASaaS convierte a Efeonce en un **Growth Operating System**: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación. Esto es **global-ready** por diseño: el sistema puede localizar idioma, mercado, regulación y canales sin cambiar la tesis central. LATAM es el primer campo de prueba, no el límite del modelo.
 
 ### Las 6 características del modelo (cada una es una directriz de producto)
 
@@ -70,7 +72,7 @@ No se abandona el fee de servicio — se **agrega una capa de producto** que jus
 | **Métricas** | OTD%, RpA | + Revenue Enabled | + benchmarks industria |
 | **AI Agents** | Brand governance | + recomendaciones | + agents custom |
 | **Acciones** | Solo visualización | Aprobar + solicitar | + integraciones |
-| **Comunidad** | Newsletter | + networking | + advisory board |
+| **Comunidad / aprendizaje** | Newsletter + contenido/tools | + networking + webinars | + advisory board + benchmarks |
 | **Reporting** | Mensual | Quincenal + portal | Real-time + custom |
 
 > Estos tiers son **capability flags en el producto** (ver Admin/RBAC y arquitectura de acceso vigente). El agente debe construir features pensando a qué tier pertenecen: una vista de Revenue Enabled es Pro+; los benchmarks cross-tenant son Enterprise y dependen de masa crítica.

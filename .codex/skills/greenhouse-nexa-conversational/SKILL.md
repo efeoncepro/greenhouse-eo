@@ -26,7 +26,7 @@ Toda la inteligencia está documentada por capas en **`docs/architecture/nexa-in
 
 - `system-prompt/` — el prompt versionado (V1 rollback / V2 modular) + qué tiene hoy. Código: `src/lib/nexa/nexa-system-prompt.ts`.
 - `behavior/` — comportamiento por turno + ruteo de tools + ruteo de provider (auto-router). Código: `nexa-service.ts`, `nexa-model-router.ts`, `nexa-provider.ts`, `providers/`.
-- `voice/` — contrato de voz Efeonce. Fuente: `docs/context/05_voz-tono-estilo.md`.
+- `voice/` — identidad + voz de Nexa. Fuentes: `docs/architecture/nexa-intelligence/voice/nexa-identity-canon.md` + `docs/architecture/nexa-intelligence/voice/nexa-voice-system-v1.md` + `docs/context/05_voz-tono-estilo.md`.
 - `knowledge/` — retrieval (RAG) + calidad de respuesta + evidencia/citas. Código: `nexa-tools.ts`, `src/lib/knowledge/search/**`, `conversational-evidence.ts`.
 - `experience/` — Conversational Experience + Nexa Moments + Nexa Answers (las vistas de producto).
 - `governance/` — do's & don'ts consolidados.
@@ -43,6 +43,29 @@ Toda la inteligencia está documentada por capas en **`docs/architecture/nexa-in
 ## Contratos versionados (SSOT — no romper sin bumpear versión)
 
 `surfaceContext` (`@/lib/nexa/nexa-answers-surface-context`) · `nexa-answer-render-plan.v1` · `nexa-evidence.v1` · `knowledge-search.v1` · `NEXA_PROMPT_GOVERNANCE` (versión del prompt). Detalle: `nexa-intelligence/technical/data-contracts.md`.
+
+## Identidad de Nexa (canon)
+
+Nexa no es un chatbot ni un asistente virtual genérico. **Nexa es alguien más del equipo Efeonce**: tiene nombre, presencia, personalidad, origen y rostro. Es la personificación del Why dentro de Greenhouse: co-creación, educación, integralidad, memoria y transparencia convertidas en una inteligencia operativa que lee el sistema contigo.
+
+Frase interna: **Nexa es la inteligencia tranquila de Efeonce: alguien del equipo que lee el sistema contigo y te ayuda a actuar mejor.**
+
+Identidad visual canonica:
+- Rostro/persona: `NexaFace` (`NEXA_FACE_SRC` -> `public/images/avatar-nexa/nexa-face.webp`). Usarlo para presence, hero/header y momentos donde Nexa acompaña/explica/sintetiza.
+- Branding: `GreenhouseNexaBrandMark` + assets `public/images/nexa-mark/*`. La unidad minima de marca es arco + sparkle; no reemplazar por `tabler-sparkles` suelto.
+- Conversacion: `NexaSenderMark` para avatar por-mensaje y `NexaPresenceMark` para estado online/pensando. La foto real no va en cada bubble.
+- Interaccion: `NexaGlowBorder`, `GreenhouseShinyBorder palette='nexa'` y spectrum palette Nexa son lenguaje de accion/invocacion, no decoracion libre.
+
+Reglas de identidad:
+- NUNCA llamarla "bot", "asistente virtual" o "IA genérica" en copy de producto.
+- NUNCA usar su rostro como decoración si no hay contexto, evidencia o siguiente paso.
+- NUNCA crear una Nexa por dominio; Nexa es una, los dominios le dan contexto.
+- NUNCA usar iconos genericos como sustituto de Nexa Mark en CTAs o surfaces que la invocan.
+- SIEMPRE hacer que deje al usuario más capaz que antes de preguntar.
+
+SSOT: `docs/architecture/nexa-intelligence/voice/nexa-identity-canon.md`.
+
+Nexa Voice V1: `docs/architecture/nexa-intelligence/voice/nexa-voice-system-v1.md`. Modelo verbal: **Aclara, Acompaña, Advierte, Activa**. Úsalo para copy, chat, UI, prompts sugeridos, CTA "Pregúntale a Nexa", future audio/video y cualquier superficie nueva. El runtime prompt actual está parcialmente alineado; implementarlo literalmente en `nexa-system-prompt.ts` requiere cambio clase `voice`, bump, snapshot y QA.
 
 ## Invariantes del runtime del chat (TASK-1112/1113/1124)
 
@@ -115,6 +138,7 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 ## Required reads (en orden)
 
 1. **`docs/architecture/nexa-intelligence/README.md`** — el índice de capas del backend (SSOT de la inteligencia). Leé la capa que vas a tocar.
+   - Para identidad/voz: `voice/nexa-identity-canon.md` + `voice/nexa-voice-system-v1.md` + `voice/voice-tone-style-personality.md`.
 2. `docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md` — el contrato de la experiencia (shell + coreografía + contratos SSOT). + `..._DOMAIN_PLAYBOOK.md` para agregar un dominio.
 3. `docs/architecture/ui-platform/PRIMITIVES.md` — fila "Nexa chat atoms / answer surfaces".
 4. `docs/documentation/plataforma/nexa-conversational-experience.md` + `nexa-intelligence-capas.md` — la versión humana.

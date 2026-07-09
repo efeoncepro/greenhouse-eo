@@ -34,6 +34,7 @@ El Why sin mecanismo es humo de agencia. Cada faceta se sostiene en algo concret
 - **Medición honesta** — Revenue Enabled: la creatividad medida se **defiende**; nada de vanity.
 - **Software propio** — Greenhouse/Kortex/Verk: donde el servicio se ejecuta, se hace visible y guarda tu historial.
 - **Educación como sistema** — Think educa al mercado; el protocolo de transparencia + los frameworks compartidos educan al cliente.
+- **Experiencia Efeonce** — el cliente no entra solo a una agencia: entra a un ecosistema de crecimiento con operación, software, aprendizaje, contenido, tools, networking y memoria.
 
 ### WHAT — lo tangible
 
@@ -41,13 +42,47 @@ Las cuatro capabilities (creatividad y contenido · estrategia y crecimiento · 
 
 ### Disciplina anti-humo (regla dura de esta creencia)
 
-"Co-creación", "integralidad", "experiencia increíble", "partner" son **exactamente** las palabras que una agencia commodity usa vacías. Efeonce solo se las gana **encadenando siempre el Why a su mecanismo**. Nunca decir "co-creamos / te acompañamos / experiencia integral" sin la prueba concreta al lado (el login, el grader, el número, el ciclo). Prohibidos **sin mecanismo**: *"acompañamiento integral", "experiencia 360", "somos tu partner"* (coherente con los don'ts de voz de `05`).
+"Co-creación", "integralidad", "experiencia increíble", "partner", "comunidad" y "ecosistema" son **exactamente** las palabras que una agencia commodity usa vacías. Efeonce solo se las gana **encadenando siempre el Why a su mecanismo**. Nunca decir "co-creamos / te acompañamos / experiencia integral / comunidad exclusiva / ecosistema de crecimiento" sin la prueba concreta al lado (el login, el grader, el número, el ciclo, la tool, la sesión, el benchmark, el contenido, la red o el historial). Prohibidos **sin mecanismo**: *"acompañamiento integral", "experiencia 360", "ecosistema integral", "comunidad exclusiva", "aprendizaje transformador", "somos tu partner"* (coherente con los don'ts de voz de `05`).
 
 ### Reconciliación con el modelo ASaaS (insight load-bearing)
 
 El **switching cost NO nace de dejar al cliente dependiente y a oscuras** (el juego de la agencia tradicional), sino de **hacerlo más capaz y guardarle su historial acumulado**. Retenemos por **capacidad + memoria, no por opacidad**. Educar al cliente y subir el switching cost no se contradicen: un cliente más capaz da mejores briefs, co-crea mejor, y su historial en las plataformas lo ata **por valor, no como rehén**. (Ver `14`.)
 
 > **Este bloque es el SSOT del Why/Golden Circle de Efeonce.** El resto de los docs (`01`, `05`, `10`, `14`) y la skill `efeonce-agency` lo **citan**, no lo recopian. Si difieren, manda este bloque.
+
+### Ambición de escala y diferenciador defendible
+
+La ambición de Efeonce es **LATAM-first, no LATAM-limited**: construir una agencia grande y reconocida en toda Latinoamérica desde el inicio, preparada para servir después a EEUU hispano, mercados en inglés y otros mercados internacionales. La presencia LATAM es una ventaja operativa/cultural y una prueba de ejecución multi-país; **no es el techo de la categoría**.
+
+El diferenciador defendible no es decir "co-creamos", "somos partner" ni "somos agencia con IA". Eso ya es lenguaje commodity. El diferenciador es **convertir la co-creación en software, método, datos y memoria acumulada**:
+
+- **Software:** Greenhouse, Kortex y Verk hacen visible y operable la relación.
+- **Método:** Loop Marketing + ICO convierten el trabajo en un sistema repetible.
+- **Datos:** Revenue Enabled conecta operación con pipeline, revenue y NRR.
+- **Memoria:** cada ciclo deja historial, aprendizaje y contexto reutilizable.
+- **Capacidad:** el cliente entiende más, decide mejor y entrega mejores briefs.
+
+La categoría aspiracional se expresa como **Growth Operating System** y **ASaaS (Agency Service as a Software)**. La frase interna de posicionamiento:
+
+> **Efeonce no es una agencia que ejecuta piezas. Es un sistema operativo de crecimiento: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación.**
+
+En inglés, usar transcreación, no traducción literal: **Efeonce is a Growth Operating System for ambitious brands: strategy, creative, media, data and proprietary software working as one system.**
+
+Regla para posicionamiento global: vender el **sistema** antes que el origen regional. "LATAM" puede aparecer como prueba de ejecución multi-mercado, cercanía cultural, velocidad y eficiencia, pero nunca como límite de ambición ni como sustituto del mecanismo.
+
+### Operating Code interno
+
+La cultura interna que hace real este Why vive en `docs/operations/EFEONCE_OPERATING_CODE_V1.md`. No es un set de valores decorativos: gobierna hiring, onboarding, performance, rituales y delivery.
+
+Regla cultural:
+
+> **En Efeonce se valora a quien deja al cliente más capaz, deja el sistema con más memoria y conecta su trabajo con crecimiento real.**
+
+### Nexa como personificación del Why
+
+Nexa es la personificación del Why dentro de Greenhouse. No es un chatbot ni una mascota: es alguien más del equipo Efeonce, con nombre, personalidad, origen, rostro y branding propio. Representa la inteligencia tranquila del ecosistema: lee la operación con evidencia, explica el mecanismo, protege el criterio y ayuda a actuar mejor.
+
+Regla de marca: Nexa nunca debe presentarse como "asistente virtual" genérico ni usarse decorativamente. Su identidad aparece cuando hay contexto, evidencia, permiso, intención y siguiente paso. El rostro aprobado vive en `NexaFace` / `public/images/avatar-nexa/nexa-face.webp`; el sistema de marca vive en `GreenhouseNexaBrandMark` y `public/images/nexa-mark/*`. En CTAs o superficies que invocan a Nexa, usar Nexa Mark (arco + sparkle), no iconos genéricos. Canon: `docs/architecture/nexa-intelligence/voice/nexa-identity-canon.md`.
 
 ---
 
@@ -112,7 +147,7 @@ Las 4 capas verbales (en secuencia natural de conversación):
 | Nested Loops™ | "Cada fase construye sobre la anterior." | Propuestas. |
 | ICO | "Ves en tiempo real qué pasa con tu marketing." | Diferenciador en pitches. Onboarding. |
 | **Ecosistema de producto** (Greenhouse + Kortex + Verk) | "Tienes login a tres plataformas donde ves tu operación, tu CRM y tu contenido en tiempo real. Cada ciclo el sistema se vuelve más valioso." | Demo en pitch. Ecosystem Tour. Switching cost. Referrals. |
-| Frameworks específicos (Surround Discovery™, AEO, CSC, Revenue Enabled, SOLVE) | Se traducen a beneficios. | Solo en profundidad técnica. |
+| Frameworks específicos (Surround Discovery™ —incluye SOLVE como etapa—, AEO, CSC, Revenue Enabled) | Se traducen a beneficios. | Solo en profundidad técnica. |
 
 ---
 
@@ -146,21 +181,24 @@ Las 4 capas verbales (en secuencia natural de conversación):
 5. "Empower your ___" se activa según contexto; "Growth" es default.
 6. Tono **"tú"** siempre. "Usted" solo en contratos, legales y procurement.
 7. **Beneficios primero, nombres después.**
+8. La Experiencia Efeonce se comunica como mecanismo, no como adjetivo: operación + software + aprendizaje + red + memoria. Si no puedes nombrar el mecanismo, no uses "ecosistema".
 
 ---
 
 ## La marca vivida (por qué el producto importa para la marca)
 
-ICO y el ecosistema de producto no son solo operaciones — son **experiencia de marca**. Cuando un cliente ve dashboards en tiempo real, aprueba contenido con un click y recibe insights de su CRM, está viviendo la marca de una forma que ningún post de LinkedIn replica.
+ICO y el ecosistema de producto no son solo operaciones — son **experiencia de marca**. Cuando un cliente ve dashboards en tiempo real, aprueba contenido con un click, recibe insights de su CRM, aprende con contenido/tools y accede a una red de crecimiento, está viviendo la marca de una forma que ningún post de LinkedIn replica.
 
 | Touchpoint | Antes | Con ecosistema de producto |
 |---|---|---|
 | Onboarding | Email + kick-off | **Ecosystem Tour** con credenciales a Greenhouse + acceso a Verk/Kortex según servicio. |
 | Reporting | Informe quincenal por email | Tres plataformas 24/7 + resumen ejecutivo quincenal. |
 | Renovación | PPT de resultados | "Tu año con Efeonce" generado desde datos de Greenhouse + Verk + Kortex. |
+| Aprendizaje | Tips sueltos en reuniones | Think, blog, YouTube, sociales, ebooks, webinars y futuro podcast conectados al journey del cliente. |
+| Comunidad | Relación bilateral con la agencia | Networking, sesiones y futuros benchmarks/advisory de clientes como parte del ecosistema. |
 | Switching cost | Bajo, relacional | Alto: datos + proceso + IA + historial en tres plataformas. Sistémico. |
 
-> Cada feature de Greenhouse que mejora onboarding, reporting o el sentido de "ecosistema vivo" es, literalmente, construcción de marca. El **Ecosystem Tour** y **"Tu año con Efeonce"** son artefactos de producto con peso de marca directo.
+> Cada feature de Greenhouse que mejora onboarding, reporting, aprendizaje o el sentido de "ecosistema vivo" es, literalmente, construcción de marca. El **Ecosystem Tour**, **Ecosystem Learning Layer** y **"Tu año con Efeonce"** son artefactos de producto con peso de marca directo.
 
 ---
 
