@@ -1,3 +1,13 @@
+## Sesion 2026-07-09 - Home public site audit -> PDR hardening - Codex - docs
+
+> **Pedido:** ajustar los PDR correspondientes tras evaluar si el Home actual refleja el Why, Experiencia Efeonce y Growth Operating System.
+>
+> **Diagnóstico:** el Home live de `efeoncepro.com` está parcialmente alineado (estrategia, creatividad, tecnología, IA, ecosistema, resultados y `120+` empresas), pero todavía vende más una agencia creativa/digital competente que un **Growth Operating System / ASaaS**. Además conserva residuos visibles/indexables de template Ohio/Elementor/ThemeForest (`Quality fonts`, `Google Fonts`, `WooCommerce`, `WPBakery + Elementor`, reviews/links de ThemeForest), que bloquean confianza.
+>
+> **Docs actualizados:** `docs/public-site/decisions/PDR-010-home-es-el-pitch-agencia-se-pliega.md` ahora declara el audit live 2026-07-09, el rework de Home como limpieza estructural + pitch Growth OS y los residuos de template como blocker. `PDR-012-growth-operating-system-global-positioning.md` aterriza el posicionamiento al Home con arco de mensaje y reglas duras. `PDR-008-landing-agencia-marketing-digital-posicionamiento.md` agrega delta que PDR-010/PDR-012 mandan sobre cualquier texto que suene a landing `/agencia` separada. `docs/public-site/PRODUCT_ROADMAP.md` y `changelog.md` sincronizados.
+>
+> **Caveat:** no se tocó WordPress/runtime. El Home live sigue igual hasta ejecutar el rework correspondiente (TASK-1358 reorientada).
+
 ## Sesion 2026-07-09 - Nexa Voice System V1 - Codex - docs/skills
 
 > **Pedido:** definir Nexa Voice de forma meticulosa y rigurosa, no solo confirmar que existia una base.

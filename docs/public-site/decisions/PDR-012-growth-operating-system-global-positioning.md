@@ -31,12 +31,34 @@ La tesis de diferenciacion:
 
 LATAM es punto de partida y prueba de ejecucion multi-pais, no techo de la marca. La narrativa publica debe ser **LATAM-first, global-ready**.
 
+## Aplicacion al Home
+
+La Home es la superficie donde este posicionamiento se prueba primero. Debe responder en el primer recorrido:
+
+1. **Que es Efeonce:** un Growth Operating System / modelo ASaaS, no una agencia que vende piezas por separado.
+2. **Que problema resuelve:** la fragmentacion entre estrategia, creatividad, medios, datos, CRM/web y aprendizaje.
+3. **Como lo hace real:** operacion integrada + software propio + datos + metodo + memoria acumulada.
+4. **Por que creer:** casos citables, resultados verificables, `120+` empresas, `80%` renovacion, presencia multi-pais, HubSpot/Kortex/Greenhouse/Verk solo cuando el contexto lo justifique como prueba.
+5. **Que hago despues:** agenda una reunion, toma un diagnostico/Grader o entra a una spoke de servicio.
+
+La Home no debe sonar a manifiesto abstracto ni a catalogo de servicios. El arco correcto es:
+
+```text
+No somos otra agencia de marketing digital.
+Somos el sistema donde estrategia, creatividad, medios, datos y software trabajan como una sola operacion.
+Por eso el crecimiento se construye contigo, se ve en vivo y se acumula ciclo a ciclo.
+```
+
+El Why puede aparecer como tension o remate, pero no debe quedar solo. Siempre debe ir unido a mecanismo: login/visibilidad, grader/tool, dato, ciclo, contenido, red o historial.
+
 ## Reglas duras
 
 - No abrir con "agencia integral", "agencia 360", "AI agency" ni "partner estrategico" sin mecanismo.
+- No abrir con creatividad/marcas/contenido como si fueran la categoria completa. Son capabilities del sistema, no el sistema.
 - Si se usa "co-creacion", debe ir pegada a prueba: Greenhouse, login vivo, grader, ICO, Revenue Enabled, Loop, Kortex, Verk o historial acumulado.
 - No vender LATAM como limite de mercado. Usarlo como ventaja cultural/operativa y prueba regional.
 - La Home vende el sistema; About Us explica el Why/identidad; las landings de servicio demuestran capabilities especificas.
+- La Home no puede cerrar con contenido de template/demo/theme visible o indexable. Cualquier residuo de Ohio/Elementor/ThemeForest es blocker de confianza.
 - En ingles, transcrear el sistema y la promesa. No traducir literalmente giros es-CL.
 
 ## Alternativas descartadas
@@ -50,6 +72,7 @@ LATAM es punto de partida y prueba de ejecucion multi-pais, no techo de la marca
 
 - `docs/context/09_marca-agencia.md` sigue siendo el SSOT del Why; este PDR fija como se baja al sitio publico y a la ambicion global.
 - La Home y futuras superficies de categoria deben abrir desde el sistema, no desde un catalogo de servicios.
+- La auditoria del Home live 2026-07-09 queda como señal de ejecucion: hoy hay alineacion parcial, pero el sitio todavia comunica "agencia creativa/digital competente" mas que "Growth Operating System". El rework debe corregir eso antes de optimizaciones visuales.
 - Las landings de servicio deben probar una parte del sistema, no presentarse como unidades aisladas.
 - El roadmap publico debe preparar arquitectura `hreflang` y transcreacion para expansion pan-hispana, US Hispanic, en-US y otros mercados.
 
