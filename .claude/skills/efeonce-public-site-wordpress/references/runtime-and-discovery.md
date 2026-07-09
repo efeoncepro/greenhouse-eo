@@ -25,6 +25,47 @@ Use this reference for public-site inventory, bridge inspection, runtime repo bi
   Redes Sociales wall assets v1 under `assets/img/social/wall/v1/`; full note
   `docs/operations/public-site-social-wall-media-production-20260708.md`.
 
+## Global Footer Widget Facts
+
+Use this when the user asks to inspect or update the public-site footer. Do not
+mutate the footer during discovery.
+
+- Canonical audit and rollout evidence:
+  `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`.
+- The visible footer is `footer#colophon.site-footer.clb__dark_section`,
+  rendered by the Ohio child theme plus WordPress sidebars/widgets. The current
+  visible footer is not rendered from the headless `eoh_site_settings_footer_*`
+  ACF/options layer.
+- Runtime template:
+  `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/themes/ohio-child/parts/elements/footer.php`.
+  It counts active sidebars `ohio-sidebar-footer-1..4` and renders each through
+  `dynamic_sidebar(...)`.
+- Careers footer entry lives in `ohio-sidebar-footer-3`:
+  `ohio_widget_subscribe-2`, `block-32 | Unete a nuestro equipo`,
+  `block-31 | ¿Te interesa trabajar con nosotros?`.
+- Current Careers contract: footer recruiting is Careers-only. `block-31`
+  renders one CTA, `Ver vacantes y postular`, pointing to
+  `https://greenhouse.efeoncepro.com/public/careers` with `target="_blank"` and
+  `rel="noopener noreferrer"`. Do not re-add `people@efeoncepro.com` to this
+  public footer block unless the operator explicitly reverses the Careers-only
+  decision.
+- Rollback snapshots from the 2026-07-09 rollout:
+  `gh_backup_before_footer_careers_link_20260709T122602Z` and
+  `gh_backup_before_footer_careers_email_removal_20260709T123047Z`. To revert,
+  restore `widget_block_target_before` into `widget_block[31]`, flush WP cache,
+  purge Kinsta, and re-run a footer browser audit.
+- Footer widget writes should snapshot `sidebars_widgets`, `widget_block`, and
+  any Ohio footer widget/options touched. Use the governed WP-CLI eval-file
+  wrapper; do not SQL-edit serialized widget options.
+- After any footer mutation: `wp cache flush`, `wp kinsta cache purge --all`,
+  verify Home plus at least one service landing in desktop `1440` and mobile
+  `390`, assert one Careers link, expected target/rel, no stale email copy, and
+  `scrollWidth === clientWidth`.
+- Adjacent footer debt remains intentionally separate unless scoped: demo
+  Resources links, malformed Instagram URL, placeholder social `#`, missing
+  social accessible labels, newsletter/legal mixed-language copy, and
+  inconsistent link targets.
+
 ## Classic Navigation Menu Facts
 
 Use this when the user asks how to add a URL to the public-site menu. Do not

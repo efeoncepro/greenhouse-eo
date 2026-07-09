@@ -116,6 +116,19 @@ Rollback procedure:
 3. Flush WordPress cache and purge Kinsta cache.
 4. Re-run the footer browser audit on Home and at least one service landing, desktop `1440` + mobile `390`.
 
+## Canonization For Future Agents - 2026-07-09
+
+This footer contract is also summarized in:
+
+- `.codex/skills/efeonce-public-site-wordpress/references/runtime-and-discovery.md`
+- `.claude/skills/efeonce-public-site-wordpress/references/runtime-and-discovery.md`
+- `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md`
+- `project_context.md`
+
+Future agents should read those references before changing the global footer.
+The audit remains the detailed source for evidence, rollback snapshots, and
+the full discovery path.
+
 ## Scope
 
 Reviewed:

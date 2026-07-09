@@ -1,3 +1,11 @@
+## Sesion 2026-07-09 - Public Site footer Careers-only canonized in skills - Codex
+
+> **Pedido:** documentar el cambio del footer Careers-only en skills y donde corresponda, luego commitear.
+>
+> **Documentacion actualizada:** el contrato del footer global quedo canonizado en `.codex/skills/efeonce-public-site-wordpress/references/runtime-and-discovery.md` y `.claude/skills/efeonce-public-site-wordpress/references/runtime-and-discovery.md`. Tambien se agrego nota en `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md`, `project_context.md` y `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`.
+>
+> **Contrato vigente:** el footer visible lo renderiza Ohio child theme + widgets (`ohio-sidebar-footer-3`, `widget_block[31]`), no `eoh_site_settings_footer_*`; Careers es el unico camino publico de postulacion desde el footer (`Ver vacantes y postular` -> `https://greenhouse.efeoncepro.com/public/careers`); no reintroducir `people@efeoncepro.com` salvo decision explicita del operador. Verificacion futura minima: Home + una landing de servicio, desktop1440/mobile390, link unico, target/rel, correo ausente y `scrollWidth == clientWidth`.
+
 ## Sesion 2026-07-09 - Public Site footer Careers-only path - Codex
 
 > **Pedido:** quitar el correo del footer para que postulaciones y consulta de vacantes se manejen por Careers.
