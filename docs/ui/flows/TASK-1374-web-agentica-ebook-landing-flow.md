@@ -56,7 +56,7 @@
 | form.loading | El script/contrato del form está resolviendo. | Mount del componente | Éxito/error del contrato | Skeleton estable; sin salto de layout. |
 | form.ready | Campos gobernados disponibles. | Éxito del contrato | Usuario envía | El host no duplica campos ni validación. |
 | form.submitting | El renderer envía datos a Greenhouse. | Submit nativo | Accepted/error | El renderer previene doble submit. |
-| form.success | Submit aceptado; el ebook se envía por email async. | Evento de éxito del renderer | n/a (final) | Estado honesto "revisa tu email"; sin fake download. |
+| form.success (thank-you) | Submit aceptado; la descarga tokenizada se dispara y el email de respaldo sale async. | Evento de éxito del renderer (con token del handoff) | n/a (final) | **Tarjeta inline** reemplaza el form (NO overlay): confirma descarga + email, botón "Descargar de nuevo" (gated con el token), un puente al grader `/brand-visibility`. Foco al título, `role=status`. |
 | form.error | Submit falló o el renderer devolvió error seguro. | Error del renderer | Retry/editar | Copy seguro, sin stack/API. |
 | form.denied | Origen/superficie no autorizado. | Fallo de CORS/surface guard | Fix de allowlist gobernado | Bloqueador pre-launch, no aceptable como final. |
 

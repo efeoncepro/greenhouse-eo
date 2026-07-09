@@ -145,7 +145,7 @@ Reglas obligatorias:
 - Auth/access gate: público; capabilities de autoría (`growth.forms.author/.review/.publish/.destinations.manage/.surfaces.manage`) para el operador; grant a rol real ya existente.
 - Sensitive data posture: PII (nombre/email) — encriptado at rest (`GROWTH_FORMS_PII_ENCRYPTION_ENABLED`), reveal capability+reason+audit; NUNCA loggear/telemeter PII.
 - Error contract: errores sanitizados del renderer (nunca `reason` crudo); `captureWithDomain`.
-- Abuse/rate-limit posture: Turnstile fail-closed + `GROWTH_FORMS_PER_EMAIL_PER_DAY`/`PER_IP_PER_DAY`. Política de email: **decidir** (ver Open Questions) — para un ebook de contenido amplio, probablemente NO exigir correo corporativo (maximizar leads), quizá bloquear disposable.
+- Abuse/rate-limit posture: Turnstile fail-closed + `GROWTH_FORMS_PER_EMAIL_PER_DAY`/`PER_IP_PER_DAY`. **Política de email: solo correo corporativo (operador)** — `emailPolicy={mode:'block_field',field:'email'}` con gate `corporate_email` (bloquea free/disposable) vía `/verify-email` debounced, igual que el grader. El ebook es para equipos/marcas reales.
 
 ### Runtime evidence
 
@@ -185,7 +185,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Autoría + publicación del form del ebook
 
-- Autorar draft (`authorDraftForm`) del form `fdef-efeonce-web-agentica-ebook`: campos nombre (req), email (req), rol (opcional, select con las 4 opciones del PR), consent; copy es-CL; `success_behavior_json` = success card "Te enviamos el ebook a tu email" (+ link de descarga si aplica).
+- Autorar draft (`authorDraftForm`) del form `fdef-efeonce-web-agentica-ebook`: campos nombre (req), email (req, **gate corporate_email** — bloquea free/disposable, como el grader), rol (opcional, select con las 4 opciones del PR), consent; copy es-CL.
+- `success_behavior_json` = **success card baseline** (thank-you inline, NO overlay): título "Tu ebook va en camino", cuerpo con confirmación honesta de descarga + email + puente `Medir mi visibilidad` → `/brand-visibility`. El botón "Descargar de nuevo" (gated) NO va en el success card estático — lo pinta la landing con el token del handoff (TASK-1374 slice 3).
 - `reviewForm` → `publishForm` con `form_key` estable.
 - Smoke `GET` por `formKey` (render contract sin leak) + `/submit` fail-closed.
 
@@ -310,6 +311,5 @@ Seguir el runbook `docs/manual-de-uso/growth/alta-surface-growth-form-checklist.
 
 ## Open Questions
 
-- **Política de email:** ¿corporate-only (como el grader) o cualquier email válido? Para un ebook de contenido amplio, exigir corporate mata leads de consumo. Sugerencia: cualquier email válido, quizá bloquear disposable.
 - **Success contract:** confirmar en Discovery si el `tokenized_report` handoff (TASK-1336) se generaliza a un `tokenized_asset` (descarga) o si se agrega un success behavior nuevo para asset download.
 - **Epic:** `EPIC-019` por defecto (público); confirmar si va al epic del hub Think.

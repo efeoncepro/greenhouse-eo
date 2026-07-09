@@ -77,8 +77,14 @@ La landing toma la estructura y el copy del export como base y los aterriza a la
 | `think.webAgentica.landing.form.loading.title` | 6 | `Preparando el formulario` | none | Skeleton. |
 | `think.webAgentica.landing.form.loading.body` | 6 | `Estamos conectando con Greenhouse para cargar los campos y protecciones.` | none | Loader honesto. |
 | `think.webAgentica.landing.form.degraded` | 6 | `No pudimos cargar el formulario. Recarga la página o escríbenos desde el sitio de Efeonce.` | none | Sin internals. |
-| `think.webAgentica.landing.form.success.title` | 6 | `Te enviamos el ebook a tu email` | none | Éxito gobernado. |
-| `think.webAgentica.landing.form.success.body` | 6 | `Si no lo ves en unos minutos, revisa spam o promociones.` | none | Del PR. |
+| `think.webAgentica.landing.form.success.title` | 6 | `Tu ebook va en camino` | none | Thank-you inline (reemplaza el form, NO overlay). |
+| `think.webAgentica.landing.form.success.body` | 6 | `Te enviamos «El fin de la web» a tu correo y lo abrimos aquí mismo. ¿No ves el email? Revisa spam o promociones en unos minutos.` | ebook title | Confirma ambos canales (descarga + email); honesto. |
+| `think.webAgentica.landing.form.success.redownload` | 6 | `Descargar de nuevo` | none | Botón de recuperación gated (usa el token del handoff, no un href estático). |
+| `think.webAgentica.landing.form.success.bridge.kicker` | 6 | `El siguiente paso` | none | Un solo next step (restraint). |
+| `think.webAgentica.landing.form.success.bridge.title` | 6 | `¿Cómo te ve la IA hoy?` | none | Puente al grader hermano. |
+| `think.webAgentica.landing.form.success.bridge.body` | 6 | `Ya sabes hacia dónde va la web. Mide si ChatGPT, Perplexity y Google AI te encuentran, entienden y recomiendan.` | none | Continuidad con brand-visibility. |
+| `think.webAgentica.landing.form.success.bridge.cta` | 6 | `Medir mi visibilidad` | href `/brand-visibility` | CTA primario del thank-you. |
+| `think.webAgentica.landing.form.corporateGate` | 6 | `Usa tu correo corporativo — el ebook está pensado para equipos y marcas reales.` | none | El form exige correo corporativo (bloquea free/disposable), igual que el grader. |
 | `think.webAgentica.landing.faq.agent.q` | 7 | `¿Qué es un agente de inteligencia artificial?` | none | Del PR. |
 | `think.webAgentica.landing.faq.aeo.q` | 7 | `¿Qué es AEO y en qué se diferencia del SEO?` | none | Del PR. |
 | `think.webAgentica.landing.faq.llms.q` | 7 | `¿Qué es llms.txt y cómo se implementa?` | none | Del PR. |
@@ -97,7 +103,7 @@ Las respuestas del FAQ se toman verbatim del PR #12 (`renderVals()`), revisadas 
 | error | `No pudimos cargar el formulario` | `Recarga la página. Si persiste, usa el contacto público de Efeonce.` | `Reintentar` | No filtrar API/CORS. |
 | denied | `Este formulario no está disponible desde este origen` | `La superficie pública aún no está autorizada para este form.` | none | Evidencia pre-launch; lo resuelve el allowlist gobernado. |
 | submitting | `Enviando tu solicitud` | `Estamos validando el formulario antes de enviarte el ebook.` | none | El renderer previene doble submit. |
-| success | `Te enviamos el ebook a tu email` | `Si no lo ves en unos minutos, revisa spam o promociones.` | none | Éxito real = email enviado por el fulfillment gobernado. |
+| success (thank-you) | `Tu ebook va en camino` | `Te enviamos «El fin de la web» a tu correo y lo abrimos aquí mismo. ¿No ves el email? Revisa spam o promociones en unos minutos.` | `Descargar de nuevo` (re-dispara la descarga tokenizada) + puente `Medir mi visibilidad` → `/brand-visibility` | **Tarjeta inline** que reemplaza el form (NO overlay). Confirma ambos canales (descarga + email); botón de recuperación gated (usa el token del handoff); un solo next step (puente al grader). Foco al título del panel, `role=status`/`aria-live=polite`. |
 
 ## Accessibility Contract
 
@@ -139,7 +145,9 @@ Las respuestas del FAQ se toman verbatim del PR #12 (`renderVals()`), revisadas 
 - Alternatives considered: (a) mergear el PR tal cual — rechazado: sin SEO/GTM, form muerto, design system foráneo, URL con `/index.html`; (b) mergear con parches mínimos — rechazado: deja DM Sans + `_ds/` foráneo como deuda visible; (c) iframe del export — rechazado: peor SEO y sin marca.
 - Why this pattern: la página existe para SEO + captación; su valor depende de `<head>` correcto, marca Efeonce y un form que realmente capte el lead y entregue el ebook. El export no cumple ninguno de los tres.
 - Reuse / extend / new primitive: reuse `BaseLayout` + patrón form dock; no nace primitive Greenhouse.
-- Open risks: el **form instance del ebook (form_key) + el fulfillment de email + el ebook PDF** no existen todavía (dependencia backend-data en greenhouse-eo); el origin `think.efeoncepro.com` debe estar autorizado en el allowlist gobernado para este form.
+- Decisión (thank-you post-descarga): **tarjeta inline** que reemplaza el form (el área muta a "gracias"), NO overlay/modal. Alternativas rechazadas: overlay full-screen (pesado, focus-trap, anti-restraint 2026), route change (rompe contexto/SEO). Por qué: restraint + accesibilidad (foco al panel sin ceremonia de cerrar) + consistencia con el hermano brand-visibility (que ya muta el form en un panel post-submit inline). Anatomía: confirmación de ambos canales + recuperación ("Descargar de nuevo" gated con el token) + un solo next step (puente al grader). El success_card gobernado del form es el baseline; la landing pinta el estado post-submit con el token (mismo reparto que brand-visibility).
+- Decisión (política de email): **solo correo corporativo** (bloquea free/disposable), igual que el grader — el ebook es para equipos/marcas reales; el gate lo aplica el contrato gobernado del form (`emailPolicy`), no la landing.
+- Open risks: el **form instance del ebook (form_key) + el fulfillment de email + el ebook PDF** no existen todavía (dependencia backend-data en greenhouse-eo, TASK-1375); el origin `think.efeoncepro.com` debe estar autorizado en el allowlist gobernado para este form.
 - Follow-up: si el fulfillment del ebook no está listo, los slices 1–2 (scaffold + port visual) igual proceden; el slice del form embed queda bloqueado hasta la foundation.
 
 ## Acceptance Checklist

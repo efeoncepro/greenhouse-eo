@@ -351,6 +351,11 @@ Puntos clave de implementación:
 - Confirmar el **Epic** correcto (EPIC-019 público vs epic del hub Think) — ver Open Questions.
 - Evaluar convergencia futura Think → `efeonce-web` (misma marca/URL final) para esta landing.
 
+## Delta 2026-07-09 (thank-you + email)
+
+- **Thank-you post-descarga (analizado con state-design/forms-ux/modern-ui/ux-writing):** **tarjeta inline** que reemplaza el form (NO overlay/modal). Anatomía: confirmación honesta (descarga + email) + recuperación "Descargar de nuevo" (gated con el token del handoff, la landing lo pinta) + un solo next step (puente al grader `/brand-visibility`). El success_card gobernado del form es el baseline (TASK-1375); la landing enriquece con el token. Copy en el ledger del wireframe (`form.success.*`). Foco al título del panel + `role=status`.
+- **Política de email (operador):** solo **correo corporativo** (bloquea free/disposable), igual que el grader; el gate lo aplica el contrato del form (TASK-1375), no la landing.
+
 ## Delta 2026-07-09
 
 - **Decisión de acento (operador):** la landing usa **Navy + Teal**, NO el naranja del PR ni amber. Y el teal ya existe y está en uso en Think: **`#36c8bf`**, la firma visual del hero de `/brand-visibility` (`src/components/HeroAnswerLens.astro`), junto al navy `#001a33` y los azules `#4b8dff`/`#7eb1ff`. El navy base sale del `axis.accent` de `report-tokens.ts`. En slice 2 se **tokeniza el teal `#36c8bf`** en `report-tokens.ts` (hoy está inline en HeroAnswerLens) para que la landing lo consuma como var, no HEX crudo. NUNCA el naranja `#ff6501` del export.
