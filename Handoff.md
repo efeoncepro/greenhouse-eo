@@ -21,9 +21,19 @@
 > to-do) = foundation del Growth Form del ebook + entrega + surface/origin +
 > destination HubSpot, que desbloquea el slice 3 (form embed) de TASK-1374.
 >
-> **Estado:** planificacion completa, cero codigo en efeonce-think todavia. El
-> operador eligio crear la foundation primero y diferir el port visual. Slice 3 de
-> TASK-1374 bloqueado por TASK-1375; TASK-1375 bloqueada por el ebook PDF (contenido).
+> **Estado:** TASK-1375 (foundation backend-data) **code-complete local (staging)**, rollout
+> pendiente. Implementado: primitive reusable de entrega tokenizada de asset (tabla `form_asset`
+> + ruta gated `/api/public/growth/forms/[slug]/asset/[handle]` proxy-stream + handoff renderer
+> `download_url`; 228 tests + typecheck verdes) y el ebook web-agentica como primer consumer (PDF
+> 9MB subido al bucket privado staging; form publicado idempotente config-driven — `form_key
+> db1e254c-e762-41ae-a85f-50b29dc33ba5`, surface `fhsf-web-agentica-ebook`, corporate gate +
+> success_card + assetDownload). Publisher genérico idempotente (`ebook-forms.registry.ts` +
+> `pnpm growth:forms:publish-ebook`): agregar un ebook = una config + un comando (pedido operador).
+> Playbook actualizado. **Follow-ups:** HubSpot destination + property del rol + email de respaldo
+> (necesitan HubSpot form + copy). **Rollout:** subir PDF a prod, publicar form en prod, flags,
+> deploy `renderer-latest.js`, smoke real. TASK-1374 (landing) sigue pendiente de implementar; el
+> slice 3 (embed) ya tiene su `form_key`/`surface`. Landings de casos de éxito = flujo hermano
+> (mismo patrón config-driven).
 >
 > **Ojo (WIP ajeno):** el clone `/Users/jreye/Documents/efeonce-think` (main) tiene
 > WIP sucio NO relacionado (embed HubSpot Meetings: `preview/meeting-embed.astro` +

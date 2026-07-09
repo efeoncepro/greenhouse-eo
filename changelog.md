@@ -2,6 +2,20 @@
 
 ## 2026-07-09
 
+- **Growth Forms — entrega tokenizada de asset (ebook lead magnets) + ebook web-agentica
+  (TASK-1375, code-complete staging).** Nuevo primitive reusable: tabla server-only
+  `greenhouse_growth.form_asset` (form → asset entregable), ruta pública gated
+  `GET /api/public/growth/forms/[slug]/asset/[handle]` (handle = `submission_id`; valida
+  aceptada + TTL; proxy-stream desde el bucket privado, sin signed-URL), y handoff del
+  renderer (`successBehavior.kind='asset_access'` + `assetDownload.downloadPathTemplate` →
+  emite `download_url` en `gh_form_submission_accepted`; key en ambos allowlists; parity +
+  no-leak verdes). El ebook se descarga SOLO tras completar el form (sin submit no hay handle).
+  Primer consumer: ebook "El fin de la web" (`/web-agentica`) — PDF subido al bucket privado,
+  form publicado config-driven + idempotente (registry `ebook-forms.registry.ts` +
+  `pnpm growth:forms:publish-ebook`), corporate email gate + success_card thank-you + puente al
+  grader. Agregar un ebook nuevo = una config + un comando. Follow-ups: HubSpot destination +
+  email de respaldo. Rollout pendiente (prod bucket/publish, flags, deploy `renderer-latest.js`,
+  smoke real). Playbook: `docs/reference/ebook-lead-magnet-playbook.md`.
 - **Public Site content hub — Demo 35 documentado como layout candidato.** Se
   reviso read-only `Demo 35: Blog Magazine` (`page_id=225984`,
   `/homedemo35-elementor/`) como base visual elegida para la futura home del

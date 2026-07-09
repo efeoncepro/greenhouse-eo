@@ -53,17 +53,39 @@ El `success_card` gobernado del form es el **baseline** (copy de confirmación +
 - URL corta y SEO-friendly, sin `/index.html`, sin redirect (`trailingSlash:'never'`).
 - Form embebido como `<greenhouse-form>` (consumer del contrato gobernado); la landing no valida ni entrega.
 
-## 5. Checklist por ebook/landing nuevo
+## 5. Cómo agregar un ebook nuevo (config-driven, NO reimplementar)
 
-- [ ] Tomar el PDF de `01. Entregables Ebook/`; NO commitearlo al repo.
-- [ ] Subir el PDF al bucket privado (`greenhouse-assets.ts`).
-- [ ] Autorar + publicar el Growth Form (corporate email gate + success card baseline + puente al grader) por el lifecycle gobernado; `form_key` estable.
-- [ ] Surface + origin (`think.efeoncepro.com` en el allowlist) + Turnstile hostname.
-- [ ] Entrega tokenizada (descarga en pantalla) + email de respaldo con el link (no adjunto).
-- [ ] Destination HubSpot (lead) + property mapping.
-- [ ] Landing Astro nativa (AXIS/Geist, SEO+GTM, URL corta) + thank-you inline.
-- [ ] Fila en `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`.
-- [ ] Smoke real browser desde el origin (Turnstile + CORS) antes de declarar live.
+El flujo está **primitivizado + config-driven** (TASK-1375). Un ebook nuevo NO es una implementación larga: es una **config chica + dos comandos idempotentes**.
+
+1. Subir el PDF (privado, NUNCA al repo):
+
+   ```bash
+   set -a && source .env.local && set +a
+   pnpm growth:forms:upload-asset -- --file "<ruta OneDrive del PDF>" \
+     --object "ebooks/<slug>/<archivo>.pdf" --apply
+   ```
+
+2. Agregar una entrada al registry `scripts/growth/ebook-forms.registry.ts` (`EBOOK_FORMS`): slug, nombre, surface, origin, asset (object/filename), copy del thank-you (título/cuerpo/reward/puente) y consent version. Los campos (Nombre/Apellido/correo-corporativo/rol/consent), el gate corporativo, las policies y la ruta gated son **estándar compartidos** (no se repiten).
+
+3. Publicar (idempotente — re-run = no-op; `--force` para republicar):
+
+   ```bash
+   pnpm growth:forms:publish-ebook -- --slug <slug> --apply
+   ```
+
+   Imprime el `form_key` + `surface` para el embed `<greenhouse-form>` de la landing.
+
+4. Landing Astro nativa (TASK-1374 como molde: AXIS/Geist, SEO+GTM, URL corta, thank-you inline) que embebe el form y dispara la descarga con el `download_url` del evento `gh_form_submission_accepted`.
+
+5. Registrar la fila en `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`.
+
+6. **Rollout** (Runtime Rollout Completion Gate): subir el PDF también al bucket privado de **prod**; publicar el form en prod; flags ON (`GROWTH_FORMS_PUBLIC_API_ENABLED`, `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` para el gate corporativo); deploy del bundle `renderer-latest.js` (handoff `download_url`); Turnstile hostname del origin; smoke real browser (Turnstile + CORS) antes de declarar live.
+
+Follow-ups por ebook (no bloquean la descarga on-screen): destination HubSpot (lead) + property mapping (incl. rol) + email de respaldo con el link.
+
+## 6. Flujo hermano: landings de casos de éxito
+
+Las **landings de casos de éxito** (success-case) son otro flujo público recurrente del mismo tipo (una landing Astro nativa + posible captura/asset gated). Comparten la base: página nativa AXIS/Geist + SEO+GTM + (si aplica) form gobernado + primitive de entrega tokenizada. Cuando se aborden, seguir el mismo patrón config-driven (registry + publisher) en vez de reimplementar. Deriva del mismo espíritu "un primitive, muchos consumers".
 
 ## Referencias
 

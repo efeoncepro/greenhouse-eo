@@ -235,6 +235,27 @@ Operador eligió **primitive de plataforma + ebook** (reusable para todos los eb
 
 Slices refinados: A1 migración `form_asset` → A2 ruta gated stream → A3 handoff renderer + allowlist + parity → B1 upload PDF → B2 script publish form → B3 surface+origin+HubSpot → B4 consumer email → B5 tracking+smoke.
 
+## Delta 2026-07-09 — implementación (code-complete local, rollout + follow-ups pendientes)
+
+**Primitive de plataforma (reusable para todos los ebooks) — code-complete + testeado:**
+
+- **A1** migración `greenhouse_growth.form_asset` (aplicada en staging; DO-block verde; `db.d.ts` regen).
+- **A2** ruta gated `GET /api/public/growth/forms/[formSlug]/asset/[handle]` (handle=`submission_id`, valida accepted+TTL, proxy-stream desde bucket privado) + helper `resolveFormAssetDelivery` + reader `getActiveFormAsset` + 7 tests.
+- **A3** handoff renderer: `successBehavior.kind='asset_access'` + `assetDownload.downloadPathTemplate` → el renderer emite `download_url` en `gh_form_submission_accepted`; key en ambos allowlists + mirror + parity/no-leak verdes (228 tests).
+
+**Ebook web-agentica (primer consumer) — publicado (staging):**
+
+- **B1** PDF (9 MB) subido a `gs://efeonce-group-greenhouse-private-assets-staging/ebooks/web-agentica/el-fin-de-la-web.pdf` (script reusable `growth:forms:upload-asset`).
+- **B2** form publicado config-driven + idempotente (`ebook-forms.registry.ts` + `growth:forms:publish-ebook`): campos Nombre/Apellido/correo-corporativo/rol-opcional/consent, gate `corporate_email`, `destination_policy=greenhouse_only`, success_card thank-you + puente `/brand-visibility`, handoff `assetDownload`, surface `fhsf-web-agentica-ebook` (origin think), fila `form_asset`.
+- **Datos para el embed en la landing (TASK-1374):** `form_key = db1e254c-e762-41ae-a85f-50b29dc33ba5`, `surface = fhsf-web-agentica-ebook`.
+
+**Follow-ups (NO bloquean la descarga on-screen):**
+
+- **HubSpot destination** (entrega del lead) + **property mapping del rol** (el operador aún no tiene la property mapeada) — B3.
+- **Email de respaldo** con el link a la ruta gated (consumer reactivo sobre `submission_accepted`) — necesita copy.
+
+**Rollout pendiente (Runtime Rollout Completion Gate — NO operativamente completo):** subir el PDF al bucket privado de **prod**; publicar el form en prod; verificar flags (`GROWTH_FORMS_PUBLIC_API_ENABLED`, `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` para el gate corporativo); **deploy del bundle `renderer-latest.js`** (handoff `download_url`); Turnstile hostname think; smoke real browser (Turnstile + CORS) — coordinar con el embed de TASK-1374. Estado: **code complete, rollout pendiente.**
+
 ## Detailed Spec
 
 Seguir el runbook `docs/manual-de-uso/growth/alta-surface-growth-form-checklist.md` (Tier 1 config-only si la entrega es success-card; Tier 2 si se agrega el consumer reactivo de email). Precedente de autoría/activación por `form_key`: los scripts `growth:forms:activate-*`. La entrega del ebook NO es destination: es success card (browser-safe href) y/o consumer reactivo de dominio sobre `growth.forms.submission_accepted` (patrón grader). El lead a HubSpot sí es destination (async, at-most-once).
