@@ -77,7 +77,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- **Ebook PDF** (activo de contenido) — producido y hosteado en un origin servible (para el link de descarga y/o adjunto de email). Bloqueante para la entrega real.
+- **Ebook PDF** — **UBICADO** (2026-07-09): `~/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/07. Ebook/01. Entregables Ebook/Ebook_DesarrolloTradicional.pdf` (real, 9.0 MB, PDF 1.7). Esa carpeta es el **drop folder del equipo para todos los ebooks** (source of truth). Se sube al bucket privado (NO al repo). Por el peso (~9 MB), el email lleva el **link** (signed URL), no el archivo adjunto. Convención reusable: `docs/reference/ebook-lead-magnet-playbook.md`.
 - Motor Growth Forms vigente (`src/lib/growth/forms/**`, engine flags ON en Vercel + ops-worker).
 - CORS gobernado por surface (TASK-1335) + Turnstile widget con hostname `think.efeoncepro.com` (verificar; el grader ya opera en think).
 
