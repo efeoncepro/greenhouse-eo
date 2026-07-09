@@ -1,0 +1,154 @@
+# TASK-1374 / Web Agéntica — Ebook Lead Magnet Landing Wireframe
+
+## Meta
+
+- Status: `draft`
+- Owner task: `TASK-1374 — Landing pública del ebook "El fin de la web" (/web-agentica)`
+- Product Design asset: PR #12 de `efeoncepro/efeonce-think` (`feat/landing-fin-desarrollo-tradicional`) como **referencia de diseño** (estructura de secciones, copy, efectos CSS), NO como código a integrar. El export trae un design system foráneo (`_ds/efeonce-design-system-*`) + fuente DM Sans que se DESCARTAN; la landing se re-autora nativa con tokens AXIS + Geist/Poppins.
+- Intended consumers: decisores de marketing/growth, C-level, SEO/contenidos y producto/tech que llegan por búsqueda ("marketing con IA", "AEO", "web agéntica"), enlace social o email.
+- Copy source: copy local del hub `efeonce-think` (constantes cercanas a la ruta), alineado a `docs/context/05_voz-tono-estilo.md` (es-CL tuteo) y `docs/context/09_marca-agencia.md` (marca Efeonce). El copy visible del PR se reusa como base, tokenizado.
+- Primitive decision: reuse del `BaseLayout` de Think (SEO+GTM) + patrón del `BrandVisibilityFormDock` para el form gobernado `<greenhouse-form>` + secciones CSS locales re-tokenizadas. No nace primitive Greenhouse (la superficie vive en Astro público externo).
+- UI ready target: `no`
+
+## Brief
+
+- Primary user: una persona de marketing/dirección que intuye que la IA está cambiando cómo la encuentran y quiere una guía corta y accionable.
+- User moment: primer contacto con el lead magnet; quiere entender el valor del ebook y decidir si deja su correo a cambio.
+- Job to be done: entender la tesis ("hay dos tipos de visitantes: personas y agentes; tu web solo sirve a uno"), ver qué trae el ebook, y descargarlo dejando datos en un form gobernado que lo envía por email.
+- Primary decision signal: la página debe verse enterprise-moderna y de marca Efeonce (no un PDF glorificado ni una landing genérica), con continuidad visual con el hub Think.
+- Non-goals: prometer resultados, mostrar métricas propias sin fuente, reconstruir el form fuera del contrato gobernado, entregar el ebook sin capturar el lead, usar DM Sans / el design system foráneo del export, exponer `/…/index.html`.
+
+## Layout Skeleton
+
+| Region | Slot | Purpose | Component candidate | Data source |
+|---|---|---|---|---|
+| 0 | Header | Identidad Efeonce/Think sin distraer del CTA. | `BaseLayout` / header local Think | Static copy |
+| 1 | Hero | Vender la tesis "El fin de la web / Marketing digital + IA" y llevar al form con un CTA de scroll. | Editorial hero (eyebrow + accent-word H1 + lead + CTA) sobre grid+beams animados | Static copy |
+| 2 | Stats strip | Dar peso con 3 datos citados con fuente (−27% tráfico orgánico, 3× tráfico IA, 7× ventas agénticas). | Floating stat cards (count-up) | Static copy con fuente literal |
+| 3 | Thesis | "Tu sitio ya tiene dos tipos de visitantes. Solo estás diseñado para uno." Explicar el cambio humano→agente. | Two-column / split editorial | Static copy |
+| 4 | What's inside | "Qué vas a encontrar dentro" — los 5 actos + checklist "Lo que haces esta semana". | Feature list / bento ligero | Static copy |
+| 5 | Audience | "Para quién es este ebook" / "No es para ti si…" — calificar al lead. | Two-column fit/no-fit list | Static copy |
+| 6 | Form dock | "Descarga el ebook gratis" — form gobernado (nombre, email, rol opcional) que envía el ebook por email. | `<greenhouse-form>` + script loader (patrón `BrandVisibilityFormDock`) | Greenhouse Growth Forms |
+| 7 | FAQ | Resolver 5 dudas (qué es un agente IA, AEO vs SEO, llms.txt, zero-click commerce, bots > humanos). | Accordion `<details>` | Static copy |
+| 8 | Footer | Marca pública Efeonce + legal básico. | Footer Think existente | Static copy |
+
+## Content Model (from PR #12, tokenized)
+
+La landing toma la estructura y el copy del export como base y los aterriza a la arquitectura de Think. No inventa datos nuevos; conserva las fuentes citadas del PR.
+
+| Sección PR (export) | Landing nativa | Regla de porting |
+|---|---|---|
+| Hero "Marketing digital + IA · El fin de la web" | Hero con eyebrow + H1 accent-word + lead + CTA "Descargar el ebook gratis". | Re-tokenizar color/tipografía a AXIS/Geist; conservar grid+beams como CSS local. |
+| Stats (−27% / 3× / 7×) | Stat strip con fuente literal ("HubSpot, 2026", "Cyber Week 2025"). | Nunca dato sin fuente; count-up con fallback estático. |
+| "Dos tipos de visitantes" | Thesis split. | Copy es-CL, sin promesa. |
+| "Qué vas a encontrar dentro" (5 actos + checklist) | What's inside. | Lista honesta de contenidos del ebook. |
+| "Para quién / No es para ti si…" | Audience fit. | Califica el lead; no exagera. |
+| Form (name, email, rol select) | `<greenhouse-form>` gobernado. | Campos vienen del contrato, NO se hand-autoran. |
+| FAQ (5 Q) | Accordion + `FAQPage` JSON-LD. | Rich result AEO; copy del PR. |
+| `onSubmit` local falso | Éxito gobernado "revisa tu email". | El form del export NO capturaba nada; se reemplaza por el submit gobernado. |
+
+## Copy Ledger
+
+| Copy id | Region | Text | Dynamic values | Notes |
+|---|---|---|---|---|
+| `think.webAgentica.landing.meta.title` | SEO | `El fin de la web: marketing + IA \| Efeonce Think` | none | Título indexable, keyword-first. |
+| `think.webAgentica.landing.meta.description` | SEO | `Descarga gratis el ebook sobre la web agéntica: cómo la IA cambia quién encuentra tu marca y qué hacer esta semana.` | none | Sin garantías. |
+| `think.webAgentica.landing.hero.eyebrow` | 1 | `Marketing digital + IA` | none | Categoría literal. |
+| `think.webAgentica.landing.hero.title` | 1 | `El fin de la web como la conoces` | none | H1 accent-word ("fin"). |
+| `think.webAgentica.landing.hero.body` | 1 | `Tu sitio ya recibe dos tipos de visitantes: personas y agentes de IA. Este ebook te muestra cómo dejar de diseñar solo para uno.` | none | Tesis en el fold. |
+| `think.webAgentica.landing.hero.cta` | 1 | `Descargar el ebook gratis` | none | Ancla al form. |
+| `think.webAgentica.landing.hero.reassurance` | 1 | `Sin spam. Solo el ebook y contenido que sí sirve.` | none | Reduce fricción. |
+| `think.webAgentica.landing.stats.title` | 2 | `Lo que ya está pasando` | none | Encabezado de datos. |
+| `think.webAgentica.landing.stats.traffic` | 2 | `−27% · Caída del tráfico orgánico interanual` | `HubSpot, 2026` | Fuente literal obligatoria. |
+| `think.webAgentica.landing.stats.aiReferral` | 2 | `3× · El tráfico referido por IA se triplicó` | none | Del PR. |
+| `think.webAgentica.landing.stats.agenticSales` | 2 | `7× · Más ventas con integración agéntica` | `Cyber Week 2025` | Fuente literal. |
+| `think.webAgentica.landing.thesis.title` | 3 | `Tu sitio ya tiene dos tipos de visitantes` | none | Del PR. |
+| `think.webAgentica.landing.thesis.subtitle` | 3 | `Solo estás diseñado para uno` | none | Remate. |
+| `think.webAgentica.landing.inside.title` | 4 | `Qué vas a encontrar dentro` | none | Sección contenidos. |
+| `think.webAgentica.landing.inside.subtitle` | 4 | `Cinco actos para leer la nueva web` | none | Del PR. |
+| `think.webAgentica.landing.inside.checklist` | 4 | `Incluye checklist «Lo que haces esta semana»` | none | Accionable. |
+| `think.webAgentica.landing.audience.forTitle` | 5 | `Para quién es este ebook` | none | Calificación. |
+| `think.webAgentica.landing.audience.againstTitle` | 5 | `No es para ti si…` | none | Honestidad. |
+| `think.webAgentica.landing.form.title` | 6 | `Descarga el ebook gratis` | none | Encabezado del form; los campos vienen del contrato. |
+| `think.webAgentica.landing.form.body` | 6 | `Léelo en 20 minutos. Aplícalo esta semana. Te lo enviamos a tu email.` | none | Entrega = email. |
+| `think.webAgentica.landing.form.rolePlaceholder` | 6 | `Selecciona (opcional)` | none | Rol opcional (campo del contrato). |
+| `think.webAgentica.landing.form.submit` | 6 | `Enviarme el ebook` | none | CTA del contrato. |
+| `think.webAgentica.landing.form.consent` | 6 | `Al descargar aceptas recibir contenido de Efeonce. Baja cuando quieras.` | none | Consent gobernado. |
+| `think.webAgentica.landing.form.loading.title` | 6 | `Preparando el formulario` | none | Skeleton. |
+| `think.webAgentica.landing.form.loading.body` | 6 | `Estamos conectando con Greenhouse para cargar los campos y protecciones.` | none | Loader honesto. |
+| `think.webAgentica.landing.form.degraded` | 6 | `No pudimos cargar el formulario. Recarga la página o escríbenos desde el sitio de Efeonce.` | none | Sin internals. |
+| `think.webAgentica.landing.form.success.title` | 6 | `Te enviamos el ebook a tu email` | none | Éxito gobernado. |
+| `think.webAgentica.landing.form.success.body` | 6 | `Si no lo ves en unos minutos, revisa spam o promociones.` | none | Del PR. |
+| `think.webAgentica.landing.faq.agent.q` | 7 | `¿Qué es un agente de inteligencia artificial?` | none | Del PR. |
+| `think.webAgentica.landing.faq.aeo.q` | 7 | `¿Qué es AEO y en qué se diferencia del SEO?` | none | Del PR. |
+| `think.webAgentica.landing.faq.llms.q` | 7 | `¿Qué es llms.txt y cómo se implementa?` | none | Del PR. |
+| `think.webAgentica.landing.faq.zeroClick.q` | 7 | `¿Qué es zero-click commerce?` | none | Del PR. |
+| `think.webAgentica.landing.faq.bots.q` | 7 | `¿Cuándo los bots superaron al tráfico humano?` | none | Del PR (Cloudflare, jun 2026). |
+
+Las respuestas del FAQ se toman verbatim del PR #12 (`renderVals()`), revisadas es-CL. Toda métrica conserva su fuente literal.
+
+## State Copy
+
+| State | Title | Body | CTA / recovery | Notes |
+|---|---|---|---|---|
+| ready | `Descarga el ebook gratis` | `Déjanos tus datos y te enviamos el ebook a tu email.` | Submit por `<greenhouse-form>` | Default. |
+| loading | `Preparando el formulario` | `Estamos conectando con Greenhouse para cargar los campos y protecciones.` | none | Skeleton rico, no spinner-only. |
+| empty | `Formulario no disponible` | `El contrato del form no devolvió campos publicables.` | `Reintentar` | Raro; sin internals. |
+| error | `No pudimos cargar el formulario` | `Recarga la página. Si persiste, usa el contacto público de Efeonce.` | `Reintentar` | No filtrar API/CORS. |
+| denied | `Este formulario no está disponible desde este origen` | `La superficie pública aún no está autorizada para este form.` | none | Evidencia pre-launch; lo resuelve el allowlist gobernado. |
+| submitting | `Enviando tu solicitud` | `Estamos validando el formulario antes de enviarte el ebook.` | none | El renderer previene doble submit. |
+| success | `Te enviamos el ebook a tu email` | `Si no lo ves en unos minutos, revisa spam o promociones.` | none | Éxito real = email enviado por el fulfillment gobernado. |
+
+## Accessibility Contract
+
+- Heading order: un solo `h1` en el hero; secciones con `h2` ordenados; FAQ usa `<details>/<summary>` nativo; cards con `h3` solo si anidan en sección.
+- Aria: región del form etiquetada por `Descarga el ebook gratis`; loader/success/degraded en live region polite.
+- Focus: foco inicial default; skip link del layout alcanza main; tras success/error, foco al heading del estado si el host lo permite.
+- Color-independent: todos los estados con etiqueta de texto; el estado no se expresa solo por color.
+- Reduced motion: grid drift, beams, spotlight y count-ups colapsan a estático con el mismo significado.
+- Targets: CTA y summary del FAQ ≥44px; contraste AA verificado en el naranja de acento sobre navy.
+
+## Implementation Mapping
+
+- Route / surface: `efeonce-think` ruta `/web-agentica` (`think.efeoncepro.com/web-agentica`), pública e indexable. Canónica sin `/index.html`, sin redirect (respeta `trailingSlash:'never'`).
+- Primitives: Think `BaseLayout` (title/description/canonical/robots/OG/JSON-LD/GTM/favicon); patrón `BrandVisibilityFormDock` para el form host; secciones CSS locales.
+- Component candidates: Astro page `src/pages/web-agentica/index.astro`; componente local `src/components/WebAgenticaFormDock.astro` (o reuso parametrizado del dock existente) que hospeda el `<greenhouse-form>` del ebook + estados; secciones presentacionales locales solo si no duplican el renderer.
+- Copy source: módulo de copy local de la ruta; no dispersar strings reusables en el markup.
+- Data reader / command: ninguno en Think. El submit y la entrega del ebook los gobierna Greenhouse (Growth Forms + fulfillment de email). Think no valida ni entrega.
+- API parity: sin endpoint local de submit, sin validación local, sin consent/Turnstile local. El único write path es el renderer gobernado.
+- Access / capability: página pública sin auth.
+- Descartes explícitos del export: `support.js`, `image-slot.js`, `_ds/efeonce-design-system-*/**` (incl. DM Sans), y el redirect `src/pages/fin-desarrollo-tradicional.astro`. Los assets `ebook-hero.png`/logos se optimizan vía `astro:assets`.
+- GVC markers: `web-agentica-landing`, `web-agentica-hero`, `web-agentica-stats`, `web-agentica-thesis`, `web-agentica-inside`, `web-agentica-audience`, `web-agentica-form`, `web-agentica-form-loader`, `web-agentica-faq`, `web-agentica-footer`.
+
+## GVC Scenario Plan
+
+- Scenario file: capture local de Think (`scripts/capture.mjs /web-agentica web-agentica-landing`) — GVC de greenhouse-eo no apunta al repo externo; se usa el capturador propio de Think.
+- Route: `/web-agentica` en Think local y staging/prod tras deploy.
+- Viewports: desktop 1440, laptop 1280, mobile 390.
+- Required steps: cargar página, confirmar meta indexable + canonical sin `/index.html`, capturar hero settled, esperar `<greenhouse-form>`, verificar fold con tesis + CTA, capturar loader/ready del form, scroll por stats/thesis/inside/audience/FAQ, capturar success sintético en modo controlado, capturar reduced-motion.
+- Required captures: hero desktop, stats, form loader, form ready, success, full page desktop, hero mobile, form mobile, full page mobile.
+- Required `data-capture` markers: los 10 listados arriba.
+- Assertions: sin scores/promesas falsas, sin campos locales fuera del `<greenhouse-form>`, script carga desde Greenhouse, ruta indexable, sin DM Sans ni `_ds/` foráneo, sin overflow horizontal.
+- Scroll-width checks: `scrollWidth <= clientWidth` en 1440 y 390.
+- Accessibility/focus checks: teclado alcanza CTA, form y summaries del FAQ; foco visible; sin saltos de heading.
+- Reduced-motion evidence: captura con `prefers-reduced-motion: reduce` probando que stats/beams/grid quedan legibles sin animación.
+
+## Design Decision Log
+
+- Decision: re-autorar la landing del PR #12 como página Astro nativa en `/web-agentica`, con `BaseLayout` (SEO+GTM), tokens AXIS/Geist, efectos CSS portados y form gobernado que entrega el ebook por email; NO mergear el export crudo.
+- Alternatives considered: (a) mergear el PR tal cual — rechazado: sin SEO/GTM, form muerto, design system foráneo, URL con `/index.html`; (b) mergear con parches mínimos — rechazado: deja DM Sans + `_ds/` foráneo como deuda visible; (c) iframe del export — rechazado: peor SEO y sin marca.
+- Why this pattern: la página existe para SEO + captación; su valor depende de `<head>` correcto, marca Efeonce y un form que realmente capte el lead y entregue el ebook. El export no cumple ninguno de los tres.
+- Reuse / extend / new primitive: reuse `BaseLayout` + patrón form dock; no nace primitive Greenhouse.
+- Open risks: el **form instance del ebook (form_key) + el fulfillment de email + el ebook PDF** no existen todavía (dependencia backend-data en greenhouse-eo); el origin `think.efeoncepro.com` debe estar autorizado en el allowlist gobernado para este form.
+- Follow-up: si el fulfillment del ebook no está listo, los slices 1–2 (scaffold + port visual) igual proceden; el slice del form embed queda bloqueado hasta la foundation.
+
+## Acceptance Checklist
+
+- [x] Todas las strings visibles están en el copy ledger.
+- [x] Los valores con fuente (stats) declaran su fuente literal.
+- [x] Estados loading/empty/error/degraded/success explícitos.
+- [x] Ningún copy implica garantía ni dato sin fuente.
+- [x] El FAQ tiene alternativa semántica (`<details>`), no solo motion.
+- [x] Implementation mapping nombra primitive, copy source, contrato de datos y ruta.
+- [x] GVC scenario plan es específico para el capturador de Think.
+- [x] Design decision log explica reuse/rechazos antes de escribir JSX.
