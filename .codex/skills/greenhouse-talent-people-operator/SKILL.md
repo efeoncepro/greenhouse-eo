@@ -18,6 +18,7 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | Trigger | Lane |
 |---|---|
 | "open a vacancy / define the role / job brief" | Talent acquisition — intake + scorecard |
+| "redact a public vacancy / oferta laboral / job posting" | Job offer recipe + inbound recruiting |
 | "source candidates / head hunt / find a senior X" | Sourcing + executive search |
 | "inbound recruiting / careers / employer brand / talent pool" | Inbound + candidate experience |
 | "design the test / interview / competency assessment / rubric" | Assessment + structured interviewing |
@@ -25,6 +26,7 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | "hire abroad / remote / contractor vs EOR / which country" | Global hiring (with payroll/legal boundary) |
 | "onboarding / ramp / development / career path" | People development |
 | "engagement / burnout / wellbeing / retention / flight risk" | Engagement + wellbeing |
+| "cultura / operating code / performance review / valores en equipo" | Efeonce Operating Code + People development |
 | "headcount / capacity gap / build vs buy vs borrow / org design" | Workforce planning |
 | any of the above **inside Greenhouse** (Hiring/ATS, assessment engine) | + load `references/greenhouse-runtime.md` |
 
@@ -59,7 +61,7 @@ Recruiting fashion changes; **selection validity** is measured. Teach the 2026-c
 7. **Workforce planning & org design** → `references/workforce-planning.md`. Headcount, build/buy/borrow, capacity gap → TalentDemand, agency org shapes, ICO synergy.
 8. **Generations & 2026 trends** → `references/generations-trends-2026.md`. Boomer→Gen Alpha profiles, how attraction/assessment/retention change per generation, and the transversal 2026 trends.
 
-Greenhouse runtime binding (domain, code paths, invariants) → `references/greenhouse-runtime.md`. Templates (scorecard, job brief, sourcing map, interview guide) → `templates/`.
+Greenhouse runtime binding (domain, code paths, invariants) → `references/greenhouse-runtime.md`. Templates (scorecard, job brief, job offer recipe with inbound recruiting, sourcing map, interview guide) → `templates/`.
 
 ## Synergies (compose, don't duplicate)
 
@@ -74,15 +76,38 @@ Greenhouse runtime binding (domain, code paths, invariants) → `references/gree
 | `seo-aeo` / `commercial-expert` | Inbound recruiting = careers attracts + ranks; employer brand = GTM for talent. |
 | `greenhouse-nexa-conversational` | Operate hiring/assessment from conversation via Full API Parity (propose→confirm). |
 | `efeonce-agency` + `docs/context/` | Real agency roles (Account, Design, Media, Strategy, Dev), ASaaS model, Globe clients. |
+| `greenhouse-production-release` | Public careers runtime rollout, flags, production smoke and release closure when code/config changes. Talent owns normal vacancy creation/publication as Hiring data; release is not required for each new vacancy. |
+
+## Efeonce Operating Code (culture is evidence, not vibes)
+
+When the work touches hiring, onboarding, performance, rituals, engagement or team culture, load `docs/operations/EFEONCE_OPERATING_CODE_V1.md`.
+
+Core rule:
+
+> In Efeonce, value the people who leave the client more capable, leave the system with more memory, and connect their work to real growth.
+
+Apply it as observable behavior, not "culture fit":
+
+- **Transparency:** shows status, risks and decisions with context.
+- **Education:** raises client/team judgment.
+- **Memory:** leaves reusable learning, data, templates, playbooks or assets.
+- **Impact:** connects work to business, efficiency or decision quality.
+- **System:** reduces fragmentation and improves the operating backbone.
+
+Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onboarding-performance.md` for interview questions, onboarding and performance calibration.
 
 ## Hard rules (anti-regression, fairness + legality first)
 
 - **NEVER** let an assessment/interview score auto-reject or auto-hire. It is **input to a human decision** (AI-Act human-oversight; also the Greenhouse invariant).
 - **NEVER** use — or recommend — emotion recognition, facial/voice "personality" inference, or social scoring of candidates (AI-Act prohibited + indefensible).
 - **NEVER** design a selection step that isn't **job-related and validity-oriented**; avoid anything that is a proxy for a protected class (adverse impact). Prefer structured interviews + work samples over unstructured "culture fit".
+- **NEVER** use "culture fit" as vague affinity. If evaluating Operating Code alignment, tie it to job-related evidence: transparency, education, memory, impact and system behavior.
 - **NEVER** compute payroll/comp/tax here — hand off to `greenhouse-payroll-auditor`. **NEVER** draft the legal contract — hand off to contracting/legal.
 - **NEVER** treat AI output as truth: **propose → a human confirms**, with an eval baseline (mirrors the Greenhouse assessment AI design).
 - **NEVER** collect candidate identity documents at the public apply stage; capture post-decision, and treat candidate PII with the same masked/reveal/audit rigor as an employee's.
+- **NEVER** create/open/publish a Greenhouse vacancy by SQL or ad hoc UI state. Use Hiring writers (`createTalentDemand` → `createHiringOpening` → `updateHiringOpening` → `publishOpening`) and record `public_id`, public URL and apply URL.
+- **NEVER** escalate normal vacancy publication to a production release when careers runtime is already live and flags are configured. Release only for code, schema, flags/env, infra, renderer or apply-contract changes.
+- **NEVER** leave a Talent Pool / Banco de Talento surface decorative if it captures leads. It must be backed by Growth Forms or a Hiring command, with consent, captcha/rate-limit and generic success state.
 - **NEVER** reason from a pre-2024 base for trends/law/validity — cite the 2026 landscape and the 2022 validity revision.
 - **SIEMPRE** design for a **multigenerational** workforce (don't optimize a process only for one cohort).
 - **SIEMPRE** make selection **structured, documented, and contestable** (a candidate can be told why; a recruiter can override AI).
@@ -94,6 +119,7 @@ Greenhouse runtime binding (domain, code paths, invariants) → `references/gree
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (domain + assessment deltas)
 - The active `EPIC-011` + `TASK-1360..1363` specs (assessment engine + surfaces)
 - `docs/context/` business pack (voice, ICO, agency, HubSpot) when the work touches brand/roles/metrics
+- `docs/operations/EFEONCE_OPERATING_CODE_V1.md` when the work touches culture, onboarding, performance or Efeonce-specific hiring
 - `references/greenhouse-runtime.md` (this skill) for code paths + invariants
 
 ## Output format

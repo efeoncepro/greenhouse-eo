@@ -24,6 +24,11 @@ El sitio público es la **capa de adquisición** del ecosistema digital Efeonce
 (modelo de capas en [PDR-003](decisions/PDR-003-layering-ecosistema-digital-efeonce.md):
 adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kortex/Verk).
 
+La categoría pública queda fijada por [PDR-012](decisions/PDR-012-growth-operating-system-global-positioning.md):
+**Growth Operating System / ASaaS**, LATAM-first y global-ready. La Home debe vender
+el sistema; About Us debe explicar el Why; cada spoke de servicio debe demostrar una
+capability dentro del sistema, no presentarse como agencia suelta.
+
 ## Estado actual (baseline)
 
 | Superficie | Estado | Rol | Fuente |
@@ -107,7 +112,10 @@ adquisición · contenido/Think · experiencia, sobre plataformas Greenhouse/Kor
   separada; su contenido es la Home** (que absorbe el head term "agencia de marketing digital" en title/H1
   + reencuadre + repartición a spokes). **TASK-1358 se reorienta** a rework de la Home. El material de
   identidad (4 unidades, ICO, ecosistema) se mueve al **About Us** — el gap real ahora, sobre la página
-  existente `/about-us-efeonce/` (249770), pendiente de su propio PDR + task. Ver
+  existente `/about-us-efeonce/` (249770), pendiente de su propio PDR + task. **Auditoría live 2026-07-09:**
+  el Home actual solo refleja parcialmente el Why/Growth OS y conserva residuos de template Ohio/Elementor/
+  ThemeForest; el rework no es retoque de copy, sino limpieza estructural + pitch Growth Operating System.
+  Ver
   [PDR-010](decisions/PDR-010-home-es-el-pitch-agencia-se-pliega.md).
 
 - **PDR-011 — About Us: página de identidad (Golden Circle)** (decidido, 2026-07-08) + **TASK-1369**

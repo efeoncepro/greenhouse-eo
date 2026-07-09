@@ -8,6 +8,8 @@ De **$6.9M a $15–25M CLP/mes** en revenue recurrente (base actual: retainer Sk
 
 > *Concentrar energía en pocas cuentas de alto valor, profundizar con múltiples servicios, y filtrar agresivamente el new business para que cada propuesta tenga probabilidad real de cierre.*
 
+La ambición de escala es **LATAM-first, global-ready**: ganar reconocimiento regional fuerte primero, pero construir método, producto, idioma y pruebas para atender diversos mercados. El argumento comercial no debe limitarse a "somos una agencia LATAM"; LATAM es prueba de ejecución multi-país. El diferenciador defendible es **Growth Operating System / ASaaS**: co-creación convertida en software, método, datos y memoria acumulada.
+
 ---
 
 ## El ecosistema de producto como activo comercial

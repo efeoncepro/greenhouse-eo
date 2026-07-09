@@ -20,6 +20,9 @@
 import { validateNationalIdByCountry, type NationalIdReasonCode } from '@/lib/identity-documents'
 
 import { classifyEmailTier1 } from '../email-verification/tier1'
+import { validateE164PhoneValue } from './phone'
+
+export { CALLING_CODES } from './phone'
 
 export const NAMED_VALIDATORS = [
   'text',
@@ -75,32 +78,6 @@ export interface ValidatorFieldShape {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const URL_RE = /^https?:\/\/[^\s.]+\.[^\s]{2,}$/i
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
-
-/**
- * Calling codes E.164 para prefijar cuando el input no trae `+` (LATAM + US).
- * SSOT de los países con normalización/máscara de teléfono soportada — el renderer
- * (`mask.ts`) lo importa para derivar la máscara por país sin duplicar la lista.
- */
-export const CALLING_CODES: Record<string, string> = {
-  CL: '56',
-  AR: '54',
-  BO: '591',
-  BR: '55',
-  CA: '1',
-  CO: '57',
-  CR: '506',
-  EC: '593',
-  ES: '34',
-  GB: '44',
-  GT: '502',
-  MX: '52',
-  PA: '507',
-  PE: '51',
-  PY: '595',
-  US: '1',
-  UY: '598',
-  VE: '58',
-}
 
 const asString = (value: unknown): string => {
   if (Array.isArray(value)) return value.join(',')
@@ -167,26 +144,12 @@ const validateCorporateEmail = (raw: unknown): FormFieldValidationResult => {
  * code, no se duplica. Validación per-país rica (libphonenumber) = follow-up.
  */
 const validateE164Phone = (raw: unknown, params?: ValidatorParams): FormFieldValidationResult => {
-  const input = asString(raw).trim()
+  const result = validateE164PhoneValue(raw, params)
 
-  if (input.length === 0) return required()
+  if (result.reasonCode === 'field_required') return required()
+  if (!result.valid) return result
 
-  const hasPlus = input.startsWith('+')
-  let digits = input.replace(/\D/g, '')
-
-  if (!hasPlus) {
-    const cc = CALLING_CODES[(params?.country ?? 'CL').toUpperCase()] ?? ''
-
-    if (cc && !digits.startsWith(cc)) digits = `${cc}${digits}`
-  }
-
-  const e164 = `+${digits}`
-
-  if (!/^\+[1-9]\d{7,14}$/.test(e164)) {
-    return { valid: false, normalized: e164, formatted: e164, reasonCode: 'phone_format' }
-  }
-
-  return ok(e164)
+  return ok(result.normalized, result.formatted)
 }
 
 const validateUrl = (raw: unknown): FormFieldValidationResult => {

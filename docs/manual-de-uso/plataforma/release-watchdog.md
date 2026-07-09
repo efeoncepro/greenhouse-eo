@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual operativo (lenguaje simple, paso a paso)
 > **Version:** 1.0
 > **Creado:** 2026-05-10 por TASK-849 V1.1
-> **Ultima actualizacion:** 2026-05-24
+> **Ultima actualizacion:** 2026-07-09
 > **Documentacion tecnica:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md), [runbook operativo](../../operations/runbooks/production-release-watchdog.md)
 
 ## Estado vigente
@@ -90,6 +90,7 @@ Bug en vivo que requiere atencion. Casos comunes:
 - **stale_approval `error` (>24h)**: deploy esperando approval >1 dia. Cancelar el run viejo (esta superseded por commits mas recientes).
 - **pending_without_jobs `error` (>5min)**: el bug class del incidente historico se reprodujo. Investigar.
 - **worker_revision_drift `error`**: la revision Cloud Run no matchea el ultimo deploy verde. Si el worker drifted es `hubspot-greenhouse-integration`, ejecutar el recovery del runbook con `hubspot-greenhouse-integration-deploy.yml`, `environment=production`, `expected_sha=<release target_sha>` y `skip_tests=false`; luego verificar `/health`, `/contract` y watchdog `drift_count=0`.
+- **worker_revision_drift solo en `ops-worker`**: puede ser residual conocido si el deploy fue change-gated. Antes de re-disparar workflows, confirmar que Cloud Run esta `Ready=True`, el workflow dice `deploy_needed=false` y el diff de rutas runtime entre el SHA servido y el target es vacío. Si todo eso se cumple, documentar y no redeployar por etiqueta.
 
 ### 🟠 `critical` — INCIDENT MODE
 
@@ -177,6 +178,21 @@ gcloud run services describe ops-worker \
 ```
 
 **2. Si difieren** → re-trigger workflow:
+
+Antes de re-trigger, si el worker es `ops-worker`, descarta el caso conocido de
+change-gate:
+
+```bash
+git diff --name-only <cloud_run_git_sha> <release_target_sha> -- \
+  package.json pnpm-lock.yaml tsconfig.json \
+  services/ops-worker scripts/ops-worker src/lib/ops src/lib/release
+```
+
+Si no hay archivos, el workflow summary muestra `deploy_needed=false` y Cloud
+Run está `Ready=True`, no hay acción técnica pendiente: documenta el residual de
+label y cierra con esa caveat.
+
+Si hay diff runtime real o el worker no es ese caso:
 
 ```bash
 gh workflow run "Ops Worker Deploy" --ref main

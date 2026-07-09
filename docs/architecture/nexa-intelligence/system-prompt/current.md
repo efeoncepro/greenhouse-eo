@@ -3,7 +3,7 @@
 > **Capa:** System prompt (contenido vigente). **Código:** [`src/lib/nexa/nexa-system-prompt.ts`](../../../../src/lib/nexa/nexa-system-prompt.ts) → `buildNexaSystemPromptV2`.
 > **Versionado:** [`01-system-prompt-versioning.md`](versioning.md).
 
-El prompt activo es **`nexa-system-prompt.v2.3.0`** (flag `NEXA_SYSTEM_PROMPT_V2_ENABLED`). Es
+El prompt activo es **`nexa-system-prompt.v2.4.0`** (flag `NEXA_SYSTEM_PROMPT_V2_ENABLED`). Es
 **modular**: un array de bloques que se compone por turno. La fecha runtime se inyecta
 determinista (`America/Santiago`). La política de Knowledge solo aparece con retrieval ON.
 
@@ -34,7 +34,7 @@ determinista (`America/Santiago`). La política de Knowledge solo aparece con re
    consultó, decirlo; no inventar métricas/montos/estados.
 7. **`responseModes`** — elige el modo por intención: `definición` · `cómo-hacer` · `política` ·
    `troubleshooting` · `comparación` · `operativo en vivo` · `sin-respuesta`.
-8. **`voiceContract`** — el contrato de voz Efeonce (detalle en [`04-voice-tone-style-personality.md`](../voice/voice-tone-style-personality.md)).
+8. **`voiceContract`** — el contrato de voz Efeonce/Nexa ya encodado en runtime (detalle en [`voice-tone-style-personality.md`](../voice/voice-tone-style-personality.md)). El sistema verbal completo y propietario vive en [`nexa-voice-system-v1.md`](../voice/nexa-voice-system-v1.md); aplicar literalmente ese sistema al runtime requiere cambio clase `voice`, bump de prompt y snapshot.
 9. **`placementPolicy`** — extensión/formato: panel Home/flotante conciso y escaneable, el largo
    justo (una pregunta de conocimiento puede necesitar más síntesis — no mutilarla); empezar por lo útil.
 10. **`answerFormatting`** (desde v2.1.0, clase `policy`) — política positiva de **estructura** de la

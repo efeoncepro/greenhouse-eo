@@ -45,6 +45,19 @@ delight (candidate experience → referrals + brand)
 - **Talent pool**: keep warm relationships with silver-medalists and inbound interest even when no role is open. In Greenhouse this maps to `candidate_facet` on a Person + a future Talent Pool surface.
 - **Careers surface** = the Greenhouse public careers landing (TASK-354). Same tokenized/public pattern serves the assessment (TASK-1363).
 
+### Public vacancy recipe (offer as inbound asset)
+
+The public offer is a conversion asset, not the internal job brief. After intake, use `templates/job-offer-recipe.md` to structure the candidate-facing vacancy:
+
+- candidate promise and role mission first;
+- 3-5 success outcomes;
+- real work in plain language;
+- must-have vs nice-to-have competencies;
+- short public competency chips;
+- candidate-facing process with no internal template IDs;
+- compensation/location transparency;
+- nurture path through Talent Pool/Growth Forms when the candidate is not a fit today.
+
 ### Head hunting / executive search (outbound for senior + scarce)
 
 For senior, scarce, or confidential roles, inbound is not enough — you hunt.

@@ -10,6 +10,8 @@ Operación legal: Efeonce Group SpA. Presencia: **Chile, Colombia, México, Per�
 
 > Para un agente de Greenhouse: "quiénes somos" se traduce en producto como **multi-tenant + multi-unidad + multi-país + multi-moneda**. El portal modela una agencia que corre como sistema, no como silos.
 
+Ambición de escala: **LATAM-first, no LATAM-limited**. La presencia regional prueba ejecución multi-país, cercanía cultural y capacidad operativa; no define el techo. Efeonce debe poder atender diversos mercados y crecer hacia el mundo desde la misma tesis: **Growth Operating System / ASaaS**.
+
 ---
 
 ## El Why — por qué existimos
@@ -19,6 +21,10 @@ Operación legal: Efeonce Group SpA. Presencia: **Chile, Colombia, México, Per�
 El crecimiento no se entrega: se **co-construye**. No nace de los números ni de los entregables, sino de *cómo trabajamos juntos* —con transparencia, educándote y sumando cada ciclo. Un cliente que crece con nosotros sale **más capaz, no más dependiente**. Tres pilares: **co-creación** (operas con nosotros en vivo), **educación** (te hacemos mejor, no dependiente) e **integralidad** (el crecimiento nace de la relación completa, no del gráfico).
 
 > El Why completo (Golden Circle Why·How·What, los mecanismos que lo prueban, la disciplina anti-humo y la reconciliación con el switching cost ASaaS) es SSOT en **`09_marca-agencia.md` → §El Golden Circle de Efeonce**. Esto es el resumen.
+
+> El comportamiento interno que hace vivible este Why está en **`docs/operations/EFEONCE_OPERATING_CODE_V1.md`**. Regla cultural: en Efeonce se valora a quien deja al cliente más capaz, deja el sistema con más memoria y conecta su trabajo con crecimiento real.
+
+> La bajada hacia el cliente es la **Experiencia Efeonce**: no solo entra a una agencia, entra a un ecosistema de crecimiento con operación, software, aprendizaje, contenido, networking y memoria. SSOT: `10_experiencia-cliente.md`.
 
 ---
 
@@ -35,7 +41,7 @@ Loop Marketing es el framework estratégico (impulsado por HubSpot como sucesor 
 | **TRANSVERSAL** | ¿Qué lo hace posible? | Wave | Web performance, tracking, DSP/DMP/CDP, schema, automatización, web agéntica. |
 
 - **Nested Loops™** — metodología propietaria para *operar* Loop Marketing.
-- **SOLVE** — framework de medición y accountability (4ª fase del motor S⁴ de Surround Discovery™, no un framework suelto).
+- **Surround Discovery™** incluye el motor **S⁴: SENSE → SHAPE → SURFACE → SOLVE**. **SOLVE es una etapa de Surround Discovery™, no una metodología independiente.**
 
 ---
 
@@ -88,10 +94,11 @@ Los 4 pilares operativos de ICO (stack real): **Brand Intelligence Hub** (Notion
 
 Lo que nos hace competitivos no es *tener* muchas unidades — es la **integración real** entre ellas (los datos de Evolve alimentan el brief de Express sin que un humano copie y pegue), los **sistemas documentados** que estructuran el trabajo, y la **capa de inteligencia operativa** que casi ninguna agencia LATAM tiene.
 
-- Metodologías documentadas: Nested Loops™, Surround Discovery™, Surround Strategy™, CSC + ICO, SOLVE.
+- Metodologías documentadas: Nested Loops™, Surround Discovery™ (incluye SOLVE como etapa), Surround Strategy™, CSC + ICO.
 - AI-First con gobernanza (Multi-Model AI Studio + tiers de riesgo + protocolo off-brand).
 - Transparencia radical: el cliente ve la operación en tiempo real. **Esto es, literalmente, lo que Greenhouse entrega.**
-- Medición: SOLVE + Revenue Enabled. Atribución conectada a pipeline, no vanity metrics.
+- Experiencia Efeonce: el cliente accede a operación, software, aprendizaje, contenido, tools, networking y memoria; Greenhouse lo vuelve visible y acumulable.
+- Medición: Revenue Enabled + la etapa SOLVE dentro de Surround Discovery™. Atribución conectada a pipeline, no vanity metrics.
 
 ---
 

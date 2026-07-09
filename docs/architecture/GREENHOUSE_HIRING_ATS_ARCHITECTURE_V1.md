@@ -20,6 +20,26 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-09 — Structured vacancy publication operator (TASK-1371)
+
+Hiring vacancy publication now has a canonical backend-data operator:
+`src/lib/hiring/vacancy-publication-operator.ts`. It accepts a structured brief
+and supports `dryRun | execute | publish`; CLI wrapper
+`pnpm hiring:publish-vacancy --file <brief.json>` and internal endpoint
+`POST /api/hiring/vacancy-publications` must reuse this command.
+
+The public opening projection gained additive structured fields:
+`public_work_mode`, `public_hiring_region`, `public_city`, `public_country`,
+`public_office_location`, `public_area`, `public_skill_tags`,
+`public_compensation_band` and internal `publication_source_ref`.
+`public_location_mode` remains legacy compatibility only and must be derived
+from structured fields, not authored as free copy. `publishOpening` now guards
+required public structured fields before an opening can become `public_listed`.
+
+Compensation is explicitly optional in V1: `public_compensation_band` can be
+provided, but publish does not require it until finance/payroll/legal define the
+approved band governance.
+
 ## Why This Document Exists
 
 Efeonce no necesita un ATS corporativo genérico aislado del resto del negocio.

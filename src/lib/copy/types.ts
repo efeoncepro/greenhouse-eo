@@ -252,6 +252,7 @@ export interface CareersCopy {
       brand: string
       pendingTitle: string
     }
+    phoneCountryAria: string
     submit: string
     submitting: string
     successTitle: string
@@ -263,6 +264,7 @@ export interface CareersCopy {
       lastName: string
       emailRequired: string
       emailInvalid: string
+      phoneInvalid: string
       urlInvalid: string
       consent: string
       captcha: string

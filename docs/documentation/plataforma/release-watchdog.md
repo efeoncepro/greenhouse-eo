@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-05-10 por TASK-849 V1.1
-> **Ultima actualizacion:** 2026-05-24
+> **Ultima actualizacion:** 2026-07-09
 > **Documentacion tecnica:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Manual operativo:** [release-watchdog manual de uso](../../manual-de-uso/plataforma/release-watchdog.md)
 
@@ -146,6 +146,13 @@ NO confunde con:
 2. **CI gate workflow allowlist**: si alguien agrega un workflow nuevo de deploy production sin agregarlo al `RELEASE_DEPLOY_WORKFLOWS` en `workflow-allowlist.ts`, el Watchdog NO lo detecta. Sin un CI gate que valide esto, queda como discipline manual.
 3. **GH Actions schedule reliability**: GitHub Actions cron puede tener delays >30min en horarios pico GitHub. Para warning threshold 2h es OK; si emerge unreliability sostenida (5+ skipped runs en 7 dias), considerar fallback a Cloud Scheduler.
 4. **Workers sin GIT_SHA**: workers deployados pre TASK-849 Slice 1 no tienen `GIT_SHA` env var → `worker_revision_drift` retorna `data_missing`, NO falso positivo. Re-deployar resuelve.
+5. **`ops-worker` change-gated**: la señal V1 compara el último workflow verde
+   contra el `GIT_SHA` servido por Cloud Run. Si `ops-worker` no tuvo cambios en
+   sus rutas runtime, el workflow puede saltar el rebuild (`deploy_needed=false`)
+   y Cloud Run conserva un SHA anterior aunque el código servido sea equivalente
+   al target. El operador debe validar el diff runtime; si está vacío y el
+   servicio está `Ready=True`, el hallazgo es residual de label y no requiere
+   redeploy.
 
 ## Roadmap futuro
 

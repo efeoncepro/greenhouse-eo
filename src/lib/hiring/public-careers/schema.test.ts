@@ -45,6 +45,13 @@ describe('parsePublicHiringApplication', () => {
     expect(out?.portfolioUrl).toBe('https://ada.dev')
     expect(out?.linkedinUrl).toBe('https://linkedin.com/in/ada')
   })
+
+  it('normaliza teléfono opcional a E.164 y rechaza teléfonos inválidos', () => {
+    const out = parsePublicHiringApplication({ ...valid, phone: '9 1234 5678' })
+
+    expect(out?.phone).toBe('+56912345678')
+    expect(parsePublicHiringApplication({ ...valid, phone: '123' })).toBeNull()
+  })
 })
 
 describe('isSafeHttpUrl', () => {

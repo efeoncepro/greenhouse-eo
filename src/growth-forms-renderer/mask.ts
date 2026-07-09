@@ -12,7 +12,7 @@
  * módulo isomórfico que ya usa el renderer), nunca una copia local. Países sin máscara
  * dedicada degradan honesto a passthrough (sin máscara falsa que confunda).
  */
-import { CALLING_CODES } from '@/lib/growth/forms/validators/core'
+import { CALLING_CODES } from '@/lib/growth/forms/validators/phone'
 
 import type { RendererFieldDefinition } from './contract'
 

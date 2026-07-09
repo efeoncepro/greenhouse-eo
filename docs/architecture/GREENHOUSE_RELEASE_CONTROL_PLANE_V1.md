@@ -6,6 +6,31 @@
 > **Replaces:** N/A (no formal release contract pre-2026-05-10; lived as tribal knowledge in `Handoff.md`)
 > **Related:** TASK-849 (Production Release Watchdog Alerts), TASK-857 (GitHub Webhooks Release Event Ingestion), TASK-742 (Auth Resilience 7-layer), TASK-765 (payment_orders state machine), TASK-773 (outbox publisher cutover)
 
+## Delta 2026-07-09 — Agent release operating discipline
+
+El control plane no solo define workflows: tambien define cómo deben operar los
+agentes. Un release no empieza con investigacion ad hoc; empieza cargando
+`greenhouse-production-release`, el playbook de incidentes y los runbooks.
+
+Contrato operativo agregado:
+
+- Medir tiempos de release es obligatorio cuando el operador lo pide, pero la
+  medicion no convierte approvals, workers lentos, Azure `no_infra_diff`,
+  `ops-worker` change-gated o runner queue final en incidentes nuevos.
+- `ops-worker` puede conservar un `GIT_SHA` anterior si el workflow detecta
+  `deploy_needed=false`. Si el diff de rutas runtime entre Cloud Run `GIT_SHA`
+  y `target_sha` es vacio y el servicio esta `Ready=True`, el hallazgo es
+  residual de label y no debe forzar redeploy.
+- Si la transition final a `released` queda queued/stale tras runtime verde, el
+  cierre solo puede hacerse por el CLI canonico
+  `release:orchestrator-transition-state` con release ID y razon auditada; nunca
+  por SQL directo.
+- Todo pase a produccion debe registrar tiempos en
+  `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`: agente, fecha, release
+  ID, run ID, target SHA, **tiempo agente end-to-end** como KPI principal,
+  workflow elapsed, manifest elapsed, runtime-green elapsed, fases, bloqueo
+  principal y aprendizaje. El tiempo de manifest no mide eficiencia del agente.
+
 ## Delta 2026-06-18 — Ops Worker workflow drift guard
 
 El `ops-worker` sigue desplegándose exclusivamente por GitHub Actions como

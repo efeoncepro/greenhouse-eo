@@ -16,6 +16,7 @@ import {
   HIRING_FULFILLMENT_MODES,
   HIRING_OPENING_STATUSES,
   HIRING_OPENING_VISIBILITIES,
+  HIRING_PUBLIC_WORK_MODES,
   TALENT_DEMAND_ENGAGEMENT_TYPES,
   TALENT_DEMAND_ORIGINS,
   TALENT_DEMAND_PRIORITIES,
@@ -267,6 +268,15 @@ type HiringOpeningRow = {
   public_requirements: unknown
   public_nice_to_have: unknown
   public_location_mode: unknown
+  public_work_mode: unknown
+  public_hiring_region: unknown
+  public_city: unknown
+  public_country: unknown
+  public_office_location: unknown
+  public_area: unknown
+  public_skill_tags: unknown
+  public_compensation_band: unknown
+  publication_source_ref: unknown
   public_employment_mode: unknown
   public_seniority: unknown
   public_process_notes: unknown
@@ -300,6 +310,15 @@ const normalizeHiringOpening = (row: HiringOpeningRow): HiringOpening => ({
   publicRequirements: toNullableStr(row.public_requirements),
   publicNiceToHave: toNullableStr(row.public_nice_to_have),
   publicLocationMode: toNullableStr(row.public_location_mode),
+  publicWorkMode: (toNullableStr(row.public_work_mode) as HiringOpening['publicWorkMode']) ?? null,
+  publicHiringRegion: toNullableStr(row.public_hiring_region),
+  publicCity: toNullableStr(row.public_city),
+  publicCountry: toNullableStr(row.public_country),
+  publicOfficeLocation: toNullableStr(row.public_office_location),
+  publicArea: toNullableStr(row.public_area),
+  publicSkillTags: toStringArray(row.public_skill_tags),
+  publicCompensationBand: toNullableStr(row.public_compensation_band),
+  publicationSourceRef: toNullableStr(row.publication_source_ref),
   publicEmploymentMode: toNullableStr(row.public_employment_mode),
   publicSeniority: toNullableStr(row.public_seniority),
   publicProcessNotes: toNullableStr(row.public_process_notes),
@@ -434,7 +453,9 @@ const HIRING_OPENING_COLUMNS = `
   opening_id, public_id, demand_id, internal_title, seniority, requested_seats, owner_user_id,
   space_id, organization_id, budget_band, rate_band, risk_notes, internal_notes, visibility,
   publication_status, public_title, public_summary, public_description, public_requirements,
-  public_nice_to_have, public_location_mode, public_employment_mode, public_seniority,
+  public_nice_to_have, public_location_mode, public_work_mode, public_hiring_region,
+  public_city, public_country, public_office_location, public_area, public_skill_tags,
+  public_compensation_band, publication_source_ref, public_employment_mode, public_seniority,
   public_process_notes, apply_url, status, published_at, created_by, created_at, updated_at`
 
 const CANDIDATE_FACET_COLUMNS = `
@@ -885,6 +906,19 @@ export const updateHiringOpening = async (
   if (input.publicRequirements !== undefined) push('public_requirements', input.publicRequirements)
   if (input.publicNiceToHave !== undefined) push('public_nice_to_have', input.publicNiceToHave)
   if (input.publicLocationMode !== undefined) push('public_location_mode', input.publicLocationMode)
+
+  if (input.publicWorkMode !== undefined) {
+    push('public_work_mode', input.publicWorkMode == null ? null : assertEnum(input.publicWorkMode, HIRING_PUBLIC_WORK_MODES, 'publicWorkMode'))
+  }
+
+  if (input.publicHiringRegion !== undefined) push('public_hiring_region', input.publicHiringRegion)
+  if (input.publicCity !== undefined) push('public_city', input.publicCity)
+  if (input.publicCountry !== undefined) push('public_country', input.publicCountry)
+  if (input.publicOfficeLocation !== undefined) push('public_office_location', input.publicOfficeLocation)
+  if (input.publicArea !== undefined) push('public_area', input.publicArea)
+  if (input.publicSkillTags !== undefined) push('public_skill_tags', input.publicSkillTags)
+  if (input.publicCompensationBand !== undefined) push('public_compensation_band', input.publicCompensationBand)
+  if (input.publicationSourceRef !== undefined) push('publication_source_ref', input.publicationSourceRef)
   if (input.publicEmploymentMode !== undefined) push('public_employment_mode', input.publicEmploymentMode)
   if (input.publicSeniority !== undefined) push('public_seniority', input.publicSeniority)
   if (input.publicProcessNotes !== undefined) push('public_process_notes', input.publicProcessNotes)

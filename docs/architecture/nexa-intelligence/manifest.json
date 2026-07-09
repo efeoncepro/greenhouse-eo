@@ -28,6 +28,8 @@
     "behavior/README.md",
     "behavior/behavior-and-routing.md",
     "voice/README.md",
+    "voice/nexa-identity-canon.md",
+    "voice/nexa-voice-system-v1.md",
     "voice/voice-tone-style-personality.md",
     "knowledge/README.md",
     "knowledge/retrieval-answer-quality.md",
@@ -56,7 +58,7 @@
       "key": "voice",
       "label": "Voz, tono, estilo y personalidad",
       "code": ["docs/context/05_voz-tono-estilo.md"],
-      "docs": ["voice/voice-tone-style-personality.md"]
+      "docs": ["voice/voice-tone-style-personality.md", "voice/nexa-identity-canon.md", "voice/nexa-voice-system-v1.md"]
     },
     {
       "key": "behavior-routing",

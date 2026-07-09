@@ -34,6 +34,8 @@ Es la **vista por capas** que organiza esos contratos en planos de producto nave
 
 ### [`voice/`](voice/README.md) — cómo suena
 
+- [`nexa-identity-canon.md`](voice/nexa-identity-canon.md) — quién es Nexa: miembro del equipo, personificación del Why, rostro/origen y reglas de identidad.
+- [`nexa-voice-system-v1.md`](voice/nexa-voice-system-v1.md) — Nexa Voice como sistema verbal propietario: 4 A, modos conversacionales, fraseología, límites y QA.
 - [`voice-tone-style-personality.md`](voice/voice-tone-style-personality.md) — contrato de voz Efeonce.
 
 ### [`knowledge/`](knowledge/README.md) — recuperar + sintetizar + respaldar

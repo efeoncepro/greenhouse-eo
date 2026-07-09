@@ -4,7 +4,7 @@
 
 ## Posicionamiento
 
-**Categoría:** *Growth partner con sistema operativo propio y ecosistema de producto.* **No** "agencia de marketing digital". La categoría se construye sobre tres conceptos propietarios:
+**Categoría:** *Growth Operating System / ASaaS con ecosistema de producto propio.* **No** "agencia de marketing digital", "agencia integral", "AI agency" ni proveedor de servicios sueltos. La categoría se construye sobre tres conceptos propietarios:
 
 - **Loop Marketing + IA** — el crecimiento es compuesto, no lineal. Cada ciclo construye sobre el anterior.
 - **ASaaS (Agency Service as a Software)** — el servicio de agencia empaquetado como producto de software. Tres plataformas, no informes.
@@ -21,6 +21,8 @@
 | Acumulación | Cada trimestre de cero | Datos acumulados | **Datos + conocimiento + marca + historial operativo** |
 
 > *Las agencias te entregan informes. Los SaaS te entregan herramientas. Nosotros te damos un ecosistema de tres productos de software donde ves tu operación, tu CRM y tu contenido —en tiempo real— con un equipo dedicado que lo opera.* **Greenhouse es la columna "ves tu operación".**
+
+**Ambición de mercado:** LATAM es el punto de partida y la prueba de ejecución multi-país; no es el límite. El GTM debe quedar preparado para una narrativa pan-hispana/global: vender el sistema operativo de crecimiento antes que el origen regional. SSOT de la decisión pública: `docs/public-site/decisions/PDR-012-growth-operating-system-global-positioning.md`.
 
 ---
 

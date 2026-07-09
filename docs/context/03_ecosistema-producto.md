@@ -97,7 +97,7 @@ Cada plataforma productiza un tipo de servicio distinto:
 | **Nested Loops™** | Sistema estratégico Express→Tailor→Amplify→Evolve. | Propuestas. |
 | **ICO** | Sistema operativo transversal: gobernanza, métricas, quality gates. | Diferenciador en pitches. Onboarding. |
 | **Ecosistema de producto** | Greenhouse + Kortex + Verk. Modelo ASaaS. | Demo en pitch. Argumento de switching cost. |
-| **Frameworks específicos** | Surround Discovery™, AEO, CSC, Revenue Enabled, SOLVE. | Solo en profundidad técnica. Se traducen a beneficios. |
+| **Frameworks específicos** | Surround Discovery™ (S⁴: SENSE → SHAPE → SURFACE → SOLVE), AEO, CSC, Revenue Enabled. | Solo en profundidad técnica. Se traducen a beneficios. |
 
 **Cómo cobra vida la IP en Greenhouse:** Loop Marketing → ciclo completo visible en dashboards; ICO → métricas RpA/OTD%/FTR en el dashboard del cliente; Surround Discovery™ → embed card del Surround Map (vía Verk); Revenue Enabled → inteligencia financiera (revenue/costo/margen por cliente).
 

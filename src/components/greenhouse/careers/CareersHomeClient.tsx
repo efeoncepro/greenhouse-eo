@@ -90,7 +90,8 @@ export const CareersHomeClient = ({ copy, listingState, openings }: CareersHomeC
   const showResults = !showError && filteredOpenings.length > 0
   const openCount = openings.length
   const hiringBadgeSuffix = openCount === 1 ? copy.hero.hiringBadgeSuffixSingular : copy.hero.hiringBadgeSuffixPlural
-  const marqueeItems = [...copy.marquee, ...copy.marquee]
+  const marqueeItems = copy.marquee.length ? copy.marquee : [copy.fallbacks.area]
+  const marqueeSegments = [0, 1] as const
   const poolDone = Boolean(poolDoneName)
 
   const toggleFilter = (key: 'area' | 'modality', value: string) => {
@@ -128,6 +129,7 @@ export const CareersHomeClient = ({ copy, listingState, openings }: CareersHomeC
           </span>
           <h1 className={styles.heroTitle}>
             <span className={styles.heroTitleAccent}>{copy.hero.titleAccent}</span>
+            {' '}
             <br />
             {copy.hero.titleRest}
             <i className={`${styles.heroArrow} tabler-arrow-up-right`} aria-hidden='true' />
@@ -148,13 +150,17 @@ export const CareersHomeClient = ({ copy, listingState, openings }: CareersHomeC
             <span>{copy.hero.proof}</span>
           </div>
         </div>
-        <div className={styles.marqueeWrap} aria-hidden='true'>
+        <div className={styles.marqueeWrap} aria-hidden='true' data-capture='careers-home-marquee'>
           <div className={styles.marqueeTrack}>
-            {marqueeItems.map((item, index) => (
-              <span className={styles.marqueeItem} key={`${item}-${index}`}>
-                <span>{item}</span>
-                <i className='tabler-diamond-filled' />
-              </span>
+            {marqueeSegments.map(segment => (
+              <div className={styles.marqueeSegment} key={segment}>
+                {marqueeItems.map((item, index) => (
+                  <span className={styles.marqueeItem} key={`${segment}-${item}-${index}`}>
+                    <span>{item}</span>
+                    <i className='tabler-diamond-filled' />
+                  </span>
+                ))}
+              </div>
             ))}
           </div>
         </div>
@@ -384,50 +390,56 @@ export const CareersHomeClient = ({ copy, listingState, openings }: CareersHomeC
   )
 }
 
-const OpeningCard = ({ copy, opening }: { copy: CareersCopy; opening: CareersOpeningViewModel }) => (
-  <Link
-    className={`${styles.vacancyCard} ${styles.reveal}`}
-    href={opening.detailHref}
-    aria-label={formatCareersTemplate(copy.aria.openingCardTemplate, { role: opening.title })}
-  >
-    <div className={styles.cardTop}>
-      <span className={styles.areaText}>{opening.area}</span>
-      <span className={`${styles.modalityChip} ${modalityClassName(opening.modalityKind)}`}>
-        <i className={opening.modalityIcon} aria-hidden='true' />
-        {opening.modality}
-      </span>
-    </div>
-    <h3 className={styles.cardTitle}>{opening.title}</h3>
-    <div className={styles.cardMeta}>
-      <span className={styles.metaItem}>
-        <i className='tabler-map-pin' aria-hidden='true' />
-        {opening.location}
-      </span>
-      <span className={styles.metaItem}>
-        <i className='tabler-stairs-up' aria-hidden='true' />
-        {opening.seniority}
-      </span>
-      <span className={styles.metaItem}>
-        <i className='tabler-clock' aria-hidden='true' />
-        {opening.employment}
-      </span>
-    </div>
-    <p className={styles.cardBody}>{opening.summary}</p>
-    <div className={styles.chipList}>
-      {opening.skillChips.map(skill => (
-        <span className={styles.skillChip} key={skill}>
-          {skill}
+const OpeningCard = ({ copy, opening }: { copy: CareersCopy; opening: CareersOpeningViewModel }) => {
+  const showLocation = opening.location !== opening.modality
+
+  return (
+    <Link
+      className={`${styles.vacancyCard} ${styles.reveal}`}
+      href={opening.detailHref}
+      aria-label={formatCareersTemplate(copy.aria.openingCardTemplate, { role: opening.title })}
+    >
+      <div className={styles.cardTop}>
+        <span className={styles.areaText}>{opening.area}</span>
+        <span className={`${styles.modalityChip} ${modalityClassName(opening.modalityKind)}`}>
+          <i className={opening.modalityIcon} aria-hidden='true' />
+          {opening.modality}
         </span>
-      ))}
-    </div>
-    <div className={styles.cardFooter}>
-      <span className={styles.cardCta}>{copy.listing.cardCta}</span>
-      <span className={styles.arrowCircle} aria-hidden='true'>
-        <i className='tabler-arrow-right' />
-      </span>
-    </div>
-  </Link>
-)
+      </div>
+      <h3 className={styles.cardTitle}>{opening.title}</h3>
+      <div className={styles.cardMeta}>
+        {showLocation ? (
+          <span className={styles.metaItem}>
+            <i className='tabler-map-pin' aria-hidden='true' />
+            {opening.location}
+          </span>
+        ) : null}
+        <span className={styles.metaItem}>
+          <i className='tabler-stairs-up' aria-hidden='true' />
+          {opening.seniority}
+        </span>
+        <span className={styles.metaItem}>
+          <i className='tabler-clock' aria-hidden='true' />
+          {opening.employment}
+        </span>
+      </div>
+      <p className={styles.cardBody}>{opening.summary}</p>
+      <div className={styles.chipList}>
+        {opening.skillChips.map(skill => (
+          <span className={styles.skillChip} key={skill}>
+            {skill}
+          </span>
+        ))}
+      </div>
+      <div className={styles.cardFooter}>
+        <span className={styles.cardCta}>{copy.listing.cardCta}</span>
+        <span className={styles.arrowCircle} aria-hidden='true'>
+          <i className='tabler-arrow-right' />
+        </span>
+      </div>
+    </Link>
+  )
+}
 
 export const ProcessSection = ({ copy }: { copy: CareersCopy }) => (
   <section id='gh-process' className={styles.processSection} data-capture='careers-process'>

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.1
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-06-30 por Claude
+> **Ultima actualizacion:** 2026-07-09 por Codex
 > **Documentacion tecnica:** [TASK-851](../../tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md), [CLAUDE.md §Production Release Orchestrator invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Orquestador de Release a Producción
@@ -103,6 +103,21 @@ El orquestador es un workflow GitHub Actions, pero el operador casi nunca lo dis
 Ninguna interfaz es un motor de release nuevo: las dos terminan corriendo `production-release.yml` y escribiendo en `release_manifests`. La diferencia con disparar el workflow crudo es que el harness **fuerza el orden seguro** (preflight → promoción → orquestador → approval → workers/Vercel/Azure → health → manifest → watchdog → flags del ledger) y exige aprobación humana explícita por cada mutación externa (push, dispatch, approval gate, deploy, flags, rollback). El agente lee y propone; la persona autoriza cada paso.
 
 > **Condiciones esperadas del flujo por squash (no son fallas).** Como cada release se promueve con *squash-merge*, `main` y `develop` divergen. Eso produce señales que parecen errores pero son conocidas: el PR develop→main puede requerir un merge de sincronización, un check de política puede marcar un archivo que **ya está en producción**, y los avisos de smoke/CI del commit fresco de `main` se resuelven con una razón de bypass documentada. El runbook (§2.3) y la skill `greenhouse-production-release` explican cómo reconocerlas y resolverlas paso a paso; el fondo (que el clasificador de política deje de marcar archivos ya desplegados) está registrado en **ISSUE-114**.
+
+> **Leccion operativa 2026-07-09.** Un agente no debe tratar condiciones comunes
+> del release como descubrimiento nuevo. Approvals, workers lentos, Azure
+> `no_infra_diff`, `ops-worker` change-gated y `transition-released` en cola
+> tienen caminos documentados. Si el runtime ya está verde y falta sólo una
+> transición final atascada por runner, el cierre se hace con el CLI canónico de
+> state machine y razón auditada, nunca con SQL.
+
+> **Timing obligatorio.** Desde 2026-07-09 cada release debe registrar el
+> **tiempo agente end-to-end** como KPI principal, no solo la duracion del
+> workflow. El registro vive en
+> `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`: agente, fecha, release
+> ID, run ID, SHA, fases de revision/analisis/release/diagnostico/docs,
+> workflow elapsed, manifest elapsed, runtime-green elapsed y bloqueo principal.
+> Esto permite evaluar eficiencia por agente sin depender de memoria.
 
 ## Roles + permisos
 

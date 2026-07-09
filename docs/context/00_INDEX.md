@@ -26,6 +26,7 @@
 | Tocar el sync con HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
 | Evaluar ASaaS, tiers, switching cost, self-service o monetizacion | `14_modelo-negocio-asaas` |
+| Impregnar cultura interna, hiring, onboarding, performance o rituales de equipo | `09_marca-agencia` + `docs/operations/EFEONCE_OPERATING_CODE_V1.md` |
 
 **Enganche desde el repo.** Este archivo está pensado para referenciarse desde el `CLAUDE.md` / `AGENTS.md` de Greenhouse. Sugerencia de línea en ese archivo raíz:
 
@@ -53,6 +54,10 @@ El cliente ve su operación en tiempo real: qué pasa, cuándo pasa y dónde est
 Todo lo que mostramos debe poder conectarse —directa o indirectamente— con impacto en el negocio del cliente (pipeline, revenue, NRR), no con vanity metrics. La inteligencia financiera y las métricas ICO existen para alimentar esa cadena causal. **Medimos lo que defiende presupuesto, no lo que decora un slide.**
 
 > **Detrás de estos tres ejes hay un Why de marca:** *no te entregamos crecimiento, lo construimos contigo —y te dejamos más capaz de sostenerlo* (co-creación · educación · integralidad). Los tres ejes son el How/What de ese Why en producto: el switching cost se gana haciendo al cliente más capaz (no dependiente), la transparencia hace real la co-creación, y Revenue Enabled prueba que el crecimiento es integral. SSOT del Why: `09_marca-agencia.md` → §El Golden Circle de Efeonce.
+
+**Ambición de mercado:** Efeonce es **LATAM-first, no LATAM-limited**. La dirección es construir una agencia grande y reconocida en toda Latinoamérica desde el inicio, preparada para servir EEUU hispano, mercados en inglés y otros mercados internacionales. La categoría defendible no es "agencia integral" ni "AI agency": es **Growth Operating System / ASaaS**, con co-creación convertida en software, método, datos y memoria acumulada. Decisión pública: `docs/public-site/decisions/PDR-012-growth-operating-system-global-positioning.md`.
+
+**Cultura operativa:** el Why se impregna en el equipo mediante el **Efeonce Operating Code**: `docs/operations/EFEONCE_OPERATING_CODE_V1.md`. Regla cultural: *en Efeonce se valora a quien deja al cliente más capaz, deja el sistema con más memoria y conecta su trabajo con crecimiento real.*
 
 ---
 
@@ -115,10 +120,11 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 | `07_ico.md` | ICO explicado: qué es, por qué existe, 4 pilares, 7 fases CSC, las dos cadenas causales, cómo vive en Greenhouse. |
 | `08_estrategia-comercial.md` | Dos motores, cuentas ancla y playbooks, cross-sell por Pulse, demo por buyer persona, KPIs, dependencias de producto. |
 | `09_marca-agencia.md` | Arquitectura de marca (masterbrand + capabilities), sistema verbal, posicionamiento, elevator pitch, messaging por audiencia, reglas de comunicación. |
-| `10_experiencia-cliente.md` | Greenhouse como sistema de experiencia: journey de 8 fases + 2 transversales mapeado a módulos, artefactos de marca (Ecosystem Tour, "Tu año con Efeonce"), métricas de adopción. |
+| `10_experiencia-cliente.md` | Experiencia Efeonce como entrada al ecosistema de crecimiento: operación, software, aprendizaje, red y memoria. Greenhouse como command center; journey de 8 fases + 2 transversales, artefactos de marca y métricas de adopción. |
 | `11_hubspot-bowtie.md` | Arquitectura HubSpot: 3 pipelines de deals, properties custom, y Bow-tie (lifecycle dual 7/12 stages + motion booleans) con los **internal names exactos** para el sync de Account 360. |
 | `13_icp-buyer-personas-jtbd.md` | ICPs, buyer personas y Jobs-to-be-Done. Traduce dolores comerciales en prioridades de producto por usuario y tier de entrada. |
 | `14_modelo-negocio-asaas.md` | Modelo ASaaS recalibrado: switching cost, self-service, tiers, monetizacion recurrente y roadmap de exposicion/adopcion. |
+| `../operations/EFEONCE_OPERATING_CODE_V1.md` | Codigo operativo interno: hiring, onboarding, performance, rituales y conductas que vuelven cultura el Why. |
 
 ---
 

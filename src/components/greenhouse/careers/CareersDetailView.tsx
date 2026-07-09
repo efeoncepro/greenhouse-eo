@@ -10,26 +10,31 @@ interface CareersDetailViewProps {
   opening: CareersOpeningViewModel
 }
 
-export const CareersDetailView = ({ copy, opening }: CareersDetailViewProps) => (
-  <div className={styles.fade}>
-    <section className={styles.detailHero} data-capture='careers-detail-hero'>
-      <div className={`${styles.container} ${styles.detailHeroInner}`}>
-        <span className={`${styles.eyebrow} ${styles.eyebrowDark}`}>{opening.area}</span>
-        <h1 className={styles.detailTitle}>{opening.title}</h1>
-        <div className={styles.detailChips} aria-label={copy.detail.summaryTitle}>
-          <span className={styles.detailChip}>
-            <i className='tabler-map-pin' aria-hidden='true' />
-            {opening.location}
-          </span>
-          <span className={styles.detailChip}>
-            <i className={opening.modalityIcon} aria-hidden='true' />
-            {opening.modality}
-          </span>
-          <span className={styles.detailChip}>
-            <i className='tabler-stairs-up' aria-hidden='true' />
-            {opening.seniority}
-          </span>
-        </div>
+export const CareersDetailView = ({ copy, opening }: CareersDetailViewProps) => {
+  const showLocation = opening.location !== opening.modality
+
+  return (
+    <div className={styles.fade}>
+      <section className={styles.detailHero} data-capture='careers-detail-hero'>
+        <div className={`${styles.container} ${styles.detailHeroInner}`}>
+          <span className={`${styles.eyebrow} ${styles.eyebrowDark}`}>{opening.area}</span>
+          <h1 className={styles.detailTitle}>{opening.title}</h1>
+          <div className={styles.detailChips} aria-label={copy.detail.summaryTitle}>
+            {showLocation ? (
+              <span className={styles.detailChip}>
+                <i className='tabler-map-pin' aria-hidden='true' />
+                {opening.location}
+              </span>
+            ) : null}
+            <span className={styles.detailChip}>
+              <i className={opening.modalityIcon} aria-hidden='true' />
+              {opening.modality}
+            </span>
+            <span className={styles.detailChip}>
+              <i className='tabler-stairs-up' aria-hidden='true' />
+              {opening.seniority}
+            </span>
+          </div>
         <p className={styles.applyIntro}>{opening.summary}</p>
         <div className={styles.heroActions}>
           <Link
@@ -120,7 +125,7 @@ export const CareersDetailView = ({ copy, opening }: CareersDetailViewProps) => 
           <h2 className={styles.summaryTitle}>{copy.detail.summaryTitle}</h2>
           <div className={styles.summaryRows}>
             <SummaryRow label={copy.detail.labels.area} value={opening.area} />
-            <SummaryRow label={copy.detail.labels.location} value={opening.location} />
+            {showLocation ? <SummaryRow label={copy.detail.labels.location} value={opening.location} /> : null}
             <SummaryRow label={copy.detail.labels.modality} value={opening.modality} />
             <SummaryRow label={copy.detail.labels.seniority} value={opening.seniority} />
             <SummaryRow label={copy.detail.labels.employment} value={opening.employment} />
@@ -137,8 +142,9 @@ export const CareersDetailView = ({ copy, opening }: CareersDetailViewProps) => 
         </div>
       </aside>
     </section>
-  </div>
-)
+    </div>
+  )
+}
 
 const ListSection = ({
   check,

@@ -28,7 +28,8 @@ EJE A — SUPERFICIES front-of-house  (mapeadas al BOW-TIE: adquisición → exp
        │      └─ Glitch              (sección de noticias: blogpost + newsletter
        │                              semanal — IA, Marketing, Negocios)
        ├─ AI Visibility Grader       (tool / lead magnet)
-       ├─ Ebooks · Webinars          (lead magnets)
+       ├─ Ebooks · Webinars · Podcast (lead magnets / thought leadership)
+       ├─ YouTube · canales sociales (distribución y confianza)
        └─ los forms capturan usuarios en etapa temprana → base de nurturing
                           think.efeoncepro.com (Astro) + efeoncepro.com/blog (WP)
 
@@ -44,6 +45,8 @@ EJE A — SUPERFICIES front-of-house  (mapeadas al BOW-TIE: adquisición → exp
 
   3. Experiencia  (una capa, DOS caras)
        ├─ Cliente:   portal cliente / sky-efeonce ──▶ experiencia.efeoncepro.com
+       │             + Experiencia Efeonce: aprendizaje, networking, contenido,
+       │               webinars/podcast/tools y comunidad alrededor del servicio
        └─ Operador:  cockpit interno Greenhouse   (back-of-house, tenant internal)
 
 EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más vendes")
@@ -72,11 +75,18 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 - **La capa de experiencia tiene dos caras** — cliente (sky → `experiencia.efeoncepro.com`)
   y operador (cockpit Greenhouse). Mismo runtime, audiencias y jobs distintos
   (esto es lo que separa Nexa cliente vs Nexa operador y su navegación).
+- **Experiencia Efeonce excede el portal.** El cliente contrató entrada a un
+  ecosistema de crecimiento: operación, software, aprendizaje, contenido, tools,
+  networking y memoria. Greenhouse es el command center que vuelve esa experiencia
+  visible y acumulable; no sustituye YouTube, sociales, webinars, podcast, ebooks
+  ni sesiones de comunidad.
 - **Think es EL hub de contenido** (destino), con jerarquía de propiedades:
   `Think (hub) → Marketing con Manzanitas (blog · marca editorial flagship) →
   Glitch (sección de noticias: blogpost + newsletter semanal, IA/Marketing/
   Negocios)`, más tools/lead magnets como hermanos del blog (grader, ebooks,
-  webinars). El bloque Gutenberg `efeoncepro/glitch-drop` (TASK-1337) es solo el
+  webinars, podcast). YouTube y canales sociales son distribución/relación del
+  mismo sistema editorial, no capas rivales. El bloque Gutenberg
+  `efeoncepro/glitch-drop` (TASK-1337) es solo el
   módulo de render de Glitch, no la sección. Modelo mental = HubSpot (destino con
   Blog + free tools + newsletter). Distribución por **web + email**. **Hub de
   marca ≠ host:** cada pieza tiene UNA URL canónica; el split de runtime actual

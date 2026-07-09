@@ -1,6 +1,7 @@
 # Job Brief / Scorecard template
 
 Fill with the hiring manager at intake. This is the contract that seeds sourcing + the assessment.
+After this exists, use `templates/job-offer-recipe.md` to turn the internal brief into a public vacancy with inbound recruiting.
 
 ## Role
 
@@ -29,6 +30,18 @@ Fill with the hiring manager at intake. This is the contract that seeds sourcing
 
 > Skills-based, not credential-based. Cut the wishlist. Every competency maps to an assessment step.
 
+## Efeonce Operating Code behaviors (job-related evidence)
+
+Use `docs/operations/EFEONCE_OPERATING_CODE_V1.md`. Do not use vague "culture fit"; evaluate observable behaviors required for Efeonce work.
+
+| Behavior | Must-have? | How we'll assess | Evidence expected |
+|---|---|---|---|
+| Transparency: shows state, risks and decisions with context |  | structured interview / reference / work sample |  |
+| Education: raises client/team judgment |  | structured interview / work sample |  |
+| Memory: leaves reusable learning, data or assets |  | portfolio / work sample / reference |  |
+| Impact: connects work to business or decision quality |  | structured interview / case |  |
+| System: reduces fragmentation across capabilities/tools |  | structured interview / case |  |
+
 ## Assessment plan (from competencies)
 
 - Template (Greenhouse `hiring_assessment_template`):
@@ -46,4 +59,5 @@ Fill with the hiring manager at intake. This is the contract that seeds sourcing
 
 - [ ] Every step is job-related / validity-oriented
 - [ ] No proxy for a protected class; no emotion/biometric AI
+- [ ] Operating Code behaviors are evaluated with evidence, not affinity
 - [ ] AI (if used) proposes only; human confirms; candidate can be told why

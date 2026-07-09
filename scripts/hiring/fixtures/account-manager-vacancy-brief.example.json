@@ -1,0 +1,38 @@
+{
+  "idempotencyKey": "vacancy-account-manager-marketing-20260709",
+  "sourceReference": "job-brief-account-manager-marketing-20260709",
+  "requestedRole": "Account Manager / Especialista en Marketing",
+  "publicTitle": "Account Manager / Especialista en Marketing",
+  "publicSummary": "Lidera cuentas de crecimiento combinando criterio operativo, marketing generalista y coordinación de especialistas.",
+  "publicDescription": "Buscamos a alguien que cuide la relación diaria con clientes, convierta prioridades de negocio en próximos pasos claros y coordine campañas, contenidos, SEO y proveedores con memoria operativa.",
+  "responsibilities": [
+    "Gestionar la relación diaria con clientes y mantener claridad sobre estado, riesgos y próximos pasos.",
+    "Coordinar campañas, contenidos, SEO, growth tasks y proveedores externos.",
+    "Preparar actualizaciones ejecutivas con foco en decisiones y aprendizaje reutilizable."
+  ],
+  "requirements": [
+    "Experiencia operando cuentas, proyectos o clientes de marketing digital.",
+    "Nociones prácticas de SEO, contenido, performance o growth.",
+    "Capacidad de ordenar prioridades, levantar riesgos y coordinar especialistas."
+  ],
+  "niceToHave": [
+    "Experiencia en agencia, consultora o equipos de crecimiento.",
+    "Familiaridad con HubSpot, analytics, paid media o automatización."
+  ],
+  "skillTags": [
+    "Marketing",
+    "SEO",
+    "Vendor management",
+    "Liderazgo operativo"
+  ],
+  "publicArea": "Marketing",
+  "workMode": "remote",
+  "hiringRegion": "LATAM",
+  "seniority": "L2",
+  "employmentMode": "Jornada completa",
+  "engagementType": "on_going",
+  "fulfillmentMode": "internal_hire",
+  "demandOrigin": "manual_internal",
+  "priority": "high",
+  "publicProcessNotes": "Postulación, conversación inicial, assessment práctico y entrevista final."
+}

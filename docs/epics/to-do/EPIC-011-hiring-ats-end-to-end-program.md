@@ -94,6 +94,12 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1364` — **Assessment Validity Feedback Loop**: link assessment score → real hire outcome (quality-of-hire 90d/6m) to measure predictive validity; read-only, advisory, feeds EU AI-Act technical documentation. `backend-data`. Blocked by `TASK-1360`. (From the `greenhouse-talent-people-operator` review of TASK-1360 — validity gap.)
 - `TASK-1365` — **Adverse-Impact & Fairness Monitoring**: privacy-safe aggregate monitoring of selection rates across groups (4/5ths) + drift; voluntary self-ID separated from the decision; observes, never adjusts; required for EU AI-Act bias testing. `backend-data`. Blocked by `TASK-1360`. (From the `greenhouse-talent-people-operator` review — fairness gap.)
 
+### Publication + Growth Forms apply extension (Delta 2026-07-09)
+
+- `TASK-1371` — **Hiring Vacancy Publication Operator Command**: structured backend-data operator `dryRun|execute|publish` for publishing openings from approved briefs without release/SQL/UI-only flow. Adds structured public fields (`public_work_mode`, `public_hiring_region`, location, `public_area`, `public_skill_tags`, optional compensation band), publish guards, CLI/API internal surface and idempotency via the API Platform command ledger.
+- `TASK-1372` — **Growth Forms Application Upload + ATS Destination Foundation**: makes Growth Forms a real application-form source of truth for CV/private upload and Hiring/ATS destination.
+- `TASK-1373` — **Careers Apply Native Growth Form Migration**: migrates `/public/careers/[publicId]/apply` to the native `<greenhouse-form>` renderer after `TASK-1372`.
+
 ## Existing Related Work
 
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
