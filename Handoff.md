@@ -1,3 +1,17 @@
+## Sesion 2026-07-09 - Release acotado PR #152 Careers/TASK-1371 - Codex - PRODUCCION
+
+> **Pedido:** hacer `commit + push` y release rapido/acotado del bloque Careers/TASK-1371, evitando la ceremonia larga de releases anteriores.
+>
+> **Push/PR:** `develop` se empujo con el commit local `0cfced559 chore(careers): polish public copy and release evidence`. El PR #152 (`Release: TASK-1371 careers structured public fields and copy polish`) quedo inicialmente `CONFLICTING` por la divergencia squash de `main`; se aplico el camino canonico del runbook (`git merge origin/main -X ours --no-edit`) y se empujo el merge `fa1b58a03` con arbol identico a `develop` (`git diff --stat origin/develop..HEAD` vacio). Squash merge a `main`: `fa2581eaf5367f2c25b6fb5bd5b14add3335253c`.
+>
+> **Release:** production release run `29015217854`, target `fa2581eaf5367f2c25b6fb5bd5b14add3335253c`, manifest `fa2581eaf536-2080521e-d750-4a38-a3d7-83754a5cd086`. Se uso `bypass_preflight_reason` documentado para fresh-main/lote con migracion, con gates locales verdes. Preflight, record, approval, Vercel READY, workers, Azure no-diff y `/api/auth/health` pasaron. El job final `Transition release_manifests -> released` quedo queued/stale despues de runtime verde; se solicito cancel del run y se cerraron las transiciones por CLI canonico `pnpm release:orchestrator-transition-state` (no SQL). Manifest final: `released`, `started_at=2026-07-09T11:35:22Z`, `completed_at=2026-07-09T11:51:23Z`, `manifest_seconds=962`.
+>
+> **Smoke production Careers:** `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009` responde 200 en desktop1440/mobile390 sirviendo Sentry release `fa2581eaf536`; muestra `Ubicacion=LATAM`, `Modalidad=Remoto`, no `Modalidad=LATAM`, sin overflow. Chips de `Competencias clave` en prod: `Marketing`, `SEO`, `Vendor management`, `Liderazgo operativo`; no fragments largos de requisitos. Apply mobile `/apply` responde 200, muestra el rol, sin overflow y con release `fa2581eaf536`. No se intento submit Turnstile para mantener release acotado.
+>
+> **Watchdog/Cloud Run:** primer `pnpm release:watchdog --json` local corrio sin PG env y cayo al fallback GitHub, reportando drift viejo `915be...` para workers; es falso para este cierre. Rerun con `GREENHOUSE_POSTGRES_*` uso manifest correcto y quedo solo `ops-worker` como drift label (`gh=fa2581eaf536`, `run=0cfced559316`). Direct Cloud Run confirma `commercial-cost-worker`, `ico-batch-worker` y `hubspot-greenhouse-integration` con `GIT_SHA=fa2581eaf536...`; `ops-worker` con `GIT_SHA=0cfced559316...`. Verificacion definitiva: `git diff --name-only 0cfced559316502233e8a550ca588ea1a7049897 fa2581eaf5367f2c25b6fb5bd5b14add3335253c` devuelve 0 paths, por lo que el residual `ops-worker` es label drift por merge/squash, no runtime drift. No redeployar solo para alinear etiqueta.
+>
+> **Tiempo:** cronometro formal desde `2026-07-09T11:20:48Z`; cierre registrado en `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`. Tiempo agente E2E aproximado: ~40m, runtime green a 10m10s desde run start, manifest 16m02s.
+
 ## Sesion 2026-07-09 - TASK-1371 execution intake - Codex - backend-data
 
 > **Pedido:** ejecutar `TASK-1371` para crear el operador programatico de publicacion de vacantes.

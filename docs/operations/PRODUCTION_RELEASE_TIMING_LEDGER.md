@@ -77,6 +77,7 @@ stop  = release comunicado con evidencia + docs/handoff actualizados
 |---|---|---|---|---|---|---:|---:|---:|---:|---|---|
 | 2026-07-09 | Codex | `433cfa2b0fd3-9964d4e9-438e-4b69-bd62-f068a05c8b97` | `28991488376` | `433cfa2b0fd3a022143ff869448b901042db530d` | TASK-354 public careers route + flags iniciales | No medido formalmente | 12m14s | 10m09s | 11m05s | Ninguno critico; workers normales | Happy path tecnico: workflow cerca de 12m, pero no sirve para evaluar eficiencia del agente porque no mide preparacion/revision/cierre. |
 | 2026-07-09 | Codex | `915be02a86ab-7c6aa11e-b9c1-4990-8086-cdfacb3a763b` | `28999468657` | `915be02a86abfd49c71365af8a647f9fdfa35207` | Release acoplado PR #151: fix de inferencia/responsabilidades careers + vacante Account Manager | No medido formalmente; **estimacion operador >=2h** incluyendo revisar, analizar, release, diagnostico, watchdog, docs y respuesta | 26m47s | 21m50s | 13m04s | `transition-released` queued/stale + persecucion innecesaria de watchdog/`ops-worker` residual | La duracion relevante para eficiencia por agente fue >=2h, no 21m50s. Separar agente E2E de control plane. Desde este punto el agente debe cronometrar E2E. |
+| 2026-07-09 | Codex | `fa2581eaf536-2080521e-d750-4a38-a3d7-83754a5cd086` | `29015217854` | `fa2581eaf5367f2c25b6fb5bd5b14add3335253c` | PR #152: TASK-1371 Careers campos publicos estructurados + UI/copy polish + fix live `Modalidad=LATAM` | ~40m medido desde `2026-07-09T11:20:48Z` hasta cierre documental/final | 21m12s hasta cancel request procesado; runtime green a 10m10s | 16m02s | 10m10s | `transition-released` queued/stale despues de runtime verde; watchdog local sin PG env cayo a fallback GH y reporto falso drift viejo | Release acotado: Vercel READY antes de dispatch, bypass preflight documentado por fresh-main/migracion, transition cerrado por CLI canonico tras cancelar run stale; `ops-worker` quedo en `0cfced559316` pero `git diff 0cfced559316..fa2581eaf536` = 0, residual de label por squash/merge. |
 
 ### Nota 2026-07-09 — Codex release acoplado PR #151
 
@@ -98,6 +99,44 @@ smoke/verificacion: no medido formalmente
 docs/handoff/final: no medido formalmente
 total agente E2E: estimacion operador >=2h
 ```
+
+### Nota 2026-07-09 — Codex release acotado PR #152
+
+Cronometro formal iniciado en `2026-07-09T11:20:48Z`. El operador pidio
+`commit + push` y un release rapido, sin la ceremonia completa. Se hizo PR #152
+`develop -> main`, squash merge a `fa2581eaf5367f2c25b6fb5bd5b14add3335253c`
+y dispatch del orquestador con `bypass_preflight_reason` documentado porque el
+lote incluia migraciones/fresh-main y los gates locales ya estaban verdes.
+
+Desglose medido:
+
+```text
+preparacion/revision: ~4m (leer contratos minimos, confirmar clean tree y push)
+PR/merge: ~8m (PR #152, merge origin/main -X ours por divergencia squash, push, squash merge)
+orquestador/control-plane: 10m10s hasta runtime verde; 16m02s manifest; 21m12s hasta cancel/stale run
+post-release diagnosis/watchdog: ~6m (watchdog sin PG env -> falso drift; rerun con PG env; ops-worker diff_count=0)
+smoke/verificacion: ~4m (health 200, Careers detail/apply desktop/mobile, Cloud Run GIT_SHA)
+docs/handoff/final: ~8m (ledger + handoff + docs commit/push)
+total agente E2E: ~40m
+```
+
+Evidencia operativa:
+
+- Manifest `released`, `started_at=2026-07-09T11:35:22Z`,
+  `completed_at=2026-07-09T11:51:23Z`, `manifest_seconds=962`.
+- GitHub run `29015217854` dejo todos los jobs runtime verdes y
+  `/api/auth/health` verde, pero el job `Transition release_manifests -> released`
+  quedo `queued`; se solicito cancel y se cerraron las transiciones por
+  `pnpm release:orchestrator-transition-state`, no SQL.
+- Careers production sirve Sentry release `fa2581eaf536`; detalle
+  `EO-OPN-0009` muestra `Ubicacion=LATAM`, `Modalidad=Remoto`, no
+  `Modalidad=LATAM`, sin overflow desktop/mobile.
+- Cloud Run directo: `commercial-cost-worker`, `ico-batch-worker` y
+  `hubspot-greenhouse-integration` sirven `GIT_SHA=fa2581eaf536...`.
+  `ops-worker` sirve `0cfced559316...`; `git diff --name-only
+  0cfced559316502233e8a550ca588ea1a7049897
+  fa2581eaf5367f2c25b6fb5bd5b14add3335253c` devuelve 0 paths, asi que es
+  residual de label, no drift runtime.
 
 ## Desglose obligatorio desde el siguiente release
 
