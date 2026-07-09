@@ -1,3 +1,41 @@
+## Sesion 2026-07-09 - TASK-1374/1375 ebook landing /web-agentica (efeonce-think) - Claude - PLANNING/DOCS
+
+> **Pedido:** analizar el PR #12 de `efeoncepro/efeonce-think` (ebook landing
+> "El fin de la web") e incorporarlo de forma segura en una URL corta SEO-friendly,
+> sin romper la estructura; luego crear task y pasar a `/implement-task`.
+>
+> **Analisis:** el PR es un export estatico de una herramienta de diseno (design
+> system foraneo `_ds/` + DM Sans + `support.js`, form muerto `setState`, sin SEO
+> ni GTM, URL con `/index.html`, PR de fork nunca desplegado). Veredicto: NO
+> mergear; re-autorar como pagina Astro nativa. Fundamentado con skills astro
+> (overlay efeonce-think), arch-architect y modern-ui.
+>
+> **URL elegida (operador):** `/web-agentica` (corta, keyword on-theme).
+> **Acento (operador):** Navy + Teal — el teal es `#36c8bf`, el que ya usa
+> `/brand-visibility` (`HeroAnswerLens.astro`); se tokeniza en `report-tokens.ts`.
+> NUNCA el naranja `#ff6501` del export.
+>
+> **Creado:** `TASK-1374` (ui-ux/motion, in-progress) = la landing `/web-agentica`
+> nativa con `BaseLayout` (SEO+GTM), tokens AXIS/Geist, efectos CSS portados y form
+> gobernado; trio UI robusto (wireframe/flow/motion). `TASK-1375` (backend-data,
+> to-do) = foundation del Growth Form del ebook + entrega + surface/origin +
+> destination HubSpot, que desbloquea el slice 3 (form embed) de TASK-1374.
+>
+> **Estado:** planificacion completa, cero codigo en efeonce-think todavia. El
+> operador eligio crear la foundation primero y diferir el port visual. Slice 3 de
+> TASK-1374 bloqueado por TASK-1375; TASK-1375 bloqueada por el ebook PDF (contenido).
+>
+> **Ojo (WIP ajeno):** el clone `/Users/jreye/Documents/efeonce-think` (main) tiene
+> WIP sucio NO relacionado (embed HubSpot Meetings: `preview/meeting-embed.astro` +
+> `EfeonceMeetingEmbed.astro` + `astro.config` sitemap filter + README). NO tocarlo
+> ni commitearlo al implementar; stagear solo archivos propios.
+>
+> **Siguiente paso:** implementar TASK-1375 (publicar el Growth Form del ebook) o,
+> si se prioriza el visual, TASK-1374 slices 1-2 (scaffold+SEO / port a navy+teal
+> con GVC loop). Ambos entran por `/implement-task`.
+
+---
+
 ## Sesion 2026-07-09 - Public Site Demo 35 Blog Magazine layout review - Codex - READ-ONLY/DOCS
 
 > **Pedido:** revisar y documentar `Demo 35: Blog Magazine` como layout elegido

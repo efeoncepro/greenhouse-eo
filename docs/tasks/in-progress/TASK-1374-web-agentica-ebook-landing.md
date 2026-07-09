@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -22,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `content|ui`
-- Blocked by: `none` (slices 1–2 desbloqueados; slice de form embed depende de la foundation del ebook, ver Dependencies)
+- Blocked by: `TASK-1375` (solo el slice 3 — form embed; slices 1–2 scaffold+SEO / port visual quedan desbloqueados)
 - Branch: `task/TASK-1374-web-agentica-ebook-landing`
 - Legacy ID: `PR efeoncepro/efeonce-think #12 (feat/landing-fin-desarrollo-tradicional)`
 - GitHub Issue: `none`
@@ -351,8 +351,15 @@ Puntos clave de implementación:
 - Confirmar el **Epic** correcto (EPIC-019 público vs epic del hub Think) — ver Open Questions.
 - Evaluar convergencia futura Think → `efeonce-web` (misma marca/URL final) para esta landing.
 
+## Delta 2026-07-09
+
+- **Decisión de acento (operador):** la landing usa **Navy + Teal**, NO el naranja del PR ni amber. Y el teal ya existe y está en uso en Think: **`#36c8bf`**, la firma visual del hero de `/brand-visibility` (`src/components/HeroAnswerLens.astro`), junto al navy `#001a33` y los azules `#4b8dff`/`#7eb1ff`. El navy base sale del `axis.accent` de `report-tokens.ts`. En slice 2 se **tokeniza el teal `#36c8bf`** en `report-tokens.ts` (hoy está inline en HeroAnswerLens) para que la landing lo consuma como var, no HEX crudo. NUNCA el naranja `#ff6501` del export.
+- **Secuencia (operador):** primero se crea la **foundation backend-data** (TASK-1375) para desbloquear el slice 3; el port visual (slices 1–2) queda diferido a después de la foundation.
+- **Slice 3 Blocked by → TASK-1375** (ebook Growth Form + entrega + PDF + surface/origin).
+
 ## Open Questions
 
+- **Token teal — RESUELTO:** el teal es `#36c8bf` (ya en uso en `/brand-visibility`, `HeroAnswerLens.astro`). En slice 2 se tokeniza en `report-tokens.ts` y la landing lo consume como var.
 - **Epic**: se asignó `EPIC-019` (público/content marketing) por defecto; confirmar si el hub Think tiene un epic propio (TASK-1325/1326 son lead-magnet hub) al que deba colgarse.
 - **Entrega del ebook**: ¿sólo email, o también descarga directa on-screen si el contrato expone un enlace? Por defecto, email (patrón lead magnet + copy del PR).
 - **Correo corporativo**: ¿el form del ebook exige correo corporativo (como el grader) o acepta cualquier email? Decidir en la foundation.
