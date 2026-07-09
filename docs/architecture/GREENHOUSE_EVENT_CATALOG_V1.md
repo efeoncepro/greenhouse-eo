@@ -1166,6 +1166,7 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | `hiring.opening.published` / `hiring.opening.unpublished` | v1 | `hiring_opening` | `publishOpening` / `unpublishOpening` (publication contract) | — |
 | `hiring.candidate_facet.created` / `hiring.candidate_facet.updated` | v1 | `hiring_candidate_facet` (`candidate_facet_id` `cndf-{uuid}`) | store `reconcileCandidateFacet` (upsert person-first) | — |
 | `hiring.application.created` / `hiring.application.stage_changed` | v1 | `hiring_application` (`application_id` `happ-{uuid}`) | store `createHiringApplication` / `updateHiringApplicationStage` | — |
+| `hiring.application.decided` | v1 | `hiring_application` (`application_id` `happ-{uuid}`) | `decideHiringApplication` (TASK-355) | TASK-356 materializará el handoff downstream |
 
 **Payload v1**: ids + campos de estado (status/stage/source), sin PII (el detalle se re-lee del aggregate en `greenhouse_hiring.*`). Emitidos **transaccionalmente** en el mismo `withGreenhousePostgresTransaction` que el write del aggregate (nunca best-effort fuera de la tx). **Sin consumer reactivo en V1** (audit/observabilidad del dominio): el `HiringHandoff` explícito + las proyecciones/señales reactivas (`hiring.signal.*`, promoción a `member`) llegan en TASK-356. Aggregate types nuevos: `talent_demand`, `hiring_opening`, `hiring_candidate_facet`, `hiring_application` (`AGGREGATE_TYPES` en `src/lib/sync/event-catalog.ts`). Dominio de observabilidad: `captureWithDomain(err, 'hiring', …)`.
 

@@ -5,7 +5,7 @@
 - Priority: `P1`
 - Effort: `Alto`
 - Required checkpoint: `human`
-- Status: `pending approval`
+- Status: `code complete 2026-07-09; rollout/dependencies pending`
 - Goal: implementar el HTML interactivo aprobado con fidelidad visual y conductual de alto detalle, conectado a contratos reales y sin copiar semántica demo al runtime.
 - Branch strategy: permanecer en `develop` por confirmación del goal; excepción documentada, sin push remoto automático.
 
@@ -35,7 +35,7 @@
 - TASK-1362 (candidate document resolver) y TASK-1363 (taking/review UI) siguen `to-do`. TASK-355 debe dejar adapters/slots reales y estados degradados explícitos; no inventar documentos ni scorecards autoritativos.
 - `hiring.application.decided` todavía no existe en `EVENT_TYPES`; el publisher de TASK-355 necesita registrar el contrato mínimo para que TASK-356 lo consuma después.
 - `hiring_application` ya posee snapshot de decisión/handoff. El reason estructurado se guardará en `explainability_json.decisionHistory[]` bajo row lock y transacción, preservando history append-only sin introducir un segundo aggregate prematuro; el snapshot current permanece en columnas canónicas.
-- La task propone viewCodes `agency.hiring.*`, pero el registry vigente usa el namespace de sección `gestion.*`. Antes del seed se corregirá la spec a `gestion.hiring`, `gestion.hiring_demand`, `gestion.hiring_pipeline`, `gestion.hiring_publication` y `gestion.hiring_application_detail`, manteniendo rutas `/agency/hiring/**`.
+- La spec ya fue corregida al namespace vigente: `gestion.hiring`, `gestion.hiring_demand`, `gestion.hiring_pipeline`, `gestion.hiring_publication` y `gestion.hiring_application_detail`, manteniendo rutas `/agency/hiring/**`.
 - `GreenhouseDragList` hoy solo reordena una lista y no tiene contrato cross-lane/keyboard. Se extenderá de forma additive para agrupación/transfer; el menú “Mover a etapa” y la state machine optimistic quedan en el consumer Hiring.
 
 ## Solution quality assessment

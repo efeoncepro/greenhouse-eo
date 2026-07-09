@@ -2,6 +2,7 @@
 
 ## 2026-07-09
 
+- **TASK-355 Hiring Desk — control room interno code complete en dev.** Se implementaron Demand, Pipeline, Application 360 y Publication bajo `CompositionShell`, fieles al HTML aprobado y conectados al runtime Hiring real. Incluye drawer de demanda con plantillas/dirty guard/split action; Kanban `HiringApplication` drag + teclado + optimistic rollback; assessment advisory con revisión/edición/confirmación humana de sugerencias IA; PII masked y degradación honesta hasta TASK-1362; decisión gobernada idempotente con reason, historial append-only y evento transaccional `hiring.application.decided`; publicación allowlist con `revalidatePath`. Views `gestion.hiring*` + rutas alcanzables y migración aplicadas en Cloud SQL dev. Build/tests/access/GVC 1440+390 verdes. Estado: code complete, rollout staging/production pendiente; sin push/deploy.
 - **Growth Forms — entrega tokenizada de asset (ebook lead magnets) + ebook web-agentica
   (TASK-1375, code-complete staging).** Nuevo primitive reusable: tabla server-only
   `greenhouse_growth.form_asset` (form → asset entregable), ruta pública gated

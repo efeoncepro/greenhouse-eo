@@ -187,10 +187,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             children: [
               { label: nl(GH_AGENCY_NAV.team), href: '/agency/team', icon: 'tabler-friends' },
               { label: nl(GH_AGENCY_NAV.talentDiscovery), href: '/agency/talent-discovery' },
+              { label: nl(GH_AGENCY_NAV.hiring), href: '/agency/hiring', icon: 'tabler-users-plus' },
               { label: nl(GH_AGENCY_NAV.staffAugmentation), href: '/agency/staff-augmentation' }
             ].filter(item => {
               if (item.href === '/agency/team') return canSeeView('gestion.equipo', true)
               if (item.href === '/agency/talent-discovery') return canSeeView('gestion.equipo', true)
+              if (item.href === '/agency/hiring') return canSeeView('gestion.hiring', false)
               if (item.href === '/agency/staff-augmentation') return canSeeView('gestion.staff_augmentation', true)
 
               return true

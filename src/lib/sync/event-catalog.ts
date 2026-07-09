@@ -1096,6 +1096,7 @@ export const EVENT_TYPES = {
   hiringCandidateFacetUpdated: 'hiring.candidate_facet.updated',
   hiringApplicationCreated: 'hiring.application.created',
   hiringApplicationStageChanged: 'hiring.application.stage_changed',
+  hiringApplicationDecided: 'hiring.application.decided',
 
   // TASK-1360 — Assessment Engine. Sin consumer reactivo en V1 (audit/observabilidad).
   hiringAssessmentTemplateCreated: 'hiring.assessment.template_created',

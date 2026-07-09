@@ -38,6 +38,8 @@ export interface MetricSummaryCardProps {
    * title + value (el dato clave nunca desaparece; condensación honesta, nunca clip).
    */
   density?: CardDensityRequest
+  /** Refuerza el título con `text.primary` cuando el card es KPI principal de una superficie. */
+  titleEmphasis?: boolean
 }
 
 /**
@@ -58,7 +60,8 @@ const MetricSummaryCard = ({
   statusLabel,
   statusTone = 'secondary',
   statusIcon,
-  density: densityRequest
+  density: densityRequest,
+  titleEmphasis = false
 }: MetricSummaryCardProps) => {
   const reduced = useReducedMotion()
   // SSR-safe: el reveal sólo activa su `initial` (offset de entrada) tras montar; en el primer render (SSR +
@@ -91,9 +94,10 @@ const MetricSummaryCard = ({
   // caja(200ms)/contenido(300ms) da el efecto Transformer. Solo en el path adaptable; legacy byte-idéntico.
   const reveal = (key: string, show: boolean, node: ReactNode, staggerIndex = 0): ReactNode => {
     if (!adaptive) return show ? node : null
+    if (reduced) return show ? node : null
 
     // Cascada: cada pieza arranca con un delay según su orden de lectura. Reduced-motion → sin delay.
-    const delay = reduced ? 0 : staggerIndex * cardDensityRevealStaggerSec
+    const delay = staggerIndex * cardDensityRevealStaggerSec
 
     return (
       <AnimatePresence key={`reveal-${key}`} initial={false}>
@@ -115,7 +119,7 @@ const MetricSummaryCard = ({
 
   const titleNode = (
     <Stack direction='row' spacing={1} alignItems='center' sx={{ minWidth: 0 }}>
-      <Typography variant='subtitle1' sx={{ fontWeight: 600 }} noWrap>
+      <Typography variant='subtitle1' color={titleEmphasis ? 'text.primary' : undefined} sx={{ fontWeight: 600 }} noWrap>
         {title}
       </Typography>
       {tooltip ? (

@@ -109,6 +109,7 @@ const enUS: NavigationCopy = {
     services: { label: 'Services', subtitle: 'Services contracted by Space' },
     sampleSprints: { label: 'Sample Sprints', subtitle: 'Commercial pilots, trials and discovery' },
     staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding and assignment economics' },
+    hiring: { label: 'Hiring', subtitle: 'Demand, applicants and decisions' },
     economics: { label: 'Economics', subtitle: 'P&L and profitability' },
     team: { label: 'Capacity', subtitle: 'Team workload and allocation' },
     talentDiscovery: { label: 'Talent', subtitle: 'Discovery and ranking' },

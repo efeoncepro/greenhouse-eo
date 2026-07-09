@@ -1,5 +1,6 @@
 ## Estado vigente para agentes
 
+- **TASK-355 Hiring Desk code complete en dev, rollout pendiente (2026-07-09):** rutas internas `/agency/hiring`, `/pipeline`, `/applications/[id]` y `/publication` materializan Demand, Kanban, Application 360 y governance de publicación sobre el dominio real `src/lib/hiring/**`. Shell canónica `CompositionShell`; cards adaptativas; drag + menú de teclado + rollback; assessment review consume TASK-1360/1361 con confirmación humana; decisión gobernada `POST /api/hiring/applications/[id]/decide` exige capability `hiring.application.decide:execute`, idempotencia y reason, conserva `decisionHistory[]` append-only y emite `hiring.application.decided` transaccional. Views vigentes: `gestion.hiring*` (no el namespace stale `agency.hiring.*`), migración aplicada en Cloud SQL dev y reachability verde. PII se mantiene masked; reveal real sigue en TASK-1362. GVC PASS 1440/390 para las cuatro superficies + drawer/error/rollback. No está desplegado a staging/production.
 - **Public Site Demo 35 blog layout candidate (2026-07-09):** el operador eligio
   `Demo 35: Blog Magazine` (`page_id=225984`, `/homedemo35-elementor/`) como
   base visual para la futura pagina principal del blog/content hub. Es una

@@ -166,7 +166,7 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 - [ ] Demand (tabla server-side) · Pipeline (kanban `RoadmapBoard`, card=`HiringApplication`, `updateHiringApplicationStage`) · 360 (tabs + assessment 1363 + docs 1362 + decisión) · Publication (diff + publish).
 - [ ] Kanban con **alternativa por teclado** + optimistic+rollback; a11y axe verde.
 - [ ] `decideHiringApplication`: humano decide, reason estructurado, idempotencia + audit; scorecard advisory.
-- [ ] viewCodes `agency.hiring.*` con ruta alcanzable (reachability) mismo PR; `role_view_fallback=0`.
+- [ ] viewCodes `gestion.hiring*` con ruta alcanzable (reachability) mismo PR; `role_view_fallback=0`.
 - [ ] PII masked/reveal (capability+reason+audit); Publication solo allowlist; publish → `revalidatePath`.
 - [ ] Readers del 360 anti silent-catch (degradación honesta).
 - [ ] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia.

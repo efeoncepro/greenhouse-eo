@@ -118,6 +118,7 @@ export type {
   ActionsCopy,
   AriaCopy,
   CareersCopy,
+  HiringDeskCopy,
   EmptyCopy,
   EmailsCopy,
   ErrorsCopy,

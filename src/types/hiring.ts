@@ -251,6 +251,61 @@ export interface HiringApplication {
   updatedAt: string
 }
 
+/**
+ * Razón humana y defendible de una decisión. El score/AI puede aportar evidencia,
+ * pero nunca sustituye este juicio explícito del operador.
+ */
+export interface HiringDecisionReason {
+  summary: string
+  evidence?: string[]
+  overridesAdvisory?: boolean
+}
+
+export interface HiringDecisionHistoryEntry {
+  decisionId: string
+  idempotencyKey: string
+  decision: HiringDecision
+  decidedAt: string
+  decidedBy: string | null
+  reason: HiringDecisionReason
+  selectedDestination: HiringFulfillmentMode | null
+  tentativeStartDate: string | null
+  expectedLegalEntity: string | null
+  expectedContext: string | null
+  prerequisitesSnapshot: Record<string, unknown>
+  supersedesDecisionId: string | null
+}
+
+export interface HiringDeskOpeningSummary {
+  opening: HiringOpening
+  demand: TalentDemand
+  applicationCount: number
+  activeApplicationCount: number
+}
+
+export interface HiringDeskApplicationSummary {
+  application: HiringApplication
+  candidateName: string
+  candidateInitials: string
+  maskedEmail: string | null
+  portfolioUrl: string | null
+  linkedinUrl: string | null
+  openingTitle: string
+  openingPublicId: string
+  area: string | null
+}
+
+export interface HiringDeskSnapshot {
+  openings: HiringDeskOpeningSummary[]
+  applications: HiringDeskApplicationSummary[]
+  totals: {
+    openings: number
+    applications: number
+    publishedOpenings: number
+    activeDemands: number
+  }
+}
+
 // ── Public opening projection (allowlist-only — consumido por TASK-354 careers) ──
 // NUNCA incluye owner, budget/rate, risk, notes internos, score ni cliente confidencial.
 
@@ -403,6 +458,23 @@ export interface CreateHiringApplicationInput {
   nextStepAt?: string | null
   notes?: string | null
   dedupeFingerprint?: string | null
+}
+
+export interface DecideHiringApplicationInput {
+  decision: HiringDecision
+  reason: HiringDecisionReason
+  idempotencyKey: string
+  selectedDestination?: HiringFulfillmentMode | null
+  tentativeStartDate?: string | null
+  expectedLegalEntity?: string | null
+  expectedContext?: string | null
+  prerequisitesSnapshot?: Record<string, unknown>
+}
+
+export interface DecideHiringApplicationResult {
+  application: HiringApplication
+  decisionEntry: HiringDecisionHistoryEntry
+  idempotentReplay: boolean
 }
 
 export interface ListTalentDemandFilters {
