@@ -6455,6 +6455,19 @@ export interface GreenhouseGrowthEmailVerificationCache {
   verified_tier: Generated<string>;
 }
 
+export interface GreenhouseGrowthFormAsset {
+  active: Generated<boolean>;
+  asset_kind: Generated<string>;
+  content_type: Generated<string>;
+  created_at: Generated<Timestamp>;
+  file_name: string;
+  form_asset_id: Generated<string>;
+  form_id: string;
+  object_name: string;
+  ttl_hours: Generated<number>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseGrowthFormDefinition {
   created_at: Generated<Timestamp>;
   created_by: string | null;
@@ -11349,6 +11362,7 @@ export interface DB {
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
   "greenhouse_growth.email_verification_cache": GreenhouseGrowthEmailVerificationCache;
+  "greenhouse_growth.form_asset": GreenhouseGrowthFormAsset;
   "greenhouse_growth.form_definition": GreenhouseGrowthFormDefinition;
   "greenhouse_growth.form_destination": GreenhouseGrowthFormDestination;
   "greenhouse_growth.form_destination_attempt": GreenhouseGrowthFormDestinationAttempt;
