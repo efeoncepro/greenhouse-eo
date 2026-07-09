@@ -1,3 +1,17 @@
+## Sesion 2026-07-09 - Public Site footer Careers CTA live - Codex
+
+> **Pedido:** despues de commitear la auditoria, agregar en el footer publico un enlace/boton a Careers para que las personas puedan ver vacantes y postular.
+>
+> **Commit previo:** `05b21f743 docs(public-site): audit footer careers entry` dejo versionada la auditoria read-only antes de mutar el sitio.
+>
+> **Cambio live:** en `efeoncepro.com`, se actualizo solo `widget_block[31]` dentro de `ohio-sidebar-footer-3` bajo `Unete a nuestro equipo`. CTA agregado: `Ver vacantes y postular` -> `https://greenhouse.efeoncepro.com/public/careers`, `target="_blank"`, `rel="noopener noreferrer"`. `people@efeoncepro.com` queda como canal secundario.
+>
+> **Rollback:** snapshot WordPress `gh_backup_before_footer_careers_link_20260709T122602Z` con `ohio-sidebar-footer-3`, `widget_block[31]` y `widget_block[32]` previos. Para revertir: restaurar `widget_block_target_before` en `widget_block[31]`, flush WP cache, purge Kinsta y repetir browser audit.
+>
+> **Cache/verificacion:** `wp cache flush` y `wp kinsta cache purge --all` OK. Browser audit OK en Home + SEO desktop1440/mobile390: link unico visible, label correcto, target/rel correctos, `scrollWidth == clientWidth`; destino Careers `HTTP/2 200`. Evidencia: `.captures/public-footer-careers-link-20260709T1226/`.
+>
+> **Nota:** no se tocaron deudas vecinas del footer (links demo Ohio/Colabrio/ThemeForest/Figma, Instagram malformado, social `#`, labels accesibles, newsletter/legal copy mixto).
+
 ## Sesion 2026-07-09 - Public Site footer audit para Careers - Codex - READ-ONLY
 
 > **Pedido:** revisar el footer del sitio publico antes de agregar un acceso a Careers/vacantes, sin modificar el sitio live, entendiendo su comportamiento y documentandolo.
