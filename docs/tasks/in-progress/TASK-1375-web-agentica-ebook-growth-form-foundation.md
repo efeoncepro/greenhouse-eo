@@ -249,10 +249,13 @@ Slices refinados: A1 migración `form_asset` → A2 ruta gated stream → A3 han
 - **B2** form publicado config-driven + idempotente (`ebook-forms.registry.ts` + `growth:forms:publish-ebook`): campos Nombre/Apellido/correo-corporativo/rol-opcional/consent, gate `corporate_email`, `destination_policy=greenhouse_only`, success_card thank-you + puente `/brand-visibility`, handoff `assetDownload`, surface `fhsf-web-agentica-ebook` (origin think), fila `form_asset`.
 - **Datos para el embed en la landing (TASK-1374):** `form_key = db1e254c-e762-41ae-a85f-50b29dc33ba5`, `surface = fhsf-web-agentica-ebook`.
 
-**Follow-ups (NO bloquean la descarga on-screen):**
+**Email de respaldo — DONE (B4, code-complete + verificado visualmente):**
+
+- Email agency-branded (Efeonce) `growth_ebook_delivery` (`src/emails/EbookDeliveryEmail.tsx`) + dispatch `sendEbookDeliveryEmail` (`src/lib/growth/forms/ebook-delivery.ts`) + consumer reactivo `growth_ebook_delivery_from_submission` sobre `submission_accepted` (drenado por `ops-reactive-growth`). **GENÉRICO por ebook**: el contenido (título/bajada/puente) sale del `success_behavior` del propio form; el link es la ruta gated (`/api/public/growth/forms/{slug}/asset/{submissionId}`), NUNCA adjunta el PDF. Flag `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` default OFF (ledger). Render verificado + 4 tests de gates.
+
+**Follow-up restante (NO bloquea la descarga on-screen):**
 
 - **HubSpot destination** (entrega del lead) + **property mapping del rol** (el operador aún no tiene la property mapeada) — B3.
-- **Email de respaldo** con el link a la ruta gated (consumer reactivo sobre `submission_accepted`) — necesita copy.
 
 **Rollout pendiente (Runtime Rollout Completion Gate — NO operativamente completo):** subir el PDF al bucket privado de **prod**; publicar el form en prod; verificar flags (`GROWTH_FORMS_PUBLIC_API_ENABLED`, `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` para el gate corporativo); **deploy del bundle `renderer-latest.js`** (handoff `download_url`); Turnstile hostname think; smoke real browser (Turnstile + CORS) — coordinar con el embed de TASK-1374. Estado: **code complete, rollout pendiente.**
 

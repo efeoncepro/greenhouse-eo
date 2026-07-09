@@ -13,9 +13,12 @@
   Primer consumer: ebook "El fin de la web" (`/web-agentica`) — PDF subido al bucket privado,
   form publicado config-driven + idempotente (registry `ebook-forms.registry.ts` +
   `pnpm growth:forms:publish-ebook`), corporate email gate + success_card thank-you + puente al
-  grader. Agregar un ebook nuevo = una config + un comando. Follow-ups: HubSpot destination +
-  email de respaldo. Rollout pendiente (prod bucket/publish, flags, deploy `renderer-latest.js`,
-  smoke real). Playbook: `docs/reference/ebook-lead-magnet-playbook.md`.
+  grader. Agregar un ebook nuevo = una config + un comando. **Email de respaldo** (B4): email
+  agency-branded genérico (`growth_ebook_delivery`) + consumer reactivo sobre `submission_accepted`
+  que envía el LINK gated de descarga (nunca adjunta el PDF); contenido del `success_behavior` del
+  form (sirve para todos los ebooks); flag `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` default OFF.
+  Follow-up: HubSpot destination + property del rol. Rollout pendiente (prod bucket/publish, flags,
+  deploy `renderer-latest.js` + ops-worker, smoke real). Playbook: `docs/reference/ebook-lead-magnet-playbook.md`.
 - **Public Site content hub — Demo 35 documentado como layout candidato.** Se
   reviso read-only `Demo 35: Blog Magazine` (`page_id=225984`,
   `/homedemo35-elementor/`) como base visual elegida para la futura home del
