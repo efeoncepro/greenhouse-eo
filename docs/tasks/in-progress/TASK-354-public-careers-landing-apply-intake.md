@@ -39,7 +39,10 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 - **UI code complete:** `/public/careers/**` implementado con alta fidelidad al HTML local `carreers`, usando marca Efeonce externa, home employer-brand, listado, detalle, apply y estados no disponibles. Listing/detalle consumen solo `PublicOpeningPayload`; apply postea a `POST /api/public/hiring/applications`.
 - **Apply como Growth Form, sin write path paralelo:** el formulario usa contrato browser de Growth Forms (`formKind='application'`, slug `efeonce-careers-application`, schema/campos/consent/captcha y eventos `gh_form_*`) con estética del HTML fuente; la autoridad de negocio sigue siendo Hiring/TASK-1367.
 - **CV con Greenhouse uploader/asset pipeline:** el apply público acepta un PDF opcional y lo adjunta como asset privado a `hiring_application` usando `createPrivatePendingAsset` + `attachAssetToAggregate`. No usa el endpoint privado del componente autenticado en browser público.
+- **GVC runtime formalizado:** se agregó `scripts/frontend/scenarios/task354-careers-runtime-audit.scenario.ts` para capturar home/listing/detalle/apply/uploader en desktop 1440 + mobile 390 con gates layout/runtime/keyboard/reduced-motion. El loop detectó targets tocables pequeños y se corrigieron brand/footer/privacy links en `careers.module.css`.
+- **Paridad HTML verificada:** comparación Playwright + `sharp` contra `/Users/jreye/Documents/carreers/Efeonce Carrers/Efeonce Careers.dc.html` en desktop 1440 y mobile 390. La diferencia visual esperada es contenido runtime (1 opening seed) vs baseline estático (6 openings) y ausencia del overlay de revisión del HTML.
 - **Rollout iniciado por instrucción del operador:** `HIRING_PUBLIC_APPLICATIONS_ENABLED=true` y `NEXT_PUBLIC_TURNSTILE_SITE_KEY` quedaron seteados en Vercel `staging` y `Production` el 2026-07-09; `TURNSTILE_SECRET` existe en ambos. Falta build fresco + release control plane + smoke staging/prod para cerrar.
+- **Release control plane:** el preflight contra `develop`/`main` queda bloqueado por `release_batch_policy` (`split_batch`: 787 archivos, dominios sensibles `payroll + auth_access + cloud_release + db_migrations`). No es blocker de código TASK-354, pero impide declarar producción cerrada sin dividir batch o aprobar marker `[release-coupled: reason]`.
 - **Límite explícito:** `revalidatePath` on-demand al publicar/despublicar queda en TASK-355 (Publication Desk). Esta UI ya usa ISR (`revalidate=300`) y no crea un publish command paralelo.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -61,7 +64,7 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 - Motion: `docs/ui/motion/TASK-354-public-careers-landing-motion.md`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Code complete; rollout en curso`
+- Status real: `Code complete; rollout pendiente por release_batch_policy`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`
@@ -293,7 +296,7 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 ### Production verification sequence
 
 1. Deploy staging + sembrar un opening publicado real (via 355/353).
-2. GVC careers-listing/detail/apply desktop+mobile mirados; `scrollWidth==clientWidth`; consola limpia.
+2. GVC `task354-careers-runtime-audit` desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia.
 3. Postular de punta a punta contra staging → verificar application creada (por el service 1367) + confirmación genérica.
 4. Repetir en prod vía release pipeline.
 
@@ -331,10 +334,14 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 - `pnpm task:lint --task TASK-354`
 - `pnpm ops:lint --changed`
 - `pnpm docs:closure-check`
+- `pnpm fe:capture task354-careers-runtime-audit --env=local --task TASK-354`
 - `pnpm fe:capture --route=/public/careers --env=local --hold=1500`
 - `pnpm fe:capture --route=/public/careers/EO-OPN-0006 --env=local --hold=1500`
 - `pnpm fe:capture --route=/public/careers/EO-OPN-0006/apply --env=local --hold=1500`
 - Playwright local smoke desktop/mobile: home/detail/apply 200, consola limpia, `scrollWidth == clientWidth`, Growth Forms contract visible, validation events `gh_form_*`.
+- Playwright local smoke con CV PDF: `202 accepted`, application creada y asset privado `hiring_application_cv` adjunto; limpieza posterior de seed/application/asset en dev PG/GCS.
+- Parity audit local: `.captures/task354-html-parity-2026-07-09T02-04-49/{source-html,runtime-next,compare}-{desktop1440,mobile390}.png`.
+- GVC runtime green: `.captures/2026-07-09T02-04-07_task354-careers-runtime-audit/` (12 frames, desktop1440 + mobile390, console/runtime/layout/keyboard/reduced-motion).
 
 ## Closing Protocol
 

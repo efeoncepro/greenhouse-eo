@@ -117,6 +117,7 @@
   display: flex;
   align-items: center;
   min-width: 0;
+  min-height: 32px;
   gap: 14px;
 }
 
@@ -1892,6 +1893,9 @@
 }
 
 .consentText a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
   color: var(--primary);
   font-weight: 800;
 }
@@ -2030,6 +2034,12 @@
   gap: 18px;
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.8125rem;
+}
+
+.footerLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
 }
 
 .footerLinks a:hover {
