@@ -6,7 +6,7 @@
 > **Ultima actualizacion:** 2026-07-03 por Claude (pipeline ideate → author → run)
 > **Modulo:** Public Site / Content Factory / Astro binding
 > **Comandos/API:** `pnpm public-website:content-factory:{ideate,author,run,validate,plan}`, `pnpm public-website:*`, `GET /api/admin/public-site/binding`
-> **Documentacion relacionada:** `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`, `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`, `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
+> **Documentacion relacionada:** `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`, `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`, `docs/documentation/public-site/wordpress-blog-content-hub-search.md`, `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
 
 ## Antes de empezar
 
@@ -89,6 +89,12 @@ privado**; publicar es siempre tu paso final.
 2. Usa inspect o inspect-post-deep para una pagina/post especifico.
 3. Revisa fingerprints, bloques, SEO, assets y layout notes.
 4. Guarda evidencia versionada si la decision importa.
+
+Para trabajo de content hub/blog, carga tambien
+`docs/documentation/public-site/wordpress-blog-content-hub-search.md` y
+`docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`.
+La categoria forma parte del permalink de posts (`/%category%/%postname%/`), por
+lo que retaxonomizar contenido publicado requiere mapa de URL/canonical/redirect.
 
 ## Leer el binding Astro/Vercel desde Greenhouse
 

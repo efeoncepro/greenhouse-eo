@@ -94,7 +94,9 @@ DB agregada:
 ## Documentacion relacionada
 
 - `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
+- `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`
 - `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md`
+- `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`
 - `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`

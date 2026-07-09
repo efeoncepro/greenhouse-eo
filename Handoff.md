@@ -1,3 +1,173 @@
+## Sesion 2026-07-09 - TASK-1374/1375 ebook landing /web-agentica (efeonce-think) - Claude - PLANNING/DOCS
+
+> **Pedido:** analizar el PR #12 de `efeoncepro/efeonce-think` (ebook landing
+> "El fin de la web") e incorporarlo de forma segura en una URL corta SEO-friendly,
+> sin romper la estructura; luego crear task y pasar a `/implement-task`.
+>
+> **Analisis:** el PR es un export estatico de una herramienta de diseno (design
+> system foraneo `_ds/` + DM Sans + `support.js`, form muerto `setState`, sin SEO
+> ni GTM, URL con `/index.html`, PR de fork nunca desplegado). Veredicto: NO
+> mergear; re-autorar como pagina Astro nativa. Fundamentado con skills astro
+> (overlay efeonce-think), arch-architect y modern-ui.
+>
+> **URL elegida (operador):** `/web-agentica` (corta, keyword on-theme).
+> **Acento (operador):** Navy + Teal — el teal es `#36c8bf`, el que ya usa
+> `/brand-visibility` (`HeroAnswerLens.astro`); se tokeniza en `report-tokens.ts`.
+> NUNCA el naranja `#ff6501` del export.
+>
+> **Creado:** `TASK-1374` (ui-ux/motion, in-progress) = la landing `/web-agentica`
+> nativa con `BaseLayout` (SEO+GTM), tokens AXIS/Geist, efectos CSS portados y form
+> gobernado; trio UI robusto (wireframe/flow/motion). `TASK-1375` (backend-data,
+> to-do) = foundation del Growth Form del ebook + entrega + surface/origin +
+> destination HubSpot, que desbloquea el slice 3 (form embed) de TASK-1374.
+>
+> **Estado:** TASK-1375 (foundation backend-data) **code-complete local (staging)**, rollout
+> pendiente. Implementado: primitive reusable de entrega tokenizada de asset (tabla `form_asset`
+> + ruta gated `/api/public/growth/forms/[slug]/asset/[handle]` proxy-stream + handoff renderer
+> `download_url`; 228 tests + typecheck verdes) y el ebook web-agentica como primer consumer (PDF
+> 9MB subido al bucket privado staging; form publicado idempotente config-driven — `form_key
+> db1e254c-e762-41ae-a85f-50b29dc33ba5`, surface `fhsf-web-agentica-ebook`, corporate gate +
+> success_card + assetDownload). Publisher genérico idempotente (`ebook-forms.registry.ts` +
+> `pnpm growth:forms:publish-ebook`): agregar un ebook = una config + un comando (pedido operador).
+> Playbook actualizado. **Follow-ups:** HubSpot destination + property del rol + email de respaldo
+> (necesitan HubSpot form + copy). **Rollout:** subir PDF a prod, publicar form en prod, flags,
+> deploy `renderer-latest.js`, smoke real. TASK-1374 (landing) sigue pendiente de implementar; el
+> slice 3 (embed) ya tiene su `form_key`/`surface`. Landings de casos de éxito = flujo hermano
+> (mismo patrón config-driven).
+>
+> **Ojo (WIP ajeno):** el clone `/Users/jreye/Documents/efeonce-think` (main) tiene
+> WIP sucio NO relacionado (embed HubSpot Meetings: `preview/meeting-embed.astro` +
+> `EfeonceMeetingEmbed.astro` + `astro.config` sitemap filter + README). NO tocarlo
+> ni commitearlo al implementar; stagear solo archivos propios.
+>
+> **Siguiente paso:** implementar TASK-1375 (publicar el Growth Form del ebook) o,
+> si se prioriza el visual, TASK-1374 slices 1-2 (scaffold+SEO / port a navy+teal
+> con GVC loop). Ambos entran por `/implement-task`.
+
+---
+
+## Sesion 2026-07-09 - Public Site Demo 35 Blog Magazine layout review - Codex - READ-ONLY/DOCS
+
+> **Pedido:** revisar y documentar `Demo 35: Blog Magazine` como layout elegido
+> para la futura pagina principal del blog/content hub, sin aplicar cambios de
+> momento.
+>
+> **Resultado:** auditoria canonica creada en
+> `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md` y
+> enlazada desde `docs/audits/public-site/README.md`,
+> `docs/documentation/public-site/wordpress-blog-content-hub-search.md`,
+> `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`,
+> `docs/public-site/PRODUCT_ROADMAP.md`, `project_context.md`, `changelog.md` y
+> skills `efeonce-public-site-wordpress` Codex/Claude.
+>
+> **Hallazgos clave:** `Demo 35` es page Elementor/Ohio publicada (`page_id=225984`,
+> `/homedemo35-elementor/`), no `page_for_posts`; tiene 55 containers, 58 widgets
+> y 15 `ohio_recent_posts`. Sirve como layout magazine (hero, rails 75/25,
+> banners, features, staff picks, suscripcion), pero no como contenido final:
+> posts demo/attachments, `See More` con `href="#"`, links externos
+> `ohio.clbthemes.com`, banners `/demo35/category/...` 404 y CF7 newsletter sin
+> HubSpot mapping. Render read-only sin overflow horizontal en desktop 1440 y
+> mobile 390.
+>
+> **Siguiente paso recomendado:** cuando el operador pida cambios, trabajar sobre
+> copia/draft gobernada o mutacion explicita con snapshot; mapear widget por
+> `path`/ID, reemplazar contenido demo, corregir CTAs/rutas y conectar
+> suscripcion a contrato medible antes de considerar cutover del hub.
+
+## Sesion 2026-07-09 - Public Site WordPress blog/content hub/search audit - Codex - READ-ONLY
+
+> **Pedido:** revisar profundamente como el sitio publico/WordPress maneja blog,
+> entradas, taxonomias, categorias, estilos Ohio, paginas y busqueda para preparar
+> el refresh del content hub, y documentarlo en docs/skills.
+>
+> **Evidencia:** `pnpm public-website:discover -- --authenticated --wpcli --write`
+> genero `docs/operations/discovery-public-website-wordpress-20260709.md`;
+> `pnpm public-website:content-factory:inspect -- --write` genero
+> `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-2026-07-09T13-17-44-170Z.json`.
+> WP-CLI read-only consulto posts/taxonomias/search/options/templates/sidebar y
+> smoke HTTP reviso `/glitch/`, `/?s=hubspot` y `/search/hubspot/`. No hubo
+> mutaciones en WordPress/Kinsta/cache/runtime.
+>
+> **Hallazgos clave:** posts viven como `post` + Gutenberg; no hay `page_for_posts`;
+> permalinks `/%category%/%postname%/`; Ohio parent gobierna `index.php`,
+> `search.php`, `single.php` y `parts/blog_grid/*`; search nativo mezcla posts,
+> paginas, attachments, Elementor landings y Ohio portfolio, con Yoast
+> `noindex, follow`; sidebar/blog y tags arrastran deuda demo de Ohio/ThemeForest.
+>
+> **Docs/skills actualizados:** auditoria
+> `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`,
+> contrato funcional `docs/documentation/public-site/wordpress-blog-content-hub-search.md`,
+> manual `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`,
+> indices `docs/audits/public-site/README.md`, `docs/public-site/README.md`,
+> `docs/public-site/PRODUCT_ROADMAP.md`, docs Content Factory/Gutenberg, skills
+> `efeonce-public-site-wordpress` Codex/Claude (`SKILL.md`,
+> `references/content-factory-gutenberg.md`, `references/runtime-and-discovery.md`),
+> `project_context.md` y `changelog.md`.
+>
+> **Siguiente trabajo recomendado:** crear tareas separadas para taxonomia editorial
+> canonica, limpieza de demo posts/categorias/tags/sidebar, buscador editorial
+> `post` only, URL canonica del hub WP vs Think/Astro y medicion CTA/newsletter/grader.
+
+## Sesion 2026-07-09 - Public Site footer Careers-only canonized in skills - Codex
+
+> **Pedido:** documentar el cambio del footer Careers-only en skills y donde corresponda, luego commitear.
+>
+> **Documentacion actualizada:** el contrato del footer global quedo canonizado en `.codex/skills/efeonce-public-site-wordpress/references/runtime-and-discovery.md` y `.claude/skills/efeonce-public-site-wordpress/references/runtime-and-discovery.md`. Tambien se agrego nota en `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md`, `project_context.md` y `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`.
+>
+> **Contrato vigente:** el footer visible lo renderiza Ohio child theme + widgets (`ohio-sidebar-footer-3`, `widget_block[31]`), no `eoh_site_settings_footer_*`; Careers es el unico camino publico de postulacion desde el footer (`Ver vacantes y postular` -> `https://greenhouse.efeoncepro.com/public/careers`); no reintroducir `people@efeoncepro.com` salvo decision explicita del operador. Verificacion futura minima: Home + una landing de servicio, desktop1440/mobile390, link unico, target/rel, correo ausente y `scrollWidth == clientWidth`.
+
+## Sesion 2026-07-09 - Public Site footer Careers-only path - Codex
+
+> **Pedido:** quitar el correo del footer para que postulaciones y consulta de vacantes se manejen por Careers.
+>
+> **Cambio live:** se actualizo solo `widget_block[31]` dentro de `ohio-sidebar-footer-3`. Se removio el parrafo `O escribenos a people@efeoncepro.com`; queda solo la pregunta `¿Te interesa trabajar con nosotros?` y el CTA `Ver vacantes y postular` -> `https://greenhouse.efeoncepro.com/public/careers`, `target="_blank"`, `rel="noopener noreferrer"`.
+>
+> **Rollback:** snapshot WordPress `gh_backup_before_footer_careers_email_removal_20260709T123047Z` con `ohio-sidebar-footer-3`, `widget_block[31]` y `widget_block[32]` previos a quitar el correo. Para revertir: restaurar `widget_block_target_before` en `widget_block[31]`, flush WP cache, purge Kinsta y repetir browser audit.
+>
+> **Cache/verificacion:** `wp cache flush` y `wp kinsta cache purge --all` OK. Browser audit OK en Home + SEO desktop1440/mobile390: link unico visible, label correcto, target/rel correctos, `people@efeoncepro.com` ausente, helper de email ausente, `scrollWidth == clientWidth`. Evidencia: `.captures/public-footer-careers-email-removed-20260709T1230/`.
+
+## Sesion 2026-07-09 - Public Site footer Careers CTA live - Codex
+
+> **Pedido:** despues de commitear la auditoria, agregar en el footer publico un enlace/boton a Careers para que las personas puedan ver vacantes y postular.
+>
+> **Commit previo:** `05b21f743 docs(public-site): audit footer careers entry` dejo versionada la auditoria read-only antes de mutar el sitio.
+>
+> **Cambio live:** en `efeoncepro.com`, se actualizo solo `widget_block[31]` dentro de `ohio-sidebar-footer-3` bajo `Unete a nuestro equipo`. CTA agregado: `Ver vacantes y postular` -> `https://greenhouse.efeoncepro.com/public/careers`, `target="_blank"`, `rel="noopener noreferrer"`. `people@efeoncepro.com` queda como canal secundario.
+>
+> **Rollback:** snapshot WordPress `gh_backup_before_footer_careers_link_20260709T122602Z` con `ohio-sidebar-footer-3`, `widget_block[31]` y `widget_block[32]` previos. Para revertir: restaurar `widget_block_target_before` en `widget_block[31]`, flush WP cache, purge Kinsta y repetir browser audit.
+>
+> **Cache/verificacion:** `wp cache flush` y `wp kinsta cache purge --all` OK. Browser audit OK en Home + SEO desktop1440/mobile390: link unico visible, label correcto, target/rel correctos, `scrollWidth == clientWidth`; destino Careers `HTTP/2 200`. Evidencia: `.captures/public-footer-careers-link-20260709T1226/`.
+>
+> **Nota:** no se tocaron deudas vecinas del footer (links demo Ohio/Colabrio/ThemeForest/Figma, Instagram malformado, social `#`, labels accesibles, newsletter/legal copy mixto).
+
+## Sesion 2026-07-09 - Public Site footer audit para Careers - Codex - READ-ONLY
+
+> **Pedido:** revisar el footer del sitio publico antes de agregar un acceso a Careers/vacantes, sin modificar el sitio live, entendiendo su comportamiento y documentandolo.
+>
+> **Resultado:** auditoria documentada en `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`, enlazada desde `docs/audits/public-site/README.md`. No se hizo mutacion en WordPress, Elementor, Kinsta, cache, theme ni Greenhouse runtime.
+>
+> **Source of truth:** el footer visible de `efeoncepro.com` es `footer#colophon.site-footer.clb__dark_section` renderizado por el child theme Ohio + sidebars/widgets WordPress, no por los settings headless `eoh_site_settings_footer_*`. Runtime template: `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/themes/ohio-child/parts/elements/footer.php`, que cuenta `ohio-sidebar-footer-1..4` y renderiza `dynamic_sidebar(...)`.
+>
+> **Mapa operativo:** `ohio-sidebar-footer-3` contiene `ohio_widget_subscribe-2`, `block-32 | Unete a nuestro equipo` y `block-31 | ¿Te interesa trabajar con nosotros?people@efeoncepro.com`. Ese es el lugar natural para agregar el link/CTA `Ver vacantes abiertas` hacia `https://greenhouse.efeoncepro.com/public/careers`. El footer actual no tiene ningun link a `greenhouse` ni `careers`.
+>
+> **Evidencia:** Playwright read-only en Home, AEO, SEO y Social, desktop1440 + mobile390, sin overflow horizontal; artefactos en `.captures/public-footer-readonly-20260709/` (`footer-audit.json`, screenshots Home desktop/mobile). WP-CLI read-only confirmo sidebars/widgets.
+>
+> **Deudas detectadas pero NO corregidas:** recursos demo Ohio/Colabrio/ThemeForest/Figma siguen visibles; Instagram apunta a `instagram.com.com`; un icono social apunta a `#`; social anchors no tienen labels accesibles observados; newsletter usa `Subscribete`/`Subscribirme` y CF7 `en_US`; legal links siguen en ingles; targets externos/internos son inconsistentes. No mezclar estas limpiezas con el enlace de Careers salvo scope explicito.
+
+## Sesion 2026-07-09 - Release acotado PR #152 Careers/TASK-1371 - Codex - PRODUCCION
+
+> **Pedido:** hacer `commit + push` y release rapido/acotado del bloque Careers/TASK-1371, evitando la ceremonia larga de releases anteriores.
+>
+> **Push/PR:** `develop` se empujo con el commit local `0cfced559 chore(careers): polish public copy and release evidence`. El PR #152 (`Release: TASK-1371 careers structured public fields and copy polish`) quedo inicialmente `CONFLICTING` por la divergencia squash de `main`; se aplico el camino canonico del runbook (`git merge origin/main -X ours --no-edit`) y se empujo el merge `fa1b58a03` con arbol identico a `develop` (`git diff --stat origin/develop..HEAD` vacio). Squash merge a `main`: `fa2581eaf5367f2c25b6fb5bd5b14add3335253c`.
+>
+> **Release:** production release run `29015217854`, target `fa2581eaf5367f2c25b6fb5bd5b14add3335253c`, manifest `fa2581eaf536-2080521e-d750-4a38-a3d7-83754a5cd086`. Se uso `bypass_preflight_reason` documentado para fresh-main/lote con migracion, con gates locales verdes. Preflight, record, approval, Vercel READY, workers, Azure no-diff y `/api/auth/health` pasaron. El job final `Transition release_manifests -> released` quedo queued/stale despues de runtime verde; se solicito cancel del run y se cerraron las transiciones por CLI canonico `pnpm release:orchestrator-transition-state` (no SQL). Manifest final: `released`, `started_at=2026-07-09T11:35:22Z`, `completed_at=2026-07-09T11:51:23Z`, `manifest_seconds=962`.
+>
+> **Smoke production Careers:** `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009` responde 200 en desktop1440/mobile390 sirviendo Sentry release `fa2581eaf536`; muestra `Ubicacion=LATAM`, `Modalidad=Remoto`, no `Modalidad=LATAM`, sin overflow. Chips de `Competencias clave` en prod: `Marketing`, `SEO`, `Vendor management`, `Liderazgo operativo`; no fragments largos de requisitos. Apply mobile `/apply` responde 200, muestra el rol, sin overflow y con release `fa2581eaf536`. No se intento submit Turnstile para mantener release acotado.
+>
+> **Watchdog/Cloud Run:** primer `pnpm release:watchdog --json` local corrio sin PG env y cayo al fallback GitHub, reportando drift viejo `915be...` para workers; es falso para este cierre. Rerun con `GREENHOUSE_POSTGRES_*` uso manifest correcto y quedo solo `ops-worker` como drift label (`gh=fa2581eaf536`, `run=0cfced559316`). Direct Cloud Run confirma `commercial-cost-worker`, `ico-batch-worker` y `hubspot-greenhouse-integration` con `GIT_SHA=fa2581eaf536...`; `ops-worker` con `GIT_SHA=0cfced559316...`. Verificacion definitiva: `git diff --name-only 0cfced559316502233e8a550ca588ea1a7049897 fa2581eaf5367f2c25b6fb5bd5b14add3335253c` devuelve 0 paths, por lo que el residual `ops-worker` es label drift por merge/squash, no runtime drift. No redeployar solo para alinear etiqueta.
+>
+> **Tiempo:** cronometro formal desde `2026-07-09T11:20:48Z`; cierre registrado en `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`. Tiempo agente E2E aproximado: ~40m, runtime green a 10m10s desde run start, manifest 16m02s.
+
 ## Sesion 2026-07-09 - TASK-1371 execution intake - Codex - backend-data
 
 > **Pedido:** ejecutar `TASK-1371` para crear el operador programatico de publicacion de vacantes.

@@ -51,6 +51,8 @@ export const RENDERER_ALLOWED_PAYLOAD_KEYS = [
   // TASK-1336 tokenized_report handoff — handle público del run + URL de status (browser-safe).
   'run_handle',
   'status_url',
+  // TASK-1375 asset download handoff — URL pública GATED de descarga del asset (browser-safe).
+  'download_url',
 ] as const
 export type RendererAllowedPayloadKey = (typeof RENDERER_ALLOWED_PAYLOAD_KEYS)[number]
 

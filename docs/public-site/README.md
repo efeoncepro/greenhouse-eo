@@ -59,6 +59,12 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   Business Context Pack `docs/context/`.
 - **SEO/AEO:** skill `seo-aeo` (+ framework propietario "5 niveles" y overlay
   Efeonce) — la doctrina de posicionamiento en búsqueda + IA.
+- **Content hub/blog WordPress:** contrato operativo vigente en
+  [`docs/documentation/public-site/wordpress-blog-content-hub-search.md`](../documentation/public-site/wordpress-blog-content-hub-search.md)
+  y auditoria base
+  [`docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`](../audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md).
+  Layout candidato elegido: `Demo 35: Blog Magazine`, documentado en
+  [`docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`](../audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md).
 - **Grader / dominio growth:** `architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`.
 
 ## Convención de PDR

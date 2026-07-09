@@ -225,6 +225,13 @@ Ohio/WordPress agregan clases al `body` que cambian layout, header, sidebar y mo
 | `.site-footer .widget-title` | Titulos footer | Typography/color puede venir de Ohio global footer options. |
 | `.site-footer-copyright` | Copyright/footer legal | No mezclar con eslogan/marca. |
 
+Contrato vigente del footer global (2026-07-09):
+
+- El footer visible de `efeoncepro.com` se renderiza desde Ohio child theme + sidebars/widgets WordPress, no desde `eoh_site_settings_footer_*`.
+- La entrada Careers vive en `ohio-sidebar-footer-3`, `block-32 | Unete a nuestro equipo` + `block-31`.
+- `block-31` debe mantener Careers como camino unico: CTA `Ver vacantes y postular` hacia `https://greenhouse.efeoncepro.com/public/careers`; no reintroducir `people@efeoncepro.com` en el footer publico salvo decision explicita del operador.
+- Fuente canonica, rollback y evidencia: `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`.
+
 ### Widgets Ohio y clases frontend
 
 | Selector / patron | Widget / origen | Nota |

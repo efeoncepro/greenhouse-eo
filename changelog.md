@@ -2,6 +2,52 @@
 
 ## 2026-07-09
 
+- **Growth Forms — entrega tokenizada de asset (ebook lead magnets) + ebook web-agentica
+  (TASK-1375, code-complete staging).** Nuevo primitive reusable: tabla server-only
+  `greenhouse_growth.form_asset` (form → asset entregable), ruta pública gated
+  `GET /api/public/growth/forms/[slug]/asset/[handle]` (handle = `submission_id`; valida
+  aceptada + TTL; proxy-stream desde el bucket privado, sin signed-URL), y handoff del
+  renderer (`successBehavior.kind='asset_access'` + `assetDownload.downloadPathTemplate` →
+  emite `download_url` en `gh_form_submission_accepted`; key en ambos allowlists; parity +
+  no-leak verdes). El ebook se descarga SOLO tras completar el form (sin submit no hay handle).
+  Primer consumer: ebook "El fin de la web" (`/web-agentica`) — PDF subido al bucket privado,
+  form publicado config-driven + idempotente (registry `ebook-forms.registry.ts` +
+  `pnpm growth:forms:publish-ebook`), corporate email gate + success_card thank-you + puente al
+  grader. Agregar un ebook nuevo = una config + un comando. **Email de respaldo** (B4): email
+  agency-branded genérico (`growth_ebook_delivery`) + consumer reactivo sobre `submission_accepted`
+  que envía el LINK gated de descarga (nunca adjunta el PDF); contenido del `success_behavior` del
+  form (sirve para todos los ebooks); flag `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` default OFF.
+  Follow-up: HubSpot destination + property del rol. Rollout pendiente (prod bucket/publish, flags,
+  deploy `renderer-latest.js` + ops-worker, smoke real). Playbook: `docs/reference/ebook-lead-magnet-playbook.md`.
+- **Public Site content hub — Demo 35 documentado como layout candidato.** Se
+  reviso read-only `Demo 35: Blog Magazine` (`page_id=225984`,
+  `/homedemo35-elementor/`) como base visual elegida para la futura home del
+  blog. Quedo documentado que es una pagina Elementor/Ohio publicada, no
+  `page_for_posts`, con 55 containers, 58 widgets y 15 `ohio_recent_posts`;
+  renderiza sin overflow en desktop 1440/mobile 390, pero requiere limpiar posts
+  demo/attachments, CTAs `#`, links externos Ohio, rutas `/demo35/category/...`
+  404 y suscripcion CF7 antes de usarse como hub final. Auditoria:
+  `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`.
+
+- **Public Site content hub/blog/search audit canonizada.** Se reviso read-only el
+  blog WordPress vivo de `efeoncepro.com`: posts Gutenberg, categorias/tags,
+  permalinks `/%category%/%postname%/`, archivos Ohio, sidebar, single posts y
+  busqueda nativa. Hallazgos clave: no hay `page_for_posts`; Ohio parent gobierna
+  archive/search/single; search mezcla posts/paginas/landings/portfolio y queda
+  `noindex, follow`; tags/sidebar/posts demo deben limpiarse antes de refrescar el
+  hub. Nuevos docs: `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`,
+  `docs/documentation/public-site/wordpress-blog-content-hub-search.md` y
+  `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`.
+  Skills `efeonce-public-site-wordpress` Codex/Claude sincronizadas.
+
+- **Public Site footer - contrato Careers-only canonizado en skills.** Se llevo el contrato operativo del footer global a las skills `efeonce-public-site-wordpress` de Codex y Claude (`references/runtime-and-discovery.md`) y al inventario Ohio/Elementor. Queda documentado que el footer visible lo renderiza Ohio child theme + widgets (`ohio-sidebar-footer-3`, `widget_block[31]`), que Careers es el unico camino publico de postulacion desde el footer, y que no se debe reintroducir `people@efeoncepro.com` salvo decision explicita del operador. `project_context.md` y la auditoria publica quedaron enlazados.
+
+- **Public Site footer - Careers como unico camino de postulacion.** Se removio `people@efeoncepro.com` del bloque `Unete a nuestro equipo` en el footer global de `efeoncepro.com`, dejando solo el CTA `Ver vacantes y postular` hacia `https://greenhouse.efeoncepro.com/public/careers`. Mutacion acotada a `widget_block[31]` en `ohio-sidebar-footer-3`; backup WordPress `gh_backup_before_footer_careers_email_removal_20260709T123047Z`; cache WP/Kinsta purgada. Verificacion browser en Home + SEO desktop1440/mobile390: email ausente, link unico, visible y sin overflow.
+
+- **Public Site footer - CTA Careers publicado.** Tras commitear la auditoria read-only del footer, se agrego en `efeoncepro.com` un boton `Ver vacantes y postular` bajo `Unete a nuestro equipo`, apuntando a `https://greenhouse.efeoncepro.com/public/careers` con `target="_blank"` y `rel="noopener noreferrer"`. La mutacion fue acotada a `widget_block[31]` en `ohio-sidebar-footer-3`; backup WordPress `gh_backup_before_footer_careers_link_20260709T122602Z`; cache WP/Kinsta purgada. Verificacion browser en Home + SEO desktop1440/mobile390: link unico, visible, destino 200 y sin overflow.
+
+- **Public Site footer - auditoria read-only para entrada a Careers.** Se reviso el footer global de `efeoncepro.com` sin mutar WordPress/Kinsta/runtime y se documento su contrato operativo en `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`. Hallazgo clave: el footer visible lo renderiza Ohio child theme + widgets/sidebars (`ohio-sidebar-footer-*`), no los settings headless `eoh_site_settings_footer_*`; la zona natural para agregar vacantes es el bloque `Unete a nuestro equipo` de `ohio-sidebar-footer-3`, hoy limitado a `people@efeoncepro.com`. La auditoria registra evidencia desktop/mobile sin overflow y separa deudas no corregidas: links demo Ohio, Instagram malformado, placeholder social `#`, labels accesibles faltantes, newsletter/legal copy mixto.
+
 - **Careers públicas — revisión UI + UX writing pre-release local verde.** Se auditó home/listing, detalle `EO-OPN-0009`, apply y 404 en desktop1440, wide2048 y mobile390 antes de agrupar release. GVC local y Playwright product audit quedaron verdes (`failed=[]`): sin overflow de página, controles nombrados, `Ubicación=LATAM` y `Modalidad=Remoto`, chips canónicos y estado inválido del apply correcto. Ajustes aplicados: el H1 de home conserva el diseño visual pero su `textContent` ahora lee `Crece con Efeonce`, no `Crececon Efeonce`; y el namespace de copy Careers se refinó con UX writing/copywriting/brand voice para sacar expresiones excluyentes o demasiado performáticas (`locos`, `Hollywood-level`) y mejorar errores/empty/success con recuperación clara. Criterio documentado: en vacantes de marketing se permite spanglish profesional (`growth`, `performance`, `vendor management`, `brief`, etc.) cuando es vocabulario real del rol; no limpiar términos de oficio por purismo. El círculo `N` de capturas locales se clasificó como indicador dev de Next (`nextjs-portal`), no UI de producto.
 
 - **Careers públicas — fallback legacy de modalidad y chips canonizado en código.** Se corrigió localmente el caso donde una vacante con datos legacy podía mostrar `Ubicación=LATAM` y `Modalidad=LATAM`: la modalidad canónica es `public_work_mode` y, si falta, una región legacy (`LATAM`, `Global`, etc.) degrada a `Remoto` sin perder la ubicación. También se endureció el fallback de competencias para no renderizar fragments de requisitos como chips; `public_skill_tags` sigue siendo la fuente de verdad. Producción sigue mostrando el bug mientras sirva el release anterior `915be02a...`; requiere release/hotfix de código.

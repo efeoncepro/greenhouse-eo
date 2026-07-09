@@ -109,6 +109,24 @@ export type FormSubmissionRow = {
   updated_at: Date
 }
 
+/**
+ * TASK-1375 — asset entregable gated de un form (ebook PDF en bucket privado).
+ * SERVER-ONLY: `object_name` nunca cruza al render contract. La ruta de descarga
+ * resuelve el objeto desde acá por el `form_id` de la submission aceptada.
+ */
+export type FormAssetRow = {
+  form_asset_id: string
+  form_id: string
+  asset_kind: string
+  object_name: string
+  file_name: string
+  content_type: string
+  ttl_hours: number
+  active: boolean
+  created_at: Date
+  updated_at: Date
+}
+
 export type FormDestinationAttemptRow = {
   attempt_id: string
   submission_id: string
@@ -373,12 +391,15 @@ export interface UpsertHostSurfaceInput {
 
 export const insertHostSurface = async (input: UpsertHostSurfaceInput): Promise<FormHostSurfaceRow> => {
   const rows = await query<FormHostSurfaceRow>(
+    // TASK-1375 — honra `surfaceId` si viene (id estable p.ej. `fhsf-web-agentica-ebook`); si no,
+    // usa el DEFAULT (`fhsf-` || gen_random_uuid()). Aditivo/backward-compatible.
     `INSERT INTO greenhouse_growth.form_host_surface (
-       surface_kind, surface_name, origin_allowlist_json, allowed_form_slugs_json,
+       surface_id, surface_kind, surface_name, origin_allowlist_json, allowed_form_slugs_json,
        embed_key_id, embed_key_hash, renderer_channel, csp_requirements_json, status)
-     VALUES ($1, $2, $3::jsonb, $4::jsonb, $5, $6, COALESCE($7,'stable'), $8::jsonb, COALESCE($9,'active'))
+     VALUES (COALESCE($1, 'fhsf-' || gen_random_uuid()::text), $2, $3, $4::jsonb, $5::jsonb, $6, $7, COALESCE($8,'stable'), $9::jsonb, COALESCE($10,'active'))
      RETURNING *`,
     [
+      input.surfaceId ?? null,
       input.surfaceKind,
       input.surfaceName,
       JSON.stringify(input.originAllowlist),
@@ -391,7 +412,7 @@ export const insertHostSurface = async (input: UpsertHostSurfaceInput): Promise<
     ],
   )
 
-  
+
 return rows[0]
 }
 
@@ -577,9 +598,59 @@ export const getSubmissionById = async (submissionId: string): Promise<FormSubmi
     [submissionId],
   )
 
-  
+
 return rows[0] ?? null
 }
+
+/** TASK-1375 — el asset activo que entrega un form (una fila por form). SERVER-ONLY. */
+export const getActiveFormAsset = async (formId: string): Promise<FormAssetRow | null> => {
+  const rows = await query<FormAssetRow>(
+    `SELECT * FROM greenhouse_growth.form_asset WHERE form_id = $1 AND active LIMIT 1`,
+    [formId],
+  )
+
+  return rows[0] ?? null
+}
+
+export interface UpsertFormAssetInput {
+  formId: string
+  objectName: string
+  fileName: string
+  assetKind?: string
+  contentType?: string
+  ttlHours?: number
+}
+
+/**
+ * TASK-1375 — Registra/reemplaza el asset entregable activo de un form (write gobernado).
+ * Desactiva el asset activo previo (append-friendly; el índice parcial exige uno activo por
+ * form) e inserta el nuevo. SERVER-ONLY: `object_name` nunca cruza al render contract.
+ */
+export const upsertActiveFormAsset = async (input: UpsertFormAssetInput): Promise<FormAssetRow> =>
+  withTransaction(async tx => {
+    await tx.query(
+      `UPDATE greenhouse_growth.form_asset SET active = false, updated_at = NOW()
+        WHERE form_id = $1 AND active`,
+      [input.formId],
+    )
+
+    const rows = await tx.query<FormAssetRow>(
+      `INSERT INTO greenhouse_growth.form_asset
+         (form_id, asset_kind, object_name, file_name, content_type, ttl_hours, active)
+       VALUES ($1, COALESCE($2,'ebook'), $3, $4, COALESCE($5,'application/pdf'), COALESCE($6,72), true)
+       RETURNING *`,
+      [
+        input.formId,
+        input.assetKind ?? null,
+        input.objectName,
+        input.fileName,
+        input.contentType ?? null,
+        input.ttlHours ?? null,
+      ],
+    )
+
+    return rows.rows[0]
+  })
 
 export const listSubmissions = async (opts: { formId?: string; limit?: number } = {}): Promise<FormSubmissionRow[]> => {
   const limit = Math.min(Math.max(opts.limit ?? 100, 1), 500)

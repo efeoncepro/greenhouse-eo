@@ -25,6 +25,47 @@ Use this reference for public-site inventory, bridge inspection, runtime repo bi
   Redes Sociales wall assets v1 under `assets/img/social/wall/v1/`; full note
   `docs/operations/public-site-social-wall-media-production-20260708.md`.
 
+## Global Footer Widget Facts
+
+Use this when the user asks to inspect or update the public-site footer. Do not
+mutate the footer during discovery.
+
+- Canonical audit and rollout evidence:
+  `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`.
+- The visible footer is `footer#colophon.site-footer.clb__dark_section`,
+  rendered by the Ohio child theme plus WordPress sidebars/widgets. The current
+  visible footer is not rendered from the headless `eoh_site_settings_footer_*`
+  ACF/options layer.
+- Runtime template:
+  `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/themes/ohio-child/parts/elements/footer.php`.
+  It counts active sidebars `ohio-sidebar-footer-1..4` and renders each through
+  `dynamic_sidebar(...)`.
+- Careers footer entry lives in `ohio-sidebar-footer-3`:
+  `ohio_widget_subscribe-2`, `block-32 | Unete a nuestro equipo`,
+  `block-31 | ¿Te interesa trabajar con nosotros?`.
+- Current Careers contract: footer recruiting is Careers-only. `block-31`
+  renders one CTA, `Ver vacantes y postular`, pointing to
+  `https://greenhouse.efeoncepro.com/public/careers` with `target="_blank"` and
+  `rel="noopener noreferrer"`. Do not re-add `people@efeoncepro.com` to this
+  public footer block unless the operator explicitly reverses the Careers-only
+  decision.
+- Rollback snapshots from the 2026-07-09 rollout:
+  `gh_backup_before_footer_careers_link_20260709T122602Z` and
+  `gh_backup_before_footer_careers_email_removal_20260709T123047Z`. To revert,
+  restore `widget_block_target_before` into `widget_block[31]`, flush WP cache,
+  purge Kinsta, and re-run a footer browser audit.
+- Footer widget writes should snapshot `sidebars_widgets`, `widget_block`, and
+  any Ohio footer widget/options touched. Use the governed WP-CLI eval-file
+  wrapper; do not SQL-edit serialized widget options.
+- After any footer mutation: `wp cache flush`, `wp kinsta cache purge --all`,
+  verify Home plus at least one service landing in desktop `1440` and mobile
+  `390`, assert one Careers link, expected target/rel, no stale email copy, and
+  `scrollWidth === clientWidth`.
+- Adjacent footer debt remains intentionally separate unless scoped: demo
+  Resources links, malformed Instagram URL, placeholder social `#`, missing
+  social accessible labels, newsletter/legal mixed-language copy, and
+  inconsistent link targets.
+
 ## Classic Navigation Menu Facts
 
 Use this when the user asks how to add a URL to the public-site menu. Do not
@@ -190,6 +231,53 @@ wp_update_nav_menu_item(61, 0, [
 
 After any menu write: `wp kinsta cache purge --all`, verify `#menu-primary` and
 `#mobile-menu`, and check dropdown/overflow behavior.
+
+## Blog / Content Hub / Search Facts
+
+Use this when the user asks about the public blog, content hub, WordPress search,
+categories, tags, editorial posts or Glitch.
+
+Canonical docs:
+
+- `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
+- `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`
+- `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`
+- `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`
+
+Runtime observations from the 2026-07-09 read-only audit:
+
+- Posts live as native WordPress `post` and are Gutenberg/block-first.
+- Landing pages are separate from posts and should stay Elementor/Ohio or custom
+  widget governed.
+- `page_for_posts=0`; there is no assigned WP posts page. Category/tag/archive
+  surfaces and search carry the visible blog browsing experience.
+- Post permalinks use `/%category%/%postname%/`. Retaxonomizing a published post
+  can change its URL; require a permalink/canonical/redirect plan.
+- Ohio parent owns archive/search/single rendering: `index.php`, `search.php`,
+  `single.php`, `parts/blog_grid/layout_type*.php`; child theme currently only
+  overrides headline/footer/support CSS for this domain.
+- Effective Ohio blog options observed: `blog_grid_1`, `3-2-1` columns, masonry
+  on, boxed/equal-height cards on, left `ohio-sidebar-blog`, fixed desktop search.
+- Native WP search queries title/excerpt/content and by default mixes `post`,
+  `page`, `attachment`, `e-landing-page`, `e-floating-buttons` and
+  `ohio_portfolio`. Search results are Yoast `noindex, follow`.
+- Current sidebar still contains Ohio/demo debt: external Colabrio promo banner,
+  `Staff Picks`, `Recent Comments`, tag cloud and `Search` button. Do not treat
+  it as final content hub UX.
+- Current categories/tags include real editorial lines plus demo/duplicate/typo
+  debt. Do not use tags as public navigation until cleanup.
+- `eo-vibe-coding-api` has a `blog-hub` scaffold, but it is not a finished hub.
+- `Demo 35: Blog Magazine` (`page_id=225984`, `/homedemo35-elementor/`) is the
+  operator-selected visual layout candidate for the blog home. It is an
+  Elementor/Ohio page, not native `page_for_posts`: 55 containers, 58 widgets,
+  15 `ohio_recent_posts`, no horizontal overflow in desktop 1440/mobile 390.
+  Treat it as layout reference only until demo posts/attachments, `href="#"`,
+  external Ohio links, `/demo35/category/...` 404s and CF7 subscription wiring
+  are cleaned up.
+
+Recommended next steps for a content hub refresh: separate tasks for editorial
+taxonomy, demo content/sidebar cleanup, post-only/editorial search, canonical hub
+URL, and measurement/CTA wiring.
 
 ## Runtime Repo Binding
 

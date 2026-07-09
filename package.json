@@ -103,6 +103,8 @@
     "growth:forms:activate-aeo-reference-copy": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-reference-copy-contract.ts",
     "growth:forms:activate-aeo-success-card": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-success-card-contract.ts",
     "growth:forms:activate-grader-tokenized-report": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-grader-tokenized-report-handoff.ts",
+    "growth:forms:upload-asset": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/upload-form-asset.ts",
+    "growth:forms:publish-ebook": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/publish-ebook-form.ts",
     "growth:forms:activate-grader-premium-intake": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-grader-premium-intake-contract.ts",
     "growth:forms:verify-aeo-full-name-destination-contract": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/verify-aeo-full-name-destination-contract.ts",
     "growth:forms:activate-aeo-select-copy": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-select-copy-contract.ts",

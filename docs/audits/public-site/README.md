@@ -4,4 +4,7 @@ Evidencia visual, auditorias y revisiones operativas de superficies publicas de 
 
 ## Artefactos
 
+- [Demo 35 Blog Magazine layout review - 2026-07-09](2026-07-09-demo35-blog-magazine-layout-review.md)
+- [WordPress blog/content hub/search audit - 2026-07-09](2026-07-09-wordpress-blog-content-hub-search.md)
+- [Public Site Footer read-only audit - Careers entry readiness - 2026-07-09](2026-07-09-footer-careers-entry-readiness.md)
 - [Sky Efeonce landing evidence — 2026-06-28](sky-efeonce-landing-2026-06-28/README.md)

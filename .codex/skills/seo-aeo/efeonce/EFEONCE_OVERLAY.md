@@ -12,6 +12,12 @@
   Elementor, landing pages Greenhouse→WordPress, atribución HubSpot, AI Content
   Factory, EPIC-019/TASK-1111/1116/1122/1123. **Toda ejecución sobre el sitio
   pasa por aquí.**
+- **Content hub/blog WordPress contract** —
+  `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
+  (auditoria base:
+  `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`).
+  Cargarlo antes de recomendar retaxonomizacion, pillar/cluster, busqueda
+  editorial, limpieza de tags o migracion/canonical del blog.
 - **`commercial-expert`** (overlay Greenhouse) — ASaaS, Bow-tie, ICP Globe,
   posicionamiento de 4 productos, portal HubSpot 48713323.
 - **`hubspot-ops` / `hubspot-greenhouse-bridge`** — atribución y CRM.
@@ -27,6 +33,12 @@
   técnico se ejecuta con plugin SEO (Yoast/RankMath/Slim SEO — verificar cuál usa
   el sitio vía la skill WordPress) + WP-CLI/REST. No inventes; revisa el stack
   real.
+- **Blog/content hub actual (verificado 2026-07-09):** posts nativos WordPress +
+  Gutenberg; no hay `page_for_posts`; permalinks `/%category%/%postname%/`;
+  archivos/search/singles los renderiza Ohio parent; search nativo mezcla posts,
+  paginas, attachments, landings y portfolio, con Yoast `noindex, follow`. Antes
+  de un refresh SEO de clusters, limpiar demo posts/tags/sidebar y definir
+  taxonomia + canonical hub.
 - **⚠️ Migración futura a Astro (planificada, as-of 2026-06):** Efeonce migrará
   eventualmente el sitio público a **Astro**. La guía WordPress de esta skill
   sigue vigente hasta que ocurra. Implicaciones SEO/AEO a tener listas para el

@@ -13,6 +13,15 @@ legacy block debt before preparing any `post_draft_gutenberg` or
 Read-only WP-CLI inspection on 2026-06-14 sampled the six latest published
 posts on `efeoncepro.com`.
 
+Refresh note 2026-07-09: the broader content-hub audit is now documented in
+`docs/documentation/public-site/wordpress-blog-content-hub-search.md` and
+`docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`.
+Current WordPress permalinks use `/%category%/%postname%/`, search results are
+native WordPress search with Yoast `noindex, follow`, and the visible archive
+render is owned by Ohio parent templates plus `global_blog_*` options. When a
+new or refreshed article is meant to support the content hub, review category,
+tags, featured image, excerpt and search/archive impact before publishing.
+
 | Example post | Observed structure |
 | --- | --- |
 | `249766` Glitch #02 | 81 parsed blocks, H2 intro, H3 numbered sections, 8 images, separators, many legacy `core/freeform` fragments. |

@@ -80,6 +80,7 @@ import { knowledgeNotionIngestProjection } from './knowledge-notion-ingest'
 import { sampleSprintHubSpotOutboundProjection } from './sample-sprint-hubspot-outbound'
 import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 import { growthAeoDiagnosticGraderRunProjection } from './growth-aeo-diagnostic-grader-run-from-submission'
+import { growthEbookDeliveryFromSubmissionProjection } from './growth-ebook-delivery-from-submission'
 import { growthGraderRunFromSubmissionProjection } from './growth-grader-run-from-submission'
 import { growthAiVisibilityLeadHandoffProjection } from './growth-ai-visibility-lead-handoff'
 import { growthAiVisibilityOperatorSendProjection } from './growth-ai-visibility-operator-send'
@@ -175,6 +176,7 @@ registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(notionFtrWritebackProjection) // TASK-903 Slice 2 — PATCH Notion select [GH] FTR PRODUCTIVO con veredicto del snapshot, gated NOTION_FTR_WRITEBACK_ENABLED (default OFF)
   registerProjection(knowledgeNotionIngestProjection) // TASK-1094 — re-fetch + gate + re-ingest idempotente | deprecación de páginas de knowledge Notion (webhook-triggered); gated upstream por NOTION_KNOWLEDGE_WEBHOOK_ENABLED
   registerProjection(growthGraderRunFromSubmissionProjection) // TASK-1251 — growth.forms.submission_accepted (grader-form) → enqueue grader run + materialize lead linked to submission (idempotent, PII-safe); drenado por ops-reactive-growth
+  registerProjection(growthEbookDeliveryFromSubmissionProjection) // TASK-1375 — growth.forms.submission_accepted (ebook form) → email de respaldo con link gated de descarga (genérico por ebook, idempotente); drenado por ops-reactive-growth
   registerProjection(growthAeoDiagnosticGraderRunProjection) // TASK-1321 — growth.forms.submission_accepted (/aeo-2/ efeonce-aeo-diagnostic) → remap + brand-intelligence category + cost-cap → enqueue grader run + materialize lead (kill-switch GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED default-ON); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityLeadHandoffProjection) // TASK-1242 — growth.ai_visibility.lead_handoff_requested → upsert contact/company en HubSpot (in-app directo, idempotente, consent+score gated); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityReportEmailProjection) // TASK-1250 — growth.ai_visibility.report_email_requested → email de entrega del informe al lead (adjunto PDF público-safe, consent+estado gated, idempotente DB-level); drenado por ops-reactive-growth

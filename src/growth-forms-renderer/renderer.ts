@@ -1957,7 +1957,11 @@ export class FormRenderer {
         // TASK-1336 — handoff auto-descriptivo del `tokenized_report`: el host recibe el handle
         // público + la URL de status para arrancar el poll (sin hardcodear ruta ni conocer el
         // grader). Sólo cuando el behavior lo declara y hay handle; nunca rompe legacy.
-        ...this.buildTokenizedReportHandoff(result.submissionId)
+        ...this.buildTokenizedReportHandoff(result.submissionId),
+        // TASK-1375 — handoff de descarga GATED del asset (ebook): el host recibe `download_url`
+        // (ruta pública + handle) para disparar la descarga on-screen post-submit. Sólo cuando el
+        // behavior `asset_access` lo declara y hay handle; nunca rompe legacy.
+        ...this.buildAssetDownloadHandoff(result.submissionId)
       })
       this.clearDraft() // enviado OK → el borrador ya no aplica.
       this.renderSuccess()
@@ -2020,6 +2024,29 @@ export class FormRenderer {
     const statusUrl = `${this.api.baseUrl.replace(/\/$/, '')}${path}`
 
     return { run_handle: submissionId, status_url: statusUrl }
+  }
+
+  /**
+   * TASK-1375 — Handoff de descarga GATED de asset (ebook lead magnet). Espejo de
+   * `buildTokenizedReportHandoff`: resuelve el `downloadPathTemplate` declarado por el behavior
+   * `asset_access` (browser-safe: ruta relativa bajo `/api/public/` con `{handle}`) sustituyendo
+   * `{handle}` por el `submissionId` y lo absolutiza contra el mismo origen del API público.
+   * Devuelve `{ download_url }` allowlisted para el evento `gh_form_submission_accepted`; `{}` (no
+   * handoff) si el behavior no lo declara o falta el handle. El renderer no conoce el ebook ni el
+   * object_name (server-only): sólo dispara la URL gated.
+   */
+  private buildAssetDownloadHandoff(
+    submissionId: string | undefined
+  ): { download_url: string } | Record<string, never> {
+    const behavior = this.contract.successBehavior
+    const template = behavior.kind === 'asset_access' ? behavior.assetDownload?.downloadPathTemplate : undefined
+
+    if (!template || !submissionId) return {}
+
+    const path = template.replace('{handle}', encodeURIComponent(submissionId))
+    const downloadUrl = `${this.api.baseUrl.replace(/\/$/, '')}${path}`
+
+    return { download_url: downloadUrl }
   }
 
   private renderSuccess(): void {

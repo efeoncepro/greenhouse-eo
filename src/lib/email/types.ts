@@ -22,6 +22,7 @@ export type EmailType =
   | 'quote_share'
   | 'contractor_remittance_paid'
   | 'ai_visibility_grader_report'
+  | 'growth_ebook_delivery'
 
 export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered' | 'dead_letter'
 
@@ -52,6 +53,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   quote_share:                  'transactional',
   contractor_remittance_paid:   'transactional',
   ai_visibility_grader_report:  'transactional',
+  growth_ebook_delivery:        'transactional',
 }
 
 export interface EmailRecipient {
@@ -126,7 +128,8 @@ export interface SendEmailInput<TContext extends EmailTemplateContext = EmailTem
  */
 export const AGENCY_FROM_ADDRESS = 'Efeonce <greenhouse@efeoncepro.com>'
 export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
-  'ai_visibility_grader_report'
+  'ai_visibility_grader_report',
+  'growth_ebook_delivery'
 ])
 
 export interface SendEmailResult {
