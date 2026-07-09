@@ -109,6 +109,24 @@ export type FormSubmissionRow = {
   updated_at: Date
 }
 
+/**
+ * TASK-1375 — asset entregable gated de un form (ebook PDF en bucket privado).
+ * SERVER-ONLY: `object_name` nunca cruza al render contract. La ruta de descarga
+ * resuelve el objeto desde acá por el `form_id` de la submission aceptada.
+ */
+export type FormAssetRow = {
+  form_asset_id: string
+  form_id: string
+  asset_kind: string
+  object_name: string
+  file_name: string
+  content_type: string
+  ttl_hours: number
+  active: boolean
+  created_at: Date
+  updated_at: Date
+}
+
 export type FormDestinationAttemptRow = {
   attempt_id: string
   submission_id: string
@@ -577,8 +595,18 @@ export const getSubmissionById = async (submissionId: string): Promise<FormSubmi
     [submissionId],
   )
 
-  
+
 return rows[0] ?? null
+}
+
+/** TASK-1375 — el asset activo que entrega un form (una fila por form). SERVER-ONLY. */
+export const getActiveFormAsset = async (formId: string): Promise<FormAssetRow | null> => {
+  const rows = await query<FormAssetRow>(
+    `SELECT * FROM greenhouse_growth.form_asset WHERE form_id = $1 AND active LIMIT 1`,
+    [formId],
+  )
+
+  return rows[0] ?? null
 }
 
 export const listSubmissions = async (opts: { formId?: string; limit?: number } = {}): Promise<FormSubmissionRow[]> => {
