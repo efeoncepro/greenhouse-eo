@@ -53,11 +53,38 @@ no como frase libre escrita por un agente. Regla operativa:
   obligatorio para publish hasta que finance/payroll/legal definan bandas
   aprobadas y su governance.
 
+Voz y copy publico:
+
+- Redacta para candidatos externos, no para el equipo interno. La voz puede ser
+  exigente y con punto de vista, pero no excluyente.
+- Evita bromas internas o etiquetas identitarias como `locos`; prefiere señales
+  observables: criterio, rigor, ganas de construir, ownership, experiencia real.
+- En marketing, conserva spanglish profesional cuando sea el término real del
+  oficio (`growth`, `performance`, `vendor management`, `brief`, `paid media`,
+  etc.). No traduzcas esos términos solo por limpiar el español; sí corrige
+  jerga interna que no aporte claridad al candidato.
+- Si ajustas labels, CTAs, empty states, errores o textos de apply, hazlo en
+  `src/lib/copy/dictionaries/*/careers.ts` y valida layout desktop/mobile.
+
 Ejemplo real: `Account Manager / Especialista en Marketing` quedó como demand
 `EO-TDM-0012` y opening `EO-OPN-0009`:
 
 - `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009`
 - `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009/apply`
+
+Compatibilidad legacy importante:
+
+- `public_location_mode=LATAM` en una vacante remota legacy significa region de
+  contratacion/ubicacion, no modalidad.
+- Si falta `public_work_mode`, el view-model debe degradar a
+  `Modalidad=Remoto` y preservar `Ubicacion=LATAM`.
+- No arreglar `Modalidad=LATAM` editando copy/CSS ni cambiando
+  `public_location_mode` a `Remoto`; eso rompe la ubicacion. La correccion vive
+  en codigo y en publicar campos estructurados (`public_work_mode`,
+  `public_hiring_region`, `public_skill_tags`).
+- Si produccion sigue mostrando `Modalidad=LATAM`, verificar primero el release
+  servido. El release viejo `915be02a86abfd49c71365af8a647f9fdfa35207` no lee
+  los campos estructurados nuevos y requiere release/hotfix de codigo.
 
 Publicar una vacante nueva **NO requiere release** si el runtime de careers ya
 esta desplegado y `HIRING_PUBLIC_APPLICATIONS_ENABLED`/Turnstile estan en el
@@ -166,6 +193,17 @@ Además, validar mobile 390 con Playwright o escenario GVC dedicado:
 - campos y botones sin overlap;
 - copy legible;
 - reduced-motion sin animaciones decorativas obligatorias.
+
+Evidencia local de referencia post-fix 2026-07-09:
+
+- `pnpm fe:capture task354-careers-runtime-audit --env=local` ->
+  `.captures/2026-07-09T11-11-01_task354-careers-runtime-audit`.
+- Auditoria Playwright producto -> `.captures/2026-07-09T10-49-careers-product-ui-audit`
+  (`failed=[]`) para home, detalle, apply y 404 en desktop1440, wide2048 y
+  mobile390.
+- Invalid submit probe -> `.captures/2026-07-09T-careers-apply-invalid-state`.
+- El circulo negro `N` que puede aparecer en capturas locales es el
+  `nextjs-portal` de desarrollo, no UI de producto ni Nexa.
 
 ## Cutover
 

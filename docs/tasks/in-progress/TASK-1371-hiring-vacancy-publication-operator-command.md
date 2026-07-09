@@ -31,7 +31,7 @@ Hechos verificados contra el repo real. Task bien encuadrada (Full API Parity: u
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Implementado local / rollout pendiente`
 - Rank: `TBD`
 - Domain: `hr|ops`
 - Blocked by: `none`
@@ -466,10 +466,20 @@ La solucion aceptable tiene una primitive server-side unica. La CLI, endpoint in
 ## Evidence 2026-07-09
 
 - `pnpm test src/lib/hiring/vacancy-publication-operator.test.ts src/lib/hiring/publication.test.ts src/lib/hiring/public-careers/view-model.test.ts` — verde.
-- `pnpm test` — verde: 1258 test files passed, 23 skipped; 8868 tests passed, 126 skipped.
+- `pnpm test` — verde inicial: 1258 test files passed, 23 skipped; 8868 tests passed, 126 skipped.
+- `pnpm test` — verde final tras compatibilidad Careers: 1258 test files passed, 23 skipped; 8870 tests passed, 126 skipped.
 - `pnpm exec eslint src/lib/hiring/vacancy-publication-operator.ts src/lib/hiring/vacancy-publication-operator.test.ts src/lib/hiring/publication.ts src/lib/hiring/publication.test.ts src/lib/hiring/public-careers/view-model.ts src/lib/hiring/public-careers/view-model.test.ts src/app/api/hiring/vacancy-publications/route.ts scripts/hiring/publish-vacancy.ts` — verde.
+- `pnpm exec eslint src/lib/hiring/public-careers/view-model.ts src/lib/hiring/public-careers/view-model.test.ts` — verde tras fix de modalidad/chips legacy.
+- `pnpm exec eslint src/components/greenhouse/careers/CareersHomeClient.tsx src/components/greenhouse/careers/CareersDetailView.tsx src/components/greenhouse/careers/CareersApplyClient.tsx src/lib/hiring/public-careers/view-model.ts src/lib/hiring/public-careers/view-model.test.ts` — verde tras revision UI pre-release.
+- `pnpm exec eslint src/lib/copy/dictionaries/es-CL/careers.ts src/lib/copy/dictionaries/en-US/careers.ts src/lib/hiring/public-careers/view-model.test.ts` — verde tras revision UX writing/copy.
 - `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` — verde.
-- `pnpm build` — verde; warning no bloqueante existente de Turbopack en `src/lib/roadmap/work-item-index/reader.ts` por patron amplio.
+- `pnpm build` — verde final post-copy; warning no bloqueante existente de Turbopack en `src/lib/roadmap/work-item-index/reader.ts` por patron amplio.
+- `pnpm fe:capture task354-careers-runtime-audit --env=local` — verde post-copy: 2 variants, 12 frames, output `.captures/2026-07-09T11-11-01_task354-careers-runtime-audit`.
+- Playwright copy probe final — verde: home/detail/apply desktop1440/mobile390 sin overflow, sin copy viejo (`locos`, `Hollywood-level`, `sin friccion`, etc.), con copy nuevo y `growth tasks` preservado como spanglish profesional de marketing.
+- Playwright product UI audit local — verde: `.captures/2026-07-09T10-49-careers-product-ui-audit` cubre home/detail/apply/404 en desktop1440, wide2048 y mobile390 (12 combinaciones), con assertions `failed=[]` para HTTP status, overflow, controles nombrados, H1 semantico, split `Ubicacion=LATAM` / `Modalidad=Remoto` y chips canonicos.
+- Playwright apply invalid-state probe — verde: `.captures/2026-07-09T-careers-apply-invalid-state`; submit vacio enfoca primer input invalido, muestra resumen/errores, marca requireds y no genera overflow en desktop1440/mobile390.
+- `pnpm task:lint --task TASK-1371` — verde: `template=1`, `errors=0`, `warnings=0`.
+- `pnpm ops:lint --changed` — verde.
 - `pnpm hiring:publish-vacancy --file scripts/hiring/fixtures/account-manager-vacancy-brief.example.json --dry-run` — verde; preview valido con warning `public_compensation_band_not_set`.
 - `gtimeout 180s pnpm pg:connect:migrate` — verde: aplico `20260709182000000_task-1371-hiring-opening-public-structured-fields` y `20260709183000000_task-1371-account-manager-legacy-location-backfill`.
 - `gtimeout 90s pnpm pg:connect:status` — verde: `No migrations to run!`.
@@ -477,11 +487,70 @@ La solucion aceptable tiene una primitive server-side unica. La CLI, endpoint in
 - Query DB post-smoke — verde: `EO-OPN-0009` quedo `publication_status=published`, `visibility=public_listed`, `public_area=Marketing`, `public_work_mode=remote`, `public_hiring_region=LATAM`, `public_location_mode=LATAM`, `publication_source_ref=job-brief-account-manager-marketing-20260709`.
 - `curl -I https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009` — verde: `HTTP/2 200`.
 
+## Compatibility Ledger 2026-07-09 — Careers view-model symptoms
+
+Contexto observado en runtime/screenshot durante la ejecucion: la vacante Account Manager mostraba `Ubicacion=LATAM` y `Modalidad=LATAM`, y las competencias clave salian como fragments de prosa (`Experiencia operando...`, `Nociones practicas...`, `Capacidad de ordenar...`) cuando faltaban tags estructurados o el bundle live aun usaba fallback legacy.
+
+Resolucion aplicada:
+
+- Source of truth canonica:
+  - modalidad publica vive en `public_work_mode` (`remote|hybrid|onsite`);
+  - ubicacion remota vive en `public_hiring_region` (`LATAM`, `Global`, etc.);
+  - ubicacion hibrida/presencial vive en `public_city`/`public_country`/`public_office_location`;
+  - chips publicos viven en `public_skill_tags`.
+- `public_location_mode` queda solo como compatibilidad legacy. Para remoto puede contener `LATAM` como region/ubicacion, pero nunca debe interpretarse como modalidad canonica ni editarse a mano para "arreglar" la UI.
+- `src/lib/hiring/public-careers/view-model.ts` ahora degrada defensivamente un `public_location_mode` legacy tipo `LATAM`, `Global`, `Chile`, etc. a `Modalidad=Remoto` si `public_work_mode` viene ausente, preservando `Ubicacion=LATAM`.
+- El mismo view-model prioriza `skillTags` estructurados. Si debe caer a fallback legacy, canonicaliza por reglas cortas (`Account management`, `SEO`, `Liderazgo operativo`, `Growth`, etc.) y evita convertir frases de requisitos en chips visibles.
+- Regresiones agregadas en `src/lib/hiring/public-careers/view-model.test.ts`:
+  - no renderizar una region remota legacy como modalidad;
+  - mantener chips Account Manager canonicos sin fragments de prosa.
+
+Lo que NO debe hacer el siguiente agente:
+
+- No corregir `Modalidad=LATAM` cambiando copy JSX/CSS o reemplazando `public_location_mode` por `Remoto`; eso mezcla ubicacion y modalidad otra vez.
+- No volver a inferir `Área` o competencias desde copy como solucion final. Es fallback temporal para legacy; la solucion canonica es publicar/republicar con `public_area` y `public_skill_tags`.
+- No cerrar `TASK-1371` como complete si falta push/release/smoke productivo del bundle que contiene estos cambios. Estado correcto: `in-progress`, code complete local, rollout pendiente.
+
+Commits locales relevantes en `develop`:
+
+- `ff6bd4b0f` — operador TASK-1371, campos estructurados y docs iniciales.
+- `c048d71e5` — marker `-- Up Migration` faltante en migracion forward-fix.
+- `a78a41861` — endurecimiento de migraciones, smoke runtime y cierre local.
+- `971494c27` — compatibilidad Careers: modalidad legacy `LATAM` -> `Remoto` y chips canonicos.
+
+Diagnostico live posterior:
+
+- Produccion `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009` seguia mostrando el bug con Sentry release `915be02a86abfd49c71365af8a647f9fdfa35207`.
+- Ese release no selecciona `public_work_mode`, `public_hiring_region` ni `public_skill_tags` en `src/lib/hiring/publication.ts`; su `PublicOpeningPayload` solo incluye `locationMode`.
+- Con ese bundle viejo no existe mitigacion de datos que muestre simultaneamente `Ubicacion=LATAM` y `Modalidad=Remoto`, porque ambos labels derivan del mismo `public_location_mode`.
+- Estado operativo correcto: corregido en codigo local, **bug todavia presente en produccion hasta release/hotfix de codigo**.
+
+## UI Pre-release Review 2026-07-09
+
+Revision solicitada antes de agrupar release: revisar meticulosamente la UI publica Careers para detectar ajustes adicionales que convenga llevar en el mismo paquete.
+
+Hallazgos:
+
+- **Bloqueante visual descartado:** el circulo negro con `N` visto en capturas locales es `nextjs-portal` (Next.js dev tools indicator), no `NexaFloatingButton`, no DOM de producto y no aparecera en production build. No perseguirlo como fuga de Nexa en `/public/careers`.
+- **Ajuste aplicado:** `CareersHomeClient` ahora inserta un espacio semantico entre `copy.hero.titleAccent` y `copy.hero.titleRest`. Visualmente sigue renderizando en dos lineas, pero el `h1.textContent` pasa de `Crececon Efeonce` a `Crece con Efeonce` para accesibilidad/SEO.
+- **Detalle Account Manager:** local con bundle actual muestra chips hero `LATAM`, `Remoto`, `L2`; resumen lateral `Ubicacion=LATAM`, `Modalidad=Remoto`; competencias clave `Marketing`, `SEO`, `Vendor management`, `Liderazgo operativo`.
+- **Apply:** form desktop/mobile mantiene labels, iconos, CV uploader, consentimiento, Turnstile local fallback y estado invalido sin overflow. Los `input` nativos de file/checkbox son 1px por accesibilidad/control custom; no son targets visuales pequenos.
+- **Home/listing/marquee:** sin overflow de pagina en 1440/2048/390; H1 corregido; listing muestra tags canonicos; el marquee conserva segmentos duplicados sin hueco de pagina.
+- **404 Careers:** estado no encontrado renderiza card/CTA/footer sin solapes en desktop/mobile.
+- **UX writing / brand voice:** se reviso `src/lib/copy/dictionaries/*/careers.ts` con las skills `greenhouse-ux-content-accessibility`, `copywriting` y `efeonce-agency`. Se refino employer brand, CTAs, proceso, empty/error/success y helper de CV para sonar mas Efeonce y menos generico/excluyente. Se retiraron expresiones publicamente riesgosas (`locos`, `Hollywood-level`) y se mantuvo el criterio de spanglish profesional para marketing: terminos como `growth`, `performance`, `vendor management`, `brief` o `paid media` son validos si describen el trabajo real; no traducirlos por purismo.
+
+Evidencia durable:
+
+- GVC final post-copy: `.captures/2026-07-09T11-11-01_task354-careers-runtime-audit`.
+- Playwright audit: `.captures/2026-07-09T10-49-careers-product-ui-audit/audit.json` (`failed=[]`).
+- Invalid submit screenshots: `.captures/2026-07-09T-careers-apply-invalid-state`.
+
 ## Closure State 2026-07-09
 
 - Estado: `in-progress`, con implementacion, migraciones y smoke runtime local/Cloud SQL verificados.
 - Motivo de no cierre: por instruccion operativa, no mover a `complete/` en este corte; queda lista para revision/commit/release posterior.
 - Nota `publicLocationMode`: para remoto se setea intencionalmente a `LATAM` como fallback legacy de ubicacion. La modalidad canonica ya no vive ahi: vive en `public_work_mode='remote'`.
+- Rollout pendiente: `develop` contiene los commits locales y estaba ahead de `origin/develop`; produccion seguira mostrando el bundle anterior hasta push/release gobernado. Si se pide release, usar `greenhouse-production-release` y medir tiempo agente end-to-end.
 
 ## Closing Protocol
 
@@ -489,11 +558,11 @@ La solucion aceptable tiene una primitive server-side unica. La CLI, endpoint in
 - [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado si cambia lifecycle o path
-- [ ] `Handoff.md` quedo actualizado con evidencia, tiempos y cualquier bloqueo
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] `project_context.md` quedo actualizado si cambia el proceso operativo de talento
-- [ ] la skill de talento quedo actualizada con el nuevo comando/proceso
-- [ ] se ejecuto chequeo de impacto cruzado sobre `TASK-354`, `TASK-355` y manuales HR
+- [x] `Handoff.md` quedo actualizado con evidencia, tiempos y cualquier bloqueo
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] `project_context.md` quedo actualizado si cambia el proceso operativo de talento
+- [x] la skill de talento quedo actualizada con el nuevo comando/proceso
+- [x] se ejecuto chequeo de impacto cruzado sobre `TASK-354`, `TASK-355` y manuales HR
 
 ## Follow-ups
 
@@ -503,7 +572,7 @@ La solucion aceptable tiene una primitive server-side unica. La CLI, endpoint in
 
 ## Open Questions
 
-- Nombre final del command y si vive bajo `src/lib/hiring/publication-operator.ts` o un submodulo dedicado.
-- Si el endpoint interno debe agregarse en esta task o si CLI + server command bastan para el primer release operativo.
+- **[RESUELTA 2026-07-09]** Nombre final y ubicacion: `publishHiringVacancyFromBrief` vive en `src/lib/hiring/vacancy-publication-operator.ts`.
+- **[RESUELTA 2026-07-09]** Endpoint interno: se agrego `POST /api/hiring/vacancy-publications` y reusa el mismo command que el CLI.
 - **[RESUELTA 2026-07-08]** Idempotencia: **reusar el command execution ledger canónico `src/lib/api-platform/core/idempotency.ts` + `core/commands.ts`** (existe). No rodar idempotencia propia en el store salvo brecha concreta demostrada en Discovery.
-- **[NUEVA] Compensación/salario:** ¿el operador expone un `publicCompBand`/rango salarial (EU Pay Transparency jun 2026)? Decidir explícitamente in/out — si out, declarar por qué (owner + condición de retiro); si in, agregarlo como campo estructurado del brief/opening con su allowlist pública. No dejarlo silenciosamente ausente.
+- **[RESUELTA 2026-07-09 como V1 opcional]** Compensación/salario: el operador expone `publicCompensationBand` como campo estructurado opcional y warning `public_compensation_band_not_set`; no es publish guard hasta que finance/payroll/legal definan governance de bandas aprobadas.

@@ -53,9 +53,15 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 - Careers públicas permite postular a vacantes de Efeonce desde `/public/careers` con formulario seguro, confirmación genérica y carga opcional de CV en PDF.
 
+### Correcciones
+
+- Las vacantes públicas separan correctamente ubicación y modalidad: por ejemplo, un rol remoto puede mostrar `Ubicación: LATAM` y `Modalidad: Remoto`, sin duplicar la región como modalidad. Las competencias clave se muestran como etiquetas cortas y legibles.
+- Se refinó el tono público de Careers: textos de employer brand, errores, estados vacíos y confirmaciones son más claros, menos excluyentes y más alineados a la voz Efeonce.
+
 ### Notas
 
 - El CV se guarda como asset privado de Greenhouse. Documentos de identidad y captura documental avanzada quedan fuera del apply público.
+- En roles de marketing se conserva spanglish profesional cuando ayuda a describir el trabajo real (`growth`, `performance`, `vendor management`, `brief`, etc.).
 
 ## 2026.05-beta.7
 

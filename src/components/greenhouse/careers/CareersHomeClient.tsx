@@ -129,6 +129,7 @@ export const CareersHomeClient = ({ copy, listingState, openings }: CareersHomeC
           </span>
           <h1 className={styles.heroTitle}>
             <span className={styles.heroTitleAccent}>{copy.hero.titleAccent}</span>
+            {' '}
             <br />
             {copy.hero.titleRest}
             <i className={`${styles.heroArrow} tabler-arrow-up-right`} aria-hidden='true' />

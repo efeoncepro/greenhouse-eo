@@ -223,6 +223,6 @@ describe('careers public view model', () => {
   })
 
   it('formats copy templates without requiring functions in serialized copy', () => {
-    expect(formatCareersTemplate(copy.apply.titleTemplate, { role: 'Diseño' })).toBe('Postúlate a Diseño')
+    expect(formatCareersTemplate(copy.apply.titleTemplate, { role: 'Diseño' })).toBe('Postula a Diseño')
   })
 })

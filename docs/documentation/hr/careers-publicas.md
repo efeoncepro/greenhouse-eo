@@ -89,6 +89,42 @@ La oferta debe separar `Ubicacion` y `Modalidad` como datos de dominio:
 - `public_compensation_band` queda disponible como campo estructurado opcional,
   no publish-required hasta cerrar governance de bandas.
 
+## Voz pública y UX writing
+
+Careers es una superficie pública de employer brand. El copy visible vive en
+`src/lib/copy/dictionaries/*/careers.ts`; no hardcodear labels, CTAs, errores ni
+estados en JSX.
+
+Reglas vigentes:
+
+- Usar voz Efeonce: directa, exigente, con mecanismo. No llenar con entusiasmo
+  decorativo ni promesas sin prueba.
+- Evitar expresiones que funcionen como broma interna pero puedan sonar
+  excluyentes o inmaduras para candidatos externos. Ejemplos retirados:
+  `locos`, `Únete a los locos`, `Hollywood-level creativity`.
+- Errores y estados vacíos deben decir qué pasó y cuál es el próximo paso
+  seguro: reintentar, limpiar filtros, revisar campos marcados o volver al
+  listado.
+- En vacantes de marketing, el spanglish profesional es válido cuando describe
+  el trabajo real y el mercado lo usa: `growth`, `performance`, `vendor
+  management`, `brief`, `paid media`, `pipeline`, etc. No traducir esos términos
+  por purismo si perderían precisión. Solo corregir spanglish que opaque,
+  mezcle jerga interna innecesaria o dificulte a un candidato externo.
+
+Nota de compatibilidad 2026-07-09:
+
+- Si un registro legacy trae `public_location_mode=LATAM`, ese valor es una
+  región/ubicación remota legacy, no una modalidad. El view-model debe mostrar
+  `Ubicacion=LATAM` y `Modalidad=Remoto` cuando no exista `public_work_mode`.
+- No corregir `Modalidad=LATAM` cambiando CSS/copy ni reemplazando
+  `public_location_mode` por `Remoto`; eso vuelve a mezclar ubicacion y
+  modalidad. La solucion canonica es publicar/republicar con `public_work_mode`
+  y `public_hiring_region`.
+- El bundle productivo `915be02a86abfd49c71365af8a647f9fdfa35207` no selecciona
+  `public_work_mode`, `public_hiring_region` ni `public_skill_tags`; por eso no
+  hay data-only fix limpio para ese release viejo. Requiere release/hotfix de
+  codigo.
+
 Si careers ya esta live y los flags/Turnstile estan configurados, publicar otro
 opening visible en production es solo un write gobernado de Hiring. No debe
 pasar por un release de codigo.
@@ -147,6 +183,19 @@ captura.
 - submit en progreso;
 - success genérico;
 - rate-limit/captcha/server error genéricos.
+
+## Evidencia visual vigente
+
+La revision UI pre-release local del 2026-07-09 cubrio `/public/careers`,
+detalle `EO-OPN-0009`, apply y 404 en desktop1440, wide2048 y mobile390.
+
+- GVC final post-copy: `.captures/2026-07-09T11-11-01_task354-careers-runtime-audit`.
+- Playwright product audit: `.captures/2026-07-09T10-49-careers-product-ui-audit`
+  con `failed=[]`.
+- Invalid submit probe:
+  `.captures/2026-07-09T-careers-apply-invalid-state`.
+- El circulo negro `N` de capturas locales es `nextjs-portal` (indicador de
+  desarrollo de Next.js), no `NexaFloatingButton` ni UI de producto.
 
 ## Documentación técnica relacionada
 
