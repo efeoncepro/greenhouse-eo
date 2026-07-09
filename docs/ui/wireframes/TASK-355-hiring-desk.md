@@ -8,7 +8,8 @@
 - UI rigor: `ui-platform`
 - Ruta: `src/app/(dashboard)/agency/hiring/**` (NO `[lang]`). Marca: **Greenhouse** (app interna, no Efeonce institucional).
 - Locale: bilingüe es-CL + en-US vía `getMicrocopy(locale)` (dictionaries `hiringDesk`).
-- Estado: `draft` (UI ready: no — falta loop GVC)
+- Estado: `approved` (UI ready: yes — HTML interactivo revisado en Playwright el 2026-07-09; GVC runtime sigue siendo gate de cierre)
+- Referencia visual aprobada local: `~/Documents/carreers/Hiring-Desk/Hiring-Desk/Hiring Desk.dc.html` (fuente completa con estados, dialogs, drawer, Kanban y microinteracciones; no reconstruir desde screenshots aisladas)
 - Skills: `greenhouse-talent-people-operator` · `greenhouse-ux` · `info-architecture` · `state-design` · `forms-ux` · `a11y-architect` · `arch-architect`
 
 ## Brief

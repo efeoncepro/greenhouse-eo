@@ -1,3 +1,11 @@
+## Sesion 2026-07-09 - TASK-355 Hiring Desk - Codex - PLAN CHECKPOINT
+
+> **Goal confirmado:** implementar el HTML interactivo aprobado de Hiring Desk con fidelidad visual y conductual de alto detalle, conectado al runtime real y sin push/deploy automatico.
+>
+> **Discovery:** `TASK-353` esta complete y el blocker de TASK-355 era stale. El HTML fuente `~/Documents/carreers/Hiring-Desk/Hiring-Desk/Hiring Desk.dc.html` fue renderizado e inspeccionado con Playwright: Demand, drawer, Pipeline drag/keyboard/rollback, Application 360, assessment, docs/PII, decision/history, Publication, dialogs, locale, dark y reduced-motion. Los uploads de task/wireframe/flow/motion coinciden byte a byte con el repo.
+>
+> **Estado:** TASK-355 movida a `in-progress`, `UI ready: yes`; plan canonico en `docs/tasks/plans/TASK-355-plan.md`, checkpoint humano pendiente. Ejecucion secuencial, en `develop` por confirmacion del goal, sin subagentes ni push. Gaps honestos: TASK-1362 y TASK-1363 siguen to-do; sus embeds se implementaran como adapters con degraded states hasta que sus contracts aterricen. El control demo de fallo de red queda solo en GVC/harness, no en produccion.
+
 ## Sesion 2026-07-09 - TASK-1374/1375 ebook landing /web-agentica (efeonce-think) - Claude - PLANNING/DOCS
 
 > **Pedido:** analizar el PR #12 de `efeoncepro/efeonce-think` (ebook landing

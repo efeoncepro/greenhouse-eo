@@ -30,23 +30,23 @@ Migrada a formato nuevo + gaps cerrados (arch-architect + overlay §17, greenhou
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-355-hiring-desk.md`
 - Flow: `docs/ui/flows/TASK-355-hiring-desk-flow.md`
 - Motion: `docs/ui/motion/TASK-355-hiring-desk-motion.md`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Plan pendiente de checkpoint humano`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-353`
+- Blocked by: `none`
 - Branch: `task/TASK-355-hiring-desk-internal-workspaces-publication-governance`
 - Legacy ID: `follow-on de GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1`
 - GitHub Issue: `none`
