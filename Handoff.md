@@ -1,3 +1,17 @@
+## Sesion 2026-07-09 - Public Site footer audit para Careers - Codex - READ-ONLY
+
+> **Pedido:** revisar el footer del sitio publico antes de agregar un acceso a Careers/vacantes, sin modificar el sitio live, entendiendo su comportamiento y documentandolo.
+>
+> **Resultado:** auditoria documentada en `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`, enlazada desde `docs/audits/public-site/README.md`. No se hizo mutacion en WordPress, Elementor, Kinsta, cache, theme ni Greenhouse runtime.
+>
+> **Source of truth:** el footer visible de `efeoncepro.com` es `footer#colophon.site-footer.clb__dark_section` renderizado por el child theme Ohio + sidebars/widgets WordPress, no por los settings headless `eoh_site_settings_footer_*`. Runtime template: `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/themes/ohio-child/parts/elements/footer.php`, que cuenta `ohio-sidebar-footer-1..4` y renderiza `dynamic_sidebar(...)`.
+>
+> **Mapa operativo:** `ohio-sidebar-footer-3` contiene `ohio_widget_subscribe-2`, `block-32 | Unete a nuestro equipo` y `block-31 | ¿Te interesa trabajar con nosotros?people@efeoncepro.com`. Ese es el lugar natural para agregar el link/CTA `Ver vacantes abiertas` hacia `https://greenhouse.efeoncepro.com/public/careers`. El footer actual no tiene ningun link a `greenhouse` ni `careers`.
+>
+> **Evidencia:** Playwright read-only en Home, AEO, SEO y Social, desktop1440 + mobile390, sin overflow horizontal; artefactos en `.captures/public-footer-readonly-20260709/` (`footer-audit.json`, screenshots Home desktop/mobile). WP-CLI read-only confirmo sidebars/widgets.
+>
+> **Deudas detectadas pero NO corregidas:** recursos demo Ohio/Colabrio/ThemeForest/Figma siguen visibles; Instagram apunta a `instagram.com.com`; un icono social apunta a `#`; social anchors no tienen labels accesibles observados; newsletter usa `Subscribete`/`Subscribirme` y CF7 `en_US`; legal links siguen en ingles; targets externos/internos son inconsistentes. No mezclar estas limpiezas con el enlace de Careers salvo scope explicito.
+
 ## Sesion 2026-07-09 - Release acotado PR #152 Careers/TASK-1371 - Codex - PRODUCCION
 
 > **Pedido:** hacer `commit + push` y release rapido/acotado del bloque Careers/TASK-1371, evitando la ceremonia larga de releases anteriores.
