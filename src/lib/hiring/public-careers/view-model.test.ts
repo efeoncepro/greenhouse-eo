@@ -48,6 +48,29 @@ describe('careers public view model', () => {
     expect(filterCareersOpenings([vm], { modality: 'Remoto' })).toHaveLength(1)
   })
 
+  it('weights primary role signals over incidental nice-to-have terms when inferring area', () => {
+    const vm = buildCareersOpeningViewModel(
+      {
+        ...opening,
+        publicId: 'EO-OPN-0009',
+        title: 'Account Manager / Especialista en Marketing',
+        summary: 'Lidera cuentas, planes de marketing, SEO y coordinación de proveedores.',
+        description:
+          'Acompañar cuentas en crecimiento.\n\nResponsabilidades principales:\n\n- Coordinar campañas, contenidos, SEO, growth tasks y próximos pasos comerciales.\n- Gestionar la relación diaria con clientes.\n- Preparar actualizaciones ejecutivas.',
+        requirements: 'Marketing generalista\nNociones de SEO\nVendor management\nLiderazgo operativo',
+        niceToHave: 'Coordinación de SEO, contenido, paid media, diseño, web o automatización.',
+      },
+      copy,
+    )
+
+    expect(vm.area).toBe('Marketing')
+    expect(vm.responsibilityItems).toEqual([
+      'Coordinar campañas, contenidos, SEO, growth tasks y próximos pasos comerciales.',
+      'Gestionar la relación diaria con clientes.',
+      'Preparar actualizaciones ejecutivas.',
+    ])
+  })
+
   it('formats copy templates without requiring functions in serialized copy', () => {
     expect(formatCareersTemplate(copy.apply.titleTemplate, { role: 'Diseño' })).toBe('Postúlate a Diseño')
   })
