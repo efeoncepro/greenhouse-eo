@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -221,6 +221,19 @@ Reglas obligatorias:
 - Producción del ebook PDF (contenido — dependencia, no código).
 - Cambios al motor Growth Forms, al renderer o al contrato CORS (se reusan).
 - Cualquier "reporte"/grader (esto es entrega de contenido, no diagnóstico).
+
+## Delta 2026-07-09 — arquitectura verificada (Discovery) + decisión operador
+
+Operador eligió **primitive de plataforma + ebook** (reusable para todos los ebooks). Diseño verificado contra el código real:
+
+- **Handle de descarga = `submissionId`** (UUID v4 que el submit ya devuelve y el handoff `gh_form_submission_accepted` puede emitir), con TTL por `form_submission.created_at`. NO se crea tabla de tokens (proporcional; `submissionId` es no-enumerable). La ruta valida: submission existe + `status='accepted'` + form correcto + dentro de TTL.
+- **Entrega = proxy-stream** desde el bucket privado (NO signed-URL — no hay infra de signing; patrón `api/public/growth/ai-visibility/report/[token]/pdf/route.ts`).
+- **Asset server-only en tabla nueva `greenhouse_growth.form_asset`** (form_id → bucket_name, object_name, file_name, content_type, ttl_hours). NUNCA en el render contract (leak boundary). Es el SSOT "qué asset entrega este form" → un ebook = una fila.
+- **Handoff renderer generalizado**: key `download_url` (o `asset_url`) construida de un `downloadPathTemplate` con `{handle}` — aditivo, mirror de `tokenized_report`. Agregar la key a AMBOS allowlists (`src/growth-forms-renderer/telemetry.ts` + espejo `src/lib/growth/forms/contracts.ts`) + mantener el parity test verde. Ship de `renderer-latest.js` (compartido por todas las forms → blast cross-form, aditivo/opt-in).
+- **Publicación por script gobernado** (`scripts/growth/publish-web-agentica-ebook-form.ts`: `authorDraftForm` corporate gate + success_card `reward.kind:'ebook'` + `createHostSurface` think + `addDestination` HubSpot + fila `form_asset`), dry-run/apply. NO seed SQL crudo del form.
+- **Email de respaldo**: consumer reactivo sobre `submission_accepted` con el link a la ruta gated (mismo `submissionId`), NO adjunto (9 MB).
+
+Slices refinados: A1 migración `form_asset` → A2 ruta gated stream → A3 handoff renderer + allowlist + parity → B1 upload PDF → B2 script publish form → B3 surface+origin+HubSpot → B4 consumer email → B5 tracking+smoke.
 
 ## Detailed Spec
 
