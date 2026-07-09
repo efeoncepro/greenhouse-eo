@@ -55,6 +55,9 @@ Use repo docs as source of truth for long-lived contracts:
 - `docs/operations/discovery-public-website-wordpress-20260614.md`
 - `docs/operations/discovery-public-website-elementor-20260614.md`
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`
+- `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
+- `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`
+- `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`
 - `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md`
 - `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md`
 - `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`

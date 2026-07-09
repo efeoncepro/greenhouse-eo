@@ -2,6 +2,27 @@
 
 ## 2026-07-09
 
+- **Public Site content hub — Demo 35 documentado como layout candidato.** Se
+  reviso read-only `Demo 35: Blog Magazine` (`page_id=225984`,
+  `/homedemo35-elementor/`) como base visual elegida para la futura home del
+  blog. Quedo documentado que es una pagina Elementor/Ohio publicada, no
+  `page_for_posts`, con 55 containers, 58 widgets y 15 `ohio_recent_posts`;
+  renderiza sin overflow en desktop 1440/mobile 390, pero requiere limpiar posts
+  demo/attachments, CTAs `#`, links externos Ohio, rutas `/demo35/category/...`
+  404 y suscripcion CF7 antes de usarse como hub final. Auditoria:
+  `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`.
+
+- **Public Site content hub/blog/search audit canonizada.** Se reviso read-only el
+  blog WordPress vivo de `efeoncepro.com`: posts Gutenberg, categorias/tags,
+  permalinks `/%category%/%postname%/`, archivos Ohio, sidebar, single posts y
+  busqueda nativa. Hallazgos clave: no hay `page_for_posts`; Ohio parent gobierna
+  archive/search/single; search mezcla posts/paginas/landings/portfolio y queda
+  `noindex, follow`; tags/sidebar/posts demo deben limpiarse antes de refrescar el
+  hub. Nuevos docs: `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`,
+  `docs/documentation/public-site/wordpress-blog-content-hub-search.md` y
+  `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`.
+  Skills `efeonce-public-site-wordpress` Codex/Claude sincronizadas.
+
 - **Public Site footer - contrato Careers-only canonizado en skills.** Se llevo el contrato operativo del footer global a las skills `efeonce-public-site-wordpress` de Codex y Claude (`references/runtime-and-discovery.md`) y al inventario Ohio/Elementor. Queda documentado que el footer visible lo renderiza Ohio child theme + widgets (`ohio-sidebar-footer-3`, `widget_block[31]`), que Careers es el unico camino publico de postulacion desde el footer, y que no se debe reintroducir `people@efeoncepro.com` salvo decision explicita del operador. `project_context.md` y la auditoria publica quedaron enlazados.
 
 - **Public Site footer - Careers como unico camino de postulacion.** Se removio `people@efeoncepro.com` del bloque `Unete a nuestro equipo` en el footer global de `efeoncepro.com`, dejando solo el CTA `Ver vacantes y postular` hacia `https://greenhouse.efeoncepro.com/public/careers`. Mutacion acotada a `widget_block[31]` en `ohio-sidebar-footer-3`; backup WordPress `gh_backup_before_footer_careers_email_removal_20260709T123047Z`; cache WP/Kinsta purgada. Verificacion browser en Home + SEO desktop1440/mobile390: email ausente, link unico, visible y sin overflow.

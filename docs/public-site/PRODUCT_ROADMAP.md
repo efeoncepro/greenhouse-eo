@@ -157,6 +157,21 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 ## Next
 
+- **Refresh del content hub WordPress/Think**: la auditoria read-only del
+  2026-07-09 confirma que el blog vive hoy en WordPress nativo con Gutenberg,
+  permalinks `/%category%/%postname%/`, archivos Ohio por categoria y busqueda
+  nativa `noindex, follow` que mezcla posts/paginas/portfolio. Antes de
+  redisenar el hub, ejecutar tareas separadas para taxonomia editorial canonica,
+  limpieza de demo posts/tags/sidebar, buscador editorial `post` only y decision
+  de hub canonico WP vs Think/Astro. El layout visual elegido como candidato es
+  `Demo 35: Blog Magazine` (`page_id=225984`), pero debe tratarse como base de
+  layout y no como contenido final: requiere reemplazar posts demo/attachments,
+  corregir CTAs/rutas `/demo35/category/...`, conectar suscripcion y validar
+  desktop/mobile. Ver
+  [`wordpress-blog-content-hub-search.md`](../documentation/public-site/wordpress-blog-content-hub-search.md)
+  y la auditoria
+  [`2026-07-09-demo35-blog-magazine-layout-review.md`](../audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md).
+
 - **Guía pillar "community manager" en Think** (PDR-005 §Consecuencias): captura el
   término de alto volumen e intención job/how-to (Semrush CL 4.400/mes) como autoridad
   top-of-funnel que enlaza a la spoke `/servicios/redes-sociales`. TASK aparte bajo el

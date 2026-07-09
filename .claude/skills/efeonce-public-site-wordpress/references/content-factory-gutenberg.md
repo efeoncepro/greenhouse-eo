@@ -6,6 +6,9 @@ Canonical docs:
 
 - `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
 - `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
+- `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
+- `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`
+- `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`
 - `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`
 - `docs/documentation/public-site/content-factory-golden-examples/README.md`
 - `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`
@@ -16,6 +19,10 @@ Canonical docs:
 - Posts and landings are separate lanes.
 - Posts should be Gutenberg/block-first because current Efeonce editorial posts use Gutenberg.
 - Landings should be constrained Elementor/Ohio modules unless a reusable custom widget is justified.
+- Current WP post permalinks use `/%category%/%postname%/`; category changes can change published URLs.
+- There is no assigned WP posts page (`page_for_posts=0`) as of the 2026-07-09 audit; archives/categories/search carry the visible blog experience.
+- Ohio parent owns archive/search/single render; the child theme only overrides selected surfaces such as headline/footer and support CSS.
+- Native WP search mixes posts, pages, attachments, Elementor landing pages and Ohio portfolio. For content-hub search, plan a post-only/editorial search instead of relying on global search.
 - Existing content must be inspected before refresh/fix.
 - Refresh/fix works on draft/private clone first. Direct mutation of published content requires explicit task/release approval.
 - Treat `blockName` for Gutenberg and `widgetType` for Elementor as builder module identifiers; keep the native field in planning artifacts.
@@ -34,6 +41,15 @@ Build or load a Content Intelligence Map covering:
 - HubSpot/CTA;
 - anchors;
 - ownership/freshness/fingerprint.
+
+For content-hub/blog work, additionally inspect:
+
+- current permalink and whether category is part of it;
+- category hierarchy and Yoast primary category;
+- tag quality and demo/duplicate tags;
+- featured image and excerpt quality for Ohio cards;
+- whether the post appears in relevant category archives/search;
+- sidebar/search impact if the work changes navigation or discovery.
 
 ## Commands
 
@@ -79,6 +95,15 @@ pnpm public-website:content-factory:post-tool -- edit-pullquote --post-url <url>
 - Treat `core/freeform` as observable legacy debt for inspection/refresh, not as a generated block for new drafts.
 - Validate drafts before any bridge write.
 - `status=block` from validation is a hard stop; `status=warning` requires review.
+- For Glitch POV, prefer `efeoncepro/glitch-drop`; it is an editorial aside, not a quote.
+
+## Content Hub / Search Guardrails
+
+- Do not treat current tags as public navigation until demo tags, duplicates and typos are cleaned.
+- Do not retaxonomize published posts without a URL/canonical/redirect plan because category participates in permalinks.
+- Do not index internal search results; current Yoast behavior is `noindex, follow` and should remain unless a specific SEO decision changes it.
+- Do not use the `eo-vibe-coding-api` `blog-hub` scaffold as the final content hub. It is a planning scaffold and still needs real recent-posts/editorial navigation widgets.
+- Before refreshing the content hub, plan separate workstreams for editorial taxonomy, demo content cleanup, sidebar/navigation cleanup, post-only search and hub canonical URL.
 
 ## Existing Post Refresh Guardrails
 

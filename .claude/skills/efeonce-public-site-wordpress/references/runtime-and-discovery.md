@@ -232,6 +232,53 @@ wp_update_nav_menu_item(61, 0, [
 After any menu write: `wp kinsta cache purge --all`, verify `#menu-primary` and
 `#mobile-menu`, and check dropdown/overflow behavior.
 
+## Blog / Content Hub / Search Facts
+
+Use this when the user asks about the public blog, content hub, WordPress search,
+categories, tags, editorial posts or Glitch.
+
+Canonical docs:
+
+- `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
+- `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`
+- `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`
+- `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`
+
+Runtime observations from the 2026-07-09 read-only audit:
+
+- Posts live as native WordPress `post` and are Gutenberg/block-first.
+- Landing pages are separate from posts and should stay Elementor/Ohio or custom
+  widget governed.
+- `page_for_posts=0`; there is no assigned WP posts page. Category/tag/archive
+  surfaces and search carry the visible blog browsing experience.
+- Post permalinks use `/%category%/%postname%/`. Retaxonomizing a published post
+  can change its URL; require a permalink/canonical/redirect plan.
+- Ohio parent owns archive/search/single rendering: `index.php`, `search.php`,
+  `single.php`, `parts/blog_grid/layout_type*.php`; child theme currently only
+  overrides headline/footer/support CSS for this domain.
+- Effective Ohio blog options observed: `blog_grid_1`, `3-2-1` columns, masonry
+  on, boxed/equal-height cards on, left `ohio-sidebar-blog`, fixed desktop search.
+- Native WP search queries title/excerpt/content and by default mixes `post`,
+  `page`, `attachment`, `e-landing-page`, `e-floating-buttons` and
+  `ohio_portfolio`. Search results are Yoast `noindex, follow`.
+- Current sidebar still contains Ohio/demo debt: external Colabrio promo banner,
+  `Staff Picks`, `Recent Comments`, tag cloud and `Search` button. Do not treat
+  it as final content hub UX.
+- Current categories/tags include real editorial lines plus demo/duplicate/typo
+  debt. Do not use tags as public navigation until cleanup.
+- `eo-vibe-coding-api` has a `blog-hub` scaffold, but it is not a finished hub.
+- `Demo 35: Blog Magazine` (`page_id=225984`, `/homedemo35-elementor/`) is the
+  operator-selected visual layout candidate for the blog home. It is an
+  Elementor/Ohio page, not native `page_for_posts`: 55 containers, 58 widgets,
+  15 `ohio_recent_posts`, no horizontal overflow in desktop 1440/mobile 390.
+  Treat it as layout reference only until demo posts/attachments, `href="#"`,
+  external Ohio links, `/demo35/category/...` 404s and CF7 subscription wiring
+  are cleaned up.
+
+Recommended next steps for a content hub refresh: separate tasks for editorial
+taxonomy, demo content/sidebar cleanup, post-only/editorial search, canonical hub
+URL, and measurement/CTA wiring.
+
 ## Runtime Repo Binding
 
 Confirmed runtime repo:

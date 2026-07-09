@@ -1,3 +1,65 @@
+## Sesion 2026-07-09 - Public Site Demo 35 Blog Magazine layout review - Codex - READ-ONLY/DOCS
+
+> **Pedido:** revisar y documentar `Demo 35: Blog Magazine` como layout elegido
+> para la futura pagina principal del blog/content hub, sin aplicar cambios de
+> momento.
+>
+> **Resultado:** auditoria canonica creada en
+> `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md` y
+> enlazada desde `docs/audits/public-site/README.md`,
+> `docs/documentation/public-site/wordpress-blog-content-hub-search.md`,
+> `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`,
+> `docs/public-site/PRODUCT_ROADMAP.md`, `project_context.md`, `changelog.md` y
+> skills `efeonce-public-site-wordpress` Codex/Claude.
+>
+> **Hallazgos clave:** `Demo 35` es page Elementor/Ohio publicada (`page_id=225984`,
+> `/homedemo35-elementor/`), no `page_for_posts`; tiene 55 containers, 58 widgets
+> y 15 `ohio_recent_posts`. Sirve como layout magazine (hero, rails 75/25,
+> banners, features, staff picks, suscripcion), pero no como contenido final:
+> posts demo/attachments, `See More` con `href="#"`, links externos
+> `ohio.clbthemes.com`, banners `/demo35/category/...` 404 y CF7 newsletter sin
+> HubSpot mapping. Render read-only sin overflow horizontal en desktop 1440 y
+> mobile 390.
+>
+> **Siguiente paso recomendado:** cuando el operador pida cambios, trabajar sobre
+> copia/draft gobernada o mutacion explicita con snapshot; mapear widget por
+> `path`/ID, reemplazar contenido demo, corregir CTAs/rutas y conectar
+> suscripcion a contrato medible antes de considerar cutover del hub.
+
+## Sesion 2026-07-09 - Public Site WordPress blog/content hub/search audit - Codex - READ-ONLY
+
+> **Pedido:** revisar profundamente como el sitio publico/WordPress maneja blog,
+> entradas, taxonomias, categorias, estilos Ohio, paginas y busqueda para preparar
+> el refresh del content hub, y documentarlo en docs/skills.
+>
+> **Evidencia:** `pnpm public-website:discover -- --authenticated --wpcli --write`
+> genero `docs/operations/discovery-public-website-wordpress-20260709.md`;
+> `pnpm public-website:content-factory:inspect -- --write` genero
+> `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-2026-07-09T13-17-44-170Z.json`.
+> WP-CLI read-only consulto posts/taxonomias/search/options/templates/sidebar y
+> smoke HTTP reviso `/glitch/`, `/?s=hubspot` y `/search/hubspot/`. No hubo
+> mutaciones en WordPress/Kinsta/cache/runtime.
+>
+> **Hallazgos clave:** posts viven como `post` + Gutenberg; no hay `page_for_posts`;
+> permalinks `/%category%/%postname%/`; Ohio parent gobierna `index.php`,
+> `search.php`, `single.php` y `parts/blog_grid/*`; search nativo mezcla posts,
+> paginas, attachments, Elementor landings y Ohio portfolio, con Yoast
+> `noindex, follow`; sidebar/blog y tags arrastran deuda demo de Ohio/ThemeForest.
+>
+> **Docs/skills actualizados:** auditoria
+> `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`,
+> contrato funcional `docs/documentation/public-site/wordpress-blog-content-hub-search.md`,
+> manual `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`,
+> indices `docs/audits/public-site/README.md`, `docs/public-site/README.md`,
+> `docs/public-site/PRODUCT_ROADMAP.md`, docs Content Factory/Gutenberg, skills
+> `efeonce-public-site-wordpress` Codex/Claude (`SKILL.md`,
+> `references/content-factory-gutenberg.md`, `references/runtime-and-discovery.md`),
+> `project_context.md` y `changelog.md`.
+>
+> **Siguiente trabajo recomendado:** crear tareas separadas para taxonomia editorial
+> canonica, limpieza de demo posts/categorias/tags/sidebar, buscador editorial
+> `post` only, URL canonica del hub WP vs Think/Astro y medicion CTA/newsletter/grader.
+
 ## Sesion 2026-07-09 - Public Site footer Careers-only canonized in skills - Codex
 
 > **Pedido:** documentar el cambio del footer Careers-only en skills y donde corresponda, luego commitear.
