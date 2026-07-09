@@ -25,13 +25,16 @@ Confirma:
 1. Intenta enviar vacío.
 2. Deben aparecer errores inline y un resumen accesible.
 3. Completa nombre, apellido, email y consentimiento.
-4. Completa portafolio/LinkedIn solo con URLs `https://` si aplica.
-5. Envía.
-6. La respuesta visible debe ser genérica, tanto para envío aceptado como para
+4. Sube un CV PDF de prueba si aplica. El límite visible es 10 MB y no deben
+   aceptarse DOC, DOCX ni ZIP.
+5. Completa portafolio/LinkedIn solo con URLs `https://` si aplica.
+6. Envía.
+7. La respuesta visible debe ser genérica, tanto para envío aceptado como para
    dedupe seguro.
 
-No pedir ni subir CV en V1. Si una persona necesita compartir evidencia, usar
-portafolio o LinkedIn hasta que TASK-1362 habilite document capture.
+No pedir documentos de identidad ni datos personales sensibles en el apply
+público. TASK-1362 queda para document capture completo, scan/quarantine y
+otros documentos de candidato.
 
 ## Captura visual
 

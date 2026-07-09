@@ -32,8 +32,11 @@ gobernado `POST /api/public/hiring/applications` de TASK-1367.
   existe una postulación previa ni el estado interno del proceso.
 - El formulario público no pide documentos de identidad, edad, género, foto ni
   otros datos proxy de clase protegida.
-- V1 es links-only: portafolio y LinkedIn. La carga de CV/documentos queda para
-  TASK-1362.
+- El CV opcional se acepta solo como PDF (máx. 10 MB) y se guarda como asset
+  privado de Greenhouse adjunto a la postulación. Portafolio y LinkedIn siguen
+  siendo enlaces seguros `https://`.
+- Documentos de identidad, portfolio-file, scan/quarantine formal y resolver
+  documental unificado quedan para TASK-1362.
 - El consentimiento usa copy de careers y versiona la política enviada al backend.
 - Turnstile se resuelve desde el contrato de formulario cuando el ambiente tiene
   site key configurada; en desarrollo puede degradar con token local seguro.

@@ -166,8 +166,16 @@ export const careers: CareersCopy = {
     availabilityOptions: ['Inmediata', '2 a 4 semanas', '1 a 2 meses', 'Estoy explorando'],
     cv: {
       label: 'Currículum (opcional)',
-      title: 'La carga de CV viene después',
-      body: 'V1 usa enlaces seguros. Comparte tu portafolio o LinkedIn; el upload de archivos se activará en una siguiente iteración.',
+      title: 'Sube tu CV',
+      body: 'Arrastra o selecciona tu CV en PDF. Lo guardamos como asset privado de Greenhouse.',
+      hint: 'PDF, máximo 10 MB.',
+      selectedTitle: 'CV listo para enviar',
+      browseCta: 'Elegir PDF',
+      replaceCta: 'Reemplazar',
+      removeCta: 'Quitar',
+      invalidType: 'Sube un PDF. Por seguridad no aceptamos DOC, DOCX ni ZIP en este formulario.',
+      tooLarge: 'El PDF supera el máximo de 10 MB.',
+      empty: 'El archivo está vacío. Elige otro PDF.',
     },
     consent: {
       title: 'Acepto que Efeonce trate mis datos para este proceso de selección.',

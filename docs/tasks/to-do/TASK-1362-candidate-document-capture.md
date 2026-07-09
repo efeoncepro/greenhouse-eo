@@ -6,6 +6,7 @@ Hechos verificados contra el repo real. La task está bien encuadrada (reusar, n
 
 - **Sustrato confirmado real:** `createPrivatePendingAsset`/`attachAssetToAggregate`/`canTenantAccessAsset`/`downloadPrivateAsset` existen en `src/lib/storage/greenhouse-assets.ts`; `CONTEXT_RETENTION_CLASS`/`CONTEXT_PREFIX` son `Record<GreenhouseAssetContext, …>` exhaustivos (la red anti-olvido de authz es real). `person_identity_documents.evidence_asset_id` existe (migración TASK-784, FK a `greenhouse_core.assets`). El enfoque reuse-not-recreate está bien fundado.
 - **OVERLAP con TASK-1367 (complete) — recalibrar Slice 2:** `candidate_facet` **YA tiene `portfolio_url` + `linkedin_url`** (los agregó 1367 en el apply intake). El Slice 2 proponía una columna nueva `portfolio_links` → **drift redundante**. El portafolio-**enlace** ya está resuelto (1367). 1362 owns el portafolio-**archivo** (asset context `hiring_candidate_portfolio_file`) + el **resolver unificado** de documentos del candidato. **NO** agregar `portfolio_links` salvo que se justifique explícitamente soportar *múltiples* enlaces (1367 da uno + LinkedIn); si se justifica, es una decisión declarada, no una segunda columna silenciosa.
+- **OVERLAP con TASK-354 (2026-07-09):** el CV PDF opcional del apply público ya aterriza como asset privado (`hiring_application_cv_draft` → `hiring_application_cv`) por instrucción del operador. Esta task conserva el alcance de document capture completo: portfolio-file/muestras, identidad post-decisión, resolver unificado y scan/quarantine formal.
 - **Scan/quarantine net-new confirmado:** no existe scan de malware de assets. El único patrón de quarantine en el repo es `context_document_quarantine` (dominio `structured-context`) — reusable como **referencia de forma** del registro de quarantine, pero el escaneo antivirus real (ClamAV/GCP) es net-new (sigue siendo la Open Question + el mayor riesgo). `backend-critical` + gatear el upload público de 354 detrás del Slice 4 es correcto.
 - **Retención/borrado de PII de candidatos rechazados (elevar de follow-up a riesgo):** guardar CV/identidad de personas que NO se contrataron es una obligación de protección de datos (Ley 21.719) — dejar la policy de retención/borrado como invariante declarado + riesgo, no solo follow-up.
 
@@ -38,15 +39,15 @@ Hechos verificados contra el repo real. La task está bien encuadrada (reusar, n
 
 ## Summary
 
-Habilitar la carga de documentos de candidato reutilizando plataformas existentes: CV/portafolio (archivo) sobre la plataforma de assets privados con contextos hiring nuevos; portafolio-enlace como campo en `candidate_facet`; y documento de identidad reutilizando `person_identity_documents` (masked/reveal). Agrega quarantine/scan para uploads públicos. Sin esto, el apply público (TASK-354) y el desk (TASK-355) no pueden manejar CV, portafolio ni identidad de forma segura.
+Habilitar la captura documental completa de candidatos reutilizando plataformas existentes: portfolio-file/muestras sobre assets privados con contextos hiring nuevos, documento de identidad reutilizando `person_identity_documents` (masked/reveal), resolver unificado de documentos y quarantine/scan para uploads públicos. El CV PDF básico del apply público quedó cubierto por TASK-354; esta task lo endurece con scan/retención y amplía el resto del paquete documental.
 
 ## Why This Task Exists
 
-TASK-353 dejó `candidate_facet`/`hiring_application` pero sin carga de documentos. Operación necesita CV, enlaces de portafolio y documento de identidad. El error a evitar es crear un bucket/tabla de documentos paralela: ya existe la plataforma de assets privados (`greenhouse_core.assets` + `GREENHOUSE_PRIVATE_ASSETS_BUCKET`) y la tabla de documentos de identidad con reveal/audit (`person_identity_documents`, TASK-784). Falta el wiring hiring-aware (anclaje por candidato que no tiene `member`) y quarantine/scan para uploads públicos (no existe hoy en la plataforma de assets).
+TASK-353 dejó `candidate_facet`/`hiring_application` y TASK-354 agregó el primer CV PDF privado, pero operación necesita el paquete documental completo: muestras/portfolio-file, identidad post-decisión, resolver unificado, retención/borrado y scan/quarantine. El error a evitar es crear un bucket/tabla de documentos paralela: ya existe la plataforma de assets privados (`greenhouse_core.assets` + `GREENHOUSE_PRIVATE_ASSETS_BUCKET`) y la tabla de documentos de identidad con reveal/audit (`person_identity_documents`, TASK-784).
 
 ## Goal
 
-- Permitir subir CV/muestras de trabajo de un candidato como assets privados anclados a la postulación/persona.
+- Permitir subir muestras/portfolio-file y endurecer CV como assets privados anclados a la postulación/persona.
 - Capturar el enlace de portafolio y (post-decisión) el documento de identidad con el rigor de PII existente.
 - Agregar quarantine/scan a los uploads que vienen de la web pública.
 
@@ -72,7 +73,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-354-public-careers-landing-apply-intake.md`
+- `docs/tasks/in-progress/TASK-354-public-careers-landing-apply-intake.md`
 - `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md` (§`Delta 2026-07-08`)
 
 ## Dependencies & Impact
@@ -88,14 +89,14 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- `TASK-354` (apply público sube CV/portafolio)
+- `TASK-354` (apply público ya sube CV PDF; 1362 endurece y amplía document capture)
 - `TASK-355` (desk muestra documentos)
 - `TASK-356` (identity docs cerca de la decisión/handoff)
 
 ### Files owned
 
-- `src/types/assets.ts` (solo agregar contextos `hiring_application_cv` / `hiring_candidate_portfolio` / `hiring_candidate_identity_doc`)
-- `src/lib/storage/greenhouse-assets.ts` (solo agregar los contextos a los 3 mapas + `canAccessHiringAsset`)
+- `src/types/assets.ts` (CV básico ya agregado por TASK-354; agregar contextos restantes `hiring_candidate_portfolio` / `hiring_candidate_identity_doc` y, si aplica, scan/quarantine)
+- `src/lib/storage/greenhouse-assets.ts` (CV básico ya agregado por TASK-354; agregar contextos restantes a los 3 mapas + `canAccessHiringAsset`)
 - `src/app/api/assets/private/route.ts` (solo agregar los contextos a la allowlist + guard)
 - `src/lib/hiring/documents/**` (helpers hiring-aware: linkear asset a application/facet, resolver docs de un candidato)
 - `migrations/<ts>_task-1362-candidate-document-scan.sql` (wiring quarantine/scan; **NO** columna portafolio — ya existe por 1367, salvo justificar array multi-enlace)
@@ -112,7 +113,7 @@ Reglas obligatorias:
 
 ### Gap
 
-- Los contextos de asset son un `Record` exhaustivo por enum sin entradas hiring; falta el anclaje por candidato (no member).
+- Los contextos de CV hiring existen desde TASK-354; faltan contextos restantes, resolver documental, retención/borrado y scan/quarantine.
 - No hay helper hiring-aware para linkear/resolver documentos de un candidato.
 - No existe quarantine/scan de virus en la plataforma de assets (necesario para uploads públicos).
 - `candidate_facet` no tiene campo de portafolio-enlace.

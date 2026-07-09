@@ -42,6 +42,21 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.07-beta.1
+
+**Canal:** Beta
+**Fecha:** 2026-07-09
+**Disponible para:** internal
+**Módulos:** Hiring / Careers públicas
+
+### Novedades
+
+- Careers públicas permite postular a vacantes de Efeonce desde `/public/careers` con formulario seguro, confirmación genérica y carga opcional de CV en PDF.
+
+### Notas
+
+- El CV se guarda como asset privado de Greenhouse. Documentos de identidad y captura documental avanzada quedan fuera del apply público.
+
 ## 2026.05-beta.7
 
 **Canal:** Beta

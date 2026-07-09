@@ -1734,6 +1734,7 @@
 }
 
 .cvDrop {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1743,6 +1744,38 @@
   border-radius: var(--radius-md);
   background: var(--surface-alt);
   color: var(--text-secondary);
+  transition:
+    border-color var(--motion-short) var(--ease-standard),
+    background var(--motion-short) var(--ease-standard),
+    box-shadow var(--motion-short) var(--ease-standard);
+}
+
+.cvDropActive,
+.cvDrop:hover {
+  border-color: var(--primary);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(3, 117, 219, 0.12);
+}
+
+.cvDropSelected {
+  border-color: rgba(21, 127, 71, 0.45);
+  background: var(--success-tonal);
+}
+
+.cvDropError {
+  border-color: rgba(183, 31, 41, 0.5);
+  background: var(--error-tonal);
+}
+
+.cvInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .cvIcon {
@@ -1773,6 +1806,26 @@
 
 .cvText span {
   font-size: 0.8125rem;
+}
+
+.cvHint {
+  color: var(--text-disabled);
+  font-weight: 700;
+}
+
+.cvActions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+
+.cvButton {
+  min-height: 34px;
+  padding-inline: 12px;
+  font-size: 0.78rem;
 }
 
 .consentCard {

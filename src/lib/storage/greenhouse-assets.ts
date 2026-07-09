@@ -66,7 +66,9 @@ const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<DraftUploadContext, number> = 
   contractor_invoice_draft: 25 * 1024 * 1024,
   contractor_work_evidence_draft: 25 * 1024 * 1024,
   provider_invoice_draft: 25 * 1024 * 1024,
-  organization_logo_draft: 5 * 1024 * 1024
+  organization_logo_draft: 5 * 1024 * 1024,
+  // TASK-354 — CV público: PDF-only en el submit con Turnstile; 10 MiB max.
+  hiring_application_cv_draft: 10 * 1024 * 1024
 }
 
 // TASK-791 — MIME extra permitido por contexto. La factura electrónica oficial
@@ -111,6 +113,8 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   organization_logo_draft: 'organization_brand_asset',
   organization_logo: 'organization_brand_asset',
   organization_logo_candidate: 'organization_brand_asset',
+  hiring_application_cv_draft: 'hiring_candidate_document',
+  hiring_application_cv: 'hiring_candidate_document',
   // TASK-1023 — Workforce Contracting signable document (offer letter / employment contract).
   workforce_contracting_document: 'workforce_contract',
   // TASK-490 — signed PDF artifact from the signature provider (vault retention).
@@ -150,6 +154,8 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   organization_logo_draft: 'organization-logos',
   organization_logo: 'organization-logos',
   organization_logo_candidate: 'organization-logos',
+  hiring_application_cv_draft: 'hiring-application-cv',
+  hiring_application_cv: 'hiring-application-cv',
   // TASK-1023 — Workforce Contracting signable document bucket prefix.
   workforce_contracting_document: 'workforce-contracting-documents',
   // TASK-490 — signed signature artifact bucket prefix.
@@ -435,7 +441,7 @@ export const createPrivatePendingAsset = async ({
   metadata
 }: {
   contextType: DraftUploadContext
-  uploadedByUserId: string
+  uploadedByUserId: string | null
   fileName: string
   contentType: string
   bytes: ArrayBuffer | Uint8Array | Buffer
@@ -593,7 +599,7 @@ export const attachAssetToAggregate = async ({
   assetId: string
   ownerAggregateType: Exclude<GreenhouseAssetContext, DraftUploadContext>
   ownerAggregateId: string
-  actorUserId: string
+  actorUserId: string | null
   ownerClientId?: string | null
   ownerSpaceId?: string | null
   ownerMemberId?: string | null
@@ -978,6 +984,12 @@ const canAccessOrganizationLogoAsset = (tenant: TenantContext, asset: Greenhouse
   )
 }
 
+const canAccessHiringCandidateDocumentAsset = (tenant: TenantContext) =>
+  hasRouteGroup(tenant, 'hr') ||
+  hasRouteGroup(tenant, 'internal') ||
+  hasRouteGroup(tenant, 'admin') ||
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+
 export const canTenantAccessAsset = ({
   tenant,
   asset
@@ -1035,6 +1047,10 @@ export const canTenantAccessAsset = ({
     case 'organization_logo':
     case 'organization_logo_candidate':
       return canAccessOrganizationLogoAsset(tenant, asset)
+    // TASK-354 — CVs de Careers son privados; candidatos públicos nunca descargan por esta ruta.
+    case 'hiring_application_cv_draft':
+    case 'hiring_application_cv':
+      return canAccessHiringCandidateDocumentAsset(tenant)
     default:
       return false
   }

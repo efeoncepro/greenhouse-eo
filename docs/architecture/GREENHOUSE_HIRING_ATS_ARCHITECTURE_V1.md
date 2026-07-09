@@ -899,6 +899,7 @@ Modelo canónico (schema `greenhouse_hiring`):
 ### Document capture — reutilización, no plataformas nuevas
 
 - **CV / portafolio (archivo)**: plataforma de assets privados existente (`greenhouse_core.assets` + `GREENHOUSE_PRIVATE_ASSETS_BUCKET`), contextos hiring nuevos anclados por `application_id`/`candidate_facet_id`/`identity_profile_id` (el candidato NO tiene `member` → NO anclar por member). Portafolio-enlace = campo en `candidate_facet`.
+- **Delta 2026-07-09 (TASK-354):** el apply público ya acepta CV PDF opcional (máx. 10 MB) como `hiring_application_cv_draft` → `hiring_application_cv`, adjunto a `hiring_application`. Sigue pendiente TASK-1362 para portfolio-file, identidad y scan/quarantine formal.
 - **Documento de identidad**: reutiliza `greenhouse_core.person_identity_documents` (TASK-784) anclado al `identity_profile_id` del candidato, patrón enmascarado/revelar + capability `person.legal_profile.reveal_sensitive` + audit; imagen escaneada como `evidence_asset_id`. Capturado **post-decisión** (no en apply público).
 - Net-new: **quarantine/scan** de uploads públicos (no existe en la plataforma de assets hoy).
 

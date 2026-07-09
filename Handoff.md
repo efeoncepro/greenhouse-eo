@@ -4,7 +4,7 @@
 > **Form:** el apply es Growth Form en contrato browser (`formKind='application'`, slug `efeonce-careers-application`, schema/campos/consent/captcha/eventos `gh_form_*`) con estética del HTML; el submit autoritativo sigue siendo Hiring/TASK-1367 vía `POST /api/public/hiring/applications`. No se creó pipeline paralelo.
 > **Flags:** por instrucción del operador, Vercel quedó con `HIRING_PUBLIC_APPLICATIONS_ENABLED=true` y `NEXT_PUBLIC_TURNSTILE_SITE_KEY` en `staging` y `Production`; `TURNSTILE_SECRET` está presente en ambos. Como `NEXT_PUBLIC_*` se hornea en build, falta promoción/build fresco + smoke staging/prod para cierre.
 > **Validación local ya hecha:** tests focales, typecheck, lint, task/ops lint, GVC local home/detail/apply y Playwright desktop/mobile sin overflow, con contrato Growth Forms y eventos `gh_form_*` verificados. Pendiente re-ejecutar gates tras el último patch documental/Sentry antes del commit.
-> **Límites/follow-ups:** CV upload real sigue en `TASK-1362`; `revalidatePath` on-publish queda en `TASK-355` (Publication Desk). Esta UI usa ISR `revalidate=300` y no crea un publish command paralelo.
+> **Límites/follow-ups:** CV PDF opcional ya queda en TASK-354 vía assets privados; `TASK-1362` sigue para portfolio-file, identidad, scan/quarantine formal y resolver documental unificado. `revalidatePath` on-publish queda en `TASK-355` (Publication Desk). Esta UI usa ISR `revalidate=300` y no crea un publish command paralelo.
 
 ## Sesion 2026-07-08 - Vercel docs-only ignored build guard - Codex - code/config
 

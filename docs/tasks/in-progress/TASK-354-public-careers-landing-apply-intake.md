@@ -26,7 +26,7 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 
 - **Task partida por Execution profile** (Task Authoring Contract + task-planner): el *apply intake service* (endpoint público + validación + reconciliación Person→facet→application + dedupe/idempotency + consent + anti-abuse) se movió a **`TASK-1367` (backend-data)**. Esta task queda como la **careers UI** (`ui-ux`): listing + detalle + apply form, **cliente delgado** del service de 1367. `Blocked by` ahora incluye `TASK-1367`.
 - **Docs de diseño creados (robustos, no stubs):** `docs/ui/wireframes/TASK-354-public-careers-landing.md`, `docs/ui/flows/TASK-354-public-careers-landing-flow.md`, y el **master UI flow del programa** `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md` (esta surface = nodos N1/N2/N3).
-- **V1 links-only:** portafolio/LinkedIn como enlace; el upload de archivo (CV) es `TASK-1362`. El shell público sin sesión se diseña reusable para `/assessment/[token]` (TASK-1363).
+- **V1 con CV PDF privado:** portafolio/LinkedIn siguen como enlace; el CV opcional se sube como PDF (máx. 10 MB) dentro del submit público protegido por Turnstile y se persiste en `greenhouse_core.assets` con contexto `hiring_application_cv`. `TASK-1362` queda para document capture completo (portfolio-file, identidad, scan/quarantine formal). El shell público sin sesión se diseña reusable para `/assessment/[token]` (TASK-1363).
 - El apply **NO** dispara el test (se envía después desde el desk, TASK-355/1363).
 
 ## Delta 2026-07-08 (desbloqueo de ejecución Codex)
@@ -38,6 +38,7 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 
 - **UI code complete:** `/public/careers/**` implementado con alta fidelidad al HTML local `carreers`, usando marca Efeonce externa, home employer-brand, listado, detalle, apply y estados no disponibles. Listing/detalle consumen solo `PublicOpeningPayload`; apply postea a `POST /api/public/hiring/applications`.
 - **Apply como Growth Form, sin write path paralelo:** el formulario usa contrato browser de Growth Forms (`formKind='application'`, slug `efeonce-careers-application`, schema/campos/consent/captcha y eventos `gh_form_*`) con estética del HTML fuente; la autoridad de negocio sigue siendo Hiring/TASK-1367.
+- **CV con Greenhouse uploader/asset pipeline:** el apply público acepta un PDF opcional y lo adjunta como asset privado a `hiring_application` usando `createPrivatePendingAsset` + `attachAssetToAggregate`. No usa el endpoint privado del componente autenticado en browser público.
 - **Rollout iniciado por instrucción del operador:** `HIRING_PUBLIC_APPLICATIONS_ENABLED=true` y `NEXT_PUBLIC_TURNSTILE_SITE_KEY` quedaron seteados en Vercel `staging` y `Production` el 2026-07-09; `TURNSTILE_SECRET` existe en ambos. Falta build fresco + release control plane + smoke staging/prod para cerrar.
 - **Límite explícito:** `revalidatePath` on-demand al publicar/despublicar queda en TASK-355 (Publication Desk). Esta UI ya usa ISR (`revalidate=300`) y no crea un publish command paralelo.
 
@@ -58,7 +59,7 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 - Wireframe: `docs/ui/wireframes/TASK-354-public-careers-landing.md`
 - Flow: `docs/ui/flows/TASK-354-public-careers-landing-flow.md`
 - Motion: `docs/ui/motion/TASK-354-public-careers-landing-motion.md`
-- Backend impact: `none`
+- Backend impact: `api`
 - Epic: `EPIC-011`
 - Status real: `Code complete; rollout en curso`
 - Rank: `TBD`
@@ -79,8 +80,12 @@ TASK-353 dejó la foundation + el payload público (`PublicOpeningPayload`) y TA
 ## Goal
 
 - Renderizar listing + detalle público consumiendo SOLO el payload allowlist (nunca columnas internas).
-- Entregar un apply form accesible (bilingüe es-CL + en-US vía next-intl, links-only V1) que postee al service de TASK-1367 con confirmación genérica y segura.
+- Entregar un apply form accesible (bilingüe es-CL + en-US vía next-intl, con CV PDF opcional vía assets privados) que postee al service de TASK-1367 con confirmación genérica y segura.
 - Diseñar el shell público sin sesión reusable para `/assessment/[token]` (TASK-1363).
+
+## Hybrid Execution Justification
+
+El operador pidió explícitamente que el upload de CV use Greenhouse uploader/asset pipeline dentro del cierre end-to-end de esta UI. El backend añadido es pequeño, reversible y sin migración: `multipart/form-data` en el endpoint público existente + contextos exhaustivos del asset registry + attach a `hiring_application`. No cambia schema de Hiring ni crea comandos paralelos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -192,7 +197,16 @@ Ver la tabla completa en el wireframe (§Implementation Mapping): VacancyCard = 
 
 ### Design decision log
 
-- Marca Efeonce (no Greenhouse); links-only V1 (upload = 1362); confirmación genérica terminal; shell público reusable (DDL-2 master); filtrado client-side V1; locale-aware `hreflang`-ready. Detalle en wireframe + flow.
+- Marca Efeonce (no Greenhouse); CV PDF opcional como asset privado (document capture amplio = 1362); confirmación genérica terminal; shell público reusable (DDL-2 master); filtrado client-side V1; locale-aware `hreflang`-ready. Detalle en wireframe + flow.
+
+## Backend/Data Contract
+
+- Endpoint afectado: `POST /api/public/hiring/applications`.
+- Entrada pública: JSON sin archivo (compatibilidad) o `multipart/form-data` con los mismos campos + `cvFile` opcional.
+- Archivo permitido: `application/pdf`, tamaño máximo 10 MB, validado en cliente y servidor.
+- Persistencia: `greenhouse_core.assets` en bucket privado con contexto draft `hiring_application_cv_draft`; attach final a `owner_aggregate_type='hiring_application_cv'` y `owner_aggregate_id=<application_id>`.
+- Acceso: el candidato público nunca recibe URL de descarga. Descarga interna pasa por `/api/assets/private/[assetId]` y `canTenantAccessAsset` limitado a HR/internal/admin/EFEONCE_ADMIN.
+- Riesgo residual documentado: V1 PDF-only marca `scanStatus='not_scanned_pdf_only_v1'`; scan/quarantine formal queda en `TASK-1362`.
 
 ### Visual verification
 
@@ -223,7 +237,7 @@ Ver la tabla completa en el wireframe (§Implementation Mapping): VacancyCard = 
 
 ### Slice 3 — Apply form (N3) — forms-ux floor
 
-- Form (`react-hook-form` o `useActionState`): Nombre/Apellido (fila pareada) · Correo · Teléfono (opcional) · Portafolio-link (opcional) · LinkedIn-link (opcional) · Disponibilidad (opcional) · Mensaje (opcional) · Consent · **Turnstile widget**. Postea a `POST /api/public/hiring/applications` (1367) con `captchaToken`.
+- Form (`react-hook-form` o `useActionState`): Nombre/Apellido (fila pareada) · Correo · Teléfono (opcional) · CV PDF (opcional) · Portafolio-link (opcional) · LinkedIn-link (opcional) · Disponibilidad (opcional) · Mensaje (opcional) · Consent · **Turnstile widget**. Postea a `POST /api/public/hiring/applications` (1367) con `captchaToken`.
 - **Floor forms-ux (obligatorio):** single column, label sobre input, `autocomplete`+`inputmode` por campo (ver wireframe §Implementation Mapping), validación 3-stage (silencio→blur→fix-on-change→server-confirm), error inline 4-elementos (`aria-invalid`+`aria-describedby`+`role=alert`), submit **ENABLED** (validar al click, NO deshabilitar por consent), preservar datos en error, foco al primer error, NO autofocus, "(opcional)" en la minoría, paste tolerante (teléfono).
 - Estados: idle/validando-inline/enviando/accepted-genérico/rate-limited/captcha-failed/validación/error. Confirmación genérica (nunca revela dedupe/estado/PII). Consent referencia el aviso de privacidad (Ley 21.719).
 
@@ -238,7 +252,7 @@ Ver la tabla completa en el wireframe (§Implementation Mapping): VacancyCard = 
 ## Out of Scope
 
 - El apply intake service (backend) — TASK-1367.
-- Upload de archivo CV — TASK-1362 (V1 links-only).
+- Document capture completo — TASK-1362 (portfolio-file, identidad, scan/quarantine formal). El CV PDF opcional V1 queda en TASK-354 por instrucción del operador.
 - Assessment (envío/rendición) — TASK-1363; el apply no dispara el test.
 - Desk interno — TASK-355.
 
@@ -333,7 +347,7 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 
 ## Follow-ups
 
-- `TASK-1362` doc capture → upload de CV como archivo (V2 del apply).
+- `TASK-1362` doc capture → portfolio-file, identity docs, resolver documental unificado y scan/quarantine formal.
 - `TASK-1363` reusa el shell público para `/assessment/[token]`.
 - `TASK-355` cablea `revalidatePath('/public/careers')` y detalle/apply al publish/unpublish real.
 - Endpoint de búsqueda dedicado si crece el volumen de vacantes.

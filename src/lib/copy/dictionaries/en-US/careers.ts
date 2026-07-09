@@ -166,8 +166,16 @@ export const careers: CareersCopy = {
     availabilityOptions: ['Immediate', '2 to 4 weeks', '1 to 2 months', 'Exploring'],
     cv: {
       label: 'CV (optional)',
-      title: 'CV upload comes next',
-      body: 'V1 uses safe links. Share your portfolio or LinkedIn; file uploads will arrive in a later iteration.',
+      title: 'Upload your CV',
+      body: 'Drag or select your CV as a PDF. We store it as a private Greenhouse asset.',
+      hint: 'PDF, 10 MB maximum.',
+      selectedTitle: 'CV ready to send',
+      browseCta: 'Choose PDF',
+      replaceCta: 'Replace',
+      removeCta: 'Remove',
+      invalidType: 'Upload a PDF. For safety, this form does not accept DOC, DOCX, or ZIP files.',
+      tooLarge: 'The PDF is larger than the 10 MB limit.',
+      empty: 'The file is empty. Choose another PDF.',
     },
     consent: {
       title: 'I agree that Efeonce may process my data for this selection process.',

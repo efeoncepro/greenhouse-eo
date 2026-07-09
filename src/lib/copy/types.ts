@@ -229,6 +229,14 @@ export interface CareersCopy {
       label: string
       title: string
       body: string
+      hint: string
+      selectedTitle: string
+      browseCta: string
+      replaceCta: string
+      removeCta: string
+      invalidType: string
+      tooLarge: string
+      empty: string
     }
     consent: {
       title: string

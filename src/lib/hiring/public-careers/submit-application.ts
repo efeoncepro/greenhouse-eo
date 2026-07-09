@@ -7,6 +7,7 @@ import { createHiringApplication, reconcileCandidateFacet } from '@/lib/hiring/s
 import { resolvePublishedOpeningIdByPublicId } from '@/lib/hiring/publication'
 import { isHiringError } from '@/lib/hiring/errors'
 
+import { attachPublicCareersCvToApplication } from './cv-upload'
 import type { NormalizedApplicationInput } from './schema'
 
 export type SubmitApplicationOutcome = 'accepted' | 'not_open'
@@ -15,6 +16,24 @@ export interface SubmitApplicationResult {
   outcome: SubmitApplicationOutcome
   /** public_id de la application (solo presente en `accepted`; NUNCA revela dedupe/estado interno). */
   applicationPublicId: string | null
+  /** application_id interno para trazabilidad server-side; nunca se retorna al browser. */
+  applicationId: string | null
+}
+
+type SubmitPublicHiringApplicationOptions = {
+  cvFile?: File | null
+}
+
+const getDuplicateApplicationId = (error: unknown): string | null => {
+  if (!isHiringError(error) || error.code !== 'hiring_application_duplicate') return null
+
+  const details = 'details' in error ? error.details : null
+
+  if (!details || typeof details !== 'object') return null
+
+  const applicationId = (details as { applicationId?: unknown }).applicationId
+
+  return typeof applicationId === 'string' && applicationId ? applicationId : null
 }
 
 /**
@@ -29,11 +48,12 @@ export interface SubmitApplicationResult {
  */
 export const submitPublicHiringApplication = async (
   input: NormalizedApplicationInput,
+  options: SubmitPublicHiringApplicationOptions = {},
 ): Promise<SubmitApplicationResult> => {
   const openingId = await resolvePublishedOpeningIdByPublicId(input.openingPublicId)
 
   if (!openingId) {
-    return { outcome: 'not_open', applicationPublicId: null }
+    return { outcome: 'not_open', applicationPublicId: null, applicationId: null }
   }
 
   // 1. Person (email-first reconcile; idempotente — devuelve el profile existente si el email ya existe).
@@ -65,6 +85,19 @@ export const submitPublicHiringApplication = async (
   // Idempotency key para audit/traza; el enforcement real es el UNIQUE del store.
   const dedupeFingerprint = createHash('sha256').update(`${openingId}|${input.email}`).digest('hex')
 
+  const attachCv = async (applicationId: string) => {
+    if (!options.cvFile) return
+
+    await attachPublicCareersCvToApplication({
+      file: options.cvFile,
+      applicationId,
+      openingId,
+      openingPublicId: input.openingPublicId,
+      identityProfileId,
+      candidateFacetId: facet.candidateFacetId,
+    })
+  }
+
   try {
     const application = await createHiringApplication(
       {
@@ -77,12 +110,19 @@ export const submitPublicHiringApplication = async (
       null,
     )
 
+    await attachCv(application.applicationId)
 
-return { outcome: 'accepted', applicationPublicId: application.publicId }
+    return { outcome: 'accepted', applicationPublicId: application.publicId, applicationId: application.applicationId }
   } catch (error) {
     // Duplicado → MISMO success genérico (nunca revela "ya postulaste"). Otros errores propagan.
     if (isHiringError(error) && error.code === 'hiring_application_duplicate') {
-      return { outcome: 'accepted', applicationPublicId: null }
+      const applicationId = getDuplicateApplicationId(error)
+
+      if (applicationId) {
+        await attachCv(applicationId)
+      }
+
+      return { outcome: 'accepted', applicationPublicId: null, applicationId }
     }
 
     throw error

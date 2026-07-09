@@ -7,6 +7,7 @@ import {
   useState,
   type ChangeEvent,
   type CSSProperties,
+  type DragEvent,
   type FormEvent,
   type HTMLAttributes,
   type ReactNode,
@@ -20,6 +21,12 @@ import { createTelemetryEmitter, type TelemetryEmitter } from '@/growth-forms-re
 import { TurnstileTokenClient } from '@/growth-forms-renderer/turnstile'
 import { RENDERER_VERSION } from '@/growth-forms-renderer/version'
 import type { CareersCopy } from '@/lib/copy'
+import {
+  PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES,
+  formatPublicCareersCvFileSize,
+  validatePublicCareersCvUpload,
+  type PublicCareersCvValidationError,
+} from '@/lib/hiring/public-careers/cv-upload-contract'
 import { formatCareersTemplate, type CareersOpeningViewModel } from '@/lib/hiring/public-careers/view-model'
 
 import styles from './careers.module.css'
@@ -46,7 +53,8 @@ interface ApplicationFormValues {
 }
 
 type ApplicationField = keyof ApplicationFormValues
-type ApplicationErrors = Partial<Record<ApplicationField | 'captcha' | 'server', string>>
+type ApplicationErrorField = ApplicationField | 'captcha' | 'server' | 'cv'
+type ApplicationErrors = Partial<Record<ApplicationErrorField, string>>
 
 const INITIAL_VALUES: ApplicationFormValues = {
   firstName: '',
@@ -71,6 +79,7 @@ const FIELD_ORDER: Array<ApplicationField | 'captcha'> = [
 ]
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const CV_ACCEPT = PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES.join(',')
 
 const isHttpsUrl = (value: string): boolean => {
   const trimmed = value.trim()
@@ -82,6 +91,13 @@ const isHttpsUrl = (value: string): boolean => {
   } catch {
     return false
   }
+}
+
+const resolveCvValidationMessage = (copy: CareersCopy, error: PublicCareersCvValidationError): string => {
+  if (error === 'file_too_large') return copy.apply.cv.tooLarge
+  if (error === 'file_empty') return copy.apply.cv.empty
+
+  return copy.apply.cv.invalidType
 }
 
 const resolveServerError = (copy: CareersCopy, outcome: unknown, status: number): string => {
@@ -97,10 +113,13 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
   const turnstileSiteKey = formContract.security?.captcha?.siteKey ?? null
   const [values, setValues] = useState<ApplicationFormValues>(INITIAL_VALUES)
   const [errors, setErrors] = useState<ApplicationErrors>({})
+  const [cvFile, setCvFile] = useState<File | null>(null)
+  const [isCvDragActive, setIsCvDragActive] = useState(false)
   const [submitState, setSubmitState] = useState<SubmitState>('idle')
   const [captchaState, setCaptchaState] = useState<CaptchaState>(turnstileSiteKey ? 'pending' : 'verified')
   const turnstileRef = useRef<TurnstileTokenClient | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
+  const cvInputRef = useRef<HTMLInputElement | null>(null)
   const telemetryRef = useRef<TelemetryEmitter | null>(null)
   const viewedRef = useRef(false)
   const startedRef = useRef(false)
@@ -178,6 +197,65 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
     })
   }
 
+  const clearCvError = () => {
+    setErrors(current => {
+      if (!current.cv) return current
+
+      const next = { ...current }
+
+      delete next.cv
+
+      return next
+    })
+  }
+
+  const selectCvFile = (file: File | null) => {
+    emitStarted()
+
+    if (!file) {
+      setCvFile(null)
+      clearCvError()
+
+      return
+    }
+
+    const validationError = validatePublicCareersCvUpload(file)
+
+    if (validationError) {
+      setCvFile(null)
+      setErrors(current => ({ ...current, cv: resolveCvValidationMessage(copy, validationError) }))
+      setSubmitState('invalid')
+
+      if (cvInputRef.current) {
+        cvInputRef.current.value = ''
+      }
+
+      return
+    }
+
+    setCvFile(file)
+    clearCvError()
+  }
+
+  const removeCvFile = () => {
+    setCvFile(null)
+    clearCvError()
+
+    if (cvInputRef.current) {
+      cvInputRef.current.value = ''
+    }
+  }
+
+  const handleCvInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    selectCvFile(event.target.files?.[0] ?? null)
+  }
+
+  const handleCvDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsCvDragActive(false)
+    selectCvFile(event.dataTransfer.files?.[0] ?? null)
+  }
+
   const validate = (): ApplicationErrors => {
     const nextErrors: ApplicationErrors = {}
     const email = values.email.trim()
@@ -189,6 +267,9 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
     if (!isHttpsUrl(values.portfolioUrl)) nextErrors.portfolioUrl = copy.apply.errors.urlInvalid
     if (!isHttpsUrl(values.linkedinUrl)) nextErrors.linkedinUrl = copy.apply.errors.urlInvalid
     if (!values.consent) nextErrors.consent = copy.apply.errors.consent
+    const cvValidationError = cvFile ? validatePublicCareersCvUpload(cvFile) : null
+
+    if (cvValidationError) nextErrors.cv = resolveCvValidationMessage(copy, cvValidationError)
 
     return nextErrors
   }
@@ -275,23 +356,44 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
     }
 
     try {
+      const applicationPayload = {
+        openingPublicId: opening.publicId,
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        email: values.email.trim(),
+        phone: values.phone.trim() || null,
+        portfolioUrl: values.portfolioUrl.trim() || null,
+        linkedinUrl: values.linkedinUrl.trim() || null,
+        availability: values.availability.trim() || null,
+        message: values.message.trim() || null,
+        consent: values.consent,
+        consentPolicyVersion: formContract.consent?.consentPolicyVersion ?? 'efeonce-careers-2026-07',
+        captchaToken,
+      }
+
+      const requestInit: RequestInit = cvFile
+        ? {
+            method: 'POST',
+            body: Object.entries(applicationPayload).reduce((formData, [key, value]) => {
+              if (value !== null && value !== undefined) {
+                formData.set(key, String(value))
+              }
+
+              return formData
+            }, new FormData()),
+          }
+        : {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(applicationPayload),
+          }
+
+      if (cvFile && requestInit.body instanceof FormData) {
+        requestInit.body.set('cvFile', cvFile, cvFile.name)
+      }
+
       const response = await fetch('/api/public/hiring/applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          openingPublicId: opening.publicId,
-          firstName: values.firstName.trim(),
-          lastName: values.lastName.trim(),
-          email: values.email.trim(),
-          phone: values.phone.trim() || null,
-          portfolioUrl: values.portfolioUrl.trim() || null,
-          linkedinUrl: values.linkedinUrl.trim() || null,
-          availability: values.availability.trim() || null,
-          message: values.message.trim() || null,
-          consent: values.consent,
-          consentPolicyVersion: formContract.consent?.consentPolicyVersion ?? 'efeonce-careers-2026-07',
-          captchaToken,
-        }),
+        ...requestInit,
       })
 
       const body = (await response.json().catch(() => null)) as { outcome?: string } | null
@@ -477,14 +579,62 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
               ))}
             </select>
           </div>
-          <div className={styles.cvDrop} aria-label={copy.apply.cv.label}>
-            <span className={styles.cvIcon}>
-              <i className='tabler-file-cv' aria-hidden='true' />
-            </span>
-            <span className={styles.cvText}>
-              <strong>{copy.apply.cv.title}</strong>
-              <span>{copy.apply.cv.body}</span>
-            </span>
+          <div className={styles.field} data-capture='careers-cv-uploader'>
+            <span className={styles.label}>{copy.apply.cv.label}</span>
+            <div
+              className={`${styles.cvDrop} ${isCvDragActive ? styles.cvDropActive : ''} ${cvFile ? styles.cvDropSelected : ''} ${errors.cv ? styles.cvDropError : ''}`}
+              onDragEnter={event => {
+                event.preventDefault()
+                setIsCvDragActive(true)
+              }}
+              onDragOver={event => {
+                event.preventDefault()
+                setIsCvDragActive(true)
+              }}
+              onDragLeave={() => setIsCvDragActive(false)}
+              onDrop={handleCvDrop}
+              role='group'
+              aria-describedby={errors.cv ? errorId('cv') : undefined}
+            >
+              <input
+                ref={cvInputRef}
+                className={styles.cvInput}
+                id={fieldId('cv')}
+                name='cvFile'
+                type='file'
+                accept={CV_ACCEPT}
+                onChange={handleCvInputChange}
+                aria-label={copy.apply.cv.label}
+              />
+              <span className={styles.cvIcon}>
+                <i className={cvFile ? 'tabler-file-type-pdf' : 'tabler-upload'} aria-hidden='true' />
+              </span>
+              <span className={styles.cvText}>
+                <strong>{cvFile ? copy.apply.cv.selectedTitle : copy.apply.cv.title}</strong>
+                <span>{cvFile ? `${cvFile.name} - ${formatPublicCareersCvFileSize(cvFile.size)}` : copy.apply.cv.body}</span>
+                <span className={styles.cvHint}>{copy.apply.cv.hint}</span>
+              </span>
+              <span className={styles.cvActions}>
+                <button
+                  className={`${styles.button} ${styles.buttonOutlined} ${styles.cvButton}`}
+                  type='button'
+                  onClick={() => cvInputRef.current?.click()}
+                >
+                  {cvFile ? copy.apply.cv.replaceCta : copy.apply.cv.browseCta}
+                </button>
+                {cvFile ? (
+                  <button className={styles.textButton} type='button' onClick={removeCvFile}>
+                    {copy.apply.cv.removeCta}
+                  </button>
+                ) : null}
+              </span>
+            </div>
+            {errors.cv ? (
+              <span className={styles.errorText} id={errorId('cv')}>
+                <i className='tabler-alert-circle' aria-hidden='true' />
+                {errors.cv}
+              </span>
+            ) : null}
           </div>
         </FormSection>
 
@@ -558,8 +708,8 @@ const FormSection = ({ children, number, title }: { children: ReactNode; number:
   </section>
 )
 
-const fieldId = (field: ApplicationField | 'captcha') => `careers-apply-${field}`
-const errorId = (field: ApplicationField | 'captcha') => `${fieldId(field)}-error`
+const fieldId = (field: ApplicationField | 'captcha' | 'cv') => `careers-apply-${field}`
+const errorId = (field: ApplicationField | 'captcha' | 'cv') => `${fieldId(field)}-error`
 
 const TextField = ({
   autoComplete,

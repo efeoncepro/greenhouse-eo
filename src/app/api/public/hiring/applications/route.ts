@@ -9,6 +9,11 @@ import {
   type HiringIntakeOutcome,
 } from '@/lib/hiring/public-careers/abuse-guard'
 import { isHiringPublicApplicationsEnabled } from '@/lib/hiring/public-careers/config'
+import {
+  PUBLIC_CAREERS_CV_MAX_BYTES,
+  validatePublicCareersCvUpload,
+} from '@/lib/hiring/public-careers/cv-upload-contract'
+import { PublicCareersCvUploadError } from '@/lib/hiring/public-careers/cv-upload'
 import { parsePublicHiringApplication } from '@/lib/hiring/public-careers/schema'
 import { submitPublicHiringApplication } from '@/lib/hiring/public-careers/submit-application'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -42,6 +47,8 @@ const STATUS: Record<HiringIntakeOutcome, number> = {
   invalid: 422,
 }
 
+const MAX_PUBLIC_APPLY_BODY_BYTES = PUBLIC_CAREERS_CV_MAX_BYTES + 256 * 1024
+
 const getClientIp = (request: Request): string | null =>
   request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip')?.trim() || null
 
@@ -57,20 +64,62 @@ const safeRecord = async (input: Parameters<typeof recordHiringIntakeEvent>[0]):
   }
 }
 
+const parseBooleanFormValue = (value: FormDataEntryValue | null): boolean =>
+  typeof value === 'string' && ['true', '1', 'on', 'yes'].includes(value.trim().toLowerCase())
+
+const parsePublicApplyRequest = async (
+  request: Request,
+): Promise<{ body: Record<string, unknown>; cvFile: File | null } | null> => {
+  const contentType = request.headers.get('content-type')?.toLowerCase() ?? ''
+
+  if (!contentType.includes('multipart/form-data')) {
+    return { body: (await request.json()) as Record<string, unknown>, cvFile: null }
+  }
+
+  const contentLength = Number(request.headers.get('content-length') ?? 0)
+
+  if (Number.isFinite(contentLength) && contentLength > MAX_PUBLIC_APPLY_BODY_BYTES) {
+    return null
+  }
+
+  const formData = await request.formData()
+  const body: Record<string, unknown> = {}
+
+  for (const [key, value] of formData.entries()) {
+    if (key === 'cvFile' || value instanceof File) continue
+
+    body[key] = value
+  }
+
+  body.consent = parseBooleanFormValue(formData.get('consent'))
+
+  const cvCandidate = formData.get('cvFile')
+
+  return {
+    body,
+    cvFile: cvCandidate instanceof File ? cvCandidate : null,
+  }
+}
+
 export async function POST(request: Request) {
   // Flag OFF → 404 invisible (no revela que el endpoint existe).
   if (!isHiringPublicApplicationsEnabled()) {
     return NextResponse.json({ outcome: 'disabled', message: MESSAGES.disabled }, { status: 404 })
   }
 
-  let body: Record<string, unknown>
+  let requestPayload: { body: Record<string, unknown>; cvFile: File | null } | null
 
   try {
-    body = (await request.json()) as Record<string, unknown>
+    requestPayload = await parsePublicApplyRequest(request)
   } catch {
     return respond('invalid')
   }
 
+  if (!requestPayload) {
+    return respond('invalid')
+  }
+
+  const { body, cvFile } = requestPayload
   const ip = getClientIp(request)
   const ipHash = hashHiringIp(ip)
   const captchaToken = typeof body.captchaToken === 'string' ? body.captchaToken : null
@@ -96,6 +145,14 @@ export async function POST(request: Request) {
 
     const emailHash = hashHiringEmail(parsed.email)
 
+    const cvValidationError = cvFile ? validatePublicCareersCvUpload(cvFile) : null
+
+    if (cvValidationError) {
+      await safeRecord({ emailHash, ipHash, openingPublicId: parsed.openingPublicId, outcome: 'invalid' })
+
+      return respond('invalid')
+    }
+
     // 3. Rate-limit (per-email → per-IP).
     const abuse = await checkHiringIntakeAbuse({ emailHash, ipHash })
 
@@ -106,7 +163,25 @@ export async function POST(request: Request) {
     }
 
     // 4. Submit gobernado (multi-step idempotente). Duplicado → 'accepted' genérico.
-    const result = await submitPublicHiringApplication(parsed)
+    let result: Awaited<ReturnType<typeof submitPublicHiringApplication>>
+
+    try {
+      result = await submitPublicHiringApplication(parsed, { cvFile })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : null
+
+      if (
+        error instanceof PublicCareersCvUploadError ||
+        message === 'unsupported_type' ||
+        message === 'file_too_large'
+      ) {
+        await safeRecord({ emailHash, ipHash, openingPublicId: parsed.openingPublicId, outcome: 'invalid' })
+
+        return respond('invalid')
+      }
+
+      throw error
+    }
 
     await safeRecord({ emailHash, ipHash, openingPublicId: parsed.openingPublicId, outcome: result.outcome })
 

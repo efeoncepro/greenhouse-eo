@@ -18,6 +18,7 @@ export type GreenhouseAssetRetentionClass =
   | 'organization_brand_asset'
   | 'hr_certification'
   | 'hr_evidence'
+  | 'hiring_candidate_document'
   // TASK-1023 — labor contracts / offer letters; long retention (5yr+ post-termination).
   | 'workforce_contract'
   // TASK-791 — Contractor invoice / work evidence retention classes. Provider
@@ -60,6 +61,9 @@ export type GreenhouseAssetContext =
   | 'organization_logo_draft'
   | 'organization_logo'
   | 'organization_logo_candidate'
+  // TASK-354 — public Careers CVs use the shared private asset registry.
+  | 'hiring_application_cv_draft'
+  | 'hiring_application_cv'
   // TASK-1023 — Workforce Contracting Studio signable document (offer letter / employment contract).
   | 'workforce_contracting_document'
   // TASK-490 — signed PDF artifact returned by the signature provider (EPIC-001 signature platform).
@@ -116,6 +120,7 @@ export type DraftUploadContext = Extract<
   | 'contractor_work_evidence_draft'
   | 'provider_invoice_draft'
   | 'organization_logo_draft'
+  | 'hiring_application_cv_draft'
 >
 
 export interface UploadPrivateAssetInput {

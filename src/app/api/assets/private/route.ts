@@ -21,7 +21,8 @@ const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>([
   'contractor_invoice_draft',
   'contractor_work_evidence_draft',
   'provider_invoice_draft',
-  'organization_logo_draft'
+  'organization_logo_draft',
+  'hiring_application_cv_draft'
 ])
 
 const isDraftContext = (value: string): value is DraftUploadContext =>
@@ -81,6 +82,17 @@ const canUploadForContext = ({
   // gated by organization.brand_asset and the operating-entity guard.
   if (contextType === 'organization_logo_draft') {
     return hasRouteGroup(tenant, 'internal') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  }
+
+  // TASK-354 — CVs de candidatos subidos on-behalf por equipo interno.
+  // El apply público no usa esta ruta: sube el PDF dentro del submit con Turnstile.
+  if (contextType === 'hiring_application_cv_draft') {
+    return (
+      hasRouteGroup(tenant, 'hr') ||
+      hasRouteGroup(tenant, 'internal') ||
+      hasRouteGroup(tenant, 'admin') ||
+      hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+    )
   }
 
   return hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
