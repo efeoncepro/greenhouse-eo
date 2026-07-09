@@ -4,7 +4,27 @@
 >
 > **Discovery:** `TASK-353` esta complete y el blocker de TASK-355 era stale. El HTML fuente `~/Documents/carreers/Hiring-Desk/Hiring-Desk/Hiring Desk.dc.html` fue renderizado e inspeccionado con Playwright: Demand, drawer, Pipeline drag/keyboard/rollback, Application 360, assessment, docs/PII, decision/history, Publication, dialogs, locale, dark y reduced-motion. Los uploads de task/wireframe/flow/motion coinciden byte a byte con el repo.
 >
-> **Estado:** TASK-355 movida a `in-progress`, `UI ready: yes`; plan canonico en `docs/tasks/plans/TASK-355-plan.md`, checkpoint humano pendiente. Ejecucion secuencial, en `develop` por confirmacion del goal, sin subagentes ni push. Gaps honestos: TASK-1362 y TASK-1363 siguen to-do; sus embeds se implementaran como adapters con degraded states hasta que sus contracts aterricen. El control demo de fallo de red queda solo en GVC/harness, no en produccion.
+> **Estado:** TASK-355 movida a `in-progress`, `UI ready: yes`; plan canonico en `docs/tasks/plans/TASK-355-plan.md`, **aprobado por el operador el 2026-07-09**. Ejecucion secuencial, en `develop` por confirmacion del goal, sin subagentes ni push. Gaps honestos: TASK-1362 y TASK-1363 siguen to-do; sus embeds se implementaran como adapters con degraded states hasta que sus contracts aterricen. El control demo de fallo de red queda solo en GVC/harness, no en produccion.
+
+## Sesion 2026-07-09 - Paso a producción develop→main (release 41aefb457) - Claude - RELEASE
+
+> **Release completado + released.** develop→main completo (36 commits: TASK-1374/1375 ebook +
+> maquinaria de entrega tokenizada + batch develop). Target SHA `41aefb457ba343e5c1eb7dda346f7ab2cf11dc9a`,
+> release_id `41aefb457ba3-edb048f7-5dbc-46cb-8206-fd34b117a979`, run `29044883487`, manifest = `released`.
+> 4 workers Cloud Run ✅, Vercel prod READY ✅, HubSpot ✅, Azure = no-op (Skip Bicep, no diff), health ✅.
+>
+> **Aprendizaje documentado en la skill (gotcha #6 + paso 6):** el entorno `production` se pide **DOS
+> veces** en el mismo run — la 2da aprobación es la de los jobs Azure gated, y aparece DESPUÉS de que
+> arrancan los deploys. Si no se aprueba, el run queda `waiting` y el manifest nunca transiciona a
+> `released` (el `.status` no revela el gate → hay que polear `pending_deployments`). En este release el
+> 2do gate quedó sin aprobar ~43 min → stall. Regla: aprobar ambos gates de inmediato. Tiempos en
+> `PRODUCTION_RELEASE_TIMING_LEDGER.md` (agente E2E ~1h24m, dominado por el stall; sin él ~12-15m).
+>
+> **Pendiente de activación del ebook (post-release):** con la maquinaria ya en prod, falta: (1) deploy
+> de la landing efeonce-think a `main` (think.efeoncepro.com/web-agentica) + flip noindex→index; (2) flip
+> del flag `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` en el ops-worker (si se quiere el email de respaldo);
+> (3) smoke real E2E. La descarga on-screen gated ya debería funcionar en prod (form en la única DB +
+> ruta/renderer/handoff released + PDF en bucket prod).
 
 ## Sesion 2026-07-09 - TASK-1374/1375 ebook landing /web-agentica (efeonce-think) - Claude - PLANNING/DOCS
 

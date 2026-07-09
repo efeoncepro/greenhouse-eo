@@ -92,8 +92,21 @@ gh workflow run production-release.yml \
   -f force_infra_deploy=false
 ```
 
-6. Approve the `Production Release Orchestrator` environment gate, not random
-   stale worker runs.
+6. Approve the `production` environment gate — **OJO: el entorno `production` se pide
+   DOS veces en el mismo run** (ver gotcha #6). Aprobá AMBAS: la primera (jobs del
+   orquestador) y la segunda (jobs Azure gated, que aparece después de que arrancan los
+   deploys). Si dejás la segunda sin aprobar, el run queda `waiting` indefinidamente y el
+   manifest NUNCA transiciona a `released`. **Poleá `pending_deployments` REPETIDAMENTE
+   durante todo el run, no solo el `.status` del run** (el status queda `waiting` pero no
+   dice que hay un gate esperando). No aprobar runs de workers stale ajenos.
+
+   ```bash
+   # Detectar y aprobar CADA gate pendiente (correr en loop hasta run=completed):
+   gh api "repos/efeoncepro/greenhouse-eo/actions/runs/<run_id>/pending_deployments" \
+     --jq '.[] | {env:.environment.name, id:.environment.id, canApprove:.current_user_can_approve}'
+   gh api "repos/efeoncepro/greenhouse-eo/actions/runs/<run_id>/pending_deployments" \
+     -X POST -f state=approved -F "environment_ids[]=<env_id>" -f comment="<razon>"
+   ```
 7. Watch the orchestrator complete:
    - preflight
    - record-started
@@ -138,6 +151,25 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
    `READY` para el `target_sha`. Si un release futuro quiere ahorrar builds
    docs-only en `main`, primero debe modelar explícitamente un estado
    `vercel_skipped` en el release control plane, runbooks y watchdog.
+
+6. **El entorno `production` se pide DOS veces — los jobs Azure gated tienen su propio
+   gate (verificado 2026-07-09, release `41aefb457`).** Tras aprobar la 1ra aprobación
+   (jobs del orquestador: preflight/record/workers/Vercel), los 2 jobs Azure gated
+   (`Deploy Azure Teams Bot (gated)` / `Deploy Azure Teams Notifications (gated)` →
+   step `Health check Azure (preflight-style)`) piden **una SEGUNDA aprobación del mismo
+   entorno `production`**. Mientras no se aprueba, esos jobs quedan `waiting`, el run
+   completo queda `waiting`, y el job `Transition release_manifests → released` **no
+   corre** (el manifest queda en estado `preflight`, nunca `released`). **Síntoma:**
+   `gh run view` muestra `run=waiting/` indefinido pese a que workers + Vercel + health
+   ya están verdes; el `.status` NO revela que hay un gate esperando. **Fix:** poleá
+   `pending_deployments` en loop (no solo `run.status`) y aprobá el 2do gate. Una vez
+   aprobado, los jobs Azure corren `Validate Bicep` + `Detect Bicep diff vs origin/main`
+   → **`Skip Bicep deploy (no diff)` + `Deploy … stack` = `skipped`** (no-op esperado
+   cuando no hay diff de infra ni federated creds — coincide con "Azure `no_infra_diff`
+   puede ser un no-op esperado"), y entonces corre la transición → `released`. **Costo si
+   se omite:** en `41aefb457` el 2do gate quedó sin aprobar ~43 min → el run stalleó todo
+   ese tiempo. **Regla: aprobar SIEMPRE ambos gates `production` de inmediato.** (Este es
+   el "siempre se quedan waiting" de los jobs Azure: no es una falla, es el 2do gate.)
 
 ## What The Orchestrator Owns
 
