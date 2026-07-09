@@ -1,3 +1,5 @@
+-- Up Migration
+
 -- TASK-1371 — Hiring vacancy publication operator structured public fields.
 -- Additive-only: public opening projection gets structured data so Careers and
 -- operators stop inferring area, modality, location and public tags from copy.
@@ -60,6 +62,8 @@ COMMENT ON COLUMN greenhouse_hiring.hiring_opening.publication_source_ref IS
 CREATE UNIQUE INDEX IF NOT EXISTS hiring_opening_publication_source_ref_uniq
   ON greenhouse_hiring.hiring_opening (publication_source_ref)
   WHERE publication_source_ref IS NOT NULL;
+
+-- Down Migration
 
 -- Down is intentionally non-destructive. Reverting code leaves these nullable
 -- columns unused, preserving already-published vacancy data.
