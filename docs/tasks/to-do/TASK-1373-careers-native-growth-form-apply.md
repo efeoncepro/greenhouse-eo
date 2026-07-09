@@ -11,6 +11,22 @@ Hechos verificados contra el repo real + el contrato canónico de Growth Forms. 
 - **form_key, no slug** (regla dura de la skill): embeder por `form-key` (`9f7a8fc0-…`), nunca slug/page. La task ya lo hace.
 - **a11y "gratis" del renderer:** los errores accesibles (`role=alert`/`aria-invalid`/`aria-describedby`), skeleton, anti-double-submit y Turnstile invisible los da el renderer por construcción; 1373 owns solo el host chrome (heading/hero/no-JS fallback) y su a11y.
 
+## Contrato de paridad estética — HARD RULE, NO INTERPRETABLE (2026-07-08)
+
+> **Directiva del operador:** migrar a `<greenhouse-form>` NO puede degradar ni un pixel de la riqueza estética actual del apply de Careers. "Growth Form" ≠ "look genérico". La migración es una **re-plataforma invisible al usuario**: mismo diseño, distinto motor. Esta sección es un contrato duro; ningún agente puede cerrarla reinterpretando la estética a la baja.
+>
+> **La prueba de aceptación es la paridad visual, no "se ve bien".** El estado objetivo es **indistinguible** del form custom actual + del HTML de referencia `~/Documents/carreers/Efeonce Carrers/Efeonce Careers.dc.html`, en desktop 1440 **y** mobile 390. Cualquier regresión visual (icono perdido, tipografía distinta, spacing, color, selector de país degradado, CTA plano, estados de error genéricos) = **task NO cerrada**, `UI ready: no`.
+
+**Reglas duras (NUNCA / SIEMPRE):**
+
+- **NUNCA** aceptar el look default del renderer para los campos. La presentación premium va gobernada en el render contract vía un **`styleVariant` de careers** (patrón `diagnostic_premium` de AEO: input look tokenizado, foco/error ricos, combobox custom para selects sin popup nativo del SO, motion del CTA, copy field-level). El `styleVariant` es **obligatorio**, no opcional.
+- **NUNCA** perder los **iconos por campo** ni el **selector de teléfono con país** (bandera/código) que el form tiene hoy. Se preservan como **capacidad gobernada del renderer** (`field.presentation.icon` allowlist + phone-country UI, provista por TASK-1372), no como decoración descartable. Si el renderer aún no los soporta, se extiende el renderer — NUNCA se degrada la UI.
+- **SIEMPRE** `appearance='bare'`: TODO el chrome (hero, card, jerarquía, identidad Efeonce, layout de secciones, copy de confianza, progreso, no-JS fallback) queda como **markup del host de Careers**, intacto. El renderer pinta **solo** los inputs, transparente, dentro de la card rica del host. La riqueza "alrededor" del form no la toca el renderer.
+- **SIEMPRE** mapear los tokens `--ghf-*` a la paleta Efeonce/careers **scopeada al host**, honrando el contrato `.ghf-scope`/`hosted` (TASK-1298) para que los overrides propaguen al contenido. NUNCA HEX inline.
+- **NUNCA** hacer "rip and replace": el `CareersApplyClient` custom se **conserva detrás de un flag como rollback** hasta que el GVC before/after pruebe paridad. El cutover al nativo se hace **solo tras sign-off de paridad visual**, nunca antes.
+- **SIEMPRE** cerrar con **GVC before/after** (form custom actual vs migrado, contra el HTML de referencia) mirado en loop, desktop 1440 + mobile 390. La evidencia de paridad es requisito de `UI ready: yes`, no un nice-to-have.
+- **Deuda visual = 0 sin follow-up explícito.** No se acepta "casi igual" ni "se pulirá después" sin una task follow-up declarada y aprobada por el operador.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -29,7 +45,7 @@ Hechos verificados contra el repo real + el contrato canónico de Growth Forms. 
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1373-careers-native-growth-form.md`
 - Flow: `docs/ui/flows/TASK-1373-careers-native-growth-form-flow.md`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-1373-careers-native-growth-form-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-011`
 - Status real: `Diseno`
@@ -189,7 +205,7 @@ Reglas obligatorias:
 ### Implementation mapping
 
 - Route / surface: `src/app/public/careers/[publicId]/apply/page.tsx`.
-- Primitive / variant / kind: `<greenhouse-form>` application form, `appearance='bare'`, `color-scheme='light'`.
+- Primitive / variant / kind: `<greenhouse-form>` application form, `appearance='bare'`, `color-scheme='light'`, **`styleVariant` de careers premium (obligatorio)** — input look/foco/error tokenizados, combobox custom de selects, motion CTA, iconos por campo, phone-country; NUNCA el look default.
 - Component candidates: simplify `CareersApplyClient` into host wrapper/no-JS fallback or replace with `GreenhouseFormHost`.
 - Copy source: Growth Forms contract + careers copy.
 - Data reader / command: Growth Forms render contract and public submit API from `TASK-1372`.
@@ -321,8 +337,12 @@ Reglas obligatorias:
 
 - [ ] Careers apply uses native `<greenhouse-form>` as the actual renderer and submit path.
 - [ ] The local component no longer owns ATS submit, Turnstile execution, phone validation or CV upload orchestration.
-- [ ] Field icons, phone country selector, CV upload, errors and success state preserve the approved Careers visual language.
-- [ ] Submit through Growth Forms creates/reuses a Hiring application through the ATS adapter.
+- [ ] **PARIDAD ESTÉTICA (hard):** el form migrado es **visualmente indistinguible** del `CareersApplyClient` custom actual + del HTML de referencia, verificado con **GVC before/after** en desktop 1440 **y** mobile 390. Cualquier regresión (icono, tipografía, spacing, color, país del teléfono, CTA, estados de error) bloquea el cierre.
+- [ ] **`styleVariant` de careers premium** aplicado en el render contract (input look/foco/error ricos + combobox custom de selects + motion CTA + copy field-level); NO se aceptó el look default del renderer.
+- [ ] **Iconos por campo + selector de teléfono con país** preservados como capacidad gobernada del renderer (`field.presentation.icon` + phone-country, de TASK-1372), no descartados.
+- [ ] `appearance='bare'` + todo el chrome (hero/card/jerarquía/identidad Efeonce/no-JS fallback) host-owned; `--ghf-*` mapeados a la paleta Efeonce scopeada al host, `.ghf-scope`/`hosted` (TASK-1298) honrado.
+- [ ] **Rollback preservado:** el `CareersApplyClient` custom queda detrás de flag hasta el sign-off de paridad; el cutover al nativo ocurre solo después.
+- [ ] Submit through Growth Forms creates/reuses a Hiring application through the ATS projection (TASK-1372).
 - [ ] GVC desktop/mobile confirms no horizontal overflow and no missing key visual states.
 - [ ] The success and error states remain generic and privacy-safe.
 - [ ] Manuals and docs say Careers application form is a Growth Form, not a decorative adapter.
@@ -351,5 +371,5 @@ Reglas obligatorias:
 
 ## Open Questions
 
-- Whether the renderer needs a generic `field.presentation.icon` allowlist or whether application fields map icons by type.
-- Whether the migration ships behind a temporary flag or as a direct cutover after staging smoke.
+- **[RESUELTA 2026-07-08 — no interpretable]** El renderer expone una capacidad **gobernada de icono por campo** (`field.presentation.icon` allowlist en el contrato, provista por TASK-1372) + phone-country UI. Los iconos NO se pierden ni quedan a criterio del implementador; si el renderer no los soporta aún, se extiende el renderer. La opción "mapear por tipo" es aceptable solo si reproduce 1:1 los iconos actuales.
+- **[RESUELTA 2026-07-08]** La migración ships **detrás de flag con el custom como rollback**, cutover **solo tras sign-off de paridad visual** (GVC before/after). NUNCA cutover directo sin paridad probada.

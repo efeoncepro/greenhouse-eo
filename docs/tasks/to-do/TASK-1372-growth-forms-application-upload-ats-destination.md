@@ -11,6 +11,7 @@ Hechos verificados contra el repo real + el contrato canónico de Growth Forms. 
 - **Scan acoplado a 1362 (`Blocked by: none` subestima):** el upload público de archivos necesita el scan que 1362 owns (su Slice 4). Coordinar: 1372 ship con PDF-only V1 + quarantine como compensating control (el mismo que 1362 usa) y el scan de 1362 lo endurece después; declararlo como dependencia de coordinación, no blocker duro.
 - **ops-worker deploy paths:** la projection ATS corre en el ops-worker (como el dispatcher) → asegurar que `src/lib/growth/forms/**` + cualquier path nuevo de la projection estén en las 3 listas de `ops-worker-deploy.yml` (clase de bug recurrente de la skill).
 - **Reuse `submitPublicHiringApplication` (1367):** la reconciliación Person→facet→application + dedupe se mantiene canónica; la projection la llama, no la duplica. El endpoint directo `/api/public/hiring/applications` (1367) queda legacy cuando 1373 migra la UI.
+- **⚠️ CONTRATO DE RIQUEZA ESTÉTICA (HARD — 1372 debe PROVEER lo que 1373 consume):** 1372 owns el render contract + el renderer, así que **debe exponer como capacidades gobernadas** todo lo que el apply rico de Careers necesita para NO degradarse al migrar (directiva del operador, ver TASK-1373 §`Contrato de paridad estética`): (1) **field policy con `field.presentation.icon`** (allowlist de iconos por campo) para preservar los iconos actuales; (2) **presentación premium vía `styleVariant`** (patrón `diagnostic_premium` de AEO: input look/foco/error tokenizados, **combobox custom de selects** sin popup nativo del SO, motion CTA, copy field-level) reutilizable por careers; (3) **phone-country UI** (bandera/código) como capacidad del renderer, no del host. Si el renderer no soporta alguna, **se extiende el renderer** — NUNCA se acepta un downgrade visual del apply. El file/CV field debe tener su propio visual language gobernado (no un input file crudo). Estas capacidades son parte del contrato que 1373 declara como bloqueante de su paridad; 1372 no está completa si el renderer no puede reproducir la riqueza actual de Careers.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -317,6 +318,7 @@ Reglas obligatorias:
 - [ ] The browser receives no destination mapping, no internal ATS IDs, no private file URLs and no secrets.
 - [ ] Existing non-file Growth Forms keep passing renderer contract and submit tests.
 - [ ] Submit with a PDF creates Growth submission, private asset and ATS application in a controlled smoke.
+- [ ] **Capacidades de riqueza expuestas (bloqueante de la paridad de TASK-1373):** el render contract/renderer soporta (a) `field.presentation.icon` (iconos por campo), (b) un `styleVariant` premium reutilizable por careers (input/foco/error tokenizados + combobox custom de selects + motion CTA + copy field-level), (c) phone-country UI, y (d) file/CV field con visual language gobernado. 1372 NO está completa si el renderer no puede reproducir la riqueza actual del apply de Careers.
 - [ ] The implementation is documented for Growth Forms and Careers operators.
 
 ## Verification
