@@ -7278,6 +7278,18 @@ export interface GreenhouseHiringTalentDemand {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHrAssessmentValidityEvidence {
+  computed_at: Generated<Timestamp>;
+  computed_by: string | null;
+  evidence_id: Generated<string>;
+  outcome_source: string;
+  result_json: Generated<Json>;
+  sample_size: number;
+  scope_json: Generated<Json>;
+  verdict: string;
+  window_months: number;
+}
+
 export interface GreenhouseHrContractorEngagementEvents {
   actor_user_id: string | null;
   contractor_engagement_id: string;
@@ -11499,6 +11511,7 @@ export interface DB {
   "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
+  "greenhouse_hr.assessment_validity_evidence": GreenhouseHrAssessmentValidityEvidence;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
   "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
   "greenhouse_hr.contractor_invoice_assets": GreenhouseHrContractorInvoiceAssets;
