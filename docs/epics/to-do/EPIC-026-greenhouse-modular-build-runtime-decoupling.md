@@ -44,7 +44,7 @@ El grafo actual concentra aproximadamente 1.225 entrypoints y requiere mitigacio
 
 - `TASK-1376` ✅ evidence complete — baseline cuantitativo, dependency graph y veredicto `conditional-go`; cierre documental en curso.
 - `TASK-1377` ✅ — enforcement extraction-ready completado en templates, skills Codex/Claude repo/equipo/globales, hooks y task/ops lint; matriz de cobertura auditada.
-- `TASK-1379` propuesto, no registrado — experimento A/B de materialización del índice Roadmap; requiere confirmación del operador.
+- `TASK-1379` 📋 — experimento A/B registrado para materializar el índice Roadmap; bloquea foundation y deployables hasta cumplir targets.
 - `TBD` — workspace foundation + dependency-boundary enforcement.
 - `TBD` — extracción piloto seleccionada por `TASK-1376`.
 - `TBD` — routing/auth/release/observability multi-app.
