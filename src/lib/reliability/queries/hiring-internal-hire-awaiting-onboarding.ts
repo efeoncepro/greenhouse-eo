@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { isHiringHandoffBridgesEnabled } from '@/lib/hiring/handoff/config'
 import { captureWithDomain } from '@/lib/observability/capture'
 import type { ReliabilitySignal } from '@/types/reliability'
 
@@ -42,6 +43,22 @@ const resolveSummary = (total: number) => {
 
 export const getHiringInternalHireAwaitingOnboardingSignal = async (): Promise<ReliabilitySignal> => {
   const label = 'Contrataciones internas sin onboarding'
+
+  // Audit 2026-07-10: con los bridges OFF nadie puede drenar la cola — alarmar sería ruido
+  // permanente que entrena a ignorar el signal. Estado honesto: degraded-by-config, no error.
+  if (!isHiringHandoffBridgesEnabled()) {
+    return {
+      signalId: HIRING_INTERNAL_HIRE_AWAITING_ONBOARDING_SIGNAL_ID,
+      moduleKey: 'hiring',
+      kind: 'lag',
+      source: 'getHiringInternalHireAwaitingOnboardingSignal',
+      label,
+      severity: 'ok',
+      summary: 'Bridges de handoff deshabilitados (HIRING_HANDOFF_BRIDGES_ENABLED=OFF) — SLA de pickup no aplica.',
+      observedAt: new Date().toISOString(),
+      evidence: [],
+    }
+  }
 
   try {
     const rows = await query<{ total: number; [column: string]: unknown }>(QUERY_SQL)

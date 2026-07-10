@@ -85,6 +85,13 @@ const OVERDUE_SQL = `
       cc.consent_status = 'withdrawn'
       OR cc.closed_at < CURRENT_TIMESTAMP - make_interval(months => $1::int)
     )
+    -- Audit 2026-07-10: una postulación ABIERTA en otro opening reactiva la base de
+    -- retención — no marcar sus documentos como vencidos mientras el proceso vive.
+    AND NOT EXISTS (
+      SELECT 1 FROM greenhouse_hiring.hiring_application open_app
+      WHERE open_app.identity_profile_id = cc.identity_profile_id
+        AND open_app.decision IS NULL
+    )
   GROUP BY cc.candidate_facet_id, cc.identity_profile_id, reason, cc.closed_at
   HAVING COUNT(a.asset_id) > 0
   ORDER BY cc.closed_at ASC

@@ -173,6 +173,25 @@ export const decideHiringApplication = async (
       }
     }
 
+    // Audit 2026-07-10: seleccionar contra un opening cerrado/cancelado produce un hire
+    // sin vacante viva (handoff huérfano). Validar el contexto dentro de la misma tx.
+    if (decision === 'selected' || decision === 'backup_selected') {
+      const openingResult = await client.query<{ status: string }>(
+        `SELECT status FROM greenhouse_hiring.hiring_opening WHERE opening_id = $1`,
+        [currentRow.opening_id],
+      )
+
+      const openingStatus = openingResult.rows[0]?.status
+
+      if (openingStatus === 'closed' || openingStatus === 'cancelled') {
+        throw new HiringValidationError(
+          'El opening ya está cerrado o cancelado; no se puede seleccionar esta postulación.',
+          'hiring_opening_not_open_for_decision',
+          409,
+        )
+      }
+    }
+
     const now = new Date().toISOString()
     const previous = history.at(-1) ?? null
 

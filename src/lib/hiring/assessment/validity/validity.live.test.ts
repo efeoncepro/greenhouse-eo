@@ -21,8 +21,16 @@ describe.skipIf(!hasPgConfig)('assessment validity — live PG (TASK-1364)', () 
   afterAll(async () => {
     if (evidenceId) {
       // La tabla es append-only (trigger): retirar el registro sintético requiere
-      // deshabilitar el guard SOLO para el cleanup del test.
-      await runGreenhousePostgresQuery(`ALTER TABLE greenhouse_hr.assessment_validity_evidence DISABLE TRIGGER validity_evidence_no_delete_trigger`)
+      // deshabilitar el guard SOLO para el cleanup del test. ALTER TRIGGER exige
+      // ownership (ops) — con credenciales runtime el cleanup se salta sin fallar
+      // (el registro sintético residual es inocuo y auditable).
+      try {
+        await runGreenhousePostgresQuery(`ALTER TABLE greenhouse_hr.assessment_validity_evidence DISABLE TRIGGER validity_evidence_no_delete_trigger`)
+      } catch {
+        console.warn('[validity.live] cleanup omitido: se requiere ownership (ops) para deshabilitar el trigger append-only.')
+
+        return
+      }
 
       try {
         await runGreenhousePostgresQuery(`DELETE FROM greenhouse_hr.assessment_validity_evidence WHERE evidence_id = $1`, [evidenceId])

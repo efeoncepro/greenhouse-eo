@@ -81,7 +81,7 @@ return Number.isFinite(n) ? n : 0
 export const submitAssessment = async (assessmentId: string, actorUserId: string | null): Promise<void> => {
   await withGreenhousePostgresTransaction(async (client) => {
     const a = await client.query(
-      `SELECT status, method FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 LIMIT 1`,
+      `SELECT status, method FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 FOR UPDATE`,
       [assessmentId],
     )
 
@@ -151,9 +151,14 @@ export const recordHumanScore = async (
     throw new HiringValidationError('El puntaje debe estar entre 0 y 100.', 'assessment_invalid_score', 400)
   }
 
-  const text = `UPDATE greenhouse_hiring.hiring_assessment_response
+  // Audit 2026-07-10: corregir una respuesta de una instancia ya scored (o terminal) dejaría
+  // el competency_result/rollup desalineados en silencio. El guard vive en el mismo UPDATE.
+  const text = `UPDATE greenhouse_hiring.hiring_assessment_response r
      SET human_score = $1, needs_human_rating = FALSE, scored_by = $2, scored_at = NOW()
-     WHERE response_id = $3 RETURNING response_id`
+     FROM greenhouse_hiring.hiring_assessment a
+     WHERE r.response_id = $3 AND a.assessment_id = r.assessment_id
+       AND a.status IN ('in_progress', 'submitted')
+     RETURNING r.response_id`
 
   const values = [score, scorerUserId, responseId]
 
@@ -161,7 +166,21 @@ export const recordHumanScore = async (
     ? (await client.query(text, values)).rows
     : await runGreenhousePostgresQuery(text, values)
 
-  if (!rows[0]) throw new HiringNotFoundError('La respuesta no existe.', 'assessment_response_not_found')
+  if (!rows[0]) {
+    const existing = await (client
+      ? client.query(`SELECT a.status FROM greenhouse_hiring.hiring_assessment_response r JOIN greenhouse_hiring.hiring_assessment a ON a.assessment_id = r.assessment_id WHERE r.response_id = $1`, [responseId]).then((r) => r.rows)
+      : runGreenhousePostgresQuery(`SELECT a.status FROM greenhouse_hiring.hiring_assessment_response r JOIN greenhouse_hiring.hiring_assessment a ON a.assessment_id = r.assessment_id WHERE r.response_id = $1`, [responseId]))
+
+    if ((existing[0] as { status?: string } | undefined)?.status) {
+      throw new HiringValidationError(
+        'La evaluación ya fue finalizada o cerrada; esta respuesta no se puede corregir.',
+        'assessment_response_not_correctable',
+        409,
+      )
+    }
+
+    throw new HiringNotFoundError('La respuesta no existe.', 'assessment_response_not_found')
+  }
 }
 
 /** ¿La instancia ya no tiene respuestas pendientes de corrección humana? */
@@ -184,13 +203,25 @@ return num(rows[0]?.pending) === 0
 export const finalizeAssessment = async (assessmentId: string, actorUserId: string | null): Promise<void> => {
   await withGreenhousePostgresTransaction(async (client) => {
     const a = await client.query(
-      `SELECT application_id, status FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 LIMIT 1`,
+      `SELECT application_id, status FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 FOR UPDATE`,
       [assessmentId],
     )
 
     const row = a.rows[0] as { application_id: string; status: string } | undefined
 
     if (!row) throw new HiringNotFoundError('La evaluación no existe.', 'assessment_not_found')
+
+    // Audit 2026-07-10: finalize solo desde estados abiertos con respuestas completas —
+    // un finalize sobre cancelled/expired resucitaría una instancia terminal, y repetirlo
+    // sobre scored reescribiría resultados sin re-corrección.
+    if (!['submitted', 'in_progress'].includes(row.status)) {
+      throw new HiringValidationError(
+        'La evaluación no está lista para finalizar.',
+        'assessment_not_finalizable',
+        409,
+        { status: row.status },
+      )
+    }
 
     const pending = await client.query(
       `SELECT COUNT(*)::int AS n FROM greenhouse_hiring.hiring_assessment_response
@@ -228,6 +259,19 @@ export const finalizeAssessment = async (assessmentId: string, actorUserId: stri
     )
 
     await rollupCompetencyResultsToApplication(row.application_id, client)
+
+    // El rollup actualizó hiring_competency_result + el snapshot en la application —
+    // emitir el evento declarado en el catálogo (audit 2026-07-10: estaba declarado y
+    // documentado pero nunca se emitía). Payload agregado sin PII.
+    await publishOutboxEvent(
+      {
+        aggregateType: AGGREGATE_TYPES.hiringApplication,
+        aggregateId: row.application_id,
+        eventType: EVENT_TYPES.hiringCompetencyResultUpdated,
+        payload: { applicationId: row.application_id, assessmentId, actorUserId },
+      },
+      client,
+    )
   })
 }
 

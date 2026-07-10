@@ -88,6 +88,9 @@ const buildTxClient = (options: {
   memberIntakeStatus?: string
 }) => {
   const query = vi.fn(async (sql: string, values: unknown[] = []) => {
+    // Audit 2026-07-10: recheck del handoff dentro de la tx (lockConsumableHandoffInTx).
+    if (/FROM greenhouse_hiring\.hiring_handoff\b/.test(sql)) return { rows: [{ state: 'approved' }] }
+
     if (/FOR UPDATE/.test(sql)) return { rows: options.existing ? [options.existing] : [] }
 
     if (/INSERT INTO greenhouse_hr\.hiring_activation_request\b(?!_events)/.test(sql)) {

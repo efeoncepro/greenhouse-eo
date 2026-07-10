@@ -125,7 +125,8 @@ export const materializeHandoffFromApplication = async (
               selected_destination, tentative_start_date, expected_legal_entity,
               prerequisites_snapshot_json, explainability_json
        FROM greenhouse_hiring.hiring_application
-       WHERE application_id = $1`,
+       WHERE application_id = $1
+       FOR UPDATE`,
       [safeApplicationId],
     )
 
@@ -146,6 +147,9 @@ export const materializeHandoffFromApplication = async (
       throw error
     }
 
+    // Audit 2026-07-10: el lock de la application (FOR UPDATE, arriba) serializa este
+    // snapshot contra un decide concurrente (que también la lockea) — sin él, el
+    // materialize podía leer una decisión vieja y el lock del handoff llegaba tarde (TOCTOU).
     const decision = (app.decision ?? null) as HiringDecision | null
     const existingRow = await lockHandoffByApplicationId(client, safeApplicationId)
 

@@ -53,6 +53,8 @@ describe('decideHiringApplication', () => {
   it('locks the application, appends a defendible decision and emits the seam event in the same transaction', async () => {
     const query = vi.fn()
       .mockResolvedValueOnce({ rows: [baseRow] })
+      // Audit 2026-07-10: validación del contexto — el opening debe estar vivo para selected.
+      .mockResolvedValueOnce({ rows: [{ status: 'active' }] })
       // TASK-1383: COUNT de instancias scored para el snapshot del assessment en la decisión.
       .mockResolvedValueOnce({ rows: [{ n: 0 }] })
       .mockImplementationOnce(async (_sql: string, values: unknown[]) => ({

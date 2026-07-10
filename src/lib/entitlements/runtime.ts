@@ -481,20 +481,20 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.ai_assist', action: 'execute', scope: 'tenant', source: hiringSource })
   }
 
-  // TASK-353 — publish/decide: verbos de gobernanza consecuentes (execute). Least-privilege:
-  // sin EFEONCE_ACCOUNT (comercial abre demanda pero no publica vacantes ni decide contratación).
+  // TASK-353 — publish/decide: verbos de gobernanza consecuentes (execute). Least-privilege
+  // REAL (audit 2026-07-10): SOLO roles — sin routeGroup `internal`, porque TODO tenant
+  // interno lo porta incondicionalmente (role-route-mapping) y el tier quedaba abierto a
+  // collaborator/designer/people_viewer. Sin EFEONCE_ACCOUNT (comercial abre demanda pero
+  // no publica vacantes ni decide contratación).
   if (
-    hasRouteGroup(subject, 'internal') ||
     hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
     hasRole(subject, ROLE_CODES.HR_MANAGER) ||
     hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
   ) {
-    const hiringGovSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
-
     // TASK-356 — handoff.approve entra al mismo tier de gobernanza: quien decide la
     // contratación gobierna el handoff downstream (approve/setup/complete/cancel).
     for (const capability of ['hiring.opening.publish', 'hiring.application.decide', 'hiring.assessment.score', 'hiring.handoff.approve'] as const) {
-      addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: hiringGovSource })
+      addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: 'role' })
     }
   }
 

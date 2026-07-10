@@ -28,7 +28,7 @@ Auditoría 2026-07-10 (código real + specs downstream) → hardening pre-TASK-1
 - **Expiración operativa**: `token_expires_at` (+14d al asignar) + time-limit (`started_at + time_limit_minutes`) enforceados en resolve/start/save/submit → transición real a `expired`. El primer save auto-arranca el timer; `submitAssessment` exige `in_progress`.
 - **Anti-anclaje implementado** en `listResponses` (scorecard ajeno oculto hasta cerrar el propio) — antes solo estaba prometido en el docstring.
 - **`needs_human_rating` del tipo REAL en DB** (la superficie pública de 1363 no es fuente de verdad); anti-leak de `buildPublicQuestion` ahora testeado.
-- **SME gate auditable** (`status_changed_by/at`); **dedupe del ledger IA** por `(kind, input_digest)` pendiente.
+- **SME gate auditable** (`status_changed_by/at`); **dedupe del ledger IA** por `(kind, input_digest)` implementado y live-tested.
 - **Snapshot del assessment en la decisión**: `decideHiringApplication` persiste server-side `prerequisitesSnapshot.assessment` (score/matchScore/scoredInstances/capturedAt) — el score al decidir queda reconstruible (pre-TASK-1364).
 
 **Invariante nuevo — Template Versioning (pre-TASK-1364/1365):** un `hiring_assessment_template` con instancias es **INMUTABLE** en contenido y módulos (trigger DB; solo `status` muta). Editar = crear versión nueva con `version` + `supersedes_template_id`. **NUNCA** editar in-place un template usado: la correlación validez/fairness por `template_id` asume contenido congelado.
@@ -1084,3 +1084,19 @@ La puerta de entrada pública de candidatos (el service backend; la careers UI e
 - **Flujo (MULTI-STEP IDEMPOTENTE, no single-transaction):** resolver `opening_id` interno (gated) → reconcile Person (`createIdentityProfile` email-first) → `candidate_facet` (source=`public_careers`, consent granted, links) → `hiring_application` (dedupe `UNIQUE(opening_id, identity_profile_id)`). Los 3 son commits separados; el retry es seguro (reconcile por email + upsert por identity_profile_id + dedupe UNIQUE). Efectos pesados (scoring/email/handoff) async, NO en el submit.
 - **Endpoint** `POST /api/public/hiring/applications` (público, sin sesión, gate=anti-abuse no capability): flag → parse → Turnstile → rate-limit → validación → submit. **Respuestas SIEMPRE genéricas** (duplicado → mismo `accepted` 202; nunca revela dedupe/estado/existencia previa/PII). Reusa el shared security core `src/lib/growth/public-submission/*`.
 - **Flag** `HIRING_PUBLIC_APPLICATIONS_ENABLED` default OFF (404 invisible). Consumer: careers UI (TASK-354).
+
+## Delta 2026-07-10 — Auditoría integral del motor (governance + E2E) + hardening de concurrencia
+
+Auditoría completa del motor hiring (2 pasadas independientes: gobernanza/capabilities + trazado E2E de flujos). Hallazgos cerrados en el mismo ciclo:
+
+- **Governance (ALTA):** el tier de capabilities de gobernanza (`opening.publish`, `application.decide`, `assessment.score`, `handoff.approve`) otorgaba por `hasRouteGroup('internal')` — cualquier usuario interno podía decidir contrataciones. Ahora es role-only: `EFEONCE_ADMIN` / `HR_MANAGER` / `EFEONCE_OPERATIONS` (`src/lib/entitlements/runtime.ts`).
+- **Consent (ALTA, Ley 21.719):** `reconcileCandidateFacet` pisaba `consent_status` a `not_captured` en upserts sin consent explícito (borraba `granted`/`withdrawn` y desarmaba la base de retención). Ahora el consent solo cambia con valor explícito (`COALESCE($n, existente)` con el param crudo — NO `EXCLUDED`, que ya viene coalescado). Verificado live en las 4 transiciones.
+- **Activation retry (ALTA):** `completeHiringActivation` con request `active` pero `transitionHiringHandoff('complete')` post-commit fallido quedaba en dead-end (early return). El replay ahora solo es total con handoff `completed`; si no, re-corre la transición.
+- **Concurrencia scoring:** `submitAssessment`/`finalizeAssessment` leen status con `FOR UPDATE`; finalize valida status finalizable (`submitted`/`in_progress`); `recordHumanScore` rechaza correcciones sobre instancias terminales (guard en el propio UPDATE con join al assessment).
+- **TOCTOU:** `materializeHiringHandoff` lockea la application (`FOR UPDATE`) antes del snapshot (serializa vs decide concurrente); los commands de activación re-verifican el handoff DENTRO de la tx (`lockConsumableHandoffInTx`).
+- **Decide context:** `selected`/`backup_selected` sobre opening `closed`/`cancelled` → 409; los stages decision-owned (`selected`/`backup`/`rejected`/`withdrawn`) ya no se setean vía PATCH de stage (los define el command decide).
+- **Retention:** el reader de retención excluye candidatos con postulaciones ABIERTAS en otros openings (una postulación viva reactiva la base de retención).
+- **Unicidad estructural** (migración `20260710223640237`): índice único parcial de instancias de assessment abiertas por (application, template) + único de `members.identity_profile_id` (Person-first: re-hire = reactivación, nunca member paralelo). Pre-check live: 0 duplicados.
+- **Otros:** carrera del apply dedupe → 409 tipado (no 502); signal `hiring.internal_hire_awaiting_onboarding` honesto con bridges OFF (no ruido); `reviewHiringActivation` reabre requests `cancelled` con audit; boundary test domain-wide recursivo (`src/lib/hiring/boundary-domain.test.ts`); `finalizeAssessment` emite `hiring.competency_result.updated` (estaba declarado y nunca se emitía).
+
+Áreas confirmadas sólidas sin cambios: state machine del handoff, pipeline de apply público (anti-abuse + respuestas genéricas), scan/quarantine de CV, gating por evidencia del complete, boundary contractor/payroll.

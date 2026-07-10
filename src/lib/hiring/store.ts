@@ -970,7 +970,10 @@ export const reconcileCandidateFacet = async (
   const identityProfileId = assertNonEmptyString(input.identityProfileId, 'identityProfileId')
   const source = assertOptionalEnum(input.source, CANDIDATE_SOURCES, 'source') ?? 'manual'
   const readiness = assertOptionalEnum(input.readiness, CANDIDATE_READINESS, 'readiness') ?? 'unknown'
-  const consentStatus = assertOptionalEnum(input.consentStatus, CANDIDATE_CONSENT_STATUSES, 'consentStatus') ?? 'not_captured'
+  // Audit 2026-07-10: el consent NUNCA se degrada por omisión — solo cambia si el input lo
+  // declara explícito (un upsert interno sin consentStatus pisaba granted/withdrawn →
+  // desarmaba el trigger de retención Ley 21.719). NULL = preservar existente.
+  const consentStatus = assertOptionalEnum(input.consentStatus, CANDIDATE_CONSENT_STATUSES, 'consentStatus') ?? null
 
   return withGreenhousePostgresTransaction(async (client) => {
     await assertIdentityProfileExists(client, identityProfileId)
@@ -990,7 +993,7 @@ export const reconcileCandidateFacet = async (
          identity_profile_id, member_id, source, readiness, availability, seniority, expected_rate,
          expected_rate_currency, rate_band, consent_status, consent_policy_version, consent_captured_at,
          retention_policy, source_attribution, portfolio_url, linkedin_url, notes, created_by
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, COALESCE($10, 'not_captured'), $11, $12, $13, $14, $15, $16, $17, $18)
        ON CONFLICT (identity_profile_id) DO UPDATE SET
          member_id = COALESCE(EXCLUDED.member_id, greenhouse_hiring.candidate_facet.member_id),
          source = EXCLUDED.source,
@@ -1000,7 +1003,7 @@ export const reconcileCandidateFacet = async (
          expected_rate = COALESCE(EXCLUDED.expected_rate, greenhouse_hiring.candidate_facet.expected_rate),
          expected_rate_currency = COALESCE(EXCLUDED.expected_rate_currency, greenhouse_hiring.candidate_facet.expected_rate_currency),
          rate_band = COALESCE(EXCLUDED.rate_band, greenhouse_hiring.candidate_facet.rate_band),
-         consent_status = EXCLUDED.consent_status,
+         consent_status = COALESCE($10, greenhouse_hiring.candidate_facet.consent_status),
          consent_policy_version = COALESCE(EXCLUDED.consent_policy_version, greenhouse_hiring.candidate_facet.consent_policy_version),
          consent_captured_at = COALESCE(EXCLUDED.consent_captured_at, greenhouse_hiring.candidate_facet.consent_captured_at),
          retention_policy = COALESCE(EXCLUDED.retention_policy, greenhouse_hiring.candidate_facet.retention_policy),
@@ -1108,7 +1111,10 @@ export const createHiringApplication = async (
       )
     }
 
-    const rows = await runQuery<HiringApplicationRow>(
+    let rows: HiringApplicationRow[]
+
+    try {
+      rows = await runQuery<HiringApplicationRow>(
       client,
       `INSERT INTO greenhouse_hiring.hiring_application (
          opening_id, identity_profile_id, candidate_facet_id, owner_user_id, stage, score, match_score,
@@ -1131,6 +1137,19 @@ export const createHiringApplication = async (
         actorUserId,
       ],
     )
+    } catch (error) {
+      // Carrera del check-then-insert: dos apply simultáneos pasan el SELECT y uno pierde
+      // contra el UNIQUE (opening, identity_profile). Mismo contrato que el check explícito.
+      if ((error as { code?: string })?.code === '23505') {
+        throw new HiringValidationError(
+          'Ya existe una postulación de esta persona para este opening.',
+          'hiring_application_duplicate',
+          409,
+        )
+      }
+
+      throw error
+    }
 
     const application = normalizeHiringApplication(rows[0])
 
@@ -1160,16 +1179,42 @@ export const updateHiringApplicationStage = async (
 ): Promise<HiringApplication> => {
   const nextStage = assertEnum(stage, HIRING_APPLICATION_STAGES, 'stage')
 
-  
-return withGreenhousePostgresTransaction(async (client) => {
+  // Audit 2026-07-10: los stages terminales son propiedad del command decide (snapshot de
+  // prerequisitos + decision audit). Setearlos via PATCH crearía drift stage↔decision.
+  if (['selected', 'backup', 'rejected', 'withdrawn'].includes(nextStage)) {
+    throw new HiringValidationError(
+      'Este estado se define con la decisión formal de la postulación, no con un cambio de etapa.',
+      'hiring_application_stage_decision_owned',
+      422,
+    )
+  }
+
+  return withGreenhousePostgresTransaction(async (client) => {
     const rows = await runQuery<HiringApplicationRow>(
       client,
       `UPDATE greenhouse_hiring.hiring_application SET stage = $1
-       WHERE application_id = $2 RETURNING ${HIRING_APPLICATION_COLUMNS}`,
+       WHERE application_id = $2 AND decision IS NULL RETURNING ${HIRING_APPLICATION_COLUMNS}`,
       [nextStage, applicationId],
     )
 
-    if (!rows[0]) throw new HiringNotFoundError('La postulación no existe.', 'hiring_application_not_found')
+    if (!rows[0]) {
+      const existing = await runQuery<{ decision: string | null }>(
+        client,
+        `SELECT decision FROM greenhouse_hiring.hiring_application WHERE application_id = $1`,
+        [applicationId],
+      )
+
+      if (existing[0]?.decision) {
+        throw new HiringValidationError(
+          'La postulación ya tiene decisión formal; su etapa no se puede cambiar.',
+          'hiring_application_already_decided',
+          409,
+        )
+      }
+
+      throw new HiringNotFoundError('La postulación no existe.', 'hiring_application_not_found')
+    }
+
     const application = normalizeHiringApplication(rows[0])
 
     await publishOutboxEvent(

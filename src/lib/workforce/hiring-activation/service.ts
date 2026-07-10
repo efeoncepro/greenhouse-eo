@@ -67,6 +67,33 @@ const assertConsumableHandoff = async (hiringHandoffId: string): Promise<HiringH
   return handoff
 }
 
+
+/**
+ * Re-verificación del handoff DENTRO de la tx (audit 2026-07-10): assertConsumableHandoff
+ * corre fuera de la tx (check-then-act) — un revoke concurrente entre el check y el write
+ * dejaría un member materializado sobre un handoff revocado. El lock serializa contra
+ * transitionHiringHandoff.
+ */
+const lockConsumableHandoffInTx = async (
+  client: { query: (text: string, values?: unknown[]) => Promise<{ rows: Array<Record<string, unknown>> }> },
+  handoffId: string,
+): Promise<void> => {
+  const result = await client.query(
+    `SELECT state FROM greenhouse_hiring.hiring_handoff WHERE handoff_id = $1 FOR UPDATE`,
+    [handoffId],
+  )
+
+  const state = result.rows[0]?.state as string | undefined
+
+  if (!state || !['approved', 'in_setup', 'completed'].includes(state)) {
+    throw new HiringActivationError(
+      'El handoff cambió de estado durante la operación. Revísalo antes de continuar.',
+      'hiring_activation_handoff_state_changed',
+      409,
+    )
+  }
+}
+
 /**
  * review — claim del request para un handoff aprobado de la cola. Idempotente: si el
  * request ya existe, lo retorna sin transicionar.
@@ -76,6 +103,28 @@ export const reviewHiringActivation = async (input: CommandInput): Promise<Hirin
 
   return runGreenhouseQuery(async (client) => {
     const existing = await lockActivationRequestByHandoffId(client, handoff.handoffId)
+
+    // Audit 2026-07-10: cancelled no es terminal absoluto — si el handoff sigue consumible
+    // (p. ej. la cancelación fue un error operativo), review lo reabre con audit trail.
+    if (existing?.state === 'cancelled') {
+      const reopened = await updateActivationRequestState(client, {
+        activationRequestId: existing.activation_request_id,
+        state: 'pending_hr_review',
+        blockedReason: null,
+        blockedDetail: null,
+      })
+
+      await appendActivationEvent(client, {
+        activationRequestId: existing.activation_request_id,
+        fromState: 'cancelled',
+        toState: 'pending_hr_review',
+        actorUserId: input.actorUserId,
+        reasonCode: 'review_reopened',
+        reasonDetail: null,
+      })
+
+      return normalizeActivationRequest(reopened)
+    }
 
     if (existing) return normalizeActivationRequest(existing)
 
@@ -115,6 +164,8 @@ export const createMemberForHiringActivation = async (
   const handoff = await assertConsumableHandoff(input.hiringHandoffId)
 
   return runGreenhouseQuery(async (client) => {
+    await lockConsumableHandoffInTx(client, handoff.handoffId)
+
     let request = await lockActivationRequestByHandoffId(client, handoff.handoffId)
 
     if (!request) {
@@ -368,7 +419,9 @@ export const completeHiringActivation = async (input: CommandInput): Promise<Hir
     )
   }
 
-  if (request.state === 'active') return request
+  // Audit 2026-07-10: si el request quedó active pero el transitionHiringHandoff post-commit
+  // falló, el retry DEBE re-correr la transición — solo es replay total con handoff completed.
+  if (request.state === 'active' && handoff.state === 'completed') return request
 
   return runGreenhouseQuery(async (client) => {
     const locked = await lockActivationRequestByHandoffId(client, handoff.handoffId)
