@@ -420,3 +420,9 @@ Landing `/web-agentica` construida nativa en `efeonce-think` (commit local, NO p
 - El copy aclara `La descarga comienza al enviar`; no sustituye la entrega inmediata confirmada por una promesa de email. El vínculo de privacidad sigue siendo contenido del contrato del renderer: convertir su URL visible a una etiqueta editorial requiere una extensión reusable del contrato/versionado del form, no CSS local engañoso.
 - Motion: halo ambiental e indicador de la rail son CSS compositor-only y se desactivan con `prefers-reduced-motion`; el renderer mantiene su feedback de foco, validación y CTA. No se introduce wizard, progreso falso, confetti ni dependencia hover-only.
 - Producción Ready: Vercel `dpl_ApdT2shGrdjUjKdAw6L7WqetncCj`, alias `think.efeoncepro.com`. Smoke productivo sintético en 1440 y 390: cuatro controles reales cargados, `scrollWidth === clientWidth`, success inline visible y foco en `#web-agentica-success-title`; reduced-motion confirma que señal y halo no animan.
+
+## Delta 2026-07-10 — hero: evidencia, dirección visual y recorrido progresivo
+
+- La señal Cloudflare se reestructura como ledger editorial (índice, etiqueta, afirmación y fuente) para que pese como evidencia y no como píldora decorativa. El CTA mantiene su acción y aclara entrega `PDF inmediato tras enviar`; los cinco actos, checklist y niveles quedan en una proof row compacta.
+- Sin cambiar el activo, el arte se reencuadra y recibe las anotaciones decorativas `Interfaz humana` / `Lectura del agente`, que hacen legible la tesis de dos interfaces. El contenido accesible no depende de ellas: H1 y lead conservan la tesis completa.
+- En escritorio, el recorrido inferior se revela después del primer scroll y al recibir foco. En móvil, sin JS y con `prefers-reduced-motion` permanece visible desde el inicio. Evidencia local: 1440/390 sin overflow; test de scroll/foco confirma opacidad final `1`; reduced-motion deja `hero-visual` sin animación y mantiene navegación visible.

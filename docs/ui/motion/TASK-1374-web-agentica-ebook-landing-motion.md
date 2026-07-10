@@ -25,6 +25,7 @@
 | Hero grid | Load + idle | Deriva sutil del grid con máscara radial (portado del PR, re-tokenizado a `axis.*`). | CSS `@keyframes` + mask | yes |
 | Hero beams | Load + idle | Haces de luz que "caen" (naranja/azul de acento), ambientales. | CSS `@keyframes` | yes |
 | Hero entrance | Initial load | Reveal escalonado de eyebrow → H1 → lead → CTA. | CSS transition / IntersectionObserver | yes |
+| Hero signal / route nav | Initial load → primera lectura | Evidencia editorial queda estable; el recorrido aparece suavemente tras el primer scroll. | CSS + listener pasivo | yes |
 | Signal cards | Scroll into view + pointer | Reveal escalonado; halo teal sigue el puntero como realce decorativo, sin ocultar contenido. | CSS + custom props (`--spot-x/y`) | yes |
 | Thesis lanes | Scroll into view | Dos interfaces entran desde lados opuestos; el pulso conector orienta la transición humano→agente. | CSS | yes |
 | Section reveals | Scroll into view | Opacity + translateY < 16px al entrar cada sección. | CSS / IntersectionObserver | yes |
@@ -119,6 +120,7 @@
 - Delta 2026-07-10: el rectángulo inclinado detrás del visual de hero se retira por competir con el arte. Las secciones de señales y tesis reciben coreografía contenida y un halo de puntero no esencial; el footer usa entrada y pulso suave sólo como orientación de cierre. No se agrega GSAP ni una dependencia de cliente.
 - Delta 2026-07-10 (success): el wrapper del form se vuelve transparente al aceptar y la conclusión absorbe la única superficie blanca. Se quita `tabindex` del live region para que el foco permanezca en el título y no dibuje un ring global de área completa.
 - Delta 2026-07-10 (workspace): el estado de captura adopta una rail editorial navy + una zona de formulario clara. La rail sólo anima un indicador y un halo con `transform`; los campos conservan la microinteracción del renderer (focus halo, check de validación, pending y compresión del CTA). `prefers-reduced-motion` elimina ambas animaciones ambientales y mantiene la jerarquía completa.
+- Delta 2026-07-10 (hero direction): la señal Cloudflare deja de ser una píldora y pasa a ledger editorial estático; el arte recibe dos anotaciones puramente decorativas que conectan las dos interfaces con el H1. La navegación inferior no compite en la primera impresión desktop: aparece tras `scrollY > 56` con opacidad/transform. Es progresiva: sin JS, en móvil y con reduced-motion ya está visible; `:focus-within` la vuelve visible para teclado.
 - Reuse / extend / new primitive: reuse del shell de Think + CSS route-local + renderer Growth Forms; sin primitive nueva.
 - Open risks: portar los efectos sin regresión de contraste/perf; el fold no debe dañar LCP en mobile.
 - Follow-up: si algún reveal necesita GSAP, mantenerlo scoped y documentar el token de timing.
