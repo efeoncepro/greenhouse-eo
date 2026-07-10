@@ -11,6 +11,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Dominio / disparador | Skill a invocar | Invariantes (cargar al tocar) |
 |---|---|---|
 | Contractor engagements/payables/honorarios | `greenhouse-finance-accounting-operator` (+payroll) | `architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` |
+| Hiring/ATS: documentos de candidato + scan/quarantine de assets | `greenhouse-talent-people-operator` | `architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (§Candidate document capture) |
 | Production release / promoción develop→main | `greenhouse-production-release` | `architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` |
 | Finance ledger/bank/CLP/FX/economic-category | `greenhouse-finance-accounting-operator` | `architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` |
 | ICO / delivery metrics / RpA / OTD / Notion-metrics | `greenhouse-ico` | `architecture/metrics/ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` |
@@ -302,9 +303,9 @@ Si falta algo, reportar el estado como `code complete, rollout pendiente` o `ope
 
 **Feature Flag State Ledger (anti deuda cognitiva):** los env-var flags (`*_ENABLED`) que quedan code-complete pero pendientes de prender, y el estado por environment de los ~60 flags activos, se registran en **`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`** (SSOT humano del estado; la verdad live es `vercel env ls`). **SIEMPRE** que declares un flag nuevo, agregá su fila al inventario; si lo dejás code-complete sin prender, agregá una fila a "§ Pendientes de acción"; al prenderlo/apagarlo, actualizá el snapshot. Es distinto de los flags PG declarativos (`home_rollout_flags`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`). **Gate mecánico de cierre:** `pnpm docs:closure-check` corre `feature-flags-audit --strict` y **falla (exit 1) si hay un `*_ENABLED` en código sin fila en el ledger** — ningún cierre pasa con un flag sin registrar. Pasada manual: `pnpm flags:audit` (advisory) / `pnpm flags:audit --strict --no-vercel`.
 
-**⚠️ Prender un flag es MULTI-RUNTIME, no "prenderlo en Vercel".** Un `*_ENABLED` es una env var leída por **cada runtime que ejecuta el código gateado**, y Greenhouse tiene **5 runtimes con env vars independientes**: **Vercel** (app Next.js) + 4 Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Prenderlo en uno **NO** lo prende en los otros. **NUNCA** prendas (ni apagues) un flag sin antes mapear dónde se LEE (`grep -rn "<FLAG>" src/ services/ | grep -v __tests__`) y aplicarlo en **todos** los runtimes del mapeo. **Heurística:** si gatea algo **async** (email de respaldo, projection reactiva, consumer del outbox, cron de Cloud Scheduler, materializer) vive en el **`ops-worker`, NO en Vercel** — prenderlo en Vercel no hace nada; si gatea una **ruta/superficie visible**, vive en Vercel; puede vivir en **ambos**. Cloud Run: `gcloud run services update <svc> --region <r> --project efeonce-group --update-env-vars <FLAG>=true` (ya crea la revisión, no requiere redeploy aparte). **SIEMPRE** verificar la env en la **revisión activa** y ejercitar el flujo real (que la var exista ≠ que el consumer funcione), y **declarar el/los runtime(s) en la fila del ledger** (sin eso, el próximo agente asume Vercel y se equivoca). Runbook completo: `FEATURE_FLAG_STATE_LEDGER.md` → §`Cómo prender un env-var flag`.
+**⚠️ Prender un flag es MULTI-RUNTIME, no "prenderlo en Vercel".** Hay **5 runtimes con env vars independientes** (Vercel + 4 Cloud Run). **NUNCA** prendas/apagues un flag sin mapear antes dónde se LEE (`grep -rn "<FLAG>" src/ services/`) y aplicarlo en **todos**; lo **async** (email, projection reactiva, consumer del outbox, cron) vive en el **`ops-worker`, NO en Vercel**. **SIEMPRE** verificar en la **revisión activa** + ejercitar el flujo real, y declarar el runtime en la fila del ledger. Runbook: `FEATURE_FLAG_STATE_LEDGER.md`.
 
-**Caso fuente 2026-07-09:** `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` (email de entrega del ebook lead magnet) se lee **sólo** en el `ops-worker` (gatea una projection reactiva drenada por `ops-reactive-growth`). El runbook del ledger sólo enseñaba `vercel env add`; prenderlo ahí habría dejado el email muerto mientras la success card se lo prometía al usuario. Se prendió con `gcloud run services update ops-worker` (rev `ops-worker-00470-898`).
+**Caso fuente 2026-07-09:** `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` se lee **sólo** en el `ops-worker`; prenderlo en Vercel habría dejado el email muerto.
 
 **Caso fuente 2026-06-01:** Workforce Activation/SCIM tenia codigo TASK-872/874/876, pero sin `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true`, `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true`, redeploy de Vercel y backfill de usuarios ya creados, Entra seguia creando solo `client_users` y no `members`. La pantalla prometia activacion laboral, pero Maggie Borralles no aparecia hasta completar rollout + recovery.
 
@@ -1174,130 +1175,11 @@ Los invariantes operativos de Knowledge + Nexa — knowledge platform foundation
 
 **Reglas duras load-bearing (resumen — detalle en la spec):** **NUNCA** Nexa queryea `greenhouse_knowledge.knowledge_chunks` directo ni mete el corpus al prompt (lint `no-direct-knowledge-chunk-query`; consumir el contrato `knowledge-search.v1` / readers). **NUNCA** Nexa responde un dato de conocimiento sin citar ni inventa cuando `confidence=none`. **NUNCA** el LLM ejecuta un write — el loop es propose→confirm→execute (la acción gobernada muta sólo en el endpoint de confirmación humana). **NUNCA** retrieval agéntico retorna `agent_excluded`/`quarantined`/`restricted`. **NUNCA** instanciar un SDK LLM dentro de un dominio (Gemini/Anthropic via cliente canónico de `src/lib/ai/`); el secreto se resuelve server-side. **NUNCA** registrar un archivo Nexa nuevo sin agregarlo al `manifest.json` (doc gate).
 
-### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
+### SQL embebido / date-math — invariantes (TASK-893)
 
-Toda query SQL embebida en TS que aparezca en code paths productivos — especialmente signal readers, reliability queries, materializers, audit scripts — **debe validar sus assumptions de schema contra PG real antes de mergear**. `db.d.ts` (Kysely codegen) NO es source of truth — infiere DATE columns como `Timestamp` TS, lo cual lleva al bug class `EXTRACT(EPOCH FROM (date - date))` que produce `function pg_catalog.extract(unknown, integer) does not exist` en runtime.
+Los invariantes del SQL Signal Reader Schema Validation Gate (4 capas: lint rule `greenhouse/no-extract-epoch-from-date-subtraction`, smoke pre-merge contra PG real, protocolo de verificación de schema, patrones canónicos de "días entre fechas") viven en **`docs/architecture/agent-invariants/SQL_DATE_MATH_AGENT_INVARIANTS.md`**. **Cargar ese doc al escribir cualquier query SQL embebida en TS.**
 
-**Bug class historico** (3 incidentes Sentry 2026-05-16 antes de las 12:00 UTC-4):
-
-1. `column pe.superseded_by_entry_id does not exist` en GET /admin (commit 468505e5 hotfix).
-2. `function pg_catalog.extract(unknown, integer) does not exist` en GET /admin (mismo commit).
-3. `function pg_catalog.extract(unknown, integer) does not exist` en POST /reliability-ai-watch (commit bec374c8 hotfix).
-
-Causa raíz comun: developers asumen tipos basados en `db.d.ts` (TS shapes inferred). En PG real:
-
-- `date - date = integer` (días). `EXTRACT(EPOCH FROM integer)` NO existe.
-- `timestamp - timestamp = interval`. `EXTRACT(EPOCH FROM interval)` OK.
-- `date - integer = date`. `date + integer = date`.
-
-**4 capas defense-in-depth canonical**:
-
-#### 1. Lint rule `greenhouse/no-extract-epoch-from-date-subtraction` (mode error)
-
-Detecta patterns SQL inseguros via 7 regex AST:
-
-- `EXTRACT(EPOCH FROM (CURRENT_DATE - X))` — CURRENT_DATE es DATE.
-- `EXTRACT(EPOCH FROM (X - CURRENT_DATE))` — mirror.
-- `EXTRACT(EPOCH FROM (X::date - Y))` — cast explícito a DATE dispara bug.
-- `EXTRACT(EPOCH FROM (X - Y::date))` — mirror.
-- `EXTRACT(EPOCH FROM (MAX(*_date) - X))` — heurística: columnas con sufijo `_date` son típicamente DATE.
-- `EXTRACT(EPOCH FROM (X.*_date - Y))` — column reference.
-- `EXTRACT(EPOCH FROM (effective_from - start_date))` — caso TASK-890/TASK-872 canonical.
-
-Modo `error` desde commit-1 (tolerancia cero — el bug class ya generó 2 Sentry alerts en producción).
-
-#### 2. Smoke test pre-merge (canonical workflow)
-
-Cuando un signal reader nuevo emerja o se modifique una query SQL existente, el dev DEBE ejecutar la query contra PG real via proxy ANTES de mergear:
-
-```bash
-# Levantar proxy
-cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432 &
-
-# Smoke script canonical (one-shot, tira la query + valida no error)
-cat > /tmp/_smoke-reader.ts <<'EOF'
-import 'server-only'
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-
-const main = async () => {
-  const r = await runGreenhousePostgresQuery(`<the new SQL query here>`)
-  console.log('OK', r.length, 'rows')
-}
-main().catch(err => { console.error('FAIL:', err.message); process.exit(1) })
-EOF
-
-# Run con env
-set -a && source .env.local && set +a
-cp /tmp/_smoke-reader.ts scripts/_smoke-reader.ts
-pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/_smoke-reader.ts
-rm -f scripts/_smoke-reader.ts
-```
-
-Si la query falla → fix antes de mergear. NO mergear assumiendo que `db.d.ts` es source of truth.
-
-#### 3. Schema verification protocol canonical
-
-Cuando se necesite saber el tipo real de una columna en PG:
-
-```bash
-pnpm pg:connect:shell
-greenhouse_app=> SELECT data_type FROM information_schema.columns
-                 WHERE table_schema='greenhouse_finance'
-                   AND table_name='account_balances'
-                   AND column_name='balance_date';
-```
-
-O via TS:
-
-```ts
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-const r = await runGreenhousePostgresQuery(`
-  SELECT column_name, data_type FROM information_schema.columns
-  WHERE table_schema=$1 AND table_name=$2
-`, ['greenhouse_finance', 'account_balances'])
-```
-
-**Reglas para columnas DATE vs TIMESTAMP**:
-
-- Sufijo `_date` (`balance_date`, `effective_from`, `start_date`, `hire_date`) → **típicamente DATE** en PG real.
-- Sufijo `_at` (`created_at`, `updated_at`, `attached_at`, `lifecycle_stage_since`) → **típicamente TIMESTAMPTZ**.
-- `CURRENT_DATE` → DATE. `NOW()` / `CURRENT_TIMESTAMP` → TIMESTAMPTZ.
-- En duda → verificar con `information_schema.columns`.
-
-#### 4. Canonical fix patterns
-
-Cuando emerja la necesidad de "días entre dos fechas":
-
-```sql
--- ✓ Pattern canonical #1: días directos (date - date = integer)
-SELECT (CURRENT_DATE - MAX(balance_date))::int AS days_stale
-FROM greenhouse_finance.account_balances;
-
--- ✓ Pattern canonical #2: cast explícito a timestamptz si necesitas epoch
-SELECT EXTRACT(EPOCH FROM ((finished_at)::timestamptz - (started_at)::timestamptz)) AS seconds
-FROM greenhouse_sync.source_sync_runs;
-
--- ✓ Pattern canonical #3: días con decimales
-SELECT EXTRACT(DAY FROM ((x)::timestamptz - (y)::timestamptz)) AS days
-FROM some_table;
-
--- ✗ Pattern PROHIBIDO (bug class TASK-893 hotfix)
-SELECT EXTRACT(EPOCH FROM (CURRENT_DATE - MAX(balance_date)))::int / 86400 AS days
-FROM greenhouse_finance.account_balances;
--- Runtime: ERROR — function pg_catalog.extract(unknown, integer) does not exist
-```
-
-**⚠️ Reglas duras**:
-
-- **NUNCA** confiar en `db.d.ts` (Kysely codegen) como source of truth de tipos PG. Es estimate inferred — DATE columns aparecen como `Timestamp` TS sin distinción.
-- **NUNCA** usar `EXTRACT(EPOCH FROM (X - Y))` cuando X o Y es DATE. Use `(X - Y)::int` para días directos o cast a `::timestamptz` ambos lados.
-- **NUNCA** mergear un signal reader nuevo o reliability query sin haber ejecutado la query al menos una vez contra PG real via proxy. Lint rule mecánica catch los patterns conocidos; smoke test catch el rest.
-- **NUNCA** fixear el bug class en un solo callsite cuando emerja por Sentry alert. Hacer audit global (`grep -rn 'EXTRACT(EPOCH FROM' src/ services/`) + fixear TODOS los broken callsites en un solo commit + agregar lint rule + smoke test pre-merge.
-- **NUNCA** desactivar la lint rule `greenhouse/no-extract-epoch-from-date-subtraction` para callsites legítimos sin agregar override block explícito en `eslint.config.mjs`. Override block requiere razón documentada en comentario.
-- **SIEMPRE** que un nuevo reader/query emerja, validar contra PG real via proxy ANTES de mergear. Schema verification protocol canonical es 1-line query a `information_schema.columns`.
-- **SIEMPRE** que el bug class se manifieste vía Sentry alert, escalation es: (1) audit global, (2) fix sistemático, (3) lint rule update (si falta cobertura), (4) CLAUDE.md update. NO fixear un callsite y shippear.
-
-**Spec canónica**: lint rule en `eslint-plugins/greenhouse/rules/no-extract-epoch-from-date-subtraction.mjs` + tests en `__tests__/`. Override block en `eslint.config.mjs`.
+**Reglas duras (resumen):** **NUNCA** confiar en `db.d.ts` (Kysely codegen) como source of truth de tipos PG — infiere DATE como `Timestamp` TS. **NUNCA** `EXTRACT(EPOCH FROM (X - Y))` cuando X o Y es DATE (`date - date = integer`; revienta en runtime): usar `(X - Y)::int` para días, o castear ambos lados a `::timestamptz`. **NUNCA** mergear un reader/query nuevo sin ejercitarlo al menos una vez contra PG real vía proxy (los mocks Vitest ejercitan el TS, NO el SQL). **NUNCA** fixear un solo callsite cuando el bug class emerge por Sentry: audit global + fix sistemático + lint rule + doc.
 
 ### Payroll/Workforce — participation/exit/leave/reconciliation/offboarding invariants (TASK-890, 891, 892, 893, 895)
 
@@ -1310,12 +1192,6 @@ Los invariantes operativos de payroll participation/exit — workforce exit payr
 Los invariantes operativos del dominio contractor — engagements, invoice assets, work submissions, payables→Finance bridge, honorarios CL (retención SII), international/provider boundary + FX policy, self-service hub, closure + transition controls, remittance advice, agreed-amount SoD + guardrail, bank settlement, due-date/SLA, monthly payment run, run report, paid lifecycle + email, double-rail exclusion + current work classification, employee→contractor connected command, compensation tuple drift — viven en **`docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` → §"Invariantes operativos para agentes (TASK-790…981)"** (contrato + state machines + boundaries + signals + capabilities por sub-dominio, verbatim). **Cargar esa spec al tocar `src/lib/contractor-engagements/**` o el settlement de contractor payables en `src/lib/finance/**`.**
 
 **Boundary duro bidireccional (aplica también desde payroll/finiquito, NO solo desde contractor):** el dominio contractor **NUNCA** escribe/muta `payroll_entries`, `payroll_adjustments`, `compensation_versions`, `final_settlements`/`final_settlement_documents` ni recalcula payroll/compensación; el payout del contractor **NUNCA** entra como payroll dependiente ni dispara finiquito laboral (su cierre es `contractor_closure`, **NUNCA** finiquito); no aplica deducciones estatutarias Chile a honorarios (solo retención SII versionada). **SIEMPRE** correr como gate de cierre al tocar este dominio o su transición: `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde — cualquier rojo en finiquito/offboarding es regresión, no "test ajeno".
-
-### Candidate document capture + asset scan/quarantine — invariantes (TASK-1362)
-
-Los invariantes de captura documental de candidatos (contextos hiring, resolver unificado, identidad post-decisión, retención Ley 21.719) y del **escaneo de assets antes del attach** viven en **`docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` → §`Invariantes operativos para agentes — Candidate document capture`**.
-
-**Reglas duras (resumen):** **NUNCA** confiar en `file.type`/extensión para decidir el tipo de un upload (es valor del cliente; el tipo real lo dan los magic bytes vía `scanAssetBytes`). **NUNCA** adjuntar un asset venido de la web pública sin escanearlo: el camino ergonómico es `scanAndGateUploadedAsset` (opera sobre bytes+assetId, no sobre `File`, para que cualquier upload lo reuse) y la red estructural es que `attachAssetToAggregate` **rechaza** los contextos de documento de candidato sin veredicto `clean` (`asset_scan_required`/`asset_scan_blocking`) — un camino nuevo (Growth Forms TASK-1372/1373) que olvide el gate falla en el attach, no pasa en silencio. **NUNCA** asumir que reusar `submitPublicHiringApplication` arrastra el scan (sólo escanea si recibe un `File`; el consumer reactivo del worker nunca tiene bytes). **NUNCA** degradar en silencio a "sin antivirus" (flag ON sin endpoint ⇒ veredicto `error` bloqueante; fail-closed). **NUNCA** `UPDATE`/`DELETE` sobre `asset_scan_results` fuera de `resolution_*` (trigger append-only). **NUNCA** autorizar documentos de candidato por routeGroup (predicado canónico `canAccessHiringCandidateDocument`, capability-based; `client_*` jamás). **NUNCA** anclar un documento de candidato por `member_id` (el candidato no tiene member hasta el handoff). **NUNCA** pedir el documento de identidad en el apply público ni exponer `value_full` por el resolver. **NUNCA** borrar PII de candidatos automáticamente (detectar + alertar; el borrado es comando gobernado con humano en el loop).
 
 ### Navigation Reachability Governance — invariantes (TASK-982)
 
