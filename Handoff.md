@@ -1,3 +1,7 @@
+## Sesion 2026-07-10 - TASK-770 Hiring→HRIS activation bridge iniciada - Claude
+
+TASK-770 movida a `in-progress`, en ejecución local-first sobre `develop` (sin branch, sin push hasta instrucción). Desbloqueada por TASK-356 (cola + handoff live). Objetivo: bridge backend-critical que consume la cola internal_hire, crea/promueve `member` no-activo `pending_intake` sobre el mismo `identity_profile_id` (core source-neutral compartido con SCIM, cascade D-2), engancha readiness/intake/onboarding existentes y marca el handoff `completed` con evidencia. Flag `HIRING_ACTIVATION_ENABLED` default OFF. Scripts ajenos preservados.
+
 ## Sesion 2026-07-10 - TASK-356 Hiring Handoff COMPLETE (code) - Claude
 
 > **TASK-356 completa en `develop` local-first (7 commits, SIN push).** El nodo reactivo N10 del ATS quedó implementado
