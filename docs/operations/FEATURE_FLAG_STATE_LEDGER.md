@@ -52,6 +52,7 @@ Es **encontrable** desde: `CLAUDE.md` (Runtime Rollout Completion Gate), `AGENTS
 
 - **NUNCA** declarar un env-var flag nuevo (`*_ENABLED`) sin agregar una fila a **§ Inventario** y, si queda code-complete pero sin prender, a **§ Pendientes de acción** — en el mismo PR. **Enforcement mecánico:** `pnpm docs:closure-check` corre `feature-flags-audit --strict` y **falla (exit 1) si hay un flag en código sin registrar acá** → ningún cierre/closure pasa con un flag sin documentar.
 - **NUNCA** considerar un flag "rolled out" hasta verlo en el environment correcto (`vercel env ls`) **+ redeploy aplicado**. `code complete` ≠ `operationally complete` (ver Runtime Rollout Completion Gate en `CLAUDE.md`).
+- **NUNCA prender un flag sólo en Vercel.** Un `*_ENABLED` se lee en **cada runtime que ejecuta el código gateado**, y Greenhouse tiene 5 runtimes con env vars independientes: **Vercel** (app Next.js) y 4 servicios **Cloud Run** (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Prenderlo en uno NO lo prende en los otros. **SIEMPRE** ejecutar el paso 0 de §`Cómo prender un env-var flag` (mapear runtimes ANTES de prender) y declarar en la fila del ledger **en qué runtime(s) vive**. Un flag que gatea una **projection reactiva / consumer / cron** corre en el **ops-worker**, NO en Vercel — prenderlo en Vercel no hace absolutamente nada. Caso fuente 2026-07-09: `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` (email de entrega del ebook) vive sólo en el `ops-worker`; el runbook de este doc sólo enseñaba `vercel env add`, y prenderlo ahí habría dejado el email muerto con la success card prometiéndoselo al usuario.
 - **SIEMPRE** que prendas/apagues un flag en un environment, actualizá la **§ Snapshot** (con fecha) y, si cerró un pendiente, sacá la fila de **§ Pendientes de acción**.
 - **NUNCA** confíes en este doc como verdad live para una decisión crítica — la **verdad live es `vercel env ls`**. Este doc es el ledger humano (intención + pendientes + último snapshot conocido).
 - Para flags `NEXT_PUBLIC_*`: se hornean en el bundle **en build time** → prenderlos requiere un **build fresco** (push o redeploy con build cache desmarcado), no un redeploy que reusa build.
@@ -65,8 +66,9 @@ Es **encontrable** desde: `CLAUDE.md` (Runtime Rollout Completion Gate), `AGENTS
 | Flag | Owner | Estado actual | Acción pendiente | Nota |
 |---|---|---|---|---|
 | `HIRING_PUBLIC_APPLICATIONS_ENABLED` | TASK-1367/TASK-354 | **staging + Production: env vars SET 2026-07-09** (`HIRING_PUBLIC_APPLICATIONS_ENABLED=true` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY`; `TURNSTILE_SECRET` presente en ambos). **Production build/release completo inicial** en `433cfa2b0fd3` (`production-release.yml` run `28991488376` success); **release acoplado del fix robusto de inferencia/responsabilidades** en `915be02a86abfd49c71365af8a647f9fdfa35207` (PR #151, manifest `915be02a86ab-7c6aa11e-b9c1-4990-8086-cdfacb3a763b`, runtime verde; `ops-worker` residual documentado como label drift si diff runtime vacío). **Opening real publicado:** `EO-OPN-0009` (`Account Manager / Especialista en Marketing`) creado vía writers canónicos el 2026-07-09. | (1) smoke público con browser/Turnstile: submit → `hiring_application` creada + dedupe genérico; (2) tras smoke, sacar esta fila de pendientes y dejar solo § Snapshot. | Gatea el endpoint público de postulación. Default OFF → **404 invisible** (no revela que existe). Anti-abuse: Turnstile + rate-limit (5/email/día, 20/IP/día) vía `hiring_application_intake_events`. Respuestas siempre genéricas (duplicado → mismo `accepted` 202). La careers UI (TASK-354) es el consumer. |
+| `ASSET_MALWARE_SCAN_ENABLED` | TASK-1362 | OFF/default en todos los environments (verdad live: `vercel env ls`) · **code-complete, adapter NUNCA ejercitado contra un servicio real** | (1) decidir si se provisiona ClamAV: siempre-caliente (`min-instances=1`, ~2 GiB para la base de firmas, no escala a cero sin romper el submit público) ≈ **USD 19-25/mes**, contra **USD 7,32/30d** que cuesta hoy TODO Cloud Run del proyecto; (2) si se provisiona: desplegar el servicio, `vercel env add ASSET_MALWARE_SCAN_ENABLED staging` + `ASSET_MALWARE_SCAN_ENDPOINT` + redeploy; (3) **ejercitar el flujo real** (PDF limpio → `attached`; EICAR → `infected` + `quarantined`) — que la env var exista NO prueba que el consumer funcione; (4) recién ahí prod. | Gatea SÓLO el adapter de firmas. El scanner **`structural` corre siempre**, flag o no: es lo que hoy impide que un binario disfrazado de PDF entre al bucket privado. **Fail-closed**: flag ON sin `ASSET_MALWARE_SCAN_ENDPOINT` emite veredicto `error` (bloqueante), nunca degrada en silencio a "sin antivirus". |
 | `HIRING_ASSESSMENT_AI_ENABLED` | TASK-1361 | OFF/default en todos los environments (verdad live: `vercel env ls`) · **code-complete + gated** | (1) correr el eval baseline REAL `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/assessment-scoring-eval.ts` (requiere `greenhouse-anthropic-api-key` + ADC) y verificar MAE/tolerancia/correlación verdes vs el dataset curado; (2) `vercel env add HIRING_ASSESSMENT_AI_ENABLED staging` + redeploy → habilita los propose paths (generar preguntas / sugerir puntaje); (3) prod tras sign-off HR/Legal (hiring-AI = alto riesgo EU AI Act). | Gatea SOLO los propose paths (`proposeQuestionsForCompetency` / `proposeScoreForResponse`). El confirm/reject de propuestas existentes NO se gatea (un humano siempre drena la cola). La IA PROPONE evidencia; el humano confirma vía `confirmAiProposal` — el LLM nunca escribe banco/score. Default OFF → los propose devuelven 409 `assessment_ai_disabled`. |
-| `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` | TASK-1375 | OFF/default en todos los environments (verdad live: `vercel env ls`) · **code-complete + gated** | (1) confirmar el base URL público del ops-worker (`GREENHOUSE_PUBLIC_APP_URL`/`NEXT_PUBLIC_APP_URL`) para el link de descarga; (2) deploy del ops-worker (bundlea la projection + el template de email); (3) flip del flag por environment → smoke: submit real → llega el email con el link gated (descarga sólo tras completar el form). | Email de respaldo del ebook lead magnet (consumer reactivo `growth_ebook_delivery`, drenado por `ops-reactive-growth`). Default OFF → sólo descarga on-screen. **Genérico por ebook** (lee el contenido del `success_behavior` del form). El email lleva el LINK gated, NUNCA adjunta el PDF (9 MB). |
+| `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` | TASK-1375 | **ops-worker (prod): ON — 2026-07-09**, revisión `ops-worker-00470-898` sirviendo 100% del tráfico (`GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=true` verificado en la revisión activa). El código de la projection + el template entraron con el release `41aefb457`. Base URL: NO se setea env → `publicBaseUrl()` cae al default correcto `https://greenhouse.efeoncepro.com`. Infra de email confirmada en el worker (`RESEND_API_KEY` + `RESEND_API_KEY_SECRET_REF` + `EMAIL_FROM`), misma maquinaria ya probada en prod por `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED`. | (1) **smoke humano pendiente**: submit real en `think.efeoncepro.com/web-agentica` con correo corporativo → verificar que llega el email con el link gated. NO es automatizable: el Turnstile invisible del form bloquea browsers automatizados (comportamiento correcto), así que el submit aceptado sólo lo produce una persona. (2) Tras el smoke, sacar esta fila de pendientes y dejar sólo § Snapshot. | Email de respaldo del ebook lead magnet (consumer reactivo `growth_ebook_delivery`, drenado por `ops-reactive-growth`). **Flujo crítico**: la success card le promete el email al usuario, por eso NO debe quedar OFF en prod. **Genérico por ebook** (lee el contenido del `success_behavior` del form). El email lleva el LINK gated, NUNCA adjunta el PDF (9 MB). |
 | `PPM_POSITION_ENABLED` | TASK-1189 | OFF/default en todos los environments (verdad live: `vercel env ls`) · **code-complete + shadow** | (1) **captura de la tasa PPM real** del contribuyente con el contador (hoy seed placeholder 0.25% en `ppm_rate_config`) + **validación contable** de la cifra shadow (19 períodos, ej. 2026-06 = 14.500 CLP); (2) flip del flag; (3) redeploy ops-worker si se agrega materialización reactiva. | Línea PPM del F29 (child A de TASK-1186). Default OFF → el endpoint `GET /api/finance/ppm/monthly-position` marca `enabled:false` (shadow). La tasa vive en la SSOT `ppm_rate_config` (actualizable sin deploy); el flag gatea la exposición "oficial". |
 | `RETENTION_POSITION_ENABLED` | TASK-1188 | **staging: ON** (2026-06-20, toma efecto en el redeploy del push) · prod: OFF | (1) **prod queda gated en validación contable** de la cifra de retenciones (2026-05 = 242.623 CLP, 2026-06 = 138.646 CLP) vs el F29 real; (2) tras sign-off, `vercel env add RETENTION_POSITION_ENABLED Production` + redeploy; (3) redeploy del ops-worker si se agrega materialización reactiva. | Línea de retenciones del F29 (child B de TASK-1186). Default OFF → el endpoint `GET /api/finance/retention/monthly-position` marca `enabled:false` (shadow), nadie trata la cifra como oficial. La data shadow existe en `retention_monthly_positions` (materializada manualmente). |
 | `NEXA_INTERACTION_LANE_ENABLED` + `NEXT_PUBLIC_NEXA_INTERACTION_LANE_ENABLED` | TASK-1079 | **staging:** env vars SET (2026-06-18), **redeploy pendiente** · prod: OFF | (1) redeploy de staging con **build fresco** (NEXT_PUBLIC se hornea en build) → habilita "Lateral" en el menú de modo de Nexa. (2) prod = decisión del operador tras sign-off | Lane sidecar de Nexa (concepto C). Default-safe: solo habilita la opción, el default sigue siendo el flotante. |
@@ -173,6 +175,7 @@ _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vac�
 | `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` (ops-worker + Vercel) | — | ✅ (2026-06-27, smoke E2E sent) | — | TASK-1250 (prod OFF; gated TASK-1246) |
 | `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` (ops-worker + Vercel) | — | ⚠️ **CORREGIDO 2026-06-29 (TASK-1291): ABSENT en TODOS los envs Vercel** (`vercel env ls` = SoT; el "staging ON" anterior quedó stale desde el smoke de TASK-1279). La cross-sell SEND está gateada OFF (command rechaza `aeo_send_disabled`). | — | TASK-1279/1291 (re-enable gateado por eval TASK-1292 + sign-off) |
 | `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` | — | — | — | TASK-1227 (gatea el extractor de prosa; el proveedor lo elige `_PROSE_EXTRACTION_PROVIDER`, TASK-1271, default `anthropic`) |
+| `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` (**ops-worker / Cloud Run**, NO Vercel) | ✅ (2026-07-09, rev `ops-worker-00470-898`) | — | — | TASK-1375 (flujo crítico: la success card promete el email). Smoke humano pendiente — el Turnstile del form impide el submit automatizado |
 | `GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_ENABLED` | — | — | — | TASK-1271 (eval-only; default OFF; NO afecta el path de runs — lo consume sólo el harness/CLI de eval) |
 | `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED` | — | ✅ (2026-06-24, smoke real `full` EO-GRUN-00011 OK) | — | TASK-1234 |
 | `GROWTH_AI_VISIBILITY_PORTAL_RUN_ENABLED` | — | ✅ (2026-06-29, smoke real: Berel contratado accepted + run `portal_contracted` drenado; org sin entitlement denied) | — | TASK-1277 (prod OFF; gated EPIC-020 + sign-off comercial) |
@@ -188,23 +191,87 @@ _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vac�
 
 ## § Cómo prender un env-var flag
 
+> ⚠️ **Un flag no es "el flag de Vercel".** Es una env var leída por **cada runtime que ejecuta el código gateado**. Greenhouse tiene **5 runtimes con env vars totalmente independientes**. Prenderlo en el runtime equivocado = no pasa nada (y peor: parece prendido en el ledger). **El paso 0 no es opcional.**
+
+### Los 5 runtimes y sus env vars
+
+| Runtime | Qué ejecuta | Cómo se prende | Cómo se verifica |
+|---|---|---|---|
+| **Vercel** (app Next.js) | API routes, server components, UI, crons de `vercel.json` | `vercel env add` + redeploy | `vercel env ls` |
+| **`ops-worker`** (Cloud Run, `us-east4`) | **projections reactivas, consumers del outbox, crons de Cloud Scheduler**, emails async | `gcloud run services update ops-worker` | `gcloud run revisions describe` |
+| **`commercial-cost-worker`** (Cloud Run, `us-east4`) | jobs de costo comercial | `gcloud run services update commercial-cost-worker` | idem |
+| **`ico-batch-worker`** (Cloud Run, `us-east4`) | batches ICO / delivery metrics | `gcloud run services update ico-batch-worker` | idem |
+| **`hubspot-greenhouse-integration`** (Cloud Run, `us-central1`) | bridge + webhooks HubSpot | `gcloud run services update hubspot-greenhouse-integration --region us-central1` | idem |
+
+### Paso 0 — Mapear en QUÉ runtime(s) vive el flag (ANTES de prender)
+
 ```bash
-# 1) Agregar la var al environment correcto (scalar crudo, sin comillas/newline)
+# Encontrar dónde se LEE el flag (no dónde se declara)
+grep -rn "<FLAG_NAME>\|is<Feature>Enabled" src/ services/ | grep -v __tests__
+```
+
+Traducí cada path a su runtime:
+
+| Path donde se lee | Runtime real |
+|---|---|
+| `src/app/**`, `src/views/**`, `src/components/**` | **Vercel** |
+| `src/lib/sync/projections/**` (projection reactiva) | **ops-worker** (la drena `ops-reactive-*`) |
+| `services/ops-worker/**` | **ops-worker** |
+| `services/<otro-worker>/**` | ese worker |
+| `src/lib/**` compartido | **depende de los callers** → seguir la cadena hasta un `src/app/**` (Vercel) y/o una projection/worker (Cloud Run). Puede ser **los dos**. |
+
+**Heurística de bolsillo:** ¿el flag gatea algo **async** (email de respaldo, projection, consumer del outbox, cron de Scheduler, materializer)? → **ops-worker, NO Vercel.** ¿Gatea una **ruta/superficie visible**? → **Vercel.** ¿Ambas cosas? → **ambos** (ej. `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED`, marcado `(ops-worker + Vercel)` en el snapshot).
+
+### Paso 1 — Prender en CADA runtime del mapeo
+
+```bash
+# --- Vercel (si aplica) --------------------------------------------------
 printf %s "true" | vercel env add <FLAG_NAME> <environment> --scope efeonce-7670142f
 #    environments: Production | staging | preview | development  (staging = custom env)
 #    Si el flag tiene mirror NEXT_PUBLIC_*, agregar AMBAS.
 
-# 2) Redeploy (las env vars NO se toman en caliente):
-#    - server var (*_ENABLED): aplica en el próximo deploy.
-#    - NEXT_PUBLIC_* : se hornea en build → requiere BUILD FRESCO
-#      (push a la rama del env, o Redeploy con "Use existing Build Cache" DESMARCADO).
-
-# 3) Verificar el consumer real (no solo que la var exista):
-vercel env ls | grep <FLAG_NAME>
-#    + abrir la surface en el environment y confirmar el comportamiento.
+# --- Cloud Run (si aplica) — repetir por cada worker del mapeo -----------
+gcloud run services update <servicio> \
+  --region <us-east4|us-central1> --project efeonce-group \
+  --update-env-vars <FLAG_NAME>=true
+#    Esto YA crea una revisión nueva y enruta el tráfico: no hace falta redeploy aparte.
 ```
 
-Para **apagar** (rollback): `vercel env rm <FLAG_NAME> <environment> --scope efeonce-7670142f` + redeploy. (Quitar la var = OFF/default.)
+### Paso 2 — Redeploy donde haga falta
+
+- **Vercel server var** (`*_ENABLED`): aplica en el próximo deploy (las env vars NO se toman en caliente).
+- **Vercel `NEXT_PUBLIC_*`**: se hornea en build → requiere **BUILD FRESCO** (push a la rama del env, o Redeploy con "Use existing Build Cache" DESMARCADO).
+- **Cloud Run**: el `services update` ya crea la revisión. Nada más.
+
+### Paso 3 — Verificar en CADA runtime (que la var exista Y que el consumer se comporte)
+
+```bash
+# Vercel
+vercel env ls | grep <FLAG_NAME>
+
+# Cloud Run — leer la env de la REVISIÓN ACTIVA (no del servicio "en general")
+REV=$(gcloud run services describe <servicio> --region <region> --project efeonce-group \
+        --format='value(status.latestReadyRevisionName)')
+gcloud run revisions describe "$REV" --region <region> --project efeonce-group \
+  --format="json(spec.containers[0].env)" | grep -A1 <FLAG_NAME>
+```
+
+Y además: **ejercitar el flujo real**. Que la var exista no prueba que el consumer haga lo suyo. Si el flag gatea un email async, el smoke es "llega el email", no "la var está".
+
+### Paso 4 — Actualizar este ledger
+
+Registrar en la fila **el/los runtime(s)** donde quedó prendido + fecha + revisión (Cloud Run) — igual que
+`GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` (**ops-worker**, rev `ops-worker-00470-898`). Sin el runtime explícito, el próximo agente asume Vercel y se equivoca.
+
+### Apagar (rollback)
+
+```bash
+vercel env rm <FLAG_NAME> <environment> --scope efeonce-7670142f   # + redeploy
+gcloud run services update <servicio> --region <region> --project efeonce-group \
+  --remove-env-vars <FLAG_NAME>
+```
+
+(Quitar la var = OFF/default.) **Apagar también es multi-runtime**: quitarla de Vercel no la apaga en el worker.
 
 Para los **PG rollout flags** (`home_rollout_flags`): se prenden vía admin endpoint sin redeploy — ver el platform doc.
 
@@ -220,6 +287,8 @@ Para los **PG rollout flags** (`home_rollout_flags`): se prenden vía admin endp
 **Payroll / Workforce:** `PAYROLL_PARTICIPATION_WINDOW_ENABLED` (TASK-890) · `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (TASK-891) · `LEAVE_PARTICIPATION_AWARE_ENABLED` (TASK-892) · `PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED` · `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` (TASK-872) · `WORKFORCE_ACTIVATION_READINESS_GUARD_ENABLED` · `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` (TASK-872) · `WORKFORCE_CONTRACTING_AI_ENABLED` (TASK-1019).
 
 **Hiring / ATS (EPIC-011):** `HIRING_ASSESSMENT_AI_ENABLED` (TASK-1361 — gatea los propose paths del AI assist del motor de assessment; `src/lib/hiring/assessment/ai/config.ts`; code-complete + gated, ver § Pendientes) · `HIRING_PUBLIC_APPLICATIONS_ENABLED` (TASK-1367/TASK-354 — gatea el endpoint público de postulación `POST /api/public/hiring/applications`; `src/lib/hiring/public-careers/config.ts`; staging+Production env SET 2026-07-09, production release `433cfa2b0fd3` live, opening real `EO-OPN-0009` publicado, submit smoke pendiente; default OFF = 404 invisible).
+
+**Storage / Assets (TASK-1362):** `ASSET_MALWARE_SCAN_ENABLED` (TASK-1362 — suma el adapter `clamav-http` encima del scanner estructural en `scanAssetBytes`; `src/lib/storage/asset-scan/config.ts`; **runtime: Vercel** — el upload público de CV corre en el route handler de Next, ningún Cloud Run sube assets de usuario hoy; code-complete + NO verificado contra servicio real, ver § Pendientes). Acompañantes (no `*_ENABLED`): `ASSET_MALWARE_SCAN_ENDPOINT`, `ASSET_MALWARE_SCAN_TIMEOUT_MS`.
 
 **Finance:** `FINANCE_BIGQUERY_WRITE_ENABLED` · `FINANCE_RECONCILIATION_AI_ENABLED` (TASK-934) · `FINANCE_DISTRIBUTION_AI_ENABLED` · `FINANCE_CORE_MXN_ENABLED` · `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED` · `FINANCE_MXN_PAYMENT_ORDERS_ENABLED` · `FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED` · `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED` · `RETENTION_POSITION_ENABLED` (TASK-1188, línea retenciones del F29 — code-complete + shadow, ver § Pendientes; `src/lib/finance/retention/flags.ts`) · `PPM_POSITION_ENABLED` (TASK-1189, línea PPM del F29 — code-complete + shadow; `src/lib/finance/ppm/flags.ts`). **Contractor:** `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED` · `CONTRACTOR_AGREED_AMOUNT_GUARDRAIL_ENABLED` (EPIC-013).
 

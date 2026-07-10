@@ -76,6 +76,46 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'internal'
   },
   {
+    viewCode: 'gestion.hiring',
+    section: 'gestion',
+    label: 'Hiring Desk',
+    description: 'Workspace interno de demandas, postulantes, decisiones y publicación de vacantes.',
+    routePath: '/agency/hiring',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.hiring_demand',
+    section: 'gestion',
+    label: 'Hiring — Demanda',
+    description: 'Demanda de talento, aperturas y ownership operativo.',
+    routePath: '/agency/hiring',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.hiring_pipeline',
+    section: 'gestion',
+    label: 'Hiring — Pipeline',
+    description: 'Pipeline kanban de postulaciones y etapas de selección.',
+    routePath: '/agency/hiring/pipeline',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.hiring_publication',
+    section: 'gestion',
+    label: 'Hiring — Publicación',
+    description: 'Gobierno del payload público y ciclo de publicación de openings.',
+    routePath: '/agency/hiring/publication',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.hiring_application_detail',
+    section: 'gestion',
+    label: 'Hiring — Postulación 360',
+    description: 'Detalle integral, assessment, documentos, decisión y actividad de una postulación.',
+    routePath: '/agency/hiring/applications/[applicationId]',
+    routeGroup: 'internal'
+  },
+  {
     viewCode: 'gestion.spaces',
     section: 'gestion',
     label: 'Spaces',

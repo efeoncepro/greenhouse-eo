@@ -84,6 +84,7 @@ export const GH_AGENCY_NAV = {
   services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' },
   sampleSprints: { label: 'Sample Sprints', subtitle: 'Pilotos, trials y discovery comerciales' },
   staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding y economía por assignment' },
+  hiring: { label: 'Hiring', subtitle: 'Demandas, postulantes y decisiones' },
   economics: { label: 'Economía', subtitle: 'P&L y rentabilidad' },
   team: { label: 'Capacidad', subtitle: 'Carga operativa y dedicación del equipo' },
   talentDiscovery: { label: 'Talento', subtitle: 'Descubrimiento y ranking' },

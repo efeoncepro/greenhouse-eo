@@ -18,6 +18,7 @@ import { empty } from './empty'
 import { emails } from './emails'
 import { errors } from './errors'
 import { feedback } from './feedback'
+import { hiringDesk } from './hiringDesk'
 import { loading } from './loading'
 import { months } from './months'
 import { notAuthorized } from './notAuthorized'
@@ -41,5 +42,6 @@ export const esCL: MicrocopyDictionary = {
   feedback,
   time,
   emails,
-  careers
+  careers,
+  hiringDesk
 }

@@ -126,7 +126,7 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 
 - [ ] `TASK-353` delivered foundation and no downstream task uses mocks or parallel schema.
 - [ ] `TASK-354` delivered public careers/apply without exposing internal opening metadata or unsafe assets.
-- [ ] `TASK-355` delivered internal desk with `HiringApplication` as board unit and capability-aware PII handling.
+- [x] `TASK-355` delivered internal desk with `HiringApplication` as board unit and capability-aware PII handling.
 - [ ] `TASK-356` delivered auditable `HiringHandoff`, versioned events and downstream signals.
 - [ ] `TASK-770` delivered selected candidate -> collaborator active closure for `internal_hire`.
 - [ ] People 360 shows the journey from candidate/application to member/onboarding/active without duplicate identities.

@@ -37,7 +37,7 @@ Revisada con `arch-architect` (lente dominante — es capa reactiva/outbox/CQRS)
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-353`
+- Blocked by: `none`
 - Branch: `task/TASK-356-hiring-handoff-reactive-signals-downstream-bridges`
 - Legacy ID: `follow-on de GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1 + RESEARCH-003`
 - GitHub Issue: `none`

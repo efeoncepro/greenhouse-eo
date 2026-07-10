@@ -104,7 +104,7 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-353-hiring-ats-domain-foundation.md`
 - `docs/tasks/to-do/TASK-354-public-careers-landing-apply-intake.md`
-- `docs/tasks/to-do/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
+- `docs/tasks/complete/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
 - `docs/tasks/to-do/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md`
 - `docs/tasks/to-do/TASK-770-hiring-to-hris-collaborator-activation.md`
 

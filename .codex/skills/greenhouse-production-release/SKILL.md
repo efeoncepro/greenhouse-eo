@@ -104,8 +104,19 @@ gh workflow run production-release.yml \
   -f force_infra_deploy=false
 ```
 
-6. Approve the `Production Release Orchestrator` environment gate, not random
-   stale worker runs.
+6. Approve the `production` environment gate — **OJO: el entorno `production` se pide
+   DOS veces en el mismo run** (ver gotcha #6). Aprobá AMBAS: la primera (jobs del
+   orquestador) y la segunda (jobs Azure gated, que aparece después de que arrancan los
+   deploys). Si dejás la segunda sin aprobar, el run queda `waiting` indefinidamente y el
+   manifest NUNCA transiciona a `released`. **Poleá `pending_deployments` REPETIDAMENTE
+   durante todo el run, no solo el `.status` del run.** No aprobar runs de workers stale.
+
+   ```bash
+   gh api "repos/efeoncepro/greenhouse-eo/actions/runs/<run_id>/pending_deployments" \
+     --jq '.[] | {env:.environment.name, id:.environment.id, canApprove:.current_user_can_approve}'
+   gh api "repos/efeoncepro/greenhouse-eo/actions/runs/<run_id>/pending_deployments" \
+     -X POST -f state=approved -F "environment_ids[]=<env_id>" -f comment="<razon>"
+   ```
 7. Watch the orchestrator complete:
    - preflight
    - record-started
@@ -128,7 +139,13 @@ gh workflow run production-release-watchdog.yml --ref main \
    - `commercial-cost-worker` in `us-east4`
    - `ico-batch-worker` in `us-east4`
    - `hubspot-greenhouse-integration` in `us-central1`
-10. **Prender los flags pendientes de este release.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`: por cada feature `code-complete` cuyo flip estaba gated a este release, `vercel env add <FLAG>=true Production` (+ `gcloud run services update ops-worker --update-env-vars ...` si el flag corre en el worker) + redeploy + smoke del flujo en prod + actualizar la fila del ledger (snapshot por environment). El deploy del código no activa nada por sí solo. Si un flag requería su migración en prod, confirmar que entró por este release antes de prenderlo.
+10. **Prender los flags pendientes de este release — en TODOS los runtimes, no sólo Vercel.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`. Por cada feature `code-complete` cuyo flip estaba gated a este release:
+    - **Paso 0 obligatorio — mapear dónde se LEE el flag:** `grep -rn "<FLAG>" src/ services/ | grep -v __tests__`. Hay **5 runtimes con env vars independientes**: Vercel (app Next.js) + 4 Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Prenderlo en uno **NO** lo prende en los otros. **Heurística:** si gatea algo **async** (email, projection reactiva, consumer del outbox, cron de Cloud Scheduler, materializer) vive en el **`ops-worker`, NO en Vercel** — prenderlo en Vercel no hace nada; si gatea una ruta/superficie visible vive en Vercel; puede vivir en **ambos**.
+    - **Aplicar en cada runtime del mapeo:** `vercel env add <FLAG> Production` + redeploy · y/o `gcloud run services update <svc> --region <us-east4|us-central1> --project efeonce-group --update-env-vars <FLAG>=true` (ya crea la revisión; no requiere redeploy aparte).
+    - **Verificar en el deploy/revisión ACTIVO** (`vercel env ls` · `gcloud run revisions describe <rev> --format="json(spec.containers[0].env)"`) **y ejercitar el flujo real** — que la var exista ≠ que el consumer funcione.
+    - **Actualizar la fila del ledger declarando el/los runtime(s)** + fecha + revisión Cloud Run. Sin el runtime explícito, el próximo agente asume Vercel y se equivoca.
+
+    El deploy del código no activa nada por sí solo. Si un flag requería su migración en prod, confirmar que entró por este release antes de prenderlo. **Apagar/rollback también es multi-runtime.** Caso fuente 2026-07-09: `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` vive sólo en el `ops-worker`; el runbook sólo enseñaba `vercel env add` y prenderlo ahí habría dejado el email muerto con la success card prometiéndoselo al usuario.
 11. **Registrar tiempos del release.** Actualizar `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release ID, run ID, target SHA, agent E2E elapsed como KPI principal, desglose de fases, workflow elapsed, manifest elapsed, runtime-green elapsed, blocker principal y aprendizaje.
 
 ## Gotchas conocidos del release (verificados 2026-07-03 #139; fix de raíz = ISSUE-114)
@@ -150,6 +167,19 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
    `READY` para el `target_sha`. Si un release futuro quiere ahorrar builds
    docs-only en `main`, primero debe modelar explícitamente un estado
    `vercel_skipped` en el release control plane, runbooks y watchdog.
+
+6. **El entorno `production` se pide DOS veces — los jobs Azure gated tienen su propio
+   gate (verificado 2026-07-09, release `41aefb457`).** Tras aprobar la 1ra aprobación
+   (jobs del orquestador), los 2 jobs Azure gated (`Deploy Azure Teams Bot/Notifications
+   (gated)` → step `Health check Azure (preflight-style)`) piden una **SEGUNDA aprobación
+   del mismo entorno `production`**. Sin aprobar, quedan `waiting`, el run queda `waiting`
+   y `Transition release_manifests → released` no corre (manifest en `preflight`, nunca
+   `released`). El `.status` NO revela el gate esperando → poleá `pending_deployments` en
+   loop. Aprobado el 2do gate, Azure corre `Validate Bicep` + `Detect diff` → `Skip Bicep
+   deploy (no diff)` + `Deploy … stack` = `skipped` (no-op esperado), y transiciona a
+   `released`. En `41aefb457` el 2do gate sin aprobar stalleó el run ~43 min. **Regla:
+   aprobar SIEMPRE ambos gates de inmediato.** (Este es el "siempre se quedan waiting" de
+   los jobs Azure: no es falla, es el 2do gate.)
 
 ## What The Orchestrator Owns
 

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
-import { publishOpening, toHiringErrorResponse, unpublishOpening } from '@/lib/hiring'
+import { getHiringOpeningById, publishOpening, toHiringErrorResponse, unpublishOpening } from '@/lib/hiring'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
 /**
@@ -26,9 +27,13 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   try {
     const { id } = await params
     const result = await publishOpening(id, tenant.userId)
+    const opening = await getHiringOpeningById(id)
+
+    revalidatePath('/public/careers')
+    revalidatePath(`/public/careers/${result.publicId}`)
 
     
-return NextResponse.json(result)
+    return NextResponse.json({ ...result, opening })
   } catch (error) {
     return toHiringErrorResponse(error, 'opening_publish')
   }
@@ -48,9 +53,13 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const { searchParams } = new URL(request.url)
     const mode = searchParams.get('mode') === 'closed' ? 'closed' : 'paused'
     const result = await unpublishOpening(id, tenant.userId, mode)
+    const opening = await getHiringOpeningById(id)
+
+    revalidatePath('/public/careers')
+    revalidatePath(`/public/careers/${result.publicId}`)
 
     
-return NextResponse.json(result)
+    return NextResponse.json({ ...result, opening })
   } catch (error) {
     return toHiringErrorResponse(error, 'opening_unpublish')
   }

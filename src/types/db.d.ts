@@ -1984,6 +1984,24 @@ export interface GreenhouseCoreAssets {
   visibility: string;
 }
 
+export interface GreenhouseCoreAssetScanResults {
+  asset_id: string;
+  declared_mime_type: string | null;
+  detected_mime_type: string | null;
+  duration_ms: number | null;
+  findings_json: Generated<Json>;
+  resolution_notes: string | null;
+  resolution_status: Generated<string>;
+  resolved_at: Timestamp | null;
+  resolved_by_user_id: string | null;
+  scan_id: string;
+  scanned_at: Generated<Timestamp>;
+  scanner: string;
+  scanner_version: string;
+  size_bytes: Int8 | null;
+  verdict: string;
+}
+
 export interface GreenhouseCoreAuditEvents {
   actor_user_id: string | null;
   created_at: Generated<Timestamp>;
@@ -11164,6 +11182,7 @@ export interface DB {
   "greenhouse_core.api_platform_command_executions": GreenhouseCoreApiPlatformCommandExecutions;
   "greenhouse_core.api_platform_request_logs": GreenhouseCoreApiPlatformRequestLogs;
   "greenhouse_core.asset_access_log": GreenhouseCoreAssetAccessLog;
+  "greenhouse_core.asset_scan_results": GreenhouseCoreAssetScanResults;
   "greenhouse_core.assets": GreenhouseCoreAssets;
   "greenhouse_core.audit_events": GreenhouseCoreAuditEvents;
   "greenhouse_core.auth_tokens": GreenhouseCoreAuthTokens;

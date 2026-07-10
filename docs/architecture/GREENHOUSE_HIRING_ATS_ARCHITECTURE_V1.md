@@ -20,6 +20,82 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-10 — Candidate document capture: scan/quarantine, resolver unificado y retención (TASK-1362)
+
+### Contexto: superficie abierta, no preventivo
+
+El upload público de CV (TASK-354/1367) estaba vivo validando con `file.type` — el MIME que declara el navegador.
+Ningún byte se inspeccionaba. Un binario renombrado a `.pdf` entraba al bucket privado y quedaba `attached`. El
+escaneo dejó de ser un preventivo y se implementó como remediación, antes que el resto de la task.
+
+### Escaneo de assets — puerto provider-neutral
+
+`src/lib/storage/asset-scan/` es un puerto (mismo patrón que la signature platform de TASK-490):
+
+- `structural` — magic bytes, coherencia MIME↔contenido, hazards de PDF (`/Launch`, `/EmbeddedFile`, `/RichMedia`,
+  `/XFA` bloquean; `/JavaScript` y `/OpenAction` son advisory porque los emiten exportadores legítimos). Corre
+  SIEMPRE, in-process, sin infraestructura.
+- `clamav-http` — behind `ASSET_MALWARE_SCAN_ENABLED` (default OFF). Composición, no reemplazo: el peor veredicto gana.
+
+Lifecycle: `pending → scan → attached | quarantined`. `quarantined` es terminal — los bytes se preservan para triage
+forense, el asset nunca se adjunta y `downloadPrivateAsset` lo rechaza sin importar la capability del actor.
+
+`greenhouse_core.asset_scan_results` es append-only por trigger: sólo las columnas `resolution_*` (triage humano)
+pueden mutar. Outbox `asset.quarantined`; signal `storage.asset_scan.open_quarantine` (steady 0; `infected`/`error`
+escalan a error).
+
+### Invariantes operativos para agentes — Candidate document capture
+
+- **NUNCA** confiar en `file.type` (ni en la extensión) para decidir el tipo de un upload. Es un valor del cliente. El
+  tipo real lo determinan los magic bytes vía `scanAssetBytes`.
+- **NUNCA** adjuntar un asset que venga de la web pública sin escanearlo. El camino ergonómico es
+  `scanAndGateUploadedAsset` (`src/lib/storage/asset-scan/gate.ts`), que opera sobre **bytes + assetId** (NO sobre un
+  `File`) para que cualquier upload lo pueda reusar. La red de seguridad es estructural:
+  `attachAssetToAggregate` **rechaza** los contextos `hiring_application_cv` / `hiring_candidate_portfolio_file` sin un
+  veredicto `clean` registrado (`asset_scan_required` / `asset_scan_blocking:<verdict>`). Un camino de upload nuevo
+  (Growth Forms, TASK-1372/1373) que olvide el gate **falla en el attach**, no pasa en silencio.
+- **NUNCA** asumir que reusar `submitPublicHiringApplication` arrastra el escaneo: sólo escanea cuando se le pasa un
+  `File`. Un consumer reactivo del worker nunca tiene bytes (sólo JSON de PG), así que el escaneo debe ocurrir en el
+  upload síncrono y el worker adjuntar un asset ya escaneado.
+- **NUNCA** decidir "el último veredicto gana" mirando el scan más reciente: dos scans con el mismo `scanned_at` se
+  desempatan por `scan_id` y un `clean` podría taparle el paso a un `infected`. El guard agrega sobre TODOS los
+  veredictos del asset; un bloqueante `open` veta el attach hasta que el triage humano lo resuelva.
+- **NUNCA** degradar en silencio a "sin antivirus": con `ASSET_MALWARE_SCAN_ENABLED=true` y sin
+  `ASSET_MALWARE_SCAN_ENDPOINT`, el veredicto es `error` (bloqueante). Fail-closed.
+- **NUNCA** hacer fallar la postulación porque su archivo quedó en cuarentena: confirmaría al atacante qué payload fue
+  rechazado. La postulación se acepta; el documento se resuelve como `quarantined` y el signal levanta la mano.
+- **NUNCA** hacer `UPDATE`/`DELETE` sobre `asset_scan_results` fuera de las columnas `resolution_*` (el trigger aborta).
+- **NUNCA** autorizar documentos de candidato por routeGroup. El predicado canónico es
+  `canAccessHiringCandidateDocument` (capability `hiring.application.read` + `client_*` denegado por `tenantType`).
+  El check por routeGroup `hr` le daba los CV a roles sin ninguna capability de Hiring (`hr_payroll`).
+- **NUNCA** anclar un documento de candidato por `member_id`: un candidato no tiene member hasta el handoff
+  (TASK-356). Se ancla por `identity_profile_id` / `candidate_facet_id` / `application_id`.
+- **NUNCA** pedir el documento de identidad en el apply público. `captureCandidateIdentityDocument` exige actor
+  autenticado Y una decisión favorable (`selected`/`backup_selected`) — el guardrail es código, no comentario.
+- **NUNCA** exponer `value_full` de un documento de identidad por el resolver. Sale sólo por el reveal auditado de
+  TASK-784 (capability + reason ≥5 chars + audit append-only).
+- **NUNCA** crear una columna de portafolio nueva: `candidate_facet.portfolio_url`/`linkedin_url` existen desde
+  TASK-1367 y ya vienen saneados (`isSafeHttpUrl`, https-only, sin fetch server-side).
+- **NUNCA** borrar documentos de candidatos automáticamente. `retention.ts` detecta y alerta; el borrado de PII de
+  personas reales es un comando gobernado con humano en el loop (owner People Ops).
+
+### Resolver unificado
+
+`resolveCandidateDocuments` (`src/lib/hiring/documents/`) reúne archivos + enlaces + identidad enmascarada. Un
+primitive, muchos consumers (desk TASK-355, handoff TASK-356, Nexa/MCP por construcción vía
+`GET /api/hiring/candidate-facets/[candidateFacetId]/documents`). No degrada en silencio: si una fuente falla, la
+excepción sube — "sin documentos" y "la consulta falló" no pueden verse iguales.
+
+Detalle load-bearing: los assets `pending`/`quarantined` tienen `owner_aggregate_id = NULL` (el INSERT lo deja así),
+así que el resolver los encuentra por `metadata_json->>'candidateFacetId'`. Omitir esa rama haría desaparecer del desk
+justo los documentos bloqueados por el escáner.
+
+### Retención (Ley 21.719)
+
+Política declarada: **12 meses** desde `rejected`/`withdrawn`. Consentimiento retirado vence sin ventana. Los
+contratados quedan fuera (les aplica la retención laboral). Signal `hiring.candidate_document.retention_overdue`
+(warning; `consent_withdrawn` escala a error). El borrado es follow-up gobernado.
+
 ## Delta 2026-07-09 — Structured vacancy publication operator (TASK-1371)
 
 Hiring vacancy publication now has a canonical backend-data operator:
@@ -887,7 +963,9 @@ La foundation transaccional del dominio quedó materializada (local-first, verif
 
 **Capabilities V1 (8, seedeadas en `capabilities_registry` + grants en `runtime.ts`):** `hiring.demand.{read,write}`, `hiring.opening.{read,write,publish}`, `hiring.application.{read,write,decide}`. Grant: internal ∪ EFEONCE_ADMIN ∪ HR_MANAGER ∪ EFEONCE_OPERATIONS (∪ EFEONCE_ACCOUNT en read/write; publish/decide least-privilege sin comercial). NUNCA `client_*`. `hiring.application.decide` queda seedeada/grantada ahora y su endpoint dedicado llega con el desk interno (TASK-355).
 
-**Views (pendiente TASK-355):** los viewCodes del desk (`agency.hiring`, `agency.hiring.demand`, `agency.hiring.pipeline`, `agency.hiring.publication`, `agency.hiring.application_detail`) se seedean en `VIEW_REGISTRY` + migración `role_view_assignments` **junto con las rutas reales** en TASK-355 (seedear un viewCode sin ruta alcanzable violaría la governance de reachability + `role_view_fallback`).
+**Views (TASK-355, implementadas en dev):** `gestion.hiring`, `gestion.hiring_demand`, `gestion.hiring_pipeline`, `gestion.hiring_publication` y `gestion.hiring_application_detail` viven en `VIEW_REGISTRY`, `role_view_assignments` y el manifest de reachability junto con las rutas `/agency/hiring/**`. Los viewCodes mantienen namespace de navegación `gestion.*`; la ruta conserva ownership de producto bajo `agency`. El acceso visible no reemplaza las capabilities finas de cada reader/command.
+
+**Desk interno (TASK-355, code complete / rollout pendiente):** Demand, Pipeline, Application 360 y Publication comparten `CompositionShell` y consumen el dominio `src/lib/hiring/**`; el Kanban representa `HiringApplication`, ofrece drag más menú operable por teclado y persiste con rollback. `decideHiringApplication` bloquea la fila, exige reason humana estructurada, actualiza el snapshot vigente, agrega `explainability_json.decisionHistory[]` append-only y publica `hiring.application.decided` v1 en la misma transacción. El review de assessment consume TASK-1360/1361; documentos mantiene PII masked y declara degradación hasta el resolver/reveal de TASK-1362. Documentación funcional: `docs/documentation/hr/hiring-desk.md`; manual: `docs/manual-de-uso/hr/operar-hiring-desk.md`.
 
 ### Invariantes operativos para agentes — Hiring / ATS foundation
 

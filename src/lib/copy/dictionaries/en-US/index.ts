@@ -8,6 +8,7 @@ import { comingSoon } from './comingSoon'
 import { empty } from './empty'
 import { errors } from './errors'
 import { feedback } from './feedback'
+import { hiringDesk } from './hiringDesk'
 import { loading } from './loading'
 import { months } from './months'
 import { notAuthorized } from './notAuthorized'
@@ -32,5 +33,6 @@ export const enUS: MicrocopyDictionary = {
   time,
   // Email localization is intentionally deferred to the email rollout child task.
   emails: esCLEmails,
-  careers
+  careers,
+  hiringDesk
 }

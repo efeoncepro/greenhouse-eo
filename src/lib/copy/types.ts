@@ -56,6 +56,7 @@ export type MicrocopyNamespace =
   | 'time' // Formatos de tiempo relativo: hace X minutos, ayer, etc.
   | 'emails' // Copy institucional compartido por templates y notification delivery
   | 'careers' // TASK-354: Careers pública Efeonce (attract, listing, detail, apply)
+  | 'hiringDesk' // TASK-355: workspace interno de Hiring
 
 /**
  * Estructura raíz de un dictionary completo por locale.
@@ -77,6 +78,183 @@ export interface MicrocopyDictionary {
   time: TimeCopy
   emails: EmailsCopy
   careers: CareersCopy
+  hiringDesk: HiringDeskCopy
+}
+
+export interface HiringDeskCopy {
+  title: string
+  eyebrow: string
+  subtitle: string
+  navigation: {
+    demand: string
+    pipeline: string
+    publication: string
+  }
+  common: {
+    search: string
+    retry: string
+    cancel: string
+    save: string
+    close: string
+    confirm: string
+    loading: string
+    noResults: string
+    openApplication: string
+    previous: string
+    next: string
+    agency: string
+    demandFormRegion: string
+    createOptions: string
+  }
+  demand: {
+    title: string
+    subtitle: string
+    newDemand: string
+    activeDemands: string
+    openPositions: string
+    applicants: string
+    published: string
+    role: string
+    area: string
+    owner: string
+    ownerSelf: string
+    status: string
+    seats: string
+    publication: string
+    candidates: string
+    targetDate: string
+    openingsTitle: string
+    openingsCaption: string
+    emptyTitle: string
+    emptyBody: string
+    filteredEmptyBody: string
+    drawerTitle: string
+    drawerSubtitle: string
+    templateLabel: string
+    templatePlaceholder: string
+    roleLabel: string
+    areaLabel: string
+    seniorityLabel: string
+    skillsLabel: string
+    businessUnitLabel: string
+    seatsLabel: string
+    modeLabel: string
+    targetDateLabel: string
+    summaryLabel: string
+    internalCompensation: string
+    compensationHint: string
+    previewTitle: string
+    create: string
+    createAndPublish: string
+    createAnother: string
+    discardTitle: string
+    discardBody: string
+    discard: string
+    discardContinue: string
+    drawerHint: string
+    created: string
+  }
+  pipeline: {
+    title: string
+    subtitle: string
+    openingLabel: string
+    allOpenings: string
+    applicantLabel: string
+    applicantsLabel: string
+    searchPlaceholder: string
+    boardHint: string
+    moveTo: string
+    saved: string
+    saving: string
+    rollback: string
+    emptyLane: string
+    keyboardHint: string
+    simulateFailure: string
+    sourcePublicCareers: string
+    tagDelivered: string
+    tagAssigned: string
+    appliedDaysAgo: string
+    appliedDayUnit: string
+    appliedDaysUnit: string
+    stages: Record<string, string>
+  }
+  application: {
+    back: string
+    overview: string
+    assessment: string
+    documents: string
+    decision: string
+    decideAction: string
+    activity: string
+    candidate: string
+    contact: string
+    opening: string
+    score: string
+    match: string
+    nextStep: string
+    source: string
+    assessmentTitle: string
+    assessmentPending: string
+    assignAssessment: string
+    assignmentLink: string
+    copyLink: string
+    reviewAssessment: string
+    reviewPending: string
+    aiSuggestion: string
+    aiSuggestionNote: string
+    scoreLabel: string
+    overallScore: string
+    confirmScore: string
+    scoreConfirmed: string
+    finalizeScorecard: string
+    scorecardFinalized: string
+    documentsTitle: string
+    documentsUnavailable: string
+    documentsBody: string
+    revealConfirm: string
+    decisionTitle: string
+    decisionIntro: string
+    decisionType: string
+    decisionAdvance: string
+    decisionReject: string
+    decisionHold: string
+    destination: string
+    startDate: string
+    legalEntity: string
+    context: string
+    reason: string
+    evidence: string
+    advisoryOverride: string
+    confirmTitle: string
+    confirmBody: string
+    decided: string
+    supersede: string
+    history: string
+    activityTitle: string
+  }
+  publication: {
+    title: string
+    subtitle: string
+    publicPreview: string
+    internalOnly: string
+    allowlist: string
+    publish: string
+    pause: string
+    resume: string
+    reopen: string
+    close: string
+    edit: string
+    publishTitle: string
+    publishBody: string
+    pauseTitle: string
+    pauseBody: string
+    closeTitle: string
+    closeBody: string
+    resumeBody: string
+    reopenBody: string
+    updated: string
+    noOpening: string
+  }
 }
 
 export interface CareersCopy {

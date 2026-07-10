@@ -71,7 +71,7 @@ Revisar y respetar:
 - `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md`
 - `docs/tasks/in-progress/TASK-354-public-careers-landing-apply-intake.md`
 - `docs/tasks/complete/TASK-1367-careers-apply-intake-service.md`
-- `docs/tasks/to-do/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
+- `docs/tasks/complete/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
 - `docs/documentation/hr/careers-publicas.md`
 - `docs/manual-de-uso/hr/operar-careers-publicas.md`
 

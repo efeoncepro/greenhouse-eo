@@ -1,6 +1,8 @@
 export type GreenhouseAssetVisibility = 'public' | 'private'
 
-export type GreenhouseAssetStatus = 'pending' | 'attached' | 'orphaned' | 'deleted'
+// TASK-1362 — `quarantined` es terminal: el asset existe (bytes preservados para
+// triage forense) pero NUNCA quedó adjunto a su aggregate ni es descargable.
+export type GreenhouseAssetStatus = 'pending' | 'attached' | 'orphaned' | 'deleted' | 'quarantined'
 
 export type GreenhouseAssetRetentionClass =
   | 'public_media'
@@ -64,6 +66,10 @@ export type GreenhouseAssetContext =
   // TASK-354 — public Careers CVs use the shared private asset registry.
   | 'hiring_application_cv_draft'
   | 'hiring_application_cv'
+  // TASK-1362 — muestras/portafolio-archivo del candidato. El portafolio-ENLACE
+  // vive en `candidate_facet.portfolio_url` (TASK-1367); esto es el archivo.
+  | 'hiring_candidate_portfolio_file_draft'
+  | 'hiring_candidate_portfolio_file'
   // TASK-1023 — Workforce Contracting Studio signable document (offer letter / employment contract).
   | 'workforce_contracting_document'
   // TASK-490 — signed PDF artifact returned by the signature provider (EPIC-001 signature platform).
@@ -121,6 +127,7 @@ export type DraftUploadContext = Extract<
   | 'provider_invoice_draft'
   | 'organization_logo_draft'
   | 'hiring_application_cv_draft'
+  | 'hiring_candidate_portfolio_file_draft'
 >
 
 export interface UploadPrivateAssetInput {

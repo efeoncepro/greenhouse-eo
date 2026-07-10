@@ -4,6 +4,8 @@
 export * from './errors'
 export * from './error-response'
 export * from './store'
+export * from './decide'
+export * from './desk'
 export * from './publication'
 export * from './vacancy-publication-operator'
 export type * from '@/types/hiring'

@@ -5,7 +5,7 @@
 - Task: `TASK-355`
 - Superficie: Hiring Desk interno (kanban + 360 + publication). Wireframe: `docs/ui/wireframes/TASK-355-hiring-desk.md` · Flow: `docs/ui/flows/TASK-355-hiring-desk-flow.md` · Master: `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md`
 - Rigor de motion: **funcional** (feedback de estado del pipeline), no cinemático. Todo tokenizado + reduced-motion-aware. El motion del drag SIEMPRE tiene equivalente sin-motion (teclado).
-- Estado: `draft` (UI ready: no)
+- Estado: `approved` (UI ready: yes — microinteracciones contrastadas con el HTML interactivo aprobado el 2026-07-09)
 
 ## Motion Brief
 

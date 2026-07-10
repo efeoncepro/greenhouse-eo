@@ -35,6 +35,20 @@ export interface ChildRouteDeclaration {
 
 export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
   {
+    route: '/agency/hiring/pipeline',
+    parent: '/agency/hiring',
+    via: 'tab',
+    reason:
+      'Pipeline de Hiring Desk (TASK-355), alcanzable desde la navegación local persistente del workspace.'
+  },
+  {
+    route: '/agency/hiring/publication',
+    parent: '/agency/hiring',
+    via: 'tab',
+    reason:
+      'Gobierno de publicación de Hiring Desk (TASK-355), alcanzable desde la navegación local persistente del workspace.'
+  },
+  {
     route: '/hr/contractors/new',
     parent: '/hr/contractors',
     via: 'header-cta',

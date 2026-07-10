@@ -5,6 +5,7 @@ import { createHash, randomUUID } from 'node:crypto'
 import type { PoolClient } from 'pg'
 
 import { ROLE_CODES } from '@/config/role-codes'
+import { canAccessHiringCandidateDocument } from '@/lib/hiring/documents/access'
 import { hasRoleCode, hasRouteGroup } from '@/lib/tenant/authorization'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import { getBigQueryProjectId } from '@/lib/bigquery'
@@ -68,7 +69,9 @@ const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<DraftUploadContext, number> = 
   provider_invoice_draft: 25 * 1024 * 1024,
   organization_logo_draft: 5 * 1024 * 1024,
   // TASK-354 — CV público: PDF-only en el submit con Turnstile; 10 MiB max.
-  hiring_application_cv_draft: 10 * 1024 * 1024
+  hiring_application_cv_draft: 10 * 1024 * 1024,
+  // TASK-1362 — muestras de portafolio: PDF o imagen, mismo techo que el CV.
+  hiring_candidate_portfolio_file_draft: 10 * 1024 * 1024
 }
 
 // TASK-791 — MIME extra permitido por contexto. La factura electrónica oficial
@@ -115,6 +118,8 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   organization_logo_candidate: 'organization_brand_asset',
   hiring_application_cv_draft: 'hiring_candidate_document',
   hiring_application_cv: 'hiring_candidate_document',
+  hiring_candidate_portfolio_file_draft: 'hiring_candidate_document',
+  hiring_candidate_portfolio_file: 'hiring_candidate_document',
   // TASK-1023 — Workforce Contracting signable document (offer letter / employment contract).
   workforce_contracting_document: 'workforce_contract',
   // TASK-490 — signed PDF artifact from the signature provider (vault retention).
@@ -156,6 +161,8 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   organization_logo_candidate: 'organization-logos',
   hiring_application_cv_draft: 'hiring-application-cv',
   hiring_application_cv: 'hiring-application-cv',
+  hiring_candidate_portfolio_file_draft: 'hiring-candidate-portfolio',
+  hiring_candidate_portfolio_file: 'hiring-candidate-portfolio',
   // TASK-1023 — Workforce Contracting signable document bucket prefix.
   workforce_contracting_document: 'workforce-contracting-documents',
   // TASK-490 — signed signature artifact bucket prefix.
@@ -303,7 +310,9 @@ const mapAssetRow = (row: AssetRow): GreenhouseAssetRecord => ({
   assetId: row.asset_id,
   publicId: row.public_id,
   visibility: row.visibility === 'public' ? 'public' : 'private',
-  status: (['attached', 'orphaned', 'deleted'].includes(row.status) ? row.status : 'pending') as GreenhouseAssetStatus,
+  status: (['attached', 'orphaned', 'deleted', 'quarantined'].includes(row.status)
+    ? row.status
+    : 'pending') as GreenhouseAssetStatus,
   bucketName: row.bucket_name,
   objectPath: row.object_path,
   filename: row.filename,
@@ -585,6 +594,68 @@ export const createPrivatePendingAsset = async ({
   return asset
 }
 
+/**
+ * TASK-1362 — Contextos cuyo contenido puede venir de la web pública y que, por
+ * lo tanto, NO pueden adjuntarse sin un veredicto limpio de escaneo.
+ *
+ * El guardrail vive acá, en el attach, y no en el caller a propósito: el camino
+ * de subida va a cambiar (TASK-1372/1373 migran el apply de Careers a Growth
+ * Forms, parten el flujo en un upload síncrono + un consumer reactivo, y jubilan
+ * la ruta directa actual). Un chequeo que dependa de que el próximo implementador
+ * recuerde llamar al escáner es un chequeo que se pierde en la próxima migración.
+ * Acá, cualquier camino de attach —presente o futuro— falla si no hubo escaneo.
+ */
+const SCAN_REQUIRED_ATTACH_CONTEXTS = new Set<GreenhouseAssetContext>([
+  'hiring_application_cv',
+  'hiring_candidate_portfolio_file'
+])
+
+const assertAssetScannedBeforeAttach = async (
+  assetId: string,
+  ownerAggregateType: GreenhouseAssetContext,
+  client?: QueryableClient
+) => {
+  if (!SCAN_REQUIRED_ATTACH_CONTEXTS.has(ownerAggregateType)) return
+
+  // Agregamos sobre TODOS los veredictos del asset en vez de tomar el último.
+  // "El peor veredicto gana" no puede depender del orden: dos scans con el mismo
+  // `scanned_at` se desempatan por `scan_id`, y ahí un `clean` podría taparle el
+  // paso a un `suspicious`. Un bloqueante abierto veta el attach, punto.
+  //
+  // Query inline (sin importar `asset-scan/store`) para no crear un ciclo: el
+  // gate de escaneo importa este módulo para poder cuarentenar.
+  const rows = await queryAssetRows<{
+    blocking_verdict: string | null
+    has_clean: boolean | null
+    total: string | number
+  }>(
+    `
+      SELECT
+        MIN(verdict) FILTER (
+          WHERE verdict IN ('suspicious', 'infected', 'error') AND resolution_status = 'open'
+        ) AS blocking_verdict,
+        BOOL_OR(verdict = 'clean') AS has_clean,
+        COUNT(*) AS total
+      FROM greenhouse_core.asset_scan_results
+      WHERE asset_id = $1
+    `,
+    [assetId],
+    client
+  )
+
+  const summary = rows[0]
+
+  if (summary?.blocking_verdict) {
+    throw new Error(`asset_scan_blocking:${summary.blocking_verdict}`)
+  }
+
+  // Sin filas, o con filas que no incluyen ningún `clean` (p. ej. sólo el
+  // `legacy_unscanned` del backfill): nadie verificó estos bytes.
+  if (!summary?.has_clean) {
+    throw new Error('asset_scan_required')
+  }
+}
+
 export const attachAssetToAggregate = async ({
   assetId,
   ownerAggregateType,
@@ -606,6 +677,8 @@ export const attachAssetToAggregate = async ({
   metadata?: Record<string, unknown>
   client?: QueryableClient
 }) => {
+  await assertAssetScannedBeforeAttach(assetId, ownerAggregateType, client)
+
   const ownershipScope = normalizeGreenhouseAssetOwnershipScope({
     ownerClientId,
     ownerSpaceId,
@@ -674,6 +747,65 @@ export const attachAssetToAggregate = async ({
       ownerSpaceId: asset.ownerSpaceId,
       ownerMemberId: asset.ownerMemberId,
       actorUserId
+    }
+  }, client)
+
+  return asset
+}
+
+/**
+ * TASK-1362 — Transición terminal `pending → quarantined`.
+ *
+ * Se invoca cuando el escaneo emite un veredicto bloqueante. El asset NO se
+ * borra (los bytes son evidencia del intento) y NUNCA se adjunta a su aggregate:
+ * queda fuera del alcance de `downloadPrivateAsset` y de cualquier resolver.
+ *
+ * Sólo transiciona desde `pending`. Un asset ya `attached` no se puede
+ * cuarentenar por esta vía — eso sería un recovery deliberado con humano.
+ */
+export const quarantineAsset = async ({
+  assetId,
+  scanId,
+  verdict,
+  findingCodes,
+  client
+}: {
+  assetId: string
+  scanId: string
+  verdict: string
+  findingCodes: string[]
+  client?: QueryableClient
+}): Promise<GreenhouseAssetRecord | null> => {
+  const rows = await queryAssetRows<AssetRow>(
+    `
+      UPDATE greenhouse_core.assets
+      SET status = 'quarantined'
+      WHERE asset_id = $1 AND status = 'pending'
+      RETURNING *
+    `,
+    [assetId],
+    client
+  )
+
+  const row = rows[0]
+
+  if (!row) return null
+
+  const asset = mapAssetRow(row)
+
+  await publishOutboxEvent({
+    aggregateType: 'asset',
+    aggregateId: asset.assetId,
+    eventType: 'asset.quarantined',
+    payload: {
+      assetId: asset.assetId,
+      publicId: asset.publicId,
+      ownerAggregateType: asset.ownerAggregateType,
+      retentionClass: asset.retentionClass,
+      scanId,
+      verdict,
+      // Códigos estables, nunca el contenido del archivo ni PII del candidato.
+      findingCodes
     }
   }, client)
 
@@ -984,11 +1116,11 @@ const canAccessOrganizationLogoAsset = (tenant: TenantContext, asset: Greenhouse
   )
 }
 
+// TASK-1362 — el predicado canónico vive en el dominio hiring (capability-based).
+// Esta función existía como check por routeGroup y le daba el CV de un candidato
+// a cualquiera con routeGroup `hr`, incluidos roles sin capability de Hiring.
 const canAccessHiringCandidateDocumentAsset = (tenant: TenantContext) =>
-  hasRouteGroup(tenant, 'hr') ||
-  hasRouteGroup(tenant, 'internal') ||
-  hasRouteGroup(tenant, 'admin') ||
-  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  canAccessHiringCandidateDocument(tenant)
 
 export const canTenantAccessAsset = ({
   tenant,
@@ -1047,9 +1179,12 @@ export const canTenantAccessAsset = ({
     case 'organization_logo':
     case 'organization_logo_candidate':
       return canAccessOrganizationLogoAsset(tenant, asset)
-    // TASK-354 — CVs de Careers son privados; candidatos públicos nunca descargan por esta ruta.
+    // TASK-354/1362 — documentos de candidato: privados, capability hiring, `client_*` nunca.
+    // Los candidatos públicos jamás descargan por esta ruta.
     case 'hiring_application_cv_draft':
     case 'hiring_application_cv':
+    case 'hiring_candidate_portfolio_file_draft':
+    case 'hiring_candidate_portfolio_file':
       return canAccessHiringCandidateDocumentAsset(tenant)
     default:
       return false
@@ -1126,6 +1261,13 @@ export const downloadPrivateAsset = async ({
 
   if (!asset || asset.status === 'deleted') {
     throw new Error('asset_not_found')
+  }
+
+  // TASK-1362 — un asset en cuarentena nunca sale del bucket por esta ruta, sin
+  // importar la capability del actor. Los bytes se preservan para triage forense;
+  // se acceden por herramienta de operaciones, no por el download del portal.
+  if (asset.status === 'quarantined') {
+    throw new Error('asset_quarantined')
   }
 
   const file = await downloadGreenhouseStorageObject({

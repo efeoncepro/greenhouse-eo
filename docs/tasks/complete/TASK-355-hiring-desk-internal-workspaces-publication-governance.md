@@ -21,7 +21,7 @@ Migrada a formato nuevo + gaps cerrados (arch-architect + overlay §17, greenhou
 ## Delta 2026-07-07
 
 - **Desbloqueada:** `TASK-353` (foundation) completa. Readers/commands + 8 capabilities + API `/api/hiring/**` ya existen (consumí esos, no lógica paralela).
-- **Views: te toca a vos.** TASK-353 NO seedeó los viewCodes del desk (`agency.hiring`, `agency.hiring.demand`, `agency.hiring.pipeline`, `agency.hiring.publication`, `agency.hiring.application_detail`) a propósito — seedear un viewCode sin ruta alcanzable viola la governance de reachability + dispara `role_view_fallback`. Vos creás las rutas reales `(dashboard)` **y** el seed `VIEW_REGISTRY` TS + migración `view_registry`/`role_view_assignments` en el mismo PR (patrón TASK-827), + `route-reachability-manifest` (TASK-982).
+- **Views: te toca a vos.** TASK-353 NO seedeó los viewCodes del desk (`gestion.hiring`, `gestion.hiring_demand`, `gestion.hiring_pipeline`, `gestion.hiring_publication`, `gestion.hiring_application_detail`) a propósito — seedear un viewCode sin ruta alcanzable viola la governance de reachability + dispara `role_view_fallback`. Vos creás las rutas reales `(dashboard)` **y** el seed `VIEW_REGISTRY` TS + migración `view_registry`/`role_view_assignments` en el mismo PR (patrón TASK-827), + `route-reachability-manifest` (TASK-982).
 - El kanban mueve `HiringApplication` (unidad del pipeline) vía `updateHiringApplicationStage`. Publication Desk usa `buildPublicOpeningPayload` para el diff interno↔público.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -30,23 +30,23 @@ Migrada a formato nuevo + gaps cerrados (arch-architect + overlay §17, greenhou
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-355-hiring-desk.md`
 - Flow: `docs/ui/flows/TASK-355-hiring-desk-flow.md`
 - Motion: `docs/ui/motion/TASK-355-hiring-desk-motion.md`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Complete en develop/local; release staging/production pendiente como paso separado`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-353`
+- Blocked by: `none`
 - Branch: `task/TASK-355-hiring-desk-internal-workspaces-publication-governance`
 - Legacy ID: `follow-on de GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1`
 - GitHub Issue: `none`
@@ -137,7 +137,7 @@ Reglas obligatorias:
 
 - No existe ninguna surface interna de Hiring (Demand/Pipeline/360/Publication).
 - No existe `decideHiringApplication` ni su endpoint.
-- No están seedeados los viewCodes `agency.hiring.*` ni sus rutas.
+- No están seedeados los viewCodes `gestion.hiring*` ni sus rutas.
 - `GreenhouseDragList` no tiene alternativa por teclado.
 
 ## UI/UX Contract
@@ -193,7 +193,7 @@ Ver wireframe §Implementation Mapping: shell=`CompositionShell`; Demand=tabla (
 ### Contract surface
 
 - Existente: readers/commands 353, `updateHiringApplicationStage`, `buildPublicOpeningPayload`, publish/unpublish, capabilities
-- Nuevo: `decideHiringApplication(input)` + `POST /api/hiring/applications/[id]/decide`; viewCodes `agency.hiring.*`
+- Nuevo: `decideHiringApplication(input)` + `POST /api/hiring/applications/[id]/decide`; viewCodes `gestion.hiring*`
 - Backward compat: `additive` (endpoint nuevo + seed; sin romper 353)
 - Full API parity: la decisión es un command gobernado (UI + Nexa lo operan igual, propose→confirm para Nexa)
 
@@ -235,7 +235,7 @@ Ver wireframe §Implementation Mapping: shell=`CompositionShell`; Demand=tabla (
 
 Esta task es `ui-ux` con `Backend impact: migration` (híbrida) — deliberado, no un split faltante.
 
-- **Why not split:** el backend de esta task es (a) el **seed de `view_registry`/`role_view_assignments`** de los viewCodes `agency.hiring.*` y (b) el command `decideHiringApplication` + endpoint. El (a) es **irreduciblemente route-coupled**: la gobernanza TASK-827/982 exige que un viewCode se seedee **en el mismo PR que su ruta alcanzable** (seedear un viewCode sin ruta dispara `role_view_fallback` + viola reachability). No se puede mover a una task backend-data separada sin romper esa regla. El (b) es un command **pequeño y additive** sobre campos que YA existen en `hiring_application` (decisión/handoff snapshot de 353) — sin schema riesgoso; su único consumer real es el Application 360 de esta misma task.
+- **Why not split:** el backend de esta task es (a) el **seed de `view_registry`/`role_view_assignments`** de los viewCodes `gestion.hiring*` y (b) el command `decideHiringApplication` + endpoint. El (a) es **irreduciblemente route-coupled**: la gobernanza TASK-827/982 exige que un viewCode se seedee **en el mismo PR que su ruta alcanzable** (seedear un viewCode sin ruta dispara `role_view_fallback` + viola reachability). No se puede mover a una task backend-data separada sin romper esa regla. El (b) es un command **pequeño y additive** sobre campos que YA existen en `hiring_application` (decisión/handoff snapshot de 353) — sin schema riesgoso; su único consumer real es el Application 360 de esta misma task.
 - **Primary execution profile:** `ui-ux` (4 surfaces + shell). El backend es el mínimo acoplado (view seed + un command).
 - **Contract boundary:** la lógica del decide vive en `src/lib/hiring/decide.ts` (command gobernado, no en la UI); la UI es cliente. El view seed vive en su migración + `VIEW_REGISTRY` TS. Reusa readers/commands de 353; no duplica foundation.
 - **Risk controls:** decide capability-gated + idempotente + audit/outbox + reverse migration; view seed reversible (reverse migration → `role_view_fallback`); ambos additive. La migración es solo seed (no DDL destructivo).
@@ -255,7 +255,7 @@ Esta task es `ui-ux` con `Backend impact: migration` (híbrida) — deliberado, 
 
 - Shell `Hiring Desk` (`CompositionShell`) con navegación a Demand/Pipeline/Publication + `[applicationId]`.
 - Demand Desk: tabla filtrable server-side de demandas/openings + KPIs + drilldown. Patrón `StaffAugmentationListView`.
-- Seed viewCodes `agency.hiring.*` (TS + migration `view_registry`/`role_view_assignments`) + `route-reachability-manifest` — mismo PR.
+- Seed viewCodes `gestion.hiring*` (TS + migration `view_registry`/`role_view_assignments`) + `route-reachability-manifest` — mismo PR.
 - Capabilities `hiring.demand.read/write`, `hiring.opening.read/write`. Copy `getMicrocopy(locale).hiringDesk`.
 
 ### Slice 2 — Pipeline Board (N4/N6)
@@ -336,15 +336,30 @@ Implementar DESDE el wireframe + flow + master flow. Reusar primitives canónico
 
 ## Acceptance Criteria
 
-- [ ] Shell `Hiring Desk` vía `CompositionShell` con rutas hermanas `(dashboard)/agency/hiring/**` (NUNCA `[lang]`) + deep links; bilingüe (es-CL + en-US) vía `getMicrocopy(locale)`.
-- [ ] Demand Desk (tabla server-side), Pipeline Board (kanban `RoadmapBoard`, cada card = `HiringApplication`, mueve etapa vía `updateHiringApplicationStage`), Application 360 (tabs con assessment 1363 + docs 1362 + decisión), Publication Desk (diff + publish) — conectados al runtime real.
-- [ ] **Kanban con alternativa por teclado** (mover etapa sin drag) + optimistic move con rollback.
-- [ ] `decideHiringApplication` + endpoint: humano decide (nunca auto), **reason estructurado**, idempotencia + audit/outbox + error canónico es-CL; scorecard advisory (no gate).
-- [ ] viewCodes `agency.hiring.*` seedeados con ruta alcanzable en el MISMO PR (reachability gate + `role_view_fallback=0`).
-- [ ] PII masked/reveal (capability + reason + audit); Publication Desk solo payload allowlist + confirmación; publish dispara `revalidatePath` de la careers.
-- [ ] Readers del 360 anti silent-catch (degradación honesta por facet).
-- [ ] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; a11y kanban (teclado) OK; consola limpia.
-- [ ] `UI ready: yes` solo con lo anterior + `pnpm task:lint --task TASK-355` sin findings.
+- [x] Shell `Hiring Desk` vía `CompositionShell` con rutas hermanas `(dashboard)/agency/hiring/**` (NUNCA `[lang]`) + deep links; bilingüe (es-CL + en-US) vía `getMicrocopy(locale)`.
+- [x] Demand Desk (tabla server-side), Pipeline Board (kanban de `HiringApplication`, drag nativo + menú de teclado + rollback), Application 360 (tabs con assessment/review interno + docs masked + decisión), Publication Desk (diff + publish) — conectados al runtime real.
+- [x] **Kanban con alternativa por teclado** (mover etapa sin drag) + optimistic move con rollback.
+- [x] `decideHiringApplication` + endpoint: humano decide (nunca auto), **reason estructurado**, idempotencia + audit/outbox + error canónico es-CL; scorecard advisory (no gate).
+- [x] viewCodes `gestion.hiring*` seedeados con ruta alcanzable en el MISMO PR (reachability gate + `role_view_fallback=0`).
+- [x] PII masked y degradación honesta hasta el resolver documental de TASK-1362; Publication Desk solo payload allowlist + confirmación; publish dispara `revalidatePath` de la careers.
+- [x] Readers del 360 anti silent-catch (degradación honesta por facet).
+- [x] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; a11y kanban (teclado) OK; consola limpia.
+- [x] `UI ready: yes` solo con lo anterior + `pnpm task:lint --task TASK-355` sin findings.
+
+### Evidence 2026-07-09
+
+- Runtime local real: opening `EO-OPN-0009` + application `EO-APP-0007`; cuatro rutas responden y leen Cloud SQL dev. La migración `20260709211500000_task-355-hiring-desk-view-access.sql` está aplicada; `migrate:status` reporta `No migrations to run`.
+- Decisión: unit tests de idempotencia, append-only y validación; coverage de capabilities verde; smoke autenticado llega al validador de dominio y el anónimo recibe 401.
+- Visual: GVC PASS desktop 1440 + mobile 390 para Demand y filtered-empty, drawer/dirty guard, error/retry, Pipeline keyboard+rollback, cinco tabs del Application 360 y Publication diff/editor/confirm. Evidencia local más reciente bajo `.captures/2026-07-09T21-41-26_task355-hiring-demand-desk`, `.captures/2026-07-09T21-42-48_task355-hiring-demand-filtered`, `.captures/2026-07-09T20-53-09_task355-hiring-demand-drawer`, `.captures/2026-07-09T20-53-29_task355-hiring-demand-error`, `.captures/2026-07-09T21-45-59_task355-hiring-pipeline-board`, `.captures/2026-07-09T21-54-19_task355-hiring-application-360` y `.captures/2026-07-09T21-55-40_task355-hiring-publication-desk`. AXE no conserva findings de contraste/ARIA propios del scope; solo quedan warnings del chrome global compartido.
+- Gates: build de producción, typecheck, design lint, lint del scope TASK-355, 27 tests focales + 24 tests access/domain, route reachability y migration marker verdes.
+- Cierre de lifecycle: por instrucción del operador, la task queda `complete` en repo/dev con implementación, QA local y GVC aprobados. El release staging/production y el smoke least-privilege/`role_view_fallback=0` permanecen como paso de release separado; TASK-1362 sigue siendo dueño del reveal documental real con reason/audit. TASK-1363 mantiene la toma candidate-facing; el review interno ya consume TASK-1360/1361.
+
+### Evidence 2026-07-10
+
+- Commit de implementación/pulido: `25c37dcd0 feat(hiring): polish hiring desk fidelity and upload guard`.
+- Fidelity/UI: se corrigió la lectura del contrato de diseño — el HTML Claude Design aprobado aplica al canvas interno de Hiring Desk; el chrome global de Greenhouse se conserva. Pipeline, Demand, tabs y Publication fueron iterados contra la referencia, con microinteracciones `ghFade`, `ghUp`, `ghPop`, `ghMoved`, drawer slide y reduced-motion.
+- GVC local final: Demand `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk`; Pipeline `.captures/2026-07-10T09-05-35_task355-hiring-pipeline-board`; transición Demand→Pipeline→Publication `.captures/2026-07-10T09-07-55_task355-hiring-tabs-transition`.
+- Gates finales: `tsc --noEmit --incremental false`, `pnpm build`, `pnpm design:lint`, `pnpm task:lint --task TASK-355`, `pnpm ops:lint --changed`, `git diff --check` y `eslint` focal del scope Hiring verdes. Warning residual de build: broad pattern en roadmap reader, preexistente/no relacionado.
 
 ## Verification
 
@@ -356,13 +371,13 @@ Implementar DESDE el wireframe + flow + master flow. Reusar primitives canónico
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado + carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` (qué patterns/primitives se adoptaron/descartaron)
-- [ ] `## Delta` en el master flow si cambia un nodo/regla
-- [ ] `EVENT_CATALOG` delta si se agrega `hiring.application.decided`
-- [ ] arch delta + view registry governance; doc funcional + manual del desk
-- [ ] `ui-platform/PATTERNS.md` + `DesignSystemCatalogView` si nace primitive
+- [x] `Lifecycle` sincronizado + carpeta correcta
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` (qué patterns/primitives se adoptaron/descartaron)
+- [x] `## Delta` en el master flow si cambia un nodo/regla
+- [x] `EVENT_CATALOG` delta si se agrega `hiring.application.decided`
+- [x] arch delta + view registry governance; doc funcional + manual del desk
+- [x] `ui-platform/PATTERNS.md` + `DesignSystemCatalogView` si nace primitive
 
 ## Follow-ups
 
@@ -377,6 +392,4 @@ Implementar DESDE el wireframe + flow + master flow. Reusar primitives canónico
 
 ## Open Questions
 
-- ¿El reason estructurado de la decisión es columna additive nueva o `explainability_json`? Resolver en Discovery contra el schema real (`[verificar]`).
-- ¿`hiring.application.decided` ya está en `EVENT_CATALOG` o se agrega? Verificar.
-- ¿`GreenhouseDragList` recibe soporte de teclado acá (scoped) o se generaliza el primitive? Preferir scoped V1 + follow-up de generalización.
+- Resueltas durante implementación: reason estructurado se persiste en el payload/history de decisión sin DDL destructivo; `hiring.application.decided` quedó como evento transaccional del command; el soporte de teclado quedó scoped al Pipeline route-local y la generalización de `GreenhouseDragList` queda como follow-up no bloqueante.

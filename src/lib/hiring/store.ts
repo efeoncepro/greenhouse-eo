@@ -384,7 +384,7 @@ const normalizeCandidateFacet = (row: CandidateFacetRow): CandidateFacet => ({
   updatedAt: toTimestamp(row.updated_at) ?? '',
 })
 
-type HiringApplicationRow = {
+export type HiringApplicationRow = {
   application_id: unknown
   public_id: unknown
   opening_id: unknown
@@ -413,7 +413,7 @@ type HiringApplicationRow = {
   updated_at: unknown
 }
 
-const normalizeHiringApplication = (row: HiringApplicationRow): HiringApplication => ({
+export const normalizeHiringApplication = (row: HiringApplicationRow): HiringApplication => ({
   applicationId: toStr(row.application_id),
   publicId: toStr(row.public_id),
   openingId: toStr(row.opening_id),
@@ -464,7 +464,7 @@ const CANDIDATE_FACET_COLUMNS = `
   consent_captured_at, retention_policy, source_attribution, verification_signals_json, portfolio_url,
   linkedin_url, status, notes, created_by, created_at, updated_at`
 
-const HIRING_APPLICATION_COLUMNS = `
+export const HIRING_APPLICATION_COLUMNS = `
   application_id, public_id, opening_id, identity_profile_id, candidate_facet_id, owner_user_id, stage,
   score, match_score, blocking_issues, next_step_at, source, notes, explainability_json,
   dedupe_fingerprint, decision, decision_at, decision_by, selected_destination, tentative_start_date,

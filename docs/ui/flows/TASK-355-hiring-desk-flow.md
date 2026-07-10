@@ -6,7 +6,7 @@
 - Master flow: `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md` — 355 = **N4 (bandeja/pipeline) · N5 (ficha 360) · N6 (asignar test) · N8 (review scorecard) · N9 (decisión)** + N-publish.
 - Wireframe: `docs/ui/wireframes/TASK-355-hiring-desk.md` · Motion: `docs/ui/motion/TASK-355-hiring-desk-motion.md`
 - Ruta: `src/app/(dashboard)/agency/hiring/**` (NO `[lang]`); interno (con sesión, route group `internal`); bilingüe.
-- Estado: `draft` (UI ready: no)
+- Estado: `approved` (UI ready: yes — flujo contrastado con el HTML interactivo aprobado el 2026-07-09)
 
 ## Flow Brief
 
@@ -66,7 +66,7 @@ opening publication: draft → published ⇄ paused → closed (Publication Desk
 ## Routing Contract
 
 - `src/app/(dashboard)/agency/hiring/**` (NUNCA `[lang]`). Shell `CompositionShell`; rutas hermanas Demand/Pipeline/Publication + `[applicationId]`.
-- **viewCodes `agency.hiring.*` seedeados con ruta alcanzable en el MISMO PR** (`VIEW_REGISTRY` + migration + `route-reachability-manifest`, TASK-827/982); NUNCA un viewCode sin ruta (dispara `role_view_fallback`).
+- **viewCodes `gestion.hiring*` seedeados con ruta alcanzable en el MISMO PR** (`VIEW_REGISTRY` + migration + `route-reachability-manifest`, TASK-827/982); NUNCA un viewCode sin ruta (dispara `role_view_fallback`).
 - Deep links estables (compartibles); el 360 abre como ruta hija (o sidecar sobre el pipeline).
 - Bilingüe es-CL + en-US vía `getLocale()` + `getMicrocopy(locale)`; sin segmento de URL de locale.
 

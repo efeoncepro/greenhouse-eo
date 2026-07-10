@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import type { DraftUploadContext, PrivateAssetUploadResponse } from '@/types/assets'
 import { resolveCurrentHrMemberId } from '@/lib/hr-core/service'
+import { can } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { createPrivatePendingAsset } from '@/lib/storage/greenhouse-assets'
 import { hasRoleCode, hasRouteGroup, requireTenantContext } from '@/lib/tenant/authorization'
@@ -22,7 +23,8 @@ const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>([
   'contractor_work_evidence_draft',
   'provider_invoice_draft',
   'organization_logo_draft',
-  'hiring_application_cv_draft'
+  'hiring_application_cv_draft',
+  'hiring_candidate_portfolio_file_draft'
 ])
 
 const isDraftContext = (value: string): value is DraftUploadContext =>
@@ -84,15 +86,13 @@ const canUploadForContext = ({
     return hasRouteGroup(tenant, 'internal') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   }
 
-  // TASK-354 — CVs de candidatos subidos on-behalf por equipo interno.
-  // El apply público no usa esta ruta: sube el PDF dentro del submit con Turnstile.
-  if (contextType === 'hiring_application_cv_draft') {
-    return (
-      hasRouteGroup(tenant, 'hr') ||
-      hasRouteGroup(tenant, 'internal') ||
-      hasRouteGroup(tenant, 'admin') ||
-      hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
-    )
+  // TASK-354/1362 — documentos de candidato subidos on-behalf por equipo interno.
+  // El apply público NO usa esta ruta: sube el PDF dentro del submit con Turnstile
+  // y pasa por el escaneo de contenido antes del attach.
+  // El upload exige la capability de escritura de Hiring: leer una postulación no
+  // habilita adjuntarle documentos.
+  if (contextType === 'hiring_application_cv_draft' || contextType === 'hiring_candidate_portfolio_file_draft') {
+    return tenant.tenantType !== 'client' && can(tenant, 'hiring.application.write', 'update', 'tenant')
   }
 
   return hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
