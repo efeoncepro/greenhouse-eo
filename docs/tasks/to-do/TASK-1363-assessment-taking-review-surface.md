@@ -1,5 +1,13 @@
 # TASK-1363 — Assessment Taking + Review Surface
 
+## Delta 2026-07-10 — TASK-1384: el banco del lote 1 está ACTIVO (25 preguntas, cobertura 9/9)
+
+- El pool activo para AM L2 existe (25 preguntas work-sample-first, review adversarial aplicado). Observaciones del review que ESTA task debe honrar:
+  - **El pool NO cabe en un test de 60 min** (~100-130 min realistas si se asignan todas): la rendición debe MUESTREAR (~1 por competencia + refuerzo en las 4 core ≈ 11-13 preguntas) o subir el time limit del template. Decidir el mecanismo de sampling en el diseño de la superficie.
+  - **No asignar juntas las 2 conductuales de anécdota** (composure `qst` "situación real de presión" + ownership "proyecto que falló por causa tuya"): invitan a la misma historia — si caen juntas, pedir ejemplos distintos.
+  - La regla de puntaje parcial de multi_choice es del engine (`computeObjectiveScore`, Jaccard con penalización) — la UI no la re-implementa, solo la comunica si muestra desglose.
+- Cobertura verificable: `pnpm hiring:question-bank-coverage`. Guía para el review surface: `docs/documentation/hr/assessment-question-authoring-guide.md`.
+
 ## Delta 2026-07-10 — TASK-1383 (hardening) endureció la costura que esta task consume
 
 - **Autosave**: `saveResponse` ahora ES idempotente de verdad (UNIQUE parciales + upsert; antes el docstring lo prometía sin serlo). El primer save **auto-arranca el timer** (assigned/sent → in_progress) — la UI no necesita llamar `startAssessment` antes del primer autosave, pero SÍ debe llamarlo al abrir (para countdown honesto).

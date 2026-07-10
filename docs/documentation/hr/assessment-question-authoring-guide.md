@@ -38,6 +38,7 @@ Lo actitudinal (`composure_pressure`, `ownership`, etc.) NUNCA se evalúa como a
 - ❌ Nada que exija contexto local no relevante al rol (modismos, referencias que un candidato internacional competente no tendría).
 - ❌ Emotion recognition, tests de personalidad encubiertos, o cualquier cosa que puntúe rasgos en vez de trabajo (prohibido por diseño y por EU AI Act).
 - ❌ Enunciados con doble negación, trampas de lectura o adornos que midan comprensión lectora en vez de la competencia.
+- ❌ **Usar los ejemplos de ESTA guía como ítems del banco**: la guía circula entre revisores y agentes — un ejemplo publicado es una pregunta filtrada (lección del review del lote 1: dos borradores copiaban los ejemplos verbatim y fueron retirados).
 
 ## El flujo (quién hace qué)
 
@@ -67,5 +68,5 @@ npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/question-ban
 ## Referencias
 
 - Doctrina de assessment: skill `greenhouse-talent-people-operator` (`references/assessment-interviewing.md`)
-- Task del banco: `docs/tasks/in-progress/TASK-1384-assessment-question-bank-sme-v1.md`
+- Task del banco: `docs/tasks/complete/TASK-1384-assessment-question-bank-sme-v1.md`
 - Fairness (próximo): `docs/tasks/to-do/TASK-1365-assessment-adverse-impact-fairness-monitoring.md`

@@ -1,3 +1,16 @@
+## Sesion 2026-07-10 - TASK-1384 COMPLETE — banco lote 1 activo (review delegado) - Claude
+
+> **TASK-1384 completa: cobertura 9/9 ✅, 25 preguntas ACTIVAS para Account Manager L2.** El S4 (review SME)
+> se resolvió por **delegación explícita del operador** ("Resuélvelo con las skills existentes") como pase
+> adversarial INDEPENDIENTE (agente revisor ≠ autor, doctrina talent-people + guía). Veredicto: 17 APPROVE ·
+> 7 REVISE · 0 REJECT + 2 editoriales. El revisor cazó defectos reales: 2 copias verbatim de los ejemplos de
+> la guía (filtración — retiradas/reemplazadas), 1 nivel deshonesto, rúbricas dobles/no observables, contexto
+> de voz faltante. Aplicación con writers canónicos y registro durable (`apply-sme-review-lote1.ts`, actor
+> auditado). 9 retiradas (append-only). Guía actualizada con la regla anti-filtración.
+> **Follow-up de calidad declarado: spot-check humano del contenido antes del primer candidato real**
+> (gate natural: rollout de 1363). Delta a 1363 con las restricciones del pool (sampling ~12 preguntas o
+> subir time limit; no asignar juntas las 2 conductuales de anécdota).
+
 ## Sesion 2026-07-10 - TASK-1384 Question Bank S1-S3 ejecutados - Claude
 
 > TASK-1384 en ejecución local-first: **S1-S3 completos, S4 bloqueado en humanos (por diseño)**.
