@@ -2,7 +2,7 @@
 
 > **Tipo:** Referencia operativa (convención reusable)
 > **Creado:** 2026-07-09 por Claude
-> **Última actualización:** 2026-07-09 por Claude
+> **Última actualización:** 2026-07-10 por Codex
 > **Implementación de referencia:** `TASK-1374` (landing `/web-agentica`) + `TASK-1375` (foundation del Growth Form + entrega)
 
 Este doc fija cómo Efeonce publica un **lead magnet de ebook**: de dónde salen los PDFs, cómo se entregan de forma gated, y cómo se arma la landing + el thank-you. Aplica a **todos los ebooks y landings** que hagamos, no solo al primero.
@@ -25,6 +25,19 @@ Los ebooks (entregables + editables) viven en OneDrive de Efeonce:
 
 - **El equipo deja acá todos los ebooks.** Para publicar uno, se toma el PDF de `01. Entregables Ebook/`.
 - **NUNCA** commitear el PDF al repo (binarios pesados; el de Desarrollo Tradicional pesa ~9 MB). El PDF va al bucket privado de GCS, no a git.
+
+### Inventario cargado en GCS (2026-07-10)
+
+Estos son identificadores de almacenamiento interno, **no URLs públicas de descarga**. Cada PDF queda privado y una landing debe servirlo exclusivamente mediante el handoff tokenizado descrito abajo. Los seis objetos están verificados en ambos ambientes; las nuevas landings/formularios para los cinco ebooks adicionales siguen pendientes.
+
+| Ebook | Fuente local final | Objeto privado (staging y producción) | Landing/formulario |
+| --- | --- | --- | --- |
+| El fin de la web solo para humanos (web agéntica) | `Ebook_DesarrolloTradicional.pdf` | `gs://efeonce-group-greenhouse-private-assets-staging/ebooks/web-agentica/el-fin-de-la-web.pdf`<br>`gs://efeonce-group-greenhouse-private-assets-prod/ebooks/web-agentica/el-fin-de-la-web.pdf` | `/web-agentica` publicado; form `efeonce-web-agentica-ebook` |
+| Content Supply Chain | `Content Supply Chain_v3.pdf` | `gs://efeonce-group-greenhouse-private-assets-staging/ebooks/content-supply-chain/content-supply-chain-v3.pdf`<br>`gs://efeonce-group-greenhouse-private-assets-prod/ebooks/content-supply-chain/content-supply-chain-v3.pdf` | Pendiente de crear |
+| Humanidad Aumentada | `Ebook Humanidad Aumentada_FINAL.pdf` | `gs://efeonce-group-greenhouse-private-assets-staging/ebooks/humanidad-aumentada/ebook-humanidad-aumentada-final.pdf`<br>`gs://efeonce-group-greenhouse-private-assets-prod/ebooks/humanidad-aumentada/ebook-humanidad-aumentada-final.pdf` | Pendiente de crear |
+| Loop Marketing | `Loop Marketing ID.pdf` | `gs://efeonce-group-greenhouse-private-assets-staging/ebooks/loop-marketing/loop-marketing-id.pdf`<br>`gs://efeonce-group-greenhouse-private-assets-prod/ebooks/loop-marketing/loop-marketing-id.pdf` | Pendiente de crear |
+| Surround Discovery | `Surround Discovery_Final.pdf` | `gs://efeonce-group-greenhouse-private-assets-staging/ebooks/surround-discovery/surround-discovery-final.pdf`<br>`gs://efeonce-group-greenhouse-private-assets-prod/ebooks/surround-discovery/surround-discovery-final.pdf` | Pendiente de crear |
+| Surround Strategy | `Surround Strategy_Final.pdf` | `gs://efeonce-group-greenhouse-private-assets-staging/ebooks/surround-strategy/surround-strategy-final.pdf`<br>`gs://efeonce-group-greenhouse-private-assets-prod/ebooks/surround-strategy/surround-strategy-final.pdf` | Pendiente de crear |
 
 ## 2. Entrega gated (el ebook se baja SOLO tras completar el form)
 
