@@ -25,7 +25,16 @@ Las vistas `gestion.hiring*` controlan visibilidad de rutas. Cada reader y comma
 
 ## Estados y límites
 
-La interfaz diferencia loading, vacío inicial, filtros sin resultados, error recuperable, write optimista/rollback y dependencia degradada. La UI candidate-facing para rendir tests sigue en TASK-1363; captura/reveal documental completo sigue en TASK-1362; handoff downstream sigue en TASK-356.
+La interfaz diferencia loading, vacío inicial, filtros sin resultados, error recuperable, write optimista/rollback y dependencia degradada. La UI candidate-facing para rendir tests sigue en TASK-1363; captura/reveal documental completo sigue en TASK-1362.
+
+## Handoff downstream (TASK-356)
+
+Cuando una postulación se decide como **seleccionada**, Greenhouse materializa automáticamente (vía el pipeline reactivo) un **handoff**: una ficha auditable que dice "esta persona fue seleccionada para este destino" y espera aprobación humana. Nada se contrata solo: aprobar el handoff no crea colaboradores ni asignaciones — entrega la solicitud al equipo receptor (HRIS para contratación interna, Staff Augmentation para placements). El equipo receptor confirma el cierre con evidencia (referencia del colaborador o placement creado).
+
+- Un rechazo, un respaldo o una espera **nunca** generan handoff.
+- Si la decisión cambia después de aprobar el handoff, este se **bloquea** para revisión humana en lugar de sobrescribirse en silencio.
+- Los destinos que aún no tienen equipo receptor en Greenhouse (contractor, partner, reasignación interna) nacen bloqueados con motivo visible, nunca en silencio.
+- La cola "Listos para onboarding" y su pantalla llegan con TASK-770 (la interfaz aún no está publicada; el flag de los bridges está apagado por defecto).
 
 ## Referencias
 

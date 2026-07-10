@@ -1,5 +1,17 @@
 # TASK-356 — Hiring Handoff, Reactive Signals & Downstream Bridges
 
+## Delta 2026-07-10 — Ejecución completada (local-first, develop, sin push)
+
+Implementación cerrada en 7 commits sobre `develop`. Divergencias/deltas contra la spec recalibrada:
+
+- **Slice 0 fue evidencia, no acción:** el runtime vivo tenía **0 eventos `hiring.application.decided`** en el outbox y **0 aplicaciones decididas** (verificado por proxy el 2026-07-10, pre-implementación). No hubo nada que re-marcar como `no-op:pending-task-356-consumer`, y el backfill (`scripts/hiring/backfill-handoffs.ts`, dry-run→apply, entregado igual) reportó `candidates=0`. El SQL de re-marcado no fue necesario.
+- **Revocación (gap real cerrado, no estaba en la spec):** una re-decisión de `selected` → `rejected|withdrawn|on_hold|backup_selected` sobre un handoff existente NO es no-op: en `pending`/`blocked` pre-aprobación → `cancelled` auditado; en `approved|in_setup|completed` → `blocked:decision_revoked` (nuevo valor del enum, 7 razones en total). Un handoff bloqueado por supersede/revocación post-aprobación es **sticky**: solo un humano lo resuelve (cancel vía command).
+- **`approved → completed` directo permitido** (in_setup es opcional): forzar el paso intermedio era burocracia sin invariante que lo exija; `completed` sigue exigiendo `downstream_ref`.
+- **Reopen:** una nueva decisión `selected` sobre un handoff `cancelled` reutiliza la fila (UNIQUE) y la re-deriva a `pending`/`blocked` con audit `decision_superseded` — sin esto una re-selección legítima quedaba atascada para siempre.
+- **Reliability:** se creó el módulo `hiring` (decisión explícita de la spec) y las 2 señales de TASK-1362 migraron de `documents` → `hiring` en el mismo PR. `ReliabilityModuleDomain` reusa `'hr'` (no se extendió el union).
+- **Smoke E2E real verde** (`scripts/hiring/_sanity-handoff-reactive.ts`): seed sintético → decide selected → consumer scoped por handlerKey → 1 handoff pending → replay sin re-fetch → supersede de destino → revocación → cancelled → cleanup completo, contra `greenhouse-pg-dev`.
+- **Estado de rollout:** migración APLICADA (única instancia = prod data plane); código local-first sin push. Al pushear: redeploy del ops-worker para registrar el projection. Flag `HIRING_HANDOFF_BRIDGES_ENABLED` OFF (fila en el ledger). Ver Handoff.md.
+
 ## Delta 2026-07-10 — Revisión 5-lentes contra runtime real (arch + talent + payroll + finance + product-design)
 
 Revisada con `arch-architect` (+overlay Greenhouse), `greenhouse-talent-people-operator`, `greenhouse-payroll-auditor`, `greenhouse-finance-accounting-operator` y `greenhouse-ux`. Todo verificado contra el código, no contra `db.d.ts` ni contra el Delta anterior. **El Delta 2026-07-08 quedó obsoleto en su premisa central y en cuatro decisiones de diseño.** Correcciones:
@@ -41,7 +53,7 @@ Revisada con `arch-architect` (lente dominante — es capa reactiva/outbox/CQRS)
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -51,7 +63,7 @@ Revisada con `arch-architect` (lente dominante — es capa reactiva/outbox/CQRS)
 - UI ready: `n/a`
 - Backend impact: `sync`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `COMPLETE 2026-07-10 — code complete en develop local (sin push); migración APLICADA; rollout pendiente: push + redeploy ops-worker (registra el projection) + flag bridges OFF hasta TASK-770`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`
@@ -247,30 +259,39 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth (`hiring_handoff`), contract surface (eventos + command + readers + signals) y consumers (770/360/StaffAug/Nexa) nombrados con paths reales.
-- [ ] Invariantes (trigger doble `decided`+`selected`, lectura de snapshot no de payload, supersede guardado por estado, boundary NO-member/NO-contractor-engagement, destinos no soportados → `blocked`) explícitos; idempotencia en dos planos.
-- [ ] Migration additive + **materializer sin flag** + flag de bridges OFF + rollback (revert/reverse) explícito.
-- [ ] Backfill obligatorio documentado (re-marcado `pending-task-356-consumer` + script idempotente dry-run→apply).
-- [ ] Evidencia DB/worker listada (materialize + replay + rejected-no-crea + supersede + signals steady).
-- [ ] Errores canónicos + `blocked_reason` como código estable + audit/outbox + sin leak de PII.
+- [x] Source of truth (`hiring_handoff`), contract surface (eventos + command + readers + signals) y consumers (770/360/StaffAug/Nexa) nombrados con paths reales.
+- [x] Invariantes (trigger doble `decided`+`selected`, lectura de snapshot no de payload, supersede guardado por estado, boundary NO-member/NO-contractor-engagement, destinos no soportados → `blocked`) explícitos; idempotencia en dos planos.
+- [x] Migration additive + **materializer sin flag** + flag de bridges OFF + rollback (revert/reverse) explícito.
+- [x] Backfill obligatorio documentado (re-marcado `pending-task-356-consumer` + script idempotente dry-run→apply).
+- [x] Evidencia DB/worker listada (materialize + replay + rejected-no-crea + supersede + signals steady).
+- [x] Errores canónicos + `blocked_reason` como código estable + audit/outbox + sin leak de PII.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive (`src/lib/hiring/handoff/**` command/reader + `projections/hiring-handoff-materialize.ts`), NO en UI.
-- [ ] Modelada como aggregate/command (`HiringHandoff` + `transitionHiringHandoff`), no click-handler.
-- [ ] Read = `listInternalHireReadyForOnboarding`/`getHiringJourneyForPerson` (readers canónicos); write = command con semantics + authorization fina (`hiring.handoff.approve`) + idempotencia + audit/outbox + errores canónicos + observabilidad.
-- [ ] Capability + grant en el MISMO PR (`hiring.handoff.approve` en catálogo + grant a ≥1 rol real + coverage test verde).
-- [ ] Camino programático declarado: `POST /api/hiring/handoffs/[id]/*` interno + reader para 770; Nexa por parity.
-- [ ] Write apto para `propose → confirm → execute` (Nexa opera el approve por construcción, no integración Nexa-específica).
-- [ ] Un primitive, muchos consumers (770 UI, Person 360, Staff Aug, Nexa) — cero lógica duplicada.
-- [ ] Parity check = SÍ.
+- [x] Lógica en el primitive (`src/lib/hiring/handoff/**` command/reader + `projections/hiring-handoff-materialize.ts`), NO en UI.
+- [x] Modelada como aggregate/command (`HiringHandoff` + `transitionHiringHandoff`), no click-handler.
+- [x] Read = `listInternalHireReadyForOnboarding`/`getHiringJourneyForPerson` (readers canónicos); write = command con semantics + authorization fina (`hiring.handoff.approve`) + idempotencia + audit/outbox + errores canónicos + observabilidad.
+- [x] Capability + grant en el MISMO PR (`hiring.handoff.approve` en catálogo + grant a ≥1 rol real + coverage test verde).
+- [x] Camino programático declarado: `POST /api/hiring/handoffs/[id]/*` interno + reader para 770; Nexa por parity.
+- [x] Write apto para `propose → confirm → execute` (Nexa opera el approve por construcción, no integración Nexa-específica).
+- [x] Un primitive, muchos consumers (770 UI, Person 360, Staff Aug, Nexa) — cero lógica duplicada.
+- [x] Parity check = SÍ.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — EXECUTION LOG (lo llena el agente que toma la task)
      ═══════════════════════════════════════════════════════════ -->
 
-<!-- Zone 2 queda como marker al crear la task. El agente ejecutor registra aquí
-     Discovery/Audit/Plan/slices reales al tomarla. No llenar al crear. -->
+### Execution Log (2026-07-10, Claude — local-first develop)
+
+- **Discovery:** verificado contra runtime real (consumer semantics de `reactive-consumer.ts`, payload de `decide.ts`, schema de la migración 353, patrón capability/grant, wire-up reliability de 5 puntos + registry filter). PG vivo: 0 eventos decided, 0 decisiones → Slice 0 = evidencia.
+- **Slice 1** (`2444a12cb`): migración `20260710173221695` — `hiring_handoff` + `hiring_handoff_audit` (append-only, triggers) + seed `hiring.handoff.approve` + DO guards; aplicada + verificada contra `information_schema`; `db.d.ts` regenerado.
+- **Slice 2**: dominio `src/lib/hiring/handoff/**` (types/state-machine/store/materialize/transition) + endpoint `POST /api/hiring/handoffs/[id]/[action]` + capability en catálogo TS + grant tier governance + aggregate/7 eventos en event-catalog + `decided` a REACTIVE_EVENT_TYPES.
+- **Slice 3**: projection `hiring_handoff_materialize` (domain people, SIN flag) registrado; backfill idempotente (dry-run vivo: candidates=0).
+- **Slice 4**: cola `listInternalHireReadyForOnboarding` + journey `getHiringJourneyForPerson` + bridge `listStaffAugmentationHandoffIntents` + flag config + `src/lib/copy/hiring.ts`.
+- **Slice 5**: módulo reliability `hiring` (types + 2 Records incident-mapping + registry) + signals `handoff_blocked_stale`/`internal_hire_awaiting_onboarding` + migración de las 2 señales de `documents`.
+- **Slice 6**: 49 tests dominio + boundary negativo estático/runtime + tests del projection; smoke E2E contra PG real verde.
+- **Gates:** `pnpm test` full 9030 ✓ · `pnpm typecheck` ✓ · lint ✓ · `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` 573 ✓ · coverage capability ✓ · build prod ✓ (ver Handoff).
+
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -400,20 +421,20 @@ Re-marcar eventos swept → deploy + redeploy ops-worker (materializer activo, b
 
 ## Acceptance Criteria
 
-- [ ] Existe `HiringHandoff` como aggregate runtime (tabla + store + type) con state-machine + CHECK + audit trail append-only (triggers anti-UPDATE/DELETE).
-- [ ] El consumer reactivo (`ProjectionDefinition`, domain `people`) materializa el handoff **solo** desde `hiring.application.decided` **y solo cuando `decision='selected'`**, leyendo el snapshot actual (no el payload), es idempotente (replay → sin duplicado) y no hace silent-skip.
-- [ ] Una re-decisión sobre un handoff `pending` lo actualiza + audita; sobre uno `approved|in_setup|completed` lo bloquea con `decision_superseded_after_approval` (nunca sobrescribe en silencio).
-- [ ] `hiring.handoff.*` registrados y versionados en `event-catalog.ts`, documentados en `GREENHOUSE_EVENT_CATALOG_V1.md`, sin PII sensible. (`hiring.application.decided` ya existía — no se re-registra.)
-- [ ] El materializer y el command **NUNCA** escriben `members`/`assignments`/`placements`/`payroll_*`/`compensation_versions`/`final_settlements`/`contractor_engagements`/`providers`/`expenses` (boundary test negativo verde).
-- [ ] Los destinos sin owner (`contractor`, `partner`, `internal_reassignment`) nacen `blocked:destination_not_supported`, nunca `pending` mudo.
-- [ ] Un `internal_hire` aprobado llega a la cola `listInternalHireReadyForOnboarding` (read-model) para que HRIS/770 cree/promueva `member` sobre el mismo `identity_profile_id`.
-- [ ] La conversión (770) deja el `member` en `pending_intake`/`onboarding`; 356 no activa nada por side effect (verificado por boundary, no por 356 crear member).
-- [ ] El handoff NO transporta ningún campo interpretable como `contractType`; `expected_legal_entity` está marcado como propuesta no vinculante.
-- [ ] Command `transitionHiringHandoff` gobernado por `hiring.handoff.approve` (capability + grant + coverage test mismo PR), idempotente, con audit + errores canónicos + `blocked_reason` como código estable.
-- [ ] Reliability signals `hiring.handoff_blocked_stale` + `hiring.internal_hire_awaiting_onboarding` visibles en `/admin/operations` en steady=0 (si se crea el `hiring` module, las 2 señales preexistentes bajo `documents` migran en el mismo PR).
-- [ ] Reader hiring-aware de Person 360 (journey longitudinal) sin silent-catch.
-- [ ] **El materializer NO está gateado**; `HIRING_HANDOFF_BRIDGES_ENABLED` default OFF + fila en el ledger declarando runtime Vercel + ops-worker.
-- [ ] Eventos `decided` previos re-marcados `no-op:pending-task-356-consumer` y backfill idempotente ejecutado (dry-run → apply) con `COUNT` verificado.
+- [x] Existe `HiringHandoff` como aggregate runtime (tabla + store + type) con state-machine + CHECK + audit trail append-only (triggers anti-UPDATE/DELETE).
+- [x] El consumer reactivo (`ProjectionDefinition`, domain `people`) materializa el handoff **solo** desde `hiring.application.decided` **y solo cuando `decision='selected'`**, leyendo el snapshot actual (no el payload), es idempotente (replay → sin duplicado) y no hace silent-skip.
+- [x] Una re-decisión sobre un handoff `pending` lo actualiza + audita; sobre uno `approved|in_setup|completed` lo bloquea con `decision_superseded_after_approval` (nunca sobrescribe en silencio).
+- [x] `hiring.handoff.*` registrados y versionados en `event-catalog.ts`, documentados en `GREENHOUSE_EVENT_CATALOG_V1.md`, sin PII sensible. (`hiring.application.decided` ya existía — no se re-registra.)
+- [x] El materializer y el command **NUNCA** escriben `members`/`assignments`/`placements`/`payroll_*`/`compensation_versions`/`final_settlements`/`contractor_engagements`/`providers`/`expenses` (boundary test negativo verde).
+- [x] Los destinos sin owner (`contractor`, `partner`, `internal_reassignment`) nacen `blocked:destination_not_supported`, nunca `pending` mudo.
+- [x] Un `internal_hire` aprobado llega a la cola `listInternalHireReadyForOnboarding` (read-model) para que HRIS/770 cree/promueva `member` sobre el mismo `identity_profile_id`.
+- [x] La conversión (770) deja el `member` en `pending_intake`/`onboarding`; 356 no activa nada por side effect (verificado por boundary, no por 356 crear member).
+- [x] El handoff NO transporta ningún campo interpretable como `contractType`; `expected_legal_entity` está marcado como propuesta no vinculante.
+- [x] Command `transitionHiringHandoff` gobernado por `hiring.handoff.approve` (capability + grant + coverage test mismo PR), idempotente, con audit + errores canónicos + `blocked_reason` como código estable.
+- [x] Reliability signals `hiring.handoff_blocked_stale` + `hiring.internal_hire_awaiting_onboarding` wired (módulo `hiring` creado; las 2 señales bajo `documents` migradas mismo PR). *Verificación visual en `/admin/operations` queda para el deploy (código local-first sin push); queries verdes contra PG real.*
+- [x] Reader hiring-aware de Person 360 (journey longitudinal) sin silent-catch.
+- [x] **El materializer NO está gateado**; `HIRING_HANDOFF_BRIDGES_ENABLED` default OFF + fila en el ledger declarando runtime Vercel + ops-worker.
+- [x] Eventos `decided` previos re-marcados `no-op:pending-task-356-consumer` y backfill idempotente ejecutado (dry-run → apply) con `COUNT` verificado.
 
 ## Verification
 
@@ -431,11 +452,11 @@ Re-marcar eventos swept → deploy + redeploy ops-worker (materializer activo, b
 
 ## Closing Protocol
 
-- [ ] Eventos y señales registrados en el control plane institucional (projection-registry + RELIABILITY_REGISTRY), NO en bus ad hoc.
-- [ ] `GREENHOUSE_EVENT_CATALOG_V1.md` + `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` con `## Delta`.
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` con la fila del flag; `Handoff.md` + `changelog.md`.
-- [ ] `## Delta` a TASK-770 (consume la cola/handoff) y a TASK-355 (seam del evento) si cambian supuestos.
-- [ ] Runtime Rollout Completion Gate: si queda code-complete sin flip/redeploy, reportar `code complete, rollout pendiente`.
+- [x] Eventos y señales registrados en el control plane institucional (projection-registry + RELIABILITY_REGISTRY), NO en bus ad hoc.
+- [x] `GREENHOUSE_EVENT_CATALOG_V1.md` + `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` con `## Delta`.
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` con la fila del flag; `Handoff.md` + `changelog.md`.
+- [x] `## Delta` a TASK-770 (consume la cola/handoff) y a TASK-355 (seam del evento) si cambian supuestos.
+- [x] Runtime Rollout Completion Gate: si queda code-complete sin flip/redeploy, reportar `code complete, rollout pendiente`.
 
 ## Follow-ups
 

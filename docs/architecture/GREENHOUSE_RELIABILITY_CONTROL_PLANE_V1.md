@@ -7,6 +7,16 @@
 > Creada: `2026-04-25` por TASK-600
 > Última actualización: `2026-06-28` por Playwright smoke false-red fix
 
+## Delta 2026-07-10 — TASK-356: módulo `hiring` + 2 signals + migración de señales desde `documents`
+
+Nuevo `ReliabilityModuleKey: 'hiring'` (domain `hr`, `incidentDomainTag: 'hiring'`, prioridad de incident-mapping 18 — por encima de `documents` para que un incident `hiring_*` rutee al dueño del dominio). Señales:
+
+- `hiring.handoff_blocked_stale` (kind `lag`, steady=0): handoffs `blocked` >48h sin resolución; supersede/revocación post-aprobación escala a `error`.
+- `hiring.internal_hire_awaiting_onboarding` (kind `lag`, steady=0): handoffs `internal_hire` `approved|in_setup` >72h sin pickup de HRIS/770 (SLA de no perder un hire).
+- **Migradas desde `documents` (mismo PR, anti-drift):** `hiring.candidate_document.retention_overdue` + `storage.asset_scan.open_quarantine` (ambas de TASK-1362, candidate docs) ahora emiten `moduleKey: 'hiring'`.
+
+Fuera de alcance por decisión (5-lentes 2026-07-10): `coverage_risk`/`opening_stalled` NO son reliability signals — una vacante sin llenar es estado de negocio (workforce planning / ICO), no falla de sistema.
+
 ## Delta 2026-06-28 — Playwright API smoke contract + lane-scoped publishing
 
 El smoke de staging protege contratos funcionales; no debe convertir latencia de un endpoint JSON pesado en falla de producto ni propagar un spec platform/tooling a lanes de dominio no dueñas. La investigacion de los runs develop `fd50bea`, `0bd03e9` y `4a66fc0` encontro que `platform.cron.staging_drift` estaba sano (`count=0`), pero `cron-staging-parity.spec.ts` agotaba el budget al navegar con Chromium a `/api/admin/reliability`.

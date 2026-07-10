@@ -1,5 +1,15 @@
 # TASK-770 — Hiring to HRIS Collaborator Activation (backend-data)
 
+## Delta 2026-07-10 — TASK-356 completada: la cola y el handoff YA existen en runtime
+
+- **Desbloqueada por TASK-356** (implementada local-first en `develop`). Lo que esta task consume ya es real:
+  - Cola read-model: `listInternalHireReadyForOnboarding()` en `src/lib/hiring/handoff/queue.ts` (handoffs `internal_hire` en `approved|in_setup`, con scope via opening + `full_name` de identity_profiles). **Gateada por `HIRING_HANDOFF_BRIDGES_ENABLED` (default OFF)** — retorna `{enabled:false, items:[]}` explícito; 770 debe manejar ese estado y el flip del flag es parte de SU rollout.
+  - Aggregate `greenhouse_hiring.hiring_handoff` + audit append-only; command `transitionHiringHandoff` (`POST /api/hiring/handoffs/[id]/complete` con `downstreamRef` = evidencia del member creado — así 770 marca `completed`, nunca por inferencia).
+  - Copy es-CL de estados/razones/CTAs listo en `src/lib/copy/hiring.ts` (`GH_HIRING_HANDOFF` + helpers `hiringHandoffStateLabel`/`hiringHandoffBlockedReasonLabel`).
+  - Señal `hiring.internal_hire_awaiting_onboarding` (72h SLA) ya vigila la cola — cuando 770 active el flujo, esa señal detecta cola sin drenar.
+- El handoff llega con `identity_profile_id` + `candidate_facet_id`: crear/promover el `member` SIEMPRE sobre ese mismo profile (cascade anti-dup D-2), en `pending_intake`.
+
+
 ## Delta 2026-07-08 (v2) — Revisión 3-lentes + split UI + reframe "bridge, no subsistema"
 
 Revisada con `arch-architect` (dominante — toca creación de `member`/identity, la superficie del incidente 2026-06-01) + `greenhouse-talent-people-operator` + product-design. Hechos verificados contra el repo real. **Reframe central: 770 es un BRIDGE que reusa la maquinaria de activación workforce existente, NO un subsistema nuevo.** Ajustes:

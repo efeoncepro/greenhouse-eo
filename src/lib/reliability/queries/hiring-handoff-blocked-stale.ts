@@ -67,7 +67,7 @@ export const getHiringHandoffBlockedStaleSignal = async (): Promise<ReliabilityS
         },
         { kind: 'metric', label: 'total', value: String(total) },
         { kind: 'metric', label: 'post_approval', value: String(postApproval) },
-        { kind: 'doc', label: 'Spec', value: 'docs/tasks/in-progress/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md' },
+        { kind: 'doc', label: 'Spec', value: 'docs/tasks/complete/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md' },
       ],
     }
   } catch (error) {

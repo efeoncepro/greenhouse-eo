@@ -2,6 +2,22 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-07-10 — TASK-356: HiringHandoff lifecycle (7 events v1) + primer consumer reactivo hiring
+
+Aggregate type nuevo: `hiring_handoff` (identity `hhof-{uuid}`, UNIQUE por `hiring_application_id`). Los 7 eventos son **audit-only en V1** (sin consumer reactivo; los barre el sweep). Payload mínimo sin PII: `{handoffId, applicationId, openingId, decisionId, selectedDestination, state, blockedReason, ...extra}`.
+
+| Evento | Trigger | Notas |
+|---|---|---|
+| `hiring.handoff.created` | Materializer reactivo (primera decisión `selected` de una application) | Lleva el estado de nacimiento: `pending` (destino soportado: `internal_hire`/`staff_augmentation`) o `blocked` (`destination_not_supported` para `contractor`/`partner`/`internal_reassignment`). |
+| `hiring.handoff.approved` | Command `transitionHiringHandoff` (capability `hiring.handoff.approve`) | Incluye `actorUserId`. Solo destinos soportados. |
+| `hiring.handoff.in_setup` | Command (setup) | Paso opcional entre approved y completed. |
+| `hiring.handoff.completed` | Command (complete) | Requiere `downstreamRef` (evidencia del owner: member/placement id). Nunca por inferencia. |
+| `hiring.handoff.blocked` | Materializer (supersede post-aprobación / revocación) | `blockedReason` = código estable del enum `HiringHandoffBlockedReason`. |
+| `hiring.handoff.cancelled` | Command (cancel) o materializer (revocación de un pending) | Revocación = la application se re-decidió a `rejected|withdrawn|on_hold|backup_selected`. |
+| `hiring.handoff.decision_superseded` | Materializer (nueva decisión `selected` con `decisionId` distinto) | En `pending`/`blocked` re-deriva la fila; en post-aprobación acompaña al `blocked`. |
+
+Además: **`hiring.application.decided` (TASK-355) dejó de ser audit-only** — ahora dispara el projection `hiring_handoff_materialize` (domain `people`, registrado en `projections/index.ts`), que lee el snapshot ACTUAL de `hiring_application` (nunca el payload — hay coalescing por scope) y solo materializa con `decision='selected'`. Entró a `REACTIVE_EVENT_TYPES`.
+
 ## Delta 2026-06-07 — TASK-1020: Leave Approval Authority Recovery (1 event v1, audit-only)
 
 Aggregate type: `leave_request`. Audit-only (NO reactivo — no dispara projection).

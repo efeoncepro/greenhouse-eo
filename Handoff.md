@@ -1,3 +1,30 @@
+## Sesion 2026-07-10 - TASK-356 Hiring Handoff COMPLETE (code) - Claude
+
+> **TASK-356 completa en `develop` local-first (7 commits, SIN push).** El nodo reactivo N10 del ATS quedó implementado
+> end-to-end: aggregate `greenhouse_hiring.hiring_handoff` + audit append-only (migración `20260710173221695`
+> **APLICADA** — única instancia Cloud SQL) · dominio `src/lib/hiring/handoff/**` (state-machine dual, materializer
+> con upsert guardado por `decision_id`+`state`, command `transitionHiringHandoff`) · projection
+> `hiring_handoff_materialize` (domain `people`, **SIN flag** — un no-op es terminal) · capability
+> `hiring.handoff.approve` (catálogo+grant+seed mismo PR) · 7 eventos `hiring.handoff.*` v1 · cola
+> `listInternalHireReadyForOnboarding` + journey Person 360 + bridge Staff Aug (flag
+> `HIRING_HANDOFF_BRIDGES_ENABLED` OFF, fila en el ledger) · módulo reliability `hiring` con 2 señales nuevas
+> (48h blocked / 72h SLA internal_hire) + las 2 de TASK-1362 migradas desde `documents`.
+>
+> **Runtime vivo verificado ANTES de implementar: 0 eventos `decided`, 0 decisiones** → Slice 0 (re-marcado) fue
+> evidencia con COUNT=0 y el backfill (entregado igual) reporta candidates=0. **Smoke E2E contra PG real verde**
+> (`scripts/hiring/_sanity-handoff-reactive.ts`): decide selected → consumer scoped → 1 handoff pending → replay sin
+> duplicado → supersede de destino → revocación rejected → cancelled + audit, con cleanup completo.
+> Gates: test full 9030/0 · build prod · typecheck · lint · gate payroll/offboarding 573/0 · coverage capability.
+>
+> **Gaps de la spec cerrados en ejecución (documentados en el Delta de la task):** revocación
+> (`selected`→`rejected|withdrawn` sobre handoff existente → cancelled/blocked:decision_revoked, enum de 7 razones),
+> reopen de cancelled, approved→completed directo (in_setup opcional).
+>
+> **Rollout pendiente (no bloquea el cierre local-first):** (1) push a `develop` cuando el operador lo indique;
+> (2) **redeploy del ops-worker** para que registre el projection (hasta eso, los `decided` nuevos quedan en la cola
+> `people` sin drenar — hoy no hay tráfico de decisiones); (3) flag de bridges queda OFF hasta que TASK-770 tenga su
+> consumer (fila en § Pendientes del ledger). TASK-770 quedó desbloqueada con `## Delta` (cola + command + copy listos).
+
 ## Sesion 2026-07-10 - TASK-356 Hiring Handoff reactivo iniciada - Claude
 
 TASK-356 movida a `in-progress` y en ejecución local-first sobre `develop` (sin branch, sin push — default del harness implement-task). Baseline: recalibración 5-lentes 2026-07-10 committeada junto al intake. Objetivo: aggregate `HiringHandoff` + consumer reactivo (`hiring.application.decided`, solo `decision=selected`) + eventos `hiring.handoff.*` + capability `hiring.handoff.approve` + reliability signals + cola internal_hire (para TASK-770) + journey Person 360. Materializer sin flag; `HIRING_HANDOFF_BRIDGES_ENABLED` OFF gatea solo readers/bridges. Scripts ajenos `scripts/_verify-form-asset.ts` y `scripts/hiring/verify-public-apply-smoke.mjs` preservados fuera de scope.

@@ -64,7 +64,7 @@ export const getHiringInternalHireAwaitingOnboardingSignal = async (): Promise<R
           value: `greenhouse_hiring.hiring_handoff WHERE selected_destination='internal_hire' AND state IN ('approved','in_setup') AND state_changed_at < NOW() - INTERVAL '${PICKUP_HOURS} hours'`,
         },
         { kind: 'metric', label: 'total', value: String(total) },
-        { kind: 'doc', label: 'Spec', value: 'docs/tasks/in-progress/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md' },
+        { kind: 'doc', label: 'Spec', value: 'docs/tasks/complete/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md' },
       ],
     }
   } catch (error) {

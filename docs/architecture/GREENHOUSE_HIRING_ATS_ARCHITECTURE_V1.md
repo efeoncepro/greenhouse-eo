@@ -20,6 +20,20 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-10 — TASK-356: HiringHandoff implementado (aggregate + consumer reactivo + bridges)
+
+El nodo N10 del master flow (handoff decisión→downstream) pasó de spec a runtime:
+
+- **Aggregate:** `greenhouse_hiring.hiring_handoff` (UNIQUE por `hiring_application_id`, `decision_id` ancla del supersede, CHECK state/destination/blocked_reason, `completed` exige `downstream_ref`) + `hiring_handoff_audit` append-only (triggers anti-UPDATE/DELETE). Migración `20260710173221695`.
+- **Dominio:** `src/lib/hiring/handoff/**` — state-machine dual (command: `pending→approved→[in_setup]→completed`, `pending|approved|blocked→cancelled`, `blocked` NUNCA por command; system: supersede/revocación/reopen), `materializeHandoffFromApplication` (tx propia, lee snapshot actual, upsert guardado por `decision_id`+`state`), `transitionHiringHandoff` (command gobernado por capability `hiring.handoff.approve`, idempotente por target state).
+- **Consumer reactivo:** `hiring_handoff_materialize` (domain `people`, trigger SOLO `hiring.application.decided`). **SIN flag** — un no-op es terminal en `outbox_reactive_log`. Solo `decision='selected'` materializa; `backup_selected|rejected|withdrawn|on_hold` → no-op explícito o revocación (pending→cancelled; post-aprobación→`blocked:decision_revoked`). Supersede post-aprobación → `blocked:decision_superseded_after_approval` (nunca overwrite). Destinos sin owner V1 (`contractor`→EPIC-013, `partner`, `internal_reassignment`) nacen `blocked:destination_not_supported`.
+- **Bridges (flag `HIRING_HANDOFF_BRIDGES_ENABLED` default OFF, `enabled:false` explícito):** `listInternalHireReadyForOnboarding()` (cola para TASK-770), `getHiringJourneyForPerson()` (journey Person 360, sin flag), `listStaffAugmentationHandoffIntents()` (el owner llama `createStaffAugPlacement` explícito y completa con `downstream_ref`).
+- **Command API:** `POST /api/hiring/handoffs/[id]/(approve|setup|complete|cancel)`.
+- **Reliability:** módulo `hiring` nuevo (ReliabilityModuleKey) con `hiring.handoff_blocked_stale` (48h) + `hiring.internal_hire_awaiting_onboarding` (72h SLA); las 2 señales de TASK-1362 migraron de `documents` → `hiring`.
+- **Eventos:** `hiring.handoff.*` (7, v1, audit-only) — ver `GREENHOUSE_EVENT_CATALOG_V1.md` Delta 2026-07-10.
+- **Copy:** `src/lib/copy/hiring.ts` = contrato de presentación es-CL de los códigos estables (770 renderiza desde ahí, nunca el código crudo).
+- **Boundary verificado por test:** el dominio solo escribe `hiring_handoff`/`hiring_handoff_audit`/outbox — nunca `members`/`assignments`/`placements`/`payroll_*`/`compensation_versions`/`final_settlements`/`contractor_engagements`/`providers`/`expenses` (boundary.test.ts estático + asserts runtime).
+
 ## Delta 2026-07-10 — Candidate document capture: scan/quarantine, resolver unificado y retención (TASK-1362)
 
 ### Contexto: superficie abierta, no preventivo
