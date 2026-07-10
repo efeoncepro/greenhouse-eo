@@ -25,5 +25,10 @@ export {
   isValidSystemTransition,
 } from './state-machine'
 export { getHiringHandoffById, getHiringHandoffByApplicationId } from './store'
+export { isHiringHandoffBridgesEnabled } from './config'
+export { listInternalHireReadyForOnboarding } from './queue'
+export type { InternalHireQueueItem, InternalHireQueueResult } from './queue'
+export { getHiringJourneyForPerson } from './journey'
+export type { HiringJourneyForPerson, HiringJourneyApplication, HiringJourneyHandoff } from './journey'
 export { materializeHandoffFromApplication } from './materialize'
 export { isHiringHandoffCommandAction, transitionHiringHandoff } from './transition'
