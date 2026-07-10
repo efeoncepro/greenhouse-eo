@@ -27,10 +27,11 @@
 | 2 | Stats strip | Dar peso al marco con 2 interfaces, 4 niveles y 1 cambio de modelo. | Signal cards con reveal escalonado + halo de puntero no esencial. | Static copy |
 | 3 | Thesis | "Tu sitio ya tiene dos tipos de visitantes. Solo estás diseñado para uno." Explicar el cambio humano→agente. | Split editorial + dos lanes semánticas (experiencia propia / ventana del agente). | Static copy |
 | 4 | What's inside | "Qué vas a encontrar dentro" — los 5 actos + checklist "Lo que haces esta semana". | Ruta editorial de cinco capítulos: rail de progreso puramente decorativa, tarjetas de lectura completas y spotlight localizado solo en puntero fino. Conserva una lista ordenada, no un carrusel. | Static copy |
-| 5 | Audience | "Para quién es este ebook" / "No es para ti si…" — calificar al lead. | Two-column fit/no-fit list | Static copy |
-| 6 | Form workspace | Rail editorial que explica los tres resultados de la guía + "Descarga el ebook gratis" — form gobernado (nombre, email, rol opcional). La descarga comienza al enviar. | Host Astro para la rail + `<greenhouse-form>` (patrón `BrandVisibilityFormDock`) | Greenhouse Growth Forms |
-| 7 | FAQ | Resolver 5 dudas (qué es un agente IA, AEO vs SEO, llms.txt, zero-click commerce, bots > humanos). | Accordion `<details>` | Static copy |
-| 8 | Footer | Cerrar la lectura, ubicar la marca y ofrecer navegación útil sin competir con el CTA. | Footer editorial de tres zonas + meta legal. | Static copy |
+| 5 | Audience | Auto-calificar la decisión: no otra táctica, sino qué parte del sistema revisar primero. | Dos artículos complementarios: punto de partida y aclaración honesta; síntesis y siguiente paso visibles en cada uno. | Static copy |
+| 6 | Credibility brief | Confirmar quién guía la lectura antes de pedir datos. | Banda editorial de Efeonce Think / Research brief. | Static copy |
+| 7 | Form workspace | Rail editorial que explica los tres resultados de la guía + "Descarga el ebook gratis" — form gobernado (nombre, email, rol opcional). La descarga comienza al enviar. | Host Astro para la rail + `<greenhouse-form>` (patrón `BrandVisibilityFormDock`) | Greenhouse Growth Forms |
+| 8 | FAQ | Resolver las objeciones que quedan antes de actuar: agentes, niveles, búsqueda, legibilidad, zero-click y solicitudes automatizadas. | Accordion `<details>` | Static copy |
+| 9 | Cierre + footer | Volver a la decisión, ofrecer el CTA final y ubicar la marca/navegación útil sin competir con la captura. | Cierre editorial + footer de tres zonas y meta legal. | Static copy |
 
 ## Content Model (from PR #12, tokenized)
 
@@ -42,7 +43,8 @@ La landing toma la estructura y el copy del export como base y los aterriza a la
 | Stats (−27% / 3× / 7×) | Stat strip con fuente literal ("HubSpot, 2026", "Cyber Week 2025"). | Nunca dato sin fuente; count-up con fallback estático. |
 | "Dos tipos de visitantes" | Thesis split. | Copy es-CL, sin promesa. |
 | "Qué vas a encontrar dentro" (5 actos + checklist) | What's inside. | Lista honesta de contenidos del ebook. |
-| "Para quién / No es para ti si…" | Audience fit. | Califica el lead; no exagera. |
+| "Para quién / No es para ti si…" | Auto-calificación de audiencia. | Explica la decisión que el ebook ayuda a tomar; no es una matriz estática de fit/no-fit. |
+| Autor del ebook | Credibility brief antes del formulario. | Efeonce Think se presenta como guía de investigación, sin desviar la tesis hacia SEO. |
 | Form (name, email, rol select) | `<greenhouse-form>` gobernado. | Campos vienen del contrato, NO se hand-autoran. |
 | FAQ (5 Q) | Accordion + `FAQPage` JSON-LD. | Rich result AEO; copy del PR. |
 | `onSubmit` local falso | Éxito gobernado "revisa tu email". | El form del export NO capturaba nada; se reemplaza por el submit gobernado. |
@@ -70,39 +72,41 @@ La landing toma la estructura y el copy del export como base y los aterriza a la
 | `think.webAgentica.landing.inside.title` | 4 | `Qué vas a encontrar dentro` | none | Sección contenidos. |
 | `think.webAgentica.landing.inside.subtitle` | 4 | `Cinco actos para leer la nueva web` | none | Del PR. |
 | `think.webAgentica.landing.inside.checklist` | 4 | `Incluye checklist «Lo que haces esta semana»` | none | Accionable. |
-| `think.webAgentica.landing.audience.forTitle` | 5 | `Para quién es este ebook` | none | Calificación. |
-| `think.webAgentica.landing.audience.againstTitle` | 5 | `No es para ti si…` | none | Honestidad. |
-| `think.webAgentica.landing.form.title` | 6 | `Descarga el ebook gratis` | none | Encabezado del form; los campos vienen del contrato. |
-| `think.webAgentica.landing.form.body` | 6 | `Cinco actos y un checklist para entender la web agéntica y actuar esta semana. La descarga comienza al enviar.` | none | Promesa verificable de entrega inmediata; no condiciona la experiencia a una confirmación de email. |
-| `think.webAgentica.landing.form.rail.kicker` | 6 | `Tu mapa de lectura` | none | Orienta la columna editorial del workspace. |
-| `think.webAgentica.landing.form.rail.title` | 6 | `Una guía breve para una web que ya no tiene un solo visitante.` | none | Repite la tesis sin competir con el H1. |
-| `think.webAgentica.landing.form.rail.items` | 6 | `Dos interfaces` / `Cuatro niveles` / `Checklist semanal` | none | Resume resultados concretos; no promete un diagnóstico. |
-| `think.webAgentica.landing.form.rail.delivery` | 6 | `La descarga comienza al enviar.` | none | Cierra la rail con una expectativa honesta. |
-| `think.webAgentica.landing.form.rolePlaceholder` | 6 | `Selecciona (opcional)` | none | Rol opcional (campo del contrato). |
-| `think.webAgentica.landing.form.submit` | 6 | `Enviarme el ebook` | none | CTA del contrato. |
-| `think.webAgentica.landing.form.consent` | 6 | `Al descargar aceptas recibir contenido de Efeonce. Baja cuando quieras.` | none | Consent gobernado. |
-| `think.webAgentica.landing.form.loading.title` | 6 | `Preparando el formulario` | none | Skeleton. |
-| `think.webAgentica.landing.form.loading.body` | 6 | `Estamos conectando con Greenhouse para cargar los campos y protecciones.` | none | Loader honesto. |
-| `think.webAgentica.landing.form.degraded` | 6 | `No pudimos cargar el formulario. Recarga la página o escríbenos desde el sitio de Efeonce.` | none | Sin internals. |
-| `think.webAgentica.landing.form.success.title` | 6 | `Tu descarga está lista` | none | Confirmación inline; el form ya no ocupa el espacio del estado final. |
-| `think.webAgentica.landing.form.success.body` | 6 | `El PDF ya se está descargando. Si necesitas abrirlo otra vez, usa el botón mientras esta página siga abierta.` | none | Honesto: confirma la entrega inmediata, sin prometer un email no verificado. |
-| `think.webAgentica.landing.form.success.redownload` | 6 | `Descargar el ebook otra vez` | none | Recuperación gated (usa el token del handoff, no un href estático). |
-| `think.webAgentica.landing.form.success.bridge.kicker` | 6 | `Tu punto de partida` | none | Cross-sell secundario, subordinado a la descarga. |
-| `think.webAgentica.landing.form.success.bridge.title` | 6 | `Mide el nivel 1 de tu web agéntica` | none | El grader cubre ser encontrado y entendido, no resume los cuatro niveles. |
-| `think.webAgentica.landing.form.success.bridge.body` | 6 | `Descubre si ChatGPT, Perplexity y Google AI encuentran y entienden tu marca. El ebook te ayuda a avanzar desde ahí hacia acciones y capacidades.` | none | Conecta la medición con la tesis completa, sin volver a SEO/AEO. |
-| `think.webAgentica.landing.form.success.bridge.cta` | 6 | `Medir mi visibilidad en IA` | href `/brand-visibility` | Cross-sell explícito hacia el grader hermano. |
-| `think.webAgentica.landing.footer.kicker` | 8 | `Efeonce Think` | none | Contexto editorial de la marca. |
-| `think.webAgentica.landing.footer.body` | 8 | `Ideas y capacidades para la web que ya están usando tus clientes.` | none | Cierre de marca concreto, sin promesa. |
-| `think.webAgentica.landing.footer.explore` | 8 | `Explora la guía` | none | Navegación de recuperación a los hitos de lectura. |
-| `think.webAgentica.landing.footer.signal` | 8 | `La nueva interfaz ya está abierta.` | none | Señal editorial, no dato cuantitativo. |
-| `think.webAgentica.landing.form.corporateGate` | 6 | `Usa tu correo corporativo — el ebook está pensado para equipos y marcas reales.` | none | El form exige correo corporativo (bloquea free/disposable), igual que el grader. |
-| `think.webAgentica.landing.faq.agent.q` | 7 | `¿Qué es un agente de inteligencia artificial?` | none | Del PR. |
-| `think.webAgentica.landing.faq.aeo.q` | 7 | `¿Qué es AEO y en qué se diferencia del SEO?` | none | Del PR. |
-| `think.webAgentica.landing.faq.llms.q` | 7 | `¿Qué es llms.txt y cómo se implementa?` | none | Del PR. |
-| `think.webAgentica.landing.faq.zeroClick.q` | 7 | `¿Qué es zero-click commerce?` | none | Del PR. |
-| `think.webAgentica.landing.faq.bots.q` | 7 | `¿Cuándo los bots superaron al tráfico humano?` | none | Del PR (Cloudflare, jun 2026). |
+| `think.webAgentica.landing.audience.title` | 5 | `No necesitas otra táctica. Necesitas saber qué parte del sistema revisar primero.` | none | Convierte la calificación en una decisión, no en una ficha de perfil. |
+| `think.webAgentica.landing.audience.body` | 5 | `Esta guía está hecha para equipos que prefieren entender el cambio antes de rediseñar su presencia, sus datos o su forma de entregar valor.` | none | Une contenido con la siguiente acción. |
+| `think.webAgentica.landing.audience.yes` | 5 | `Tu punto de partida` / `Es para ti si…` | none | Card guía: decisión de inversión, presencia donde se delegan decisiones, lectura del agente y resultados consumibles. |
+| `think.webAgentica.landing.audience.no` | 5 | `Una aclaración honesta` / `No es para ti todavía si…` | none | Filtra tácticas aisladas, checklist sustituto y prioridad exclusiva por clics. |
+| `think.webAgentica.landing.audience.transition` | 5 | `Si te reconoces aquí, los cinco actos te dan un mapa antes de decidir qué mover esta semana.` | none | Conecta auto-calificación con el valor ya explicado; no crea un CTA competidor. |
+| `think.webAgentica.landing.author.kicker` | 6 | `Efeonce Think · Research brief` | none | Credencial compacta antes de pedir el correo. |
+| `think.webAgentica.landing.author.body` | 6 | `Escrito por el equipo de Efeonce para ayudar a equipos de marketing, growth y digital a leer el cambio antes de decidir qué rediseñar.` | none | Guía, no promesa de servicio ni framing SEO. |
+| `think.webAgentica.landing.form.title` | 7 | `Descarga el ebook gratis` | none | Encabezado del form; los campos vienen del contrato. |
+| `think.webAgentica.landing.form.body` | 7 | `Cinco actos y un checklist para entender la web agéntica y actuar esta semana. La descarga comienza al enviar.` | none | Promesa verificable de entrega inmediata; no condiciona la experiencia a una confirmación de email. |
+| `think.webAgentica.landing.form.rail.kicker` | 7 | `Tu mapa de lectura` | none | Orienta la columna editorial del workspace. |
+| `think.webAgentica.landing.form.rail.title` | 7 | `Una guía breve para una web que ya no tiene un solo visitante.` | none | Repite la tesis sin competir con el H1. |
+| `think.webAgentica.landing.form.rail.items` | 7 | `Dos interfaces` / `Cuatro niveles` / `Checklist semanal` | none | Resume resultados concretos; no promete un diagnóstico. |
+| `think.webAgentica.landing.form.rail.delivery` | 7 | `La descarga comienza al enviar.` | none | Cierra la rail con una expectativa honesta. |
+| `think.webAgentica.landing.form.rolePlaceholder` | 7 | `Selecciona (opcional)` | none | Rol opcional (campo del contrato). |
+| `think.webAgentica.landing.form.submit` | 7 | `Enviarme el ebook` | none | CTA del contrato. |
+| `think.webAgentica.landing.form.consent` | 7 | `Al descargar aceptas recibir contenido de Efeonce. Baja cuando quieras.` | none | Consent gobernado. |
+| `think.webAgentica.landing.form.loading.title` | 7 | `Preparando el formulario` | none | Skeleton. |
+| `think.webAgentica.landing.form.loading.body` | 7 | `Estamos conectando con Greenhouse para cargar los campos y protecciones.` | none | Loader honesto. |
+| `think.webAgentica.landing.form.degraded` | 7 | `No pudimos cargar el formulario. Recarga la página o escríbenos desde el sitio de Efeonce.` | none | Sin internals. |
+| `think.webAgentica.landing.form.success.title` | 7 | `Tu descarga está lista` | none | Confirmación inline; el form ya no ocupa el espacio del estado final. |
+| `think.webAgentica.landing.form.success.body` | 7 | `El PDF ya se está descargando. Si necesitas abrirlo otra vez, usa el botón mientras esta página siga abierta.` | none | Honesto: confirma la entrega inmediata, sin prometer un email no verificado. |
+| `think.webAgentica.landing.form.success.redownload` | 7 | `Descargar el ebook otra vez` | none | Recuperación gated (usa el token del handoff, no un href estático). |
+| `think.webAgentica.landing.form.success.bridge.kicker` | 7 | `Tu punto de partida` | none | Cross-sell secundario, subordinado a la descarga. |
+| `think.webAgentica.landing.form.success.bridge.title` | 7 | `Mide el nivel 1 de tu web agéntica` | none | El grader cubre ser encontrado y entendido, no resume los cuatro niveles. |
+| `think.webAgentica.landing.form.success.bridge.body` | 7 | `Descubre si ChatGPT, Perplexity y Google AI encuentran y entienden tu marca. El ebook te ayuda a avanzar desde ahí hacia acciones y capacidades.` | none | Conecta la medición con la tesis completa, sin volver a SEO/AEO. |
+| `think.webAgentica.landing.form.success.bridge.cta` | 7 | `Medir mi visibilidad en IA` | href `/brand-visibility` | Cross-sell explícito hacia el grader hermano. |
+| `think.webAgentica.landing.faq.title` | 8 | `Antes de actuar, aclaremos lo esencial.` | none | Capa de objeciones después de la captura, no otra promesa de tráfico. |
+| `think.webAgentica.landing.faq.llms` | 8 | `Es un archivo auxiliar ... no reemplaza una decisión de producto, datos o capacidades por sí solo.` | none | Aclara `llms.txt` sin convertirlo en la tesis de la guía. |
+| `think.webAgentica.landing.footer.kicker` | 9 | `Efeonce Think` | none | Contexto editorial de la marca. |
+| `think.webAgentica.landing.footer.body` | 9 | `Ideas y capacidades para la web que ya están usando tus clientes.` | none | Cierre de marca concreto, sin promesa. |
+| `think.webAgentica.landing.footer.explore` | 9 | `Explora la guía` | none | Navegación de recuperación a los hitos de lectura. |
+| `think.webAgentica.landing.footer.signal` | 9 | `La nueva interfaz ya está abierta.` | none | Señal editorial, no dato cuantitativo. |
+| `think.webAgentica.landing.form.corporateGate` | 7 | `Usa tu correo corporativo — el ebook está pensado para equipos y marcas reales.` | none | El form exige correo corporativo (bloquea free/disposable), igual que el grader. |
 
-Las respuestas del FAQ se toman verbatim del PR #12 (`renderVals()`), revisadas es-CL. Toda métrica conserva su fuente literal.
+Las preguntas y respuestas del FAQ se adaptan al contenido vigente del ebook y se revisan en es-CL; la explicación de `llms.txt` conserva su rol acotado. Toda métrica conserva su fuente literal.
 
 ## State Copy
 
@@ -142,8 +146,8 @@ Las respuestas del FAQ se toman verbatim del PR #12 (`renderVals()`), revisadas 
 - Scenario file: capture local de Think (`scripts/capture.mjs /web-agentica web-agentica-landing`) — GVC de greenhouse-eo no apunta al repo externo; se usa el capturador propio de Think.
 - Route: `/web-agentica` en Think local y staging/prod tras deploy.
 - Viewports: desktop 1440, laptop 1280, mobile 390.
-- Required steps: cargar página, confirmar meta indexable + canonical sin `/index.html`, capturar hero settled, esperar `<greenhouse-form>`, verificar fold con tesis + CTA, capturar loader/ready del form, scroll por stats/thesis/inside/audience/FAQ, capturar success sintético en modo controlado, capturar reduced-motion.
-- Required captures: hero desktop, stats, form loader, form ready, success, full page desktop, hero mobile, form mobile, full page mobile.
+- Required steps: cargar página, confirmar meta indexable + canonical sin `/index.html`, capturar hero settled, esperar `<greenhouse-form>`, verificar fold con tesis + CTA, capturar loader/ready del form, recorrer stats → tesis → actos → audience → credibility brief → form → FAQ, probar hover de cards de audiencia en puntero fino y capturar reduced-motion.
+- Required captures: hero desktop, stats, audience desktop/hover, author+form, form loader, form ready, success, full page desktop, hero mobile, audience mobile, form mobile, full page mobile.
 - Required `data-capture` markers: los 10 listados arriba.
 - Assertions: sin scores/promesas falsas, sin campos locales fuera del `<greenhouse-form>`, script carga desde Greenhouse, ruta indexable, sin DM Sans ni `_ds/` foráneo, sin overflow horizontal.
 - Scroll-width checks: `scrollWidth <= clientWidth` en 1440 y 390.
@@ -162,6 +166,7 @@ Las respuestas del FAQ se toman verbatim del PR #12 (`renderVals()`), revisadas 
 - Decisión (cursor del hero, 2026-07-10): el cursor grande no queda congelado en la imagen. Se extrae de forma mecánica sobre su transparencia original y se monta como una capa SVG alineada al arte: entrada desde el borde inferior, recorrido hacia la interfaz, clic teal y salida invisible antes de reiniciar. Es sólo una metáfora de interacción humana, por lo que no recibe semántica ni eventos. En móvil y reduced-motion se suprime para preservar la composición estática y la prioridad del CTA.
 - Decisión (ruta de actos, 2026-07-10): los cinco actos no se convierten en tabs, wizard ni carrusel — no existe una acción o contenido diferido que justifique un control interactivo. Se conserva el `<ol>` completo y cada card expone su título y síntesis sin hover. La sensación de recorrido viene de una rail visual conectada, un pulso de progreso al entrar la sección y una elevación/spotlight no esencial sobre puntero fino. Móvil apila los capítulos como lectura lineal; reduced-motion conserva rail y jerarquía, sin recorrido ni elevación.
 - Decisión (vitalidad editorial): se elimina el recuadro inclinado detrás del arte del hero; competía con la propia imagen. Las señales usan un halo de puntero puramente decorativo y reveal escalonado; la tesis gana dos lanes explícitas que materializan las dos interfaces; el footer se convierte en un cierre editorial de tres zonas. Ninguna de estas capas depende de hover, JavaScript o motion para comunicar significado; reduced motion muestra el estado final.
+- Decisión (audiencia y arco, 2026-07-10): la auto-calificación deja de ser dos recuadros equivalentes. El primer artículo explica el punto de partida y el marco que entrega el ebook; el segundo usa una exclusión honesta sin crear una zona vacía. Ambos conservan toda la información sin hover y se apilan en móvil. El orden editorial queda: evidencia → problema → mapa → auto-calificación → credencial Efeonce → captura → objeciones → cierre. La credencial va antes del formulario para que Efeonce sea guía antes de pedir datos; se retira el framing de SEO del copy de autor y `llms.txt` se mantiene como detalle auxiliar, no como la promesa del ebook.
 - Decisión (política de email): **solo correo corporativo** (bloquea free/disposable), igual que el grader — el ebook es para equipos/marcas reales; el gate lo aplica el contrato gobernado del form (`emailPolicy`), no la landing.
 - Open risks: el **form instance del ebook (form_key) + el fulfillment de email + el ebook PDF** no existen todavía (dependencia backend-data en greenhouse-eo, TASK-1375); el origin `think.efeoncepro.com` debe estar autorizado en el allowlist gobernado para este form.
 - Follow-up: si el fulfillment del ebook no está listo, los slices 1–2 (scaffold + port visual) igual proceden; el slice del form embed queda bloqueado hasta la foundation.

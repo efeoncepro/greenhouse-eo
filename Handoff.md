@@ -1,3 +1,11 @@
+## Sesión 2026-07-10 — Think `/web-agentica`: audiencia y arco narrativo — RELEASED
+
+> **Publicado:** Think `0924f4d` (`feat(web-agentica): strengthen audience narrative`) llegó a `main`; Vercel Production `dpl_1RrahyGh9EjEEQZzt8WxD7Sp7jm8` está Ready y `https://think.efeoncepro.com/web-agentica` sirve la versión.
+>
+> **Cambio:** la secuencia queda evidencia → problema → mapa de cinco actos → auto-calificación → credencial Efeonce → captura → objeciones → cierre. La audiencia deja de ser dos cards vacías/equivalentes: `Tu punto de partida` presenta el marco y `Una aclaración honesta` filtra tácticas aisladas. Efeonce Think aparece antes del form como guía; el FAQ aclara objeciones, y `llms.txt` se presenta como auxiliar, no como la tesis SEO del ebook.
+>
+> **Evidencia:** `pnpm type-check` + `pnpm build` Think verdes. Smoke productivo en 1440 y 390/reduced-motion: orden DOM audience→author→form, cero overflow/errores de aplicación; hover desktop de audiencia `translateY(-5.6px)` + halo, y fallback móvil/reduced sin animation/lift ni cursor hero. Capturas: `efeonce-think/.captures/web-agentica-production-narrative/{desktop-audience-hover,mobile-audience-reduced}.png`. No se ejecutó submit ni se creó un lead en QA.
+
 ## Sesion 2026-07-10 - Think `/web-agentica` ruta de cinco actos - RELEASED
 
 > **Publicado:** Think `2aff0ae` (`feat(web-agentica): enrich chapter journey`) llegó a `main`; Vercel Production `dpl_CwTGBxEShzpgxmVSz19mbpUfjo35` está Ready y `https://think.efeoncepro.com/web-agentica` sirve la versión nueva.
