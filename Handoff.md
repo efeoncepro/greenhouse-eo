@@ -42,10 +42,15 @@
 > con pools vía Connector (invisibles a `lsof :15432`). Kill → 3/100 al instante. Lección + prevención en
 > `docs/issues/resolved/ISSUE-119-*`.
 >
-> **Rollout pendiente:** push cuando el operador lo indique; flip conjunto `HIRING_ACTIVATION_ENABLED` +
+> **Rollout APLICADO 2026-07-10 (por instrucción del operador):** push a `develop` (`e10400603`, 11 commits —
+> 8 de TASK-770 + 3 doc-only ajenos de web-agentica). 7/7 workflows verdes (CI, Task Contract, CLAUDE.md
+> governance, Playwright smoke, Ops/Commercial/ICO worker deploys). **ops-worker revisión `00477-nm6`
+> sirviendo 100%**; staging Vercel Ready. La API + readers + señal quedaron desplegados.
+> **Sigue pendiente por diseño (no es deuda):** flip conjunto `HIRING_ACTIVATION_ENABLED` +
 > `HIRING_HANDOFF_BRIDGES_ENABLED` en staging cuando TASK-1368 entregue la UI → smoke real → sign-off
-> People/HRIS → prod. Docs: manual `activar-colaborador-desde-hiring.md`, funcional hiring-desk §Handoff,
-> skill talent-people (espejos), deltas EVENT_CATALOG/HIRING_ATS/HRIS.
+> People/HRIS → prod (secuencia en el ledger). Promoción develop→main con el próximo release del control plane.
+> Docs: manual `activar-colaborador-desde-hiring.md`, funcional hiring-desk §Handoff, skill talent-people
+> (espejos), deltas EVENT_CATALOG/HIRING_ATS/HRIS.
 
 ## Sesion 2026-07-10 - TASK-770 Hiring→HRIS activation bridge iniciada - Claude
 
