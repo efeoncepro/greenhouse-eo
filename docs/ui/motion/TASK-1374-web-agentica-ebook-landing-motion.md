@@ -29,6 +29,7 @@
 | Hero signal / route nav | Initial load → primera lectura | Evidencia editorial queda estable; el recorrido aparece suavemente tras el primer scroll. | CSS + listener pasivo | yes |
 | Signal cards | Scroll into view + pointer | Reveal escalonado; halo teal sigue el puntero como realce decorativo, sin ocultar contenido. | CSS + custom props (`--spot-x/y`) | yes |
 | Thesis lanes | Scroll into view | Dos interfaces entran desde lados opuestos; el pulso conector orienta la transición humano→agente. | CSS | yes |
+| Ruta de cinco actos | Scroll into view + pointer fino | Rail editorial se habilita junto a las cards; un pulso recorre la conexión una vez. Las cards ya visibles ganan elevación, borde y spotlight localizado al hover. | CSS compositor-only + custom props existentes | yes |
 | Section reveals | Scroll into view | Opacity + translateY < 16px al entrar cada sección. | CSS / IntersectionObserver | yes |
 | Form contract loader | Renderer no listo | Skeleton estable de "cargando formulario"; sin spinner-only. | CSS skeleton | yes |
 | Form host ready | Contrato resuelto | Reemplazo del skeleton con transición corta opacity/translate. | CSS transition | yes |
@@ -62,6 +63,7 @@
 | FAQ toggle | colapsado | expandido | 160–240ms ease-out | altura + opacity del panel | display inmediato |
 | Signal cards | sección fuera de viewport | cards visibles | 240–420ms ease-out | stagger corto + halo por puntero opcional | cards visibles, sin halo dinámico |
 | Thesis lanes | sección fuera de viewport | dos interfaces visibles | 240–360ms ease-out | entradas opuestas + pulso conector | ambas lanes visibles, conector estático |
+| Ruta de cinco actos | sección fuera de viewport | rail + cinco capítulos | entrada corta escalonada; pulso único tras la llegada | las cards conservan contenido completo en su estado natural; hover solo en puntero fino aporta lift/spotlight y no desbloquea información | rail y cards estáticas, sin lift ni pulso |
 | Error | cualquier loading/pending | error/degraded | 0–160ms | detener motion ambiental; recovery estable | error estático |
 
 ## Primitive & Token Mapping
@@ -98,6 +100,7 @@
 - Compositor-only: transform/opacity/background-position/mask-position; la capa SVG del cursor sólo anima `transform`, `opacity` y el radio de un anillo breve.
 - Layout reads/writes: sin loops de medición; sin scroll-jacking.
 - Animation scope: hero (grid/beams/entrance), signal cards, thesis lanes, section reveals, form loader, success/error y footer signal.
+- Chapter route: no se carga una isla ni se crea un tab/carousel. El mismo `IntersectionObserver` progresivo de la landing habilita la llegada; el spotlight reutiliza el listener `data-spotlight` ya acotado a puntero fino.
 - Cursor assets: el hero base responsivo se exporta sin el cursor de origen; `hero-cursor.png` conserva el recorte transparente y se monta sólo en desktop sobre el mismo `viewBox` 1536×1024. No hay inpainting/generación ni JavaScript de animación.
 - Compact constraint: el cursor se omite en `max-width: 920px` para conservar el hero móvil como lectura editorial, no como demo pequeña.
 - Counter constraints: los count-ups son datos citados con fuente, no métricas propias inventadas; con fallback estático.
@@ -126,6 +129,7 @@
 - Delta 2026-07-10 (workspace): el estado de captura adopta una rail editorial navy + una zona de formulario clara. La rail sólo anima un indicador y un halo con `transform`; los campos conservan la microinteracción del renderer (focus halo, check de validación, pending y compresión del CTA). `prefers-reduced-motion` elimina ambas animaciones ambientales y mantiene la jerarquía completa.
 - Delta 2026-07-10 (hero direction): la señal Cloudflare deja de ser una píldora y pasa a ledger editorial estático; el arte recibe dos anotaciones puramente decorativas que conectan las dos interfaces con el H1. La navegación inferior no compite en la primera impresión desktop: aparece tras `scrollY > 56` con opacidad/transform. Es progresiva: sin JS, en móvil y con reduced-motion ya está visible; `:focus-within` la vuelve visible para teclado.
 - Delta 2026-07-10 (cursor profundo): se extrae mecánicamente el cursor grande del PNG original porque ocupa un área ya transparente; el arte principal pasa a una base idéntica sin ese cursor. Un SVG decorativo, alineado al `viewBox` del activo, lo reintroduce en desktop con un loop de entrada → recorrido → clic → salida. El anillo teal confirma el clic sin simular una acción del usuario. Se rechazan seguimiento real del mouse, scroll-linked motion e inpainting generativo: introducen costo, ambigüedad o alteran el activo editorial sin añadir significado. Móvil y `prefers-reduced-motion` muestran la base estática.
+- Delta 2026-07-10 (capítulos como recorrido): la fila plana de cards pasa a una ruta editorial con rail de progreso y jerarquía de capítulo. La coreografía sólo expresa orden de lectura: cards entran sin quedar ocultas sin JS, la rail recibe un pulso único y el pointer fino activa spotlight/elevación superficial. Se descartan carousel, tabs y auto-advance porque los cinco resúmenes ya son contenido completo y no hay una selección que el usuario deba confirmar. Móvil/reduced-motion conservan todos los capítulos visibles y estáticos.
 - Reuse / extend / new primitive: reuse del shell de Think + CSS route-local + renderer Growth Forms; sin primitive nueva.
 - Open risks: portar los efectos sin regresión de contraste/perf; el fold no debe dañar LCP en mobile.
 - Follow-up: si algún reveal necesita GSAP, mantenerlo scoped y documentar el token de timing.
