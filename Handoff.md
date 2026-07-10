@@ -15,6 +15,14 @@
 > Sigue pendiente del programa (gates de operador, ya en ledger/follow-ups): eval baseline IA + sign-off HR/Legal
 > para el flip de 1361; banco de preguntas SME y actionKey Nexa sin task asignada.
 
+## Sesión 2026-07-10 — Think `/web-agentica`: inspección fluida del cursor — RELEASED
+
+> **Publicado:** Think `890a492` (`feat(web-agentica): choreograph cursor inspection path`) llegó a `main`; Vercel Production `dpl_4TzU9Z7WMv2SjU1mne4kyr22ESFi` está Ready y `https://think.efeoncepro.com/web-agentica` sirve la versión.
+>
+> **Cambio:** el cursor deja de recorrer segmentos aislados. Ahora usa una única curva Bézier con micro-pausas de lectura: tarjeta FTR → menú → código → barra de herramientas → canvas → clic → salida invisible. El ciclo de 7,2 s está dedicado a cruzar el arte completo; las pausas no superan 220 ms y el clic sigue siendo la única confirmación explícita.
+>
+> **Evidencia:** Think `pnpm type-check` + `pnpm build` verdes. Playwright productivo fijó y revisó los cinco hitos: punta en FTR, menú, código, herramientas y canvas; halo/clic sólo en canvas, `pointer-events:none`, HTTP 200, cero errores/overflow en 1440 y cursor oculto a 390/reduced-motion. Capturas: `efeonce-think/.captures/web-agentica-cursor-inspection-production/{ftr,menu,code,tools,canvas}.png`.
+
 ## Sesión 2026-07-10 — Think `/web-agentica`: SEO y AEO semántico — RELEASED
 
 > **Publicado:** Think `781a386` (`feat(web-agentica): strengthen SEO and AEO metadata`) llegó a `main`; Vercel Production `efeonce-think-66qo89ktk-efeonce-7670142f.vercel.app` está Ready y `https://think.efeoncepro.com/web-agentica` sirve la versión.

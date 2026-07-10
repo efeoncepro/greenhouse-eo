@@ -2,6 +2,8 @@
 
 ## 2026-07-10
 
+- **Ebook `/web-agentica` — cursor como inspección continua.** Think `890a492` sustituye los segmentos del puntero por una curva Bézier que explora FTR, menú, código, herramientas y canvas antes del clic. El loop mantiene salida invisible, no intercepta clicks y conserva el arte estático en touch/reduced-motion. Producción `dpl_4TzU9Z7WMv2SjU1mne4kyr22ESFi` Ready; smoke sin errores ni overflow.
+
 - **Hiring/ATS — hardening del Assessment Engine (TASK-1383, EPIC-011, code complete en develop local).** Auditoría 2-lentes de la foundation 1360/1361 → 10 hallazgos cerrados el mismo día: idempotencia real del autosave a nivel DB (los duplicados sesgaban el score final), anti-anclaje independent-before-debrief implementado, expiración de token/time-limit operativa con transición a `expired`, guard del answer_key testeado, `needs_human_rating` derivado del tipo real, actor del SME gate auditable, dedupe del ledger de propuestas IA, snapshot del assessment al momento de decidir (reconstruible para el validity loop), y **templates inmutables una vez usados** (trigger + version/supersedes — contrato de versionado decidido antes de acumular datos de validez/fairness). 6 live guards E2E contra PG real verdes. Deltas a 1363/1364/1365.
 
 - **Ebook `/web-agentica` — SEO/AEO semántico y distribuible.** Think `781a386` añade metadatos únicos de búsqueda/compartir, alternativas de imagen, una respuesta visible y un grafo JSON-LD fiel de organización, sitio, página, ebook y FAQ; sitemap y `llms.txt` describen la ruta pública. Producción Ready; smoke confirma HTML, schema, 1440/390/reduced-motion sin overflow ni errores. La promesa sigue siendo la web agéntica, no una oferta genérica de SEO.
