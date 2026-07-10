@@ -1,3 +1,14 @@
+## Sesion 2026-07-10 - TASK-1364 Validity Loop COMPLETE (code) - Claude
+
+> **TASK-1364 completa en develop local (sin push).** El loop "¿el assessment predice?" quedó implementado:
+> `getAssessmentValidity` (join activation_request 770 → member → outcome ICO rpa_avg primario /
+> eval_summaries secundario etiquetado × score AL DECIDIR — snapshot 1383) con Pearson por competencia,
+> umbrales honestos (n<10 SIN correlación / 10-29 preliminar / ≥30 establecida), agregados sin PII,
+> evidencia AI-Act append-only (`assessment_validity_evidence`, migración APLICADA) y API GET/POST con
+> capabilities existentes. 8/8 tests incl. live contra PG real (join CTE+LATERAL+jsonb verificado; hoy
+> degrada honesto: 0 hires con assessment). El loop acumula evidencia automáticamente con cada
+> contratación que cierre el bridge de 770. Delta a 1365 (reusa el join + umbrales + patrón evidencia).
+
 ## Sesion 2026-07-10 - TASK-1384 COMPLETE — banco lote 1 activo (review delegado) - Claude
 
 > **TASK-1384 completa: cobertura 9/9 ✅, 25 preguntas ACTIVAS para Account Manager L2.** El S4 (review SME)

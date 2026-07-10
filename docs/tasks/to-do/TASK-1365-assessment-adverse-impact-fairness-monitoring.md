@@ -1,5 +1,10 @@
 # TASK-1365 — Adverse-Impact & Fairness Monitoring
 
+## Delta 2026-07-10 — TASK-1364 completa: el join score↔outcome existe y es reusable
+
+- `getAssessmentValidity` (`src/lib/hiring/assessment/validity/get-validity.ts`) implementó el join canónico activation_request(770)→member→outcome (ICO rpa_avg primario / eval_summaries secundario, fuente etiquetada) — el `[opcional]` de esta task ya no requiere construirlo. Umbrales de muestra resueltos (n<10 sin reporte / 10-29 preliminar / ≥30 establecida) reusables para el k-anon del monitor. Evidencia AI-Act append-only en `greenhouse_hr.assessment_validity_evidence` (mismo patrón para el bias testing).
+
+
 ## Delta 2026-07-10 — TASK-1383: versionado de templates resuelto (supuesto de este monitor)
 
 - `getSelectionFairness(stage|template, window)` puede correlacionar por `template_id` con seguridad: TASK-1383 hizo los templates inmutables una vez usados (trigger) + `version`/`supersedes_template_id`. Sin esto, un template editado in-place habría mezclado versiones en las tasas por template sin detectarlo.

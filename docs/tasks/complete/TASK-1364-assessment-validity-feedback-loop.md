@@ -20,7 +20,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -33,7 +33,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `COMPLETE 2026-07-10 — reader + evidencia AI-Act live; nace reportando insufficient_sample (0 hires con assessment — honesto por diseño); acumula evidencia con cada contratación de 770`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none` (1360 complete)
@@ -165,28 +165,32 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth (join score↔outcome) + contract surface + consumers nombrados.
-- [ ] Invariante read-only / no-gate / outcome-canónico explícito y con test.
-- [ ] Degradación honesta con muestra insuficiente.
-- [ ] Evidencia DB del join contra PG real.
-- [ ] Sin PII per-candidato en el reporte agregado.
+- [x] Source of truth (join score↔outcome) + contract surface + consumers nombrados.
+- [x] Invariante read-only / no-gate / outcome-canónico explícito y con test.
+- [x] Degradación honesta con muestra insuficiente.
+- [x] Evidencia DB del join contra PG real.
+- [x] Sin PII per-candidato en el reporte agregado.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en `src/lib/hiring/assessment/validity/**`, no en UI.
-- [ ] Modelado como reader canónico; sin write.
-- [ ] Read expuesto como recurso; sin command (read-only).
-- [ ] Reusa capability `hiring.assessment.read`; sin capability nueva (o grant + coverage si se agrega).
-- [ ] Camino programático: `/api/hiring/assessments/validity/**`; Nexa por construcción.
-- [ ] N/A write (no muta).
-- [ ] Un reader, muchos consumers.
-- [ ] Parity check = SÍ.
+- [x] Lógica en `src/lib/hiring/assessment/validity/**`, no en UI.
+- [x] Modelado como reader canónico; sin write.
+- [x] Read expuesto como recurso; sin command (read-only).
+- [x] Reusa capability `hiring.assessment.read`; sin capability nueva (o grant + coverage si se agrega).
+- [x] Camino programático: `/api/hiring/assessments/validity/**`; Nexa por construcción.
+- [x] N/A write (no muta).
+- [x] Un reader, muchos consumers.
+- [x] Parity check = SÍ.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     El agente que toma esta task ejecuta Discovery y produce
-     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ZONE 2 — EXECUTION LOG
      ═══════════════════════════════════════════════════════════ -->
+
+### Execution Log (2026-07-10, Claude — local-first develop)
+
+- **S1**: migración `20260710213822022` — `greenhouse_hr.assessment_validity_evidence` append-only (triggers anti-UPDATE/DELETE) para la documentación técnica AI-Act. Aplicada + verificada.
+- **S2-S3**: `src/lib/hiring/assessment/validity/` — `stats.ts` (Pearson puro con null honesto, verdicts n<10/10-29/≥30), `get-validity.ts` (un query: activation_request 770 → member → outcome ICO rpa_avg primario / eval_summaries secundario etiquetado × score al decidir snapshot 1383 + per-competencia; agregados SIN PII), `evidence.ts` (snapshot inmutable). API GET (hiring.assessment.read) + POST evidencia (hiring.assessment.score) — cero capabilities nuevas.
+- **S4**: 8/8 tests — Pearson/verdicts, read-only estático, no-PII en shapes, y **live contra PG real**: el join CTE+LATERAL+jsonb+date-math corre, degrada honesto (`insufficient_sample`, `outcomeSource:none` con 0 hires) y la evidencia rechaza UPDATE por trigger.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -258,11 +262,11 @@ Reusar el patrón de readers analíticos del repo (person-360 facets / ICO). El 
 
 ## Acceptance Criteria
 
-- [ ] Existe el join score↔outcome (application→member→desempeño) sobre el mismo `identity_profile_id`.
-- [ ] `getAssessmentValidity` reporta correlación por competencia/plantilla + muestra + verdict, con degradación honesta si n es bajo.
-- [ ] El reader es read-only; NUNCA reescribe scores ni convierte el score en gate.
-- [ ] El outcome sale de la fuente canónica, no inline.
-- [ ] La evidencia de validez queda auditable (documentación AI-Act); sin PII per-candidato en agregados.
+- [x] Existe el join score↔outcome (application→member→desempeño) sobre el mismo `identity_profile_id`.
+- [x] `getAssessmentValidity` reporta correlación por competencia/plantilla + muestra + verdict, con degradación honesta si n es bajo.
+- [x] El reader es read-only; NUNCA reescribe scores ni convierte el score en gate.
+- [x] El outcome sale de la fuente canónica, no inline.
+- [x] La evidencia de validez queda auditable (documentación AI-Act); sin PII per-candidato en agregados.
 
 ## Verification
 
@@ -273,12 +277,12 @@ Reusar el patrón de readers analíticos del repo (person-360 facets / ICO). El 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1360/1365)
+- [x] `Lifecycle` sincronizado
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1360/1365)
 
 ## Follow-ups
 
