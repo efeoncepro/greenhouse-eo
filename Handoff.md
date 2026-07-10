@@ -20,10 +20,17 @@
 > (`selected`→`rejected|withdrawn` sobre handoff existente → cancelled/blocked:decision_revoked, enum de 7 razones),
 > reopen de cancelled, approved→completed directo (in_setup opcional).
 >
-> **Rollout pendiente (no bloquea el cierre local-first):** (1) push a `develop` cuando el operador lo indique;
-> (2) **redeploy del ops-worker** para que registre el projection (hasta eso, los `decided` nuevos quedan en la cola
-> `people` sin drenar — hoy no hay tráfico de decisiones); (3) flag de bridges queda OFF hasta que TASK-770 tenga su
-> consumer (fila en § Pendientes del ledger). TASK-770 quedó desbloqueada con `## Delta` (cola + command + copy listos).
+> **Rollout APLICADO 2026-07-10 (por instrucción del operador):** push a `develop` (`92749101b`, 10 commits — 9 de
+> TASK-356 + 1 doc-only ajeno). Workflows del push verdes: Task Contract, CLAUDE.md governance, Playwright smoke,
+> Commercial Cost Worker Deploy y **Ops Worker Deploy** (revisión `ops-worker-00476-l6z` sirviendo 100%; el lane
+> `ops-reactive-people` corre en la revisión nueva con 0 pendientes → projection `hiring_handoff_materialize`
+> registrado y drenando). Staging Vercel deployado desde el mismo push. **Sigue pendiente por diseño:** flag de
+> bridges OFF hasta que TASK-770 tenga su consumer (secuencia de flip en el ledger); la promoción develop→main
+> ocurrirá con el próximo release del control plane (el materializer no la necesita — corre en el worker compartido).
+> TASK-770 quedó desbloqueada con `## Delta` (cola + command + copy listos).
+> **Docs post-rollout:** manual `docs/manual-de-uso/hr/operar-hiring-handoff.md`, runtime binding del handoff en la
+> skill `greenhouse-talent-people-operator` (espejos .claude/.codex) y §Handoff downstream en
+> `docs/documentation/hr/hiring-desk.md` + índices.
 
 ## Sesion 2026-07-10 - TASK-356 Hiring Handoff reactivo iniciada - Claude
 
