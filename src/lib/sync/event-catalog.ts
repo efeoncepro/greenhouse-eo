@@ -677,6 +677,9 @@ export const EVENT_TYPES = {
   assetAttached: 'asset.attached',
   assetDeleted: 'asset.deleted',
   assetDownloaded: 'asset.downloaded',
+  // TASK-1362 — el scan bloqueó el asset antes del attach (suplantación de tipo,
+  // firma de malware, o scanner caído). Sin consumer reactivo: audit + signal.
+  assetQuarantined: 'asset.quarantined',
 
   // Capacity Economics
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',

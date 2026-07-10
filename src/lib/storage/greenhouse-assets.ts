@@ -303,7 +303,9 @@ const mapAssetRow = (row: AssetRow): GreenhouseAssetRecord => ({
   assetId: row.asset_id,
   publicId: row.public_id,
   visibility: row.visibility === 'public' ? 'public' : 'private',
-  status: (['attached', 'orphaned', 'deleted'].includes(row.status) ? row.status : 'pending') as GreenhouseAssetStatus,
+  status: (['attached', 'orphaned', 'deleted', 'quarantined'].includes(row.status)
+    ? row.status
+    : 'pending') as GreenhouseAssetStatus,
   bucketName: row.bucket_name,
   objectPath: row.object_path,
   filename: row.filename,
@@ -674,6 +676,65 @@ export const attachAssetToAggregate = async ({
       ownerSpaceId: asset.ownerSpaceId,
       ownerMemberId: asset.ownerMemberId,
       actorUserId
+    }
+  }, client)
+
+  return asset
+}
+
+/**
+ * TASK-1362 — Transición terminal `pending → quarantined`.
+ *
+ * Se invoca cuando el escaneo emite un veredicto bloqueante. El asset NO se
+ * borra (los bytes son evidencia del intento) y NUNCA se adjunta a su aggregate:
+ * queda fuera del alcance de `downloadPrivateAsset` y de cualquier resolver.
+ *
+ * Sólo transiciona desde `pending`. Un asset ya `attached` no se puede
+ * cuarentenar por esta vía — eso sería un recovery deliberado con humano.
+ */
+export const quarantineAsset = async ({
+  assetId,
+  scanId,
+  verdict,
+  findingCodes,
+  client
+}: {
+  assetId: string
+  scanId: string
+  verdict: string
+  findingCodes: string[]
+  client?: QueryableClient
+}): Promise<GreenhouseAssetRecord | null> => {
+  const rows = await queryAssetRows<AssetRow>(
+    `
+      UPDATE greenhouse_core.assets
+      SET status = 'quarantined'
+      WHERE asset_id = $1 AND status = 'pending'
+      RETURNING *
+    `,
+    [assetId],
+    client
+  )
+
+  const row = rows[0]
+
+  if (!row) return null
+
+  const asset = mapAssetRow(row)
+
+  await publishOutboxEvent({
+    aggregateType: 'asset',
+    aggregateId: asset.assetId,
+    eventType: 'asset.quarantined',
+    payload: {
+      assetId: asset.assetId,
+      publicId: asset.publicId,
+      ownerAggregateType: asset.ownerAggregateType,
+      retentionClass: asset.retentionClass,
+      scanId,
+      verdict,
+      // Códigos estables, nunca el contenido del archivo ni PII del candidato.
+      findingCodes
     }
   }, client)
 
@@ -1126,6 +1187,13 @@ export const downloadPrivateAsset = async ({
 
   if (!asset || asset.status === 'deleted') {
     throw new Error('asset_not_found')
+  }
+
+  // TASK-1362 — un asset en cuarentena nunca sale del bucket por esta ruta, sin
+  // importar la capability del actor. Los bytes se preservan para triage forense;
+  // se acceden por herramienta de operaciones, no por el download del portal.
+  if (asset.status === 'quarantined') {
+    throw new Error('asset_quarantined')
   }
 
   const file = await downloadGreenhouseStorageObject({

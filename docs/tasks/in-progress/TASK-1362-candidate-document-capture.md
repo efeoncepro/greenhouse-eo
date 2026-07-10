@@ -16,7 +16,7 @@ Hechos verificados contra el repo real. La task está bien encuadrada (reusar, n
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

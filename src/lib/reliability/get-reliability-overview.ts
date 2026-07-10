@@ -191,6 +191,7 @@ import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibil
 import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
+import { getAssetScanOpenQuarantineSignal } from './queries/asset-scan-open-quarantine'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
 import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
 // TASK-1085 — Nexa knowledge retrieval observability (moduleKey 'knowledge').
@@ -669,6 +670,7 @@ interface ReliabilityOverviewSources {
 
   /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
   knowledgeQuarantineCount?: ReliabilitySignal | null
+  assetScanOpenQuarantine?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
   /** TASK-1085 — Nexa knowledge retrieval signals (no-source rate + stale-source). */
@@ -1140,6 +1142,7 @@ export const buildReliabilityOverview = (
     ...(sources.workforceUnlinkedInternalUsers ? [sources.workforceUnlinkedInternalUsers] : []),
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
+    ...(sources.assetScanOpenQuarantine ? [sources.assetScanOpenQuarantine] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
     // TASK-1085 — Nexa knowledge retrieval observability (no-source rate + stale-source).
@@ -1703,6 +1706,12 @@ export const getReliabilityOverview = async (
     preloadedSources.knowledgeQuarantineCount !== undefined
       ? preloadedSources.knowledgeQuarantineCount
       : await getKnowledgeQuarantineCountSignal().catch(() => null)
+
+  // TASK-1362 — Assets bloqueados por el escaneo de contenido, sin triage humano.
+  const assetScanOpenQuarantine =
+    preloadedSources.assetScanOpenQuarantine !== undefined
+      ? preloadedSources.assetScanOpenQuarantine
+      : await getAssetScanOpenQuarantineSignal().catch(() => null)
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2491,6 +2500,7 @@ export const getReliabilityOverview = async (
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
     knowledgeQuarantineCount,
+    assetScanOpenQuarantine,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,
     nexaKnowledgeRetrieval,

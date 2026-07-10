@@ -1,6 +1,8 @@
 export type GreenhouseAssetVisibility = 'public' | 'private'
 
-export type GreenhouseAssetStatus = 'pending' | 'attached' | 'orphaned' | 'deleted'
+// TASK-1362 — `quarantined` es terminal: el asset existe (bytes preservados para
+// triage forense) pero NUNCA quedó adjunto a su aggregate ni es descargable.
+export type GreenhouseAssetStatus = 'pending' | 'attached' | 'orphaned' | 'deleted' | 'quarantined'
 
 export type GreenhouseAssetRetentionClass =
   | 'public_media'
