@@ -1,5 +1,28 @@
 # TASK-1362 — Candidate Document Capture
 
+## Delta 2026-07-10 — Ejecución (Discovery recalibró la spec + hallazgo de seguridad)
+
+- **Hallazgo que reordenó los slices:** el upload público de CV ya estaba VIVO y validaba con `file.type` (el MIME
+  declarado por el cliente); nunca se inspeccionaba un byte. Slice 4 (scan) dejó de ser preventivo y pasó a ser
+  **remediación**, así que se ejecutó PRIMERO. Orden real: 4 → 1 → 2 → 3 → 5.
+- **Contextos:** `hiring_application_cv{,_draft}` ya existían (TASK-354/1367). Se agregaron sólo
+  `hiring_candidate_portfolio_file{,_draft}`.
+- **Sin columna nueva:** `candidate_facet.portfolio_url`/`linkedin_url` ya existen (TASK-1367). Confirmado en PG real.
+  No se justificó multi-enlace.
+- **Corrección de la spec:** la columna enmascarada de `person_identity_documents` se llama `display_mask`, NO `value_masked`.
+- **Open Question #1 (servicio de scan) — RESUELTA:** puerto provider-neutral. `structural` (magic bytes + coherencia
+  MIME + hazards PDF) siempre activo, cero infra. `clamav-http` code-complete detrás de `ASSET_MALWARE_SCAN_ENABLED`
+  (default OFF). ClamAV always-on ≈ USD 19-25/mes (estimado sobre la factura real: todo Cloud Run cuesta USD 7,32/30d).
+  Scanners de terceros por API descartados: sacarían el CV del candidato del perímetro (Ley 21.719).
+- **Open Question #2 (sanitize del enlace) — YA RESUELTA upstream** por TASK-1367 (`isSafeHttpUrl`: https-only, sin
+  fetch server-side). El resolver lo consume tal cual.
+- **Over-exposure cerrada (cambio de comportamiento):** el acceso a documentos de candidato era por routeGroup `hr`,
+  lo que se los daba a roles sin ninguna capability de Hiring (`hr_payroll`). Ahora exige `hiring.application.read`.
+- **Retención (Slice 5):** política declarada = 12 meses desde `rejected`/`withdrawn`; consentimiento retirado vence
+  sin ventana; contratados fuera de alcance. El módulo **detecta y alerta, NO borra**: el borrado de PII de personas
+  reales es follow-up gobernado con owner People Ops.
+- **Sin capabilities nuevas** → `capability-grant-coverage` intacto.
+
 ## Delta 2026-07-08 — Revisión 3-lentes (arch-architect + talent/people-ops + product-design)
 
 Hechos verificados contra el repo real. La task está bien encuadrada (reusar, no recrear); ajustes:
@@ -29,7 +52,7 @@ Hechos verificados contra el repo real. La task está bien encuadrada (reusar, n
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `TASK-353`
@@ -281,13 +304,13 @@ Los mapas por-contexto de `greenhouse-assets.ts` son `Record` exhaustivos sobre 
 
 ## Acceptance Criteria
 
-- [ ] CV/muestras se suben como assets privados anclados por `application_id`/`candidate_facet_id`/`identity_profile_id` (NUNCA `member_id`).
-- [ ] `canAccessHiringAsset` autoriza por capability hiring + ownership y niega `client_*`; test verde.
-- [ ] Existe un resolver unificado que devuelve todos los documentos de un candidato (CV/portafolio-archivo assets + `portfolio_url`/`linkedin_url` de 1367 + identidad masked); NO se agrega columna de portafolio nueva salvo justificación de multi-enlace.
-- [ ] La policy de retención/borrado de documentos de candidatos no contratados queda definida (o declarada como follow-up con owner + condición), no PII acumulada indefinidamente.
-- [ ] Documento de identidad reutiliza `person_identity_documents` con masked/reveal + capability `person.legal_profile.reveal_sensitive` + audit; NO se pide en el apply público.
-- [ ] Uploads públicos pasan por quarantine/scan antes de quedar attached; signal de quarantine.
-- [ ] Sin leak de `value_full`; errores canónicos es-CL; respuesta pública genérica.
+- [x] CV/muestras se suben como assets privados anclados por `application_id`/`candidate_facet_id`/`identity_profile_id` (NUNCA `member_id`).
+- [x] `canAccessHiringAsset` autoriza por capability hiring + ownership y niega `client_*`; test verde.
+- [x] Existe un resolver unificado que devuelve todos los documentos de un candidato (CV/portafolio-archivo assets + `portfolio_url`/`linkedin_url` de 1367 + identidad masked); NO se agrega columna de portafolio nueva salvo justificación de multi-enlace.
+- [x] La policy de retención/borrado de documentos de candidatos no contratados queda definida (o declarada como follow-up con owner + condición), no PII acumulada indefinidamente.
+- [x] Documento de identidad reutiliza `person_identity_documents` con masked/reveal + capability `person.legal_profile.reveal_sensitive` + audit; NO se pide en el apply público.
+- [x] Uploads públicos pasan por quarantine/scan antes de quedar attached; signal de quarantine.
+- [x] Sin leak de `value_full`; errores canónicos es-CL; respuesta pública genérica.
 
 ## Verification
 
@@ -299,11 +322,11 @@ Los mapas por-contexto de `greenhouse-assets.ts` son `Record` exhaustivos sobre 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
+- [x] `Lifecycle` sincronizado (`in-progress` — rollout pendiente)
+- [x] archivo en la carpeta correcta (`in-progress/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
 - [ ] chequeo de impacto cruzado (TASK-354/355/356)
 - [ ] delta en `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` si el contrato final difiere
 

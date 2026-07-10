@@ -1,6 +1,75 @@
+## Sesion 2026-07-10 - TASK-1362 Candidate Document Capture - Claude - CODE COMPLETE / ROLLOUT PENDIENTE
+
+> **Hallazgo de seguridad que reordenó la task.** Discovery encontró que el upload público de CV de Careers
+> (`CareersApplyClient` → `POST /api/public/hiring/applications` → `attachPublicCareersCvToApplication`) ya estaba
+> vivo y validaba con `file.type`, el MIME que declara el navegador. Nunca se inspeccionaba un byte: un ejecutable
+> renombrado a `.pdf` entraba al bucket privado y quedaba `attached`. El propio código lo admitía
+> (`scanStatus: 'not_scanned_pdf_only_v1'`). Por eso el Slice 4 (scan) se ejecutó PRIMERO, invirtiendo el orden de
+> la spec: era remediación de una superficie abierta, no un preventivo.
+>
+> **Recalibración de la spec contra el repo real:** los contextos `hiring_application_cv{,_draft}` YA existían
+> (TASK-354/1367) y `candidate_facet.portfolio_url`/`linkedin_url` también (TASK-1367) → NO se agregó columna.
+> La columna de identidad se llama `display_mask`, no `value_masked`. La Open Question del sanitize del enlace ya
+> estaba resuelta upstream (`isSafeHttpUrl`, https-only, sin fetch server-side).
+>
+> **Decisión de arquitectura (Open Question #1, scan service):** puerto provider-neutral (patrón TASK-490). Adapter
+> `structural` (magic bytes + coherencia MIME↔contenido + hazards PDF) corre SIEMPRE, in-process, cero infra —
+> cierra el agujero explotable hoy. Adapter `clamav-http` code-complete detrás de `ASSET_MALWARE_SCAN_ENABLED`
+> (default OFF, **nunca ejercitado contra un servicio real**). Costo estimado sobre la factura real de Cloud Run:
+> ClamAV always-on (min-instances=1, ~2 GiB, no escala a cero) ≈ USD 19-25/mes, contra USD 7,32/30d que cuesta hoy
+> TODO Cloud Run del proyecto. Scanners de terceros por API descartados: exportarían el CV del candidato fuera del
+> perímetro (Ley 21.719). Fail-closed: peor veredicto gana; flag ON sin endpoint → veredicto `error` bloqueante.
+>
+> **Implementado (5 slices):** (4) scan/quarantine + migración `asset_scan_results` append-only + `quarantined` en el
+> CHECK de `assets` + backfill `legacy_unscanned` + outbox `asset.quarantined` + signal
+> `storage.asset_scan.open_quarantine`; (1) contextos `hiring_candidate_portfolio_file{,_draft}` +
+> `canAccessHiringCandidateDocument` capability-based; (2) resolver unificado `resolveCandidateDocuments` +
+> `GET /api/hiring/candidate-facets/[id]/documents`; (3) captura de identidad post-decisión sobre
+> `person_identity_documents` (sin tabla nueva, guardrail ejecutable); (5) retención Ley 21.719 declarada (12 meses) +
+> signal `hiring.candidate_document.retention_overdue`.
+>
+> **Cierre de over-exposure (cambio de comportamiento deliberado):** el acceso a documentos de candidato era por
+> routeGroup `hr`, así que roles sin ninguna capability de Hiring —`hr_payroll`— podían descargar CVs. Ahora exige
+> `hiring.application.read`. Sin capabilities nuevas (todas ya granteadas), así que `capability-grant-coverage` sigue verde.
+>
+> **Evidencia:** migración aplicada y verificada contra Cloud SQL dev (CHECK acepta `quarantined`; backfill escribió la
+> fila `legacy_unscanned` del único CV vivo; el trigger bloquea DELETE y la mutación del veredicto, y permite el triage).
+> SQL del resolver ejercitada contra PG real (ambas ramas: `owner_aggregate_id` para attached, metadata para
+> quarantined/pending — los drafts tienen `owner_aggregate_id NULL`). SQL de retención probada en sus 4 ramas dentro de
+> una transacción con rollback (rechazado hace 18m con ventana 12 → aparece; ventana 24 → no; consentimiento retirado →
+> vencido sin ventana; contratado hace 5 años → nunca). `pnpm test` 8971/0, `pnpm build` y `pnpm local:check` verdes.
+> 98 tests nuevos.
+>
+> **Estado real:** `code complete, rollout pendiente`. En `develop`, local-first, SIN push. Falta: (1) aplicar la
+> migración en staging y prod vía release pipeline; (2) smoke real del apply público (PDF limpio → attached; binario
+> renombrado → quarantined + signal); (3) decidir si se provisiona ClamAV (USD ~20/mes) — hasta entonces el flag queda
+> OFF y el structural sostiene la defensa; (4) el borrado de PII vencida es follow-up gobernado, owner People Ops.
+>
+> **Gap conocido, declarado:** si el apply de Careers migra al renderer nativo de Growth Forms (TASK-1373) con su
+> propio upload (TASK-1372), ese path nuevo DEBE llamar a `scanAssetBytes` antes del attach. Hoy el único camino de
+> upload de CV público pasa por `attachPublicCareersCvToApplication`, que sí escanea.
+
 ## Sesion 2026-07-09 - TASK-355 Hiring Desk - Codex - CODE COMPLETE / ROLLOUT PENDIENTE
 
 > **Goal confirmado:** implementar el HTML interactivo aprobado de Hiring Desk con fidelidad visual y conductual de alto detalle, conectado al runtime real y sin push/deploy automatico.
+>
+> **Aclaración crítica del operador (2026-07-10):** el diseño iterado en Claude Design/HTML aprobado es el contrato de fidelidad para **lo de adentro** del workspace Hiring Desk (tabs, cards, Kanban, drawer, dialogs, estados y microinteracciones). El chrome global de Greenhouse —sidebar, topbar, buscador global, avatar, dock, layout dashboard y menú vertical— **NO** debe reemplazarse por el chrome del HTML. Próximo intento: no tocar `src/app/(dashboard)/layout.tsx` ni navigation chrome; ajustar solo views/componentes internos de Hiring.
+>
+> **Corrección aplicada 2026-07-10:** se mantuvo el chrome global Greenhouse intacto y se ajustó solo el canvas interno de TASK-355. Se reforzó la fidelidad del HTML en densidad, tabs internos, card/lane Kanban, drawer, dialogs, toast bottom-right y microinteracciones (`ghFade`, `ghUp`, `ghPop`, `ghMoved`, drawer slide, reduced-motion). A360 dejó de depender de MUI Tabs y usa tablist custom fiel al HTML con click/flechas/focus. No se reintrodujeron `HiringDeskAppShell`, cambios a `src/app/(dashboard)/layout.tsx` ni componentes custom de chrome.
+>
+> **Corrección visual posterior 2026-07-10:** tras feedback del operador, se volvió a auditar Pipeline contra el HTML aprobado. Se eliminó el wrapper `GreenhouseDragList` del Kanban porque insertaba indicadores/slivers azules ajenos al prototipo; Pipeline ahora usa drag/drop nativo route-local + menú de etapa por teclado. Las cards ya no son anchors con botón anidado (anti-patrón que rompía menú mobile): la superficie visual es draggable, el área principal es un botón semántico independiente y el menú de etapa queda como `IconButton` hermano. Los tabs principales volvieron a ser botones `data-tab` con `router.push` simple, sin estado optimista que mostraba "Pipeline" mientras seguía renderizando "Demanda". El selector de opening usa label corto `Rol · Área` y copy visible del Pipeline quedó canónica es-CL/en-US.
+>
+> **Corrección de scrollbar fantasma 2026-07-10:** se eliminó el scroll vertical accidental sobre el tablist interno de Hiring. Causa verificada: `[data-capture="hiring-tabs"]` quedaba con `scrollHeight > clientHeight` por 2px y `overflowY=auto` al combinar `overflowX:auto` con un contenedor que no estiraba al ancho disponible. Fix en `HiringDeskFrame`: el header de tabs ahora ocupa el ancho disponible, reserva 42px de alto, oculta scrollbars cosméticas y mantiene scroll horizontal táctil sólo cuando haga falta en mobile. Verificación Playwright local: `clientHeight=42`, `scrollHeight=42`, `documentOverflowX=0`, `bodyOverflowX=0`; GVC PASS `.captures/2026-07-10T07-59-21_task355-hiring-tabs-transition`.
+>
+> **Pulido final local 2026-07-10:** se cerró la brecha de baja densidad del Pipeline (runtime real con 1 postulación vs. HTML demo con muchas cards) sin inventar datos: lanes/cards reciben entrada escalonada, empty drop-zones se compactan cuando el pipeline está sparse, el scrollbar horizontal queda como affordance interna del board y se agregan fades de borde en vez de scroll de página. Demand suma iconografía de delta positivo en KPIs y Application 360 oculta scrollbars cosméticas en tabs internas. Se generó auditoría canvas-only contra el HTML aprobado, excluyendo el chrome global: `.captures/task355-hiring-reference-canvas-2026-07-10T08-18-26-140Z/index.html`. GVC final: Pipeline `.captures/2026-07-10T08-19-55_task355-hiring-pipeline-board` (mobile+desktop, microinteracción card hover/focus/reduced-motion incluida) y tabs `.captures/2026-07-10T08-16-47_task355-hiring-tabs-transition`.
+>
+> **Corrección UI enterprise posterior 2026-07-10:** por feedback visual del operador, se corrigió alineación del toolbar Pipeline (selector/count a la izquierda, search/toggle a la derecha, sin solape), placeholder fiel `Buscar postulante…`, helper con icono alineado, lanes/cards con mayor profundidad visual y Publicación con hero/diff cards menos planos. La transición tabs se rehizo con navegación link robusta + entrada `ghHiringPanel` más perceptible + `viewTransitionName='hiring-desk-panel'` (reduced-motion respetado); se retiró el hover gris persistente de la pestaña activa. Evidencia actualizada: Pipeline `.captures/2026-07-10T09-05-35_task355-hiring-pipeline-board` y tabs Demand→Pipeline→Publicación `.captures/2026-07-10T09-07-55_task355-hiring-tabs-transition`.
+>
+> **Pulido Demanda enterprise 2026-07-10:** tras nuevo feedback visual del operador, se enriqueció Demand Desk para acercarla a la referencia Claude Design sin tocar el chrome global: KPIs con gradiente/acento/top glow y delta semántico, toolbar en card premium con grupos izquierda/derecha, controles más compactos y alineados, tabla con header/row hover/CTA más enterprise y labels visibles canónicos (`Abierta`, `Publicada`) en vez de valores raw. Se corrigió el tablist interno para envolver/clippear en xs y evitar overflow cosmético. ADC fue relanzado con `gcloud auth application-default login`, `pnpm pg:connect:status` quedó OK y el localhost quedó corriendo contra Cloud SQL Proxy local + sesión `agent@greenhouse.efeonce.org`. GVC Demand PASS desktop/mobile: `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk`.
+>
+> **Evidencia final 2026-07-10:** `pnpm fe:capture task355-hiring-tabs-transition --env=local` PASS en `.captures/2026-07-10T07-48-54_task355-hiring-tabs-transition` (Demand → Pipeline → Publication). `pnpm fe:capture task355-hiring-pipeline-board --env=local` PASS desktop/mobile en `.captures/2026-07-10T07-49-16_task355-hiring-pipeline-board` (board sin slivers, menú de etapa, rollback). `tsc --noEmit`, `pnpm build`, `pnpm design:lint`, `pnpm task:lint --task TASK-355`, `pnpm ops:lint --changed` verdes. Overflow `doc/body/main = 0` en `/agency/hiring`, `/agency/hiring/pipeline`, `/agency/hiring/publication` para 1440x900 y 390x844. Warning de build restante: broad pattern en roadmap reader, preexistente/no relacionado.
+>
+> **Evidencia 2026-07-10:** `eslint` focal y `tsc --noEmit` verdes; `pnpm design:lint`, `route-reachability-gate`, `task:lint --task TASK-355`, `ops:lint --changed`, `git diff --check` verdes. GVC local: Home `.captures/2026-07-10T04-52-42_inline-home`; Demand/drawer `.captures/2026-07-10T04-52-59_inline-agency-hiring`, `.captures/2026-07-10T04-53-11_inline-agency-hiring-capturedrawer-account-manager`; Pipeline/A360/Publication `.captures/2026-07-10T04-53-26_inline-agency-hiring-pipeline-capturefailure-stage`, `.captures/2026-07-10T04-53-32_inline-agency-hiring-pipeline-captureapplication-first`, `.captures/2026-07-10T04-53-48_inline-agency-hiring-publication`; GVC interactivo `task355-hiring-pipeline-board` desktop/mobile PASS en `.captures/2026-07-10T04-56-20_task355-hiring-pipeline-board`; pruebas Playwright ricas en `.captures/task355-rich-interactions/` (drawer dirty guard, A360 tabs, publication confirm dialog). Overflow de página `0` en Home/Hiring desktop+mobile; solo Kanban conserva scroll interno esperado.
 >
 > **Implementado:** cuatro rutas internas con `CompositionShell`: Demand Desk + drawer/split action/dirty guard, Pipeline de `HiringApplication` con drag/teclado/optimistic rollback, Application 360 con assessment real (incluye review/edición/confirmación humana de sugerencia IA), docs masked, decisión estructurada e historial, y Publication diff/editor/confirmaciones. Copy es-CL/en-US canónica. `decideHiringApplication` usa row lock, idempotencia, reason estructurado, history append-only y outbox `hiring.application.decided` en la misma tx. ViewCodes corregidos a `gestion.hiring*`; migración aplicada en Cloud SQL dev.
 >

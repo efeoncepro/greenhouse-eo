@@ -20,6 +20,72 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-10 — Candidate document capture: scan/quarantine, resolver unificado y retención (TASK-1362)
+
+### Contexto: superficie abierta, no preventivo
+
+El upload público de CV (TASK-354/1367) estaba vivo validando con `file.type` — el MIME que declara el navegador.
+Ningún byte se inspeccionaba. Un binario renombrado a `.pdf` entraba al bucket privado y quedaba `attached`. El
+escaneo dejó de ser un preventivo y se implementó como remediación, antes que el resto de la task.
+
+### Escaneo de assets — puerto provider-neutral
+
+`src/lib/storage/asset-scan/` es un puerto (mismo patrón que la signature platform de TASK-490):
+
+- `structural` — magic bytes, coherencia MIME↔contenido, hazards de PDF (`/Launch`, `/EmbeddedFile`, `/RichMedia`,
+  `/XFA` bloquean; `/JavaScript` y `/OpenAction` son advisory porque los emiten exportadores legítimos). Corre
+  SIEMPRE, in-process, sin infraestructura.
+- `clamav-http` — behind `ASSET_MALWARE_SCAN_ENABLED` (default OFF). Composición, no reemplazo: el peor veredicto gana.
+
+Lifecycle: `pending → scan → attached | quarantined`. `quarantined` es terminal — los bytes se preservan para triage
+forense, el asset nunca se adjunta y `downloadPrivateAsset` lo rechaza sin importar la capability del actor.
+
+`greenhouse_core.asset_scan_results` es append-only por trigger: sólo las columnas `resolution_*` (triage humano)
+pueden mutar. Outbox `asset.quarantined`; signal `storage.asset_scan.open_quarantine` (steady 0; `infected`/`error`
+escalan a error).
+
+### Invariantes operativos para agentes — Candidate document capture
+
+- **NUNCA** confiar en `file.type` (ni en la extensión) para decidir el tipo de un upload. Es un valor del cliente. El
+  tipo real lo determinan los magic bytes vía `scanAssetBytes`.
+- **NUNCA** adjuntar un asset que venga de la web pública sin pasar por `scanAssetBytes` antes del attach. Si aparece
+  un camino de upload nuevo (p. ej. el renderer nativo de Growth Forms, TASK-1372/1373), DEBE llamar al escáner.
+- **NUNCA** degradar en silencio a "sin antivirus": con `ASSET_MALWARE_SCAN_ENABLED=true` y sin
+  `ASSET_MALWARE_SCAN_ENDPOINT`, el veredicto es `error` (bloqueante). Fail-closed.
+- **NUNCA** hacer fallar la postulación porque su archivo quedó en cuarentena: confirmaría al atacante qué payload fue
+  rechazado. La postulación se acepta; el documento se resuelve como `quarantined` y el signal levanta la mano.
+- **NUNCA** hacer `UPDATE`/`DELETE` sobre `asset_scan_results` fuera de las columnas `resolution_*` (el trigger aborta).
+- **NUNCA** autorizar documentos de candidato por routeGroup. El predicado canónico es
+  `canAccessHiringCandidateDocument` (capability `hiring.application.read` + `client_*` denegado por `tenantType`).
+  El check por routeGroup `hr` le daba los CV a roles sin ninguna capability de Hiring (`hr_payroll`).
+- **NUNCA** anclar un documento de candidato por `member_id`: un candidato no tiene member hasta el handoff
+  (TASK-356). Se ancla por `identity_profile_id` / `candidate_facet_id` / `application_id`.
+- **NUNCA** pedir el documento de identidad en el apply público. `captureCandidateIdentityDocument` exige actor
+  autenticado Y una decisión favorable (`selected`/`backup_selected`) — el guardrail es código, no comentario.
+- **NUNCA** exponer `value_full` de un documento de identidad por el resolver. Sale sólo por el reveal auditado de
+  TASK-784 (capability + reason ≥5 chars + audit append-only).
+- **NUNCA** crear una columna de portafolio nueva: `candidate_facet.portfolio_url`/`linkedin_url` existen desde
+  TASK-1367 y ya vienen saneados (`isSafeHttpUrl`, https-only, sin fetch server-side).
+- **NUNCA** borrar documentos de candidatos automáticamente. `retention.ts` detecta y alerta; el borrado de PII de
+  personas reales es un comando gobernado con humano en el loop (owner People Ops).
+
+### Resolver unificado
+
+`resolveCandidateDocuments` (`src/lib/hiring/documents/`) reúne archivos + enlaces + identidad enmascarada. Un
+primitive, muchos consumers (desk TASK-355, handoff TASK-356, Nexa/MCP por construcción vía
+`GET /api/hiring/candidate-facets/[candidateFacetId]/documents`). No degrada en silencio: si una fuente falla, la
+excepción sube — "sin documentos" y "la consulta falló" no pueden verse iguales.
+
+Detalle load-bearing: los assets `pending`/`quarantined` tienen `owner_aggregate_id = NULL` (el INSERT lo deja así),
+así que el resolver los encuentra por `metadata_json->>'candidateFacetId'`. Omitir esa rama haría desaparecer del desk
+justo los documentos bloqueados por el escáner.
+
+### Retención (Ley 21.719)
+
+Política declarada: **12 meses** desde `rejected`/`withdrawn`. Consentimiento retirado vence sin ventana. Los
+contratados quedan fuera (les aplica la retención laboral). Signal `hiring.candidate_document.retention_overdue`
+(warning; `consent_withdrawn` escala a error). El borrado es follow-up gobernado.
+
 ## Delta 2026-07-09 — Structured vacancy publication operator (TASK-1371)
 
 Hiring vacancy publication now has a canonical backend-data operator:
