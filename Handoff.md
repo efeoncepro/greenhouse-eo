@@ -11,9 +11,12 @@
 > retention excluye postulaciones abiertas, índices únicos parciales (migración APLICADA, pre-check 0
 > dups), apply race → 409, signal SLA honesto con bridges OFF, reopen de cancelled auditado, boundary
 > test domain-wide, evento `hiring.competency_result.updated` ahora sí se emite. 829 tests verdes +
-> suites live contra PG real. **Hallazgo ajeno sin tocar:** el checkpoint in-progress de TASK-1371
-> (`ff6bd4b0f`, otra sesión) endureció el publish gate y dejó rojos `store.live.test.ts` +
-> `submit-application.live.test.ts` — le corresponde al owner de 1371.
+> suites live contra PG real. **Fixtures live de 1371 alineadas:** el checkpoint `ff6bd4b0f` (ya en
+> origin/develop) endureció el publish gate (exige payload público estructurado + renombró el error a
+> `hiring_opening_missing_public_structured_fields`) y dejó rojos `store.live.test.ts` +
+> `submit-application.live.test.ts` por fixtures desactualizadas (creaban el opening con solo título).
+> Fix test-only aplicado (setup provee el payload completo): **246/246 tests de hiring verdes incl.
+> suite live**. NO se tocó lógica de producción de 1371 — sigue in-progress.
 
 ## Sesion 2026-07-10 - Eval IA verde + flag staging ON + TASK-1385 creada - Claude
 
