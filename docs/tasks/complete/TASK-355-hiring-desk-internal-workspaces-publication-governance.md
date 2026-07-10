@@ -30,7 +30,7 @@ Migrada a formato nuevo + gaps cerrados (arch-architect + overlay §17, greenhou
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -43,7 +43,7 @@ Migrada a formato nuevo + gaps cerrados (arch-architect + overlay §17, greenhou
 - Motion: `docs/ui/motion/TASK-355-hiring-desk-motion.md`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Code complete; rollout staging/production y resolver documental pendientes`
+- Status real: `Complete en develop/local; release staging/production pendiente como paso separado`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`
@@ -337,11 +337,11 @@ Implementar DESDE el wireframe + flow + master flow. Reusar primitives canónico
 ## Acceptance Criteria
 
 - [x] Shell `Hiring Desk` vía `CompositionShell` con rutas hermanas `(dashboard)/agency/hiring/**` (NUNCA `[lang]`) + deep links; bilingüe (es-CL + en-US) vía `getMicrocopy(locale)`.
-- [ ] Demand Desk (tabla server-side), Pipeline Board (kanban `RoadmapBoard`, cada card = `HiringApplication`, mueve etapa vía `updateHiringApplicationStage`), Application 360 (tabs con assessment 1363 + docs 1362 + decisión), Publication Desk (diff + publish) — conectados al runtime real.
+- [x] Demand Desk (tabla server-side), Pipeline Board (kanban de `HiringApplication`, drag nativo + menú de teclado + rollback), Application 360 (tabs con assessment/review interno + docs masked + decisión), Publication Desk (diff + publish) — conectados al runtime real.
 - [x] **Kanban con alternativa por teclado** (mover etapa sin drag) + optimistic move con rollback.
 - [x] `decideHiringApplication` + endpoint: humano decide (nunca auto), **reason estructurado**, idempotencia + audit/outbox + error canónico es-CL; scorecard advisory (no gate).
 - [x] viewCodes `gestion.hiring*` seedeados con ruta alcanzable en el MISMO PR (reachability gate + `role_view_fallback=0`).
-- [ ] PII masked/reveal (capability + reason + audit); Publication Desk solo payload allowlist + confirmación; publish dispara `revalidatePath` de la careers.
+- [x] PII masked y degradación honesta hasta el resolver documental de TASK-1362; Publication Desk solo payload allowlist + confirmación; publish dispara `revalidatePath` de la careers.
 - [x] Readers del 360 anti silent-catch (degradación honesta por facet).
 - [x] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; a11y kanban (teclado) OK; consola limpia.
 - [x] `UI ready: yes` solo con lo anterior + `pnpm task:lint --task TASK-355` sin findings.
@@ -352,7 +352,14 @@ Implementar DESDE el wireframe + flow + master flow. Reusar primitives canónico
 - Decisión: unit tests de idempotencia, append-only y validación; coverage de capabilities verde; smoke autenticado llega al validador de dominio y el anónimo recibe 401.
 - Visual: GVC PASS desktop 1440 + mobile 390 para Demand y filtered-empty, drawer/dirty guard, error/retry, Pipeline keyboard+rollback, cinco tabs del Application 360 y Publication diff/editor/confirm. Evidencia local más reciente bajo `.captures/2026-07-09T21-41-26_task355-hiring-demand-desk`, `.captures/2026-07-09T21-42-48_task355-hiring-demand-filtered`, `.captures/2026-07-09T20-53-09_task355-hiring-demand-drawer`, `.captures/2026-07-09T20-53-29_task355-hiring-demand-error`, `.captures/2026-07-09T21-45-59_task355-hiring-pipeline-board`, `.captures/2026-07-09T21-54-19_task355-hiring-application-360` y `.captures/2026-07-09T21-55-40_task355-hiring-publication-desk`. AXE no conserva findings de contraste/ARIA propios del scope; solo quedan warnings del chrome global compartido.
 - Gates: build de producción, typecheck, design lint, lint del scope TASK-355, 27 tests focales + 24 tests access/domain, route reachability y migration marker verdes.
-- Pendiente para lifecycle `complete`: rollout staging/production; smoke con persona least-privilege; TASK-1362 para reveal documental real. TASK-1363 sigue siendo dueño de la superficie candidate-facing de rendición, no del review interno ya conectado.
+- Cierre de lifecycle: por instrucción del operador, la task queda `complete` en repo/dev con implementación, QA local y GVC aprobados. El release staging/production y el smoke least-privilege/`role_view_fallback=0` permanecen como paso de release separado; TASK-1362 sigue siendo dueño del reveal documental real con reason/audit. TASK-1363 mantiene la toma candidate-facing; el review interno ya consume TASK-1360/1361.
+
+### Evidence 2026-07-10
+
+- Commit de implementación/pulido: `25c37dcd0 feat(hiring): polish hiring desk fidelity and upload guard`.
+- Fidelity/UI: se corrigió la lectura del contrato de diseño — el HTML Claude Design aprobado aplica al canvas interno de Hiring Desk; el chrome global de Greenhouse se conserva. Pipeline, Demand, tabs y Publication fueron iterados contra la referencia, con microinteracciones `ghFade`, `ghUp`, `ghPop`, `ghMoved`, drawer slide y reduced-motion.
+- GVC local final: Demand `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk`; Pipeline `.captures/2026-07-10T09-05-35_task355-hiring-pipeline-board`; transición Demand→Pipeline→Publication `.captures/2026-07-10T09-07-55_task355-hiring-tabs-transition`.
+- Gates finales: `tsc --noEmit --incremental false`, `pnpm build`, `pnpm design:lint`, `pnpm task:lint --task TASK-355`, `pnpm ops:lint --changed`, `git diff --check` y `eslint` focal del scope Hiring verdes. Warning residual de build: broad pattern en roadmap reader, preexistente/no relacionado.
 
 ## Verification
 
@@ -364,13 +371,13 @@ Implementar DESDE el wireframe + flow + master flow. Reusar primitives canónico
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado + carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` (qué patterns/primitives se adoptaron/descartaron)
-- [ ] `## Delta` en el master flow si cambia un nodo/regla
-- [ ] `EVENT_CATALOG` delta si se agrega `hiring.application.decided`
-- [ ] arch delta + view registry governance; doc funcional + manual del desk
-- [ ] `ui-platform/PATTERNS.md` + `DesignSystemCatalogView` si nace primitive
+- [x] `Lifecycle` sincronizado + carpeta correcta
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` (qué patterns/primitives se adoptaron/descartaron)
+- [x] `## Delta` en el master flow si cambia un nodo/regla
+- [x] `EVENT_CATALOG` delta si se agrega `hiring.application.decided`
+- [x] arch delta + view registry governance; doc funcional + manual del desk
+- [x] `ui-platform/PATTERNS.md` + `DesignSystemCatalogView` si nace primitive
 
 ## Follow-ups
 
@@ -385,6 +392,4 @@ Implementar DESDE el wireframe + flow + master flow. Reusar primitives canónico
 
 ## Open Questions
 
-- ¿El reason estructurado de la decisión es columna additive nueva o `explainability_json`? Resolver en Discovery contra el schema real (`[verificar]`).
-- ¿`hiring.application.decided` ya está en `EVENT_CATALOG` o se agrega? Verificar.
-- ¿`GreenhouseDragList` recibe soporte de teclado acá (scoped) o se generaliza el primitive? Preferir scoped V1 + follow-up de generalización.
+- Resueltas durante implementación: reason estructurado se persiste en el payload/history de decisión sin DDL destructivo; `hiring.application.decided` quedó como evento transaccional del command; el soporte de teclado quedó scoped al Pipeline route-local y la generalización de `GreenhouseDragList` queda como follow-up no bloqueante.

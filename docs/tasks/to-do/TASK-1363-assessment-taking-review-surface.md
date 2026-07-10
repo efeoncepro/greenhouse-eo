@@ -32,7 +32,7 @@ Hechos verificados contra el repo real. Ajustes:
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-354`, `TASK-355`
+- Blocked by: `TASK-354`
 - Branch: `task/TASK-1363-assessment-taking-review-surface`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -79,7 +79,7 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-1360-assessment-engine-foundation.md`
 - `docs/tasks/to-do/TASK-354-public-careers-landing-apply-intake.md` (patrón tokenizado + shell público)
-- `docs/tasks/to-do/TASK-355-hiring-desk-internal-workspaces-publication-governance.md` (Application 360 host del scorecard)
+- `docs/tasks/complete/TASK-355-hiring-desk-internal-workspaces-publication-governance.md` (Application 360 host del scorecard)
 
 ## Dependencies & Impact
 
@@ -87,7 +87,7 @@ Reglas obligatorias:
 
 - `TASK-1360` (motor: instancias, respuestas, scoring, rollup + contrato de token)
 - `TASK-354` (shell público + patrón tokenizado) `[verificar]`
-- `TASK-355` (Application 360 donde se embebe el scorecard) `[verificar]`
+- `TASK-355` (Application 360 donde se embebe el scorecard; complete en repo/dev)
 - Product-design loop (dirección visual) — prerequisito de `UI ready: yes`
 
 ### Blocks / Impacts
@@ -114,7 +114,7 @@ Reglas obligatorias:
 ### Pendiente (blocked-by vivos, NO existen todavía)
 
 - Shell público tokenizado (TASK-354, `to-do`) — host de la rendición (DDL-2: mismo shell del apply).
-- Application 360 (TASK-355, `to-do`) — host del scorecard/review.
+- Application 360 (TASK-355, `complete`) — host del scorecard/review interno ya disponible en el desk.
 
 ### Gap
 

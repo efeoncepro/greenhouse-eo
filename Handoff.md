@@ -66,7 +66,7 @@
 > Delta agregado a la spec de TASK-1372 (mata `scanPolicy='pdf_only_v1'` como opción) + invariantes en el doc de
 > arquitectura y en CLAUDE.md.
 
-## Sesion 2026-07-09 - TASK-355 Hiring Desk - Codex - CODE COMPLETE / ROLLOUT PENDIENTE
+## Sesion 2026-07-09 - TASK-355 Hiring Desk - Codex - COMPLETE EN REPO/DEV / RELEASE PENDIENTE
 
 > **Goal confirmado:** implementar el HTML interactivo aprobado de Hiring Desk con fidelidad visual y conductual de alto detalle, conectado al runtime real y sin push/deploy automatico.
 >
@@ -92,7 +92,7 @@
 >
 > **Evidencia:** build producción, typecheck, design lint y lint del scope verdes; 27 tests focales + 24 de access/domain; capability coverage detectó y corrigió `update→execute`; actor autenticado llega a validación de dominio, anónimo recibe 401; reachability 219 rutas/0 orphans; `migrate:status` sin pendientes. GVC PASS desktop 1440/mobile 390: Demand `.captures/2026-07-09T21-41-26_task355-hiring-demand-desk`, filtered empty `.captures/2026-07-09T21-42-48_task355-hiring-demand-filtered`, drawer `.captures/2026-07-09T20-53-09_task355-hiring-demand-drawer`, error `.captures/2026-07-09T20-53-29_task355-hiring-demand-error`, Pipeline `.captures/2026-07-09T21-45-59_task355-hiring-pipeline-board`, 360 `.captures/2026-07-09T21-54-19_task355-hiring-application-360`, Publication `.captures/2026-07-09T21-55-40_task355-hiring-publication-desk`. ScrollWidth verificado igual a clientWidth en 1440/390.
 >
-> **Estado real:** `code complete, rollout pendiente`; se mantiene `in-progress`, en `develop`, sin push/deploy. Falta release a staging/production + smoke least-privilege/`role_view_fallback=0`; TASK-1362 sigue siendo dueño del reveal documental con reason/audit. TASK-1363 mantiene la toma candidate-facing; el review interno ya consume TASK-1360/1361. Residual UI: axe reporta contraste 4.3:1 del breadcrumb y nombres de controles/Nexa en el chrome global preexistente; el contraste, ARIA, reduced-motion y estados propios de TASK-355 quedaron corregidos.
+> **Estado real actualizado 2026-07-10:** `TASK-355` queda `complete` en repo/dev por instrucción del operador. Spec movida a `docs/tasks/complete/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`, registry/README/contexto sincronizados y commit local `25c37dcd0` contiene la implementación/pulido. No se declara deploy: falta release staging/production + smoke least-privilege/`role_view_fallback=0` como paso separado. TASK-1362 sigue siendo dueño del reveal documental con reason/audit. TASK-1363 mantiene la toma candidate-facing; el review interno ya consume TASK-1360/1361. Residual UI: axe reporta contraste 4.3:1 del breadcrumb y nombres de controles/Nexa en el chrome global preexistente; el contraste, ARIA, reduced-motion y estados propios de TASK-355 quedaron corregidos.
 
 ## Sesion 2026-07-09 - Paso a producción develop→main (release 41aefb457) - Claude - RELEASE
 

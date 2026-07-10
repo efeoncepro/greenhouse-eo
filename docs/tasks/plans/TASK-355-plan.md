@@ -107,7 +107,7 @@
 4. Implementar Application 360, decision command/API/history/event; integrar adapters assessment/docs con degradación honesta.
 5. Implementar Publication Desk y revalidation de careers.
 6. Añadir dictionaries, state tests, route/API tests y GVC scenarios desktop/mobile/reduced-motion/keyboard/overflow; iterar contra baseline hasta enterprise-ready.
-7. Ejecutar QA release audit, cierre documental y lifecycle. Si 1362/1363 o rollout externo siguen pendientes, dejar TASK-355 `in-progress` como `code complete, dependencias/rollout pendientes`, sin declarar cierre falso.
+7. Ejecutar QA release audit, cierre documental y lifecycle. **Actualización 2026-07-10:** por instrucción explícita del operador y con QA local/GVC/build/typecheck completos, TASK-355 se cerró como `complete` en repo/dev; 1362/1363 y release externo quedan como follow-ups/seams separados, no como bloqueo del lifecycle.
 
 ## Files to create
 
