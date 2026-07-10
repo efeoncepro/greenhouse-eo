@@ -25,7 +25,6 @@ import { resolveNexaInteractionModeForUser } from '@/lib/nexa/interaction-mode.s
 import RecentsTracker from '@/components/greenhouse/RecentsTracker'
 import ChunkRecoveryClear from '@/components/ChunkRecoveryClear'
 import { AdaptiveSidecarShellProvider, ShellFloatingActionDock } from '@/components/greenhouse/primitives'
-import HiringDeskRouteShell from '@/components/greenhouse/hiring/HiringDeskRouteShell'
 
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
@@ -66,26 +65,20 @@ const Layout = async (props: ChildrenType) => {
       <NexaContextProvider>
         <NexaInteractionModeProvider initialMode={nexaInteractionMode}>
         <AdaptiveSidecarShellProvider>
-          <HiringDeskRouteShell
-            dashboard={(
-              <LayoutWrapper
-                systemMode={systemMode}
-                verticalLayout={
-                  <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />} footer={<VerticalFooter />}>
-                    {/* TASK-1079 — host del modo lane: passthrough byte-idéntico salvo modo lane. */}
-                    <NexaLaneContentHost>{children}</NexaLaneContentHost>
-                  </VerticalLayout>
-                }
-                horizontalLayout={
-                  <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
-                    <NexaLaneContentHost>{children}</NexaLaneContentHost>
-                  </HorizontalLayout>
-                }
-              />
-            )}
-          >
-            {children}
-          </HiringDeskRouteShell>
+          <LayoutWrapper
+            systemMode={systemMode}
+            verticalLayout={
+              <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />} footer={<VerticalFooter />}>
+                {/* TASK-1079 — host del modo lane: passthrough byte-idéntico salvo modo lane. */}
+                <NexaLaneContentHost>{children}</NexaLaneContentHost>
+              </VerticalLayout>
+            }
+            horizontalLayout={
+              <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
+                <NexaLaneContentHost>{children}</NexaLaneContentHost>
+              </HorizontalLayout>
+            }
+          />
         </AdaptiveSidecarShellProvider>
         <ShellFloatingActionDock>
           <ScrollToTop docked className='mui-fixed'>

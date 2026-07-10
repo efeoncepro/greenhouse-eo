@@ -165,7 +165,6 @@ export interface HiringDeskCopy {
     rollback: string
     emptyLane: string
     keyboardHint: string
-    simulateFailure: string
     stages: Record<string, string>
   }
   application: {

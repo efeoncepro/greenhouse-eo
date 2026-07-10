@@ -8,6 +8,10 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import FormControl from '@mui/material/FormControl'
@@ -33,6 +37,7 @@ import Typography from '@mui/material/Typography'
 import {
   GreenhouseButton,
   GreenhouseChip,
+  MetricSummaryCard,
 } from '@/components/greenhouse/primitives'
 import type { HiringDeskCopy } from '@/lib/copy'
 import type {
@@ -55,7 +60,6 @@ type DemandForm = {
   businessUnit: string
   seats: string
   workMode: HiringPublicWorkMode
-  manager: string
   targetDate: string
   summary: string
   compensationMin: string
@@ -70,7 +74,6 @@ const EMPTY_FORM: DemandForm = {
   businessUnit: 'Chile',
   seats: '1',
   workMode: 'hybrid',
-  manager: 'mp',
   targetDate: '',
   summary: '',
   compensationMin: '',
@@ -80,19 +83,13 @@ const EMPTY_FORM: DemandForm = {
 const AREAS = ['Growth', 'Marketing', 'Creative', 'Technology', 'Operations', 'People', 'Finance', 'Sales', 'Strategy']
 const SENIORITIES = ['Junior', 'Semi Senior', 'Senior', 'Lead']
 
-const MANAGERS = [
-  ['mp', 'María José Peña'],
-  ['jr', 'Julio Reyes'],
-  ['cm', 'Carla Muñoz'],
-] as const
-
 const formForTemplate = (value: string): DemandForm => {
   if (value === 'account-manager') {
-    return { ...EMPTY_FORM, role: 'Account Manager', area: 'Growth', seniority: 'Junior', skills: 'Account mgmt, Upsell, QBR', summary: 'Lidera las cuentas clave de Growth y su expansión.' }
+    return { ...EMPTY_FORM, role: 'Account Manager', area: 'Sales', seniority: 'Senior', skills: 'Gestión de clientes, CRM, Inglés', summary: 'Lidera relaciones de largo plazo y convierte estrategia en crecimiento medible.' }
   }
 
   if (value === 'growth-designer') {
-    return { ...EMPTY_FORM, role: 'Growth Designer', area: 'Growth', seniority: 'Semi Senior', skills: 'Figma, CRO, Experimentación', summary: 'Diseña experiencias digitales que combinan craft, datos y velocidad de aprendizaje.' }
+    return { ...EMPTY_FORM, role: 'Growth Designer', area: 'Growth', seniority: 'Senior', skills: 'Figma, Experimentación, CRO', summary: 'Diseña experiencias digitales que combinan craft, datos y velocidad de aprendizaje.' }
   }
 
   if (value === 'data-engineer') {
@@ -111,44 +108,6 @@ const STATUS_TONE = {
   closed: 'default',
 } as const
 
-const DemandKpi = ({
-  label,
-  value,
-  delta,
-  icon,
-  tone,
-}: {
-  label: string
-  value: number
-  delta: string
-  icon: string
-  tone: 'primary' | 'success' | 'secondary' | 'info'
-}) => (
-  <Paper
-    variant='outlined'
-    sx={(theme) => ({
-      position: 'relative',
-      minBlockSize: 128,
-      p: 6,
-      overflow: 'hidden',
-      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-      containerType: 'inline-size',
-      backgroundColor: 'background.paper',
-    })}
-  >
-    <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={3}>
-      <Box sx={{ minWidth: 0 }}>
-        <Typography variant='caption' color='text.secondary' fontWeight={650}>{label}</Typography>
-        <Typography variant='h3' sx={{ mt: 4, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{value}</Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 2 }}>{delta}</Typography>
-      </Box>
-      <Box sx={(theme) => ({ display: 'grid', placeItems: 'center', flex: '0 0 auto', inlineSize: 34, blockSize: 34, borderRadius: `${theme.shape.customBorderRadius.md}px`, color: `${tone}.dark`, backgroundColor: `${tone}.lightOpacity` })}>
-        <i aria-hidden='true' className={icon} />
-      </Box>
-    </Stack>
-  </Paper>
-)
-
 interface DemandDeskViewProps {
   copy: HiringDeskCopy
   initialSnapshot: HiringDeskSnapshot
@@ -163,7 +122,6 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
   const [query, setQuery] = useState(initialQuery)
   const [statusFilter, setStatusFilter] = useState('')
   const [areaFilter, setAreaFilter] = useState('')
-  const [demandView, setDemandView] = useState<'data' | 'empty' | 'error'>('data')
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(Boolean(initialDrawerTemplate))
@@ -213,9 +171,6 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
 
     return true
   }), [areaFilter, query, snapshot.openings, statusFilter])
-
-  const effectiveLoadError = loadError || (demandView === 'error' ? 'Verifica tu conexión e intenta de nuevo. Si persiste, el equipo ya fue notificado.' : null)
-  const rowsForView = demandView === 'empty' || demandView === 'error' ? [] : visibleOpenings
 
   const refresh = useCallback(async (nextQuery = query) => {
     setLoading(true)
@@ -358,7 +313,7 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
     <GreenhouseButton
       kind='primaryAction'
       leadingIconClassName='tabler-plus'
-      onClick={() => { setDiscardOpen(false); setDrawerOpen(true) }}
+      onClick={() => setDrawerOpen(true)}
       dataCapture='hiring-new-demand'
     >
       {copy.demand.newDemand}
@@ -366,27 +321,27 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
   )
 
   const content = (
-    <Stack spacing={5} sx={{ minWidth: 0 }}>
-      <Grid container spacing={4}>
+    <Stack spacing={4} sx={{ minWidth: 0 }}>
+      <Grid container spacing={3}>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <DemandKpi label={copy.demand.activeDemands} value={pipelineMetrics.active} delta='+4 vs. semana anterior' icon='tabler-users' tone='primary' />
+          <MetricSummaryCard density='auto' titleEmphasis title={copy.demand.activeDemands} value={pipelineMetrics.active} subtitle='+4 vs. semana anterior' icon='tabler-users' iconColor='primary' />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <DemandKpi label={copy.demand.openPositions} value={pipelineMetrics.evaluation} delta='+2 vs. semana anterior' icon='tabler-clipboard-check' tone='success' />
+          <MetricSummaryCard density='auto' titleEmphasis title={copy.demand.openPositions} value={pipelineMetrics.evaluation} subtitle='+2 vs. semana anterior' icon='tabler-clipboard-check' iconColor='success' />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <DemandKpi label={copy.demand.applicants} value={pipelineMetrics.pendingDecision} delta='+1 esperando decisión' icon='tabler-gavel' tone='secondary' />
+          <MetricSummaryCard density='auto' titleEmphasis title={copy.demand.applicants} value={pipelineMetrics.pendingDecision} subtitle='+1 esperando decisión' icon='tabler-gavel' iconColor='secondary' />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <DemandKpi label={copy.demand.published} value={pipelineMetrics.selectedThisMonth} delta='+1 vs. mes anterior' icon='tabler-user-check' tone='info' />
+          <MetricSummaryCard density='auto' titleEmphasis title={copy.demand.published} value={pipelineMetrics.selectedThisMonth} subtitle='+1 vs. mes anterior' icon='tabler-user-check' iconColor='info' />
         </Grid>
       </Grid>
 
-      <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }} spacing={3} useFlexGap flexWrap='wrap'>
-          <Box sx={{ inlineSize: { xs: '100%', md: 320 } }}>
+      <Paper variant='outlined' sx={{ p: { xs: 2, md: 2.5 }, borderRadius: 3 }}>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               data-capture='hiring-demand-search'
-              size='small'
               fullWidth
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -399,90 +354,31 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
                 },
               }}
             />
-          </Box>
-          <FormControl size='small' sx={{ inlineSize: { xs: '100%', sm: 150 } }}><InputLabel id='demand-status-filter'>Estado</InputLabel><Select labelId='demand-status-filter' label='Estado' value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><MenuItem value=''>Todos</MenuItem><MenuItem value='active'>Abierta</MenuItem><MenuItem value='paused'>Pausada</MenuItem><MenuItem value='closed'>Cerrada</MenuItem><MenuItem value='draft'>Borrador</MenuItem></Select></FormControl>
-          <FormControl size='small' sx={{ inlineSize: { xs: '100%', sm: 140 } }}><InputLabel id='demand-area-filter'>Área</InputLabel><Select labelId='demand-area-filter' label='Área' value={areaFilter} onChange={(event) => setAreaFilter(event.target.value)}><MenuItem value=''>Todas</MenuItem>{availableAreas.map((area) => <MenuItem key={area} value={area}>{area}</MenuItem>)}</Select></FormControl>
-          <Box sx={{ flex: 1 }} />
-          <Stack direction='row' alignItems='center' spacing={2}>
-            <Typography variant='caption' color='text.disabled'>Vista (demo)</Typography>
-            <Box
-              role='group'
-              aria-label={copy.demand.title}
-              sx={(theme) => ({
-                display: 'inline-flex',
-                blockSize: 34,
-                overflow: 'hidden',
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: `${theme.shape.customBorderRadius.md}px`,
-              })}
-            >
-              {([
-                ['data', 'Datos'],
-                ['empty', 'Vacío'],
-                ['error', 'Error'],
-              ] as const).map(([value, label]) => (
-                <Box
-                  key={value}
-                  component='button'
-                  type='button'
-                  onClick={() => setDemandView(value)}
-                  sx={(theme) => ({
-                    border: 0,
-                    borderInlineStart: value === 'data' ? 0 : `1px solid ${theme.palette.divider}`,
-                    px: 2.75,
-                    cursor: 'pointer',
-                    backgroundColor: demandView === value ? 'primary.main' : 'background.paper',
-                    color: demandView === value ? 'primary.contrastText' : 'text.secondary',
-                    fontSize: theme.typography.caption.fontSize,
-                    fontWeight: 650,
-                  })}
-                >
-                  {label}
-                </Box>
-              ))}
-            </Box>
-          </Stack>
-          {action}
-      </Stack>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <FormControl fullWidth><InputLabel id='demand-status-filter'>Estado</InputLabel><Select labelId='demand-status-filter' label='Estado' value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><MenuItem value=''>Todos</MenuItem><MenuItem value='active'>Abierta</MenuItem><MenuItem value='paused'>Pausada</MenuItem><MenuItem value='closed'>Cerrada</MenuItem><MenuItem value='draft'>Borrador</MenuItem></Select></FormControl>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <FormControl fullWidth><InputLabel id='demand-area-filter'>Área</InputLabel><Select labelId='demand-area-filter' label='Área' value={areaFilter} onChange={(event) => setAreaFilter(event.target.value)}><MenuItem value=''>Todas</MenuItem>{availableAreas.map((area) => <MenuItem key={area} value={area}>{area}</MenuItem>)}</Select></FormControl>
+          </Grid>
+        </Grid>
+      </Paper>
 
-      <Paper variant='outlined' sx={(theme) => ({ minWidth: 0, overflow: 'hidden', borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' spacing={1} sx={{ px: 6, py: 4, borderBlockEnd: 1, borderColor: 'divider' }}><Box><Typography variant='h6'>{copy.demand.openingsTitle}</Typography><Typography variant='body2' color='text.secondary'>1 opening activo · foco del programa</Typography></Box></Stack>
-        {effectiveLoadError ? (
-          <Stack spacing={3.5} sx={{ px: 6, py: 8 }}>
-            <Alert severity='error'>{effectiveLoadError}</Alert>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}><Button variant='outlined' size='small' startIcon={<i className='tabler-refresh' />} onClick={() => { setDemandView('data'); void refresh() }}>{copy.common.retry}</Button></Box>
-          </Stack>
-        ) : rowsForView.length === 0 && !loading ? (
-          <Stack alignItems='center' spacing={3} sx={{ px: 6, py: 13, textAlign: 'center' }}>
+      {loadError ? <Alert severity='error' action={<Button onClick={() => void refresh()}>{copy.common.retry}</Button>}>{loadError}</Alert> : null}
+
+      <Paper variant='outlined' sx={{ minWidth: 0, overflow: 'hidden', borderRadius: 3 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' spacing={1} sx={{ px: 3, py: 2.5, borderBlockEnd: 1, borderColor: 'divider' }}><Typography variant='h6'>{copy.demand.openingsTitle}</Typography><Typography variant='body2' color='text.secondary'>{visibleOpenings.length} {copy.demand.openingsCaption}</Typography></Stack>
+        {visibleOpenings.length === 0 && !loading ? (
+          <Stack alignItems='center' spacing={2} sx={{ px: 3, py: 9, textAlign: 'center' }}>
             <Box sx={(theme) => ({ display: 'grid', placeItems: 'center', inlineSize: 56, blockSize: 56, borderRadius: '50%', color: theme.palette.primary.main, backgroundColor: theme.palette.primary.lightOpacity })}>
-              <i aria-hidden='true' className={query ? 'tabler-search-off' : 'tabler-briefcase-off'} />
+              <i aria-hidden='true' className='tabler-briefcase-off' />
             </Box>
             <Typography variant='h5'>{query ? copy.common.noResults : copy.demand.emptyTitle}</Typography>
             <Typography color='text.secondary'>{query ? copy.demand.filteredEmptyBody : copy.demand.emptyBody}</Typography>
           </Stack>
         ) : (
           <TableContainer role='region' aria-label={copy.demand.title} tabIndex={0} sx={{ overflowX: 'auto' }}>
-            <Table
-              size='small'
-              sx={{
-                minWidth: 860,
-                '& .MuiTableCell-head': {
-                  px: 4,
-                  py: 2.75,
-                  color: 'text.disabled',
-                  fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  letterSpacing: '.06em',
-                  textTransform: 'uppercase',
-                },
-                '& .MuiTableCell-body': {
-                  px: 4,
-                  py: 3.25,
-                  borderColor: 'divider',
-                },
-                '& .MuiTableRow-root:hover': { backgroundColor: 'action.hover' },
-              }}
-            >
+            <Table sx={{ minWidth: 860 }}>
               <TableHead>
                 <TableRow>
                   <TableCell>{copy.demand.role}</TableCell>
@@ -495,11 +391,11 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rowsForView.map(({ opening, demand, applicationCount }) => (
+                {visibleOpenings.map(({ opening, demand, applicationCount }) => (
                   <TableRow key={opening.openingId} hover>
                     <TableCell>
                       <Stack spacing={0.5}>
-                        <Typography variant='body2' color='text.primary' fontWeight={650}>{opening.internalTitle}</Typography>
+                        <Typography variant='subtitle1' color='text.primary' fontWeight={650}>{opening.internalTitle}</Typography>
                         <Typography variant='caption' color='text.secondary'>{opening.publicId} · {opening.seniority ?? '—'}</Typography>
                       </Stack>
                     </TableCell>
@@ -509,23 +405,11 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
                       <GreenhouseChip size='small' kind='status' variant='label' tone={STATUS_TONE[opening.status]} label={opening.status === 'active' ? 'Abierta' : opening.status} />
                     </TableCell>
                     <TableCell><GreenhouseChip size='small' kind='status' variant='label' tone={opening.publicationStatus === 'published' ? 'success' : opening.publicationStatus === 'paused' ? 'warning' : 'default'} label={opening.publicationStatus} /></TableCell>
-                    <TableCell align='center'>
-                      <Stack direction='row' alignItems='center' justifyContent='center' spacing={1.5}>
-                        <i aria-hidden='true' className='tabler-users text-disabled' />
-                        <Typography fontWeight={700} sx={{ fontVariantNumeric: 'tabular-nums' }}>{applicationCount}</Typography>
-                      </Stack>
-                    </TableCell>
+                    <TableCell align='center'><Typography fontWeight={700}>{applicationCount}</Typography></TableCell>
                     <TableCell align='right'>
-                      <Button
-                        component={NextLink}
-                        href={`/agency/hiring/pipeline?openingId=${opening.openingId}`}
-                        size='small'
-                        variant='tonal'
-                        endIcon={<i aria-hidden='true' className='tabler-arrow-right' />}
-                        aria-label={`${copy.pipeline.title}: ${opening.internalTitle}`}
-                      >
-                        Ver pipeline
-                      </Button>
+                      <IconButton component={NextLink} href={`/agency/hiring/pipeline?openingId=${opening.openingId}`} aria-label={`${copy.pipeline.title}: ${opening.internalTitle}`}>
+                        <i aria-hidden='true' className='tabler-arrow-up-right' />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -539,7 +423,7 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
 
   return (
     <>
-      <HiringDeskFrame surface='demand' copy={copy} primary={content} />
+      <HiringDeskFrame surface='demand' copy={copy} action={action} primary={content} />
 
       <Drawer
         anchor='right'
@@ -555,15 +439,11 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
               void createDemand('create')
             }
           },
-          sx: (theme) => ({
-            inlineSize: 'min(520px, 100vw)',
-            maxInlineSize: '100%',
-            boxShadow: theme.shadows[16],
-          }),
+          sx: { inlineSize: 'min(520px, 100vw)', maxInlineSize: '100%' },
         }}
       >
         <Stack sx={{ minBlockSize: '100%' }}>
-          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={3} sx={{ px: 6, py: 4.5 }}>
+          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={2} sx={{ px: { xs: 2.5, sm: 4 }, py: 3 }}>
             <Box>
               <Typography variant='h4'>{copy.demand.drawerTitle}</Typography>
               <Typography color='text.secondary' sx={{ mt: 0.5 }}>{copy.demand.drawerSubtitle}</Typography>
@@ -572,7 +452,7 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
           </Stack>
           <Divider />
 
-          <Stack component='section' role='region' aria-label={copy.common.demandFormRegion} tabIndex={0} spacing={4.5} sx={{ flex: 1, px: 6, py: 4.5, overflowY: 'auto' }}>
+          <Stack component='section' role='region' aria-label={copy.common.demandFormRegion} tabIndex={0} spacing={3} sx={{ flex: 1, px: { xs: 2.5, sm: 4 }, py: 3, overflowY: 'auto' }}>
             {formError ? <Alert severity='error'>{formError}</Alert> : null}
 
             <Box>
@@ -601,7 +481,7 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
             <Typography variant='overline' color='text.secondary' sx={{ letterSpacing: '0.08em' }}>Identidad del cargo</Typography>
 
             <TextField required autoFocus label={copy.demand.roleLabel} value={form.role} onChange={(event) => updateForm('role', event.target.value)} />
-            <Grid container spacing={3.5}>
+            <Grid container spacing={2}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth required>
                   <InputLabel id='hiring-area-label'>{copy.demand.areaLabel}</InputLabel>
@@ -640,7 +520,7 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
               <TextField fullWidth label={copy.demand.skillsLabel} value={form.skills} onChange={(event) => updateForm('skills', event.target.value)} helperText='Escribe y separa cada skill con una coma.' />
             </Box>
             <Typography variant='overline' color='text.secondary' sx={{ letterSpacing: '0.08em' }}>Contexto</Typography>
-            <Grid container spacing={3.5}>
+            <Grid container spacing={2}>
               <Grid size={{ xs: 12, sm: 8 }}>
                 <TextField fullWidth label={copy.demand.businessUnitLabel} value={form.businessUnit} onChange={(event) => updateForm('businessUnit', event.target.value)} />
               </Grid>
@@ -648,27 +528,16 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
                 <TextField fullWidth type='number' label={copy.demand.seatsLabel} value={form.seats} onChange={(event) => updateForm('seats', event.target.value)} slotProps={{ htmlInput: { min: 1, max: 100 } }} />
               </Grid>
             </Grid>
-            <Grid container spacing={3.5}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormControl fullWidth>
-                  <InputLabel id='hiring-mode-label'>{copy.demand.modeLabel}</InputLabel>
-                  <Select labelId='hiring-mode-label' label={copy.demand.modeLabel} value={form.workMode} onChange={(event) => updateForm('workMode', event.target.value as HiringPublicWorkMode)}>
-                    <MenuItem value='remote'>Remoto</MenuItem>
-                    <MenuItem value='hybrid'>Híbrido</MenuItem>
-                    <MenuItem value='onsite'>Presencial</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormControl fullWidth>
-                  <InputLabel id='hiring-manager-label'>{copy.demand.owner}</InputLabel>
-                  <Select labelId='hiring-manager-label' label={copy.demand.owner} value={form.manager} onChange={(event) => updateForm('manager', event.target.value)}>
-                    {MANAGERS.map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
+            <FormControl fullWidth>
+              <InputLabel id='hiring-mode-label'>{copy.demand.modeLabel}</InputLabel>
+              <Select labelId='hiring-mode-label' label={copy.demand.modeLabel} value={form.workMode} onChange={(event) => updateForm('workMode', event.target.value as HiringPublicWorkMode)}>
+                <MenuItem value='remote'>Remoto</MenuItem>
+                <MenuItem value='hybrid'>Híbrido</MenuItem>
+                <MenuItem value='onsite'>Presencial</MenuItem>
+              </Select>
+            </FormControl>
             <TextField type='date' label={copy.demand.targetDateLabel} value={form.targetDate} onChange={(event) => updateForm('targetDate', event.target.value)} slotProps={{ inputLabel: { shrink: true } }} />
+            <TextField disabled label={copy.demand.owner} value={copy.demand.ownerSelf} />
 
             <Paper variant='outlined' sx={{ p: 2.5, borderRadius: 3 }}>
               <Stack spacing={2}>
@@ -676,7 +545,7 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
                   <Typography variant='subtitle1' fontWeight={650}>{copy.demand.internalCompensation}</Typography>
                   <Typography variant='caption' color='text.secondary'>{copy.demand.compensationHint}</Typography>
                 </Box>
-                <Grid container spacing={3.5}>
+                <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}><TextField fullWidth label='Mínimo' value={form.compensationMin} onChange={(event) => updateForm('compensationMin', event.target.value)} /></Grid>
                   <Grid size={{ xs: 6 }}><TextField fullWidth label='Máximo' value={form.compensationMax} onChange={(event) => updateForm('compensationMax', event.target.value)} /></Grid>
                 </Grid>
@@ -693,82 +562,57 @@ const DemandDeskView = ({ copy, initialSnapshot, currentUserId, simulateLoadFail
               helperText={`${form.summary.length}/140`}
             />
 
-            <Paper variant='outlined' sx={(theme) => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px`, overflow: 'hidden' })}>
-              <Stack direction='row' alignItems='center' spacing={1.75} sx={{ px: 3.5, py: 2.25, backgroundColor: 'action.hover', borderBlockEnd: 1, borderColor: 'divider' }}>
-                <i aria-hidden='true' className='tabler-eye text-success' />
-                <Typography variant='overline' color='text.secondary' sx={{ letterSpacing: '.05em' }}>Vista previa · público</Typography>
+            <Paper sx={(theme) => ({ p: 3, borderRadius: 3, background: `linear-gradient(145deg, ${theme.palette.primary.lightOpacity}, ${theme.palette.background.paper})`, border: `1px solid ${theme.palette.primary.lightOpacity}` })}>
+              <Typography variant='overline' color='primary.main'>{copy.demand.previewTitle}</Typography>
+              <Typography variant='h5' sx={{ mt: 1 }}>{form.role || copy.demand.roleLabel}</Typography>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ my: 1.5 }}>
+                {form.area ? <GreenhouseChip size='small' kind='attribute' label={form.area} /> : null}
+                {form.seniority ? <GreenhouseChip size='small' kind='attribute' label={form.seniority} /> : null}
+                <GreenhouseChip size='small' kind='attribute' label={form.workMode === 'remote' ? 'Remoto' : form.workMode === 'hybrid' ? 'Híbrido' : 'Presencial'} />
+                <GreenhouseChip size='small' kind='attribute' label={`${form.seats || 1} ${copy.demand.seats.toLocaleLowerCase()}`} />
               </Stack>
-              <Stack spacing={2} sx={{ p: 3.5 }}>
-                <Typography variant='h6'>{form.role || 'Nuevo cargo'}</Typography>
-                <Typography variant='caption' color='text.secondary'>{form.area || 'Growth'} · {form.businessUnit || 'Chile'} · {form.workMode === 'remote' ? 'Remoto' : form.workMode === 'hybrid' ? 'Híbrido' : 'Presencial'} · {form.seniority}</Typography>
-                <Typography color='text.primary'>{form.summary || 'Sin resumen aún.'}</Typography>
-                {skillTokens.length > 0 ? (
-                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                    {skillTokens.map((skill) => <GreenhouseChip key={skill} size='small' kind='attribute' label={skill} />)}
-                  </Stack>
-                ) : null}
-              </Stack>
+              <Typography color='text.secondary'>{form.summary || 'El resumen público aparecerá aquí.'}</Typography>
             </Paper>
             <Alert severity='info'>{copy.demand.drawerHint}</Alert>
           </Stack>
 
           <Divider />
-          <Stack sx={{ position: 'sticky', insetBlockEnd: 0, px: 6, py: 3.5, backgroundColor: 'background.paper' }}>
-            {discardOpen ? (
-              <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent='space-between' spacing={3}>
-                <Typography color='text.primary'>{copy.demand.discardBody}</Typography>
-                <Stack direction='row' justifyContent='flex-end' spacing={2}>
-                  <Button variant='text' onClick={() => setDiscardOpen(false)}>{copy.demand.discardContinue}</Button>
-                  <Button color='error' variant='contained' onClick={() => { setDiscardOpen(false); setDrawerOpen(false); resetForm() }}>{copy.demand.discard}</Button>
-                </Stack>
-              </Stack>
-            ) : (
-              <Stack direction='row' justifyContent='flex-end' alignItems='center' spacing={2.5}>
-                <Button variant='outlined' onClick={requestClose} disabled={submitting}>{copy.common.cancel}</Button>
-                <Stack direction='row' justifyContent='flex-end'>
-                  <Button
-                    type='submit'
-                    variant='contained'
-                    disabled={submitting}
-                    startIcon={submitting ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : <i aria-hidden='true' className='tabler-plus' />}
-                    sx={(theme) => ({
-                      minBlockSize: 38,
-                      borderStartEndRadius: 0,
-                      borderEndEndRadius: 0,
-                      color: theme.palette.primary.contrastText,
-                      boxShadow: 'none',
-                      fontWeight: 700,
-                      '&:hover': {
-                        boxShadow: 'none',
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    })}
-                  >
-                    {copy.demand.create}
-                  </Button>
-                  <IconButton
-                    aria-label={copy.common.createOptions}
-                    aria-haspopup='menu'
-                    onClick={(event) => setMenuAnchor(event.currentTarget)}
-                    disabled={submitting}
-                    sx={(theme) => ({ ml: 0.5, border: `1px solid ${theme.palette.primary.main}`, borderRadius: `${theme.shape.customBorderRadius.md}px`, color: theme.palette.primary.contrastText, backgroundColor: theme.palette.primary.main, '&:hover': { backgroundColor: theme.palette.primary.dark } })}
-                  >
-                    <i aria-hidden='true' className='tabler-chevron-up' />
-                  </IconButton>
-                  <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)} transformOrigin={{ vertical: 'bottom', horizontal: 'right' }} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
-                    <MenuItem onClick={() => { setMenuAnchor(null); void createDemand('publish') }}>
-                      <i aria-hidden='true' className='tabler-world-upload mie-2 text-success' /> {copy.demand.createAndPublish}
-                    </MenuItem>
-                    <MenuItem onClick={() => { setMenuAnchor(null); void createDemand('another') }}>
-                      <i aria-hidden='true' className='tabler-copy-plus mie-2' /> {copy.demand.createAnother}
-                    </MenuItem>
-                  </Menu>
-                </Stack>
-              </Stack>
-            )}
+          <Stack direction={{ xs: 'column-reverse', sm: 'row' }} justifyContent='space-between' spacing={2} sx={{ position: 'sticky', insetBlockEnd: 0, p: { xs: 2.5, sm: 3 }, backgroundColor: 'background.paper' }}>
+            <Button onClick={requestClose} disabled={submitting}>{copy.common.cancel}</Button>
+            <Stack direction='row' justifyContent='flex-end'>
+              <GreenhouseButton type='submit' disabled={submitting} leadingIcon={submitting ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}>
+                {copy.demand.create}
+              </GreenhouseButton>
+              <IconButton
+                aria-label={copy.common.createOptions}
+                aria-haspopup='menu'
+                onClick={(event) => setMenuAnchor(event.currentTarget)}
+                disabled={submitting}
+                sx={(theme) => ({ ml: 0.5, border: `1px solid ${theme.palette.primary.main}`, borderRadius: `${theme.shape.customBorderRadius.md}px`, color: theme.palette.primary.contrastText, backgroundColor: theme.palette.primary.main, '&:hover': { backgroundColor: theme.palette.primary.dark } })}
+              >
+                <i aria-hidden='true' className='tabler-chevron-down' />
+              </IconButton>
+              <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
+                <MenuItem onClick={() => { setMenuAnchor(null); void createDemand('publish') }}>
+                  <i aria-hidden='true' className='tabler-world-upload mie-2' /> {copy.demand.createAndPublish}
+                </MenuItem>
+                <MenuItem onClick={() => { setMenuAnchor(null); void createDemand('another') }}>
+                  <i aria-hidden='true' className='tabler-copy-plus mie-2' /> {copy.demand.createAnother}
+                </MenuItem>
+              </Menu>
+            </Stack>
           </Stack>
         </Stack>
       </Drawer>
+
+      <Dialog open={discardOpen} onClose={() => setDiscardOpen(false)} PaperProps={{ 'data-capture': 'hiring-demand-discard-dialog' }}>
+        <DialogTitle>{copy.demand.discardTitle}</DialogTitle>
+        <DialogContent><Typography color='text.secondary'>{copy.demand.discardBody}</Typography></DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDiscardOpen(false)}>{copy.demand.discardContinue}</Button>
+          <Button color='error' onClick={() => { setDiscardOpen(false); setDrawerOpen(false); resetForm() }}>{copy.demand.discard}</Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar open={Boolean(toast)} autoHideDuration={4000} onClose={() => setToast(null)} message={toast} />
     </>

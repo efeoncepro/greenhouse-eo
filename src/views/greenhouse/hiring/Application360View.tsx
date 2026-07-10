@@ -28,11 +28,14 @@ import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 
 import {
   GreenhouseButton,
   GreenhouseChip,
+  MetricSummaryCard,
   isCardDensityAtLeast,
   useContainerDensity,
 } from '@/components/greenhouse/primitives'
@@ -114,6 +117,7 @@ interface CandidateContextCardProps {
 const CandidateContextCard = ({ item, copy }: CandidateContextCardProps) => {
   const { ref, density, containerType } = useContainerDensity('auto')
   const condensed = isCardDensityAtLeast(density, 'condensed')
+  const peek = density === 'peek'
 
   return (
     <Paper
@@ -121,26 +125,44 @@ const CandidateContextCard = ({ item, copy }: CandidateContextCardProps) => {
       variant='outlined'
       sx={(theme) => ({
         containerType,
-        p: condensed ? 3 : 4,
+        p: condensed ? 2.5 : 3,
         minWidth: 0,
-        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-        transition: theme.transitions.create('padding', { duration: theme.transitions.duration.shorter }),
+        borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+        transition: theme.transitions.create(['padding', 'box-shadow'], { duration: theme.transitions.duration.shorter }),
         '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
       })}
     >
-      <Stack spacing={condensed ? 2 : 2.75}>
-        <Typography variant='h6'>Perfil del candidato</Typography>
-        {[
-          [copy.application.opening, item.openingTitle],
-          [copy.application.source, item.application.source === 'public_careers' ? 'Careers público' : item.application.source.replaceAll('_', ' ')],
-          ['Postulación', formatDate(item.application.createdAt, { dateStyle: 'medium' }, 'es-CL')],
-          ['Email', item.maskedEmail ?? 'c•••••@•••••.com'],
-        ].map(([label, value], index) => (
-          <Stack key={label} direction='row' alignItems='center' justifyContent='space-between' spacing={3} sx={{ py: 2.75, borderBlockEnd: index < 3 ? 1 : 0, borderColor: 'divider' }}>
-            <Typography variant='body2' color='text.secondary'>{label}</Typography>
-            <Typography variant='body2' color={label === 'Email' ? 'text.disabled' : 'text.primary'} fontWeight={650} textAlign='right'>{value}</Typography>
-          </Stack>
-        ))}
+      <Stack spacing={condensed ? 2 : 3}>
+        <Stack direction={peek ? 'column' : 'row'} alignItems={peek ? 'flex-start' : 'center'} spacing={2}>
+          <Avatar sx={{ inlineSize: condensed ? 48 : 64, blockSize: condensed ? 48 : 64, bgcolor: 'primary.dark', color: 'common.white', fontWeight: 750 }}>{item.candidateInitials}</Avatar>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant={condensed ? 'h6' : 'h5'}>{item.candidateName}</Typography>
+            <Typography color='text.secondary' variant='body2'>{item.application.publicId}</Typography>
+          </Box>
+        </Stack>
+        <GreenhouseChip kind='status' variant='label' tone='info' label={copy.pipeline.stages[item.application.stage]} />
+        {!peek ? (
+          <>
+            <Divider />
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant='caption' color='text.secondary'>{copy.application.contact}</Typography>
+                <Typography variant='body2' fontWeight={600}>{item.maskedEmail ?? '—'}</Typography>
+              </Box>
+              <Box>
+                <Typography variant='caption' color='text.secondary'>{copy.application.opening}</Typography>
+                <Typography variant='body2' fontWeight={600}>{item.openingTitle}</Typography>
+              </Box>
+              {item.area ? <Box><Typography variant='caption' color='text.secondary'>{copy.demand.area}</Typography><Typography variant='body2' fontWeight={600}>{item.area}</Typography></Box> : null}
+            </Stack>
+            {!condensed && (item.portfolioUrl || item.linkedinUrl) ? (
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                {item.portfolioUrl ? <Button component='a' href={item.portfolioUrl} target='_blank' rel='noreferrer' size='small' color='inherit' startIcon={<i className='tabler-world' />}>Portfolio</Button> : null}
+                {item.linkedinUrl ? <Button component='a' href={item.linkedinUrl} target='_blank' rel='noreferrer' size='small' color='inherit' startIcon={<i className='tabler-brand-linkedin' />}>LinkedIn</Button> : null}
+              </Stack>
+            ) : null}
+          </>
+        ) : null}
       </Stack>
     </Paper>
   )
@@ -399,38 +421,49 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
   }
 
   const overview = (
-    <Grid container spacing={4} sx={{ '& > *': { minWidth: 0 } }}>
-      <Grid size={{ xs: 12, md: 7 }}>
-        <Stack spacing={4}>
-          <Alert severity='info' icon={<i className='tabler-info-circle' />} sx={(theme) => ({ border: `1px solid ${theme.palette.info.lightOpacity}`, color: 'text.primary' })}>Datos personales enmascarados por defecto — se revelan con motivo y quedan auditados.</Alert>
+    <Stack spacing={4}>
+      <Grid container spacing={3} sx={{ '& > *': { minWidth: 0 } }}>
+        <Grid size={{ xs: 12, md: 5 }}>
+          <Stack spacing={2}>
+            <Alert severity='info' icon={<i className='tabler-shield-lock' />} sx={{ color: 'text.primary' }}>Datos personales enmascarados por defecto — se revelan con motivo y quedan auditados.</Alert>
             <CandidateContextCard item={item} copy={copy} />
-        </Stack>
-      </Grid>
-      <Grid size={{ xs: 12, md: 5 }}>
-        <Stack spacing={4}>
-          <Paper variant='outlined' sx={(theme) => ({ p: 6, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
-            <Stack spacing={4}>
-              <Typography variant='h6'>Afinidad con el rol</Typography>
+          </Stack>
+        </Grid>
+        <Grid size={{ xs: 12, md: 7 }}>
+          <Paper variant='outlined' sx={{ p: { xs: 2.5, md: 3.5 }, borderRadius: 3, minBlockSize: '100%' }}>
+            <Stack spacing={3}>
               <Box>
-                <Stack direction='row' alignItems='baseline' spacing={2}>
-                  <Typography variant='h2' sx={{ fontVariantNumeric: 'tabular-nums' }}>{item.application.matchScore != null ? `${item.application.matchScore}%` : '82%'}</Typography>
+                <Typography variant='h6'>Afinidad con el rol</Typography>
+                <Stack direction='row' alignItems='baseline' spacing={1} sx={{ mt: 2 }}>
+                  <Typography variant='h2'>{item.application.matchScore != null ? `${item.application.matchScore}%` : '—'}</Typography>
                   <Typography color='text.secondary'>advisory</Typography>
                 </Stack>
-                <LinearProgress aria-label={copy.application.match} variant='determinate' value={item.application.matchScore ?? 82} sx={(theme) => ({ mt: 3, blockSize: 8, borderRadius: `${theme.shape.customBorderRadius.lg}px` })} />
+                <LinearProgress aria-label={copy.application.match} variant='determinate' value={item.application.matchScore ?? 0} sx={(theme) => ({ mt: 2, blockSize: 8, borderRadius: `${theme.shape.customBorderRadius.lg}px` })} />
               </Box>
+              <Divider />
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 6 }}><MetricSummaryCard density='auto' titleEmphasis title={copy.application.score} value={item.application.score ?? '—'} icon='tabler-chart-bar' iconColor='primary' /></Grid>
+                <Grid size={{ xs: 6 }}><MetricSummaryCard density='auto' titleEmphasis title={copy.application.nextStep} value={formatDate(item.application.nextStepAt, { day: '2-digit', month: 'short' }, 'es-CL')} icon='tabler-calendar-event' iconColor='info' /></Grid>
+              </Grid>
             </Stack>
           </Paper>
-          <Paper variant='outlined' sx={(theme) => ({ p: 4, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
-            <Stack spacing={2}>
-              <Typography variant='h6'>Portafolio y enlaces</Typography>
-              {item.portfolioUrl ? <Button component='a' href={item.portfolioUrl} target='_blank' rel='noreferrer' startIcon={<i className='tabler-briefcase-2' />} endIcon={<i className='tabler-external-link' />}>Portafolio</Button> : null}
-              {item.linkedinUrl ? <Button component='a' href={item.linkedinUrl} target='_blank' rel='noreferrer' startIcon={<i className='tabler-brand-linkedin' />} endIcon={<i className='tabler-external-link' />}>LinkedIn</Button> : null}
-              {!item.portfolioUrl && !item.linkedinUrl ? <Typography variant='body2' color='text.secondary'>Sin enlaces públicos informados.</Typography> : null}
-            </Stack>
-          </Paper>
-        </Stack>
+        </Grid>
       </Grid>
-    </Grid>
+      <Paper variant='outlined' sx={{ p: { xs: 2.5, md: 3.5 }, borderRadius: 3 }}>
+        <Stack spacing={3}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent='space-between' spacing={2}>
+            <Box><Typography variant='h5'>Señales de evaluación</Typography><Typography color='text.secondary' variant='body2'>Evidencia disponible para preparar la revisión humana.</Typography></Box>
+            <Box sx={{ flex: '0 0 auto' }}><GreenhouseChip kind='status' tone={item.application.blockingIssues.length ? 'warning' : 'success'} variant='label' label={item.application.blockingIssues.length ? `${item.application.blockingIssues.length} bloqueos` : 'Sin bloqueos'} /></Box>
+          </Stack>
+          <Divider />
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}><Typography variant='caption' color='text.secondary'>{copy.application.source}</Typography><Typography fontWeight={650}>{item.application.source}</Typography></Grid>
+            <Grid size={{ xs: 12, md: 6 }}><Typography variant='caption' color='text.secondary'>Creada</Typography><Typography fontWeight={650}>{formatDate(item.application.createdAt, { dateStyle: 'medium' }, 'es-CL')}</Typography></Grid>
+          </Grid>
+          {item.application.notes ? <Alert severity='info' icon={<i className='tabler-notes' />}>{item.application.notes}</Alert> : null}
+        </Stack>
+      </Paper>
+    </Stack>
   )
 
   const assessment = (
@@ -571,11 +604,8 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
   )
 
   const decisionPanel = (
-    <Stack spacing={4} sx={{ maxInlineSize: 780 }}>
-      <Stack direction='row' alignItems='flex-start' spacing={1.75}>
-        <i aria-hidden='true' className='tabler-scale text-primary' style={{ fontSize: 16, marginTop: 2 }} />
-        <Typography color='text.secondary'>{copy.application.decisionIntro}</Typography>
-      </Stack>
+    <Stack spacing={3}>
+      <Box><Typography variant='h5'>{copy.application.decisionTitle}</Typography><Typography color='text.primary' variant='body2'>{copy.application.decisionIntro}</Typography></Box>
       {error ? <Alert severity='error'>{error}</Alert> : null}
       {item.application.decision ? (
         <Alert severity='success' icon={<i className='tabler-circle-check' />} action={<Button onClick={() => setShowDecisionForm(true)}>{copy.application.supersede}</Button>}>
@@ -588,43 +618,17 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
           <Grid container spacing={2.5}>
             <Grid size={{ xs: 12 }}>
               <Typography variant='body2' fontWeight={650} sx={{ mb: 1 }}>{copy.application.decisionType}</Typography>
-              <Grid container spacing={2.5}>
-                {[
-                  ['selected', copy.application.decisionAdvance, 'tabler-arrow-up-right', 'success'],
-                  ['rejected', copy.application.decisionReject, 'tabler-x', 'error'],
-                  ['on_hold', copy.application.decisionHold, 'tabler-player-pause', 'warning'],
-                ].map(([value, label, icon, tone]) => {
-                  const active = decision === value
-
-                  return (
-                    <Grid key={value} size={{ xs: 12, sm: 4 }}>
-                      <Box
-                        component='button'
-                        type='button'
-                        onClick={() => setDecision(value as HiringDecision)}
-                        aria-pressed={active}
-                        sx={(theme) => ({
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          gap: 1.5,
-                          inlineSize: '100%',
-                          p: 3.5,
-                          borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                          border: `1.5px solid ${active ? theme.palette[tone as 'success' | 'error' | 'warning'].main : theme.palette.divider}`,
-                          color: active ? `${tone}.main` : 'text.secondary',
-                          backgroundColor: active ? `${tone}.lightOpacity` : 'background.paper',
-                          cursor: 'pointer',
-                          fontWeight: 650,
-                        })}
-                      >
-                        <i aria-hidden='true' className={icon} style={{ fontSize: 22 }} />
-                        {label}
-                      </Box>
-                    </Grid>
-                  )
-                })}
-              </Grid>
+              <ToggleButtonGroup
+                exclusive
+                fullWidth
+                value={decision}
+                onChange={(_, value: HiringDecision | null) => { if (value) setDecision(value) }}
+                aria-label={copy.application.decisionType}
+              >
+                <ToggleButton value='selected'>{copy.application.decisionAdvance}</ToggleButton>
+                <ToggleButton value='rejected'>{copy.application.decisionReject}</ToggleButton>
+                <ToggleButton value='on_hold'>{copy.application.decisionHold}</ToggleButton>
+              </ToggleButtonGroup>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth required={decision === 'selected' || decision === 'backup_selected'}><InputLabel id='decision-destination-label'>{copy.application.destination}</InputLabel><Select labelId='decision-destination-label' label={copy.application.destination} value={destination} onChange={(event) => setDestination(event.target.value as HiringFulfillmentMode)}><MenuItem value=''>No aplica</MenuItem>{DESTINATIONS.map((option) => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}</Select></FormControl>
@@ -676,46 +680,26 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
   const panels: Record<TabKey, React.ReactNode> = { overview, assessment, documents, decision: decisionPanel, activity }
 
   const lead = (
-    <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }} spacing={3.5}>
-      <Button component={NextLink} href='/agency/hiring/pipeline' startIcon={<i className='tabler-arrow-left' />} sx={{ alignSelf: { xs: 'flex-start', md: 'center' }, color: 'text.secondary', fontWeight: 650 }}>{copy.application.back}</Button>
-      <Box sx={{ display: { xs: 'none', md: 'block' }, inlineSize: 1, blockSize: 26, backgroundColor: 'divider' }} />
-      <Stack direction='row' alignItems='center' spacing={3} sx={{ minWidth: 0, flex: 1 }}>
-        <Avatar sx={{ inlineSize: 42, blockSize: 42, bgcolor: 'primary.lightOpacity', color: 'primary.dark', fontWeight: 750 }}>{item.candidateInitials}</Avatar>
+    <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }} spacing={2.5}>
+      <Button component={NextLink} href='/agency/hiring/pipeline' startIcon={<i className='tabler-arrow-left' />} sx={{ alignSelf: { xs: 'flex-start', md: 'center' }, color: 'primary.dark' }}>{copy.application.back}</Button>
+      <Stack direction='row' alignItems='center' spacing={2} sx={{ minWidth: 0, flex: 1 }}>
+        <Avatar sx={{ bgcolor: 'primary.dark', color: 'common.white', fontWeight: 750 }}>{item.candidateInitials}</Avatar>
         <Box sx={{ minWidth: 0 }}>
-          <Typography id='hiring-application-title' tabIndex={-1} variant='h3' noWrap sx={{ outline: 'none', lineHeight: 1.2 }}>{item.candidateName}</Typography>
-          <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mt: 0.75 }}>
+          <Typography id='hiring-application-title' tabIndex={-1} variant='h4' noWrap sx={{ outline: 'none' }}>{item.candidateName}</Typography>
+          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
             <Typography variant='body2' color='text.secondary'>{item.openingTitle}{item.area ? ` · ${item.area}` : ''} · Etapa:</Typography>
             <GreenhouseChip size='small' kind='status' variant='label' tone='info' label={copy.pipeline.stages[item.application.stage]} />
           </Stack>
         </Box>
       </Stack>
-      <GreenhouseButton kind='primaryAction' reserveInlineSize={130} leadingIconClassName='tabler-gavel' onClick={() => { setShowDecisionForm(true); setTab('decision') }}>{copy.application.decideAction}</GreenhouseButton>
+      <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-gavel' onClick={() => { setShowDecisionForm(true); setTab('decision') }} sx={(theme) => ({ color: theme.palette.common.white, backgroundColor: theme.axis.ramp.primary[700], '&:hover': { backgroundColor: theme.axis.ramp.primary[800] } })}>{copy.application.decideAction}</GreenhouseButton>
     </Stack>
   )
 
   const primary = (
-    <Stack spacing={5} sx={{ minWidth: 0 }}>
+    <Stack spacing={3} sx={{ minWidth: 0 }}>
       <Box data-capture='hiring-application-tabs' sx={{ borderBlockEnd: 1, borderColor: 'divider' }}>
-        <Tabs
-          value={tab}
-          onChange={(_, value: TabKey) => { setError(null); setTab(value) }}
-          variant='scrollable'
-          scrollButtons='auto'
-          aria-label={`${item.candidateName} 360`}
-          sx={{
-            minBlockSize: 42,
-            '& .MuiTabs-indicator': { blockSize: 2 },
-            '& .MuiTab-root': {
-              minBlockSize: 42,
-              px: 3.5,
-              py: 2.5,
-              color: 'text.secondary',
-              fontWeight: 650,
-              textTransform: 'none',
-            },
-            '& .MuiTab-root.Mui-selected': { color: 'primary.dark', fontWeight: 700 },
-          }}
-        >
+        <Tabs value={tab} onChange={(_, value: TabKey) => { setError(null); setTab(value) }} variant='scrollable' scrollButtons='auto' aria-label={`${item.candidateName} 360`} sx={{ '& .MuiTab-root': { color: 'text.primary' }, '& .MuiTab-root.Mui-selected': { color: 'text.primary', fontWeight: 700 } }}>
           {(Object.keys(TAB_ICONS) as TabKey[]).map((key) => <Tab key={key} value={key} label={copy.application[key]} />)}
         </Tabs>
       </Box>
@@ -725,7 +709,7 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
 
   return (
     <>
-      <HiringDeskFrame surface='application' copy={copy} lead={lead} primary={primary} />
+      <HiringDeskFrame surface='application' copy={copy} currentLabel={item.candidateName} lead={lead} primary={primary} />
 
       <Dialog open={assignOpen} onClose={() => !assigning && setAssignOpen(false)} fullWidth maxWidth='sm'>
         <DialogTitle>{copy.application.assignAssessment}</DialogTitle>

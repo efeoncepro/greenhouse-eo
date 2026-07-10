@@ -14,11 +14,11 @@
 
 ## Brief
 
-El "control room" del ATS: un reclutador/hiring manager opera el pipeline de punta a punta bajo la shell común aprobada del HTML de referencia — publica una vacante, ve postulantes, los mueve por etapas, asigna el test, revisa el scorecard (la IA sugiere, él confirma) y decide con un reason defendible. Es la contraparte interna de la careers pública (354). Fairness: decisión estructurada, contestable, nunca auto-rechazo; PII masked por default.
+El "control room" del ATS: un reclutador/hiring manager opera el pipeline de punta a punta bajo una shell común (`CompositionShell`) — publica una vacante, ve postulantes, los mueve por etapas, asigna el test, revisa el scorecard (la IA sugiere, él confirma) y decide con un reason defendible. Es la contraparte interna de la careers pública (354). Fairness: decisión estructurada, contestable, nunca auto-rechazo; PII masked por default.
 
 ## Layout Skeleton
 
-### Shell común — `Hiring Desk` (HTML aprobado)
+### Shell común — `Hiring Desk` (CompositionShell)
 
 ```
 ┌─ Greenhouse (dashboard) ──────────────────────────────────────────┐
@@ -133,7 +133,7 @@ El "control room" del ATS: un reclutador/hiring manager opera el pipeline de pun
 
 | Región | Componente (primitive → Vuexy `Custom*` → MUI) | Reader/Command | Notas |
 |---|---|---|---|
-| Shell | `HiringDeskRouteShell` → `HiringDeskAppShell` (sidebar/topbar/canvas aislado por ruta) | — | Replica la shell del HTML aprobado; no toca el chrome Vuexy del resto del portal. `Application 360` usa el detail shell plano del HTML aprobado, no una reinterpretación con `CompositionShell`. |
+| Shell | `CompositionShell` (regiones + nav hermana) | — | NO shell hand-rolled |
 | Demand Desk | tabla (patrón `StaffAugmentationListView`) + `MetricSummaryCard` KPIs | readers openings/demands (353, server-side paginado) | drilldown |
 | Pipeline Board | `RoadmapBoard` + `GreenhouseDragList` (+ teclado) | `updateHiringApplicationStage` (353) | Adaptive Card; optimistic+rollback |
 | Application 360 | detail shell (patrón `PlacementDetailView`) + tabs | readers 360 + embed 1363/1362 + `decideHiringApplication` | anti silent-catch |
@@ -152,7 +152,7 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 
 ## Design Decision Log
 
-- **HTML aprobado como fuente literal de fidelidad:** Demand, Pipeline, Application 360 y Publication usan el canvas fijo del HTML (`sidebar 256`, topbar `60`, canvas `1440`) mediante una shell aislada a `/agency/hiring/**`; no se aplica una reinterpretación del chrome global Vuexy ni una composición alternativa sobre `CompositionShell`. Es una excepción limitada a TASK-355, no una primitive paralela ni cambio de shell para otras rutas.
+- **Composition Shell base** (CLAUDE.md); cards Adaptive (density=auto).
 - **Kanban canónico** (`RoadmapBoard`/`GreenhouseDragList`) + teclado obligatorio (a11y), NO demo full-version.
 - **360 = hub** que embebe assessment (1363) + docs (1362) + decisión; IA propone→humano confirma; anti-anclaje.
 - **Decisión estructurada/contestable** (reason obligatorio) — fairness/AI-Act; scorecard advisory, nunca gate.
@@ -162,7 +162,7 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 
 ## Acceptance Checklist
 
-- [ ] Shell aislada fiel al HTML aprobado + rutas `(dashboard)/agency/hiring/**` (NO `[lang]`) + deep links; bilingüe.
+- [ ] Shell `CompositionShell` + rutas `(dashboard)/agency/hiring/**` (NO `[lang]`) + deep links; bilingüe.
 - [ ] Demand (tabla server-side) · Pipeline (kanban `RoadmapBoard`, card=`HiringApplication`, `updateHiringApplicationStage`) · 360 (tabs + assessment 1363 + docs 1362 + decisión) · Publication (diff + publish).
 - [ ] Kanban con **alternativa por teclado** + optimistic+rollback; a11y axe verde.
 - [ ] `decideHiringApplication`: humano decide, reason estructurado, idempotencia + audit; scorecard advisory.

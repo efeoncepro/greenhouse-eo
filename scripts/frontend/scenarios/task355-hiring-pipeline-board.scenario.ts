@@ -28,7 +28,7 @@ export const scenario: CaptureScenario = {
     { kind: 'wait', selector: '[role="menu"]' },
     { kind: 'mark', label: 'pipeline-keyboard-menu', clipSelector: '[role="menu"]', note: 'Alternativa de etapa operable por teclado.' },
     { kind: 'click', selector: '[role="menu"] li:has-text("Screening")' },
-    { kind: 'wait', selector: 'text=No se pudo mover, se revirtió.', timeout: 8000 },
+    { kind: 'wait', selector: 'text=No pudimos guardar. Restauramos la etapa anterior.', timeout: 8000 },
     { kind: 'sleep', ms: 350 },
     { kind: 'mark', label: 'pipeline-rollback', note: 'Rollback visible tras fallo de red inyectado solo por harness GVC.' },
   ],

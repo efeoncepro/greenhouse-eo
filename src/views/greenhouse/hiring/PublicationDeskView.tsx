@@ -10,10 +10,20 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
+import Divider from '@mui/material/Divider'
+import FormControl from '@mui/material/FormControl'
 import Grid from '@mui/material/Grid'
+import InputLabel from '@mui/material/InputLabel'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
+import Select from '@mui/material/Select'
 import Snackbar from '@mui/material/Snackbar'
 import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
@@ -24,38 +34,78 @@ import HiringDeskFrame from './HiringDeskFrame'
 import { hiringRequest } from './hiring-client'
 
 type PublicationAction = 'publish' | 'pause' | 'resume' | 'close' | 'reopen'
-type PublicationUiAction = {
-  action: PublicationAction
-  label: string
-  kind: 'primaryAction' | 'secondaryAction' | 'custom'
-  icon: string
-  tone?: 'error'
-}
 
 interface PublicationDeskViewProps {
   copy: HiringDeskCopy
   initialSnapshot: HiringDeskSnapshot
 }
 
-const publicationTone = (status: HiringOpening['publicationStatus']) => {
-  if (status === 'published') return 'success'
-  if (status === 'paused') return 'warning'
-
-  return 'default'
-}
-
 const PublicationDeskView = ({ copy, initialSnapshot }: PublicationDeskViewProps) => {
   const [openings, setOpenings] = useState(initialSnapshot.openings)
+  const [openingId, setOpeningId] = useState(initialSnapshot.openings[0]?.opening.openingId ?? '')
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState<Partial<HiringOpening>>({})
   const [saving, setSaving] = useState(false)
   const [confirmAction, setConfirmAction] = useState<PublicationAction | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
 
-  const selected = openings[0] ?? null
+  const selected = useMemo(() => openings.find((item) => item.opening.openingId === openingId) ?? null, [openingId, openings])
   const opening = selected?.opening ?? null
+
+  const beginEdit = () => {
+    if (!opening) return
+
+    setDraft({
+      publicTitle: opening.publicTitle ?? opening.internalTitle,
+      publicSummary: opening.publicSummary ?? '',
+      publicDescription: opening.publicDescription ?? '',
+      publicRequirements: opening.publicRequirements ?? '',
+      publicNiceToHave: opening.publicNiceToHave ?? '',
+      publicArea: opening.publicArea ?? '',
+      publicSeniority: opening.publicSeniority ?? opening.seniority ?? '',
+      publicLocationMode: opening.publicLocationMode ?? '',
+      publicSkillTags: opening.publicSkillTags,
+    })
+    setEditing(true)
+  }
 
   const replaceOpening = (updated: HiringOpening) => {
     setOpenings((current) => current.map((item) => item.opening.openingId === updated.openingId ? { ...item, opening: updated } : item))
+  }
+
+  const savePublicContent = async () => {
+    if (!opening) return
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const updated = await hiringRequest<HiringOpening>(`/api/hiring/openings/${opening.openingId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          publicTitle: draft.publicTitle,
+          publicSummary: draft.publicSummary,
+          publicDescription: draft.publicDescription,
+          publicRequirements: draft.publicRequirements,
+          publicNiceToHave: draft.publicNiceToHave,
+          publicArea: draft.publicArea,
+          publicSeniority: draft.publicSeniority,
+          publicLocationMode: draft.publicLocationMode,
+          publicSkillTags: typeof draft.publicSkillTags === 'string'
+            ? String(draft.publicSkillTags).split(',').map((item) => item.trim()).filter(Boolean)
+            : draft.publicSkillTags,
+        }),
+      })
+
+      replaceOpening(updated)
+      setEditing(false)
+      setToast('Contenido público guardado.')
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : 'No se pudo guardar el contenido público.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const runPublicationAction = async () => {
@@ -91,148 +141,97 @@ const PublicationDeskView = ({ copy, initialSnapshot }: PublicationDeskViewProps
     reopen: { title: copy.publication.reopen, body: copy.publication.reopenBody, tone: 'primary' as const },
   }[confirmAction] : null
 
-  const publicFields = useMemo(() => opening ? [
-    ['Título del cargo', opening.publicTitle ?? opening.internalTitle],
+  const publicFields = opening ? [
+    ['Título', opening.publicTitle],
     ['Resumen', opening.publicSummary],
-    ['Responsabilidades', opening.publicDescription],
-    ['Requisitos', opening.publicRequirements],
-    ['Ubicación', opening.publicHiringRegion ?? opening.publicLocationMode],
+    ['Área', opening.publicArea],
+    ['Seniority', opening.publicSeniority],
     ['Modalidad', opening.publicWorkMode ?? opening.publicLocationMode],
-  ] : [], [opening])
+    ['Skills', opening.publicSkillTags.join(', ')],
+    ['Descripción', opening.publicDescription],
+    ['Requisitos', opening.publicRequirements],
+    ['Deseables', opening.publicNiceToHave],
+  ] : []
 
-  const clippedValueSx = {
-    display: '-webkit-box',
-    overflow: 'hidden',
-    WebkitBoxOrient: 'vertical',
-    WebkitLineClamp: 1,
-  } as const
-
-  const internalFields = useMemo(() => opening ? [
-    'Notas internas del hiring manager',
-    'Presupuesto / banda salarial',
-    'Nivel de riesgo del cargo',
-    'Configuración del scorecard',
-    'Umbral de aprobación',
-  ].map((label) => {
-    const values: Record<string, string | null | undefined> = {
-      'Notas internas del hiring manager': opening.internalNotes,
-      'Presupuesto / banda salarial': opening.budgetBand,
-      'Nivel de riesgo del cargo': opening.riskNotes,
-      'Configuración del scorecard': opening.publicRequirements ? 'Configurado' : null,
-      'Umbral de aprobación': opening.rateBand,
-    }
-
-    return [label, values[label]]
-  }) : [], [opening])
-
-  const actions: PublicationUiAction[] = opening ? (() => {
-    if (opening.publicationStatus === 'draft' || opening.publicationStatus === 'ready_for_review') {
-      return [{ action: 'publish', label: copy.publication.publish, kind: 'primaryAction', icon: 'tabler-world-upload' }]
-    }
-
-    if (opening.publicationStatus === 'published') {
-      return [
-        { action: 'pause', label: copy.publication.pause, kind: 'secondaryAction', icon: 'tabler-player-pause' },
-        { action: 'close', label: copy.publication.close, kind: 'custom', icon: 'tabler-lock', tone: 'error' },
-      ]
-    }
-
-    if (opening.publicationStatus === 'paused') {
-      return [
-        { action: 'resume', label: copy.publication.resume, kind: 'primaryAction', icon: 'tabler-player-play' },
-        { action: 'close', label: copy.publication.close, kind: 'custom', icon: 'tabler-lock', tone: 'error' },
-      ]
-    }
-
-    return [{ action: 'reopen', label: copy.publication.reopen, kind: 'secondaryAction', icon: 'tabler-lock-open' }]
-  })() : []
+  const internalFields = opening ? [
+    ['Título interno', opening.internalTitle],
+    ['Budget band', opening.budgetBand],
+    ['Rate band', opening.rateBand],
+    ['Notas de riesgo', opening.riskNotes],
+    ['Notas internas', opening.internalNotes],
+    ['Owner ID', opening.ownerUserId],
+  ] : []
 
   const content = (
-    <Stack spacing={4} sx={{ minWidth: 0, maxInlineSize: 1080 }}>
+    <Stack spacing={4} sx={{ minWidth: 0 }}>
+      <Box><Typography variant='h4'>{copy.publication.title}</Typography><Typography color='text.secondary' sx={{ mt: 1 }}>{copy.publication.subtitle}</Typography></Box>
       {error ? <Alert severity='error'>{error}</Alert> : null}
+      <Paper variant='outlined' sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
+        <FormControl fullWidth>
+          <InputLabel id='publication-opening-label'>{copy.pipeline.openingLabel}</InputLabel>
+          <Select labelId='publication-opening-label' label={copy.pipeline.openingLabel} value={openingId} onChange={(event) => { setOpeningId(event.target.value); setEditing(false) }}>
+            {openings.map(({ opening: item }) => <MenuItem key={item.openingId} value={item.openingId}>{item.internalTitle} · {item.publicationStatus}</MenuItem>)}
+          </Select>
+        </FormControl>
+      </Paper>
 
-      {!opening ? <Alert severity='info'>{copy.publication.noOpening}</Alert> : (
-        <>
-          <Paper variant='outlined' sx={(theme) => ({ p: 4, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
-            <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }} spacing={3.5}>
-              <Box sx={(theme) => ({ display: 'grid', placeItems: 'center', inlineSize: 44, blockSize: 44, borderRadius: `${theme.shape.customBorderRadius.md}px`, color: 'primary.dark', backgroundColor: 'primary.lightOpacity', flex: '0 0 auto' })}>
-                <i aria-hidden='true' className='tabler-briefcase' style={{ fontSize: 22 }} />
-              </Box>
-              <Box sx={{ minWidth: 0, flex: 1 }}>
-                <Typography variant='h6'>{opening.publicTitle ?? opening.internalTitle}</Typography>
-                <Typography variant='caption' color='text.secondary'>{opening.publicId} · {opening.publicArea ?? 'Growth'} · {opening.publicHiringRegion ?? opening.publicLocationMode ?? 'Chile'}</Typography>
-              </Box>
-              <GreenhouseChip kind='status' variant='label' tone={publicationTone(opening.publicationStatus)} iconClassName={opening.publicationStatus === 'published' ? 'tabler-world' : 'tabler-pencil'} label={opening.publicationStatus} />
-              {opening.publicationStatus === 'published' ? <Button component='a' href={`/public/careers/${opening.publicId}`} target='_blank' rel='noreferrer' size='small' endIcon={<i className='tabler-external-link' />}>Ver en careers</Button> : null}
-            </Stack>
-          </Paper>
+      {!selected || !opening ? <Alert severity='info'>{copy.publication.noOpening}</Alert> : (
+        <Grid data-capture='hiring-publication-diff' container spacing={3} sx={{ '& > *': { minWidth: 0 } }}>
+          <Grid size={{ xs: 12, lg: 7 }}>
+            <Paper variant='outlined' sx={{ p: { xs: 2.5, md: 3.5 }, borderRadius: 3, minBlockSize: '100%' }}>
+              <Stack spacing={3}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2}>
+                  <Stack direction='row' alignItems='center' spacing={1.5}><Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 40, blockSize: 40, borderRadius: 2, color: 'success.main', backgroundColor: 'success.lightOpacity' }}><i className='tabler-world' /></Box><Box><Typography variant='h5'>{copy.publication.publicPreview}</Typography><Typography variant='caption' color='text.secondary'>{opening.publicId}</Typography></Box></Stack>
+                  <Stack direction='row' spacing={1} alignItems='center'><GreenhouseChip kind='status' variant='label' tone={opening.publicationStatus === 'published' ? 'success' : opening.publicationStatus === 'paused' ? 'warning' : 'default'} label={opening.publicationStatus} />{!editing ? <Button size='small' onClick={beginEdit} startIcon={<i className='tabler-edit' />}>{copy.publication.edit}</Button> : null}</Stack>
+                </Stack>
+                <Divider />
 
-          <Alert severity='info' icon={<i className='tabler-shield-check' />}><Typography fontWeight={700}>{copy.publication.allowlist}</Typography><Typography variant='body2'>Esto es lo que verá el público. Lo interno nunca cruza al listado público.</Typography></Alert>
-
-          <Grid data-capture='hiring-publication-diff' container spacing={4} sx={{ '& > *': { minWidth: 0 } }}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Paper variant='outlined' sx={(theme) => ({ p: 4, borderRadius: `${theme.shape.customBorderRadius.lg}px`, minBlockSize: '100%' })}>
-                <Stack spacing={0}>
-                  <Stack direction='row' alignItems='center' spacing={2} sx={{ mb: 2 }}><i aria-hidden='true' className='tabler-world-check text-success' style={{ fontSize: 18 }} /><Typography variant='subtitle2' color='success.dark' fontWeight={750}>{copy.publication.publicPreview}</Typography></Stack>
-                  {publicFields.map(([label, value]) => (
-                    <Box key={label} sx={{ py: 1.35, borderBlockEnd: 1, borderColor: 'divider' }}>
-                      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', lineHeight: 1.25 }}>{label}</Typography>
-                      <Typography variant='body2' color='text.primary' sx={{ ...clippedValueSx, lineHeight: 1.45 }}>{value || 'No informado'}</Typography>
+                {editing ? (
+                  <Stack spacing={2.5}>
+                    <TextField required label='Título público' value={draft.publicTitle ?? ''} onChange={(event) => setDraft((current) => ({ ...current, publicTitle: event.target.value }))} />
+                    <TextField multiline minRows={2} label='Resumen público' value={draft.publicSummary ?? ''} onChange={(event) => setDraft((current) => ({ ...current, publicSummary: event.target.value }))} />
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth label='Área' value={draft.publicArea ?? ''} onChange={(event) => setDraft((current) => ({ ...current, publicArea: event.target.value }))} /></Grid>
+                      <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth label='Seniority' value={draft.publicSeniority ?? ''} onChange={(event) => setDraft((current) => ({ ...current, publicSeniority: event.target.value }))} /></Grid>
+                    </Grid>
+                    <TextField label='Skills' value={Array.isArray(draft.publicSkillTags) ? draft.publicSkillTags.join(', ') : draft.publicSkillTags ?? ''} onChange={(event) => setDraft((current) => ({ ...current, publicSkillTags: event.target.value as never }))} />
+                    <TextField multiline minRows={4} label='Descripción' value={draft.publicDescription ?? ''} onChange={(event) => setDraft((current) => ({ ...current, publicDescription: event.target.value }))} />
+                    <TextField multiline minRows={3} label='Requisitos' value={draft.publicRequirements ?? ''} onChange={(event) => setDraft((current) => ({ ...current, publicRequirements: event.target.value }))} />
+                    <TextField multiline minRows={3} label='Deseables' value={draft.publicNiceToHave ?? ''} onChange={(event) => setDraft((current) => ({ ...current, publicNiceToHave: event.target.value }))} />
+                    <Stack direction='row' justifyContent='flex-end' spacing={1}><Button onClick={() => setEditing(false)} disabled={saving} sx={{ color: 'text.primary' }}>{copy.common.cancel}</Button><GreenhouseButton kind='primaryAction' onClick={() => void savePublicContent()} disabled={saving} leadingIcon={saving ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined} sx={(theme) => ({ color: theme.palette.common.white, backgroundColor: theme.axis.ramp.primary[700], '&:hover': { backgroundColor: theme.axis.ramp.primary[800] } })}>{copy.common.save}</GreenhouseButton></Stack>
+                  </Stack>
+                ) : (
+                  <Stack spacing={2.5}>
+                    <Box sx={(theme) => ({ p: 3, borderRadius: 3, background: `linear-gradient(145deg, ${theme.palette.primary.lightOpacity}, ${theme.palette.background.paper})` })}>
+                      <Typography variant='h4'>{opening.publicTitle ?? opening.internalTitle}</Typography>
+                      <Typography color='text.secondary' sx={{ mt: 1 }}>{opening.publicSummary ?? 'Sin resumen público.'}</Typography>
+                      <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mt: 2 }}>{opening.publicArea ? <GreenhouseChip kind='attribute' label={opening.publicArea} /> : null}{opening.publicSeniority ? <GreenhouseChip kind='attribute' label={opening.publicSeniority} /> : null}{opening.publicWorkMode ? <GreenhouseChip kind='attribute' label={opening.publicWorkMode} /> : null}</Stack>
                     </Box>
-                  ))}
-                </Stack>
-              </Paper>
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Paper variant='outlined' sx={(theme) => ({ p: 4, borderRadius: `${theme.shape.customBorderRadius.lg}px`, minBlockSize: '100%', backgroundColor: 'action.hover' })}>
-                <Stack spacing={0}>
-                  <Stack direction='row' alignItems='center' spacing={2} sx={{ mb: 2 }}><i aria-hidden='true' className='tabler-eye-off text-disabled' style={{ fontSize: 18 }} /><Typography variant='subtitle2' color='text.secondary' fontWeight={750}>{copy.publication.internalOnly}</Typography></Stack>
-                  {internalFields.map(([label]) => (
-                    <Stack key={label} direction='row' alignItems='center' spacing={2.25} sx={{ py: 3, borderBlockEnd: 1, borderColor: 'divider', color: 'text.disabled' }}>
-                      <i aria-hidden='true' className='tabler-lock' />
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography color='inherit' sx={clippedValueSx}>{label}</Typography>
-                      </Box>
-                    </Stack>
-                  ))}
-                </Stack>
-              </Paper>
-            </Grid>
+                    <List disablePadding>{publicFields.map(([label, value]) => <ListItem key={label} disableGutters divider><ListItemIcon sx={{ minWidth: 36 }}><i className={value ? 'tabler-check text-success' : 'tabler-minus text-disabled'} /></ListItemIcon><ListItemText primary={label} secondary={value || 'No informado'} /></ListItem>)}</List>
+                  </Stack>
+                )}
+              </Stack>
+            </Paper>
           </Grid>
 
-          <Stack direction='row' alignItems='center' spacing={2.5} sx={(theme) => ({ border: `1px dashed ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.md}px`, px: 3.5, py: 2.75 })}>
-            <i aria-hidden='true' className='tabler-link text-disabled' />
-            <Typography variant='caption' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>{`careers.efeonce.com/${opening.publicId}`}</Typography>
-          </Stack>
-
-          <Stack direction='row' justifyContent='flex-end' spacing={2.5} flexWrap='wrap' useFlexGap>
-            {actions.map((action) => (
-              action.kind === 'secondaryAction' ? (
-                <Button
-                  key={action.action}
-                  variant='outlined'
-                  color='inherit'
-                  startIcon={<i aria-hidden='true' className={action.icon} />}
-                  onClick={() => setConfirmAction(action.action)}
-                  sx={{ minInlineSize: 170, minBlockSize: 40, fontWeight: 700 }}
-                >
-                  {action.label}
-                </Button>
-              ) : (
-                <GreenhouseButton
-                  key={action.action}
-                  kind={action.kind}
-                  tone={action.tone}
-                  leadingIconClassName={action.icon}
-                  onClick={() => setConfirmAction(action.action)}
-                  disabled={action.action === 'publish' && !opening.publicTitle}
-                >
-                  {action.label}
-                </GreenhouseButton>
-              )
-            ))}
-          </Stack>
-        </>
+          <Grid size={{ xs: 12, lg: 5 }}>
+            <Stack spacing={3}>
+              <Paper variant='outlined' sx={{ p: 3, borderRadius: 3 }}>
+                <Stack spacing={2}><Stack direction='row' alignItems='center' spacing={1.5}><Box sx={{ color: 'warning.main' }}><i className='tabler-lock' /></Box><Box><Typography variant='h6'>{copy.publication.internalOnly}</Typography><Typography variant='caption' color='text.secondary'>Excluido por allowlist</Typography></Box></Stack><Divider /><List disablePadding>{internalFields.map(([label, value]) => <ListItem key={label} disableGutters><ListItemIcon sx={{ minWidth: 36 }}><i className='tabler-eye-off' /></ListItemIcon><ListItemText primary={label} secondary={value || 'Sin dato'} /></ListItem>)}</List></Stack>
+              </Paper>
+              <Alert severity='success' icon={<i className='tabler-shield-check' />}><Typography fontWeight={700}>{copy.publication.allowlist}</Typography><Typography variant='body2'>Solo la columna izquierda alimenta Careers. La información interna no sale de este workspace.</Typography></Alert>
+              <Paper variant='outlined' sx={{ p: 3, borderRadius: 3 }}>
+                <Stack spacing={2}>
+                  {opening.publicationStatus === 'draft' || opening.publicationStatus === 'ready_for_review' ? <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-world-upload' onClick={() => setConfirmAction('publish')} disabled={!opening.publicTitle} sx={(theme) => ({ color: theme.palette.common.white, backgroundColor: theme.axis.ramp.primary[700], '&:hover': { backgroundColor: theme.axis.ramp.primary[800] } })}>{copy.publication.publish}</GreenhouseButton> : null}
+                  {opening.publicationStatus === 'published' ? <GreenhouseButton kind='secondaryAction' leadingIconClassName='tabler-player-pause' onClick={() => setConfirmAction('pause')} sx={{ color: 'text.primary' }}>{copy.publication.pause}</GreenhouseButton> : null}
+                  {opening.publicationStatus === 'paused' ? <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-player-play' onClick={() => setConfirmAction('resume')} sx={(theme) => ({ color: theme.palette.common.white, backgroundColor: theme.axis.ramp.primary[700], '&:hover': { backgroundColor: theme.axis.ramp.primary[800] } })}>{copy.publication.resume}</GreenhouseButton> : null}
+                  {opening.publicationStatus === 'closed' ? <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-reload' onClick={() => setConfirmAction('reopen')} sx={(theme) => ({ color: theme.palette.common.white, backgroundColor: theme.axis.ramp.primary[700], '&:hover': { backgroundColor: theme.axis.ramp.primary[800] } })}>{copy.publication.reopen}</GreenhouseButton> : null}
+                  {opening.publicationStatus !== 'closed' ? <GreenhouseButton variant='outlined' tone='error' leadingIconClassName='tabler-circle-x' onClick={() => setConfirmAction('close')}>{copy.publication.close}</GreenhouseButton> : null}
+                </Stack>
+              </Paper>
+            </Stack>
+          </Grid>
+        </Grid>
       )}
     </Stack>
   )
@@ -240,14 +239,7 @@ const PublicationDeskView = ({ copy, initialSnapshot }: PublicationDeskViewProps
   return (
     <>
       <HiringDeskFrame surface='publication' copy={copy} primary={content} />
-      <Dialog open={Boolean(confirmAction)} onClose={() => !saving && setConfirmAction(null)} fullWidth maxWidth='sm' PaperProps={{ 'data-capture': 'hiring-publication-confirm-dialog' }}>
-        <DialogTitle>{confirmation?.title}</DialogTitle>
-        <DialogContent><Typography color='text.primary'>{confirmation?.body}</Typography></DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmAction(null)} disabled={saving} sx={{ color: 'text.primary' }}>{copy.common.cancel}</Button>
-          <GreenhouseButton tone={confirmation?.tone} disabled={saving} onClick={() => void runPublicationAction()} leadingIcon={saving ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}>{copy.common.confirm}</GreenhouseButton>
-        </DialogActions>
-      </Dialog>
+      <Dialog open={Boolean(confirmAction)} onClose={() => !saving && setConfirmAction(null)} fullWidth maxWidth='sm' PaperProps={{ 'data-capture': 'hiring-publication-confirm-dialog' }}><DialogTitle>{confirmation?.title}</DialogTitle><DialogContent><Typography color='text.primary'>{confirmation?.body}</Typography></DialogContent><DialogActions><Button onClick={() => setConfirmAction(null)} disabled={saving} sx={{ color: 'text.primary' }}>{copy.common.cancel}</Button><GreenhouseButton tone={confirmation?.tone} disabled={saving} onClick={() => void runPublicationAction()} leadingIcon={saving ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined} sx={{ color: 'text.primary' }}>{copy.common.confirm}</GreenhouseButton></DialogActions></Dialog>
       <Snackbar open={Boolean(toast)} autoHideDuration={4000} onClose={() => setToast(null)} message={toast} />
     </>
   )
