@@ -196,6 +196,8 @@ import { getHiringCandidateRetentionOverdueSignal } from './queries/hiring-candi
 // TASK-356 — Hiring handoff workflow signals (moduleKey 'hiring').
 import { getHiringHandoffBlockedStaleSignal } from './queries/hiring-handoff-blocked-stale'
 import { getHiringInternalHireAwaitingOnboardingSignal } from './queries/hiring-internal-hire-awaiting-onboarding'
+// TASK-770 — Bridge hiring→HRIS (moduleKey 'workforce').
+import { getWorkforceHiringActivationStuckSignal } from './queries/workforce-hiring-activation-stuck'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
 import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
 // TASK-1085 — Nexa knowledge retrieval observability (moduleKey 'knowledge').
@@ -678,6 +680,7 @@ interface ReliabilityOverviewSources {
   hiringCandidateRetentionOverdue?: ReliabilitySignal | null
   hiringHandoffBlockedStale?: ReliabilitySignal | null
   hiringInternalHireAwaitingOnboarding?: ReliabilitySignal | null
+  workforceHiringActivationStuck?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
   /** TASK-1085 — Nexa knowledge retrieval signals (no-source rate + stale-source). */
@@ -1153,6 +1156,7 @@ export const buildReliabilityOverview = (
     ...(sources.hiringCandidateRetentionOverdue ? [sources.hiringCandidateRetentionOverdue] : []),
     ...(sources.hiringHandoffBlockedStale ? [sources.hiringHandoffBlockedStale] : []),
     ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
+    ...(sources.workforceHiringActivationStuck ? [sources.workforceHiringActivationStuck] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
     // TASK-1085 — Nexa knowledge retrieval observability (no-source rate + stale-source).
@@ -1740,6 +1744,12 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringInternalHireAwaitingOnboarding !== undefined
       ? preloadedSources.hiringInternalHireAwaitingOnboarding
       : await getHiringInternalHireAwaitingOnboardingSignal().catch(() => null)
+
+  // TASK-770 — member creado pero ficha laboral sin completar (limbo del hire, steady=0).
+  const workforceHiringActivationStuck =
+    preloadedSources.workforceHiringActivationStuck !== undefined
+      ? preloadedSources.workforceHiringActivationStuck
+      : await getWorkforceHiringActivationStuckSignal().catch(() => null)
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2532,6 +2542,7 @@ export const getReliabilityOverview = async (
     hiringCandidateRetentionOverdue,
     hiringHandoffBlockedStale,
     hiringInternalHireAwaitingOnboarding,
+    workforceHiringActivationStuck,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,
     nexaKnowledgeRetrieval,
