@@ -24,6 +24,42 @@ const SENSITIVE_DOMAINS = ['finance', 'payroll', 'auth', 'identity', 'billing', 
 const UI_DOMAINS = ['ui', 'design-system', 'motion', 'accessibility']
 const UI_IMPACTS = new Set(['copy', 'layout', 'interaction', 'motion', 'primitive', 'flow'])
 const UI_READY_VALUES = new Set(['yes', 'no', 'n/a', 'na'])
+const MODULAR_PLACEMENT_ADOPTION_ID = 1376
+
+const TOPOLOGY_IMPACTS = new Set([
+  'none',
+  'portal',
+  'public',
+  'api',
+  'worker',
+  'domain-package',
+  'ui-package',
+  'tooling',
+  'cross-runtime'
+])
+
+const FUTURE_CANDIDATE_HOMES = new Set([
+  'portal',
+  'public',
+  'api',
+  'worker',
+  'domain-package',
+  'ui-package',
+  'remain-shared',
+  'undecided'
+])
+
+const MODULAR_PLACEMENT_FIELDS = [
+  'Topology impact',
+  'Current home',
+  'Future candidate home',
+  'Boundary',
+  'Server/browser split',
+  'Build impact',
+  'Extraction blocker'
+]
+
+const PLACEHOLDER_VALUE_RE = /(?:\[.*\]|<.*>|\b(?:tbd|todo|placeholder|verificar)\b)/i
 
 const BACKEND_DATA_DOMAINS = [
   'api',
@@ -146,6 +182,101 @@ const isBackendDataImpacted = task => {
   const lowerDomain = task.domain ?? ''
 
   return BACKEND_DATA_DOMAINS.some(domain => lowerDomain.includes(domain))
+}
+
+const parseListFields = content => {
+  const fields = new Map()
+
+  for (const line of content.split('\n')) {
+    const match = line.match(/^\s*-\s+([^:]+):\s*(.*?)\s*$/)
+
+    if (!match) continue
+    fields.set(match[1].trim().toLowerCase(), stripStatusValue(match[2]))
+  }
+
+  return fields
+}
+
+const checkModularPlacementContract = (task, context) => {
+  if (!task.idNumber || task.idNumber < MODULAR_PLACEMENT_ADOPTION_ID) return []
+
+  const section = task.sections.get('modular placement contract')
+  const severity = blockingSeverity(context)
+
+  if (!section) {
+    return [
+      finding({
+        task,
+        rule: 'modular-placement-contract',
+        severity,
+        message:
+          'Missing "## Modular Placement Contract". Follow docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md.'
+      })
+    ]
+  }
+
+  const fields = parseListFields(section.content)
+  const findings = []
+
+  for (const field of MODULAR_PLACEMENT_FIELDS) {
+    const value = fields.get(field.toLowerCase()) ?? ''
+
+    if (!value) {
+      findings.push(
+        finding({
+          task,
+          rule: 'modular-placement-contract',
+          severity,
+          line: section.line,
+          message: `Modular Placement Contract is missing "${field}".`
+        })
+      )
+      continue
+    }
+
+    if (PLACEHOLDER_VALUE_RE.test(value)) {
+      findings.push(
+        finding({
+          task,
+          rule: 'modular-placement-contract',
+          severity,
+          line: section.line,
+          message: `Modular Placement Contract field "${field}" contains a placeholder: "${value}".`
+        })
+      )
+    }
+  }
+
+  const topologyImpact = normalizeStatusValue(fields.get('topology impact') ?? '')
+  const futureHome = normalizeStatusValue(fields.get('future candidate home') ?? '')
+
+  if (topologyImpact && !TOPOLOGY_IMPACTS.has(topologyImpact)) {
+    findings.push(
+      finding({
+        task,
+        rule: 'modular-placement-contract',
+        severity,
+        line: section.line,
+        message: `Topology impact must be one of ${Array.from(TOPOLOGY_IMPACTS).join(', ')}. Received "${topologyImpact}".`
+      })
+    )
+  }
+
+  if (futureHome && !FUTURE_CANDIDATE_HOMES.has(futureHome)) {
+    findings.push(
+      finding({
+        task,
+        rule: 'modular-placement-contract',
+        severity,
+        line: section.line,
+        message:
+          `Future candidate home must be one of ${Array.from(FUTURE_CANDIDATE_HOMES).join(', ')}. ` +
+          `Received "${futureHome}".`
+      })
+    )
+  }
+
+  return findings
 }
 
 const checkRequiredSections = (task, context) => {
@@ -754,6 +885,11 @@ export const RULES = [
     id: 'files-owned-section',
     appliesTo: task => task.kind === 'template',
     check: checkFilesOwned
+  },
+  {
+    id: 'modular-placement-contract',
+    appliesTo: task => task.kind === 'template' && ACTIVE_TASK_LIFECYCLES.has(task.folderLifecycle),
+    check: checkModularPlacementContract
   },
   {
     id: 'acceptance-checkboxes',

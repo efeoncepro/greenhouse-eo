@@ -18,8 +18,9 @@ Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_
 7. Mantener `UI ready: no` hasta que el wireframe y el `## UI/UX Contract` incluyan implementation mapping, GVC scenario plan y design decision log; solo entonces puede pasar a `yes`
 8. Si la task toca backend, datos, DB, API, commands, readers, migrations, sync, cron, webhooks o integraciones, declarar `Execution profile: backend-data`, completar `Backend impact` y copiar el bloque de [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_BACKEND_DATA_ADDENDUM.md)
 9. Si `UI impact != none` y `Backend impact != none`, preferir split en dos tasks (`backend-data` foundation + `ui-ux` consumer). Si se conserva una task hibrida, agregar `## Hybrid Execution Justification`.
-10. Para tasks `umbrella` o `policy`: Zone 3 (Detailed Spec) puede omitirse; Verification es revision manual
-11. El cierre de una task no termina cuando el codigo "ya funciona": termina solo cuando el agente actualiza `Lifecycle`, mueve el archivo a la carpeta correcta y sincroniza `docs/tasks/README.md`
+10. Toda task nueva debe completar `## Modular Placement Contract` según `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`; un fix local puede usar `Topology impact: none`, pero no omitir el bloque.
+11. Para tasks `umbrella` o `policy`: Zone 3 (Detailed Spec) puede omitirse; Verification es revision manual
+12. El cierre de una task no termina cuando el codigo "ya funciona": termina solo cuando el agente actualiza `Lifecycle`, mueve el archivo a la carpeta correcta y sincroniza `docs/tasks/README.md`
 
 ---
 
@@ -121,6 +122,22 @@ Reglas obligatorias:
 ### Gap
 
 - [que sigue roto, faltante o ambiguo]
+
+## Modular Placement Contract
+
+- Topology impact: `[none|portal|public|api|worker|domain-package|ui-package|tooling|cross-runtime]`
+- Current home: `[path/runtime real donde se construye ahora]`
+- Future candidate home: `[portal|public|api|worker|domain-package|ui-package|remain-shared|undecided]`
+- Boundary: `[primitive/contract y consumers autorizados]`
+- Server/browser split: `[n/a|descripcion explicita]`
+- Build impact: `[none|dependencia pesada/filesystem input/global entrypoint explicito]`
+- Extraction blocker: `[none|transaccion/auth/routing/data/provider constraint explicito]`
+
+[Toda task nueva completa este bloque. Un fix estrictamente local puede declarar
+`Topology impact: none` y usar descripciones cortas, pero no deja placeholders.
+La task no crea `apps/*`/`packages/*` por anticipado: `Future candidate home` es
+metadata de diseño hasta que EPIC-026 autorice una frontera. Source of truth:
+`docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.]
 
 ## UI/UX Contract
 

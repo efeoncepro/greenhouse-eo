@@ -91,6 +91,19 @@ SOURCE OF TRUTH
 
 Si hay conflicto entre task/spec, documentación y runtime real, prevalece arquitectura vigente + código/schema/runtime verificados. Corrige o anota el drift antes de implementar si cambia contrato o bloquea.
 
+MODULAR PLACEMENT CONTRACT
+
+Antes de Plan/Implementación, lee `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` y valida el `## Modular Placement Contract` de la task contra el repo real:
+
+- `Current home` es el path/runtime donde se construye ahora.
+- `Future candidate home` es metadata, no permiso para crear `apps/*`, `packages/*`, servicios o repositorios.
+- `Boundary` nombra el primitive/contract y sus consumers autorizados.
+- `Server/browser split` mantiene DB, stores, secrets y provider SDKs fuera del browser.
+- `Build impact` declara dependencias pesadas, filesystem inputs o global entrypoints.
+- `Extraction blocker` nombra transacción/auth/routing/data/provider o `none`.
+
+Si el bloque falta, tiene placeholders o contradice el código, corrige la task antes de implementar. Un fix local puede usar `Topology impact: none`, pero no omitir el contrato.
+
 GOAL PREFLIGHT
 
 Antes de ejecutar el hook para una `TASK-###`, verifica si el operador ya dio un
@@ -329,6 +342,7 @@ Revisar y, si aplica, actualizar este documento cuando cambie cualquiera de:
   cross-agent.
 - `docs/tasks/TASK_PROCESS.md`.
 - `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`.
+- `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
 - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`.
 - package scripts usados como gates (`docs:closure-check`, `docs:context-check`,

@@ -145,6 +145,10 @@ After user confirmation:
 3. Update `docs/tasks/README.md` with the next available ID
 4. Commit with message: `docs: create TASK-### — [short title]`
 
+## EPIC-026 Modular Placement Contract
+
+When authoring a task in greenhouse-eo, read `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`. Every new canonical task completes `## Modular Placement Contract` with topology impact, current home, future candidate home, canonical boundary, server/browser split, build impact and extraction blocker. A local fix uses `Topology impact: none`, but never omits the section or leaves placeholders. Candidate homes are metadata and do not authorize opportunistic `apps/*`, `packages/*`, services or repositories. Run `pnpm task:lint --task TASK-###`; blocking adoption starts at TASK-1376.
+
 ## Quality Rules
 
 - **All paths must be real.** Do not invent file paths. If you cannot confirm a file exists, mark it with `[verificar]` for the agent taking the task to confirm during Discovery.

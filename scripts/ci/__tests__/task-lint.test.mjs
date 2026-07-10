@@ -144,6 +144,29 @@ N/A — additive repo-only tooling, no production runtime impact.
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 `
 
+const modularPlacementContract = ({
+  topologyImpact = 'none',
+  currentHome = 'scripts/ci/**',
+  futureCandidateHome = 'remain-shared',
+  boundary = 'task lint contract consumed by authoring tools',
+  serverBrowserSplit = 'n/a — tooling only',
+  buildImpact = 'none',
+  extractionBlocker = 'none'
+} = {}) => [
+  '## Modular Placement Contract',
+  '',
+  `- Topology impact: \`${topologyImpact}\``,
+  `- Current home: \`${currentHome}\``,
+  `- Future candidate home: \`${futureCandidateHome}\``,
+  `- Boundary: \`${boundary}\``,
+  `- Server/browser split: \`${serverBrowserSplit}\``,
+  `- Build impact: \`${buildImpact}\``,
+  `- Extraction blocker: \`${extractionBlocker}\``
+].join('\n')
+
+const withModularPlacementContract = (source, contract = modularPlacementContract()) =>
+  source.replace('<!-- ZONE 2 — PLAN MODE -->', `${contract}\n\n<!-- ZONE 2 — PLAN MODE -->`)
+
 const createRepo = () => {
   const root = mkdtempSync(join(tmpdir(), 'task-lint-'))
 
@@ -176,6 +199,86 @@ const createRepo = () => {
 }
 
 const cases = [
+  {
+    name: 'accepts the extraction-ready contract for post-adoption tasks',
+    run: () => {
+      const root = createRepo()
+      const id = 'TASK-1377'
+
+      write(
+        join(root, 'docs', 'tasks', 'TASK_ID_REGISTRY.md'),
+        `# Registry\n\n| Task ID | Lifecycle | Brief | File |\n| --- | --- | --- | --- |\n| \`${id}\` | \`to-do\` | Fixture. | \`docs/tasks/to-do/${id}-fixture.md\` |\n`
+      )
+      write(join(root, 'docs', 'tasks', 'README.md'), '# Task Index\n\n- siguiente ID disponible: `TASK-1378`\n')
+      write(
+        join(root, 'docs', 'tasks', 'to-do', `${id}-fixture.md`),
+        withModularPlacementContract(taskFixture({ id }))
+      )
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: id } })
+
+      assert.equal(result.errors.some(item => item.rule === 'modular-placement-contract'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'errors when a post-adoption task omits the modular placement contract',
+    run: () => {
+      const root = createRepo()
+      const id = 'TASK-1377'
+
+      write(
+        join(root, 'docs', 'tasks', 'TASK_ID_REGISTRY.md'),
+        `# Registry\n\n| Task ID | Lifecycle | Brief | File |\n| --- | --- | --- | --- |\n| \`${id}\` | \`to-do\` | Fixture. | \`docs/tasks/to-do/${id}-fixture.md\` |\n`
+      )
+      write(join(root, 'docs', 'tasks', 'README.md'), '# Task Index\n\n- siguiente ID disponible: `TASK-1378`\n')
+      write(join(root, 'docs', 'tasks', 'to-do', `${id}-fixture.md`), taskFixture({ id }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: id } })
+
+      assert.equal(result.errors.some(item => item.rule === 'modular-placement-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'errors on invalid modular placement enums and placeholders',
+    run: () => {
+      const root = createRepo()
+      const id = 'TASK-1377'
+
+      write(
+        join(root, 'docs', 'tasks', 'TASK_ID_REGISTRY.md'),
+        `# Registry\n\n| Task ID | Lifecycle | Brief | File |\n| --- | --- | --- | --- |\n| \`${id}\` | \`to-do\` | Fixture. | \`docs/tasks/to-do/${id}-fixture.md\` |\n`
+      )
+      write(join(root, 'docs', 'tasks', 'README.md'), '# Task Index\n\n- siguiente ID disponible: `TASK-1378`\n')
+      write(
+        join(root, 'docs', 'tasks', 'to-do', `${id}-fixture.md`),
+        withModularPlacementContract(taskFixture({ id }), modularPlacementContract({
+          topologyImpact: 'microservice',
+          currentHome: '[path/runtime real donde se construye ahora]',
+          futureCandidateHome: 'new-repo'
+        }))
+      )
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: id } })
+      const modularErrors = result.errors.filter(item => item.rule === 'modular-placement-contract')
+
+      assert.equal(modularErrors.length >= 3, true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'does not retroactively require modular placement on pre-adoption tasks',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture())
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'modular-placement-contract'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
   {
     name: 'parses Status multiline fields without truncating the next field',
     run: () => {

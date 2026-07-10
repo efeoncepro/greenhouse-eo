@@ -145,6 +145,12 @@ After confirmation:
 - If a capability combines backend/data reusable work and visible UI, do not default to one broad task. Create a `backend-data` foundation task for schema/API/reader/command/migration/sync/contract work and a separate `ui-ux` consumer task for route/layout/interaction/copy/GVC work. A vertical hybrid task is acceptable only when the change is small, reversible, does not introduce risky migration/schema work, and includes `## Hybrid Execution Justification` plus explicit slice order.
 - If the user only wants a draft, stop before writing files.
 
+## EPIC-026 Modular Placement Contract
+
+When authoring a task in greenhouse-eo, read docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md. Every new canonical task completes `## Modular Placement Contract` with topology impact, current home, future candidate home, canonical boundary, server/browser split, build impact and extraction blocker. A truly local fix uses `Topology impact: none`, but never omits the section or leaves placeholders. Candidate homes are planning metadata and do not authorize opportunistic `apps/*`, `packages/*`, services or repositories.
+
+Run `pnpm task:lint --task TASK-###`; the contract is blocking from TASK-1376 onward.
+
 ## Output Contract
 
 Your primary artifact is the task markdown file itself.

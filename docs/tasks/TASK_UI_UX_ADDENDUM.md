@@ -6,6 +6,12 @@ layout, estados, interaccion, motion, primitive, flujo de producto o evidencia v
 Este addendum no reemplaza `TASK_TEMPLATE.md`: lo extiende cuando `Execution profile` sea
 `ui-ux` o cuando `UI impact` sea distinto de `none`.
 
+Antes de este addendum, toda task nueva completa `## Modular Placement Contract`. Para UI,
+`Current home` nombra la surface actual, `Future candidate home` normalmente es `portal`,
+`public` o `ui-package`, `Boundary` identifica el reader/command/DTO consumido y
+`Server/browser split` prohíbe stores/DB/secrets/provider SDKs en Client Components. Ver
+`docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
+
 ## Wireframe Gate
 
 Toda task `ui-ux` o con `UI impact != none` debe declarar en `## Status`:

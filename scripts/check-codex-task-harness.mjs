@@ -12,6 +12,9 @@ const files = {
   prompt: 'docs/operations/CODEX_EXECUTION_PROMPT_V1.md',
   hook: 'scripts/codex-task-hook.mjs',
   skill: '.codex/skills/greenhouse-task-execution-hook/SKILL.md',
+  taskPlannerSkill: '.codex/skills/greenhouse-task-planner/SKILL.md',
+  architectSkill: '.codex/skills/software-architect-2026/SKILL.md',
+  modularOperatingModel: 'docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md',
   agents: 'AGENTS.md',
   claude: 'CLAUDE.md',
   claudeCommand: '.claude/commands/implement-task.md',
@@ -46,10 +49,20 @@ requireIncludes('CODEX prompt', sources.prompt, '/goal [TASK-###] UI enterprise-
 requireIncludes('CODEX prompt', sources.prompt, 'SUBAGENT TOOLING')
 requireIncludes('CODEX prompt', sources.prompt, 'multi_agent_v1')
 requireIncludes('CODEX prompt', sources.prompt, 'fork recomendado, no autorizado/no disponible')
+requireIncludes('CODEX prompt', sources.prompt, 'MODULAR PLACEMENT CONTRACT')
+requireIncludes('CODEX prompt', sources.prompt, 'MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md')
+requireIncludes('CODEX prompt', sources.prompt, 'Future candidate home')
 requireIncludes('CODEX hook', sources.hook, '--subagents')
 requireIncludes('CODEX skill', sources.skill, '/implement-task ###')
 requireIncludes('CODEX skill', sources.skill, 'Goal Preflight')
 requireIncludes('CODEX skill', sources.skill, '--subagents')
+requireIncludes('CODEX skill', sources.skill, 'Modular Placement Contract')
+requireIncludes('CODEX task planner', sources.taskPlannerSkill, 'EPIC-026 Modular Placement Contract')
+requireIncludes('CODEX task planner', sources.taskPlannerSkill, 'MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md')
+requireIncludes('CODEX architect', sources.architectSkill, 'Greenhouse EPIC-026 transitional rule')
+requireIncludes('CODEX architect', sources.architectSkill, 'MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md')
+requireIncludes('modular operating model', sources.modularOperatingModel, '## Mechanical enforcement')
+requireIncludes('modular operating model', sources.modularOperatingModel, 'pnpm task:lint --task TASK-###')
 requireIncludes('AGENTS.md', sources.agents, '/implement-task ###')
 requireIncludes('AGENTS.md', sources.agents, 'Goal preflight TASK-* para Codex')
 requireIncludes('AGENTS.md', sources.agents, '--subagents')
@@ -58,6 +71,8 @@ requireIncludes('CLAUDE.md', sources.claude, 'Delta Codex goal preflight')
 requireIncludes('CLAUDE.md', sources.claude, '--subagents')
 requireIncludes('Claude command', sources.claudeCommand, 'TASK-###|###')
 requireIncludes('Claude command', sources.claudeCommand, '/goal TASK-### UI enterprise-ready')
+requireIncludes('Claude command', sources.claudeCommand, 'MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md')
+requireIncludes('Claude command', sources.claudeCommand, 'Modular Placement Contract')
 requireIncludes('project_context.md', sources.projectContext, '/implement-task ###')
 
 rejectIncludes('CODEX prompt stale branch rule', sources.prompt, 'crea branch `task/TASK-###-short-slug`')

@@ -98,7 +98,7 @@ UI work continues to follow the Greenhouse UI contracts. Additionally:
 
 ## Required task authoring note
 
-While `EPIC-026` is active, every new non-trivial task should answer in `## Architecture Alignment`, `## Dependencies & Impact` or its backend/UI contract:
+While `EPIC-026` is active, every new canonical task must complete `## Modular Placement Contract` in Zone 1:
 
 - **Current home:** real path/runtime where it will be built now.
 - **Future candidate home:** portal, public, API, worker, domain package, UI package or `remain shared`.
@@ -107,7 +107,16 @@ While `EPIC-026` is active, every new non-trivial task should answer in `## Arch
 - **Build impact:** new heavy dependencies, filesystem inputs or global entrypoints.
 - **Extraction blocker:** transaction, auth/session, routing, data or provider constraint that would prevent an independent deployment.
 
-For a small local fix, a one-line `no modular topology impact` statement is sufficient. Do not inflate task scope merely to satisfy this note.
+For a small local fix, use `Topology impact: none` with short real answers for the remaining fields. Do not inflate task scope merely to satisfy this contract.
+
+## Mechanical enforcement
+
+- Blocking adoption starts at `TASK-1376`; older backlog is not mass-migrated.
+- `pnpm task:lint --task TASK-###` rejects a missing block, missing fields, placeholders and invalid enums.
+- `pnpm ops:lint --changed` propagates the same task findings; it does not duplicate the rule.
+- Planners must write the block before registration; execution hooks validate it against repo reality before code.
+- Canonical enums and copyable shape live in `docs/tasks/TASK_TEMPLATE.md`; this document owns rationale and behavior.
+- Candidate homes never authorize topology creation. Only an approved EPIC-026 child task can create/move `apps/*` or `packages/*`.
 
 ## Examples
 

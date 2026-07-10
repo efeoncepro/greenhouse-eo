@@ -30,6 +30,7 @@ Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_
 - Branch convention: `task/TASK-###-short-slug` (e.g., `task/TASK-003-finance-dashboard-fix`)
 - Las tasks con UI visible usan el mismo `TASK-###`, pero declaran `Execution profile: ui-ux`, `UI impact`, `UI ready`, `Wireframe: docs/ui/wireframes/...`, `Flow: docs/ui/flows/...|none`, `Motion: docs/ui/motion/...|none` y completan `## UI/UX Contract`.
 - Las tasks con backend/data usan el mismo `TASK-###`, pero declaran `Execution profile: backend-data`, `Backend impact` y completan `## Backend/Data Contract`.
+- Toda task nueva completa `## Modular Placement Contract` con current home, future candidate home, boundary, server/browser split, build impact y extraction blocker. Un fix local usa `Topology impact: none`; no se omite el bloque.
 
 ---
 
@@ -118,6 +119,31 @@ El linter valida presencia, no calidad del prose. La revision humana/agente debe
 
 Regla de migracion: no convertir masivamente backlog historico. `complete/` queda como historia;
 `in-progress/` y `to-do/` agregan el contrato UI/UX o Backend/Data cuando se editan, se rankean o se toman.
+
+### Modular Placement Contract durante EPIC-026
+
+El contrato canónico vive en `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
+Desde `TASK-1376`, toda task nueva declara una sección parseable:
+
+```md
+## Modular Placement Contract
+
+- Topology impact: `none|portal|public|api|worker|domain-package|ui-package|tooling|cross-runtime`
+- Current home: `path/runtime real`
+- Future candidate home: `portal|public|api|worker|domain-package|ui-package|remain-shared|undecided`
+- Boundary: `primitive/contract y consumers`
+- Server/browser split: `n/a|descripcion explicita`
+- Build impact: `none|impacto explicito`
+- Extraction blocker: `none|constraint explicito`
+```
+
+Reglas:
+
+- `Future candidate home` no autoriza crear `apps/*` o `packages/*`.
+- `Topology impact: none` es el fast-path proporcional para fixes/documentación local; los demás campos siguen presentes con respuestas cortas y reales.
+- No usar placeholders del template ni `TBD`/`[verificar]` al listar la task.
+- El linter aplica a tasks nuevas desde `TASK-1376`; no migra backlog histórico/complete masivamente.
+- Planners y ejecutores deben revisar este bloque en Discovery/Audit/Plan antes de escribir código.
 
 ## Calidad de solucion obligatoria
 
@@ -336,7 +362,8 @@ El agente DEBE hacer estas acciones antes de producir un plan:
    Si la task cambia source of truth, schema compartido, access model, auth/session, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, el ADR check es obligatorio.
 8. **Skill scan** — consultar skills disponibles en el entorno del agente a nivel global o de repo. Leer cada skill relevante antes de escribir codigo que la necesite. Registrar en Discovery summary que skills se usaran y para que slice.
 9. **Subagent assessment** — evaluar si la task se beneficia de delegacion a subagentes (ver protocolo abajo). Registrar la decision en el plan: ejecucion secuencial por el agente principal, o fork con coordinacion.
-10. **UI/UX profile check** — si `Execution profile: ui-ux` o `UI impact != none`, completar `## UI/UX Contract`, declarar un wireframe existente y declarar flow/motion contract cuando aplique antes de escribir JSX/copy visible:
+10. **Modular placement check** — validar `## Modular Placement Contract` contra el repo real antes de escribir código: current home existe o es el runtime real; future home es solo candidata; boundary nombra el primitive/contrato; browser/server split evita imports privilegiados; build impact declara dependencias/inputs/entrypoints; extraction blocker nombra transacción/auth/routing/data/provider o `none`.
+11. **UI/UX profile check** — si `Execution profile: ui-ux` o `UI impact != none`, completar `## UI/UX Contract`, declarar un wireframe existente y declarar flow/motion contract cuando aplique antes de escribir JSX/copy visible:
    - correr `pnpm ui:wireframe-check --task TASK-###`;
    - correr `pnpm ui:flow-check --task TASK-###` si `UI impact: flow` o hay sidecar/drawer/modal/popover/navegacion;
    - correr `pnpm ui:motion-check --task TASK-###` si `UI impact: motion` o hay motion/microinteracciones no triviales;
@@ -346,7 +373,7 @@ El agente DEBE hacer estas acciones antes de producir un plan:
    - declarar copy source;
    - declarar motion/microinteracciones y reduced-motion fallback;
    - declarar GVC scenario/viewports y check de scroll horizontal.
-11. **Backend/Data profile check** — si `Execution profile: backend-data` o `Backend impact != none`, completar `## Backend/Data Contract` antes de escribir backend/data:
+12. **Backend/Data profile check** — si `Execution profile: backend-data` o `Backend impact != none`, completar `## Backend/Data Contract` antes de escribir backend/data:
    - nombrar source of truth, contrato programatico y consumidores;
    - declarar invariantes de datos, tenant/space boundary y access/capability gates;
    - declarar idempotency, concurrencia, transaction boundary, audit/outbox/history si aplica;

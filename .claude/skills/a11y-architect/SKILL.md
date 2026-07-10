@@ -9,6 +9,10 @@ overrides: a11y-architect
 
 Load global `a11y-architect/SKILL.md` first → then read this overlay → then apply rules. When the global skill and this overlay disagree, **this overlay wins**.
 
+## Modular placement gate
+
+For Greenhouse work governed by `TASK-1376+`, read the task's `## Modular Placement Contract` and `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`. Accessibility needs may change the server/browser split, but they do not authorize a new deployable, route owner, or package extraction. Record those consequences in the contract and defer topology changes to the architecture ADR.
+
 ## Why this overlay exists
 
 Greenhouse EO is a Next.js 16 + MUI 7.x portal that serves Efeonce internal teams + Globe clients (enterprise marketing teams across the Americas). The product is **es-CL first, en-US second** (i18n is real, not aspirational). Compliance target: WCAG 2.2 AA + Chile's Ley 21.719 (data protection, accessibility implications). EAA exposure exists for Globe clients headquartered in EU.

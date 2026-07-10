@@ -30,6 +30,7 @@ This overlay pins the Greenhouse decisions so the global skill's "boring tech pr
 - **`docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`** + Platform Health V1.
 - **`docs/architecture/GREENHOUSE_AUTH_RESILIENCE_V1.md`** — TASK-742 7-layer defense template.
 - **`docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`** — Full API parity (UI is a client of governed contracts; Duncan Lennox / HubSpot principle). See pinned decision #16.
+- **`docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`** — EPIC-026 contract for continuing product work extraction-ready without pre-creating target apps/packages.
 
 ## Compose with the `astro` skill (Astro / static-site / efeonce-think work)
 
@@ -155,6 +156,8 @@ Any evidence upload (reconciliation snapshot, finiquito attachment, audit screen
 New tasks live in `docs/tasks/to-do/TASK-###-*.md` following `docs/tasks/TASK_TEMPLATE.md`. Move to `in-progress/` and `complete/` per `docs/tasks/TASK_PROCESS.md`.
 
 Any architecture spec from this skill that requires implementation creates a TASK-### file via the `greenhouse-task-planner` skill.
+
+Every new canonical task also completes `## Modular Placement Contract`: current home, future candidate home, canonical boundary, server/browser split, build impact and extraction blocker. `Topology impact: none` is the proportional fast-path. Candidate homes do not authorize `apps/*`/`packages/*` until an EPIC-026 child task does.
 
 ### 12. Migration discipline
 

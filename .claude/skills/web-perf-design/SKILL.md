@@ -9,6 +9,10 @@ overrides: web-perf-design
 
 Load global `web-perf-design/SKILL.md` first → then read this overlay. Where they disagree, **this overlay wins**.
 
+## Modular build gate
+
+For `TASK-1376+`, performance findings that affect dependency weight, hydration, route builds, or deployment cost must be recorded in `## Modular Placement Contract` (`Build impact` and `Extraction blocker`). Optimize the current home without silently creating a new runtime; follow `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
+
 ## Pinned decisions
 
 ### 1. Field metrics source: Vercel Analytics (RUM) + CrUX

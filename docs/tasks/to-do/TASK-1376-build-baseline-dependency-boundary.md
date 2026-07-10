@@ -123,6 +123,16 @@ Reglas obligatorias:
 - No hay una matriz cuantificada de fronteras candidatas ni objetivo mínimo de ahorro.
 - El peso de `docs/`, `scripts/` y `full-version/` no está separado entre contexto inerte y dependencia runtime real.
 
+## Modular Placement Contract
+
+- Topology impact: `tooling`
+- Current home: `scripts/architecture/build-baseline/** + docs/audits/platform/**`
+- Future candidate home: `remain-shared`
+- Boundary: `baseline JSON sanitizado + audit Markdown; no runtime productivo lo consume`
+- Server/browser split: `n/a — tooling local/read-only`
+- Build impact: `agrega medición/análisis on-demand; no entra al bundle Next.js`
+- Extraction blocker: `none`
+
 ## Backend/Data Contract
 
 ### Backend/data brief

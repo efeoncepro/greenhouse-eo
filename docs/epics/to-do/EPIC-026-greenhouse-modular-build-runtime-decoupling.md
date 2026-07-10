@@ -43,6 +43,7 @@ El grafo actual concentra aproximadamente 1.225 entrypoints y requiere mitigacio
 ## Child Tasks
 
 - `TASK-1376` — baseline cuantitativo, dependency graph, matriz de fronteras y veredicto de primera extracción.
+- `TASK-1377` ✅ — enforcement extraction-ready completado en templates, skills Codex/Claude repo/equipo/globales, hooks y task/ops lint; matriz de cobertura auditada.
 - `TBD` — higiene del contexto de build y materialización del índice Roadmap.
 - `TBD` — workspace foundation + dependency-boundary enforcement.
 - `TBD` — extracción piloto seleccionada por `TASK-1376`.

@@ -9,6 +9,10 @@ overrides: frontend-architect
 
 Load global `frontend-architect/SKILL.md` first → then read this overlay. Where they disagree, **this overlay wins**.
 
+## Modular placement gate (mandatory)
+
+Before deciding RSC/client boundaries, route groups, caching, data flow, or package placement for `TASK-1376+`, validate `## Modular Placement Contract` against `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`. Treat `src/app` as the current portal home, not the permanent topology. Keep domain logic extraction-ready, document build impact, and never create a deployable or physically extract a candidate package without the governing ADR/task.
+
 ## Pinned decisions
 
 ### 1. Stack — Next.js 16 App Router + React 19 + MUI 7.x + Vuexy

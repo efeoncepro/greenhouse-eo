@@ -9,6 +9,10 @@ overrides: info-architecture
 
 Load global `info-architecture/SKILL.md` first → then read this overlay. Where they disagree, **this overlay wins**.
 
+## Modular placement gate
+
+For `TASK-1376+`, route and navigation placement must agree with the task's `## Modular Placement Contract` and `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`. A URL or menu location identifies the current product surface; it does not by itself establish a permanent deployable boundary or authorize extraction.
+
 ## Pinned decisions
 
 ### 1. Top-level nav — canonical module set

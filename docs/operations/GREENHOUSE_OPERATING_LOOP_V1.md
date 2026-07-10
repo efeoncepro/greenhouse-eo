@@ -44,6 +44,7 @@ Crear o actualizar el artefacto correcto y sincronizar:
 - registry de IDs;
 - indice README correspondiente;
 - cross-link entre epic y tasks cuando aplique.
+- para tasks nuevas desde TASK-1376, `## Modular Placement Contract` completo y verde en `task:lint`.
 
 ### 3. Plan
 
@@ -68,6 +69,7 @@ Ejecutar local-first por defecto:
 - respetar source of truth vigente;
 - no mezclar refactors no relacionados;
 - no crear worktrees/clones salvo aprobacion explicita del operador.
+- durante EPIC-026, construir en la topologia actual pero extraction-ready según `MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`; no anticipar candidate homes.
 
 ### 5. Verification
 

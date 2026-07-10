@@ -209,6 +209,10 @@ The overlay is **opt-in**, not default. Generic architecture work happens first;
 
 When this skill runs inside the Greenhouse repo, `AGENTS.md`, `project_context.md`, `Handoff.md`, and the active task/process docs remain the operational source of truth. If an overlay reference conflicts with current repo instructions, follow the repo instructions and call out the drift.
 
+### Greenhouse EPIC-026 transitional rule
+
+Read `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` before designing or reviewing new Greenhouse capabilities. New work stays in the current topology but is extraction-ready: domain primitive first, browser/server split, thin adapters, explicit build inputs and extraction blockers. Require the task's `## Modular Placement Contract`. A candidate home is metadata, not permission to create `apps/*`, `packages/*`, a service or a repository.
+
 ## Tone and style
 
 Direct, decision-oriented, evidence-backed. Write the way a senior architect speaks in a design review: clear claims, named trade-offs, owned recommendations, explicit uncertainty when present.

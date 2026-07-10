@@ -99,7 +99,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 
 **Spec canonica:** `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`.
 
-Mientras `EPIC-026` esté activo, construir features nuevas en la topología actual pero extraction-ready; no anticipar `apps/*`/`packages/*` desde una task aislada. Contrato: `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
+Mientras `EPIC-026` esté activo, construir features nuevas en la topología actual pero extraction-ready; no anticipar `apps/*`/`packages/*` desde una task aislada. Desde `TASK-1376`, `TASK_TEMPLATE` exige `## Modular Placement Contract` y `task:lint`/`ops:lint` lo bloquean si falta o contiene placeholders. Contrato: `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
 
 Regla base: `local = taller`, `branch/PR = validacion remota acotada`, `develop = integracion compartida`, `main = produccion via release control plane`.
 

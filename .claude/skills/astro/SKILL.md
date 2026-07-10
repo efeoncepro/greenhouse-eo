@@ -33,6 +33,8 @@ Greenhouse headless model. When a task is about efeonce-think, **read
 `efeonce-overlay.md` first** — it pins the repo-specific decisions that override
 generic Astro advice.
 
+For Greenhouse-governed work (`TASK-1376+`), also validate the task's `## Modular Placement Contract` and `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`. Astro/public is a candidate future home; do not create or extract a deployable without its approved architecture task/ADR.
+
 ---
 
 ## Load order

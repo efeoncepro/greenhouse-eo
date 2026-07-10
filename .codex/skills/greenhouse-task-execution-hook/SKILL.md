@@ -77,6 +77,8 @@ pnpm codex:task-hook TASK-### --develop --subagents
 
 Apply the prompt printed by the command before implementation.
 
+Before planning or code, validate `## Modular Placement Contract` against `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`: current/candidate home, canonical boundary, server/browser split, build inputs and extraction blocker. A candidate home never authorizes opportunistic `apps/*` or `packages/*`.
+
 ## Filesystem / Worktree Rule
 
 Do not create `git worktree` folders or cloned repo folders by default when this

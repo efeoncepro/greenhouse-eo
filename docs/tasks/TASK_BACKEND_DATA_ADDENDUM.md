@@ -4,6 +4,8 @@ Addendum copiable para tasks `TASK-###` que tocan backend, datos, DB, API routes
 
 No reemplaza `TASK_TEMPLATE.md`: se pega como `## Backend/Data Contract` dentro de Zone 1 cuando `Execution profile: backend-data` o `Backend impact != none`.
 
+Antes de este addendum, toda task nueva completa `## Modular Placement Contract`. Para backend/data, `Boundary` debe nombrar el command/reader/event/API canónico, `Server/browser split` debe mantener stores/DB/secrets/providers fuera del browser, `Build impact` declara SDKs o filesystem inputs y `Extraction blocker` identifica transacciones/auth/data/provider que impiden deployment independiente. Ver `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
+
 ## Cuándo usarlo
 
 Usar este addendum si la task cambia cualquiera de estos planos:
