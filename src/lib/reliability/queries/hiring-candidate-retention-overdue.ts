@@ -57,7 +57,7 @@ export const getHiringCandidateRetentionOverdueSignal = async (): Promise<Reliab
 
     return {
       signalId: HIRING_CANDIDATE_RETENTION_OVERDUE_SIGNAL_ID,
-      moduleKey: 'documents',
+      moduleKey: 'hiring',
       kind: 'data_quality',
       source: 'getHiringCandidateRetentionOverdueSignal',
       label,
@@ -77,7 +77,7 @@ export const getHiringCandidateRetentionOverdueSignal = async (): Promise<Reliab
 
     return {
       signalId: HIRING_CANDIDATE_RETENTION_OVERDUE_SIGNAL_ID,
-      moduleKey: 'documents',
+      moduleKey: 'hiring',
       kind: 'data_quality',
       source: 'getHiringCandidateRetentionOverdueSignal',
       label,

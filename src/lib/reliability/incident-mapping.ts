@@ -126,7 +126,18 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
   // TASK-1082 — Knowledge Platform ingestion.
   knowledge: ['knowledge_', 'knowledge platform', 'knowledge ingestion', 'quarantine', 'greenhouse_knowledge'],
   // TASK-1226 — Growth AI Visibility Grader (provider adapters, runs, observations).
-  growth: ['ai visibility', 'ai_visibility', 'growth.ai_visibility', 'greenhouse_growth', 'grader run']
+  growth: ['ai visibility', 'ai_visibility', 'growth.ai_visibility', 'greenhouse_growth', 'grader run'],
+  // TASK-356 — Hiring/ATS: handoff reactivo + dominio de reclutamiento (greenhouse_hiring).
+  hiring: [
+    'hiring_handoff',
+    'hiring handoff',
+    'hiring_application',
+    'hiring.application',
+    'hiring.handoff',
+    'talent_demand',
+    'candidate_facet',
+    'greenhouse_hiring'
+  ]
 }
 
 /**
@@ -150,6 +161,10 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   // Por encima de cloud para que un incident `signature_request`/`zapsign` ruteee
   // al subsystem Documents y no al fallback cloud genérico.
   documents: 17,
+  // TASK-356 — hiring: dueño del dominio de reclutamiento. Por encima de documents
+  // para que un incident hiring_* (aunque toque assets/documentos de candidato)
+  // rutee al módulo hiring y no al genérico de firmas.
+  hiring: 18,
   // TASK-1082 — knowledge ingestion: prioridad media (dueño del corpus/quarantine).
   knowledge: 16,
   // TASK-1226 — growth AI Visibility: prioridad media (dueño del grader/observations).

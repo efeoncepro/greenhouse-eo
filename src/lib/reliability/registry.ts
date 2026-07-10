@@ -545,6 +545,39 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     incidentDomainTag: 'knowledge'
   },
   {
+    // TASK-356 — Hiring / ATS: dominio de reclutamiento (EPIC-011). Handoff reactivo
+    // decisión→downstream (hiring_handoff, state-machine+CHECK+audit) + candidate document
+    // capture (TASK-1362: scan/quarantine + retención). Las 2 señales de candidate docs
+    // migraron desde `documents` al nacer este módulo (mismo PR, anti-drift).
+    moduleKey: 'hiring',
+    label: 'Hiring / ATS',
+    description:
+      'Dominio Hiring/ATS (TASK-353/355/356): talent_demand → opening → candidate → application → decisión → HiringHandoff. El handoff se materializa reactivo desde hiring.application.decided (solo selected) y entrega cola auditable a HRIS/770 y Staff Aug sin crear member/placement por side effect. Incluye candidate document capture (scan/quarantine + retención, TASK-1362).',
+    domain: 'hr',
+    routes: [{ path: '/agency/hiring', label: 'Hiring desk (TASK-355)' }],
+    apis: [
+      { path: '/api/hiring/handoffs', label: 'Handoff commands (TASK-356)' },
+      { path: '/api/hiring/applications', label: 'Applications + decide (TASK-355)' }
+    ],
+    dependencies: [
+      'greenhouse_hiring.hiring_handoff',
+      'greenhouse_hiring.hiring_handoff_audit',
+      'greenhouse_hiring.hiring_application',
+      'greenhouse_hiring.candidate_facet',
+      'greenhouse_core.asset_scan_results (candidate docs, TASK-1362)',
+      'greenhouse_sync.outbox_events (hiring.application.decided → hiring_handoff_materialize)'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/hiring/**',
+      'src/lib/sync/projections/hiring-handoff-materialize.ts',
+      'src/lib/reliability/queries/hiring-*.ts',
+      'src/lib/reliability/queries/asset-scan-*.ts'
+    ],
+    expectedSignalKinds: ['lag', 'data_quality', 'incident'],
+    incidentDomainTag: 'hiring'
+  },
+  {
     moduleKey: 'growth',
     label: 'Growth · AI Visibility Grader',
     description:

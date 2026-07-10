@@ -28,6 +28,7 @@ export type ReliabilityModuleKey =
   | 'documents' // TASK-490 — Signature orchestration + document vault (EPIC-001 signable pack)
   | 'knowledge' // TASK-1082 — Knowledge Platform ingestion (corpus + chunks + sanitize/quarantine)
   | 'growth' // TASK-1226 — Growth AI Visibility Grader (provider adapters, runs, observations)
+  | 'hiring' // TASK-356 — Hiring/ATS (handoff decisión→downstream + candidate docs/asset scan de TASK-1362)
 
 export type ReliabilityModuleDomain =
   | 'platform'

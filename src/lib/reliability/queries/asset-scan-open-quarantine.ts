@@ -60,7 +60,7 @@ export const getAssetScanOpenQuarantineSignal = async (): Promise<ReliabilitySig
 
     return {
       signalId: ASSET_SCAN_OPEN_QUARANTINE_SIGNAL_ID,
-      moduleKey: 'documents',
+      moduleKey: 'hiring',
       kind: 'data_quality',
       source: 'getAssetScanOpenQuarantineSignal',
       label,
@@ -84,7 +84,7 @@ export const getAssetScanOpenQuarantineSignal = async (): Promise<ReliabilitySig
 
     return {
       signalId: ASSET_SCAN_OPEN_QUARANTINE_SIGNAL_ID,
-      moduleKey: 'documents',
+      moduleKey: 'hiring',
       kind: 'data_quality',
       source: 'getAssetScanOpenQuarantineSignal',
       label,

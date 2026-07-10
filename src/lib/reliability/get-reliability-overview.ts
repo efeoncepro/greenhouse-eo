@@ -193,6 +193,9 @@ import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getAssetScanOpenQuarantineSignal } from './queries/asset-scan-open-quarantine'
 import { getHiringCandidateRetentionOverdueSignal } from './queries/hiring-candidate-retention-overdue'
+// TASK-356 — Hiring handoff workflow signals (moduleKey 'hiring').
+import { getHiringHandoffBlockedStaleSignal } from './queries/hiring-handoff-blocked-stale'
+import { getHiringInternalHireAwaitingOnboardingSignal } from './queries/hiring-internal-hire-awaiting-onboarding'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
 import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
 // TASK-1085 — Nexa knowledge retrieval observability (moduleKey 'knowledge').
@@ -673,6 +676,8 @@ interface ReliabilityOverviewSources {
   knowledgeQuarantineCount?: ReliabilitySignal | null
   assetScanOpenQuarantine?: ReliabilitySignal | null
   hiringCandidateRetentionOverdue?: ReliabilitySignal | null
+  hiringHandoffBlockedStale?: ReliabilitySignal | null
+  hiringInternalHireAwaitingOnboarding?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
   /** TASK-1085 — Nexa knowledge retrieval signals (no-source rate + stale-source). */
@@ -1146,6 +1151,8 @@ export const buildReliabilityOverview = (
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
     ...(sources.assetScanOpenQuarantine ? [sources.assetScanOpenQuarantine] : []),
     ...(sources.hiringCandidateRetentionOverdue ? [sources.hiringCandidateRetentionOverdue] : []),
+    ...(sources.hiringHandoffBlockedStale ? [sources.hiringHandoffBlockedStale] : []),
+    ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
     // TASK-1085 — Nexa knowledge retrieval observability (no-source rate + stale-source).
@@ -1721,6 +1728,18 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringCandidateRetentionOverdue !== undefined
       ? preloadedSources.hiringCandidateRetentionOverdue
       : await getHiringCandidateRetentionOverdueSignal().catch(() => null)
+
+  // TASK-356 — Handoffs bloqueados sin resolución humana (workflow atascado, steady=0).
+  const hiringHandoffBlockedStale =
+    preloadedSources.hiringHandoffBlockedStale !== undefined
+      ? preloadedSources.hiringHandoffBlockedStale
+      : await getHiringHandoffBlockedStaleSignal().catch(() => null)
+
+  // TASK-356 — Contrataciones internas aprobadas sin onboarding (SLA de no perder un hire).
+  const hiringInternalHireAwaitingOnboarding =
+    preloadedSources.hiringInternalHireAwaitingOnboarding !== undefined
+      ? preloadedSources.hiringInternalHireAwaitingOnboarding
+      : await getHiringInternalHireAwaitingOnboardingSignal().catch(() => null)
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2511,6 +2530,8 @@ export const getReliabilityOverview = async (
     knowledgeQuarantineCount,
     assetScanOpenQuarantine,
     hiringCandidateRetentionOverdue,
+    hiringHandoffBlockedStale,
+    hiringInternalHireAwaitingOnboarding,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,
     nexaKnowledgeRetrieval,
