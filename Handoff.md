@@ -1,3 +1,20 @@
+## Sesion 2026-07-10 - Auditoria integral motor hiring: 17 hallazgos cerrados - Claude
+
+> **Auditoría completa del motor hiring (governance + E2E) con todos los hallazgos CERRADOS en el
+> mismo ciclo** (commit en develop local, sin push). 3 ALTAS: (1) capabilities de gobernanza
+> (`publish/decide/score/approve`) se otorgaban a CUALQUIER usuario interno via routeGroup → ahora
+> role-only (admin/HR/ops); (2) `reconcileCandidateFacet` pisaba `consent_status` a `not_captured` en
+> upserts sin consent → preserve con param crudo, verificado live en 4 transiciones (Ley 21.719);
+> (3) `completeHiringActivation` dejaba el handoff en dead-end si la transición post-commit fallaba →
+> replay re-corre la transición. Más: FOR UPDATE + guards de status en scoring, TOCTOU en materialize
+> y activation (lock in-tx), decide valida opening vivo, stages decision-owned bloqueados en PATCH,
+> retention excluye postulaciones abiertas, índices únicos parciales (migración APLICADA, pre-check 0
+> dups), apply race → 409, signal SLA honesto con bridges OFF, reopen de cancelled auditado, boundary
+> test domain-wide, evento `hiring.competency_result.updated` ahora sí se emite. 829 tests verdes +
+> suites live contra PG real. **Hallazgo ajeno sin tocar:** el checkpoint in-progress de TASK-1371
+> (`ff6bd4b0f`, otra sesión) endureció el publish gate y dejó rojos `store.live.test.ts` +
+> `submit-application.live.test.ts` — le corresponde al owner de 1371.
+
 ## Sesion 2026-07-10 - Eval IA verde + flag staging ON + TASK-1385 creada - Claude
 
 > **El eval baseline de la IA de scoring (gate de 1361) corrió VERDE con provider real**: 6/6 casos,
