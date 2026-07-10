@@ -348,7 +348,7 @@ interface MemberIntakeRow extends Record<string, unknown> {
 }
 
 interface OnboardingCaseRow extends Record<string, unknown> {
-  case_id: string
+  onboarding_case_id: string
 }
 
 /**
@@ -395,12 +395,12 @@ export const completeHiringActivation = async (input: CommandInput): Promise<Hir
 
     // Evidencia del case de onboarding (lo abre completeWorkforceMemberIntake).
     const caseResult = await client.query<OnboardingCaseRow>(
-      `SELECT case_id FROM greenhouse_hr.work_relationship_onboarding_cases
+      `SELECT onboarding_case_id FROM greenhouse_hr.work_relationship_onboarding_cases
        WHERE member_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [locked.member_id],
     )
 
-    const onboardingCaseId = caseResult.rows[0]?.case_id ?? null
+    const onboardingCaseId = caseResult.rows[0]?.onboarding_case_id ?? null
 
     const updated = await updateActivationRequestState(client, {
       activationRequestId: locked.activation_request_id,

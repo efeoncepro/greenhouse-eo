@@ -116,7 +116,7 @@ const buildTxClient = (options: {
     }
 
     if (/work_relationship_onboarding_cases/.test(sql)) {
-      return { rows: [{ case_id: 'case-1' }] }
+      return { rows: [{ onboarding_case_id: 'case-1' }] }
     }
 
     throw new Error(`SQL inesperada: ${sql.slice(0, 90)}`)
