@@ -25,8 +25,8 @@
 | Hero grid | Load + idle | Deriva sutil del grid con máscara radial (portado del PR, re-tokenizado a `axis.*`). | CSS `@keyframes` + mask | yes |
 | Hero beams | Load + idle | Haces de luz que "caen" (naranja/azul de acento), ambientales. | CSS `@keyframes` | yes |
 | Hero entrance | Initial load | Reveal escalonado de eyebrow → H1 → lead → CTA. | CSS transition / IntersectionObserver | yes |
-| Stat cards | Scroll into view | Count-up de −27% / 3× / 7× con la fuente citada visible. | CSS/JS count-up con fallback | yes |
-| Spotlight cards | Hover / pointer | Halo naranja que sigue el cursor en cards de contenido. | CSS custom props (`--spot-x/y`) | opt |
+| Signal cards | Scroll into view + pointer | Reveal escalonado; halo teal sigue el puntero como realce decorativo, sin ocultar contenido. | CSS + custom props (`--spot-x/y`) | yes |
+| Thesis lanes | Scroll into view | Dos interfaces entran desde lados opuestos; el pulso conector orienta la transición humano→agente. | CSS | yes |
 | Section reveals | Scroll into view | Opacity + translateY < 16px al entrar cada sección. | CSS / IntersectionObserver | yes |
 | Form contract loader | Renderer no listo | Skeleton estable de "cargando formulario"; sin spinner-only. | CSS skeleton | yes |
 | Form host ready | Contrato resuelto | Reemplazo del skeleton con transición corta opacity/translate. | CSS transition | yes |
@@ -43,6 +43,7 @@
 | Spotlight content cards | Card sobria | Halo naranja siguiendo cursor | Ring visible si interactiva | n/a | n/a | n/a |
 | Form submit (del renderer) | Botón "Enviarme el ebook" | Señal de borde/elevación | Ring visible | Compresión | Estado pendiente del renderer | Copy de error estable |
 | FAQ `<summary>` | `+` colapsado | Lift de ink | Ring visible | n/a | n/a | Abre/cierra con altura animada corta |
+| Footer links | Visible | Subrayado teal | Ring visible | n/a | n/a | Navegación nativa estable |
 
 ## Transition Specs
 
@@ -55,6 +56,8 @@
 | Submit | `form.ready` | `form.submitting` | renderer-owned | pending + doble-submit deshabilitado | texto de pending estático |
 | Success | `form.submitting` | `form.success` | 0–240ms ease-out | reemplazo calmo del form por la confirmación de descarga; dos columnas sólo en desktop | swap instantáneo |
 | FAQ toggle | colapsado | expandido | 160–240ms ease-out | altura + opacity del panel | display inmediato |
+| Signal cards | sección fuera de viewport | cards visibles | 240–420ms ease-out | stagger corto + halo por puntero opcional | cards visibles, sin halo dinámico |
+| Thesis lanes | sección fuera de viewport | dos interfaces visibles | 240–360ms ease-out | entradas opuestas + pulso conector | ambas lanes visibles, conector estático |
 | Error | cualquier loading/pending | error/degraded | 0–160ms | detener motion ambiental; recovery estable | error estático |
 
 ## Primitive & Token Mapping
@@ -90,7 +93,7 @@
 
 - Compositor-only: transform/opacity/background-position/mask-position.
 - Layout reads/writes: sin loops de medición; sin scroll-jacking.
-- Animation scope: hero (grid/beams/entrance), stat count-up, section reveals, spotlight, form loader, success/error.
+- Animation scope: hero (grid/beams/entrance), signal cards, thesis lanes, section reveals, form loader, success/error y footer signal.
 - Counter constraints: los count-ups son datos citados con fuente, no métricas propias inventadas; con fallback estático.
 - Mobile constraints: sin canvas full-screen; beams/grid livianos; el fold no debe empujar el CTA fuera de vista ni dañar LCP/INP (el PR mete `support.js` render-blocking en `<head>` — se elimina).
 
@@ -112,6 +115,7 @@
 - Decision: motion marketing ambient + reveal (grid/beams/count-up/spotlight portados del PR, re-tokenizados a AXIS), sin pipeline orquestado; el post-submit es una confirmación de descarga inmediata, calma y recuperable.
 - Alternatives considered: página estática sin motion (pierde el wow del PR); GSAP orquestado como en brand-visibility (innecesario: no hay wait async ni report handoff); confetti/progreso en success (deshonesto para una descarga ya entregada).
 - Why this pattern: el usuario necesita una entrada premium de marca y datos con peso, no una consola de análisis; la entrega es gated en el mismo momento, por lo que el éxito confirma el archivo y conserva la tesis de web agéntica.
+- Delta 2026-07-10: el rectángulo inclinado detrás del visual de hero se retira por competir con el arte. Las secciones de señales y tesis reciben coreografía contenida y un halo de puntero no esencial; el footer usa entrada y pulso suave sólo como orientación de cierre. No se agrega GSAP ni una dependencia de cliente.
 - Reuse / extend / new primitive: reuse del shell de Think + CSS route-local + renderer Growth Forms; sin primitive nueva.
 - Open risks: portar los efectos sin regresión de contraste/perf; el fold no debe dañar LCP en mobile.
 - Follow-up: si algún reveal necesita GSAP, mantenerlo scoped y documentar el token de timing.

@@ -27,6 +27,7 @@
 | `<greenhouse-form>` (ebook) | Captura y submit gobernados + trigger del envío del ebook | Embebido en panel sobrio, `appearance="bare"`, con skeleton de carga. | Full-width con spacing estable y foco visible. | Growth Forms renderer |
 | Estado de éxito | Confirmación de descarga en pantalla | Reemplaza el form por una conclusión de dos columnas: descarga/recovery + cross-sell del grader como nivel 1. | Una columna, full-width. | Estado route-local del dock |
 | Descarga gated | Entrega real del lead magnet | El handoff post-submit entrega el `download_url` de corta duración; Think sólo lo dispara y permite reintento durante la sesión. | Igual. | Greenhouse asset handoff |
+| Footer editorial | Recuperación y cierre de lectura | Marca, navegación hacia hitos de la guía y privacidad sin competir con el CTA. | Zonas apiladas; links conservan el mismo orden. | Footer route-local |
 
 ## Flow Map
 
@@ -76,6 +77,7 @@
 - Focus restore: si success/error reemplazan el form host, el foco va al heading del nuevo estado cuando es técnicamente posible.
 - Screen reader: loading/error/success usan live region polite si el host controla el estado.
 - Keyboard traversal: header, CTA, campos del form, submit, retry y summaries del FAQ alcanzables en orden de documento.
+- Footer: enlaces nativos hacia hitos de lectura y privacidad; la vitalidad visual no crea controles paralelos.
 - Reduced motion: ver contrato de motion; loaders ambientales colapsan a skeleton + texto.
 
 ## Data & Command Boundaries

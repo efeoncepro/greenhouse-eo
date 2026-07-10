@@ -24,13 +24,13 @@
 |---|---|---|---|---|
 | 0 | Header | Identidad Efeonce/Think sin distraer del CTA. | `BaseLayout` / header local Think | Static copy |
 | 1 | Hero | Vender la tesis "El fin de la web / Marketing digital + IA" y llevar al form con un CTA de scroll. | Editorial hero (eyebrow + accent-word H1 + lead + CTA) sobre grid+beams animados | Static copy |
-| 2 | Stats strip | Dar peso con 3 datos citados con fuente (−27% tráfico orgánico, 3× tráfico IA, 7× ventas agénticas). | Floating stat cards (count-up) | Static copy con fuente literal |
-| 3 | Thesis | "Tu sitio ya tiene dos tipos de visitantes. Solo estás diseñado para uno." Explicar el cambio humano→agente. | Two-column / split editorial | Static copy |
+| 2 | Stats strip | Dar peso al marco con 2 interfaces, 4 niveles y 1 cambio de modelo. | Signal cards con reveal escalonado + halo de puntero no esencial. | Static copy |
+| 3 | Thesis | "Tu sitio ya tiene dos tipos de visitantes. Solo estás diseñado para uno." Explicar el cambio humano→agente. | Split editorial + dos lanes semánticas (experiencia propia / ventana del agente). | Static copy |
 | 4 | What's inside | "Qué vas a encontrar dentro" — los 5 actos + checklist "Lo que haces esta semana". | Feature list / bento ligero | Static copy |
 | 5 | Audience | "Para quién es este ebook" / "No es para ti si…" — calificar al lead. | Two-column fit/no-fit list | Static copy |
 | 6 | Form dock | "Descarga el ebook gratis" — form gobernado (nombre, email, rol opcional) que envía el ebook por email. | `<greenhouse-form>` + script loader (patrón `BrandVisibilityFormDock`) | Greenhouse Growth Forms |
 | 7 | FAQ | Resolver 5 dudas (qué es un agente IA, AEO vs SEO, llms.txt, zero-click commerce, bots > humanos). | Accordion `<details>` | Static copy |
-| 8 | Footer | Marca pública Efeonce + legal básico. | Footer Think existente | Static copy |
+| 8 | Footer | Cerrar la lectura, ubicar la marca y ofrecer navegación útil sin competir con el CTA. | Footer editorial de tres zonas + meta legal. | Static copy |
 
 ## Content Model (from PR #12, tokenized)
 
@@ -84,6 +84,10 @@ La landing toma la estructura y el copy del export como base y los aterriza a la
 | `think.webAgentica.landing.form.success.bridge.title` | 6 | `Mide el nivel 1 de tu web agéntica` | none | El grader cubre ser encontrado y entendido, no resume los cuatro niveles. |
 | `think.webAgentica.landing.form.success.bridge.body` | 6 | `Descubre si ChatGPT, Perplexity y Google AI encuentran y entienden tu marca. El ebook te ayuda a avanzar desde ahí hacia acciones y capacidades.` | none | Conecta la medición con la tesis completa, sin volver a SEO/AEO. |
 | `think.webAgentica.landing.form.success.bridge.cta` | 6 | `Medir mi visibilidad en IA` | href `/brand-visibility` | Cross-sell explícito hacia el grader hermano. |
+| `think.webAgentica.landing.footer.kicker` | 8 | `Efeonce Think` | none | Contexto editorial de la marca. |
+| `think.webAgentica.landing.footer.body` | 8 | `Ideas y capacidades para la web que ya están usando tus clientes.` | none | Cierre de marca concreto, sin promesa. |
+| `think.webAgentica.landing.footer.explore` | 8 | `Explora la guía` | none | Navegación de recuperación a los hitos de lectura. |
+| `think.webAgentica.landing.footer.signal` | 8 | `La nueva interfaz ya está abierta.` | none | Señal editorial, no dato cuantitativo. |
 | `think.webAgentica.landing.form.corporateGate` | 6 | `Usa tu correo corporativo — el ebook está pensado para equipos y marcas reales.` | none | El form exige correo corporativo (bloquea free/disposable), igual que el grader. |
 | `think.webAgentica.landing.faq.agent.q` | 7 | `¿Qué es un agente de inteligencia artificial?` | none | Del PR. |
 | `think.webAgentica.landing.faq.aeo.q` | 7 | `¿Qué es AEO y en qué se diferencia del SEO?` | none | Del PR. |
@@ -146,6 +150,7 @@ Las respuestas del FAQ se toman verbatim del PR #12 (`renderVals()`), revisadas 
 - Why this pattern: la página existe para SEO + captación; su valor depende de `<head>` correcto, marca Efeonce y un form que realmente capte el lead y entregue el ebook. El export no cumple ninguno de los tres.
 - Reuse / extend / new primitive: reuse `BaseLayout` + patrón form dock; no nace primitive Greenhouse.
 - Decisión (thank-you post-descarga): **tarjeta inline** que reemplaza el form (el área muta a una conclusión), NO overlay/modal. Alternativas rechazadas: overlay full-screen (pesado, focus-trap, anti-restraint 2026) y route change (rompe contexto/SEO). La entrega es inmediata y el usuario necesita confirmación, recuperación gated y una continuación útil. El grader se conserva como cross-sell secundario, pero se presenta con precisión como medición del nivel 1 (ser encontrado y entendido), no como sustituto del framework de cuatro niveles del ebook. En desktop el estado final usa dos columnas para no dejar una tarjeta de captura estrecha y aislada; en mobile se apila. La tarjeta no promete email hasta que ese delivery tenga evidencia independiente. El success_card gobernado del form es el baseline; la landing pinta el estado post-submit con el token.
+- Decisión (vitalidad editorial): se elimina el recuadro inclinado detrás del arte del hero; competía con la propia imagen. Las señales usan un halo de puntero puramente decorativo y reveal escalonado; la tesis gana dos lanes explícitas que materializan las dos interfaces; el footer se convierte en un cierre editorial de tres zonas. Ninguna de estas capas depende de hover, JavaScript o motion para comunicar significado; reduced motion muestra el estado final.
 - Decisión (política de email): **solo correo corporativo** (bloquea free/disposable), igual que el grader — el ebook es para equipos/marcas reales; el gate lo aplica el contrato gobernado del form (`emailPolicy`), no la landing.
 - Open risks: el **form instance del ebook (form_key) + el fulfillment de email + el ebook PDF** no existen todavía (dependencia backend-data en greenhouse-eo, TASK-1375); el origin `think.efeoncepro.com` debe estar autorizado en el allowlist gobernado para este form.
 - Follow-up: si el fulfillment del ebook no está listo, los slices 1–2 (scaffold + port visual) igual proceden; el slice del form embed queda bloqueado hasta la foundation.
