@@ -9867,3 +9867,6 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 - `hiring_opening` gana campos publicos estructurados (`public_work_mode`, region/ubicacion, `public_area`, `public_skill_tags`, `public_compensation_band`) y `publishOpening` bloquea vacantes sin estructura publica minima.
 - Careers ahora prefiere `PublicOpeningPayload` estructurado para area, modalidad, ubicacion y chips; la heuristica queda como fallback legacy.
 - Verificacion local: tests focales Hiring/Careers verdes, lint focal verde, typecheck verde y CLI dry-run Account Manager verde. Smoke DB execute/publish pendiente porque el proxy local Cloud SQL no estaba levantado (`127.0.0.1:15432`).
+# 2026-07-10 — Build cost recovery architecture
+
+- Se aceptó EPIC-027 para iniciar desacople físico incremental de Greenhouse tras la escalada económica reportada de Vercel. Design System Labs será el primer piloto; producción y Vercel permanecen sin cambios hasta que TASK-1382 demuestre aislamiento y beneficio.

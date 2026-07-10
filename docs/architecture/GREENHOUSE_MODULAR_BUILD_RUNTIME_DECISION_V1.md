@@ -2,7 +2,8 @@
 
 ## Status
 
-- Status: `Rejected`
+- Status: `Superseded`
+- Superseded by: `docs/architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md`
 - Date proposed: `2026-07-10`
 - Decision owner: `Platform / Architecture`
 - Epic: `EPIC-026`
@@ -11,6 +12,8 @@
 - Confidence: `medium`
 - Validated as of: `2026-07-10`
 - Evidence verdict: `no-go` after TASK-1379
+
+> Historical scope: TASK-1379's Roadmap materialization remains a valid `no-go`. The broader conclusion to stop physical decomposition was superseded on 2026-07-10 after operator invoice evidence showed an approximately USD 20 -> USD 530 Elastic escalation, Standard builds up to 45 minutes/incomplete, and USD 250 current Elastic spend despite local-first work.
 
 ## Context
 
