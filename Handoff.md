@@ -45,9 +45,26 @@
 > renombrado → quarantined + signal); (3) decidir si se provisiona ClamAV (USD ~20/mes) — hasta entonces el flag queda
 > OFF y el structural sostiene la defensa; (4) el borrado de PII vencida es follow-up gobernado, owner People Ops.
 >
-> **Gap conocido, declarado:** si el apply de Careers migra al renderer nativo de Growth Forms (TASK-1373) con su
-> propio upload (TASK-1372), ese path nuevo DEBE llamar a `scanAssetBytes` antes del attach. Hoy el único camino de
-> upload de CV público pasa por `attachPublicCareersCvToApplication`, que sí escanea.
+> **Gap detectado por el operador y CERRADO estructuralmente (2026-07-10).** El operador preguntó si la migración del
+> form de Careers a Growth Forms (TASK-1372/1373) rompería el escaneo. La respuesta era **sí**: el scan estaba soldado
+> al `File` del submit síncrono, y 1372 parte el flujo en un upload en Vercel (que tiene bytes) + un consumer reactivo
+> en el worker (que sólo ve JSON de PG, nunca un `File`), además de jubilar la ruta directa que yo había endurecido.
+> `submitPublicHiringApplication` sin `cvFile` deja `attachCv` como no-op → el escáner nunca corría. Peor: la spec de
+> 1372 nombra literalmente `createPrivatePendingAsset` + `attachAssetToAggregate` como los helpers a usar, sin mencionar
+> el escaneo.
+>
+> No se resolvió con un comentario. Se cerró con dos piezas:
+> 1. **`scanAndGateUploadedAsset`** (`src/lib/storage/asset-scan/gate.ts`): opera sobre **bytes + assetId**, NO sobre un
+>    `File`, para que el upload síncrono de Growth Forms lo reuse tal cual. `cv-upload.ts` se refactorizó para consumirlo.
+> 2. **Guardrail dentro de `attachAssetToAggregate`**: los contextos `hiring_application_cv` /
+>    `hiring_candidate_portfolio_file` NO se adjuntan sin un veredicto `clean` registrado
+>    (`asset_scan_required` / `asset_scan_blocking:<verdict>`). Cualquier camino de attach —presente o futuro— falla si
+>    alguien olvida escanear. La verificación agrega sobre TODOS los veredictos del asset, no toma el último: dos scans
+>    con el mismo `scanned_at` se desempatan por `scan_id`, y un `clean` podía taparle el paso a un `infected`
+>    (ejercitado contra PG real; antes pasaba, ahora bloquea). Un bloqueante `open` veta el attach hasta el triage humano.
+>
+> Delta agregado a la spec de TASK-1372 (mata `scanPolicy='pdf_only_v1'` como opción) + invariantes en el doc de
+> arquitectura y en CLAUDE.md.
 
 ## Sesion 2026-07-09 - TASK-355 Hiring Desk - Codex - CODE COMPLETE / ROLLOUT PENDIENTE
 

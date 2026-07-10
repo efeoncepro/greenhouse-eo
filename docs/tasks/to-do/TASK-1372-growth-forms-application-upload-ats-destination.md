@@ -1,5 +1,30 @@
 # TASK-1372 — Growth Forms Application Upload + ATS Destination Foundation
 
+## Delta 2026-07-10 — El escaneo de archivos YA EXISTE y es obligatorio (cerrado por TASK-1362)
+
+**Cambia el Slice 2 y responde la Open Question del `scanPolicy`.** TASK-1362 implementó el scan/quarantine
+real, así que este slice ya NO puede describirse como "PDF-only V1 hasta que 1362 complete full scan".
+
+- **`scanPolicy='pdf_only_v1'` está MUERTO como opción.** Nunca fue una verificación: `validatePublicCareersCvUpload`
+  sólo miraba `file.type`, el MIME que declara el navegador. Un ejecutable renombrado a `.pdf` pasaba.
+- **El helper a usar NO es `createPrivatePendingAsset` + `attachAssetToAggregate` a secas.** Entre ambos va
+  `scanAndGateUploadedAsset` (`src/lib/storage/asset-scan/gate.ts`), que opera sobre **bytes + assetId** —no sobre
+  un `File`— precisamente para que el upload síncrono de esta task lo pueda reusar tal cual. Si el veredicto
+  bloquea, el asset queda en cuarentena y **no se adjunta**.
+- **Red de seguridad estructural:** `attachAssetToAggregate` ahora RECHAZA los contextos
+  `hiring_application_cv` / `hiring_candidate_portfolio_file` sin un veredicto `clean` registrado
+  (`asset_scan_required` / `asset_scan_blocking:<verdict>`). Es decir: si el Slice 2 se cablea sin llamar al gate,
+  **el attach falla en runtime**, no pasa silenciosamente. No hay forma de abrir un segundo camino sin escanear.
+- **Consecuencia para el Slice 3 (projection reactiva):** el consumer del worker sólo ve JSON de PG, nunca un
+  `File`. Por eso el escaneo DEBE ocurrir en el submit síncrono (Vercel, donde están los bytes) y el worker se
+  limita a adjuntar un asset ya escaneado. `submitPublicHiringApplication` sin `cvFile` NO escanea nada — su
+  `attachCv` es un no-op. No confiar en que reusarlo arrastra el scan: no lo hace.
+- **Riesgo de la matriz "CV accepted without scan posture" → mitigado, pero sólo si se usa el gate.** El flag
+  `ASSET_MALWARE_SCAN_ENABLED` suma ClamAV encima; el escáner estructural corre siempre, prendido o no.
+
+Invariantes duros: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` →
+§`Invariantes operativos para agentes — Candidate document capture`.
+
 ## Delta 2026-07-08 — Revisión 3-lentes + skill `greenhouse-growth-forms`
 
 Hechos verificados contra el repo real + el contrato canónico de Growth Forms. Ajustes (uno de fondo):

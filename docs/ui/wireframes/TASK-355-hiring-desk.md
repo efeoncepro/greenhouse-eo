@@ -10,23 +10,25 @@
 - Locale: bilingüe es-CL + en-US vía `getMicrocopy(locale)` (dictionaries `hiringDesk`).
 - Estado: `approved` (UI ready: yes — HTML interactivo revisado en Playwright el 2026-07-09; GVC runtime sigue siendo gate de cierre)
 - Referencia visual aprobada local: `~/Documents/carreers/Hiring-Desk/Hiring-Desk/Hiring Desk.dc.html` (fuente completa con estados, dialogs, drawer, Kanban y microinteracciones; no reconstruir desde screenshots aisladas)
+- **Contrato Claude Design / Greenhouse Chrome:** el HTML aprobado de Claude Design es un prototipo funcional aprobado para el **contenido interno del workspace Hiring Desk**: tabs, tarjetas, Kanban, drawers, dialogs, estados, microinteracciones, densidades y copy visible de la superficie. **NO** autoriza reemplazar el chrome global de Greenhouse: sidebar, topbar, buscador global, navegación vertical, avatar, dock flotante, layout dashboard y wrappers de `(dashboard)` siguen siendo el source of truth del producto.
 - Skills: `greenhouse-talent-people-operator` · `greenhouse-ux` · `info-architecture` · `state-design` · `forms-ux` · `a11y-architect` · `arch-architect`
 
 ## Brief
 
-El "control room" del ATS: un reclutador/hiring manager opera el pipeline de punta a punta bajo una shell común (`CompositionShell`) — publica una vacante, ve postulantes, los mueve por etapas, asigna el test, revisa el scorecard (la IA sugiere, él confirma) y decide con un reason defendible. Es la contraparte interna de la careers pública (354). Fairness: decisión estructurada, contestable, nunca auto-rechazo; PII masked por default.
+El "control room" del ATS: un reclutador/hiring manager opera el pipeline de punta a punta dentro del chrome global de Greenhouse — publica una vacante, ve postulantes, los mueve por etapas, asigna el test, revisa el scorecard (la IA sugiere, él confirma) y decide con un reason defendible. El layout, densidad y microinteracciones **dentro del canvas de Hiring Desk** deben seguir el HTML Claude Design aprobado con máxima fidelidad. Es la contraparte interna de la careers pública (354). Fairness: decisión estructurada, contestable, nunca auto-rechazo; PII masked por default.
 
 ## Layout Skeleton
 
-### Shell común — `Hiring Desk` (CompositionShell)
+### Shell común — `Hiring Desk` dentro del chrome Greenhouse
 
 ```
-┌─ Greenhouse (dashboard) ──────────────────────────────────────────┐
-│  Hiring Desk    [Demanda] [Pipeline] [Publicación]   (es-CL/en-US) │  tabs hermanas (deep link)
-├───────────────────────────────────────────────────────────────────┤
-│  <región activa: Demand Desk | Pipeline Board | Publication Desk>  │
-│  (Application 360 abre como ruta hija /[applicationId] o sidecar)  │
-└───────────────────────────────────────────────────────────────────┘
+┌─ Chrome global Greenhouse existente (NO tocar/reemplazar) ───────────────┐
+│  Sidebar + topbar + búsqueda global + avatar + dock siguen siendo runtime │
+├──────────────────────────────────────────────────────────────────────────┤
+│  Canvas interno Hiring Desk — aquí sí manda el HTML Claude Design aprobado│
+│  Hiring Desk    [Demanda] [Pipeline] [Publicación]                       │
+│  <región activa: Demand Desk | Pipeline Board | Publication Desk | 360>   │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Surface 1 — Demand Desk (N4) `/agency/hiring`
@@ -133,9 +135,10 @@ El "control room" del ATS: un reclutador/hiring manager opera el pipeline de pun
 
 | Región | Componente (primitive → Vuexy `Custom*` → MUI) | Reader/Command | Notas |
 |---|---|---|---|
-| Shell | `CompositionShell` (regiones + nav hermana) | — | NO shell hand-rolled |
+| Chrome global | Layout existente de `(dashboard)` / Vuexy-Greenhouse | — | **No reemplazar** por el chrome del HTML. El prototipo Claude Design no gobierna sidebar/topbar globales. |
+| Canvas Hiring | `HiringDeskFrame` + views de Hiring | — | Aquí se implementa la fidelidad al HTML aprobado: densidad, tabs, cards, Kanban, drawers, dialogs y microinteracciones. |
 | Demand Desk | tabla (patrón `StaffAugmentationListView`) + `MetricSummaryCard` KPIs | readers openings/demands (353, server-side paginado) | drilldown |
-| Pipeline Board | `RoadmapBoard` + `GreenhouseDragList` (+ teclado) | `updateHiringApplicationStage` (353) | Adaptive Card; optimistic+rollback |
+| Pipeline Board | Kanban route-local fiel al HTML: lanes 264px + cards `HiringApplication` + drag/drop nativo + menú teclado | `updateHiringApplicationStage` (353) | Se evita wrapper DnD que inserta indicadores visuales ajenos al HTML; drag es aditivo. La card separa superficie visual draggable, botón principal de apertura y `IconButton` de menú para evitar nested interactive. |
 | Application 360 | detail shell (patrón `PlacementDetailView`) + tabs | readers 360 + embed 1363/1362 + `decideHiringApplication` | anti silent-catch |
 | Decisión form | `react-hook-form` + confirmación | `decideHiringApplication` (nuevo) | reason estructurado |
 | Publication Desk | diff view + acciones | `buildPublicOpeningPayload` + `publishOpening`/`unpublishOpening` | `revalidatePath('/public/careers')` |
@@ -146,14 +149,24 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 
 - `hiring-demand-desk` (loaded/empty/filtered/error).
 - `hiring-pipeline-board` (columnas + columna vacía + **drag** + **teclado move** + optimistic/rollback).
+- `hiring-tabs-transition` (Demand → Pipeline → Publication con tablist real y panel transition).
 - `hiring-application-360` (tabs + assessment embed [pending/AI-suggested/scored] + docs [masked/reveal] + decisión form).
 - `hiring-publication-desk` (diff + publish-confirm).
 - Checks: `scrollWidth==clientWidth` (1440 + 390), consola limpia, reduced-motion, **a11y kanban por teclado (axe)**, foco correcto. Datos reales vía 353/1367.
+- Evidencia local final 2026-07-10: `task355-hiring-pipeline-board` PASS en `.captures/2026-07-10T08-19-55_task355-hiring-pipeline-board` (mobile-first + desktop; card hover/focus/reduced-motion; rollback) y `task355-hiring-tabs-transition` PASS en `.captures/2026-07-10T08-16-47_task355-hiring-tabs-transition`.
+- Evidencia posterior por feedback visual 2026-07-10: `task355-hiring-pipeline-board` PASS en `.captures/2026-07-10T09-05-35_task355-hiring-pipeline-board` (toolbar alineado, search derecho, placeholder fiel, lanes/cards con mayor profundidad) y `task355-hiring-tabs-transition` PASS en `.captures/2026-07-10T09-07-55_task355-hiring-tabs-transition` (Demand → Pipeline → Publicación con navegación robusta y panel transition).
+- Evidencia posterior Demanda 2026-07-10: `task355-hiring-demand-desk` PASS desktop/mobile en `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk` (KPIs con profundidad, toolbar izquierda/derecha alineado, tabla enterprise, responsive sin overflow de página).
+- Auditoría de fidelidad canvas-only 2026-07-10: `.captures/task355-hiring-reference-canvas-2026-07-10T08-18-26-140Z/index.html` compara el `main` del HTML aprobado contra runtime Demand/Pipeline/Publication, excluyendo el chrome global Greenhouse por contrato.
 
 ## Design Decision Log
 
+- **Contrato de fidelidad correcto:** Claude Design/HTML aprobado gobierna el interior de Hiring Desk; Greenhouse gobierna el chrome global. No tocar `src/app/(dashboard)/layout.tsx`, menús globales, topbar, dock, avatar ni navegación para perseguir fidelidad visual del prototipo.
 - **Composition Shell base** (CLAUDE.md); cards Adaptive (density=auto).
-- **Kanban canónico** (`RoadmapBoard`/`GreenhouseDragList`) + teclado obligatorio (a11y), NO demo full-version.
+- **Kanban canónico route-local para Hiring**: se prioriza fidelidad al HTML aprobado sobre wrappers genéricos cuando estos agregan artefactos visuales; drag/drop nativo + menú teclado obligatorio (a11y), NO demo full-version.
+- **Pipeline sparse real-data polish:** el HTML demo tiene muchas postulaciones; runtime real puede tener 1. En baja densidad no se inventan cards demo: se compactan drop-zones, se usa motion de entrada de lanes/cards, se conservan lanes de 264px y el scroll queda interno al board con affordance de borde, nunca como scroll de página.
+- **Demand enterprise polish:** la vista Demanda debe evitar el plano "tabla + filtros" cuando hay pocos datos reales. Los KPIs llevan acento/gradiente/glow sutil, el toolbar se agrupa izquierda/derecha como superficie premium, los filtros usan labels compactos/responsive y la tabla traduce estados raw a labels canónicos visibles (`Abierta`, `Publicada`) sin inventar métricas ni alterar el reader.
+- **Toolbar Pipeline:** selector/count quedan anclados a la izquierda y search/toggle a la derecha; no permitir solape entre `Select` y `TextField`. Placeholder específico de Pipeline: `Buscar postulante…`.
+- **Transición tabs:** las tabs son navegación real (`href`) para no perder robustez; el panel aplica entrada `ghHiringPanel` y `viewTransitionName='hiring-desk-panel'`, con reduced-motion sin animación.
 - **360 = hub** que embebe assessment (1363) + docs (1362) + decisión; IA propone→humano confirma; anti-anclaje.
 - **Decisión estructurada/contestable** (reason obligatorio) — fairness/AI-Act; scorecard advisory, nunca gate.
 - **Publication diff** anti-leak; publish refresca la careers (`revalidatePath`).
@@ -162,12 +175,12 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 
 ## Acceptance Checklist
 
-- [ ] Shell `CompositionShell` + rutas `(dashboard)/agency/hiring/**` (NO `[lang]`) + deep links; bilingüe.
-- [ ] Demand (tabla server-side) · Pipeline (kanban `RoadmapBoard`, card=`HiringApplication`, `updateHiringApplicationStage`) · 360 (tabs + assessment 1363 + docs 1362 + decisión) · Publication (diff + publish).
+- [ ] Chrome global Greenhouse intacto + rutas `(dashboard)/agency/hiring/**` (NO `[lang]`) + deep links; bilingüe.
+- [ ] Demand (tabla server-side) · Pipeline (kanban route-local fiel al HTML, card=`HiringApplication`, `updateHiringApplicationStage`) · 360 (tabs + assessment 1363 + docs 1362 + decisión) · Publication (diff + publish).
 - [ ] Kanban con **alternativa por teclado** + optimistic+rollback; a11y axe verde.
 - [ ] `decideHiringApplication`: humano decide, reason estructurado, idempotencia + audit; scorecard advisory.
 - [ ] viewCodes `gestion.hiring*` con ruta alcanzable (reachability) mismo PR; `role_view_fallback=0`.
 - [ ] PII masked/reveal (capability+reason+audit); Publication solo allowlist; publish → `revalidatePath`.
 - [ ] Readers del 360 anti silent-catch (degradación honesta).
-- [ ] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia.
+- [x] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia en canvas TASK-355. Evidencia local vigente: `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk` + `.captures/2026-07-10T09-05-35_task355-hiring-pipeline-board` + `.captures/2026-07-10T09-07-55_task355-hiring-tabs-transition`; warnings axe restantes pertenecen al chrome global preexistente, no al card nesting corregido.
 - [ ] `UI ready: yes` solo con lo anterior + `pnpm task:lint --task TASK-355` sin findings.

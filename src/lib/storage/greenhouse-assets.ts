@@ -594,6 +594,68 @@ export const createPrivatePendingAsset = async ({
   return asset
 }
 
+/**
+ * TASK-1362 — Contextos cuyo contenido puede venir de la web pública y que, por
+ * lo tanto, NO pueden adjuntarse sin un veredicto limpio de escaneo.
+ *
+ * El guardrail vive acá, en el attach, y no en el caller a propósito: el camino
+ * de subida va a cambiar (TASK-1372/1373 migran el apply de Careers a Growth
+ * Forms, parten el flujo en un upload síncrono + un consumer reactivo, y jubilan
+ * la ruta directa actual). Un chequeo que dependa de que el próximo implementador
+ * recuerde llamar al escáner es un chequeo que se pierde en la próxima migración.
+ * Acá, cualquier camino de attach —presente o futuro— falla si no hubo escaneo.
+ */
+const SCAN_REQUIRED_ATTACH_CONTEXTS = new Set<GreenhouseAssetContext>([
+  'hiring_application_cv',
+  'hiring_candidate_portfolio_file'
+])
+
+const assertAssetScannedBeforeAttach = async (
+  assetId: string,
+  ownerAggregateType: GreenhouseAssetContext,
+  client?: QueryableClient
+) => {
+  if (!SCAN_REQUIRED_ATTACH_CONTEXTS.has(ownerAggregateType)) return
+
+  // Agregamos sobre TODOS los veredictos del asset en vez de tomar el último.
+  // "El peor veredicto gana" no puede depender del orden: dos scans con el mismo
+  // `scanned_at` se desempatan por `scan_id`, y ahí un `clean` podría taparle el
+  // paso a un `suspicious`. Un bloqueante abierto veta el attach, punto.
+  //
+  // Query inline (sin importar `asset-scan/store`) para no crear un ciclo: el
+  // gate de escaneo importa este módulo para poder cuarentenar.
+  const rows = await queryAssetRows<{
+    blocking_verdict: string | null
+    has_clean: boolean | null
+    total: string | number
+  }>(
+    `
+      SELECT
+        MIN(verdict) FILTER (
+          WHERE verdict IN ('suspicious', 'infected', 'error') AND resolution_status = 'open'
+        ) AS blocking_verdict,
+        BOOL_OR(verdict = 'clean') AS has_clean,
+        COUNT(*) AS total
+      FROM greenhouse_core.asset_scan_results
+      WHERE asset_id = $1
+    `,
+    [assetId],
+    client
+  )
+
+  const summary = rows[0]
+
+  if (summary?.blocking_verdict) {
+    throw new Error(`asset_scan_blocking:${summary.blocking_verdict}`)
+  }
+
+  // Sin filas, o con filas que no incluyen ningún `clean` (p. ej. sólo el
+  // `legacy_unscanned` del backfill): nadie verificó estos bytes.
+  if (!summary?.has_clean) {
+    throw new Error('asset_scan_required')
+  }
+}
+
 export const attachAssetToAggregate = async ({
   assetId,
   ownerAggregateType,
@@ -615,6 +677,8 @@ export const attachAssetToAggregate = async ({
   metadata?: Record<string, unknown>
   client?: QueryableClient
 }) => {
+  await assertAssetScannedBeforeAttach(assetId, ownerAggregateType, client)
+
   const ownershipScope = normalizeGreenhouseAssetOwnershipScope({
     ownerClientId,
     ownerSpaceId,

@@ -32,9 +32,14 @@ export const hiringDesk: HiringDeskCopy = {
   },
   pipeline: {
     title: 'Pipeline de postulantes', subtitle: 'Arrastra tarjetas o usa el menú de etapa; cada cambio se guarda con rollback.',
-    openingLabel: 'Postulantes de', allOpenings: 'Todas las vacantes', moveTo: 'Mover a etapa', saved: 'Etapa actualizada.',
+    openingLabel: 'Postulantes de', allOpenings: 'Todas las vacantes', applicantLabel: 'postulante', applicantsLabel: 'postulantes',
+    searchPlaceholder: 'Buscar postulante…',
+    boardHint: 'Arrastra una tarjeta o usa el menú ⋮ para mover con teclado.',
+    moveTo: 'Mover a etapa', saved: 'Etapa actualizada.',
     saving: 'Guardando cambio…', rollback: 'No se pudo mover, se revirtió.',
-    emptyLane: 'Suelta una postulación aquí', keyboardHint: 'También puedes mover esta postulación con teclado.',
+    emptyLane: 'Suelta una postulación aquí', keyboardHint: 'También puedes mover esta postulación con teclado.', simulateFailure: 'Simular fallo de red',
+    sourcePublicCareers: 'Careers público', tagDelivered: 'Test entregado', tagAssigned: 'Test asignado',
+    appliedDaysAgo: 'Postuló hace {days} {unit}', appliedDayUnit: 'día', appliedDaysUnit: 'días',
     stages: {
       sourced: 'Sourced', screening: 'Screening', qualified: 'Evaluación', shortlisted: 'Evaluación',
       client_review: 'Evaluación', interview: 'Entrevista', decision_pending: 'Decisión', selected: 'Cerrado',

@@ -1,9 +1,8 @@
 import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
-import { isBlockingVerdict, scanAssetBytes } from '@/lib/storage/asset-scan'
-import { recordAssetScanResult } from '@/lib/storage/asset-scan/store'
-import { attachAssetToAggregate, createPrivatePendingAsset, quarantineAsset } from '@/lib/storage/greenhouse-assets'
+import { scanAndGateUploadedAsset } from '@/lib/storage/asset-scan/gate'
+import { attachAssetToAggregate, createPrivatePendingAsset } from '@/lib/storage/greenhouse-assets'
 
 import {
   validatePublicCareersCvUpload,
@@ -90,26 +89,25 @@ export const attachPublicCareersCvToApplication = async ({
     },
   })
 
-  const scan = await scanAssetBytes({ bytes, declaredMimeType, fileName: file.name })
-
-  const scanId = await recordAssetScanResult({
+  const gate = await scanAndGateUploadedAsset({
     assetId: uploaded.assetId,
-    result: scan,
+    bytes,
     declaredMimeType,
-    sizeBytes: bytes.byteLength,
+    fileName: file.name,
   })
 
-  if (isBlockingVerdict(scan.verdict)) {
-    const findingCodes = scan.findings.filter(finding => finding.severity === 'blocking').map(finding => finding.code)
-
-    await quarantineAsset({ assetId: uploaded.assetId, scanId, verdict: scan.verdict, findingCodes })
-
+  if (gate.outcome === 'quarantined') {
     // Observabilidad sin PII: nunca el nombre del archivo ni el email del candidato.
-    captureWithDomain(new Error(`public_careers_cv_quarantined:${scan.verdict}`), 'hiring', {
-      extra: { assetId: uploaded.assetId, scanId, verdict: scan.verdict, findingCodes, scanner: scan.scanner },
+    captureWithDomain(new Error(`public_careers_cv_quarantined:${gate.verdict}`), 'hiring', {
+      extra: {
+        assetId: gate.assetId,
+        scanId: gate.scanId,
+        verdict: gate.verdict,
+        findingCodes: gate.findingCodes,
+      },
     })
 
-    return { outcome: 'quarantined', assetId: uploaded.assetId, scanId }
+    return { outcome: 'quarantined', assetId: gate.assetId, scanId: gate.scanId }
   }
 
   await attachAssetToAggregate({
@@ -119,14 +117,12 @@ export const attachPublicCareersCvToApplication = async ({
     actorUserId: null,
     metadata: {
       ...documentMetadata,
-      scanStatus: scan.verdict,
-      scanId,
-      scanner: scan.scanner,
+      scanStatus: 'clean',
+      scanId: gate.scanId,
+      scanner: gate.scanner,
       // Hallazgos advisory (p. ej. un PDF con /JavaScript exportado por Word):
       // no bloquean, pero quedan visibles para quien audite el documento.
-      advisoryFindingCodes: scan.findings
-        .filter(finding => finding.severity === 'advisory')
-        .map(finding => finding.code),
+      advisoryFindingCodes: gate.advisoryFindingCodes,
     },
   })
 

@@ -48,8 +48,18 @@ escalan a error).
 
 - **NUNCA** confiar en `file.type` (ni en la extensión) para decidir el tipo de un upload. Es un valor del cliente. El
   tipo real lo determinan los magic bytes vía `scanAssetBytes`.
-- **NUNCA** adjuntar un asset que venga de la web pública sin pasar por `scanAssetBytes` antes del attach. Si aparece
-  un camino de upload nuevo (p. ej. el renderer nativo de Growth Forms, TASK-1372/1373), DEBE llamar al escáner.
+- **NUNCA** adjuntar un asset que venga de la web pública sin escanearlo. El camino ergonómico es
+  `scanAndGateUploadedAsset` (`src/lib/storage/asset-scan/gate.ts`), que opera sobre **bytes + assetId** (NO sobre un
+  `File`) para que cualquier upload lo pueda reusar. La red de seguridad es estructural:
+  `attachAssetToAggregate` **rechaza** los contextos `hiring_application_cv` / `hiring_candidate_portfolio_file` sin un
+  veredicto `clean` registrado (`asset_scan_required` / `asset_scan_blocking:<verdict>`). Un camino de upload nuevo
+  (Growth Forms, TASK-1372/1373) que olvide el gate **falla en el attach**, no pasa en silencio.
+- **NUNCA** asumir que reusar `submitPublicHiringApplication` arrastra el escaneo: sólo escanea cuando se le pasa un
+  `File`. Un consumer reactivo del worker nunca tiene bytes (sólo JSON de PG), así que el escaneo debe ocurrir en el
+  upload síncrono y el worker adjuntar un asset ya escaneado.
+- **NUNCA** decidir "el último veredicto gana" mirando el scan más reciente: dos scans con el mismo `scanned_at` se
+  desempatan por `scan_id` y un `clean` podría taparle el paso a un `infected`. El guard agrega sobre TODOS los
+  veredictos del asset; un bloqueante `open` veta el attach hasta que el triage humano lo resuelva.
 - **NUNCA** degradar en silencio a "sin antivirus": con `ASSET_MALWARE_SCAN_ENABLED=true` y sin
   `ASSET_MALWARE_SCAN_ENDPOINT`, el veredicto es `error` (bloqueante). Fail-closed.
 - **NUNCA** hacer fallar la postulación porque su archivo quedó en cuarentena: confirmaría al atacante qué payload fue

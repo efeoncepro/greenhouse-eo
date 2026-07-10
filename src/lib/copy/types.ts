@@ -159,12 +159,23 @@ export interface HiringDeskCopy {
     subtitle: string
     openingLabel: string
     allOpenings: string
+    applicantLabel: string
+    applicantsLabel: string
+    searchPlaceholder: string
+    boardHint: string
     moveTo: string
     saved: string
     saving: string
     rollback: string
     emptyLane: string
     keyboardHint: string
+    simulateFailure: string
+    sourcePublicCareers: string
+    tagDelivered: string
+    tagAssigned: string
+    appliedDaysAgo: string
+    appliedDayUnit: string
+    appliedDaysUnit: string
     stages: Record<string, string>
   }
   application: {
