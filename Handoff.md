@@ -1,3 +1,14 @@
+## Sesion 2026-07-10 - Eval IA verde + flag staging ON + TASK-1385 creada - Claude
+
+> **El eval baseline de la IA de scoring (gate de 1361) corrió VERDE con provider real**: 6/6 casos,
+> 100% dentro de tolerancia, **Pearson 0.99** vs referencia humana. Y justificó su existencia: cazó un
+> bug latente REAL — Claude 5+ depreca `temperature` (400) y el path de scoring nacía roto; fix causa
+> raíz en el cliente canónico `generateStructuredAnthropic` (retry auto-adaptativo, beneficia a todos
+> los consumers). **`HIRING_ASSESSMENT_AI_ENABLED` = ON en staging** (env + redeploy verificados);
+> **prod queda gateado SOLO por sign-off HR/Legal** (el flip técnico está desbloqueado, ledger
+> actualizado). Además: **TASK-1385 creada** (AI-assisted vacancy public copy, propose→confirm sobre
+> inputs allowlist-safe — la IA nunca ve presupuesto/rate; complementa 1371).
+
 ## Sesion 2026-07-10 - TASK-1364 Validity Loop COMPLETE (code) - Claude
 
 > **TASK-1364 completa en develop local (sin push).** El loop "¿el assessment predice?" quedó implementado:
@@ -36779,3 +36790,6 @@ TASK-1377 quedó `complete` localmente. Desde TASK-1376 toda task nueva lleva `#
 - EPIC-027 está `in-progress`; TASK-1382 está `to-do` y lista para hook/plan: workspace mínimo + piloto Design System Labs pure-UI + affected-build/A-B.
 - En este bloque no se creó proyecto Vercel, no se cambió routing/env/producción y no se ejecutó todavía TASK-1382. Siguiente paso: `pnpm codex:task-hook TASK-1382 --develop`, aprobar plan y ejecutar local-first.
 - Canon: `docs/architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md`; evidencia: `docs/audits/platform/2026-07-10-vercel-build-cost-escalation.md`.
+## Sesión 2026-07-10 — Surround Discovery ebook: assets y plan de landing — Codex
+
+> Se verificaron y documentaron los seis ebooks finales en los buckets privados staging/producción; el inventario canónico vive en `docs/reference/ebook-lead-magnet-playbook.md`. Para Surround Discovery™ se creó el par dependiente `TASK-1386` (configurar/publicar una instancia del **primitive existente** Growth Forms, no construir otro formulario) → `TASK-1387` (landing editorial Think). TASK-1387 incluye wireframe, flow y motion completos: enseña SEO, AEO, Video Discovery, Social Discovery y Marketplace Optimization como cinco superficies, y el ciclo `SENSE → SHAPE → SURFACE → SOLVE` sin presentar SOLVE como framework autónomo. Gates de creación pasan: task lint 0/0 para ambas tasks, wireframe/flow/motion/readiness TASK-1387 y `ops:lint --changed`. Pendiente real: ejecutar TASK-1386 para obtener form key/surface/evidencia de descarga gated; TASK-1387 no se implementa ni publica antes de ese contrato.
