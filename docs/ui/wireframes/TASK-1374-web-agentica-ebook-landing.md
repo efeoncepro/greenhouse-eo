@@ -28,7 +28,7 @@
 | 3 | Thesis | "Tu sitio ya tiene dos tipos de visitantes. Solo estás diseñado para uno." Explicar el cambio humano→agente. | Split editorial + dos lanes semánticas (experiencia propia / ventana del agente). | Static copy |
 | 4 | What's inside | "Qué vas a encontrar dentro" — los 5 actos + checklist "Lo que haces esta semana". | Feature list / bento ligero | Static copy |
 | 5 | Audience | "Para quién es este ebook" / "No es para ti si…" — calificar al lead. | Two-column fit/no-fit list | Static copy |
-| 6 | Form dock | "Descarga el ebook gratis" — form gobernado (nombre, email, rol opcional) que envía el ebook por email. | `<greenhouse-form>` + script loader (patrón `BrandVisibilityFormDock`) | Greenhouse Growth Forms |
+| 6 | Form workspace | Rail editorial que explica los tres resultados de la guía + "Descarga el ebook gratis" — form gobernado (nombre, email, rol opcional). La descarga comienza al enviar. | Host Astro para la rail + `<greenhouse-form>` (patrón `BrandVisibilityFormDock`) | Greenhouse Growth Forms |
 | 7 | FAQ | Resolver 5 dudas (qué es un agente IA, AEO vs SEO, llms.txt, zero-click commerce, bots > humanos). | Accordion `<details>` | Static copy |
 | 8 | Footer | Cerrar la lectura, ubicar la marca y ofrecer navegación útil sin competir con el CTA. | Footer editorial de tres zonas + meta legal. | Static copy |
 
@@ -70,7 +70,11 @@ La landing toma la estructura y el copy del export como base y los aterriza a la
 | `think.webAgentica.landing.audience.forTitle` | 5 | `Para quién es este ebook` | none | Calificación. |
 | `think.webAgentica.landing.audience.againstTitle` | 5 | `No es para ti si…` | none | Honestidad. |
 | `think.webAgentica.landing.form.title` | 6 | `Descarga el ebook gratis` | none | Encabezado del form; los campos vienen del contrato. |
-| `think.webAgentica.landing.form.body` | 6 | `Léelo en 20 minutos. Aplícalo esta semana. Te lo enviamos a tu email.` | none | Entrega = email. |
+| `think.webAgentica.landing.form.body` | 6 | `Cinco actos y un checklist para entender la web agéntica y actuar esta semana. La descarga comienza al enviar.` | none | Promesa verificable de entrega inmediata; no condiciona la experiencia a una confirmación de email. |
+| `think.webAgentica.landing.form.rail.kicker` | 6 | `Tu mapa de lectura` | none | Orienta la columna editorial del workspace. |
+| `think.webAgentica.landing.form.rail.title` | 6 | `Una guía breve para una web que ya no tiene un solo visitante.` | none | Repite la tesis sin competir con el H1. |
+| `think.webAgentica.landing.form.rail.items` | 6 | `Dos interfaces` / `Cuatro niveles` / `Checklist semanal` | none | Resume resultados concretos; no promete un diagnóstico. |
+| `think.webAgentica.landing.form.rail.delivery` | 6 | `La descarga comienza al enviar.` | none | Cierra la rail con una expectativa honesta. |
 | `think.webAgentica.landing.form.rolePlaceholder` | 6 | `Selecciona (opcional)` | none | Rol opcional (campo del contrato). |
 | `think.webAgentica.landing.form.submit` | 6 | `Enviarme el ebook` | none | CTA del contrato. |
 | `think.webAgentica.landing.form.consent` | 6 | `Al descargar aceptas recibir contenido de Efeonce. Baja cuando quieras.` | none | Consent gobernado. |
@@ -101,7 +105,7 @@ Las respuestas del FAQ se toman verbatim del PR #12 (`renderVals()`), revisadas 
 
 | State | Title | Body | CTA / recovery | Notes |
 |---|---|---|---|---|
-| ready | `Descarga el ebook gratis` | `Déjanos tus datos y te enviamos el ebook a tu email.` | Submit por `<greenhouse-form>` | Default. |
+| ready | `Descarga el ebook gratis` | `Cinco actos y un checklist para entender la web agéntica y actuar esta semana. La descarga comienza al enviar.` | Submit por `<greenhouse-form>` | Default; la rail editorial explica lo que incluye sin replicar el contrato. |
 | loading | `Preparando el formulario` | `Estamos conectando con Greenhouse para cargar los campos y protecciones.` | none | Skeleton rico, no spinner-only. |
 | empty | `Formulario no disponible` | `El contrato del form no devolvió campos publicables.` | `Reintentar` | Raro; sin internals. |
 | error | `No pudimos cargar el formulario` | `Recarga la página. Si persiste, usa el contacto público de Efeonce.` | `Reintentar` | No filtrar API/CORS. |
@@ -150,6 +154,7 @@ Las respuestas del FAQ se toman verbatim del PR #12 (`renderVals()`), revisadas 
 - Why this pattern: la página existe para SEO + captación; su valor depende de `<head>` correcto, marca Efeonce y un form que realmente capte el lead y entregue el ebook. El export no cumple ninguno de los tres.
 - Reuse / extend / new primitive: reuse `BaseLayout` + patrón form dock; no nace primitive Greenhouse.
 - Decisión (thank-you post-descarga): **una sola tarjeta inline** reemplaza el form (el área muta a una conclusión), NO overlay/modal ni card exterior redundante. Alternativas rechazadas: overlay full-screen (pesado, focus-trap, anti-restraint 2026) y route change (rompe contexto/SEO). La entrega es inmediata y el usuario necesita confirmación, recuperación gated y una continuación útil. El grader se conserva como cross-sell secundario, pero se presenta con precisión como medición del nivel 1 (ser encontrado y entendido), no como sustituto del framework de cuatro niveles del ebook. En desktop el estado final usa dos columnas para no dejar una tarjeta de captura estrecha y aislada; en mobile se apila. La tarjeta no promete email hasta que ese delivery tenga evidencia independiente. El focus ring se reserva para el título programáticamente enfocado; `role=status`/`aria-live` anuncia el panel sin volverlo focalizable. El success_card gobernado del form es el baseline; la landing pinta el estado post-submit con el token.
+- Decisión (workspace de conversión, 2026-07-10): el estado `ready` pasa de una tarjeta de form genérica a una composición de dos zonas: una rail editorial con resultados concretos del ebook y una zona de captura que consume el renderer sin modificar campos, consentimiento, validación ni submit. La rail se apila antes del form en móvil; no hay wizard, progreso falso, confetti ni hover que cargue significado. El host sólo aplica tokens `--ghf-*` y densidad; toda semántica e interacción de los controles continúa siendo del renderer gobernado.
 - Decisión (vitalidad editorial): se elimina el recuadro inclinado detrás del arte del hero; competía con la propia imagen. Las señales usan un halo de puntero puramente decorativo y reveal escalonado; la tesis gana dos lanes explícitas que materializan las dos interfaces; el footer se convierte en un cierre editorial de tres zonas. Ninguna de estas capas depende de hover, JavaScript o motion para comunicar significado; reduced motion muestra el estado final.
 - Decisión (política de email): **solo correo corporativo** (bloquea free/disposable), igual que el grader — el ebook es para equipos/marcas reales; el gate lo aplica el contrato gobernado del form (`emailPolicy`), no la landing.
 - Open risks: el **form instance del ebook (form_key) + el fulfillment de email + el ebook PDF** no existen todavía (dependencia backend-data en greenhouse-eo, TASK-1375); el origin `think.efeoncepro.com` debe estar autorizado en el allowlist gobernado para este form.

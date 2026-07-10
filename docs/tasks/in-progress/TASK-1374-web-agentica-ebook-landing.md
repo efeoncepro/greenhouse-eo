@@ -413,3 +413,10 @@ Landing `/web-agentica` construida nativa en `efeonce-think` (commit local, NO p
 - Think `809778a` (Vercel `dpl_433QUV9AsVFvpWhphaJfr3YKmEYZ`, Ready) elimina el doble shell de la confirmación: al aceptar, el wrapper del formulario queda transparente y el panel de éxito es la única tarjeta blanca.
 - El `role=status` ya no tiene `tabindex`; el foco programático y visible queda restringido a `#web-agentica-success-title`. Así se conserva la notificación accesible sin que la regla global `[tabindex]:focus-visible` dibuje un borde azul alrededor de toda la conclusión.
 - Smoke productivo sintético: 1440 y 390 sin overflow, panel no focalizable, título con ring teal, sin errores ni requests fallidas de aplicación.
+
+## Delta 2026-07-10 — workspace de conversión premium desplegado
+
+- Think `43637bf` cambia el estado inicial del form de una tarjeta aislada a un workspace editorial: rail navy con los tres resultados concretos del ebook (dos interfaces, cuatro niveles y checklist semanal) + captura clara con el renderer gobernado. El host no replica campos, consentimiento, validación, pending ni submit; sólo compone el valor y aplica tokens `--ghf-*` para densidad, foco, CTA y estados.
+- El copy aclara `La descarga comienza al enviar`; no sustituye la entrega inmediata confirmada por una promesa de email. El vínculo de privacidad sigue siendo contenido del contrato del renderer: convertir su URL visible a una etiqueta editorial requiere una extensión reusable del contrato/versionado del form, no CSS local engañoso.
+- Motion: halo ambiental e indicador de la rail son CSS compositor-only y se desactivan con `prefers-reduced-motion`; el renderer mantiene su feedback de foco, validación y CTA. No se introduce wizard, progreso falso, confetti ni dependencia hover-only.
+- Producción Ready: Vercel `dpl_ApdT2shGrdjUjKdAw6L7WqetncCj`, alias `think.efeoncepro.com`. Smoke productivo sintético en 1440 y 390: cuatro controles reales cargados, `scrollWidth === clientWidth`, success inline visible y foco en `#web-agentica-success-title`; reduced-motion confirma que señal y halo no animan.

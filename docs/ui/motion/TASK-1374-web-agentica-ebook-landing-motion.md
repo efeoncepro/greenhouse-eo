@@ -30,6 +30,7 @@
 | Section reveals | Scroll into view | Opacity + translateY < 16px al entrar cada sección. | CSS / IntersectionObserver | yes |
 | Form contract loader | Renderer no listo | Skeleton estable de "cargando formulario"; sin spinner-only. | CSS skeleton | yes |
 | Form host ready | Contrato resuelto | Reemplazo del skeleton con transición corta opacity/translate. | CSS transition | yes |
+| Form value rail | Estado ready | Pulso lento del indicador y halo ambiental del borde inferior; los tres resultados permanecen legibles sin motion. | CSS compositor-only | yes |
 | Submit pending | Renderer enviando | Estado pendiente controlado por el renderer; el host puede añadir contexto no bloqueante. | Renderer + CSS | yes |
 | Success | Submit aceptado | Reemplazo calmo por la confirmación de descarga y recuperación gated; sin confetti ni progreso. | CSS + live region | yes |
 | Error/degraded | Fallo de carga/submit/autorización | Estado estático calmo con un solo camino de retry/recuperación. | CSS + live region | yes |
@@ -117,6 +118,7 @@
 - Why this pattern: el usuario necesita una entrada premium de marca y datos con peso, no una consola de análisis; la entrega es gated en el mismo momento, por lo que el éxito confirma el archivo y conserva la tesis de web agéntica.
 - Delta 2026-07-10: el rectángulo inclinado detrás del visual de hero se retira por competir con el arte. Las secciones de señales y tesis reciben coreografía contenida y un halo de puntero no esencial; el footer usa entrada y pulso suave sólo como orientación de cierre. No se agrega GSAP ni una dependencia de cliente.
 - Delta 2026-07-10 (success): el wrapper del form se vuelve transparente al aceptar y la conclusión absorbe la única superficie blanca. Se quita `tabindex` del live region para que el foco permanezca en el título y no dibuje un ring global de área completa.
+- Delta 2026-07-10 (workspace): el estado de captura adopta una rail editorial navy + una zona de formulario clara. La rail sólo anima un indicador y un halo con `transform`; los campos conservan la microinteracción del renderer (focus halo, check de validación, pending y compresión del CTA). `prefers-reduced-motion` elimina ambas animaciones ambientales y mantiene la jerarquía completa.
 - Reuse / extend / new primitive: reuse del shell de Think + CSS route-local + renderer Growth Forms; sin primitive nueva.
 - Open risks: portar los efectos sin regresión de contraste/perf; el fold no debe dañar LCP en mobile.
 - Follow-up: si algún reveal necesita GSAP, mantenerlo scoped y documentar el token de timing.
