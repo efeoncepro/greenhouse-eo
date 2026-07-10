@@ -58,6 +58,7 @@ import { productCatalogPricesSyncProjection } from './product-catalog-prices-syn
 import { teamsNotifyProjection } from './teams-notify'
 import { providerBqSyncProjection } from './provider-bq-sync'
 import { hrOnboardingAutoCreateProjection } from './hr-onboarding-auto-create'
+import { hiringHandoffMaterializeProjection } from './hiring-handoff-materialize'
 import { hubspotServicesIntakeProjection } from './hubspot-services-intake'
 import { hubspotCompaniesIntakeProjection } from './hubspot-companies-intake'
 import { paymentProfileNotificationsProjection } from './payment-profile-notifications'
@@ -156,6 +157,7 @@ registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(hubspotServicesIntakeProjection) // TASK-813b — async intake p_services HubSpot via outbox event
   registerProjection(hubspotCompaniesIntakeProjection) // TASK-878 — async intake companies + contacts HubSpot via outbox event (mirror TASK-813b)
   registerProjection(hrOnboardingAutoCreateProjection)
+  registerProjection(hiringHandoffMaterializeProjection) // TASK-356 — hiring.application.decided → materializa HiringHandoff (snapshot actual, solo decision=selected; SIN flag — un no-op es terminal)
   registerProjection(paymentProfileNotificationsProjection) // TASK-753 — notify beneficiary on profile lifecycle events
   registerProjection(engagementConvertedProjection)
   registerProjection(engagementCancelledProjection)
