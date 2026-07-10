@@ -2,6 +2,8 @@
 
 ## 2026-07-10
 
+- **TASK-1379 / EPIC-026 — experimento Roadmap cerrado `no-go`.** La proyección gzip experimental eliminó docs de los traces, redujo artifacts 88,6–96,2% y mejoró clean p50 19,9%, pero warm RSS p95 empeoró 9,8% (7,51→8,25 GB), incumpliendo el gate obligatorio de memoria. Se revirtió el cutover, se rechazó el ADR y se detuvo el programa de desacople físico; el runtime vigente no cambia y el contrato extraction-ready para trabajo nuevo permanece.
+
 - **TASK-1376 — baseline build/dependency completado; veredicto `conditional-go`.** Nuevo tooling `pnpm architecture:build-baseline` mide inventario, clean/warm, RSS, output, grafo y Vercel read-only con JSON sanitizado. Baseline: 1.269 entrypoints; clean p50 138 s; warm p50/p95 102/124 s y RSS p95 7,51 GB; Vercel Ready p50/p95 4/7 min en ventana corta. Roadmap arrastra 2.493 Markdown por trace y artifacts analyzer de 8,83–9,61 MB. Se propone TASK-1379 para un A/B de índice materializado; no se autoriza aún `apps/*`, `packages/*`, deploy ni proyectos nuevos.
 
 - **TASK-1377 — enforcement extraction-ready cross-agent completado.** Desde `TASK-1376`, las tasks nuevas deben declarar `## Modular Placement Contract`; `task:lint` bloquea ausencia, placeholders y enums inválidos, y `ops:lint` delega el mismo gate. Se sincronizaron template/proceso/addenda, hooks y skills Codex/Claude de repo, equipo y globales, con matriz auditada. No cambia runtime ni crea todavía `apps/*`/`packages/*`.

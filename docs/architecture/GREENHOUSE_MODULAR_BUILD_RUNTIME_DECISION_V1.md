@@ -2,7 +2,7 @@
 
 ## Status
 
-- Status: `Proposed`
+- Status: `Rejected`
 - Date proposed: `2026-07-10`
 - Decision owner: `Platform / Architecture`
 - Epic: `EPIC-026`
@@ -10,7 +10,7 @@
 - Reversibility: `two-way-but-slow`
 - Confidence: `medium`
 - Validated as of: `2026-07-10`
-- Evidence verdict: `conditional-go`
+- Evidence verdict: `no-go` after TASK-1379
 
 ## Context
 
@@ -21,6 +21,8 @@ El build actual ya requirió limitar workers de static generation, reservar un h
 La decisión debe optimizar tres resultados a la vez: costo remoto, ergonomía local y reducción de acoplamiento cognitivo, sin perder transacciones, authz, Full API Parity, audit/outbox ni la capacidad de hacer cambios atómicos entre dominios.
 
 ## Decision
+
+**Resultado final 2026-07-10:** la propuesta queda rechazada en este evidence gate. TASK-1379 mejoró clean p50 19,9% y redujo 88,6–96,2% los artifacts Roadmap, pero warm RSS p95 empeoró 9,8% hasta 8,25 GB. Como el gate exigía reducir RSS al menos 10%, no se autoriza workspace foundation, `apps/*`, `packages/*` ni nuevos deployables. El cutover experimental fue revertido.
 
 Si `TASK-1376` confirma el baseline y una primera frontera con beneficio neto, Greenhouse evolucionará incrementalmente desde una única aplicación Next.js hacia un **modular monorepo con múltiples unidades desplegables**, manteniendo por defecto un **modular monolith de dominio y datos**.
 
@@ -63,11 +65,11 @@ docs/
 
 La forma es orientativa. `TASK-1376` decide la primera extracción; no autoriza crear todas las carpetas de una vez.
 
-## Evidence decision — TASK-1376
+## Evidence decision — TASK-1376 / TASK-1379
 
 El veredicto es `conditional-go`, no aceptación general de la topología objetivo. Baseline: local clean p50 138 s (n=3, sin p95); warm p50/p95 102/124 s y RSS p50/p95 6,56/7,51 GB (n=5); Vercel Ready p50/p95 4/7 min sobre ventana CLI corta. Billing FOCUS quedó `not_configured` y no se interpreta como costo cero.
 
-La primera prueba reversible es extraer el índice derivado Roadmap del filesystem runtime del portal. Hoy tres traces arrastran 2.493 Markdown cada uno, el analyzer produce 9,61 MB para `/roadmap` y ~8,83 MB por endpoint, y Turbopack advierte un patrón de 30.278 archivos. Hasta que un A/B demuestre reducción ≥10% de p50 clean o fase atribuible, ≥10% de p95 RSS y ≥75% del artifact Roadmap, este ADR permanece `Proposed` y no autoriza `apps/*`, `packages/*` ni proyectos Vercel.
+TASK-1379 ejecutó esa prueba: cero Markdown en traces, reducción de analyzer ≥88,6% y clean p50 -19,9%, pero warm RSS p95 pasó de 7,51 a 8,25 GB (+9,8%). Los targets eran conjuntivos; el resultado es `no-go`. El reader filesystem fue restaurado y este ADR queda `Rejected` hasta que una hipótesis arquitectónica distinta aporte evidencia nueva.
 
 ## Alternatives considered
 
@@ -144,6 +146,7 @@ Un resultado `no-go` mantiene la optimización dentro de la app actual y deja es
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
-- `docs/epics/to-do/EPIC-026-greenhouse-modular-build-runtime-decoupling.md`
+- `docs/epics/complete/EPIC-026-greenhouse-modular-build-runtime-decoupling.md`
 - `docs/tasks/in-progress/TASK-1376-build-baseline-dependency-boundary.md`
 - `docs/audits/platform/2026-07-10-greenhouse-build-dependency-baseline.md`
+- `docs/audits/platform/2026-07-10-roadmap-materialized-index-ab.md`

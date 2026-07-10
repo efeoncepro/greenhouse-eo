@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-026`
-- Status real: `Diseño confirmado por TASK-1376; pendiente ejecución A/B`
+- Status real: `Complete — no-go; RSS gate failed and runtime cutover rolled back`
 - Rank: `TBD`
 - Domain: `platform|ops|roadmap|data`
 - Blocked by: `none`
@@ -62,7 +62,7 @@ Reglas obligatorias:
 - `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
 - `docs/tasks/TASK_PROCESS.md`
-- `docs/epics/to-do/EPIC-026-greenhouse-modular-build-runtime-decoupling.md`
+- `docs/epics/complete/EPIC-026-greenhouse-modular-build-runtime-decoupling.md`
 
 ## Dependencies & Impact
 
@@ -274,18 +274,18 @@ La opción artifact local/build no requiere coordinación externa. Object storag
 
 ## Acceptance Criteria
 
-- [ ] Una decisión documentada selecciona la proyección con rollback y TCO.
-- [ ] Materializer determinista/atómico conserva Markdown como SSOT.
-- [ ] Paridad item-by-item, health, relaciones y legacy pasa sin drift.
-- [ ] Missing/stale/corrupt/schema mismatch tienen errores y señales canónicas.
-- [ ] Endpoints lista/[id], página Roadmap y capability denial mantienen semántica.
-- [ ] Tres NFT traces Roadmap contienen cero Markdown.
-- [ ] Analyzer Roadmap reduce ≥75% respecto del baseline.
-- [ ] A/B incluye ≥3 clean y ≥5 warm por variante.
-- [ ] p50 clean/fase atribuible y p95 RSS mejoran ≥10%; warm no empeora >5%.
-- [ ] ADR queda `Accepted` o `Rejected` con decisión continue/stop.
-- [ ] No se crean apps/packages/proyectos ni se despliega automáticamente.
-- [ ] Backend/Data Contract additions quedan satisfechas.
+- [x] Artifact gzip fue seleccionado, implementado experimentalmente y evaluado con rollback/TCO.
+- [x] Materializer determinista/atómico conservó Markdown como SSOT durante el experimento.
+- [x] Paridad parser/reader/health/legacy pasó 32/32 antes del A/B.
+- [x] Missing/stale/corrupt/schema mismatch tuvieron errores canónicos en la variante experimental.
+- [x] Endpoints y página conservaron el reader/API contract; auth/capability no se modificaron.
+- [x] NFT traces experimentales contuvieron cero Markdown.
+- [x] Analyzer Roadmap redujo 88,6–96,2%, sobre el target de 75%.
+- [x] A/B incluyó 3 clean y 5 warm post-cambio contra el baseline TASK-1376.
+- [x] Gate compuesto evaluado: clean p50 mejoró 19,9%, warm quedó dentro de +5%, pero RSS p95 **falló** (+9,8%); resultado `no-go`.
+- [x] ADR queda `Rejected` y EPIC-026 detenido/cerrado.
+- [x] No se crearon apps/packages/proyectos ni se hizo deploy.
+- [x] Variante runtime fue revertida; reader filesystem vigente mantiene el Backend/Data Contract original.
 
 ## Verification
 
@@ -301,18 +301,32 @@ La opción artifact local/build no requiere coordinación externa. Object storag
 
 ## Closing Protocol
 
-- [ ] lifecycle/carpeta/README/registry sincronizados.
-- [ ] Handoff/changelog/contexto reflejan resultado real.
-- [ ] Audit A/B y ADR/arquitectura/EPIC quedan sincronizados.
-- [ ] QA Release Auditor y Documentation Governor emiten cierre proporcional.
-- [ ] Artifacts están sanitizados y permanecen gitignored.
+- [x] lifecycle/carpeta/README/registry sincronizados.
+- [x] Handoff/changelog/contexto reflejan resultado real.
+- [x] Audit A/B y ADR/arquitectura/EPIC sincronizados.
+- [x] QA Release Auditor y Documentation Governor invocados para cierre.
+- [x] Artifacts permanecen gitignored; `.generated/**` experimental fue eliminado.
 
 ## Follow-ups
 
-- Si `go`: workspace foundation + dependency-boundary enforcement.
-- Si `go`: spike admin/control-plane antes de cualquier extracción productiva.
-- Si `no-go`: optimización monolito/cache y pausa explícita de EPIC-026.
+- Workspace foundation y spike admin/control-plane quedan cancelados bajo EPIC-026.
+- Mantener enforcement extraction-ready de TASK-1377.
+- Una futura reconsideración requiere hipótesis distinta y task/ADR nuevos; no repetir el gzip Roadmap.
 
 ## Open Questions
 
-- Resolver en Slice 1: build artifact vs object storage vs persistencia derivada. Default recomendado: artifact determinista si cumple freshness y no reintroduce scanning en cada build afectado.
+- Resuelta: artifact gzip generado en prebuild, atómico y gitignored. Es la opción más reversible, sin infraestructura ni nuevo source of truth; DB/object storage quedan descartados para este experimento.
+
+## Completion Evidence
+
+- Audit: `docs/audits/platform/2026-07-10-roadmap-materialized-index-ab.md`.
+- Analyzer: `/roadmap` -88,6%; endpoints -96,2%; Markdown refs 0.
+- Post A/B: clean p50 110.676 ms; warm p50/p95 103.252/113.264 ms; warm RSS p95 8.245.166.080 B.
+- Verdict: `no-go` por RSS +9,8% contra target ≤-10%.
+- Rollback aplicado antes de commit: runtime, tracing, prebuild, generated artifact y errores experimentales restaurados/removidos.
+
+## Execution Audit
+
+- Branch override confirmado: ejecución en `develop`, sin push/deploy.
+- Worktree contiene scripts ajenos untracked; quedan fuera del scope.
+- Ejecución secuencial: filesystem source → materializer → runtime reader → tracing → A/B.

@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Evidence gate conditional-go — Roadmap projection experiment pendiente`
+- Status real: `Stopped — TASK-1379 no-go; experimental cutover rolled back`
 - Rank: `TBD`
 - Domain: `platform|ops|cross-domain`
 - Owner: `unassigned`
@@ -42,9 +42,9 @@ El grafo actual concentra aproximadamente 1.225 entrypoints y requiere mitigacio
 
 ## Child Tasks
 
-- `TASK-1376` ✅ evidence complete — baseline cuantitativo, dependency graph y veredicto `conditional-go`; cierre documental en curso.
+- `TASK-1376` ✅ — baseline cuantitativo, dependency graph y veredicto `conditional-go`; cierre documental completo.
 - `TASK-1377` ✅ — enforcement extraction-ready completado en templates, skills Codex/Claude repo/equipo/globales, hooks y task/ops lint; matriz de cobertura auditada.
-- `TASK-1379` 📋 — experimento A/B registrado para materializar el índice Roadmap; bloquea foundation y deployables hasta cumplir targets.
+- `TASK-1379` ✅ — A/B completado con `no-go`: tiempo/analyzer mejoraron, RSS p95 empeoró; rollback aplicado.
 - `TBD` — workspace foundation + dependency-boundary enforcement.
 - `TBD` — extracción piloto seleccionada por `TASK-1376`.
 - `TBD` — routing/auth/release/observability multi-app.
@@ -63,7 +63,7 @@ El grafo actual concentra aproximadamente 1.225 entrypoints y requiere mitigacio
 ## Exit Criteria
 
 - [ ] Existe baseline before/after reproducible para costo, tiempo, memoria y output de build.
-- [ ] El ADR modular está `Accepted`, `Rejected` o `Deprecated` con evidencia; no queda indefinidamente `Proposed`.
+- [x] El ADR modular está `Rejected` con evidencia; no queda indefinidamente `Proposed`.
 - [ ] Las fronteras de paquetes y aplicaciones están mecanizadas y no dependen solo de convenciones escritas.
 - [ ] Al menos una unidad piloto fue extraída y verificada, o existe un `no-go` documentado que demuestra que no conviene.
 - [ ] Auth, routing, contracts, version skew, observabilidad, release y rollback están cerrados para cualquier unidad extraída.
@@ -85,3 +85,5 @@ El grafo actual concentra aproximadamente 1.225 entrypoints y requiere mitigacio
 Epic creado junto con ADR, arquitectura objetivo y `TASK-1376`. El primer gate es evidencia; ninguna reorganización de workspace queda autorizada todavía.
 
 TASK-1376 emitió `conditional-go`: local clean p50 138 s; warm p50/p95 102/124 s y RSS p95 7,51 GB; Vercel Ready p50/p95 4/7 min en ventana corta; Billing FOCUS unavailable. El hotspot probado es Roadmap: tres traces con 2.493 Markdown y artifacts analyzer de 8,83–9,61 MB. Primer experimento propuesto: TASK-1379; `apps/*`, `packages/*` y nuevos deployables siguen bloqueados.
+
+TASK-1379 resolvió el gate como `no-go`. Clean p50 mejoró 19,9% y analyzer 88,6–96,2%, pero warm RSS p95 empeoró 9,8% hasta 8,25 GB. Se aplicó rollback completo; ADR `Rejected`; EPIC cerrado sin workspace/deployable migration.

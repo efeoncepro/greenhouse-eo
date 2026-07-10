@@ -1,6 +1,6 @@
 # Greenhouse Modular Build & Runtime Architecture V1
 
-> Status: `Proposed`
+> Status: `Rejected by TASK-1379 evidence gate`
 > Version: `1.0`
 > Date: `2026-07-10`
 > Governing decision: `GREENHOUSE_MODULAR_BUILD_RUNTIME_DECISION_V1.md`
@@ -10,6 +10,8 @@
 Define the target architecture and incremental migration path for reducing Greenhouse build cost, local resource pressure and deployment coupling without rewriting the product or fragmenting its business invariants.
 
 This document governs `EPIC-026`. It does not itself authorize a workspace move or a production cutover; child tasks do.
+
+TASK-1379 closed the program with `no-go`: the Roadmap projection experiment reduced analyzer/build clean time but increased warm RSS p95 to 8.25 GB. The target topology remains historical design context, not an authorized migration plan.
 
 ## 2. Current state
 
@@ -212,7 +214,7 @@ The release control plane must distinguish `code complete`, `deployed`, `routed`
 - Identify high-fanout dependencies and route clusters.
 - Remove safe build-context waste.
 - Select or reject the first extraction.
-- TASK-1376 verdict: `conditional-go`; first bounded experiment is the Roadmap materialized-index build-input boundary. No deployable split is authorized yet.
+- TASK-1376 verdict was `conditional-go`; TASK-1379 resolved it as `no-go` and rolled back the Roadmap cutover. No deployable split is authorized.
 
 ### Phase 1 — Workspace foundation
 

@@ -39,7 +39,7 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-023` | `to-do` | `docs/epics/to-do/EPIC-023-growth-cta-popup-cro-engine.md` |
 | `EPIC-024` | `to-do` | `docs/epics/to-do/EPIC-024-hubspot-portal-grader.md` |
 | `EPIC-025` | `to-do` | `docs/epics/to-do/EPIC-025-vivir-el-why-cocreacion-educacion-cliente.md` |
-| `EPIC-026` | `to-do` | `docs/epics/to-do/EPIC-026-greenhouse-modular-build-runtime-decoupling.md` |
+| `EPIC-026` | `complete` | `docs/epics/complete/EPIC-026-greenhouse-modular-build-runtime-decoupling.md` |
 
 ## Siguiente ID disponible
 

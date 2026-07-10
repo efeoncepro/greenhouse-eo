@@ -113,9 +113,12 @@ if (command === 'inventory') {
     process.exitCode = exitCode || 0
   })
 } else if (command === 'summarize') {
+  const prefix = valueAfter('--prefix')
+
   const sampleFiles = fs.existsSync(outputRoot)
     ? fs
         .readdirSync(outputRoot)
+        .filter(entry => !prefix || entry.startsWith(prefix))
         .map(entry => path.join(outputRoot, entry, 'sample.json'))
         .filter(fs.existsSync)
     : []
