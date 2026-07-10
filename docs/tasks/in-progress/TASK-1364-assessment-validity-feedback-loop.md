@@ -1,5 +1,12 @@
 # TASK-1364 — Assessment Validity Feedback Loop
 
+## Delta 2026-07-10 (ejecución) — Open Questions resueltas + recalibración del join
+
+- **Fuente de outcome (resuelta, dual con prioridad):** primaria = `greenhouse_serving.ico_member_metrics` (VIVA hoy: RpA/OTD/FTR mensual por member — desempeño operativo objetivo materializado por el ICO engine); secundaria = `greenhouse_hr.eval_summaries.overall_rating` (TASK-029, hoy sin filas — el adapter la soporta y siempre etiqueta la fuente). Pearson es invariante a escala → los outcomes se consumen en su escala nativa, sin normalización inventada.
+- **Umbrales de muestra (resueltos):** n<10 → `insufficient_sample` (NO se reporta r); 10-29 → `preliminary`; ≥30 → `established`.
+- **Join recalibrado:** el enlace application↔member NO va por `identity_profile_id` (ambiguo ante multi-application): usa el mapping durable de TASK-770 `greenhouse_hr.hiring_activation_request` (application_id ↔ member_id, UNIQUE por handoff). El score correlacionado es el **del momento de decidir** (snapshot de 1383 en `decisionHistory[]`), con fallback al rollup vigente; per-competencia vía `hiring_competency_result`.
+- Estado de datos al implementar: 0 hires con assessment → el reader nace reportando `insufficient_sample` (degradación honesta verificada live).
+
 ## Delta 2026-07-10 — TASK-1383 dejó los contratos de datos que este loop necesita
 
 - **Versionado de templates decidido e implementado**: un `template_id` con instancias es INMUTABLE (trigger DB sobre contenido y módulos; solo `status` muta) + columnas `version`/`supersedes_template_id`. Correlacionar por `template_id` es seguro: un id = un contenido congelado. Editar = crear versión nueva con supersede.
@@ -13,7 +20,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -29,7 +36,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-1360`
+- Blocked by: `none` (1360 complete)
 - Branch: `task/TASK-1364-assessment-validity-feedback-loop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
