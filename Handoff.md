@@ -1,3 +1,7 @@
+## Sesion 2026-07-10 - TASK-1384 Question Bank SME creada (to-do) - Claude
+
+TASK-1384 creada y registrada (lint 0/0): banco de preguntas real del assessment (contenido SME work-sample-first) — el follow-up sin dueño de 1360 que la auditoría marcó como la brecha más grande del programa. 4 slices: matriz de cobertura por rol → guía de autoría SME + reporte binario `hiring:question-bank-coverage` → drafting gobernado (IA-asistido si el flag de 1361 se habilita, manual si no; SIEMPRE draft→sme_review) → review humano + activación + plantillas por rol. **Out-of-band crítico: People Ops debe agendar SMEs por skill ANTES del Slice 3** (riesgo #1 de estancamiento). Queda en to-do lista para tomar.
+
 ## Sesion 2026-07-10 - TASK-1383 Assessment hardening COMPLETE (code) - Claude
 
 > **Auditoría de la foundation Assessment (1360/1361) → TASK-1383 creada y ejecutada en la misma sesión.**
