@@ -326,6 +326,19 @@ ENV_VARS="${ENV_VARS},NOTION_KNOWLEDGE_TOKEN_SECRET_REF=${NOTION_KNOWLEDGE_TOKEN
 ENV_VARS="${ENV_VARS},NOTION_KNOWLEDGE_WEBHOOK_ENABLED=${NOTION_KNOWLEDGE_WEBHOOK_ENABLED}"
 ensure_secret_accessor_binding "${NOTION_KNOWLEDGE_TOKEN_SECRET_REF}:latest"
 
+# TASK-1375 — Email de respaldo del ebook lead magnet. La projection reactiva
+# `growth_ebook_delivery_from_submission` corre SÓLO acá (la drena `ops-reactive-growth`),
+# NO en Vercel: gatear esto en Vercel no hace nada. Flujo crítico — la success card del form
+# le promete el email al usuario, así que OFF en prod = promesa incumplida.
+# Declarativo acá para que `--set-env-vars` (destructivo) NO lo borre en cada redeploy:
+# prenderlo sólo con `gcloud run services update --update-env-vars` sobrevive hasta el
+# siguiente deploy y después falla EN SILENCIO. Pasó el 2026-07-10: se prendió en la revisión
+# 00470 y la 00473 lo borró; el consumer reactivo registró `skip: flag OFF` y el email nunca
+# salió, mientras la success card decía "te lo enviamos a tu correo".
+# Rollback (<5min): `gcloud run services update ops-worker --update-env-vars GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=false`.
+GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED="${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED}"
+
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 else
