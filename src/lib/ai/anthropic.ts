@@ -73,10 +73,10 @@ export const generateStructuredAnthropic = async <T>(
 ): Promise<AnthropicStructuredResult<T>> => {
   const client = await getAnthropicClient()
 
-  const response = await client.messages.create({
+  const buildParams = (withTemperature: boolean): Anthropic.Messages.MessageCreateParamsNonStreaming => ({
     model: input.model,
     max_tokens: input.maxTokens ?? 4096,
-    temperature: input.temperature ?? 0.2,
+    ...(withTemperature ? { temperature: input.temperature ?? 0.2 } : {}),
     system: input.system,
     tools: [
       {
@@ -88,6 +88,23 @@ export const generateStructuredAnthropic = async <T>(
     tool_choice: { type: 'tool', name: input.toolName },
     messages: [{ role: 'user', content: input.prompt }]
   })
+
+  // Los modelos Claude 5+ deprecaron `temperature` (400 invalid_request_error). El contrato
+  // del cliente canónico se auto-adapta: retry único sin el parámetro ante ese 400 específico
+  // (model-agnóstico — cubre modelos futuros sin mantener una lista).
+  let response: Anthropic.Messages.Message
+
+  try {
+    response = await client.messages.create(buildParams(true))
+  } catch (error) {
+    const message = error instanceof Error ? error.message : ''
+
+    if (message.includes('`temperature` is deprecated')) {
+      response = await client.messages.create(buildParams(false))
+    } else {
+      throw error
+    }
+  }
 
   const toolUse = response.content.find(
     (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
