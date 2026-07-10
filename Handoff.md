@@ -1,3 +1,14 @@
+## Sesion 2026-07-10 - TASK-1384 Question Bank S1-S3 ejecutados - Claude
+
+> TASK-1384 en ejecución local-first: **S1-S3 completos, S4 bloqueado en humanos (por diseño)**.
+> Matriz de cobertura (lote 1 = Account Manager L2, la vacante real) + guía de autoría SME
+> (work-sample-first, rúbricas contestables, sesgos prohibidos) + `pnpm hiring:question-bank-coverage`
+> (criterio binario) + **24 borradores de calidad redactados y en cola `sme_review` contra PG real**
+> (15 work-sample/situational + 9 choice de fundamento; NADA activo — solo un SME humano activa).
+> **Próximo paso NO-agente: People Ops agenda los expertos por skill del lote 1**, revisan contra la
+> guía y activan; la cobertura pasa de 🟡 a ✅ y la task cierra. Los borradores viven en el script
+> idempotente `scripts/hiring/draft-question-bank-lote1.ts` (re-ejecutable, no duplica).
+
 ## Sesion 2026-07-10 - TASK-1384 Question Bank SME creada (to-do) - Claude
 
 TASK-1384 creada y registrada (lint 0/0): banco de preguntas real del assessment (contenido SME work-sample-first) — el follow-up sin dueño de 1360 que la auditoría marcó como la brecha más grande del programa. 4 slices: matriz de cobertura por rol → guía de autoría SME + reporte binario `hiring:question-bank-coverage` → drafting gobernado (IA-asistido si el flag de 1361 se habilita, manual si no; SIEMPRE draft→sme_review) → review humano + activación + plantillas por rol. **Out-of-band crítico: People Ops debe agendar SMEs por skill ANTES del Slice 3** (riesgo #1 de estancamiento). Queda en to-do lista para tomar.

@@ -16,7 +16,7 @@
 - UI ready: `n/a`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `S1-S3 COMPLETOS 2026-07-10 — matriz + guía + coverage tool + 24 borradores en sme_review (PG real). BLOQUEADA EN S4: revisión SME humana (People Ops agenda expertos)`
 - Rank: `TBD`
 - Domain: `agency|hr`
 - Blocked by: `none`
@@ -111,8 +111,16 @@ Reglas obligatorias:
 - Extraction blocker: `ninguno`
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — EXECUTION LOG (lo llena el agente que toma la task)
+     ZONE 2 — EXECUTION LOG
      ═══════════════════════════════════════════════════════════ -->
+
+### Execution Log (2026-07-10, Claude — local-first develop)
+
+- **S1**: matriz de cobertura SoT en `scripts/hiring/question-bank-matrix.ts` — lote 1 = Account Manager L2 (validado por la vacante real EO-OPN-0009), 9 módulos del template vivo, target 3 activas core / 2 soporte.
+- **S2**: guía SME `docs/documentation/hr/assessment-question-authoring-guide.md` (work-sample-first, anatomía, rúbricas contestables, checklist de sesgos, actitudinales vía Operating Code, ejemplos bueno/malo) + `pnpm hiring:question-bank-coverage` (reporte binario contra la matriz; exit 1 bajo target).
+- **S3**: 24 borradores redactados con la doctrina de `greenhouse-talent-people-operator` (15 open_text/situational work-sample-first para intermedio, 9 con answer_key para nociones/fundamento), creados vía `createQuestion` (writer canónico) + transicionados a `sme_review` contra PG real. Script idempotente `scripts/hiring/draft-question-bank-lote1.ts` (dry-run→apply). Cobertura live: 9/9 celdas `🟡 pendiente SME`, 0 activas — **correcto por diseño** (solo un humano activa).
+- **S4 (PENDIENTE — out-of-band humano)**: People Ops agenda SMEs por skill → revisan contra la guía → activan (`transitionQuestionStatus`, actor auditado) → cobertura verde → plantilla smoke → cierre.
+
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -193,9 +201,9 @@ N/A — contenido vía writers gobernados; sin flag propio. (El propose IA usa e
 
 ## Acceptance Criteria
 
-- [ ] Matriz de cobertura V1 documentada (roles lote 1 × competencias × niveles × target).
-- [ ] Guía de autoría SME publicada en `docs/documentation/hr/` (work-sample-first + sesgos + ejemplos).
-- [ ] `pnpm hiring:question-bank-coverage` existe y reporta contra la matriz.
+- [x] Matriz de cobertura V1 documentada (roles lote 1 × competencias × niveles × target).
+- [x] Guía de autoría SME publicada en `docs/documentation/hr/` (work-sample-first + sesgos + ejemplos).
+- [x] `pnpm hiring:question-bank-coverage` existe y reporta contra la matriz.
 - [ ] Lote 1: cobertura verde — preguntas `active` (pasaron `sme_review` con actor humano real) para todas las celdas target.
 - [ ] ≥1 plantilla nueva de rol creada y asignable (smoke: assign → resolve → payload candidato sin answer_key).
 - [ ] Cero preguntas activadas por seed/SQL directo (todo vía writers gobernados).
