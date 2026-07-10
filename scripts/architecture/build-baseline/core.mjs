@@ -215,6 +215,10 @@ export const summarizeSamples = samples => {
   const durations = successful.map(sample => sample.durationMs)
   const rss = successful.map(sample => sample.peakRssBytes).filter(Number.isFinite)
 
+  const treeRss = successful
+    .map(sample => sample.processProfile?.summary?.peakTreeRssBytes)
+    .filter(Number.isFinite)
+
   return {
     sampleCount: samples.length,
     successfulCount: successful.length,
@@ -228,6 +232,11 @@ export const summarizeSamples = samples => {
       p50: percentile(rss, 0.5),
       p95: rss.length >= 5 ? percentile(rss, 0.95) : null,
       max: rss.length ? Math.max(...rss) : null
+    },
+    peakTreeRssBytes: {
+      p50: percentile(treeRss, 0.5),
+      p95: treeRss.length >= 5 ? percentile(treeRss, 0.95) : null,
+      max: treeRss.length ? Math.max(...treeRss) : null
     },
     confidence: successful.length >= 5 ? 'medium' : successful.length >= 3 ? 'low' : 'insufficient'
   }

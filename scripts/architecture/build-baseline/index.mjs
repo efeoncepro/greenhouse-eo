@@ -5,6 +5,7 @@ import path from 'node:path'
 import { spawn, spawnSync } from 'node:child_process'
 
 import { buildInventory, gitMetadata, listFiles, sanitize, summarizeSamples } from './core.mjs'
+import { createProcessProfiler } from './process-profiler.mjs'
 
 const repoRoot = process.cwd()
 const outputRoot = path.resolve(repoRoot, 'artifacts/architecture/build-baseline')
@@ -57,9 +58,18 @@ if (command === 'inventory') {
 } else if (command === 'measure') {
   const cacheState = valueAfter('--cache-state') || 'unknown'
   const shellCommand = valueAfter('--command')
+  const profileProcesses = args.includes('--profile-processes')
+  const sampleIntervalMs = Number.parseInt(valueAfter('--sample-interval-ms') || '500', 10)
 
-  if (!['clean', 'warm', 'unknown'].includes(cacheState) || !shellCommand) {
-    console.error('usage: measure --cache-state clean|warm|unknown --command "..." [--run-id id]')
+  if (
+    !['clean', 'warm', 'unknown'].includes(cacheState) ||
+    !shellCommand ||
+    !Number.isFinite(sampleIntervalMs) ||
+    sampleIntervalMs < 250
+  ) {
+    console.error(
+      'usage: measure --cache-state clean|warm|unknown --command "..." [--profile-processes] [--sample-interval-ms >=250] [--run-id id]'
+    )
     process.exit(2)
   }
 
@@ -68,24 +78,50 @@ if (command === 'inventory') {
   const tsconfigBefore = fs.readFileSync(tsconfigPath, 'utf8')
   const stderr = []
   const started = Date.now()
+  const buildMetaPath = path.join(repoRoot, '.next-build-meta.json')
 
   const child = spawn('/usr/bin/time', ['-l', '/bin/sh', '-lc', shellCommand], {
     cwd: repoRoot,
     env: { ...process.env, NEXT_TELEMETRY_DISABLED: '1' },
-    stdio: ['ignore', 'inherit', 'pipe']
+    stdio: ['ignore', 'pipe', 'pipe']
+  })
+
+  const profiler = profileProcesses
+    ? createProcessProfiler({ rootPid: child.pid, intervalMs: sampleIntervalMs })
+    : null
+
+  profiler?.start()
+
+  child.stdout.on('data', chunk => {
+    process.stdout.write(chunk)
+    profiler?.observeOutput(chunk.toString())
   })
 
   child.stderr.on('data', chunk => {
     process.stderr.write(chunk)
     stderr.push(chunk.toString())
+    profiler?.observeOutput(chunk.toString())
   })
-  child.on('close', exitCode => {
+  child.on('close', async exitCode => {
+    const processProfile = await profiler?.stop()
+
     if (fs.readFileSync(tsconfigPath, 'utf8') !== tsconfigBefore) fs.writeFileSync(tsconfigPath, tsconfigBefore)
     const timeOutput = stderr.join('')
     const rssMatch = timeOutput.match(/(\d+)\s+maximum resident set size/i)
     const peakRssBytes = rssMatch ? Number(rssMatch[1]) : null
+
+    const buildMeta = (() => {
+      try {
+        if (fs.statSync(buildMetaPath).mtimeMs < started) return null
+
+        return JSON.parse(fs.readFileSync(buildMetaPath, 'utf8'))
+      } catch {
+        return null
+      }
+    })()
+
     const distDirMatch = shellCommand.match(/NEXT_DIST_DIR=([^\s]+)/)
-    const distDir = distDirMatch?.[1] || null
+    const distDir = buildMeta?.distDir || distDirMatch?.[1] || null
     const distFiles = distDir ? listFiles(path.resolve(repoRoot, distDir)) : []
     const inventory = buildInventory(repoRoot)
 
@@ -94,6 +130,7 @@ if (command === 'inventory') {
       cacheState,
       durationMs: Date.now() - started,
       peakRssBytes,
+      processProfile: processProfile || null,
       exitCode,
       status: exitCode === 0 ? 'ok' : 'error',
       error: exitCode === 0 ? null : 'build_failed',
@@ -106,7 +143,11 @@ if (command === 'inventory') {
             traceFiles: distFiles.filter(file => file.endsWith('.nft.json')).length
           }
         : null,
-      missingEvidence: [peakRssBytes ? null : 'peak_rss', distDir ? null : 'build_output'].filter(Boolean),
+      missingEvidence: [
+        peakRssBytes ? null : 'peak_rss',
+        distDir ? null : 'build_output',
+        profileProcesses && !processProfile?.summary.sampleCount ? 'process_profile' : null
+      ].filter(Boolean),
       warnings: [],
       confidence: peakRssBytes && distDir ? 'high' : 'medium'
     })

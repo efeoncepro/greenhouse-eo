@@ -30,5 +30,33 @@ test('summary does not invent p95 with fewer than five samples', () => {
 
   assert.equal(summary.durationMs.p50, 20)
   assert.equal(summary.durationMs.p95, null)
+  assert.equal(summary.peakTreeRssBytes.p50, null)
   assert.equal(summary.confidence, 'low')
+})
+
+test('summary reports aggregate process-tree RSS separately from legacy timed RSS', () => {
+  const summary = summarizeSamples([
+    {
+      status: 'ok',
+      durationMs: 10,
+      peakRssBytes: 100,
+      processProfile: { summary: { peakTreeRssBytes: 300 } }
+    },
+    {
+      status: 'ok',
+      durationMs: 20,
+      peakRssBytes: 200,
+      processProfile: { summary: { peakTreeRssBytes: 500 } }
+    },
+    {
+      status: 'ok',
+      durationMs: 30,
+      peakRssBytes: 300,
+      processProfile: { summary: { peakTreeRssBytes: 700 } }
+    }
+  ])
+
+  assert.equal(summary.peakRssBytes.p50, 200)
+  assert.equal(summary.peakTreeRssBytes.p50, 500)
+  assert.equal(summary.peakTreeRssBytes.p95, null)
 })
