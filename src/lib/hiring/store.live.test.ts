@@ -133,12 +133,21 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
 
   it('publish guard (422) requires public_title; publish/unpublish toggles the public listing', async () => {
     await expect(publishOpening(created.openingId, 'user-live-test')).rejects.toSatisfy(
-      (err: unknown) => isHiringError(err) && (err as { code: string }).code === 'hiring_opening_missing_public_copy',
+      (err: unknown) => isHiringError(err) && (err as { code: string }).code === 'hiring_opening_missing_public_structured_fields',
     )
 
+    // TASK-1371: el publish exige campos públicos estructurados completos (no basta el título).
     await updateHiringOpening(
       created.openingId,
-      { publicTitle: 'Diseñador/a Senior (LIVE-TEST)', publicSummary: 'resumen público' },
+      {
+        publicTitle: 'Diseñador/a Senior (LIVE-TEST)',
+        publicSummary: 'resumen público',
+        publicDescription: 'Descripción pública de la vacante para el aviso de careers.',
+        publicArea: 'Marketing',
+        publicWorkMode: 'remote',
+        publicHiringRegion: 'Chile',
+        publicSkillTags: ['figma', 'design-systems'],
+      },
       'user-live-test',
     )
     const published = await publishOpening(created.openingId, 'user-live-test')

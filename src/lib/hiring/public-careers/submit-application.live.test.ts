@@ -43,7 +43,20 @@ describe.skipIf(!hasPgConfig)('submitPublicHiringApplication — live PG (TASK-1
     const opening = await createHiringOpening({ demandId: demand.demandId, internalTitle: 'T1367 LIVE internal' }, 'user-live-test')
 
     state.openingId = opening.openingId
-    await updateHiringOpening(opening.openingId, { publicTitle: 'Account Manager (T1367 LIVE)', publicSummary: 'resumen' }, 'user-live-test')
+    // TASK-1371: publish exige el payload público estructurado completo.
+    await updateHiringOpening(
+      opening.openingId,
+      {
+        publicTitle: 'Account Manager (T1367 LIVE)',
+        publicSummary: 'resumen',
+        publicDescription: 'Descripción pública de la vacante para careers.',
+        publicArea: 'Growth',
+        publicWorkMode: 'remote',
+        publicHiringRegion: 'Chile',
+        publicSkillTags: ['account-management', 'reporting'],
+      },
+      'user-live-test',
+    )
     const published = await publishOpening(opening.openingId, 'user-live-test')
 
     state.openingPublicId = published.publicId
