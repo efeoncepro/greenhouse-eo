@@ -35,6 +35,7 @@ La migración seguirá un patrón strangler y estas reglas:
 8. Cada extracción tendrá routing reversible, observabilidad cross-runtime y rollback probado.
 9. Vercel seguirá siendo el host del portal durante la primera fase; una migración de cloud/host requerirá otro ADR.
 10. El programa podrá detenerse tras cualquier slice si el ahorro observado no compensa el costo operacional.
+11. Mientras el programa avanza, el producto seguirá construyéndose en la topología actual bajo el contrato extraction-ready de `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`; ninguna feature aislada anticipará `apps/*` o `packages/*`.
 
 ## Target shape
 
@@ -135,5 +136,6 @@ Un resultado `no-go` mantiene la optimización dentro de la app actual y deja es
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
+- `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
 - `docs/epics/to-do/EPIC-026-greenhouse-modular-build-runtime-decoupling.md`
 - `docs/tasks/to-do/TASK-1376-build-baseline-dependency-boundary.md`

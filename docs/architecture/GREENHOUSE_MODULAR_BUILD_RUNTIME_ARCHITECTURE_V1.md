@@ -290,3 +290,13 @@ The release control plane must distinguish `code complete`, `deployed`, `routed`
 - Session cookie and OAuth callback constraints under candidate routing.
 - Which packages are browser-safe versus server-only.
 - Whether the first boundary can deploy independently without cross-transaction writes.
+
+## 17. Building product while the migration advances
+
+Product delivery does not pause for `EPIC-026`. Until a child task approves and implements the workspace foundation, new work remains in the current `src/`/`services/` topology but must be extraction-ready: canonical domain primitive first, browser-safe contracts separated from server-only adapters, thin UI/API/Nexa/MCP consumers, explicit build inputs and current workload placement for async work.
+
+The executable placement and review contract lives in:
+
+- `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
+
+No feature task may opportunistically create the target `apps/*` or `packages/*` topology. Conversely, ordinary product work must not be blocked when it can follow the transitional dependency rules safely.

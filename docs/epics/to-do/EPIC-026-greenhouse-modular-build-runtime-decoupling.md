@@ -38,6 +38,7 @@ El grafo actual concentra aproximadamente 1.225 entrypoints y requiere mitigacio
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`
+- `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
 
 ## Child Tasks
 
@@ -67,6 +68,7 @@ El grafo actual concentra aproximadamente 1.225 entrypoints y requiere mitigacio
 - [ ] Auth, routing, contracts, version skew, observabilidad, release y rollback están cerrados para cualquier unidad extraída.
 - [ ] El costo total post-cambio, incluido overhead operacional, mejora frente al baseline o el programa se detiene.
 - [ ] La experiencia local permite checks afectados y conserva un gate integral reproducible.
+- [ ] El contrato transicional para construir features nuevas fue reemplazado por ownership real o retirado explícitamente al cerrar el epic.
 
 ## Non-goals
 

@@ -1,6 +1,8 @@
 ## Sesion 2026-07-10 - EPIC-026 modular build/runtime decoupling - Codex - DOCUMENTADO / EVIDENCIA PENDIENTE
 
 > Se registraron `EPIC-026`, `TASK-1376`, ADR propuesto y arquitectura V1 para desacoplar incrementalmente el grafo de build de Greenhouse. Target: modular monorepo + unidades desplegables, conservando modular monolith de dominio/datos; sin reescritura, multirepo, microservicios, microfrontends, split de PostgreSQL ni migración de Vercel. `TASK-1376` es el gate: baseline local/Vercel, dependency graph, matriz de fronteras y veredicto `go|conditional-go|no-go`. No hubo cambios de código/runtime/deploy. Gates de autoría: `task:lint` y `ops:lint --changed` en cero.
+>
+> **Cómo seguir construyendo desde ahora:** contrato activo `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`. Las features nuevas siguen viviendo en `src/`/`services/`, pero nacen extraction-ready: primitive canónico antes de UI/route, contratos browser-safe separados de adapters server-only, consumers delgados y workload placement vigente. No crear `apps/*`/`packages/*` desde una feature aislada ni bloquear delivery esperando el workspace futuro.
 
 ## Sesion 2026-07-10 - TASK-1362 Candidate Document Capture - Claude - CODE COMPLETE / ROLLOUT PENDIENTE
 > **⚠️ Nota de colisión multi-agente (2026-07-10).** El commit `25c37dcd0` ("polish hiring desk fidelity and upload
