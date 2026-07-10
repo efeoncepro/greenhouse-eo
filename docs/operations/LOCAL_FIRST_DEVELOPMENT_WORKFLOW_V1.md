@@ -70,6 +70,14 @@ pnpm actions:cost:audit --from YYYY-MM-DD --to YYYY-MM-DD
 
 El comando usa GitHub Actions Runs/Jobs API via `gh` y entrega hotspots estimados por workflow/job. No reemplaza la factura oficial ni `cloud.billing.github`.
 
+Cuando un build local normal entra en OOM/swap o el operador prefiere reducir concurrencia aunque tarde algo más:
+
+```bash
+pnpm build:low-memory
+```
+
+Este comando ejecuta el mismo prebuild y `run-next-build.mjs`, pero fija un perfil explícito de 1 CPU. Es un escape hatch, no el default ni una garantía universal de menor RSS: TASK-1381 observó p50 equivalente y p95 -6,8% frente a 2 CPUs, insuficiente para adoptar selección automática. No usarlo en CI/Vercel; falla cerrado allí. Evidencia: `docs/audits/platform/2026-07-10-adaptive-local-low-memory-build.md`.
+
 Además:
 
 - tests focales siguen siendo obligatorios cuando existe suite especifica;

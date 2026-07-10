@@ -1,4 +1,8 @@
 
+## Sesion 2026-07-10 - TASK-1381 low-memory build iniciada - Codex
+
+TASK-1381 ejecutada sobre `develop` por autorización explícita, sin branch/worktree, push ni deploy. Excepción goal preflight: el operador confirmó registrar+ejecutar inmediatamente. Cohorte alternada n=5: low tree RSS p50/p95 6,18/6,70 GB vs balanced 6,17/7,18 GB (deltas +0,2%/-6,8%; target -15% FAIL); tiempo p50 +4,5%. Veredicto `keep-explicit-only`: `pnpm build:low-memory` queda como escape hatch manual con prebuild/runner y fail-closed CI/Vercel; el selector `build:local` fue retirado. `pnpm build`, build:fast, next.config y remotos intactos. Audit: `docs/audits/platform/2026-07-10-adaptive-local-low-memory-build.md`. TASK-356 y scripts ajenos preservados.
+
 ## Sesion 2026-07-10 - TASK-1380 RSS attribution iniciada - Codex
 
 TASK-1380 ejecutada sobre `develop` por autorización explícita, sin branch/worktree nuevo, push ni deploy. Excepción goal preflight: el mismo mensaje confirmó registrar y ejecutar inmediatamente. Profiler sanitizado root+árbol/fases agregado al baseline tooling; overhead control -0,3% (ruido). Resultado n=3: `cpus=1` tree RSS p50 6,58 GB vs 7,94 GB en `cpus=2` (-17,1%), duración 106,1 vs 96,9 s (+9,5%); `cpus=4` descartado por 8,29 GB con ahorro de tiempo marginal. Veredicto `proceed` solo hacia propuesta TASK-1381 low-memory/adaptativa con n≥5; no se cambió default/runtime/CI/Vercel y EPIC-026 permanece cerrado. Audit: `docs/audits/platform/2026-07-10-build-rss-attribution-concurrency.md`. Archivos ajenos TASK-356, `scripts/_verify-form-asset.ts` y `scripts/hiring/verify-public-apply-smoke.mjs` permanecen fuera de scope.

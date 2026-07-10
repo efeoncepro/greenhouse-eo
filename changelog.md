@@ -2,6 +2,8 @@
 
 ## 2026-07-10
 
+- **TASK-1381 — escape hatch `build:low-memory`, selección adaptativa rechazada.** Se agregó un wrapper local explícito de 1 CPU que reutiliza prebuild/runner y falla cerrado en CI/Vercel. La cohorte n=5 no logró el target: tree RSS p50 +0,2%, p95 -6,8% y tiempo p50 +4,5% frente a 2 CPUs; por eso no existe `build:local` automático y los comandos/defaults remotos permanecen intactos.
+
 - **TASK-1380 — profiler de RSS por árbol/fase + veredicto `proceed`.** `architecture:build-baseline measure` puede muestrear root/descendientes, clasificar procesos sin argv/env y atribuir peaks a fases. La cohorte n=3 muestra que `cpus=1` reduce tree RSS p50 17,1% frente a `cpus=2` con +9,5% de tiempo; compile/typecheck dominan y `cpus=4` queda descartado. No se cambió ningún default/runtime/deploy; se propone validar un modo local low-memory separado.
 
 - **TASK-1379 / EPIC-026 — experimento Roadmap cerrado `no-go`.** La proyección gzip experimental eliminó docs de los traces, redujo artifacts 88,6–96,2% y mejoró clean p50 19,9%, pero warm RSS p95 empeoró 9,8% (7,51→8,25 GB), incumpliendo el gate obligatorio de memoria. Se revirtió el cutover, se rechazó el ADR y se detuvo el programa de desacople físico; el runtime vigente no cambia y el contrato extraction-ready para trabajo nuevo permanece.
