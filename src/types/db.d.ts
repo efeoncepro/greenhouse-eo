@@ -7121,6 +7121,40 @@ export interface GreenhouseHiringHiringCompetencyResult {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHiringHiringHandoff {
+  blocked_detail: string | null;
+  blocked_reason: string | null;
+  candidate_facet_id: string;
+  created_at: Generated<Timestamp>;
+  decision_id: string;
+  downstream_ref: string | null;
+  expected_legal_entity: string | null;
+  hiring_application_id: string;
+  hiring_handoff_id: Generated<string>;
+  identity_profile_id: string;
+  opening_id: string;
+  prerequisites_snapshot_json: Generated<Json>;
+  selected_destination: string;
+  state: Generated<string>;
+  state_changed_at: Generated<Timestamp>;
+  tentative_start_date: Timestamp | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringHandoffAudit {
+  actor_user_id: string | null;
+  audit_id: Generated<string>;
+  decision_id: string | null;
+  downstream_ref: string | null;
+  from_state: string | null;
+  hiring_handoff_id: string;
+  occurred_at: Generated<Timestamp>;
+  open_prerequisites_json: Generated<Json>;
+  reason_code: string | null;
+  reason_detail: string | null;
+  to_state: string;
+}
+
 export interface GreenhouseHiringHiringOpening {
   apply_url: string | null;
   budget_band: string | null;
@@ -11421,6 +11455,8 @@ export interface DB {
   "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;
   "greenhouse_hiring.hiring_competency": GreenhouseHiringHiringCompetency;
   "greenhouse_hiring.hiring_competency_result": GreenhouseHiringHiringCompetencyResult;
+  "greenhouse_hiring.hiring_handoff": GreenhouseHiringHiringHandoff;
+  "greenhouse_hiring.hiring_handoff_audit": GreenhouseHiringHiringHandoffAudit;
   "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
