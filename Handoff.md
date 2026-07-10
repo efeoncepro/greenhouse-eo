@@ -1,3 +1,47 @@
+## Sesion 2026-07-10 - Release develop→main `4e7e9093d` (TASK-1362 + TASK-355 + batch) - Claude - RELEASED
+
+> **Release completo y verificado.** `develop`→`main` (50+ commits). Target SHA `4e7e9093d169ac35193e9eb882c3ee8c8a517896`,
+> release_id `4e7e9093d169-a2238744-44…`, orchestrator run `29089153955`, manifest = **`released`** (512s).
+> Vercel prod READY, `/api/auth/health` 200, 4 Cloud Run OK, Azure = no-op (`Skip Bicep, no diff`).
+> **Tiempo agente E2E: 1h 08m** (10:30:27Z → 11:38Z). Desglose en `PRODUCTION_RELEASE_TIMING_LEDGER.md`.
+>
+> **Lo que este release cierra:** el upload público de CV de Careers estaba VIVO validando con `file.type` —el MIME
+> que declara el navegador— sin inspeccionar un solo byte. Un ejecutable renombrado a `.pdf` entraba al bucket privado
+> y quedaba `attached`. Ahora `pending → scan → attached | quarantined`, con guardrail estructural en
+> `attachAssetToAggregate` (rechaza documentos de candidato sin veredicto `clean`).
+>
+> **Bloqueo principal — gate de `CLAUDE.md` (35k tokens).** No era deuda de esta task: `main` estaba **exactamente**
+> en el tope (34.999/35.000), así que cualquier línea de cualquier agente rompía el CI. Fix de raíz (el que el propio
+> gate prescribe): el bloque más pesado del archivo (TASK-893 SQL Signal Reader Gate, 1.648 tok / 125 líneas de runbook
+> inline) se movió **verbatim** a `docs/architecture/agent-invariants/SQL_DATE_MATH_AGENT_INVARIANTS.md` + pointer;
+> los invariantes de TASK-1362 pasaron a una fila del router. **103% → 97%**, ~1.400 tokens de margen recuperados para
+> todos. `claude-md audit --strict` = 0 huérfanas (contenido verbatim, sin pérdida).
+>
+> **Los dos gates `production` se aprobaron con 22s de diferencia** (11:23:13 / 11:23:35) poleando `pending_deployments`
+> en loop, NO `run.status`. Manifest 512s vs 2.782s del release anterior, que se comió el stall de 43 min del 2do gate
+> (jobs Azure). **Ese loop debe ser el default del playbook.**
+>
+> **Gotchas confirmados:** #2 (preflight local `requires_break_glass` por 4 migraciones — el diff 3-dot resucita una ya
+> desplegada; post-merge = `ship`, 0 archivos; las reales eran 2). #4 (`ops-worker` en `92a35daec`: diff runtime vacío,
+> no importa el código nuevo, `asset.quarantined` sin consumer reactivo ⇒ residual de label, NO drift; no se forzó
+> redeploy). #1 (merge canónico `-X ours` dejó el PR MERGEABLE).
+>
+> **Hallazgo operativo:** hay UNA sola instancia Cloud SQL (`greenhouse-pg-dev`) y sirve producción. Aplicar una
+> migración "en dev" es aplicarla en prod. Ambas migraciones del release (`task-355-hiring-desk-view-access`,
+> `task-1362-asset-scan-quarantine`) verificadas vivas.
+>
+> **Flags:** ninguno se prendió con este release. `ASSET_MALWARE_SCAN_ENABLED` queda **OFF por diseño** — el escáner
+> estructural corre siempre y cierra el ataque real; ClamAV (GPL, gratis; se paga el Cloud Run, ≈USD 19-25/mes en la
+> cuenta `efeonce-group`) es decisión abierta del operador.
+>
+> **No validado / pendiente humano:**
+> 1. **Smoke E2E del apply público con Turnstile** (PDF limpio → `attached`; binario renombrado → `quarantined` +
+>    signal). El Turnstile bloquea browsers automatizados —comportamiento correcto—, así que sólo una persona puede
+>    producir el submit aceptado. Verificado sí: endpoint vivo (403 `captcha_failed` fail-closed), `/public/careers` 200.
+> 2. **Watchdog local degradado** (`GITHUB_RELEASE_OBSERVER_TOKEN` no configurado): `worker_revision_drift` y
+>    `pending_without_jobs` salen `unknown`. El drift se verificó **manualmente** contra `gcloud` (evidencia más fuerte).
+> 3. Borrado de PII de candidatos vencida: follow-up gobernado, owner People Ops.
+
 ## Sesion 2026-07-10 - EPIC-026 modular build/runtime decoupling - Codex - DOCUMENTADO / EVIDENCIA PENDIENTE
 
 > Se registraron `EPIC-026`, `TASK-1376`, ADR propuesto y arquitectura V1 para desacoplar incrementalmente el grafo de build de Greenhouse. Target: modular monorepo + unidades desplegables, conservando modular monolith de dominio/datos; sin reescritura, multirepo, microservicios, microfrontends, split de PostgreSQL ni migración de Vercel. `TASK-1376` es el gate: baseline local/Vercel, dependency graph, matriz de fronteras y veredicto `go|conditional-go|no-go`. No hubo cambios de código/runtime/deploy. Gates de autoría: `task:lint` y `ops:lint --changed` en cero.

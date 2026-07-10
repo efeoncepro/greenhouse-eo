@@ -1,5 +1,20 @@
 # TASK-1362 — Candidate Document Capture
 
+## Delta 2026-07-10 — RELEASED a producción
+
+Release `4e7e9093d169ac35193e9eb882c3ee8c8a517896`, manifest `4e7e9093d169-a2238744-44…` = `released`,
+orchestrator run `29089153955`. Migración `20260710084320146_task-1362-asset-scan-quarantine` aplicada
+(instancia única `greenhouse-pg-dev`, que sirve producción): `CHECK` de `assets` acepta `quarantined`,
+`asset_scan_results` viva con la fila `legacy_unscanned` del CV histórico. Vercel prod READY, health 200,
+4 Cloud Run verificados (`ops-worker` con residual de label por deploy change-gated, diff runtime vacío).
+
+`ASSET_MALWARE_SCAN_ENABLED` queda **OFF por diseño**: el escáner estructural corre siempre y es el que
+cierra el ataque real. No es un pendiente de rollout.
+
+**Pendiente humano (no automatizable):** smoke E2E del apply público con Turnstile — un PDF real debe
+quedar `attached`; un binario renombrado a `.pdf`, `quarantined` + signal. El Turnstile bloquea browsers
+automatizados (comportamiento correcto), así que sólo una persona puede producir el submit aceptado.
+
 ## Delta 2026-07-10 — Ejecución (Discovery recalibró la spec + hallazgo de seguridad)
 
 - **Hallazgo que reordenó los slices:** el upload público de CV ya estaba VIVO y validaba con `file.type` (el MIME
@@ -39,7 +54,7 @@ Hechos verificados contra el repo real. La task está bien encuadrada (reusar, n
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -52,7 +67,7 @@ Hechos verificados contra el repo real. La task está bien encuadrada (reusar, n
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Code complete, rollout pendiente`
+- Status real: `Complete — released a producción 2026-07-10 (release 4e7e9093d)`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `TASK-353`
@@ -322,13 +337,13 @@ Los mapas por-contexto de `greenhouse-assets.ts` son `Record` exhaustivos sobre 
 
 ## Closing Protocol
 
-- [x] `Lifecycle` sincronizado (`in-progress` — rollout pendiente)
-- [x] archivo en la carpeta correcta (`in-progress/`)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
 - [x] `docs/tasks/README.md` sincronizado
 - [x] `Handoff.md` actualizado
 - [x] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-354/355/356)
-- [ ] delta en `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` si el contrato final difiere
+- [x] chequeo de impacto cruzado (delta agregado a TASK-1372: el scan NO se hereda; guardrail estructural en el attach)
+- [x] delta en `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (+ invariantes para agentes)
 
 ## Follow-ups
 
