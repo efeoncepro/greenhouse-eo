@@ -34,6 +34,15 @@ Load whenever the work happens *inside* the Greenhouse repo (not pure advisory).
 - **Ops aids**: backfill `scripts/hiring/backfill-handoffs.ts` (dry-run→apply); live smoke `scripts/hiring/_sanity-handoff-reactive.ts`.
 - Manual: `docs/manual-de-uso/hr/operar-hiring-handoff.md`. Functional doc: `docs/documentation/hr/hiring-desk.md` §Handoff downstream.
 
+## The activation bridge (handoff → collaborator, TASK-770 ✓ complete)
+
+- **Home**: `src/lib/workforce/hiring-activation/**` (NOT hr-core). Mapping `greenhouse_hr.hiring_activation_request` (UNIQUE per handoff) + append-only events. Commands `review → create-member → open-onboarding → complete` + `cancel` via `POST /api/hr/hiring-activation/[id]/[action]`. Flag `HIRING_ACTIVATION_ENABLED` (OFF; stacks on 356's bridges flag). UI = TASK-1368.
+- **Member core source-neutral** (`member-core.ts`): sibling of the SCIM D-2 cascade — resolve by `identity_profile_id` → legacy email without profile → reactivate inactive → INSERT mirroring SCIM (**`active=TRUE` + `workforce_intake_status='pending_intake'`** — the payroll/capacity gate is the intake status, NOT the active column; `members.active` is NOT a generated column, that was a misread of kysely's `Generated<>`). Identity conflicts → request `blocked` (`ambiguous_identity|member_conflict|member_already_active`), NEVER auto-merge. D-2 discoverability by construction (profile populated → SCIM backfills `azure_oid` later, no dup).
+- **REUSES, never rebuilds**: checklist via `createOnboardingInstance` (TASK-030; no template → `blocked:onboarding_template_missing`); activation ONLY via `completeWorkforceMemberIntake` + readiness (the bridge never writes `workforce_intake_status='completed'` — static test enforces); `ready_to_activate` computed live, never persisted.
+- **Capabilities**: `hiring.activation.review` (new, execute) for queue/review/complete/cancel; `workforce.member.intake.update` for create-member; `hr.onboarding_instance` for open-onboarding.
+- **Signal**: `workforce.hiring_activation_stuck` (member created, intake pending >7d, steady=0) — complements 356's `hiring.internal_hire_awaiting_onboarding` (approved without member).
+- **Ops aids**: live smoke `scripts/hiring/_sanity-hiring-activation.ts`. Manual: `docs/manual-de-uso/hr/activar-colaborador-desde-hiring.md`.
+
 ## Public careers / vacancy publication contract
 
 When the work is "create/open/publish a vacancy" inside Greenhouse, operate the

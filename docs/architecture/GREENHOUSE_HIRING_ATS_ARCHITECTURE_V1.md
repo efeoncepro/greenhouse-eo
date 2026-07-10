@@ -20,6 +20,18 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-10 — TASK-770: bridge de activación hiring→HRIS implementado
+
+El loop `internal_hire` quedó cerrado end-to-end (falta solo la UI, TASK-1368):
+
+- **Bridge:** `src/lib/workforce/hiring-activation/**` — mapping durable `greenhouse_hr.hiring_activation_request` (UNIQUE por handoff) + trail append-only. Commands `review → create-member → open-onboarding → complete` + `cancel` (`POST /api/hr/hiring-activation/[id]/[action]`), flag `HIRING_ACTIVATION_ENABLED` OFF.
+- **Member core source-neutral** (`member-core.ts`): hermano del cascade D-2 del SCIM — lanes por `identity_profile_id` → email legacy sin profile → reactivación de inactivo → INSERT espejo SCIM (`active=TRUE`, `workforce_intake_status='pending_intake'`, membership operating entity, `member.created`). Drift → `blocked` con código (`ambiguous_identity|member_conflict|member_already_active`), NUNCA auto-merge. Discoverability D-2 por construcción (profile poblado → SCIM backfillea `azure_oid` sin duplicar).
+- **Recalibración importante:** `members.active`/`status` NO son GENERATED (verificado live; el `Generated<>` de kysely = "tiene default"). La regla "activación solo vía `completeWorkforceMemberIntake` + readiness" es de GOBERNANZA — el bridge la honra: nunca escribe `workforce_intake_status='completed'` (test estático lo garantiza) y `complete` solo verifica la evidencia.
+- **REUSA, no reconstruye:** checklist vía `createOnboardingInstance` (TASK-030, sin template aplicable → `blocked:onboarding_template_missing`); case vía el propio `completeWorkforceMemberIntake`; readiness live en el detail reader (`ready_to_activate` derivado, nunca persistido).
+- **Capabilities:** 1 nueva `hiring.activation.review` (execute; hr routeGroup ∪ EFEONCE_ADMIN ∪ HR_MANAGER); create-member reusa `workforce.member.intake.update`; open-onboarding reusa `hr.onboarding_instance`.
+- **Señal:** `workforce.hiring_activation_stuck` (member creado, ficha sin completar >7d; steady=0) — namespace workforce, deconflictada de las señales hiring de 356.
+- **Smoke E2E contra PG real verde** (`scripts/hiring/_sanity-hiring-activation.ts`): cola → claim → member pending_intake (1 por persona, replay sin duplicado) → checklist → complete bloqueado sin intake → complete con evidencia (`downstreamRef=member:<id>`).
+
 ## Delta 2026-07-10 — TASK-356: HiringHandoff implementado (aggregate + consumer reactivo + bridges)
 
 El nodo N10 del master flow (handoff decisión→downstream) pasó de spec a runtime:

@@ -1,3 +1,11 @@
+## Sesion 2026-07-10 - Think `/web-agentica` ruta de cinco actos - RELEASED
+
+> **Publicado:** Think `2aff0ae` (`feat(web-agentica): enrich chapter journey`) llegó a `main`; Vercel Production `dpl_CwTGBxEShzpgxmVSz19mbpUfjo35` está Ready y `https://think.efeoncepro.com/web-agentica` sirve la versión nueva.
+>
+> **Cambio:** la sección de cinco actos deja de ser una fila plana de cards y pasa a una ruta editorial: rail conectada, numeración `01/05` por capítulo y spotlight/elevación sólo con puntero fino. No se agregan tabs, carousel, auto-advance ni contenido diferido: el `<ol>` mantiene las cinco síntesis completas y la interactividad no carga significado. Móvil apila los capítulos y oculta la rail; reduced-motion mantiene el estado final sin pulso, lift ni spotlight.
+>
+> **Evidencia:** Think `pnpm type-check` y `pnpm build` verdes. Playwright productivo confirmó 200, 5 listitems semánticos bajo H2, cero texto recortado (`scrollHeight == clientHeight`) y `scrollWidth == clientWidth` en 1440/1280/390. El hover del acto III mide `translateY(-7.2px)` / `scale(1.018)` en desktop; reduced-motion queda en `translate=0`, `scale=1`, sin animación de rail. Capturas: `efeonce-think/.captures/web-agentica-production-actos-{desktop-hover,laptop,mobile,reduced}.png`. Wireframe y motion contract de TASK-1374 actualizados; no se tocó WIP ajeno de Think ni de Greenhouse.
+
 ## Sesion 2026-07-10 - Think `/web-agentica` cursor del hero - RELEASED
 
 > **Publicado:** Think `a76e4ae` (`feat(web-agentica): animate hero cursor`) llegó a `main`; Vercel Production `dpl_8FG7dXpodMwuu2x9vFz88CB6JwTz` está Ready y alias `https://think.efeoncepro.com` sirve la versión nueva.
@@ -5,6 +13,39 @@
 > **Cambio:** el cursor grande del PNG original ocupaba transparencia completa, por lo que se extrajo mecánicamente sin inpainting. El hero ahora consume una base responsiva sin cursor (`ebook-hero-motion-base*`) y monta `hero-cursor.png` en un SVG alineado al mismo `viewBox`: entrada desde el borde inferior, recorrido hacia la interfaz, anillo teal de clic y salida invisible antes del reinicio. Es decorativo (`aria-hidden`, sin pointer events), no persigue al mouse ni altera la conversión. En `max-width:920px` y `prefers-reduced-motion: reduce` la capa se oculta y el arte permanece estático.
 >
 > **Evidencia:** Think `pnpm type-check` y `pnpm build` verdes. Playwright local y producción: HTTP 200, base/cursor assets correctos, `scrollWidth == clientWidth` en 1440 y 390, cursor `block` en desktop motion y `none` en mobile/reduced-motion. Capturas productivas: `efeonce-think/.captures/web-agentica-production-cursor-{desktop-motion,desktop-reduced,mobile}.png`. Se actualizaron el wireframe y el contrato de motion de TASK-1374. WIP ajeno de Meetings/preview y cambios de README/astro.config quedaron sin stagear.
+
+## Sesion 2026-07-10 - TASK-770 Hiring→HRIS activation bridge COMPLETE (code) - Claude
+
+> **TASK-770 completa en `develop` local-first (SIN push).** El loop internal_hire del programa Hiring/ATS quedó
+> cerrado end-to-end a nivel backend (la UI es TASK-1368, desbloqueada con `## Delta`). Bridge en
+> `src/lib/workforce/hiring-activation/**`: mapping `hiring_activation_request` (UNIQUE por handoff, migración
+> `20260710190116537` APLICADA) + commands review/create-member/open-onboarding/complete/cancel + API
+> `/api/hr/hiring-activation/**` + capability nueva `hiring.activation.review` (las demás acciones reusan
+> workforce.member.intake.update / hr.onboarding_instance) + señal `workforce.hiring_activation_stuck` + flag
+> `HIRING_ACTIVATION_ENABLED` OFF (ledger).
+>
+> **Recalibración mayor verificada contra PG vivo:** `members.active`/`status` NO son GENERATED (el Delta previo
+> leyó mal el `Generated<>` de kysely). El patrón correcto es el del SCIM: member nace `active=TRUE` +
+> `workforce_intake_status='pending_intake'` (el gate de payroll es el intake status). El member core
+> source-neutral espeja el cascade D-2 (link por profile → email legacy → reactivación → INSERT), bloquea en
+> conflicto (nunca auto-merge) y garantiza discoverability D-2 por construcción. La activación pasa SOLO por
+> `completeWorkforceMemberIntake` + readiness — el bridge nunca escribe `workforce_intake_status='completed'`
+> (test estático lo prohíbe) y `complete` cierra con evidencia (`downstreamRef=member:<id>`).
+>
+> **Evidencia:** test full 9058/0 · build prod · gate payroll+workforce 702/0 · coverage capability · smoke E2E
+> contra PG real verde (cola → claim → member pending_intake 1-por-persona → checklist → complete bloqueado sin
+> intake → complete con evidencia). El smoke destapó 2 fixes reales (gate TASK-893): columna `onboarding_case_id`
+> y FK del actor a `client_users`.
+>
+> **ISSUE-119 (colateral, resuelto):** durante el smoke, la instancia única de Cloud SQL estaba SATURADA
+> (100/100 conexiones, rechazaba a todos incl. prod) por 2 scripts tsx zombies de otra sesión colgados 4+ horas
+> con pools vía Connector (invisibles a `lsof :15432`). Kill → 3/100 al instante. Lección + prevención en
+> `docs/issues/resolved/ISSUE-119-*`.
+>
+> **Rollout pendiente:** push cuando el operador lo indique; flip conjunto `HIRING_ACTIVATION_ENABLED` +
+> `HIRING_HANDOFF_BRIDGES_ENABLED` en staging cuando TASK-1368 entregue la UI → smoke real → sign-off
+> People/HRIS → prod. Docs: manual `activar-colaborador-desde-hiring.md`, funcional hiring-desk §Handoff,
+> skill talent-people (espejos), deltas EVENT_CATALOG/HIRING_ATS/HRIS.
 
 ## Sesion 2026-07-10 - TASK-770 Hiring→HRIS activation bridge iniciada - Claude
 

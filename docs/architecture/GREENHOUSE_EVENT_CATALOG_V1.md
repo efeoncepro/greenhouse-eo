@@ -2,6 +2,15 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-07-10 — TASK-770: bridge de activación hiring→HRIS (2 events v1, audit-only)
+
+Aggregate type nuevo: `hiring_activation_request` (identity `hact-{uuid}`, UNIQUE por `hiring_handoff_id`). Sin consumer reactivo (audit/observabilidad). El lifecycle workforce que el bridge orquesta YA emite sus propios eventos (`member.created` — que dispara `hr_onboarding_auto_create` —, `workforce.member.intake_completed`, `hr.onboarding.instance_created`, `work_relationship_onboarding_case.*`): 770 NO los duplica.
+
+| Evento | Trigger | Notas |
+|---|---|---|
+| `hiring.activation.linked` | `createMemberForHiringActivation` (command) | La faceta member quedó materializada/enlazada para el handoff. Payload: `{activationRequestId, hiringHandoffId, applicationId, identityProfileId, memberId, memberOutcome: created_new|linked_existing|reactivated, actorUserId}`. |
+| `hiring.activation.completed` | `completeHiringActivation` (command) | El bridge cerró con evidencia: intake `completed` + handoff `completed` (`downstreamRef=member:<id>`). Payload con `onboardingInstanceId`/`onboardingCaseId`. |
+
 ## Delta 2026-07-10 — TASK-356: HiringHandoff lifecycle (7 events v1) + primer consumer reactivo hiring
 
 Aggregate type nuevo: `hiring_handoff` (identity `hhof-{uuid}`, UNIQUE por `hiring_application_id`). Los 7 eventos son **audit-only en V1** (sin consumer reactivo; los barre el sweep). Payload mínimo sin PII: `{handoffId, applicationId, openingId, decisionId, selectedDestination, state, blockedReason, ...extra}`.

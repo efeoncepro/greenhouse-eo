@@ -34,7 +34,8 @@ Cuando una postulación se decide como **seleccionada**, Greenhouse materializa 
 - Un rechazo, un respaldo o una espera **nunca** generan handoff.
 - Si la decisión cambia después de aprobar el handoff, este se **bloquea** para revisión humana en lugar de sobrescribirse en silencio.
 - Los destinos que aún no tienen equipo receptor en Greenhouse (contractor, partner, reasignación interna) nacen bloqueados con motivo visible, nunca en silencio.
-- La cola "Listos para onboarding" y su pantalla llegan con TASK-770 (la interfaz aún no está publicada; el flag de los bridges está apagado por defecto).
+- Para contratación interna, el **bridge de activación** (TASK-770) toma el handoff aprobado y crea la ficha de colaborador **sobre la misma persona** (nunca una identidad nueva), en estado "pendiente de intake" — invisible para nómina hasta que HR completa la ficha por Workforce Activation. El cierre siempre exige evidencia (la ficha creada) y los conflictos de identidad quedan bloqueados para revisión humana, nunca se fusionan solos.
+- La pantalla de la cola de activación llega con TASK-1368 (los flags del bridge están apagados por defecto).
 
 ## Referencias
 

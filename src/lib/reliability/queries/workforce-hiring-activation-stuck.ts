@@ -68,7 +68,7 @@ export const getWorkforceHiringActivationStuckSignal = async (): Promise<Reliabi
         },
         { kind: 'metric', label: 'total', value: String(total) },
         { kind: 'metric', label: 'very_stale', value: String(veryStale) },
-        { kind: 'doc', label: 'Spec', value: 'docs/tasks/in-progress/TASK-770-hiring-to-hris-collaborator-activation.md' },
+        { kind: 'doc', label: 'Spec', value: 'docs/tasks/complete/TASK-770-hiring-to-hris-collaborator-activation.md' },
       ],
     }
   } catch (error) {

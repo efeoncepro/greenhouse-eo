@@ -1,5 +1,9 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-07-10 — TASK-770 Hiring→HRIS Collaborator Activation (bridge)
+
+El HRIS recibe contrataciones internas desde Hiring por un bridge gobernado (no side effects): un `HiringHandoff` aprobado (TASK-356) entra a la cola de activación; HR reclama el caso (`hiring_activation_request`, UNIQUE por handoff), materializa la faceta `member` sobre el MISMO `identity_profile_id` (core source-neutral espejo del SCIM: `active=TRUE` + `pending_intake`, membership, `member.created` → checklist auto), asegura el checklist de onboarding (TASK-030) y — cuando el intake se completa por el path canónico (`completeWorkforceMemberIntake` + readiness TASK-872/874, que el bridge NUNCA reimplementa ni bypassa) — cierra con `hiring.activation.completed` marcando el handoff `completed` con `downstreamRef=member:<id>`. API `POST /api/hr/hiring-activation/[id]/(review|create-member|open-onboarding|complete|cancel)`, flag `HIRING_ACTIVATION_ENABLED` OFF, señal `workforce.hiring_activation_stuck`. UI = TASK-1368. Detalle: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` Delta 2026-07-10.
+
 ## Delta 2026-05-04 — TASK-763 Lifecycle UI adoption
 
 La UI de checklists converge en una shell `Lifecycle / Onboarding & Offboarding`:

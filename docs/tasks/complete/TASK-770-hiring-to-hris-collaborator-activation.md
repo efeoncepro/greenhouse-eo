@@ -49,7 +49,7 @@ Revisada con `arch-architect` (dominante — toca creación de `member`/identity
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -59,7 +59,7 @@ Revisada con `arch-architect` (dominante — toca creación de `member`/identity
 - UI ready: `n/a`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `COMPLETE 2026-07-10 — code complete en develop local (sin push); migración APLICADA; rollout pendiente: push + flip conjunto de flags con TASK-1368 + sign-off People/HRIS`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `TASK-356`
@@ -117,7 +117,7 @@ Reglas obligatorias:
 
 - `docs/tasks/complete/TASK-030-hris-onboarding-offboarding.md`
 - `docs/tasks/complete/TASK-353-hiring-ats-domain-foundation.md`
-- `docs/tasks/to-do/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md`
+- `docs/tasks/complete/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md`
 - `docs/tasks/complete/TASK-763-lifecycle-onboarding-offboarding-ui-mockup-adoption.md` (mockup aprobado que guía la UI — implementada en TASK-1368)
 - `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`
 
@@ -173,8 +173,19 @@ Reglas obligatorias:
 - No existe el mark-completed del handoff con referencias downstream reales.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE (lo llena el agente que toma la task)
+     ZONE 2 — EXECUTION LOG
      ═══════════════════════════════════════════════════════════ -->
+
+### Execution Log (2026-07-10, Claude — local-first develop)
+
+- **Discovery** (2 subagentes + PG vivo): cascade D-2 module-private OID-shaped; `members.active`/`status` NO GENERATED (recalibración en el Delta); patrón canónico = active=TRUE + pending_intake; `hr_onboarding_auto_create` ya crea checklist en member.created; matriz de capabilities existentes verificada.
+- **Slice 1**: migración `20260710190116537` — `hiring_activation_request` (UNIQUE por handoff, CHECKs member_required/blocked_reason) + `_events` append-only + seed `hiring.activation.review`; verificada contra information_schema.
+- **Slices 2-4**: member-core source-neutral (lanes profile/email/reactivación/INSERT espejo SCIM + drift → conflict error) · service (review/create-member/open-onboarding/complete/cancel, claim FOR UPDATE, blocked auditado, complete exige intake completed + marca handoff con downstreamRef) · readers (cola merged + detail con readiness live) · API `/api/hr/hiring-activation/**` con caps least-privilege · grant + coverage verde · flag OFF.
+- **Slice 5**: señal `workforce.hiring_activation_stuck` (5 puntos del overview) + 28 tests (lanes, idempotencia, conflictos, boundary estático que además prohíbe `workforce_intake_status='completed'` por write directo).
+- **Smoke E2E contra PG real VERDE** (`scripts/hiring/_sanity-hiring-activation.ts`): cola → claim → member pending_intake (1 por persona, replay sin dup) → checklist → complete bloqueado sin intake → complete con evidencia → handoff completed. Fixes destapados por el gate TASK-893: `onboarding_case_id` (no `case_id`), FK de actor a `client_users`.
+- **Incidente colateral resuelto**: ISSUE-119 (saturación de conexiones PG por scripts tsx zombies de otra sesión — kill → 3/100).
+- **Gates**: test full 9058/0 · build prod · typecheck · lint · gate payroll+workforce 702/0 · coverage capability · task:lint/flags/docs/qa.
+
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -241,22 +252,22 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] SSOT (`members` vía core canónico + `hiring_activation_request`), contract surface (service/readers/API/eventos/signal) y consumers (1368/360/Nexa) nombrados con paths reales.
-- [ ] Invariantes (un-member-por-persona vía D-2, nace `pending_intake` no-activo, activación vía path existente, boundary NO-payroll) explícitos; idempotencia con claim atómico.
-- [ ] Reusa readiness/intake/onboarding/legal existentes (no reimplementa); capabilities reusadas + ≤1 nueva con grant mismo PR.
-- [ ] Migration additive + flag OFF + rollback explícito.
-- [ ] Evidencia DB/worker (member no-activo + onboarding + replay + señal steady).
+- [x] SSOT (`members` vía core canónico + `hiring_activation_request`), contract surface (service/readers/API/eventos/signal) y consumers (1368/360/Nexa) nombrados con paths reales.
+- [x] Invariantes (un-member-por-persona vía D-2, nace `pending_intake` no-activo, activación vía path existente, boundary NO-payroll) explícitos; idempotencia con claim atómico.
+- [x] Reusa readiness/intake/onboarding/legal existentes (no reimplementa); capabilities reusadas + ≤1 nueva con grant mismo PR.
+- [x] Migration additive + flag OFF + rollback explícito.
+- [x] Evidencia DB/worker (member no-activo + onboarding + replay + señal steady).
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive (`src/lib/workforce/hiring-activation/**`), NO en UI (la UI es 1368).
-- [ ] Modelada como command/aggregate (`activateHiringHandoffAsCollaborator`), no click-handler.
-- [ ] Read (`listHiringActivationQueue`/`getHiringJourneyForPerson`) + write (command con semantics + auth fina + idempotencia + audit/outbox + errores canónicos).
-- [ ] Capability nueva (≤1) + grant mismo PR (coverage test).
-- [ ] Camino programático: `POST /api/hr/hiring-activation/*` + reader para 1368; Nexa por parity.
-- [ ] Write apto para propose→confirm→execute.
-- [ ] Un primitive, muchos consumers (1368 UI, Person 360, Nexa) — cero lógica duplicada; el member core es compartido con SCIM.
-- [ ] Parity check = SÍ.
+- [x] Lógica en el primitive (`src/lib/workforce/hiring-activation/**`), NO en UI (la UI es 1368).
+- [x] Modelada como command/aggregate (`activateHiringHandoffAsCollaborator`), no click-handler.
+- [x] Read (`listHiringActivationQueue`/`getHiringJourneyForPerson`) + write (command con semantics + auth fina + idempotencia + audit/outbox + errores canónicos).
+- [x] Capability nueva (≤1) + grant mismo PR (coverage test).
+- [x] Camino programático: `POST /api/hr/hiring-activation/*` + reader para 1368; Nexa por parity.
+- [x] Write apto para propose→confirm→execute.
+- [x] Un primitive, muchos consumers (1368 UI, Person 360, Nexa) — cero lógica duplicada; el member core es compartido con SCIM.
+- [x] Parity check = SÍ.
 
 ## Scope
 
@@ -355,15 +366,15 @@ Idempotency: key `hiring_handoff_id + identity_profile_id`; reintento retorna el
 
 ## Acceptance Criteria
 
-- [ ] Un `HiringHandoff` `internal_hire` aprobado aparece en la cola de activación (consumiendo el contrato de 356).
-- [ ] Se crea/promueve un único `member` sobre el mismo `identity_profile_id`, **no activo, `pending_intake`**, vía el core source-neutral (no INSERT ad hoc), discoverable por cascade D-2.
-- [ ] Reintentar la activación no duplica `member`, onboarding ni eventos (idempotencia + claim atómico).
-- [ ] Bloquea ante identidad ambigua, `member` incompatible (`MemberIdentityDriftError`) o datos legales mínimos faltantes.
-- [ ] Se abre onboarding (case/instance reusando runtime existente) antes de activar, salvo excepción auditada.
-- [ ] `member` activo solo vía `completeWorkforceMemberIntake` + readiness (`resolveWorkforceActivationReadiness`), NUNCA `UPDATE active=true`.
-- [ ] `HiringHandoff` `completed` solo con `member_id`/`onboarding_*` reales.
-- [ ] Capabilities reusadas + ≤1 nueva con grant mismo PR; señal `workforce.hiring_activation_stuck` steady=0.
-- [ ] People 360 muestra el journey sin identidad paralela.
+- [x] Un `HiringHandoff` `internal_hire` aprobado aparece en la cola de activación (consumiendo el contrato de 356).
+- [x] Se crea/promueve un único `member` sobre el mismo `identity_profile_id`, **no activo, `pending_intake`**, vía el core source-neutral (no INSERT ad hoc), discoverable por cascade D-2.
+- [x] Reintentar la activación no duplica `member`, onboarding ni eventos (idempotencia + claim atómico).
+- [x] Bloquea ante identidad ambigua, `member` incompatible (`MemberIdentityDriftError`) o datos legales mínimos faltantes.
+- [x] Se abre onboarding (case/instance reusando runtime existente) antes de activar, salvo excepción auditada.
+- [x] `member` activo solo vía `completeWorkforceMemberIntake` + readiness (`resolveWorkforceActivationReadiness`), NUNCA `UPDATE active=true`.
+- [x] `HiringHandoff` `completed` solo con `member_id`/`onboarding_*` reales.
+- [x] Capabilities reusadas + ≤1 nueva con grant mismo PR; señal `workforce.hiring_activation_stuck` steady=0.
+- [x] People 360 muestra el journey sin identidad paralela.
 
 ## Verification
 
@@ -374,12 +385,12 @@ Idempotency: key `hiring_handoff_id + identity_profile_id`; reintento retorna el
 
 ## Closing Protocol
 
-- [ ] `Lifecycle`/carpeta sincronizados; `README.md`; `Handoff.md`; `changelog.md`
-- [ ] `## Delta` a `TASK-1368` (consume readers/commands de 770) y a `TASK-356` si cambian supuestos de la cola
-- [ ] `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` + `Greenhouse_HRIS_Architecture_v1.md` con delta
-- [ ] `EVENT_CATALOG` actualizado si se agregan eventos `hiring.activation.*`
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` con la fila del flag
-- [ ] doc funcional + manual HR actualizados; Runtime Rollout Completion Gate (flag/redeploy) reportado
+- [x] `Lifecycle`/carpeta sincronizados; `README.md`; `Handoff.md`; `changelog.md`
+- [x] `## Delta` a `TASK-1368` (consume readers/commands de 770) y a `TASK-356` si cambian supuestos de la cola
+- [x] `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` + `Greenhouse_HRIS_Architecture_v1.md` con delta
+- [x] `EVENT_CATALOG` actualizado si se agregan eventos `hiring.activation.*`
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` con la fila del flag
+- [x] doc funcional + manual HR actualizados; Runtime Rollout Completion Gate (flag/redeploy) reportado
 
 ## Follow-ups
 

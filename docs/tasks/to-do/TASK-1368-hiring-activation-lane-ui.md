@@ -1,5 +1,15 @@
 # TASK-1368 — Hiring Activation Lane UI (People/HRIS)
 
+## Delta 2026-07-10 — TASK-770 completada: el backend del bridge YA existe
+
+- **Desbloqueada por TASK-770** (implementada local-first en `develop`). Consumir, no reconstruir:
+  - Cola merged: `listHiringActivationQueue()` / detail con readiness LIVE: `getHiringActivationDetail(handoffId)` (`src/lib/workforce/hiring-activation/readers.ts`) — `readyToActivate` viene derivado del resolver workforce; NUNCA persistirlo ni recomputarlo en UI.
+  - Commands por API: `POST /api/hr/hiring-activation/[id]/(review|create-member|open-onboarding|complete|cancel)`. Capabilities: `hiring.activation.review` (cola/review/complete/cancel), `workforce.member.intake.update` (create-member), `hr.onboarding_instance` (open-onboarding).
+  - Estados del request: `pending_hr_review|blocked|member_created|onboarding_open|active|cancelled` + `blockedReason` con código estable (`ambiguous_identity|member_conflict|member_already_active|onboarding_template_missing|handoff_not_approved|legal_data_missing`) — falta declarar el copy es-CL de estos códigos (extender `src/lib/copy/hiring.ts`).
+  - Doble flag: `HIRING_ACTIVATION_ENABLED` (770) + `HIRING_HANDOFF_BRIDGES_ENABLED` (356) — la UI debe manejar `enabled:false` explícito.
+  - El paso "completar ficha" NO es de esta UI: enlaza a Workforce Activation existente (`/hr/workforce/activation`); `complete` del bridge solo cierra con evidencia.
+
+
 ## Delta 2026-07-08
 
 - **Split de TASK-770** (decisión operador 2026-07-08): 770 quedó backend-data (bridge de activación); esta task es su **consumer ui-ux** = la activation lane que People Ops opera. Patrón 354(UI)/1367(backend).
