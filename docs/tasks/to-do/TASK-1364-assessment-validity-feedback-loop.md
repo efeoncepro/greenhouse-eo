@@ -1,5 +1,12 @@
 # TASK-1364 — Assessment Validity Feedback Loop
 
+## Delta 2026-07-10 — TASK-1383 dejó los contratos de datos que este loop necesita
+
+- **Versionado de templates decidido e implementado**: un `template_id` con instancias es INMUTABLE (trigger DB sobre contenido y módulos; solo `status` muta) + columnas `version`/`supersedes_template_id`. Correlacionar por `template_id` es seguro: un id = un contenido congelado. Editar = crear versión nueva con supersede.
+- **Score al momento de decidir, reconstruible**: `decideHiringApplication` ahora snapshotea server-side `prerequisitesSnapshot.assessment = {score, matchScore, scoredInstances, capturedAt}` en cada entrada de `decisionHistory[]` — aunque un finalize posterior sobreescriba `hiring_application.score`, el valor visto al decidir queda en el historial.
+- **Integridad del AVG garantizada**: respuestas con UNIQUE a nivel DB (duplicados ya no pueden sesgar el rollup).
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

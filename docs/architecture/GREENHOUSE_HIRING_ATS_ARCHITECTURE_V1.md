@@ -20,6 +20,21 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-10 — TASK-1383: Assessment Engine hardening + invariante de versionado de templates
+
+Auditoría 2026-07-10 (código real + specs downstream) → hardening pre-TASK-1363:
+
+- **Idempotencia a nivel DB de las respuestas**: UNIQUE parciales `(assessment_id, question_id)` / `(assessment_id, competency_id) WHERE question_id IS NULL` + upsert en `saveResponse`/`recordScorecardRating`. El autosave repetido ya no puede duplicar filas ni sesgar el AVG del score final.
+- **Expiración operativa**: `token_expires_at` (+14d al asignar) + time-limit (`started_at + time_limit_minutes`) enforceados en resolve/start/save/submit → transición real a `expired`. El primer save auto-arranca el timer; `submitAssessment` exige `in_progress`.
+- **Anti-anclaje implementado** en `listResponses` (scorecard ajeno oculto hasta cerrar el propio) — antes solo estaba prometido en el docstring.
+- **`needs_human_rating` del tipo REAL en DB** (la superficie pública de 1363 no es fuente de verdad); anti-leak de `buildPublicQuestion` ahora testeado.
+- **SME gate auditable** (`status_changed_by/at`); **dedupe del ledger IA** por `(kind, input_digest)` pendiente.
+- **Snapshot del assessment en la decisión**: `decideHiringApplication` persiste server-side `prerequisitesSnapshot.assessment` (score/matchScore/scoredInstances/capturedAt) — el score al decidir queda reconstruible (pre-TASK-1364).
+
+**Invariante nuevo — Template Versioning (pre-TASK-1364/1365):** un `hiring_assessment_template` con instancias es **INMUTABLE** en contenido y módulos (trigger DB; solo `status` muta). Editar = crear versión nueva con `version` + `supersedes_template_id`. **NUNCA** editar in-place un template usado: la correlación validez/fairness por `template_id` asume contenido congelado.
+
+Verificación: 6 live guards E2E contra PG real (idempotencia, expiración, anti-anclaje, inmutabilidad, dedupe) + anti-leak unit + suite full.
+
 ## Delta 2026-07-10 — TASK-770: bridge de activación hiring→HRIS implementado
 
 El loop `internal_hire` quedó cerrado end-to-end (falta solo la UI, TASK-1368):

@@ -301,14 +301,16 @@ El detalle de schema por tabla, enums y el ejemplo Account Manager viven en `EPI
 
 ## Acceptance Criteria
 
-- [ ] Existen las tablas del motor (competency, question, template, template_module, assessment, response, competency_result) en `greenhouse_hiring`, additive sobre TASK-353.
-- [ ] `category` y `level` son columnas separadas con CHECK; ningún enum combinado.
-- [ ] `answer_key_json`/`rubric_json` NUNCA aparece en el reader/payload candidate-facing (test anti-leak verde).
-- [ ] Existe la plantilla seed "Account Manager L2" con los 5 módulos ponderados.
-- [ ] Scoring objetivo automático + cola de corrección humana funcionan; el resultado por competencia rueda a `hiring_application.score/match_score/explainability_json` vía helper único.
-- [ ] El score de assessment NO alimenta payroll/ICO ni auto-rechaza (boundary con test).
-- [ ] Capabilities `hiring.assessment.{read,author,score}` en catálogo + grants a roles reales + coverage test verde.
-- [ ] Rutas `/api/hiring/assessments/**` dual-gate con errores canónicos es-CL.
+> **Nota 2026-07-10 (TASK-1383):** los checkboxes de Acceptance quedaron sin marcar al cierre original pese a `Lifecycle: complete`. La auditoría 2026-07-10 verificó el as-built contra código + PG vivo y los marca ahora; los defectos encontrados en la costura (idempotencia de saveResponse, anti-anclaje, expiración, anti-leak sin test) se cerraron en **TASK-1383**.
+
+- [x] Existen las tablas del motor (competency, question, template, template_module, assessment, response, competency_result) en `greenhouse_hiring`, additive sobre TASK-353.
+- [x] `category` y `level` son columnas separadas con CHECK; ningún enum combinado.
+- [x] `answer_key_json`/`rubric_json` NUNCA aparece en el reader/payload candidate-facing (test anti-leak verde).
+- [x] Existe la plantilla seed "Account Manager L2" con los 5 módulos ponderados.
+- [x] Scoring objetivo automático + cola de corrección humana funcionan; el resultado por competencia rueda a `hiring_application.score/match_score/explainability_json` vía helper único.
+- [x] El score de assessment NO alimenta payroll/ICO ni auto-rechaza (boundary con test).
+- [x] Capabilities `hiring.assessment.{read,author,score}` en catálogo + grants a roles reales + coverage test verde.
+- [x] Rutas `/api/hiring/assessments/**` dual-gate con errores canónicos es-CL.
 
 ## Verification
 

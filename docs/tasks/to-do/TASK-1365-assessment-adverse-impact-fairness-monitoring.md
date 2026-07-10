@@ -1,5 +1,11 @@
 # TASK-1365 — Adverse-Impact & Fairness Monitoring
 
+## Delta 2026-07-10 — TASK-1383: versionado de templates resuelto (supuesto de este monitor)
+
+- `getSelectionFairness(stage|template, window)` puede correlacionar por `template_id` con seguridad: TASK-1383 hizo los templates inmutables una vez usados (trigger) + `version`/`supersedes_template_id`. Sin esto, un template editado in-place habría mezclado versiones en las tasas por template sin detectarlo.
+- Recordatorio vigente (aceptado por diseño): la demografía self-ID es prospectiva — cada candidato procesado antes de habilitar este monitor queda fuera para siempre. Argumento para priorizarla temprano en el roadmap del programa.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

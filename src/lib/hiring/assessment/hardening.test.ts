@@ -35,7 +35,7 @@ describe('buildPublicQuestion (anti-leak del answer_key — TASK-1383)', () => {
   }
 
   it('NUNCA incluye answerKey ni rubric en el payload candidato', () => {
-    const publicQuestion = buildPublicQuestion(fullQuestion as never) as Record<string, unknown>
+    const publicQuestion = buildPublicQuestion(fullQuestion as never) as unknown as Record<string, unknown>
 
     expect(publicQuestion).not.toHaveProperty('answerKey')
     expect(publicQuestion).not.toHaveProperty('rubric')
@@ -46,7 +46,7 @@ describe('buildPublicQuestion (anti-leak del answer_key — TASK-1383)', () => {
   })
 
   it('SÍ conserva lo que el candidato necesita (prompt, opciones, tipo)', () => {
-    const publicQuestion = buildPublicQuestion(fullQuestion as never) as Record<string, unknown>
+    const publicQuestion = buildPublicQuestion(fullQuestion as never) as unknown as Record<string, unknown>
 
     expect(publicQuestion).toMatchObject({ questionId: 'qst-1', type: 'single_choice' })
     expect(publicQuestion).toHaveProperty('prompt')

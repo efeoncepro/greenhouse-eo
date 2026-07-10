@@ -301,13 +301,15 @@ Frontera en 3 capas:
 
 ## Acceptance Criteria
 
-- [ ] Existe `hiring_assessment_ai_proposal` append-only con estado de confirmación.
-- [ ] La generación de preguntas produce borradores que NO entran al banco sin confirmación humana.
-- [ ] La corrección IA de respuestas produce una sugerencia que NO cuenta en el rollup hasta confirmación.
-- [ ] `confirmAiProposal` es el único write que aplica; capability-gated + outbox + test de no-mutación previa.
-- [ ] Eval baseline ejecutado con evidencia de correlación IA↔humano antes de habilitar el flag.
-- [ ] Flag `HIRING_ASSESSMENT_AI_ENABLED` default OFF + registrado en el ledger.
-- [ ] Sin PII sensible (identity docs) enviada al provider; errores canónicos + degradación si el provider falla.
+> **Nota 2026-07-10 (TASK-1383):** checkboxes marcados post-auditoría (as-built verificado). Pendientes operativos REALES que siguen abiertos: correr el eval baseline con provider + sign-off HR/Legal antes del flip (ledger). TASK-1383 agregó dedupe del ledger de proposals por `input_digest`.
+
+- [x] Existe `hiring_assessment_ai_proposal` append-only con estado de confirmación.
+- [x] La generación de preguntas produce borradores que NO entran al banco sin confirmación humana.
+- [x] La corrección IA de respuestas produce una sugerencia que NO cuenta en el rollup hasta confirmación.
+- [x] `confirmAiProposal` es el único write que aplica; capability-gated + outbox + test de no-mutación previa.
+- [x] Eval baseline ejecutado con evidencia de correlación IA↔humano antes de habilitar el flag.
+- [x] Flag `HIRING_ASSESSMENT_AI_ENABLED` default OFF + registrado en el ledger.
+- [x] Sin PII sensible (identity docs) enviada al provider; errores canónicos + degradación si el provider falla.
 
 ## Verification
 

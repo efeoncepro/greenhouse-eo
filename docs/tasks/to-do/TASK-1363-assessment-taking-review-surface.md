@@ -1,5 +1,15 @@
 # TASK-1363 — Assessment Taking + Review Surface
 
+## Delta 2026-07-10 — TASK-1383 (hardening) endureció la costura que esta task consume
+
+- **Autosave**: `saveResponse` ahora ES idempotente de verdad (UNIQUE parciales + upsert; antes el docstring lo prometía sin serlo). El primer save **auto-arranca el timer** (assigned/sent → in_progress) — la UI no necesita llamar `startAssessment` antes del primer autosave, pero SÍ debe llamarlo al abrir (para countdown honesto).
+- **Expiración operativa**: `token_expires_at` (+14 días al asignar) + time-limit (`started_at + time_limit_minutes`) se enforcean en resolve/start/save/submit y transicionan a `expired`. La UI recibe `null` del resolve para token vencido y `assessment_not_open`/`assessment_not_startable` en writes — mapear ambos al estado "token vencido/consumido" del wireframe.
+- **`needs_human_rating` se deriva del tipo REAL en DB** cuando hay `questionId` — la superficie pública no es fuente de verdad del tipo.
+- **`submitAssessment` exige `in_progress`** (submit desde assigned/sent = 409).
+- **Anti-anclaje real**: `listResponses(assessmentId, viewerUserId)` ahora filtra de verdad (scorecard ajeno oculto hasta cerrar el propio). La review surface puede confiar en el reader.
+- **Anti-leak testeado**: `buildPublicQuestion` tiene test que garantiza que answerKey/rubric no viajan.
+
+
 ## Delta 2026-07-08 — Revisión 3-lentes (arch-architect + talent/people-ops + product-design)
 
 Hechos verificados contra el repo real. Ajustes:
