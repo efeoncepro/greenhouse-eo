@@ -1,3 +1,7 @@
+## Sesion 2026-07-10 - TASK-356 Hiring Handoff reactivo iniciada - Claude
+
+TASK-356 movida a `in-progress` y en ejecución local-first sobre `develop` (sin branch, sin push — default del harness implement-task). Baseline: recalibración 5-lentes 2026-07-10 committeada junto al intake. Objetivo: aggregate `HiringHandoff` + consumer reactivo (`hiring.application.decided`, solo `decision=selected`) + eventos `hiring.handoff.*` + capability `hiring.handoff.approve` + reliability signals + cola internal_hire (para TASK-770) + journey Person 360. Materializer sin flag; `HIRING_HANDOFF_BRIDGES_ENABLED` OFF gatea solo readers/bridges. Scripts ajenos `scripts/_verify-form-asset.ts` y `scripts/hiring/verify-public-apply-smoke.mjs` preservados fuera de scope.
+
 
 ## Sesion 2026-07-10 - TASK-1381 low-memory build iniciada - Codex
 
