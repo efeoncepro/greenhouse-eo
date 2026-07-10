@@ -25,6 +25,7 @@
 | Hero grid | Load + idle | Deriva sutil del grid con máscara radial (portado del PR, re-tokenizado a `axis.*`). | CSS `@keyframes` + mask | yes |
 | Hero beams | Load + idle | Haces de luz que "caen" (naranja/azul de acento), ambientales. | CSS `@keyframes` | yes |
 | Hero entrance | Initial load | Reveal escalonado de eyebrow → H1 → lead → CTA. | CSS transition / IntersectionObserver | yes |
+| Hero cursor route | Después de la entrada del hero + idle | El cursor extraído del arte entra desde su posición editorial, recorre la interfaz y marca un clic teal antes de salir. Es una capa SVG decorativa; no sigue al mouse ni intercepta acciones. | SVG inline (`animateTransform`/`animate`) + PNG transparente | yes (desktop motion) |
 | Hero signal / route nav | Initial load → primera lectura | Evidencia editorial queda estable; el recorrido aparece suavemente tras el primer scroll. | CSS + listener pasivo | yes |
 | Signal cards | Scroll into view + pointer | Reveal escalonado; halo teal sigue el puntero como realce decorativo, sin ocultar contenido. | CSS + custom props (`--spot-x/y`) | yes |
 | Thesis lanes | Scroll into view | Dos interfaces entran desde lados opuestos; el pulso conector orienta la transición humano→agente. | CSS | yes |
@@ -52,6 +53,7 @@
 | Transition | From | To | Timing / easing token | Behavior | Reduced-motion fallback |
 |---|---|---|---|---|---|
 | Hero entrance | blank hero | hero content | 240–420ms ease-out | opacity + translateY < 16px, stagger < 80ms | contenido inmediato, sin stagger |
+| Hero cursor route | arte estático sin cursor | cursor visible → recorrido → clic → salida | loop de 8s, inicio diferido tras la entrada | translate + opacity dentro del SVG; el clic usa un anillo teal breve. La vuelta ocurre ya invisible para no producir un salto perceptible. | SVG oculto; se conserva el mismo arte sin cursor estático |
 | Section reveal | oculto | visible | 240–360ms ease-out | opacity + translateY al entrar viewport | contenido inmediato |
 | Stat count-up | 0 | valor final | 600–900ms ease-out | conteo numérico con fuente visible | número final directo |
 | Form contract | `form.loading` | `form.ready` | 180–240ms ease-out | crossfade skeleton → renderer host | swap instantáneo con texto de estado |
@@ -79,7 +81,7 @@
 - Detection: `@media (prefers-reduced-motion: reduce)` (el PR ya lo declara para grid/beams; se conserva y se extiende).
 - Replacement behavior: mostrar todo el contenido de inmediato; reemplazar grid drift, beams y count-ups por estado estático con el mismo significado (el número final visible, no el conteo).
 - Meaning preserved: cada dato conserva su valor + fuente en texto; el estado del form es texto.
-- Animations removed: grid drift, beams, entrance stagger, section reveals, count-up, spotlight, transiciones translate.
+- Animations removed: grid drift, beams, entrance stagger, cursor route/click, section reveals, count-up, spotlight, transiciones translate.
 - Animations retained: focus ring y cambios de estado instantáneos.
 
 ## Accessibility & Feedback
@@ -93,9 +95,11 @@
 
 ## Performance Guardrails
 
-- Compositor-only: transform/opacity/background-position/mask-position.
+- Compositor-only: transform/opacity/background-position/mask-position; la capa SVG del cursor sólo anima `transform`, `opacity` y el radio de un anillo breve.
 - Layout reads/writes: sin loops de medición; sin scroll-jacking.
 - Animation scope: hero (grid/beams/entrance), signal cards, thesis lanes, section reveals, form loader, success/error y footer signal.
+- Cursor assets: el hero base responsivo se exporta sin el cursor de origen; `hero-cursor.png` conserva el recorte transparente y se monta sólo en desktop sobre el mismo `viewBox` 1536×1024. No hay inpainting/generación ni JavaScript de animación.
+- Compact constraint: el cursor se omite en `max-width: 920px` para conservar el hero móvil como lectura editorial, no como demo pequeña.
 - Counter constraints: los count-ups son datos citados con fuente, no métricas propias inventadas; con fallback estático.
 - Mobile constraints: sin canvas full-screen; beams/grid livianos; el fold no debe empujar el CTA fuera de vista ni dañar LCP/INP (el PR mete `support.js` render-blocking en `<head>` — se elimina).
 
@@ -106,8 +110,8 @@
 - Route: `/web-agentica`
 - Viewports: 1440, 1280, 390
 - Required steps: capturar hero settled, stat count-up settled, form loader, form ready, submit pending/success en modo controlado seguro, reduced-motion.
-- Required captures: hero, stats, form loader, form ready, success, error/degraded, hero mobile, form mobile.
-- Required frame labels: `hero-settled`, `stats-settled`, `form-loading`, `form-ready`, `form-success`, `reduced-motion`.
+- Required captures: hero cursor en desplazamiento, hero cursor en clic, hero reduced-motion, hero mobile, stats, form loader, form ready, success, error/degraded y form mobile.
+- Required frame labels: `hero-cursor-travel`, `hero-cursor-click`, `hero-reduced-motion`, `hero-mobile`, `stats-settled`, `form-loading`, `form-ready`, `form-success`.
 - Required `data-capture` markers: `web-agentica-landing`, `web-agentica-hero`, `web-agentica-stats`, `web-agentica-thesis`, `web-agentica-inside`, `web-agentica-audience`, `web-agentica-form`, `web-agentica-form-loader`, `web-agentica-faq`, `web-agentica-footer`.
 - Assertions: sin layout shift que mueva el form, sin progreso falso, sin overflow, reduced-motion desactiva la motion ambiental, sin `_ds/` ni DM Sans.
 - Reduced-motion evidence: captura o assert dedicado con `prefers-reduced-motion: reduce`.
@@ -121,6 +125,7 @@
 - Delta 2026-07-10 (success): el wrapper del form se vuelve transparente al aceptar y la conclusión absorbe la única superficie blanca. Se quita `tabindex` del live region para que el foco permanezca en el título y no dibuje un ring global de área completa.
 - Delta 2026-07-10 (workspace): el estado de captura adopta una rail editorial navy + una zona de formulario clara. La rail sólo anima un indicador y un halo con `transform`; los campos conservan la microinteracción del renderer (focus halo, check de validación, pending y compresión del CTA). `prefers-reduced-motion` elimina ambas animaciones ambientales y mantiene la jerarquía completa.
 - Delta 2026-07-10 (hero direction): la señal Cloudflare deja de ser una píldora y pasa a ledger editorial estático; el arte recibe dos anotaciones puramente decorativas que conectan las dos interfaces con el H1. La navegación inferior no compite en la primera impresión desktop: aparece tras `scrollY > 56` con opacidad/transform. Es progresiva: sin JS, en móvil y con reduced-motion ya está visible; `:focus-within` la vuelve visible para teclado.
+- Delta 2026-07-10 (cursor profundo): se extrae mecánicamente el cursor grande del PNG original porque ocupa un área ya transparente; el arte principal pasa a una base idéntica sin ese cursor. Un SVG decorativo, alineado al `viewBox` del activo, lo reintroduce en desktop con un loop de entrada → recorrido → clic → salida. El anillo teal confirma el clic sin simular una acción del usuario. Se rechazan seguimiento real del mouse, scroll-linked motion e inpainting generativo: introducen costo, ambigüedad o alteran el activo editorial sin añadir significado. Móvil y `prefers-reduced-motion` muestran la base estática.
 - Reuse / extend / new primitive: reuse del shell de Think + CSS route-local + renderer Growth Forms; sin primitive nueva.
 - Open risks: portar los efectos sin regresión de contraste/perf; el fold no debe dañar LCP en mobile.
 - Follow-up: si algún reveal necesita GSAP, mantenerlo scoped y documentar el token de timing.

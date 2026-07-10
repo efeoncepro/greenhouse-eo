@@ -1,3 +1,11 @@
+## Sesion 2026-07-10 - Think `/web-agentica` cursor del hero - RELEASED
+
+> **Publicado:** Think `a76e4ae` (`feat(web-agentica): animate hero cursor`) llegó a `main`; Vercel Production `dpl_8FG7dXpodMwuu2x9vFz88CB6JwTz` está Ready y alias `https://think.efeoncepro.com` sirve la versión nueva.
+>
+> **Cambio:** el cursor grande del PNG original ocupaba transparencia completa, por lo que se extrajo mecánicamente sin inpainting. El hero ahora consume una base responsiva sin cursor (`ebook-hero-motion-base*`) y monta `hero-cursor.png` en un SVG alineado al mismo `viewBox`: entrada desde el borde inferior, recorrido hacia la interfaz, anillo teal de clic y salida invisible antes del reinicio. Es decorativo (`aria-hidden`, sin pointer events), no persigue al mouse ni altera la conversión. En `max-width:920px` y `prefers-reduced-motion: reduce` la capa se oculta y el arte permanece estático.
+>
+> **Evidencia:** Think `pnpm type-check` y `pnpm build` verdes. Playwright local y producción: HTTP 200, base/cursor assets correctos, `scrollWidth == clientWidth` en 1440 y 390, cursor `block` en desktop motion y `none` en mobile/reduced-motion. Capturas productivas: `efeonce-think/.captures/web-agentica-production-cursor-{desktop-motion,desktop-reduced,mobile}.png`. Se actualizaron el wireframe y el contrato de motion de TASK-1374. WIP ajeno de Meetings/preview y cambios de README/astro.config quedaron sin stagear.
+
 ## Sesion 2026-07-10 - TASK-770 Hiring→HRIS activation bridge iniciada - Claude
 
 TASK-770 movida a `in-progress`, en ejecución local-first sobre `develop` (sin branch, sin push hasta instrucción). Desbloqueada por TASK-356 (cola + handoff live). Objetivo: bridge backend-critical que consume la cola internal_hire, crea/promueve `member` no-activo `pending_intake` sobre el mismo `identity_profile_id` (core source-neutral compartido con SCIM, cascade D-2), engancha readiness/intake/onboarding existentes y marca el handoff `completed` con evidencia. Flag `HIRING_ACTIVATION_ENABLED` default OFF. Scripts ajenos preservados.
