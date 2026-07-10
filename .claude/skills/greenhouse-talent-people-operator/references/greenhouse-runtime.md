@@ -11,6 +11,7 @@ Load whenever the work happens *inside* the Greenhouse repo (not pure advisory).
   - `hiring_opening` — derived from demand; internal truth vs **public allowlist payload** (`buildPublicOpeningPayload` — never leak internal fields).
   - `candidate_facet` — the recruiting facet on a **Person** (`greenhouse_core.identity_profiles`), UNIQUE per person. **No parallel `candidate` identity.**
   - `hiring_application` — the pipeline unit; carries decision + handoff snapshots; `score`/`match_score`/`explainability_json` (the assessment rollup target).
+  - `hiring_handoff` (TASK-356, ✓ complete) — the explicit boundary object decision→downstream. UNIQUE per application, anchored to `decision_id` (supersede), state-machine `pending→approved→[in_setup]→completed` + `blocked`/`cancelled`, append-only `hiring_handoff_audit`.
 - Store: `src/lib/hiring/**` (SQL-crudo + `HiringValidationError` + transactional outbox). API: `/api/hiring/**` (dual-gate: internal tenant + `can()`).
 - Capabilities: `hiring.{demand,opening,application}.*` (granted to internal roles only — NUNCA `client_*`).
 
@@ -20,6 +21,18 @@ Load whenever the work happens *inside* the Greenhouse repo (not pure advisory).
 - `TASK-1361` Assessment AI Assist — AI **proposes** questions + open-answer scores; **human confirms**; eval baseline; flag OFF default. (This is the AI-Act-safe pattern — see `assessment-interviewing.md`.)
 - `TASK-1362` Candidate Document Capture — CV/portfolio on the **private assets platform** (reuse, don't build buckets); **identity docs reuse `person_identity_documents`** (masked/reveal + capability `person.legal_profile.reveal_sensitive` + audit), captured **post-decision**; quarantine/scan for public uploads.
 - `TASK-1363` Assessment Taking + Review Surface — candidate takes the test via a **public tokenized Greenhouse link** (`/assessment/[token]`, single-use, time-limited); internal review in Application 360. `UI ready: no` until product-design loop.
+
+## The handoff (decision → downstream runtime, TASK-356 ✓ complete)
+
+- **Trigger**: `hiring.application.decided` with `decision='selected'` materializes a `HiringHandoff` via the reactive consumer `hiring_handoff_materialize` (domain `people`, runs in ops-worker; **no flag** — a no-op would be terminal in `outbox_reactive_log`). Rejections/backups/holds NEVER create a handoff; a re-decision that revokes a selection cancels a pending handoff or blocks an approved one (`decision_revoked`).
+- **Supersede**: a new `selected` decision updates a `pending` handoff (audited `decision_superseded`); on an `approved|in_setup|completed` handoff it BLOCKS (`decision_superseded_after_approval`) — never silent overwrite. Blocked-post-approval is sticky: a human resolves via cancel.
+- **Supported destinations V1**: `internal_hire` (→ HRIS queue, TASK-770) + `staff_augmentation` (owner calls `createStaffAugPlacement` explicitly). `contractor`/`partner`/`internal_reassignment` are born `blocked:destination_not_supported`.
+- **Command**: `transitionHiringHandoff` / `POST /api/hiring/handoffs/[id]/(approve|setup|complete|cancel)` — capability `hiring.handoff.approve` (governance tier, same as decide). `complete` REQUIRES `downstreamRef` (evidence: member/placement id) — never by inference.
+- **Readers (flag `HIRING_HANDOFF_BRIDGES_ENABLED`, default OFF, `enabled:false` explicit)**: `listInternalHireReadyForOnboarding()` (queue for 770), `listStaffAugmentationHandoffIntents()`; `getHiringJourneyForPerson()` (Person 360 journey, unflagged).
+- **Copy contract**: `src/lib/copy/hiring.ts` (`GH_HIRING_HANDOFF`) — UI renders stable codes via helpers, never raw codes/improvised prose.
+- **Reliability**: module `hiring` — `hiring.handoff_blocked_stale` (48h) + `hiring.internal_hire_awaiting_onboarding` (72h SLA, "don't lose a hire").
+- **Ops aids**: backfill `scripts/hiring/backfill-handoffs.ts` (dry-run→apply); live smoke `scripts/hiring/_sanity-handoff-reactive.ts`.
+- Manual: `docs/manual-de-uso/hr/operar-hiring-handoff.md`. Functional doc: `docs/documentation/hr/hiring-desk.md` §Handoff downstream.
 
 ## Public careers / vacancy publication contract
 
@@ -95,7 +108,7 @@ contract, or initial cutover smoke.
 - **AI proposes, human confirms** (`propose → confirm → execute`) with an eval baseline; no emotion/biometric/personality inference.
 - **Candidate PII** = same rigor as an employee: masked/reveal + capability + audit; never log `value_full`; identity docs captured post-decision, never at public apply.
 - **Anchor candidate assets by** `identity_profile_id` / `candidate_facet_id` / `application_id` — never `member_id` (candidates have no member).
-- **Boundary**: hiring **never** writes `member` / `assignment` / `placement` / payroll truth / compensation. Handoff is explicit (TASK-356); collaborator activation is HRIS/People (TASK-770).
+- **Boundary**: hiring **never** writes `member` / `assignment` / `placement` / payroll truth / compensation / `contractor_engagements` / `providers` / `expenses`. The handoff (TASK-356, live) is the explicit exit contract — it carries `selected_destination` (CHECK'd enum) and NEVER a field readable as `contractType`; `expected_legal_entity` is a non-binding proposal. Collaborator activation is HRIS/People (TASK-770). Guarded by `src/lib/hiring/handoff/boundary.test.ts`.
 - **Capabilities → grant coverage**: any new capability is granted to ≥1 real role in the same PR (guard `capability-grant-coverage.test.ts`); real roles only (`src/config/role-codes.ts`), never `client_*`.
 - Observability: `captureWithDomain(err, 'hiring', …)`.
 

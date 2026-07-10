@@ -103,6 +103,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### HR y Nomina
 
+- [Hiring Desk y Handoff](hr/hiring-desk.md) — dominio Hiring/ATS: demanda, pipeline, decisión estructurada, publicación allowlist y el handoff downstream (decisión seleccionada → ficha auditable que HRIS/Staff Aug aprueban y completan con evidencia; nada se contrata solo).
 - [People, Workforce, Payroll y Contractors end-to-end](hr/people-workforce-payroll-contractors-end-to-end.md) — mapa funcional completo reconciliado contra codigo y DB: Workforce Activation, HR Core, Payroll, honorarios, Deel/internacional, Contractors, payables, offboarding/finiquitos y puente con Finance; separa automatico vs operador y evita mezclar contractors con nomina dependiente.
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
 - [Workforce Activation Readiness](hr/workforce-activation-readiness.md) — resolver canónico y workspace HR para habilitar colaboradores antes de cerrar intake, con lanes, blockers, guard y override auditado

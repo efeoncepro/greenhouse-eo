@@ -53,6 +53,8 @@ La diferencia con otras capas de documentacion:
 
 ### HR y Nomina
 
+- [Operar el Hiring Desk](hr/operar-hiring-desk.md) — demanda de talento, pipeline de postulaciones, Application 360, decisión estructurada y publicación de vacantes.
+- [Operar el Hiring Handoff](hr/operar-hiring-handoff.md) — qué pasa cuando decides una postulación como seleccionada: aprobar/preparar/completar/cancelar el handoff, estados y bloqueos, evidencia de cierre, señales de operaciones y backfill/smoke.
 - [Operar Workforce, Payroll y Contractors end-to-end](hr/operar-workforce-payroll-contractors-end-to-end.md) — guia operador para decidir el camino correcto entre Workforce Activation, nomina mensual, honorarios, contractors, employee-to-contractor, finiquitos y pagos en Finance sin duplicar obligaciones.
 - [Habilitar colaborador en Workforce Activation](hr/habilitar-colaborador-workforce.md) — como resolver blockers de readiness desde `/hr/workforce/activation` antes de completar ficha.
 - [Completar ficha laboral de un colaborador](hr/completar-ficha-laboral.md) — como cerrar el workflow workforce intake desde la UI; desde TASK-874 el cierre consulta readiness automático y bloquea fichas incompletas.
