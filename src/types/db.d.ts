@@ -7556,6 +7556,40 @@ export interface GreenhouseHrGoals {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHrHiringActivationRequest {
+  activation_request_id: Generated<string>;
+  blocked_detail: string | null;
+  blocked_reason: string | null;
+  candidate_facet_id: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  hiring_application_id: string;
+  hiring_handoff_id: string;
+  identity_profile_id: string;
+  member_id: string | null;
+  member_outcome: string | null;
+  onboarding_case_id: string | null;
+  onboarding_instance_id: string | null;
+  state: Generated<string>;
+  state_changed_at: Generated<Timestamp>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrHiringActivationRequestEvents {
+  activation_request_id: string;
+  actor_user_id: string | null;
+  event_id: Generated<string>;
+  from_state: string | null;
+  member_id: string | null;
+  metadata_json: Generated<Json>;
+  occurred_at: Generated<Timestamp>;
+  onboarding_case_id: string | null;
+  onboarding_instance_id: string | null;
+  reason_code: string | null;
+  reason_detail: string | null;
+  to_state: string;
+}
+
 export interface GreenhouseHrLeaveBalanceAdjustments {
   adjustment_id: string;
   created_at: Generated<Timestamp>;
@@ -11476,6 +11510,8 @@ export interface DB {
   "greenhouse_hr.goal_key_results": GreenhouseHrGoalKeyResults;
   "greenhouse_hr.goal_progress": GreenhouseHrGoalProgress;
   "greenhouse_hr.goals": GreenhouseHrGoals;
+  "greenhouse_hr.hiring_activation_request": GreenhouseHrHiringActivationRequest;
+  "greenhouse_hr.hiring_activation_request_events": GreenhouseHrHiringActivationRequestEvents;
   "greenhouse_hr.leave_balance_adjustments": GreenhouseHrLeaveBalanceAdjustments;
   "greenhouse_hr.leave_balances": GreenhouseHrLeaveBalances;
   "greenhouse_hr.leave_policies": GreenhouseHrLeavePolicies;
