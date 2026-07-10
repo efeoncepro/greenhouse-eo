@@ -1,3 +1,11 @@
+## Sesión 2026-07-10 — Think `/web-agentica`: cursor del hero natural — RELEASED
+
+> **Publicado:** Think `9a4fa7d` (`fix(web-agentica): accelerate cursor interaction`) llegó a `main`; Vercel Production `dpl_BkVrwSwi8x6M4hEkESLFBGb99Dnb` está Ready y `https://think.efeoncepro.com/web-agentica` sirve la versión.
+>
+> **Cambio:** el cursor deja el loop lento de 11,5 s. Ahora recorre el panel en 5,8 s: entra desde fuera, barre controles, sobrepasa/corrige una vez, hace hover con halo teal en la punta, pulsa y se retira invisible. No sigue al mouse, no intercepta acciones ni finge una interacción real.
+>
+> **Evidencia:** `pnpm type-check` + `pnpm build` Think verdes. Playwright productivo confirmó siete pistas SVG a 5,8 s, hover y clic en el punto correcto, cero overflow/errores de aplicación en 1440; 390/reduced-motion oculta el cursor. Capturas: `efeonce-think/.captures/web-agentica-cursor-natural-production/{hover,click}.png`. No se creó un lead.
+
 ## Sesión 2026-07-10 — Think `/web-agentica`: audiencia y arco narrativo — RELEASED
 
 > **Publicado:** Think `0924f4d` (`feat(web-agentica): strengthen audience narrative`) llegó a `main`; Vercel Production `dpl_1RrahyGh9EjEEQZzt8WxD7Sp7jm8` está Ready y `https://think.efeoncepro.com/web-agentica` sirve la versión.
