@@ -37,6 +37,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Backend (API routes/stores/outbox/reactive) | `greenhouse-backend` | inline (Full API Parity + canonical error contract + auth helpers) |
 | Secret hygiene / rotación | `greenhouse-secret-hygiene` | inline (Secret Manager Hygiene) |
 | Sitio público (landings/posicionamiento/roadmap del sitio) | `efeonce-public-site-wordpress` + `seo-aeo`/`commercial-expert` | `docs/public-site/` (README índice + PRODUCT_ROADMAP + `decisions/` PDR ≠ ADR) |
+| Licitaciones públicas y privadas / RFP-RFQ (Chile + LATAM, bid/no-bid, ChileCompra, garantías) | `greenhouse-public-private-tenders` (+ `commercial-expert`) | `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (módulo runtime) |
 
 ### Business Context Pack
 
