@@ -7042,6 +7042,7 @@ export interface GreenhouseHiringHiringAssessment {
   submitted_at: Timestamp | null;
   template_id: string | null;
   time_limit_minutes: number | null;
+  token_expires_at: Timestamp | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -7086,8 +7087,10 @@ export interface GreenhouseHiringHiringAssessmentTemplate {
   name: string;
   role_hint: string | null;
   status: Generated<string>;
+  supersedes_template_id: string | null;
   template_id: Generated<string>;
   updated_at: Generated<Timestamp>;
+  version: Generated<number>;
 }
 
 export interface GreenhouseHiringHiringAssessmentTemplateModule {
@@ -7235,6 +7238,8 @@ export interface GreenhouseHiringHiringQuestion {
   question_id: Generated<string>;
   rubric_json: Generated<Json>;
   status: Generated<string>;
+  status_changed_at: Timestamp | null;
+  status_changed_by: string | null;
   type: string;
   updated_at: Generated<Timestamp>;
 }
