@@ -342,11 +342,12 @@ return withGreenhousePostgresTransaction(async (client) => {
 
     const rows = await runQuery<QuestionRow>(
       client,
-      `UPDATE greenhouse_hiring.hiring_question SET status = $1 WHERE question_id = $2 RETURNING ${QUESTION_COLS_FULL}`,
-      [next, questionId],
+      `UPDATE greenhouse_hiring.hiring_question
+       SET status = $1, status_changed_by = $3, status_changed_at = NOW()
+       WHERE question_id = $2 RETURNING ${QUESTION_COLS_FULL}`,
+      [next, questionId, actorUserId],
     )
 
-    void actorUserId
     
 return normalizeQuestion(rows[0])
   })

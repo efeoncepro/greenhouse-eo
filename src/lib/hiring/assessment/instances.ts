@@ -170,15 +170,42 @@ export const listAssessmentsForApplication = async (applicationId: string): Prom
 return rows.map(normalizeAssessment)
 }
 
-/** Resuelve una instancia por su token (single-use). Solo si sigue rendible. */
+/** Predicado SQL de vencimiento: token vencido o time-limit excedido (TASK-1383). */
+/** Vigencia del link tokenizado del candidato (TASK-1383; 1363 comunica la fecha). */
+const TOKEN_TTL_DAYS = 14
+
+const OVERDUE_PREDICATE = `(
+  (token_expires_at IS NOT NULL AND token_expires_at < NOW())
+  OR (started_at IS NOT NULL AND time_limit_minutes IS NOT NULL
+      AND started_at + make_interval(mins => time_limit_minutes) < NOW())
+)`
+
+/**
+ * Transiciona a `expired` las instancias abiertas vencidas (token o time-limit).
+ * Loud por estado: la instancia queda `expired` (auditable), nunca un skip mudo.
+ */
+const expireOverdueAssessment = async (whereSql: string, params: unknown[]): Promise<void> => {
+  await runGreenhousePostgresQuery(
+    `UPDATE greenhouse_hiring.hiring_assessment
+     SET status = 'expired'
+     WHERE ${whereSql} AND status IN ('assigned', 'sent', 'in_progress') AND ${OVERDUE_PREDICATE}`,
+    params,
+  )
+}
+
+/** Resuelve una instancia por su token (single-use). Solo si sigue rendible (expira vencidas). */
 export const resolveAssessmentByToken = async (rawToken: string): Promise<Assessment | null> => {
   if (!rawToken) return null
+
+  const tokenHash = hashToken(rawToken)
+
+  await expireOverdueAssessment('access_token_hash = $1', [tokenHash])
 
   const rows = await runGreenhousePostgresQuery<AssessmentRow>(
     `SELECT ${ASSESSMENT_COLS} FROM greenhouse_hiring.hiring_assessment
      WHERE access_token_hash = $1 AND method = 'candidate_test' AND status IN ('assigned', 'sent', 'in_progress')
      LIMIT 1`,
-    [hashToken(rawToken)],
+    [tokenHash],
   )
 
   
@@ -239,8 +266,8 @@ export const assignCandidateTest = async (
     const rows = await runQuery<AssessmentRow>(
       client,
       `INSERT INTO greenhouse_hiring.hiring_assessment
-         (application_id, template_id, method, status, access_token_hash, time_limit_minutes, accommodations_json, created_by)
-       VALUES ($1, $2, 'candidate_test', 'assigned', $3, $4, $5::jsonb, $6)
+         (application_id, template_id, method, status, access_token_hash, time_limit_minutes, accommodations_json, created_by, token_expires_at)
+       VALUES ($1, $2, 'candidate_test', 'assigned', $3, $4, $5::jsonb, $6, NOW() + make_interval(days => ${TOKEN_TTL_DAYS}))
        RETURNING ${ASSESSMENT_COLS}`,
       [
         applicationId,
@@ -305,8 +332,10 @@ return assessment
   })
 }
 
-/** Marca una instancia como en progreso (arranca el timer). Idempotente. */
+/** Marca una instancia como en progreso (arranca el timer). Idempotente. Expira vencidas. */
 export const startAssessment = async (assessmentId: string): Promise<Assessment> => {
+  await expireOverdueAssessment('assessment_id = $1', [assessmentId])
+
   const rows = await runGreenhousePostgresQuery<AssessmentRow>(
     `UPDATE greenhouse_hiring.hiring_assessment
      SET status = 'in_progress', started_at = COALESCE(started_at, NOW())
@@ -328,22 +357,29 @@ interface SaveResponseInput {
   answer: Record<string, unknown>
 }
 
-/** Guarda una respuesta (candidate_test). Idempotente por (assessment, question). El scoring
- *  objetivo se computa al submit (Slice 4); acá solo se marca needs_human_rating por tipo. */
+/**
+ * Guarda una respuesta (candidate_test). Idempotente por (assessment, question) — upsert
+ * respaldado por UNIQUE parcial (TASK-1383): el autosave repetido actualiza, nunca duplica
+ * (los duplicados sesgaban el AVG del score final). `needs_human_rating` se deriva del tipo
+ * REAL de la pregunta en DB (nunca del declarado por el caller — la superficie pública de
+ * 1363 no es fuente de verdad). El primer save auto-arranca el timer (assigned/sent →
+ * in_progress) y las instancias vencidas se expiran antes de aceptar el write.
+ */
 export const saveResponse = async (input: SaveResponseInput): Promise<AssessmentResponse> => {
   const assessmentId = str(input.assessmentId)
   const competencyId = str(input.competencyId)
+  const questionId = input.questionId ? str(input.questionId) : null
 
   if (!assessmentId || !competencyId) {
     throw new HiringValidationError('assessmentId y competencyId son obligatorios.', 'assessment_field_required', 400)
   }
 
-  const needsHumanRating = HUMAN_RATED_QUESTION_TYPES.includes(input.questionType)
+  await expireOverdueAssessment('assessment_id = $1', [assessmentId])
 
   return withGreenhousePostgresTransaction(async (client) => {
     const open = await runQuery<{ status: string }>(
       client,
-      `SELECT status FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 LIMIT 1`,
+      `SELECT status FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 LIMIT 1 FOR UPDATE`,
       [assessmentId],
     )
 
@@ -355,13 +391,46 @@ export const saveResponse = async (input: SaveResponseInput): Promise<Assessment
       })
     }
 
+    // Primer write = la rendición empezó: arranca el timer (idempotente).
+    if (open[0].status !== 'in_progress') {
+      await runQuery(
+        client,
+        `UPDATE greenhouse_hiring.hiring_assessment
+         SET status = 'in_progress', started_at = COALESCE(started_at, NOW())
+         WHERE assessment_id = $1`,
+        [assessmentId],
+      )
+    }
+
+    // Tipo real desde DB cuando hay pregunta; el declarado solo para respuestas ad-hoc.
+    let needsHumanRating = HUMAN_RATED_QUESTION_TYPES.includes(input.questionType)
+
+    if (questionId) {
+      const q = await runQuery<{ type: string }>(
+        client,
+        `SELECT type FROM greenhouse_hiring.hiring_question WHERE question_id = $1 LIMIT 1`,
+        [questionId],
+      )
+
+      if (!q[0]) throw new HiringNotFoundError('La pregunta no existe.', 'assessment_question_not_found')
+      needsHumanRating = HUMAN_RATED_QUESTION_TYPES.includes(q[0].type as QuestionType)
+    }
+
+    const conflictClause = questionId
+      ? `(assessment_id, question_id) WHERE question_id IS NOT NULL`
+      : `(assessment_id, competency_id) WHERE question_id IS NULL`
+
     const rows = await runQuery<ResponseRow>(
       client,
       `INSERT INTO greenhouse_hiring.hiring_assessment_response
          (assessment_id, question_id, competency_id, answer_json, needs_human_rating)
        VALUES ($1, $2, $3, $4::jsonb, $5)
+       ON CONFLICT ${conflictClause} DO UPDATE SET
+         answer_json = EXCLUDED.answer_json,
+         needs_human_rating = EXCLUDED.needs_human_rating,
+         updated_at = NOW()
        RETURNING ${RESPONSE_COLS}`,
-      [assessmentId, input.questionId ?? null, competencyId, JSON.stringify(input.answer ?? {}), needsHumanRating],
+      [assessmentId, questionId, competencyId, JSON.stringify(input.answer ?? {}), needsHumanRating],
     )
 
     
@@ -387,6 +456,11 @@ return withGreenhousePostgresTransaction(async (client) => {
       `INSERT INTO greenhouse_hiring.hiring_assessment_response
          (assessment_id, competency_id, answer_json, human_score, needs_human_rating, scored_by, scored_at)
        VALUES ($1, $2, '{}'::jsonb, $3, FALSE, $4, NOW())
+       ON CONFLICT (assessment_id, competency_id) WHERE question_id IS NULL DO UPDATE SET
+         human_score = EXCLUDED.human_score,
+         scored_by = EXCLUDED.scored_by,
+         scored_at = NOW(),
+         updated_at = NOW()
        RETURNING ${RESPONSE_COLS}`,
       [assessmentId, competencyId, score, evaluatorUserId],
     )
@@ -397,20 +471,52 @@ return normalizeResponse(rows[0])
 }
 
 /**
- * Respuestas de una instancia. Anti-anclaje (independent-before-debrief): para un
- * interviewer_scorecard, un evaluador NO ve los ratings de OTROS evaluadores de la misma
- * application hasta que su propia instancia esté `scored`/`submitted`.
+ * Respuestas de una instancia. Anti-anclaje (independent-before-debrief, TASK-1383): para un
+ * interviewer_scorecard AJENO, el evaluador que mira NO recibe los ratings hasta que su
+ * propia instancia de la misma application esté `submitted`/`scored`. Sin `viewerUserId`
+ * (llamadas server-internas) no se filtra.
  */
 export const listResponses = async (
   assessmentId: string,
   viewerUserId?: string | null,
 ): Promise<AssessmentResponse[]> => {
+  if (viewerUserId) {
+    const meta = await runGreenhousePostgresQuery<{
+      method: string
+      evaluator_user_id: string | null
+      application_id: string
+    }>(
+      `SELECT method, evaluator_user_id, application_id
+       FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 LIMIT 1`,
+      [assessmentId],
+    )
+
+    const instance = meta[0]
+
+    if (
+      instance &&
+      instance.method === 'interviewer_scorecard' &&
+      instance.evaluator_user_id !== viewerUserId
+    ) {
+      const own = await runGreenhousePostgresQuery<{ status: string }>(
+        `SELECT status FROM greenhouse_hiring.hiring_assessment
+         WHERE application_id = $1 AND method = 'interviewer_scorecard' AND evaluator_user_id = $2
+         LIMIT 1`,
+        [instance.application_id, viewerUserId],
+      )
+
+      const ownClosed = own[0] && ['submitted', 'scored'].includes(own[0].status)
+
+      // Anti-anclaje: el evaluador con scorecard abierto no ve ratings ajenos.
+      if (!ownClosed) return []
+    }
+  }
+
   const rows = await runGreenhousePostgresQuery<ResponseRow>(
     `SELECT ${RESPONSE_COLS} FROM greenhouse_hiring.hiring_assessment_response WHERE assessment_id = $1 ORDER BY created_at`,
     [assessmentId],
   )
 
-  void viewerUserId
   
 return rows.map(normalizeResponse)
 }

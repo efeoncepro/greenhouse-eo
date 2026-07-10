@@ -133,11 +133,26 @@ export const createAiProposal = async (
   const model = assertNonEmpty(input.model, 'model')
   const promptVersion = assertNonEmpty(input.promptVersion, 'promptVersion')
 
+  // TASK-1383: dedupe — un propose repetido con el mismo (kind, input_digest) pendiente
+  // retorna la proposal existente (no duplica la cola ni re-emite el evento).
+  if (input.inputDigest) {
+    const existing = await runQuery<AiProposalRow>(
+      client,
+      `SELECT ${AI_PROPOSAL_COLS} FROM greenhouse_hiring.hiring_assessment_ai_proposal
+       WHERE kind = $1 AND input_digest = $2 AND status = 'proposed' LIMIT 1`,
+      [kind, input.inputDigest],
+    )
+
+    if (existing[0]) return normalizeProposal(existing[0])
+  }
+
   const rows = await runQuery<AiProposalRow>(
     client,
     `INSERT INTO greenhouse_hiring.hiring_assessment_ai_proposal
        (kind, target_ref, proposed_json, provider, model, prompt_version, input_digest, usage_json, created_by)
      VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7, $8::jsonb, $9)
+     ON CONFLICT (kind, input_digest) WHERE status = 'proposed' AND input_digest IS NOT NULL
+     DO NOTHING
      RETURNING ${AI_PROPOSAL_COLS}`,
     [
       kind,
@@ -151,6 +166,18 @@ export const createAiProposal = async (
       actorUserId,
     ],
   )
+
+  // Carrera perdida del ON CONFLICT: retornar la pendiente ganadora.
+  if (!rows[0] && input.inputDigest) {
+    const winner = await runQuery<AiProposalRow>(
+      client,
+      `SELECT ${AI_PROPOSAL_COLS} FROM greenhouse_hiring.hiring_assessment_ai_proposal
+       WHERE kind = $1 AND input_digest = $2 AND status = 'proposed' LIMIT 1`,
+      [kind, input.inputDigest],
+    )
+
+    if (winner[0]) return normalizeProposal(winner[0])
+  }
 
   const proposal = normalizeProposal(rows[0])
 

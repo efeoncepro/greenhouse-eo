@@ -176,6 +176,22 @@ export const decideHiringApplication = async (
     const now = new Date().toISOString()
     const previous = history.at(-1) ?? null
 
+    // TASK-1383: snapshot del assessment AL MOMENTO de decidir, derivado del server (nunca
+    // del caller). `hiring_application.score` se sobreescribe con cada finalize posterior —
+    // sin esto, el score que se vio al decidir no es reconstruible (validity loop TASK-1364).
+    const scoredCountResult = await client.query<{ n: string }>(
+      `SELECT COUNT(*)::int AS n FROM greenhouse_hiring.hiring_assessment
+       WHERE application_id = $1 AND status = 'scored'`,
+      [safeApplicationId],
+    )
+
+    const assessmentSnapshot = {
+      score: currentRow.score == null ? null : Number(currentRow.score),
+      matchScore: currentRow.match_score == null ? null : Number(currentRow.match_score),
+      scoredInstances: Number(scoredCountResult.rows[0]?.n ?? 0),
+      capturedAt: now,
+    }
+
     const decisionEntry: HiringDecisionHistoryEntry = {
       decisionId: `hiring-decision-${randomUUID()}`,
       idempotencyKey,
@@ -187,7 +203,7 @@ export const decideHiringApplication = async (
       tentativeStartDate: input.tentativeStartDate ?? null,
       expectedLegalEntity: input.expectedLegalEntity?.trim() || null,
       expectedContext: input.expectedContext?.trim() || null,
-      prerequisitesSnapshot: input.prerequisitesSnapshot ?? {},
+      prerequisitesSnapshot: { ...(input.prerequisitesSnapshot ?? {}), assessment: assessmentSnapshot },
       supersedesDecisionId: previous?.decisionId ?? null,
     }
 

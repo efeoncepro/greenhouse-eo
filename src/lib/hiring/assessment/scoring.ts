@@ -89,8 +89,10 @@ export const submitAssessment = async (assessmentId: string, actorUserId: string
 
     if (!row) throw new HiringNotFoundError('La evaluación no existe.', 'assessment_not_found')
 
-    if (!['assigned', 'sent', 'in_progress'].includes(row.status)) {
-      throw new HiringValidationError('La evaluación ya fue enviada.', 'assessment_not_open', 409, { status: row.status })
+    // TASK-1383: submit SOLO desde in_progress (el timer arrancó vía start o el primer
+    // autosave). Un submit sobre assigned/sent = flujo roto, no un estado válido.
+    if (row.status !== 'in_progress') {
+      throw new HiringValidationError('La evaluación no está en progreso.', 'assessment_not_open', 409, { status: row.status })
     }
 
     // Auto-score objetivo: join a la pregunta para conocer type + answer_key.
