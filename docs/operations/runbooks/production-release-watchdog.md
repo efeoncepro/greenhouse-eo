@@ -178,6 +178,29 @@ El watchdog soporta 2 strategies de auth para GitHub API:
 2. Sino, fallback a `GITHUB_RELEASE_OBSERVER_TOKEN` PAT (Vercel) o `GITHUB_TOKEN` (GH Actions auto-provisto)
 3. Sin nada → `severity='unknown'` (degraded honest)
 
+> **⚠️ Gap verificado 2026-07-10 (release `4e7e9093d`).** El orden canónico de arriba describe el resolver
+> **async** (`resolveGithubToken`). Pero los tres readers del watchdog (`stale_approval`,
+> `pending_without_jobs`, `worker_revision_drift`) llaman `resolveGithubTokenSync`, que es **PAT-only**:
+> lee `GITHUB_RELEASE_OBSERVER_TOKEN ?? GITHUB_TOKEN` y **nunca mintea el installation token del GitHub App**.
+> Consecuencia: con el App perfectamente configurado (como está en Vercel Production desde 2026-05), esos
+> signals igual degradan a `unknown` si no hay PAT. El propio `github-helpers.ts` marca el sync resolver como
+> deuda ("una vez que todos los callers migren a `resolveGithubToken` async, este helper deja de ser necesario").
+> **Hasta que migren, el PAT NO es opcional para el watchdog.**
+
+#### Correr el watchdog en LOCAL
+
+El script `scripts/release/production-release-watchdog.ts` **no carga `.env.local`** (no usa dotenv), así que
+las env vars deben exportarse en el shell. Como los readers son PAT-only (ver gap arriba), lo más simple es
+reusar el token del `gh` CLI ya autenticado — sin imprimirlo nunca:
+
+```bash
+set -a && source .env.local && set +a
+export GITHUB_TOKEN="$(gh auth token)"
+pnpm release:watchdog --json
+```
+
+Verificado 2026-07-10: con esto los 3 signals dejan de ser `unknown`.
+
 #### Setup GitHub App AUTOMATIZADO (recomendado, ~5 min)
 
 ```bash
