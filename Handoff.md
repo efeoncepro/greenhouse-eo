@@ -1,3 +1,28 @@
+## Sesion 2026-07-10 - TASK-1383 Assessment hardening COMPLETE (code) - Claude
+
+> **Auditoría de la foundation Assessment (1360/1361) → TASK-1383 creada y ejecutada en la misma sesión.**
+> La auditoría (2 lentes: código real + specs 1363/1364/1365) validó la arquitectura pero encontró 10 hallazgos;
+> todos cerrados: **saveResponse idempotente a nivel DB** (UNIQUE parciales + upsert — los duplicados del autosave
+> sesgaban el AVG del score final), **anti-anclaje implementado** (antes solo prometido en el docstring),
+> **expiración operativa** (token +14d, time-limit → `expired`, auto-start del timer, submit solo in_progress),
+> **anti-leak de buildPublicQuestion testeado**, needs_human_rating del tipo REAL en DB, actor del SME gate,
+> dedupe del ledger IA, **snapshot server-side del assessment en la decisión** (score al decidir reconstruible,
+> pre-1364) e **invariante de versionado de templates** (inmutables con instancias vía trigger + version/supersedes
+> — contrato pre-1364/1365, decidido ANTES de acumular datos).
+> Migración `20260710202351833` APLICADA y verificada. **6 live guards E2E contra PG real verdes.**
+> Higiene: checkboxes 1360/1361 saneados con nota, deltas a 1363/1364/1365, invariante en el arch doc.
+> Sin flag propio (fixes de correctitud en superficie interna sin tráfico); rollout = push normal.
+> Sigue pendiente del programa (gates de operador, ya en ledger/follow-ups): eval baseline IA + sign-off HR/Legal
+> para el flip de 1361; banco de preguntas SME y actionKey Nexa sin task asignada.
+
+## Sesión 2026-07-10 — Think `/web-agentica`: SEO y AEO semántico — RELEASED
+
+> **Publicado:** Think `781a386` (`feat(web-agentica): strengthen SEO and AEO metadata`) llegó a `main`; Vercel Production `efeonce-think-66qo89ktk-efeonce-7670142f.vercel.app` está Ready y `https://think.efeoncepro.com/web-agentica` sirve la versión.
+>
+> **Cambio:** la landing conserva la tesis de web agéntica y gana distribución precisa: title y description propios, títulos/alternativas sociales, respuesta visible y citable sobre qué es la web agéntica, canonical/robots indexables y un grafo JSON-LD coherente de `Organization` → `WebSite` → `WebPage` → `Book` + `FAQPage`. `llms.txt` ahora describe la guía como contenido público/citable; no se infiere que ese archivo reemplace contenido, producto o capacidades.
+>
+> **Evidencia:** Think `pnpm type-check` + `pnpm build` verdes. Smoke productivo: HTTP 200, metadata/canonical/robots correctos, seis entidades JSON-LD, seis FAQ visibles y estructuradas, sitemap y `llms.txt` con la URL, cero errores y sin overflow en 1440 y 390/reduced-motion. No se envió ningún formulario ni se creó un lead.
+
 ## Sesión 2026-07-10 — Think `/web-agentica`: cursor del hero natural — RELEASED
 
 > **Publicado:** Think `9a4fa7d` (`fix(web-agentica): accelerate cursor interaction`) llegó a `main`; Vercel Production `dpl_BkVrwSwi8x6M4hEkESLFBGb99Dnb` está Ready y `https://think.efeoncepro.com/web-agentica` sirve la versión.

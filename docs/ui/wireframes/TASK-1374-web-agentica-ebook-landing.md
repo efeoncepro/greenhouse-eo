@@ -108,6 +108,14 @@ La landing toma la estructura y el copy del export como base y los aterriza a la
 
 Las preguntas y respuestas del FAQ se adaptan al contenido vigente del ebook y se revisan en es-CL; la explicación de `llms.txt` conserva su rol acotado. Toda métrica conserva su fuente literal.
 
+## SEO/AEO Contract — 2026-07-10
+
+- **Documento de resultado:** title `Web agéntica: guía gratuita en 5 actos | Efeonce Think`; description centrada en cómo los agentes encuentran, leen y usan una presencia digital, los cinco actos y el checklist. Es copy de distribución de la misma guía, no una promesa de optimización SEO.
+- **Compartir:** Open Graph y Twitter usan el titular editorial `El fin de la web solo para humanos — guía de web agéntica`, descripción breve equivalente y una alternativa de imagen que describe la portada azul y sus interfaces.
+- **Respuesta recuperable visible:** la sección `Señales de la transición` define: `La web agéntica es una presencia que un agente puede encontrar, entender y usar.` La frase sirve a personas y sistemas; no depende de schema, hover ni motion.
+- **Datos estructurados:** el grafo JSON-LD representa únicamente entidades visibles/verificables: Organization, WebSite, ImageObject, WebPage, Book y las seis preguntas del FAQ. No se marcan datos de fecha, rating, precio, breadcrumb o autor individual inexistentes. El fragmento `#preguntas-frecuentes` apunta a la sección real.
+- **Descubrimiento:** canonical sin `/index.html`, robots `index, follow, max-image-preview:large`, sitemap Astro y `llms.txt` incluyen la ruta. `llms.txt` es auxiliar y nunca reemplaza la lectura visible, los datos ni las capacidades del negocio.
+
 ## State Copy
 
 | State | Title | Body | CTA / recovery | Notes |

@@ -437,3 +437,10 @@ Landing `/web-agentica` construida nativa en `efeonce-think` (commit local, NO p
 
 - Think `9a4fa7d` sustituye el recorrido de 11,5 s —percibido como lento y mecánico— por un ciclo de 5,8 s: entrada desde fuera del panel, barrido de controles, sobrepaso/corrección, halo de hover anclado a la punta real, clic teal breve y salida invisible antes de reiniciar.
 - Verificación visual local y productiva: `pnpm type-check` + `pnpm build` verdes; Vercel `dpl_BkVrwSwi8x6M4hEkESLFBGb99Dnb` Ready. La ruta live expone los siete tracks a 5,8 s; frames de hover/click muestran el foco en la punta y el pulso posterior. Desktop y móvil reduced-motion conservan `scrollWidth <= clientWidth`; la capa cursor queda `display:none` en reduced/mobile. No se ejecutó submit ni se creó un lead en QA.
+
+## Delta 2026-07-10 — SEO/AEO semántico en producción
+
+- Think `781a386` reemplaza los metadatos genéricos por un title y description centrados en la guía de web agéntica, añade títulos/descripción/alternativa de imagen específicos para Open Graph y Twitter, y conserva el canonical limpio + `index, follow, max-image-preview:large`.
+- El JSON-LD pasa de dos objetos aislados a un grafo fiel y visible: `Organization`, `WebSite`, `ImageObject`, `WebPage`, `Book` (ebook gratuito, audiencia de marketing/growth/digital) y `FAQPage` con las seis respuestas que el usuario puede leer. No declara fechas, autorías personales, ratings, ofertas, breadcrumbs ni capacidades que la página no muestra.
+- La introducción de señales incorpora una definición breve de web agéntica para recuperación por pasajes; `llms.txt` suma la ruta, su alcance y la condición de descarga gated. No se presenta `llms.txt` ni schema como sustituto de producto, contenido o decisión de negocio.
+- Producción Vercel Ready: `efeonce-think-66qo89ktk-efeonce-7670142f.vercel.app`. Smoke de `https://think.efeoncepro.com/web-agentica` valida HTTP 200, title/description/canonical/robots/OG/Twitter, las seis entidades JSON-LD + seis FAQ, sitemap y `llms.txt`; desktop 1440 y móvil 390/reduced-motion no muestran overflow ni errores. No se envió submit ni se generó un lead.
