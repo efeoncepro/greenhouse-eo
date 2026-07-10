@@ -1,4 +1,19 @@
 ## Sesion 2026-07-10 - TASK-1362 Candidate Document Capture - Claude - CODE COMPLETE / ROLLOUT PENDIENTE
+> **⚠️ Nota de colisión multi-agente (2026-07-10).** El commit `25c37dcd0` ("polish hiring desk fidelity and upload
+> guard") lo hizo **Codex con un `git add` amplio mientras yo tenía trabajo en vuelo**, y mezcla tres cosas bajo un
+> mensaje que no describe ninguna: (1) el guardrail de escaneo de TASK-1362 (`asset-scan/gate.ts`,
+> `attach-guard.test.ts`, el guard en `greenhouse-assets.ts`, el refactor de `cv-upload.ts`, deltas de docs);
+> (2) el WIP de UI de TASK-355 (5 vistas de Hiring Desk, copy, wireframe, escenarios GVC); (3) el script temporal
+> `scripts/_verify-form-asset.ts`.
+>
+> Verificado: **el contenido de TASK-1362 entró completo y correcto** (guard presente, fix de lint incluido); no se
+> perdió nada. Por decisión del operador NO se reescribió la historia (Codex podía estar trabajando sobre ese HEAD);
+> sólo se sacó el script temporal del repo con `git rm --cached` (queda en disco). Si alguien audita el historial de
+> TASK-1362, el guardrail vive en `25c37dcd0`, no en los tres commits `TASK-1362 Slice *`.
+>
+> **Lección operativa (ya en memoria):** con Codex activo en la misma rama, `git add -A`/`git add .` de cualquiera de
+> los dos agentes secuestra el trabajo en vuelo del otro. Stagear siempre rutas explícitas.
+
 
 > **Hallazgo de seguridad que reordenó la task.** Discovery encontró que el upload público de CV de Careers
 > (`CareersApplyClient` → `POST /api/public/hiring/applications` → `attachPublicCareersCvToApplication`) ya estaba
