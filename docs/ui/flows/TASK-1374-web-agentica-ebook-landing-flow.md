@@ -15,7 +15,7 @@
 
 - Primary user: prospecto anónimo evaluando si descargar el ebook de la web agéntica.
 - Entry moment: llega desde búsqueda, social, email o navegación directa.
-- Successful outcome: entiende la tesis, completa el form gobernado y recibe el ebook por email; ve un estado de éxito honesto en pantalla ("revisa tu email").
+- Successful outcome: entiende la tesis, completa el form gobernado y descarga el ebook de inmediato mediante un token gated; ve un estado de éxito honesto y recuperable en pantalla.
 - Primary decision/action: dejar sus datos tras entender qué trae el ebook.
 - Non-goals: entregar el ebook sin capturar el lead, crear un endpoint local de intake, generar un "reporte" (esto es contenido, no el grader), indexar cualquier URL con datos del lead.
 
@@ -25,16 +25,16 @@
 |---|---|---|---|---|
 | `/web-agentica` landing | Entrada, posicionamiento del ebook, host del form | Hero + tesis + contenidos arriba; form dock ancla accesible por CTA de scroll. | Secciones apiladas en el mismo orden; CTA lleva al form. | Think Astro page + `BaseLayout` |
 | `<greenhouse-form>` (ebook) | Captura y submit gobernados + trigger del envío del ebook | Embebido en panel sobrio, `appearance="bare"`, con skeleton de carga. | Full-width con spacing estable y foco visible. | Growth Forms renderer |
-| Estado de éxito | Confirmación en pantalla | Reemplaza el form con "Te enviamos el ebook a tu email". | Mismo, full-width. | Estado route-local del dock |
-| Email con el ebook | Entrega real del lead magnet | Enviado por el fulfillment gobernado de Greenhouse (adjunto/enlace al PDF). | Igual. | Greenhouse email pipeline |
+| Estado de éxito | Confirmación de descarga en pantalla | Reemplaza el form por una conclusión de dos columnas: descarga/recovery + cross-sell del grader como nivel 1. | Una columna, full-width. | Estado route-local del dock |
+| Descarga gated | Entrega real del lead magnet | El handoff post-submit entrega el `download_url` de corta duración; Think sólo lo dispara y permite reintento durante la sesión. | Igual. | Greenhouse asset handoff |
 
 ## Flow Map
 
 1. Entry: el usuario abre `/web-agentica`; la página es indexable y presenta la tesis "El fin de la web" con CTA "Descargar el ebook gratis".
 2. Primary action: revisa stats, tesis, contenidos y audiencia; hace scroll (o clic en CTA) hasta el form dock.
 3. Submit: el renderer gobernado envía los datos a Greenhouse; el submit gobernado (`submitForm`: honeypot + consent + dedupe + outbox) los acepta.
-4. Fulfillment: el evento outbox dispara el envío del ebook por email (fulfillment gobernado en Greenhouse). Think NO envía el email ni adjunta el PDF.
-5. Success: en pantalla, el form se reemplaza por el estado "Te enviamos el ebook a tu email" (honesto: confirma envío, no descarga on-screen a menos que el contrato exponga un enlace directo).
+4. Fulfillment: el handoff post-submit entrega un `download_url` gated; Think lo dispara sin conocer el asset ni generar una URL estática compartible.
+5. Success: en pantalla, el form se reemplaza por una confirmación con recuperación gated y un cross-sell al grader, explicado como medición del nivel 1; Think no inventa un report ni captura datos localmente.
 6. Recovery / exit: si el form no carga, el submit falla o el origen no está autorizado, la landing muestra un estado degradado seguro sin exponer internals.
 
 ## Interaction Triggers
@@ -45,7 +45,7 @@
 | CTA "Descargar el ebook gratis" | Usuario | Scroll suave al form dock | Enter/Space en el link/botón | Ancla `#web-agentica-form`, foco al heading del form. |
 | Renderer script resuelto | `<greenhouse-form>` host | `form.ready` | n/a | Depende del allowlist gobernado + render contract. |
 | Submit form | Usuario en el renderer | `form.submitting` → `form.success` o `form.error` | Submit nativo | Sin handler local salvo callbacks/eventos del renderer. |
-| Submission accepted | Evento de éxito del renderer | `form.success` | n/a | Éxito = "revisa tu email"; el envío del ebook es async vía outbox. |
+| Submission accepted | Evento de éxito del renderer | `form.success` | n/a | Éxito = descarga tokenizada; la recuperación conserva el mismo token durante la sesión. |
 | Retry load | Form host degradado | `form.loading` | Enter/Space | Solo si el host puede re-pedir el renderer con seguridad. |
 
 ## State Machine
@@ -56,13 +56,13 @@
 | form.loading | El script/contrato del form está resolviendo. | Mount del componente | Éxito/error del contrato | Skeleton estable; sin salto de layout. |
 | form.ready | Campos gobernados disponibles. | Éxito del contrato | Usuario envía | El host no duplica campos ni validación. |
 | form.submitting | El renderer envía datos a Greenhouse. | Submit nativo | Accepted/error | El renderer previene doble submit. |
-| form.success (thank-you) | Submit aceptado; la descarga tokenizada se dispara y el email de respaldo sale async. | Evento de éxito del renderer (con token del handoff) | n/a (final) | **Tarjeta inline** reemplaza el form (NO overlay): confirma descarga + email, botón "Descargar de nuevo" (gated con el token), un puente al grader `/brand-visibility`. Foco al título, `role=status`. |
+| form.success (thank-you) | Submit aceptado; la descarga tokenizada se dispara. | Evento de éxito del renderer (con token del handoff) | n/a (final) | **Tarjeta inline** reemplaza el form (NO overlay): confirma descarga, botón gated y cross-sell al grader como nivel 1. Dos columnas en desktop, una en mobile. Foco al título, `role=status`. |
 | form.error | Submit falló o el renderer devolvió error seguro. | Error del renderer | Retry/editar | Copy seguro, sin stack/API. |
 | form.denied | Origen/superficie no autorizado. | Fallo de CORS/surface guard | Fix de allowlist gobernado | Bloqueador pre-launch, no aceptable como final. |
 
 ## Routing Contract
 
-- Route changes: ninguno (single-route). Éxito in-place; la entrega ocurre por email fuera del navegador.
+- Route changes: ninguno (single-route). Éxito in-place; la entrega ocurre con la descarga gated post-submit.
 - Canonical URL: `https://think.efeoncepro.com/web-agentica` (sin `/index.html`, sin trailing slash, sin redirect).
 - Deep-link behavior: `#web-agentica-form` puede anclar al form de forma accesible.
 - Back button / reload: reload vuelve a `landing.ready` y re-resuelve el contrato del form; sin persistencia de borrador local.

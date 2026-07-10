@@ -153,7 +153,7 @@ Reglas obligatorias:
 - Pending / disabled: pending del renderer; doble-submit prevenido por el renderer.
 - Escape / click-away: none (sin modal).
 - Focus restore: tras success/error, foco al heading del estado.
-- Latency feedback: skeleton de carga del form; success honesto "revisa tu email".
+- Latency feedback: skeleton de carga del form; success honesto de descarga gated y recuperación con el token post-submit.
 - Toast / alert behavior: estados in-flow en el form dock, no toasts globales.
 
 ### Motion & microinteractions
@@ -239,7 +239,7 @@ Reglas obligatorias:
 
 - Embeber `<greenhouse-form>` del ebook (patrón `BrandVisibilityFormDock`) con `formKey`/`surface` del ebook.
 - Estados: loading/ready/submitting/success/error/degraded/denied.
-- Success honesto "te enviamos el ebook a tu email"; sin campos/validación/consent local.
+- Success honesto de descarga gated; sin campos/validación/consent local.
 - GVC de los estados del form.
 
 ### Slice 4 — Cierre: gates + deploy + PR
@@ -265,7 +265,7 @@ Puntos clave de implementación:
 
 - El `<head>` completo lo da `BaseLayout`; la ruta sólo pasa `title`, `description`, `canonical` (implícito), `ogImage` (hero del ebook) y `jsonLd` (WebPage+FAQPage).
 - Los efectos del PR (`.lp-hero-grid-*`, `.lp-beams-collision`, `.lp-spotlight-card`) son CSS reutilizable: se copian re-tokenizando los HEX (`#ff6501`/`#ec661c`/azules) a vars AXIS/acento.
-- El form dock reusa el patrón de `BrandVisibilityFormDock.astro` (script `renderer-latest.js` + `<greenhouse-form appearance="bare">` + fallback noscript + estados), cambiando `formKey`/`surface` al del ebook y el success copy a "revisa tu email".
+- El form dock reusa el patrón de `BrandVisibilityFormDock.astro` (script `renderer-latest.js` + `<greenhouse-form appearance="bare">` + fallback noscript + estados), cambiando `formKey`/`surface` al del ebook y el success copy a confirmación de descarga gated.
 
 ## Rollout Plan & Risk Matrix
 
@@ -321,7 +321,7 @@ Puntos clave de implementación:
 - [ ] `/web-agentica` es una página Astro nativa con `BaseLayout` (title, description, canonical sin `/index.html`, robots index, OG/Twitter, JSON-LD WebPage+FAQPage, GTM `GTM-NGHPGRLZ`, favicon).
 - [ ] Cero DM Sans y cero `_ds/`/`support.js`/`image-slot.js`/`_ds_bundle.js`; tipografía Geist/Poppins y color desde `axis.*`/var de acento (ningún HEX crudo del export).
 - [ ] Los efectos hero (grid, beams), stats count-up (con fuente literal), spotlight y section reveals funcionan y tienen fallback de reduced-motion.
-- [ ] El form es el `<greenhouse-form>` gobernado del ebook; sin campos/validación/consent locales; success honesto "te enviamos el ebook a tu email" (o el estado bloqueado/placeholder mientras la foundation no exista).
+- [ ] El form es el `<greenhouse-form>` gobernado del ebook; sin campos/validación/consent locales; success honesto de descarga gated, con recuperación mediante el token del handoff.
 - [ ] Sin scroll horizontal de página en desktop 1440 ni mobile 390; GVC desktop+mobile capturado y mirado.
 - [ ] La surface `/web-agentica` está registrada en `greenhouse.repo.json`; ninguna URL con lead se indexa.
 - [ ] PR #12 de `efeonce-think` cerrado con explicación.
@@ -361,7 +361,7 @@ Landing `/web-agentica` construida nativa en `efeonce-think` (commit local, NO p
 - **Form + descarga**: embebe `<greenhouse-form form-key=db1e254c… surface=fhsf-web-agentica-ebook>`; al aceptarse el submit dispara la **descarga gated on-screen** con el `download_url` del handoff (`gh_form_submission_accepted`, TASK-1375) + **thank-you inline** (NO overlay) con "Descargar de nuevo" + puente al grader.
 - **Verificado**: `pnpm build` + `pnpm type-check` verdes; GVC desktop 1440 + mobile 390 **mirado** (navy+teal enterprise); `scrollWidth==clientWidth` (sin overflow). El form muestra su fallback honesto offline (sin API) — en staging con el form + API renderiza los campos.
 
-**Rollout pendiente (NO operativamente completo):** push de efeonce-think a `main` (deploy prod) — hacer junto con el rollout prod de TASK-1375 (form en prod DB, PDF en bucket prod, flags, deploy `renderer-latest.js` + ops-worker); **smoke real end-to-end** desde el origin (Turnstile + CORS): submit → llega email + descarga on-screen. Para probar en staging: apuntar `GREENHOUSE_API_BASE` a staging + `pnpm dev`.
+**Rollout aplicado parcialmente:** Think ya está en `main` y producción; el form, Turnstile, CORS y descarga gated se verificaron con submit humano. Falta evidencia independiente de entrega por email/HubSpot; no se debe bloquear ni desmentir la descarga inmediata por esa verificación pendiente.
 
 ## Delta 2026-07-09 (thank-you + email)
 
@@ -380,3 +380,24 @@ Landing `/web-agentica` construida nativa en `efeonce-think` (commit local, NO p
 - **Epic**: se asignó `EPIC-019` (público/content marketing) por defecto; confirmar si el hub Think tiene un epic propio (TASK-1325/1326 son lead-magnet hub) al que deba colgarse.
 - **Entrega del ebook**: ¿sólo email, o también descarga directa on-screen si el contrato expone un enlace? Por defecto, email (patrón lead magnet + copy del PR).
 - **Correo corporativo**: ¿el form del ebook exige correo corporativo (como el grader) o acepta cualquier email? Decidir en la foundation.
+
+## Delta 2026-07-10 — revisión CRO/UI y experiencia enterprise (code complete, rollout pendiente)
+
+- La landing en `efeonce-think` incorpora un shell editorial de research brief: navegación del recorrido, señales de mercado con fuentes, jerarquía de los cinco actos como timeline, CTA con feedback de hover/press, foco explícito al heading del formulario y focus-visible.
+- El motion es progresivo (IntersectionObserver + CSS): no oculta contenido sin JavaScript y se desactiva con `prefers-reduced-motion`. Las tarjetas no interactivas permanecen estáticas; la animación solo comunica entrada y progreso de lectura.
+- El hero usa el mismo arte, ahora servido como WebP responsive (640/960/1536, con PNG como fallback). No se cambió el contenido del activo por instrucción del operador. **Deuda visual explícita:** la portada conserva el título alternativo; Diseño debe entregar un activo alineado con el H1 antes del rollout.
+- Evidencia local: `pnpm type-check` y `pnpm build` de Think verdes; Playwright a 1440 y 390 confirma `scrollWidth === clientWidth`, CTA→`#web-agentica-form-title`, WebP responsive y reduced-motion sin transiciones/animaciones. La captura canónica GVC no corre desde el workspace Astro hermano; se usó Playwright local para la evidencia visual y la captura GVC/live queda en el smoke de deployment.
+- Pendiente operativo: merge/deploy de Think y smoke real browser desde `think.efeoncepro.com` con el form (CORS + Turnstile + submit + descarga/email). No se hizo push ni deploy.
+
+## Delta 2026-07-10 — tesis editorial corregida en producción
+
+- La lectura íntegra del Content Hub confirma que SEO/AEO es solo el primer nivel del Acto IV, no la promesa del ebook. La landing live prioriza ahora dos interfaces, los cuatro niveles (encontrado, legible, accionable e intrínseco) y la transición de páginas a capacidades.
+- Se retiraron SEO/AEO de estadísticas, audiencia, FAQ, eyebrow y proof row; el selector de rol del form usa `Contenidos / Estrategia`. La verificación browser de producción no encuentra esos términos en el texto visible.
+- Think se desplegó primero para `c0d76bb`; el submit humano con Turnstile y la descarga gated quedaron confirmados después. El refinamiento visual post-descarga vive en el deploy posterior `c28a989`.
+
+## Delta 2026-07-10 — éxito post-descarga refinado y desplegado
+
+- El operador confirmó el submit humano y la descarga gated real del ebook desde `think.efeoncepro.com`; la evidencia cubre Turnstile, CORS y entrega inmediata, no email/HubSpot.
+- Think `c28a989` reemplaza el estado anterior por una conclusión inline responsive: desktop en dos columnas y móvil apilado; confirma la descarga, mantiene `Descargar el ebook otra vez` con el token post-submit y mueve el foco al título del estado.
+- El grader queda como cross-sell, con copy que acota su rol a medir el **nivel 1** (si ChatGPT, Perplexity y Google AI encuentran y entienden la marca) y conecta el resultado con los cuatro niveles del ebook. No se vuelve a presentar SEO/AEO como el foco de la guía.
+- Verificación productiva sintética sin crear lead: estado renderizado en desktop 1440 y móvil 390, `scrollWidth <= clientWidth`, foco en `#web-agentica-success-title`, CTA `/brand-visibility`, sin errores de aplicación. Vercel production Ready: `dpl_8YiG2YH5PvN3R63DfEtyJJC2unHk`.

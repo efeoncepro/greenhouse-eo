@@ -31,7 +31,7 @@
 | Form contract loader | Renderer no listo | Skeleton estable de "cargando formulario"; sin spinner-only. | CSS skeleton | yes |
 | Form host ready | Contrato resuelto | Reemplazo del skeleton con transición corta opacity/translate. | CSS transition | yes |
 | Submit pending | Renderer enviando | Estado pendiente controlado por el renderer; el host puede añadir contexto no bloqueante. | Renderer + CSS | yes |
-| Success | Submit aceptado | Transición calma del form al estado "revisa tu email"; sin confetti ni progreso. | CSS + live region | yes |
+| Success | Submit aceptado | Reemplazo calmo por la confirmación de descarga y recuperación gated; sin confetti ni progreso. | CSS + live region | yes |
 | Error/degraded | Fallo de carga/submit/autorización | Estado estático calmo con un solo camino de retry/recuperación. | CSS + live region | yes |
 
 ## Microinteraction States
@@ -53,7 +53,7 @@
 | Stat count-up | 0 | valor final | 600–900ms ease-out | conteo numérico con fuente visible | número final directo |
 | Form contract | `form.loading` | `form.ready` | 180–240ms ease-out | crossfade skeleton → renderer host | swap instantáneo con texto de estado |
 | Submit | `form.ready` | `form.submitting` | renderer-owned | pending + doble-submit deshabilitado | texto de pending estático |
-| Success | `form.submitting` | `form.success` | 240–360ms ease-out | reemplazo calmo del form por "revisa tu email" | swap instantáneo |
+| Success | `form.submitting` | `form.success` | 0–240ms ease-out | reemplazo calmo del form por la confirmación de descarga; dos columnas sólo en desktop | swap instantáneo |
 | FAQ toggle | colapsado | expandido | 160–240ms ease-out | altura + opacity del panel | display inmediato |
 | Error | cualquier loading/pending | error/degraded | 0–160ms | detener motion ambiental; recovery estable | error estático |
 
@@ -64,7 +64,7 @@
 - Imports forbidden: Lottie, librerías de animación pesadas, `support.js`/`image-slot.js`/`_ds_bundle.js` del export, polling ad hoc, state machines locales que dupliquen Greenhouse.
 - Timing tokens: mapear a CSS vars de Think/AXIS si existen; si no, duraciones locales acotadas y documentadas.
 - Easing tokens: ease-out para entradas; linear/soft para lanes ambientales; sin bounce/spring espectáculo.
-- Layout animation: evitar morphs que muevan el form; dimensiones estables para host y estados.
+- Layout animation: el form no hace morph; al terminar, la tarjeta puede adoptar inmediatamente su ancho de conclusión desktop. En movimiento reducido el swap es inmediato.
 - CSS properties: transform, opacity, background-position, mask-position; evitar animar width/height/top/left.
 - Color: el naranja de acento y los azules de las beams/grid salen de `axis.*` / la var de acento — NUNCA HEX crudo (el PR los trae hardcodeados; se re-tokenizan).
 - GSAP justification: por defecto NO se necesita GSAP (todo es CSS ambient + reveal). Si un reveal de hero lo justifica, queda scoped a la ruta y no gobierna validación ni lógica.
@@ -109,9 +109,9 @@
 
 ## Design Decision Log
 
-- Decision: motion marketing ambient + reveal (grid/beams/count-up/spotlight portados del PR, re-tokenizados a AXIS), sin pipeline orquestado; el post-submit es un estado calmo "revisa tu email".
-- Alternatives considered: página estática sin motion (pierde el wow del PR); GSAP orquestado como en brand-visibility (innecesario: no hay wait async ni report handoff); confetti/progreso en success (deshonesto para entrega por email).
-- Why this pattern: el usuario necesita una entrada premium de marca y datos con peso, no una consola de análisis; la entrega ocurre por email, así que el éxito es una confirmación calma.
+- Decision: motion marketing ambient + reveal (grid/beams/count-up/spotlight portados del PR, re-tokenizados a AXIS), sin pipeline orquestado; el post-submit es una confirmación de descarga inmediata, calma y recuperable.
+- Alternatives considered: página estática sin motion (pierde el wow del PR); GSAP orquestado como en brand-visibility (innecesario: no hay wait async ni report handoff); confetti/progreso en success (deshonesto para una descarga ya entregada).
+- Why this pattern: el usuario necesita una entrada premium de marca y datos con peso, no una consola de análisis; la entrega es gated en el mismo momento, por lo que el éxito confirma el archivo y conserva la tesis de web agéntica.
 - Reuse / extend / new primitive: reuse del shell de Think + CSS route-local + renderer Growth Forms; sin primitive nueva.
 - Open risks: portar los efectos sin regresión de contraste/perf; el fold no debe dañar LCP en mobile.
 - Follow-up: si algún reveal necesita GSAP, mantenerlo scoped y documentar el token de timing.

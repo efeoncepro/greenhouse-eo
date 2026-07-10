@@ -29,7 +29,7 @@ Los ebooks (entregables + editables) viven en OneDrive de Efeonce:
 ## 2. Entrega gated (el ebook se baja SOLO tras completar el form)
 
 1. **PDF → bucket privado** `GREENHOUSE_PRIVATE_ASSETS_BUCKET` vía el helper canónico `src/lib/storage/greenhouse-assets.ts`. Nunca público, nunca URL estática compartible.
-2. **Form gobernado** (Growth Forms) con gate de **correo corporativo** (bloquea free/disposable, como el grader). Campos típicos: nombre, email (corporate), rol (opcional).
+2. **Form gobernado** (Growth Forms) con gate de **correo corporativo** (bloquea free/disposable, como el grader). Campos estándar: nombre completo, email corporativo, empresa opcional, rol opcional y un único consentimiento.
 3. Al enviar el form, el submit gobernado **emite un token de descarga** ligado a la submission (patrón tokenized handoff del grader; el `gh_form_submission_accepted` lleva el handle escalar).
 4. La landing dispara la **descarga inmediata en pantalla** con ese token → ruta gobernada `/api/public/growth/forms/.../asset/[token]` valida y devuelve un **signed URL de corta expiración** desde el bucket privado.
 5. **Email de respaldo:** consumer reactivo sobre `submission_accepted` envía el **link** (signed URL), NO el archivo adjunto (los PDFs de ~9 MB exceden límites de adjunto y ensucian entregabilidad). Sin form completado ⇒ sin token ⇒ sin descarga.
@@ -65,7 +65,7 @@ El flujo está **primitivizado + config-driven** (TASK-1375). Un ebook nuevo NO 
      --object "ebooks/<slug>/<archivo>.pdf" --apply
    ```
 
-2. Agregar una entrada al registry `scripts/growth/ebook-forms.registry.ts` (`EBOOK_FORMS`): slug, nombre, surface, origin, asset (object/filename), copy del thank-you (título/cuerpo/reward/puente) y consent version. Los campos (Nombre/Apellido/correo-corporativo/rol/consent), el gate corporativo, las policies y la ruta gated son **estándar compartidos** (no se repiten).
+2. Agregar una entrada al registry `scripts/growth/ebook-forms.registry.ts` (`EBOOK_FORMS`): slug, nombre, surface, origin, asset (object/filename), copy del thank-you (título/cuerpo/reward/puente) y consent version. Los campos (nombre completo/correo corporativo/empresa opcional/rol opcional y consentimiento único), el gate corporativo, las policies y la ruta gated son **estándar compartidos** (no se repiten).
 
 3. Publicar (idempotente — re-run = no-op; `--force` para republicar):
 

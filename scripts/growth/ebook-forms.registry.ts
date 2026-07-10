@@ -11,30 +11,81 @@ import 'server-only'
  */
 
 // ── Campos estándar (compartidos por todos los ebooks) ────────────────────────
-// Nombre, Apellido, Correo (gate corporate_email), Rol (opcional), consent.
+// Nombre completo, Correo (gate corporate_email), Empresa y Rol opcionales.
+// El consentimiento se declara una sola vez en `copy.checkboxes` del render contract;
+// no debe duplicarse como campo del schema.
 export const STANDARD_EBOOK_FIELDS = [
-  { key: 'firstName', type: 'text', label: 'Nombre', required: true, autocomplete: 'given-name', validator: 'text', maxLength: 120 },
-  { key: 'lastName', type: 'text', label: 'Apellido', required: true, autocomplete: 'family-name', validator: 'text', maxLength: 120 },
-  { key: 'email', type: 'email', label: 'Correo corporativo', required: true, autocomplete: 'email', inputMode: 'email', validator: 'corporate_email', maxLength: 200 },
+  {
+    key: 'fullName',
+    type: 'text',
+    label: 'Nombre completo',
+    required: true,
+    autocomplete: 'name',
+    validator: 'text',
+    maxLength: 160
+  },
+  {
+    key: 'email',
+    type: 'email',
+    label: 'Correo corporativo',
+    required: true,
+    autocomplete: 'email',
+    inputMode: 'email',
+    validator: 'corporate_email',
+    maxLength: 200
+  },
+  {
+    key: 'company',
+    type: 'text',
+    label: 'Empresa',
+    required: false,
+    autocomplete: 'organization',
+    validator: 'text',
+    maxLength: 160
+  },
   {
     key: 'role',
     type: 'select',
-    label: '¿Cuál es tu rol? (opcional)',
+    label: '¿Cuál es tu rol?',
     placeholder: 'Selecciona',
     required: false,
     options: [
       { value: 'direccion', label: 'Dirección / C-level' },
       { value: 'marketing', label: 'Marketing / Growth' },
-      { value: 'seo_contenidos', label: 'SEO / Contenidos' },
+      { value: 'seo_contenidos', label: 'Contenidos / Estrategia' },
       { value: 'producto_tech', label: 'Producto / Tech' },
-      { value: 'otro', label: 'Otro' },
-    ],
-  },
-  { key: 'marketingConsent', type: 'consent', required: true },
+      { value: 'otro', label: 'Otro' }
+    ]
+  }
 ] as const
 
 // El gate de correo corporativo (bloquea free/disposable), estándar para todos los ebooks.
-export const STANDARD_EBOOK_VALIDATION = { emailPolicy: { mode: 'block_field', field: 'email' } as const }
+export const STANDARD_EBOOK_VALIDATION = {
+  emailPolicy: { mode: 'block_field', field: 'email' } as const,
+  namePolicy: {
+    mode: 'split_full_name' as const,
+    sourceField: 'fullName',
+    firstNameField: 'firstName',
+    lastNameField: 'lastName',
+    confidenceField: 'nameParseConfidence'
+  }
+}
+
+// El submit público siempre verifica Turnstile; el renderer necesita este contrato browser-safe
+// para obtener el token invisible antes de enviar. La misma site key ya gobierna los formularios
+// públicos de Think, incluido el hostname think.efeoncepro.com.
+export const STANDARD_EBOOK_UI_POLICY = {
+  composition: 'static',
+  security: {
+    captcha: {
+      provider: 'turnstile',
+      required: true,
+      mode: 'invisible',
+      siteKey: '0x4AAAAAADqwX2R7v-k9pItv',
+      execution: 'submit'
+    }
+  }
+} as const
 
 // greenhouse_only: el lead se captura en Greenhouse; entrega HubSpot + email de respaldo = follow-up.
 // El ebook se entrega gated por handoff tokenizado (assetDownload), NO por form_destination.
@@ -42,7 +93,7 @@ export const STANDARD_EBOOK_DESTINATION_POLICY = {
   mode: 'greenhouse_only',
   engineDestinations: false,
   rationale:
-    'Lead capturado en Greenhouse. Entrega HubSpot + email de respaldo = follow-up. El ebook se entrega gated por handoff tokenizado (assetDownload), no por form_destination.',
+    'Lead capturado en Greenhouse. Entrega HubSpot + email de respaldo = follow-up. El ebook se entrega gated por handoff tokenizado (assetDownload), no por form_destination.'
 }
 
 export interface EbookFormConfig {
@@ -67,46 +118,61 @@ export interface EbookFormConfig {
   }
   consentVersion: string
   /** copy de ayuda + aviso legal del form. */
-  copy: { helps: Record<string, string>; submit: string; noticeText: string; privacyUrl: string; consentLabel: string }
+  copy: {
+    helps: Record<string, string>
+    errors?: Record<string, string>
+    submit: string
+    noticeText: string
+    privacyUrl: string
+    consentLabel: string
+  }
 }
 
 // La ruta gated de descarga es determinista por slug (el primitive de plataforma).
-export const downloadPathTemplateForSlug = (slug: string): string =>
-  `/api/public/growth/forms/${slug}/asset/{handle}`
+export const downloadPathTemplateForSlug = (slug: string): string => `/api/public/growth/forms/${slug}/asset/{handle}`
 
 // ── El registry ───────────────────────────────────────────────────────────────
 export const EBOOK_FORMS: EbookFormConfig[] = [
   {
     slug: 'efeonce-web-agentica-ebook',
-    name: 'Efeonce · Ebook El fin de la web',
-    purpose: 'Lead magnet del ebook "El fin de la web" (marketing + IA) — landing /web-agentica.',
+    name: 'Efeonce · Ebook El fin de la web solo para humanos',
+    purpose: 'Lead magnet del ebook "El fin de la web solo para humanos" (web agéntica) — landing /web-agentica.',
     surfaceId: 'fhsf-web-agentica-ebook',
     surfaceName: 'Efeonce Think — Ebook web agéntica',
     origins: ['https://think.efeoncepro.com'],
-    asset: { objectName: 'ebooks/web-agentica/el-fin-de-la-web.pdf', fileName: 'El-fin-de-la-web-Efeonce.pdf', ttlHours: 72 },
-    success: {
-      title: 'Tu ebook va en camino',
-      body: 'Te enviamos «El fin de la web» a tu correo y lo abrimos aquí mismo. ¿No ves el email? Revisa spam o promociones en unos minutos.',
-      rewardTitle: 'El fin de la web',
-      rewardBody: 'Marketing digital + IA. Léelo en 20 minutos, aplícalo esta semana.',
-      bridge: { label: 'Medir mi visibilidad', href: '/brand-visibility' },
+    asset: {
+      objectName: 'ebooks/web-agentica/el-fin-de-la-web.pdf',
+      fileName: 'El-fin-de-la-web-Efeonce.pdf',
+      ttlHours: 72
     },
-    consentVersion: 'efeonce-web-agentica-ebook-consent-v1',
+    success: {
+      title: 'Tu descarga está lista',
+      body: 'El PDF ya se está descargando. Si necesitas abrirlo otra vez, usa el botón mientras esta página siga abierta.',
+      rewardTitle: 'El fin de la web solo para humanos',
+      rewardBody: 'Cinco actos y un checklist para entender la web agéntica y actuar esta semana.',
+      bridge: { label: 'Medir mi visibilidad en IA', href: '/brand-visibility' }
+    },
+    consentVersion: 'efeonce-web-agentica-ebook-consent-v2',
     copy: {
       helps: {
-        'firstName.help': 'Así sabemos cómo saludarte.',
-        'lastName.help': 'Para personalizar bien la conversación.',
-        'email.help': 'Usa tu correo corporativo. El ebook está pensado para equipos y marcas reales.',
-        'role.help': 'Nos ayuda a mandarte contenido que sí te sirve.',
+        'fullName.help': 'Así personalizamos el envío.',
+        'email.help': 'Usa tu correo corporativo para recibir el ebook.',
+        'company.help': 'Opcional: nos ayuda a contextualizar el contenido.',
+        'role.help': 'Opcional: nos ayuda a enviarte contenido relevante.'
       },
-      submit: 'Enviarme el ebook',
+      errors: {
+        'fullName.error.required': 'Escribe tu nombre completo para enviarte el ebook.',
+        'email.error.required': 'Usa un correo corporativo para recibir el ebook.',
+        'consent.error.required': 'Necesitas aceptar para recibir el ebook.'
+      },
+      submit: 'Enviar y descargar el ebook',
       noticeText:
-        'Efeonce Group SpA usará estos datos para enviarte el ebook y contenido relacionado. Puedes darte de baja cuando quieras.',
+        'Efeonce Group SpA usará estos datos para enviarte el ebook y contenido relacionado. Puedes darte de baja en cualquier momento.',
       privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/',
-      consentLabel: 'Acepto recibir el ebook y contenido de Efeonce. Baja cuando quieras.',
-    },
-  },
+      consentLabel:
+        'Acepto recibir el ebook y contenido relacionado de Efeonce. Puedo darme de baja en cualquier momento.'
+    }
+  }
 ]
 
-export const getEbookFormConfig = (slug: string): EbookFormConfig | undefined =>
-  EBOOK_FORMS.find(e => e.slug === slug)
+export const getEbookFormConfig = (slug: string): EbookFormConfig | undefined => EBOOK_FORMS.find(e => e.slug === slug)

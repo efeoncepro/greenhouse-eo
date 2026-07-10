@@ -22,17 +22,18 @@ import {
   getHostSurfaceById,
   getPublishedVersionBySlug,
   insertHostSurface,
-  upsertActiveFormAsset,
+  upsertActiveFormAsset
 } from '@/lib/growth/forms/store'
 
 import {
   EBOOK_FORMS,
   STANDARD_EBOOK_DESTINATION_POLICY,
   STANDARD_EBOOK_FIELDS,
+  STANDARD_EBOOK_UI_POLICY,
   STANDARD_EBOOK_VALIDATION,
   downloadPathTemplateForSlug,
   getEbookFormConfig,
-  type EbookFormConfig,
+  type EbookFormConfig
 } from './ebook-forms.registry'
 
 const APPLY = process.argv.includes('--apply')
@@ -50,15 +51,22 @@ const buildSuccessBehavior = (cfg: EbookFormConfig) => ({
   title: cfg.success.title,
   body: cfg.success.body,
   reward: { kind: 'ebook' as const, title: cfg.success.rewardTitle, body: cfg.success.rewardBody },
-  actions: [{ kind: 'external_link' as const, label: cfg.success.bridge.label, href: cfg.success.bridge.href, target: '_self' as const }],
-  assetDownload: { downloadPathTemplate: downloadPathTemplateForSlug(cfg.slug) },
+  actions: [
+    {
+      kind: 'external_link' as const,
+      label: cfg.success.bridge.label,
+      href: cfg.success.bridge.href,
+      target: '_self' as const
+    }
+  ],
+  assetDownload: { downloadPathTemplate: downloadPathTemplateForSlug(cfg.slug) }
 })
 
 const buildCopyRefs = (cfg: EbookFormConfig) => ({
-  copy: { ...cfg.copy.helps, 'actions.submit': cfg.copy.submit },
+  copy: { ...cfg.copy.helps, ...(cfg.copy.errors ?? {}), submit: cfg.copy.submit },
   noticeText: cfg.copy.noticeText,
   privacyUrl: cfg.copy.privacyUrl,
-  checkboxes: [{ key: 'marketingConsent', label: cfg.copy.consentLabel, required: true }],
+  checkboxes: [{ key: 'marketingConsent', label: cfg.copy.consentLabel, required: true }]
 })
 
 const publishOne = async (cfg: EbookFormConfig): Promise<void> => {
@@ -71,7 +79,9 @@ const publishOne = async (cfg: EbookFormConfig): Promise<void> => {
   }
 
   if (!APPLY) {
-    console.log(`  DRY-RUN: publicaría con fields=[${STANDARD_EBOOK_FIELDS.map(f => f.key).join(', ')}], surface=${cfg.surfaceId}, asset=${cfg.asset.objectName}`)
+    console.log(
+      `  DRY-RUN: publicaría con fields=[${STANDARD_EBOOK_FIELDS.map(f => f.key).join(', ')}], surface=${cfg.surfaceId}, asset=${cfg.asset.objectName}`
+    )
 
     return
   }
@@ -86,7 +96,7 @@ const publishOne = async (cfg: EbookFormConfig): Promise<void> => {
       surfaceName: cfg.surfaceName,
       originAllowlist: cfg.origins,
       allowedFormSlugs: [cfg.slug],
-      status: 'active',
+      status: 'active'
     })
     console.log(`  surface creado: ${cfg.surfaceId}`)
   } else {
@@ -101,7 +111,7 @@ const publishOne = async (cfg: EbookFormConfig): Promise<void> => {
         objectName: cfg.asset.objectName,
         fileName: cfg.asset.fileName,
         assetKind: 'ebook',
-        ttlHours: cfg.asset.ttlHours,
+        ttlHours: cfg.asset.ttlHours
       })
 
       console.log(`  form_asset en sync: ${asset.form_asset_id}`)
@@ -125,17 +135,17 @@ const publishOne = async (cfg: EbookFormConfig): Promise<void> => {
     fieldSchema: [...STANDARD_EBOOK_FIELDS],
     validationSchema: STANDARD_EBOOK_VALIDATION,
     copyRefs: buildCopyRefs(cfg),
-    uiPolicy: { composition: 'static' },
+    uiPolicy: STANDARD_EBOOK_UI_POLICY,
     successBehavior: buildSuccessBehavior(cfg),
     destinationPolicy: STANDARD_EBOOK_DESTINATION_POLICY,
     retentionPolicy: {
       scope: 'prospect_lead_pii',
       leadPiiRetentionDays: 730,
       legalBasis: 'consent',
-      consentPolicyVersion: cfg.consentVersion,
+      consentPolicyVersion: cfg.consentVersion
     },
     consentPolicyVersion: cfg.consentVersion,
-    createdBy: 'task-1375-publish-ebook',
+    createdBy: 'task-1375-publish-ebook'
   })
 
   const asset = await upsertActiveFormAsset({
@@ -143,7 +153,7 @@ const publishOne = async (cfg: EbookFormConfig): Promise<void> => {
     objectName: cfg.asset.objectName,
     fileName: cfg.asset.fileName,
     assetKind: 'ebook',
-    ttlHours: cfg.asset.ttlHours,
+    ttlHours: cfg.asset.ttlHours
   })
 
   console.log(`  form_asset ok: ${asset.form_asset_id}`)
@@ -181,7 +191,9 @@ const main = async (): Promise<void> => {
     process.exit(1)
   }
 
-  console.log(`Publish ebook forms — mode: ${APPLY ? 'APPLY' : 'DRY-RUN'}${FORCE ? ' (force)' : ''} — targets: ${targets.length}`)
+  console.log(
+    `Publish ebook forms — mode: ${APPLY ? 'APPLY' : 'DRY-RUN'}${FORCE ? ' (force)' : ''} — targets: ${targets.length}`
+  )
 
   for (const cfg of targets) await publishOne(cfg)
 }

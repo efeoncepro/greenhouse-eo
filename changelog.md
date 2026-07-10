@@ -2,6 +2,8 @@
 
 ## 2026-07-10
 
+- **Ebook `/web-agentica` — captación y éxito post-descarga verificados.** El formulario gobernado publicado usa nombre completo, correo corporativo, empresa y rol opcionales, un consentimiento único y copy de descarga consistente; mantiene la normalización server-side hacia nombre/apellido. Tras detectar un submit rechazado, la configuración pública se republicó como versión 7 con `security.captcha` Turnstile browser-safe: el renderer obtiene y envía el token que el endpoint exige. El operador confirmó submit humano y descarga gated en producción. Think desplegó el estado post-descarga como una conclusión responsive: confirmación y reintento del archivo a la izquierda, cross-sell al grader a la derecha, explicado con precisión como medición del nivel 1 (ser encontrado y entendido) dentro de la tesis de cuatro niveles del ebook. No se declara confirmada la entrega por email ni HubSpot.
+
 - **TASK-1381 — escape hatch `build:low-memory`, selección adaptativa rechazada.** Se agregó un wrapper local explícito de 1 CPU que reutiliza prebuild/runner y falla cerrado en CI/Vercel. La cohorte n=5 no logró el target: tree RSS p50 +0,2%, p95 -6,8% y tiempo p50 +4,5% frente a 2 CPUs; por eso no existe `build:local` automático y los comandos/defaults remotos permanecen intactos.
 
 - **TASK-1380 — profiler de RSS por árbol/fase + veredicto `proceed`.** `architecture:build-baseline measure` puede muestrear root/descendientes, clasificar procesos sin argv/env y atribuir peaks a fases. La cohorte n=3 muestra que `cpus=1` reduce tree RSS p50 17,1% frente a `cpus=2` con +9,5% de tiempo; compile/typecheck dominan y `cpus=4` queda descartado. No se cambió ningún default/runtime/deploy; se propone validar un modo local low-memory separado.

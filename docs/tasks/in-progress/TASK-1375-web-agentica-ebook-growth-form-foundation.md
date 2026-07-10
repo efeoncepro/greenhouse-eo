@@ -257,7 +257,7 @@ Slices refinados: A1 migración `form_asset` → A2 ruta gated stream → A3 han
 
 - **HubSpot destination** (entrega del lead) + **property mapping del rol** (el operador aún no tiene la property mapeada) — B3.
 
-**Rollout pendiente (Runtime Rollout Completion Gate — NO operativamente completo):** subir el PDF al bucket privado de **prod**; publicar el form en prod; verificar flags (`GROWTH_FORMS_PUBLIC_API_ENABLED`, `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` para el gate corporativo); **deploy del bundle `renderer-latest.js`** (handoff `download_url`); Turnstile hostname think; smoke real browser (Turnstile + CORS) — coordinar con el embed de TASK-1374. Estado: **code complete, rollout pendiente.**
+**Rollout aplicado con cierre parcial:** el PDF privado, form publicado, renderer, Turnstile y origin Think ya sirven el submit humano y la descarga gated en producción. La evidencia no cubre por sí sola el email de respaldo ni el delivery HubSpot; esos dos consumidores permanecen como verificación operativa pendiente. Estado: **download path operativo; delivery de respaldo pendiente de evidencia.**
 
 ## Detailed Spec
 
@@ -350,3 +350,10 @@ Seguir el runbook `docs/manual-de-uso/growth/alta-surface-growth-form-checklist.
 
 - **Success contract:** confirmar en Discovery si el `tokenized_report` handoff (TASK-1336) se generaliza a un `tokenized_asset` (descarga) o si se agrega un success behavior nuevo para asset download.
 - **Epic:** `EPIC-019` por defecto (público); confirmar si va al epic del hub Think.
+
+## Delta 2026-07-10 — versión 7 de conversión publicada (descarga productiva verificada)
+
+- Se repuso el form por el publisher gobernado (`--force --apply`): versión anterior deprecada y versión 7 publicada para el `form_key` estable `db1e254c-e762-41ae-a85f-50b29dc33ba5`.
+- El contrato ahora expone `fullName` requerido, email corporativo requerido, empresa opcional y rol opcional; el `namePolicy.split_full_name` normaliza el nombre al contrato downstream de nombre/apellido. Se removió el campo `consent` duplicado: el único consentimiento vive en `copyRefs.checkboxes`.
+- Copy y tratamiento de consentimiento actualizados: CTA `Enviar y descargar el ebook`, ayuda/errores por campo y versión de consentimiento `efeonce-web-agentica-ebook-consent-v2`. El publisher escribe el key canónico `copy.submit`, que consume el renderer live. Se conservan descarga gated y puente post-success.
+- Corrección posterior al intento humano: la versión previa omitía `uiPolicy.security.captcha`, mientras el endpoint exige Turnstile fail-closed. La versión 7 expone `security.captcha` (Turnstile invisible, `execution: submit`) para que el renderer obtenga y envíe `captchaToken` antes de postear; además alinea el `successBehavior` con descarga inmediata y CTA de cross-sell al grader. El operador confirmó submit real desde Think y descarga gated del PDF. Pendiente de cierre: evidencia separada de email de respaldo y delivery HubSpot (no inferirla desde la descarga).
