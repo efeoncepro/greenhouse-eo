@@ -407,3 +407,9 @@ Landing `/web-agentica` construida nativa en `efeonce-think` (commit local, NO p
 - Think `372a09d` está desplegado en `main` (Vercel `dpl_4FTdQ3eU5YmkBDiNKmn54tciqkHT`, Ready, alias `think.efeoncepro.com`). Se retiró el recuadro inclinado que competía con el arte del hero; no se modificó el activo, que sigue pendiente de Diseño.
 - Las señales de transición hacen reveal escalonado y admiten un halo de puntero decorativo; la tesis materializa las dos interfaces con lanes conectadas; FAQ suma feedback de apertura/cierre; el footer mínimo se sustituyó por un cierre editorial con marca, navegación de recuperación, señal de futuro y metadatos legales. El significado sigue disponible sin hover o JavaScript.
 - Evidencia productiva: desktop y 390 px sin overflow; el hero no conserva borde de frame, una tarjeta responde al hover con `translateY(-6px)`, hay dos lanes y el footer es visible; en `prefers-reduced-motion` no se aplica la mejora de motion ni animaciones ambientales. No hubo errores de aplicación; los abortos de Analytics al cerrar el browser son telemetría esperada, no fallo de la landing.
+
+## Delta 2026-07-10 — estado post-descarga sin doble recuadro
+
+- Think `809778a` (Vercel `dpl_433QUV9AsVFvpWhphaJfr3YKmEYZ`, Ready) elimina el doble shell de la confirmación: al aceptar, el wrapper del formulario queda transparente y el panel de éxito es la única tarjeta blanca.
+- El `role=status` ya no tiene `tabindex`; el foco programático y visible queda restringido a `#web-agentica-success-title`. Así se conserva la notificación accesible sin que la regla global `[tabindex]:focus-visible` dibuje un borde azul alrededor de toda la conclusión.
+- Smoke productivo sintético: 1440 y 390 sin overflow, panel no focalizable, título con ring teal, sin errores ni requests fallidas de aplicación.

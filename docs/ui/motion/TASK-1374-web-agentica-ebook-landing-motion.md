@@ -54,7 +54,7 @@
 | Stat count-up | 0 | valor final | 600–900ms ease-out | conteo numérico con fuente visible | número final directo |
 | Form contract | `form.loading` | `form.ready` | 180–240ms ease-out | crossfade skeleton → renderer host | swap instantáneo con texto de estado |
 | Submit | `form.ready` | `form.submitting` | renderer-owned | pending + doble-submit deshabilitado | texto de pending estático |
-| Success | `form.submitting` | `form.success` | 0–240ms ease-out | reemplazo calmo del form por la confirmación de descarga; dos columnas sólo en desktop | swap instantáneo |
+| Success | `form.submitting` | `form.success` | 0–240ms ease-out | reemplazo calmo por una sola superficie de confirmación; dos columnas sólo en desktop | swap instantáneo |
 | FAQ toggle | colapsado | expandido | 160–240ms ease-out | altura + opacity del panel | display inmediato |
 | Signal cards | sección fuera de viewport | cards visibles | 240–420ms ease-out | stagger corto + halo por puntero opcional | cards visibles, sin halo dinámico |
 | Thesis lanes | sección fuera de viewport | dos interfaces visibles | 240–360ms ease-out | entradas opuestas + pulso conector | ambas lanes visibles, conector estático |
@@ -82,7 +82,7 @@
 
 ## Accessibility & Feedback
 
-- Focus visibility: todos los controles con foco visible; sin afordances hover-only.
+- Focus visibility: todos los controles con foco visible; sin afordances hover-only. Tras éxito, el ring se limita al heading programáticamente enfocado; el live region no es focalizable.
 - Keyboard activation: CTA/FAQ/retry usan links/botones nativos; el FAQ usa `<details>/<summary>`.
 - Live region: loading/submit/success/error usan live region polite cuando el host controla el estado.
 - Color-independent: el estado y los datos no se expresan solo por color (etiqueta + valor en texto).
@@ -116,6 +116,7 @@
 - Alternatives considered: página estática sin motion (pierde el wow del PR); GSAP orquestado como en brand-visibility (innecesario: no hay wait async ni report handoff); confetti/progreso en success (deshonesto para una descarga ya entregada).
 - Why this pattern: el usuario necesita una entrada premium de marca y datos con peso, no una consola de análisis; la entrega es gated en el mismo momento, por lo que el éxito confirma el archivo y conserva la tesis de web agéntica.
 - Delta 2026-07-10: el rectángulo inclinado detrás del visual de hero se retira por competir con el arte. Las secciones de señales y tesis reciben coreografía contenida y un halo de puntero no esencial; el footer usa entrada y pulso suave sólo como orientación de cierre. No se agrega GSAP ni una dependencia de cliente.
+- Delta 2026-07-10 (success): el wrapper del form se vuelve transparente al aceptar y la conclusión absorbe la única superficie blanca. Se quita `tabindex` del live region para que el foco permanezca en el título y no dibuje un ring global de área completa.
 - Reuse / extend / new primitive: reuse del shell de Think + CSS route-local + renderer Growth Forms; sin primitive nueva.
 - Open risks: portar los efectos sin regresión de contraste/perf; el fold no debe dañar LCP en mobile.
 - Follow-up: si algún reveal necesita GSAP, mantenerlo scoped y documentar el token de timing.

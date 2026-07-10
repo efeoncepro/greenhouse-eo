@@ -25,7 +25,7 @@
 |---|---|---|---|---|
 | `/web-agentica` landing | Entrada, posicionamiento del ebook, host del form | Hero + tesis + contenidos arriba; form dock ancla accesible por CTA de scroll. | Secciones apiladas en el mismo orden; CTA lleva al form. | Think Astro page + `BaseLayout` |
 | `<greenhouse-form>` (ebook) | Captura y submit gobernados + trigger del envío del ebook | Embebido en panel sobrio, `appearance="bare"`, con skeleton de carga. | Full-width con spacing estable y foco visible. | Growth Forms renderer |
-| Estado de éxito | Confirmación de descarga en pantalla | Reemplaza el form por una conclusión de dos columnas: descarga/recovery + cross-sell del grader como nivel 1. | Una columna, full-width. | Estado route-local del dock |
+| Estado de éxito | Confirmación de descarga en pantalla | Reemplaza el form por una sola conclusión de dos columnas: descarga/recovery + cross-sell del grader como nivel 1. | Una columna, full-width. | Estado route-local del dock |
 | Descarga gated | Entrega real del lead magnet | El handoff post-submit entrega el `download_url` de corta duración; Think sólo lo dispara y permite reintento durante la sesión. | Igual. | Greenhouse asset handoff |
 | Footer editorial | Recuperación y cierre de lectura | Marca, navegación hacia hitos de la guía y privacidad sin competir con el CTA. | Zonas apiladas; links conservan el mismo orden. | Footer route-local |
 
@@ -57,7 +57,7 @@
 | form.loading | El script/contrato del form está resolviendo. | Mount del componente | Éxito/error del contrato | Skeleton estable; sin salto de layout. |
 | form.ready | Campos gobernados disponibles. | Éxito del contrato | Usuario envía | El host no duplica campos ni validación. |
 | form.submitting | El renderer envía datos a Greenhouse. | Submit nativo | Accepted/error | El renderer previene doble submit. |
-| form.success (thank-you) | Submit aceptado; la descarga tokenizada se dispara. | Evento de éxito del renderer (con token del handoff) | n/a (final) | **Tarjeta inline** reemplaza el form (NO overlay): confirma descarga, botón gated y cross-sell al grader como nivel 1. Dos columnas en desktop, una en mobile. Foco al título, `role=status`. |
+| form.success (thank-you) | Submit aceptado; la descarga tokenizada se dispara. | Evento de éxito del renderer (con token del handoff) | n/a (final) | **Una tarjeta inline** reemplaza el form (NO overlay ni shell exterior): confirma descarga, botón gated y cross-sell al grader como nivel 1. Dos columnas en desktop, una en mobile. Foco al título; `role=status` anuncia sin recibir foco. |
 | form.error | Submit falló o el renderer devolvió error seguro. | Error del renderer | Retry/editar | Copy seguro, sin stack/API. |
 | form.denied | Origen/superficie no autorizado. | Fallo de CORS/surface guard | Fix de allowlist gobernado | Bloqueador pre-launch, no aceptable como final. |
 
@@ -74,7 +74,7 @@
 - Initial focus: default del browser; skip link al main.
 - CTA de scroll: al activar, mueve foco al heading del form dock (`Descarga el ebook gratis`).
 - Escape / click-away: ninguno; sin modal/drawer en V1.
-- Focus restore: si success/error reemplazan el form host, el foco va al heading del nuevo estado cuando es técnicamente posible.
+- Focus restore: si success/error reemplazan el form host, el foco va al heading del nuevo estado cuando es técnicamente posible. El panel de éxito no tiene `tabindex`; el ring no puede ocupar toda la conclusión.
 - Screen reader: loading/error/success usan live region polite si el host controla el estado.
 - Keyboard traversal: header, CTA, campos del form, submit, retry y summaries del FAQ alcanzables en orden de documento.
 - Footer: enlaces nativos hacia hitos de lectura y privacidad; la vitalidad visual no crea controles paralelos.
