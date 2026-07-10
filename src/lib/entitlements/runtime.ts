@@ -491,7 +491,9 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   ) {
     const hiringGovSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
 
-    for (const capability of ['hiring.opening.publish', 'hiring.application.decide', 'hiring.assessment.score'] as const) {
+    // TASK-356 — handoff.approve entra al mismo tier de gobernanza: quien decide la
+    // contratación gobierna el handoff downstream (approve/setup/complete/cancel).
+    for (const capability of ['hiring.opening.publish', 'hiring.application.decide', 'hiring.assessment.score', 'hiring.handoff.approve'] as const) {
       addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: hiringGovSource })
     }
   }

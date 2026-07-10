@@ -239,6 +239,10 @@ export const AGGREGATE_TYPES = {
   hiringCandidateFacet: 'hiring_candidate_facet',
   hiringApplication: 'hiring_application',
 
+  // TASK-356 — HiringHandoff: boundary object decisión→downstream. Identity:
+  // hiring_handoff_id ('hhof-{uuid}'). UNIQUE por hiring_application_id.
+  hiringHandoff: 'hiring_handoff',
+
   // TASK-1360 — Assessment Engine. Identities: template_id ('atpl-{uuid}'),
   // assessment_id ('asmt-{uuid}').
   hiringAssessmentTemplate: 'hiring_assessment_template',
@@ -1101,6 +1105,18 @@ export const EVENT_TYPES = {
   hiringApplicationStageChanged: 'hiring.application.stage_changed',
   hiringApplicationDecided: 'hiring.application.decided',
 
+  // TASK-356 — HiringHandoff lifecycle (v1, payload mínimo sin PII: IDs + destino + estado).
+  // created lleva el estado de nacimiento (pending o blocked:destination_not_supported);
+  // blocked/cancelled cubren tanto command como supersede/revocación del materializer.
+  // Sin consumer reactivo en V1 (audit/observabilidad; la cola la lee 770 por read-model).
+  hiringHandoffCreated: 'hiring.handoff.created',
+  hiringHandoffApproved: 'hiring.handoff.approved',
+  hiringHandoffInSetup: 'hiring.handoff.in_setup',
+  hiringHandoffCompleted: 'hiring.handoff.completed',
+  hiringHandoffBlocked: 'hiring.handoff.blocked',
+  hiringHandoffCancelled: 'hiring.handoff.cancelled',
+  hiringHandoffDecisionSuperseded: 'hiring.handoff.decision_superseded',
+
   // TASK-1360 — Assessment Engine. Sin consumer reactivo en V1 (audit/observabilidad).
   hiringAssessmentTemplateCreated: 'hiring.assessment.template_created',
   hiringAssessmentAssigned: 'hiring.assessment.assigned',
@@ -1118,6 +1134,9 @@ export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
 // ── Reactive event types (events that trigger downstream actions) ──
 
 export const REACTIVE_EVENT_TYPES = [
+  // TASK-356 — hiring.application.decided dispara hiring_handoff_materialize (domain people)
+  EVENT_TYPES.hiringApplicationDecided,
+
   // Organization 360 invalidation
   EVENT_TYPES.assignmentCreated,
   EVENT_TYPES.assignmentUpdated,
