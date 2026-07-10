@@ -104,13 +104,13 @@ Reglas obligatorias: el score sigue siendo advisory (nunca auto-reject); answer_
 
 ## Modular Placement Contract
 
-- Topology impact: `none` (hardening in-place del dominio existente)
-- Current home: `src/lib/hiring/assessment/**` (server-only, sin browser split)
-- Candidate home: el mismo (metadata; sin extracción anticipada)
-- Canonical boundary: dominio hiring/assessment; único write cross-dominio ya existente = rollup a `hiring_application` (sin cambios de boundary)
-- Server/browser split: server-only (sin cambios)
-- Build impact: nulo (sin deps nuevas)
-- Extraction blocker: ninguno nuevo
+- Topology impact: `none`
+- Current home: `src/lib/hiring/assessment/** (server-only, hardening in-place del dominio existente)`
+- Future candidate home: `remain-shared`
+- Boundary: `dominio hiring/assessment; único write cross-dominio ya existente = rollup a hiring_application (sin cambios de boundary)`
+- Server/browser split: `server-only (sin cambios)`
+- Build impact: `nulo (sin deps nuevas ni deployables)`
+- Extraction blocker: `ninguno nuevo`
 
 ## Backend/Data Contract
 
