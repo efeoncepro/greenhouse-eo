@@ -1,4 +1,8 @@
 
+## Sesion 2026-07-10 - TASK-1376 build/dependency baseline - Codex
+
+TASK-1376 quedó complete localmente sobre `develop` por override explícito, sin push/deploy. Veredicto `conditional-go`: 1.269 entrypoints; clean p50 138 s (n=3); warm p50/p95 102/124 s y RSS p95 7,51 GB (n=5); 20 deployments Vercel recientes con Ready p50/p95 4/7 min, pero FOCUS 30d `not_configured` (`billing_unavailable`, no USD 0). Analyzer oficial: Roadmap 9,61 MB y endpoints ~8,83 MB, cada trace con 2.493 Markdown; warning dinámico abarca 30.278 archivos. Primera prueba propuesta: TASK-1379 materializa el índice Roadmap y exige ≥10% p50 clean/fase atribuible, ≥10% p95 RSS, ≥75% artifact y cero Markdown en traces. ADR sigue Proposed; no autoriza apps/packages/proyectos. Audit: `docs/audits/platform/2026-07-10-greenhouse-build-dependency-baseline.md`. Tooling tests 4/4, ESLint/redaction/task/ops gates PASS. Archivos ajenos `scripts/_verify-form-asset.ts`, `scripts/hiring/verify-public-apply-smoke.mjs` y TASK-1378 preservados.
+
 ## Sesion 2026-07-10 - Release develop→main `4e7e9093d` (TASK-1362 + TASK-355 + batch) - Claude - RELEASED
 
 > **Release completo y verificado.** `develop`→`main` (50+ commits). Target SHA `4e7e9093d169ac35193e9eb882c3ee8c8a517896`,

@@ -19,6 +19,8 @@
     "local:check:full": "pnpm local:check && pnpm test && pnpm build",
     "local:check:ui": "pnpm local:check && pnpm design:lint && pnpm build",
     "actions:cost:audit": "node scripts/github-actions-cost-audit.mjs",
+    "architecture:build-baseline": "node scripts/architecture/build-baseline/index.mjs",
+    "architecture:build-baseline:test": "node --test scripts/architecture/build-baseline/*.test.mjs",
     "predev": "pnpm build:icons",
     "dev": "next dev --webpack",
     "dev:turbo": "next dev --turbopack",

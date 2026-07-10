@@ -19,7 +19,7 @@ Preliminary inventory on 2026-07-10:
 
 | Dimension | Baseline |
 | --- | ---: |
-| App Router entrypoints | 1,225 |
+| App Router entrypoints | 1,269 |
 | Pages | 279 |
 | Route handlers | 946 |
 | Files under `src/` | 6,140 |
@@ -29,6 +29,10 @@ Preliminary inventory on 2026-07-10:
 | `full-version/` size | ~25 MB |
 | Build heap ceiling | 8 GB |
 | Static generation workers | capped at 4 |
+| Local clean p50 | 138 s (n=3; p95 no publicado) |
+| Local warm p50 / p95 | 102 / 124 s (n=5) |
+| Local warm RSS p50 / p95 | 6.56 / 7.51 GB |
+| Vercel Ready p50 / p95 | 4 / 7 min (ventana CLI corta) |
 
 These are orientation values, not the accepted performance baseline. `TASK-1376` must measure p50/p95, cache state and billed build data reproducibly.
 
@@ -208,6 +212,7 @@ The release control plane must distinguish `code complete`, `deployed`, `routed`
 - Identify high-fanout dependencies and route clusters.
 - Remove safe build-context waste.
 - Select or reject the first extraction.
+- TASK-1376 verdict: `conditional-go`; first bounded experiment is the Roadmap materialized-index build-input boundary. No deployable split is authorized yet.
 
 ### Phase 1 — Workspace foundation
 

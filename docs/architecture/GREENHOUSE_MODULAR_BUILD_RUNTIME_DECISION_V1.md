@@ -10,10 +10,11 @@
 - Reversibility: `two-way-but-slow`
 - Confidence: `medium`
 - Validated as of: `2026-07-10`
+- Evidence verdict: `conditional-go`
 
 ## Context
 
-Greenhouse opera hoy como una gran aplicación Next.js que reúne portal autenticado, superficies públicas, API/BFF, administración, crons HTTP, documentación runtime, tooling y una porción importante de la operación de plataforma. El repositorio contiene, al baseline preliminar del 10 de julio de 2026, aproximadamente 1.225 entrypoints de App Router (279 páginas y 946 route handlers), 6.140 archivos bajo `src/` y mitigaciones explícitas para un build cuyo working set se acerca al límite de 8 GB de la máquina estándar de Vercel.
+Greenhouse opera hoy como una gran aplicación Next.js que reúne portal autenticado, superficies públicas, API/BFF, administración, crons HTTP, documentación runtime, tooling y una porción importante de la operación de plataforma. El baseline medido del 10 de julio de 2026 confirma 1.269 entrypoints de App Router (279 páginas y 946 route handlers), 6.140 archivos bajo `src/` y un p95 warm RSS de 7,51 GB, cerca del heap ceiling de 8 GB.
 
 El build actual ya requirió limitar workers de static generation, reservar un heap Node de 8 GB, desactivar sourcemaps fuera de producción y crear guards para builds docs-only. Estas medidas reducen síntomas, pero no reducen el grafo que debe comprender, compilar y desplegar cada cambio. A la vez, Greenhouse ya cuenta con límites de dominio, workers Cloud Run y contratos server-side suficientemente maduros para iniciar un desacople incremental.
 
@@ -61,6 +62,12 @@ docs/
 ```
 
 La forma es orientativa. `TASK-1376` decide la primera extracción; no autoriza crear todas las carpetas de una vez.
+
+## Evidence decision — TASK-1376
+
+El veredicto es `conditional-go`, no aceptación general de la topología objetivo. Baseline: local clean p50 138 s (n=3, sin p95); warm p50/p95 102/124 s y RSS p50/p95 6,56/7,51 GB (n=5); Vercel Ready p50/p95 4/7 min sobre ventana CLI corta. Billing FOCUS quedó `not_configured` y no se interpreta como costo cero.
+
+La primera prueba reversible es extraer el índice derivado Roadmap del filesystem runtime del portal. Hoy tres traces arrastran 2.493 Markdown cada uno, el analyzer produce 9,61 MB para `/roadmap` y ~8,83 MB por endpoint, y Turbopack advierte un patrón de 30.278 archivos. Hasta que un A/B demuestre reducción ≥10% de p50 clean o fase atribuible, ≥10% de p95 RSS y ≥75% del artifact Roadmap, este ADR permanece `Proposed` y no autoriza `apps/*`, `packages/*` ni proyectos Vercel.
 
 ## Alternatives considered
 
@@ -138,4 +145,5 @@ Un resultado `no-go` mantiene la optimización dentro de la app actual y deja es
 - `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
 - `docs/epics/to-do/EPIC-026-greenhouse-modular-build-runtime-decoupling.md`
-- `docs/tasks/to-do/TASK-1376-build-baseline-dependency-boundary.md`
+- `docs/tasks/in-progress/TASK-1376-build-baseline-dependency-boundary.md`
+- `docs/audits/platform/2026-07-10-greenhouse-build-dependency-baseline.md`

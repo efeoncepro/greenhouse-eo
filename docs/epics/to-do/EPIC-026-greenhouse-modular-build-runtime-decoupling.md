@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseno`
+- Status real: `Evidence gate conditional-go — Roadmap projection experiment pendiente`
 - Rank: `TBD`
 - Domain: `platform|ops|cross-domain`
 - Owner: `unassigned`
@@ -42,9 +42,9 @@ El grafo actual concentra aproximadamente 1.225 entrypoints y requiere mitigacio
 
 ## Child Tasks
 
-- `TASK-1376` — baseline cuantitativo, dependency graph, matriz de fronteras y veredicto de primera extracción.
+- `TASK-1376` ✅ evidence complete — baseline cuantitativo, dependency graph y veredicto `conditional-go`; cierre documental en curso.
 - `TASK-1377` ✅ — enforcement extraction-ready completado en templates, skills Codex/Claude repo/equipo/globales, hooks y task/ops lint; matriz de cobertura auditada.
-- `TBD` — higiene del contexto de build y materialización del índice Roadmap.
+- `TASK-1379` propuesto, no registrado — experimento A/B de materialización del índice Roadmap; requiere confirmación del operador.
 - `TBD` — workspace foundation + dependency-boundary enforcement.
 - `TBD` — extracción piloto seleccionada por `TASK-1376`.
 - `TBD` — routing/auth/release/observability multi-app.
@@ -83,3 +83,5 @@ El grafo actual concentra aproximadamente 1.225 entrypoints y requiere mitigacio
 ## Delta 2026-07-10
 
 Epic creado junto con ADR, arquitectura objetivo y `TASK-1376`. El primer gate es evidencia; ninguna reorganización de workspace queda autorizada todavía.
+
+TASK-1376 emitió `conditional-go`: local clean p50 138 s; warm p50/p95 102/124 s y RSS p95 7,51 GB; Vercel Ready p50/p95 4/7 min en ventana corta; Billing FOCUS unavailable. El hotspot probado es Roadmap: tres traces con 2.493 Markdown y artifacts analyzer de 8,83–9,61 MB. Primer experimento propuesto: TASK-1379; `apps/*`, `packages/*` y nuevos deployables siguen bloqueados.

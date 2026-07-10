@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-026`
-- Status real: `Diseno`
+- Status real: `Complete — evidence verdict conditional-go; experimento Roadmap pendiente`
 - Rank: `TBD`
 - Domain: `platform|ops`
 - Blocked by: `none`
@@ -335,21 +335,21 @@ N/A — repo/tooling + lecturas autorizadas. Si falta acceso a billing/build met
 
 ## Acceptance Criteria
 
-- [ ] Existe un comando reproducible que emite baseline JSON sanitizado y falla con errores canónicos.
-- [ ] Cada muestra declara commit, dirty state, versiones, máquina, cache state, duración y confidence.
-- [ ] El audit separa local clean, local cached y Vercel; ausencia de vendor data no aparece como costo cero.
-- [ ] El inventario confirma páginas, route handlers, build inputs y filesystem/output-tracing dependencies.
-- [ ] Existe build/import graph con high-fanout dependencies y clasificación browser/server.
-- [ ] Se compara al menos monolito optimizado, workspace foundation, public, API y admin/control-plane.
-- [ ] La recomendación contiene una sola primera frontera o un `no-go`, con rollback y TCO.
-- [ ] Los targets de ahorro derivan del baseline y no son porcentajes inventados previamente.
-- [ ] El ADR queda actualizado con evidencia y estado apropiado.
-- [ ] No se movieron rutas, no se cambió Vercel y no hubo deployment.
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Existe un comando reproducible que emite baseline JSON sanitizado y falla con errores canónicos.
+- [x] Cada muestra declara commit, dirty state, versiones, máquina, cache state, duración y confidence.
+- [x] El audit separa local clean, local cached y Vercel; ausencia de vendor data no aparece como costo cero.
+- [x] El inventario confirma páginas, route handlers, build inputs y filesystem/output-tracing dependencies.
+- [x] Existe build/import graph con high-fanout dependencies y clasificación browser/server.
+- [x] Se compara al menos monolito optimizado, workspace foundation, public, API y admin/control-plane.
+- [x] La recomendación contiene una sola primera frontera o un `no-go`, con rollback y TCO.
+- [x] Los targets de ahorro derivan del baseline y no son porcentajes inventados previamente.
+- [x] El ADR queda actualizado con evidencia y estado apropiado.
+- [x] No se movieron rutas, no se cambió Vercel y no hubo deployment.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime o DB evidence queda N/A: el cambio es tooling/docs y Vercel read-only.
+- [x] Sensitive domains tienen errores canónicos, redaction allowlist y no raw data leaks.
 
 ## Verification
 
@@ -362,25 +362,34 @@ N/A — repo/tooling + lecturas autorizadas. Si falta acceso a billing/build met
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `docs/epics/to-do/EPIC-026-greenhouse-modular-build-runtime-decoupling.md` refleja el veredicto y child-task split.
-- [ ] `docs/architecture/GREENHOUSE_MODULAR_BUILD_RUNTIME_DECISION_V1.md` refleja evidencia, confidence y estado real.
-- [ ] Se invoco `greenhouse-qa-release-auditor` y `greenhouse-documentation-governor` antes del cierre.
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real.
+- [x] el archivo vive en `complete/`.
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre.
+- [x] `Handoff.md` quedó actualizado con evidencia, deuda y próximo checkpoint.
+- [x] `changelog.md` quedó actualizado con el nuevo tooling/veredicto.
+- [x] se ejecutó chequeo de impacto cruzado sobre ADR, arquitectura, EPIC y Roadmap.
+- [x] `EPIC-026` refleja el veredicto y child-task split propuesto.
+- [x] el ADR refleja evidencia, confidence y estado real `Proposed + conditional-go`.
+- [x] se invocaron QA Release Auditor y Documentation Governor.
 
 ## Follow-ups
 
-- Task de higiene de build context / Roadmap projection, si la evidencia la prioriza.
-- Task de workspace foundation y dependency boundaries, solo con veredicto `go` o `conditional-go` satisfecho.
-- Task de primera extracción piloto, definida por la matriz y no preasignada.
-- Task de release/observability multi-app antes del primer cutover productivo.
+- `TASK-1379` propuesta, no registrada: Roadmap Materialized Index Build-Input Extraction Experiment.
+- Workspace foundation queda bloqueado hasta que el A/B Roadmap cumpla targets.
+- Admin/control-plane queda como candidato de deployable posterior, no autorizado.
+- Release/observability multi-app permanece antes de cualquier cutover productivo.
 
 ## Open Questions
 
-- ¿Qué porcentaje mínimo de reducción p95/RSS/TCO justifica el overhead operacional? Se fija después del baseline.
-- ¿La primera frontera será public, API, admin o ninguna? La task debe decidirlo con evidencia.
-- ¿El índice Roadmap debe materializarse en build, DB o artifact estático? Discovery debe comparar opciones sin implementarlas.
+- Resuelta: targets mínimos del experimento = ≥10% p50 clean o fase atribuible, ≥10% p95 RSS y ≥75% artifact Roadmap.
+- Resuelta: primera frontera experimental = Roadmap projection; primer deployable candidato posterior = admin/control-plane.
+- Abierta para `TASK-1379`: escoger build artifact, object storage o proyección persistida conservando Markdown como SSOT.
+
+## Completion Evidence
+
+- Auditoría: `docs/audits/platform/2026-07-10-greenhouse-build-dependency-baseline.md`.
+- 3 clean + 5 warm válidos; una muestra contaminada excluida explícitamente.
+- Analyzer oficial completado en 58 s; Roadmap 8,83–9,61 MB y 2.493 Markdown por trace.
+- Tests tooling `4/4`, ESLint focal PASS, redaction scan 13 JSON sin findings.
+- Vercel read-only: 20 deployments; Ready p50/p95 4/7 min; FOCUS `not_configured`.
+- QA verdict: PASS para tooling/evidence; el programa arquitectónico permanece conditional y sin rollout.
