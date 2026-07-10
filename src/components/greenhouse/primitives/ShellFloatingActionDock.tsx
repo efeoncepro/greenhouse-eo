@@ -19,7 +19,9 @@ const ShellFloatingActionDock = ({
 }: ShellFloatingActionDockProps) => {
   const pathname = usePathname()
 
-  if (pathname === '/design-system/nexa-chat') return null
+  // Hiring Desk owns its approved application shell, whose reference does not
+  // include the global floating dock. Its workflows expose actions in-context.
+  if (pathname === '/design-system/nexa-chat' || pathname?.startsWith('/agency/hiring')) return null
 
   return (
     <>
