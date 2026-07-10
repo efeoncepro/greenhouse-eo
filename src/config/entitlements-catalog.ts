@@ -2113,6 +2113,10 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // TASK-356 — HiringHandoff: gobernar las transiciones del boundary object hacia downstream
   // (approve/setup/complete/cancel). Verbo execute (gobernanza); mismo tier que decide.
   { key: 'hiring.handoff.approve', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-770 — Triage de la cola de activación hiring→HRIS (review/complete/cancel del
+  // bridge). ÚNICA capability nueva de 770: create-member reusa workforce.member.intake.update
+  // y open-onboarding reusa hr.onboarding_instance. Grant: hr routeGroup + EFEONCE_ADMIN + HR_MANAGER.
+  { key: 'hiring.activation.review', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1360 — Assessment Engine. read: catálogo/plantillas/instancias + scorecard. author: crear
   // plantillas/preguntas + asignar instancias. score: registrar/corregir puntaje humano + finalizar.
   { key: 'hiring.assessment.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },

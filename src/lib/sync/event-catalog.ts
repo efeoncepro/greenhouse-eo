@@ -243,6 +243,10 @@ export const AGGREGATE_TYPES = {
   // hiring_handoff_id ('hhof-{uuid}'). UNIQUE por hiring_application_id.
   hiringHandoff: 'hiring_handoff',
 
+  // TASK-770 — Bridge hiring→HRIS. Identity: activation_request_id ('hact-{uuid}').
+  // UNIQUE por hiring_handoff_id.
+  hiringActivationRequest: 'hiring_activation_request',
+
   // TASK-1360 — Assessment Engine. Identities: template_id ('atpl-{uuid}'),
   // assessment_id ('asmt-{uuid}').
   hiringAssessmentTemplate: 'hiring_assessment_template',
@@ -1116,6 +1120,11 @@ export const EVENT_TYPES = {
   hiringHandoffBlocked: 'hiring.handoff.blocked',
   hiringHandoffCancelled: 'hiring.handoff.cancelled',
   hiringHandoffDecisionSuperseded: 'hiring.handoff.decision_superseded',
+
+  // TASK-770 — Eventos puente del bridge de activación (v1, sin PII; solo los que el
+  // lifecycle workforce NO emite ya — member.created/intake_completed/onboarding.* existen).
+  hiringActivationLinked: 'hiring.activation.linked',
+  hiringActivationCompleted: 'hiring.activation.completed',
 
   // TASK-1360 — Assessment Engine. Sin consumer reactivo en V1 (audit/observabilidad).
   hiringAssessmentTemplateCreated: 'hiring.assessment.template_created',

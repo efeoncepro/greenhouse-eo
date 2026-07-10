@@ -723,6 +723,25 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-770 — Triage del bridge de activación hiring→HRIS (cola/review/complete/cancel).
+  // HR opera la activación: hr routeGroup ∪ EFEONCE_ADMIN ∪ HR_MANAGER. Las demás acciones
+  // del bridge reusan workforce.member.intake.update / hr.onboarding_instance (arriba).
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER)
+  ) {
+    const hiringActivationSource: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.activation.review',
+      action: 'execute',
+      scope: 'tenant',
+      source: hiringActivationSource
+    })
+  }
+
   // TASK-947 — Nexa Insights detail page canonical /nexa/insights/[id].
   // Capability `nexa.insights.read` seedeada en capabilities_registry; este
   // grant garantiza que el page render sea accesible end-to-end (invariant
