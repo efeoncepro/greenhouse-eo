@@ -325,6 +325,7 @@ Sin flag nueva — fix determinista de primitives con **versionado como mecanism
 
 ## Follow-ups
 
+- **Guard anti-downgrade de findings (hallazgo post-cierre 2026-07-11):** un `POST /score` desde un runtime SIN extracción de prosa (local/Vercel) re-normaliza y PISA los findings ricos que el worker computó con prosa (mismo schema_version → upsert). Ahora es VISIBLE (`proseExtraction.status`) pero sigue siendo destructivo. Propuesta: el upsert no debe reemplazar un finding `prose ok` con uno `disabled/not_configured`, o el endpoint score debe rechazar recompute desde runtimes sin extracción.
 - ISSUE-113: arreglar de raíz la config Vertex del path brand-intelligence (mitigado por fallthrough).
 - Evaluar exposición del desglose `partial` (qué provider×prompt faltó) en el reporte público (hoy solo en run detail).
 - Re-publicar informe SKY + swap del enlace en la propuesta (operador, out-of-band).
