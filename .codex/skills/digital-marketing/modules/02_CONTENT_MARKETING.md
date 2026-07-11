@@ -3,6 +3,12 @@
 > Crear y **distribuir** contenido de valor para atraer y enganchar audiencia. En 2026 el
 > filtro sube: sin insight original ni distribución, el contenido muere. La *táctica SEO/
 > schema* es de `seo-aeo`; el *content loop* de growth es de `growth-marketing-cro`.
+>
+> **Hand-off a `content-marketing-studio`:** este módulo decide el **rol del contenido en el
+> mix** (estrategia de canal, content-led demand). La **ejecución profunda del motor de
+> contenidos** — content ops/pipeline, producción, atomización/repurposing, formatos a fondo,
+> distribución y medición contenido→pipeline — es del studio `content-marketing-studio` (mismo
+> patrón que este skill hace hand-off de social a `social-media-studio`).
 
 ## 1. Estrategia antes que calendario
 
@@ -81,5 +87,6 @@ convierten ~4.4× vs orgánico. Implicación para content marketing:
 - Mensaje que guía el contenido → `01`; amplificar con paid → `03`; social/creator → `04`
 - Newsletter como canal → `06`; campaña integrada → `07`
 - Táctica SEO/AEO/schema → `seo-aeo`; content loop + atribución → `growth-marketing-cro`
+- **Ejecución profunda del motor de contenidos** (ops/pipeline, atomización, formatos, medición) → skill **`content-marketing-studio`**
 - Motor real en el repo (AI Content Factory) → `efeonce/CONTENT_ENGINE.md`
 - Artefactos → `templates/content-calendar.md`, `templates/content-brief.md`

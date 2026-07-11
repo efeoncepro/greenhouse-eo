@@ -38,6 +38,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Secret hygiene / rotación | `greenhouse-secret-hygiene` | inline (Secret Manager Hygiene) |
 | Sitio público (landings/posicionamiento/roadmap del sitio) | `efeonce-public-site-wordpress` + `seo-aeo`/`commercial-expert` | `docs/public-site/` (README índice + PRODUCT_ROADMAP + `decisions/` PDR ≠ ADR) |
 | Licitaciones públicas y privadas / RFP-RFQ (Chile + LATAM, bid/no-bid, ChileCompra, garantías) | `greenhouse-public-private-tenders` (+ `commercial-expert`) | `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (módulo runtime) |
+| Content marketing: motor de contenidos (editorial/ops/atomización/distribución/medición, blog/newsletter/ebook/webinar) | `content-marketing-studio` (+ `digital-marketing`/`copywriting`/`seo-aeo`) | inline (studio de ejecución; `digital-marketing` módulo 02 le hace hand-off) |
 
 ### Business Context Pack
 
