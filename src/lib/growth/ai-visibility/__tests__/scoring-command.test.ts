@@ -7,6 +7,7 @@ import {
   FIXTURE_SKIPPED
 } from '../evals/observation-fixtures'
 import { type NormalizedFinding } from '../normalization/contracts'
+import { AI_VISIBILITY_SCORE_VERSION } from '../scoring/config'
 import { type PersistedGraderScore } from '../scoring/engine'
 
 const captured: { findings: NormalizedFinding[]; score: PersistedGraderScore | null } = {
@@ -81,7 +82,7 @@ describe('growth/ai-visibility — scoreGraderRun command', () => {
     // 4 observaciones (incl. skipped) → 4 findings persistidos.
     expect(findings).toHaveLength(4)
     expect(captured.findings).toHaveLength(4)
-    expect(score.scoreVersion).toBe('ai_visibility_score_v1')
+    expect(score.scoreVersion).toBe(AI_VISIBILITY_SCORE_VERSION)
 
     // Descubrimiento sin marca → AI Visibility con piso real.
     const aiVis = score.dimensions.find(d => d.key === 'ai_visibility')

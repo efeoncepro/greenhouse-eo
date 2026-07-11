@@ -8,7 +8,10 @@
  * `score_version` produce el mismo score (determinismo). PURO.
  */
 
-export const AI_VISIBILITY_SCORE_VERSION = 'ai_visibility_score_v1' as const
+// TASK-1390 (ISSUE-120): v2 = sourceTypes clasificados + same-site domain matching +
+// prose-extraction outcome. Los scores v1 quedan como historia versionada (conviven;
+// mismo run + misma versión sigue siendo reproducible — la lógica nueva SOLO escribe v2).
+export const AI_VISIBILITY_SCORE_VERSION = 'ai_visibility_score_v2' as const
 
 export type GraderScoreVersion = typeof AI_VISIBILITY_SCORE_VERSION
 

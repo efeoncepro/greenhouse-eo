@@ -14,7 +14,9 @@ import {
   type GrowthAiVisibilitySourceType
 } from '../contracts'
 
-export const NORMALIZED_FINDING_SCHEMA_VERSION = 'normalized_finding_v1' as const
+// TASK-1390 (ISSUE-120): v2 = +proseExtraction, sourceTypes clasificados, presencia same-site.
+// Las filas v1 conviven (UNIQUE incluye schema_version); el reader prefiere la versión más nueva.
+export const NORMALIZED_FINDING_SCHEMA_VERSION = 'normalized_finding_v2' as const
 
 /** Provider del finding: providers del grader + `manual_import` (evidencia cargada a mano). */
 export const NORMALIZED_FINDING_PROVIDERS = [
