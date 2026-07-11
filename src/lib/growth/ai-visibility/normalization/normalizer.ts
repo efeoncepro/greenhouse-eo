@@ -23,6 +23,7 @@ import {
   type NormalizedFinding,
   type NormalizedFindingProvider
 } from './contracts'
+import { classifySourceType } from './source-type-classifier'
 
 export interface NormalizationContext {
   /** Nombre de la marca sujeto del grado. */
@@ -70,15 +71,21 @@ const nameAppearsInText = (name: string, text: string): boolean => {
 
 const dedupe = (values: string[]): string[] => [...new Set(values.filter(Boolean))]
 
+/**
+ * TASK-1390 (ISSUE-120 Gap A): el `sourceType` explícito del provider manda; sin él,
+ * clasificación determinista por dominio (antes todo caía a 'unknown' y
+ * `citation_quality` era estructuralmente 0).
+ */
 const resolveSourceTypes = (
-  observation: GrowthAiVisibilityProviderObservation
+  observation: GrowthAiVisibilityProviderObservation,
+  subjectDomain: string | null
 ): GrowthAiVisibilitySourceType[] => {
   if (observation.citations.length === 0) {
     return []
   }
 
   return dedupe(
-    observation.citations.map(citation => citation.sourceType ?? 'unknown')
+    observation.citations.map(citation => citation.sourceType ?? classifySourceType(citation.domain, subjectDomain))
   ) as GrowthAiVisibilitySourceType[]
 }
 
@@ -186,7 +193,7 @@ export const normalizeObservation = (
     brandMentioned: presence.brandMentioned,
     competitorsMentioned: resolveCompetitors(observation, context),
     citationDomains,
-    sourceTypes: resolveSourceTypes(observation),
+    sourceTypes: resolveSourceTypes(observation, context.subjectDomain),
     commercialIntentMatch: resolveCommercialIntent(presence.brandMentioned, tag),
     confidence: presence.confidence
     // sentimentLabel/sentimentScore/categoryAssociations/messageDriftClaims/brandRank
