@@ -3,8 +3,8 @@
  * NO es un archivo de test (sin `.test.ts`): provee builders deterministas.
  */
 
-import { type NormalizedFinding } from '../normalization/contracts'
-import { SCORE_DIMENSION_CONFIG_BY_KEY, type ScoreDimensionKey } from '../scoring/config'
+import { NORMALIZED_FINDING_SCHEMA_VERSION, type NormalizedFinding } from '../normalization/contracts'
+import { AI_VISIBILITY_SCORE_VERSION, SCORE_DIMENSION_CONFIG_BY_KEY, type ScoreDimensionKey } from '../scoring/config'
 import { type DimensionScore, type PersistedGraderScore } from '../scoring/engine'
 
 export const makeDimension = (key: ScoreDimensionKey, score: number | null): DimensionScore => {
@@ -37,7 +37,7 @@ export const makeScore = (
     weightSum === 0 ? null : Math.round((scored.reduce((sum, d) => sum + d.score * d.weight, 0) / weightSum) * 10) / 10
 
   return {
-    scoreVersion: 'ai_visibility_score_v1',
+    scoreVersion: AI_VISIBILITY_SCORE_VERSION,
     runId: 'run-fixture',
     overallScore,
     scoreStatus: 'completed',
@@ -74,7 +74,7 @@ export const makeFinding = (overrides: Partial<NormalizedFinding> = {}): Normali
   proseExtraction: null,
     confidence: 0.8,
     trustSignal: null,
-    schemaVersion: 'normalized_finding_v1',
+    schemaVersion: NORMALIZED_FINDING_SCHEMA_VERSION,
     ...overrides
   }
 }

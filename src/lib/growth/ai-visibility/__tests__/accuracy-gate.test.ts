@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { AI_VISIBILITY_SCORE_VERSION } from '../scoring/config'
+
 import { type AccuracyFinding } from '../accuracy'
 import { type RawGraderScore } from '../scoring/engine'
 import { BRAND_ACCURACY_REVIEW_REASON, resolveScoreStatus } from '../review-gates/gates'
@@ -7,7 +9,7 @@ import { makeFinding } from './report-fixtures'
 
 // Score crudo con cobertura suficiente (no insufficient_data) y sin riesgo de lenguaje.
 const healthyRaw: RawGraderScore = {
-  scoreVersion: 'ai_visibility_score_v1',
+  scoreVersion: AI_VISIBILITY_SCORE_VERSION,
   runId: 'run-acc',
   overallScore: 40,
   dimensions: [],

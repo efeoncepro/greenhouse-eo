@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import { AI_VISIBILITY_SCORE_VERSION } from '../scoring/config'
+
 import { type PersistedGraderScore } from '../scoring/engine'
 import { toPublicSafeScore } from '../scoring/dto'
 
 const SCORE: PersistedGraderScore = {
-  scoreVersion: 'ai_visibility_score_v1',
+  scoreVersion: AI_VISIBILITY_SCORE_VERSION,
   runId: 'run-1',
   overallScore: 42.5,
   scoreStatus: 'completed',

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { AI_VISIBILITY_SCORE_VERSION } from '../scoring/config'
+
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 
 import { buildGraderReport, type ReportRunMeta } from '../report/builder'
@@ -217,7 +219,7 @@ describe('growth/ai-visibility — report builder', () => {
     expect(report.provenance.asOfDate).toBe('2026-06-24T12:00:00.000Z')
     expect(report.provenance.providersSampled).toEqual(['gemini', 'openai'])
     expect(report.provenance.promptCount).toBe(2)
-    expect(report.provenance.scoreVersion).toBe('ai_visibility_score_v1')
+    expect(report.provenance.scoreVersion).toBe(AI_VISIBILITY_SCORE_VERSION)
     expect(report.disclaimer).toBe(GH_GROWTH_AI_VISIBILITY.disclaimer)
   })
 })
