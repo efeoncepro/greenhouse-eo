@@ -62,6 +62,33 @@ export type SentimentLabel = (typeof SENTIMENT_LABELS)[number]
 export const COMMERCIAL_INTENT_MATCH_VALUES = ['yes', 'no', 'partial', 'unknown'] as const
 export type CommercialIntentMatch = (typeof COMMERCIAL_INTENT_MATCH_VALUES)[number]
 
+/**
+ * TASK-1390 (ISSUE-120 Gap C) — estado del intento de extracción de prosa.
+ * Vive acá (y no en prose-extraction/contracts) porque el finding lo persiste;
+ * prose-extraction lo re-exporta para sus providers/router.
+ */
+export const PROSE_EXTRACTION_STATUSES = [
+  'ok',
+  'disabled',
+  'not_configured',
+  'empty_excerpt',
+  'schema_invalid',
+  'provider_error'
+] as const
+
+export type ProseExtractionStatus = (typeof PROSE_EXTRACTION_STATUSES)[number]
+
+/**
+ * Resultado del intento de extracción de prosa sobre el finding. `ran=false` con su
+ * `status` hace la degradación DIAGNOSTICABLE (antes se descartaba y `sentiment
+ * unknown` era indistinguible de "no corrió"). `null` = finding anterior al contrato v2.
+ */
+export interface ProseExtractionOutcome {
+  ran: boolean
+  status: ProseExtractionStatus
+  provider: string | null
+}
+
 export interface NormalizedFinding {
   findingId: string
   runId: string
@@ -77,6 +104,8 @@ export interface NormalizedFinding {
   citationDomains: string[]
   sourceTypes: GrowthAiVisibilitySourceType[]
   commercialIntentMatch: CommercialIntentMatch
+  /** TASK-1390: resultado del intento de extracción de prosa; null = finding anterior al contrato v2. */
+  proseExtraction: ProseExtractionOutcome | null
   /** Trazabilidad de confianza del muestreo (0..1): fracción de runs que coinciden / certeza de extracción. */
   confidence: number
   /** Señal de confianza/reputación opcional (ej. `no_independent_reviews_found`); null si no aplica. */
@@ -97,6 +126,20 @@ const isSentimentLabel = (value: unknown): value is SentimentLabel =>
 
 const isCommercialIntentMatch = (value: unknown): value is CommercialIntentMatch =>
   typeof value === 'string' && (COMMERCIAL_INTENT_MATCH_VALUES as readonly string[]).includes(value)
+
+const isProseExtractionStatus = (value: unknown): value is ProseExtractionStatus =>
+  typeof value === 'string' && (PROSE_EXTRACTION_STATUSES as readonly string[]).includes(value)
+
+const isProseExtractionOutcome = (value: unknown): value is ProseExtractionOutcome => {
+  if (typeof value !== 'object' || value === null) return false
+  const o = value as Record<string, unknown>
+
+  return (
+    typeof o.ran === 'boolean' &&
+    isProseExtractionStatus(o.status) &&
+    (o.provider === null || typeof o.provider === 'string')
+  )
+}
 
 const isSourceType = (value: unknown): value is GrowthAiVisibilitySourceType =>
   typeof value === 'string' && (GROWTH_AI_VISIBILITY_SOURCE_TYPES as readonly string[]).includes(value)
@@ -141,6 +184,8 @@ export const validateNormalizedFinding = (input: unknown): NormalizedFinding => 
   if (!isStringArray(f.citationDomains)) fail('citationDomains')
   if (!(Array.isArray(f.sourceTypes) && f.sourceTypes.every(isSourceType))) fail('sourceTypes')
   if (!isCommercialIntentMatch(f.commercialIntentMatch)) fail('commercialIntentMatch')
+  // Campo TASK-1390: los findings/payloads legacy no lo traen — ausencia ≡ null.
+  if (!(f.proseExtraction == null || isProseExtractionOutcome(f.proseExtraction))) fail('proseExtraction')
   if (!(typeof f.confidence === 'number' && f.confidence >= 0 && f.confidence <= 1)) fail('confidence')
   if (!(f.trustSignal === null || typeof f.trustSignal === 'string')) fail('trustSignal')
   if (f.schemaVersion !== NORMALIZED_FINDING_SCHEMA_VERSION) fail('schemaVersion')
@@ -182,7 +227,45 @@ export const createEmptyNormalizedFinding = (input: {
   citationDomains: [],
   sourceTypes: [],
   commercialIntentMatch: 'unknown',
+  proseExtraction: null,
   confidence: 0,
   trustSignal: null,
   schemaVersion: NORMALIZED_FINDING_SCHEMA_VERSION
 })
+
+/** Statuses de extracción que constituyen degradación NO intencional (alimenta la señal de reliability). */
+export const PROSE_EXTRACTION_DEGRADED_STATUSES = ['not_configured', 'schema_invalid', 'provider_error'] as const
+
+/** Agregado diagnosticable del intento de extracción de prosa de un set de findings (TASK-1390 Gap C). */
+export interface ProseExtractionSummary {
+  total: number
+  ran: number
+  degraded: number
+  byStatus: Partial<Record<ProseExtractionStatus, number>>
+}
+
+export const summarizeProseExtraction = (findings: NormalizedFinding[]): ProseExtractionSummary => {
+  const byStatus: Partial<Record<ProseExtractionStatus, number>> = {}
+  let ran = 0
+  let degraded = 0
+
+  for (const finding of findings) {
+    const outcome = finding.proseExtraction
+
+    if (!outcome) {
+      continue
+    }
+
+    byStatus[outcome.status] = (byStatus[outcome.status] ?? 0) + 1
+
+    if (outcome.ran) {
+      ran += 1
+    }
+
+    if ((PROSE_EXTRACTION_DEGRADED_STATUSES as readonly string[]).includes(outcome.status)) {
+      degraded += 1
+    }
+  }
+
+  return { total: findings.length, ran, degraded, byStatus }
+}

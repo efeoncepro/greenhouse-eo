@@ -33,6 +33,7 @@ const projectFinding = (row: RawFinding): NormalizedFinding => ({
   citationDomains: (row.citation_domains as string[] | null) ?? [],
   sourceTypes: (row.source_types as NormalizedFinding['sourceTypes'] | null) ?? [],
   commercialIntentMatch: row.commercial_intent_match as NormalizedFinding['commercialIntentMatch'],
+  proseExtraction: (row.prose_extraction as NormalizedFinding['proseExtraction'] | null) ?? null,
   confidence: Number(row.confidence ?? 0),
   trustSignal: (row.trust_signal as string | null) ?? null,
   schemaVersion: row.schema_version as NormalizedFinding['schemaVersion']
@@ -62,8 +63,8 @@ export const upsertNormalizedFindings = async (findings: NormalizedFinding[]): P
          (finding_id, run_id, prompt_id, provider, brand_mentioned, brand_rank,
           competitors_mentioned, sentiment_label, sentiment_score, category_associations,
           message_drift_claims, citation_domains, source_types, commercial_intent_match,
-          confidence, trust_signal, schema_version)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+          confidence, trust_signal, schema_version, prose_extraction)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
        ON CONFLICT (run_id, prompt_id, provider, schema_version) DO UPDATE SET
          brand_mentioned = EXCLUDED.brand_mentioned,
          brand_rank = EXCLUDED.brand_rank,
@@ -77,6 +78,7 @@ export const upsertNormalizedFindings = async (findings: NormalizedFinding[]): P
          commercial_intent_match = EXCLUDED.commercial_intent_match,
          confidence = EXCLUDED.confidence,
          trust_signal = EXCLUDED.trust_signal,
+         prose_extraction = EXCLUDED.prose_extraction,
          updated_at = NOW()`,
       [
         f.findingId,
@@ -95,7 +97,8 @@ export const upsertNormalizedFindings = async (findings: NormalizedFinding[]): P
         f.commercialIntentMatch,
         f.confidence,
         f.trustSignal,
-        f.schemaVersion
+        f.schemaVersion,
+        f.proseExtraction === null ? null : JSON.stringify(f.proseExtraction)
       ]
     )
   }
@@ -104,8 +107,17 @@ export const upsertNormalizedFindings = async (findings: NormalizedFinding[]): P
 }
 
 export const getNormalizedFindings = async (runId: string): Promise<NormalizedFinding[]> => {
+  // TASK-1390: los findings conviven por schema_version (UNIQUE incluye la versión).
+  // Un run re-scoreado con el contrato nuevo tendría filas v1 + v2 → devolver SOLO la
+  // versión más nueva por (prompt, provider); los runs legacy (solo v1) no cambian.
   const rows = await runGreenhousePostgresQuery<RawFinding>(
-    `SELECT * FROM greenhouse_growth.normalized_findings WHERE run_id = $1 ORDER BY created_at ASC`,
+    `SELECT * FROM (
+       SELECT DISTINCT ON (prompt_id, provider) *
+       FROM greenhouse_growth.normalized_findings
+       WHERE run_id = $1
+       ORDER BY prompt_id, provider, schema_version DESC
+     ) latest
+     ORDER BY created_at ASC`,
     [runId]
   )
 

@@ -33,11 +33,13 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ru
   const { runId } = await params
 
   try {
-    const { score, findings } = await scoreGraderRun({ runId })
+    const { score, findings, proseExtraction } = await scoreGraderRun({ runId })
 
     return NextResponse.json({
       score,
       findingCount: findings.length,
+      // TASK-1390 (Gap C): degradación de la extracción de prosa diagnosticable en el response.
+      proseExtraction,
       publicSafe: toPublicSafeScore(score)
     })
   } catch (error) {

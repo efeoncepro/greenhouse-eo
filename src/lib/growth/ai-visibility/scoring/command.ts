@@ -17,7 +17,7 @@ import { extractCitationDomain } from '../observation'
 import { getGraderProfile, getGraderRun, getRunObservations, type GraderExecutionPrompt } from '../store'
 import { normalizeObservation } from '../normalization/normalizer'
 import { enrichFindingWithLlm } from '../normalization/llm-extraction'
-import { type NormalizedFinding } from '../normalization/contracts'
+import { summarizeProseExtraction, type NormalizedFinding, type ProseExtractionSummary } from '../normalization/contracts'
 import {
   isPromptFamily,
   isPromptFanOutType,
@@ -42,6 +42,8 @@ export class GraderScoringError extends Error {
 export interface ScoreGraderRunResult {
   score: PersistedGraderScore
   findings: NormalizedFinding[]
+  /** TASK-1390 (Gap C): agregado diagnosticable del intento de extracción de prosa. */
+  proseExtraction: ProseExtractionSummary
 }
 
 /**
@@ -146,7 +148,7 @@ export const scoreGraderRun = async (input: {
       reviewReasons: status.reviewReasons
     })
 
-    return { score, findings }
+    return { score, findings, proseExtraction: summarizeProseExtraction(findings) }
   } catch (error) {
     captureWithDomain(error, 'growth', {
       tags: { source: 'growth_ai_visibility_scoring_command' },
@@ -161,7 +163,12 @@ export const scoreGraderRun = async (input: {
 export const readGraderScore = async (
   runId: string,
   scoreVersion?: string
-): Promise<{ score: PersistedGraderScore | null; findings: NormalizedFinding[] }> => ({
-  score: await getGraderScore(runId, scoreVersion),
-  findings: await getNormalizedFindings(runId)
-})
+): Promise<{
+  score: PersistedGraderScore | null
+  findings: NormalizedFinding[]
+  proseExtraction: ProseExtractionSummary
+}> => {
+  const [score, findings] = await Promise.all([getGraderScore(runId, scoreVersion), getNormalizedFindings(runId)])
+
+  return { score, findings, proseExtraction: summarizeProseExtraction(findings) }
+}

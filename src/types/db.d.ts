@@ -6896,6 +6896,10 @@ export interface GreenhouseGrowthNormalizedFindings {
   finding_id: string;
   message_drift_claims: Generated<string[]>;
   prompt_id: string;
+  /**
+   * TASK-1390: resultado del intento de extracción de prosa ({ran,status,provider}); NULL = finding anterior al contrato v2.
+   */
+  prose_extraction: Json | null;
   provider: string;
   run_id: string;
   schema_version: string;

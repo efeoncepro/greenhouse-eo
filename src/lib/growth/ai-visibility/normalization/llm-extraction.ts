@@ -38,7 +38,7 @@ export const enrichFindingWithLlm = async (
 ): Promise<NormalizedFinding> => {
   const excerpt = observation.answerExcerpt ?? ''
 
-  const { fields } = await runProseExtraction(
+  const { fields, metadata } = await runProseExtraction(
     {
       excerpt,
       subjectBrand: context.subjectBrand,
@@ -48,14 +48,25 @@ export const enrichFindingWithLlm = async (
     { telemetry: { runId: observation.runId, promptId: observation.promptId, provider: observation.provider } }
   )
 
+  // TASK-1390 (ISSUE-120 Gap C): la metadata del router ya no se descarta — el finding
+  // registra si la extracción corrió y, si degradó, POR QUÉ (antes `sentiment unknown`
+  // era indistinguible de "la extracción no corrió").
+  const proseExtraction = {
+    ran: metadata.status === 'ok',
+    status: metadata.status,
+    provider: metadata.providerId
+  }
+
   // Degradación honesta: flag OFF, excerpt vacío, schema inválido o error de
-  // proveedor → el router devuelve fields=null y el determinista queda intacto.
+  // proveedor → el router devuelve fields=null y el determinista queda intacto
+  // (solo se anota el outcome del intento).
   if (!fields) {
-    return finding
+    return { ...finding, proseExtraction }
   }
 
   return {
     ...finding,
+    proseExtraction,
     // Refina brandMentioned SOLO si el determinista quedó ambiguo/unknown (el dominio manda cuando es 'yes'/'no').
     brandMentioned:
       finding.brandMentioned === 'unknown' || finding.brandMentioned === 'ambiguous'

@@ -71,6 +71,7 @@ export const makeFinding = (overrides: Partial<NormalizedFinding> = {}): Normali
     citationDomains: [],
     sourceTypes: [],
     commercialIntentMatch: 'unknown',
+  proseExtraction: null,
     confidence: 0.8,
     trustSignal: null,
     schemaVersion: 'normalized_finding_v1',

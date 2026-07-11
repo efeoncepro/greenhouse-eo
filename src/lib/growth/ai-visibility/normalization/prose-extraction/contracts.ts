@@ -82,14 +82,14 @@ export interface ProseExtractionProvider {
   extract(input: ProseExtractionInput): Promise<ProseExtractionProviderResponse>
 }
 
-/** Estado del intento de extracción (observabilidad/eval). `ok` = fields presentes. */
-export type ProseExtractionStatus =
-  | 'ok'
-  | 'disabled'
-  | 'not_configured'
-  | 'empty_excerpt'
-  | 'schema_invalid'
-  | 'provider_error'
+/**
+ * Estado del intento de extracción (observabilidad/eval). `ok` = fields presentes.
+ * TASK-1390: la fuente del enum vive en `../contracts` (el finding lo persiste);
+ * acá se re-exporta para providers/router.
+ */
+export type { ProseExtractionStatus } from '../contracts'
+
+import { type ProseExtractionStatus } from '../contracts'
 
 /** Campos de prosa ya validados/sanitizados que el dominio puede mergear al finding. */
 export interface ProseExtractionFields {

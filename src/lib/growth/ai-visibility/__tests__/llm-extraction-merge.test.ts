@@ -52,13 +52,17 @@ afterEach(() => {
 })
 
 describe('enrichFindingWithLlm — merge semantics (TASK-1271 sobre el router)', () => {
-  it('fields null (router degradó) → devuelve el finding determinista intacto', async () => {
-    runProseExtractionMock.mockResolvedValue({ fields: null, metadata: { status: 'disabled' } })
+  it('fields null (router degradó) → determinista intacto + outcome anotado (TASK-1390)', async () => {
+    runProseExtractionMock.mockResolvedValue({ fields: null, metadata: { status: 'disabled', providerId: null } })
 
     const finding = deterministicFinding({ brandMentioned: 'no', confidence: 0.9 })
     const result = await enrichFindingWithLlm(finding, baseObservation, context)
 
-    expect(result).toBe(finding)
+    // Los campos deterministas quedan intactos; solo se anota el outcome del intento.
+    expect(result.brandMentioned).toBe('no')
+    expect(result.confidence).toBe(0.9)
+    expect(result.sentimentLabel).toBe('unknown')
+    expect(result.proseExtraction).toEqual({ ran: false, status: 'disabled', provider: null })
   })
 
   it('NO sobrescribe brandMentioned cuando el determinista ya resolvió yes/no', async () => {
@@ -120,5 +124,59 @@ describe('enrichFindingWithLlm — merge semantics (TASK-1271 sobre el router)',
 
     // Sólo IDs canónicos pueden salir; un candidato libre no mapeado no se publica como string crudo.
     expect(result.categoryAssociations).not.toContain('una categoría inventada que no existe en la taxonomía')
+  })
+})
+
+describe('TASK-1390 (ISSUE-120 Gap C) — el outcome de la extracción se anota, no se descarta', () => {
+  beforeEach(() => {
+    runProseExtractionMock.mockReset()
+  })
+
+  it('degradación (fields=null) → finding determinista intacto + proseExtraction con la causa', async () => {
+    runProseExtractionMock.mockResolvedValue({
+      fields: null,
+      metadata: {
+        providerId: 'anthropic',
+        model: null,
+        version: 'prose-extraction.v1',
+        status: 'not_configured',
+        costEstimateUsd: 0,
+        latencyMs: 0,
+        usage: null
+      }
+    })
+
+    const deterministic = deterministicFinding()
+    const enriched = await enrichFindingWithLlm(deterministic, baseObservation, context)
+
+    expect(enriched.sentimentLabel).toBe('unknown') // determinista intacto
+    expect(enriched.proseExtraction).toEqual({ ran: false, status: 'not_configured', provider: 'anthropic' })
+  })
+
+  it('extracción ok → proseExtraction.ran=true con provider', async () => {
+    runProseExtractionMock.mockResolvedValue({
+      fields: {
+        brandMentioned: 'yes',
+        sentimentLabel: 'positive',
+        sentimentScore: 0.6,
+        categoryAssociations: [],
+        messageDriftClaims: [],
+        confidence: 0.8
+      },
+      metadata: {
+        providerId: 'anthropic',
+        model: 'claude',
+        version: 'prose-extraction.v1',
+        status: 'ok',
+        costEstimateUsd: 0.001,
+        latencyMs: 900,
+        usage: null
+      }
+    })
+
+    const enriched = await enrichFindingWithLlm(deterministicFinding(), baseObservation, context)
+
+    expect(enriched.sentimentLabel).toBe('positive')
+    expect(enriched.proseExtraction).toEqual({ ran: true, status: 'ok', provider: 'anthropic' })
   })
 })

@@ -22,6 +22,7 @@ export const GROWTH_AI_VISIBILITY_INSUFFICIENT_DATA_RATE_SIGNAL_ID = 'growth.ai_
 export const GROWTH_AI_VISIBILITY_REVIEW_REQUIRED_RATE_SIGNAL_ID = 'growth.ai_visibility.report_review_required_rate'
 export const GROWTH_AI_VISIBILITY_EVAL_REGRESSION_SIGNAL_ID = 'growth.ai_visibility.prompt_pack_eval_regression'
 export const GROWTH_AI_VISIBILITY_BRAND_ACCURACY_REVIEW_SIGNAL_ID = 'growth.ai_visibility.brand_accuracy_review'
+export const GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_DEGRADED_SIGNAL_ID = 'growth.ai_visibility.prose_extraction_degraded'
 
 const MODULE_KEY = 'growth' as const
 
@@ -122,6 +123,40 @@ const buildEvalRegressionSignal = (observedAt: string): ReliabilitySignal => {
   }
 }
 
+/**
+ * TASK-1390 (ISSUE-120 Gap C) — degradación NO intencional de la extracción de prosa
+ * (not_configured/schema_invalid/provider_error) en findings de los últimos 7 días.
+ * Steady = 0. `disabled`/`empty_excerpt` son degradación honesta esperada (no alertan);
+ * findings legacy sin outcome (NULL) no cuentan.
+ */
+const buildProseExtractionDegradedSignal = async (observedAt: string): Promise<ReliabilitySignal> => {
+  const rows = await runGreenhousePostgresQuery<{ status: string; count: number }>(
+    `SELECT prose_extraction->>'status' AS status, COUNT(*)::int AS count
+     FROM greenhouse_growth.normalized_findings
+     WHERE created_at >= NOW() - INTERVAL '7 days'
+       AND prose_extraction->>'status' IN ('not_configured', 'schema_invalid', 'provider_error')
+     GROUP BY 1
+     ORDER BY 2 DESC`
+  )
+
+  const degraded = rows.reduce((sum, row) => sum + Number(row.count ?? 0), 0)
+
+  return {
+    signalId: GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_DEGRADED_SIGNAL_ID,
+    moduleKey: MODULE_KEY,
+    kind: 'data_quality',
+    source: 'getGrowthAiVisibilityScoringSignals',
+    label: 'Extracción de prosa degradada (AI Visibility)',
+    severity: degraded === 0 ? 'ok' : degraded > 50 ? 'error' : 'warning',
+    summary:
+      degraded === 0
+        ? 'Sin degradación no intencional de la extracción de prosa (7d).'
+        : `${degraded} findings con extracción de prosa degradada (7d): flag/secret/provider del runtime que puntúa. Detalle por status en evidence.`,
+    observedAt,
+    evidence: rows.map(row => ({ kind: 'metric' as const, label: String(row.status), value: String(row.count) }))
+  }
+}
+
 // Stubs: sin failure-ledger todavía. Steady ok; follow-up = ledger de intentos
 // de normalización/recompute (mismo patrón que auth_attempts).
 const buildStubSignal = (signalId: string, label: string, observedAt: string): ReliabilitySignal => ({
@@ -157,8 +192,25 @@ export const getGrowthAiVisibilityScoringSignals = async (): Promise<Reliability
     ]
   })
 
+  const proseSignal = await buildProseExtractionDegradedSignal(observedAt).catch(error => {
+    captureWithDomain(error, 'growth', { tags: { source: 'reliability_signal_prose_extraction' } })
+
+    return {
+      signalId: GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_DEGRADED_SIGNAL_ID,
+      moduleKey: MODULE_KEY,
+      kind: 'data_quality' as const,
+      source: 'getGrowthAiVisibilityScoringSignals',
+      label: 'Extracción de prosa degradada (AI Visibility)',
+      severity: 'unknown' as const,
+      summary: 'No fue posible leer el signal. Revisa los logs.',
+      observedAt,
+      evidence: [{ kind: 'metric' as const, label: 'error', value: error instanceof Error ? error.message : String(error) }]
+    }
+  })
+
   return [
     ...statusSignals,
+    proseSignal,
     buildEvalRegressionSignal(observedAt),
     buildStubSignal(GROWTH_AI_VISIBILITY_NORMALIZATION_FAILED_SIGNAL_ID, 'Fallos de normalización (AI Visibility)', observedAt),
     buildStubSignal(GROWTH_AI_VISIBILITY_SCORE_RECOMPUTE_FAILED_SIGNAL_ID, 'Fallos de recompute de score (AI Visibility)', observedAt)

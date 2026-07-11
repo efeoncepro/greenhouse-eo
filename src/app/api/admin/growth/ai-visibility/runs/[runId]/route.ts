@@ -40,7 +40,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ run
     }
 
     const observations = await getRunObservations(runId)
-    const { score, findings } = await readGraderScore(runId)
+    const { score, findings, proseExtraction } = await readGraderScore(runId)
 
     return NextResponse.json({
       run,
@@ -48,6 +48,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ run
       observationCount: observations.length,
       findings,
       findingCount: findings.length,
+      proseExtraction,
       score
     })
   } catch (error) {
