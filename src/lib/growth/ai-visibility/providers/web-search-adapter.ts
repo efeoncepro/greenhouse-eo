@@ -49,7 +49,27 @@ export interface WebSearchAdapterConfig {
   runCall: (input: { prompt: string; model: string; timeoutMs: number }) => Promise<WebSearchCallResult>
 }
 
-export const createWebSearchAdapter = (config: WebSearchAdapterConfig): ProviderAdapter => {
+/**
+ * TASK-1390 (ISSUE-120 Gap D) — backoff exponencial + jitter entre reintentos.
+ * Antes los retries eran inmediatos: un throttle de cuota (Vertex RESOURCE_EXHAUSTED)
+ * mataba TODOS los intentos dentro de la misma ventana. Base 500ms ×3^attempt,
+ * cap 4s, jitter ±25%. Inyectable (`sleep`) para tests deterministas.
+ */
+export const backoffDelayMs = (attempt: number): number => {
+  const base = Math.min(500 * Math.pow(3, attempt), 4000)
+  const jitter = base * 0.25 * (Math.random() * 2 - 1)
+
+  return Math.max(0, Math.round(base + jitter))
+}
+
+const defaultSleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
+
+export const createWebSearchAdapter = (
+  config: WebSearchAdapterConfig,
+  deps: { sleep?: (ms: number) => Promise<void> } = {}
+): ProviderAdapter => {
+  const sleep = deps.sleep ?? defaultSleep
+
   const { provider, defaultModel } = config
 
   const capabilities: ProviderAdapterCapabilities = {
@@ -101,6 +121,10 @@ export const createWebSearchAdapter = (config: WebSearchAdapterConfig): Provider
             })
 
             if (errorCode === 'rate_limited' || (result.httpStatus ?? 0) >= 500) {
+              if (attempt < context.maxRetries) {
+                await sleep(backoffDelayMs(attempt))
+              }
+
               continue
             }
 
@@ -136,7 +160,13 @@ export const createWebSearchAdapter = (config: WebSearchAdapterConfig): Provider
             latencyMs: 0
           })
 
-          if (errorCode === 'timeout') {
+          // TASK-1390: rate_limited (throttle de cuota detectado del error crudo) también
+          // reintenta — antes solo timeout, y el throttle moría al primer intento.
+          if (errorCode === 'timeout' || errorCode === 'rate_limited') {
+            if (attempt < context.maxRetries) {
+              await sleep(backoffDelayMs(attempt))
+            }
+
             continue
           }
 

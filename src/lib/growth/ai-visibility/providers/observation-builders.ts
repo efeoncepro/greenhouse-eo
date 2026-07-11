@@ -53,6 +53,18 @@ export const mapThrownErrorToErrorCode = (error: unknown): GrowthAiVisibilityPro
     return 'invalid_response'
   }
 
+  // TASK-1390 (ISSUE-120 Gap D): los SDK (Vertex) no exponen httpStatus — un throttle de
+  // cuota llegaba como error genérico y era indistinguible de un 500. Detectar la clase
+  // por message/code para que el retry (con backoff) lo trate como rate_limited.
+  if (error instanceof Error) {
+    const code = (error as Error & { code?: unknown; status?: unknown }).code ?? (error as Error & { status?: unknown }).status
+    const haystack = `${String(code ?? '')} ${error.message}`
+
+    if (/RESOURCE_EXHAUSTED|rate.?limit|too many requests|quota|\b429\b/i.test(haystack)) {
+      return 'rate_limited'
+    }
+  }
+
   return 'provider_error'
 }
 
