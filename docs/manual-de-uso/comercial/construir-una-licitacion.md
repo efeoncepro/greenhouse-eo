@@ -57,7 +57,7 @@ Guía operativa para **armar una propuesta de licitación** (pública o privada 
 - Revísala. Puedes pedir abrirla en el navegador o exportarla a Word/PDF para leerla cómoda.
 
 ### 8-bis. Presentar el diagnóstico de visibilidad en IA (si el servicio es de contenido/SEO)
-- Si se corrió el **AI Visibility Grader** (paso 5), pídele al agente que lo presente en la propuesta con tres capas: **números concretos** (¿la IA conoce la marca?, ¿el blog del cliente aparece como fuente?, ¿quién lidera la categoría?), **el enlace vivo** al informe del cliente, y **la escalera 5-Be** (Ser encontrada / legible / correcta / accionable / intrínseca) con los **valores reales** del cliente y qué significa cada uno.
+- Si se corrió el **AI Visibility Grader** (paso 5), pídele al agente que lo presente en la propuesta con tres capas: **números concretos** (¿la IA conoce la marca?, ¿el blog del cliente aparece como fuente?, ¿quién lidera la categoría?), **el enlace vivo** al informe del cliente, y **la escalera Be X** (Ser encontrada / legible / correcta / accionable / intrínseca) con los **valores reales** del cliente y qué significa cada uno.
 - **Importante para el agente:** el informe completo (con tono y categoría) lo genera el **worker** al encolar el run; **no** se debe puntuar ni publicar el informe "a mano" (sale sin tono ni categoría). Los valores de la escalera se toman del informe publicado, no se inventan.
 
 ### 9. Armar la económica y el paquete

@@ -197,6 +197,18 @@ Las tres producen el **mismo shape** → `packaging` no ramifica. Si el RFP exig
 
 ---
 
+## 9-bis. Modo de construcción — co-creación dirigida por casos, con canonización
+
+Este dominio **no se diseña de escritorio**: se co-construye. Modo canónico acordado con el operador (2026-07-11):
+
+1. **El operador dirige** — marca el siguiente movimiento (un caso real, una decisión, un "y si…").
+2. **Se ejecuta sobre realidad** — el vehículo es una licitación de verdad (SKY primero, la próxima después), nunca un ejemplo inventado. La realidad expone lo que el diseño de escritorio no ve.
+3. **Se extrae el aprendizaje** — qué funcionó, qué falló, qué patrón emergió.
+4. **Se canoniza en el plano correcto** — método (`bid-construction-playbook`), este spec, docs (funcional/manual), memoria; con las skills que apliquen (arch, commercial, talent, finance, copywriting, licitaciones…).
+5. **Cada aprendizaje canonizado = un requisito del producto** — engorda este spec; cuando haya masa crítica, se construye por fases (§9). **Documentar hoy = escribir la spec ejecutable del runtime.**
+
+**Gates que no se degradan** (si se rompen, el modo deja de *construir* y se evapora): realidad sobre memoria · human-in-control en lo sensible · canonizar en las 3 capas + memoria al cerrar cada bloque (no dejar el aprendizaje sólo en el chat). Es primo del *Real-Artifact Iterative Verification Loop* (features visuales validadas con artefacto real, no mocks) y del *Solution Quality Operating Model* (causa raíz, no parches) — no es un método nuevo, es el estilo de la casa. Mientras el status sea `Proposed`, cada iteración es **doc-only** (reversible, sin deuda) hasta que un ADR autorice construir.
+
 ## 10. Open Questions (deliberadamente no decididas)
 
 1. **Schema de aterrizaje:** ¿`greenhouse_crm` o un schema `greenhouse_commercial` nuevo? (Alinear con dónde viven hoy deals/quotes/contracts.)
