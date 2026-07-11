@@ -40,6 +40,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Licitaciones públicas y privadas / RFP-RFQ (Chile + LATAM, bid/no-bid, ChileCompra, garantías) | `greenhouse-public-private-tenders` (+ `commercial-expert`) | `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (módulo runtime) |
 | Content marketing: motor de contenidos (editorial/ops/atomización/distribución/medición, blog/newsletter/ebook/webinar) | `content-marketing-studio` (+ `digital-marketing`/`copywriting`/`seo-aeo`) | inline (studio de ejecución; `digital-marketing` módulo 02 le hace hand-off) |
 | Legal: privacidad de datos (CL/CO/MX/PE/EEUU) · contratos (MSA/SOW/NDA) · IP y derechos de uso · publicidad/consumidor — **NO laboral** | `legal-privacy-ip-operator` (+ `payroll-auditor` para laboral) | inline (orientador, NO asesoría legal; privacidad web-verificada as-of 2026-07) |
+| Research + Benchmark (market/competitive/VoC · benchmark/AI SoV · CI · para Efeonce y clientes) | `research-benchmark-operator` (+ `deep-research` harness, `seo-aeo`, `commercial-expert`) | inline (2 carriles; método+rigor, ejecución→deep-research; evidencia con as-of, NO memoria) |
 
 ### Business Context Pack
 
