@@ -23,7 +23,7 @@ import {
   type NormalizedFinding,
   type NormalizedFindingProvider
 } from './contracts'
-import { classifySourceType } from './source-type-classifier'
+import { classifySourceType, isSameSiteDomain } from './source-type-classifier'
 
 export interface NormalizationContext {
   /** Nombre de la marca sujeto del grado. */
@@ -101,7 +101,13 @@ const resolveBrandPresence = (
   tag: PromptTag | undefined
 ): BrandPresence => {
   const excerpt = observation.answerExcerpt ?? ''
-  const domainCited = context.subjectDomain ? citationDomains.includes(context.subjectDomain) : false
+
+  // TASK-1390 (ISSUE-120 Gap B): same-site en vez de igualdad exacta — el perfil puede
+  // declarar un subdominio (blog.skyairline.com) y los motores citar el apex, o viceversa.
+  const domainCited = context.subjectDomain
+    ? citationDomains.some(domain => isSameSiteDomain(domain, context.subjectDomain))
+    : false
+
   const nameInExcerpt = nameAppearsInText(context.subjectBrand, excerpt)
   const isDiscovery = tag ? !tag.namesBrand : false
 

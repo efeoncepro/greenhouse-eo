@@ -118,3 +118,29 @@ describe('growth/ai-visibility — normalizer pobla sourceTypes clasificados (wi
     expect(finding.sourceTypes).not.toContain('unknown')
   })
 })
+
+describe('growth/ai-visibility — presencia por dominio same-site (Gap B, caso real run EO-GRUN-00044)', () => {
+  it('perfil declara subdominio (blog.*) y el motor cita el apex → brandMentioned yes por dominio', () => {
+    const context: NormalizationContext = {
+      subjectBrand: 'SKY Airline',
+      subjectDomain: 'blog.skyairline.com',
+      competitorsDeclared: ['JetSMART']
+    }
+
+    const observation = {
+      ...FIXTURE_DISCOVERY_ABSENT,
+      answerExcerpt: 'Entre las aerolíneas destacadas está la low-cost chilena con vuelos a todo el país.',
+      citations: FIXTURE_DISCOVERY_ABSENT.citations.slice(0, 1).map(citation => ({
+        ...citation,
+        sourceType: undefined,
+        domain: 'skyairline.com'
+      }))
+    }
+
+    const finding = normalizeObservation(observation, context)
+
+    expect(finding.brandMentioned).toBe('yes')
+    expect(finding.confidence).toBeGreaterThanOrEqual(0.8)
+    expect(finding.sourceTypes).toContain('owned')
+  })
+})
