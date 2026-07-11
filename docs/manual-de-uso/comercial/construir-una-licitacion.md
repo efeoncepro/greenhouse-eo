@@ -53,6 +53,7 @@ Guía operativa para **armar una propuesta de licitación** (pública o privada 
 
 ### 8. Redactar la oferta técnica
 - El agente redacta la propuesta hacia lo que evalúan las bases y le da un **pase de estilo** (claro, persuasivo, sin humo, en es-CL).
+- **Registro formal, no tuteo:** una oferta de licitación va en **trato formal (de usted) / institucional** (el cliente en 3ª persona), no en tuteo — es un documento que evalúa un comité. Formal no es frío: el contenido sigue cálido, sube el registro. Aplica solo a los documentos que ve el cliente.
 - Revísala. Puedes pedir abrirla en el navegador o exportarla a Word/PDF para leerla cómoda.
 
 ### 8-bis. Presentar el diagnóstico de visibilidad en IA (si el servicio es de contenido/SEO)

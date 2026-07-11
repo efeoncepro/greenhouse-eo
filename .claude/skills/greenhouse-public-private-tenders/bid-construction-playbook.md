@@ -74,6 +74,7 @@ El diagnóstico del grader (Fase 4) es un diferencial brutal, pero **cómo se pr
 
 ### Fase 7 — Redacción (con pase de copywriting)
 - Redacta la **oferta técnica** modelada hacia lo que evalúan las bases (no genérica). Luego **pase de craft**: anti-humo (claim → mecanismo), beneficios antes que siglas, prueba > hype, es-CL profesional sin voseo, corte de AI-slop.
+- **Registro formal, NO tuteo (regla dura).** Una oferta de licitación es un documento contractual que evalúa un comité y que pasa a formar parte del contrato: el género pide **trato formal ("de usted") + institucional (SKY/el cliente en 3ª persona)**, nunca tuteo. El tuteo es correcto para blog/landing/producto (contextos cercanos), no para un deliverable que evalúa procurement. Formal ≠ frío: el contenido sigue cálido en las ideas; lo que sube es el registro gramatical. Aplica **solo a los documentos client-facing** (técnica + económica); los internos (diagnóstico, squad, matriz) dan igual. `tu blog`→`su blog`/`el blog del cliente`; `puedes ver`→`puede ver`; `te menciona`→`menciona al cliente`. Caso fuente: SKY 2026-07-11.
 - **Output:** oferta técnica final redactada.
 - *Skill:* `copywriting` (craft); tono es-CL / tokenización de copy de producto → `greenhouse-ux-writing` cuando aplique.
 
