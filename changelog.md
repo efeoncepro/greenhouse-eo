@@ -7,6 +7,8 @@
 - La **extracción de prosa registra su outcome** ({ran,status,provider}): `sentiment unknown` ya no es indistinguible de "no corrió". Señal nueva `growth.ai_visibility.prose_extraction_degraded`.
 - Retries de providers con **backoff exponencial** y throttles de cuota clasificados `rate_limited` (Vertex sin httpStatus).
 - Versionado: `normalized_finding_v2` + `ai_visibility_score_v2` (v1 convive como historia; snapshots públicos inmutables). Migración additive `prose_extraction` JSONB.
+
+- **Tender Deck Composer — expresión `Empower your` exclusiva de decks canonizada en Figma.** Se creó el componente `Deck / Expression / Empower Your` con variantes Growth, Brand, Engine y Voice, junto con los tokens aislados `Deck / Primitives` + `Deck / Semantic`. La familia fija `Empower` Poppins ExtraBold Italic + `your` Poppins ExtraBold + sufijo Poppins Black Italic; no afecta tokens ni superficies del portal. Fuente canónica: `docs/architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md`.
 ## 2026-07-11
 
 - **Creative Workflow / Glitch — T–Z y reconstrucción 3D rechazados; producción detenida.** Seedance/Veo/Kling no pasaron actuación/continuidad (US$10.44 + tokens Seedance). El blocking 3D logró contactos 15/28, pero el operador lo rechazó porque la reconstrucción se veía rudimentaria frente al 4K; no continuar lookdev ni usarla como referencia generativa. No hay candidata, retime, audio final, publicación ni bundle. Archive privado: 106 artefactos/142160554 bytes. El audio futuro sigue definido como dos respuestas `micrófono → preamp → corneta/monitor`; si se reabre, la ruta fundada es captura práctica integral. Canon: `ai-generations/2026-07-11_glitch-microphone-intro/review/takes-u-to-z-guided-recovery-review.md` y `review/v3-blocking-review.md`.

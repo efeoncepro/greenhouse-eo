@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Geist:wght@400;600&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1920px; height:1080px; }
+  body { font-family:'Geist',sans-serif; overflow:hidden; }
+
+  :root { --safe:72px; }   /* safe-area: ningún contenido toca el borde de la slide */
+  .slide { position:relative; width:1920px; height:1080px; display:flex; background:#eef0f3; }
+
+  /* ===== LEFT: brand panel — layout Figma + degradado HERO de Think (estable) =====
+     Fuente canónica: efeonce-think index.astro .home-hero / .hero-shell.
+     axis-navy-soft = AXIS accent-800, axis-navy = AXIS accent-900. */
+  :root {
+    --axis-navy-soft:#023c70;   /* AXIS accent-800 */
+    --axis-navy:#00284d;        /* AXIS accent-900 */
+    --axis-navy-deep:#001a33;   /* cierre profundo (hero Think) */
+    --axis-teal:#2c98b0;        /* LUZ — glow superior */
+    --axis-violet:#33029c;      /* acento para jugar (subtle) */
+  }
+  .brand {
+    position:relative; width:912px; flex:none; height:1080px; overflow:hidden;
+    border-top-right-radius:64px; border-bottom-right-radius:64px;
+    background:
+      radial-gradient(72% 56% at 6% 4%, color-mix(in srgb, var(--axis-teal) 64%, transparent) 0%, transparent 52%),
+      radial-gradient(56% 50% at 100% 98%, color-mix(in srgb, var(--axis-violet) 34%, transparent) 0%, transparent 58%),
+      linear-gradient(160deg, var(--axis-navy-soft) 0%, var(--axis-navy) 62%, var(--axis-navy-deep) 100%);
+  }
+  .brand-head { position:absolute; left:72px; top:286px; z-index:2; }
+  .brand-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:58px; line-height:1.06; color:#fff; letter-spacing:-.015em; }
+  .brand-logo { display:block; margin-top:20px; height:92px; }
+
+  /* ===== RIGHT: content — 7 bullets (star + semibold lead + regular desc) ===== */
+  .content { flex:1; display:flex; flex-direction:column; justify-content:space-between; padding:var(--safe) 96px var(--safe) 74px; }
+  .bullet { display:flex; align-items:flex-start; gap:24px; padding-bottom:22px; border-bottom:1.6px dashed #b7c2d2; }
+  .bullet:last-child { border-bottom:none; padding-bottom:0; }
+  .bullet .star { flex:none; width:44px; height:44px; margin-top:2px; }
+  .bullet .txt { font-size:28px; line-height:1.36; color:#020061; font-weight:400; }
+  .bullet .txt b { font-weight:600; }
+</style></head>
+<body>
+  <div class="slide">
+    <div class="brand">
+      <div class="brand-head">
+        <div class="brand-title">Diferenciadores de</div>
+        <img class="brand-logo" src="file:///Users/jreye/Documents/greenhouse-eo/public/branding/logo-negative.svg" alt="efeonce">
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+<script>
+  const STAR = 'file:///Users/jreye/Documents/greenhouse-eo/docs/architecture/tender-deck-composer-prototypes/assets/star1.svg';
+  const bullets = [
+    ["SEO + AEO, no solo redacción.","optimizamos para posicionar en buscadores y para ser citados por los asistentes con IA."],
+    ["Llegamos con diagnóstico, no con un pitch.","ya medimos su blog con el AI Visibility Grader y Semrush antes de escribir esta propuesta."],
+    ["Expertos en WordPress y partners de Automattic.","operamos la capa técnica directamente sobre su plataforma."],
+    ["Ecosistema de contenido en operación.","motor de producción con gobernanza y hub editorial propio, no un proveedor puntual."],
+    ["Reportería con visibilidad en IA.","medimos citabilidad y ownership de categoría, no solo tráfico orgánico."],
+    ["Equipo dedicado con un responsable único.","un squad enfocado en el blog de SKY, no compartido con otras cuentas."],
+    ["Metodología Surround Discovery.","marco propietario de Efeonce para la visibilidad en buscadores y asistentes con IA."]
+  ];
+  document.getElementById('content').innerHTML = bullets.map(([t,d])=>
+    `<div class="bullet"><img class="star" src="${STAR}"><div class="txt"><b>${t}</b> ${d}</div></div>`).join('');
+</script>
+</body></html>

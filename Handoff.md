@@ -1,3 +1,10 @@
+## Sesión 2026-07-11 — Tender Deck Composer: expresión `Empower your` canonizada en Figma
+
+- Se canonizó la familia exclusiva de **decks AXIS** `Empower your …` en Figma `Sistema Axis - PPT`: componente `Deck / Expression / Empower Your` con variantes `Growth`, `Brand`, `Engine` y `Voice`; fragmentos `Empower` (Poppins ExtraBold Italic), `your` (Poppins ExtraBold) y sufijo (Poppins Black Italic).
+- Los colores quedan aislados de producto bajo `Deck / Primitives` + `Deck / Semantic`: prefijo `#848484`, Growth `#173B6C`, Brand `#ED6F2D`, Engine `#3273D4`, Voice `#AC2D55`. El contrato de uso y el enlace canónico viven en `docs/architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → `Expresión exclusiva de deck`.
+- Evidencia: Figma node `39:2`, matriz de cuatro variantes revisada visualmente; variables y estilos vinculados, sin colores hardcodeados en el componente. No hay impacto runtime, despliegue ni tokens del portal.
+- Siguiente layout Codex: `SectionDividerSplit` (`Right / Left`, Figma `6:12498 / 4:151`). Claude conserva `ChartSplit` y `StatSplit` según el reparto documentado del composer.
+
 ## Sesión 2026-07-11 — Glitch: ronda T–Z cerrada y recuperación 3D preparada
 
 > **Estado activo:** no hay master ni candidata aprobada. T–Z fallaron actuación/continuidad y el operador rechazó explícitamente el blocking 3D porque se veía horrible frente al key visual. Aunque 3D controló contactos 15/28, no continuar lookdev, no usarlo como referencia de otro modelo y no promover sus píxeles. Gasto detenido, sin retime, recomposición, audio final, publicación ni bundle. Costo estimado T–Z US$10.44 + tokens Seedance. Blender 5.1.2 permanece fuera del repo. Archive privado: 106 archivos / 142160554 bytes. Única ruta fundada si se reabre: captura práctica integral. Canon: `ai-generations/2026-07-11_glitch-microphone-intro/review/v3-blocking-review.md`.

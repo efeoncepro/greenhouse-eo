@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:wght@600&display=swap');
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:1920px; height:1080px; }
+    body { overflow:hidden; font-family:'Geist',sans-serif; }
+
+    :root {
+      --safe:72px;
+      --surface:#eef0f3;
+      --ink:#020061;
+      --navy:#00284d;
+      --navy-2:#023c70;
+      --navy-deep:#001a33;
+      --teal:#36c8bf;
+      --violet:#33029c;
+      --lime:#6fbc00;
+    }
+
+    .slide { width:1920px; height:1080px; display:flex; background:var(--surface); }
+    .contrast { width:960px; height:1080px; padding:var(--safe) 74px var(--safe) var(--safe); color:var(--ink); }
+    .thesis { display:flex; gap:28px; margin-top:64px; max-width:790px; }
+    .thesis-rule { width:4px; flex:none; border-radius:2px; background:linear-gradient(180deg, var(--lime), var(--teal)); }
+    .thesis h1 { font-family:'Poppins',sans-serif; font-size:58px; font-weight:600; letter-spacing:-.022em; line-height:1.04; }
+    .concept { margin:106px 0 0 56px; max-width:680px; }
+    .concept-label { display:flex; align-items:center; gap:20px; color:#5aa500; font-family:'Poppins',sans-serif; font-size:29px; font-weight:600; }
+    .concept-icon { width:54px; height:54px; border:2px solid currentColor; border-radius:50%; display:grid; place-items:center; font-size:30px; line-height:1; }
+    .concept h2 { margin-top:50px; font-family:'Poppins',sans-serif; font-size:37px; font-weight:600; letter-spacing:-.015em; line-height:1.1; }
+    .concept-body { margin-top:18px; display:flex; flex-direction:column; gap:28px; font-size:29px; line-height:1.32; }
+    .concept-body strong { font-weight:600; }
+
+    .proposal { position:relative; width:1004px; height:1080px; overflow:hidden; border-radius:64px 0 0 64px; color:#fff; padding:var(--safe) 76px; background:
+      radial-gradient(62% 63% at 101% 13%, rgba(42,194,184,.72) 0%, rgba(42,194,184,.26) 35%, transparent 64%),
+      radial-gradient(71% 62% at 91% 103%, rgba(103,23,205,.76) 0%, rgba(103,23,205,.22) 42%, transparent 72%),
+      linear-gradient(132deg, #196df2 0%, var(--navy-2) 46%, var(--navy-deep) 100%); }
+    .proposal::before { content:''; position:absolute; inset:0; opacity:.10; pointer-events:none; background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .75px); background-size:4px 4px; }
+    .proposal-inner { position:relative; z-index:1; margin:194px 0 0 56px; max-width:720px; }
+    .proposal-label { display:flex; align-items:center; gap:20px; font-family:'Poppins',sans-serif; font-size:29px; font-weight:600; }
+    .proposal-icon { width:54px; height:54px; border-radius:50%; display:grid; place-items:center; background:#fff; color:#1477ec; font-size:29px; line-height:1; }
+    .proposal h2 { margin-top:48px; max-width:670px; font-family:'Poppins',sans-serif; font-size:44px; font-weight:600; letter-spacing:-.018em; line-height:1.08; }
+    .proposal-body { margin-top:24px; max-width:710px; display:flex; flex-direction:column; gap:30px; font-size:29px; line-height:1.32; }
+    .proposal-body strong { font-weight:600; }
+    .outcome { position:absolute; z-index:1; left:132px; right:76px; bottom:80px; display:flex; gap:20px; align-items:flex-start; padding-top:24px; border-top:1px solid rgba(255,255,255,.48); font-size:25px; line-height:1.25; }
+    .outcome-label { flex:none; color:var(--teal); font-size:17px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
+    .outcome strong { font-weight:600; }
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="DualTextSplit">
+    <section class="contrast" aria-label="Primera idea">
+      <header class="thesis">
+        <span class="thesis-rule" aria-hidden="true"></span>
+        <h1 data-slot="title" data-slot-type="string" data-slot-required="true">Del diagnóstico al<br>descubrimiento</h1>
+      </header>
+      <article class="concept" data-slot="leftConcept" data-slot-type="object" data-slot-required="true">
+        <p class="concept-label"><span class="concept-icon" aria-hidden="true">•</span><span data-slot-field="label">01 · Detectar</span></p>
+        <h2 data-slot-field="title">Entender antes de producir</h2>
+        <div class="concept-body" data-slot-field="paragraphs">
+          <p>Lee señales de mercado, audiencias y búsqueda para <strong>detectar la oportunidad real.</strong></p>
+          <p>Convierte información dispersa en una lectura priorizada antes de abrir el calendario editorial.</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="proposal" aria-label="Segunda idea">
+      <article class="proposal-inner" data-slot="rightConcept" data-slot-type="object" data-slot-required="true">
+        <p class="proposal-label"><span class="proposal-icon" aria-hidden="true">✓</span><span data-slot-field="label">02 · Construir</span></p>
+        <h2 data-slot-field="title">Convertir señales en sistema</h2>
+        <div class="proposal-body" data-slot-field="paragraphs">
+          <p>Conecta SEO, AEO y entidad en una superficie editorial que <strong>hace visible la marca.</strong></p>
+          <p>La evidencia se transforma en decisiones, piezas y aprendizaje continuo sobre el sistema.</p>
+        </div>
+      </article>
+      <aside class="outcome" data-slot="outcome" data-slot-type="object" data-slot-required="true" aria-label="Resultado esperado">
+        <span class="outcome-label" data-slot-field="label">Resultado</span>
+        <p data-slot-field="text">De producir piezas a <strong>construir descubrimiento.</strong></p>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:wght@600&display=swap');
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:1920px; height:1080px; }
+    body { overflow:hidden; font-family:'Geist',sans-serif; }
+
+    :root { --safe:72px; --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33; --teal:#36c8bf; --violet:#33029c; --ink:#020061; --surface:#eef0f3; }
+    .slide { width:1920px; height:1080px; display:flex; background:var(--surface); }
+    .column { width:960px; height:1080px; padding:var(--safe); }
+
+    .brand { position:relative; overflow:hidden; color:#fff; padding-right:86px; border-radius:0 64px 64px 0; background:
+      radial-gradient(70% 56% at 8% 4%, rgba(54,200,191,.62) 0%, rgba(54,200,191,.13) 38%, transparent 67%),
+      radial-gradient(65% 62% at 86% 102%, rgba(102,24,204,.78) 0%, rgba(102,24,204,.22) 42%, transparent 70%),
+      linear-gradient(150deg, #084e99 0%, var(--navy) 52%, var(--navy-deep) 100%); }
+    .brand::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.12; background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .75px); background-size:4px 4px; }
+    .light { color:var(--ink); padding-left:86px; }
+    .head { position:relative; z-index:1; min-height:228px; }
+    .eyebrow { font-size:19px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
+    .brand .eyebrow { color:var(--teal); }
+    .light .eyebrow { color:var(--violet); }
+    h1, h2 { margin-top:22px; max-width:700px; font-family:'Poppins',sans-serif; font-size:51px; font-weight:600; letter-spacing:-.021em; line-height:1.06; }
+    .tips { position:relative; z-index:1; display:flex; flex-direction:column; gap:0; }
+    .tip { min-height:145px; display:grid; grid-template-columns:56px 1fr; align-items:start; gap:22px; padding:24px 0; border-top:1px solid rgba(255,255,255,.38); }
+    .light .tip { border-color:rgba(2,0,97,.24); }
+    .tip-icon { width:42px; height:42px; margin-top:2px; object-fit:contain; }
+    .brand .tip-icon { filter:brightness(0) invert(1); }
+    .tip-copy { font-size:26px; line-height:1.3; }
+    .tip-copy strong { font-weight:600; }
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="DualListSplit">
+    <section class="column brand" aria-label="Primera lista">
+      <header class="head">
+        <p class="eyebrow" data-slot="leftEyebrow" data-slot-type="string" data-slot-required="true">La propuesta</p>
+        <h1 data-slot="leftTitle" data-slot-type="string" data-slot-required="true">Lo que sostiene una respuesta sólida</h1>
+      </header>
+      <div class="tips" data-slot="leftItems" data-slot-type="array" data-slot-required="true">
+        <article class="tip"><img class="tip-icon" src="assets/star1.svg" alt="" aria-hidden="true"><p class="tip-copy"><strong>Diagnóstico trazable.</strong> La propuesta parte desde evidencia, no desde supuestos.</p></article>
+        <article class="tip"><img class="tip-icon" src="assets/star1.svg" alt="" aria-hidden="true"><p class="tip-copy"><strong>Prioridades verificables.</strong> Cada decisión responde al RFP y a la oportunidad detectada.</p></article>
+        <article class="tip"><img class="tip-icon" src="assets/star1.svg" alt="" aria-hidden="true"><p class="tip-copy"><strong>Equipo y operación conectados.</strong> La estrategia se traduce en una forma concreta de ejecutar.</p></article>
+        <article class="tip"><img class="tip-icon" src="assets/star1.svg" alt="" aria-hidden="true"><p class="tip-copy"><strong>Control de calidad.</strong> La evidencia acompaña cada etapa antes de entregar.</p></article>
+      </div>
+    </section>
+
+    <section class="column light" aria-label="Segunda lista">
+      <header class="head">
+        <p class="eyebrow" data-slot="rightEyebrow" data-slot-type="string" data-slot-required="true">El resultado</p>
+        <h2 data-slot="rightTitle" data-slot-type="string" data-slot-required="true">Lo que recibe el equipo del cliente</h2>
+      </header>
+      <div class="tips" data-slot="rightItems" data-slot-type="array" data-slot-required="true">
+        <article class="tip"><img class="tip-icon" src="assets/star1.svg" alt="" aria-hidden="true"><p class="tip-copy"><strong>Una lectura compartida.</strong> La oportunidad, las prioridades y los criterios quedan explícitos.</p></article>
+        <article class="tip"><img class="tip-icon" src="assets/star1.svg" alt="" aria-hidden="true"><p class="tip-copy"><strong>Un sistema de contenidos.</strong> Las piezas responden a una arquitectura, no a encargos aislados.</p></article>
+        <article class="tip"><img class="tip-icon" src="assets/star1.svg" alt="" aria-hidden="true"><p class="tip-copy"><strong>Evidencia para decidir.</strong> Las señales de desempeño guían la siguiente iteración.</p></article>
+        <article class="tip"><img class="tip-icon" src="assets/star1.svg" alt="" aria-hidden="true"><p class="tip-copy"><strong>Transferencia operativa.</strong> El conocimiento queda disponible para el equipo, no solo para el proveedor.</p></article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

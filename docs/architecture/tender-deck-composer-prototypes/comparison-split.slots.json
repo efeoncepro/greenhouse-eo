@@ -1,0 +1,58 @@
+{
+  "template": "ComparisonSplit",
+  "figmaNodeId": "8:13782",
+  "version": "0.2",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "leftTitle": {
+      "selector": "[data-slot='leftTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 72, "maxLines": 3, "overflow": "reject" }
+    },
+    "rightTitle": {
+      "selector": "[data-slot='rightTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 86, "maxLines": 3, "overflow": "reject" }
+    },
+    "rows": {
+      "selector": "[data-slot='rows']",
+      "type": "paired-array",
+      "required": true,
+      "constraints": {
+        "minItems": 3,
+        "maxItems": 5,
+        "pairing": "exact",
+        "leftLeadMaxCharacters": 42,
+        "rightLeadMaxCharacters": 42,
+        "leftBodyMaxCharacters": 94,
+        "rightBodyMaxCharacters": 94,
+        "overflow": "reject"
+      },
+      "item": {
+        "left": {
+          "type": "object",
+          "shape": {
+            "lead": { "type": "string", "required": true },
+            "body": { "type": "string", "required": true }
+          }
+        },
+        "right": {
+          "type": "object",
+          "shape": {
+            "lead": { "type": "string", "required": true },
+            "body": { "type": "string", "required": true }
+          }
+        },
+        "evidenceRef": { "type": "string", "required": false, "consumer": "validation-only" }
+      }
+    },
+    "proposalBrand": {
+      "selector": "[data-slot='proposalBrand']",
+      "type": "fixed-asset",
+      "source": "public/branding/logo-negative.svg",
+      "agentMayOverridePresentation": false
+    }
+  }
+}

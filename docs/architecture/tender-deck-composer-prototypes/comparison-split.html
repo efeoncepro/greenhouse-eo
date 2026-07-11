@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Geist:wght@400;600&display=swap');
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:1920px; height:1080px; }
+    body { font-family:'Geist', sans-serif; overflow:hidden; }
+
+    :root {
+      --safe:72px;
+      --navy:#00284d;
+      --navy-2:#023c70;
+      --navy-deep:#001a33;
+      --teal:#36c8bf;
+      --ink:#020061;
+      --surface:#eef0f3;
+      --violet:#33029c;
+    }
+
+    .slide { width:1920px; height:1080px; display:flex; background:var(--surface); }
+
+    /* El molde compara dos posturas: la propuesta solo completa pares de filas. */
+    .column { width:50%; height:1080px; padding:var(--safe); }
+    .contrast { display:flex; flex-direction:column; color:var(--ink); padding-right:54px; }
+    .contrast h1 { margin:58px auto 0; max-width:720px; font-family:'Poppins', sans-serif; font-size:58px; font-weight:600; line-height:1.06; letter-spacing:-.018em; text-align:center; }
+    .proposal {
+      position:relative; overflow:hidden; border-top-left-radius:64px; border-bottom-left-radius:64px;
+      color:#fff; padding-left:76px;
+      background:
+        radial-gradient(60% 48% at 92% 100%, color-mix(in srgb, var(--teal) 20%, transparent) 0%, transparent 48%),
+        radial-gradient(128% 100% at 30% -12%, var(--navy-2) 0%, var(--navy) 52%, var(--navy-deep) 100%);
+    }
+    .proposal::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.18; background-image:radial-gradient(rgba(255,255,255,.75) .6px, transparent .7px); background-size:5px 5px; }
+    .proposal-head { position:relative; z-index:1; margin-top:58px; }
+    .proposal-logo { display:block; width:354px; height:92px; object-fit:contain; object-position:left center; }
+    .proposal-title { max-width:630px; margin-top:34px; font-family:'Poppins', sans-serif; font-size:44px; font-weight:600; line-height:1.08; letter-spacing:-.015em; }
+
+    .rows { flex:1; display:flex; flex-direction:column; justify-content:center; margin-top:46px; }
+    .row { min-height:128px; display:grid; align-items:center; border-bottom:1.5px solid currentColor; }
+    .contrast .row { grid-template-columns:112px 1fr; border-color:rgba(2,0,97,.54); }
+    .proposal .row { position:relative; z-index:1; grid-template-columns:1fr 84px; border-color:rgba(255,255,255,.48); }
+    .row:last-child { border-bottom:0; }
+    .row-copy { font-size:23px; line-height:1.28; font-weight:400; }
+    .contrast .row-copy { max-width:650px; text-align:right; }
+    .proposal .row-copy { max-width:660px; }
+    .row-lead { display:block; margin-bottom:6px; font-size:28px; font-weight:600; line-height:1.12; }
+    .row-body { display:block; }
+    .contrast-icon, .proposal-icon { width:54px; height:54px; border-radius:50%; display:grid; place-items:center; font-family:'Poppins',sans-serif; font-weight:600; font-size:34px; line-height:1; }
+    .contrast-icon { border:2px solid rgba(2,0,97,.62); color:var(--ink); font-size:30px; }
+    .proposal-icon { justify-self:end; background:#fff; color:var(--ink); font-size:35px; }
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="ComparisonSplit">
+    <section class="column contrast" aria-label="Enfoque de contraste">
+      <h1 data-slot="leftTitle" data-slot-type="string" data-slot-required="true">Modelo editorial<br>por piezas</h1>
+      <div class="rows" data-slot="rows" data-slot-type="paired-array" data-slot-required="true">
+        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead">Calendario sin diagnóstico</strong><span class="row-body">No inicia desde una lectura común de la oportunidad.</span></p></article>
+        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead">Actividad como única señal</strong><span class="row-body">Tráfico y publicaciones no muestran la visibilidad en IA.</span></p></article>
+        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead">Optimización aislada</strong><span class="row-body">SEO, AEO y entidad se trabajan como iniciativas separadas.</span></p></article>
+        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead">Reportar sin aprender</strong><span class="row-body">El ciclo deja poco espacio para corregir el sistema.</span></p></article>
+      </div>
+    </section>
+
+    <section class="column proposal" aria-label="Propuesta Efeonce">
+      <header class="proposal-head">
+        <img class="proposal-logo" src="../../../public/branding/logo-negative.svg" alt="efeonce" data-slot="proposalBrand" data-slot-type="fixed-asset">
+        <h2 class="proposal-title" data-slot="rightTitle" data-slot-type="string" data-slot-required="true">Un ecosistema editorial que crea descubrimiento.</h2>
+      </header>
+      <div class="rows">
+        <article class="row"><p class="row-copy"><strong class="row-lead">Diagnóstico primero</strong><span class="row-body">Search, Answer y Entity determinan dónde intervenir.</span></p><span class="proposal-icon">✓</span></article>
+        <article class="row"><p class="row-copy"><strong class="row-lead">Visibilidad que se puede leer</strong><span class="row-body">Mide presencia, citabilidad y autoridad junto a las señales orgánicas.</span></p><span class="proposal-icon">✓</span></article>
+        <article class="row"><p class="row-copy"><strong class="row-lead">Una misma superficie</strong><span class="row-body">Conecta SEO, AEO y las señales de entidad en el mismo sistema.</span></p><span class="proposal-icon">✓</span></article>
+        <article class="row"><p class="row-copy"><strong class="row-lead">Evidencia que mejora</strong><span class="row-body">Opera con aprendizaje continuo para corregir el sistema editorial.</span></p><span class="proposal-icon">✓</span></article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

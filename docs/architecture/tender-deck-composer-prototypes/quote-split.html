@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600;1,700&family=Geist:wght@400;600&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1920px; height:1080px; }
+  body { font-family:'Geist',sans-serif; overflow:hidden; }
+
+  :root {
+    --safe:72px;
+    --axis-navy-soft:#023c70; --axis-navy:#00284d; --axis-navy-deep:#001a33;
+    --axis-teal:#2c98b0; --teal-bright:#36c8bf; --axis-violet:#33029c;
+    --ink:#020061; --panel-bg:#eef0f3;
+  }
+  .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
+
+  /* ===== LEFT: slot de atribución / persona (claro) ===== */
+  .aside {
+    position:relative; width:760px; flex:none; height:1080px; overflow:hidden;
+    padding:var(--safe); display:flex; flex-direction:column; justify-content:flex-end;
+  }
+  /* comilla grande = motivo único del quote (una sola en toda la slide) */
+  .aside .wmq { position:absolute; left:60px; top:150px; font-family:'Poppins',sans-serif; font-weight:700;
+    font-size:340px; line-height:.7; color:color-mix(in srgb, var(--teal-bright) 46%, transparent); user-select:none; }
+  .aside .inner { position:relative; padding-left:38px; }
+  .aside .inner::before { content:''; position:absolute; left:0; top:4px; bottom:4px; width:3px; border-radius:2px;
+    background:linear-gradient(180deg, var(--teal-bright) 0%, color-mix(in srgb, var(--axis-violet) 55%, transparent) 100%); }
+  .aside .eyebrow { font-family:'Geist',sans-serif; font-weight:600; font-size:20px; letter-spacing:.10em;
+    text-transform:uppercase; color:var(--ink); opacity:.55; margin-bottom:12px; }
+  .aside .who { font-family:'Poppins',sans-serif; font-weight:600; font-size:32px; line-height:1.12; color:var(--ink); }
+  .aside .sub { font-size:22px; line-height:1.4; color:rgba(2,0,97,.6); margin-top:8px; }
+
+  /* ===== RIGHT: panel de marca — statement ===== */
+  .brand {
+    position:relative; flex:1; height:1080px; overflow:hidden;
+    border-top-left-radius:64px; border-bottom-left-radius:64px;
+    padding:var(--safe) 96px var(--safe) 84px;
+    display:flex; flex-direction:column; justify-content:center;
+    background:
+      radial-gradient(66% 52% at 96% 4%, color-mix(in srgb, var(--axis-teal) 60%, transparent) 0%, transparent 52%),
+      radial-gradient(60% 54% at 4% 100%, color-mix(in srgb, var(--axis-violet) 32%, transparent) 0%, transparent 56%),
+      linear-gradient(150deg, var(--axis-navy-soft) 0%, var(--axis-navy) 60%, var(--axis-navy-deep) 100%);
+    color:#fff;
+  }
+  .statement { font-family:'Poppins',sans-serif; font-weight:600; font-size:52px; line-height:1.24;
+    letter-spacing:-.015em; color:#fff; max-width:920px; }
+  .statement em { font-style:italic; color:var(--teal-bright); }
+  .statement .wm { height:40px; vertical-align:-1px; margin:0 8px 0 5px; }
+</style></head>
+<body>
+  <div class="slide">
+    <!-- LEFT: atribución / slot persona -->
+    <div class="aside">
+      <div class="wmq">&ldquo;</div>
+      <div class="inner">
+        <div class="eyebrow">El compromiso</div>
+        <div class="who">En la propuesta técnica para SKY</div>
+        <div class="sub">Un squad dedicado, con un responsable único de la cuenta.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: statement -->
+    <div class="brand">
+      <div class="statement">En este proyecto, <img class="wm" src="file:///Users/jreye/Documents/greenhouse-eo/public/branding/logo-negative.svg" alt="Efeonce"> liderará la <em>estrategia de visibilidad</em>, la producción editorial del blog y la <em>optimización para buscadores y asistentes con IA</em>, con medición continua de la autoridad de SKY en su categoría.</div>
+    </div>
+  </div>
+</body></html>

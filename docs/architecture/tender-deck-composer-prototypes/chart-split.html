@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1920px; height:1080px; }
+  body { font-family:'Geist',sans-serif; overflow:hidden; }
+
+  :root {
+    --safe:72px;
+    --blue:#196df2; --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33;
+    --teal:#36c8bf; --teal-deep:#2ab5ab; --violet:#6717cd;
+    --ink:#020061; --panel-bg:#eef0f3;
+  }
+  .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
+
+  /* ===== LEFT: texto sobre claro ===== */
+  .text {
+    width:812px; flex:none; height:1080px;
+    padding:var(--safe) 52px var(--safe) var(--safe);
+    display:flex; flex-direction:column; justify-content:center; gap:30px;
+  }
+  .head-row { display:flex; gap:28px; }
+  .rule { flex:none; width:3px; border-radius:2px; align-self:stretch;
+    background:linear-gradient(180deg, var(--teal) 0%, color-mix(in srgb, var(--violet) 60%, transparent) 100%); }
+  .eyebrow { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--ink); opacity:.55; margin-bottom:14px; }
+  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:50px; line-height:1.1; letter-spacing:-.015em; color:var(--ink); }
+  .title em { font-style:italic; color:var(--violet); }
+  .body { display:flex; flex-direction:column; gap:22px; max-width:660px; }
+  .p { font-size:25px; line-height:1.45; color:var(--ink); }
+  .p b { font-weight:600; color:var(--violet); font-variant-numeric:tabular-nums; }
+
+  /* ===== RIGHT: panel de marca — degradado rico + grain ===== */
+  .brand {
+    position:relative; flex:1; height:1080px; overflow:hidden;
+    border-top-left-radius:64px; border-bottom-left-radius:64px;
+    padding:var(--safe) var(--safe);
+    display:flex; flex-direction:column; justify-content:center;
+    background:
+      radial-gradient(60% 60% at 100% 8%, rgba(42,194,184,.62) 0%, rgba(42,194,184,.22) 36%, transparent 64%),
+      radial-gradient(66% 60% at 96% 104%, rgba(103,23,205,.66) 0%, rgba(103,23,205,.20) 44%, transparent 74%),
+      linear-gradient(134deg, var(--blue) 0%, var(--navy-2) 44%, var(--navy-deep) 100%);
+    color:#fff;
+  }
+  .brand::before { content:''; position:absolute; inset:0; opacity:.09; pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .8px); background-size:5px 5px; }
+
+  /* glass card que aterriza el chart */
+  .card { position:relative; z-index:1; background:rgba(255,255,255,.055);
+    border:1px solid rgba(255,255,255,.14); border-radius:30px;
+    box-shadow:0 30px 70px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.14);
+    padding:54px 58px; }
+
+  .card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:40px; }
+  .chart-eyebrow { font-weight:600; font-size:19px; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); }
+  .chart-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:38px; line-height:1.08; letter-spacing:-.012em; color:#fff; margin-top:8px; }
+  .chart-sub { font-size:20px; color:rgba(255,255,255,.62); margin-top:6px; }
+  /* hero-insight: el multiplicador */
+  .hero { flex:none; text-align:right; }
+  .hero .num { font-family:'Geist',sans-serif; font-weight:600; font-size:80px; line-height:.86; color:var(--teal);
+    font-variant-numeric:tabular-nums; letter-spacing:-.02em; text-shadow:0 0 34px rgba(54,200,191,.4); }
+  .hero .lab { font-size:18px; line-height:1.28; color:rgba(255,255,255,.66); margin-top:10px; max-width:210px; margin-left:auto; }
+
+  .plot { position:relative; margin-top:50px; display:flex; flex-direction:column; gap:30px; }
+  .refline { position:absolute; left:88%; top:34px; bottom:40px; width:0; border-left:2px dashed rgba(255,255,255,.4); z-index:3; }
+  .row { position:relative; }
+  .rlabel { display:flex; align-items:baseline; gap:16px; margin-bottom:11px; }
+  .rlabel .name { font-family:'Poppins',sans-serif; font-weight:600; font-size:23px; color:rgba(255,255,255,.82); }
+  .rlabel .val { font-family:'Geist',sans-serif; font-weight:600; font-size:26px; color:rgba(255,255,255,.82); font-variant-numeric:tabular-nums; }
+  .track { position:relative; height:46px; background:rgba(255,255,255,.05); border-radius:12px; }
+  .fill { height:100%; border-radius:12px; }
+  /* barras del campo con matiz azul de marca (no gris) */
+  .fill.muted { background:linear-gradient(180deg, rgba(120,172,248,.62) 0%, rgba(58,116,214,.5) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.2); }
+
+  .row.sky .rlabel .name, .row.sky .rlabel .val { color:var(--teal); }
+  .row.sky .rlabel .val { font-size:38px; }
+  .fill.sky { background:linear-gradient(180deg, #5fe0d6 0%, var(--teal-deep) 100%);
+    box-shadow:0 0 38px rgba(54,200,191,.5), inset 0 1px 0 rgba(255,255,255,.32); }
+  .gap { position:absolute; top:50%; height:0; border-top:2px dashed rgba(54,200,191,.72); transform:translateY(-50%); z-index:2; }
+  .gap .glabel { position:absolute; left:50%; top:-45px; transform:translateX(-50%); white-space:nowrap;
+    font-family:'Poppins',sans-serif; font-weight:600; font-size:18px; color:var(--teal);
+    background:rgba(54,200,191,.14); border:1px solid rgba(54,200,191,.42); border-radius:999px; padding:6px 15px; }
+
+  .foot { position:relative; z-index:1; margin-top:36px; font-size:16px; color:rgba(255,255,255,.5); }
+</style></head>
+<body>
+  <div class="slide">
+    <!-- LEFT: texto -->
+    <div class="text">
+      <div class="head-row">
+        <div class="rule"></div>
+        <div>
+          <div class="eyebrow">Share of Voice en IA</div>
+          <h1 class="title">SKY compite, pero el líder <em>concentra la conversación</em></h1>
+        </div>
+      </div>
+      <div class="body">
+        <p class="p">En las respuestas de asistentes con IA sobre la categoría, la marca líder concentra cerca de la <b>mitad</b> del Share of Voice.</p>
+        <p class="p">SKY aparece, pero a un tercio de esa presencia. Esos <b>+32 pts</b> de brecha son el techo — y el foco del plan.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: chart en glass card -->
+    <div class="brand">
+      <div class="card">
+        <div class="card-head">
+          <div class="titles">
+            <div class="chart-eyebrow">Distribución por marca</div>
+            <div class="chart-title">AI Share of Voice</div>
+            <div class="chart-sub">Participación en las respuestas de la categoría</div>
+          </div>
+          <div class="hero">
+            <div class="num">2,8×</div>
+            <div class="lab">lo que el líder concentra frente a SKY</div>
+          </div>
+        </div>
+
+        <div class="plot">
+          <div class="refline"></div>
+
+          <div class="row">
+            <div class="rlabel"><span class="name">Líder de categoría</span><span class="val">50%</span></div>
+            <div class="track"><div class="fill muted" style="width:88%"></div></div>
+          </div>
+
+          <div class="row">
+            <div class="rlabel"><span class="name">Competidor directo</span><span class="val">27%</span></div>
+            <div class="track"><div class="fill muted" style="width:48%"></div></div>
+          </div>
+
+          <div class="row sky">
+            <div class="rlabel"><span class="name">SKY</span><span class="val">18%</span></div>
+            <div class="track">
+              <div class="fill sky" style="width:32%"></div>
+              <div class="gap" style="left:32%; width:56%"><span class="glabel">+32 pts a cerrar</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="foot">Fuente: AI Visibility Grader · corrida ilustrativa (los valores reales se fijan por diagnóstico)</div>
+      </div>
+    </div>
+  </div>
+</body></html>
