@@ -1,7 +1,7 @@
 # Manual de uso — Construir una licitación paso a paso
 
 > **Tipo de documento:** Manual de uso (runbook operativo)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-07-11 por Claude (con Julio Reyes)
 > **Última actualización:** 2026-07-11 por Claude
 > **Documentación funcional:** `docs/documentation/comercial/construccion-de-licitaciones.md`
@@ -55,6 +55,10 @@ Guía operativa para **armar una propuesta de licitación** (pública o privada 
 - El agente redacta la propuesta hacia lo que evalúan las bases y le da un **pase de estilo** (claro, persuasivo, sin humo, en es-CL).
 - Revísala. Puedes pedir abrirla en el navegador o exportarla a Word/PDF para leerla cómoda.
 
+### 8-bis. Presentar el diagnóstico de visibilidad en IA (si el servicio es de contenido/SEO)
+- Si se corrió el **AI Visibility Grader** (paso 5), pídele al agente que lo presente en la propuesta con tres capas: **números concretos** (¿la IA conoce la marca?, ¿el blog del cliente aparece como fuente?, ¿quién lidera la categoría?), **el enlace vivo** al informe del cliente, y **la escalera 5-Be** (Ser encontrada / legible / correcta / accionable / intrínseca) con los **valores reales** del cliente y qué significa cada uno.
+- **Importante para el agente:** el informe completo (con tono y categoría) lo genera el **worker** al encolar el run; **no** se debe puntuar ni publicar el informe "a mano" (sale sin tono ni categoría). Los valores de la escalera se toman del informe publicado, no se inventan.
+
 ### 9. Armar la económica y el paquete
 - El agente crea la **planilla económica** (en el formato exigido; si no hay, diseña una limpia) con el precio confirmado.
 - Se re-corre la **matriz de cumplimiento** (todos los obligatorios ✅) y se **exporta a PDF** la técnica + la económica.
@@ -85,6 +89,9 @@ Si las tres no pasan, la propuesta no está lista.
 - **No** cotizar bajo el costo real del equipo ni bajar del piso de negociación.
 - **No** usar cifras o casos inventados; solo casos reales y citables.
 - **No** improvisar el alcance ni el equipo: se fundan con las skills de dominio.
+- **No** afirmar un negativo sin medirlo (ej. "no aparece en la IA"): se corre el grader real primero. Afirmar un negativo falso en una propuesta es grave.
+- **No** presentar que "la IA cita fuentes creíbles" como si citara al cliente: son cosas distintas. El dato fuerte es si el dominio del propio cliente aparece entre las fuentes.
+- **No** puntuar ni publicar el informe del grader "a mano": el informe completo (con tono y categoría) lo arma el worker al encolar el run.
 
 ## Problemas comunes
 

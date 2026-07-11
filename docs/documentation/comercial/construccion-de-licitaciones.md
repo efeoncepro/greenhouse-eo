@@ -1,7 +1,7 @@
 # Construcción de Licitaciones — Método Efeonce
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-07-11 por Claude (con Julio Reyes)
 > **Última actualización:** 2026-07-11 por Claude
 > **Documentación técnica / método canónico:** skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md`
@@ -29,6 +29,18 @@ Construir una licitación pasa por diez momentos encadenados. Cada uno produce a
 
 Antes de dar la propuesta por lista, se hace una **revisión crítica con tres miradas**: comercial (¿convence al comité y baja el miedo a decidir?), equipo (¿el equipo es real y tiene capacidad?) y finanzas (¿el precio cubre el costo real y no se erosiona con el tiempo?). Si las tres no pasan, la propuesta no está lista aunque el texto se lea bien.
 
+## El diagnóstico de visibilidad en IA (cuando el servicio es de contenido/SEO)
+
+Cuando la licitación es de contenido, SEO o presencia digital, Efeonce mide el activo del cliente con su propia herramienta —el **AI Visibility Grader**— y lo presenta en la propuesta como diferencial. La forma de mostrarlo tiene tres capas:
+
+1. **Números concretos** que cuentan una historia (¿la IA conoce la marca?, ¿el blog del cliente aparece como fuente cuando la IA responde?, ¿quién lidera la categoría?).
+2. **Un enlace vivo** al informe completo, para que el cliente vea su propio diagnóstico en tiempo real.
+3. **La escalera de madurez "5-Be"** —Ser encontrada, Ser legible, Ser correcta, Ser accionable, Ser intrínseca— con el valor real del cliente en cada peldaño y qué significa estar ahí. Esa escalera ordena todo en una foto y muestra que los peldaños débiles son, justamente, lo que el servicio va a trabajar.
+
+Dos cuidados de honestidad: **(a)** la escalera medida por la IA (percepción) puede diferir de la revisión técnica del sitio (¿tiene los datos que la IA necesita?), y no se contradicen —una mide la marca, la otra el activo—; al cliente va la medida. **(b)** Que la IA cite "fuentes creíbles" no significa que cite al cliente; el dato fuerte es si el dominio del propio cliente aparece entre esas fuentes.
+
+> Detalle técnico y operación del grader: skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md` (Fase 4-bis) y `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md`.
+
 ## Principios que no se negocian
 
 - **Primero admisibilidad, después todo lo demás.** Es el error más común quedar fuera por un anexo o una declaración faltante, no por el precio.
@@ -49,6 +61,12 @@ Este método es **vivo**: cada vez que armamos o mejoramos una licitación, se a
 
 ## Primer caso de referencia
 
-El primer caso completo con este método fue la licitación de **SKY Airline — Producción de Contenido Blog** (plataforma Wherex, julio 2026): se leyeron las bases, se validó admisibilidad, se eligieron los diferenciadores (caso Berel, SEO + AEO, portal, metodología Surround Discovery), se definió la cadencia con las áreas de contenido y SEO, se diseñó un squad de ~2,2 personas dedicadas, se calculó el precio sobre el costo real del equipo, y se redactó la propuesta con un pase de estilo. Los archivos viven en la carpeta comercial de esa licitación.
+El primer caso completo con este método fue la licitación de **SKY Airline — Producción de Contenido Blog** (plataforma Wherex, julio 2026): se leyeron las bases, se validó admisibilidad, se eligieron los diferenciadores (caso Berel, SEO + AEO, portal, metodología Surround Discovery, WordPress + partner de Automattic), se analizó el blog real con Semrush y el AI Visibility Grader, se benchmarkeó a la competencia (JetSMART, LATAM, Flybondi), se definió la cadencia con las áreas de contenido y SEO, se diseñó un squad de ~2,2 personas dedicadas, se calculó el precio sobre el costo real del equipo, y se redactó la propuesta con un pase de estilo. La propuesta incrusta el informe de visibilidad IA en vivo y la escalera 5-Be con los valores reales de SKY. Los archivos viven en la carpeta comercial de esa licitación.
 
-> **Detalle técnico:** el método canónico, las 10 fases y qué skill entra en cada una están en la skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md`. El manual operativo paso a paso está en `docs/manual-de-uso/comercial/construir-una-licitacion.md`.
+Este caso dejó dos aprendizajes que ya son parte del método: **medir antes de afirmar** (una versión previa dijo "SKY casi no aparece en la IA" por inferencia técnica; el grader real lo desmintió —SKY sí es reconocida y citada— y afirmar un negativo falso en una propuesta es grave), y **si la herramienta sale incompleta, se arregla la herramienta, no el informe del cliente** (así el resto de clientes no hereda el mismo hueco).
+
+## Hacia dónde va esto (norte)
+
+Este método manual es el **precursor de una plataforma agéntica de licitaciones**: cada fase (leer bases, admisibilidad, diagnóstico, squad, precio, redacción, deck y económica) está pensada para volverse una **capacidad con contrato programático gobernado** que la interfaz, el agente Nexa y las integraciones puedan operar —la misma doctrina de "todo tiene contrato programático" que rige a Greenhouse—. Los layouts de esa plataforma ya existen en Figma. Documentar bien el método hoy es construir el plano de ese producto: cuando se implemente, parte de aquí, no de cero.
+
+> **Detalle técnico:** el método canónico, las 10 fases (+ Fase 4-bis) y qué skill entra en cada una están en la skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md`. El manual operativo paso a paso está en `docs/manual-de-uso/comercial/construir-una-licitacion.md`.

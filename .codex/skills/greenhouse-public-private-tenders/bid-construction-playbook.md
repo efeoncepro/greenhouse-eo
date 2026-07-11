@@ -44,6 +44,21 @@ Cada fase declara: **qué se hace**, **qué skill/companion entra**, y **el outp
 - **Benchmarkea a la competencia del cliente** (`research-benchmark-operator` + Semrush + fetch). Mide a los competidores directos en su mismo terreno: ¿tienen el mismo activo (blog/sitio)? ¿quién va adelante? ¿dónde está la batalla directa (mismos términos/destinos)? ¿hay una carrera que nadie ganó aún (p. ej. AEO)? Esto convierte la propuesta en un argumento competitivo ("vas ganando esta carrera y nadie ganó la otra — te ponemos primero"), no solo en una lista de entregables. Declara peer set + `as-of` + confianza.
 - **Output:** definición de alcance, volumen y enfoque metodológico defendible, **calibrado con el diagnóstico del activo real**.
 
+### Fase 4-bis — Presentar el diagnóstico AEO en la propuesta (patrón replicable)
+
+El diagnóstico del grader (Fase 4) es un diferencial brutal, pero **cómo se presenta decide si convence o abruma**. Patrón de 3 capas, validado en SKY:
+
+1. **Números duros en bullets, encadenados a negocio** (no dimensiones sueltas). Elige 3-4 hechos que cuenten una historia: claridad de marca (¿la IA te conoce?), **citas del activo licitado** (¿el blog/sitio del cliente aparece como fuente? — casi siempre 0, y es el claim más potente), ownership de categoría (¿quién lidera la conversación vs. el cliente?). Cada bullet con su número real + qué significa.
+2. **Enlace vivo al informe público** (`think.efeoncepro.com/brand-visibility/r/<token>`): "puedes ver el informe completo, en vivo". Que el cliente vea su propio diagnóstico en vivo es un movimiento Challenger (teach) que vale más que un pitch.
+3. **La escalera de madurez 5-Be con sus valores REALES** — ordena todo en una foto. Los cinco peldaños (framework AEO de Efeonce): **Ser encontrada** (Be Found) · **Ser legible** (Be Readable) · **Ser correcta** (Be Correct) · **Ser accionable** (Be Actionable) · **Ser intrínseca** (Be Intrinsic). Los valores (score + severidad por peldaño) salen de `model.levels` del informe público — **NUNCA inventados**. Tabla: `peldaño (5-Be) | valor | qué mide | qué significa estar ahí`. Cierra con la lectura: *fortalezas en los peldaños óptimo + los peldaños crítico = exactamente el scope del servicio*. (Ejes: `found/readable/correct/intrinsic` son eje **percepción**; `actionable` es eje **agentic** — la frontera de la web agéntica.)
+
+**⚠️ Dos trampas de honestidad (no las pises):**
+
+- **Dos lentes del 5-Be, y NO se contradicen.** La lente **técnica inferida** (¿el sitio tiene schema/meta/`llms.txt`?) puede decir "Be Readable débil" mientras la lente **medida por el grader** (¿la IA percibe/representa a la marca?) dice "Ser legible óptimo" — porque una mide el **activo** y la otra la **percepción**. Al cliente va **solo la lente medida** (la técnica es munición interna para justificar el scope). El puente entre ambas suele ser **Ser accionable** (la frontera agéntica: ahí el gap técnico —datos estructurados ausentes— se ve MEDIDO en la escalera).
+- **`citation_quality` mide si las FUENTES que cita la IA son creíbles, NO si son del cliente.** Un `citation_quality` alto NO significa que citen al cliente. Por eso NO va a la propuesta como si midiera la marca; el claim defendible es **por dominios** (¿aparece el dominio/blog del cliente entre las fuentes citadas?). Confundirlos sería afirmar algo falso.
+
+**Regla de operación (Fase 4, recordatorio):** el informe completo (con tono + categoría percibida) SOLO sale del **camino del worker** (encolar run async → el worker ejecuta, puntúa CON extracción de prosa y **auto-publica** el snapshot). **NUNCA** `POST /score` ni `report/publish` manual desde local/Vercel: la extracción de prosa solo corre en el worker, y un score manual congela un informe incompleto (tono/categoría en blanco) — caso real SKY 2026-07-11.
+
 ### Fase 5 — Diseño del squad (Managed Squad)
 - Diseña el **equipo que se asigna al cliente**: roles, seniority, % dedicación, jerarquía, RACI y sinergias. Un servicio licitado = **Managed Squad** (Efeonce opera), no staff-aug.
 - De cara al cliente: **rol + seniority** (sin nombres, salvo consentimiento). Internamente: mapeo a roles de nómina para trazar el loaded cost.
@@ -110,6 +125,14 @@ Regla: si las tres lentes no pasaron, la propuesta **no está lista** aunque el 
 | 9 Empaquetado/export | `propuesta-tecnica-economica.md` |
 | 10 Presentación | humano (regla dura) |
 
+## Norte: hacia una plataforma agéntica de licitaciones
+
+Este método manual es el **precursor de un producto**: una plataforma agéntica —con tools— para construir licitaciones, decks y propuestas económicas de punta a punta. Los **layouts ya existen en Figma** (heads-up del operador, jul-2026).
+
+Implicación de diseño (para cuando se implemente): **cada fase de este playbook se vuelve una capability con contrato programático gobernado**, no lógica atrapada en una UI. Leer bases, correr admisibilidad, correr el grader + escalera 5-Be, diseñar el squad, calcular pricing sobre loaded cost, redactar, armar la económica y el deck → cada una un primitive canónico en `src/lib/**` que **la UI (los layouts Figma), Nexa y MCP** consumen por igual. Es la doctrina **Full API Parity** de Greenhouse aplicada al dominio comercial: un motor, muchos consumers; los writes sensibles (enviar, firmar, publicar) siguen el loop de acción gobernada `propose → confirm → execute` con el humano en el punto de confirmación (coherente con la Fase 10, "human-in-control").
+
+Regla para no perder el plano: **cada mejora del método manual documentada aquí es un requisito del producto futuro**. Cuando se autorice construir la plataforma (vía ADR/task del `software-architect-2026` + `greenhouse-backend`), parte de este playbook, no de cero. Documentar el método hoy = escribir la especificación funcional de ese runtime.
+
 ## Documentación viva (obligatorio al iterar)
 
 Este método es **vivo**: cada vez que se construye o mejora una licitación, se sincroniza en **tres planos** (contrato de documentación de plataforma):
@@ -122,4 +145,18 @@ Si el método cambia (nueva fase, nueva skill en la orquesta, nueva regla), actu
 
 ## Caso de referencia (primera destilación)
 
-Primer caso end-to-end que produjo este playbook: **SKY Airline — Producción de Contenido Blog** (Wherex, jul-2026). Ejercitó las 10 fases: lectura de bases → admisibilidad → fit (cliente existente, otra área) → diferenciadores (Berel, SEO+AEO, portal, Surround Discovery) → alcance vía `content-marketing-studio` + `seo-aeo` (8 art/mes, pillar/cluster) → squad (`client-squad-design`, ≈2,2 FTE) → pricing sobre loaded cost real de nómina → redacción + pase `copywriting`. Artefactos en la carpeta comercial de la licitación (borrador, oferta técnica, squad blueprint).
+Primer caso end-to-end que produjo este playbook: **SKY Airline — Producción de Contenido Blog** (Wherex, jul-2026; cliente existente de Efeonce en otra área). Ejercitó las 10 fases + la Fase 4-bis:
+
+- **Bases → admisibilidad → fit → diferenciadores** (Berel como caso SEO+AEO por Wherex, portal Greenhouse, Surround Discovery, WordPress + partner de Automattic).
+- **Alcance (Fase 4):** `content-marketing-studio` + `seo-aeo` (cadencia pillar/cluster); **análisis del activo real** con Semrush (~13,5K keywords, ~40K visitas/mes, near-miss como Antofagasta 110K en pos 12) + **AI Visibility Grader real** (2 runs de 5 motores) + **benchmark de competencia** (JetSMART rival directo mismos destinos; LATAM lidera la conversación en IA; nadie ganó la carrera AEO).
+- **Fase 4-bis (presentación del diagnóstico):** bullets duros (claridad de marca 100, **blog = 0 citas en 35 respuestas**, ownership 20 con LATAM 16 / JetSMART 9) + **informe público en vivo** incrustado + **escalera 5-Be con valores reales** (Ser encontrada 40 · Ser legible 70 · Ser correcta 37 · Ser accionable 8 · Ser intrínseca 76).
+- **Squad (`client-squad-design`, ≈2,2 FTE) → pricing sobre loaded cost real de nómina → redacción + pase `copywriting` → económica → export.**
+
+**Lecciones que este caso grabó en el método (aplican a toda licitación futura):**
+
+1. **Mide, no infieras — y jamás afirmes un negativo falso.** La primera versión dijo "SKY casi no aparece en la IA / no es citada" a partir de sondas técnicas; el grader real lo desmintió (entity 100, SoV competitivo alto — SKY SÍ es citada y reconocida). Afirmar un negativo falso en una propuesta es grave. Corregir al dato medido.
+2. **Si el instrumento sale parcial, arregla EL SISTEMA, no el informe.** Cuando el diagnóstico salió incompleto, el reflejo correcto no fue "maquillar el informe de este cliente" sino auditar el grader (parió `ISSUE-120` + `TASK-1390`: clasificador de fuentes, matching same-site, visibilidad de la degradación de prosa, backoff). Ajustar solo el informe habría dejado el gap oculto para los demás clientes.
+3. **El informe completo lo arma el worker, no la mano.** Ver Fase 4-bis (regla de operación): `POST /score`/publish manual congela un informe sin tono ni categoría.
+4. **Dos lentes del 5-Be no se contradicen** (Fase 4-bis): al cliente va la percepción medida; la técnica es munición interna.
+
+Artefactos en la carpeta comercial de la licitación (borrador, oferta técnica + HTML con la escalera 5-Be, oferta económica, squad blueprint, diagnóstico interno). Cómo operar el grader: memoria `reference_ai_visibility_grader_how_to_run` + `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md`.
