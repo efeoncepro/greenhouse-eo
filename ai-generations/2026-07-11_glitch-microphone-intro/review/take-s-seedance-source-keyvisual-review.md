@@ -1,5 +1,7 @@
 # Revisión — take S / Seedance 2.0 con key visual íntegro
 
+> Nota de contrato: las referencias históricas de esta revisión a foley directo sobre la malla quedaron supersedidas. El audio vigente son exactamente dos respuestas amplificadas `micrófono → preamp → monitor/corneta`; el veredicto de rechazo no cambia.
+
 ## Identificación
 
 | Campo | Valor |

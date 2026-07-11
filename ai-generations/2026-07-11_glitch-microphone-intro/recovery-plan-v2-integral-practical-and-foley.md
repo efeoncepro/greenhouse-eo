@@ -1,12 +1,14 @@
 # Plan de recuperación V2 — practical integrado y doble golpe real
 
-> Estado: **sin toma aprobada; reintento Seedance bloqueado externamente.** Este plan sustituyó la corrección editorial de F e I. Esos clips siguen **rechazados creativamente**: el `ON AIR` compuesto se percibe pegado y el gesto retimado comunica presión, no prueba de sonido.
+> Estado: **sin toma aprobada; rutas generativas T–Z agotadas y gasto detenido.** Este plan sustituyó la corrección editorial de F e I. Esos clips siguen **rechazados creativamente**: el `ON AIR` compuesto se percibe pegado y el gesto retimado comunica presión, no prueba de sonido.
 
 ## Addendum de ejecución — Fal / Seedance 2.0
 
 S usó el key visual 4K íntegro como referencia de `bytedance/seedance-2.0/image-to-video`, sin borrar, difuminar ni recomponer el `ON AIR`. La continuidad del set aprobó: cámara, paleta, cabina, mano, micrófono y practical quedaron fieles al material entregado. S se rechaza completo porque el índice se queda apoyado demasiado tiempo y el audio nativo no deja dos golpes aislados comprobables. La revisión canónica es [take-s-seedance-source-keyvisual-review.md](./review/take-s-seedance-source-keyvisual-review.md).
 
-T fija el gesto correcto —ruptura de contacto, impactos de máximo dos frames, rebote inmediato y aire claro— pero Fal respondió `HTTP 403 User is locked — Exhausted balance` antes de asignar un `request_id`. La siguiente acción es recarga de saldo por el titular de Fal; no se cambia diseño, referencia ni se intenta reparar S en post.
+T se ejecutó después de la recarga (`019f51ce-780f-7533-b4be-60e11f3e0d5b`). Conservó el set y el practical, pero sostuvo ambos contactos y su audio nativo tuvo actividad fuera del patrón de dos respuestas. U/V/X intentaron transferir guías temporales de uno o dos frames; Seedance volvió a expandirlas. W/Veo produjo dos contactos largos y una luz ajena; Y/Kling no corrigió la presión y degradó la continuidad; Z/Seedance usó una actuación humana como referencia, pero abrió apoyado y no separó dos taps. La evidencia consolidada está en [review/takes-u-to-z-guided-recovery-review.md](./review/takes-u-to-z-guided-recovery-review.md).
+
+No se autoriza otra variante equivalente de generación, edición o prompt. El costo estimado T–Z es US$10.44 más token billing de Seedance. No existe master ni candidata; no se mezcla audio, no se publica y no se copia ningún output a producción.
 
 ## Evidencia histórica de Omni / Vertex
 
@@ -80,13 +82,13 @@ No debe haber una fase de dedo aplastado, malla comprimida, brazo de micrófono 
 
 El sonido debe ser el de una yema golpeando suavemente la **rejilla de un micrófono de broadcast en un estudio**, no el de un botón, teclado, interruptor, metal hueco ni efecto de UI.
 
-La ruta preferida es capturar foley aislado de un micrófono real de construcción equivalente: registrar la respuesta mecánica del propio micrófono y una toma cercana de la rejilla a 48 kHz / 24-bit. Se escogen dos golpes de yema suaves, se sincronizan al fotograma de contacto y se mezclan sin música, voz, room tone ni tercer acento. Si se usa sonido nativo de Veo/Gemini, será una toma candidata sometida a la misma escucha; no se conserva por estar sincronizada.
+La ruta preferida es capturar o generar la salida real de una cadena de prueba `micrófono → preamp → corneta/monitor`: el gesto físico excita la cápsula, pero el espectador oye la respuesta amplificada del sistema, no el golpe de yema contra la rejilla en primer plano. Se escogen dos respuestas breves de monitor, se sincronizan al fotograma de contacto y se mantienen sin música, voz, room tone persistente ni tercer acento. Si se usa sonido nativo de un modelo, será una toma candidata sometida a la misma escucha; no se conserva sólo por estar sincronizada.
 
 | Capa | Debe oírse | No debe oírse |
 | --- | --- | --- |
-| Ataque | `toc` corto y amortiguado de yema sobre malla. | Click de mouse, botón plástico, golpe de uña. |
-| Cuerpo | Pequeña respuesta grave/media de cápsula y cuerpo del micrófono. | Pop subgrave excesivo, campana metálica o resonancia larga. |
-| Cola | Decaimiento seco de aproximadamente 80–120 ms. | Reverb de sala, whoosh, beep, estática o música. |
+| Ataque | Impulso de cápsula/preamp reproducido por el monitor; corto, limitado en banda y no close-miked. | Click de mouse, botón plástico, golpe directo de uña o piel sobre metal. |
+| Cuerpo | Respuesta grave/media contenida de la corneta/monitor, con carácter de señal amplificada. | Pop subgrave excesivo, boom cinematográfico, campana metálica o resonancia larga. |
+| Cola | Decaimiento amortiguado de cono de aproximadamente 80–120 ms. | Reverb de sala evidente, whoosh, beep, estática o música. |
 | Patrón | Dos eventos y sólo dos, en el frame de ambos contactos. | Acento de la señal, tercer golpe o subida musical. |
 
 El segundo golpe puede ser mínimamente más afirmado por interpretación, pero no un “doble click” ni una puntuación electrónica. La respuesta visual posterior no añade un sonido: el silencio que sigue deja que el motivo respire.
@@ -118,8 +120,8 @@ El segundo golpe puede ser mínimamente más afirmado por interpretación, pero 
 
 ## Fallback honesto
 
-Un modelo generativo no obtiene aprobación por prometer texto legible: debe demostrarlo dentro de este plano. Si las dos tomas completas no pasan el gate del `ON AIR`, la ruta correcta es una fuente con practical físico real o una escena 3D íntegra donde el letrero sea geometría del set. Esa alternativa preserva la integración material; **no habilita** volver a componer un rótulo sobre un video ya terminado.
+Un modelo generativo no obtiene aprobación por prometer texto legible o contacto breve: debe demostrar ambos dentro del plano. T–Z demostraron que, con la fuente actual contradictoria, el set puede preservarse pero el contacto se expande de forma sistemática; las ediciones además introdujeron artefactos. La ruta vigente es aprobar primero una fuente precontacto coherente —mismo set, practical y composición, pero dedo en hover y señal aún no disparada— o cambiar explícitamente la narrativa para aceptar el contacto inicial. La ruta 3D fue explorada y rechazada por dirección. Ninguna alternativa habilita retimar el dedo ni componer un rótulo sobre un video ya terminado.
 
 ## Resultado buscado
 
-El espectador ve un estudio real, un micrófono real y un técnico probándolo con dos toques suaves. Escucha dos `toc` breves de micrófono, no dos clics. Sólo entonces el estudio responde y Glitch puede abrirse.
+El espectador ve un estudio real, un micrófono real y un técnico probándolo con dos toques suaves. Escucha dos respuestas breves por la corneta/monitor —la confirmación de que el canal tiene señal—, no el golpe acústico sobre la rejilla ni dos clics. Sólo entonces Glitch puede abrirse.

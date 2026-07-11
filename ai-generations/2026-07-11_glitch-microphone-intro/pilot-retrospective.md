@@ -1,6 +1,6 @@
 # Retrospectivo del piloto Glitch — El micrófono se abre
 
-> Estado al 2026-07-11: **sin candidato aprobado.** F/I y O están rechazados creativamente. S de Seedance conserva el diseño pero falla actuación/foley; T no se pudo enviar por saldo Fal agotado. La ruta actual queda en [recovery-plan-v2-integral-practical-and-foley.md](./recovery-plan-v2-integral-practical-and-foley.md).
+> Estado al 2026-07-11: **sin candidato aprobado; gasto detenido después de Z.** T–Z probaron generación integral, guías temporales, guía de actuación y edición localizada. Ninguna toma pasó los dos contactos de 1–2 frames sin degradar continuidad. La evidencia queda en [review/takes-u-to-z-guided-recovery-review.md](./review/takes-u-to-z-guided-recovery-review.md).
 
 ## Propósito y alcance
 
@@ -108,22 +108,32 @@ Para añadir el sonido pedido por el operador, la primera formulación `audio-on
 
 1. El take natural queda como fuente técnica; E, F, H e I están rechazados. No hay placa visual ni candidato editorial vigente.
 2. Para este tipo de plano, `ON AIR` es parte de la escenografía y no pertenece al post. La toma V2 parte del key visual intacto y rechaza una generación que no conserve el practical.
-3. El audio nativo Omni es guía candidata, no materia prima de aceptación. El foley final debe pasar una escucha de contacto real de yema sobre malla de micrófono.
+3. El audio nativo Omni es guía candidata, no materia prima de aceptación. El foley final debe pasar una escucha de la respuesta amplificada `micrófono → preamp → monitor/corneta`, no del golpe directo sobre la malla.
 4. El montaje determinista conserva valor para timing que no cambie el significado físico; no puede reconstruir este gesto ni este practical.
-5. No se archivaron binarios en remoto ni se publicó nada. Eso ocurre sólo después de aprobación creativa.
+5. Los binarios del run se archivan en GCS como evidencia rechazada y con manifiesto remoto; no se publicó nada ni se copió a un bundle de producción.
+
+## Ronda Fal T–Z y cierre de gasto
+
+T se ejecutó después de recargar Fal y confirmó que Seedance puede retener el diseño y el `ON AIR` diegético, pero volvió sostenidos los dos contactos y añadió actividad/colas sonoras. U/V/X intentaron referencia temporal con contactos cada vez más compactos; el modelo los expandió sistemáticamente. W/Veo partió de un hover íntegro, pero hizo contactos largos e inventó un orbe. Y/Kling intentó una edición localizada y produjo presión, el mismo orbe y desaparición de la mano. Z transfirió la cadencia de O, pero abrió apoyado y no entregó dos taps separados.
+
+La ronda T–Z costó aproximadamente US$10.44 más token billing de Seedance. Al no existir visual aprobado, `finish-glitch-monitor-response-master.mjs` no se ejecuta como entrega. La corrección del operador sobre audio queda canonizada: deben oírse exactamente dos respuestas amplificadas de la cadena `micrófono → preamp → corneta/monitor`, no dos golpes directos de piel contra la rejilla.
+
+La auditoría posterior encontró una causa más temprana: el 4K ya muestra contacto y señal, aunque el contrato exige hover y señal posterior. La ruta fundada ya no es otro prompt ni 3D —3D fue rechazado por dirección— sino resolver el estado inicial. Si se mantiene la acción, debe aprobarse primero un key visual precontacto fiel al diseño y después probar un tap silencioso antes de escalar.
 
 ## Procedimiento reproducible
 
-El procedimiento anterior es histórico. El procedimiento vigente parte del key visual intacto, genera/filma una sola toma integral, exige el practical y la actuación completos antes de post, y resuelve el foley en un gate separado. Ver [recovery-plan-v2-integral-practical-and-foley.md](./recovery-plan-v2-integral-practical-and-foley.md).
+El procedimiento anterior es histórico. El procedimiento vigente separa verdad de diseño y first frame operativo: valida su compatibilidad, aprueba el estado precontacto, ejecuta preflight del producto, prueba un tap silencioso y sólo después escala a doble tap y audio. Ver [la auditoría de causa raíz](./review/source-state-and-creative-video-workflow-audit.md).
 
 El renderer y las variantes están en render-omni-glitch-intro.mjs. El procedimiento operativo reusable está en docs/manual-de-uso/ai-tooling/operar-pilotos-creative-workflow.md.
 
 ## Qué queda pendiente
 
-- Aprobación creativa del gesto, timing y frame de corte.
-- Aprobación creativa del foley de dos taps y revisión de la transición con el primer plano real de Glitch.
+- Decisión narrativa: aceptar el contacto inicial actual o aprobar un key visual precontacto.
+- Si se mantiene el doble tap, prueba silenciosa de un solo contacto con referencia ground-truth y stop rule de dos fallos equivalentes.
+- Aprobación creativa del gesto, timing y frame de corte de esa nueva fuente.
+- Aprobación de exactamente dos respuestas de corneta/monitor y revisión de la transición con el primer plano real de Glitch.
 - Decisión de upscale después del corte aprobado.
-- Archive gobernado de masters, export y revisión.
+- Verificación del archive gobernado de masters y evidencia rechazada.
 - Confirmación de gasto desde el ledger o facturación del proveedor, si se necesita conciliación financiera.
 
 ## Qué no cambia
@@ -132,4 +142,4 @@ Este piloto no cambia el runtime de Greenhouse, no crea una pantalla Studio, no 
 
 ## Aprendizaje promovido a las skills
 
-Las skills Codex y Claude se corrigieron: el finish determinista se limita a ajustes editoriales que no cambian la verdad física del plano. Una actuación táctil hero y un practical diegético son parte de la toma íntegra, no de una capa posterior; el foley de contacto se dirige como `piel → malla → cuerpo/cápsula`, con gate de escucha propio. Omni puede aportar guía, pero su output `completed` sigue siendo candidato técnico hasta pasar revisión temporal y creativa.
+Las skills Codex y Claude se corrigieron: el finish determinista se limita a ajustes editoriales que no cambian la verdad física del plano. Una actuación táctil hero y un practical diegético son parte de la toma íntegra, no de una capa posterior. En este caso el diseño sonoro no presenta el contacto acústico directo: presenta la cadena capturada y amplificada `piel/malla → cápsula/preamp → corneta/monitor`, con sólo dos respuestas y gate de escucha propio. Un output `completed` sigue siendo candidato técnico hasta pasar revisión temporal y creativa.

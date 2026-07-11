@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "state": "completed",
+  "mode": "--execute",
+  "provider": "fal.ai direct queue",
+  "model": "fal-ai/kling-video/o3/pro/video-to-video/edit",
+  "takeId": "y",
+  "strategy": "localized generative video edit of W performance; canonical 4K image supplied for appearance continuity; no masking/compositing",
+  "sourceVideo": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-w-veo-3-1-hover-double-tap-master.mp4",
+    "sha256": "e19fd20568f44717c94dcf3132d9c6d814126ce89130aeb79bc310fe186b5789",
+    "durationSeconds": 4
+  },
+  "keyVisual": {
+    "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e"
+  },
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-y-kling-o3-pro-tap-rebound-master.mp4",
+  "expected": "4 seconds, silent; exact source framing and practical with two 1–2-frame contacts",
+  "costNote": "Official Fal docs checked 2026-07-11: Kling O3 Pro edit is US$0.168/s; the four-second input is estimated at US$0.67.",
+  "startedAt": "2026-07-11T16:30:56.918Z",
+  "completedAt": "2026-07-11T16:37:49.660Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/kling-o3-pro-tap-rebound-edit.md",
+  "fal": {
+    "requestId": "019f5204-9161-7c42-8c86-51a9a937d166",
+    "remoteVideo": {
+      "url": "https://v3b.fal.media/files/b/0aa1d82e/1l-1P-0-ZhFxAHpcDWKn3_output.mp4",
+      "content_type": "video/mp4",
+      "file_name": "output.mp4",
+      "file_size": 6344771
+    }
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-y-kling-o3-pro-tap-rebound-master.mp4",
+    "bytes": 6344771,
+    "sha256": "8fd8ed282fa3747ffc1a7d57a7bf9645e11e67ddffecbd586331cb4fd4c2d1a3"
+  }
+}

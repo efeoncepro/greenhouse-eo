@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "state": "rejected-by-operator-visual-quality-do-not-continue",
+  "createdAt": "2026-07-11T17:04:07Z",
+  "blender": {
+    "version": "5.1.2",
+    "application": "/Applications/Blender.app",
+    "cli": "/opt/homebrew/bin/blender",
+    "installationScope": "system application outside repository"
+  },
+  "source": {
+    "keyVisual": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "keyVisualSha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e",
+    "usage": "camera, composition, palette and physical-practical reference only; not rendered as a backplate"
+  },
+  "humanAssetCandidate": {
+    "name": "Blender Human Base Meshes Bundle v1.0.0",
+    "sourceUrl": "https://download.blender.org/demo/bundles/bundles-3.6/human-base-meshes-bundle-v1.0.0.zip",
+    "downloadedOutsideRepo": "/Users/jreye/Library/Application Support/Blender/5.1/assets/greenhouse-glitch/human-base-meshes-bundle-v1.0.0.zip",
+    "sha256": "46a912c0524072ac3b78c35d5d2471df7b8df102394a050ca8cd7184e3393648",
+    "licenseEvidence": "Blender Foundation describes Essentials human base meshes as CC0; bundle source is official download.blender.org. Candidate was inspected but not used in this proxy blocking.",
+    "inspectedAsset": "Hand  - Realistic; 831 vertices"
+  },
+  "buildScript": "build-blender-v3-blocking.py",
+  "format": {
+    "durationSeconds": 5,
+    "fps": 24,
+    "frames": 120,
+    "previewDimensions": "360x640",
+    "audio": "none"
+  },
+  "performance": {
+    "hoverFrames": [1, 13, 16, 26, 29],
+    "contactFrames": [15, 28],
+    "reboundFrames": [16, 29],
+    "rule": "one-frame contacts; the following frame is airborne"
+  },
+  "artifacts": [
+    {
+      "role": "blocking-video",
+      "sha256": "71aedac455bdc9a093e2b141474982519a567d16a0b93225c4258167b64f8b1c",
+      "sizeBytes": 41793,
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/v3-blocking/glitch-microphone-intro-v3-blocking.mp4"
+    },
+    {
+      "role": "blender-scene",
+      "sha256": "0ebacd939d774ba63faade6c51e97c63880c4a82491ce81d4ace9da577aa6985",
+      "sizeBytes": 213441,
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/v3-blocking/glitch-microphone-intro-v3-blocking.blend"
+    },
+    {
+      "role": "contact-sheet",
+      "sha256": "5b5488bbd451a5442d25a13b4a4acdaba9fa6335038a5056a60374522aef616c",
+      "sizeBytes": 71479,
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/v3-blocking/blocking-contact-sheet.jpg"
+    }
+  ],
+  "decision": "Timing control passed, but the operator rejected the 3D direction because the reconstruction looked poor versus the supplied key visual. Do not continue lookdev, use as a video-model reference, publish or promote."
+}

@@ -2,6 +2,8 @@
 
 > Master editorial: 24 fps · duración objetivo de edición: 120 frames / 5,0 s · sin música ni VO.
 
+> **Preflight bloqueante:** este cue sheet no es compatible con el 4K actual como first frame, porque la fuente ya muestra contacto y señal azul. No volver a generar desde ese frame bajo este contrato. Primero debe aprobarse un key visual precontacto o cambiarse la narrativa; ver `review/source-state-and-creative-video-workflow-audit.md`.
+
 ## Lectura de la fuente
 
 El gesto no es una sola presión: es una comprobación de audio inequívoca. La yema ya está muy cerca de la parte alta de la rejilla; sólo necesita recorrer pocos milímetros para hacer dos contactos ligeros. La acción completa lee `tap, lift, tap, lift`, sin que el antebrazo entre, la muñeca caiga ni el dedo parezca presionar un botón.

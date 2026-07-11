@@ -1,5 +1,7 @@
 # Especificación de motion y sonido
 
+> **Estado de aplicabilidad:** el contrato sigue describiendo la intención creativa, pero no puede ejecutarse desde el 4K actual como frame inicial inmutable: allí la yema ya toca la rejilla y los arcos ya están visibles. Requiere un key visual precontacto aprobado o una decisión narrativa distinta antes de cualquier generación.
+
 ## Motion
 
 ### Principio dominante
@@ -32,21 +34,21 @@ El plano vive por **anticipación contenida, strike, rebound, strike, rebound y 
 
 ### Decisión de principio
 
-**Sin música no significa sin diseño.** La intro usa silencio activo: dos foleys aislados y nada más. Esto hace que el gesto sea una comprobación auditiva sin convertirlo en una “prueba de micrófono” explícita ni en una cama de ambiente.
+**Sin música no significa sin diseño.** La intro usa silencio activo: dos respuestas aisladas del canal por la corneta/monitor del estudio y nada más. El espectador no escucha el golpe acústico de la yema contra la rejilla en primer plano; escucha que el micrófono lo captó y que el sistema tiene señal.
 
 ### Paleta sonora
 
 | Capa | Diseño | Tratamiento |
 | --- | --- | --- |
-| Contacto 1 | Yema contra malla metálica: transiente pequeño de rejilla + cuerpo amortiguado de cápsula. | `Toc` seco, corto y cercano, con cuerpo bajo/medio contenido y cola de 80–120 ms; no un click. |
-| Contacto 2 | Mismo material y fuerza controlada, capturado en una toma distinta. | Segundo `toc` natural, no doble-click; sin boom, whoosh, beep, uña, campana ni botón plástico. |
+| Contacto 1 | La cápsula capta el impulso y el preamp lo entrega a una corneta/monitor del estudio. | `Pum/toc` amplificado, corto y limitado en banda, con cuerpo bajo/medio de altavoz y cola amortiguada de 80–120 ms; no se oye la yema en close-up. |
+| Contacto 2 | La misma cadena `micrófono → preamp → monitor`, con una segunda respuesta natural. | Segundo golpe de señal, no doble-click; sin boom cinematográfico, whoosh, beep, uña, campana ni botón plástico. |
 | Señal visual | Arcos azules y actividad baja de consola. | No tiene puntuación sonora propia ni tercer transiente. |
 | Resto | Silencio. | Sin room tone, estática, voz, música, stinger ni reverb de sala. |
 
 ### Sincronía y mezcla
 
 - Alinear los dos transientes al primer frame de contacto cercano a 0:00.62 y 0:01.17. El take I es evidencia rechazada y no determina estos tiempos.
-- La primera opción es foley aislado registrado sobre una rejilla de micrófono equivalente; el audio nativo de un modelo es guía candidata, no foley final por defecto. Documentar fuente, prompt si aplica, tomas elegidas y sincronía.
+- La primera opción es registrar o generar la **salida amplificada** de una cadena equivalente `micrófono → preamp → monitor/corneta`; el golpe acústico directo sobre la rejilla no es el sonido narrativo. El audio nativo de un modelo es guía candidata, no aprobación por defecto. Documentar fuente, prompt, cadena y sincronía.
 - Nunca conservar un tercer transiente que el modelo invente para la señal visual.
 - Mantener definición suficiente para traducir en móvil, sin convertir el transiente de rejilla en un click agresivo o separar el ataque de su cuerpo amortiguado.
 - Mezclar esta intro en el master completo de Glitch; no perseguir por separado un target de loudness que destruya su dinámica. Para web/social, evaluar el programa terminado contra el target de entrega acordado y dejar true peak con margen.
@@ -56,7 +58,7 @@ El plano vive por **anticipación contenida, strike, rebound, strike, rebound y 
 
 - [ ] No hay música, voz, aplauso, radio estática, room tone, beep, whoosh ni stinger.
 - [ ] El contacto se entiende en auriculares, laptop y móvil.
-- [ ] El SFX no suena a botón, teclado, puerta, uña, campana de metal ni golpe pesado; se entiende piel sobre malla de micrófono.
+- [ ] El SFX no suena a botón, teclado, puerta, uña, campana de metal ni golpe acústico cercano; se entiende que el canal del micrófono responde por el monitor/corneta.
 - [ ] Hay exactamente dos transientes, cada uno sincronizado con el frame de impacto y rebote; el hover entre ambos se entiende.
 - [ ] La señal visual no tapa ni reemplaza el segundo foley; no genera un tercer acento.
 - [ ] El corte deja espacio real para el primer downbeat o frase de Glitch.

@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "state": "completed",
+  "mode": "--execute",
+  "provider": "fal.ai direct queue",
+  "model": "fal-ai/veo3.1/image-to-video",
+  "takeId": "w",
+  "strategy": "Veo 3.1 from an unedited integral hover frame; two generated visual taps; audio disabled and governed separately",
+  "parent": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-v-seedance-2-reference-guided-master.mp4",
+    "sha256": "55b2fc9f956978c6322425ffda4ed8fdd49c04615ee83773ce145de61c448c5b",
+    "frame": 36
+  },
+  "source": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-microphone-intro-w-hover-source-v-frame-036.png",
+    "bytes": 1648556,
+    "sha256": "1a2821ba5da4f784fde5cd58dd56f7cbd3280ee011eb1a62e246e27e6b62138b",
+    "dimensions": "1080x1920"
+  },
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-w-veo-3-1-hover-double-tap-master.mp4",
+  "expected": "4 seconds, 1080p, 9:16, 24 fps target, silent",
+  "costNote": "Official Fal docs checked 2026-07-11: Veo 3.1 is US$0.20/s without audio at 1080p; four seconds are estimated at US$0.80.",
+  "startedAt": "2026-07-11T16:15:51.791Z",
+  "completedAt": "2026-07-11T16:17:45.456Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/veo-3-1-hover-source-double-tap.md",
+  "fal": {
+    "requestId": "019f51f6-c03f-75c3-a4d5-986506fd6c7f",
+    "seed": null,
+    "remoteVideo": {
+      "url": "https://v3b.fal.media/files/b/0aa1d7aa/VvMrkqdffbTj7_VXqOK2N_b2136a0cbd944eee94c1167139a6737f.mp4",
+      "content_type": "video/mp4",
+      "file_name": "b2136a0cbd944eee94c1167139a6737f.mp4",
+      "file_size": 3456651
+    }
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-w-veo-3-1-hover-double-tap-master.mp4",
+    "bytes": 3456651,
+    "sha256": "e19fd20568f44717c94dcf3132d9c6d814126ce89130aeb79bc310fe186b5789"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "ok": true,
+  "state": "completed",
+  "mode": "--execute",
+  "provider": "fal.ai direct queue",
+  "model": "bytedance/seedance-2.0/fast/reference-to-video",
+  "takeId": "z",
+  "strategy": "reference-guided integral regeneration: immutable 4K image + timing-only motion guide + two amplified monitor-response audio cues",
+  "source": {
+    "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e",
+    "dimensions": "2160x3840"
+  },
+  "motionSource": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-o-omni-integral-natural-double-tap-master.mp4",
+    "sha256": "e575896c318f852b042624a0e3d160fc1cc35d4c9dde229b4eff997163c516d4"
+  },
+  "foleySource": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-o-omni-integral-natural-double-tap-master.mp4",
+    "sha256": "e575896c318f852b042624a0e3d160fc1cc35d4c9dde229b4eff997163c516d4"
+  },
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-z-seedance-2-reference-guided-master.mp4",
+  "expected": "5 seconds, 720p, 9:16, 24 fps target, silent generated visual; exact monitor responses muxed only after visual approval",
+  "costNote": "Official Fal docs checked 2026-07-11: fast 720p with video input is approximately US$0.1452/s; five seconds are estimated at US$0.73 plus token billing.",
+  "startedAt": "2026-07-11T16:40:30.309Z",
+  "completedAt": "2026-07-11T16:43:18.722Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/seedance-2-reference-guided-tap-tap-z.md",
+  "guides": {
+    "motionGuide": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-o-omni-integral-natural-double-tap-master.mp4",
+      "bytes": 744554,
+      "sha256": "e575896c318f852b042624a0e3d160fc1cc35d4c9dde229b4eff997163c516d4"
+    },
+    "foleyGuide": null
+  },
+  "fal": {
+    "requestId": "019f520d-5406-7411-8113-3dec310bb415",
+    "seed": 155533357,
+    "remoteVideo": {
+      "url": "https://v3b.fal.media/files/b/0aa1d843/32NXH2NQYjGCDMNknv_Kl_video.mp4",
+      "content_type": "video/mp4",
+      "file_name": "video.mp4",
+      "file_size": 4757343
+    }
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-z-seedance-2-reference-guided-master.mp4",
+    "bytes": 4757343,
+    "sha256": "fb5ceac5f7ad7b8838898c0a245764e3d2eb66f9e160230bc2c99d0ff3733346"
+  }
+}

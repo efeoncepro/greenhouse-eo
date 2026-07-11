@@ -1,8 +1,8 @@
 # Creative Workflow piloto — producir la intro de Glitch
 
-> Actualización de ejecución 2026-07-11: se probó **Fal.ai / Seedance 2.0 image-to-video** con el key visual PNG 4K íntegro. S preservó correctamente diseño, cámara, colores, micrófono y practical físico, pero no aprobó la actuación ni el foley. T, la corrección dirigida de ese take, quedó bloqueado por `HTTP 403 User is locked — Exhausted balance` antes de generar. No se superpone, repone ni trackea el letrero.
+> Actualización de ejecución 2026-07-11: T se ejecutó tras recargar Fal y luego se probaron U–Z mediante Seedance Standard/Fast, Veo 3.1 y Kling O3 Pro. Todas las tomas fallaron el gate de dos contactos de 1–2 frames o la continuidad integral. El gasto se detuvo; no se superpone, repone, trackea ni recorta el letrero y tampoco se retima la actuación.
 
-> Estado: **operativamente bloqueado por saldo Fal.** F/I y O están rechazados creativamente: un practical diegético no se puede recomponer en post, una presión no se arregla mediante retime y una toma text-only no puede sustituir el diseño entregado. La ruta vigente es [recovery-plan-v2-integral-practical-and-foley.md](./recovery-plan-v2-integral-practical-and-foley.md); la evidencia de S/T está en [take-s-seedance-source-keyvisual-review.md](./review/take-s-seedance-source-keyvisual-review.md).
+> Estado: **operativamente bloqueado por contradicción del estado fuente, no por saldo.** F/I/O/S–Z están rechazados y 3D fue descartado por dirección. La siguiente ruta válida es aprobar un key visual precontacto o cambiar explícitamente la narrativa; otra variante equivalente desde el 4K actual no está fundada. Ver [la auditoría de causa raíz](./review/source-state-and-creative-video-workflow-audit.md).
 
 > Decisión de motor documentada: esta ruta no desplaza a Omni de RRSS. La landing de Redes Sociales partió de un set ficticio de imágenes generadas y Omni las convirtió en microescenas vivas publicadas; Glitch parte de una imagen que es la identidad exacta del set y exige física/tacto hero. La regla es seleccionar por fidelidad e interpretación permitidas, no por formato o canal: `.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
 
@@ -32,13 +32,16 @@ Revisar y aprobar en conjunto:
 
 No producir si aún se discute duración, el grado de silencio, la naturaleza del contacto o si la música entra antes/después del corte.
 
+Además, completar una matriz `estado visible en el source ↔ estado exigido al frame 0`. Si dedo, señal, iluminación, texto diegético o pose contradicen el primer beat, el request queda bloqueado. Un prompt no puede convertir un frame de contacto inmutable en un frame de hover. Ejecutar el preflight del producto cuando exista —por ejemplo `video_plan`— y conservar su resultado antes de simular costo o generar.
+
 ## Gate 1 — preparar la referencia
 
 1. Verificar el SHA-256 del key visual contra el README.
-2. Conservar el PNG 2160×3840 como fuente inmutable.
-3. Conservar el key visual original **2160×3840** como fuente canónica. Si un motor exige adaptación, sólo se permite una reducción sin crop que preserve integralmente el `ON AIR`, la mano y el micrófono. Quedan prohibidos el perfil `sign-neutral-720-jpeg` y cualquier neutralización del letrero.
+2. Conservar el PNG 2160×3840 como fuente canónica de diseño, no asumir automáticamente que es un first frame válido.
+3. Si se mantiene el contrato hover/doble tap, crear y aprobar un key visual precontacto fiel al original: misma composición, micrófono, mano, set, cromática y `ON AIR`, con yema elevada 8–12 mm y señal posterior aún inactiva. Si un motor exige adaptación, sólo se permite una reducción sin crop que preserve integralmente el practical, la mano y el micrófono. Quedan prohibidos el perfil `sign-neutral-720-jpeg` y cualquier neutralización del letrero.
 4. No usar el storyboard compuesto como input de Omni: contiene tipografía, mosaicos y frames múltiples que el modelo podría mezclar.
-5. Usar una sola imagen de referencia. El gesto de esta versión comienza en hover cercano y sólo recorre unos milímetros por contacto.
+5. Asignar un rol explícito a cada referencia: start frame, end frame, identidad, movimiento, cámara o audio. No derivar una guía de movimiento reordenando frames de un take rechazado.
+6. Probar primero un tap silencioso en clip corto; sólo escalar a doble tap cuando el rebote perceptual pase.
 
 ## Gate 2 — ruta Omni histórica (no ejecutar para V2)
 
@@ -91,7 +94,7 @@ Only after the second strike, let the existing blue signal arcs pulse once very 
 No added people, no cuts, no text overlays, no music or speech.
 ```
 
-Solicitar audio de scratch como parte de una edición audiovisual localizada, no con una instrucción `audio-only`: describir dos ticks secos de yema contra malla, sin música, voz, room tone, radio estática ni beep. El output completo sigue siendo un candidato que debe pasar gate visual y sonoro por separado.
+No solicitar audio durante esta prueba. El sonido se diseña sólo después de aprobar el visual y representa dos respuestas amplificadas `micrófono → preamp → monitor/corneta`, no dos ticks directos de yema contra malla.
 
 ## Gate 4 — revisión de imagen y selección
 
@@ -133,7 +136,7 @@ El script es reversible: toma el export Omni de cinco segundos, retima dos traye
 ## Gate 5 — post, sonido y finish (V2)
 
 1. Editar el take elegido a los primeros ~5 s definidos en `sequence-script.md`.
-2. Tratar el audio nativo de modelo como guía candidata, no como finish. El foley final se registra/genera de forma aislada y debe pasar el gate de `piel → malla → cuerpo de micrófono` de la especificación V2. No recuperar el audio del take I ni montar foley sobre una placa determinista rechazada.
+2. Tratar el audio nativo de modelo como guía candidata, no como finish. El foley final se registra/genera de forma aislada y debe pasar el gate de respuesta amplificada `micrófono → preamp → monitor/corneta`. No recuperar el audio del take I ni montar foley sobre una placa determinista rechazada.
 
 3. Mantener silencio fuera de los dos foleys; no incorporar room tone, música, voz, beep ni un tercer transiente inventado.
 4. Se pueden componer wordmarks o textos no diegéticos posteriores; nunca el `ON AIR` ni otro elemento que deba pertenecer al estudio.

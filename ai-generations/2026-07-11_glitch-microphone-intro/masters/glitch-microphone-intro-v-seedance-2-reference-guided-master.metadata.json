@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "state": "completed",
+  "mode": "--execute",
+  "provider": "fal.ai direct queue",
+  "model": "bytedance/seedance-2.0/reference-to-video",
+  "takeId": "v",
+  "strategy": "reference-guided integral regeneration: immutable 4K image + timing-only motion guide + two amplified monitor-response audio cues",
+  "source": {
+    "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e",
+    "dimensions": "2160x3840"
+  },
+  "motionSource": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-t-seedance-2-source-keyvisual-master.mp4",
+    "sha256": "8a71efd9eb31b91b960779df9822941381238ecc93687b7bfb0e11fce33c7dda"
+  },
+  "foleySource": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-o-omni-integral-natural-double-tap-master.mp4",
+    "sha256": "e575896c318f852b042624a0e3d160fc1cc35d4c9dde229b4eff997163c516d4"
+  },
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-v-seedance-2-reference-guided-master.mp4",
+  "expected": "5 seconds, 1080p, 9:16, 24 fps target, silent generated visual; exact monitor responses muxed only after visual approval",
+  "costNote": "Official Fal docs checked 2026-07-11: 1080p is US$0.682/s and video input applies a 0.6 multiplier; five seconds are estimated at US$2.05 plus token billing.",
+  "startedAt": "2026-07-11T16:05:51.116Z",
+  "completedAt": "2026-07-11T16:09:20.888Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/seedance-2-reference-guided-tap-tap-v.md",
+  "guides": {
+    "motionGuide": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-microphone-intro-v-ballistic-motion-guide-720x1280.mp4",
+      "bytes": 261380,
+      "sha256": "58571d2325c451da99aab1b9a22182ffa652467b25a00ade2d9d3f4cdb0d1bc1"
+    },
+    "foleyGuide": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-microphone-intro-v-two-monitor-response-guide.wav",
+      "bytes": 1440102,
+      "sha256": "a68570440f5409ae2944fc5141e34275175b834f0fe26dbc34de5b4abe619057"
+    }
+  },
+  "fal": {
+    "requestId": "019f51ed-9c41-7be1-a704-259a7367a3cd",
+    "seed": 643796002,
+    "remoteVideo": {
+      "url": "https://v3b.fal.media/files/b/0aa1d777/w9H8LwzDFz1VcnlkjeKnz_video.mp4",
+      "content_type": "video/mp4",
+      "file_name": "video.mp4",
+      "file_size": 10583442
+    }
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-v-seedance-2-reference-guided-master.mp4",
+    "bytes": 10583442,
+    "sha256": "55b2fc9f956978c6322425ffda4ed8fdd49c04615ee83773ce145de61c448c5b"
+  }
+}

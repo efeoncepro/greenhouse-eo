@@ -1,0 +1,647 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-07-11T17:04:07Z",
+  "run": "ai-generations/2026-07-11_glitch-microphone-intro",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-11_glitch-microphone-intro",
+  "totalBytes": 142160554,
+  "fileCount": 106,
+  "files": [
+    {
+      "path": "exports/glitch-microphone-intro-a-natural-5s-silent.mp4",
+      "sizeBytes": 1447706,
+      "sha256": "781b661f6bf70fc459b107a1a34b0e808009ddc2cfe437ddb15e76987b065bfb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-a-natural-5s-silent.mp4"
+    },
+    {
+      "path": "exports/glitch-microphone-intro-e-tap-tap-on-air-5s-silent.mp4",
+      "sizeBytes": 1311874,
+      "sha256": "c2a959e7fad20ad9071522856736020e6d26ae49e2b0c794ba5e45a05ad6819c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-e-tap-tap-on-air-5s-silent.mp4"
+    },
+    {
+      "path": "exports/glitch-microphone-intro-f-percussive-tap-on-air-5s-silent.mp4",
+      "sizeBytes": 705566,
+      "sha256": "57962772c3a5ac12e67f32dbbdb9ea85cd5562a6a8fd3a615c2eef50b0323977",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-f-percussive-tap-on-air-5s-silent.mp4"
+    },
+    {
+      "path": "exports/glitch-microphone-intro-i-percussive-tap-on-air-5s-gemini-foley.mp4",
+      "sizeBytes": 727914,
+      "sha256": "e0db767a4624f92ace6b9075681a5cd9330887ca7393e6bbbddabf7b1687f587",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-i-percussive-tap-on-air-5s-gemini-foley.mp4"
+    },
+    {
+      "path": "exports/glitch-microphone-intro-o-omni-integral-natural-double-tap-5s.mp4",
+      "sizeBytes": 747139,
+      "sha256": "e58c795b9df4ecaf98883db6993683e64134fbd0df4da1d0e4666b23c64d4978",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-o-omni-integral-natural-double-tap-5s.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-a-natural-omni-master.mp4",
+      "sizeBytes": 2478786,
+      "sha256": "2715a06cab88acfa72ba6fd658c2ef76f61196cfa580506e483e5a225051b30c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-a-natural-omni-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-d-tap-tap-omni-interactions-edit-master.mp4",
+      "sizeBytes": 2528755,
+      "sha256": "3561b1abff3ac5e19eac583b03e959b5a48fe078146cdc6522cca40b4f051c93",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-d-tap-tap-omni-interactions-edit-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-h-omni-percussive-tap-sound-guidance.mp4",
+      "sizeBytes": 959655,
+      "sha256": "c2994f5950d4c490b21dcecea929c41a1ea6b9e13d02288a14686241617e293a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-h-omni-percussive-tap-sound-guidance.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-k-omni-integral-text-to-video-master.mp4",
+      "sizeBytes": 626118,
+      "sha256": "193a3226878ed2a46166975a0fe0fd91c8cd6abadadb7cda6df58559d18a1c9e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-k-omni-integral-text-to-video-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-keyref-hand-neutral-jpeg-probe.mp4",
+      "sizeBytes": 2536004,
+      "sha256": "df555d2726e8deb85479e5e2604c595f43c96cbb18139f16eac5dcc440613578",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-keyref-hand-neutral-jpeg-probe.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-l-omni-integral-vertex-text-master.mp4",
+      "sizeBytes": 2498019,
+      "sha256": "57d6c061242de195608eea1f23848a734be5bae75a7c2e7d414daf728c8b2539",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-l-omni-integral-vertex-text-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-n-omni-integral-ballistic-tap-master.mp4",
+      "sizeBytes": 652575,
+      "sha256": "37af1d4435fa9e27faa5b9383a1d18ea3db7617f5285d192b65e19eca07cb31f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-n-omni-integral-ballistic-tap-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-o-omni-integral-natural-double-tap-master.mp4",
+      "sizeBytes": 744554,
+      "sha256": "e575896c318f852b042624a0e3d160fc1cc35d4c9dde229b4eff997163c516d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-o-omni-integral-natural-double-tap-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-r-omni-hand-reference-practical-master.mp4",
+      "sizeBytes": 2416811,
+      "sha256": "0be3a98d945778f7ec6add557fadfde23b4b381a45095793d7668bdd9983d032",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-r-omni-hand-reference-practical-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-s-seedance-2-source-keyvisual-master.mp4",
+      "sizeBytes": 2896160,
+      "sha256": "f02fcdcfaf47324616ff82927080333b3e6aa326591e3a71fe1d36d07b0a44e2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-s-seedance-2-source-keyvisual-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-t-seedance-2-source-keyvisual-master.mp4",
+      "sizeBytes": 2395341,
+      "sha256": "8a71efd9eb31b91b960779df9822941381238ecc93687b7bfb0e11fce33c7dda",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-t-seedance-2-source-keyvisual-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-u-seedance-2-reference-guided-master.mp4",
+      "sizeBytes": 5155790,
+      "sha256": "f1c7bc8a93002768abc29389a2c2f151d7f499707367546ab516336a565f7ee2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-u-seedance-2-reference-guided-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-v-seedance-2-reference-guided-master.mp4",
+      "sizeBytes": 10583442,
+      "sha256": "55b2fc9f956978c6322425ffda4ed8fdd49c04615ee83773ce145de61c448c5b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-v-seedance-2-reference-guided-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-w-veo-3-1-hover-double-tap-master.mp4",
+      "sizeBytes": 3456651,
+      "sha256": "e19fd20568f44717c94dcf3132d9c6d814126ce89130aeb79bc310fe186b5789",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-w-veo-3-1-hover-double-tap-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-x-seedance-2-reference-guided-master.mp4",
+      "sizeBytes": 3647987,
+      "sha256": "878d869e8677c8c70adecd124ae4dc0bd20c279c23304250de46ad6a31b8cb2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-x-seedance-2-reference-guided-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-y-kling-o3-pro-tap-rebound-master.mp4",
+      "sizeBytes": 6344771,
+      "sha256": "8fd8ed282fa3747ffc1a7d57a7bf9645e11e67ddffecbd586331cb4fd4c2d1a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-y-kling-o3-pro-tap-rebound-master.mp4"
+    },
+    {
+      "path": "masters/glitch-microphone-intro-z-seedance-2-reference-guided-master.mp4",
+      "sizeBytes": 4757343,
+      "sha256": "fb5ceac5f7ad7b8838898c0a245764e3d2eb66f9e160230bc2c99d0ff3733346",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-z-seedance-2-reference-guided-master.mp4"
+    },
+    {
+      "path": "refs/glitch-keyref-hand-light-720.jpg",
+      "sizeBytes": 172036,
+      "sha256": "49f4249d0d18eb201f97eebca4fd56b827adaa428c393914820133b1dc193459",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-keyref-hand-light-720.jpg"
+    },
+    {
+      "path": "refs/glitch-keyref-hand-light-720.png",
+      "sizeBytes": 1061640,
+      "sha256": "58e8404b836f4524ff1bda09cd9a7472d2a01b32ec0af6e767701de093b0d584",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-keyref-hand-light-720.png"
+    },
+    {
+      "path": "refs/glitch-keyref-mic-console-720.png",
+      "sizeBytes": 622556,
+      "sha256": "00c69bde654fe38d850a88dcb8a1f88e971dbcff7d97c73f16293d0d4f174476",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-keyref-mic-console-720.png"
+    },
+    {
+      "path": "refs/glitch-keyref-navy-blue-practicals-720.png",
+      "sizeBytes": 184899,
+      "sha256": "0402d3e8a8370b64f236af5ddf88a2b342ffd44e7634c2050acb7cd28af625e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-keyref-navy-blue-practicals-720.png"
+    },
+    {
+      "path": "refs/glitch-microphone-intro-u-ballistic-motion-guide-720x1280.mp4",
+      "sizeBytes": 296983,
+      "sha256": "c011ebb19ed6bd9d6c19dbd256569f322f902e1917e9315444c6b665dfc2dbf4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-microphone-intro-u-ballistic-motion-guide-720x1280.mp4"
+    },
+    {
+      "path": "refs/glitch-microphone-intro-v-ballistic-motion-guide-720x1280.mp4",
+      "sizeBytes": 261380,
+      "sha256": "58571d2325c451da99aab1b9a22182ffa652467b25a00ade2d9d3f4cdb0d1bc1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-microphone-intro-v-ballistic-motion-guide-720x1280.mp4"
+    },
+    {
+      "path": "refs/glitch-microphone-intro-w-hover-source-v-frame-036.png",
+      "sizeBytes": 1648556,
+      "sha256": "1a2821ba5da4f784fde5cd58dd56f7cbd3280ee011eb1a62e246e27e6b62138b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-microphone-intro-w-hover-source-v-frame-036.png"
+    },
+    {
+      "path": "refs/glitch-microphone-intro-x-ballistic-motion-guide-720x1280.mp4",
+      "sizeBytes": 203806,
+      "sha256": "9fa03ef70b3a563df5523603bdd025542603d1982a79f39a574aa3831a4397dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-microphone-intro-x-ballistic-motion-guide-720x1280.mp4"
+    },
+    {
+      "path": "refs/microfono-broadcast-4k-omni-reference.jpg",
+      "sizeBytes": 1280556,
+      "sha256": "73edea6034b85c5706847a6ac86998861d24897885aee5b993a8db5f9f22d08f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/microfono-broadcast-4k-omni-reference.jpg"
+    },
+    {
+      "path": "refs/microfono-broadcast-720x1280-omni-integral.jpg",
+      "sizeBytes": 124452,
+      "sha256": "993aaca5ccaf6b6210eef70ed9546d82b677c1ce5f0bac2af67dc3ddf603ced8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/microfono-broadcast-720x1280-omni-integral.jpg"
+    },
+    {
+      "path": "refs/microfono-broadcast-720x1280-omni-integral.png",
+      "sizeBytes": 1102278,
+      "sha256": "b888fa0af92f204480c4f3f36e3b4a16bda15cf9fa58a3a384c8b9a18a5e0bea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/microfono-broadcast-720x1280-omni-integral.png"
+    },
+    {
+      "path": "refs/microfono-broadcast-720x1280-omni-reference.png",
+      "sizeBytes": 1102278,
+      "sha256": "b888fa0af92f204480c4f3f36e3b4a16bda15cf9fa58a3a384c8b9a18a5e0bea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/microfono-broadcast-720x1280-omni-reference.png"
+    },
+    {
+      "path": "refs/microfono-broadcast-sign-neutral-720x1280-omni-reference.jpg",
+      "sizeBytes": 122740,
+      "sha256": "df0a460dfbd9222b27fe84d7351b9327e4332248b5263fcd6c663b95b47de0de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/refs/microfono-broadcast-sign-neutral-720x1280-omni-reference.jpg"
+    },
+    {
+      "path": "review/glitch-microphone-intro-o-omni-integral-natural-double-tap-poster.jpg",
+      "sizeBytes": 77240,
+      "sha256": "b76a2d6533edb1bbf03a435b767b1caaef542a8769f0366b99c1fe475c3bfa3b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/glitch-microphone-intro-o-omni-integral-natural-double-tap-poster.jpg"
+    },
+    {
+      "path": "review/keyref-hand-neutral-jpeg-probe-overview.png",
+      "sizeBytes": 871500,
+      "sha256": "b47c118b01a22190ce98b65c4d2a767c0b55e7f5a1220da66e18d8e382667044",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/keyref-hand-neutral-jpeg-probe-overview.png"
+    },
+    {
+      "path": "review/take-k-omni-text-action.png",
+      "sizeBytes": 1116041,
+      "sha256": "4a6c1fed013f044625ca8cd088ccc2e34515b689f2a7ee6dbc1bb0370019b103",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-k-omni-text-action.png"
+    },
+    {
+      "path": "review/take-k-omni-text-audio-0-3s.png",
+      "sizeBytes": 4384,
+      "sha256": "64213012e285b1185ccccf116b289c163492bec2505081a94c118303fac9fe76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-k-omni-text-audio-0-3s.png"
+    },
+    {
+      "path": "review/take-k-omni-text-overview.png",
+      "sizeBytes": 244593,
+      "sha256": "2d2b9da97a82e2ef9c21260ae9b0a6e809fc09c08dd35fa5a8aad69f2e33700e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-k-omni-text-overview.png"
+    },
+    {
+      "path": "review/take-l-vertex-text-12fps-contact-window-detail.png",
+      "sizeBytes": 2156130,
+      "sha256": "723cdf7152d8c07de6dec69046fd2dfa6f23899c9175be0d7d8dfd8cff08f23b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-l-vertex-text-12fps-contact-window-detail.png"
+    },
+    {
+      "path": "review/take-l-vertex-text-24fps-contact-window.png",
+      "sizeBytes": 1135885,
+      "sha256": "a61cb36f050d26d90300de7e2729c20eb11a6a7e3cfb457091c924ea452f10a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-l-vertex-text-24fps-contact-window.png"
+    },
+    {
+      "path": "review/take-l-vertex-text-24fps-grille-contact-crop.png",
+      "sizeBytes": 1677910,
+      "sha256": "0a9b8afda1c837826c02e6830b1c8206c903b2dfe6acae95388479486181f008",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-l-vertex-text-24fps-grille-contact-crop.png"
+    },
+    {
+      "path": "review/take-l-vertex-text-action.png",
+      "sizeBytes": 1012243,
+      "sha256": "946c6fec896df4320b5898b90a4fe9da618a54b88034e9ba228de7ce4e9d05b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-l-vertex-text-action.png"
+    },
+    {
+      "path": "review/take-l-vertex-text-audio-0-3s.png",
+      "sizeBytes": 3581,
+      "sha256": "1fd11f2a002782269c8d34420bc55ec5757c1b5f33d634218f63e7199ab4ff88",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-l-vertex-text-audio-0-3s.png"
+    },
+    {
+      "path": "review/take-l-vertex-text-overview.png",
+      "sizeBytes": 758582,
+      "sha256": "67f26c6396ac9a64f64bb0ab7d5b7680a004c20031b7751adc211f7199b4f112",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-l-vertex-text-overview.png"
+    },
+    {
+      "path": "review/take-n-omni-ballistic-24fps-grille-contact-crop.png",
+      "sizeBytes": 1937274,
+      "sha256": "fd4f635d171728e4f5f1dfb4fbf78577cd3ec556fe1d1a1a56b383684b603334",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-n-omni-ballistic-24fps-grille-contact-crop.png"
+    },
+    {
+      "path": "review/take-n-omni-ballistic-audio-0-3s.png",
+      "sizeBytes": 4383,
+      "sha256": "648e496ce57aa32e09618d7a073bb4136bc2d953bd7d9196c2f1e952ba04487a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-n-omni-ballistic-audio-0-3s.png"
+    },
+    {
+      "path": "review/take-n-omni-ballistic-overview.png",
+      "sizeBytes": 237173,
+      "sha256": "640bb5f01fd60a846d77a7563e9fdf8c690084d1cd84445f242bef4cc6d30426",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-n-omni-ballistic-overview.png"
+    },
+    {
+      "path": "review/take-o-contact-01.jpg",
+      "sizeBytes": 751935,
+      "sha256": "e51ac133197e0f7de127628049f7b11896a7a33a16e71dfa342cc5b730c9945e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-o-contact-01.jpg"
+    },
+    {
+      "path": "review/take-o-contact-02.jpg",
+      "sizeBytes": 410862,
+      "sha256": "941b7edcba3b7cc7a6d77886f8429f966b3014404f5be95d106fcaaad9f10e96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-o-contact-02.jpg"
+    },
+    {
+      "path": "review/take-o-omni-natural-24fps-grille-contact-crop.png",
+      "sizeBytes": 2391941,
+      "sha256": "5ce39d830a473e25c9dca7791d8f858ba6dec47888da9225f721c0f03ec1253f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-o-omni-natural-24fps-grille-contact-crop.png"
+    },
+    {
+      "path": "review/take-o-omni-natural-audio-0-3s.png",
+      "sizeBytes": 3610,
+      "sha256": "2682533f44c67bd872dc176f8e768ae5cff9ed631322d6da95e983ee9d3c7a9a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-o-omni-natural-audio-0-3s.png"
+    },
+    {
+      "path": "review/take-o-omni-natural-audio-sync-frames.png",
+      "sizeBytes": 1927511,
+      "sha256": "8a8287763ee1b8ac037f5ab072f21ae93bbb57529fdb762f421151881cf4f0f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-o-omni-natural-audio-sync-frames.png"
+    },
+    {
+      "path": "review/take-o-omni-natural-overview.png",
+      "sizeBytes": 231942,
+      "sha256": "55a3e394566ee4f61850b045525b64bba70f69f0ddd29495b48555938a96955e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-o-omni-natural-overview.png"
+    },
+    {
+      "path": "review/take-s-frames/f-01.png",
+      "sizeBytes": 1382792,
+      "sha256": "73aef3294a50f0101aef88ab665cefe02c1fa0e8b54136693348e4cead220760",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-01.png"
+    },
+    {
+      "path": "review/take-s-frames/f-02.png",
+      "sizeBytes": 1417941,
+      "sha256": "62f80b5cc98764dffdbeceb22330f996121d037eded6b1b88b770d1aa913aa5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-02.png"
+    },
+    {
+      "path": "review/take-s-frames/f-03.png",
+      "sizeBytes": 1433538,
+      "sha256": "2094b8defee1c25b08d08e5223b39e0db8030484844efe3e251a814d3501da47",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-03.png"
+    },
+    {
+      "path": "review/take-s-frames/f-04.png",
+      "sizeBytes": 1411699,
+      "sha256": "fb2be475d10d3ca3eef57d1024c4de78659a7d6169f3c0d28abe57b86c9e6b5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-04.png"
+    },
+    {
+      "path": "review/take-s-frames/f-05.png",
+      "sizeBytes": 1410550,
+      "sha256": "a3ce7489ffe1d6d3c7934a3dfcb4e6c64e76445b10acef0b8305b5de5790fb63",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-05.png"
+    },
+    {
+      "path": "review/take-s-frames/f-06.png",
+      "sizeBytes": 1412185,
+      "sha256": "6a752702d2bde82ae468d1d618c96de539593ec37c08fa526307b4b4422e1374",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-06.png"
+    },
+    {
+      "path": "review/take-s-frames/f-07.png",
+      "sizeBytes": 1417385,
+      "sha256": "936e9bbc54dc45ae8d998a4cd670e871b34538cfff80fc3a64fadec4c147a32e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-07.png"
+    },
+    {
+      "path": "review/take-s-frames/f-08.png",
+      "sizeBytes": 1452646,
+      "sha256": "19af546c62c0651bde8461e1945ba4aeeeceee2d78d00e3b60e0fca8ba41c657",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-08.png"
+    },
+    {
+      "path": "review/take-s-frames/f-09.png",
+      "sizeBytes": 1505256,
+      "sha256": "a9dca9711387b738542452a1ce52e262c358cd36f2c2f41c79c1db054c3d887c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-09.png"
+    },
+    {
+      "path": "review/take-s-frames/f-10.png",
+      "sizeBytes": 1486713,
+      "sha256": "7f1b58beb3077c2c53ac225e14ec8424f6afd6f1d0f776afe42fd955740b07a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-10.png"
+    },
+    {
+      "path": "review/take-s-frames/f-11.png",
+      "sizeBytes": 1520099,
+      "sha256": "26246711145b44ae0bee112d1d574bb4fa18ab081cf449b759c16b34b5ddf785",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-11.png"
+    },
+    {
+      "path": "review/take-s-frames/f-12.png",
+      "sizeBytes": 1545687,
+      "sha256": "8966470fcdb1426c0c0a51ebb1bdc4005a3d5166f35142fa82b9a2fb60b18f10",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-12.png"
+    },
+    {
+      "path": "review/take-s-frames/f-13.png",
+      "sizeBytes": 1529383,
+      "sha256": "0e5077812d72a89e0f5b082af3377a0345346f085a7cd06cb4bf48f49be32200",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-13.png"
+    },
+    {
+      "path": "review/take-s-frames/f-14.png",
+      "sizeBytes": 1527403,
+      "sha256": "613875e9425bd311d7bf0d909b1d47a4704a7df7f5ba74f4a3b7e93e16c69599",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-14.png"
+    },
+    {
+      "path": "review/take-s-frames/f-15.png",
+      "sizeBytes": 1563518,
+      "sha256": "81fdc5e0cce1a0a10a0e29689a18de87bec9fcd090dfcd17a6137b38cf5cc6e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-15.png"
+    },
+    {
+      "path": "review/take-s-frames/f-16.png",
+      "sizeBytes": 1555572,
+      "sha256": "ef171c8cf0fda29f2e27797ba39f425c8deebeb7a3f43b8dde93d6d655c302e3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-16.png"
+    },
+    {
+      "path": "review/take-s-frames/f-17.png",
+      "sizeBytes": 1541182,
+      "sha256": "eb0d63d250f76cf3eae98e18892e5794bd966b7b795914f18568816314368626",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-17.png"
+    },
+    {
+      "path": "review/take-s-frames/f-18.png",
+      "sizeBytes": 1475818,
+      "sha256": "930f550f3fc2effa1cff9def4b3800d2213562890acdc3d57e9714905550aa81",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-frames/f-18.png"
+    },
+    {
+      "path": "review/take-s-seedance-24fps-contact-window-1p5-4p1.png",
+      "sizeBytes": 5034695,
+      "sha256": "9ead505d84c63df420ad332bb463be25080f7753e0b53c0698d6e7aa3ddbd6ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-seedance-24fps-contact-window-1p5-4p1.png"
+    },
+    {
+      "path": "review/take-s-seedance-audio-0-3s.png",
+      "sizeBytes": 6230,
+      "sha256": "0dccfaa8a0ca5198cf5a92108aa205c25a631fd31bafa8cb661c4286626af62f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-seedance-audio-0-3s.png"
+    },
+    {
+      "path": "review/take-s-seedance-full-action-window.png",
+      "sizeBytes": 2650764,
+      "sha256": "6664184dc4bd8395cb91350fa2aa935001ba7919ea93a07c3177d6e253288841",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-seedance-full-action-window.png"
+    },
+    {
+      "path": "review/take-s-seedance-source-overview.png",
+      "sizeBytes": 410543,
+      "sha256": "23da46022033f991e91ab19fe15d1be564d4eec39c1cef7551fe31735c03796e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-seedance-source-overview.png"
+    },
+    {
+      "path": "review/take-s-seedance-tap-window.png",
+      "sizeBytes": 2738209,
+      "sha256": "6c0dd9e2ad5116273b9b6292d836bdff5c6413fad84dc3b34cee54313849aeab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-seedance-tap-window.png"
+    },
+    {
+      "path": "review/take-t-seedance-audio-waveform.png",
+      "sizeBytes": 8109,
+      "sha256": "8ed4e555b2385aa3559dbef24aeebe435b4da402cdc72e84ea6bacec48ed97e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-t-seedance-audio-waveform.png"
+    },
+    {
+      "path": "review/take-t-seedance-contact-window-frames-31-70.jpg",
+      "sizeBytes": 907888,
+      "sha256": "4cbfa4a410eee61d193c12e2e96f0adaff6cb744173edf7fdb3e08a05b8ad358",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-t-seedance-contact-window-frames-31-70.jpg"
+    },
+    {
+      "path": "review/take-t-seedance-overview.jpg",
+      "sizeBytes": 437151,
+      "sha256": "f2bd003a89003a455e307ecdd400aeb2beebd8570749ea921fee0dfbc7aae63e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-t-seedance-overview.jpg"
+    },
+    {
+      "path": "review/take-t-seedance-second-contact-frames-71-100.jpg",
+      "sizeBytes": 690062,
+      "sha256": "c19a0f4293bdb806322da18ccc754c39e5d1317b033e9f063c5c0b5bcab8517b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-t-seedance-second-contact-frames-71-100.jpg"
+    },
+    {
+      "path": "review/take-u-contact-1-frames-30-43.jpg",
+      "sizeBytes": 783846,
+      "sha256": "48fd7cf63a42e0e3f5345739d9f3567e225562e0aea743cb07afe70cf4b69f47",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-u-contact-1-frames-30-43.jpg"
+    },
+    {
+      "path": "review/take-u-contact-2-frames-49-62.jpg",
+      "sizeBytes": 784549,
+      "sha256": "7cc4c58db5921cd47a05be295f7599479ceb4240fd83e1e976ff3cb95c4ae2f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-u-contact-2-frames-49-62.jpg"
+    },
+    {
+      "path": "review/take-u-monitor-response-guide-waveform.png",
+      "sizeBytes": 3643,
+      "sha256": "10d2fb1780fdf8cf6489dc8e539c5f9e6ccd9313837485fa4961e4052c948d85",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-u-monitor-response-guide-waveform.png"
+    },
+    {
+      "path": "review/take-u-seedance-action-frames-21-80.jpg",
+      "sizeBytes": 1378926,
+      "sha256": "0118ed726d5aaaafeb4755afabc0ff7c29a3def9ff59abab54504df8e9f64974",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-u-seedance-action-frames-21-80.jpg"
+    },
+    {
+      "path": "review/take-u-seedance-audio-spectrum.png",
+      "sizeBytes": 504724,
+      "sha256": "6147253dedc4c21dc9c0860805589590cb2d3c284b03a08dd8fe34d654075f6a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-u-seedance-audio-spectrum.png"
+    },
+    {
+      "path": "review/take-u-seedance-audio-waveform.png",
+      "sizeBytes": 4493,
+      "sha256": "03fefb2dff14e6997655419bb5c41e9aadbef0e674200ab14fbcb17571d83b49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-u-seedance-audio-waveform.png"
+    },
+    {
+      "path": "review/take-u-seedance-overview.jpg",
+      "sizeBytes": 441287,
+      "sha256": "277abf6abe39ed5360699fad3c1d7e282299ed4e9397e29a68a0c41dc9119709",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-u-seedance-overview.jpg"
+    },
+    {
+      "path": "review/take-v-contact-1-frames-25-45.jpg",
+      "sizeBytes": 1317744,
+      "sha256": "f49d35eb80fa4aba79154f740d24cdbd2668638e6edebb06e265df5dc0fcef3d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-v-contact-1-frames-25-45.jpg"
+    },
+    {
+      "path": "review/take-v-contact-2-frames-44-64.jpg",
+      "sizeBytes": 1197015,
+      "sha256": "0cb358e7591f0239ab86e9481354c82b93ac878a01e35e649ac86caf7ca26799",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-v-contact-2-frames-44-64.jpg"
+    },
+    {
+      "path": "review/take-v-seedance-overview.jpg",
+      "sizeBytes": 451357,
+      "sha256": "cad887fe93e2c1ac07360d2464a6604e1dc7f269f3cfd4f5aadccd4798a8ed66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-v-seedance-overview.jpg"
+    },
+    {
+      "path": "review/take-w-veo-action-frames-01-48.jpg",
+      "sizeBytes": 2048156,
+      "sha256": "c21b53ac41e9453293c138641f617afb064fa9617bccbafd6b250a8ef5cfcc67",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-w-veo-action-frames-01-48.jpg"
+    },
+    {
+      "path": "review/take-w-veo-action-frames-49-96.jpg",
+      "sizeBytes": 1758946,
+      "sha256": "fa231e4dff5a8bef805fec20c5249dd0debfe172b273c6399ac22d9b31a37f47",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-w-veo-action-frames-49-96.jpg"
+    },
+    {
+      "path": "review/take-w-veo-overview.jpg",
+      "sizeBytes": 549743,
+      "sha256": "7d0114539560c1f2e2110aaed4c040e664e37d347c04e04e3913f032e30f0e8f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-w-veo-overview.jpg"
+    },
+    {
+      "path": "review/take-x-seedance-action-frames-20-69.jpg",
+      "sizeBytes": 2088571,
+      "sha256": "ae98ff518d95b320440f6c96a1aeb096c91014b9fcdbd2f503605894147199aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-x-seedance-action-frames-20-69.jpg"
+    },
+    {
+      "path": "review/take-x-seedance-overview.jpg",
+      "sizeBytes": 416311,
+      "sha256": "519d939ca8cc92ec67401eb9a389779751f1394d0cd659d13b3fc4710480f0ac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-x-seedance-overview.jpg"
+    },
+    {
+      "path": "review/take-y-contact-01.jpg",
+      "sizeBytes": 912017,
+      "sha256": "2dd22223bf34dec8f3f30ee1322404d9ea2aa6cfa7c1e4611a9d475b403922e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-y-contact-01.jpg"
+    },
+    {
+      "path": "review/take-y-contact-02.jpg",
+      "sizeBytes": 801934,
+      "sha256": "a06d253471fdba1feac56b2953e78f198a1a816fac0609d8d85eeb30d2d5a59b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-y-contact-02.jpg"
+    },
+    {
+      "path": "review/take-y-contact-03.jpg",
+      "sizeBytes": 128102,
+      "sha256": "d40cfc5b41d4b07aa074af06605e501772d71e0dba8e46c0f7a14020a4e691bd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-y-contact-03.jpg"
+    },
+    {
+      "path": "review/take-z-contact-01.jpg",
+      "sizeBytes": 832899,
+      "sha256": "508994e08fe20602c6c0bb1fd95bf17b7a373d6023cf35e23a535fc77d3853c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-z-contact-01.jpg"
+    },
+    {
+      "path": "review/take-z-contact-02.jpg",
+      "sizeBytes": 771843,
+      "sha256": "a8205f296d2adda9c5ac9ef96c0316548f69fef0aa1363ab62060b63f9bc57c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-z-contact-02.jpg"
+    },
+    {
+      "path": "review/take-z-contact-03.jpg",
+      "sizeBytes": 426876,
+      "sha256": "d88f3a80fdc3544b92537fe8b5288356a47d834374b33cfdcb5e37d8e7a44920",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/review/take-z-contact-03.jpg"
+    },
+    {
+      "path": "v3-blocking/blocking-contact-sheet.jpg",
+      "sizeBytes": 71479,
+      "sha256": "5b5488bbd451a5442d25a13b4a4acdaba9fa6335038a5056a60374522aef616c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/v3-blocking/blocking-contact-sheet.jpg"
+    },
+    {
+      "path": "v3-blocking/glitch-microphone-intro-v3-blocking.blend",
+      "sizeBytes": 213441,
+      "sha256": "0ebacd939d774ba63faade6c51e97c63880c4a82491ce81d4ace9da577aa6985",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/v3-blocking/glitch-microphone-intro-v3-blocking.blend"
+    },
+    {
+      "path": "v3-blocking/glitch-microphone-intro-v3-blocking.mp4",
+      "sizeBytes": 41793,
+      "sha256": "71aedac455bdc9a093e2b141474982519a567d16a0b93225c4258167b64f8b1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_glitch-microphone-intro/v3-blocking/glitch-microphone-intro-v3-blocking.mp4"
+    }
+  ]
+}

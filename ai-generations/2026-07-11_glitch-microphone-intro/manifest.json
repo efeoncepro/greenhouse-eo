@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "runId": "2026-07-11_glitch-microphone-intro",
-  "status": "seedance-2-retry-blocked-by-fal-balance",
-  "workflowStatus": "pilot-evidence-retained; deterministic-overlay-and-retime route rejected; text-only plate O rejected for design drift; Seedance S rejected for sustained contact/native-audio ambiguity; Seedance T blocked before request by Fal balance",
+  "status": "no-approved-master-after-takes-t-through-z; generative-spend-stopped",
+  "workflowStatus": "pilot evidence retained; production frozen after source-state audit confirmed that the immutable 4K starts in contact with signal already visible while the brief requires hover and post-second-tap signal; no retime, ON AIR recomposition, candidate, publication or production bundle output",
   "purpose": "Pilot creative workflow for the Glitch intro motif: El micrófono se abre.",
   "format": {
     "aspectRatio": "9:16",
@@ -32,11 +32,11 @@
   },
   "currentEngine": {
     "provider": "fal.ai",
-    "model": "bytedance/seedance-2.0/image-to-video",
-    "mode": "image-to-video with exact intact 4K source; no overlay, crop, tracking or text repair",
-    "status": "take S rendered and rejected; take T blocked before request by exhausted Fal balance"
+    "model": "Seedance 2.0 Standard/Fast, Veo 3.1 and Kling O3 Pro",
+    "mode": "integral image/reference-to-video and localized generative edit; exact 4K visual supplied; no overlay, crop, tracking, mask or text repair",
+    "status": "takes T-Z rendered and rejected; spend stopped after Z"
   },
-  "plannedTakes": 2,
+  "originalPlannedTakes": 2,
   "productionScript": "render-seedance-2-source-keyvisual-direct-queue.mjs",
   "editorialRecoveryScript": "compose-glitch-tap-tap-on-air.mjs",
   "omniFoleyRequestScript": "request-omni-percussive-tap-sound.mjs",
@@ -47,7 +47,7 @@
   "renderedTakes": [
     {
       "take": "natural",
-      "status": "technical-candidate",
+      "status": "rejected-historical-evidence",
       "generatedAt": "2026-07-11T10:15:22.406Z",
       "referenceProfile": "sign-neutral-720-jpeg",
       "referenceSha256": "df0a460dfbd9222b27fe84d7351b9327e4332248b5263fcd6c663b95b47de0de",
@@ -111,6 +111,27 @@
       },
       "review": "review/take-s-seedance-source-keyvisual-review.md",
       "reason": "Visual design continuity passed, but the fingertip held/returned to contact for a perceptible interval rather than two one-to-two-frame strikes with immediate rebounds. No post repair or audio extraction is allowed."
+    },
+    {
+      "take": "t-seedance-2-source-keyvisual",
+      "status": "rejected-after-frame-and-audio-review",
+      "generatedAt": "2026-07-11T15:35:16.702Z",
+      "generationMode": "Fal.ai Seedance 2.0 image-to-video with the exact intact 4K PNG key visual",
+      "requestId": "019f51ce-780f-7533-b4be-60e11f3e0d5b",
+      "seed": 1307895314,
+      "estimatedCostUsd": 3.41,
+      "master": {
+        "path": "masters/glitch-microphone-intro-t-seedance-2-source-keyvisual-master.mp4",
+        "durationSeconds": 5.041667,
+        "dimensions": "1080x1920",
+        "fps": 24,
+        "codec": "h264",
+        "audio": "native AAC 44.1 kHz stereo; rejected because it has pre-contact activity and resonant tails; historical direct-grille wording is superseded by the monitor-speaker response contract",
+        "bytes": 2395341,
+        "sha256": "8a71efd9eb31b91b960779df9822941381238ecc93687b7bfb0e11fce33c7dda"
+      },
+      "review": "review/take-t-seedance-source-keyvisual-review.md",
+      "reason": "Visual continuity and the in-set ON AIR practical passed. Both purported contacts are held for perceptible multi-frame intervals, not one-to-two-frame strikes with immediate airborne rebound; the native audio also fails the exactly-two-foley contract. No post repair or audio extraction is allowed."
     }
   ],
   "runHistory": [
@@ -248,7 +269,7 @@
       "at": "2026-07-11T12:21:56.763Z",
       "take": "s-seedance-2-source-keyvisual",
       "result": "rejected-after-frame-and-audio-review",
-      "reason": "Exact 4K source visual continuity passed, but contact held too long/ambiguously and the native track did not establish exactly two isolated dry grille taps.",
+      "reason": "Exact 4K source visual continuity passed, but contact held too long/ambiguously and the native track did not establish exactly two isolated monitor-speaker responses.",
       "requestId": "019f511d-84fc-7e31-b402-2c418ba6b78d",
       "artifact": "masters/glitch-microphone-intro-s-seedance-2-source-keyvisual-master.mp4"
     },
@@ -259,10 +280,19 @@
       "providerStatus": 403,
       "reason": "Fal User is locked — Exhausted balance. No request_id, video or second provider charge was created.",
       "artifact": "masters/glitch-microphone-intro-t-seedance-2-source-keyvisual-master.metadata.json"
+    },
+    {
+      "at": "2026-07-11T15:35:16.702Z",
+      "take": "t-seedance-2-source-keyvisual",
+      "result": "rejected-after-frame-and-audio-review",
+      "requestId": "019f51ce-780f-7533-b4be-60e11f3e0d5b",
+      "estimatedCostUsd": 3.41,
+      "reason": "A single Fal request completed after balance reload. Exact source design and practical continuity pass, but both contacts hold perceptibly and native audio contains non-contract activity/tails. Stop spend; no post repair or promotion.",
+      "artifact": "masters/glitch-microphone-intro-t-seedance-2-source-keyvisual-master.mp4"
     }
   ],
   "editorialRecovery": {
-    "status": "technical-candidate-awaiting-creative-approval",
+    "status": "rejected-historical-evidence",
     "sourceVideo": "exports/glitch-microphone-intro-a-natural-5s-silent.mp4",
     "operation": "deterministic percussive retime plus canonical ON AIR practical composition; no new generative pixels",
     "output": {
@@ -297,17 +327,103 @@
     "frameMd5": "992bee1b4fda7e8e3690279f5c383b269d0bc84cf56aa7fcfbc18b2c37bcb372"
   },
   "selectedTake": null,
+  "guidedRecoveryTakes": {
+    "status": "all-rejected-no-candidate",
+    "review": "review/takes-u-to-z-guided-recovery-review.md",
+    "estimatedCostUsdTThroughZ": 10.44,
+    "seedanceTokenBilling": "additional; Fal invoice is accounting source of truth",
+    "takes": [
+      {
+        "take": "u",
+        "requestId": "019f51e3-9364-7e32-9d5f-0d5403c27185",
+        "model": "bytedance/seedance-2.0/reference-to-video",
+        "estimatedCostUsd": 2.05,
+        "sha256": "f1c7bc8a93002768abc29389a2c2f151d7f499707367546ab516336a565f7ee2",
+        "result": "rejected-multiframe-contacts-and-nonconforming-native-audio"
+      },
+      {
+        "take": "v",
+        "requestId": "019f51ed-9c41-7be1-a704-259a7367a3cd",
+        "model": "bytedance/seedance-2.0/reference-to-video",
+        "estimatedCostUsd": 2.05,
+        "sha256": "55b2fc9f956978c6322425ffda4ed8fdd49c04615ee83773ce145de61c448c5b",
+        "result": "rejected-contact-expanded-to-about-five-frames"
+      },
+      {
+        "take": "w",
+        "requestId": "019f51f6-c03f-75c3-a4d5-986506fd6c7f",
+        "model": "fal-ai/veo3.1/image-to-video",
+        "estimatedCostUsd": 0.8,
+        "sha256": "e19fd20568f44717c94dcf3132d9c6d814126ce89130aeb79bc310fe186b5789",
+        "result": "rejected-long-contacts-and-invented-white-orb"
+      },
+      {
+        "take": "x",
+        "requestId": "019f51fc-e47f-7032-9759-625f709b85a0",
+        "model": "bytedance/seedance-2.0/fast/reference-to-video",
+        "estimatedCostUsd": 0.73,
+        "sha256": "878d869e8677c8c70adecd124ae4dc0bd20c279c23304250de46ad6a31b8cb2d",
+        "result": "rejected-contact-expanded-to-about-five-or-six-frames"
+      },
+      {
+        "take": "y",
+        "requestId": "019f5204-9161-7c42-8c86-51a9a937d166",
+        "model": "fal-ai/kling-video/o3/pro/video-to-video/edit",
+        "estimatedCostUsd": 0.67,
+        "sha256": "8fd8ed282fa3747ffc1a7d57a7bf9645e11e67ddffecbd586331cb4fd4c2d1a3",
+        "result": "rejected-sustained-press-white-orb-and-hand-disappearance"
+      },
+      {
+        "take": "z",
+        "requestId": "019f520d-5406-7411-8113-3dec310bb415",
+        "model": "bytedance/seedance-2.0/fast/reference-to-video",
+        "estimatedCostUsd": 0.73,
+        "sha256": "fb5ceac5f7ad7b8838898c0a245764e3d2eb66f9e160230bc2c99d0ff3733346",
+        "result": "rejected-starts-in-contact-and-no-separated-double-tap"
+      }
+    ],
+    "audioContract": "Exactly two short amplified microphone/preamp/monitor-speaker responses, not direct skin-on-grille impacts; no music, voice, ambience or third accent.",
+    "nextValidRoute": "resolve the source-state contradiction; if hover plus double tap remains required, approve a faithful pre-contact key visual before any new model test"
+  },
+  "rootCauseAudit": {
+    "status": "confirmed-generation-frozen",
+    "document": "review/source-state-and-creative-video-workflow-audit.md",
+    "validatedAt": "2026-07-11",
+    "finding": "The canonical 4K already shows fingertip-to-grille contact and visible blue signal arcs, but the immutable-first-frame contract requires an initial air gap and signal only after the second tap.",
+    "magnificPreflight": "video_plan reproduced the conflict and instructed the agent not to generate until the starting-state decision is resolved.",
+    "requiredDecision": "Either accept the current contact/signal as narrative frame zero or approve a new faithful pre-contact key visual. The latter is recommended if the two-tap action remains mandatory.",
+    "stopRule": "Maximum two equivalent failures per architecture; no audio before visual approval; no guide derived from a rejected take."
+  },
   "recoveryV2": {
-    "status": "seedance-retry-blocked-by-fal-balance",
+    "status": "superseded-by-source-state-audit-no-approved-take",
     "plan": "recovery-plan-v2-integral-practical-and-foley.md",
     "visualRule": "Generate or film one complete shot from the intact key visual; the existing practical remains part of the set from the first frame. No post-production visual overlay, crop, mask, tracking or retime may repair it.",
     "performanceRule": "Two fingertip strikes with immediate rebound, never a press.",
-    "audioRule": "Native model audio is a candidate only; final foley must pass isolated audio review."
+    "audioRule": "The audience hears two short microphone-to-preamp-to-monitor-speaker responses, not the direct grille impact. Native model audio is only a candidate and must pass isolated review."
   },
-  "remoteArtifacts": null,
+  "recoveryV3": {
+    "status": "rejected-by-operator-visual-quality",
+    "timingEvidence": "contacts at frames 15 and 28; rebounds at 16 and 29",
+    "visualDecision": "The reconstruction looked rudimentary and materially worse than the supplied 4K key visual.",
+    "prohibitedNextActions": [
+      "continue 3D lookdev",
+      "use blocking as a reference for another video model",
+      "publish or promote 3D output"
+    ],
+    "evidence": "review/v3-blocking-review.md"
+  },
+  "remoteArtifacts": {
+    "manifest": "artifacts.remote.json",
+    "bucket": "gs://efeonce-group-greenhouse-private-assets-prod",
+    "prefix": "ai-generations/2026-07-11_glitch-microphone-intro/",
+    "fileCount": 106,
+    "totalBytes": 142160554,
+    "generatedAt": "2026-07-11T17:04:07Z",
+    "purpose": "private evidence archive only; no artifact is approved or copied to a production bundle"
+  },
   "approval": {
-    "creative": "no-approved-take; take-s-rejected-for-gesture-and-foley",
-    "productionSpend": "take-s-completed-with-Fal-Seedance-2; take-t-blocked-before-request-by-exhausted-balance",
-    "finalDelivery": "not-approved"
+    "creative": "no-approved-take; T-Z rejected after frame-level review",
+    "productionSpend": "stopped-after-take-z; estimated T-Z cost USD 10.44 plus Seedance token billing",
+    "finalDelivery": "not-approved-not-published-not-in-production-bundle"
   }
 }
