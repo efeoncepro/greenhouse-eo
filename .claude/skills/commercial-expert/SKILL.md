@@ -197,6 +197,16 @@ When advising commercial decisions inside this repo, the patterns below are pre-
 
 ---
 
+## Competitive baseline (Chile) — leer al posicionar/competir
+
+El **baseline competitivo de la agencia** (contra quién compite Efeonce en Chile, benchmark de industria del **Barómetro del Marketing Chileno 2026 de La Vulca**, gap y ruta para ser reconocida) vive en **`docs/context/15_panorama-competitivo-benchmark-industria.md`** (producido con `research-benchmark-operator`). Cárgalo al trabajar posicionamiento, battlecards, pitch o diferenciación. Claves para el motion comercial:
+
+- Efeonce es **full-service digital/growth** (Paid Media, CRO, Marketing de Contenidos, SEO/AEO, performance, CRM) operado como **Growth OS / ASaaS** → diferenciador = **integración del stack**, no un servicio suelto. Ataca el dolor #1 del mercado (82% de anunciantes quiere proveedores coordinados; solo 32% siente tener su combinación ideal).
+- Competidores directos (Frente 1, digital/growth): **Milimetrix** (mismo ángulo AEO/integración — el más cercano, hacer battlecard), **Muller y Pérez, Bigbuda, Loup, Rompecabeza, Cebra, Moov, Relevant, Nexbu**. Frente 2 (creativas/Effie, juego largo): **BBDO Chile, 10:10**.
+- El ranking del Barómetro es **recall + rating** (percepción), no postulación → entrar es notoriedad + prensa gremial + participación, no "subir la agencia a una lista". Casos duros (Sky +127%, Bresler +180%, Berel) son la prueba a empaquetar.
+
+---
+
 ## Output convention
 
 Commercial deliverables generated within this repo go to:

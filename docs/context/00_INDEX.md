@@ -26,6 +26,7 @@
 | Tocar el sync con HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
 | Evaluar ASaaS, tiers, switching cost, self-service o monetizacion | `14_modelo-negocio-asaas` |
+| Entender el panorama competitivo, el benchmark de industria (Barómetro La Vulca), quiénes son los competidores en Chile y el baseline para mejorar la agencia | `15_panorama-competitivo-benchmark-industria` |
 | Impregnar cultura interna, hiring, onboarding, performance o rituales de equipo | `09_marca-agencia` + `docs/operations/EFEONCE_OPERATING_CODE_V1.md` |
 
 **Enganche desde el repo.** Este archivo está pensado para referenciarse desde el `CLAUDE.md` / `AGENTS.md` de Greenhouse. Sugerencia de línea en ese archivo raíz:

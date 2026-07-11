@@ -167,6 +167,7 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 | Tocar sync HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
 | Evaluar ASaaS, tiers, switching cost, self-service o monetización | `14_modelo-negocio-asaas` |
+| Entender competencia, benchmark de industria (Barómetro La Vulca), quiénes son los competidores en Chile y el baseline para mejorar la agencia | `15_panorama-competitivo-benchmark-industria` |
 
 ---
 

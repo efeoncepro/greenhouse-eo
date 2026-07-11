@@ -62,6 +62,12 @@ Pillar (blog, vía Content Factory)
 - **Bow-tie / GTM / métricas / ICP** → `docs/context/` (`05` voz, `06` métricas, `08` comercial, `11` HubSpot bow-tie) + `efeonce-agency`.
 - **es-CL neutro, tuteo**, sin voseo. El operador no es argentino.
 
+## Baseline competitivo + jugada de autoridad (2026)
+
+El baseline competitivo de la agencia vive en `docs/context/15_panorama-competitivo-benchmark-industria.md` (producido con `research-benchmark-operator`). Hallazgo que le toca directo a este studio: los competidores digitales de Efeonce (Milimetrix, Muller y Pérez, Bigbuda, Loup…) **ganan visibilidad de industria dominando su propio SERP de categoría** con contenido de autoridad ("mejores agencias / estado del marketing digital y AEO en Chile"), y **Efeonce está ausente** — irónico, porque vende AEO y es full-stack (Paid Media, CRO, contenidos, SEO/AEO, performance).
+
+**Jugada canónica para este studio (quick win del baseline):** producir contenido de autoridad propio que gane ese SERP **con método creíble** (data study, no auto-bombo), apropiando el ángulo AEO/integración antes que la competencia lo consolide. Es literalmente vender lo que Efeonce vende. Cruza con `seo-aeo` (citabilidad/AI SoV) y `research-benchmark-operator` (el data study como munición). Meta: volver a Efeonce **fuente** que la prensa gremial (DF, Adlatina, Publimark, ANDA, IAB, AMDD) cite — no solo proveedor.
+
 ## Reglas duras del overlay
 
 - **NUNCA** reimplementar el Content Factory ni el publishing (operar vía `efeonce-public-site-wordpress`).

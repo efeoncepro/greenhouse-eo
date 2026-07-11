@@ -37,6 +37,15 @@ Efeonce ya tiene un **benchmark productizado**: el **AI Visibility Grader** (sco
 
 El research/benchmark riguroso posiciona a Efeonce como **partner estratégico**, no solo ejecutor — y suele **abrir la puerta** a un engagement mayor (el gap revelado justifica el servicio que lo cierra). Encájalo en el modelo comercial (proyecto/retainer) con `commercial-expert`. El AI Visibility benchmark es la punta de lanza (ties al Grader como lead magnet / servicio AEO).
 
+## Baseline competitivo real de Efeonce (caso vivo — 2026)
+
+El primer benchmark/CI real producido con esta skill es el **baseline competitivo de la agencia**: análisis del **Barómetro del Marketing Chileno 2026 (La Vulca)** + panorama de competidores en Chile + gap analysis + ruta para entrar al ranking. **SSOT:** `docs/context/15_panorama-competitivo-benchmark-industria.md`. Es el baseline vivo para mejorar la agencia — **actualízalo** (paso 2026: re-WebSearch competidores + pedir el informe completo a La Vulca) cuando se corra una nueva ola o cambie el mercado.
+
+Aprendizajes canónicos de ese caso (aplican a futuros benchmarks de industria):
+- Rankings tipo Barómetro son **recall + rating** (percepción), no postulación → entrar es un juego de **notoriedad/prensa gremial/participación**, no de "subir tu agencia a una lista".
+- Los "rankings de mejores agencias" que circulan en la web suelen ser **auto-publicados** por las propias agencias (se auto-rankean #1) → válidos como **set competitivo**, no como jerarquía objetiva. Márcalos con esa salvedad.
+- Hallazgo CI reutilizable: los competidores ganan visibilidad **dominando su propio SERP de categoría** con contenido de autoridad; medir la ausencia/presencia ahí es un benchmark en sí (ties `07` AI SoV + `seo-aeo`).
+
 ## Reglas duras del overlay
 
 - **NUNCA** reimplementar el AI Visibility Grader ni el harness `deep-research`.
