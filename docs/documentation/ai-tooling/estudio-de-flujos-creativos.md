@@ -16,7 +16,7 @@ En vez de generar una imagen suelta a mano y despues, aparte, un video, y despue
 Un ejemplo de flujo:
 
 ```
-[Brief de campaña] → [Generar hero image] → [Animar a video 9:16] → [Locución es-CL] → [Reframe a 3 formatos] → [Entregable]
+[Brief de campaña] → [Generar hero image] → [Animar a video 9:16] → [Revisión humana] → [Editar / componer] → [Locución es-CL] → [Reframe a 3 formatos] → [Entregable]
 ```
 
 ## Para que sirve
@@ -26,6 +26,23 @@ Un ejemplo de flujo:
 - **Entregables de cliente Globe** (aerolineas, bancos, manufactura): sets de campaña reproducibles.
 - **Alimentar el sitio y la marca** (heros, ilustraciones, videos cortos) desde una receta gobernada.
 - **Operar por conversacion con Nexa**: le pides "arma un flujo de banner + video para esta campaña", Nexa propone la receta y el costo, tu confirmas, y se ejecuta.
+
+## Piloto operativo: Glitch, El micrófono se abre
+
+El 2026-07-11 se validó una corrida manual y versionada de este modelo de trabajo para la intro de Glitch. No construye todavía el lienzo ni el motor del Estudio de Flujos: valida el ciclo operativo que el futuro producto deberá orquestar.
+
+La corrida separó con claridad:
+
+1. Fuente creativa canónica en 4K.
+2. Adapter de inferencia limitado a la resolución aceptada por el modelo.
+3. Generación controlada con aprobación y metadata.
+4. Master local, edición del video existente cuando aplica, finish editorial, revisión humana y foley posterior controlado.
+5. Composición determinista de assets exactos (por ejemplo, tipografía suministrada) cuando el modelo no puede conservarlos.
+6. Archivo gobernado sólo después de aprobar creativamente.
+
+El proveedor bloqueó seis requests iniciales antes de generar candidatos. La recuperación documentada neutralizó sólo un texto legible dentro del adapter de inferencia y produjo un candidato técnico sin alterar el key visual canónico. Este resultado enseña que un flujo no debe reintentar a ciegas: conserva el input, evidencia el bloqueo, permite una recuperación mínima y corta el gasto si esa recuperación no funciona.
+
+El piloto además comprobó un límite operativo importante: una edición video-a-video puede completar técnicamente y aun así romper continuidad. Un finish determinista sirve sólo si el master ya contiene la actuación correcta y el ajuste no cambia la verdad física del plano. La revisión creativa posterior rechazó la recuperación F/I: el `ON AIR` ya existía como practical en el key visual original, pero al reponerlo en post se veía pegado; el retime de la mano se leía como presión y el foley Gemini no sonaba a una prueba real de micrófono. La regla vigente distingue texto/UI no diegéticos —que pueden componerse— de practicals/actuaciones hero: estos deben nacer en una toma integral y pasar su gate de profundidad, oclusión, anatomía y escucha. Para foley nativo, el audio de un modelo sigue siendo guía candidata, nunca aceptación automática. Resultado, evidencia y ruta actual: [Glitch recovery V2](../../../ai-generations/2026-07-11_glitch-microphone-intro/recovery-plan-v2-integral-practical-and-foley.md). El estado sigue siendo piloto: no implica que el Estudio de Flujos exista como producto ni que una generación sea automáticamente aprobada o publicable.
 
 ## Como funciona (en simple)
 
@@ -47,6 +64,9 @@ Tipos de nodo previstos:
 | **Entrada / Brief** | El punto de partida: un texto, una imagen de referencia, parametros |
 | **Generar imagen** | Crea una imagen con el mejor modelo segun el caso |
 | **Generar video** | Anima una imagen o crea un video |
+| **Editar video** | Cambia un clip existente sólo cuando el cambio necesita una acción, objeto o píxel que aún no está en el material. |
+| **Revisión humana** | Pausa la receta para mirar el resultado real y aprobar o rechazar creativamente; terminar una generación no salta este nodo. |
+| **Componer / editar** | Reordena timing, sostiene un beat, agrega foley o compone texto/logo/practical exacto desde un asset real sin pedir otra generación. |
 | **Locucion / Musica / SFX** | Genera audio (voz, musica, efectos) |
 | **Mejorar (upscale)** | Sube la resolucion o la calidad |
 | **Reencuadrar (reframe)** | Cambia el formato (16:9, 9:16, 1:1) |
@@ -59,7 +79,8 @@ Cuando corres un flujo, ves su avance:
 
 - **En cola:** la receta esta lista y esperando turno para ejecutarse.
 - **Ejecutando:** el motor esta generando; cada nodo muestra su propio estado (esperando, generando, listo).
-- **Completado:** todos los pasos terminaron; los entregables estan en la libreria.
+- **En revisión:** el asset existe, pero una persona debe mirar actuación, continuidad, texto, sonido y corte. Aún no es un entregable.
+- **Completado:** todos los pasos, incluida la revisión requerida, terminaron; los entregables estan en la libreria.
 - **Con fallas:** algun paso no pudo terminar. Importante: **no pierdes lo que ya se genero** — los pasos que si terminaron quedan guardados, y puedes retomar desde ahi.
 - **Cancelado:** lo detuviste; los pasos que faltaban no se ejecutan ni se cobran.
 
@@ -82,6 +103,7 @@ Un flujo **multiplica el gasto**: si tiene 5 pasos que generan media, son 5 gene
 - **"Un paso quedo en falla."** El motor reintenta solo un par de veces. Si igual falla, el flujo queda "con fallas" pero conservas lo ya generado; puedes ajustar ese paso y retomar.
 - **"No me deja conectar dos nodos."** Los tipos de entrada/salida no son compatibles (por ejemplo, audio → imagen). Revisa que la salida y la entrada sean del mismo tipo.
 - **"Me pide aprobar antes de correr."** El costo total estimado supero el limite; es la proteccion de gasto funcionando.
+- **"La edición terminó, pero se ve mal."** El estado técnico no es aprobación creativa. Rechaza ese nodo conservando su evidencia. Si sólo necesitas timing, orden, texto exacto o foley, usa el mismo clip en un nodo de composición; si faltan píxeles/acción, formula una nueva edición acotada.
 
 ## Diferencia con otras herramientas
 

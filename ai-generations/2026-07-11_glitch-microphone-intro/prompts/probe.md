@@ -1,0 +1,1 @@
+Animate the supplied portrait broadcast-studio image as one calm continuous cinematic shot. Preserve the existing hand, microphone, composition and lighting. Keep motion extremely subtle and natural. No added people, no text overlays, no cuts, no music and no speech.

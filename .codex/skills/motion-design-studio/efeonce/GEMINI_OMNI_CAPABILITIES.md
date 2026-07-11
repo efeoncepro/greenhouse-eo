@@ -2,7 +2,7 @@
 
 > **Tipo de documento:** Catálogo de capacidades + mapa de sinergia (agent-facing).
 > **Hermano de:** `GEMINI_OMNI_VERTEX.md` (contrato operativo: endpoint, auth, pricing, gotchas). **Este doc NO repite el contrato** — si necesitas invocarlo, lee ese. Acá está TODO lo que Omni *puede hacer* y **cómo combinarlo** con las skills de la familia "studio" para exprimirlo.
-> **Verificado as-of:** 2026-07-05 (runtime `efeonce-group`, Vertex región `global`) + docs oficiales Google al 2026-07-05.
+> **Verificado as-of:** runtime base 2026-07-05 + edición persistida Glitch 2026-07-11 (`efeonce-group`, Vertex región `global`); docs oficiales Google reverificadas 2026-07-11.
 > **Idioma:** es-CL neutro (tuteo).
 > **Regla de volatilidad:** el modelo está en `PUBLIC_PREVIEW` (lanzado 2026-06-30). Todo lo marcado `⚠️ volátil` cambia semana a semana; reverifica antes de comprometer costo o pipeline. Google promete "longer durations / higher res coming soon", así que los techos (720p / 10 s) son lo primero que se moverá.
 > **Regla de honestidad:** distingo entre lo que **verificamos en vivo (✅)**, lo que está **documentado por Google (📄)**, lo que es **marketing/visión de terceros no confirmado (📣)** y lo que **no probamos (⬜)**. Varios sitios de terceros venden "4K nativo con audio y lip-sync en un solo pase" — eso es la **visión del modelo full**, NO el preview Flash que corre hoy (720p, sin lip-sync verificado). No confundas la valla publicitaria con el runtime.
@@ -23,7 +23,7 @@ Omni Flash es el modelo "any-to-any" de Google donde **el razonamiento de Gemini
 | **Imagen** (`image/png`/`jpeg`, base64 inline) | ✅ verificado | Video+audio+texto | Texto + 1 imagen → `image_to_video` |
 | **Imagen ×2** (dos referencias) | ✅ **verificado** (mezcló estadio vacío + estadio con multitud en una toma) | Video+audio+texto | Texto + N imágenes → `reference_to_video` |
 | **Imagen 2–6** (tags `<IMAGE_REF_0>`…`<IMAGE_REF_5>`) | 📄 documentado (verificamos 2) | Video+audio+texto | `reference_to_video` |
-| **Video** (`video/mp4`, ≤3 s, base64 inline) | ✅ **verificado** (edición video-to-video real) | Video+audio+texto | Texto + video → `edit` / continuación |
+| **Video** (`video/mp4`, hasta 10 s observado en Interactions, base64 inline) | ✅ **verificado** (edición video-to-video real) | Video+audio+texto | Texto + video → `edit` / continuación |
 | **Audio de referencia** | 📄 **NO soportado** en preview (*"uploading audio references is unsupported"*) | — | — |
 | **Múltiples videos de referencia** | 📄 NO soportado (solo 1 video ref) | — | — |
 | **URL de YouTube como fuente** | 📄 NO soportado | — | — |
@@ -77,6 +77,8 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 
 **Lectura práctica:** el audio nativo de Omni es la mayor sorpresa positiva verificada — **contextual, sincronizado, gratis** (viene en el clip). Úsalo como **guía/scratch** que ya te dice el ritmo y la textura, y reemplázalo/mézclalo en `audio-studio` cuando el entregable es final.
 
+**Caveat runtime Glitch (2026-07-11, V2):** un edit pedido literalmente como `audio-only` fue rechazado antes de generar. Una formulación audiovisual localizada sí devolvió AAC, pero sus píxeles alteraron el practical y añadió un tercer acento; más tarde, la escucha creativa también rechazó ese foley por no sonar a un golpe real de micrófono. El take entero F/I se descartó: no convertir un practical diegético en overlay ni una presión en golpe mediante retime. Audio nativo = guía candidata; el foley final necesita su propio gate de material, acción, transientes y escucha.
+
 ### A.5 Edición (video-to-video) y multi-turno conversacional
 
 | Qué puedes editar de un clip existente | Estado | Ejemplo de instrucción |
@@ -93,6 +95,7 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 - **Multi-turno stateful:** encadenas ediciones con `previous_interaction_id` (Gemini API) — **recuerda el video** y aplica el cambio **preservando lo que no tocas**. Es el diferenciador central: iteras "hablándole" en vez de regenerar desde cero.
 - **Inpaint temporal:** implícito en "make X invisible / put Y on" — edición localizada que respeta el resto de los frames.
 - **⚠️ Restricción regional:** editar videos **subidos por el usuario** NO está disponible en EEA, Suiza y Reino Unido.
+- **Gate que no negocia:** `completed` prueba que el provider terminó, no que el plano conserva continuidad. Revisa el video entero a 1× y 0.5×, más contact sheet. Si sólo necesitas retime/orden, termina el mismo master; pero si el ajuste cambia una actuación física hero o un practical que debe vivir dentro del set, crea una toma integral nueva: no lo reconstruyas con overlay ni retime. Para foley nativo pedido expresamente, úsalo sólo como guía y conserva eventos que pasen su propio gate de escucha.
 
 ### A.6 Límites del nivel preview (Flash, 2026-07-05)
 
@@ -102,7 +105,7 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 | Duración máx | **10 s** por request | volátil ("longer soon") |
 | FPS | 24, fijo | — |
 | Nº imágenes de referencia | 2 ✅ / hasta 6 📄 | volátil |
-| Nº videos de referencia | 1 (≤3 s) | — |
+| Nº videos de referencia | 1; **10 s procesados en Interactions** durante el piloto Glitch | Verificar límite vigente antes de producción |
 | Audio de entrada | no soportado | volátil ("not yet") |
 | Extensión/interpolación | no soportado | volátil |
 | Idioma | **inglés pleno**; otros no evaluados | prueba es antes de confiar |
@@ -175,8 +178,8 @@ La tesis: **Omni casi nunca trabaja solo.** Deforma texto/logos, tapa a 720p, du
 | **image_to_video / reference_to_video** | `design-studio` + `greenhouse-ai-image-generator` | Generas el **keyframe** exacto (KV, still on-brand) con la matriz de modelos de imagen (Nano Banana 2 Lite, GPT Image, Recraft, Flux, Ideogram) → lo pasas como `inlineData` a Omni | Video que **arranca del arte que tú controlas**, no de la lotería del prompt |
 | **reference_to_video multi-imagen (2–6)** | `design-studio` | Generas N stills coherentes (sujeto + entorno + paleta) y los mandas juntos → Omni los compone en una toma | **Composición dirigida**: mezclas elementos (verificado: estadio vacío + con multitud) sin depender de que el prompt acierte |
 | **Reference-chaining (frame previo → i2v)** | `design-studio` (retoca el frame) + este estudio (`../workflows/reference-chaining.md`) | Extraes el **último frame** de la toma anterior, lo limpias/ajustas, y lo usas como referencia del beat siguiente | **Continuidad entre tomas** — cura la "desconexión" de clips text-to-video sueltos |
-| **edición conversacional multi-turno** | este estudio (dirección) + `../modules/06_EDITING_MONTAGE_PACING.md` | Iteras variaciones hablándole (luz, cámara, wardrobe) para generar **cobertura** de una misma escena → montas las variantes | Varias tomas de un mismo mundo para editar con ritmo, sin re-shoot |
-| **audio nativo contextual** | `audio-studio` (voz ElevenLabs/Seed Audio, música, SFX, mezcla, mastering, loudness) + `../modules/07_SOUND_MUSIC_DESIGN.md` | Usas el audio de Omni como **scratch** que ya trae ritmo/textura → en `audio-studio` reemplazas VO, subes música con licencia, y **mezclas a loudness de entrega** (−14 LUFS web / −16 social) | Audio **final de calidad broadcast**, no el scratch generativo |
+| **edición conversacional multi-turno** | este estudio (dirección) + `../modules/06_EDITING_MONTAGE_PACING.md` + workflow E | Iteras una intención acotada, persistes el interaction ID y haces gate temporal; si el cambio es editorial, retimas el mismo master | Cobertura de una misma escena sin re-shoot, o finish controlado sin gastar un render nuevo |
+| **audio nativo contextual** | `audio-studio` (voz ElevenLabs/Seed Audio, música, SFX, mezcla, mastering, loudness) + `../modules/07_SOUND_MUSIC_DESIGN.md` | Usas el audio de Omni como **scratch** que ya trae ritmo/textura; si se necesita rescatar un foley, segmentas sus eventos y los montas sobre la placa aprobada → en `audio-studio` reemplazas VO, subes música con licencia, y **mezclas a loudness de entrega** (−14 LUFS web / −16 social) | Audio **final de calidad broadcast**, no el scratch generativo |
 | **techo 720p** | Magnific (MCP+API) + Higgsfield `upscale_video` + `../modules/08_COLOR_GRADE_FINISH.md` | **Video Sequence Enhancement** de Magnific (upscale frame-consistent, no frame-a-frame) sube el clip a 1080p/4K sin romper continuidad; grade en Resolve | Master en **1080p+**, color final, listo para entrega |
 | **deforma texto / logos / UI** | Playwright (UI crisp) + `../workflows/ui-without-after-effects.md` + `../workflows/hybrid-world-plus-ui.md` | Omni pinta el **plate cinematográfico de fondo** (atmósfera/cámara/profundidad); el **texto/logo/UI exacto** se compone encima como asset real (HTML+Playwright a 1280×720, o mograph AE) | Fondo cine + **micro-texto y logo nítidos y exactos** — nunca confías la exactitud al modelo |
 | **cámara solo por texto (sin presets)** | Higgsfield Cinema Studio (`../STUDIO_TOOLING.md`) | Si necesitas **cámara nombrada y repetible** (dolly, crash-zoom, orbit, focal length) → produces esa toma en Higgsfield; Omni queda para edición/mundo | Movimiento de cámara **dirigido y consistente** entre tomas |
@@ -227,6 +230,11 @@ El pipeline que exprime cada fortaleza y tapa cada debilidad. **Dirige el humano
    Sobre un clip elegido, itera hablándole: luz, cámara, wardrobe, estilo.
    → cobertura de la escena para editar con ritmo.
 
+4b. GATE TEMPORAL → RUTA CORRECTA  (`workflows/omni-in-place-edit-and-deterministic-finish.md`)
+   `completed` = candidato técnico. Revisión 1× + 0.5× + contact sheet de actuación,
+   anatomía, cámara y fondo. Si faltan píxeles/acción, una nueva interacción acotada;
+   si el cambio es timing, orden, texto exacto o foley, finish determinista sobre el mismo master.
+
 5. AUDIO SCRATCH → MEZCLA FINAL  (Omni nativo → audio-studio)
    El audio nativo de Omni (contextual, sincronizado) = scratch/guía de ritmo.
    audio-studio: VO ElevenLabs/Seed Audio + música con licencia + SFX
@@ -256,6 +264,7 @@ El pipeline que exprime cada fortaleza y tapa cada debilidad. **Dirige el humano
 
 **Reglas de oro del playbook:**
 - **Omni al centro, no solo.** Su valor es **animar arte que tú controlas** (paso 1→2) y **editar hablándole** (paso 4). Todo lo demás lo hacen mejor las hermanas.
+- **El output del provider no decide dirección.** Ningún estado `completed` salta el gate temporal; preserva interaction ID, input, output y motivo de aceptar/rechazar.
 - **Nunca el micro-texto/logo/precio/citas al modelo.** Van crisp en post (paso 6). Verificado que Omni los deforma ("ChatGPT→ChatOFT", precio 890→850).
 - **Audio nativo = scratch, no master.** Te regala el ritmo; el master es `audio-studio` (paso 5).
 - **720p sube en el finish, no antes** (paso 8) — y solo de lo elegido, para no quemar créditos de upscale.

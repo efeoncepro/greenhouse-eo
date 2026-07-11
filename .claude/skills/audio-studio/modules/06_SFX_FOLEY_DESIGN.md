@@ -77,6 +77,23 @@ que representan aunque no lo sean (clásico: apio para huesos rotos); graba de c
 das espacio en la mezcla. El foley da la **capa orgánica** que ni la síntesis ni la IA replican
 del todo.
 
+### 4.1 Contacto sobre una rejilla de micrófono: no es un click de interfaz
+
+Cuando el plano muestra una prueba de micrófono con yema, el sonido debe conservar la causa física:
+**piel → malla metálica → cuerpo/cápsula del micrófono**. No tratarlo como botón, teclado ni impacto
+genérico.
+
+1. Registrar varias tomas suaves con la yema sobre una rejilla de un micrófono de construcción
+   comparable; capturar, si es posible, tanto la respuesta del propio micrófono como un micro cercano
+   de la malla. Grabar en seco a 48 kHz / 24-bit.
+2. Buscar un `toc` amortiguado: transiente pequeño de malla, cuerpo bajo/medio contenido y una cola
+   corta. Evitar uña, metal campana, pop subgrave, slap de piel y reverberación de sala.
+3. Elegir tomas distintas para dos golpes consecutivos y sincronizar el inicio del transiente al frame
+   exacto de contacto. El silencio entre ambos es parte de la lectura de `tap → lift → tap → lift`.
+4. Si se usa SFX generativo o audio nativo de video, describir **material + acción + fuerza + espacio**
+   y someterlo a la misma comparación auditiva. “Sincronizado” no significa “físicamente creíble”.
+5. Nunca añadir un beep, stinger o tercer acento para una señal visual si la escena no lo produce.
+
 ## 5. SFX generativo con IA
 
 | Herramienta | Fuerte en | Nota |

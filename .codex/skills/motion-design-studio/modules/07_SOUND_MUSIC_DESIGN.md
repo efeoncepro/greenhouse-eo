@@ -50,6 +50,20 @@ work-in-progress, no un master.
 - **Ambience como pegamento:** un room tone tenue y continuo bajo toda la pieza disimula los
   empalmes entre tomas (crítico con tomas IA que no comparten espacio real, ver `modules/09`).
 
+### Silencio activo y acciones repetidas
+
+Cuando una intro no lleva música ni VO, el silencio no elimina el diseño: hace más importante el
+foley. Cada contacto físico relevante necesita su propio transient y su propia liberación; no copies
+un click idéntico si la actuación debe leerse humana. Si sólo el segundo gesto abre una señal, la
+respuesta técnica entra después de ese segundo contacto y deja el primero sin recompensa sonora. El
+audio nativo del modelo puede orientar timing, pero el master conserva foley/licencias/mezcla propios.
+
+**Regla de rescate Omni (Glitch, 2026-07-11):** un MP4 de Omni puede ofrecer foley útil y fallar
+visualmente al mismo tiempo. No adoptes el clip entero: cuenta los transientes, corta sólo las
+ventanas solicitadas, elimina acentos inventados y remúxalos sobre la placa visual aprobada. Un prompt
+literal `audio-only` fue rechazado en este caso; si se pide sonido nativo, la llamada debe ser una
+edición audiovisual localizada y su video sigue sujeto al gate temporal completo.
+
 ---
 
 ## 3. Vocabulario de SFX de motion (los que más se usan)

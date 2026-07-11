@@ -1,0 +1,3 @@
+Edit this existing five-second studio video in place. Preserve the same hand, finger, microphone, ON AIR sign, blue response, lighting, framing, camera and timing. Do not add text, graphics, camera movement, music, dialogue or narration.
+
+When the fingertip makes its two quick sound-check contacts with the metal microphone grille, include a natural close-mic tap for each impact. The first tap is gentle and the second is slightly firmer. Both sounds are short, dry metal-grille ticks with a subtle low body and immediate decay. The action is a strike and rebound, never a button press or heavy thump. The rest of the clip stays quiet.

@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-07-11_glitch-microphone-intro",
+  "status": "recovery-v2-planned-no-creative-candidate",
+  "workflowStatus": "pilot-evidence-retained; deterministic-overlay-and-retime-route-rejected-for-this-shot",
+  "purpose": "Pilot creative workflow for the Glitch intro motif: El micrófono se abre.",
+  "format": {
+    "aspectRatio": "9:16",
+    "editorialDurationSeconds": 5,
+    "fps": 24
+  },
+  "sources": [
+    {
+      "role": "key-visual",
+      "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+      "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e",
+      "dimensions": "2160x3840"
+    },
+    {
+      "role": "storyboard-source",
+      "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/storyboard_microfono_9x16_2160x3840.png",
+      "sha256": "407b0b2fdbfbcc93a8bf84dfb4f7d610191bd7b16a63f186468d61ab355ca7fe",
+      "dimensions": "2160x3840"
+    }
+  ],
+  "plannedEngine": {
+    "provider": "Vertex AI",
+    "project": "efeonce-group",
+    "location": "global",
+    "model": "gemini-omni-flash-preview",
+    "mode": "image-to-video"
+  },
+  "plannedTakes": 3,
+  "productionScript": "render-omni-glitch-intro.mjs",
+  "editorialRecoveryScript": "compose-glitch-tap-tap-on-air.mjs",
+  "omniFoleyRequestScript": "request-omni-percussive-tap-sound.mjs",
+  "foleyFinishScript": "finish-glitch-percussive-tap-with-gemini-foley.mjs",
+  "reviewTemplate": "take-review-template.md",
+  "transitionHandoff": "transition-handoff.md",
+  "retrospective": "pilot-retrospective.md",
+  "renderedTakes": [
+    {
+      "take": "natural",
+      "status": "technical-candidate",
+      "generatedAt": "2026-07-11T10:15:22.406Z",
+      "referenceProfile": "sign-neutral-720-jpeg",
+      "referenceSha256": "df0a460dfbd9222b27fe84d7351b9327e4332248b5263fcd6c663b95b47de0de",
+      "master": {
+        "path": "masters/glitch-microphone-intro-a-natural-omni-master.mp4",
+        "durationSeconds": 10,
+        "dimensions": "720x1280",
+        "fps": 24,
+        "codec": "h264",
+        "bytes": 2478786
+      },
+      "editorialExport": {
+        "path": "exports/glitch-microphone-intro-a-natural-5s-silent.mp4",
+        "durationSeconds": 5,
+        "dimensions": "720x1280",
+        "fps": 24,
+        "codec": "h264",
+        "audio": "none; foley pending",
+        "bytes": 1447706
+      },
+      "review": "review/take-a-natural-review.md"
+    }
+  ],
+  "runHistory": [
+    {
+      "at": "2026-07-11T10:01:29.990Z",
+      "take": "natural",
+      "result": "blocked",
+      "vertexStatus": 429,
+      "reason": "RESOURCE_EXHAUSTED",
+      "artifact": "masters/glitch-microphone-intro-a-natural-omni-master.metadata.json"
+    },
+    {
+      "at": "2026-07-11T10:03:49.415Z",
+      "take": "natural",
+      "result": "blocked",
+      "vertexStatus": 200,
+      "reason": "promptFeedback.blockReason=OTHER",
+      "artifact": "masters/glitch-microphone-intro-a-natural-omni-master.metadata.json"
+    },
+    {
+      "at": "2026-07-11T10:04:59.535Z",
+      "take": "natural",
+      "result": "blocked",
+      "vertexStatus": 200,
+      "reason": "promptFeedback.blockReason=OTHER with simplified prompt and direct 4K PNG input",
+      "artifact": "masters/glitch-microphone-intro-a-natural-omni-master.metadata.json"
+    },
+    {
+      "at": "2026-07-11T10:06:14.545Z",
+      "take": "natural",
+      "result": "blocked",
+      "vertexStatus": 200,
+      "reason": "promptFeedback.blockReason=OTHER with simplified prompt and direct 4K JPEG input; no candidates returned",
+      "artifact": "masters/glitch-microphone-intro-a-natural-omni-master.metadata.json"
+    },
+    {
+      "at": "2026-07-11T10:07:33.544Z",
+      "take": "natural",
+      "result": "blocked",
+      "vertexStatus": 200,
+      "reason": "promptFeedback.blockReason=OTHER with documented 720x1280 PNG input and simplified prompt",
+      "artifact": "masters/glitch-microphone-intro-a-natural-omni-master.metadata.json"
+    },
+    {
+      "at": "2026-07-11T10:08:41.629Z",
+      "take": "probe",
+      "result": "blocked",
+      "vertexStatus": 200,
+      "reason": "promptFeedback.blockReason=OTHER with documented 720x1280 PNG input and neutral source probe; classify the key visual as rejected by the preview",
+      "artifact": "masters/glitch-microphone-intro-probe-source-input-omni-master.metadata.json"
+    },
+    {
+      "at": "2026-07-11T10:15:22.406Z",
+      "take": "natural",
+      "result": "rendered",
+      "vertexStatus": 200,
+      "reason": "Rendered after applying the sign-neutral-720-jpeg reference profile; the profile preserves the canonical composition and neutralizes only the legible ON AIR sign.",
+      "artifact": "masters/glitch-microphone-intro-a-natural-omni-master.mp4"
+    },
+    {
+      "at": "2026-07-11T10:36:38.809Z",
+      "take": "tap-tap-omni-interactions-edit",
+      "result": "rejected-after-review",
+      "vertexStatus": 200,
+      "reason": "Gemini Omni Interactions processed the existing video and returned MP4, but continuity artefacts after the first second failed visual review.",
+      "artifact": "masters/glitch-microphone-intro-d-tap-tap-omni-interactions-edit-master.mp4"
+    },
+    {
+      "at": "2026-07-11T10:40:55.725Z",
+      "take": "tap-tap-on-air-editorial-recovery",
+      "result": "rejected-after-creative-review",
+      "reason": "The large ON AIR crop occluded the fingertip and the retime read as a press instead of a percussive strike-and-rebound.",
+      "artifact": "exports/glitch-microphone-intro-e-tap-tap-on-air-5s-silent.mp4"
+    },
+    {
+      "at": "2026-07-11T10:54:00.000Z",
+      "take": "percussive-tap-on-air-editorial-finish",
+      "result": "candidate-rendered",
+      "reason": "Deterministic visual finish preserves the source hand and camera, creates two one-to-two-frame strike-and-rebound contacts, and restores a small exact ON AIR practical behind the hand.",
+      "artifact": "exports/glitch-microphone-intro-f-percussive-tap-on-air-5s-silent.mp4"
+    },
+    {
+      "at": "2026-07-11T11:00:34.066Z",
+      "take": "omni-percussive-tap-audio-only",
+      "result": "blocked",
+      "reason": "Interactions rejected the literal audio-only formulation before output: The prompt could not be processed.",
+      "interactionId": "video-4fbfbdd8-689a-446b-95d3-f51395987dae",
+      "artifact": "masters/glitch-microphone-intro-g-omni-percussive-tap-sound-guidance.metadata.json"
+    },
+    {
+      "at": "2026-07-11T11:02:55.893Z",
+      "take": "omni-percussive-tap-sound-guidance",
+      "result": "video-rejected-audio-recovered",
+      "reason": "Omni returned AAC foley, but altered ON AIR and added a third accent; no generated video pixels were accepted.",
+      "interactionId": "video-97db98fe-6cd4-454a-ae75-caa20381e97f",
+      "artifact": "masters/glitch-microphone-intro-h-omni-percussive-tap-sound-guidance.mp4"
+    },
+    {
+      "at": "2026-07-11T11:05:08.676Z",
+      "take": "percussive-tap-on-air-gemini-foley-finish",
+      "result": "candidate-rendered",
+      "reason": "The deterministic finish keeps F video frames unchanged and mounts only the first two approved Omni foley windows, omitting the third generated accent.",
+      "artifact": "exports/glitch-microphone-intro-i-percussive-tap-on-air-5s-gemini-foley.mp4"
+    }
+  ],
+  "editorialRecovery": {
+    "status": "technical-candidate-awaiting-creative-approval",
+    "sourceVideo": "exports/glitch-microphone-intro-a-natural-5s-silent.mp4",
+    "operation": "deterministic percussive retime plus canonical ON AIR practical composition; no new generative pixels",
+    "output": {
+      "path": "exports/glitch-microphone-intro-f-percussive-tap-on-air-5s-silent.mp4",
+      "durationSeconds": 5,
+      "dimensions": "720x1280",
+      "fps": 24,
+      "codec": "h264",
+      "audio": "none; visual plate for foley finish",
+      "bytes": 705566,
+      "sha256": "57962772c3a5ac12e67f32dbbdb9ea85cd5562a6a8fd3a615c2eef50b0323977"
+    },
+    "review": "review/take-i-percussive-tap-on-air-gemini-foley-review.md",
+    "rejectedEditorialFinish": {
+      "artifact": "exports/glitch-microphone-intro-e-tap-tap-on-air-5s-silent.mp4",
+      "reason": "ON AIR rendered as a foreground card over the finger and the action read as pressure."
+    },
+    "rejectedOmniEdit": {
+      "interactionId": "video-b1998a20-6009-44b9-b975-c039eb047f75",
+      "artifact": "masters/glitch-microphone-intro-d-tap-tap-omni-interactions-edit-master.mp4",
+      "reason": "continuity artefacts after the first second"
+    }
+  },
+  "geminiFoleyRecovery": {
+    "status": "audio-events-recovered-video-rejected",
+    "sourceInteractionId": "video-97db98fe-6cd4-454a-ae75-caa20381e97f",
+    "sourceArtifact": "masters/glitch-microphone-intro-h-omni-percussive-tap-sound-guidance.mp4",
+    "sourceVideoDisposition": "rejected; practical text drift and an extra third accent",
+    "retainedAudioWindowsSeconds": ["0.30–0.57", "0.83–1.20"],
+    "omittedAudioTransient": "near 2.1 seconds",
+    "finishArtifact": "exports/glitch-microphone-intro-i-percussive-tap-on-air-5s-gemini-foley.mp4",
+    "frameMd5": "992bee1b4fda7e8e3690279f5c383b269d0bc84cf56aa7fcfbc18b2c37bcb372"
+  },
+  "selectedTake": null,
+  "recoveryV2": {
+    "status": "planned-awaiting-production-approval",
+    "plan": "recovery-plan-v2-integral-practical-and-foley.md",
+    "visualRule": "Generate or film one complete shot; the ON AIR practical must exist in the scene from the first frame. No post-production visual overlay, crop, mask, tracking or retime may repair it.",
+    "performanceRule": "Two fingertip strikes with immediate rebound, never a press.",
+    "audioRule": "Native model audio is a candidate only; final foley must pass isolated audio review."
+  },
+  "remoteArtifacts": null,
+  "approval": {
+    "creative": "rejected-current-candidate; recovery-v2-planned",
+    "productionSpend": "new-generation-not-yet-authorized",
+    "finalDelivery": "not-approved"
+  }
+}

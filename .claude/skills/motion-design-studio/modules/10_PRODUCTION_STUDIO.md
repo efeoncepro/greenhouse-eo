@@ -49,6 +49,8 @@ idear → storyboard → animatic → producir → editar → finalizar → entr
 | **Personaje consistente hablando** | **IA** | Soul ID + LipSync + Voice Binding |
 | **Escena IA con texto/logo de marca encima** | **Híbrido** | plate IA + texto/logo en AE (texto real, no generado) |
 | **Escena IA con shake/move imposible** | **Híbrido** | plate IA estático + move/shake en post (`modules/09 §7`) |
+| **Gesto/beat ya presente, pero con timing u orden equivocado** | **Humano determinista** | retime/corte/reverse legible del mismo master; no pedir otra generación |
+| **Texto, logo o practical exacto en plate IA** | **Híbrido** | overlay desde asset real + composite (`modules/11`) |
 | **Upscale / limpieza de detalle** | **IA (finish)** | Magnific (`modules/08 §8`) |
 | **Edición, sonido, color grade final** | **Humano** | DaVinci Resolve / AE |
 
@@ -135,6 +137,8 @@ Documenta todo en `templates/motion-delivery-spec.md`. Un handoff sin spec produ
 - [ ] Gasto IA dimensionado y **aprobado** antes del volumen; prueba validada primero.
 - [ ] Consistencia de personaje/producto fijada upstream (`modules/09 §4`).
 - [ ] Edición cerrada (`edit-decision-list.md`), ritmo y continuidad OK (`modules/06`).
+- [ ] Cada edit IA `completed` pasó revisión 1×, 0.5× y contact sheet; provider status y aprobación creativa quedaron separados.
+- [ ] Cambios sólo editoriales se resolvieron sobre el master existente; texto/logo/practical exactos vienen de assets canónicos, no de IA.
 - [ ] Sonido completo + loudness al target (`modules/07`).
 - [ ] Grade + match + finishing + upscale (si aplica), color space/codec correctos (`modules/08`).
 - [ ] Master + versiones por destino, QC en pantalla real de cada versión.

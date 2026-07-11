@@ -1,0 +1,73 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-11T11:02:40.160Z",
+  "completedAt": "2026-07-11T11:03:44.993Z",
+  "operation": "Gemini Omni audio-guidance edit of an already-approved visual candidate",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "sourceVideo": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-f-percussive-tap-on-air-5s-silent.mp4",
+    "sha256": "57962772c3a5ac12e67f32dbbdb9ea85cd5562a6a8fd3a615c2eef50b0323977",
+    "bytes": 705566,
+    "mimeType": "video/mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "r_frame_rate": "24/1"
+        }
+      ],
+      "format": {
+        "duration": "5.000000"
+      }
+    }
+  },
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-percussive-tap-sound-edit.md",
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-h-omni-percussive-tap-sound-guidance.mp4",
+    "sha256": "c2994f5950d4c490b21dcecea929c41a1ea6b9e13d02288a14686241617e293a",
+    "bytes": 959655,
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "r_frame_rate": "24/1"
+        },
+        {
+          "codec_name": "aac",
+          "codec_type": "audio",
+          "r_frame_rate": "0/0"
+        }
+      ],
+      "format": {
+        "duration": "5.013000"
+      }
+    },
+    "audioPresent": true
+  },
+  "interaction": {
+    "id": "video-6cb272ac-494e-476d-822b-e4be504ada5e",
+    "status": "completed",
+    "model": "gemini-omni-flash-preview",
+    "created": null,
+    "updated": null,
+    "outputTypes": [
+      {
+        "type": "video",
+        "mimeType": "video/mp4",
+        "hasData": true
+      }
+    ]
+  }
+}

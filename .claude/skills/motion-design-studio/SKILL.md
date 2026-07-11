@@ -118,6 +118,7 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
 | 09 | `modules/09_AI_VIDEO_PIPELINE.md` | dirigir el pipeline IA (modelos, image-to-video, cámara, consistencia) |
 | 10 | `modules/10_PRODUCTION_STUDIO.md` | orquestar humano/IA/híbrido + gasto gobernado + handoff |
 | 11 | `modules/11_VFX_COMPOSITING.md` | compositing, keying, roto, tracking/matchmove, CGI, simulaciones, AI-VFX |
+| 12 | `modules/12_CREATIVE_WORKFLOWS.md` | elegir una receta validada y decidir entre edición Omni y post determinista |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -181,6 +182,8 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `ANTIPATTERNS.md` — los errores que arruinan una animación.
 - `workflows/` — **biblioteca viva de recetas creativas validadas** (`README.md` índice + un archivo por
   workflow). Crece con cada producción: cuando algo funciona, se documenta acá.
+- `modules/12_CREATIVE_WORKFLOWS.md` — router compacto de esas recetas y de la regla: un output de IA
+  completado es candidato técnico, no aprobación creativa.
 - `spot-studio/SPOT_STUDIO.md` — **sistema de producción de spots** (IA + humano): pipeline por etapas +
   gates que garantizan el acabado final + lanes (UI-crisp/Omni/product-real) + checklists (animatic gate,
   finish pre-flight) + 4 pilares. Léelo al producir un **spot/brand film completo** (no una toma suelta).

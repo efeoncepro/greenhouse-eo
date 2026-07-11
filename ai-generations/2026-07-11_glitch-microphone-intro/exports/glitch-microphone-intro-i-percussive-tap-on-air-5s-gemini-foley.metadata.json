@@ -1,0 +1,95 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-11T11:05:08.572Z",
+  "completedAt": "2026-07-11T11:05:08.676Z",
+  "operation": "deterministic visual preservation plus two extracted Gemini Omni foley impacts",
+  "intentPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/gemini-foley-deterministic-finish.md",
+  "input": {
+    "visualPlate": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-f-percussive-tap-on-air-5s-silent.mp4",
+      "sha256": "57962772c3a5ac12e67f32dbbdb9ea85cd5562a6a8fd3a615c2eef50b0323977",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 720,
+            "height": 1280,
+            "r_frame_rate": "24/1"
+          }
+        ],
+        "format": {
+          "duration": "5.000000"
+        }
+      }
+    },
+    "omniAudioGuide": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-h-omni-percussive-tap-sound-guidance.mp4",
+      "sha256": "c2994f5950d4c490b21dcecea929c41a1ea6b9e13d02288a14686241617e293a",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 720,
+            "height": 1280,
+            "r_frame_rate": "24/1"
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "sample_rate": "48000",
+            "channels": 2,
+            "r_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "duration": "5.013000"
+        }
+      }
+    }
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-i-percussive-tap-on-air-5s-gemini-foley.mp4",
+    "sha256": "e0db767a4624f92ace6b9075681a5cd9330887ca7393e6bbbddabf7b1687f587",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "r_frame_rate": "24/1"
+        },
+        {
+          "codec_name": "aac",
+          "codec_type": "audio",
+          "sample_rate": "48000",
+          "channels": 2,
+          "r_frame_rate": "0/0"
+        }
+      ],
+      "format": {
+        "duration": "5.000000"
+      }
+    }
+  },
+  "sourceSelection": {
+    "retainedOmniAudioWindowsSeconds": [
+      "0.30–0.57",
+      "0.83–1.20"
+    ],
+    "finalTransientTargetsSeconds": [
+      0.38,
+      0.85
+    ],
+    "omittedOmniAudioTransient": "near 2.1 seconds",
+    "generatedVideoPixels": "rejected and not used"
+  }
+}

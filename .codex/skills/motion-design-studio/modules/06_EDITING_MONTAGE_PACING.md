@@ -181,6 +181,10 @@ de ser el paso final y se vuelve la **arquitectura de toda la producción IA**.
    contraste distintos; el grade las unifica para que lean como una sola cámara.
 6. **Ritmo con música (§7)** para que el ensamble tenga pulso propio y no se sienta como "clips
    pegados".
+7. **Repara según la clase de cambio.** Si al revisar un clip IA falta una acción/objeto que no existe,
+   usa una edición generativa persistida y vuelve a pasar QA temporal. Si la acción ya existe y sólo hay
+   que reordenarla, repetirla, sostenerla o cortar mejor, hazlo en el edit con material del mismo master:
+   es más controlable y no quema otra generación.
 
 **Regla:** en pipeline IA, **el edit no es post — es el plan**. Storyboard → chunks → montaje es el
 flujo; quien genera clips largos "a ver si salen" quema créditos y termina sin corte.
@@ -202,7 +206,11 @@ flujo; quien genera clips largos "a ver si salen" quema créditos y termina sin 
 - **NUNCA** cortes por reloj: corta cuando el plano ya dijo lo suyo y el siguiente aporta.
 - **NUNCA** uses una transición decorada donde un corte seco sirve — el cut es el default pro.
 - **NUNCA** cruces el eje de 180° sin intención o sin un plano neutro que reubique.
-- **NUNCA** generes video IA largo "a ver qué sale": genera chunks de 5-8s y ensámblalos.
+- **NUNCA** generes video IA largo "a ver qué sale": genera chunks de 5–8s y ensámblalos.
+- **NUNCA** uses otra generación para resolver un cambio puramente editorial (timing, orden, freeze,
+  ritmo, texto exacto o foley) si el master ya contiene el material necesario.
+- **SIEMPRE** trata un MP4 `completed` por IA como candidato hasta revisarlo entero a 1×, 0.5× y en
+  contact sheet; artefactos de continuidad pueden aparecer fuera del beat editado.
 - **NUNCA** dejes que la continuidad (eje, dirección, luz, personaje) dependa del modelo IA — es tuya.
 - **SIEMPRE** arma el rough cut largo y luego corta sin piedad hasta que no puedas sacar nada más.
 - **SIEMPRE** marca los beats antes de cortar en secuencias rítmicas; alinea el pico con el drop.

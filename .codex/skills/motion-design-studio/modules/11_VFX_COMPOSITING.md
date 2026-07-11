@@ -22,6 +22,8 @@ creíble**. En un estudio de motion/broadcast, los casos típicos:
 
 - **Compositing**: combinar múltiples elementos (plates, CGI, título, partículas, generación IA)
   en una toma final creíble.
+- **Restauración de practical exacto**: recomponer un letrero, logo o texto que el plate IA volvió
+  ilegible desde su asset canónico autorizado, no pedir que el modelo lo escriba de nuevo.
 - **Keying**: extraer un sujeto de un fondo (green/blue screen, chroma) y limpiar el spill.
 - **Rotoscoping**: aislar un elemento **sin** green screen, cuadro por cuadro (o con IA).
 - **Tracking / matchmove**: pegar un elemento al movimiento de la toma (2D, planar, cámara 3D).
@@ -116,6 +118,8 @@ matte express → Runway; relighting → Beeble; sim propia → Houdini (o stock
 - **NUNCA** entregues un composite sin matchear los **7 vectores** (§2) — sobre todo grano, bordes y
   sombra de contacto. Un elemento demasiado limpio o sin sombra delata el efecto.
 - **NUNCA** confíes un roto/key IA sin **QC frame-a-frame** en los cortes visibles (falla en pelo/oclusión).
+- **NUNCA** uses tipografía generada para reparar un practical, logo o dato exacto. Compón el asset real
+  y matchea los 7 vectores; si la cámara se mueve, trackea el plano antes de overlay.
 - **NUNCA** metas CGI sin sombra de contacto ni luz matcheada — flota.
 - **NUNCA** cites de memoria qué tool AI-VFX domina — reverifica (`SOURCES.md`).
 - **NUNCA** hagas una simulación cara cuando un **stock element** composited resuelve (gasto gobernado).

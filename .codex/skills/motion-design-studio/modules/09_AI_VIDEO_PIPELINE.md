@@ -151,6 +151,7 @@ ilusión.** Es el error #1 que separa el video IA amateur del pro. Herramientas 
 | **Tomas > ~10s** | Deriva, morphing, pérdida de coherencia en clips largos | Genera en **chunks de 5–8s** y **montá** (`modules/06`). El master largo se arma editando, no generando de una |
 | **Through-object moves** | Cámara que atraviesa un objeto (a través de una ventana, un anillo) se rompe | **Plates estáticos** + el *move* en post (compositing/3D camera en AE). No lo resuelve el modelo hoy |
 | **Manos / texto / detalle fino** | Manos deformes, texto ilegible, logos derretidos | Evitá primeros planos de manos/texto generado; pon el **texto real en post** (mograph, `modules/05`); logo compositeado, no generado |
+| **Edit `completed` con deriva temporal** | La edición cambia artefactos, cámara o anatomía fuera de la zona pedida | `completed` = candidato. Revisar 1×/0.5× + contact sheet; si sólo faltan timing/orden/repetición y las poses existen, retimar el mismo master en post (`workflows/omni-in-place-edit-and-deterministic-finish.md`) |
 | **Deriva de identidad** | Personaje cambia entre tomas | Soul ID / refs / Voice Binding (§4) |
 | **Deriva de color** | Cada toma con distinta temperatura/contraste | Grade de match unificador (`modules/08 §4`) |
 | **Flicker en upscale** | Detalle "hierve" frame a frame | Video Sequence Enhancement frame-consistent, no upscale imagen-por-imagen (`modules/08 §8`) |
@@ -172,7 +173,7 @@ completo en `modules/08 §8`.
 dirigir (shot list + prompt sheet)
    → generar variaciones IA (rápido, volumen, barato por toma)
    → CURAR humano (elegir las tomas buenas, descartar deriva/artefactos)
-   → refinar prompt / re-generar las que faltan (una variable por vez)
+   → clasificar el cambio: refinar una interacción sólo si faltan píxeles; si es editorial, terminar el clip existente de forma determinista
    → montar (edición, modules/06) → sonido (07) → grade (08) → upscale/finish (08 §8)
    → QC humano → entrega (con confirmación humana)
 ```

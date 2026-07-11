@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-11T10:40:54.819Z",
+  "completedAt": "2026-07-11T10:40:55.725Z",
+  "operation": "deterministic editorial recovery of the already generated Omni video",
+  "intentPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/tap-tap-editorial-recovery.md",
+  "input": {
+    "sourceVideo": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-a-natural-5s-silent.mp4",
+      "sha256": "781b661f6bf70fc459b107a1a34b0e808009ddc2cfe437ddb15e76987b065bfb",
+      "videoProbe": {
+        "width": 720,
+        "height": 1280,
+        "r_frame_rate": "24/1",
+        "duration": "5.000000"
+      }
+    },
+    "sourceKeyVisual": {
+      "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+      "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e"
+    }
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/exports/glitch-microphone-intro-e-tap-tap-on-air-5s-silent.mp4",
+    "sha256": "c2a959e7fad20ad9071522856736020e6d26ae49e2b0c794ba5e45a05ad6819c",
+    "videoProbe": {
+      "width": 720,
+      "height": 1280,
+      "r_frame_rate": "24/1",
+      "duration": "5.000000"
+    }
+  }
+}

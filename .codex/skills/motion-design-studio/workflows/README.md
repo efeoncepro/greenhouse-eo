@@ -27,6 +27,7 @@
 | **UI-heavy sin After Effects** | UI/texto/citas/gauge legibles y exactos (mograph HTML + Playwright) | **validado** 2026-07-05 | `ui-without-after-effects.md` |
 | **Híbrido mundo-IA + UI real** | spot completo: mundo IA + producto crisp compuesto | **validado (patrón)** | `hybrid-world-plus-ui.md` |
 | **Living Social Wall Clips** | micro-clips vivos por formato social (UGC/Reel/Historia/Creador) sin caer en pan/zoom de stills | **validado** 2026-07-08 | `living-social-wall-clips.md` |
+| **Omni in-place edit → deterministic finish** | editar un clip existente con Omni sólo si faltan píxeles; si no, retime/composite/foley sobre el mismo master | **validado con caveat** 2026-07-11 | `omni-in-place-edit-and-deterministic-finish.md` |
 
 ## Estructura estándar de un workflow
 
@@ -46,3 +47,5 @@
 **El *look* puede venir de IA; la *exactitud* (texto, citas, logos, números, marca) SIEMPRE de assets/
 mograph reales compuestos.** El operador aprueba antes de entregar; **gasto gobernado** en cada generación
 IA. Contrato del modelo Omni: `efeonce/GEMINI_OMNI_VERTEX.md`.
+
+**El estado técnico no es aprobación creativa.** Un video Omni `completed` entra a revisión temporal; sólo si requiere geometría/acción inexistente se itera con el modelo. Retime, orden, repetición y texto exacto se resuelven sobre el clip existente. Si se pide foley nativo, revisar audio y video por separado y rescatar sólo eventos aprobados sobre la placa aceptada.

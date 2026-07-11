@@ -1,0 +1,80 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-11T10:14:43.974Z",
+  "completedAt": "2026-07-11T10:15:22.406Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "takeName": "natural",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/natural.md",
+  "source": {
+    "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e",
+    "bytes": 4944297,
+    "dimensions": "2160x3840",
+    "note": "The canonical 4K PNG is never cropped or altered. Execution derives a 720x1280 model adapter because Gemini Omni Flash Preview supports 720p reference images."
+  },
+  "reference": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/microfono-broadcast-sign-neutral-720x1280-omni-reference.jpg",
+    "sha256": "df0a460dfbd9222b27fe84d7351b9327e4332248b5263fcd6c663b95b47de0de",
+    "bytes": 122740,
+    "profile": {
+      "fileName": "microfono-broadcast-sign-neutral-720x1280-omni-reference.jpg",
+      "mimeType": "image/jpeg",
+      "dimensions": "720x1280",
+      "transformation": "Lanczos scale from canonical 2160x3840 PNG, then a local blur over the legible ON AIR sign only; composition, hand, microphone and lighting are preserved. JPEG is stripped of source metadata for the model adapter.",
+      "ffmpegArgs": [
+        "-filter_complex",
+        "[0:v]scale=720:1280:flags=lanczos,split=2[base][sign];[sign]crop=180:118:400:257,boxblur=14:7[blurredSign];[base][blurredSign]overlay=400:257,format=yuvj420p[out]",
+        "-map",
+        "[out]",
+        "-frames:v",
+        "1",
+        "-q:v",
+        "2"
+      ]
+    },
+    "dimensions": "720x1280",
+    "mimeType": "image/jpeg",
+    "derivedFrom": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "transformation": "Lanczos scale from canonical 2160x3840 PNG, then a local blur over the legible ON AIR sign only; composition, hand, microphone and lighting are preserved. JPEG is stripped of source metadata for the model adapter."
+  },
+  "masterPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-a-natural-omni-master.mp4",
+  "outputBytes": 2478786,
+  "videoMimeType": "video/mp4",
+  "videoProbe": {
+    "ok": true,
+    "stream": {
+      "width": 720,
+      "height": 1280,
+      "r_frame_rate": "24/1",
+      "duration": "10.000000"
+    }
+  },
+  "attemptsUsed": 1,
+  "usageMetadata": {
+    "promptTokenCount": 1301,
+    "candidatesTokenCount": 57920,
+    "totalTokenCount": 59810,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 1100
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 201
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 57920
+      }
+    ],
+    "thoughtsTokenCount": 589
+  },
+  "responseText": "**Crafting a Dynamic Scene**\n\nI'll start with the image and user input to visualize a calm, professional broadcast studio. Subtle movements are key: a finger tap on the microphone, pulsing blue arcs, and flickering console lights. I'll break down the video into a 10-second timeline, specifying camera movement, hand gestures, and matching audio. The final prompt will precisely combine visuals, audio, and technical details to generate the desired output.\n\n\n"
+}

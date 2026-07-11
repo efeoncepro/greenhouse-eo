@@ -1,0 +1,44 @@
+{
+  "ok": false,
+  "startedAt": "2026-07-11T10:26:53.652Z",
+  "failedAt": "2026-07-11T10:27:17.933Z",
+  "operation": "video-to-video edit",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "sourceVideo": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-a-natural-omni-master.mp4",
+    "bytes": 2478786,
+    "mimeType": "video/mp4",
+    "videoProbe": {
+      "width": 720,
+      "height": 1280,
+      "r_frame_rate": "24/1",
+      "duration": "10.000000"
+    }
+  },
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/tap-tap-video-edit.md",
+  "attemptsUsed": 1,
+  "responseSummary": {
+    "responseId": "bhpSarejBq_IobIPmaeb0QE",
+    "modelVersion": "gemini-omni-flash-preview",
+    "usageMetadata": {
+      "promptTokenCount": 546,
+      "totalTokenCount": 953,
+      "trafficType": "ON_DEMAND",
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 546
+        }
+      ],
+      "thoughtsTokenCount": 407
+    },
+    "promptFeedback": {
+      "blockReason": "OTHER",
+      "blockReasonMessage": "The prompt could not be processed. Please try rephrasing the prompt or using different input."
+    },
+    "candidates": []
+  },
+  "error": "Vertex edit returned no inline video payload."
+}

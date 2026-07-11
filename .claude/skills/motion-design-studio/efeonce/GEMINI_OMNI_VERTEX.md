@@ -1,7 +1,7 @@
 # Gemini Omni Flash en Vertex AI — referencia operativa
 
 > **Tipo de documento:** Referencia técnica agent-facing (para operar Gemini Omni sin volver a investigar).
-> **Verificado as-of:** 2026-07-05 (runtime `efeonce-group`) + docs oficiales Google al 2026-07-05.
+> **Verificado as-of:** runtime base 2026-07-05 + edición persistida Glitch 2026-07-11 (`efeonce-group`, `global`); docs oficiales Google reverificadas 2026-07-11.
 > **Idioma:** es-CL neutro (tuteo).
 > **Regla de uso:** el modelo está en **PUBLIC_PREVIEW**. Todo dato marcado `(as-of 2026-07 — reverificar)` es volátil: confírmalo contra la fuente antes de comprometer costo o pipeline. Google lanzó el modelo el **2026-06-30**; el contrato cambia semana a semana.
 
@@ -12,7 +12,7 @@
 - **Modelo:** `gemini-omni-flash-preview`.
 - **Dónde corre para nosotros:** Vertex AI, región **`global`** (NO `us-central1`, NO `us-east4` → ahí da `NOT_FOUND`). Verificado en `efeonce-group`.
 - **Método en Vertex:** clásico `generateContent`, con `generationConfig.responseModalities: ["TEXT","VIDEO"]` (ambas obligatorias).
-- **Salida verificada:** clip **10 s · 1280×720 · 24 fps · MP4**, base64 inline en `candidates[].content.parts[].inlineData` (`mimeType: video/mp4`) + un part de texto "thinking" que se ignora.
+- **Salida verificada:** clip **10 s · 720p de lado corto · 24 fps · MP4**, base64 inline en `candidates[].content.parts[].inlineData` (`mimeType: video/mp4`) + un part de texto "thinking" que se ignora. Con referencia portrait se verificó `720×1280`; con landscape, `1280×720`.
 - **Entradas:** texto + imagen (`image/png`) + video (`video/mp4`) como `inlineData` → text/image/video-to-video con fuerte continuidad.
 - **Costo:** ~**$0.10 por segundo** de video 720p ($17.50/1M tokens de salida × 5.792 tokens/seg). Un clip de 10 s ≈ **$1.00**.
 - **Watermark:** SynthID invisible + C2PA Content Credentials, siempre, no desactivable.
@@ -170,11 +170,11 @@ La Gemini API pública **reemplazó** `generateContent` por la **Interactions AP
 POST https://generativelanguage.googleapis.com/v1beta/interactions
 # SDK google-genai: client.interactions.create(...)
 ```
-- `response_format`: `{ "type": "video", "aspect_ratio": "16:9"|"9:16" }`, entrega `base64` (<4 MB) o `uri` (>4 MB, recomendado).
+- `response_format`: `{ "type": "video", "aspect_ratio": "16:9"|"9:16" }` para generación. **En `task:'edit'` omite `aspect_ratio`: en Vertex devolvió `400 Aspect ratio cannot be set in response format for edit task`; el edit preserva el aspect del input.
 - `generation_config.video_config.task`: `text_to_video|image_to_video|reference_to_video|edit`.
 - Multi-turno stateful: encadena con `previous_interaction_id`.
-- Flags de performance: `background=false`, `store=false`, `stream=false` para generación síncrona rápida (ojo: `store=false` **desactiva** editar ese video después).
-- Salida: `steps[].content[]` con `type:"video"`, `mime_type:"video/mp4"`, y `data` (base64) o `uri`.
+- Flags de performance: para una edición recuperable que puede tardar, usar `background:true` + `store:true` y polling por ID. `store=false` **desactiva** editar/recuperar ese video después.
+- Salida: `steps[type='model_output'].content[]` con `type:"video"`, `mime_type:"video/mp4"`, y `data` (base64) o `uri`. No busques recursivamente en toda la interacción: podrías extraer el `input` como falso output.
 
 **Parámetros NO soportados** (ambas rutas, preview): `system instructions`, `temperature`, `top_p`, `stop sequences`, `negativePrompt` (embébelo en lenguaje natural), `seed`, `fps`, `duration`, `resolution`, provisioned throughput.
 
@@ -248,8 +248,11 @@ Fuente: [Gemini Developer API pricing](https://ai.google.dev/gemini-api/docs/pri
 | **Filtros IP (`ip_detected`)** | Rechaza prompts/renders con propiedad intelectual protegida (personajes, marcas de terceros) | Prompts originales; nada de IP ajena |
 | **Consistencia de personaje** | Se degrada ante cambios de escena / paneos largos | Clips cortos, escenas estables; refuerza con imagen de referencia del personaje |
 | **Audio de entrada no soportado** | No puedes pasar una pista de audio como referencia (preview) | Guía el audio por texto; edita audio en post (DaVinci) |
+| **Edit `audio-only` literal** | En el piloto Glitch fue rechazado pre-generación; el preview no ofrece una operación de mezcla/audio aislada | Si el operador pide textura Omni, formular una edición audiovisual localizada, revisar sus píxeles/transientes por separado y rescatar sólo ventanas de audio aprobadas sobre la placa visual determinista |
 | **Sin `negativePrompt`/`temperature`/`top_p`/system prompt** | Control fino ausente | Todo se dirige por lenguaje natural en el prompt |
 | **`store=false` rompe edición futura** (Gemini API) | Si generas sin persistir, no puedes editar ese clip después | Deja `store=true` si vas a iterar |
+| **`completed` no prueba continuidad** | Un edit puede devolver MP4 válido y aun así introducir bandas, drift o anatomía fuera de la zona pedida | Revisar el clip completo a 1×/0.5× + contact sheet antes de aceptarlo; registrar `provider completed` separado de `creative accepted` |
+| **Cambio sólo editorial** | Retime, repetición, freeze o texto exacto no requieren píxeles nuevos | Editar el mismo master de forma determinista; no gastar un render Omni para ordenar beats existentes. Foley nativo sólo por petición explícita y siempre se recupera por eventos, no aceptando el video completo |
 | **Región Vertex** | Solo `global`; `us-central1`/`us-east4` → NOT_FOUND | Fija `locations/global` en el endpoint |
 | **EEA/CH/UK** | No se puede editar video subido por el usuario en esas regiones | Considera si el flujo cliente cae ahí |
 
@@ -289,6 +292,28 @@ Hechos comprobados por nosotros, no inferidos de docs:
 > pedirlo — `audio-studio` lo reemplaza/mejora para el master; (b) **9:16 nativo** con referencia portrait
 > → versiones sociales sin reframe; (c) **edición y multi-referencia** habilitan variaciones e inserción de
 > elementos manteniendo el mundo (continuidad). Mapa completo en `efeonce/GEMINI_OMNI_CAPABILITIES.md`.
+
+### 9.2 Edit in-place recuperable + gate temporal — validado con caveat, 2026-07-11 (Glitch)
+
+Una edición real del master de Glitch usó `@google/genai` con `vertexai:true`, proyecto `efeonce-group`,
+región `global`, `generation_config.video_config.task:'edit'`, `background:true` y `store:true`. La
+interacción `video-b1998a20-6009-44b9-b975-c039eb047f75` procesó 10 s de video como input y devolvió
+10 s de MP4 desde `model_output`; se pudo recuperar después por ID sin otra llamada de pago.
+
+La evidencia **no** valida aceptación automática: el clip fue rechazado tras revisar contacto, continuidad
+y fondos porque introdujo artefactos después del primer segundo. El aprendizaje operativo es estable:
+
+1. Si hace falta una acción/objeto/píxel que no existe, usar una interacción persistida y una sola
+   instrucción acotada.
+2. Si el cambio es timing, repetición, hold, orden de beats o texto exacto, no regenerar: editar
+   el master existente de forma determinista. Si el operador pide foley nativo, usar una edición
+   audiovisual localizada como guía, revisar sus píxeles y rescatar sólo eventos de audio aprobados.
+3. Todo edit termina con revisión 1×, 0.5× y contact sheet; `completed` es estado de provider, no verdict
+   de dirección.
+4. Texto/logos/practicals exactos se componen desde el asset canónico, no se piden al modelo.
+
+Receta y evidencia: `workflows/omni-in-place-edit-and-deterministic-finish.md` y
+`ai-generations/2026-07-11_glitch-microphone-intro/`.
 
 Snippet canónico de invocación (curl):
 ```bash

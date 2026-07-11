@@ -28,7 +28,7 @@ Fuerzas en tensión: (a) el canvas visual es tentador de construir primero, pero
 
 Construir el **Creative Flow Studio**: una capa de orquestación de grafos (`content.media.flow`) que compone múltiples generaciones del Media Foundry en un pipeline visual node-based. **Tres piezas nuevas**, todo lo demás es reuse:
 
-1. **Modelo del grafo + DSL de nodos** (`src/lib/media/flow/flow-graph.ts`, `node-registry.ts`) — nodos tipados (input, generate-image, generate-video, tts, upscale, reframe, compose, output) con **puertos tipados** (`text | image | video | audio | 3d`); validación de conexiones (no se enchufa audio a un input de imagen) y de aciclicidad (es un DAG real). El catálogo de tipos de nodo es **config versionada**, no hardcode.
+1. **Modelo del grafo + DSL de nodos** (`src/lib/media/flow/flow-graph.ts`, `node-registry.ts`) — nodos tipados (input, generate-image, generate-video, **edit-video**, tts, upscale, reframe, **compose**, **extract-audio**, **review**, output) con **puertos tipados** (`text | image | video | audio | 3d`); validación de conexiones (no se enchufa audio a un input de imagen) y de aciclicidad (es un DAG real). El catálogo de tipos de nodo es **config versionada**, no hardcode.
 2. **DAG runner** (`flow-runner.ts`) — orden topológico, ejecuta nodo por nodo, pasa el asset de salida de un nodo como *reference input* del siguiente. **Cada nodo generativo NO genera: crea un `generation_job` del foundry** (`flow_run_nodes.generation_job_id` FK → `generation_jobs.job_id`) y espera su resultado. El runner orquesta; el foundry genera, cobra, modera y enruta providers.
 3. **Canvas** (`@xyflow/react` / React Flow) — nodos como componentes React tokenizados (primitives AXIS), no LiteGraph crudo. Renderiza y edita el grafo; el estado se serializa a `flow_definitions` (jsonb: grafo lógico + layout x/y separados).
 
@@ -87,7 +87,7 @@ CREATE TABLE greenhouse_media.flow_runs (
   run_id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   flow_id          uuid NOT NULL REFERENCES greenhouse_media.flow_definitions(flow_id),
   status           text NOT NULL DEFAULT 'queued'
-                     CHECK (status IN ('queued','running','succeeded','failed','dead_letter','canceled')),
+                     CHECK (status IN ('queued','running','awaiting_review','succeeded','failed','dead_letter','canceled')),
   requested_by     text NOT NULL,
   estimated_cost_usd numeric(10,4),         -- Σ estimados de los nodos (budget gate a nivel FLOW)
   actual_cost_usd  numeric(10,4),           -- Σ reales
@@ -101,9 +101,9 @@ CREATE TABLE greenhouse_media.flow_run_nodes (
   run_node_id       bigserial PRIMARY KEY,
   run_id            uuid NOT NULL REFERENCES greenhouse_media.flow_runs(run_id),
   node_key          text NOT NULL,          -- id del nodo dentro del grafo
-  node_type         text NOT NULL,          -- del node_registry (generate-image | tts | reframe | ...)
+  node_type         text NOT NULL,          -- del node_registry (generate-image | edit-video | compose | extract-audio | review | tts | reframe | ...)
   status            text NOT NULL DEFAULT 'pending'
-                      CHECK (status IN ('pending','waiting_deps','running','succeeded','failed','skipped')),
+                      CHECK (status IN ('pending','waiting_deps','running','awaiting_review','succeeded','failed','skipped','rejected')),
   generation_job_id uuid REFERENCES greenhouse_media.generation_jobs(job_id),  -- ← el nodo NO genera; delega al foundry
   result_asset_id   uuid,                   -- asset producido (del job del foundry)
   created_at        timestamptz NOT NULL DEFAULT now(),
@@ -143,13 +143,14 @@ CREATE TABLE greenhouse_media.flow_run_transitions (
     └──────────┘                    └──────────┘ └────────┘
 ```
 
-**Por nodo:** `pending → waiting_deps → running → succeeded | failed | skipped`. Un nodo entra a `running` solo cuando sus dependencias (edges entrantes) están `succeeded`. `failed` transitorio hereda el retry del `generation_job`. Terminal del run: `succeeded`, `canceled`, `dead_letter`. **Partial results:** un run `failed` preserva los `result_asset_id` de los nodos ya `succeeded`.
+**Por nodo:** `pending → waiting_deps → running → awaiting_review → succeeded | rejected | failed | skipped`. Un nodo entra a `running` solo cuando sus dependencias (edges entrantes) están `succeeded`. `failed` transitorio hereda el retry del `generation_job`; `awaiting_review` pertenece a un nodo `review` y no dispara gasto. Terminal del run: `succeeded`, `canceled`, `dead_letter`. **Partial results:** un run `failed` preserva los `result_asset_id` de los nodos ya `succeeded`; un asset generado puede estar técnicamente disponible pero seguir como **candidato** hasta que un review humano lo apruebe o rechace.
 
 ### Governance
 
 - **Capabilities separadas:** `media.flow.author` (crear/editar flows y plantillas), `media.flow.execute` (correr un flow — gasta), `media.flow.read` (ver flows/runs). **Author ≠ execute** (autorar no debe implicar gastar).
 - **Budget gate a nivel FLOW (safety #1):** antes de encolar, el runner estima `Σ estimated_cost_usd` de todos los nodos y lo compara contra el cap por-org/por-request/por-período. Sobre el cap → `propose` requiere aprobación explícita. El budget gate del foundry (por-job) sigue operando como segunda capa, pero el gate **primario** es el agregado del flow, porque N nodos amplifican el gasto.
 - **Governed action (Nexa):** el LLM NUNCA corre un flow directo. `propose → confirm → execute` — Nexa propone la plantilla + params + **costo total estimado**; muta solo en el endpoint de confirmación humana. Amplificado respecto al foundry: un flow confirma N generaciones de una vez.
+- **Creative review gate:** todo template que entregue o encadene un asset generativo sensible (video, imagen hero, audio de marca) declara un nodo `review` antes de finish/publicación. `generation succeeded` no implica `creative approved`: la revisión ve el asset real, puede rechazarlo sin perder lineage y decide si el siguiente paso es otra generación, `edit-video`, `compose` determinista o `extract-audio` (audio aceptado con video rechazado, con ventanas/transientes explícitos y placa visual preservada). **Límite V2:** `compose` no puede reparar un practical diegético ni simular una actuación física hero; si cambia profundidad/oclusión/causalidad del mundo, el runner vuelve a `generate-video` o deriva a captura/3D de toma completa.
 - **Moderación:** heredada del foundry por nodo (prompt/output pasan por su guard).
 - **Audit append-only** de transiciones (run + por nodo) + lineage del asset (heredado del foundry).
 
@@ -178,6 +179,8 @@ CREATE TABLE greenhouse_media.flow_run_transitions (
 - **NUNCA** hardcodear el catálogo de tipos de nodo en runtime — sale del `node_registry` versionado.
 - **NUNCA** encolar un grafo sin validar puertos compatibles + aciclicidad (es un DAG, no un grafo cualquiera).
 - **NUNCA** perder los assets de nodos ya `succeeded` cuando un nodo posterior falla — partial results preservados (run nodes append-only en su lineage).
+- **NUNCA** inferir que un MP4/imagen `succeeded` está aprobado creativamente. El nodo `review` separa estado técnico de aceptación humana; un rechazo conserva asset, prompt, metadata y motivo para aprender sin re-cobrar a ciegas.
+- **NUNCA** usar un nodo generativo para timing, orden, freeze, texto/logo **no diegético** exacto o foley si un `compose`/edit determinista sobre el asset existente resuelve el pedido. `edit-video` se reserva para píxeles/acción que no existen en el lineage. **Excepción de realidad de toma:** un practical que pertenece al mundo, o una actuación corporal cuyo significado no está presente en los frames, no se compone ni retima; exige una toma completa nueva. Si el operador pide explícitamente foley nativo de video IA, `extract-audio` puede rescatar sólo eventos aprobados de un output visual rechazado, nunca promover ese video ni sus transientes inventados.
 - **NUNCA** crear identidad paralela para el flow/asset — extiende Cliente/Servicio vía FK; el asset va por el uploader canónico (TASK-721) heredado del foundry.
 - **SIEMPRE** un flow nace con contrato gobernado (Full API Parity) — UI, Nexa, MCP, CLI son consumers del mismo runner.
 
@@ -196,6 +199,7 @@ CREATE TABLE greenhouse_media.flow_run_transitions (
 
 - **Slice 0 — Fundación:** schema `flow_definitions/flow_runs/flow_run_nodes` + state machine + `node_registry` (config) + capabilities `media.flow.*`. Depende de Media Foundry Slice 0–1.
 - **Slice 1 — DAG runner headless (corazón):** ejecutar por API un flow lineal de 2–3 nodos (imagen → video → audio) sobre ops-worker, cada nodo = `generation_job` del foundry. **Sin UI.** Prueba el encadenamiento real.
+- **Gate transversal de templates:** modelar desde el Slice 1 los nodos no generativos `review`, `compose` y `extract-audio`: pausa humana explícita, razones de aceptación/rechazo, lineage de overlays/edits y recuperación selectiva de eventos de audio sin gasto de provider. La plantilla debe clasificar cada elemento como no diegético o practical/actuación de toma: el segundo bloquea `compose` y fuerza una nueva producción integral. No requiere canvas para probarlo.
 - **Slice 2 — Gobernanza de costo:** budget gate agregado a nivel flow + `propose→confirm→execute` + reliability signals.
 - **Slice 3 — Canvas (plantillas):** React Flow con plantillas curadas parametrizables — la cara del producto.
 - **Slice 4 — Canvas libre:** autoría de grafos (`media.flow.author`) + validación de puertos en vivo.

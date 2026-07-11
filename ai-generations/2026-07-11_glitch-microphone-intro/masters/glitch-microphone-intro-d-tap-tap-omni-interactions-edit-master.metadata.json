@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-11T10:36:35.892Z",
+  "completedAt": "2026-07-11T10:36:38.809Z",
+  "operation": "video-to-video edit through Gemini Omni Interactions",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "sourceVideo": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-a-natural-omni-master.mp4",
+    "bytes": 2478786,
+    "mimeType": "video/mp4",
+    "videoProbe": {
+      "width": 720,
+      "height": 1280,
+      "r_frame_rate": "24/1",
+      "duration": "10.000000"
+    }
+  },
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/tap-tap-video-edit-interactions.md",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-d-tap-tap-omni-interactions-edit-master.mp4",
+  "outputBytes": 2528755,
+  "videoMimeType": "video/mp4",
+  "videoProbe": {
+    "width": 720,
+    "height": 1280,
+    "r_frame_rate": "24/1",
+    "duration": "10.000000"
+  },
+  "interaction": {
+    "id": "video-b1998a20-6009-44b9-b975-c039eb047f75",
+    "status": "completed",
+    "model": "gemini-omni-flash-preview",
+    "created": null,
+    "updated": null,
+    "outputTypes": [
+      {
+        "type": "video",
+        "mimeType": "video/mp4",
+        "hasData": true
+      }
+    ]
+  }
+}

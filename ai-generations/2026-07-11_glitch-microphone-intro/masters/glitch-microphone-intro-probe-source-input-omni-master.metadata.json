@@ -1,0 +1,34 @@
+{
+  "ok": false,
+  "startedAt": "2026-07-11T10:08:29.887Z",
+  "failedAt": "2026-07-11T10:08:41.629Z",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "takeName": "probe",
+  "source": {
+    "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e",
+    "bytes": 4944297,
+    "dimensions": "2160x3840",
+    "note": "The canonical 4K PNG is never cropped or altered. Execution derives a 720x1280 model adapter because Gemini Omni Flash Preview supports 720p reference images."
+  },
+  "reference": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/microfono-broadcast-720x1280-omni-reference.png",
+    "sha256": "b888fa0af92f204480c4f3f36e3b4a16bda15cf9fa58a3a384c8b9a18a5e0bea",
+    "bytes": 1102278,
+    "dimensions": "720x1280",
+    "mimeType": "image/png",
+    "derivedFrom": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "transformation": "Lanczos scale from canonical 2160x3840 PNG to model-supported 720x1280 PNG; no crop."
+  },
+  "attemptsUsed": 1,
+  "responseSummary": {
+    "promptFeedback": {
+      "blockReason": "OTHER",
+      "blockReasonMessage": "The prompt could not be processed. Please try rephrasing the prompt or using different input."
+    },
+    "candidates": []
+  },
+  "error": "Vertex response did not include an inline video payload."
+}
