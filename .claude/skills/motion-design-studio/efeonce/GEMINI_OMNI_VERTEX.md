@@ -48,7 +48,7 @@ Google no publica el detalle interno del modelo (tamaño, training data, mezcla 
 | Razonamiento del mundo | Sí (fuerte) | Débil | **Sí (heredado de Gemini)** |
 | Costo video 720p | n/a | $0.10/s | **$0.10/s** (paridad con Veo 3.1 Fast) |
 
-Lectura práctica: **si necesitas video, Omni Flash; si necesitas texto/análisis, Gemini 3.x Flash; si necesitas render cinemático "one-shot" sin conversación, Veo sigue siendo válido.** Omni Flash gana cuando el valor está en **iterar el video hablándole** (editar, reemplazar, extender la idea manteniendo continuidad).
+Lectura práctica: **si necesitas video con una microescena que puede reinterpretar un paquete de referencias o editar por conversación, Omni Flash es fuerte; si necesitas texto/análisis, Gemini 3.x Flash; si necesitas render cinemático "one-shot" sin conversación, Veo sigue siendo válido.** No seleccionar Omni sólo por el canal: para un set/producto/practical que debe conservarse fielmente desde un key visual, evaluar primero Seedance image/reference-to-video y aplicar el mismo gate de actuación/sonido. Evidencia comparada: `workflows/engine-selection-by-fidelity-contract.md`.
 
 ---
 
@@ -74,6 +74,12 @@ Lectura práctica: **si necesitas video, Omni Flash; si necesitas texto/análisi
 ### 2.3 Combinaciones soportadas (tareas)
 
 En la Gemini API la tarea se declara con `generation_config.video_config.task`: `text_to_video` · `image_to_video` · `reference_to_video` · `edit`. En Vertex/`generateContent` la tarea se **infiere de las partes** que mandas (solo texto → t2v; texto+imagen → i2v; texto+video → edición/continuación).
+
+### 2.4 Excepción operativa: practical legible bloqueado (Glitch, 2026-07-11)
+
+En una corrida real de Glitch, el PNG íntegro con un practical `ON AIR` legible, su derivado 720p y un video que ya contenía ese practical devolvieron `promptFeedback.blockReason=OTHER` antes de producir candidato. No se aisló que la palabra sea el motivo único: un request **sólo de texto** sí generó un letrero `ON AIR` físico y correctamente integrado en el set. Trata esto como un bloqueo opaco de combinación de input, no como una regla de seguridad sobre todo texto.
+
+Cuando un elemento es diegético y narrativamente crítico, quedan prohibidos blur de entrada y recomposición posterior para eludir este bloqueo. Haz un probe mínimo una sola vez; si el mismo input vuelve a bloquearse, conserva el asset como dirección y genera el **plano completo** text-to-video, describiendo el elemento como practical físico desde el primer frame. Valida su perspectiva, oclusión, profundidad y lectura en el resultado. No uses ese fallback para logos, copy de UI o texto que deba ser exacto: éstos permanecen fuera de Omni.
 
 ---
 
@@ -224,7 +230,7 @@ Fuente: [Gemini Developer API pricing](https://ai.google.dev/gemini-api/docs/pri
 | **Nano Banana 2 Lite** (`gemini-3.1-flash-lite-image`) | $0.25 (texto/imagen/video) | $1.50 texto/thinking · **$30.00** imagen | Encadena bien con Omni (imagen → i2v) |
 | **Veo 3.1 Fast** | — | **$0.10/s (720p)** · $0.12/s (1080p) · $0.30/s (4k) | Usar cuando necesitas >720p o one-shot |
 
-> Regla de costo: **Omni Flash sale igual que Veo Fast a 720p**, así que el diferencial no es plata sino **capacidad conversacional**. Si el clip se va a iterar 3+ veces hablándole, Omni; si es render final único y quizás en 1080p/4k, Veo.
+> Regla de costo: **Omni Flash sale igual que Veo Fast a 720p**, así que el diferencial no es sólo plata sino ajuste del motor al contrato de fidelidad. No decidir sólo por “3+ iteraciones”: Glitch acumuló iteraciones Omni sin conservar su set, mientras que Redes Sociales validó Omni porque animó un paquete de stills ficticios sin copy/practical exacto. Antes de gastar, clasificar si la referencia es flexible o identidad de set (`workflows/engine-selection-by-fidelity-contract.md`).
 
 ---
 
@@ -252,7 +258,7 @@ Fuente: [Gemini Developer API pricing](https://ai.google.dev/gemini-api/docs/pri
 | **Sin `negativePrompt`/`temperature`/`top_p`/system prompt** | Control fino ausente | Todo se dirige por lenguaje natural en el prompt |
 | **`store=false` rompe edición futura** (Gemini API) | Si generas sin persistir, no puedes editar ese clip después | Deja `store=true` si vas a iterar |
 | **`completed` no prueba continuidad** | Un edit puede devolver MP4 válido y aun así introducir bandas, drift o anatomía fuera de la zona pedida | Revisar el clip completo a 1×/0.5× + contact sheet antes de aceptarlo; registrar `provider completed` separado de `creative accepted` |
-| **Cambio sólo editorial** | Retime, repetición, freeze o texto exacto no requieren píxeles nuevos | Editar el mismo master de forma determinista; no gastar un render Omni para ordenar beats existentes. Foley nativo sólo por petición explícita y siempre se recupera por eventos, no aceptando el video completo |
+| **Cambio sólo editorial** | Retime, repetición o freeze que no cambian la verdad física no requieren píxeles nuevos | Editar el mismo master de forma determinista; nunca usarlo para fingir actuación hero, practical diegético o texto integrado. Foley nativo sólo por petición explícita y siempre se recupera por eventos, no aceptando el video completo |
 | **Región Vertex** | Solo `global`; `us-central1`/`us-east4` → NOT_FOUND | Fija `locations/global` en el endpoint |
 | **EEA/CH/UK** | No se puede editar video subido por el usuario en esas regiones | Considera si el flujo cliente cae ahí |
 
@@ -310,7 +316,7 @@ y fondos porque introdujo artefactos después del primer segundo. El aprendizaje
    audiovisual localizada como guía, revisar sus píxeles y rescatar sólo eventos de audio aprobados.
 3. Todo edit termina con revisión 1×, 0.5× y contact sheet; `completed` es estado de provider, no verdict
    de dirección.
-4. Texto/logos/practicals exactos se componen desde el asset canónico, no se piden al modelo.
+4. Logos, copy de UI y texto no diegético exactos se componen desde el asset canónico, no se piden al modelo. Un practical diegético crítico no se compone post: o nace físicamente dentro de la toma íntegra o se rechaza.
 
 Receta y evidencia: `workflows/omni-in-place-edit-and-deterministic-finish.md` y
 `ai-generations/2026-07-11_glitch-microphone-intro/`.

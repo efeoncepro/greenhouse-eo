@@ -1,0 +1,87 @@
+{
+  "ok": true,
+  "mode": "--execute",
+  "provider": "Vertex AI / Gemini Omni generateContent",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "task": "text-to-video inferred from a text-only request",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-n-omni-integral-ballistic-tap-master.mp4",
+  "constraints": [
+    "Entire ON AIR sign is generated as a physical in-set practical.",
+    "No compositing or post-generated overlay.",
+    "The requested motion encodes a discrete contact/rebound frame contract."
+  ],
+  "startedAt": "2026-07-11T11:51:11.594Z",
+  "completedAt": "2026-07-11T11:51:41.784Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-integral-ballistic-tap-v2.md",
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-n-omni-integral-ballistic-tap-master.mp4",
+    "bytes": 652575,
+    "mimeType": "video/mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "r_frame_rate": "24/1"
+        },
+        {
+          "codec_name": "aac",
+          "codec_type": "audio",
+          "r_frame_rate": "0/0"
+        }
+      ],
+      "format": {
+        "duration": "3.008000"
+      }
+    }
+  },
+  "response": {
+    "responseId": "MC5Sau6oB-qIlOAPmrLIuA4",
+    "modelVersion": "gemini-omni-flash-preview",
+    "usageMetadata": {
+      "promptTokenCount": 457,
+      "candidatesTokenCount": 17376,
+      "totalTokenCount": 18391,
+      "trafficType": "ON_DEMAND",
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 457
+        }
+      ],
+      "candidatesTokensDetails": [
+        {
+          "modality": "VIDEO",
+          "tokenCount": 17376
+        }
+      ],
+      "thoughtsTokenCount": 558
+    },
+    "promptFeedback": null,
+    "candidates": [
+      {
+        "finishReason": "STOP",
+        "finishMessage": null,
+        "safetyRatings": null,
+        "parts": [
+          {
+            "text": "**Planning Precise Visuals**\n\nI'm outlining a video. I'll start with the studio setup and camera specifics. Then, I'll detail the engineer's finger movements. These include the finger's tap on the microphone and its spring back. The audio will match the visuals with a \"toc\" sound and electronic effects. Finally, I will set the video's parameters.\n\n\n",
+            "mimeType": null,
+            "hasData": false
+          },
+          {
+            "text": null,
+            "mimeType": "video/mp4",
+            "hasData": true
+          }
+        ]
+      }
+    ]
+  }
+}

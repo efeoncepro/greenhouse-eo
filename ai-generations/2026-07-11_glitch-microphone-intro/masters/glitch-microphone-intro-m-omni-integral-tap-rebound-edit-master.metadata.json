@@ -1,0 +1,18 @@
+{
+  "ok": false,
+  "mode": "--execute",
+  "provider": "Vertex AI / Gemini Omni generateContent",
+  "model": "gemini-omni-flash-preview",
+  "task": "video-to-video edit inferred from inline video input",
+  "sourcePath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-l-omni-integral-vertex-text-master.mp4",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-m-omni-integral-tap-rebound-edit-master.mp4",
+  "constraints": [
+    "Preserve the integral physical ON AIR practical.",
+    "Change only the physical tap/rebound action and native foley.",
+    "No post-compositing."
+  ],
+  "startedAt": "2026-07-11T11:49:10.337Z",
+  "failedAt": "2026-07-11T11:49:31.664Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-integral-tap-rebound-edit.md",
+  "error": "Vertex Omni returned no video: {\"promptFeedback\":{\"blockReason\":\"OTHER\",\"blockReasonMessage\":\"The prompt could not be processed. Please try rephrasing the prompt or using different input.\"},\"candidates\":[]}"
+}

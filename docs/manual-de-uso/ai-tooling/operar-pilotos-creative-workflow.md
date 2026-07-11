@@ -1,4 +1,4 @@
-# Operar pilotos de Creative Workflow con Gemini Omni
+# Operar pilotos de Creative Workflow con motores de video IA
 
 > Tipo de documento: Manual de uso operativo
 >
@@ -6,7 +6,7 @@
 
 ## Para qué sirve
 
-Este manual permite a un operador o agente ejecutar un piloto creativo de imagen a video de forma reproducible, con gasto controlado y evidencia suficiente para distinguir una falla de capacidad de un bloqueo de entrada.
+Este manual permite a un operador o agente ejecutar un piloto creativo de imagen a video de forma reproducible, con gasto controlado y evidencia suficiente para distinguir una falla de capacidad de un bloqueo de entrada. No presupone que Gemini Omni sea el motor de toda toma: la selección depende del contrato de fidelidad de la referencia, la física de la acción y la interpretación que el proyecto permite.
 
 El referente ejecutado es la intro Glitch El micrófono se abre. Su retrospectivo canónico vive en ai-generations/2026-07-11_glitch-microphone-intro/pilot-retrospective.md.
 
@@ -15,24 +15,36 @@ El referente ejecutado es la intro Glitch El micrófono se abre. Su retrospectiv
 1. Crear una corrida versionada bajo ai-generations con brief, secuencia, storyboard, motion y sonido, manifest y renderer.
 2. Mantener el key visual original como fuente canónica. No sobrescribirlo ni usar el storyboard multipanel como input.
 3. Validar dirección, duración, formato, acción, audio y límite de gasto antes de llamar al modelo.
-4. Autenticar ambos caminos de Google Cloud: gcloud auth login y gcloud auth application-default login.
-5. Ejecutar primero el modo plan. Ningún plan debe llamar a Vertex.
+4. Elegir el motor mediante el gate `ancla visual flexible` vs `identidad de set`; no decidir por canal ni precio aislado. Ver [Selección de motor por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md).
+5. Si se usará Omni/Vertex, autenticar ambos caminos de Google Cloud: gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
+6. Ejecutar primero el modo plan. Ningún plan debe llamar al proveedor.
+
+## Gate de selección de motor
+
+| Condición creativa | Primera mano | Evidencia |
+| --- | --- | --- |
+| Stills ficticios de una campaña: pueden reinterpretarse dentro del mismo lenguaje visual; no tienen copy ni practical exacto | Gemini Omni image-to-video | RRSS: `gpt-image-2` generó ocho key visuals; Omni animó seis referencias y se publicaron beats de cuatro segundos. |
+| El key visual ya es la verdad de un set/producto/practical y debe mantener identidad espacial | Seedance image/reference-to-video | Glitch S conservó correctamente set, paleta y practical; el take sigue rechazado por gesto/foley, no por diseño. |
+| Se necesita explorar una acción inexistente mediante conversación y el plano tolera reinterpretación | Gemini Omni edit/generation | El resultado siempre pasa revisión temporal completa. |
+| Sólo cambian ritmo, orden, trim, hold, grade o copy no diegético exacto | Edición determinista / mograph | No se generan píxeles ni se simula una física ausente. |
+
+El canal no decide: un video de RRSS puede ser excelente con Omni si parte de un paquete de imágenes flexible, y una intro vertical puede requerir Seedance si el set es una identidad que no debe rediseñarse.
 
 ## Flujo de generación
 
-1. Preparar un adapter de la resolución admitida por el modelo. Registrar dimensiones, hash, transformación y relación con el asset canónico.
+1. Preparar la referencia admitida por el motor elegido. Registrar dimensiones, hash, transformación y relación con el asset canónico. No borrar/difuminar un practical diegético para hacerlo compatible con un motor.
 2. Ejecutar un solo take con una variable creativa controlada.
 3. Guardar prompt, metadata, respuesta, master y resultados de ffprobe.
 4. Separar el master de generación del export editorial. El master puede durar diez segundos; el corte útil se selecciona después de revisar.
 5. No publicar, archivar ni declarar final un asset sin revisión humana.
 
-## Si aparece HTTP 429
+## Si aparece HTTP 429 en Omni / Vertex
 
 1. Revisar metadata y usar sólo el backoff limitado del renderer.
 2. No cambiar el brief ni lanzar una batería paralela.
 3. Si el límite persiste después de los reintentos definidos, detener la corrida y registrar capacidad pendiente.
 
-## Si aparece HTTP 200 sin candidatos
+## Si aparece HTTP 200 sin candidatos en Omni / Vertex
 
 Un HTTP 200 no equivale a una generación. Si promptFeedback está presente y candidates está vacío, la entrada fue bloqueada antes de producir video.
 
@@ -45,6 +57,13 @@ Un HTTP 200 no equivale a una generación. Si promptFeedback está presente y ca
 7. Si la recuperación falla, cambiar de mano: keyframe compatible nuevo, otro motor o craft humano e híbrido.
 
 No se debe intentar desactivar filtros, ocultar contenido sensible ni presentar una recuperación de adapter como aprobación automática de un asset.
+
+## Si Fal responde `403 User is locked — Exhausted balance`
+
+1. Detener el take: no existe candidato, request ID ni razón creativa que depurar.
+2. Guardar el error y el prompt planificado en el manifest; no declarar que hubo una segunda generación ni inferir cargo.
+3. Registrar `operativamente bloqueado` en Handoff con el titular de la cuenta como responsable de recargar saldo.
+4. Tras la recarga, ejecutar sólo el take ya planificado y someterlo a la misma revisión; no convertir el bloqueo financiero en una batería de prompts nuevos.
 
 ## Revisión y post
 
@@ -75,6 +94,7 @@ No se debe intentar desactivar filtros, ocultar contenido sensible ni presentar 
 ## Referencias
 
 - Documentación funcional: docs/documentation/ai-tooling/estudio-de-flujos-creativos.md
+- Regla de selección y evidencia cruzada: `.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`
 - Piloto Glitch: ai-generations/2026-07-11_glitch-microphone-intro/
 - Ruta vigente Glitch: ai-generations/2026-07-11_glitch-microphone-intro/recovery-plan-v2-integral-practical-and-foley.md
 - Evidencia rechazada del take I: ai-generations/2026-07-11_glitch-microphone-intro/review/take-i-percussive-tap-on-air-gemini-foley-review.md

@@ -104,8 +104,9 @@ grande (pregunta, thinking, ambiente) + **mograph crisp** donde el micro-texto e
 
 - **Toma cinematográfica con cámara + personaje consistente** → Higgsfield (Cinema Studio + Soul ID).
 - **Cine dirigido con beats/coreografía** → Runway Gen-4.5.
-- **Control por referencias / social / económico** → Seedance / Kling.
-- **Broadcast** → Veo 3.1. **Edición conversacional** → Gemini Omni.
+- **Set/producto/practical que debe conservar identidad espacial desde una referencia íntegra** → Seedance image/reference-to-video, con gate de actuación y sonido.
+- **RRSS desde un paquete de stills ficticios, sin copy/practical exacto** → Gemini Omni image-to-video (ver `workflows/living-social-wall-clips.md`); no confundir el canal con la regla de motor.
+- **Broadcast** → Veo 3.1. **Edición conversacional o microescena flexible** → Gemini Omni. Selección completa: `workflows/engine-selection-by-fidelity-contract.md`.
 - **Tipo kinética / mograph de precisión / 3D** → craft humano (AE/Blender/Houdini), handoff con spec.
 - **VFX / compositing** (keying, roto, tracking/matchmove, integración CGI, simulaciones, cleanup) → craft
   humano (Nuke/Fusion/AE + Mocha) + AI-VFX (Runway roto, Wonder/Flow mocap, Beeble relight); ver `../modules/11`.

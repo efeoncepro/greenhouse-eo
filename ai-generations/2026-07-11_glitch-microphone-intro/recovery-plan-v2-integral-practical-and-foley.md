@@ -1,10 +1,22 @@
 # Plan de recuperación V2 — practical integrado y doble golpe real
 
-> Estado: **propuesto; no autoriza una nueva llamada de generación aún.** Este plan sustituye la ruta de corrección editorial de los takes F e I. Esos clips quedan **rechazados creativamente**: el `ON AIR` compuesto se percibe pegado y el gesto retimado todavía comunica presión, no prueba de sonido.
+> Estado: **sin toma aprobada; reintento Seedance bloqueado externamente.** Este plan sustituyó la corrección editorial de F e I. Esos clips siguen **rechazados creativamente**: el `ON AIR` compuesto se percibe pegado y el gesto retimado comunica presión, no prueba de sonido.
+
+## Addendum de ejecución — Fal / Seedance 2.0
+
+S usó el key visual 4K íntegro como referencia de `bytedance/seedance-2.0/image-to-video`, sin borrar, difuminar ni recomponer el `ON AIR`. La continuidad del set aprobó: cámara, paleta, cabina, mano, micrófono y practical quedaron fieles al material entregado. S se rechaza completo porque el índice se queda apoyado demasiado tiempo y el audio nativo no deja dos golpes aislados comprobables. La revisión canónica es [take-s-seedance-source-keyvisual-review.md](./review/take-s-seedance-source-keyvisual-review.md).
+
+T fija el gesto correcto —ruptura de contacto, impactos de máximo dos frames, rebote inmediato y aire claro— pero Fal respondió `HTTP 403 User is locked — Exhausted balance` antes de asignar un `request_id`. La siguiente acción es recarga de saldo por el titular de Fal; no se cambia diseño, referencia ni se intenta reparar S en post.
+
+## Evidencia histórica de Omni / Vertex
+
+La ruta no usa Veo. Los takes anteriores A–I y el take O se realizaron con `gemini-omni-flash-preview` en Vertex AI, región `global`. La imagen 4K íntegra y el video generado con una señal legible fueron bloqueados antes de generar/editar con `promptFeedback.blockReason=OTHER`; no se pudo aislar que la palabra fuera la causa única. Una generación Omni sólo desde texto sí produjo una señal `ON AIR` físicamente montada en el set. Por ello se usó el key visual como dirección y se generó una toma de reemplazo íntegra, no una capa ni una recomposición.
+
+El take O quedó rechazado por el operador: aunque su practical y foley aislados eran plausibles, la toma text-only cambió el diseño, la paleta, el micrófono y la composición fuente. El take N se descartó porque una coreografía por frames convirtió el segundo gesto en presión. La regla vigente es dirigir el comportamiento humano y auditar cada frame; los límites temporales de T son un criterio de aceptación, no una licencia para convertir la acción en una animación rígida.
 
 ## Decisión de dirección
 
-La pieza final se realizará como **una toma nueva, continua e íntegra que parte del key visual original intacto**. El `ON AIR` ya existe desde el primer fotograma como parte material de la cabina: una señal roja montada al fondo, con perspectiva, luz, desenfoque, oclusiones naturales y la misma óptica que el micrófono y la mano. No se permitirá borrarlo, neutralizarlo ni reconstruirlo después con crop, máscara, tracking, overlay, tarjeta, layer 2D ni composición sobre el video.
+La pieza final se realizará como **una toma nueva, continua e íntegra dirigida por el key visual original**. El `ON AIR` existe desde el primer fotograma como parte material de la cabina: una señal roja montada al fondo, con perspectiva, luz, desenfoque, oclusiones naturales y la misma óptica que el micrófono y la mano. No se permitirá borrarlo, neutralizarlo ni reconstruirlo después con crop, máscara, tracking, overlay, tarjeta, layer 2D ni composición sobre el video. Si el proveedor bloquea el source intacto, no se fuerza ese input: se genera el plate completo desde texto bajo esta dirección.
 
 El gesto tampoco se corregirá con retime. La mano debe ser generada o filmada ejecutando una acción de percusión: `hover → golpe breve → rebote visible → hover → golpe breve → rebote`. Si una toma no lo hace, se descarta completa. No se “arregla” el dedo en post.
 
@@ -12,22 +24,22 @@ El gesto tampoco se corregirá con retime. La mano debe ser generada o filmada e
 
 | Elemento | Decisión |
 | --- | --- |
-| Key visual 4K original | Es el **primer frame y referencia visual obligatoria**: cámara, luz, micrófono, consola, mano y `ON AIR` ya están resueltos. Su hash coincide con el archivo entregado nuevamente por el operador: `fde797…4608e`. |
+| Key visual 4K original | Es la **referencia de dirección obligatoria**: cámara, luz, micrófono, consola, mano y `ON AIR` ya están resueltos. Su hash coincide con el archivo entregado nuevamente por el operador: `fde797…4608e`. No se transmite mientras Omni bloquee el practical legible. |
 | Storyboard entregado | Conserva la arquitectura narrativa `instante previo → contacto/activación → voz lista`. Sirve para los beats de la toma; el contacto se redefine como dos golpes suaves, no como la presión que sugieren algunos cuadros. |
 | Take A de Omni | Sólo referencia histórica de tono y encuadre; no es placa final. |
 | Takes E, F e I | Rechazados. No se reutilizan como base, ni visual ni sonora. |
 | `ON AIR` | Debe nacer dentro de la toma nueva. Si sus letras derivan, parpadean o parecen añadidas, se rechaza el take entero. |
 | Audio nativo de un modelo | Referencia de ritmo/alternativa de audición, nunca aceptación automática. El master se decide por su foley aislado. |
 
-## Ruta recomendada en Google Cloud
+## Ruta histórica en Google Cloud (no ejecutar para V2)
 
-1. **Preflight sin generar:** confirmar en Vertex el modelo Veo disponible, cuota, región, duración vertical y la ruta de image-to-video con audio. La evidencia del piloto ya descarta volver a usar el adapter que borraba o difuminaba el letrero, y tampoco justifica otro edit de Omni sobre los clips existentes.
-2. **Referencia íntegra:** usar el key visual 4K original **sin adapter que borre el texto** como primer frame/referencia del video. El letrero rojo `ON AIR` ya está físicamente montado en el fondo; el job sólo puede animar la toma y debe conservarlo. Si el motor no acepta ese source o no retiene esa lectura física, no se pasa a una solución de post: se cambia de motor o de mano.
-3. **Piloto de performance:** producir una única toma corta de validación con un motor de vídeo de Google Cloud apto para image-to-video y audio nativo. La toma debe ser un plano único, sin cortes ni movimiento de cámara protagonista. No se pide al modelo “arreglar” un clip previo.
-4. **Dos takes dirigidos como máximo:** si el piloto pasa la geometría del set, se ejecutan sólo dos variaciones del mismo plano: una con una aproximación ligeramente más contenida y otra con un rebote de yema más legible. No se abren conceptos, encuadres ni estilos nuevos.
-5. **Selección dura:** sólo un take que pase todos los gates visuales continúa a sonido. Si el modelo no conserva el practical como objeto de la escena, se detiene la generación y se pasa a una toma física o a una escena 3D completa; nunca a un overlay.
+1. **Preflight sin generar:** confirmar en Vertex el modelo Omni, cuota, región y autenticación de `gcloud`. La evidencia descarta volver a usar el adapter que borraba o difuminaba el letrero, y tampoco justifica otro edit de Omni sobre clips que ya contengan el practical bloqueado.
+2. **Input discriminado:** probar una vez el key visual íntegro sin adapter. Si devuelve `OTHER` tanto con prompt mínimo como con probe neutro, registrar la evidencia y dejar de insistir con ese mismo input.
+3. **Toma íntegra Omni:** generar sólo desde texto el plano completo, usando el key visual y storyboard como dirección; la señal `ON AIR` se describe como practical físico del set, nunca como texto sobrepuesto.
+4. **Dos takes dirigidos como máximo:** variar la dirección humana —una aproximación contenida y un rebote de yema más legible— sin numerar fotogramas ni abrir conceptos/encuadres nuevos.
+5. **Selección dura:** sólo un take que pase set, actuación y sonido continúa a finish. Si la señal se degrada o parece overlay, se rechaza el take entero; nunca se repara en post.
 
-Gemini Omni sí permite generación/edición y audio nativo, pero su comportamiento en este piloto —entrada bloqueada con el practical legible y drift al editar— lo deja fuera de la ruta visual final. Veo se prueba como motor de toma completa, no como promesa de texto perfecto. La exactitud del `ON AIR` se valida en imagen, no se presupone por el nombre del modelo.
+Gemini Omni permite generación/edición y audio nativo, pero el preview puede bloquear una combinación de input sin especificar causa. En esta ejecución, Omni siguió siendo el motor visual final porque sí consiguió una toma íntegra mediante texto. La exactitud del `ON AIR` se valida en imagen, no se presupone por el nombre del modelo.
 
 ## Diseño de la toma nueva
 

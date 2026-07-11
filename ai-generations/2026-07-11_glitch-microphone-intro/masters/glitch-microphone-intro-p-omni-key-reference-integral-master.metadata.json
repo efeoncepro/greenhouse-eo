@@ -1,0 +1,49 @@
+{
+  "ok": false,
+  "mode": "--execute",
+  "provider": "Vertex AI / Gemini Omni generateContent",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "task": "multi-reference image-to-video inferred from three unmodified source crops plus text",
+  "canonicalSource": {
+    "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e"
+  },
+  "references": [
+    {
+      "role": "hand-and-light",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-keyref-hand-light-720.png",
+      "sha256": "58e8404b836f4524ff1bda09cd9a7472d2a01b32ec0af6e767701de093b0d584",
+      "bytes": 1061640,
+      "mimeType": "image/png",
+      "derivation": "crop and Lanczos reduction from canonical source; no blur, mask, replacement or overlay; the ON AIR panel is excluded from reference pixels because that complete input path is provider-blocked."
+    },
+    {
+      "role": "microphone-and-console",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-keyref-mic-console-720.png",
+      "sha256": "00c69bde654fe38d850a88dcb8a1f88e971dbcff7d97c73f16293d0d4f174476",
+      "bytes": 622556,
+      "mimeType": "image/png",
+      "derivation": "crop and Lanczos reduction from canonical source; no blur, mask, replacement or overlay; the ON AIR panel is excluded from reference pixels because that complete input path is provider-blocked."
+    },
+    {
+      "role": "navy-blue-practicals",
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-keyref-navy-blue-practicals-720.png",
+      "sha256": "0402d3e8a8370b64f236af5ddf88a2b342ffd44e7634c2050acb7cd28af625e1",
+      "bytes": 184899,
+      "mimeType": "image/png",
+      "derivation": "crop and Lanczos reduction from canonical source; no blur, mask, replacement or overlay; the ON AIR panel is excluded from reference pixels because that complete input path is provider-blocked."
+    }
+  ],
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-p-omni-key-reference-integral-master.mp4",
+  "constraints": [
+    "Use the source design, palette, hand, microphone and console.",
+    "Generate the ON AIR sign in the physical plate; never compose it after generation.",
+    "Gesture is tap, rebound, air gap, tap, rebound."
+  ],
+  "startedAt": "2026-07-11T12:02:23.182Z",
+  "failedAt": "2026-07-11T12:02:37.247Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-key-reference-integral-v4.md",
+  "error": "Vertex Omni returned no video: {\"promptFeedback\":{\"blockReason\":\"OTHER\",\"blockReasonMessage\":\"The prompt could not be processed. Please try rephrasing the prompt or using different input.\"},\"candidates\":[]}"
+}

@@ -1,0 +1,6 @@
+{
+  "ok": false,
+  "state": "failed",
+  "failedAt": "2026-07-11T12:28:27.651Z",
+  "error": "Fal queue submit failed with HTTP 403: User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing."
+}

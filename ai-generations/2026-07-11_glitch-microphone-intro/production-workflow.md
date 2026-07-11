@@ -1,6 +1,10 @@
 # Creative Workflow piloto — producir la intro de Glitch
 
-> Estado: **histórico y sustituido como ruta de producción.** F/I están rechazados creativamente: un practical diegético no se puede recomponer en post y un golpe de micrófono no se puede simular desde una presión mediante retime. La ruta vigente es [recovery-plan-v2-integral-practical-and-foley.md](./recovery-plan-v2-integral-practical-and-foley.md). Los comandos y perfiles que siguen sólo preservan evidencia del piloto; no se ejecutan para el siguiente take.
+> Actualización de ejecución 2026-07-11: se probó **Fal.ai / Seedance 2.0 image-to-video** con el key visual PNG 4K íntegro. S preservó correctamente diseño, cámara, colores, micrófono y practical físico, pero no aprobó la actuación ni el foley. T, la corrección dirigida de ese take, quedó bloqueado por `HTTP 403 User is locked — Exhausted balance` antes de generar. No se superpone, repone ni trackea el letrero.
+
+> Estado: **operativamente bloqueado por saldo Fal.** F/I y O están rechazados creativamente: un practical diegético no se puede recomponer en post, una presión no se arregla mediante retime y una toma text-only no puede sustituir el diseño entregado. La ruta vigente es [recovery-plan-v2-integral-practical-and-foley.md](./recovery-plan-v2-integral-practical-and-foley.md); la evidencia de S/T está en [take-s-seedance-source-keyvisual-review.md](./review/take-s-seedance-source-keyvisual-review.md).
+
+> Decisión de motor documentada: esta ruta no desplaza a Omni de RRSS. La landing de Redes Sociales partió de un set ficticio de imágenes generadas y Omni las convirtió en microescenas vivas publicadas; Glitch parte de una imagen que es la identidad exacta del set y exige física/tacto hero. La regla es seleccionar por fidelidad e interpretación permitidas, no por formato o canal: `.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
 
 ## Resultado de la recuperación
 
@@ -102,7 +106,7 @@ Solicitar audio de scratch como parte de una edición audiovisual localizada, no
 
 ### Recuperación cuando el source probe falla
 
-El probe de este piloto falló con `promptFeedback.blockReason=OTHER`. El siguiente run debe declarar una sola ruta: keyframe compatible nuevo, motor de video alternativo o craft humano/híbrido. Reutilizar el mismo input en Omni no es un experimento nuevo y queda prohibido hasta que el proveedor explique o cambie el comportamiento del preview.
+El probe de este piloto falló con `promptFeedback.blockReason=OTHER`. Para este caso se validó una única alternativa dentro de Omni: un plano completo text-to-video dirigido por el key visual, con el practical generado como geometría/material de set desde el primer frame. Reutilizar el mismo input bloqueado no es un experimento nuevo y queda prohibido hasta que el proveedor explique o cambie el comportamiento del preview. No convertir esta excepción en una licencia para overlay.
 
 ### Rechazo automático
 

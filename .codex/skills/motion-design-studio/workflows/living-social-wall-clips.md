@@ -24,6 +24,17 @@ No la uses para formatos que son naturalmente editoriales/estáticos
 es una micro-escena donde sujeto, cámara, entorno y gramática del formato se
 mueven con intención.
 
+## Evidencia de cadena: imágenes primero, Omni después
+
+Este no fue un caso de texto-a-video libre. La cadena publicada fue:
+
+1. `gpt-image-2` generó un paquete ficticio de **ocho** key visuals de campaña: seis verticales desde `portrait-batch.json` y dos horizontales desde `landscape-batch.json`.
+2. Los stills se revisaron como una familia coherente antes de animar: mural/macaws, paleta azul-verde, energía de campaña y **sin texto, logos ni UI que debieran sobrevivir literalmente**.
+3. Sólo seis formatos que prometen footage (`Reel`, `Historia`, `UGC`, `Creador`) pasaron por Gemini Omni image-to-video con una referencia 720×1280 por slot; `Carrusel` y `Post` se mantuvieron estáticos.
+4. Cada master Omni de 10 s se revisó, se recortó a un beat de 4 s y se publicó como WebM/MP4/poster **sin audio** para la pared de la landing.
+
+Por eso es evidencia positiva para Omni en RRSS: la referencia funcionaba como ancla de **lenguaje visual** y la acción podía reinterpretarse dentro de la misma campaña ficticia. No demuestra que Omni sea la primera mano para todo visual de referencia; un set/producto/practical que debe retener identidad exacta y física hero se clasifica con el contrato de fidelidad: `engine-selection-by-fidelity-contract.md`.
+
 ## Pasos
 
 1. **Define el trabajo del slot.** Decide si ese formato debe ser video o

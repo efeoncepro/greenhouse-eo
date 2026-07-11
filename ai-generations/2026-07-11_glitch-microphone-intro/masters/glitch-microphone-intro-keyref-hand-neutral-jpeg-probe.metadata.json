@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "startedAt": "2026-07-11T12:05:37.329Z",
+  "completedAt": "2026-07-11T12:06:16.990Z",
+  "referencePath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-keyref-hand-light-720.jpg",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-keyref-hand-neutral-jpeg-probe.mp4",
+  "responseStatus": 200,
+  "promptFeedback": null,
+  "usageMetadata": {
+    "promptTokenCount": 1150,
+    "candidatesTokenCount": 57920,
+    "totalTokenCount": 59469,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 1100
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 50
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 57920
+      }
+    ],
+    "thoughtsTokenCount": 399
+  }
+}

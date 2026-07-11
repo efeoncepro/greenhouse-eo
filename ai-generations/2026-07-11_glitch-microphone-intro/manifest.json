@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "runId": "2026-07-11_glitch-microphone-intro",
-  "status": "recovery-v2-planned-no-creative-candidate",
-  "workflowStatus": "pilot-evidence-retained; deterministic-overlay-and-retime-route-rejected-for-this-shot",
+  "status": "seedance-2-retry-blocked-by-fal-balance",
+  "workflowStatus": "pilot-evidence-retained; deterministic-overlay-and-retime route rejected; text-only plate O rejected for design drift; Seedance S rejected for sustained contact/native-audio ambiguity; Seedance T blocked before request by Fal balance",
   "purpose": "Pilot creative workflow for the Glitch intro motif: El micrófono se abre.",
   "format": {
     "aspectRatio": "9:16",
@@ -23,15 +23,21 @@
       "dimensions": "2160x3840"
     }
   ],
-  "plannedEngine": {
+  "historicalEngine": {
     "provider": "Vertex AI",
     "project": "efeonce-group",
     "location": "global",
     "model": "gemini-omni-flash-preview",
-    "mode": "image-to-video"
+    "mode": "text-to-video; full physical plate because the intact practical source was blocked as image/video input"
   },
-  "plannedTakes": 3,
-  "productionScript": "render-omni-glitch-intro.mjs",
+  "currentEngine": {
+    "provider": "fal.ai",
+    "model": "bytedance/seedance-2.0/image-to-video",
+    "mode": "image-to-video with exact intact 4K source; no overlay, crop, tracking or text repair",
+    "status": "take S rendered and rejected; take T blocked before request by exhausted Fal balance"
+  },
+  "plannedTakes": 2,
+  "productionScript": "render-seedance-2-source-keyvisual-direct-queue.mjs",
   "editorialRecoveryScript": "compose-glitch-tap-tap-on-air.mjs",
   "omniFoleyRequestScript": "request-omni-percussive-tap-sound.mjs",
   "foleyFinishScript": "finish-glitch-percussive-tap-with-gemini-foley.mjs",
@@ -63,6 +69,48 @@
         "bytes": 1447706
       },
       "review": "review/take-a-natural-review.md"
+    },
+    {
+      "take": "o-integral-natural-double-tap",
+      "status": "rejected-by-operator-design-continuity",
+      "generatedAt": "2026-07-11T11:53:00.000Z",
+      "generationMode": "Vertex Gemini Omni text-to-video; no image/video reference was transmitted after that path returned promptFeedback.blockReason=OTHER",
+      "master": {
+        "path": "masters/glitch-microphone-intro-o-omni-integral-natural-double-tap-master.mp4",
+        "durationSeconds": 3.008,
+        "dimensions": "720x1280",
+        "fps": 24,
+        "codec": "h264",
+        "audio": "native AAC, two dominant foley transients",
+        "bytes": 744554
+      },
+      "editorialExport": {
+        "path": "exports/glitch-microphone-intro-o-omni-integral-natural-double-tap-5s.mp4",
+        "durationSeconds": 5,
+        "dimensions": "720x1280",
+        "fps": 24,
+        "codec": "h264",
+        "audio": "native AAC for the 3.008-second generated take, followed only by silence",
+        "sha256": "e58c795b9df4ecaf98883db6993683e64134fbd0df4da1d0e4666b23c64d4978"
+      },
+      "review": "review/take-o-omni-natural-audio-sync-frames.png"
+    },
+    {
+      "take": "s-seedance-2-source-keyvisual",
+      "status": "rejected-after-frame-and-audio-review",
+      "generatedAt": "2026-07-11T12:21:56.763Z",
+      "generationMode": "Fal.ai Seedance 2.0 image-to-video with the exact intact 4K PNG key visual",
+      "master": {
+        "path": "masters/glitch-microphone-intro-s-seedance-2-source-keyvisual-master.mp4",
+        "durationSeconds": 5.041667,
+        "dimensions": "1080x1920",
+        "fps": 24,
+        "codec": "h264",
+        "audio": "native AAC 44.1 kHz stereo; rejected because two isolated mic-tap events were not established",
+        "sha256": "f02fcdcfaf47324616ff82927080333b3e6aa326591e3a71fe1d36d07b0a44e2"
+      },
+      "review": "review/take-s-seedance-source-keyvisual-review.md",
+      "reason": "Visual design continuity passed, but the fingertip held/returned to contact for a perceptible interval rather than two one-to-two-frame strikes with immediate rebounds. No post repair or audio extraction is allowed."
     }
   ],
   "runHistory": [
@@ -166,6 +214,51 @@
       "result": "candidate-rendered",
       "reason": "The deterministic finish keeps F video frames unchanged and mounts only the first two approved Omni foley windows, omitting the third generated accent.",
       "artifact": "exports/glitch-microphone-intro-i-percussive-tap-on-air-5s-gemini-foley.mp4"
+    },
+    {
+      "at": "2026-07-11T11:38:00.000Z",
+      "take": "integral-source-input-probe",
+      "result": "blocked",
+      "vertexStatus": 200,
+      "reason": "Gemini Omni Interactions rejected the intact key visual as image-to-video; then Vertex Omni rejected the take L video as video-to-video edit. Both return promptFeedback.blockReason=OTHER before candidate generation.",
+      "artifact": "masters/glitch-microphone-intro-j-omni-integral-master.metadata.json"
+    },
+    {
+      "at": "2026-07-11T11:42:00.000Z",
+      "take": "l-integral-text-vertex",
+      "result": "rejected-after-frame-review",
+      "reason": "The full physical ON AIR practical was successful, but the contact held too long and read as pressure.",
+      "artifact": "masters/glitch-microphone-intro-l-omni-integral-vertex-text-master.mp4"
+    },
+    {
+      "at": "2026-07-11T11:51:00.000Z",
+      "take": "n-integral-ballistic-text",
+      "result": "rejected-after-frame-and-audio-review",
+      "reason": "Explicit frame choreography yielded a slow press and a resonant second impact; do not encode the gesture as frame numbering in the prompt.",
+      "artifact": "masters/glitch-microphone-intro-n-omni-integral-ballistic-tap-master.mp4"
+    },
+    {
+      "at": "2026-07-11T11:53:00.000Z",
+      "take": "o-integral-natural-double-tap",
+      "result": "rejected-by-operator-design-continuity",
+      "reason": "The in-set ON AIR and native foley passed the isolated checks, but the text-only plate changed the studio design, palette, microphone/boom and composition from the supplied 4K visual.",
+      "artifact": "exports/glitch-microphone-intro-o-omni-integral-natural-double-tap-5s.mp4"
+    },
+    {
+      "at": "2026-07-11T12:21:56.763Z",
+      "take": "s-seedance-2-source-keyvisual",
+      "result": "rejected-after-frame-and-audio-review",
+      "reason": "Exact 4K source visual continuity passed, but contact held too long/ambiguously and the native track did not establish exactly two isolated dry grille taps.",
+      "requestId": "019f511d-84fc-7e31-b402-2c418ba6b78d",
+      "artifact": "masters/glitch-microphone-intro-s-seedance-2-source-keyvisual-master.mp4"
+    },
+    {
+      "at": "2026-07-11T12:28:27.651Z",
+      "take": "t-seedance-2-source-keyvisual",
+      "result": "blocked-before-generation",
+      "providerStatus": 403,
+      "reason": "Fal User is locked — Exhausted balance. No request_id, video or second provider charge was created.",
+      "artifact": "masters/glitch-microphone-intro-t-seedance-2-source-keyvisual-master.metadata.json"
     }
   ],
   "editorialRecovery": {
@@ -205,16 +298,16 @@
   },
   "selectedTake": null,
   "recoveryV2": {
-    "status": "planned-awaiting-production-approval",
+    "status": "seedance-retry-blocked-by-fal-balance",
     "plan": "recovery-plan-v2-integral-practical-and-foley.md",
-    "visualRule": "Generate or film one complete shot; the ON AIR practical must exist in the scene from the first frame. No post-production visual overlay, crop, mask, tracking or retime may repair it.",
+    "visualRule": "Generate or film one complete shot from the intact key visual; the existing practical remains part of the set from the first frame. No post-production visual overlay, crop, mask, tracking or retime may repair it.",
     "performanceRule": "Two fingertip strikes with immediate rebound, never a press.",
     "audioRule": "Native model audio is a candidate only; final foley must pass isolated audio review."
   },
   "remoteArtifacts": null,
   "approval": {
-    "creative": "rejected-current-candidate; recovery-v2-planned",
-    "productionSpend": "new-generation-not-yet-authorized",
+    "creative": "no-approved-take; take-s-rejected-for-gesture-and-foley",
+    "productionSpend": "take-s-completed-with-Fal-Seedance-2; take-t-blocked-before-request-by-exhausted-balance",
     "finalDelivery": "not-approved"
   }
 }

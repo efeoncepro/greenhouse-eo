@@ -1,0 +1,69 @@
+{
+  "ok": true,
+  "mode": "--execute",
+  "provider": "Vertex AI / Gemini Omni generateContent",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "task": "image-to-video inferred from JPEG reference plus text",
+  "referencePath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/glitch-keyref-hand-light-720.jpg",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-r-omni-hand-reference-practical-master.mp4",
+  "constraints": [
+    "Keep reference visual identity.",
+    "Use only an in-set live-transmission practical sign, never an overlay.",
+    "Two tap-and-rebound events with native foley."
+  ],
+  "startedAt": "2026-07-11T12:08:42.984Z",
+  "completedAt": "2026-07-11T12:09:27.570Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-hand-reference-practical-v6.md",
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-r-omni-hand-reference-practical-master.mp4",
+    "bytes": 2416811,
+    "mimeType": "video/mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "r_frame_rate": "24/1"
+        },
+        {
+          "codec_name": "aac",
+          "codec_type": "audio",
+          "r_frame_rate": "0/0"
+        }
+      ],
+      "format": {
+        "duration": "10.005000"
+      }
+    }
+  },
+  "promptFeedback": null,
+  "usageMetadata": {
+    "promptTokenCount": 1474,
+    "candidatesTokenCount": 57920,
+    "totalTokenCount": 60266,
+    "trafficType": "ON_DEMAND",
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 374
+      },
+      {
+        "modality": "IMAGE",
+        "tokenCount": 1100
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "VIDEO",
+        "tokenCount": 57920
+      }
+    ],
+    "thoughtsTokenCount": 872
+  }
+}

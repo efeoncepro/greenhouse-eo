@@ -1,0 +1,94 @@
+{
+  "ok": true,
+  "runId": "2026-07-11_glitch-microphone-intro",
+  "take": "l-omni-integral-vertex-text",
+  "mode": "execute",
+  "provider": "Vertex AI / Gemini Omni generateContent",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "task": "text_to_video inferred by Vertex from a text-only request",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-l-omni-integral-vertex-text-master.mp4",
+  "prompt": "A single continuous portrait 9:16 macro close-up in a real premium broadcast studio, at night. Locked camera, no cuts. The black broadcast microphone and boom occupy the lower-right foreground. A professional mixing console fills the lower background with restrained blue and green LEDs. An adult male hand enters from the upper left, warmly lit against deep navy studio shadows and electric blue practical light.\n\nIn the upper-right rear wall, a small red rectangular practical sign is physically mounted in the studio. Its exact readable text is: ON AIR. It is behind the hand and microphone, with real perspective, natural bokeh and a subtle red glow. It is part of the set, never a title, overlay, floating card or foreground element.\n\n0.00–0.55: the relaxed index fingertip hovers 6–10 mm above the upper-front metal grille. 0.55–0.67: the soft fingertip pad makes a light microphone soundcheck tap, contacts the grille for one or two frames only, and immediately rebounds to a visible hover. 0.67–1.08: calm air gap. 1.08–1.25: the same fingertip makes a second gentle tap, again only one or two frames, then immediately rebounds. It reads tap, lift, tap, lift: never press, hold, drag, button click, squeeze or microphone deformation. The wrist, palm, forearm, boom and microphone remain stable; natural anatomy, no extra fingers.\n\nOnly after the second rebound, the blue studio signal arcs and console light answer once, very subtly. Then hold still for a clean hard cut. Native sound: exactly two close, quiet, damped fingertip-on-microphone-grille foley hits, each a small muted toc with a tiny microphone-body response. No mouse click, keyboard, plastic button, nail, metallic ping, beep, room tone, music, dialogue, voice, third accent or signal sound. No captions, new text, logo, UI, extra people or glitch effect.",
+  "sourceDirection": "The 4K key visual and storyboard direct composition and light. They are not transmitted because Omni blocks their intact practical-containing pixels before generation.",
+  "constraints": [
+    "ON AIR is specified as a physical practical generated inside the shot, never post-composed.",
+    "The gesture is tap, lift, tap, lift, not pressure.",
+    "The native Omni audio is reviewed as a candidate, not automatically accepted."
+  ],
+  "startedAt": "2026-07-11T11:45:00.324Z",
+  "completedAt": "2026-07-11T11:45:35.350Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-integral-vertex-text-to-video.md",
+  "response": {
+    "responseId": "vSxSaqDeD6_IobIPmaeb0QE",
+    "modelVersion": "gemini-omni-flash-preview",
+    "usageMetadata": {
+      "promptTokenCount": 429,
+      "candidatesTokenCount": 57920,
+      "totalTokenCount": 58438,
+      "trafficType": "ON_DEMAND",
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 429
+        }
+      ],
+      "candidatesTokensDetails": [
+        {
+          "modality": "VIDEO",
+          "tokenCount": 57920
+        }
+      ],
+      "thoughtsTokenCount": 89
+    },
+    "promptFeedback": null,
+    "candidates": [
+      {
+        "finishReason": "STOP",
+        "finishMessage": null,
+        "safetyRatings": null,
+        "parts": [
+          {
+            "text": "**Creating a Detailed Scene**\n\nI need to generate a specific video using a prompt. The prompt will meticulously outline the visual actions, timing of those actions, and accompanying audio to ensure accuracy and realism. It must create a continuous macro shot within a studio setting.\n\n\n",
+            "mimeType": null,
+            "hasData": false
+          },
+          {
+            "text": null,
+            "mimeType": "video/mp4",
+            "hasData": true
+          }
+        ]
+      }
+    ]
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-l-omni-integral-vertex-text-master.mp4",
+    "bytes": 2498019,
+    "mimeType": "video/mp4",
+    "probe": {
+      "ok": true,
+      "data": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 720,
+            "height": 1280,
+            "r_frame_rate": "24/1"
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "r_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "duration": "10.005000"
+        }
+      }
+    }
+  }
+}

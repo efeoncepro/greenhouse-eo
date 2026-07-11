@@ -1,6 +1,6 @@
 # Retrospectivo del piloto Glitch — El micrófono se abre
 
-> Estado al 2026-07-11: **F/I rechazados creativamente.** Este documento conserva evidencia de un piloto fallido en su finish, no un candidato vigente ni un workflow generalizable. Ruta actual: [recovery-plan-v2-integral-practical-and-foley.md](./recovery-plan-v2-integral-practical-and-foley.md).
+> Estado al 2026-07-11: **sin candidato aprobado.** F/I y O están rechazados creativamente. S de Seedance conserva el diseño pero falla actuación/foley; T no se pudo enviar por saldo Fal agotado. La ruta actual queda en [recovery-plan-v2-integral-practical-and-foley.md](./recovery-plan-v2-integral-practical-and-foley.md).
 
 ## Propósito y alcance
 
@@ -26,6 +26,20 @@ El PNG 4K nunca se modificó. Es la fuente de dirección, color, finish y archiv
 La pregunta no era si Omni estaba disponible. El mismo endpoint, modalidad de respuesta y patrón de inline image ya habían producido clips verticales y con personas dentro del workspace. La pregunta era por qué esta combinación de imagen y prompt no llegaba a generar candidatos.
 
 La señal decisiva fue una respuesta HTTP 200 con promptFeedback poblado y candidates vacío. Eso significa que la entrada se bloqueó antes de generar video. El valor OTHER no identifica una categoría específica ni debe tratarse como una explicación de seguridad concluyente.
+
+## Addendum de producción integral — Omni, no Veo
+
+Los takes A–I ya ejecutados eran Gemini Omni sobre Vertex; Veo fue un intento de planificación equivocado que se detuvo y no dejó output de producción. La corrección posterior regresó a la ruta verificada `gemini-omni-flash-preview` / `generateContent` en `global`.
+
+La evidencia nueva no permite afirmar que las letras `ON AIR` por sí solas bloqueen el modelo. Sí muestra un patrón operativo: la imagen íntegra con practical legible, su versión 720p y el video L que ya contenía esa señal fueron bloqueados antes de generar/editar con `promptFeedback.blockReason=OTHER`. En contraste, Omni aceptó una solicitud sólo de texto que describe una señal `ON AIR` física en la pared y generó el plano completo. La respuesta correcta no fue borrar o montar el letrero: fue conservar la fuente como dirección y generar íntegramente el mundo alternativo con el practical ya dentro.
+
+El primer plate integral L fue rechazado: su contacto se prolongó y leía presión. El intento N de ordenar la acción por número de frame también fue rechazado: amplificó ese defecto y generó un segundo golpe resonante. El take O vuelve a una instrucción humana, no mecánica: `tap tap`, strike-and-bounce, hueco de aire visible, y dos foleys cortos. Su master Omni dura 3,008 s y la exportación de 5 s sólo clona el último frame del propio plano y prolonga el silencio; no añade ni manipula el `ON AIR`.
+
+## Addendum Fal / Seedance 2.0
+
+El operador autorizó probar Fal.ai con Seedance 2.0. S se generó mediante `bytedance/seedance-2.0/image-to-video` con el PNG 4K canónico íntegro, 1080p vertical, cinco segundos y audio nativo. A diferencia de la ruta text-only de Omni, retuvo el estudio entregado: composición, micrófono, boom, consola, colores y el practical de fondo. Esa continuidad es una evidencia positiva del motor, no una aprobación del take.
+
+La revisión de S detectó contacto sostenido/ambiguo de la yema contra la rejilla y audio que no se puede aprobar como dos golpes secos exclusivos. Se rechaza íntegro y no se extraen sus píxeles ni audio. T fue preparado con el límite explícito de dos fotogramas por contacto, rebote y aire visible; Fal devolvió `HTTP 403 User is locked — Exhausted balance` antes de crear request o entregar output. Evidencia: [review/take-s-seedance-source-keyvisual-review.md](./review/take-s-seedance-source-keyvisual-review.md), metadata S/T y `render-seedance-2-source-keyvisual-direct-queue.mjs`.
 
 ## Línea de tiempo de ejecución
 

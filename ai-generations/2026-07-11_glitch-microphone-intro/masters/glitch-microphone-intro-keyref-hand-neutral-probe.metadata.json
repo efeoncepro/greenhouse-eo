@@ -1,0 +1,36 @@
+{
+  "ok": false,
+  "startedAt": "2026-07-11T12:04:24.589Z",
+  "completedAt": "2026-07-11T12:04:33.349Z",
+  "responseStatus": 200,
+  "promptFeedback": {
+    "blockReason": "OTHER",
+    "blockReasonMessage": "The prompt could not be processed. Please try rephrasing the prompt or using different input."
+  },
+  "candidateCount": 0,
+  "response": {
+    "promptFeedback": {
+      "blockReason": "OTHER",
+      "blockReasonMessage": "The prompt could not be processed. Please try rephrasing the prompt or using different input."
+    },
+    "usageMetadata": {
+      "promptTokenCount": 1150,
+      "totalTokenCount": 1467,
+      "trafficType": "ON_DEMAND",
+      "promptTokensDetails": [
+        {
+          "modality": "IMAGE",
+          "tokenCount": 1100
+        },
+        {
+          "modality": "TEXT",
+          "tokenCount": 50
+        }
+      ],
+      "thoughtsTokenCount": 317
+    },
+    "modelVersion": "gemini-omni-flash-preview",
+    "createTime": "2026-07-11T12:04:25.232994Z",
+    "responseId": "STFSaqKcDuy3obIPioSJ-AI"
+  }
+}

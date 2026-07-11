@@ -1,0 +1,87 @@
+{
+  "ok": true,
+  "mode": "--execute",
+  "provider": "Vertex AI / Gemini Omni generateContent",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "task": "text-to-video inferred from a text-only request",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-o-omni-integral-natural-double-tap-master.mp4",
+  "constraints": [
+    "The ON AIR sign is a physical generated practical.",
+    "No post-compositing.",
+    "Gesture must read strike, bounce, gap, strike, bounce."
+  ],
+  "startedAt": "2026-07-11T11:52:48.729Z",
+  "completedAt": "2026-07-11T11:53:20.378Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-integral-natural-double-tap-v3.md",
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-o-omni-integral-natural-double-tap-master.mp4",
+    "bytes": 744554,
+    "mimeType": "video/mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "r_frame_rate": "24/1"
+        },
+        {
+          "codec_name": "aac",
+          "codec_type": "audio",
+          "r_frame_rate": "0/0"
+        }
+      ],
+      "format": {
+        "duration": "3.008000"
+      }
+    }
+  },
+  "response": {
+    "responseId": "ki5SaujUEK_IobIPmaeb0QE",
+    "modelVersion": "gemini-omni-flash-preview",
+    "usageMetadata": {
+      "promptTokenCount": 356,
+      "candidatesTokenCount": 17376,
+      "totalTokenCount": 18056,
+      "trafficType": "ON_DEMAND",
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 356
+        }
+      ],
+      "candidatesTokensDetails": [
+        {
+          "modality": "VIDEO",
+          "tokenCount": 17376
+        }
+      ],
+      "thoughtsTokenCount": 324
+    },
+    "promptFeedback": null,
+    "candidates": [
+      {
+        "finishReason": "STOP",
+        "finishMessage": null,
+        "safetyRatings": null,
+        "parts": [
+          {
+            "text": "**Composing Studio Macro Video**\n\nI will create a short video of a finger tapping a broadcast microphone. The video will show a macro shot of the microphone in a radio studio at night. The finger will tap the microphone grille twice, and then the hand will rest. The audio will be silent except for two synchronized tapping sounds.\n\n\n",
+            "mimeType": null,
+            "hasData": false
+          },
+          {
+            "text": null,
+            "mimeType": "video/mp4",
+            "hasData": true
+          }
+        ]
+      }
+    ]
+  }
+}

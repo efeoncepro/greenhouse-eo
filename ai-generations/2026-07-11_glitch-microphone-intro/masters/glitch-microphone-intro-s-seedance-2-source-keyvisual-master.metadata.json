@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "state": "completed",
+  "mode": "--execute",
+  "provider": "fal.ai direct queue fallback",
+  "reasonForFallback": "The canonical runFalModel helper stalled before returning a Fal request ID in this CLI process. This out-of-band script follows the same official queue contract and obtains the existing key only through GCP Secret Manager; it never prints or persists the key.",
+  "model": "bytedance/seedance-2.0/image-to-video",
+  "task": "image-to-video",
+  "input": {
+    "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e",
+    "dimensions": "2160x3840",
+    "mimeType": "image/png"
+  },
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-s-seedance-2-source-keyvisual-master.mp4",
+  "expected": "5 seconds, 1080p, 9:16, native audio",
+  "costNote": "Official Fal documentation checked 2026-07-11: Seedance 2.0 Standard is approximately US$0.682/second at 1080p, so the 5-second run is expected around US$3.41 plus token billing.",
+  "startedAt": "2026-07-11T12:18:34.144Z",
+  "completedAt": "2026-07-11T12:21:56.763Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/seedance-2-source-keyvisual-tap-tap.md",
+  "source": {
+    "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e",
+    "bytes": 4944297
+  },
+  "fal": {
+    "requestId": "019f511d-84fc-7e31-b402-2c418ba6b78d",
+    "seed": 926590900,
+    "remoteVideo": {
+      "url": "https://v3b.fal.media/files/b/0aa1d223/6n5PR_Zvqzg1z3rw34cps_video.mp4",
+      "content_type": "video/mp4",
+      "file_name": "video.mp4",
+      "file_size": 2896160
+    }
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-s-seedance-2-source-keyvisual-master.mp4",
+    "bytes": 2896160,
+    "sha256": "f02fcdcfaf47324616ff82927080333b3e6aa326591e3a71fe1d36d07b0a44e2"
+  }
+}

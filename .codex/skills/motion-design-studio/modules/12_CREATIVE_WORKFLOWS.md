@@ -85,7 +85,13 @@ HTML/CSS/JS animado (timeline `setTimeout`/CSS) con **logo real embebido** → c
 4. **Fallback correcto:** si las poses necesarias viven en el master, retima sólo material contiguo y reversos legibles; no regeneres por reordenar una acción. Componer tipografía/marks/practicals desde el asset fuente real, no desde letras IA.
 5. **Finish:** foley independiente, room tone cuando la dirección lo pida, grade y QC. Un MP4 Omni puede aportar foley y fallar visualmente: extrae ventanas aprobadas, elimina acentos inventados y remúxalas sobre la placa que pasó QA. El render mudo o el MP4 del modelo nunca son master final por defecto.
 
-El caso Glitch probó ambas rutas: Omni Interactions procesó el video pero fue rechazado por artefactos de continuidad; la salida seleccionada conservó el mismo export, construyó `tap → lift → tap → lift` por retime y compuso `ON AIR` desde el key visual 4K. Receta detallada: `workflows/omni-in-place-edit-and-deterministic-finish.md`.
+El caso Glitch probó ambas rutas: Omni Interactions procesó el video pero fue rechazado por artefactos de continuidad. El finish F/I también se rechazó: retimar una presión no creó un golpe real y recomponer `ON AIR` lo hizo parecer una capa. La ruta exige una toma íntegra nueva; Seedance preservó su set pero aún no aprobó gesto/foley. Receta y límite: `workflows/omni-in-place-edit-and-deterministic-finish.md`.
+
+## Workflow F — "Elegir por contrato de fidelidad" (EVIDENCIA LIMITADA 2026-07-11)
+
+**No clasifiques por canal.** El caso RRSS fue `gpt-image-2` → set de key visuals ficticios → Omni image-to-video → beats web: funcionó porque cada microescena podía reinterpretarse dentro de la misma campaña y no contenía texto/practical exacto. Glitch exige lo contrario: el key visual es la verdad del set y el gesto/sound deben ser físicamente inequívocos; Seedance fue más fiel al mundo, pero aún no es un take aprobado.
+
+Antes de gastar, declara si la referencia es una **ancla visual flexible** o una **identidad de set**; clasifica copy/UI, practical y actuación hero. Elige Omni para microescenas donde el modelo pueda interpretar desde un paquete de stills o para el loop conversacional; empieza por Seedance cuando la imagen existente, objeto y espacio deben conservarse; usa post sólo si los frames ya contienen la verdad física. Detalle y evidencia: `workflows/engine-selection-by-fidelity-contract.md`.
 
 ---
 
@@ -98,6 +104,7 @@ El caso Glitch probó ambas rutas: Omni Interactions procesó el video pero fue 
 | UI/texto/citas/gauge **legibles y exactos** | **C** (HTML + Playwright) |
 | Un spot que mezcla mundo IA + producto | **D** (híbrido) |
 | Cambiar una escena ya generada sin regenerar por reflejo | **E** (editar sólo si hacen falta píxeles nuevos; post determinista si no) |
+| Elegir motor para una referencia, practical o acción física | **F** (contrato de fidelidad antes que canal/precio) |
 
 > **Regla transversal:** el **look** puede venir de IA; la **exactitud** (texto, citas, logos, números,
 > marca) **siempre** de assets/mograph reales compuestos. El operador aprueba antes de entregar; gasto

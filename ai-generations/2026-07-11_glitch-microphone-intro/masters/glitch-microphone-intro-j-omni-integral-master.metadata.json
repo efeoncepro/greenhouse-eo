@@ -1,0 +1,40 @@
+{
+  "ok": false,
+  "runId": "2026-07-11_glitch-microphone-intro",
+  "take": "j-omni-integral",
+  "mode": "execute",
+  "provider": "Vertex AI / Gemini Omni",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "task": "image_to_video",
+  "reference": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/microfono-broadcast-720x1280-omni-integral.jpg",
+    "mimeType": "image/jpeg",
+    "dimensions": "720x1280",
+    "sha256": "993aaca5ccaf6b6210eef70ed9546d82b677c1ce5f0bac2af67dc3ddf603ced8",
+    "bytes": 124452,
+    "sourcePath": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sourceSha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e",
+    "transformation": "Lanczos reduction plus JPEG encoding only; no crop, sign neutralization, mask, blur or visual edit."
+  },
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-j-omni-integral-master.mp4",
+  "prompt": "One continuous locked 9:16 close-up in this exact broadcast studio. Preserve the supplied image and every existing element exactly, including the background practical sign, microphone, hand, composition and lighting.\n\nAt the very start, the index fingertip completes a light tap on the microphone grille and immediately lifts into a visible hover. After a short pause in the air, it makes one more gentle tap and immediately lifts again. Two quick fingertip strikes with clear rebounds, never a press or hold. Keep the wrist, palm, microphone and camera still.\n\nAfter the second lift, the existing blue studio signal responds very subtly, then everything settles. Native audio: exactly two very soft, close, damped microphone-grille taps; no music, voice, room tone, click, beep or third sound. No cuts, new people, new text, captions, logo, UI or glitch effect.",
+  "constraints": [
+    "The source includes ON AIR and is passed intact; no sign-neutral adapter is allowed.",
+    "The first original contact becomes the first impact and must rebound immediately.",
+    "Native audio is reviewed separately; only exactly two realistic grille hits are eligible."
+  ],
+  "startedAt": "2026-07-11T11:41:10.065Z",
+  "failedAt": "2026-07-11T11:41:21.943Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-integral-practical-tap-tap.md",
+  "interaction": {
+    "id": "video-727d00e0-6bca-485e-ac52-a3e10dd727f7",
+    "status": "failed",
+    "model": "gemini-omni-flash-preview",
+    "created": null,
+    "updated": null,
+    "outputTypes": []
+  },
+  "error": "Gemini Omni did not return a video: {\"id\":\"video-727d00e0-6bca-485e-ac52-a3e10dd727f7\",\"status\":\"failed\",\"model\":\"gemini-omni-flash-preview\",\"created\":null,\"updated\":null,\"outputTypes\":[]}"
+}

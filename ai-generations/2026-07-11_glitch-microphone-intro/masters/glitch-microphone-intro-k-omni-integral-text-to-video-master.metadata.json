@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "runId": "2026-07-11_glitch-microphone-intro",
+  "take": "k-omni-integral-text-to-video",
+  "mode": "execute",
+  "provider": "Vertex AI / Gemini Omni",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "task": "text_to_video",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-k-omni-integral-text-to-video-master.mp4",
+  "prompt": "Single continuous, locked 9:16 cinematic macro close-up inside a real dark broadcast studio at night. Same visual direction as a premium radio control room: a black broadcast microphone and boom fill the lower-right foreground; a mixing console with dim blue and green LEDs fills the lower background; an adult male hand enters from upper left; warm realistic skin against deep navy shadows, electric blue practicals and subtle green console light. No camera move and no cut.\n\nA small red rectangular ON AIR sign is physically screwed to the acoustic rear wall in the upper-right background. Its text reads exactly ON AIR. It is a real studio practical: correct perspective, red glow, natural depth of field, behind the hand and microphone, never floating, never a foreground title, never a graphic overlay.\n\n[0.0–0.55s] The relaxed index fingertip hovers 6–10 mm above the upper-front metal grille of the microphone. [0.55–0.67s] The soft pad of that fingertip performs a light microphone soundcheck tap: contact for only one or two frames, then immediate rebound upward to a clear hover. [0.67–1.08s] Quiet visible air gap. [1.08–1.25s] The same fingertip makes a second light tap and immediately rebounds. This reads tap, lift, tap, lift — never pressing, holding, dragging, clicking a button, squeezing or deforming the microphone. Wrist, palm, forearm, boom and microphone stay stable; no extra fingers or anatomy changes. [1.33–1.70s] Only after the second rebound, the existing blue signal arcs and console glow respond once, minimally. Then the studio remains still for a clean hard cut.\n\nNative sound has exactly two soft close microphone-check foley hits: damped fingertip against a metal grille with a tiny muted microphone-body response. No mouse click, keyboard, plastic button, nail, metallic ring, beep, room tone, music, speech, voice or third sound. No captions, extra text, logo, UI, glitch effect, additional people or camera movement.",
+  "sourceDirection": "Original 4K key visual and storyboard remain direction references; they are not passed as image input because Omni rejected the intact source before generation.",
+  "constraints": [
+    "ON AIR is generated as a physical practical inside the complete shot, never a post overlay.",
+    "Two fingertip strikes have explicit rebounds and exactly two diegetic audio hits.",
+    "The output remains a candidate until visual and audio review pass."
+  ],
+  "startedAt": "2026-07-11T11:42:25.843Z",
+  "completedAt": "2026-07-11T11:43:08.706Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-integral-text-to-video.md",
+  "interaction": {
+    "id": "video-8212567b-50e2-4d64-99e8-9741a28bd16c",
+    "status": "completed",
+    "model": "gemini-omni-flash-preview",
+    "created": null,
+    "updated": null,
+    "outputTypes": [
+      {
+        "type": "video",
+        "mimeType": "video/mp4",
+        "hasData": true
+      }
+    ]
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-k-omni-integral-text-to-video-master.mp4",
+    "bytes": 626118,
+    "mimeType": "video/mp4"
+  }
+}

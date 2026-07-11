@@ -1,0 +1,31 @@
+{
+  "ok": false,
+  "mode": "--execute",
+  "provider": "Vertex AI / Gemini Omni generateContent",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "task": "image-to-video inferred from a JPEG reference plus text",
+  "canonicalSource": {
+    "path": "/Users/jreye/Downloads/microfono_broadcast_video_assets/microfono_broadcast_9x16_2160x3840.png",
+    "sha256": "fde797f7a096587392ea3cffb4ada4ff260f0e1329e38135ade32cae4904608e"
+  },
+  "reference": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/refs/microfono-broadcast-sign-neutral-720x1280-omni-reference.jpg",
+    "sha256": "df0a460dfbd9222b27fe84d7351b9327e4332248b5263fcd6c663b95b47de0de",
+    "bytes": 122740,
+    "mimeType": "image/jpeg",
+    "derivation": "720x1280 JPEG derived from canonical 4K key visual. It preserves the full visual design, hand, microphone, console and palette; the original legible sign panel is defocused only in inference reference because this preview blocks the intact source. The final sign must be born physically in the generated scene, never composited after."
+  },
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/masters/glitch-microphone-intro-q-omni-source-design-practical-master.mp4",
+  "constraints": [
+    "Preserve supplied art direction and object design.",
+    "The ON AIR sign must be physical/generated in-scene.",
+    "No visual post-compositing.",
+    "Tap, rebound, gap, tap, rebound with two native foley hits."
+  ],
+  "startedAt": "2026-07-11T12:07:47.828Z",
+  "failedAt": "2026-07-11T12:07:51.335Z",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-11_glitch-microphone-intro/prompts/omni-source-design-practical-v5.md",
+  "error": "Vertex Omni returned no video: {\"promptFeedback\":{\"blockReason\":\"OTHER\",\"blockReasonMessage\":\"The prompt could not be processed. Please try rephrasing the prompt or using different input.\"},\"candidates\":[]}"
+}
