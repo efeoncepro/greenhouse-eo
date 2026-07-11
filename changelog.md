@@ -1,5 +1,12 @@
 # changelog.md
 
+## 2026-07-11 — TASK-1390: AI Visibility Grader — citation_quality real + degradación diagnosticable (ISSUE-120)
+
+- El grader ahora **clasifica las fuentes de las citas** (determinista, por dominio): `citation_quality` deja de ser 0 estructural para todos los clientes (re-score SKY: 0 → 90.9 con las mismas citas; overall 52.5 → 73.3).
+- La presencia por dominio es **same-site** (subdominios ≡ apex).
+- La **extracción de prosa registra su outcome** ({ran,status,provider}): `sentiment unknown` ya no es indistinguible de "no corrió". Señal nueva `growth.ai_visibility.prose_extraction_degraded`.
+- Retries de providers con **backoff exponencial** y throttles de cuota clasificados `rate_limited` (Vertex sin httpStatus).
+- Versionado: `normalized_finding_v2` + `ai_visibility_score_v2` (v1 convive como historia; snapshots públicos inmutables). Migración additive `prose_extraction` JSONB.
 ## 2026-07-11
 
 - **Efeonce Creative Studio — arquitectura agentic sister + EPIC-028.** Se aceptó la dirección de una plataforma creativa independiente de Greenhouse para imagen/video/audio/3D: UI, MCP y agentes son consumers del mismo contract; el agente propone/prepara, mientras gasto, entrega y publicación permanecen gobernados por `propose → reserve → approve → execute`. Define assets/lineage y credit ledger append-only como dominio propio, control plane + worker async aislados, acceso interno primero y gates explícitos para cliente, pagos/credit sales, upload externo y publicación. Se crearon ADR, arquitectura y EPIC-028; PDR/context/skills se actualizaron. Las propuestas Greenhouse de Media Foundry, Creative Flow Studio y Creative Video Studio, incluido TASK-996, quedan superseded como ubicación de runtime, preservando evidencia histórica.

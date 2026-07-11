@@ -2057,3 +2057,12 @@ Growth/AEO, redeploy `greenhouse-ic8cg4ery`) **y en staging** (parity flip 2026-
   steady son la evidencia. Si comercial/legal exige sign-off formal del outbound, queda como follow-up de TASK-1279.
 - **Follow-up vigente:** la UI de review operador (confirmar categoría/arquetipo + preview de prompts antes de correr sobre un
   prospecto) sigue como task `ui-ux` dentro del alcance EPIC-021.
+
+## Delta 2026-07-11 — TASK-1390 (ISSUE-120): sourceType classifier + same-site + prose outcome + backoff
+
+- **Clasificador determinista de `sourceType`** (`normalization/source-type-classifier.ts`): las citas sin tipo del provider se clasifican por dominio (owned same-site del sujeto + listas curadas news/social/earned/directory/marketplace; `unknown` honesto). Cierra la dimensión muerta `citation_quality` (era 0 estructural para toda marca). El valor explícito del provider sigue mandando.
+- **Matching same-site** (`isSameSiteDomain`): la presencia por dominio del sujeto compara por sufijo de dominio bidireccional (subdominios ≡ apex), ya no igualdad exacta.
+- **Outcome de la extracción de prosa persistido** (`proseExtraction {ran,status,provider}` en el finding; columna JSONB additive): la degradación del hook LLM es diagnosticable (antes `sentiment unknown` era indistinguible de "no corrió"). Señal nueva `growth.ai_visibility.prose_extraction_degraded` (steady=0; `disabled`/`empty_excerpt` no alertan). Expuesto agregado en el response del score y el run detail.
+- **Retries con backoff exponencial + jitter** en el web-search-adapter, y clasificación `rate_limited` desde message/code para SDKs sin httpStatus (Vertex `RESOURCE_EXHAUSTED`); rate_limited thrown ahora reintenta.
+- **Versionado:** `normalized_finding_v2` + `ai_visibility_score_v2`; el findingId default incorpora la versión (el PK colisionaba entre versiones en re-score). Filas/scores v1 conviven como historia; `getNormalizedFindings` devuelve la versión más nueva por (prompt, provider). Snapshots públicos inmutables.
+- **Evidencia:** re-score live `EO-GRUN-00045` → `citation_quality 0 → 90.9`, overall `52.5 → 73.3` con las mismas citas. Spec: `docs/tasks/complete/TASK-1390-ai-visibility-grader-issue-120-pipeline-fixes.md` + `docs/issues/resolved/ISSUE-120-*.md`.

@@ -487,3 +487,9 @@ La auditoria del 2026-06-29 encontro primero `GROWTH_AI_VISIBILITY_PERPLEXITY_EN
 - Funcional: [ai-visibility-grader.md](../../documentation/growth/ai-visibility-grader.md)
 - Arquitectura + invariantes: [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 - Codigo: `src/lib/growth/ai-visibility/**`, smoke `scripts/growth/ai-visibility-smoke.ts`.
+
+## Delta 2026-07-11 — TASK-1390 (pipeline v2)
+
+- Los findings/scores nuevos usan `normalized_finding_v2` / `ai_visibility_score_v2`: `sourceTypes` ahora se clasifican determinísticamente por dominio (owned same-site + listas curadas) → `citation_quality` puntúa de verdad (antes 0 estructural, ISSUE-120). Los runs viejos conservan sus filas v1 (conviven); un re-score produce la versión nueva sin tocar la vieja.
+- Cada finding lleva `proseExtraction {ran,status,provider}`: si `sentiment` sale `unknown`, el status dice POR QUÉ (`disabled`=flag OFF esperado; `not_configured`/`provider_error`/`schema_invalid`=degradación real → señal `growth.ai_visibility.prose_extraction_degraded` en `/admin/operations`).
+- Un throttle de cuota (Vertex `RESOURCE_EXHAUSTED`) ahora clasifica `rate_limited` y reintenta con backoff — un `provider_error` genérico ya no lo enmascara.

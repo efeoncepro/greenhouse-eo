@@ -63,3 +63,17 @@
 - Runs: `EO-GRUN-00044`, `EO-GRUN-00045` (`greenhouse_growth`); reporte público `grt-d8cb68da…` (incrustado en la propuesta SKY).
 - Código: `src/lib/growth/ai-visibility/normalization/normalizer.ts` (líneas 81, 97), `scoring/engine.ts` (27, 192-208), `normalization/llm-extraction.ts`, `normalization/prose-extraction/router.ts` (104-170).
 - Contexto: TASK-1333 (drift extracción worker/Vercel), ISSUE-113 (Gemini provider_error), FEATURE_FLAG_STATE_LEDGER deltas 2026-06-30/07-04.
+
+## Resolución (2026-07-11 — TASK-1390)
+
+**Estado: resolved.** Los 4 gaps cerrados en `TASK-1390` (commits en develop, local-first):
+
+- **Gap A:** clasificador determinista `source-type-classifier.ts` (owned same-site + listas curadas news/social/earned/directory/marketplace; `unknown` honesto) cableado en el normalizer. Sin LLM.
+- **Gap B:** `isSameSiteDomain` (sufijo de dominio bidireccional) en `resolveBrandPresence` — el perfil puede declarar subdominio y el motor citar el apex.
+- **Gap C:** `proseExtraction {ran,status,provider}` persistido en el finding (columna JSONB additive, migración `20260711154951551`), expuesto en score/run-detail, + señal `growth.ai_visibility.prose_extraction_degraded` (steady=0; `disabled`/`empty_excerpt` no alertan).
+- **Gap D:** backoff exponencial + jitter en retries del web-search-adapter + clasificación `rate_limited` desde message/code (Vertex sin httpStatus) + retry en rate_limited thrown.
+- Versionado: `normalized_finding_v2` + `ai_visibility_score_v2` (+ findingId versionado — el PK colisionaba entre versiones, destapado por la verificación live). v1 convive como historia.
+
+**Verificación (re-score live `EO-GRUN-00045`, DB real):** `citation_quality 0 → 90.9` (30/33 obs con fuentes creíbles) con las MISMAS citas; overall `52.5 → 73.3`; sourceTypes reales (owned 6, earned 18, news 16, social 16, marketplace 13, directory 6); `proseExtraction {disabled:35}` diagnosticable. Snapshot público previo intacto (inmutable).
+
+**Pendiente no bloqueante:** confirmar en Sentry la causa exacta del `provider_error` de Gemini gn03 (la clasificación nueva lo hará visible como `rate_limited` si era throttle); re-publicar informe SKY con v2 (decisión comercial del operador).
