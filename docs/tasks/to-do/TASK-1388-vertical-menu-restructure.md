@@ -380,6 +380,7 @@ Cambio de UI sin migraciones, sin cambio de rutas, sin gating, sin backend. Ries
 - Breadcrumbs / local nav para rutas profundas (wayfinding) — no existe en el chrome hoy.
 - Card-sort formal (5–8 usuarios internos) para validar taxonomía de zonas/dominios y reparto sidebar↔avatar antes de congelar copy y pasar a `UI ready: yes`.
 - Visibilizar el `ShortcutsDropdown` (favoritos) si el card-sort muestra baja adopción.
+- **TASK-1389 (gobernanza de navegación)** — candado anti-regresión: Contrato de Asignación de Superficies + gate de presupuesto del sidebar (`pnpm nav:budget`). Su gate arranca en `warn` y se **promueve a `error` cuando esta task (TASK-1388) baje el sidebar bajo el tope** (verificado verde). Es lo que evita que la navegación vuelva a inflarse.
 
 ## Open Questions
 
