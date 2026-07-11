@@ -27,7 +27,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | UI/feature platforms (home-rollout/nexa-insights/shortcuts/table-density/sample-sprints/account-360) | `greenhouse-ux` + product-design | `architecture/agent-invariants/UI_FEATURE_AGENT_INVARIANTS.md` |
 | UI Platform (Composition Shell/Adaptive Card/Floating Surface/Motion/Elevation/Figma) | `greenhouse-ux` `modern-ui` `state-design` | `architecture/agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md` + `architecture/ui-platform/*` |
 | Ops/Reliability/Platform (Teams Bot/ops-worker/Vercel cron/reliability/platform-health) | `greenhouse-cron-sync-ops` `teams-bot-platform` | `architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` |
-| EPIC-027 / trabajo nuevo durante desacople build-runtime | `software-architect-2026` cuando cambia la frontera | `architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` + `operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` |
+| EPIC-027 / trabajo nuevo durante desacople build-runtime · cualquier decisión de arquitectura (dominio/schema/agentes/frontera) | `arch-architect` (skill canónica de arquitectura; overlay greenhouse-pinned) | `architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` + `operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` |
 | Entitlements governance + capability grants + ROLE_CODES | — | `architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` · `architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` |
 | Typography + Efeonce brand | `typography-design` | `architecture/agent-invariants/DESIGN_TOKENS_BRAND_AGENT_INVARIANTS.md` |
 | AI image + LLM providers | `greenhouse-ai-image-generator` | `architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` |
