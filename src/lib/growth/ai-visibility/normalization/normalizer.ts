@@ -19,6 +19,7 @@ import {
 } from '../contracts'
 import {
   createEmptyNormalizedFinding,
+  NORMALIZED_FINDING_SCHEMA_VERSION,
   type CommercialIntentMatch,
   type NormalizedFinding,
   type NormalizedFindingProvider
@@ -178,8 +179,12 @@ export const normalizeObservation = (
   observation: GrowthAiVisibilityProviderObservation,
   context: NormalizationContext
 ): NormalizedFinding => {
+  // TASK-1390: el finding convive por schema_version en DB (UNIQUE compuesto), pero el
+  // PK es finding_id — un re-score con contrato nuevo sobre un run viejo colisionaba el
+  // PK (mismo observationId). El id default incorpora la versión: determinista para el
+  // recompute de la MISMA versión (upsert), único entre versiones (conviven).
   const finding = createEmptyNormalizedFinding({
-    findingId: context.findingId ?? observation.observationId,
+    findingId: context.findingId ?? `${observation.observationId}::${NORMALIZED_FINDING_SCHEMA_VERSION}`,
     runId: observation.runId,
     promptId: observation.promptId,
     provider: observation.provider as NormalizedFindingProvider
