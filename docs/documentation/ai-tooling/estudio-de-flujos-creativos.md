@@ -4,8 +4,8 @@
 > **Version:** 1.0
 > **Creado:** 2026-07-06 por Claude (vision operador Julio Reyes)
 > **Ultima actualizacion:** 2026-07-06 por Claude
-> **Estado:** Propuesta — todavia no esta construido. Ver la decision tecnica abajo.
-> **Documentacion tecnica:** [ADR Creative Flow Studio](../../architecture/GREENHOUSE_CREATIVE_FLOW_STUDIO_DECISION_V1.md)
+> **Estado:** Propuesta histórica de ubicación Greenhouse — no está construido ahí. El programa vigente nace como plataforma hermana agentic.
+> **Documentación técnica vigente:** [Efeonce Creative Studio — Agentic Platform Architecture V1](../../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md). La [ADR Creative Flow Studio](../../architecture/GREENHOUSE_CREATIVE_FLOW_STUDIO_DECISION_V1.md) se conserva como referencia de diseño DAG, ya superseded como runtime.
 
 ## Que es
 

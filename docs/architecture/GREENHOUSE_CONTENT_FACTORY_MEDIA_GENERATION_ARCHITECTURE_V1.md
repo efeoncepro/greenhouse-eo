@@ -4,7 +4,7 @@
 > **Version:** 1.0
 > **Creado:** 2026-07-04 por Claude (visión operador Julio Reyes)
 > **Ultima actualizacion:** 2026-07-04
-> **Status:** `proposal` — la implementación NO ha comenzado; ver ADR `GREENHOUSE_CONTENT_FACTORY_MEDIA_GENERATION_DECISION_V1.md`
+> **Status:** `superseded as Greenhouse runtime` — la implementación NO comenzó y ahora corresponde a [Efeonce Creative Studio](EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md). Este documento es evidencia histórica de principios, no especificación ejecutable en este repositorio.
 > **Owner:** Content / AI Platform (ai-tooling)
 > **Domain boundary:** `content.media` — generación multimodal (imagen / video / audio / 3D). Hermano del plano editorial `content.editorial` (TASK-1123, EPIC-019).
 > **Validated as of:** 2026-07-04 (pricing Vertex/Magnific/Higgsfield + disponibilidad de modelos verificados en vivo esta fecha)

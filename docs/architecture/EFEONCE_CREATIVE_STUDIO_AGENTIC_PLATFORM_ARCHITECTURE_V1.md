@@ -1,0 +1,280 @@
+# Efeonce Creative Studio — Agentic Platform Architecture V1
+
+> **Estado:** arquitectura objetivo aprobada por dirección; implementación pendiente de EPIC-028.
+> **ADR:** [Efeonce Creative Studio: plataforma agentic peer con paridad UI + MCP](EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md)
+> **Audiencia:** Creative Technology, producto, operaciones creativas y futuros integradores de Efeonce.
+> **Principio rector:** una capacidad operable por una persona debe ser operable por un agente autorizado mediante el mismo contrato gobernado.
+
+## 1. Resultado que se está construyendo
+
+Creative Studio no es una galería de prompts ni un SaaS de generación. Es el **sistema operativo de producción creativa asistida** de Efeonce: convierte una intención aprobable en una corrida trazable de imagen, video, audio o 3D; conserva su evidencia; y deja al equipo y, luego, al cliente operar la misma capacidad desde UI, MCP o agentes.
+
+La primera oferta es interna. El modelo de datos, autorización, presupuesto y asset rights nace listo para workspaces de cliente, pero ningún cliente se habilita hasta completar los gates de EPIC-028.
+
+### Principios de arquitectura
+
+| Principio | Implicación concreta |
+| --- | --- |
+| Agentic by design | El agente planea y propone sobre contracts; no maneja navegador ni secretos de proveedores. |
+| UI + MCP parity | La UI llama la misma API/command layer que el MCP server; no hay privilegio oculto de una surface. |
+| Agency craft is product | Templates, rúbricas, referencias, decisiones y evaluación son IP versionada, no sólo prompts. |
+| Human authority on spend and delivery | Estimar no gasta; reservar no ejecuta; aprobar sí permite una corrida acotada. |
+| Fidelity before provider preference | El router recibe un contrato explícito: preserve-set, human-action, exact-text, flexible-style, audio-foley, etc. |
+| Own the durable record | Asset, lineage, review y ledger viven en el Studio aun si la inferencia ocurre en un tercero. |
+| Separate runtime, connected ecosystem | Integra por API/evento/deep link; nunca por tablas, credenciales o sesiones compartidas. |
+
+## 2. Contexto de ecosistema y límites
+
+Creative Studio es un backbone peer junto a Greenhouse, Kortex y Verk. Greenhouse sigue siendo el hub de operación de cuenta; Creative Studio es dueño de la producción y la memoria creativa.
+
+```mermaid
+flowchart LR
+  team["Equipo Efeonce"] --> ui["Creative Studio UI"]
+  agent["Agente autorizado / MCP client"] --> mcp["Creative Studio MCP"]
+  ui --> api["Command + Reader API"]
+  mcp --> api
+  api --> domain["Creative domain"]
+  domain --> db[("PostgreSQL")]
+  domain --> assets[("Private asset storage")]
+  domain --> queue["Dispatch queue"]
+  queue --> runner["Creative Runner"]
+  runner --> providers["Model / render providers"]
+  domain --> events["Versioned events / projections"]
+  events --> greenhouse["Greenhouse: account/deliverable projection"]
+  events --> verk["Verk / distribution when approved"]
+  events --> surfaces["Think / public surfaces only after publication"]
+```
+
+### Ownership boundary
+
+| Creative Studio owns | It may expose | It must not own |
+| --- | --- | --- |
+| Workspace creative projects, briefs, templates, reference packs, runs, asset versions, reviews, provider attempts, credit ledger, usage/cost evidence | Approved assets, run state, delivery references, usage summaries and deep links | Greenhouse Account 360, client commercial record, HR/finance ledger, public publishing, Verk distribution calendar |
+
+Greenhouse's identity/organization can be linked through an explicit external binding, but `studio_workspace_id` remains the local tenant key. A mapping is not a foreign key into Greenhouse's database.
+
+## 3. Archetype and deployment shape
+
+Start as a **modular monolith with a separate worker deployable**, not microservices:
+
+```text
+efeonce-creative/                         # new private repository
+  apps/studio-web/                         # Next.js UI + BFF/API + MCP transport
+  apps/creative-runner/                    # TypeScript worker entrypoint / Cloud Run Job
+  packages/domain/                         # commands, readers, policies, state machines
+  packages/provider-contract/              # provider-neutral capability interfaces
+  packages/media-qc/                       # hashes, metadata, contact sheets, waveform helpers
+  packages/database/                       # schema, migrations, repositories
+  packages/contracts/                      # OpenAPI/MCP schemas/events shared by consumers
+  infra/terraform/                         # GCP projects, IAM, storage, Cloud Run, observability
+```
+
+| Layer | Initial choice | Why |
+| --- | --- | --- |
+| Product UI and HTTP API | Next.js App Router + strict TypeScript | Fast internal product delivery and typed contract consumers. |
+| Worker | Node.js / TypeScript in Cloud Run Jobs | Long, retryable provider polls/render orchestration must not hold web requests. |
+| Durable operational store | Dedicated Cloud SQL for PostgreSQL instance/database | Transactional state, ledger, audit and tenant isolation; no Greenhouse database sharing. |
+| Asset store | Private Cloud Storage buckets | Durable originals/derivatives with short-lived signed delivery URLs. |
+| Dispatch | Cloud Tasks → fast dispatcher → Cloud Run Job | Reliable hand-off without pretending a 10-minute generation is an HTTP request. |
+| Secrets and identity | Secret Manager + least-privilege service accounts | Provider keys are never available to UI/MCP clients. |
+| Telemetry | OpenTelemetry traces/metrics/logs plus domain run events | Correlates human, agent, MCP, worker and provider attempts. |
+
+The target is separate GCP projects (for example `efeonce-creative-dev` and `efeonce-creative-prod`) under Efeonce governance. Project/billing/security approval is a bootstrap gate, not assumed provisioned by this document.
+
+## 4. Core domain model
+
+| Aggregate | Responsibility | Key invariants |
+| --- | --- | --- |
+| `workspace` / `member` / `role_grant` | Tenant, membership and authority | Every domain row is scoped to one workspace. |
+| `brand_profile` / `project` | Durable creative context | Brand and rights constraints are versioned, not injected ad hoc into prompts. |
+| `creative_template` | Curated Efeonce workflow | Versioned inputs, fidelity contract, review gates, allowed providers and cost policy. |
+| `reference_asset` / `asset_version` | Original and derived media | Content hash, source, rights, lineage, storage policy and derivative parent are recorded. |
+| `creative_run` / `run_step` / `provider_attempt` | Execution and recovery | One logical run can have several attempts; a retry never erases evidence. |
+| `review_decision` | Craft/rights/delivery approval | Technical completion cannot self-approve a deliverable. |
+| `credit_ledger` / `credit_reservation` | Commercial allowance and settlement | Append-only entries; reservation and settlement are idempotent. |
+| `command_execution` / `audit_event` | Programmatic safety | Actor, authority, payload fingerprint, outcome and correlation are durable. |
+
+### Run lifecycle
+
+```mermaid
+stateDiagram-v2
+  [*] --> draft
+  draft --> prepared: validate template + references
+  prepared --> estimated: router + quote
+  estimated --> reserved: credits held
+  reserved --> awaiting_approval
+  awaiting_approval --> queued: authorized approval
+  awaiting_approval --> cancelled
+  queued --> running
+  running --> candidate_ready: provider completed + assets ingested
+  running --> recoverable_failure
+  recoverable_failure --> queued: explicit retry / branch
+  candidate_ready --> under_review
+  under_review --> approved
+  under_review --> changes_requested
+  changes_requested --> draft
+  under_review --> rejected
+  approved --> delivered
+  delivered --> [*]
+```
+
+The provider's `succeeded` maps only to `candidate_ready`. The words **approved**, **delivered** and **published** are separate business decisions.
+
+## 5. The canonical capability contract
+
+Every command follows this envelope:
+
+```text
+actor + workspace scope + capability + idempotency key + command payload
+  → authorize → validate policy → audit → domain command
+  → projection/event → response with command/run ID
+```
+
+Reads are policy-filtered projections. Commands have explicit idempotency and return a stable result or an in-progress/replay response; clients never retry by duplicating provider spend.
+
+### Surface parity matrix
+
+| Capability | UI | MCP / agent | Control point |
+| --- | --- | --- | --- |
+| Browse templates, assets and run history | Reader API | Read-only tool/resource | Workspace and asset policy |
+| Prepare brief/reference pack | Form calls `prepareRun` | `creative.prepare_run` | Validation, rights/classification check |
+| Estimate model route and credit spend | UI estimate | `creative.estimate_run` | Router and commercial policy |
+| Reserve and submit a run | Approval dialog | `creative.submit_run` with one-time approval token | Role, budget, idempotency, credit reservation |
+| Follow run/review evidence | Run detail | `creative.get_run` / `creative.get_asset` | Scoped projection only |
+| Request changes or branch an attempt | Review surface | `creative.branch_run` | Lineage and review policy |
+| Approve delivery or publish externally | Controlled human UI | Not autonomous in V1; MCP may create a proposal only | Explicit human authority + destination policy |
+
+The MCP server is a thin protocol adapter. It validates the caller's issued identity and workspace grant, then invokes the same command/reader layer. It never receives database credentials, provider secrets or a privileged cross-workspace role.
+
+### Agent autonomy levels
+
+| Level | Agent may do | Agent may not do |
+| --- | --- | --- |
+| `read` | Inspect approved workspace context, runs, templates and permitted assets | Retrieve another workspace, private originals or hidden provider keys |
+| `propose` (default) | Build brief, select template, propose routing/cost/review plan | Reserve credits, execute generation, approve or publish |
+| `prepare` | Create a validated run draft and estimate | Convert an estimate into charge/spend |
+| `execute-approved` | Submit only a signed, bounded approval token | Change scope, spend cap, provider policy or delivery target |
+
+## 6. Media production and provider routing
+
+`ProviderAdapter` is a capability interface, not a generic lowest-common-denominator wrapper. A template declares what it needs: input/output modality, reference count, camera/action constraint, exact-text sensitivity, foley/audio requirement, allowed transformations, latency ceiling and budget tier.
+
+The router returns a **route proposal**: chosen provider/model, input adapter plan, expected credit range, known limitations and fallback policy. It stores that proposal with the run so it can be audited when a model or pricing changes.
+
+The Glitch intro becomes a canonical fixture: a practical `ON AIR` must be born in the scene, the finger performs a strike-and-rebound rather than a button press, and microphone foley must be evaluated as sound-of-contact. The router cannot silently replace this with an overlay or generic tap SFX. The RRSS micro-scenes are a different fixture: synthetic key visuals can be a flexible visual anchor and may route to a different video engine.
+
+### Asset and rights policy
+
+1. Ingest authorized source file → hash, classify, record rights/source → store private original.
+2. Create inference adapter only when provider constraints demand it; preserve relation to the original and record every visual/text alteration.
+3. Ingest provider output into private storage; provider URL is ephemeral evidence, never source of truth.
+4. Generate machine-readable QA evidence where useful (technical metadata, contact sheet, waveform, frame hash); human craft review remains decisive.
+5. Use time-limited signed URLs only after authorization. Asset events and logs carry identifiers, not public raw URLs.
+
+## 7. Credits and commercial boundary
+
+Provider spend is an internal input; credits are the customer-facing unit of an Efeonce capability. The ledger allows a credit price to include direction, template/IP, storage, review, support and margin instead of pretending it is a pass-through token.
+
+```text
+allocation → estimate → reservation hold → approval → execution
+  → actual provider cost evidence → settlement | release | refund adjustment
+```
+
+- `credit_ledger` is append-only. Balance is a projection, never the only mutable number.
+- Reservations expire, are scoped to a run and are idempotent.
+- A failed provider attempt settles according to a documented policy; no silent double charge.
+- V1 may allocate internal/client credits manually or through the commercial engagement. Checkout, tax, invoicing and self-serve top-ups are explicitly deferred until finance/legal design.
+
+## 8. Security, tenancy and policy
+
+- Start internal-only but enforce `workspace_id`, roles, row policies and asset authorization from the first migration.
+- Roles: `agency_admin`, `studio_operator`, `client_creator`, `client_approver`, `client_viewer` are working names; policy defines their effective capabilities rather than hardcoding UI permissions.
+- Separate service accounts: web/API, MCP adapter, dispatcher, runner and event/projection publisher. Grant only necessary IAM/resource access.
+- Store keys in Secret Manager; never return keys to UI/MCP/agent context and never write prompt/reference contents to broad logs.
+- Treat incoming client assets as untrusted. External client upload requires a virus/scanning/quarantine and rights acceptance gate before broad enablement.
+- Prompts and outputs inherit workspace classification. Restricted material requires explicit template/provider allowlisting and cannot be silently routed to an unapproved third party.
+- Cross-platform integration uses versioned client credentials and explicit bindings under the sister-platform contract. Greenhouse does not get implicit write authority over Studio credits or assets.
+
+## 9. Observability, evaluation and review
+
+Each run produces a correlated record across API, agent/MCP call, queue dispatch, worker, provider attempt, storage ingest and review. Required dimensions include `workspace_id`, `project_id`, `run_id`, `template_version`, `provider`, `model`, `attempt`, `actor_type`, `credit_reservation_id` and error class (never raw secret or public asset URL).
+
+### Quality gates
+
+| Gate | Automated evidence | Human decision |
+| --- | --- | --- |
+| Technical | File integrity, duration/ratio, codec, hash, ingest completion | Reject if it is unusable despite valid metadata |
+| Fidelity | Template-specific evaluators/fixtures, reference pack checks | Direction decides set continuity, anatomy/action and practical authenticity |
+| Audio | Loudness/duration/waveform and sync markers | Sound review decides foley realism, absence of unwanted music/ambience |
+| Rights and delivery | Asset policy, destination and approval state | Authorized reviewer approves delivery/publication |
+| Economics | Estimate versus reservation versus actual cost | Owner resolves exception before further spend |
+
+Golden fixtures begin with the validated RRSS workflow and the Glitch recovery record. A provider/model is not promoted simply because it returned `completed`; it needs documented performance on the fidelity contract it claims to serve.
+
+## 10. Initial public/private API shape
+
+All external programmatic routes are versioned and authenticated. The exact OpenAPI/MCP schema is a bootstrap task; this is the semantic boundary:
+
+```text
+GET  /v1/templates
+GET  /v1/runs/{runId}
+GET  /v1/assets/{assetId}
+POST /v1/runs:prepare
+POST /v1/runs:estimate
+POST /v1/runs:submit             # requires approval token + Idempotency-Key
+POST /v1/runs/{runId}:branch
+POST /v1/runs/{runId}:review
+```
+
+MCP tools map to the same commands/readers. A client-facing public API is **not** implied by this initial shape; access starts private and scoped to Efeonce identities/MCP principals.
+
+## 11. Delivery sequence
+
+```mermaid
+sequenceDiagram
+  participant A as Human or agent
+  participant S as Studio command API
+  participant L as Credit ledger
+  participant Q as Dispatcher
+  participant W as Runner job
+  participant P as Provider
+  participant R as Reviewer
+
+  A->>S: prepare + estimate run
+  S->>L: create estimate/reservation proposal
+  S-->>A: route, limits, cost and approval request
+  A->>S: submit with approval token + idempotency key
+  S->>L: reserve credits atomically
+  S->>Q: enqueue run
+  Q->>W: start bounded job
+  W->>P: generate / poll / retrieve
+  P-->>W: candidate output
+  W->>S: ingest assets + candidate_ready evidence
+  S-->>R: review queue and proofs
+  R->>S: approve / reject / request change
+  S->>L: settle or release reservation
+```
+
+## 12. Phased delivery and deliberate non-goals
+
+| Phase | Outcome | Explicitly excluded |
+| --- | --- | --- |
+| 0 — foundation | New repo, project boundaries, tenant/auth, assets, ledger skeleton, audit/telemetry, provider contract, one internal template | Client access, payments, free canvas |
+| 1 — prove craft | Image/video/audio runs, route estimate/approval, review, provider evidence, RRSS + Glitch fixtures | Autonomous publishing, arbitrary model marketplace |
+| 2 — client-ready | Scoped client roles, asset intake/rights, client review, contracts/events for Greenhouse and Verk | Unbounded self-serve spend, cross-tenant collaboration |
+| 3 — scale IP | Batch/variants, curated flow composition, evaluation registry, commercial credit allocation | General-purpose automation platform |
+| 4 — advanced authoring | Governed canvas/DAG and richer agent collaboration if evidence warrants it | Replacing professional direction/review |
+
+## 13. Architecture decisions deferred to the bootstrap tasks
+
+- Identity issuer and SSO binding for the initial internal team.
+- Exact PostgreSQL tenancy enforcement mechanism (RLS policy design and ORM/runtime integration).
+- Provider adapter order and contract tests from live accounts, not marketing claims.
+- Credit currency, expiry/refund policy, tax/invoicing and commercial packaging.
+- Data retention, licensed asset policy, consent/deepfake policy and external upload scanner.
+- Whether an audio-specific runtime later merits Python/GPU tooling. TypeScript/Cloud Run Jobs is the default until evidence proves otherwise.
+
+## 14. External technical references
+
+The infrastructure selections follow managed primitives suitable for this stage: [Cloud Run Jobs](https://cloud.google.com/run/docs/create-jobs), [Cloud Tasks HTTP targets](https://docs.cloud.google.com/tasks/docs/creating-http-target-tasks), [Cloud Run service-to-service authentication](https://docs.cloud.google.com/run/docs/authenticating/service-to-service), [Cloud Storage signed URLs](https://docs.cloud.google.com/storage/docs/access-control/signed-urls), [Cloud SQL for PostgreSQL](https://docs.cloud.google.com/sql/docs/postgres), [Secret Manager](https://docs.cloud.google.com/secret-manager/docs/overview) and [OpenTelemetry JavaScript](https://opentelemetry.io/docs/languages/js/). These are deployment building blocks, not authorization to provision them before EPIC-028 bootstrap approval.
+

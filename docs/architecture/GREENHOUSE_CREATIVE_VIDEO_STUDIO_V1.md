@@ -1,14 +1,14 @@
 # Greenhouse Creative Video Studio V1
 
 > **Tipo de documento:** Spec de arquitectura / ADR propuesto
-> **Status:** Proposed
+> **Status:** Superseded — la implementación propuesta dentro de Greenhouse fue reemplazada el 2026-07-11 por [Efeonce Creative Studio](EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md), plataforma hermana agentic con paridad UI + MCP.
 > **Date:** 2026-06-02
 > **Owner:** Platform / Creative Operations / AI Tooling
 > **Scope:** Video generation, brand capture, HyperFrames compositions, asset library, approval workflow, render jobs
 > **Reversibility:** two-way-but-slow
 > **Confidence:** medium
 > **Validated as of:** 2026-06-02
-> **Task:** TASK-996 — Greenhouse Creative Video Studio
+> **Historical task:** TASK-996 — Greenhouse Creative Video Studio (no ejecutar como implementación Greenhouse)
 
 ---
 
@@ -304,4 +304,3 @@ Pilot verification:
 - HyperFrames validate: no console errors;
 - HyperFrames inspect: `0 layout issues`;
 - snapshots captured for four beats.
-

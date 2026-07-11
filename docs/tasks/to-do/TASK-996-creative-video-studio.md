@@ -1,4 +1,6 @@
-# TASK-996 — Greenhouse Creative Video Studio
+# TASK-996 — Greenhouse Creative Video Studio *(superseded historical proposal)*
+
+> **No ejecutar en `greenhouse-eo`.** Desde 2026-07-11 esta task queda superseded como ubicación de runtime por [EPIC-028 — Efeonce Creative Studio](../../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md). Conserva el piloto HyperFrames como evidencia; la implementación debe nacer en el repositorio separado y bajo la nueva arquitectura agentic/UI+MCP.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -13,18 +15,25 @@
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
+- Execution profile: `standard`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Superseded — no ejecutar; runtime trasladado a EPIC-028 / repositorio separado`
 - Rank: `TBD`
-- Domain: `platform|ai|content|agency|ui|ops`
-- Blocked by: `ADR acceptance: docs/architecture/GREENHOUSE_CREATIVE_VIDEO_STUDIO_V1.md`
+- Domain: `platform|ai|content|agency|ops`
+- Blocked by: `Superseded by docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`
 - Branch: `task/TASK-996-creative-video-studio`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
 ## Summary
 
-Productizar dentro de Greenhouse la capacidad validada en el piloto HyperFrames:
+Propuesta histórica para productizar dentro de Greenhouse la capacidad validada en el piloto HyperFrames:
 generar promos/videos de marca desde una URL, brief o asset library, con captura
 de identidad visual, guion, storyboard, composicion HTML animada, VO, snapshots,
 revision humana y export MP4/WebM.
@@ -38,8 +47,9 @@ storage canonico, permisos, aprobacion, versionado, render jobs, asset library
 ni lifecycle operativo.
 
 La oportunidad robusta no es "subir un video" sino crear un **Creative Video
-Studio**: Greenhouse como control plane de producto y HyperFrames como motor de
-composicion/render.
+Studio**. Esa oportunidad sigue vigente, pero la decisión posterior asigna su
+control plane, workers, assets y MCP a una plataforma hermana de Efeonce, no a
+Greenhouse.
 
 ## Goal
 

@@ -1,3 +1,9 @@
+## Sesión 2026-07-11 — Efeonce Creative Studio: plataforma agentic sister definida
+
+> **Decisión de arquitectura aceptada (dirección, sin runtime aún):** la capability de media de Efeonce no debe entrar a Greenhouse. Nace como **Efeonce Creative Studio**, plataforma hermana con repositorio, despliegue, base de datos, buckets, secrets, provider adapters, assets/lineage y ledger de créditos propios. UI, MCP y agentes son consumers del mismo command/reader contract; el agente propone/prepara, pero coste, entrega y publicación siguen `propose → reserve → approve → execute`. Cloud shape propuesta: Next.js/API + Cloud Run Jobs para worker largo, Cloud Tasks como despacho, Cloud SQL PostgreSQL, GCS privado, Secret Manager y OTel; provisioning queda explícitamente bloqueado hasta el bootstrap.
+>
+> **Gobernanza creada:** ADR `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md`, arquitectura `..._ARCHITECTURE_V1.md`, programa `EPIC-028`. El contexto/PDR/skills Codex+Claude ya reconocen a Creative Studio como cuarta plataforma (nombre de trabajo, no sub-marca pública). Las propuestas Greenhouse de Media Foundry, Creative Flow Studio y Creative Video Studio quedan superseded como ubicación de runtime; `TASK-996` conserva la evidencia HyperFrames y no se debe ejecutar en Greenhouse. Siguiente decisión operativa: aprobar bootstrap del nuevo repo/proyectos GCP y abrir sus tasks fundacionales; no crear infraestructura ni gastar proveedores desde este repositorio.
+
 ## Sesion 2026-07-10 - Auditoria integral motor hiring: 17 hallazgos cerrados - Claude
 
 > **Auditoría completa del motor hiring (governance + E2E) con todos los hallazgos CERRADOS en el

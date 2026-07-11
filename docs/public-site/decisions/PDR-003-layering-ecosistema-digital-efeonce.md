@@ -54,6 +54,8 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   • Runtime Greenhouse    PG + BQ, modelo canónico 360, Nexa, entitlements
   • Kortex                CRM / datos comercial (peer system + producto vendible)
   • Verk                  analítica (producto)
+  • Efeonce Creative Studio (nombre de trabajo)  producción creativa agentic: UI + MCP,
+       assets/runs/review/créditos; peer runtime, no módulo Greenhouse
   • Pipelines             Notion↔BQ, HubSpot↔BQ, ops-worker
 ```
 
@@ -103,11 +105,17 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   pipeline) y (b) producto vendible del portfolio. Peer system: Greenhouse lo
   **observa y le pide comandos gobernados**, no lo absorbe (contrato sister
   platforms + reader/command adapter, TASK-1162/1164).
+- **Efeonce Creative Studio vive en el eje B**, no como una página nueva de
+  Greenhouse ni como una sub-marca pública por defecto. Es la capability creativa
+  agentic de Efeonce: sus surfaces humanas, MCP y agentes consumen un mismo
+  contrato; Greenhouse puede converger entregables aprobados por integración, pero
+  no hospeda sus workers, assets, créditos ni adapters de proveedores. Decisión:
+  `EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md` / EPIC-028.
 
 ## Alternativas descartadas
 
 - **Una sola lista plana de "capas"** mezclando superficies y plataformas — mete
-  a Kortex/Verk (horizontales) en el mismo plano que sitio/contenido/experiencia
+  a Kortex/Verk/Creative Studio (horizontales) en el mismo plano que sitio/contenido/experiencia
   (verticales por audiencia) y confunde "cómo te tocan" con "con qué operas".
 - **Think y /blog como superficies separadas** — falso: son un hub de contenido;
   el blog (Manzanitas + Glitch) es una familia del hub, no un rival. (Corrige el
@@ -129,7 +137,7 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 
 ## Reglas duras
 
-- **NUNCA** meter Kortex/Verk (eje B) en las capas front-of-house (eje A).
+- **NUNCA** meter Kortex/Verk/Creative Studio (eje B) en las capas front-of-house (eje A).
 - **NUNCA** tratar Think y el blog como superficies que compiten — son el mismo
   hub de contenido; resolver la coexistencia por canonical URL, no separándolos.
 - **NUNCA** modelar "experiencia" como una sola audiencia — cliente y operador

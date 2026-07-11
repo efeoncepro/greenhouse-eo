@@ -41,7 +41,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-025` | `to-do` | `docs/epics/to-do/EPIC-025-vivir-el-why-cocreacion-educacion-cliente.md` |
 | `EPIC-026` | `complete` | `docs/epics/complete/EPIC-026-greenhouse-modular-build-runtime-decoupling.md` |
 | `EPIC-027` | `in-progress` | `docs/epics/in-progress/EPIC-027-greenhouse-build-cost-recovery-decomposition.md` |
+| `EPIC-028` | `to-do` | `docs/epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-028`
+- `EPIC-029`

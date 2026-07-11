@@ -1,16 +1,17 @@
 # 03 · Ecosistema de Producto
 
-> Regla maestra: **cada plataforma puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub donde todo converge.** Las plataformas verticales (Kortex, Verk) alimentan el hub sin depender de él para operar.
+> Regla maestra: **cada plataforma puede venderse y operar de forma independiente. Cuando el cliente está en el ecosistema completo, Greenhouse es el hub donde todo converge.** Las plataformas verticales (Kortex, Verk y Creative Studio) alimentan el hub sin depender de él para operar.
 
-Efeonce tiene tres plataformas de software propietario, en distinta madurez:
+Efeonce tiene cuatro plataformas de software propietario, en distinta madurez:
 
 | Plataforma | Territorio | ICP | GTM | Estado |
 |---|---|---|---|---|
 | **Greenhouse** | Experiencia de cliente + operaciones internas | Clientes activos de servicio Efeonce | B2B directo (parte del servicio) | Operativo (~77% madurez ASaaS) |
 | **Kortex** | CRM Intelligence Platform (sobre HubSpot) | Fase 1: clientes Efeonce Digital. Fase 2: agencias HubSpot (B2B2B) | B2B2B → HubSpot Marketplace | Operativo (validado en producción) |
 | **Verk** | Content + Distribution Operating System | Fase 1: interno. Fase 2: empresas con 20+ piezas/mes (B2B standalone) | B2B standalone | P0 en construcción |
+| **Efeonce Creative Studio** *(nombre de trabajo)* | Producción creativa agentic: imagen, video, audio, assets, review y créditos | Fase 1: equipo Efeonce. Fase 2: equipos creativos/marketing de clientes | Capability Efeonce; futuro acceso/credits B2B gobernado | Dirección aprobada; bootstrap pendiente (EPIC-028) |
 
-**Por qué tres plataformas independientes y no un monolito:** ICP distinto por plataforma; narrativa ASaaS más potente (ecosistema de producto, no "agencia con portal"); independencia técnica (Verk no hereda el test coverage de Greenhouse; Kortex no depende del ciclo de releases de Verk); patrón ya probado (Kortex corre como plataforma independiente con integración bidireccional con Greenhouse).
+**Por qué cuatro plataformas independientes y no un monolito:** ICP y ritmo de producto distintos; narrativa ASaaS más potente (ecosistema de producto, no "agencia con portal"); independencia técnica (Creative Studio no hereda el runtime pesado de Greenhouse; Verk no hereda su test coverage; Kortex no depende del ciclo de releases de Verk); patrón ya probado (Kortex corre como plataforma independiente con integración bidireccional con Greenhouse).
 
 ---
 
@@ -46,9 +47,22 @@ Content + Distribution Operating System. Donde la estrategia de distribución se
 
 ---
 
+## Efeonce Creative Studio — producción creativa agentic (plataforma hermana)
+
+Capability para dirigir y operar generación de imagen, video, audio y extensiones futuras mediante templates, referencias, assets, review y crédito gobernado. Nace con una superficie UI y una superficie MCP/agente sobre el mismo contrato; no es una galería de prompts ni un módulo de Greenhouse.
+
+**Lo que el agente de Greenhouse necesita saber:**
+
+- Creative Studio es dueño de `studio_workspace_id`, assets, runs, provider attempts, revisión y ledger de créditos. Greenhouse puede enlazar una organización/espacio mediante binding explícito, nunca por tablas compartidas.
+- Un output `candidate_ready` no significa aprobable/publicable. Sólo se proyectan a Greenhouse o Verk entregables con la decisión y scope autorizados.
+- El primer acceso es interno. Cliente, upload externo, pagos y venta de créditos quedan sujetos a los gates del [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md).
+- Arquitectura/ADR: `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_*.md`.
+
+---
+
 ## Arquitectura de integración
 
-Tres plataformas independientes que comparten capa de datos y se comunican por **APIs REST**. El patrón que ya funciona entre Kortex y Greenhouse es el mismo para Verk.
+Cuatro plataformas independientes que se comunican por **APIs REST/eventos versionados** y comparten sólo la capa analítica autorizada cuando corresponde. El patrón que ya funciona entre Kortex y Greenhouse es el punto de partida para Verk y Creative Studio; no autoriza data stores compartidos.
 
 ### BigQuery como data lake compartido (proyecto GCP `efeonce-group`)
 
@@ -57,10 +71,12 @@ Tres plataformas independientes que comparten capa de datos y se comunican por *
 | **Greenhouse** | `notion_ops`, `greenhouse` | `hubspot_crm`, `notion_ops` | Diario (cron 03:00–03:30) |
 | **Kortex** | `kortex` | `hubspot_crm` | On-demand (per deployment) |
 | **Verk** | `verk` | `hubspot_crm`, `notion_ops`, `searchconsole`, `analytics_*` | Nightly ETL + API real-time |
+| **Creative Studio** | `TBD — export analítico autorizado` | Sólo datasets autorizados por contrato | No habilitado hasta bootstrap |
 
 ### Convergencia en Greenhouse
 - **Verk → Greenhouse:** Surround Map + resumen de calendar como embed card en el dashboard.
 - **Kortex → Greenhouse:** progreso de implementación + KPIs de adopción en Account 360.
+- **Creative Studio → Greenhouse:** sólo referencias a entregables aprobados, estados o uso acordado mediante contrato/evento versionado; nunca assets privados, créditos o provider logs por defecto.
 - **Greenhouse como hub:** un solo login. Las verticales alimentan el hub sin depender de él para operar.
 
 ### Tenant mapping
@@ -70,6 +86,7 @@ Tres plataformas independientes que comparten capa de datos y se comunican por *
 | Greenhouse | `space_id` | — | `company_id` (Account 360) |
 | Kortex | `portal_id` | `portal_id → space_id` | OAuth scoped por portal |
 | Verk | `brand_id` | `greenhouse_space_id` (nullable) | Vía tracking + attribution |
+| Creative Studio | `studio_workspace_id` | binding explícito a `space_id` (cuando aplique) | Vía organización/engagement autorizado, no implícito |
 
 > Patrón a respetar al construir integraciones en Greenhouse: **BigQuery como data lake compartido + API REST para consumo en tiempo real.** No acoples Greenhouse al runtime de otra plataforma; consume sus datos.
 
@@ -79,13 +96,13 @@ Tres plataformas independientes que comparten capa de datos y se comunican por *
 
 Cada plataforma productiza un tipo de servicio distinto:
 
-| Dimensión ASaaS | Greenhouse | Kortex | Verk |
+| Dimensión ASaaS | Greenhouse | Kortex | Verk | Creative Studio |
 |---|---|---|---|
-| Servicio que productiza | Operación de cuenta + transparencia + gobernanza | Implementación y gestión de CRM | Producción de contenido + distribución |
-| Valor acumulativo (= switching cost) | Historial ICO + inteligencia financiera + Person/Account 360 | Schema CRM + workflows + UI Extensions instaladas | Brand profiles + keyword universe + performance histórico |
-| Intelligence layer | AI Tools + recomendaciones proactivas (roadmap → Nexa) | Agente Claude (manifests YAML) | Verk Agent (roadmap) |
+| Servicio que productiza | Operación de cuenta + transparencia + gobernanza | Implementación y gestión de CRM | Producción de contenido + distribución | Dirección y producción de media agentic |
+| Valor acumulativo (= switching cost) | Historial ICO + inteligencia financiera + Person/Account 360 | Schema CRM + workflows + UI Extensions instaladas | Brand profiles + keyword universe + performance histórico | Reference packs + templates + lineage de assets + decisiones/revisión creativa |
+| Intelligence layer | AI Tools + recomendaciones proactivas (roadmap → Nexa) | Agente Claude (manifests YAML) | Verk Agent (roadmap) | Agentes/MCP con `propose→approve→execute` |
 
-> *Efeonce no es una agencia que tiene un portal. Es un ecosistema de producto con tres plataformas que además ofrece servicio. El servicio opera las plataformas. Las plataformas generan el switching cost. El switching cost protege el revenue. Ese es el flywheel ASaaS.*
+> *Efeonce no es una agencia que tiene un portal. Es un ecosistema de producto con cuatro plataformas que además ofrece servicio. El servicio opera las plataformas. Las plataformas generan el switching cost. El switching cost protege el revenue. Ese es el flywheel ASaaS.*
 
 ---
 
@@ -96,7 +113,7 @@ Cada plataforma productiza un tipo de servicio distinto:
 | **Loop Marketing** | Filosofía: crecimiento compuesto. | Thought leadership. |
 | **Nested Loops™** | Sistema estratégico Express→Tailor→Amplify→Evolve. | Propuestas. |
 | **ICO** | Sistema operativo transversal: gobernanza, métricas, quality gates. | Diferenciador en pitches. Onboarding. |
-| **Ecosistema de producto** | Greenhouse + Kortex + Verk. Modelo ASaaS. | Demo en pitch. Argumento de switching cost. |
+| **Ecosistema de producto** | Greenhouse + Kortex + Verk + Creative Studio (dirección aprobada; nombre público pendiente). Modelo ASaaS. | Demo en pitch. Argumento de switching cost. |
 | **Frameworks específicos** | Surround Discovery™ (S⁴: SENSE → SHAPE → SURFACE → SOLVE), AEO, CSC, Revenue Enabled. | Solo en profundidad técnica. Se traducen a beneficios. |
 
 **Cómo cobra vida la IP en Greenhouse:** Loop Marketing → ciclo completo visible en dashboards; ICO → métricas RpA/OTD%/FTR en el dashboard del cliente; Surround Discovery™ → embed card del Surround Map (vía Verk); Revenue Enabled → inteligencia financiera (revenue/costo/margen por cliente).
@@ -105,4 +122,4 @@ Cada plataforma productiza un tipo de servicio distinto:
 
 *Fuente: Efeonce Product Ecosystem v1.0 (documento ancla — prevalece sobre downstream en conflictos de arquitectura de producto).*
 
-*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*
+*Última verificación de drift contra runtime: 2026-07-11 — Creative Studio es dirección aprobada/EPIC-028, no runtime existente; targets/fechas comerciales son intencionales.*

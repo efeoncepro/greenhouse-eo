@@ -1,12 +1,14 @@
 # ADR — Content Factory Media Generation Foundry V1
 
 > **Tipo:** Architecture Decision Record (dedicado, cross-domain)
-> **Canonical spec:** `GREENHOUSE_CONTENT_FACTORY_MEDIA_GENERATION_ARCHITECTURE_V1.md`
+> **Historical spec:** `GREENHOUSE_CONTENT_FACTORY_MEDIA_GENERATION_ARCHITECTURE_V1.md`
 > **Regla ADR:** `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
+
+> **Superseded 2026-07-11:** la ubicación de runtime propuesta en Greenhouse fue reemplazada por [Efeonce Creative Studio](EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md), plataforma hermana agentic. Los principios de provider-neutrality, async y gasto gobernado permanecen como evidencia histórica, no como autorización para implementar `content.media` en este repositorio.
 
 ## Architecture Decision 2026-07-04 — Media Generation Foundry provider-neutral
 
-- **Status:** `Proposed` — visión aprobada como dirección; implementación deferida ("eventualmente"). No materializar contratos irreversibles sobre este ADR hasta pasar a `Accepted` con checkpoint humano.
+- **Status:** `Superseded` — la dirección de capacidad permanece válida, pero su implementación ya no corresponde a Greenhouse. Ver ADR Efeonce Creative Studio.
 - **Date:** 2026-07-04
 - **Owner:** Content / AI Platform (ai-tooling)
 - **Scope:** dominio nuevo `content.media` (generación imagen/video/audio/3D); `src/lib/media/**`, `src/app/api/ai-tools/media/**`, schema `greenhouse_media` (o extensión `greenhouse_ai`), reliability subsystem `AI & Media`. Toca costo (gasto real), Nexa (governed action), providers cloud (Vertex/OpenAI/Magnific/Higgsfield).

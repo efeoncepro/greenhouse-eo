@@ -557,6 +557,7 @@ Antes de abrir una integracion nueva, confirmar:
 
 - `Verk` queda explicitamente contemplada como future sister platform consumer de este contrato
 - no debe recibir anexo propio hasta tener baseline real de repo o arquitectura equivalente
+- `Efeonce Creative Studio` queda contemplada como plataforma hermana agentic de producción creativa (EPIC-028). Antes de existir su repositorio y baseline, Greenhouse sólo puede tratarla como dirección arquitectónica: al bootstrap debe recibir binding explícito, credentials por service account, scope de workspace y contratos versionados para proyecciones/deliverables. Sus assets, créditos y provider secrets son de su propiedad y no se comparten por DB, sesión ni acceso administrativo implícito.
 
 ### 13.3 Contratos ya conectados a este marco
 

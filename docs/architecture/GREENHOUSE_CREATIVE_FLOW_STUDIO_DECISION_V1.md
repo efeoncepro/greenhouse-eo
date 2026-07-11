@@ -1,12 +1,14 @@
 # ADR — Creative Flow Studio (orquestación de media node-based) V1
 
 > **Tipo:** Architecture Decision Record (dedicado, cross-domain)
-> **Canonical engine spec:** `GREENHOUSE_CONTENT_FACTORY_MEDIA_GENERATION_ARCHITECTURE_V1.md` (el motor de generación single-shot)
+> **Historical engine spec:** `GREENHOUSE_CONTENT_FACTORY_MEDIA_GENERATION_ARCHITECTURE_V1.md` (el motor de generación single-shot propuesto)
 > **Regla ADR:** `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
+
+> **Superseded 2026-07-11:** el runner, las plantillas y cualquier canvas creativo deben nacer en [Efeonce Creative Studio](EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md), no como `content.media.flow` dentro de Greenhouse. Se preservan este análisis DAG y la evidencia del piloto como referencia histórica.
 
 ## Architecture Decision 2026-07-06 — Creative Flow Studio (capa de orquestación DAG sobre el Media Foundry)
 
-- **Status:** `Proposed` — dirección aprobada; implementación deferida. Depende de que el **Media Generation Foundry** (`GREENHOUSE_CONTENT_FACTORY_MEDIA_GENERATION_DECISION_V1.md`, hoy `Proposed`) pase a `Accepted` y tenga al menos su motor de generación single-shot vivo. No materializar contratos irreversibles sobre este ADR hasta pasar a `Accepted` con checkpoint humano.
+- **Status:** `Superseded` — la propuesta Greenhouse-local queda reemplazada por la plataforma hermana Efeonce Creative Studio; no materializar este dominio en `greenhouse-eo`.
 - **Date:** 2026-07-06
 - **Owner:** Content / AI Platform (ai-tooling)
 - **Scope:** capa nueva `content.media.flow` — orquestación visual de pipelines de generación. `src/lib/media/flow/**`, `src/app/api/ai-tools/media/flows/**`, tablas `greenhouse_media.flow_definitions` / `flow_runs` / `flow_run_nodes`, canvas React Flow bajo `ai-tooling`, reliability subsystem `AI & Media`. **Es una capa ENCIMA del Media Foundry**, no un dominio paralelo.
