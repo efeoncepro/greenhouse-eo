@@ -64,12 +64,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-118`
+`ISSUE-121`
 
 ## Open
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-120` | [AI Visibility Grader: `citation_quality` estructuralmente 0 (citas sin `sourceType`) + degradación silenciosa de la extracción de prosa](open/ISSUE-120-ai-visibility-grader-citation-quality-structural-zero-and-silent-prose-degradation.md) | pipeline normalización/scoring (todos los ambientes) | 2026-07-11 | open |
 | `ISSUE-118` | [Los readers del watchdog usan un resolver PAT-only e ignoran el GitHub App ya provisionado](open/ISSUE-118-watchdog-readers-sync-resolver-ignore-github-app.md) | local + Vercel (no afecta GH Actions) | 2026-07-10 | open |
 | `ISSUE-117` | [Offboarding ejecutado nunca desactiva `greenhouse_core.members` (active/status) → desvinculados filtran a rosters/nómina/360](open/ISSUE-117-offboarding-executed-never-deactivates-member-canonical.md) | production + staging (identity canónico) | 2026-07-06 | open |
 | `ISSUE-114` | [Preflight batch-policy: falso positivo `requires_break_glass` por divergencia de squash-merge](open/ISSUE-114-release-batch-policy-classifier-squash-divergence-false-positive.md) | CI/local (release preflight) | 2026-07-03 | open (mitigado con bypass + sync merge-base; fix de raíz pendiente) |
