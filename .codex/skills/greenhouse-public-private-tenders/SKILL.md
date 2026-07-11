@@ -1,6 +1,9 @@
 ---
 name: greenhouse-public-private-tenders
 description: Operador experto de licitaciones públicas y privadas (Chile a fondo + LATAM como matriz). Úsala para descubrir, calificar (bid/no-bid), preparar, cotizar, garantizar, presentar y hacer seguimiento de licitaciones y RFP/RFQ/RFI. Cubre Ley 19.886 + reforma 21.634, ChileCompra/Mercado Público, modalidades (Licitación Pública/Privada, Trato Directo, Convenio Marco, Compra Ágil), códigos de procedimiento (L1/LE/LP/LS/COT), bases administrativas y técnicas, criterios de evaluación, garantías (seriedad/fiel cumplimiento), inhabilidades e integridad, matriz de portales LATAM (SECOP, SEACE, PNCP, CompraNet, COMPR.AR…), y tenders privados/corporativos (Ariba, Coupa, Fieldglass, Achilles/SICEP). Alimenta el módulo runtime RESEARCH-007 y se apoya en commercial-expert, copywriting, finance-accounting-operator, talent-people-operator y task-planner. Triggers: "licitación", "licitaciones", "mercado público", "chilecompra", "convenio marco", "compra ágil", "trato directo", "bases administrativas/técnicas", "garantía de seriedad", "fiel cumplimiento", "bid/no-bid", "RFP", "RFQ", "RFI", "propuesta técnica", "oferta económica", "SECOP", "SEACE", "PNCP", "CompraNet", "adjudicación", "oferente".
+type: skill
+user-invocable: true
+argument-hint: "[país/etapa del bid o pregunta concreta]"
 ---
 
 # greenhouse-public-private-tenders — Operador de Licitaciones
@@ -23,6 +26,7 @@ description: Operador experto de licitaciones públicas y privadas (Chile a fond
 
 ```
 ¿En qué estás?
+├─ Construir la propuesta COMPLETA end-to-end (director de orquesta) . bid-construction-playbook.md
 ├─ Marco legal / norma / inhabilidades / recursos (Chile) ...... chile-publico-marco-legal.md
 ├─ Cómo opera ChileCompra: modalidades, códigos, bases,
 │  criterios, garantías, plazos, apertura, adjudicación ......... chile-publico-operativo.md
@@ -78,6 +82,7 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 
 | Archivo | Contenido |
 |---|---|
+| `bid-construction-playbook.md` | **Método end-to-end (director de orquesta):** las 10 fases para construir una propuesta completa (intake→admisibilidad→bid/no-bid→contexto→alcance→squad→pricing→redacción→económica→export→presentación) + qué skill entra en cada fase + regla de documentación viva |
 | `chile-publico-marco-legal.md` | Ley 19.886 + reforma 21.634, Reglamento DS 250, DCCP/ChileCompra, inhabilidades art. 4, ChileProveedores, Contraloría/toma de razón, Tribunal de Contratación Pública, recursos |
 | `chile-publico-operativo.md` | Modalidades y códigos (L1/LE/LP/LS, privadas, trato directo, Convenio Marco, Compra Ágil COT), bases admin+técnicas, criterios ponderados, foro, apertura, evaluación, adjudicación, garantías |
 | `bid-lifecycle-go-no-go.md` | Pipeline canónico discovered→screened→triage→evaluate→plan-bid→submit→reconcile; scoring explicable (10 componentes) + decision bands; matcher hygiene (falsos positivos) |

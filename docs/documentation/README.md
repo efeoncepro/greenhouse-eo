@@ -93,6 +93,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Quote-to-Cash Comercial end-to-end](comercial/quote-to-cash-comercial-end-to-end.md) — mapa funcional completo del dominio Comercial: organizations/parties, deals, catalogo, pricing engine, cotizaciones, aprobaciones, contratos, HubSpot sync y frontera con Finance.
 - [Pipeline comercial](finance/pipeline-comercial.md) — forecast comercial de deals, contratos standalone y pre-sales; lane dedicada en `/finance/intelligence/pipeline` con compat temporal desde Finanzas > Economía.
 - [Sample Sprints comerciales](comercial/sample-sprints.md) — pilotos, trials, POCs y discovery sobre `services.engagement_kind`, con approval, progreso, outcome, reportes y audit/outbox.
+- [Construcción de Licitaciones — Método Efeonce](comercial/construccion-de-licitaciones.md) — cómo Efeonce arma una propuesta de licitación (pública/privada, RFP/RFQ) de punta a punta: las 10 fases, principios y los tres planos de documentación viva. Método canónico en la skill `greenhouse-public-private-tenders`.
 - [Servicios engagement](comercial/servicios-engagement.md) — sincronizacion HubSpot p_services, materializacion de servicios y degradacion honesta
 - [Surfaces comerciales sobre rutas legacy Finance](comercial/surfaces-comerciales-sobre-rutas-finance.md) — cotizaciones, contratos/SOW, acuerdos marco y productos como owner-domain Comercial mientras conservan URLs `/finance/...`
 

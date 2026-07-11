@@ -26,6 +26,7 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 
 ```
 ¿En qué estás?
+├─ Construir la propuesta COMPLETA end-to-end (director de orquesta) . bid-construction-playbook.md
 ├─ Marco legal / norma / inhabilidades / recursos (Chile) ...... chile-publico-marco-legal.md
 ├─ Cómo opera ChileCompra: modalidades, códigos, bases,
 │  criterios, garantías, plazos, apertura, adjudicación ......... chile-publico-operativo.md
@@ -81,6 +82,7 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 
 | Archivo | Contenido |
 |---|---|
+| `bid-construction-playbook.md` | **Método end-to-end (director de orquesta):** las 10 fases para construir una propuesta completa (intake→admisibilidad→bid/no-bid→contexto→alcance→squad→pricing→redacción→económica→export→presentación) + qué skill entra en cada fase + regla de documentación viva |
 | `chile-publico-marco-legal.md` | Ley 19.886 + reforma 21.634, Reglamento DS 250, DCCP/ChileCompra, inhabilidades art. 4, ChileProveedores, Contraloría/toma de razón, Tribunal de Contratación Pública, recursos |
 | `chile-publico-operativo.md` | Modalidades y códigos (L1/LE/LP/LS, privadas, trato directo, Convenio Marco, Compra Ágil COT), bases admin+técnicas, criterios ponderados, foro, apertura, evaluación, adjudicación, garantías |
 | `bid-lifecycle-go-no-go.md` | Pipeline canónico discovered→screened→triage→evaluate→plan-bid→submit→reconcile; scoring explicable (10 componentes) + decision bands; matcher hygiene (falsos positivos) |

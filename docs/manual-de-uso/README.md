@@ -28,6 +28,7 @@ La diferencia con otras capas de documentacion:
 - [Operar Quote-to-Cash Comercial](comercial/operar-quote-to-cash-comercial.md) — como revisar una oportunidad, elegir party/deal/productos, construir una cotizacion, manejar aprobaciones, emitir, sincronizar HubSpot y entender cuando pasa a contrato/Finance.
 - [Pipeline comercial](comercial/pipeline-comercial.md) — como usar la lane dedicada de forecast comercial sin confundirla con revenue reconocido ni cierre financiero.
 - [Sample Sprints](comercial/sample-sprints.md) — como declarar, aprobar, registrar progreso y cerrar outcomes de pilotos/trials/POCs/discovery.
+- [Construir una licitación paso a paso](comercial/construir-una-licitacion.md) — runbook para armar una propuesta de licitación (pública/privada, RFP/RFQ) end-to-end: leer bases, admisibilidad, bid/no-bid, alcance, squad, precio, redacción, económica y presentación human-in-control.
 
 ### Growth
 

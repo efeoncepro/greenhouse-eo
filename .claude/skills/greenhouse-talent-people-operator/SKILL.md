@@ -28,6 +28,7 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | "engagement / burnout / wellbeing / retention / flight risk" | Engagement + wellbeing |
 | "cultura / operating code / performance review / valores en equipo" | Efeonce Operating Code + People development |
 | "headcount / capacity gap / build vs buy vs borrow / org design" | Workforce planning |
+| "design a squad / delivery pod for a client / RFP team section / staff augmentation / who staffs this engagement" | Client squad design (Talent-as-a-Service) |
 | any of the above **inside Greenhouse** (Hiring/ATS, assessment engine) | + load `references/greenhouse-runtime.md` |
 
 **Do NOT use for**: payroll amounts / tax / previsional (→ `greenhouse-payroll-auditor`), offer letters / employment contracts drafting (→ Workforce Contracting Studio + legal), cost/margin of a hire (→ `greenhouse-finance-accounting-operator`), the visual build of careers/assessment UI (→ product-design skills).
@@ -50,7 +51,7 @@ Recruiting fashion changes; **selection validity** is measured. Teach the 2026-c
 - **The 2022 correction matters**: Sackett, Zhang, Berry & Lievens re-analyzed with proper range-restriction corrections and **revised GMA down to r≈.31 — with structured interviews emerging as the single strongest predictor.** Ranking stays: **structured interviews, GMA, work samples, integrity** at the top. ([SIOP](https://www.siop.org/tip-article/is-cognitive-ability-the-best-predictor-of-job-performance-new-research-says-its-time-to-think-again/), [Schmidt & Oh 2016 PDF](https://home.ubalt.edu/tmitch/645/session%204/Schmidt%20&%20Oh%20validity%20and%20util%20100%20yrs%20of%20research%20Wk%20PPR%202016.pdf))
 - **Operational rule**: structure beats charisma. A structured interview + a work sample tied to real competencies predicts far better than unstructured "gut" interviews or credential screening — and is more **fair and defensible**. This is why the Greenhouse assessment engine is competency-based and structured, not a personality quiz.
 
-## The 8 pillars (each has a load-on-demand reference)
+## The 9 pillars (each has a load-on-demand reference)
 
 1. **Talent acquisition — full-cycle** → `references/talent-acquisition.md`. Intake, requisition→offer, employer brand, pipeline math, offer/close, candidate experience as differentiator.
 2. **Inbound recruiting + head hunting / executive search** → same file §Inbound + §Head hunting. Careers-as-funnel (attract→convert→nurture→hire), talent pools, boolean/x-ray sourcing, market mapping, approaching passive/senior talent.
@@ -60,8 +61,9 @@ Recruiting fashion changes; **selection validity** is measured. Teach the 2026-c
 6. **Engagement, wellbeing & retention** → `references/engagement-wellbeing.md`. eNPS, psychological safety, burnout signals, flight risk, real wellness.
 7. **Workforce planning & org design** → `references/workforce-planning.md`. Headcount, build/buy/borrow, capacity gap → TalentDemand, agency org shapes, ICO synergy.
 8. **Generations & 2026 trends** → `references/generations-trends-2026.md`. Boomer→Gen Alpha profiles, how attraction/assessment/retention change per generation, and the transversal 2026 trends.
+9. **Client squad design & staff augmentation (Talent-as-a-Service)** → `references/client-squad-design.md`. Assemble the delivery pod you assign to a client: the two modes (Managed Squad vs Staff Aug), role taxonomy × seniority, % dedication/FTE math, hierarchy, RACI, synergy map, pod archetypes, and the hand-offs to finance (loaded cost) + commercial (price) + the bid. The *delivery-facing* counterpart of workforce planning; produces the "team & governance" section of a proposal/RFP. Artifact: `templates/squad-blueprint.md`.
 
-Greenhouse runtime binding (domain, code paths, invariants) → `references/greenhouse-runtime.md`. Templates (scorecard, job brief, job offer recipe with inbound recruiting, sourcing map, interview guide) → `templates/`.
+Greenhouse runtime binding (domain, code paths, invariants) → `references/greenhouse-runtime.md`. Templates (scorecard, job brief, job offer recipe with inbound recruiting, sourcing map, interview guide, **squad blueprint**) → `templates/`.
 
 ## Synergies (compose, don't duplicate)
 
@@ -69,7 +71,8 @@ Greenhouse runtime binding (domain, code paths, invariants) → `references/gree
 |---|---|
 | `greenhouse-payroll-auditor` | Hard boundary: this skill hands over the selected hire + recommended engagement model; payroll owns amounts, tax, previsional. Never compute pay here. |
 | Workforce Contracting Studio / legal | This skill decides *who* and *how to assess*; contracting drafts the offer/contract. |
-| `greenhouse-finance-accounting-operator` | Cost/margin of a hire, loaded cost, budget band. This skill consumes bands, never recomputes economics. |
+| `greenhouse-finance-accounting-operator` | Cost/margin of a hire, loaded cost, budget band. This skill consumes bands, never recomputes economics. For a **client squad**, hand the % dedication × role so finance attaches loaded cost from `greenhouse_payroll`. |
+| `greenhouse-public-private-tenders` + `commercial-expert` | When designing a **client squad for a bid/retainer** (`references/client-squad-design.md`): this skill owns the squad *shape* (roles, seniority, % dedication, hierarchy, RACI, synergies); the tender skill wires the proposal's team section; commercial sets margin/packaging. Never price here. |
 | `greenhouse-ico` | Capacity gap + delivery load → open demand; overload as a burnout/flight-risk signal. |
 | `arch-architect` | Model new talent domains (assessment, wellbeing) with the 4 pillars + canonical primitives. |
 | product-design (`info-architecture`, `forms-ux`, `state-design`, `a11y-architect`, `dataviz-design`, `greenhouse-ux-writing`) | Careers public funnel + assessment taking/review surfaces. |
@@ -109,6 +112,7 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 - **NEVER** escalate normal vacancy publication to a production release when careers runtime is already live and flags are configured. Release only for code, schema, flags/env, infra, renderer or apply-contract changes.
 - **NEVER** leave a Talent Pool / Banco de Talento surface decorative if it captures leads. It must be backed by Growth Forms or a Hiring command, with consent, captcha/rate-limit and generic success state.
 - **NEVER** reason from a pre-2024 base for trends/law/validity — cite the 2026 landscape and the 2022 validity revision.
+- **NEVER** present a **client squad** without a single accountable **Account Lead**, a **Senior/Lead owner per lane**, and per-member **role + seniority + % dedication + reporting line**. A *service* bid (nobody naming embedded bodies) is a **Managed Squad**, not staff-aug. Never over-allocate a person across pods (ICO burnout/flight-risk signal) or name real individuals to a client without consent — default to **role + seniority** (`references/client-squad-design.md`).
 - **SIEMPRE** design for a **multigenerational** workforce (don't optimize a process only for one cohort).
 - **SIEMPRE** make selection **structured, documented, and contestable** (a candidate can be told why; a recruiter can override AI).
 - **SIEMPRE** keep the human recruiter–candidate relationship central; AI removes toil, not judgment.
