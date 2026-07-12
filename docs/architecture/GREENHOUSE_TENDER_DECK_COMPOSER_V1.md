@@ -816,7 +816,14 @@ Sumaremos imágenes al deck: **3D icons** y **personas**. Los assets de imagen s
 
 **Generación — sólo para el gap.** Lo que la librería no cubre (o cubre fuera de molde) se genera con el **generador canónico** (`pnpm ai:image`, GPT Image) anclado al subset: misma paleta azul/violeta/teal, **objeto único, sin personajes**, y **CERO texto/letras/números/logos en la imagen** (los modelos los deforman, y un asset con texto quemado no es reusable — la lección de `SEO.png`). Fondo plano → recorte con el matting del repo (`pnpm ai:image:rmbg`, AI matting), **NUNCA** color-key/`trim` (deja halo). Toda generación durable se registra en `ai-generations/2026-07-11_tender-deck-clay3d/` (prompts verbatim + auditoría).
 
-**⚠️ Pendiente bloqueante — fotos del squad.** Los slots `PersonaAsset` (3) exigen **fotos reales**. Las únicas del equipo que existen hoy (`5. Contenidos/01. Contenido Evergreen/Team Efeonce/EO_Team-*.png`) son **piezas de redes sociales** ("Te presentamos a…", con "Dato random: Potterhead" y texto quemado sobre selfies de webcam): registro informal e inservibles para un comité — **no se arreglan recortando**. Se requieren **retratos corporativos** (headshot, fondo neutro). Hasta que existan, los slots `PersonaAsset` quedan **sin llenar**; generarlos con IA está **prohibido** por el guardrail de honestidad.
+### Fotos del squad — `assets/squad/` (resuelto 2026-07-11)
+
+Los slots `PersonaAsset` exigen **fotos reales**. **Existen y viven en el repo**: `public/images/greenhouse/team/` — 7 **retratos corporativos** del equipo (posados, ropa formal, encuadre de headshot): Andrés · Daniela · Humberly · Julio · Luis · Melkin · Valentina.
+
+- **Vienen con un fondo degradado magenta/azul quemado** que choca con la paleta del deck → se recortan con el matting del repo (`pnpm ai:image:rmbg`) y quedan con alpha, listas para componer sobre el navy. Set recortado: **`assets/squad/squad-<nombre>.png`**.
+- **Ojo con el pie del busto:** las fotos vienen cortadas rectas abajo; sobre el navy el corte se lee como "guillotina". **Lo resuelve la plantilla** (contenedor o fade inferior), no el asset — no intentar arreglarlo re-recortando.
+- **NO confundir** con `Alineación/5. Contenidos/01. Contenido Evergreen/Team Efeonce/EO_Team-*.png` en OneDrive: ésas son **piezas de redes sociales** ("Te presentamos a…", "Dato random: Potterhead", texto quemado sobre selfies de webcam) — **inservibles para un comité y no se arreglan recortando**.
+- **Sigue vigente el guardrail:** una cara del squad **JAMÁS** se genera con IA (el evaluador cruza CV vs persona → tergiversación). Si falta la foto de alguien, se pide la foto; no se fabrica.
 
 ## Pendiente
 

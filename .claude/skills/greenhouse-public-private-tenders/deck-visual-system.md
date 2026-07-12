@@ -159,11 +159,18 @@ problema de integridad (ver `compliance-riesgo-integridad.md`).
 
 Una persona **decorativa/ilustrativa** puede ser IA, pero **jamás presentada como "su equipo"**.
 
-**Estado 2026-07-11:** no existen retratos corporativos del squad. Las únicas fotos del equipo
-(`5. Contenidos/01. Contenido Evergreen/Team Efeonce/`) son **piezas de redes sociales** ("Te
-presentamos a…", con datos tipo "Fan de Avicii" y texto quemado sobre selfies de webcam):
-**inservibles para un comité y no se arreglan recortando**. Hasta que existan headshots con fondo
-neutro, los slots de persona quedan **sin llenar**.
+**Dónde están las fotos — en el REPO, no en OneDrive:** `public/images/greenhouse/team/` — 7
+**retratos corporativos** (Andrés · Daniela · Humberly · Julio · Luis · Melkin · Valentina).
+
+- Vienen con un **fondo degradado magenta/azul quemado** que choca con la paleta del deck →
+  recortar con `pnpm ai:image:rmbg` y componer sobre el navy. Set ya recortado (alpha):
+  `tender-deck-composer-prototypes/assets/squad/squad-<nombre>.png`.
+- **Ojo:** están cortadas rectas al pie del busto; sobre el navy el corte lee a "guillotina".
+  **Lo resuelve la plantilla** (contenedor / fade inferior), no el asset.
+- **NO confundir** con `Alineación/5. Contenidos/01. Contenido Evergreen/Team Efeonce/` en OneDrive:
+  ésas son **piezas de redes sociales** ("Te presentamos a…", "Dato random: Potterhead", texto
+  quemado sobre selfies de webcam) — **inservibles para un comité, no se arreglan recortando**.
+- Si falta la foto de alguien, **se pide la foto**. No se fabrica.
 
 ---
 
