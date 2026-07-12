@@ -6,8 +6,9 @@ import { describe, expect, it } from 'vitest'
 import { compileBrandPack, contrastRatio, BrandPackContrastError } from '../brand-pack'
 import { buildAxisBrandPack } from '../brand-packs/axis'
 import { deckAxisCatalogDir } from '../catalogs/deck-axis'
+import { buildDeckAxisTokensCss, DECK_TOKENS_PATH } from '../catalogs/deck-axis/compile-tokens'
 
-const TOKENS_PATH = path.join(deckAxisCatalogDir, 'deck-tokens.css')
+const TOKENS_PATH = DECK_TOKENS_PATH
 const LEDGER_PATH = path.join(deckAxisCatalogDir, 'brand', 'color-ledger.json')
 
 /**
@@ -23,11 +24,23 @@ const LEDGER_PATH = path.join(deckAxisCatalogDir, 'brand', 'color-ledger.json')
  */
 describe('brand pack axis — sincronía + igualdad token↔literal (0e)', () => {
   const pack = buildAxisBrandPack()
-  const compiled = compileBrandPack(pack, { rolePrefix: 'axis-deck' })
+  const compiled = buildDeckAxisTokensCss()
   const committed = fs.readFileSync(TOKENS_PATH, 'utf8')
 
-  it('deck-tokens.css committeado === compilación del pack (byte a byte)', () => {
+  it('deck-tokens.css committeado === compilación del pack + recipes (byte a byte)', () => {
     expect(committed).toBe(compiled.css)
+  })
+
+  it('las 4 recipes canónicas existen y sus stops sólo referencian roles/tokens (nunca HEX)', () => {
+    for (const recipe of ['rich-content', 'cover-hero', 'back-cover', 'light-surface']) {
+      expect(committed).toContain(`--axis-deck-recipe-${recipe}:`)
+    }
+
+    const recipesRaw = fs.readFileSync(path.join(deckAxisCatalogDir, 'brand', 'gradient-recipes.json'), 'utf8')
+
+    expect(recipesRaw, 'una recipe declaró un HEX — los stops referencian roles/tokens').not.toMatch(
+      /"ref":\s*"#/
+    )
   })
 
   it('0e: cada base del ledger resuelve a su literal exacto (hex y triple RGB)', () => {

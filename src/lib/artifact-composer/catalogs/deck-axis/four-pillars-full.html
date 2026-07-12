@@ -9,12 +9,8 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
-    :root { --navy:var(--axis-deck-navy-860); --navy-2:var(--axis-ppt-blue-800); --navy-deep:var(--axis-deck-navy-920); --teal:var(--axis-deck-teal-500); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --surface:var(--axis-deck-surface-60); }
-    .slide { position:relative; width:1920px; height:1080px; overflow:hidden; background:
-      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
-      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%); }
+    :root { --navy:var(--axis-deck-navy-860); --navy-2:var(--axis-ppt-blue-800); --navy-deep:var(--axis-deck-navy-920); --teal:var(--axis-deck-teal-500); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --surface:var(--axis-deck-recipe-light-surface); }
+    .slide { position:relative; width:1920px; height:1080px; overflow:hidden; background: var(--axis-deck-recipe-rich-content); }
     /* `fr`, NO `%`: los porcentajes de grid NO descuentan el gap (30%+35%+35% ya es el 100% del
        content-box, y los 2×46px de gap se SUMAN encima), así que la última columna terminaba 20px
        fuera del lienzo y `.slide{overflow:hidden}` amputaba el copy en silencio. `fr` reparte lo

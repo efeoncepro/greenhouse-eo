@@ -1,0 +1,148 @@
+{
+  "$comment": "Inventario RATCHET de gradientes locales del catálogo deck-axis (TASK-1393 Slice 3c). Las 4 recipes canónicas viven como tokens (gradient-recipes.json → deck-tokens.css); estos son los gradientes de CONTENIDO/variante que quedan declarados localmente (fills de barras derivadas, variantes de grano deliberadas, glass). Sus COLORES ya salen del pack. Contrato de dos vías: un gradiente nuevo o cambiado sin actualizar este inventario ROMPE el build — crecer el molde exige declararlo (recipe o inventario con rationale), nunca colarse.",
+  "total": 96,
+  "files": {
+    "agenda-full.html": [
+      "4558229106b6ab20 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .07) .55px, transparent .8p",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
+    ],
+    "back-cover-full.html": [
+      "3785a889c86434f5 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .72) .65px, transparent .85"
+    ],
+    "bullet-list-split.html": [
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
+    ],
+    "card-grid-full.html": [
+      "3a6176bf47a4f13e linear-gradient(180deg, var(--teal), color-mix(in srgb, var(--violet) 60%, trans",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "9811fe487269f27d linear-gradient(150deg, var(--axis-deck-teal-660) 0%, var(--axis-deck-teal-750) ",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4",
+      "c736b81a20017309 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .08) .55px, transparent .8p",
+      "ddd8d0d2a5c79716 linear-gradient(158deg, rgba(var(--axis-ppt-neutral-50-rgb), .72) 0%, rgba(var(-"
+    ],
+    "case-study-split.html": [
+      "1f48d467face0e26 linear-gradient(180deg, var(--teal) 0%, color-mix(in srgb, var(--violet) 60%, tr",
+      "24412a4ea41692bd linear-gradient(180deg, var(--axis-deck-teal-350) 0%, var(--teal-deep) 100%)",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
+    ],
+    "chart-split.html": [
+      "051a74da8493c4bb linear-gradient(180deg, rgba(var(--axis-deck-blue-300-rgb), .62) 0%, rgba(var(--",
+      "1f48d467face0e26 linear-gradient(180deg, var(--teal) 0%, color-mix(in srgb, var(--violet) 60%, tr",
+      "24412a4ea41692bd linear-gradient(180deg, var(--axis-deck-teal-350) 0%, var(--teal-deep) 100%)",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
+    ],
+    "comparison-split.html": [
+      "32189c5482a34803 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .75) .6px, transparent .7px",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
+    ],
+    "cover-full.html": [
+      "4ca9285ef04d0143 linear-gradient(90deg, transparent, rgba(var(--axis-deck-recipe-cover-halo-teal-"
+    ],
+    "credentials-full.html": [
+      "24e6ef1d9646db3a linear-gradient(145deg,rgba(var(--axis-ppt-neutral-50-rgb), .16),rgba(var(--axis",
+      "2e763f5a95a190b6 linear-gradient(90deg,var(--teal),rgba(var(--axis-deck-violet-550-rgb), .9))"
+    ],
+    "dual-list-split.html": [
+      "4f88c214fadb95fd radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .9) .55px, transparent .75p",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
+    ],
+    "dual-text-split.html": [
+      "4f88c214fadb95fd radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .9) .55px, transparent .75p",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4",
+      "cb6680918bbacb90 linear-gradient(180deg, var(--lime), var(--teal))"
+    ],
+    "evidence-story-grid.html": [
+      "72db9858f7b3d098 linear-gradient(145deg, var(--axis-deck-surface-50) 0%, var(--axis-deck-surface-",
+      "9cb70a381ebe6fd0 radial-gradient(72% 54% at 100% 100%, rgba(var(--axis-deck-teal-500-rgb), .18) 0"
+    ],
+    "four-pillars-full.html": [
+      "8cc5ae768a50b315 linear-gradient(145deg, rgba(var(--axis-ppt-neutral-50-rgb), .42), var(--tone-bg"
+    ],
+    "highlight-wave.html": [
+      "217da9fa1b166df4 radial-gradient(130% 100% at 70% -10%, var(--axis-ppt-blue-800) 0%, var(--axis-d",
+      "e64f593bbcf2b368 radial-gradient(64% 52% at 96% 100%, rgba(var(--axis-deck-teal-500-rgb), .22) 0%"
+    ],
+    "metrics-split.html": [
+      "1f03d54e347f73c6 linear-gradient(160deg, rgba(var(--axis-deck-teal-500-rgb), .22) 0%, rgba(var(--",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "9151282425b3f1f3 linear-gradient(180deg, var(--teal-bright) 0%, color-mix(in srgb, var(--axis-vio",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
+    ],
+    "narrative-split.html": [
+      "59f6583cd691bb21 linear-gradient(180deg, var(--teal) 0%, var(--navy) 100%)",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
+    ],
+    "pricing-full.html": [
+      "19471fb6372b247f linear-gradient(90deg, rgba(var(--axis-ppt-green-100-rgb), .18), rgba(var(--axis"
+    ],
+    "process-steps-full.html": [
+      "1bb397db9c05a354 linear-gradient(145deg,rgba(var(--axis-ppt-neutral-50-rgb), .15),rgba(var(--axis",
+      "413dadcdd0dc59a3 radial-gradient(circle at 34% 26%,rgba(var(--axis-ppt-neutral-50-rgb), .22),tran",
+      "6b13b814b5a1663e linear-gradient(90deg,rgba(var(--axis-deck-teal-500-rgb), .18),rgba(var(--axis-d"
+    ],
+    "quote-split.html": [
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "9151282425b3f1f3 linear-gradient(180deg, var(--teal-bright) 0%, color-mix(in srgb, var(--axis-vio",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4"
+    ],
+    "section-divider-split.html": [
+      "17ce2173a1011e6a radial-gradient(66% 60% at 4% 104%, rgba(var(--axis-deck-violet-550-rgb), .42) 0",
+      "625936e45f19a14f radial-gradient(60% 60% at 0% 8%, rgba(var(--axis-deck-teal-550-rgb), .46) 0%, r",
+      "74a107bb042f7c61 linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-860) ",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p"
+    ],
+    "stat-split.html": [
+      "17ce2173a1011e6a radial-gradient(66% 60% at 4% 104%, rgba(var(--axis-deck-violet-550-rgb), .42) 0",
+      "4f88c214fadb95fd radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .9) .55px, transparent .75p",
+      "625936e45f19a14f radial-gradient(60% 60% at 0% 8%, rgba(var(--axis-deck-teal-550-rgb), .46) 0%, r",
+      "74a107bb042f7c61 linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-860) ",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p"
+    ],
+    "team-split.html": [
+      "17ce2173a1011e6a radial-gradient(66% 60% at 4% 104%, rgba(var(--axis-deck-violet-550-rgb), .42) 0",
+      "625936e45f19a14f radial-gradient(60% 60% at 0% 8%, rgba(var(--axis-deck-teal-550-rgb), .46) 0%, r",
+      "692d8e66b18bf6dd linear-gradient(150deg, var(--axis-deck-teal-660) 0%, var(--teal-deep) 100%)",
+      "74a107bb042f7c61 linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-860) ",
+      "99eb0805926a0286 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8p"
+    ],
+    "timeline-full.html": [
+      "4558229106b6ab20 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .07) .55px, transparent .8p",
+      "5e21eac7fbab61cf radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, ",
+      "5f93863461da8f42 radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%",
+      "90592ee60f4efca4 linear-gradient(180deg, var(--axis-deck-teal-450) 0%, var(--teal-deep) 100%)",
+      "a57ab3d379711abf linear-gradient(180deg,var(--axis-deck-teal-450),var(--teal-deep))",
+      "bf49233afdb4f011 linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 4",
+      "f3806ca9299f94e0 linear-gradient(90deg, transparent 0, transparent calc(var(--m) - 1.5px), rgba(v"
+    ]
+  }
+}

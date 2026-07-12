@@ -10,11 +10,7 @@
     html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
     :root { --ink:var(--axis-ppt-indigo-950); --teal:var(--axis-ppt-teal-600); --lime:var(--axis-ppt-green-100); --lime-text:var(--axis-deck-green-750); --surface:rgba(var(--axis-deck-surface-50-rgb), .86); }
-    .slide { position:relative; isolation:isolate; width:1920px; height:1080px; overflow:hidden; color:var(--axis-ppt-neutral-50); background:
-      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
-      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%); }
+    .slide { position:relative; isolation:isolate; width:1920px; height:1080px; overflow:hidden; color:var(--axis-ppt-neutral-50); background: var(--axis-deck-recipe-rich-content); }
     /* `fr`, NO `%`: 48%+52% ya es el 100% del content-box y el gap de 44px se suma encima, así que
        la 2ª columna se salía del lienzo. Hoy no se nota porque el copy no llena el track — es un
        bug latente que amputaría cualquier texto más largo. Ver la misma nota en four-pillars-full. */

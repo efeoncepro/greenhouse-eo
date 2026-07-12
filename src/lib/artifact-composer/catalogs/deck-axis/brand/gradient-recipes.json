@@ -1,0 +1,139 @@
+{
+  "$comment": "Recipes de gradiente del catálogo deck-axis (TASK-1393 Slice 3c). DATO versionado: capas EN ORDEN, tipo, geometría, stops con alpha — los stops sólo referencian ROLES del brand pack (role:*) o recipe-tokens del ledger (token:--*), nunca un HEX. La tokenización NO altera el píxel: el gate visual a 0 px y la sincronía del CSS compilado lo prueban. Cambiar una recipe = nueva revisión declarada del catálogo (BASELINE_DELTAS), nunca un edit silencioso.",
+  "version": "1.0.0",
+  "recipes": {
+    "rich-content": {
+      "description": "El campo rico de las láminas full-bleed oscuras (7 plantillas): grano blanco de baja opacidad + glow teal arriba-derecha + glow violeta abajo-izquierda + barrido navy 120° (field → fieldMid → fieldDeep). Preserva navy profundo/medio/cercano, glow teal, glow violeta y grano blanco del baseline.",
+      "layers": [
+        {
+          "fn": "radial-gradient",
+          "stops": [
+            { "ref": "role:onDark", "alpha": 0.09, "at": ".55px" },
+            { "ref": "transparent", "at": ".8px" }
+          ],
+          "tile": "0 0 / 5px 5px"
+        },
+        {
+          "fn": "radial-gradient",
+          "geometry": "52% 60% at 100% 0%",
+          "stops": [
+            { "ref": "role:accentDeep", "alpha": 0.5, "at": "0%" },
+            { "ref": "role:accentDeep", "alpha": 0.16, "at": "38%" },
+            { "ref": "transparent", "at": "66%" }
+          ]
+        },
+        {
+          "fn": "radial-gradient",
+          "geometry": "50% 55% at 0% 104%",
+          "stops": [
+            { "ref": "role:accentAlt", "alpha": 0.5, "at": "0%" },
+            { "ref": "role:accentAlt", "alpha": 0.15, "at": "44%" },
+            { "ref": "transparent", "at": "74%" }
+          ]
+        },
+        {
+          "fn": "linear-gradient",
+          "geometry": "120deg",
+          "stops": [
+            { "ref": "role:field", "at": "0%" },
+            { "ref": "role:fieldMid", "at": "48%" },
+            { "ref": "role:fieldDeep", "at": "100%" }
+          ]
+        }
+      ]
+    },
+    "cover-hero": {
+      "description": "La portada: grano finísimo + luz central teal + HALO navy alto (cover-halo-navy) + brillo teal abajo-derecha + barrido base 135% (fieldMid → fieldEdge → field). El halo es la firma visual de la portada aprobada por el operador.",
+      "layers": [
+        {
+          "fn": "radial-gradient",
+          "stops": [
+            { "ref": "role:onDark", "alpha": 0.042, "at": ".55px" },
+            { "ref": "transparent", "at": ".8px" }
+          ],
+          "tile": "0 0 / 5px 5px"
+        },
+        {
+          "fn": "radial-gradient",
+          "geometry": "58% 46% at 50% 47%",
+          "stops": [
+            { "ref": "role:accent", "alpha": 0.115, "at": "0%" },
+            { "ref": "role:accent", "alpha": 0.035, "at": "37%" },
+            { "ref": "transparent", "at": "71%" }
+          ]
+        },
+        {
+          "fn": "radial-gradient",
+          "geometry": "92% 76% at 50% -8%",
+          "stops": [
+            { "ref": "token:--axis-deck-recipe-cover-halo-navy", "alpha": 0.92, "at": "0%" },
+            { "ref": "role:fieldEdge", "alpha": 0.16, "at": "53%" },
+            { "ref": "transparent", "at": "72%" }
+          ]
+        },
+        {
+          "fn": "radial-gradient",
+          "geometry": "58% 44% at 92% 94%",
+          "stops": [
+            { "ref": "role:accent", "alpha": 0.14, "at": "0%" },
+            { "ref": "transparent", "at": "52%" }
+          ]
+        },
+        {
+          "fn": "radial-gradient",
+          "geometry": "135% 100% at 70% -10%",
+          "stops": [
+            { "ref": "role:fieldMid", "at": "0%" },
+            { "ref": "role:fieldEdge", "at": "55%" },
+            { "ref": "role:field", "at": "100%" }
+          ]
+        }
+      ]
+    },
+    "back-cover": {
+      "description": "La contraportada: destello blanco arriba-derecha sobre celestes (recipe-tokens back-cover), glow azul inferior, acento lateral y barrido 126° de navies exclusivos. Toda la familia back-cover vive como recipe-tokens del ledger — no contamina la paleta general.",
+      "layers": [
+        {
+          "fn": "radial-gradient",
+          "geometry": "42% 56% at 86% 11%",
+          "stops": [
+            { "ref": "role:onDark", "alpha": 0.9, "at": "0%" },
+            { "ref": "token:--axis-deck-recipe-backcover-200", "alpha": 0.52, "at": "18%" },
+            { "ref": "token:--axis-deck-recipe-backcover-400", "alpha": 0.38, "at": "40%" },
+            { "ref": "transparent", "at": "70%" }
+          ]
+        },
+        {
+          "fn": "radial-gradient",
+          "geometry": "55% 65% at 48% 103%",
+          "stops": [
+            { "ref": "token:--axis-deck-recipe-backcover-600", "alpha": 0.76, "at": "0%" },
+            { "ref": "token:--axis-deck-recipe-backcover-600", "alpha": 0.18, "at": "42%" },
+            { "ref": "transparent", "at": "74%" }
+          ]
+        },
+        {
+          "fn": "radial-gradient",
+          "geometry": "46% 55% at 5% 73%",
+          "stops": [
+            { "ref": "token:--axis-deck-recipe-backcover-500", "alpha": 0.33, "at": "0%" },
+            { "ref": "transparent", "at": "70%" }
+          ]
+        },
+        {
+          "fn": "linear-gradient",
+          "geometry": "126deg",
+          "stops": [
+            { "ref": "token:--axis-deck-recipe-backcover-800", "at": "0%" },
+            { "ref": "token:--axis-deck-recipe-backcover-900", "at": "52%" },
+            { "ref": "token:--axis-deck-recipe-backcover-700", "at": "100%" }
+          ]
+        }
+      ]
+    },
+    "light-surface": {
+      "description": "La superficie clara de los splits y paneles claros: el rol surface, pleno. Es una recipe (y no un color suelto) para que el catálogo social pueda declarar SU superficie sin heredar la del deck.",
+      "solid": "role:surface"
+    }
+  }
+}
