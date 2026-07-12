@@ -44,23 +44,19 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Research + Benchmark (market/competitive/VoC · benchmark/AI SoV · CI · para Efeonce y clientes) | `research-benchmark-operator` (+ `deep-research` harness, `seo-aeo`, `commercial-expert`) | inline (2 carriles; método+rigor, ejecución→deep-research; evidencia con as-of, NO memoria) |
 | Go-to-Market (segmento/ICP · positioning/category · offer/pricing · motion PLG/sales/ecosystem · funnel/bow-tie · launch · GTM economics · para Efeonce y clientes) | `gtm-architect` (orquesta `commercial-expert`/demanda/`research-benchmark`/`gtm-ga4`) | inline (estrategia+orquestación; commercial-expert ejecuta la venta; doctrina ASaaS/bow-tie manda) |
 
-### Tender pointer — `TASK-1394 → TASK-1393 → TASK-1392 → TASK-1391`
+### Tender pointer — composer + Proposal Studio (TASK-1393/1392 complete)
 
-Al tocar licitaciones, cargar `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` y el §0 de la arquitectura de Tender.
-Para cualquier deck cargar además `deck-studio`; en `TimelineFull` el plan declara `timeUnit`, eje, fases,
-hitos y `barLabel` editable, mientras el compiler deriva la geometría y falla cerrado si ese copy se recorta.
-El composer sigue siendo sólo CLI. `TASK-1394` está completa (ChartSplit 25/25). **`TASK-1393` está APLICADA
-(code complete; falta validar en Figma las 71 altas de color propuestas):** el motor vive en
-`src/lib/artifact-composer/**` (primitive domain-free) y el deck es el catálogo `catalogs/deck-axis/` con
-brand/font pack `axis` (cero HEX/fuentes literales; render hermético). Un autor/agente nunca elige `template`
-(selector + `TemplateAuthorityError`) y junto al PDF/PNG se emite el `ResolvedCompositionManifest` inmutable
-(hashes de catálogo/contratos/brand pack/fuentes + validadores). Al tocar el dominio: `pnpm composer:visual-gate`
-a CERO píxeles contra el baseline committeado (rebaseline sólo declarado en `BASELINE_DELTAS.md`) + la suite
-del paquete. El runtime empieza con `TASK-1392`:
-`tender_asset.audience` y evidencia versionada/allowlisted → contexto permitido → propuesta tipada →
-confirmación humana → command canónico. El LLM no escribe ni cruza gates. `TASK-1391` sólo renderiza ese
-manifest y es después un candidato bloqueado de `EPIC-027` para `tender-worker`; no autoriza
-Vercel/`ops-worker`/Cloud Run directo ni la creación anticipada del deployable.
+Al tocar licitaciones, cargar `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` + §0 de la arquitectura Tender
+(+ `deck-studio` para cualquier deck). El motor vive en `src/lib/artifact-composer/**` (domain-free;
+el deck es el catálogo `catalogs/deck-axis/`, brand/font pack `axis`, cero HEX/fuentes literales,
+render hermético). Un autor/agente nunca elige `template` (selector + `TemplateAuthorityError`); sólo
+el `ResolvedCompositionManifest` llega a render. Gates al tocar el dominio: `pnpm composer:visual-gate`
+a CERO píxeles (rebaseline sólo declarado en `BASELINE_DELTAS.md`) + suite del paquete. El aggregate
+`Proposal` (`greenhouse_commercial.proposal*`) opera con gates humanos en DB, entitlement per-ORG
+`proposal_studio_v1` y el loop propose → confirmación humana → command canónico: el LLM no escribe ni
+cruza gates; escrituras sólo vía `src/lib/commercial/tenders/proposals/**`. `TASK-1391` sólo renderiza
+ese manifest y sigue bloqueada por la frontera de deployable de `EPIC-027` (no autoriza
+Vercel/`ops-worker`/Cloud Run directo).
 
 ### Business Context Pack
 
