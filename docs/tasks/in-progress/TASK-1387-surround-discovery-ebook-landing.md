@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,10 +17,10 @@
 - Motion: `docs/ui/motion/TASK-1387-surround-discovery-ebook-landing-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-019`
-- Status real: `Diseño listo — bloqueada por TASK-1386 published form + runtime evidence`
+- Status real: `Live en Think desde main; falta smoke humano de submit, descarga, correo y generate_lead para cierre operativo`
 - Rank: `TBD`
 - Domain: `content|ui`
-- Blocked by: `TASK-1386`
+- Blocked by: `none`
 - Branch: `task/TASK-1387-surround-discovery-ebook-landing`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -73,7 +73,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-1386: `form_key`, surface, asset delivery and browser-surface evidence.
+- TASK-1386: `form_key`, surface y asset delivery publicados; permanece pendiente la evidencia browser-surface desde la landing Think.
 - `/Users/jreye/Documents/efeonce-think/src/layouts/BaseLayout.astro`
 - `/Users/jreye/Documents/efeonce-think/src/pages/brand-visibility/index.astro`
 - `/Users/jreye/Documents/efeonce-think/src/pages/web-agentica/index.astro`
@@ -86,7 +86,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `/Users/jreye/Documents/efeonce-think/src/pages/surround-discovery/index.astro` (ruta propuesta; confirmar el slug final antes de registrar canonical).
+- `/Users/jreye/Documents/efeonce-think/src/pages/seo-surround-discovery.astro` (ruta final confirmada: `/seo-surround-discovery`).
 - `/Users/jreye/Documents/efeonce-think/src/components/SurroundDiscoveryFormDock.astro` o extensión mínima de un patrón existente.
 - `/Users/jreye/Documents/efeonce-think/src/styles/**` sólo si el repositorio establece un home local equivalente.
 - `docs/ui/wireframes/TASK-1387-surround-discovery-ebook-landing.md`
@@ -129,7 +129,7 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: Think, ruta pública indexable `/surround-discovery` propuesta y su canonical equivalente.
+- Surface: Think, ruta pública indexable `/seo-surround-discovery` y canonical equivalente (decisión del operador, 2026-07-12).
 - Composition Shell: `no aplica` — landing editorial Astro; no es una nueva superficie de portal Greenhouse.
 - Primitive decision: `reuse` — `BaseLayout`, `<greenhouse-form>` y patrón de form dock; secciones editoriales route-locales, no primitive de portal.
 - Adaptive density / The Seam: `no aplica` — no se introducen cards de portal ni regiones adaptativas; el grid editorial colapsa a una sola columna móvil.
@@ -162,18 +162,16 @@ Reglas obligatorias:
 
 ### Motion & microinteractions
 
-- Motion primitive: `CSS`
-- Enter / exit: reveal corto de secciones al entrar en viewport; form success es swap calmado, no celebración.
-- Layout morph: ninguno; grids responden por CSS sin animar width/height.
-- Stagger: sólo los cinco nodos de superficie y cuatro pasos S⁴, breve y sin ocultar contenido cuando JS no corre.
-- Timing / easing token: usar variables/tokens existentes de Think; `160–280ms ease-out` para feedback y no introducir valores crudos repetidos.
-- Reduced-motion fallback: render inmediato, sin orbitas, parallax, conteos, auto-scroll ni stagger.
-- Non-goal motion: no GSAP, Lottie, canvas, cursor fake, scroll-jacking, pulsos que simulen telemetría ni movimiento que sugiera resultados reales.
+- Motion primitive: `CSS + browser events`, con el contrato exacto en `docs/ui/motion/TASK-1387-surround-discovery-ebook-landing-motion.md`.
+- Source fidelity: conservar del HTML aprobado reveal rAF + safety reveal, parallax por centro de viewport, respuesta de la constelación al puntero, ondas/pulsos, cross-highlight nodo↔card, foco de ebook, CTA shine/ripple y FAQ nativo; `support.js` no se copia porque sólo hospeda el Design Component original.
+- Timing / easing: los tiempos de fuente son intencionales y documentados como excepción delimitada para esta landing editorial de Think; no se introduce GSAP, Lottie, canvas ni una dependencia de animación.
+- Reduced-motion fallback: render inmediato, sin ondas, parallax, float, halo, spotlight, ripple, stagger ni transiciones de CTA/FAQ; el contenido y las acciones se conservan completos.
+- Form success: swap calmado y foco al heading de estado; no celebración ni animación que sugiera entrega si no existe `download_url`.
 
 ### Implementation mapping
 
-- Route / surface: `src/pages/surround-discovery/index.astro` en Think; confirmar canonical, sitemap y `llms.txt` durante Discovery.
-- Primitive / variant / kind: `BaseLayout`; renderer `<greenhouse-form form-key="<TASK-1386>" surface="<TASK-1386>">`; `<details>` FAQ.
+- Route / surface: `src/pages/seo-surround-discovery.astro` en Think; canonical final `https://think.efeoncepro.com/seo-surround-discovery`.
+- Primitive / variant / kind: `BaseLayout`; renderer `<greenhouse-form form-key="e8d2bfcc-c4fe-4396-8f3b-08f5ac190409" surface="fhsf-surround-discovery-ebook">`; `<details>` FAQ.
 - Component candidates: `SurroundDiscoveryMap`, `SurroundDiscoveryCycle`, `SurroundDiscoveryFormDock` route-locales sólo si reducen complejidad de la page; no construir un design system paralelo.
 - Copy source: constants tipadas cercanas a la ruta; `EBOOK_FORMS` es dueño exclusivo de copy/fields del contrato form.
 - Data reader / command: none in Think; form contract/API de Greenhouse, browser-safe.
@@ -184,7 +182,7 @@ Reglas obligatorias:
 ### GVC scenario plan
 
 - Scenario file: añadir scenario declarativo Think o verifier Playwright con nombre `surround-discovery-ebook-landing` en su repositorio.
-- Route: `/surround-discovery` local y producción.
+- Route: `/seo-surround-discovery` local y producción.
 - Viewports: 1440 y 390; reduced-motion al menos en 1440 o 390 según el path más expresivo.
 - Required steps: hero → CTA scroll → cinco superficies → S⁴ → dock loading/ready → FAQ → success/error controlado y bridge al grader.
 - Required captures: hero desktop/mobile, mapa en estado estático, S⁴, dock ready, dock success, FAQ/final, reduced-motion.
@@ -199,7 +197,7 @@ Reglas obligatorias:
 - Alternatives considered: landing de ebook genérica; dashboard mock; cinco cards independientes sin sistema; mezclar la oferta comercial en el hero.
 - Why this pattern: hace visible la relación entre SEO, AEO, grader y las otras superficies sin confundir el ebook con una landing de servicio ni fabricar datos.
 - Reuse / extend / new primitive: reusar Think/Growth Forms; componentes editoriales locales solamente.
-- Open risks: slug/canonical aún propuesto; datos de performance o casos no deben entrar sin fuente verificable; email/HubSpot no se promete antes de TASK-1386 rollout evidence.
+- Open risks: `form_key`/surface publicados pero aún sin evidencia real desde Think; datos de performance o casos no deben entrar sin fuente verificable; email/HubSpot no se promete antes de rollout evidence.
 
 ### Visual verification
 
@@ -212,7 +210,27 @@ Reglas obligatorias:
 - Before/after evidence: referencia = PDF Surround Discovery y patrones Think existentes; no se persigue pixel parity del PDF.
 - Known visual debt: ninguna aceptada; si falta asset propietario, degradar a diagrama CSS/SVG semántico antes que usar stock art.
 
-<!-- ZONE 2 — PLAN MODE: no llenar al crear -->
+<!-- ZONE 2 — PLAN MODE -->
+
+## Plan
+
+1. Consumir el contrato publicado de TASK-1386 (`form_key` `e8d2bfcc-c4fe-4396-8f3b-08f5ac190409`, surface `fhsf-surround-discovery-ebook`) sin crear campos, consentimiento, captcha, submit ni acceso directo al asset.
+2. Implementar la landing Astro en la ruta final confirmada `/seo-surround-discovery`, traduciendo el diseño aprobado a tokens/patrones de Think y manteniendo el contenido funcional sin JavaScript, hover ni motion.
+3. Añadir un verifier Playwright propio de Think para 1440, 390 y reduced motion; comprobar H1, ancla al form, FAQ, metadatos, JSON-LD, renderer y ausencia de overflow.
+4. Validar build/typecheck y el contrato público; diferenciar explícitamente evidencia de código de la evidencia externa pendiente (submit Turnstile, accepted/download y `generate_lead` desde Think desplegado).
+
+## Audit
+
+- 2026-07-12 — Corrección post-review del operador aplicada en Think: commit `025a711` sobre `main`. Se eliminaron los glyphs dependientes del CDN en el mapa (SVG inline con paths Tabler), se restauraron los tokens/gradientes/CTA del HTML aprobado, se fijó el wrap visual del hero a 2+2 líneas y se reparó el arrow hover del CTA secundario. `pnpm type-check`, `pnpm build` y `pnpm verify:surround-discovery` pasaron; producción respondió HTTP 200 y verificó 1440/390/reduced-motion sin overflow. El submit humano Turnstile → accepted → PDF → correo → `generate_lead` sigue pendiente para cierre E2E.
+- 2026-07-12 — El operador confirmó el objetivo combinado TASK-1386 → TASK-1387 y fijó la URL final `/seo-surround-discovery`.
+- 2026-07-12 — TASK-1386 publicó de forma idempotente el form/surface/asset. GET browser-safe y preflight CORS para `https://think.efeoncepro.com` fueron verificados; la evidencia de submit desde la landing sigue pendiente de desplegar Think.
+- Reuse decision: se extiende el patrón local de `WebAgenticaFormDock.astro` en un componente editorial específico, con el mismo renderer gobernado. No se crea una primitive de formulario ni se altera el PDF, GTM o las landings hermanas.
+- 2026-07-12 — Implementación local en Think: `src/pages/seo-surround-discovery.astro`, `SurroundDiscoveryFormDock.astro`, asset aprobado `public/surround-discovery/ebook-cover.jpeg` y verifier Playwright. Tras revisión comparativa se ajustó la composición para reproducir el HTML aprobado (hero/constelación, antes-ahora, mapa radial, S⁴, relaciones, ebook spotlight, rail de formulario, FAQ y cierre), no una reinterpretación editorial.
+- 2026-07-12 — Evidencia local: `pnpm type-check`, `pnpm build` y `pnpm verify:surround-discovery -- http://127.0.0.1:4333/seo-surround-discovery faithful` pasaron. El verifier revisó 1440, 390 y reduced-motion: un H1, cinco superficies, cuatro etapas, FAQ por teclado, ancla al form, renderer con `form_key`/surface exactos, JSON-LD/canonical y `scrollWidth===clientWidth`.
+- 2026-07-12 — Corrección de fidelidad motion solicitada por el operador: se completó el mapeo 1:1 del HTML aprobado y sus scripts de interacción en Astro. El verifier `motion-fidelity-rich` comprobó constelación reactiva, ondas/halo/S⁴/spotlight, siete capas de parallax, cross-highlight, CTA shine/ripple, FAQ y desactivación completa con reduced-motion. `support.js` no se incluyó: es runtime del host DC, no una dependencia de la landing.
+- 2026-07-12 — Integración de entrega completada localmente: el dock ya no oculta la `success_card` del renderer. Tras `gh_form_submission_accepted(download_url)`, inicia la descarga gated, conserva la card gobernada, enfoca su estado y añade un reintento transitorio; el consumer de ops-worker envía en paralelo el mismo link gated por correo. `submission-flow` verificó este contrato sintético sin PII; falta el smoke humano desde Think desplegado para probar Turnstile, email y `generate_lead` reales.
+- 2026-07-12 — QA release audit: `code complete, rollout pendiente`. Type-check/build/verifier y contratos públicos pasan; la evidencia de renderer real en el origin autorizado, envío de correo y medición GA4 está deliberadamente bloqueada hasta deploy + submit humano.
+- 2026-07-12 — Landing desplegada desde Think `main`: commit `3a52256160a9aa808e45a1dc15e44fcfc2794356`, Vercel `dpl_Cw5AExrqsyFxViPtUFHUSGrVEqPd` `Ready`; el dominio `think.efeoncepro.com` resolvió a ese deployment. `production-main` verificó sin submit la ruta real en 1440, 390 y reduced-motion: HTTP 200, renderer presente, sin errores de consola ni overflow. Continúan pendientes Turnstile → accepted → PDF → correo → `generate_lead` con un correo humano autorizado.
 
 <!-- ZONE 3 — EXECUTION SPEC -->
 
@@ -291,19 +309,19 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Se declara `Execution profile: ui-ux`, `UI impact: flow`, wireframe, flow y motion existentes; `pnpm ui:wireframe-check`, `ui:flow-check`, `ui:motion-check` y `ui:readiness-check` pasan para TASK-1387.
-- [ ] La ruta explica las cinco superficies y S⁴ con terminología correcta; `SOLVE` nunca se presenta como metodología separada.
-- [ ] `BaseLayout`, tokens Think y `<greenhouse-form>` se reutilizan; no hay inputs/consent/captcha/submit locales ni URL pública del PDF.
-- [ ] Default, loading, empty, error, denied, success, degraded, teclado, mobile y reduced-motion tienen comportamiento explícito.
+- [x] Se declara `Execution profile: ui-ux`, `UI impact: flow`, wireframe, flow y motion existentes; `pnpm ui:wireframe-check`, `ui:flow-check`, `ui:motion-check` y `ui:readiness-check` pasan para TASK-1387.
+- [x] La ruta explica las cinco superficies y S⁴ con terminología correcta; `SOLVE` nunca se presenta como metodología separada.
+- [x] `BaseLayout`, tokens Think y `<greenhouse-form>` se reutilizan; no hay inputs/consent/captcha/submit locales ni URL pública del PDF.
+- [x] Default, loading, empty, error, denied, success, degraded, teclado, mobile y reduced-motion tienen comportamiento explícito.
 - [ ] El CTA principal descarga el ebook tras submit aceptado; el bridge post-éxito al grader no desplaza la entrega prometida.
-- [ ] SEO/AEO técnico es visible y honesto: H1/canonical/metadata/JSON-LD/FAQ sin datos inventados.
-- [ ] GVC desktop 1440, mobile 390 y reduced motion fueron revisados; scroll horizontal de página es cero y no hay errores de consola/app.
+- [x] SEO/AEO técnico es visible y honesto: H1/canonical/metadata/JSON-LD/FAQ sin datos inventados.
+- [x] Verifier Playwright de Think revisó desktop 1440, mobile 390 y reduced motion tanto local como en producción; scroll horizontal de página es cero y no hubo page errors. No se puede ejecutar GVC Greenhouse sobre este build unit separado; las capturas productivas quedan en `efeonce-think/.captures/production-main-*`.
 - [ ] Medición registra y verifica el lead; ningún evento contiene PII, token o URL privada.
 
 ## Handoff Notes
 
 - Requiere de TASK-1386: `form_key`, `surface`, title/body final del success contract y evidencia de descargable en producción.
-- Si falta la evidencia runtime, el estado correcto es `code complete, rollout pendiente`; no declarar la landing live por el mero hecho de que la composición se vea lista.
+- La landing está disponible desde `main`; no cerrar la task hasta obtener evidencia runtime de submit, descarga, correo y medición sin exponer PII ni enlaces tokenizados.
 
 ## Closing Protocol
 

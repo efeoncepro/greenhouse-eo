@@ -37087,3 +37087,32 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 
 - Carruseles de Instagram, posts y stories no se incorporan a la foundation de Tender. `TASK-1392` preserva el seam de `asset`/`audience`/provenance/purpose, y `TASK-1391` conserva el renderer contractual de RFP.
 - `EPIC-028`/Creative Studio recibe la capability futura de formatos curados: `format_spec → composition_spec → artifact_manifest`, con carrusel Instagram como primer proving ground. Un bridge futuro Tender→Studio debe ser versionado y minimizado; nunca replica RFPs, diagnósticos internos, costos o credenciales de storage.
+
+## Sesión 2026-07-12 — TASK-1386 en ejecución: Growth Form Surround Discovery
+
+- El operador autorizó ejecutar TASK-1386 antes de TASK-1387. La implementación reutiliza de forma estricta el registry/publisher de `efeonce-web-agentica-ebook`; no se crea form engine, submit, renderer, ruta GCS ni tag GTM por ebook.
+- Plan registrado en la task: registry + tracking plan → asset/publisher idempotente por ambiente → contrato/CORS/captcha/telemetry → handoff del `form_key` y `surface_id` a Think. El smoke de navegador, descarga gated y `generate_lead` requiere el embed de TASK-1387; hasta entonces no declarar la landing live.
+- Checkout compartido actualmente en `develop`; por instrucción del operador no se cambia de rama, no se crea worktree ni se hace push. Preservar el WIP ajeno en Handoff/registry/TASK-1393.
+
+## Sesión 2026-07-12 — TASK-1386/1387 — Surround Discovery: code complete, rollout pendiente
+
+- **TASK-1386:** se publicó de forma idempotente `efeonce-surround-discovery-ebook` con `form_key` `e8d2bfcc-c4fe-4396-8f3b-08f5ac190409` y surface `fhsf-surround-discovery-ebook`. Asset privado comprobado en staging/prod; GET browser-safe sin leak y preflight CORS `204` para `https://think.efeoncepro.com`. Tracking plan registrado sobre el pipeline genérico `gh_form_submission_accepted → generate_lead`; no hay tag GTM nuevo.
+- **TASK-1387:** Think contiene `/seo-surround-discovery`, `SurroundDiscoveryFormDock.astro`, asset propietario y verifier `pnpm verify:surround-discovery`. La composición fue corregida contra el HTML aprobado —no es una reinterpretación— y reutiliza el renderer sin campos/consent/captcha/submit/PDF local. `type-check`, `build` y verifier (1440/390/reduced-motion, H1/FAQ/ancla/JSON-LD/form key/no overflow) pasan; evidencia local: `efeonce-think/.captures/faithful-*`.
+- **Bloqueante de cierre/live:** falta deploy de Think y un submit humano real desde `https://think.efeoncepro.com/seo-surround-discovery` que pruebe Turnstile → accepted → `download_url`/asset access → `generate_lead`, sin PII en la medición. Localhost está correctamente denegado por CORS; no es fallo de la landing. No hubo push, release ni cambio de rama.
+
+### Addendum — fidelidad de motion aprobada
+
+- Tras la observación del operador, se sustituyó la aproximación parcial de motion por el mapeo completo del HTML aprobado: reveal rAF, constelación reactiva, floats/halo/ondas, siete capas de parallax, cross-highlight radial, S⁴ beat, spotlight del ebook, CTA shine/ripple y FAQ nativo. `support.js` no se transfiere: es runtime del host Design Component, no lógica de la landing Think.
+- `pnpm verify:surround-discovery -- http://127.0.0.1:4333/seo-surround-discovery motion-fidelity-rich` pasa en 1440, 390 y `prefers-reduced-motion`; valida nombres de animación, interacciones, todas las capas de parallax, fallback estático, foco/FAQ/form/SEO y cero overflow. El contrato detallado queda en `docs/ui/motion/TASK-1387-surround-discovery-ebook-landing-motion.md`.
+
+### Addendum — entrega gated y correo de respaldo
+
+- Se publicó `efeonce-surround-discovery-ebook` v2 (`fver-00476c2f-ddd1-4c6d-8c8d-4df864d524fa`) sin modificar el `form_key`, surface ni asset privado. El contract público confirma `asset_access`, `downloadPathTemplate`, `success_card` y la nota de recuperación por correo.
+- La entrega por email no es una implementación local por landing: la projection productiva `growth_ebook_delivery_from_submission` re-lee la submission aceptada, genera el enlace gated por submission y usa el template transaccional reutilizable. `ops-worker-00480-lhj` tiene la projection, `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=true` y Scheduler `ops-reactive-growth` (dominio `growth`, cada 5 min) está enabled. El email no adjunta ni expone el PDF/GCS.
+- Think ahora preserva la `success_card` del renderer tras el accepted, abre el `download_url` tokenizado y agrega sólo la recuperación de re-descarga. `submission-flow` prueba esta coordinación sintéticamente en 1440/390/reduced-motion sin PII. Falta deploy de Think y smoke humano que confirme Turnstile → accepted → PDF → correo → `/g/collect generate_lead`.
+
+### Addendum — deploy productivo desde `main`
+
+- El operador autorizó publicar Think desde `main`. Se subió el commit `3a52256160a9aa808e45a1dc15e44fcfc2794356` (`feat(think): add surround discovery landing`) sin incluir el WIP ajeno del checkout. Vercel creó `dpl_Cw5AExrqsyFxViPtUFHUSGrVEqPd`, estado `Ready`; `think.efeoncepro.com` ya resuelve a ese deployment y la ruta pública es `https://think.efeoncepro.com/seo-surround-discovery`.
+- Evidencia productiva sin submit: `production-main` ejecutó el verifier en 1440, 390 y `prefers-reduced-motion`; HTTP 200, renderer Growth Forms presente, `scrollWidth===clientWidth` y cero errores de consola. No se enviaron PII, token ni formulario simulado.
+- Pendiente de cierre operativo: una persona autorizada debe enviar el formulario real para ejercitar Turnstile → `gh_form_submission_accepted` → descarga gated → correo de respaldo → `/g/collect` `generate_lead`. No afirmar entrega de correo, HubSpot ni GA4 hasta tener esa evidencia.

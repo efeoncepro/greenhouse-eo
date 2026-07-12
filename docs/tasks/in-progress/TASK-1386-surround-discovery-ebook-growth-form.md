@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-019`
-- Status real: `Diseño — foundation requerida antes del embed de TASK-1387`
+- Status real: `Live en Think desde main; falta smoke humano de submit, descarga, correo y generate_lead para cierre operativo`
 - Rank: `TBD`
 - Domain: `content|data`
 - Blocked by: `none`
@@ -179,7 +179,63 @@ Reglas obligatorias:
 - [ ] La landing es un consumer de `form_key` y el mismo contract puede usarlo cualquier host/Nexa/automatización autorizada.
 - [ ] Parity check = SÍ; el lead magnet sigue siendo un primitive gobernado, no un botón/archivo aislado.
 
-<!-- ZONE 2 — PLAN MODE: no llenar al crear -->
+<!-- ZONE 2 — PLAN MODE -->
+
+## Plan
+
+### Audit
+
+- 2026-07-12 — Publicación completada por el publisher gobernado: `form_key`
+  `e8d2bfcc-c4fe-4396-8f3b-08f5ac190409`, surface
+  `fhsf-surround-discovery-ebook`, slug
+  `efeonce-surround-discovery-ebook`. Un segundo `--apply` confirmó que no se
+  publica una versión nueva cuando la instancia ya está sincronizada.
+- 2026-07-12 — Asset privado confirmado en staging y producción con object
+  `ebooks/surround-discovery/surround-discovery-final.pdf` (PDF, 24,605,096
+  bytes, mismo checksum). El GET público entregó sólo el contrato browser-safe:
+  `fullName`, `email`, `company`, `role` y Turnstile invisible required; el
+  scan de campos sensibles no encontró portal/mapping/bucket/secret.
+- 2026-07-12 — Preflight contra submit respondió `204`, con
+  `Access-Control-Allow-Origin: https://think.efeoncepro.com` y
+  `POST, OPTIONS`. No se envió PII ni se simuló Turnstile: el submit real debe
+  ocurrir desde Think desplegado.
+- 2026-07-12 — Se publicó `fver-00476c2f-ddd1-4c6d-8c8d-4df864d524fa` (v2), sin cambiar el `form_key`, asset ni surface. La `success_card` ahora declara el enlace de respaldo por correo. Verificado en el contract público: `asset_access`, template tokenizado y `supportingNote`. El consumer reusable `growth_ebook_delivery_from_submission`, `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=true` y el Scheduler `ops-reactive-growth` (dominio `growth`, cada 5 min) están activos en `ops-worker-00480-lhj`; todavía falta el submit humano que pruebe entrega real de correo, descarga y analítica.
+- 2026-07-12 — QA release audit: `BLOCK` sólo para cierre/live, no para el código/configuración. La ruta pública, version v2, flag, worker y scheduler están verificados; Think aún no está desplegado con el dock actualizado y no se puede validar Turnstile, correo ni `generate_lead` sin un submit humano real.
+- 2026-07-12 — Rollout de Think aplicado desde `main`: commit `3a52256160a9aa808e45a1dc15e44fcfc2794356`, deployment Vercel `dpl_Cw5AExrqsyFxViPtUFHUSGrVEqPd` `Ready` y `https://think.efeoncepro.com/seo-surround-discovery` sirviendo ese SHA. El verifier productivo comprobó 1440, 390 y reduced-motion sin errores de consola ni overflow; no envió PII ni resolvió Turnstile, por lo que descarga, correo y `generate_lead` siguen pendientes de un submit humano.
+
+- Supuesto confirmado: `scripts/growth/ebook-forms.registry.ts` y
+  `scripts/growth/publish-ebook-form.ts` ya materializan el ciclo completo
+  idempotente usado por `efeonce-web-agentica-ebook`; TASK-1386 sólo añade una
+  configuración al registry y usa ese publisher.
+- Supuesto confirmado: la entrega usa `kind=asset_access` con
+  `assetDownload.downloadPathTemplate`; la landing sólo recibe el
+  `download_url` browser-safe después de `gh_form_submission_accepted`.
+- Supuesto confirmado: `think.efeoncepro.com` es una surface existente de
+  Growth Forms y el pipeline GTM genérico traduce
+  `gh_form_submission_accepted` a `generate_lead`; no se crea tag por ebook.
+- Riesgo de rollout: la evidencia de navegador real requiere que Think tenga el
+  embed de TASK-1387 y que Turnstile acepte el host. No se declarará live hasta
+  completar ese smoke.
+- Branch/worktree: el checkout compartido ya está en `develop`; por objetivo
+  del operador no se cambia de rama, no se crea worktree y no se hace push.
+  Se preserva el WIP ajeno y sólo se tocan los paths declarados de esta task.
+- Subagentes: `sequential`; registry → publicación → smoke → consumer Think
+  son dependientes y comparten el contrato de una misma instancia.
+
+### Slices
+
+1. Añadir `efeonce-surround-discovery-ebook` al registry, reutilizando fields,
+   validation, Turnstile, policy, success card y publisher existentes; registrar
+   la fila del form en el tracking plan.
+2. Verificar el asset privado en staging y production y ejecutar el publisher
+   idempotente primero en dry-run y luego por ambiente con `--apply`; registrar
+   `form_key` y `surface_id` obtenidos sin exponer configuración de destino.
+3. Validar contrato público por `form_key` y slug, CORS/preflight, límites
+   fail-closed de captcha y la telemetría genérica sin PII. La prueba de submit
+   real queda coordinada con el embed Think de TASK-1387.
+4. Entregar a TASK-1387 el `form_key`, `surface_id` y el contrato de
+   `download_url`; después de su embed, completar browser smoke, descarga
+   tokenizada y `generate_lead` antes de cualquier declaración live.
 
 <!-- ZONE 3 — EXECUTION SPEC -->
 
@@ -236,11 +292,11 @@ La configuración debe reflejar el ebook real: **Surround Discovery™** es visi
 
 ## Acceptance Criteria
 
-- [ ] El form `efeonce-surround-discovery-ebook` está registrado en el publisher y puede dry-run sin mutar.
-- [ ] Staging y producción poseen el asset privado, form publicado, surface Think autorizada y `form_key` verificable.
+- [x] El form `efeonce-surround-discovery-ebook` está registrado en el publisher y puede dry-run sin mutar.
+- [x] Staging y producción poseen el asset privado, form publicado, surface Think autorizada y `form_key` verificable.
 - [ ] La descarga sólo se concede a una submission aceptada; no hay URL pública estable del PDF.
-- [ ] El tracking plan describe el evento de lead y el estado de tagging real.
-- [ ] El handoff registra la evidencia de browser/rollout y separa email/HubSpot pendiente de la descarga on-screen ya comprobada.
+- [x] El tracking plan describe el evento de lead y el estado de tagging real.
+- [x] El handoff registra la evidencia de browser/rollout y separa email/HubSpot pendiente de la descarga on-screen aún no ejercitada.
 
 ## Handoff Notes
 

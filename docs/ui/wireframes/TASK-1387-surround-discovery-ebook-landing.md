@@ -5,7 +5,7 @@
 - Status: `ready-for-implementation`
 - Owner task: `TASK-1387 — Surround Discovery Ebook Landing: Discovery System in Think`
 - Intended consumers: CMO, marketing/growth lead or founder who encounters SEO, AEO, AI visibility or fragmented discovery and needs a system-level map before buying a service.
-- Surface: `think.efeoncepro.com/surround-discovery` (proposed canonical route; confirm in implementation discovery).
+- Surface: `think.efeoncepro.com/seo-surround-discovery` (canonical route confirmed by the operator on 2026-07-12).
 - Source material: `Surround Discovery_Final.pdf`, especially its five discovery surfaces and S⁴ method; `docs/context/06_glosario-metricas.md` is naming SoT.
 - Copy source: local constants in Think, aligned to `docs/context/05_voz-tono-estilo.md`; the form's fields/consent/success contract remain in `EBOOK_FORMS`.
 - Primitive decision: reuse Think `BaseLayout` + `<greenhouse-form>` dock pattern. Route-local editorial sections only; no Greenhouse portal primitive and no local form.
@@ -89,7 +89,7 @@ The implementation must validate each line against the ebook and current brand c
 
 ## Implementation Mapping
 
-- Route / surface: `/Users/jreye/Documents/efeonce-think/src/pages/surround-discovery/index.astro`.
+- Route / surface: `/Users/jreye/Documents/efeonce-think/src/pages/seo-surround-discovery.astro`.
 - Layout: `/Users/jreye/Documents/efeonce-think/src/layouts/BaseLayout.astro` with existing GTM and metadata conventions.
 - Form: `<greenhouse-form>` configured with TASK-1386 `form_key` and surface; no locally authored inputs, validation, consent, captcha or POST handler.
 - Components: route-local `SurroundDiscoveryMap.astro`, `SurroundDiscoveryCycle.astro` and `SurroundDiscoveryFormDock.astro` are permitted only if they keep the page readable; `BaseLayout` and renderer are reused.
@@ -100,7 +100,7 @@ The implementation must validate each line against the ebook and current brand c
 ## GVC Scenario Plan
 
 - Scenario: `surround-discovery-ebook-landing` in the Think repo.
-- Route: local and production `/surround-discovery`.
+- Route: local and production `/seo-surround-discovery`.
 - Viewports: 1440 desktop, 390 mobile and a reduced-motion run.
 - Steps: initial hero → CTA anchor → read five surfaces → inspect S⁴ → form loading/ready → controlled success/error → FAQ keyboard interaction → post-success grader bridge.
 - Captures: `hero`, `surfaces`, `s4-cycle`, `form-ready`, `form-success`, `faq`, `mobile-full`, `reduced-motion`.

@@ -3,39 +3,38 @@
 ## Meta
 
 - Owner task: `TASK-1387`
-- Motion tier: `CSS-only, progressive enhancement`
-- Purpose: orient reading through a complex system map and signal explicit state changes; never simulate data, discovery results or user agency.
+- Motion tier: `CSS + native browser events, progressive enhancement`
+- Source of truth: `/Users/jreye/Documents/Lead magnet/Surround Discovery - Landing/Surround Discovery.dc.html`; `support.js` is only the Design Component host/runtime support, never a production dependency in Think.
+- Fidelity rule: reproduce the approved HTML’s timings, easing, triggers and feedback; only replace its DC host with native Astro/browser code and the governed Growth Form renderer.
 
-## Motion Inventory
+## Source-fidelity mapping
 
-| Element | Trigger | Motion | Duration | Meaning | Reduced-motion |
-| --- | --- | --- | --- | --- | --- |
-| Hero map | first paint | static initial composition; optional soft opacity reveal | 160–240ms | establishes a system, not live telemetry | visible immediately |
-| Five surfaces | enters viewport | short opacity/translate stagger, DOM order preserved | 40ms gap, max 280ms | reading order from surface to system | all visible immediately |
-| Surface hover/focus | pointer/focus | border/accent/1–2px lift via transform only | 160ms | feedback that a linked concept is actionable | focus style remains; no lift required |
-| S⁴ loop | enters viewport | one subtle directional trace/pulse through ordered steps | max 500ms, once | communicates feedback loop, not an auto-running workflow | static numbered connectors |
-| Form load | renderer mount | skeleton fade to ready state | 180ms | loading state only | instant swap |
-| Form pending | renderer submit | renderer-owned disabled/pending feedback | renderer-owned | prevents duplicate action | textual state unchanged |
-| Form success/error | server outcome | host content swap, focus after paint | 0–200ms | confirmed state transition | instant swap and focus |
-| FAQ | native disclosure | CSS height/opacity only if it does not delay semantics | 160–220ms | expansion feedback | native instant disclosure |
+| Approved behavior | Think mapping | Reduced motion |
+| --- | --- | --- |
+| Viewport reveal, rAF scroll/resize and 1900ms safety reveal | `[data-reveal]` in `src/pages/seo-surround-discovery.astro`; source delay/duration data is preserved where specified | Every item is visible immediately; no hidden content without JavaScript |
+| Hero constellation | exact `--px`/`--py` mouse mapping (clamped × 7px), five float profiles (7s, 8.5s, 7.8s, 9s, 8.2s), 5s halo and 4.8s waves at 0/1.6/3.2s | Float, halo, waves and pointer displacement disabled |
+| Scroll parallax | source formula `clamp((centre - viewport/2) / viewport, -1, 1) × factor × 100`; factors `0.12`, `-0.10`, `-0.12`, `-0.18`, `0.16`, `-0.06`, `0.05` | All transforms reset |
+| Radial surfaces | 5s wave sequence 0/1.7/3.4s; 0.7s node ping; source node/card cross-highlight (scale 1.14, teal border, 12×28 shadow) | Waves/ping and hover scale disabled; semantic cards remain readable |
+| S⁴ | `s4beat` 4.8s at 0/1.2/2.4/3.6s | Static bars at source resting opacity |
+| Ebook spotlight | 74s clockwise rays, 96s reverse ring, 12s hue cycle, 9s aura breath, 6.5s shaft breath and source 3D book parallax | All light and parallax transforms disabled |
+| CTAs | `translateY(-3px)`, 0.74s shine, luminous glow; outline shadow; inline arrow at +5px | No animated transform/shine; links remain native controls |
+| Pointer feedback | source 16px fixed ripple, scale `.35 → 4.2`, opacity `.55 → 0`, removed at 600ms | No ripple |
+| FAQ | native `<details>`, 0.34s plus rotation and 0.38s `::details-content` height transition | Native disclosure remains instant |
 
-## Rules
+## Accessibility and scope rules
 
-- Use transform/opacity only; do not animate layout dimensions, scroll position, colors that encode state, canvas, WebGL or continuously running loops.
-- No GSAP, Lottie, parallax, custom cursor, counter, progress percentage, confetti or auto-advancing carousel.
-- Motion must never gate a surface description, S⁴ explanation, CTA, consent, error or recovery path.
-- `prefers-reduced-motion: reduce` disables reveal/stagger/trace/lift; the page remains fully composed at first paint.
-- Motion is decorative/wayfinding only. The form's validation, pending state and CAPTCHA feedback remain owned by the governed renderer.
+- Motion never gates a description, CTA, consent, renderer error, success recovery or asset delivery.
+- Form pending, CAPTCHA, validation and submission feedback remain owned by `<greenhouse-form>`; the landing only handles the allowlisted accepted event and focus-safe download recovery.
+- The source durations are a bounded fidelity exception to generic portal timing tokens: this is a static Think editorial build unit, not a reusable Greenhouse portal primitive. No new animation library or copied `support.js` is introduced.
+- Keyboard focus, native anchors and native `<details>` remain fully usable without hover or JavaScript.
 
 ## GVC / Micro Evidence
 
-- Focus ring is always visible and does not wait for/animate into existence.
-- Success/error moves focus to a compact labelled heading, never to a large live region/card.
-- Hero visual and surface map must not delay LCP; no client hydration is justified solely for animation.
-- GVC must capture settled desktop, mobile and reduced-motion states; inspect that no transform causes clipping or horizontal overflow at 390px.
+- `scripts/verify-surround-discovery-landing.mjs` asserts the motion names, hero pointer response, source-style cross-highlight, CTA shine/ripple, all parallax layers, static reduced-motion fallback, keyboard FAQ and no overflow at 1440/390.
+- Capture settled desktop, mobile and reduced-motion states; page `scrollWidth` must equal `clientWidth` in both responsive viewports.
 
 ## Design Decision Log
 
-- Chosen: restrained CSS motion to make the map and S⁴ reading order legible.
-- Rejected: animated orbital system/dashboard—would imply real measurement, increase distraction and conflict with the ebook’s teaching purpose.
-- Rejected: a dramatic success celebration—the promised result is a file delivery, so calm confirmation is more trustworthy.
+- Chosen: preserve the approved landing’s rich motion exactly, including decorative continuous loops, because the operator explicitly rejected a restrained reinterpretation.
+- Rejected: copying `support.js`; it provides the original Design Component host/event infrastructure, while Think needs only the page-local browser behavior described above.
+- Rejected: replacing the source choreography with a portal motion primitive or new animation library; it would alter timing/composition and create an unnecessary runtime dependency for a static Astro route.

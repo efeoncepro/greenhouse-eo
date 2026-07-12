@@ -51,6 +51,7 @@ const buildSuccessBehavior = (cfg: EbookFormConfig) => ({
   title: cfg.success.title,
   body: cfg.success.body,
   reward: { kind: 'ebook' as const, title: cfg.success.rewardTitle, body: cfg.success.rewardBody },
+  supportingNote: cfg.success.supportingNote,
   actions: [
     {
       kind: 'external_link' as const,

@@ -15,9 +15,10 @@ sequenceDiagram
   participant T as Think landing
   participant F as Growth Forms
   participant G as Gated asset route
+  participant O as Ops-worker email consumer
   participant B as Brand Visibility Grader
 
-  V->>T: Opens /surround-discovery
+  V->>T: Opens /seo-surround-discovery
   T->>V: Explains five surfaces and S⁴
   V->>T: Selects “Descargar el ebook”
   T->>V: Scrolls to governed form
@@ -28,7 +29,10 @@ sequenceDiagram
   F-->>T: gh_form_submission_accepted(download_url)
   T->>G: Initiates gated PDF download
   G-->>V: Private asset stream after accepted submission validation
-  T->>V: Inline success + redownload recovery
+  F->>V: Governed success card + optional bridge
+  T->>V: Keeps card visible + redownload recovery
+  F-->>O: growth.forms.submission_accepted
+  O->>V: Transactional email with the same gated link
   opt User wants a narrow diagnostic
     V->>B: Opens /brand-visibility
   end
@@ -41,7 +45,7 @@ sequenceDiagram
 | Page open | external | landing hero | `h1` / normal browser entry | page view + UTM context | standard browser retry |
 | Hero CTA | hero | form anchor | form heading, no forced focus for pointer user | governed CTA event only if implemented | form remains reachable by keyboard |
 | Form contract loaded | loading | ready | current focus unchanged | renderer `gh_form_viewed` | retry on error |
-| Form submit accepted | ready/pending | success | success heading (`tabindex=-1`) | `gh_form_submission_accepted → generate_lead` | redownload uses handoff URL |
+| Form submit accepted | ready/pending | success | renderer success card (`tabindex=-1`) | `gh_form_submission_accepted → generate_lead` + async email consumer | immediate download; bounded redownload and email backup use the same gated route |
 | Download failure after accepted | success | degraded | degraded heading | no PII/token event | explain recovery, do not claim completion |
 | Grader bridge | success | `/brand-visibility` | target page H1 | governed CTA event if available | browser back preserves landing state only when supported |
 | FAQ toggle | FAQ closed | FAQ open | native summary | no required event | native toggle |
@@ -50,6 +54,7 @@ sequenceDiagram
 
 - Form controls and submit behavior are renderer-owned. The host cannot retry POST, synthesize success or manufacture `download_url`.
 - `download_url` is transient browser-safe handoff data, never persisted into DOM attributes, query parameters, analytics or copied to public markup.
+- The host preserves the renderer-owned `success_card`; it may add only the transient redownload recovery below it. The async email consumer re-reads the accepted submission and sends the same gated route, never a PDF attachment or raw GCS URL.
 - Unknown origin/CORS errors are shown as a safe form-unavailable state. The operator fixes the surface configuration; the visitor is never instructed to diagnose CORS.
 - If the gated route fails after an accepted submit, retain the successful acceptance message and offer a bounded retry only while the handoff exists. Do not send the user to raw GCS.
 - The grader is a voluntary next step after the download, not an interstitial or a replacement for the promised asset.

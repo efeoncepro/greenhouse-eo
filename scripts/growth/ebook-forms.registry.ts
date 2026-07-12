@@ -113,6 +113,8 @@ export interface EbookFormConfig {
     body: string
     rewardTitle: string
     rewardBody: string
+    /** Nota honesta sobre el enlace de respaldo enviado por el consumer reactivo. */
+    supportingNote: string
     /** puente (un solo next step). href root-relative same-origin o https absoluto. */
     bridge: { label: string; href: string }
   }
@@ -134,6 +136,51 @@ export const downloadPathTemplateForSlug = (slug: string): string => `/api/publi
 // ── El registry ───────────────────────────────────────────────────────────────
 export const EBOOK_FORMS: EbookFormConfig[] = [
   {
+    slug: 'efeonce-surround-discovery-ebook',
+    name: 'Efeonce · Ebook Surround Discovery',
+    purpose:
+      'Lead magnet del ebook "Surround Discovery™" — SEO, AEO, video, social y marketplaces como sistema de descubrimiento; landing Think /seo-surround-discovery.',
+    surfaceId: 'fhsf-surround-discovery-ebook',
+    surfaceName: 'Efeonce Think — Ebook Surround Discovery',
+    origins: ['https://think.efeoncepro.com'],
+    asset: {
+      objectName: 'ebooks/surround-discovery/surround-discovery-final.pdf',
+      fileName: 'Surround-Discovery-Efeonce.pdf',
+      ttlHours: 72
+    },
+    success: {
+      title: 'Tu descarga está lista',
+      body:
+        'El PDF ya se está descargando. Si necesitas abrirlo otra vez, usa el botón mientras esta página siga abierta.',
+      rewardTitle: 'Surround Discovery™',
+      rewardBody:
+        'Una guía de 61 páginas para entender SEO, AEO, video, social y marketplaces como un sistema de descubrimiento.',
+      supportingNote:
+        'También enviaremos un enlace de respaldo a tu correo corporativo para que puedas abrir el ebook más tarde.',
+      bridge: { label: 'Medir mi visibilidad en IA', href: '/brand-visibility' }
+    },
+    consentVersion: 'efeonce-surround-discovery-ebook-consent-v1',
+    copy: {
+      helps: {
+        'fullName.help': 'Así personalizamos el envío.',
+        'email.help': 'Usa tu correo corporativo para recibir el ebook.',
+        'company.help': 'Opcional: nos ayuda a contextualizar el contenido.',
+        'role.help': 'Opcional: nos ayuda a enviarte contenido relevante.'
+      },
+      errors: {
+        'fullName.error.required': 'Escribe tu nombre completo para enviarte el ebook.',
+        'email.error.required': 'Usa un correo corporativo para recibir el ebook.',
+        'consent.error.required': 'Necesitas aceptar para recibir el ebook.'
+      },
+      submit: 'Enviar y descargar el ebook',
+      noticeText:
+        'Efeonce Group SpA usará estos datos para enviarte el ebook y contenido relacionado. Puedes darte de baja en cualquier momento.',
+      privacyUrl: 'https://efeoncepro.com/politica-de-privacidad/',
+      consentLabel:
+        'Acepto recibir el ebook y contenido relacionado de Efeonce. Puedo darme de baja en cualquier momento.'
+    }
+  },
+  {
     slug: 'efeonce-web-agentica-ebook',
     name: 'Efeonce · Ebook El fin de la web solo para humanos',
     purpose: 'Lead magnet del ebook "El fin de la web solo para humanos" (web agéntica) — landing /web-agentica.',
@@ -150,6 +197,8 @@ export const EBOOK_FORMS: EbookFormConfig[] = [
       body: 'El PDF ya se está descargando. Si necesitas abrirlo otra vez, usa el botón mientras esta página siga abierta.',
       rewardTitle: 'El fin de la web solo para humanos',
       rewardBody: 'Cinco actos y un checklist para entender la web agéntica y actuar esta semana.',
+      supportingNote:
+        'También enviaremos un enlace de respaldo a tu correo corporativo para que puedas abrir el ebook más tarde.',
       bridge: { label: 'Medir mi visibilidad en IA', href: '/brand-visibility' }
     },
     consentVersion: 'efeonce-web-agentica-ebook-consent-v2',
