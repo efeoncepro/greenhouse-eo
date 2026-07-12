@@ -48,14 +48,14 @@ DB: greenhouse_commercial.proposals + proposal_{state_transitions,assets,evidenc
 
 | Superficie | Estado |
 |---|---|
-| **Repo / CLI / scripts** (un agente Claude o un dev) | ✅ **La única puerta hoy.** Todo lo de este doc |
+| **Repo / CLI / scripts** (un agente Claude o un dev) | ✅ **El camino vivo hoy.** Todo lo de este doc |
 | **API interna** (`/api/commercial/proposals/**`) | ✅ Existe y está gateada (capability + entitlement per-ORG) |
-| **Nexa (conversación)** | ❌ **NO todavía.** El runtime de acción gobernada de Nexa existe y está probado (`propose_action` → preview → confirm → command; prior art `author_quote`), pero **cero acciones del Proposal Studio están registradas** en `NEXA_ACTION_REGISTRY`. El puente es **`TASK-1399`** (to-do, P1): enchufar el dominio sin lógica nueva |
-| **UI del portal** | ❌ No existe (F5) |
+| **Nexa (conversación)** | ⚙️ **Code-complete, flag OFF** (TASK-1399). Registradas en `NEXA_ACTION_REGISTRY`: `register_proposal`, `attach_proposal_rfp`, `record_proposal_evidence`, `request_proposal_render` + el tool read-only `proposal_status`. Se prenden con **`NEXA_PROPOSAL_ACTIONS_ENABLED`** (default OFF, además del master `NEXA_ACTION_RUNTIME_ENABLED`) — y el render exige además `ARTIFACT_RENDER_JOBS_ENABLED` en el MISMO target |
+| **UI del portal** | ❌ No existe (F5). El read model del día a día ya está listo para ella: `proposals/operator-view.ts` |
 
-**Consecuencia práctica:** si alguien pregunta *"¿puedo pedirle un deck a Nexa?"*, la respuesta
-honesta hoy es **no** — se lo pide a un agente en el repo. Ver el manual del día a día:
-`docs/manual-de-uso/proposal-studio/rfp-a-pdf-el-dia-a-dia.md`.
+**Consecuencia práctica:** si alguien pregunta *"¿puedo pedirle un deck a Nexa?"* — el código está, la
+puerta se abre con el flag. Mientras esté OFF, Nexa lo dice honestamente (gap `runtime_disabled`) y el
+camino del día a día sigue siendo el repo. Manual: `docs/manual-de-uso/proposal-studio/rfp-a-pdf-el-dia-a-dia.md`.
 
 ## USO — las 6 recetas
 
@@ -153,6 +153,31 @@ fallos no-reintentables (audience/semántica/peso/geometría/drift) exigen un ma
 - **Cada agente tiene su eval fixture** (`__tests__/*-agent-eval.test.ts`) — ES el gate para
   tocar prompt/schema.
 
+### 5b · Nexa: el dominio operado desde el chat (TASK-1399)
+
+Nexa **no es un camino paralelo**: es otro consumer del mismo primitive. Las 4 acciones
+(`src/lib/nexa/actions/proposal-studio.ts`) delegan en `createProposal` / `attachProposalAsset` /
+`recordProposalEvidence` / `requestProposalRender` y cruzan la **misma puerta** que las rutas
+(`assertProposalStudioAccessForSubject`). El tool read-only `proposal_status` lee el **mismo** read
+model del día a día (`proposals/operator-view.ts`) que consumirá la UI.
+
+Tres invariantes nacieron acá y aplican a **cualquier acción gobernada futura** (no sólo a este dominio):
+
+1. **El scope sale de la sesión, NUNCA del modelo.** Ningún `inputSchema` acepta `ownerOrgId`: se
+   deriva del entitlement (`resolveProposalStudioOwnerOrg`) y el cliente entra **por nombre**
+   (`resolveClientOrganizationByName`, fail-closed: cero → no inventa; varias → pregunta). Dejar que el
+   LLM proponga un UUID de organización es una superficie de ataque, no una comodidad.
+2. **Un preview que promete lo que va a fallar es una mentira.** Si un invariante de dominio bloquea la
+   acción, `buildPreview` lanza `NexaActionBlockedError` → gap `unavailable`: **se explica, no se
+   propone**. (Antes eso sólo podía morir en el `execute`, después de que el humano confirmara.)
+3. **El preview ejercita los gates del command, no una copia.** Por eso los gates del render viven en
+   `assertProposalRenderAdmissible` (read-only) y los corren los dos. Una evidencia `internal` citada en
+   un artefacto `client_facing` **nunca llega a ser una tarjeta de confirmar**.
+
+⚠️ El schema del `manifest` usa `.passthrough()` **a propósito**: Zod borra las claves que no declara, y
+el manifest lleva su procedencia (`input`). Strippearla cambia el `manifestHash` → el MISMO deck pedido
+por API y por Nexa daría DOS jobs. **El manifest se valida, no se reescribe.**
+
 ### 6 · Operación y diagnóstico
 
 ```bash
@@ -184,6 +209,8 @@ gcloud run jobs execute artifact-worker --project=efeonce-group --region=us-east
 | **Un failure_code nuevo** del render | Migración additive al CHECK de `proposal_render_jobs.failure_code` + el union `RenderJobFailureCode` + decidir si entra a `NON_RETRYABLE_FAILURES` | Un string ad-hoc en failure_detail |
 | **Una constraint nueva del RFP** (p. ej. formato de archivo) | `render-constraints.ts` (`extractRenderConstraints` + su test) → viaja FIJADA en el job → el worker la enforcea | Leerla "fresca" en el worker (rompe determinismo) |
 | **Una fase agéntica nueva** (análisis F1, packaging F2…) | El MOLDE: contexto allowlisted tipado → propuesta tipada que cita inputs y declara blockers → validación fail-closed que recomputa → confirm member-only → EL MISMO command canónico → eval fixture. Copiar `render-agent.ts`, no inventar | Un prompt suelto; un tool con acceso a DB/storage/jobs.run |
+| **Una acción nueva operable desde Nexa** | Copiar el molde de `actions/proposal-studio.ts`: schema Zod SIN ids de organización (el scope se deriva) + `isEnabled` con flag propio default-OFF + `isPermitted` sync (capability) + `buildPreview` que **cruza la puerta y ejercita los gates del command** (bloqueo → `NexaActionBlockedError`) + `execute` que re-cruza la puerta y delega en el command **sin** `idempotencyKey` (la pone el confirm) → registrar en `NEXA_ACTION_REGISTRY` **y en la descripción del tool `propose_action`** (la lista está hardcodeada ahí: si no la actualizás, el LLM no sabe que existe) | Un `ownerOrgId` en el schema; reglas de dominio nuevas dentro de la acción; un preview que "avisa" de un bloqueo en vez de bloquear |
+| **Una UI del Studio (F5)** | Consumir `operator-view.ts` (el read model ya existe) + `assertProposalStudioAccessForSubject` (la misma puerta) + `assertProposalRenderAdmissible` para deshabilitar "Generar" **con el motivo real** | Reimplementar los gates en el componente (drift garantizado: el día que se agregue uno, la UI miente) |
 | **Batch de renders** (30 carruseles) | Open Question CON DIENTES en TASK-1391: `png-set` probablemente quiere batch por ejecución (cold start de Chromium domina). Decidir CON DATOS de carga | Subir `tasks`/`parallelism` a ojo |
 | **Otro detector de QA visual** | `quality-gates.ts` + calibrarlo contra los 40 frames del baseline (como blank_slide: reales ≥2,41%, sintético 0%) + código de fallo | Un warning que nadie lee |
 

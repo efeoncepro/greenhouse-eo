@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-027`
-- Status real: `Diseño`
+- Status real: `Code complete — rollout pendiente (flag OFF por diseño)`
 - Rank: `alto — es el gap que separa "el sistema existe" de "el equipo lo usa"`
 - Domain: `commercial|ai`
 - Blocked by: `none — TASK-1392/1393/1391 complete; el runtime gobernado de Nexa YA existe y tiene prior art (author_quote)`
@@ -322,17 +322,20 @@ futura UI), nunca a la definición de acción.
 
 ## Acceptance Criteria
 
-- [ ] Las acciones viven en `src/lib/nexa/actions/proposal-*.ts` y ejecutan los commands canónicos
+- [x] Las acciones viven en `src/lib/nexa/actions/proposal-studio.ts` y ejecutan los commands canónicos
       existentes; **cero lógica de negocio duplicada**.
-- [ ] El LLM solo PROPONE un payload validado por el mismo schema del command; el humano ve un
+- [x] El LLM solo PROPONE un payload validado por el mismo schema del command; el humano ve un
       preview read-only y confirma; el endpoint de confirmación es la ÚNICA mutación.
-- [ ] El `actor` viene del contexto de sesión, jamás del payload del modelo.
-- [ ] Todos los gates del dominio siguen vigentes y hay test que lo prueba (en particular: una
-      evidencia `internal` citada por un render `client_facing` sigue fallando cerrado desde Nexa).
-- [ ] El preview no expone RFP crudo, costos, evidencia interna ni URLs de storage.
-- [ ] Flag default OFF + fila en el ledger en el MISMO PR.
-- [ ] El manual `rfp-a-pdf-el-dia-a-dia.md` se actualiza: el apartado "Cómo será con Nexa" pasa a ser
-      "Cómo se hace con Nexa".
+- [x] El `actor` viene del contexto de sesión, jamás del payload del modelo. **Y más: el SCOPE
+      también** — ningún `inputSchema` acepta `ownerOrgId` (se deriva del entitlement) y el cliente
+      entra por nombre, resuelto fail-closed.
+- [x] Todos los gates del dominio siguen vigentes y hay test que lo prueba — y además smoke contra PG
+      REAL (`scripts/commercial/_sanity-nexa-proposal-actions.ts`): una evidencia `internal` de SKY
+      citada en un render `client_facing` **no llega ni a proponerse** (gap `unavailable`).
+- [x] El preview no expone RFP crudo, costos, evidencia interna ni URLs de storage.
+- [x] Flag default OFF (`NEXA_PROPOSAL_ACTIONS_ENABLED`) + fila en el ledger en el MISMO commit.
+- [x] El manual `rfp-a-pdf-el-dia-a-dia.md` se actualizó: "Cómo será con Nexa (F5)" (que ya era falso)
+      pasó a ser "Operar desde Nexa (el chat)", con el estado real (flag OFF) y sin prometer UI.
 
 ## Verification
 
@@ -348,6 +351,60 @@ futura UI), nunca a la definición de acción.
 - No cerrar como "Nexa opera el Studio" si sólo existe la definición sin smoke conversacional.
 - Actualizar al cerrar: `rfp-a-pdf-el-dia-a-dia.md` (§ Nexa deja de ser futuro),
   `proposal-studio-runtime.md` (la skill), Handoff y changelog.
+
+## Resultado (2026-07-12) — lo que se construyó y los 3 bugs que aparecieron por el camino
+
+**Entregado (5 slices, todo en `develop`, sin push):**
+
+| Slice | Qué |
+|---|---|
+| S1 `0cabe9991` | Upload del RFP por HTTP (`proposal_rfp_draft` / `proposal_deliverable_draft` en `/api/assets/private`), con guard exhaustivo derivado del tipo (un contexto nuevo sin autorización **rompe el build**) |
+| S2 `87b8425fa` | `operator-view.ts` — el read model del día a día ("¿cómo va y dónde está el PDF?"): semáforo de deadline, conteos, link canónico de descarga. Lo consumirá también la UI (F5) |
+| S3 `cbd2cbcba` | 4 acciones gobernadas + tool read-only `proposal_status` + flag `NEXA_PROPOSAL_ACTIONS_ENABLED` (OFF) + fila en el ledger |
+| S4 `f9b7edc72` | 20 tests del gobierno + el fix del manifest (abajo) |
+| S5 | Docs: doc-gate Nexa (behavior + data-contracts + manifest), invariantes del dominio, manual del operador, skill (Claude + mirror Codex), regla auto-load |
+
+**Los 3 bugs que la task no venía a arreglar y encontró:**
+
+1. **Toda acción parametrizada de Nexa estaba rota** (latente desde TASK-1212; nunca explotó porque su
+   flag jamás se prendió): la confirm-card **no re-ecoaba `execution.input`**, y el endpoint de confirm
+   re-valida `body.input` contra el schema → recibía `undefined` → **422 `invalid_input` siempre**.
+   `author_quote` habría muerto en su primer intento real. Arreglado en S1.
+2. **Zod se estaba comiendo el manifest** (lo cazó el test de S4): faltaba `.passthrough()` → se borraba
+   la procedencia (`input`) del `ResolvedCompositionManifest` → **otro `manifestHash`** → el MISMO deck
+   pedido por la API y por Nexa habría producido **dos jobs** en vez de uno idempotente.
+3. **Drift del manifest del doc-gate de Nexa**: `nexa-tools.ts` (donde viven TODOS los tools) sólo exigía
+   docs de knowledge. Corregido: ahora exige la tabla de ruteo — que es el doc que un tool nuevo debe
+   actualizar de verdad.
+
+**Tres invariantes nuevos que aplican a TODA acción gobernada futura** (no sólo a este dominio; quedaron
+en `behavior-and-routing.md` §Reglas duras y en los invariantes del dominio):
+
+1. **El scope sale de la sesión, nunca del modelo** — ningún `inputSchema` acepta un id de organización.
+2. **Un preview que promete lo que va a fallar es una mentira** — `NexaActionBlockedError` → gap
+   `unavailable`: la acción no se propone, **se explica**.
+3. **El preview ejercita los gates del command, no una copia** — `assertProposalRenderAdmissible`.
+
+**Verificación:**
+
+- `pnpm test` full: **9.417 tests verdes** (1.308 archivos) · `pnpm build` producción: verde · lint/tsc limpios.
+- `pnpm nexa:doc-gate --changed`: verde (11 dominios, 25 docs de capa, 42 archivos Nexa cubiertos).
+- **Smoke contra PG REAL** (`scripts/commercial/_sanity-nexa-proposal-actions.ts`), con la propuesta SKY viva:
+  - flags OFF → gap `runtime_disabled` (el bloque nace apagado de verdad);
+  - org dueña **derivada del entitlement** (Efeonce) — nadie la propuso;
+  - `proposal_status` → SKY: `intake`, deadline `at_risk`, 3 evidencias, artefacto `completed`, link
+    `/api/assets/private/asset-266fe55c…`;
+  - `register_proposal` → preview con el cliente resuelto **por nombre** ("Aguas Andinas"), sin un solo
+    UUID salido del modelo;
+  - **EL GATE**: se registró la evidencia interna real de SKY (loaded cost) y se citó en un render
+    `client_facing` → **no se propuso nada**; gap `unavailable` (la evidencia interna ni siquiera existe
+    en esa proyección — defensa en profundidad). Con la evidencia legítima **sí propone**, y el manifest
+    viaja **verbatim**.
+
+**Rollout pendiente (por diseño, no por olvido):** `NEXA_PROPOSAL_ACTIONS_ENABLED` sigue **OFF en todos
+los targets**. Prenderlo en staging + el smoke conversacional con el LLM real (que Nexa *decida* llamar
+al tool) es el próximo paso, y **requiere push + decisión del operador**. Mientras esté OFF, Nexa lo dice
+honestamente y el camino del día a día sigue siendo el repo.
 
 ## Notas de precisión (detectadas al documentar, 2026-07-12)
 

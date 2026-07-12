@@ -2,6 +2,19 @@
 
 ## 2026-07-12
 
+- **TASK-1399 COMPLETE — el Proposal Studio se opera desde el chat (code-complete, flag OFF).**
+  4 acciones gobernadas (registrar propuesta · adjuntar RFP · registrar evidencia · pedir el deck) +
+  el tool read-only `proposal_status` + el read model del día a día + el upload del RFP por HTTP.
+  Nexa es **otro consumer del mismo primitive**, por la misma puerta (`assertProposalStudioAccessForSubject`).
+  Tres invariantes nuevos para toda acción gobernada futura: **el scope sale de la sesión** (ningún
+  schema acepta un id de organización; el cliente entra por nombre, fail-closed), **un preview nunca
+  promete lo que va a fallar** (`NexaActionBlockedError` → gap `unavailable`: se explica, no se
+  propone) y **el preview ejercita los gates del command, no una copia**. Cazó 3 bugs latentes: el eco
+  de `input` roto en la confirm-card (toda acción parametrizada moría en 422, `author_quote` incluida),
+  Zod strippeando la procedencia del manifest (el mismo deck habría dado dos jobs) y drift del
+  doc-gate. Smoke contra PG real: la evidencia interna de SKY citada en un artefacto para el comprador
+  **no llega ni a proponerse**. `pnpm test` 9.417 verdes + build de producción verde. Rollout =
+  decisión del operador (`NEXA_PROPOSAL_ACTIONS_ENABLED` OFF por diseño).
 - **Documentación completa del Proposal Studio (manual + funcional + arquitectura) y el gap que
   destapó.** ~3.700 líneas verificadas contra el código: 5 runbooks de operación (incluido
   "de un RFP al PDF", la puerta de entrada), 5 docs funcionales (los gates con su razón de negocio,

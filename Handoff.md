@@ -1,3 +1,39 @@
+## Sesión 2026-07-12 (cont. 17) — TASK-1399: el Proposal Studio ya se opera desde el chat (Claude)
+
+- **La puerta que faltaba, construida.** 4 acciones gobernadas (`register_proposal`,
+  `attach_proposal_rfp`, `record_proposal_evidence`, `request_proposal_render`) + el tool read-only
+  **`proposal_status`** ("¿cómo va la propuesta de SKY y dónde está el PDF?") + el **read model del
+  día a día** (`operator-view.ts`, que también consumirá la UI de F5) + el **upload del RFP por HTTP**.
+  Nexa **no es un camino paralelo**: es otro consumer del MISMO primitive, por la MISMA puerta.
+- **3 invariantes nuevos que aplican a TODA acción gobernada futura** (no sólo a licitaciones):
+  1. **El scope sale de la sesión, nunca del modelo** — ningún `inputSchema` acepta un id de
+     organización (se deriva del entitlement; el cliente entra **por nombre**, fail-closed: si es
+     ambiguo pregunta, si no existe lo dice). Dejar que el LLM proponga un UUID de org no es una
+     comodidad: es una superficie de ataque.
+  2. **Un preview que promete lo que va a fallar es una mentira** — nuevo `NexaActionBlockedError` →
+     gap `unavailable`: la acción **no se propone, se explica**. Antes eso sólo podía morir en el
+     `execute`, DESPUÉS de que el humano confirmara.
+  3. **El preview ejercita los gates del command, no una copia** (`assertProposalRenderAdmissible`).
+     Una copia es drift garantizado: el día que se agregue un gate, el preview mentiría.
+- 🔴 **3 bugs latentes cazados, ninguno era el objetivo de la task:**
+  1. **Toda acción parametrizada de Nexa estaba rota** (desde TASK-1212, nunca explotó porque su flag
+     jamás se prendió): la confirm-card no re-ecoaba `execution.input` → el confirm re-valida y
+     recibía `undefined` → **422 siempre**. `author_quote` habría muerto en su primer uso real.
+  2. **Zod se estaba comiendo el manifest**: faltaba `.passthrough()` → se borraba su procedencia →
+     otro `manifestHash` → el MISMO deck pedido por API y por Nexa habría dado **dos jobs**.
+  3. **Drift del doc-gate de Nexa**: `nexa-tools.ts` (todos los tools) sólo exigía docs de knowledge.
+- **Evidencia real (smoke contra PG, propuesta SKY viva):** flags OFF → gap honesto; org dueña
+  derivada del entitlement; `proposal_status` → SKY (`intake`, deadline `at_risk`, artefacto
+  `completed` + link); `register_proposal` → cliente resuelto **por nombre** sin un solo UUID del
+  modelo; y **EL GATE**: la evidencia interna de SKY (loaded cost) citada en un artefacto para el
+  comprador → **no se propone nada** (ni siquiera existe en esa proyección). Con la legítima, sí.
+- **Gates:** `pnpm test` full **9.417 verdes** · `pnpm build` producción verde · `nexa:doc-gate` verde.
+- ⚠️ **Rollout pendiente POR DISEÑO:** `NEXA_PROPOSAL_ACTIONS_ENABLED` **OFF en todos los targets**.
+  Prenderlo en staging + smoke conversacional con el LLM real = **requiere push + decisión del
+  operador**. Mientras esté OFF, Nexa lo dice honestamente y el día a día sigue siendo el repo.
+- Docs: manual del operador (§ "Operar desde Nexa"), invariantes del dominio, capas de Nexa
+  Intelligence (behavior + data-contracts + manifest), skill (Claude + mirror Codex), regla auto-load.
+
 ## Sesión 2026-07-12 (cont. 16) — Documentación COMPLETA del Proposal Studio + el gap que destapó (Claude)
 
 - **4 agentes en paralelo** produjeron ~3.700 líneas verificadas contra el código (cero invención:

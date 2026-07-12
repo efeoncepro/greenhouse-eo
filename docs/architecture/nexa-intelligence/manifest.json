@@ -51,14 +51,25 @@
     {
       "key": "system-prompt",
       "label": "System prompt (versionado + contenido vigente)",
-      "code": ["src/lib/nexa/nexa-system-prompt.ts"],
-      "docs": ["system-prompt/versioning.md", "system-prompt/current.md"]
+      "code": [
+        "src/lib/nexa/nexa-system-prompt.ts"
+      ],
+      "docs": [
+        "system-prompt/versioning.md",
+        "system-prompt/current.md"
+      ]
     },
     {
       "key": "voice",
       "label": "Voz, tono, estilo y personalidad",
-      "code": ["docs/context/05_voz-tono-estilo.md"],
-      "docs": ["voice/voice-tone-style-personality.md", "voice/nexa-identity-canon.md", "voice/nexa-voice-system-v1.md"]
+      "code": [
+        "docs/context/05_voz-tono-estilo.md"
+      ],
+      "docs": [
+        "voice/voice-tone-style-personality.md",
+        "voice/nexa-identity-canon.md",
+        "voice/nexa-voice-system-v1.md"
+      ]
     },
     {
       "key": "behavior-routing",
@@ -72,19 +83,36 @@
         "src/lib/nexa/providers/gemini.ts",
         "src/lib/nexa/providers/anthropic.ts"
       ],
-      "docs": ["behavior/behavior-and-routing.md", "technical/llm-models.md"]
+      "docs": [
+        "behavior/behavior-and-routing.md",
+        "technical/llm-models.md"
+      ]
     },
     {
       "key": "llm-models",
       "label": "Config de modelos LLM (IDs, picker, resolución de provider)",
-      "code": ["src/config/nexa-models.ts"],
-      "docs": ["technical/llm-models.md", "behavior/behavior-and-routing.md"]
+      "code": [
+        "src/config/nexa-models.ts"
+      ],
+      "docs": [
+        "technical/llm-models.md",
+        "behavior/behavior-and-routing.md"
+      ]
     },
     {
       "key": "tools-knowledge",
-      "label": "Tool search_knowledge + calidad de respuesta",
-      "code": ["src/lib/nexa/nexa-tools.ts", "src/lib/knowledge/search/search-knowledge.ts", "src/lib/knowledge/search/rerank-knowledge-chunks.ts"],
-      "docs": ["knowledge/retrieval-answer-quality.md", "technical/rag-pipeline.md", "technical/techniques.md"]
+      "label": "Catálogo de tools (operativos + search_knowledge) + calidad de respuesta",
+      "code": [
+        "src/lib/nexa/nexa-tools.ts",
+        "src/lib/knowledge/search/search-knowledge.ts",
+        "src/lib/knowledge/search/rerank-knowledge-chunks.ts"
+      ],
+      "docs": [
+        "behavior/behavior-and-routing.md",
+        "knowledge/retrieval-answer-quality.md",
+        "technical/rag-pipeline.md",
+        "technical/techniques.md"
+      ]
     },
     {
       "key": "evidence",
@@ -94,13 +122,22 @@
         "src/lib/nexa/nexa-answers-citation-mapper.ts",
         "src/lib/nexa/strip-markdown-excerpt.ts"
       ],
-      "docs": ["knowledge/evidence-and-citations.md", "technical/data-contracts.md"]
+      "docs": [
+        "knowledge/evidence-and-citations.md",
+        "technical/data-contracts.md"
+      ]
     },
     {
       "key": "experience",
       "label": "Experiencia (Conversational Experience, Nexa Moments, Nexa Answers)",
-      "code": ["src/lib/nexa/nexa-answers-surface-context.ts"],
-      "docs": ["experience/conversational-experience.md", "experience/nexa-answers.md", "experience/nexa-moments.md"]
+      "code": [
+        "src/lib/nexa/nexa-answers-surface-context.ts"
+      ],
+      "docs": [
+        "experience/conversational-experience.md",
+        "experience/nexa-answers.md",
+        "experience/nexa-moments.md"
+      ]
     },
     {
       "key": "suggested-prompts",
@@ -112,7 +149,9 @@
         "src/lib/nexa/data-aware-finance-resolver.ts",
         "src/app/api/nexa/suggested-prompts/route.ts"
       ],
-      "docs": ["experience/suggested-prompts.md"]
+      "docs": [
+        "experience/suggested-prompts.md"
+      ]
     },
     {
       "key": "governed-actions",
@@ -122,24 +161,42 @@
         "src/lib/nexa/actions/registry.ts",
         "src/lib/nexa/actions/pilot-mark-notifications-read.ts",
         "src/lib/nexa/actions/author-quote.ts",
+        "src/lib/nexa/actions/proposal-studio.ts",
+        "src/lib/nexa/actions/blocked-error.ts",
         "src/lib/nexa/actions/extract-proposals.ts",
         "src/lib/nexa/actions/confirm.ts",
         "src/lib/nexa/actions/events-store.ts",
         "src/app/api/nexa/actions/[actionKey]/confirm/route.ts"
       ],
-      "docs": ["behavior/behavior-and-routing.md", "technical/data-contracts.md"]
+      "docs": [
+        "behavior/behavior-and-routing.md",
+        "technical/data-contracts.md"
+      ]
     },
     {
       "key": "flags",
       "label": "Flags + rollout de Nexa/Knowledge",
-      "code": ["src/lib/nexa/flags.ts", "src/lib/knowledge/search/flags.ts"],
-      "docs": ["system-prompt/versioning.md", "knowledge/retrieval-answer-quality.md", "experience/suggested-prompts.md", "experience/conversational-experience.md", "behavior/behavior-and-routing.md"]
+      "code": [
+        "src/lib/nexa/flags.ts",
+        "src/lib/knowledge/search/flags.ts"
+      ],
+      "docs": [
+        "system-prompt/versioning.md",
+        "knowledge/retrieval-answer-quality.md",
+        "experience/suggested-prompts.md",
+        "experience/conversational-experience.md",
+        "behavior/behavior-and-routing.md"
+      ]
     },
     {
       "key": "qa",
       "label": "QA matrix de calidad de respuesta de Nexa Knowledge",
-      "code": ["scripts/nexa-knowledge-qa-matrix.mjs"],
-      "docs": ["knowledge/retrieval-answer-quality.md"]
+      "code": [
+        "scripts/nexa-knowledge-qa-matrix.mjs"
+      ],
+      "docs": [
+        "knowledge/retrieval-answer-quality.md"
+      ]
     }
   ]
 }

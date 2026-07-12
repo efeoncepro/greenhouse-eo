@@ -33,10 +33,13 @@ system prompt ni los modulos de composicion/voz.
 | **"¿Cuánto cobré / por qué cobré eso?" (pago PROPIO del colaborador)** | **`explain_my_pay`** (TASK-1146) — líquido + desglose regime-aware del **propio** member (anti-oracle por `context.memberId`); NUNCA el pago de otro ni el agregado de la nómina (eso es `check_payroll`, operador) |
 | **"¿Cuál es el OTD/RpA/FTR/desempeño de UNA persona nombrada?" (ej. "el OTD de Daniela Ferreira")** | **`get_member_performance`** (TASK-1216) — desempeño ICO de esa persona si el caller tiene acceso. `get_otd` es agregado de organización/agencia, NUNCA de una persona |
 | **"¿Por qué cambió el OTD/RpA/FTR? ¿Qué señales/anomalías/insights hay?" (causa raíz de delivery)** | **`list_insights`** (lista del período) / **`get_insight`** (un insight por ID) — TASK-1181, Nexa Insight ↔ Conversation Bridge Slice 1. Análisis advisory (Nexa Insights), distinto del OTD en vivo (`get_otd`) y de las definiciones (`search_knowledge`); al citar un insight, ofrece su enlace |
+| **"¿Cómo va la propuesta/licitación de X? ¿Ya está el deck? ¿Cuánto falta para el cierre?"** | **`proposal_status`** (TASK-1399) — estado del Proposal Studio: etapa, riesgo de deadline, conteos de evidencia/documentos y el link canónico de descarga del artefacto. Read-only; gateado por `NEXA_PROPOSAL_ACTIONS_ENABLED` |
 | Conversación general / aclaración / siguiente paso | sin tool, responde directo |
 | Tool no disponible (permisos/datos) | lo dice con honestidad + ofrece el camino real |
 
-**Catálogo de tools operativos (member/operador):** `check_payroll` (operador, agregado del período), `explain_my_pay` (member-self, pago propio + por qué, TASK-1146), `get_otd`, `get_member_performance` (desempeño ICO de una persona nombrada, TASK-1216), `check_emails`, `get_capacity`, `pending_invoices`, `search_knowledge`, `get_insight` + `list_insights` (Nexa Insights — advisory de delivery, TASK-1181). Cada uno gateado por `isAvailable`; `explain_my_pay` solo con `memberId` y reusa `buildReceiptPresentation` (regime-aware, NUNCA recomputa).
+**Catálogo de tools operativos (member/operador):** `check_payroll` (operador, agregado del período), `explain_my_pay` (member-self, pago propio + por qué, TASK-1146), `get_otd`, `get_member_performance` (desempeño ICO de una persona nombrada, TASK-1216), `check_emails`, `get_capacity`, `pending_invoices`, `search_knowledge`, `get_insight` + `list_insights` (Nexa Insights — advisory de delivery, TASK-1181), `quote_price` (estimado referencial del catálogo), `proposal_status` (estado de las propuestas/licitaciones + link del artefacto, TASK-1399). Cada uno gateado por `isAvailable`; `explain_my_pay` solo con `memberId` y reusa `buildReceiptPresentation` (regime-aware, NUNCA recomputa).
+
+**`proposal_status` (TASK-1399, Full API Parity):** wrapper fino sobre `listProposalsForOperator` — el MISMO read model del día a día que consume la UI del Proposal Studio; NO queryea `proposal*` directo. El scope sale del **entitlement** (`resolveProposalStudioOwnerOrg`: la org que tiene contratado `proposal_studio_v1`), nunca de un id que proponga el LLM, y la capability `commercial.proposal.read` se re-verifica dentro del tool (que esté disponible no autoriza la lectura). NUNCA expone el contenido del RFP ni de la evidencia: sólo estado, riesgo de deadline, conteos y el path canónico `/api/assets/private/<id>`, que re-autoriza en cada descarga. `client_*` nunca lo ve.
 
 **Person-level performance read (TASK-1216, Full API Parity):** `get_member_performance(person)` hace que el chat sea **cliente del MISMO primitive** `readMemberIcoProfileForSubject` (`src/lib/people/person-activity-access.ts`) que consumen los lanes MCP/app de API Platform (`api/platform/{ecosystem,app}/people/performance`) y la UI — un primitive, muchos consumers. Wrapper fino: NO recomputa ni queryea `ico_member_metrics` directo; mapea el `runtimeContext` del turno a `PeopleActivitySubject` (shape neutral session-free) y delega. Autorización = la de People (`canViewActivity` + anti-IDOR de scope, supervisor → subárbol). `isAvailable = tenantType === 'efeonce_internal'` (mirror de `get_insight`). `not_found` uniforme (no existe / fuera de scope), ambiguo → desambiguación, sin métricas → gap honesto. NUNCA confundir con `get_otd` (agregado de org/agencia, nunca persona).
 
@@ -178,12 +181,59 @@ Dominio `commercial-q2c`, capability `commercial.quotation`, gateada por
 governed-action surface con el close Q2C (TASK-1206). Spec: ADR
 `GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md` (Delta 2026-06-21).
 
+### Proposal Studio — el primer BLOQUE de acciones (TASK-1399)
+
+`author_quote` era una acción suelta. El Proposal Studio es el primer **ciclo completo** operable desde
+el chat: `register_proposal` → `attach_proposal_rfp` → `record_proposal_evidence` →
+`request_proposal_render`, más el tool **read-only `proposal_status`** ("¿cómo va la propuesta de X y
+dónde está el PDF?", sobre el mismo `listProposalsForOperator` que consume la UI). Dominio
+`commercial-proposals`, capabilities `commercial.proposal.{manage,render}`, todo detrás de
+**`NEXA_PROPOSAL_ACTIONS_ENABLED`** (default OFF, además del master). Cada acción delega en el command
+canónico (`createProposal`, `attachProposalAsset`, `recordProposalEvidence`, `requestProposalRender`) y
+cruza la MISMA puerta que las rutas (`assertProposalStudioAccessForSubject`: entitlement per-ORG
+`proposal_studio_v1` + capability del actor). Contrato del dominio:
+[`COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`](../../agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md).
+
+Tres invariantes nacieron acá y aplican a **toda acción gobernada futura**, no sólo a ésta:
+
+1. **El scope sale de la sesión, NUNCA del modelo.** Ninguna acción del bloque recibe `ownerOrgId`: se
+   deriva del entitlement (`resolveProposalStudioOwnerOrg`), y el cliente entra **por nombre**, resuelto
+   fail-closed contra el catálogo (`resolveClientOrganizationByName`: cero coincidencias → no inventa;
+   varias → pregunta). Un LLM no puede conocer un UUID, y dejar que lo *proponga* es una superficie de
+   ataque (nombrar la org de otro y confiar en que el gate la atrape). Los únicos ids que viajan en un
+   `input` son los que el sistema acaba de emitir y el agente vio (`proposalId`, `assetId`, `evidenceId`).
+
+2. **Un preview que promete algo que va a fallar es una mentira.** El resolver sabía degradar por
+   "no existe / no habilitada / sin permiso / input inválido". Faltaba el caso que aparece apenas una
+   acción tiene **invariantes de dominio**: todo está en orden y el ESTADO REAL la bloquea (una evidencia
+   interna citada en un artefacto para el comprador, un deadline vencido, un validador en rojo). Nuevo
+   **`NexaActionBlockedError`** (`actions/blocked-error.ts`): si `buildPreview` lo lanza, el resolver
+   devuelve gap **`unavailable`** con su mensaje es-CL — la acción **no se propone, se explica**. Sólo ese
+   error se traduce a gap; cualquier otra excepción del preview sigue siendo un bug ruidoso.
+
+3. **El preview ejercita los MISMOS gates que el command, no una copia.** Los gates de admisibilidad del
+   render se extrajeron a `assertProposalRenderAdmissible` (read-only) y los corren los dos. Una copia
+   habría sido drift garantizado: el día que se agregue un gate, el preview mentiría. Consecuencia
+   concreta: **una evidencia `internal` citada en un artefacto `client_facing` nunca llega a ser una
+   tarjeta de confirmar** — el mismo fail-closed que protege el piso de negociación en la API aplica al chat.
+
+**El `audience` es el vector de fuga del dominio** (una evidencia interna lleva loaded cost). Por eso el
+preview de `record_proposal_evidence` lo dice de forma inequívoca (título + métrica + consecuencia) y el
+agente **nunca re-clasifica** la visibilidad de un documento: `attach_proposal_rfp` no acepta `audience`,
+se respeta el default seguro por kind.
+
 ## Reglas duras
 
 - **TASK-1137** — el LLM **NUNCA** ejecuta un write: solo propone una `actionKey` registrada vía
   `propose_action`. La ejecución requiere **confirmación humana** + el endpoint determinístico de
   confirmación (capability `nexa.action.execute` + idempotency foundation). Sin command canónico
   bound → gap honesto/deep-link, NUNCA un endpoint inventado.
+- **TASK-1399** — el **scope de una acción NUNCA se propone**: ningún `inputSchema` acepta un id de
+  organización (ni de tenant). Se deriva de la sesión/entitlement server-side. Los únicos ids que el LLM
+  puede pasar son los que el sistema ya emitió y el agente vio (`proposalId`, `assetId`, `evidenceId`).
+- **TASK-1399** — un **preview NUNCA promete lo que va a fallar**. Si un invariante de dominio bloquea la
+  acción, `buildPreview` lanza `NexaActionBlockedError` → gap `unavailable` (se explica, no se propone).
+  Y el preview **ejercita los gates del command**, nunca una copia de sus reglas (drift garantizado).
 - **NUNCA** devolver `error.message` crudo (ni prosa inglesa) al cliente desde un handler del chat. Usar `canonicalErrorResponse` + `captureWithDomain('home', …)`. (Bug-class cerrado en TASK-1131.)
 - **NUNCA** exponer la selección de modelo al usuario.
 - **NUNCA** instanciar un SDK LLM dentro de un dominio: Gemini vía `getGoogleGenAIClient`, Anthropic

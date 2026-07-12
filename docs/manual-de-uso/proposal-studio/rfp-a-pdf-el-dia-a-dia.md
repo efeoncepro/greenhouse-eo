@@ -1,9 +1,9 @@
 # Proposal Studio — De un RFP al PDF en la mano (el día a día)
 
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-12 por Claude (redacción técnica)
-> **Ultima actualizacion:** 2026-07-12 por Claude
+> **Ultima actualizacion:** 2026-07-12 por Claude — se agrega la sección "Operar desde Nexa (el chat)" (TASK-1399)
 > **Documentacion tecnica:** `docs/tasks/complete/TASK-1391-tender-deck-renderer-worker-artifact-pipeline.md` · `.claude/skills/greenhouse-public-private-tenders/proposal-studio-runtime.md`
 
 ---
@@ -35,9 +35,9 @@ Estas cuatro verdades ordenan todo el manual. Ninguna es opinión: son el estado
 
 ### 1. Hoy **no hay pantalla** del Proposal Studio
 
-No existe una UI del Proposal Studio en el portal, ni una superficie de Nexa conectada a este dominio. Verificado: el registro de acciones gobernadas de Nexa (`src/lib/nexa/actions/registry.ts`) sólo tiene `mark_notifications_read` y `author_quote` — **no hay ninguna acción de propuestas**, y no hay tool de Nexa que las lea o escriba.
+No existe una UI del Proposal Studio en el portal. Lo que **sí** existe ya es la operación desde el **chat de Nexa**: un tool de sólo lectura (`proposal_status`) y cuatro acciones gobernadas (registrar la propuesta, adjuntar el RFP, registrar evidencia, pedir el deck). Están **listas en el código, pero apagadas por defecto** — el flag `NEXA_PROPOSAL_ACTIONS_ENABLED` viene en `false`, así que hasta que se prenda en el entorno, Nexa te va a decir honestamente que no puede operar propuestas.
 
-**Entonces, ¿cómo lo operas hoy?** Le pides a **Claude Code** (el agente en el repo, en tu terminal) que ejecute los comandos por ti — o los corres tú. El sistema completo existe y funciona: base de datos, gates, agentes, worker en Cloud Run. Lo que falta es la ventana. Eso es F5 (§7 de este manual).
+**Entonces, ¿cómo lo operas hoy?** Le pides a **Claude Code** (el agente en el repo, en tu terminal) que ejecute los comandos por ti — o los corres tú. Ese es el camino vivo del día a día y es el que documenta todo este manual. El sistema completo existe y funciona: base de datos, gates, agentes, worker en Cloud Run. Cuando se prenda el flag, Nexa opera **la misma máquina, con los mismos gates**, desde el chat: ver "Operar desde Nexa (el chat)" más abajo.
 
 ### 2. El sistema **no confía en el modelo**: confía en ti
 
@@ -473,45 +473,126 @@ El sistema **cazó tres bugs reales el primer día** — no en tests, en la corr
 
 ---
 
-## Cómo será con Nexa (F5) — y por qué hoy no está
+## Operar desde Nexa (el chat)
 
-Esto es el futuro declarado, no una promesa vaga. Vale la pena entenderlo, porque **te dice qué va a cambiar y qué NO**.
+Todo lo anterior — registrar la propuesta, adjuntarle el RFP, registrar evidencia, pedir el deck — **también se puede hacer hablándole a Nexa**, sin terminal y sin comandos. No es un camino paralelo ni un atajo: Nexa es **otro cliente de la misma máquina**, con los mismos gates, los mismos rechazos y la misma confirmación humana.
 
-### Lo que va a cambiar: la superficie
+### El estado real, hoy (léelo antes de intentarlo)
 
-Hoy le hablas a Claude Code en tu terminal. Mañana le vas a hablar a **Nexa**, dentro del portal:
+Esto está **construido y probado, pero apagado por defecto**. Nexa opera propuestas sólo cuando el flag `NEXA_PROPOSAL_ACTIONS_ENABLED` está prendido en el entorno donde estás (además del flag maestro de acciones de Nexa, `NEXA_ACTION_RUNTIME_ENABLED`).
 
-> *"Nexa, llegó un RFP de SKY para el blog 2026, cierra el 15 de julio en Wherex. Regístralo."*
->
-> *"Nexa, arma el deck de la propuesta de SKY con la oferta técnica aprobada."*
+| Situación | Qué pasa |
+|---|---|
+| **Flag apagado** (lo que verás hoy si no se prendió) | Nexa te dice, sin rodeos, que las acciones gobernadas no están habilitadas. **No inventa, no simula, no "hace como que"**. |
+| **Flag prendido** | Nexa opera el ciclo completo, con la tarjeta de confirmación que verás más abajo. |
+| **Pedir el deck** (`request_proposal_render`) | Necesita **además** `ARTIFACT_RENDER_JOBS_ENABLED` en el mismo entorno. Hoy está prendido en staging y **apagado en producción, por diseño**. |
 
-Y verás una pantalla del Proposal Studio: la lista de propuestas, sus estados, sus deadlines, el semáforo de admisibilidad, los renders y sus PDFs.
+**Mientras tanto, el camino vivo del día a día es el que documenta el resto de este manual**: tú + Claude Code + los comandos. No hay pantalla del Proposal Studio en el portal, y esta sección no te promete una.
 
-### Lo que NO va a cambiar: el contrato
+### Lo que puedes preguntarle (sólo lectura, no cambia nada)
 
-Y esto es lo importante, porque significa que **lo que aprendes hoy en este manual sigue valiendo idéntico**:
+Nexa tiene un tool de consulta del Proposal Studio. Puedes escribirle literalmente:
+
+```text
+¿Cómo va la propuesta de SKY?
+```
+
+```text
+¿Qué licitaciones tengo abiertas?
+```
+
+```text
+¿Ya está el deck de SKY? Pásame el link para descargarlo.
+```
+
+```text
+Muéstrame también las propuestas cerradas (ganadas, perdidas, declinadas).
+```
+
+Lo que te responde, por propuesta:
+
+- **En qué etapa está** (el estado del recorrido: `intake`, `fit_review`, `producing`, `ready_to_submit`…).
+- **Cómo viene el plazo**: vencido, **con el plazo encima** (menos de 72 horas), tranquilo, o **sin fecha declarada**.
+- **Cuánto tiene cargado**: cuántas evidencias, cuántos documentos, cuántos requisitos.
+- **Si su documento ya está listo**, con el **link de descarga** del último artefacto. Ese link vuelve a verificar tus permisos cada vez que lo abres: no es un link público, no lo reenvíes esperando que le funcione a alguien de afuera.
+- **Si hay renders en curso** o alguno que necesita que lo mires.
+
+**Lo que Nexa NO te muestra por acá:** el contenido del RFP ni el de la evidencia. El tool devuelve estado y metadatos, nunca el texto de los documentos.
+
+### Lo que puedes pedirle (las cuatro acciones)
+
+Estas cuatro **sí cambian algo**, y por eso ninguna se ejecuta sola: Nexa **propone**, tú **confirmas** en una tarjeta, y recién ahí el sistema ejecuta.
+
+| Le pides… | Frase que puedes escribir | Lo que Nexa necesita que le digas |
+|---|---|---|
+| **Abrir la propuesta** | `Registra una propuesta nueva para SKY: "SKY — Gestión del blog 2026", es un RFP privado por Wherex, cierra el 15 de julio a las 18:00 y la fecha es ambigua (las bases dan dos). Moneda CLP.` | El **cliente por su nombre** ("SKY"), el título, el origen (licitación pública / RFP privado / venta directa) y, si lo sabes, el deadline. |
+| **Adjuntar el RFP** | `Adjunta este documento a la propuesta de SKY como rfp_source.` | El **archivo ya subido** (ver abajo) y de qué tipo es (el RFP, un anexo, la oferta técnica, la matriz de admisibilidad, el deck…). |
+| **Registrar evidencia** | `Registra una evidencia para la propuesta de SKY: sale de la oferta técnica, es un documento atestiguado por el equipo, con fecha 2026-07-12, y va para el comprador.` | De **dónde sale** el dato, **cómo se obtuvo**, su **fecha de vigencia**, si es medida / atestiguada / ilustrativa, y —lo más importante— si es **interna** o **para el comprador**. |
+| **Pedir el deck / PDF** | `Genera el deck de la propuesta de SKY para el comprador, con la evidencia que ya registramos.` | La propuesta, para quién es el artefacto, y el **plan del deck ya compuesto** (el que produce `pnpm deck:compose`). |
+
+**Antes de adjuntar un documento tienes que subirlo.** El archivo no viaja por el chat: se sube al almacén privado de Greenhouse (pasa por el escaneo de seguridad, como cualquier archivo del portal) y eso te devuelve un identificador que es lo que Nexa usa después. Por HTTP:
+
+```bash
+curl -X POST '<portal>/api/assets/private' \
+  -F 'contextType=proposal_rfp_draft' \
+  -F 'file=@bases-sky-blog-2026.pdf'
+# → { assetId: "asset-..." }
+```
+
+(Para un entregable — la oferta técnica, el deck que produjiste aparte — el `contextType` es `proposal_deliverable_draft`.)
+
+### Qué ves ANTES de confirmar
+
+Nexa nunca ejecuta al toque. Te muestra una **tarjeta** con exactamente lo que va a pasar, y ahí decides. Lo que trae cada una:
+
+| Acción | La tarjeta te muestra |
+|---|---|
+| **Registrar propuesta** | Cliente · Origen · **Deadline** (y si es ambiguo, lo dice) · Moneda. Y te aclara que la propuesta queda en estado inicial: **todavía no compromete nada ante el comprador**. |
+| **Adjuntar documento** | Tipo del documento · **Visibilidad**: interna o al comprador. Nexa te aclara que **no lee el contenido ni lo publica**: sólo lo deja asociado. |
+| **Registrar evidencia** | El título mismo de la tarjeta te grita el destino: *"Registrar evidencia **INTERNA**"* o *"Registrar evidencia **PARA EL COMPRADOR**"*. Más su clasificación, su fecha de vigencia y de dónde sale. |
+| **Pedir el deck** | Para quién es (el comprador / interno) · cuántas láminas · **cuántas evidencias cita** · el límite de peso que impuso el RFP. |
+
+**Mira siempre la visibilidad.** Es el campo que decide si un dato tuyo puede salir de Efeonce. Una evidencia marcada *interna* lleva tu estructura de costos y tu piso de negociación: si por error la marcas *para el comprador*, se la estás entregando a la contraparte. Esa fila de la tarjeta existe justamente para que nadie confirme eso sin darse cuenta.
+
+La tarjeta **caduca a los 5 minutos**. Si te distraes, pídesela de nuevo — es a propósito: no quieres confirmar una propuesta armada con datos de hace media hora.
+
+### Qué pasa cuando confirmas
+
+El sistema ejecuta el **mismo comando** que correrías por terminal — no hay una "versión Nexa" más suelta — y te responde qué quedó hecho:
+
+- **Registraste la propuesta** → te dice el estado en que quedó y cuál es el siguiente paso (adjuntarle el RFP).
+- **Adjuntaste el documento** → te confirma con qué visibilidad quedó.
+- **Registraste la evidencia** → te confirma si quedó interna (y por lo tanto **no podrá citarse** en nada que vea el comprador) o si ya puede citarse en la oferta.
+- **Pediste el deck** → te dice que quedó **encolado**. El archivo se genera aparte y tarda unos minutos; después lo bajas con el link que te da `proposal_status`.
+
+**Si pides dos veces lo mismo, no se duplica nada.** Si vuelves a pedir el mismo deck, con el mismo contenido y el mismo propósito, el sistema te devuelve **el mismo artefacto** en vez de generar otro. Lo mismo con la propuesta y con el documento adjunto: Nexa te lo dirá ("eso ya estaba registrado; no dupliqué nada"). Si quieres un deck distinto, **cambia el plan** — eso cambia el contenido, y entonces sí es un artefacto nuevo.
+
+### Cuando Nexa NO puede (y te lo dice)
+
+Esta es la parte que más conviene conocer, porque la vas a ver. **Nexa prefiere decirte que no antes que inventarte un sí.** Lo que hace en cada caso:
+
+| Situación | Qué hace Nexa |
+|---|---|
+| **El cliente que nombraste es ambiguo** (hay varias organizaciones que podrían ser) | **Te pregunta cuál**. No elige por ti. |
+| **El cliente no existe** en el sistema | **Te lo dice**. No inventa una organización ni un identificador para salir del paso. |
+| **No sabes el deadline / las bases no lo dicen** | La propuesta queda **"sin fecha declarada"**. Nexa **no inventa una fecha**. Y si le declaras una, tiene que decir si es confirmada o ambigua — una fecha inventada te hace perder el proceso. |
+| **La visibilidad del documento adjunto** | **Nexa no la elige.** Se aplica el valor seguro que corresponde a ese tipo de documento, y la tarjeta te lo muestra. Un agente no re-clasifica qué puede salir al comprador. |
+| **Citaste una evidencia interna en un artefacto para el comprador** | Nexa **no te propone nada**: te explica que el artefacto se rechazaría completo. Es el mismo `audience_violation` de más arriba, pero atajado antes — **no vas a ver una tarjeta que te promete un PDF que iba a fallar cerrado**. |
+| **El deadline ya venció, el RFP exige accesibilidad, o un control del deck está en rojo** | Igual: **no propone, explica el motivo**. Los mismos gates, con las mismas razones. |
+| **Tu organización no tiene contratado el Proposal Studio** | Te lo dice tal cual. Sin el módulo `proposal_studio_v1`, nadie opera — ni tú, ni un admin. |
+| **No tienes permiso** para esa operación | Te lo dice, y no propone. |
+
+### Lo que NO cambia porque lo pidas por chat
 
 | Sigue igual | Por qué |
 |---|---|
-| **propose → confirm → execute** | Nexa **propone**; tú confirmas; **el mismo command** ejecuta. Nexa no va a tener un camino privilegiado. |
-| **Los gates humanos** | `fit_review → producing`, `fit_review → declined`, `packaging → ready_to_submit` siguen exigiendo un `member`. Nexa **no puede cruzarlos**, ni con un bug: la base de datos no admite un actor agente. |
-| **El `audience` de la evidencia** | Un deck `client_facing` con una evidencia `internal` seguirá siendo rechazado entero. Nexa no lo puede saltar. |
-| **La QA mecánica y el juicio humano** | Nexa te va a mostrar el PDF más rápido. **Seguirás teniendo que mirarlo.** |
-| **El deadline, la accesibilidad, el peso** | Los mismos gates, fallando cerrado, con los mismos códigos. |
+| **Propone → confirmas → ejecuta** | Nexa **nunca escribe**. Propone; **tú** confirmas; el mismo comando de siempre ejecuta. No hay camino privilegiado para el chat. |
+| **Los gates humanos de estado** | "Vamos a este bid", "no vamos", "esto está listo para el comité" siguen exigiendo una persona. Nexa **no puede cruzarlos**, ni con un bug: la base de datos no admite un actor agente. |
+| **La visibilidad de la evidencia** | Un deck para el comprador con una evidencia interna se rechaza **entero**. Nexa no lo salta; lo detecta antes. |
+| **La QA mecánica y tu juicio** | Nexa te va a dejar el PDF más rápido. **Igual tienes que abrirlo y leerlo entero antes de subirlo.** |
+| **El deadline, la accesibilidad, el peso** | Los mismos controles, fallando cerrado, con los mismos códigos de la sección "Qué haces si falla". |
 
-Nexa no va a ser "el sistema con menos frenos". Va a ser **la misma máquina con una ventana**. Los agentes que ya existen (`intake-agent.ts`, `render-agent.ts`) están construidos exactamente con ese molde, con su suite de evaluación como gate — sólo les falta quién los llame desde una conversación.
-
-### El estado honesto, hoy
-
-- ✅ El dominio, los commands, los gates, la evidencia, los estados: **funcionan** (TASK-1392).
-- ✅ El motor de composición y sus 25 plantillas: **funcionan** (TASK-1393).
-- ✅ El worker en Cloud Run, la cola, el asset store: **funcionan en staging, con evidencia real** (TASK-1391).
-- ✅ Los agentes intake y render: **existen como contratos server-side con su eval**.
-- ❌ **No hay UI.**
-- ❌ **No hay tool de Nexa que los invoque.** (Verificado: el registro de acciones gobernadas de Nexa no tiene ninguna acción de propuestas.)
-- ❌ **Producción está cerrada por diseño** — el enqueue productivo sigue apagado hasta el sign-off + la integración al release control plane.
-
-Hoy el camino es **tú + Claude Code + los comandos de este manual**. Es un camino real y completo: produjo el PDF de SKY.
+Nexa no es "el sistema con menos frenos". Es **la misma máquina, con una puerta más cómoda**.
 
 ---
 
@@ -524,6 +605,7 @@ Hoy el camino es **tú + Claude Code + los comandos de este manual**. Es un cami
 - **NUNCA** empezar a construir la propuesta antes de correr la admisibilidad. Es la decisión más cara que puedes tomar mal.
 - **NUNCA** meter una cifra en el deck que no tenga una evidencia registrada detrás. En una licitación, afirmar algo falso no es un error de estilo: es un problema.
 - **NUNCA** tutear al cliente en un documento client-facing. Registro formal (de usted, institucional). El deck y la oferta los evalúa un comité, y pasan a formar parte del contrato.
+- **NUNCA** confirmar una tarjeta de Nexa sin leer la fila de **visibilidad**. Es el único campo que decide si un dato tuyo puede salir de Efeonce, y confirmar es tu firma: el sistema ejecuta porque **tú** lo autorizaste.
 
 ---
 
@@ -546,6 +628,12 @@ Normal, y es buena señal. El CLI **no corre los gates del dominio** (audience, 
 
 **"¿Dónde quedó mi PDF?"**
 En el asset store privado, vinculado a la propuesta. El `output_pdf_asset_id` está en la fila del job (`greenhouse_commercial.proposal_render_jobs`). Nunca en un bucket público.
+
+**"Le pedí a Nexa que registre una propuesta y me dice que no está habilitado."**
+Es el comportamiento correcto, no un error: el bloque de propuestas de Nexa está **apagado por defecto** (`NEXA_PROPOSAL_ACTIONS_ENABLED`, más el flag maestro `NEXA_ACTION_RUNTIME_ENABLED`). Mientras no se prenda en ese entorno, opera por el camino de este manual (tú + Claude Code). Y ojo: prender un flag es **multi-runtime** — se prende donde se lee, no "en Vercel" a secas.
+
+**"Nexa me dice que no puede generar el deck y explica por qué, en vez de mostrarme la tarjeta."**
+También es correcto. Nexa corre los mismos controles del render **antes** de proponerte nada: si el artefacto iba a ser rechazado (evidencia interna citada para el comprador, deadline vencido, accesibilidad exigida, un control en rojo), prefiere explicártelo a ofrecerte un botón que iba a fallar. Arregla la causa —está en "Qué haces si falla"— y vuelve a pedírselo.
 
 ---
 

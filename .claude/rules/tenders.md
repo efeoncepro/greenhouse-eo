@@ -28,6 +28,19 @@ contrato de TASK-1391: un artefacto `client_facing` con UNA evidencia `internal`
 **NUNCA** escribir a `proposals`/hijos fuera de esos commands; **NUNCA** exponer RFP crudo, costos,
 `external_source_snapshot` ni URLs de storage en una proyección/evento.
 
+**El dominio se opera desde Nexa (TASK-1399, code-complete · flag `NEXA_PROPOSAL_ACTIONS_ENABLED` OFF):**
+4 acciones gobernadas (`src/lib/nexa/actions/proposal-studio.ts`) + el tool read-only `proposal_status`
+(sobre `proposals/operator-view.ts`, el read model del día a día). Nexa es **otro consumer del mismo
+primitive**, no un camino paralelo. **UNA PUERTA, DOS ENTRADAS:** el núcleo del gate es
+`assertProposalStudioAccessForSubject` (subject canónico) y la firma vieja es su adapter — **NUNCA**
+escribas un segundo gate para un consumer nuevo. **EL SCOPE SALE DE LA SESIÓN:** **NUNCA** agregues un
+`ownerOrgId` (ni ningún id de organización) a un `inputSchema` de agente — se deriva del entitlement y el
+cliente se resuelve **por nombre** fail-closed. **UN PREVIEW NUNCA PROMETE LO QUE VA A FALLAR:** los gates
+del render viven en `assertProposalRenderAdmissible` (read-only) y los corren el preview **y** el command
+— **NUNCA** una copia (drift); si el estado bloquea, `NexaActionBlockedError` → gap `unavailable` (se
+explica, no se propone). **El manifest se valida, NO se reescribe** (`.passthrough()` en su schema Zod: sin
+él, Zod borra su procedencia y el mismo deck daría dos jobs en vez de uno idempotente).
+
 **Gates mecánicos del dominio — SIEMPRE al tocarlo:**
 
 - `pnpm vitest run src/lib/artifact-composer` verde (12+ suites: boundary/composability/geometría/

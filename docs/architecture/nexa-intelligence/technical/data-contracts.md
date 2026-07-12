@@ -68,6 +68,25 @@ unavailable | invalid_input` + `message` + `deepLink?`; **`invalid_input`** = el
 propios invariantes, así que un eco manipulado no escala privilegio. Primera parametrizada: `author_quote`
 → command `submitQuoteFromBuilder` (contrato Zod en `@/lib/commercial/submit-quote-from-builder-schema.ts`).
 
+**Bloqueo por invariante de dominio (TASK-1399)**: los 5 gaps de arriba cubren "no existe / no habilitada
+/ sin permiso / input inválido". Falta el caso que aparece apenas una acción tiene invariantes de dominio:
+todo está en orden y el **estado real** la bloquea (evidencia interna citada en un artefacto para el
+comprador, deadline vencido, validador en rojo). Para eso, `buildPreview` puede lanzar
+**`NexaActionBlockedError`** (`@/lib/nexa/actions/blocked-error.ts`) con su `userMessage` es-CL: el resolver
+lo traduce a `gap.reason='unavailable'` — la acción **no se propone, se explica**. Sólo ese error se
+traduce; cualquier otra excepción del preview es un bug y sigue siendo ruidosa (no se disfraza de "no
+disponible"). Corolario del diseño: **ningún `inputSchema` acepta un id de organización** — el scope se
+deriva de la sesión/entitlement server-side, nunca de lo que proponga el LLM.
+
+**Bloque Proposal Studio (TASK-1399)**: `register_proposal` · `attach_proposal_rfp` ·
+`record_proposal_evidence` · `request_proposal_render` → commands `createProposal`, `attachProposalAsset`,
+`recordProposalEvidence`, `requestProposalRender` (contratos Zod en
+`@/lib/commercial/tenders/proposals/action-schemas.ts`). ⚠️ El `manifest` de render se valida con
+`.passthrough()` **a propósito**: Zod borra las claves que no declara, y el `ResolvedCompositionManifest`
+lleva campos que el schema no enumera (`input` = su procedencia). Strippearlos cambiaría el
+`manifestHash` → el MISMO deck pedido por la API y por Nexa daría DOS jobs en vez de uno idempotente.
+**El manifest se valida, no se reescribe.**
+
 **Ledger de eventos** (no es contrato de cliente): `greenhouse_ai.nexa_action_events` (append-only) —
 una fila por evento del ciclo de vida (`proposed | proposal_denied | executed | failed |
 execution_denied | conflict | cancelled`). Lo leen las reliability signals `nexa.action.failure_rate`

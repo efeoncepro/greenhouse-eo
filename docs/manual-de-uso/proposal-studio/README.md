@@ -1,12 +1,12 @@
 # Proposal Studio + Artifact Composer + Artifact Renderer — índice
 
 > **Tipo de documento:** Manual de uso (índice de carpeta)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-12 por Claude
-> **Ultima actualizacion:** 2026-07-12 por Claude
+> **Ultima actualizacion:** 2026-07-12 por Claude — se indexa la operación desde Nexa (TASK-1399)
 > **Modulo:** Comercial — Proposal Studio (`commercial.proposal.*`, módulo `proposal_studio_v1`)
 > **Documentacion tecnica:** [GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md) · [COMMERCIAL_TENDERS_AGENT_INVARIANTS.md](../../architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md)
-> **Tasks fuente:** `TASK-1392` (aggregate `Proposal`) · `TASK-1393` (Artifact Composer) · `TASK-1391` (Artifact Renderer en Cloud Run)
+> **Tasks fuente:** `TASK-1392` (aggregate `Proposal`) · `TASK-1393` (Artifact Composer) · `TASK-1391` (Artifact Renderer en Cloud Run) · `TASK-1399` (operación desde Nexa)
 
 ## Para qué sirve esta carpeta
 
@@ -27,6 +27,7 @@ Son tres piezas encadenadas. Conviene saber cuál es cuál antes de abrir un man
 | Si quieres… | Lee |
 |---|---|
 | **Te llegó un RFP y quieres el PDF en la mano** (el recorrido completo del día a día, con el caso guía SKY) | **[rfp-a-pdf-el-dia-a-dia.md](rfp-a-pdf-el-dia-a-dia.md)** |
+| **Operar propuestas desde el chat de Nexa** (qué le pides, qué ves antes de confirmar, cuándo te dice honestamente que no puede) | [rfp-a-pdf-el-dia-a-dia.md → "Operar desde Nexa (el chat)"](rfp-a-pdf-el-dia-a-dia.md#operar-desde-nexa-el-chat) |
 | Crear una propuesta, mover su estado, adjuntar el RFP, registrar evidencia, declarar requisitos, vincular la cotización | [crear-y-operar-una-propuesta.md](crear-y-operar-una-propuesta.md) |
 | Convertir un plan de láminas en el PDF de la oferta (los dos caminos: exploratorio y productivo) | [generar-el-deck-de-una-propuesta.md](generar-el-deck-de-una-propuesta.md) |
 | Entender por qué el sistema rechazó tu render, o qué significa un `failure_code` | [entender-los-errores-y-rechazos.md](entender-los-errores-y-rechazos.md) |
@@ -62,6 +63,12 @@ Estos manuales **complementan**, no reemplazan, a los dos manuales comerciales p
   (`org-2df565fb-98aa-42f7-b324-ea9a2209017f`). Cualquier otra organización recibe
   `proposal_not_entitled` (403).
 - **Sin UI todavía:** el sistema se opera por **API y por scripts**. No hay pantalla en el portal.
+- **Nexa (TASK-1399):** el chat ya puede consultar el estado de las propuestas (`proposal_status`) y
+  operar el ciclo con cuatro acciones gobernadas (registrar la propuesta, adjuntar el RFP, registrar
+  evidencia, pedir el deck), con el loop propone → confirmas → ejecuta. Está **code-complete con el
+  flag `NEXA_PROPOSAL_ACTIONS_ENABLED` apagado por defecto**: hasta que se prenda en el entorno, Nexa
+  responde honestamente que no está disponible y el camino vivo sigue siendo el de los manuales.
+  Pedir el deck exige además `ARTIFACT_RENDER_JOBS_ENABLED` en el mismo target.
 
 ## Referencias técnicas
 

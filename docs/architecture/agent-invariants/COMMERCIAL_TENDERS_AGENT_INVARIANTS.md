@@ -175,6 +175,43 @@ El **Proposal Intake Agent** (shipped: `src/lib/commercial/tenders/proposals/int
   (`assertEvidenceAllowedForAudience`). **NUNCA** el renderer/autoría lee `proposal_evidence`
   directo ni recibe `external_source_snapshot`, costos o URLs de storage.
 
+### El dominio se opera desde Nexa (TASK-1399) — y sigue siendo el MISMO primitive
+
+El ciclo completo es operable desde el chat: **`register_proposal` → `attach_proposal_rfp` →
+`record_proposal_evidence` → `request_proposal_render`** (`src/lib/nexa/actions/proposal-studio.ts`) +
+el tool read-only **`proposal_status`** (sobre `proposals/operator-view.ts`, el MISMO read model del
+día a día que consume la UI). Todo detrás de **`NEXA_PROPOSAL_ACTIONS_ENABLED`** (default OFF, además
+del master `NEXA_ACTION_RUNTIME_ENABLED`). Nexa **no es un camino paralelo**: cada acción delega en el
+command canónico y cruza la MISMA puerta que las rutas.
+
+- **UNA PUERTA, DOS ENTRADAS.** El núcleo del gate es
+  **`assertProposalStudioAccessForSubject({ subject, ownerOrgId, need })`** (entitlement per-ORG
+  `proposal_studio_v1` + capability del actor); `assertProposalStudioAccess({ tenant, … })` es el
+  adapter de las rutas. **NUNCA** escribas un segundo gate para un consumer nuevo (UI, MCP, cron): una
+  puerta duplicada es el drift que termina dejando pasar una org sin módulo contratado.
+- **EL SCOPE SALE DE LA SESIÓN, NUNCA DEL MODELO.** Ninguna acción recibe `ownerOrgId`: se deriva del
+  entitlement (`resolveProposalStudioOwnerOrg`) y el cliente entra **por nombre**, resuelto fail-closed
+  (`resolveClientOrganizationByName`: cero → no inventa; varias → pregunta). **NUNCA** agregues un id de
+  organización a un `inputSchema` de agente — dejar que el LLM *proponga* un UUID es una superficie de
+  ataque (nombrar la org de otro y confiar en que el gate la atrape). Los únicos ids que un agente pasa
+  son los que el sistema acabó de emitir (`proposalId`, `assetId`, `evidenceId`).
+- **UN PREVIEW QUE PROMETE LO QUE VA A FALLAR ES UNA MENTIRA.** Los gates de admisibilidad del render
+  viven en **`assertProposalRenderAdmissible`** (read-only) y los corren **el preview y el command**.
+  **NUNCA** reimplementes esas reglas en un preview/afordance de UI: una copia es drift garantizado (el
+  día que se agregue un gate, el preview miente). Si el estado real bloquea la acción, se lanza
+  `NexaActionBlockedError` → gap `unavailable`: **la acción no se propone, se explica**. Consecuencia:
+  una evidencia `internal` citada en un artefacto `client_facing` **nunca llega a ser una tarjeta de
+  confirmar**.
+- **EL AGENTE NO RE-CLASIFICA VISIBILIDAD.** `attach_proposal_rfp` **no acepta `audience`**: se respeta
+  el default seguro por kind. El `audience` de una evidencia SÍ es explícito y obligatorio — y su
+  preview lo declara de forma inequívoca (título + métrica + consecuencia), porque una evidencia interna
+  lleva loaded cost, o sea el piso de negociación.
+- **EL MANIFEST SE VALIDA, NO SE REESCRIBE.** El schema Zod del render usa `.passthrough()` a propósito:
+  Zod **borra las claves que no declara**, y el `ResolvedCompositionManifest` lleva campos que el schema
+  no enumera (`input` = su procedencia). Strippearlos cambia el `manifestHash` → el MISMO deck pedido por
+  la API y por Nexa produciría **DOS jobs** en vez de uno idempotente. **NUNCA** re-tipes el manifest sin
+  passthrough.
+
 ## Human-in-control (principio 3)
 
 - **NUNCA** un agente **envía** una oferta, la **firma**, ni confirma declaraciones juradas. Prepara el
