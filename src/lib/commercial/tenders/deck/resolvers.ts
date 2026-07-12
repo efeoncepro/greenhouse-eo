@@ -10,15 +10,50 @@
  * que el molde existe para evitar.
  */
 
-/** Un efecto sobre el DOM del item: setear un atributo, o marcar la clase de tono. */
+import { solarIconPath } from './solar-icons'
+
+/** Un efecto sobre el DOM del item: atributo, clase de tono, o GEOMETRÍA (estilo). */
 export interface FieldEffect {
-  /** Selector DENTRO del item. `':self'` = el nodo raíz del item. */
+  /**
+   * Selector DENTRO del item.
+   * - `':self'`  = el nodo raíz del item (para clases de tono).
+   * - `':field'` = el nodo `[data-slot-field="<campo>"]` del propio campo.
+   *
+   * ⚠️ NUNCA escribir texto en `':self'`: `textContent` sobre la raíz del item BORRA todos sus hijos
+   * (y con ellos las anclas del resto de los campos). Para texto derivado, usar `':field'`.
+   */
   selector: string
   attr?: string
   value?: string
   /** Clase de tono a aplicar (reemplaza a las del mismo grupo). */
   toneClass?: string
   toneGroup?: string[]
+  /**
+   * Propiedad CSS a escribir (`height`, `left`, `width`…).
+   *
+   * ⚠️ Esto es lo que evita que una lámina MIENTA. Las barras de los prototipos tienen alturas y
+   * posiciones hardcodeadas; si el composer sólo cambiara los NÚMEROS, la barra seguiría midiendo lo
+   * del ejemplo — un gráfico que exagera (o esconde) la mejora real. En una oferta eso no es un bug
+   * de layout: es **fabricación gráfica**. La geometría se deriva del dato, siempre.
+   */
+  styleProp?: string
+  styleValue?: string
+  /** Escribe el valor como TEXTO del nodo (para ordinales derivados, que no son un atributo). */
+  asText?: boolean
+}
+
+/**
+ * Contexto que un resolver necesita más allá del valor del campo.
+ *
+ * Los resolvers de geometría no pueden decidir con un solo campo: una barra de Gantt necesita
+ * `startUnit` Y `endUnit` Y cuántas unidades tiene el eje; una barra de "antes/después" necesita el
+ * otro valor para escalar. Por eso el resolver ve el item completo y el resto de los slots.
+ */
+export interface ResolverContext {
+  item: Record<string, unknown>
+  index: number
+  itemCount: number
+  slots: Record<string, unknown>
 }
 
 /** Qué hacer con un campo de item al llenar el DOM. */
@@ -61,7 +96,35 @@ const FOUR_PILLAR_ICON: Record<string, string> = {
   human: SOLAR('users-group-rounded')
 }
 
-type ResolverDef = (value: string) => FieldEffect[] | null
+/**
+ * Íconos de las plantillas que usan `<svg><path>` inline (no `<img src>`): acá va el NOMBRE del
+ * ícono Solar; el resolver le pide su path a `solar-icons.ts`.
+ */
+const TEAM_ROLE_ICON: Record<string, string> = {
+  lead: 'star',
+  strategy: 'target',
+  content: 'pen-new-square',
+  technical: 'settings',
+  data: 'chart-2'
+}
+
+const METRICS_KPI_ICON: Record<string, string> = {
+  visibility: 'target',
+  engines: 'cpu',
+  authority: 'ranking',
+  gap: 'chart-2'
+}
+
+const CARD_GRID_ICON: Record<string, string> = {
+  search: 'magnifer',
+  conversation: 'chat-square',
+  authoring: 'pen-new-square',
+  data: 'database',
+  measurement: 'chart-square',
+  governance: 'shield-check'
+}
+
+type ResolverDef = (value: string, ctx: ResolverContext) => FieldEffect[] | null
 
 const RESOLVERS: Record<string, { known: string[]; build: ResolverDef }> = {
   'stat-goal-icon': {
@@ -104,7 +167,188 @@ const RESOLVERS: Record<string, { known: string[]; build: ResolverDef }> = {
           // los planes salen marcados como "el propuesto".
           [{ selector: ':self', toneGroup: ['is-proposed'] }]
     }
+  },
+
+  // ── Íconos SVG inline ────────────────────────────────────────────────────────────────────────
+  // Estas plantillas no usan `<img src>` sino `<svg><path d="…">`: hay que reescribir el `d`.
+
+  'team-role-icon': {
+    known: Object.keys(TEAM_ROLE_ICON),
+    build: value => {
+      const icon = TEAM_ROLE_ICON[value]
+
+      return icon ? [{ selector: '.av svg path', attr: 'd', value: solarIconPath(icon) }] : null
+    }
+  },
+
+  'metrics-kpi-icon': {
+    known: Object.keys(METRICS_KPI_ICON),
+    build: value => {
+      const icon = METRICS_KPI_ICON[value]
+
+      return icon ? [{ selector: '.ic svg path', attr: 'd', value: solarIconPath(icon) }] : null
+    }
+  },
+
+  'card-grid-capability-icon': {
+    known: Object.keys(CARD_GRID_ICON),
+    build: value => {
+      const icon = CARD_GRID_ICON[value]
+
+      return icon ? [{ selector: '.ic svg path', attr: 'd', value: solarIconPath(icon) }] : null
+    }
+  },
+
+  // ── Ordinales: chrome derivado, no dato autorable ────────────────────────────────────────────
+  // El número de un capítulo/fase sale de su POSICIÓN. Si el autor lo escribiera a mano, un deck
+  // reordenado quedaría con la numeración vieja y se contradiría solo.
+
+  'ordinal-number': {
+    known: ['<derivado del índice>'],
+    build: (_value, ctx) => [{ selector: ':field', value: String(ctx.index + 1).padStart(2, '0'), asText: true }]
+  },
+
+  'timeline-phase-ordinal': {
+    known: ['<derivado del índice>'],
+    build: (_value, ctx) => [{ selector: '.n', value: String(ctx.index + 1).padStart(2, '0'), asText: true }]
+  },
+
+  'section-number': {
+    known: ['<derivado del orden de la sección>'],
+    build: value => [{ selector: ':field', value: String(value).padStart(2, '0'), asText: true }]
+  },
+
+  'chapter-anchor': {
+    // No es texto: alimenta el `href="#<id>"` — la nav del HTML y el link interno del PDF.
+    known: ['<slideId destino>'],
+    build: value => [{ selector: ':self', attr: 'href', value: `#${value}` }]
+  },
+
+  // ── Geometría: lo que impide que la lámina MIENTA ────────────────────────────────────────────
+
+  /**
+   * `case-study-before-after-bar-scale` — las dos barras se derivan de los valores REALES.
+   *
+   * El prototipo trae `height:74px` y `height:234px` fijas. Si el composer sólo cambiara los
+   * números, un "de 12 a 14" se seguiría dibujando como el salto gigante del ejemplo. Eso no es un
+   * bug de layout en una oferta: es **fabricación gráfica** — el evaluador ve una mejora que no
+   * ocurrió. La barra mayor toma el alto máximo y la otra escala proporcionalmente.
+   */
+  'case-study-before-after-bar-scale': {
+    known: ['<derivado de beforeValue/afterValue>'],
+    build: (_value, ctx) => {
+      const before = toNumber(ctx.item.beforeValue)
+      const after = toNumber(ctx.item.afterValue)
+
+      if (before === null || after === null) return null
+
+      const max = Math.max(before, after)
+
+      if (max <= 0) return null
+
+      const MAX_PX = 234
+      const MIN_PX = 12 // una barra de 0 igual debe verse: una raya, no la nada
+
+      const height = (value: number) => `${Math.max(MIN_PX, Math.round((value / max) * MAX_PX))}px`
+
+      return [
+        { selector: '.barcol.before .bar', styleProp: 'height', styleValue: height(before) },
+        { selector: '.barcol.after .bar', styleProp: 'height', styleValue: height(after) }
+      ]
+    }
+  },
+
+  /**
+   * `chart-bar-geometry` — el ancho de cada barra sale de su valor.
+   *
+   * Mismo principio: las barras del prototipo son `width:88%|48%|32%` a mano. La serie mayor cae
+   * sobre la refline (88%) y el resto escala contra ella.
+   */
+  'chart-bar-geometry': {
+    known: ['<derivado de valuePct>'],
+    build: (_value, ctx) => {
+      const series = Array.isArray(ctx.slots.series) ? (ctx.slots.series as Record<string, unknown>[]) : []
+      const values = series.map(item => toNumber(item.valuePct)).filter((n): n is number => n !== null)
+      const max = Math.max(...values, 0)
+      const own = toNumber(ctx.item.valuePct)
+
+      if (own === null || max <= 0) return null
+
+      const REFLINE_PCT = 88
+      const width = Math.round((own / max) * REFLINE_PCT)
+
+      return [{ selector: '.fill', styleProp: 'width', styleValue: `${width}%` }]
+    }
+  },
+
+  /**
+   * `timeline-phase-span` — la barra de la fase se posiciona por sus unidades reales.
+   *
+   * Una fase que va del mes 2 al 4 debe dibujarse ahí. Con la geometría del prototipo, un plan de 8
+   * meses se seguiría viendo como el de 6 del ejemplo: el cronograma diría una cosa y la barra otra.
+   */
+  'timeline-phase-span': {
+    known: ['<derivado de startUnit/endUnit>'],
+    build: (_value, ctx) => {
+      const axis = Array.isArray(ctx.slots.timeAxis) ? ctx.slots.timeAxis : []
+      const units = axis.length
+
+      const start = toNumber(ctx.item.startUnit)
+      const end = toNumber(ctx.item.endUnit)
+
+      if (units <= 0 || start === null || end === null || end < start) return null
+
+      const unit = 100 / units
+      const left = (start - 1) * unit
+      const width = (end - start + 1) * unit
+
+      return [
+        { selector: '.bar', styleProp: 'left', styleValue: `${left.toFixed(2)}%` },
+        { selector: '.bar', styleProp: 'width', styleValue: `${width.toFixed(2)}%` }
+      ]
+    }
+  },
+
+  'timeline-phase-bar-kind': {
+    known: ['work', 'continuous'],
+    build: value => {
+      if (value !== 'work' && value !== 'continuous') return null
+
+      return value === 'continuous'
+        ? [{ selector: '.bar', toneClass: 'cont', toneGroup: ['cont'] }]
+        : [{ selector: '.bar', toneGroup: ['cont'] }]
+    }
+  },
+
+  'timeline-milestone-position': {
+    known: ['<derivado de la unidad del hito>'],
+    build: (value, ctx) => {
+      const axis = Array.isArray(ctx.slots.timeAxis) ? ctx.slots.timeAxis : []
+      const units = axis.length
+      const at = toNumber(value)
+
+      if (units <= 0 || at === null) return null
+
+      // El hito se ancla al FIN de su unidad (un hito "en el mes 2" cae al cerrar el mes 2).
+      const left = (at / units) * 100
+
+      return [{ selector: ':self', styleProp: 'left', styleValue: `${left.toFixed(2)}%` }]
+    }
   }
+}
+
+const toNumber = (value: unknown): number | null => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+
+  if (typeof value === 'string') {
+    // Tolera "1.234", "45%", "$ 1.200" — el dato manda, no su formato de presentación.
+    const cleaned = value.replace(/[^\d.,-]/g, '').replace(/\.(?=\d{3}\b)/g, '').replace(',', '.')
+    const parsed = Number.parseFloat(cleaned)
+
+    return Number.isFinite(parsed) ? parsed : null
+  }
+
+  return null
 }
 
 export class UnknownResolverValueError extends Error {
@@ -126,7 +370,8 @@ export class UnknownResolverValueError extends Error {
  */
 export const resolveFieldDirective = (
   field: { resolver?: string; consumer?: string },
-  value: unknown
+  value: unknown,
+  ctx: ResolverContext = { item: {}, index: 0, itemCount: 1, slots: {} }
 ): FieldDirective => {
   if (field.consumer === 'validation-only') {
     return { mode: 'skip' }
@@ -143,7 +388,7 @@ export const resolveFieldDirective = (
     throw new Error(`Resolver "${field.resolver}" declarado en el contrato pero no implementado en resolvers.ts`)
   }
 
-  const effects = resolver.build(String(value))
+  const effects = resolver.build(String(value), ctx)
 
   if (!effects) {
     throw new UnknownResolverValueError(field.resolver, String(value), resolver.known)

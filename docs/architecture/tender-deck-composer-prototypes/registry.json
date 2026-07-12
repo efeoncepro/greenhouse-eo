@@ -24,20 +24,20 @@
       "contentTypes": ["back-cover"], "prototype": "back-cover-full.html", "slotsRef": "back-cover-full.slots.json" },
 
     { "name": "AgendaFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
-      "contentTypes": ["agenda"], "prototype": "agenda-full.html", "slotsRef": null,
+      "contentTypes": ["agenda"], "prototype": "agenda-full.html", "slotsRef": "agenda-full.slots.json",
       "nav": { "clickableItems": true, "targetSlideIdPerItem": true, "pdfInternalLinks": true },
       "overflow": "4-8 items (prefer 6); 7-8 => 2x4; >8 => group into Parts or consolidate, never split into 2 agenda slides" },
 
     { "name": "SectionDividerSplit", "kind": "split", "source": "figma", "figmaNode": "6:12498 / 4:151", "owner": "claude", "status": "built",
-      "contentTypes": ["section-divider"], "prototype": "section-divider-split.html", "slotsRef": null,
+      "contentTypes": ["section-divider"], "prototype": "section-divider-split.html", "slotsRef": "section-divider-split.slots.json",
       "variants": ["brand-left", "brand-right"] },
 
     { "name": "NarrativeSplit", "kind": "split", "source": "figma", "figmaNode": "5:7869", "owner": "claude", "status": "built",
-      "contentTypes": ["narrative"], "prototype": "narrative-split.html", "slotsRef": null,
+      "contentTypes": ["narrative"], "prototype": "narrative-split.html", "slotsRef": "narrative-split.slots.json",
       "rightSlot": ["PersonaAsset", "ConceptVisual"] },
 
     { "name": "BulletListSplit", "kind": "split", "source": "figma", "figmaNode": "8:14178", "owner": "claude", "status": "built",
-      "contentTypes": ["bullet-list"], "prototype": "bullet-list-split.html", "slotsRef": null },
+      "contentTypes": ["bullet-list"], "prototype": "bullet-list-split.html", "slotsRef": "bullet-list-split.slots.json" },
 
     { "name": "DualListSplit", "kind": "split", "source": "figma", "figmaNode": "8:14347", "owner": "codex", "status": "built",
       "contentTypes": ["dual-list"], "prototype": "dual-list-split.html", "slotsRef": "dual-list-split.slots.json" },
@@ -49,18 +49,18 @@
       "contentTypes": ["one-metric"], "prototype": "stat-split.html", "slotsRef": "stat-split.slots.json" },
 
     { "name": "MetricsSplit", "kind": "split", "source": "figma", "figmaNode": "7:13598", "owner": "claude", "status": "built",
-      "contentTypes": ["several-kpis"], "prototype": "metrics-split.html", "slotsRef": null,
+      "contentTypes": ["several-kpis"], "prototype": "metrics-split.html", "slotsRef": "metrics-split.slots.json",
       "rightSlot": ["PersonaAsset", "ConceptVisual"] },
 
     { "name": "ChartSplit", "kind": "split", "source": "figma", "figmaNode": "5:10852", "owner": "claude", "status": "built",
-      "contentTypes": ["chart"], "prototype": "chart-split.html", "slotsRef": null,
+      "contentTypes": ["chart"], "prototype": "chart-split.html", "slotsRef": "chart-split.slots.json",
       "requires": ["heroStat"] },
 
     { "name": "ComparisonSplit", "kind": "split", "source": "figma", "figmaNode": "8:13782", "owner": "codex", "status": "built",
       "contentTypes": ["comparison"], "prototype": "comparison-split.html", "slotsRef": "comparison-split.slots.json" },
 
     { "name": "QuoteSplit", "kind": "split", "source": "figma", "figmaNode": "8:14071", "owner": "claude", "status": "built",
-      "contentTypes": ["statement"], "prototype": "quote-split.html", "slotsRef": null,
+      "contentTypes": ["statement"], "prototype": "quote-split.html", "slotsRef": "quote-split.slots.json",
       "leftSlot": ["PersonaAsset", "Attribution"],
       "modes": ["statement (Efeonce, first-party)", "testimonial (requires real sourced quote)"] },
 
@@ -71,17 +71,17 @@
       "contentTypes": ["four-pillars"], "prototype": "four-pillars-full.html", "slotsRef": "four-pillars-full.slots.json" },
 
     { "name": "CardGridFull", "kind": "full-bleed", "source": "figma", "figmaNode": "5:7657", "owner": "claude", "status": "built",
-      "contentTypes": ["capabilities-grid"], "prototype": "card-grid-full.html", "slotsRef": null },
+      "contentTypes": ["capabilities-grid"], "prototype": "card-grid-full.html", "slotsRef": "card-grid-full.slots.json" },
 
     { "name": "TimelineFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
-      "contentTypes": ["timeline"], "prototype": "timeline-full.html", "slotsRef": null },
+      "contentTypes": ["timeline"], "prototype": "timeline-full.html", "slotsRef": "timeline-full.slots.json" },
 
     { "name": "TeamSplit", "kind": "split", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
-      "contentTypes": ["team"], "prototype": "team-split.html", "slotsRef": null,
+      "contentTypes": ["team"], "prototype": "team-split.html", "slotsRef": "team-split.slots.json",
       "memberAvatar": ["PhotoAsset", "RoleIcon"] },
 
     { "name": "CaseStudySplit", "kind": "split", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
-      "contentTypes": ["case-study"], "prototype": "case-study-split.html", "slotsRef": null,
+      "contentTypes": ["case-study"], "prototype": "case-study-split.html", "slotsRef": "case-study-split.slots.json",
       "requires": ["result.hero", "result.beforeAfter", "result.source"] },
 
     { "name": "PricingFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "codex", "status": "built",

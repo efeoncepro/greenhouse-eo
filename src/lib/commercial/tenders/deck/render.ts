@@ -47,24 +47,39 @@ interface FillInstruction {
   fieldPlan?: Record<string, FieldDirective>
 }
 
-const buildFieldPlan = (slotContract: SlotContract, value: SlotValue): Record<string, FieldDirective> | undefined => {
+const buildFieldPlan = (
+  slotContract: SlotContract,
+  value: SlotValue,
+  slots: Record<string, unknown>
+): Record<string, FieldDirective> | undefined => {
   const shape = slotContract.item?.shape
 
   if (!shape || !Array.isArray(value)) return undefined
 
   const plan: Record<string, FieldDirective> = {}
 
-  // Un `kind` distinto por item podría resolver a íconos distintos; por eso el plan se calcula con
-  // el valor de CADA item, no una vez para toda la lista. Se indexa por `<índice>.<campo>`.
+  // Un `kind` distinto por item resuelve a un ícono distinto, y la geometría de una barra depende
+  // del item Y del resto de la serie. Por eso el plan se calcula por item, con contexto completo.
   value.forEach((item, index) => {
     if (typeof item !== 'object' || item === null) return
+
+    const ctx = {
+      item: item as Record<string, unknown>,
+      index,
+      itemCount: value.length,
+      slots
+    }
 
     for (const [fieldName, field] of Object.entries(shape)) {
       const fieldValue = (item as Record<string, unknown>)[fieldName]
 
-      if (fieldValue === undefined || fieldValue === null || fieldValue === '') continue
+      // Un resolver DERIVADO (ordinal, geometría) corre aunque el campo no venga: el número de fase
+      // sale del índice, no de un dato que el autor tenga que escribir.
+      const derived = Boolean(field.resolver)
 
-      plan[`${index}.${fieldName}`] = resolveFieldDirective(field, fieldValue)
+      if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
+
+      plan[`${index}.${fieldName}`] = resolveFieldDirective(field, fieldValue, ctx)
     }
   })
 
@@ -83,7 +98,7 @@ const buildInstructions = (slide: SlideSpec, contract: TemplateContract): FillIn
       selector: slotContract.selector,
       type: slotContract.type,
       value,
-      fieldPlan: buildFieldPlan(slotContract, value)
+      fieldPlan: buildFieldPlan(slotContract, value, slide.slots as Record<string, unknown>)
     })
   }
 
@@ -223,11 +238,28 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
           field.innerHTML = sanitize(item)
         } else if (item && typeof item === 'object') {
           const index = items.indexOf(item)
+          const record = item as Record<string, unknown>
 
-          for (const [fieldName, fieldValue] of Object.entries(item as Record<string, unknown>)) {
-            if (fieldValue === undefined || fieldValue === null || fieldValue === '') continue
+          // Se recorre el PLAN, no los campos del item: los resolvers derivados (el ordinal de una
+          // fase, la altura de una barra) no tienen valor propio en el item — se calculan desde el
+          // índice o desde la serie. Iterar el item los dejaría fuera.
+          const planned = Object.keys(instruction.fieldPlan ?? {})
+            .filter(key => key.startsWith(`${index}.`))
+            .map(key => key.slice(String(index).length + 1))
 
+          const fieldNames = new Set([...Object.keys(record), ...planned])
+
+          for (const fieldName of fieldNames) {
+            const fieldValue = record[fieldName]
             const directive = instruction.fieldPlan?.[`${index}.${fieldName}`] ?? { mode: 'text' }
+
+            // Un campo sin valor y sin resolver no se escribe (lo limpia el barrido de abajo).
+            if (
+              directive.mode === 'text' &&
+              (fieldValue === undefined || fieldValue === null || fieldValue === '')
+            ) {
+              continue
+            }
 
             // `validation-only` (ej. evidenceRef): se exige, pero NUNCA se pinta. Es munición
             // interna — la fuente de una cifra no es copy para el comité.
@@ -235,7 +267,14 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
 
             if (directive.mode === 'apply') {
               for (const effect of directive.effects) {
-                const target = effect.selector === ':self' ? node : node.querySelector(effect.selector)
+                const target =
+                  effect.selector === ':self'
+                    ? node
+                    : effect.selector === ':field'
+                      ? // El nodo del propio campo. Escribir texto en `:self` (la raíz del item)
+                        // borraría todos los hijos y con ellos las anclas del resto de los campos.
+                        node.querySelector(`[data-slot-field="${fieldName}"]`)
+                      : node.querySelector(effect.selector)
 
                 if (!target) {
                   problems.push(
@@ -248,6 +287,16 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
 
                 if (effect.attr && effect.value !== undefined) {
                   target.setAttribute(effect.attr, effect.value)
+                }
+
+                // Geometría: la barra se DERIVA del dato (ver el comentario en resolvers.ts —
+                // una barra que no se recalcula es fabricación gráfica).
+                if (effect.styleProp && effect.styleValue !== undefined) {
+                  ;(target as HTMLElement).style.setProperty(effect.styleProp, effect.styleValue)
+                }
+
+                if (effect.asText && effect.value !== undefined) {
+                  target.textContent = effect.value
                 }
 
                 // El tono es excluyente. Se limpia el grupo SIEMPRE (aunque no venga un tono nuevo):

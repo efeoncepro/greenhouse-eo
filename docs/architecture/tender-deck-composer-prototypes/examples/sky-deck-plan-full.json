@@ -1,0 +1,99 @@
+{
+  "_readme": [
+    "DeckPlan ampliado — ejercita las plantillas TIER-1 del bid (las que puntúan o evitan el descarte):",
+    "agenda · equipo · cronograma. Sirve como prueba real del composer sobre las plantillas recién",
+    "anotadas, y como referencia de cómo se escribe cada una.",
+    "",
+    "El equipo son PERSONAS REALES (assets/squad/*.png, fotos del squad). Nunca caras IA.",
+    "",
+    "pnpm tsx scripts/commercial/compose-tender-deck.ts docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan-full.json"
+  ],
+
+  "tenderId": "TND-DEMO-SKY-FULL",
+
+  "slides": [
+    {
+      "slideId": "agenda",
+      "contentType": "agenda",
+      "template": "AgendaFull",
+      "slots": {
+        "sectionLabel": "LO QUE VAMOS A REVISAR",
+        "title": "Agenda",
+        "deckMeta": "<b>5</b> capítulos · 20 minutos",
+        "chapters": [
+          {
+            "number": "01",
+            "title": "El diagnóstico",
+            "description": "Dónde está su marca hoy, medido",
+            "targetSlideId": "diagnostico"
+          },
+          {
+            "number": "02",
+            "title": "El método",
+            "description": "Cuatro frentes que se sostienen",
+            "targetSlideId": "metodo"
+          },
+          {
+            "number": "03",
+            "title": "El equipo",
+            "description": "Quiénes trabajan en su cuenta",
+            "targetSlideId": "equipo"
+          },
+          {
+            "number": "04",
+            "title": "El plan de trabajo",
+            "description": "Hitos, entregables y holgura",
+            "targetSlideId": "cronograma"
+          },
+          {
+            "number": "05",
+            "title": "La inversión",
+            "description": "Desglose y condiciones",
+            "targetSlideId": "economica"
+          }
+        ],
+        "footerLabel": "Propuesta técnica y económica"
+      }
+    },
+
+    {
+      "slideId": "equipo",
+      "contentType": "team",
+      "template": "TeamSplit",
+      "slots": {
+        "sectionLabel": "EL EQUIPO",
+        "headline": "Personas con <em>nombre</em>, no una bolsa de horas",
+        "lead": "Cada rol tiene una persona asignada y una dedicación declarada.",
+        "highlight": "Usted sabe <em>a quién preguntarle</em> cada cosa.",
+        "rosterLabel": "EL SQUAD",
+        "rosterMeta": "4 roles dedicados",
+        "members": [
+          {
+            "kind": "lead",
+            "role": "Líder de cuenta",
+            "description": "Responsable del compromiso y del cumplimiento del plan.",
+            "dedication": "40%"
+          },
+          {
+            "kind": "strategy",
+            "role": "Estrategia de visibilidad",
+            "description": "Define qué medir y qué mover en cada ciclo.",
+            "dedication": "50%"
+          },
+          {
+            "kind": "content",
+            "role": "Dirección editorial",
+            "description": "Construye el contenido que el motor puede citar.",
+            "dedication": "60%"
+          },
+          {
+            "kind": "data",
+            "role": "Medición y evidencia",
+            "description": "Corre el grader y sostiene la trazabilidad del dato.",
+            "dedication": "30%"
+          }
+        ]
+      }
+    }
+  ]
+}
