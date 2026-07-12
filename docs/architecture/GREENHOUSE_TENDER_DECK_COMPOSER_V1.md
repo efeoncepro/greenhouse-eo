@@ -908,14 +908,16 @@ con una palabra guillotinada es peor que un fallo, porque parece terminado y nad
 
 ## Pendiente
 
-- **Anotar los slots de las 11 plantillas que no los tienen** (Agenda, Timeline, Team, CaseStudy,
-  Chart, Metrics, Quote, Narrative, BulletList, CardGrid, SectionDivider) — sin `data-slot` no son
-  componibles. Es mecánico, pero es lo que separa el catálogo de 25 de un composer que use las 25.
-- **Los 3 nodos de juicio** (orquestador · chapter-authors · verifier) — F2. El determinista ya está.
+**Hecho** (esta lista estaba desactualizada; se sincroniza 2026-07-12): las 25 plantillas ya tienen
+`data-slot` + `*.slots.json`; el `registry.json` y el `selector.ts` ya están formalizados; y el
+desborde del `thesis` de `FourPillarsFull` quedó **cerrado de raíz** (ver "La 2ª bug class").
+
+- **Los 3 nodos de juicio** (orquestador · chapter-authors · verifier) — **F2, el próximo hito**. Todo
+  el carril determinista (selector → validación → slot-fill → geometría → render) ya está.
 - **Verde fuera de paleta** en `StatSplit` (íconos + métricas) y en los tonos `ai`/`human` de
   `FourPillarsFull`: el molde no tiene verde (acento teal-sobre-oscuro / violeta-sobre-claro).
-- El `thesis` de `FourPillarsFull` se **desborda** por la derecha.
-- Extraer y construir las demás plantillas del catálogo (aplicando el molde).
-- Formalizar el **registry** (`template → node-id → content-type → slots`) + el **selector** (agente elige plantilla por tipo de contenido) — milestone del composer.
-- Embeber fuentes (Poppins/Geist) para runtime self-contained (hoy vía Google Fonts en Chromium).
+- **Embeber fuentes** (Poppins/Geist) para runtime self-contained — hoy Chromium las pide a Google
+  Fonts por red, así que el render **no es hermético**: sin red, el deck sale con la tipografía de
+  fallback. Al embeberlas se puede bloquear `http(s)://**` en el render y cerrar el determinismo.
+- **Ritmo vertical de `PricingFull`**: hay un vacío grande entre el header y el panel de planes.
 - Jugar con el token `--axis-violet` en variantes.
