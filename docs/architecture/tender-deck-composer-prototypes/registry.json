@@ -21,7 +21,7 @@
       "contentTypes": ["cover"], "prototype": "cover-full.html", "slotsRef": "cover-full.slots.json" },
 
     { "name": "BackCoverFull", "kind": "full-bleed", "source": "design", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["back-cover"], "prototype": "back-cover-full.html", "slotsRef": null },
+      "contentTypes": ["back-cover"], "prototype": "back-cover-full.html", "slotsRef": "back-cover-full.slots.json" },
 
     { "name": "AgendaFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
       "contentTypes": ["agenda"], "prototype": "agenda-full.html", "slotsRef": null,
@@ -40,13 +40,13 @@
       "contentTypes": ["bullet-list"], "prototype": "bullet-list-split.html", "slotsRef": null },
 
     { "name": "DualListSplit", "kind": "split", "source": "figma", "figmaNode": "8:14347", "owner": "codex", "status": "built",
-      "contentTypes": ["dual-list"], "prototype": "dual-list-split.html", "slotsRef": null },
+      "contentTypes": ["dual-list"], "prototype": "dual-list-split.html", "slotsRef": "dual-list-split.slots.json" },
 
     { "name": "DualTextSplit", "kind": "split", "source": "figma", "figmaNode": "8:14102", "owner": "codex", "status": "built",
-      "contentTypes": ["dual-text"], "prototype": "dual-text-split.html", "slotsRef": null },
+      "contentTypes": ["dual-text"], "prototype": "dual-text-split.html", "slotsRef": "dual-text-split.slots.json" },
 
     { "name": "StatSplit", "kind": "split", "source": "figma", "figmaNode": "7:13485", "owner": "codex", "status": "built",
-      "contentTypes": ["one-metric"], "prototype": "stat-split.html", "slotsRef": null },
+      "contentTypes": ["one-metric"], "prototype": "stat-split.html", "slotsRef": "stat-split.slots.json" },
 
     { "name": "MetricsSplit", "kind": "split", "source": "figma", "figmaNode": "7:13598", "owner": "claude", "status": "built",
       "contentTypes": ["several-kpis"], "prototype": "metrics-split.html", "slotsRef": null,
@@ -57,7 +57,7 @@
       "requires": ["heroStat"] },
 
     { "name": "ComparisonSplit", "kind": "split", "source": "figma", "figmaNode": "8:13782", "owner": "codex", "status": "built",
-      "contentTypes": ["comparison"], "prototype": "comparison-split.html", "slotsRef": null },
+      "contentTypes": ["comparison"], "prototype": "comparison-split.html", "slotsRef": "comparison-split.slots.json" },
 
     { "name": "QuoteSplit", "kind": "split", "source": "figma", "figmaNode": "8:14071", "owner": "claude", "status": "built",
       "contentTypes": ["statement"], "prototype": "quote-split.html", "slotsRef": null,
@@ -65,10 +65,10 @@
       "modes": ["statement (Efeonce, first-party)", "testimonial (requires real sourced quote)"] },
 
     { "name": "HighlightWave", "kind": "full-bleed", "source": "figma", "figmaNode": "4:124", "owner": "codex", "status": "built",
-      "contentTypes": ["highlight"], "prototype": "highlight-wave.html", "slotsRef": null },
+      "contentTypes": ["highlight"], "prototype": "highlight-wave.html", "slotsRef": "highlight-wave.slots.json" },
 
     { "name": "FourPillarsFull", "kind": "full-bleed", "source": "figma", "figmaNode": "8:24297", "owner": "codex", "status": "built",
-      "contentTypes": ["four-pillars"], "prototype": "four-pillars-full.html", "slotsRef": null },
+      "contentTypes": ["four-pillars"], "prototype": "four-pillars-full.html", "slotsRef": "four-pillars-full.slots.json" },
 
     { "name": "CardGridFull", "kind": "full-bleed", "source": "figma", "figmaNode": "5:7657", "owner": "claude", "status": "built",
       "contentTypes": ["capabilities-grid"], "prototype": "card-grid-full.html", "slotsRef": null },
@@ -97,11 +97,11 @@
       "contentTypes": ["credentials"], "prototype": "credentials-full.html", "slotsRef": "credentials-full.slots.json" },
 
     { "name": "EvidenceStoryGrid", "kind": "full-bleed", "source": "figma", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["evidence-story"], "prototype": "evidence-story-grid.html", "slotsRef": null,
+      "contentTypes": ["evidence-story"], "prototype": "evidence-story-grid.html", "slotsRef": "evidence-story-grid.slots.json",
       "note": "PROVISIONAL: layout historia de transformación + grid de evidencia; el prototipo trae contenido de ejemplo IDD/Think, no SKY. Confirmar content-type y fit al set de licitación (Codex)." },
 
     { "name": "HumanImpactFull", "kind": "full-bleed", "source": "figma", "figmaNode": null, "owner": "codex", "status": "built",
-      "contentTypes": ["human-impact"], "prototype": "human-impact-full.html", "slotsRef": null,
+      "contentTypes": ["human-impact"], "prototype": "human-impact-full.html", "slotsRef": "human-impact-full.slots.json",
       "note": "PROVISIONAL: layout antes→después humano por rol/persona; prototipo con contenido de ejemplo IDD/Think, no SKY. Confirmar content-type y fit (Codex)." }
   ],
 

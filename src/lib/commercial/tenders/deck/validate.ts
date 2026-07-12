@@ -1,0 +1,268 @@
+/**
+ * Tender Deck Composer — validación de slots contra el contrato de la plantilla.
+ *
+ * Dos reglas gobiernan este módulo:
+ *
+ * 1. **`overflow: reject` — nunca truncar.** Si el copy no cabe, el renderer NO lo corta: rechaza la
+ *    lámina. Truncar en silencio el texto de una oferta contractual es peor que fallar: el evaluador
+ *    lee una frase mutilada y nadie se entera. Que lo corrija un humano (o el chapter-author en el
+ *    reintento).
+ *
+ * 2. **Una cifra sin evidencia no pasa.** `quantifiedClaimsRequireEvidenceRef` implementa el
+ *    principio anti-humo del método: los datos son reales del bid o ilustrativos marcados, NUNCA
+ *    fabricados. Si un slot trae una métrica sin `evidenceRef`, el deck no se compone.
+ */
+
+import type {
+  SlotContract,
+  SlotValue,
+  SlotViolation,
+  TemplateContract,
+  SlideSpec
+} from './contracts'
+
+const stripTags = (value: string): string => value.replace(/<[^>]*>/g, '')
+
+/** Cuenta caracteres visibles: el markup no ocupa espacio en la lámina. */
+const visibleLength = (value: string): number => stripTags(value).length
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+interface ValidateContext {
+  slideId: string
+  template: string
+  slot: string
+}
+
+const violation = (ctx: ValidateContext, code: SlotViolation['code'], message: string): SlotViolation => ({
+  slideId: ctx.slideId,
+  template: ctx.template,
+  slot: ctx.slot,
+  code,
+  message
+})
+
+const validateStringLike = (ctx: ValidateContext, contract: SlotContract, value: SlotValue): SlotViolation[] => {
+  if (typeof value !== 'string') {
+    return [violation(ctx, 'wrong_type', `se esperaba un ${contract.type}, llegó ${typeof value}`)]
+  }
+
+  const max = contract.constraints?.maxCharacters
+
+  if (max !== undefined && visibleLength(value) > max) {
+    return [
+      violation(
+        ctx,
+        'too_long',
+        `${visibleLength(value)} caracteres visibles excede el máximo de ${max}. ` +
+          `El renderer NO trunca (overflow=reject): reescribe el copy más corto.`
+      )
+    ]
+  }
+
+  return []
+}
+
+const validateItemShape = (
+  ctx: ValidateContext,
+  shape: NonNullable<NonNullable<SlotContract['item']>['shape']>,
+  item: Record<string, unknown>,
+  index: number,
+  requireEvidence: boolean
+): SlotViolation[] => {
+  const violations: SlotViolation[] = []
+
+  for (const [fieldName, field] of Object.entries(shape)) {
+    const raw = item[fieldName]
+    const present = raw !== undefined && raw !== null && raw !== ''
+
+    if (field.required && !present) {
+      violations.push(
+        violation(ctx, 'missing_required_field', `el item ${index} no trae el campo requerido "${fieldName}"`)
+      )
+      continue
+    }
+
+    if (!present) continue
+
+    if (field.maxCharacters !== undefined && typeof raw === 'string' && visibleLength(raw) > field.maxCharacters) {
+      violations.push(
+        violation(
+          ctx,
+          'item_too_long',
+          `item ${index}, campo "${fieldName}": ${visibleLength(raw)} caracteres excede ${field.maxCharacters} (overflow=reject)`
+        )
+      )
+    }
+
+    if (field.values && typeof raw === 'string' && !field.values.includes(raw)) {
+      violations.push(
+        violation(
+          ctx,
+          'disallowed_enum',
+          `item ${index}, campo "${fieldName}": "${raw}" no está en los valores permitidos (${field.values.join(', ')})`
+        )
+      )
+    }
+
+    // Anti-fabricación: un campo puede exigir que otro venga con él (ej. `metric` exige `evidenceRef`).
+    for (const dependency of field.requires ?? []) {
+      const companion = item[dependency]
+
+      if (companion === undefined || companion === null || companion === '') {
+        violations.push(
+          violation(
+            ctx,
+            'missing_evidence_ref',
+            `item ${index}: el campo "${fieldName}" trae un dato ("${String(raw)}") pero falta "${dependency}". ` +
+              `Una cifra sin su fuente no entra a una oferta: dato real del bid, o ilustrativo marcado.`
+          )
+        )
+      }
+    }
+  }
+
+  if (requireEvidence) {
+    const hasMetric = typeof item.metric === 'string' && item.metric.trim() !== ''
+    const hasEvidence = typeof item.evidenceRef === 'string' && item.evidenceRef.trim() !== ''
+
+    if (hasMetric && !hasEvidence) {
+      violations.push(
+        violation(
+          ctx,
+          'missing_evidence_ref',
+          `item ${index}: métrica "${String(item.metric)}" sin evidenceRef. Cifra sin fuente = no se compone.`
+        )
+      )
+    }
+  }
+
+  return violations
+}
+
+const validateArray = (ctx: ValidateContext, contract: SlotContract, value: SlotValue): SlotViolation[] => {
+  if (!Array.isArray(value)) {
+    return [violation(ctx, 'wrong_type', `se esperaba un array, llegó ${typeof value}`)]
+  }
+
+  const violations: SlotViolation[] = []
+  const { minItems, maxItems, maxCharactersPerItem, quantifiedClaimsRequireEvidenceRef } = contract.constraints ?? {}
+
+  if (minItems !== undefined && value.length < minItems) {
+    violations.push(violation(ctx, 'too_few_items', `${value.length} items, el mínimo es ${minItems}`))
+  }
+
+  if (maxItems !== undefined && value.length > maxItems) {
+    violations.push(
+      violation(
+        ctx,
+        'too_many_items',
+        `${value.length} items excede el máximo de ${maxItems}. El renderer NO recorta la lista: quita items o divide la lámina.`
+      )
+    )
+  }
+
+  value.forEach((item, index) => {
+    if (typeof item === 'string') {
+      if (maxCharactersPerItem !== undefined && visibleLength(item) > maxCharactersPerItem) {
+        violations.push(
+          violation(
+            ctx,
+            'item_too_long',
+            `item ${index}: ${visibleLength(item)} caracteres excede ${maxCharactersPerItem} (overflow=reject)`
+          )
+        )
+      }
+
+      return
+    }
+
+    if (isPlainObject(item) && contract.item?.shape) {
+      violations.push(
+        ...validateItemShape(ctx, contract.item.shape, item, index, quantifiedClaimsRequireEvidenceRef === true)
+      )
+    }
+  })
+
+  return violations
+}
+
+/** Valida los slots de UNA lámina contra el contrato de su plantilla. Función pura. */
+export const validateSlide = (slide: SlideSpec, contract: TemplateContract): SlotViolation[] => {
+  const violations: SlotViolation[] = []
+
+  for (const slotName of Object.keys(slide.slots)) {
+    if (!contract.slots[slotName]) {
+      violations.push({
+        slideId: slide.slideId,
+        template: slide.template,
+        slot: slotName,
+        code: 'unknown_slot',
+        message:
+          `la plantilla "${slide.template}" no declara el slot "${slotName}". ` +
+          `El renderer sólo llena slots declarados: no agrega copy ni composición libre.`
+      })
+    }
+  }
+
+  for (const [slotName, contractSlot] of Object.entries(contract.slots)) {
+    const ctx: ValidateContext = { slideId: slide.slideId, template: slide.template, slot: slotName }
+    const value = slide.slots[slotName]
+    const present = value !== undefined && value !== null && value !== ''
+
+    if (!present) {
+      if (contractSlot.required) {
+        violations.push(violation(ctx, 'missing_required', `el slot "${slotName}" es requerido y no vino`))
+      }
+
+      continue
+    }
+
+    switch (contractSlot.type) {
+      case 'string':
+      case 'rich-string':
+        violations.push(...validateStringLike(ctx, contractSlot, value))
+        break
+
+      case 'array':
+      case 'paired-array':
+        violations.push(...validateArray(ctx, contractSlot, value))
+        break
+
+      default:
+        // asset / asset-ref / fixed-asset / object / enum: la forma la valida el resolver de assets.
+        break
+    }
+  }
+
+  return violations
+}
+
+/** Valida el deck completo. Si devuelve algo, NO se compone: se reporta y lo arregla un humano. */
+export const validateDeck = (
+  slides: SlideSpec[],
+  contracts: Map<string, TemplateContract>
+): SlotViolation[] => {
+  const violations: SlotViolation[] = []
+
+  for (const slide of slides) {
+    const contract = contracts.get(slide.template)
+
+    if (!contract) {
+      violations.push({
+        slideId: slide.slideId,
+        template: slide.template,
+        slot: '(plantilla)',
+        code: 'unknown_slot',
+        message: `no existe contrato de slots para la plantilla "${slide.template}"`
+      })
+
+      continue
+    }
+
+    violations.push(...validateSlide(slide, contract))
+  }
+
+  return violations
+}

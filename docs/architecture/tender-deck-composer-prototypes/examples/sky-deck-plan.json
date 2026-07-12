@@ -1,0 +1,183 @@
+{
+  "_readme": [
+    "DeckPlan de referencia — caso SKY. Es el ARTEFACTO AUDITABLE del composer (ADR §5-ter):",
+    "los mismos slots producen el mismo deck. El PDF es una derivación de este JSON, no la fuente.",
+    "",
+    "Este JSON es lo que los tres nodos de juicio (orquestador + chapter-authors + verifier) emiten.",
+    "De aquí abajo TODO es determinista: selector -> validación -> slot-fill -> render.",
+    "",
+    "DATOS: las cifras de la escalera Be X son REALES (medidas por el AI Visibility Grader) y viajan",
+    "con su evidenceRef. Las de pricing son ILUSTRATIVAS y están marcadas como tales: el composer",
+    "rechaza una métrica sin evidencia, pero el precio real lo pone el cotizador (quote-to-cash).",
+    "",
+    "Componer:  pnpm tsx scripts/commercial/compose-tender-deck.ts docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan.json"
+  ],
+
+  "tenderId": "TND-DEMO-SKY",
+
+  "slides": [
+    {
+      "slideId": "diagnostico",
+      "contentType": "one-metric",
+      "template": "StatSplit",
+      "slots": {
+        "eyebrow": "EL DIAGNÓSTICO",
+        "leftVisual": { "src": "assets/clay3d/clay-ai-visibility.png" },
+        "title": "Su marca es <em>legible</em> para los motores de IA, pero no la <em>citan</em>",
+        "narrative": [
+          "Medimos la visibilidad de SKY en los motores de respuesta antes de proponer nada. El diagnóstico no es una opinión: es una corrida del grader sobre 35 respuestas reales.",
+          "El hallazgo duro: <strong>el blog no aparece citado ni una sola vez</strong>. La marca se entiende, pero no es la fuente que el motor usa para responder."
+        ],
+        "outcomesEyebrow": "ESCALERA BE X",
+        "outcomesTitle": "Dónde está SKY hoy, medido",
+        "goals": [
+          {
+            "kind": "visibility",
+            "title": "Ser encontrada",
+            "metric": "40/100",
+            "body": "La marca aparece, pero <strong>pierde el primer plano</strong> frente a competidores regionales.",
+            "evidenceRef": "aeo-run-sky-2026-07"
+          },
+          {
+            "kind": "citability",
+            "title": "Ser correcta",
+            "metric": "37/100",
+            "body": "Cuando el motor responde, <strong>mezcla datos desactualizados</strong> con los vigentes.",
+            "evidenceRef": "aeo-run-sky-2026-07"
+          },
+          {
+            "kind": "coherence",
+            "title": "Ser accionable",
+            "metric": "8/100",
+            "body": "El punto más bajo: <strong>nada de lo que el motor dice lleva a una acción</strong> concreta.",
+            "evidenceRef": "aeo-run-sky-2026-07"
+          },
+          {
+            "kind": "growth",
+            "title": "Ser intrínseca",
+            "metric": "76/100",
+            "body": "La base está: la marca <strong>ya es parte de la categoría</strong> en la respuesta.",
+            "evidenceRef": "aeo-run-sky-2026-07"
+          }
+        ]
+      }
+    },
+
+    {
+      "slideId": "metodo",
+      "contentType": "four-pillars",
+      "template": "FourPillarsFull",
+      "slots": {
+        "sectionLabel": "CÓMO LO HACEMOS",
+        "title": "Cuatro frentes que se sostienen entre sí",
+        "context": [
+          "No proponemos una campaña: proponemos un sistema que se mide.",
+          "Cada frente produce evidencia que alimenta al siguiente."
+        ],
+        "thesis": "El crecimiento se vuelve sostenible cuando <strong>la evidencia guía cada decisión</strong>, no la intuición del mes.",
+        "pillars": [
+          {
+            "kind": "data",
+            "title": "Medir antes de afirmar",
+            "body": "Corremos el grader sobre su marca y su categoría.",
+            "detail": "El punto de partida es un número, no una hipótesis. Se vuelve a medir cada ciclo."
+          },
+          {
+            "kind": "method",
+            "title": "Construir lo citable",
+            "body": "Contenido diseñado para que el motor lo use como fuente.",
+            "detail": "Estructura, evidencia y entidad: las tres cosas que hacen que una respuesta lo cite a usted."
+          },
+          {
+            "kind": "ai",
+            "title": "Operar con agentes",
+            "body": "El equipo opera sobre una plataforma, no sobre planillas.",
+            "detail": "La producción se acelera sin perder el control: cada pieza pasa por revisión humana."
+          },
+          {
+            "kind": "human",
+            "title": "Un squad dedicado",
+            "body": "Personas con nombre y dedicación declarada.",
+            "detail": "No es una bolsa de horas: es un equipo que usted conoce y al que le puede preguntar."
+          }
+        ]
+      }
+    },
+
+    {
+      "slideId": "cumplimiento",
+      "contentType": "requirements-table",
+      "template": "RequirementsTableFull",
+      "slots": {
+        "sectionLabel": "MATRIZ DE CUMPLIMIENTO",
+        "title": "Requisito por requisito, con su evidencia",
+        "summary": {
+          "value": "4/4",
+          "label": "Requisitos excluyentes cubiertos",
+          "detail": "Cada uno con su documento de respaldo adjunto."
+        },
+        "requirements": [
+          {
+            "kind": "excluyente",
+            "requirement": "Experiencia acreditada en marketing digital (3+ años)",
+            "evidence": "Casos acreditados + certificados de cliente (Anexo B)",
+            "status": "cubierto"
+          },
+          {
+            "kind": "excluyente",
+            "requirement": "Equipo con dedicación declarada al proyecto",
+            "evidence": "Squad nominado con % de dedicación (Anexo C)",
+            "status": "cubierto"
+          },
+          {
+            "kind": "puntúa",
+            "requirement": "Metodología con métricas verificables",
+            "evidence": "Escalera Be X + corrida del grader (Anexo D)",
+            "status": "cubierto"
+          },
+          {
+            "kind": "puntúa",
+            "requirement": "Plan de trabajo con hitos y holgura",
+            "evidence": "Cronograma con dependencias (Anexo E)",
+            "status": "cubierto"
+          }
+        ]
+      }
+    },
+
+    {
+      "slideId": "economica",
+      "contentType": "pricing",
+      "template": "PricingFull",
+      "slots": {
+        "sectionLabel": "OFERTA ECONÓMICA — CIFRAS ILUSTRATIVAS",
+        "title": "La inversión, desglosada",
+        "summary": {
+          "amount": "UF 000",
+          "period": "Valor mensual — cifra ilustrativa, no cotizada",
+          "taxNote": "Cifras de ejemplo: el monto real lo emite el cotizador"
+        },
+        "pricingOptions": [
+          {
+            "label": "Plan base",
+            "status": "Ilustrativo",
+            "scope": "Diagnóstico + contenido citable + medición mensual",
+            "amount": "UF 000",
+            "isProposed": true
+          },
+          {
+            "label": "Plan ampliado",
+            "status": "Ilustrativo",
+            "scope": "Lo anterior + squad dedicado + operación con agentes",
+            "amount": "UF 000",
+            "isProposed": false
+          }
+        ],
+        "commercialTerms": [
+          { "label": "Reajuste", "value": "UF (sin reajuste adicional)" },
+          { "label": "Forma de pago", "value": "Mensual, 30 días desde la factura" }
+        ]
+      }
+    }
+  ]
+}

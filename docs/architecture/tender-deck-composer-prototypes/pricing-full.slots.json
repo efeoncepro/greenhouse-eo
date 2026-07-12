@@ -37,7 +37,7 @@
           "status": { "type": "string", "required": false, "maxCharacters": 14, "maxLines": 1 },
           "scope": { "type": "string", "required": true, "maxCharacters": 96, "maxLines": 2 },
           "amount": { "type": "string", "required": true, "maxCharacters": 20, "maxLines": 1 },
-          "isProposed": { "type": "boolean", "required": true, "description": "exactly one option must be true; renders the fixed proposed-state treatment" }
+          "isProposed": { "type": "boolean", "required": true, "resolver": "pricing-option-tone", "description": "exactly one option must be true; renders the fixed proposed-state treatment" }
         }
       }
     },
