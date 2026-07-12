@@ -107,6 +107,13 @@ export type RecordProposalEvidenceActionInput = z.infer<typeof recordProposalEvi
  * brand pack + fuentes + validadores). El agente lo transporta verbatim; el command re-valida su
  * shape v1 y RECHAZA cualquier manifest con un validador en rojo.
  *
+ * ⚠️ `.passthrough()` NO es opcional acá, es LOAD-BEARING. Zod, por defecto, **borra las claves que
+ * no declara** — y el `ResolvedCompositionManifest` lleva campos que este schema no enumera (el
+ * `input` del autor, que es lo que le permite al manifest explicar de dónde salió). Sin passthrough,
+ * el manifest que se persiste NO sería el que el composer resolvió, su `manifestHash` sería otro, y
+ * el MISMO deck pedido por la API y por Nexa produciría DOS jobs distintos en vez de uno idempotente.
+ * El manifest se valida, no se reescribe.
+ *
  * En F0 el plan del deck todavía vive como archivo del repo (gap declarado en la task): por eso esta
  * acción recibe el manifest ya resuelto. Cuando el plan sea una entidad del dominio, la firma se
  * simplifica a `planId` y el agente deja de transportar nada.
@@ -118,30 +125,36 @@ export const requestProposalRenderActionSchema = z.object({
   outputTarget: z.enum(['pdf-merged', 'png-set']),
   /** Ids de evidencia que el artefacto CITA (el gate resuelve su audience real y falla cerrado). */
   evidenceIds: z.array(z.string().min(1)).default([]),
-  /** ResolvedCompositionManifest producido por `resolvePlan`. */
-  manifest: z.object({
-    manifestVersion: z.number(),
-    artifactId: z.string(),
-    catalog: z.object({
-      name: z.string(),
-      version: z.string(),
-      registryHash: z.string(),
-      ownerOrgId: z.string()
-    }),
-    slides: z.array(z.record(z.string(), z.unknown())),
-    brandPack: z.object({ name: z.string(), hash: z.string() }).nullable(),
-    fonts: z
-      .array(z.object({ family: z.string(), variant: z.string(), checksum: z.string() }))
-      .nullable(),
-    validators: z.array(
-      z.object({
-        name: z.string(),
-        version: z.string(),
-        result: z.string(),
-        violations: z.array(z.string())
-      })
-    )
-  })
+  /** ResolvedCompositionManifest producido por `resolvePlan` — VERBATIM (ver passthrough arriba). */
+  manifest: z
+    .object({
+      manifestVersion: z.number(),
+      artifactId: z.string(),
+      catalog: z
+        .object({
+          name: z.string(),
+          version: z.string(),
+          registryHash: z.string(),
+          ownerOrgId: z.string()
+        })
+        .passthrough(),
+      slides: z.array(z.record(z.string(), z.unknown())),
+      brandPack: z.object({ name: z.string(), hash: z.string() }).passthrough().nullable(),
+      fonts: z
+        .array(z.object({ family: z.string(), variant: z.string(), checksum: z.string() }).passthrough())
+        .nullable(),
+      validators: z.array(
+        z
+          .object({
+            name: z.string(),
+            version: z.string(),
+            result: z.string(),
+            violations: z.array(z.string())
+          })
+          .passthrough()
+      )
+    })
+    .passthrough()
 })
 
 export type RequestProposalRenderActionInput = z.infer<typeof requestProposalRenderActionSchema>
