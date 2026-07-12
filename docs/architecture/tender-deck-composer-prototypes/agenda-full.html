@@ -71,7 +71,7 @@
   // el <a class="ch"> es el BLUEPRINT del item de `chapters` (array slot):
   // href="#<targetSlideId>" lo resuelve el composer (resolver: chapter-anchor), no es texto.
   document.getElementById('grid').innerHTML = chapters.map(([n,t,d,id]) =>
-    `<a class="ch" href="#${id}"><div class="n" data-slot-field="number">${n}</div><div><div class="t" data-slot-field="title">${t}</div><div class="d" data-slot-field="description">${d}</div></div></a>`).join('');
+    `<a class="ch" href="#${id}"><div class="n" data-slot-field="number">${n}</div><div><div class="t" data-slot-field="title">${t}</div><div class="d" data-slot-field="description">${d}</div>  <img class="deck-url-bubble signature-AgendaFull" src="assets/url-lum.svg" alt="efeoncepro.com">
+  </div></a>`).join('');
 </script>
-  <img class="deck-url-bubble signature-AgendaFull" src="assets/url-lum.svg" alt="efeoncepro.com">
 </body></html>

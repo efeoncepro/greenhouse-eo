@@ -86,7 +86,7 @@
   document.getElementById('members').innerHTML = team.map(([ic,role,desc,pct]) =>
     `<div class="member"><div class="av"><svg viewBox="0 0 24 24">${I[ic]}</svg></div>`
     + `<div class="m"><div class="role" data-slot-field="role">${role}</div><div class="rdesc" data-slot-field="description">${desc}</div></div>`
-    + `<div class="ded"><div class="pct" data-slot-field="dedication">${pct}%</div><div class="lbl">dedicación</div></div></div>`).join('');
+    + `<div class="ded"><div class="pct" data-slot-field="dedication">${pct}%</div><div class="lbl">dedicación</div></div>  <img class="deck-url-bubble signature-TeamSplit" src="assets/url-lum.svg" alt="efeoncepro.com">
+  </div>`).join('');
 </script>
-  <img class="deck-url-bubble signature-TeamSplit" src="assets/url-lum.svg" alt="efeoncepro.com">
 </body></html>

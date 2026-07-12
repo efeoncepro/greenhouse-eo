@@ -187,6 +187,26 @@ describe('componibilidad del catálogo', () => {
           // Si la plantilla no es componible, `fillSlide` ABORTA — y ese throw es el fallo del test.
           await expect(fill).resolves.not.toThrow()
 
+          // La firma usa `mix-blend-mode: luminosity`, y **un blend se mezcla con el backdrop de su
+          // contexto de apilamiento**. Si la burbuja vive FUERA del `.slide` (hermana, hija de
+          // `<body>`), no tiene el degradado debajo en su mismo contexto y **se pinta plana**.
+          //
+          // Bug real (deck SKY): 10 de las 25 la tenían fuera. Se detectó MIRANDO el PDF —en unas
+          // láminas la firma se fundía y en otras no—. No era del renderer ni del formato: era DÓNDE
+          // vivía la burbuja en el DOM. Este guard lo vuelve imposible.
+          const signatureInsideSlide = await page.evaluate(() => {
+            const bubble = document.querySelector('.deck-url-bubble')
+
+            if (!bubble) return 'no-signature'
+
+            return bubble.closest('.slide') ? 'inside' : 'outside'
+          })
+
+          expect(
+            signatureInsideSlide,
+            `${entry.name}: la firma está FUERA del .slide → mix-blend-mode se queda sin backdrop y se pinta plana. Muévela dentro del elemento .slide.`
+          ).not.toBe('outside')
+
           return
         }
 
