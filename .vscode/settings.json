@@ -1,4 +1,11 @@
 {
+  // Python: este repo es TypeScript/Next. Los ~18 .py son scripts sueltos y un servicio legacy —
+  // nadie los edita acá. Pylance levantaba un language server que reventaba con `spawn EBADF`
+  // (ISSUE: crash del extension host, 2026-07-12) y se llevaba la ventana de VS Code por delante.
+  // `None` apaga el language server sin desinstalar nada. Si algún día hay que tocar Python, se
+  // revierte a "Default" puntualmente.
+  "python.languageServer": "None",
+  "python.analysis.autoImportCompletions": false,
   // JS
   "javascript.updateImportsOnFileMove.enabled": "always",
   // JSON
