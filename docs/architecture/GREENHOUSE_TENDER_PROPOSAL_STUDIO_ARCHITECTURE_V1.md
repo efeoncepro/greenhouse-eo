@@ -46,11 +46,18 @@ contra él **sin actualizarlo**. Lo que sigue es la foto verificada contra el re
 sin Task Closing Quality Gate), mientras este doc decía que la implementación la autorizaba "la task de
 F1". Se registra para que no se repita: **todo hito siguiente nace con TASK + lifecycle + gates.**
 
-**El siguiente hito YA tiene task y está bloqueado a propósito — `TASK-1391`** (Tender Deck Renderer:
-worker, cola y artifact pipeline). Lleva el composer de **CLI local** a **capability gobernada**: Cloud Run
-Job dedicado con Chromium, outbox/cola con backpressure, artefactos versionados (PDF + PNGs + provenance)
-en el asset store, command/reader idempotentes y señales operativas. **Blocked by:** autorización de la
-próxima frontera de deployable de **EPIC-027** + la foundation mínima del aggregate `Tender`.
+**El siguiente hito es `TASK-1392` (F0, Tender Proposal Studio Foundation)**: materializa el aggregate,
+state machine DB, assets/intake y el **Tender Intake Agent Contract** (contexto/tool surface estructurado →
+propuesta trazable → confirmación humana → command canónico). No es CRUD para conectar después: el agente
+usa las mismas capabilities que API/UI/Nexa/MCP y jamás escribe directo. **Blocked by:** arbitraje del
+ownership `RESEARCH-007 → Tender` antes de crear `greenhouse_commercial.tenders`.
+
+`TASK-1391` queda como su sucesora: lleva el composer de **CLI local** a capability agentic de artefactos
+mediante un `Tender Render Agent` acotado (contexto/tools allowlisted → `TenderRenderProposal` trazable →
+confirmación humana → command canónico), Cloud Run Job dedicado con Chromium, outbox/cola con backpressure,
+outputs versionados (PDF + PNGs + provenance), command/reader idempotentes y señales. El agente no puede
+encolar, invocar `jobs.run`, ejecutar Chromium ni publicar artefactos. **Blocked by:** `TASK-1392` +
+autorización de la próxima frontera de deployable de **EPIC-027**.
 
 ⚠️ Regla dura que TASK-1391 protege: **el render pesado NUNCA corre en Vercel ni en el `ops-worker`**
 (bloquearía el publisher del outbox). Va en un `tender-worker` dedicado — y un deployable nuevo requiere
@@ -399,7 +406,7 @@ Es el patrón canónico **un modelo → N renderers** (espejo del **Report Artif
 
 | Fase | Entrega | Depende de |
 |---|---|---|
-| **F0 — Esqueleto** | Aggregate `Tender` + state machine + `tender_assets` + intake (crear + subir RFP + ver estado). **Sin IA.** | — |
+| **F0 — Esqueleto agentic** | Aggregate `Tender` + state machine + `tender_assets` + intake (crear + subir RFP + ver estado) + contexto/tools tipados para que el agente proponga intake y el humano confirme el mismo command. **Sin análisis IA autónomo.** | `TASK-1392` |
 | **F1 — Análisis + admisibilidad** | Fan-out de lectura → requisito-set + matriz de admisibilidad automática + fit score → gate humano. | F0 |
 | **F2 — Producción** | Enganchar lo que YA funciona como capabilities: grader/worker, squad, pricing, redacción (registro formal) → técnica + económica base. | F1 |
 | **F3 — Económica adapter** | Contrato `TenderQuote` de 3 vías + enganche del cotizador `quote-to-cash`. | F2 |

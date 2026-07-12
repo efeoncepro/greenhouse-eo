@@ -36888,4 +36888,10 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 # Handoff — 2026-07-12 · Render de decks: Cloud Run Job (propuesto)
 
 - La ejecución final del Tender Deck Composer queda documentada como `tender-worker` **Cloud Run Job**, no service HTTP: una tarea/ejecución por `DeckPlan` inmutable, iniciada desde job persistido + outbox dispatcher y terminando en asset store/audit. `ops-worker` puede despachar/reconciliar el job liviano, pero jamás ejecutar Chromium; Cloud Tasks es opcional sólo como backpressure del dispatcher.
-- [`TASK-1391`](docs/tasks/to-do/TASK-1391-tender-deck-renderer-worker-artifact-pipeline.md) registra la foundation backend-data: source de truth del job, idempotencia, constraints del RFP, Chromium/fuentes herméticos, artefactos, signals, staging benchmark y rollback. Está bloqueada hasta autorización de frontera de `EPIC-027` y foundation runtime de Tender/tender_assets.
+- [`TASK-1391`](docs/tasks/to-do/TASK-1391-tender-deck-renderer-worker-artifact-pipeline.md) registra la foundation backend-data como capability agentic de artefactos: `TenderRenderContext`/tools allowlisted → propuesta trazable → confirmación humana → command canónico; luego source de truth del job, idempotencia, constraints del RFP, Chromium/fuentes herméticos, artefactos, signals, staging benchmark y rollback. El agente no encola ni ejecuta/publica. Está bloqueada hasta autorización de frontera de `EPIC-027` y foundation runtime de Tender/tender_assets.
+
+# Handoff — 2026-07-12 · Tender Proposal Studio F0 agentic
+
+- Se creó [`TASK-1392`](docs/tasks/to-do/TASK-1392-tender-proposal-studio-foundation.md) como predecessor de TASK-1391. F0 no se implementa como CRUD: incluye aggregate/state machine/assets/intake y `Tender Intake Agent Contract` (contexto allowlisted + tools sobre primitives + propuesta tipada/trazable/evaluable + confirmación humana que ejecuta el mismo command).
+- Está bloqueada por el arbitraje de ownership de `greenhouse_commercial.tenders` entre RESEARCH-007 y Tender Proposal Studio. No crear tabla paralela ni habilitar al LLM a mutar estado, assets o gates humanos.
+- Ambas tasks quedan registradas como hijas de `EPIC-027`: `TASK-1392` permanece en el modular monolith; `TASK-1391` es sólo el candidato de próxima frontera y sigue bloqueada hasta el `continue|pause|stop` explícito del epic.

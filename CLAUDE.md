@@ -43,6 +43,14 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Research + Benchmark (market/competitive/VoC · benchmark/AI SoV · CI · para Efeonce y clientes) | `research-benchmark-operator` (+ `deep-research` harness, `seo-aeo`, `commercial-expert`) | inline (2 carriles; método+rigor, ejecución→deep-research; evidencia con as-of, NO memoria) |
 | Go-to-Market (segmento/ICP · positioning/category · offer/pricing · motion PLG/sales/ecosystem · funnel/bow-tie · launch · GTM economics · para Efeonce y clientes) | `gtm-architect` (orquesta `commercial-expert`/demanda/`research-benchmark`/`gtm-ga4`) | inline (estrategia+orquestación; commercial-expert ejecuta la venta; doctrina ASaaS/bow-tie manda) |
 
+### Tender pointer — `TASK-1392 → TASK-1391`
+
+Al tocar licitaciones, cargar `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` y el §0 de la arquitectura de Tender.
+El composer F1 es sólo CLI; el runtime empieza con `TASK-1392`: `tender_asset.audience` explícito y
+`contexto allowlisted → propuesta tipada → confirmación humana → command canónico`. El LLM no escribe ni
+cruza gates. `TASK-1391` es después un candidato bloqueado de `EPIC-027` para `tender-worker`; no autoriza
+Vercel/`ops-worker`/Cloud Run directo ni la creación anticipada del deployable.
+
 ### Business Context Pack
 
 - `docs/context/` es el context pack de negocio, marca, GTM, producto y experiencia cliente de Efeonce/Greenhouse. Empezar por `docs/context/00_INDEX.md`.
