@@ -98,6 +98,23 @@ Antes de dar la propuesta por lista, pásala por **tres lentes** que suelen expo
 
 Regla: si las tres lentes no pasaron, la propuesta **no está lista** aunque el texto se lea bien.
 
+### Fase 9-bis — El deck (composición, no diseño)
+
+**Cargar `deck-visual-system.md`.** El deck de la propuesta (técnica o de presentación ejecutiva)
+**se compone desde un catálogo cerrado de 25 plantillas** — **nunca** se dibuja freehand. Se elige la
+plantilla por el tipo de contenido (selector determinista, `registry.json`) y se rellenan sus slots.
+
+Las que **puntúan o evitan el descarte** son T1 y no son opcionales: **matriz de cumplimiento**
+(`RequirementsTableFull` — evita el descarte), **cronograma** (`TimelineFull`), **equipo**
+(`TeamSplit` — el evaluador cruza CV vs requisito) y **económica** (`PricingFull`).
+
+Reglas duras que se cruzan con este playbook:
+
+- **Cifras:** reales del bid o **ilustrativas marcadas**. Nunca fabricadas (principio 4, anti-humo).
+- **Equipo: fotos REALES, nunca caras IA.** El evaluador cruza el CV contra la persona → una cara
+  fabricada es **tergiversación**, no un tema estético (ver `compliance-riesgo-integridad.md`).
+- **Registro institucional (de usted)** en todo lo client-facing.
+
 ### Fase 10 — Presentación human-in-control
 - **La oferta la sube un humano** a la plataforma, con comprobante guardado. El agente/skill **prepara**; **nunca envía ni firma**. Confirmaciones sensibles (ej. "sin demandas contra el comprador") las valida el operador.
 

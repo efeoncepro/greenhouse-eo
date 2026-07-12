@@ -72,6 +72,17 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 - **No engine keeps a logo pixel-exact** (~90% redraw). If the mark must be exact, mask its region and re-stamp the real vector (e.g. `public/branding/SVG/isotipo-efeonce-negativo.svg`) by composition. With `gpt-image-2` the logo is faithful enough that this is optional.
 - **Background:** `gpt-image-2` returns opaque. `pnpm ai:image:rmbg` cuts it to transparent with **AI matting** (soft, professional hair edges) instead of color-key/flood-fill, which leaves "bitten" edges and white halos. Free/local matting; do not spend Higgsfield/Magnific credits on this. Engine = `@imgly/background-removal-node` (model `medium` default; `small` for speed — `large` is NOT bundled in v1.4.5). Its native deps (`onnxruntime-node` + a nested `sharp`) are approved via `pnpm.onlyBuiltDependencies` in `package.json`, so a plain `pnpm install` builds them; first run has a few-seconds model warm-up.
 - **Human-review every variant against the anchor** for identity drift before keeping it.
+
+## Icon / asset SET craft (lessons from `2026-07-11_tender-deck-clay3d`)
+
+When the deliverable is a **set** of assets (icon family, illustration library) rather than a single image:
+
+- **Judge the set COMPOSED on its real background, never asset-by-asset.** Build a contact sheet on the actual surface color and look at it. An asset that reads fine in isolation can break the cohesion of the group — and cohesion is the whole point of a set. In that run, the first curation passed asset-by-asset and then **half of it collapsed** the moment it was composited on the real navy.
+- **Curate before you generate.** Check whether the team already produced the assets (e.g. the OneDrive clay libraries). But **a pre-existing library is not automatically usable**: define explicit filters up front (subject type · palette · render language · no baked-in text) and **enforce them even when it means regenerating everything**. Convenience does not override the criterion.
+- **Never bake text into a reusable asset.** A clay icon with the word "SEO" modeled into it is dead the moment the concept changes. Prompt hard: *"absolutely NO text, NO letters, NO numbers, NO logos"* — and re-check the render, because models sneak glyphs in.
+- **Matting eats white objects.** `@imgly/background-removal-node` will devour a white/cream subject sitting on a light studio background — it reads as background. If the subject must be light, **generate it in color** instead of trying to rescue it at cutout time.
+- **Never `sharp.trim()`** an asset whose background is semi-transparent: it leaves a visible halo rectangle. Use the matting path.
+- **Prompt the negative space of the concept, not just the concept.** Asking for "ascending steps" yields a **bar chart** (which then collides with your metrics icon). Spell out what it must NOT be: *"do NOT make ascending bars, do NOT make a bar chart, equal-height platforms"*.
 - **Log durable generations in `ai-generations/`** (repo, not `.captures/`): one subfolder per run named `YYYY-MM-DD_<semantic>/` with `README.md` (verbatim prompts) + `manifest.json`, plus a row in `ai-generations/INDEX.md`. Worked example: `ai-generations/2026-07-05_nexa-fallback-characters/` — the 3D Nexa character (`public/images/illustrations/characters/greenhouse-*.png`) posed per fallback `kind`.
 
 ## Provider Choice
