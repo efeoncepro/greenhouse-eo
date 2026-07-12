@@ -15,16 +15,52 @@
 /* La portada y contraportada ya contienen la burbuja canónica como asset semántico. */
 [data-template='AgendaFull'] .r { display:none; }
 
-/* En splits con marca a la izquierda, la firma queda fuera del cuerpo sobre el mismo campo oscuro. */
+/* Centro global: hay una banda negativa real bajo el contenido. No usar transform: rompería luminosity. */
+.signature-AgendaFull,
+.signature-CardGridFull {
+  left:0;
+  right:0;
+  margin-inline:auto;
+  bottom:36px;
+}
+
+/* Centro del campo oscuro izquierdo: la firma pertenece al bloque de marca, no al borde del canvas. */
 .signature-BulletListSplit,
 .signature-DualListSplit,
 .signature-MetricsSplit,
 .signature-StatSplit,
 .signature-TeamSplit,
 .signature-SectionDividerSplit {
-  right:auto;
-  left:42px;
+  left:0;
+  margin-inline:auto;
   bottom:36px;
+}
+.signature-BulletListSplit { right:calc(100% - 912px); }
+.signature-DualListSplit { right:calc(100% - 960px); }
+.signature-MetricsSplit,
+.signature-SectionDividerSplit { right:calc(100% - 1040px); }
+.signature-StatSplit { right:calc(100% - 1004px); }
+.signature-TeamSplit { right:calc(100% - 812px); }
+
+/* QuoteSplit: el statement deja una banda de cierre centrada dentro del campo de marca derecho. */
+.signature-QuoteSplit {
+  left:760px;
+  right:0;
+  margin-inline:auto;
+  bottom:36px;
+}
+
+/* La banda inferior está ocupada: firma lateral superior, antes del recorrido de lectura. */
+.signature-DualTextSplit {
+  top:48px;
+  right:56px;
+  bottom:auto;
+}
+.signature-EvidenceStoryGrid {
+  top:54px;
+  right:auto;
+  bottom:auto;
+  left:940px;
 }
 
 /* Estas superficies llevan contenido claro en el borde inferior o derecho. */

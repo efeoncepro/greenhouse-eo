@@ -1,3 +1,10 @@
+## Sesión 2026-07-12 — Tender Deck Composer: firma `efeoncepro.com` reanclada por composición
+
+- La burbuja URL deja de caer por defecto en la esquina inferior derecha. Ahora se centra dentro de la banda negativa que realmente pertenece a la firma: canvas completo en `AgendaFull`/`CardGridFull`, campo oscuro en `BulletListSplit`, `DualListSplit`, `MetricsSplit`, `StatSplit`, `TeamSplit`, `SectionDividerSplit` y `QuoteSplit`.
+- Cuando el eje inferior está ocupado, conserva o adopta un lateral seguro: `DualTextSplit` pasa a la banda superior derecha y `EvidenceStoryGrid` a la banda superior izquierda de su panel oscuro, sin tapar el cierre narrativo. Se preservan los placements que ya funcionaban y `HighlightWave` sigue sin firma por falta de área oscura viable.
+- Canon: `docs/architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → `Firma de URL`; implementación: `docs/architecture/tender-deck-composer-prototypes/deck-signature.css`. Previews regenerados y revisados a 1920×1080; el SVG canónico y `mix-blend-mode: luminosity` se mantienen sin `transform`.
+- Coordinación: había cambios concurrentes ajenos en `four-pillars-full.html`, `human-impact-full.html`, `src/lib/commercial/tenders/deck/render.ts` y el test no rastreado `template-geometry.test.ts`; no se modificaron ni se incluyen en este ajuste de firma.
+
 ## Sesión 2026-07-11 — Tender Deck Composer: expresión `Empower your` canonizada en Figma
 
 - Se canonizó la familia exclusiva de **decks AXIS** `Empower your …` en Figma `Sistema Axis - PPT`: componente `Deck / Expression / Empower Your` con variantes `Growth`, `Brand`, `Engine` y `Voice`; fragmentos `Empower` (Poppins ExtraBold Italic), `your` (Poppins ExtraBold) y sufijo (Poppins Black Italic).
