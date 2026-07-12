@@ -362,6 +362,17 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 - Task de runtime para `ContextualVisualSlot` sólo después de que este pipeline provea asset lineage/versioning reutilizable.
 - Decisión de habilitar PPTX editable como renderer secundario sólo si un RFP concreto lo exige.
 
+## Delta 2026-07-12 — el worker renderiza CATÁLOGOS, no "el deck" (ADR Accepted)
+
+**ADR `GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md` (Accepted 2026-07-12) manda sobre esta task.** Cuatro deltas:
+
+1. **Nueva predecesora dura: `TASK-1393`** (extracción del motor a `src/lib/artifact-composer/**` + catálogos + brand pack). El worker debe renderizar **catálogos**, no "el deck". Si esta task arranca antes, cablea el nombre viejo al Cloud Run Job y hay que rehacerlo.
+2. **El `outputTarget` viene del catálogo**, no del worker: `pdf-merged` (deck 16:9) | `png-set` (carrusel IG 4:5). El merge `pdf-lib` deja de ser *el* final y pasa a ser **un** target. El mismo Job sirve a los dos catálogos.
+3. ⚠️ **La cola NO puede ser FIFO ciega.** Los perfiles de carga son **opuestos**: un deck de licitación es **raro y con deadline duro** (si no entra hoy, se pierde el proceso); un lote de 30 carruseles es **frecuente y sin urgencia**. **NUNCA** dejes que un batch social hambree el deck de un bid que vence mañana → la cola necesita **prioridad por catálogo/deadline**. Los pesos se fijan con datos reales de carga, no a ojo.
+4. **El aggregate es `Proposal`, no `Tender`** (ver Delta de TASK-1392): el artefacto se asocia a un `proposalId`, y las tablas/assets son `proposal_*`.
+
+**Frontera con Creative Studio (se está construyendo):** el `tender-worker` [nombre a revisar → `artifact-worker`] renderiza con el Composer; **Creative Studio será consumer del paquete, nunca una reimplementación**. Foundry **genera** el pixel, el Composer **compone** el frame.
+
 ## Open Questions
 
 - ¿Cuál es la task que materializa primero `greenhouse_commercial.tenders`/`tender_assets`, o debe nacer como predecessor antes de Slice 1?

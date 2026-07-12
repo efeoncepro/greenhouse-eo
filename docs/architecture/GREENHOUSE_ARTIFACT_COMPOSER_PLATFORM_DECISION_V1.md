@@ -146,6 +146,43 @@ para consumo externo. **Se declara el camino, no se implementa.**
 > a mano se vuelve producto instrumentado"*. El deck de la licitación de SKY es el caso interno que
 > financia el motor; el motor es el que después se vende.
 
+### 6. Frontera con **Efeonce Creative Studio (EPIC-028)** — resuelta
+
+`TASK-1392` ruteaba *"la composición cross-format"* a **Creative Studio**, la plataforma hermana
+(control plane propio, workers propios, créditos, proveedores; ADR `Accepted (direction)`, **sin una sola
+línea de código hoy**). No era un error: su ADR menciona *"set de RRSS"* como flujo curado. **Pero son
+cosas distintas**, y confundirlas produce el fork que este ADR existe para evitar:
+
+| | **Artifact Composer** | **Creative Studio / Media Foundry** |
+|---|---|---|
+| Qué hace | **Compone** el frame: slots → layout → geometría → render | **Genera** el pixel: IA, proveedores, créditos |
+| Naturaleza | **Determinista** (mismos slots → mismo artefacto) | **Generativa** (no determinista) |
+| "Plantilla" significa | contrato de slots + canvas + output target | flujo curado (still-to-video, audio/foley) |
+| Falla si… | el copy no cabe (`overflow: reject`) | el proveedor falla / no hay créditos |
+
+**Decisión (operador, 2026-07-12):** el Composer es un **primitive de Greenhouse**
+(`src/lib/artifact-composer/**`), **extraction-ready**. Razón: **hoy tiene un consumer real (el deck) y
+otro inmediato (el carrusel); Creative Studio todavía no tiene código.** Bloquear el motor esperando una
+plataforma que aún no existe forzaría un fork temporal — exactamente lo que no queremos.
+
+⚠️ **Pero Creative Studio SÍ va a existir — se está construyendo ahora** (operador, 2026-07-12). Eso hace
+que la extracción sea **near-term, no hipotética**, y agrega una obligación **desde el día 1**:
+
+- **El motor nace `package-shaped`**, aunque viva en el monolito: API pública explícita (barrel), **cero
+  deep-imports** desde consumers, dependencias declaradas y **cero Next-isms**.
+- ⚠️ **Blocker concreto ya detectado:** `solar-icons.ts` hace `import 'server-only'` — un **Next-ism que no
+  resuelve fuera de Next**. El CLI ya lo esquiva con un shim (`--require server-only-shim.cjs`), y **ese
+  shim viajaría a Creative Studio**. Se saca del motor: el boundary server/client se marca en el
+  **consumer**, no en un primitive portable. Prueba de portabilidad: **el motor debe correr en Node puro,
+  sin Next y sin shim**.
+- Cuando **EPIC-027** autorice la frontera, el Composer se extrae a `packages/artifact-composer` y
+  **Creative Studio lo CONSUME como paquete**. **NUNCA** lo reimplementa.
+- Un carrusel puede usar **los dos**: Creative Studio/Foundry **genera** la imagen; el Composer **compone**
+  el frame con ella. **NO** se fusionan, **NO** se duplican.
+- **NUNCA** EPIC-028 construye un segundo motor de composición de slots. Si lo necesita, **extrae éste**.
+
+**Task:** `TASK-1393` (extracción + catálogos + brand pack), predecesora de TASK-1391.
+
 ---
 
 ## Alternatives Considered

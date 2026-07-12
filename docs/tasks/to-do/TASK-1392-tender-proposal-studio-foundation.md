@@ -346,6 +346,16 @@ un eventual bridge deberá ser explícito, versionado y minimizar los inputs com
 - F1 — análisis estructurado de RFP, requisito-set, matriz de admisibilidad y fit gate.
 - F5 — UI/Nexa/MCP consumer de las capabilities F0+.
 
+## Delta 2026-07-12 — el aggregate es `Proposal`, no `Tender` (ADR Accepted)
+
+**ADR `GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md` (Accepted 2026-07-12) manda sobre esta task.** Tres cambios **antes** de escribir la migracion — hoy cuestan cero porque la tabla no existe; despues cuestan una migracion con propuestas activas:
+
+1. **`tenders` → `proposals`.** La tabla, el aggregate y los commands nacen como **`Proposal`**, con `origin ∈ {public_tender, private_rfp, direct_sales}`. Razon: **no toda propuesta es una licitacion** — el mismo motor sirve para cualquier propuesta tecnica de venta, y la state machine ya generaliza sola (los 12 estados mapean 1:1 a una venta directa). Se **rechaza `TechnicalProposal`**: nombra **UNA de las TRES partes** (tecnica/economica/administrativa) para referirse al todo. **NUNCA** agregar un `kind` que duplique `origin`. Renombrar tambien `tender_state_transitions`/`tender_assets`/`tender_requirements` a `proposal_*`.
+2. **Nace multi-tenant (ASaaS-ready).** Toda lectura/escritura del `Proposal` y sus assets va **scopeada por org** desde la **primera** migracion (un `WHERE org_id` agregado tarde **siempre** deja un reader sin filtrar), y la capability se gatea por **entitlement per-ORG** (`module_assignments`), **NUNCA** por rol: un rol no se factura, un modulo si.
+3. **El ADR de ownership sigue vigente tal cual**: RESEARCH-007 sigue dueño de `public_tender*`; la promocion ahora crea un **`Proposal` con `origin=public_tender`**.
+
+**Correccion de routing:** la nota *"la composicion cross-format queda en Creative Studio/EPIC-028"* queda **superseded**. El motor de composicion es un **primitive de Greenhouse** (`src/lib/artifact-composer/**`, **TASK-1393**), y Creative Studio sera un **consumer del paquete**, **nunca** una reimplementacion. Creative Studio **compone flujos de generacion** (pixel); el Composer **compone frames** (layout determinista) — son cosas distintas y **no se fusionan**.
+
 ## Open Questions
 
 - ¿RESEARCH-007 escribe `tenders` directamente mediante el command F0 o emite un handoff/outbox que Tender consume? Resolverlo en Slice 0 con una sola escritura canónica.
