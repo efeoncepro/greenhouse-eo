@@ -17,8 +17,10 @@
  * estén embebidas, bloquear `http(s)://**` acá y el render pasa a ser hermético.
  */
 
+import fs from 'node:fs/promises'
 import path from 'node:path'
 
+import { PDFDocument } from 'pdf-lib'
 import type { Browser, Page } from 'playwright'
 
 import type { SlideSpec, SlotContract, SlotValue, TemplateContract } from './contracts'
@@ -363,6 +365,34 @@ export const fillSlide = async (
   // Las fuentes pueden re-layoutear tras escribir el copy: esperar de nuevo evita capturar un frame
   // con el fallback de sistema (un deck con la tipografía equivocada es un deck fuera de marca).
   await page.evaluate(() => document.fonts.ready)
+}
+
+/**
+ * Ensambla las láminas en UN PDF de N páginas — el entregable real de una oferta.
+ *
+ * Cada lámina se imprime por el MISMO camino ya probado (`page.pdf()`, una página, tamaño exacto del
+ * canvas) y después se mergean los documentos con `pdf-lib`.
+ *
+ * Se descartó la alternativa de embeber las láminas en un solo HTML: cada plantilla es un documento
+ * completo con su propio CSS (todas definen `.slide`, `.brand`, `.eyebrow`…), así que concatenarlas
+ * haría que los estilos de una pisen a los de otra. Aislarlas con iframes funcionaría, pero deja la
+ * impresión a merced de cómo Chromium pagina iframes y de que las fuentes de cada frame estén listas
+ * a tiempo. Imprimir + mergear no tiene ninguno de esos modos de falla.
+ */
+export const mergeSlidePdfs = async (slidePdfPaths: string[], outPath: string): Promise<void> => {
+  const deck = await PDFDocument.create()
+
+  for (const slidePath of slidePdfPaths) {
+    const bytes = await fs.readFile(slidePath)
+    const slideDoc = await PDFDocument.load(bytes)
+    const pages = await deck.copyPages(slideDoc, slideDoc.getPageIndices())
+
+    for (const page of pages) {
+      deck.addPage(page)
+    }
+  }
+
+  await fs.writeFile(outPath, await deck.save())
 }
 
 export const renderSlide = async (

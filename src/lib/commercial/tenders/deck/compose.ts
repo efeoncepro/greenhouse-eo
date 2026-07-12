@@ -16,7 +16,7 @@ import { chromium } from 'playwright'
 
 import type { DeckPlan, SlideSpec, SlotViolation, TemplateContract, TemplateName } from './contracts'
 import { auditRegistry, findTemplate, selectTemplate, type DeckRegistry } from './selector'
-import { renderSlide } from './render'
+import { mergeSlidePdfs, renderSlide } from './render'
 import { validateDeck } from './validate'
 
 export interface DeckAssets {
@@ -95,20 +95,70 @@ export const planSlides = (
 export interface ComposeResult {
   deckPlan: DeckPlan
   slidePaths: string[]
+  /** El entregable: un PDF de N páginas. */
+  pdfPath: string
+  pdfBytes: number
+  /** Advertencias que NO frenan la composición, pero el humano debe ver antes de subir la oferta. */
+  warnings: string[]
+}
+
+export interface ComposeOptions {
+  /**
+   * Cuántas láminas se renderizan a la vez. Cada una es una página de Chromium: subirlo acelera
+   * (un deck de 25 láminas en serie son ~40s), pero cada página cuesta RAM. 4 es un punto sano.
+   */
+  concurrency?: number
+  /**
+   * Límite de tamaño del PDF, en MB.
+   *
+   * ⚠️ Esto NO es performance: en una licitación es **admisibilidad**. Los portales (Mercado Público,
+   * Wherex) rechazan archivos sobre cierto peso, y una oferta que no sube queda fuera del proceso.
+   * Default 20 MB, que es el techo típico. Ajustalo al que diga el RFP.
+   */
+  maxPdfMb?: number
+}
+
+const DEFAULT_CONCURRENCY = 4
+const DEFAULT_MAX_PDF_MB = 20
+
+/** Corre las tareas de a `limit` en paralelo, preservando el orden del resultado. */
+const mapWithConcurrency = async <T, R>(
+  items: T[],
+  limit: number,
+  task: (item: T, index: number) => Promise<R>
+): Promise<R[]> => {
+  const results: R[] = new Array(items.length)
+  let cursor = 0
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (cursor < items.length) {
+      const index = cursor++
+
+      results[index] = await task(items[index]!, index)
+    }
+  })
+
+  await Promise.all(workers)
+
+  return results
 }
 
 /**
  * Compone el deck: valida TODO antes de renderizar NADA.
  *
- * El orden importa. Validar lámina por lámina mientras se renderiza dejaría un deck a medio
- * producir cuando la lámina 7 falla — y un PDF parcial de una oferta es peor que ningún PDF: parece
- * completo. Se valida el deck entero, y si algo falla, no se emite nada.
+ * El orden importa. Validar lámina por lámina mientras se renderiza dejaría un deck a medio producir
+ * cuando la lámina 7 falla — y un PDF parcial de una oferta es peor que ningún PDF: parece completo.
+ * Se valida el deck entero, y si algo falla, no se emite nada.
  */
 export const composeDeck = async (
   assets: DeckAssets,
   deckPlan: DeckPlan,
-  outDir: string
+  outDir: string,
+  options: ComposeOptions = {}
 ): Promise<ComposeResult> => {
+  const concurrency = options.concurrency ?? DEFAULT_CONCURRENCY
+  const maxPdfMb = options.maxPdfMb ?? DEFAULT_MAX_PDF_MB
+
   const registry = await loadRegistry(assets)
 
   const contracts = new Map<TemplateName, TemplateContract>()
@@ -131,23 +181,43 @@ export const composeDeck = async (
   await fs.writeFile(path.join(outDir, 'deck-plan.json'), JSON.stringify(deckPlan, null, 2), 'utf8')
 
   const browser = await chromium.launch()
-  const slidePaths: string[] = []
 
   try {
-    for (const [index, slide] of deckPlan.slides.entries()) {
+    const rendered = await mapWithConcurrency(deckPlan.slides, concurrency, async (slide, index) => {
       const contract = contracts.get(slide.template)!
       const entry = findTemplate(registry, slide.template)!
       const templateHtmlPath = path.join(assets.templatesDir, entry.prototype)
+      const stem = path.join(outDir, `${String(index + 1).padStart(2, '0')}-${slide.slideId}`)
 
-      const outPath = path.join(outDir, `${String(index + 1).padStart(2, '0')}-${slide.slideId}.png`)
+      // El PNG es para revisión visual; el PDF (vectorial) es lo que se ensambla en el entregable.
+      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'png', outPath: `${stem}.png` })
+      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'pdf', outPath: `${stem}.pdf` })
 
-      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'png', outPath })
+      return { png: `${stem}.png`, pdf: `${stem}.pdf` }
+    })
 
-      slidePaths.push(outPath)
+    const pdfPath = path.join(outDir, `${deckPlan.tenderId}.pdf`)
+
+    await mergeSlidePdfs(
+      rendered.map(slide => slide.pdf),
+      pdfPath
+    )
+
+    const { size: pdfBytes } = await fs.stat(pdfPath)
+    const warnings: string[] = []
+    const pdfMb = pdfBytes / 1_048_576
+
+    if (pdfMb > maxPdfMb) {
+      warnings.push(
+        `El PDF pesa ${pdfMb.toFixed(1)} MB y supera el límite de ${maxPdfMb} MB. ` +
+          `En una licitación esto es ADMISIBILIDAD, no performance: si el portal rechaza el archivo, ` +
+          `la oferta queda fuera. Causa habitual: el merge no deduplica imágenes — un asset repetido ` +
+          `en N láminas se embebe N veces. Bajá el peso de los assets o dividí el deck.`
+      )
     }
+
+    return { deckPlan, slidePaths: rendered.map(slide => slide.png), pdfPath, pdfBytes, warnings }
   } finally {
     await browser.close()
   }
-
-  return { deckPlan, slidePaths }
 }

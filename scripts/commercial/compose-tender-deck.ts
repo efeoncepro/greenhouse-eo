@@ -32,7 +32,11 @@ const main = async () => {
   console.log(`\ncomponiendo "${deckPlan.tenderId}" — ${deckPlan.slides.length} láminas\n`)
 
   try {
-    const { slidePaths } = await composeDeck({ templatesDir: TEMPLATES_DIR }, deckPlan, outDir)
+    const { slidePaths, pdfPath, pdfBytes, warnings } = await composeDeck(
+      { templatesDir: TEMPLATES_DIR },
+      deckPlan,
+      outDir
+    )
 
     for (const [i, slidePath] of slidePaths.entries()) {
       const slide = deckPlan.slides[i]!
@@ -40,7 +44,12 @@ const main = async () => {
       console.log(`  ✓ ${slide.contentType.padEnd(20)} → ${slide.template.padEnd(22)} ${path.basename(slidePath)}`)
     }
 
-    console.log(`\n  deck-plan.json (artefacto auditable) + ${slidePaths.length} láminas → ${outDir}\n`)
+    console.log(`\n  📄 ${path.basename(pdfPath)} — ${slidePaths.length} páginas · ${(pdfBytes / 1_048_576).toFixed(1)} MB`)
+    console.log(`  deck-plan.json (artefacto auditable) + láminas PNG → ${outDir}\n`)
+
+    for (const warning of warnings) {
+      console.warn(`  ⚠️  ${warning}\n`)
+    }
   } catch (error) {
     if (error instanceof DeckValidationError) {
       // El deck NO se emite parcialmente: o pasa entero, o no sale nada.
