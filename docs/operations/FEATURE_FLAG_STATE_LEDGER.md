@@ -54,11 +54,26 @@ Es **encontrable** desde: `CLAUDE.md` (Runtime Rollout Completion Gate), `AGENTS
 - **NUNCA** considerar un flag "rolled out" hasta verlo en el environment correcto (`vercel env ls`) **+ redeploy aplicado**. `code complete` ≠ `operationally complete` (ver Runtime Rollout Completion Gate en `CLAUDE.md`).
 - **NUNCA prender un flag sólo en Vercel.** Un `*_ENABLED` se lee en **cada runtime que ejecuta el código gateado**, y Greenhouse tiene 5 runtimes con env vars independientes: **Vercel** (app Next.js) y 4 servicios **Cloud Run** (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Prenderlo en uno NO lo prende en los otros. **SIEMPRE** ejecutar el paso 0 de §`Cómo prender un env-var flag` (mapear runtimes ANTES de prender) y declarar en la fila del ledger **en qué runtime(s) vive**. Un flag que gatea una **projection reactiva / consumer / cron** corre en el **ops-worker**, NO en Vercel — prenderlo en Vercel no hace absolutamente nada. Caso fuente 2026-07-09: `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` (email de entrega del ebook) vive sólo en el `ops-worker`; el runbook de este doc sólo enseñaba `vercel env add`, y prenderlo ahí habría dejado el email muerto con la success card prometiéndoselo al usuario.
 - **NUNCA prender un flag de Cloud Run sólo con `gcloud run services update --update-env-vars`.** Los `deploy.sh` de los workers usan **`--set-env-vars` (destructivo)**: reescriben el set completo, así que una var agregada out-of-band **desaparece en el siguiente deploy, en silencio**. El SoT es **`services/<worker>/deploy.sh`** (declarar el flag ahí) + aplicar en vivo para efecto inmediato. **Los dos pasos, siempre.** Caso fuente 2026-07-10: el flag del ebook se prendió en la revisión `00470`, la `00473` lo borró, y el consumer reactivo registró `skip: flag OFF` — el ledger decía ON y la realidad era OFF. Un flag "prendido" que no está declarado en `deploy.sh` es una bomba de tiempo, no un rollout.
+- **NUNCA prender un flag en Vercel "aprovechando" el deploy que disparó tu push.** Vercel **congela las env vars en el instante en que CREA el build**, no cuando lo termina. Si hacés `git push` y después `vercel env add`, el deploy que está corriendo **NO tiene la var** — y va a quedar `● Ready`, verde, con el flag OFF. `vercel env ls` te va a decir que la var existe (es verdad: existe en la CONFIG del environment) mientras la **revisión que sirve el tráfico** no la tiene. El orden correcto es **`vercel env add` → DESPUÉS `git push`**; si ya empujaste, **redeployá** (`vercel redeploy <url-del-deploy> --scope efeonce-7670142f`) y confirmá que los alias apunten a la revisión nueva. Caso fuente 2026-07-12: `NEXA_PROPOSAL_ACTIONS_ENABLED` — el deploy del push quedó Ready sin la var; sin el redeploy, el ledger habría dicho ON y Nexa habría seguido respondiendo "las acciones gobernadas no están habilitadas". **Mismo bug class que el email del ebook, distinta puerta.**
 - **SIEMPRE** que prendas/apagues un flag en un environment, actualizá la **§ Snapshot** (con fecha) y, si cerró un pendiente, sacá la fila de **§ Pendientes de acción**.
 - **NUNCA** confíes en este doc como verdad live para una decisión crítica — la **verdad live es `vercel env ls`**. Este doc es el ledger humano (intención + pendientes + último snapshot conocido).
 - Para flags `NEXT_PUBLIC_*`: se hornean en el bundle **en build time** → prenderlos requiere un **build fresco** (push o redeploy con build cache desmarcado), no un redeploy que reusa build.
 
 ---
+
+## § Qué falta prender en PRODUCCIÓN (la vista corta, 2026-07-12)
+
+> **Los 3 flags que están ON en staging y OFF en producción.** Son los únicos candidatos reales a un flip de prod hoy: código desplegado, probado en staging, esperando una decisión humana. Todo lo demás o ya está ON en prod, o es default-OFF por diseño (ver la tabla larga abajo).
+>
+> ⚠️ Derivado de `vercel env ls` (2026-07-12), que dice si la **var existe**, no cuál es su **valor**: una var presente en Production puede estar en `false`. Para una decisión crítica, leé el valor.
+
+| Flag | Owner | Qué desbloquea en prod | Qué falta ANTES de prenderlo | Riesgo si se prende suelto |
+|---|---|---|---|---|
+| `ARTIFACT_RENDER_JOBS_ENABLED` | TASK-1391 | Que el deck/PDF de una licitación se **genere desde el portal** (hoy en prod sólo existe el CLI local). | (1) **Sign-off del operador**; (2) integrar `artifact-worker-deploy.yml` al **release control plane** (`RELEASE_DEPLOY_WORKFLOWS`) — hoy el workflow es staging-only. El `ops-worker` y el Job son servicios **únicos compartidos**: la puerta de prod es el *enqueue* (Vercel) + el entitlement per-ORG. | Bajo por sí solo (nada se encola sin capability + entitlement), pero **sin el release control plane no hay rollback gobernado** del worker. |
+| `NEXA_PROPOSAL_ACTIONS_ENABLED` | TASK-1399 | Que un humano **opere licitaciones hablándole a Nexa** en producción (registrar propuesta, adjuntar RFP, registrar evidencia, pedir el deck) + el tool read-only `proposal_status`. | **Prenderlo JUNTO con `ARTIFACT_RENDER_JOBS_ENABLED`.** Están acoplados por el flujo, no por el código. | **Media promesa:** sin el flag del render, Nexa registra propuestas y evidencia pero `request_proposal_render` **bloquea con `flag_disabled`** — honesto (lo dice), pero le vendés al usuario un camino que muere en el último paso. |
+| `HIRING_ASSESSMENT_AI_ENABLED` | TASK-1361 | Scoring asistido por IA en el desk de hiring (la IA **propone**, el humano confirma — el LLM nunca escribe banco/score). | **Sign-off HR/Legal** (hiring-AI = alto riesgo bajo el EU AI Act). El flip técnico ya está desbloqueado: eval baseline verde con provider real (6/6, Pearson 0.99 vs referencia humana). | Regulatorio, no técnico. No lo prendas sin ese sign-off aunque el código esté listo. |
+
+**Los otros 20 flags que están OFF en todos lados NO son una cola de pendientes** — son default-OFF **por diseño**: `*_BACKFILL_APPLY_*` (se prenden para una corrida puntual y se apagan), `*_SHADOW_*` (miden sin exponer), guardrails que esperan datos reales, y flags de features aún no cerradas. Los que sí tienen intención de flip están en la tabla larga de abajo con su acción pendiente.
 
 ## § Pendientes de acción (la parte que se olvida)
 
@@ -265,15 +280,41 @@ Hacer sólo (b) es el bug class del 2026-07-10: `GROWTH_EBOOK_EMAIL_DELIVERY_ENA
 
 ### Paso 2 — Redeploy donde haga falta
 
-- **Vercel server var** (`*_ENABLED`): aplica en el próximo deploy (las env vars NO se toman en caliente).
-- **Vercel `NEXT_PUBLIC_*`**: se hornea en build → requiere **BUILD FRESCO** (push a la rama del env, o Redeploy con "Use existing Build Cache" DESMARCADO).
+> ⚠️ **En Vercel, el orden importa: `env add` ANTES del `push`.** Vercel **congela las env vars cuando CREA el build**, no cuando lo termina. Si empujás primero, el deploy que arranca con tu push **no tiene la var** — y queda `● Ready`, verde, con el flag OFF. Es un fallo silencioso: `vercel env ls` te dice que la var existe (existe, en la CONFIG del environment) mientras la revisión que sirve el tráfico no la tiene.
+
+- **Vercel server var** (`*_ENABLED`): aplica **en el deploy que se cree DESPUÉS** de agregar la var (las env vars NO se toman en caliente, y **un deploy ya en vuelo nunca la va a tener**).
+  - Si el código ya está empujado (el caso normal cuando prendés un flag de algo recién mergeado), **redeployá**:
+
+    ```bash
+    # 1. Cuál es el deploy activo del environment
+    vercel list greenhouse-eo --scope efeonce-7670142f --meta githubCommitRef=develop | head -3
+
+    # 2. Redeploy (reusa el build; re-aplica las env vars ACTUALES)
+    vercel redeploy <deployment-url> --scope efeonce-7670142f
+
+    # 3. Confirmar que los ALIAS quedaron apuntando a la revisión nueva
+    vercel inspect <nueva-url> --scope efeonce-7670142f | grep -A3 Aliases
+    #    staging → dev-greenhouse.efeoncepro.com + greenhouse-eo-env-staging-*.vercel.app
+    ```
+
+- **Vercel `NEXT_PUBLIC_*`**: se hornea en build → requiere **BUILD FRESCO** (push a la rama del env, o Redeploy con "Use existing Build Cache" DESMARCADO). Un `vercel redeploy` normal **no alcanza**.
 - **Cloud Run**: el `services update` ya crea la revisión. Nada más.
 
 ### Paso 3 — Verificar en CADA runtime (que la var exista Y que el consumer se comporte)
 
+> ⚠️ **`vercel env ls` NO prueba nada.** Te dice que la var existe en la **config del environment**, no que la **revisión que sirve el tráfico** la tenga (ver la trampa del Paso 2). En Vercel la única verificación honesta es **ejercitar el flujo real contra el deploy activo**.
+
 ```bash
-# Vercel
+# Vercel — necesario, NO suficiente (dice que la var existe, no que el runtime la vea)
 vercel env ls | grep <FLAG_NAME>
+
+# Vercel — la verificación que SÍ vale: ejercitar el flujo contra el deploy activo.
+#   staging tiene SSO → usar el camino canónico (bypass + sesión de agente, en memoria):
+pnpm staging:request /api/<ruta-gateada-por-el-flag>
+#   Si el flag gatea una capability de Nexa, el smoke es PREGUNTARLE y ver si el tool dispara:
+pnpm staging:request POST /api/home/nexa '{"prompt":"<la pregunta real>","history":[]}'
+#   (si `staging:request` no encuentra el bypass, se resuelve vía la API de Vercel con el token de
+#    Secret Manager `greenhouse-vercel-api-token` — canalizado en memoria, NUNCA escrito a disco)
 
 # Cloud Run — leer la env de la REVISIÓN ACTIVA (no del servicio "en general")
 REV=$(gcloud run services describe <servicio> --region <region> --project efeonce-group \
