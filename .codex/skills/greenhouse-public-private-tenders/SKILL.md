@@ -33,6 +33,8 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 ├─ Decidir participar / priorizar / scoring bid-no-bid ......... bid-lifecycle-go-no-go.md
 ├─ Precio, garantías (boleta/póliza), cashflow, factoring ...... pricing-garantias-finance.md
 ├─ Armar la oferta técnica/económica/administrativa ............ propuesta-tecnica-economica.md
+├─ Producir el DECK de la propuesta: catálogo de plantillas,
+│  molde visual, selector, 3D icons, fotos del equipo ......... deck-visual-system.md
 ├─ Otro país LATAM (portal, registro, umbrales) ............... latam-portales-matriz.md
 ├─ Tender privado: proceso RFI/RFP/RFQ, evaluación,
 │  negociación/BAFO, cómo ganar (vendor-side) ................. privado-rfp-lifecycle.md
@@ -88,6 +90,7 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 | `bid-lifecycle-go-no-go.md` | Pipeline canónico discovered→screened→triage→evaluate→plan-bid→submit→reconcile; scoring explicable (10 componentes) + decision bands; matcher hygiene (falsos positivos) |
 | `pricing-garantias-finance.md` | Costeo (cost-plus vs valor) sobre loaded cost, indexación UF/UTM, instrumentos de garantía y su costo/cashflow, plazos de pago del Estado, factoring |
 | `propuesta-tecnica-economica.md` | Estructura de la oferta (técnica/económica/administrativa), matriz de cumplimiento, anexos y declaraciones juradas, armado del equipo/casos |
+| `deck-visual-system.md` | **Sistema visual del deck:** el deck se **compone** desde un catálogo cerrado de **25 plantillas** (nunca freehand) + las 5 reglas del molde (degradado vibrante — **nunca navy plano** · tipografía sin Black/900 · safe-area · íconos Solar · glass milky) + el **selector determinista** (`registry.json`, 1 content-type → 1 plantilla) + **3D icons clay** (curar > generar; 3 filtros) + **guardrail de fotos del equipo** (fotos reales, **nunca caras IA**) + render HTML→Chromium |
 | `latam-portales-matriz.md` | Por país (CL, CO, PE, BR, MX, AR, PA, CR, EC, UY): portal, órgano rector, ley, registro de proveedor, particularidades, madurez de API |
 | `privado-rfp-lifecycle.md` | Tenders corporativos vendor-side: RFI/RFP/RFQ y cuándo es cuál, sourcing events, evaluación por el comprador, shortlist, negociación/BAFO, reverse auction, cómo ganar, diferencias con lo público |
 | `privado-plataformas-sectores.md` | E-procurement (SAP Ariba, Coupa, Jaggaer, GEP, Oracle, SAP Fieldglass/VMS), precalificación y registros (Achilles, SICEP, REPRO, TVEC privado), y playbooks por sector (minería, energía, retail, banca, telco, salud privada) |

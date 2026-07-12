@@ -703,7 +703,7 @@ Formalizado como artefacto **machine-readable**: **`tender-deck-composer-prototy
 
 **Modelo:**
 
-1. **Taxonomía de content-types** (23): `cover · back-cover · agenda · section-divider · narrative · statement · highlight · bullet-list · dual-list · dual-text · one-metric · several-kpis · chart · comparison · capabilities-grid · four-pillars · process-sequential · timeline · team · case-study · credentials · pricing · requirements-table`.
+1. **Taxonomía de content-types** (**25**, 1:1 con las 25 plantillas — el SoT ejecutable es `contentTypeTaxonomy` en `registry.json`): `cover · back-cover · agenda · section-divider · narrative · statement · highlight · bullet-list · dual-list · dual-text · one-metric · several-kpis · chart · comparison · capabilities-grid · four-pillars · process-sequential · timeline · team · case-study · credentials · pricing · requirements-table · evidence-story · human-impact`.
 2. **Registry:** cada plantilla declara `name · kind (split/full-bleed) · source (figma node | gap | design) · owner · status · contentTypes[] · prototype · slotsRef` (+ flags: `nav`, `overflow`, `variants`, `rightSlot/leftSlot`, `requires`).
 3. **Selector:** el agente **clasifica el contenido** de cada slide en un content-type → el selector devuelve la plantilla cuyo `contentTypes` lo incluye (match declarativo 1:1). Las **reglas de desambiguación** resuelven los solapes (ver `registry.json → selector.disambiguation`), p.ej.:
    - métrica: **una** hero → `StatSplit`; **varios** KPIs → `MetricsSplit`; con **gráfico** → `ChartSplit`; como **resultado de caso** → `CaseStudySplit`.

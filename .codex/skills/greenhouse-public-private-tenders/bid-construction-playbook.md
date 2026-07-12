@@ -88,6 +88,22 @@ El diagnóstico del grader (Fase 4) es un diferencial brutal, pero **cómo se pr
 - **Output:** paquete completo listo para subir.
 - *Companion:* `propuesta-tecnica-economica.md` (checklist "listo para presentar").
 
+#### ⚠️ `audience`: la regla que evita el peor error de esta fase
+
+Todo artefacto del bid es **`internal`** o **`client_facing`**. **Sólo lo `client_facing` y aprobado se
+empaqueta.** Lo interno **NUNCA** se promueve por default — y acá no es un tema de permisos: es
+entregarle a la contraparte munición contra ti.
+
+| Artefacto | `audience` | Por qué |
+|---|---|---|
+| Oferta técnica · económica · deck · anexos | `client_facing` | Es lo que evalúa el comité |
+| **Squad blueprint** | **`internal`** | Lleva el **loaded cost** por rol: es tu estructura de costos |
+| **Diagnóstico interno** (lente técnica del Be X) | **`internal`** | Al cliente va **sólo la lente medida** (Fase 4-bis) |
+| Scoring bid/no-bid, walk-away, margen | **`internal`** | Revela tu piso de negociación |
+
+**NUNCA** adjuntes al paquete un archivo que no hayas clasificado explícitamente. Cuando exista el
+runtime (`tender_assets`, **TASK-1392**), la regla la refuerza la DB; hoy la refuerzas tú.
+
 ### Fase 9.5 — Revisión crítica multi-lente (QA antes de cerrar)
 
 Antes de dar la propuesta por lista, pásala por **tres lentes** que suelen exponer huecos que el redactor no ve:
@@ -97,6 +113,23 @@ Antes de dar la propuesta por lista, pásala por **tres lentes** que suelen expo
 - **Finance (`greenhouse-finance-accounting-operator`):** ¿el loaded cost está **completo** (statutory Chile + utilización 60-75% + overhead real, no bruto×1,3)? En contrato **precio-fijo sin reajuste**, ¿hay **buffer FX+inflación** para no perder margen en años posteriores? ¿Modelado el margen del **último año**, no solo el mes 1?
 
 Regla: si las tres lentes no pasaron, la propuesta **no está lista** aunque el texto se lea bien.
+
+### Fase 9-bis — El deck (composición, no diseño)
+
+**Cargar `deck-visual-system.md`.** El deck de la propuesta (técnica o de presentación ejecutiva)
+**se compone desde un catálogo cerrado de 25 plantillas** — **nunca** se dibuja freehand. Se elige la
+plantilla por el tipo de contenido (selector determinista, `registry.json`) y se rellenan sus slots.
+
+Las que **puntúan o evitan el descarte** son T1 y no son opcionales: **matriz de cumplimiento**
+(`RequirementsTableFull` — evita el descarte), **cronograma** (`TimelineFull`), **equipo**
+(`TeamSplit` — el evaluador cruza CV vs requisito) y **económica** (`PricingFull`).
+
+Reglas duras que se cruzan con este playbook:
+
+- **Cifras:** reales del bid o **ilustrativas marcadas**. Nunca fabricadas (principio 4, anti-humo).
+- **Equipo: fotos REALES, nunca caras IA.** El evaluador cruza el CV contra la persona → una cara
+  fabricada es **tergiversación**, no un tema estético (ver `compliance-riesgo-integridad.md`).
+- **Registro institucional (de usted)** en todo lo client-facing.
 
 ### Fase 10 — Presentación human-in-control
 - **La oferta la sube un humano** a la plataforma, con comprobante guardado. El agente/skill **prepara**; **nunca envía ni firma**. Confirmaciones sensibles (ej. "sin demandas contra el comprador") las valida el operador.
@@ -132,7 +165,23 @@ Este método manual es el **precursor de un producto**: una plataforma agéntica
 
 Implicación de diseño (para cuando se implemente): **cada fase de este playbook se vuelve una capability con contrato programático gobernado**, no lógica atrapada en una UI. Leer bases, correr admisibilidad, correr el grader + escalera Be X, diseñar el squad, calcular pricing sobre loaded cost, redactar, armar la económica y el deck → cada una un primitive canónico en `src/lib/**` que **la UI (los layouts Figma), Nexa y MCP** consumen por igual. Es la doctrina **Full API Parity** de Greenhouse aplicada al dominio comercial: un motor, muchos consumers; los writes sensibles (enviar, firmar, publicar) siguen el loop de acción gobernada `propose → confirm → execute` con el humano en el punto de confirmación (coherente con la Fase 10, "human-in-control").
 
-Regla para no perder el plano: **cada mejora del método manual documentada aquí es un requisito del producto futuro**. Cuando se autorice construir la plataforma (vía ADR del `arch-architect` + `greenhouse-backend`), parte de este playbook, no de cero. **El diseño de arquitectura V1 ya existe: `docs/architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`** (aggregate `Tender` + state machine + capabilities por fase + 3 planos de orquestación + económica quote-adapter; status Proposed). Documentar el método hoy = escribir la especificación funcional de ese runtime.
+Regla para no perder el plano: **cada mejora del método manual documentada aquí es un requisito del producto futuro**. Documentar el método hoy = escribir la especificación funcional de ese runtime.
+
+**Ya no es futuro abstracto — hay runtime y hay plan (2026-07-12):**
+
+| Pieza | Estado | Qué es |
+|---|---|---|
+| **Deck Composer (Fase 9-bis)** | ✅ **Shipped** | 25 plantillas + selector determinista + validación + geometría + **PDF de N páginas** (`pnpm deck:compose`). Ver `deck-visual-system.md` |
+| State machine (12 estados, 3 gates humanos) | ⚠️ **TS puro, sin DB** | `src/lib/commercial/tenders/tender-state-machine.ts` |
+| **`TASK-1392` — F0: el aggregate `Tender`** | 📋 to-do (**bloqueada**) | `tenders` + `tender_state_transitions` + `tender_assets` (con **`audience`**), state machine en DB, intake de RFP por el asset store canónico, y el **Tender Intake Agent Contract** |
+| **`TASK-1391` — renderer productivo** | 📋 to-do (**bloqueada** por 1392 + EPIC-027) | Cloud Run Job `tender-worker` con Chromium, cola, artefactos versionados |
+| Runtime Greenhouse (API · UI · capabilities) | ❌ **No existe** | El único consumer hoy es el CLI |
+
+**Cómo se vuelve agéntico (y cómo NO).** El `Tender Intake Agent` de F0 es el molde de toda fase futura de este playbook: recibe **contexto read-only allowlisted**, emite una **propuesta tipada que cita sus inputs**, **el humano confirma**, y recién ahí corre el **mismo command** que usarían API, CLI, Nexa y MCP. **Propuesta ≠ ejecución.** El LLM **nunca** escribe estado, nunca adjunta un asset, nunca cruza un gate. Es la Fase 10 ("human-in-control") convertida en arquitectura — y es exactamente **Full API Parity**: un primitive canónico, muchos consumers.
+
+**NUNCA** se introduce LangChain, LangGraph ni un Agents SDK: se reusa el cliente canónico `src/lib/ai/` y el patrón tool-use de Nexa. **NUNCA** un prompt que escriba SQL o mute estado — eso no es "agentic", es un agujero.
+
+Arquitectura: `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (**leer su §0 = estado real**) · invariantes: `agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`.
 
 ## Documentación viva (obligatorio al iterar)
 

@@ -76,6 +76,40 @@ del contrato si se adjudica. De ahí salen los tres principios; todo lo demás s
 - **NUNCA** ignores el gate de peso (`maxPdfMb`). No es estética: los portales **rechazan** adjuntos sobre
   su límite. Un deck de 40 MB que el portal no acepta es un deck que no existe.
 
+## `audience` — la regla que impide filtrarle munición al comprador (TASK-1392)
+
+Cada `tender_asset` nace **`internal`** o **`client_facing`**. **Sólo un entregable `client_facing` y
+aprobado puede empaquetarse.** En una licitación esto no es una regla de permisos: lo interno contiene
+**tu estructura de costos y tu piso de negociación**.
+
+| Artefacto | `audience` | Por qué |
+|---|---|---|
+| Oferta técnica · económica · deck · anexos | `client_facing` | Es lo que evalúa el comité |
+| **Squad blueprint** | **`internal`** | Lleva el **loaded cost** por rol |
+| **Diagnóstico interno** (lente técnica del Be X) | **`internal`** | Al cliente va sólo la lente **medida** |
+| Scoring bid/no-bid · walk-away · margen | **`internal`** | Revela tu piso de negociación |
+
+- **NUNCA** promuevas `internal → client_facing` por default ni "porque parece útil". Es una decisión
+  humana explícita, auditada.
+- **NUNCA** subas un RFP, anexo o entregable fuera del **asset store canónico**
+  (`src/lib/storage/greenhouse-assets.ts`): nada de bucket, uploader, URL pública ni carpeta paralela.
+  El scan/quarantine/ownership no es opcional — son documentos confidenciales.
+
+## El agente NUNCA escribe: `propose → confirm → execute` (TASK-1392)
+
+El **Tender Intake Agent** es el molde de toda fase agéntica futura del dominio:
+
+1. Recibe **contexto read-only allowlisted** (metadata + asset manifest + actor). No SQL, no storage.
+2. Emite una **propuesta tipada** (`TenderIntakeProposal`) que **cita sus inputs**.
+3. **El humano confirma.**
+4. Recién entonces corre **el mismo command canónico** que usarían API, CLI, Nexa y MCP.
+
+- **NUNCA** el LLM muta estado, adjunta un asset ni cruza un gate humano. **Propuesta ≠ ejecución.**
+- **NUNCA** introduzcas LangChain, LangGraph, un Agents SDK ni memoria mutable propia: se reusa el
+  cliente canónico `src/lib/ai/` y el patrón tool-use/telemetría de Nexa.
+- **NUNCA** cierres algo como "agentic" si sólo hay un prompt: hace falta contexto tipado, tools sobre
+  los primitives, propuesta trazable, eval fixture y confirmación humana real.
+
 ## Human-in-control (principio 3)
 
 - **NUNCA** un agente **envía** una oferta, la **firma**, ni confirma declaraciones juradas. Prepara el
