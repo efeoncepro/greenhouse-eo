@@ -31,8 +31,11 @@ export const TENDER_STATES = [
   'packaging', // decks branded + económica adapter + otros docs
   'ready_to_submit', // admisibilidad ✅ + PDFs, esperando submit humano
   'submitted', // el humano subió a la plataforma
-  'awarded', // adjudicada (terminal)
-  'not_awarded' // no adjudicada (terminal)
+  // ⚠️ El vocabulario terminal es GENÉRICO a propósito (decisión 2026-07-12, ver bloque de arriba):
+  // el aggregate es una PROPUESTA, y una venta directa no se "adjudica" — se gana o se pierde.
+  // El texto que ve el usuario se resuelve por `origin`, no por el estado.
+  'won', // ganada (terminal) — "Adjudicada" si origin=public_tender · "Ganada" si origin=direct_sales
+  'lost' // perdida (terminal)
 ] as const
 
 export type TenderState = (typeof TENDER_STATES)[number]
@@ -42,7 +45,7 @@ export type TenderState = (typeof TENDER_STATES)[number]
  * licitación declined/perdida, se crea un Tender nuevo (append-only), no se
  * reabre el terminal.
  */
-export const TERMINAL_TENDER_STATES = ['declined', 'awarded', 'not_awarded'] as const
+export const TERMINAL_TENDER_STATES = ['declined', 'won', 'lost'] as const
 export type TerminalTenderState = (typeof TERMINAL_TENDER_STATES)[number]
 
 /**
@@ -73,7 +76,7 @@ export type ActiveTenderState = (typeof ACTIVE_TENDER_STATES)[number]
  *   base_ready → packaging
  *   packaging → ready_to_submit
  *   ready_to_submit → submitted               (GATE HUMANO: el humano sube)
- *   submitted → awarded | not_awarded
+ *   submitted → won | lost
  *
  * Cualquier transición fuera de esta tabla es bug: `assertValidTenderStateTransition`
  * la throw fail-loud antes de tocar DB.
@@ -87,10 +90,10 @@ export const TENDER_TRANSITION_MATRIX: Readonly<Record<TenderState, readonly Ten
   base_ready: ['packaging'],
   packaging: ['ready_to_submit'],
   ready_to_submit: ['submitted'],
-  submitted: ['awarded', 'not_awarded'],
+  submitted: ['won', 'lost'],
   declined: [],
-  awarded: [],
-  not_awarded: []
+  won: [],
+  lost: []
 }
 
 /**

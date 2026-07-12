@@ -475,10 +475,23 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 
 - **Nombre final del home del motor.** Propuesto `src/lib/artifact-composer/**` (evita colisión con el
   **Composition Shell** de UI Platform, que es otra cosa). No es una decisión irreversible.
-- **¿Los estados `awarded`/`not_awarded` se renombran a `won`/`lost`?** Son vocabulario de licitación. Hoy
-  cuesta ~nada (no hay DB); después, una migración de enum. **Recomendación:** renombrar y resolver el
-  copy visible por `origin` ("Adjudicada" si `public_tender`, "Ganada" si `direct_sales`). **No lo doy por
-  decidido** — es el tipo de cosa que el operador debe vetar o confirmar.
+- ✅ **CERRADA (2026-07-12) — los estados terminales son `won`/`lost`, y YA ESTÁ APLICADO en el código.**
+  *(El operador delegó la decisión y la dejó abierta a veto; queda como decisión del agente, documentada.)*
+
+  **El razonamiento:** el aggregate se generalizó de `Tender` a **`Proposal`** — y **`awarded`/`not_awarded`
+  es vocabulario de licitación pública**. **Una venta directa no se "adjudica": se gana o se pierde.** Dejar
+  vocabulario de licitación en un objeto que ya sabemos que **no es sólo licitaciones** es **hornear en la
+  base de datos un supuesto que ya conocemos falso**.
+
+  **El copy visible se resuelve por `origin`, no por el estado:** *"Adjudicada"* si `public_tender`,
+  *"Ganada"* si `direct_sales`. El estado es genérico; la palabra que ve el usuario es contextual.
+
+  **Aplicado en `src/lib/commercial/tenders/tender-state-machine.ts`** (enum + matriz de transición +
+  terminales + tests) — **102 tests verdes**. Se hizo **ahora** porque era el único momento en que costaba
+  cero: **apenas exista la tabla, esos nombres quedan grabados en un historial append-only**, y cambiarlos
+  significa migración de enum **+ reescribir historia que se declara inmutable**.
+
+  ⚠️ **`TASK-1392` debe crear el CHECK del enum con `won`/`lost`. NUNCA con `awarded`/`not_awarded`.**
 - **¿El carrusel necesita generación de imagen (Media Foundry) además de composición?** Son primitives
   **distintos y complementarios**: Foundry **genera** el pixel (IA), el Composer **compone** el frame. Un
   carrusel puede usar los dos. **NO** se fusionan.

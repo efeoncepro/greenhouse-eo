@@ -61,7 +61,7 @@ describe('Tender state machine — camino real SKY (validación con caso)', () =
     'packaging',
     'ready_to_submit',
     'submitted',
-    'awarded'
+    'won'
   ]
 
   it('el camino completo del bid es una secuencia de transiciones válidas', () => {
@@ -75,9 +75,9 @@ describe('Tender state machine — camino real SKY (validación con caso)', () =
     expect(isTerminalTenderState('declined')).toBe(true)
   })
 
-  it('la rama perdida (submitted → not_awarded) es válida y terminal', () => {
-    expect(isValidTenderStateTransition('submitted', 'not_awarded')).toBe(true)
-    expect(isTerminalTenderState('not_awarded')).toBe(true)
+  it('la rama perdida (submitted → lost) es válida y terminal', () => {
+    expect(isValidTenderStateTransition('submitted', 'lost')).toBe(true)
+    expect(isTerminalTenderState('lost')).toBe(true)
   })
 })
 
@@ -141,7 +141,7 @@ describe('Tender state machine — type guards', () => {
   it('isActiveTenderState / isTerminalTenderState son excluyentes', () => {
     expect(isActiveTenderState('producing')).toBe(true)
     expect(isTerminalTenderState('producing')).toBe(false)
-    expect(isTerminalTenderState('awarded')).toBe(true)
-    expect(isActiveTenderState('awarded')).toBe(false)
+    expect(isTerminalTenderState('won')).toBe(true)
+    expect(isActiveTenderState('won')).toBe(false)
   })
 })

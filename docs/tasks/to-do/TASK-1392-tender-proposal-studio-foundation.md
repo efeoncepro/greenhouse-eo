@@ -249,7 +249,7 @@ activas** mañana. ⛔ **NINGUNA migración se escribe hasta que los cinco esté
 |---|---|---|---|
 | 1 | **Nombres de tabla** | ⚠️ el cuerpo decía `tenders`/`tender_*` — **el nombre que su propio Delta prohíbe** | **`proposals` · `proposal_state_transitions` · `proposal_assets` · `proposal_evidence` · `proposal_requirements`** |
 | 2 | **Enum `origin`** | 🔴 **definido TRES veces distinto**: el Scope decía `public_discovery`/`manual`; el Delta, `public_tender`/`private_rfp`/`direct_sales` | **`origin ∈ {public_tender, private_rfp, direct_sales}`** *(manda el Delta)*. ⚠️ **SKY es Wherex → `private_rfp`, NO `manual`.** **NUNCA** un `kind` que duplique `origin` |
-| 3 | **Vocabulario de los estados terminales** | ⚠️ **NADIE LO DECIDIÓ.** La state machine dice `awarded`/`not_awarded` | 🔴 **DECISIÓN PENDIENTE DEL OPERADOR.** `awarded`/`not_awarded` es **vocabulario de licitación**, y el aggregate es **`Proposal`** — **una venta directa no se "adjudica"**. Recomendación del ADR: **`won`/`lost`**, resolviendo el copy visible **por `origin`** ("Adjudicada" si `public_tender`, "Ganada" si `direct_sales`). ⚠️ **Ésta es la última vez que cuesta cero: apenas la state machine se persiste, es migración de enum + backfill de un historial append-only** |
+| 3 | **Vocabulario de los estados terminales** | ✅ **CERRADO 2026-07-12 — y YA APLICADO en el código** | **`won` / `lost`.** *(El operador delegó la decisión; queda como decisión del agente, documentada en el ADR y abierta a veto **antes** de la migración.)* Razón: `awarded`/`not_awarded` es **vocabulario de licitación**, y el aggregate es **`Proposal`** — **una venta directa no se "adjudica"**. El **copy visible se resuelve por `origin`** ("Adjudicada" si `public_tender`, "Ganada" si `direct_sales`); el estado es genérico. Aplicado en `tender-state-machine.ts` (102 tests verdes). ⚠️ **El CHECK del enum se escribe con `won`/`lost`. NUNCA con `awarded`/`not_awarded`.** |
 | 4 | **Org scoping (ASaaS)** | 🔴 **AUSENTE del cuerpo** — **cero** menciones de `org_id`/`entitlement`, pese a que el Delta lo exige desde **la primera** migración | **`owner_org_id` NOT NULL** en `proposals` **y en todos sus hijos**, desde la **migración 1**. *"Un `WHERE org_id` agregado tarde **siempre** deja un reader sin filtrar."* Y la capability va por **entitlement per-ORG** (`module_assignments`), **NUNCA por rol** — *un rol no se factura, un módulo sí* |
 | 5 | **`deadline`** | ⚠️ el cuerpo **admite que puede no existir** (*"la señal `deadline_at_risk` sólo cuando el aggregate tenga los campos"*) | **`deadline` es columna de primera clase.** Es **el dato más load-bearing del dominio**: si se pasa, **se pierde el proceso y no hay recuperación**. Y **TASK-1391 lo NECESITA** para la prioridad de cola (su Slice 2b). **Una `Proposal` sin deadline es una propuesta que no puede avisarte que se está muriendo** |
 
@@ -371,10 +371,10 @@ un eventual bridge deberá ser explícito, versionado y minimizar los inputs com
 
 **Añadidos por el Delta (b) — auditoría de rigor 2026-07-12:**
 
-- [ ] 🚪 **Los 5 vocabularios están CONGELADOS por el operador antes de la primera línea de SQL**: nombres
-      de tabla (`proposal_*`) · enum `origin` (`public_tender|private_rfp|direct_sales`) · **vocabulario de
-      estados terminales** (`awarded`/`not_awarded` **vs** `won`/`lost` — **decisión pendiente**) ·
-      `owner_org_id` · `deadline`. **Ninguno de los cinco vuelve a costar cero después de esta task.**
+- [ ] 🚪 **Los 5 vocabularios están CONGELADOS antes de la primera línea de SQL**: nombres de tabla
+      (`proposal_*`) · enum `origin` (`public_tender|private_rfp|direct_sales`) · **estados terminales
+      (`won`/`lost` — ✅ CERRADO 2026-07-12 y aplicado en el código)** · `owner_org_id` · `deadline`.
+      **Ninguno de los cinco vuelve a costar cero después de esta task.**
 - [ ] **La migración NO contiene `tenders`, `tender_*`, `origin='manual'` ni `origin='public_discovery'`.**
       *(El cuerpo de esta task los pedía; su propio Delta los prohibía.)*
 - [ ] 🔴 **`owner_org_id` NOT NULL en `proposals` y en TODOS sus hijos**, desde la primera migración. **Test
@@ -468,9 +468,9 @@ accesibilidad** derivan del *requisito-set* y **fallan cerrado** cuando el requi
 
 ## Open Questions
 
-- 🔴 **¿`awarded`/`not_awarded` se renombran a `won`/`lost`?** **Hay que decidirlo en Slice 0.** Después de
-  esta task es migración de enum + backfill de historial append-only. *(Recomendación del ADR: sí, y el copy
-  visible se resuelve por `origin`.)*
+- ~~¿`awarded`/`not_awarded` se renombran a `won`/`lost`?~~ ✅ **CERRADA 2026-07-12: `won`/`lost`**, aplicado
+  en `tender-state-machine.ts` (102 tests verdes). El copy visible se resuelve por `origin`. **El CHECK del
+  enum se escribe con `won`/`lost`.**
 - ¿RESEARCH-007 escribe `proposals` directamente mediante el command F0 o emite un handoff/outbox que el Studio consume? Resolverlo en Slice 0 con una sola escritura canónica.
 - ¿Cuáles contextos exactos de `GreenhouseAssetContext` y retention/prefix deben añadirse para RFP fuente y outputs, sin proliferar tipos por deliverable?
 - ¿Qué rol(es) internos reciben los grants iniciales de create/ingest/read/transition y cuáles gates requieren capability separada?
