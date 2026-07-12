@@ -35,6 +35,7 @@ import { SlideQualityError } from '@/lib/artifact-composer/quality-gates'
 import { SlideGeometryError, SlotFillError } from '@/lib/artifact-composer/render'
 import { attachProposalAsset } from '@/lib/commercial/tenders/proposals/assets'
 import {
+  claimNextRenderJobForExecution,
   getProposalRenderJob,
   getRenderJobManifest,
   hashResolvedManifest,
@@ -230,24 +231,39 @@ const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
 }
 
 const main = async (): Promise<void> => {
-  const renderJobId = process.env.RENDER_JOB_ID?.trim()
-
-  if (!renderJobId) {
-    throw new Error('RENDER_JOB_ID es obligatorio (lo inyecta el dispatcher en el override de la ejecución).')
-  }
-
   if (!isArtifactRenderJobsEnabled()) {
-    log('flag OFF — skip', { renderJobId })
+    log('flag OFF — skip')
 
     return
   }
 
-  // La transición valida el estado (queued|dispatched → running) y cuenta el intento.
-  const running = await markRenderJobRunning(renderJobId)
+  // Dos modos:
+  //   · RENDER_JOB_ID en env → ejecución dirigida (smoke/replay manual del operador).
+  //   · sin RENDER_JOB_ID → CLAIM ATÓMICO del próximo job por prioridad (FOR UPDATE SKIP LOCKED).
+  //     Es el modo normal: el dispatcher sólo lanza la ejecución (jobs.run, sin overrides — no
+  //     necesita `runWithOverrides`), y el worker elige. Dos ejecuciones concurrentes nunca toman
+  //     el mismo job.
+  const directJobId = process.env.RENDER_JOB_ID?.trim()
 
-  const job = await getProposalRenderJob({ ownerOrgId: running.ownerOrgId, renderJobId })
+  let job: ProposalRenderJobRecord | null
 
-  if (!job) throw new Error(`Job ${renderJobId} desapareció tras el claim (imposible: tabla append-only).`)
+  if (directJobId) {
+    const running = await markRenderJobRunning(directJobId)
+
+    job = await getProposalRenderJob({ ownerOrgId: running.ownerOrgId, renderJobId: directJobId })
+  } else {
+    job = await claimNextRenderJobForExecution()
+
+    if (!job) {
+      log('sin jobs en cola — nada que hacer')
+
+      return
+    }
+  }
+
+  if (!job) throw new Error(`Job ${directJobId} desapareció tras el claim (imposible: tabla append-only).`)
+
+  const renderJobId = job.renderJobId
 
   try {
     await renderJob(job)

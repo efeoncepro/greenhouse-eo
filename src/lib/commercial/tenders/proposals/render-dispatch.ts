@@ -3,10 +3,12 @@ import 'server-only'
 /**
  * TASK-1391 Slice 2b — el DISPATCHER de render jobs (la cola con prioridad por fin tiene dueño).
  *
- * Corre en el ops-worker (Cloud Scheduler cada 2 min). NO renderiza nada: selecciona el próximo
- * job por PRIORIDAD y hace una llamada de ~200 ms a la Jobs API (`jobs.run`) del Cloud Run Job
- * `artifact-worker` con `RENDER_JOB_ID` como override. El invariante "ops-worker no ejecuta
- * Chromium" se respeta.
+ * Corre en el ops-worker (Cloud Scheduler cada 2 min). NO renderiza nada: comprueba si HAY trabajo
+ * (por la misma regla de prioridad) y lanza una ejecución del Cloud Run Job `artifact-worker`
+ * (`jobs.run`, ~200 ms, SIN overrides). El WORKER hace el claim atómico del job concreto
+ * (`FOR UPDATE SKIP LOCKED`) — así el dispatcher no necesita `runWithOverrides` (permiso que
+ * `run.invoker` no incluye) y dos ejecuciones concurrentes nunca toman el mismo job.
+ * El invariante "ops-worker no ejecuta Chromium" se respeta.
  *
  * Reglas de la cola (Slice 0 · decisión 6 — NUNCA FIFO ciega):
  *   - prioridad = deadline más próximo primero (fijado en el job, no re-leído);
@@ -26,7 +28,6 @@ import {
   isArtifactRenderJobsEnabled,
   listExpiredQueuedRenderJobs,
   listProposalRenderJobs,
-  markRenderJobDispatched,
   markRenderJobFailed,
   selectNextRenderJobForDispatch
 } from './render-jobs'
@@ -43,8 +44,15 @@ export interface RenderDispatchResult {
   postponed: Array<{ renderJobId: string; state: string; deadline: string | null }>
 }
 
-/** Ejecuta el Cloud Run Job con el RENDER_JOB_ID como override de env de la ejecución. */
-const runArtifactWorkerJob = async (renderJobId: string): Promise<string> => {
+/**
+ * Lanza una ejecución del Cloud Run Job — SIN overrides de env.
+ *
+ * ⚠️ Deliberado: `runWithOverrides` exige un permiso IAM que `run.invoker` NO incluye. En vez de
+ * escalar el privilegio del dispatcher, el WORKER hace el claim atómico del próximo job
+ * (`claimNextRenderJobForExecution`, FOR UPDATE SKIP LOCKED). El dispatcher decide CUÁNDO hay que
+ * ejecutar; el worker decide CUÁL toma — sin riesgo de doble-ejecución.
+ */
+const runArtifactWorkerJob = async (): Promise<string> => {
   const auth = new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'] })
   const client = await auth.getClient()
 
@@ -52,12 +60,7 @@ const runArtifactWorkerJob = async (renderJobId: string): Promise<string> => {
 
   const response = await client.request<{ metadata?: { name?: string }; name?: string }>({
     url,
-    method: 'POST',
-    data: {
-      overrides: {
-        containerOverrides: [{ env: [{ name: 'RENDER_JOB_ID', value: renderJobId }] }]
-      }
-    }
+    method: 'POST'
   })
 
   // La operación devuelve el nombre de la ejecución (…/executions/<name>).
@@ -92,7 +95,7 @@ export const dispatchNextRenderJob = async (): Promise<RenderDispatchResult> => 
   let executionName: string
 
   try {
-    executionName = await runArtifactWorkerJob(next.renderJobId)
+    executionName = await runArtifactWorkerJob()
   } catch (error) {
     captureWithDomain(error, 'commercial', {
       tags: { source: 'artifact_render_dispatch' },
@@ -108,16 +111,14 @@ export const dispatchNextRenderJob = async (): Promise<RenderDispatchResult> => 
     return { expiredClosed: expired.length, dispatched: [], postponed: [] }
   }
 
-  const dispatched = await markRenderJobDispatched(next.renderJobId, executionName)
-
-  // 3 · Visibilidad de los pospuestos: los que siguen en cola tras este tick.
+  // 3 · Visibilidad de los pospuestos: los que siguen en cola tras lanzar esta ejecución (el
+  // worker tomará el de mayor prioridad; el resto espera el próximo tick). Un descarte silencioso
+  // sería la peor falla posible acá.
   const stillQueued = await listProposalRenderJobs({ ownerOrgId: next.ownerOrgId, state: 'queued', limit: 20 })
 
-  const postponed = stillQueued.map(job => ({
-    renderJobId: job.renderJobId,
-    state: job.state,
-    deadline: job.deadline
-  }))
+  const postponed = stillQueued
+    .filter(job => job.renderJobId !== next.renderJobId)
+    .map(job => ({ renderJobId: job.renderJobId, state: job.state, deadline: job.deadline }))
 
   if (postponed.length > 0) {
     console.log(
@@ -127,9 +128,11 @@ export const dispatchNextRenderJob = async (): Promise<RenderDispatchResult> => 
     )
   }
 
+  console.log(`[render-dispatch] ejecución lanzada ${executionName} (candidato de mayor prioridad: ${next.renderJobId})`)
+
   return {
     expiredClosed: expired.length,
-    dispatched: [{ renderJobId: dispatched.renderJobId, executionName }],
+    dispatched: [{ renderJobId: next.renderJobId, executionName }],
     postponed
   }
 }

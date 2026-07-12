@@ -630,6 +630,62 @@ export const selectNextRenderJobForDispatch = async (input?: {
   return rows[0] ? mapJobRow(rows[0]) : null
 }
 
+/**
+ * CLAIM ATÓMICO del próximo job (lo usa el worker al arrancar SIN `RENDER_JOB_ID`).
+ *
+ * Por qué el worker elige y no el dispatcher: ejecutar un Cloud Run Job con overrides de env
+ * exige el permiso `run.jobs.runWithOverrides` (NO incluido en `run.invoker`). Darle ese permiso
+ * al dispatcher es escalar privilegio para nada: con `FOR UPDATE SKIP LOCKED` el worker toma el
+ * job de mayor prioridad de forma atómica — dos ejecuciones concurrentes JAMÁS toman el mismo, y
+ * el dispatcher se queda con el `jobs.run` simple (least privilege).
+ *
+ * Misma regla de prioridad que `selectNextRenderJobForDispatch`: deadline + aging; vencidos fuera.
+ */
+export const claimNextRenderJobForExecution = async (input?: {
+  agingMinutes?: number
+}): Promise<ProposalRenderJobRecord | null> => {
+  const agingMinutes = input?.agingMinutes ?? 30
+
+  return withGreenhousePostgresTransaction(async client => {
+    const candidate = await client.query<{ render_job_id: string; owner_org_id: string; state: string }>(
+      `SELECT render_job_id, owner_org_id, state
+         FROM greenhouse_commercial.proposal_render_jobs
+        WHERE state = 'queued'
+          AND (deadline IS NULL OR deadline > now())
+        ORDER BY
+          LEAST(
+            COALESCE(deadline, 'infinity'::timestamptz),
+            created_at + make_interval(mins => $1)
+          ) ASC,
+          created_at ASC
+        LIMIT 1
+        FOR UPDATE SKIP LOCKED`,
+      [agingMinutes]
+    )
+
+    const row = candidate.rows[0]
+
+    if (!row) return null
+
+    const updated = await client.query<Record<string, unknown>>(
+      `UPDATE greenhouse_commercial.proposal_render_jobs
+          SET state = 'running', started_at = now(), attempts = attempts + 1
+        WHERE render_job_id = $1
+        RETURNING ${JOB_COLUMNS}`,
+      [row.render_job_id]
+    )
+
+    await client.query(
+      `INSERT INTO greenhouse_commercial.proposal_render_job_events
+         (render_job_id, owner_org_id, from_state, to_state, detail, actor_kind)
+       VALUES ($1, $2, 'queued', 'running', $3, 'worker')`,
+      [row.render_job_id, row.owner_org_id, JSON.stringify({ claim: 'skip_locked' })]
+    )
+
+    return mapJobRow(updated.rows[0]!)
+  })
+}
+
 /** Jobs en cola con deadline ya vencido: no compiten; el dispatcher los cierra con detalle. */
 export const listExpiredQueuedRenderJobs = async (): Promise<ProposalRenderJobRecord[]> => {
   const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(

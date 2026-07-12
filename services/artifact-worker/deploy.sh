@@ -7,7 +7,7 @@
 #
 # ⚠️ Este archivo es el SoT de las env vars del Job en Cloud Run (regla del repo):
 # `--set-env-vars` es DESTRUCTIVO — toda var agregada out-of-band desaparece en el próximo
-# deploy. El flag ARTIFACT_RENDER_JOBS_ENABLED vive DECLARADO acá (default false) y su fila en
+# deploy. El flag ARTIFACT_RENDER_JOBS_ENABLED vive DECLARADO acá (ON desde 2026-07-12) y su fila en
 # docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
 #
 # Uso: ENV=staging bash services/artifact-worker/deploy.sh
@@ -92,9 +92,11 @@ ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_STORAGE_ENV=${STORAGE_ENV}"
 ENV_VARS="${ENV_VARS},GOOGLE_CLOUD_PROJECT=${PROJECT_ID}"
-# 🚩 Flag del pipeline de render (ledger: FEATURE_FLAG_STATE_LEDGER.md). Default OFF:
-# el Job invocado con el flag apagado registra skip y sale 0 — no renderiza.
-ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLED:-false}"
+# 🚩 Flag del pipeline de render. Con el flag OFF el Job registra skip y sale 0 — no renderiza.
+# ON desde 2026-07-12 (autorizado por el operador). El Job sólo ejecuta filas de
+# proposal_render_jobs que el dispatcher le pasa: con el enqueue apagado en Vercel PROD, el
+# único trabajo posible viene de staging/CLI. Ledger: FEATURE_FLAG_STATE_LEDGER.md
+ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLED:-true}"
 
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
 
@@ -141,7 +143,7 @@ if [[ "${DEPLOYED_SHA}" != "${GIT_SHA:0:40}" ]]; then
   exit 1
 fi
 
-echo "✓ artifact-worker desplegado (${ENV}, flag=${ARTIFACT_RENDER_JOBS_ENABLED:-false})"
+echo "✓ artifact-worker desplegado (${ENV}, flag=${ARTIFACT_RENDER_JOBS_ENABLED:-true})"
 echo "  Ejecución manual de smoke:"
 echo "  gcloud run jobs execute ${JOB_NAME} --project=${PROJECT_ID} --region=${REGION} \\"
 echo "    --update-env-vars=RENDER_JOB_ID=<id> --wait"

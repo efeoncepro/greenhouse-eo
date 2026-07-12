@@ -209,7 +209,11 @@ ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
 # TASK-1391 — flag del pipeline de render (multi-runtime; SoT Cloud Run = deploy.sh; ledger:
 # docs/operations/FEATURE_FLAG_STATE_LEDGER.md). El dispatcher lo lee; OFF ⇒ skip logueado.
-ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLED:-false}"
+# 🚩 ON desde 2026-07-12 (autorizado por el operador). ⚠️ El ops-worker es un servicio ÚNICO
+# (staging y production comparten revisión): prenderlo acá habilita el DISPATCHER, no el enqueue.
+# La puerta real de producción sigue siendo Vercel PROD, que NO tiene la var (nadie encola desde
+# prod) + el entitlement per-ORG `proposal_studio_v1`. Ledger: FEATURE_FLAG_STATE_LEDGER.md
+ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
