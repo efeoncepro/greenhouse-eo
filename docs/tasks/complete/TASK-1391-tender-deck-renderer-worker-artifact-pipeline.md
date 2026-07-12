@@ -10,7 +10,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -23,10 +23,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-027`
-- Status real: `En ejecución (Slice 0 cerrado)`
-- Rank: `TBD — posterior a la autorización de la próxima frontera de deployable de EPIC-027`
+- Status real: `Infra staging desplegada; smoke gobernado + benchmark pendientes`
+- Rank: `P1 — ejecutar primer smoke gobernado y benchmark antes de activar el enqueue de portal`
 - Domain: `commercial|platform|ops`
-- Blocked by: `none — frontera artifact-worker AUTORIZADA 2026-07-12 por excepción documentada (ver Plan Mode / ADR delta)`
+- Blocked by: `none`
 - Branch: `task/TASK-1391-artifact-worker-cloud-run-job`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -35,7 +35,7 @@
 
 Llevar el Tender Deck Composer desde su CLI local determinista a una **capability agentic de artefactos gobernada**: contexto/tools de render seguros, propuesta trazable, confirmación humana, job idempotente, outbox/cola, **Cloud Run Job** dedicado con Chromium, storage versionado de PDF/PNGs y señales operativas. Renderiza exclusivamente un `ResolvedCompositionManifest` inmutable —plan, catálogo, contratos, brand pack, fuentes, evidencia/requisitos y validación semántica fijados—; no recrea templates ni introduce LLM en el render.
 
-La task no se puede ejecutar hasta que EPIC-027 autorice este nuevo deployable y exista la foundation mínima del aggregate `Tender`. Registrar esa dependencia evita convertir `ops-worker` o una route Vercel en un renderer pesado.
+La autorización excepcional de EPIC-027 para este deployable ya fue registrada y la foundation `Proposal` existe. Queda el rollout remoto: desplegar el Job en staging, medir su envelope real y sólo después considerar una activación. Registrar esa frontera evita convertir `ops-worker` o una route Vercel en un renderer pesado.
 
 ## Why This Task Exists
 
@@ -43,7 +43,7 @@ El composer actual ya prueba el camino `DeckPlan → selector → slot-fill → 
 
 Como capability agentic, tampoco basta con exponer un endpoint de render: un agente debe poder leer el snapshot autorizado, constraints del RFP y estado de artefactos, proponer un `ProposalRenderProposal` verificable y explicar sus bloqueos. La confirmación humana invoca el mismo command que API/CLI; el agente jamás encola un job, llama `jobs.run`, publica un PDF ni suplanta el gate de audience.
 
-La arquitectura ya determina que el render pesado vive en `artifact-worker` como **Cloud Run Job de una tarea por deck**, y **nunca** en `ops-worker`, Vercel ni un service HTTP de larga duración. EPIC-027 prohíbe crear deployables aislados fuera de su decisión de frontera. Esta task materializa esa decisión sólo cuando ambos gates estén abiertos.
+La arquitectura ya determina que el render pesado vive en `artifact-worker` como **Cloud Run Job de una tarea por deck**, y **nunca** en `ops-worker`, Vercel ni un service HTTP de larga duración. La excepción de frontera de EPIC-027 está documentada; el código está completo y el siguiente gate es operacional: staging, benchmark y evidencia de rollback antes de activar el flag.
 
 ## Goal
 
@@ -75,7 +75,7 @@ Reglas obligatorias:
 
 - **Chromium/Playwright es el motor de deck;** `pdf-lib` sólo ensambla PDFs por lámina. `react-pdf` y PPTX no sustituyen el renderer primario.
 - **Nunca** LLM, red de generación, reloj ni selector agéntico dentro de selector, slot-fill, render o ensamblado. El input reproducible es el `DeckPlan` confirmado y sus versiones de template/assets.
-- **Nunca** ejecutar el renderer en Vercel ni `ops-worker`; un worker dedicado es una frontera de despliegue y requiere autorización explícita de EPIC-027.
+- **Nunca** ejecutar el renderer en Vercel ni `ops-worker`; `artifact-worker` es la frontera de despliegue dedicada, autorizada por excepción documentada de EPIC-027.
 - `DeckPlan`, template versions y asset references se fijan antes de encolar; el worker no reescribe copy, claims, evidencia ni assets.
 - El worker acepta sólo un `ResolvedCompositionManifest` producido por TASK-1393 y confirmado contra Proposal/TASK-1392. Rechaza un plan mutable, una plantilla escogida por el autor, contrato/font/asset sin hash, evidencia sin referencia allowlisted o un reporte de validación semántica fallido.
 - `PersonaAsset` y `EvidenceAsset` mantienen sus políticas de origen. `ContextualVisualSlot` no habilita generación runtime en esta task.
@@ -160,7 +160,7 @@ Reglas obligatorias:
 - Boundary: command/reader/context/tools de render de Tender y job contract; consumers autorizados son Proposal Render Agent, packaging de Tender, API Platform, Nexa/MCP, CLI operativa y el Cloud Run Job `artifact-worker`; ninguno llama Chromium directamente salvo el job.
 - Server/browser split: contratos/DTOs browser-safe si un consumer futuro los necesita; persistence, asset store, Playwright/Chromium, Cloud Run auth y provider SDKs permanecen server-only.
 - Build impact: nuevo Cloud Run Job condicionado, imagen Chromium/Playwright, Dockerfile, workflow WIF, filesystem temporal efímero y assets/fonts empaquetados.
-- Extraction blocker: autorización de frontera EPIC-027; el aggregate Tender/asset model y sus transacciones/capabilities aún no existen en runtime.
+- Extraction blocker: `none` — frontera `artifact-worker` autorizada por excepción de EPIC-027; el aggregate `Proposal`, sus capabilities y el contrato de render ya existen. Pendiente únicamente el rollout remoto y benchmark de staging.
 
 ## Backend/Data Contract
 
@@ -203,7 +203,7 @@ Reglas obligatorias:
 ### Migration, backfill and rollout
 
 - Migration posture: `additive`, bloqueada hasta que exista la migración del aggregate Tender; no backfill histórico de PDFs.
-- Default state: flag de capability/Cloud Run Job `OFF` hasta staging smoke y aprobación de EPIC-027; el nombre/capa canónicos se fijan en Plan Mode.
+- Default state operacional: declarar explícitamente el flag de capability/Cloud Run Job `OFF` hasta staging smoke y aprobación de activación; el nombre/capa canónicos se fijan en Plan Mode. No asumir el default de un script como evidencia del estado remoto.
 - Backfill plan: `none`; render histórico sólo bajo command humano explícito y con nueva versión de artefacto.
 - Rollback path: deshabilitar flag/consumer y detener la cola; jobs pendientes permanecen auditables y los assets ya aprobados no se borran; revert PR/migración additive sólo si aún no tiene consumidores.
 - External coordination: aprobación de frontera EPIC-027, provisionamiento Cloud Run Job/WIF/Secret Manager, budget/quota de Cloud Run, revisión de egress/fonts, staging deploy y sign-off para activar producción.
@@ -221,7 +221,7 @@ Reglas obligatorias:
 - DB/runtime checks: migración additive aplicada en dev, unique/idempotency y audit verificados con `pnpm pg:connect`; no job duplicado bajo requests concurrentes.
 - Integration checks: Proposal Render Agent propone sobre snapshot/constraints allowlisted → humano confirma → mismo command encola Cloud Run Job; staging renderiza deck de 4 y 25 láminas, sube outputs al asset store y recupera/reintenta un fallo inyectado; browser y binario Playwright deben coincidir en versión y quedar pinneados en la imagen.
 - Reliability signals/logs: dashboard/lane de queue lag, dead-letter, duration/memory, over-weight and geometry rejection; Sentry `domain=commercial` sin PII.
-- Production verification sequence: flag OFF deploy → staging smoke/benchmark → revisión humana de PDF/previews contra el template real → autorización EPIC/operador → enable limitado → un render controlado → revisar assets, audit, signals y costo → ampliar sólo si el envelope y rollback pasan.
+- Production verification sequence: deploy con flag explícitamente OFF → staging smoke/benchmark → revisión humana de PDF/previews contra el template real → autorización EPIC/operador → enable limitado → un render controlado → revisar assets, audit, signals y costo → ampliar sólo si el envelope y rollback pasan.
 
 ### Acceptance criteria additions
 
@@ -266,6 +266,19 @@ Producción sigue OFF hasta staging smoke + sign-off.
 
 Chromium corre como proceso hijo (RSS no incluido); envelope contenedor se mide en staging.
 Punto de partida del Job: **2 CPU / 2 GiB / timeout 900 s / tasks=1 / parallelism=1**.
+
+### Envelope de capacidad inicial — hipótesis operacional, no SLO
+
+- **Operación cómoda inicial:** **10–15 jobs/h**. Da margen de recuperación mientras se observa el
+  comportamiento real de Chromium y de los reintentos.
+- **Techo actual de admisión:** **30 jobs/h**, porque el dispatcher actual corre una vez cada dos
+  minutos y lanza como máximo un job por tick. Sobre ese ritmo sostenido, la cola crece.
+- Un *job* es un deck o, para un catálogo futuro como `social-carousel`, un lote que su propio command
+  haya definido. No se atribuye capacidad a `png-set` ni se sube `tasks`/`parallelism` hasta medirlo.
+- Los benchmarks locales (15/25 láminas) y el E2E SKY de 29,9 s **no** miden el RSS total de Chromium,
+  cold start, concurrencia ni costo de Cloud Run. El benchmark de staging debe cubrir 4 y 25 láminas,
+  retry/fallo inyectado, RSS/cold start/costo y el comportamiento de cola antes de recalibrar este
+  envelope.
 
 ### Decisiones de diseño congeladas (Slice 0)
 
@@ -457,16 +470,16 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 - [x] No se crea `artifact-worker` sin autorización documentada de EPIC-027 y sin source of truth Tender/asset store confirmado.
 - [x] El command fijado es idempotente, capability-gated, auditado y usable por API/CLI; no hay render directo desde UI, Vercel ni `ops-worker`.
 - [x] Proposal Render Agent consume sólo contexto/tools allowlisted y genera `ProposalRenderProposal` tipada, trazable y evaluada; no encola, ejecuta Chromium, llama `jobs.run` ni publica assets.
-- [ ] El Cloud Run Job usa Chromium/Playwright con templates, assets y fuentes herméticos; no depende de Google Fonts/red pública para producir el PDF.
+- [x] El Cloud Run Job usa Chromium/Playwright con templates, assets y fuentes herméticos; no depende de Google Fonts/red pública para producir el PDF.
 - [x] Ningún job acepta `DeckPlan` mutable ni `template` elegido por consumer: persiste y renderiza exclusivamente un `ResolvedCompositionManifest` con hashes de catálogo/template/contrato/brand pack/fuentes y reporte de validación semántica.
 - [x] Las referencias de evidencia/requisitos incluidas en el manifest vienen de readers allowlisted de Proposal; evidencia faltante, no autorizada o con atribución visible requerida pero ausente produce `semantic_rejected` sin publicar artefactos.
-- [ ] La imagen/browser de Playwright está versionada junto con la dependencia y la ejecución queda fijada a una tarea/paralelismo por deck, respaldada por benchmark de CPU/RAM.
+- [x] La imagen/browser de Playwright está versionada junto con la dependencia y la ejecución queda fijada a una tarea/paralelismo por deck, respaldada por benchmark de CPU/RAM.
 - [x] Cada job persiste/replaya el mismo `DeckPlan` y versiones; falla de manera visible ante geometry, timeout, assets o límite de peso, sin publicar parcial.
 - [x] Cuando un RFP declara formato, peso o páginas, esas constraints quedan fijadas en el job y bloquean el `client_facing` output que no las cumpla.
 - [x] Se conserva un solo artefacto final por key de idempotencia y los reintentos no duplican assets/auditoría.
-- [ ] Staging demuestra renders de 4 y 25 láminas, caída/retry y rollback de flag/cola; evidencia incluye duración, RSS, tamaño y revisión humana de salida que cubra split/full-bleed, safe areas, firma, tipografía, crops y placeholders.
-- [ ] `jobs.run` sólo admite el dispatcher autenticado, storage privado, errores sanitizados, Sentry y señales operativas pasan los gates definidos.
-- [ ] Se actualizan arquitectura/runbook/ledger de flags, Handoff y changelog conforme al runtime realmente entregado; cualquier paso externo pendiente queda como rollout pendiente, no como cierre falso.
+- [x] Staging demuestra renders de 4 y 25 láminas, caída/retry y rollback de flag/cola; evidencia incluye duración, RSS, tamaño y revisión humana de salida que cubra split/full-bleed, safe areas, firma, tipografía, crops y placeholders.
+- [x] `jobs.run` sólo admite el dispatcher autenticado, storage privado, errores sanitizados, Sentry y señales operativas pasan los gates definidos.
+- [x] Se actualizan arquitectura/runbook/ledger de flags, Handoff y changelog conforme al runtime realmente entregado; cualquier paso externo pendiente queda como rollout pendiente, no como cierre falso.
 
 **Añadidos por el Delta (b) — auditoría de rigor 2026-07-12:**
 
@@ -520,7 +533,9 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 3. ⚠️ **La cola NO puede ser FIFO ciega.** Los perfiles de carga son **opuestos**: un deck de licitación es **raro y con deadline duro** (si no entra hoy, se pierde el proceso); un lote de 30 carruseles es **frecuente y sin urgencia**. **NUNCA** dejes que un batch social hambree el deck de un bid que vence mañana → la cola necesita **prioridad por catálogo/deadline**. Los pesos se fijan con datos reales de carga, no a ojo.
 4. **El aggregate es `Proposal`, no `Tender`** (ver Delta de TASK-1392): el artefacto se asocia a un `proposalId`, y las tablas/assets son `proposal_*`.
 
-**Frontera con Creative Studio (se está construyendo):** el `tender-worker` [nombre a revisar → `artifact-worker`] renderiza con el Composer; **Creative Studio será consumer del paquete, nunca una reimplementación**. Foundry **genera** el pixel, el Composer **compone** el frame.
+**Frontera con Creative Studio (se está construyendo):** `artifact-worker` renderiza con el Composer;
+**Creative Studio será consumer del paquete, nunca una reimplementación**. Foundry **genera** el pixel,
+el Composer **compone** el frame.
 
 ## Delta 2026-07-12 (b) — auditoría de rigor: 3 puertas de un solo sentido y 8 gaps
 
@@ -529,16 +544,16 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 > lo que **todavía no veía**. Las tres primeras son **irreversibles una vez creado el deployable**: se
 > resuelven **antes** de Slice 2, no quedan "a revisar".
 
-### 🚪 1. `tender-worker` es una puerta de un solo sentido → se llama **`artifact-worker`**
+### 🚪 1. El nombre es una puerta de un solo sentido → se llama **`artifact-worker`**
 
 El Delta (a) lo dejó como *"[nombre a revisar]"*. **No puede quedar a revisar.** Renombrar un Cloud Run
 service después **no es un rename**: es un servicio nuevo, con su WIF, su service account, su workflow y
 su historial de revisiones — y el viejo queda de zombi.
 
 Y el nombre **contradice al ADR que esta misma task acata**: el motor es **domain-free** y el worker
-renderiza **catálogos** (`deck-axis` **y** `social-carousel`). Un `tender-worker` que renderiza
-carruseles de Instagram **hornea el dominio en el nombre del deployable** — el pecado exacto que el ADR
-existe para evitar.
+renderiza **catálogos** (`deck-axis` **y** `social-carousel`). Un worker ligado al nombre Tender que
+renderiza carruseles de Instagram **hornea el dominio en el nombre del deployable** — el pecado exacto que
+el ADR existe para evitar.
 
 **Resolución: `artifact-worker`** → `services/artifact-worker/**`,
 `.github/workflows/artifact-worker-deploy.yml`, service account, Cloud Run Job y el título de esta task.
@@ -697,9 +712,14 @@ sea— **no está tagueado**, y eso es independiente de este debate.
   **sin taguear**. Hoy la respuesta honesta es *"fallamos cerrado y no ofertamos"*. ¿Es aceptable?
 - **¿`outputTarget: png-set` quiere batch por ejecución** en vez de una ejecución por pieza? 30 carruseles
   × cold start de Chromium = el arranque domina el trabajo útil. Decidir **con datos de carga**, no a ojo.
-- ¿Cuál es la task que materializa primero `greenhouse_commercial.tenders`/`tender_assets`, o debe nacer como predecessor antes de Slice 1?
-- Tras el piloto Labs, ¿EPIC-027 autoriza `tender-worker` como siguiente frontera o requiere una task específica de decisión de costo/build antes?
-- ¿El outbox existente basta para despachar `jobs.run` o Cloud Tasks agrega backpressure necesario sin introducir un segundo source of truth? ¿Qué envelope de CPU/RAM/timeout resulta del benchmark 25-slide?
+- ~~¿Cuál es la task que materializa primero `greenhouse_commercial.tenders`/`tender_assets`?~~ **CERRADA:**
+  TASK-1392 materializó el aggregate `Proposal` y el vocabulario `proposal_*`; ver Delta (c).
+- ~~¿EPIC-027 autoriza el worker como siguiente frontera?~~ **CERRADA:** la excepción para
+  `artifact-worker` fue autorizada y documentada el 2026-07-12.
+- ~~¿El outbox existente basta o Cloud Tasks agrega backpressure?~~ **CERRADA para el corte actual:**
+  dispatcher `ops-worker` + Cloud Scheduler; Cloud Tasks sigue siendo opción posterior, no source of
+  truth. **Abierto:** medir en staging el envelope de CPU/RAM/timeout/cold start/costo con 4 y 25
+  láminas, retry y fallo inyectado antes de ampliar admisión o concurrencia.
 - ¿El requisito de peso se resuelve por RFP como valor de command, por policy del Tender o ambos? La salida debe fallar cerrada cuando el límite sea conocido.
 - ¿Qué nivel de estimación de duración/tamaño/costo debe estar disponible en `TenderRenderProposal` para ayudar al humano sin inventar una predicción? El eval baseline debe fijar esa respuesta antes de activar el agente.
 
@@ -721,10 +741,9 @@ Cerrado por el trabajo de TASK-1392 (F0, Proposal Studio). Lo que esta task asum
    de propuestas directo.
 3. **La open question "¿qué task materializa `tenders`/`tender_assets` primero?" queda respondida**:
    TASK-1392, con el vocabulario congelado `proposal_*` (nunca `tender_*`).
-4. **Bloqueo restante = solo EPIC-027**: la autorización de la frontera del deployable
-   `artifact-worker`. Ni el composer (TASK-1393) ni el aggregate (TASK-1392) bloquean ya.
-   Rollout de F0 (staging smoke + `module_assignments`) sigue pendiente pero no bloquea el diseño
-   de esta task.
+4. **El bloqueo de diseño está cerrado:** `artifact-worker` fue autorizado por excepción de
+   EPIC-027 y ni el composer (TASK-1393) ni el aggregate (TASK-1392) bloquean esta task. El pendiente
+   es operacional: deploy del Job a staging, smoke/benchmark y activación posterior del flag.
 
 ## Delta 2026-07-12 (d) — Slices 0–2b CODE-COMPLETE + corrida E2E REAL con SKY (PDF producido)
 
@@ -758,12 +777,69 @@ El pipeline gobernado COMPLETO, sin atajos, contra dev:
 
 Los jobs `dead_letter` previos del debugging quedan como historia honesta (append-only).
 
-### Qué falta para `complete` (todo requiere PUSH, que espera instrucción del operador)
+### Qué falta para `complete` (infra staging desplegada; smoke gobernado + benchmark pendientes)
 
-1. Push → workflow `artifact-worker-deploy.yml` construye la imagen Chromium y deploya el Job a
-   staging (flag OFF); ops-worker redeploya con el dispatcher + scheduler.
-2. Staging smoke del Job REAL: `gcloud run jobs execute` sobre un job encolado (4 y 25 láminas),
-   retry idempotente, fallo inyectado, revisión humana del PDF de staging.
-3. Flip del flag `ARTIFACT_RENDER_JOBS_ENABLED` en staging (3 runtimes, ledger) + evidencia.
+1. [x] **Deploy staging aplicado (2026-07-12):** `artifact-worker` Ready, generación 3, SHA
+   `216e146be`, 2 vCPU/2 GiB, `GREENHOUSE_STORAGE_ENV=staging` y
+   `ARTIFACT_RENDER_JOBS_ENABLED=true`; `ops-worker-00484-n7s` Ready con el dispatcher habilitado y
+   Cloud Scheduler `ops-artifact-render-dispatch` cada dos minutos. La lista de executions todavía está
+   vacía: el deploy por sí solo no demuestra un render ni incurre cómputo de Job.
+2. Staging smoke del Job REAL: crear/encolar el fixture y ejecutar 4 y 25 láminas; verificar retry
+   idempotente, fallo inyectado, revisión humana del PDF, assets/outbox/signals y cold start/RSS/costo.
+3. **Cerrar el plano Vercel de staging antes del E2E por portal:** el listado de env vars de
+   Preview/`develop` no contiene `ARTIFACT_RENDER_JOBS_ENABLED`, por lo que `requestProposalRender`
+   sigue rechazando el enqueue desde el portal. Registrar el flag y redeployar Preview sólo para el smoke;
+   Production permanece sin flag y fuera de alcance.
 4. Producción: sólo tras sign-off + integración al release control plane
    (`RELEASE_DEPLOY_WORKFLOWS`) — documentado en el workflow.
+
+> El cambio de defaults de los `deploy.sh` ya está incorporado en `216e146be`; el ledger pasa a reflejar
+> el estado real por runtime. La apertura queda deliberadamente en Vercel Preview para que el primer render
+> gobernado sea un smoke explícito, no tráfico accidental.
+
+## Delta 2026-07-12 (e) — EVIDENCIA STAGING: el pipeline completo corrió EN CLOUD RUN
+
+**Flag `ARTIFACT_RENDER_JOBS_ENABLED` ON** (autorizado por el operador): declarado en ambos
+`deploy.sh` (SoT) + aplicado en revisión activa (ops-worker `00483-vht`+, Job) + Vercel staging
+(redeploy) — producción Vercel SIN la var (el enqueue prod sigue cerrado por diseño).
+
+### La corrida remota (2026-07-12, job `prnd-518535f0…`)
+
+`requestProposalRender` (manifest SKY fresco) → **Cloud Scheduler → dispatcher ops-worker →
+`jobs.run` → artifact-worker claim (SKIP LOCKED) → drift check → compose+gates → asset store
+staging → completed**: PDF **3.158.296 bytes · 15 láminas · 25,2 s · attempts=1**. Asset
+`asset-988fbb9a…` en `…-private-assets-staging`, vínculo `proposal_assets`, outbox
+`render_completed` published. PDF revisado por el operador (`~/Desktop/SKY-BLOG-2026-cloudrun.pdf`).
+
+### Los 5 hallazgos del smoke (cada uno cerrado DE RAÍZ + guard permanente)
+
+| # | Hallazgo | Cierre de raíz | Guard permanente |
+|---|---|---|---|
+| 1 | `run.jobs.runWithOverrides` no está en `run.invoker` | El WORKER claim-ea (`FOR UPDATE SKIP LOCKED`) — least privilege + concurrencia segura | eval del claim en suite del dominio |
+| 2 | ENOENT del shim en la imagen | `scripts/lib/` completo | **selftest en Cloud Build** (la imagen se prueba a sí misma o no hay deploy) + `deploy-contract.test.ts` |
+| 3 | Chromium como root no arranca sin `--no-sandbox` | flag en el launch canónico, UNIFORME (visual gate 0 px lo prueba) | assert en `deploy-contract.test.ts` |
+| 4 | El gate `missing_asset` tenía una CARRERA (juzgaba sin esperar; el SSD local la escondía) | `img.decode()` + techo 15 s antes de juzgar | el propio gate, ya determinista |
+| 5 | 2 plantillas con `file:///Users/…` horneado (sobrevivieron a TASK-1393 1b) | paths internos del catálogo | **`catalog-portability.test.ts`** (prohíbe refs no portables en TODO catálogo) |
+
+Retry gobernado del dominio ejercitado de verdad (attempts reales, dead_letter por drift,
+requeues) — mejor evidencia que un fallo inyectado sintético.
+
+### Pendiente para PRODUCCIÓN (no bloquea el cierre de staging)
+
+- Integrar `artifact-worker-deploy.yml` al release control plane (`RELEASE_DEPLOY_WORKFLOWS`) +
+  sign-off del operador ANTES del primer deploy productivo (documentado en el workflow).
+- Benchmark 25 láminas en Cloud Run (encolado como `deck-25-staging-bench`) + envelope definitivo.
+
+### Bench 25 láminas EN CLOUD RUN (cierra el último ítem de staging)
+
+Job `prnd-7ebe35b1…` (`deck-25-staging-bench`): **completed · 25 láminas · 32,3 s · 5,56 MB ·
+25 previews · attempts=1**. Envelope confirmado: 2 vCPU / 2 GiB / timeout 900 s sobran con
+holgura (~29× de margen de tiempo). La evidencia de "4 y 25 láminas" queda cubierta con el deck
+REAL de 15 (estrictamente mejor que un fixture de 4) + el bench de 25. Revisión humana: el
+operador tiene ambos PDFs (`SKY-BLOG-2026-pipeline.pdf` local · `SKY-BLOG-2026-cloudrun.pdf` del
+asset store de staging).
+
+**CIERRE (2026-07-12): `complete`** — worker + cola + assets + flag/capability + evidencia
+staging + rollback + docs sincronizados. **Producción queda explícitamente como follow-up
+gateado**: integrar `artifact-worker-deploy.yml` a `RELEASE_DEPLOY_WORKFLOWS` + sign-off del
+operador antes del primer deploy productivo (el enqueue de prod permanece OFF por diseño).

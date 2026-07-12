@@ -1,3 +1,38 @@
+## Sesión 2026-07-12 (cont. 15) — 🏆 TASK-1391 COMPLETE: el render corre EN CLOUD RUN (Claude)
+
+- **Evidencia staging REAL**: deck SKY 15 láminas → `completed` en Cloud Run (job `prnd-518535f0…`,
+  25,2 s, 3,16 MB, attempts=1, asset en `…-private-assets-staging`, outbox published) + bench 25
+  láminas → `completed` (32,3 s, 5,56 MB). El camino ENTERO remoto: Scheduler → dispatcher
+  ops-worker → `jobs.run` → claim SKIP LOCKED → drift check → gates → asset store.
+- **Los 5 hallazgos del smoke, cerrados de raíz + guards permanentes**: (1) IAM
+  `runWithOverrides` ∉ `run.invoker` → el worker claim-ea (least privilege + concurrencia segura);
+  (2) ENOENT del shim → `scripts/lib/` completo + **SELFTEST en Cloud Build** (la imagen se prueba
+  a sí misma o no hay deploy) + `deploy-contract.test.ts` (10 asserts, incl. pin Playwright ↔
+  package.json); (3) Chromium root sin `--no-sandbox` → flag uniforme en el launch canónico
+  (visual gate 0 px); (4) CARRERA en el gate missing_asset (el SSD local la escondía) →
+  `img.decode()` + techo 15 s; (5) 2 plantillas con `file:///Users/…` horneado →
+  **`catalog-portability.test.ts`** (refs no portables prohibidas en TODO catálogo).
+- **Flag ON staging verificado ×3 runtimes** (declarado en deploy.sh = SoT); **Vercel PROD sin la
+  var** — el enqueue de producción sigue cerrado por diseño. Ledger actualizado con evidencia.
+- **Lifecycle → `complete/`**. Follow-up gateado de PRODUCCIÓN: integrar
+  `artifact-worker-deploy.yml` a `RELEASE_DEPLOY_WORKFLOWS` + sign-off ANTES del primer deploy
+  productivo (documentado en el workflow y en la task).
+
+## Sesión 2026-07-12 (cont. 15) — TASK-1391: infraestructura staging desplegada; smoke gobernado pendiente (Codex)
+
+- **Estado vigente (supersede las notas históricas que dicen “push/deploy pendiente”):** `develop` ya
+  contiene `216e146be`; `artifact-worker` quedó Ready en staging (2 vCPU/2 GiB, storage staging, flag
+  ON) y `ops-worker-00484-n7s` tiene el dispatcher ON + Scheduler cada dos minutos. El Job no tiene
+  executions todavía: despliegue no equivale a smoke ni consume cómputo de render mientras no se ejecute.
+- **Siguiente paso operacional:** Preview/`develop` no tiene `ARTIFACT_RENDER_JOBS_ENABLED`, por lo que
+  `requestProposalRender` continúa rechazando enqueue desde el portal. Registrar ese flag sólo para el
+  smoke y ejecutar 4/25 láminas, retry/fallo inyectado, revisión humana de PDF y benchmark de cold
+  start/RSS/costo. Production queda sin flag y fuera de alcance.
+- Capacidad inicial documentada como hipótesis: 10–15 jobs/h cómodos; techo actual 30 jobs/h por el
+  dispatcher de un job cada dos minutos. No es un SLO ni habilita aún `social-carousel`.
+- **Excepción de rama:** el operador autorizó esta corrección documental directamente en `develop`;
+  alcance docs-only, sin deploy, cambio de flag ni push ejecutado por Codex.
+
 ## Sesión 2026-07-12 (cont. 14) — Skills actualizadas: el runtime 1391/1392/1393 documentado para agentes nuevos (Claude)
 
 - **Companion NUEVO canónico:** `greenhouse-public-private-tenders/proposal-studio-runtime.md` —

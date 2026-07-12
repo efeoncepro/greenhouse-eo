@@ -1,5 +1,11 @@
 # TASK-1363 — Assessment Taking + Review Surface
 
+## Delta 2026-07-12 — TASK-354 is ready; formal blocker removed
+
+- **TASK-354 is code complete and its public Careers route is live** (`/public/careers`, application flag and Turnstile configured; `Blocked by: none`). Its reusable public shell is therefore an available dependency, not a blocker for this task.
+- **TASK-355 is complete** and the Application 360 host is available. TASK-1360/1361/1383/1384 provide the assessment engine, hardening and active question bank.
+- `Blocked by` is now `none`: TASK-1363 is ready to enter its UI implementation plan. The remaining TASK-354 submit smoke is operational closure for Careers, not a reason to defer the independent tokenized assessment surface.
+
 ## Delta 2026-07-10 — TASK-1384: el banco del lote 1 está ACTIVO (25 preguntas, cobertura 9/9)
 
 - El pool activo para AM L2 existe (25 preguntas work-sample-first, review adversarial aplicado). Observaciones del review que ESTA task debe honrar:
@@ -50,7 +56,7 @@ Hechos verificados contra el repo real. Ajustes:
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-354`
+- Blocked by: `none`
 - Branch: `task/TASK-1363-assessment-taking-review-surface`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -104,7 +110,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-1360` (motor: instancias, respuestas, scoring, rollup + contrato de token)
-- `TASK-354` (shell público + patrón tokenizado) `[verificar]`
+- `TASK-354` (shell público tokenizado reutilizable; code complete/live, dependencia disponible)
 - `TASK-355` (Application 360 donde se embebe el scorecard; complete en repo/dev)
 - Product-design loop (dirección visual) — prerequisito de `UI ready: yes`
 
@@ -129,10 +135,10 @@ Reglas obligatorias:
 - **Motor de assessment (TASK-1360 + TASK-1361, ✓ COMPLETE):** contrato real en `src/lib/hiring/assessment/**` — `resolveAssessmentByToken` (single-use), `saveResponse`, `submitAssessment`, `buildPublicQuestion` (allowlist anti answer-key), `finalizeAssessment` (scoring/rollup), `assignCandidateTest`, `time_limit_minutes`, **`accommodations_json`**; capabilities `hiring.assessment.read/author/score/ai_assist` sembradas + granteadas.
 - Primitives UI Platform (Composition Shell, inputs canónicos, drawer/sidecar).
 
-### Pendiente (blocked-by vivos, NO existen todavía)
+### Foundations available
 
-- Shell público tokenizado (TASK-354, `to-do`) — host de la rendición (DDL-2: mismo shell del apply).
-- Application 360 (TASK-355, `complete`) — host del scorecard/review interno ya disponible en el desk.
+- Shell público tokenizado (TASK-354, code complete/live) — host reutilizable de la rendición (DDL-2: mismo shell del apply).
+- Application 360 (TASK-355, complete) — host del scorecard/review interno disponible en el desk.
 
 ### Gap
 
@@ -277,7 +283,7 @@ La rendición candidate-facing reutiliza el patrón de shell público tokenizado
 
 ### Feature flags / cutover
 
-- El candidate-facing se habilita junto al apply público (TASK-354) tras GVC verde. La UI interna es additive (visible solo con capability). Sin flag propio salvo que el rollout del apply público lo requiera.
+- El candidate-facing reutiliza el shell público ya habilitado por TASK-354 y se libera tras su propio GVC verde. La UI interna es additive (visible solo con capability). Evaluar en Plan Mode si el assessment requiere un flag independiente; no acoplar su cutover al submit smoke residual de Careers.
 
 ### Rollback plan per slice
 
@@ -296,7 +302,7 @@ La rendición candidate-facing reutiliza el patrón de shell público tokenizado
 
 ### Out-of-band coordination required
 
-- N/A — repo-only (depende del rollout del apply público de TASK-354).
+- N/A — el shell público de TASK-354 ya está disponible; la coordinación runtime específica se limita al rollout propio del assessment si Plan Mode determina un flag.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

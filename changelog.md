@@ -2,6 +2,14 @@
 
 ## 2026-07-12
 
+- **TASK-1391 COMPLETE — el deck de SKY se renderizó EN CLOUD RUN por el pipeline gobernado.**
+  Primer Cloud Run Job del ecosistema operando: 15 láminas en 25,2 s y bench de 25 en 32,3 s,
+  ambos al primer intento, con assets versionados en el bucket privado de staging y outbox
+  publicado. El smoke real cazó 5 bugs invisibles en local (IAM, imagen, sandbox, una carrera en
+  el propio gate de calidad y paths absolutos horneados en 2 plantillas) — cada uno cerrado de
+  raíz con su guard permanente (selftest de imagen como gate del deploy, contrato de deploy
+  testeado, gate determinista, test de portabilidad de catálogos). Producción queda gateada por
+  el release control plane + sign-off.
 - **Skills sincronizadas con el runtime de licitaciones (1391/1392/1393).** Companion nuevo
   `proposal-studio-runtime.md` en la skill de tenders (uso end-to-end + costuras de evolución para
   agentes nuevos); `deck-visual-system`, `bid-construction-playbook`, `deck-studio/composition` y
@@ -14,7 +22,9 @@
   render (asset ausente, fallback tipográfico, lámina en blanco); Render Agent propose→confirm→
   execute con eval; dispatcher con prioridad deadline+aging (nunca FIFO ciega). Corrida E2E real:
   la propuesta técnica de SKY → PDF de 15 láminas por el camino gobernado completo (3 bugs reales
-  cazados y arreglados de raíz). Staging deploy del Job pendiente de push (flag OFF, ledger).
+  cazados y arreglados de raíz). **Infra staging desplegada:** Job `artifact-worker` (2 vCPU/2 GiB,
+  flag ON) + dispatcher/Scheduler ON. El primer execution/smoke y benchmark siguen pendientes; Vercel
+  Preview aún no tiene el flag, por lo que el portal no encola renders por ahora.
 - **CI: unit suite ya no está roja por el composer (fix preexistente).** El job de tests corría sin
   browsers de Playwright y las suites del artifact-composer que lanzan Chromium fallaban con
   "Executable doesn't exist" desde que el deck composer entró al repo. Ahora CI provisiona el
@@ -136,7 +146,7 @@
 
 - **Tender Proposal Studio — F0 nace agentic, no CRUD.** TASK-1392 materializa el aggregate/asset intake como capability agentic gobernada: contexto allowlisted + tools sobre primitives + `TenderIntakeProposal` trazable/evaluable + confirmación humana que ejecuta el command canónico. No incluye análisis autónomo de RFP ni permite que un LLM escriba estado/asset/gates directo; desbloquea TASK-1391.
 
-- **EPIC-027 — tareas Tender registradas sin adelantar la frontera.** `TASK-1392` y `TASK-1391` quedan como hijas del programa de desacople: la primera conserva la foundation agentic en el modular monolith; la segunda es un candidato bloqueado para `tender-worker` Cloud Run Job. Ninguna autoriza por sí misma un deployable; exige la decisión explícita `continue|pause|stop` del epic.
+- **EPIC-027 — tareas Tender registradas sin adelantar la frontera.** `TASK-1392` y `TASK-1391` quedan como hijas del programa de desacople: la primera conserva la foundation agentic en el modular monolith; la segunda era el candidato para el Cloud Run Job `artifact-worker`. Esa frontera fue autorizada posteriormente por excepción documentada; los detalles vigentes viven en la entrada 2026-07-12.
 
 - **Creative Studio — composición de formatos curados, no renderer genérico en Tender.** Carruseles de Instagram, posts y stories se formalizan como futuro contrato de Creative Studio (`format_spec → composition_spec → artifact_manifest`), con carrusel como primer proving ground de EPIC-028. Tender mantiene RFP, `audience`, admisibilidad y su renderer contractual; un bridge posterior será minimizado/versionado y no replica material interno ni credenciales.
 
