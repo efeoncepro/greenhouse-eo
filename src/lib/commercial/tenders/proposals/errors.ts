@@ -50,3 +50,19 @@ export class ProposalQuoteMismatchError extends Error {
     this.name = 'ProposalQuoteMismatchError'
   }
 }
+
+export class ProposalEntitlementError extends Error {
+  constructor(public readonly ownerOrgId: string) {
+    super(
+      `La organización "${ownerOrgId}" no tiene el módulo proposal_studio_v1 activo: la capability se contrata por org, no se hereda por rol.`
+    )
+    this.name = 'ProposalEntitlementError'
+  }
+}
+
+export class ProposalForbiddenError extends Error {
+  constructor(need: string) {
+    super(`El actor no tiene la capability requerida para esta operación (${need}).`)
+    this.name = 'ProposalForbiddenError'
+  }
+}

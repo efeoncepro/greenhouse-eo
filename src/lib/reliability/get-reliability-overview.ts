@@ -266,6 +266,8 @@ import { getCommercialOrganizationTypeLifecycleDriftSignal } from './queries/com
 import { getOrganizationWebsiteUrlUnsyncedSignal } from './queries/organization-website-url-unsynced'
 // TASK-1212 — cotizaciones emitidas sin líneas (autoría fuera del command atómico). Roll up `commercial`.
 import { getCommercialQuoteAuthoredWithoutCommandSignal } from './queries/commercial-quote-authored-without-command'
+// TASK-1392 — Proposal Studio F0 signals (rollup commercial).
+import { getCommercialProposalSignals } from './queries/commercial-proposal-signals'
 import {
   getQ2cConvertedWithoutIncomeSignal,
   getQ2cConvertedWithoutAuditSignal,
@@ -2387,7 +2389,9 @@ export const getReliabilityOverview = async (
           getQ2cConvertedWithoutAuditSignal().catch(() => null),
           getQ2cIssuedWithoutDealSignal().catch(() => null),
           getQ2cContractOnlySlaBreachSignal().catch(() => null),
-          getQ2cDuplicateIncomeSignal().catch(() => null)
+          getQ2cDuplicateIncomeSignal().catch(() => null),
+          // TASK-1392 — Proposal Studio F0: propuestas estancadas + deadlines en riesgo.
+          getCommercialProposalSignals().catch(() => null)
         ])
           .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
@@ -2396,7 +2400,8 @@ export const getReliabilityOverview = async (
 
             const validOutbound = outboundSignals.filter((s): s is NonNullable<typeof s> => s !== null)
 
-            return [...withProjection, ...validOutbound]
+            // .flat(): algunos readers (TASK-1392 proposal signals) devuelven ReliabilitySignal[].
+            return [...withProjection, ...validOutbound.flat()]
           })
           .catch(() => null)
 

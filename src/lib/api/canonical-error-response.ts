@@ -121,6 +121,13 @@ export type CanonicalErrorCode =
   | 'search_console_token_unhealthy'
   | 'search_console_property_not_accessible'
   | 'search_console_sites_unavailable'
+  // Proposal Studio F0 (TASK-1392).
+  | 'proposal_not_found'
+  | 'proposal_invalid_input'
+  | 'proposal_invalid_transition'
+  | 'proposal_human_gate_required'
+  | 'proposal_quote_gate_failed'
+  | 'proposal_not_entitled'
 // Reserved for future canonical codes — extender aquí cuando emerjan
 // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -477,13 +484,45 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 502,
     message: 'No pudimos obtener tus propiedades de Search Console. Intenta de nuevo en unos minutos.',
     actionable: true
+  },
+  // Proposal Studio F0 (TASK-1392) — errores tipados del aggregate Proposal.
+  proposal_not_found: {
+    status: 404,
+    message: 'La propuesta no existe o no pertenece a tu organización.',
+    actionable: false
+  },
+  proposal_invalid_input: {
+    status: 422,
+    message: 'Los datos de la propuesta no son válidos. Revisa los campos e intenta de nuevo.',
+    actionable: false
+  },
+  proposal_invalid_transition: {
+    status: 409,
+    message: 'Esa transición de estado no está permitida para esta propuesta.',
+    actionable: false
+  },
+  proposal_human_gate_required: {
+    status: 403,
+    message: 'Este paso requiere confirmación humana explícita de una persona autorizada.',
+    actionable: false
+  },
+  proposal_quote_gate_failed: {
+    status: 409,
+    message: 'La decisión de participar exige una cotización vinculada con margen suficiente. Vincula la cotización antes de continuar.',
+    actionable: false
+  },
+  proposal_not_entitled: {
+    status: 403,
+    message: 'Tu organización no tiene activado el Proposal Studio. Habla con tu equipo de Efeonce para activarlo.',
+    actionable: false
   }
 }
 
 /**
  * Build canonical error NextResponse. Single source of truth para todos los
  * errores API que cruzan al cliente. Replaces ad-hoc
- * `NextResponse.json({ error: 'English prose' }, { status: 422 })`.
+ * `NextResponse.json({ error: 'English prose' },
+ *   { status: 422 })`.
  *
  * @param code stable canonical error code
  * @param overrides opcional: extiende `extra` con metadata adicional safe
