@@ -120,6 +120,8 @@ export const AGGREGATE_TYPES = {
 
   // Commercial Quotation (canonical, TASK-347 cutover)
   quotation: 'quotation',
+  // Proposal Studio (TASK-1392 F0): el aggregate de la oferta que Efeonce construye
+  proposal: 'proposal',
   quotationLineItem: 'quotation_line_item',
   quotationLineCostOverride: 'quotation_line_cost_override',
   commercialCapacity: 'commercial_capacity',
@@ -560,6 +562,15 @@ export const EVENT_TYPES = {
   quotationSynced: 'commercial.quotation.synced',
   quotationConverted: 'commercial.quotation.converted',
   quotationLineItemsSynced: 'commercial.quotation.line_items_synced',
+
+  // Proposal Studio (TASK-1392 F0) — payloads v1 sin contenido sensible (IDs/kind/estado, nunca
+  // contenido de RFP, precios de costo ni evidencia cruda)
+  proposalCreated: 'commercial.proposal.created',
+  proposalStateTransitioned: 'commercial.proposal.state_transitioned',
+  proposalRfpIngested: 'commercial.proposal.rfp_ingested',
+  proposalEvidenceRecorded: 'commercial.proposal.evidence_recorded',
+  proposalRequirementDeclared: 'commercial.proposal.requirement_declared',
+  proposalQuoteAttached: 'commercial.proposal.quote_attached',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
 
   // Commercial Deals (TASK-453)

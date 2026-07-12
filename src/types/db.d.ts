@@ -1196,6 +1196,7 @@ export interface GreenhouseCommercialProposals {
   deadline_confidence: Generated<string>;
   hubspot_company_id: string | null;
   hubspot_deal_id: string | null;
+  idempotency_key: string | null;
   origin: string;
   owner_org_id: string;
   platform: string | null;
