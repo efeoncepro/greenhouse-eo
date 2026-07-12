@@ -55,8 +55,8 @@
       "name": "--axis-deck-navy-990",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:11"
       },
       "occurrences": 3,
       "files": [
@@ -73,8 +73,8 @@
       "name": "--axis-deck-navy-940",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:6"
       },
       "occurrences": 1,
       "files": [
@@ -89,8 +89,8 @@
       "name": "--axis-deck-navy-960",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:8"
       },
       "occurrences": 1,
       "files": [
@@ -105,8 +105,8 @@
       "name": "--axis-deck-navy-970",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:9"
       },
       "occurrences": 1,
       "files": [
@@ -121,8 +121,8 @@
       "name": "--axis-deck-navy-950",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:7"
       },
       "occurrences": 1,
       "files": [
@@ -137,8 +137,8 @@
       "name": "--axis-deck-navy-930",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:5"
       },
       "occurrences": 1,
       "files": [
@@ -153,8 +153,8 @@
       "name": "--axis-deck-navy-980",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:10"
       },
       "occurrences": 19,
       "files": [
@@ -185,8 +185,8 @@
       "name": "--axis-deck-navy-900",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:2"
       },
       "occurrences": 1,
       "files": [
@@ -201,8 +201,8 @@
       "name": "--axis-deck-navy-910",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:3"
       },
       "occurrences": 1,
       "files": [
@@ -217,8 +217,8 @@
       "name": "--axis-deck-navy-920",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:4"
       },
       "occurrences": 37,
       "files": [
@@ -256,8 +256,8 @@
       "name": "--axis-deck-recipe-backcover-900",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:20"
       },
       "occurrences": 1,
       "files": [
@@ -270,8 +270,8 @@
       "name": "--axis-deck-navy-880",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:25"
       },
       "occurrences": 2,
       "files": [
@@ -287,8 +287,8 @@
       "name": "--axis-deck-recipe-backcover-800",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:19"
       },
       "occurrences": 1,
       "files": [
@@ -301,8 +301,8 @@
       "name": "--axis-deck-navy-870",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:24"
       },
       "occurrences": 1,
       "files": [
@@ -317,8 +317,8 @@
       "name": "--axis-deck-navy-860",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:23"
       },
       "occurrences": 17,
       "files": [
@@ -346,8 +346,8 @@
       "name": "--axis-deck-navy-850",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:22"
       },
       "occurrences": 1,
       "files": [
@@ -362,8 +362,8 @@
       "name": "--axis-deck-navy-800",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:21"
       },
       "occurrences": 3,
       "files": [
@@ -378,8 +378,8 @@
       "name": "--axis-deck-recipe-backcover-700",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:18"
       },
       "occurrences": 1,
       "files": [
@@ -392,8 +392,8 @@
       "name": "--axis-deck-recipe-backcover-600",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:17"
       },
       "occurrences": 2,
       "files": [
@@ -409,8 +409,8 @@
       "name": "--axis-deck-cyan-700",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:12"
       },
       "occurrences": 1,
       "files": [
@@ -423,8 +423,8 @@
       "name": "--axis-deck-jade-750",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:20"
       },
       "occurrences": 1,
       "files": [
@@ -437,8 +437,8 @@
       "name": "--axis-deck-recipe-backcover-500",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:16"
       },
       "occurrences": 1,
       "files": [
@@ -533,8 +533,8 @@
       "name": "--axis-deck-teal-750",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:20"
       },
       "occurrences": 4,
       "files": [
@@ -551,8 +551,8 @@
       "name": "--axis-deck-recipe-cover-halo-navy",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:21"
       },
       "occurrences": 1,
       "files": [
@@ -567,8 +567,8 @@
       "name": "--axis-deck-blue-510",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:6"
       },
       "occurrences": 1,
       "files": [
@@ -581,8 +581,8 @@
       "name": "--axis-deck-recipe-backcover-400",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:15"
       },
       "occurrences": 1,
       "files": [
@@ -597,8 +597,8 @@
       "name": "--axis-deck-teal-660",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:19"
       },
       "occurrences": 2,
       "files": [
@@ -612,8 +612,8 @@
       "name": "--axis-deck-teal-650",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:18"
       },
       "occurrences": 2,
       "files": [
@@ -628,8 +628,8 @@
       "name": "--axis-deck-jade-550",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:19"
       },
       "occurrences": 2,
       "files": [
@@ -645,8 +645,8 @@
       "name": "--axis-deck-cyan-550",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:11"
       },
       "occurrences": 2,
       "files": [
@@ -662,8 +662,8 @@
       "name": "--axis-deck-teal-560",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:17"
       },
       "occurrences": 2,
       "files": [
@@ -677,8 +677,8 @@
       "name": "--axis-deck-teal-550",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:16"
       },
       "occurrences": 44,
       "files": [
@@ -735,8 +735,8 @@
       "name": "--axis-deck-blue-500",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:5"
       },
       "occurrences": 1,
       "files": [
@@ -776,8 +776,8 @@
       "name": "--axis-deck-teal-500",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:15"
       },
       "occurrences": 55,
       "files": [
@@ -828,8 +828,8 @@
       "name": "--axis-deck-blue-450",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:4"
       },
       "occurrences": 1,
       "files": [
@@ -844,8 +844,8 @@
       "name": "--axis-deck-violet-650",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:24"
       },
       "occurrences": 3,
       "files": [
@@ -861,8 +861,8 @@
       "name": "--axis-deck-cyan-400",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:9"
       },
       "occurrences": 1,
       "files": [
@@ -877,8 +877,8 @@
       "name": "--axis-deck-steel-650",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:5"
       },
       "occurrences": 1,
       "files": [
@@ -891,8 +891,8 @@
       "name": "--axis-deck-teal-450",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:14"
       },
       "occurrences": 2,
       "files": [
@@ -905,8 +905,8 @@
       "name": "--axis-deck-steel-600",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:4"
       },
       "occurrences": 1,
       "files": [
@@ -919,8 +919,8 @@
       "name": "--axis-deck-green-750",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:16"
       },
       "occurrences": 2,
       "files": [
@@ -934,8 +934,8 @@
       "name": "--axis-deck-green-700",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:15"
       },
       "occurrences": 1,
       "files": [
@@ -948,8 +948,8 @@
       "name": "--axis-deck-steel-550",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:3"
       },
       "occurrences": 1,
       "files": [
@@ -962,8 +962,8 @@
       "name": "--axis-deck-cyan-350",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:8"
       },
       "occurrences": 1,
       "files": [
@@ -978,8 +978,8 @@
       "name": "--axis-deck-teal-350",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:13"
       },
       "occurrences": 2,
       "files": [
@@ -993,8 +993,8 @@
       "name": "--axis-deck-violet-550",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:23"
       },
       "occurrences": 54,
       "files": [
@@ -1055,8 +1055,8 @@
       "name": "--axis-deck-green-660",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:14"
       },
       "occurrences": 1,
       "files": [
@@ -1069,8 +1069,8 @@
       "name": "--axis-deck-green-650",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:13"
       },
       "occurrences": 2,
       "files": [
@@ -1086,8 +1086,8 @@
       "name": "--axis-deck-recipe-cover-halo-teal",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:22"
       },
       "occurrences": 1,
       "files": [
@@ -1102,8 +1102,8 @@
       "name": "--axis-deck-steel-450",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:2"
       },
       "occurrences": 1,
       "files": [
@@ -1116,8 +1116,8 @@
       "name": "--axis-deck-blue-300",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:2"
       },
       "occurrences": 1,
       "files": [
@@ -1132,8 +1132,8 @@
       "name": "--axis-deck-teal-300",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:12"
       },
       "occurrences": 1,
       "files": [
@@ -1146,8 +1146,8 @@
       "name": "--axis-deck-steel-400",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:25"
       },
       "occurrences": 1,
       "files": [
@@ -1160,8 +1160,8 @@
       "name": "--axis-deck-recipe-backcover-300",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:14"
       },
       "occurrences": 1,
       "files": [
@@ -1174,8 +1174,8 @@
       "name": "--axis-deck-blue-310",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:3"
       },
       "occurrences": 1,
       "files": [
@@ -1188,8 +1188,8 @@
       "name": "--axis-deck-teal-200",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:11"
       },
       "occurrences": 20,
       "files": [
@@ -1213,8 +1213,8 @@
       "name": "--axis-deck-recipe-backcover-200",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:13"
       },
       "occurrences": 1,
       "files": [
@@ -1229,8 +1229,8 @@
       "name": "--axis-deck-steel-250",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:24"
       },
       "occurrences": 1,
       "files": [
@@ -1243,8 +1243,8 @@
       "name": "--axis-deck-ice-200",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:17"
       },
       "occurrences": 1,
       "files": [
@@ -1257,8 +1257,8 @@
       "name": "--axis-deck-teal-150",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:10"
       },
       "occurrences": 1,
       "files": [
@@ -1271,8 +1271,8 @@
       "name": "--axis-deck-steel-200",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:23"
       },
       "occurrences": 1,
       "files": [
@@ -1285,8 +1285,8 @@
       "name": "--axis-deck-recipe-backcover-100",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:77:12"
       },
       "occurrences": 1,
       "files": [
@@ -1299,8 +1299,8 @@
       "name": "--axis-deck-teal-100",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:9"
       },
       "occurrences": 1,
       "files": [
@@ -1313,8 +1313,8 @@
       "name": "--axis-deck-cyan-100",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:7"
       },
       "occurrences": 1,
       "files": [
@@ -1329,8 +1329,8 @@
       "name": "--axis-deck-violet-150",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:21"
       },
       "occurrences": 2,
       "files": [
@@ -1346,8 +1346,8 @@
       "name": "--axis-deck-surface-70",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:8"
       },
       "occurrences": 1,
       "files": [
@@ -1360,8 +1360,8 @@
       "name": "--axis-deck-violet-50",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:22"
       },
       "occurrences": 1,
       "files": [
@@ -1374,8 +1374,8 @@
       "name": "--axis-deck-surface-60",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:7"
       },
       "occurrences": 14,
       "files": [
@@ -1403,8 +1403,8 @@
       "name": "--axis-deck-ice-50",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:18"
       },
       "occurrences": 2,
       "files": [
@@ -1421,8 +1421,8 @@
       "name": "--axis-deck-surface-50",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:78:6"
       },
       "occurrences": 3,
       "files": [
@@ -1440,8 +1440,8 @@
       "name": "--axis-deck-cyan-50",
       "figma": {
         "collection": "Deck / Primitives",
-        "status": "proposed",
-        "nodeId": null
+        "status": "exists",
+        "nodeId": "VariableID:76:10"
       },
       "occurrences": 1,
       "files": [
