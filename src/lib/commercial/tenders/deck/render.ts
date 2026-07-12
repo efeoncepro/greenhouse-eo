@@ -21,11 +21,28 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import { PDFDocument } from 'pdf-lib'
-import type { Browser, Page } from 'playwright'
+import { chromium, type Browser, type Page } from 'playwright'
 
 import type { SlideSpec, SlotContract, SlotValue, TemplateContract } from './contracts'
 import { resolveFieldDirective, type FieldDirective } from './resolvers'
 import { layoutTimelineSchedule, parseTimelineSchedule } from './timeline'
+
+/**
+ * Launch canónico del Chromium del composer — DETERMINISTA por contrato.
+ *
+ * Un `chromium.launch()` desnudo rasteriza `backdrop-filter`/blends en GPU, y la GPU puede variar
+ * subpíxeles entre corridas del MISMO commit (medido 2026-07-12: 3 píxeles de antialiasing en
+ * `HighlightWave`, zona del wave-frame con `backdrop-filter: blur(20px)`). Eso rompe la promesa de
+ * auditoría del ADR (mismos slots → mismo artefacto) y haría mentir a un gate de 0 píxeles.
+ *
+ * Rasterización por software + perfil de color fijo + sin texto LCD = el mismo píxel en cada corrida.
+ * TODO consumer que renderice láminas (composeDeck, el gate visual, un worker futuro) DEBE lanzar el
+ * browser por acá — un launch paralelo con otros flags produce otro píxel y invalida el baseline.
+ */
+export const launchComposerBrowser = (): Promise<Browser> =>
+  chromium.launch({
+    args: ['--disable-gpu', '--force-color-profile=srgb', '--disable-lcd-text', '--disable-partial-raster']
+  })
 
 export interface RenderTarget {
   /** PNG por lámina (revisión visual) o PDF (el entregable). */

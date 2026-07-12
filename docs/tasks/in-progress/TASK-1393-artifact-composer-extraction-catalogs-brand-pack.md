@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto` <!-- era `Medio`; subió con el Delta (b) (molde + fuentes + contraste) y el Delta (c) (gate estético). Un `Medio` acá invitaba a apurar los slices que protegen la estética. -->

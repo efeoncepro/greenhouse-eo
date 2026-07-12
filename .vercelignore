@@ -29,3 +29,6 @@ Greenhouse_Capabilities_Architecture_v1.md
 # of the Vercel Next.js bundle. They deploy separately via
 # `.github/workflows/hubspot-greenhouse-integration-deploy.yml`.
 services/hubspot_greenhouse_integration/
+
+# TASK-1393: baseline visual del artifact-composer (40MB de PNGs committeados) — el build de Next no lo lee
+scripts/frontend/baselines/artifact-composer

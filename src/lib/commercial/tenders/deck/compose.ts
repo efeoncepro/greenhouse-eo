@@ -12,11 +12,9 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import { chromium } from 'playwright'
-
 import type { DeckPlan, SlideSpec, SlotViolation, TemplateContract, TemplateName } from './contracts'
 import { auditRegistry, findTemplate, selectTemplate, type DeckRegistry } from './selector'
-import { mergeSlidePdfs, renderSlide } from './render'
+import { launchComposerBrowser, mergeSlidePdfs, renderSlide } from './render'
 import { validateDeck } from './validate'
 
 export interface DeckAssets {
@@ -180,7 +178,8 @@ export const composeDeck = async (
   // El DeckPlan se persiste JUNTO al render: es lo que permite el replay determinista.
   await fs.writeFile(path.join(outDir, 'deck-plan.json'), JSON.stringify(deckPlan, null, 2), 'utf8')
 
-  const browser = await chromium.launch()
+  // Launch determinista canónico: mismos slots → mismo píxel (ver `launchComposerBrowser`).
+  const browser = await launchComposerBrowser()
 
   try {
     const rendered = await mapWithConcurrency(deckPlan.slides, concurrency, async (slide, index) => {

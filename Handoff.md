@@ -1,3 +1,13 @@
+## Sesión 2026-07-12 (cont. 7) — TASK-1393 EN CURSO: Artifact Composer extraction (Claude)
+
+- `TASK-1393` movida a `in-progress/`. Trabajo en `develop`, local-first, **sin push** hasta señal del
+  operador. Objetivo: Slice 0 (baseline visual congelado + `composer:visual-gate`) ANTES de mover un
+  archivo; luego Slice 1 (move a `src/lib/artifact-composer/**` + frontera), 1b (assets fuera de
+  `docs/`), 2 (catálogo/`outputTarget`), 3/3b (brand pack + ledger 80 bases + molde), 4 (font pack +
+  `ResolvedCompositionManifest`).
+- ⚠️ Coordinación con Codex: NO construir el catálogo del carrusel copiando el motor mientras esta task
+  esté abierta; el motor está en movimiento hacia `artifact-composer/`.
+
 ## Sesión 2026-07-12 (cont. 6) — PDF → PPTX → Adobe Express REST: destinos del composer aceptados
 
 - **Decisión del operador documentada:** PDF mantiene el contrato de entrega/fidelidad; los siguientes
