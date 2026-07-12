@@ -1,10 +1,15 @@
-import 'server-only'
-
 import fs from 'node:fs'
 import path from 'node:path'
 
 /**
- * Tender Deck Composer — catálogo de íconos Solar Bold.
+ * Artifact Composer — catálogo de íconos Solar Bold.
+ *
+ * ⚠️ SIN `import 'server-only'` a propósito (TASK-1393 Slice 1): es un Next-ism que no resuelve
+ * fuera de Next y obligaba al CLI a cargar un shim (`server-only-shim.cjs`) que habría viajado a
+ * cualquier consumer del paquete (Creative Studio, tender-worker). El motor es un primitive
+ * portable: el boundary server/client se marca en el CONSUMER, no acá. Que esto no corre en un
+ * browser lo garantiza la realidad (lee del filesystem y el motor entero depende de Playwright),
+ * no una marca de framework.
  *
  * Las plantillas usan los íconos de dos formas distintas, y el resolver tiene que saber cuál:
  * - `<img src="assets/solar/target-bold.svg">` → se cambia el `src`.

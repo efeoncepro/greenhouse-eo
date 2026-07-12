@@ -11,8 +11,8 @@
 import path from 'node:path'
 import fs from 'node:fs/promises'
 
-import { composeDeck, DeckValidationError } from '@/lib/commercial/tenders/deck/compose'
-import type { DeckPlan } from '@/lib/commercial/tenders/deck/contracts'
+// Barrel del primitive — cero deep-imports (TASK-1393: el motor vive en artifact-composer/).
+import { composeDeck, DeckValidationError, type DeckPlan } from '@/lib/artifact-composer'
 
 const TEMPLATES_DIR = path.resolve(process.cwd(), 'docs/architecture/tender-deck-composer-prototypes')
 

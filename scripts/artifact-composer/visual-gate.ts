@@ -32,10 +32,17 @@ import path from 'node:path'
 
 import type { Browser } from 'playwright'
 
-import { composeDeck, loadRegistry, loadTemplateContract } from '@/lib/commercial/tenders/deck/compose'
-import type { DeckPlan, SlideSpec } from '@/lib/commercial/tenders/deck/contracts'
-import { fillSlide, launchComposerBrowser } from '@/lib/commercial/tenders/deck/render'
-import { synthesizeProbeSlots } from '@/lib/commercial/tenders/deck/synthesize'
+// Barrel del primitive — cero deep-imports (TASK-1393: el motor vive en artifact-composer/).
+import {
+  composeDeck,
+  fillSlide,
+  launchComposerBrowser,
+  loadRegistry,
+  loadTemplateContract,
+  synthesizeProbeSlots,
+  type DeckPlan,
+  type SlideSpec
+} from '@/lib/artifact-composer'
 
 import { compareImages, loadPng } from '../frontend/lib/visual-diff'
 

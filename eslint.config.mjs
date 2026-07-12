@@ -501,6 +501,31 @@ export default [
     }
   },
 
+  // TASK-1393 — Frontera del Artifact Composer (primitive domain-free, package-shaped).
+  // El motor NUNCA importa de un dominio (commercial/growth/…) ni trae Next-isms: nace
+  // extraction-ready para EPIC-027 y sus consumers futuros (Creative Studio, tender-worker) lo
+  // recibirán como paquete. Capa 2 del gate — la capa 1 (allowlist estricta de imports) vive en
+  // `src/lib/artifact-composer/__tests__/package-boundary.test.ts`.
+  {
+    files: ['src/lib/artifact-composer/**/*.ts'],
+    ignores: ['**/__tests__/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            { name: 'server-only', message: 'TASK-1393: Next-ism prohibido en el primitive portable — el boundary server/client se marca en el CONSUMER.' }
+          ],
+          patterns: [
+            { group: ['@/lib/commercial/*', '@/lib/growth/*'], message: 'TASK-1393: el motor NUNCA importa de un dominio. Si lo necesita, es del catálogo/consumer.' },
+            { group: ['@/*', '@core/*', '@menu/*', '@layouts/*'], message: 'TASK-1393: cero alias del monolito dentro del primitive package-shaped (fuera del repo no resuelven).' },
+            { group: ['next', 'next/*'], message: 'TASK-1393: cero Next-isms en el primitive portable.' }
+          ]
+        }
+      ]
+    }
+  },
+
   // TASK-890 Slice 3 — la lint rule no-inline-payroll-scope-gate se desactiva
   // SOLO en los archivos donde el patrón aparece legítimamente:
   //  * src/lib/payroll/exit-eligibility/** — el resolver canónico (LATERAL JOIN

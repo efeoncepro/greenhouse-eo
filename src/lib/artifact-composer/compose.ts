@@ -46,6 +46,23 @@ export class MissingSlotContractError extends Error {
   }
 }
 
+/**
+ * El autor declara INTENCIÓN (`contentType`), nunca AUTORIDAD DE PRESENTACIÓN (`template`).
+ * Un `DeckPlan` histórico que traiga `template` sólo es válido si coincide EXACTAMENTE con lo que
+ * el selector deriva de su `contentType` — una discrepancia aborta (TASK-1393 Slice 1). Ninguna
+ * ruta nueva acepta `template` como autoridad de un autor: usar `CompositionPlanInput`.
+ */
+export class TemplateAuthorityError extends Error {
+  constructor(slideId: string, declared: TemplateName, selected: TemplateName) {
+    super(
+      `La lámina "${slideId}" declara template="${declared}", pero el selector del catálogo deriva ` +
+        `"${selected}" para su contentType. El autor no elige plantilla: declara la intención ` +
+        `(contentType + slots) y el catálogo resuelve.`
+    )
+    this.name = 'TemplateAuthorityError'
+  }
+}
+
 export const loadRegistry = async (assets: DeckAssets): Promise<DeckRegistry> => {
   const raw = await fs.readFile(path.join(assets.templatesDir, 'registry.json'), 'utf8')
   const registry = JSON.parse(raw) as DeckRegistry
@@ -158,6 +175,16 @@ export const composeDeck = async (
   const maxPdfMb = options.maxPdfMb ?? DEFAULT_MAX_PDF_MB
 
   const registry = await loadRegistry(assets)
+
+  // Adaptador del DeckPlan histórico: si el plan trae `template`, debe ser EXACTAMENTE lo que el
+  // selector deriva de su contentType. El autor nunca es autoridad de presentación.
+  for (const slide of deckPlan.slides) {
+    const selected = selectTemplate(registry, slide.contentType)
+
+    if (slide.template !== selected) {
+      throw new TemplateAuthorityError(slide.slideId, slide.template, selected)
+    }
+  }
 
   const contracts = new Map<TemplateName, TemplateContract>()
 
