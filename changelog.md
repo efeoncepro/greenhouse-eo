@@ -2,6 +2,20 @@
 
 ## 2026-07-12
 
+- **El aggregate `Proposal` existe: Proposal Studio F0 (TASK-1392, Slices 0-6 — code complete, rollout staging pendiente).**
+  Toda propuesta comercial (licitación pública, RFP privado o venta directa) es ahora un objeto
+  gobernado en `greenhouse_commercial.proposal*`: state machine persistida (matriz en tabla +
+  triggers append-only + gates humanos exigidos por la DB), vocabularios congelados (`proposal_*` ·
+  `origin` 3 valores · terminales `won`/`lost` · `owner_org_id` NOT NULL en todo · `deadline` de
+  primera clase), intake de RFP por el asset store canónico (scan gate), evidencia inmutable con
+  audience declarado y hash, requisitos mínimos, y la costura al cotizador (gate de margen
+  fail-closed en `fit_review` + snapshot congelado en `packaging` — "nunca un GO sin margen" ya es
+  mecanismo). Capability agentic de nacimiento: entitlement per-ORG (`module_assignments:
+  proposal_studio_v1`, OFF en todos los ambientes), API parity (7 routes), 6 eventos outbox,
+  Proposal Intake Agent (propose → confirm → execute con eval fixture; el LLM jamás muta — ni existe
+  `actor_kind='agent'`) y la proyección allowlisted de render para TASK-1391 (un artefacto
+  client_facing con UNA evidencia internal falla cerrado). 7 suites / 63 tests; SQL ejercitado en
+  vivo contra PG dev. Falta: staging smoke + habilitación del módulo (decisión del operador).
 - **Artifact Composer nace como primitive de plataforma (TASK-1393, Slices 0-4 — code complete, validación Figma pendiente).**
   El motor de composición dejó `commercial/tenders/deck/**` por `src/lib/artifact-composer/**`
   (domain-free, package-shaped, frontera mecánica, cero Next-isms) y el deck pasó a ser el catálogo

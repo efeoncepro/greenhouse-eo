@@ -1,8 +1,9 @@
 # GREENHOUSE — Tender Proposal Studio (arquitectura V1)
 
 > **Tipo:** Architecture spec / ADR — **diseño del aggregate; parcialmente implementado** (ver §0)
-> **Versión:** 0.4 · **Status:** **Partially implemented** — el spec del aggregate sigue `Proposed` (no hay DB, ni API, ni UI), pero **F4 (deck composer) y la state machine YA son código shipped**. **§5-ter: Accepted** (topología del runtime del composer).
+> **Versión:** 0.5 · **Status:** **Implemented (F0 code-complete, rollout pendiente)** — el aggregate `Proposal`, su state machine persistida, API parity, entitlement per-ORG, intake agent y la proyección de render existen en código y en dev; falta staging smoke + habilitación del módulo. **§5-ter: Accepted** (topología del runtime del composer).
 > **Creado:** 2026-07-11 por Claude (skill `arch-architect`) con Julio Reyes
+> **v0.5 (2026-07-12, TASK-1392 F0 code-complete):** el aggregate **`Proposal` YA EXISTE** — schema `greenhouse_commercial.proposal*` aplicado a dev (state machine persistida: matriz de transiciones en tabla + triggers append-only/anti-DELETE/immutable-fields + gate humano exigido por la DB), commands/readers idempotentes + API parity (`/api/commercial/proposals/**`), entitlement per-ORG (`module_assignments: proposal_studio_v1` — un rol no se factura, un módulo sí), 3 capabilities `commercial.proposal.{read,manage,gate}` con grants, outbox (6 eventos `commercial.proposal.*`), costura al cotizador (`quote_id` + gate de margen en `fit_review` fail-closed + snapshot congelado), **Proposal Intake Agent Contract** (contexto allowlisted → propuesta tipada validada fail-closed → confirmación humana ejecuta el MISMO command; eval fixture como gate del prompt) y **proyección allowlisted de render** (`render-projection.ts` — el contrato de TASK-1391; un artefacto client_facing con una sola evidencia internal falla cerrado). Además **TASK-1393 movió el composer** a `src/lib/artifact-composer/**` (primitive domain-free; el deck es el catálogo `deck-axis`). **Rollout: pendiente** — sin `module_assignments` activo el dominio está OFF en todos los ambientes.
 > **v0.4 (2026-07-12):** corrige la mentira de estado (el doc decía "diseño, NO implementación" y "cada iteración es doc-only" con ~2.000 LOC en `src/lib/commercial/tenders/**`). Agrega §0 (estado real), declara que la state machine es **TS puro sin DB**, registra que **el roadmap se ejecutó invertido** (F4 antes que F0-F2) y **retira el Apéndice B** en la parte que contradecía al composer (raster de Figma como fondo).
 > **v0.3 (2026-07-11):** la topología del runtime del composer se promueve a **ADR (§5-ter, Accepted)**: orquestador + fan-out por capítulo + resto determinista, con 4-pilar y hard rules. **Corrección de dependencia:** el composer **NO** depende del `agent-runtime` (Q8 v0.2 era falsa en ambas mitades — hay prior art en Nexa, y los 3 nodos de juicio son *structured output*, no tool-chains).
 > **v0.2 (2026-07-11):** los 6 refinamientos validados contra SKY (§9-ter) quedan **incorporados al cuerpo** (schema §1, gates §2, capabilities §3, deck §4, quote §6); Open Questions aterrizadas contra runtime real (Q1 schema, Q3 worker, Q8 agent-runtime).
@@ -18,15 +19,19 @@ contra él **sin actualizarlo**. Lo que sigue es la foto verificada contra el re
 
 | Pieza | Estado | Dónde |
 |---|---|---|
-| **Deck composer (F4)** — selector · validación · slot-fill · resolvers · geometría · render | ✅ **Shipped** (~1.800 LOC, 4 suites) | `src/lib/commercial/tenders/deck/**` |
-| **Entregable PDF** — N páginas mergeadas (`pdf-lib`) + gate de peso | ✅ **Shipped** | `deck/render.ts` · `deck/compose.ts` |
-| **Catálogo de 25 plantillas** con `data-slot` + `*.slots.json` + `registry.json` | ✅ **25/25 built** | `docs/architecture/tender-deck-composer-prototypes/` |
-| **State machine** (12 estados, 3 gates humanos, 16 tests) | ⚠️ **TS puro, SIN DB** | `src/lib/commercial/tenders/tender-state-machine.ts` |
-| **CLI** `pnpm deck:compose <plan.json> [--out dir]` | ✅ **Shipped** (único consumer hoy) | `scripts/commercial/compose-tender-deck.ts` |
-| Tabla `greenhouse_commercial.tenders` + CHECK + trigger append-only + `tender_state_transitions` | ❌ **No existe** (no hay migración) | — |
-| API routes · UI · capabilities/entitlements · outbox events | ❌ **No existe** | — |
-| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ **No existe** | — |
-| Renderer productivo (Cloud Run Job + cola + artifact store + señales) | 📋 **Diseñado, bloqueado** | **TASK-1391** (`to-do`, P1, EPIC-027) |
+| **Composer (motor domain-free)** — selector · validación · slot-fill · resolvers · geometría · render · brand pack · visual gate 0px | ✅ **Shipped** (TASK-1393) | `src/lib/artifact-composer/**` (el deck es el **catálogo** `catalogs/deck-axis/`) |
+| **Entregable PDF** — N páginas mergeadas (`pdf-lib`) + gate de peso | ✅ **Shipped** | `artifact-composer/render.ts` · `compose.ts` |
+| **Catálogo de 25 plantillas** con `data-slot` + `*.slots.json` + `registry.json` | ✅ **25/25 built** | `src/lib/artifact-composer/catalogs/deck-axis/templates/` |
+| **State machine** (12 estados, 3 gates humanos) | ✅ **Persistida** (TASK-1392): matriz en `proposal_state_matrix` + trigger + historial append-only; TS y DB en paridad (test) | `tender-state-machine.ts` + `migrations/20260712160001023_*` |
+| **CLI** `pnpm deck:compose <plan.json> [--out dir]` | ✅ **Shipped** (consumer del catálogo) | `scripts/artifact-composer/compose-deck.ts` |
+| **Aggregate `Proposal`** — `proposals` + `proposal_state_transitions` + `proposal_assets` + `proposal_evidence` + `proposal_requirements` (CHECKs · triggers · org-scope NOT NULL en todos) | ✅ **Aplicado a dev** (TASK-1392) | `src/lib/commercial/tenders/proposals/**` |
+| API routes · capabilities/entitlement per-ORG · outbox events · reliability signals | ✅ **Code-complete** (7 routes; `proposal_studio_v1`; 6 eventos; señales `commercial`) | `/api/commercial/proposals/**` |
+| **Proposal Intake Agent Contract** (propose → confirm → execute + eval fixture) | ✅ **Code-complete** (internal-only, OFF sin módulo) | `proposals/intake-agent.ts` |
+| **Proyección allowlisted de render** + gate de audience fail-closed | ✅ **Code-complete** — el contrato que TASK-1391 consume | `proposals/render-projection.ts` |
+| UI · Nexa/MCP surface | ❌ **No existe** (F5) | — |
+| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ **No existe** (F1/F2) | — |
+| Renderer productivo (Cloud Run Job + cola + artifact store + señales) | 📋 **Diseñado, bloqueado** por EPIC-027; su contrato de lectura YA existe (`render-projection`) | **TASK-1391** (`to-do`, P1, EPIC-027) |
+| **Staging smoke + habilitación `module_assignments`** | ⏳ **Rollout pendiente** — el dominio está OFF en todos los ambientes | — |
 
 **Tres consecuencias que hay que tener presentes:**
 
@@ -34,13 +39,14 @@ contra él **sin actualizarlo**. Lo que sigue es la foto verificada contra el re
    → F4 (decks). Se construyó **F4 primero**, porque el deck era lo que desbloqueaba una licitación real
    (SKY). No es un error — es la secuencia que el negocio pidió — pero significa que **el motor de
    composición existe sin el aggregate que debería contenerlo**.
-2. **La state machine es lógica pura sin persistencia.** El §2 de este doc describe `CHECK` constraint +
-   trigger append-only + outbox; **nada de eso existe todavía**. Hoy son 174 líneas de TS que validan
-   transiciones en memoria. **NUNCA** asumas que hay una tabla `tenders` porque este doc la dibuja.
-3. **Full API Parity aún NO aplica** — no hay UI ni contrato programático, así que no hay parity que
-   romper. **Pero en el momento en que se construya la primera ruta o capability, aplica completa**: el
-   composer ya es el primitive canónico en `src/lib/**`, y la UI/Nexa/MCP deben consumirlo, no
-   reimplementarlo.
+2. ~~**La state machine es lógica pura sin persistencia.**~~ **Cerrado por TASK-1392 (2026-07-12):** la
+   matriz vive en `proposal_state_matrix` con trigger de enforcement, historial append-only en
+   `proposal_state_transitions` (el gate humano lo exige también la DB: `requires_human_gate ⇒ actor
+   member`) y un test de paridad TS ↔ DB. El TS sigue siendo la fuente del vocabulario; la DB lo replica.
+3. **Full API Parity YA aplica** — TASK-1392 construyó el contrato programático (commands/readers +
+   `/api/commercial/proposals/**` + capabilities per-ORG). Toda surface futura (UI, Nexa, MCP) consume
+   estos MISMOS primitives; el intake agent ya lo demuestra (su confirmación ejecuta `createProposal` +
+   `attachProposalAsset`, no una ruta paralela).
 
 **Deuda de gobernanza declarada:** el **deck composer F1 se construyó sin TASK-###** (fuera del lifecycle,
 sin Task Closing Quality Gate), mientras este doc decía que la implementación la autorizaba "la task de

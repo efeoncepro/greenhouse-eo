@@ -146,10 +146,10 @@ aprobado puede empaquetarse.** En una licitación esto no es una regla de permis
 
 ## El agente NUNCA escribe: `propose → confirm → execute` (TASK-1392)
 
-El **Tender Intake Agent** es el molde de toda fase agéntica futura del dominio:
+El **Proposal Intake Agent** (shipped: `src/lib/commercial/tenders/proposals/intake-agent.ts`) es el molde de toda fase agéntica futura del dominio:
 
 1. Recibe **contexto read-only allowlisted** (metadata + asset manifest + actor). No SQL, no storage.
-2. Emite una **propuesta tipada** (`TenderIntakeProposal`) que **cita sus inputs**.
+2. Emite una **propuesta tipada** (`ProposalIntakeProposal`) que **cita sus inputs** y se valida **fail-closed contra el contexto** (org/asset/duplicado fuera del allowlist → se rechaza completa).
 3. **El humano confirma.**
 4. Recién entonces corre **el mismo command canónico** que usarían API, CLI, Nexa y MCP.
 
@@ -158,6 +158,12 @@ El **Tender Intake Agent** es el molde de toda fase agéntica futura del dominio
   cliente canónico `src/lib/ai/` y el patrón tool-use/telemetría de Nexa.
 - **NUNCA** cierres algo como "agentic" si sólo hay un prompt: hace falta contexto tipado, tools sobre
   los primitives, propuesta trazable, eval fixture y confirmación humana real.
+- **NUNCA** toques el prompt o el schema del intake agent sin correr su eval fixture
+  (`proposals/__tests__/intake-agent-eval.test.ts`) — es EL gate del contrato.
+- **La proyección de render es allowlisted** (`proposals/render-projection.ts`): un artefacto
+  `client_facing` que cite UNA evidencia `internal` **falla cerrado**
+  (`assertEvidenceAllowedForAudience`). **NUNCA** el renderer/autoría lee `proposal_evidence`
+  directo ni recibe `external_source_snapshot`, costos o URLs de storage.
 
 ## Human-in-control (principio 3)
 

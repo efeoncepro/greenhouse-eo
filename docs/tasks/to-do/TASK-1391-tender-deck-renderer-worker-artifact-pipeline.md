@@ -26,7 +26,7 @@
 - Status real: `Diseno`
 - Rank: `TBD — posterior a la autorización de la próxima frontera de deployable de EPIC-027`
 - Domain: `commercial|platform|ops`
-- Blocked by: `TASK-1393 (Artifact Composer/catalog snapshot) + TASK-1392 (Proposal aggregate/assets/evidence F0) + EPIC-027 next-boundary authorization`
+- Blocked by: `EPIC-027 next-boundary authorization (único bloqueo vivo — TASK-1393 ✅ code-complete y TASK-1392 ✅ code-complete al 2026-07-12; ver Delta (c))`
 - Branch: `task/TASK-1391-artifact-worker-cloud-run-job`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -651,3 +651,26 @@ sea— **no está tagueado**, y eso es independiente de este debate.
 - ¿El outbox existente basta para despachar `jobs.run` o Cloud Tasks agrega backpressure necesario sin introducir un segundo source of truth? ¿Qué envelope de CPU/RAM/timeout resulta del benchmark 25-slide?
 - ¿El requisito de peso se resuelve por RFP como valor de command, por policy del Tender o ambos? La salida debe fallar cerrada cuando el límite sea conocido.
 - ¿Qué nivel de estimación de duración/tamaño/costo debe estar disponible en `TenderRenderProposal` para ayudar al humano sin inventar una predicción? El eval baseline debe fijar esa respuesta antes de activar el agente.
+
+## Delta 2026-07-12 (c) — TASK-1392 F0 code-complete: el contrato de lectura de este worker YA EXISTE
+
+Cerrado por el trabajo de TASK-1392 (F0, Proposal Studio). Lo que esta task asumía como pendiente ya es código:
+
+1. **El aggregate existe**: `greenhouse_commercial.proposals` + `proposal_state_transitions` +
+   `proposal_assets` + `proposal_evidence` + `proposal_requirements` aplicados a dev (state machine
+   persistida, triggers append-only, `owner_org_id NOT NULL` en todos, `deadline` de primera clase —
+   el insumo de la **prioridad de cola** del punto 3 del Delta (a)).
+2. **El contrato de lectura de este worker es `buildProposalRenderProjection`**
+   (`src/lib/commercial/tenders/proposals/render-projection.ts`, + `GET
+   /api/commercial/proposals/[id]/render-projection`): proyección allowlisted (assets metadata +
+   evidencia permitida + requisitos) que NUNCA expone RFP crudo, costos, `external_source_snapshot`
+   ni URLs de storage. El gate `assertEvidenceAllowedForAudience` es fail-closed: **un artefacto
+   `client_facing` con UNA evidencia `internal` se rechaza completo** (test de acceptance en
+   `__tests__/render-projection-audience.test.ts`). Este worker consume esa proyección; no lee DB
+   de propuestas directo.
+3. **La open question "¿qué task materializa `tenders`/`tender_assets` primero?" queda respondida**:
+   TASK-1392, con el vocabulario congelado `proposal_*` (nunca `tender_*`).
+4. **Bloqueo restante = solo EPIC-027**: la autorización de la frontera del deployable
+   `artifact-worker`. Ni el composer (TASK-1393) ni el aggregate (TASK-1392) bloquean ya.
+   Rollout de F0 (staging smoke + `module_assignments`) sigue pendiente pero no bloquea el diseño
+   de esta task.

@@ -13,12 +13,20 @@ Antes de tocar este dominio, cargá **`docs/architecture/agent-invariants/COMMER
 (+ la skill `greenhouse-public-private-tenders` → `deck-visual-system.md` y `deck-studio` para argumento,
 composición y entrega del deck).
 
-**Estado real (TASK-1393, 2026-07-12):** el motor vive en **`src/lib/artifact-composer/**`** (primitive
-domain-free, package-shaped, frontera mecánica por allowlist) y el deck es el **catálogo
+**Estado real (TASK-1393 + TASK-1392, 2026-07-12):** el motor vive en **`src/lib/artifact-composer/**`**
+(primitive domain-free, package-shaped, frontera mecánica por allowlist) y el deck es el **catálogo
 `catalogs/deck-axis/`** (plantillas + registry + resolvers + validadores semánticos + brand pack `axis`
 compilado + font pack local — el render **bloquea la red** y falla cerrado). Emite PDF + PNG + el
-**`ResolvedCompositionManifest`** (`pnpm deck:compose`). La state machine (12 estados) sigue TS puro SIN
-tabla en DB; **no hay API/UI/migración/capability** — el único consumer es el CLI.
+**`ResolvedCompositionManifest`** (`pnpm deck:compose`). **El aggregate `Proposal` EXISTE** (TASK-1392,
+aplicado a dev): `greenhouse_commercial.proposal*` con state machine persistida (matriz + triggers
+append-only; gates humanos exigidos por la DB), commands/readers en
+`src/lib/commercial/tenders/proposals/**`, API `/api/commercial/proposals/**`, entitlement **per-ORG**
+(`module_assignments: proposal_studio_v1` — **OFF en todos los ambientes hasta staging evidence**),
+outbox `commercial.proposal.*`, intake agent (propose → confirm → execute; el LLM **NUNCA** muta — ni
+siquiera existe `actor_kind='agent'`) y la **proyección allowlisted de render** (`render-projection.ts`,
+contrato de TASK-1391: un artefacto `client_facing` con UNA evidencia `internal` **falla cerrado**).
+**NUNCA** escribir a `proposals`/hijos fuera de esos commands; **NUNCA** exponer RFP crudo, costos,
+`external_source_snapshot` ni URLs de storage en una proyección/evento.
 
 **Gates mecánicos del dominio — SIEMPRE al tocarlo:**
 

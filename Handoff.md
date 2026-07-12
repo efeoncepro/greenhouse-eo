@@ -1,3 +1,29 @@
+## Sesión 2026-07-12 (cont. 9) — TASK-1392 F0 CODE-COMPLETE (Slices 0→6, 7 commits): rollout staging pendiente (Claude)
+
+- **Los 7 commits en `develop` local-first (SIN push):** S0 `97079970f` (ADR aplicado + 5 vocabularios
+  congelados), S1 `75372d70e` (schema completo APLICADO a dev — `proposals` + matriz de estados en tabla
+  + historial/evidencia append-only + gates humanos en la DB; smoke psql de los 8 guards), S2
+  `3c19461be` (store idempotente + quote margin gate fail-closed + snapshot `to_jsonb`; smoke live hasta
+  terminal `declined`), S3 `d43bc6fa0` (asset governance: 4 contexts con scan gate + evidencia con
+  audience/hash + requisitos), S4 `d84639911` (API parity 7 routes + entitlement per-ORG
+  `proposal_studio_v1` + 3 capabilities con grants + 6 eventos outbox + señales), S5 `5483228de`
+  (**Proposal Intake Agent**: contexto allowlisted → propuesta tipada validada fail-closed →
+  confirmación member-only ejecuta el MISMO command; eval fixture = gate del prompt), S6 `aa0ef3ca5`
+  (**proyección allowlisted de render** — el contrato de TASK-1391 — + gate de audience: un artefacto
+  client_facing con UNA evidencia internal falla cerrado; sanity live contra PG dev).
+- **Gates:** 7 suites / 63 tests del dominio · lint 0 · tsc 0 · capability⇒grant coverage verde.
+- **Docs sincronizados:** arch §0 v0.5 (`GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`),
+  EVENT_CATALOG (aggregate `proposal`), invariants, `.claude/rules/tenders.md`, doc funcional
+  `docs/documentation/comercial/proposal-studio-aggregate.md`, TASK-1391 Delta (c) (su único bloqueo
+  vivo = EPIC-027), Delta (c) en la task con la matriz slice→evidencia.
+- 🔴 **Para `complete` faltan (por diseño, no por olvido):** (1) migraciones + smoke en **staging**,
+  (2) **habilitar el módulo** `proposal_studio_v1` vía `module_assignments` (hoy sin assignment en
+  ningún ambiente ⇒ dominio OFF), (3) push bajo instrucción del operador. Estado honesto:
+  `code complete, rollout pendiente`; la task sigue `in-progress/`.
+- ⚠️ Codex: NUNCA escribir a `proposals`/hijos fuera de `src/lib/commercial/tenders/proposals/**`;
+  el LLM no muta (ni existe `actor_kind='agent'`); la proyección de render es la ÚNICA lectura
+  permitida para autoría/render.
+
 ## Sesión 2026-07-12 (cont. 8) — TASK-1393 IMPLEMENTACIÓN COMPLETA (Slices 0→4, 12 commits): code complete, validación Figma pendiente (Claude)
 
 - **Todos los slices aplicados** en `develop` local-first (SIN push): 3b-i `2860f2c7c` (BrandPack +

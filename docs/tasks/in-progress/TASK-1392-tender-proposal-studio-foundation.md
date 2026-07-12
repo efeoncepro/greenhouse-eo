@@ -212,20 +212,20 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, handoff RESEARCH-007→Studio y contract surface están aprobados con paths/objetos reales antes de la migración.
-- [ ] Invariantes de identidad, state machine, audience/asset ownership, idempotencia y gates humanos se prueban en TS y DB.
+- [x] Source of truth, handoff RESEARCH-007→Studio y contract surface están aprobados con paths/objetos reales antes de la migración.
+- [x] Invariantes de identidad, state machine, audience/asset ownership, idempotencia y gates humanos se prueban en TS y DB.
 - [ ] Migración additive, backfill/rollback y acceso a RFPs/deliverables privados están explícitos y verificados en staging.
-- [ ] API/CLI consumen commands/readers canónicos; no hay writes a tablas/asset store por consumer ad hoc.
-- [ ] Errores, audit/outbox y señales no filtran contenido comercial confidencial.
+- [x] API/CLI consumen commands/readers canónicos; no hay writes a tablas/asset store por consumer ad hoc.
+- [x] Errores, audit/outbox y señales no filtran contenido comercial confidencial.
 
 ### Capability Definition of Done — Full API Parity gate
 
-- [ ] Las reglas viven en `src/lib/commercial/tenders/**`; UI, endpoint, CLI y worker no duplican negocio.
-- [ ] `Tender` y sus comandos se modelan como aggregate/capability, no como click-handler o tabla expuesta.
-- [ ] Create/ingest/transition tienen command, autorización fina, idempotencia, audit/outbox, errores sanitizados y reader de estado.
-- [ ] Capability y grant a ≥1 rol real se agregan en el mismo PR con coverage.
-- [ ] Camino programático de API Platform/CLI queda documentado; UI/Nexa/MCP heredan el mismo primitive cuando se incorporen.
-- [ ] Los writes sensibles respetan `propose → confirm → execute`; no se implementa envío/firma de oferta.
+- [x] Las reglas viven en `src/lib/commercial/tenders/**`; UI, endpoint, CLI y worker no duplican negocio.
+- [x] `Tender` y sus comandos se modelan como aggregate/capability, no como click-handler o tabla expuesta.
+- [x] Create/ingest/transition tienen command, autorización fina, idempotencia, audit/outbox, errores sanitizados y reader de estado.
+- [x] Capability y grant a ≥1 rol real se agregan en el mismo PR con coverage.
+- [x] Camino programático de API Platform/CLI queda documentado; UI/Nexa/MCP heredan el mismo primitive cuando se incorporen.
+- [x] Los writes sensibles respetan `propose → confirm → execute`; no se implementa envío/firma de oferta.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -366,36 +366,36 @@ un eventual bridge deberá ser explícito, versionado y minimizar los inputs com
 
 ## Acceptance Criteria
 
-- [ ] Ownership de `greenhouse_commercial.proposals` y handoff RESEARCH-007→Studio se aprueban/documentan antes de crear la tabla.
-- [ ] `Tender`, `proposal_state_transitions` y `proposal_assets` existen como schema additive con FKs/checks/indexes/trigger append-only y paridad con `tender-state-machine.ts`.
-- [ ] Create/ingest/attach/read/transition son commands/readers capability-gated, idempotentes, auditados y consumibles programáticamente; no hay writes ad hoc.
-- [ ] Proposal Intake Agent consume sólo contexto allowlisted y tools sobre los mismos readers/commands; emite propuesta tipada con trace/eval y nunca muta estado, assets ni gates humanos directamente.
-- [ ] RFPs y deliverables usan únicamente el asset store canónico, siguen scan/ownership privado y preservan kind/status/audience/version/lineage.
-- [ ] Cada referencia de evidencia client-facing se resuelve a `proposal_evidence` versionada con source/asset, locator, método, as-of, clasificación y hash; una fuente libre, asset interno o evidencia no aprobada falla cerrada.
-- [ ] La proyección allowlisted para autoría/render contiene sólo evidencia y requisitos permitidos; no expone RFP crudo, costos internos, prompts, URLs privadas ni acceso directo a storage/DB.
-- [ ] Transiciones terminales, saltos de estado, gates humanos, asset quarantined/incompatible y promoción interna no autorizada fallan cerrados.
+- [x] Ownership de `greenhouse_commercial.proposals` y handoff RESEARCH-007→Studio se aprueban/documentan antes de crear la tabla.
+- [x] `Tender`, `proposal_state_transitions` y `proposal_assets` existen como schema additive con FKs/checks/indexes/trigger append-only y paridad con `tender-state-machine.ts`.
+- [x] Create/ingest/attach/read/transition son commands/readers capability-gated, idempotentes, auditados y consumibles programáticamente; no hay writes ad hoc.
+- [x] Proposal Intake Agent consume sólo contexto allowlisted y tools sobre los mismos readers/commands; emite propuesta tipada con trace/eval y nunca muta estado, assets ni gates humanos directamente.
+- [x] RFPs y deliverables usan únicamente el asset store canónico, siguen scan/ownership privado y preservan kind/status/audience/version/lineage.
+- [x] Cada referencia de evidencia client-facing se resuelve a `proposal_evidence` versionada con source/asset, locator, método, as-of, clasificación y hash; una fuente libre, asset interno o evidencia no aprobada falla cerrada.
+- [x] La proyección allowlisted para autoría/render contiene sólo evidencia y requisitos permitidos; no expone RFP crudo, costos internos, prompts, URLs privadas ni acceso directo a storage/DB.
+- [x] Transiciones terminales, saltos de estado, gates humanos, asset quarantined/incompatible y promoción interna no autorizada fallan cerrados.
 - [ ] Staging verifica migration, command retry/concurrencia, asset intake/read, audit/outbox, grants y rollback; no se declara producción sin esa evidencia.
-- [ ] TASK-1391 recibe un contrato documentado y testeado, o permanece bloqueada con la dependencia explícita.
+- [x] TASK-1391 recibe un contrato documentado y testeado, o permanece bloqueada con la dependencia explícita. *(Cumplido: `render-projection.ts` + acceptance test + Delta (c) en TASK-1391 — su único bloqueo vivo es EPIC-027.)*
 
 **Añadidos por el Delta (b) — auditoría de rigor 2026-07-12:**
 
-- [ ] 🚪 **Los 5 vocabularios están CONGELADOS antes de la primera línea de SQL**: nombres de tabla
+- [x] 🚪 **Los 5 vocabularios están CONGELADOS antes de la primera línea de SQL**: nombres de tabla
       (`proposal_*`) · enum `origin` (`public_tender|private_rfp|direct_sales`) · **estados terminales
       (`won`/`lost` — ✅ CERRADO 2026-07-12 y aplicado en el código)** · `owner_org_id` · `deadline`.
       **Ninguno de los cinco vuelve a costar cero después de esta task.**
-- [ ] **La migración NO contiene `tenders`, `tender_*`, `origin='manual'` ni `origin='public_discovery'`.**
+- [x] **La migración NO contiene `tenders`, `tender_*`, `origin='manual'` ni `origin='public_discovery'`.**
       *(El cuerpo de esta task los pedía; su propio Delta los prohibía.)*
-- [ ] 🔴 **`owner_org_id` NOT NULL en `proposals` y en TODOS sus hijos**, desde la primera migración. **Test
+- [x] 🔴 **`owner_org_id` NOT NULL en `proposals` y en TODOS sus hijos**, desde la primera migración. **Test
       que demuestra que ningún reader del dominio consulta sin filtro de org.** *(Un `WHERE org_id` agregado
       tarde siempre deja un reader sin filtrar.)*
-- [ ] 🔴 **La capability se gatea por entitlement per-ORG (`module_assignments`), NO por rol.** *(El cuerpo
+- [x] 🔴 **La capability se gatea por entitlement per-ORG (`module_assignments`), NO por rol.** *(El cuerpo
       decía "grants a rol real" y contradecía a su Delta. Un rol no se factura; un módulo sí.)*
-- [ ] 🔴 **`deadline` existe como columna de primera clase** y `commercial.proposal.deadline_at_risk` puede
+- [x] 🔴 **`deadline` existe como columna de primera clase** y `commercial.proposal.deadline_at_risk` puede
       emitirse. **TASK-1391 lo consume** para la prioridad de cola.
-- [ ] 🔴 **`proposal_requirements` NACE en esta task** (aunque sea mínimo, poblado por command humano). **Sin
+- [x] 🔴 **`proposal_requirements` NACE en esta task** (aunque sea mínimo, poblado por command humano). **Sin
       él, TASK-1391 queda bloqueada por esta task y aun así sin lo que necesita** — un bloqueo que no
       desbloquea.
-- [ ] **Cada `proposal_evidence` lleva `audience` declarado**, y existe el test que demuestra que un
+- [x] **Cada `proposal_evidence` lleva `audience` declarado**, y existe el test que demuestra que un
       artefacto `client_facing` con **una sola** evidencia `internal` **falla cerrado**.
 
 ## Verification
@@ -496,3 +496,35 @@ accesibilidad** derivan del *requisito-set* y **fallan cerrado** cuando el requi
   humanos). Grants: `EFEONCE_ADMIN` + `EFEONCE_ACCOUNT` (las 3), `EFEONCE_OPERATIONS` (read). **La puerta es
   el entitlement per-ORG** (`module_assignments`, module `proposal_studio_v1`, patrón AI Visibility); el rol
   sólo abre dentro de una org habilitada.
+
+## Delta 2026-07-12 (c) — F0 CODE-COMPLETE (Slices 0–6), rollout staging pendiente
+
+**Estado honesto: `code complete, rollout pendiente`.** Los 7 commits de la implementación viven en
+`develop` local (97079970f · 75372d70e · 3c19461be · d43bc6fa0 · d84639911 · 5483228de · aa0ef3ca5).
+
+### Qué quedó implementado y verificado
+
+| Slice | Entregable | Evidencia |
+|---|---|---|
+| 0 | ADR aplicado + 5 vocabularios congelados (`proposal_*` · `origin` 3 valores · `won`/`lost` · `owner_org_id` · `deadline`) | docs + migración sin `tender_*` ni `origin='manual'` |
+| 1 | Schema additive completo aplicado a dev: `proposals` + `proposal_state_matrix` (11 filas) + `proposal_state_transitions` + `proposal_assets` + `proposal_evidence` + `proposal_requirements`; triggers immutable/anti-DELETE/matriz/gate-humano; CHECKs (pairing público, quote gate post-GO, snapshot en packaging, deadline explícito) | smoke psql en vivo: 8 guards ejercitados con rollback |
+| 2 | Store: `createProposal`/`transitionProposalState`/`attachProposalQuote` idempotentes + lock FOR UPDATE + snapshot `to_jsonb(q.*)`; quote margin gate puro fail-closed | smoke live: propuesta probe recorrida hasta terminal `declined`; gate humano y de margen rechazando; cross-org NULL |
+| 3 | Asset governance: 4 contexts nuevos en `GreenhouseAssetContext` (scan gate), `attachProposalAsset`/`ingestProposalRfp`/`recordProposalEvidence` (fuente exclusiva + sha256 + audience obligatorio)/`declareProposalRequirement` | tests + smoke |
+| 4 | API parity (7 routes `/api/commercial/proposals/**`) + entitlement per-ORG (`module_assignments: proposal_studio_v1`) + 3 capabilities con grants + 6 outbox events + reliability signals + errores canónicos es-CL | coverage test capability⇒grant verde |
+| 5 | Proposal Intake Agent Contract: contexto allowlisted → `ProposalIntakeProposal` tipada → validación fail-closed → confirmación member-only ejecuta el MISMO command (idempotencyKey derivada). Eval fixture = gate del prompt/schema | `intake-agent-eval.test.ts` (golden + 8 rechazos) |
+| 6 | Proyección allowlisted de render (`render-projection.ts` + `GET …/render-projection`) — el contrato de TASK-1391. Acceptance test: artefacto `client_facing` con UNA evidencia `internal` falla cerrado | unit + sanity live con evidencia probe mixta (filtro SQL + gate + cross-org verificados contra PG dev) |
+
+- Suite del dominio: **7 archivos / 63 tests verdes**; lint 0; tsc 0.
+- Docs sincronizados: arch §0 v0.5 · EVENT_CATALOG (6 eventos `proposal`) · invariants ·
+  `.claude/rules/tenders.md` · doc funcional `docs/documentation/comercial/proposal-studio-aggregate.md` ·
+  TASK-1391 Delta (c) (su único bloqueo vivo es EPIC-027).
+- **Manual de uso: diferido con razón** — F0 no tiene superficie visible (API/CLI internal-only, módulo
+  OFF). Owner: quien construya F5 (UI/Nexa). Condición de retiro: primera surface visible.
+
+### Qué falta para `complete` (rollout)
+
+1. **Staging**: aplicar migraciones (`pnpm pg:connect:migrate` contra staging), smoke de
+   commands/assets/outbox/recovery allí, y evidencia documentada (la spec lo exige en Verification).
+2. **Habilitación**: asignar `proposal_studio_v1` vía `module_assignments` a la org Efeonce (decisión
+   del operador — hoy NO hay assignment en ningún ambiente ⇒ dominio OFF por diseño).
+3. Push de los commits a `develop` remoto (bajo instrucción explícita del operador).
