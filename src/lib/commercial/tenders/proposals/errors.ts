@@ -58,6 +58,30 @@ export class ProposalAudienceError extends Error {
   }
 }
 
+/** Rechazo de un render por regla de la propuesta (audience/constraint/semántica). */
+export class ProposalRenderRejectedError extends Error {
+  constructor(
+    public readonly code:
+      | 'audience_violation'
+      | 'accessibility_unsupported'
+      | 'semantic_rejected'
+      | 'deadline_expired'
+      | 'flag_disabled',
+    message: string
+  ) {
+    super(message)
+    this.name = 'ProposalRenderRejectedError'
+  }
+}
+
+/** Conflicto de estado de un job de render (retry inválido, job no reintentable…). */
+export class ProposalRenderStateError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ProposalRenderStateError'
+  }
+}
+
 export class ProposalEntitlementError extends Error {
   constructor(public readonly ownerOrgId: string) {
     super(

@@ -24,14 +24,26 @@ import type { ProposalActor } from './types'
 
 export const PROPOSAL_STUDIO_MODULE_KEY = 'proposal_studio_v1'
 
-export type ProposalAccessNeed = 'read' | 'create' | 'update' | 'execute' | 'approve'
+export type ProposalAccessNeed = 'read' | 'create' | 'update' | 'execute' | 'approve' | 'render_propose' | 'render_execute' | 'render_read' | 'render_retry'
 
-const NEED_TO_CAPABILITY: Record<ProposalAccessNeed, { capability: 'commercial.proposal.read' | 'commercial.proposal.manage' | 'commercial.proposal.gate'; action: 'read' | 'create' | 'update' | 'execute' | 'approve' }> = {
+const NEED_TO_CAPABILITY: Record<
+  ProposalAccessNeed,
+  {
+    capability: 'commercial.proposal.read' | 'commercial.proposal.manage' | 'commercial.proposal.gate' | 'commercial.proposal.render'
+    action: 'read' | 'create' | 'update' | 'execute' | 'approve'
+  }
+> = {
   read: { capability: 'commercial.proposal.read', action: 'read' },
   create: { capability: 'commercial.proposal.manage', action: 'create' },
   update: { capability: 'commercial.proposal.manage', action: 'update' },
   execute: { capability: 'commercial.proposal.manage', action: 'execute' },
-  approve: { capability: 'commercial.proposal.gate', action: 'approve' }
+  approve: { capability: 'commercial.proposal.gate', action: 'approve' },
+  // `propose` no escribe (el agente solo lee para proponer) y `retry` ES re-ejecutar:
+  // se mapean a los verbos canónicos sin extender el vocabulario de plataforma.
+  render_propose: { capability: 'commercial.proposal.render', action: 'read' },
+  render_execute: { capability: 'commercial.proposal.render', action: 'execute' },
+  render_read: { capability: 'commercial.proposal.render', action: 'read' },
+  render_retry: { capability: 'commercial.proposal.render', action: 'execute' }
 }
 
 export const assertProposalStudioAccess = async (input: {

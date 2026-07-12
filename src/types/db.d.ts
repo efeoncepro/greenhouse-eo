@@ -1167,6 +1167,49 @@ export interface GreenhouseCommercialProposalEvidence {
   source_asset_id: string | null;
 }
 
+export interface GreenhouseCommercialProposalRenderJobEvents {
+  actor_kind: string;
+  actor_member_id: string | null;
+  created_at: Generated<Timestamp>;
+  detail: Generated<Json>;
+  event_id: Generated<string>;
+  from_state: string | null;
+  owner_org_id: string;
+  render_job_id: string;
+  to_state: string;
+}
+
+export interface GreenhouseCommercialProposalRenderJobs {
+  artifact_purpose: string;
+  attempts: Generated<number>;
+  audience: string;
+  catalog_name: string;
+  constraints: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  deadline: Timestamp | null;
+  dispatched_at: Timestamp | null;
+  evidence_refs: Generated<Json>;
+  execution_name: string | null;
+  failure_code: string | null;
+  failure_detail: string | null;
+  finished_at: Timestamp | null;
+  manifest: Json;
+  manifest_hash: string;
+  max_attempts: Generated<number>;
+  output_pdf_asset_id: string | null;
+  output_preview_asset_ids: Generated<Json>;
+  output_report: Json | null;
+  output_target: string;
+  owner_org_id: string;
+  proposal_id: string;
+  render_job_id: Generated<string>;
+  requested_by_kind: string;
+  requested_by_member_id: string | null;
+  started_at: Timestamp | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialProposalRequirements {
   attested_at: Timestamp | null;
   attested_by_member_id: string | null;
@@ -11333,6 +11376,8 @@ export interface DB {
   "greenhouse_commercial.product_units": GreenhouseCommercialProductUnits;
   "greenhouse_commercial.proposal_assets": GreenhouseCommercialProposalAssets;
   "greenhouse_commercial.proposal_evidence": GreenhouseCommercialProposalEvidence;
+  "greenhouse_commercial.proposal_render_job_events": GreenhouseCommercialProposalRenderJobEvents;
+  "greenhouse_commercial.proposal_render_jobs": GreenhouseCommercialProposalRenderJobs;
   "greenhouse_commercial.proposal_requirements": GreenhouseCommercialProposalRequirements;
   "greenhouse_commercial.proposal_state_matrix": GreenhouseCommercialProposalStateMatrix;
   "greenhouse_commercial.proposal_state_transitions": GreenhouseCommercialProposalStateTransitions;

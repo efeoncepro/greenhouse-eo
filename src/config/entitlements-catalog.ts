@@ -956,6 +956,14 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['approve'] as const,
     defaultScope: 'tenant'
   },
+  {
+    key: 'commercial.proposal.render',
+    module: 'commercial',
+    // `retry` ES volver a ejecutar y `propose` (del agente) no escribe nada:
+    // el vocabulario se queda en los verbos canónicos de la plataforma.
+    actions: ['read', 'execute'] as const,
+    defaultScope: 'tenant'
+  },
 
   {
     key: 'commercial.party.create',

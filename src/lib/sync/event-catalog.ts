@@ -571,6 +571,10 @@ export const EVENT_TYPES = {
   proposalEvidenceRecorded: 'commercial.proposal.evidence_recorded',
   proposalRequirementDeclared: 'commercial.proposal.requirement_declared',
   proposalQuoteAttached: 'commercial.proposal.quote_attached',
+  // TASK-1391 — Artifact Renderer (jobs de render del artifact-worker)
+  proposalRenderRequested: 'commercial.proposal.render_requested',
+  proposalRenderCompleted: 'commercial.proposal.render_completed',
+  proposalRenderFailed: 'commercial.proposal.render_failed',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
 
   // Commercial Deals (TASK-453)

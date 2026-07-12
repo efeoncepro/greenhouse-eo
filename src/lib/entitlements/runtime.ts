@@ -2168,6 +2168,16 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+
+    for (const renderAction of ['read', 'execute'] as const) {
+      addEntitlement(entries, {
+        module: 'commercial',
+        capability: 'commercial.proposal.render',
+        action: renderAction,
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
   }
 
   if (hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)) {

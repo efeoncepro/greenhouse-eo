@@ -128,6 +128,8 @@ export type CanonicalErrorCode =
   | 'proposal_human_gate_required'
   | 'proposal_quote_gate_failed'
   | 'proposal_not_entitled'
+  | 'proposal_render_rejected'
+  | 'proposal_render_conflict'
 // Reserved for future canonical codes — extender aquí cuando emerjan
 // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -514,6 +516,17 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   proposal_not_entitled: {
     status: 403,
     message: 'Tu organización no tiene activado el Proposal Studio. Habla con tu equipo de Efeonce para activarlo.',
+    actionable: false
+  },
+  proposal_render_rejected: {
+    status: 422,
+    message:
+      'El render fue rechazado por una regla de la propuesta (evidencia interna, requisito del RFP o accesibilidad no soportada). Revisa el detalle del job.',
+    actionable: false
+  },
+  proposal_render_conflict: {
+    status: 409,
+    message: 'Ya existe un job de render para ese mismo manifest y propósito. Consulta su estado o reintenta el existente.',
     actionable: false
   }
 }

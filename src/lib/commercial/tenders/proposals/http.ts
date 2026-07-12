@@ -15,6 +15,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { InvalidTenderStateTransitionError } from '../tender-state-machine'
 import {
   ProposalAudienceError,
+  ProposalRenderRejectedError,
+  ProposalRenderStateError,
   ProposalEntitlementError,
   ProposalForbiddenError,
   ProposalHumanGateError,
@@ -51,6 +53,14 @@ export const proposalErrorResponse = (error: unknown): NextResponse<CanonicalErr
 
   if (error instanceof ProposalEntitlementError) {
     return canonicalErrorResponse('proposal_not_entitled')
+  }
+
+  if (error instanceof ProposalRenderRejectedError) {
+    return canonicalErrorResponse('proposal_render_rejected')
+  }
+
+  if (error instanceof ProposalRenderStateError) {
+    return canonicalErrorResponse('proposal_render_conflict')
   }
 
   if (error instanceof ProposalForbiddenError) {
