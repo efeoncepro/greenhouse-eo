@@ -47,13 +47,32 @@ const GENERIC_FAMILIES = new Set([
   'emoji'
 ])
 
-/** Todo `<img>` del DOM debe haber resuelto: 404 → caja vacía silenciosa en el PDF. */
+/**
+ * Todo `<img>` del DOM debe haber resuelto: 404 → caja vacía silenciosa en el PDF.
+ *
+ * ⚠️ SIN CARRERAS: primero se ESPERA la carga de cada imagen (`img.decode()`, que resuelve al
+ * decodificar y rechaza si la fuente falló) con un techo duro, y RECIÉN entonces se juzga
+ * `naturalWidth`. Juzgar sin esperar produce falsos `missing_asset` cuando el filesystem es lento
+ * (Cloud Run streamea capas de imagen en frío — cazado en el primer smoke real; en local el SSD
+ * lo escondía). Un gate que depende de la velocidad del disco no es un gate: es una moneda.
+ */
 export const assertAllImagesResolved = async (page: Page, slideId: string): Promise<void> => {
-  const broken = await page.evaluate(() =>
-    Array.from(document.querySelectorAll('img'))
+  const broken = await page.evaluate(async () => {
+    const imgs = Array.from(document.querySelectorAll('img'))
+
+    const settle = Promise.all(
+      imgs.map(img =>
+        img.decode().catch(() => undefined) // el rechazo (fuente rota) se juzga abajo por naturalWidth
+      )
+    )
+
+    // Techo duro: si en 15 s una imagen local no cargó, ESO también es un hallazgo real.
+    await Promise.race([settle, new Promise(resolve => setTimeout(resolve, 15_000))])
+
+    return imgs
       .filter(img => !img.complete || img.naturalWidth === 0)
       .map(img => img.getAttribute('src') ?? '(sin src)')
-  )
+  })
 
   if (broken.length > 0) {
     throw new SlideQualityError(
