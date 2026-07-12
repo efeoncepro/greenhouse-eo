@@ -6,7 +6,7 @@
 > **v0.2 (2026-07-12):** se corrige el status (decía `doc-only` con el runtime ya shipped), se declara el **entregable PDF real** (merge `pdf-lib` de N páginas + gate de peso), el **CLI canónico `pnpm deck:compose`**, el **inventario de los 15 resolvers**, la **state machine** (12 estados, sin DB) y la **2ª bug class** (geometría). Se elimina el bloque muerto que decía "slotsRef sólo en CoverFull".
 > **Siguiente hardening de plataforma y marca:** `TASK-1393` extrae el Artifact Composer, formaliza el catálogo `deck-axis` y materializa AXIS como `brandPack` reutilizable; conserva el output aprobado y no construye el catálogo social.
 > **Spec raíz:** `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (§4 deck pipeline, Apéndices A/B)
-> **Fuente de layouts:** Figma `Sistema Axis - PPT` (fileKey `GXYeJaRjotmFuczfnd8hLi`)
+> **Fuente de layouts y primitivas de presentación:** Figma `Sistema Axis - PPT` (fileKey `GXYeJaRjotmFuczfnd8hLi`; `Color Primitives` `33:2`). Sus aliases se llevaron locales a las primeras plantillas en `b38a8d0e2` y se replicaron al catálogo de 25 en `e78e9dfb2`; TASK-1393 los centraliza sin sustituirlos por el mirror UI.
 
 ## Qué es esto
 
@@ -44,7 +44,7 @@ Base = degradado hero de Think (`efeonce-think` → `index.astro .home-hero` / `
 }
 ```
 
-- Colores = tokens AXIS (accent-800/900) + `--axis-teal`/`--axis-violet`. **NUNCA** hardcodear HEX sueltos fuera de estos tokens.
+- Colores = primitivas PPT del pack `deck-axis`. Todo literal existente debe quedar asociado a una variable/node del mismo Sistema Axis-PPT antes de migrar; los aliases que coincidan con AXIS UI pueden usar crosswalk, pero **NUNCA** se sustituyen valores por cercanía ni se hardcodean HEX sueltos fuera del pack. Gradientes = recipes del catálogo (`cover.hero|richContent|backCover|lightSurface`), con capas/stops que refieren tokens de color/opacidad; nunca strings CSS repetidos por plantilla. **Think es sólo referencia histórica de geometría del hero, no una fuente de color ni un segundo brand pack.**
 - **NUNCA** volver al mesh gradient recreado (rechazado: no escala, no se renderiza igual).
 
 **Degradado del cover = receta EXACTA del hero de Think (verificada en `efeonce-think`, 2026-07-11).** Rechazados por el operador: el mesh recreado, el 3-color con violeta (se ve manchón/sucio), y el teal a alta opacidad (manchón verde). Lo que SÍ funciona (tokens Think = `web-agentica/index.astro`):

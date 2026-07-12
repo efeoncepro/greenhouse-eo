@@ -92,19 +92,32 @@ no). **No hay que inventar nada; sólo cambia el vocabulario visible.**
 - El **squad blueprint lleva loaded cost** → `audience=internal`, **siempre**. Filtrarlo al comprador es
   entregarle tu estructura de costos y tu piso de negociación.
 
-### 4. Los tokens AXIS se comparten; la paleta **no se copia**
+### 4. El contrato de brand pack se comparte; la paleta **no se copia**
 
 **Hallazgo:** las 25 plantillas hardcodean **51 HEX distintos**, con la paleta **re-declarada en cada
 archivo**. Hoy es deuda; **con un segundo catálogo es un multiplicador de brand drift** — y viola la regla
-canónica del repo (**AXIS es SoT: se cambia el token y todo deriva**).
+canónica del repo (**un SoT declarado por superficie: se cambia el token y todo deriva**).
 
-- **Los catálogos comparten una capa de tokens**: un CSS de custom properties **generado desde el SoT**
-  (`src/@core/theme/axis-tokens.ts`), importado por toda plantilla de todo catálogo.
+- **Dos SoT existentes no se deben confundir.** `src/@core/theme/axis-tokens.ts` es el mirror del AXIS de UI
+  (Figma `Design System | Vuexy → AXIS`); el primer pack de presentación `deck-axis` deriva de Figma
+  `Sistema Axis - PPT`, [`Color Primitives` `33:2`](https://www.figma.com/design/GXYeJaRjotmFuczfnd8hLi/Sistema-Axis---PPT?node-id=33-2). Coinciden parcialmente, pero no son intercambiables:
+  `blue/500` es `#0375D9` en PPT y `#0375DB` en UI; `blue/900` es `#022A4E` y `#00284D` respectivamente.
+- **Los catálogos comparten el contrato de brand pack**, no una copia ciega de la paleta UI: CSS custom
+  properties se generan desde la fuente declarada por el pack. `deck-axis` usa las primitivas PPT; un
+  crosswalk a `axis-tokens.ts` sólo es válido cuando el valor coincide exactamente. Todo literal actual del
+  deck debe mapear a una variable/node del mismo Sistema Axis-PPT antes de tokenizarse; no se aproxima,
+  normaliza ni atribuye a otra fuente.
 - **NUNCA** un catálogo nuevo re-declara la paleta. **NUNCA** una plantilla nueva hardcodea un HEX de
   marca.
 - El **molde visual** (degradado, tipografía, safe-area, íconos, glass) **es del catálogo**, no del motor.
   Cada superficie tiene el suyo — un carrusel de IG **no** usa el molde del deck — pero **ambos beben de
   los mismos tokens**.
+
+**Tokenización de gradientes.** Un gradiente no es un color: es una receta visual de catálogo. `deck-axis`
+declara recipes versionadas (`cover.hero`, `richContent`, `backCover`, `lightSurface`) como capas ordenadas
+`linear|radial|grain`, con geometría, stops, opacidad y blend. Los stops referencian roles del `BrandPack`;
+las templates sólo seleccionan la recipe y el CSS compilado la resuelve. Así un cambio de marca puede variar
+el pack sin alterar la geometría del deck, y un catálogo social crea su propio molde sin copiar el renderer.
 
 ### 5. Nace para Efeonce, pero **nace multi-tenant** (fundaciones ASaaS)
 
@@ -247,7 +260,7 @@ que la extracción sea **near-term, no hipotética**, y agrega una obligación *
 | Motor de composición | **Platform** | `src/lib/artifact-composer/**` (domain-free) |
 | Catálogo deck AXIS (16:9 → PDF) | Commercial | `catalogs/deck-axis/` |
 | Catálogo social (4:5 → PNG set) | Growth/Social | `catalogs/social-carousel/` |
-| Tokens de marca | **AXIS SoT** | `src/@core/theme/axis-tokens.ts` → CSS custom props generado |
+| Tokens de marca | **Brand-pack SoT declarado** | `deck-axis`: Figma PPT `33:2` → CSS custom props generado; `axis-tokens.ts` queda como mirror UI con crosswalk exacto |
 | Aggregate de la oferta | Commercial | `greenhouse_commercial.proposals` (`origin`) |
 | Precio | **quote-to-cash** | `src/lib/commercial/quote-to-cash/**` — el Proposal **no** calcula |
 | Radar público | RESEARCH-007 | `greenhouse_commercial.public_tender*` (ADR de ownership, sin cambios) |
@@ -289,7 +302,7 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 |---|---|---|---|
 | **0** | **Congelar la dirección** (este ADR) + avisar a Codex **antes** de que el carrusel forkee el motor | — | **Un fork.** Es lo urgente. |
 | **1** | Extraer el motor → `src/lib/artifact-composer/**`; el deck pasa a ser `catalogs/deck-axis`; `outputTarget` al contrato del catálogo | Slice 0 | Crece con cada consumer |
-| **2** | **Brand pack como input**: capa de tokens generada desde el SoT, consumida por toda plantilla. Las 25 dejan de hardcodear la paleta. AXIS pasa a ser *un* brand pack | Slice 1 | Brand drift × N catálogos **+ bloquea el as-a-service** |
+| **2** | **Brand pack como input**: capa de tokens generada desde el SoT declarado del pack, consumida por toda plantilla. `deck-axis` parte de Figma PPT `33:2`; las 25 dejan de hardcodear la paleta. AXIS pasa a ser *un* brand pack | Slice 1 | Brand drift × N catálogos **+ bloquea el as-a-service** |
 | **3** | `Tender → Proposal` (dominio + tabla + `origin`) + **org scoping y entitlement per-ORG desde la primera migración** — **debe entrar ANTES de que TASK-1392 cree la tabla** | Slice 0 | **Una migración** (y un `WHERE org_id` agregado tarde siempre deja un reader sin filtrar) |
 | **4** | Catálogo `social-carousel` (4:5 → PNG set) + su molde visual + su consumer en growth | Slices 1-2 | — |
 | **5** | *(diferido, no ahora)* Lane `api/platform/ecosystem/*`, UI de cliente, billing por render | Slices 1-4 | — (las costuras ya están puestas) |
