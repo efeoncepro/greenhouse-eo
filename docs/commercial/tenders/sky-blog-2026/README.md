@@ -1,15 +1,32 @@
 # Licitación SKY — Servicio de Producción de Contenido Blog (Wherex, 2026)
 
-> **Este archivo es el ÍNDICE, no una copia.** Los entregables viven en OneDrive (sincronizado local) —
-> **NO se duplican al repo**: dos copias de un documento contractual terminan en entregar la versión
-> equivocada. El repo guarda el índice (para no redescubrir la carpeta cada sesión) y el `deck-plan.json`
-> (que sí es artefacto de código, auditable y re-componible).
+> # ⚠️ Dónde vive qué (corregido 2026-07-12)
 >
-> 📁 **Carpeta canónica (local, sincronizada):**
+> **La licitación SE TRABAJA EN EL REPO.** Antes este README decía que los entregables vivían en OneDrive
+> y **no se duplicaban al repo** — el miedo era correcto (*dos copias de un documento contractual terminan
+> en entregar la versión equivocada*) pero **la solución era la equivocada**, y el riesgo se materializó:
+> la oferta técnica tenía **dos artefactos editables a mano** (un `.md` y un `.html` con CSS curado) y
+> **el PDF que estaba en OneDrive era de dos días antes**, sin nada de lo que se había agregado.
+>
+> **La regla correcta no es "una sola ubicación": es UNA SOLA FUENTE.**
+>
+> | | Dónde | Qué es |
+> |---|---|---|
+> | **FUENTE** | **este repo** (`.md` · `deck-plan.json` · `.xlsx` · las bases) | **Lo único que se edita.** Versionado, auditable, con historia |
+> | **DERIVADO** | OneDrive (`.pdf`, `.html`) | **Se re-emite con un comando. NUNCA se edita a mano** |
+>
+> ```bash
+> pnpm tender:render docs/commercial/tenders/sky-blog-2026/oferta-tecnica.md --out .captures/sky-oferta
+> pnpm deck:compose  docs/commercial/tenders/sky-blog-2026/deck-plan.json  --out .captures/sky-bid
+> ```
+>
+> Después se copian los PDF a OneDrive, **que es de donde el operador los sube a Wherex**.
+> *(Es el mismo principio del Artifact Composer: el Plan es el artefacto auditable; el PDF es derivado y
+> re-componible.)*
+>
+> 📁 **Carpeta OneDrive (entregables, sincronizada local):**
 > `~/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Sky Airlines/7. Blog/`
->
 > Se lee y escribe **por filesystem** — no hace falta el conector de SharePoint.
-> Última verificación: **2026-07-12**.
 
 ---
 
@@ -47,18 +64,35 @@
 
 ## Los artefactos
 
-### Client-facing (van a SKY)
+### La fuente normativa — manda sobre todo lo demás
 
 | Archivo | Qué es |
 |---|---|
-| [`oferta-tecnica.md`](oferta-tecnica.md) | **La oferta técnica.** Es el **contenido fuente del deck**: diagnóstico con el grader real, escalera Be X, benchmark competitivo, método, squad, SLA. |
-| [`oferta-economica.html`](oferta-economica.html) | **La oferta económica.** Cifras reales (ver abajo). |
+| [`bases/bases-licitacion-sky.docx`](bases/) + `.txt` | **Las Bases.** El `.txt` es el texto extraído: **verifica siempre contra él**, no contra la memoria. Todo requisito de formato, peso, plazo o plantilla **sale de acá**. |
+
+### Client-facing (van a SKY) — **`.md` = FUENTE, el PDF se re-emite**
+
+| Archivo | Qué es |
+|---|---|
+| [`oferta-tecnica.md`](oferta-tecnica.md) | **La oferta técnica.** Abre con la **matriz de cumplimiento** (cruza cada requisito de las Bases con la sección donde se responde) y cierra el **régimen de penalidades** aceptado. Es además el **contenido fuente del deck**. |
+| [`oferta-economica.md`](oferta-economica.md) | **La oferta económica.** Cifras reales (ver abajo). |
+| [`propuesta-economica.xlsx`](propuesta-economica.xlsx) | **El Excel de la económica.** ⚠️ **Es FUENTE, no derivado** (Wherex no trae plantilla, se creó a mano). Las Bases lo listan como **documento integrante** (§1.2). |
+| [`deck-plan.json`](deck-plan.json) | El plan del deck — **artefacto auditable**; el PDF de 15 láminas es derivado. |
+
+> ⚠️ **Antes de subir el Excel: verificar que las Bases NO impongan un formato para la económica.** El
+> **Tribunal de Contratación Pública declaró ILEGAL una adjudicación** (SEREMI Magallanes, 2025) porque el
+> presupuesto se presentó con el desglose del oferente **en vez del formato obligatorio de las Bases** — y
+> sostuvo que **ni siquiera era subsanable**. *(SKY es Wherex = privado, así que el riesgo es contractual,
+> no de nulidad. La regla se mantiene: **si las Bases traen plantilla, se usa la de las Bases**, aunque sea
+> peor que la nuestra.)*
 
 ### ⚠️ INTERNOS — NUNCA van a SKY
 
 | Archivo | Por qué es interno |
 |---|---|
 | [`matriz-admisibilidad-INTERNO.md`](matriz-admisibilidad-INTERNO.md) | Checklist de control + **loaded cost y piso de negociación**. Entregarlo sería darle a la contraparte tu estructura de costos. |
+| [`squad-blueprint-INTERNO.md`](squad-blueprint-INTERNO.md) | **Loaded cost** del squad. |
+| [`diagnostico-INTERNO.md`](diagnostico-INTERNO.md) · [`benchmark-competencia-INTERNO.md`](benchmark-competencia-INTERNO.md) | Material de trabajo; lo publicable ya está destilado en la oferta técnica. |
 
 > **Regla dura (`audience`):** todo artefacto del bid es **`internal`** o **`client_facing`**. **Sólo lo
 > `client_facing` se empaqueta.** El squad blueprint y el diagnóstico interno llevan **loaded cost** — no
