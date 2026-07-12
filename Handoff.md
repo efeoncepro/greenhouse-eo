@@ -1,12 +1,25 @@
-## Sesión 2026-07-12 (cont. 7) — TASK-1393 EN CURSO: Artifact Composer extraction (Claude)
+## Sesión 2026-07-12 (cont. 7) — TASK-1393 EN CURSO: Slices 0→3a COMPLETOS (Claude)
 
-- `TASK-1393` movida a `in-progress/`. Trabajo en `develop`, local-first, **sin push** hasta señal del
-  operador. Objetivo: Slice 0 (baseline visual congelado + `composer:visual-gate`) ANTES de mover un
-  archivo; luego Slice 1 (move a `src/lib/artifact-composer/**` + frontera), 1b (assets fuera de
-  `docs/`), 2 (catálogo/`outputTarget`), 3/3b (brand pack + ledger 80 bases + molde), 4 (font pack +
-  `ResolvedCompositionManifest`).
-- ⚠️ Coordinación con Codex: NO construir el catálogo del carrusel copiando el motor mientras esta task
-  esté abierta; el motor está en movimiento hacia `artifact-composer/`.
+- **Hecho (local-first en `develop`, SIN push):** Slice 0 `b59df463d` (baseline 40 frames + `pnpm
+  composer:visual-gate` a 0 px + `BASELINE_DELTAS.md` dos-vías; 0a arregló no-determinismo GPU real →
+  `launchComposerBrowser()`); Slice 1 `72e9ba6e7` (motor → `src/lib/artifact-composer/**`, boundary
+  test allowlist + eslint, sin `server-only`/shim, barrel, `TemplateAuthorityError`); Slice 1b
+  `a50eecb60` (catálogo runtime → `catalogs/deck-axis/`, PII squad declarada, catálogo autocontenido;
+  ⚠️ `docs/` NO se excluye completo de `.vercelignore` — el Roadmap reader TASK-1152 lo lee en runtime);
+  Slice 2 `88b80c678` (`ArtifactCatalog` + `outputTarget` fail-closed + resolvers/timeline al catálogo +
+  4 validadores semánticos reales + `resolvePlan`→manifest + toy-catalog test); Slice 3a `2d633819d`
+  (snapshot AXIS-PPT vía Figma MCP: 68 primitives + 50 semantic + Deck/Foundations; `pnpm
+  composer:color-ledger`: 646 literales → **78 bases**, 7 exactas PPT, 71 `pending`).
+- **Gates verdes en cada slice:** visual gate 0 px · 10 suites/111 tests del paquete · lint · tsc ·
+  build prod (1b) · CLI `deck:compose` idéntico (Node puro).
+- 🔴 **Gate del operador antes de 3b:** nombrar las 71 altas del ledger extiende la colección `Deck`
+  del `Sistema Axis - PPT` (convención descubierta: `--axis-deck-*`). Es propose → confirm sobre la
+  biblioteca de marca — la clasificación se entregará como propuesta en el ledger, no se hornea sola.
+- **Pendiente:** 3b/3c (clasificación + compilador BrandPack con guard WCAG advisory-para-axis +
+  gradient recipes + molde compilado, UNA pasada sobre las 25) · 4 (font pack del brand pack +
+  manifest emitido) · docs de cierre. Detalle en el Delta (d) de la task.
+- ⚠️ Coordinación con Codex: NO construir el catálogo del carrusel copiando el motor; ya existe el
+  contrato `ArtifactCatalog` + el toy-catalog test como referencia de extensión.
 
 ## Sesión 2026-07-12 (cont. 6) — PDF → PPTX → Adobe Express REST: destinos del composer aceptados
 

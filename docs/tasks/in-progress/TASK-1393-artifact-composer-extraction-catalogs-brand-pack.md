@@ -683,6 +683,29 @@ compara el **valor computado** de cada token contra el literal que reemplaza, si
 pregunta *"¿esto está bien diseñado?"* sigue siendo humana. El gate garantiza que las horas invertidas no se
 pierdan por accidente — no que las próximas estén bien invertidas.
 
+## Delta 2026-07-12 (d) — bitácora de implementación (Claude): Slices 0 → 3a COMPLETOS, con 4 recalibraciones medidas
+
+> Trabajo en `develop`, local-first, sin push. Gate visual verde (0 píxeles) en cada slice.
+
+| Slice | Commit | Estado |
+|---|---|---|
+| **0** — baseline congelado + `pnpm composer:visual-gate` | `b59df463d` | ✅ 40 frames (25 probes sintéticos compartidos con composability + 15 láminas SKY), manifest sha256, `BASELINE_DELTAS.md` de dos vías con digest sellado. **0a encontró y arregló no-determinismo REAL**: `chromium.launch()` desnudo variaba subpíxeles de GPU (3 px en HighlightWave, `backdrop-filter`) → nace `launchComposerBrowser()` (software raster + sRGB) como launch canónico. 2 selftests post-fix: 0 px |
+| **1** — move + frontera + package-shaped | `72e9ba6e7` | ✅ motor en `src/lib/artifact-composer/**`; boundary test por ALLOWLIST (relativo-interno + `node:*` + playwright + pdf-lib) + override eslint; sin `server-only` ni shim (CLI corre Node puro); barrel; `CompositionPlanInput`/`ResolvedCompositionManifest`; `TemplateAuthorityError` |
+| **1b** — assets fuera de `docs/` | `a50eecb60` | ✅ catálogo runtime (12,4MB) → `catalogs/deck-axis/`; política PII squad declarada; el gate ATRAPÓ una regresión real del move (logo efeonce escapaba vía `../../../public/`) → catálogo autocontenido |
+| **2** — catálogo como dato | `88b80c678` | ✅ `ArtifactCatalog` + `outputTarget` fail-closed (`png-set` sin PDF; `pptx-native`/`adobe-express-rest` declarados abortan); 16 resolvers + icon set + timeline al catálogo; `CatalogSemanticValidator` con 4 reglas reales de deck-axis probadas (pricing-integrity, team-dedication, requirements-coverage, template-compatibility — el deck SKY pasa las 4); `resolvePlan` → manifest con hashes; toy catalog test (la regla que define la task, probada) |
+| **3a** — snapshot + ledger | `2d633819d` | ✅ snapshot AXIS-PPT verificado vía Figma MCP (68 primitives `33:2` + 50 semantic `33:129` + Deck/Foundations `39:2`); `pnpm composer:color-ledger` (contrato de dos vías) |
+| 3b/3c — clasificación + compilador + recipes + molde | — | ⏳ **siguiente**; ver gate de decisión abajo |
+| 4 — font pack + manifest emitido | — | ⏳ |
+
+**Recalibraciones (medidas, no opiniones):**
+
+1. **La cifra canónica del ledger es 78, no 80**: 646 literales → 78 bases RGB normalizadas medidas mecánicamente sobre el catálogo vigente (`pnpm composer:color-ledger`). 7/78 exactas contra PPT (como anticipaba la auditoría). El doc de la task queda superseded por el tool en esta cifra.
+2. **"8 suites, 102 tests" era 7 suites del deck + la de la state machine** (que NO viaja: es del aggregate `Proposal`). Post-refactor: 10 suites / 111 tests del paquete, todas verdes.
+3. **`docs/` NO se puede excluir completo de `.vercelignore`**: el Roadmap reader (TASK-1152) lee `docs/{epics,tasks,mini-tasks,issues}/**/*.md` en runtime vía `outputFileTracingIncludes`. Se excluyó sólo `tender-deck-composer-prototypes/` (~40MB post-move). El texto del Slice 1b queda recalibrado así.
+4. **Los alphas son composicionales**: el blanco aparece con 54 alphas distintos — la "opacidad nombrada" por base×alpha sería ruido. Se tokeniza la BASE (`--x` + `--x-rgb`) y el alpha queda en la composición; las opacidades nombradas se reservan para las recipes.
+
+**🔴 Gate de decisión del operador antes de 3b (propose → confirm):** las **71 altas** del ledger deben nombrarse extendiendo la colección `Deck` del `Sistema Axis - PPT`, cuya convención existente es CSS-custom-property (`--axis-deck-empower-*`, descubierta en `39:2`). Nombrar y crear ~71 variables en la biblioteca de marca del operador NO es un write silencioso de agente: la clasificación propuesta se entregará como tabla (`figma.status: proposed` en el ledger) para validación antes de hornearse en las 25 plantillas. Las 20 altas estructurales ya venían pre-nombradas por esta task (navy/teal/violet/surfaces/halo/back-cover).
+
 ## Open Questions
 
 - ¿Nombre final del home? `src/lib/artifact-composer/**` evita colision con el **Composition Shell** de UI Platform (que es otra cosa). No es irreversible.
