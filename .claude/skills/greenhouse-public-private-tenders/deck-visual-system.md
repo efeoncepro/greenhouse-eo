@@ -349,6 +349,18 @@ comas del join a la vista.
   queda declarada, porque su callout **requiere una decisión de diseño** (¿contra qué se mide la brecha?),
   y **una barra sin dato es una barra que miente**.
 
+### ⚠️ La 4ª bug class: el chrome que depende de DÓNDE vive en el DOM
+
+- **La firma (`efeoncepro.com`) vive DENTRO del `.slide`. Siempre.** `mix-blend-mode: luminosity` se mezcla
+  con el backdrop de **su** contexto de apilamiento: si la burbuja es hermana del `.slide`, **no tiene con
+  qué fundirse y se pinta plana**. 21 de 22 plantillas la tenían fuera — se veía como "en unas láminas
+  funciona y en otras no". **No era el PDF** (el blend sobrevive al `print-to-pdf`; verificado contra el
+  raster real).
+- **El hito de timeline: `at` es el FIN de la unidad.** Rotular *"Semana 1"* con `at: 1` pone el rombo en el
+  **cierre del Mes 1** → la lámina **afirma una fecha falsa**. En una oferta eso es **fabricación**, de la
+  misma familia que una barra que no sale del dato. Y un hito en la última unidad cae al **100%** del eje:
+  su etiqueta se ancla **hacia adentro** (`.at-end`, derivado del dato) para no partirse contra el borde.
+
 ### Estado del catálogo — 24/25 componibles ✅ (verificado en CI)
 
 Las 25 plantillas tienen `data-slot` en el HTML y su `*.slots.json`, enlazado en el `registry.json`.

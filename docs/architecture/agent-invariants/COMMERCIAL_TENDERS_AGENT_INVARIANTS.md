@@ -100,6 +100,16 @@ del contrato si se adjudica. De ahí salen los tres principios; todo lo demás s
   tres días de entregar. El gate es `pnpm vitest run src/lib/commercial/tenders` (intenta llenar las 25).
 - **NUNCA** cierres un deck porque "los tests pasan". Cuatro pasos numerados todos como "01" y unos
   párrafos aplanados con comas **pasaban todos los tests**. **MIRA LOS FRAMES, TODOS.**
+- **SIEMPRE** la firma de URL vive **dentro** del `.slide`. **Bug class 4:** `mix-blend-mode` se mezcla con
+  el backdrop de **su** contexto de apilamiento — si la burbuja es hermana del `.slide`, **no tiene con qué
+  fundirse y se pinta plana**. 21 de 22 plantillas la tenían fuera. (No era el PDF: el blend sobrevive al
+  `print-to-pdf`.)
+- **NUNCA** rotules un hito de timeline con una fecha que no sea la que el eje pinta. `at` es el **FIN de
+  la unidad**: un hito "Semana 1" con `at: 1` cae en el **cierre del Mes 1** → la lámina **afirma una fecha
+  falsa**. Es fabricación, no un bug de layout.
+- **NUNCA** escribas un guard que chequee **texto** cuando puedes chequear el **DOM**. El primer guard de la
+  firma buscaba `</main>` y daba por buenas las plantillas que usan `<div class="slide">`: **un check que
+  miente es peor que no tenerlo**.
 - **NUNCA** ignores el gate de peso (`maxPdfMb`). No es estética: los portales **rechazan** adjuntos sobre
   su límite. Un deck de 40 MB que el portal no acepta es un deck que no existe.
 

@@ -1,3 +1,40 @@
+## Sesión 2026-07-12 (cont. 2) — Deck SKY: firma, ordinales, timeline · PENDIENTE VISUAL PARA CODEX
+
+**Estado del deck SKY:** 15 láminas, PDF 3.5 MB, `.captures/sky-bid/`. Plan auditable en
+`docs/commercial/tenders/sky-blog-2026/deck-plan.json`. Cifras reales y trazables. 92 tests verdes.
+
+**4ª bug class cerrada — el chrome que depende de DÓNDE vive en el DOM:**
+
+- **La firma perdía el blend según la lámina.** `mix-blend-mode: luminosity` se mezcla con el backdrop de
+  **su** contexto de apilamiento: 21 de 22 plantillas tenían la burbuja **fuera** del `.slide` (hermana,
+  hija de `<body>`) → sin degradado debajo, **se pintaba plana**. **NO era el PDF**: se verificó
+  rasterizando el PDF con poppler y comparándolo contra el PNG — el blend sobrevive al `print-to-pdf`.
+  Fix: la firma vive dentro del `.slide` en las 22. Guard **por DOM** (`closest('.slide')`), porque el
+  primer guard chequeaba texto (`</main>`) y **daba por buenas las que usan `<div class="slide">`**.
+- **El hito del final del eje.** `at` es el **FIN de la unidad** (`at:3` con 3 meses → 100%, el borde). Su
+  label se partía. Fix general: el **rombo queda en su fecha real** y la **etiqueta se ancla hacia adentro**
+  (`.at-start`/`.at-end` emitidas por el resolver desde el dato). ⚠️ Y una corrección de autoría: mis hitos
+  decían *"Semana 1"* con `at:1`, que cae en el cierre del Mes 1 → **la lámina afirmaba una fecha falsa**.
+  Eso es **fabricación**, no un bug de layout.
+- **Antes (mismo día):** el barrido borraba el **ordinal derivado** (los 4 pasos salían como "01") y un
+  **array dentro de un objeto** se aplanaba con las comas del join a la vista.
+
+**⚠️ PENDIENTE VISUAL — el operador lo delegó a Codex (2026-07-12):**
+
+1. **`ProcessStepsFull`**: los círculos numerados salen **encima** de las cards (el `.index` es
+   `position:absolute` y la `.card` es **estática** → lo posicionado pinta sobre lo estático, sin importar
+   el orden del DOM). El operador los quiere **detrás**. Ojo: el `.index` lleva un `box-shadow` de 12px que
+   **sólo tiene sentido si va encima** — al mandarlo atrás, ese halo queda inútil y habría que quitarlo.
+2. **`RequirementsTableFull`**: subir la tabla — queda muy pegada a la burbuja de URL.
+3. **`PricingFull`**: centrar la burbuja y subir un poco la tabla de inversión.
+4. La firma **sigue leyéndose gris** para el operador en algunas láminas (yo verifiqué que el blend sí se
+   aplica en 08-ciclo, PNG y PDF). **Falta identificar en cuáles** y si el gris es el resultado esperado del
+   `luminosity` sobre ese backdrop o un caso mal resuelto.
+
+**Estado de la entrega SKY:** técnica ✅ · económica ✅ (PDF) · **Excel creado** ✅ (Wherex no tiene
+plantilla) · **deck ✅ pendiente de los ajustes visuales**. Plazo de las bases: **15/07/2026**. Lo sube el
+operador a Wherex (regla dura: el agente prepara, el humano sube).
+
 ## Sesión 2026-07-12 (cont.) — El deck REAL de SKY: 7 de 25 plantillas no componían
 
 - **Se compuso el deck real de la licitación SKY** (15 láminas, PDF 3.5 MB) con cifras **medidas y trazables**: escalera Be X del grader (40/70/37/8/76 con `evidenceRef`), el hallazgo de **0 citas del blog en 35 respuestas**, Semrush (~40K visitas/mes), y la económica exacta (5.200.000 / 6.900.000 / 260.000 CLP). Registro formal de usted. Plan auditable: `docs/commercial/tenders/sky-blog-2026/deck-plan.json`.

@@ -1002,6 +1002,38 @@ una barra que miente.**
 > cuatro "01" y los párrafos aplanados **pasaban todos los tests**. **SIEMPRE** mirar los frames —todos,
 > no una muestra—. Los dos hallazgos vinieron de una **revisión visual**, no del CI.
 
+### ⚠️ La 4ª bug class: **el chrome que depende de DÓNDE vive en el DOM**
+
+Dos bugs distintos, una misma raíz: **una plantilla puede verse bien y estar mal armada**, y sólo se nota
+en el frame.
+
+**a) La firma perdía el blend según la lámina.** El operador lo vio en el PDF: en unas láminas la burbuja
+`efeoncepro.com` se fundía con el degradado y en otras salía plana. **No era del renderer ni del formato
+PDF** (verificado: el blend sobrevive al `print-to-pdf`; se comparó el PNG contra el PDF rasterizado con
+poppler). Era **dónde vivía la burbuja en el DOM**.
+
+`mix-blend-mode: luminosity` se mezcla con el **backdrop de SU contexto de apilamiento**. Si la firma es
+**hermana** del `.slide` (hija de `<body>`), no tiene el degradado debajo en su mismo contexto — y **se
+pinta plana**. **21 de las 22** plantillas con firma la tenían fuera.
+
+- **SIEMPRE** la firma vive **dentro** del elemento `.slide`. Su posición en pantalla no cambia (mismo
+  origen, mismo tamaño); lo que cambia es su contexto de blend.
+- Guard: `template-composability.test.ts` afirma `bubble.closest('.slide') !== null` **sobre el DOM real**
+  de las 25. ⚠️ La primera versión del guard chequeaba el texto (`</main>`) y **daba por buenas las
+  plantillas que usan `<div class="slide">`** — *un check que miente es peor que no tenerlo*.
+
+**b) El hito del final del eje estrujaba su etiqueta.** `timeline-milestone-position` ancla el hito al
+**FIN de su unidad** (`at: 3` con un eje de 3 meses → **100%**, el borde exacto del lienzo). Su label,
+centrado y `nowrap`, se partía contra el borde. **El prototipo lo esquivaba a mano**: sus ejemplos usan
+16%, 50% y 91%, **nunca 100%** — la plantilla no sabía contener el caso real.
+
+- Fix general **derivado del dato**: el **rombo se queda en su posición real** (la fecha no se negocia) y
+  la **etiqueta se ancla hacia adentro** en los extremos. El resolver emite `.at-start`/`.at-end` desde el
+  porcentaje calculado; el CSS invierte el anclaje. Sirve para cualquier deck.
+- ⚠️ **`at` es el FIN de la unidad, no su inicio.** Un hito rotulado *"Semana 1"* con `at: 1` cae en el
+  **cierre del Mes 1** — la lámina **afirma una fecha falsa** en un documento contractual. Eso no es un bug
+  de layout: es **fabricación**, la misma familia que una barra que no sale del dato.
+
 ### Contrato del HTML (lo que una plantilla debe declarar)
 
 - `data-slot` + `data-slot-type` en el contenedor del slot.
