@@ -78,6 +78,12 @@ export interface SlotContract {
   item?: SlotItemContract
   defaultAsset?: string
   resolver?: string
+  /**
+   * Etiquetas de un slot `enum`: el plan declara la CLAVE (`combined`) y la lámina muestra su
+   * ETIQUETA (`Propuesta Técnica y Económica`). El autor elige de un conjunto cerrado; el copy
+   * visible es del contrato, no suyo — así la portada no puede decir cualquier cosa.
+   */
+  values?: Record<string, string>
 }
 
 export interface TemplateContract {

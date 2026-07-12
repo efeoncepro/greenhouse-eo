@@ -45,6 +45,8 @@ interface FillInstruction {
    * porque los resolvers son lógica de dominio: el browser sólo ejecuta el resultado.
    */
   fieldPlan?: Record<string, FieldDirective>
+  /** Etiquetas del `enum` (clave → copy visible). Ver `SlotContract.values`. */
+  enumLabels?: Record<string, string>
 }
 
 const buildFieldPlan = (
@@ -98,7 +100,8 @@ const buildInstructions = (slide: SlideSpec, contract: TemplateContract): FillIn
       selector: slotContract.selector,
       type: slotContract.type,
       value,
-      fieldPlan: buildFieldPlan(slotContract, value, slide.slots as Record<string, unknown>)
+      fieldPlan: buildFieldPlan(slotContract, value, slide.slots as Record<string, unknown>),
+      enumLabels: slotContract.values
     })
   }
 
@@ -160,6 +163,29 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
 
     if (type === 'string') {
       el.textContent = String(value)
+      continue
+    }
+
+    if (type === 'enum') {
+      // El plan declara la CLAVE; la lámina muestra la ETIQUETA del contrato. Una clave fuera del
+      // conjunto ABORTA: si cayera a texto crudo, la portada de una oferta diría "combined".
+      const labels = instruction.enumLabels
+
+      if (!labels) {
+        problems.push(`${instruction.selector}: slot enum sin "values" en el contrato`)
+        continue
+      }
+
+      const label = labels[String(value)]
+
+      if (label === undefined) {
+        problems.push(
+          `${instruction.selector}: "${String(value)}" no es un valor válido del enum (${Object.keys(labels).join(', ')})`
+        )
+        continue
+      }
+
+      el.textContent = label
       continue
     }
 

@@ -169,6 +169,32 @@ const RESOLVERS: Record<string, { known: string[]; build: ResolverDef }> = {
     }
   },
 
+  /**
+   * `legend-layer-tone` — el punto de la leyenda NO es contenido: su opacidad **codifica la
+   * profundidad de la capa** (outer → middle → core). El prototipo lo trae hardcodeado inline en
+   * cada `.dot`, así que si el filler sólo clonara el blueprint, **los tres puntos saldrían del tono
+   * más pálido** y la leyenda dejaría de significar algo. El tono sale de la capa, o no sale.
+   */
+  'legend-layer-tone': {
+    known: ['outer', 'middle', 'core'],
+    build: value => {
+      const TEAL = '54,200,191'
+
+      const background =
+        value === 'outer'
+          ? `rgba(${TEAL},.30)`
+          : value === 'middle'
+            ? `rgba(${TEAL},.60)`
+            : value === 'core'
+              ? `rgb(${TEAL})`
+              : null
+
+      if (background === null) return null
+
+      return [{ selector: '.dot', styleProp: 'background', styleValue: background }]
+    }
+  },
+
   // ── Íconos SVG inline ────────────────────────────────────────────────────────────────────────
   // Estas plantillas no usan `<img src>` sino `<svg><path d="…">`: hay que reescribir el `d`.
 
