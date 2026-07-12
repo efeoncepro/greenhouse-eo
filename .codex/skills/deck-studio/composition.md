@@ -30,6 +30,25 @@ freehand por la puerta de atrás.
 
 ## Cómo se compone
 
+> **Estado runtime (2026-07-12 — TASK-1393/1392/1391 shipped):** el motor vive en
+> `src/lib/artifact-composer/**` (domain-free; el deck es el catálogo `catalogs/deck-axis/`).
+> Hay DOS caminos y no se confunden:
+>
+> 1. **Exploratorio (autoría/iteración):** `pnpm deck:compose <plan.json> --out <dir>` — local,
+>    sin DB, sin flag. Es donde se itera el argumento y se MIRAN los frames.
+> 2. **Productivo (entregable de una Proposal):** `requestProposalRender` → job gobernado →
+>    Cloud Run Job `artifact-worker` → PDF versionado en el asset store privado. Gates
+>    fail-closed: audience por referencia (evidencia interna JAMÁS en un artefacto
+>    client_facing), accesibilidad (PDF/UA exigido ⇒ rechazo), peso/páginas del RFP fijados,
+>    deadline. Manual completo de uso y evolución:
+>    `greenhouse-public-private-tenders/proposal-studio-runtime.md`.
+>
+> **La QA visual ya es MECÁNICA en ambos caminos** (`quality-gates.ts`, dentro del render):
+> `missing_asset` (todo `<img>` con naturalWidth>0) · `font_fallback_detected` (familia sin
+> FontFace declarada) · `blank_slide` (contraste local por tiles, calibrado contra el baseline).
+> "Mirar los frames" sigue siendo el gate del CRAFT — estos detectores son el piso que no
+> depende de que alguien mire.
+
 ```bash
 pnpm deck:compose <plan.json> --out <dir>
 ```

@@ -318,82 +318,39 @@ Artifact Composer (un motor, domain-free)
 - El **molde visual** (degradado, safe-area, íconos, glass) **es del catálogo**, no del motor. Un carrusel
   de IG **no** usa el molde del deck — pero **ambos beben de los mismos tokens**.
 
-## Hacia dónde va — el runtime que viene (TASK-1392 → TASK-1391)
+## El runtime YA EXISTE (TASK-1392 + TASK-1391 — shipped 2026-07-12)
 
-Hoy el composer es un **CLI local** sin dueño: el `DeckPlan` se escribe a mano y el PDF cae en una
-carpeta. **No hay Tender, ni assets gobernados, ni pantalla.** Eso se cierra en dos tasks, en este orden:
+Lo que esta sección anunciaba como futuro **ya es código corriendo**. El manual completo de USO y
+EVOLUCIÓN vive en **[`proposal-studio-runtime.md`](proposal-studio-runtime.md)** — léelo antes de
+operar. El resumen:
 
-**`TASK-1392` — F0: el aggregate `Tender` (predecesor obligatorio).** Crea `tenders` +
-`tender_state_transitions` + `tender_assets`, persiste la state machine en DB (trigger append-only) e
-ingiere los RFP por el **asset store canónico**. Trae además el **Tender Intake Agent Contract**: el
-agente recibe contexto **read-only allowlisted**, emite una **`TenderIntakeProposal` tipada** que cita sus
-inputs, y **el humano confirma** → recién ahí corre el **mismo command** que usarían API/CLI/Nexa/MCP.
-*Bloqueada por* el arbitraje de ownership con RESEARCH-007.
+- **El aggregate es `Proposal`** (`greenhouse_commercial.proposal*`, TASK-1392): state machine
+  persistida con gates humanos EN LA DB, RFP/evidencia/requisitos por el asset store canónico,
+  entitlement per-ORG (`proposal_studio_v1`), API parity, intake agent propose→confirm→execute.
+- **El motor vive en `src/lib/artifact-composer/**`** (TASK-1393, domain-free) y el deck es el
+  catálogo `catalogs/deck-axis/`. `pnpm deck:compose` sigue siendo el CLI exploratorio.
+- **El render productivo es un command gobernado** (TASK-1391): `requestProposalRender` →
+  `proposal_render_jobs` (idempotencia por hash canónico del manifest) → dispatcher con prioridad
+  deadline+aging → Cloud Run Job `artifact-worker` (Chromium pinneado) → PDF + previews al asset
+  store privado. Corrida real de referencia: el deck SKY de 15 láminas salió por este camino.
 
-**`TASK-1391` — el renderer productivo (sucesora).** Lleva el composer de CLI a capability de artefactos:
-Cloud Run **Job** `tender-worker` con Chromium, cola/outbox con backpressure, PDFs versionados con
-provenance en el asset store. *Bloqueada por* TASK-1392 **+** la autorización de frontera de **EPIC-027**.
+### Las reglas que ese runtime ENFORCEA (ya no son intención)
 
-### Las reglas que traen esas tasks (aplican YA al pensar el deck)
+- ⚠️ **`audience` es la regla más peligrosa de todas — y ahora es un GATE.** Cada evidencia nace
+  `internal` o `client_facing`; un artefacto `client_facing` que cite **UNA** referencia
+  `internal` se rechaza completo (`audience_violation`), al encolar Y en el worker. El squad
+  blueprint lleva **loaded cost**: filtrarlo no es un bug de permisos — es entregarle a la
+  contraparte tu estructura de costos.
+- **Accesibilidad = admisibilidad.** Si el requisito-set del RFP exige PDF/UA/508/EAA, el render
+  **falla cerrado** (`accessibility_unsupported`): Chromium print-to-PDF no emite PDF taggeado.
+  Mejor no ofertar que entregar un artefacto inadmisible.
+- **La QA visual es MECÁNICA**: `missing_asset` (todo `<img>` resolvió), `font_fallback_detected`
+  (familia sin FontFace), `blank_slide` (contraste local por tiles) — gates de publicación dentro
+  del render, calibrados contra los 40 frames del baseline.
+- **NUNCA** el render pesado en **Vercel** ni en el **`ops-worker`**: vive en el `artifact-worker`
+  (frontera autorizada por excepción documentada de EPIC-027).
+- **El deadline viaja FIJADO en el job** y un deadline vencido no compite ni se encola.
 
-- ⚠️ **`audience` es la regla más peligrosa de todas.** Cada `tender_asset` nace `internal` o
-  `client_facing`. **Sólo un entregable `client_facing` y aprobado puede empaquetarse.** Lo interno
-  **NUNCA** se promueve por default: el diagnóstico interno, el squad blueprint (¡que lleva **loaded
-  cost**!) y la lente técnica del Be X son **munición interna**. Filtrarlos al comprador no es un bug de
-  permisos — es entregarle a la contraparte tu estructura de costos.
-- **NUNCA** el render pesado en **Vercel** ni en el **`ops-worker`** (bloquearía el publisher del outbox).
-  Va en el `tender-worker` dedicado, y **un deployable nuevo requiere la decisión de frontera de EPIC-027**.
-- **Chromium/Playwright ES el motor del deck**; `pdf-lib` sólo ensambla. **`react-pdf` y PPTX NO lo
-  sustituyen** — no reproducen el molde AXIS.
-- **El formato lo dicta el requisito-set de ESE tender**, no un límite global supuesto. Peso, páginas y
-  tipo salen de las bases; cuando el requisito se conoce, el job **falla cerrado** antes de marcar un deck
-  como client-facing.
-- **Un PDF técnicamente válido pero con fallback tipográfico, asset ausente, crop malo o contenido
-  recortado NO PASA.** Por eso hay que **embeber las fuentes**: hoy Chromium las pide a Google Fonts por
-  red, así que el render **no es hermético** (sin red, el deck sale fuera de marca). Es deuda declarada.
-- **El worker NUNCA reescribe** copy, claims, evidencia ni assets. El `DeckPlan` se **fija** antes de
-  encolar: mismos slots → mismo PDF.
-- **La exportación NUNCA sube ni presenta la oferta.** El humano lo hace.
-- El agente **NUNCA** escribe directo: propuesta ≠ ejecución. Y **NUNCA** se introduce LangChain,
-  LangGraph ni un Agents SDK — se reusa el cliente canónico `src/lib/ai/` y el patrón tool-use de Nexa.
-
-### ⚠️ La 3ª bug class: "tiene contrato" ≠ "es componible" (2026-07-12, deck SKY)
-
-El catálogo decía **25/25 con contrato ✅** y la doc prometía que *"el composer las puede llenar todas"*.
-**Era falso.** La **primera oferta real** —SKY, la primera que usó más de 6 plantillas— reventó **7 de 25**.
-Nadie las había ejercitado: **tener un `slots.json` no es ser componible.**
-
-Se cerraron las 4 clases de bug del motor (evidencia que sólo se saltaba en arrays —el `sourceRef` de
-`QuoteSplit` llegaba a **borrar la lámina entera**—; objetos que no honraban resolvers; `fixed-*` aplicado
-a medias; `paired-array` sin implementar) **y dos que sólo se ven mirando el frame**: el barrido borraba el
-**ordinal derivado** (los 4 pasos salían como "01") y un **array dentro de un objeto** se aplanaba con las
-comas del join a la vista.
-
-**Hoy: 25/25 componibles** (TASK-1394), verificado por `template-composability.test.ts` en CI y por
-render real PNG/PDF de `ChartSplit` con brecha positiva y cero.
-
-**Reglas duras que salen de acá:**
-
-- **NUNCA** asumas que una plantilla es usable porque tiene `slots.json`. **El gate es
-  `pnpm vitest run src/lib/commercial/tenders`**, que intenta llenar las 25.
-- **NUNCA** cierres un deck con "los tests pasan". Los cuatro "01" y los párrafos aplanados **pasaban
-  todos los tests**. **MIRA LOS FRAMES — TODOS.** Es la única verificación que sirve.
-- **NUNCA** catalogues una plantilla rota como deuda si el fix es mecánico: se arregla. `ChartSplit` se
-  cerró de raíz: el contrato ya medía la brecha contra el líder; el motor debía respetar
-  `itemSelector`/`fixedChildren`, remover chrome no sostenido y derivar el callout. Si la serie
-  destacada lidera, la brecha cero **no dibuja** callout. **Una barra sin dato es una barra que miente.**
-
-### ⚠️ La 4ª bug class: el chrome que depende de DÓNDE vive en el DOM
-
-- **La firma (`efeoncepro.com`) vive DENTRO del `.slide`. Siempre.** `mix-blend-mode: luminosity` se mezcla
-  con el backdrop de **su** contexto de apilamiento: si la burbuja es hermana del `.slide`, **no tiene con
-  qué fundirse y se pinta plana**. 21 de 22 plantillas la tenían fuera — se veía como "en unas láminas
-  funciona y en otras no". **No era el PDF** (el blend sobrevive al `print-to-pdf`; verificado contra el
-  raster real).
-- **El hito de timeline: `at` es el FIN de la unidad.** Rotular *"Semana 1"* con `at: 1` pone el rombo en el
-  **cierre del Mes 1** → la lámina **afirma una fecha falsa**. En una oferta eso es **fabricación**, de la
-  misma familia que una barra que no sale del dato. Y un hito en la última unidad cae al **100%** del eje:
-  su etiqueta se ancla **hacia adentro** (`.at-end`, derivado del dato) para no partirse contra el borde.
 
 ### Estado del catálogo — 25/25 componibles ✅ (verificado en CI + frame real)
 

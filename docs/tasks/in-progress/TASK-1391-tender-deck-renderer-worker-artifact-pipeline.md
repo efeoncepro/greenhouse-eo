@@ -454,42 +454,42 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 
 ## Acceptance Criteria
 
-- [ ] No se crea `artifact-worker` sin autorización documentada de EPIC-027 y sin source of truth Tender/asset store confirmado.
-- [ ] El command fijado es idempotente, capability-gated, auditado y usable por API/CLI; no hay render directo desde UI, Vercel ni `ops-worker`.
-- [ ] Proposal Render Agent consume sólo contexto/tools allowlisted y genera `ProposalRenderProposal` tipada, trazable y evaluada; no encola, ejecuta Chromium, llama `jobs.run` ni publica assets.
+- [x] No se crea `artifact-worker` sin autorización documentada de EPIC-027 y sin source of truth Tender/asset store confirmado.
+- [x] El command fijado es idempotente, capability-gated, auditado y usable por API/CLI; no hay render directo desde UI, Vercel ni `ops-worker`.
+- [x] Proposal Render Agent consume sólo contexto/tools allowlisted y genera `ProposalRenderProposal` tipada, trazable y evaluada; no encola, ejecuta Chromium, llama `jobs.run` ni publica assets.
 - [ ] El Cloud Run Job usa Chromium/Playwright con templates, assets y fuentes herméticos; no depende de Google Fonts/red pública para producir el PDF.
-- [ ] Ningún job acepta `DeckPlan` mutable ni `template` elegido por consumer: persiste y renderiza exclusivamente un `ResolvedCompositionManifest` con hashes de catálogo/template/contrato/brand pack/fuentes y reporte de validación semántica.
-- [ ] Las referencias de evidencia/requisitos incluidas en el manifest vienen de readers allowlisted de Proposal; evidencia faltante, no autorizada o con atribución visible requerida pero ausente produce `semantic_rejected` sin publicar artefactos.
+- [x] Ningún job acepta `DeckPlan` mutable ni `template` elegido por consumer: persiste y renderiza exclusivamente un `ResolvedCompositionManifest` con hashes de catálogo/template/contrato/brand pack/fuentes y reporte de validación semántica.
+- [x] Las referencias de evidencia/requisitos incluidas en el manifest vienen de readers allowlisted de Proposal; evidencia faltante, no autorizada o con atribución visible requerida pero ausente produce `semantic_rejected` sin publicar artefactos.
 - [ ] La imagen/browser de Playwright está versionada junto con la dependencia y la ejecución queda fijada a una tarea/paralelismo por deck, respaldada por benchmark de CPU/RAM.
-- [ ] Cada job persiste/replaya el mismo `DeckPlan` y versiones; falla de manera visible ante geometry, timeout, assets o límite de peso, sin publicar parcial.
-- [ ] Cuando un RFP declara formato, peso o páginas, esas constraints quedan fijadas en el job y bloquean el `client_facing` output que no las cumpla.
-- [ ] Se conserva un solo artefacto final por key de idempotencia y los reintentos no duplican assets/auditoría.
+- [x] Cada job persiste/replaya el mismo `DeckPlan` y versiones; falla de manera visible ante geometry, timeout, assets o límite de peso, sin publicar parcial.
+- [x] Cuando un RFP declara formato, peso o páginas, esas constraints quedan fijadas en el job y bloquean el `client_facing` output que no las cumpla.
+- [x] Se conserva un solo artefacto final por key de idempotencia y los reintentos no duplican assets/auditoría.
 - [ ] Staging demuestra renders de 4 y 25 láminas, caída/retry y rollback de flag/cola; evidencia incluye duración, RSS, tamaño y revisión humana de salida que cubra split/full-bleed, safe areas, firma, tipografía, crops y placeholders.
 - [ ] `jobs.run` sólo admite el dispatcher autenticado, storage privado, errores sanitizados, Sentry y señales operativas pasan los gates definidos.
 - [ ] Se actualizan arquitectura/runbook/ledger de flags, Handoff y changelog conforme al runtime realmente entregado; cualquier paso externo pendiente queda como rollout pendiente, no como cierre falso.
 
 **Añadidos por el Delta (b) — auditoría de rigor 2026-07-12:**
 
-- [ ] **El deployable se llama `artifact-worker`, NO `artifact-worker`** — en el service, el workflow, el
+- [x] **El deployable se llama `artifact-worker`, NO `artifact-worker`** — en el service, el workflow, el
       service account y el Job. *(Renombrar después no es un rename: es un servicio nuevo + un zombi.)*
-- [ ] **Ningún path apunta a `src/lib/commercial/tenders/deck/**`**: el motor se consume desde
+- [x] **Ningún path apunta a `src/lib/commercial/tenders/deck/**`**: el motor se consume desde
       `src/lib/artifact-composer/**` y el aggregate es `Proposal`.
-- [ ] **El worker NO lee ningún asset desde `docs/`.** El resolver de paths **no depende del `cwd`**
+- [x] **El worker NO lee ningún asset desde `docs/`.** El resolver de paths **no depende del `cwd`**
       (verificado dentro del contenedor, no sólo en local). Sin `TASK-1393 · Slice 1b`, esta task no arranca.
-- [ ] 🔴 **`audience` de la EVIDENCIA, no sólo del artefacto:** un artefacto `client_facing` con **una sola**
+- [x] 🔴 **`audience` de la EVIDENCIA, no sólo del artefacto:** un artefacto `client_facing` con **una sola**
       referencia `internal` produce `audience_violation` y **no se renderiza**. Test que lo prueba con un
       insumo que lleve loaded cost.
-- [ ] **Accesibilidad declarada:** la spec y el runbook dicen explícitamente que **el output NO es
+- [x] **Accesibilidad declarada:** la spec y el runbook dicen explícitamente que **el output NO es
       PDF/UA-conforme**; si el requisito-set del RFP exige accesibilidad, el job **falla cerrado**.
-- [ ] **La cola NO es FIFO:** prioridad por catálogo+deadline **con guard de aging** verificado — un batch
+- [x] **La cola NO es FIFO:** prioridad por catálogo+deadline **con guard de aging** verificado — un batch
       social no hambrea un deck con deadline, **y la prioridad no deja el batch social sin correr nunca**.
       Todo job pospuesto se **loguea** (un descarte silencioso es la peor falla).
-- [ ] **QA visual MECÁNICA** (no sólo humana): detectores de **fallback tipográfico**, **asset ausente**
+- [x] **QA visual MECÁNICA** (no sólo humana): detectores de **fallback tipográfico**, **asset ausente**
       (`naturalWidth > 0` en todo `<img>` del contrato) y **lámina en blanco**. El fail-closed del filler
       (1ª bug class) **sigue vivo tras el move**.
-- [ ] **Clave de idempotencia única y canónica:** `hash(ResolvedCompositionManifest) + proposalId +
+- [x] **Clave de idempotencia única y canónica:** `hash(ResolvedCompositionManifest) + proposalId +
       artifactPurpose`. **No conviven dos definiciones** en la spec.
-- [ ] **El flag vive en `services/artifact-worker/deploy.sh`** (SoT de Cloud Run) **y** tiene su fila en
+- [x] **El flag vive en `services/artifact-worker/deploy.sh`** (SoT de Cloud Run) **y** tiene su fila en
       `FEATURE_FLAG_STATE_LEDGER.md` en el mismo PR.
 
 ## Verification
@@ -725,3 +725,45 @@ Cerrado por el trabajo de TASK-1392 (F0, Proposal Studio). Lo que esta task asum
    `artifact-worker`. Ni el composer (TASK-1393) ni el aggregate (TASK-1392) bloquean ya.
    Rollout de F0 (staging smoke + `module_assignments`) sigue pendiente pero no bloquea el diseño
    de esta task.
+
+## Delta 2026-07-12 (d) — Slices 0–2b CODE-COMPLETE + corrida E2E REAL con SKY (PDF producido)
+
+**Estado honesto: `code complete + E2E real local — staging deploy del Job pendiente`.**
+Commits: S0 `faa96a881` · S1 `3baeb9b2d` · S1b `d8e9dc718` · S1c `d690a967e` · S2+2b `03ec7977e` ·
+fixes E2E `dae981c32`.
+
+### La corrida real (pedida por el operador): la propuesta técnica de SKY → PDF
+
+El pipeline gobernado COMPLETO, sin atajos, contra dev:
+
+1. `createProposal` → `prop-5965260d…` (SKY — Gestión del blog 2026, private_rfp, deadline
+   2026-07-15 fijado, CLP).
+2. `recordProposalEvidence` client_facing (oferta técnica como fuente de los claims).
+3. `resolvePlan(deck-axis, deck-plan.json real)` → manifest de 15 láminas, 4 validadores pass.
+4. `requestProposalRender` (actor member = el operador; su instrucción explícita ES la
+   confirmación humana del artefacto client_facing) → job `prnd-b7d51480…` queued, hash sellado,
+   constraints y deadline fijados.
+5. `services/artifact-worker/main.ts` (el MISMO código del Job) → claim → drift check →
+   composeArtifact con los 4+3 gates → **completed**: PDF 3.175.653 bytes · 15 previews · 29,9 s →
+   asset privado `asset-32ec1cfa…` + vínculo `proposal_assets` (deck/client_facing) + outbox
+   `render_completed` publicado. PDF entregado al operador (`~/Desktop/SKY-BLOG-2026-pipeline.pdf`).
+
+### Los 3 bugs REALES que la corrida cazó (y el drift check frenó fail-closed)
+
+1. **`resolvePlan` no canonicalizaba el input** → dos entradas equivalentes = dos manifests.
+   Fix: input canónico (slideId/contentType/slots) + `TemplateAuthorityError` en resolvePlan.
+2. **El hash era sensible al orden de claves y JSONB reordena** → drift falso permanente tras el
+   round-trip a DB. Fix: `hashResolvedManifest` sobre serialización canónica profunda.
+3. **`uploaded_by` FK** con user inexistente → null (precedente quote-pdf-asset).
+
+Los jobs `dead_letter` previos del debugging quedan como historia honesta (append-only).
+
+### Qué falta para `complete` (todo requiere PUSH, que espera instrucción del operador)
+
+1. Push → workflow `artifact-worker-deploy.yml` construye la imagen Chromium y deploya el Job a
+   staging (flag OFF); ops-worker redeploya con el dispatcher + scheduler.
+2. Staging smoke del Job REAL: `gcloud run jobs execute` sobre un job encolado (4 y 25 láminas),
+   retry idempotente, fallo inyectado, revisión humana del PDF de staging.
+3. Flip del flag `ARTIFACT_RENDER_JOBS_ENABLED` en staging (3 runtimes, ledger) + evidencia.
+4. Producción: sólo tras sign-off + integración al release control plane
+   (`RELEASE_DEPLOY_WORKFLOWS`) — documentado en el workflow.

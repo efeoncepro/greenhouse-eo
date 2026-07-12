@@ -2,6 +2,19 @@
 
 ## 2026-07-12
 
+- **Skills sincronizadas con el runtime de licitaciones (1391/1392/1393).** Companion nuevo
+  `proposal-studio-runtime.md` en la skill de tenders (uso end-to-end + costuras de evolución para
+  agentes nuevos); `deck-visual-system`, `bid-construction-playbook`, `deck-studio/composition` y
+  ambos SKILL.md actualizados de "futuro" a "shipped + cómo se usa". Espejo `.codex/` incluido.
+- **TASK-1391 Slices 0-2b code-complete — el render de artefactos es una capability gobernada y
+  el deck de SKY ya salió por ella (2026-07-12).** Frontera `artifact-worker` (primer Cloud Run
+  Job) autorizada por excepción documentada de EPIC-027. `proposal_render_jobs` con idempotencia
+  canónica y gates fail-closed al encolar (evidencia interna en artefacto client_facing ·
+  accesibilidad PDF/UA no soportada · deadline vencido · validadores); QA visual mecánica en el
+  render (asset ausente, fallback tipográfico, lámina en blanco); Render Agent propose→confirm→
+  execute con eval; dispatcher con prioridad deadline+aging (nunca FIFO ciega). Corrida E2E real:
+  la propuesta técnica de SKY → PDF de 15 láminas por el camino gobernado completo (3 bugs reales
+  cazados y arreglados de raíz). Staging deploy del Job pendiente de push (flag OFF, ledger).
 - **CI: unit suite ya no está roja por el composer (fix preexistente).** El job de tests corría sin
   browsers de Playwright y las suites del artifact-composer que lanzan Chromium fallaban con
   "Executable doesn't exist" desde que el deck composer entró al repo. Ahora CI provisiona el

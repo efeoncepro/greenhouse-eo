@@ -30,7 +30,7 @@ contra él **sin actualizarlo**. Lo que sigue es la foto verificada contra el re
 | **Proyección allowlisted de render** + gate de audience fail-closed | ✅ **Code-complete** — el contrato que TASK-1391 consume | `proposals/render-projection.ts` |
 | UI · Nexa/MCP surface | ❌ **No existe** (F5) | — |
 | Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ **No existe** (F1/F2) | — |
-| Renderer productivo (Cloud Run Job + cola + artifact store + señales) | 📋 **Diseñado, bloqueado** por EPIC-027; su contrato de lectura YA existe (`render-projection`) | **TASK-1391** (`to-do`, P1, EPIC-027) |
+| **Renderer productivo (TASK-1391)** — `proposal_render_jobs` (aplicado a dev) + gates fail-closed al encolar (audience por referencia · accesibilidad · deadline · validadores) + QA mecánica en renderSlide (missing_asset/font_fallback/blank_slide) + Render Agent (propose→confirm→execute + eval) + dispatcher con prioridad deadline+aging + `services/artifact-worker` (PRIMER Cloud Run Job, frontera autorizada por excepción EPIC-027) | ✅ **Code-complete + E2E real local** (deck SKY 15 láminas → PDF por el camino gobernado completo, 2026-07-12); **staging deploy del Job pendiente** (flag OFF multi-runtime) | `src/lib/commercial/tenders/proposals/render-*` · `services/artifact-worker/**` |
 | **Staging smoke + habilitación `module_assignments`** | ✅ **Ejecutado 2026-07-12** — módulo activo para Efeonce; smoke con evidencia en TASK-1392 Delta (d) | `cpma-task1392-efeonce-proposal-studio` |
 
 **Tres consecuencias que hay que tener presentes:**

@@ -233,7 +233,10 @@ layout para una lámina puntual.
 visual es señal de rigor; un deck que cambia de lenguaje cada tres láminas se lee como un collage y
 **resta**.
 
-Detalle completo (catálogo, selector, CLI, PDF, las bug classes del motor): **[`composition.md`](composition.md)**.
+Detalle completo (catálogo, selector, CLI, PDF, las bug classes del motor): **[`composition.md`](composition.md)**. Para el camino **productivo en Greenhouse** (el deck como entregable gobernado de una `Proposal`:
+render job → Cloud Run Job `artifact-worker` → PDF en el asset store, con gates de audience/
+accesibilidad/peso y QA visual mecánica) el manual es
+`greenhouse-public-private-tenders/proposal-studio-runtime.md` — shipped 2026-07-12.
 
 **Cronogramas `TimelineFull`.** El autor o agente escribe el schedule (`timeUnit`, eje, fases, hitos y
 `barLabel`); nunca porcentajes, líneas de grilla ni conectores. `barLabel` es copy editable en barras

@@ -171,13 +171,19 @@ Regla para no perder el plano: **cada mejora del método manual documentada aqu�
 
 | Pieza | Estado | Qué es |
 |---|---|---|
-| **Deck Composer (Fase 9-bis)** | ✅ **Shipped** | 25 plantillas + selector determinista + validación + geometría + **PDF de N páginas** (`pnpm deck:compose`). Ver `deck-visual-system.md` |
-| State machine (12 estados, 3 gates humanos) | ⚠️ **TS puro, sin DB** | `src/lib/commercial/tenders/tender-state-machine.ts` |
-| **`TASK-1392` — F0: el aggregate `Tender`** | 📋 to-do (**bloqueada**) | `tenders` + `tender_state_transitions` + `tender_assets` (con **`audience`**), state machine en DB, intake de RFP por el asset store canónico, y el **Tender Intake Agent Contract** |
-| **`TASK-1391` — renderer productivo** | 📋 to-do (**bloqueada** por 1392 + EPIC-027) | Cloud Run Job `tender-worker` con Chromium, cola, artefactos versionados |
-| Runtime Greenhouse (API · UI · capabilities) | ❌ **No existe** | El único consumer hoy es el CLI |
+| **Artifact Composer (Fase 9-bis)** | ✅ **Shipped** (TASK-1393) | Motor domain-free en `src/lib/artifact-composer/**`; el deck es el catálogo `deck-axis` (25 plantillas + selector + brand pack + fuentes herméticas). CLI exploratorio: `pnpm deck:compose`. Ver `deck-visual-system.md` |
+| **Aggregate `Proposal` (F0)** | ✅ **Shipped** (TASK-1392) | `greenhouse_commercial.proposal*`: state machine EN DB (gates humanos que la DB misma exige), RFP/evidencia/requisitos por asset store, entitlement per-ORG, API parity, **Proposal Intake Agent** |
+| **Renderer productivo** | ✅ **Code-complete** (TASK-1391; staging deploy pendiente) | `requestProposalRender` → cola con prioridad deadline+aging → Cloud Run Job `artifact-worker` (Chromium pinneado) → PDF versionado en asset store. **La propuesta SKY real ya salió por este camino** |
+| **Manual de USO y EVOLUCIÓN** | 📖 | **`proposal-studio-runtime.md`** — lo primero que lee un agente nuevo: las 6 recetas de uso + las costuras de extensión |
 
-**Cómo se vuelve agéntico (y cómo NO).** El `Tender Intake Agent` de F0 es el molde de toda fase futura de este playbook: recibe **contexto read-only allowlisted**, emite una **propuesta tipada que cita sus inputs**, **el humano confirma**, y recién ahí corre el **mismo command** que usarían API, CLI, Nexa y MCP. **Propuesta ≠ ejecución.** El LLM **nunca** escribe estado, nunca adjunta un asset, nunca cruza un gate. Es la Fase 10 ("human-in-control") convertida en arquitectura — y es exactamente **Full API Parity**: un primitive canónico, muchos consumers.
+**Cómo se vuelve agéntico (y cómo NO) — YA IMPLEMENTADO ×2.** El molde es: contexto read-only
+allowlisted → **propuesta tipada que cita sus inputs y DECLARA sus bloqueos** → validación
+fail-closed que recomputa contra el contexto → **el humano confirma** → corre el **mismo command**
+que usarían API, CLI, Nexa y MCP → **eval fixture como gate del prompt**. Existen dos instancias
+vivas para copiar: `intake-agent.ts` y `render-agent.ts`. **Propuesta ≠ ejecución.** El LLM
+**nunca** escribe estado (en la DB ni existe `actor_kind='agent'`). Toda fase futura de este
+playbook (admisibilidad F1, económica, redacción) se agentiza copiando ese molde — nunca con un
+prompt suelto ni un tool con acceso a DB/storage.
 
 **NUNCA** se introduce LangChain, LangGraph ni un Agents SDK: se reusa el cliente canónico `src/lib/ai/` y el patrón tool-use de Nexa. **NUNCA** un prompt que escriba SQL o mute estado — eso no es "agentic", es un agujero.
 

@@ -1,3 +1,44 @@
+## Sesión 2026-07-12 (cont. 14) — Skills actualizadas: el runtime 1391/1392/1393 documentado para agentes nuevos (Claude)
+
+- **Companion NUEVO canónico:** `greenhouse-public-private-tenders/proposal-studio-runtime.md` —
+  el documento que un agente nuevo lee para USAR el pipeline completo (mapa en una pantalla + las
+  6 recetas: proposal, evidencia/requisitos, manifest, render gobernado, agentes, operación) y
+  para EVOLUCIONARLO (tabla de costuras: catálogo nuevo, outputTarget, brand pack, failure codes,
+  constraints, fase agéntica con el molde — y las 3 cosas que NO evolucionan).
+- Actualizadas (estado stale → shipped): `deck-visual-system.md` (sección "Hacia dónde va" →
+  "el runtime YA EXISTE" + reglas ahora ENFORCEADAS), `SKILL.md` de tenders (header dos-runtimes +
+  árbol de decisión + tabla), `bid-construction-playbook.md` (tabla de estado + molde agéntico ×2
+  instancias vivas), `deck-studio/composition.md` (dos caminos: exploratorio vs productivo + QA
+  mecánica) y `deck-studio/SKILL.md` (pointer al camino productivo).
+- Todo espejado a `.codex/skills/` (dual Claude/Codex). Memorias persistentes actualizadas.
+
+## Sesión 2026-07-12 (cont. 13) — TASK-1391 Slices 0→2b CODE-COMPLETE + PDF SKY REAL por el pipeline (Claude)
+
+- **Frontera AUTORIZADA** (operador, AskUserQuestion): `artifact-worker` = PRIMER Cloud Run Job,
+  por excepción documentada de EPIC-027 (ADR delta + EPIC + DECISIONS_INDEX; la frontera del
+  PORTAL sigue por la vía ordinaria). Commits: S0 `faa96a881` · S1 `3baeb9b2d` (migración
+  `proposal_render_jobs` APLICADA a dev + 5 guards smoke vivo + command idempotente con gates
+  audience/accesibilidad/deadline + capability render + API parity) · S1b `d8e9dc718` (QA visual
+  MECÁNICA en renderSlide: missing_asset · font_fallback · blank_slide calibrado con los 40 frames
+  — visual gate a 0 px CON los gates activos) · S1c `d690a967e` (Render Agent propose→confirm→
+  execute + eval; una propuesta que ESCONDE un bloqueo se rechaza) · S2+2b `03ec7977e`
+  (services/artifact-worker: Dockerfile playwright pinneado + tsx sobre fuente sin bundle;
+  deploy.sh `gcloud run jobs` tasks=1/parallelism=1/max-retries=0; workflow staging-only;
+  dispatcher ops-worker con prioridad deadline+AGING, vencidos cerrados gobernados, pospuestos
+  logueados; señales starvation/dead_letter; flag en ledger ×3 runtimes) · fixes E2E `dae981c32`.
+- **🏆 Corrida REAL pedida por el operador: la propuesta técnica de SKY atravesó el pipeline
+  gobernado completo** (createProposal → evidencia client_facing → resolvePlan → 
+  requestProposalRender → worker) y produjo el **PDF de 15 láminas (3,18 MB, 29,9 s)** subido al
+  asset store privado + vínculo proposal_assets + outbox published. Entregado en
+  `~/Desktop/SKY-BLOG-2026-pipeline.pdf`. El E2E cazó 3 bugs reales (input no canónico ·
+  hash sensible a JSONB · uploaded_by FK) que el drift check frenó fail-closed — arreglados de raíz.
+- 🔴 **Para `complete` falta el rollout remoto (requiere PUSH, que espera instrucción):** deploy
+  staging del Job + smoke real en Cloud Run + flip del flag (3 runtimes) + evidencia. Producción
+  además exige integrar el workflow al release control plane (RELEASE_DEPLOY_WORKFLOWS).
+- ⚠️ Codex: el render productivo SOLO por `requestProposalRender` (jamás compose directo en
+  runtime); el manifest se hashea con `hashResolvedManifest` (canónico, estable a JSONB) — NUNCA
+  JSON.stringify; el retry es del dominio (max-retries=0 en Cloud Run).
+
 ## Sesión 2026-07-12 (cont. 12) — TASK-1391 EN CURSO: intake + discovery (Claude)
 
 - TASK-1391 (Artifact Renderer: Cloud Run Job `artifact-worker` + cola + artifact pipeline) movida a
