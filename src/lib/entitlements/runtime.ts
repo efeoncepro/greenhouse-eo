@@ -2188,6 +2188,16 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+    // TASK-1391 follow-up: sin esto, Operations podía leer la propuesta pero NO el estado de sus
+    // jobs de render (GET …/render-jobs exige `commercial.proposal.render` action read) — un
+    // agujero de lectura, no una decisión. Operations lee; NO ejecuta renders.
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.proposal.render',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   // Commercial Party Lifecycle (TASK-535 §9.1). Sales roles not yet modeled —

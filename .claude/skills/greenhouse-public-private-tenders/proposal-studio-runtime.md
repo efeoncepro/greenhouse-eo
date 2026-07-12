@@ -78,7 +78,7 @@ const { proposal } = await createProposal({
 - La PUERTA es doble: capability (`commercial.proposal.*`) + **entitlement per-ORG**
   (`module_assignments: proposal_studio_v1`). Sin módulo asignado a la org, nadie opera.
 - Transiciones: `transitionProposalState` — la matriz vive en DB (`proposal_state_matrix`);
-  los 3 gates humanos (`fit_review→producing|declined`, `packaging→ready_to_submit`) exigen
+  los 3 gates humanos (`fit_review→producing`, `fit_review→declined`, `ready_to_submit→submitted` — el bid/no-bid y la PRESENTACIÓN de la oferta; verificado en `HUMAN_GATE_TRANSITIONS`) exigen
   `actor.kind='member'` (la DB también lo exige — un agente NO puede cruzarlos ni con bug).
 
 ### 2 · RFP, evidencia y requisitos

@@ -26,6 +26,7 @@ Son tres piezas encadenadas. Conviene saber cuál es cuál antes de abrir un man
 
 | Si quieres… | Lee |
 |---|---|
+| **Te llegó un RFP y quieres el PDF en la mano** (el recorrido completo del día a día, con el caso guía SKY) | **[rfp-a-pdf-el-dia-a-dia.md](rfp-a-pdf-el-dia-a-dia.md)** |
 | Crear una propuesta, mover su estado, adjuntar el RFP, registrar evidencia, declarar requisitos, vincular la cotización | [crear-y-operar-una-propuesta.md](crear-y-operar-una-propuesta.md) |
 | Convertir un plan de láminas en el PDF de la oferta (los dos caminos: exploratorio y productivo) | [generar-el-deck-de-una-propuesta.md](generar-el-deck-de-una-propuesta.md) |
 | Entender por qué el sistema rechazó tu render, o qué significa un `failure_code` | [entender-los-errores-y-rechazos.md](entender-los-errores-y-rechazos.md) |

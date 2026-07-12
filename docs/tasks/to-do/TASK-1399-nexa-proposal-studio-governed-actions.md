@@ -53,6 +53,7 @@ la respuesta expuso que **el sistema está completo pero sin puerta**. Los gaps,
 | 3 | **No existe el reader "mis propuestas"** | `buildProposalRenderProjection` es POR propuesta; no hay listado con estado/deadline/semáforo | Un read model del día a día (deadline at risk, jobs en curso, artefactos listos) |
 | 4 | **El `deck-plan.json` vive fuera del dominio** | Es un archivo suelto en `docs/commercial/tenders/<caso>/`: se versiona mal y no está vinculado al aggregate | El plan es un asset/entidad de la propuesta (cierra el loop de trazabilidad) |
 | 5 | **La "confirmación humana" hoy es una instrucción verbal al agente** | El script de SKY lo documenta explícitamente: el actor member se pasa por parámetro | Un confirm auditado con la identidad de sesión (el endpoint de Nexa ya lo hace: `context.memberId`) |
+| 6 | **No hay camino HTTP para SUBIR el binario del RFP** | Los contextos `proposal_rfp_draft`/`proposal_deliverable_draft` existen en el asset store (scan gate, 50 MB, allowlist Office), pero **no están en `DRAFT_CONTEXT_VALUES` de `POST /api/assets/private`** ni tienen rama en `canUploadForContext`: el binario solo entra por script server-side | Habilitar el upload gobernado (es una extensión de allowlist, no lógica nueva) — sin esto, "adjuntar el RFP" desde Nexa/UI es imposible |
 
 **El gap 5 es el más sutil y el más importante**: el contrato `propose → confirm → execute` está
 implementado y es correcto, pero **la confirmación no está materializada en una superficie con
@@ -347,6 +348,16 @@ futura UI), nunca a la definición de acción.
 - No cerrar como "Nexa opera el Studio" si sólo existe la definición sin smoke conversacional.
 - Actualizar al cerrar: `rfp-a-pdf-el-dia-a-dia.md` (§ Nexa deja de ser futuro),
   `proposal-studio-runtime.md` (la skill), Handoff y changelog.
+
+## Notas de precisión (detectadas al documentar, 2026-07-12)
+
+- **`missing_asset`, `blank_slide` y `font_fallback_detected` NO están en `NON_RETRYABLE_FAILURES`**,
+  pero en la práctica casi siempre son culpa del plan o del catálogo: un retry reproduce el mismo
+  fallo y gasta uno de los 3 intentos. Se documentaron con matiz ("reintenta solo si sospechas causa
+  ambiental"). **Decisión pendiente:** ¿moverlos a no-reintentables? Requiere datos de uso real.
+- **`timeout` cubre dos cosas distintas** (deadline vencido en cola vs. timeout de ejecución del
+  worker). Hoy solo lo emite el dispatcher para el primer caso; si el segundo aparece, conviene un
+  código propio para no confundir el diagnóstico.
 
 ## Follow-ups
 
