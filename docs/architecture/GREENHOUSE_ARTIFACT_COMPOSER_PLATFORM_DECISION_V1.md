@@ -8,6 +8,12 @@
 > **Confidence:** `high` (la extracción está verificada contra el código, no supuesta)
 > **Validated as of:** 2026-07-12 — verificado en el repo: el motor **no importa nada** de `commercial/`; `ContentType`/`TemplateName` son `string` (registry-driven, no uniones cerradas); el `viewport` sale del contrato de cada plantilla. Un canvas 1080×1350 funciona hoy sin tocar el motor.
 
+> **Delta 2026-07-12 (b) — el molde deja de ser una CONVENCIÓN y pasa a ser un ARTEFACTO COMPILADO.**
+> Ver §7. Este ADR ya decía *"el molde visual es del catálogo, no del motor"*, pero **no decía cómo**: hoy
+> el molde se re-implementa a mano en cada plantilla. La evidencia dice que eso no se sostiene. Extiende
+> el Slice 2 (brand pack) del roadmap: **color y geometría se tokenizan en la MISMA pasada**, porque tocan
+> los mismos 25 archivos.
+
 ---
 
 ## Context
@@ -198,6 +204,150 @@ que la extracción sea **near-term, no hipotética**, y agrega una obligación *
 
 ---
 
+### 7. El molde es un **artefacto compilado**, no una convención — y el chrome se ancla a una **región**, no a un píxel
+
+**Delta 2026-07-12 (b).** El §4 ya declaraba que *"el molde visual (degradado, tipografía, safe-area,
+íconos, glass) es del catálogo, no del motor"*. Correcto — pero **incompleto**: decía **de quién es** el
+molde y no **cómo se materializa**. Hoy el molde vive como una **convención documentada** (las 5 reglas de
+`deck-visual-system.md`) que **cada plantilla re-implementa a mano**.
+
+**Un contrato que hay que re-implementar 25 veces no es un contrato: es una sugerencia.** Y la evidencia
+dice que las sugerencias se violan.
+
+#### La evidencia (medida en el repo, 2026-07-12)
+
+| Elemento del molde | Veces re-declarado |
+|---|---|
+| El **lienzo** (`1920×1080`, `overflow:hidden`) | **25 / 25** |
+| El **degradado de marca** | **25 / 25** |
+| El `.slide` | 24 / 25 |
+| La **safe-area de 72px** | 20 / 25 |
+| El **glass** (`backdrop-filter`) | 8 / 8 de las que lo usan |
+| **HEX de marca** | **262** literales (50 únicos) |
+| El **placement de la firma** | **medido a mano por plantilla**: `calc(100% - 912px)`, `- 960px`, `- 1004px`, `- 1040px`, `- 812px` |
+
+Que el **lienzo** —lo más invariante que existe en el sistema— esté re-declarado 25 veces es el
+diagnóstico completo.
+
+#### El síntoma que nombra la causa
+
+Los cinco `calc(100% - NNNpx)` de `deck-signature.css` no son fealdad de CSS: son la **confesión** de que
+**el chrome no tiene forma de PREGUNTARLE al layout dónde termina una región**. La firma debe centrarse en
+el campo oscuro; como no puede preguntarlo, alguien abrió cada plantilla, **midió el panel con la regla** y
+escribió el número. Si mañana `TeamSplit` mueve su columna 20px, **la firma no se entera**.
+
+Las bug classes ya documentadas son el mismo mecanismo, no incidentes separados:
+
+- **4ª bug class (a) — la firma sin blend en 21 de 22 plantillas.** El mismo chrome, re-declarado 22 veces,
+  mal 21. Un molde que **coloca** la firma habría hecho ese bug **imposible de escribir**.
+- **2ª bug class — `%`+`gap` amputó la tesis de SKY.** Hubo que arreglarlo plantilla por plantilla y después
+  poner un test que le hace **grep a las 25** para que nadie lo reintroduzca. **Un guard que vigila 25 copias
+  es la confesión de que debería haber una sola.**
+
+#### La decisión
+
+**El molde se compila una vez y las plantillas lo COMPONEN. Dejan de dibujarlo.**
+
+El catálogo (`deck-axis`) pasa a tener **tres partes**, no una:
+
+| Parte | Qué es | Estado |
+|---|---|---|
+| **Brand pack** | Tokens de marca como **input** (color, recipes de gradiente) | ✅ ya decidido — §4, Slice 2 |
+| **Molde** *(nuevo)* | **Lienzo · regiones direccionables · safe-area · escala de espaciado · chrome · glass · roles tipográficos.** Compilado a CSS **una vez**, consumido por las 25 | ⛔ **el hueco que este Delta cierra** |
+| **Plantillas** | Declaran **su composición** (qué regiones usa, qué chrome lleva) + **sus slots** | Dejan de re-declarar el molde |
+
+**El principio load-bearing: el chrome se ancla a una REGIÓN, no a un píxel.**
+
+Una región **declara su caja**. El chrome **la pide por nombre**. La firma no dice `right: calc(100% - 912px)`:
+dice *"céntrame en la región `brandField`"*. Con eso mueren, **en la causa**, tres cosas a la vez:
+
+1. Los cinco números mágicos (la firma **deriva** su posición del layout real).
+2. El bug del blend (el molde coloca la firma **dentro** del contexto de apilamiento del `.slide` — una
+   plantilla **físicamente no puede** ponerla fuera).
+3. El drift futuro (si una plantilla mueve su columna, la firma **la sigue**).
+
+**Y la geometría ilegal pasa de vigilada a irrepresentable.** Hoy `template-geometry.test.ts` **prohíbe**
+el patrón `%`+`gap` en las 25. Con un primitive de layout que emite `minmax(0, Nfr)`, **no puedes escribir
+`%`+`gap` porque no escribes el grid**. El guard se queda (defense-in-depth), pero deja de ser **lo único**
+que separa al comité de una tesis guillotinada. *Hacer el estado ilegal irrepresentable es estrictamente
+mejor que ponerle un linter encima.*
+
+#### ⚠️ La frontera que NO se cruza: el catálogo sigue CERRADO
+
+**Las primitivas son detalle INTERNO del catálogo. NO son una superficie de autoría.**
+
+El `Plan` (`deck-plan.json`) **sigue eligiendo una PLANTILLA por nombre**. **NUNCA** podrá ensamblar
+primitivas. El autor —humano o agente— **no ve el molde**.
+
+Esto no es purismo: es lo que hace bueno al sistema. La regla que gobierna el deck es que **se compone
+desde un catálogo cerrado, no se dibuja freehand**, y el motivo es comercial, no estético — **una propuesta
+la lee un comité que COMPARA**, y un deck que cambia de lenguaje cada tres láminas se lee como un collage y
+**resta**. Si cualquier agente puede apilar átomos en un layout nuevo, **reabrimos el freehand por la puerta
+de atrás** — y encima rompemos el fail-closed del motor, que asume un contrato de plantilla cerrado.
+
+> **Modularizar por dentro es lo contrario de abrir por fuera.** El molde existe para que las 25 plantillas
+> **no puedan** desviarse, no para que nazca la 26 sin pasar por el catálogo.
+
+#### Hasta dónde llega el molde (y dónde parar)
+
+**Llega:** lienzo, regiones, safe-area, escala de espaciado, chrome (firma, folio), glass, roles tipográficos,
+recipes de gradiente. Todo eso es **invariante del catálogo** y hoy está duplicado con evidencia.
+
+**NO llega (por ahora):** una librería de **átomos de contenido** (stat, bullet, card, fila de tabla).
+Ahí la pendiente es resbaladiza: se termina construyendo un design system que nadie pidió, y cada átomo
+nuevo erosiona el catálogo cerrado. **Regla: un átomo se extrae sólo cuando ya está duplicado ≥3 veces
+Y es idéntico.** Si hay que parametrizarlo para que calce, no es un átomo — es una plantilla nueva, y
+esa discusión es del catálogo.
+
+#### Secuencia — y el error que hay que evitar
+
+⚠️ **Color y geometría tocan LOS MISMOS 25 archivos.** Hacerlos en dos pasadas = **tocar las 25 plantillas
+dos veces** = dos regresiones visuales sobre todo el catálogo. **Eso es el error.**
+
+**Recomendación: el molde entra en la MISMA pasada que el brand pack** (Slice 2 del roadmap, que pasa a ser
+*brand pack + molde*). Una sola vez sobre las 25, una sola regresión visual que revisar.
+
+Orden completo, con lo que ya está en vuelo:
+
+1. **El deck de SKY sale primero.** Deadline contractual (15/07); Codex está con los ajustes visuales. Tocar
+   la base geométrica de las 25 ahora es la forma más eficiente de romper un deck que ya funciona.
+2. **TASK-1394** (ChartSplit + los dos huecos del motor). Chica, quirúrgica, del motor — viaja limpia.
+3. **TASK-1393 Slice 1** (extracción a `src/lib/artifact-composer/**`).
+4. **TASK-1393 Slice 2 = brand pack + molde, una sola pasada sobre las 25.**
+
+**Verificación obligatoria del sweep:** componer **las 25** antes y después y **diffear los frames**
+(`pnpm fe:capture:diff`). El refactor debe ser **visualmente neutro** salvo donde corrige un bug conocido —
+y esa excepción se declara lámina por lámina. **Los tests verdes no son el gate**: los cuatro "01", los
+párrafos aplanados y la firma sin blend **pasaban los 92 tests**.
+
+#### 4 pilares (de este Delta)
+
+**Safety.** El blast radius no es un actor malicioso: es un **documento contractual frente a un comité**. La
+amenaza real es la **fabricación** (una barra que no sale del dato, un hito con una fecha que el eje no
+pinta, una lámina con el copy de relleno). El molde **agrega** un gate —la geometría ilegal se vuelve
+irrepresentable— y **NUNCA** puede debilitar el fail-closed del slot-fill ni `assertSlideFitsCanvas`.
+Multi-tenant: cuando llegue el brand pack de un cliente, **un molde filtrado entre packs es contaminación de
+marca** — el molde es **por catálogo** y **parametrizado por el pack**, nunca global.
+
+**Robustness.** El invariante es *"el frame emitido es el que el contrato prometió"*. Hoy 25 copias del
+molde = **25 oportunidades de drift**, y ya se materializaron (21/22 en la firma). Single-sourcing lo cierra.
+El riesgo del propio refactor es real: **tocar las 25 puede cambiar silenciosamente todas las láminas** — por
+eso el diff visual de las 25 es **gate de merge**, no una cortesía.
+
+**Resilience.** Se preserva la conducta canónica: ante una geometría que no cabe, el composer **aborta**
+(`SlideGeometryError`) en vez de emitir una mentira. El `Plan` sigue siendo el artefacto auditable y el PDF
+un derivado **re-componible** — un molde corregido **re-emite** el deck sin re-autorarlo.
+
+**Scalability.** Es el punto entero. Con el molde como convención, **el catálogo social (`social-carousel`)
+re-declara el molde otra vez**: la deuda escala N catálogos × M plantillas. El ADR ya identificó ese
+multiplicador para el **color**; **aplica idéntico a la geometría**, y nadie lo había nombrado. Un molde
+compilado hace que un catálogo nuevo declare **el suyo, una vez**.
+
+**Reversibilidad:** `two-way` (revert), pero **de radio ancho** — toca las 25. Barato hoy (25 plantillas,
+1 catálogo, sin runtime). Con `social-carousel` vivo, se paga dos veces.
+
+---
+
 ## Alternatives Considered
 
 | Alternativa | Por qué NO |
@@ -282,6 +432,18 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 - **NUNCA** el motor ni una plantilla hornea "AXIS"/"Efeonce" como constante: **la marca es un input**
   (brand pack). AXIS es *el brand pack de Efeonce*, no *el* brand pack. Hornearlo **mata el as-a-service**.
 - **NUNCA** un catálogo re-declara la paleta ni hardcodea un HEX de marca. Los tokens salen del brand pack.
+- **NUNCA** una plantilla re-declara el **molde** (lienzo, degradado, safe-area, glass, escala de
+  espaciado, roles tipográficos). Lo **compone**. *(Delta b — §7)*
+- **NUNCA** el chrome se ancla a un **píxel medido a mano**: se ancla a una **región por nombre**. Un
+  `calc(100% - 912px)` en el CSS del catálogo es la señal de que una región no es direccionable. *(Delta b)*
+- **NUNCA** el `Plan` ensambla primitivas: **elige una plantilla del catálogo, por nombre.** Las primitivas
+  son detalle **interno** del catálogo, **no una superficie de autoría**. El catálogo es **cerrado** — un
+  comité **compara**, y un collage resta. *(Delta b — la frontera dura)*
+- **NUNCA** se extrae un átomo de contenido que no esté duplicado **≥3 veces y sea idéntico**. Si hay que
+  parametrizarlo para que calce, no es un átomo: es una plantilla nueva, y eso lo decide el catálogo. *(Delta b)*
+- **SIEMPRE** que un sweep toque las 25 plantillas, el **diff visual de las 25** (`pnpm fe:capture:diff`) es
+  **gate de merge**. Los tests verdes **no** son el gate de un deck: los cuatro "01", los párrafos aplanados
+  y la firma sin blend **pasaban los 92 tests**. *(Delta b)*
 - **NUNCA** un catálogo, plantilla, asset o `Proposal` sin **org dueña resoluble** ("global" es un valor
   explícito, no la ausencia de dato). **NUNCA** gatees esta capability por rol: va por **entitlement
   per-ORG** — un rol no se factura, un módulo sí.
@@ -302,7 +464,7 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 |---|---|---|---|
 | **0** | **Congelar la dirección** (este ADR) + avisar a Codex **antes** de que el carrusel forkee el motor | — | **Un fork.** Es lo urgente. |
 | **1** | Extraer el motor → `src/lib/artifact-composer/**`; el deck pasa a ser `catalogs/deck-axis`; `outputTarget` al contrato del catálogo | Slice 0 | Crece con cada consumer |
-| **2** | **Brand pack como input**: capa de tokens generada desde el SoT declarado del pack, consumida por toda plantilla. `deck-axis` parte de Figma PPT `33:2`; las 25 dejan de hardcodear la paleta. AXIS pasa a ser *un* brand pack | Slice 1 | Brand drift × N catálogos **+ bloquea el as-a-service** |
+| **2** | **Brand pack + molde, en UNA sola pasada sobre las 25** *(ampliado por el Delta b — §7)*. **(a) Brand pack como input**: capa de tokens generada desde el SoT declarado del pack; las 25 dejan de hardcodear la paleta (262 HEX). AXIS pasa a ser *un* brand pack. **(b) Molde compilado**: lienzo, **regiones direccionables**, safe-area, escala de espaciado, chrome anclado **a región y no a píxel**, glass, roles tipográficos. Las plantillas **componen** el molde, dejan de dibujarlo. **Gate de merge: diff visual de las 25** | Slice 1 | Brand drift × N catálogos **+ bloquea el as-a-service**. Y si se hace en **dos** pasadas: se tocan las 25 plantillas **dos veces** = **dos regresiones visuales** sobre todo el catálogo |
 | **3** | `Tender → Proposal` (dominio + tabla + `origin`) + **org scoping y entitlement per-ORG desde la primera migración** — **debe entrar ANTES de que TASK-1392 cree la tabla** | Slice 0 | **Una migración** (y un `WHERE org_id` agregado tarde siempre deja un reader sin filtrar) |
 | **4** | Catálogo `social-carousel` (4:5 → PNG set) + su molde visual + su consumer en growth | Slices 1-2 | — |
 | **5** | *(diferido, no ahora)* Lane `api/platform/ecosystem/*`, UI de cliente, billing por render | Slices 1-4 | — (las costuras ya están puestas) |
@@ -322,6 +484,17 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
   carrusel puede usar los dos. **NO** se fusionan.
 - **Prioridad de cola concreta** (pesos, clases, starvation guard): se define con datos reales de carga en
   TASK-1391, no a ojo.
+- **¿El Figma `Sistema Axis - PPT` es también el SoT del MOLDE, o sólo del color?** *(Delta b — pregunta
+  abierta del operador, sin responder al 2026-07-12.)* Hoy sabemos que el nodo `33:2` son **Color
+  Primitives** (68). **No está verificado** si el archivo declara además primitivas de **layout/espaciado/
+  regiones**. Las tres salidas son distintas y hay que elegir **antes** del sweep: (a) Figma es SoT del
+  molde completo → el molde se **espeja** y el código no inventa; (b) Figma es SoT sólo del color → el
+  molde nace en código y **se sube a Figma después**; (c) el molde actual es un punto de partida que el
+  operador **igual va a querer mover** → entonces conviene tokenizarlo **antes** de rediseñarlo, no
+  después. **Decisión del operador.**
+- **¿El molde entra como Slice 2 de TASK-1393 (una pasada sobre las 25) o como task hermana?** La
+  recomendación es **una sola pasada** (tocar las 25 dos veces = dos regresiones visuales). Pero eso
+  engorda TASK-1393, que ya es grande. **Decisión del operador.**
 
 ---
 
