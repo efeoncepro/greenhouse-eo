@@ -14,7 +14,11 @@
       radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
       radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
       linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%); }
-    .hero { position:relative; z-index:1; height:498px; padding:66px 72px 68px; display:grid; grid-template-columns:30% 35% 35%; gap:46px; color:#fff; }
+    /* `fr`, NO `%`: los porcentajes de grid NO descuentan el gap (30%+35%+35% ya es el 100% del
+       content-box, y los 2×46px de gap se SUMAN encima), así que la última columna terminaba 20px
+       fuera del lienzo y `.slide{overflow:hidden}` amputaba el copy en silencio. `fr` reparte lo
+       que queda DESPUÉS del gap; `minmax(0,…)` evita que el min-content vuelva a inflar el track. */
+    .hero { position:relative; z-index:1; height:498px; padding:66px 72px 68px; display:grid; grid-template-columns:minmax(0,30fr) minmax(0,35fr) minmax(0,35fr); gap:46px; color:#fff; }
     .section-label { position:absolute; right:72px; top:62px; border:2px solid rgba(255,255,255,.82); border-radius:99px; padding:10px 22px; color:#fff; font-size:18px; font-weight:600; letter-spacing:.025em; }
     .title { align-self:end; max-width:480px; font-family:'Poppins',sans-serif; font-size:59px; font-weight:800; letter-spacing:-.045em; line-height:1.05; }
     .title em { font-style:italic; color:var(--teal); }

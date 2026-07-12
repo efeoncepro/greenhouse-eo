@@ -863,6 +863,42 @@ relleno de la plantilla.
 **Cerrada de raíz:** cualquier tipo o campo que el filler no sepa llenar **aborta el deck**. **NUNCA**
 agregar un `default:` silencioso ni un `continue` que deje pasar un slot sin escribir.
 
+### ⚠️ La 2ª bug class: **el contrato que MIENTE sobre lo que cabe** (2026-07-12)
+
+La validación de `validate.ts` cuenta **caracteres** contra `maxCharacters`. Pero un contrato puede
+mentir: `FourPillarsFull` declaraba `thesis: max 150`, la tesis de SKY medía 100 — pasó validación
+con holgura — y aun así **salió amputada en el PDF**: `…se vuelve sosteni|` cortado en seco.
+
+La causa era aritmética, no de copy. El `.hero` declaraba:
+
+```css
+.hero { padding:66px 72px; grid-template-columns:30% 35% 35%; gap:46px; }
+```
+
+Los porcentajes de CSS Grid se calculan sobre el content-box y **no descuentan el `gap`**: los tracks
+sumaban `100% + 2×46px`, así que la última columna terminaba **20px fuera del lienzo** — y
+`.slide { overflow:hidden }` los cortaba **sin emitir nada**. El deck se veía terminado. El mismo
+patrón estaba **latente** en `HumanImpactFull` (48%+52% + gap), invisible sólo porque el copy no
+llenaba el track.
+
+**Cerrada en tres capas:**
+
+1. **Las plantillas** usan `minmax(0, Nfr)`, nunca `%`, cuando hay `gap` (`fr` reparte lo que queda
+   **después** del gap, así que no puede desbordar).
+2. **Runtime** — `assertSlideFitsCanvas` (`render.ts`) mide, **antes de imprimir nada**, cada nodo del
+   contrato (`data-slot` / `data-slot-field`) contra su ventana visible real (el lienzo ∩ cada ancestro
+   que clipea). Si algo queda recortado, la lámina **no se emite**: `SlideGeometryError` nombra el slot,
+   los px y el texto amputado. Sólo audita nodos de contrato — los decorativos (glows, paneles a
+   sangre, la burbuja de URL) **sangran a propósito** y auditarlos daría falsos positivos. Y el recorte
+   interno sólo cuenta si la caja **realmente clipea** (`overflow != visible`): un titular cuyo
+   `scrollHeight` excede su caja por 3px con `overflow:visible` se pinta entero — eso no es un recorte.
+3. **Autoría** — `__tests__/template-geometry.test.ts` prohíbe el patrón `%`+`gap` en las **25**
+   plantillas, incluso donde esté latente.
+
+**NUNCA** asumas que "pasó `maxCharacters`" significa "cabe". El contrato declara una intención; el
+único juez de la geometría es el layout real. Y **NUNCA** dejes que un recorte sea silencioso: un PDF
+con una palabra guillotinada es peor que un fallo, porque parece terminado y nadie lo revisa dos veces.
+
 ### Contrato del HTML (lo que una plantilla debe declarar)
 
 - `data-slot` + `data-slot-type` en el contenedor del slot.

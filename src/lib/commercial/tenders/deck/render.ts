@@ -444,6 +444,141 @@ export const mergeSlidePdfs = async (slidePdfPaths: string[], outPath: string): 
   await fs.writeFile(outPath, await deck.save())
 }
 
+export interface ClippedSlot {
+  slot: string
+  /** Px que el nodo se sale del lienzo, por borde. */
+  overflowRight: number
+  overflowBottom: number
+  /** Px que el texto se sale de su PROPIA caja (recorte interno). */
+  textOverflowX: number
+  textOverflowY: number
+  excerpt: string
+}
+
+export class SlideGeometryError extends Error {
+  constructor(
+    readonly slideId: string,
+    readonly clipped: ClippedSlot[]
+  ) {
+    super(
+      `La lámina "${slideId}" no cabe en su lienzo: ${clipped.length} slot(s) quedan recortados. ` +
+        `El renderer NO amputa copy (overflow=reject).\n` +
+        clipped
+          .map(c => {
+            const where = [
+              c.overflowRight > 0 ? `${c.overflowRight}px fuera del borde derecho` : '',
+              c.overflowBottom > 0 ? `${c.overflowBottom}px fuera del borde inferior` : '',
+              c.textOverflowX > 0 ? `${c.textOverflowX}px de texto fuera de su caja (horizontal)` : '',
+              c.textOverflowY > 0 ? `${c.textOverflowY}px de texto fuera de su caja (vertical)` : ''
+            ]
+              .filter(Boolean)
+              .join(', ')
+
+            return `  - slot "${c.slot}": ${where} — «${c.excerpt}»`
+          })
+          .join('\n') +
+        `\nAcorta el copy, o corrige la geometría de la plantilla si el contrato dice que ese largo cabe.`
+    )
+    this.name = 'SlideGeometryError'
+  }
+}
+
+/**
+ * Verifica que lo que el contrato llenó QUEPA de verdad.
+ *
+ * La validación de `validate.ts` cuenta caracteres contra `maxCharacters` — pero un contrato puede
+ * mentir: la lámina `FourPillarsFull` declaraba `thesis: max 150` mientras su grid (columnas en `%`
+ * + `gap`, que los porcentajes no descuentan) dejaba la última columna 20px fuera del lienzo. Con
+ * `.slide { overflow:hidden }` el resultado no era un error: era un PDF con una palabra guillotinada
+ * que parecía correcto. Esa es la bug class que este guard cierra — el copy pasa validación y la
+ * lámina igual miente.
+ *
+ * Sólo se auditan los nodos del contrato (`data-slot` / `data-slot-field`): los elementos
+ * decorativos (glows, paneles a sangre, el burbujeo de la URL) se salen del lienzo A PROPÓSITO, y
+ * auditarlos daría falsos positivos.
+ */
+export const assertSlideFitsCanvas = async (
+  page: Page,
+  slide: SlideSpec,
+  contract: TemplateContract
+): Promise<void> => {
+  const clipped = await page.evaluate(
+    ({ width, height }) => {
+      // 2px: absorbe el redondeo sub-pixel del layout. Una palabra amputada nunca mide 2px.
+      const TOLERANCE = 2
+      const found: ClippedSlot[] = []
+
+      const clipsContent = (el: Element): boolean => {
+        const style = getComputedStyle(el)
+
+        return style.overflowX !== 'visible' || style.overflowY !== 'visible'
+      }
+
+      document.querySelectorAll('[data-slot], [data-slot-field]').forEach(node => {
+        const el = node as HTMLElement
+        const rect = el.getBoundingClientRect()
+
+        if (rect.width === 0 || rect.height === 0) return
+
+        // La ventana donde el nodo es REALMENTE visible: el lienzo, recortado además por cada
+        // ancestro que clipee (`.slide{overflow:hidden}`, paneles, tarjetas…). Un texto que se sale
+        // de su propia caja pero cuyo box NO clipea (`overflow:visible`) se pinta entero: eso no es
+        // un recorte, es cómo se comportan los descendientes tipográficos. Sólo miente lo que
+        // desaparece.
+        let clipLeft = 0
+        let clipTop = 0
+        let clipRight = width
+        let clipBottom = height
+
+        for (let a = el.parentElement; a; a = a.parentElement) {
+          if (!clipsContent(a)) continue
+
+          const ancestor = a.getBoundingClientRect()
+
+          clipLeft = Math.max(clipLeft, ancestor.left)
+          clipTop = Math.max(clipTop, ancestor.top)
+          clipRight = Math.min(clipRight, ancestor.right)
+          clipBottom = Math.min(clipBottom, ancestor.bottom)
+        }
+
+        const overflowRight = Math.round(rect.right - clipRight)
+        const overflowBottom = Math.round(rect.bottom - clipBottom)
+
+        // Recorte interno: sólo cuenta si la PROPIA caja clipea su contenido.
+        const selfClips = clipsContent(el)
+        const textOverflowX = selfClips ? Math.round(el.scrollWidth - el.clientWidth) : 0
+        const textOverflowY = selfClips ? Math.round(el.scrollHeight - el.clientHeight) : 0
+
+        const escapes =
+          overflowRight > TOLERANCE ||
+          overflowBottom > TOLERANCE ||
+          textOverflowX > TOLERANCE ||
+          textOverflowY > TOLERANCE ||
+          rect.left < clipLeft - TOLERANCE ||
+          rect.top < clipTop - TOLERANCE
+
+        if (!escapes) return
+
+        found.push({
+          slot: el.getAttribute('data-slot') ?? el.getAttribute('data-slot-field') ?? el.tagName.toLowerCase(),
+          overflowRight: Math.max(0, overflowRight),
+          overflowBottom: Math.max(0, overflowBottom),
+          textOverflowX: Math.max(0, textOverflowX),
+          textOverflowY: Math.max(0, textOverflowY),
+          excerpt: (el.textContent ?? '').trim().slice(0, 60)
+        })
+      })
+
+      return found
+    },
+    { width: contract.viewport.width, height: contract.viewport.height }
+  )
+
+  if (clipped.length > 0) {
+    throw new SlideGeometryError(slide.slideId, clipped)
+  }
+}
+
 export const renderSlide = async (
   browser: Browser,
   templateHtmlPath: string,
@@ -459,6 +594,10 @@ export const renderSlide = async (
 
   try {
     await fillSlide(page, templateHtmlPath, slide, contract)
+
+    // Antes de imprimir NADA: si el copy no cabe, se rechaza. Un PDF con una palabra cortada es
+    // peor que un fallo — se ve terminado, y nadie lo revisa dos veces.
+    await assertSlideFitsCanvas(page, slide, contract)
 
     if (target.kind === 'png') {
       await page.screenshot({ path: target.outPath })

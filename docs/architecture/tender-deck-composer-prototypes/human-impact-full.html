@@ -14,7 +14,10 @@
       radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
       radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
       linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%); }
-    .hero { position:relative; z-index:1; height:526px; display:grid; grid-template-columns:48% 52%; gap:44px; padding:145px 132px 66px; }
+    /* `fr`, NO `%`: 48%+52% ya es el 100% del content-box y el gap de 44px se suma encima, así que
+       la 2ª columna se salía del lienzo. Hoy no se nota porque el copy no llena el track — es un
+       bug latente que amputaría cualquier texto más largo. Ver la misma nota en four-pillars-full. */
+    .hero { position:relative; z-index:1; height:526px; display:grid; grid-template-columns:minmax(0,48fr) minmax(0,52fr); gap:44px; padding:145px 132px 66px; }
     .title-block { position:relative; padding-left:34px; }
     .title-block::before { content:''; position:absolute; left:0; top:15px; bottom:4px; width:3px; background:rgba(255,255,255,.86); }
     .eyebrow { margin-bottom:20px; font-size:24px; font-weight:300; letter-spacing:.008em; line-height:1.2; text-transform:uppercase; }

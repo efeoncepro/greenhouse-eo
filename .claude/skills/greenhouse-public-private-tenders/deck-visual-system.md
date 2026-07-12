@@ -225,6 +225,29 @@ Por eso las plantillas con gráfico (`ChartSplit`, `CaseStudySplit`, `TimelineFu
 **resolvers de geometría** y **abortan si el resolver falta**. Si vas a tocar una lámina con barras:
 la barra sale del número, o no sale.
 
+### ⚠️ La 2ª bug class: el contrato que MIENTE sobre lo que CABE (2026-07-12)
+
+`validate.ts` cuenta **caracteres** contra `maxCharacters` — pero eso **no prueba que quepa**.
+`FourPillarsFull` declaraba `thesis: max 150`, la tesis de SKY medía 100 (pasó con holgura) y aun así
+salió **amputada** en el PDF: `…se vuelve sosteni|`.
+
+La causa no era el copy, era aritmética de CSS: `.hero` tenía `grid-template-columns: 30% 35% 35%` +
+`gap: 46px`. **Los porcentajes de Grid no descuentan el `gap`** → los tracks sumaban `100% + 92px`, la
+última columna terminaba **20px fuera del lienzo**, y `.slide { overflow:hidden }` la cortaba **sin
+emitir nada**. El deck se veía terminado. El mismo patrón estaba latente en `HumanImpactFull`.
+
+**Reglas duras que salen de acá:**
+
+- **NUNCA** `grid-template-columns` en `%` si la grilla tiene `gap`. Usa `minmax(0, Nfr)` — `fr`
+  reparte lo que queda **después** del gap. El test `template-geometry.test.ts` lo prohíbe en las 25.
+- **NUNCA** asumas que "pasó `maxCharacters`" = "cabe". El contrato declara intención; el único juez
+  de la geometría es el layout real. El runtime lo verifica con `assertSlideFitsCanvas` (`render.ts`):
+  mide cada nodo del contrato contra su ventana visible real **antes de imprimir** y aborta con
+  `SlideGeometryError` (slot + px + texto cortado). Los decorativos (glows, paneles a sangre, la
+  burbuja de URL) **sangran a propósito** y quedan fuera de la auditoría.
+- **NUNCA** dejes que un recorte sea silencioso. Un PDF con una palabra guillotinada es **peor que un
+  fallo**: parece terminado, y nadie lo revisa dos veces.
+
 ### Estado del catálogo — 25/25 con contrato ✅
 
 Las 25 plantillas tienen `data-slot` en el HTML y su `*.slots.json`, enlazado en el `registry.json`.
