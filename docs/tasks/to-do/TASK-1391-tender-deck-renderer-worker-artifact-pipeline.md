@@ -582,36 +582,32 @@ hasta el próximo deploy **y desaparece en silencio**.
 
 ---
 
-### 🟡 11. La pregunta incómoda: **¿el deck es siquiera el entregable que se puntúa?**
+### ✅ 11. El deck SÍ es el entregable — confirmado por el operador (2026-07-12)
 
-**Hallazgo del 2026-07-12 leyendo las bases reales de SKY** (`docs/commercial/tenders/sky-blog-2026/bases/`):
+**Se levantó una duda y quedó zanjada. Se deja escrita para que nadie la re-levante.**
 
-> **§2.6.1 — *"Las ofertas deberán ser subidas a plataforma… en formato PDF"*.**
-> **§2.6.2 — la presentación ejecutiva ocurre SÓLO *"en caso de que SKY así lo requiera"*, dura máximo
-> 2 horas y se avisa con 24 h.**
+Al leer las bases de SKY (`docs/commercial/tenders/sky-blog-2026/bases/`) se leyó §2.6.1 —*"las ofertas
+deberán ser subidas a plataforma… en formato PDF"*— como si exigiera un **documento largo** en vez de
+láminas. **Es una mala lectura.** Las bases exigen **el FORMATO PDF, no el género del documento.**
 
-**Lo que se entrega y se puntúa es la OFERTA TÉCNICA (documento largo) + la ECONÓMICA + el Excel. El deck
-es para una eventual defensa oral que puede no ocurrir.**
+> **Un deck exportado a PDF **es** un PDF.** La propuesta se **compone** con el Artifact Composer y se
+> entrega como PDF. **Ése es el camino, y esta task lo productiviza.**
 
-Esta task —y el composer entero— asumen que **"el deck" ES el artefacto de la licitación**. **En el primer
-caso real, no lo era.**
+Y §2.6.2 (la presentación ejecutiva de hasta 2 h, avisada con 24 h) **es otra cosa**: una eventual
+**defensa oral**, no el formato de la oferta. El mismo artefacto sirve a las dos — que es exactamente el
+caso `deck-studio` describe como **"defensa oral + leave-behind"**.
 
-**No invalida la task** (el deck sigue siendo valioso y el pipeline sirve igual). **Pero abre una pregunta
-de producto que hay que contestar ANTES de invertir en el deployable:**
+**Conclusión: el catálogo `deck-axis` (16:9 → `pdf-merged`) es el camino correcto y esta task no cambia.**
+**NO** hace falta un renderer de documento largo, ni otro `outputTarget`, ni otro catálogo.
 
-> **¿El Proposal Studio necesita también un renderer de DOCUMENTO largo** (oferta técnica: paginado, con
-> índice, numerado, **taggeable**) **además del renderer de láminas?**
-
-El catálogo de 25 plantillas es **16:9 y de láminas**. Una oferta técnica es **otro `outputTarget` y otro
-catálogo** — y encima es **el que sí tiene requisito de accesibilidad** (§4). **Open Question de máxima
-prioridad.**
+⚠️ **Lo que SÍ sigue en pie es §4 (accesibilidad):** el PDF que emitimos —venga de láminas o de lo que
+sea— **no está tagueado**, y eso es independiente de este debate.
 
 ## Open Questions
 
-- 🔴 **¿El Proposal Studio necesita un renderer de DOCUMENTO largo (oferta técnica) además del de
-  láminas?** En el primer caso real (SKY), **el deck no era el entregable puntuado** — lo eran la oferta
-  técnica y la económica en PDF. Contestar **antes** de construir el deployable: puede cambiar el
-  `outputTarget`, el catálogo y —vía accesibilidad— hasta el motor de render.
+- ~~¿El Proposal Studio necesita un renderer de DOCUMENTO largo además del de láminas?~~ **CERRADA por el
+  operador (2026-07-12): NO.** La propuesta se compone con el Composer y se entrega **en PDF** — y un deck
+  exportado a PDF **es** un PDF. Las bases exigen el **formato**, no el género del documento. Ver §11.
 - 🔴 **¿Qué pasa el día que un RFP exija PDF/UA (Section 508 / EAA)?** `Chromium print-to-PDF` emite PDF
   **sin taguear**. Hoy la respuesta honesta es *"fallamos cerrado y no ofertamos"*. ¿Es aceptable?
 - **¿`outputTarget: png-set` quiere batch por ejecución** en vez de una ejecución por pieza? 30 carruseles
