@@ -1826,6 +1826,18 @@ Cuando un agente modifica archivos listados como "owned" por otra task, debe rev
 - La referencia canonica para este flujo queda en:
   - `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
 
+## Artifact Composer — primitive de plataforma, catálogos y `Proposal` (ADR 2026-07-12)
+
+**Direccion canonica: `docs/architecture/GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md` (Accepted).** El motor de composicion **NO es del dominio comercial** (verificado: no importa nada de `commercial/`, content-types abiertos, canvas por plantilla). Se extrae a **`src/lib/artifact-composer/**`** (domain-free) y las superficies pasan a ser **catalogos = DATO**: `deck-axis` (16:9 → PDF de N paginas) y `social-carousel` (4:5 → PNG set). El aggregate deja de ser `Tender` y pasa a **`Proposal`** con `origin ∈ {public_tender, private_rfp, direct_sales}`.
+
+- **NUNCA** el Composer importa de un dominio (`commercial`, `growth`…). **NUNCA** lo copies para una superficie nueva: **un catalogo, no un fork**. Si agregar el catalogo te obliga a tocar el motor, el motor esta mal y se arregla **una vez** (el guard de geometria y sus tests son compartidos — un fix protege a todos).
+- **NUNCA** llames `TechnicalProposal` al aggregate: nombra **UNA de las TRES partes** (tecnica/economica/administrativa). **No toda propuesta es una licitacion** — la licitacion es un `origin`. **NUNCA** agregues un `kind` que duplique `origin`.
+- **NUNCA** hornees AXIS/Efeonce como constante ni hardcodees un HEX de marca. **La marca es un INPUT (brand pack)**; AXIS es *el brand pack de Efeonce*, no *el* brand pack. Hornearlo **mata el as-a-service**. (Hoy las 25 plantillas hardcodean **51 HEX** con la paleta re-declarada por archivo: es deuda que con 2 catalogos se vuelve multiplicador de brand drift.)
+- **Nace multi-tenant:** **NUNCA** un catalogo/plantilla/asset/`Proposal` sin **org dueña resoluble** ("global" es un valor explicito, no ausencia de dato). **NUNCA** gatees la capability por rol → **entitlement per-ORG** (`module_assignments`): un rol no se factura, un modulo si.
+- **NUNCA** el `Proposal` calcula precio → `quote-to-cash` sobre loaded cost. **NUNCA** un GO sin margen.
+- **NUNCA** FIFO ciego en la cola de render: perfiles de carga **opuestos** (deck = raro + deadline duro; carrusel = frecuente + sin urgencia). Un batch social **no puede hambrear** un bid que vence mañana.
+- **NUNCA** un catalogo consume assets de otro dominio/org (social ⇄ propuestas). El aislamiento de scope **es** el aislamiento multi-tenant.
+
 ## Licitaciones / Tender Deck Composer — invariantes (2026-07-12)
 
 **Cargar `docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`** al tocar `src/lib/commercial/tenders/**`, `docs/architecture/tender-deck-composer-prototypes/**` o cualquier oferta/deck de licitacion. Contrato: `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` (deck) + `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` **§0 = estado real** (leerlo antes que nada). Skill: `greenhouse-public-private-tenders`.

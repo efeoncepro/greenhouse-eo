@@ -263,6 +263,29 @@ emitir nada**. El deck se veía terminado. El mismo patrón estaba latente en `H
 - **NUNCA** dejes que un recorte sea silencioso. Un PDF con una palabra guillotinada es **peor que un
   fallo**: parece terminado, y nadie lo revisa dos veces.
 
+## ⚠️ Dirección canónica: el motor NO es del deck (ADR 2026-07-12)
+
+`GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md` (Accepted). El composer **no sabe qué es una
+licitación** — es un **primitive de plataforma** (`src/lib/artifact-composer/**`), y "el deck" es sólo
+**uno de sus catálogos**:
+
+```
+Artifact Composer (un motor, domain-free)
+  ├── catalogs/deck-axis          16:9 1920×1080 → PDF de N páginas   ← esta skill
+  └── catalogs/social-carousel     4:5 1080×1350 → PNG set            ← growth/social
+```
+
+- **Un catálogo es DATO, no una rama del motor.** Si agregar una superficie te obliga a tocar el motor, el
+  motor está mal. **NUNCA** copies el composer para una superficie nueva: **un catálogo, no un fork.**
+- **El aggregate ya no es `Tender`, es `Proposal`** (`origin ∈ {public_tender, private_rfp,
+  direct_sales}`): **no toda propuesta es una licitación**. La licitación es un **origen**.
+- **La marca es un INPUT (brand pack), no una constante.** AXIS es *el brand pack de Efeonce*, no *el*
+  brand pack — la capability **nace multi-tenant** (as-a-service ready). **NUNCA** hardcodees un HEX de
+  marca en una plantilla: hoy hay **51 HEX** repartidos por los 25 archivos y es deuda que **bloquea el
+  as-a-service**.
+- El **molde visual** (degradado, safe-area, íconos, glass) **es del catálogo**, no del motor. Un carrusel
+  de IG **no** usa el molde del deck — pero **ambos beben de los mismos tokens**.
+
 ## Hacia dónde va — el runtime que viene (TASK-1392 → TASK-1391)
 
 Hoy el composer es un **CLI local** sin dueño: el `DeckPlan` se escribe a mano y el PDF cae en una

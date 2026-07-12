@@ -27,6 +27,28 @@ frontera de **EPIC-027**: no se crea por conveniencia. Eso es exactamente lo que
 
 ---
 
+## ⚠️ Dirección canónica (ADR `GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`, Accepted 2026-07-12)
+
+**El motor NO es del dominio comercial.** Se extrae como primitive de plataforma y las superficies pasan a
+ser **catálogos (= DATO)**. El aggregate deja de llamarse `Tender`.
+
+| Antes | Ahora |
+|---|---|
+| `src/lib/commercial/tenders/deck/**` | **`src/lib/artifact-composer/**`** (domain-free) |
+| "el deck" | **catálogo** `deck-axis` (16:9 → PDF) · **catálogo** `social-carousel` (4:5 → PNG set) |
+| aggregate `Tender` | aggregate **`Proposal`** · `origin ∈ {public_tender, private_rfp, direct_sales}` |
+| AXIS horneado en las plantillas | **brand pack como INPUT** (AXIS = el brand pack **de Efeonce**) |
+
+- **NUNCA** el Composer importa de un dominio. **NUNCA** lo copies para una superficie nueva — **un
+  catálogo, no un fork**. Si agregar el catálogo te obliga a tocar el motor, el motor está mal.
+- **NUNCA** llames `TechnicalProposal` al aggregate: nombra **una de las tres partes** (técnica /
+  económica / administrativa). **No toda propuesta es una licitación** — la licitación es un `origin`.
+- **NUNCA** hornees AXIS/Efeonce como constante ni hardcodees un HEX de marca: **mata el as-a-service**.
+  Nace **multi-tenant** (org scoping + **entitlement per-ORG**, nunca por rol — un rol no se factura).
+- **NUNCA** el `Proposal` calcula precio (eso es `quote-to-cash` sobre loaded cost).
+- **NUNCA** FIFO ciego en la cola de render: un batch social **no puede hambrear** el deck de un bid que
+  vence mañana (perfiles de carga opuestos).
+
 ## Los 3 principios que gobiernan todo
 
 Una oferta de licitación es un **documento contractual que evalúa un comité** y que pasa a formar parte

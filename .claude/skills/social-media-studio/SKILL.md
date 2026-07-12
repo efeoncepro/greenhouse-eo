@@ -112,7 +112,19 @@ El estudio cierra el loop **idear → producir → programar → medir → itera
 herramientas conectadas (detalle en `efeonce/STUDIO_TOOLING.md`):
 
 - **Producir**: `higgsfield-*` (video/imagen/audio/UGC), `greenhouse-ai-image-generator`
-  y `greenhouse-digital-brand-asset-designer` (estáticos/carruseles), Figma/Adobe Express.
+  y `greenhouse-digital-brand-asset-designer` (estáticos), Figma/Adobe Express.
+- **Componer un carrusel con plantillas** → **Artifact Composer** (ADR
+  `GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`, Accepted 2026-07-12). El carrusel **no se dibuja
+  lámina por lámina**: es un **catálogo** del motor de composición que ya existe (el mismo que produce los
+  decks de licitación). Se escribe un `Plan` (láminas + slots) y el motor lo materializa.
+  - **NUNCA** copies/forkees el composer para social. **Un catálogo, no un fork** — un segundo motor
+    obliga a arreglar cada bug de geometría dos veces.
+  - Ganas gratis lo que ya está probado: **`overflow: reject`** (un texto que no cabe en el 4:5 **no se
+    recorta**: falla) y la **verificación de geometría antes de renderizar**.
+  - **La marca es un INPUT (brand pack)**, no una constante → el mismo catálogo sirve para Efeonce **y
+    para un cliente Globe** (as-a-service). **NUNCA** hardcodees un HEX de marca en una plantilla.
+  - Frontera con **Media Foundry**: Foundry **genera** el pixel (IA); el Composer **compone** el frame. Un
+    carrusel puede usar los dos. **NO** se fusionan.
 - **Programar y medir**: **Metricool** MCP (`getBestTimeToPostByNetwork`,
   `createScheduledPost`, `getAnalyticsDataByMetrics`, `getBrandSettings`).
 - **Publicar y HubSpot**: atribución/lead capture social → `growth-marketing-cro` +
