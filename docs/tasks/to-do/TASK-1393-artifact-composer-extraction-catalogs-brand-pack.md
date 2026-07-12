@@ -120,8 +120,11 @@ Reglas obligatorias:
 ### Already exists
 
 - Motor completo y verde: selector (audit de cierre referencial) · validate (`overflow: reject` + anti-fabricacion por `evidenceRef`) · 15 resolvers (iconos, ordinales, **geometria anti-fabricacion**) · render (slot-fill en DOM real + `assertSlideFitsCanvas` + captura) · compose (valida TODO antes de renderizar NADA + merge `pdf-lib`).
-- **25/25 plantillas** con `data-slot` + `*.slots.json` + `registry.json` (25 content-types, 1:1).
-- 5 suites (66 tests), incluida `template-geometry.test.ts` que prohibe `%`+`gap` en las 25.
+- **25/25 plantillas** con `data-slot` + `*.slots.json` + `registry.json` (25 content-types, 1:1) — **y, desde TASK-1394, 25/25 COMPONIBLES**, que **no es lo mismo**: *"tener contrato ≠ ser componible"* fue la **3ª bug class** (7 de 25 reventaron al componer la primera oferta real).
+- ⚠️ **Baseline actualizado 2026-07-12 (el doc decía "5 suites, 66 tests" — estaba stale):** **8 suites, 102 tests.** Las dos que importan y **DEBEN sobrevivir al move**:
+  - **`template-geometry.test.ts`** — prohíbe `%`+`gap` en las 25 (2ª bug class).
+  - 🔴 **`template-composability.test.ts`** — **sintetiza un payload desde cada contrato e intenta llenar las 25.** Es lo que convierte *"componible"* de **promesa de la doc** en **hecho verificable en CI**. Su `KNOWN_BROKEN` es un **contrato de dos vías**: falla si una sana se rompe **y también** si una rota se arregla y nadie la saca. **La lista no puede mentir.** *(Hoy está **vacía**: 25/25.)*
+  - Verifica además que **la firma vive dentro del `.slide`** (4ª bug class: `mix-blend-mode` sin backdrop).
 - CLI `pnpm deck:compose <plan.json> [--out dir]`; outDir default `.captures/tender-deck`.
 - El motor **NO** importa nada de `commercial/` (solo `server-only` + sus propios modulos).
 
@@ -261,9 +264,16 @@ después excluir `docs/`.** Al revés es un build roto días después, en silenc
 - **3b · Ledger → primitives → roles → CSS:** antes de compilar, producir un ledger versionado de las **80** bases RGB normalizadas (incluye `rgba()`), con `0` sin mapping y una sola clasificación por base: primitive PPT, `Deck / Primitives`, `Deck / Semantic`, token exclusivo de recipe u opacidad nombrada. Implementar el contrato portable `BrandPack` y un compilador determinista que genere custom properties para primitives, roles semánticos (`surface`, `ink`, `onDark`, `accent`, `glass`, `border`, `dataState`) y opacidades. Cada alta de color conserva valor exacto y variable/node verificable en el mismo Figma PPT; no se aceptan fuentes externas, aproximaciones ni valores huérfanos. El crosswalk a `axis-tokens.ts` sólo se permite por igualdad exacta.
 - **3c · Roles → gradients:** declarar las recipes de `deck-axis` como datos versionados del catálogo, no como strings repetidos por template. Cada recipe contiene capas ordenadas, tipo (`linear|radial|grain`), geometría (ángulo/tamaño/origen), stops, opacidad y blend; cada stop apunta a un role/opacity token, nunca a HEX/RGBA. Cubrir `cover.hero`, `richContent`, `backCover` y `lightSurface` y preservar para cada una las capas, orden, posiciones y alpha del baseline; para `richContent`, en particular, navy profundo/medio/cercano, glow teal, glow violeta y grano blanco.
 - `Empower your Growth|Brand|Voice|Engine` son claims de capability/masterbrand, no paletas de submarca ni aliases cromáticos implícitos.
-- Hacer que las 25 plantillas importen el CSS compilado y elijan una recipe por nombre; **eliminar los 51 HEX** de marca y gradients locales hardcodeados sin modificar su valor calculado.
+- Hacer que las 25 plantillas importen el CSS compilado y elijan una recipe por nombre; **eliminar TODO HEX de marca** y gradient local hardcodeado **sin modificar su valor calculado**. ⚠️ **La cifra canónica es el ledger de 80 bases RGB normalizadas** *(el "51 HEX" que circulaba por este doc está **superseded**: la medición real son **262 literales HEX / 50 únicos** + las bases de `rgb()/rgba()` → **80 bases normalizadas**. **Un solo número, y es el del ledger.**)*
 - El brand pack pasa a ser **parametro** de `compose(...)`. AXIS queda como *el brand pack de Efeonce*, cargado por default; **nada** en el motor ni en las plantillas lo nombra como constante.
 - Guard: un test/lint que falla si una plantilla reintroduce un HEX de marca.
+- 🔴 **Guard de CONTRASTE en el compilador del brand pack (Delta b · §3).** Hoy AXIS está afinado **a mano**
+  y nadie lo verifica. **Pero apenas la marca es un INPUT, un cliente puede traer una paleta que produzca
+  texto por debajo de 4,5:1** — y el deck sale ilegible, o inadmisible.
+  **El compilador debe RECHAZAR un brand pack cuyos roles no pasen WCAG AA contra sus superficies**
+  (4,5:1 texto normal · 3:1 texto grande). **Falla al compilar, no en la lámina.**
+  *(Cuesta poco hoy, con un solo pack. Con packs de cliente, es la diferencia entre un producto y una
+  demanda.)*
 - Verificacion visual **obligatoria**: componer el deck SKY con el brand pack AXIS y **mirar las 4 laminas** — la tokenizacion no puede cambiar el pixel.
 
 ### Slice 3b — El MOLDE también se tokeniza, en la MISMA pasada que el color
@@ -443,7 +453,17 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 - [ ] El motor ofrece `CatalogSemanticValidator` sin reglas de Proposal/Tender embebidas; `deck-axis` versiona y prueba sus reglas de compatibilidad, evidencia, pricing, staffing y cobertura de requisitos contra fixtures.
 - [ ] Poppins/Geist se cargan desde el font pack local versionado, con licencia/variante/checksum declarados; el renderer bloquea la red de fuentes y falla cerrado ante fallback o asset ausente.
 - [ ] El deck SKY conserva contenido, geometría, texto seleccionable y frames aprobados respecto del baseline pre-refactor; si el font/asset pack cambia de revisión, el manifest y baseline versionados declaran la diferencia y las 4 láminas fueron **miradas**, no sólo testeadas.
-- [ ] Las 2 bug classes siguen cerradas: filler que aborta ante slot desconocido, `overflow: reject`, y `assertSlideFitsCanvas` (66 tests verdes).
+- [ ] **Las 4 bug classes siguen cerradas** *(el doc decía "las 2" — stale: hay cuatro)*: **(1)** filler que **aborta** ante un slot desconocido + `overflow: reject` — *el fallo silencioso*; **(2)** `assertSlideFitsCanvas` — *la lámina no puede amputar copy en silencio*; **(3)** `template-composability.test.ts` con `KNOWN_BROKEN` vacío — *"tener contrato" ≠ "ser componible"*; **(4)** la firma vive **dentro** del `.slide` — *el chrome que depende de dónde vive en el DOM*. **Todas las suites verdes** (hoy: **8 suites / 102 tests** — el número crece, el criterio es *"todas verdes"*, no un número congelado).
+
+**Añadidos por el Delta (b) — auditoría de rigor 2026-07-12:**
+
+- [ ] 🔴 **El MOLDE se tokenizó EN LA MISMA PASADA que el color** (Slice 3b). **No se tocan las 25 plantillas dos veces.** El lienzo, la safe-area, el espaciado, el glass y los roles de tipo se compilan **una vez**; las plantillas los **componen**.
+- [ ] 🔴 **El chrome se ancla a una REGIÓN, no a un píxel.** No queda **ni un** `calc(100% - NNNpx)` en el CSS del catálogo.
+- [ ] 🔴 **Las FUENTES y los roles tipográficos viven en el BRAND PACK, no en el catálogo.** Un brand pack de cliente **cambia la tipografía**. *(Si las fuentes cuelgan del catálogo, el deck del cliente sale en las fuentes de Efeonce — y el as-a-service es mentira.)*
+- [ ] **El `BrandPack` declara licencia y derecho de embebido por fuente**, y **falla cerrado** si un pack trae una fuente sin derecho de embebido. *(Poppins y Geist son OFL; las de un cliente probablemente no.)*
+- [ ] 🔴 **El compilador RECHAZA un brand pack cuyos roles no pasen WCAG AA** contra sus superficies (4,5:1 / 3:1). **Falla al compilar, no en la lámina.**
+- [ ] **El `Plan` NO puede ensamblar primitivas del molde.** Elige **una plantilla por nombre**. Las primitivas son detalle **interno** del catálogo, **no una superficie de autoría** — el catálogo sigue **cerrado**.
+- [ ] **Diff visual de las 25** (`pnpm fe:capture:diff`) como **gate de merge**: el refactor es **visualmente neutro** salvo excepción declarada **lámina por lámina**.
 - [ ] `pnpm deck:compose` conserva nombre, argumentos y outDir por defecto.
 
 ## Verification
@@ -466,8 +486,70 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 - Task `ui-ux` de extensión de `deck-axis` posterior a esta extracción: portada con contexto/fecha, nota visible de evidencia, capacidad de equipo, proceso cíclico y matriz de cumplimiento paginable. Debe consumir los contratos semánticos ya sellados; nunca editar HTML/slots de SKY como excepción.
 - Extraccion a `packages/artifact-composer` cuando EPIC-027 lo autorice (Creative Studio lo consume desde ahi).
 
+## Delta 2026-07-12 (b) — auditoría de rigor: 3 hallazgos de fondo y 3 baselines que mentían
+
+> **Revisado con `arch-architect` · `greenhouse-public-private-tenders` · `deck-studio` · `design-studio`
+> + product-design (2026-07-12).**
+>
+> **Esta task está notablemente mejor construida que TASK-1391 y TASK-1392** — su cuerpo **no** se
+> contradice con su Delta, el gate de frontera es mecánico y el ledger de color es riguroso. Así que los
+> hallazgos son más finos. **Pero tres son de fondo, y dos de ellos rompen la premisa del as-a-service.**
+
+### 1. 🔴 El MOLDE faltaba en el Scope — y el ADR exige que vaya en la MISMA pasada que el color
+
+El **Delta (b) §7 del ADR** dice: *"el molde deja de ser una CONVENCIÓN y pasa a ser un ARTEFACTO
+COMPILADO"*, y que **color y geometría van en una sola pasada** porque **tocan los mismos 25 archivos**.
+
+**El Scope de esta task tokenizaba el color (Slice 3) y NO el molde.** Resultado: se habrían tocado **las
+25 plantillas dos veces** → **dos regresiones visuales sobre todo el catálogo**. Ese es el error que el
+ADR existe para prevenir.
+
+→ **Nace `Slice 3b`.** Medido: el **lienzo** (`1920×1080` + `overflow:hidden`) y el **degradado** están
+re-declarados **25/25**; la safe-area, 20/25. Y los cinco `calc(100% - 912px)` de `deck-signature.css` eran
+la **confesión** de que el chrome no podía preguntarle al layout dónde termina una región: **alguien midió
+cada panel con la regla**. *(Codex ya empezó a corregirlo con `data-url-bubble-backdrop` — ese patrón es el
+correcto y se generaliza.)*
+
+### 2. 🔴 Las FUENTES estaban asignadas a la capa equivocada — y eso rompe el as-a-service
+
+El Slice 4 decía *"font pack local versionado **del `deck-axis`**"* → **el catálogo dueño de las fuentes**.
+
+> **La tipografía ES marca.** Si el font pack cuelga del **catálogo**, **cambiar el brand pack NO cambia
+> las fuentes** → **el deck de un cliente saldría en Poppins/Geist, que son las fuentes de Efeonce.**
+>
+> **Toda la premisa del as-a-service se cae en una línea de asignación de capa.**
+
+**Canónico:** el **`BrandPack`** es dueño de `{ colorPrimitives, roles, opacities, FONTS, typeRoles }`. El
+**catálogo** es dueño del **molde** y **referencia roles**, nunca valores.
+
+**Y el corolario legal, que es nuestro problema en cuanto sirvamos a un cliente:** las fuentes de un cliente
+**probablemente NO son de licencia abierta** (Poppins y Geist sí lo son). El `BrandPack` debe declarar
+**licencia y derecho de embebido por fuente**, y **fallar cerrado** si no lo tiene.
+
+### 3. 🔴 Falta el guard de CONTRASTE — y con brand pack de cliente deja de ser opcional
+
+Hoy AXIS está afinado **a mano** y **nadie verifica el contraste**. **Apenas la marca es un INPUT, un
+cliente puede traer una paleta que produzca texto bajo 4,5:1** → deck ilegible, o **inadmisible** (WCAG AA
+es piso, y en licitaciones con exigencia de accesibilidad es requisito).
+
+→ **El compilador del brand pack RECHAZA un pack cuyos roles no pasen WCAG AA contra sus superficies.
+Falla al compilar, no en la lámina.** Cuesta poco hoy, con un solo pack.
+
+### Y 3 baselines que el doc declaraba y ya eran falsos
+
+| El doc decía | La realidad (medida 2026-07-12) |
+|---|---|
+| *"5 suites (66 tests)"* — **y estaba como criterio de aceptación** | **8 suites, 102 tests.** ⚠️ **Un número congelado en un acceptance criterion es una trampa**: el criterio correcto es **"todas las suites verdes"**, no un conteo que envejece |
+| *"las **2** bug classes"* | Son **4**. Faltaban: *"tener contrato ≠ ser componible"* (3ª) y *"el chrome que depende de dónde vive en el DOM"* (4ª) |
+| *"eliminar los **51 HEX**"* | **262 literales HEX / 50 únicos**, y con las bases de `rgb()/rgba()` → **80 bases normalizadas**. El doc tenía **tres cifras distintas** conviviendo. **La canónica es el ledger de 80** |
+
+**Y algo que el doc no mencionaba y es load-bearing:** **`template-composability.test.ts` DEBE sobrevivir al
+move.** Es el guard que convierte *"componible"* de **promesa de la doc** en **hecho verificable en CI**, y
+su `KNOWN_BROKEN` es un **contrato de dos vías**: falla si una plantilla sana se rompe **y también** si una
+rota se arregla y nadie la saca. **La lista no puede mentir.**
+
 ## Open Questions
 
 - ¿Nombre final del home? `src/lib/artifact-composer/**` evita colision con el **Composition Shell** de UI Platform (que es otra cosa). No es irreversible.
-- ¿El catalogo `deck-axis` mantiene su home actual en `docs/architecture/tender-deck-composer-prototypes/` o se mueve junto al motor? Hoy las plantillas viven en `docs/` — raro para un asset de runtime, pero moverlas rompe rutas en varios docs. Decidir en Plan Mode.
+- ~~¿El catálogo mantiene su home en `docs/` o se mueve?~~ **CERRADA (Delta b · Slice 1b): se mueve.** El motor hace `fs.readFileSync` sobre `docs/` **en runtime** — eso no es documentación, es un **asset store mal ubicado**, y en un contenedor (TASK-1391) **revienta**.
 - ¿El generador de tokens corre en `prebuild` o como script explicito? Depende de si el CI necesita el CSS generado.
