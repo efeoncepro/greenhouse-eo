@@ -11,6 +11,9 @@
 > **Fuente de verdad técnica:** `docs/architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md`
 > (molde + contratos de slots) · SoT machine-readable: `registry.json` en
 > `docs/architecture/tender-deck-composer-prototypes/`.
+>
+> **Doc funcional (lenguaje simple):** `docs/documentation/comercial/tender-deck-composer.md`
+> **Manual de uso (paso a paso + errores):** `docs/manual-de-uso/comercial/componer-deck-de-licitacion.md`
 
 ---
 
@@ -209,11 +212,23 @@ Está cerrado de raíz: **cualquier tipo o campo que el filler no sepa llenar ab
 tocás el renderer, **NUNCA** agregues un `default:` silencioso ni un `continue` que deje pasar un
 slot sin escribir.
 
-### Estado del catálogo
+### ⚠️ La otra regla dura: una lámina NO PUEDE MENTIR
 
-**11 de las 24 plantillas todavía no tienen sus slots anotados** (Agenda, Timeline, Team, CaseStudy,
-Chart, Metrics, Quote, Narrative, BulletList, CardGrid, SectionDivider) → **no son componibles**
-hasta anotarlas. Anotar = poner `data-slot` / `data-slot-field` / `data-slot-items` en el HTML.
+Las barras, las posiciones y las escalas se **derivan del dato**, siempre. Nunca se escriben a mano.
+
+Los prototipos traen la geometría hardcodeada (`height:234px`, `width:88%`, `--m:16.6667%`). Si el
+composer sólo cambiara los **números** y dejara la **barra** del ejemplo, un "de 12 a 14" se dibujaría
+como el salto gigante del prototipo. En una oferta eso **no es un bug de layout: es fabricación
+gráfica** — el evaluador ve una mejora que no ocurrió.
+
+Por eso las plantillas con gráfico (`ChartSplit`, `CaseStudySplit`, `TimelineFull`) declaran
+**resolvers de geometría** y **abortan si el resolver falta**. Si vas a tocar una lámina con barras:
+la barra sale del número, o no sale.
+
+### Estado del catálogo — 25/25 con contrato ✅
+
+Las 25 plantillas tienen `data-slot` en el HTML y su `*.slots.json`, enlazado en el `registry.json`.
+El composer las puede llenar todas.
 
 ## Render
 

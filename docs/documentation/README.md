@@ -26,6 +26,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Portal Cliente y Customer Experience end-to-end](client-portal/portal-cliente-customer-experience-end-to-end.md) — mapa funcional completo del portal cliente como BFF: roles cliente, vistas, modulos activables, resolver server-side, estados normal/zero-state/not assigned/degraded/error, asignaciones auditables y frontera con Admin Center.
 - [Menu dinamico y acceso a modulos del Portal Cliente](client-portal/menu-dinamico-y-acceso-a-modulos.md) — como funciona el portal cliente compositivo desde TASK-827: catalogo de modulos vendibles (Globe, Wave, addons), resolver canonico server-side, 5 estados visuales canonicos (normal / zero-state recien activado / not_assigned con modulo no comprado / degraded parcial / error completo), page guards resolver-based en 9 rutas cliente, anatomia 5-elementos de empty states, glosario completo. Reemplaza el patron legacy de menu uniforme por business_line.
 
+### Comercial
+
+- [Tender Deck Composer](comercial/tender-deck-composer.md) — como se arma el deck de una licitacion: catalogo cerrado de 25 plantillas (el deck se compone, no se dibuja), las tres cosas que el composer NO deja pasar (cifra sin fuente, texto truncado, grafico que exagera una mejora que no ocurrio), el PDF entregable y el gate de peso (admisibilidad del portal), y el guardrail de fotos reales del equipo.
+
 ### Admin Center
 
 - [Admin Center end-to-end](admin-center/admin-center-operacion-end-to-end.md) — como opera Admin Center sin convertirse en bypass: tenants, usuarios, roles, vistas, permission sets, integraciones, email delivery, AI Tools, pricing catalog, SLAs, calendario operacional, responsabilidades, audit y capabilities.

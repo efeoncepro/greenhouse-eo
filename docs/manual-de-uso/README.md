@@ -10,6 +10,10 @@ La diferencia con otras capas de documentacion:
 
 ## Indice por categoria
 
+### Comercial
+
+- [Componer el deck de una licitacion](comercial/componer-deck-de-licitacion.md) — `pnpm deck:compose <plan.json>`: escribir el plan, componer, revisar las laminas y entregar. Que significan `too_long` (el renderer NO trunca), `missing_evidence_ref` (una cifra sin fuente no se compone) y el aviso de peso del PDF (si el portal rechaza el archivo, la oferta queda fuera del proceso).
+
 ### Finanzas
 
 - [Registrar ingresos, egresos, pagos y ordenes de pago](finance/registrar-ingresos-egresos-y-ordenes-de-pago.md) — guia operador end-to-end para crear documentos de ingreso/egreso, registrar cobros/pagos reales, decidir pago directo vs orden de pago, aprobar/enviar/marcar pagado y conciliar.
