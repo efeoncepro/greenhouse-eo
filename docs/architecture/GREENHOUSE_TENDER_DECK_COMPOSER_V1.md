@@ -757,9 +757,14 @@ intake (requisitos del bid + método 10-fases)
 
 **NUNCA:** LLM en render/selector/ensamblado (rompe reproducibilidad) · fan-out por slide por defecto · recursión de subagentes (**profundidad = 1**) · scratchpad mutable compartido (result-only; contexto read-only del molde/registro/caso) · auto-submit · fabricar datos.
 
-**Dependencia dura:** el composer **NO** construye su propio agent-runtime — consume el **`src/lib/ai/agent-runtime` (tool-runner) canónico compartido**, que hoy **no existe** (memoria Q8). Es prerequisito, no parte del composer.
+**Dependencias — corregido 2026-07-11 (v0.2).** La v0.1 declaraba como *dependencia dura* el `src/lib/ai/agent-runtime` (tool-runner) "que no existe". **Falso en ambas mitades:**
 
-**Pendiente:** promover esto a **ADR** (decisión de topología difícil de revertir que cruza agent-runtime + Full API Parity + método) en `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`. Hoy queda como dirección v0.1 doc-only.
+- **Existe prior art:** Nexa corre un tool loop en producción (`src/lib/nexa/providers/{anthropic,gemini}.ts` + `nexa-tools.ts` + `nexa-turn-telemetry.ts`), single-hop. (`src/lib/ai/greenhouse-agent.ts` **no** es prior art pese al nombre: single-shot de Gemini, sin tools.)
+- **El composer no lo necesita:** sus 3 nodos de juicio (orquestador · chapter-author · verifier) producen **structured output** sobre **contexto read-only** — no tool-chains. Eso ya lo cubre `generateStructured{Anthropic,Gemini,OpenAI}` en `src/lib/ai/`, y el fan-out es `Promise.all` en TS.
+
+El `agent-runtime` queda como **evolución de plataforma** (no bloquea el composer). Si algún día se construye, es **extracción/generalización del loop de Nexa** (strangler), **NUNCA** un segundo loop paralelo, y con task propia.
+
+**✅ ADR promovido (2026-07-11):** esta topología es ahora **`GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` → §5-ter (Accepted)**, con 4-pilar, alternativas rechazadas y hard rules. Esta sección queda como la explicación larga; **el ADR manda**.
 
 ### Capa de assets / imágenes del deck (3D icons + personas) — frontera runtime vs out-of-band
 

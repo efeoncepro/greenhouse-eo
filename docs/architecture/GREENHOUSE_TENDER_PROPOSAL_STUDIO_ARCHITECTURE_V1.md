@@ -1,8 +1,9 @@
 # GREENHOUSE — Tender Proposal Studio (arquitectura V1)
 
 > **Tipo:** Architecture spec / ADR (diseño, NO implementación)
-> **Versión:** 0.2 · **Status:** Proposed
+> **Versión:** 0.3 · **Status:** Proposed (el spec) · **§5-ter: Accepted** (topología del runtime del composer)
 > **Creado:** 2026-07-11 por Claude (skill `arch-architect`) con Julio Reyes
+> **v0.3 (2026-07-11):** la topología del runtime del composer se promueve a **ADR (§5-ter, Accepted)**: orquestador + fan-out por capítulo + resto determinista, con 4-pilar y hard rules. **Corrección de dependencia:** el composer **NO** depende del `agent-runtime` (Q8 v0.2 era falsa en ambas mitades — hay prior art en Nexa, y los 3 nodos de juicio son *structured output*, no tool-chains).
 > **v0.2 (2026-07-11):** los 6 refinamientos validados contra SKY (§9-ter) quedan **incorporados al cuerpo** (schema §1, gates §2, capabilities §3, deck §4, quote §6); Open Questions aterrizadas contra runtime real (Q1 schema, Q3 worker, Q8 agent-runtime).
 > **Método funcional (SSOT):** skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md` (10 fases + Fase 4-bis)
 > **Prior art:** `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (discovery público), `src/lib/commercial/quote-to-cash/**` (cotizador), `src/lib/release/state-machine.ts` (patrón state machine)
@@ -184,7 +185,117 @@ Decisión: **Claude (Anthropic) como modelo primario, vía el cliente canónico 
 - **Rechazados:** OpenAI Agents SDK / Swarm (acopla a vendor, viola la abstracción de provider), LangGraph/LangChain (exotic + estado/memoria propios que competirían con la state machine canónica = dos fuentes de verdad del flujo).
 - **Claude Agent SDK:** candidato para el *harness de fan-out headless en el worker de producción*, no para el core (el core es tool-runner propio).
 
-**Gap detectado (aprendizaje del loop, 2026-07-11):** NO existe hoy un tool-runner / agent-loop canónico en `src/lib/**` (grep sin resultados). Es un **primitive nuevo a crear** — `src/lib/ai/agent-runtime` (tool-use loop sobre el cliente canónico, tools = capabilities, con eval + observabilidad). Precondición de F1/F2. Va a Open Questions.
+**Gap detectado (v0.2) — CORREGIDO en v0.3 (2026-07-11).** La v0.2 declaró "no existe tool-runner en `src/lib/**`, hay que crearlo, precondición dura de F1/F2". **Ambas mitades eran falsas.** Ver §5-ter: existe prior art funcional en Nexa, y el composer no lo necesita para F1/F2.
+
+## 5-ter. ADR — Topología de runtime del composer (Accepted, 2026-07-11)
+
+> **Status:** `Accepted` (topología). El spec padre sigue `Proposed`: esta decisión fija **la forma**, no autoriza implementación — eso lo hace la task de F1.
+> **Contexto:** promoción a ADR de la dirección v0.1 documentada en `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → §"Arquitectura del runtime del composer".
+> **Blast radius:** decisión de topología de agentes + frontera determinista/agéntico. Difícil de revertir una vez que hay decks emitidos (la reproducibilidad es una promesa de auditoría). Se decide ahora, se implementa en F1.
+
+### Decisión (topología)
+
+**Pipeline determinista con exactamente dos nodos de juicio, fan-out acotado por CAPÍTULO, y cero LLM en el camino de render.**
+
+```text
+intake (requisitos del bid + método 10-fases)
+  │
+  ├─ (agente) ORQUESTADOR ──► outline = [{ capítulo, content-types, brief, targetSlideIds }]
+  │
+  ├─ fan-out DETERMINISTA sobre capítulos (Promise.all, N≈6-8):
+  │     (agente) chapter-author ──► slots JSON por slide
+  │     [el SELECTOR elige la plantilla: lookup en registry.json — SIN LLM]
+  │
+  ├─ (agente) VERIFIER ──► integridad de datos · registro institucional · coherencia
+  │
+  ├─ DETERMINISTA: slots + plantilla → HTML → Chromium → PDF · ensamblado · paginación
+  │
+  └─ [HUMANO confirma / exporta]   ← acción gobernada; nada sale sin firma
+```
+
+| Determinista — **sin LLM** | Agéntico — **juicio** |
+|---|---|
+| Selector (content-type → plantilla) · slot-fill · render HTML→PDF · ensamblado · orden de páginas · deep-links de agenda | Outline del deck (capítulos, orden, arco) · autoría por capítulo (copy institucional, qué métrica destacar) · verificación |
+
+**Por qué por capítulo y no por slide:** las slides de un capítulo comparten datos y argumento. Un agente por slide (15-25) cuesta más, pierde el hilo narrativo y multiplica la superficie de alucinación. Por capítulo son ~6-8 agentes que se coordinan mejor y cada uno ve su bloque completo.
+
+**Por qué el selector NO es agéntico:** el `registry.json` ya define un match declarativo 1:1 (25 content-types → 25 plantillas) + reglas de desambiguación. Meter un LLM ahí sólo agrega no-determinismo a un lookup que ya es una función pura. Si ningún content-type calza, **es señal de que falta una plantilla en el catálogo** (abrir gap), no de improvisar el layout.
+
+### Alternativas rechazadas (topología)
+
+| Alternativa | Por qué no |
+|---|---|
+| Un agente monolítico que "arma el deck" | Sin frontera determinista no hay reproducibilidad ni auditoría; el mismo contenido daría PDFs distintos. Indefendible para un documento contractual. |
+| Fan-out por slide | 15-25 agentes: más caro, pierde el arco del capítulo, más superficie de alucinación. Sin beneficio de calidad. |
+| Selector agéntico (LLM elige la plantilla) | Convierte un lookup determinista en una fuente de no-determinismo. El registry ya resuelve el match 1:1. |
+| LLM en el render / ensamblado | Rompe "mismos slots → mismo PDF", que es la promesa de auditoría del artefacto. |
+| Subagentes recursivos (profundidad > 1) | Costo y latencia no acotados, sin ganancia demostrable en un pipeline de forma conocida. Profundidad = 1, dura. |
+| Framework de agentes (LangGraph, OpenAI Agents SDK) | Estado/memoria propios que competirían con la state machine canónica = dos fuentes de verdad del flujo. Rechazado ya en §5-bis. |
+
+### Corrección de dependencia — el composer NO depende del `agent-runtime`
+
+La v0.2 declaraba el `src/lib/ai/agent-runtime` como **"precondición dura de F1/F2"**. La investigación de prior art (2026-07-11) lo desmiente en dos frentes:
+
+1. **Existe prior art funcional.** Nexa ya corre un tool loop en producción: `src/lib/nexa/providers/{anthropic,gemini}.ts` (abstracción de provider + failover), `nexa-tools.ts` (`getNexaToolDeclarations` + `executeNexaTool`), `nexa-turn-telemetry.ts`. Es **single-hop** (llamada → `tool_use` → `tool_result` → respuesta final), no un loop multi-turn — pero la afirmación "no existe tool-runner en el repo" era falsa. (`src/lib/ai/greenhouse-agent.ts` **no** es prior art pese al nombre: es un single-shot de Gemini sin tools.)
+
+2. **El composer no necesita un tool-runner.** Sus tres nodos de juicio producen **structured output**, no tool-chains:
+   - el ORQUESTADOR devuelve un outline JSON;
+   - el chapter-author devuelve slots JSON desde su brief + **contexto read-only** (el propio diseño ya prohíbe scratchpad mutable y fija el contexto del molde/registry/caso como read-only, así que **no hay nada que ir a buscar dinámicamente**);
+   - el VERIFIER devuelve un veredicto estructurado sobre material que ya recibió.
+
+   Eso lo cubre `generateStructured{Anthropic,Gemini,OpenAI}` — **que ya existe** en `src/lib/ai/`. El fan-out es `Promise.all` en TS.
+
+**Consecuencia:** el `agent-runtime` baja de **precondición bloqueante** a **evolución de plataforma**. El composer F1 se construye sobre los helpers de structured output existentes. El día que un subagente necesite **pedir datos que no se le pueden inyectar** (p. ej. un verifier que consulte la fuente de una cifra contra el ledger), ahí entra el runtime — y entonces la forma correcta **no es escribirlo de cero, sino extraer y generalizar el loop de Nexa** (strangler: Nexa pasa a consumirlo con `maxTurns=1`), nunca abrir un segundo loop paralelo. Eso es un refactor con blast radius sobre Nexa productivo → **merece su propia task**, no un side-quest del composer.
+
+### 4-Pilar
+
+#### Safety
+
+- **Qué puede salir mal:** que salga una oferta con una cifra inventada, en registro no-institucional, o que el sistema "envíe" algo sin firma humana.
+- **Gates:** `propose → confirm → execute` — los agentes **proponen** un borrador; el LLM nunca escribe estado ni envía. El humano confirma/exporta (capability gobernada). Mapea 1:1 a la regla del método (jamás se envía una oferta sin sign-off).
+- **Blast radius si falla:** un deck de un tender (un cliente). No cruza tenants. Pero el daño reputacional/legal de una cifra fabricada en una oferta contractual es **desproporcionado al blast radius técnico** — por eso el VERIFIER es un nodo obligatorio, no opcional.
+- **Verificado por:** VERIFIER (integridad de datos + registro + fuentes) + gate humano + regla "datos reales o **ilustrativos marcados**, nunca fabricados".
+- **Riesgo residual:** el VERIFIER es un LLM; puede dejar pasar una fabricación sutil. **Mitigación consciente:** el humano firma (es la última defensa, y es la que el método ya exige). No lo mitigamos con un segundo verifier — sería teatro de defensa-en-profundidad sobre el mismo modo de falla.
+
+#### Robustness
+
+- **Idempotencia:** el artefacto auditable son los **slots JSON**. Re-render de los mismos slots es una función pura → mismo PDF. Clave de idempotencia = hash(slots + versión de plantilla).
+- **Atomicidad:** el deck se materializa como artefacto sólo al final; un capítulo que falla **no deja un deck a medias publicado** (el borrador queda en estado, no en el asset store).
+- **Fallo parcial:** si un chapter-author falla, se reintenta **ese capítulo** (los demás ya están); el deck no se regenera entero.
+- **Determinismo:** garantizado por construcción — el único no-determinismo vive en 3 nodos, aguas arriba de los slots. Aguas abajo de los slots, todo es puro.
+
+#### Resilience
+
+- **Retry:** bounded por capítulo (N=2, backoff). Un capítulo que agota retries degrada a **slot vacío marcado**, no a deck silenciosamente incompleto.
+- **Observabilidad:** trace-id por subagente, costo por agente, latencia por nodo (el patrón de `nexa-turn-telemetry` es el precedente a copiar).
+- **Recovery:** replay desde slots (no desde el prompt) — barato, determinista y auditable.
+- **Degradación honesta:** un capítulo que falló se ve como **falta** en el borrador, nunca como una slide plausible autogenerada.
+
+#### Scalability
+
+- **Costo en tokens:** outline (1) + capítulos (~6-8) + verifier (1) ≈ **~10 llamadas por deck**, acotado y predecible. El render — que es lo voluminoso — cuesta **cero tokens**.
+- **Latencia:** el fan-out por capítulo es paralelo → wall-clock ≈ el capítulo más lento, no la suma.
+- **Contención:** el render Chromium es pesado (minutos) → vive en el **`tender-worker` dedicado** (Q3), NUNCA en el `ops-worker` (un render de 5 min bloquearía el publisher del outbox, que corre cada 2 min).
+- **A 10x:** escala linealmente en decks; el cuello es Chromium (CPU), no el LLM. Se absorbe con concurrencia del worker.
+
+### Hard rules (NUNCA / SIEMPRE)
+
+- **NUNCA** un LLM en el selector, el slot-fill, el render o el ensamblado. Rompe la reproducibilidad, que es la promesa de auditoría del artefacto.
+- **NUNCA** fan-out por slide (por defecto). La unidad de autoría es el **capítulo**.
+- **NUNCA** subagentes recursivos: **profundidad = 1**, dura.
+- **NUNCA** scratchpad mutable compartido entre subagentes. Contexto read-only (molde + registry + caso); los agentes devuelven **resultado**, no mutan estado común.
+- **NUNCA** auto-submit. El LLM no cruza el gate: `propose → confirm → execute`.
+- **NUNCA** fabricar datos de cliente: valores reales del bid o **ilustrativos marcados**.
+- **NUNCA** abrir un segundo tool loop paralelo al de Nexa. Si hace falta un runtime, se **extrae y generaliza el existente** (ver arriba).
+- **NUNCA** correr el render del deck en el `ops-worker`.
+- **SIEMPRE** el artefacto auditable son los **slots JSON**, no el PDF. El PDF es una derivación.
+- **SIEMPRE** eval baseline antes de tocar el prompt de cualquiera de los 3 agentes (regla `arch-architect`: no hay cambio de prompt sin eval).
+
+### Open questions (deliberadamente no decididas)
+
+- **Modelo por nodo:** ¿el chapter-author corre en el mismo modelo que el orquestador? (El orquestador razona sobre estructura; el author escribe copy institucional. Podrían querer modelos distintos.) Se decide con el eval baseline de F1, no antes.
+- **Eval baseline:** qué golden set usa (¿decks SKY ya producidos a mano como referencia?). Pendiente de F1.
+- **Imágenes:** el modo "runtime gen" (vs. assets pre-producidos por `assetId`) queda diseñado pero no autorizado; preferir siempre pre-producido (ver `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → §capa de assets).
 
 ## 6. Económica: fuente única (Greenhouse), múltiples formatos de salida
 
@@ -284,7 +395,7 @@ El esqueleto de 8 estados capturó el caso SKY entero sin forzar nada. La ejecuc
 - **Q1 · Schema de aterrizaje → `greenhouse_commercial`.** Verificado: `deals`, `contract_quotes`, `contracts`, `engagement_*`, `pricing_*` ya viven en `greenhouse_commercial` (no `greenhouse_crm`). El Tender aterriza junto a ellos (§1). No se crea schema nuevo.
 - **Q2 · Convergencia con RESEARCH-007 → dos módulos, un handoff.** RESEARCH-007 descubre/clasifica el discovery público; el Studio construye. Punto de promoción: opportunity pública → `Tender(origin=public_discovery)` con FK. No se fusionan (dimensiones ortogonales: descubrir vs. construir).
 - **Q3 · Runtime del orquestador → `tender-worker` dedicado (diferido a F1).** El fan-out de lectura + agentic loops + render Chromium es pesado y largo (minutos); NO debe compartir el `ops-worker` (cron de outbox cada 2 min — un render de deck de 5 min bloquearía el publisher). Worker propio = aislamiento. F0 no tiene IA → sin worker; el worker nace en F1.
-- **Q8 · Agent-runtime canónico → `src/lib/ai/agent-runtime` compartido.** Confirmado: sólo existe `src/lib/ai/anthropic.ts`, no hay tool-runner loop. Es **infraestructura, no de dominio** → primitive compartido (reusable por Nexa y otros), tool-use loop sobre el cliente canónico, tools = capabilities, con eval + observabilidad. **Precondición dura de F1/F2.**
+- **Q8 · Agent-runtime canónico → NO es precondición del composer (corregido v0.3, 2026-07-11).** La respuesta v0.2 ("no existe tool-runner; es precondición dura de F1/F2") era **incorrecta en ambas mitades**. (a) **Existe prior art:** Nexa corre un tool loop en producción (`src/lib/nexa/providers/*`, `nexa-tools.ts`, `nexa-turn-telemetry.ts`), single-hop. (b) **El composer no lo necesita:** sus 3 nodos de juicio producen *structured output* (no tool-chains) sobre contexto read-only, y eso ya lo cubre `generateStructured{Anthropic,Gemini,OpenAI}`. El `agent-runtime` baja a **evolución de plataforma**; cuando se haga, es **extracción/generalización del loop de Nexa** (strangler, Nexa consume con `maxTurns=1`), **NUNCA** un segundo loop paralelo, y merece **task propia** (blast radius sobre Nexa productivo). Detalle: **§5-ter**.
 
 ### Abiertas (decisión del operador — marca / alcance)
 
