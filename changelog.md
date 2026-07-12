@@ -2,6 +2,10 @@
 
 ## 2026-07-12
 
+- **CI: unit suite ya no está roja por el composer (fix preexistente).** El job de tests corría sin
+  browsers de Playwright y las suites del artifact-composer que lanzan Chromium fallaban con
+  "Executable doesn't exist" desde que el deck composer entró al repo. Ahora CI provisiona el
+  headless shell pinneado por versión de @playwright/test con cache (determinismo de layout).
 - **TASK-1392 y TASK-1393 COMPLETE — rollout ejecutado (2026-07-12).**
   Proposal Studio F0 operativo en staging: módulo `proposal_studio_v1` activo para Efeonce
   (entitlement per-ORG auditado), smoke end-to-end con evidencia (idempotencia, org isolation,

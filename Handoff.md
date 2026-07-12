@@ -1,3 +1,14 @@
+## Sesión 2026-07-12 (cont. 11) — fix CI preexistente: Chromium para las suites del composer (Claude)
+
+- El job de unit tests de `ci.yml` NO instalaba browsers de Playwright → las suites del composer que
+  lanzan Chromium fallaban con "Executable doesn't exist". **Rojo PREEXISTENTE** (run 29192166841,
+  commit `99b6d0153`, cuando aún vivían en `commercial/tenders/deck`); TASK-1393 lo amplió de 2 a 4
+  suites. Fix `515a1e513`: provisionar el **headless shell pinneado** por versión de `@playwright/test`
+  + `actions/cache` sobre `~/.cache/ms-playwright` (hit=segundos). NO se usa el system Chrome del
+  runner: cambia de versión y mediría otro layout en `assertSlideFitsCanvas`.
+- Los 2 fallos previos de `CLAUDE.md governance` eran el budget (35.026 > 35.000): el tender pointer
+  se compactó y actualizó en `86ffc50f0` — gate verde desde entonces.
+
 ## Sesión 2026-07-12 (cont. 10) — ROLLOUT COMPLETO: TASK-1392 y TASK-1393 pasan a COMPLETE (Claude)
 
 Autorización del operador: *"Termina todo lo que falte"* (+ confirmación explícita del grant del módulo).
