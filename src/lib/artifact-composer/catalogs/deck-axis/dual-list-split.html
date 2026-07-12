@@ -1,15 +1,16 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <link rel="stylesheet" href="deck-tokens.css">
+    <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:wght@600&display=swap');
+    
 
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { overflow:hidden; font-family:'Geist',sans-serif; }
+    body { overflow:hidden; font-family:var(--axis-deck-type-text); }
 
     :root { --safe:72px; --navy:var(--axis-deck-navy-860); --navy-2:var(--axis-ppt-blue-800); --navy-deep:var(--axis-deck-navy-920); --teal:var(--axis-deck-teal-500); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --surface:var(--axis-deck-recipe-light-surface); }
     .slide { display:flex; background:var(--surface); }
@@ -26,7 +27,7 @@
     .eyebrow { font-size:19px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
     .brand .eyebrow { color:var(--teal); }
     .light .eyebrow { color:var(--violet); }
-    h1, h2 { margin-top:22px; max-width:700px; font-family:'Poppins',sans-serif; font-size:51px; font-weight:600; letter-spacing:-.021em; line-height:1.06; }
+    h1, h2 { margin-top:22px; max-width:700px; font-family:var(--axis-deck-type-display); font-size:51px; font-weight:600; letter-spacing:-.021em; line-height:1.06; }
     .tips { position:relative; z-index:1; display:flex; flex-direction:column; gap:0; }
     .tip { min-height:145px; display:grid; grid-template-columns:56px 1fr; align-items:start; gap:22px; padding:24px 0; border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .38); }
     .light .tip { border-color:rgba(var(--axis-ppt-indigo-950-rgb), .24); }

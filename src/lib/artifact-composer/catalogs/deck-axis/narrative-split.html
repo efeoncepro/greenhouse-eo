@@ -1,12 +1,13 @@
 <!doctype html>
-<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   /* Cursivas REALES cargadas (Poppins ital 600) — nunca faux italic. Geist solo roman. */
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600&family=Geist:wght@400;600&display=swap');
+  
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Geist',sans-serif; overflow:hidden; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
   :root {
     --safe:72px;
@@ -37,7 +38,7 @@
   .rule { flex:none; width:3px; border-radius:2px;
     background:linear-gradient(180deg, var(--teal) 0%, var(--navy) 100%); }
   .title {
-    font-family:'Poppins',sans-serif; font-weight:600; font-size:56px; line-height:1.08;
+    font-family:var(--axis-deck-type-display); font-weight:600; font-size:56px; line-height:1.08;
     letter-spacing:-.015em; color:var(--ink);
   }
   .title em { font-style:italic; color:var(--violet); }   /* cursiva REAL Poppins */
@@ -49,7 +50,7 @@
   .p .ac { font-weight:600; color:var(--violet); }   /* acento sobre claro: color+peso, roman */
 
   .closing {
-    font-family:'Geist',sans-serif; font-weight:600; font-size:30px; line-height:1.3;
+    font-family:var(--axis-deck-type-text); font-weight:600; font-size:30px; line-height:1.3;
     color:var(--ink); max-width:770px;
   }
   .closing .ac { color:var(--violet); }
@@ -67,19 +68,19 @@
   }
   .brand-head { position:absolute; left:72px; top:72px; }
   .brand-eyebrow { font-weight:600; font-size:20px; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); }
-  .brand-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:40px; line-height:1.06; letter-spacing:-.01em; margin-top:8px; color:var(--axis-ppt-neutral-50); }
+  .brand-title { font-family:var(--axis-deck-type-display); font-weight:600; font-size:40px; line-height:1.06; letter-spacing:-.01em; margin-top:8px; color:var(--axis-ppt-neutral-50); }
 
   /* anillos concéntricos "surround" — centrados */
   .rings { position:absolute; left:50%; top:47%; transform:translate(-50%,-50%); width:580px; height:580px; }
   .rings svg { width:100%; height:100%; overflow:visible; }
   .rings .brandmark { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-    font-family:'Poppins',sans-serif; font-weight:600; font-size:20px; letter-spacing:.04em; color:var(--teal); }
+    font-family:var(--axis-deck-type-display); font-weight:600; font-size:20px; letter-spacing:.04em; color:var(--teal); }
 
   /* leyenda de las 3 capas — pie del panel */
   .legend { position:absolute; left:72px; bottom:72px; display:flex; flex-direction:column; gap:16px; }
   .leg { display:flex; align-items:baseline; gap:14px; }
   .leg .dot { width:14px; height:14px; border-radius:50%; flex:none; align-self:center; }
-  .leg .k { font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; letter-spacing:.02em; color:var(--axis-ppt-neutral-50); }
+  .leg .k { font-family:var(--axis-deck-type-display); font-weight:600; font-size:22px; letter-spacing:.02em; color:var(--axis-ppt-neutral-50); }
   .leg .v { font-size:20px; color:rgba(var(--axis-ppt-neutral-50-rgb), .72); }
 </style></head>
 <body>

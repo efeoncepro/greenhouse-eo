@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
+  
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Geist',sans-serif; overflow:hidden; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
   :root {
     --safe:72px;
@@ -25,7 +26,7 @@
   .rule { flex:none; width:3px; border-radius:2px; align-self:stretch;
     background:linear-gradient(180deg, var(--teal) 0%, color-mix(in srgb, var(--violet) 60%, transparent) 100%); }
   .eyebrow { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--ink); opacity:.55; margin-bottom:14px; }
-  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:50px; line-height:1.1; letter-spacing:-.015em; color:var(--ink); }
+  .title { font-family:var(--axis-deck-type-display); font-weight:600; font-size:50px; line-height:1.1; letter-spacing:-.015em; color:var(--ink); }
   .title em { font-style:italic; color:var(--violet); }
   .body { display:flex; flex-direction:column; gap:22px; max-width:660px; }
   .p { font-size:25px; line-height:1.45; color:var(--ink); }
@@ -54,11 +55,11 @@
 
   .card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:40px; }
   .chart-eyebrow { font-weight:600; font-size:19px; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); }
-  .chart-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:38px; line-height:1.08; letter-spacing:-.012em; color:var(--axis-ppt-neutral-50); margin-top:8px; }
+  .chart-title { font-family:var(--axis-deck-type-display); font-weight:600; font-size:38px; line-height:1.08; letter-spacing:-.012em; color:var(--axis-ppt-neutral-50); margin-top:8px; }
   .chart-sub { font-size:20px; color:rgba(var(--axis-ppt-neutral-50-rgb), .62); margin-top:6px; }
   /* hero-insight: el multiplicador */
   .hero { flex:none; text-align:right; }
-  .hero .num { font-family:'Geist',sans-serif; font-weight:600; font-size:80px; line-height:.86; color:var(--teal);
+  .hero .num { font-family:var(--axis-deck-type-text); font-weight:600; font-size:80px; line-height:.86; color:var(--teal);
     font-variant-numeric:tabular-nums; letter-spacing:-.02em; text-shadow:0 0 34px rgba(var(--axis-deck-teal-500-rgb), .4); }
   .hero .lab { font-size:18px; line-height:1.28; color:rgba(var(--axis-ppt-neutral-50-rgb), .66); margin-top:10px; max-width:210px; margin-left:auto; }
 
@@ -66,8 +67,8 @@
   .refline { position:absolute; left:88%; top:34px; bottom:40px; width:0; border-left:2px dashed rgba(var(--axis-ppt-neutral-50-rgb), .4); z-index:3; }
   .row { position:relative; }
   .rlabel { display:flex; align-items:baseline; gap:16px; margin-bottom:11px; }
-  .rlabel .name { font-family:'Poppins',sans-serif; font-weight:600; font-size:23px; color:rgba(var(--axis-ppt-neutral-50-rgb), .82); }
-  .rlabel .val { font-family:'Geist',sans-serif; font-weight:600; font-size:26px; color:rgba(var(--axis-ppt-neutral-50-rgb), .82); font-variant-numeric:tabular-nums; }
+  .rlabel .name { font-family:var(--axis-deck-type-display); font-weight:600; font-size:23px; color:rgba(var(--axis-ppt-neutral-50-rgb), .82); }
+  .rlabel .val { font-family:var(--axis-deck-type-text); font-weight:600; font-size:26px; color:rgba(var(--axis-ppt-neutral-50-rgb), .82); font-variant-numeric:tabular-nums; }
   .track { position:relative; height:46px; background:rgba(var(--axis-ppt-neutral-50-rgb), .05); border-radius:12px; }
   .fill { height:100%; border-radius:12px; }
   /* barras del campo con matiz azul de marca (no gris) */
@@ -80,7 +81,7 @@
     box-shadow:0 0 38px rgba(var(--axis-deck-teal-500-rgb), .5), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .32); }
   .gap { position:absolute; top:50%; height:0; border-top:2px dashed rgba(var(--axis-deck-teal-500-rgb), .72); transform:translateY(-50%); z-index:2; }
   .gap .glabel { position:absolute; left:50%; top:-45px; transform:translateX(-50%); white-space:nowrap;
-    font-family:'Poppins',sans-serif; font-weight:600; font-size:18px; color:var(--teal);
+    font-family:var(--axis-deck-type-display); font-weight:600; font-size:18px; color:var(--teal);
     background:rgba(var(--axis-deck-teal-500-rgb), .14); border:1px solid rgba(var(--axis-deck-teal-500-rgb), .42); border-radius:999px; padding:6px 15px; }
 
   .foot { position:relative; z-index:1; margin-top:36px; font-size:16px; color:rgba(var(--axis-ppt-neutral-50-rgb), .5); }

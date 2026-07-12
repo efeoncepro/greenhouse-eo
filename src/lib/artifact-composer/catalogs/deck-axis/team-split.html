@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
+  
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Geist',sans-serif; overflow:hidden; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
   :root { --safe:72px; --teal:var(--axis-deck-teal-500); --teal-deep:var(--axis-deck-teal-750); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --panel-bg:var(--axis-deck-recipe-light-surface); }
   .slide { display:flex; background:var(--panel-bg); }
@@ -22,17 +23,17 @@
       linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-860) 44%, var(--axis-deck-navy-920) 100%);
   }
   .eyebrow { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--teal); margin-bottom:16px; }
-  .headline { font-family:'Poppins',sans-serif; font-weight:600; font-size:50px; line-height:1.08; letter-spacing:-.018em; color:var(--axis-ppt-neutral-50); }
+  .headline { font-family:var(--axis-deck-type-display); font-weight:600; font-size:50px; line-height:1.08; letter-spacing:-.018em; color:var(--axis-ppt-neutral-50); }
   .headline em { font-style:italic; color:var(--teal); }
   .lead { font-size:24px; line-height:1.45; color:rgba(var(--axis-ppt-neutral-50-rgb), .82); max-width:600px; }
   .hl { margin-top:8px; background:rgba(var(--axis-ppt-neutral-50-rgb), .08); border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .16); border-radius:20px; padding:26px 30px; max-width:620px; }
-  .hl p { font-family:'Poppins',sans-serif; font-weight:600; font-size:24px; line-height:1.3; color:var(--axis-ppt-neutral-50); }
+  .hl p { font-family:var(--axis-deck-type-display); font-weight:600; font-size:24px; line-height:1.3; color:var(--axis-ppt-neutral-50); }
   .hl em { font-style:italic; color:var(--teal); }
 
   /* ===== RIGHT: roster de tarjetas (bloque cohesivo, centrado) ===== */
   .roster { flex:1; height:1080px; padding:var(--safe) 76px; display:flex; flex-direction:column; justify-content:center; }
   .rhead { display:flex; align-items:baseline; gap:16px; margin-bottom:28px; }
-  .rhead .k { font-family:'Geist',sans-serif; font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--violet); opacity:.8; }
+  .rhead .k { font-family:var(--axis-deck-type-text); font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--violet); opacity:.8; }
   .rhead .s { font-size:18px; color:var(--axis-deck-steel-450); }
   .members { display:flex; flex-direction:column; gap:20px; }
   .member { background:var(--axis-ppt-neutral-50); border:1px solid rgba(var(--axis-ppt-indigo-950-rgb), .06); border-radius:18px;
@@ -44,10 +45,10 @@
   .av svg { width:31px; height:31px; display:block; }
   /* jerarquía: ROL domina · descripción segunda · dedicación = dato tabular (columna derecha) */
   .m { flex:1; }
-  .role { font-family:'Poppins',sans-serif; font-weight:600; font-size:25px; line-height:1.05; letter-spacing:-.01em; color:var(--ink); }
+  .role { font-family:var(--axis-deck-type-display); font-weight:600; font-size:25px; line-height:1.05; letter-spacing:-.01em; color:var(--ink); }
   .rdesc { font-size:15px; line-height:1.3; color:var(--axis-deck-steel-550); margin-top:5px; }
   .ded { flex:none; text-align:right; min-width:96px; }
-  .ded .pct { font-family:'Geist',sans-serif; font-weight:600; font-size:28px; line-height:1; color:var(--violet); font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
+  .ded .pct { font-family:var(--axis-deck-type-text); font-weight:600; font-size:28px; line-height:1; color:var(--violet); font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
   .ded .lbl { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--axis-deck-steel-400); margin-top:5px; }
 </style></head>
 <body>

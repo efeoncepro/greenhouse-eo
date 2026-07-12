@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
+  
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Geist',sans-serif; overflow:hidden; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
   :root {
     --safe:72px; --teal:var(--axis-deck-teal-500); --teal-deep:var(--axis-deck-teal-650); --violet:var(--axis-deck-violet-550); --ink:var(--axis-ppt-indigo-950);
@@ -24,7 +25,7 @@
   /* header */
   .head { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }
   .eyebrow { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--teal); margin-bottom:12px; }
-  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:52px; line-height:1.04; letter-spacing:-.02em; color:var(--axis-ppt-neutral-50); }
+  .title { font-family:var(--axis-deck-type-display); font-weight:600; font-size:52px; line-height:1.04; letter-spacing:-.02em; color:var(--axis-ppt-neutral-50); }
   .head .meta { text-align:right; font-size:21px; color:rgba(var(--axis-ppt-neutral-50-rgb), .66); line-height:1.4; }
   .head .meta b { color:var(--axis-ppt-neutral-50); font-weight:600; font-variant-numeric:tabular-nums; }
 
@@ -43,7 +44,7 @@
   .axis { height:44px; }
   .axis .track { display:flex; }
   .axis .mo { flex:1; padding-left:16px; display:flex; align-items:center;
-    font-family:'Geist',sans-serif; font-weight:600; font-size:16px; letter-spacing:.03em; color:rgba(var(--axis-ppt-neutral-50-rgb), .5);
+    font-family:var(--axis-deck-type-text); font-weight:600; font-size:16px; letter-spacing:.03em; color:rgba(var(--axis-ppt-neutral-50-rgb), .5);
     text-transform:uppercase; font-variant-numeric:tabular-nums; border-left:1.5px solid rgba(var(--axis-ppt-neutral-50-rgb), .10); }
   .axis .mo:first-child { border-left:none; }
 
@@ -59,15 +60,15 @@
   .mstone.at-start { transform:translateX(0); align-items:flex-start; }
   .mstone .dia { width:16px; height:16px; background:var(--teal); transform:rotate(45deg); border-radius:3px;
     box-shadow:0 0 16px rgba(var(--axis-deck-teal-500-rgb), .7); }
-  .mstone .ml { margin-top:11px; font-family:'Poppins',sans-serif; font-weight:600; font-size:18px; color:var(--axis-ppt-neutral-50); white-space:nowrap; }
+  .mstone .ml { margin-top:11px; font-family:var(--axis-deck-type-display); font-weight:600; font-size:18px; color:var(--axis-ppt-neutral-50); white-space:nowrap; }
   .mstone .md { font-size:12px; color:var(--teal); letter-spacing:.06em; text-transform:uppercase; margin-top:3px; }
 
   /* filas de fase */
   .phases { flex:1; display:flex; flex-direction:column; justify-content:space-around; }
   .phase { }
   .phase .lbl { display:flex; gap:15px; align-items:baseline; padding-right:28px; }
-  .phase .n { font-family:'Geist',sans-serif; font-weight:600; font-size:16px; color:var(--teal); font-variant-numeric:tabular-nums; flex:none; opacity:.9; }
-  .phase .pt { font-family:'Poppins',sans-serif; font-weight:600; font-size:27px; line-height:1.05; letter-spacing:-.012em; color:var(--axis-ppt-neutral-50); }
+  .phase .n { font-family:var(--axis-deck-type-text); font-weight:600; font-size:16px; color:var(--teal); font-variant-numeric:tabular-nums; flex:none; opacity:.9; }
+  .phase .pt { font-family:var(--axis-deck-type-display); font-weight:600; font-size:27px; line-height:1.05; letter-spacing:-.012em; color:var(--axis-ppt-neutral-50); }
   .phase .pd { font-size:15px; line-height:1.3; color:rgba(var(--axis-ppt-neutral-50-rgb), .55); margin-top:6px; }
   .bar { position:absolute; top:50%; transform:translateY(-50%); height:44px; border-radius:12px; z-index:2;
     background:linear-gradient(180deg, var(--axis-deck-teal-450) 0%, var(--teal-deep) 100%);

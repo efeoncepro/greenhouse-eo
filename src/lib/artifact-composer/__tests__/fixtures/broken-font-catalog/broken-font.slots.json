@@ -1,0 +1,7 @@
+{
+  "template": "BrokenFontCard",
+  "viewport": { "width": 400, "height": 300 },
+  "slots": {
+    "title": { "selector": "[data-slot='title']", "type": "string", "required": true, "constraints": { "maxCharacters": 40, "overflow": "reject" } }
+  }
+}

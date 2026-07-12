@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <link rel="stylesheet" href="deck-tokens.css">
+    <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Poppins:ital,wght@0,600;0,800;1,800&display=swap');
+    
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { overflow:hidden; font-family:'Geist',sans-serif; }
+    body { overflow:hidden; font-family:var(--axis-deck-type-text); }
     :root { --navy:var(--axis-deck-navy-860); --navy-2:var(--axis-ppt-blue-800); --navy-deep:var(--axis-deck-navy-920); --teal:var(--axis-deck-teal-500); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --surface:var(--axis-deck-recipe-light-surface); }
     .slide { background: var(--axis-deck-recipe-rich-content); }
     /* `fr`, NO `%`: los porcentajes de grid NO descuentan el gap (30%+35%+35% ya es el 100% del
@@ -17,11 +18,11 @@
        que queda DESPUÉS del gap; `minmax(0,…)` evita que el min-content vuelva a inflar el track. */
     .hero { position:relative; z-index:1; height:498px; padding:66px 72px 68px; display:grid; grid-template-columns:minmax(0,30fr) minmax(0,35fr) minmax(0,35fr); gap:46px; color:var(--axis-ppt-neutral-50); }
     .section-label { position:absolute; right:72px; top:62px; border:2px solid rgba(var(--axis-ppt-neutral-50-rgb), .82); border-radius:99px; padding:10px 22px; color:var(--axis-ppt-neutral-50); font-size:18px; font-weight:600; letter-spacing:.025em; }
-    .title { align-self:end; max-width:480px; font-family:'Poppins',sans-serif; font-size:59px; font-weight:800; letter-spacing:-.045em; line-height:1.05; }
+    .title { align-self:end; max-width:480px; font-family:var(--axis-deck-type-display); font-size:59px; font-weight:800; letter-spacing:-.045em; line-height:1.05; }
     .title em { font-style:italic; color:var(--teal); }
     .context { align-self:end; max-width:610px; padding-bottom:8px; display:flex; flex-direction:column; gap:28px; color:rgba(var(--axis-ppt-neutral-50-rgb), .86); font-size:24px; line-height:1.27; }
     .context strong { font-weight:600; }
-    .thesis { align-self:end; max-width:550px; margin-left:auto; padding:4px 0 6px 28px; border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .74); font-family:'Poppins',sans-serif; font-size:30px; font-weight:600; letter-spacing:-.018em; line-height:1.13; }
+    .thesis { align-self:end; max-width:550px; margin-left:auto; padding:4px 0 6px 28px; border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .74); font-family:var(--axis-deck-type-display); font-size:30px; font-weight:600; letter-spacing:-.018em; line-height:1.13; }
     .thesis em { font-style:italic; color:var(--teal); }
     .pillars { position:absolute; z-index:2; bottom:0; left:0; width:100%; height:583px; display:grid; grid-template-columns:repeat(4,1fr); overflow:hidden; border-radius:52px 52px 0 0; background:rgba(var(--axis-deck-surface-50-rgb), .96); }
     .pillar { min-width:0; padding:72px 62px 58px; border-right:1px solid rgba(var(--axis-ppt-indigo-950-rgb), .1); display:flex; flex-direction:column; }
@@ -37,7 +38,7 @@
     .method { --icon-filter:invert(14%) sepia(99%) saturate(4030%) hue-rotate(260deg) brightness(72%) contrast(119%); }
     .human { --icon-filter:invert(70%) sepia(76%) saturate(1225%) hue-rotate(44deg) brightness(87%) contrast(102%); }
     .pillar-head { min-height:112px; display:flex; align-items:center; gap:28px; }
-    .pillar-title { color:var(--tone-text); font-family:'Poppins',sans-serif; font-size:36px; font-weight:800; letter-spacing:-.035em; line-height:1.03; }
+    .pillar-title { color:var(--tone-text); font-family:var(--axis-deck-type-display); font-size:36px; font-weight:800; letter-spacing:-.035em; line-height:1.03; }
     .pillar-body { margin-top:52px; color:var(--ink); font-size:26px; font-weight:600; line-height:1.18; }
     .pillar-detail { margin-top:30px; color:var(--ink); font-size:24px; line-height:1.28; }
   </style>

@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <link rel="stylesheet" href="deck-tokens.css">
+    <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@500;600&display=swap');
+    
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { overflow:hidden; font-family:'Geist',sans-serif; }
+    body { overflow:hidden; font-family:var(--axis-deck-type-text); }
     :root { --lum:var(--axis-deck-recipe-backcover-100); --lum-muted:var(--axis-deck-recipe-backcover-300); --deep:var(--axis-deck-navy-880); }
     .slide { isolation:isolate; background: var(--axis-deck-recipe-back-cover); }
     .slide::after { content:''; position:absolute; inset:0; z-index:-1; opacity:.16; background-image:radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .72) .65px, transparent .85px); background-size:4px 4px; }

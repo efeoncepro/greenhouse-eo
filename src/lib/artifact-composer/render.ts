@@ -710,6 +710,12 @@ export const fillSlide = async (
     ;(globalThis as unknown as { __name: <T>(fn: T) => T }).__name = fn => fn
   })
 
+  // RENDER HERMÉTICO (TASK-1393 Slice 4): el catálogo es autocontenido (assets + fuentes locales
+  // del brand pack), así que TODA salida a la red se bloquea. Una plantilla que pida algo por
+  // http(s) —una fuente de Google, un asset remoto— no degrada en silencio: su recurso falla y el
+  // assert de fuentes de abajo (o el frame) lo delata. Mismos slots → mismo artefacto, sin red.
+  await page.route(/^https?:\/\//, route => route.abort())
+
   // `file://` + assets relativos: el HTML resuelve sus propios SVG/PNG desde el dir de la plantilla.
   await page.goto(`file://${path.resolve(templateHtmlPath)}`, { waitUntil: 'load' })
   await page.evaluate(() => document.fonts.ready)
@@ -727,6 +733,22 @@ export const fillSlide = async (
   // Las fuentes pueden re-layoutear tras escribir el copy: esperar de nuevo evita capturar un frame
   // con el fallback de sistema (un deck con la tipografía equivocada es un deck fuera de marca).
   await page.evaluate(() => document.fonts.ready)
+
+  // FAIL-CLOSED tipográfico: una fuente declarada que no carga (archivo ausente, red bloqueada)
+  // queda en status 'error' — y un PDF que degradó a fallback tipográfico PARECE terminado. No se
+  // emite: se aborta con el detalle. (Las faces 'unloaded' no usadas por la lámina son legítimas.)
+  const brokenFonts = await page.evaluate(() =>
+    [...document.fonts]
+      .filter(face => face.status === 'error')
+      .map(face => `${face.family} ${face.weight} ${face.style}`)
+  )
+
+  if (brokenFonts.length > 0) {
+    throw new SlotFillError(
+      slide.slideId,
+      brokenFonts.map(font => `fuente declarada que NO cargó (el render no degrada a fallback): ${font}`)
+    )
+  }
 }
 
 /**

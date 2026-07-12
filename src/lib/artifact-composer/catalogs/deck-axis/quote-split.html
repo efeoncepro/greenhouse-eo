@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600;1,700&family=Geist:wght@400;600&display=swap');
+  
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Geist',sans-serif; overflow:hidden; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
   :root {
     --safe:72px;
@@ -21,14 +22,14 @@
     padding:var(--safe); display:flex; flex-direction:column; justify-content:flex-end;
   }
   /* comilla grande = motivo único del quote (una sola en toda la slide) */
-  .aside .wmq { position:absolute; left:60px; top:150px; font-family:'Poppins',sans-serif; font-weight:700;
+  .aside .wmq { position:absolute; left:60px; top:150px; font-family:var(--axis-deck-type-display); font-weight:700;
     font-size:340px; line-height:.7; color:color-mix(in srgb, var(--teal-bright) 46%, transparent); user-select:none; }
   .aside .inner { position:relative; padding-left:38px; }
   .aside .inner::before { content:''; position:absolute; left:0; top:4px; bottom:4px; width:3px; border-radius:2px;
     background:linear-gradient(180deg, var(--teal-bright) 0%, color-mix(in srgb, var(--axis-violet) 55%, transparent) 100%); }
-  .aside .eyebrow { font-family:'Geist',sans-serif; font-weight:600; font-size:20px; letter-spacing:.10em;
+  .aside .eyebrow { font-family:var(--axis-deck-type-text); font-weight:600; font-size:20px; letter-spacing:.10em;
     text-transform:uppercase; color:var(--ink); opacity:.55; margin-bottom:12px; }
-  .aside .who { font-family:'Poppins',sans-serif; font-weight:600; font-size:32px; line-height:1.12; color:var(--ink); }
+  .aside .who { font-family:var(--axis-deck-type-display); font-weight:600; font-size:32px; line-height:1.12; color:var(--ink); }
   .aside .sub { font-size:22px; line-height:1.4; color:rgba(var(--axis-ppt-indigo-950-rgb), .6); margin-top:8px; }
 
   /* ===== RIGHT: panel de marca — statement ===== */
@@ -44,7 +45,7 @@
       linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
     color:var(--axis-ppt-neutral-50);
   }
-  .statement { font-family:'Poppins',sans-serif; font-weight:600; font-size:52px; line-height:1.24;
+  .statement { font-family:var(--axis-deck-type-display); font-weight:600; font-size:52px; line-height:1.24;
     letter-spacing:-.015em; color:var(--axis-ppt-neutral-50); max-width:920px; }
   .statement em { font-style:italic; color:var(--teal-bright); }
   .statement .wm { height:40px; vertical-align:-1px; margin:0 8px 0 5px; }

@@ -1,0 +1,9 @@
+{
+  "version": "0.1",
+  "canvas": { "width": 400, "height": 300 },
+  "contentTypeTaxonomy": ["note"],
+  "templates": [
+    { "name": "BrokenFontCard", "kind": "full", "contentTypes": ["note"], "prototype": "broken-font.html", "slotsRef": "broken-font.slots.json", "status": "built" }
+  ],
+  "selector": { "map": { "note": "BrokenFontCard" } }
+}

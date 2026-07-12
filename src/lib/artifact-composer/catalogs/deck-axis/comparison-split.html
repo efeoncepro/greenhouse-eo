@@ -1,15 +1,16 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <link rel="stylesheet" href="deck-tokens.css">
+    <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Geist:wght@400;600&display=swap');
+    
 
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Geist', sans-serif; overflow:hidden; }
+    body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
     :root {
       --safe:72px;
@@ -27,7 +28,7 @@
     /* El molde compara dos posturas: la propuesta solo completa pares de filas. */
     .column { width:50%; height:1080px; padding:var(--safe); }
     .contrast { display:flex; flex-direction:column; color:var(--ink); padding-right:54px; }
-    .contrast h1 { margin:58px auto 0; max-width:720px; font-family:'Poppins', sans-serif; font-size:58px; font-weight:600; line-height:1.06; letter-spacing:-.018em; text-align:center; }
+    .contrast h1 { margin:58px auto 0; max-width:720px; font-family:var(--axis-deck-type-display); font-size:58px; font-weight:600; line-height:1.06; letter-spacing:-.018em; text-align:center; }
     .proposal {
       position:relative; overflow:hidden; border-top-left-radius:64px; border-bottom-left-radius:64px;
       color:var(--axis-ppt-neutral-50); padding-left:76px;
@@ -40,7 +41,7 @@
     .proposal::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.18; background-image:radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .75) .6px, transparent .7px); background-size:5px 5px; }
     .proposal-head { position:relative; z-index:1; margin-top:58px; }
     .proposal-logo { display:block; width:354px; height:92px; object-fit:contain; object-position:left center; }
-    .proposal-title { max-width:630px; margin-top:34px; font-family:'Poppins', sans-serif; font-size:44px; font-weight:600; line-height:1.08; letter-spacing:-.015em; }
+    .proposal-title { max-width:630px; margin-top:34px; font-family:var(--axis-deck-type-display); font-size:44px; font-weight:600; line-height:1.08; letter-spacing:-.015em; }
 
     .rows { flex:1; display:flex; flex-direction:column; justify-content:center; margin-top:46px; }
     .row { min-height:128px; display:grid; align-items:center; border-bottom:1.5px solid currentColor; }
@@ -52,7 +53,7 @@
     .proposal .row-copy { max-width:660px; }
     .row-lead { display:block; margin-bottom:6px; font-size:28px; font-weight:600; line-height:1.12; }
     .row-body { display:block; }
-    .contrast-icon, .proposal-icon { width:54px; height:54px; border-radius:50%; display:grid; place-items:center; font-family:'Poppins',sans-serif; font-weight:600; font-size:34px; line-height:1; }
+    .contrast-icon, .proposal-icon { width:54px; height:54px; border-radius:50%; display:grid; place-items:center; font-family:var(--axis-deck-type-display); font-weight:600; font-size:34px; line-height:1; }
     .contrast-icon { border:2px solid rgba(var(--axis-ppt-indigo-950-rgb), .62); color:var(--ink); font-size:30px; }
     .proposal-icon { justify-self:end; background:var(--axis-ppt-neutral-50); color:var(--ink); font-size:35px; }
   </style>

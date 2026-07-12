@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Geist:wght@400;500&display=swap');
+  
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Geist',sans-serif; overflow:hidden; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
   :root {
     --safe:72px;
@@ -31,7 +32,7 @@
   .relationship-mark { width:88px; height:1px; margin:26px 0 20px; background:linear-gradient(90deg, transparent, rgba(var(--axis-deck-recipe-cover-halo-teal-rgb), .76), transparent); box-shadow:0 0 18px rgba(var(--axis-deck-teal-500-rgb), .22); }
   .client-stage { min-height:170px; display:flex; align-items:center; justify-content:center; }
   .logo-client  { width:auto; height:170px; max-width:280px; object-fit:contain; filter:brightness(0) invert(1); }
-  .proposal-kind { max-width:790px; margin-top:26px; font-family:'Poppins',sans-serif; font-weight:600; font-size:70px; color:var(--axis-ppt-neutral-50); line-height:1.06; letter-spacing:-.025em; text-wrap:balance; }
+  .proposal-kind { max-width:790px; margin-top:26px; font-family:var(--axis-deck-type-display); font-weight:600; font-size:70px; color:var(--axis-ppt-neutral-50); line-height:1.06; letter-spacing:-.025em; text-wrap:balance; }
 
 </style></head>
 <body>

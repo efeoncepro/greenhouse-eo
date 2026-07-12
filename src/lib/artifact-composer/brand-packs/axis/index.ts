@@ -29,6 +29,9 @@ const SNAPSHOT_PATH = path.join(PACK_DIR, 'axis-ppt-snapshot.json')
 const ROLES_PATH = path.join(PACK_DIR, 'roles.json')
 const LEDGER_PATH = path.resolve(PACK_DIR, '../../catalogs/deck-axis/brand/color-ledger.json')
 
+/** Home del pack (fonts.json + fonts/ + snapshot + roles). */
+export const axisPackDir = PACK_DIR
+
 interface SnapshotFile {
   source: { fileKey: string; nodeId: string }
   primitives: Record<string, string>

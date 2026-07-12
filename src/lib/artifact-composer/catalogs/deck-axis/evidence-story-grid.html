@@ -1,15 +1,16 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <link rel="stylesheet" href="deck-tokens.css">
+    <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Poppins:ital,wght@0,600;0,800;1,800&display=swap');
+    
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { overflow: hidden; font-family: 'Geist', sans-serif; }
+    body { overflow: hidden; font-family: var(--axis-deck-type-text); }
 
     :root { --ink: var(--axis-ppt-indigo-950); --violet: var(--axis-ppt-indigo-600); --teal: var(--axis-deck-teal-500); }
 
@@ -44,7 +45,7 @@
       left: 72px;
       width: 690px;
       color: var(--ink);
-      font-family: 'Poppins', sans-serif;
+      font-family: var(--axis-deck-type-display);
       font-size: 68px;
       font-weight: 800;
       letter-spacing: -.055em;
@@ -140,7 +141,7 @@
 
     .evidence-head { display: flex; align-items: center; gap: 30px; }
     .evidence-icon { width: 88px; height: 88px; filter: invert(100%) brightness(200%); }
-    .evidence-value { font-family: 'Poppins', sans-serif; font-size: 126px; font-weight: 800; letter-spacing: -.08em; line-height: .8; }
+    .evidence-value { font-family: var(--axis-deck-type-display); font-size: 126px; font-weight: 800; letter-spacing: -.08em; line-height: .8; }
     .evidence-label { max-width: 630px; margin-top: 20px; color: rgba(var(--axis-ppt-neutral-50-rgb), .88); font-size: 28px; font-weight: 700; line-height: 1.15; }
     .evidence-detail { max-width: 640px; margin-top: 16px; color: rgba(var(--axis-ppt-neutral-50-rgb), .68); font-size: 23px; line-height: 1.24; }
     .evidence-source { margin-top: 12px; color: rgba(var(--axis-ppt-neutral-50-rgb), .52); font-size: 18px; font-style: italic; }

@@ -108,6 +108,17 @@ export interface ArtifactCatalog {
   layoutHooks?: Record<TemplateName, CatalogLayoutHook>
   /** Invariantes semánticas del catálogo, versionadas y probadas con fixtures. */
   semanticValidators?: CatalogSemanticValidator[]
+  /**
+   * Materialización del brand pack dentro del catálogo (CSS compilado + font pack). El manifest
+   * resuelto sella su hash y checksums: un replay puede probar QUÉ marca gobernó el render.
+   */
+  brand?: {
+    packName: string
+    /** Archivos compilados del pack dentro de `templatesDir` (se hashean juntos, en orden). */
+    compiledFiles: string[]
+    /** Manifest de fuentes del pack (JSON con `fonts[]: {family, weight, style, sha256}`). */
+    fontsManifestPath?: string
+  }
 }
 
 export class MissingSlotContractError extends Error {
@@ -174,6 +185,38 @@ export const runSemanticValidators = (
 
 const sha256File = async (filePath: string): Promise<string> =>
   crypto.createHash('sha256').update(await fs.readFile(filePath)).digest('hex')
+
+/** Sella la marca que gobierna el render: hash conjunto del pack compilado + checksums de fuentes. */
+export const resolveBrandSeal = async (
+  catalog: ArtifactCatalog
+): Promise<{
+  brandPack: { name: string; hash: string } | null
+  fonts: Array<{ family: string; variant: string; checksum: string }> | null
+}> => {
+  if (!catalog.brand) return { brandPack: null, fonts: null }
+
+  const hash = crypto.createHash('sha256')
+
+  for (const file of catalog.brand.compiledFiles) {
+    hash.update(await fs.readFile(path.join(catalog.templatesDir, file)))
+  }
+
+  let fonts: Array<{ family: string; variant: string; checksum: string }> | null = null
+
+  if (catalog.brand.fontsManifestPath) {
+    const manifest = JSON.parse(await fs.readFile(catalog.brand.fontsManifestPath, 'utf8')) as {
+      fonts: Array<{ family: string; weight: number; style: string; sha256: string }>
+    }
+
+    fonts = manifest.fonts.map(font => ({
+      family: font.family,
+      variant: `${font.weight}${font.style === 'italic' ? ' italic' : ''}`,
+      checksum: font.sha256
+    }))
+  }
+
+  return { brandPack: { name: catalog.brand.packName, hash: hash.digest('hex') }, fonts }
+}
 
 /**
  * Resuelve un plan AUTORABLE contra el catálogo → `ResolvedCompositionManifest`.
@@ -247,6 +290,8 @@ export const resolvePlan = async (
     })
   }
 
+  const seal = await resolveBrandSeal(catalog)
+
   return {
     manifestVersion: 1,
     artifactId: input.artifactId,
@@ -258,8 +303,8 @@ export const resolvePlan = async (
       ownerOrgId: catalog.ownerOrgId
     },
     slides: resolvedSlides,
-    brandPack: null,
-    fonts: null,
+    brandPack: seal.brandPack,
+    fonts: seal.fonts,
     validators: validatorRuns
   }
 }

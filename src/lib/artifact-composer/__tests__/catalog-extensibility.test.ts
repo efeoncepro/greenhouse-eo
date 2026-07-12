@@ -82,10 +82,29 @@ describe('extensibilidad por catálogo', () => {
     expect(manifest.slides[0]!.contractHash).toMatch(/^[0-9a-f]{64}$/)
     expect(manifest.slides[0]!.templateHash).toMatch(/^[0-9a-f]{64}$/)
 
-    // brandPack/fonts se materializan en Slices 3/4 — hasta entonces son null EXPLÍCITO.
+    // El toy catalog no declara marca: null EXPLÍCITO (no ausencia accidental).
     expect(manifest.brandPack).toBeNull()
     expect(manifest.fonts).toBeNull()
   })
+
+  it('una fuente declarada que NO carga aborta la composición — el render no degrada a fallback (Slice 4)', async () => {
+    const brokenCatalog: ArtifactCatalog = {
+      name: 'broken-font-probe',
+      ownerOrgId: 'global',
+      templatesDir: path.resolve(__dirname, 'fixtures/broken-font-catalog'),
+      outputTarget: 'png-set',
+      resolvers: {}
+    }
+
+    const plan: DeckPlan = {
+      tenderId: 'BROKEN-FONT-001',
+      slides: [{ slideId: 'nota', contentType: 'note', template: 'BrokenFontCard', slots: { title: 'Hola' } }]
+    }
+
+    await expect(composeArtifact(brokenCatalog, plan, '.captures/composer-broken-font')).rejects.toThrow(
+      /fuente declarada que NO cargó/
+    )
+  }, 60_000)
 })
 
 describe('validadores semánticos del catálogo deck-axis (versionados, fail-closed)', () => {
@@ -179,5 +198,12 @@ describe('validadores semánticos del catálogo deck-axis (versionados, fail-clo
     manifest.slides.forEach((slide, index) => {
       expect(slide.template).toBe(skyPlan.slides[index]!.template)
     })
+
+    // Slice 4: el manifest SELLA la marca que gobierna el render — pack compilado + font pack con
+    // checksums. Un replay puede probar QUÉ marca produjo el artefacto sin consultar Figma ni red.
+    expect(manifest.brandPack).toMatchObject({ name: 'axis' })
+    expect(manifest.brandPack!.hash).toMatch(/^[0-9a-f]{64}$/)
+    expect(manifest.fonts).toHaveLength(13)
+    expect(manifest.fonts!.every(font => /^[0-9a-f]{64}$/.test(font.checksum))).toBe(true)
   })
 })

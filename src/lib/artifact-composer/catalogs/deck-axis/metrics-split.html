@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600&family=Geist:wght@400;600&display=swap');
+  
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Geist',sans-serif; overflow:hidden; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
   :root {
     --safe:72px;
@@ -29,8 +30,8 @@
     color:var(--axis-ppt-neutral-50);
   }
   /* título editorial: título dominante + subtítulo */
-  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:58px; line-height:1.05; letter-spacing:-.02em; color:var(--axis-ppt-neutral-50); }
-  .subtitle { font-family:'Poppins',sans-serif; font-weight:600; font-size:31px; line-height:1.1; letter-spacing:-.01em;
+  .title { font-family:var(--axis-deck-type-display); font-weight:600; font-size:58px; line-height:1.05; letter-spacing:-.02em; color:var(--axis-ppt-neutral-50); }
+  .subtitle { font-family:var(--axis-deck-type-display); font-weight:600; font-size:31px; line-height:1.1; letter-spacing:-.01em;
     color:rgba(var(--axis-ppt-neutral-50-rgb), .68); margin-top:14px; }
   .subtitle .cli { color:var(--teal-bright); }
 
@@ -45,10 +46,10 @@
     display:grid; place-items:center; color:var(--teal-bright); }
   .kpi .ic svg { width:37px; height:37px; display:block; }
   .kpi .num { flex:none; width:220px;
-    font-family:'Geist',sans-serif; font-weight:600; font-size:50px; line-height:1; color:var(--axis-ppt-neutral-50);
+    font-family:var(--axis-deck-type-text); font-weight:600; font-size:50px; line-height:1; color:var(--axis-ppt-neutral-50);
     font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
   .kpi .meta { display:flex; flex-direction:column; gap:9px; }
-  .kpi .label { font-family:'Poppins',sans-serif; font-weight:600; font-size:26px; line-height:1.05; color:var(--axis-ppt-neutral-50); }
+  .kpi .label { font-family:var(--axis-deck-type-display); font-weight:600; font-size:26px; line-height:1.05; color:var(--axis-ppt-neutral-50); }
   .kpi .qual { font-size:18px; line-height:1.35; color:rgba(var(--axis-ppt-neutral-50-rgb), .6); max-width:400px; }
 
   /* ===== RIGHT: la lectura (anclada + profundidad sutil) ===== */
@@ -64,9 +65,9 @@
   .read .inner { position:relative; padding-left:38px; display:flex; flex-direction:column; gap:28px; max-width:660px; }
   .read .inner::before { content:''; position:absolute; left:0; top:4px; bottom:4px; width:3px; border-radius:2px;
     background:linear-gradient(180deg, var(--teal-bright) 0%, color-mix(in srgb, var(--axis-violet) 55%, transparent) 100%); }
-  .read .eyebrow { font-family:'Geist',sans-serif; font-weight:600; font-size:20px; letter-spacing:.10em;
+  .read .eyebrow { font-family:var(--axis-deck-type-text); font-weight:600; font-size:20px; letter-spacing:.10em;
     text-transform:uppercase; color:var(--ink); opacity:.55; }
-  .read .lead { font-family:'Poppins',sans-serif; font-weight:600; font-size:52px; line-height:1.08;
+  .read .lead { font-family:var(--axis-deck-type-display); font-weight:600; font-size:52px; line-height:1.08;
     letter-spacing:-.015em; color:var(--ink); }
   .read .lead em { font-style:italic; color:var(--axis-violet); }
   .read .p { font-size:27px; line-height:1.45; color:var(--ink); }

@@ -19,6 +19,7 @@ import path from 'node:path'
 import {
   loadRegistry,
   loadTemplateContract,
+  resolvePlan,
   runSemanticValidators,
   CatalogSemanticError,
   UnimplementedOutputTargetError,
@@ -162,6 +163,25 @@ export const composeArtifact = async (
 
   // El plan se persiste JUNTO al render: es lo que permite el replay determinista.
   await fs.writeFile(path.join(outDir, 'deck-plan.json'), JSON.stringify(deckPlan, null, 2), 'utf8')
+
+  // El MANIFEST resuelto se emite junto al artefacto (TASK-1393 Slice 4): input canónico +
+  // catálogo/contratos/templates con hashes + brand pack + fuentes + validadores. Permite explicar
+  // y REPETIR el mismo artefacto sin consultar el reloj, Figma, red ni una base de datos — y es lo
+  // ÚNICO que un renderer productivo (TASK-1391) debe aceptar.
+  const manifest = await resolvePlan(catalog, {
+    artifactId: deckPlan.tenderId,
+    slides: deckPlan.slides.map(slide => ({
+      slideId: slide.slideId,
+      contentType: slide.contentType,
+      slots: slide.slots
+    }))
+  })
+
+  await fs.writeFile(
+    path.join(outDir, `${deckPlan.tenderId}.manifest.json`),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    'utf8'
+  )
 
   const emitPdf = catalog.outputTarget === 'pdf-merged'
 

@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <link rel="stylesheet" href="deck-tokens.css">
+    <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Poppins:ital,wght@0,600;0,800;1,800&display=swap');
+    
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { overflow:hidden; font-family:'Geist',sans-serif; }
+    body { overflow:hidden; font-family:var(--axis-deck-type-text); }
     :root { --ink:var(--axis-ppt-indigo-950); --muted:var(--axis-deck-steel-600); --teal:var(--axis-deck-teal-500); --blue:var(--axis-deck-blue-500); --violet:var(--axis-ppt-indigo-600); }
     .slide { background:
       radial-gradient(64% 52% at 96% 100%, rgba(var(--axis-deck-teal-500-rgb), .22) 0%, transparent 46%),
@@ -16,7 +17,7 @@
     .wave-frame { position:absolute; inset:56px; border-radius:22px; background:rgba(var(--axis-deck-surface-60-rgb), .82); backdrop-filter:blur(var(--deck-blur-xl)) saturate(1.08); }
     .content { position:relative; z-index:1; width:100%; height:100%; padding:154px 228px 146px; display:flex; flex-direction:column; justify-content:center; }
     .eyebrow { color:var(--blue); font-size:19px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
-    .statement { margin-top:24px; max-width:1280px; color:var(--ink); font-family:'Poppins',sans-serif; font-size:76px; font-weight:600; letter-spacing:-.045em; line-height:1.05; }
+    .statement { margin-top:24px; max-width:1280px; color:var(--ink); font-family:var(--axis-deck-type-display); font-size:76px; font-weight:600; letter-spacing:-.045em; line-height:1.05; }
     .statement-highlight { display:block; margin-top:8px; width:max-content; max-width:100%; color:var(--violet); font-size:88px; font-style:italic; font-weight:800; letter-spacing:-.06em; line-height:1.02; }
     .statement-tail { display:block; margin-top:8px; }
     .statement-tail:empty { display:none; }

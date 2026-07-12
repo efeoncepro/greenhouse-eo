@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
+  
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Geist',sans-serif; overflow:hidden; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
   :root { --safe:72px; --teal:var(--axis-deck-teal-500); --teal-deep:var(--axis-deck-teal-560); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --panel-bg:var(--axis-deck-recipe-light-surface); }
   .slide { display:flex; background:var(--panel-bg); }
@@ -17,10 +18,10 @@
   .head-row { display:flex; gap:28px; }
   .rule { flex:none; width:3px; border-radius:2px; align-self:stretch;
     background:linear-gradient(180deg, var(--teal) 0%, color-mix(in srgb, var(--violet) 60%, transparent) 100%); }
-  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:44px; line-height:1.08; letter-spacing:-.018em; color:var(--ink); margin-top:14px; }
+  .title { font-family:var(--axis-deck-type-display); font-weight:600; font-size:44px; line-height:1.08; letter-spacing:-.018em; color:var(--ink); margin-top:14px; }
   .title em { font-style:italic; color:var(--violet); }
   .stages { display:flex; flex-direction:column; gap:26px; max-width:710px; }
-  .stage .ov { font-family:'Geist',sans-serif; font-weight:600; font-size:16px; letter-spacing:.08em; text-transform:uppercase; color:var(--violet); margin-bottom:9px; }
+  .stage .ov { font-family:var(--axis-deck-type-text); font-weight:600; font-size:16px; letter-spacing:.08em; text-transform:uppercase; color:var(--violet); margin-bottom:9px; }
   .stage p { font-size:23px; line-height:1.4; color:var(--ink); }
   .stage p b { font-weight:600; color:var(--violet); }
 
@@ -38,14 +39,14 @@
   .result .ov { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--teal); }
   /* hero */
   .hero { display:flex; align-items:baseline; margin-top:16px; }
-  .hero .num { font-family:'Geist',sans-serif; font-weight:600; font-size:132px; line-height:.82; color:var(--teal);
+  .hero .num { font-family:var(--axis-deck-type-text); font-weight:600; font-size:132px; line-height:.82; color:var(--teal);
     font-variant-numeric:tabular-nums; letter-spacing:-.03em; text-shadow:0 0 50px rgba(var(--axis-deck-teal-500-rgb), .45); }
   .hero .lab { font-size:26px; line-height:1.22; color:rgba(var(--axis-ppt-neutral-50-rgb), .86); max-width:280px; margin-left:22px; }
 
   /* before → after (barras — visualiza el salto que ES el ×3,2) */
   .ba { display:flex; align-items:flex-end; gap:44px; margin-top:46px; height:270px; }
   .barcol { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
-  .barcol .bnum { font-family:'Geist',sans-serif; font-weight:600; font-size:30px; font-variant-numeric:tabular-nums; margin-bottom:12px; }
+  .barcol .bnum { font-family:var(--axis-deck-type-text); font-weight:600; font-size:30px; font-variant-numeric:tabular-nums; margin-bottom:12px; }
   .barcol .bar { width:96px; border-radius:14px 14px 4px 4px; }
   .barcol .bcap { font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:rgba(var(--axis-ppt-neutral-50-rgb), .55); margin-top:14px; }
   .before .bnum { color:rgba(var(--axis-ppt-neutral-50-rgb), .6); }
@@ -54,7 +55,7 @@
   .after .bar { height:234px; background:linear-gradient(180deg, var(--axis-deck-teal-350) 0%, var(--teal-deep) 100%);
     box-shadow:0 0 40px rgba(var(--axis-deck-teal-500-rgb), .5), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .3); }
   .ba .lead-in { align-self:center; display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
-  .ba .lead-in .t { font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; color:var(--axis-ppt-neutral-50); }
+  .ba .lead-in .t { font-family:var(--axis-deck-type-display); font-weight:600; font-size:22px; color:var(--axis-ppt-neutral-50); }
   .ba .lead-in .s { font-size:16px; color:rgba(var(--axis-ppt-neutral-50-rgb), .6); }
 
   /* chips de apoyo */

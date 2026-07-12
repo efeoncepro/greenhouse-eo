@@ -17,12 +17,17 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { buildDeckAxisTokensCss, DECK_TOKENS_PATH } from '@/lib/artifact-composer/catalogs/deck-axis/compile-tokens'
+import {
+  buildDeckAxisTokensCss,
+  syncPackFontBinaries,
+  DECK_FONTS_PATH,
+  DECK_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/deck-axis/compile-tokens'
 
 const main = () => {
   const check = process.argv.includes('--check')
 
-  const { css, contrastFindings, packName, contrastEnforcement } = buildDeckAxisTokensCss()
+  const { css, fontsCss, fonts, contrastFindings, packName, contrastEnforcement } = buildDeckAxisTokensCss()
 
   if (contrastFindings.length > 0) {
     console.log(`\n⚠️  Contraste WCAG AA (pack "${packName}", enforcement=${contrastEnforcement}):`)
@@ -39,20 +44,24 @@ const main = () => {
   }
 
   if (check) {
-    const committed = fs.existsSync(DECK_TOKENS_PATH) ? fs.readFileSync(DECK_TOKENS_PATH, 'utf8') : ''
+    const committedTokens = fs.existsSync(DECK_TOKENS_PATH) ? fs.readFileSync(DECK_TOKENS_PATH, 'utf8') : ''
+    const committedFonts = fs.existsSync(DECK_FONTS_PATH) ? fs.readFileSync(DECK_FONTS_PATH, 'utf8') : ''
 
-    if (committed !== css) {
-      console.error('✗ deck-tokens.css NO está sincronizado. Corré: pnpm composer:brand-pack')
+    if (committedTokens !== css || committedFonts !== fontsCss) {
+      console.error('✗ deck-tokens.css/deck-fonts.css NO sincronizados. Corré: pnpm composer:brand-pack')
       process.exit(1)
     }
 
-    console.log('✓ deck-tokens.css sincronizado con el pack + recipes.')
+    console.log('✓ deck-tokens.css + deck-fonts.css sincronizados con el pack + recipes.')
 
     return
   }
 
   fs.writeFileSync(DECK_TOKENS_PATH, css, 'utf8')
+  fs.writeFileSync(DECK_FONTS_PATH, fontsCss, 'utf8')
+  syncPackFontBinaries(fonts)
   console.log(`✓ tokens + recipes → ${path.relative(process.cwd(), DECK_TOKENS_PATH)}`)
+  console.log(`✓ ${fonts.length} fuentes del pack → deck-fonts.css + catalogs/deck-axis/fonts/ (render hermético)`)
 }
 
 main()

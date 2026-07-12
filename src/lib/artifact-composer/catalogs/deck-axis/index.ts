@@ -23,6 +23,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import type { ArtifactCatalog } from '../../catalog'
+import { axisPackDir } from '../../brand-packs/axis'
 import { deckAxisResolvers } from './resolvers'
 import { deckAxisSemanticValidators } from './semantic-validators'
 import { timelineLayoutHook, timelineSlideValidator } from './timeline-hooks'
@@ -47,5 +48,11 @@ export const deckAxisCatalog: ArtifactCatalog = {
   resolvers: deckAxisResolvers,
   slideValidators: { TimelineFull: timelineSlideValidator },
   layoutHooks: { TimelineFull: timelineLayoutHook },
-  semanticValidators: deckAxisSemanticValidators
+  semanticValidators: deckAxisSemanticValidators,
+  // La marca que gobierna el render, sellable en el manifest: el pack axis compilado + su font pack.
+  brand: {
+    packName: 'axis',
+    compiledFiles: ['deck-tokens.css', 'deck-fonts.css'],
+    fontsManifestPath: path.join(axisPackDir, 'fonts.json')
+  }
 }

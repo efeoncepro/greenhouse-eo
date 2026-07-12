@@ -1,6 +1,6 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
-<!-- manifest-digest: 1d66608aeb512ed2bdd1537ea129f641dc52cb4505eb0b5368a6e88828d8aed3 -->
+<!-- manifest-digest: 0df171f4fc8d4acac94137887ee8abf23c21b7a6c52c4e7b6f4aab8c427ef9da -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

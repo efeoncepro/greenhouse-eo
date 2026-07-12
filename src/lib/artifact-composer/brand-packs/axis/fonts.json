@@ -1,0 +1,148 @@
+{
+  "$comment": "Font pack del brand pack `axis` (TASK-1393 Slice 4). La tipografía ES marca: las fuentes viven en el PACK, no en el catálogo — un brand pack de cliente trae las suyas, con licencia y derecho de embebido declarados (el compilador falla cerrado sin embedRights). Poppins y Geist son OFL-1.1.",
+  "fonts": [
+    {
+      "family": "Geist",
+      "weight": 400,
+      "style": "normal",
+      "file": "fonts/geist-400.ttf",
+      "sha256": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455",
+      "bytes": 72916,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Geist",
+      "weight": 500,
+      "style": "normal",
+      "file": "fonts/geist-500.ttf",
+      "sha256": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876",
+      "bytes": 72996,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Geist",
+      "weight": 600,
+      "style": "normal",
+      "file": "fonts/geist-600.ttf",
+      "sha256": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d",
+      "bytes": 73048,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Geist",
+      "weight": 700,
+      "style": "normal",
+      "file": "fonts/geist-700.ttf",
+      "sha256": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3",
+      "bytes": 72984,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Poppins",
+      "weight": 600,
+      "style": "italic",
+      "file": "fonts/poppins-600-italic.ttf",
+      "sha256": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436",
+      "bytes": 174628,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Poppins",
+      "weight": 700,
+      "style": "italic",
+      "file": "fonts/poppins-700-italic.ttf",
+      "sha256": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0",
+      "bytes": 172720,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Poppins",
+      "weight": 800,
+      "style": "italic",
+      "file": "fonts/poppins-800-italic.ttf",
+      "sha256": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60",
+      "bytes": 169984,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Poppins",
+      "weight": 900,
+      "style": "italic",
+      "file": "fonts/poppins-900-italic.ttf",
+      "sha256": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe",
+      "bytes": 167692,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Poppins",
+      "weight": 300,
+      "style": "normal",
+      "file": "fonts/poppins-300.ttf",
+      "sha256": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e",
+      "bytes": 156188,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Poppins",
+      "weight": 600,
+      "style": "normal",
+      "file": "fonts/poppins-600.ttf",
+      "sha256": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5",
+      "bytes": 151516,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Poppins",
+      "weight": 700,
+      "style": "normal",
+      "file": "fonts/poppins-700.ttf",
+      "sha256": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e",
+      "bytes": 150292,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Poppins",
+      "weight": 800,
+      "style": "normal",
+      "file": "fonts/poppins-800.ttf",
+      "sha256": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48",
+      "bytes": 149072,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    },
+    {
+      "family": "Poppins",
+      "weight": 900,
+      "style": "normal",
+      "file": "fonts/poppins-900.ttf",
+      "sha256": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0",
+      "bytes": 147708,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Google Fonts css2 (TTF completo), 2026-07-12"
+    }
+  ]
+}

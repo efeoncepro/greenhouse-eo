@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Geist:wght@400;600&display=swap');
+  
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Geist',sans-serif; overflow:hidden; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
 
   :root { --safe:72px; }   /* safe-area: ningún contenido toca el borde de la slide */
   .slide { display:flex; background: var(--axis-deck-recipe-light-surface); }
@@ -30,7 +31,7 @@
       linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
   }
   .brand-head { position:absolute; left:72px; top:286px; z-index:2; }
-  .brand-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:58px; line-height:1.06; color:var(--axis-ppt-neutral-50); letter-spacing:-.015em; }
+  .brand-title { font-family:var(--axis-deck-type-display); font-weight:600; font-size:58px; line-height:1.06; color:var(--axis-ppt-neutral-50); letter-spacing:-.015em; }
   .brand-logo { display:block; margin-top:20px; height:92px; }
 
   /* ===== RIGHT: content — 7 bullets (star + semibold lead + regular desc) ===== */

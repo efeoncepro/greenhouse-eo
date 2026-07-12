@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <link rel="stylesheet" href="deck-tokens.css">
+    <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
   <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:ital,wght@0,600;1,600&display=swap');
+    
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { overflow:hidden; font-family:'Geist',sans-serif; }
+    body { overflow:hidden; font-family:var(--axis-deck-type-text); }
     :root { --safe:72px; --navy:var(--axis-deck-navy-860); --navy-2:var(--axis-ppt-blue-800); --navy-deep:var(--axis-deck-navy-920); --teal:var(--axis-deck-teal-500); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --surface:var(--axis-deck-recipe-light-surface); }
     .slide { display:flex; background:var(--surface); }
     .context { position:relative; width:1004px; height:1080px; overflow:hidden; color:var(--axis-ppt-neutral-50); border-radius:0 64px 64px 0; padding:var(--safe); background:
@@ -22,7 +23,7 @@
     .context-header { display:grid; grid-template-columns:205px minmax(0,1fr); align-items:center; gap:34px; margin-top:42px; }
     .context-visual { width:205px; height:205px; }
     .context-visual img { display:block; width:100%; height:100%; object-fit:contain; }
-    .context h1 { max-width:560px; font-family:'Poppins',sans-serif; font-size:52px; font-weight:600; letter-spacing:-.022em; line-height:1.06; }
+    .context h1 { max-width:560px; font-family:var(--axis-deck-type-display); font-size:52px; font-weight:600; letter-spacing:-.022em; line-height:1.06; }
     .context h1 em { font-style:italic; }
     .narrative { margin-top:96px; max-width:730px; display:flex; flex-direction:column; gap:28px; font-size:30px; line-height:1.34; }
     .narrative strong { font-weight:600; }
@@ -30,12 +31,12 @@
     .outcomes { width:916px; height:1080px; padding:var(--safe) 72px; color:var(--ink); }
     .outcomes-header { padding:36px 0 28px; }
     .outcomes-eyebrow { color:var(--violet); font-size:18px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
-    .outcomes h2 { margin-top:14px; max-width:670px; font-family:'Poppins',sans-serif; font-size:43px; font-weight:600; letter-spacing:-.018em; line-height:1.1; }
+    .outcomes h2 { margin-top:14px; max-width:670px; font-family:var(--axis-deck-type-display); font-size:43px; font-weight:600; letter-spacing:-.018em; line-height:1.1; }
     .goal-list { border-top:1px solid rgba(var(--axis-ppt-indigo-950-rgb), .2); }
     .goal { min-height:158px; display:grid; grid-template-columns:100px 1fr; align-items:center; gap:24px; border-bottom:1px solid rgba(var(--axis-ppt-indigo-950-rgb), .2); }
     .goal:last-child { border-bottom:0; }
     .goal-icon { width:64px; height:64px; object-fit:contain; filter:brightness(0) saturate(100%) invert(11%) sepia(93%) saturate(5479%) hue-rotate(262deg) brightness(85%) contrast(119%); }
-    .goal-title { display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; font-family:'Poppins',sans-serif; font-size:34px; font-weight:600; letter-spacing:-.015em; line-height:1.08; }
+    .goal-title { display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; font-family:var(--axis-deck-type-display); font-size:34px; font-weight:600; letter-spacing:-.015em; line-height:1.08; }
     .goal-metric { color:var(--violet); font-size:27px; font-style:italic; letter-spacing:-.02em; }
     .goal-metric:empty { display:none; }
     .goal-body { margin-top:8px; max-width:630px; font-size:24px; line-height:1.28; }
