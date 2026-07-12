@@ -9,7 +9,8 @@
 - Lifecycle: `to-do`
 - Priority: `P1`
 - Impact: `Alto`
-- Effort: `Medio`
+- Effort: `Alto` <!-- era `Medio`; subió con el Delta (b) (molde + fuentes + contraste) y el Delta (c) (gate estético). Un `Medio` acá invitaba a apurar los slices que protegen la estética. -->
+- Riesgo dominante: `regresión visual silenciosa` — ver **Slice 0**
 - Type: `implementation`
 - Execution profile: `standard`
 - UI impact: `none`
@@ -107,6 +108,7 @@ Reglas obligatorias:
 
 ### Files owned
 
+- 🔴 `scripts/frontend/baselines/artifact-composer/**` (**el baseline congelado: 25 plantillas + 15 láminas SKY** — el artefacto más valioso de la task) + `BASELINE_DELTAS.md` + el script `composer:visual-gate` en `package.json` [Slice 0]
 - `src/lib/commercial/tenders/deck/**` → `src/lib/artifact-composer/**` (move + boundary)
 - `src/lib/artifact-composer/catalogs/**` [nombres exactos se fijan en Plan Mode]
 - `docs/architecture/tender-deck-composer-prototypes/**` → home del catalogo `deck-axis` [ruta final en Plan Mode]
@@ -192,6 +194,58 @@ Reglas obligatorias:
 
 ## Scope
 
+### Slice 0 — 🔴 BASELINE VISUAL CONGELADO: la estética deja de ser una intención y pasa a ser un GATE
+
+> **Directiva del operador (2026-07-12):** *"esa estética costó horas de trabajo; necesito que no se rompa."*
+>
+> **La task ya pedía "mirar las láminas" y "diff visual" — y eso NO alcanza, por una razón simple: no
+> existe un baseline congelado contra el cual diffear.** Si el refactor arranca y el baseline se captura
+> después, se está comparando el refactor contra sí mismo. El gate era decorativo.
+>
+> **Este slice va PRIMERO. Antes de mover un solo archivo.** Su único entregable es la red de seguridad.
+
+**Por qué los tests verdes NO protegen la estética.** El motor puede quedar perfectamente correcto y el deck
+salir peor. Los tres vectores son reales y ninguno produce un test rojo:
+
+| Vector | Qué pasa | Por qué ningún test lo ve |
+|---|---|---|
+| **Tokenizar 80 bases** (Slice 3) | un token resuelve a `#0F2A3E` donde el literal decía `#0F2A3D` | el token existe, el lint pasa, el color corrió 1 punto × 80 bases |
+| **Fuentes al brand pack** (Slice 4) | el pack local no reproduce las métricas de la fuente de red → el texto reflowea | **mejor caso:** los resolvers son *fail-closed* y revientan (ruidoso, honesto). **Peor caso:** cabe por poco y **amputa** — la 2ª bug class |
+| **Compilar el molde** (Slice 3b) | el chrome se ancla a una región y **cambia de stacking context** | el `mix-blend-mode: luminosity` pierde su backdrop, **la lámina igual renderiza** — sólo sale fea. Es literalmente la **4ª bug class** |
+
+**Entregables:**
+
+- **0a · Probar que el render es DETERMINISTA antes de confiar en un diff.** Componer el catálogo completo
+  **dos veces sobre el mismo commit** y comparar. Si dos corridas del mismo código no dan el mismo píxel, el
+  gate no puede exigir cero — hay que **encontrar y eliminar la fuente de no-determinismo** (versión de
+  Chromium pineada, `deviceScaleFactor` fijo, fuentes locales, sin red, sin `Date.now()` en el render, sin
+  animación en vuelo al capturar). **Un gate de cero píxeles sobre un render no-determinista es un gate que
+  miente**, y es exactamente la clase de fabricación que este repo prohíbe. Este sub-slice **es el permiso
+  para todos los demás**.
+- **0b · Congelar el baseline y COMMITEARLO.** Renderizar **las 25 plantillas** (con los payloads sintéticos
+  que `template-composability.test.ts` **ya sabe derivar de cada contrato** — el harness existe) **más las
+  15 láminas reales del deck SKY**, y committear los PNG + su manifest de checksums bajo
+  `scripts/frontend/baselines/artifact-composer/**` (mismo contrato durable que ya usan las 4 superficies
+  vivas: `baseline-contract.ts` + `pixelmatch`). **El baseline es el artefacto más valioso de esta task**:
+  es la única representación de "las horas de trabajo" que un refactor puede verificar.
+- **0c · El gate: `pnpm composer:visual-gate`.** Recompone las 40 imágenes y las diffea contra el baseline
+  con `pixelmatch` (reusa `scripts/frontend/lib/visual-diff.ts`). **Umbral: 0 píxeles.** No "se ve parecido",
+  no "diferencia menor al 1%". **Cero.** Corre en **cada slice** y **bloquea el merge**.
+- **0d · Rebaseline explícito, nunca silencioso.** Un cambio de píxel **intencional** (p. ej. la migración de
+  fuentes de Slice 4, o corregir un bug conocido) se declara **lámina por lámina** en
+  `BASELINE_DELTAS.md` — qué lámina, qué cambió, por qué, quién lo aprobó — y el baseline se re-promueve
+  **en el mismo PR**. **Un rebaseline sin su entrada en `BASELINE_DELTAS.md` también falla el gate.**
+  *(Contrato de dos vías, igual que el `KNOWN_BROKEN` de composability: **la lista no puede mentir**. Sin
+  esto, el gate se "arregla" promoviendo el baseline y nadie se entera — que es peor que no tenerlo.)*
+- **0e · Prueba mecánica de la tokenización, independiente del píxel.** El ledger de 80 bases genera un test
+  que compara el **valor computado** del token contra el **literal exacto que reemplaza**. Un token que
+  resuelve a otro valor **rompe el build**, sin depender de que alguien mire. *(El diff de píxel y este test
+  se cubren mutuamente: el test atrapa el color corrido aunque el diff tuviera ruido; el diff atrapa el
+  blend/stacking/reflow que ningún test de valores ve.)*
+
+> **La regla que deja escrita este slice: en una task de refactor visual, el baseline se congela ANTES de
+> tocar el primer archivo, o no es un baseline — es una foto de lo que ya rompiste.**
+
 ### Slice 1 — Mover el motor y sellar la frontera (**package-shaped desde el dia 1**)
 
 - Mover `src/lib/commercial/tenders/deck/**` → `src/lib/artifact-composer/**` con sus 5 suites.
@@ -274,7 +328,16 @@ después excluir `docs/`.** Al revés es un build roto días después, en silenc
   (4,5:1 texto normal · 3:1 texto grande). **Falla al compilar, no en la lámina.**
   *(Cuesta poco hoy, con un solo pack. Con packs de cliente, es la diferencia entre un producto y una
   demanda.)*
-- Verificacion visual **obligatoria**: componer el deck SKY con el brand pack AXIS y **mirar las 4 laminas** — la tokenizacion no puede cambiar el pixel.
+  - ⚠️ **Scoping obligatorio del guard, o esta task se auto-bloquea.** El pack AXIS de hoy está afinado a
+    mano y **nadie ha medido su contraste**: es perfectamente posible que **alguna combinación vigente no
+    pase AA**. Si el guard nace bloqueante para todos los packs, **TASK-1393 no cierra hasta rediseñar la
+    paleta** — y eso es exactamente la regresión estética que el operador prohibió.
+    **Canónico:** el guard corre **siempre** y **reporta siempre**; es **bloqueante para packs no-default**
+    (cliente) y **advisory para el pack `axis`**, cuyas violaciones se listan explícitamente en el reporte
+    y salen como **follow-up de diseño**, no como bloqueo de refactor. *(Un refactor no arregla una decisión
+    de marca: la revela. Y una cosa a la vez.)*
+- Verificacion visual **obligatoria**: `pnpm composer:visual-gate` verde (0 píxeles) — **la tokenización no
+  puede cambiar el píxel**, y ahora eso lo decide una máquina, no la buena voluntad de quien mira.
 
 ### Slice 3b — El MOLDE también se tokeniza, en la MISMA pasada que el color
 
@@ -377,6 +440,13 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 
 ### Slice ordering hard rule
 
+- 🔴 **Slice 0 MUST cerrar ANTES de tocar el primer archivo.** El baseline se congela **sobre el commit
+  pre-refactor**. Un baseline capturado después del primer slice **no es un baseline**: es una foto de lo que
+  ya rompiste, y el gate valida contra el error. **No es una preferencia de orden: es la condición de
+  existencia del gate.**
+- **Y dentro de Slice 0, `0a` (determinismo) va antes que `0b` (congelar).** Congelar un baseline sobre un
+  render no-determinista produce un gate que falla al azar → el equipo lo empieza a ignorar → el gate muere.
+  **Si el render no es determinista, se arregla el render; no se relaja el umbral.**
 - Slice 1 MUST cerrar antes de Slice 2: no se puede parametrizar un catalogo mientras el motor siga bajo `commercial/`.
 - **Slice 1b — orden DURO e invertible sólo a costa de romper el build:** primero **mudar los assets**
   fuera de `docs/`, **después** agregar `docs/` a `.vercelignore`. Nunca al revés. Hoy el motor hace
@@ -391,7 +461,9 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| El refactor cambia el pixel del deck (regresion visual silenciosa) | composer/render | medium | manifest/versiones + gate de geometría, texto seleccionable y frame diff + **mirar** las 4 láminas SKY en cada slice | frame distinto sin nueva revisión de catálogo; lámina que cambia sin motivo |
+| 🔴 **El refactor rompe la estética** (regresión visual silenciosa: color corrido, glow desplazado, blend muerto, texto reflowado) | composer/render | **high** — es el modo de falla **más probable** de esta task, y **ningún test verde lo ve** | **Slice 0: baseline congelado + `pnpm composer:visual-gate` a 0 píxeles, bloqueante en cada slice** + test de igualdad computada del ledger + rebaseline sólo con entrada en `BASELINE_DELTAS.md` | gate rojo; o —peor— un baseline promovido sin su delta declarado |
+| **El gate de píxel se "arregla" promoviendo el baseline** en vez de arreglando la regresión | proceso | **medium** — es la salida fácil bajo presión de cierre | `BASELINE_DELTAS.md` es **contrato de dos vías**: un rebaseline **sin** su entrada declarada **también falla el gate** | baseline nuevo en el diff del PR sin línea correspondiente en `BASELINE_DELTAS.md` |
+| El render **no es determinista** → el gate falla al azar → el equipo lo empieza a ignorar → **el gate muere** | composer/render | medium | **Slice 0a**: probar determinismo (2 corridas, mismo commit, mismo píxel) **antes** de congelar. Si no lo es, **se arregla el render**, no se relaja el umbral | dos corridas del mismo commit difieren; alguien propone "subir el threshold a 0,5%" |
 | Se degrada una bug class ya cerrada (fallo silencioso / geometria) | composer | low | las 5 suites viajan con el motor; `template-geometry.test.ts` corre sobre las 25 | test rojo; una lamina vuelve a amputar copy |
 | El motor "se lleva" un pedazo de dominio al moverse | boundary | medium | **lint/test de frontera**: import de `commercial/**` o `growth/**` rompe el build | build rojo en el gate de frontera |
 | **Se excluye `docs/` del deploy antes de mudar los assets** → el `readFileSync` del composer queda roto en runtime, y el síntoma no aparece hasta que un consumer server-side lo toque (días después, en silencio) | Vercel / composer | **high** si nadie lee el ordering rule | **Slice 1b: mudar los assets PRIMERO, `.vercelignore` DESPUÉS.** Gate: mismo artefacto lógico/frame aprobado cuando la revisión no cambia, y build de Vercel verde tras la exclusión | `ENOENT` en un route/worker que compone; PDF que sale sin íconos |
@@ -410,19 +482,25 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
+| 0 | nada que revertir: **sólo agrega** el baseline y el gate. Es la red, no el trapecio | — | n/a |
 | 1 | revert PR (es un move + un lint) | < 5 min | si |
 | 2 | revert PR; el motor vuelve a tener sus resolvers dentro | < 5 min | si |
 | 3 | revert PR; las plantillas vuelven a sus HEX | < 5 min | si |
+
+> 🔴 **El rollback estético es el baseline.** Committear los 40 PNG en Slice 0 no es sólo un gate: es la
+> **única representación verificable** de la estética actual. Si un slice la rompe y no se detecta a tiempo,
+> el baseline sigue siendo el norte contra el cual reconstruir. **Sin él, "cómo se veía antes" es un recuerdo.**
 
 ### Production verification sequence
 
 **N/A — la task no toca produccion** (no hay runtime desplegado del composer; el unico consumer es el CLI). La verificacion es local:
 
-1. `pnpm vitest run src/lib/artifact-composer` verde (las 5 suites, 66 tests).
-2. `pnpm deck:compose examples/sky-deck-plan.json` conserva el artefacto lógico, geometría, texto seleccionable y frames aprobados; sólo exige el mismo hash de PDF si fuente/assets mantienen la misma revisión.
-3. **Mirar** las 4 laminas del deck SKY (no basta con que el test pase: una regresion de color o de crop no la ve un assert).
-4. Gate de frontera: un import de dominio dentro del motor **rompe el build**.
-5. `pnpm local:check` + `pnpm test` (full) + `pnpm build` (prod).
+1. 🔴 **`pnpm composer:visual-gate` verde (0 píxeles) contra el baseline congelado.** Corre en **cada** slice, no sólo al final. **Es el gate que decide si la task cierra.**
+2. `pnpm vitest run src/lib/artifact-composer` — **todas las suites verdes** (hoy 8/102; el criterio es *"todas verdes"*, no un número congelado).
+3. `pnpm deck:compose examples/sky-deck-plan.json` conserva el artefacto lógico, geometría y texto seleccionable; el hash de PDF sólo se exige si fuente/assets mantienen la misma revisión.
+4. **Mirar** las láminas del deck SKY. *(El gate mecánico es el piso, no el techo: atrapa el píxel corrido, pero **la pregunta "¿esto está bien diseñado?" sigue siendo humana.** El gate protege lo que ya existe; no bendice lo nuevo.)*
+5. Gate de frontera: un import de dominio dentro del motor **rompe el build**.
+6. `pnpm local:check` + `pnpm test` (full) + `pnpm build` (prod).
 
 ### Out-of-band coordination required
 
@@ -435,6 +513,16 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+### 🔴 Gate estético (Slice 0) — si estos cuatro no están verdes, **la task NO cierra**, aunque todo lo demás lo esté
+
+- [ ] **El render es determinista**: dos composiciones del mismo commit producen **el mismo píxel**. *(Probado en `0a`, **antes** de congelar el baseline. Un gate de cero píxeles sobre un render no-determinista es un gate que miente.)*
+- [ ] **Existe un baseline congelado y committeado** (`scripts/frontend/baselines/artifact-composer/**`) con **las 25 plantillas + las 15 láminas del deck SKY**, capturado sobre el **commit pre-refactor**.
+- [ ] **`pnpm composer:visual-gate` corre en cada slice, compara contra ese baseline con `pixelmatch` y falla con umbral CERO píxeles.** No "se ve parecido", no "<1% de drift". **Cero.**
+- [ ] **Todo cambio de píxel intencional está declarado lámina por lámina en `BASELINE_DELTAS.md`** (qué cambió, por qué, quién lo aprobó) y el baseline se re-promueve en el **mismo PR**. **Un rebaseline sin su entrada declarada TAMBIÉN falla el gate** — contrato de dos vías, igual que `KNOWN_BROKEN`: *la lista no puede mentir*.
+- [ ] **Prueba mecánica de la tokenización, independiente del píxel:** un test compara el **valor computado** de cada token contra el **literal exacto que reemplaza** (las 80 bases del ledger). Un token que resuelve a otro valor **rompe el build**.
+
+### Resto
 
 - [ ] El motor vive en `src/lib/artifact-composer/**` y **no importa nada** de `src/lib/commercial/**` ni `src/lib/growth/**`; un import de dominio **rompe el build** (gate mecanico, no criterio de reviewer).
 - [ ] El motor **corre en Node puro, sin Next y sin el shim de `server-only`** — es la prueba de que Creative Studio podra consumirlo como paquete sin arrastrar un workaround.
@@ -463,7 +551,8 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 - [ ] **El `BrandPack` declara licencia y derecho de embebido por fuente**, y **falla cerrado** si un pack trae una fuente sin derecho de embebido. *(Poppins y Geist son OFL; las de un cliente probablemente no.)*
 - [ ] 🔴 **El compilador RECHAZA un brand pack cuyos roles no pasen WCAG AA** contra sus superficies (4,5:1 / 3:1). **Falla al compilar, no en la lámina.**
 - [ ] **El `Plan` NO puede ensamblar primitivas del molde.** Elige **una plantilla por nombre**. Las primitivas son detalle **interno** del catálogo, **no una superficie de autoría** — el catálogo sigue **cerrado**.
-- [ ] **Diff visual de las 25** (`pnpm fe:capture:diff`) como **gate de merge**: el refactor es **visualmente neutro** salvo excepción declarada **lámina por lámina**.
+- [ ] ~~Diff visual de las 25 como gate de merge~~ → **superseded y endurecido por el Gate estético (Slice 0)**, arriba: baseline congelado + `composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` de dos vías. *(Antes esto era una intención sin baseline contra el cual diffear — o sea, decorativo.)*
+- [ ] **El guard de contraste es advisory para el pack `axis` y bloqueante para packs no-default.** Sus violaciones sobre AXIS se reportan y salen como **follow-up de diseño**, **no** bloquean este refactor. *(Un refactor no arregla una decisión de marca: la revela.)*
 - [ ] `pnpm deck:compose` conserva nombre, argumentos y outDir por defecto.
 
 ## Verification
@@ -547,6 +636,52 @@ Falla al compilar, no en la lámina.** Cuesta poco hoy, con un solo pack.
 move.** Es el guard que convierte *"componible"* de **promesa de la doc** en **hecho verificable en CI**, y
 su `KNOWN_BROKEN` es un **contrato de dos vías**: falla si una plantilla sana se rompe **y también** si una
 rota se arregla y nadie la saca. **La lista no puede mentir.**
+
+## Delta 2026-07-12 (c) — la estética deja de ser una intención y pasa a ser un GATE
+
+> **Directiva del operador:** *"esa estética costó horas de trabajo; necesito que garantices que no se va a
+> romper."*
+
+**No se puede *prometer* que ningún agente cometa un error. Lo que sí se puede es hacer que un error no
+pueda cerrar la task.** Eso es lo que agrega este Delta: **Slice 0**.
+
+**El agujero que tenía la task.** Ya pedía *"diff visual de las 25"* y *"mirar las 4 láminas"* — y ambas
+cosas eran **decorativas**, por una razón que no se veía a simple vista: **no existía un baseline congelado
+contra el cual diffear.** Si el refactor arranca y el baseline se captura después, se está comparando el
+refactor **contra sí mismo**. Y *"mirar"* es un criterio de reviewer, no un gate: el primer día se mira, el
+quinto slice ya no.
+
+**Por qué esta task en particular necesita esto y otras no.** Las tres operaciones centrales de 1393
+**parecen preservadoras de valor y no lo son** — y las tres fallan **sin poner un test en rojo**:
+
+1. **Tokenizar 80 bases** → un token que resuelve a un HEX vecino pasa el lint, pasa los tests, y corre el
+   color. × 80.
+2. **Mover las fuentes al brand pack** → si el pack local no reproduce las métricas, el texto reflowea. El
+   *mejor* caso es que los resolvers fail-closed revienten. El *peor* es que quepa por poco y **ampute** —
+   que es la **2ª bug class**, la que hace que un PDF mutilado **parezca terminado**.
+3. **Compilar el molde** → el chrome se ancla a una región y **cambia de stacking context**; el
+   `mix-blend-mode: luminosity` pierde su backdrop y **la lámina igual renderiza**, sólo que fea. Es la
+   **4ª bug class**, literal.
+
+**El mecanismo (Slice 0), en una línea:** determinismo probado → baseline congelado y **committeado** sobre
+el commit pre-refactor → `pnpm composer:visual-gate` a **cero píxeles**, bloqueante **en cada slice** →
+rebaseline **sólo** con su delta declarado lámina por lámina *(contrato de dos vías: **la lista no puede
+mentir**, igual que el `KNOWN_BROKEN` de composability)* → y, cubriéndolo por el otro flanco, un test que
+compara el **valor computado** de cada token contra el literal que reemplaza, sin depender del píxel.
+
+**Dos decisiones que este Delta toma explícitamente, porque callarlas rompía la task:**
+
+- **El guard de contraste NO puede nacer bloqueante sobre AXIS.** El pack de hoy está afinado a mano y nadie
+  midió su contraste: es posible que alguna combinación vigente no pase AA. Un guard bloqueante para todos
+  los packs **impide cerrar 1393 hasta rediseñar la paleta** — o sea, provoca exactamente la regresión
+  estética que se quiere evitar. **Advisory para `axis`, bloqueante para packs de cliente.** *Un refactor no
+  arregla una decisión de marca: la revela. Y una cosa a la vez.*
+- **Si el render resulta no ser determinista, se arregla el render — no se relaja el umbral.** Un gate que
+  falla al azar es un gate que el equipo aprende a ignorar, y entonces no protege nada.
+
+**Lo que este gate NO hace, y hay que decirlo:** protege **lo que ya existe**; no bendice lo nuevo. La
+pregunta *"¿esto está bien diseñado?"* sigue siendo humana. El gate garantiza que las horas invertidas no se
+pierdan por accidente — no que las próximas estén bien invertidas.
 
 ## Open Questions
 
