@@ -23,7 +23,7 @@ incompatibles con copy.
 - No cambia el estado de plataforma: F1 sigue siendo CLI; el runtime agentic, assets y commands siguen
   perteneciendo a `TASK-1392` (y worker posterior `TASK-1391`). No crear API/UI/capability paralela.
 
-## Sesión 2026-07-12 (cont. 2) — Deck SKY: firma, ordinales, timeline · PENDIENTE VISUAL PARA CODEX
+## Sesión 2026-07-12 (cont. 2) — Deck SKY: firma, ordinales, timeline · cierre visual Codex
 
 **Estado del deck SKY:** 15 láminas, PDF 3.5 MB, `.captures/sky-bid/`. Plan auditable en
 `docs/commercial/tenders/sky-blog-2026/deck-plan.json`. Cifras reales y trazables. 92 tests verdes.
@@ -31,11 +31,13 @@ incompatibles con copy.
 **4ª bug class cerrada — el chrome que depende de DÓNDE vive en el DOM:**
 
 - **La firma perdía el blend según la lámina.** `mix-blend-mode: luminosity` se mezcla con el backdrop de
-  **su** contexto de apilamiento: 21 de 22 plantillas tenían la burbuja **fuera** del `.slide` (hermana,
-  hija de `<body>`) → sin degradado debajo, **se pintaba plana**. **NO era el PDF**: se verificó
+  **su** contexto de apilamiento: no basta con vivir dentro del `.slide`; en un split debe ser descendiente
+  del panel oscuro que pinta el degradado. Si queda como hermana del panel, toma el canvas claro y **se pinta gris**.
+  **NO era el PDF**: se verificó
   rasterizando el PDF con poppler y comparándolo contra el PNG — el blend sobrevive al `print-to-pdf`.
-  Fix: la firma vive dentro del `.slide` en las 22. Guard **por DOM** (`closest('.slide')`), porque el
-  primer guard chequeaba texto (`</main>`) y **daba por buenas las que usan `<div class="slide">`**.
+  Fix: la firma vive dentro de su dueño de backdrop (panel marcado `data-url-bubble-backdrop` en las split).
+  Guard **por DOM** exige ese dueño, además de canvas y blend; el primer guard chequeaba texto (`</main>`) y
+  **daba por buenas las que usan `<div class="slide">`**.
 - **El hito del final del eje.** `at` es el **FIN de la unidad** (`at:3` con 3 meses → 100%, el borde). Su
   label se partía. Fix general: el **rombo queda en su fecha real** y la **etiqueta se ancla hacia adentro**
   (`.at-start`/`.at-end` emitidas por el resolver desde el dato). ⚠️ Y una corrección de autoría: mis hitos
@@ -44,17 +46,23 @@ incompatibles con copy.
 - **Antes (mismo día):** el barrido borraba el **ordinal derivado** (los 4 pasos salían como "01") y un
   **array dentro de un objeto** se aplanaba con las comas del join a la vista.
 
-**⚠️ PENDIENTE VISUAL — el operador lo delegó a Codex (2026-07-12):**
+**Cierre visual Codex (2026-07-12):**
 
-1. **`ProcessStepsFull`**: los círculos numerados salen **encima** de las cards (el `.index` es
-   `position:absolute` y la `.card` es **estática** → lo posicionado pinta sobre lo estático, sin importar
-   el orden del DOM). El operador los quiere **detrás**. Ojo: el `.index` lleva un `box-shadow` de 12px que
-   **sólo tiene sentido si va encima** — al mandarlo atrás, ese halo queda inútil y habría que quitarlo.
-2. **`RequirementsTableFull`**: subir la tabla — queda muy pegada a la burbuja de URL.
-3. **`PricingFull`**: centrar la burbuja y subir un poco la tabla de inversión.
-4. La firma **sigue leyéndose gris** para el operador en algunas láminas (yo verifiqué que el blend sí se
-   aplica en 08-ciclo, PNG y PDF). **Falta identificar en cuáles** y si el gris es el resultado esperado del
-   `luminosity` sobre ese backdrop o un caso mal resuelto.
+1. **`URL Bubble`** queda como primitive del catálogo: preserva el SVG canónico gris y `opacity:.72`; el
+   efecto viene exclusivamente de `mix-blend-mode: luminosity`, nunca de recolorear el asset. En las split la
+   primitive vive dentro del panel que pinta su backdrop (`data-url-bubble-backdrop`), no sólo dentro del canvas.
+   Portada y contraportada ahora también consumen la misma primitive (con variante inline para el stack de cierre).
+   El guard de composability verifica canvas, dueño de backdrop de las split y que Chromium computa
+   `mixBlendMode === 'luminosity'`; `HighlightWave` sigue siendo la única excepción sin firma.
+   **Endurecimiento posterior:** el contrato ya no se limita a split: las 24 plantillas con firma declaran
+   `data-url-bubble-backdrop` y el guard exige ese ancestro para todas. Se corrigió además `AgendaFull`, que
+   tenía el chrome inyectado dentro del blueprint JavaScript de una fila en vez de pertenecer al canvas.
+2. **`ProcessStepsFull`**: se separaron los círculos de sus cards (`padding-top:136px`): ya no se montan ni
+   su halo invade el vidrio. Los ordinales derivados conservan `01–04`.
+3. **`RequirementsTableFull`**: la matriz sube y deja una banda negativa inequívoca antes de `URL Bubble`.
+4. **`PricingFull`**: el ledger sube y la bubble se centra bajo la tabla, sin competir con condiciones comerciales.
+5. Evidencia local: `pnpm vitest run ...template-composability.test.ts` **26/26** y composición SKY real:
+   **15 láminas**, PDF **3.5 MB**, revisado en `/tmp/sky-bid-url-bubble-1783853960/`.
 
 **Estado de la entrega SKY:** técnica ✅ · económica ✅ (PDF) · **Excel creado** ✅ (Wherex no tiene
 plantilla) · **deck ✅ pendiente de los ajustes visuales**. Plazo de las bases: **15/07/2026**. Lo sube el

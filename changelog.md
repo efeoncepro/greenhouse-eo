@@ -19,6 +19,23 @@
   documentación funcional, `AGENTS.md`, `CLAUDE.md`, `.claude/rules/tenders.md`, `project_context.md` y
   handoff enlazan la misma regla.
 
+- **Tender Deck Composer — `URL Bubble` y cuatro correcciones de composición.** La firma
+  `efeoncepro.com` queda canonizada como primitive CSS única (`.deck-url-bubble`): conserva el SVG gris
+  fuente y `opacity:.72`; el tono depende exclusivamente de `mix-blend-mode: luminosity` contra el
+  backdrop real, nunca de recolorear el asset. Portada y contraportada pasan a consumirla y el guard de
+  composability verifica canvas + dueño del backdrop en split + blend computado en Chromium (HighlightWave sigue siendo la excepción
+  deliberada sin firma). Además, `ProcessStepsFull` separa círculos y cards; `RequirementsTableFull` sube
+  la matriz para despejar la firma; y `PricingFull` sube el ledger y centra la firma. Evidencia: 26/26
+  composability + deck SKY de 15 láminas / 3.5 MB revisado visualmente.
+
+- **Corrección de `URL Bubble` — backdrop, no sólo canvas.** La primera corrección sólo aseguró que la
+  firma quedara dentro de `[data-template]`; eso sigue siendo insuficiente en una composición split: si el
+  nodo es hermano del panel oscuro, `luminosity` recibe el canvas claro y el SVG se ve gris. Las split ahora
+  lo anidan en el panel que pinta el degradado (`data-url-bubble-backdrop`), sin cambiar el SVG gris ni
+  `opacity:.72`; el guard Chromium exige explícitamente ese dueño de backdrop para las **24** plantillas con
+  firma. `AgendaFull` deja de inyectar la burbuja dentro del blueprint JavaScript de una fila y la declara
+  como chrome del canvas.
+
 - **Tender Deck Composer — la 4ª bug class: el chrome que depende de DÓNDE vive en el DOM.** (a) La firma `efeoncepro.com` perdía el `mix-blend-mode: luminosity` **según la lámina**: el blend se mezcla con el backdrop de **su** contexto de apilamiento, y **21 de 22** plantillas tenían la burbuja **fuera** del `.slide` (hermana, hija de `<body>`) → sin degradado debajo, se pintaba plana. **No era el PDF**: se verificó rasterizándolo con poppler contra el PNG — el blend sobrevive al `print-to-pdf`. Ahora la firma vive dentro del `.slide` en las 22, con guard **por DOM** (el primer guard chequeaba texto y daba por buenas las plantillas que usan `<div class="slide">`: *un check que miente es peor que no tenerlo*). (b) El hito de timeline en la última unidad caía al **100%** del eje y su etiqueta se partía contra el borde — el prototipo lo esquivaba a mano (16%, 50%, 91%, nunca 100%). Fix general derivado del dato: el **rombo se queda en su fecha real** y la **etiqueta se ancla hacia adentro** (`.at-start`/`.at-end`). ⚠️ Y una corrección de **autoría**: `at` es el **FIN de la unidad**, así que un hito rotulado "Semana 1" con `at:1` caía en el cierre del Mes 1 — **la lámina afirmaba una fecha falsa**, que es **fabricación**, no un bug de layout. Canon: `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → "La 4ª bug class".
 
 - **Tender Deck Composer — el catálogo era "25/25 con contrato" pero sólo 18 componían.** Componer la **primera oferta real** (SKY, la primera que usó más de 6 plantillas) reventó **7 de 25**: tener un `slots.json` no es ser componible, y nadie las había ejercitado. Las 7 eran **4 clases de bug del motor**, cerradas en la causa: la evidencia (`validation-only`) sólo se saltaba en arrays —el `sourceRef` de `QuoteSplit` escribía sobre el nodo `.slide` y **borraba la lámina**—; los objetos no honraban resolvers; `fixed-*` se aplicaba a medias (y donde el contrato tipaba `asset` con `agentMayOverride:false`, **el tipo mentía**); y `paired-array` no existía (una comparación son **dos columnas con markup distinto** → dos blueprints). **Dos más sólo se vieron mirando el frame**, con los tests en verde: el barrido borraba el **ordinal derivado** (los 4 pasos salían como "01") y un **array dentro de un objeto** se aplanaba con las comas del join a la vista. Guard nuevo: `template-composability.test.ts` intenta llenar las 25 → **"componible" es verificable en CI**, con `KNOWN_BROKEN` como contrato de dos vías. **24/25**; queda `ChartSplit` (su callout requiere una **decisión de diseño**, no un fix mecánico). **Lección: los tests verdes no son el gate de un deck — mirar los frames, todos.** Canon: `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → "La 3ª bug class".

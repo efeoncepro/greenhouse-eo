@@ -18,7 +18,6 @@
     .lum { mix-blend-mode:luminosity; }
     .stack { position:absolute; left:0; right:0; bottom:68px; display:flex; flex-direction:column; align-items:center; }
     .brand { width:520px; height:150px; object-fit:contain; }
-    .url { width:270px; height:72px; margin-top:10px; object-fit:contain; }
     .socials { display:flex; align-items:center; gap:16px; margin-top:22px; }
     .social { width:48px; height:48px; display:block; object-fit:contain; mix-blend-mode:luminosity; filter:invert(88%) sepia(27%) saturate(535%) hue-rotate(164deg) brightness(103%) contrast(101%); }
     .contacts { display:flex; align-items:center; justify-content:center; gap:28px; margin-top:28px; color:var(--lum); font-size:22px; font-weight:600; letter-spacing:.012em; line-height:1; white-space:nowrap; }
@@ -27,10 +26,10 @@
   </style>
 </head>
 <body>
-  <main class="slide" data-template="BackCoverFull" aria-label="Contraportada Efeonce">
+  <main class="slide" data-template="BackCoverFull" data-url-bubble-backdrop aria-label="Contraportada Efeonce">
     <div class="stack">
       <img class="brand lum" src="../../../public/branding/logo-negative.svg" alt="efeonce" data-slot="efeonceLogo">
-      <img class="url lum" src="assets/url-lum.svg" alt="efeoncepro.com" data-slot="urlBubble">
+      <img class="deck-url-bubble deck-url-bubble--inline signature-BackCoverFull" src="assets/url-lum.svg" alt="efeoncepro.com" data-slot="urlBubble">
       <nav class="socials lum" aria-label="Redes sociales de Efeonce" data-slot="socialLinks">
         <img class="social" src="assets/social/spotify.svg" alt="Spotify"><img class="social" src="assets/social/instagram.svg" alt="Instagram"><img class="social" src="assets/social/linkedin.svg" alt="LinkedIn"><img class="social" src="assets/social/threads.svg" alt="Threads"><img class="social" src="assets/social/youtube.svg" alt="YouTube"><img class="social" src="assets/social/tiktok.svg" alt="TikTok">
       </nav>

@@ -37,12 +37,9 @@
   .logo-client  { width:auto; height:170px; max-width:280px; object-fit:contain; filter:brightness(0) invert(1); }
   .proposal-kind { max-width:790px; margin-top:26px; font-family:'Poppins',sans-serif; font-weight:600; font-size:70px; color:#fff; line-height:1.06; letter-spacing:-.025em; text-wrap:balance; }
 
-  /* burbuja URL — footer (técnica #848484 + luminosity, sin transform que aísle) */
-  .url { position:absolute; left:0; right:0; bottom:var(--safe); text-align:center; }
-  .url img { height:64px; mix-blend-mode:luminosity; }
 </style></head>
 <body>
-  <div class="cover" data-template="CoverFull">
+  <div class="cover" data-template="CoverFull" data-url-bubble-backdrop>
     <div class="stack">
       <img class="logo-efeonce" src="../../../public/branding/logo-negative.svg" alt="efeonce" data-slot="efeonceLogo">
       <div class="relationship-mark" aria-hidden="true"></div>
@@ -51,6 +48,6 @@
       </div>
       <div class="proposal-kind" data-slot="proposalKind" data-slot-type="enum" data-slot-required="true" data-slot-resolver="proposal-kind-label">Propuesta Técnica</div>
     </div>
-    <div class="url"><img src="assets/url-lum.svg" alt="efeoncepro.com" data-slot="urlBubble"></div>
+    <img class="deck-url-bubble signature-CoverFull" src="assets/url-lum.svg" alt="efeoncepro.com" data-slot="urlBubble">
   </div>
 </body></html>

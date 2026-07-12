@@ -52,13 +52,14 @@
 <body>
   <div class="slide" data-template="TeamSplit">
     <!-- LEFT -->
-    <div class="brand">
+    <div class="brand" data-url-bubble-backdrop>
       <div>
         <div class="eyebrow" data-slot="sectionLabel" data-slot-type="string">El equipo</div>
         <h1 class="headline" data-slot="headline" data-slot-type="rich-string" data-slot-required="true">Un squad dedicado, con un <em>responsable único</em></h1>
       </div>
       <p class="lead" data-slot="lead" data-slot-type="rich-string" data-slot-required="true">El mismo equipo de punta a punta — sin rotación y sin compartir tu cuenta con otras marcas.</p>
       <div class="hl"><p data-slot="highlight" data-slot-type="rich-string" data-slot-required="true">5 roles enfocados en SKY. Un solo responsable que <em>responde por todo</em>.</p></div>
+      <img class="deck-url-bubble signature-TeamSplit" src="assets/url-lum.svg" alt="efeoncepro.com">
     </div>
 
     <!-- RIGHT: roster -->
@@ -86,7 +87,7 @@
   document.getElementById('members').innerHTML = team.map(([ic,role,desc,pct]) =>
     `<div class="member"><div class="av"><svg viewBox="0 0 24 24">${I[ic]}</svg></div>`
     + `<div class="m"><div class="role" data-slot-field="role">${role}</div><div class="rdesc" data-slot-field="description">${desc}</div></div>`
-    + `<div class="ded"><div class="pct" data-slot-field="dedication">${pct}%</div><div class="lbl">dedicación</div></div>  <img class="deck-url-bubble signature-TeamSplit" src="assets/url-lum.svg" alt="efeoncepro.com">
+    + `<div class="ded"><div class="pct" data-slot-field="dedication">${pct}%</div><div class="lbl">dedicación</div></div>
   </div>`).join('');
 </script>
 </body></html>

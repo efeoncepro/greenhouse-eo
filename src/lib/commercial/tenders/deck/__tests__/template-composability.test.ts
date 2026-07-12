@@ -118,9 +118,7 @@ interface RegistryEntry {
   contentTypes: string[]
 }
 
-const registry: { templates: RegistryEntry[] } = JSON.parse(
-  await fs.readFile(path.join(DIR, 'registry.json'), 'utf8')
-)
+const registry: { templates: RegistryEntry[] } = JSON.parse(await fs.readFile(path.join(DIR, 'registry.json'), 'utf8'))
 
 let browser: Browser
 
@@ -188,24 +186,46 @@ describe('componibilidad del catálogo', () => {
           await expect(fill).resolves.not.toThrow()
 
           // La firma usa `mix-blend-mode: luminosity`, y **un blend se mezcla con el backdrop de su
-          // contexto de apilamiento**. Si la burbuja vive FUERA del `.slide` (hermana, hija de
-          // `<body>`), no tiene el degradado debajo en su mismo contexto y **se pinta plana**.
+          // contexto de apilamiento**. En un split, no basta que viva dentro de `.slide`: si queda
+          // como hermana del panel oscuro, su backdrop efectivo sigue siendo el canvas claro y se
+          // pinta gris/plana. Debe vivir DENTRO del panel que pinta el degradado.
           //
           // Bug real (deck SKY): 10 de las 25 la tenían fuera. Se detectó MIRANDO el PDF —en unas
           // láminas la firma se fundía y en otras no—. No era del renderer ni del formato: era DÓNDE
           // vivía la burbuja en el DOM. Este guard lo vuelve imposible.
-          const signatureInsideSlide = await page.evaluate(() => {
+          const signaturePrimitive = await page.evaluate(() => {
             const bubble = document.querySelector('.deck-url-bubble')
 
-            if (!bubble) return 'no-signature'
+            if (!bubble) return null
 
-            return bubble.closest('.slide') ? 'inside' : 'outside'
+            return {
+              placement: bubble.closest('[data-template]') ? 'inside' : 'outside',
+              backdrop: bubble.closest('[data-url-bubble-backdrop]') ? 'owner' : 'missing',
+              blend: window.getComputedStyle(bubble).mixBlendMode
+            }
           })
 
+          // HighlightWave es la excepción de composición: su campo claro no admite una firma.
+          if (signaturePrimitive === null) {
+            expect(entry.name, `${entry.name}: toda plantilla salvo HighlightWave usa URL Bubble.`).toBe(
+              'HighlightWave'
+            )
+
+return
+          }
+
           expect(
-            signatureInsideSlide,
-            `${entry.name}: la firma está FUERA del .slide → mix-blend-mode se queda sin backdrop y se pinta plana. Muévela dentro del elemento .slide.`
+            signaturePrimitive.placement,
+            `${entry.name}: URL Bubble está FUERA del canvas de plantilla → mix-blend-mode se queda sin backdrop y se pinta plana. Muévela dentro de [data-template].`
           ).not.toBe('outside')
+          expect(
+            signaturePrimitive.blend,
+            `${entry.name}: URL Bubble debe conservar mix-blend-mode: luminosity; no cambies el color del SVG para compensar un blend ausente.`
+          ).toBe('luminosity')
+          expect(
+            signaturePrimitive.backdrop,
+            `${entry.name}: URL Bubble no declara un dueño de backdrop. Conserva SVG gris + opacity .72 + luminosity y anida el nodo en [data-url-bubble-backdrop] que realmente pinta su fondo.`
+          ).toBe('owner')
 
           return
         }

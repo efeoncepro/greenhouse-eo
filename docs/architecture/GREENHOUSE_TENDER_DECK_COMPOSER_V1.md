@@ -88,11 +88,17 @@ Receta canónica:
 - **`CoverFull` NO cambia de familia:** la portada mantiene su hero-Think (radial navy con luz arriba), con grano editorial tenue y una luz teal central de relación; no admite azul eléctrico ni un cuarto degradado. Es full-bleed y tiene su propio contrato.
 - **Ya aplicado a** `NarrativeSplit`, `MetricsSplit`, `QuoteSplit`, `ChartSplit` (Claude) + `DualTextSplit`, `ComparisonSplit` (Codex, origen de la receta). Toda Split nueva usa esta receta.
 
-### Firma de URL — burbuja de luminosity (chrome fijo)
+### Firma de URL — `URL Bubble` primitive (chrome fijo)
 
-Toda lámina que tenga espacio negativo suficiente lleva la firma no configurable `efeoncepro.com` como burbuja discreta. Es chrome de marca, no un slot ni copy que el compositor pueda sustituir. Siempre se inserta el SVG canónico `assets/url-lum.svg` como `<img>` real —nunca se recrea como pill CSS ni como pseudo-elemento— y usa `mix-blend-mode: luminosity`, texto pequeño y contraste de borde. La firma debe cerrar el recorrido visual sin competir con el título ni cubrir una métrica, navegación, logo o evidencia. `HighlightWave` es la excepción deliberada: su campo claro ocupa el lienzo y el marco navy no da área viable, por lo que no lleva burbuja.
+Toda lámina que tenga espacio negativo suficiente lleva la primitive no configurable **`URL Bubble`** (`.deck-url-bubble`) con la firma `efeoncepro.com`. Es chrome de marca, no un slot ni copy que el compositor pueda sustituir. Siempre se inserta el SVG canónico `assets/url-lum.svg` como `<img>` real —nunca se recrea como pill CSS ni como pseudo-elemento— y usa `mix-blend-mode: luminosity` conservando el gris y la opacidad propios del asset, texto pequeño y contraste de borde. Las clases `signature-<Template>` sólo definen placement, nunca el tratamiento óptico. La firma debe cerrar el recorrido visual sin competir con el título ni cubrir una métrica, navegación, logo o evidencia. `HighlightWave` es la excepción deliberada: su campo claro ocupa el lienzo y el marco navy no da área viable, por lo que no lleva burbuja.
 
-**Posición por composición, no por esquina por defecto (auditada 2026-07-12):** la primera opción es centrarla dentro de la banda negativa real —en todo el canvas (`AgendaFull`, `CardGridFull`), dentro del campo oscuro de un split (`BulletListSplit`, `DualListSplit`, `MetricsSplit`, `StatSplit`, `TeamSplit`, `SectionDividerSplit`, `QuoteSplit`) o dentro de una banda central propia (`CoverFull`, `BackCoverFull`, `FourPillarsFull`, `HumanImpactFull`, `CredentialsFull`). Si ese eje está ocupado por tabla, cronograma, leyenda, navegación o cierre narrativo, se lleva al costado seguro del mismo campo oscuro (`NarrativeSplit`, `ChartSplit`, `ComparisonSplit`, `CaseStudySplit`, `PricingFull`, `RequirementsTableFull`, `TimelineFull`, `ProcessStepsFull`); `DualTextSplit` y `EvidenceStoryGrid` usan banda superior lateral para despejar cierres densos. La implementación vive en `tender-deck-composer-prototypes/deck-signature.css`. Nunca centrar con `transform`.
+**Contrato de backdrop (obligatorio):** cada `URL Bubble` es descendiente de exactamente un
+`[data-url-bubble-backdrop]`, el elemento que **efectivamente pinta** el fondo bajo la firma. En láminas full
+es el canvas raíz; en split es el panel dark, nunca su contenedor claro hermano. El guard Chromium del catálogo
+verifica este ancestro, además de `mixBlendMode === 'luminosity'`; estar meramente dentro de `[data-template]`
+no es evidencia suficiente.
+
+**Posición por composición, no por esquina por defecto (auditada 2026-07-12):** la primera opción es centrarla dentro de la banda negativa real —en todo el canvas (`AgendaFull`, `CardGridFull`, `PricingFull`, `RequirementsTableFull`), dentro del campo oscuro de un split (`BulletListSplit`, `DualListSplit`, `MetricsSplit`, `StatSplit`, `TeamSplit`, `SectionDividerSplit`, `QuoteSplit`) o dentro de una banda central propia (`CoverFull`, `BackCoverFull`, `FourPillarsFull`, `HumanImpactFull`, `CredentialsFull`). Si ese eje está ocupado por cronograma, leyenda, navegación o cierre narrativo, se lleva al costado seguro del mismo campo oscuro (`NarrativeSplit`, `ChartSplit`, `ComparisonSplit`, `CaseStudySplit`, `TimelineFull`, `ProcessStepsFull`); `DualTextSplit` y `EvidenceStoryGrid` usan banda superior lateral para despejar cierres densos. La implementación vive en `tender-deck-composer-prototypes/deck-signature.css`. Nunca centrar con `transform`.
 
 ### 2. Tipografía — pocos pesos, semánticos (skill `typography-design`)
 
@@ -1014,12 +1020,15 @@ PDF** (verificado: el blend sobrevive al `print-to-pdf`; se comparó el PNG cont
 poppler). Era **dónde vivía la burbuja en el DOM**.
 
 `mix-blend-mode: luminosity` se mezcla con el **backdrop de SU contexto de apilamiento**. Si la firma es
-**hermana** del `.slide` (hija de `<body>`), no tiene el degradado debajo en su mismo contexto — y **se
-pinta plana**. **21 de las 22** plantillas con firma la tenían fuera.
+**hermana** del canvas de plantilla (hija de `<body>`) o, en un split, **hermana del panel oscuro** dentro de un
+canvas claro, no tiene el degradado debajo en su mismo contexto — y **se pinta gris/plana**. La ubicación visual
+encima del degradado no basta: el nodo debe ser su descendiente.
 
-- **SIEMPRE** la firma vive **dentro** del elemento `.slide`. Su posición en pantalla no cambia (mismo
-  origen, mismo tamaño); lo que cambia es su contexto de blend.
-- Guard: `template-composability.test.ts` afirma `bubble.closest('.slide') !== null` **sobre el DOM real**
+- **SIEMPRE** la firma vive dentro de su **dueño de backdrop**: el canvas si éste pinta el fondo, o el panel
+  oscuro marcado `data-url-bubble-backdrop` en una composición split. Su posición en pantalla no cambia; lo que
+  cambia es su contexto de blend.
+- Guard: `template-composability.test.ts` afirma canvas + `mixBlendMode === 'luminosity'` **sobre el DOM real**
+  y exige `data-url-bubble-backdrop` para cada split que pinta el degradado en un panel hermano.
   de las 25. ⚠️ La primera versión del guard chequeaba el texto (`</main>`) y **daba por buenas las
   plantillas que usan `<div class="slide">`** — *un check que miente es peor que no tenerlo*.
 

@@ -44,7 +44,7 @@
   .foot .r { color:var(--teal); font-weight:600; letter-spacing:.02em; }
 </style></head>
 <body>
-  <div class="slide" data-template="AgendaFull">
+  <div class="slide" data-template="AgendaFull" data-url-bubble-backdrop>
     <div class="head">
       <div>
         <div class="eyebrow" data-slot="sectionLabel" data-slot-type="string">La propuesta</div>
@@ -56,6 +56,7 @@
     <div class="grid" id="grid" data-slot="chapters" data-slot-type="array" data-slot-required="true"></div>
 
     <div class="foot"><span data-slot="footerLabel" data-slot-type="string">Propuesta técnica · SKY</span><span class="r">efeoncepro.com</span></div>
+    <img class="deck-url-bubble signature-AgendaFull" src="assets/url-lum.svg" alt="efeoncepro.com">
   </div>
 
 <script>
@@ -71,7 +72,7 @@
   // el <a class="ch"> es el BLUEPRINT del item de `chapters` (array slot):
   // href="#<targetSlideId>" lo resuelve el composer (resolver: chapter-anchor), no es texto.
   document.getElementById('grid').innerHTML = chapters.map(([n,t,d,id]) =>
-    `<a class="ch" href="#${id}"><div class="n" data-slot-field="number">${n}</div><div><div class="t" data-slot-field="title">${t}</div><div class="d" data-slot-field="description">${d}</div>  <img class="deck-url-bubble signature-AgendaFull" src="assets/url-lum.svg" alt="efeoncepro.com">
+    `<a class="ch" href="#${id}"><div class="n" data-slot-field="number">${n}</div><div><div class="t" data-slot-field="title">${t}</div><div class="d" data-slot-field="description">${d}</div>
   </div></a>`).join('');
 </script>
 </body></html>

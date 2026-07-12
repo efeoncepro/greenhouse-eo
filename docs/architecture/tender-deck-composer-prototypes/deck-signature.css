@@ -1,4 +1,10 @@
-/* Chrome fijo del Tender Deck Composer: asset SVG real, no una recreación CSS. */
+/*
+ * URL Bubble — primitive de firma del catálogo Tender Deck.
+ *
+ * Usa el SVG canónico `assets/url-lum.svg`, no una recreación CSS. La clase base define el
+ * tratamiento óptico; `signature-<Template>` sólo decide placement y nunca puede sobrescribir
+ * blend, opacidad ni asset.
+ */
 .deck-url-bubble {
   position:absolute;
   right:56px;
@@ -7,9 +13,20 @@
   width:220px;
   height:auto;
   display:block;
+  /* El SVG fuente se mantiene gris: `luminosity` lo adapta al fondo sin cambiar su color base. */
   opacity:.72;
   pointer-events:none;
   mix-blend-mode:luminosity;
+}
+
+/* Variante de flujo: la contraportada la integra a su stack de cierre. */
+.deck-url-bubble--inline {
+  position:relative;
+  right:auto;
+  bottom:auto;
+  z-index:auto;
+  width:270px;
+  margin-top:10px;
 }
 
 /* La portada y contraportada ya contienen la burbuja canónica como asset semántico. */
@@ -24,7 +41,15 @@
   bottom:36px;
 }
 
-/* Centro del campo oscuro izquierdo: la firma pertenece al bloque de marca, no al borde del canvas. */
+/* Portada: banda negativa propia, centrada sin transform para no aislar el blend. */
+.signature-CoverFull {
+  right:0;
+  left:0;
+  margin-inline:auto;
+  bottom:72px;
+}
+
+/* Centro local del panel oscuro que pinta el backdrop: nunca el canvas claro padre. */
 .signature-BulletListSplit,
 .signature-DualListSplit,
 .signature-MetricsSplit,
@@ -32,19 +57,14 @@
 .signature-TeamSplit,
 .signature-SectionDividerSplit {
   left:0;
+  right:0;
   margin-inline:auto;
   bottom:36px;
 }
-.signature-BulletListSplit { right:calc(100% - 912px); }
-.signature-DualListSplit { right:calc(100% - 960px); }
-.signature-MetricsSplit,
-.signature-SectionDividerSplit { right:calc(100% - 1040px); }
-.signature-StatSplit { right:calc(100% - 1004px); }
-.signature-TeamSplit { right:calc(100% - 812px); }
 
 /* QuoteSplit: el statement deja una banda de cierre centrada dentro del campo de marca derecho. */
 .signature-QuoteSplit {
-  left:760px;
+  left:0;
   right:0;
   margin-inline:auto;
   bottom:36px;
@@ -86,4 +106,20 @@
   right:auto;
   left:42px;
   bottom:30px;
+}
+
+/* La matriz termina antes de la firma: la URL Bubble no puede leerse como una sexta fila. */
+.signature-RequirementsTableFull {
+  right:0;
+  left:0;
+  margin-inline:auto;
+  bottom:36px;
+}
+
+/* La oferta económica cierra sobre el eje del canvas, no sobre las condiciones comerciales. */
+.signature-PricingFull {
+  right:0;
+  left:0;
+  margin-inline:auto;
+  bottom:36px;
 }
