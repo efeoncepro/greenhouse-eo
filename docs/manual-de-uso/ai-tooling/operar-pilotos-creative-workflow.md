@@ -19,6 +19,10 @@ El referente ejecutado es la intro Glitch El micrófono se abre. Su retrospectiv
 5. Si se usará Omni/Vertex, autenticar ambos caminos de Google Cloud: gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
 6. Ejecutar primero el modo plan. Ningún plan debe llamar al proveedor.
 
+### Exploración no es producción
+
+Antes de crear un piloto, declarar si se está **explorando** una dirección o ejecutando una receta ya aprobada. Un agente puede recuperar contexto y proponer brief, referencias, shot list, ruta y estimate; debe entregar ese plan en forma editable. Sólo una aprobación humana habilita un run con gasto. No convertir una conversación, un prompt prometedor o un render aislado en un workflow compartible sin evidencia, rúbrica y límites explícitos. Contexto y preguntas abiertas: [RESEARCH-009](../../research/RESEARCH-009-creative-operations-agentic-workflows.md).
+
 ## Gate de selección de motor
 
 | Condición creativa | Primera mano | Evidencia |

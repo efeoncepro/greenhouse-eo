@@ -7,6 +7,11 @@
 > **Sello de frescura.** Los pasos son estables; los modelos/precios son volátiles
 > `(as-of 2026-07 — reverificar → SOURCES.md)`.
 
+> **Frontera importante.** Esta biblioteca empieza **después** de una decisión creativa: una receta
+> validada es producción convergente, no exploración, conversación o un prompt prometedor. El agente
+> puede proponer un plan editable, pero no elevarlo a workflow compartible sin evidencia, rúbrica,
+> owner builder y límites de gasto/approval. Doctrina: `docs/research/RESEARCH-009-creative-operations-agentic-workflows.md`.
+
 ---
 
 ## ⭐ Workflow A — "Reference-Video → Omni Enhance" (VALIDADO 2026-07-05, spot AEO Grader)

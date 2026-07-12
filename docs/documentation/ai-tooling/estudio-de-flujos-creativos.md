@@ -6,6 +6,7 @@
 > **Ultima actualizacion:** 2026-07-12 por Codex
 > **Estado:** Propuesta histórica de ubicación Greenhouse — no está construido ahí. El programa vigente nace como plataforma hermana agentic.
 > **Documentación técnica vigente:** [Efeonce Creative Studio — Agentic Platform Architecture V1](../../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md). La [ADR Creative Flow Studio](../../architecture/GREENHOUSE_CREATIVE_FLOW_STUDIO_DECISION_V1.md) se conserva como referencia de diseño DAG, ya superseded como runtime.
+> **Investigación activa:** [RESEARCH-009 — Creative Operations y workflows agentic](../../research/RESEARCH-009-creative-operations-agentic-workflows.md) separa evidencia de mercado de decisiones de producto.
 
 ## Que es
 
@@ -18,6 +19,8 @@ Un ejemplo de flujo:
 ```
 [Brief de campaña] → [Generar hero image] → [Animar a video 9:16] → [Revisión humana] → [Editar / componer] → [Locución es-CL] → [Reframe a 3 formatos] → [Entregable]
 ```
+
+Un flujo no sustituye la parte divergente de la creatividad. Primero existe exploración: problema, concepto, referencias, tratamientos y alternativas. Sólo cuando dirección creativa fija una intención puede nacer una receta repetible que un operador o agente ejecute con inputs acotados. La investigación de este modelo de dos velocidades, del patrón **builder → runner** y de los límites del agente vive en [RESEARCH-009](../../research/RESEARCH-009-creative-operations-agentic-workflows.md).
 
 ## Para que sirve
 

@@ -9,6 +9,11 @@
 > El router del `SKILL.md` apunta a esta carpeta. Para el **conocimiento de craft** (principios, cámara,
 > edición, sonido) están los `modules/`; para **cómo llamar cada herramienta**, `efeonce/STUDIO_TOOLING.md`
 > + `efeonce/GEMINI_OMNI_VERTEX.md`; **acá vive el "cómo lo combinamos y qué resultó".**
+>
+> **Qué no entra aquí.** Una exploración, un prompt, una capacidad de proveedor o un agente que recién
+> propuso un plan no son workflows todavía. Primero pasan por dirección creativa, evidencia y una
+> decisión builder; el marco de Creative Operations vive en
+> `docs/research/RESEARCH-009-creative-operations-agentic-workflows.md`.
 
 ## Cómo usar / cómo agregar
 

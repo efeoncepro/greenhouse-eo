@@ -82,8 +82,10 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
    **contrato completo de Gemini Omni en Vertex** está en `efeonce/GEMINI_OMNI_VERTEX.md`. La capacidad
    investigada de previs 3D exportada → Seedance reference-to-video vive en
    `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`: no es receta validada ni autoriza
-   reciclar el blocking Glitch rechazado. Cuando algo nuevo funcione, **documéntalo en `workflows/`**
-   (es como crece la skill).
+   reciclar el blocking Glitch rechazado. La doctrina/market research de **Creative Operations**
+   (exploración vs. producción, builder → runner, memoria y agencia humana) vive en
+   `docs/research/RESEARCH-009-creative-operations-agentic-workflows.md`; cuando algo nuevo funcione,
+   **documéntalo en `workflows/`** (es como crece la skill).
 5. **Aterriza a Efeonce** si es marca/canales propios o un cliente Globe:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
 6. **Cierra con un artefacto** de `templates/` (brief, storyboard, animatic/shotlist, prompt sheet,
@@ -185,6 +187,9 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `ANTIPATTERNS.md` — los errores que arruinan una animación.
 - `workflows/` — **biblioteca viva de recetas creativas validadas** (`README.md` índice + un archivo por
   workflow). Crece con cada producción: cuando algo funciona, se documenta acá.
+- `docs/research/RESEARCH-009-creative-operations-agentic-workflows.md` — doctrina y research de mercado
+  para distinguir exploración creativa, receta de producción, roles builder/runner y límites del agente;
+  no es una receta ejecutable.
 - `modules/12_CREATIVE_WORKFLOWS.md` — router compacto de esas recetas y de la regla: un output de IA
   completado es candidato técnico, no aprobación creativa.
 - `spot-studio/SPOT_STUDIO.md` — **sistema de producción de spots** (IA + humano): pipeline por etapas +

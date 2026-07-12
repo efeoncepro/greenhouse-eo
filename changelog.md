@@ -2,6 +2,8 @@
 
 ## 2026-07-12
 
+- **Creative Studio / Creative Operations — investigación de workflows y agentes canonizada.** `RESEARCH-009` reúne evidencia de Adobe, Magnific, Canva, Google Flow, Runway, ComfyUI y MCP, y fija la doctrina de dos velocidades: explorar no es ejecutar; un agente propone planes editables, dirección creativa construye templates/rúbricas y un runner sólo opera inputs semánticos con aprobación humana. Arquitectura, EPIC-028, manual y skills espejo lo referencian. Sin cambio de runtime, proveedor, ADR, gasto ni publicación.
+
 - **Creative Workflow / Seedance — previs 3D como referencia multimodal documentada, no promovida.** Se registró que Seedance 2.0 puede recibir una previs 3D como video exportado junto a un keyframe de look, siempre que el adapter exponga `reference-to-video`; no consume `.blend` ni ofrece cámara 3D determinista. La documentación funcional, manual y espejos Codex/Claude distinguen capacidad externa de receta validada: no hubo generación, cambio runtime ni ADR, y el blocking 3D Glitch rechazado sigue vetado como input. Canon: `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`.
 
 - **TASK-1399 COMPLETE — el Proposal Studio se opera desde el chat (code-complete, flag OFF).**

@@ -4,6 +4,7 @@
 > **ADR:** [Efeonce Creative Studio: plataforma agentic peer con paridad UI + MCP](EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_DECISION_V1.md)
 > **Audiencia:** Creative Technology, producto, operaciones creativas y futuros integradores de Efeonce.
 > **Principio rector:** una capacidad operable por una persona debe ser operable por un agente autorizado mediante el mismo contrato gobernado.
+> **Investigación de producto:** [RESEARCH-009 — Creative Operations y workflows agentic](../research/RESEARCH-009-creative-operations-agentic-workflows.md) registra el landscape y las hipótesis de bootstrap; no modifica esta ADR ni autoriza runtime nuevo.
 
 ## 1. Resultado que se está construyendo
 
@@ -20,6 +21,8 @@ La primera oferta es interna. El modelo de datos, autorización, presupuesto y a
 | Agency craft is product | Templates, rúbricas, referencias, decisiones y evaluación son IP versionada, no sólo prompts. |
 | Human authority on spend and delivery | Estimar no gasta; reservar no ejecuta; aprobar sí permite una corrida acotada. |
 | Fidelity before provider preference | El router recibe un contrato explícito: preserve-set, human-action, exact-text, flexible-style, audio-foley, etc. |
+| Exploration before repeatability | El agente puede explorar y proponer planes editables; sólo una decisión creativa humana convierte una hipótesis en template/run repetible. |
+| Builder / runner separation | Dirección creativa versiona la receta y sus límites; el runner sólo opera inputs semánticos expuestos, nunca el grafo o secretos internos. |
 | Own the durable record | Asset, lineage, review y ledger viven en el Studio aun si la inferencia ocurre en un tercero. |
 | Separate runtime, connected ecosystem | Integra por API/evento/deep link; nunca por tablas, credenciales o sesiones compartidas. |
 

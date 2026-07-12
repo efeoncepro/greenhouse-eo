@@ -11,6 +11,27 @@
 
 ---
 
+## 0. Creative Operations — dos velocidades, cuatro roles
+
+**No todo acto creativo es un workflow.** Antes de producir hay una fase divergente de investigación,
+concepto, referencias, tratamientos y alternativas. El estudio no debe encerrar esa fase en un DAG ni
+gastar por cada idea: el agente recupera contexto y propone un brief/shot list/plan **editable**. Sólo
+una decisión de dirección creativa convierte esa hipótesis en receta repetible y luego en un run con
+presupuesto aprobado.
+
+| Rol | Hace | No hace |
+|---|---|---|
+| **Builder** — dirección creativa/diseñador | Define intención, referencias canónicas, qué puede variar, rúbrica y recipe/template versionado | Delegar gusto, aprobación o decisión de marca al modelo |
+| **Agente** | Recupera evidencia, arma plan, propone ruta/costo y opera herramientas permitidas | Reservar gasto, ampliar scope, aprobar delivery o publicar por sí solo |
+| **Runner** — productor/operador | Ejecuta el flow publicado con inputs creativos semánticos y coordina el review | Editar el grafo interno o adivinar la dirección sin el builder |
+| **Ingeniería** | Hace confiables permisos, lineage, jobs, costos y observabilidad | Convertirse en director estético |
+
+La receta es IP creativa, no una lista opaca de prompts. El output de un agente debe poder abrirse,
+ajustarse, versionarse y volver a correrse. Investigación y doctrina canónica:
+`docs/research/RESEARCH-009-creative-operations-agentic-workflows.md`.
+
+---
+
 ## 1. El loop de producción
 
 ```

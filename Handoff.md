@@ -1,3 +1,9 @@
+## Sesión 2026-07-12 (cont. 19) — Creative Operations y agentes: investigación canonizada (Codex)
+
+> **Hecho:** se abrió `RESEARCH-009-creative-operations-agentic-workflows.md` con el scan de Adobe, Magnific, Canva, Google Flow, Runway, ComfyUI y conectores MCP. La tesis operativa separa exploración divergente de producción convergente; formaliza builder (dirección/diseño), agent, runner (producción) e ingeniería. Está enlazada desde la arquitectura Creative Studio, EPIC-028, documentación funcional/manual e índices; los espejos Codex/Claude de `motion-design-studio` obligan que un agent entregue plan editable y no eleve conversación/prompt a workflow sin evidencia.
+>
+> **Límite y siguiente paso:** no hay cambio de ADR, schema, runtime, proveedor ni gasto. `RESEARCH-009` sigue `Active`; sólo pasa a `Validated` con un fixture builder/runner y un rol agentic acotado evaluado con costo, review humana y criterio de reversión. El bootstrap sigue perteneciendo al repositorio futuro de Creative Studio, no a Greenhouse.
+
 ## Sesión 2026-07-12 (cont. 18) — Seedance reference-to-video con previs 3D documentado (Codex)
 
 > **Hecho:** se documentó la capacidad externa de Seedance 2.0 de combinar video de referencia, imagen, audio y prompt. Una previs Blender/Unreal/C4D llega como playblast/video exportado y puede guiar cámara, blocking y timing; no se transmite un `.blend` ni una escena/cámara 3D editable. Canon: `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`, enlazado desde documentación funcional, manual y espejos Codex/Claude de `motion-design-studio`.
