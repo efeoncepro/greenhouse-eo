@@ -1137,6 +1137,98 @@ export interface GreenhouseCommercialProductUnits {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialProposalAssets {
+  asset_id: string;
+  audience: string;
+  created_at: Generated<Timestamp>;
+  created_by_member_id: string | null;
+  kind: string;
+  owner_org_id: string;
+  proposal_asset_id: Generated<string>;
+  proposal_id: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  version: Generated<number>;
+}
+
+export interface GreenhouseCommercialProposalEvidence {
+  as_of: Timestamp;
+  audience: string;
+  classification: string;
+  content_hash: string;
+  created_at: Generated<Timestamp>;
+  created_by_member_id: string | null;
+  evidence_id: Generated<string>;
+  external_source_snapshot: Json | null;
+  locator: string;
+  method: string;
+  owner_org_id: string;
+  proposal_id: string;
+  source_asset_id: string | null;
+}
+
+export interface GreenhouseCommercialProposalRequirements {
+  attested_at: Timestamp | null;
+  attested_by_member_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_member_id: string | null;
+  is_blocking: Generated<boolean>;
+  label: string;
+  owner_org_id: string;
+  proposal_id: string;
+  requirement_id: Generated<string>;
+  requirement_kind: string;
+  requires_human_attestation: Generated<boolean>;
+  source_asset_id: string | null;
+  source_locator: string | null;
+  updated_at: Generated<Timestamp>;
+  value: string | null;
+  weight: Numeric | null;
+}
+
+export interface GreenhouseCommercialProposals {
+  client_organization_id: string;
+  created_at: Generated<Timestamp>;
+  created_by_member_id: string | null;
+  currency: string | null;
+  deadline: Timestamp | null;
+  deadline_assumption: string | null;
+  deadline_confidence: Generated<string>;
+  hubspot_company_id: string | null;
+  hubspot_deal_id: string | null;
+  origin: string;
+  owner_org_id: string;
+  platform: string | null;
+  proposal_id: Generated<string>;
+  public_opportunity_id: string | null;
+  quote_id: string | null;
+  quote_snapshot_json: Json | null;
+  quote_snapshot_taken_at: Timestamp | null;
+  state: Generated<string>;
+  title: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialProposalStateMatrix {
+  from_state: string;
+  requires_human_gate: Generated<boolean>;
+  to_state: string;
+}
+
+export interface GreenhouseCommercialProposalStateTransitions {
+  actor_kind: string;
+  actor_member_id: string | null;
+  created_at: Generated<Timestamp>;
+  from_state: string;
+  metadata_json: Generated<Json>;
+  owner_org_id: string;
+  proposal_id: string;
+  reason: string;
+  requires_human_gate: Generated<boolean>;
+  to_state: string;
+  transition_id: Generated<string>;
+}
+
 export interface GreenhouseCommercialQuotationAuditLog {
   action: string;
   actor_name: string;
@@ -11238,6 +11330,12 @@ export interface DB {
   "greenhouse_commercial.product_source_kind_mapping": GreenhouseCommercialProductSourceKindMapping;
   "greenhouse_commercial.product_sync_conflicts": GreenhouseCommercialProductSyncConflicts;
   "greenhouse_commercial.product_units": GreenhouseCommercialProductUnits;
+  "greenhouse_commercial.proposal_assets": GreenhouseCommercialProposalAssets;
+  "greenhouse_commercial.proposal_evidence": GreenhouseCommercialProposalEvidence;
+  "greenhouse_commercial.proposal_requirements": GreenhouseCommercialProposalRequirements;
+  "greenhouse_commercial.proposal_state_matrix": GreenhouseCommercialProposalStateMatrix;
+  "greenhouse_commercial.proposal_state_transitions": GreenhouseCommercialProposalStateTransitions;
+  "greenhouse_commercial.proposals": GreenhouseCommercialProposals;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
   "greenhouse_commercial.quotation_line_cost_override_history": GreenhouseCommercialQuotationLineCostOverrideHistory;
   "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;
