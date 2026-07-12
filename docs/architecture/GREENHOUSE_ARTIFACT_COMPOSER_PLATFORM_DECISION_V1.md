@@ -89,14 +89,44 @@ no). **No hay que inventar nada; sólo cambia el vocabulario visible.**
   tal cual**: RESEARCH-007 sigue dueño de `public_tender*`; la promoción ahora crea un **`Proposal` con
   `origin=public_tender`**.
 
-### 3. Frontera con Finance (quote-to-cash) — el Proposal **no fija el precio**
+### 3. `Proposal` ⇄ Cotizador — **no es una frontera pasiva: es una COSTURA** *(corregido 2026-07-12)*
 
-- La `Proposal` **contiene** la oferta económica; **NO la calcula**. El monto real lo emite el
-  **cotizador** (`src/lib/commercial/quote-to-cash/**`) sobre **loaded cost**. **NUNCA** reimplementar
-  pricing dentro del dominio de propuestas.
-- **Nunca un GO sin margen sobre loaded cost.** Ese gate vive en `fit_review`, no en el renderer.
-- El **squad blueprint lleva loaded cost** → `audience=internal`, **siempre**. Filtrarlo al comprador es
-  entregarle tu estructura de costos y tu piso de negociación.
+> ⚠️ **Corrección del operador (2026-07-12):** *"`Proposal` es distinto, **pero debe hacer sinergias
+> directas con el módulo de cotizaciones**"*. La versión anterior de este §3 sólo declaraba **qué NO
+> hacer** (*"la Proposal no calcula el precio"*) y **no decía cómo el precio ENTRA**. Eso dejó dos
+> agujeros reales, y ambos ya se materializaron.
+
+**Los dos agujeros de la frontera pasiva:**
+
+1. 🔴 **"Nunca un GO sin margen sobre loaded cost" era una REGLA SIN MECANISMO.** El gate vive en
+   `fit_review` — pero la `Proposal` **no tenía ningún vínculo con una `Quote`**. **No se puede hacer
+   cumplir una regla de margen sobre un objeto que no conoce su costo.**
+2. 🔴 **El precio se escribió A MANO.** La económica de SKY (5.200.000 / 6.900.000 / 260.000 CLP) se
+   redactó en prosa, **sin trazabilidad al loaded cost y sin margen verificado**.
+
+   > **Una cifra de dinero en un PDF client-facing sin origen trazable es exactamente la misma clase de
+   > problema que una estadística sin `evidenceRef` — pero aplicada al dinero.** Todo el dominio prohíbe
+   > la primera y toleraba la segunda.
+
+**La costura canónica:**
+
+- **La oferta económica de una `Proposal` ES una `Quote`.** No es prosa que "coincide" con una cotización:
+  **es la cotización, renderizada.** `Proposal.quote_id` (nullable hasta que exista precio).
+- **El cotizador sigue siendo el ÚNICO que calcula.** `src/lib/commercial/submit-quote-from-builder.ts` +
+  `src/lib/finance/pricing/{pricing-engine-v2,costing-engine}.ts` (loaded cost). **NUNCA** reimplementar
+  pricing dentro del dominio de propuestas — eso no cambia.
+- 🔴 **El gate `fit_review` LEE el margen de la Quote.** Ahí se hace cumplir *"nunca un GO sin margen"*.
+  **Sin `quote_id`, el gate no puede evaluarse y la transición debe fallar cerrada** — no aprobar por
+  omisión.
+- **Al entrar a `packaging`, la Quote se CONGELA en un snapshot inmutable** que el artefacto renderiza —
+  **el mismo patrón que `proposal_evidence`**: el PDF debe ser reproducible, y una cotización viva que
+  cambia después de emitir el PDF haría que el artefacto **mienta sobre su propio precio**.
+  El `PricingFull` del deck lee **ese snapshot**, no la tabla viva.
+- **El squad blueprint lleva loaded cost** → `audience=internal`, **SIEMPRE**. Filtrarlo al comprador es
+  entregarle **tu estructura de costos y tu piso de negociación**. *(Y por eso la evidencia lleva
+  `audience` **por referencia**: ver el invariante de fuga en TASK-1391.)*
+
+> **La regla corta: el Proposal no calcula el precio, pero TAMPOCO lo transcribe. Lo REFERENCIA.**
 
 ### 4. El contrato de brand pack se comparte; la paleta **no se copia**
 
