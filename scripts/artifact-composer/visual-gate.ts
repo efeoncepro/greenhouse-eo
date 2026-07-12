@@ -43,13 +43,14 @@ import {
   type DeckPlan,
   type SlideSpec
 } from '@/lib/artifact-composer'
+import { deckAxisCatalogDir } from '@/lib/artifact-composer/catalogs/deck-axis'
 
 import { compareImages, loadPng } from '../frontend/lib/visual-diff'
 
 const ROOT = process.cwd()
 
-/** ⚠️ Debe seguir al catálogo: hoy los templates viven en docs/ (se mudan en Slice 1b). */
-const TEMPLATES_DIR = path.resolve(ROOT, 'docs/architecture/tender-deck-composer-prototypes')
+/** El home del catálogo lo declara el propio catálogo (Slice 1b: los assets viven con él). */
+const TEMPLATES_DIR = deckAxisCatalogDir
 
 /** El deck real que protege este gate: 15 láminas de la oferta SKY. */
 const SKY_PLAN_PATH = path.resolve(ROOT, 'docs/commercial/tenders/sky-blog-2026/deck-plan.json')

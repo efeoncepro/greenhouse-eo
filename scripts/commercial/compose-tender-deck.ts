@@ -13,8 +13,9 @@ import fs from 'node:fs/promises'
 
 // Barrel del primitive — cero deep-imports (TASK-1393: el motor vive en artifact-composer/).
 import { composeDeck, DeckValidationError, type DeckPlan } from '@/lib/artifact-composer'
+import { deckAxisCatalogDir } from '@/lib/artifact-composer/catalogs/deck-axis'
 
-const TEMPLATES_DIR = path.resolve(process.cwd(), 'docs/architecture/tender-deck-composer-prototypes')
+const TEMPLATES_DIR = deckAxisCatalogDir
 
 const main = async () => {
   const [planPath, ...rest] = process.argv.slice(2)

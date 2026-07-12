@@ -32,3 +32,9 @@ services/hubspot_greenhouse_integration/
 
 # TASK-1393: baseline visual del artifact-composer (40MB de PNGs committeados) — el build de Next no lo lee
 scripts/frontend/baselines/artifact-composer
+
+# TASK-1393 Slice 1b: tras mudar el catálogo runtime a src/lib/artifact-composer/catalogs/deck-axis,
+# lo que queda acá son PREVIEWs + referencias Figma (~40MB de documentación pura). ⚠️ NO excluir
+# `docs/` completo: el Roadmap reader (TASK-1152) lee docs/{epics,tasks,mini-tasks,issues}/**/*.md
+# en runtime vía outputFileTracingIncludes (next.config.ts) — excluirlo rompería /api/roadmap/*.
+docs/architecture/tender-deck-composer-prototypes/

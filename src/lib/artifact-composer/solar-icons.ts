@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 /**
  * Artifact Composer — catálogo de íconos Solar Bold.
@@ -20,9 +21,12 @@ import path from 'node:path'
  * actualice un ícono).
  */
 
+// Module-relative, NUNCA relativo al cwd (Slice 1b: los assets viven CON el catálogo, no en
+// docs/). Deuda declarada para Slice 2: el icon set pasa a ser inyectable por catálogo — este
+// default deck-axis es la última referencia del motor a un catálogo concreto.
 const SOLAR_DIR = path.resolve(
-  process.cwd(),
-  'docs/architecture/tender-deck-composer-prototypes/assets/solar'
+  path.dirname(fileURLToPath(import.meta.url)),
+  'catalogs/deck-axis/assets/solar'
 )
 
 const cache = new Map<string, string>()

@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-const TEMPLATES_DIR = path.join(process.cwd(), 'docs/architecture/tender-deck-composer-prototypes')
+const TEMPLATES_DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalogs/deck-axis')
 
 const templateFiles = fs
   .readdirSync(TEMPLATES_DIR)

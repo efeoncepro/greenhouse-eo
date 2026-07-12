@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { SlideSpec, TemplateContract } from '../contracts'
 import { fillSlide } from '../render'
 
-const DIR = path.join(process.cwd(), 'docs/architecture/tender-deck-composer-prototypes')
+const DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalogs/deck-axis')
 const CONTRACT_PATH = path.join(DIR, 'chart-split.slots.json')
 const TEMPLATE_PATH = path.join(DIR, 'chart-split.html')
 

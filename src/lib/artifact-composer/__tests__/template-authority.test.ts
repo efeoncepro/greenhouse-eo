@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { composeDeck, TemplateAuthorityError } from '../index'
 import type { DeckPlan } from '../contracts'
 
-const TEMPLATES_DIR = path.join(process.cwd(), 'docs/architecture/tender-deck-composer-prototypes')
+const TEMPLATES_DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalogs/deck-axis')
 
 /**
  * TASK-1393 Slice 1 — el autor declara INTENCIÓN, nunca AUTORIDAD DE PRESENTACIÓN.

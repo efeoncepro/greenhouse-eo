@@ -8,7 +8,7 @@ import type { SlideSpec, TemplateContract } from '../contracts'
 import { fillSlide } from '../render'
 import { synthesizeSlotValue } from '../synthesize'
 
-const DIR = path.join(process.cwd(), 'docs/architecture/tender-deck-composer-prototypes')
+const DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalogs/deck-axis')
 
 /**
  * Este test existe porque "la plantilla tiene su `slots.json`" **NO** significa "el composer la puede

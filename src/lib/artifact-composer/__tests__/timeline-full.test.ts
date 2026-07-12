@@ -9,7 +9,7 @@ import { assertSlideFitsCanvas, fillSlide } from '../render'
 import { layoutTimelineSchedule, parseTimelineSchedule } from '../timeline'
 import { validateSlide } from '../validate'
 
-const DIR = path.join(process.cwd(), 'docs/architecture/tender-deck-composer-prototypes')
+const DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalogs/deck-axis')
 const TEMPLATE_PATH = path.join(DIR, 'timeline-full.html')
 
 const contract = JSON.parse(await fs.readFile(path.join(DIR, 'timeline-full.slots.json'), 'utf8')) as TemplateContract

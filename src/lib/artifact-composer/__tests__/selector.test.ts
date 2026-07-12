@@ -7,7 +7,7 @@ import { auditRegistry, selectTemplate, UnknownContentTypeError, type DeckRegist
 
 const TEMPLATES_DIR = path.resolve(
   process.cwd(),
-  'docs/architecture/tender-deck-composer-prototypes'
+  'src/lib/artifact-composer/catalogs/deck-axis'
 )
 
 const loadRealRegistry = (): DeckRegistry =>
