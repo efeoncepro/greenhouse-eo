@@ -162,6 +162,13 @@ paralaje, o interacción 3D — un spot de tipo kinética plana no lo necesita. 
 equivale a **generar keyframes de prueba** para bloquear el camera move antes de comprometer la toma
 final (módulo 09). Regla: previs solo los planos donde el riesgo de cámara justifica el costo.
 
+Cuando el modelo/endpoint expone reference-to-video multimodal, la previs puede pasar a Seedance como
+**video exportado** junto a un keyframe que define el look final. No se le entrega el `.blend` ni una
+cámara 3D editable: la toma queda condicionada, no bloqueada frame a frame. Confirmar video + imagen
+de referencia, probar un único take y revisar composición, contactos, texto y continuidad. Capacidad
+investigada y no receta validada; no reutilizar el blocking 3D Glitch rechazado. Canon:
+`docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`.
+
 ## 7. Shotlist — el puente a la producción
 
 La **shotlist** es la traducción del storyboard aprobado a **órdenes de producción**: la tabla que

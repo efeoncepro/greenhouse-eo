@@ -29,7 +29,7 @@ No hay "el mejor modelo" — hay **el mejor modelo para ESTA toma**. Elige por l
 | **Higgsfield Cinema Studio** | Control de cámara nombrado y **repetible** | Presets: dolly, crash zoom, orbit, crane, pan, tilt, tracking + elegir **focal length** + física óptica. El control de cámara más dirigible |
 | **Higgsfield Soul ID** | **Consistencia de personaje** | Subir 3–5 fotos, entrenar ~5–10 min, reusar el mismo rostro en todas las tools. EL diferenciador |
 | **Runway Gen-4.5** | **Cine dirigido** | Entiende beats y coreografía de cámara (pan/truck/handheld). Fuerte para narrativa dirigida |
-| **Seedance 2.0 / 2.5** | Briefs detallados + **muchas refs** | Camera moves + hasta 12–50 refs (fija personaje/producto) + audio ref. 2.5: 30s / 4K. **Barato (~$0.06/s)** |
+| **Seedance 2.0 / 2.5** | Briefs detallados + **muchas refs** | Camera moves + hasta 12–50 refs (fija personaje/producto) + audio ref. Puede usar previs 3D como **video exportado** con keyframe de look si el endpoint expone reference-to-video; no recibe `.blend`. 2.5: 30s / 4K. **Barato (~$0.06/s)** |
 | **Kling 3.0** | **Storyboarding multi-shot + Voice Binding** | Voz consistente en 6 cortes / 5 idiomas. Económico |
 | **Veo 3.1** | **Broadcast** | Frame rate de cine, sync audio-visual nativo. ~$0.10/s |
 | **Gemini Omni** | **Edición conversacional multi-turn** | Multimodal, consistencia entre turnos. Vertex (proyecto efeonce-group) |

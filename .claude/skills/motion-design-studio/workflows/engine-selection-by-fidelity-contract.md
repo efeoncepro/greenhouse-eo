@@ -12,10 +12,17 @@
 | --- | --- | --- |
 | Un paquete de stills ficticios define tono/campaña, pero cada microescena puede interpretarse; no hay texto ni objeto diegético que deba ser exacto | **Gemini Omni image-to-video** | Convierte cada key visual en un beat vivo y breve; funciona especialmente bien para UGC, Reel, Historia y Creador si se describe la acción humana concreta. |
 | Un key visual existente es la verdad del set: composición, micrófono/producto, practical, color y profundidad deben seguir reconocibles | **Seedance image/reference-to-video** | Empieza desde la referencia íntegra y favorece el contrato de conservar mundo/objeto. Sigue siendo candidato técnico y debe pasar actuación, texto y sonido. |
+| La toma necesita cámara, blocking o timing espacial preplaneados; el look puede reinterpretarse | **Seedance reference-to-video** con playblast/viewport **exportado** + keyframe de look | El modelo puede tomar video e imagen como referencias; requiere un endpoint que exponga ambos y una prueba aislada. Capacidad investigada, no receta validada. |
 | Falta una acción/objeto que no existe y se necesita explorar o editar hablando sobre una escena que tolera reinterpretación | **Gemini Omni edit/generation** | Su valor diferencial es el loop conversacional, no una promesa de fidelidad frame-perfect. |
 | Sólo cambia orden, pausa, trim, freeze, grade o copy no diegético exacto | **Post determinista / mograph** | No gastar generación ni fingir física que no existe en los frames. |
 
 La plataforma o canal es un dato de formato; la **fidelidad permitida**, la presencia de un practical y la semántica física de la acción son la decisión de motor.
+
+## Previs 3D → Seedance: capacidad investigada, no evidencia interna
+
+Seedance recibe referencias de texto, imagen, audio y video; una previs se aporta como media exportada, no como `.blend` ni escena editable. El video puede orientar cámara, composición, blocking y ritmo, mientras una imagen alineada define el look final. Esto sigue siendo condicionamiento interpretativo: no garantiza cámara 3D, geometría, contactos, texto ni continuidad frame-perfect.
+
+Antes de probar, confirmar que el endpoint expone **video de referencia + imagen de referencia** y registrar modelo/tier, prompt, costo, metadata y rúbrica temporal. La fuente funcional, las referencias oficiales y el límite específico de Glitch viven en `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`. El blocking 3D Glitch fue rechazado por el operador: no reutilizarlo ni elevar esta capacidad a workflow validado sin un fixture nuevo autorizado.
 
 ## Caso validado: Redes Sociales
 

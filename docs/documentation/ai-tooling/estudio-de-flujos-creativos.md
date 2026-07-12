@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-07-06 por Claude (vision operador Julio Reyes)
-> **Ultima actualizacion:** 2026-07-06 por Claude
+> **Ultima actualizacion:** 2026-07-12 por Codex
 > **Estado:** Propuesta histórica de ubicación Greenhouse — no está construido ahí. El programa vigente nace como plataforma hermana agentic.
 > **Documentación técnica vigente:** [Efeonce Creative Studio — Agentic Platform Architecture V1](../../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md). La [ADR Creative Flow Studio](../../architecture/GREENHOUSE_CREATIVE_FLOW_STUDIO_DECISION_V1.md) se conserva como referencia de diseño DAG, ya superseded como runtime.
 
@@ -45,6 +45,8 @@ El proveedor bloqueó seis requests iniciales antes de generar candidatos. La re
 El piloto además comprobó un límite operativo importante: una edición video-a-video puede completar técnicamente y aun así romper continuidad. Un finish determinista sirve sólo si el master ya contiene la actuación correcta y el ajuste no cambia la verdad física del plano. La revisión creativa posterior rechazó la recuperación F/I: el `ON AIR` ya existía como practical en el key visual original, pero al reponerlo en post se veía pegado; el retime de la mano se leía como presión y el foley Gemini no sonaba a una prueba real de micrófono. Seedance después conservó correctamente el set 4K de Glitch, pero tampoco aprobó el gesto ni el audio: conservar diseño y cumplir una acción física son gates separados.
 
 La comparación no clasifica motores por canal. En la landing de Redes Sociales se generó primero un paquete ficticio de ocho imágenes; Omni animó seis referencias de ese paquete en microescenas publicadas. Allí las imágenes eran una ancla de lenguaje visual y no había texto/practical exacto que conservar. Para una identidad de set, producto o practical físico que debe mantenerse reconocible, el workflow prueba primero un motor de referencia como Seedance. Para una microescena flexible, un loop conversacional o una campaña ficticia desde stills, Omni sigue siendo una mano probada. El nodo futuro `generate-video` debe registrar este contrato de fidelidad junto a modelo, referencia, presupuesto y revisión; no debe inferirlo desde “RRSS” o “landing”. La regla operativa completa vive en [Selección por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md). El estado sigue siendo piloto: no implica que el Estudio de Flujos exista como producto ni que una generación sea automáticamente aprobada o publicable.
+
+Una capacidad externa adicional, aún sin prueba interna aprobada, es usar una previs 3D exportada como video de referencia junto a un keyframe de look final en Seedance. No significa importar Blender ni habilitar un renderer 3D: el modelo interpreta video, imágenes y prompt. El contrato, límites y la exclusión expresa del blocking 3D de Glitch viven en [Previsualización 3D con Seedance](previs-3d-y-referencias-seedance.md).
 
 ## Como funciona (en simple)
 

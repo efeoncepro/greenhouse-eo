@@ -1,3 +1,9 @@
+## Sesión 2026-07-12 (cont. 18) — Seedance reference-to-video con previs 3D documentado (Codex)
+
+> **Hecho:** se documentó la capacidad externa de Seedance 2.0 de combinar video de referencia, imagen, audio y prompt. Una previs Blender/Unreal/C4D llega como playblast/video exportado y puede guiar cámara, blocking y timing; no se transmite un `.blend` ni una escena/cámara 3D editable. Canon: `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`, enlazado desde documentación funcional, manual y espejos Codex/Claude de `motion-design-studio`.
+>
+> **Límite y estado:** no se ejecutó proveedor, no se modificó runtime/ADR ni se validó una receta. El adapter futuro debe exponer video + imagen de referencia, y todo take requiere rúbrica temporal. La decisión del operador sobre Glitch sigue vigente: su blocking 3D rechazado no se reutiliza como referencia generativa. Próximo paso sólo con un fixture nuevo autorizado y presupuesto aprobado.
+
 ## Sesión 2026-07-12 (cont. 17) — TASK-1399: el Proposal Studio ya se opera desde el chat (Claude)
 
 - **La puerta que faltaba, construida.** 4 acciones gobernadas (`register_proposal`,

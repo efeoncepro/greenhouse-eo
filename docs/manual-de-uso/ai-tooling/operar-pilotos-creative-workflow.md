@@ -25,10 +25,17 @@ El referente ejecutado es la intro Glitch El micrófono se abre. Su retrospectiv
 | --- | --- | --- |
 | Stills ficticios de una campaña: pueden reinterpretarse dentro del mismo lenguaje visual; no tienen copy ni practical exacto | Gemini Omni image-to-video | RRSS: `gpt-image-2` generó ocho key visuals; Omni animó seis referencias y se publicaron beats de cuatro segundos. |
 | El key visual ya es la verdad de un set/producto/practical y debe mantener identidad espacial | Seedance image/reference-to-video | Glitch S conservó correctamente set, paleta y practical; el take sigue rechazado por gesto/foley, no por diseño. |
+| Una toma requiere blocking, timing o cámara espacial preplaneada, y el look final puede reinterpretarse | Seedance reference-to-video con previs 3D exportada + keyframe | Capacidad externa documentada; exige endpoint con referencias de video y una prueba aislada. No es receta interna validada ni habilita reutilizar el blocking 3D rechazado de Glitch. |
 | Se necesita explorar una acción inexistente mediante conversación y el plano tolera reinterpretación | Gemini Omni edit/generation | El resultado siempre pasa revisión temporal completa. |
 | Sólo cambian ritmo, orden, trim, hold, grade o copy no diegético exacto | Edición determinista / mograph | No se generan píxeles ni se simula una física ausente. |
 
 El canal no decide: un video de RRSS puede ser excelente con Omni si parte de un paquete de imágenes flexible, y una intro vertical puede requerir Seedance si el set es una identidad que no debe rediseñarse.
+
+### Cuando la referencia es una previs 3D
+
+Una previs de Blender, Unreal o Cinema 4D se exporta como video/playblast: Seedance no recibe el `.blend` ni una cámara 3D editable. Usar el video para bloquear cámara, encuadre, timing y acción, y una imagen alineada para materiales, personaje, luz y look final. Confirmar antes que el endpoint permite video + imagen como referencias; un modo limitado a image-to-video no sirve. El patrón sigue siendo probabilístico, por lo que revisar anatomía, contactos, texto y continuidad como cualquier otro take.
+
+El detalle de capacidad, fuentes, prompt de intención y restricciones internas está en [Previsualización 3D con Seedance](../../documentation/ai-tooling/previs-3d-y-referencias-seedance.md). No usar esta nota para reabrir o reciclar el blocking 3D rechazado de Glitch.
 
 ## Flujo de generación
 

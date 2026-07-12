@@ -79,8 +79,11 @@ argument-hint: "[tarea o pregunta — ej: 'dirige un brand film de 30s para el g
    y usa el pipeline con las herramientas conectadas + confirmación humana antes de producir/entregar.
    Para **recetas de producción validadas** (qué combinación funcionó y cómo — reference→Omni enhance,
    reference-chaining, UI-sin-AE, híbrido), consulta la **biblioteca viva** `workflows/README.md`; el
-   **contrato completo de Gemini Omni en Vertex** está en `efeonce/GEMINI_OMNI_VERTEX.md`. Cuando algo
-   nuevo funcione, **documéntalo en `workflows/`** (es como crece la skill).
+   **contrato completo de Gemini Omni en Vertex** está en `efeonce/GEMINI_OMNI_VERTEX.md`. La capacidad
+   investigada de previs 3D exportada → Seedance reference-to-video vive en
+   `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`: no es receta validada ni autoriza
+   reciclar el blocking Glitch rechazado. Cuando algo nuevo funcione, **documéntalo en `workflows/`**
+   (es como crece la skill).
 5. **Aterriza a Efeonce** si es marca/canales propios o un cliente Globe:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
 6. **Cierra con un artefacto** de `templates/` (brief, storyboard, animatic/shotlist, prompt sheet,

@@ -2,6 +2,8 @@
 
 ## 2026-07-12
 
+- **Creative Workflow / Seedance — previs 3D como referencia multimodal documentada, no promovida.** Se registró que Seedance 2.0 puede recibir una previs 3D como video exportado junto a un keyframe de look, siempre que el adapter exponga `reference-to-video`; no consume `.blend` ni ofrece cámara 3D determinista. La documentación funcional, manual y espejos Codex/Claude distinguen capacidad externa de receta validada: no hubo generación, cambio runtime ni ADR, y el blocking 3D Glitch rechazado sigue vetado como input. Canon: `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`.
+
 - **TASK-1399 COMPLETE — el Proposal Studio se opera desde el chat (code-complete, flag OFF).**
   4 acciones gobernadas (registrar propuesta · adjuntar RFP · registrar evidencia · pedir el deck) +
   el tool read-only `proposal_status` + el read model del día a día + el upload del RFP por HTTP.
