@@ -15,14 +15,16 @@
     --teal:#36c8bf;        /* teal[500] — teal de firma de Think */
   }
 
-  /* ===== CoverFull: hero de Think — radial navy (luz arriba) + teal como LUZ sutil ===== */
+  /* ===== CoverFull: hero de Think — cámara navy, luz de relación y grano editorial ===== */
   .cover {
     position:relative; width:1920px; height:1080px; overflow:hidden;
     display:flex; align-items:center; justify-content:center;
     padding:var(--safe);
     background:
+      radial-gradient(rgba(255,255,255,.042) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(58% 46% at 50% 47%, rgba(54, 200, 191, .115) 0%, rgba(54, 200, 191, .035) 37%, transparent 71%),
       radial-gradient(92% 76% at 50% -8%, rgba(14, 82, 133, .92) 0%, rgba(0, 40, 77, .16) 53%, transparent 72%),
-      radial-gradient(58% 44% at 92% 94%, rgba(54, 200, 191, .17) 0%, transparent 52%),
+      radial-gradient(58% 44% at 92% 94%, rgba(54, 200, 191, .14) 0%, transparent 52%),
       radial-gradient(135% 100% at 70% -10%, var(--navy-2) 0%, var(--navy) 55%, var(--navy-deep) 100%);
   }
 
@@ -30,9 +32,9 @@
      solo reemplaza los slots; la jerarquía y las proporciones no se negocian. */
   .stack { position:relative; z-index:1; width:900px; display:flex; flex-direction:column; align-items:center; text-align:center; transform:translateY(-18px); }
   .logo-efeonce { width:650px; max-height:188px; object-fit:contain; }
-  .relationship-mark { width:56px; height:1px; margin:24px 0 18px; background:linear-gradient(90deg, transparent, rgba(235, 250, 252, .72), transparent); }
-  .client-stage { min-height:104px; display:flex; align-items:center; justify-content:center; }
-  .logo-client  { width:500px; max-height:132px; object-fit:contain; filter:brightness(0) invert(1); }
+  .relationship-mark { width:88px; height:1px; margin:26px 0 20px; background:linear-gradient(90deg, transparent, rgba(114, 222, 216, .76), transparent); box-shadow:0 0 18px rgba(54, 200, 191, .22); }
+  .client-stage { min-height:170px; display:flex; align-items:center; justify-content:center; }
+  .logo-client  { width:auto; height:170px; max-width:280px; object-fit:contain; filter:brightness(0) invert(1); }
   .proposal-kind { max-width:790px; margin-top:26px; font-family:'Poppins',sans-serif; font-weight:600; font-size:70px; color:#fff; line-height:1.06; letter-spacing:-.025em; text-wrap:balance; }
 
   /* burbuja URL — footer (técnica #848484 + luminosity, sin transform que aísle) */
