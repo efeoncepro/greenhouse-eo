@@ -32,7 +32,9 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY tsconfig.json ./
 COPY src/ ./src/
-COPY scripts/lib/server-only-shim.cjs ./scripts/lib/server-only-shim.cjs
+# El shim requiere sus vecinos (server-only-empty.cjs, …): se copia el dir completo — copiar
+# sólo el entrypoint del shim revienta con ENOENT dentro del contenedor (bug del primer smoke).
+COPY scripts/lib/ ./scripts/lib/
 COPY services/artifact-worker/ ./services/artifact-worker/
 COPY services/_shared/ ./services/_shared/
 # Branding compartido que algún template referencia vía asset interno del catálogo.
@@ -40,5 +42,6 @@ COPY public/branding/ ./public/branding/
 
 ENV NODE_ENV=production
 
-# El Job recibe RENDER_JOB_ID como override de env en cada ejecución (Jobs API).
+# Modo normal: sin RENDER_JOB_ID, el worker CLAIM-ea el próximo job por prioridad
+# (FOR UPDATE SKIP LOCKED). RENDER_JOB_ID sigue soportado para smoke/replay dirigido.
 ENTRYPOINT ["npx", "tsx", "--require", "./scripts/lib/server-only-shim.cjs", "services/artifact-worker/main.ts"]
