@@ -71,6 +71,13 @@ autorización de la próxima frontera de deployable de **EPIC-027**.
 (bloquearía el publisher del outbox). Va en un `tender-worker` dedicado — y un deployable nuevo requiere
 la decisión de frontera de EPIC-027, no se crea por conveniencia.
 
+**Límite de reutilización de formatos:** el `DeckPlan` actual y el eventual `tender-worker` sirven al
+entregable contractual de Tender; no se generalizan dentro de esta foundation para carruseles, posts o
+stories. Esos formatos pertenecen a la futura capa `format_spec → composition_spec → artifact_manifest` de
+Efeonce Creative Studio (EPIC-028). Cuando exista su contrato sister-platform, Tender podrá consumirlo con
+un request minimizado y aprobado; conserva siempre RFP, requisito-set, `audience`, gates y elegibilidad
+client-facing, y jamás replica por defecto material interno o credenciales de storage.
+
 ---
 
 ## Decisión

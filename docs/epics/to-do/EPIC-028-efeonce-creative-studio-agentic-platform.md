@@ -46,6 +46,7 @@ Este programa convierte esos aprendizajes en una capability de agencia acumulabl
 - `TASK-###` — **Creative Studio repository and cloud boundary.** Crear repositorio privado, CI, proyectos GCP, IAM/Secret Manager, Cloud Run, Cloud SQL, buckets, IaC y observabilidad base.
 - `TASK-###` — **Identity, workspace and canonical command foundation.** Tenant/RLS, roles/capabilities, actor/audit/idempotency y API contract base para UI/MCP.
 - `TASK-###` — **Asset provenance and rights foundation.** Asset ingestion privado, hashes, versiones, lineage, signed delivery y políticas de clasificación/derechos.
+- `TASK-###` — **Curated format composition and artifact contract.** `format_spec` + `composition_spec` + `artifact_manifest` versionados para formatos curados; primer proving ground = carrusel Instagram. Decks Tender podrán ser consumer futuro sólo por contrato sister-platform, sin absorber RFPs ni mover su renderer contractual.
 - `TASK-###` — **Credit ledger and governed run lifecycle.** Estimate/reserve/approve/execute/settle con append-only ledger y worker dispatch seguro.
 - `TASK-###` — **Provider contract and first curated template.** Adapter registry, router por contrato de fidelidad, prueba de una modalidad y fixture/evals de control.
 - `TASK-###` — **Studio UI and MCP parity proving ground.** La misma corrida se prepara/estima/envía/revisa desde UI y herramienta MCP, con evidencia de no duplicación.
@@ -80,4 +81,3 @@ Este programa convierte esos aprendizajes en una capability de agencia acumulabl
 ## Delta 2026-07-11
 
 Epic creado desde la decisión explícita del operador: la capability debe nacer agentic y ser operable por UI y MCP con el mismo contrato. La siguiente acción es decidir el bootstrap del repositorio/proyectos, no abrir implementación dentro de `greenhouse-eo`.
-

@@ -262,6 +262,7 @@ Reglas obligatorias:
 - LLM authoring, selector agéntico, generación runtime de `ContextualVisualSlot`, imágenes IA o asset creative workflow.
 - Ejecución autónoma del render por un agente, acceso de tools a `jobs.run`/Cloud Run/DB/storage, o un prompt que evite la confirmación humana.
 - Cambiar la taxonomía, los templates AXIS, la composición visual o añadir renderer PPTX/`react-pdf`.
+- Generalizar este renderer contractual para carruseles, posts, stories u otros formatos de social media. La futura abstracción cross-format vive en Efeonce Creative Studio (EPIC-028); un bridge posterior consume/produce contratos versionados y no cambia el ownership Tender de RFP, `audience`, admisibilidad ni artifacts.
 - Crear el worker si EPIC-027 no autoriza la frontera o si no existe source of truth Tender suficiente.
 
 ## Detailed Spec

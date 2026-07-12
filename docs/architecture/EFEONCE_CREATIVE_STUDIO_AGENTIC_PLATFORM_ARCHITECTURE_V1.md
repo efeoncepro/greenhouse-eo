@@ -87,12 +87,29 @@ The target is separate GCP projects (for example `efeonce-creative-dev` and `efe
 | --- | --- | --- |
 | `workspace` / `member` / `role_grant` | Tenant, membership and authority | Every domain row is scoped to one workspace. |
 | `brand_profile` / `project` | Durable creative context | Brand and rights constraints are versioned, not injected ad hoc into prompts. |
-| `creative_template` | Curated Efeonce workflow | Versioned inputs, fidelity contract, review gates, allowed providers and cost policy. |
+| `creative_template` / `format_spec` | Curated Efeonce workflow and output format | Versioned inputs, fidelity contract, slots/safe areas, export profiles, review gates, allowed providers and cost policy. |
+| `composition_spec` / `artifact_manifest` | Repeatable composition and its delivered result | Immutable template + semantic slots/assets/copy input; output files, dimensions, hashes, lineage, render/review evidence and approved delivery use. |
 | `reference_asset` / `asset_version` | Original and derived media | Content hash, source, rights, lineage, storage policy and derivative parent are recorded. |
 | `creative_run` / `run_step` / `provider_attempt` | Execution and recovery | One logical run can have several attempts; a retry never erases evidence. |
 | `review_decision` | Craft/rights/delivery approval | Technical completion cannot self-approve a deliverable. |
 | `credit_ledger` / `credit_reservation` | Commercial allowance and settlement | Append-only entries; reservation and settlement are idempotent. |
 | `command_execution` / `audit_event` | Programmatic safety | Actor, authority, payload fingerprint, outcome and correlation are durable. |
+
+### Cross-format composition boundary
+
+Creative Studio owns the reusable production grammar for **curated formats**, not a free canvas: a
+`format_spec` defines output constraints (for example frame ratio/count, safe areas, slot types and export
+profiles); a `composition_spec` fixes a selected template plus approved semantic inputs; and an
+`artifact_manifest` records each rendered derivative, its hashes, lineage, review evidence and intended
+delivery use. The first proving format should be an **Instagram carousel**; posts, stories and deck-like
+presentations are subsequent format specs, not separate renderer products.
+
+This boundary deliberately does **not** move Tender Proposal Studio into Creative Studio. Tender owns the
+RFP, requirement-set, audience classification, contractual gates and client-facing eligibility. Until a
+versioned sister-platform handoff exists, its deterministic `DeckPlan` and `tender-worker` remain its own
+specialized path. A future Tender integration may send only an approved, minimized composition request and
+receive an `artifact_manifest`; it never synchronizes raw RFPs, internal diagnostics, costs or storage
+credentials into Creative Studio by default.
 
 ### Run lifecycle
 
@@ -260,7 +277,7 @@ sequenceDiagram
 | Phase | Outcome | Explicitly excluded |
 | --- | --- | --- |
 | 0 — foundation | New repo, project boundaries, tenant/auth, assets, ledger skeleton, audit/telemetry, provider contract, one internal template | Client access, payments, free canvas |
-| 1 — prove craft | Image/video/audio runs, route estimate/approval, review, provider evidence, RRSS + Glitch fixtures | Autonomous publishing, arbitrary model marketplace |
+| 1 — prove craft | Image/video/audio runs, route estimate/approval, review, provider evidence, **Instagram carousel** + RRSS/Glitch fixtures | Autonomous publishing, arbitrary model marketplace |
 | 2 — client-ready | Scoped client roles, asset intake/rights, client review, contracts/events for Greenhouse and Verk | Unbounded self-serve spend, cross-tenant collaboration |
 | 3 — scale IP | Batch/variants, curated flow composition, evaluation registry, commercial credit allocation | General-purpose automation platform |
 | 4 — advanced authoring | Governed canvas/DAG and richer agent collaboration if evidence warrants it | Replacing professional direction/review |
@@ -277,4 +294,3 @@ sequenceDiagram
 ## 14. External technical references
 
 The infrastructure selections follow managed primitives suitable for this stage: [Cloud Run Jobs](https://cloud.google.com/run/docs/create-jobs), [Cloud Tasks HTTP targets](https://docs.cloud.google.com/tasks/docs/creating-http-target-tasks), [Cloud Run service-to-service authentication](https://docs.cloud.google.com/run/docs/authenticating/service-to-service), [Cloud Storage signed URLs](https://docs.cloud.google.com/storage/docs/access-control/signed-urls), [Cloud SQL for PostgreSQL](https://docs.cloud.google.com/sql/docs/postgres), [Secret Manager](https://docs.cloud.google.com/secret-manager/docs/overview) and [OpenTelemetry JavaScript](https://opentelemetry.io/docs/languages/js/). These are deployment building blocks, not authorization to provision them before EPIC-028 bootstrap approval.
-

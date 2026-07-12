@@ -18,7 +18,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `migration`
-- Epic: `none`
+- Epic: `EPIC-027`
 - Status real: `Diseno`
 - Rank: `TBD — predecessor obligatorio de TASK-1391`
 - Domain: `commercial|data|ops`
@@ -37,7 +37,7 @@ El dominio ya tiene el Deck Composer F4 shipped y una state machine TS pura, per
 
 Además, un CRUD no satisface la dirección del Studio: un agente debe poder leer el contexto permitido, proponer el intake y operar las mismas capabilities que UI/API/Nexa/MCP, pero nunca mutar directamente ni ejecutar análisis o submit por cuenta propia. F0 necesita por ello un **Tender Intake Agent Contract**: input estructurado → propuesta trazable → confirmación humana → command canónico. No se acepta agregar un SDK/agente paralelo o un prompt que escriba SQL/estado.
 
-El riesgo principal no es técnico sino de source of truth: RESEARCH-007 descubre oportunidades públicas y Tender Proposal Studio construye la oferta. Ambos mencionan `greenhouse_commercial.tenders`; antes de migrar se debe resolver que convergen por handoff —no por absorción ni tabla paralela— y dejar la decisión indexada si exige ADR.
+El riesgo principal es aplicar correctamente el source of truth ya decidido: RESEARCH-007 descubre oportunidades públicas y Tender Proposal Studio construye la oferta. El ADR Accepted fija que convergen por handoff —no por absorción ni tabla paralela—; la migración debe materializar esa decisión, sus claves y su idempotencia.
 
 ## Goal
 
@@ -88,7 +88,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- Arbitraje de ownership con RESEARCH-007 sobre `greenhouse_commercial.tenders`; si se requiere ADR, aprobar/indexar antes de la migración.
+- ADR `GREENHOUSE_TENDER_DISCOVERY_OWNERSHIP_BOUNDARY_DECISION_V1.md` (Accepted): aplicar el ownership `RESEARCH-007 public_tender* → Tender greenhouse_commercial.tenders` y su command de promoción human-gated antes de la migración.
 - Composer y state machine ya materializados: `src/lib/commercial/tenders/deck/**`, `src/lib/commercial/tenders/tender-state-machine.ts`.
 - Prior art de structured output/tool loop: `src/lib/ai/` y `src/lib/nexa/{providers,nexa-tools.ts,nexa-turn-telemetry.ts}`; confirmar adapter exacto en Plan Mode, sin crear SDK/framework de agentes paralelo.
 - Asset store canónico y sus contextos/retention/scan: `src/lib/storage/greenhouse-assets.ts`, `src/types/assets.ts`.
@@ -123,7 +123,7 @@ Reglas obligatorias:
 - No existen tabla, constraints, trigger append-only, reader/store, command, API/capability/grant, outbox ni contract/tool surface del Tender Intake Agent.
 - `GreenhouseAssetContext` no tiene contexto Tender ni el asset store conoce los prefixes/retention permitidos para RFPs/outputs de licitación.
 - No hay vínculo entre assets físicos y el deliverable semántico `tender_assets` (kind/status/audience/version).
-- No está arbitrado en runtime/documentación el ownership de la tabla canónica con RESEARCH-007; crearla sin ese gate arriesga source of truth paralelo.
+- El ownership ya está decidido en arquitectura, pero todavía no está materializado en runtime como FK/command/idempotencia de promoción; omitirlo reabriría el riesgo de source of truth paralelo.
 
 ## Modular Placement Contract
 
@@ -133,7 +133,7 @@ Reglas obligatorias:
 - Boundary: aggregate/commands/readers/tools `Tender`; consumers autorizados: API Platform, Tender Intake Agent, future UI/Nexa/MCP, RESEARCH-007 handoff, TASK-1391 renderer; ninguno accede tablas directamente.
 - Server/browser split: contracts DTO browser-safe sólo si un reader los necesita; DB, asset store, scan, commands, outbox y capabilities son server-only.
 - Build impact: migración additive y posible extensión del asset store; sin nueva dependencia pesada, worker, filesystem runtime ni deployable.
-- Extraction blocker: ownership con RESEARCH-007 y transacciones entre Tender, asset store, API command ledger y outbox permanecen en el monolito.
+- Extraction blocker: las transacciones entre Tender, asset store, API command ledger y outbox permanecen en el monolito; el handoff RESEARCH-007 sólo cruza por command/contrato, no por tablas compartidas.
 
 ## Backend/Data Contract
 
@@ -173,7 +173,7 @@ Reglas obligatorias:
 - Default state: capabilities/commands y agent runtime OFF o internal-only hasta staging smoke; sin UI pública, análisis autónomo ni ejecución automática de render.
 - Backfill plan: `none`; la licitación SKY se importa sólo mediante command explícito si el operador lo aprueba, como evidencia controlada.
 - Rollback path: flags/capabilities OFF y revert PR; migraciones additive/historial se conservan si hay comandos/audit aplicados, nunca DELETE manual de transiciones/assets.
-- External coordination: owner de RESEARCH-007/arquitectura para arbitraje; staging migration; revisión de roles/capabilities; operador comercial confirma asset client-facing y, si importa SKY, los inputs permitidos.
+- External coordination: owner de RESEARCH-007/arquitectura para validar la aplicación del handoff Accepted; staging migration; revisión de roles/capabilities; operador comercial confirma asset client-facing y, si importa SKY, los inputs permitidos.
 
 ### Security and access
 
@@ -247,6 +247,7 @@ Reglas obligatorias:
 - Parsing/IA profunda del RFP, requisito-set/admisibilidad, fit score, pricing/quote adapter, HubSpot deal, producción de copy/squad/diagnóstico o submit. El agente F0 propone intake estructurado; el fan-out lector pertenece a F1.
 - Cloud Run Job, outbox dispatcher de render, Chromium, cola, previews/PDF productivos y artifact pipeline (TASK-1391).
 - UI, Figma, wireframes, GVC, Nexa/MCP UI, generación de imágenes o ContextualVisualSlot runtime.
+- Generalizar el Deck Composer como plataforma de carruseles/posts/stories o crear un renderer/media runtime compartido: la composición cross-format es un slice futuro de Efeonce Creative Studio (EPIC-028). Esta task sólo preserva el seam de Tender para un handoff versionado, sin enviar RFPs o material interno fuera de Greenhouse.
 - Absorber RESEARCH-007, reimplementar Cliente 360, cotizador, asset store o crear un bucket/storage/identity paralelos.
 
 ## Detailed Spec
@@ -254,6 +255,11 @@ Reglas obligatorias:
 F0 establece el mínimo confiable para que una licitación exista como objeto de negocio y como capability agentic: `Tender` creado en `intake`, assets RFP registrados privados y vinculados, historial de cambios defensible, una proyección legible y un contexto/tool surface que el agente puede consumir sin inventar estado. El `Tender Intake Agent` recibe sólo metadata/asset manifest/actor autorizados y devuelve un `TenderIntakeProposal` tipado con referencias a esos inputs; la confirmación humana invoca el mismo `createTender`/`ingestTenderRfp` que usarían API o CLI. No debe intentar simular el resto del pipeline cambiando estados sin evidencia. El estado `intake` sólo representa el baseline inicial; F1 agrega análisis/requisitos y F2/F4 producen outputs.
 
 El agente reusa el cliente canónico `src/lib/ai/` y el patrón tool-use/telemetría de Nexa; no introduce LangChain, LangGraph, Agents SDK ni memoria mutable propia. El handoff desde RESEARCH-007 debe transportar la referencia a la oportunidad descubierta y su evidencia, no copiar entidades ni inventar datos. La migración queda bloqueada si el owner de ambas arquitecturas no puede demostrar una única escritura/lectura canónica de `tenders`.
+
+El seam de formatos se limita a referencias portables que el dominio ya necesita (`asset` versionado,
+`audience`, provenance, purpose y snapshot de entrega). No se introducen en Tender `format_spec`,
+`composition_spec` ni `artifact_manifest` como modelos propios: Creative Studio los definirá en EPIC-028 y
+un eventual bridge deberá ser explícito, versionado y minimizar los inputs compartidos.
 
 ## Rollout Plan & Risk Matrix
 
@@ -292,7 +298,7 @@ El agente reusa el cliente canónico `src/lib/ai/` y el patrón tool-use/telemet
 
 ### Production verification sequence
 
-1. Aprobar ownership RESEARCH-007→Tender y capability/access model.
+1. Confirmar que la migración/command aplica el ownership Accepted RESEARCH-007→Tender y el capability/access model.
 2. Aplicar migration staging con commands OFF; inspeccionar schema/constraints/FKs/triggers.
 3. Producir propuesta del Tender Intake Agent sobre contexto allowlisted y confirmar el intake de control; verificar que usa el mismo command, scan, ownership, asset link/audience/version y read projection.
 4. Probar retry/concurrencia, transiciones ilegales/terminales y gates humanos; confirmar audit/outbox sin secretos/contents.
@@ -301,7 +307,7 @@ El agente reusa el cliente canónico `src/lib/ai/` y el patrón tool-use/telemet
 
 ### Out-of-band coordination required
 
-- Owner de RESEARCH-007/Tender architecture: resolver ownership/handoff de `greenhouse_commercial.tenders`.
+- Owner de RESEARCH-007/Tender architecture: validar que schema/command implementan el handoff Accepted de `greenhouse_commercial.tenders`.
 - Operador comercial: confirma Tender de control, RFP permitido y clasificación internal/client-facing.
 - Owner agent/Nexa: revisa tool contract, propuesta estructurada, trace/eval fixture y el gate humano; no habilita ejecución autónoma.
 - Operaciones DB/Cloud: migration staging, asset scanning/retention y observabilidad/outbox.
@@ -329,8 +335,8 @@ El agente reusa el cliente canónico `src/lib/ai/` y el patrón tool-use/telemet
 
 ## Closing Protocol
 
-- No mover a `complete/` si falta arbitraje RESEARCH-007, migration staging, asset access/scan, capability/grant, audit/outbox o evidencia de rollback.
-- Si el arbitraje exige un ADR/predecessor, dejar la task `to-do` bloqueada y enlazarlo; no crear una tabla paralela ni improvisar sobre `public_tenders`.
+- No mover a `complete/` si falta aplicar/validar el ADR RESEARCH-007, migration staging, asset access/scan, capability/grant, audit/outbox o evidencia de rollback.
+- Si schema o command contradicen el ADR Accepted, dejar la task `to-do` bloqueada y corregir el contrato antes de migrar; no crear una tabla paralela ni improvisar sobre `public_tenders`.
 - No cerrar como "agentic" si sólo existe un prompt: debe existir contexto tipado, tool contract sobre primitives, propuesta trazable, eval y confirmación humana real.
 - Cerrar con changelog/Handoff, docs de arquitectura/método si el runtime cambia el handoff y actualización explícita de TASK-1391.
 

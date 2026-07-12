@@ -36895,3 +36895,8 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 - Se creó [`TASK-1392`](docs/tasks/to-do/TASK-1392-tender-proposal-studio-foundation.md) como predecessor de TASK-1391. F0 no se implementa como CRUD: incluye aggregate/state machine/assets/intake y `Tender Intake Agent Contract` (contexto allowlisted + tools sobre primitives + propuesta tipada/trazable/evaluable + confirmación humana que ejecuta el mismo command).
 - Está bloqueada por el arbitraje de ownership de `greenhouse_commercial.tenders` entre RESEARCH-007 y Tender Proposal Studio. No crear tabla paralela ni habilitar al LLM a mutar estado, assets o gates humanos.
 - Ambas tasks quedan registradas como hijas de `EPIC-027`: `TASK-1392` permanece en el modular monolith; `TASK-1391` es sólo el candidato de próxima frontera y sigue bloqueada hasta el `continue|pause|stop` explícito del epic.
+
+# Handoff — 2026-07-12 · Formatos creativos reutilizables
+
+- Carruseles de Instagram, posts y stories no se incorporan a la foundation de Tender. `TASK-1392` preserva el seam de `asset`/`audience`/provenance/purpose, y `TASK-1391` conserva el renderer contractual de RFP.
+- `EPIC-028`/Creative Studio recibe la capability futura de formatos curados: `format_spec → composition_spec → artifact_manifest`, con carrusel Instagram como primer proving ground. Un bridge futuro Tender→Studio debe ser versionado y minimizado; nunca replica RFPs, diagnósticos internos, costos o credenciales de storage.
