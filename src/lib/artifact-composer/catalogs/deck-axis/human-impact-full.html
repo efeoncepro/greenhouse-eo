@@ -2,15 +2,15 @@
 <html lang="es">
 <head>
     <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Poppins:ital,wght@0,300;0,800;0,900;1,800;1,900&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
     :root { --ink:var(--axis-ppt-indigo-950); --teal:var(--axis-ppt-teal-600); --lime:var(--axis-ppt-green-100); --lime-text:var(--axis-deck-green-750); --surface:rgba(var(--axis-deck-surface-50-rgb), .86); }
-    .slide { position:relative; isolation:isolate; width:1920px; height:1080px; overflow:hidden; color:var(--axis-ppt-neutral-50); background: var(--axis-deck-recipe-rich-content); }
+    .slide { isolation:isolate; color:var(--axis-ppt-neutral-50); background: var(--axis-deck-recipe-rich-content); }
     /* `fr`, NO `%`: 48%+52% ya es el 100% del content-box y el gap de 44px se suma encima, así que
        la 2ª columna se salía del lienzo. Hoy no se nota porque el copy no llena el track — es un
        bug latente que amputaría cualquier texto más largo. Ver la misma nota en four-pillars-full. */
@@ -23,7 +23,7 @@
     .context { align-self:start; max-width:765px; padding-top:1px; font-size:26px; line-height:1.29; }
     .context p + p { margin-top:34px; }
     .context strong { font-weight:700; }
-    .impact-card { position:absolute; z-index:2; left:0; right:0; bottom:0; height:584px; overflow:hidden; border-radius:58px 58px 0 0; background:var(--surface); border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .44); box-shadow:0 -1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .17), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .62); backdrop-filter:blur(20px) saturate(1.06); }
+    .impact-card { position:absolute; z-index:2; left:0; right:0; bottom:0; height:584px; overflow:hidden; border-radius:58px 58px 0 0; background:var(--surface); border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .44); box-shadow:0 -1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .17), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .62); backdrop-filter:blur(var(--deck-blur-xl)) saturate(1.06); }
     .role-title { position:absolute; top:57px; left:120px; width:800px; display:flex; align-items:flex-start; gap:21px; color:var(--lime-text); font-family:'Poppins',sans-serif; font-size:39px; font-weight:800; letter-spacing:-.045em; line-height:1.1; }
     .role-title .arrow { flex:0 0 auto; width:48px; height:48px; margin-top:0; display:grid; place-items:center; border-radius:50%; background:var(--lime); }
     .role-title .arrow img { width:31px; height:31px; filter:brightness(0) invert(1); }

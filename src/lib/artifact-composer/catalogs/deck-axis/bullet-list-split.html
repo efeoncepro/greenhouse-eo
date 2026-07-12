@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
-  html,body { width:1920px; height:1080px; }
   body { font-family:'Geist',sans-serif; overflow:hidden; }
 
   :root { --safe:72px; }   /* safe-area: ningún contenido toca el borde de la slide */
-  .slide { position:relative; width:1920px; height:1080px; display:flex; background: var(--axis-deck-recipe-light-surface); }
+  .slide { display:flex; background: var(--axis-deck-recipe-light-surface); }
 
   /* ===== LEFT: brand panel — layout Figma + degradado HERO de Think (estable) =====
      Fuente canónica: efeonce-think index.astro .home-hero / .hero-shell.

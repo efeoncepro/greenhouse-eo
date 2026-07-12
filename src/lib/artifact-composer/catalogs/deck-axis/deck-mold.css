@@ -1,0 +1,61 @@
+/*
+ * Molde del catálogo deck-axis — ARTEFACTO COMPILADO, no convención (TASK-1393 Slice 3b-molde).
+ *
+ * "Un contrato que hay que re-implementar 25 veces no es un contrato: es una sugerencia" — el
+ * lienzo (lo más invariante del sistema) estaba re-declarado 25/25. Desde este slice las
+ * plantillas COMPONEN el molde: lo cargan después de deck-tokens.css y dejan de dibujarlo.
+ *
+ * Qué es del MOLDE (invariante del catálogo): lienzo · safe-area · escala de espaciado · escala de
+ * blur del glass · el chrome de la firma (deck-signature.css, anclado a REGIÓN vía
+ * data-url-bubble-backdrop — nunca a un píxel medido a mano).
+ * Qué NO es del molde: átomos de contenido (stat, bullet, card) — un átomo se extrae sólo cuando
+ * está duplicado ≥3 veces Y es idéntico; si hay que parametrizarlo, es una plantilla nueva y eso
+ * lo decide el catálogo. Las primitivas del molde son detalle INTERNO: el Plan sigue eligiendo
+ * UNA plantilla por nombre, nunca ensambla primitivas.
+ */
+
+:root {
+  /* Lienzo 16:9 del deck. El canvas es dato del registry; estas vars lo materializan en CSS. */
+  --deck-canvas-w: 1920px;
+  --deck-canvas-h: 1080px;
+
+  /* Safe-area editorial: el contenido nunca toca el borde (regla 3 del molde). */
+  --deck-safe: 72px;
+
+  /* Escala de espaciado medida del catálogo vigente (vocabulario del molde; múltiplos editoriales
+     reales del deck, no una escala 4n inventada). */
+  --deck-space-1: 8px;
+  --deck-space-2: 14px;
+  --deck-space-3: 20px;
+  --deck-space-4: 28px;
+  --deck-space-5: 36px;
+  --deck-space-6: 42px;
+  --deck-space-7: 56px;
+  --deck-space-8: 72px;
+
+  /* Escala de blur del glass (los 5 pasos medidos en las 9 superficies glass del catálogo). */
+  --deck-blur-s: 14px;
+  --deck-blur-m: 16px;
+  --deck-blur-l: 18px;
+  --deck-blur-xl: 20px;
+  --deck-blur-2xl: 24px;
+}
+
+/* El documento ES el lienzo: sin scroll, sin sorpresa de layout. */
+html,
+body {
+  width: var(--deck-canvas-w);
+  height: var(--deck-canvas-h);
+}
+
+/*
+ * El lienzo de lámina. `overflow:hidden` es parte del contrato: junto con `assertSlideFitsCanvas`
+ * (que audita ANTES de imprimir), garantiza que nada sangra fuera del canvas sin que el geometry
+ * gate lo haya visto. Una plantilla no re-declara esto: lo compone.
+ */
+.slide {
+  position: relative;
+  width: var(--deck-canvas-w);
+  height: var(--deck-canvas-h);
+  overflow: hidden;
+}

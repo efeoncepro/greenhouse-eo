@@ -1,24 +1,22 @@
 <!doctype html>
 <html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
-  html,body { width:1920px; height:1080px; }
   body { font-family:'Geist',sans-serif; overflow:hidden; }
 
   :root { --safe:72px; --teal:var(--axis-deck-teal-500); --violet:var(--axis-deck-violet-550); }
   /* full-bleed dark-even (blanco legible en todo el ancho) + glows + grain */
-  .slide {
-    position:relative; width:1920px; height:1080px; padding:var(--safe) var(--safe);
+  .slide { padding:var(--safe) var(--safe);
     display:flex; flex-direction:column; color:var(--axis-ppt-neutral-50);
     background:
       radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .07) .55px, transparent .8px) 0 0 / 5px 5px,
       radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
       radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
       radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
-      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
-  }
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%); }
 
   .head { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }
   .eyebrow { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--teal); margin-bottom:12px; }

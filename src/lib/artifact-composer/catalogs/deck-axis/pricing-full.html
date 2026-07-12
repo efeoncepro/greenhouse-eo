@@ -2,15 +2,15 @@
 <html lang="es">
 <head>
     <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Poppins:ital,wght@0,600;0,800;1,800&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
     :root { --ink:var(--axis-ppt-indigo-950); --teal:var(--axis-ppt-teal-600); --lime:var(--axis-ppt-green-100); --rich:var(--axis-deck-navy-920); --glass:rgba(var(--axis-deck-ice-50-rgb), .14); }
-    .slide { position:relative; isolation:isolate; width:1920px; height:1080px; overflow:hidden; color:var(--axis-ppt-neutral-50); background: var(--axis-deck-recipe-rich-content); }
+    .slide { isolation:isolate; color:var(--axis-ppt-neutral-50); background: var(--axis-deck-recipe-rich-content); }
     .header { position:absolute; top:108px; left:132px; right:132px; display:grid; grid-template-columns:1.02fr .98fr; gap:84px; align-items:end; }
     .eyebrow { margin-bottom:18px; color:var(--axis-deck-teal-300); font-size:18px; font-weight:700; letter-spacing:.13em; line-height:1; text-transform:uppercase; }
     .title { max-width:780px; font-family:'Poppins',sans-serif; font-size:61px; font-weight:800; letter-spacing:-.052em; line-height:1.02; }
@@ -20,7 +20,7 @@
     .summary-amount { color:var(--axis-ppt-neutral-50); font-family:'Poppins',sans-serif; font-size:76px; font-weight:800; letter-spacing:-.072em; line-height:.94; white-space:nowrap; }
     .summary-period { margin-top:15px; color:var(--axis-deck-teal-200); font-size:23px; font-weight:600; line-height:1.15; }
     .summary-note { margin-top:9px; color:rgba(var(--axis-ppt-neutral-50-rgb), .62); font-size:16px; line-height:1.2; }
-    .ledger { position:absolute; top:500px; left:132px; right:132px; bottom:132px; overflow:hidden; display:grid; grid-template-columns:minmax(0,1fr) 426px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .29); border-radius:30px; background:var(--glass); box-shadow:inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .2), 0 20px 55px rgba(var(--axis-deck-navy-930-rgb), .16); backdrop-filter:blur(18px) saturate(1.08); }
+    .ledger { position:absolute; top:500px; left:132px; right:132px; bottom:132px; overflow:hidden; display:grid; grid-template-columns:minmax(0,1fr) 426px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .29); border-radius:30px; background:var(--glass); box-shadow:inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .2), 0 20px 55px rgba(var(--axis-deck-navy-930-rgb), .16); backdrop-filter:blur(var(--deck-blur-l)) saturate(1.08); }
     .items { min-width:0; padding:40px 48px 36px; }
     .ledger-label { color:var(--axis-deck-teal-200); font-size:15px; font-weight:700; letter-spacing:.14em; line-height:1; text-transform:uppercase; }
     .column-head { display:grid; grid-template-columns:minmax(0,1fr) 200px; gap:34px; margin-top:28px; padding-bottom:14px; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .20); color:rgba(var(--axis-ppt-neutral-50-rgb), .54); font-size:14px; font-weight:600; letter-spacing:.09em; line-height:1; text-transform:uppercase; }

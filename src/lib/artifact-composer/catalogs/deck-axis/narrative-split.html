@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   /* Cursivas REALES cargadas (Poppins ital 600) — nunca faux italic. Geist solo roman. */
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
-  html,body { width:1920px; height:1080px; }
   body { font-family:'Geist',sans-serif; overflow:hidden; }
 
   :root {
@@ -19,7 +19,7 @@
     --violet:var(--axis-ppt-indigo-600);         /* acento sobre CLARO (pasa contraste) */
     --panel-bg:var(--axis-deck-recipe-light-surface);       /* fondo claro de la slide */
   }
-  .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
+  .slide { display:flex; background:var(--panel-bg); }
 
   /* ===== LEFT: columna de texto sobre fondo claro ===== */
   .text {

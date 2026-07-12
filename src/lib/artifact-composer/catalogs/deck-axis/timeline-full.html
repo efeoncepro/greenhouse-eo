@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
 <meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
-  html,body { width:1920px; height:1080px; }
   body { font-family:'Geist',sans-serif; overflow:hidden; }
 
   :root {
@@ -13,15 +13,13 @@
     --m:100%;                    /* el compiler TimelineFull fija 100 / unidades del eje */
   }
   /* full-bleed dark-even: navy en todo el ancho (blanco legible) + glows teal/violeta + grain */
-  .slide {
-    position:relative; width:1920px; height:1080px; padding:var(--safe) var(--safe);
+  .slide { padding:var(--safe) var(--safe);
     display:flex; flex-direction:column; color:var(--axis-ppt-neutral-50);
     background:
       radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .07) .55px, transparent .8px) 0 0 / 5px 5px,
       radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
       radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
-      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
-  }
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%); }
 
   /* header */
   .head { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }

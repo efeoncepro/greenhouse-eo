@@ -2,24 +2,18 @@
 <html lang="es">
 <head>
     <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
 <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Poppins:ital,wght@0,600;0,800;1,800&display=swap');
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 1920px; height: 1080px; }
     body { overflow: hidden; font-family: 'Geist', sans-serif; }
 
     :root { --ink: var(--axis-ppt-indigo-950); --violet: var(--axis-ppt-indigo-600); --teal: var(--axis-deck-teal-500); }
 
-    .slide {
-      position: relative;
-      width: 1920px;
-      height: 1080px;
-      overflow: hidden;
-      background: var(--axis-deck-recipe-rich-content);
-    }
+    .slide { background: var(--axis-deck-recipe-rich-content); }
 
     .story-panel {
       position: absolute;
@@ -141,7 +135,7 @@
       padding: 32px 40px 28px;
       background: rgba(var(--axis-deck-navy-970-rgb), .72);
       box-shadow: inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .08);
-      backdrop-filter: blur(14px) saturate(1.08);
+      backdrop-filter: blur(var(--deck-blur-s)) saturate(1.08);
     }
 
     .evidence-head { display: flex; align-items: center; gap: 30px; }
