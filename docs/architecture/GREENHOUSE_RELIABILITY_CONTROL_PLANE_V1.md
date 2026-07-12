@@ -2,10 +2,28 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.10`
+> Versión: `1.11`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-06-28` por Playwright smoke false-red fix
+> Última actualización: `2026-07-12` por TASK-1391 (signals de la cola de render de artefactos)
+
+## Delta 2026-07-12 — TASK-1391: 2 signals de la cola de render de artefactos
+
+Dos señales nuevas bajo `moduleKey='commercial'` (`source='proposal_studio'`, `kind='data_quality'`),
+que hacen observable el **pipeline de render gobernado** (`greenhouse_commercial.proposal_render_jobs` →
+Cloud Run Job `artifact-worker`). Se suman a las 2 de TASK-1392 en el mismo reader:
+[`src/lib/reliability/queries/commercial-proposal-signals.ts`](../../src/lib/reliability/queries/commercial-proposal-signals.ts).
+
+| `signalId` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- |
+| `artifact.render.queue.starvation` | Render jobs en `queued` (con deadline vivo o sin deadline) hace más de **20 minutos**. El dispatcher corre cada 2 min: 20 min en cola = **dispatcher caído o inanición de prioridad** (la cola prioriza por deadline + aging, nunca FIFO ciega) | `0 → ok`, `>0 → error` | **0** |
+| `artifact.render.dead_letter` | Render jobs que llegaron a `dead_letter` en los últimos **7 días** — agotaron `max_attempts` o su `failure_code` no es reintentable. **Requieren humano**: retry del dominio (`POST …/render-jobs/[id]/retry`) o corrección del plan/evidencia y un render nuevo | `0 → ok`, `>0 → error` | **0** |
+
+Ambas degradan honestamente a `unknown` si la query falla (`captureWithDomain('commercial')`). El estado
+de negocio del render vive en `proposal_render_jobs`, **no** en Cloud Run: una ejecución exitosa del Job
+no implica un render exitoso (un fallo gobernado sale con exit 0 y su `failure_code`).
+
+Spec: [`GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`](GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md) §5.
 
 ## Delta 2026-07-10 — TASK-356: módulo `hiring` + 2 signals + migración de señales desde `documents`
 

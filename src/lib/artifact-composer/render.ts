@@ -10,11 +10,10 @@
  * - `reducedMotion` + espera de `document.fonts.ready`: el frame se captura estable, con la
  *   tipografía ya aplicada (no con el fallback de sistema, que sería un deck fuera de marca).
  *
- * ⚠️ DEUDA de determinismo: las plantillas todavía piden Poppins/Geist a Google Fonts por red, así
- * que el render NO es hermético (sin red, la tipografía cae al fallback). No se puede bloquear la
- * red hasta EMBEBER las fuentes en las plantillas — es el pendiente declarado en
- * GREENHOUSE_TENDER_DECK_COMPOSER_V1.md ("embeber fuentes para runtime self-contained"). Cuando
- * estén embebidas, bloquear `http(s)://**` acá y el render pasa a ser hermético.
+ * ✅ HERMÉTICO desde TASK-1393 (esta cabecera declaraba lo contrario hasta 2026-07-12 — el
+ * comentario quedó stale y contradecía al código; corregido). Hoy: las fuentes salen del font pack
+ * LOCAL del brand pack (OFL + checksums), `fillSlide` **aborta la red** (`page.route(/^https?:/)`)
+ * y **falla cerrado** si una `FontFace` no cargó. Un deck jamás sale con tipografía de fallback.
  */
 
 import fs from 'node:fs/promises'

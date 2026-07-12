@@ -9,6 +9,30 @@
 > **Spec raíz:** `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (§4 deck pipeline, Apéndices A/B)
 > **Fuente de layouts y primitivas de presentación:** Figma `Sistema Axis - PPT` (fileKey `GXYeJaRjotmFuczfnd8hLi`; `Color Primitives` `33:2`). Sus aliases se llevaron locales a las primeras plantillas en `b38a8d0e2` y se replicaron al catálogo de 25 en `e78e9dfb2`; TASK-1393 los centraliza sin sustituirlos por el mirror UI.
 
+## Delta 2026-07-12 — TASK-1391 APLICADA: el composer **ya no es solo CLI** — hay un pipeline de render gobernado
+
+> ⚠️ **Este doc describe el DESIGN SYSTEM del deck (molde, plantillas, resolvers, tipografía).** El
+> **runtime productivo** que lleva un `ResolvedCompositionManifest` a un artefacto publicado (cola, job
+> record, worker, gates, deploy, señales) vive ahora en su spec propia:
+> **`GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`** — leerla antes de tocar render, cola o worker.
+
+Lo que cambió (todo verificado en Cloud Run staging, 2026-07-12):
+
+- El CLI `pnpm deck:compose` **sigue existiendo** y no depende de ningún flag — es el camino local y el
+  modo degradado. Pero **ya no es el único camino**: `requestProposalRender` (command gobernado,
+  idempotente, con gates fail-closed) encola un job en `greenhouse_commercial.proposal_render_jobs`.
+- El render pesado corre en el **Cloud Run Job `artifact-worker`** (Chromium pinneado), **nunca** en
+  Vercel ni en el `ops-worker`. Evidencia: deck SKY de 15 láminas en **25,2 s / 3,16 MB** y bench de 25
+  láminas en **32,3 s / 5,56 MB**, ambos `completed` al primer intento.
+- Lo único renderizable productivo es el **`ResolvedCompositionManifest`** sellado: el worker lo
+  **re-resuelve** contra su copia del catálogo y compara hash — si una plantilla/contrato/brand pack
+  cambió desde el enqueue, es `manifest_drift` y **no se publica**.
+- El "mirar los frames" se volvió **mecánico también en el render productivo**: `missing_asset`,
+  `font_fallback_detected` y `blank_slide` son **gates de publicación** dentro de `renderSlide`, no
+  advertencias.
+- **El PDF emitido NO es PDF/UA** (Chromium print-to-PDF no taguea): si el RFP exige accesibilidad, el
+  render **se rechaza al encolar** (`accessibility_unsupported`).
+
 ## Delta 2026-07-12 — TASK-1393 APLICADA (Slices 0-4): el motor es `artifact-composer`, el deck es un CATÁLOGO y la marca es un INPUT
 
 > ⚠️ **Este doc conserva paths/números históricos en varias secciones; lo vigente es esto.**

@@ -24,6 +24,11 @@ DB: greenhouse_commercial.proposals + proposal_{state_transitions,assets,evidenc
     render_jobs,render_job_events} — append-only, org-scoped, gates humanos EN LA DB
 ```
 
+> **Capacidad actual (provisional, no SLO):** el benchmark Cloud Run de TASK-1391 confirmó un deck
+> de 15 láminas en **25,2 s / 3,16 MB** y uno de 25 en **32,3 s / 5,56 MB**, ambos al primer intento.
+> Operar inicialmente en **10–15 jobs/h**; el dispatcher tiene techo de **30 jobs/h** (uno cada dos
+> minutos). No extrapolar a concurrencia sostenida ni a `png-set` hasta que su command tenga datos propios.
+
 **Las 4 verdades que ordenan todo:**
 
 1. **El aggregate es `Proposal`** (no `Tender`): `origin ∈ {public_tender, private_rfp,
@@ -38,6 +43,19 @@ DB: greenhouse_commercial.proposals + proposal_{state_transitions,assets,evidenc
    `actor_kind='agent'` en la DB. Punto.
 
 ---
+
+## ⚠️ QUIÉN puede operar esto HOY (leer antes de prometerle nada a nadie)
+
+| Superficie | Estado |
+|---|---|
+| **Repo / CLI / scripts** (un agente Claude o un dev) | ✅ **La única puerta hoy.** Todo lo de este doc |
+| **API interna** (`/api/commercial/proposals/**`) | ✅ Existe y está gateada (capability + entitlement per-ORG) |
+| **Nexa (conversación)** | ❌ **NO todavía.** El runtime de acción gobernada de Nexa existe y está probado (`propose_action` → preview → confirm → command; prior art `author_quote`), pero **cero acciones del Proposal Studio están registradas** en `NEXA_ACTION_REGISTRY`. El puente es **`TASK-1399`** (to-do, P1): enchufar el dominio sin lógica nueva |
+| **UI del portal** | ❌ No existe (F5) |
+
+**Consecuencia práctica:** si alguien pregunta *"¿puedo pedirle un deck a Nexa?"*, la respuesta
+honesta hoy es **no** — se lo pide a un agente en el repo. Ver el manual del día a día:
+`docs/manual-de-uso/proposal-studio/rfp-a-pdf-el-dia-a-dia.md`.
 
 ## USO — las 6 recetas
 

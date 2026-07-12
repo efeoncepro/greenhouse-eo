@@ -19,15 +19,25 @@
 | **Brand pack `axis`** (snapshot Figma PPT + ledger 78 bases + roles + font pack OFL + guard WCAG advisory) | ✅ `src/lib/artifact-composer/brand-packs/axis/` — compilado por `pnpm composer:brand-pack`; ⚠️ **71 altas `figma.status=proposed`** pendientes de validación del operador en `Sistema Axis - PPT` |
 | **Gate estético**: baseline 40 frames + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` dos-vías | ✅ `scripts/frontend/baselines/artifact-composer/**` — corre en cada cambio del dominio |
 | `ResolvedCompositionManifest` (input + hashes de catálogo/contratos/brand pack/fuentes + validadores) | ✅ **se emite junto al PDF/PNG** (`<artifactId>.manifest.json`); es lo único que TASK-1391 debe aceptar |
-| CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ **único consumer hoy** — nombre/args/salida idénticos pre-refactor |
-| State machine (12 estados, 3 gates humanos) | ⚠️ **TS puro — NO hay tabla en DB** (`src/lib/commercial/tenders/tender-state-machine.ts`, terminales `won`/`lost`) |
-| API routes · UI · migración · capability · outbox | ❌ **no existen** |
-| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ no existen |
-| Renderer productivo: Cloud Run Job + cola + artifact store + señales | 📋 **TASK-1391** (`to-do`, P1) — **bloqueada por EPIC-027** |
+| CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ shipped — **ya NO es el único consumer** (ver renderer productivo abajo); no depende de ningún flag: es el camino local y el modo degradado |
+| State machine (12 estados, 3 gates humanos) | ✅ **PERSISTIDA** (TASK-1392): matriz en `proposal_state_matrix` + trigger de enforcement + historial append-only; TS ↔ DB con test de paridad. Terminales `won`/`lost` |
+| Aggregate `Proposal` · API routes · migración · capabilities · entitlement per-ORG · outbox | ✅ **existen** (TASK-1392): `greenhouse_commercial.proposal*`, `/api/commercial/proposals/**`, `commercial.proposal.{read,manage,gate,render}`, módulo `proposal_studio_v1`, 9 eventos `commercial.proposal.*` |
+| UI · Nexa/MCP surface | ❌ **no existen** (F5) |
+| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ no existen (F1/F2) |
+| **Renderer productivo**: Cloud Run **Job** `artifact-worker` + cola con prioridad + asset store + 2 signals | ✅ **TASK-1391 `complete`** — **staging E2E verificado en Cloud Run** (15 láminas 25,2 s / 3,16 MB · bench 25 láminas 32,3 s / 5,56 MB). **Producción explícitamente gateada** (release control plane + sign-off). Spec: **`GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`** |
 
 ⚠️ **NUNCA** corras el render pesado (Chromium) en **Vercel** ni en el **`ops-worker`** — bloquearía el
-publisher del outbox. Va en un **`tender-worker` dedicado**, y un deployable nuevo requiere la decisión de
-frontera de **EPIC-027**: no se crea por conveniencia. Eso es exactamente lo que TASK-1391 protege.
+publisher del outbox. Va en el Cloud Run **Job** dedicado **`artifact-worker`** (**NO** `tender-worker`:
+renderiza catálogos, no un dominio), frontera autorizada por **excepción documentada de EPIC-027**. Un
+deployable nuevo no se crea por conveniencia.
+
+⚠️ **Lo único renderizable productivo es el `ResolvedCompositionManifest` sellado.** El worker lo
+**re-resuelve** contra su copia del catálogo y compara hash: si una plantilla/contrato/brand pack cambió
+desde el enqueue → `manifest_drift` y **no se publica**. Gates fail-closed **al encolar** (audience por
+referencia · accesibilidad · deadline vencido · validadores) y **en el worker** (geometría · missing_asset ·
+font_fallback · blank_slide · peso · páginas). **El PDF NO es PDF/UA**: si el RFP exige accesibilidad, el
+render se rechaza al encolar (`accessibility_unsupported`) — *mejor no ofertar que entregar un artefacto
+inadmisible*.
 
 ---
 

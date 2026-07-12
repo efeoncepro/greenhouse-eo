@@ -1,3 +1,28 @@
+## Sesión 2026-07-12 (cont. 16) — Documentación COMPLETA del Proposal Studio + el gap que destapó (Claude)
+
+- **4 agentes en paralelo** produjeron ~3.700 líneas verificadas contra el código (cero invención:
+  todo comando/función/ruta citada existe — auditado con grep):
+  - `docs/manual-de-uso/proposal-studio/` (5 runbooks): **`rfp-a-pdf-el-dia-a-dia.md`** (la puerta
+    de entrada: RFP → PDF, con los prompts exactos), `crear-y-operar-una-propuesta.md`,
+    `generar-el-deck-de-una-propuesta.md`, `entender-los-errores-y-rechazos.md` (los 12 failure
+    codes en lenguaje humano), `operar-el-artifact-worker.md` (cola/logs/señales/apagado).
+  - `docs/documentation/proposal-studio/` (5 docs funcionales): sistema completo, **los gates y por
+    qué existen** (la razón de negocio de cada uno), el motor de composición, decisiones de diseño
+    (con las alternativas RECHAZADAS) e índice.
+  - `docs/architecture/GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`: la spec técnica canónica (~750
+    líneas: schema verbatim, firmas exactas, gates en 2 capas, topología, señales, extensión).
+- **Auditoría de docs stale (lo más valioso):** corregidos 6 docs que mentían — el más peligroso era
+  `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` (auto-load por path) que decía "API/migración/outbox no
+  existen" y "TASK-1391 bloqueada". También: cabecera de `render.ts` que declaraba deuda de
+  fuentes ya cerrada, `CLOUD_INFRASTRUCTURE` sin la categoría Cloud Run **Job**, `DECISIONS_INDEX`
+  con `tender-worker`, y `OPS_RELIABILITY_AGENT_INVARIANTS` sin invariantes de Jobs (agregados).
+- 🔴 **EL GAP QUE DESTAPÓ (TASK-1399, P1, to-do):** el sistema está completo pero **SIN PUERTA** —
+  hoy sólo se opera desde el repo. Nexa YA tiene el runtime de acción gobernada
+  (`propose_action` → preview → confirm → command) con prior art (`author_quote`) y **CERO acciones
+  del Proposal Studio registradas**. Además faltan los readers del día a día (mis propuestas,
+  descargar el PDF) y la confirmación humana hoy es una instrucción verbal, no un click con
+  identidad. La spec ya está escrita y validada.
+
 ## Sesión 2026-07-12 (cont. 15) — 🏆 TASK-1391 COMPLETE: el render corre EN CLOUD RUN (Claude)
 
 - **Evidencia staging REAL**: deck SKY 15 láminas → `completed` en Cloud Run (job `prnd-518535f0…`,
@@ -18,19 +43,11 @@
   `artifact-worker-deploy.yml` a `RELEASE_DEPLOY_WORKFLOWS` + sign-off ANTES del primer deploy
   productivo (documentado en el workflow y en la task).
 
-## Sesión 2026-07-12 (cont. 15) — TASK-1391: infraestructura staging desplegada; smoke gobernado pendiente (Codex)
+## Sesión 2026-07-12 (cont. 15) — snapshot pre-smoke de Codex (superado)
 
-- **Estado vigente (supersede las notas históricas que dicen “push/deploy pendiente”):** `develop` ya
-  contiene `216e146be`; `artifact-worker` quedó Ready en staging (2 vCPU/2 GiB, storage staging, flag
-  ON) y `ops-worker-00484-n7s` tiene el dispatcher ON + Scheduler cada dos minutos. El Job no tiene
-  executions todavía: despliegue no equivale a smoke ni consume cómputo de render mientras no se ejecute.
-- **Siguiente paso operacional:** Preview/`develop` no tiene `ARTIFACT_RENDER_JOBS_ENABLED`, por lo que
-  `requestProposalRender` continúa rechazando enqueue desde el portal. Registrar ese flag sólo para el
-  smoke y ejecutar 4/25 láminas, retry/fallo inyectado, revisión humana de PDF y benchmark de cold
-  start/RSS/costo. Production queda sin flag y fuera de alcance.
-- Capacidad inicial documentada como hipótesis: 10–15 jobs/h cómodos; techo actual 30 jobs/h por el
-  dispatcher de un job cada dos minutos. No es un SLO ni habilita aún `social-carousel`.
-- **Excepción de rama:** el operador autorizó esta corrección documental directamente en `develop`;
+> Esta nota registra la revisión previa al primer execution. Queda **superada** por la evidencia staging
+> verificada de Claude inmediatamente arriba: TASK-1391 está `complete`; Production sigue gateada.
+- **Excepción de rama original:** el operador autorizó la corrección documental directamente en `develop`;
   alcance docs-only, sin deploy, cambio de flag ni push ejecutado por Codex.
 
 ## Sesión 2026-07-12 (cont. 14) — Skills actualizadas: el runtime 1391/1392/1393 documentado para agentes nuevos (Claude)

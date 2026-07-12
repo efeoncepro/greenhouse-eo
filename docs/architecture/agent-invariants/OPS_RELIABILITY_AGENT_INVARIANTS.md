@@ -175,3 +175,29 @@ Contrato versionado `platform-health.v1` que un agente, MCP, Teams bot, cron de 
 - **NO** depender de campos no documentados. Solo `contractVersion: "platform-health.v1"` garantiza shape estable.
 - Tests: `pnpm test src/lib/platform-health src/lib/observability/redact` (47 tests cubren composer, safe-modes, redaction, with-source-timeout, recommended-checks).
 - Spec: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` (sección Platform Health), doc funcional `docs/documentation/plataforma/platform-health-api.md`, OpenAPI `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` (schema `PlatformHealthV1`).
+
+## Cloud Run JOBS (categoría nueva desde 2026-07-12 — TASK-1391)
+
+El ecosistema dejó de tener sólo **services**: `artifact-worker` es el **primer Cloud Run Job**
+(render de artefactos del composer). Un Job **no expone HTTP**, se ejecuta por invocación y **una
+ejecución = un artefacto** (`tasks=1`, `parallelism=1`, `max-retries=0`).
+
+- **NUNCA** ejecutes render pesado (Chromium) en el `ops-worker` ni en Vercel: bloquearía el
+  publisher del outbox. Va en el Job dedicado — y **un deployable nuevo exige la decisión de
+  frontera de EPIC-027** (la de `artifact-worker` está autorizada por excepción documentada).
+- **NUNCA** subas `--max-retries` del Job: el reintento es **del dominio**
+  (`proposal_render_jobs.attempts` + `retryProposalRenderJob`). Si Cloud Run reintentara solo, el
+  contador y el dead-letter dejarían de significar algo.
+- **NUNCA** le des al dispatcher el permiso `run.jobs.runWithOverrides`: el worker **claim-ea** su
+  trabajo (`FOR UPDATE SKIP LOCKED`), así basta `run.invoker` (menos privilegio + concurrencia
+  segura). Rediseñar para necesitar menos permiso > escalar IAM.
+- **SIEMPRE** que una imagen de worker lleve runtime pesado (Chromium, fuentes, catálogos), **la
+  imagen se prueba a sí misma en el build** (`--selftest` como paso de Cloud Build): un ENOENT o una
+  fuente faltante debe morir en el pipeline, nunca en una ejecución productiva (ISSUE-121).
+- **SIEMPRE** pinnea la imagen base a la versión exacta de la dependencia del repo (Playwright):
+  otro Chromium = otro píxel = otro artefacto. Hay test de contrato (`deploy-contract.test.ts`).
+- El **dispatcher** del Job vive en el `ops-worker` (endpoint + Cloud Scheduler) y hace `jobs.run`
+  (~200 ms). El flag (`ARTIFACT_RENDER_JOBS_ENABLED`) es **multi-runtime ×3** (Vercel enqueue ·
+  ops-worker dispatch · el Job): prenderlo en uno solo deja el pipeline muerto **en silencio**.
+
+Spec: `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md` · Runbook: `docs/manual-de-uso/proposal-studio/operar-el-artifact-worker.md`

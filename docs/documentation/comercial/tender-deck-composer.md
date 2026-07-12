@@ -1,11 +1,35 @@
 # Tender Deck Composer — Cómo se arma el deck de una propuesta
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-12 por Claude (con Julio Reyes)
-> **Ultima actualizacion:** 2026-07-12 — destinos PDF → PPTX → Adobe Express documentados
+> **Ultima actualizacion:** 2026-07-12 por Claude — Delta: el motor se extrajo a `artifact-composer` y el render gobernado ya existe (ver aviso abajo)
 > **Documentacion tecnica:** [GREENHOUSE_TENDER_DECK_COMPOSER_V1.md](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md) · ADR: [GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md §5-ter](../../architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md)
 > **Manual de uso:** [comercial/componer-deck-de-licitacion.md](../../manual-de-uso/comercial/componer-deck-de-licitacion.md)
+
+---
+
+## ⚠️ Delta 2026-07-12 — este documento quedó parcialmente desactualizado
+
+> Lo que dice sobre **cómo se compone un deck** (catálogo cerrado, anti-fabricación, texto que no se
+> recorta, gráficos derivados del dato, fotos reales, gate de peso) **sigue vigente**. Lo que dice
+> sobre **dónde vive el motor y cómo se opera** ya no. Tres correcciones:
+>
+> 1. **El motor ya no vive en `src/lib/commercial/tenders/deck/`.** Se extrajo a
+>    **`src/lib/artifact-composer/**`** como **primitive domain-free** (TASK-1393): el motor **no sabe
+>    qué es una licitación** y el deck pasó a ser **un catálogo** (`deck-axis`) — es decir, **dato**.
+>    Otra superficie (por ejemplo un carrusel) es **otro catálogo**, no otro motor.
+> 2. **La marca dejó de estar horneada.** Las plantillas ya no llevan colores ni fuentes literales:
+>    la marca es un **brand pack** (un input). AXIS es *el brand pack de Efeonce*, no *el* brand pack.
+> 3. **Ya NO es "solo una línea de comandos".** TASK-1391 está **completa y verificada end-to-end en
+>    staging**: existe el render gobernado (con cola, prioridad por deadline y gates fail-closed), el
+>    **`artifact-worker`** en Cloud Run, y el PDF queda **versionado en el almacén privado** vinculado a
+>    su propuesta. La sección *"Dónde se usa hoy"* de abajo describe el estado anterior. (Sigue siendo
+>    cierto que **no hay pantalla en el portal**.) Producción sigue **apagada a propósito**.
+>
+> **La documentación vigente del sistema completo vive en
+> [`docs/documentation/proposal-studio/`](../proposal-studio/README.md)** — empieza por su README.
+> El motor, en [el-motor-de-composicion.md](../proposal-studio/el-motor-de-composicion.md).
 
 ## Qué es
 

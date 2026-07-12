@@ -23,14 +23,14 @@ contra él **sin actualizarlo**. Lo que sigue es la foto verificada contra el re
 | **Entregable PDF** — N páginas mergeadas (`pdf-lib`) + gate de peso | ✅ **Shipped** | `artifact-composer/render.ts` · `compose.ts` |
 | **Catálogo de 25 plantillas** con `data-slot` + `*.slots.json` + `registry.json` | ✅ **25/25 built** | `src/lib/artifact-composer/catalogs/deck-axis/templates/` |
 | **State machine** (12 estados, 3 gates humanos) | ✅ **Persistida** (TASK-1392): matriz en `proposal_state_matrix` + trigger + historial append-only; TS y DB en paridad (test) | `tender-state-machine.ts` + `migrations/20260712160001023_*` |
-| **CLI** `pnpm deck:compose <plan.json> [--out dir]` | ✅ **Shipped** (consumer del catálogo) | `scripts/artifact-composer/compose-deck.ts` |
+| **CLI** `pnpm deck:compose <plan.json> [--out dir]` | ✅ **Shipped** (consumer del catálogo) | `scripts/commercial/compose-tender-deck.ts` |
 | **Aggregate `Proposal`** — `proposals` + `proposal_state_transitions` + `proposal_assets` + `proposal_evidence` + `proposal_requirements` (CHECKs · triggers · org-scope NOT NULL en todos) | ✅ **Aplicado a dev** (TASK-1392) | `src/lib/commercial/tenders/proposals/**` |
 | API routes · capabilities/entitlement per-ORG · outbox events · reliability signals | ✅ **Code-complete** (7 routes; `proposal_studio_v1`; 6 eventos; señales `commercial`) | `/api/commercial/proposals/**` |
 | **Proposal Intake Agent Contract** (propose → confirm → execute + eval fixture) | ✅ **Code-complete** (internal-only, OFF sin módulo) | `proposals/intake-agent.ts` |
 | **Proyección allowlisted de render** + gate de audience fail-closed | ✅ **Code-complete** — el contrato que TASK-1391 consume | `proposals/render-projection.ts` |
 | UI · Nexa/MCP surface | ❌ **No existe** (F5) | — |
 | Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ **No existe** (F1/F2) | — |
-| **Renderer productivo (TASK-1391)** — `proposal_render_jobs` (aplicado a dev) + gates fail-closed al encolar (audience por referencia · accesibilidad · deadline · validadores) + QA mecánica en renderSlide (missing_asset/font_fallback/blank_slide) + Render Agent (propose→confirm→execute + eval) + dispatcher con prioridad deadline+aging + `services/artifact-worker` (PRIMER Cloud Run Job, frontera autorizada por excepción EPIC-027) | ✅ **Code-complete + E2E real local** (deck SKY 15 láminas → PDF por el camino gobernado completo, 2026-07-12); **staging deploy del Job pendiente** (flag OFF multi-runtime) | `src/lib/commercial/tenders/proposals/render-*` · `services/artifact-worker/**` |
+| **Renderer productivo (TASK-1391)** — `proposal_render_jobs` (aplicado a dev) + gates fail-closed al encolar (audience por referencia · accesibilidad · deadline · validadores) + QA mecánica en renderSlide (missing_asset/font_fallback/blank_slide) + Render Agent (propose→confirm→execute + eval) + dispatcher con prioridad deadline+aging + `services/artifact-worker` (PRIMER Cloud Run Job, frontera autorizada por excepción EPIC-027) | ✅ **Staging E2E verificado en Cloud Run:** 15 láminas en 25,2 s / 3,16 MB y 25 láminas en 32,3 s / 5,56 MB, assets privados + outbox publicados. Job/dispatcher/Vercel staging ON; Production sigue OFF y gateada por release control plane + sign-off. | `src/lib/commercial/tenders/proposals/render-*` · `services/artifact-worker/**` |
 | **Staging smoke + habilitación `module_assignments`** | ✅ **Ejecutado 2026-07-12** — módulo activo para Efeonce; smoke con evidencia en TASK-1392 Delta (d) | `cpma-task1392-efeonce-proposal-studio` |
 
 **Tres consecuencias que hay que tener presentes:**
@@ -66,23 +66,26 @@ discovery. **El GO del bid/no-bid ES el momento de la promoción.** Lo decide el
 **no tiene** oportunidad pública detrás; si el bid colgara del discovery, una licitación privada no tendría
 dónde vivir. **Con esto, Slice 0 de TASK-1392 queda desbloqueada.**
 
-`TASK-1391` queda como su sucesora: lleva el composer de **CLI local** a capability agentic de artefactos
-mediante un `Tender Render Agent` acotado (contexto/tools allowlisted → `TenderRenderProposal` trazable →
+`TASK-1391` lleva el composer de **CLI local** a capability agentic de artefactos mediante un
+`Proposal Render Agent` acotado (contexto/tools allowlisted → `ProposalRenderProposal` trazable →
 confirmación humana → command canónico), Cloud Run Job dedicado con Chromium, outbox/cola con backpressure,
-outputs versionados (PDF + PNGs + provenance), command/reader idempotentes y señales. El agente no puede
-encolar, invocar `jobs.run`, ejecutar Chromium ni publicar artefactos. **Blocked by:** `TASK-1392` +
-autorización de la próxima frontera de deployable de **EPIC-027**.
+outputs versionados (PDF + PNGs + provenance), command/reader idempotentes y señales. **TASK-1391 está
+`complete` (2026-07-12): staging verificado end-to-end EN CLOUD RUN** (15 láminas 25,2 s / 3,16 MB · bench
+25 láminas 32,3 s / 5,56 MB); **producción queda explícitamente gateada** (release control plane +
+sign-off). El runtime completo (cola · job record · gates · deploy · observabilidad) vive en su spec
+propia: **`GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`**. El agente no puede encolar, invocar `jobs.run`,
+ejecutar Chromium ni publicar artefactos.
 
 ⚠️ Regla dura que TASK-1391 protege: **el render pesado NUNCA corre en Vercel ni en el `ops-worker`**
-(bloquearía el publisher del outbox). Va en un `tender-worker` dedicado — y un deployable nuevo requiere
-la decisión de frontera de EPIC-027, no se crea por conveniencia.
+(bloquearía el publisher del outbox). Va en el `artifact-worker` dedicado — la excepción de frontera de
+EPIC-027 ya está documentada; no se crean deployables nuevos por conveniencia.
 
-**Límite de reutilización de formatos:** el `DeckPlan` actual y el eventual `tender-worker` sirven al
-entregable contractual de Tender; no se generalizan dentro de esta foundation para carruseles, posts o
-stories. Esos formatos pertenecen a la futura capa `format_spec → composition_spec → artifact_manifest` de
-Efeonce Creative Studio (EPIC-028). Cuando exista su contrato sister-platform, Tender podrá consumirlo con
-un request minimizado y aprobado; conserva siempre RFP, requisito-set, `audience`, gates y elegibilidad
-client-facing, y jamás replica por defecto material interno o credenciales de storage.
+**Límite de reutilización de formatos:** `artifact-worker` y el Composer admiten catálogos, pero el
+consumer implementado es el render de Proposal con `deck-axis`. Un carrusel, post o story necesita su
+propio command, contrato de dominio/admisión y benchmark; no puede encolar arbitrariamente en este flujo.
+La capa `format_spec → composition_spec → artifact_manifest` pertenece a Efeonce Creative Studio
+(EPIC-028). Cualquier bridge conserva RFP, requisito-set, `audience`, gates y elegibilidad client-facing,
+y jamás replica por defecto material interno o credenciales de storage.
 
 ---
 
@@ -351,8 +354,9 @@ La v0.2 declaraba el `src/lib/ai/agent-runtime` como **"precondición dura de F1
 
 - **Costo en tokens:** outline (1) + capítulos (~6-8) + verifier (1) ≈ **~10 llamadas por deck**, acotado y predecible. El render — que es lo voluminoso — cuesta **cero tokens**.
 - **Latencia:** el fan-out por capítulo es paralelo → wall-clock ≈ el capítulo más lento, no la suma.
-- **Contención:** el render Chromium es pesado (minutos) → vive en el **`tender-worker` dedicado como Cloud Run Job**, NUNCA en el `ops-worker` (un render de 5 min bloquearía el publisher del outbox, que corre cada 2 min). Una ejecución = un `DeckPlan` fijado; `tasks=1` y `parallelism=1` por deck. El renderer puede conservar concurrencia interna de láminas sólo dentro del envelope benchmarkeado de CPU/RAM.
-- **A 10x:** escala horizontalmente por ejecuciones de deck; el cuello es Chromium (CPU/RAM), no el LLM. El job record/outbox regula admisión y dedupe; un límite de ejecuciones concurrentes se calibra por benchmark/costo, no por el default de Cloud Run.
+- **Contención:** el render Chromium es pesado → vive en el **`artifact-worker` dedicado como Cloud Run Job**, NUNCA en el `ops-worker` (un render de 5 min bloquearía el publisher del outbox, que corre cada 2 min). Una ejecución = un `ResolvedCompositionManifest` fijado; `tasks=1` y `parallelism=1` por deck. El renderer puede conservar concurrencia interna de láminas sólo dentro del envelope benchmarkeado de CPU/RAM.
+- **Capacidad inicial:** 10–15 jobs/h es una hipótesis operacional conservadora; 30 jobs/h es el techo actual del dispatcher (un job cada 2 min), no una promesa de Cloud Run. La medición staging de 4/25 láminas, cold start, RSS, retry y costo recalibra ese envelope; la fuente canónica es el Plan Mode de TASK-1391.
+- **A 10x:** escala horizontalmente por ejecuciones de artefacto; el cuello es Chromium (CPU/RAM), no el LLM. El job record/outbox regula admisión y dedupe; un límite de ejecuciones concurrentes se calibra por benchmark/costo, no por el default de Cloud Run.
 
 ### Hard rules (NUNCA / SIEMPRE)
 
@@ -363,7 +367,7 @@ La v0.2 declaraba el `src/lib/ai/agent-runtime` como **"precondición dura de F1
 - **NUNCA** auto-submit. El LLM no cruza el gate: `propose → confirm → execute`.
 - **NUNCA** fabricar datos de cliente: valores reales del bid o **ilustrativos marcados**.
 - **NUNCA** abrir un segundo tool loop paralelo al de Nexa. Si hace falta un runtime, se **extrae y generaliza el existente** (ver arriba).
-- **NUNCA** correr el render del deck en el `ops-worker`, una route Vercel ni un Cloud Run Service HTTP. `ops-worker` puede despachar/reconciliar el job liviano, pero Chromium corre exclusivamente dentro del Cloud Run Job `tender-worker`.
+- **NUNCA** correr el render del deck en el `ops-worker`, una route Vercel ni un Cloud Run Service HTTP. `ops-worker` puede despachar/reconciliar el job liviano, pero Chromium corre exclusivamente dentro del Cloud Run Job `artifact-worker`.
 - **SIEMPRE** el artefacto auditable son los **slots JSON**, no el PDF. El PDF es una derivación.
 - **SIEMPRE** eval baseline antes de tocar el prompt de cualquiera de los 3 agentes (regla `arch-architect`: no hay cambio de prompt sin eval).
 
@@ -472,7 +476,7 @@ El esqueleto de 8 estados capturó el caso SKY entero sin forzar nada. La ejecuc
 
 - **Q1 · Schema de aterrizaje → `greenhouse_commercial`.** Verificado: `deals`, `contract_quotes`, `contracts`, `engagement_*`, `pricing_*` ya viven en `greenhouse_commercial` (no `greenhouse_crm`). El Tender aterriza junto a ellos (§1). No se crea schema nuevo.
 - **Q2 · Convergencia con RESEARCH-007 → dos módulos, un handoff.** RESEARCH-007 descubre/clasifica el discovery público; el Studio construye. Punto de promoción: opportunity pública → `Tender(origin=public_discovery)` con FK. No se fusionan (dimensiones ortogonales: descubrir vs. construir).
-- **Q3 · Runtime del orquestador → `tender-worker` dedicado como Cloud Run Job (diferido a F1).** El fan-out de lectura + agentic loops + render Chromium es pesado y largo (minutos); NO debe compartir el `ops-worker` (cron de outbox cada 2 min — un render de deck de 5 min bloquearía el publisher). El recurso es un **Cloud Run Job**, no un service HTTP: recibe un `jobId` que apunta al snapshot inmutable del `DeckPlan`, corre una tarea/una ejecución por deck y termina. El job record + outbox son el source of truth y el mecanismo de recovery; un dispatcher liviano puede invocar `jobs.run`, pero no renderiza. Cloud Tasks es opt-in posterior para backpressure del dispatcher, no transport directo del PDF. F0 no tiene IA → sin worker; el job nace en F1.
+- **Q3 · Runtime del orquestador → `artifact-worker` dedicado como Cloud Run Job.** El fan-out de lectura + agentic loops + render Chromium es pesado; NO debe compartir el `ops-worker` (cron de outbox cada 2 min — un render de deck largo bloquearía el publisher). El recurso es un **Cloud Run Job**, no un service HTTP: recibe un `jobId` que apunta al snapshot inmutable del `ResolvedCompositionManifest`, corre una tarea/una ejecución por deck y termina. El job record + outbox son el source of truth y el mecanismo de recovery; un dispatcher liviano puede invocar `jobs.run`, pero no renderiza. Cloud Tasks es opt-in posterior para backpressure del dispatcher, no transport directo del PDF. Código/E2E local completos; deploy y benchmark de staging pendientes.
 - **Q8 · Agent-runtime canónico → NO es precondición del composer (corregido v0.3, 2026-07-11).** La respuesta v0.2 ("no existe tool-runner; es precondición dura de F1/F2") era **incorrecta en ambas mitades**. (a) **Existe prior art:** Nexa corre un tool loop en producción (`src/lib/nexa/providers/*`, `nexa-tools.ts`, `nexa-turn-telemetry.ts`), single-hop. (b) **El composer no lo necesita:** sus 3 nodos de juicio producen *structured output* (no tool-chains) sobre contexto read-only, y eso ya lo cubre `generateStructured{Anthropic,Gemini,OpenAI}`. El `agent-runtime` baja a **evolución de plataforma**; cuando se haga, es **extracción/generalización del loop de Nexa** (strangler, Nexa consume con `maxTurns=1`), **NUNCA** un segundo loop paralelo, y merece **task propia** (blast radius sobre Nexa productivo). Detalle: **§5-ter**.
 
 ### Abiertas (decisión del operador — marca / alcance)

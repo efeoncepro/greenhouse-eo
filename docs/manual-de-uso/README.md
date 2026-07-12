@@ -29,6 +29,12 @@ La diferencia con otras capas de documentacion:
 
 ### Comercial
 
+- **[Proposal Studio — de un RFP al PDF (empieza acá)](proposal-studio/rfp-a-pdf-el-dia-a-dia.md)** — el manual del día a día: te llegó un RFP y quieres el PDF en la mano. Admisibilidad → registrar la propuesta → RFP y evidencia → plan del deck → render gobernado → revisar → subir. Incluye los prompts exactos para pedirle cada paso a un agente, qué información SOLO puedes dar tú, cómo se revisa y confirma, y el caso guía SKY completo. ⚠️ Hoy no hay UI ni Nexa: se opera desde el repo (ver TASK-1399).
+- [Proposal Studio — índice del dominio](proposal-studio/README.md) — qué manual leer según lo que necesites hacer.
+- [Crear y operar una propuesta](proposal-studio/crear-y-operar-una-propuesta.md) — el objeto de negocio: crear, estados y sus compuertas humanas, adjuntar el RFP, registrar evidencia con su audiencia (interno vs. cliente), declarar requisitos y vincular la cotización con su gate de margen.
+- [Generar el deck de una propuesta](proposal-studio/generar-el-deck-de-una-propuesta.md) — de `plan.json` al PDF: los dos caminos (exploratorio `pnpm deck:compose` vs. productivo `requestProposalRender`), qué pasa en cada etapa (cola → dispatcher → worker → asset store) y cómo obtener el archivo.
+- [Entender los errores y rechazos](proposal-studio/entender-los-errores-y-rechazos.md) — la tabla completa: qué significa cada rechazo en lenguaje simple, por qué el sistema lo bloquea (la razón de negocio), qué hacer, y si se reintenta o exige un plan nuevo.
+- [Operar el artifact-worker](proposal-studio/operar-el-artifact-worker.md) — cola, ejecuciones, logs, señales, reintentos, cómo apagar todo (el flag es multi-runtime) y qué no hacer nunca.
 - [Operar Quote-to-Cash Comercial](comercial/operar-quote-to-cash-comercial.md) — como revisar una oportunidad, elegir party/deal/productos, construir una cotizacion, manejar aprobaciones, emitir, sincronizar HubSpot y entender cuando pasa a contrato/Finance.
 - [Pipeline comercial](comercial/pipeline-comercial.md) — como usar la lane dedicada de forecast comercial sin confundirla con revenue reconocido ni cierre financiero.
 - [Sample Sprints](comercial/sample-sprints.md) — como declarar, aprobar, registrar progreso y cerrar outcomes de pilotos/trials/POCs/discovery.

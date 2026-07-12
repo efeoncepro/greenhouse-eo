@@ -1,8 +1,30 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
-> **Version:** 1.7
-> **Last updated:** 2026-04-23
+> **Version:** 1.8
+> **Last updated:** 2026-07-12
 > **Audience:** Platform engineers, DevOps, on-call operators
+
+## Delta 2026-07-12 — `artifact-worker`: el PRIMER Cloud Run **Job** del ecosistema (TASK-1391)
+
+Hasta hoy el inventario de §4 solo tenía **services** (Cloud Run HTTP + Cloud Functions). `artifact-worker`
+inaugura una **categoría nueva**: un Cloud Run **Job** — no expone HTTP, se invoca por `jobs.run` y
+escala a cero de verdad. Renderiza artefactos del Artifact Composer (Chromium/Playwright pinneado) a
+partir de filas de `greenhouse_commercial.proposal_render_jobs`. **Frontera autorizada por excepción
+documentada de EPIC-027.**
+
+- Inventario en §4 → nueva subsección **"Cloud Run Jobs"** (región `us-east4`, SA `greenhouse-portal@`,
+  2 vCPU / 2 GiB, `task-timeout=900 s`, `tasks=1`/`parallelism=1`, `max-retries=0`).
+- Scheduler nuevo en §5: `ops-artifact-render-dispatch` (`*/2 * * * *` → `POST /artifact-render/dispatch`
+  del `ops-worker`).
+- **Invocación:** el dispatcher (en `ops-worker`, misma SA) hace `jobs.run` **simple** con
+  `roles/run.invoker`. **NO** se usa `runWithOverrides` (permiso que `run.invoker` no incluye): el worker
+  hace el **claim atómico** de su propio job (`FOR UPDATE SKIP LOCKED`) — menos privilegio y concurrencia
+  segura por construcción (ISSUE-121 · #1).
+- **Flag multi-runtime ×3:** `ARTIFACT_RENDER_JOBS_ENABLED` se lee en Vercel (enqueue), `ops-worker`
+  (dispatch) y el Job. SoT en Cloud Run = los `deploy.sh` (`--set-env-vars` es destructivo).
+- **Deploy:** `.github/workflows/artifact-worker-deploy.yml` — **staging-only**. La promoción a
+  production exige integrarlo al release control plane (`RELEASE_DEPLOY_WORKFLOWS`) + sign-off.
+- Spec canónica: **`GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`**.
 
 ## Delta 2026-06-06 — Secret Manager IAM binding helper para deploys Cloud Run
 
@@ -661,6 +683,23 @@ La auditoría live confirmó `13` servicios serverless:
 | `hubspot-greenhouse-integration` | `us-central1` | default compute SA | **public** (`allUsers`) | parcial | revisar si el exposure público es realmente el deseado |
 | `notion-bq-sync` | `us-central1` | default compute SA | **public** (`allUsers`) | Secret Manager | exposición pública innecesaria para un sync interno; `minScale=0` desde `2026-04-24` |
 
+### Cloud Run Jobs (categoría nueva — 2026-07-12, TASK-1391)
+
+Un Cloud Run **Job** no es un service: **no expone HTTP**, se invoca por `jobs.run` (Jobs API) y una
+ejecución termina. El primero (y único hoy) del ecosistema:
+
+| Job | Region | Identity | Invocación | Recursos | Nota |
+| --- | --- | --- | --- | --- | --- |
+| `artifact-worker` | `us-east4` | `greenhouse-portal@...` | IAM only — `jobs.run` **sin overrides** desde el dispatcher del `ops-worker` (`roles/run.invoker`) | `cpu=2`, `mem=2Gi`, `task-timeout=900s`, `tasks=1`, `parallelism=1`, `max-retries=0` | Render de artefactos del Artifact Composer (Chromium/Playwright **pinneado** a la versión de `@playwright/test`). Secrets vía Secret Manager. Flag `ARTIFACT_RENDER_JOBS_ENABLED` (SoT: `services/artifact-worker/deploy.sh`). **Staging-only** hasta sign-off + release control plane |
+
+- `max-retries=0` es deliberado: **el retry es del dominio** (`proposal_render_jobs.attempts`), no de
+  Cloud Run — ninguna re-ejecución ocurre fuera del contrato del job record.
+- Un fallo **gobernado** sale con **exit 0** (el código queda en `failure_code`); un **exit ≠ 0** es un bug
+  del worker (Sentry `domain=commercial`, tag `source=artifact_worker`).
+- La imagen corre un **selftest dentro de Cloud Build** (catálogo + checksums de fuentes + Chromium +
+  render probe): si falla, **no hay deploy**.
+- Spec: `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md` §4.
+
 ### Cloud Functions Gen 2 / legacy services
 
 Servicios activos:
@@ -703,6 +742,10 @@ La auditoría live confirmó `16` jobs activos, todos habilitados en `us-east4`.
 - `ops-product-catalog-drift-detect`
 - `ops-quotation-lifecycle`
 - `ops-nexa-weekly-digest`
+- `ops-artifact-render-dispatch` (2026-07-12, TASK-1391) — `*/2 * * * *` → `POST /artifact-render/dispatch`
+  del `ops-worker`. **No renderiza**: elige el próximo `proposal_render_job` por prioridad (deadline +
+  aging), cierra los de deadline vencido y lanza UNA ejecución del Cloud Run **Job** `artifact-worker`
+  (~200 ms). Con el flag OFF hace *skip logueado*
 
 ### Materializaciones batch
 

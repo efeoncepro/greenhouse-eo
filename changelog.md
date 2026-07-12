@@ -2,6 +2,13 @@
 
 ## 2026-07-12
 
+- **Documentación completa del Proposal Studio (manual + funcional + arquitectura) y el gap que
+  destapó.** ~3.700 líneas verificadas contra el código: 5 runbooks de operación (incluido
+  "de un RFP al PDF", la puerta de entrada), 5 docs funcionales (los gates con su razón de negocio,
+  las decisiones y sus alternativas rechazadas) y la spec técnica canónica del pipeline de render.
+  La auditoría corrigió 6 docs que mentían sobre el estado del sistema. Y expuso el gap real:
+  **el sistema no tiene puerta** — sólo se opera desde el repo; Nexa tiene el runtime gobernado
+  listo pero cero acciones del dominio registradas → **TASK-1399** (P1).
 - **TASK-1391 COMPLETE — el deck de SKY se renderizó EN CLOUD RUN por el pipeline gobernado.**
   Primer Cloud Run Job del ecosistema operando: 15 láminas en 25,2 s y bench de 25 en 32,3 s,
   ambos al primer intento, con assets versionados en el bucket privado de staging y outbox
@@ -22,9 +29,8 @@
   render (asset ausente, fallback tipográfico, lámina en blanco); Render Agent propose→confirm→
   execute con eval; dispatcher con prioridad deadline+aging (nunca FIFO ciega). Corrida E2E real:
   la propuesta técnica de SKY → PDF de 15 láminas por el camino gobernado completo (3 bugs reales
-  cazados y arreglados de raíz). **Infra staging desplegada:** Job `artifact-worker` (2 vCPU/2 GiB,
-  flag ON) + dispatcher/Scheduler ON. El primer execution/smoke y benchmark siguen pendientes; Vercel
-  Preview aún no tiene el flag, por lo que el portal no encola renders por ahora.
+  cazados y arreglados de raíz). Este hito pre-smoke queda superado por el cierre staging documentado
+  en la primera entrada de 2026-07-12.
 - **CI: unit suite ya no está roja por el composer (fix preexistente).** El job de tests corría sin
   browsers de Playwright y las suites del artifact-composer que lanzan Chromium fallaban con
   "Executable doesn't exist" desde que el deck composer entró al repo. Ahora CI provisiona el

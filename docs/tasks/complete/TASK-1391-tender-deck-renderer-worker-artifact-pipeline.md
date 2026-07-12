@@ -23,8 +23,8 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-027`
-- Status real: `Infra staging desplegada; smoke gobernado + benchmark pendientes`
-- Rank: `P1 — ejecutar primer smoke gobernado y benchmark antes de activar el enqueue de portal`
+- Status real: `Staging verificado end-to-end; producción explícitamente gateada`
+- Rank: `P1 — cierre staging cumplido; follow-up de producción vía release control plane`
 - Domain: `commercial|platform|ops`
 - Blocked by: `none`
 - Branch: `task/TASK-1391-artifact-worker-cloud-run-job`
@@ -35,7 +35,7 @@
 
 Llevar el Tender Deck Composer desde su CLI local determinista a una **capability agentic de artefactos gobernada**: contexto/tools de render seguros, propuesta trazable, confirmación humana, job idempotente, outbox/cola, **Cloud Run Job** dedicado con Chromium, storage versionado de PDF/PNGs y señales operativas. Renderiza exclusivamente un `ResolvedCompositionManifest` inmutable —plan, catálogo, contratos, brand pack, fuentes, evidencia/requisitos y validación semántica fijados—; no recrea templates ni introduce LLM en el render.
 
-La autorización excepcional de EPIC-027 para este deployable ya fue registrada y la foundation `Proposal` existe. Queda el rollout remoto: desplegar el Job en staging, medir su envelope real y sólo después considerar una activación. Registrar esa frontera evita convertir `ops-worker` o una route Vercel en un renderer pesado.
+La autorización excepcional de EPIC-027 para este deployable ya fue registrada y la foundation `Proposal` existe. El rollout staging, los renders reales de 15/25 láminas y el benchmark ya quedaron verificados; Production sigue deliberadamente gateada por el release control plane y sign-off. Registrar esa frontera evita convertir `ops-worker` o una route Vercel en un renderer pesado.
 
 ## Why This Task Exists
 
@@ -43,7 +43,7 @@ El composer actual ya prueba el camino `DeckPlan → selector → slot-fill → 
 
 Como capability agentic, tampoco basta con exponer un endpoint de render: un agente debe poder leer el snapshot autorizado, constraints del RFP y estado de artefactos, proponer un `ProposalRenderProposal` verificable y explicar sus bloqueos. La confirmación humana invoca el mismo command que API/CLI; el agente jamás encola un job, llama `jobs.run`, publica un PDF ni suplanta el gate de audience.
 
-La arquitectura ya determina que el render pesado vive en `artifact-worker` como **Cloud Run Job de una tarea por deck**, y **nunca** en `ops-worker`, Vercel ni un service HTTP de larga duración. La excepción de frontera de EPIC-027 está documentada; el código está completo y el siguiente gate es operacional: staging, benchmark y evidencia de rollback antes de activar el flag.
+La arquitectura ya determina que el render pesado vive en `artifact-worker` como **Cloud Run Job de una tarea por deck**, y **nunca** en `ops-worker`, Vercel ni un service HTTP de larga duración. La excepción de frontera de EPIC-027 está documentada; el staging y benchmark están cerrados y el único gate operacional restante es Production, por release control plane y sign-off.
 
 ## Goal
 
