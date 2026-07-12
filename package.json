@@ -211,6 +211,7 @@
     "ai:image:rmbg": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/remove-bg.ts",
     "deck:compose": "tsx scripts/commercial/compose-tender-deck.ts",
     "composer:visual-gate": "tsx scripts/artifact-composer/visual-gate.ts",
+    "composer:color-ledger": "tsx scripts/artifact-composer/color-ledger.ts",
     "media:archive-ai-generation": "node scripts/media/archive-ai-generation.mjs",
     "media:web-video": "node scripts/media/pack-web-video.mjs",
     "media:webp": "node scripts/media/pack-webp.mjs",

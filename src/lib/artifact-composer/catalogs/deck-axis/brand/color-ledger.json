@@ -1,0 +1,1263 @@
+{
+  "$comment": "Ledger canónico de bases RGB del catálogo deck-axis (TASK-1393). Generado por `pnpm composer:color-ledger --write`; la CLASIFICACIÓN se edita a mano y el tool la preserva. Una base no está migrada hasta que su clasificación no sea pending y su token resuelva al valor EXACTO.",
+  "measuredFrom": [
+    "agenda-full.html",
+    "back-cover-full.html",
+    "bullet-list-split.html",
+    "card-grid-full.html",
+    "case-study-split.html",
+    "chart-split.html",
+    "comparison-split.html",
+    "cover-full.html",
+    "credentials-full.html",
+    "deck-signature.css",
+    "dual-list-split.html",
+    "dual-text-split.html",
+    "evidence-story-grid.html",
+    "four-pillars-full.html",
+    "highlight-wave.html",
+    "human-impact-full.html",
+    "metrics-split.html",
+    "narrative-split.html",
+    "pricing-full.html",
+    "process-steps-full.html",
+    "quote-split.html",
+    "requirements-table-full.html",
+    "section-divider-split.html",
+    "stat-split.html",
+    "team-split.html",
+    "timeline-full.html"
+  ],
+  "baseCount": 78,
+  "bases": {
+    "#000000": {
+      "classification": "ppt-primitive",
+      "name": "neutral/1000",
+      "figma": {
+        "collection": "Color Primitives",
+        "status": "exists",
+        "nodeId": "33:2"
+      },
+      "occurrences": 3,
+      "files": [
+        "chart-split.html",
+        "evidence-story-grid.html",
+        "metrics-split.html"
+      ],
+      "alphas": [
+        0.1,
+        0.18,
+        0.28
+      ]
+    },
+    "#000c21": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 3,
+      "files": [
+        "credentials-full.html",
+        "process-steps-full.html"
+      ],
+      "alphas": [
+        0.16,
+        0.22
+      ]
+    },
+    "#000e2c": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "card-grid-full.html"
+      ],
+      "alphas": [
+        0.22
+      ]
+    },
+    "#000f2a": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "requirements-table-full.html"
+      ],
+      "alphas": [
+        0.18
+      ]
+    },
+    "#001129": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "evidence-story-grid.html"
+      ],
+      "alphas": [
+        0.72
+      ]
+    },
+    "#00122b": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "evidence-story-grid.html"
+      ],
+      "alphas": [
+        0.16
+      ]
+    },
+    "#001232": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "pricing-full.html"
+      ],
+      "alphas": [
+        0.16
+      ]
+    },
+    "#001327": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 19,
+      "files": [
+        "agenda-full.html",
+        "bullet-list-split.html",
+        "card-grid-full.html",
+        "case-study-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "credentials-full.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "human-impact-full.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "pricing-full.html",
+        "process-steps-full.html",
+        "quote-split.html",
+        "requirements-table-full.html",
+        "timeline-full.html"
+      ],
+      "alphas": []
+    },
+    "#00143c": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "team-split.html"
+      ],
+      "alphas": [
+        0.08
+      ]
+    },
+    "#001633": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "credentials-full.html"
+      ],
+      "alphas": [
+        0.18
+      ]
+    },
+    "#001a33": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 37,
+      "files": [
+        "agenda-full.html",
+        "bullet-list-split.html",
+        "card-grid-full.html",
+        "case-study-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "cover-full.html",
+        "credentials-full.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "highlight-wave.html",
+        "human-impact-full.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "pricing-full.html",
+        "process-steps-full.html",
+        "quote-split.html",
+        "requirements-table-full.html",
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html",
+        "timeline-full.html"
+      ],
+      "alphas": [
+        0.13
+      ]
+    },
+    "#001a3d": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "back-cover-full.html"
+      ],
+      "alphas": []
+    },
+    "#002247": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "back-cover-full.html",
+        "process-steps-full.html"
+      ],
+      "alphas": [
+        0.34
+      ]
+    },
+    "#00224a": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "back-cover-full.html"
+      ],
+      "alphas": []
+    },
+    "#00254c": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "evidence-story-grid.html"
+      ],
+      "alphas": [
+        0.18
+      ]
+    },
+    "#00284d": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 17,
+      "files": [
+        "bullet-list-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "cover-full.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "four-pillars-full.html",
+        "highlight-wave.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "quote-split.html",
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html"
+      ],
+      "alphas": [
+        0.16
+      ]
+    },
+    "#002a4e": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "process-steps-full.html"
+      ],
+      "alphas": [
+        0.58
+      ]
+    },
+    "#00345f": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 3,
+      "files": [
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html"
+      ],
+      "alphas": []
+    },
+    "#004e9f": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "back-cover-full.html"
+      ],
+      "alphas": []
+    },
+    "#0063dd": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "back-cover-full.html"
+      ],
+      "alphas": [
+        0.18,
+        0.76
+      ]
+    },
+    "#007494": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "four-pillars-full.html"
+      ],
+      "alphas": []
+    },
+    "#007a5d": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "four-pillars-full.html"
+      ],
+      "alphas": []
+    },
+    "#0091e8": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "back-cover-full.html"
+      ],
+      "alphas": [
+        0.33
+      ]
+    },
+    "#020061": {
+      "classification": "ppt-primitive",
+      "name": "indigo/950",
+      "figma": {
+        "collection": "Color Primitives",
+        "status": "exists",
+        "nodeId": "33:2"
+      },
+      "occurrences": 34,
+      "files": [
+        "bullet-list-split.html",
+        "card-grid-full.html",
+        "case-study-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "highlight-wave.html",
+        "human-impact-full.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "pricing-full.html",
+        "quote-split.html",
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html",
+        "timeline-full.html"
+      ],
+      "alphas": [
+        0.028,
+        0.05,
+        0.06,
+        0.1,
+        0.2,
+        0.24,
+        0.5,
+        0.54,
+        0.6,
+        0.62,
+        0.78,
+        0.8
+      ]
+    },
+    "#023c70": {
+      "classification": "ppt-primitive",
+      "name": "blue/800",
+      "figma": {
+        "collection": "Color Primitives",
+        "status": "exists",
+        "nodeId": "33:2"
+      },
+      "occurrences": 31,
+      "files": [
+        "agenda-full.html",
+        "bullet-list-split.html",
+        "card-grid-full.html",
+        "case-study-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "cover-full.html",
+        "credentials-full.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "highlight-wave.html",
+        "human-impact-full.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "pricing-full.html",
+        "process-steps-full.html",
+        "quote-split.html",
+        "requirements-table-full.html",
+        "stat-split.html",
+        "timeline-full.html"
+      ],
+      "alphas": []
+    },
+    "#0b6b64": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 4,
+      "files": [
+        "card-grid-full.html",
+        "team-split.html"
+      ],
+      "alphas": [
+        0.32,
+        0.4
+      ]
+    },
+    "#0e5285": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "cover-full.html"
+      ],
+      "alphas": [
+        0.92
+      ]
+    },
+    "#1477ec": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "dual-text-split.html"
+      ],
+      "alphas": []
+    },
+    "#14b0f2": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "back-cover-full.html"
+      ],
+      "alphas": [
+        0.38
+      ]
+    },
+    "#159e93": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "card-grid-full.html",
+        "team-split.html"
+      ],
+      "alphas": []
+    },
+    "#1f9e94": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "timeline-full.html"
+      ],
+      "alphas": [
+        0.4
+      ]
+    },
+    "#22b887": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "four-pillars-full.html"
+      ],
+      "alphas": [
+        0.15,
+        0.3
+      ]
+    },
+    "#279bb7": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "four-pillars-full.html"
+      ],
+      "alphas": [
+        0.15,
+        0.3
+      ]
+    },
+    "#2ab5ab": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "case-study-split.html",
+        "chart-split.html"
+      ],
+      "alphas": []
+    },
+    "#2ac2b8": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 44,
+      "files": [
+        "agenda-full.html",
+        "bullet-list-split.html",
+        "card-grid-full.html",
+        "case-study-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "credentials-full.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "human-impact-full.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "pricing-full.html",
+        "process-steps-full.html",
+        "quote-split.html",
+        "requirements-table-full.html",
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html",
+        "timeline-full.html"
+      ],
+      "alphas": [
+        0.14,
+        0.16,
+        0.46,
+        0.5
+      ]
+    },
+    "#2c98b0": {
+      "classification": "ppt-primitive",
+      "name": "teal/600",
+      "figma": {
+        "collection": "Color Primitives",
+        "status": "exists",
+        "nodeId": "33:2"
+      },
+      "occurrences": 5,
+      "files": [
+        "bullet-list-split.html",
+        "human-impact-full.html",
+        "metrics-split.html",
+        "pricing-full.html",
+        "quote-split.html"
+      ],
+      "alphas": []
+    },
+    "#3273d4": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "highlight-wave.html"
+      ],
+      "alphas": []
+    },
+    "#33029c": {
+      "classification": "ppt-primitive",
+      "name": "indigo/600",
+      "figma": {
+        "collection": "Color Primitives",
+        "status": "exists",
+        "nodeId": "33:2"
+      },
+      "occurrences": 14,
+      "files": [
+        "bullet-list-split.html",
+        "case-study-split.html",
+        "comparison-split.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "highlight-wave.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "quote-split.html",
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html"
+      ],
+      "alphas": []
+    },
+    "#36c8bf": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 55,
+      "files": [
+        "agenda-full.html",
+        "card-grid-full.html",
+        "case-study-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "cover-full.html",
+        "credentials-full.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "highlight-wave.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "process-steps-full.html",
+        "quote-split.html",
+        "requirements-table-full.html",
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html",
+        "timeline-full.html"
+      ],
+      "alphas": [
+        0.035,
+        0.05,
+        0.115,
+        0.14,
+        0.18,
+        0.22,
+        0.26,
+        0.3,
+        0.38,
+        0.4,
+        0.42,
+        0.45,
+        0.5,
+        0.6,
+        0.7,
+        0.72,
+        0.82
+      ]
+    },
+    "#3a74d6": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "chart-split.html"
+      ],
+      "alphas": [
+        0.5
+      ]
+    },
+    "#3c08ac": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 3,
+      "files": [
+        "four-pillars-full.html"
+      ],
+      "alphas": [
+        0.13,
+        0.28
+      ]
+    },
+    "#3dc1eb": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "evidence-story-grid.html"
+      ],
+      "alphas": [
+        0.18
+      ]
+    },
+    "#43527a": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "card-grid-full.html"
+      ],
+      "alphas": []
+    },
+    "#45d6cc": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "timeline-full.html"
+      ],
+      "alphas": []
+    },
+    "#4f5871": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "highlight-wave.html"
+      ],
+      "alphas": []
+    },
+    "#517b00": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "four-pillars-full.html",
+        "human-impact-full.html"
+      ],
+      "alphas": []
+    },
+    "#5aa500": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "dual-text-split.html"
+      ],
+      "alphas": []
+    },
+    "#5c6a8c": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "team-split.html"
+      ],
+      "alphas": []
+    },
+    "#5ed3f7": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "evidence-story-grid.html"
+      ],
+      "alphas": [
+        0.98
+      ]
+    },
+    "#5fe0d6": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "case-study-split.html",
+        "chart-split.html"
+      ],
+      "alphas": []
+    },
+    "#6717cd": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 54,
+      "files": [
+        "agenda-full.html",
+        "bullet-list-split.html",
+        "card-grid-full.html",
+        "case-study-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "credentials-full.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "human-impact-full.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "pricing-full.html",
+        "process-steps-full.html",
+        "quote-split.html",
+        "requirements-table-full.html",
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html",
+        "timeline-full.html"
+      ],
+      "alphas": [
+        0.12,
+        0.15,
+        0.18,
+        0.42,
+        0.5,
+        0.52,
+        0.9
+      ]
+    },
+    "#6ec207": {
+      "classification": "ppt-primitive",
+      "name": "green/100",
+      "figma": {
+        "collection": "Color Primitives",
+        "status": "exists",
+        "nodeId": "33:2"
+      },
+      "occurrences": 5,
+      "files": [
+        "human-impact-full.html",
+        "pricing-full.html",
+        "requirements-table-full.html"
+      ],
+      "alphas": [
+        0.03,
+        0.18
+      ]
+    },
+    "#6fbc00": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "dual-text-split.html"
+      ],
+      "alphas": []
+    },
+    "#70bd00": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "four-pillars-full.html"
+      ],
+      "alphas": [
+        0.16,
+        0.32
+      ]
+    },
+    "#72ded8": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "cover-full.html"
+      ],
+      "alphas": [
+        0.76
+      ]
+    },
+    "#7684a6": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "team-split.html"
+      ],
+      "alphas": []
+    },
+    "#78acf8": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "chart-split.html"
+      ],
+      "alphas": [
+        0.62
+      ]
+    },
+    "#7ce4dc": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "pricing-full.html"
+      ],
+      "alphas": []
+    },
+    "#8390ad": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "team-split.html"
+      ],
+      "alphas": []
+    },
+    "#85c5ed": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "back-cover-full.html"
+      ],
+      "alphas": []
+    },
+    "#8aa8d8": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "requirements-table-full.html"
+      ],
+      "alphas": []
+    },
+    "#9cf1ea": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 20,
+      "files": [
+        "credentials-full.html",
+        "pricing-full.html",
+        "process-steps-full.html",
+        "requirements-table-full.html"
+      ],
+      "alphas": [
+        0.025,
+        0.04,
+        0.15,
+        0.28,
+        0.52,
+        0.62,
+        0.9
+      ]
+    },
+    "#a4eaff": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "back-cover-full.html"
+      ],
+      "alphas": [
+        0.52
+      ]
+    },
+    "#b7c2d2": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "bullet-list-split.html"
+      ],
+      "alphas": []
+    },
+    "#b9c9e9": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "requirements-table-full.html"
+      ],
+      "alphas": []
+    },
+    "#b9f8f2": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "pricing-full.html"
+      ],
+      "alphas": []
+    },
+    "#c4ccd8": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "section-divider-split.html"
+      ],
+      "alphas": []
+    },
+    "#c5e7ff": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "back-cover-full.html"
+      ],
+      "alphas": []
+    },
+    "#cffffa": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "process-steps-full.html"
+      ],
+      "alphas": []
+    },
+    "#d0f3ff": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "evidence-story-grid.html"
+      ],
+      "alphas": [
+        0.9
+      ]
+    },
+    "#d7bfff": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "process-steps-full.html",
+        "requirements-table-full.html"
+      ],
+      "alphas": [
+        0.72
+      ]
+    },
+    "#e9edf3": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "evidence-story-grid.html"
+      ],
+      "alphas": []
+    },
+    "#eee5ff": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "process-steps-full.html"
+      ],
+      "alphas": []
+    },
+    "#eef0f3": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 14,
+      "files": [
+        "bullet-list-split.html",
+        "case-study-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "four-pillars-full.html",
+        "highlight-wave.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "quote-split.html",
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html"
+      ],
+      "alphas": [
+        0.82
+      ]
+    },
+    "#f5f8fb": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 2,
+      "files": [
+        "pricing-full.html",
+        "requirements-table-full.html"
+      ],
+      "alphas": [
+        0.12,
+        0.14
+      ]
+    },
+    "#f7f8fa": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 3,
+      "files": [
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "human-impact-full.html"
+      ],
+      "alphas": [
+        0.86,
+        0.96
+      ]
+    },
+    "#f7fdff": {
+      "classification": "pending",
+      "name": null,
+      "figma": null,
+      "occurrences": 1,
+      "files": [
+        "evidence-story-grid.html"
+      ],
+      "alphas": [
+        0.98
+      ]
+    },
+    "#ffffff": {
+      "classification": "ppt-primitive",
+      "name": "neutral/50",
+      "figma": {
+        "collection": "Color Primitives",
+        "status": "exists",
+        "nodeId": "33:2"
+      },
+      "occurrences": 207,
+      "files": [
+        "agenda-full.html",
+        "back-cover-full.html",
+        "bullet-list-split.html",
+        "card-grid-full.html",
+        "case-study-split.html",
+        "chart-split.html",
+        "comparison-split.html",
+        "cover-full.html",
+        "credentials-full.html",
+        "dual-list-split.html",
+        "dual-text-split.html",
+        "evidence-story-grid.html",
+        "four-pillars-full.html",
+        "human-impact-full.html",
+        "metrics-split.html",
+        "narrative-split.html",
+        "pricing-full.html",
+        "process-steps-full.html",
+        "quote-split.html",
+        "requirements-table-full.html",
+        "section-divider-split.html",
+        "stat-split.html",
+        "team-split.html",
+        "timeline-full.html"
+      ],
+      "alphas": [
+        0.042,
+        0.05,
+        0.055,
+        0.07,
+        0.08,
+        0.09,
+        0.1,
+        0.12,
+        0.14,
+        0.15,
+        0.16,
+        0.17,
+        0.18,
+        0.19,
+        0.2,
+        0.22,
+        0.24,
+        0.25,
+        0.27,
+        0.28,
+        0.29,
+        0.3,
+        0.32,
+        0.34,
+        0.35,
+        0.36,
+        0.38,
+        0.4,
+        0.42,
+        0.44,
+        0.48,
+        0.5,
+        0.52,
+        0.54,
+        0.55,
+        0.56,
+        0.57,
+        0.58,
+        0.6,
+        0.62,
+        0.66,
+        0.68,
+        0.7,
+        0.72,
+        0.74,
+        0.75,
+        0.78,
+        0.82,
+        0.84,
+        0.86,
+        0.88,
+        0.9,
+        0.95,
+        0.96
+      ]
+    }
+  }
+}
