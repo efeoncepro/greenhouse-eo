@@ -164,6 +164,25 @@ jobs:
       - name: Test inventory
         run: pnpm test:inventory
 
+      # Los tests del artifact-composer (composability/geometría/fit) lanzan el
+      # Chromium headless shell PINNEADO de Playwright (determinismo del render:
+      # el system Chrome del runner cambia de versión y mediría otro layout).
+      # Sin este paso fallan 4 suites con "Executable doesn't exist" — rojo que
+      # existía desde que el deck composer entró al repo (runs 29192166841+).
+      # Cache por versión de @playwright/test: hit = segundos, miss = ~30s.
+      - name: Resolve Playwright version
+        id: playwright-version
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright chromium headless shell
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-shell-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+
+      - name: Provision Playwright chromium headless shell
+        run: pnpm exec playwright install chromium --only-shell
+
       - name: Test
         run: pnpm test:results
         # The full unit suite currently takes just over 5 minutes on GitHub
