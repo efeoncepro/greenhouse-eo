@@ -80,6 +80,51 @@ Nexa Voice V1: `docs/architecture/nexa-intelligence/voice/nexa-voice-system-v1.m
 
 `idle → submitted → thinking → reasoning → streaming → answered → proofOpen → followup` (+ `compacted`/`degraded`/`error`). Arranca en `onSubmit`. El **live region del status lo lleva la identidad Nexa** (un solo anuncio a11y). `prefers-reduced-motion` horneado en cada feature-primitive. (Aplica a la lente; el chat NexaThread usa el revelado typewriter de assistant-ui.)
 
+## Acciones gobernadas — Nexa OPERA, no sólo responde (TASK-1137/1212/1399)
+
+Nexa no es sólo lectura. El **runtime de acción gobernada** (`src/lib/nexa/actions/**`) implementa
+`propose → confirm → execute`: **el LLM nunca escribe** — propone una `actionKey` **registrada** (tool
+`propose_action`), el resolver determinístico (`registry.ts`) construye un **preview read-only con datos
+frescos**, un **humano confirma** en la tarjeta, y recién ahí `POST /api/nexa/actions/[actionKey]/confirm`
+ejecuta el **command canónico** dentro de la foundation de idempotencia (TASK-655).
+
+**Vivas hoy:** `mark_notifications_read` (self-action, sin input) · `author_quote` (TASK-1212) · el
+**bloque Proposal Studio** (TASK-1399): `register_proposal`, `attach_proposal_rfp`,
+`record_proposal_evidence`, `request_proposal_render` + el tool read-only `proposal_status`. Cada bloque
+tiene su **flag propio default-OFF** además del master `NEXA_ACTION_RUNTIME_ENABLED`.
+
+### Receta: registrar una acción nueva (molde `actions/proposal-studio.ts`)
+
+1. **`inputSchema` Zod** — es la única excepción viva a "no Zod nuevo" (el contrato
+   `NexaActionDefinition` lo exige). Guards de compile-time contra el input del command.
+2. **`isEnabled`** = master ∧ flag propio (default OFF) · **`isPermitted`** = `can(subject, …)` síncrono.
+3. **`buildPreview`** = cruza la puerta del dominio **y ejercita los gates del command** · **`execute`**
+   = re-cruza la puerta y delega en el command **sin** `idempotencyKey` (la pone el confirm).
+4. Registrar en `NEXA_ACTION_REGISTRY` **y en la descripción del tool `propose_action`** (la lista de
+   acciones está **hardcodeada** en ese string: si no la actualizás, el LLM no sabe que la acción existe).
+5. Flag → fila en `FEATURE_FLAG_STATE_LEDGER.md` + doc de capa (`behavior/behavior-and-routing.md`).
+
+### Hard rules de acciones (aplican a TODA acción, no sólo a las existentes)
+
+- **NUNCA** el LLM ejecuta un write. Propone; el humano confirma; el command muta. Sin command canónico
+  bound → gap honesto, **NUNCA** un endpoint inventado.
+- **NUNCA** un `inputSchema` acepta un **id de organización/tenant** (TASK-1399): el scope se **deriva de
+  la sesión/entitlement** server-side. Un LLM no puede conocer un UUID; dejar que lo *proponga* es una
+  superficie de ataque (nombrar la org de otro y confiar en que el gate la atrape). Los únicos ids que
+  viajan son los que el sistema ya emitió y el agente vio.
+- **NUNCA** un preview promete lo que va a fallar (TASK-1399): si un **invariante de dominio** bloquea la
+  acción (no permisos — estado real), `buildPreview` lanza **`NexaActionBlockedError`** → gap
+  `unavailable`: **se explica, no se propone**. Sólo ese error se traduce a gap; cualquier otra excepción
+  es un bug y sigue ruidosa.
+- **NUNCA** un preview **reimplementa** los gates del command: los **ejercita** (extraé un assert
+  read-only compartido, como `assertProposalRenderAdmissible`). Una copia miente el día que se agrega un gate.
+- **NUNCA** re-tipes con Zod un payload que debe viajar **verbatim** sin `.passthrough()`: Zod **borra las
+  claves que no declara** (bug real: el manifest del composer perdía su procedencia → otro hash → el mismo
+  artefacto pedido por dos consumers daba dos jobs).
+- **NUNCA** el `execute` pasa `idempotencyKey` al command (doble-claim sobre `api_platform_command_executions`).
+- La confirm-card **DEBE re-ecoar `execution.input`** además del `idempotencyKey` (el confirm re-valida el
+  input server-side; sin el eco, toda acción parametrizada muere en 422 — bug latente cerrado en TASK-1399).
+
 ## Receta: agregar un dominio/surface conversacional (lente)
 
 **Seguí el PLAYBOOK** (`docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md`) — Knowledge (TASK-1101) es el ejemplo trabajado. El dominio entra por **datos**, no por chrome:
@@ -133,6 +178,7 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 - **Chat flotante:** vivo (NexaThread + assistant-ui). Manda `modelMode: 'auto'` → el auto-router SÍ se alcanza con `NEXA_AUTO_ROUTER_ENABLED` ON (default OFF → Gemini). TASK-1134.
 - **Hardening abierto (tasks):** TASK-1125 (corpus prod) · TASK-1127 (QA nightly + eval wrong-source/cross-doc) · TASK-1128 (signal de drift de términos del corpus).
 - **Hardening cerrado (reciente):** TASK-1126 (golden snapshot del prompt + gate de version/changelog) · TASK-1138 (módulo `answerFormatting` del prompt V2 → v2.1.0) · TASK-1131 (contrato de error canónico es-CL + `captureWithDomain('home')` en los 5 handlers del chat) · TASK-1129 (telemetría de turno: ledger `nexa_turn_telemetry` + signal `nexa.turn.degraded_outcomes`) · TASK-1134 (model selection truth: `modelMode` auto/manual → el auto-router se alcanza en el chat).
+- **Acciones gobernadas:** runtime vivo (`NEXA_ACTION_RUNTIME_ENABLED` ON en staging y prod). `author_quote`
 - **Follow-ups de la lente:** `unhelpful` → selector de motivo; `share` → permalink real; multi-turno con compactación (TASK-1102); token-streaming real por el provider (TASK-1091). Ninguno toca la primitive.
 
 ## Required reads (en orden)
