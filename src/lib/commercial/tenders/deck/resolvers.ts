@@ -358,7 +358,18 @@ const RESOLVERS: Record<string, { known: string[]; build: ResolverDef }> = {
       // El hito se ancla al FIN de su unidad (un hito "en el mes 2" cae al cerrar el mes 2).
       const left = (at / units) * 100
 
-      return [{ selector: ':self', styleProp: 'left', styleValue: `${left.toFixed(2)}%` }]
+      // El rombo va SIEMPRE en su posición real —no se miente sobre la fecha—, pero la etiqueta se
+      // ancla HACIA ADENTRO cuando el hito cae en un extremo. Un hito en la última unidad cae al
+      // 100% del eje y su label, centrado y `nowrap`, se partiría contra el borde del lienzo. (El
+      // prototipo esquivaba esto a mano: sus ejemplos usan 16%, 50% y 91%, nunca 100%.)
+      const EDGE = 12
+      const anchor = left >= 100 - EDGE ? 'at-end' : left <= EDGE ? 'at-start' : null
+
+      return [
+        { selector: ':self', styleProp: 'left', styleValue: `${left.toFixed(2)}%` },
+        // El grupo se limpia SIEMPRE: el blueprint puede traer el anclaje de otro hito.
+        { selector: ':self', toneGroup: ['at-start', 'at-end'], ...(anchor ? { toneClass: anchor } : {}) }
+      ]
     }
   }
 }

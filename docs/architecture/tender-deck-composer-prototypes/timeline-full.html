@@ -52,6 +52,12 @@
   .milestones { height:74px; }
   .milestones .track { }
   .mstone { position:absolute; top:8px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; z-index:3; }
+  /* Hito en un extremo del eje: el ROMBO se queda en su posición real (la fecha no se negocia) y la
+     ETIQUETA se ancla hacia adentro. Sin esto, un hito en la última unidad cae al 100% y su label
+     —centrado y nowrap— se parte contra el borde del lienzo. Las clases las emite el resolver
+     `timeline-milestone-position` desde el dato, no se escriben a mano. */
+  .mstone.at-end { transform:translateX(-100%); align-items:flex-end; }
+  .mstone.at-start { transform:translateX(0); align-items:flex-start; }
   .mstone .dia { width:16px; height:16px; background:var(--teal); transform:rotate(45deg); border-radius:3px;
     box-shadow:0 0 16px rgba(54,200,191,.7); }
   .mstone .ml { margin-top:11px; font-family:'Poppins',sans-serif; font-weight:600; font-size:18px; color:#fff; white-space:nowrap; }

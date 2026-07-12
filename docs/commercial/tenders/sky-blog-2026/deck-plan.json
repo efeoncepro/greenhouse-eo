@@ -283,13 +283,13 @@
         "milestones": [
           {
             "at": "1",
-            "label": "Grilla aprobada",
-            "caption": "Semana 1"
+            "label": "Primeros artículos",
+            "caption": "Fin mes 1"
           },
           {
             "at": "3",
             "label": "Primer reporte",
-            "caption": "Mes 3"
+            "caption": "Fin mes 3"
           }
         ],
         "phases": [
