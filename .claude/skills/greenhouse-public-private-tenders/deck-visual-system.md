@@ -174,9 +174,51 @@ Una persona **decorativa/ilustrativa** puede ser IA, pero **jamás presentada co
 
 ---
 
+## Cómo se compone (el composer YA existe — F1, 2026-07-11)
+
+El deck **no se arma a mano**: se escribe un **`DeckPlan`** (JSON con las láminas y sus slots) y el
+composer lo materializa. El camino es **100% determinista** — cero LLM.
+
+```bash
+pnpm tsx scripts/commercial/compose-tender-deck.ts <deck-plan.json> [--out <dir>]
+# ejemplo vivo (caso SKY, 4 láminas):
+pnpm tsx scripts/commercial/compose-tender-deck.ts docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan.json
+```
+
+Cada lámina del plan declara `contentType` + `slots`. El **selector** resuelve la plantilla
+(lookup en `registry.json`), el **validador** aplica el contrato y el **renderer** llena el DOM real
+de Chromium. El **`DeckPlan` es el artefacto auditable**: mismos slots → mismo deck.
+
+**Lo que el composer RECHAZA (y por qué está bien que lo haga):**
+
+- **Copy que no cabe** → `overflow: reject`. **No trunca.** Truncar el texto de una oferta en
+  silencio es peor que fallar: el evaluador lee una frase mutilada y nadie se entera. Reescribí más
+  corto.
+- **Una cifra sin `evidenceRef`** → no se compone. Es el principio anti-humo del método, hecho gate.
+- **Un content-type que no calza** → revienta. Significa **falta una plantilla**, no "improvisá".
+- **Cualquier slot que el filler no sepa llenar** → aborta el deck. Ver abajo.
+
+### ⚠️ La bug class del composer: el FALLO SILENCIOSO
+
+Apareció **tres veces** durante F1, y es lo peor que puede pasar: **la lámina sale con el contenido
+de ejemplo del prototipo y nadie se entera** — un deck llegando al comité con el copy de relleno
+("Inteligencia de ejecución" ×4, un KPI que decía "3/3" cuando el dato era "4/4", los dos planes
+marcados como "el propuesto").
+
+Está cerrado de raíz: **cualquier tipo o campo que el filler no sepa llenar aborta el deck.** Si
+tocás el renderer, **NUNCA** agregues un `default:` silencioso ni un `continue` que deje pasar un
+slot sin escribir.
+
+### Estado del catálogo
+
+**11 de las 24 plantillas todavía no tienen sus slots anotados** (Agenda, Timeline, Team, CaseStudy,
+Chart, Metrics, Quote, Narrative, BulletList, CardGrid, SectionDivider) → **no son componibles**
+hasta anotarlas. Anotar = poner `data-slot` / `data-slot-field` / `data-slot-items` en el HTML.
+
 ## Render
 
-HTML (plantilla fiel con tokens) → **Chromium headless** → PNG/PDF, 16:9 1920×1080.
+HTML (plantilla fiel con tokens) → **Chromium headless** → PNG/PDF, 16:9 1920×1080. Para renderizar
+una plantilla suelta (sin composer):
 
 ```bash
 NODE_PATH=<repo>/node_modules node render.cjs <plantilla.html> <out.png> 1920 1080

@@ -825,8 +825,58 @@ Los slots `PersonaAsset` exigen **fotos reales**. **Existen y viven en el repo**
 - **NO confundir** con `Alineación/5. Contenidos/01. Contenido Evergreen/Team Efeonce/EO_Team-*.png` en OneDrive: ésas son **piezas de redes sociales** ("Te presentamos a…", "Dato random: Potterhead", texto quemado sobre selfies de webcam) — **inservibles para un comité y no se arreglan recortando**.
 - **Sigue vigente el guardrail:** una cara del squad **JAMÁS** se genera con IA (el evaluador cruza CV vs persona → tergiversación). Si falta la foto de alguien, se pide la foto; no se fabrica.
 
+## Estado del runtime — F1 ✅ (el composer compone, 2026-07-11)
+
+El **camino determinista del ADR §5-ter está implementado y verificado end-to-end**:
+`DeckPlan (JSON) → selector → validación → slot-fill → render`. **Cero LLM** en este camino.
+
+```bash
+pnpm tsx scripts/commercial/compose-tender-deck.ts <deck-plan.json> [--out <dir>]
+# ejemplo real (4 láminas, caso SKY):
+pnpm tsx scripts/commercial/compose-tender-deck.ts docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan.json
+```
+
+| Módulo (`src/lib/commercial/tenders/deck/`) | Qué hace |
+|---|---|
+| `selector.ts` | lookup determinista content-type → plantilla + audit de cierre referencial del registry. Un content-type desconocido **revienta** (significa "falta una plantilla", no "improvisá") |
+| `validate.ts` | `overflow: reject` — **nunca trunca**; y una cifra sin `evidenceRef` **no se compone** (anti-fabricación) |
+| `resolvers.ts` | traduce valor semántico → presentación (`kind` → ícono + tono). El autor dice QUÉ es; el deck decide CÓMO se ve |
+| `render.ts` | llena el **DOM real de Chromium** (el browser que resuelve el contrato es el mismo que pinta) y captura |
+| `compose.ts` | **valida TODO antes de renderizar NADA** (un PDF parcial de una oferta es peor que ninguno: parece completo) |
+
+El **`DeckPlan` es el artefacto auditable**; el PDF es una derivación suya. Ejemplo vivo:
+`examples/sky-deck-plan.json` (cifras reales del grader, cada una con su `evidenceRef`).
+
+### ⚠️ La bug class del composer: el FALLO SILENCIOSO
+
+Durante F1 apareció **tres veces** el mismo fallo, y es el peor posible acá: **la lámina sale con el
+contenido de ejemplo del prototipo y nadie se entera** — un deck llegando al comité con el copy de
+relleno de la plantilla.
+
+1. Un campo de item sin `data-slot-field` en el HTML → el filler clonaba el blueprint y no escribía.
+2. El tipo `object` no implementado en el filler → el KPI de la matriz decía **"3/3"** cuando el dato
+   era **"4/4"**.
+3. El tono del blueprint contagiando a los items → los **dos** planes marcados como "el propuesto".
+
+**Cerrada de raíz:** cualquier tipo o campo que el filler no sepa llenar **aborta el deck**. **NUNCA**
+agregar un `default:` silencioso ni un `continue` que deje pasar un slot sin escribir.
+
+### Contrato del HTML (lo que una plantilla debe declarar)
+
+- `data-slot` + `data-slot-type` en el contenedor del slot.
+- `data-slot-field` en **cada campo** de un item/objeto — si falta, el composer aborta.
+- `data-slot-items` en el **contenedor de repetición**, cuando el slot tiene un encabezado fijo (una
+  tabla): sin eso el filler clona el `<thead>` como si fuera una fila.
+
 ## Pendiente
 
+- **Anotar los slots de las 11 plantillas que no los tienen** (Agenda, Timeline, Team, CaseStudy,
+  Chart, Metrics, Quote, Narrative, BulletList, CardGrid, SectionDivider) — sin `data-slot` no son
+  componibles. Es mecánico, pero es lo que separa el catálogo de 25 de un composer que use las 25.
+- **Los 3 nodos de juicio** (orquestador · chapter-authors · verifier) — F2. El determinista ya está.
+- **Verde fuera de paleta** en `StatSplit` (íconos + métricas) y en los tonos `ai`/`human` de
+  `FourPillarsFull`: el molde no tiene verde (acento teal-sobre-oscuro / violeta-sobre-claro).
+- El `thesis` de `FourPillarsFull` se **desborda** por la derecha.
 - Extraer y construir las demás plantillas del catálogo (aplicando el molde).
 - Formalizar el **registry** (`template → node-id → content-type → slots`) + el **selector** (agente elige plantilla por tipo de contenido) — milestone del composer.
 - Embeber fuentes (Poppins/Geist) para runtime self-contained (hoy vía Google Fonts en Chromium).
