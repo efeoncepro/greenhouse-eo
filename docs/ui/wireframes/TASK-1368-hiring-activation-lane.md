@@ -8,7 +8,7 @@
 - Mockup aprobado (SoT visual): **TASK-763** (`docs/mockups/onboarding-module-mockup.html`) — preservar first-fold dominante, lanes reales, list-detail, copy operacional honesta, motion mínima.
 - Ruta: `src/app/(dashboard)/hr/workforce/activation/**` (o lane en `hr/onboarding`). NO `[lang]`. Marca **Greenhouse** (app interna).
 - Locale: bilingüe es-CL + en-US vía `getMicrocopy(locale)` (dictionaries `hiringActivation`).
-- Estado: `draft` (UI ready: no — falta loop GVC)
+- Estado: `ready for implementation` (UI ready: yes; loop GVC obligatorio durante ejecución)
 - Skills: `greenhouse-talent-people-operator` · `greenhouse-ux` · `info-architecture` · `state-design` · `forms-ux` · `a11y-architect` · `arch-architect`
 
 ## Brief

@@ -6,7 +6,7 @@
 - Master flow: `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md` — 1368 = **N11 (activación, cara People Ops)**. Backend = **TASK-770**.
 - Wireframe: `docs/ui/wireframes/TASK-1368-hiring-activation-lane.md`
 - Ruta: `src/app/(dashboard)/hr/workforce/activation/**` (NO `[lang]`); interno (route group `internal`); bilingüe.
-- Estado: `draft` (UI ready: no)
+- Estado: `ready for implementation` (UI ready: yes; evidencia GVC durante ejecución)
 
 ## Flow Brief
 

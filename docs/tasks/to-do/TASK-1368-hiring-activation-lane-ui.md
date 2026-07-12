@@ -1,5 +1,11 @@
 # TASK-1368 — Hiring Activation Lane UI (People/HRIS)
 
+## Delta 2026-07-12 — UI design ready for implementation
+
+- La fuente visual de Hiring Activation fue revisada junto con su wireframe, flow y motion contract. El list-detail, estados, interaction contract, implementation mapping, GVC scenario plan y design decision log son ejecutables.
+- TASK-770 está `complete` y sus readers/commands ya existen en `develop`; por tanto `Blocked by` pasa a `none` y `UI ready` a `yes` para iniciar la implementación UI.
+- Este estado no sustituye la evidencia de runtime: GVC desktop/390px, focus, reduced motion, flags OFF y commands reales siguen siendo gates de cierre de esta task.
+
 ## Delta 2026-07-10 — TASK-770 completada: el backend del bridge YA existe
 
 - **Desbloqueada por TASK-770** (implementada local-first en `develop`). Consumir, no reconstruir:
@@ -29,16 +35,16 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Backend impact: `none`
 - Wireframe: `docs/ui/wireframes/TASK-1368-hiring-activation-lane.md`
 - Flow: `docs/ui/flows/TASK-1368-hiring-activation-lane-flow.md`
 - Motion: `docs/ui/motion/TASK-1368-hiring-activation-lane-motion.md`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `UI design ready for implementation; backend contract TASK-770 available`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-770`
+- Blocked by: `none`
 - Branch: `task/TASK-1368-hiring-activation-lane-ui`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -207,7 +213,7 @@ Reglas obligatorias:
 - Alternatives considered: página dedicada nueva (rechazada — duplica surface + rompe el mockup 763)
 - Why this pattern: alineación al mockup aprobado + reuse máximo + cliente delgado de 770
 - Reuse / extend / new primitive: reuse (`LaneCard`, list-detail, dialogs, CompositionShell)
-- Open risks: la cola depende del contrato de 770 (no implementar UI hasta que 770 exponga los readers)
+- Open risks: validar en runtime los flags de 770/356 y los estados `enabled:false`; el contrato de readers/commands ya está disponible.
 
 ### Visual verification
 

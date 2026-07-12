@@ -2,7 +2,7 @@
 
 ## Meta
 
-- Status: `draft`
+- Status: `ready for implementation`
 - Owner task: `TASK-1363 — Assessment Taking + Review Surface`
 - Related wireframe: [docs/ui/wireframes/TASK-1363-assessment-taking-review-surface.md](../wireframes/TASK-1363-assessment-taking-review-surface.md)
 - Intended route / surface: candidate = `src/app/public/assessment/[token]/**` (URL `/assessment/[token]`, público, fuera del dashboard, NO `[lang]`, bilingüe vía `getMicrocopy`, reusa el shell público de 354/DDL-2); interno = Application 360 del desk (`(dashboard)/agency/hiring/applications/[id]`, tab `Evaluación`)
@@ -10,7 +10,7 @@
 - Primary primitives: `CompositionShell` (desk), shell público tokenizado (patrón TASK-354), `CustomTextField`/radios/`CustomChip` (respuestas), barra de progreso wizard, scorecard = barras horizontales por competencia
 - Copy source: `src/lib/copy/hiring.ts` (es-CL, tuteo)
 
-> **Nota de madurez:** este contrato fija IA, flujo, estados, rutas, copy-intent y a11y (decisiones que preceden al skin, lideradas por info-architecture). La **dirección visual** sale del product-design loop (Slice 1 de la task); `UI ready: no` hasta GVC desktop+mobile.
+> **Nota de madurez:** este contrato fija IA, flujo, estados, rutas, copy-intent y a11y; la fuente visual de Assessment fue revisada. `UI ready: yes` habilita implementación; GVC desktop+mobile es evidencia obligatoria de runtime antes del cierre.
 
 ## Flow Brief
 

@@ -5,7 +5,7 @@
 - Task: `TASK-1363`
 - Superficie: rendición del candidato (público tokenizado) + review interno (scorecard en Application 360). Wireframe: `docs/ui/wireframes/TASK-1363-assessment-taking-review-surface.md` · Flow: `docs/ui/flows/TASK-1363-assessment-taking-review-surface-flow.md` · Master: `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md`
 - Rigor de motion: **funcional** (feedback temporal de un test cronometrado — afecta confianza), NUNCA decorativa ni ansiógena. Todo tokenizado + reduced-motion-aware.
-- Estado: `draft` (UI ready: no)
+- Estado: `ready for implementation` (UI ready: yes; evidencia GVC durante ejecución)
 
 ## Motion Brief
 

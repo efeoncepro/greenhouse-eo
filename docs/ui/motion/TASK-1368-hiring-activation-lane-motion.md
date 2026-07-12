@@ -5,7 +5,7 @@
 - Task: `TASK-1368`
 - Superficie: activation lane "Contrataciones listas". Wireframe: `docs/ui/wireframes/TASK-1368-hiring-activation-lane.md` · Flow: `docs/ui/flows/TASK-1368-hiring-activation-lane-flow.md` · Master: `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md`
 - Rigor de motion: **funcional mínima** (mandato del mockup aprobado TASK-763: "motion mínima, sin loaders apilados ni motion decorativa"). Todo tokenizado + reduced-motion-aware.
-- Estado: `draft` (UI ready: no)
+- Estado: `ready for implementation` (UI ready: yes; evidencia GVC durante ejecución)
 
 ## Motion Brief
 

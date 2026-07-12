@@ -6,6 +6,12 @@
 - **TASK-355 is complete** and the Application 360 host is available. TASK-1360/1361/1383/1384 provide the assessment engine, hardening and active question bank.
 - `Blocked by` is now `none`: TASK-1363 is ready to enter its UI implementation plan. The remaining TASK-354 submit smoke is operational closure for Careers, not a reason to defer the independent tokenized assessment surface.
 
+## Delta 2026-07-12 — UI design ready for implementation
+
+- La fuente visual de Assessment fue revisada junto con los contratos versionados de wireframe, flow y motion. La dirección de la experiencia, estados, interacción, mapping de primitives, copy intent, plan GVC y design decision log están completos.
+- `UI ready` pasa a `yes`: significa **lista para implementar**, no que la rendición ya exista. El GVC runtime (desktop, 390px, reduced motion y flujos tokenizados) sigue siendo evidencia obligatoria de Slice 4 antes del cierre.
+- La fuente backend está disponible (TASK-1360/1361/1383/1384), el shell público de TASK-354 está disponible y Application 360 de TASK-355 ya hospeda la parte interna. No queda un bloqueo de diseño o foundation para iniciar.
+
 ## Delta 2026-07-10 — TASK-1384: el banco del lote 1 está ACTIVO (25 preguntas, cobertura 9/9)
 
 - El pool activo para AM L2 existe (25 preguntas work-sample-first, review adversarial aplicado). Observaciones del review que ESTA task debe honrar:
@@ -47,13 +53,13 @@ Hechos verificados contra el repo real. Ajustes:
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1363-assessment-taking-review-surface.md`
 - Flow: `docs/ui/flows/TASK-1363-assessment-taking-review-surface-flow.md`
 - Motion: `docs/ui/motion/TASK-1363-assessment-taking-review-surface-motion.md`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `UI design ready for implementation; internal review partial exists; public taking surface pending`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`
@@ -97,7 +103,7 @@ Reglas obligatorias:
 - **Anti-anclaje en el review:** mostrar rúbrica + respuesta ANTES que la sugerencia IA (1361); la sugerencia va después/colapsada (independent-before-debrief). IA propone → humano confirma.
 - **Routing:** `src/app/public/assessment/[token]/**` (NUNCA `[lang]`); bilingüe vía `getMicrocopy(locale)`; reusa el shell público de TASK-354 (DDL-2).
 - Composition Shell + primitives canónicas (no inventar grids/inputs ad hoc); copy es-CL desde `src/lib/copy/*`.
-- `UI ready: no` hasta que el product-design loop entregue dirección visual + wireframe/flow completos + GVC desktop+mobile.
+- `UI ready: yes`: la dirección visual, wireframe/flow/motion, implementation mapping, GVC scenario plan y decision log están completos. GVC desktop+mobile es gate de verificación de la implementación, no un bloqueo de inicio.
 
 ## Normative Docs
 
@@ -143,19 +149,44 @@ Reglas obligatorias:
 ### Gap
 
 - No existe superficie de rendición del candidato (la envoltura `GET/POST /api/public/assessment/[token]` + UI que consume el motor listo).
-- No existe cola de corrección ni render del scorecard en el desk.
-- No existe dirección visual aprobada (product-design loop pendiente).
+- El review interno existe parcialmente en Application 360; falta completar su cola, scorecard y estados según este contrato.
+- La dirección visual y contratos están listos; falta la implementación y su evidencia GVC.
 
 ## UI/UX Contract
 
-> Rigor: `ui-standard`. `UI ready: no` hasta completar implementation mapping + GVC scenario plan + design decision log. La dirección visual sale del product-design loop (3 conceptos → elegir → implementar); este contrato fija la IA/flujo/estados, no el skin final.
+> Rigor: `ui-standard`. `UI ready: yes`: implementation mapping + GVC scenario plan + design decision log están completos y la fuente visual de Assessment fue revisada. Este contrato fija la IA/flujo/estados; la evidencia GVC de runtime se produce durante la implementación.
 
 - **Experience brief:** el candidato rinde un test por competencias con tiempo, honesto y sin fricción; el reclutador corrige lo abierto y lee un scorecard claro. Tono es-CL, respetuoso, sin lenguaje de "examen" intimidante.
 - **Surface/system decision:** dos surfaces — (a) candidate-facing tokenizada fuera del dashboard (shell público, mínima, sin nav interna); (b) interna embebida en Application 360 (Composition Shell + tabs del desk). Nodo del flujo cross-surface del programa (ver Flow).
 - **State inventory (canónico):** `loading` · `token inválido/expirado` · `instrucciones + consentimiento` · `en progreso (con timer)` · `guardando respuesta` · `submit/enviando` · `enviado (confirmación)` · `expirado por tiempo` · (interno) `cola de corrección vacía` · `corrigiendo (rúbrica)` · `scorecard listo` · `error`.
 - **Interaction contract:** una pregunta o bloque por competencia; timer visible; autosave por respuesta; submit irreversible con confirmación; el candidato NUNCA ve correctas. Interno: rúbrica lado a lado con la respuesta, confirmar/ajustar score (incluye confirmar sugerencia IA de TASK-1361 si está habilitada).
 - **Motion/microinteractions:** transición de pregunta + estado del timer; `prefers-reduced-motion` respetado. Motion no trivial → si emerge, declarar `Motion` doc.
-- **Visual verification:** GVC desktop + mobile de la rendición y del scorecard, en loop, antes de `UI ready: yes`.
+- **Visual verification:** GVC desktop + mobile de la rendición y del scorecard, en loop, antes de declarar la implementación cerrada.
+
+### Implementation mapping
+
+- Route / surface: candidato `src/app/public/assessment/[token]/**`; interno `(dashboard)/agency/hiring/applications/[applicationId]` en la tab `Evaluación` de `Application360View`.
+- Primitive / variant / kind: shell público reutilizable de TASK-354; `CompositionShell`/primitives de Hiring Desk; `CustomTextField`, radios/checkbox, `CustomChip`, progress/timer accesible, dialog de submit y drawer/sidecar de review.
+- Component candidates: `src/views/greenhouse/hiring/assessment/**` para la rendición y componentes acotados bajo `src/components/greenhouse/hiring/assessment/**`; extender `Application360View` sin bifurcar el desk.
+- Copy source: nuevo namespace canónico de assessment en `src/lib/copy/dictionaries/{es-CL,en-US}/`; el actual `hiringDesk` solo cubre el review parcial.
+- Data reader / command: `resolveAssessmentByToken`, `startAssessment`, `saveResponse`, `submitAssessment`, `finalizeAssessment`, `recordHumanScore` y los endpoints internos de TASK-1360; los nuevos wrappers públicos solo validan token/rate-limit y jamás reimplementan scoring.
+- Access / capability: candidato por token single-use; interno por `hiring.assessment.read` y `hiring.assessment.score`; el candidato nunca recibe answer key/rúbrica.
+
+### GVC scenario plan
+
+- Scenario files: `scripts/frontend/scenarios/hiring-assessment-taking.mjs` y `hiring-assessment-scorecard.mjs`.
+- Routes: `/assessment/<token-de-prueba>` y `/agency/hiring/applications/<id>?tab=evaluacion`.
+- Viewports: 1440 y 390; capturar instrucciones, respuesta/autosave/timer, confirmación submit, inválido/expirado, cola de review y scorecard.
+- Markers: `assessment-instructions`, `assessment-question`, `assessment-timer`, `assessment-submitted`, `assessment-scorecard`, `assessment-review-queue`.
+- Assertions: sin answer-key en DOM público, `scrollWidth==clientWidth`, consola limpia, foco del dialog, timer no roba foco y reduced motion mantiene feedback.
+
+### Design decision log
+
+- Decision: wizard público tokenizado por competencia + review interno en Application 360; no login del candidato ni surface de desk paralela.
+- Alternatives: scroll largo único y radar como scorecard se descartan por fricción/legibilidad; el scorecard usa barras comparables y conserva carácter advisory.
+- Why this pattern: separa la credencial temporal de la sesión interna, protege las respuestas y mantiene la decisión humana por delante de la sugerencia IA.
+- Reuse / extend / new primitive: reutilizar shell público, Composition Shell, inputs, dialogs y disclosure; evaluar solo un timer accesible como primitive si el existente no cumple el contrato.
+- Open risks: anti-cheat V1 limitado, cumplimiento de accommodations y gobernanza del banco de preguntas; se verifican durante ejecución, no bloquean el inicio UI.
 
 ## Backend/Data Contract
 
@@ -269,8 +300,8 @@ La rendición candidate-facing reutiliza el patrón de shell público tokenizado
 
 ### Slice ordering hard rule
 
-- Slice 1 (product-design + contracts) MUST ship antes de Slice 2/3 (implementación) — sin dirección visual + wireframe/flow robustos, la UI no arranca (`UI ready: no`).
-- Slice 4 (GVC) es el gate final antes de `UI ready: yes`.
+- Slice 1 (scaffold público y copy) MUST ship antes de Slice 2/3; el contrato visual y de flujo ya está listo para implementar.
+- Slice 4 (GVC) es el gate final antes de declarar la task implementada/cerrada.
 
 ### Risk matrix
 
@@ -279,7 +310,7 @@ La rendición candidate-facing reutiliza el patrón de shell público tokenizado
 | Answer-key filtrada al candidato en el payload | UI / API | medium | Allowlist server-side (TASK-1360) + test anti-leak en el wrapper | test rojo |
 | Token reutilizable / test re-rendible | security | medium | Token single-use + expiración + submit irreversible | logs de acceso tokenizado |
 | Scorecard leído como veredicto que decide solo | hiring / legal | medium | Copy advisory + sin veredicto binario + humano decide | review de copy/UX |
-| UI construida freehand sin product-design | UI | medium | `UI ready: no` gate + wireframe/flow robustos + GVC | task lint / ui checks rojos |
+| UI construida fuera del contrato aprobado | UI | medium | wireframe/flow/motion + mapping aprobados + GVC | task lint / ui checks rojos |
 
 ### Feature flags / cutover
 
