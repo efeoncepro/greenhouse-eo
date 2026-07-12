@@ -207,6 +207,9 @@ ENV_VARS="${ENV_VARS},GCP_PROJECT=${PROJECT_ID}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=${PG_INSTANCE}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
+# TASK-1391 — flag del pipeline de render (multi-runtime; SoT Cloud Run = deploy.sh; ledger:
+# docs/operations/FEATURE_FLAG_STATE_LEDGER.md). El dispatcher lo lee; OFF ⇒ skip logueado.
+ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
@@ -845,6 +848,15 @@ delete_scheduler_job "ops-reactive-process-delivery"
 # Each domain gets its own Cloud Scheduler job hitting POST /reactive/process-domain
 # so domains drain independently and multi-instance workers can fan out safely
 # via refresh_queue SKIP LOCKED. Offsets spread the load across the minute.
+
+# TASK-1391 — dispatcher del artifact-worker (Cloud Run Job). Flag OFF ⇒ el endpoint
+# hace skip logueado; el scheduler puede quedar creado sin costo de render.
+upsert_scheduler_job \
+  "ops-artifact-render-dispatch" \
+  "*/2 * * * *" \
+  "/artifact-render/dispatch" \
+  '{}'
+echo "  -> ops-artifact-render-dispatch: */2 * * * * (TASK-1391 render queue)"
 
 upsert_scheduler_job \
   "ops-reactive-organization" \

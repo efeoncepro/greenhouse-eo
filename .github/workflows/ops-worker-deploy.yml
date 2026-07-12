@@ -60,6 +60,9 @@ on:
       # Sin este filter, cambios al motor de Growth Forms NO redeployan el worker → TASK-1297
       # quedó stranded en ops-worker (3/4 workers al target; ops-worker stale en 21aa7f97).
       - 'src/lib/growth/forms/**'
+      # TASK-1391 — el dispatcher del artifact-worker vive en el dominio proposals
+      # (render-dispatch/render-jobs); sin este path el ops-worker queda stale en silencio.
+      - 'src/lib/commercial/tenders/proposals/**'
       # TASK-1279 — el worker bundlea los reactive consumers del grader (lead-handoff,
       # report-email, operator-send) que importan estos deps transitivos. Sin estos
       # filters + sus entradas en WORKER_RUNTIME_PATHS, un cambio SOLO a estos paths

@@ -121,6 +121,7 @@ import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai
 import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
 import { handleRecurringRegradeBatch } from '@/lib/growth/ai-visibility/regrade'
 import { dispatchPendingSubmissions } from '@/lib/growth/forms/dispatch'
+import { dispatchNextRenderJob } from '@/lib/commercial/tenders/proposals/render-dispatch'
 import { isFormsDispatchEnabled } from '@/lib/growth/forms/flags'
 
 import { computeRollingRematerializationWindow } from './finance-rematerialize-seed'
@@ -1554,6 +1555,41 @@ const handleFinanceLedgerHealthCheck = async (_req: IncomingMessage, res: Server
 //
 // Body opcional: {batchSize?: number, maxRetries?: number}
 // Defaults: batchSize=100, maxRetries=OUTBOX_MAX_PUBLISH_ATTEMPTS (5).
+
+// ─── /artifact-render/dispatch ──────────────────────────────────────────────
+//
+// TASK-1391 — dispatcher del Cloud Run Job `artifact-worker`. NO renderiza: selecciona el
+// próximo proposal_render_job por prioridad (deadline + aging; vencidos se cierran gobernados;
+// pospuestos se loguean) y hace UNA llamada Jobs API (~200 ms). El invariante "ops-worker no
+// ejecuta Chromium" se respeta. Flag ARTIFACT_RENDER_JOBS_ENABLED (OFF ⇒ skip logueado).
+
+const handleArtifactRenderDispatch = async (_req: IncomingMessage, res: ServerResponse) => {
+  console.log('[ops-worker] POST /artifact-render/dispatch')
+
+  try {
+    const result = await dispatchNextRenderJob()
+
+    if (result.skipped === 'flag_off') {
+      console.log('[ops-worker] /artifact-render/dispatch skip: flag OFF')
+      json(res, 200, { ok: true, skipped: 'flag_off' })
+
+      return
+    }
+
+    console.log(
+      `[ops-worker] /artifact-render/dispatch done — expiredClosed=${result.expiredClosed} ` +
+      `dispatched=${result.dispatched.length} postponed=${result.postponed.length}`
+    )
+
+    json(res, 200, { ok: true, ...result })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown dispatch error'
+
+    console.error('[ops-worker] /artifact-render/dispatch failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
 const handleOutboxPublishBatch = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
 
@@ -2368,6 +2404,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/outbox/publish-batch') {
       await handleOutboxPublishBatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/artifact-render/dispatch') {
+      await handleArtifactRenderDispatch(req, res)
 
       return
     }

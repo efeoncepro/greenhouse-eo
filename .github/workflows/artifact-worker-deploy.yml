@@ -1,0 +1,85 @@
+name: Artifact Worker Deploy
+
+# TASK-1391 — PRIMER Cloud Run JOB del ecosistema (frontera autorizada 2026-07-12,
+# excepción documentada EPIC-027). Renderiza artefactos del Artifact Composer
+# (proposal_render_jobs) con Chromium pinneado. Sin endpoint HTTP.
+#
+# ⚠️ STAGING-ONLY por ahora: la promoción a production requiere (a) staging smoke con
+# evidencia, (b) sign-off del operador, (c) integrar este workflow al orquestador
+# production-release.yml + RELEASE_DEPLOY_WORKFLOWS ANTES del primer deploy productivo
+# (regla del release control plane). No agregar trigger de production sin eso.
+#
+# ⚠️ paths: cada src/lib/** que el worker consume DEBE estar listado o el worker
+# queda stale en silencio (bug class documentada en ops-worker-deploy.yml).
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - '.github/workflows/artifact-worker-deploy.yml'
+      - 'services/artifact-worker/**'
+      - 'services/_shared/**'
+      - 'src/lib/artifact-composer/**'
+      - 'src/lib/commercial/tenders/**'
+      - 'src/lib/storage/greenhouse-assets.ts'
+      - 'src/lib/postgres/**'
+      - 'src/lib/db.ts'
+      - 'src/lib/sync/event-catalog.ts'
+      - 'src/lib/sync/publish-event.ts'
+      - 'src/lib/observability/**'
+      - 'src/lib/secrets/**'
+      - 'src/types/db.d.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment (production requiere sign-off + release control plane)'
+        type: choice
+        required: true
+        default: staging
+        options:
+          - staging
+
+concurrency:
+  group: artifact-worker-deploy-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/develop' }}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy artifact-worker Cloud Run Job
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    environment: staging
+
+    env:
+      ENV: staging
+      GCP_PROJECT_ID: efeonce-group
+      GCP_REGION: us-east4
+      DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Deploy Cloud Run Job
+        run: bash services/artifact-worker/deploy.sh
