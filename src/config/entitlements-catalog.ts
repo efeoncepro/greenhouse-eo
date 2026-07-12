@@ -935,6 +935,28 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // Roles `sales` and `sales_lead` are not yet defined in role-codes.ts; the
   // runtime binding starts with `efeonce_admin` + `finance_admin`. When the
   // sales role family lands, extend `getTenantEntitlements()` accordingly.
+  // TASK-1392 — Proposal Studio F0. La PUERTA es el entitlement per-ORG
+  // (module_assignments: proposal_studio_v1); estas capabilities autorizan
+  // dentro de una org habilitada. `gate` = los 3 gates humanos del ciclo.
+  {
+    key: 'commercial.proposal.read',
+    module: 'commercial',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.proposal.manage',
+    module: 'commercial',
+    actions: ['create', 'update', 'execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.proposal.gate',
+    module: 'commercial',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+
   {
     key: 'commercial.party.create',
     module: 'commercial',

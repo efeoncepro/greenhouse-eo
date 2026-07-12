@@ -6,6 +6,7 @@ import type { PoolClient } from 'pg'
 
 import { ROLE_CODES } from '@/config/role-codes'
 import { canAccessHiringCandidateDocument } from '@/lib/hiring/documents/access'
+import { canAccessProposalDocument } from '@/lib/commercial/tenders/proposals/access'
 import { hasRoleCode, hasRouteGroup } from '@/lib/tenant/authorization'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import { getBigQueryProjectId } from '@/lib/bigquery'
@@ -71,7 +72,11 @@ const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<DraftUploadContext, number> = 
   // TASK-354 — CV público: PDF-only en el submit con Turnstile; 10 MiB max.
   hiring_application_cv_draft: 10 * 1024 * 1024,
   // TASK-1362 — muestras de portafolio: PDF o imagen, mismo techo que el CV.
-  hiring_candidate_portfolio_file_draft: 10 * 1024 * 1024
+  hiring_candidate_portfolio_file_draft: 10 * 1024 * 1024,
+  // TASK-1392 — bases/planillas/anexos de un RFP y deliverables de la oferta
+  // pueden ser documentos pesados (planillas con anexos, PDFs escaneados).
+  proposal_rfp_draft: 50 * 1024 * 1024,
+  proposal_deliverable_draft: 50 * 1024 * 1024
 }
 
 // TASK-791 — MIME extra permitido por contexto. La factura electrónica oficial
@@ -80,7 +85,18 @@ const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<DraftUploadContext, number> = 
 // pdf/jpeg/png/webp (PRIVATE_USER_ALLOWED_MIME_TYPES). ZIP/ejecutables fuera (V1).
 const CONTEXT_EXTRA_MIME_TYPES: Partial<Record<DraftUploadContext, ReadonlySet<string>>> = {
   contractor_invoice_draft: new Set(['application/xml', 'text/xml', 'application/json']),
-  provider_invoice_draft: new Set(['application/xml', 'text/xml', 'application/json'])
+  provider_invoice_draft: new Set(['application/xml', 'text/xml', 'application/json']),
+  // TASK-1392 — un RFP llega como bases.docx + planilla.xlsx + anexos; los
+  // deliverables editables también. Office OpenXML solamente (los legacy
+  // .doc/.xls y ZIP siguen fuera: el scanner estructural los trata como riesgo).
+  proposal_rfp_draft: new Set([
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  ]),
+  proposal_deliverable_draft: new Set([
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  ])
 }
 
 const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRetentionClass> = {
@@ -123,7 +139,13 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   // TASK-1023 — Workforce Contracting signable document (offer letter / employment contract).
   workforce_contracting_document: 'workforce_contract',
   // TASK-490 — signed PDF artifact from the signature provider (vault retention).
-  signature_signed_document: 'document_vault'
+  signature_signed_document: 'document_vault',
+  // TASK-1392 — RFPs y deliverables de Proposal: documentos comerciales
+  // confidenciales de larga retención (misma familia que contratos/quotes).
+  proposal_rfp_draft: 'document_vault',
+  proposal_rfp: 'document_vault',
+  proposal_deliverable_draft: 'document_vault',
+  proposal_deliverable: 'document_vault'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -166,7 +188,12 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   // TASK-1023 — Workforce Contracting signable document bucket prefix.
   workforce_contracting_document: 'workforce-contracting-documents',
   // TASK-490 — signed signature artifact bucket prefix.
-  signature_signed_document: 'signature-signed-documents'
+  signature_signed_document: 'signature-signed-documents',
+  // TASK-1392 — workspace anclado del Proposal (input RFP / output deliverables).
+  proposal_rfp_draft: 'proposal-rfps',
+  proposal_rfp: 'proposal-rfps',
+  proposal_deliverable_draft: 'proposal-deliverables',
+  proposal_deliverable: 'proposal-deliverables'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -607,7 +634,12 @@ export const createPrivatePendingAsset = async ({
  */
 const SCAN_REQUIRED_ATTACH_CONTEXTS = new Set<GreenhouseAssetContext>([
   'hiring_application_cv',
-  'hiring_candidate_portfolio_file'
+  'hiring_candidate_portfolio_file',
+  // TASK-1392 — un RFP viene de una contraparte externa (portal/correo) y un
+  // deliverable subido a mano puede reciclar material externo: ninguno se
+  // adjunta a una Proposal sin veredicto limpio.
+  'proposal_rfp',
+  'proposal_deliverable'
 ])
 
 const assertAssetScannedBeforeAttach = async (
@@ -1186,6 +1218,13 @@ export const canTenantAccessAsset = ({
     case 'hiring_candidate_portfolio_file_draft':
     case 'hiring_candidate_portfolio_file':
       return canAccessHiringCandidateDocumentAsset(tenant)
+    // TASK-1392 — documentos de Proposal: capability real, nunca routeGroup;
+    // client_* jamás (los internos llevan loaded cost y piso de negociación).
+    case 'proposal_rfp_draft':
+    case 'proposal_rfp':
+    case 'proposal_deliverable_draft':
+    case 'proposal_deliverable':
+      return canAccessProposalDocument(tenant)
     default:
       return false
   }

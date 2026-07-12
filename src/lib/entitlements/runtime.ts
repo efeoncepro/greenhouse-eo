@@ -2128,6 +2128,58 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1392 — Proposal Studio F0. La PUERTA real es el entitlement per-ORG
+  // (module_assignments: proposal_studio_v1) que verifica el command/route; estos
+  // grants autorizan DENTRO de una org habilitada. Admin + Account operan el
+  // ciclo completo (incl. los 3 gates humanos); Operations lee.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)) {
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.proposal.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.proposal.manage',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.proposal.manage',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.proposal.manage',
+      action: 'execute',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.proposal.gate',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)) {
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.proposal.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // Commercial Party Lifecycle (TASK-535 §9.1). Sales roles not yet modeled —
   // binding limited to admin and finance_admin for now. When TASK-536+ lands
   // the sales role family, extend this block (and do not remove the admin

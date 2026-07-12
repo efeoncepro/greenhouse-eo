@@ -74,6 +74,12 @@ export type GreenhouseAssetContext =
   | 'workforce_contracting_document'
   // TASK-490 — signed PDF artifact returned by the signature provider (EPIC-001 signature platform).
   | 'signature_signed_document'
+  // TASK-1392 — Proposal Studio F0: RFP fuente (input) y deliverables de la propuesta.
+  // Documentos comerciales CONFIDENCIALES: bucket privado, scan requerido al attach.
+  | 'proposal_rfp_draft'
+  | 'proposal_rfp'
+  | 'proposal_deliverable_draft'
+  | 'proposal_deliverable'
 
 export interface GreenhouseAssetRecord {
   assetId: string
@@ -128,6 +134,9 @@ export type DraftUploadContext = Extract<
   | 'organization_logo_draft'
   | 'hiring_application_cv_draft'
   | 'hiring_candidate_portfolio_file_draft'
+  // TASK-1392 — RFPs y deliverables de Proposal subidos por el operador comercial.
+  | 'proposal_rfp_draft'
+  | 'proposal_deliverable_draft'
 >
 
 export interface UploadPrivateAssetInput {
