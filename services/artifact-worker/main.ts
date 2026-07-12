@@ -231,6 +231,16 @@ const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
 }
 
 const main = async (): Promise<void> => {
+  // Selftest de imagen (paso de Cloud Build post-build): sin DB, sin flag. Un fallo acá aborta
+  // el DEPLOY — la clase "la imagen diverge del runtime" muere en el pipeline, no en producción.
+  if (process.argv.includes('--selftest')) {
+    const { runSelftest } = await import('./selftest')
+
+    await runSelftest()
+
+    return
+  }
+
   if (!isArtifactRenderJobsEnabled()) {
     log('flag OFF — skip')
 

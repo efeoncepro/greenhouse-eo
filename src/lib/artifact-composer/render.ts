@@ -52,7 +52,18 @@ export interface CatalogRenderRuntime {
  */
 export const launchComposerBrowser = (): Promise<Browser> =>
   chromium.launch({
-    args: ['--disable-gpu', '--force-color-profile=srgb', '--disable-lcd-text', '--disable-partial-raster']
+    // `--no-sandbox`: el worker corre como root dentro del contenedor (Cloud Run/Cloud Build) y
+    // Chromium se niega a arrancar con sandbox en ese caso. Es un flag de AISLAMIENTO DE PROCESO,
+    // no de rasterización — no toca un píxel (verificado: visual gate a 0 px con el flag puesto).
+    // Va SIEMPRE (uniforme local/contenedor): un launch que dependa del ambiente sería la clase
+    // exacta de no-determinismo que este helper existe para eliminar.
+    args: [
+      '--disable-gpu',
+      '--force-color-profile=srgb',
+      '--disable-lcd-text',
+      '--disable-partial-raster',
+      '--no-sandbox'
+    ]
   })
 
 export interface RenderTarget {

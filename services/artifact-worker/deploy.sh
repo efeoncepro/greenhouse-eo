@@ -66,6 +66,10 @@ BUILD_ID="$(gcloud builds submit "${REPO_ROOT}" \
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '${IMAGE}', '-f', 'services/artifact-worker/Dockerfile', '.']
+  # SELFTEST de la imagen (robustez sistémica): catálogo completo + checksums de fuentes +
+  # Chromium + render probe, DENTRO de la imagen recién construida. Falla ⇒ no hay deploy.
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['run', '--rm', '${IMAGE}', '--selftest']
 images: ['${IMAGE}']
 options:
   machineType: 'E2_HIGHCPU_8'
