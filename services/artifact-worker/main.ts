@@ -50,7 +50,9 @@ import { captureWithDomain } from '@/lib/observability/capture'
 
 const CATALOGS = new Map([[deckAxisCatalog.name, deckAxisCatalog]])
 
-const WORKER_ACTOR_USER = 'system-artifact-worker'
+// uploaded_by_user_id es FK nullable a users: un Job no tiene usuario — null (precedente:
+// quote-pdf-asset). El vínculo semántico con el job vive en metadata.renderJobId.
+const WORKER_ACTOR_USER = null
 
 const log = (msg: string, extra: Record<string, unknown> = {}) =>
   console.log(JSON.stringify({ svc: 'artifact-worker', msg, ...extra }))
@@ -182,7 +184,7 @@ const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
         assetId: stored.assetId,
         kind: 'deck',
         audience: job.audience,
-        actorUserId: WORKER_ACTOR_USER,
+        actorUserId: 'system:artifact-worker',
         actor: { kind: 'system' }
       })
     }

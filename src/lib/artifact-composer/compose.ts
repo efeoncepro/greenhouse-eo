@@ -24,8 +24,7 @@ import {
   CatalogSemanticError,
   UnimplementedOutputTargetError,
   IMPLEMENTED_OUTPUT_TARGETS,
-  type ArtifactCatalog
-} from './catalog'
+  type ArtifactCatalog, TemplateAuthorityError } from './catalog'
 import type { DeckPlan, TemplateContract, TemplateName } from './contracts'
 import { findTemplate, selectTemplate } from './selector'
 import { launchComposerBrowser, mergeSlidePdfs, renderSlide } from './render'
@@ -37,16 +36,7 @@ import { DeckValidationError, validateDeck } from './validate'
  * el selector deriva de su `contentType` — una discrepancia aborta (TASK-1393 Slice 1). Ninguna
  * ruta nueva acepta `template` como autoridad de un autor: usar `CompositionPlanInput`.
  */
-export class TemplateAuthorityError extends Error {
-  constructor(slideId: string, declared: TemplateName, selected: TemplateName) {
-    super(
-      `La lámina "${slideId}" declara template="${declared}", pero el selector del catálogo deriva ` +
-        `"${selected}" para su contentType. El autor no elige plantilla: declara la intención ` +
-        `(contentType + slots) y el catálogo resuelve.`
-    )
-    this.name = 'TemplateAuthorityError'
-  }
-}
+
 
 export interface ComposeResult {
   deckPlan: DeckPlan
@@ -128,14 +118,18 @@ export const composeArtifact = async (
   const assets = { templatesDir: catalog.templatesDir }
   const registry = await loadRegistry(assets)
 
-  // Adaptador del DeckPlan histórico: si el plan trae `template`, debe ser EXACTAMENTE lo que el
-  // selector deriva de su contentType. El autor nunca es autoridad de presentación.
+  // Adaptador del DeckPlan histórico: si el plan trae `template` DECLARADO, debe ser EXACTAMENTE
+  // lo que el selector deriva de su contentType (el autor nunca es autoridad de presentación).
+  // Un plan canónico (sin template — p. ej. reconstruido desde manifest.input, TASK-1391) lo
+  // recibe del selector acá mismo.
   for (const slide of deckPlan.slides) {
     const selected = selectTemplate(registry, slide.contentType)
 
-    if (slide.template !== selected) {
+    if (slide.template && slide.template !== selected) {
       throw new TemplateAuthorityError(slide.slideId, slide.template, selected)
     }
+
+    slide.template = selected
   }
 
   const contracts = new Map<TemplateName, TemplateContract>()
@@ -237,3 +231,5 @@ export const composeArtifact = async (
     await browser.close()
   }
 }
+
+export { TemplateAuthorityError }

@@ -135,9 +135,31 @@ const mapJobRow = (row: Record<string, unknown>): ProposalRenderJobRecord => ({
   updatedAt: row.updated_at as string
 })
 
-/** Hash canónico del manifest: JSON.stringify determinista del objeto VERBATIM. */
+/**
+ * Serialización CANÓNICA (claves ordenadas, profunda). El manifest viaja por JSONB y PostgreSQL
+ * normaliza el orden de claves de los objetos — un hash sensible al orden haría que el mismo
+ * manifest nunca coincida tras el round-trip a DB (drift falso). Los arrays conservan su orden
+ * (el orden de láminas SÍ es contenido).
+ */
+const canonicalJson = (value: unknown): string => {
+  if (Array.isArray(value)) {
+    return `[${value.map(canonicalJson).join(',')}]`
+  }
+
+  if (value !== null && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .filter(([, v]) => v !== undefined)
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+
+    return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(',')}}`
+  }
+
+  return JSON.stringify(value)
+}
+
+/** Hash canónico del manifest: sha256 de la serialización canónica (estable ante JSONB). */
 export const hashResolvedManifest = (manifest: unknown): string =>
-  crypto.createHash('sha256').update(JSON.stringify(manifest)).digest('hex')
+  crypto.createHash('sha256').update(canonicalJson(manifest)).digest('hex')
 
 // ─────────────────────────────────────────────────────────────────────────────
 // requestProposalRender — EL command (la confirmación humana del agente ejecuta esto mismo)

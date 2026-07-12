@@ -231,6 +231,17 @@ export const resolveBrandSeal = async (
  *
  * `brandPack`/`fonts` quedan `null` hasta que Slices 3/4 los materialicen.
  */
+export class TemplateAuthorityError extends Error {
+  constructor(slideId: string, declared: string, selected: string) {
+    super(
+      `La lámina "${slideId}" declara template="${declared}", pero el selector del catálogo deriva ` +
+        `"${selected}" para su contentType. El autor no elige plantilla: declara la intención ` +
+        `(contentType + slots) y el catálogo resuelve.`
+    )
+    this.name = 'TemplateAuthorityError'
+  }
+}
+
 export const resolvePlan = async (
   catalog: ArtifactCatalog,
   input: CompositionPlanInput
@@ -239,12 +250,34 @@ export const resolvePlan = async (
   const registry = await loadRegistry(assets)
 
   // 1 · El catálogo elige la plantilla — determinista, desde el contentType del autor.
-  const slides: SlideSpec[] = input.slides.map(slide => ({
-    slideId: slide.slideId,
-    contentType: slide.contentType,
-    template: selectTemplate(registry, slide.contentType),
-    slots: slide.slots
-  }))
+  // ⚠️ El input se CANONICALIZA (solo slideId/contentType/slots): la representación no es
+  // autoridad — dos entradas equivalentes deben producir EL MISMO manifest/hash (TASK-1391:
+  // el drift check del worker lo exige). Un `template` declarado por el caller no entra al
+  // manifest: si contradice al selector, aborta (misma regla que composeArtifact).
+  const canonicalInput: CompositionPlanInput = {
+    artifactId: input.artifactId,
+    slides: input.slides.map(slide => ({
+      slideId: slide.slideId,
+      contentType: slide.contentType,
+      slots: slide.slots
+    }))
+  }
+
+  const slides: SlideSpec[] = input.slides.map(slide => {
+    const selected = selectTemplate(registry, slide.contentType)
+    const declared = (slide as { template?: string }).template
+
+    if (declared && declared !== selected) {
+      throw new TemplateAuthorityError(slide.slideId, declared, selected)
+    }
+
+    return {
+      slideId: slide.slideId,
+      contentType: slide.contentType,
+      template: selected,
+      slots: slide.slots
+    }
+  })
 
   // 2 · Forma: contratos de slots + reglas por-plantilla del catálogo.
   const contracts = new Map<TemplateName, TemplateContract>()
@@ -295,7 +328,7 @@ export const resolvePlan = async (
   return {
     manifestVersion: 1,
     artifactId: input.artifactId,
-    input,
+    input: canonicalInput,
     catalog: {
       name: catalog.name,
       version: (registry as unknown as { version?: string }).version ?? '0',
