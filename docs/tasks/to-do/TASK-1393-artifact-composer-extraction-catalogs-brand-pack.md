@@ -189,6 +189,49 @@ Reglas obligatorias:
 - Actualizar el CLI y `deck:compose`; mantener el comando y su comportamiento **identicos** (el operador no debe notar el refactor).
 - Gate de equivalencia: el `DeckPlan` de SKY produce el **mismo PDF** que antes del move.
 
+### Slice 1b — Los ASSETS también se mudan: `docs/` deja de ser un directorio de runtime
+
+**Hallazgo 2026-07-12 (medido, no supuesto).** El motor **lee sus assets desde `docs/` en tiempo de
+ejecución**:
+
+```ts
+// src/lib/commercial/tenders/deck/solar-icons.ts
+import 'server-only'
+import fs from 'node:fs'
+const DIR = 'docs/architecture/tender-deck-composer-prototypes/assets/solar'
+const svg = fs.readFileSync(file, 'utf8')   // ← runtime read desde docs/
+```
+
+**Eso es una inversión de capas:** `docs/` es documentación, no un directorio de runtime. Y tiene un
+costo medible **hoy, en cada deploy**:
+
+| | |
+|---|---|
+| `docs/` completo | **143 MB** |
+| `docs/architecture/tender-deck-composer-prototypes` | **52 MB** (fotos del squad, íconos clay, SVG) |
+| ¿está en `.vercelignore`? | **NO** → **se sube completo en cada deploy de Vercel** |
+| ¿lo importa el bundle de Next? | **no** — pero **se sube igual**, porque `.vercelignore` no lo excluye |
+
+⚠️ **Y por eso NO se puede parchear con `.vercelignore` primero.** Excluir `docs/` **hoy** rompería el
+`readFileSync` en cualquier consumer server-side que llegue a tocar el composer (y **TASK-1391** —
+el worker de render— lo va a tocar por definición). **El orden correcto es: primero mudar los assets,
+después excluir `docs/`.** Al revés es un build roto días después, en silencio.
+
+**Entregables:**
+
+- Las plantillas, el `registry.json`, los `*.slots.json` y **los assets** (`solar/`, `clay3d/`,
+  `squad/`, `url-lum.svg`) se mudan **con el catálogo** a su home real. `docs/` conserva **la
+  documentación**, no los binarios de runtime.
+- ⚠️ **Los retratos del squad son PII de personas reales.** Al moverlos, declarar su home y su
+  política de acceso — no se replican "porque sí" a un paquete público.
+- El resolver de paths deja de apuntar a `docs/` (y deja de depender del `cwd` del proceso, que es
+  otra fragilidad latente del `readFileSync` actual).
+- **Recién entonces:** agregar `docs/` a `.vercelignore` y verificar que el build de Vercel siga
+  verde. Gate: el `DeckPlan` de SKY produce **el mismo PDF** antes y después.
+
+> **La regla que deja escrita este slice: si un directorio de documentación se lee con `fs` en
+> runtime, no es documentación — es un asset store mal ubicado.**
+
 ### Slice 2 — El catalogo como dato + `outputTarget`
 
 - Introducir el contrato de **catalogo**: `{ templatesDir, registry, resolvers, iconSet, canvas, outputTarget, ownerOrgId }`.
@@ -241,6 +284,11 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 ### Slice ordering hard rule
 
 - Slice 1 MUST cerrar antes de Slice 2: no se puede parametrizar un catalogo mientras el motor siga bajo `commercial/`.
+- **Slice 1b — orden DURO e invertible sólo a costa de romper el build:** primero **mudar los assets**
+  fuera de `docs/`, **después** agregar `docs/` a `.vercelignore`. Nunca al revés. Hoy el motor hace
+  `fs.readFileSync` sobre `docs/architecture/tender-deck-composer-prototypes/assets/**`; excluir ese
+  directorio del deploy antes de mudarlo deja el read **roto en runtime**, y el síntoma aparece días
+  después, en silencio, cuando un consumer server-side (o el worker de **TASK-1391**) lo toque.
 - Slice 2 MUST cerrar antes de Slice 3: el brand pack se inyecta **por catalogo**; sin el contrato de catalogo no hay donde colgarlo.
 - El gate de equivalencia (mismo `DeckPlan` → mismo PDF) corre en **cada** slice, no solo al final.
 - **NO** empezar el catalogo `social-carousel` hasta que Slice 2 este verde: construirlo antes es exactamente el fork que este trabajo evita.
@@ -252,6 +300,8 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 | El refactor cambia el pixel del deck (regresion visual silenciosa) | composer/render | medium | gate de equivalencia byte-a-byte + **mirar** las 4 laminas SKY en cada slice | PDF distinto al baseline; lamina que cambia sin motivo |
 | Se degrada una bug class ya cerrada (fallo silencioso / geometria) | composer | low | las 5 suites viajan con el motor; `template-geometry.test.ts` corre sobre las 25 | test rojo; una lamina vuelve a amputar copy |
 | El motor "se lleva" un pedazo de dominio al moverse | boundary | medium | **lint/test de frontera**: import de `commercial/**` o `growth/**` rompe el build | build rojo en el gate de frontera |
+| **Se excluye `docs/` del deploy antes de mudar los assets** → el `readFileSync` del composer queda roto en runtime, y el síntoma no aparece hasta que un consumer server-side lo toque (días después, en silencio) | Vercel / composer | **high** si nadie lee el ordering rule | **Slice 1b: mudar los assets PRIMERO, `.vercelignore` DESPUÉS.** Gate: mismo `DeckPlan` → mismo PDF, y build de Vercel verde tras la exclusión | `ENOENT` en un route/worker que compone; PDF que sale sin íconos |
+| Los **retratos del squad** (PII de personas reales) se replican a un paquete portable "porque estaban en la carpeta" | privacidad | medium | declarar home + política de acceso al mudarlos; **no** viajan por inercia a un paquete que Creative Studio pueda consumir | foto de un colaborador en un artefacto/paquete donde no debía estar |
 | La tokenizacion cambia colores sin querer | brand/plantillas | medium | ledger 80/80 + diff visual lamina por lamina; el token debe resolver al **mismo HEX/RGB y alpha** que reemplaza | lamina con color corrido o base sin mapping |
 | Una recipe cambia geometría/orden de capas al tokenizar | deck KV/PDF | medium | recipe declarativa + snapshot de CSS calculado + revisión de cover/rich/back/light | glow, grain o contraste visualmente distinto |
 | Se infieren colores desde claims “Empower your…” | brand/pack | medium | mapping Figma verificable; claims tratados como voz, no como subbrand | token sin variable/nodo o rationale AXIS |
