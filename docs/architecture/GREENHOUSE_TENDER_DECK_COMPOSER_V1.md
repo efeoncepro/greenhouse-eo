@@ -4,6 +4,7 @@
 > **Versión:** 0.2 · **Status:** **Implementado (F1)** — el composer compone: `src/lib/commercial/tenders/deck/**` (~1.800 LOC) + CLI `pnpm deck:compose` + 4 suites de tests. **NO es doc-only.** El molde visual sigue en co-creación.
 > **Creado:** 2026-07-11 por Claude (skills `typography-design`, `modern-ui`) con Julio Reyes
 > **v0.2 (2026-07-12):** se corrige el status (decía `doc-only` con el runtime ya shipped), se declara el **entregable PDF real** (merge `pdf-lib` de N páginas + gate de peso), el **CLI canónico `pnpm deck:compose`**, el **inventario de los 15 resolvers**, la **state machine** (12 estados, sin DB) y la **2ª bug class** (geometría). Se elimina el bloque muerto que decía "slotsRef sólo en CoverFull".
+> **Siguiente hardening de plataforma y marca:** `TASK-1393` extrae el Artifact Composer, formaliza el catálogo `deck-axis` y materializa AXIS como `brandPack` reutilizable; conserva el output aprobado y no construye el catálogo social.
 > **Spec raíz:** `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (§4 deck pipeline, Apéndices A/B)
 > **Fuente de layouts:** Figma `Sistema Axis - PPT` (fileKey `GXYeJaRjotmFuczfnd8hLi`)
 

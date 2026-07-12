@@ -41,6 +41,7 @@ El costo reportado escaló de ~USD 20 a USD 530 en Elastic; Standard llegó a 45
 - `TBD` — preview routing/auth and Vercel project cutover after TASK-1382 local gate.
 - `TBD` — 30-day cost rebaseline and next-boundary decision.
 - `TASK-1392` — Tender Proposal Studio F0 agentic foundation: aggregate, assets and governed context/tool/proposal contract within the modular monolith. It is a prerequisite for the render candidate; it **does not** authorize a deployable or move existing transactions.
+- `TASK-1393` — Artifact Composer: extracción domain-free, catálogos y brand pack: mueve el motor, formaliza `deck-axis`/`outputTarget` y hace AXIS un input generado desde SoT; no crea deployable ni implementa el catálogo social.
 - `TASK-1391` — Tender Deck Renderer worker/artifact pipeline: the next-boundary **candidate** for a dedicated `tender-worker` Cloud Run Job, after `TASK-1392`. It remains blocked until EPIC-027 explicitly resolves `continue` for that boundary, with cost, routing/auth, rollback and runtime ownership evidence.
 
 ## Existing Related Work
