@@ -1,5 +1,37 @@
 # Deck visual system — el sistema de láminas de la propuesta
 
+> # ⚠️ El CRAFT de decks ya no vive acá — vive en la skill `deck-studio`
+>
+> **Desde 2026-07-12 existe [`deck-studio`](../deck-studio/SKILL.md), la skill domain-free del oficio
+> de los decks.** Un deck **no es una licitación**: sirve igual a un pitch, un QBR, un board deck o un
+> readout. **Esta skill (licitaciones) es CONSUMER de aquélla, no su dueña.**
+>
+> **Al producir el deck de una oferta: carga `deck-studio` PRIMERO.** Trae lo que este companion nunca
+> tuvo y que decide el resultado:
+>
+> - **¿Hay narrador, o el deck se defiende solo?** Una oferta a comité **SE LEE — nadie la presenta**.
+>   Casi toda la biblioteca popular de presentaciones (*"tres palabras por lámina"*, la regla
+>   10-20-30) está escrita para el escenario y es **activamente dañina** acá.
+> - **Assertion-Evidence** (Garner & Alley 2013, p < .01): **la única evidencia experimental que
+>   existe sobre diseño de láminas.** El titular **afirma**, no etiqueta.
+> - **Tu competidor es la INDECISIÓN, no el otro oferente** (JOLT, n = 2,5M conversaciones): ~56% de
+>   los deals perdidos son gente **ya convencida** que no pudo comprometerse. **Una lámina de "por qué
+>   es seguro" por cada una de "por qué esto".**
+> - **La aritmética le gana a la prosa** (Bergman & Lundberg 2013): **modela la fórmula de puntuación
+>   ANTES de escribir.**
+> - **Los mitos que NO se citan** ([`SOURCES.md`](../deck-studio/SOURCES.md)) — el "attention span de
+>   8 segundos" está **fabricado**; la regla 10-20-30 es **un post de blog de 2005** con datos en
+>   contra.
+>
+> **Lo que sigue vigente y es de ESTA skill:** el registro **formal de usted**, la **admisibilidad**
+> (peso, formato, plazos), la **rúbrica** y que la estructura sea **espejo 1:1 de los criterios de
+> evaluación**, el guardrail de **fotos reales del squad** y el **`audience: internal | client_facing`**.
+>
+> ⚠️ **Deuda declarada:** el contenido de abajo **se solapa** con `deck-studio` y debe reducirse a lo
+> tender-específico. Hasta que eso ocurra, **si hay conflicto, manda `deck-studio`.**
+
+---
+
 > **Qué es:** el sistema visual con el que Efeonce arma el **deck** de una propuesta (técnica o de
 > presentación ejecutiva). No es "hacer slides bonitas": es un **catálogo cerrado de plantillas** con
 > contratos de contenido, para que el deck se **componga**, no se dibuje a mano.
