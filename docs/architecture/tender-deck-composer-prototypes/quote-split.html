@@ -49,20 +49,21 @@
   .statement .wm { height:40px; vertical-align:-1px; margin:0 8px 0 5px; }
 </style></head>
 <body>
-  <div class="slide" data-template="QuoteSplit">
+  <!-- mode = statement (propio de Efeonce) | testimonial (cita de un tercero: exige atribución real) -->
+  <div class="slide" data-template="QuoteSplit" data-slot="mode" data-slot-type="enum" data-slot-required="true">
     <!-- LEFT: atribución / slot persona -->
     <div class="aside">
       <div class="wmq">&ldquo;</div>
-      <div class="inner">
-        <div class="eyebrow">El compromiso</div>
-        <div class="who">En la propuesta técnica para SKY</div>
-        <div class="sub">Un squad dedicado, con un responsable único de la cuenta.</div>
+      <div class="inner" data-slot="attribution" data-slot-type="object" data-slot-required="true">
+        <div class="eyebrow" data-slot-field="label">El compromiso</div>
+        <div class="who" data-slot-field="who">En la propuesta técnica para SKY</div>
+        <div class="sub" data-slot-field="detail">Un squad dedicado, con un responsable único de la cuenta.</div>
       </div>
     </div>
 
-    <!-- RIGHT: statement -->
+    <!-- RIGHT: statement — el <img class="wm"> es el wordmark de marca (resolver: brand-wordmark-inline), no contenido -->
     <div class="brand">
-      <div class="statement">En este proyecto, <img class="wm" src="file:///Users/jreye/Documents/greenhouse-eo/public/branding/logo-negative.svg" alt="Efeonce"> liderará la <em>estrategia de visibilidad</em>, la producción editorial del blog y la <em>optimización para buscadores y asistentes con IA</em>, con medición continua de la autoridad de SKY en su categoría.</div>
+      <div class="statement" data-slot="statement" data-slot-type="rich-string" data-slot-required="true">En este proyecto, <img class="wm" src="file:///Users/jreye/Documents/greenhouse-eo/public/branding/logo-negative.svg" alt="Efeonce"> liderará la <em>estrategia de visibilidad</em>, la producción editorial del blog y la <em>optimización para buscadores y asistentes con IA</em>, con medición continua de la autoridad de SKY en su categoría.</div>
     </div>
   </div>
   <img class="deck-url-bubble signature-QuoteSplit" src="assets/url-lum.svg" alt="efeoncepro.com">

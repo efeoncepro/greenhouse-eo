@@ -77,44 +77,44 @@
     <!-- LEFT: brand + stat rows -->
     <div class="brand">
       <div class="brand-head">
-        <div class="title">Diagnóstico de visibilidad</div>
-        <div class="subtitle"><span class="cli">SKY</span> · punto de partida</div>
+        <div class="title" data-slot="title" data-slot-type="string" data-slot-required="true">Diagnóstico de visibilidad</div>
+        <div class="subtitle" data-slot="subtitle" data-slot-type="object"><span class="cli" data-slot-field="client">SKY</span> · <span data-slot-field="context">punto de partida</span></div>
       </div>
 
-      <div class="kpis">
+      <div class="kpis" data-slot="kpis" data-slot-type="array" data-slot-required="true">
         <div class="kpi">
           <div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6.222 4.601a9.5 9.5 0 0 1 1.395-.771c1.372-.615 2.058-.922 2.97-.33c.913.59.913 1.56.913 3.5v1.5c0 1.886 0 2.828.586 3.414s1.528.586 3.414.586H17c1.94 0 2.91 0 3.5.912c.592.913.285 1.599-.33 2.97a9.5 9.5 0 0 1-10.523 5.435A9.5 9.5 0 0 1 6.222 4.601"/><path fill="currentColor" d="M21.446 7.069a8.03 8.03 0 0 0-4.515-4.515C15.389 1.947 14 3.344 14 5v4a1 1 0 0 0 1 1h4c1.657 0 3.053-1.39 2.446-2.931"/></svg></div>
-          <div class="num">18%</div>
+          <div class="num"><span data-slot-field="value">18%</span><span style="color:rgba(255,255,255,.5);font-size:.6em" data-slot-field="unit"></span></div>
           <div class="meta">
-            <div class="label">AI Share of Voice</div>
-            <div class="qual">citada en 1 de cada 5 respuestas de la categoría</div>
+            <div class="label" data-slot-field="label">AI Share of Voice</div>
+            <div class="qual" data-slot-field="qual">citada en 1 de cada 5 respuestas de la categoría</div>
           </div>
         </div>
 
         <div class="kpi">
           <div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m13.629 20.472l-.542.916c-.483.816-1.69.816-2.174 0l-.542-.916c-.42-.71-.63-1.066-.968-1.262c-.338-.197-.763-.204-1.613-.219c-1.256-.021-2.043-.098-2.703-.372a5 5 0 0 1-2.706-2.706C2 14.995 2 13.83 2 11.5v-1c0-3.273 0-4.91.737-6.112a5 5 0 0 1 1.65-1.651C5.59 2 7.228 2 10.5 2h3c3.273 0 4.91 0 6.113.737a5 5 0 0 1 1.65 1.65C22 5.59 22 7.228 22 10.5v1c0 2.33 0 3.495-.38 4.413a5 5 0 0 1-2.707 2.706c-.66.274-1.447.35-2.703.372c-.85.015-1.275.022-1.613.219c-.338.196-.548.551-.968 1.262"/></svg></div>
-          <div class="num">2 / 5</div>
+          <div class="num"><span data-slot-field="value">2 / 5</span><span style="color:rgba(255,255,255,.5);font-size:.6em" data-slot-field="unit"></span></div>
           <div class="meta">
-            <div class="label">Motores que la citan</div>
-            <div class="qual">ChatGPT y Perplexity; ausente en Gemini, Copilot y AI Overviews</div>
+            <div class="label" data-slot-field="label">Motores que la citan</div>
+            <div class="qual" data-slot-field="qual">ChatGPT y Perplexity; ausente en Gemini, Copilot y AI Overviews</div>
           </div>
         </div>
 
         <div class="kpi">
           <div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.378 5.082C3 5.62 3 7.22 3 10.417v1.574c0 5.638 4.239 8.375 6.899 9.536c.721.315 1.082.473 2.101.473c1.02 0 1.38-.158 2.101-.473C16.761 20.365 21 17.63 21 11.991v-1.574c0-3.198 0-4.797-.378-5.335c-.377-.537-1.88-1.052-4.887-2.081l-.573-.196C13.595 2.268 12.812 2 12 2s-1.595.268-3.162.805L8.265 3c-3.007 1.03-4.51 1.545-4.887 2.082M15.06 10.5a.75.75 0 0 0-1.12-.999l-3.011 3.374l-.87-.974a.75.75 0 0 0-1.118 1l1.428 1.6a.75.75 0 0 0 1.119 0z" clip-rule="evenodd"/></svg></div>
-          <div class="num">58<span style="color:rgba(255,255,255,.5);font-size:.6em"> / 100</span></div>
+          <div class="num"><span data-slot-field="value">58</span><span style="color:rgba(255,255,255,.5);font-size:.6em" data-slot-field="unit"> / 100</span></div>
           <div class="meta">
-            <div class="label">Autoridad de entidad</div>
-            <div class="qual">marca reconocible, con señales de entidad aún por consolidar</div>
+            <div class="label" data-slot-field="label">Autoridad de entidad</div>
+            <div class="qual" data-slot-field="qual">marca reconocible, con señales de entidad aún por consolidar</div>
           </div>
         </div>
 
         <div class="kpi">
           <div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M11.248 2A10.03 10.03 0 0 0 2 11.248h2.98a.752.752 0 1 1 0 1.504H2A10.03 10.03 0 0 0 11.248 22v-2.98a.752.752 0 0 1 1.504 0V22A10.03 10.03 0 0 0 22 12.752h-2.98a.752.752 0 0 1 0-1.504H22A10.03 10.03 0 0 0 12.752 2v2.98a.752.752 0 1 1-1.504 0zM9.242 12c0-.415.337-.752.752-.752h1.254V9.994a.752.752 0 1 1 1.504 0v1.254h1.254a.752.752 0 0 1 0 1.504h-1.254v1.254a.752.752 0 0 1-1.504 0v-1.254H9.994A.75.75 0 0 1 9.242 12" clip-rule="evenodd"/></svg></div>
-          <div class="num">−32<span style="font-size:.5em;font-weight:400;color:rgba(255,255,255,.7)"> pts</span></div>
+          <div class="num"><span data-slot-field="value">−32</span><span style="font-size:.5em;font-weight:400;color:rgba(255,255,255,.7)" data-slot-field="unit"> pts</span></div>
           <div class="meta">
-            <div class="label">Gap vs. líder de categoría</div>
-            <div class="qual">el referente concentra cerca del 50% del Share of Voice</div>
+            <div class="label" data-slot-field="label">Gap vs. líder de categoría</div>
+            <div class="qual" data-slot-field="qual">el referente concentra cerca del 50% del Share of Voice</div>
           </div>
         </div>
       </div>
@@ -123,10 +123,10 @@
     <!-- RIGHT: la lectura -->
     <div class="read">
       <div class="inner">
-        <div class="eyebrow">La lectura</div>
-        <div class="lead">Citada, pero aún <em>no domina</em> su categoría.</div>
-        <p class="p">SKY ya aparece en respuestas de asistentes con IA, pero el líder de la categoría concentra casi <b>3×</b> su Share of Voice. El punto de partida es sólido y con techo claro para crecer.</p>
-        <div class="src">Fuente: AI Visibility Grader · corrida ilustrativa (los valores reales se fijan por diagnóstico)</div>
+        <div class="eyebrow" data-slot="readEyebrow" data-slot-type="string">La lectura</div>
+        <div class="lead" data-slot="readLead" data-slot-type="rich-string" data-slot-required="true">Citada, pero aún <em>no domina</em> su categoría.</div>
+        <p class="p" data-slot="readBody" data-slot-type="rich-string" data-slot-required="true">SKY ya aparece en respuestas de asistentes con IA, pero el líder de la categoría concentra casi <b>3×</b> su Share of Voice. El punto de partida es sólido y con techo claro para crecer.</p>
+        <div class="src" data-slot="source" data-slot-type="string" data-slot-required="true">Fuente: AI Visibility Grader · corrida ilustrativa (los valores reales se fijan por diagnóstico)</div>
       </div>
     </div>
   </div>

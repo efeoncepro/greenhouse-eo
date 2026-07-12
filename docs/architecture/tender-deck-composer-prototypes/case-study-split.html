@@ -72,44 +72,44 @@
         <div class="head-row">
           <div class="rule"></div>
           <div>
-            <div class="eyebrow">Caso · marca de consumo, categoría retail</div>
-            <h1 class="title">De invisible a <em>citada</em> en su categoría</h1>
+            <div class="eyebrow" data-slot="sectionLabel" data-slot-type="string">Caso · marca de consumo, categoría retail</div>
+            <h1 class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">De invisible a <em>citada</em> en su categoría</h1>
           </div>
         </div>
       </div>
-      <div class="stages">
+      <div class="stages" data-slot="stages" data-slot-type="array" data-slot-required="true">
         <div class="stage">
-          <div class="ov">El reto</div>
-          <p>Presencia casi nula en las respuestas de asistentes con IA; el líder concentraba la conversación de la categoría.</p>
+          <div class="ov" data-slot-field="label">El reto</div>
+          <p data-slot-field="body">Presencia casi nula en las respuestas de asistentes con IA; el líder concentraba la conversación de la categoría.</p>
         </div>
         <div class="stage">
-          <div class="ov">El enfoque</div>
-          <p><b>Surround Discovery:</b> SEO técnico + producción editorial + optimización AEO, con medición continua de citabilidad.</p>
+          <div class="ov" data-slot-field="label">El enfoque</div>
+          <p data-slot-field="body"><b>Surround Discovery:</b> SEO técnico + producción editorial + optimización AEO, con medición continua de citabilidad.</p>
         </div>
         <div class="stage">
-          <div class="ov">El aprendizaje</div>
-          <p>Rodear toda la superficie de descubrimiento —no perseguir un canal— es lo que sostiene el resultado.</p>
+          <div class="ov" data-slot-field="label">El aprendizaje</div>
+          <p data-slot-field="body">Rodear toda la superficie de descubrimiento —no perseguir un canal— es lo que sostiene el resultado.</p>
         </div>
       </div>
     </div>
 
     <!-- RIGHT: resultado -->
     <div class="result">
-      <div class="ov">El resultado</div>
-      <div class="hero">
-        <span class="num">×3,2</span>
-        <span class="lab">su Share of Voice en asistentes con IA</span>
+      <div class="ov" data-slot="resultLabel" data-slot-type="string">El resultado</div>
+      <div class="hero" data-slot="result" data-slot-type="object" data-slot-required="true">
+        <span class="num" data-slot-field="metric">×3,2</span>
+        <span class="lab" data-slot-field="metricLabel">su Share of Voice en asistentes con IA</span>
       </div>
-      <div class="ba">
-        <div class="barcol before"><div class="bnum">12%</div><div class="bar"></div><div class="bcap">Antes</div></div>
-        <div class="barcol after"><div class="bnum">38%</div><div class="bar"></div><div class="bcap">Después · 6 meses</div></div>
-        <div class="lead-in"><div class="t">El mismo método,<br>aplicado a SKY.</div><div class="s">del diagnóstico al resultado.</div></div>
+      <div class="ba" data-slot="comparison" data-slot-type="object" data-slot-required="true">
+        <div class="barcol before"><div class="bnum" data-slot-field="beforeValue">12%</div><div class="bar"></div><div class="bcap" data-slot-field="beforeCaption">Antes</div></div>
+        <div class="barcol after"><div class="bnum" data-slot-field="afterValue">38%</div><div class="bar"></div><div class="bcap" data-slot-field="afterCaption">Después · 6 meses</div></div>
+        <div class="lead-in"><div class="t" data-slot-field="bridgeTitle">El mismo método,<br>aplicado a SKY.</div><div class="s" data-slot-field="bridgeSubtitle">del diagnóstico al resultado.</div></div>
       </div>
-      <div class="chips">
+      <div class="chips" data-slot="supportingClaims" data-slot-type="array">
         <div class="chip">Citada por <b>4 de 5</b> asistentes</div>
         <div class="chip"><b>+180%</b> tráfico orgánico</div>
       </div>
-      <div class="src">Resultado acreditado · caso anonimizado, valores ilustrativos (el caso real se acredita en la oferta)</div>
+      <div class="src" data-slot="sourceNote" data-slot-type="string" data-slot-required="true">Resultado acreditado · caso anonimizado, valores ilustrativos (el caso real se acredita en la oferta)</div>
       <img class="deck-url-bubble signature-CaseStudySplit" src="assets/url-lum.svg" alt="efeoncepro.com">
     </div>
   </div>

@@ -80,10 +80,10 @@
   <div class="slide" data-template="TimelineFull">
     <div class="head">
       <div>
-        <div class="eyebrow">Plan de trabajo</div>
-        <div class="title">Cronograma del proyecto · SKY</div>
+        <div class="eyebrow" data-slot="sectionLabel" data-slot-type="string">Plan de trabajo</div>
+        <div class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">Cronograma del proyecto · SKY</div>
       </div>
-      <div class="meta"><b>6 meses</b> · 5 fases · hitos y entregables<br>ruta base, con holgura por fase</div>
+      <div class="meta" data-slot="meta" data-slot-type="rich-string"><b>6 meses</b> · 5 fases · hitos y entregables<br>ruta base, con holgura por fase</div>
     </div>
 
     <div class="gantt">
@@ -95,7 +95,7 @@
       <!-- eje meses -->
       <div class="row-flex axis">
         <div class="lbl"></div>
-        <div class="track">
+        <div class="track" data-slot="timeAxis" data-slot-type="array" data-slot-required="true">
           <div class="mo">Mes 1</div><div class="mo">Mes 2</div><div class="mo">Mes 3</div>
           <div class="mo">Mes 4</div><div class="mo">Mes 5</div><div class="mo">Mes 6</div>
         </div>
@@ -104,34 +104,34 @@
       <!-- hitos -->
       <div class="row-flex milestones">
         <div class="lbl"></div>
-        <div class="track">
-          <div class="mstone" style="left:16.6667%"><div class="dia"></div><div class="ml">Baseline entregado</div><div class="md">fin mes 1</div></div>
-          <div class="mstone" style="left:50%"><div class="dia"></div><div class="ml">1.er reporte de citabilidad</div><div class="md">fin mes 3</div></div>
-          <div class="mstone" style="left:91%"><div class="dia"></div><div class="ml">Revisión &amp; plan siguiente</div><div class="md">mes 6</div></div>
+        <div class="track" data-slot="milestones" data-slot-type="array" data-slot-required="true">
+          <div class="mstone" style="left:16.6667%"><div class="dia"></div><div class="ml" data-slot-field="label">Baseline entregado</div><div class="md" data-slot-field="caption">fin mes 1</div></div>
+          <div class="mstone" style="left:50%"><div class="dia"></div><div class="ml" data-slot-field="label">1.er reporte de citabilidad</div><div class="md" data-slot-field="caption">fin mes 3</div></div>
+          <div class="mstone" style="left:91%"><div class="dia"></div><div class="ml" data-slot-field="label">Revisión &amp; plan siguiente</div><div class="md" data-slot-field="caption">mes 6</div></div>
         </div>
       </div>
 
       <!-- fases -->
-      <div class="phases">
+      <div class="phases" data-slot="phases" data-slot-type="array" data-slot-required="true">
         <div class="row-flex phase">
-          <div class="lbl"><span class="n">01</span><div><div class="pt">Diagnóstico &amp; baseline</div><div class="pd">AEO/SEO audit + Share of Voice inicial</div></div></div>
-          <div class="track"><div class="bar" style="left:0; width:16.6667%"></div></div>
+          <div class="lbl"><span class="n">01</span><div><div class="pt" data-slot-field="title">Diagnóstico &amp; baseline</div><div class="pd" data-slot-field="description">AEO/SEO audit + Share of Voice inicial</div></div></div>
+          <div class="track"><div class="bar" style="left:0; width:16.6667%" data-slot-field="barLabel"></div></div>
         </div>
         <div class="row-flex phase">
-          <div class="lbl"><span class="n">02</span><div><div class="pt">Arquitectura &amp; quick wins</div><div class="pd">correcciones técnicas + plan editorial</div></div></div>
-          <div class="track"><div class="bar" style="left:0; width:33.3333%">correcciones + arquitectura de contenido</div></div>
+          <div class="lbl"><span class="n">02</span><div><div class="pt" data-slot-field="title">Arquitectura &amp; quick wins</div><div class="pd" data-slot-field="description">correcciones técnicas + plan editorial</div></div></div>
+          <div class="track"><div class="bar" style="left:0; width:33.3333%" data-slot-field="barLabel">correcciones + arquitectura de contenido</div></div>
         </div>
         <div class="row-flex phase">
-          <div class="lbl"><span class="n">03</span><div><div class="pt">Producción editorial</div><div class="pd">motor de contenidos en cadencia</div></div></div>
-          <div class="track"><div class="bar" style="left:16.6667%; width:66.6667%">publicación sostenida + hub editorial</div></div>
+          <div class="lbl"><span class="n">03</span><div><div class="pt" data-slot-field="title">Producción editorial</div><div class="pd" data-slot-field="description">motor de contenidos en cadencia</div></div></div>
+          <div class="track"><div class="bar" style="left:16.6667%; width:66.6667%" data-slot-field="barLabel">publicación sostenida + hub editorial</div></div>
         </div>
         <div class="row-flex phase">
-          <div class="lbl"><span class="n">04</span><div><div class="pt">Optimización AEO</div><div class="pd">citabilidad + iteración por evidencia</div></div></div>
-          <div class="track"><div class="bar" style="left:33.3333%; width:66.6667%">citabilidad en asistentes con IA</div></div>
+          <div class="lbl"><span class="n">04</span><div><div class="pt" data-slot-field="title">Optimización AEO</div><div class="pd" data-slot-field="description">citabilidad + iteración por evidencia</div></div></div>
+          <div class="track"><div class="bar" style="left:33.3333%; width:66.6667%" data-slot-field="barLabel">citabilidad en asistentes con IA</div></div>
         </div>
         <div class="row-flex phase">
-          <div class="lbl"><span class="n">05</span><div><div class="pt">Medición &amp; reporte</div><div class="pd">SoV, citabilidad y autoridad</div></div></div>
-          <div class="track"><div class="bar cont" style="left:0; width:100%">continuo · reporte mensual</div></div>
+          <div class="lbl"><span class="n">05</span><div><div class="pt" data-slot-field="title">Medición &amp; reporte</div><div class="pd" data-slot-field="description">SoV, citabilidad y autoridad</div></div></div>
+          <div class="track"><div class="bar cont" style="left:0; width:100%" data-slot-field="barLabel">continuo · reporte mensual</div></div>
         </div>
       </div>
 

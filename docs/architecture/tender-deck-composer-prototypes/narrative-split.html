@@ -86,26 +86,26 @@
     <!-- LEFT -->
     <div class="text">
       <div class="header">
-        <div class="eyebrow">01 · Metodología</div>
+        <div class="eyebrow" data-slot="sectionLabel" data-slot-type="string">01 · Metodología</div>
         <div class="head-row">
           <div class="rule"></div>
-          <h1 class="title">No optimizamos un canal:<br>rodeamos toda la <em>superficie</em><br>de descubrimiento</h1>
+          <h1 class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">No optimizamos un canal:<br>rodeamos toda la <em>superficie</em><br>de descubrimiento</h1>
         </div>
       </div>
 
-      <div class="body">
+      <div class="body" data-slot="body" data-slot-type="array" data-slot-required="true">
         <p class="p"><b>Surround Discovery es el marco propietario de Efeonce.</b> Parte de una premisa simple: hoy una marca se descubre en muchos lugares a la vez —el buscador, los asistentes con IA, las comunidades, las citas de terceros— y ninguno domina por sí solo.</p>
         <p class="p"><b>Por eso no perseguimos un solo canal.</b> Se mide y se trabaja la superficie completa: posicionamiento en Google, citabilidad en ChatGPT, Perplexity y Gemini, y las <span class="ac">señales de entidad</span> que hacen que la marca sea reconocida como referente de su categoría.</p>
       </div>
 
-      <div class="closing">Rodear la superficie de descubrimiento, <span class="ac">no correr detrás de un canal.</span></div>
+      <div class="closing" data-slot="closing" data-slot-type="rich-string">Rodear la superficie de descubrimiento, <span class="ac">no correr detrás de un canal.</span></div>
     </div>
 
     <!-- RIGHT: panel de marca + método -->
     <div class="brand">
       <div class="brand-head">
-        <div class="brand-eyebrow">El método</div>
-        <div class="brand-title">Surround Discovery</div>
+        <div class="brand-eyebrow" data-slot="conceptLabel" data-slot-type="string">El método</div>
+        <div class="brand-title" data-slot="conceptTitle" data-slot-type="string" data-slot-required="true">Surround Discovery</div>
       </div>
 
       <div class="rings">
@@ -118,10 +118,11 @@
         </svg>
       </div>
 
-      <div class="legend">
-        <div class="leg"><span class="dot" style="background:rgba(54,200,191,.30)"></span><span><span class="k">Search</span> &nbsp;<span class="v">— posicionamiento en buscadores</span></span></div>
-        <div class="leg"><span class="dot" style="background:rgba(54,200,191,.60)"></span><span><span class="k">Answer</span> &nbsp;<span class="v">— citabilidad en asistentes con IA</span></span></div>
-        <div class="leg"><span class="dot" style="background:#36c8bf"></span><span><span class="k">Entity</span> &nbsp;<span class="v">— autoridad de categoría</span></span></div>
+      <!-- la .dot NO es contenido: su tono sale del índice de la capa (resolver: legend-layer-tone) -->
+      <div class="legend" data-slot="conceptLegend" data-slot-type="array" data-slot-required="true">
+        <div class="leg"><span class="dot" style="background:rgba(54,200,191,.30)"></span><span><span class="k" data-slot-field="layer">Search</span> &nbsp;<span class="v" data-slot-field="definition">— posicionamiento en buscadores</span></span></div>
+        <div class="leg"><span class="dot" style="background:rgba(54,200,191,.60)"></span><span><span class="k" data-slot-field="layer">Answer</span> &nbsp;<span class="v" data-slot-field="definition">— citabilidad en asistentes con IA</span></span></div>
+        <div class="leg"><span class="dot" style="background:#36c8bf"></span><span><span class="k" data-slot-field="layer">Entity</span> &nbsp;<span class="v" data-slot-field="definition">— autoridad de categoría</span></span></div>
       </div>
     </div>
   </div>

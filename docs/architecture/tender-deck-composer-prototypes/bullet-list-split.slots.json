@@ -1,0 +1,33 @@
+{
+  "template": "BulletListSplit",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "brandTitle": {
+      "selector": "[data-slot='brandTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 34, "maxLines": 2, "overflow": "reject" }
+    },
+    "bullets": {
+      "selector": "[data-slot='bullets']",
+      "type": "array",
+      "required": true,
+      "constraints": { "minItems": 4, "maxItems": 7, "overflow": "reject" },
+      "item": {
+        "type": "object",
+        "shape": {
+          "lead": { "type": "string", "required": true, "maxCharacters": 54, "maxLines": 1 },
+          "description": { "type": "string", "required": true, "maxCharacters": 104, "maxLines": 2 }
+        }
+      }
+    }
+  },
+  "presentation": {
+    "brandSurface": "canonical-rich-deck-gradient on the left panel (rounded right corners)",
+    "brandLogo": "efeonce negative wordmark under brandTitle — fixed brand asset, never content",
+    "bulletIcon": "assets/star1.svg — fixed decorative marker per bullet, identical for every item, never content",
+    "typography": "lead renders semibold (<b>) and description regular, both inside the same 28px text block",
+    "layout": "bullets are distributed with space-between across the full column height; more than 7 items breaks the dashed separator rhythm"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "template": "MetricsSplit",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 32, "maxLines": 2, "overflow": "reject" }
+    },
+    "subtitle": {
+      "selector": "[data-slot='subtitle']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "client": { "type": "string", "required": true, "maxCharacters": 22, "maxLines": 1 },
+        "context": { "type": "string", "required": true, "maxCharacters": 28, "maxLines": 1 }
+      }
+    },
+    "kpis": {
+      "selector": "[data-slot='kpis']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 3,
+        "maxItems": 4,
+        "overflow": "reject",
+        "quantifiedClaimsRequireEvidenceRef": true
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "enum",
+            "required": true,
+            "values": ["visibility", "engines", "authority", "gap"],
+            "resolver": "metrics-kpi-icon"
+          },
+          "value": { "type": "string", "required": true, "maxCharacters": 8, "maxLines": 1, "requires": ["evidenceRef"] },
+          "unit": { "type": "string", "required": false, "maxCharacters": 8, "maxLines": 1, "presentation": "small dimmed suffix inside .num; renderer leaves the span empty when absent" },
+          "label": { "type": "string", "required": true, "maxCharacters": 32, "maxLines": 1 },
+          "qual": { "type": "string", "required": true, "maxCharacters": 72, "maxLines": 2 },
+          "evidenceRef": { "type": "string", "required": false, "consumer": "validation-only" }
+        }
+      }
+    },
+    "readEyebrow": {
+      "selector": "[data-slot='readEyebrow']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 20, "maxLines": 1, "overflow": "reject" }
+    },
+    "readLead": {
+      "selector": "[data-slot='readLead']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": { "maxCharacters": 50, "maxLines": 3, "allowedTags": ["em"], "overflow": "reject" }
+    },
+    "readBody": {
+      "selector": "[data-slot='readBody']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": { "maxCharacters": 200, "maxLines": 5, "allowedTags": ["b"], "overflow": "reject" }
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 110, "maxLines": 2, "overflow": "reject" }
+    }
+  },
+  "presentation": {
+    "brandSurface": "canonical-rich-deck-gradient on the left panel; KPI rows are flexed to fill the column height",
+    "icons": "Solar Bold inline SVG inside the teal glass chip (.kpi .ic svg); kind selects the icon, it is never authored content",
+    "numerals": "Geist semibold, tabular-nums; value + optional dimmed unit suffix live in the same .num block",
+    "evidencePolicy": "every KPI is a quantified claim: a value with no evidenceRef must be rejected, never rendered"
+  },
+  "resolvers": {
+    "metrics-kpi-icon": {
+      "owns": [".kpi .ic svg"],
+      "contract": "maps item.kind → the Solar Bold icon path rendered inside the teal chip (visibility → pie-chart, engines → chat-round, authority → shield-check, gap → target). The icon is presentation, never content."
+    }
+  }
+}

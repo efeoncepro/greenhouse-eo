@@ -8,7 +8,7 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
-    :root { --safe:72px; --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33; --teal:#36c8bf; --violet:#33029c; --ink:#020061; --surface:#eef0f3; --lime:#70bd00; }
+    :root { --safe:72px; --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33; --teal:#36c8bf; --violet:#33029c; --ink:#020061; --surface:#eef0f3; }
     .slide { width:1920px; height:1080px; display:flex; background:var(--surface); }
     .context { position:relative; width:1004px; height:1080px; overflow:hidden; color:#fff; border-radius:0 64px 64px 0; padding:var(--safe); background:
       radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
@@ -28,14 +28,14 @@
     .narrative .closing { font-weight:600; }
     .outcomes { width:916px; height:1080px; padding:var(--safe) 72px; color:var(--ink); }
     .outcomes-header { padding:36px 0 28px; }
-    .outcomes-eyebrow { color:#438100; font-size:18px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
+    .outcomes-eyebrow { color:var(--violet); font-size:18px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
     .outcomes h2 { margin-top:14px; max-width:670px; font-family:'Poppins',sans-serif; font-size:43px; font-weight:600; letter-spacing:-.018em; line-height:1.1; }
     .goal-list { border-top:1px solid rgba(2,0,97,.2); }
     .goal { min-height:158px; display:grid; grid-template-columns:100px 1fr; align-items:center; gap:24px; border-bottom:1px solid rgba(2,0,97,.2); }
     .goal:last-child { border-bottom:0; }
-    .goal-icon { width:64px; height:64px; object-fit:contain; filter:invert(70%) sepia(79%) saturate(740%) hue-rotate(43deg) brightness(88%) contrast(104%); }
+    .goal-icon { width:64px; height:64px; object-fit:contain; filter:brightness(0) saturate(100%) invert(11%) sepia(93%) saturate(5479%) hue-rotate(262deg) brightness(85%) contrast(119%); }
     .goal-title { display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; font-family:'Poppins',sans-serif; font-size:34px; font-weight:600; letter-spacing:-.015em; line-height:1.08; }
-    .goal-metric { color:#438100; font-size:27px; font-style:italic; letter-spacing:-.02em; }
+    .goal-metric { color:var(--violet); font-size:27px; font-style:italic; letter-spacing:-.02em; }
     .goal-metric:empty { display:none; }
     .goal-body { margin-top:8px; max-width:630px; font-size:24px; line-height:1.28; }
     .goal-body strong { font-weight:600; }

@@ -1,0 +1,16 @@
+{
+  "template":"SectionDividerSplit","figmaNodeId":"6:12498","version":"0.1","viewport":{"width":1920,"height":1080},
+  "slots":{
+    "kicker":{"selector":"[data-slot='kicker']","type":"string","required":false,"constraints":{"maxCharacters":20,"maxLines":1,"transform":"uppercase","overflow":"reject"}},
+    "sectionNumber":{"selector":"[data-slot='sectionNumber']","type":"string","required":true,"resolver":"section-number","constraints":{"maxCharacters":2,"maxLines":1,"pattern":"^[0-9]{2}$","overflow":"reject"},"notes":"Derivado del orden de la sección en el deck (01..99, tabular-nums a 190px). Se pinta en su ancla pero NO se autora a mano: si el divisor dice 02 y en la agenda ese capítulo es el 03, el deck se contradice solo."},
+    "title":{"selector":"[data-slot='title']","type":"string","required":true,"constraints":{"maxCharacters":34,"maxLines":2,"overflow":"reject"},"notes":"Debe ser EL MISMO título del capítulo homónimo en AgendaFull (mismo texto, no una paráfrasis)."},
+    "lead":{"selector":"[data-slot='lead']","type":"string","required":false,"constraints":{"maxCharacters":96,"maxLines":3,"overflow":"reject"}},
+    "agendaLabel":{"selector":"[data-slot='agendaLabel']","type":"string","required":false,"constraints":{"maxCharacters":32,"maxLines":1,"transform":"uppercase","overflow":"reject"}},
+    "sectionItems":{"selector":"[data-slot='sectionItems']","type":"array","required":true,"constraints":{"minItems":2,"maxItems":5,"overflow":"reject"},"item":{"type":"object","shape":{"number":{"type":"string","required":true,"maxCharacters":2,"maxLines":1,"resolver":"ordinal-number","notes":"Derivado del índice (01..05); se pinta en [data-slot-field='number'] pero no se autora."},"title":{"type":"string","required":true,"maxCharacters":32,"maxLines":2},"description":{"type":"string","required":true,"maxCharacters":60,"maxLines":2}}},"notes":"Es el mini-índice de lo que viene EN ESA sección: cada ítem debe corresponder a una lámina real posterior, nunca a una promesa que el deck no cumple."}
+  },
+  "presentation":{
+    "brandSurface":"panel de marca canonical-navy-rich-deck-gradient (226deg) con esquinas 64px; mini-agenda sobre panel claro #eef0f3",
+    "composition":"brand-left por defecto: número gigante teal + título + lead a la izquierda, mini-agenda punteada a la derecha",
+    "variants":{"side":{"values":["brand-left","brand-right"],"resolver":"divider-side","notes":"NO es contenido: alterna el lado del panel de marca (radios y gradiente espejados) para dar ritmo entre divisores consecutivos del mismo deck."}}
+  }
+}

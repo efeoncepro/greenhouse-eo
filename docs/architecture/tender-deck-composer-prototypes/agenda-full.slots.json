@@ -1,0 +1,17 @@
+{
+  "template":"AgendaFull","version":"0.1","viewport":{"width":1920,"height":1080},
+  "slots":{
+    "sectionLabel":{"selector":"[data-slot='sectionLabel']","type":"string","required":false,"constraints":{"maxCharacters":38,"maxLines":1,"transform":"uppercase","overflow":"reject"}},
+    "title":{"selector":"[data-slot='title']","type":"string","required":true,"constraints":{"maxCharacters":24,"maxLines":1,"overflow":"reject"}},
+    "deckMeta":{"selector":"[data-slot='deckMeta']","type":"rich-string","required":false,"resolver":"chapter-count","constraints":{"maxCharacters":56,"maxLines":1,"allowedTags":["b"],"overflow":"reject"},"notes":"El <b>N</b> inicial es el conteo de capítulos: lo deriva el resolver chapter-count desde chapters.length y NUNCA se autora a mano (un deck con 5 capítulos que dice '6' es un error de cara al cliente). El resto del string es el sujeto del deck."},
+    "chapters":{"selector":"[data-slot='chapters']","type":"array","required":true,"constraints":{"minItems":4,"maxItems":8,"overflow":"reject"},"item":{"type":"object","shape":{"number":{"type":"string","required":true,"maxCharacters":2,"maxLines":1,"resolver":"ordinal-number","notes":"Derivado del índice (01..08) y pintado en [data-slot-field='number']; no se autora."},"title":{"type":"string","required":true,"maxCharacters":40,"maxLines":2},"description":{"type":"string","required":true,"maxCharacters":60,"maxLines":2},"targetSlideId":{"type":"string","required":true,"maxCharacters":48,"resolver":"chapter-anchor","consumer":"link-href","notes":"NO es texto: alimenta href='#<targetSlideId>' del <a class='ch'> (nav en HTML + link interno en el PDF). Sin anchor resuelto el capítulo queda muerto al click."}}}},
+    "footerLabel":{"selector":"[data-slot='footerLabel']","type":"string","required":false,"constraints":{"maxCharacters":44,"maxLines":1,"overflow":"reject"}}
+  },
+  "presentation":{
+    "brandSurface":"canonical-navy-rich-deck-gradient full-bleed (dark-even)",
+    "composition":"head (eyebrow + title + deckMeta) sobre grid 2 columnas de capítulos clicables, centrado vertical; footer hairline con la URL de marca fija",
+    "fixedBrand":"el <span class='r'>efeoncepro.com</span> del footer y la burbuja .deck-url-bubble son firma de marca, NUNCA slots",
+    "itemsBlueprint":"el <a class='ch'> vive dentro del <script> (los capítulos se generan por JS): ése es el blueprint que el composer clona; el markup renderizado ya trae los tres data-slot-field",
+    "overflowPolicy":"4-8 capítulos (ideal 6). 7-8 respiran como 2x4. Con >8 se agrupa en Partes o se consolida — NUNCA se parte la agenda en dos láminas."
+  }
+}

@@ -47,15 +47,15 @@
   <div class="slide" data-template="AgendaFull">
     <div class="head">
       <div>
-        <div class="eyebrow">La propuesta</div>
-        <div class="title">Agenda</div>
+        <div class="eyebrow" data-slot="sectionLabel" data-slot-type="string">La propuesta</div>
+        <div class="title" data-slot="title" data-slot-type="string" data-slot-required="true">Agenda</div>
       </div>
-      <div class="count"><b>6</b> capítulos · propuesta técnica para SKY</div>
+      <div class="count" data-slot="deckMeta" data-slot-type="rich-string"><b>6</b> capítulos · propuesta técnica para SKY</div>
     </div>
 
-    <div class="grid" id="grid"></div>
+    <div class="grid" id="grid" data-slot="chapters" data-slot-type="array" data-slot-required="true"></div>
 
-    <div class="foot"><span>Propuesta técnica · SKY</span><span class="r">efeoncepro.com</span></div>
+    <div class="foot"><span data-slot="footerLabel" data-slot-type="string">Propuesta técnica · SKY</span><span class="r">efeoncepro.com</span></div>
   </div>
 
 <script>
@@ -68,8 +68,10 @@
     ['05','Casos & resultados','Experiencia acreditada, con métricas.','cap-casos'],
     ['06','Inversión','La propuesta económica y su alcance.','cap-inversion']
   ];
+  // el <a class="ch"> es el BLUEPRINT del item de `chapters` (array slot):
+  // href="#<targetSlideId>" lo resuelve el composer (resolver: chapter-anchor), no es texto.
   document.getElementById('grid').innerHTML = chapters.map(([n,t,d,id]) =>
-    `<a class="ch" href="#${id}"><div class="n">${n}</div><div><div class="t">${t}</div><div class="d">${d}</div></div></a>`).join('');
+    `<a class="ch" href="#${id}"><div class="n" data-slot-field="number">${n}</div><div><div class="t" data-slot-field="title">${t}</div><div class="d" data-slot-field="description">${d}</div></div></a>`).join('');
 </script>
   <img class="deck-url-bubble signature-AgendaFull" src="assets/url-lum.svg" alt="efeoncepro.com">
 </body></html>

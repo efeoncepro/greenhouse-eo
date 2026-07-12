@@ -1,0 +1,20 @@
+{
+  "template": "TeamSplit",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "sectionLabel": { "selector": "[data-slot='sectionLabel']", "type": "string", "required": false, "constraints": { "maxCharacters": 22, "maxLines": 1, "overflow": "reject" } },
+    "headline": { "selector": "[data-slot='headline']", "type": "rich-string", "required": true, "constraints": { "maxCharacters": 62, "maxLines": 3, "allowedTags": ["em"], "overflow": "reject" } },
+    "lead": { "selector": "[data-slot='lead']", "type": "rich-string", "required": true, "constraints": { "maxCharacters": 112, "maxLines": 3, "allowedTags": ["em"], "overflow": "reject" } },
+    "highlight": { "selector": "[data-slot='highlight']", "type": "rich-string", "required": true, "constraints": { "maxCharacters": 86, "maxLines": 3, "allowedTags": ["em"], "overflow": "reject" } },
+    "rosterLabel": { "selector": "[data-slot='rosterLabel']", "type": "string", "required": false, "constraints": { "maxCharacters": 18, "maxLines": 1, "overflow": "reject" } },
+    "rosterMeta": { "selector": "[data-slot='rosterMeta']", "type": "string", "required": false, "constraints": { "maxCharacters": 40, "maxLines": 1, "overflow": "reject", "consistency": "must agree with the number of members; never claim more roles than the roster renders" } },
+    "members": { "selector": "[data-slot='members']", "type": "array", "required": true, "constraints": { "minItems": 3, "maxItems": 5, "overflow": "reject", "order": "seniority / accountability first — the single accountable lead is item 1" }, "item": { "type": "object", "shape": {
+      "kind": { "type": "enum", "required": true, "values": ["lead", "strategy", "content", "technical", "data"], "resolver": "team-role-icon", "description": "selects the Solar glyph painted inside .av (lead=star, strategy=magnifer, content=pen, technical=settings, data=chart); never authored as an icon name" },
+      "role": { "type": "string", "required": true, "maxCharacters": 34, "maxLines": 1 },
+      "description": { "type": "string", "required": true, "maxCharacters": 72, "maxLines": 2 },
+      "dedication": { "type": "string", "required": true, "maxCharacters": 5, "maxLines": 1, "format": "NN%", "description": "written verbatim into .pct including the % sign — the renderer does not append it" }
+    } } }
+  },
+  "presentation": { "brandSurface": "canonical-navy-brand-panel-left", "composition": "brand intro panel + a cohesive roster of 3–5 member cards; icon, avatar disc and the 'dedicación' caption are fixed chrome", "staffingPolicy": "every declared role must be a real, staffable role with a real dedication; the single accountable lead is mandatory and is always item 1", "rendererNote": "the roster is emitted by the inline <script> from the `team` array; the composer must operate on the RENDERED DOM (post-script), not on the raw HTML string, or de-script the template first" }
+}

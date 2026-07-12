@@ -1,0 +1,24 @@
+{
+  "template":"NarrativeSplit","figmaNodeId":"5:7869","version":"0.1","viewport":{"width":1920,"height":1080},
+  "slots":{
+    "sectionLabel":{"selector":"[data-slot='sectionLabel']","type":"string","required":false,"constraints":{"maxCharacters":40,"maxLines":1,"transform":"uppercase","overflow":"reject"}},
+    "title":{"selector":"[data-slot='title']","type":"rich-string","required":true,"constraints":{"maxCharacters":80,"maxLines":3,"allowedTags":["em","br"],"overflow":"reject"},"notes":"<em> = cursiva REAL de Poppins en violeta; es el acento del titular, uno por lámina."},
+    "body":{"selector":"[data-slot='body']","type":"array","required":true,"constraints":{"minItems":1,"maxItems":2,"maxCharactersPerItem":300,"maxLinesPerItem":5,"overflow":"reject"},"item":{"type":"rich-string","allowedTags":["b","span"],"notes":"<b> = lead semibold que abre el párrafo. <span class='ac'> = acento violeta (color+peso, roman), reservado para el concepto que la lámina quiere fijar."}},
+    "closing":{"selector":"[data-slot='closing']","type":"rich-string","required":false,"constraints":{"maxCharacters":82,"maxLines":2,"allowedTags":["span"],"overflow":"reject"},"notes":"Cierre-remate de la narrativa; el <span class='ac'> marca la segunda mitad de la antítesis."},
+    "conceptLabel":{"selector":"[data-slot='conceptLabel']","type":"string","required":false,"constraints":{"maxCharacters":28,"maxLines":1,"transform":"uppercase","overflow":"reject"}},
+    "conceptTitle":{"selector":"[data-slot='conceptTitle']","type":"string","required":true,"constraints":{"maxCharacters":32,"maxLines":2,"overflow":"reject"}},
+    "conceptLegend":{"selector":"[data-slot='conceptLegend']","type":"array","required":true,"constraints":{"minItems":3,"maxItems":3,"overflow":"reject"},"item":{"type":"object","shape":{"layer":{"type":"string","required":true,"maxCharacters":12,"maxLines":1},"definition":{"type":"string","required":true,"maxCharacters":44,"maxLines":1},"tone":{"type":"enum","required":false,"values":["outer","middle","core"],"resolver":"legend-layer-tone","notes":"NO es contenido: el .dot toma su opacidad teal del índice de la capa (outer .30 → middle .60 → core sólido) y debe empatar con los 3 anillos concéntricos del SVG."}}},"notes":"Las 3 capas están HARD-COUPLED al motivo de anillos (3 círculos): no son 2 ni 4. Si el concepto no tiene 3 capas, la lámina correcta no es ésta."}
+  },
+  "presentation":{
+    "brandSurface":"panel derecho canonical-rich-deck-gradient con esquinas 64px; columna izquierda sobre panel claro #eef0f3",
+    "fixedVisual":"los anillos concéntricos 'surround' (SVG) son el motivo de marca del método: NO son un slot, y sólo se sostienen con 3 capas de leyenda",
+    "typographyContract":"cursivas reales de Poppins (ital 600) — nunca faux italic; Geist sólo roman"
+  },
+  "variants":{
+    "rightSlot":{
+      "materialized":"ConceptVisual (el prototipo vigente: anillos + conceptLabel/conceptTitle/conceptLegend)",
+      "pending":"PersonaAsset — declarado en registry.json pero NO materializado en este prototipo (no existe markup de foto). Contrato listo para cuando se autore el markup:",
+      "personaAssetContract":{"selector":"[data-slot='personaAsset']","type":"asset","required":true,"resolver":"squad-person","assetPath":"assets/squad/squad-<nombre>.png","knownAssets":["squad-andres.png","squad-daniela.png","squad-humberly.png","squad-julio.png","squad-luis.png","squad-melkin.png","squad-valentina.png"],"constraints":{"allowedKinds":["person","portrait"],"noHumanPortrait":false,"fit":"cover","anchor":"bottom-center","overflow":"reject"},"guardrail":"GUARDRAIL DURO DEL DOMINIO: las personas del equipo son FOTOS REALES del squad (assets/squad/squad-<nombre>.png). NUNCA una cara generada por IA — ni retoque generativo del rostro. noHumanPortrait:false declara que aquí SÍ se espera un retrato humano real, y que ese retrato debe venir del directorio del squad, no de un generador."}
+    }
+  }
+}

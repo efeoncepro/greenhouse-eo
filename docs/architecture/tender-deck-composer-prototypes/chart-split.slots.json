@@ -1,0 +1,109 @@
+{
+  "template": "ChartSplit",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 30, "maxLines": 1, "overflow": "reject" }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": { "maxCharacters": 62, "maxLines": 3, "allowedTags": ["em"], "overflow": "reject" }
+    },
+    "narrative": {
+      "selector": "[data-slot='narrative']",
+      "type": "array",
+      "required": true,
+      "constraints": { "minItems": 1, "maxItems": 2, "maxCharactersPerItem": 140, "maxLinesPerItem": 4, "overflow": "reject" },
+      "item": { "type": "rich-string", "allowedTags": ["b"] }
+    },
+    "chartEyebrow": {
+      "selector": "[data-slot='chartEyebrow']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 30, "maxLines": 1, "overflow": "reject" }
+    },
+    "chartTitle": {
+      "selector": "[data-slot='chartTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 26, "maxLines": 1, "overflow": "reject" }
+    },
+    "chartSubtitle": {
+      "selector": "[data-slot='chartSubtitle']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 54, "maxLines": 1, "overflow": "reject" }
+    },
+    "hero": {
+      "selector": "[data-slot='hero']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "value": { "type": "string", "required": true, "maxCharacters": 6, "maxLines": 1 },
+        "label": { "type": "string", "required": true, "maxCharacters": 44, "maxLines": 3 }
+      }
+    },
+    "series": {
+      "selector": "[data-slot='series']",
+      "type": "array",
+      "required": true,
+      "resolver": "chart-bar-geometry",
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 4,
+        "overflow": "reject",
+        "geometryResolverRequired": true,
+        "abortIfResolverMissing": true,
+        "quantifiedClaimsRequireEvidenceRef": true
+      },
+      "itemSelector": "[data-slot='series'] > .row",
+      "fixedChildren": [".refline"],
+      "item": {
+        "type": "object",
+        "shape": {
+          "name": { "type": "string", "required": true, "maxCharacters": 26, "maxLines": 1 },
+          "value": { "type": "string", "required": true, "maxCharacters": 8, "maxLines": 1, "requires": ["valuePct", "evidenceRef"] },
+          "valuePct": { "type": "number", "required": true, "min": 0, "max": 100, "consumer": "resolver-only", "resolver": "chart-bar-geometry" },
+          "highlight": { "type": "enum", "required": true, "values": ["muted", "sky"], "resolver": "chart-bar-geometry" },
+          "evidenceRef": { "type": "string", "required": false, "consumer": "validation-only" }
+        }
+      }
+    },
+    "gapCallout": {
+      "selector": "[data-slot='series'] .gap .glabel",
+      "type": "string",
+      "required": false,
+      "resolver": "chart-bar-geometry",
+      "constraints": { "maxCharacters": 24, "maxLines": 1, "overflow": "reject" }
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 110, "maxLines": 2, "overflow": "reject" }
+    }
+  },
+  "presentation": {
+    "brandSurface": "canonical-rich-deck-gradient on the right panel; chart lives in a translucent glass card",
+    "chartGeometry": "THE BARS ARE CSS WIDTHS, NOT DATA. The chart cannot be filled with text alone — see resolvers.chart-bar-geometry. If the resolver is not applied, the composer MUST abort the slide: writing the labels without recomputing the widths produces a chart that lies."
+  },
+  "resolvers": {
+    "chart-bar-geometry": {
+      "owns": [".row .track .fill", ".row .track .gap", ".row .track .gap .glabel", ".refline", ".row (class sky|muted)"],
+      "contract": [
+        "scale = 88 / max(valuePct across items); each item's bar gets style.width = round(valuePct * scale) + '%' so the largest series lands exactly on the 88% reference line",
+        ".refline stays at left:88% (it marks the leading series); if the resolver changes the scale, it must move the refline to the same percentage as the largest bar",
+        "item.highlight = 'sky' adds class 'sky' to the .row (teal label + glowing teal fill) and 'sky' to .fill; 'muted' keeps class 'muted' on .fill — no other tones exist",
+        "the highlighted row is the only one that carries .gap: style.left = highlighted bar width %, style.width = (largest bar width % − highlighted bar width %); the resolver removes .gap from every non-highlighted row",
+        ".glabel text (gapCallout) must be derived from the same numbers (e.g. '+32 pts a cerrar' = leader.valuePct − highlighted.valuePct); it must never be authored free-hand out of sync with valuePct",
+        "item.value (the printed label, e.g. '50%') is text and stays under data-slot-field='value', but the resolver must assert it is consistent with valuePct before rendering"
+      ]
+    }
+  }
+}
