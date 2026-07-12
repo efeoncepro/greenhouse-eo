@@ -1,21 +1,22 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="deck-signature.css">
+    <link rel="stylesheet" href="deck-tokens.css">
+<link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:ital,wght@0,600;1,600&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
-    :root { --safe:72px; --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33; --teal:#36c8bf; --violet:#33029c; --ink:#020061; --surface:#eef0f3; }
+    :root { --safe:72px; --navy:var(--axis-deck-navy-860); --navy-2:var(--axis-ppt-blue-800); --navy-deep:var(--axis-deck-navy-920); --teal:var(--axis-deck-teal-500); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --surface:var(--axis-deck-surface-60); }
     .slide { width:1920px; height:1080px; display:flex; background:var(--surface); }
-    .context { position:relative; width:1004px; height:1080px; overflow:hidden; color:#fff; border-radius:0 64px 64px 0; padding:var(--safe); background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(60% 60% at 0% 8%, rgba(42,194,184,.46) 0%, rgba(42,194,184,.14) 36%, transparent 64%),
-      radial-gradient(66% 60% at 4% 104%, rgba(103,23,205,.42) 0%, rgba(103,23,205,.12) 44%, transparent 74%),
-      linear-gradient(226deg, #00345f 0%, #00284d 44%, #001a33 100%); }
-    .context::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.11; background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .75px); background-size:4px 4px; }
+    .context { position:relative; width:1004px; height:1080px; overflow:hidden; color:var(--axis-ppt-neutral-50); border-radius:0 64px 64px 0; padding:var(--safe); background:
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(60% 60% at 0% 8%, rgba(var(--axis-deck-teal-550-rgb), .46) 0%, rgba(var(--axis-deck-teal-550-rgb), .14) 36%, transparent 64%),
+      radial-gradient(66% 60% at 4% 104%, rgba(var(--axis-deck-violet-550-rgb), .42) 0%, rgba(var(--axis-deck-violet-550-rgb), .12) 44%, transparent 74%),
+      linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-860) 44%, var(--axis-deck-navy-920) 100%); }
+    .context::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.11; background-image:radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .9) .55px, transparent .75px); background-size:4px 4px; }
     .context-inner { position:relative; z-index:1; height:100%; display:flex; flex-direction:column; }
     .eyebrow { color:var(--teal); font-size:19px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
     .context-header { display:grid; grid-template-columns:205px minmax(0,1fr); align-items:center; gap:34px; margin-top:42px; }
@@ -30,8 +31,8 @@
     .outcomes-header { padding:36px 0 28px; }
     .outcomes-eyebrow { color:var(--violet); font-size:18px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
     .outcomes h2 { margin-top:14px; max-width:670px; font-family:'Poppins',sans-serif; font-size:43px; font-weight:600; letter-spacing:-.018em; line-height:1.1; }
-    .goal-list { border-top:1px solid rgba(2,0,97,.2); }
-    .goal { min-height:158px; display:grid; grid-template-columns:100px 1fr; align-items:center; gap:24px; border-bottom:1px solid rgba(2,0,97,.2); }
+    .goal-list { border-top:1px solid rgba(var(--axis-ppt-indigo-950-rgb), .2); }
+    .goal { min-height:158px; display:grid; grid-template-columns:100px 1fr; align-items:center; gap:24px; border-bottom:1px solid rgba(var(--axis-ppt-indigo-950-rgb), .2); }
     .goal:last-child { border-bottom:0; }
     .goal-icon { width:64px; height:64px; object-fit:contain; filter:brightness(0) saturate(100%) invert(11%) sepia(93%) saturate(5479%) hue-rotate(262deg) brightness(85%) contrast(119%); }
     .goal-title { display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; font-family:'Poppins',sans-serif; font-size:34px; font-weight:600; letter-spacing:-.015em; line-height:1.08; }

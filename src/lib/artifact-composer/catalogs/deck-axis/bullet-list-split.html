@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -7,37 +8,37 @@
   body { font-family:'Geist',sans-serif; overflow:hidden; }
 
   :root { --safe:72px; }   /* safe-area: ningún contenido toca el borde de la slide */
-  .slide { position:relative; width:1920px; height:1080px; display:flex; background:#eef0f3; }
+  .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--axis-deck-surface-60); }
 
   /* ===== LEFT: brand panel — layout Figma + degradado HERO de Think (estable) =====
      Fuente canónica: efeonce-think index.astro .home-hero / .hero-shell.
      axis-navy-soft = AXIS accent-800, axis-navy = AXIS accent-900. */
   :root {
-    --axis-navy-soft:#023c70;   /* AXIS accent-800 */
-    --axis-navy:#00284d;        /* AXIS accent-900 */
-    --axis-navy-deep:#001a33;   /* cierre profundo (hero Think) */
-    --axis-teal:#2c98b0;        /* LUZ — glow superior */
-    --axis-violet:#33029c;      /* acento para jugar (subtle) */
+    --axis-navy-soft:var(--axis-ppt-blue-800);   /* AXIS accent-800 */
+    --axis-navy:var(--axis-deck-navy-860);        /* AXIS accent-900 */
+    --axis-navy-deep:var(--axis-deck-navy-920);   /* cierre profundo (hero Think) */
+    --axis-teal:var(--axis-ppt-teal-600);        /* LUZ — glow superior */
+    --axis-violet:var(--axis-ppt-indigo-600);      /* acento para jugar (subtle) */
   }
   .brand {
     position:relative; width:912px; flex:none; height:1080px; overflow:hidden;
     border-top-right-radius:64px; border-bottom-right-radius:64px;
     background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
   }
   .brand-head { position:absolute; left:72px; top:286px; z-index:2; }
-  .brand-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:58px; line-height:1.06; color:#fff; letter-spacing:-.015em; }
+  .brand-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:58px; line-height:1.06; color:var(--axis-ppt-neutral-50); letter-spacing:-.015em; }
   .brand-logo { display:block; margin-top:20px; height:92px; }
 
   /* ===== RIGHT: content — 7 bullets (star + semibold lead + regular desc) ===== */
   .content { flex:1; display:flex; flex-direction:column; justify-content:space-between; padding:var(--safe) 96px var(--safe) 74px; }
-  .bullet { display:flex; align-items:flex-start; gap:24px; padding-bottom:22px; border-bottom:1.6px dashed #b7c2d2; }
+  .bullet { display:flex; align-items:flex-start; gap:24px; padding-bottom:22px; border-bottom:1.6px dashed var(--axis-deck-steel-250); }
   .bullet:last-child { border-bottom:none; padding-bottom:0; }
   .bullet .star { flex:none; width:44px; height:44px; margin-top:2px; }
-  .bullet .txt { font-size:28px; line-height:1.36; color:#020061; font-weight:400; }
+  .bullet .txt { font-size:28px; line-height:1.36; color:var(--axis-ppt-indigo-950); font-weight:400; }
   .bullet .txt b { font-weight:600; }
 </style></head>
 <body>

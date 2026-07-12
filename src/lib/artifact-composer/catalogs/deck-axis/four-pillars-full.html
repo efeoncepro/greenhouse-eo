@@ -1,39 +1,40 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="deck-signature.css">
+    <link rel="stylesheet" href="deck-tokens.css">
+<link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Poppins:ital,wght@0,600;0,800;1,800&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
-    :root { --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33; --teal:#36c8bf; --violet:#33029c; --ink:#020061; --surface:#eef0f3; }
+    :root { --navy:var(--axis-deck-navy-860); --navy-2:var(--axis-ppt-blue-800); --navy-deep:var(--axis-deck-navy-920); --teal:var(--axis-deck-teal-500); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --surface:var(--axis-deck-surface-60); }
     .slide { position:relative; width:1920px; height:1080px; overflow:hidden; background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%); }
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%); }
     /* `fr`, NO `%`: los porcentajes de grid NO descuentan el gap (30%+35%+35% ya es el 100% del
        content-box, y los 2×46px de gap se SUMAN encima), así que la última columna terminaba 20px
        fuera del lienzo y `.slide{overflow:hidden}` amputaba el copy en silencio. `fr` reparte lo
        que queda DESPUÉS del gap; `minmax(0,…)` evita que el min-content vuelva a inflar el track. */
-    .hero { position:relative; z-index:1; height:498px; padding:66px 72px 68px; display:grid; grid-template-columns:minmax(0,30fr) minmax(0,35fr) minmax(0,35fr); gap:46px; color:#fff; }
-    .section-label { position:absolute; right:72px; top:62px; border:2px solid rgba(255,255,255,.82); border-radius:99px; padding:10px 22px; color:#fff; font-size:18px; font-weight:600; letter-spacing:.025em; }
+    .hero { position:relative; z-index:1; height:498px; padding:66px 72px 68px; display:grid; grid-template-columns:minmax(0,30fr) minmax(0,35fr) minmax(0,35fr); gap:46px; color:var(--axis-ppt-neutral-50); }
+    .section-label { position:absolute; right:72px; top:62px; border:2px solid rgba(var(--axis-ppt-neutral-50-rgb), .82); border-radius:99px; padding:10px 22px; color:var(--axis-ppt-neutral-50); font-size:18px; font-weight:600; letter-spacing:.025em; }
     .title { align-self:end; max-width:480px; font-family:'Poppins',sans-serif; font-size:59px; font-weight:800; letter-spacing:-.045em; line-height:1.05; }
     .title em { font-style:italic; color:var(--teal); }
-    .context { align-self:end; max-width:610px; padding-bottom:8px; display:flex; flex-direction:column; gap:28px; color:rgba(255,255,255,.86); font-size:24px; line-height:1.27; }
+    .context { align-self:end; max-width:610px; padding-bottom:8px; display:flex; flex-direction:column; gap:28px; color:rgba(var(--axis-ppt-neutral-50-rgb), .86); font-size:24px; line-height:1.27; }
     .context strong { font-weight:600; }
-    .thesis { align-self:end; max-width:550px; margin-left:auto; padding:4px 0 6px 28px; border-left:1px solid rgba(255,255,255,.74); font-family:'Poppins',sans-serif; font-size:30px; font-weight:600; letter-spacing:-.018em; line-height:1.13; }
+    .thesis { align-self:end; max-width:550px; margin-left:auto; padding:4px 0 6px 28px; border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .74); font-family:'Poppins',sans-serif; font-size:30px; font-weight:600; letter-spacing:-.018em; line-height:1.13; }
     .thesis em { font-style:italic; color:var(--teal); }
-    .pillars { position:absolute; z-index:2; bottom:0; left:0; width:100%; height:583px; display:grid; grid-template-columns:repeat(4,1fr); overflow:hidden; border-radius:52px 52px 0 0; background:rgba(247,248,250,.96); }
-    .pillar { min-width:0; padding:72px 62px 58px; border-right:1px solid rgba(2,0,97,.1); display:flex; flex-direction:column; }
+    .pillars { position:absolute; z-index:2; bottom:0; left:0; width:100%; height:583px; display:grid; grid-template-columns:repeat(4,1fr); overflow:hidden; border-radius:52px 52px 0 0; background:rgba(var(--axis-deck-surface-50-rgb), .96); }
+    .pillar { min-width:0; padding:72px 62px 58px; border-right:1px solid rgba(var(--axis-ppt-indigo-950-rgb), .1); display:flex; flex-direction:column; }
     .pillar:last-child { border-right:0; }
-    .pillar.ai { --tone-text:#007a5d; --tone-bg:rgba(34,184,135,.15); --tone-border:rgba(34,184,135,.30); }
-    .pillar.data { --tone-text:#007494; --tone-bg:rgba(39,155,183,.15); --tone-border:rgba(39,155,183,.30); }
-    .pillar.method { --tone-text:#3c08ac; --tone-bg:rgba(60,8,172,.13); --tone-border:rgba(60,8,172,.28); }
-    .pillar.human { --tone-text:#517b00; --tone-bg:rgba(112,189,0,.16); --tone-border:rgba(112,189,0,.32); }
-    .icon-stage { width:112px; height:112px; border:1px solid var(--tone-border); border-radius:18px; display:grid; place-items:center; background:linear-gradient(145deg, rgba(255,255,255,.42), var(--tone-bg)); box-shadow:inset 0 1px 0 rgba(255,255,255,.72), inset 0 -1px 0 rgba(2,0,97,.05); }
+    .pillar.ai { --tone-text:var(--axis-deck-jade-750); --tone-bg:rgba(var(--axis-deck-jade-550-rgb), .15); --tone-border:rgba(var(--axis-deck-jade-550-rgb), .30); }
+    .pillar.data { --tone-text:var(--axis-deck-cyan-700); --tone-bg:rgba(var(--axis-deck-cyan-550-rgb), .15); --tone-border:rgba(var(--axis-deck-cyan-550-rgb), .30); }
+    .pillar.method { --tone-text:var(--axis-deck-violet-650); --tone-bg:rgba(var(--axis-deck-violet-650-rgb), .13); --tone-border:rgba(var(--axis-deck-violet-650-rgb), .28); }
+    .pillar.human { --tone-text:var(--axis-deck-green-750); --tone-bg:rgba(var(--axis-deck-green-650-rgb), .16); --tone-border:rgba(var(--axis-deck-green-650-rgb), .32); }
+    .icon-stage { width:112px; height:112px; border:1px solid var(--tone-border); border-radius:18px; display:grid; place-items:center; background:linear-gradient(145deg, rgba(var(--axis-ppt-neutral-50-rgb), .42), var(--tone-bg)); box-shadow:inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .72), inset 0 -1px 0 rgba(var(--axis-ppt-indigo-950-rgb), .05); }
     .icon-stage img { width:72px; height:72px; object-fit:contain; filter:var(--icon-filter); }
     .ai { --icon-filter:invert(58%) sepia(45%) saturate(776%) hue-rotate(113deg) brightness(92%) contrast(86%); }
     .data { --icon-filter:invert(52%) sepia(43%) saturate(793%) hue-rotate(148deg) brightness(89%) contrast(84%); }

@@ -82,4 +82,22 @@ describe('brand pack axis — sincronía + igualdad token↔literal (0e)', () =>
   it('contrastRatio implementa WCAG (blanco/negro = 21)', () => {
     expect(contrastRatio('#ffffff', '#000000')).toBeCloseTo(21, 0)
   })
+
+  it('GUARD: ninguna plantilla contiene un literal de color — todo sale del brand pack', () => {
+    const files = fs
+      .readdirSync(deckAxisCatalogDir)
+      .filter(file => (file.endsWith('.html') && !file.startsWith('_')) || file === 'deck-signature.css')
+
+    const violations: string[] = []
+
+    for (const file of files) {
+      const source = fs.readFileSync(path.join(deckAxisCatalogDir, file), 'utf8')
+
+      for (const match of source.matchAll(/#[0-9a-fA-F]{3,8}\b|rgba?\(\s*\d+\s*,/g)) {
+        violations.push(`${file}: ${match[0]}`)
+      }
+    }
+
+    expect(violations, 'HEX/rgb de marca reintroducido — el color sale de deck-tokens.css').toEqual([])
+  })
 })

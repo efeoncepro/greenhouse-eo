@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   /* Cursivas REALES cargadas (Poppins ital 600) — nunca faux italic. Geist solo roman. */
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600&family=Geist:wght@400;600&display=swap');
@@ -10,13 +11,13 @@
   :root {
     --safe:72px;
     /* tokens Think / AXIS */
-    --navy:#00284d;            /* axis.accent[900] */
-    --navy-2:#023c70;          /* axis.accent[800] */
-    --navy-deep:#001a33;
-    --teal:#36c8bf;            /* teal[500] — LUZ sobre oscuro */
-    --ink:#020061;            /* navy de texto sobre claro (molde) */
-    --violet:#33029c;         /* acento sobre CLARO (pasa contraste) */
-    --panel-bg:#eef0f3;       /* fondo claro de la slide */
+    --navy:var(--axis-deck-navy-860);            /* axis.accent[900] */
+    --navy-2:var(--axis-ppt-blue-800);          /* axis.accent[800] */
+    --navy-deep:var(--axis-deck-navy-920);
+    --teal:var(--axis-deck-teal-500);            /* teal[500] — LUZ sobre oscuro */
+    --ink:var(--axis-ppt-indigo-950);            /* navy de texto sobre claro (molde) */
+    --violet:var(--axis-ppt-indigo-600);         /* acento sobre CLARO (pasa contraste) */
+    --panel-bg:var(--axis-deck-surface-60);       /* fondo claro de la slide */
   }
   .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
 
@@ -58,15 +59,15 @@
     position:relative; flex:1; height:1080px; overflow:hidden;
     border-top-left-radius:64px; border-bottom-left-radius:64px;
     background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
-    color:#fff;
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
+    color:var(--axis-ppt-neutral-50);
   }
   .brand-head { position:absolute; left:72px; top:72px; }
   .brand-eyebrow { font-weight:600; font-size:20px; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); }
-  .brand-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:40px; line-height:1.06; letter-spacing:-.01em; margin-top:8px; color:#fff; }
+  .brand-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:40px; line-height:1.06; letter-spacing:-.01em; margin-top:8px; color:var(--axis-ppt-neutral-50); }
 
   /* anillos concéntricos "surround" — centrados */
   .rings { position:absolute; left:50%; top:47%; transform:translate(-50%,-50%); width:580px; height:580px; }
@@ -78,8 +79,8 @@
   .legend { position:absolute; left:72px; bottom:72px; display:flex; flex-direction:column; gap:16px; }
   .leg { display:flex; align-items:baseline; gap:14px; }
   .leg .dot { width:14px; height:14px; border-radius:50%; flex:none; align-self:center; }
-  .leg .k { font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; letter-spacing:.02em; color:#fff; }
-  .leg .v { font-size:20px; color:rgba(255,255,255,.72); }
+  .leg .k { font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; letter-spacing:.02em; color:var(--axis-ppt-neutral-50); }
+  .leg .v { font-size:20px; color:rgba(var(--axis-ppt-neutral-50-rgb), .72); }
 </style></head>
 <body>
   <div class="slide" data-template="NarrativeSplit">
@@ -110,19 +111,19 @@
 
       <div class="rings">
         <svg viewBox="0 0 560 560" fill="none">
-          <circle cx="280" cy="280" r="266" stroke="#36c8bf" stroke-opacity=".30" stroke-width="2"/>
-          <circle cx="280" cy="280" r="188" stroke="#36c8bf" stroke-opacity=".55" stroke-width="2"/>
-          <circle cx="280" cy="280" r="110" stroke="#36c8bf" stroke-opacity=".90" stroke-width="2.5"/>
-          <circle cx="280" cy="280" r="30" fill="#36c8bf" fill-opacity=".14" stroke="#36c8bf" stroke-width="2"/>
-          <circle cx="280" cy="280" r="7" fill="#36c8bf"/>
+          <circle cx="280" cy="280" r="266" stroke-opacity=".30" stroke-width="2" style="stroke: var(--axis-deck-teal-500)"/>
+          <circle cx="280" cy="280" r="188" stroke-opacity=".55" stroke-width="2" style="stroke: var(--axis-deck-teal-500)"/>
+          <circle cx="280" cy="280" r="110" stroke-opacity=".90" stroke-width="2.5" style="stroke: var(--axis-deck-teal-500)"/>
+          <circle cx="280" cy="280" r="30" fill-opacity=".14" stroke-width="2" style="fill: var(--axis-deck-teal-500); stroke: var(--axis-deck-teal-500)"/>
+          <circle cx="280" cy="280" r="7" style="fill: var(--axis-deck-teal-500)"/>
         </svg>
       </div>
 
       <!-- la .dot NO es contenido: su tono sale del índice de la capa (resolver: legend-layer-tone) -->
       <div class="legend" data-slot="conceptLegend" data-slot-type="array" data-slot-required="true">
-        <div class="leg"><span class="dot" style="background:rgba(54,200,191,.30)"></span><span><span class="k" data-slot-field="layer">Search</span> &nbsp;<span class="v" data-slot-field="definition">— posicionamiento en buscadores</span></span></div>
-        <div class="leg"><span class="dot" style="background:rgba(54,200,191,.60)"></span><span><span class="k" data-slot-field="layer">Answer</span> &nbsp;<span class="v" data-slot-field="definition">— citabilidad en asistentes con IA</span></span></div>
-        <div class="leg"><span class="dot" style="background:#36c8bf"></span><span><span class="k" data-slot-field="layer">Entity</span> &nbsp;<span class="v" data-slot-field="definition">— autoridad de categoría</span></span></div>
+        <div class="leg"><span class="dot" style="background:rgba(var(--axis-deck-teal-500-rgb), .30)"></span><span><span class="k" data-slot-field="layer">Search</span> &nbsp;<span class="v" data-slot-field="definition">— posicionamiento en buscadores</span></span></div>
+        <div class="leg"><span class="dot" style="background:rgba(var(--axis-deck-teal-500-rgb), .60)"></span><span><span class="k" data-slot-field="layer">Answer</span> &nbsp;<span class="v" data-slot-field="definition">— citabilidad en asistentes con IA</span></span></div>
+        <div class="leg"><span class="dot" style="background:var(--axis-deck-teal-500)"></span><span><span class="k" data-slot-field="layer">Entity</span> &nbsp;<span class="v" data-slot-field="definition">— autoridad de categoría</span></span></div>
       </div>
       <img class="deck-url-bubble signature-NarrativeSplit" src="assets/url-lum.svg" alt="efeoncepro.com">
     </div>

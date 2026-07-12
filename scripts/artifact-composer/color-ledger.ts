@@ -201,19 +201,24 @@ const main = () => {
     process.exit(1)
   }
 
-  // Contrato de dos vías: medido ↔ ledger.
-  const measuredSet = new Set(measured.bases.keys())
-  const ledgerSet = new Set(Object.keys(ledger.bases))
-  const unledgered = [...measuredSet].filter(base => !ledgerSet.has(base)).sort()
-  const stale = [...ledgerSet].filter(base => !measuredSet.has(base)).sort()
+  // POST-MIGRACIÓN (Slice 3b-ii): las plantillas ya no contienen literales — TODO color sale de
+  // `deck-tokens.css`. Cualquier literal medido (esté o no en el ledger) es una REINTRODUCCIÓN de
+  // HEX de marca y falla, salvo en modo --write (el flujo legítimo para ampliar la paleta:
+  // agregar → --write → clasificar → tokenizar → volver a cero).
+  if (!write && measured.bases.size > 0) {
+    for (const [base, data] of [...measured.bases.entries()].sort()) {
+      console.error(`  ✗ literal de color reintroducido: ${base} en ${[...data.files].join(', ')}`)
+    }
 
-  for (const base of unledgered) console.error(`  ✗ base medida SIN entrada en el ledger: ${base}`)
-  for (const base of stale) console.error(`  ✗ base del ledger que YA NO existe en las plantillas: ${base}`)
-
-  if (unledgered.length > 0 || stale.length > 0) {
-    console.error('\n✗ El ledger no coincide con la medición. Actualizalo con --write y clasificá las altas.\n')
+    console.error(
+      '\n✗ Una plantilla reintrodujo un HEX/rgb de marca. El color sale del brand pack ' +
+        '(deck-tokens.css), nunca de un literal — es la costura que habilita el as-a-service.\n'
+    )
     process.exit(1)
   }
+
+  // El ledger sigue siendo el mapping token↔literal que consume el pack y el test 0e: una entrada
+  // que desaparezca del ledger rompería la compilación/0e, así que acá sólo validamos clasificación.
 
   const byClass = new Map<Classification, number>()
 

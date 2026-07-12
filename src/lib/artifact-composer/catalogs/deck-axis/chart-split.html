@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -8,9 +9,9 @@
 
   :root {
     --safe:72px;
-    --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33;
-    --teal:#36c8bf; --teal-deep:#2ab5ab; --violet:#6717cd;
-    --ink:#020061; --panel-bg:#eef0f3;
+    --navy:var(--axis-deck-navy-860); --navy-2:var(--axis-ppt-blue-800); --navy-deep:var(--axis-deck-navy-920);
+    --teal:var(--axis-deck-teal-500); --teal-deep:var(--axis-deck-teal-560); --violet:var(--axis-deck-violet-550);
+    --ink:var(--axis-ppt-indigo-950); --panel-bg:var(--axis-deck-surface-60);
   }
   .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
 
@@ -37,52 +38,52 @@
     padding:var(--safe) var(--safe);
     display:flex; flex-direction:column; justify-content:center;
     background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
-    color:#fff;
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
+    color:var(--axis-ppt-neutral-50);
   }
   .brand::before { content:''; position:absolute; inset:0; pointer-events:none; }
 
   /* glass card que aterriza el chart */
-  .card { position:relative; z-index:1; background:rgba(255,255,255,.055);
-    border:1px solid rgba(255,255,255,.14); border-radius:30px;
-    box-shadow:0 30px 70px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.14);
+  .card { position:relative; z-index:1; background:rgba(var(--axis-ppt-neutral-50-rgb), .055);
+    border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .14); border-radius:30px;
+    box-shadow:0 30px 70px rgba(var(--axis-ppt-neutral-1000-rgb), .28), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .14);
     padding:54px 58px; }
 
   .card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:40px; }
   .chart-eyebrow { font-weight:600; font-size:19px; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); }
-  .chart-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:38px; line-height:1.08; letter-spacing:-.012em; color:#fff; margin-top:8px; }
-  .chart-sub { font-size:20px; color:rgba(255,255,255,.62); margin-top:6px; }
+  .chart-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:38px; line-height:1.08; letter-spacing:-.012em; color:var(--axis-ppt-neutral-50); margin-top:8px; }
+  .chart-sub { font-size:20px; color:rgba(var(--axis-ppt-neutral-50-rgb), .62); margin-top:6px; }
   /* hero-insight: el multiplicador */
   .hero { flex:none; text-align:right; }
   .hero .num { font-family:'Geist',sans-serif; font-weight:600; font-size:80px; line-height:.86; color:var(--teal);
-    font-variant-numeric:tabular-nums; letter-spacing:-.02em; text-shadow:0 0 34px rgba(54,200,191,.4); }
-  .hero .lab { font-size:18px; line-height:1.28; color:rgba(255,255,255,.66); margin-top:10px; max-width:210px; margin-left:auto; }
+    font-variant-numeric:tabular-nums; letter-spacing:-.02em; text-shadow:0 0 34px rgba(var(--axis-deck-teal-500-rgb), .4); }
+  .hero .lab { font-size:18px; line-height:1.28; color:rgba(var(--axis-ppt-neutral-50-rgb), .66); margin-top:10px; max-width:210px; margin-left:auto; }
 
   .plot { position:relative; margin-top:50px; display:flex; flex-direction:column; gap:30px; }
-  .refline { position:absolute; left:88%; top:34px; bottom:40px; width:0; border-left:2px dashed rgba(255,255,255,.4); z-index:3; }
+  .refline { position:absolute; left:88%; top:34px; bottom:40px; width:0; border-left:2px dashed rgba(var(--axis-ppt-neutral-50-rgb), .4); z-index:3; }
   .row { position:relative; }
   .rlabel { display:flex; align-items:baseline; gap:16px; margin-bottom:11px; }
-  .rlabel .name { font-family:'Poppins',sans-serif; font-weight:600; font-size:23px; color:rgba(255,255,255,.82); }
-  .rlabel .val { font-family:'Geist',sans-serif; font-weight:600; font-size:26px; color:rgba(255,255,255,.82); font-variant-numeric:tabular-nums; }
-  .track { position:relative; height:46px; background:rgba(255,255,255,.05); border-radius:12px; }
+  .rlabel .name { font-family:'Poppins',sans-serif; font-weight:600; font-size:23px; color:rgba(var(--axis-ppt-neutral-50-rgb), .82); }
+  .rlabel .val { font-family:'Geist',sans-serif; font-weight:600; font-size:26px; color:rgba(var(--axis-ppt-neutral-50-rgb), .82); font-variant-numeric:tabular-nums; }
+  .track { position:relative; height:46px; background:rgba(var(--axis-ppt-neutral-50-rgb), .05); border-radius:12px; }
   .fill { height:100%; border-radius:12px; }
   /* barras del campo con matiz azul de marca (no gris) */
-  .fill.muted { background:linear-gradient(180deg, rgba(120,172,248,.62) 0%, rgba(58,116,214,.5) 100%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.2); }
+  .fill.muted { background:linear-gradient(180deg, rgba(var(--axis-deck-blue-300-rgb), .62) 0%, rgba(var(--axis-deck-blue-450-rgb), .5) 100%);
+    box-shadow:inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .2); }
 
   .row.sky .rlabel .name, .row.sky .rlabel .val { color:var(--teal); }
   .row.sky .rlabel .val { font-size:38px; }
-  .fill.sky { background:linear-gradient(180deg, #5fe0d6 0%, var(--teal-deep) 100%);
-    box-shadow:0 0 38px rgba(54,200,191,.5), inset 0 1px 0 rgba(255,255,255,.32); }
-  .gap { position:absolute; top:50%; height:0; border-top:2px dashed rgba(54,200,191,.72); transform:translateY(-50%); z-index:2; }
+  .fill.sky { background:linear-gradient(180deg, var(--axis-deck-teal-350) 0%, var(--teal-deep) 100%);
+    box-shadow:0 0 38px rgba(var(--axis-deck-teal-500-rgb), .5), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .32); }
+  .gap { position:absolute; top:50%; height:0; border-top:2px dashed rgba(var(--axis-deck-teal-500-rgb), .72); transform:translateY(-50%); z-index:2; }
   .gap .glabel { position:absolute; left:50%; top:-45px; transform:translateX(-50%); white-space:nowrap;
     font-family:'Poppins',sans-serif; font-weight:600; font-size:18px; color:var(--teal);
-    background:rgba(54,200,191,.14); border:1px solid rgba(54,200,191,.42); border-radius:999px; padding:6px 15px; }
+    background:rgba(var(--axis-deck-teal-500-rgb), .14); border:1px solid rgba(var(--axis-deck-teal-500-rgb), .42); border-radius:999px; padding:6px 15px; }
 
-  .foot { position:relative; z-index:1; margin-top:36px; font-size:16px; color:rgba(255,255,255,.5); }
+  .foot { position:relative; z-index:1; margin-top:36px; font-size:16px; color:rgba(var(--axis-ppt-neutral-50-rgb), .5); }
 </style></head>
 <body>
   <div class="slide" data-template="ChartSplit">

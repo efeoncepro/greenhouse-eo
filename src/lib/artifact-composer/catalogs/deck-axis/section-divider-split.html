@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -8,8 +9,8 @@
 
   :root {
     --safe:72px;
-    --navy:#00284d; --teal:#36c8bf; --violet:#33029c;
-    --ink:#020061; --panel-bg:#eef0f3;
+    --navy:var(--axis-deck-navy-860); --teal:var(--axis-deck-teal-500); --violet:var(--axis-ppt-indigo-600);
+    --ink:var(--axis-ppt-indigo-950); --panel-bg:var(--axis-deck-surface-60);
   }
   .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
 
@@ -18,18 +19,18 @@
     position:relative; width:1040px; flex:none; height:1080px; overflow:hidden;
     border-top-right-radius:64px; border-bottom-right-radius:64px;
     padding:var(--safe) 84px;
-    display:flex; flex-direction:column; justify-content:center; color:#fff;
+    display:flex; flex-direction:column; justify-content:center; color:var(--axis-ppt-neutral-50);
     background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(60% 60% at 0% 8%, rgba(42,194,184,.46) 0%, rgba(42,194,184,.14) 36%, transparent 64%),
-      radial-gradient(66% 60% at 4% 104%, rgba(103,23,205,.42) 0%, rgba(103,23,205,.12) 44%, transparent 74%),
-      linear-gradient(226deg, #00345f 0%, #00284d 44%, #001a33 100%);
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(60% 60% at 0% 8%, rgba(var(--axis-deck-teal-550-rgb), .46) 0%, rgba(var(--axis-deck-teal-550-rgb), .14) 36%, transparent 64%),
+      radial-gradient(66% 60% at 4% 104%, rgba(var(--axis-deck-violet-550-rgb), .42) 0%, rgba(var(--axis-deck-violet-550-rgb), .12) 44%, transparent 74%),
+      linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-860) 44%, var(--axis-deck-navy-920) 100%);
   }
   .kicker { font-family:'Geist',sans-serif; font-weight:600; font-size:22px; letter-spacing:.12em; text-transform:uppercase; color:var(--teal); }
   .signo { font-family:'Geist',sans-serif; font-weight:600; font-size:190px; line-height:.9; letter-spacing:-.03em;
-    color:var(--teal); font-variant-numeric:tabular-nums; margin:14px 0 6px; text-shadow:0 0 46px rgba(54,200,191,.4); }
-  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:78px; line-height:1.02; letter-spacing:-.02em; color:#fff; }
-  .lead { font-size:28px; line-height:1.4; color:rgba(255,255,255,.72); margin-top:24px; max-width:640px; }
+    color:var(--teal); font-variant-numeric:tabular-nums; margin:14px 0 6px; text-shadow:0 0 46px rgba(var(--axis-deck-teal-500-rgb), .4); }
+  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:78px; line-height:1.02; letter-spacing:-.02em; color:var(--axis-ppt-neutral-50); }
+  .lead { font-size:28px; line-height:1.4; color:rgba(var(--axis-ppt-neutral-50-rgb), .72); margin-top:24px; max-width:640px; }
 
   /* ===== RIGHT: mini-agenda sobre claro ===== */
   .agenda {
@@ -39,11 +40,11 @@
   .agenda .eyebrow { font-family:'Geist',sans-serif; font-weight:600; font-size:20px; letter-spacing:.10em;
     text-transform:uppercase; color:var(--violet); margin-bottom:6px; }
   .agenda ul { list-style:none; display:flex; flex-direction:column; gap:26px; }
-  .agenda li { display:flex; align-items:baseline; gap:22px; padding-bottom:26px; border-bottom:1.6px dashed #c4ccd8; }
+  .agenda li { display:flex; align-items:baseline; gap:22px; padding-bottom:26px; border-bottom:1.6px dashed var(--axis-deck-steel-200); }
   .agenda li:last-child { border-bottom:none; padding-bottom:0; }
   .agenda .n { font-family:'Geist',sans-serif; font-weight:600; font-size:24px; color:var(--violet); font-variant-numeric:tabular-nums; flex:none; }
   .agenda .k { font-family:'Poppins',sans-serif; font-weight:600; font-size:34px; line-height:1.1; color:var(--ink); }
-  .agenda .v { font-size:22px; color:rgba(2,0,97,.6); margin-top:6px; }
+  .agenda .v { font-size:22px; color:rgba(var(--axis-ppt-indigo-950-rgb), .6); margin-top:6px; }
 </style></head>
 <body>
   <div class="slide" data-template="SectionDividerSplit">

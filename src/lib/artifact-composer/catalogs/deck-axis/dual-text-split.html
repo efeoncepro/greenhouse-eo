@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="deck-signature.css">
+    <link rel="stylesheet" href="deck-tokens.css">
+<link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:wght@600&display=swap');
@@ -12,14 +13,14 @@
 
     :root {
       --safe:72px;
-      --surface:#eef0f3;
-      --ink:#020061;
-      --navy:#00284d;
-      --navy-2:#023c70;
-      --navy-deep:#001a33;
-      --teal:#36c8bf;
-      --violet:#33029c;
-      --lime:#6fbc00;
+      --surface:var(--axis-deck-surface-60);
+      --ink:var(--axis-ppt-indigo-950);
+      --navy:var(--axis-deck-navy-860);
+      --navy-2:var(--axis-ppt-blue-800);
+      --navy-deep:var(--axis-deck-navy-920);
+      --teal:var(--axis-deck-teal-500);
+      --violet:var(--axis-ppt-indigo-600);
+      --lime:var(--axis-deck-green-660);
     }
 
     .slide { width:1920px; height:1080px; display:flex; background:var(--surface); }
@@ -28,25 +29,25 @@
     .thesis-rule { width:4px; flex:none; border-radius:2px; background:linear-gradient(180deg, var(--lime), var(--teal)); }
     .thesis h1 { font-family:'Poppins',sans-serif; font-size:58px; font-weight:600; letter-spacing:-.022em; line-height:1.04; }
     .concept { margin:106px 0 0 56px; max-width:680px; }
-    .concept-label { display:flex; align-items:center; gap:20px; color:#5aa500; font-family:'Poppins',sans-serif; font-size:29px; font-weight:600; }
+    .concept-label { display:flex; align-items:center; gap:20px; color:var(--axis-deck-green-700); font-family:'Poppins',sans-serif; font-size:29px; font-weight:600; }
     .concept-icon { width:54px; height:54px; border:2px solid currentColor; border-radius:50%; display:grid; place-items:center; font-size:30px; line-height:1; }
     .concept h2 { margin-top:50px; font-family:'Poppins',sans-serif; font-size:37px; font-weight:600; letter-spacing:-.015em; line-height:1.1; }
     .concept-body { margin-top:18px; display:flex; flex-direction:column; gap:28px; font-size:29px; line-height:1.32; }
     .concept-body strong { font-weight:600; }
 
-    .proposal { position:relative; width:1004px; height:1080px; overflow:hidden; border-radius:64px 0 0 64px; color:#fff; padding:var(--safe) 76px; background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%); }
-    .proposal::before { content:''; position:absolute; inset:0; opacity:.10; pointer-events:none; background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .75px); background-size:4px 4px; }
+    .proposal { position:relative; width:1004px; height:1080px; overflow:hidden; border-radius:64px 0 0 64px; color:var(--axis-ppt-neutral-50); padding:var(--safe) 76px; background:
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%); }
+    .proposal::before { content:''; position:absolute; inset:0; opacity:.10; pointer-events:none; background-image:radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .9) .55px, transparent .75px); background-size:4px 4px; }
     .proposal-inner { position:relative; z-index:1; margin:194px 0 0 56px; max-width:720px; }
     .proposal-label { display:flex; align-items:center; gap:20px; font-family:'Poppins',sans-serif; font-size:29px; font-weight:600; }
-    .proposal-icon { width:54px; height:54px; border-radius:50%; display:grid; place-items:center; background:#fff; color:#1477ec; font-size:29px; line-height:1; }
+    .proposal-icon { width:54px; height:54px; border-radius:50%; display:grid; place-items:center; background:var(--axis-ppt-neutral-50); color:var(--axis-deck-blue-510); font-size:29px; line-height:1; }
     .proposal h2 { margin-top:48px; max-width:670px; font-family:'Poppins',sans-serif; font-size:44px; font-weight:600; letter-spacing:-.018em; line-height:1.08; }
     .proposal-body { margin-top:24px; max-width:710px; display:flex; flex-direction:column; gap:30px; font-size:29px; line-height:1.32; }
     .proposal-body strong { font-weight:600; }
-    .outcome { position:absolute; z-index:1; left:132px; right:76px; bottom:80px; display:flex; gap:20px; align-items:flex-start; padding-top:24px; border-top:1px solid rgba(255,255,255,.48); font-size:25px; line-height:1.25; }
+    .outcome { position:absolute; z-index:1; left:132px; right:76px; bottom:80px; display:flex; gap:20px; align-items:flex-start; padding-top:24px; border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .48); font-size:25px; line-height:1.25; }
     .outcome-label { flex:none; color:var(--teal); font-size:17px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
     .outcome strong { font-weight:600; }
   </style>

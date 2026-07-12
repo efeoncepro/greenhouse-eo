@@ -1,20 +1,21 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="deck-signature.css">
+    <link rel="stylesheet" href="deck-tokens.css">
+<link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@500;600&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
-    :root { --lum:#c5e7ff; --lum-muted:#85c5ed; --deep:#002247; }
+    :root { --lum:var(--axis-deck-recipe-backcover-100); --lum-muted:var(--axis-deck-recipe-backcover-300); --deep:var(--axis-deck-navy-880); }
     .slide { position:relative; isolation:isolate; width:1920px; height:1080px; overflow:hidden; background:
-      radial-gradient(42% 56% at 86% 11%, rgba(255,255,255,.9) 0%, rgba(164,234,255,.52) 18%, rgba(20,176,242,.38) 40%, transparent 70%),
-      radial-gradient(55% 65% at 48% 103%, rgba(0,99,221,.76) 0%, rgba(0,99,221,.18) 42%, transparent 74%),
-      radial-gradient(46% 55% at 5% 73%, rgba(0,145,232,.33) 0%, transparent 70%),
-      linear-gradient(126deg, #00224a 0%, #001a3d 52%, #004e9f 100%); }
-    .slide::after { content:''; position:absolute; inset:0; z-index:-1; opacity:.16; background-image:radial-gradient(rgba(255,255,255,.72) .65px, transparent .85px); background-size:4px 4px; }
+      radial-gradient(42% 56% at 86% 11%, rgba(var(--axis-ppt-neutral-50-rgb), .9) 0%, rgba(var(--axis-deck-recipe-backcover-200-rgb), .52) 18%, rgba(var(--axis-deck-recipe-backcover-400-rgb), .38) 40%, transparent 70%),
+      radial-gradient(55% 65% at 48% 103%, rgba(var(--axis-deck-recipe-backcover-600-rgb), .76) 0%, rgba(var(--axis-deck-recipe-backcover-600-rgb), .18) 42%, transparent 74%),
+      radial-gradient(46% 55% at 5% 73%, rgba(var(--axis-deck-recipe-backcover-500-rgb), .33) 0%, transparent 70%),
+      linear-gradient(126deg, var(--axis-deck-recipe-backcover-800) 0%, var(--axis-deck-recipe-backcover-900) 52%, var(--axis-deck-recipe-backcover-700) 100%); }
+    .slide::after { content:''; position:absolute; inset:0; z-index:-1; opacity:.16; background-image:radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .72) .65px, transparent .85px); background-size:4px 4px; }
     .lum { mix-blend-mode:luminosity; }
     .stack { position:absolute; left:0; right:0; bottom:68px; display:flex; flex-direction:column; align-items:center; }
     .brand { width:520px; height:150px; object-fit:contain; }

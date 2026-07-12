@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="deck-signature.css">
+    <link rel="stylesheet" href="deck-tokens.css">
+<link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Geist:wght@400;600&display=swap');
@@ -12,13 +13,13 @@
 
     :root {
       --safe:72px;
-      --navy:#00284d;
-      --navy-2:#023c70;
-      --navy-deep:#001a33;
-      --teal:#36c8bf;
-      --ink:#020061;
-      --surface:#eef0f3;
-      --violet:#33029c;
+      --navy:var(--axis-deck-navy-860);
+      --navy-2:var(--axis-ppt-blue-800);
+      --navy-deep:var(--axis-deck-navy-920);
+      --teal:var(--axis-deck-teal-500);
+      --ink:var(--axis-ppt-indigo-950);
+      --surface:var(--axis-deck-surface-60);
+      --violet:var(--axis-ppt-indigo-600);
     }
 
     .slide { width:1920px; height:1080px; display:flex; background:var(--surface); }
@@ -29,22 +30,22 @@
     .contrast h1 { margin:58px auto 0; max-width:720px; font-family:'Poppins', sans-serif; font-size:58px; font-weight:600; line-height:1.06; letter-spacing:-.018em; text-align:center; }
     .proposal {
       position:relative; overflow:hidden; border-top-left-radius:64px; border-bottom-left-radius:64px;
-      color:#fff; padding-left:76px;
+      color:var(--axis-ppt-neutral-50); padding-left:76px;
       background:
-        radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-        radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-        radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-        linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
+        radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+        radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+        radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+        linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
     }
-    .proposal::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.18; background-image:radial-gradient(rgba(255,255,255,.75) .6px, transparent .7px); background-size:5px 5px; }
+    .proposal::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.18; background-image:radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .75) .6px, transparent .7px); background-size:5px 5px; }
     .proposal-head { position:relative; z-index:1; margin-top:58px; }
     .proposal-logo { display:block; width:354px; height:92px; object-fit:contain; object-position:left center; }
     .proposal-title { max-width:630px; margin-top:34px; font-family:'Poppins', sans-serif; font-size:44px; font-weight:600; line-height:1.08; letter-spacing:-.015em; }
 
     .rows { flex:1; display:flex; flex-direction:column; justify-content:center; margin-top:46px; }
     .row { min-height:128px; display:grid; align-items:center; border-bottom:1.5px solid currentColor; }
-    .contrast .row { grid-template-columns:112px 1fr; border-color:rgba(2,0,97,.54); }
-    .proposal .row { position:relative; z-index:1; grid-template-columns:1fr 84px; border-color:rgba(255,255,255,.48); }
+    .contrast .row { grid-template-columns:112px 1fr; border-color:rgba(var(--axis-ppt-indigo-950-rgb), .54); }
+    .proposal .row { position:relative; z-index:1; grid-template-columns:1fr 84px; border-color:rgba(var(--axis-ppt-neutral-50-rgb), .48); }
     .row:last-child { border-bottom:0; }
     .row-copy { font-size:23px; line-height:1.28; font-weight:400; }
     .contrast .row-copy { max-width:650px; text-align:right; }
@@ -52,8 +53,8 @@
     .row-lead { display:block; margin-bottom:6px; font-size:28px; font-weight:600; line-height:1.12; }
     .row-body { display:block; }
     .contrast-icon, .proposal-icon { width:54px; height:54px; border-radius:50%; display:grid; place-items:center; font-family:'Poppins',sans-serif; font-weight:600; font-size:34px; line-height:1; }
-    .contrast-icon { border:2px solid rgba(2,0,97,.62); color:var(--ink); font-size:30px; }
-    .proposal-icon { justify-self:end; background:#fff; color:var(--ink); font-size:35px; }
+    .contrast-icon { border:2px solid rgba(var(--axis-ppt-indigo-950-rgb), .62); color:var(--ink); font-size:30px; }
+    .proposal-icon { justify-self:end; background:var(--axis-ppt-neutral-50); color:var(--ink); font-size:35px; }
   </style>
 </head>
 <body>

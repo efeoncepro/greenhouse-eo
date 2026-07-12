@@ -1,18 +1,19 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="deck-signature.css">
+    <link rel="stylesheet" href="deck-tokens.css">
+<link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Poppins:ital,wght@0,600;0,800;1,800&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
-    :root { --ink:#020061; --muted:#4f5871; --teal:#36c8bf; --blue:#3273d4; --violet:#33029c; }
+    :root { --ink:var(--axis-ppt-indigo-950); --muted:var(--axis-deck-steel-600); --teal:var(--axis-deck-teal-500); --blue:var(--axis-deck-blue-500); --violet:var(--axis-ppt-indigo-600); }
     .slide { position:relative; width:1920px; height:1080px; overflow:hidden; background:
-      radial-gradient(64% 52% at 96% 100%, rgba(54,200,191,.22) 0%, transparent 46%),
-      radial-gradient(130% 100% at 70% -10%, #023c70 0%, #00284d 52%, #001a33 100%); }
-    .wave-frame { position:absolute; inset:56px; border-radius:22px; background:rgba(238,240,243,.82); backdrop-filter:blur(20px) saturate(1.08); }
+      radial-gradient(64% 52% at 96% 100%, rgba(var(--axis-deck-teal-500-rgb), .22) 0%, transparent 46%),
+      radial-gradient(130% 100% at 70% -10%, var(--axis-ppt-blue-800) 0%, var(--axis-deck-navy-860) 52%, var(--axis-deck-navy-920) 100%); }
+    .wave-frame { position:absolute; inset:56px; border-radius:22px; background:rgba(var(--axis-deck-surface-60-rgb), .82); backdrop-filter:blur(20px) saturate(1.08); }
     .content { position:relative; z-index:1; width:100%; height:100%; padding:154px 228px 146px; display:flex; flex-direction:column; justify-content:center; }
     .eyebrow { color:var(--blue); font-size:19px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
     .statement { margin-top:24px; max-width:1280px; color:var(--ink); font-family:'Poppins',sans-serif; font-size:76px; font-weight:600; letter-spacing:-.045em; line-height:1.05; }

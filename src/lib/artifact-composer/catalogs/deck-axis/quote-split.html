@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600;1,700&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -8,9 +9,9 @@
 
   :root {
     --safe:72px;
-    --axis-navy-soft:#023c70; --axis-navy:#00284d; --axis-navy-deep:#001a33;
-    --axis-teal:#2c98b0; --teal-bright:#36c8bf; --axis-violet:#33029c;
-    --ink:#020061; --panel-bg:#eef0f3;
+    --axis-navy-soft:var(--axis-ppt-blue-800); --axis-navy:var(--axis-deck-navy-860); --axis-navy-deep:var(--axis-deck-navy-920);
+    --axis-teal:var(--axis-ppt-teal-600); --teal-bright:var(--axis-deck-teal-500); --axis-violet:var(--axis-ppt-indigo-600);
+    --ink:var(--axis-ppt-indigo-950); --panel-bg:var(--axis-deck-surface-60);
   }
   .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
 
@@ -28,7 +29,7 @@
   .aside .eyebrow { font-family:'Geist',sans-serif; font-weight:600; font-size:20px; letter-spacing:.10em;
     text-transform:uppercase; color:var(--ink); opacity:.55; margin-bottom:12px; }
   .aside .who { font-family:'Poppins',sans-serif; font-weight:600; font-size:32px; line-height:1.12; color:var(--ink); }
-  .aside .sub { font-size:22px; line-height:1.4; color:rgba(2,0,97,.6); margin-top:8px; }
+  .aside .sub { font-size:22px; line-height:1.4; color:rgba(var(--axis-ppt-indigo-950-rgb), .6); margin-top:8px; }
 
   /* ===== RIGHT: panel de marca — statement ===== */
   .brand {
@@ -37,14 +38,14 @@
     padding:var(--safe) 96px var(--safe) 84px;
     display:flex; flex-direction:column; justify-content:center;
     background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
-    color:#fff;
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
+    color:var(--axis-ppt-neutral-50);
   }
   .statement { font-family:'Poppins',sans-serif; font-weight:600; font-size:52px; line-height:1.24;
-    letter-spacing:-.015em; color:#fff; max-width:920px; }
+    letter-spacing:-.015em; color:var(--axis-ppt-neutral-50); max-width:920px; }
   .statement em { font-style:italic; color:var(--teal-bright); }
   .statement .wm { height:40px; vertical-align:-1px; margin:0 8px 0 5px; }
 </style></head>

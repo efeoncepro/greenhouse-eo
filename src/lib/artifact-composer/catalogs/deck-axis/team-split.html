@@ -1,53 +1,54 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { width:1920px; height:1080px; }
   body { font-family:'Geist',sans-serif; overflow:hidden; }
 
-  :root { --safe:72px; --teal:#36c8bf; --teal-deep:#0b6b64; --violet:#33029c; --ink:#020061; --panel-bg:#eef0f3; }
+  :root { --safe:72px; --teal:var(--axis-deck-teal-500); --teal-deep:var(--axis-deck-teal-750); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --panel-bg:var(--axis-deck-surface-60); }
   .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
 
   /* ===== LEFT: panel de marca — intro del squad ===== */
   .brand {
     position:relative; width:812px; flex:none; height:1080px; overflow:hidden;
     border-top-right-radius:64px; border-bottom-right-radius:64px;
-    padding:var(--safe) 70px; display:flex; flex-direction:column; justify-content:center; gap:30px; color:#fff;
+    padding:var(--safe) 70px; display:flex; flex-direction:column; justify-content:center; gap:30px; color:var(--axis-ppt-neutral-50);
     background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(60% 60% at 0% 8%, rgba(42,194,184,.46) 0%, rgba(42,194,184,.14) 36%, transparent 64%),
-      radial-gradient(66% 60% at 4% 104%, rgba(103,23,205,.42) 0%, rgba(103,23,205,.12) 44%, transparent 74%),
-      linear-gradient(226deg, #00345f 0%, #00284d 44%, #001a33 100%);
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(60% 60% at 0% 8%, rgba(var(--axis-deck-teal-550-rgb), .46) 0%, rgba(var(--axis-deck-teal-550-rgb), .14) 36%, transparent 64%),
+      radial-gradient(66% 60% at 4% 104%, rgba(var(--axis-deck-violet-550-rgb), .42) 0%, rgba(var(--axis-deck-violet-550-rgb), .12) 44%, transparent 74%),
+      linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-860) 44%, var(--axis-deck-navy-920) 100%);
   }
   .eyebrow { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--teal); margin-bottom:16px; }
-  .headline { font-family:'Poppins',sans-serif; font-weight:600; font-size:50px; line-height:1.08; letter-spacing:-.018em; color:#fff; }
+  .headline { font-family:'Poppins',sans-serif; font-weight:600; font-size:50px; line-height:1.08; letter-spacing:-.018em; color:var(--axis-ppt-neutral-50); }
   .headline em { font-style:italic; color:var(--teal); }
-  .lead { font-size:24px; line-height:1.45; color:rgba(255,255,255,.82); max-width:600px; }
-  .hl { margin-top:8px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:26px 30px; max-width:620px; }
-  .hl p { font-family:'Poppins',sans-serif; font-weight:600; font-size:24px; line-height:1.3; color:#fff; }
+  .lead { font-size:24px; line-height:1.45; color:rgba(var(--axis-ppt-neutral-50-rgb), .82); max-width:600px; }
+  .hl { margin-top:8px; background:rgba(var(--axis-ppt-neutral-50-rgb), .08); border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .16); border-radius:20px; padding:26px 30px; max-width:620px; }
+  .hl p { font-family:'Poppins',sans-serif; font-weight:600; font-size:24px; line-height:1.3; color:var(--axis-ppt-neutral-50); }
   .hl em { font-style:italic; color:var(--teal); }
 
   /* ===== RIGHT: roster de tarjetas (bloque cohesivo, centrado) ===== */
   .roster { flex:1; height:1080px; padding:var(--safe) 76px; display:flex; flex-direction:column; justify-content:center; }
   .rhead { display:flex; align-items:baseline; gap:16px; margin-bottom:28px; }
   .rhead .k { font-family:'Geist',sans-serif; font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--violet); opacity:.8; }
-  .rhead .s { font-size:18px; color:#7684a6; }
+  .rhead .s { font-size:18px; color:var(--axis-deck-steel-450); }
   .members { display:flex; flex-direction:column; gap:20px; }
-  .member { background:#fff; border:1px solid rgba(2,0,97,.06); border-radius:18px;
-    box-shadow:0 12px 28px rgba(0,20,60,.08); display:flex; align-items:center; gap:24px; padding:28px 30px; }
+  .member { background:var(--axis-ppt-neutral-50); border:1px solid rgba(var(--axis-ppt-indigo-950-rgb), .06); border-radius:18px;
+    box-shadow:0 12px 28px rgba(var(--axis-deck-navy-900-rgb), .08); display:flex; align-items:center; gap:24px; padding:28px 30px; }
   .av { width:60px; height:60px; flex:none; border-radius:50%;
-    background:linear-gradient(150deg, #159e93 0%, var(--teal-deep) 100%);
-    box-shadow:0 8px 18px rgba(11,107,100,.32), inset 0 1px 0 rgba(255,255,255,.3);
-    display:grid; place-items:center; color:#fff; }
+    background:linear-gradient(150deg, var(--axis-deck-teal-660) 0%, var(--teal-deep) 100%);
+    box-shadow:0 8px 18px rgba(var(--axis-deck-teal-750-rgb), .32), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .3);
+    display:grid; place-items:center; color:var(--axis-ppt-neutral-50); }
   .av svg { width:31px; height:31px; display:block; }
   /* jerarquía: ROL domina · descripción segunda · dedicación = dato tabular (columna derecha) */
   .m { flex:1; }
   .role { font-family:'Poppins',sans-serif; font-weight:600; font-size:25px; line-height:1.05; letter-spacing:-.01em; color:var(--ink); }
-  .rdesc { font-size:15px; line-height:1.3; color:#5c6a8c; margin-top:5px; }
+  .rdesc { font-size:15px; line-height:1.3; color:var(--axis-deck-steel-550); margin-top:5px; }
   .ded { flex:none; text-align:right; min-width:96px; }
   .ded .pct { font-family:'Geist',sans-serif; font-weight:600; font-size:28px; line-height:1; color:var(--violet); font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
-  .ded .lbl { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#8390ad; margin-top:5px; }
+  .ded .lbl { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--axis-deck-steel-400); margin-top:5px; }
 </style></head>
 <body>
   <div class="slide" data-template="TeamSplit">

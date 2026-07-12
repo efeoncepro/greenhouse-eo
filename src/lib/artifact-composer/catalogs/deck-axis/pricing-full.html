@@ -1,46 +1,47 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="deck-signature.css">
+    <link rel="stylesheet" href="deck-tokens.css">
+<link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Poppins:ital,wght@0,600;0,800;1,800&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
-    :root { --ink:#020061; --teal:#2c98b0; --lime:#6ec207; --rich:#001a33; --glass:rgba(245,248,251,.14); }
-    .slide { position:relative; isolation:isolate; width:1920px; height:1080px; overflow:hidden; color:#fff; background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%); }
+    :root { --ink:var(--axis-ppt-indigo-950); --teal:var(--axis-ppt-teal-600); --lime:var(--axis-ppt-green-100); --rich:var(--axis-deck-navy-920); --glass:rgba(var(--axis-deck-ice-50-rgb), .14); }
+    .slide { position:relative; isolation:isolate; width:1920px; height:1080px; overflow:hidden; color:var(--axis-ppt-neutral-50); background:
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%); }
     .header { position:absolute; top:108px; left:132px; right:132px; display:grid; grid-template-columns:1.02fr .98fr; gap:84px; align-items:end; }
-    .eyebrow { margin-bottom:18px; color:#7ce4dc; font-size:18px; font-weight:700; letter-spacing:.13em; line-height:1; text-transform:uppercase; }
+    .eyebrow { margin-bottom:18px; color:var(--axis-deck-teal-300); font-size:18px; font-weight:700; letter-spacing:.13em; line-height:1; text-transform:uppercase; }
     .title { max-width:780px; font-family:'Poppins',sans-serif; font-size:61px; font-weight:800; letter-spacing:-.052em; line-height:1.02; }
-    .title em { color:#9cf1ea; font-style:italic; }
-    .summary { align-self:end; padding:0 0 4px 42px; border-left:1px solid rgba(255,255,255,.38); }
-    .summary-label { margin-bottom:14px; color:rgba(255,255,255,.68); font-size:17px; font-weight:600; letter-spacing:.11em; line-height:1; text-transform:uppercase; }
-    .summary-amount { color:#fff; font-family:'Poppins',sans-serif; font-size:76px; font-weight:800; letter-spacing:-.072em; line-height:.94; white-space:nowrap; }
-    .summary-period { margin-top:15px; color:#9cf1ea; font-size:23px; font-weight:600; line-height:1.15; }
-    .summary-note { margin-top:9px; color:rgba(255,255,255,.62); font-size:16px; line-height:1.2; }
-    .ledger { position:absolute; top:500px; left:132px; right:132px; bottom:132px; overflow:hidden; display:grid; grid-template-columns:minmax(0,1fr) 426px; border:1px solid rgba(255,255,255,.29); border-radius:30px; background:var(--glass); box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 20px 55px rgba(0,18,50,.16); backdrop-filter:blur(18px) saturate(1.08); }
+    .title em { color:var(--axis-deck-teal-200); font-style:italic; }
+    .summary { align-self:end; padding:0 0 4px 42px; border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .38); }
+    .summary-label { margin-bottom:14px; color:rgba(var(--axis-ppt-neutral-50-rgb), .68); font-size:17px; font-weight:600; letter-spacing:.11em; line-height:1; text-transform:uppercase; }
+    .summary-amount { color:var(--axis-ppt-neutral-50); font-family:'Poppins',sans-serif; font-size:76px; font-weight:800; letter-spacing:-.072em; line-height:.94; white-space:nowrap; }
+    .summary-period { margin-top:15px; color:var(--axis-deck-teal-200); font-size:23px; font-weight:600; line-height:1.15; }
+    .summary-note { margin-top:9px; color:rgba(var(--axis-ppt-neutral-50-rgb), .62); font-size:16px; line-height:1.2; }
+    .ledger { position:absolute; top:500px; left:132px; right:132px; bottom:132px; overflow:hidden; display:grid; grid-template-columns:minmax(0,1fr) 426px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .29); border-radius:30px; background:var(--glass); box-shadow:inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .2), 0 20px 55px rgba(var(--axis-deck-navy-930-rgb), .16); backdrop-filter:blur(18px) saturate(1.08); }
     .items { min-width:0; padding:40px 48px 36px; }
-    .ledger-label { color:#9cf1ea; font-size:15px; font-weight:700; letter-spacing:.14em; line-height:1; text-transform:uppercase; }
-    .column-head { display:grid; grid-template-columns:minmax(0,1fr) 200px; gap:34px; margin-top:28px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,.20); color:rgba(255,255,255,.54); font-size:14px; font-weight:600; letter-spacing:.09em; line-height:1; text-transform:uppercase; }
+    .ledger-label { color:var(--axis-deck-teal-200); font-size:15px; font-weight:700; letter-spacing:.14em; line-height:1; text-transform:uppercase; }
+    .column-head { display:grid; grid-template-columns:minmax(0,1fr) 200px; gap:34px; margin-top:28px; padding-bottom:14px; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .20); color:rgba(var(--axis-ppt-neutral-50-rgb), .54); font-size:14px; font-weight:600; letter-spacing:.09em; line-height:1; text-transform:uppercase; }
     .column-head span:last-child { text-align:right; }
     .item-list { height:calc(100% - 86px); display:flex; flex-direction:column; }
-    .item { position:relative; flex:1 1 0; min-height:64px; display:grid; grid-template-columns:minmax(0,1fr) 200px; gap:34px; align-items:center; border-bottom:1px solid rgba(255,255,255,.16); }
-    .item.is-proposed { margin:0 -18px; padding:0 18px; background:linear-gradient(90deg, rgba(110,194,7,.18), rgba(110,194,7,.03)); border-bottom-color:rgba(156,241,234,.28); box-shadow:inset 4px 0 0 var(--lime); }
+    .item { position:relative; flex:1 1 0; min-height:64px; display:grid; grid-template-columns:minmax(0,1fr) 200px; gap:34px; align-items:center; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .16); }
+    .item.is-proposed { margin:0 -18px; padding:0 18px; background:linear-gradient(90deg, rgba(var(--axis-ppt-green-100-rgb), .18), rgba(var(--axis-ppt-green-100-rgb), .03)); border-bottom-color:rgba(var(--axis-deck-teal-200-rgb), .28); box-shadow:inset 4px 0 0 var(--lime); }
     .item:last-child { border-bottom:0; }
     .item-name { font-family:'Poppins',sans-serif; font-size:27px; font-weight:600; letter-spacing:-.026em; line-height:1.06; }
-    .item-badge { display:inline-block; margin-left:11px; padding:4px 7px 3px; transform:translateY(-3px); border:1px solid rgba(156,241,234,.52); border-radius:999px; color:#b9f8f2; font-size:11px; font-weight:700; letter-spacing:.1em; line-height:1; text-transform:uppercase; vertical-align:middle; }
-    .item-detail { margin-top:7px; color:rgba(255,255,255,.62); font-size:16px; line-height:1.25; }
+    .item-badge { display:inline-block; margin-left:11px; padding:4px 7px 3px; transform:translateY(-3px); border:1px solid rgba(var(--axis-deck-teal-200-rgb), .52); border-radius:999px; color:var(--axis-deck-teal-150); font-size:11px; font-weight:700; letter-spacing:.1em; line-height:1; text-transform:uppercase; vertical-align:middle; }
+    .item-detail { margin-top:7px; color:rgba(var(--axis-ppt-neutral-50-rgb), .62); font-size:16px; line-height:1.25; }
     .item-amount { text-align:right; font-family:'Poppins',sans-serif; font-size:28px; font-weight:600; letter-spacing:-.04em; line-height:1; white-space:nowrap; }
-    .terms { padding:40px 42px 36px; border-left:1px solid rgba(255,255,255,.25); background:rgba(0,26,51,.13); }
+    .terms { padding:40px 42px 36px; border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .25); background:rgba(var(--axis-deck-navy-920-rgb), .13); }
     .term-list { height:calc(100% - 29px); display:flex; flex-direction:column; margin-top:29px; }
-    .term { flex:1 1 0; min-height:65px; display:flex; flex-direction:column; justify-content:center; border-bottom:1px solid rgba(255,255,255,.16); }
+    .term { flex:1 1 0; min-height:65px; display:flex; flex-direction:column; justify-content:center; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .16); }
     .term:last-child { border-bottom:0; }
-    .term-label { margin-bottom:8px; color:rgba(255,255,255,.57); font-size:13px; font-weight:700; letter-spacing:.12em; line-height:1; text-transform:uppercase; }
+    .term-label { margin-bottom:8px; color:rgba(var(--axis-ppt-neutral-50-rgb), .57); font-size:13px; font-weight:700; letter-spacing:.12em; line-height:1; text-transform:uppercase; }
     .term-value { font-size:20px; font-weight:600; letter-spacing:-.015em; line-height:1.2; }
   </style>
 </head>

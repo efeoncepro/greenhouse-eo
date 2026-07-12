@@ -1,12 +1,13 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { width:1920px; height:1080px; }
   body { font-family:'Geist',sans-serif; overflow:hidden; }
 
-  :root { --safe:72px; --teal:#36c8bf; --teal-deep:#2ab5ab; --violet:#33029c; --ink:#020061; --panel-bg:#eef0f3; }
+  :root { --safe:72px; --teal:var(--axis-deck-teal-500); --teal-deep:var(--axis-deck-teal-560); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --panel-bg:var(--axis-deck-surface-60); }
   .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
 
   /* ===== LEFT: la historia (claro) ===== */
@@ -27,41 +28,41 @@
   .result {
     position:relative; flex:1; height:1080px; overflow:hidden;
     border-top-left-radius:64px; border-bottom-left-radius:64px;
-    padding:var(--safe) 84px; display:flex; flex-direction:column; justify-content:center; gap:0; color:#fff;
+    padding:var(--safe) 84px; display:flex; flex-direction:column; justify-content:center; gap:0; color:var(--axis-ppt-neutral-50);
     background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%);
   }
   .result .ov { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--teal); }
   /* hero */
   .hero { display:flex; align-items:baseline; margin-top:16px; }
   .hero .num { font-family:'Geist',sans-serif; font-weight:600; font-size:132px; line-height:.82; color:var(--teal);
-    font-variant-numeric:tabular-nums; letter-spacing:-.03em; text-shadow:0 0 50px rgba(54,200,191,.45); }
-  .hero .lab { font-size:26px; line-height:1.22; color:rgba(255,255,255,.86); max-width:280px; margin-left:22px; }
+    font-variant-numeric:tabular-nums; letter-spacing:-.03em; text-shadow:0 0 50px rgba(var(--axis-deck-teal-500-rgb), .45); }
+  .hero .lab { font-size:26px; line-height:1.22; color:rgba(var(--axis-ppt-neutral-50-rgb), .86); max-width:280px; margin-left:22px; }
 
   /* before → after (barras — visualiza el salto que ES el ×3,2) */
   .ba { display:flex; align-items:flex-end; gap:44px; margin-top:46px; height:270px; }
   .barcol { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
   .barcol .bnum { font-family:'Geist',sans-serif; font-weight:600; font-size:30px; font-variant-numeric:tabular-nums; margin-bottom:12px; }
   .barcol .bar { width:96px; border-radius:14px 14px 4px 4px; }
-  .barcol .bcap { font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.55); margin-top:14px; }
-  .before .bnum { color:rgba(255,255,255,.6); }
-  .before .bar { height:74px; background:rgba(255,255,255,.24); }
-  .after .bnum { color:#fff; }
-  .after .bar { height:234px; background:linear-gradient(180deg, #5fe0d6 0%, var(--teal-deep) 100%);
-    box-shadow:0 0 40px rgba(54,200,191,.5), inset 0 1px 0 rgba(255,255,255,.3); }
+  .barcol .bcap { font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:rgba(var(--axis-ppt-neutral-50-rgb), .55); margin-top:14px; }
+  .before .bnum { color:rgba(var(--axis-ppt-neutral-50-rgb), .6); }
+  .before .bar { height:74px; background:rgba(var(--axis-ppt-neutral-50-rgb), .24); }
+  .after .bnum { color:var(--axis-ppt-neutral-50); }
+  .after .bar { height:234px; background:linear-gradient(180deg, var(--axis-deck-teal-350) 0%, var(--teal-deep) 100%);
+    box-shadow:0 0 40px rgba(var(--axis-deck-teal-500-rgb), .5), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .3); }
   .ba .lead-in { align-self:center; display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
-  .ba .lead-in .t { font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; color:#fff; }
-  .ba .lead-in .s { font-size:16px; color:rgba(255,255,255,.6); }
+  .ba .lead-in .t { font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; color:var(--axis-ppt-neutral-50); }
+  .ba .lead-in .s { font-size:16px; color:rgba(var(--axis-ppt-neutral-50-rgb), .6); }
 
   /* chips de apoyo */
   .chips { display:flex; gap:14px; margin-top:44px; }
-  .chip { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:14px; padding:14px 20px;
-    font-size:20px; color:rgba(255,255,255,.9); }
+  .chip { background:rgba(var(--axis-ppt-neutral-50-rgb), .08); border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .15); border-radius:14px; padding:14px 20px;
+    font-size:20px; color:rgba(var(--axis-ppt-neutral-50-rgb), .9); }
   .chip b { color:var(--teal); font-weight:600; font-variant-numeric:tabular-nums; }
-  .src { font-size:16px; color:rgba(255,255,255,.5); margin-top:30px; }
+  .src { font-size:16px; color:rgba(var(--axis-ppt-neutral-50-rgb), .5); margin-top:30px; }
 
 </style></head>
 <body>

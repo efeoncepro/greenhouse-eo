@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="deck-signature.css">
+    <link rel="stylesheet" href="deck-tokens.css">
+<link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:wght@600&display=swap');
@@ -10,16 +11,16 @@
     html, body { width:1920px; height:1080px; }
     body { overflow:hidden; font-family:'Geist',sans-serif; }
 
-    :root { --safe:72px; --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33; --teal:#36c8bf; --violet:#33029c; --ink:#020061; --surface:#eef0f3; }
+    :root { --safe:72px; --navy:var(--axis-deck-navy-860); --navy-2:var(--axis-ppt-blue-800); --navy-deep:var(--axis-deck-navy-920); --teal:var(--axis-deck-teal-500); --violet:var(--axis-ppt-indigo-600); --ink:var(--axis-ppt-indigo-950); --surface:var(--axis-deck-surface-60); }
     .slide { width:1920px; height:1080px; display:flex; background:var(--surface); }
     .column { width:960px; height:1080px; padding:var(--safe); }
 
-    .brand { position:relative; overflow:hidden; color:#fff; padding-right:86px; border-radius:0 64px 64px 0; background:
-      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
-      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
-      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%); }
-    .brand::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.12; background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .75px); background-size:4px 4px; }
+    .brand { position:relative; overflow:hidden; color:var(--axis-ppt-neutral-50); padding-right:86px; border-radius:0 64px 64px 0; background:
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .5) 0%, rgba(var(--axis-deck-teal-550-rgb), .16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .5) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 44%, transparent 74%),
+      linear-gradient(120deg, var(--axis-deck-navy-920) 0%, var(--axis-ppt-blue-800) 48%, var(--axis-deck-navy-980) 100%); }
+    .brand::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.12; background-image:radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .9) .55px, transparent .75px); background-size:4px 4px; }
     .light { color:var(--ink); padding-left:86px; }
     .head { position:relative; z-index:1; min-height:228px; }
     .eyebrow { font-size:19px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
@@ -27,8 +28,8 @@
     .light .eyebrow { color:var(--violet); }
     h1, h2 { margin-top:22px; max-width:700px; font-family:'Poppins',sans-serif; font-size:51px; font-weight:600; letter-spacing:-.021em; line-height:1.06; }
     .tips { position:relative; z-index:1; display:flex; flex-direction:column; gap:0; }
-    .tip { min-height:145px; display:grid; grid-template-columns:56px 1fr; align-items:start; gap:22px; padding:24px 0; border-top:1px solid rgba(255,255,255,.38); }
-    .light .tip { border-color:rgba(2,0,97,.24); }
+    .tip { min-height:145px; display:grid; grid-template-columns:56px 1fr; align-items:start; gap:22px; padding:24px 0; border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .38); }
+    .light .tip { border-color:rgba(var(--axis-ppt-indigo-950-rgb), .24); }
     .tip-icon { width:42px; height:42px; margin-top:2px; object-fit:contain; }
     .brand .tip-icon { filter:brightness(0) invert(1); }
     .tip-copy { font-size:26px; line-height:1.3; }

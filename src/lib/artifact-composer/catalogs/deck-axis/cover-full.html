@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<html lang="es"><head>  <link rel="stylesheet" href="deck-tokens.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Geist:wght@400;500&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -9,10 +10,10 @@
   :root {
     --safe:72px;
     /* tokens Think (web-agentica) */
-    --navy:#00284d;        /* axis.accent[900] — el midnight navy de Think */
-    --navy-2:#023c70;      /* axis.accent[800] */
-    --navy-deep:#001a33;
-    --teal:#36c8bf;        /* teal[500] — teal de firma de Think */
+    --navy:var(--axis-deck-navy-860);        /* axis.accent[900] — el midnight navy de Think */
+    --navy-2:var(--axis-ppt-blue-800);      /* axis.accent[800] */
+    --navy-deep:var(--axis-deck-navy-920);
+    --teal:var(--axis-deck-teal-500);        /* teal[500] — teal de firma de Think */
   }
 
   /* ===== CoverFull: hero de Think — cámara navy, luz de relación y grano editorial ===== */
@@ -21,10 +22,10 @@
     display:flex; align-items:center; justify-content:center;
     padding:var(--safe);
     background:
-      radial-gradient(rgba(255,255,255,.042) .55px, transparent .8px) 0 0 / 5px 5px,
-      radial-gradient(58% 46% at 50% 47%, rgba(54, 200, 191, .115) 0%, rgba(54, 200, 191, .035) 37%, transparent 71%),
-      radial-gradient(92% 76% at 50% -8%, rgba(14, 82, 133, .92) 0%, rgba(0, 40, 77, .16) 53%, transparent 72%),
-      radial-gradient(58% 44% at 92% 94%, rgba(54, 200, 191, .14) 0%, transparent 52%),
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .042) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(58% 46% at 50% 47%, rgba(var(--axis-deck-teal-500-rgb), .115) 0%, rgba(var(--axis-deck-teal-500-rgb), .035) 37%, transparent 71%),
+      radial-gradient(92% 76% at 50% -8%, rgba(var(--axis-deck-recipe-cover-halo-navy-rgb), .92) 0%, rgba(var(--axis-deck-navy-860-rgb), .16) 53%, transparent 72%),
+      radial-gradient(58% 44% at 92% 94%, rgba(var(--axis-deck-teal-500-rgb), .14) 0%, transparent 52%),
       radial-gradient(135% 100% at 70% -10%, var(--navy-2) 0%, var(--navy) 55%, var(--navy-deep) 100%);
   }
 
@@ -32,10 +33,10 @@
      solo reemplaza los slots; la jerarquía y las proporciones no se negocian. */
   .stack { position:relative; z-index:1; width:900px; display:flex; flex-direction:column; align-items:center; text-align:center; transform:translateY(-18px); }
   .logo-efeonce { width:650px; max-height:188px; object-fit:contain; }
-  .relationship-mark { width:88px; height:1px; margin:26px 0 20px; background:linear-gradient(90deg, transparent, rgba(114, 222, 216, .76), transparent); box-shadow:0 0 18px rgba(54, 200, 191, .22); }
+  .relationship-mark { width:88px; height:1px; margin:26px 0 20px; background:linear-gradient(90deg, transparent, rgba(var(--axis-deck-recipe-cover-halo-teal-rgb), .76), transparent); box-shadow:0 0 18px rgba(var(--axis-deck-teal-500-rgb), .22); }
   .client-stage { min-height:170px; display:flex; align-items:center; justify-content:center; }
   .logo-client  { width:auto; height:170px; max-width:280px; object-fit:contain; filter:brightness(0) invert(1); }
-  .proposal-kind { max-width:790px; margin-top:26px; font-family:'Poppins',sans-serif; font-weight:600; font-size:70px; color:#fff; line-height:1.06; letter-spacing:-.025em; text-wrap:balance; }
+  .proposal-kind { max-width:790px; margin-top:26px; font-family:'Poppins',sans-serif; font-weight:600; font-size:70px; color:var(--axis-ppt-neutral-50); line-height:1.06; letter-spacing:-.025em; text-wrap:balance; }
 
 </style></head>
 <body>
