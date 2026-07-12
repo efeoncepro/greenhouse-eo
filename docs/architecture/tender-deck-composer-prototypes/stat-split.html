@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <link rel="stylesheet" href="deck-signature.css">
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:ital,wght@0,600;1,600&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:1920px; height:1080px; }
+    body { overflow:hidden; font-family:'Geist',sans-serif; }
+    :root { --safe:72px; --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33; --teal:#36c8bf; --violet:#33029c; --ink:#020061; --surface:#eef0f3; --lime:#70bd00; }
+    .slide { width:1920px; height:1080px; display:flex; background:var(--surface); }
+    .context { position:relative; width:1004px; height:1080px; overflow:hidden; color:#fff; border-radius:0 64px 64px 0; padding:var(--safe); background:
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(60% 60% at 0% 8%, rgba(42,194,184,.46) 0%, rgba(42,194,184,.14) 36%, transparent 64%),
+      radial-gradient(66% 60% at 4% 104%, rgba(103,23,205,.42) 0%, rgba(103,23,205,.12) 44%, transparent 74%),
+      linear-gradient(226deg, #00345f 0%, #00284d 44%, #001a33 100%); }
+    .context::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.11; background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .75px); background-size:4px 4px; }
+    .context-inner { position:relative; z-index:1; height:100%; display:flex; flex-direction:column; }
+    .eyebrow { color:var(--teal); font-size:19px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
+    .context-header { display:grid; grid-template-columns:205px minmax(0,1fr); align-items:center; gap:34px; margin-top:42px; }
+    .context-visual { width:205px; height:205px; }
+    .context-visual img { display:block; width:100%; height:100%; object-fit:contain; }
+    .context h1 { max-width:560px; font-family:'Poppins',sans-serif; font-size:52px; font-weight:600; letter-spacing:-.022em; line-height:1.06; }
+    .context h1 em { font-style:italic; }
+    .narrative { margin-top:96px; max-width:730px; display:flex; flex-direction:column; gap:28px; font-size:30px; line-height:1.34; }
+    .narrative strong { font-weight:600; }
+    .narrative .closing { font-weight:600; }
+    .outcomes { width:916px; height:1080px; padding:var(--safe) 72px; color:var(--ink); }
+    .outcomes-header { padding:36px 0 28px; }
+    .outcomes-eyebrow { color:#438100; font-size:18px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
+    .outcomes h2 { margin-top:14px; max-width:670px; font-family:'Poppins',sans-serif; font-size:43px; font-weight:600; letter-spacing:-.018em; line-height:1.1; }
+    .goal-list { border-top:1px solid rgba(2,0,97,.2); }
+    .goal { min-height:158px; display:grid; grid-template-columns:100px 1fr; align-items:center; gap:24px; border-bottom:1px solid rgba(2,0,97,.2); }
+    .goal:last-child { border-bottom:0; }
+    .goal-icon { width:64px; height:64px; object-fit:contain; filter:invert(70%) sepia(79%) saturate(740%) hue-rotate(43deg) brightness(88%) contrast(104%); }
+    .goal-title { display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; font-family:'Poppins',sans-serif; font-size:34px; font-weight:600; letter-spacing:-.015em; line-height:1.08; }
+    .goal-metric { color:#438100; font-size:27px; font-style:italic; letter-spacing:-.02em; }
+    .goal-metric:empty { display:none; }
+    .goal-body { margin-top:8px; max-width:630px; font-size:24px; line-height:1.28; }
+    .goal-body strong { font-weight:600; }
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="StatSplit">
+    <section class="context" aria-label="Contexto de la oportunidad">
+      <div class="context-inner">
+        <header>
+          <p class="eyebrow" data-slot="eyebrow" data-slot-type="string" data-slot-required="true">La oportunidad</p>
+          <div class="context-header">
+            <div class="context-visual" data-slot="leftVisual" data-slot-type="asset" data-slot-required="true">
+              <img src="assets/stat-opportunity-visual.png" alt="Ilustración conceptual de una empresa" data-slot-field="src">
+            </div>
+            <h1 data-slot="title" data-slot-type="rich-string" data-slot-required="true">La visibilidad ya no depende solo de <em>publicar más.</em></h1>
+          </div>
+        </header>
+        <div class="narrative" data-slot="narrative" data-slot-type="array" data-slot-required="true">
+          <p>Las respuestas generadas están definiendo dónde una marca aparece, qué evidencia recuperan y a quién atribuyen autoridad.</p>
+          <p class="closing">El resultado debe ser un sistema editorial que <strong>pueda aprender y demostrar avance.</strong></p>
+        </div>
+      </div>
+    </section>
+    <section class="outcomes" aria-label="Resultados que habilita la propuesta">
+      <header class="outcomes-header">
+        <p class="outcomes-eyebrow" data-slot="outcomesEyebrow" data-slot-type="string" data-slot-required="true">Resultados esperados</p>
+        <h2 data-slot="outcomesTitle" data-slot-type="string" data-slot-required="true">Lo que el sistema debe habilitar</h2>
+      </header>
+      <div class="goal-list" data-slot="goals" data-slot-type="array" data-slot-required="true">
+        <article class="goal"><img class="goal-icon" src="assets/solar/target-bold.svg" alt="" aria-hidden="true"><div><p class="goal-title"><span data-slot-field="title">Visibilidad</span><span class="goal-metric" data-slot-field="metric"></span></p><p class="goal-body" data-slot-field="body">Aparecer en las <strong>consultas donde se forma la preferencia.</strong></p></div></article>
+        <article class="goal"><img class="goal-icon" src="assets/solar/ranking-bold.svg" alt="" aria-hidden="true"><div><p class="goal-title"><span data-slot-field="title">Citabilidad</span><span class="goal-metric" data-slot-field="metric"></span></p><p class="goal-body" data-slot-field="body">Construir evidencia que los asistentes puedan <strong>recuperar y atribuir.</strong></p></div></article>
+        <article class="goal"><img class="goal-icon" src="assets/solar/shield-check-bold.svg" alt="" aria-hidden="true"><div><p class="goal-title"><span data-slot-field="title">Coherencia</span><span class="goal-metric" data-slot-field="metric"></span></p><p class="goal-body" data-slot-field="body">Conectar entidad, contenidos y fuentes en una <strong>misma lectura de marca.</strong></p></div></article>
+        <article class="goal"><img class="goal-icon" src="assets/solar/soundwave-bold.svg" alt="" aria-hidden="true"><div><p class="goal-title"><span data-slot-field="title">Aprendizaje</span><span class="goal-metric" data-slot-field="metric"></span></p><p class="goal-body" data-slot-field="body">Corregir el sistema a partir de <strong>señales reales de desempeño.</strong></p></div></article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
+  <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:wght@600&display=swap');
@@ -34,9 +35,10 @@
     .concept-body strong { font-weight:600; }
 
     .proposal { position:relative; width:1004px; height:1080px; overflow:hidden; border-radius:64px 0 0 64px; color:#fff; padding:var(--safe) 76px; background:
-      radial-gradient(62% 63% at 101% 13%, rgba(42,194,184,.72) 0%, rgba(42,194,184,.26) 35%, transparent 64%),
-      radial-gradient(71% 62% at 91% 103%, rgba(103,23,205,.76) 0%, rgba(103,23,205,.22) 42%, transparent 72%),
-      linear-gradient(132deg, #196df2 0%, var(--navy-2) 46%, var(--navy-deep) 100%); }
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%); }
     .proposal::before { content:''; position:absolute; inset:0; opacity:.10; pointer-events:none; background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .75px); background-size:4px 4px; }
     .proposal-inner { position:relative; z-index:1; margin:194px 0 0 56px; max-width:720px; }
     .proposal-label { display:flex; align-items:center; gap:20px; font-family:'Poppins',sans-serif; font-size:29px; font-weight:600; }

@@ -1,0 +1,19 @@
+{
+  "template": "FourPillarsFull",
+  "figmaNodeId": "8:24297",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "sectionLabel": { "selector": "[data-slot='sectionLabel']", "type": "string", "required": false, "constraints": { "maxCharacters": 30, "maxLines": 1, "overflow": "omit" } },
+    "title": { "selector": "[data-slot='title']", "type": "rich-string", "required": true, "constraints": { "maxCharacters": 80, "maxLines": 4, "allowedTags": ["em"], "overflow": "reject" } },
+    "context": { "selector": "[data-slot='context']", "type": "array", "required": true, "constraints": { "minItems": 1, "maxItems": 2, "maxCharactersPerItem": 120, "maxLinesPerItem": 4, "overflow": "reject" }, "item": { "type": "rich-string", "allowedTags": ["strong"] } },
+    "thesis": { "selector": "[data-slot='thesis']", "type": "rich-string", "required": true, "constraints": { "maxCharacters": 150, "maxLines": 4, "allowedTags": ["em"], "overflow": "reject" } },
+    "pillars": { "selector": "[data-slot='pillars']", "type": "array", "required": true, "constraints": { "minItems": 4, "maxItems": 4, "overflow": "reject" }, "item": { "type": "object", "shape": {
+      "kind": { "type": "enum", "values": ["ai", "data", "method", "human"], "required": true, "resolver": "four-pillars-icon-and-tone" },
+      "title": { "type": "string", "maxCharacters": 42, "required": true },
+      "body": { "type": "string", "maxCharacters": 92, "maxLines": 3, "required": true },
+      "detail": { "type": "string", "maxCharacters": 120, "maxLines": 4, "required": true }
+    } } }
+  },
+  "presentation": { "brandSurface": "canonical-rich-deck-gradient", "icons": "Solar Bold via Iconify; kind controls icon and tone" }
+}

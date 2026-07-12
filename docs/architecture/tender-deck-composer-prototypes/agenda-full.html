@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Geist:wght@400;600&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1920px; height:1080px; }
+  body { font-family:'Geist',sans-serif; overflow:hidden; }
+
+  :root { --safe:72px; --teal:#36c8bf; --violet:#6717cd; }
+  /* full-bleed dark-even (blanco legible en todo el ancho) + glows + grain */
+  .slide {
+    position:relative; width:1920px; height:1080px; padding:var(--safe) var(--safe);
+    display:flex; flex-direction:column; color:#fff;
+    background:
+      radial-gradient(rgba(255,255,255,.07) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
+  }
+
+  .head { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }
+  .eyebrow { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--teal); margin-bottom:12px; }
+  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:66px; line-height:1; letter-spacing:-.02em; color:#fff; }
+  .count { font-size:22px; color:rgba(255,255,255,.6); }
+  .count b { color:#fff; font-weight:600; font-variant-numeric:tabular-nums; }
+
+  /* grid 2×3 de capítulos — filas cohesivas, bloque centrado */
+  .grid { flex:1; display:grid; grid-template-columns:1fr 1fr; column-gap:96px; row-gap:52px;
+    align-content:center; margin-top:20px; }
+  /* cada capítulo es un ENLACE a su sección/slide (nav en HTML; link interno en el PDF) */
+  a.ch { text-decoration:none; display:flex; align-items:center; gap:34px; border-top:1.5px solid rgba(255,255,255,.16);
+    padding-top:30px; transition:border-color .18s ease; }
+  a.ch:hover { border-top-color:var(--teal); }        /* affordance en el deck interactivo */
+  a.ch:hover .t { color:var(--teal); }
+  .ch .n { font-family:'Geist',sans-serif; font-weight:600; font-size:60px; line-height:1; color:var(--teal);
+    font-variant-numeric:tabular-nums; letter-spacing:-.03em; flex:none; width:100px;
+    text-shadow:0 0 26px rgba(54,200,191,.38); }
+  .ch .t { font-family:'Poppins',sans-serif; font-weight:600; font-size:30px; line-height:1.06; letter-spacing:-.012em; color:#fff; }
+  .ch .d { font-size:18px; line-height:1.3; color:rgba(255,255,255,.58); margin-top:8px; }
+
+  .foot { display:flex; justify-content:space-between; align-items:center; padding-top:24px;
+    border-top:1px solid rgba(255,255,255,.12); font-size:17px; color:rgba(255,255,255,.5); }
+  .foot .r { color:var(--teal); font-weight:600; letter-spacing:.02em; }
+</style></head>
+<body>
+  <div class="slide" data-template="AgendaFull">
+    <div class="head">
+      <div>
+        <div class="eyebrow">La propuesta</div>
+        <div class="title">Agenda</div>
+      </div>
+      <div class="count"><b>6</b> capítulos · propuesta técnica para SKY</div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="foot"><span>Propuesta técnica · SKY</span><span class="r">efeoncepro.com</span></div>
+  </div>
+
+<script>
+  // cada capítulo lleva su targetSlideId → href="#<id>" (deep-link a la sección/slide)
+  const chapters = [
+    ['01','Contexto & diagnóstico','El punto de partida de SKY en buscadores y en IA.','cap-contexto'],
+    ['02','Enfoque — Surround Discovery','Cómo rodeamos toda la superficie de descubrimiento.','cap-enfoque'],
+    ['03','Plan de trabajo','6 meses, fases, hitos y entregables.','cap-plan'],
+    ['04','El equipo','Un squad dedicado, con un responsable único.','cap-equipo'],
+    ['05','Casos & resultados','Experiencia acreditada, con métricas.','cap-casos'],
+    ['06','Inversión','La propuesta económica y su alcance.','cap-inversion']
+  ];
+  document.getElementById('grid').innerHTML = chapters.map(([n,t,d,id]) =>
+    `<a class="ch" href="#${id}"><div class="n">${n}</div><div><div class="t">${t}</div><div class="d">${d}</div></div></a>`).join('');
+</script>
+</body></html>

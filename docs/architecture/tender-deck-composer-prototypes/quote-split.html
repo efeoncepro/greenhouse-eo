@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8">
+<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600;1,700&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -37,9 +37,10 @@
     padding:var(--safe) 96px var(--safe) 84px;
     display:flex; flex-direction:column; justify-content:center;
     background:
-      radial-gradient(66% 52% at 96% 4%, color-mix(in srgb, var(--axis-teal) 60%, transparent) 0%, transparent 52%),
-      radial-gradient(60% 54% at 4% 100%, color-mix(in srgb, var(--axis-violet) 32%, transparent) 0%, transparent 56%),
-      linear-gradient(150deg, var(--axis-navy-soft) 0%, var(--axis-navy) 60%, var(--axis-navy-deep) 100%);
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
     color:#fff;
   }
   .statement { font-family:'Poppins',sans-serif; font-weight:600; font-size:52px; line-height:1.24;
@@ -48,7 +49,7 @@
   .statement .wm { height:40px; vertical-align:-1px; margin:0 8px 0 5px; }
 </style></head>
 <body>
-  <div class="slide">
+  <div class="slide" data-template="QuoteSplit">
     <!-- LEFT: atribución / slot persona -->
     <div class="aside">
       <div class="wmq">&ldquo;</div>

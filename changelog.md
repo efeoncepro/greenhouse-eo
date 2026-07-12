@@ -2,6 +2,8 @@
 
 ## 2026-07-11 — TASK-1390: AI Visibility Grader — citation_quality real + degradación diagnosticable (ISSUE-120)
 
+- **Tender Deck Composer — cuatro plantillas reforzadas para composición segura.** `HighlightWave`, `FourPillarsFull`, `EvidenceStoryGrid` y `HumanImpactFull` ajustan presupuestos de slots para rechazar payloads que desbordan, mejoran contraste/jerarquía y regeneran sus previews. `HumanImpactFull` añade un flow fijo de vidrio como fallback cuando no existe activo de rol; un activo contextual sigue reemplazándolo. Canon: `docs/architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md`.
+
 - El grader ahora **clasifica las fuentes de las citas** (determinista, por dominio): `citation_quality` deja de ser 0 estructural para todos los clientes (re-score SKY: 0 → 90.9 con las mismas citas; overall 52.5 → 73.3).
 - La presencia por dominio es **same-site** (subdominios ≡ apex).
 - La **extracción de prosa registra su outcome** ({ran,status,provider}): `sentiment unknown` ya no es indistinguible de "no corrió". Señal nueva `growth.ai_visibility.prose_extraction_degraded`.

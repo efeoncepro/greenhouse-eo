@@ -1,0 +1,20 @@
+{
+  "template": "HighlightWave",
+  "figmaNodeId": "4:124",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "fixedChrome": {
+    "waveFrame": { "implementation": "CSS translucent light field over the canonical Think hero", "sourceFigmaNodeId": "4:124", "agentMayOverride": false }
+  },
+  "slots": {
+    "eyebrow": { "selector": "[data-slot='eyebrow']", "type": "string", "required": false, "constraints": { "maxCharacters": 36, "maxLines": 1, "overflow": "omit" } },
+    "statementLead": { "selector": "[data-slot='statementLead']", "type": "string", "required": true, "constraints": { "maxCharacters": 68, "maxLines": 2, "overflow": "reject" } },
+    "highlight": { "selector": "[data-slot='highlight']", "type": "string", "required": true, "presentation": "Poppins ExtraBold Italic; violet; block-level focal phrase", "constraints": { "maxCharacters": 54, "maxLines": 2, "overflow": "reject" } },
+    "statementTail": { "selector": "[data-slot='statementTail']", "type": "string", "required": false, "constraints": { "maxCharacters": 42, "maxLines": 1, "overflow": "omit" } },
+    "supporting": { "selector": "[data-slot='supporting']", "type": "rich-string", "required": false, "constraints": { "maxCharacters": 180, "maxLines": 3, "allowedTags": ["strong"], "overflow": "omit" } }
+  },
+  "compositionRules": [
+    "The statement is the only hero. Keep statementTail as a short continuation, never a second idea.",
+    "When both statementTail and supporting are present, the renderer must validate their declared line limits together before rendering."
+  ]
+}

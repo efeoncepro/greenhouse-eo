@@ -62,6 +62,34 @@ Base = degradado hero de Think (`efeonce-think` → `index.astro .home-hero` / `
 
 Regla dura: el teal va a **≤28% opacidad** como luz de esquina; a más opacidad se vuelve manchón. NUNCA linear plano de navy — el radial con luz arriba es lo que lo hace premium.
 
+**Refinamiento 2026-07-11 — degradado RICO canónico para superficies oscuras de contenido.**
+
+El operador rechazó expresamente usar azul eléctrico `#196df2` como base. La referencia aprobada es el degradado ya materializado por Claude en `TimelineFull`: navy profundo y dinámico, textura de puntos y glows teal/violeta contenidos. No es un navy plano ni un mesh recreado.
+
+Receta canónica:
+
+```css
+.brand {
+  background:
+    radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,                              /* textura de puntos ~9% (profundidad táctil 2026) */
+    radial-gradient(52% 60% at 100% 0%,  rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),  /* luz teal localizada */
+    radial-gradient(50% 55% at 0% 104%,  rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),  /* luz violeta localizada */
+    linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);                                            /* navy profundo → navy Think → cierre */
+}
+```
+
+**Alcance de la receta (anti-drift):** toda superficie oscura de contenido usa esta receta exacta. `CoverFull` conserva su hero Think aprobado; `BackCoverFull` conserva su gradiente canónico de cierre; `HighlightWave` usa el hero Think detrás de su campo claro. No existe un cuarto degradado de plantilla ni se usa el raster/mesh de Figma como fondo final.
+
+- **Base navy `#001a33` → `#023c70` → `#001327`** — la vida viene de luces teal/violeta periféricas, no de ampliar un azul eléctrico. El navy debe dominar la percepción del campo.
+- **Textura de puntos como capa de `background`** (no `::before`): pinta bajo el contenido, sin líos de z-index.
+- **Orientación fija de glows:** teal `at 100% 0%`, violeta `at 0% 104%`, `linear 120deg`. Es la composición aprobada de `TimelineFull`; no se espeja ni se inventa una variante por plantilla.
+- **`CoverFull` NO cambia:** la portada mantiene su receta hero-Think (radial navy con luz arriba) — es full-bleed y tiene su propio contrato.
+- **Ya aplicado a** `NarrativeSplit`, `MetricsSplit`, `QuoteSplit`, `ChartSplit` (Claude) + `DualTextSplit`, `ComparisonSplit` (Codex, origen de la receta). Toda Split nueva usa esta receta.
+
+### Firma de URL — burbuja de luminosity (chrome fijo)
+
+Toda lámina que tenga espacio negativo suficiente lleva la firma no configurable `efeoncepro.com` como burbuja discreta. Es chrome de marca, no un slot ni copy que el compositor pueda sustituir. Usa `mix-blend-mode: luminosity`, texto pequeño y contraste de borde: la firma debe cerrar el recorrido visual sin competir con el título ni cubrir una métrica, navegación, logo o evidencia. `HighlightWave` es la excepción deliberada: su campo claro ocupa el lienzo y el marco navy no da área viable, por lo que no lleva burbuja. La posición es determinada por la familia de composición (campo oscuro del split, esquina alta cuando el borde inferior es claro, y conversión del URL existente en `CoverFull`), declarada en `tender-deck-composer-prototypes/deck-signature.css`.
+
 ### 2. Tipografía — pocos pesos, semánticos (skill `typography-design`)
 
 Fuentes dictadas por AXIS PPT: **Poppins** (títulos) + **Geist** (cuerpo). Regla: pocos pesos que se lean distintos; Black (900) aplana la jerarquía → prohibido en título/lead.
@@ -167,11 +195,23 @@ Aunque el Figma esté en español, cada plantilla tiene **nombre canónico en in
 | Figma (ES) | Template (EN) | node-id | Tipo de contenido que acepta | Estado |
 |---|---|---|---|---|
 | (diseño nuevo, NO Split) | **`CoverFull`** | — | **portada full-bleed** (degradado completo, stack centrado) | ✅ **construido** |
+| (diseño nuevo, NO Split) | **`BackCoverFull`** | referencia canónica de marca | **contraportada full-bleed** (marca y contactos fijos) | ✅ **construido** |
+| Fondo Wave + texto destacado | **`HighlightWave`** | 4:124 | una idea o decisión editorial con frase-acento | ✅ **construido** (campo claro sobre hero Think canónico) |
+| Cuatro pilares + tesis | **`FourPillarsFull`** | 8:24297 | marco de capacidades · método · propuesta de valor | ✅ **construido** |
+| Persona + prueba + transformación | **`EvidenceStoryGrid`** | 8:24742 | caso de cambio · argumento con evidencia · antes/después | ✅ **construido** |
+| Impacto humano por rol | **`HumanImpactFull`** | 9:25264 | historia de cambio operativo · beneficio para una persona/equipo | ✅ **construido** |
+| Narrativa + grid de tarjetas | **`CardGridFull`** | 5:7657 | stack de capacidades · servicios · herramientas (2×N tarjetas) | ✅ **construido** (full-bleed: narrativa + caja destacada izq · grid de tarjetas glass der) |
+| Cronograma / plan de trabajo | **`TimelineFull`** | — (gap, no Figma) | plan de trabajo · fases · hitos · dependencias/holgura | ✅ **construido** (Gantt full-bleed: barras de rango + hitos diamante + conectoras) |
+| Equipo / squad | **`TeamSplit`** | — (gap, no Figma) | equipo · rol · dedicación % · responsable único | ✅ **construido** (bipartito: intro marca izq · roster de tarjetas de rol der) |
+| Oferta económica / inversión | **`PricingFull`** | — (gap, no Figma) | total de inversión · desglose cotizado · condiciones comerciales | ✅ **construido** (total héroe + ledger de una sola superficie) |
+| Matriz de cumplimiento | **`RequirementsTableFull`** | — (gap, no Figma) | requisito técnico/administrativo · evidencia · estado | ✅ **construido** (resumen de control + matriz trazable) |
+| Caso de éxito acreditado | **`CaseStudySplit`** | — (gap, no Figma) | experiencia · arco reto → enfoque → resultado + métrica | ✅ **construido** (bipartito: historia claro izq · resultado hero + barras before→after der) |
+| Agenda / índice de apertura | **`AgendaFull`** | — (gap, no Figma) | índice de capítulos · navegación del deck | ✅ **construido** (full-bleed: grid 2×3 de capítulos clickeables + footer) |
 | PersonaTitulo+Tips | **`BulletListSplit`** | 8:14178 | lista de puntos (diferenciadores · por qué Efeonce · ventajas) | ✅ **plantilla de referencia** |
-| Right / Left | `SectionDividerSplit` | 6:12498 / 4:151 | divisor de sección · cierre (bipartito) | pendiente |
+| Right / Left | `SectionDividerSplit` | 6:12498 / 4:151 | divisor de sección · cierre (bipartito) | ✅ **construido** (número de sección héroe + mini-agenda; 2 variantes espejo) |
 | Texto+Persona | `NarrativeSplit` | 5:7869 | resumen ejecutivo · enfoque · metodología | ✅ **construido** (slot derecho **flexible**: persona-foto o visual del método) |
 | Texto+Texto | `DualTextSplit` | 8:14102 | dos ideas · antes/después · contexto+solución | ✅ **construido** (dos conceptos con slots independientes) |
-| Texto+DatoDuro | `StatSplit` | 7:13485 | una métrica hero del diagnóstico | pendiente |
+| Texto+DatoDuro | `StatSplit` | 7:13485 | resultados / objetivos verificables | ✅ **construido** (contexto + 3–5 resultados) |
 | DatosDuros+Persona | `MetricsSplit` | 7:13598 | varios KPIs (diagnóstico/resultados) | ✅ **construido** (KPIs en panel de marca + slot derecho **flexible**) |
 | Texto+Grafico | `ChartSplit` | 5:10852 | un dato con gráfico | ✅ **construido** (texto claro izq + 1 chart tokenizado en panel de marca) |
 | Comparativa | `ComparisonSplit` | 8:13782 | tabla comparativa (competencia · opciones) | ✅ **construido** (pares de filas contrastadas, no tabla libre) |
@@ -202,6 +242,129 @@ urlBubble:     asset (fijo)     // Deck/SVG/url.svg (#848484 + mix-blend-mode:lu
 ```
 
 Reglas propias de `CoverFull`: degradado hero-Think (§1, navy radial + teal luz); logo efeonce grande centrado; debajo, una **marca de relación decorativa no configurable** y el `client-stage` que normaliza la marca del comprador; luego el tipo de propuesta; burbuja `efeoncepro.com` al pie con luminosity (§6). La relación entre ambas marcas nace del layout, no de texto o de una composición libre del agente. El renderer solo sustituye `clientLogo` y el enum `proposalKind`; no agrega copy, fechas, tags ni logotipos extra. El contrato legible por el futuro composer vive en `tender-deck-composer-prototypes/cover-full.slots.json`: el agente entrega un `assetId` y la selección `proposalKind`, mientras los resolvers `client-brand-mark` y `proposal-kind-label` controlan normalización óptica, etiqueta formal y límites fail-closed. El agente nunca decide CSS, escalas ni labels libres. Prototipo vivo: `cover-full.html` en scratchpad.
+
+### `BackCoverFull` — contrato de slots (contraportada)
+
+Contraportada **full-bleed** cerrada: degradado canónico, logo Efeonce, burbuja `efeoncepro.com`, set social y contacto. Es el cierre del deck, no una superficie de contenido ni un footer intercambiable.
+
+```text
+efeonceLogo:   asset fijo
+urlBubble:     asset fijo
+socialLinks:   set fijo de Iconify (Spotify · Instagram · LinkedIn · Threads · YouTube · TikTok)
+contactDetails:set fijo institucional
+```
+
+**Regla visual dura:** todos los elementos de primer plano usan `mix-blend-mode: luminosity`, incluido logo, burbuja URL, iconografía social y línea de contacto. El agente no altera el set ni sus valores. Dirección vigente: `Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile`; conserva correo y teléfonos institucionales. Contrato: `tender-deck-composer-prototypes/back-cover-full.slots.json`. Prototipo: `back-cover-full.html`.
+
+### `HighlightWave` — contrato de slots (fondo Wave + frase-acento)
+
+Superficie editorial completa, basada en el marco Wave de Figma (`4:124`). Conserva el **campo claro** y su composición, pero reemplaza su raster/mesh por el **hero Think canónico**: no introduce otro degradado al deck. El único héroe es una **frase-acento**. No es una portada ni un módulo de quote: sirve para instalar la idea que debe orientar una sección o decisión de la propuesta.
+
+```text
+eyebrow?:      string              // contexto breve; se omite si no aporta lectura
+statementLead: string              // primera idea, Poppins 600 navy
+highlight:     string              // obligatorio; Poppins ExtraBold Italic violeta, foco visual
+statementTail?: string             // remate breve, nunca abre otro concepto
+supporting?:   rich string         // 1 párrafo de encuadre, <strong> permitido
+```
+
+`highlight` es un slot semántico, no HTML ni una elección de color del agente: el renderer lo convierte en el segundo golpe tipográfico de la frase. Si el contenido requiere dos ideas de igual peso, usar `DualTextSplit`; si es una declaración atribuida, usar `QuoteSplit`. El campo Wave es **chrome CSS fijo** sobre el hero Think (no un asset raster ni un slot); el renderer valida juntos `statementTail` y `supporting` antes de renderizar para no romper el ritmo vertical. Contrato: `tender-deck-composer-prototypes/highlight-wave.slots.json`. Prototipo: `highlight-wave.html`.
+
+### `FourPillarsFull` — contrato de slots (marco de cuatro pilares)
+
+Lámina full-width para explicar una capacidad como un **sistema de cuatro partes**: argumento editorial y tesis arriba; cuatro columnas de contenido abajo. El panel superior usa el degradado rico canónico y los pilares quedan sobre una superficie clara continua.
+
+```text
+sectionLabel?: string
+title:         rich string              // <em> para una frase-acento
+context:       Array<rich string>       // 1..2 párrafos, <strong> permitido
+thesis:        rich string              // cierre editorial, <em> permitido
+pillars:       Array<{ kind, title, body, detail }> // exactamente 4
+```
+
+`kind` es fijo (`ai | data | method | human`): controla el icono Solar Bold/Iconify, el tono y el orden. El agente reemplaza copy, no añade una quinta tarjeta, no cambia iconos ni convierte los pilares en una tabla libre. Los iconos viven en vidrio con borde e inset highlight; los tonos vivos quedan para icono/superficie y los títulos usan su variante oscura accesible sobre claro. No se reproduce el mesh de Figma; el renderer aplica el degradado canónico de deck. Contrato: `tender-deck-composer-prototypes/four-pillars-full.slots.json`. Prototipo: `four-pillars-full.html`.
+
+### `EvidenceStoryGrid` — contrato de slots (persona + evidencia + consecuencia)
+
+Patrón editorial para explicar una transformación real: **persona/titular** y contexto arriba; **una evidencia cuantificada** y la consecuencia operativa abajo. No es un slide de KPIs: usa una sola prueba para sostener una historia.
+
+```text
+sectionLabel?: string
+personAsset:   PersonAsset             // retrato/figura con ancla inferior izquierda
+headline:      rich string             // <em> = palabra-acento cyan
+context:       Array<rich string>      // 1..2 párrafos, <strong> permitido
+evidence:      { value, label, detail, evidenceRef }
+outcome:       Array<rich string>      // 1..2 párrafos, <strong> permitido
+```
+
+La prueba debe tener `evidenceRef`; sin fuente, se rechaza en vez de inventar un número. El retrato es un slot (la imagen de Figma solo ilustra su encuadre) y su gesto debe conducir al titular, nunca fuera de la composición. El cuadrante superior izquierdo conserva un **canvas de trabajo fijo** (chrome genérico + grilla HTML, no raster ni marca Figma): integra retrato y headline como un único lockup editorial y nunca se degrada a foto+texto sobre un campo vacío. El agente no altera ese canvas, el panel claro, el **marco de objeto seleccionado** de la evidencia (rectángulo sin radio, contorno discontinuo y ocho tiradores) ni el degradado rico canónico. No es una card. Contrato: `tender-deck-composer-prototypes/evidence-story-grid.slots.json`. Prototipo: `evidence-story-grid.html`.
+
+### `HumanImpactFull` — contrato de slots (impacto humano por rol)
+
+Lámina editorial para bajar una metodología a su efecto en el trabajo cotidiano. Arriba presenta la tensión y la explicación; abajo, una única historia de rol y la consecuencia. No es un perfil de persona ni un slide de testimonios: es el puente entre capacidad propuesta y cambio operativo tangible.
+
+```text
+sectionLabel?: string
+title:         rich string                 // <em> es el golpe final en cursiva
+context:       Array<rich string>          // 1..2 párrafos, <strong> permitido
+roleStory:     { role: string, transition: string }
+impactChange:  { state: string, statement: string } // state: 1 palabra o concepto humano
+outcome:       rich string                 // conclusión en 2..4 líneas; <strong>/<em> permitidos
+```
+
+El panel izquierdo no admite una foto, workflow ni iconos de relleno: representa un cambio humano único y verificable. `roleStory` nombra a la persona y su punto de inflexión; `impactChange.state` es el sujeto tipográfico de la lámina (un concepto breve, por ejemplo “Autonomía”) y `impactChange.statement` lo aterriza en trabajo cotidiano. La consecuencia ocupa la columna opuesta. Así el agente compone una idea con masa visual en vez de inventar una ilustración para llenar el espacio. Las flechas Solar Bold son estructurales, no slots. La card inferior es deliberadamente **translúcida**, para que el degradado rico canónico siga presente; el agente no altera opacidad, divisores, tipografía ni jerarquía. Contrato: `tender-deck-composer-prototypes/human-impact-full.slots.json`. Prototipo: `human-impact-full.html`.
+
+### `PricingFull` — contrato de slots (oferta económica)
+
+Lámina económica de una sola jerarquía: el total es la cifra protagonista; el ledger inferior permite verificar con qué se compone y bajo qué condiciones se presenta. No es una calculadora, una tabla libre ni un set de cards de precio.
+
+```text
+sectionLabel?:  string
+title:          rich string                 // <em> es un único acento editorial
+summary:        { amount, period, taxNote } // tarifa propuesta, ya formateada y verificada aguas arriba
+pricingOptions: Array<{ label, status?, scope, amount, isProposed }> // 2..3 alternativas, exactamente una propuesta
+commercialTerms:Array<{ label, value }>     // 2..3 condiciones de forma/pago/vigencia/reajuste
+```
+
+El agente no calcula, suma, redondea ni inventa importes: recibe `summary.amount` y cada `pricingOptions[].amount` ya formateados y económicamente reconciliados. Las opciones son mutuamente excluyentes: **nunca** se presentan como un desglose que suma al importe héroe; `isProposed` debe ser `true` en exactamente una y esa tarifa debe coincidir con `summary.amount`. Si las bases exigen una planilla, impuestos, moneda o forma de presentación específica, esa evidencia prevalece sobre esta lámina y la salida se rechaza si contradice el formato obligatorio. El degradado rico canónico, la jerarquía tarifa propuesta → alternativas → condiciones y la única superficie de ledger son fijos. Contrato: `tender-deck-composer-prototypes/pricing-full.slots.json`. Prototipo: `pricing-full.html`.
+
+### `RequirementsTableFull` — contrato de slots (matriz de cumplimiento)
+
+Lámina de control para comprobar admisibilidad y trazabilidad antes de presentar. El resumen expone una sola lectura de control; la matriz demuestra requisito → evidencia → estado. No es una tabla libre ni una declaración de cumplimiento sin respaldo.
+
+```text
+sectionLabel?: string
+title:         rich string
+summary:       { value, label, detail }
+requirements:  Array<{ kind: excluyente|puntúa, requirement, evidence, status: cubierto|en-revisión|riesgo }> // 3..5
+```
+
+Cada fila necesita una evidencia o ubicación real. Un excluyente sin respaldo se declara `riesgo`; nunca se omite para mejorar la apariencia de la matriz. El agente no altera la jerarquía de estado ni convierte la lámina en una planilla completa: si hay más de cinco requisitos, debe seleccionar los que deciden admisibilidad o derivar a un anexo. Contrato: `tender-deck-composer-prototypes/requirements-table-full.slots.json`. Prototipo: `requirements-table-full.html`.
+
+### `ProcessStepsFull` — contrato de slots (método secuencial)
+
+Lámina de una metodología ordenada en pasos, no un cronograma. La rail continua sólo representa la secuencia lógica: no muestra meses, duración ni actividades simultáneas (eso corresponde a `TimelineFull`).
+
+```text
+sectionLabel?: string
+title:         rich string
+steps:         Array<{ title, description, deliverable }> // 3..5, en orden de ejecución
+```
+
+La numeración es chrome posicional del renderer: el agente entrega los pasos en orden, no números, iconos, colores ni conectores. Cada paso necesita un entregable concreto; una metodología sin output verificable no es una credencial de ejecución. Contrato: `tender-deck-composer-prototypes/process-steps-full.slots.json`. Prototipo: `process-steps-full.html`.
+
+### `CredentialsFull` — contrato de slots (credenciales verificables)
+
+Prueba social de clientes, experiencias o certificaciones con atribución. No es un collage decorativo: cada marca debe estar autorizada para el caso de uso y conservar su fuente de respaldo.
+
+```text
+sectionLabel?: string
+title:         rich string
+supporting:    string
+credentials:   Array<{ brandName, brandMark, relationship, evidenceRef }> // 4..6
+```
+
+`brandMark` es una referencia a un asset institucional aprobado; el renderer lo normaliza ópticamente sin redibujar el logotipo. `evidenceRef` es obligatorio y permanece trazable aunque no se muestre completo en el lienzo. Si no existe autorización o evidencia, la credencial se rechaza; nunca se sustituye por una marca inventada. Contrato: `tender-deck-composer-prototypes/credentials-full.slots.json`. Prototipo: `credentials-full.html`.
 
 ### `NarrativeSplit` — contrato de slots (Texto+Persona, bipartito)
 
@@ -244,6 +407,22 @@ rightSlot: PersonaAsset | ConceptVisual   // SLOT FLEXIBLE (igual criterio que N
 
 Prototipo vivo: `metrics-split.html` (render `PREVIEW-metrics-split.png`) con el diagnóstico AEO de SKY (4 KPIs + lectura), registro institucional.
 
+### `StatSplit` — contrato de slots (Texto+DatoDuro, bipartito)
+
+Contexto editorial en el **panel de marca a la izquierda** y una lista de **3–5 resultados comprobables** a la derecha. No duplica `MetricsSplit`: aquel explica varios KPIs medidos; este expresa los outcomes que la propuesta debe habilitar, con valores solo cuando existe evidencia.
+
+```text
+eyebrow:         string
+leftVisual:      ConceptVisual                  // asset obligatorio; objeto/ilustración, no retrato
+title:           rich string                    // titular de oportunidad; <em> para acento real
+narrative:       Array<rich string>             // 1..2 párrafos de contexto/cierre
+outcomesEyebrow: string
+outcomesTitle:   string
+goals:           Array<{ kind, title, metric?, body, evidenceRef? }> // 3..5 objetivos
+```
+
+`leftVisual` ocupa un marco fijo de 205×205 px y se alinea con el titular: evita el vacío central del panel oscuro sin crear decoración arbitraria. `kind` se resuelve a iconografía fija Solar Bold/Iconify (`visibility | citability | coherence | learning | growth`); el agente no adjunta iconos ni cambia el color. `metric` solo se compone cuando tiene `evidenceRef`: sin fuente se usa lenguaje cualitativo o se rechaza. El renderer conserva el contraste, orden, divisores y escala. Contrato: `tender-deck-composer-prototypes/stat-split.slots.json`. Prototipo: `stat-split.html`.
+
 ### `QuoteSplit` — contrato de slots (Quote+Persona, bipartito)
 
 **No es un testimonial genérico: es un statement / pull-quote.** Una declaración grande como *type-as-image* sobre el **panel de marca a la derecha** (degradado hero-Think, esquina redondeada izquierda) + **slot de persona/atribución a la izquierda sobre claro**.
@@ -269,21 +448,168 @@ Prototipo vivo: `quote-split.html` (render `PREVIEW-quote-split.png`) — compro
 **Texto a la izquierda sobre claro** (como `NarrativeSplit`) + **UN gráfico tokenizado** en el **panel de marca a la derecha**. NO se recrea el collage de mockups del Figma; el slot derecho aloja **un solo chart**, limpio, que responde **una** pregunta.
 
 ```text
-eyebrow:  string             // contexto (Geist 600 uppercase tracked, muted)
-title:    rich string        // hallazgo con acento violeta itálico (Poppins 600, sobre claro)
-body:     Array<{...}>        // 1..2 párrafos cortos que enmarcan el chart (acentos violeta)
-chart:    ChartSpec          // el gráfico — ver reglas dataviz abajo
+eyebrow:   string            // contexto (Geist 600 uppercase tracked, muted)
+title:     rich string       // hallazgo con acento violeta itálico (Poppins 600, sobre claro)
+body:      Array<{...}>       // 1..2 párrafos cortos que enmarcan el chart (acentos violeta)
+chart:     ChartSpec         // el gráfico dentro de una GLASS CARD — ver reglas abajo
+heroStat:  { value; label }  // dato-héroe (el multiplicador/insight que cristaliza el argumento)
 ```
 
-**Reglas del chart (piso dataviz aplicado):**
+**Reglas del chart (piso `dataviz-design` + pase de impacto `design-studio`/`modern-ui`):**
 
 - **Tipo por pregunta, no por dato.** El prototipo responde *"¿SKY domina el Share of Voice?"* → **horizontal bar chart** (comparación entre categorías; encoding posición/longitud = el más preciso de Cleveland-McGill). Para "tendencia" usar línea; para "una métrica sola" es `StatSplit`, no `ChartSplit`.
-- **Barras desde 0** (regla dura; la longitud codifica el valor). **Valores etiquetados** en la barra (nunca tooltip-only; el deck es estático). Nombres honestos (`Líder de categoría` / `Competidor directo`), **NUNCA inventar marcas** ni fabricar cifras (mismo criterio ilustrativo + fuente que `MetricsSplit`).
-- **Resaltar el sujeto con MÁS de un canal**, no solo color: la barra de SKY va **teal + label/valor bold**; el resto **muted white**. (Acento sobre oscuro = teal.)
-- **Sin ejes recargados:** los valores al final de cada fila reemplazan la grilla; track sutil `rgba(255,255,255,.07)`.
-- **Estático = SVG/HTML tokenizado**, no runtime de charts. Si una plantilla futura necesita charts ricos/animados fuera del deck, la política Greenhouse es ECharts (no aplica al render print).
+- **Barras desde 0** (regla dura; la longitud codifica el valor). **Valores etiquetados** (nunca tooltip-only; el deck es estático). Nombres honestos (`Líder de categoría` / `Competidor directo`), **NUNCA inventar marcas** ni fabricar cifras (mismo criterio ilustrativo + fuente que `MetricsSplit`).
+- **Resaltar el sujeto con MÁS de un canal**, no solo color: la barra de SKY va **teal con gradiente + glow**, valor grande teal; el resto son barras del campo con **matiz azul de marca** (`rgba(120,172,248,…)` → `rgba(58,116,214,…)`), NUNCA gris/blanco-alpha plano (se ve placeholder).
+- **Anotación de brecha = el clímax narrativo (no decorativa):** una **línea de "techo"** (nivel del líder) que baja hasta el sujeto + la distancia etiquetada en píldora (`+N pts a cerrar`). Convierte el dato en argumento (el techo = la oportunidad del plan).
+- **Dato-héroe (`heroStat`) obligatorio:** un número que *grita* la conclusión (ej. `2,8×` "lo que el líder concentra frente a SKY"), en teal con glow, arriba-derecha de la card. Sin él la lámina "no impacta" (aprendizaje 2026-07-11: barras solas = se leen como formulario, no como argumento).
+- **El chart va en una GLASS CARD** (single-layer: `rgba(255,255,255,.055)` + borde `rgba(255,255,255,.14)` + sombra + highlight inset) sobre el **degradado rico** (azul `#196df2` → navy diagonal + glow teal + glow violeta `#6717cd` + **textura de puntos ~9%**). La card aterriza el chart (deja de flotar) y suma profundidad; el degradado rico + grain es el que da el impacto premium.
+- **Estático = HTML/CSS tokenizado**, no runtime de charts. Si una plantilla futura necesita charts ricos/animados fuera del deck, la política Greenhouse es ECharts (no aplica al render print).
 
-Prototipo vivo: `chart-split.html` (render `PREVIEW-chart-split.png`) — AI Share of Voice de SKY vs. categoría (barras horizontales, SKY resaltada), registro institucional.
+Prototipo vivo: `chart-split.html` (render `PREVIEW-chart-split.png`) — AI Share of Voice de SKY vs. categoría: glass card + hero `2,8×` + barras (SKY teal glow) + anotación de brecha `+32 pts a cerrar`, sobre degradado rico. Registro institucional.
+
+### `SectionDividerSplit` — contrato de slots (divisor de sección, bipartito · 2 variantes)
+
+**Lámina de transición entre capítulos del deck** (el node del Figma viene en blanco: solo el panel de marca). Panel de marca con un **número de sección héroe** + título + lead; lado claro con una **mini-agenda** de lo que trae la sección (útil, no vacío).
+
+```text
+sectionNo: string            // "02" — número héroe (Geist 600 tabular, ~190px, teal + glow)
+kicker:    string            // "Sección" (Geist 600 uppercase tracked, teal)
+title:     string            // título de la sección (Poppins 600 blanco, ~78px)
+lead?:     string            // una línea de contexto (Geist muted)
+agenda?:   Array<{ n; k; v }>// "en esta sección": 01/02/03 (n) + título (k) + descripción (v), sobre claro, acentos violeta
+variant:   'right' | 'left'  // qué lado ocupa el panel de marca (2 variantes espejo del Figma: 6:12498 brand-izq / 4:151 brand-der)
+```
+
+- **El número de sección es el héroe visual** (teal, glow) — es lo que hace de "respiro/capítulo". Título blanco debajo (color distinto → no compiten).
+- **Mini-agenda opcional** en el lado claro: da utilidad al divisor sin llenarlo (numeración + label Poppins + descripción muted, divisor punteado). Si no hay agenda, el lado claro respira.
+- **2 variantes espejo** para alternar dividers a lo largo del deck (evita que todos los capítulos abran del mismo lado). Degradado rico con la orientación del lado que corresponda.
+
+Prototipo vivo: `section-divider-split.html` (render `PREVIEW-section-divider-split.png`) — "Sección 02 · El método" + agenda (Enfoque / Producción editorial / Medición), variante brand-izquierda.
+
+### `CardGridFull` — contrato de slots (narrativa + grid de tarjetas · full-bleed · skill `modern-ui`)
+
+**Lámina full-bleed** (NO bipartita: una sola superficie de degradado, contenido en 2 columnas encima). Izquierda = **columna narrativa** (eyebrow + titular + cuerpo + caja destacada); derecha = **pregunta de sección + grid 2×N de tarjetas glass**. Sirve para un **stack de capacidades / servicios / herramientas** (el Figma lo usaba para herramientas de marketing con logos de terceros; nosotros lo usamos con **capacidades propias + íconos Solar**, sin logos ajenos).
+
+```text
+eyebrow:   string            // Geist 600 uppercase tracked, teal
+headline:  rich string       // Poppins 600 blanco, con acento teal itálico (cursiva real)
+body:      Array<string>     // 1..2 párrafos cortos (blanco)
+highlight: rich string       // caja destacada (glass sutil) con la tesis; acento teal itálico
+question:  string            // encabezado de la derecha (Poppins 600 blanco)
+cards:     Array<{ icon; title; lead; rest }>  // 4..6 tarjetas (grid 2 col); icon = Solar Bold
+```
+
+**Reglas (piso `modern-ui` aplicado):**
+
+- **Degradado full-bleed orientado (contraste dirigido):** **oscuro a la izquierda** (`#001a33`→`#023c70`) donde va el **texto blanco** narrativo (pasa contraste), **vibrante a la derecha** (`#196df2`) donde saltan las tarjetas claras. Glows teal top-right + violeta bottom-left + textura de puntos. (No es la receta de panel de las Split; es su variante full-bleed dirigida.)
+- **Tarjetas glassmorphism MILKY (frosted, NO sólidas, pero legibles)** con **texto navy**: fondo **frosted claro** (`linear-gradient(rgba(255,255,255,.72)→.56)`) + **`backdrop-filter: blur(24px) saturate(130%)`** → se ve el degradado **difuminado** a través (tinte azul), borde de luz `rgba(255,255,255,.6)` + highlight inset. **Glass de UNA capa** (nunca apilar frosted). **Punto medio calibrado (2026-07-11):** `.95` sólido se veía "pesado/no glass"; `.42` translúcido **perdía el texto**; `~.64–.72` milky = frosted + legible (el `blur` es lo que vende el vidrio, no la baja opacidad). Cuerpo navy `#2b3a5c`.
+- **Ícono Solar Bold** en contenedor **teal-tint** (`rgba(54,200,191,.18)` + borde teal), color del ícono = teal profundo `#0c7d75` (pasa 3:1 sobre el vidrio; no el teal brillante).
+- **Grid parejo** (gutter ~22px, tratamiento de tarjeta idéntico) → 4–6 tarjetas sin verse cargadas. Título Poppins + `lead` bold + `rest` regular muted.
+- **Caja destacada** = glass sutil (`rgba(255,255,255,.08)` + borde) con la tesis en Poppins 600 + acento teal itálico. Ancla el cierre de la narrativa.
+- **NUNCA logos de terceros** dibujados a mano; capacidades propias con íconos Solar (marcas de terceros reales seguirían su regla de isotipos, no aplica acá).
+
+Prototipo vivo: `card-grid-full.html` (render `PREVIEW-card-grid-full.png`) — "¿Qué opera Efeonce en la cuenta de SKY?" + 6 capacidades (SEO · AEO · editorial · Data Hub · medición · gobernanza), registro institucional.
+
+### `TimelineFull` — contrato de slots (cronograma / plan de trabajo · full-bleed · skill `dataviz-design`)
+
+**Gantt full-bleed** — la sección "plan de trabajo y cronograma" del bid (puntúa). NO viene del Figma: diseñada como **visualización de datos**, no decoración. Fases = **barras de rango** sobre un eje temporal; hitos = **diamantes** con línea conectora; actividad continua = barra **dashed**.
+
+```text
+title:      string           // "Cronograma del proyecto · <cliente>" (Poppins 600 blanco)
+eyebrow:    string           // "Plan de trabajo" (Geist 600 uppercase, teal)
+meta:       rich string      // resumen arriba-derecha ("N meses · N fases…", tabular)
+units:      string[]         // eje: "Mes 1"…"Mes N" (Geist tabular, uppercase, muted = scaffolding quieto)
+phases:     Array<{ n; title; desc; start; end; continuous? }>  // barra por fase; posición = fracción del eje (start-1)/N … end/N
+milestones: Array<{ label; sub; at }>   // diamante teal + label; at = fracción del eje
+```
+
+**Reglas (piso `dataviz-design` + jerarquía `typography-design`):**
+
+- **Encoding correcto:** fase = **barra de rango** posicionada por fracción de mes (`left=(start-1)/N`, `width=(end-start+1)/N`); hito = **marcador diamante** con **línea conectora** que baja por las fases (convención Gantt: marca la fecha en toda la vista); actividad continua = barra **dashed outline** (always-on). Grilla mensual **sutil** (`repeating-linear-gradient`), sin ejes recargados; todo etiquetado + **leyenda**.
+- **Jerarquía de texto (escalonada, calibrada 2026-07-11):** título slide (52) › **título de fase (27, Poppins, domina el chart)** / hito (18) › eje-mes (16 uppercase muted = scaffolding) / número de fase (16 teal, índice subordinado) › descripción (15 muted) › label de barra (14). El número de fase **NO** compite con el título (era 20 vs 24 → 16 vs 27).
+- **Full-bleed dark-even:** navy en todo el ancho (blanco legible en cualquier punto) + glows teal/violeta en esquinas + grain. NO el degradado rico de Split (que se aclara en un borde y perdería el texto blanco del otro extremo del eje).
+- **Datos ilustrativos** marcados; el cronograma real se ajusta al plazo de las bases. Las fases muestran **solapes** (dependencias/holgura), no una escalera perfecta.
+
+Prototipo vivo: `timeline-full.html` (render `PREVIEW-timeline-full.png`) — plan de 6 meses de SKY (5 fases + 3 hitos), registro institucional.
+
+### `TeamSplit` — contrato de slots (equipo / squad · bipartito)
+
+La sección **equipo** del bid (puntúa: el evaluador cruza CV/rol/dedicación vs requisito). Bipartito: **panel de marca izq** con la tesis del squad + **roster de tarjetas de rol** sobre claro.
+
+```text
+eyebrow:   string            // "El equipo" (teal)
+headline:  rich string       // tesis del squad (Poppins 600, acento teal itálico) — ej. "…un responsable único"
+lead:      string            // una línea de modelo de equipo (blanco muted)
+highlight: rich string       // caja destacada (glass) con la promesa (acento teal)
+members:   Array<{ icon|photo; role; desc; dedication }>  // 4..6 filas-tarjeta
+```
+
+**Reglas:**
+
+- **Roster = tarjetas cohesivas, NO filas flotando.** Cada rol es una **tarjeta** (blanco, sombra suave, radio) con **gap ajustado parejo** (~20px) en bloque centrado. **Aprendizaje 2026-07-11 (design-studio):** `space-between` sobre filas sin fondo deja **huecos disparejos y aire excesivo**; la solución es card-bg + gap fijo + bloque cohesivo (el espacio alrededor = negativo intencional, no gaps).
+- **Jerarquía por tarjeta:** **rol** (Poppins 25 navy, domina) › **descripción** (15 muted) › **dedicación %** = dato (Geist tabular, violeta, columna derecha alineada). El avatar = chip teal circular.
+- **Honestidad:** avatar = **ícono de rol Solar**, NO caras/nombres fabricados; el slot acepta **foto + nombre reales** en un bid real. Muestra la **estructura de roles + dedicación** (lo que puntúa), no gente inventada.
+- Datos ilustrativos; las dedicaciones % son ejemplo (suman >100% porque son varios part-time, realista para un squad).
+
+Prototipo vivo: `team-split.html` (render `PREVIEW-team-split.png`) — squad de 5 roles para SKY (Lead · Estratega · Editor · Técnico · Analista) con dedicación, registro institucional.
+
+### `CaseStudySplit` — contrato de slots (caso acreditado · bipartito · dirección `design-studio`)
+
+La sección **experiencia/casos** del bid (en público la experiencia se **acredita**, no se afirma). Un caso = una mini-historia con arco **reto → enfoque → resultado**; **el resultado es el clímax**. Bipartito: **historia sobre claro izq** → **el pago (resultado) en panel de marca der**.
+
+```text
+eyebrow:    string           // "Caso · <sector anonimizado>"
+title:      rich string       // titular de transformación (Poppins 600, acento violeta) — ej. "De invisible a citada"
+stages:     Array<{ overline; text }>   // reto → enfoque → aprendizaje (3 beats; overline violeta uppercase)
+result: {
+  hero:      { value; label }  // MÉTRICA HERO = el clímax (Geist tabular ~132px, teal + glow) — ej. "×3,2"
+  beforeAfter: { before; after; caption }  // barras que VISUALIZAN el salto (el ×N es ese salto)
+  chips:     string[]          // 1..2 datos de apoyo (glass)
+  source:    string            // atribución: "resultado acreditado · <periodo>"
+}
+```
+
+**Reglas (dirección de arte `design-studio`):**
+
+- **Un solo foco = el resultado.** La métrica hero (`×N` / `%`) domina el panel de marca en teal con glow. Todo lo demás la alimenta. NUNCA tres métricas del mismo tamaño compitiendo.
+- **Flujo narrativo izq→der:** la historia (reto/enfoque/aprendizaje) se lee primero y el ojo aterriza en el resultado (panel de marca = destino). Recorrido 1→2→3.
+- **Mostrar la transformación, no solo contarla (aprendizaje 2026-07-11):** el hero + **barras before→after** (`antes` corta muted → `después` alta teal+glow) hacen el salto *visceral* y **llenan el panel** (evita el vacío inferior). Las barras ya llevan el `%` → NO repetir una línea de texto `12%→38%` (triple redundancia).
+- **Prueba/atribución obligatoria:** chips de apoyo + `source`. Caso **anonimizado por sector**, valores **ilustrativos marcados** — NUNCA fabricar un cliente real; el slot acepta el caso real acreditado en un bid.
+- **Jerarquía:** hero (132) › titular (44) › overlines de etapa › valores de barra (30) › cuerpo (23) › fuente (16). Acento **teal sobre el panel oscuro**, **violeta sobre el claro**.
+- **Tercer beat "El aprendizaje"** equilibra el peso de la mitad izquierda (evita que la historia quede lean vs. el resultado denso).
+
+Prototipo vivo: `case-study-split.html` (render `PREVIEW-case-study-split.png`) — caso anonimizado retail: `×3,2` Share of Voice en IA (12% → 38% en 6 meses), registro institucional.
+
+### `AgendaFull` — contrato de slots (índice / agenda de apertura · full-bleed · nav)
+
+Lámina de **apertura** que da el mapa de la propuesta (wayfinding). Full-bleed dark-even + header + **grid 2×N de capítulos clickeables** + footer. Se escanea en 3 s.
+
+```text
+eyebrow:  string             // "La propuesta" (teal)
+title:    string             // "Agenda" (Poppins 600 ~66px, domina)
+count:    rich string        // "N capítulos · <contexto>" (tabular)
+chapters: Array<{ n; title; desc; targetSlideId }>   // 4..8 ítems (ver overflow)
+footer:   { left; right }    // línea inferior que enmarca (ej. "Propuesta técnica · SKY" · "efeoncepro.com")
+```
+
+**Navegación — cada ítem es CLICKEABLE (regla dura):**
+
+- Cada capítulo se renderiza como **`<a class="ch" href="#<targetSlideId>">`** — es un **deep-link a su sección/slide**, no texto decorativo. `targetSlideId` = el id del **`SectionDividerSplit`** (o del primer slide) de ese capítulo.
+- **En el deck interactivo (HTML):** el click salta a la sección (con `scroll-behavior`/anchor) + affordance de hover (borde teal, título teal).
+- **En el PDF (Chromium `print-to-pdf`):** el ancla se preserva como **link interno de PDF** — el índice queda navegable en el PDF entregado. (Es la lectura *Full API Parity* de una agenda: una surface de navegación con destinos reales, no una imagen.)
+- El composer **debe** poblar `targetSlideId` de cada capítulo con un id real del deck; un ítem sin destino es un error de composición (agenda que no navega).
+
+**Overflow — qué hacer si crece más allá de estos ítems (regla dura):**
+
+- **Rango sano = 4–8 capítulos** (una agenda se **escanea**, no se lee). Preferir **6** (2×3, la referencia).
+- **7–8 capítulos:** el grid pasa a **2×4** (misma columna, una fila más); `row-gap` se ajusta y la escala del número baja **un paso** si hace falta. Sigue en **una** lámina.
+- **> 8 capítulos → NO cram:** un índice con >8 top-level significa que el deck tiene demasiados capítulos de primer nivel. **Restructurar**, no encoger la tipografía:
+  - **(preferido)** **agrupar en Partes** (ej. "Parte 1 · Entendimiento" con sub-capítulos), y la agenda lista las Partes.
+  - o **consolidar** capítulos afines en uno.
+  - **NUNCA** dividir la agenda en 2 slides ("Agenda 1/2") como default — es smell de estructura; solo válido si las bases exigen un TOC largo literal.
+- **Títulos largos:** una línea; si un título no cabe en su celda, acortar el copy (no reducir la escala global). El `desc` es **una** línea corta, opcional.
+
+Prototipo vivo: `agenda-full.html` (render `PREVIEW-agenda-full.png`) — 6 capítulos clickeables de la propuesta SKY (Contexto → Enfoque → Plan → Equipo → Casos → Inversión) + footer.
 
 ### `DualTextSplit` — contrato de slots (Texto+Texto, bipartito)
 
@@ -335,13 +661,118 @@ El agente aporta los pares con evidencia; el compositor fija iconografía, el or
 
 `BulletListSplit` renderizado end-to-end con los 7 diferenciadores reales de SKY: layout del Figma + degradado hero+teal + tipografía 600/400 + safe-area verificada. Es el molde para el resto del catálogo.
 
-## Reparto de trabajo en curso (multi-agente Claude ↔ Codex, 2026-07-11)
+## Reparto de trabajo — catálogo COMPLETO (multi-agente Claude ↔ Codex, 2026-07-11)
 
-Para paralelizar sin colisión sobre este doc y los prototipos:
+**Las 11 plantillas del catálogo están construidas ✅.** Reparto final:
 
-- **Claude:** `ChartSplit` (5:10852) ✅ → tomar `DualListSplit` (8:14347) + `SectionDividerSplit` (6:12498).
-- **Codex:** `ComparisonSplit` ✅ · `DualTextSplit` ✅ · `StatSplit` (7:13485, en curso).
-- **Regla de convivencia:** cada agente edita **solo la sección de su plantilla** (fila de catálogo + su contrato); no tocar prototipos ni secciones del otro. El `registry` + `selector` se hacen al final, en conjunto, cuando estén las 11.
+- **Claude:** `CoverFull` · `BulletListSplit` · `NarrativeSplit` · `MetricsSplit` · `QuoteSplit` · `ChartSplit` · `SectionDividerSplit`.
+- **Codex:** `DualTextSplit` · `ComparisonSplit` · `StatSplit` · `DualListSplit`.
+- **Regla de convivencia (siguió vigente):** cada agente editó **solo la sección de su plantilla**; degradado rico unificado (Rule 1) en todos los paneles de marca.
+- **Siguiente milestone (en conjunto):** `registry` (`template → node-id → content-type → slots`) + `selector` agéntico (el agente elige la plantilla por tipo de contenido). Se hace ahora que están las 11.
+
+> **Nota:** el catálogo del Figma (11) + las full-bleed agregadas (`CoverFull`, `BackCoverFull`, `HighlightWave`, `FourPillarsFull`, `CardGridFull`) suman **16 plantillas**. Faltan las de abajo para cerrar el **arco completo de un bid deck**.
+
+## Plantillas faltantes — gap de licitación (roadmap, 2026-07-11)
+
+Gap-analysis contra la **anatomía de la oferta técnica que puntúa** (skill `greenhouse-public-private-tenders` → `propuesta-tecnica-economica.md`). El set actual cubre *comprensión · metodología (paralela) · diagnóstico · valor diferencial · capacidades*, pero **NO cubre** secciones que puntúan fuerte o evitan el descarte. Estas plantillas **no vienen del Figma**: se diseñan aplicando el molde ya canónico (degradado rico, tipografía, íconos Solar, glassmorphism).
+
+| # | Plantilla propuesta | Sección del bid que cubre | Tier (peso p/ganar) | Owner |
+|---|---|---|---|---|
+| 1 | **`TimelineFull`** ✅ | plan de trabajo / **cronograma** (hitos, entregables, dependencias, holgura) | **T1** must-have · puntúa | **Claude** · construido |
+| 2 | **`TeamSplit`** ✅ | **equipo / squad** (rol · dedicación % · respaldo); el evaluador cruza CV vs requisito | **T1** must-have · puntúa | **Claude** · construido |
+| 3 | **`PricingFull`** ✅ | **oferta económica / inversión** (total · desglose cotizado · condiciones) | **T1** must-have · sobre económico | **Codex** |
+| 4 | **`RequirementsTableFull`** ✅ | **matriz de cumplimiento** técnico × SLA (item por item) — *evita el descarte* | **T1** must-have · admisibilidad | **Codex** |
+| 5 | **`CaseStudySplit`** ✅ | **caso acreditado** con arco contexto → acción → resultado + métrica (la experiencia se acredita, no se afirma) | **T2** eleva | **Claude** · construido |
+| 6 | **`ProcessStepsFull`** ✅ | metodología **secuencial** 1→2→3→4→5 (distinta de `FourPillars`, que es paralelo) | **T2** eleva | **Codex** |
+| 7 | **`AgendaFull`** ✅ | **índice / agenda** de apertura del deck | **T2** eleva | **Claude** · construido |
+| 8 | **`CredentialsFull` / `LogoWall`** ✅ | **clientes / credenciales** (prueba social por logos; distinta de capacidades) | **T3** nice-to-have | **Codex** |
+
+**Reparto (4 / 4):**
+
+- **Claude:** `TimelineFull` → `TeamSplit` → `CaseStudySplit` → `AgendaFull`.
+- **Codex:** `PricingFull` → `RequirementsTableFull` → `ProcessStepsFull` → `CredentialsFull`.
+- **Regla de convivencia (vigente):** cada agente edita **solo su fila de catálogo + su contrato**; molde canónico (degradado rico, tipografía, Solar, glassmorphism milky, acento teal-oscuro/violeta-claro) aplica a todas; contenido de referencia = caso **SKY**, registro institucional (sin tuteo). Las que impliquen datos (pricing, requisitos) usan cifras **ilustrativas** marcadas, nunca fabricadas como reales.
+- **Prioridad:** Tier 1 primero (mueven la adjudicación), luego Tier 2, luego Tier 3.
+
+## Registry + Selector — el cerebro del composer (v0.1, 2026-07-11)
+
+Formalizado como artefacto **machine-readable**: **`tender-deck-composer-prototypes/registry.json`** (patrón de los `*.slots.json`). Es el índice canónico que el selector agéntico + el renderer consumen.
+
+**Modelo:**
+
+1. **Taxonomía de content-types** (23): `cover · back-cover · agenda · section-divider · narrative · statement · highlight · bullet-list · dual-list · dual-text · one-metric · several-kpis · chart · comparison · capabilities-grid · four-pillars · process-sequential · timeline · team · case-study · credentials · pricing · requirements-table`.
+2. **Registry:** cada plantilla declara `name · kind (split/full-bleed) · source (figma node | gap | design) · owner · status · contentTypes[] · prototype · slotsRef` (+ flags: `nav`, `overflow`, `variants`, `rightSlot/leftSlot`, `requires`).
+3. **Selector:** el agente **clasifica el contenido** de cada slide en un content-type → el selector devuelve la plantilla cuyo `contentTypes` lo incluye (match declarativo 1:1). Las **reglas de desambiguación** resuelven los solapes (ver `registry.json → selector.disambiguation`), p.ej.:
+   - métrica: **una** hero → `StatSplit`; **varios** KPIs → `MetricsSplit`; con **gráfico** → `ChartSplit`; como **resultado de caso** → `CaseStudySplit`.
+   - N ítems: **pilares** paralelos → `FourPillarsFull`; **pasos** secuenciales → `ProcessStepsFull`; **fases en el tiempo** → `TimelineFull`.
+   - texto fuerte: **statement/quote** → `QuoteSplit`; **frase destacada** → `HighlightWave`; **prosa** → `NarrativeSplit`.
+
+**Reglas duras del selector:** un slide = un content-type = una plantilla (mezcla → dividir en dos slides); **NUNCA freehand** (si nada calza, falta una plantilla → abrir gap, no improvisar); el renderer sólo llena slots declarados; datos de cliente reales o **ilustrativos marcados**; registro institucional.
+
+**Pendiente del milestone (en conjunto con Codex):**
+
+- Poblar `slotsRef` de las plantillas que aún no tienen su `*.slots.json` (hoy sólo `CoverFull`).
+- Las cuatro plantillas de Codex (`PricingFull`, `RequirementsTableFull`, `ProcessStepsFull`, `CredentialsFull`) están registradas con sus contratos de slots; schema/runtime queda diferido.
+- Opcional: `registry.schema.json` (validación) + cablear a código cuando F4 pase a build (hoy Proposed/doc-only).
+
+## Arquitectura del runtime del composer — cómo se compone el deck (v0.1, dirección `arch-architect`)
+
+### En simple (la analogía de la revista)
+
+Armar el deck es como producir una **revista de propuesta**. Casi nada necesita "inteligencia": elegir la plantilla, rellenarla y exportar el PDF es **mecánico** (una máquina, siempre igual). La IA sólo hace falta en **dos partes que piensan**:
+
+1. **El director** (una IA) arma el **índice**: qué capítulos y en qué orden.
+2. **Los editores** (varias IA) escriben el contenido, **uno por capítulo, en paralelo** (por eso es rápido).
+
+Luego: **un revisor** (IA) chequea que no haya datos inventados, tono formal y coherencia → **la máquina imprime** las slides → **el humano aprueba antes de que salga**. Nada se envía solo (regla de licitaciones: no se manda oferta sin firma humana). Como la parte mecánica es fija, **el mismo contenido siempre da el mismo PDF** (auditable).
+
+*Uno por capítulo, no por slide:* las slides de un capítulo comparten datos; una IA por slide (15-25) es más cara y pierde el hilo. Por capítulo son ~6-8 editores, se coordinan mejor.
+
+### La decisión de arquitectura
+
+**Orquestador + subagentes SÍ, pero acotado a UN paso; el resto determinista.** El composer no es research abierto (donde el multi-agente brilla); es un **pipeline determinista** con **2 nodos de juicio**. La cantidad de superficies justifica **fan-out en la autoría**, no volver todo agéntico (doctrina `arch-architect`: determinista antes que multi-agente; el peso de la prueba lo carga lo exótico).
+
+| Determinista — **sin LLM** | Agéntico — **juicio** |
+|---|---|
+| **Selector** (content-type → plantilla = lookup en `registry.json`) · **slot-fill** · **render HTML→PDF** · ensamblado · orden de páginas · deep-links de agenda | **Outline del deck** (capítulos, orden, arco) · **autoría por capítulo** (copy institucional, qué métrica destacar, armar el caso) |
+
+Topología (Workflow determinista + agentes en 2 nodos):
+
+```text
+intake (requisitos del bid + método 10-fases)
+  └─(agente) ORQUESTADOR → outline = [ { capítulo, content-types, brief, targetSlideIds } ]
+        └─ fan-out DETERMINISTA sobre CAPÍTULOS:
+              (agente) chapter-author → slots JSON por slide   [el SELECTOR elige plantilla, determinista]
+        └─(agente) VERIFIER → registro · integridad de datos · coherencia · barra KV
+  └─ DETERMINISTA: slots+plantilla → HTML → PDF · ensambla · pagina · agenda deep-links
+  └─ [HUMANO confirma/exporta]   ← acción gobernada; nada "se envía" antes de esto
+```
+
+**Encaje Greenhouse:**
+
+- **Full API Parity / propose→confirm→execute:** los subagentes **proponen** el deck (borrador); el LLM **nunca escribe estado ni "envía"**; el humano confirma/exporta. Mapea 1:1 a la regla del método (nunca enviar oferta sin sign-off).
+- **Integridad de datos (defensa en profundidad):** el `VERIFIER` marca cifras fabricadas / register no-institucional / fuentes faltantes → datos reales o **ilustrativos marcados**, nunca inventados.
+- **Reproducibilidad/auditoría:** el artefacto auditable son los **slots JSON**; re-render de los mismos slots es **determinista** (mismos slots → mismo PDF). Trace-ID por subagente, costo por agente, replay desde slots.
+- **Costo:** sólo pagan tokens el outline + N capítulos + 1 verifier (acotado); el render (lo voluminoso) es gratis en tokens.
+
+**NUNCA:** LLM en render/selector/ensamblado (rompe reproducibilidad) · fan-out por slide por defecto · recursión de subagentes (**profundidad = 1**) · scratchpad mutable compartido (result-only; contexto read-only del molde/registro/caso) · auto-submit · fabricar datos.
+
+**Dependencia dura:** el composer **NO** construye su propio agent-runtime — consume el **`src/lib/ai/agent-runtime` (tool-runner) canónico compartido**, que hoy **no existe** (memoria Q8). Es prerequisito, no parte del composer.
+
+**Pendiente:** promover esto a **ADR** (decisión de topología difícil de revertir que cruza agent-runtime + Full API Parity + método) en `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`. Hoy queda como dirección v0.1 doc-only.
+
+### Capa de assets / imágenes del deck (3D icons + personas) — frontera runtime vs out-of-band
+
+Sumaremos imágenes al deck: **3D icons** y **personas**. Los assets de imagen son **slots** (`3DIcon`, `PersonaAsset`, `ConceptVisual`), NO se generan al vuelo en el render. Reglas duras (alineadas con CLAUDE.md §AI image + §MCP creativos):
+
+- **Generación de imágenes = SIEMPRE el generador canónico** `src/lib/ai/image-generator.ts` / `generateImage()` / `pnpm ai:image` (OpenAI **GPT Image** / "ChatGPT Imagen 2", secret `greenhouse-openai-api-key`; Imagen/Higgsfield-Recraft para vectores). **NUNCA** un SDK/cliente paralelo ni script ad-hoc. Dirección de arte del asset → skill `greenhouse-ai-image-generator` + `design-studio`. Precedente: personaje 3D Nexa (GPT Image edit + remove-bg local).
+- **Remove-bg — frontera crítica:** los **MCP creativos (Adobe, Figma, Higgsfield, Magnific) son OUT-OF-BAND, solo-sesión-Claude, NUNCA runtime.** Por lo tanto:
+  - **Fase de diseño (out-of-band):** Claude/humano produce los assets reusables con GPT Image + remove-bg (Adobe Creativity MCP OK acá) y los guarda en la **librería de assets con un `assetId`**.
+  - **Runtime (composer):** usa el **remove-bg del repo** (sharp local / runtime-safe). El **Adobe MCP NO es un paso del composer**.
+- **Dos modos, preferir el primero:**
+  1. **Assets pre-producidos out-of-band (preferido):** el composer **referencia** por `assetId` → runtime determinista y reproducible.
+  2. **Runtime gen (si hace falta):** paso **async gobernado** que llama `generateImage()` + remove-bg del repo; el asset generado se **pinea por hash** (se cachea, no se regenera por render) — si no, se rompe *"mismo contenido = mismo PDF"*.
+- **Guardrail de honestidad (personas):** **equipo = fotos REALES** del squad, **NUNCA caras IA fabricadas** (el evaluador cruza CV vs persona → tergiversación). Persona **decorativa/ilustrativa** = IA con **criterio de disclosure**, jamás presentada como "tu equipo". **3D icons =** preferir la **librería propietaria de ilustraciones Efeonce** (`characters/greenhouse-*.png`, obra del equipo, no stock) o generar en ese estilo.
 
 ## Pendiente
 

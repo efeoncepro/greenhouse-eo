@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8">
+<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   /* Cursivas REALES cargadas (Poppins ital 600) — nunca faux italic. Geist solo roman. */
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600&family=Geist:wght@400;600&display=swap');
@@ -58,8 +58,10 @@
     position:relative; flex:1; height:1080px; overflow:hidden;
     border-top-left-radius:64px; border-bottom-left-radius:64px;
     background:
-      radial-gradient(60% 48% at 92% 100%, color-mix(in srgb, var(--teal) 20%, transparent) 0%, transparent 46%),
-      radial-gradient(128% 100% at 30% -12%, var(--navy-2) 0%, var(--navy) 52%, var(--navy-deep) 100%);
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
     color:#fff;
   }
   .brand-head { position:absolute; left:72px; top:72px; }
@@ -80,7 +82,7 @@
   .leg .v { font-size:20px; color:rgba(255,255,255,.72); }
 </style></head>
 <body>
-  <div class="slide">
+  <div class="slide" data-template="NarrativeSplit">
     <!-- LEFT -->
     <div class="text">
       <div class="header">

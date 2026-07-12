@@ -1,0 +1,52 @@
+/* Chrome fijo del Tender Deck Composer: no es slot ni copy configurable. */
+[data-template]::after {
+  content:url('assets/url-lum.svg');
+  position:absolute;
+  right:56px;
+  bottom:36px;
+  z-index:999;
+  width:112px;
+  height:auto;
+  display:block;
+  opacity:.72;
+  pointer-events:none;
+  mix-blend-mode:luminosity;
+}
+
+/* La portada ya contiene la burbuja canónica como un asset semántico. */
+[data-template='CoverFull']::after,
+[data-template='BackCoverFull']::after { display:none; }
+[data-template='AgendaFull'] .r { display:none; }
+
+/* En splits con marca a la izquierda, la firma queda fuera del cuerpo sobre el mismo campo oscuro. */
+[data-template='BulletListSplit']::after,
+[data-template='DualListSplit']::after,
+[data-template='MetricsSplit']::after,
+[data-template='StatSplit']::after,
+[data-template='TeamSplit']::after,
+[data-template='SectionDividerSplit']::after {
+  right:auto;
+  left:42px;
+  bottom:36px;
+}
+
+/* Estas superficies llevan contenido claro en el borde inferior o derecho. */
+[data-template='FourPillarsFull']::after,
+[data-template='HumanImpactFull']::after {
+  top:122px;
+  right:72px;
+  bottom:auto;
+}
+[data-template='HighlightWave']::after {
+  display:none;
+}
+[data-template='CredentialsFull']::after {
+  top:282px;
+  right:132px;
+  bottom:auto;
+}
+[data-template='ProcessStepsFull']::after {
+  right:auto;
+  left:42px;
+  bottom:30px;
+}

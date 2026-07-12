@@ -1,0 +1,56 @@
+{
+  "template": "HumanImpactFull",
+  "figmaNodeId": "9:25264",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "sectionLabel": {
+      "selector": "[data-slot='sectionLabel']",
+      "type": "string",
+      "required": false,
+      "constraints": { "maxCharacters": 74, "maxLines": 2, "overflow": "reject" }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": { "maxCharacters": 74, "maxLines": 4, "allowedTags": ["em"], "overflow": "reject" }
+    },
+    "context": {
+      "selector": "[data-slot='context']",
+      "type": "array",
+      "required": true,
+      "constraints": { "minItems": 1, "maxItems": 2, "maxCharactersPerItem": 200, "maxLinesPerItem": 4, "overflow": "reject" },
+      "item": { "type": "rich-string", "allowedTags": ["strong"] }
+    },
+    "roleStory": {
+      "selector": "[data-slot='roleStory']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "role": { "type": "string", "required": true, "maxCharacters": 42, "maxLines": 1 },
+        "transition": { "type": "string", "required": true, "maxCharacters": 44, "maxLines": 1 }
+      }
+    },
+    "impactChange": {
+      "selector": "[data-slot='impactChange']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "state": { "type": "string", "required": true, "maxCharacters": 14, "maxLines": 1, "transform": "uppercase" },
+        "statement": { "type": "string", "required": true, "maxCharacters": 112, "maxLines": 3 }
+      }
+    },
+    "outcome": {
+      "selector": "[data-slot='outcome']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": { "maxCharacters": 180, "maxLines": 4, "allowedTags": ["strong", "em"], "overflow": "reject" }
+    }
+  },
+  "presentation": {
+    "brandSurface": "canonical-rich-deck-gradient",
+    "lowerCard": "translucent neutral glass; role story at top, a named human change as the visual subject on the left, and the operational consequence on the right",
+    "fixedIcon": "Iconify Solar Bold arrow-right; it is a directional affordance, never content"
+  }
+}

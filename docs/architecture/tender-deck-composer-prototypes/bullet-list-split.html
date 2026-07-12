@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8">
+<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -23,9 +23,10 @@
     position:relative; width:912px; flex:none; height:1080px; overflow:hidden;
     border-top-right-radius:64px; border-bottom-right-radius:64px;
     background:
-      radial-gradient(72% 56% at 6% 4%, color-mix(in srgb, var(--axis-teal) 64%, transparent) 0%, transparent 52%),
-      radial-gradient(56% 50% at 100% 98%, color-mix(in srgb, var(--axis-violet) 34%, transparent) 0%, transparent 58%),
-      linear-gradient(160deg, var(--axis-navy-soft) 0%, var(--axis-navy) 62%, var(--axis-navy-deep) 100%);
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
   }
   .brand-head { position:absolute; left:72px; top:286px; z-index:2; }
   .brand-title { font-family:'Poppins',sans-serif; font-weight:600; font-size:58px; line-height:1.06; color:#fff; letter-spacing:-.015em; }
@@ -40,7 +41,7 @@
   .bullet .txt b { font-weight:600; }
 </style></head>
 <body>
-  <div class="slide">
+  <div class="slide" data-template="BulletListSplit">
     <div class="brand">
       <div class="brand-head">
         <div class="brand-title">Diferenciadores de</div>

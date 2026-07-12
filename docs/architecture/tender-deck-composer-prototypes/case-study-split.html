@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1920px; height:1080px; }
+  body { font-family:'Geist',sans-serif; overflow:hidden; }
+
+  :root { --safe:72px; --teal:#36c8bf; --teal-deep:#2ab5ab; --violet:#33029c; --ink:#020061; --panel-bg:#eef0f3; }
+  .slide { position:relative; width:1920px; height:1080px; display:flex; background:var(--panel-bg); }
+
+  /* ===== LEFT: la historia (claro) ===== */
+  .story { width:880px; flex:none; height:1080px; padding:var(--safe) 60px var(--safe) var(--safe);
+    display:flex; flex-direction:column; justify-content:center; gap:34px; }
+  .eyebrow { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--ink); opacity:.55; }
+  .head-row { display:flex; gap:28px; }
+  .rule { flex:none; width:3px; border-radius:2px; align-self:stretch;
+    background:linear-gradient(180deg, var(--teal) 0%, color-mix(in srgb, var(--violet) 60%, transparent) 100%); }
+  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:44px; line-height:1.08; letter-spacing:-.018em; color:var(--ink); margin-top:14px; }
+  .title em { font-style:italic; color:var(--violet); }
+  .stages { display:flex; flex-direction:column; gap:26px; max-width:710px; }
+  .stage .ov { font-family:'Geist',sans-serif; font-weight:600; font-size:16px; letter-spacing:.08em; text-transform:uppercase; color:var(--violet); margin-bottom:9px; }
+  .stage p { font-size:23px; line-height:1.4; color:var(--ink); }
+  .stage p b { font-weight:600; color:var(--violet); }
+
+  /* ===== RIGHT: el pago (panel de marca) ===== */
+  .result {
+    position:relative; flex:1; height:1080px; overflow:hidden;
+    border-top-left-radius:64px; border-bottom-left-radius:64px;
+    padding:var(--safe) 84px; display:flex; flex-direction:column; justify-content:center; gap:0; color:#fff;
+    background:
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
+  }
+  .result .ov { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--teal); }
+  /* hero */
+  .hero { display:flex; align-items:baseline; margin-top:16px; }
+  .hero .num { font-family:'Geist',sans-serif; font-weight:600; font-size:132px; line-height:.82; color:var(--teal);
+    font-variant-numeric:tabular-nums; letter-spacing:-.03em; text-shadow:0 0 50px rgba(54,200,191,.45); }
+  .hero .lab { font-size:26px; line-height:1.22; color:rgba(255,255,255,.86); max-width:280px; margin-left:22px; }
+
+  /* before → after (barras — visualiza el salto que ES el ×3,2) */
+  .ba { display:flex; align-items:flex-end; gap:44px; margin-top:46px; height:270px; }
+  .barcol { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+  .barcol .bnum { font-family:'Geist',sans-serif; font-weight:600; font-size:30px; font-variant-numeric:tabular-nums; margin-bottom:12px; }
+  .barcol .bar { width:96px; border-radius:14px 14px 4px 4px; }
+  .barcol .bcap { font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.55); margin-top:14px; }
+  .before .bnum { color:rgba(255,255,255,.6); }
+  .before .bar { height:74px; background:rgba(255,255,255,.24); }
+  .after .bnum { color:#fff; }
+  .after .bar { height:234px; background:linear-gradient(180deg, #5fe0d6 0%, var(--teal-deep) 100%);
+    box-shadow:0 0 40px rgba(54,200,191,.5), inset 0 1px 0 rgba(255,255,255,.3); }
+  .ba .lead-in { align-self:center; display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
+  .ba .lead-in .t { font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; color:#fff; }
+  .ba .lead-in .s { font-size:16px; color:rgba(255,255,255,.6); }
+
+  /* chips de apoyo */
+  .chips { display:flex; gap:14px; margin-top:44px; }
+  .chip { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:14px; padding:14px 20px;
+    font-size:20px; color:rgba(255,255,255,.9); }
+  .chip b { color:var(--teal); font-weight:600; font-variant-numeric:tabular-nums; }
+  .src { font-size:16px; color:rgba(255,255,255,.5); margin-top:30px; }
+</style></head>
+<body>
+  <div class="slide" data-template="CaseStudySplit">
+    <!-- LEFT: historia -->
+    <div class="story">
+      <div>
+        <div class="head-row">
+          <div class="rule"></div>
+          <div>
+            <div class="eyebrow">Caso · marca de consumo, categoría retail</div>
+            <h1 class="title">De invisible a <em>citada</em> en su categoría</h1>
+          </div>
+        </div>
+      </div>
+      <div class="stages">
+        <div class="stage">
+          <div class="ov">El reto</div>
+          <p>Presencia casi nula en las respuestas de asistentes con IA; el líder concentraba la conversación de la categoría.</p>
+        </div>
+        <div class="stage">
+          <div class="ov">El enfoque</div>
+          <p><b>Surround Discovery:</b> SEO técnico + producción editorial + optimización AEO, con medición continua de citabilidad.</p>
+        </div>
+        <div class="stage">
+          <div class="ov">El aprendizaje</div>
+          <p>Rodear toda la superficie de descubrimiento —no perseguir un canal— es lo que sostiene el resultado.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: resultado -->
+    <div class="result">
+      <div class="ov">El resultado</div>
+      <div class="hero">
+        <span class="num">×3,2</span>
+        <span class="lab">su Share of Voice en asistentes con IA</span>
+      </div>
+      <div class="ba">
+        <div class="barcol before"><div class="bnum">12%</div><div class="bar"></div><div class="bcap">Antes</div></div>
+        <div class="barcol after"><div class="bnum">38%</div><div class="bar"></div><div class="bcap">Después · 6 meses</div></div>
+        <div class="lead-in"><div class="t">El mismo método,<br>aplicado a SKY.</div><div class="s">del diagnóstico al resultado.</div></div>
+      </div>
+      <div class="chips">
+        <div class="chip">Citada por <b>4 de 5</b> asistentes</div>
+        <div class="chip"><b>+180%</b> tráfico orgánico</div>
+      </div>
+      <div class="src">Resultado acreditado · caso anonimizado, valores ilustrativos (el caso real se acredita en la oferta)</div>
+    </div>
+  </div>
+</body></html>

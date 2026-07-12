@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <link rel="stylesheet" href="deck-signature.css">
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Poppins:ital,wght@0,300;0,800;0,900;1,800;1,900&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:1920px; height:1080px; }
+    body { overflow:hidden; font-family:'Geist',sans-serif; }
+    :root { --ink:#020061; --teal:#2c98b0; --lime:#6ec207; --lime-text:#517b00; --surface:rgba(247,248,250,.86); }
+    .slide { position:relative; isolation:isolate; width:1920px; height:1080px; overflow:hidden; color:#fff; background:
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%); }
+    .hero { position:relative; z-index:1; height:526px; display:grid; grid-template-columns:48% 52%; gap:44px; padding:145px 132px 66px; }
+    .title-block { position:relative; padding-left:34px; }
+    .title-block::before { content:''; position:absolute; left:0; top:15px; bottom:4px; width:3px; background:rgba(255,255,255,.86); }
+    .eyebrow { margin-bottom:20px; font-size:24px; font-weight:300; letter-spacing:.008em; line-height:1.2; text-transform:uppercase; }
+    .title { max-width:680px; font-family:'Poppins',sans-serif; font-size:52px; font-weight:800; letter-spacing:-.045em; line-height:1.02; }
+    .title em { display:block; font-weight:800; font-style:italic; }
+    .context { align-self:start; max-width:765px; padding-top:1px; font-size:26px; line-height:1.29; }
+    .context p + p { margin-top:34px; }
+    .context strong { font-weight:700; }
+    .impact-card { position:absolute; z-index:2; left:0; right:0; bottom:0; height:584px; overflow:hidden; border-radius:58px 58px 0 0; background:var(--surface); border-top:1px solid rgba(255,255,255,.44); box-shadow:0 -1px 0 rgba(255,255,255,.17), inset 0 1px 0 rgba(255,255,255,.62); backdrop-filter:blur(20px) saturate(1.06); }
+    .role-title { position:absolute; top:57px; left:120px; width:800px; display:flex; align-items:flex-start; gap:21px; color:var(--lime-text); font-family:'Poppins',sans-serif; font-size:39px; font-weight:800; letter-spacing:-.045em; line-height:1.1; }
+    .role-title .arrow { flex:0 0 auto; width:48px; height:48px; margin-top:0; display:grid; place-items:center; border-radius:50%; background:var(--lime); }
+    .role-title .arrow img { width:31px; height:31px; filter:brightness(0) invert(1); }
+    .role-title em { display:block; font-style:italic; }
+    .impact-change { position:absolute; top:204px; left:120px; width:770px; }
+    .impact-label { margin-bottom:17px; color:var(--teal); font-size:15px; font-weight:700; letter-spacing:.17em; line-height:1; text-transform:uppercase; }
+    .impact-state { max-width:770px; color:var(--ink); font-family:'Poppins',sans-serif; font-size:84px; font-weight:800; letter-spacing:-.064em; line-height:.92; text-transform:uppercase; }
+    .impact-statement { position:relative; max-width:650px; margin-top:29px; padding-left:22px; color:rgba(2,0,97,.78); font-size:24px; font-weight:500; letter-spacing:-.018em; line-height:1.25; }
+    .impact-statement::before { content:''; position:absolute; top:5px; bottom:5px; left:0; width:4px; background:var(--lime); }
+    .divider { position:absolute; top:63px; bottom:50px; left:48.2%; width:1px; background:rgba(2,0,97,.8); }
+    .outcome-kicker { position:absolute; top:211px; left:1034px; color:var(--teal); font-size:15px; font-weight:700; letter-spacing:.17em; line-height:1; text-transform:uppercase; }
+    .outcome { position:absolute; top:243px; left:1034px; width:712px; color:var(--ink); font-family:'Poppins',sans-serif; font-size:37px; font-weight:800; letter-spacing:-.052em; line-height:1.06; }
+    .outcome strong { font-weight:800; }
+    .outcome em { color:var(--teal); font-style:normal; }
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="HumanImpactFull">
+    <header class="hero">
+      <section class="title-block">
+        <p class="eyebrow" data-slot="sectionLabel" data-slot-type="string">09. Lo que cambia para las personas que hacen el trabajo</p>
+        <h1 class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">De la frustración operativa a la ventaja <em>competitiva</em></h1>
+      </section>
+      <div class="context" data-slot="context" data-slot-type="array" data-slot-required="true">
+        <p><strong>Hablar de metodología en abstracto es fácil. Lo relevante es lo concreto:</strong> qué cambia para la persona que llega el lunes, abre su laptop y tiene que sacar algo adelante.</p>
+        <p>Un sistema no vive en una carpeta compartida: <strong>transforma el trabajo diario de personas específicas.</strong></p>
+      </div>
+    </header>
+    <section class="impact-card" aria-label="Impacto operativo por rol">
+      <h2 class="role-title" data-slot="roleStory" data-slot-type="object" data-slot-required="true"><span class="arrow" aria-hidden="true"><img src="assets/solar/arrow-right-bold.svg" alt=""></span><span><span data-slot-field="role">El especialista de marketing</span><em data-slot-field="transition">que dejó de esperar</em></span></h2>
+      <section class="impact-change" data-slot="impactChange" data-slot-type="object" data-slot-required="true" aria-label="Cambio humano observable">
+        <p class="impact-label">El cambio humano</p>
+        <p class="impact-state" data-slot-field="state">Autonomía</p>
+        <p class="impact-statement" data-slot-field="statement">Puede transformar intención en avance sin depender de una nueva interpretación.</p>
+      </section>
+      <div class="divider" aria-hidden="true"></div>
+      <p class="outcome-kicker" aria-hidden="true">Lo que habilita</p>
+      <p class="outcome" data-slot="outcome" data-slot-type="rich-string" data-slot-required="true"><strong>El especialista no construye desde cero cada vez.</strong><br>Construye sobre <em>un sistema</em> que ya sabe cómo funciona.</p>
+    </section>
+  </main>
+</body>
+</html>

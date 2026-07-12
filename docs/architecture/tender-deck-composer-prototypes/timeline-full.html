@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1920px; height:1080px; }
+  body { font-family:'Geist',sans-serif; overflow:hidden; }
+
+  :root {
+    --safe:72px; --teal:#36c8bf; --teal-deep:#1f9e94; --violet:#6717cd; --ink:#020061;
+    --lbl:320px;                 /* ancho de la columna de etiquetas de fase */
+    --m:16.6667%;                /* un mes = 1/6 del track */
+  }
+  /* full-bleed dark-even: navy en todo el ancho (blanco legible) + glows teal/violeta + grain */
+  .slide {
+    position:relative; width:1920px; height:1080px; padding:var(--safe) var(--safe);
+    display:flex; flex-direction:column; color:#fff;
+    background:
+      radial-gradient(rgba(255,255,255,.07) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
+  }
+
+  /* header */
+  .head { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }
+  .eyebrow { font-weight:600; font-size:20px; letter-spacing:.10em; text-transform:uppercase; color:var(--teal); margin-bottom:12px; }
+  .title { font-family:'Poppins',sans-serif; font-weight:600; font-size:52px; line-height:1.04; letter-spacing:-.02em; color:#fff; }
+  .head .meta { text-align:right; font-size:21px; color:rgba(255,255,255,.66); line-height:1.4; }
+  .head .meta b { color:#fff; font-weight:600; font-variant-numeric:tabular-nums; }
+
+  /* gantt */
+  .gantt { position:relative; flex:1; display:flex; flex-direction:column; margin-top:52px; }
+  /* líneas conectoras de hito (bajan por las fases) */
+  .vlines { position:absolute; left:var(--lbl); right:0; top:56px; bottom:62px; pointer-events:none; z-index:1; }
+  .vline { position:absolute; top:0; bottom:0; width:0; border-left:1.5px dashed rgba(54,200,191,.30); }
+  .row-flex { display:flex; align-items:stretch; }
+  .lbl { width:var(--lbl); flex:none; }
+  .track { position:relative; flex:1;
+    background:repeating-linear-gradient(90deg, transparent 0, transparent calc(var(--m) - 1.5px),
+      rgba(255,255,255,.10) calc(var(--m) - 1.5px), rgba(255,255,255,.10) var(--m)); }
+
+  /* eje de meses */
+  .axis { height:44px; }
+  .axis .track { display:flex; }
+  .axis .mo { flex:1; padding-left:16px; display:flex; align-items:center;
+    font-family:'Geist',sans-serif; font-weight:600; font-size:16px; letter-spacing:.03em; color:rgba(255,255,255,.5);
+    text-transform:uppercase; font-variant-numeric:tabular-nums; border-left:1.5px solid rgba(255,255,255,.10); }
+  .axis .mo:first-child { border-left:none; }
+
+  /* lane de hitos */
+  .milestones { height:74px; }
+  .milestones .track { }
+  .mstone { position:absolute; top:8px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; z-index:3; }
+  .mstone .dia { width:16px; height:16px; background:var(--teal); transform:rotate(45deg); border-radius:3px;
+    box-shadow:0 0 16px rgba(54,200,191,.7); }
+  .mstone .ml { margin-top:11px; font-family:'Poppins',sans-serif; font-weight:600; font-size:18px; color:#fff; white-space:nowrap; }
+  .mstone .md { font-size:12px; color:var(--teal); letter-spacing:.06em; text-transform:uppercase; margin-top:3px; }
+
+  /* filas de fase */
+  .phases { flex:1; display:flex; flex-direction:column; justify-content:space-around; }
+  .phase { }
+  .phase .lbl { display:flex; gap:15px; align-items:baseline; padding-right:28px; }
+  .phase .n { font-family:'Geist',sans-serif; font-weight:600; font-size:16px; color:var(--teal); font-variant-numeric:tabular-nums; flex:none; opacity:.9; }
+  .phase .pt { font-family:'Poppins',sans-serif; font-weight:600; font-size:27px; line-height:1.05; letter-spacing:-.012em; color:#fff; }
+  .phase .pd { font-size:15px; line-height:1.3; color:rgba(255,255,255,.55); margin-top:6px; }
+  .bar { position:absolute; top:50%; transform:translateY(-50%); height:44px; border-radius:12px; z-index:2;
+    background:linear-gradient(180deg, #45d6cc 0%, var(--teal-deep) 100%);
+    box-shadow:0 8px 22px rgba(31,158,148,.4), inset 0 1px 0 rgba(255,255,255,.3);
+    display:flex; align-items:center; padding:0 18px; font-size:14px; color:rgba(255,255,255,.9); font-weight:600; letter-spacing:.01em; white-space:nowrap; overflow:hidden; }
+  .bar.cont { background:transparent; border:2px dashed rgba(54,200,191,.6); box-shadow:none; color:var(--teal); }
+
+  .legend { display:flex; gap:34px; margin-top:18px; padding-left:var(--lbl); font-size:16px; color:rgba(255,255,255,.6); }
+  .legend span { display:inline-flex; align-items:center; gap:10px; }
+  .legend .k1 { width:26px; height:12px; border-radius:4px; background:linear-gradient(180deg,#45d6cc,var(--teal-deep)); }
+  .legend .k2 { width:26px; height:12px; border-radius:4px; border:2px dashed rgba(54,200,191,.6); }
+  .legend .k3 { width:13px; height:13px; background:var(--teal); transform:rotate(45deg); border-radius:2px; }
+</style></head>
+<body>
+  <div class="slide" data-template="TimelineFull">
+    <div class="head">
+      <div>
+        <div class="eyebrow">Plan de trabajo</div>
+        <div class="title">Cronograma del proyecto · SKY</div>
+      </div>
+      <div class="meta"><b>6 meses</b> · 5 fases · hitos y entregables<br>ruta base, con holgura por fase</div>
+    </div>
+
+    <div class="gantt">
+      <div class="vlines">
+        <div class="vline" style="left:16.6667%"></div>
+        <div class="vline" style="left:50%"></div>
+        <div class="vline" style="left:91%"></div>
+      </div>
+      <!-- eje meses -->
+      <div class="row-flex axis">
+        <div class="lbl"></div>
+        <div class="track">
+          <div class="mo">Mes 1</div><div class="mo">Mes 2</div><div class="mo">Mes 3</div>
+          <div class="mo">Mes 4</div><div class="mo">Mes 5</div><div class="mo">Mes 6</div>
+        </div>
+      </div>
+
+      <!-- hitos -->
+      <div class="row-flex milestones">
+        <div class="lbl"></div>
+        <div class="track">
+          <div class="mstone" style="left:16.6667%"><div class="dia"></div><div class="ml">Baseline entregado</div><div class="md">fin mes 1</div></div>
+          <div class="mstone" style="left:50%"><div class="dia"></div><div class="ml">1.er reporte de citabilidad</div><div class="md">fin mes 3</div></div>
+          <div class="mstone" style="left:91%"><div class="dia"></div><div class="ml">Revisión &amp; plan siguiente</div><div class="md">mes 6</div></div>
+        </div>
+      </div>
+
+      <!-- fases -->
+      <div class="phases">
+        <div class="row-flex phase">
+          <div class="lbl"><span class="n">01</span><div><div class="pt">Diagnóstico &amp; baseline</div><div class="pd">AEO/SEO audit + Share of Voice inicial</div></div></div>
+          <div class="track"><div class="bar" style="left:0; width:16.6667%"></div></div>
+        </div>
+        <div class="row-flex phase">
+          <div class="lbl"><span class="n">02</span><div><div class="pt">Arquitectura &amp; quick wins</div><div class="pd">correcciones técnicas + plan editorial</div></div></div>
+          <div class="track"><div class="bar" style="left:0; width:33.3333%">correcciones + arquitectura de contenido</div></div>
+        </div>
+        <div class="row-flex phase">
+          <div class="lbl"><span class="n">03</span><div><div class="pt">Producción editorial</div><div class="pd">motor de contenidos en cadencia</div></div></div>
+          <div class="track"><div class="bar" style="left:16.6667%; width:66.6667%">publicación sostenida + hub editorial</div></div>
+        </div>
+        <div class="row-flex phase">
+          <div class="lbl"><span class="n">04</span><div><div class="pt">Optimización AEO</div><div class="pd">citabilidad + iteración por evidencia</div></div></div>
+          <div class="track"><div class="bar" style="left:33.3333%; width:66.6667%">citabilidad en asistentes con IA</div></div>
+        </div>
+        <div class="row-flex phase">
+          <div class="lbl"><span class="n">05</span><div><div class="pt">Medición &amp; reporte</div><div class="pd">SoV, citabilidad y autoridad</div></div></div>
+          <div class="track"><div class="bar cont" style="left:0; width:100%">continuo · reporte mensual</div></div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><span class="k1"></span> Fase de trabajo</span>
+        <span><span class="k2"></span> Actividad continua</span>
+        <span><span class="k3"></span> Hito / entregable</span>
+      </div>
+    </div>
+  </div>
+</body></html>

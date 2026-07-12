@@ -1,0 +1,10 @@
+{
+  "template":"RequirementsTableFull","version":"0.1","viewport":{"width":1920,"height":1080},
+  "slots":{
+    "sectionLabel":{"selector":"[data-slot='sectionLabel']","type":"string","required":false,"constraints":{"maxCharacters":52,"maxLines":1,"overflow":"reject"}},
+    "title":{"selector":"[data-slot='title']","type":"rich-string","required":true,"constraints":{"maxCharacters":62,"maxLines":3,"allowedTags":["em"],"overflow":"reject"}},
+    "summary":{"selector":"[data-slot='summary']","type":"object","required":true,"shape":{"value":{"type":"string","required":true,"maxCharacters":10,"maxLines":1},"label":{"type":"string","required":true,"maxCharacters":44,"maxLines":2},"detail":{"type":"string","required":true,"maxCharacters":68,"maxLines":2}}},
+    "requirements":{"selector":"[data-slot='requirements']","type":"array","required":true,"constraints":{"minItems":3,"maxItems":5,"overflow":"reject"},"item":{"type":"object","shape":{"kind":{"type":"enum","required":true,"values":["excluyente","puntúa"]},"requirement":{"type":"string","required":true,"maxCharacters":78,"maxLines":3},"evidence":{"type":"string","required":true,"maxCharacters":90,"maxLines":3},"status":{"type":"enum","required":true,"values":["cubierto","en-revisión","riesgo"]}}}}
+  },
+  "presentation":{"brandSurface":"canonical-navy-rich-deck-gradient","composition":"control summary hero plus one traceable requirement matrix","evidencePolicy":"every row needs a real evidence/location; unresolved excluyentes must render as riesgo, never be omitted"}
+}

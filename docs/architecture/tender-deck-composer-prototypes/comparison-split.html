@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
+  <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Geist:wght@400;600&display=swap');
@@ -30,8 +31,10 @@
       position:relative; overflow:hidden; border-top-left-radius:64px; border-bottom-left-radius:64px;
       color:#fff; padding-left:76px;
       background:
-        radial-gradient(60% 48% at 92% 100%, color-mix(in srgb, var(--teal) 20%, transparent) 0%, transparent 48%),
-        radial-gradient(128% 100% at 30% -12%, var(--navy-2) 0%, var(--navy) 52%, var(--navy-deep) 100%);
+        radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+        radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+        radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+        linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
     }
     .proposal::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.18; background-image:radial-gradient(rgba(255,255,255,.75) .6px, transparent .7px); background-size:5px 5px; }
     .proposal-head { position:relative; z-index:1; margin-top:58px; }

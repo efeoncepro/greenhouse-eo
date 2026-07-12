@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8">
+<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;1,600&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -8,7 +8,7 @@
 
   :root {
     --safe:72px;
-    --blue:#196df2; --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33;
+    --navy:#00284d; --navy-2:#023c70; --navy-deep:#001a33;
     --teal:#36c8bf; --teal-deep:#2ab5ab; --violet:#6717cd;
     --ink:#020061; --panel-bg:#eef0f3;
   }
@@ -37,13 +37,13 @@
     padding:var(--safe) var(--safe);
     display:flex; flex-direction:column; justify-content:center;
     background:
-      radial-gradient(60% 60% at 100% 8%, rgba(42,194,184,.62) 0%, rgba(42,194,184,.22) 36%, transparent 64%),
-      radial-gradient(66% 60% at 96% 104%, rgba(103,23,205,.66) 0%, rgba(103,23,205,.20) 44%, transparent 74%),
-      linear-gradient(134deg, var(--blue) 0%, var(--navy-2) 44%, var(--navy-deep) 100%);
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
     color:#fff;
   }
-  .brand::before { content:''; position:absolute; inset:0; opacity:.09; pointer-events:none;
-    background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .8px); background-size:5px 5px; }
+  .brand::before { content:''; position:absolute; inset:0; pointer-events:none; }
 
   /* glass card que aterriza el chart */
   .card { position:relative; z-index:1; background:rgba(255,255,255,.055);
@@ -85,7 +85,7 @@
   .foot { position:relative; z-index:1; margin-top:36px; font-size:16px; color:rgba(255,255,255,.5); }
 </style></head>
 <body>
-  <div class="slide">
+  <div class="slide" data-template="ChartSplit">
     <!-- LEFT: texto -->
     <div class="text">
       <div class="head-row">

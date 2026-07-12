@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
+  <link rel="stylesheet" href="deck-signature.css">
   <meta charset="utf-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Poppins:wght@600&display=swap');
@@ -14,9 +15,10 @@
     .column { width:960px; height:1080px; padding:var(--safe); }
 
     .brand { position:relative; overflow:hidden; color:#fff; padding-right:86px; border-radius:0 64px 64px 0; background:
-      radial-gradient(70% 56% at 8% 4%, rgba(54,200,191,.62) 0%, rgba(54,200,191,.13) 38%, transparent 67%),
-      radial-gradient(65% 62% at 86% 102%, rgba(102,24,204,.78) 0%, rgba(102,24,204,.22) 42%, transparent 70%),
-      linear-gradient(150deg, #084e99 0%, var(--navy) 52%, var(--navy-deep) 100%); }
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%); }
     .brand::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.12; background-image:radial-gradient(rgba(255,255,255,.9) .55px, transparent .75px); background-size:4px 4px; }
     .light { color:var(--ink); padding-left:86px; }
     .head { position:relative; z-index:1; min-height:228px; }

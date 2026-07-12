@@ -1,0 +1,152 @@
+{
+  "$schema": "./registry.schema.json",
+  "version": "0.1",
+  "status": "draft",
+  "note": "Registry canónico del Tender Deck Composer. Machine-readable: el selector agéntico elige plantilla por content-type; el renderer llena los slots. Doc raíz: GREENHOUSE_TENDER_DECK_COMPOSER_V1.md. Co-construido Claude ↔ Codex (doc-only, Proposed).",
+  "canvas": { "w": 1920, "h": 1080, "aspect": "16:9" },
+  "figmaFileKey": "GXYeJaRjotmFuczfnd8hLi",
+
+  "contentTypeTaxonomy": [
+    "cover", "back-cover", "agenda", "section-divider",
+    "narrative", "statement", "highlight",
+    "bullet-list", "dual-list", "dual-text",
+    "one-metric", "several-kpis", "chart", "comparison",
+    "capabilities-grid", "four-pillars", "process-sequential",
+    "timeline", "team", "case-study", "credentials", "pricing", "requirements-table",
+    "evidence-story", "human-impact"
+  ],
+
+  "templates": [
+    { "name": "CoverFull", "kind": "full-bleed", "source": "design", "figmaNode": null, "owner": "claude", "status": "built",
+      "contentTypes": ["cover"], "prototype": "cover-full.html", "slotsRef": "cover-full.slots.json" },
+
+    { "name": "BackCoverFull", "kind": "full-bleed", "source": "design", "figmaNode": null, "owner": "codex", "status": "built",
+      "contentTypes": ["back-cover"], "prototype": "back-cover-full.html", "slotsRef": null },
+
+    { "name": "AgendaFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
+      "contentTypes": ["agenda"], "prototype": "agenda-full.html", "slotsRef": null,
+      "nav": { "clickableItems": true, "targetSlideIdPerItem": true, "pdfInternalLinks": true },
+      "overflow": "4-8 items (prefer 6); 7-8 => 2x4; >8 => group into Parts or consolidate, never split into 2 agenda slides" },
+
+    { "name": "SectionDividerSplit", "kind": "split", "source": "figma", "figmaNode": "6:12498 / 4:151", "owner": "claude", "status": "built",
+      "contentTypes": ["section-divider"], "prototype": "section-divider-split.html", "slotsRef": null,
+      "variants": ["brand-left", "brand-right"] },
+
+    { "name": "NarrativeSplit", "kind": "split", "source": "figma", "figmaNode": "5:7869", "owner": "claude", "status": "built",
+      "contentTypes": ["narrative"], "prototype": "narrative-split.html", "slotsRef": null,
+      "rightSlot": ["PersonaAsset", "ConceptVisual"] },
+
+    { "name": "BulletListSplit", "kind": "split", "source": "figma", "figmaNode": "8:14178", "owner": "claude", "status": "built",
+      "contentTypes": ["bullet-list"], "prototype": "bullet-list-split.html", "slotsRef": null },
+
+    { "name": "DualListSplit", "kind": "split", "source": "figma", "figmaNode": "8:14347", "owner": "codex", "status": "built",
+      "contentTypes": ["dual-list"], "prototype": "dual-list-split.html", "slotsRef": null },
+
+    { "name": "DualTextSplit", "kind": "split", "source": "figma", "figmaNode": "8:14102", "owner": "codex", "status": "built",
+      "contentTypes": ["dual-text"], "prototype": "dual-text-split.html", "slotsRef": null },
+
+    { "name": "StatSplit", "kind": "split", "source": "figma", "figmaNode": "7:13485", "owner": "codex", "status": "built",
+      "contentTypes": ["one-metric"], "prototype": "stat-split.html", "slotsRef": null },
+
+    { "name": "MetricsSplit", "kind": "split", "source": "figma", "figmaNode": "7:13598", "owner": "claude", "status": "built",
+      "contentTypes": ["several-kpis"], "prototype": "metrics-split.html", "slotsRef": null,
+      "rightSlot": ["PersonaAsset", "ConceptVisual"] },
+
+    { "name": "ChartSplit", "kind": "split", "source": "figma", "figmaNode": "5:10852", "owner": "claude", "status": "built",
+      "contentTypes": ["chart"], "prototype": "chart-split.html", "slotsRef": null,
+      "requires": ["heroStat"] },
+
+    { "name": "ComparisonSplit", "kind": "split", "source": "figma", "figmaNode": "8:13782", "owner": "codex", "status": "built",
+      "contentTypes": ["comparison"], "prototype": "comparison-split.html", "slotsRef": null },
+
+    { "name": "QuoteSplit", "kind": "split", "source": "figma", "figmaNode": "8:14071", "owner": "claude", "status": "built",
+      "contentTypes": ["statement"], "prototype": "quote-split.html", "slotsRef": null,
+      "leftSlot": ["PersonaAsset", "Attribution"],
+      "modes": ["statement (Efeonce, first-party)", "testimonial (requires real sourced quote)"] },
+
+    { "name": "HighlightWave", "kind": "full-bleed", "source": "figma", "figmaNode": "4:124", "owner": "codex", "status": "built",
+      "contentTypes": ["highlight"], "prototype": "highlight-wave.html", "slotsRef": null },
+
+    { "name": "FourPillarsFull", "kind": "full-bleed", "source": "figma", "figmaNode": "8:24297", "owner": "codex", "status": "built",
+      "contentTypes": ["four-pillars"], "prototype": "four-pillars-full.html", "slotsRef": null },
+
+    { "name": "CardGridFull", "kind": "full-bleed", "source": "figma", "figmaNode": "5:7657", "owner": "claude", "status": "built",
+      "contentTypes": ["capabilities-grid"], "prototype": "card-grid-full.html", "slotsRef": null },
+
+    { "name": "TimelineFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
+      "contentTypes": ["timeline"], "prototype": "timeline-full.html", "slotsRef": null },
+
+    { "name": "TeamSplit", "kind": "split", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
+      "contentTypes": ["team"], "prototype": "team-split.html", "slotsRef": null,
+      "memberAvatar": ["PhotoAsset", "RoleIcon"] },
+
+    { "name": "CaseStudySplit", "kind": "split", "source": "gap", "figmaNode": null, "owner": "claude", "status": "built",
+      "contentTypes": ["case-study"], "prototype": "case-study-split.html", "slotsRef": null,
+      "requires": ["result.hero", "result.beforeAfter", "result.source"] },
+
+    { "name": "PricingFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "codex", "status": "built",
+      "contentTypes": ["pricing"], "prototype": "pricing-full.html", "slotsRef": "pricing-full.slots.json" },
+
+    { "name": "RequirementsTableFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "codex", "status": "built",
+      "contentTypes": ["requirements-table"], "prototype": "requirements-table-full.html", "slotsRef": "requirements-table-full.slots.json" },
+
+    { "name": "ProcessStepsFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "codex", "status": "built",
+      "contentTypes": ["process-sequential"], "prototype": "process-steps-full.html", "slotsRef": "process-steps-full.slots.json" },
+
+    { "name": "CredentialsFull", "kind": "full-bleed", "source": "gap", "figmaNode": null, "owner": "codex", "status": "built",
+      "contentTypes": ["credentials"], "prototype": "credentials-full.html", "slotsRef": "credentials-full.slots.json" },
+
+    { "name": "EvidenceStoryGrid", "kind": "full-bleed", "source": "figma", "figmaNode": null, "owner": "codex", "status": "built",
+      "contentTypes": ["evidence-story"], "prototype": "evidence-story-grid.html", "slotsRef": null,
+      "note": "PROVISIONAL: layout historia de transformación + grid de evidencia; el prototipo trae contenido de ejemplo IDD/Think, no SKY. Confirmar content-type y fit al set de licitación (Codex)." },
+
+    { "name": "HumanImpactFull", "kind": "full-bleed", "source": "figma", "figmaNode": null, "owner": "codex", "status": "built",
+      "contentTypes": ["human-impact"], "prototype": "human-impact-full.html", "slotsRef": null,
+      "note": "PROVISIONAL: layout antes→después humano por rol/persona; prototipo con contenido de ejemplo IDD/Think, no SKY. Confirmar content-type y fit (Codex)." }
+  ],
+
+  "selector": {
+    "model": "El agente clasifica el CONTENIDO de cada slide en un content-type de la taxonomía; el selector devuelve la(s) plantilla(s) cuyo `contentTypes` lo incluye. Match declarativo 1:1 en el caso base; las reglas de desambiguación resuelven los solapes.",
+    "map": {
+      "cover": "CoverFull",
+      "back-cover": "BackCoverFull",
+      "agenda": "AgendaFull",
+      "section-divider": "SectionDividerSplit",
+      "narrative": "NarrativeSplit",
+      "statement": "QuoteSplit",
+      "highlight": "HighlightWave",
+      "bullet-list": "BulletListSplit",
+      "dual-list": "DualListSplit",
+      "dual-text": "DualTextSplit",
+      "one-metric": "StatSplit",
+      "several-kpis": "MetricsSplit",
+      "chart": "ChartSplit",
+      "comparison": "ComparisonSplit",
+      "capabilities-grid": "CardGridFull",
+      "four-pillars": "FourPillarsFull",
+      "process-sequential": "ProcessStepsFull",
+      "timeline": "TimelineFull",
+      "team": "TeamSplit",
+      "case-study": "CaseStudySplit",
+      "credentials": "CredentialsFull",
+      "pricing": "PricingFull",
+      "requirements-table": "RequirementsTableFull",
+      "evidence-story": "EvidenceStoryGrid",
+      "human-impact": "HumanImpactFull"
+    },
+    "disambiguation": [
+      "métrica: UNA hero sola => StatSplit; VARIOS KPIs (3-5) de diagnóstico => MetricsSplit; una métrica que necesita GRÁFICO/comparación => ChartSplit; una métrica como RESULTADO de un caso => CaseStudySplit.",
+      "estructura de N ítems: PILARES paralelos (4, no secuenciales) => FourPillarsFull; PASOS secuenciales (1->2->3) => ProcessStepsFull; fases en el TIEMPO (con fechas) => TimelineFull.",
+      "listas: UNA lista de puntos => BulletListSplit; DOS listas paralelas => DualListSplit; capacidades con ícono en GRID => CardGridFull.",
+      "texto fuerte: STATEMENT/compromiso/pull-quote/testimonial => QuoteSplit; una IDEA/frase destacada => HighlightWave; PROSA narrativa (enfoque/método) => NarrativeSplit; DOS ideas enfrentadas (contexto+solución) => DualTextSplit.",
+      "comparación: vs COMPETENCIA en pares exactos => ComparisonSplit (no tabla libre); cumplimiento REQUISITO x SLA item por item => RequirementsTableFull."
+    ],
+    "rules": [
+      "Un slide = un content-type = una plantilla. Si el contenido mezcla dos intenciones, dividir en dos slides (no forzar una plantilla híbrida).",
+      "NUNCA generar freehand: si ningún content-type calza, es señal de que falta una plantilla en el catálogo (abrir gap), no de improvisar el layout.",
+      "El renderer sólo llena slots declarados; no agrega copy, logos, fechas ni composición libre.",
+      "Datos de cliente (métricas, pricing, requisitos) => valores reales del bid o ILUSTRATIVOS marcados; nunca fabricados como reales.",
+      "Registro institucional (sin tuteo) en todo contenido client-facing; el copy visible pasa por copywriting / greenhouse-ux-writing."
+    ]
+  }
+}

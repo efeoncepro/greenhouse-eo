@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <link rel="stylesheet" href="deck-signature.css">
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Poppins:ital,wght@0,600;0,800;1,800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 1920px; height: 1080px; }
+    body { overflow: hidden; font-family: 'Geist', sans-serif; }
+
+    :root { --ink: #020061; --violet: #33029c; --teal: #36c8bf; }
+
+    .slide {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background:
+        radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+        radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+        radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+        linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
+    }
+
+    .story-panel {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 860px;
+      overflow: hidden;
+      border-radius: 0 58px 58px 0;
+      background:
+        radial-gradient(72% 54% at 100% 100%, rgba(54,200,191,.18) 0%, transparent 72%),
+        linear-gradient(145deg, #f7f8fa 0%, #e9edf3 100%);
+    }
+
+    .story-panel::before {
+      content: '';
+      position: absolute;
+      top: 74px;
+      left: 72px;
+      width: 92px;
+      height: 5px;
+      border-radius: 99px;
+      background: var(--teal);
+    }
+
+    .headline {
+      position: absolute;
+      z-index: 2;
+      top: 118px;
+      left: 72px;
+      width: 690px;
+      color: var(--ink);
+      font-family: 'Poppins', sans-serif;
+      font-size: 68px;
+      font-weight: 800;
+      letter-spacing: -.055em;
+      line-height: 1.01;
+      text-wrap: balance;
+    }
+
+    .headline em { color: var(--violet); font-style: normal; }
+
+    .story-visual {
+      position: absolute;
+      z-index: 1;
+      left: 0;
+      bottom: -2px;
+      width: 850px;
+      height: 780px;
+      overflow: hidden;
+    }
+
+    .person {
+      position: absolute;
+      left: -100px;
+      bottom: 0;
+      width: 800px;
+      height: 780px;
+      object-fit: contain;
+      object-position: left bottom;
+      transform: scaleX(-1);
+      transform-origin: center bottom;
+    }
+
+    .evidence-panel {
+      position: absolute;
+      inset: 0 0 0 860px;
+      color: #fff;
+    }
+
+    .section-label {
+      position: absolute;
+      top: 66px;
+      right: 92px;
+      border: 2px solid rgba(255,255,255,.84);
+      border-radius: 99px;
+      padding: 9px 22px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .context {
+      position: absolute;
+      top: 132px;
+      left: 112px;
+      width: 760px;
+      color: rgba(255,255,255,.95);
+      font-size: 27px;
+      line-height: 1.24;
+    }
+
+    .context p + p { margin-top: 28px; }
+    .context strong { font-weight: 700; }
+
+    .evidence-selection {
+      position: absolute;
+      top: 410px;
+      left: 112px;
+      width: 760px;
+      height: 388px;
+      border: 1.5px dashed rgba(208,243,255,.90);
+      box-shadow: 0 0 0 1px rgba(61,193,235,.18), 0 18px 38px rgba(0,0,0,.18);
+    }
+
+    .selection-handle {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: rgba(247,253,255,.98);
+      border: 1.5px solid rgba(94,211,247,.98);
+      box-shadow: 0 0 0 1px rgba(0,37,76,.18), 0 3px 8px rgba(0,18,43,.16);
+    }
+
+    .tl { top: -8px; left: -8px; } .tc { top: -8px; left: calc(50% - 7px); } .tr { top: -8px; right: -8px; }
+    .ml { top: calc(50% - 7px); left: -8px; } .mr { top: calc(50% - 7px); right: -8px; }
+    .bl { bottom: -8px; left: -8px; } .bc { bottom: -8px; left: calc(50% - 7px); } .br { right: -8px; bottom: -8px; }
+
+    .evidence {
+      position: absolute;
+      inset: 9px;
+      padding: 32px 40px 28px;
+      background: rgba(0,17,41,.72);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter: blur(14px) saturate(1.08);
+    }
+
+    .evidence-head { display: flex; align-items: center; gap: 30px; }
+    .evidence-icon { width: 88px; height: 88px; filter: invert(100%) brightness(200%); }
+    .evidence-value { font-family: 'Poppins', sans-serif; font-size: 126px; font-weight: 800; letter-spacing: -.08em; line-height: .8; }
+    .evidence-label { max-width: 630px; margin-top: 20px; color: rgba(255,255,255,.88); font-size: 28px; font-weight: 700; line-height: 1.15; }
+    .evidence-detail { max-width: 640px; margin-top: 16px; color: rgba(255,255,255,.68); font-size: 23px; line-height: 1.24; }
+    .evidence-source { margin-top: 12px; color: rgba(255,255,255,.52); font-size: 18px; font-style: italic; }
+
+    .outcome {
+      position: absolute;
+      top: 822px;
+      left: 112px;
+      width: 740px;
+      color: rgba(255,255,255,.96);
+      font-size: 27px;
+      line-height: 1.24;
+    }
+
+    .outcome p + p { margin-top: 28px; }
+    .outcome strong { font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="EvidenceStoryGrid">
+    <section class="story-panel" aria-label="Historia de transformación">
+      <h1 class="headline" data-slot="headline" data-slot-type="rich-string" data-slot-required="true">El equipo que dejó de ser el <em>cuello de botella.</em></h1>
+      <div class="story-visual" data-slot="personAsset" data-slot-type="asset" data-slot-required="true">
+        <img class="person" src="assets/evidence-story-person.png" alt="Especialista señalando la historia de transformación" data-slot-field="src">
+      </div>
+    </section>
+
+    <section class="evidence-panel" aria-label="Evidencia y consecuencia operativa">
+      <p class="section-label" data-slot="sectionLabel" data-slot-type="string">Historia de transformación</p>
+      <div class="context" data-slot="context" data-slot-type="array" data-slot-required="true">
+        <p>El problema no es solo la carga de trabajo: es la distancia entre definir una intención y lograr que llegue intacta a la ejecución.</p>
+        <p><strong>En ese espacio se pierde contexto, aparecen reinterpretaciones y el resultado rara vez coincide con lo que se diseñó.</strong></p>
+      </div>
+
+      <section class="evidence-selection" aria-label="Marco de evidencia seleccionada">
+        <i class="selection-handle tl" aria-hidden="true"></i><i class="selection-handle tc" aria-hidden="true"></i><i class="selection-handle tr" aria-hidden="true"></i>
+        <i class="selection-handle ml" aria-hidden="true"></i><i class="selection-handle mr" aria-hidden="true"></i>
+        <i class="selection-handle bl" aria-hidden="true"></i><i class="selection-handle bc" aria-hidden="true"></i><i class="selection-handle br" aria-hidden="true"></i>
+        <article class="evidence" data-slot="evidence" data-slot-type="object" data-slot-required="true">
+          <div class="evidence-head"><img class="evidence-icon" src="assets/solar/chart-2-bold.svg" alt="" aria-hidden="true"><p class="evidence-value" data-slot-field="value">77%</p></div>
+          <p class="evidence-label" data-slot-field="label">de los equipos reporta un aumento sostenido de proyectos.</p>
+          <p class="evidence-detail" data-slot-field="detail">La demanda no puede escalar al ritmo requerido con los mismos recursos y el mismo método.</p>
+          <p class="evidence-source" data-slot-field="evidenceRef">Fuente: evidencia de referencia; sustituir por fuente verificada.</p>
+        </article>
+      </section>
+
+      <section class="outcome" data-slot="outcome" data-slot-type="array" data-slot-required="true">
+        <p><strong>El sistema reduce esa distancia.</strong> Cuando el equipo trabaja con especificaciones ejecutables, lo que define se transforma en un input directo para construir.</p>
+        <p>La jerarquía, el copy y la estructura se traducen sin una capa intermedia de interpretación. <strong>Quien define también puede verificar la intención final.</strong></p>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

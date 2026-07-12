@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8">
+<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;1,600&family=Geist:wght@400;600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -21,9 +21,10 @@
     padding:var(--safe) 72px var(--safe) var(--safe);
     display:flex; flex-direction:column; justify-content:flex-start;
     background:
-      radial-gradient(70% 54% at 4% 2%, color-mix(in srgb, var(--axis-teal) 66%, transparent) 0%, transparent 50%),
-      radial-gradient(60% 54% at 102% 100%, color-mix(in srgb, var(--axis-violet) 34%, transparent) 0%, transparent 56%),
-      linear-gradient(158deg, var(--axis-navy-soft) 0%, var(--axis-navy) 60%, var(--axis-navy-deep) 100%);
+      radial-gradient(rgba(255,255,255,.09) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(52% 60% at 100% 0%, rgba(42,194,184,.5) 0%, rgba(42,194,184,.16) 38%, transparent 66%),
+      radial-gradient(50% 55% at 0% 104%, rgba(103,23,205,.5) 0%, rgba(103,23,205,.15) 44%, transparent 74%),
+      linear-gradient(120deg, #001a33 0%, #023c70 48%, #001327 100%);
     color:#fff;
   }
   /* título editorial: título dominante + subtítulo */
@@ -72,7 +73,7 @@
   .read .src { font-size:18px; color:rgba(2,0,97,.5); margin-top:4px; }
 </style></head>
 <body>
-  <div class="slide">
+  <div class="slide" data-template="MetricsSplit">
     <!-- LEFT: brand + stat rows -->
     <div class="brand">
       <div class="brand-head">

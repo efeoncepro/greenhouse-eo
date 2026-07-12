@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <link rel="stylesheet" href="deck-signature.css">
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@500;600&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:1920px; height:1080px; }
+    body { overflow:hidden; font-family:'Geist',sans-serif; }
+    :root { --lum:#c5e7ff; --lum-muted:#85c5ed; --deep:#002247; }
+    .slide { position:relative; isolation:isolate; width:1920px; height:1080px; overflow:hidden; background:
+      radial-gradient(42% 56% at 86% 11%, rgba(255,255,255,.9) 0%, rgba(164,234,255,.52) 18%, rgba(20,176,242,.38) 40%, transparent 70%),
+      radial-gradient(55% 65% at 48% 103%, rgba(0,99,221,.76) 0%, rgba(0,99,221,.18) 42%, transparent 74%),
+      radial-gradient(46% 55% at 5% 73%, rgba(0,145,232,.33) 0%, transparent 70%),
+      linear-gradient(126deg, #00224a 0%, #001a3d 52%, #004e9f 100%); }
+    .slide::after { content:''; position:absolute; inset:0; z-index:-1; opacity:.16; background-image:radial-gradient(rgba(255,255,255,.72) .65px, transparent .85px); background-size:4px 4px; }
+    .lum { mix-blend-mode:luminosity; }
+    .stack { position:absolute; left:0; right:0; bottom:68px; display:flex; flex-direction:column; align-items:center; }
+    .brand { width:520px; height:150px; object-fit:contain; }
+    .url { width:270px; height:72px; margin-top:10px; object-fit:contain; }
+    .socials { display:flex; align-items:center; gap:16px; margin-top:22px; }
+    .social { width:48px; height:48px; display:block; object-fit:contain; mix-blend-mode:luminosity; filter:invert(88%) sepia(27%) saturate(535%) hue-rotate(164deg) brightness(103%) contrast(101%); }
+    .contacts { display:flex; align-items:center; justify-content:center; gap:28px; margin-top:28px; color:var(--lum); font-size:22px; font-weight:600; letter-spacing:.012em; line-height:1; white-space:nowrap; }
+    .contact { display:flex; align-items:center; gap:9px; mix-blend-mode:luminosity; }
+    .contact-icon { width:28px; height:28px; flex:0 0 auto; object-fit:contain; mix-blend-mode:luminosity; filter:invert(88%) sepia(27%) saturate(535%) hue-rotate(164deg) brightness(103%) contrast(101%); }
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="BackCoverFull" aria-label="Contraportada Efeonce">
+    <div class="stack">
+      <img class="brand lum" src="../../../public/branding/logo-negative.svg" alt="efeonce" data-slot="efeonceLogo">
+      <img class="url lum" src="assets/url-lum.svg" alt="efeoncepro.com" data-slot="urlBubble">
+      <nav class="socials lum" aria-label="Redes sociales de Efeonce" data-slot="socialLinks">
+        <img class="social" src="assets/social/spotify.svg" alt="Spotify"><img class="social" src="assets/social/instagram.svg" alt="Instagram"><img class="social" src="assets/social/linkedin.svg" alt="LinkedIn"><img class="social" src="assets/social/threads.svg" alt="Threads"><img class="social" src="assets/social/youtube.svg" alt="YouTube"><img class="social" src="assets/social/tiktok.svg" alt="TikTok">
+      </nav>
+      <footer class="contacts lum" data-slot="contactDetails">
+        <span class="contact email"><img class="contact-icon" src="assets/contact/letter-bold.svg" alt="">sales@efeoncepro.com</span>
+        <span class="contact phone"><img class="contact-icon" src="assets/contact/phone-calling-bold.svg" alt="">+56 9 3732 3064</span>
+        <span class="contact phone"><img class="contact-icon" src="assets/contact/phone-calling-bold.svg" alt="">+1 (239) 235-2073</span>
+        <span class="contact address"><img class="contact-icon" src="assets/contact/map-point-bold.svg" alt="">Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
