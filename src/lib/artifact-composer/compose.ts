@@ -1,50 +1,34 @@
 /**
- * Tender Deck Composer — el pipeline determinista.
+ * Artifact Composer — el pipeline determinista.
  *
  * Este es el "resto determinista" del ADR (§5-ter): selector → validación → slot-fill → render.
  * NADA acá llama a un LLM. Los tres nodos de juicio (orquestador, chapter-author, verifier) viven
- * AGUAS ARRIBA y su salida es un `DeckPlan` — JSON puro. Este módulo lo consume.
+ * AGUAS ARRIBA y su salida es un plan — JSON puro. Este módulo lo consume.
  *
- * Por eso el `DeckPlan` es el artefacto auditable: se guarda, se versiona, se replaya. El PDF es
- * una derivación suya, no la fuente.
+ * Por eso el plan es el artefacto auditable: se guarda, se versiona, se replaya. El PDF/PNG es una
+ * derivación suya, no la fuente.
+ *
+ * Desde TASK-1393 Slice 2 el motor compone CATÁLOGOS: `composeArtifact(catalog, plan, …)`. Todo lo
+ * específico de una superficie (plantillas, resolvers, validadores, output target) entra por el
+ * contrato `ArtifactCatalog` — agregar una superficie nueva no toca este archivo.
  */
 
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import type { DeckPlan, SlideSpec, SlotViolation, TemplateContract, TemplateName } from './contracts'
-import { auditRegistry, findTemplate, selectTemplate, type DeckRegistry } from './selector'
+import {
+  loadRegistry,
+  loadTemplateContract,
+  runSemanticValidators,
+  CatalogSemanticError,
+  UnimplementedOutputTargetError,
+  IMPLEMENTED_OUTPUT_TARGETS,
+  type ArtifactCatalog
+} from './catalog'
+import type { DeckPlan, TemplateContract, TemplateName } from './contracts'
+import { findTemplate, selectTemplate } from './selector'
 import { launchComposerBrowser, mergeSlidePdfs, renderSlide } from './render'
-import { validateDeck } from './validate'
-
-export interface DeckAssets {
-  /** Dir con `registry.json`, las plantillas `.html` y sus `*.slots.json`. */
-  templatesDir: string
-}
-
-export class DeckValidationError extends Error {
-  readonly violations: SlotViolation[]
-
-  constructor(violations: SlotViolation[]) {
-    const detail = violations
-      .map(v => `  [${v.slideId} · ${v.template} · ${v.slot}] ${v.code}: ${v.message}`)
-      .join('\n')
-
-    super(`El deck no pasa la validación de slots (${violations.length} problema(s)):\n${detail}`)
-    this.name = 'DeckValidationError'
-    this.violations = violations
-  }
-}
-
-export class MissingSlotContractError extends Error {
-  constructor(template: TemplateName) {
-    super(
-      `La plantilla "${template}" no tiene contrato de slots (falta su *.slots.json). ` +
-        `Sin contrato no se puede componer: el renderer sólo llena slots DECLARADOS.`
-    )
-    this.name = 'MissingSlotContractError'
-  }
-}
+import { DeckValidationError, validateDeck } from './validate'
 
 /**
  * El autor declara INTENCIÓN (`contentType`), nunca AUTORIDAD DE PRESENTACIÓN (`template`).
@@ -63,56 +47,12 @@ export class TemplateAuthorityError extends Error {
   }
 }
 
-export const loadRegistry = async (assets: DeckAssets): Promise<DeckRegistry> => {
-  const raw = await fs.readFile(path.join(assets.templatesDir, 'registry.json'), 'utf8')
-  const registry = JSON.parse(raw) as DeckRegistry
-
-  const problems = auditRegistry(registry)
-
-  if (problems.length > 0) {
-    throw new Error(`El registry del deck está corrupto:\n  - ${problems.join('\n  - ')}`)
-  }
-
-  return registry
-}
-
-export const loadTemplateContract = async (
-  assets: DeckAssets,
-  registry: DeckRegistry,
-  template: TemplateName
-): Promise<TemplateContract> => {
-  const entry = findTemplate(registry, template)
-
-  if (!entry?.slotsRef) {
-    throw new MissingSlotContractError(template)
-  }
-
-  const raw = await fs.readFile(path.join(assets.templatesDir, entry.slotsRef), 'utf8')
-
-  return JSON.parse(raw) as TemplateContract
-}
-
-/**
- * Resuelve la plantilla de cada lámina desde su content-type. Determinista: es el lookup del
- * registry, no un juicio.
- */
-export const planSlides = (
-  registry: DeckRegistry,
-  chapters: Array<{ slideId: string; contentType: string; slots: SlideSpec['slots'] }>
-): SlideSpec[] =>
-  chapters.map(chapter => ({
-    slideId: chapter.slideId,
-    contentType: chapter.contentType,
-    template: selectTemplate(registry, chapter.contentType),
-    slots: chapter.slots
-  }))
-
 export interface ComposeResult {
   deckPlan: DeckPlan
   slidePaths: string[]
-  /** El entregable: un PDF de N páginas. */
-  pdfPath: string
-  pdfBytes: number
+  /** Sólo cuando `outputTarget: 'pdf-merged'`: el entregable, un PDF de N páginas. */
+  pdfPath?: string
+  pdfBytes?: number
   /** Advertencias que NO frenan la composición, pero el humano debe ver antes de subir la oferta. */
   warnings: string[]
 }
@@ -124,7 +64,7 @@ export interface ComposeOptions {
    */
   concurrency?: number
   /**
-   * Límite de tamaño del PDF, en MB.
+   * Límite de tamaño del PDF, en MB. Sólo aplica a `pdf-merged`.
    *
    * ⚠️ Esto NO es performance: en una licitación es **admisibilidad**. Los portales (Mercado Público,
    * Wherex) rechazan archivos sobre cierto peso, y una oferta que no sube queda fuera del proceso.
@@ -159,14 +99,20 @@ const mapWithConcurrency = async <T, R>(
 }
 
 /**
- * Compone el deck: valida TODO antes de renderizar NADA.
+ * Compone un artefacto desde su catálogo: valida TODO antes de renderizar NADA.
  *
- * El orden importa. Validar lámina por lámina mientras se renderiza dejaría un deck a medio producir
- * cuando la lámina 7 falla — y un PDF parcial de una oferta es peor que ningún PDF: parece completo.
- * Se valida el deck entero, y si algo falla, no se emite nada.
+ * El orden importa. Validar lámina por lámina mientras se renderiza dejaría un artefacto a medio
+ * producir cuando la lámina 7 falla — y un PDF parcial de una oferta es peor que ningún PDF: parece
+ * completo. Se valida el plan entero (forma + semántica del catálogo), y si algo falla, no se emite
+ * nada.
+ *
+ * El destino lo declara el CATÁLOGO (`outputTarget`), no el caller:
+ * - `pdf-merged` → PNG por lámina (revisión) + UN PDF de N páginas (el entregable).
+ * - `png-set`    → N PNG y NINGÚN PDF.
+ * - cualquier target declarado y no implementado → aborta (`UnimplementedOutputTargetError`).
  */
-export const composeDeck = async (
-  assets: DeckAssets,
+export const composeArtifact = async (
+  catalog: ArtifactCatalog,
   deckPlan: DeckPlan,
   outDir: string,
   options: ComposeOptions = {}
@@ -174,6 +120,11 @@ export const composeDeck = async (
   const concurrency = options.concurrency ?? DEFAULT_CONCURRENCY
   const maxPdfMb = options.maxPdfMb ?? DEFAULT_MAX_PDF_MB
 
+  if (!IMPLEMENTED_OUTPUT_TARGETS.has(catalog.outputTarget)) {
+    throw new UnimplementedOutputTargetError(catalog.outputTarget)
+  }
+
+  const assets = { templatesDir: catalog.templatesDir }
   const registry = await loadRegistry(assets)
 
   // Adaptador del DeckPlan histórico: si el plan trae `template`, debe ser EXACTAMENTE lo que el
@@ -194,16 +145,25 @@ export const composeDeck = async (
     contracts.set(slide.template, await loadTemplateContract(assets, registry, slide.template))
   }
 
-  const violations = validateDeck(deckPlan.slides, contracts)
+  const violations = validateDeck(deckPlan.slides, contracts, catalog.slideValidators)
 
   if (violations.length > 0) {
     throw new DeckValidationError(violations)
   }
 
+  // Semántica del catálogo — fail-closed ANTES de renderizar nada.
+  const validatorRuns = runSemanticValidators(catalog, deckPlan, { registry })
+
+  if (validatorRuns.some(run => run.result === 'fail')) {
+    throw new CatalogSemanticError(validatorRuns)
+  }
+
   await fs.mkdir(outDir, { recursive: true })
 
-  // El DeckPlan se persiste JUNTO al render: es lo que permite el replay determinista.
+  // El plan se persiste JUNTO al render: es lo que permite el replay determinista.
   await fs.writeFile(path.join(outDir, 'deck-plan.json'), JSON.stringify(deckPlan, null, 2), 'utf8')
+
+  const emitPdf = catalog.outputTarget === 'pdf-merged'
 
   // Launch determinista canónico: mismos slots → mismo píxel (ver `launchComposerBrowser`).
   const browser = await launchComposerBrowser()
@@ -212,25 +172,35 @@ export const composeDeck = async (
     const rendered = await mapWithConcurrency(deckPlan.slides, concurrency, async (slide, index) => {
       const contract = contracts.get(slide.template)!
       const entry = findTemplate(registry, slide.template)!
-      const templateHtmlPath = path.join(assets.templatesDir, entry.prototype)
+      const templateHtmlPath = path.join(catalog.templatesDir, entry.prototype)
       const stem = path.join(outDir, `${String(index + 1).padStart(2, '0')}-${slide.slideId}`)
 
-      // El PNG es para revisión visual; el PDF (vectorial) es lo que se ensambla en el entregable.
-      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'png', outPath: `${stem}.png` })
-      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'pdf', outPath: `${stem}.pdf` })
+      // El PNG es para revisión visual (y ES el artefacto en `png-set`); el PDF (vectorial) sólo
+      // se imprime cuando el target lo ensambla.
+      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'png', outPath: `${stem}.png` }, catalog)
 
-      return { png: `${stem}.png`, pdf: `${stem}.pdf` }
+      if (emitPdf) {
+        await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'pdf', outPath: `${stem}.pdf` }, catalog)
+      }
+
+      return { png: `${stem}.png`, pdf: emitPdf ? `${stem}.pdf` : null }
     })
+
+    const warnings: string[] = []
+    const slidePaths = rendered.map(slide => slide.png)
+
+    if (!emitPdf) {
+      return { deckPlan, slidePaths, warnings }
+    }
 
     const pdfPath = path.join(outDir, `${deckPlan.tenderId}.pdf`)
 
     await mergeSlidePdfs(
-      rendered.map(slide => slide.pdf),
+      rendered.map(slide => slide.pdf!),
       pdfPath
     )
 
     const { size: pdfBytes } = await fs.stat(pdfPath)
-    const warnings: string[] = []
     const pdfMb = pdfBytes / 1_048_576
 
     if (pdfMb > maxPdfMb) {
@@ -242,7 +212,7 @@ export const composeDeck = async (
       )
     }
 
-    return { deckPlan, slidePaths: rendered.map(slide => slide.png), pdfPath, pdfBytes, warnings }
+    return { deckPlan, slidePaths, pdfPath, pdfBytes, warnings }
   } finally {
     await browser.close()
   }

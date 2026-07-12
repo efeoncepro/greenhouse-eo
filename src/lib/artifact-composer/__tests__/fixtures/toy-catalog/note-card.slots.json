@@ -1,0 +1,18 @@
+{
+  "template": "NoteCard",
+  "viewport": { "width": 800, "height": 1000 },
+  "slots": {
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 60, "overflow": "reject" }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 400, "overflow": "reject" }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:800px; height:1000px; }
+    body { overflow:hidden; font-family:sans-serif; }
+    .slide { position:relative; width:800px; height:1000px; overflow:hidden; background:#f4f4f4; padding:64px; }
+    .title { font-size:48px; font-weight:700; color:#111; }
+    .body { margin-top:24px; font-size:24px; color:#333; }
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="NoteCard">
+    <h1 class="title" data-slot="title" data-slot-type="string">Título</h1>
+    <p class="body" data-slot="body" data-slot-type="string">Cuerpo</p>
+  </main>
+</body>
+</html>

@@ -1,11 +1,8 @@
-import path from 'node:path'
-
 import { describe, expect, it } from 'vitest'
 
-import { composeDeck, TemplateAuthorityError } from '../index'
+import { composeArtifact, TemplateAuthorityError } from '../index'
+import { deckAxisCatalog } from '../catalogs/deck-axis'
 import type { DeckPlan } from '../contracts'
-
-const TEMPLATES_DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalogs/deck-axis')
 
 /**
  * TASK-1393 Slice 1 — el autor declara INTENCIÓN, nunca AUTORIDAD DE PRESENTACIÓN.
@@ -15,7 +12,7 @@ const TEMPLATES_DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalo
  * semánticamente incorrecta (aunque sus slots pasaran validación de forma) aborta ANTES de validar
  * y de renderizar nada.
  */
-describe('composeDeck — template authority', () => {
+describe('composeArtifact — template authority', () => {
   it('un template declarado que contradice al selector aborta con TemplateAuthorityError', async () => {
     const plan: DeckPlan = {
       tenderId: 'AUTHORITY-PROBE',
@@ -29,7 +26,7 @@ describe('composeDeck — template authority', () => {
       ]
     }
 
-    await expect(composeDeck({ templatesDir: TEMPLATES_DIR }, plan, '.captures/never-written')).rejects.toThrow(
+    await expect(composeArtifact(deckAxisCatalog, plan, '.captures/never-written')).rejects.toThrow(
       TemplateAuthorityError
     )
   })

@@ -23,9 +23,19 @@ import path from 'node:path'
 import { PDFDocument } from 'pdf-lib'
 import { chromium, type Browser, type Page } from 'playwright'
 
+import type { CatalogLayoutHook } from './catalog'
 import type { SlideSpec, SlotContract, SlotValue, TemplateContract } from './contracts'
-import { resolveFieldDirective, type FieldDirective } from './resolvers'
-import { layoutTimelineSchedule, parseTimelineSchedule } from './timeline'
+import { resolveFieldDirective, type FieldDirective, type ResolverRegistry } from './resolver-contract'
+
+/**
+ * Lo que el render necesita del CATÁLOGO (TASK-1393 Slice 2): su tabla de resolvers y sus hooks de
+ * layout derivado por plantilla. El motor no conoce `stat-goal-icon` ni `TimelineFull` — ejecuta lo
+ * que la superficie declara.
+ */
+export interface CatalogRenderRuntime {
+  resolvers: ResolverRegistry
+  layoutHooks?: Record<string, CatalogLayoutHook>
+}
 
 /**
  * Launch canónico del Chromium del composer — DETERMINISTA por contrato.
@@ -78,7 +88,8 @@ const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
 const buildFieldPlan = (
   slotContract: SlotContract,
   value: SlotValue,
-  slots: Record<string, unknown>
+  slots: Record<string, unknown>,
+  resolvers: ResolverRegistry
 ): Record<string, FieldDirective> | undefined => {
   // Un slot `object` tiene EL MISMO contrato de campo que un item de array: puede declarar evidencia
   // (`validation-only`) y campos DERIVADOS por resolver (la escala de una barra before/after). Que el
@@ -97,7 +108,7 @@ const buildFieldPlan = (
 
       if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
 
-      plan[fieldName] = resolveFieldDirective(field, fieldValue, {
+      plan[fieldName] = resolveFieldDirective(resolvers, field, fieldValue, {
         item: record,
         index: 0,
         itemCount: 1,
@@ -135,7 +146,7 @@ const buildFieldPlan = (
 
       if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
 
-      plan[`${index}.${fieldName}`] = resolveFieldDirective(field, fieldValue, ctx)
+      plan[`${index}.${fieldName}`] = resolveFieldDirective(resolvers, field, fieldValue, ctx)
     }
   })
 
@@ -159,7 +170,11 @@ const validationOnlyFields = (slot: SlotContract): string[] | undefined => {
   return skip.length > 0 ? skip : undefined
 }
 
-const buildInstructions = (slide: SlideSpec, contract: TemplateContract): FillInstruction[] => {
+const buildInstructions = (
+  slide: SlideSpec,
+  contract: TemplateContract,
+  resolvers: ResolverRegistry
+): FillInstruction[] => {
   const instructions: FillInstruction[] = []
 
   for (const [slotName, slotContract] of Object.entries(contract.slots)) {
@@ -182,7 +197,7 @@ const buildInstructions = (slide: SlideSpec, contract: TemplateContract): FillIn
       selector: slotContract.selector,
       type: slotContract.type,
       value,
-      fieldPlan: buildFieldPlan(slotContract, value, slide.slots as Record<string, unknown>),
+      fieldPlan: buildFieldPlan(slotContract, value, slide.slots as Record<string, unknown>, resolvers),
       enumLabels: slotContract.values,
       skipFields: validationOnlyFields(slotContract),
       itemSelector: slotContract.itemSelector,
@@ -677,64 +692,16 @@ export class SlotFillError extends Error {
 }
 
 /**
- * TimelineFull owns a second, derived lane: the vertical connector for each milestone. It cannot be
- * an authored slot, because then labels, diamonds and connectors could disagree. The layout compiler
- * emits all three from the same schedule after the regular array filler has created the milestone DOM.
- */
-const applyTimelineLayout = async (page: Page, slide: SlideSpec): Promise<void> => {
-  if (slide.template !== 'TimelineFull') return
-
-  const parsed = parseTimelineSchedule(slide.slots)
-
-  if (!parsed.schedule) {
-    throw new SlotFillError(
-      slide.slideId,
-      parsed.issues.map(issue => `[${issue.slot}] ${issue.message}`)
-    )
-  }
-
-  const layout = layoutTimelineSchedule(parsed.schedule)
-
-  const problem = await page.evaluate(({ unitWidth, milestonePositions }) => {
-    const root = document.querySelector<HTMLElement>('[data-template="TimelineFull"]')
-    const connectorHost = root?.querySelector<HTMLElement>('.vlines')
-    const milestoneNodes = root ? Array.from(root.querySelectorAll<HTMLElement>('.mstone')) : []
-
-    if (!root || !connectorHost) return 'TimelineFull no declara el canvas o el host .vlines requerido por el layout.'
-
-    if (milestoneNodes.length !== milestonePositions.length) {
-      return `TimelineFull tiene ${milestoneNodes.length} marcadores para ${milestonePositions.length} hitos; no se puede garantizar su correspondencia.`
-    }
-
-    root.style.setProperty('--m', unitWidth)
-    milestoneNodes.forEach((milestone, index) => milestone.style.setProperty('left', milestonePositions[index]!))
-    connectorHost.replaceChildren(
-      ...milestonePositions.map(left => {
-        const connector = document.createElement('div')
-
-        connector.className = 'vline'
-        connector.style.left = left
-        connector.setAttribute('aria-hidden', 'true')
-
-        return connector
-      })
-    )
-
-    return null
-  }, layout)
-
-  if (problem) throw new SlotFillError(slide.slideId, [problem])
-}
-
-/**
  * Llena una lámina y devuelve el HTML resultante (útil para snapshot/debug), dejando la página
- * lista para capturar.
+ * lista para capturar. Los resolvers y los hooks de layout derivado (ej. los conectores del
+ * timeline en deck-axis) los aporta el CATÁLOGO vía `runtime`.
  */
 export const fillSlide = async (
   page: Page,
   templateHtmlPath: string,
   slide: SlideSpec,
-  contract: TemplateContract
+  contract: TemplateContract,
+  runtime: CatalogRenderRuntime
 ): Promise<void> => {
   // esbuild/tsx compila las funciones con `keepNames`, que las envuelve en un helper `__name`.
   // Ese helper existe en el bundle de Node, NO dentro del browser — y `page.evaluate` serializa la
@@ -747,13 +714,15 @@ export const fillSlide = async (
   await page.goto(`file://${path.resolve(templateHtmlPath)}`, { waitUntil: 'load' })
   await page.evaluate(() => document.fonts.ready)
 
-  const problems = await page.evaluate(fillDom, buildInstructions(slide, contract))
+  const problems = await page.evaluate(fillDom, buildInstructions(slide, contract, runtime.resolvers))
 
   if (problems.length > 0) {
     throw new SlotFillError(slide.slideId, problems)
   }
 
-  await applyTimelineLayout(page, slide)
+  // Layout derivado post-fill del catálogo (los conectores de TimelineFull no pueden ser un slot
+  // autorado: labels, rombos y conectores deben salir del MISMO schedule o podrían discrepar).
+  await runtime.layoutHooks?.[slide.template]?.(page, slide)
 
   // Las fuentes pueden re-layoutear tras escribir el copy: esperar de nuevo evita capturar un frame
   // con el fallback de sistema (un deck con la tipografía equivocada es un deck fuera de marca).
@@ -928,7 +897,8 @@ export const renderSlide = async (
   templateHtmlPath: string,
   slide: SlideSpec,
   contract: TemplateContract,
-  target: RenderTarget
+  target: RenderTarget,
+  runtime: CatalogRenderRuntime
 ): Promise<void> => {
   const page = await browser.newPage({
     viewport: contract.viewport,
@@ -937,7 +907,7 @@ export const renderSlide = async (
   })
 
   try {
-    await fillSlide(page, templateHtmlPath, slide, contract)
+    await fillSlide(page, templateHtmlPath, slide, contract, runtime)
 
     // Antes de imprimir NADA: si el copy no cabe, se rechaza. Un PDF con una palabra cortada es
     // peor que un fallo — se ve terminado, y nadie lo revisa dos veces.

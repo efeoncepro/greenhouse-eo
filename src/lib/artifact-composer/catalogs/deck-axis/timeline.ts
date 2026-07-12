@@ -6,7 +6,7 @@
  * el renderer necesita, de modo que grilla, barras y conectores siempre compartan la misma escala.
  */
 
-import type { SlotValues } from './contracts'
+import type { SlotValues } from '../../contracts'
 
 export const TIMELINE_TIME_UNITS = ['day', 'week', 'month', 'quarter', 'custom'] as const
 

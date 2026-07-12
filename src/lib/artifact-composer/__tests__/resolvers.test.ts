@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveFieldDirective, UnknownResolverValueError } from '../resolvers'
+import { deckAxisResolvers } from '../catalogs/deck-axis/resolvers'
+import { resolveFieldDirective as dispatchFieldDirective, UnknownResolverValueError } from '../resolver-contract'
+
+// El dispatch es del motor; la TABLA es del catálogo deck-axis (TASK-1393 Slice 2).
+const resolveFieldDirective = (field: Parameters<typeof dispatchFieldDirective>[1], value: unknown, ctx?: Parameters<typeof dispatchFieldDirective>[3]) => dispatchFieldDirective(deckAxisResolvers, field, value, ctx)
 
 describe('deck field resolvers', () => {
   it('un campo sin resolver se escribe como texto', () => {

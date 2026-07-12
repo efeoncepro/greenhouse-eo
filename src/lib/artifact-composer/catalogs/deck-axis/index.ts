@@ -22,9 +22,30 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import type { ArtifactCatalog } from '../../catalog'
+import { deckAxisResolvers } from './resolvers'
+import { deckAxisSemanticValidators } from './semantic-validators'
+import { timelineLayoutHook, timelineSlideValidator } from './timeline-hooks'
+
 /**
  * Home del catálogo, resuelto module-relative. Nota para el worker de TASK-1391: un bundle que
- * reubique este módulo debe INYECTAR el dir del catálogo explícitamente (el contrato de Slice 2
- * lo recibe como parámetro); esta constante es el default correcto para CLI/tests/gate del repo.
+ * reubique este módulo debe INYECTAR el dir del catálogo explícitamente (el contrato lo recibe
+ * como dato); esta constante es el default correcto para CLI/tests/gate del repo.
  */
 export const deckAxisCatalogDir = path.dirname(fileURLToPath(import.meta.url))
+
+/**
+ * El catálogo completo, como DATO: esto es lo que un consumer (CLI, gate, worker de TASK-1391) le
+ * pasa a `composeArtifact`/`resolvePlan`. El motor no sabe nada de esto — y esa es la regla.
+ */
+export const deckAxisCatalog: ArtifactCatalog = {
+  name: 'deck-axis',
+  // Dueño explícito (costura ASaaS): el deck AXIS es de Efeonce. "global" jamás es un default.
+  ownerOrgId: 'efeonce',
+  templatesDir: deckAxisCatalogDir,
+  outputTarget: 'pdf-merged',
+  resolvers: deckAxisResolvers,
+  slideValidators: { TimelineFull: timelineSlideValidator },
+  layoutHooks: { TimelineFull: timelineLayoutHook },
+  semanticValidators: deckAxisSemanticValidators
+}

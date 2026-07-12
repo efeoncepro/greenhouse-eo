@@ -12,10 +12,8 @@ import path from 'node:path'
 import fs from 'node:fs/promises'
 
 // Barrel del primitive — cero deep-imports (TASK-1393: el motor vive en artifact-composer/).
-import { composeDeck, DeckValidationError, type DeckPlan } from '@/lib/artifact-composer'
-import { deckAxisCatalogDir } from '@/lib/artifact-composer/catalogs/deck-axis'
-
-const TEMPLATES_DIR = deckAxisCatalogDir
+import { composeArtifact, DeckValidationError, type DeckPlan } from '@/lib/artifact-composer'
+import { deckAxisCatalog } from '@/lib/artifact-composer/catalogs/deck-axis'
 
 const main = async () => {
   const [planPath, ...rest] = process.argv.slice(2)
@@ -33,11 +31,9 @@ const main = async () => {
   console.log(`\ncomponiendo "${deckPlan.tenderId}" — ${deckPlan.slides.length} láminas\n`)
 
   try {
-    const { slidePaths, pdfPath, pdfBytes, warnings } = await composeDeck(
-      { templatesDir: TEMPLATES_DIR },
-      deckPlan,
-      outDir
-    )
+    // El catálogo (plantillas + resolvers + validadores + outputTarget) es DATO del deck-axis;
+    // el motor compone cualquier catálogo que satisfaga el contrato.
+    const { slidePaths, pdfPath, pdfBytes, warnings } = await composeArtifact(deckAxisCatalog, deckPlan, outDir)
 
     for (const [i, slidePath] of slidePaths.entries()) {
       const slide = deckPlan.slides[i]!
@@ -45,7 +41,11 @@ const main = async () => {
       console.log(`  ✓ ${slide.contentType.padEnd(20)} → ${slide.template.padEnd(22)} ${path.basename(slidePath)}`)
     }
 
-    console.log(`\n  📄 ${path.basename(pdfPath)} — ${slidePaths.length} páginas · ${(pdfBytes / 1_048_576).toFixed(1)} MB`)
+    // deck-axis emite `pdf-merged`: el PDF siempre existe acá; el guard es por el tipo del contrato.
+    if (pdfPath && pdfBytes !== undefined) {
+      console.log(`\n  📄 ${path.basename(pdfPath)} — ${slidePaths.length} páginas · ${(pdfBytes / 1_048_576).toFixed(1)} MB`)
+    }
+
     console.log(`  deck-plan.json (artefacto auditable) + láminas PNG → ${outDir}\n`)
 
     for (const warning of warnings) {

@@ -6,6 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import type { SlideSpec, TemplateContract } from '../contracts'
 import { fillSlide } from '../render'
+import { deckAxisCatalog } from '../catalogs/deck-axis'
 
 const DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalogs/deck-axis')
 const CONTRACT_PATH = path.join(DIR, 'chart-split.slots.json')
@@ -39,7 +40,7 @@ const renderSeries = async (series: Record<string, unknown>[]) => {
     }
   }
 
-  await fillSlide(page, TEMPLATE_PATH, slide, contract)
+  await fillSlide(page, TEMPLATE_PATH, slide, contract, deckAxisCatalog)
 
   const snapshot = await page.evaluate(() => ({
     reflineCount: document.querySelectorAll('[data-slot="series"] > .refline').length,

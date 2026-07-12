@@ -1,5 +1,5 @@
 /**
- * Artifact Composer — API pública del primitive (TASK-1393 Slice 1).
+ * Artifact Composer — API pública del primitive (TASK-1393).
  *
  * El motor de composición domain-free de Greenhouse: selector → validación → slot-fill →
  * resolvers → geometría → render. NO sabe qué es una licitación, un carrusel ni una marca — las
@@ -7,26 +7,34 @@
  * ADR: `docs/architecture/GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`.
  *
  * Reglas del paquete (nace package-shaped, extraction-ready para EPIC-027):
- *   - Los consumers importan SOLO desde este barrel — cero deep-imports.
+ *   - Los consumers importan SOLO desde este barrel (o desde el barrel de un catálogo bajo
+ *     `catalogs/<nombre>`) — cero deep-imports a los internals del motor.
  *   - El motor NUNCA importa de un dominio (`commercial/`, `growth/`, …) ni trae Next-isms
  *     (`server-only`). Frontera mecánica: eslint `no-restricted-imports` + el boundary test
  *     `__tests__/package-boundary.test.ts` rompen el build ante una violación.
  *   - Dependencias declaradas del motor: `playwright`, `pdf-lib` y `node:*`. Nada más.
  */
 
-// El pipeline (valida TODO antes de renderizar NADA + merge del entregable)
+// El contrato de catálogo (dato, no código del motor) + resolución del plan autorable → manifest
 export {
-  composeDeck,
   loadRegistry,
   loadTemplateContract,
-  planSlides,
-  DeckValidationError,
+  resolvePlan,
+  runSemanticValidators,
+  CatalogSemanticError,
   MissingSlotContractError,
-  TemplateAuthorityError,
-  type ComposeOptions,
-  type ComposeResult,
-  type DeckAssets
-} from './compose'
+  UnimplementedOutputTargetError,
+  IMPLEMENTED_OUTPUT_TARGETS,
+  type ArtifactCatalog,
+  type CatalogLayoutHook,
+  type CatalogSemanticValidator,
+  type CatalogSemanticViolation,
+  type CatalogSnapshot,
+  type OutputTarget
+} from './catalog'
+
+// El pipeline (valida TODO antes de renderizar NADA + emite según el outputTarget del catálogo)
+export { composeArtifact, TemplateAuthorityError, type ComposeOptions, type ComposeResult } from './compose'
 
 // Contratos de plantilla/plan (browser-safe)
 export type {
@@ -55,6 +63,17 @@ export type {
   ResolvedCompositionSlide
 } from './plan'
 
+// El contrato de resolvers (la TABLA la aporta el catálogo; el dispatch fail-closed es del motor)
+export {
+  resolveFieldDirective,
+  UnknownResolverValueError,
+  type FieldDirective,
+  type FieldEffect,
+  type ResolverContext,
+  type ResolverDef,
+  type ResolverRegistry
+} from './resolver-contract'
+
 // Selector determinista + audit de cierre referencial del registry
 export {
   auditRegistry,
@@ -65,8 +84,14 @@ export {
   type RegistryTemplate
 } from './selector'
 
-// Validación fail-closed (`overflow: reject`, evidencia anti-fabricación)
-export { validateDeck, validateSlide } from './validate'
+// Validación fail-closed (`overflow: reject`, evidencia anti-fabricación) + reglas por-plantilla
+export {
+  validateDeck,
+  validateSlide,
+  DeckValidationError,
+  type SlideValidator,
+  type SlideValidatorMap
+} from './validate'
 
 // Render en DOM real de Chromium + geometry gate + launch determinista canónico
 export {
@@ -77,6 +102,7 @@ export {
   renderSlide,
   SlideGeometryError,
   SlotFillError,
+  type CatalogRenderRuntime,
   type ClippedSlot,
   type RenderTarget
 } from './render'

@@ -6,7 +6,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import type { SlideSpec, TemplateContract } from '../contracts'
 import { assertSlideFitsCanvas, fillSlide } from '../render'
-import { layoutTimelineSchedule, parseTimelineSchedule } from '../timeline'
+import { deckAxisCatalog } from '../catalogs/deck-axis'
+import { layoutTimelineSchedule, parseTimelineSchedule } from '../catalogs/deck-axis/timeline'
 import { validateSlide } from '../validate'
 
 const DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalogs/deck-axis')
@@ -84,9 +85,9 @@ describe('TimelineFull — schedule data-driven', () => {
       const page = await browser.newPage({ viewport: contract.viewport })
 
       try {
-        expect(validateSlide(slide, contract)).toEqual([])
+        expect(validateSlide(slide, contract, deckAxisCatalog.slideValidators)).toEqual([])
 
-        await fillSlide(page, TEMPLATE_PATH, slide, contract)
+        await fillSlide(page, TEMPLATE_PATH, slide, contract, deckAxisCatalog)
         await assertSlideFitsCanvas(page, slide, contract)
 
         const layout = await page.evaluate(() => ({
@@ -126,7 +127,7 @@ describe('TimelineFull — schedule data-driven', () => {
     milestones[0] = { ...milestones[0], at: 1.5 }
     phases[0] = { ...phases[0], startUnit: 0, endUnit: 4 }
 
-    const violations = validateSlide(slide, contract)
+    const violations = validateSlide(slide, contract, deckAxisCatalog.slideValidators)
 
     expect(violations.filter(violation => violation.code === 'invalid_value')).toHaveLength(2)
     expect(violations.map(violation => violation.message).join(' ')).toContain('frontera entera')

@@ -14,7 +14,29 @@
  */
 
 import type { SlotContract, SlotValue, SlotViolation, TemplateContract, SlideSpec } from './contracts'
-import { parseTimelineSchedule } from './timeline'
+
+/**
+ * Validador de lámina que aporta el CATÁLOGO para una plantilla concreta (TASK-1393 Slice 2).
+ * El motor no conoce la semántica de `TimelineFull` ni de ninguna otra plantilla: el catálogo
+ * declara sus reglas por template y el motor las ejecuta con el mismo fail-closed.
+ */
+export type SlideValidator = (slide: SlideSpec) => SlotViolation[]
+
+export type SlideValidatorMap = Record<string, SlideValidator>
+
+export class DeckValidationError extends Error {
+  readonly violations: SlotViolation[]
+
+  constructor(violations: SlotViolation[]) {
+    const detail = violations
+      .map(v => `  [${v.slideId} · ${v.template} · ${v.slot}] ${v.code}: ${v.message}`)
+      .join('\n')
+
+    super(`El deck no pasa la validación de slots (${violations.length} problema(s)):\n${detail}`)
+    this.name = 'DeckValidationError'
+    this.violations = violations
+  }
+}
 
 /**
  * Un slot **template-owned**: existe en el contrato, pero lo llena la PLANTILLA, no el autor. Es el
@@ -215,7 +237,11 @@ const validateArray = (ctx: ValidateContext, contract: SlotContract, value: Slot
 }
 
 /** Valida los slots de UNA lámina contra el contrato de su plantilla. Función pura. */
-export const validateSlide = (slide: SlideSpec, contract: TemplateContract): SlotViolation[] => {
+export const validateSlide = (
+  slide: SlideSpec,
+  contract: TemplateContract,
+  slideValidators?: SlideValidatorMap
+): SlotViolation[] => {
   const violations: SlotViolation[] = []
 
   for (const slotName of Object.keys(slide.slots)) {
@@ -271,23 +297,23 @@ export const validateSlide = (slide: SlideSpec, contract: TemplateContract): Slo
     }
   }
 
-  if (slide.template === 'TimelineFull') {
-    for (const issue of parseTimelineSchedule(slide.slots).issues) {
-      violations.push(
-        violation(
-          { slideId: slide.slideId, template: slide.template, slot: issue.slot },
-          'invalid_value',
-          issue.message
-        )
-      )
-    }
+  // Reglas por-plantilla del CATÁLOGO (ej. el schedule de TimelineFull en deck-axis). El motor las
+  // ejecuta pero no las conoce: semántica de plantilla = dato del catálogo, no código del motor.
+  const catalogValidator = slideValidators?.[slide.template]
+
+  if (catalogValidator) {
+    violations.push(...catalogValidator(slide))
   }
 
   return violations
 }
 
 /** Valida el deck completo. Si devuelve algo, NO se compone: se reporta y lo arregla un humano. */
-export const validateDeck = (slides: SlideSpec[], contracts: Map<string, TemplateContract>): SlotViolation[] => {
+export const validateDeck = (
+  slides: SlideSpec[],
+  contracts: Map<string, TemplateContract>,
+  slideValidators?: SlideValidatorMap
+): SlotViolation[] => {
   const violations: SlotViolation[] = []
 
   for (const slide of slides) {
@@ -305,7 +331,7 @@ export const validateDeck = (slides: SlideSpec[], contracts: Map<string, Templat
       continue
     }
 
-    violations.push(...validateSlide(slide, contract))
+    violations.push(...validateSlide(slide, contract, slideValidators))
   }
 
   return violations

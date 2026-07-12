@@ -21,13 +21,9 @@ import { fileURLToPath } from 'node:url'
  * actualice un ícono).
  */
 
-// Module-relative, NUNCA relativo al cwd (Slice 1b: los assets viven CON el catálogo, no en
-// docs/). Deuda declarada para Slice 2: el icon set pasa a ser inyectable por catálogo — este
-// default deck-axis es la última referencia del motor a un catálogo concreto.
-const SOLAR_DIR = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'catalogs/deck-axis/assets/solar'
-)
+// Module-relative, NUNCA relativo al cwd. Desde Slice 2 este módulo vive DENTRO del catálogo
+// deck-axis (el icon set es semántica del deck, no del motor): sus assets están al lado.
+const SOLAR_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'assets/solar')
 
 const cache = new Map<string, string>()
 

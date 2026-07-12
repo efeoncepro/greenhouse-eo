@@ -34,7 +34,7 @@ import type { Browser } from 'playwright'
 
 // Barrel del primitive — cero deep-imports (TASK-1393: el motor vive en artifact-composer/).
 import {
-  composeDeck,
+  composeArtifact,
   fillSlide,
   launchComposerBrowser,
   loadRegistry,
@@ -43,7 +43,7 @@ import {
   type DeckPlan,
   type SlideSpec
 } from '@/lib/artifact-composer'
-import { deckAxisCatalogDir } from '@/lib/artifact-composer/catalogs/deck-axis'
+import { deckAxisCatalog, deckAxisCatalogDir } from '@/lib/artifact-composer/catalogs/deck-axis'
 
 import { compareImages, loadPng } from '../frontend/lib/visual-diff'
 
@@ -140,7 +140,7 @@ const renderCatalogProbes = async (browser: Browser, outDir: string): Promise<st
     })
 
     try {
-      await fillSlide(page, path.join(TEMPLATES_DIR, entry.prototype), slide, contract)
+      await fillSlide(page, path.join(TEMPLATES_DIR, entry.prototype), slide, contract, deckAxisCatalog)
       await page.screenshot({ path: path.join(outDir, rel) })
     } finally {
       await page.close()
@@ -157,7 +157,7 @@ const renderSkyDeck = async (outDir: string): Promise<string[]> => {
   const deckPlan = JSON.parse(await fs.readFile(SKY_PLAN_PATH, 'utf8')) as DeckPlan
   const skyDir = path.join(outDir, 'sky')
 
-  const { slidePaths } = await composeDeck({ templatesDir: TEMPLATES_DIR }, deckPlan, skyDir, {
+  const { slidePaths } = await composeArtifact(deckAxisCatalog, deckPlan, skyDir, {
     concurrency: CONCURRENCY
   })
 

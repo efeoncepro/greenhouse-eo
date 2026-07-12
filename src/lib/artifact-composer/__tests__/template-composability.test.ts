@@ -6,6 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import type { SlideSpec, TemplateContract } from '../contracts'
 import { fillSlide } from '../render'
+import { deckAxisCatalog } from '../catalogs/deck-axis'
 import { synthesizeSlotValue } from '../synthesize'
 
 const DIR = path.join(process.cwd(), 'src/lib/artifact-composer/catalogs/deck-axis')
@@ -97,7 +98,7 @@ describe('componibilidad del catálogo', () => {
           slots
         } as unknown as SlideSpec
 
-        const fill = fillSlide(page, path.join(DIR, entry.prototype), slide, contract)
+        const fill = fillSlide(page, path.join(DIR, entry.prototype), slide, contract, deckAxisCatalog)
         const reason = KNOWN_BROKEN[entry.name]
 
         if (reason === undefined) {

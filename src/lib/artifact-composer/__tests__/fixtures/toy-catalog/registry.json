@@ -1,0 +1,16 @@
+{
+  "version": "0.1",
+  "canvas": { "width": 800, "height": 1000 },
+  "contentTypeTaxonomy": ["note"],
+  "templates": [
+    {
+      "name": "NoteCard",
+      "kind": "full",
+      "contentTypes": ["note"],
+      "prototype": "note-card.html",
+      "slotsRef": "note-card.slots.json",
+      "status": "built"
+    }
+  ],
+  "selector": { "map": { "note": "NoteCard" } }
+}
