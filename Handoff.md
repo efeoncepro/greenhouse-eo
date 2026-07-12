@@ -6,6 +6,24 @@
 
 ## Sesión 2026-07-12 (cont. 17) — TASK-1399: el Proposal Studio ya se opera desde el chat (Claude)
 
+- ✅ **PRENDIDO EN STAGING Y VERIFICADO CON EL LLM REAL (2026-07-12).** `NEXA_PROPOSAL_ACTIONS_ENABLED=true`
+  en Vercel staging (runtime ÚNICO: el chat es un route handler de Next; ningún Cloud Run lo lee).
+  - ⚠️ **Trampa confirmada:** el deploy que disparó el push se creó **antes** de agregar la env var y
+    **no la tenía** (Vercel congela las env vars al CREAR el build). Hubo que **redeployar**
+    (rev `greenhouse-l6mcub3cd`, la que hoy tienen los alias). Si sólo hubiera mirado la consola, el
+    ledger diría ON y la realidad sería OFF — exactamente el bug class del email del ebook.
+  - **Evidencia conversacional real (LLM decidiendo, no un mock):**
+    · *"¿Cómo va la propuesta de SKY?"* → disparó `proposal_status` → *"su documento ya está listo…
+      plazo crítico: 15 de julio 18:00… 3 trabajos de renderizado que necesitan atención"*, con el
+      link de descarga del deck.
+    · *"Registra una propuesta para Aguas Andinas… no sé la fecha de cierre"* → propuso
+      `register_proposal` con el cliente resuelto **por nombre**, deadline **"Sin fecha declarada"**
+      (NO lo inventó) y el `input` **sin `ownerOrgId`** (el scope sale de la sesión). Nada se escribió:
+      quedó en propuesta esperando confirmación humana.
+- **Producción: OFF, y así debería quedarse por ahora.** Prenderlo allá sin `ARTIFACT_RENDER_JOBS_ENABLED`
+  (OFF en prod por diseño) daría una Nexa que registra propuestas y evidencia pero **no puede generar el
+  deck**. Lo coherente es prender ambos juntos, y el del render exige sign-off + release control plane.
+
 - **La puerta que faltaba, construida.** 4 acciones gobernadas (`register_proposal`,
   `attach_proposal_rfp`, `record_proposal_evidence`, `request_proposal_render`) + el tool read-only
   **`proposal_status`** ("¿cómo va la propuesta de SKY y dónde está el PDF?") + el **read model del
