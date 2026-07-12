@@ -8,6 +8,53 @@
 
 ---
 
+## Matriz de cumplimiento de las Bases
+
+Esta matriz se incorpora para facilitar la evaluación: cruza **cada requerimiento de las Bases** con la
+sección exacta de esta oferta donde se responde. Efeonce declara el **cumplimiento íntegro** de la
+totalidad de los requerimientos, sin excepciones ni reservas.
+
+### Requisitos de admisibilidad
+
+| Requisito de las Bases | Cumplimiento |
+|---|---|
+| Persona jurídica legalmente constituida (§2.3) | ✅ Efeonce Group SpA |
+| Sin demandas ni reclamos pendientes contra SKY (§2.3) | ✅ Se declara no tener demandas ni reclamos pendientes en contra de SKY, ante organismos judiciales o del Estado |
+| Presentación en formato PDF por la plataforma Wherex (§2.6.1) | ✅ |
+| Validez de la oferta: 120 días (§2.9) | ✅ Declarada en la carátula |
+
+### Oferta Técnica — Definición del servicio (§3.3)
+
+| # | Actividad exigida por las Bases | Dónde se responde |
+|---|---|---|
+| **1** | **Planificación editorial** — grilla mensual propuesta y **aprobada por SKY antes del desarrollo**; alineada a estrategia comercial, destinos y campañas vigentes | **§4** (Fase 1) · **§5** |
+| **2** | **Desarrollo de contenidos** — artículos originales sobre las 7 temáticas requeridas (destinos operados; qué hacer en los destinos; gastronomía y cultura local; datos útiles para viajeros; recomendaciones y experiencias; tendencias del turismo; noticias e industria aérea) | **§5** (las 7 temáticas, una a una) · **§6** |
+| **3** | **Contenidos ad-hoc** — artículos específicos para campañas, nuevos destinos e iniciativas corporativas, manteniendo el estilo editorial | **§4** (Fase 2) · **§11** (SLA de ad-hoc) |
+| **4** | **Optimización SEO** — palabras clave; títulos y subtítulos; meta título y meta descripción; estructura de encabezados H1/H2/H3; enlaces internos y externos; buenas prácticas de redacción | **§7** (los 6 requisitos, uno a uno) |
+| **5** | **Recursos visuales** — al menos una imagen principal por artículo, libre de derechos o con permisos; reemplazo si SKY la observa | **§8** |
+| **6** | **Reportería y métricas** — visualizaciones por artículo; usuarios alcanzados; clics; posicionamiento orgánico; desempeño SEO; palabras clave posicionadas; tráfico orgánico generado; recomendaciones de mejora | **§9** (los 8 indicadores, uno a uno) |
+| **7** | **Coordinación del servicio** — reuniones periódicas de planificación, validación, análisis y optimización | **§10** (Gobernanza) |
+
+### Niveles de servicio (§3.4) y régimen de penalidades (§3.5)
+
+| Requisito de las Bases | Dónde se responde |
+|---|---|
+| Los **9 indicadores de SLA** exigidos, con su umbral | **§11** (tabla completa, indicador por indicador) |
+| **Régimen de penalidades** — 6 cláusulas | **§11 · Régimen de penalidades** — **aceptado íntegramente** |
+
+### Oferta Económica (§3.2) — se presenta en documento separado
+
+| Requisito de las Bases | Estado |
+|---|---|
+| **Precio** | ✅ Oferta Económica |
+| **Condiciones de pago** — 30 días desde la aceptación conforme de la factura | ✅ Oferta Económica |
+| **Reajustes** — sin reajuste durante la vigencia | ✅ Oferta Económica |
+| **Duración y condiciones de término** — 2 años renovables, con aviso de 60 días (§3.3.8) | ✅ Oferta Económica |
+| **Desembolsos** | ✅ Oferta Económica — **no aplican**: el valor mensual es todo incluido |
+| **Documento Excel con propuesta económica** (§1.2, documento integrante) | ✅ Se acompaña |
+
+---
+
 ## 1. Resumen ejecutivo
 
 El objetivo del blog de SKY es claro: **crecer en tráfico orgánico, atraer visitas cualificadas a sus canales digitales y entregar contenido de valor al pasajero.** No se trata de publicar artículos; se trata de operar un activo comercial que rinda mes a mes.
@@ -234,8 +281,33 @@ Efeonce se compromete con la totalidad de los indicadores exigidos:
 | Calidad SEO | 100% de los artículos, bajo checklist SEO/AEO |
 | Reporte mensual de métricas | Primeros 10 días hábiles del mes siguiente |
 | Disponibilidad para reuniones de coordinación | Según requerimiento de SKY, con el ejecutivo asignado |
+| Ejecutivo de cuenta | **Un ejecutivo responsable del servicio durante toda la vigencia del contrato**, con reemplazo formal y traspaso documentado en caso de ausencia |
 
 La operación editorial se diseña con holgura de calendario para sostener estos niveles durante los dos años del contrato.
+
+### Régimen de penalidades
+
+**Efeonce declara conocer y aceptar íntegramente el régimen de penalidades establecido en las Bases, sin
+excepciones ni reservas.**
+
+| Incumplimiento (§3.5 de las Bases) | Penalización | Aceptación |
+|---|---|---|
+| Retraso en la entrega de la planificación mensual | 2% del valor mensual por cada día hábil de atraso, con un máximo de 10% | ✅ Aceptada |
+| Retraso en la entrega de contenidos comprometidos | 2% del valor mensual por cada día hábil de atraso, hasta un máximo de 15% | ✅ Aceptada |
+| Incumplimiento en la entrega del reporte mensual | 5% del valor mensual del servicio | ✅ Aceptada |
+| Contenidos sin optimización SEO o que no cumplan lo requerido | SKY podrá rechazar el contenido y exigir su corrección sin costo adicional | ✅ Aceptada |
+| Incumplimiento de los tiempos de respuesta establecidos | 2% del valor mensual por evento, hasta un máximo de 10% mensual | ✅ Aceptada |
+| Reiteración de incumplimientos (3 o más en un período de 3 meses) | Plan de mejora formal y, de persistir, término anticipado del contrato | ✅ Aceptada |
+| Incumplimiento de plazos en contenidos ad-hoc comprometidos | 2% del valor del requerimiento por cada día hábil de atraso, salvo reprogramación aprobada por SKY | ✅ Aceptada |
+
+**Cómo se sostiene el compromiso.** Efeonce no acepta estas penalidades confiando en que no se aplicarán:
+las asume porque el servicio está diseñado para no gatillarlas. La grilla editorial se aprueba **antes** de
+producir; la capacidad se dimensiona con holgura sobre el volumen comprometido (§10); cada artículo pasa
+por doble control —editorial y de posicionamiento— antes de entregarse (§4, Fase 2); y el ejecutivo de
+cuenta responde por los plazos de forma nominal, no difusa.
+
+Si un incumplimiento llegara a producirse, Efeonce informará a SKY de forma proactiva, junto con su causa
+y su plan de corrección, antes de que SKY tenga que detectarlo.
 
 ## 12. Por qué Efeonce
 
