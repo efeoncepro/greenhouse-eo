@@ -2,6 +2,13 @@
 
 ## 2026-07-12
 
+- **TASK-1392 y TASK-1393 COMPLETE — rollout ejecutado (2026-07-12).**
+  Proposal Studio F0 operativo en staging: módulo `proposal_studio_v1` activo para Efeonce
+  (entitlement per-ORG auditado), smoke end-to-end con evidencia (idempotencia, org isolation,
+  gates humanos rechazando al agente, proyección client_facing sin material interno, outbox
+  published). Artifact Composer cerró su gate de marca: las 71 variables `--axis-deck-*` existen
+  en el Figma `Sistema Axis - PPT` (igualdad exacta 71/71, ledger con VariableID real, visual gate
+  a 0 píxeles). TASK-1391 queda bloqueada únicamente por la frontera de deployable de EPIC-027.
 - **El aggregate `Proposal` existe: Proposal Studio F0 (TASK-1392, Slices 0-6 — code complete, rollout staging pendiente).**
   Toda propuesta comercial (licitación pública, RFP privado o venta directa) es ahora un objeto
   gobernado en `greenhouse_commercial.proposal*`: state machine persistida (matriz en tabla +

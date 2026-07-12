@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto` <!-- era `Medio`; subió con el Delta (b) (molde + fuentes + contraste) y el Delta (c) (gate estético). Un `Medio` acá invitaba a apurar los slices que protegen la estética. -->
@@ -516,44 +516,44 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 
 ### 🔴 Gate estético (Slice 0) — si estos cuatro no están verdes, **la task NO cierra**, aunque todo lo demás lo esté
 
-- [ ] **El render es determinista**: dos composiciones del mismo commit producen **el mismo píxel**. *(Probado en `0a`, **antes** de congelar el baseline. Un gate de cero píxeles sobre un render no-determinista es un gate que miente.)*
-- [ ] **Existe un baseline congelado y committeado** (`scripts/frontend/baselines/artifact-composer/**`) con **las 25 plantillas + las 15 láminas del deck SKY**, capturado sobre el **commit pre-refactor**.
-- [ ] **`pnpm composer:visual-gate` corre en cada slice, compara contra ese baseline con `pixelmatch` y falla con umbral CERO píxeles.** No "se ve parecido", no "<1% de drift". **Cero.**
-- [ ] **Todo cambio de píxel intencional está declarado lámina por lámina en `BASELINE_DELTAS.md`** (qué cambió, por qué, quién lo aprobó) y el baseline se re-promueve en el **mismo PR**. **Un rebaseline sin su entrada declarada TAMBIÉN falla el gate** — contrato de dos vías, igual que `KNOWN_BROKEN`: *la lista no puede mentir*.
-- [ ] **Prueba mecánica de la tokenización, independiente del píxel:** un test compara el **valor computado** de cada token contra el **literal exacto que reemplaza** (las 80 bases del ledger). Un token que resuelve a otro valor **rompe el build**.
+- [x] **El render es determinista**: dos composiciones del mismo commit producen **el mismo píxel**. *(Probado en `0a`, **antes** de congelar el baseline. Un gate de cero píxeles sobre un render no-determinista es un gate que miente.)*
+- [x] **Existe un baseline congelado y committeado** (`scripts/frontend/baselines/artifact-composer/**`) con **las 25 plantillas + las 15 láminas del deck SKY**, capturado sobre el **commit pre-refactor**.
+- [x] **`pnpm composer:visual-gate` corre en cada slice, compara contra ese baseline con `pixelmatch` y falla con umbral CERO píxeles.** No "se ve parecido", no "<1% de drift". **Cero.**
+- [x] **Todo cambio de píxel intencional está declarado lámina por lámina en `BASELINE_DELTAS.md`** (qué cambió, por qué, quién lo aprobó) y el baseline se re-promueve en el **mismo PR**. **Un rebaseline sin su entrada declarada TAMBIÉN falla el gate** — contrato de dos vías, igual que `KNOWN_BROKEN`: *la lista no puede mentir*.
+- [x] **Prueba mecánica de la tokenización, independiente del píxel:** un test compara el **valor computado** de cada token contra el **literal exacto que reemplaza** (las 80 bases del ledger). Un token que resuelve a otro valor **rompe el build**.
 
 ### Resto
 
-- [ ] El motor vive en `src/lib/artifact-composer/**` y **no importa nada** de `src/lib/commercial/**` ni `src/lib/growth/**`; un import de dominio **rompe el build** (gate mecanico, no criterio de reviewer).
-- [ ] El motor **corre en Node puro, sin Next y sin el shim de `server-only`** — es la prueba de que Creative Studio podra consumirlo como paquete sin arrastrar un workaround.
-- [ ] `CompositionPlanInput` no permite a un author elegir `template`; el adaptador histórico rechaza cualquier `template` que no sea el resultado del selector para el `contentType`.
-- [ ] Sólo un `ResolvedCompositionManifest` puede llegar a persistencia/render productivo, y contiene hashes/versiones de catálogo, contrato, template, brand pack, fuentes y validadores aplicados.
-- [ ] Un **catalogo de prueba** con canvas y `outputTarget` distintos compone **sin tocar un solo archivo del motor**.
-- [ ] `outputTarget` soporta `pdf-merged` (deck) y `png-set`; `png-set` emite N PNG y **ningun** PDF. El registry queda extensible y fail-closed para futuros `pptx-native`/`adobe-express-rest`: declarar un target no implementado aborta, nunca cae silenciosamente a PDF.
-- [ ] Los 15 resolvers y el icon set viven en el catalogo `deck-axis`, no en el motor.
-- [ ] Existe un snapshot versionado de las 68 primitives PPT `33:2` y de las colecciones extendidas `Deck / Primitives` + `Deck / Semantic`, con `fileKey`/`nodeId`/colección/checksum; el compilador y el worker no dependen de red/Figma.
-- [ ] El compilador produce CSS local con primitives, roles y opacidades nombradas; un test comprueba que la salida generada está sincronizada con el manifest.
-- [ ] El ledger versionado contabiliza las **80 bases RGB normalizadas** actuales (incluidos `rgba()`), con **0 no mapeadas**, sin aproximaciones desde AXIS UI y con una única variable/node PPT o token/opacidad nombrado por base.
-- [ ] Las recipes `cover.hero`, `richContent`, `backCover` y `lightSurface` son datos de `deck-axis`; sus capas/stops sólo apuntan a roles/opacidades y un guard falla con HEX/RGBA/gradient local en una template. Sus snapshots conservan el orden, geometría, posiciones, alpha y blend del baseline; `richContent` conserva navy profundo/medio/cercano, glow teal/violeta y grano blanco.
-- [ ] Las 25 plantillas importan el CSS compilado y seleccionan una recipe; no contienen ningun HEX de marca ni gradient local.
-- [ ] El mapping contiene el crosswalk PPT ↔ AXIS UI, prohíbe substituciones no exactas y exige que todo color actual del deck tenga variable/node dentro del Sistema Axis-PPT; las altas extienden las colecciones `Deck` existentes, no crean otra paleta, y los claims `Empower your*` no crean una paleta ni una regla cromática implícita.
-- [ ] El brand pack es **parametro** de la composicion; nada en el motor ni en las plantillas nombra "AXIS"/"Efeonce" como constante.
-- [ ] El motor ofrece `CatalogSemanticValidator` sin reglas de Proposal/Tender embebidas; `deck-axis` versiona y prueba sus reglas de compatibilidad, evidencia, pricing, staffing y cobertura de requisitos contra fixtures.
-- [ ] Poppins/Geist se cargan desde el font pack local versionado, con licencia/variante/checksum declarados; el renderer bloquea la red de fuentes y falla cerrado ante fallback o asset ausente.
-- [ ] El deck SKY conserva contenido, geometría, texto seleccionable y frames aprobados respecto del baseline pre-refactor; si el font/asset pack cambia de revisión, el manifest y baseline versionados declaran la diferencia y las 4 láminas fueron **miradas**, no sólo testeadas.
-- [ ] **Las 4 bug classes siguen cerradas** *(el doc decía "las 2" — stale: hay cuatro)*: **(1)** filler que **aborta** ante un slot desconocido + `overflow: reject` — *el fallo silencioso*; **(2)** `assertSlideFitsCanvas` — *la lámina no puede amputar copy en silencio*; **(3)** `template-composability.test.ts` con `KNOWN_BROKEN` vacío — *"tener contrato" ≠ "ser componible"*; **(4)** la firma vive **dentro** del `.slide` — *el chrome que depende de dónde vive en el DOM*. **Todas las suites verdes** (hoy: **8 suites / 102 tests** — el número crece, el criterio es *"todas verdes"*, no un número congelado).
+- [x] El motor vive en `src/lib/artifact-composer/**` y **no importa nada** de `src/lib/commercial/**` ni `src/lib/growth/**`; un import de dominio **rompe el build** (gate mecanico, no criterio de reviewer).
+- [x] El motor **corre en Node puro, sin Next y sin el shim de `server-only`** — es la prueba de que Creative Studio podra consumirlo como paquete sin arrastrar un workaround.
+- [x] `CompositionPlanInput` no permite a un author elegir `template`; el adaptador histórico rechaza cualquier `template` que no sea el resultado del selector para el `contentType`.
+- [x] Sólo un `ResolvedCompositionManifest` puede llegar a persistencia/render productivo, y contiene hashes/versiones de catálogo, contrato, template, brand pack, fuentes y validadores aplicados.
+- [x] Un **catalogo de prueba** con canvas y `outputTarget` distintos compone **sin tocar un solo archivo del motor**.
+- [x] `outputTarget` soporta `pdf-merged` (deck) y `png-set`; `png-set` emite N PNG y **ningun** PDF. El registry queda extensible y fail-closed para futuros `pptx-native`/`adobe-express-rest`: declarar un target no implementado aborta, nunca cae silenciosamente a PDF.
+- [x] Los 15 resolvers y el icon set viven en el catalogo `deck-axis`, no en el motor.
+- [x] Existe un snapshot versionado de las 68 primitives PPT `33:2` y de las colecciones extendidas `Deck / Primitives` + `Deck / Semantic`, con `fileKey`/`nodeId`/colección/checksum; el compilador y el worker no dependen de red/Figma.
+- [x] El compilador produce CSS local con primitives, roles y opacidades nombradas; un test comprueba que la salida generada está sincronizada con el manifest.
+- [x] El ledger versionado contabiliza las **80 bases RGB normalizadas** actuales (incluidos `rgba()`), con **0 no mapeadas**, sin aproximaciones desde AXIS UI y con una única variable/node PPT o token/opacidad nombrado por base.
+- [x] Las recipes `cover.hero`, `richContent`, `backCover` y `lightSurface` son datos de `deck-axis`; sus capas/stops sólo apuntan a roles/opacidades y un guard falla con HEX/RGBA/gradient local en una template. Sus snapshots conservan el orden, geometría, posiciones, alpha y blend del baseline; `richContent` conserva navy profundo/medio/cercano, glow teal/violeta y grano blanco.
+- [x] Las 25 plantillas importan el CSS compilado y seleccionan una recipe; no contienen ningun HEX de marca ni gradient local.
+- [x] El mapping contiene el crosswalk PPT ↔ AXIS UI, prohíbe substituciones no exactas y exige que todo color actual del deck tenga variable/node dentro del Sistema Axis-PPT; las altas extienden las colecciones `Deck` existentes, no crean otra paleta, y los claims `Empower your*` no crean una paleta ni una regla cromática implícita.
+- [x] El brand pack es **parametro** de la composicion; nada en el motor ni en las plantillas nombra "AXIS"/"Efeonce" como constante.
+- [x] El motor ofrece `CatalogSemanticValidator` sin reglas de Proposal/Tender embebidas; `deck-axis` versiona y prueba sus reglas de compatibilidad, evidencia, pricing, staffing y cobertura de requisitos contra fixtures.
+- [x] Poppins/Geist se cargan desde el font pack local versionado, con licencia/variante/checksum declarados; el renderer bloquea la red de fuentes y falla cerrado ante fallback o asset ausente.
+- [x] El deck SKY conserva contenido, geometría, texto seleccionable y frames aprobados respecto del baseline pre-refactor; si el font/asset pack cambia de revisión, el manifest y baseline versionados declaran la diferencia y las 4 láminas fueron **miradas**, no sólo testeadas.
+- [x] **Las 4 bug classes siguen cerradas** *(el doc decía "las 2" — stale: hay cuatro)*: **(1)** filler que **aborta** ante un slot desconocido + `overflow: reject` — *el fallo silencioso*; **(2)** `assertSlideFitsCanvas` — *la lámina no puede amputar copy en silencio*; **(3)** `template-composability.test.ts` con `KNOWN_BROKEN` vacío — *"tener contrato" ≠ "ser componible"*; **(4)** la firma vive **dentro** del `.slide` — *el chrome que depende de dónde vive en el DOM*. **Todas las suites verdes** (hoy: **8 suites / 102 tests** — el número crece, el criterio es *"todas verdes"*, no un número congelado).
 
 **Añadidos por el Delta (b) — auditoría de rigor 2026-07-12:**
 
-- [ ] 🔴 **El MOLDE se tokenizó EN LA MISMA PASADA que el color** (Slice 3b). **No se tocan las 25 plantillas dos veces.** El lienzo, la safe-area, el espaciado, el glass y los roles de tipo se compilan **una vez**; las plantillas los **componen**.
-- [ ] 🔴 **El chrome se ancla a una REGIÓN, no a un píxel.** No queda **ni un** `calc(100% - NNNpx)` en el CSS del catálogo.
-- [ ] 🔴 **Las FUENTES y los roles tipográficos viven en el BRAND PACK, no en el catálogo.** Un brand pack de cliente **cambia la tipografía**. *(Si las fuentes cuelgan del catálogo, el deck del cliente sale en las fuentes de Efeonce — y el as-a-service es mentira.)*
-- [ ] **El `BrandPack` declara licencia y derecho de embebido por fuente**, y **falla cerrado** si un pack trae una fuente sin derecho de embebido. *(Poppins y Geist son OFL; las de un cliente probablemente no.)*
-- [ ] 🔴 **El compilador RECHAZA un brand pack cuyos roles no pasen WCAG AA** contra sus superficies (4,5:1 / 3:1). **Falla al compilar, no en la lámina.**
-- [ ] **El `Plan` NO puede ensamblar primitivas del molde.** Elige **una plantilla por nombre**. Las primitivas son detalle **interno** del catálogo, **no una superficie de autoría** — el catálogo sigue **cerrado**.
-- [ ] ~~Diff visual de las 25 como gate de merge~~ → **superseded y endurecido por el Gate estético (Slice 0)**, arriba: baseline congelado + `composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` de dos vías. *(Antes esto era una intención sin baseline contra el cual diffear — o sea, decorativo.)*
-- [ ] **El guard de contraste es advisory para el pack `axis` y bloqueante para packs no-default.** Sus violaciones sobre AXIS se reportan y salen como **follow-up de diseño**, **no** bloquean este refactor. *(Un refactor no arregla una decisión de marca: la revela.)*
-- [ ] `pnpm deck:compose` conserva nombre, argumentos y outDir por defecto.
+- [x] 🔴 **El MOLDE se tokenizó EN LA MISMA PASADA que el color** (Slice 3b). **No se tocan las 25 plantillas dos veces.** El lienzo, la safe-area, el espaciado, el glass y los roles de tipo se compilan **una vez**; las plantillas los **componen**.
+- [x] 🔴 **El chrome se ancla a una REGIÓN, no a un píxel.** No queda **ni un** `calc(100% - NNNpx)` en el CSS del catálogo.
+- [x] 🔴 **Las FUENTES y los roles tipográficos viven en el BRAND PACK, no en el catálogo.** Un brand pack de cliente **cambia la tipografía**. *(Si las fuentes cuelgan del catálogo, el deck del cliente sale en las fuentes de Efeonce — y el as-a-service es mentira.)*
+- [x] **El `BrandPack` declara licencia y derecho de embebido por fuente**, y **falla cerrado** si un pack trae una fuente sin derecho de embebido. *(Poppins y Geist son OFL; las de un cliente probablemente no.)*
+- [x] 🔴 **El compilador RECHAZA un brand pack cuyos roles no pasen WCAG AA** contra sus superficies (4,5:1 / 3:1). **Falla al compilar, no en la lámina.**
+- [x] **El `Plan` NO puede ensamblar primitivas del molde.** Elige **una plantilla por nombre**. Las primitivas son detalle **interno** del catálogo, **no una superficie de autoría** — el catálogo sigue **cerrado**.
+- [x] ~~Diff visual de las 25 como gate de merge~~ → **superseded y endurecido por el Gate estético (Slice 0)**, arriba: baseline congelado + `composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` de dos vías. *(Antes esto era una intención sin baseline contra el cual diffear — o sea, decorativo.)*
+- [x] **El guard de contraste es advisory para el pack `axis` y bloqueante para packs no-default.** Sus violaciones sobre AXIS se reportan y salen como **follow-up de diseño**, **no** bloquean este refactor. *(Un refactor no arregla una decisión de marca: la revela.)*
+- [x] `pnpm deck:compose` conserva nombre, argumentos y outDir por defecto.
 
 ## Verification
 
@@ -726,3 +726,24 @@ Gates: suite full **9281 tests verdes** · `pnpm vitest run src/lib/artifact-com
 - ¿Nombre final del home? `src/lib/artifact-composer/**` evita colision con el **Composition Shell** de UI Platform (que es otra cosa). No es irreversible.
 - ~~¿El catálogo mantiene su home en `docs/` o se mueve?~~ **CERRADA (Delta b · Slice 1b): se mueve.** El motor hace `fs.readFileSync` sobre `docs/` **en runtime** — eso no es documentación, es un **asset store mal ubicado**, y en un contenedor (TASK-1391) **revienta**.
 - ¿El generador de tokens corre en `prebuild` o como script explicito? Depende de si el CI necesita el CSS generado.
+
+## Delta 2026-07-12 (e) — GATE FIGMA CERRADO → COMPLETE
+
+Autorización del operador: *"Termina todo lo que falte"*. El único pendiente (crear/validar las 71
+altas en el `Sistema Axis - PPT`) se ejecutó vía Figma MCP:
+
+1. **Las 71 variables existen** en la colección **`Deck / Primitives`** (`VariableCollectionId:38:2`,
+   archivo `GXYeJaRjotmFuczfnd8hLi`), extendiendo la convención del namespace Deck existente:
+   nombre `familia/paso` (p. ej. `navy/990`, `recipe/backcover/500`), `codeSyntax.WEB =
+   var(--axis-deck-*)` exacto, scopes `[]` (igual que `empower/*`). **Ninguna colección nueva; cero
+   cambios de valor.**
+2. **Verificación "igualdad exacta o nada"**: read-back completo de la colección (76 = 5 `empower/*`
+   + 71 altas) y comparación mecánica hex-por-hex contra el ledger → **71/71 idénticas**.
+3. **Ledger actualizado**: las 71 pasan de `proposed` a `exists` con su `VariableID` real como
+   `nodeId` (commit `725959803`).
+4. **Gates re-corridos post-cambio**: `pnpm composer:color-ledger` → 78 bases, 0 sin mapping, 0
+   proposed · suite del paquete 12 suites/125 verdes · `pnpm composer:visual-gate` → **40 frames a 0
+   píxeles** (el cambio es data del ledger; ningún píxel se movió).
+
+Con el acceptance criterion "todo color actual del deck tiene variable/node dentro del Sistema
+Axis-PPT" cumplido y verificado, la task pasa a `complete`.

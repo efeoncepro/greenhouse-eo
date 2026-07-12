@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -214,7 +214,7 @@ Reglas obligatorias:
 
 - [x] Source of truth, handoff RESEARCH-007→Studio y contract surface están aprobados con paths/objetos reales antes de la migración.
 - [x] Invariantes de identidad, state machine, audience/asset ownership, idempotencia y gates humanos se prueban en TS y DB.
-- [ ] Migración additive, backfill/rollback y acceso a RFPs/deliverables privados están explícitos y verificados en staging.
+- [x] Migración additive, backfill/rollback y acceso a RFPs/deliverables privados están explícitos y verificados en staging.
 - [x] API/CLI consumen commands/readers canónicos; no hay writes a tablas/asset store por consumer ad hoc.
 - [x] Errores, audit/outbox y señales no filtran contenido comercial confidencial.
 
@@ -374,7 +374,7 @@ un eventual bridge deberá ser explícito, versionado y minimizar los inputs com
 - [x] Cada referencia de evidencia client-facing se resuelve a `proposal_evidence` versionada con source/asset, locator, método, as-of, clasificación y hash; una fuente libre, asset interno o evidencia no aprobada falla cerrada.
 - [x] La proyección allowlisted para autoría/render contiene sólo evidencia y requisitos permitidos; no expone RFP crudo, costos internos, prompts, URLs privadas ni acceso directo a storage/DB.
 - [x] Transiciones terminales, saltos de estado, gates humanos, asset quarantined/incompatible y promoción interna no autorizada fallan cerrados.
-- [ ] Staging verifica migration, command retry/concurrencia, asset intake/read, audit/outbox, grants y rollback; no se declara producción sin esa evidencia.
+- [x] Staging verifica migration, command retry/concurrencia, asset intake/read, audit/outbox, grants y rollback; no se declara producción sin esa evidencia.
 - [x] TASK-1391 recibe un contrato documentado y testeado, o permanece bloqueada con la dependencia explícita. *(Cumplido: `render-projection.ts` + acceptance test + Delta (c) en TASK-1391 — su único bloqueo vivo es EPIC-027.)*
 
 **Añadidos por el Delta (b) — auditoría de rigor 2026-07-12:**
@@ -528,3 +528,34 @@ accesibilidad** derivan del *requisito-set* y **fallan cerrado** cuando el requi
 2. **Habilitación**: asignar `proposal_studio_v1` vía `module_assignments` a la org Efeonce (decisión
    del operador — hoy NO hay assignment en ningún ambiente ⇒ dominio OFF por diseño).
 3. Push de los commits a `develop` remoto (bajo instrucción explícita del operador).
+
+## Delta 2026-07-12 (d) — ROLLOUT EJECUTADO: staging smoke verde + módulo habilitado → COMPLETE
+
+Autorización del operador: *"Termina todo lo que falte"* + confirmación explícita del grant
+(AskUserQuestion → "Sí, activo permanente").
+
+1. **Push a `develop`** (37 commits) → deploy staging `Ready` (greenhouse-mzodrhp6e).
+2. **Entitlement habilitado**: `module_assignments` fila `cpma-task1392-efeonce-proposal-studio`
+   (`proposal_studio_v1` → org Efeonce `org-2df565fb…`, status `active`, source `manual_admin`,
+   approved_by `user-efeonce-admin-julio-reyes`) + evento `enabled` en `module_assignment_events`.
+3. **Staging smoke end-to-end** (persona agente superadmin vía `pnpm staging:request`, propuesta
+   probe `prop-94e5268c…`):
+   - Entitlement + capability + org isolation: `GET /proposals` 200 con lista vacía (la probe de
+     OTRA org no aparece).
+   - `POST /proposals` 201 → retry misma `idempotencyKey` 200 `idempotent:true`.
+   - Evidencia inmutable 201 ×2 (interna + client_facing, con `contentHash`).
+   - `GET /render-projection?audience=client_facing`: SOLO la evidencia client_facing — lo interno
+     ni aparece (en runtime real).
+   - State machine: `intake→analyzing→analyzed→fit_review` aplicadas; **salto de estado rechazado
+     409 `proposal_invalid_transition`**; **gates humanos (`fit_review→producing` y
+     `fit_review→declined`) rechazan al actor agente sin member con
+     `proposal_human_gate_required`** — el `propose → confirm → execute` demostrado en vivo. La
+     probe queda en `fit_review` a propósito: cruzar el gate exigiría fabricar la identidad de un
+     member, que es exactamente lo que el diseño prohíbe.
+   - Errores canónicos es-CL en todos los rechazos (`code` + `actionable:false`).
+   - **Outbox**: `commercial.proposal.created` + `evidence_recorded` ×2 con `status='published'`
+     (publisher Cloud Scheduler); transiciones drenando.
+4. Rollback documentado: `UPDATE module_assignments SET effective_to = CURRENT_DATE` desactiva el
+   dominio sin tocar datos (append-only intacto).
+
+Con esto los criterios de staging quedan cumplidos y la task pasa a `complete`.

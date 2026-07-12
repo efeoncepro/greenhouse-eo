@@ -1,3 +1,26 @@
+## Sesión 2026-07-12 (cont. 10) — ROLLOUT COMPLETO: TASK-1392 y TASK-1393 pasan a COMPLETE (Claude)
+
+Autorización del operador: *"Termina todo lo que falte"* (+ confirmación explícita del grant del módulo).
+
+- **Push a `develop`** (37 commits acumulados de TASK-1393+1392) → staging `Ready`.
+- **TASK-1392 → COMPLETE.** Entitlement `proposal_studio_v1` habilitado para Efeonce
+  (`module_assignments` `cpma-task1392-efeonce-proposal-studio`, active, + evento `enabled`).
+  **Staging smoke end-to-end verde** (probe `prop-94e5268c…`): create 201 → retry idempotente 200 ·
+  evidencia inmutable ×2 · proyección `client_facing` SIN lo interno · salto de estado → 409 canónico ·
+  **gates humanos rechazan al agente sin member (`proposal_human_gate_required`)** — la probe queda en
+  `fit_review` a propósito (cruzar el gate exigiría fabricar identidad de member) · outbox `published`.
+  Rollback: `effective_to` en el assignment apaga el dominio sin tocar datos.
+- **TASK-1393 → COMPLETE.** El gate Figma se ejecutó vía Figma MCP: **las 71 altas `--axis-deck-*`
+  existen** en `Deck / Primitives` (`VariableCollectionId:38:2`, archivo `GXYeJaRjotmFuczfnd8hLi`),
+  convención del namespace existente (`familia/paso` + codeSyntax WEB + scopes []), **verificadas por
+  igualdad exacta 71/71** (read-back completo) y el ledger promovido a `exists` con `VariableID` real
+  (commit `725959803`). Gates re-corridos: ledger 0 proposed · 12 suites/125 · **visual gate 40 frames
+  a 0 píxeles**.
+- Lifecycle/registry/README sincronizados; ambas specs con Delta de cierre y evidencia.
+- ⚠️ Pendientes que NO bloquean: TASK-1391 sigue `to-do` bloqueada SOLO por EPIC-027; el snapshot
+  `axis-ppt-snapshot.json` podría re-snapshotearse para incluir las 71 nuevas (hoy documenta las
+  colecciones al 2026-07-12 pre-altas — el ledger es el SoT del mapping, no urge).
+
 ## Sesión 2026-07-12 (cont. 9) — TASK-1392 F0 CODE-COMPLETE (Slices 0→6, 7 commits): rollout staging pendiente (Claude)
 
 - **Los 7 commits en `develop` local-first (SIN push):** S0 `97079970f` (ADR aplicado + 5 vocabularios

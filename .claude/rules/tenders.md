@@ -21,7 +21,7 @@ compilado + font pack local — el render **bloquea la red** y falla cerrado). E
 aplicado a dev): `greenhouse_commercial.proposal*` con state machine persistida (matriz + triggers
 append-only; gates humanos exigidos por la DB), commands/readers en
 `src/lib/commercial/tenders/proposals/**`, API `/api/commercial/proposals/**`, entitlement **per-ORG**
-(`module_assignments: proposal_studio_v1` — **OFF en todos los ambientes hasta staging evidence**),
+(`module_assignments: proposal_studio_v1` — **activo para Efeonce desde 2026-07-12**; otras orgs OFF),
 outbox `commercial.proposal.*`, intake agent (propose → confirm → execute; el LLM **NUNCA** muta — ni
 siquiera existe `actor_kind='agent'`) y la **proyección allowlisted de render** (`render-projection.ts`,
 contrato de TASK-1391: un artefacto `client_facing` con UNA evidencia `internal` **falla cerrado**).
