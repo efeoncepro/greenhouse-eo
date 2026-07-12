@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-121`
+`ISSUE-122`
 
 ## Open
 
@@ -90,6 +90,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                                                            | Ambiente                       | Detectado  | Resuelto   | Causa                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ISSUE-121` | artifact-worker: la bug class del primer deploy — 5 hallazgos del smoke real en Cloud Run (IAM overrides · imagen incompleta · sandbox root · carrera del gate missing_asset · paths absolutos horneados), todos cerrados de raíz + guards permanentes (selftest de imagen, deploy-contract, portabilidad de catálogos) | staging (Cloud Run) | 2026-07-12 | ✅ Resuelto 2026-07-12 |
 | `ISSUE-120` | [AI Visibility Grader: `citation_quality` estructuralmente 0 + degradación silenciosa de la extracción de prosa](resolved/ISSUE-120-ai-visibility-grader-citation-quality-structural-zero-and-silent-prose-degradation.md) | pipeline normalización/scoring | 2026-07-11 | 2026-07-11 (TASK-1390: clasificador sourceType + same-site + prose outcome + backoff; re-score live verificado) |
 | `ISSUE-119` | [Saturación de conexiones PG por scripts tsx locales zombies](resolved/ISSUE-119-pg-connection-saturation-zombie-local-scripts.md) | Cloud SQL única instancia (afectaba prod) | 2026-07-10 | 2026-07-10 | Dos scripts `tsx` locales de una sesión previa quedaron colgados 4+ horas con pools vía Cloud SQL Connector (invisibles a `lsof :15432`) y agotaron los 100 slots de `greenhouse-pg-dev`. Kill de los zombies → 3/100 conexiones al instante. Lección: scripts con pool deben cerrar con `process.exit()`; diagnóstico debe revisar `ps aux | grep tsx` además del proxy. |
 | `ISSUE-116` | [El deadline de cálculo de nómina se anclaba al último día hábil del mes del período, no al close-window del mes siguiente](resolved/ISSUE-116-payroll-calculation-deadline-anchored-on-wrong-month.md) | staging + production (payroll) | 2026-07-06 | 2026-07-06 | El período de junio aparecía "Fuera de plazo operativo" con deadline `2026-06-30`, pero Efeonce paga dentro de los primeros 5 días hábiles POSTERIORES al cierre → el deadline correcto es el 5.º día hábil de julio (`2026-07-07`). `resolvePayrollCalculationDeadline` anclaba en `getLastBusinessDayOfMonth(period.month)` (mes equivocado). No bloqueaba el cálculo (`blocksCalculation:false`), pero la etiqueta + `overdue_allowed` + `calculatedOnTime` eran incorrectos para TODOS los períodos. Fix: primitiva canónica `getNthBusinessDayOfMonth` + deadline = N.º día hábil del mes siguiente (reusa `closeWindowBusinessDays`) + rename semántico `lastBusinessDay→deadlineDate`. Code-only. Verificado: readiness 2026-06 → `deadlineDate:2026-07-07, state:pending, isOverdue:false`; 596 tests + typecheck verdes. |

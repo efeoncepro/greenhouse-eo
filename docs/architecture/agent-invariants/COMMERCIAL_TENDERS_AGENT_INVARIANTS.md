@@ -224,3 +224,23 @@ El **Proposal Intake Agent** (shipped: `src/lib/commercial/tenders/proposals/int
     no un caso borde. Es justamente lo que decidió el ADR.
 - **El dominio tenders NO escribe** payroll, finance ni HR. Consume `loaded cost` para el pricing; no lo
   calcula ni lo muta.
+
+## Aprendizajes ISSUE-121 — el primer deploy del artifact-worker (2026-07-12)
+
+Cinco bugs invisibles en local, todos de la clase *"la nube difiere de la máquina del autor"*.
+Los invariantes que dejaron:
+
+- **NUNCA** declarar "listo" un deployable nuevo sin ejecutarlo en su runtime real; **SIEMPRE**
+  la imagen se prueba a sí misma en el pipeline (selftest de Cloud Build del artifact-worker:
+  catálogo completo + fuentes por checksum + Chromium + render probe — falla ⇒ no hay deploy).
+- **NUNCA** un gate de calidad juzga estado asíncrono sin esperar su settlement determinista
+  (`img.decode()` + techo, jamás un juicio inmediato ni un sleep). Un gate que depende de la
+  velocidad del disco es una moneda.
+- **NUNCA** hashear con `JSON.stringify` contenido que viaja por JSONB (Postgres reordena claves):
+  el hash del manifest usa serialización canónica (`hashResolvedManifest`).
+- **SIEMPRE** preferir rediseñar para necesitar MENOS privilegio antes que escalar IAM: el worker
+  claim-ea su job (`FOR UPDATE SKIP LOCKED`) en vez de darle `runWithOverrides` al dispatcher.
+- **Un catálogo es DATO portable o no es un catálogo**: `catalog-portability.test.ts` prohíbe
+  `file://`, paths absolutos y referencias que escapen del árbol en TODA plantilla.
+- Chromium en contenedor como root exige `--no-sandbox` — vive en el launch canónico UNIFORME
+  (es aislamiento de proceso, no rasterización; visual gate 0 px lo prueba).
