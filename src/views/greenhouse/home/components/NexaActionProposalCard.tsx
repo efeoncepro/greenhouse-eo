@@ -51,7 +51,17 @@ const NexaActionProposalCardBase = ({ proposal }: { proposal: NexaActionProposal
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ idempotencyKey: proposal.execution.idempotencyKey })
+        // TASK-1399 — el `input` DEBE re-ecoarse: sin él, toda acción PARAMETRIZADA (author_quote y
+        // las del Proposal Studio) muere en el confirm con `invalid_input` → 422, porque el endpoint
+        // re-valida `body.input` contra el `inputSchema` (confirm.ts) y recibía `undefined`. Bug
+        // latente desde TASK-1212; no explotó sólo porque su flag nunca se prendió.
+        // Re-ecoarlo NO es una brecha: el servidor RE-VALIDA con el mismo schema y el command
+        // re-enforza capability + invariantes — un eco manipulado sólo puede autorar lo que ese
+        // usuario ya podía autorar.
+        body: JSON.stringify({
+          idempotencyKey: proposal.execution.idempotencyKey,
+          input: proposal.execution.input
+        })
       })
 
       const data = await response.json().catch(() => ({}))

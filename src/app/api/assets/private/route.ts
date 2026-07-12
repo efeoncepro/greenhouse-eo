@@ -10,22 +10,38 @@ import { ROLE_CODES } from '@/config/role-codes'
 
 export const dynamic = 'force-dynamic'
 
-const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>([
-  'leave_request_draft',
-  'purchase_order_draft',
-  'master_agreement_draft',
-  'certification_draft',
-  'evidence_draft',
-  'finance_reconciliation_evidence_draft',
-  'sample_sprint_report_draft',
-  'resignation_letter_ratified_draft',
-  'contractor_invoice_draft',
-  'contractor_work_evidence_draft',
-  'provider_invoice_draft',
-  'organization_logo_draft',
-  'hiring_application_cv_draft',
-  'hiring_candidate_portfolio_file_draft'
-])
+/**
+ * ⚠️ EXHAUSTIVO POR TIPO (TASK-1399). Antes esto era un `new Set<DraftUploadContext>([...])`, que
+ * NO exige exhaustividad: `proposal_rfp_draft`/`proposal_deliverable_draft` existían en el tipo y
+ * en el asset store (límite, MIME, retención, scan gate) pero faltaban acá — el upload moría con
+ * `400 Unsupported asset context` y NADIE lo detectaba (ni tsc ni un test). Causa raíz del gap.
+ *
+ * Ahora el Set se deriva de un `Record<DraftUploadContext, true>`: agregar un contexto nuevo al
+ * tipo y olvidarlo acá **rompe el build**. El drift ya no es posible.
+ */
+const DRAFT_CONTEXT_MAP: Record<DraftUploadContext, true> = {
+  leave_request_draft: true,
+  purchase_order_draft: true,
+  master_agreement_draft: true,
+  certification_draft: true,
+  evidence_draft: true,
+  finance_reconciliation_evidence_draft: true,
+  sample_sprint_report_draft: true,
+  resignation_letter_ratified_draft: true,
+  contractor_invoice_draft: true,
+  contractor_work_evidence_draft: true,
+  provider_invoice_draft: true,
+  organization_logo_draft: true,
+  hiring_application_cv_draft: true,
+  hiring_candidate_portfolio_file_draft: true,
+  // TASK-1399 — Proposal Studio: el binario del RFP/anexo y los deliverables entran por acá.
+  proposal_rfp_draft: true,
+  proposal_deliverable_draft: true
+}
+
+const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>(
+  Object.keys(DRAFT_CONTEXT_MAP) as DraftUploadContext[]
+)
 
 const isDraftContext = (value: string): value is DraftUploadContext =>
   DRAFT_CONTEXT_VALUES.has(value as DraftUploadContext)
@@ -69,6 +85,15 @@ const canUploadForContext = ({
   // HR sube on-behalf cuando el contractor no tiene acceso al portal.
   if (contextType === 'contractor_invoice_draft' || contextType === 'contractor_work_evidence_draft') {
     return Boolean(tenant.memberId) || hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  }
+
+  // TASK-1399 — Proposal Studio: subir el RFP/anexo o un deliverable exige la MISMA capability
+  // que el command que después los vincula (`commercial.proposal.manage`). NO se acepta
+  // member-only: es un documento comercial confidencial, no un archivo personal. La PUERTA real
+  // (entitlement per-ORG `proposal_studio_v1`) la aplica el command de vínculo — acá es defensa
+  // adelantada. Los roles `client_*` nunca pasan (no tienen la capability).
+  if (contextType === 'proposal_rfp_draft' || contextType === 'proposal_deliverable_draft') {
+    return can(tenant, 'commercial.proposal.manage', 'update', 'tenant')
   }
 
   // TASK-791 — provider invoices/statements: solo Finance/HR/admin (NO contractor).

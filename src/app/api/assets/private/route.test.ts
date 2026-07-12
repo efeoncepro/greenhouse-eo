@@ -18,6 +18,13 @@ vi.mock('@/lib/hr-core/service', () => ({
   resolveCurrentHrMemberId: (...args: unknown[]) => mockResolveCurrentHrMemberId(...args)
 }))
 
+const mockCan = vi.fn(() => false)
+
+vi.mock('@/lib/entitlements/runtime', () => ({
+  can: (...args: unknown[]) => mockCan(...(args as [])),
+  buildTenantEntitlementSubject: (tenant: unknown) => tenant
+}))
+
 import { POST } from '@/app/api/assets/private/route'
 
 describe('POST /api/assets/private', () => {
@@ -89,5 +96,68 @@ describe('POST /api/assets/private', () => {
         ownerMemberId: 'member-123'
       })
     )
+  })
+
+  // ── TASK-1399 — Proposal Studio: el binario del RFP entra por HTTP ──────────
+  //
+  // Antes de esta task los contextos existían en el asset store (límite 50 MB, MIME docx/xlsx,
+  // retención document_vault, scan gate) pero NO en la allowlist de esta ruta: todo upload de
+  // propuesta moría en `400 Unsupported asset context` — el RFP sólo entraba por script.
+
+  it('acepta el RFP de una propuesta cuando el actor tiene commercial.proposal.manage', async () => {
+    mockCan.mockReturnValue(true)
+    mockRequireTenantContext.mockResolvedValue({
+      tenant: { userId: 'user-1', memberId: 'julio', clientId: null, spaceId: null, routeGroups: ['internal'] },
+      unauthorizedResponse: null
+    })
+
+    const form = new FormData()
+
+    form.append('file', new File(['bases'], 'bases.pdf', { type: 'application/pdf' }))
+    form.append('contextType', 'proposal_rfp_draft')
+
+    const response = await POST(new Request('http://localhost/api/assets/private', { method: 'POST', body: form }))
+
+    expect(response.status).toBe(201)
+    expect(mockCan).toHaveBeenCalledWith(expect.anything(), 'commercial.proposal.manage', 'update', 'tenant')
+    expect(mockCreatePrivatePendingAsset).toHaveBeenCalledWith(
+      expect.objectContaining({ contextType: 'proposal_rfp_draft' })
+    )
+  })
+
+  it('RECHAZA el RFP a quien no tiene la capability (el documento comercial no es un archivo personal)', async () => {
+    mockCan.mockReturnValue(false)
+    mockRequireTenantContext.mockResolvedValue({
+      // Un member cualquiera: sin la capability NO sube un RFP (no vale el member-only).
+      tenant: { userId: 'user-2', memberId: 'alguien', clientId: null, spaceId: null, routeGroups: [] },
+      unauthorizedResponse: null
+    })
+
+    const form = new FormData()
+
+    form.append('file', new File(['bases'], 'bases.pdf', { type: 'application/pdf' }))
+    form.append('contextType', 'proposal_rfp_draft')
+
+    const response = await POST(new Request('http://localhost/api/assets/private', { method: 'POST', body: form }))
+
+    expect(response.status).toBe(403)
+    expect(mockCreatePrivatePendingAsset).not.toHaveBeenCalled()
+  })
+
+  it('el deliverable de una propuesta usa la misma puerta', async () => {
+    mockCan.mockReturnValue(true)
+    mockRequireTenantContext.mockResolvedValue({
+      tenant: { userId: 'user-1', memberId: 'julio', clientId: null, spaceId: null, routeGroups: ['internal'] },
+      unauthorizedResponse: null
+    })
+
+    const form = new FormData()
+
+    form.append('file', new File(['deck'], 'deck.pdf', { type: 'application/pdf' }))
+    form.append('contextType', 'proposal_deliverable_draft')
+
+    const response = await POST(new Request('http://localhost/api/assets/private', { method: 'POST', body: form }))
+
+    expect(response.status).toBe(201)
   })
 })
