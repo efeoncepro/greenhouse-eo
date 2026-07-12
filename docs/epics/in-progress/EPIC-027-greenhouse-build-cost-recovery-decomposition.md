@@ -42,7 +42,7 @@ El costo reportado escaló de ~USD 20 a USD 530 en Elastic; Standard llegó a 45
 - `TBD` — 30-day cost rebaseline and next-boundary decision.
 - `TASK-1392` — Tender Proposal Studio F0 agentic foundation: aggregate, assets and governed context/tool/proposal contract within the modular monolith. It is a prerequisite for the render candidate; it **does not** authorize a deployable or move existing transactions.
 - `TASK-1393` — Artifact Composer: extracción domain-free, catálogos y brand pack: mueve el motor, formaliza `deck-axis`/`outputTarget` y hace AXIS un input generado desde SoT; no crea deployable ni implementa el catálogo social.
-- `TASK-1391` — Tender Deck Renderer worker/artifact pipeline: the next-boundary **candidate** for a dedicated `tender-worker` Cloud Run Job, after `TASK-1392`. It remains blocked until EPIC-027 explicitly resolves `continue` for that boundary, with cost, routing/auth, rollback and runtime ownership evidence.
+- `TASK-1391` — Artifact Renderer worker/artifact pipeline: the `artifact-worker` Cloud Run Job boundary was **authorized 2026-07-12 via documented exception** (operator decision; cost/routing-auth/rollback/ownership evidence recorded in `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` → Delta 2026-07-12). This exception covers ONLY the batch render Job; the portal next-boundary decision (Labs/Admin/Public) remains gated by the ordinary path (TASK-1382 pilot + 30-day cost rebaseline).
 
 ## Existing Related Work
 
@@ -56,7 +56,7 @@ El costo reportado escaló de ~USD 20 a USD 530 en Elastic; Standard llegó a 45
 - [ ] Portal graph meets the accepted reduction gate or the pilot is rolled back with evidence.
 - [ ] Cost attribution is available per deployable for at least one billing cycle.
 - [ ] Production routing/auth/rollback passes before duplicate routes are removed.
-- [ ] Next boundary has explicit `continue|pause|stop` decision.
+- [ ] Next boundary has explicit `continue|pause|stop` decision. *(Partial: the `artifact-worker` batch Job boundary resolved `continue` 2026-07-12 via documented exception; the PORTAL next-boundary decision remains open and follows the ordinary path.)*
 
 ## Non-goals
 

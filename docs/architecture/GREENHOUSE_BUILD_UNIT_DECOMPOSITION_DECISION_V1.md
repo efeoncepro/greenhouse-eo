@@ -81,3 +81,36 @@ This ADR supersedes the program-level no-decomposition conclusion in `GREENHOUSE
 - `docs/tasks/complete/TASK-1376-build-baseline-dependency-boundary.md`
 - `docs/tasks/complete/TASK-1379-roadmap-materialized-index-build-input-experiment.md`
 
+## Delta 2026-07-12 — Excepción documentada: frontera `artifact-worker` (Cloud Run Job) AUTORIZADA
+
+**Decisión del operador (2026-07-12, sesión TASK-1391):** se autoriza la creación del deployable
+**`artifact-worker`** (primer **Cloud Run Job** del ecosistema; imagen con Playwright/Chromium pinneado)
+por la **vía de excepción documentada** que TASK-1391 contempla ("EPIC-027 debe autorizar… o documentar
+la excepción antes de crear `services/artifact-worker/`"), sin esperar la vía ordinaria
+(pilot Labs TASK-1382 + rebaseline de costo de 30 días).
+
+**Evidencia exigida por EPIC-027 (cost · routing/auth · rollback · runtime ownership):**
+
+- **Costo:** Cloud Run **Job** con scale-to-zero — se paga sólo por ejecución. Benchmark local
+  (Slice 0): deck 15 láminas = 4,4 s / PDF 3,2 MB · 25 láminas = 6,2 s / PDF 5,6 MB · RSS del
+  proceso node ~260 MB. Envelope inicial 2 CPU / 2 GiB / timeout acotado; el perfil de carga del
+  catálogo deck es **raro** (unidades/mes, no unidades/hora). El costo dominante es Artifact
+  Registry (imagen Chromium ~1 GiB) + ejecuciones esporádicas — órdenes de magnitud bajo el
+  problema de costo que originó EPIC-027 (builds Vercel/Elastic).
+- **Routing/auth:** el Job **no expone endpoint HTTP**. Invocación exclusiva vía Jobs API
+  (`jobs.run`) por el dispatcher autenticado (ops-worker, OIDC/IAM `roles/run.invoker`); patrón
+  IAM idéntico a los 4 services existentes (`--no-allow-unauthenticated`).
+- **Rollback:** < 10 min — flag `ARTIFACT_RENDER_JOBS_ENABLED` OFF + pausar el dispatch; los jobs
+  quedan auditables (tabla append-only) y los assets aprobados no se borran. El deployable puede
+  eliminarse por completo sin tocar dominio (el render vuelve a ser CLI local).
+- **Runtime ownership:** Ops/Platform (deploy, señales, runbook) + Commercial (semántica del job).
+  El render pesado NUNCA corre en Vercel ni `ops-worker` (invariante del outbox publisher).
+
+**Por qué la excepción es segura respecto del espíritu del ADR:** este deployable NO toca el problema
+que el gate protege (el grafo/build del portal Next.js): no mueve rutas, no divide el build de Vercel,
+no crea `apps/*` ni `packages/*`. Es un worker batch aislado, del mismo tipo operativo que los 4 ya
+productivos, con la única novedad del modo Job + Chromium. La decisión de frontera del PORTAL
+(Labs/Admin/Public) sigue intacta y sigue gateada por la vía ordinaria.
+
+**Registro cruzado:** EPIC-027 (child + exit criterion parcial), `DECISIONS_INDEX.md`, TASK-1391 Slice 0.
+

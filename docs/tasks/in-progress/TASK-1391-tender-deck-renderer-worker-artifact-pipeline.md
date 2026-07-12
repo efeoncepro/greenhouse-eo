@@ -23,10 +23,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-027`
-- Status real: `Diseno`
+- Status real: `En ejecución (Slice 0 cerrado)`
 - Rank: `TBD — posterior a la autorización de la próxima frontera de deployable de EPIC-027`
 - Domain: `commercial|platform|ops`
-- Blocked by: `EPIC-027 next-boundary authorization (único bloqueo vivo — TASK-1393 ✅ code-complete y TASK-1392 ✅ code-complete al 2026-07-12; ver Delta (c))`
+- Blocked by: `none — frontera artifact-worker AUTORIZADA 2026-07-12 por excepción documentada (ver Plan Mode / ADR delta)`
 - Branch: `task/TASK-1391-artifact-worker-cloud-run-job`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -245,6 +245,57 @@ Reglas obligatorias:
      ZONE 2 — PLAN MODE
      Se completa sólo al tomar la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Plan Mode — Slice 0 CERRADO (2026-07-12)
+
+### 🚪 Gate de frontera: AUTORIZADO por excepción documentada
+
+**Decisión del operador (2026-07-12):** el deployable `artifact-worker` (primer Cloud Run **Job**;
+imagen Playwright/Chromium pinneada) queda autorizado por la vía de excepción que esta task contempla
+(línea "o documentar la excepción"), sin esperar la vía ordinaria (pilot Labs TASK-1382 + rebaseline
+30 días). Registro: `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` → Delta 2026-07-12 (evidencia
+de costo/auth/rollback/ownership) + EPIC-027 (child + exit criterion parcial) + `DECISIONS_INDEX.md`.
+Producción sigue OFF hasta staging smoke + sign-off.
+
+### Benchmark baseline (Slice 0, local M-series)
+
+| Plan | Wall | PDF | RSS node |
+|---|---|---|---|
+| SKY 15 láminas (fixture real) | 4,37 s | 3,2 MB | ~250 MB |
+| 25 láminas (SKY + 10 reales repetidas) | 6,20 s | 5,6 MB | ~260 MB |
+
+Chromium corre como proceso hijo (RSS no incluido); envelope contenedor se mide en staging.
+Punto de partida del Job: **2 CPU / 2 GiB / timeout 900 s / tasks=1 / parallelism=1**.
+
+### Decisiones de diseño congeladas (Slice 0)
+
+1. **Tabla:** `greenhouse_commercial.proposal_render_jobs` (additive; estados CHECK + historial
+   append-only `proposal_render_job_events`; UNIQUE parcial de idempotencia sobre jobs activos).
+2. **Clave de idempotencia (canónica, única):** `manifest_hash + proposal_id + artifact_purpose`
+   (el manifest ya sella catálogo/template/contrato/brand pack/fuentes).
+3. **El manifest del composer sigue domain-free.** El `audience` por referencia de evidencia viaja
+   en el JOB (columnas/jsonb propios), no dentro de `ResolvedCompositionManifest` — contaminarlo
+   violaría el ADR del composer. El gate reusa `assertEvidenceAllowedForAudience`.
+4. **Enqueue exige un `ResolvedCompositionManifest` YA resuelto** (producido por `resolvePlan` en
+   CLI/tooling); el comando valida hashes + audience + constraints y persiste. El worker re-resuelve
+   contra su copia del catálogo y VERIFICA igualdad de hashes antes de renderizar (drift = fallo).
+5. **Dispatcher:** Cloud Scheduler (\*/2 min) → endpoint autenticado en `ops-worker`
+   (`/artifact-render/dispatch`) que hace la selección por prioridad y llama `jobs.run` (~200 ms,
+   NO render — el invariante "ops-worker no ejecuta Chromium" se respeta). Cloud Tasks rechazado
+   (segundo source of truth sin necesidad al volumen actual).
+6. **Prioridad:** deadline asc (fijado en el job) + aging con techo; deadline vencido no compite ni
+   se despacha; todo job pospuesto se loguea; signal `artifact.render.queue.starvation`.
+7. **Flag:** `ARTIFACT_RENDER_JOBS_ENABLED` — multi-runtime (Vercel enqueue · ops-worker dispatch ·
+   worker), SoT Cloud Run = `services/artifact-worker/deploy.sh`, fila en el ledger en el mismo PR.
+8. **Capability:** `commercial.proposal.render` (actions: propose/execute/read/retry) + grants
+   ADMIN/ACCOUNT en el mismo PR; entitlement per-ORG = el mismo `proposal_studio_v1` de F0.
+9. **Constraints del RFP:** helper `extractRenderConstraints(requirements)` → `{maxPdfMb, formats,
+   maxPages, accessibilityRequired}` con detección conservadora (PDF/UA · 508 · EAA · WCAG ·
+   accesib*); `accessibilityRequired=true` ⇒ fail-closed al encolar Y en el worker (Chromium
+   print-to-PDF no emite PDF taggeado — limitación declarada en spec/runbook).
+10. **Peso:** el warning de `composeArtifact` se promueve a outcome `size_rejected` en el job
+    usando el constraint del RFP (default 20 MB si el RFP no declara).
+
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
