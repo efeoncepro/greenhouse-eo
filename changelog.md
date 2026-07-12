@@ -2,12 +2,12 @@
 
 ## 2026-07-12
 
-- **ADR — Tender Deck destinations: PDF → PPTX → Adobe Express.** El PDF permanece contractual; se
-  acepta `pptx-native` como próximo renderer automático y Adobe Express como destino posterior
-  editable mediante Add-on nativo. El manifest/slots de Greenhouse sigue siendo fuente de verdad;
-  conversiones PDF/HTML e importaciones no son renderers soportados. Adobe Express REST queda sólo POC
-  de plantillas taggeadas mientras sea beta. No hay runtime, credenciales ni comandos nuevos aún;
-  `TASK-1393` deja la costura extensible.
+- **ADR — Tender Deck destinations: PDF → PPTX → Adobe Express REST.** El PDF permanece contractual;
+  se acepta `pptx-native` como próximo renderer automático y `adobe-express-rest` como destino posterior
+  por API server-to-server sobre templates etiquetados. No hay Add-on en el flujo de producto. El
+  manifest/slots sigue fuente de verdad; conversiones PDF/HTML/importaciones no son renderers. Express
+  REST sólo cubre matriz fija y queda POC/no producción mientras Adobe beta prohíba uso comercial.
+  `TASK-1395`/`TASK-1396` implementan los targets después de `TASK-1393`/`TASK-1391`.
 
 - **Tender Deck Composer — ChartSplit 25/25 y geometría sin fabricación.** `TASK-1394` cierra la última
   plantilla no componible: el motor ahora honra `itemSelector`/`fixedChildren`, permite remoción

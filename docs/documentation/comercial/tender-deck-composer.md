@@ -88,14 +88,15 @@ Después del PDF, el producto tendrá dos destinos:
 1. **PPTX nativo editable:** textos, barras, hitos y tablas serán objetos reales de PowerPoint. Por
    ejemplo, la etiqueta de una barra del Gantt seguirá siendo editable, pero su posición nace del
    mismo schedule que usa el PDF.
-2. **Adobe Express editable:** permitirá continuar el trabajo dentro de Express sin convertir el PDF
-   en fuente. El camino productivo previsto es un Add-on que crea elementos nativos; la API REST de
-   Adobe sólo sirve hoy para probar variaciones sobre plantillas taggeadas y no para un Gantt variable.
+2. **Adobe Express editable por API:** Greenhouse generará variaciones de templates Express nativos
+   previamente etiquetados, sin Add-on en el flujo de cliente. La API cambia textos, imágenes y videos;
+   cada duración/estructura de Gantt debe coincidir con un template aprobado. Si rangos, fases o hitos
+   no caben en la matriz, el Composer no improvisa: entrega PPTX/PDF o rechaza Express.
 
 En ambos casos, la persona o el agente cambia el **plan del deck** y reemite. Si alguien modifica a
 mano el PPTX o documento Express, crea una variante externa que debe declararse; esa edición no
 reescribe los datos de Greenhouse en silencio. Detalle técnico y estado de disponibilidad: ADR de
-destinos en la [documentación técnica](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md#architecture-decision-2026-07-12--pdf-contractual-luego-pptx-nativo-y-adobe-express).
+destinos en la [documentación técnica](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md#architecture-decision-2026-07-12--pdf-contractual-luego-pptx-nativo-y-adobe-express-rest).
 
 ## Las fotos del equipo
 

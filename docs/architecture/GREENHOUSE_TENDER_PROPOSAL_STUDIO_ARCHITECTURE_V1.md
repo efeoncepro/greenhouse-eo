@@ -535,11 +535,11 @@ Principio: **fidelidad manda** (es una propuesta a un comité; se ve premium o n
 >    → *"NUNCA volver al mesh gradient recreado"*. **Se conserva el texto original abajo sólo como
 >    registro histórico de cómo se llegó a la decisión — NO como instrucción.**
 >
-> 3. **Los outputs editables ya tienen ADR vigente:** PDF contractual → PPTX nativo → Adobe Express.
->    La fila histórica `MCP html→Express` no describe una API/runtime válido: Adobe Express REST trabaja
->    con variaciones de documentos Express taggeados y el Add-on Document API es el carril capaz de
->    componer estructuras variables. Manda
->    [`GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → ADR de destinos](GREENHOUSE_TENDER_DECK_COMPOSER_V1.md#architecture-decision-2026-07-12--pdf-contractual-luego-pptx-nativo-y-adobe-express).
+> 3. **Los outputs editables ya tienen ADR vigente:** PDF contractual → PPTX nativo → Adobe Express
+>    REST. La fila histórica `MCP html→Express` no describe una API/runtime válido: Express REST crea
+>    variaciones sobre documentos taggeados y sólo opera una matriz de estructuras fijas, no un Gantt
+>    dinámico. Por decisión del operador no hay Add-on en el flujo de producto. Manda
+>    [`GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → ADR de destinos](GREENHOUSE_TENDER_DECK_COMPOSER_V1.md#architecture-decision-2026-07-12--pdf-contractual-luego-pptx-nativo-y-adobe-express-rest).
 
 **Trabajo F4 (histórico):** reconstruir los 10 módulos como **plantillas HTML fieles UNA VEZ** (verificadas con GVC contra el Figma), + el registry de slots + el motor de llenado. Es acotado (10 plantillas), reutilizable para siempre, en el stack de la casa.
 

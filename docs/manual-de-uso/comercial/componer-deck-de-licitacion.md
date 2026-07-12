@@ -16,7 +16,8 @@ contenido. El resultado es un **PDF de N páginas** listo para revisar y entrega
 > **Alcance actual:** este manual opera sólo el PDF y PNGs. PPTX nativo y Adobe Express son los dos
 > destinos posteriores aprobados, pero no hay comando, credencial ni paso manual que los produzca aún.
 > No importe el PDF esperando preservar edición/fidelidad: cuando existan, ambos nacerán del mismo
-> plan de datos. Ver [ADR de destinos](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md#architecture-decision-2026-07-12--pdf-contractual-luego-pptx-nativo-y-adobe-express).
+> plan de datos. Adobe Express se emitirá por REST sólo para templates etiquetados compatibles; no
+> convierte PDF ni redibuja Gantts arbitrarios. Ver [ADR de destinos](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md#architecture-decision-2026-07-12--pdf-contractual-luego-pptx-nativo-y-adobe-express-rest).
 
 ## Antes de empezar
 

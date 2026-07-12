@@ -1,11 +1,13 @@
-## Sesión 2026-07-12 (cont. 6) — PDF → PPTX → Adobe Express: destinos del composer aceptados
+## Sesión 2026-07-12 (cont. 6) — PDF → PPTX → Adobe Express REST: destinos del composer aceptados
 
 - **Decisión del operador documentada:** PDF mantiene el contrato de entrega/fidelidad; los siguientes
-  destinos son `pptx-native` (automático y editable) y Adobe Express (Add-on nativo interactivo).
-  El `Plan`/manifest Greenhouse permanece fuente de verdad; edición externa es variante explícita.
-- **Límite Adobe:** REST beta sólo varía plantillas Express taggeadas y no resuelve estructura Gantt;
-  POC/no producción hasta GA y autorización comercial. Se descarta `MCP html→Express` como supuesto de
-  renderer. `TASK-1393` deja registry extensible; no implementa destinos, API ni credenciales.
+  destinos son `pptx-native` (automático y editable) y `adobe-express-rest` (API server-to-server).
+  No hay Add-on en el flujo Greenhouse/cliente. El `Plan`/manifest sigue fuente de verdad; edición
+  externa es variante explícita.
+- **Límite Adobe:** REST beta sólo varía templates Express taggeados y no resuelve Gantt libre; cada
+  schedule debe caber en matriz fija o aborta. POC/no producción hasta autorización comercial. Tag
+  Elements se usa sólo al preparar template porque Adobe lo exige, nunca runtime. Se descarta
+  `MCP html→Express`. `TASK-1395`/`TASK-1396` ya registradas.
 - **Docs/skills:** ADR embebido + índice de decisiones, Proposal Studio histórico corregido, docs
   funcional/manual y espejos `deck-studio` Codex/Claude. Docs-only; no se tocó runtime. El WIP ajeno
   `docs/commercial/tenders/sky-blog-2026/oferta-tecnica.md` se preservó.
