@@ -1,0 +1,120 @@
+# Commercial / Tenders — invariantes operativos para agentes
+
+> **Tipo:** Companion de invariantes (load-on-demand)
+> **Versión:** 1.0
+> **Creado:** 2026-07-12 por Claude
+> **Cargar al tocar:** `src/lib/commercial/tenders/**` · `docs/architecture/tender-deck-composer-prototypes/**` · `scripts/commercial/compose-tender-deck.ts` · cualquier oferta/deck/propuesta de licitación
+> **Contrato completo:** `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` (el deck) · `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (el aggregate; **leer su §0 — estado real**) · `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (discovery público)
+> **Skill:** `greenhouse-public-private-tenders` (método) + `deck-visual-system.md` (el deck) + `bid-construction-playbook.md` (las 10 fases)
+
+---
+
+## Estado real del dominio (2026-07-12) — no asumas de más
+
+| Pieza | Estado |
+|---|---|
+| Deck composer (selector · validate · slot-fill · 15 resolvers · geometría · render · **PDF de N páginas**) | ✅ shipped, `src/lib/commercial/tenders/deck/**` |
+| 25 plantillas con `data-slot` + `*.slots.json` + `registry.json` | ✅ 25/25 built |
+| CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ **único consumer hoy** |
+| State machine (12 estados, 3 gates humanos) | ⚠️ **TS puro — NO hay tabla `tenders` en DB** |
+| API routes · UI · migración · capability · outbox | ❌ **no existen** |
+| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ no existen |
+| Renderer productivo: Cloud Run Job + cola + artifact store + señales | 📋 **TASK-1391** (`to-do`, P1) — **bloqueada por EPIC-027** |
+
+⚠️ **NUNCA** corras el render pesado (Chromium) en **Vercel** ni en el **`ops-worker`** — bloquearía el
+publisher del outbox. Va en un **`tender-worker` dedicado**, y un deployable nuevo requiere la decisión de
+frontera de **EPIC-027**: no se crea por conveniencia. Eso es exactamente lo que TASK-1391 protege.
+
+---
+
+## Los 3 principios que gobiernan todo
+
+Una oferta de licitación es un **documento contractual que evalúa un comité** y que pasa a formar parte
+del contrato si se adjudica. De ahí salen los tres principios; todo lo demás son sus consecuencias.
+
+1. **Anti-fabricación.** Nada que el deck muestre puede ser inventado — ni una cifra, ni una barra, ni
+   una cara. Fabricar en una licitación no es un bug estético: es **tergiversación**.
+2. **Fail-closed, nunca silencioso.** Un entregable que sale mal **pareciendo bien** es peor que un
+   fallo, porque nadie lo revisa dos veces. Todo lo que el composer no pueda garantizar, **aborta**.
+3. **Human-in-control.** El agente **prepara**; el humano **decide, firma y sube**. Siempre.
+
+---
+
+## Anti-fabricación (principio 1)
+
+- **NUNCA** compongas una cifra sin `evidenceRef`. `validate.ts` lo rechaza: una métrica cuantificada sin
+  su fuente **no se compone**. Si el dato no está medido, no va — o va **marcado como ilustrativo**.
+- **NUNCA** dibujes geometría a mano. Las barras, spans y posiciones **se derivan del dato** vía los 5
+  resolvers de geometría. Si el resolver falta, el deck **aborta**. Un "de 12 a 14" pintado con la barra
+  gigante del prototipo es **fabricación gráfica**: el evaluador ve una mejora que no ocurrió.
+- **NUNCA** generes una cara del squad con IA. El evaluador cruza el CV contra la persona. Si falta la
+  foto de alguien, **se pide la foto**. No se fabrica. (Fotos reales: `assets/squad/squad-<nombre>.png`.)
+- **NUNCA** afirmes un negativo sin medirlo. Decir "la IA no cita a la marca" sin correr el AI Visibility
+  Grader es afirmar algo falso en un documento contractual. **Mide, no infieras** (caso SKY: la primera
+  versión afirmó un negativo que el grader desmintió).
+- `consumer: validation-only` (p. ej. `evidenceRef`) **NUNCA** se pinta: es munición interna, no copy
+  para el comité.
+
+## Fail-closed (principio 2) — las 2 bug classes que ya nos mordieron
+
+- **NUNCA** agregues un `default:` silencioso ni un `continue` que deje pasar un slot sin escribir.
+  **Bug class 1 (el fallo silencioso):** la lámina salía con el **copy de relleno del prototipo** y nadie
+  se enteraba — un deck llegando al comité diciendo "Inteligencia de ejecución ×4", o un KPI que decía
+  "3/3" cuando el dato era "4/4". Cualquier tipo o campo que el filler no sepa llenar **aborta el deck**.
+- **NUNCA** `grid-template-columns` en `%` si la grilla tiene `gap`. Usa `minmax(0, Nfr)`.
+  **Bug class 2 (el contrato que miente sobre lo que cabe):** los porcentajes de Grid **no descuentan el
+  gap**, así que los tracks se salían 20px del lienzo y `.slide{overflow:hidden}` **amputaba una palabra
+  en silencio** (`…se vuelve sosteni|`). El copy había pasado validación con holgura. El test
+  `template-geometry.test.ts` lo prohíbe en las 25 plantillas.
+- **NUNCA** asumas que "pasó `maxCharacters`" significa "cabe". El contrato declara **intención**; el
+  único juez de la geometría es el **layout real**. `assertSlideFitsCanvas` (`render.ts`) mide cada nodo
+  del contrato contra su ventana visible real **antes de imprimir** y aborta con `SlideGeometryError`.
+- **NUNCA** trunques copy que no cabe (`overflow: reject` es el **único** modo). Se reescribe más corto,
+  o se corrige la geometría. El renderer no amputa.
+- **NUNCA** emitas un PDF parcial. `compose.ts` **valida TODO antes de renderizar NADA**: un PDF a medio
+  producir de una oferta parece completo, y eso es exactamente el fallo que no se detecta.
+- **NUNCA** ignores el gate de peso (`maxPdfMb`). No es estética: los portales **rechazan** adjuntos sobre
+  su límite. Un deck de 40 MB que el portal no acepta es un deck que no existe.
+
+## Human-in-control (principio 3)
+
+- **NUNCA** un agente **envía** una oferta, la **firma**, ni confirma declaraciones juradas. Prepara el
+  paquete; **el humano lo sube** y guarda el comprobante.
+- **NUNCA** un GO sin **margen sobre loaded cost**. Fit 10/10 con margen negativo es **NO-BID**.
+- **Admisibilidad ANTES que fit.** Un excluyente faltante deja fuera aunque la propuesta sea perfecta.
+
+---
+
+## Composición del deck (reglas duras)
+
+- **NUNCA** dibujes una lámina freehand. El deck **se compone** desde el catálogo cerrado de **25
+  plantillas** (selector determinista sobre `registry.json`, 1 content-type → 1 plantilla). Si nada calza:
+  **falta una plantilla** → se abre el gap, **no se improvisa**.
+- **NUNCA** vuelvas al **raster de Figma como fondo** (`get_screenshot` → `background: url(panel.png)`).
+  Fue evaluado y **rechazado**: no responde a tokens, no se adapta al contenido, pesa, y ata cada lámina a
+  un PNG. El fondo es un **degradado tokenizado en CSS**. (El Apéndice B del ADR del Studio todavía
+  describe esa táctica: está marcado **SUPERSEDED** — manda el composer.)
+- **NUNCA** mezcles dos content-types en una lámina. Se divide en dos.
+- **NUNCA** toques `src/lib/commercial/tenders/**` sin correr `pnpm vitest run src/lib/commercial/tenders`
+  (las 5 suites cubren las bug classes que ya nos costaron un deck roto).
+
+## Registro y copy
+
+- **Registro formal ("de usted"), NUNCA tuteo**, en todo lo **client-facing** (técnica + económica + deck).
+  Es un documento que evalúa procurement. Formal ≠ frío. Los documentos internos (diagnóstico, squad,
+  matriz) dan igual. Caso fuente: SKY 2026-07-11.
+- El copy visible pasa por `copywriting`; nada de AI-slop, claim → mecanismo.
+
+---
+
+## Fronteras del dominio
+
+- **El composer NO decide el precio.** El monto real lo emite el **cotizador** (`quote-to-cash`). En el
+  deck, las cifras de pricing van **reales o marcadas como ilustrativas**, nunca inventadas.
+- **El Deck Composer ≠ RESEARCH-007.** RESEARCH-007 es **discovery público** (Mercado Público/ChileCompra:
+  encontrar y filtrar oportunidades). El Proposal Studio es **producción del bid** (construir la oferta).
+  Convergen **por handoff, no por absorción**. ⚠️ **Ownership de la tabla `greenhouse_commercial.tenders`
+  aún NO está arbitrado** entre ambos programas — no crees esa tabla sin resolverlo (ver §Pendiente en
+  ambos docs).
+- **El dominio tenders NO escribe** payroll, finance ni HR. Consume `loaded cost` para el pricing; no lo
+  calcula ni lo muta.

@@ -1,8 +1,9 @@
 # GREENHOUSE — Tender Deck Composer (design system del composer)
 
-> **Tipo:** Working design doc (parte de Tender Proposal Studio F4 — deck pipeline)
-> **Versión:** 0.1 · **Status:** Working (co-creación en curso, doc-only)
+> **Tipo:** Working design doc + **contrato del runtime F1** (parte de Tender Proposal Studio F4 — deck pipeline)
+> **Versión:** 0.2 · **Status:** **Implementado (F1)** — el composer compone: `src/lib/commercial/tenders/deck/**` (~1.800 LOC) + CLI `pnpm deck:compose` + 4 suites de tests. **NO es doc-only.** El molde visual sigue en co-creación.
 > **Creado:** 2026-07-11 por Claude (skills `typography-design`, `modern-ui`) con Julio Reyes
+> **v0.2 (2026-07-12):** se corrige el status (decía `doc-only` con el runtime ya shipped), se declara el **entregable PDF real** (merge `pdf-lib` de N páginas + gate de peso), el **CLI canónico `pnpm deck:compose`**, el **inventario de los 15 resolvers**, la **state machine** (12 estados, sin DB) y la **2ª bug class** (geometría). Se elimina el bloque muerto que decía "slotsRef sólo en CoverFull".
 > **Spec raíz:** `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (§4 deck pipeline, Apéndices A/B)
 > **Fuente de layouts:** Figma `Sistema Axis - PPT` (fileKey `GXYeJaRjotmFuczfnd8hLi`)
 
@@ -711,11 +712,16 @@ Formalizado como artefacto **machine-readable**: **`tender-deck-composer-prototy
 
 **Reglas duras del selector:** un slide = un content-type = una plantilla (mezcla → dividir en dos slides); **NUNCA freehand** (si nada calza, falta una plantilla → abrir gap, no improvisar); el renderer sólo llena slots declarados; datos de cliente reales o **ilustrativos marcados**; registro institucional.
 
-**Pendiente del milestone (en conjunto con Codex):**
+**Estado del milestone — ✅ CERRADO (2026-07-12).** Este bloque listaba pendientes que **ya no lo son**;
+se deja la foto real para que nadie los vuelva a "hacer":
 
-- Poblar `slotsRef` de las plantillas que aún no tienen su `*.slots.json` (hoy sólo `CoverFull`).
-- Las cuatro plantillas de Codex (`PricingFull`, `RequirementsTableFull`, `ProcessStepsFull`, `CredentialsFull`) están registradas con sus contratos de slots; schema/runtime queda diferido.
-- Opcional: `registry.schema.json` (validación) + cablear a código cuando F4 pase a build (hoy Proposed/doc-only).
+- **`slotsRef`: 25/25.** Todas las plantillas tienen su `*.slots.json` enlazado en el `registry.json`
+  (el bloque decía "hoy sólo `CoverFull`" — falso desde el 2026-07-11).
+- **Selector cableado a código:** `selector.ts` consume el `registry.json` como SoT ejecutable y
+  `auditRegistry()` valida su cierre referencial **en cada compose** (un content-type sin plantilla, o
+  una plantilla sin `slotsRef`, revientan el deck). El registry ya **no** es doc-only.
+- **Único pendiente real:** `registry.schema.json` (validación del propio registry) — opcional, hoy
+  cubierto por `auditRegistry()` + el test `selector.test.ts`.
 
 ## Arquitectura del runtime del composer — cómo se compone el deck (v0.1, dirección `arch-architect`)
 
@@ -781,6 +787,8 @@ Sumaremos imágenes al deck: **3D icons** y **personas**. Los assets de imagen s
   2. **Runtime gen (si hace falta):** paso **async gobernado** que llama `generateImage()` + remove-bg del repo; el asset generado se **pinea por hash** (se cachea, no se regenera por render) — si no, se rompe *"mismo contenido = mismo PDF"*.
 - **Guardrail de honestidad (personas):** **equipo = fotos REALES** del squad, **NUNCA caras IA fabricadas** (el evaluador cruza CV vs persona → tergiversación). Persona **decorativa/ilustrativa** = IA con **criterio de disclosure**, jamás presentada como "tu equipo". **3D icons =** preferir la **librería propietaria de ilustraciones Efeonce**, o generar en ese estilo.
 
+**`ContextualVisualSlot` (Proposed, 2026-07-12).** Cuando una lámina requiera una imagen que cambie con su contenido, no recibe un `imageUrl` decorativo: declara un slot semántico cuya intención se deriva del `SlideSpec` (idea, claims, audiencia y safe area de la plantilla), se confirma, se genera/curaduría fuera del renderer y termina como `assetId` aprobado. El composer sigue consumiendo sólo referencias versionadas y por eso conserva su determinismo. El contrato completo —políticas de evidencia/personas, provenance, commands y piloto por template— vive en [`tender-deck-composer-prototypes/CONTEXTUAL_VISUAL_SLOT_CONTRACT_V1.md`](tender-deck-composer-prototypes/CONTEXTUAL_VISUAL_SLOT_CONTRACT_V1.md). No autoriza todavía generación runtime ni slots virtuales sin markup.
+
 ### Dirección de arte de los 3D icons — **clay 3D mate** (decidido 2026-07-11)
 
 **El estilo es `clay 3D mate`**, anclado a AXIS: material arcilla mate, formas gruesas y muy redondeadas (sin aristas), luz key suave arriba-izquierda, sombra de contacto sutil, perspectiva 3/4, color plano saturado por objeto, sin textura. **Referencias canónicas en Figma** (`Sistema Axis — PPT`, fileKey `GXYeJaRjotmFuczfnd8hLi`): nodo **`5:3133`** (trofeo — objeto suelto) y nodo **`5:12352`** (embudo agrietado con elementos satélite — escena conceptual). Ambos son **rasters embebidos**, no vectores.
@@ -827,27 +835,75 @@ Los slots `PersonaAsset` exigen **fotos reales**. **Existen y viven en el repo**
 - **NO confundir** con `Alineación/5. Contenidos/01. Contenido Evergreen/Team Efeonce/EO_Team-*.png` en OneDrive: ésas son **piezas de redes sociales** ("Te presentamos a…", "Dato random: Potterhead", texto quemado sobre selfies de webcam) — **inservibles para un comité y no se arreglan recortando**.
 - **Sigue vigente el guardrail:** una cara del squad **JAMÁS** se genera con IA (el evaluador cruza CV vs persona → tergiversación). Si falta la foto de alguien, se pide la foto; no se fabrica.
 
-## Estado del runtime — F1 ✅ (el composer compone, 2026-07-11)
+## Estado del runtime — F1 ✅ (el composer compone y **emite el PDF**, 2026-07-11/12)
 
 El **camino determinista del ADR §5-ter está implementado y verificado end-to-end**:
-`DeckPlan (JSON) → selector → validación → slot-fill → render`. **Cero LLM** en este camino.
+`DeckPlan (JSON) → selector → validación → slot-fill → resolvers → geometría → render → PDF`.
+**Cero LLM** en este camino.
+
+### El CLI canónico
 
 ```bash
-pnpm tsx scripts/commercial/compose-tender-deck.ts <deck-plan.json> [--out <dir>]
+pnpm deck:compose <deck-plan.json> [--out <dir>]
+
 # ejemplo real (4 láminas, caso SKY):
-pnpm tsx scripts/commercial/compose-tender-deck.ts docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan.json
+pnpm deck:compose docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan.json
 ```
 
-| Módulo (`src/lib/commercial/tenders/deck/`) | Qué hace |
+**`pnpm deck:compose` es el alias canónico** (`package.json`). El shim `--require server-only-shim.cjs`
+está horneado en el script — invocar `tsx` a mano sin él **revienta** (`solar-icons.ts` importa
+`server-only`). Si `--out` no se pasa, el `outDir` por defecto es **`.captures/tender-deck`**.
+
+### El entregable: UN PDF de N páginas (no un puñado de PNGs)
+
+Esto es lo que hace del composer un motor y no un previsualizador:
+
+1. Cada lámina se imprime **por separado** con `page.pdf()` (una página, tamaño exacto del canvas).
+2. Las N páginas se **mergean con `pdf-lib`** en `<tenderId>.pdf` — **el entregable real de la oferta**.
+3. Se emite además un **PNG por lámina** (revisión visual) y el **`deck-plan.json`** (replay auditable).
+
+Se descartó embeber las 25 plantillas en un solo HTML: cada una es un documento completo con su propio
+CSS (todas definen `.slide`, `.brand`, `.eyebrow`…), así que concatenarlas haría que los estilos de una
+pisen a los de otra. **Imprimir + mergear no tiene ese modo de falla.**
+
+**Gate de peso = regla de admisibilidad, no estética.** `maxPdfMb` (default 20 MB) existe porque los
+portales de licitación **rechazan** adjuntos sobre su límite. Un deck hermoso de 40 MB que el portal no
+acepta es un deck que no existe. Hoy emite *warning*; el límite duro lo fija cada licitación.
+
+### Los módulos
+
+| Módulo (`src/lib/commercial/tenders/`) | Qué hace |
 |---|---|
-| `selector.ts` | lookup determinista content-type → plantilla + audit de cierre referencial del registry. Un content-type desconocido **revienta** (significa "falta una plantilla", no "improvisá") |
-| `validate.ts` | `overflow: reject` — **nunca trunca**; y una cifra sin `evidenceRef` **no se compone** (anti-fabricación) |
-| `resolvers.ts` | traduce valor semántico → presentación (`kind` → ícono + tono). El autor dice QUÉ es; el deck decide CÓMO se ve |
-| `render.ts` | llena el **DOM real de Chromium** (el browser que resuelve el contrato es el mismo que pinta) y captura |
-| `compose.ts` | **valida TODO antes de renderizar NADA** (un PDF parcial de una oferta es peor que ninguno: parece completo) |
+| `deck/selector.ts` | lookup determinista content-type → plantilla + audit de cierre referencial del registry. Un content-type desconocido **revienta** (significa "falta una plantilla", no "improvisá") |
+| `deck/validate.ts` | `overflow: reject` — **nunca trunca**; y una cifra sin `evidenceRef` **no se compone** (anti-fabricación) |
+| `deck/resolvers.ts` | **15 resolvers**: traducen valor semántico → presentación. El autor dice QUÉ es; el deck decide CÓMO se ve (ver tabla abajo) |
+| `deck/render.ts` | llena el **DOM real de Chromium** (el browser que resuelve el contrato es el mismo que pinta), **verifica geometría** y captura PNG/PDF |
+| `deck/compose.ts` | **valida TODO antes de renderizar NADA** (un PDF parcial de una oferta es peor que ninguno: parece completo) + mergea el PDF final |
+| `tender-state-machine.ts` | **12 estados** del ciclo de la licitación + 3 gates humanos. ⚠️ **TS puro: NO hay tabla `tenders` en DB** — la persistencia es diseño, no runtime |
+
+### Los 15 resolvers (`resolvers.ts`)
+
+Un resolver traduce un **valor semántico** del `DeckPlan` a **presentación**. Existen para que el autor
+del deck **no pueda** elegir el ícono, el ordinal ni el largo de una barra a mano:
+
+| Familia | Resolvers | Qué garantiza |
+|---|---|---|
+| **Iconografía** (6) | `stat-goal-icon` · `four-pillars-icon-and-tone` · `team-role-icon` · `metrics-kpi-icon` · `card-grid-capability-icon` · `pricing-option-tone` | El ícono y el tono salen del `kind`, no del gusto. Un `kind` desconocido **revienta** (no cae a un ícono default) |
+| **Ordinales / chrome derivado** (4) | `ordinal-number` · `timeline-phase-ordinal` · `section-number` · `chapter-anchor` | La numeración sale del índice del array. Nadie escribe "03" a mano y se equivoca |
+| **Geometría — anti-fabricación gráfica** (5) | `case-study-before-after-bar-scale` · `chart-bar-geometry` · `timeline-phase-span` · `timeline-phase-bar-kind` · `timeline-milestone-position` | **La barra sale del número, o no sale.** Si el resolver falta, el deck aborta — ver "una lámina NO PUEDE MENTIR" |
+
+`consumer: validation-only` (p. ej. `evidenceRef`) **nunca se pinta**: es munición interna para validar
+la cifra, no copy para el comité.
 
 El **`DeckPlan` es el artefacto auditable**; el PDF es una derivación suya. Ejemplo vivo:
 `examples/sky-deck-plan.json` (cifras reales del grader, cada una con su `evidenceRef`).
+
+### Lo que NO existe todavía (para que nadie lo asuma)
+
+**Runtime Greenhouse = 0.** No hay API routes, ni UI, ni migración, ni capability/entitlement, ni outbox
+event. **El único consumer del composer hoy es el CLI.** Cuando nazca la primera ruta o capability,
+aplica **Full API Parity** completa: el composer ya es el primitive canónico en `src/lib/**` — la UI,
+Nexa y MCP lo **consumen**, no lo reimplementan.
 
 ### ⚠️ La bug class del composer: el FALLO SILENCIOSO
 

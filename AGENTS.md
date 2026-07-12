@@ -1826,6 +1826,20 @@ Cuando un agente modifica archivos listados como "owned" por otra task, debe rev
 - La referencia canonica para este flujo queda en:
   - `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
 
+## Licitaciones / Tender Deck Composer — invariantes (2026-07-12)
+
+**Cargar `docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`** al tocar `src/lib/commercial/tenders/**`, `docs/architecture/tender-deck-composer-prototypes/**` o cualquier oferta/deck de licitacion. Contrato: `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` (deck) + `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` **§0 = estado real** (leerlo antes que nada). Skill: `greenhouse-public-private-tenders`.
+
+**Estado real (no asumas de mas):** el composer YA emite el entregable — **UN PDF de N paginas** (cada lamina impresa por separado + merge `pdf-lib`) via `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`); las **25 plantillas** tienen `data-slot` + `*.slots.json` + `registry.json` (25/25 built); hay **15 resolvers** (iconos, ordinales, geometria); la **state machine (12 estados) es TS puro SIN tabla en DB**; y **NO existe** API/UI/migracion/capability/outbox — el **unico consumer hoy es el CLI**. Productizacion (Cloud Run Job + cola + artifact store) = **TASK-1391**, bloqueada por EPIC-027.
+
+Una oferta es un **documento contractual que evalua un comite**. De ahi las 3 reglas raiz:
+
+1. **Anti-fabricacion.** **NUNCA** componer una cifra sin `evidenceRef` (`validate.ts` la rechaza). **NUNCA** dibujar geometria a mano: la barra sale del numero o no sale (5 resolvers de geometria; si falta el resolver, el deck aborta). **NUNCA** generar una cara del squad con IA — el evaluador cruza CV vs persona: es **tergiversacion**, no un tema estetico. **NUNCA** afirmar un negativo sin medirlo (correr el AI Visibility Grader; caso SKY: la v1 afirmo un negativo falso).
+2. **Fail-closed, nunca silencioso.** **NUNCA** un `default:` silencioso ni un `continue` que deje pasar un slot sin escribir (bug class 1: la lamina salia con el copy de relleno del prototipo). **NUNCA** truncar copy (`overflow: reject` es el unico modo). **NUNCA** `grid-template-columns` en `%` con `gap` — los porcentajes de Grid **no descuentan el gap**, los tracks se salen del lienzo y `.slide{overflow:hidden}` **amputa la palabra en silencio** (bug class 2, deck SKY). **"Paso `maxCharacters`" NO significa "cabe"**: el contrato declara intencion, el unico juez de la geometria es el layout real (`assertSlideFitsCanvas` aborta con `SlideGeometryError` antes de imprimir). **NUNCA** emitir un PDF parcial (`compose.ts` valida TODO antes de renderizar NADA). El gate de peso (`maxPdfMb`) es **regla de admisibilidad** — los portales rechazan adjuntos sobre su limite.
+3. **Human-in-control.** El agente **prepara**; el **humano sube y firma**. **NUNCA** un GO sin margen sobre loaded cost (fit 10/10 + margen negativo = NO-BID). **Admisibilidad ANTES que fit.**
+
+Ademas: **NUNCA** dibujar una lamina freehand (se compone desde el catalogo cerrado de 25; si nada calza, **falta una plantilla** → abrir gap, no improvisar). **NUNCA** volver al raster de Figma como fondo (rechazado: no responde a tokens, no escala; el fondo es degradado tokenizado en CSS). **NUNCA** correr el render pesado en Vercel ni en `ops-worker` (bloquearia el publisher del outbox) — va en un `tender-worker` dedicado. **Registro formal ("de usted"), NUNCA tuteo**, en todo lo client-facing. **SIEMPRE** gate de cierre: `pnpm vitest run src/lib/commercial/tenders` verde.
+
 ## Checklist de Cierre de Turno
 
 - Cambios acotados y entendibles.

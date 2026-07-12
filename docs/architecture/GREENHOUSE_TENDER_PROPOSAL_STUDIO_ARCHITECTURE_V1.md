@@ -1,12 +1,60 @@
 # GREENHOUSE — Tender Proposal Studio (arquitectura V1)
 
-> **Tipo:** Architecture spec / ADR (diseño, NO implementación)
-> **Versión:** 0.3 · **Status:** Proposed (el spec) · **§5-ter: Accepted** (topología del runtime del composer)
+> **Tipo:** Architecture spec / ADR — **diseño del aggregate; parcialmente implementado** (ver §0)
+> **Versión:** 0.4 · **Status:** **Partially implemented** — el spec del aggregate sigue `Proposed` (no hay DB, ni API, ni UI), pero **F4 (deck composer) y la state machine YA son código shipped**. **§5-ter: Accepted** (topología del runtime del composer).
 > **Creado:** 2026-07-11 por Claude (skill `arch-architect`) con Julio Reyes
+> **v0.4 (2026-07-12):** corrige la mentira de estado (el doc decía "diseño, NO implementación" y "cada iteración es doc-only" con ~2.000 LOC en `src/lib/commercial/tenders/**`). Agrega §0 (estado real), declara que la state machine es **TS puro sin DB**, registra que **el roadmap se ejecutó invertido** (F4 antes que F0-F2) y **retira el Apéndice B** en la parte que contradecía al composer (raster de Figma como fondo).
 > **v0.3 (2026-07-11):** la topología del runtime del composer se promueve a **ADR (§5-ter, Accepted)**: orquestador + fan-out por capítulo + resto determinista, con 4-pilar y hard rules. **Corrección de dependencia:** el composer **NO** depende del `agent-runtime` (Q8 v0.2 era falsa en ambas mitades — hay prior art en Nexa, y los 3 nodos de juicio son *structured output*, no tool-chains).
 > **v0.2 (2026-07-11):** los 6 refinamientos validados contra SKY (§9-ter) quedan **incorporados al cuerpo** (schema §1, gates §2, capabilities §3, deck §4, quote §6); Open Questions aterrizadas contra runtime real (Q1 schema, Q3 worker, Q8 agent-runtime).
 > **Método funcional (SSOT):** skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md` (10 fases + Fase 4-bis)
 > **Prior art:** `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (discovery público), `src/lib/commercial/quote-to-cash/**` (cotizador), `src/lib/release/state-machine.ts` (patrón state machine)
+
+---
+
+## §0 — Estado real (qué existe HOY vs qué es diseño) — 2026-07-12
+
+**Leer esto antes que nada.** Este doc nació como diseño puro y durante dos días se construyó código
+contra él **sin actualizarlo**. Lo que sigue es la foto verificada contra el repo.
+
+| Pieza | Estado | Dónde |
+|---|---|---|
+| **Deck composer (F4)** — selector · validación · slot-fill · resolvers · geometría · render | ✅ **Shipped** (~1.800 LOC, 4 suites) | `src/lib/commercial/tenders/deck/**` |
+| **Entregable PDF** — N páginas mergeadas (`pdf-lib`) + gate de peso | ✅ **Shipped** | `deck/render.ts` · `deck/compose.ts` |
+| **Catálogo de 25 plantillas** con `data-slot` + `*.slots.json` + `registry.json` | ✅ **25/25 built** | `docs/architecture/tender-deck-composer-prototypes/` |
+| **State machine** (12 estados, 3 gates humanos, 16 tests) | ⚠️ **TS puro, SIN DB** | `src/lib/commercial/tenders/tender-state-machine.ts` |
+| **CLI** `pnpm deck:compose <plan.json> [--out dir]` | ✅ **Shipped** (único consumer hoy) | `scripts/commercial/compose-tender-deck.ts` |
+| Tabla `greenhouse_commercial.tenders` + CHECK + trigger append-only + `tender_state_transitions` | ❌ **No existe** (no hay migración) | — |
+| API routes · UI · capabilities/entitlements · outbox events | ❌ **No existe** | — |
+| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ **No existe** | — |
+| Renderer productivo (Cloud Run Job + cola + artifact store + señales) | 📋 **Diseñado, bloqueado** | **TASK-1391** (`to-do`, P1, EPIC-027) |
+
+**Tres consecuencias que hay que tener presentes:**
+
+1. **El roadmap se ejecutó INVERTIDO.** §10 planificaba F0 (esqueleto+DB) → F1 (análisis) → F2 (producción)
+   → F4 (decks). Se construyó **F4 primero**, porque el deck era lo que desbloqueaba una licitación real
+   (SKY). No es un error — es la secuencia que el negocio pidió — pero significa que **el motor de
+   composición existe sin el aggregate que debería contenerlo**.
+2. **La state machine es lógica pura sin persistencia.** El §2 de este doc describe `CHECK` constraint +
+   trigger append-only + outbox; **nada de eso existe todavía**. Hoy son 174 líneas de TS que validan
+   transiciones en memoria. **NUNCA** asumas que hay una tabla `tenders` porque este doc la dibuja.
+3. **Full API Parity aún NO aplica** — no hay UI ni contrato programático, así que no hay parity que
+   romper. **Pero en el momento en que se construya la primera ruta o capability, aplica completa**: el
+   composer ya es el primitive canónico en `src/lib/**`, y la UI/Nexa/MCP deben consumirlo, no
+   reimplementarlo.
+
+**Deuda de gobernanza declarada:** el **deck composer F1 se construyó sin TASK-###** (fuera del lifecycle,
+sin Task Closing Quality Gate), mientras este doc decía que la implementación la autorizaba "la task de
+F1". Se registra para que no se repita: **todo hito siguiente nace con TASK + lifecycle + gates.**
+
+**El siguiente hito YA tiene task y está bloqueado a propósito — `TASK-1391`** (Tender Deck Renderer:
+worker, cola y artifact pipeline). Lleva el composer de **CLI local** a **capability gobernada**: Cloud Run
+Job dedicado con Chromium, outbox/cola con backpressure, artefactos versionados (PDF + PNGs + provenance)
+en el asset store, command/reader idempotentes y señales operativas. **Blocked by:** autorización de la
+próxima frontera de deployable de **EPIC-027** + la foundation mínima del aggregate `Tender`.
+
+⚠️ Regla dura que TASK-1391 protege: **el render pesado NUNCA corre en Vercel ni en el `ops-worker`**
+(bloquearía el publisher del outbox). Va en un `tender-worker` dedicado — y un deployable nuevo requiere
+la decisión de frontera de EPIC-027, no se crea por conveniencia.
 
 ---
 
@@ -275,8 +323,8 @@ La v0.2 declaraba el `src/lib/ai/agent-runtime` como **"precondición dura de F1
 
 - **Costo en tokens:** outline (1) + capítulos (~6-8) + verifier (1) ≈ **~10 llamadas por deck**, acotado y predecible. El render — que es lo voluminoso — cuesta **cero tokens**.
 - **Latencia:** el fan-out por capítulo es paralelo → wall-clock ≈ el capítulo más lento, no la suma.
-- **Contención:** el render Chromium es pesado (minutos) → vive en el **`tender-worker` dedicado** (Q3), NUNCA en el `ops-worker` (un render de 5 min bloquearía el publisher del outbox, que corre cada 2 min).
-- **A 10x:** escala linealmente en decks; el cuello es Chromium (CPU), no el LLM. Se absorbe con concurrencia del worker.
+- **Contención:** el render Chromium es pesado (minutos) → vive en el **`tender-worker` dedicado como Cloud Run Job**, NUNCA en el `ops-worker` (un render de 5 min bloquearía el publisher del outbox, que corre cada 2 min). Una ejecución = un `DeckPlan` fijado; `tasks=1` y `parallelism=1` por deck. El renderer puede conservar concurrencia interna de láminas sólo dentro del envelope benchmarkeado de CPU/RAM.
+- **A 10x:** escala horizontalmente por ejecuciones de deck; el cuello es Chromium (CPU/RAM), no el LLM. El job record/outbox regula admisión y dedupe; un límite de ejecuciones concurrentes se calibra por benchmark/costo, no por el default de Cloud Run.
 
 ### Hard rules (NUNCA / SIEMPRE)
 
@@ -287,7 +335,7 @@ La v0.2 declaraba el `src/lib/ai/agent-runtime` como **"precondición dura de F1
 - **NUNCA** auto-submit. El LLM no cruza el gate: `propose → confirm → execute`.
 - **NUNCA** fabricar datos de cliente: valores reales del bid o **ilustrativos marcados**.
 - **NUNCA** abrir un segundo tool loop paralelo al de Nexa. Si hace falta un runtime, se **extrae y generaliza el existente** (ver arriba).
-- **NUNCA** correr el render del deck en el `ops-worker`.
+- **NUNCA** correr el render del deck en el `ops-worker`, una route Vercel ni un Cloud Run Service HTTP. `ops-worker` puede despachar/reconciliar el job liviano, pero Chromium corre exclusivamente dentro del Cloud Run Job `tender-worker`.
 - **SIEMPRE** el artefacto auditable son los **slots JSON**, no el PDF. El PDF es una derivación.
 - **SIEMPRE** eval baseline antes de tocar el prompt de cualquiera de los 3 agentes (regla `arch-architect`: no hay cambio de prompt sin eval).
 
@@ -295,7 +343,7 @@ La v0.2 declaraba el `src/lib/ai/agent-runtime` como **"precondición dura de F1
 
 - **Modelo por nodo:** ¿el chapter-author corre en el mismo modelo que el orquestador? (El orquestador razona sobre estructura; el author escribe copy institucional. Podrían querer modelos distintos.) Se decide con el eval baseline de F1, no antes.
 - **Eval baseline:** qué golden set usa (¿decks SKY ya producidos a mano como referencia?). Pendiente de F1.
-- **Imágenes:** el modo "runtime gen" (vs. assets pre-producidos por `assetId`) queda diseñado pero no autorizado; preferir siempre pre-producido (ver `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → §capa de assets).
+- **Imágenes:** el modo "runtime gen" (vs. assets pre-producidos por `assetId`) queda diseñado pero no autorizado; preferir siempre pre-producido. El `ContextualVisualSlot` ya define cómo una imagen se deriva semánticamente de una lámina, se aprueba y termina fijada como `assetId`, pero no habilita el command/runtime todavía (ver `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → §capa de assets y `tender-deck-composer-prototypes/CONTEXTUAL_VISUAL_SLOT_CONTRACT_V1.md`).
 
 ## 6. Económica: fuente única (Greenhouse), múltiples formatos de salida
 
@@ -372,7 +420,9 @@ Este dominio **no se diseña de escritorio**: se co-construye. Modo canónico ac
 4. **Se canoniza en el plano correcto** — método (`bid-construction-playbook`), este spec, docs (funcional/manual), memoria; con las skills que apliquen (arch, commercial, talent, finance, copywriting, licitaciones…).
 5. **Cada aprendizaje canonizado = un requisito del producto** — engorda este spec; cuando haya masa crítica, se construye por fases (§9). **Documentar hoy = escribir la spec ejecutable del runtime.**
 
-**Gates que no se degradan** (si se rompen, el modo deja de *construir* y se evapora): realidad sobre memoria · human-in-control en lo sensible · canonizar en las 3 capas + memoria al cerrar cada bloque (no dejar el aprendizaje sólo en el chat). Es primo del *Real-Artifact Iterative Verification Loop* (features visuales validadas con artefacto real, no mocks) y del *Solution Quality Operating Model* (causa raíz, no parches) — no es un método nuevo, es el estilo de la casa. Mientras el status sea `Proposed`, cada iteración es **doc-only** (reversible, sin deuda) hasta que un ADR autorice construir.
+**Gates que no se degradan** (si se rompen, el modo deja de *construir* y se evapora): realidad sobre memoria · human-in-control en lo sensible · canonizar en las 3 capas + memoria al cerrar cada bloque (no dejar el aprendizaje sólo en el chat). Es primo del *Real-Artifact Iterative Verification Loop* (features visuales validadas con artefacto real, no mocks) y del *Solution Quality Operating Model* (causa raíz, no parches) — no es un método nuevo, es el estilo de la casa.
+
+> ⚠️ **Esta línea decía** *"mientras el status sea `Proposed`, cada iteración es doc-only (reversible, sin deuda) hasta que un ADR autorice construir"*. **Quedó obsoleta el 2026-07-11/12**: el deck composer y la state machine se construyeron sin ese ADR. Ver **§0** para el estado real y la deuda de gobernanza. Lo que sigue vigente es la *intención*: el aggregate `Tender` (DB, API, UI, capabilities) **sí** sigue `Proposed` y **no** se construye sin task.
 
 ## 9-ter. Refinamientos validados contra SKY (primer caso del loop)
 
@@ -394,7 +444,7 @@ El esqueleto de 8 estados capturó el caso SKY entero sin forzar nada. La ejecuc
 
 - **Q1 · Schema de aterrizaje → `greenhouse_commercial`.** Verificado: `deals`, `contract_quotes`, `contracts`, `engagement_*`, `pricing_*` ya viven en `greenhouse_commercial` (no `greenhouse_crm`). El Tender aterriza junto a ellos (§1). No se crea schema nuevo.
 - **Q2 · Convergencia con RESEARCH-007 → dos módulos, un handoff.** RESEARCH-007 descubre/clasifica el discovery público; el Studio construye. Punto de promoción: opportunity pública → `Tender(origin=public_discovery)` con FK. No se fusionan (dimensiones ortogonales: descubrir vs. construir).
-- **Q3 · Runtime del orquestador → `tender-worker` dedicado (diferido a F1).** El fan-out de lectura + agentic loops + render Chromium es pesado y largo (minutos); NO debe compartir el `ops-worker` (cron de outbox cada 2 min — un render de deck de 5 min bloquearía el publisher). Worker propio = aislamiento. F0 no tiene IA → sin worker; el worker nace en F1.
+- **Q3 · Runtime del orquestador → `tender-worker` dedicado como Cloud Run Job (diferido a F1).** El fan-out de lectura + agentic loops + render Chromium es pesado y largo (minutos); NO debe compartir el `ops-worker` (cron de outbox cada 2 min — un render de deck de 5 min bloquearía el publisher). El recurso es un **Cloud Run Job**, no un service HTTP: recibe un `jobId` que apunta al snapshot inmutable del `DeckPlan`, corre una tarea/una ejecución por deck y termina. El job record + outbox son el source of truth y el mecanismo de recovery; un dispatcher liviano puede invocar `jobs.run`, pero no renderiza. Cloud Tasks es opt-in posterior para backpressure del dispatcher, no transport directo del PDF. F0 no tiene IA → sin worker; el job nace en F1.
 - **Q8 · Agent-runtime canónico → NO es precondición del composer (corregido v0.3, 2026-07-11).** La respuesta v0.2 ("no existe tool-runner; es precondición dura de F1/F2") era **incorrecta en ambas mitades**. (a) **Existe prior art:** Nexa corre un tool loop en producción (`src/lib/nexa/providers/*`, `nexa-tools.ts`, `nexa-turn-telemetry.ts`), single-hop. (b) **El composer no lo necesita:** sus 3 nodos de juicio producen *structured output* (no tool-chains) sobre contexto read-only, y eso ya lo cubre `generateStructured{Anthropic,Gemini,OpenAI}`. El `agent-runtime` baja a **evolución de plataforma**; cuando se haga, es **extracción/generalización del loop de Nexa** (strangler, Nexa consume con `maxTurns=1`), **NUNCA** un segundo loop paralelo, y merece **task propia** (blast radius sobre Nexa productivo). Detalle: **§5-ter**.
 
 ### Abiertas (decisión del operador — marca / alcance)
@@ -451,7 +501,19 @@ Principio: **fidelidad manda** (es una propuesta a un comité; se ve premium o n
 | **Adobe Express** | ❌ motor (saltos Figma→?→Express). ✅ **una salida más** desde el HTML canónico (MCP `html→Express`) cuando pidan editable. |
 | **Figma como runtime** | ❌ acopla producción a un externo frágil. Figma es el **diseño-fuente** de los módulos, no el runtime de generación. |
 
-**Trabajo F4:** reconstruir los 10 módulos como **plantillas HTML fieles UNA VEZ** (verificadas con GVC contra el Figma), + el registry de slots + el motor de llenado. Es acotado (10 plantillas), reutilizable para siempre, en el stack de la casa.
+> ⚠️ **APÉNDICE B — SUPERSEDED (2026-07-12).** Este apéndice quedó **obsoleto y en parte contradicho**
+> por el runtime real. El contrato vigente del deck es **`GREENHOUSE_TENDER_DECK_COMPOSER_V1.md`**; si
+> algo de acá choca con ese doc, **manda el composer**. Dos correcciones duras:
+>
+> 1. **No son 10 módulos, son 25 plantillas** — todas construidas, con slots y registry.
+> 2. **La táctica de "renderizar el panel desde Figma vía `get_screenshot` y usarlo como capa de
+>    fondo" fue RECHAZADA** (punto 3 más abajo). El composer decidió lo contrario: el fondo es un
+>    **degradado tokenizado en CSS**, porque el raster no escala (no responde a tokens, no se adapta
+>    al contenido, pesa, y ata cada lámina a un PNG). Ver `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md`
+>    → *"NUNCA volver al mesh gradient recreado"*. **Se conserva el texto original abajo sólo como
+>    registro histórico de cómo se llegó a la decisión — NO como instrucción.**
+
+**Trabajo F4 (histórico):** reconstruir los 10 módulos como **plantillas HTML fieles UNA VEZ** (verificadas con GVC contra el Figma), + el registry de slots + el motor de llenado. Es acotado (10 plantillas), reutilizable para siempre, en el stack de la casa.
 
 **Vertical delgado — PROBADO (2026-07-11):** módulo `PersonaTitulo+Tips` → plantilla HTML (gradiente AXIS + `Poppins` título / `Geist` bullets navy `#020061` + ícono estrella + separador punteado) → llenada con los 7 diferenciadores reales de SKY → render Chromium 1920×1080 → **resultado premium, fidelidad alta vs el Figma**. Aprendizajes canonizados:
 1. **HTML + Chromium reproduce el módulo AXIS a nivel premium** (gradiente con grano vía CSS `radial/linear` + SVG noise; tipografía real vía Google Fonts). Confirma la decisión.

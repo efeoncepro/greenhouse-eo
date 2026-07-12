@@ -15,7 +15,7 @@ contenido. El resultado es un **PDF de N páginas** listo para revisar y entrega
 ## Antes de empezar
 
 - El deck se **compone**, no se dibuja: se elige entre **25 plantillas** del catálogo.
-- Necesitás el contenido **ya decidido** (qué dice cada lámina, con qué datos y con qué evidencia).
+- Necesitas el contenido **ya decidido** (qué dice cada lámina, con qué datos y con qué evidencia).
 - Las cifras deben ser **reales del proceso** o **ilustrativas marcadas**. El composer rechaza una
   métrica sin su fuente.
 
@@ -52,7 +52,7 @@ contenido**:
 }
 ```
 
-**Ejemplos completos y funcionando** (copiá de ahí):
+**Ejemplos completos y funcionando** (copia de ahí):
 
 - `docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan.json` — diagnóstico ·
   método · matriz de cumplimiento · económica.
@@ -79,7 +79,7 @@ componiendo "TND-000123" — 4 láminas
 
 ### 3. Revisar
 
-**Mirá las láminas PNG, una por una.** El composer garantiza que el contenido es el tuyo y que las
+**Mira las láminas PNG, una por una.** El composer garantiza que el contenido es el tuyo y que las
 reglas se cumplen — **no** que el deck sea persuasivo. Eso lo juzga una persona.
 
 ### 4. Entregar
@@ -94,28 +94,57 @@ reglas se cumplen — **no** que el deck sea persuasivo. Eso lo juzga una person
 | `📄 <deck>.pdf — N páginas · X MB` | El entregable está listo | Revisar y entregar |
 | `⚠️ El PDF pesa X MB y supera el límite` | **Riesgo de admisibilidad** | Ver abajo |
 | `✗ El deck no pasa la validación de slots` | Hay contenido que rompe una regla | Ver abajo |
+| `✗ La lámina "X" no cabe en su lienzo` | El layout **recortaría** el texto | Ver abajo |
+
+> **¿Dónde quedó el PDF?** Si no pasas `--out`, todo se escribe en **`.captures/tender-deck/`**:
+> el PDF del deck (`<tenderId>.pdf`), un PNG por lámina y el `deck-plan.json` (el artefacto que
+> permite volver a componer el mismo deck, idéntico).
 
 ## Los errores más comunes (y qué significan de verdad)
 
 ### `too_long` — "el renderer NO trunca"
 
-El texto excede el espacio de la lámina. **Reescribilo más corto.**
+El texto excede el presupuesto de caracteres del slot. **Reescríbelo más corto.**
 
 El composer no lo recorta a propósito: una frase mutilada en una oferta contractual es peor que un
 error visible, porque el evaluador la lee así y nadie se entera.
 
+### `La lámina "X" no cabe en su lienzo` — el layout recorta
+
+**Este NO es el mismo error que `too_long`, y la diferencia importa.** Acá el copy **sí pasó** el límite
+de caracteres — y aun así **no cabe físicamente** en la lámina: el texto se saldría del borde y quedaría
+cortado a media palabra.
+
+El mensaje te dice el slot, cuántos píxeles se sale y qué texto quedaría amputado:
+
+```text
+✗ La lámina "metodo" no cabe en su lienzo: 1 slot(s) quedan recortados.
+  - slot "thesis": 20px fuera del borde derecho — «El crecimiento se vuelve sostenible cuando la evidencia guía»
+```
+
+Dos causas posibles, y conviene distinguirlas antes de tocar nada:
+
+1. **El copy es más largo de lo que esa lámina aguanta** → acórtalo (aunque el contador de caracteres
+   diga que "cabía"). El presupuesto de caracteres es una aproximación; el juez real es el layout.
+2. **La plantilla tiene mal la geometría** → si el texto es razonable y aun así se sale, el problema es
+   la lámina, no tu copy. Es un bug de plantilla: repórtalo (pasó de verdad — ver el caso del `%` + `gap`
+   en la documentación técnica). **No lo resuelvas mutilando el mensaje que quieres dar.**
+
+Por qué el composer prefiere fallar: un PDF con una palabra guillotinada **parece terminado**, y nadie
+lo revisa dos veces. Un error, sí.
+
 ### `missing_evidence_ref` — "una cifra sin fuente no se compone"
 
-Una lámina afirma un número sin decir de dónde salió. **Agregá el `evidenceRef`** (la corrida del
+Una lámina afirma un número sin decir de dónde salió. **Agrega el `evidenceRef`** (la corrida del
 grader, el anexo, el documento).
 
-Si el número es ilustrativo, decilo en la lámina (como en `sky-deck-plan.json`, donde la económica
+Si el número es ilustrativo, dilo en la lámina (como en `sky-deck-plan.json`, donde la económica
 dice "cifras ilustrativas, no cotizadas").
 
 ### `unknown_slot` / `UnknownContentTypeError`
 
-El contenido no calza con ninguna plantilla. **Esto no significa "improvisá un layout":** significa
-que **falta una plantilla en el catálogo**. Abrí el gap.
+El contenido no calza con ninguna plantilla. **Esto no significa "improvisa un layout":** significa
+que **falta una plantilla en el catálogo**. Abre el gap.
 
 ### `el campo X no tiene [data-slot-field]` — el fallo silencioso
 
@@ -129,8 +158,8 @@ Se arregla anotando la plantilla (es trabajo de plantilla, no de contenido).
 **No es un problema de rendimiento.** Los portales (Mercado Público, Wherex) rechazan archivos sobre
 cierto peso: **si el archivo no sube, la oferta queda fuera del proceso.**
 
-Causa habitual: el mismo asset repetido en muchas láminas se embebe muchas veces. Bajá el peso de
-las imágenes o dividí el deck. El límite se ajusta al que diga el pliego:
+Causa habitual: el mismo asset repetido en muchas láminas se embebe muchas veces. Baja el peso de
+las imágenes o divide el deck. El límite se ajusta al que diga el pliego:
 
 ```ts
 composeDeck(assets, plan, outDir, { maxPdfMb: 10 })

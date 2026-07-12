@@ -91,6 +91,36 @@ se pide la foto.
 
 Regla del dominio: **la oferta la sube un humano.** El sistema prepara; la persona decide.
 
+## Dónde se usa hoy (y dónde todavía no)
+
+**Todavía NO hay una pantalla en el portal.** El composer se opera desde la **línea de comandos**
+(`pnpm deck:compose`), y el PDF queda en una carpeta local. No hay botón, no hay vista, no hay
+"componer deck" dentro de Greenhouse.
+
+Eso es **intencional y temporal**: primero se construyó el motor (que es lo difícil y lo que garantiza
+que el deck no mienta), y la pantalla vendrá después. Cuando llegue, **consumirá este mismo motor** — no
+va a existir una segunda forma de armar decks escondida dentro de una vista.
+
+El paso siguiente ya está diseñado (**TASK-1391**): mover el render a un worker dedicado, con cola,
+y guardar los PDFs como artefactos versionados en vez de archivos sueltos. Está en espera de una
+decisión de plataforma mayor.
+
+## Si algo no cabe, el composer se detiene
+
+Vale la pena entender por qué, porque es contraintuitivo: **el composer prefiere fallar antes que
+entregar un deck que se ve bien pero miente.**
+
+Pasó de verdad. Una lámina salió con una frase cortada a media palabra —"…se vuelve *sosteni*"— y el
+sistema la dio por buena, porque el texto cumplía el límite de caracteres. Lo que fallaba era la
+**geometría** de la plantilla: el texto se salía del borde y el recorte lo escondía.
+
+Hoy el composer **mide** cada bloque de texto contra el espacio real de la lámina antes de imprimir. Si
+algo quedaría cortado, **no emite el PDF** y dice exactamente qué frase, en qué lámina y por cuántos
+píxeles. Un PDF con una palabra guillotinada **parece terminado**, y por eso nadie lo revisa dos veces:
+es peor que un error visible.
+
 > **Detalle técnico:** el motor vive en `src/lib/commercial/tenders/deck/` y se opera con
 > `pnpm deck:compose`. La topología (qué es determinista y qué usa IA) está decidida en el ADR
-> §5-ter del spec del Studio.
+> §5-ter del spec del Studio. Los invariantes del dominio (anti-fabricación, fail-closed,
+> human-in-control) viven en
+> [`agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`](../../architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md).

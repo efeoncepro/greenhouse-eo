@@ -25,6 +25,12 @@ Este brief nace despues de validar acceso real a la API de Mercado Publico y com
 
 > **Delta 2026-05-30:** revision arquitectonica del programa despues de validar Compra Agil API v2 Beta. `TASK-678` pasa a ser P1/policy gate para congelar convivencia API v2 live + COT mensual historico/fallback + OC post-award; `TASK-677` queda explicitamente historico/backfill/benchmark/fallback; `TASK-675/676/682/683/687` quedan ajustadas para depender del registry/freeze correcto antes de implementar runtime.
 
+> **Delta 2026-07-12 — nacio un dominio hermano: el Tender Proposal Studio.** Mientras este programa (discovery publico) sigue en `to-do`, se construyo `src/lib/commercial/tenders/**`: el **Tender Deck Composer** (25 plantillas con contrato de slots, selector determinista, 15 resolvers, verificacion de geometria y **PDF de N paginas** como entregable, via `pnpm deck:compose`) + una **state machine de 12 estados** (TS puro, sin DB). Docs: `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md`, `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (leer su **§0 = estado real**) y `agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`.
+>
+> **Frontera:** RESEARCH-007 es **discovery** (encontrar y filtrar oportunidades publicas); el Studio es **produccion del bid** (construir la oferta). Convergen **por handoff, no por absorcion**: una oportunidad publica con GO **promueve** a un `Tender` (`origin=public_discovery`).
+>
+> ⚠️ **Ownership NO arbitrado — leer antes de crear tablas.** Ambos programas reclaman `greenhouse_commercial`: el Studio dibuja `tenders` + `tender_requirements`; `TASK-674/675/683/686` planifican tablas de licitaciones en el mismo schema. **NUNCA** crear la tabla `tenders` sin resolver primero quien es su dueno (candidato natural: el aggregate `Tender` del Studio, con las tablas de discovery referenciandolo — pero requiere ADR). Hoy **no existe ninguna de las dos**, asi que la colision es evitable a costo cero si se arbitra ahora.
+
 ## Contexto Confirmado
 
 ### Fuentes Externas

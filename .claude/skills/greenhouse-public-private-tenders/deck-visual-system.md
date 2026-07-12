@@ -183,10 +183,25 @@ El deck **no se arma a mano**: se escribe un **`DeckPlan`** (JSON con las lámin
 composer lo materializa. El camino es **100% determinista** — cero LLM.
 
 ```bash
-pnpm tsx scripts/commercial/compose-tender-deck.ts <deck-plan.json> [--out <dir>]
+pnpm deck:compose <deck-plan.json> [--out <dir>]
 # ejemplo vivo (caso SKY, 4 láminas):
-pnpm tsx scripts/commercial/compose-tender-deck.ts docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan.json
+pnpm deck:compose docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan.json
 ```
+
+**`pnpm deck:compose` es el alias canónico** — NO invoques `tsx` a mano: el script hornea el shim
+`server-only`, y sin él revienta. Sin `--out`, el `outDir` por defecto es **`.captures/tender-deck`**.
+
+### El entregable es UN PDF de N páginas (no un puñado de PNGs)
+
+Esto es lo que hace del composer un **motor** y no un previsualizador:
+
+1. Cada lámina se imprime por separado (`page.pdf()`, una página, tamaño exacto del canvas).
+2. Las N páginas se **mergean con `pdf-lib`** en `<tenderId>.pdf` — **el entregable real de la oferta**.
+3. Además salen un **PNG por lámina** (revisión visual) y el **`deck-plan.json`** (replay auditable).
+
+**El gate de peso (`maxPdfMb`, default 20 MB) es una regla de ADMISIBILIDAD, no estética:** los portales
+de licitación **rechazan** adjuntos sobre su límite. Un deck hermoso de 40 MB que el portal no acepta es
+un deck que no existe. El límite duro lo fija cada licitación — revísalo en las bases.
 
 Cada lámina del plan declara `contentType` + `slots`. El **selector** resuelve la plantilla
 (lookup en `registry.json`), el **validador** aplica el contrato y el **renderer** llena el DOM real
