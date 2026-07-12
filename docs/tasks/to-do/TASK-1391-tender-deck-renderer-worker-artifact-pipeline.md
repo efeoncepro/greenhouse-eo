@@ -1,4 +1,8 @@
-# TASK-1391 — Tender Deck Renderer: Cloud Run Job, Queue and Artifact Pipeline
+# TASK-1391 — Artifact Renderer: Cloud Run Job, Queue and Artifact Pipeline
+
+> ⚠️ **El deployable se llama `artifact-worker`, NO `tender-worker`** (Delta b · §1). Renderiza
+> **catálogos** (`deck-axis` **y** `social-carousel`), no un dominio. El nombre del archivo conserva el
+> slug histórico para no romper el registry; **lo canónico es lo que dice esta línea.**
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -23,7 +27,7 @@
 - Rank: `TBD — posterior a la autorización de la próxima frontera de deployable de EPIC-027`
 - Domain: `commercial|platform|ops`
 - Blocked by: `TASK-1393 (Artifact Composer/catalog snapshot) + TASK-1392 (Proposal aggregate/assets/evidence F0) + EPIC-027 next-boundary authorization`
-- Branch: `task/TASK-1391-tender-deck-renderer-cloud-run-job`
+- Branch: `task/TASK-1391-artifact-worker-cloud-run-job`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -37,9 +41,9 @@ La task no se puede ejecutar hasta que EPIC-027 autorice este nuevo deployable y
 
 El composer actual ya prueba el camino `DeckPlan → selector → slot-fill → Chromium → PDF` y compone cuatro láminas SKY en local, pero es un CLI con filesystem local. No persiste jobs, no tiene cola ni backpressure entre decks, no guarda artefactos en el asset store, no ofrece un command/read model ni posee despliegue Cloud Run. El render abre Chromium, compone PNG y PDF por slide y fusiona con `pdf-lib`; es correcto para fidelidad AXIS pero necesita aislamiento de CPU/RAM y una operación reproducible antes de atender varias licitaciones concurrentes.
 
-Como capability agentic, tampoco basta con exponer un endpoint de render: un agente debe poder leer el snapshot autorizado, constraints del RFP y estado de artefactos, proponer un `TenderRenderProposal` verificable y explicar sus bloqueos. La confirmación humana invoca el mismo command que API/CLI; el agente jamás encola un job, llama `jobs.run`, publica un PDF ni suplanta el gate de audience.
+Como capability agentic, tampoco basta con exponer un endpoint de render: un agente debe poder leer el snapshot autorizado, constraints del RFP y estado de artefactos, proponer un `ProposalRenderProposal` verificable y explicar sus bloqueos. La confirmación humana invoca el mismo command que API/CLI; el agente jamás encola un job, llama `jobs.run`, publica un PDF ni suplanta el gate de audience.
 
-La arquitectura ya determina que el render pesado vive en `tender-worker` como **Cloud Run Job de una tarea por deck**, y **nunca** en `ops-worker`, Vercel ni un service HTTP de larga duración. EPIC-027 prohíbe crear deployables aislados fuera de su decisión de frontera. Esta task materializa esa decisión sólo cuando ambos gates estén abiertos.
+La arquitectura ya determina que el render pesado vive en `artifact-worker` como **Cloud Run Job de una tarea por deck**, y **nunca** en `ops-worker`, Vercel ni un service HTTP de larga duración. EPIC-027 prohíbe crear deployables aislados fuera de su decisión de frontera. Esta task materializa esa decisión sólo cuando ambos gates estén abiertos.
 
 ## Goal
 
@@ -48,7 +52,7 @@ La arquitectura ya determina que el render pesado vive en `tender-worker` como *
 - Persistir PDF, previews PNG y metadata/provenance como artefactos versionados, con tamaño máximo como gate de admisibilidad y recovery por replay del plan fijado.
 - Persistir el `ResolvedCompositionManifest` junto al job/output, incluyendo hashes de catálogo/template/contrato/brand pack/fuentes, resultado de validadores semánticos y referencias allowlisted de evidencia/requisitos. Un PDF no es reproducible ni auditable si sólo conserva slots sueltos.
 - Obtener evidencia staging de correctness, aislamiento, throughput, memoria y rollback antes de cualquier activación productiva.
-- Exponer contexto/tools y `TenderRenderProposal` agent-safe: propuesta con snapshot, preflight, constraints, estimación de recursos y bloqueos; confirmación humana para ejecutar el command canónico.
+- Exponer contexto/tools y `ProposalRenderProposal` agent-safe: propuesta con snapshot, preflight, constraints, estimación de recursos y bloqueos; confirmación humana para ejecutar el command canónico.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -76,9 +80,13 @@ Reglas obligatorias:
 - El worker acepta sólo un `ResolvedCompositionManifest` producido por TASK-1393 y confirmado contra Proposal/TASK-1392. Rechaza un plan mutable, una plantilla escogida por el autor, contrato/font/asset sin hash, evidencia sin referencia allowlisted o un reporte de validación semántica fallido.
 - `PersonaAsset` y `EvidenceAsset` mantienen sus políticas de origen. `ContextualVisualSlot` no habilita generación runtime en esta task.
 - Todo write entra por primitive/command con capability, idempotencia, audit y errores sanitizados; UI, Nexa, MCP y API son consumers, no implementaciones paralelas.
-- El agente consume únicamente readers/context allowlisted y tools sobre primitives; `TenderRenderProposal` es trazable/evaluable y **nunca** equivale a ejecutar/encolar/publicar. No crear framework/SDK de agentes, prompt con writes ni tool de acceso directo a Cloud Run/DB/storage.
+- El agente consume únicamente readers/context allowlisted y tools sobre primitives; `ProposalRenderProposal` es trazable/evaluable y **nunca** equivale a ejecutar/encolar/publicar. No crear framework/SDK de agentes, prompt con writes ni tool de acceso directo a Cloud Run/DB/storage.
 - El PDF es un artefacto de diseño y de licitación: conserva el layout HTML AXIS, relación 16:9, safe areas, fuentes y assets aprobados. Un PDF técnicamente válido pero con fallback tipográfico, asset ausente, crop incorrecto o contenido recortado **no pasa** la revisión.
-- Formato, tamaño, páginas y demás requisitos conocidos del RFP derivan del requisito-set de ese Tender; cuando el requisito es conocido, el job falla cerrado antes de marcar un deck como client-facing. La exportación nunca sube ni presenta la oferta.
+- Formato, tamaño, páginas y demás requisitos conocidos del RFP derivan del requisito-set de esa `Proposal`; cuando el requisito es conocido, el job falla cerrado antes de marcar un deck como client-facing. La exportación nunca sube ni presenta la oferta.
+- 🔴 **NUNCA** un artefacto `client_facing` puede contener **una sola** referencia de evidencia `audience: internal`. Los insumos internos llevan **loaded cost y piso de negociación**: colarlos en el PDF es **entregarle a la contraparte nuestra estructura de costos**. El `audience` viaja **por referencia** en el manifest, no sólo en el artefacto; el job **falla cerrado** (`audience_violation`) **antes** de renderizar. *(Delta b · §6.)*
+- ⚠️ **La accesibilidad es parte del requisito-set, no una cortesía.** `Chromium print-to-PDF` emite un PDF **SIN taguear** — no es configuración, **es el motor**: esta arquitectura **no puede** producir PDF/UA. Si el requisito-set declara accesibilidad (Section 508 / EAA / PDF/UA), el job **falla cerrado**. **Mejor no ofertar que entregar un artefacto inadmisible.** La limitación se declara explícita en spec y runbook. *(Delta b · §4.)*
+- **La QA visual del artefacto tiene que ser MECÁNICA, no sólo humana.** En régimen **nadie mira cada render** — y la doctrina del composer (*"los tests verdes NO son el gate: mirar los frames"*) **muere el día que esto se automatiza** salvo que se vuelva un gate. `assertSlideFitsCanvas` cubre geometría; **NO** cubre fallback tipográfico, asset ausente ni lámina en blanco. *(Delta b · §7.)*
+- **La cola NUNCA es FIFO ciega, y la prioridad NUNCA va sin guard de aging.** Un batch social no puede hambrear un bid con deadline duro; y **prioridad sin aging es hambruna con otro nombre** (el batch social no correría nunca). *(Delta a · §3 + Delta b · §5 → Slice 2b.)*
 
 ## Normative Docs
 
@@ -94,8 +102,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `EPIC-027` — debe autorizar `tender-worker` como siguiente deployable, o documentar la excepción antes de crear `services/tender-worker/`.
-- Foundation runtime del aggregate `Tender`, `tender_assets` y capabilities `commercial.tender.*` descritas como Proposed en `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`; confirmar la task dueña o crearla antes de aplicar una migración.
+- `EPIC-027` — debe autorizar `artifact-worker` como siguiente deployable, o documentar la excepción antes de crear `services/artifact-worker/`.
+- Foundation runtime del aggregate `Tender`, `proposal_assets` y capabilities `commercial.tender.*` descritas como Proposed en `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`; confirmar la task dueña o crearla antes de aplicar una migración.
 - `TASK-1392` — Tender Proposal Studio F0 agentic: provee aggregate, assets/audience, context/tool contracts, propuesta/confirmación humana y el handoff que el render agent consume.
 - `TASK-1393` — Artifact Composer: provee catálogo `deck-axis`, `CompositionPlanInput`/`ResolvedCompositionManifest`, selector derivado, contratos/versiones, validadores semánticos y font pack hermético. No se cablea el worker al shape histórico de `DeckPlan`.
 - Requisito-set `tender_requirements` del aggregate Tender: el job de packaging consume constraints de formato/peso/páginas reales, no un límite global supuesto.
@@ -117,7 +125,7 @@ Reglas obligatorias:
 - `src/lib/artifact-composer/**` — **el motor** (post-TASK-1393). Esta task lo **consume**, no lo reescribe
 - `src/lib/commercial/proposals/**` — commands/readers/job contracts, render context/tools/proposal/evals del agente (aggregate **`Proposal`**, no `Tender` — Delta a · §4)
 - `src/lib/storage/greenhouse-assets.ts` y sus tests, sólo si el contrato existente necesita una extensión compatible
-- `services/artifact-worker/**` — **nuevo Cloud Run Job** (⚠️ **`artifact-worker`, NO `tender-worker`** — Delta b · §1: el worker renderiza **catálogos**, no un dominio). Condicionado al gate EPIC-027
+- `services/artifact-worker/**` — **nuevo Cloud Run Job** (⚠️ **`artifact-worker`, NO `artifact-worker`** — Delta b · §1: el worker renderiza **catálogos**, no un dominio). Condicionado al gate EPIC-027
 - `services/artifact-worker/deploy.sh` — **SoT del flag en Cloud Run** (Delta b · §10)
 - `services/_shared/**` (sólo helpers Cloud Run reutilizables)
 - `.github/workflows/artifact-worker-deploy.yml` y deploy script asociado (nuevos, si el worker es autorizado)
@@ -133,7 +141,7 @@ Reglas obligatorias:
 - El renderer valida contratos, espera tipografías, rechaza slots fuera del canvas y preserva el orden de slides.
 - El renderer exporta el HTML real de cada template: PNG de revisión y PDF vectorial por lámina; no rasteriza el deck ni reconstruye el diseño con un segundo motor.
 - El CLI `pnpm deck:compose` compone ejemplos locales; el plan SKY de cuatro láminas generó un PDF de 1,1 MB en 2,33 s en la revisión 2026-07-12.
-- Existen patrones productivos de Cloud Run, WIF, Sentry, `source_sync_runs`, deploy scripts y helpers de Secret Manager; no existe `services/tender-worker/` ni un Cloud Run Job de render.
+- Existen patrones productivos de Cloud Run, WIF, Sentry, `source_sync_runs`, deploy scripts y helpers de Secret Manager; no existe `services/artifact-worker/` ni un Cloud Run Job de render.
 - Las fuentes de las plantillas todavía se cargan desde Google Fonts, por lo que el render no es hermético y debe resolverlo antes de depender de un worker sin red pública.
 
 ### Gap
@@ -149,7 +157,7 @@ Reglas obligatorias:
 - Topology impact: `worker`
 - Current home: `src/lib/commercial/tenders/deck/**` y los patrones Cloud Run existentes bajo `services/**`
 - Future candidate home: `worker`
-- Boundary: command/reader/context/tools de render de Tender y job contract; consumers autorizados son Tender Render Agent, packaging de Tender, API Platform, Nexa/MCP, CLI operativa y el Cloud Run Job `tender-worker`; ninguno llama Chromium directamente salvo el job.
+- Boundary: command/reader/context/tools de render de Tender y job contract; consumers autorizados son Proposal Render Agent, packaging de Tender, API Platform, Nexa/MCP, CLI operativa y el Cloud Run Job `artifact-worker`; ninguno llama Chromium directamente salvo el job.
 - Server/browser split: contratos/DTOs browser-safe si un consumer futuro los necesita; persistence, asset store, Playwright/Chromium, Cloud Run auth y provider SDKs permanecen server-only.
 - Build impact: nuevo Cloud Run Job condicionado, imagen Chromium/Playwright, Dockerfile, workflow WIF, filesystem temporal efímero y assets/fonts empaquetados.
 - Extraction blocker: autorización de frontera EPIC-027; el aggregate Tender/asset model y sus transacciones/capabilities aún no existen en runtime.
@@ -161,7 +169,7 @@ Reglas obligatorias:
 - Backend rigor: `backend-critical`
 - Impacto principal: `integration`
 - Source of truth afectado: `ResolvedCompositionManifest` confirmado + snapshots de catálogo/template/brand pack/font/evidencia/requisitos; job/audit de render y artefactos Proposal a materializar bajo `greenhouse_commercial` [verificar schema/table exactos al existir Proposal].
-- Consumidores afectados: Tender Render Agent, Cloud Run Job, dispatcher/outbox, Tender packaging command, API Platform, CLI operativa, futuros UI/Nexa/MCP y asset store.
+- Consumidores afectados: Proposal Render Agent, Cloud Run Job, dispatcher/outbox, Tender packaging command, API Platform, CLI operativa, futuros UI/Nexa/MCP y asset store.
 - Runtime target: `local + staging + production Cloud Run Job`.
 
 ### Contract surface
@@ -169,11 +177,11 @@ Reglas obligatorias:
 - Contrato existente a respetar: `CompositionPlanInput`/`ResolvedCompositionManifest` del Artifact Composer, `compose()`, asset store canónico, `ProposalEvidenceRef` y API Platform command ledger.
 - Contrato nuevo o modificado: `ProposalRenderContext`, tools/readers allowlisted, `ProposalRenderProposal`, command de confirmación/ejecución de render; reader de estado/artefactos; job record append-only con hash del manifest + versiones; evento/signal de éxito, fallo, retry, sobrepeso, evidencia o validación semántica rechazada.
 - Backward compatibility: `additive and gated`; el CLI local continúa funcionando y no muta jobs productivos.
-- Full API parity: Tender Render Agent, `commercial.tender.package` o su primitive de render llaman el mismo command; API/CLI/Nexa/MCP no reciben rutas especiales ni acceso directo a tablas/Cloud Run.
+- Full API parity: Proposal Render Agent, `commercial.tender.package` o su primitive de render llaman el mismo command; API/CLI/Nexa/MCP no reciben rutas especiales ni acceso directo a tablas/Cloud Run.
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `greenhouse_commercial.tenders`, `tender_assets` y job/audit de render [verificar nombres y migración dueña antes de aplicar].
+- Entidades/tablas/views afectadas: `greenhouse_commercial.proposals`, `proposal_assets` y job/audit de render [verificar nombres y migración dueña antes de aplicar].
 - Invariantes que no se pueden romper:
   - Mismo `ResolvedCompositionManifest` canónico + mismas versiones de catálogo/template/contrato/brand pack/fuentes/assets/evidencia = mismo artefacto lógico; un replay no vuelve a autorizar ni altera slots.
   - El selector ya está resuelto por catálogo: un job nunca recibe ni respeta un `template` escogido por un agente/consumer.
@@ -183,9 +191,13 @@ Reglas obligatorias:
   - Cuando el RFP declara tipo, peso, páginas u otro requisito de archivo, el job lo persiste como constraint de ese snapshot y falla cerrado si el output no lo cumple; nunca sustituye el requisito por el default global de 20 MB.
   - Un fallo de una lámina o un peso excesivo deja el job fallido/recuperable, nunca un deck parcial publicado.
   - `ops-worker` y Vercel no ejecutan Chromium para este dominio.
+  - 🔴 **El `audience` viaja POR REFERENCIA, no sólo por artefacto.** Un artefacto `client_facing` con **una sola** referencia de evidencia `audience: internal` produce `audience_violation` y **no se renderiza**. *(Los insumos internos llevan loaded cost y piso de negociación: colarlos en el PDF es entregarle a la contraparte nuestra estructura de costos.)*
+  - **El requisito-set incluye ACCESIBILIDAD.** Si el RFP la exige (Section 508 / EAA / PDF/UA), el job **falla cerrado**: `Chromium print-to-PDF` emite PDF **sin taguear** y **el motor no puede** producir PDF/UA.
+  - **El `deadline` de la `Proposal` viaja FIJADO en el job**, no se re-lee al despachar (un deadline mutable haría no determinista la prioridad). Una propuesta con **deadline vencido** no compite por prioridad.
+  - **La QA visual es un GATE mecánico**, no una revisión humana opcional: fallback tipográfico, asset ausente (`naturalWidth > 0` en todo `<img>` del contrato) y lámina en blanco **bloquean** la publicación.
   - El agente sólo propone usando plan/asset/constraint permitidos; no encola, invoca `jobs.run`, ejecuta Chromium ni publica artefactos.
-- Tenant/space boundary: el command deriva actor, `tenderId`, cliente/space y audience desde el aggregate Tender; worker recibe un job autenticado, no IDs arbitrarios del request.
-- Idempotency/concurrency: clave estable basada en `tenderId + canonical hash(DeckPlan + template versions + asset versions) + artifact purpose`; lock/unique constraint transaccional; una ejecución Cloud Run Job procesa un deck (`tasks=1`, `parallelism=1`) mientras el renderer mantiene concurrencia interna benchmarkeada.
+- Tenant/space boundary: el command deriva actor, `proposalId`, cliente/space y audience desde el aggregate Tender; worker recibe un job autenticado, no IDs arbitrarios del request.
+- Idempotency/concurrency: **clave canónica ÚNICA — `hash(ResolvedCompositionManifest) + proposalId + artifactPurpose`.** ⚠️ El manifest **ya contiene** los hashes de catálogo/template/contrato/brand pack/fuentes/assets: **repetirlos en la clave duplica la verdad** (y la definición vieja usaba `DeckPlan`, un shape que ya no existe). **No pueden convivir dos definiciones de la clave en esta spec** *(Delta b · §8)*. Lock/unique constraint transaccional. Una ejecución de Cloud Run Job procesa **un deck** (`tasks=1`, `parallelism=1`) mientras el renderer mantiene concurrencia interna benchmarkeada. ⚠️ **Ese envelope es correcto para `pdf-merged` (deck) y probablemente NO para `png-set`** (30 carruseles = 30 cold starts de Chromium): ver Open Question de batch.
 - Audit/outbox/history: transiciones append-only del job, API Platform command ledger, metadata del asset, trace/tool calls/outcome del agente y reliability signals para queue lag, fallo/retry, geometry failure y file-size rejection.
 
 ### Migration, backfill and rollout
@@ -207,7 +219,7 @@ Reglas obligatorias:
 
 - Local checks: tests de command/idempotencia, render context/tools/proposal/eval fixture, worker payload/auth, renderer/geometry, cache/replay, peso y errores; Docker build/health local; `pnpm deck:compose` sobre fixture SKY.
 - DB/runtime checks: migración additive aplicada en dev, unique/idempotency y audit verificados con `pnpm pg:connect`; no job duplicado bajo requests concurrentes.
-- Integration checks: Tender Render Agent propone sobre snapshot/constraints allowlisted → humano confirma → mismo command encola Cloud Run Job; staging renderiza deck de 4 y 25 láminas, sube outputs al asset store y recupera/reintenta un fallo inyectado; browser y binario Playwright deben coincidir en versión y quedar pinneados en la imagen.
+- Integration checks: Proposal Render Agent propone sobre snapshot/constraints allowlisted → humano confirma → mismo command encola Cloud Run Job; staging renderiza deck de 4 y 25 láminas, sube outputs al asset store y recupera/reintenta un fallo inyectado; browser y binario Playwright deben coincidir en versión y quedar pinneados en la imagen.
 - Reliability signals/logs: dashboard/lane de queue lag, dead-letter, duration/memory, over-weight and geometry rejection; Sentry `domain=commercial` sin PII.
 - Production verification sequence: flag OFF deploy → staging smoke/benchmark → revisión humana de PDF/previews contra el template real → autorización EPIC/operador → enable limitado → un render controlado → revisar assets, audit, signals y costo → ampliar sólo si el envelope y rollback pasan.
 
@@ -242,7 +254,7 @@ Reglas obligatorias:
 
 ### Slice 0 — Gate de frontera y contrato de job
 
-- Confirmar que EPIC-027 autoriza el deployable `tender-worker` y que la foundation `Tender`/`tender_assets` tiene task/owner/materialización suficiente; si falta, dejar esta task bloqueada y crear/ligar el predecessor, sin crear el servicio.
+- Confirmar que EPIC-027 autoriza el deployable `artifact-worker` y que la foundation `Tender`/`proposal_assets` tiene task/owner/materialización suficiente; si falta, dejar esta task bloqueada y crear/ligar el predecessor, sin crear el servicio.
 - Decidir y documentar command/reader, tabla(s) additive, key de idempotencia, asset/version/audience contract, capability/grant, flags y ruta de cola; revisar si un ADR incremental es necesario antes de migrar.
 - Medir baseline local de 4 y 25 láminas: duración, RSS, tamaño, recursos de Chromium y comportamiento ante timeout/fallo.
 
@@ -253,10 +265,27 @@ Reglas obligatorias:
 - Conectar confirmación humana de la propuesta al mismo command idempotente; la propuesta nunca escribe un job ni tiene acceso a dispatcher/Cloud Run/storage.
 - Integrar asset store para outputs privados/versionados; preservar `audience`, provenance, hash, manifest completo, referencias de evidencia permitidas y las constraints del requisito-set (peso, páginas, tipo/formato cuando existan) como gates de publicación.
 - Convertir el warning de peso en outcome gobernado (`size_rejected` o equivalente) cuando el requisito de formato aplique; no publicar PDF parcial o sobrepeso.
+- 🔴 **Gate de `audience` sobre la EVIDENCIA** (Delta b · §6): el manifest lleva el `audience` de **cada** referencia; un artefacto `client_facing` con **una sola** referencia `internal` produce `audience_violation` y **no se renderiza**. **Test que lo prueba con un insumo real que lleve loaded cost.**
 
-### Slice 2 — `tender-worker` Cloud Run Job y empaquetado Chromium
+### Slice 1b — La QA visual se vuelve MECÁNICA (o muere al automatizarse)
 
-- Crear el Cloud Run Job `tender-worker` sólo si Slice 0 autorizó la frontera; reutilizar Docker/WIF/Sentry/secret-IAM helpers canónicos. El dispatcher autenticado invoca `jobs.run`; el Job no publica endpoint HTTP de render.
+**La doctrina del composer —*"los tests verdes NO son el gate: mirar los frames"*— sólo funciona si hay
+alguien mirando. En régimen no lo hay.** Estos detectores son lo que la reemplaza. **Sin ellos, el
+pipeline automatiza la producción de un artefacto que puede mentir, y nadie lo revisa.**
+
+| Detector | Cómo | Outcome |
+|---|---|---|
+| **Fallback tipográfico** | render de control con la familia bloqueada → si el output es **idéntico**, la fuente **nunca se aplicó** | `font_fallback_detected` |
+| **Asset ausente** (imagen 404 → caja vacía) | assert de que **todo `<img>` del contrato resolvió** (`naturalWidth > 0`) | `missing_asset` |
+| **Lámina en blanco / casi vacía** | umbral de densidad de píxeles no-fondo por lámina | `blank_slide` |
+| **Copy del prototipo** (1ª bug class) | ya cubierto por el **fail-closed del filler** → **verificar que sobrevivió al move de TASK-1393** | aborta la lámina |
+
+- `assertSlideFitsCanvas` (geometría) **ya existe y se conserva**: estos detectores lo **complementan**, no lo reemplazan.
+- Los cuatro son **gates de publicación**, no advertencias.
+
+### Slice 2 — `artifact-worker` Cloud Run Job y empaquetado Chromium
+
+- Crear el Cloud Run Job `artifact-worker` sólo si Slice 0 autorizó la frontera; reutilizar Docker/WIF/Sentry/secret-IAM helpers canónicos. El dispatcher autenticado invoca `jobs.run`; el Job no publica endpoint HTTP de render.
 - Empaquetar los snapshots de catálogo/templates, brand pack y font pack ya verificados por TASK-1393; el worker comprueba hashes y bloquea egress de fuentes. Fijar la imagen y el binario de Playwright a la misma versión; no usar tags flotantes.
 - Consumir jobs desde outbox/cola con una ejecución/tarea por deck (`tasks=1`, `parallelism=1`); la concurrencia interna de páginas se configura sólo desde benchmark, no por suposición. Cloud Tasks queda fuera del render directo y sólo se considera si el dispatcher necesita backpressure dedicado.
 
@@ -300,7 +329,7 @@ entra hoy, **se pierde el proceso**); un lote de 30 carruseles es **frecuente y 
 
 ## Detailed Spec
 
-La ruta de ejecución esperada es `TenderRenderContext/tools → TenderRenderProposal → human confirm → persist immutable job + RFP constraints → outbox dispatcher → authenticated jobs.run → Cloud Run Job tender-worker (1 deck) → composeDeck(plan) → validate geometry/formato/peso → private asset-store writes → audit/status reader`. El job puede reintentar sólo el mismo snapshot de plan; una edición de contenido/template/asset crea una nueva clave y una nueva versión de artefacto. El agente no puede saltarse ningún borde de este flujo.
+La ruta de ejecución esperada es `ProposalRenderContext/tools → ProposalRenderProposal → human confirm → persist immutable job + RFP constraints → outbox dispatcher → authenticated jobs.run → Cloud Run Job artifact-worker (1 deck) → composeDeck(plan) → validate geometry/formato/peso → private asset-store writes → audit/status reader`. El job puede reintentar sólo el mismo snapshot de plan; una edición de contenido/template/asset crea una nueva clave y una nueva versión de artefacto. El agente no puede saltarse ningún borde de este flujo.
 
 La exportación conserva el sistema visual de las plantillas; el renderer no introduce un “fallback estético”. Todo preview y PDF pasa una revisión de composición sobre el output real antes de ser elegible como client-facing. Plan Mode debe decidir si el outbox existente basta o requiere Cloud Tasks sólo para backpressure del dispatcher, definir el modelo de operación de los artefactos temporales y confirmar las tablas reales. No se acepta una route Vercel de larga duración, un endpoint Cloud Run público de render, ni polling que redisponga Chromium por cada consulta de estado.
 
@@ -308,7 +337,7 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 
 ### Slice ordering hard rule
 
-- Slice 0 MUST cerrar antes de crear migraciones, capabilities, service account, Dockerfile o `services/tender-worker/`.
+- Slice 0 MUST cerrar antes de crear migraciones, capabilities, service account, Dockerfile o `services/artifact-worker/`.
 - Slice 1 (snapshot/job/audit) MUST cerrar antes de Slice 2 (Cloud Run Job consume); el job nunca recibe `DeckPlan` mutable desde un request.
 - Slice 2 MUST cerrar antes de Slice 3 (dispatcher/signal/rollout); no activar un Cloud Run Job que no pueda reportar/recoverar fallos.
 - Producción permanece OFF hasta evidencia staging de los tres slices y autorización explícita.
@@ -333,7 +362,12 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 
 ### Feature flags / cutover
 
-- Flag de capability/Cloud Run Job Tender Renderer y Tender Render Agent: default OFF; nombre, owner, ledger y eval fixture se fijan en Slice 0 para no crear una variable duplicada.
+- Flag de capability/Cloud Run Job del Artifact Renderer y del Proposal Render Agent: default OFF; nombre, owner, ledger y eval fixture se fijan en Slice 0 para no crear una variable duplicada.
+- ⚠️ **Prender un flag acá es MULTI-RUNTIME, y en Cloud Run el SoT es el `deploy.sh`** *(Delta b · §10)*:
+  - Declararlo en **`services/artifact-worker/deploy.sh`** — los `deploy.sh` usan `--set-env-vars`, que es **destructivo** y **borra toda var agregada out-of-band**.
+  - **Y además** aplicarlo en vivo (`gcloud run services update … --update-env-vars`) para efecto inmediato.
+  - **Hacer sólo lo segundo = el flag desaparece en el próximo deploy, en silencio.** Verificar en la **revisión activa** + ejercitar el flujo real.
+  - **Fila en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` en el MISMO PR** — `pnpm docs:closure-check` **falla** si un `*_ENABLED` no está registrado.
 - El CLI local sigue disponible para fixtures y no activa jobs productivos.
 - Cutover: staging OFF → smoke worker autenticado → revisión humana → enable limitado por Tender autorizado → verificación signals/costo → expansión explícita.
 
@@ -350,7 +384,7 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 
 1. Confirmar la autorización de EPIC-027 y el estado real de Tender/asset store/capabilities.
 2. Aplicar migración additive y deploy staging con flag OFF; validar que sólo el dispatcher autenticado puede invocar `jobs.run` y que no existe endpoint público de render.
-3. Ejecutar Tender Render Agent sobre snapshot allowlisted; verificar propuesta/traza/eval y que el humano confirmado invoca el mismo command. Encolar un deck fixture de 4 láminas y uno de 25; verificar hash, orden, geometría, constraints de RFP, peso, assets privados, audit y reader.
+3. Ejecutar Proposal Render Agent sobre snapshot allowlisted; verificar propuesta/traza/eval y que el humano confirmado invoca el mismo command. Encolar un deck fixture de 4 láminas y uno de 25; verificar hash, orden, geometría, constraints de RFP, peso, assets privados, audit y reader.
 4. Repetir el mismo command concurrentemente y verificar un solo job/asset final; inyectar timeout y recuperar sin cambiar el plan.
 5. Revisar PDF/PNGs contra las composiciones de template (safe areas, firma, fuentes, crops y placeholders), signals, Sentry y costo/RSS; confirmar rollback de flag/cola.
 6. Obtener sign-off humano y habilitar un Tender controlado; no ampliar hasta que el requisito de archivo del RFP esté validado.
@@ -369,9 +403,9 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 
 ## Acceptance Criteria
 
-- [ ] No se crea `tender-worker` sin autorización documentada de EPIC-027 y sin source of truth Tender/asset store confirmado.
+- [ ] No se crea `artifact-worker` sin autorización documentada de EPIC-027 y sin source of truth Tender/asset store confirmado.
 - [ ] El command fijado es idempotente, capability-gated, auditado y usable por API/CLI; no hay render directo desde UI, Vercel ni `ops-worker`.
-- [ ] Tender Render Agent consume sólo contexto/tools allowlisted y genera `TenderRenderProposal` tipada, trazable y evaluada; no encola, ejecuta Chromium, llama `jobs.run` ni publica assets.
+- [ ] Proposal Render Agent consume sólo contexto/tools allowlisted y genera `ProposalRenderProposal` tipada, trazable y evaluada; no encola, ejecuta Chromium, llama `jobs.run` ni publica assets.
 - [ ] El Cloud Run Job usa Chromium/Playwright con templates, assets y fuentes herméticos; no depende de Google Fonts/red pública para producir el PDF.
 - [ ] Ningún job acepta `DeckPlan` mutable ni `template` elegido por consumer: persiste y renderiza exclusivamente un `ResolvedCompositionManifest` con hashes de catálogo/template/contrato/brand pack/fuentes y reporte de validación semántica.
 - [ ] Las referencias de evidencia/requisitos incluidas en el manifest vienen de readers allowlisted de Proposal; evidencia faltante, no autorizada o con atribución visible requerida pero ausente produce `semantic_rejected` sin publicar artefactos.
@@ -385,7 +419,7 @@ La exportación conserva el sistema visual de las plantillas; el renderer no int
 
 **Añadidos por el Delta (b) — auditoría de rigor 2026-07-12:**
 
-- [ ] **El deployable se llama `artifact-worker`, NO `tender-worker`** — en el service, el workflow, el
+- [ ] **El deployable se llama `artifact-worker`, NO `artifact-worker`** — en el service, el workflow, el
       service account y el Job. *(Renombrar después no es un rename: es un servicio nuevo + un zombi.)*
 - [ ] **Ningún path apunta a `src/lib/commercial/tenders/deck/**`**: el motor se consume desde
       `src/lib/artifact-composer/**` y el aggregate es `Proposal`.
