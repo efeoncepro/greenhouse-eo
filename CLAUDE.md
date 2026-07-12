@@ -47,6 +47,8 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 ### Tender pointer — `TASK-1392 → TASK-1391`
 
 Al tocar licitaciones, cargar `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` y el §0 de la arquitectura de Tender.
+Para cualquier deck cargar además `deck-studio`; en `TimelineFull` el plan declara `timeUnit`, eje, fases,
+hitos y `barLabel` editable, mientras el compiler deriva la geometría y falla cerrado si ese copy se recorta.
 El composer F1 es sólo CLI; el runtime empieza con `TASK-1392`: `tender_asset.audience` explícito y
 `contexto allowlisted → propuesta tipada → confirmación humana → command canónico`. El LLM no escribe ni
 cruza gates. `TASK-1391` es después un candidato bloqueado de `EPIC-027` para `tender-worker`; no autoriza

@@ -1,9 +1,9 @@
 # Tender Deck Composer — Cómo se arma el deck de una propuesta
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-12 por Claude (con Julio Reyes)
-> **Ultima actualizacion:** 2026-07-12 por Claude
+> **Ultima actualizacion:** 2026-07-12 — `TimelineFull` data-driven y `barLabel` editable
 > **Documentacion tecnica:** [GREENHOUSE_TENDER_DECK_COMPOSER_V1.md](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md) · ADR: [GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md §5-ter](../../architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md)
 > **Manual de uso:** [comercial/componer-deck-de-licitacion.md](../../manual-de-uso/comercial/componer-deck-de-licitacion.md)
 
@@ -60,6 +60,15 @@ se puede cambiar el número y dejar la barra del ejemplo.
 
 Esto importa más de lo que parece: una barra que exagera una mejora que no ocurrió no es un error de
 diseño, es **fabricación gráfica** frente a un comité evaluador.
+
+### 4. Un cronograma también es dato, no decoración
+
+En `TimelineFull`, quien prepara el deck declara la unidad temporal, el eje, las fases y los hitos. El
+composer calcula desde esos datos la grilla, los rangos de las barras, los diamantes y los conectores.
+
+Los textos dentro de las barras (`barLabel`) son contenido **editable** por el agente o la persona: aparecen
+tanto en barras de trabajo sólidas como en actividad continua punteada, incluso si dura una sola unidad. Si el
+texto no cabe en la barra real, el composer se detiene; no lo oculta ni modifica el calendario para disimularlo.
 
 ## Qué produce
 

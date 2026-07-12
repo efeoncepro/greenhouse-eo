@@ -5,7 +5,8 @@
 > **Creado:** 2026-07-12 por Claude
 > **Cargar al tocar:** `src/lib/commercial/tenders/**` · `docs/architecture/tender-deck-composer-prototypes/**` · `scripts/commercial/compose-tender-deck.ts` · cualquier oferta/deck/propuesta de licitación
 > **Contrato completo:** `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` (el deck) · `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (el aggregate; **leer su §0 — estado real**) · `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (discovery público)
-> **Skill:** `greenhouse-public-private-tenders` (método) + `deck-visual-system.md` (el deck) + `bid-construction-playbook.md` (las 10 fases)
+> **Skills:** `greenhouse-public-private-tenders` (método) + `deck-studio` (argumento, composición y
+> entrega del deck) + `deck-visual-system.md` (el deck) + `bid-construction-playbook.md` (las 10 fases)
 
 ---
 
@@ -107,6 +108,10 @@ del contrato si se adjudica. De ahí salen los tres principios; todo lo demás s
 - **NUNCA** rotules un hito de timeline con una fecha que no sea la que el eje pinta. `at` es el **FIN de
   la unidad**: un hito "Semana 1" con `at: 1` cae en el **cierre del Mes 1** → la lámina **afirma una fecha
   falsa**. Es fabricación, no un bug de layout.
+- **NUNCA** edites manualmente porcentajes, grilla o conectores de `TimelineFull`. El `DeckPlan` declara
+  `timeUnit`, `timeAxis` (3..8), rangos enteros de fases e hitos; el compiler deriva la geometría desde ese
+  único schedule. `barLabel` es copy editable de barra sólida o punteada, incluso de una unidad: se conserva
+  y se mide contra la geometría real; si se recorta, se rechaza. No se borra para hacer pasar el render.
 - **NUNCA** escribas un guard que chequee **texto** cuando puedes chequear el **DOM**. El primer guard de la
   firma buscaba `</main>` y daba por buenas las plantillas que usan `<div class="slide">`: **un check que
   miente es peor que no tenerlo**.

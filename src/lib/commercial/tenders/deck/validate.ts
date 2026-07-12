@@ -13,13 +13,8 @@
  *    fabricados. Si un slot trae una métrica sin `evidenceRef`, el deck no se compone.
  */
 
-import type {
-  SlotContract,
-  SlotValue,
-  SlotViolation,
-  TemplateContract,
-  SlideSpec
-} from './contracts'
+import type { SlotContract, SlotValue, SlotViolation, TemplateContract, SlideSpec } from './contracts'
+import { parseTimelineSchedule } from './timeline'
 
 /**
  * Un slot **template-owned**: existe en el contrato, pero lo llena la PLANTILLA, no el autor. Es el
@@ -68,6 +63,28 @@ const validateStringLike = (ctx: ValidateContext, contract: SlotContract, value:
           `El renderer NO trunca (overflow=reject): reescribe el copy más corto.`
       )
     ]
+  }
+
+  return []
+}
+
+const validateEnum = (ctx: ValidateContext, contract: SlotContract, value: SlotValue): SlotViolation[] => {
+  if (typeof value !== 'string') {
+    return [violation(ctx, 'wrong_type', `se esperaba un enum, llegó ${typeof value}`)]
+  }
+
+  // Los contratos históricos usan tanto arrays de valores como mapas clave→label. Ambos representan
+  // el mismo conjunto cerrado; el renderer sólo necesita labels cuando el enum se pinta.
+  const rawValues = contract.values as unknown
+
+  const values = Array.isArray(rawValues)
+    ? rawValues
+    : rawValues && typeof rawValues === 'object'
+      ? Object.keys(rawValues)
+      : []
+
+  if (!values.includes(value)) {
+    return [violation(ctx, 'disallowed_enum', `"${value}" no está en los valores permitidos (${values.join(', ')})`)]
   }
 
   return []
@@ -244,9 +261,25 @@ export const validateSlide = (slide: SlideSpec, contract: TemplateContract): Slo
         violations.push(...validateArray(ctx, contractSlot, value))
         break
 
+      case 'enum':
+        violations.push(...validateEnum(ctx, contractSlot, value))
+        break
+
       default:
         // asset / asset-ref / fixed-asset / object / enum: la forma la valida el resolver de assets.
         break
+    }
+  }
+
+  if (slide.template === 'TimelineFull') {
+    for (const issue of parseTimelineSchedule(slide.slots).issues) {
+      violations.push(
+        violation(
+          { slideId: slide.slideId, template: slide.template, slot: issue.slot },
+          'invalid_value',
+          issue.message
+        )
+      )
     }
   }
 
@@ -254,10 +287,7 @@ export const validateSlide = (slide: SlideSpec, contract: TemplateContract): Slo
 }
 
 /** Valida el deck completo. Si devuelve algo, NO se compone: se reporta y lo arregla un humano. */
-export const validateDeck = (
-  slides: SlideSpec[],
-  contracts: Map<string, TemplateContract>
-): SlotViolation[] => {
+export const validateDeck = (slides: SlideSpec[], contracts: Map<string, TemplateContract>): SlotViolation[] => {
   const violations: SlotViolation[] = []
 
   for (const slide of slides) {

@@ -9,7 +9,7 @@
   :root {
     --safe:72px; --teal:#36c8bf; --teal-deep:#1f9e94; --violet:#6717cd; --ink:#020061;
     --lbl:320px;                 /* ancho de la columna de etiquetas de fase */
-    --m:16.6667%;                /* un mes = 1/6 del track */
+    --m:100%;                    /* el compiler TimelineFull fija 100 / unidades del eje */
   }
   /* full-bleed dark-even: navy en todo el ancho (blanco legible) + glows teal/violeta + grain */
   .slide {
@@ -93,12 +93,8 @@
     </div>
 
     <div class="gantt">
-      <div class="vlines">
-        <div class="vline" style="left:16.6667%"></div>
-        <div class="vline" style="left:50%"></div>
-        <div class="vline" style="left:91%"></div>
-      </div>
-      <!-- eje meses -->
+      <div class="vlines" aria-hidden="true"></div>
+      <!-- eje temporal discreto -->
       <div class="row-flex axis">
         <div class="lbl"></div>
         <div class="track" data-slot="timeAxis" data-slot-type="array" data-slot-required="true">
@@ -121,23 +117,23 @@
       <div class="phases" data-slot="phases" data-slot-type="array" data-slot-required="true">
         <div class="row-flex phase">
           <div class="lbl"><span class="n">01</span><div><div class="pt" data-slot-field="title">Diagnóstico &amp; baseline</div><div class="pd" data-slot-field="description">AEO/SEO audit + Share of Voice inicial</div></div></div>
-          <div class="track"><div class="bar" style="left:0; width:16.6667%" data-slot-field="barLabel"></div></div>
+          <div class="track"><div class="bar" style="left:0; width:16.6667%"><span data-slot-field="barLabel"></span></div></div>
         </div>
         <div class="row-flex phase">
           <div class="lbl"><span class="n">02</span><div><div class="pt" data-slot-field="title">Arquitectura &amp; quick wins</div><div class="pd" data-slot-field="description">correcciones técnicas + plan editorial</div></div></div>
-          <div class="track"><div class="bar" style="left:0; width:33.3333%" data-slot-field="barLabel">correcciones + arquitectura de contenido</div></div>
+          <div class="track"><div class="bar" style="left:0; width:33.3333%"><span data-slot-field="barLabel">correcciones + arquitectura de contenido</span></div></div>
         </div>
         <div class="row-flex phase">
           <div class="lbl"><span class="n">03</span><div><div class="pt" data-slot-field="title">Producción editorial</div><div class="pd" data-slot-field="description">motor de contenidos en cadencia</div></div></div>
-          <div class="track"><div class="bar" style="left:16.6667%; width:66.6667%" data-slot-field="barLabel">publicación sostenida + hub editorial</div></div>
+          <div class="track"><div class="bar" style="left:16.6667%; width:66.6667%"><span data-slot-field="barLabel">publicación sostenida + hub editorial</span></div></div>
         </div>
         <div class="row-flex phase">
           <div class="lbl"><span class="n">04</span><div><div class="pt" data-slot-field="title">Optimización AEO</div><div class="pd" data-slot-field="description">citabilidad + iteración por evidencia</div></div></div>
-          <div class="track"><div class="bar" style="left:33.3333%; width:66.6667%" data-slot-field="barLabel">citabilidad en asistentes con IA</div></div>
+          <div class="track"><div class="bar" style="left:33.3333%; width:66.6667%"><span data-slot-field="barLabel">citabilidad en asistentes con IA</span></div></div>
         </div>
         <div class="row-flex phase">
           <div class="lbl"><span class="n">05</span><div><div class="pt" data-slot-field="title">Medición &amp; reporte</div><div class="pd" data-slot-field="description">SoV, citabilidad y autoridad</div></div></div>
-          <div class="track"><div class="bar cont" style="left:0; width:100%" data-slot-field="barLabel">continuo · reporte mensual</div></div>
+          <div class="track"><div class="bar cont" style="left:0; width:100%"><span data-slot-field="barLabel">continuo · reporte mensual</span></div></div>
         </div>
       </div>
 

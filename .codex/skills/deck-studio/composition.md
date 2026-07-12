@@ -126,6 +126,45 @@ composer DEBE abortar la lámina.**
 
 ---
 
+## `TimelineFull` — cronograma data-driven
+
+Use `TimelineFull` cuando la lámina comunica **duración, solapes, entregables o hitos en el tiempo**.
+Un proceso lógico sin duración pertenece a `ProcessStepsFull`; no se simula un Gantt para hacerlo más
+ornamental.
+
+El `DeckPlan` expresa el schedule, no su dibujo:
+
+```ts
+{
+  timeUnit: 'day' | 'week' | 'month' | 'quarter' | 'custom',
+  timeAxis: ['Mes 1', 'Mes 2', 'Mes 3'], // 3..8 unidades ordenadas
+  phases: [{
+    kind: 'work' | 'continuous',
+    startUnit: 1,                         // entero, inclusivo
+    endUnit: 2,                           // entero, inclusivo
+    title: 'Diagnóstico',
+    description: '...',
+    barLabel: 'Movimiento desde la primera semana' // opcional, editable
+  }],
+  milestones: [{ at: 1, label: 'Baseline', caption: 'Fin Mes 1' }]
+}
+```
+
+- `startUnit`, `endUnit` y `at` son fronteras enteras del eje (`1..N`); un hito se sitúa al **fin** de
+  su unidad.
+- `barLabel` es contenido estructurado, no texto metido en el HTML. Puede usarse en barras sólidas y
+  punteadas, incluso si la fase ocupa una sola unidad.
+- El compiler deriva de ese único schedule la grilla, el rango de cada barra, los diamantes, sus
+  conectores y los anclajes de etiquetas de borde. No se editan porcentajes ni líneas a mano.
+- `assertSlideFitsCanvas` mide el resultado real: si el `barLabel` (u otro texto) se recortaría, el
+  compose aborta. No se borra la etiqueta para “hacerlo pasar”; se acorta el copy o se corrige el plan.
+
+Fuentes canónicas: `docs/architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → `TimelineFull`,
+`docs/architecture/tender-deck-composer-prototypes/timeline-full.slots.json` y el ejemplo real
+`docs/commercial/tenders/sky-blog-2026/deck-plan.json`.
+
+---
+
 ## Hard rules
 
 - **NUNCA** dibujes una lámina freehand. Si no hay plantilla, **hay un gap de catálogo**.
@@ -133,5 +172,9 @@ composer DEBE abortar la lámina.**
 - **NUNCA** un `default:` silencioso en el filler. **Fail-closed o nada.**
 - **NUNCA** asumas que pasó la validación de caracteres = cabe.
 - **NUNCA** geometría dibujada a mano. **Se deriva del dato, siempre.**
+- **NUNCA** edites porcentajes, grilla o conectores de `TimelineFull`; escribe el schedule y deja que el
+  compiler los derive.
+- **NUNCA** borres `barLabel` para pasar una fase corta. Es copy editable; si no cabe, el renderer debe
+  rechazarlo y el autor debe resolver el contenido o el schedule.
 - **NUNCA** declares un deck listo sin **MIRAR TODOS LOS FRAMES**. Los tests verdes no son el gate.
 - **SIEMPRE** el `Plan` es el artefacto auditable; el PDF es derivado y re-componible.

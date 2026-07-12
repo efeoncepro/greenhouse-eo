@@ -38,6 +38,10 @@ Un hito de timeline rotulado *"Semana 1"* que en realidad **cae en el cierre del
 > **Un rótulo que no coincide con lo que el eje dibuja es fabricación**, aunque el layout esté
 > perfecto. **Verifica los rótulos contra la geometría real, no contra tu intención.**
 
+El `barLabel` de una fase no altera el calendario: es copy editable de una barra sólida o punteada,
+incluso en una unidad. Debe vivir en el `DeckPlan`, y el renderer debe medirlo en su geometría real;
+si se recorta, se rechaza en vez de ocultarlo o borrar el texto.
+
 ### 4. La cara que no existe
 
 **El equipo va con FOTOS REALES. NUNCA caras generadas por IA.**
@@ -156,6 +160,8 @@ o una ñ que no está en el subset).
 - **NUNCA** una cifra client-facing sin `evidenceRef`. **Sin procedencia, no entra.**
 - **NUNCA** geometría dibujada a mano. **Una barra sin dato es una barra que miente.**
 - **NUNCA** un rótulo que afirme algo que el eje no pinta. **Verifica contra la geometría real.**
+- **NUNCA** ocultes un `barLabel` para disfrazar falta de espacio. Es copy del plan; el renderer lo mide
+  y falla cerrado si no cabe.
 - **NUNCA** una cara de IA presentada como una persona real del equipo. **Se pide la foto.**
 - **NUNCA** promuevas un artefacto `internal` a la entrega. **Ante la duda, es interno.**
 - **NUNCA** inventes el límite de peso. **Sale de LAS BASES.**

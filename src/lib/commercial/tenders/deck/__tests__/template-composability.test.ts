@@ -77,7 +77,7 @@ const synthesize = (slot: SlotContract): unknown => {
       return clamp(constraints.maxCharacters, 'Texto')
 
     case 'enum':
-      return Object.keys(slot.values ?? {})[0]
+      return Array.isArray(slot.values) ? slot.values[0] : Object.keys(slot.values ?? {})[0]
 
     case 'asset':
     case 'asset-ref':

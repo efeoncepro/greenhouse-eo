@@ -140,6 +140,7 @@ export interface SlotViolation {
     | 'unknown_slot'
     | 'wrong_type'
     | 'disallowed_enum'
+    | 'invalid_value'
     | 'missing_evidence_ref'
     | 'missing_required_field'
   message: string

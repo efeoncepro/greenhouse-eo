@@ -1,3 +1,28 @@
+## Sesión 2026-07-12 (cont. 3) — `TimelineFull` data-driven + labels de barras preservados
+
+**Estado:** el Gantt de SKY (`Resultado temprano, no promesas`) vuelve a mostrar sus tres textos de barra:
+`Movimiento desde la primera semana`, `Producción a cadencia completa` y `La tracción empieza a verse`.
+Su ausencia no era intencional; una versión intermedia los había eliminado al tratar las barras cortas como
+incompatibles con copy.
+
+- `TimelineFull` v0.2 toma `timeUnit` (`day|week|month|quarter|custom`), 3..8 unidades discretas, fases
+  con rangos enteros y hitos de frontera. El compiler deriva desde ese único schedule la grilla, barras,
+  diamantes, conectores y anclajes de borde: no hay porcentajes ni líneas que editar a mano.
+- `phases[].barLabel` es copy opcional y **editable por agente/persona** para barras `work` (sólidas) y
+  `continuous` (punteadas), incluso si ocupan una unidad. Ya no existe una regla arbitraria de “mínimo dos
+  unidades”: sólo `assertSlideFitsCanvas` decide con la geometría final. Si se recorta, el compose falla
+  cerrado; nunca se borra/trunca la etiqueta para hacerlo pasar.
+- Evidencia: `pnpm vitest run src/lib/commercial/tenders` → **97/97**; composición local SKY → **15
+  láminas / 3.5 MB**; frame revisado:
+  `.captures/timelinefull-labels-restored/09-arranque.png`.
+- La skill **domain-free** `deck-studio` queda documentada y espejada byte-a-byte en
+  `.codex/skills/deck-studio/` y `.claude/skills/deck-studio/`; `composition.md` y
+  `evidence-integrity.md` contienen el contrato específico de `TimelineFull`. El companion de tender,
+  AGENTS/CLAUDE, regla auto-load `.claude/rules/tenders.md`, spec, manual, documentación funcional y
+  `project_context.md` apuntan al mismo contrato.
+- No cambia el estado de plataforma: F1 sigue siendo CLI; el runtime agentic, assets y commands siguen
+  perteneciendo a `TASK-1392` (y worker posterior `TASK-1391`). No crear API/UI/capability paralela.
+
 ## Sesión 2026-07-12 (cont. 2) — Deck SKY: firma, ordinales, timeline · PENDIENTE VISUAL PARA CODEX
 
 **Estado del deck SKY:** 15 láminas, PDF 3.5 MB, `.captures/sky-bid/`. Plan auditable en

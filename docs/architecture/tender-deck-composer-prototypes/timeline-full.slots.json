@@ -1,14 +1,15 @@
 {
   "template": "TimelineFull",
-  "version": "0.1",
+  "version": "0.2",
   "viewport": { "width": 1920, "height": 1080 },
   "slots": {
     "sectionLabel": { "selector": "[data-slot='sectionLabel']", "type": "string", "required": false, "constraints": { "maxCharacters": 26, "maxLines": 1, "overflow": "reject" } },
     "title": { "selector": "[data-slot='title']", "type": "rich-string", "required": true, "constraints": { "maxCharacters": 56, "maxLines": 2, "allowedTags": ["em"], "overflow": "reject" } },
     "meta": { "selector": "[data-slot='meta']", "type": "rich-string", "required": false, "constraints": { "maxCharacters": 92, "maxLines": 3, "allowedTags": ["b", "br"], "overflow": "reject" } },
-    "timeAxis": { "selector": "[data-slot='timeAxis']", "type": "array", "required": true, "resolver": "timeline-axis-scale", "constraints": { "minItems": 3, "maxItems": 8, "maxCharactersPerItem": 12, "maxLinesPerItem": 1, "overflow": "reject", "order": "chronological; item index defines the unit number used by phase/milestone resolvers" }, "item": { "type": "string" } },
+    "timeUnit": { "selector": "[data-template='TimelineFull']", "type": "enum", "required": true, "consumer": "validation-only", "values": ["day", "week", "month", "quarter", "custom"], "description": "semantic unit of the discrete schedule; custom still requires ordered labels in timeAxis" },
+    "timeAxis": { "selector": "[data-slot='timeAxis']", "type": "array", "required": true, "constraints": { "minItems": 3, "maxItems": 8, "maxCharactersPerItem": 12, "maxLinesPerItem": 1, "overflow": "reject", "order": "chronological; item index defines the discrete boundary used by phase/milestone layout" }, "item": { "type": "string" } },
     "milestones": { "selector": "[data-slot='milestones']", "type": "array", "required": true, "constraints": { "minItems": 1, "maxItems": 4, "overflow": "reject", "collision": "labels are nowrap; more than 4 milestones collide on the lane" }, "item": { "type": "object", "shape": {
-      "at": { "type": "number", "required": true, "resolver": "timeline-milestone-position", "consumer": "layout", "description": "fractional unit position on the timeAxis (e.g. 1 = end of unit 1, 3 = end of unit 3). Resolver converts it to the diamond's left% and emits the matching dashed connector inside .vlines" },
+      "at": { "type": "number", "required": true, "resolver": "timeline-milestone-position", "consumer": "layout", "description": "integer boundary on timeAxis (e.g. 1 = end of unit 1, 3 = end of unit 3). The timeline layout compiler derives both the diamond and its dashed connector." },
       "label": { "type": "string", "required": true, "maxCharacters": 32, "maxLines": 1 },
       "caption": { "type": "string", "required": true, "maxCharacters": 16, "maxLines": 1 }
     } } },
@@ -19,8 +20,8 @@
       "endUnit": { "type": "number", "required": true, "resolver": "timeline-phase-span", "consumer": "layout", "description": "last timeAxis unit the phase occupies (1-based, inclusive); must be >= startUnit and <= timeAxis length" },
       "title": { "type": "string", "required": true, "maxCharacters": 34, "maxLines": 2 },
       "description": { "type": "string", "required": true, "maxCharacters": 52, "maxLines": 2 },
-      "barLabel": { "type": "string", "required": false, "maxCharacters": 46, "maxLines": 1, "description": "clipped by the bar (nowrap + overflow hidden); omit on bars narrower than 2 units" }
+      "barLabel": { "type": "string", "required": false, "maxCharacters": 46, "maxLines": 1, "description": "editable label inside either a work or continuous bar; its real fit is validated against the rendered bar geometry, not an arbitrary unit-count rule" }
     } } }
   },
-  "presentation": { "brandSurface": "timeline-full-approved-navy-gradient", "composition": "one month axis + one milestone lane + 3–5 phase bars over a shared track; legend is fixed chrome", "schedulePolicy": "phase spans and milestone positions are computed from unit indexes, never hand-placed; a milestone must land on a real unit boundary of the declared timeAxis" }
+  "presentation": { "brandSurface": "timeline-full-approved-navy-gradient", "composition": "one discrete axis + one milestone lane + 3–5 phase bars over a shared track; legend is fixed chrome", "schedulePolicy": "timeUnit, labels, phase spans, axis grid, milestone markers and connectors are compiled from one schedule; a milestone must land on a real unit boundary of the declared timeAxis" }
 }

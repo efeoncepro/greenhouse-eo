@@ -1,10 +1,11 @@
 # Componer el deck de una licitación
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-12 por Claude (con Julio Reyes)
 > **Documentacion funcional:** [tender-deck-composer.md](../../documentation/comercial/tender-deck-composer.md)
 > **Documentacion tecnica:** [GREENHOUSE_TENDER_DECK_COMPOSER_V1.md](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md)
+> **Última actualización:** 2026-07-12 — `TimelineFull` data-driven y `barLabel` editable
 > **Método del bid:** skill `greenhouse-public-private-tenders` → `deck-visual-system.md`
 
 ## Para qué sirve
@@ -57,6 +58,43 @@ contenido**:
 - `docs/architecture/tender-deck-composer-prototypes/examples/sky-deck-plan.json` — diagnóstico ·
   método · matriz de cumplimiento · económica.
 - `.../examples/sky-deck-plan-full.json` — agenda · equipo.
+
+#### Si la lámina es un cronograma (`TimelineFull`)
+
+El cronograma se declara como un schedule discreto; no se editan porcentajes ni conectores en HTML.
+Indica la unidad temporal (`day`, `week`, `month`, `quarter` o `custom`), entre 3 y 8 labels ordenados,
+fases con límites enteros inclusivos y hitos en el cierre de una unidad:
+
+```json
+{
+  "timeUnit": "week",
+  "timeAxis": ["Semana 1", "Semana 2", "Semana 3"],
+  "milestones": [{ "at": 1, "label": "Baseline", "caption": "Fin Semana 1" }],
+  "phases": [
+    {
+      "kind": "work",
+      "startUnit": 1,
+      "endUnit": 2,
+      "title": "Preparación",
+      "description": "Línea base y prioridades",
+      "barLabel": "Movimiento desde la primera semana"
+    },
+    {
+      "kind": "continuous",
+      "startUnit": 2,
+      "endUnit": 3,
+      "title": "Seguimiento",
+      "description": "Medición y optimización",
+      "barLabel": "La tracción empieza a verse"
+    }
+  ]
+}
+```
+
+`barLabel` es opcional y **editable por el agente** en ambas clases de barra (sólida `work` y punteada
+`continuous`), incluso en una fase de una unidad. La grilla, barras, diamantes y conectores se calculan desde
+ese mismo schedule. Un hito entre unidades, un rango fuera del eje o un texto de barra que no cabe hace fallar
+la composición; no se corrige a mano ni se borra la etiqueta para pasar el render.
 
 ### 2. Componer
 

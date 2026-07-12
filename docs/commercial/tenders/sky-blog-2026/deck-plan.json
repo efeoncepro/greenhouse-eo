@@ -275,6 +275,7 @@
         "sectionLabel": "PRIMEROS 90 DÍAS",
         "title": "Resultado temprano, <em>no promesas</em>",
         "meta": "SKY ve movimiento <strong>desde la primera semana</strong>",
+        "timeUnit": "month",
         "timeAxis": [
           "Mes 1",
           "Mes 2",
@@ -282,12 +283,12 @@
         ],
         "milestones": [
           {
-            "at": "1",
+            "at": 1,
             "label": "Primeros artículos",
             "caption": "Fin mes 1"
           },
           {
-            "at": "3",
+            "at": 3,
             "label": "Primer reporte",
             "caption": "Fin mes 3"
           }
@@ -295,24 +296,24 @@
         "phases": [
           {
             "kind": "work",
-            "startUnit": "1",
-            "endUnit": "1",
+            "startUnit": 1,
+            "endUnit": 1,
             "title": "Diagnóstico y quick wins",
             "description": "Capa técnica + páginas a un paso del top 3.",
             "barLabel": "Movimiento desde la primera semana"
           },
           {
             "kind": "work",
-            "startUnit": "2",
-            "endUnit": "2",
+            "startUnit": 2,
+            "endUnit": 2,
             "title": "Ritmo pleno",
             "description": "Cadencia completa y primeros clusters de destino.",
             "barLabel": "Producción a cadencia completa"
           },
           {
             "kind": "continuous",
-            "startUnit": "3",
-            "endUnit": "3",
+            "startUnit": 3,
+            "endUnit": 3,
             "title": "Primera evidencia",
             "description": "Tráfico, palabras clave y visibilidad en IA.",
             "barLabel": "La tracción empieza a verse"

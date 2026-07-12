@@ -521,18 +521,19 @@ Prototipo vivo: `card-grid-full.html` (render `PREVIEW-card-grid-full.png`) — 
 ```text
 title:      string           // "Cronograma del proyecto · <cliente>" (Poppins 600 blanco)
 eyebrow:    string           // "Plan de trabajo" (Geist 600 uppercase, teal)
-meta:       rich string      // resumen arriba-derecha ("N meses · N fases…", tabular)
-units:      string[]         // eje: "Mes 1"…"Mes N" (Geist tabular, uppercase, muted = scaffolding quieto)
-phases:     Array<{ n; title; desc; start; end; continuous? }>  // barra por fase; posición = fracción del eje (start-1)/N … end/N
-milestones: Array<{ label; sub; at }>   // diamante teal + label; at = fracción del eje
+meta:       rich string      // resumen arriba-derecha ("N unidades · N fases…", tabular)
+timeUnit:   day|week|month|quarter|custom  // semántica explícita del eje discreto
+timeAxis:   string[]         // 3..8 labels ordenados; ej. "Semana 1"… o "Trimestre 1"… (Geist tabular, muted)
+phases:     Array<{ title; desc; startUnit; endUnit; kind; barLabel? }>  // enteros inclusivos 1..N; barra = fracción exacta del eje; label editable
+milestones: Array<{ label; sub; at }>   // `at` entero 1..N; diamante + conector derivados de la misma frontera
 ```
 
 **Reglas (piso `dataviz-design` + jerarquía `typography-design`):**
 
-- **Encoding correcto:** fase = **barra de rango** posicionada por fracción de mes (`left=(start-1)/N`, `width=(end-start+1)/N`); hito = **marcador diamante** con **línea conectora** que baja por las fases (convención Gantt: marca la fecha en toda la vista); actividad continua = barra **dashed outline** (always-on). Grilla mensual **sutil** (`repeating-linear-gradient`), sin ejes recargados; todo etiquetado + **leyenda**.
-- **Jerarquía de texto (escalonada, calibrada 2026-07-11):** título slide (52) › **título de fase (27, Poppins, domina el chart)** / hito (18) › eje-mes (16 uppercase muted = scaffolding) / número de fase (16 teal, índice subordinado) › descripción (15 muted) › label de barra (14). El número de fase **NO** compite con el título (era 20 vs 24 → 16 vs 27).
+- **Encoding correcto:** fase = **barra de rango** posicionada por fracción del eje (`left=(start-1)/N`, `width=(end-start+1)/N`); hito = **marcador diamante** con **línea conectora** que baja por las fases. El compiler de `TimelineFull` deriva **grilla, barras, marcadores y conectores** del mismo schedule, por lo que no se puede cambiar N ni el número de hitos dejando geometría de ejemplo. Actividad continua = barra **dashed outline**. Sin ejes recargados; todo etiquetado + **leyenda**.
+- **Jerarquía de texto (escalonada, calibrada 2026-07-11):** título slide (52) › **título de fase (27, Poppins, domina el chart)** / hito (18) › eje temporal (16 uppercase muted = scaffolding) / número de fase (16 teal, índice subordinado) › descripción (15 muted) › label de barra (14). El número de fase **NO** compite con el título (era 20 vs 24 → 16 vs 27).
 - **Full-bleed dark-even:** navy en todo el ancho (blanco legible en cualquier punto) + glows teal/violeta en esquinas + grain. NO el degradado rico de Split (que se aclara en un borde y perdería el texto blanco del otro extremo del eje).
-- **Datos ilustrativos** marcados; el cronograma real se ajusta al plazo de las bases. Las fases muestran **solapes** (dependencias/holgura), no una escalera perfecta.
+- **Integridad temporal:** `timeUnit` no es decoración y los rangos/hitos son fronteras enteras reales del eje (`1 ≤ start ≤ end ≤ N`, `1 ≤ at ≤ N`). El `barLabel` es contenido editable en barras sólidas y punteadas, incluso de una unidad: el renderer mide su geometría real y rechaza sólo el texto que se recortaría. Datos ilustrativos marcados; el cronograma real se ajusta al plazo de las bases. Las fases muestran **solapes** (dependencias/holgura), no una escalera perfecta.
 
 Prototipo vivo: `timeline-full.html` (render `PREVIEW-timeline-full.png`) — plan de 6 meses de SKY (5 fases + 3 hitos), registro institucional.
 

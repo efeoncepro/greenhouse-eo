@@ -2,6 +2,23 @@
 
 ## 2026-07-12
 
+- **Tender Deck Composer — `TimelineFull` v0.2 y labels de barra recuperados.** El Gantt deja de ser un
+  molde de seis meses: acepta `timeUnit` (`day|week|month|quarter|custom`), 3..8 labels de eje, rangos
+  enteros de fases e hitos de frontera. Un compiler deriva de ese único schedule grilla, barras, diamantes,
+  conectores y anclajes de borde; no hay porcentajes ni líneas de ejemplo que editar. `barLabel` vuelve a
+  ser copy **editable** del `DeckPlan` en barras sólidas y punteadas, incluso de una unidad; su ajuste se
+  valida contra la geometría real (`assertSlideFitsCanvas`), sin regla artificial de span mínimo ni
+  ocultamiento/truncado para pasar. SKY recupera `Movimiento desde la primera semana`, `Producción a
+  cadencia completa` y `La tracción empieza a verse`. Evidencia: 97/97 tests de Tender y compose SKY de
+  15 láminas / 3.5 MB revisado visualmente.
+
+- **`deck-studio` — contrato de cronogramas sincronizado para Codex y Claude.** La skill domain-free queda
+  espejada en `.codex/skills/deck-studio/` y `.claude/skills/deck-studio/`; `composition.md` y
+  `evidence-integrity.md` explicitan que el agente escribe schedule + `barLabel`, nunca geometría manual,
+  y que el renderer falla cerrado si el copy no cabe. El canon Tender, companion de invariantes, manual,
+  documentación funcional, `AGENTS.md`, `CLAUDE.md`, `.claude/rules/tenders.md`, `project_context.md` y
+  handoff enlazan la misma regla.
+
 - **Tender Deck Composer — la 4ª bug class: el chrome que depende de DÓNDE vive en el DOM.** (a) La firma `efeoncepro.com` perdía el `mix-blend-mode: luminosity` **según la lámina**: el blend se mezcla con el backdrop de **su** contexto de apilamiento, y **21 de 22** plantillas tenían la burbuja **fuera** del `.slide` (hermana, hija de `<body>`) → sin degradado debajo, se pintaba plana. **No era el PDF**: se verificó rasterizándolo con poppler contra el PNG — el blend sobrevive al `print-to-pdf`. Ahora la firma vive dentro del `.slide` en las 22, con guard **por DOM** (el primer guard chequeaba texto y daba por buenas las plantillas que usan `<div class="slide">`: *un check que miente es peor que no tenerlo*). (b) El hito de timeline en la última unidad caía al **100%** del eje y su etiqueta se partía contra el borde — el prototipo lo esquivaba a mano (16%, 50%, 91%, nunca 100%). Fix general derivado del dato: el **rombo se queda en su fecha real** y la **etiqueta se ancla hacia adentro** (`.at-start`/`.at-end`). ⚠️ Y una corrección de **autoría**: `at` es el **FIN de la unidad**, así que un hito rotulado "Semana 1" con `at:1` caía en el cierre del Mes 1 — **la lámina afirmaba una fecha falsa**, que es **fabricación**, no un bug de layout. Canon: `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → "La 4ª bug class".
 
 - **Tender Deck Composer — el catálogo era "25/25 con contrato" pero sólo 18 componían.** Componer la **primera oferta real** (SKY, la primera que usó más de 6 plantillas) reventó **7 de 25**: tener un `slots.json` no es ser componible, y nadie las había ejercitado. Las 7 eran **4 clases de bug del motor**, cerradas en la causa: la evidencia (`validation-only`) sólo se saltaba en arrays —el `sourceRef` de `QuoteSplit` escribía sobre el nodo `.slide` y **borraba la lámina**—; los objetos no honraban resolvers; `fixed-*` se aplicaba a medias (y donde el contrato tipaba `asset` con `agentMayOverride:false`, **el tipo mentía**); y `paired-array` no existía (una comparación son **dos columnas con markup distinto** → dos blueprints). **Dos más sólo se vieron mirando el frame**, con los tests en verde: el barrido borraba el **ordinal derivado** (los 4 pasos salían como "01") y un **array dentro de un objeto** se aplanaba con las comas del join a la vista. Guard nuevo: `template-composability.test.ts` intenta llenar las 25 → **"componible" es verificable en CI**, con `KNOWN_BROKEN` como contrato de dos vías. **24/25**; queda `ChartSplit` (su callout requiere una **decisión de diseño**, no un fix mecánico). **Lección: los tests verdes no son el gate de un deck — mirar los frames, todos.** Canon: `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → "La 3ª bug class".

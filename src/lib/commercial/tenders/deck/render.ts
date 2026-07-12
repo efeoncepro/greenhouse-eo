@@ -25,6 +25,7 @@ import type { Browser, Page } from 'playwright'
 
 import type { SlideSpec, SlotContract, SlotValue, TemplateContract } from './contracts'
 import { resolveFieldDirective, type FieldDirective } from './resolvers'
+import { layoutTimelineSchedule, parseTimelineSchedule } from './timeline'
 
 export interface RenderTarget {
   /** PNG por lámina (revisión visual) o PDF (el entregable). */
@@ -265,7 +266,8 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
         continue
       }
 
-      const target = (el.querySelector('[data-slot-field="src"]') as HTMLImageElement | null) ?? (el as HTMLImageElement)
+      const target =
+        (el.querySelector('[data-slot-field="src"]') as HTMLImageElement | null) ?? (el as HTMLImageElement)
 
       target.setAttribute('src', String(src))
       continue
@@ -482,10 +484,7 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
             const directive = instruction.fieldPlan?.[`${index}.${fieldName}`] ?? { mode: 'text' }
 
             // Un campo sin valor y sin resolver no se escribe (lo limpia el barrido de abajo).
-            if (
-              directive.mode === 'text' &&
-              (fieldValue === undefined || fieldValue === null || fieldValue === '')
-            ) {
+            if (directive.mode === 'text' && (fieldValue === undefined || fieldValue === null || fieldValue === '')) {
               continue
             }
 
@@ -624,6 +623,56 @@ export class SlotFillError extends Error {
 }
 
 /**
+ * TimelineFull owns a second, derived lane: the vertical connector for each milestone. It cannot be
+ * an authored slot, because then labels, diamonds and connectors could disagree. The layout compiler
+ * emits all three from the same schedule after the regular array filler has created the milestone DOM.
+ */
+const applyTimelineLayout = async (page: Page, slide: SlideSpec): Promise<void> => {
+  if (slide.template !== 'TimelineFull') return
+
+  const parsed = parseTimelineSchedule(slide.slots)
+
+  if (!parsed.schedule) {
+    throw new SlotFillError(
+      slide.slideId,
+      parsed.issues.map(issue => `[${issue.slot}] ${issue.message}`)
+    )
+  }
+
+  const layout = layoutTimelineSchedule(parsed.schedule)
+
+  const problem = await page.evaluate(({ unitWidth, milestonePositions }) => {
+    const root = document.querySelector<HTMLElement>('[data-template="TimelineFull"]')
+    const connectorHost = root?.querySelector<HTMLElement>('.vlines')
+    const milestoneNodes = root ? Array.from(root.querySelectorAll<HTMLElement>('.mstone')) : []
+
+    if (!root || !connectorHost) return 'TimelineFull no declara el canvas o el host .vlines requerido por el layout.'
+
+    if (milestoneNodes.length !== milestonePositions.length) {
+      return `TimelineFull tiene ${milestoneNodes.length} marcadores para ${milestonePositions.length} hitos; no se puede garantizar su correspondencia.`
+    }
+
+    root.style.setProperty('--m', unitWidth)
+    milestoneNodes.forEach((milestone, index) => milestone.style.setProperty('left', milestonePositions[index]!))
+    connectorHost.replaceChildren(
+      ...milestonePositions.map(left => {
+        const connector = document.createElement('div')
+
+        connector.className = 'vline'
+        connector.style.left = left
+        connector.setAttribute('aria-hidden', 'true')
+
+        return connector
+      })
+    )
+
+    return null
+  }, layout)
+
+  if (problem) throw new SlotFillError(slide.slideId, [problem])
+}
+
+/**
  * Llena una lámina y devuelve el HTML resultante (útil para snapshot/debug), dejando la página
  * lista para capturar.
  */
@@ -649,6 +698,8 @@ export const fillSlide = async (
   if (problems.length > 0) {
     throw new SlotFillError(slide.slideId, problems)
   }
+
+  await applyTimelineLayout(page, slide)
 
   // Las fuentes pueden re-layoutear tras escribir el copy: esperar de nuevo evita capturar un frame
   // con el fallback de sistema (un deck con la tipografía equivocada es un deck fuera de marca).

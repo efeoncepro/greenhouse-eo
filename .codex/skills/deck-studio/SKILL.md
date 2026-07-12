@@ -235,6 +235,11 @@ visual es señal de rigor; un deck que cambia de lenguaje cada tres láminas se 
 
 Detalle completo (catálogo, selector, CLI, PDF, las bug classes del motor): **[`composition.md`](composition.md)**.
 
+**Cronogramas `TimelineFull`.** El autor o agente escribe el schedule (`timeUnit`, eje, fases, hitos y
+`barLabel`); nunca porcentajes, líneas de grilla ni conectores. `barLabel` es copy editable en barras
+sólidas **y** punteadas, incluso si una fase ocupa una sola unidad. La geometría real decide si cabe y el
+composer falla cerrado si se recortaría. Contrato operativo: [`composition.md`](composition.md#timelinefull--cronograma-data-driven).
+
 ---
 
 ## Router — qué cargar según lo que estés haciendo
