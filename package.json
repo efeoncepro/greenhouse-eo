@@ -259,7 +259,8 @@
     "postinstall": "npm run build:icons",
     "clean": "node scripts/clean-paths.mjs .next-local .next",
     "clear": "node scripts/clean-paths.mjs node_modules .next-local .next",
-    "prepare": "husky"
+    "prepare": "husky",
+    "tender:render": "tsx scripts/commercial/render-tender-doc.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [

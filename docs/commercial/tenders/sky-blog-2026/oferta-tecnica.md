@@ -18,10 +18,10 @@ totalidad de los requerimientos, sin excepciones ni reservas.
 
 | Requisito de las Bases | Cumplimiento |
 |---|---|
-| Persona jurídica legalmente constituida (§2.3) | ✅ Efeonce Group SpA |
-| Sin demandas ni reclamos pendientes contra SKY (§2.3) | ✅ Se declara no tener demandas ni reclamos pendientes en contra de SKY, ante organismos judiciales o del Estado |
-| Presentación en formato PDF por la plataforma Wherex (§2.6.1) | ✅ |
-| Validez de la oferta: 120 días (§2.9) | ✅ Declarada en la carátula |
+| Persona jurídica legalmente constituida (§2.3) | **Cumple** — Efeonce Group SpA |
+| Sin demandas ni reclamos pendientes contra SKY (§2.3) | **Cumple** — se declara no tener demandas ni reclamos pendientes en contra de SKY, ante organismos judiciales o del Estado |
+| Presentación en formato PDF por la plataforma Wherex (§2.6.1) | **Cumple** |
+| Validez de la oferta: 120 días (§2.9) | **Cumple** — declarada en la carátula |
 
 ### Oferta Técnica — Definición del servicio (§3.3)
 
@@ -46,12 +46,12 @@ totalidad de los requerimientos, sin excepciones ni reservas.
 
 | Requisito de las Bases | Estado |
 |---|---|
-| **Precio** | ✅ Oferta Económica |
-| **Condiciones de pago** — 30 días desde la aceptación conforme de la factura | ✅ Oferta Económica |
-| **Reajustes** — sin reajuste durante la vigencia | ✅ Oferta Económica |
-| **Duración y condiciones de término** — 2 años renovables, con aviso de 60 días (§3.3.8) | ✅ Oferta Económica |
-| **Desembolsos** | ✅ Oferta Económica — **no aplican**: el valor mensual es todo incluido |
-| **Documento Excel con propuesta económica** (§1.2, documento integrante) | ✅ Se acompaña |
+| **Precio** | **Cumple** — Oferta Económica |
+| **Condiciones de pago** — 30 días desde la aceptación conforme de la factura | **Cumple** — Oferta Económica |
+| **Reajustes** — sin reajuste durante la vigencia | **Cumple** — Oferta Económica |
+| **Duración y condiciones de término** — 2 años renovables, con aviso de 60 días (§3.3.8) | **Cumple** — Oferta Económica |
+| **Desembolsos** | **Cumple** — Oferta Económica: **no aplican**; el valor mensual es todo incluido |
+| **Documento Excel con propuesta económica** (§1.2, documento integrante) | **Cumple** — se acompaña |
 
 ---
 
@@ -292,13 +292,13 @@ excepciones ni reservas.**
 
 | Incumplimiento (§3.5 de las Bases) | Penalización | Aceptación |
 |---|---|---|
-| Retraso en la entrega de la planificación mensual | 2% del valor mensual por cada día hábil de atraso, con un máximo de 10% | ✅ Aceptada |
-| Retraso en la entrega de contenidos comprometidos | 2% del valor mensual por cada día hábil de atraso, hasta un máximo de 15% | ✅ Aceptada |
-| Incumplimiento en la entrega del reporte mensual | 5% del valor mensual del servicio | ✅ Aceptada |
-| Contenidos sin optimización SEO o que no cumplan lo requerido | SKY podrá rechazar el contenido y exigir su corrección sin costo adicional | ✅ Aceptada |
-| Incumplimiento de los tiempos de respuesta establecidos | 2% del valor mensual por evento, hasta un máximo de 10% mensual | ✅ Aceptada |
-| Reiteración de incumplimientos (3 o más en un período de 3 meses) | Plan de mejora formal y, de persistir, término anticipado del contrato | ✅ Aceptada |
-| Incumplimiento de plazos en contenidos ad-hoc comprometidos | 2% del valor del requerimiento por cada día hábil de atraso, salvo reprogramación aprobada por SKY | ✅ Aceptada |
+| Retraso en la entrega de la planificación mensual | 2% del valor mensual por cada día hábil de atraso, con un máximo de 10% | **Aceptada** |
+| Retraso en la entrega de contenidos comprometidos | 2% del valor mensual por cada día hábil de atraso, hasta un máximo de 15% | **Aceptada** |
+| Incumplimiento en la entrega del reporte mensual | 5% del valor mensual del servicio | **Aceptada** |
+| Contenidos sin optimización SEO o que no cumplan lo requerido | SKY podrá rechazar el contenido y exigir su corrección sin costo adicional | **Aceptada** |
+| Incumplimiento de los tiempos de respuesta establecidos | 2% del valor mensual por evento, hasta un máximo de 10% mensual | **Aceptada** |
+| Reiteración de incumplimientos (3 o más en un período de 3 meses) | Plan de mejora formal y, de persistir, término anticipado del contrato | **Aceptada** |
+| Incumplimiento de plazos en contenidos ad-hoc comprometidos | 2% del valor del requerimiento por cada día hábil de atraso, salvo reprogramación aprobada por SKY | **Aceptada** |
 
 **Cómo se sostiene el compromiso.** Efeonce no acepta estas penalidades confiando en que no se aplicarán:
 las asume porque el servicio está diseñado para no gatillarlas. La grilla editorial se aprueba **antes** de
