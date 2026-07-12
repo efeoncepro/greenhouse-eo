@@ -34,7 +34,11 @@ import {
   ProposalRenderRejectedError,
   ProposalRenderStateError
 } from './errors'
-import { assertEvidenceAllowedForAudience, buildProposalRenderProjection } from './render-projection'
+import {
+  assertEvidenceAllowedForAudience,
+  buildProposalRenderProjection,
+  type ProposalRenderProjection
+} from './render-projection'
 import { extractRenderConstraints, type ProposalRenderConstraints } from './render-constraints'
 import type { ProposalActor, ProposalAudience } from './types'
 
@@ -188,9 +192,24 @@ export interface RequestProposalRenderInput {
   actor: ProposalActor
 }
 
-export const requestProposalRender = async (
-  input: RequestProposalRenderInput
-): Promise<{ job: ProposalRenderJobRecord; idempotent: boolean }> => {
+/**
+ * TASK-1399 — LOS GATES DE ADMISIBILIDAD DEL RENDER, en una sola función READ-ONLY.
+ *
+ * Existían inline dentro de `requestProposalRender`. Extraerlos NO es cosmético: cualquier consumer
+ * que quiera decir "¿esto se va a poder generar?" ANTES de escribir (el preview de la acción
+ * gobernada de Nexa, un futuro botón de UI que deshabilita "Generar" con el motivo) necesita
+ * ejercitar los MISMOS gates. Una copia de estas reglas en el preview es drift garantizado: el día
+ * que se agregue un gate nuevo, el preview mentiría y el usuario confirmaría algo que va a fallar.
+ *
+ * No muta nada; sólo lee la proyección y lanza el rechazo tipado que corresponda.
+ */
+export const assertProposalRenderAdmissible = async (
+  input: Omit<RequestProposalRenderInput, 'actor'> & { actor: Pick<ProposalActor, 'kind'> }
+): Promise<{
+  projection: ProposalRenderProjection
+  constraints: ProposalRenderConstraints
+  evidenceIds: string[]
+}> => {
   if (!isArtifactRenderJobsEnabled()) {
     throw new ProposalRenderRejectedError(
       'flag_disabled',
@@ -242,11 +261,6 @@ export const requestProposalRender = async (
 
   assertEvidenceAllowedForAudience(projection, evidenceIds, input.audience)
 
-  const evidenceRefs: RenderJobEvidenceRef[] = evidenceIds.map(id => ({
-    evidenceId: id,
-    audience: projection.allowedEvidence.find(e => e.evidenceId === id)!.audience
-  }))
-
   // Gate 2 — constraints del requisito-set, FIJADAS en el job.
   const constraints = extractRenderConstraints(projection.requirements)
 
@@ -264,6 +278,22 @@ export const requestProposalRender = async (
       'El deadline de la propuesta ya venció: no se encola un render para un proceso cerrado.'
     )
   }
+
+  return { projection, constraints, evidenceIds }
+}
+
+export const requestProposalRender = async (
+  input: RequestProposalRenderInput
+): Promise<{ job: ProposalRenderJobRecord; idempotent: boolean }> => {
+  const { manifest } = input
+
+  // Los gates NO se re-implementan acá: se ejercitan (los mismos que ve el preview).
+  const { projection, constraints, evidenceIds } = await assertProposalRenderAdmissible(input)
+
+  const evidenceRefs: RenderJobEvidenceRef[] = evidenceIds.map(id => ({
+    evidenceId: id,
+    audience: projection.allowedEvidence.find(e => e.evidenceId === id)!.audience
+  }))
 
   const manifestHash = hashResolvedManifest(manifest)
 

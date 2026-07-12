@@ -33,9 +33,22 @@ import {
 import { PRICING_OUTPUT_CURRENCIES, type PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 import { simulateQuotePricingFromService } from '@/lib/finance/pricing/simulate-quote-pricing'
 
+import { can } from '@/lib/entitlements/runtime'
+import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
+import { listProposalsForOperator } from '@/lib/commercial/tenders/proposals/operator-view'
+import {
+  ProposalOrgResolutionError,
+  resolveProposalStudioOwnerOrg
+} from '@/lib/commercial/tenders/proposals/org-resolution'
+
 import { recordNexaActionEvent } from './actions/events-store'
 import { buildNexaActionContext, canUseNexaActionRuntime, resolveNexaActionProposal } from './actions/registry'
-import { isNexaActionRuntimeEnabled, isNexaKnowledgeRetrievalEnabled, isNexaKnowledgeSynthesisBriefEnabled } from './flags'
+import {
+  isNexaActionRuntimeEnabled,
+  isNexaKnowledgeRetrievalEnabled,
+  isNexaKnowledgeSynthesisBriefEnabled,
+  isNexaProposalActionsEnabled
+} from './flags'
 import type {
   NexaRuntimeContext,
   NexaToolInvocation,
@@ -142,6 +155,17 @@ const hasRoleCode = (tenant: NexaRuntimeContext, roleCode: string) => tenant.rol
 
 const isInternalOperationsUser = (tenant: NexaRuntimeContext) =>
   hasRouteGroup(tenant, 'internal') || hasRouteGroup(tenant, 'agency') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+
+/** TASK-1399 — subject canónico de entitlements desde el contexto de sesión de Nexa (nunca del LLM). */
+const buildNexaProposalSubject = (tenant: NexaRuntimeContext): TenantEntitlementSubject => ({
+  userId: tenant.userId,
+  tenantType: tenant.tenantType,
+  roleCodes: tenant.roleCodes,
+  primaryRoleCode: tenant.roleCodes[0] ?? '',
+  routeGroups: tenant.routeGroups,
+  authorizedViews: [],
+  memberId: tenant.memberId
+})
 
 const buildToolUnavailableResult = (toolName: NexaToolName, reason: string): NexaToolResult => ({
   available: false,
@@ -949,7 +973,14 @@ const proposeActionTool: NexaToolDefinition = {
     name: 'propose_action',
     description:
       'PROPONE (no ejecuta) una acción gobernada para que el usuario la confirme antes de que ocurra cualquier cambio. Úsalo SOLO cuando el usuario pide explícitamente realizar una acción registrada. Pasa el `actionKey` exacto de una acción registrada — NUNCA inventes una acción, endpoint ni URL. Para acciones parametrizadas, pasa también `input` con los datos requeridos. Devuelve una previsualización con el impacto; tú debes pedirle al usuario que confirme. Acciones registradas: ' +
-      'mark_notifications_read (marcar todas tus notificaciones como leídas, sin input); author_quote (crear o emitir una cotización; requiere `input` = { mode: "create"|"edit", header: { organizationId, currency, ... }, lines: [...], issueAfterSave }). Si la acción no existe o no está permitida, te lo diré y debes ofrecer una alternativa honesta, no inventar.',
+      'mark_notifications_read (marcar todas tus notificaciones como leídas, sin input); ' +
+      'author_quote (crear o emitir una cotización; requiere `input` = { mode: "create"|"edit", header: { organizationId, currency, ... }, lines: [...], issueAfterSave }); ' +
+      'register_proposal (abrir una propuesta/licitación nueva; `input` = { clientOrganizationName, origin: "public_tender"|"private_rfp"|"direct_sales", title, deadline?, deadlineConfidence?, currency? } — el cliente va por NOMBRE, nunca por id, y si no sabes el deadline NO lo inventes: omítelo); ' +
+      'attach_proposal_rfp (vincular un documento YA SUBIDO a una propuesta; `input` = { proposalId, assetId, kind }); ' +
+      'record_proposal_evidence (registrar una evidencia citable; `input` = { proposalId, locator, method, asOf, classification, audience, sourceAssetId? | externalSourceSnapshot? } — el `audience` es CRÍTICO: "internal" es un dato que NO puede salir al comprador, "client_facing" sí; si no estás seguro, pregúntale al usuario antes de proponer); ' +
+      'request_proposal_render (pedir el deck/PDF de una propuesta; `input` = { proposalId, artifactPurpose, audience, outputTarget, evidenceIds, manifest } — el `manifest` lo produce el composer, NUNCA lo inventes). ' +
+      'Para saber el estado de una propuesta o su proposalId, usa antes el tool `proposal_status`. ' +
+      'Si la acción no existe o no está permitida, te lo diré y debes ofrecer una alternativa honesta, no inventar.',
     parametersJsonSchema: {
       type: 'object',
       additionalProperties: false,
@@ -1497,6 +1528,126 @@ const quotePriceTool: NexaToolDefinition = {
   }
 }
 
+// ── proposal_status (TASK-1399) ─────────────────────────────────────────────
+// Read-only: "¿cómo van mis propuestas y dónde está el PDF?". Consume el MISMO read model del día a
+// día que la UI (`listProposalsForOperator`), scopeado a la org que tiene contratado el módulo — el
+// scope NO lo propone el modelo. Nunca expone el contenido del RFP ni de la evidencia: sólo estado,
+// riesgo de deadline, conteos y el link canónico de descarga (que re-autoriza en cada acceso).
+const proposalStatusTool: NexaToolDefinition = {
+  declaration: {
+    name: 'proposal_status',
+    description:
+      'Muestra el estado de las propuestas/licitaciones del Proposal Studio: en qué etapa están, cuánto falta para el deadline, cuánta evidencia tienen y si su artefacto (deck/PDF) ya está listo para descargar. Úsalo cuando pregunten "¿cómo va la propuesta de X?", "¿qué licitaciones tengo abiertas?" o "¿ya está el deck?". Es SOLO LECTURA: no modifica nada. Puedes filtrar por nombre con `search`.',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        search: {
+          type: 'string',
+          description: 'Filtro por título o cliente (ej. "SKY"). Omitir para ver todas las activas.'
+        },
+        includeClosed: {
+          type: 'boolean',
+          description: 'Incluir las cerradas (ganadas/perdidas/declinadas). Default false.'
+        }
+      },
+      required: []
+    }
+  },
+  isAvailable: tenant =>
+    isNexaProposalActionsEnabled() &&
+    tenant.tenantType !== 'client' &&
+    (isInternalOperationsUser(tenant) || hasRouteGroup(tenant, 'commercial')),
+  async execute(args, context) {
+    const { tenant } = context
+    const generatedAt = new Date().toISOString()
+    const scopeLabel = 'Proposal Studio'
+
+    // El scope sale del ENTITLEMENT (qué org contrató el módulo), nunca de un id que proponga el LLM.
+    let owner: Awaited<ReturnType<typeof resolveProposalStudioOwnerOrg>>
+
+    try {
+      owner = await resolveProposalStudioOwnerOrg()
+    } catch (error) {
+      if (error instanceof ProposalOrgResolutionError) {
+        return buildToolUnavailableResult('proposal_status', error.message)
+      }
+
+      throw error
+    }
+
+    // La capability se re-verifica acá: que el tool esté disponible no autoriza la lectura.
+    if (!can(buildNexaProposalSubject(tenant), 'commercial.proposal.read', 'read', 'tenant')) {
+      return buildToolUnavailableResult('proposal_status', 'No tienes acceso a las propuestas del Proposal Studio.')
+    }
+
+    const rows = await listProposalsForOperator({
+      ownerOrgId: owner.organizationId,
+      includeClosed: args.includeClosed === true,
+      limit: 25
+    })
+
+    const search = typeof args.search === 'string' ? args.search.trim().toLowerCase() : ''
+    const filtered = search ? rows.filter(row => row.title.toLowerCase().includes(search)) : rows
+
+    if (filtered.length === 0) {
+      return {
+        available: true,
+        summary: search
+          ? `No encontré ninguna propuesta que coincida con "${search}".`
+          : 'No hay propuestas activas en el Proposal Studio.',
+        source: 'postgres',
+        scopeLabel,
+        generatedAt,
+        metrics: [],
+        raw: { total: 0, search: search || null }
+      }
+    }
+
+    const atRisk = filtered.filter(row => row.deadlineRisk === 'at_risk' || row.deadlineRisk === 'expired').length
+    const withArtifact = filtered.filter(row => row.latestArtifact?.downloadUrl).length
+
+    return {
+      available: true,
+      summary:
+        `${filtered.length} propuesta${filtered.length === 1 ? '' : 's'} en el Proposal Studio` +
+        `${atRisk > 0 ? `, ${atRisk} con el plazo encima o vencido` : ''}.`,
+      source: 'postgres',
+      scopeLabel,
+      generatedAt,
+      metrics: [
+        { label: 'Propuestas', value: String(filtered.length) },
+        { label: 'Plazo crítico', value: String(atRisk), tone: atRisk > 0 ? 'warning' : 'default' },
+        { label: 'Con documento listo', value: String(withArtifact) }
+      ],
+      raw: {
+        // Sólo estado y metadata: NUNCA contenido del RFP ni de la evidencia.
+        proposals: filtered.map(row => ({
+          proposalId: row.proposalId,
+          title: row.title,
+          state: row.state,
+          origin: row.origin,
+          deadline: row.deadline,
+          deadlineRisk: row.deadlineRisk,
+          evidenceCount: row.counts.evidence,
+          assetCount: row.counts.assets,
+          requirementCount: row.counts.requirements,
+          artifact: row.latestArtifact
+            ? {
+                purpose: row.latestArtifact.artifactPurpose,
+                state: row.latestArtifact.state,
+                failureCode: row.latestArtifact.failureCode,
+                downloadUrl: row.latestArtifact.downloadUrl
+              }
+            : null,
+          renderJobsInFlight: row.renderJobsInFlight,
+          renderJobsNeedingAttention: row.renderJobsNeedingAttention
+        }))
+      }
+    }
+  }
+}
+
 const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   check_payroll: checkPayrollTool,
   get_otd: getOtdTool,
@@ -1509,7 +1660,8 @@ const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   propose_action: proposeActionTool,
   get_insight: getInsightTool,
   list_insights: listInsightsTool,
-  quote_price: quotePriceTool
+  quote_price: quotePriceTool,
+  proposal_status: proposalStatusTool
 }
 
 export const getNexaToolDeclarations = (tenant: NexaRuntimeContext): FunctionDeclaration[] =>

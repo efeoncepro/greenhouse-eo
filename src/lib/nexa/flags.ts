@@ -75,6 +75,17 @@ export const isNexaActionRuntimeEnabled = (): boolean => process.env.NEXA_ACTION
 export const isNexaQuoteAuthorActionEnabled = (): boolean =>
   process.env.NEXA_QUOTE_AUTHOR_ACTION_ENABLED === 'true'
 
+// TASK-1399 — per-action allowlist del bloque Proposal Studio (`register_proposal`,
+// `attach_proposal_rfp`, `record_proposal_evidence`, `request_proposal_render`) + el tool read-only
+// `proposal_status`. Default OFF (independiente del master flag): operar una licitación desde el chat
+// toca evidencia con audience (una evidencia interna lleva loaded cost = piso de negociación), así que
+// el bloque nace gateado explícitamente además del runtime master. Con OFF, el resolver devuelve gap
+// honesto `runtime_disabled`, el confirm rechaza y el tool de estado no se ofrece. La mutación SIEMPRE
+// ocurre en el confirm humano; los commands re-enforzan entitlement per-ORG + capability + audience.
+// Server-only: que Nexa pueda operar propuestas es decisión de runtime, no de la UI.
+export const isNexaProposalActionsEnabled = (): boolean =>
+  process.env.NEXA_PROPOSAL_ACTIONS_ENABLED === 'true'
+
 // TASK-1087 — Prompts sugeridos data-aware (Tier 2). Default OFF: con OFF, los prompts del chat
 // flotante se quedan en Tier 1/1.5 (plantillas por ruta + nombre real de la entidad), byte-idéntico
 // al comportamiento previo. Con ON, el panel consulta `GET /api/nexa/suggested-prompts` y, si hay

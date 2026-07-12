@@ -6,12 +6,21 @@ import { ROLE_CODES } from '@/config/role-codes'
 
 import { isNexaActionRuntimeEnabled } from '../flags'
 import { authorQuoteAction } from './author-quote'
+import { isNexaActionBlockedError } from './blocked-error'
 import { markNotificationsReadAction } from './pilot-mark-notifications-read'
+import {
+  attachProposalRfpAction,
+  proposalStudioActions,
+  recordProposalEvidenceAction,
+  registerProposalAction,
+  requestProposalRenderAction
+} from './proposal-studio'
 import {
   NEXA_ACTION_PROPOSAL_CONTRACT_VERSION,
   type NexaActionContext,
   type NexaActionDefinition,
   type NexaActionGap,
+  type NexaActionPreviewResult,
   type NexaActionProposal
 } from './types'
 
@@ -61,8 +70,17 @@ export const buildNexaActionContext = (source: NexaActionContextSource): NexaAct
 // valida el input via `inputSchema` antes de invocar los callbacks tipados, así que `any` es seguro.
 const NEXA_ACTION_REGISTRY: Record<string, NexaActionDefinition<any>> = {
   [markNotificationsReadAction.actionKey]: markNotificationsReadAction,
-  [authorQuoteAction.actionKey]: authorQuoteAction
+  [authorQuoteAction.actionKey]: authorQuoteAction,
+  // TASK-1399 — Proposal Studio: el ciclo completo de una propuesta desde el chat (registrar →
+  // adjuntar el RFP → registrar evidencia → pedir el deck). Todas detrás de su propio flag.
+  [registerProposalAction.actionKey]: registerProposalAction,
+  [attachProposalRfpAction.actionKey]: attachProposalRfpAction,
+  [recordProposalEvidenceAction.actionKey]: recordProposalEvidenceAction,
+  [requestProposalRenderAction.actionKey]: requestProposalRenderAction
 }
+
+/** Las 4 del Proposal Studio, para que el tool describa exactamente lo que el registry expone. */
+export const PROPOSAL_STUDIO_ACTION_KEYS = proposalStudioActions.map(action => action.actionKey)
 
 export const getNexaActionDefinition = (actionKey: string): NexaActionDefinition<any> | null =>
   NEXA_ACTION_REGISTRY[actionKey] ?? null
@@ -151,7 +169,30 @@ export const resolveNexaActionProposal = async (
     actionInput = parsed.data
   }
 
-  const preview = await definition.buildPreview(context, actionInput)
+  // TASK-1399 — el cuarto gate: INVARIANTES DE DOMINIO. La acción existe, está habilitada, hay
+  // permiso y el input valida… pero el estado real la bloquea (evidencia interna citada en un
+  // artefacto para el cliente, deadline vencido, validador en rojo). Antes eso sólo podía morir en
+  // el `execute`, DESPUÉS de que el humano confirmara — una tarjeta que prometía algo que iba a
+  // fallar cerrado. Ahora el preview lo bloquea y Nexa lo EXPLICA en vez de proponerlo.
+  // Sólo `NexaActionBlockedError` se traduce a gap: cualquier otra excepción es un bug y sigue ruidosa.
+  let preview: NexaActionPreviewResult
+
+  try {
+    preview = await definition.buildPreview(context, actionInput)
+  } catch (error) {
+    if (isNexaActionBlockedError(error)) {
+      return {
+        kind: 'gap',
+        gap: {
+          reason: 'unavailable',
+          message: error.userMessage,
+          deepLink: error.deepLink ?? definition.deepLinkFallback
+        }
+      }
+    }
+
+    throw error
+  }
 
   const proposal: NexaActionProposal = {
     contractVersion: NEXA_ACTION_PROPOSAL_CONTRACT_VERSION,

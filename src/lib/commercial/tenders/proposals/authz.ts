@@ -9,14 +9,21 @@ import 'server-only'
  *      abre nada (default OFF en todos los ambientes).
  *   2. CAPABILITY del actor (`can()`) — autoriza la operación DENTRO de una org habilitada.
  *
- * TODO consumer (API route, CLI, tools del intake agent, futuros UI/Nexa/MCP) pasa por acá antes
+ * TODO consumer (API route, CLI, tools del intake agent, Nexa, futuros UI/MCP) pasa por acá antes
  * de tocar un primitive. Los `client_*` nunca operan propuestas en F0 (defensa en profundidad
  * además de las capabilities, que ningún rol cliente tiene).
+ *
+ * ⚠️ TASK-1399 — DOS entradas, UNA puerta. El núcleo (`assertProposalStudioAccessForSubject`) opera
+ * sobre el `TenantEntitlementSubject` canónico; `assertProposalStudioAccess` es el adapter para
+ * quien ya tiene un `TenantContext` (las rutas). Nexa entra por el núcleo con el subject derivado de
+ * su sesión. **NUNCA** escribas un segundo gate para un consumer nuevo: una puerta duplicada es
+ * exactamente el drift que termina dejando pasar una org sin módulo contratado.
  */
 
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { can } from '@/lib/entitlements/runtime'
+import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 import { ProposalEntitlementError, ProposalForbiddenError } from './errors'
@@ -46,19 +53,22 @@ const NEED_TO_CAPABILITY: Record<
   render_retry: { capability: 'commercial.proposal.render', action: 'execute' }
 }
 
-export const assertProposalStudioAccess = async (input: {
-  tenant: TenantContext
+/**
+ * EL NÚCLEO. Recibe el subject canónico de entitlements — el mismo que produce una ruta desde su
+ * `TenantContext` y el mismo que produce Nexa desde su sesión. Cualquier consumer nuevo entra por acá.
+ */
+export const assertProposalStudioAccessForSubject = async (input: {
+  subject: TenantEntitlementSubject
   ownerOrgId: string
   need: ProposalAccessNeed
 }): Promise<{ actor: ProposalActor }> => {
-  const { tenant, ownerOrgId, need } = input
+  const { subject, ownerOrgId, need } = input
 
-  if (tenant.tenantType === 'client') {
+  if (subject.tenantType === 'client') {
     throw new ProposalForbiddenError(need)
   }
 
   const { capability, action } = NEED_TO_CAPABILITY[need]
-  const subject = buildTenantEntitlementSubject(tenant)
 
   if (!can(subject, capability, action)) {
     throw new ProposalForbiddenError(need)
@@ -84,6 +94,18 @@ export const assertProposalStudioAccess = async (input: {
   }
 
   return {
-    actor: tenant.memberId ? { kind: 'member', memberId: tenant.memberId } : { kind: 'system' }
+    actor: subject.memberId ? { kind: 'member', memberId: subject.memberId } : { kind: 'system' }
   }
 }
+
+/** Adapter para consumers que ya tienen `TenantContext` (las API routes). Misma puerta, misma lógica. */
+export const assertProposalStudioAccess = async (input: {
+  tenant: TenantContext
+  ownerOrgId: string
+  need: ProposalAccessNeed
+}): Promise<{ actor: ProposalActor }> =>
+  assertProposalStudioAccessForSubject({
+    subject: buildTenantEntitlementSubject(input.tenant),
+    ownerOrgId: input.ownerOrgId,
+    need: input.need
+  })
