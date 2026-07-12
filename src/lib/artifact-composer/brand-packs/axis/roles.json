@@ -1,0 +1,26 @@
+{
+  "$comment": "Roles semánticos del brand pack `axis` (TASK-1393 Slice 3b). Un rol asigna INTENCIÓN reusable sin revelar un HEX: las recipes y el molde referencian roles, nunca valores. Los contrastPairs son las promesas WCAG AA que el compilador evalúa SIEMPRE (advisory para axis — afinado a mano; blocking para packs de cliente).",
+  "roles": {
+    "surface": "--axis-deck-surface-60",
+    "surfaceBright": "--axis-deck-surface-50",
+    "surfaceEdge": "--axis-deck-surface-70",
+    "ink": "--axis-ppt-indigo-950",
+    "onDark": "--axis-ppt-neutral-50",
+    "accent": "--axis-deck-teal-500",
+    "accentDeep": "--axis-deck-teal-550",
+    "accentAlt": "--axis-deck-violet-550",
+    "fieldDeep": "--axis-deck-navy-980",
+    "field": "--axis-deck-navy-920",
+    "fieldMid": "--axis-ppt-blue-800",
+    "fieldEdge": "--axis-deck-navy-860"
+  },
+  "contrastPairs": [
+    { "fg": "onDark", "bg": "field", "min": 4.5, "context": "copy blanco sobre el campo navy (mayoría de las láminas oscuras)" },
+    { "fg": "onDark", "bg": "fieldDeep", "min": 4.5, "context": "copy blanco sobre el navy profundo (rich content)" },
+    { "fg": "onDark", "bg": "fieldMid", "min": 4.5, "context": "copy blanco sobre el borde alto del degradado" },
+    { "fg": "ink", "bg": "surface", "min": 4.5, "context": "tinta indigo sobre panel claro (HighlightWave, paneles glass claros)" },
+    { "fg": "ink", "bg": "surfaceBright", "min": 4.5, "context": "tinta indigo sobre superficie brillante" },
+    { "fg": "accent", "bg": "fieldDeep", "min": 3, "context": "acentos/numerales teal sobre navy profundo (texto grande)" },
+    { "fg": "accentAlt", "bg": "surface", "min": 3, "context": "titulares violeta italic sobre panel claro (texto grande)" }
+  ]
+}
