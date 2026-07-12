@@ -22,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD — predecessor obligatorio de TASK-1391`
 - Domain: `commercial|data|ops`
-- Blocked by: `arbitraje de ownership de greenhouse_commercial.tenders entre Tender Proposal Studio y RESEARCH-007 antes de crear la tabla`
+- Blocked by: `none — ownership arbitrado 2026-07-12 (ADR GREENHOUSE_TENDER_DISCOVERY_OWNERSHIP_BOUNDARY_DECISION_V1.md, Accepted): el Studio es dueño de greenhouse_commercial.tenders; RESEARCH-007 de public_tender*; la promoción es un command human-gated, nunca un INSERT desde discovery. Slice 0 pasa de arbitrar a APLICAR el ADR (confirmar schema real, keys, FKs y contrato de handoff).`
 - Branch: `task/TASK-1392-tender-proposal-studio-foundation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -218,9 +218,11 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 0 — Arbitraje de ownership y contrato F0
+### Slice 0 — Aplicar el ADR de ownership y fijar el contrato F0
 
-- Resolver y documentar quién crea/posee `greenhouse_commercial.tenders` y cómo RESEARCH-007 promueve una oportunidad pública sin tabla paralela; abrir/actualizar ADR si la decisión cambia arquitectura vigente.
+> ✅ **El arbitraje YA ocurrió** — ADR `GREENHOUSE_TENDER_DISCOVERY_OWNERSHIP_BOUNDARY_DECISION_V1.md` (Accepted 2026-07-12). Este slice **ya no decide**: **aplica**. El Studio es dueño de `greenhouse_commercial.tenders`; RESEARCH-007 de `public_tender*`; la promoción es `createTender(origin='public_discovery', public_opportunity_id)` con confirmación humana (el GO del bid/no-bid, TASK-684), **nunca** un INSERT desde discovery; `origin=manual` **sin FK** es válido (SKY/Wherex). **NUNCA** guardar estado del bid en `public_tender*` (un re-sync lo pisaría).
+
+- Materializar el contrato del ADR en el schema: `origin` (enum), `public_opportunity_id` nullable + FK, y la unicidad/idempotencia del command de promoción (una oportunidad no puede generar dos Tenders por retry).
 - Confirmar schema real de Cliente 360, API Platform/capabilities/outbox y asset store; fijar keys, FKs, retention contexts y contract de handoff antes de migrar.
 
 ### Slice 1 — Schema additive + state machine persistida

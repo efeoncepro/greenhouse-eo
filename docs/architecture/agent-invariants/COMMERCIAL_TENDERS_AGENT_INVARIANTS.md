@@ -145,10 +145,19 @@ El **Tender Intake Agent** es el molde de toda fase agéntica futura del dominio
 
 - **El composer NO decide el precio.** El monto real lo emite el **cotizador** (`quote-to-cash`). En el
   deck, las cifras de pricing van **reales o marcadas como ilustrativas**, nunca inventadas.
-- **El Deck Composer ≠ RESEARCH-007.** RESEARCH-007 es **discovery público** (Mercado Público/ChileCompra:
-  encontrar y filtrar oportunidades). El Proposal Studio es **producción del bid** (construir la oferta).
-  Convergen **por handoff, no por absorción**. ⚠️ **Ownership de la tabla `greenhouse_commercial.tenders`
-  aún NO está arbitrado** entre ambos programas — no crees esa tabla sin resolverlo (ver §Pendiente en
-  ambos docs).
+- **El Studio ≠ RESEARCH-007 — ownership ARBITRADO (ADR `GREENHOUSE_TENDER_DISCOVERY_OWNERSHIP_BOUNDARY_DECISION_V1.md`, Accepted 2026-07-12):**
+  - El **Studio es dueño de `greenhouse_commercial.tenders`** (+ `tender_state_transitions`,
+    `tender_assets`, `tender_requirements`): el aggregate de **la oferta que Efeonce construye, pública o
+    privada**.
+  - **RESEARCH-007 es dueño de `public_tender*`**: el **espejo re-sincronizable** del radar Mercado
+    Público.
+  - **NUNCA** el discovery escribe/actualiza/borra `tenders`. La promoción es un **command con
+    confirmación humana** — `createTender(origin='public_discovery', public_opportunity_id)` — y **el GO
+    del bid/no-bid ES ese momento**. Un cron no decide participar en una licitación.
+  - **NUNCA** guardes estado del bid (fase, decisión, entregables, assets) en `public_tender*`: un
+    re-sync desde Mercado Público **pisaría** el estado de una oferta en vuelo.
+  - **NUNCA** crees una tabla paralela de licitaciones ni "improvises sobre `public_tenders`".
+  - Una licitación **privada** (SKY/Wherex) nace con `origin=manual` y **sin FK** — es válido y esperado,
+    no un caso borde. Es justamente lo que decidió el ADR.
 - **El dominio tenders NO escribe** payroll, finance ni HR. Consume `loaded cost` para el pricing; no lo
   calcula ni lo muta.

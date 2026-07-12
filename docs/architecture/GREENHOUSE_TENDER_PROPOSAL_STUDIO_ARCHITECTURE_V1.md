@@ -49,8 +49,16 @@ F1". Se registra para que no se repita: **todo hito siguiente nace con TASK + li
 **El siguiente hito es `TASK-1392` (F0, Tender Proposal Studio Foundation)**: materializa el aggregate,
 state machine DB, assets/intake y el **Tender Intake Agent Contract** (contexto/tool surface estructurado →
 propuesta trazable → confirmación humana → command canónico). No es CRUD para conectar después: el agente
-usa las mismas capabilities que API/UI/Nexa/MCP y jamás escribe directo. **Blocked by:** arbitraje del
-ownership `RESEARCH-007 → Tender` antes de crear `greenhouse_commercial.tenders`.
+usa las mismas capabilities que API/UI/Nexa/MCP y jamás escribe directo.
+
+✅ **El ownership YA está arbitrado** — ADR **`GREENHOUSE_TENDER_DISCOVERY_OWNERSHIP_BOUNDARY_DECISION_V1.md`**
+(Accepted 2026-07-12): **el Studio es dueño de `greenhouse_commercial.tenders`** (la oferta que Efeonce
+construye, **pública o privada**); **RESEARCH-007 es dueño de `public_tender*`** (espejo re-sincronizable
+del radar Mercado Público); y la **promoción de una oportunidad a un Tender es un command con confirmación
+humana** — `createTender(origin='public_discovery', public_opportunity_id)` — **NUNCA** un INSERT desde el
+discovery. **El GO del bid/no-bid ES el momento de la promoción.** Lo decide el caso privado: SKY (Wherex)
+**no tiene** oportunidad pública detrás; si el bid colgara del discovery, una licitación privada no tendría
+dónde vivir. **Con esto, Slice 0 de TASK-1392 queda desbloqueada.**
 
 `TASK-1391` queda como su sucesora: lleva el composer de **CLI local** a capability agentic de artefactos
 mediante un `Tender Render Agent` acotado (contexto/tools allowlisted → `TenderRenderProposal` trazable →

@@ -29,7 +29,13 @@ Este brief nace despues de validar acceso real a la API de Mercado Publico y com
 >
 > **Frontera:** RESEARCH-007 es **discovery** (encontrar y filtrar oportunidades publicas); el Studio es **produccion del bid** (construir la oferta). Convergen **por handoff, no por absorcion**: una oportunidad publica con GO **promueve** a un `Tender` (`origin=public_discovery`).
 >
-> ⚠️ **Ownership NO arbitrado — leer antes de crear tablas.** Ambos programas reclaman `greenhouse_commercial`: el Studio dibuja `tenders` + `tender_requirements`; `TASK-674/675/683/686` planifican tablas de licitaciones en el mismo schema. **NUNCA** crear la tabla `tenders` sin resolver primero quien es su dueno (candidato natural: el aggregate `Tender` del Studio, con las tablas de discovery referenciandolo — pero requiere ADR). Hoy **no existe ninguna de las dos**, asi que la colision es evitable a costo cero si se arbitra ahora.
+> ✅ **Ownership ARBITRADO — ADR `GREENHOUSE_TENDER_DISCOVERY_OWNERSHIP_BOUNDARY_DECISION_V1.md` (Accepted 2026-07-12).** Tres reglas duras:
+>
+> 1. **RESEARCH-007 es dueno de `greenhouse_commercial.public_tender*`** — el espejo **re-sincronizable** del radar Mercado Publico.
+> 2. **El Tender Proposal Studio es dueno de `greenhouse_commercial.tenders`** — el aggregate de la oferta que Efeonce construye, **publica o privada**.
+> 3. **La promocion de una oportunidad a un Tender es un COMMAND con confirmacion humana**, NUNCA un INSERT desde el discovery: `createTender(origin='public_discovery', public_opportunity_id)`. **El GO del bid/no-bid (TASK-684) ES el momento de la promocion** — no hay un paso extra.
+>
+> **NUNCA** este programa escribe/actualiza/borra `tenders`. **NUNCA** guarda estado del bid (fase, decision, entregables, assets) en `public_tender*`: un re-sync desde Mercado Publico **pisaria** el estado de una oferta en vuelo. Lo decide el caso privado: **SKY (Wherex) no tiene oportunidad publica detras** — si el bid colgara del discovery, una licitacion privada no tendria donde vivir.
 
 ## Contexto Confirmado
 
