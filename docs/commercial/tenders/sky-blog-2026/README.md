@@ -17,8 +17,7 @@
 
 | | |
 |---|---|
-| **Entrega** | **15/07/2026** (§2.2 de las bases) — ⚠️ pero §2.8 dice *"apertura de ofertas 10 de julio 16:00"*. **Las bases se contradicen.** El plazo de consultas cerró el 03/07 → no se puede preguntar. |
-| **Estado del plazo** | ⚠️⚠️ **Hoy 12/07: la lectura del 10/07 YA VENCIÓ.** **Puerta #0: verificar en Wherex si el proceso sigue abierto.** Si lo está, entregar **hoy**, no el 15. |
+| **Entrega** | **15/07/2026.** ✅ **RESUELTO por el operador (2026-07-12): el proceso SIGUE ABIERTO y cierra el 15.** La contradicción de las bases (§2.2 dice 15/07, §2.8 dice *"apertura de ofertas 10 de julio 16:00"*) **queda zanjada: manda el 15.** No volver a levantarla. |
 | **Plataforma** | Wherex (las comisiones del adjudicado las absorbe Efeonce) |
 | **Excluyente único** | No tener demandas contra SKY → ✅ **confirmado 2026-07-11** |
 | **Deal HubSpot** | `62535094842` · Company `Sky Airlines` (`30825221458`) · TCV **CLP 124.800.000** (2 años) |
@@ -29,13 +28,20 @@
 
 | # | Entregable | Estado |
 |---|---|---|
-| 0 | **Verificar en Wherex que el proceso sigue abierto** | ⚠️ **Operador — puerta #0** |
-| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ⛔ **A PRODUCIR** |
-| 2 | **Planilla Excel de la económica** — Wherex **no tiene plantilla**, hay que crearla | ⛔ **A PRODUCIR** |
-| 3 | Subir a Wherex | ⏳ **Operador** (regla dura: el agente prepara; el humano sube y firma) |
+| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ✅ **15 láminas, PDF 3.5 MB** — pendiente de ajustes visuales |
+| 2 | Subir a Wherex | ⏳ **Operador** (regla dura: el agente prepara; el humano sube y firma) |
 | — | Oferta técnica (PDF) | ✅ 2026-07-11 |
 | — | Oferta económica (PDF) | ✅ 2026-07-11 |
+| — | Planilla Excel de la económica | ✅ creada (Wherex no tiene plantilla) |
 | — | Línea "Desembolsos: no aplican" (mínimo §3.2) | ✅ ya está en la económica |
+
+> ⚠️ **Antes de subir el Excel, verificar que las bases NO impongan un formato para la económica.**
+> En Chile, el **Tribunal de Contratación Pública declaró ILEGAL una adjudicación** (SEREMI de
+> Educación de Magallanes, 2025) porque el presupuesto se presentó **con el desglose propio del
+> oferente en vez del formato obligatorio de las bases** — y sostuvo que **ni siquiera era
+> subsanable**. Si las bases traen plantilla, **se usa la de las bases, aunque sea peor que la
+> nuestra.** *(SKY es Wherex = privado, así que la Ley 19.886 no aplica y el riesgo es contractual,
+> no de nulidad. Pero la regla se mantiene.)*
 
 ---
 
