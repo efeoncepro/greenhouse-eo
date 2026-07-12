@@ -325,7 +325,31 @@ provenance en el asset store. *Bloqueada por* TASK-1392 **+** la autorización d
 - El agente **NUNCA** escribe directo: propuesta ≠ ejecución. Y **NUNCA** se introduce LangChain,
   LangGraph ni un Agents SDK — se reusa el cliente canónico `src/lib/ai/` y el patrón tool-use de Nexa.
 
-### Estado del catálogo — 25/25 con contrato ✅
+### ⚠️ La 3ª bug class: "tiene contrato" ≠ "es componible" (2026-07-12, deck SKY)
+
+El catálogo decía **25/25 con contrato ✅** y la doc prometía que *"el composer las puede llenar todas"*.
+**Era falso.** La **primera oferta real** —SKY, la primera que usó más de 6 plantillas— reventó **7 de 25**.
+Nadie las había ejercitado: **tener un `slots.json` no es ser componible.**
+
+Se cerraron las 4 clases de bug del motor (evidencia que sólo se saltaba en arrays —el `sourceRef` de
+`QuoteSplit` llegaba a **borrar la lámina entera**—; objetos que no honraban resolvers; `fixed-*` aplicado
+a medias; `paired-array` sin implementar) **y dos que sólo se ven mirando el frame**: el barrido borraba el
+**ordinal derivado** (los 4 pasos salían como "01") y un **array dentro de un objeto** se aplanaba con las
+comas del join a la vista.
+
+**Hoy: 24/25 componibles**, verificado por `template-composability.test.ts` en CI.
+
+**Reglas duras que salen de acá:**
+
+- **NUNCA** asumas que una plantilla es usable porque tiene `slots.json`. **El gate es
+  `pnpm vitest run src/lib/commercial/tenders`**, que intenta llenar las 25.
+- **NUNCA** cierres un deck con "los tests pasan". Los cuatro "01" y los párrafos aplanados **pasaban
+  todos los tests**. **MIRA LOS FRAMES — TODOS.** Es la única verificación que sirve.
+- **NUNCA** catalogues una plantilla rota como deuda si el fix es mecánico: se arregla. Sólo `ChartSplit`
+  queda declarada, porque su callout **requiere una decisión de diseño** (¿contra qué se mide la brecha?),
+  y **una barra sin dato es una barra que miente**.
+
+### Estado del catálogo — 24/25 componibles ✅ (verificado en CI)
 
 Las 25 plantillas tienen `data-slot` en el HTML y su `*.slots.json`, enlazado en el `registry.json`.
 El composer las puede llenar todas.

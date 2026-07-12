@@ -77,7 +77,7 @@ del contrato si se adjudica. De ahí salen los tres principios; todo lo demás s
 - `consumer: validation-only` (p. ej. `evidenceRef`) **NUNCA** se pinta: es munición interna, no copy
   para el comité.
 
-## Fail-closed (principio 2) — las 2 bug classes que ya nos mordieron
+## Fail-closed (principio 2) — las 3 bug classes que ya nos mordieron
 
 - **NUNCA** agregues un `default:` silencioso ni un `continue` que deje pasar un slot sin escribir.
   **Bug class 1 (el fallo silencioso):** la lámina salía con el **copy de relleno del prototipo** y nadie
@@ -95,6 +95,11 @@ del contrato si se adjudica. De ahí salen los tres principios; todo lo demás s
   o se corrige la geometría. El renderer no amputa.
 - **NUNCA** emitas un PDF parcial. `compose.ts` **valida TODO antes de renderizar NADA**: un PDF a medio
   producir de una oferta parece completo, y eso es exactamente el fallo que no se detecta.
+- **NUNCA** asumas que una plantilla es usable porque tiene `slots.json`. **Bug class 3:** el catálogo se
+  declaraba "25/25 con contrato ✅" y **7 de 25 no componían** — se descubrió con la primera oferta real, a
+  tres días de entregar. El gate es `pnpm vitest run src/lib/commercial/tenders` (intenta llenar las 25).
+- **NUNCA** cierres un deck porque "los tests pasan". Cuatro pasos numerados todos como "01" y unos
+  párrafos aplanados con comas **pasaban todos los tests**. **MIRA LOS FRAMES, TODOS.**
 - **NUNCA** ignores el gate de peso (`maxPdfMb`). No es estética: los portales **rechazan** adjuntos sobre
   su límite. Un deck de 40 MB que el portal no acepta es un deck que no existe.
 

@@ -956,6 +956,52 @@ llenaba el track.
 único juez de la geometría es el layout real. Y **NUNCA** dejes que un recorte sea silencioso: un PDF
 con una palabra guillotinada es peor que un fallo, porque parece terminado y nadie lo revisa dos veces.
 
+### ⚠️ La 3ª bug class: **"tiene contrato" ≠ "es componible"** (2026-07-12, deck SKY)
+
+El catálogo se declaraba **25/25 con contrato ✅** y esta misma doc decía *"el composer las puede llenar
+todas"*. **Era falso.** Al componer la **primera oferta real** —SKY, la primera que usó más de 6
+plantillas— **7 de 25 reventaron**. Nadie lo sabía porque **nadie las había ejercitado**: tener un
+`slots.json` no es ser componible.
+
+El fail-closed hizo su trabajo (abortó en vez de imprimir el copy del prototipo), pero **lo descubrió el
+operador, a tres días de entregar una licitación**. Las 7 eran **4 clases de bug del motor**, todas
+cerradas en la causa:
+
+| # | Bug del motor | Qué producía |
+|---|---|---|
+| 1 | **La evidencia sólo se saltaba en arrays.** `consumer: validation-only` no se honraba en slots ni en campos de objeto | `CaseStudySplit` no componía (le buscaba ancla de texto al `evidenceRef` de un KPI). Peor: el `sourceRef` de `QuoteSplit` tenía el selector de `mode` —que es **el nodo `.slide` entero**— y al escribirlo **borraba la lámina** |
+| 2 | **Objeto y array no honraban el mismo contrato de campo.** Los resolvers sólo corrían dentro de arrays | Un campo **derivado** dentro de un objeto (la escala de una barra) se trataba como texto y exigía un ancla que no existe |
+| 3 | **`fixed-*` no era una regla, era un caso.** El chrome template-owned se saltaba sólo para dos de los tres tipos | `DualListSplit.tipIcon` (que ni declara selector, porque nunca fue del autor) rompía el fill. Y donde el contrato tipaba `asset` con `agentMayOverride:false`, **el tipo mentía** |
+| 4 | **`paired-array` no estaba implementado.** Se caía al camino de `array` | Una comparación son **dos columnas con markup distinto** (ícono de contraste vs. check): necesita **dos blueprints**, no uno |
+
+**Y dos más que sólo se ven MIRANDO el frame** (los tests pasaban):
+
+- **El barrido borraba el chrome derivado.** Un campo opcional que no vino se elimina del DOM — pero un
+  campo **derivado** tampoco "viene" del autor: **lo escribe el resolver**. El barrido borraba el ordinal
+  justo después de escribirlo, y los cuatro pasos de `ProcessStepsFull` salían todos como **"01"**.
+  **Regla: un campo está provisto si lo dio el AUTOR o si lo derivó un RESOLVER.**
+- **Un array dentro de un objeto no es un `String(array)`.** Los `paragraphs` de una columna se aplanaban
+  en un bloque único **con las comas del join a la vista**, destruyendo los `<p>` del diseñador. Un campo
+  con valor array es una **lista repetida**: su ancla es el contenedor y su primer hijo el blueprint.
+
+### El guard: `template-composability.test.ts`
+
+Sintetiza un payload **mínimo válido desde cada contrato** (respetando enums, `minItems`, `maxCharacters`,
+y dándole números a los resolvers de geometría) e intenta llenar **las 25**. **"Componible" pasa de ser
+una promesa de la doc a un hecho verificable en CI.**
+
+`KNOWN_BROKEN` es un **contrato de dos vías**: el test falla si una plantilla sana se rompe **y también**
+si una rota se arregla y nadie la saca de la lista. **La lista no puede mentir.**
+
+**Estado: 24/25.** Sólo queda **`ChartSplit`**, y **se declara en vez de improvisarla**: su callout `.gap`
+sólo existe en la 3ª fila del prototipo y **no tiene resolver de geometría** — de dónde sale su posición es
+una **decisión de diseño** (¿contra qué se mide la brecha?), no un fix mecánico. **Una barra sin dato es
+una barra que miente.**
+
+> **La lección operativa:** los tests verdes **NO** son el gate de un deck. `ProcessStepsFull` mostrando
+> cuatro "01" y los párrafos aplanados **pasaban todos los tests**. **SIEMPRE** mirar los frames —todos,
+> no una muestra—. Los dos hallazgos vinieron de una **revisión visual**, no del CI.
+
 ### Contrato del HTML (lo que una plantilla debe declarar)
 
 - `data-slot` + `data-slot-type` en el contenedor del slot.
