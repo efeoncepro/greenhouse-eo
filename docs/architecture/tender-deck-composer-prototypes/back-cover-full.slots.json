@@ -1,13 +1,50 @@
 {
   "template": "BackCoverFull",
   "version": "0.1",
-  "viewport": { "width": 1920, "height": 1080 },
-  "slots": {
-    "efeonceLogo": { "selector": "[data-slot='efeonceLogo']", "type": "asset", "required": true, "resolver": "efeonce-negative-logo", "agentMayOverride": false },
-    "urlBubble": { "selector": "[data-slot='urlBubble']", "type": "asset", "required": true, "resolver": "efeonce-url-bubble-luminosity", "agentMayOverride": false },
-    "socialLinks": { "selector": "[data-slot='socialLinks']", "type": "fixed-social-set", "required": true, "resolver": "efeonce-social-set", "agentMayOverride": false },
-    "contactDetails": { "selector": "[data-slot='contactDetails']", "type": "fixed-contact-set", "required": true, "resolver": "efeonce-contact-set", "agentMayOverride": false,
-      "value": { "email": "sales@efeoncepro.com", "chilePhone": "+56 9 3732 3064", "usPhone": "+1 (239) 235-2073", "address": "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile" } }
+  "viewport": {
+    "width": 1920,
+    "height": 1080
   },
-  "presentation": { "allForegroundElements": "mix-blend-mode: luminosity", "background": "canonical Efeonce back-cover gradient" }
+  "slots": {
+    "efeonceLogo": {
+      "selector": "[data-slot='efeonceLogo']",
+      "type": "fixed-asset",
+      "required": true,
+      "resolver": "efeonce-negative-logo",
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae; el plan no lo declara."
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "resolver": "efeonce-url-bubble-luminosity",
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae; el plan no lo declara."
+    },
+    "socialLinks": {
+      "selector": "[data-slot='socialLinks']",
+      "type": "fixed-social-set",
+      "required": true,
+      "resolver": "efeonce-social-set",
+      "agentMayOverride": false
+    },
+    "contactDetails": {
+      "selector": "[data-slot='contactDetails']",
+      "type": "fixed-contact-set",
+      "required": true,
+      "resolver": "efeonce-contact-set",
+      "agentMayOverride": false,
+      "value": {
+        "email": "sales@efeoncepro.com",
+        "chilePhone": "+56 9 3732 3064",
+        "usPhone": "+1 (239) 235-2073",
+        "address": "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile"
+      }
+    }
+  },
+  "presentation": {
+    "allForegroundElements": "mix-blend-mode: luminosity",
+    "background": "canonical Efeonce back-cover gradient"
+  }
 }

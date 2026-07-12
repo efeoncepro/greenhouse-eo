@@ -1,25 +1,120 @@
 {
-  "template":"QuoteSplit","figmaNodeId":"8:14071","version":"0.1","viewport":{"width":1920,"height":1080},
-  "slots":{
-    "mode":{"selector":"[data-slot='mode']","type":"enum","required":true,"values":["statement","testimonial"],"consumer":"validation-only","notes":"NUNCA se pinta. Gobierna la exigencia de atribución: en 'statement' (declaración propia de Efeonce) basta la promesa institucional; en 'testimonial' (cita de un tercero) la atribución debe ser REAL — persona nombrada, cargo y fuente verificable. Sin este discriminador la misma lámina podría vestir una frase interna con la autoridad visual de un testimonio de cliente."},
-    "attribution":{"selector":"[data-slot='attribution']","type":"object","required":true,"shape":{
-      "label":{"type":"string","required":false,"maxCharacters":30,"maxLines":1,"transform":"uppercase"},
-      "who":{"type":"string","required":true,"maxCharacters":44,"maxLines":2,"notes":"mode=statement → el contexto de la declaración ('En la propuesta técnica para SKY'). mode=testimonial → el NOMBRE REAL de quien la dijo; un genérico ('un cliente') es rechazo."},
-      "detail":{"type":"string","required":true,"maxCharacters":92,"maxLines":3,"notes":"mode=statement → el alcance del compromiso. mode=testimonial → cargo + empresa + fuente/fecha; es el único anclaje visible de la atribución, por eso es required en ambos modos."}
-    },"constraints":{"testimonialRequiresAttributedSource":true},"notes":"En mode=testimonial, 'detail' DEBE contener cargo+empresa y la fuente (dónde se dijo y cuándo). El composer rechaza un testimonial cuyo detail no traiga fuente."},
-    "sourceRef":{"selector":"[data-slot='mode']","type":"string","required":false,"consumer":"validation-only","constraints":{"maxCharacters":160,"requiredWhen":"mode=testimonial"},"notes":"Nunca se pinta: es la traza auditable de la cita (URL, contrato, acta, mail de aprobación del cliente). Obligatoria para publicar un testimonio de un tercero en una oferta; el pixel sólo muestra 'detail'."},
-    "statement":{"selector":"[data-slot='statement']","type":"rich-string","required":true,"constraints":{"maxCharacters":245,"maxLines":6,"allowedTags":["em","img"],"overflow":"reject"},"resolver":"brand-wordmark-inline","notes":"<em> = cursiva real de Poppins en teal, para los 2-3 conceptos que la cita quiere fijar. El <img class='wm'> es EXCLUSIVAMENTE el wordmark de Efeonce inyectado por el resolver brand-wordmark-inline (public/branding/logo-negative.svg): el composer NO acepta un <img> arbitrario dentro del statement."}
+  "template": "QuoteSplit",
+  "figmaNodeId": "8:14071",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
   },
-  "presentation":{
-    "brandSurface":"panel derecho canonical-rich-deck-gradient con esquinas 64px; aside izquierdo sobre panel claro #eef0f3",
-    "fixedMotif":"la comilla gigante (.wmq) es el motivo único del quote — una sola en toda la lámina, NUNCA un slot",
-    "wordmarkPolicy":"el wordmark inline sólo aplica en mode=statement (habla Efeonce en primera persona). En mode=testimonial habla un tercero: meter el wordmark de Efeonce dentro de su boca es falsear la cita → el resolver debe omitirlo."
+  "slots": {
+    "mode": {
+      "selector": "[data-slot='mode']",
+      "type": "enum",
+      "required": true,
+      "values": [
+        "statement",
+        "testimonial"
+      ],
+      "consumer": "validation-only",
+      "notes": "NUNCA se pinta. Gobierna la exigencia de atribución: en 'statement' (declaración propia de Efeonce) basta la promesa institucional; en 'testimonial' (cita de un tercero) la atribución debe ser REAL — persona nombrada, cargo y fuente verificable. Sin este discriminador la misma lámina podría vestir una frase interna con la autoridad visual de un testimonio de cliente."
+    },
+    "attribution": {
+      "selector": "[data-slot='attribution']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 30,
+          "maxLines": 1,
+          "transform": "uppercase"
+        },
+        "who": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 44,
+          "maxLines": 2,
+          "notes": "mode=statement → el contexto de la declaración ('En la propuesta técnica para SKY'). mode=testimonial → el NOMBRE REAL de quien la dijo; un genérico ('un cliente') es rechazo."
+        },
+        "detail": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 92,
+          "maxLines": 3,
+          "notes": "mode=statement → el alcance del compromiso. mode=testimonial → cargo + empresa + fuente/fecha; es el único anclaje visible de la atribución, por eso es required en ambos modos."
+        }
+      },
+      "constraints": {
+        "testimonialRequiresAttributedSource": true
+      },
+      "notes": "En mode=testimonial, 'detail' DEBE contener cargo+empresa y la fuente (dónde se dijo y cuándo). El composer rechaza un testimonial cuyo detail no traiga fuente."
+    },
+    "sourceRef": {
+      "selector": "[data-slot='statement']",
+      "type": "string",
+      "required": false,
+      "consumer": "validation-only",
+      "constraints": {
+        "maxCharacters": 160,
+        "requiredWhen": "mode=testimonial"
+      },
+      "notes": "Nunca se pinta: es la traza auditable de la cita (URL, contrato, acta, mail de aprobación del cliente). Obligatoria para publicar un testimonio de un tercero en una oferta; el pixel sólo muestra 'detail'.",
+      "description": "Evidencia de la cita: se exige, NUNCA se pinta. Antes apuntaba a [data-slot='mode'] (= el nodo .slide) y al escribirse BORRABA la lámina entera."
+    },
+    "statement": {
+      "selector": "[data-slot='statement']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 245,
+        "maxLines": 6,
+        "allowedTags": [
+          "em",
+          "img"
+        ],
+        "overflow": "reject"
+      },
+      "resolver": "brand-wordmark-inline",
+      "notes": "<em> = cursiva real de Poppins en teal, para los 2-3 conceptos que la cita quiere fijar. El <img class='wm'> es EXCLUSIVAMENTE el wordmark de Efeonce inyectado por el resolver brand-wordmark-inline (public/branding/logo-negative.svg): el composer NO acepta un <img> arbitrario dentro del statement."
+    }
   },
-  "variants":{
-    "leftSlot":{
-      "materialized":"Attribution (el prototipo vigente: label + who + detail)",
-      "pending":"PersonaAsset — declarado en registry.json pero NO materializado en este prototipo (no existe markup de foto). Contrato listo para cuando se autore el markup:",
-      "personaAssetContract":{"selector":"[data-slot='personaAsset']","type":"asset","required":true,"resolver":"squad-person","assetPath":"assets/squad/squad-<nombre>.png","knownAssets":["squad-andres.png","squad-daniela.png","squad-humberly.png","squad-julio.png","squad-luis.png","squad-melkin.png","squad-valentina.png"],"constraints":{"allowedKinds":["person","portrait"],"noHumanPortrait":false,"fit":"cover","anchor":"bottom-left","overflow":"reject"},"guardrail":"GUARDRAIL DURO DEL DOMINIO: la persona que firma la cita es una FOTO REAL (assets/squad/squad-<nombre>.png para el squad Efeonce; para un testimonial, la foto real cedida por el cliente). NUNCA una cara generada por IA. noHumanPortrait:false = aquí SÍ se espera un retrato humano real. Poner una cara sintética junto a un testimonio atribuido es fabricar evidencia."}
+  "presentation": {
+    "brandSurface": "panel derecho canonical-rich-deck-gradient con esquinas 64px; aside izquierdo sobre panel claro #eef0f3",
+    "fixedMotif": "la comilla gigante (.wmq) es el motivo único del quote — una sola en toda la lámina, NUNCA un slot",
+    "wordmarkPolicy": "el wordmark inline sólo aplica en mode=statement (habla Efeonce en primera persona). En mode=testimonial habla un tercero: meter el wordmark de Efeonce dentro de su boca es falsear la cita → el resolver debe omitirlo."
+  },
+  "variants": {
+    "leftSlot": {
+      "materialized": "Attribution (el prototipo vigente: label + who + detail)",
+      "pending": "PersonaAsset — declarado en registry.json pero NO materializado en este prototipo (no existe markup de foto). Contrato listo para cuando se autore el markup:",
+      "personaAssetContract": {
+        "selector": "[data-slot='personaAsset']",
+        "type": "asset",
+        "required": true,
+        "resolver": "squad-person",
+        "assetPath": "assets/squad/squad-<nombre>.png",
+        "knownAssets": [
+          "squad-andres.png",
+          "squad-daniela.png",
+          "squad-humberly.png",
+          "squad-julio.png",
+          "squad-luis.png",
+          "squad-melkin.png",
+          "squad-valentina.png"
+        ],
+        "constraints": {
+          "allowedKinds": [
+            "person",
+            "portrait"
+          ],
+          "noHumanPortrait": false,
+          "fit": "cover",
+          "anchor": "bottom-left",
+          "overflow": "reject"
+        },
+        "guardrail": "GUARDRAIL DURO DEL DOMINIO: la persona que firma la cita es una FOTO REAL (assets/squad/squad-<nombre>.png para el squad Efeonce; para un testimonial, la foto real cedida por el cliente). NUNCA una cara generada por IA. noHumanPortrait:false = aquí SÍ se espera un retrato humano real. Poner una cara sintética junto a un testimonio atribuido es fabricar evidencia."
+      }
     }
   }
 }

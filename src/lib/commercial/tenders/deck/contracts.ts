@@ -22,8 +22,13 @@ export type SlotType =
   | 'enum'
   | 'asset'
   | 'asset-ref'
-  | 'fixed-asset'
   | 'paired-array'
+  // `fixed-*` = **template-owned**: el chrome del deck (logo, burbuja de URL, redes, contacto). El
+  // contrato los declara para ser completo, pero NO se le exigen al plan ni el autor los sobreescribe
+  // — viven en el HTML. El composer sólo verifica que su ancla exista.
+  | 'fixed-asset'
+  | 'fixed-social-set'
+  | 'fixed-contact-set'
 
 /**
  * Qué hacer cuando el valor excede la constraint.
@@ -78,6 +83,15 @@ export interface SlotContract {
   item?: SlotItemContract
   defaultAsset?: string
   resolver?: string
+  /**
+   * `validation-only` = **munición interna**: se exige para validar (una cifra sin fuente no se
+   * compone), pero **NUNCA se pinta**. La fuente de un dato no es copy para el comité.
+   *
+   * Se honra en los TRES niveles —slot, campo de objeto y campo de item—. Honrarlo sólo en los
+   * arrays fue el bug que dejó a `CaseStudySplit` sin componer y, peor, hizo que el `sourceRef` de
+   * `QuoteSplit` se escribiera sobre el nodo de la lámina entera y la borrara.
+   */
+  consumer?: 'validation-only'
   /**
    * Etiquetas de un slot `enum`: el plan declara la CLAVE (`combined`) y la lámina muestra su
    * ETIQUETA (`Propuesta Técnica y Económica`). El autor elige de un conjunto cerrado; el copy

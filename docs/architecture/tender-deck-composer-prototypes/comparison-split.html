@@ -60,11 +60,11 @@
   <main class="slide" data-template="ComparisonSplit">
     <section class="column contrast" aria-label="Enfoque de contraste">
       <h1 data-slot="leftTitle" data-slot-type="string" data-slot-required="true">Modelo editorial<br>por piezas</h1>
-      <div class="rows" data-slot="rows" data-slot-type="paired-array" data-slot-required="true">
-        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead">Calendario sin diagnóstico</strong><span class="row-body">No inicia desde una lectura común de la oportunidad.</span></p></article>
-        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead">Actividad como única señal</strong><span class="row-body">Tráfico y publicaciones no muestran la visibilidad en IA.</span></p></article>
-        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead">Optimización aislada</strong><span class="row-body">SEO, AEO y entidad se trabajan como iniciativas separadas.</span></p></article>
-        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead">Reportar sin aprender</strong><span class="row-body">El ciclo deja poco espacio para corregir el sistema.</span></p></article>
+      <div class="rows" data-slot="rows" data-slot-type="paired-array" data-slot-required="true" data-slot-items="left">
+        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead" data-slot-field="lead">Calendario sin diagnóstico</strong><span class="row-body" data-slot-field="body">No inicia desde una lectura común de la oportunidad.</span></p></article>
+        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead" data-slot-field="lead">Actividad como única señal</strong><span class="row-body" data-slot-field="body">Tráfico y publicaciones no muestran la visibilidad en IA.</span></p></article>
+        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead" data-slot-field="lead">Optimización aislada</strong><span class="row-body" data-slot-field="body">SEO, AEO y entidad se trabajan como iniciativas separadas.</span></p></article>
+        <article class="row"><span class="contrast-icon" aria-hidden="true">—</span><p class="row-copy"><strong class="row-lead" data-slot-field="lead">Reportar sin aprender</strong><span class="row-body" data-slot-field="body">El ciclo deja poco espacio para corregir el sistema.</span></p></article>
       </div>
     </section>
 
@@ -73,11 +73,11 @@
         <img class="proposal-logo" src="../../../public/branding/logo-negative.svg" alt="efeonce" data-slot="proposalBrand" data-slot-type="fixed-asset">
         <h2 class="proposal-title" data-slot="rightTitle" data-slot-type="string" data-slot-required="true">Un ecosistema editorial que crea descubrimiento.</h2>
       </header>
-      <div class="rows">
-        <article class="row"><p class="row-copy"><strong class="row-lead">Diagnóstico primero</strong><span class="row-body">Search, Answer y Entity determinan dónde intervenir.</span></p><span class="proposal-icon">✓</span></article>
-        <article class="row"><p class="row-copy"><strong class="row-lead">Visibilidad que se puede leer</strong><span class="row-body">Mide presencia, citabilidad y autoridad junto a las señales orgánicas.</span></p><span class="proposal-icon">✓</span></article>
-        <article class="row"><p class="row-copy"><strong class="row-lead">Una misma superficie</strong><span class="row-body">Conecta SEO, AEO y las señales de entidad en el mismo sistema.</span></p><span class="proposal-icon">✓</span></article>
-        <article class="row"><p class="row-copy"><strong class="row-lead">Evidencia que mejora</strong><span class="row-body">Opera con aprendizaje continuo para corregir el sistema editorial.</span></p><span class="proposal-icon">✓</span></article>
+      <div class="rows" data-slot-items="right">
+        <article class="row"><p class="row-copy"><strong class="row-lead" data-slot-field="lead">Diagnóstico primero</strong><span class="row-body" data-slot-field="body">Search, Answer y Entity determinan dónde intervenir.</span></p><span class="proposal-icon">✓</span></article>
+        <article class="row"><p class="row-copy"><strong class="row-lead" data-slot-field="lead">Visibilidad que se puede leer</strong><span class="row-body" data-slot-field="body">Mide presencia, citabilidad y autoridad junto a las señales orgánicas.</span></p><span class="proposal-icon">✓</span></article>
+        <article class="row"><p class="row-copy"><strong class="row-lead" data-slot-field="lead">Una misma superficie</strong><span class="row-body" data-slot-field="body">Conecta SEO, AEO y las señales de entidad en el mismo sistema.</span></p><span class="proposal-icon">✓</span></article>
+        <article class="row"><p class="row-copy"><strong class="row-lead" data-slot-field="lead">Evidencia que mejora</strong><span class="row-body" data-slot-field="body">Opera con aprendizaje continuo para corregir el sistema editorial.</span></p><span class="proposal-icon">✓</span></article>
       </div>
     </section>
   </main>

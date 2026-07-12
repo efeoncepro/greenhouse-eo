@@ -47,13 +47,46 @@ interface FillInstruction {
   fieldPlan?: Record<string, FieldDirective>
   /** Etiquetas del `enum` (clave → copy visible). Ver `SlotContract.values`. */
   enumLabels?: Record<string, string>
+  /** Campos de un slot `object` que son evidencia (`validation-only`): se validan, NUNCA se pintan. */
+  skipFields?: string[]
 }
+
+const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
 
 const buildFieldPlan = (
   slotContract: SlotContract,
   value: SlotValue,
   slots: Record<string, unknown>
 ): Record<string, FieldDirective> | undefined => {
+  // Un slot `object` tiene EL MISMO contrato de campo que un item de array: puede declarar evidencia
+  // (`validation-only`) y campos DERIVADOS por resolver (la escala de una barra before/after). Que el
+  // filler sólo honrara eso en los arrays dejaba a los objetos como ciudadanos de segunda — y era el
+  // bug que impedía componer CaseStudySplit: buscaba un ancla de texto para `barScale`, que es
+  // geometría, no copy.
+  const objectShape = (slotContract as unknown as { shape?: Record<string, never> }).shape
+
+  if (slotContract.type === 'object' && objectShape && isPlainRecord(value)) {
+    const plan: Record<string, FieldDirective> = {}
+    const record = value as unknown as Record<string, unknown>
+
+    for (const [fieldName, field] of Object.entries(objectShape)) {
+      const fieldValue = record[fieldName]
+      const derived = Boolean((field as { resolver?: string }).resolver)
+
+      if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
+
+      plan[fieldName] = resolveFieldDirective(field, fieldValue, {
+        item: record,
+        index: 0,
+        itemCount: 1,
+        slots
+      })
+    }
+
+    return Object.keys(plan).length > 0 ? plan : undefined
+  }
+
   const shape = slotContract.item?.shape
 
   if (!shape || !Array.isArray(value)) return undefined
@@ -88,6 +121,23 @@ const buildFieldPlan = (
   return plan
 }
 
+/**
+ * Los campos de un slot `object` marcados `validation-only` (el `evidenceRef` de un KPI). Se exigen
+ * al autor —una cifra sin fuente no se compone— pero **no se pintan**: la fuente no es copy para el
+ * comité, y buscarle un ancla en el HTML rompía la lámina.
+ */
+const validationOnlyFields = (slot: SlotContract): string[] | undefined => {
+  const shape = (slot as unknown as { shape?: Record<string, { consumer?: string }> }).shape
+
+  if (!shape) return undefined
+
+  const skip = Object.entries(shape)
+    .filter(([, field]) => field.consumer === 'validation-only')
+    .map(([name]) => name)
+
+  return skip.length > 0 ? skip : undefined
+}
+
 const buildInstructions = (slide: SlideSpec, contract: TemplateContract): FillInstruction[] => {
   const instructions: FillInstruction[] = []
 
@@ -96,12 +146,24 @@ const buildInstructions = (slide: SlideSpec, contract: TemplateContract): FillIn
 
     if (value === undefined || value === null) continue
 
+    // Evidencia: se valida, NUNCA se pinta. Sin esto, el `sourceRef` de QuoteSplit se escribía sobre
+    // el nodo `[data-slot='mode']` —que es la lámina entera— y la borraba.
+    if (slotContract.consumer === 'validation-only') continue
+
+    // Chrome **template-owned** (`fixed-asset`, `fixed-social-set`, `fixed-contact-set`): el logo, la
+    // burbuja de URL, el set de redes, el ícono de una lista. Lo posee la PLANTILLA y ya vive en su
+    // HTML: el composer no lo escribe ni se lo pide al plan. La regla vale para los TRES o no vale
+    // para ninguno — `DualListSplit.tipIcon` ni siquiera declara un selector, justamente porque nunca
+    // fue del autor.
+    if (slotContract.type.startsWith('fixed-')) continue
+
     instructions.push({
       selector: slotContract.selector,
       type: slotContract.type,
       value,
       fieldPlan: buildFieldPlan(slotContract, value, slide.slots as Record<string, unknown>),
-      enumLabels: slotContract.values
+      enumLabels: slotContract.values,
+      skipFields: validationOnlyFields(slotContract)
     })
   }
 
@@ -194,7 +256,7 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
       continue
     }
 
-    if (type === 'asset' || type === 'asset-ref' || type === 'fixed-asset') {
+    if (type === 'asset' || type === 'asset-ref') {
       const src =
         typeof value === 'string' ? value : value && typeof value === 'object' ? (value as any).src : undefined
 
@@ -215,8 +277,45 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
         continue
       }
 
-      for (const [fieldName, fieldValue] of Object.entries(value as Record<string, unknown>)) {
-        if (fieldValue === undefined || fieldValue === null || fieldValue === '') continue
+      // Se recorre el PLAN además del objeto: un campo DERIVADO (la escala de la barra before/after)
+      // no tiene valor propio —se calcula—, así que iterar sólo el objeto lo dejaría fuera. Es la
+      // misma regla que ya regía en los arrays: **objeto y array honran el mismo contrato de campo**.
+      const record = value as Record<string, unknown>
+      const fieldNames = new Set([...Object.keys(record), ...Object.keys(instruction.fieldPlan ?? {})])
+
+      for (const fieldName of fieldNames) {
+        const fieldValue = record[fieldName]
+        const directive = instruction.fieldPlan?.[fieldName] ?? { mode: 'text' as const }
+
+        // Evidencia dentro de un objeto (el `evidenceRef` de un KPI): se exige, pero NUNCA se pinta.
+        // La fuente de una cifra no tiene por qué existir en el HTML — no es copy para el comité.
+        if (directive.mode === 'skip') continue
+
+        if (directive.mode === 'text' && (fieldValue === undefined || fieldValue === null || fieldValue === '')) {
+          continue
+        }
+
+        if (directive.mode === 'apply') {
+          for (const effect of directive.effects) {
+            const target = effect.selector === ':self' ? el : el.querySelector(effect.selector)
+
+            if (!target) {
+              problems.push(
+                `${instruction.selector}: el resolver de "${fieldName}" apunta a "${effect.selector}", que no existe en el HTML.`
+              )
+
+              continue
+            }
+
+            if (effect.attr) target.setAttribute(effect.attr, String(effect.value))
+            if (effect.styleProp) (target as HTMLElement).style.setProperty(effect.styleProp, String(effect.styleValue))
+            if (effect.toneGroup) for (const cls of effect.toneGroup) target.classList.remove(cls)
+            if (effect.toneClass) target.classList.add(effect.toneClass)
+            if (effect.asText) target.textContent = String(effect.value)
+          }
+
+          continue
+        }
 
         const field = el.querySelector(`[data-slot-field="${fieldName}"]`)
 
@@ -235,7 +334,80 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
       continue
     }
 
-    if (type === 'array' || type === 'paired-array') {
+    if (type === 'paired-array') {
+      // Una comparación son DOS columnas con markup DISTINTO (a la izquierda el ícono del contraste,
+      // a la derecha el check de la propuesta). Por eso no alcanza con un array: hacen falta DOS
+      // blueprints, y cada item aporta su lado. Los hosts se declaran en el HTML con
+      // `[data-slot-items="left"|"right"]` — así el diseñador controla el markup de cada lado y el
+      // filler sólo empareja.
+      const items = Array.isArray(value) ? value : []
+      const root = el.closest('[data-template]') ?? document
+
+      const leftHost = (root.querySelector('[data-slot-items="left"]') as Element | null) ?? el
+      const rightHost = root.querySelector('[data-slot-items="right"]') as Element | null
+
+      if (!rightHost) {
+        problems.push(
+          `el slot paired-array "${instruction.selector}" no declara su columna derecha: falta [data-slot-items="right"] en el HTML`
+        )
+        continue
+      }
+
+      const sides: { host: Element; key: 'left' | 'right' }[] = [
+        { host: leftHost, key: 'left' },
+        { host: rightHost, key: 'right' }
+      ]
+
+      let broken = false
+
+      for (const { host, key } of sides) {
+        const itemTemplate = host.firstElementChild
+
+        if (!itemTemplate) {
+          problems.push(`el slot paired-array "${instruction.selector}" no tiene item-template en la columna ${key}`)
+          broken = true
+          continue
+        }
+
+        const blueprint = itemTemplate.cloneNode(true) as Element
+
+        host.innerHTML = ''
+
+        for (const item of items) {
+          const side = (item as Record<string, unknown>)?.[key]
+
+          if (!side || typeof side !== 'object') {
+            problems.push(`el item del paired-array "${instruction.selector}" no trae su lado "${key}"`)
+            broken = true
+            continue
+          }
+
+          const node = blueprint.cloneNode(true) as Element
+
+          for (const [fieldName, fieldValue] of Object.entries(side as Record<string, unknown>)) {
+            const field = node.querySelector(`[data-slot-field="${fieldName}"]`)
+
+            if (!field) {
+              problems.push(
+                `[${instruction.selector}] columna ${key}: el campo "${fieldName}" no tiene [data-slot-field="${fieldName}"] en el HTML. Sin ancla, quedaría el contenido de ejemplo del prototipo.`
+              )
+              broken = true
+              continue
+            }
+
+            field.innerHTML = sanitize(String(fieldValue))
+          }
+
+          host.appendChild(node)
+        }
+      }
+
+      if (broken) continue
+
+      continue
+    }
+
+    if (type === 'array') {
       const items = Array.isArray(value) ? value : []
 
       // El slot y el CONTENEDOR DE REPETICIÓN pueden no ser el mismo nodo: una tabla tiene un

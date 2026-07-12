@@ -528,6 +528,12 @@
           }
         ]
       }
+    },
+    {
+      "slideId": "contraportada",
+      "contentType": "back-cover",
+      "template": "BackCoverFull",
+      "slots": {}
     }
   ]
 }

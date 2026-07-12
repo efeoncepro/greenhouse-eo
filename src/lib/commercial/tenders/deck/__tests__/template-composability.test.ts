@@ -55,6 +55,11 @@ const synthesize = (slot: SlotContract): unknown => {
 
     if (typeof field.resolver === 'string' && GEOMETRY_RESOLVERS.includes(field.resolver)) return '1'
 
+    // Un resolver de geometría deriva de los campos VECINOS del item (`beforeValue`/`afterValue`, el
+    // eje del timeline). Si el probe les diera texto, el resolver no podría calcular y abortaría —
+    // correctamente: una barra sin dato es una barra que miente. El probe tiene que darle números.
+    if (/(?:^at$|Value$|Unit$|Pct$)/.test(fallback)) return '10'
+
     return clamp(field.maxCharacters as number | undefined, fallback)
   }
 
@@ -137,12 +142,8 @@ afterAll(async () => {
  * Se vacía en **TASK-1394**. Mientras tenga entradas, el catálogo **NO** es "25/25 componible".
  */
 const KNOWN_BROKEN: Record<string, string> = {
-  BackCoverFull: 'declara tipos `fixed-social-set` / `fixed-contact-set` que no existen en SlotType',
-  ChartSplit: 'el `.refline` es el primer hijo del slot → el filler lo clona como fila (falta `data-slot-items`)',
-  ComparisonSplit: 'HTML sin ningún `data-slot-field`; `paired-array` no está implementado en el filler',
-  DualListSplit: 'HTML sin `data-slot-field` en los items (`lead` / `body`)',
-  QuoteSplit: 'los selectores del contrato no matchean el DOM; `sourceRef` apunta al selector de `mode`',
-  CaseStudySplit: 'falta el ancla `data-slot-field="evidenceRef"` en el HTML'
+  ChartSplit:
+    'el callout `.gap` sólo existe en la 3ª fila del prototipo y no tiene resolver de geometría: de dónde sale su posición es una DECISIÓN DE DISEÑO (¿contra qué se mide la brecha?), no un fix mecánico. TASK-1394.'
 }
 
 describe('componibilidad del catálogo', () => {
@@ -150,7 +151,7 @@ describe('componibilidad del catálogo', () => {
     // Si esto sorprende a alguien: el catálogo declaraba "25/25 con contrato ✅" y la doc decía que
     // el composer podía llenarlas todas. No era cierto — se descubrió componiendo la primera oferta
     // real (SKY, 2026-07-12), a tres días de entregar.
-    expect(Object.keys(KNOWN_BROKEN).length).toBeLessThanOrEqual(6)
+    expect(Object.keys(KNOWN_BROKEN).length).toBeLessThanOrEqual(1)
   })
 
   it.each(registry.templates.map(t => [t.name, t] as const))(
@@ -161,6 +162,11 @@ describe('componibilidad del catálogo', () => {
       const slots: Record<string, unknown> = {}
 
       for (const [slotName, slotContract] of Object.entries(contract.slots)) {
+        // El probe se pone en los zapatos del AUTOR: no sintetiza lo que la plantilla posee
+        // (`fixed-*`) ni la evidencia que nunca se pinta. Si lo hiciera, estaría probando un contrato
+        // que ningún deck real escribe.
+        if (slotContract.type.startsWith('fixed-')) continue
+
         slots[slotName] = synthesize(slotContract)
       }
 

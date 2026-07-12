@@ -21,6 +21,15 @@ import type {
   SlideSpec
 } from './contracts'
 
+/**
+ * Un slot **template-owned**: existe en el contrato, pero lo llena la PLANTILLA, no el autor. Es el
+ * chrome fijo del deck (logo Efeonce, burbuja de URL, set de redes, datos de contacto). Marcarlos
+ * `required` y además exigírselos al plan haría que cada deck tuviera que copiar —y mantener
+ * sincronizado— un valor que ya vive en el HTML. El contrato los declara para ser completo; el
+ * composer sólo verifica que el ancla exista.
+ */
+const isTemplateOwned = (type: SlotContract['type']): boolean => type.startsWith('fixed-')
+
 const stripTags = (value: string): string => value.replace(/<[^>]*>/g, '')
 
 /** Cuenta caracteres visibles: el markup no ocupa espacio en la lámina. */
@@ -212,7 +221,12 @@ export const validateSlide = (slide: SlideSpec, contract: TemplateContract): Slo
     const present = value !== undefined && value !== null && value !== ''
 
     if (!present) {
-      if (contractSlot.required) {
+      // Los slots `fixed-*` son **chrome que la plantilla posee** (logo Efeonce, burbuja de URL, set
+      // de redes, datos de contacto): el contrato los marca `agentMayOverride: false` justamente
+      // porque NO son del autor. Exigírselos al plan obligaría a copiar en cada deck un valor que ya
+      // vive en la plantilla — y a mantenerlo sincronizado en N planes. Se declaran para que el
+      // contrato sea completo, no para que alguien los escriba.
+      if (contractSlot.required && !isTemplateOwned(contractSlot.type)) {
         violations.push(violation(ctx, 'missing_required', `el slot "${slotName}" es requerido y no vino`))
       }
 
