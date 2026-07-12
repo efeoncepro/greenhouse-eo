@@ -1,3 +1,39 @@
+## Sesión 2026-07-12 (cont. 5) — TASK-1394 completa: ChartSplit 25/25
+
+- `TASK-1394` cierra la única entrada de `KNOWN_BROKEN`. La causa no era diseño: el contrato ya
+  definía la brecha contra el líder y el resolver existía; faltaban primitives genéricas para honrarlo.
+- Entrega `remove`, `resolver-only`, `itemSelector`/`fixedChildren` y validación `value ↔ valuePct`.
+  La refline fija ya no se clona como fila; sólo la serie `sky` no líder muestra `.gap`, y una brecha
+  cero no genera callout ficticio.
+- Evidencia: Tender suite **102/102**, `local:check` verde, guard **25/25** y dos renders CLI revisados
+  (`.captures/task-1394-chart-gap/` y `...-zero-gap/`, PNG/PDF ~0,2 MB). Repo-only: no rollout pendiente.
+- Las skills espejo `deck-studio` y `greenhouse-public-private-tenders` (Codex/Claude) ya cargan la
+  misma regla: `itemSelector`/`fixedChildren`, remoción explícita, callout derivado y cero-brecha sin
+  afirmación ficticia. Se eliminó su estado stale de 24/25 / “decisión de diseño pendiente”.
+- `TASK-1393` queda desbloqueada para mover este contrato a `artifact-composer` sin reimplementarlo.
+
+## Sesión 2026-07-12 (cont. 4) — Capability agentic escalable: contrato distribuido en TASK-1391..1393
+
+**Decisión del operador:** no se aceptan parches ni edición manual como camino de generación. **SKY es el
+cliente de la propuesta**, nunca el nombre del producto/capability.
+
+- `TASK-1393` ahora sella el límite que faltaba: el autor/agent entrega `CompositionPlanInput`
+  (intención semántica), jamás un `template`; `deck-axis` resuelve y versiona el selector,
+  contratos/hashes, reglas semánticas y brand/font pack en un `ResolvedCompositionManifest` inmutable.
+  Incluye fuentes locales verificables y un punto de extensión de validación: compatibilidad
+  content-type/template, evidencia, pricing, staffing y cobertura de requisitos. Se ejecuta **después** de
+  `TASK-1394`, que toca el mismo resolver.
+- `TASK-1392` deja explícita la pieza de verdad comercial: `Proposal` y su registro de evidencia
+  versionada/allowlisted. Un claim que llegue al deck debe tener fuente o snapshot, locator, método,
+  fecha de corte, clasificación y hash; el agente sólo recibe la proyección permitida, no strings libres.
+- `TASK-1391` se limita a renderizar ese manifest y sus snapshots preflighted. El job rechaza plan mutable,
+  template elegido por autor, activo/fuente sin hash, fuente no allowlisted o reporte semántico fallido;
+  permanece bloqueado por `TASK-1393`, `TASK-1392` y la autorización de frontera `EPIC-027`.
+- Quedan fuera adrede las variantes visuales que hoy faltan (contexto de cover, evidencia visible, capacidad
+  del equipo, ciclo de feedback y compliance paginado): requieren una **task `ui-ux` sucesora** del catálogo,
+  con wireframe/flow y matriz de estados. No se registra aún para no saltar el protocolo de autoría de
+  tasks; el próximo ID disponible es `TASK-1395`.
+
 ## Sesión 2026-07-12 (cont. 3) — `TimelineFull` data-driven + labels de barras preservados
 
 **Estado:** el Gantt de SKY (`Resultado temprano, no promesas`) vuelve a mostrar sus tres textos de barra:

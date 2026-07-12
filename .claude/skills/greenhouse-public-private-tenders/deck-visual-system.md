@@ -369,7 +369,8 @@ a medias; `paired-array` sin implementar) **y dos que sólo se ven mirando el fr
 **ordinal derivado** (los 4 pasos salían como "01") y un **array dentro de un objeto** se aplanaba con las
 comas del join a la vista.
 
-**Hoy: 24/25 componibles**, verificado por `template-composability.test.ts` en CI.
+**Hoy: 25/25 componibles** (TASK-1394), verificado por `template-composability.test.ts` en CI y por
+render real PNG/PDF de `ChartSplit` con brecha positiva y cero.
 
 **Reglas duras que salen de acá:**
 
@@ -377,9 +378,10 @@ comas del join a la vista.
   `pnpm vitest run src/lib/commercial/tenders`**, que intenta llenar las 25.
 - **NUNCA** cierres un deck con "los tests pasan". Los cuatro "01" y los párrafos aplanados **pasaban
   todos los tests**. **MIRA LOS FRAMES — TODOS.** Es la única verificación que sirve.
-- **NUNCA** catalogues una plantilla rota como deuda si el fix es mecánico: se arregla. Sólo `ChartSplit`
-  queda declarada, porque su callout **requiere una decisión de diseño** (¿contra qué se mide la brecha?),
-  y **una barra sin dato es una barra que miente**.
+- **NUNCA** catalogues una plantilla rota como deuda si el fix es mecánico: se arregla. `ChartSplit` se
+  cerró de raíz: el contrato ya medía la brecha contra el líder; el motor debía respetar
+  `itemSelector`/`fixedChildren`, remover chrome no sostenido y derivar el callout. Si la serie
+  destacada lidera, la brecha cero **no dibuja** callout. **Una barra sin dato es una barra que miente.**
 
 ### ⚠️ La 4ª bug class: el chrome que depende de DÓNDE vive en el DOM
 
@@ -393,10 +395,12 @@ comas del join a la vista.
   misma familia que una barra que no sale del dato. Y un hito en la última unidad cae al **100%** del eje:
   su etiqueta se ancla **hacia adentro** (`.at-end`, derivado del dato) para no partirse contra el borde.
 
-### Estado del catálogo — 24/25 componibles ✅ (verificado en CI)
+### Estado del catálogo — 25/25 componibles ✅ (verificado en CI + frame real)
 
 Las 25 plantillas tienen `data-slot` en el HTML y su `*.slots.json`, enlazado en el `registry.json`.
-El composer las puede llenar todas.
+El composer las puede llenar todas. En arrays, el contrato declara el blueprint repetible
+(`itemSelector`) y cualquier chrome fijo (`fixedChildren`); el filler no infiere por orden de DOM ni
+conserva el chrome de ejemplo si el dato no lo sostiene.
 
 ## Render
 

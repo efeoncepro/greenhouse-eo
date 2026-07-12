@@ -2,6 +2,21 @@
 
 ## 2026-07-12
 
+- **Tender Deck Composer — ChartSplit 25/25 y geometría sin fabricación.** `TASK-1394` cierra la última
+  plantilla no componible: el motor ahora honra `itemSelector`/`fixedChildren`, permite remoción
+  explícita de chrome que el dato no sostiene y modela `gapCallout` como derivado. La barra/label
+  inconsistente aborta, una única serie destacada genera la brecha y una brecha cero no inventa callout.
+  Evidencia: 102 tests Tender, guard 25/25 y PNG/PDF revisados con/sin brecha. Las skills espejo
+  `deck-studio` y `greenhouse-public-private-tenders` quedan sincronizadas para Codex y Claude.
+
+- **Tender / Artifact Composer — ruta robusta hacia una capability agentic.** Se endurecen las tasks de
+  plataforma sin implementar runtime: `TASK-1393` pasa a resolver intención semántica en un
+  `ResolvedCompositionManifest` inmutable (selector, contratos, validadores, hashes y fuentes locales),
+  `TASK-1392` gobierna `Proposal` y la evidencia versionada/allowlisted, y `TASK-1391` sólo renderizará
+  ese manifest preflighted cuando `EPIC-027` lo autorice. La capacidad no se llama SKY: SKY es el cliente.
+  Las variantes visuales faltantes quedan separadas para una sucesora `ui-ux`, no como excepciones o
+  edición manual del deck.
+
 - **Tender Deck Composer — `TimelineFull` v0.2 y labels de barra recuperados.** El Gantt deja de ser un
   molde de seis meses: acepta `timeUnit` (`day|week|month|quarter|custom`), 3..8 labels de eje, rangos
   enteros de fases e hitos de frontera. Un compiler deriva de ese único schedule grilla, barras, diamantes,

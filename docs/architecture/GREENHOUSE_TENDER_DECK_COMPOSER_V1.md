@@ -1000,9 +1000,13 @@ una promesa de la doc a un hecho verificable en CI.**
 `KNOWN_BROKEN` es un **contrato de dos vías**: el test falla si una plantilla sana se rompe **y también**
 si una rota se arregla y nadie la saca de la lista. **La lista no puede mentir.**
 
-**Estado: 24/25.** Sólo queda **`ChartSplit`**, y **se declara en vez de improvisarla**: su callout `.gap`
-sólo existe en la 3ª fila del prototipo y **no tiene resolver de geometría** — de dónde sale su posición es
-una **decisión de diseño** (¿contra qué se mide la brecha?), no un fix mecánico. **Una barra sin dato es
+**Estado: 25/25 (TASK-1394, 2026-07-12).** `ChartSplit` confirmó otra variante de la misma familia:
+el resolver `chart-bar-geometry` y la aritmética contra la serie líder ya existían en el contrato; lo
+que faltaba era que el motor pudiera honrarlo. El filler ahora respeta `itemSelector`/`fixedChildren`,
+para no clonar una refline como fila; los resolvers pueden remover explícitamente el chrome que el dato
+no sostiene; y `gapCallout` es semántica derivada del item destacado, no un slot top-level escrito a
+mano. La lámina aborta si `value` contradice `valuePct`, si no hay exactamente una serie `sky`, o si
+la brecha no puede derivarse. Con brecha cero, el `.gap` se elimina. **Una barra o brecha sin dato es
 una barra que miente.**
 
 > **La lección operativa:** los tests verdes **NO** son el gate de un deck. `ProcessStepsFull` mostrando

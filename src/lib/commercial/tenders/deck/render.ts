@@ -50,6 +50,9 @@ interface FillInstruction {
   enumLabels?: Record<string, string>
   /** Campos de un slot `object` que son evidencia (`validation-only`): se validan, NUNCA se pintan. */
   skipFields?: string[]
+  /** Blueprint de item y chrome fijo declarados por el contrato de colección. */
+  itemSelector?: string
+  fixedChildren?: string[]
 }
 
 const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
@@ -111,7 +114,7 @@ const buildFieldPlan = (
 
       // Un resolver DERIVADO (ordinal, geometría) corre aunque el campo no venga: el número de fase
       // sale del índice, no de un dato que el autor tenga que escribir.
-      const derived = Boolean(field.resolver)
+      const derived = Boolean(field.resolver) || field.consumer === 'resolver-only'
 
       if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
 
@@ -164,7 +167,9 @@ const buildInstructions = (slide: SlideSpec, contract: TemplateContract): FillIn
       value,
       fieldPlan: buildFieldPlan(slotContract, value, slide.slots as Record<string, unknown>),
       enumLabels: slotContract.values,
-      skipFields: validationOnlyFields(slotContract)
+      skipFields: validationOnlyFields(slotContract),
+      itemSelector: slotContract.itemSelector,
+      fixedChildren: slotContract.fixedChildren
     })
   }
 
@@ -310,6 +315,12 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
             }
 
             if (effect.attr) target.setAttribute(effect.attr, String(effect.value))
+
+            if (effect.remove) {
+              target.remove()
+              continue
+            }
+
             if (effect.styleProp) (target as HTMLElement).style.setProperty(effect.styleProp, String(effect.styleValue))
             if (effect.toneGroup) for (const cls of effect.toneGroup) target.classList.remove(cls)
             if (effect.toneClass) target.classList.add(effect.toneClass)
@@ -447,17 +458,38 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
       // clonaría el encabezado como si fuera un item. `[data-slot-items]` marca dónde van los items;
       // si no está, se repite sobre el propio slot (el caso simple: una lista).
       const host = (el.querySelector('[data-slot-items]') as Element | null) ?? el
-      const itemTemplate = host.firstElementChild
+      const itemTemplate = instruction.itemSelector ? el.querySelector(instruction.itemSelector) : host.firstElementChild
 
       if (!itemTemplate) {
-        problems.push(`el slot array "${instruction.selector}" no tiene un item-template en el HTML`)
+        const detail = instruction.itemSelector
+          ? `no encuentra el itemSelector "${instruction.itemSelector}" declarado por el contrato`
+          : 'no tiene un item-template en el HTML'
+
+        problems.push(`el slot array "${instruction.selector}" ${detail}`)
         continue
       }
 
       // El markup del item lo define el HTML (lo controla el diseñador). Acá sólo se clona y se llena.
       const blueprint = itemTemplate.cloneNode(true) as Element
+      const fixedChildren: Element[] = []
+
+      for (const selector of instruction.fixedChildren ?? []) {
+        const fixed = host.querySelector(selector)
+
+        if (!fixed) {
+          problems.push(
+            `el slot array "${instruction.selector}" declara el fixedChild "${selector}", pero no existe dentro del host.`
+          )
+          continue
+        }
+
+        fixedChildren.push(fixed.cloneNode(true) as Element)
+      }
+
+      if (problems.length > 0) continue
 
       host.innerHTML = ''
+      host.append(...fixedChildren)
 
       for (const item of items) {
         const node = blueprint.cloneNode(true) as Element
@@ -514,6 +546,11 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
 
                 if (effect.attr && effect.value !== undefined) {
                   target.setAttribute(effect.attr, effect.value)
+                }
+
+                if (effect.remove) {
+                  target.remove()
+                  continue
                 }
 
                 // Geometría: la barra se DERIVA del dato (ver el comentario en resolvers.ts —

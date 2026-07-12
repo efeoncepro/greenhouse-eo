@@ -1,6 +1,6 @@
 {
   "template": "ChartSplit",
-  "version": "0.1",
+  "version": "0.2",
   "viewport": { "width": 1920, "height": 1080 },
   "slots": {
     "eyebrow": {
@@ -62,7 +62,7 @@
         "abortIfResolverMissing": true,
         "quantifiedClaimsRequireEvidenceRef": true
       },
-      "itemSelector": "[data-slot='series'] > .row",
+      "itemSelector": "[data-slot='series'] > .row.sky",
       "fixedChildren": [".refline"],
       "item": {
         "type": "object",
@@ -70,17 +70,11 @@
           "name": { "type": "string", "required": true, "maxCharacters": 26, "maxLines": 1 },
           "value": { "type": "string", "required": true, "maxCharacters": 8, "maxLines": 1, "requires": ["valuePct", "evidenceRef"] },
           "valuePct": { "type": "number", "required": true, "min": 0, "max": 100, "consumer": "resolver-only", "resolver": "chart-bar-geometry" },
-          "highlight": { "type": "enum", "required": true, "values": ["muted", "sky"], "resolver": "chart-bar-geometry" },
+          "highlight": { "type": "enum", "required": true, "values": ["muted", "sky"], "consumer": "resolver-only" },
+          "gapCallout": { "type": "string", "required": false, "maxCharacters": 24, "maxLines": 1, "consumer": "resolver-only" },
           "evidenceRef": { "type": "string", "required": false, "consumer": "validation-only" }
         }
       }
-    },
-    "gapCallout": {
-      "selector": "[data-slot='series'] .gap .glabel",
-      "type": "string",
-      "required": false,
-      "resolver": "chart-bar-geometry",
-      "constraints": { "maxCharacters": 24, "maxLines": 1, "overflow": "reject" }
     },
     "source": {
       "selector": "[data-slot='source']",
@@ -100,7 +94,7 @@
         "scale = 88 / max(valuePct across items); each item's bar gets style.width = round(valuePct * scale) + '%' so the largest series lands exactly on the 88% reference line",
         ".refline stays at left:88% (it marks the leading series); if the resolver changes the scale, it must move the refline to the same percentage as the largest bar",
         "item.highlight = 'sky' adds class 'sky' to the .row (teal label + glowing teal fill) and 'sky' to .fill; 'muted' keeps class 'muted' on .fill — no other tones exist",
-        "the highlighted row is the only one that carries .gap: style.left = highlighted bar width %, style.width = (largest bar width % − highlighted bar width %); the resolver removes .gap from every non-highlighted row",
+        "the highlighted row is the only one that carries .gap: style.left = highlighted bar width %, style.width = (largest bar width % − highlighted bar width %); the resolver removes .gap from every non-highlighted row and also when highlighted is the leader (gap = 0)",
         ".glabel text (gapCallout) must be derived from the same numbers (e.g. '+32 pts a cerrar' = leader.valuePct − highlighted.valuePct); it must never be authored free-hand out of sync with valuePct",
         "item.value (the printed label, e.g. '50%') is text and stays under data-slot-field='value', but the resolver must assert it is consistent with valuePct before rendering"
       ]

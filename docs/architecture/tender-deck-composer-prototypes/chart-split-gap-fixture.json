@@ -1,0 +1,25 @@
+{
+  "tenderId": "chart-split-gap-fixture",
+  "slides": [
+    {
+      "slideId": "chart-gap",
+      "contentType": "chart",
+      "template": "ChartSplit",
+      "slots": {
+        "eyebrow": "Diagnóstico ilustrativo",
+        "title": "La brecha se deriva del <em>dato medido</em>",
+        "narrative": ["La geometría del gráfico se recompone desde cada valor, no desde el ejemplo de la plantilla."],
+        "chartEyebrow": "Distribución por marca",
+        "chartTitle": "Share of Voice",
+        "chartSubtitle": "Fixture visual de geometría",
+        "hero": { "value": "2,8×", "label": "lo que el líder concentra frente a SKY" },
+        "series": [
+          { "name": "Líder", "value": "50%", "valuePct": 50, "highlight": "muted", "evidenceRef": "fixture-leader" },
+          { "name": "Competidor", "value": "27%", "valuePct": 27, "highlight": "muted", "evidenceRef": "fixture-competitor" },
+          { "name": "SKY", "value": "18%", "valuePct": 18, "highlight": "sky", "evidenceRef": "fixture-sky" }
+        ],
+        "source": "Fuente: fixture visual; no representa una medición de cliente."
+      }
+    }
+  ]
+}

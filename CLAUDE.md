@@ -44,14 +44,18 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Research + Benchmark (market/competitive/VoC · benchmark/AI SoV · CI · para Efeonce y clientes) | `research-benchmark-operator` (+ `deep-research` harness, `seo-aeo`, `commercial-expert`) | inline (2 carriles; método+rigor, ejecución→deep-research; evidencia con as-of, NO memoria) |
 | Go-to-Market (segmento/ICP · positioning/category · offer/pricing · motion PLG/sales/ecosystem · funnel/bow-tie · launch · GTM economics · para Efeonce y clientes) | `gtm-architect` (orquesta `commercial-expert`/demanda/`research-benchmark`/`gtm-ga4`) | inline (estrategia+orquestación; commercial-expert ejecuta la venta; doctrina ASaaS/bow-tie manda) |
 
-### Tender pointer — `TASK-1392 → TASK-1391`
+### Tender pointer — `TASK-1394 → TASK-1393 → TASK-1392 → TASK-1391`
 
 Al tocar licitaciones, cargar `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` y el §0 de la arquitectura de Tender.
 Para cualquier deck cargar además `deck-studio`; en `TimelineFull` el plan declara `timeUnit`, eje, fases,
 hitos y `barLabel` editable, mientras el compiler deriva la geometría y falla cerrado si ese copy se recorta.
-El composer F1 es sólo CLI; el runtime empieza con `TASK-1392`: `tender_asset.audience` explícito y
-`contexto allowlisted → propuesta tipada → confirmación humana → command canónico`. El LLM no escribe ni
-cruza gates. `TASK-1391` es después un candidato bloqueado de `EPIC-027` para `tender-worker`; no autoriza
+El composer F1 es sólo CLI. `TASK-1394` está completa: cerró ChartSplit 25/25 con geometría fail-closed,
+`itemSelector`/`fixedChildren` y remoción explícita. Luego `TASK-1393` convierte
+la intención semántica en `ResolvedCompositionManifest` inmutable (selector, contratos/hashes, validadores,
+brand/font pack): un autor/agente nunca elige `template`. El runtime empieza con `TASK-1392`:
+`tender_asset.audience` y evidencia versionada/allowlisted → contexto permitido → propuesta tipada →
+confirmación humana → command canónico. El LLM no escribe ni cruza gates. `TASK-1391` sólo renderiza ese
+manifest y es después un candidato bloqueado de `EPIC-027` para `tender-worker`; no autoriza
 Vercel/`ops-worker`/Cloud Run directo ni la creación anticipada del deployable.
 
 ### Business Context Pack

@@ -40,6 +40,10 @@ const synthesize = (slot: SlotContract): unknown => {
     if (Array.isArray(field.values)) return field.values[0]
     if (field.values && typeof field.values === 'object') return Object.keys(field.values as object)[0]
     if (Array.isArray(field.enum)) return field.enum[0]
+    // Un label cuantificado que declara depender de valuePct debe representar exactamente ese mismo
+    // valor. El probe no puede usar el placeholder "value": activaría correctamente el guard
+    // anti-fabricación de ChartSplit.
+    if (Array.isArray(field.requires) && field.requires.includes('valuePct')) return '1%'
     if (field.format === 'NN%') return '10%'
     // `isProposed` es booleano-como-string: el resolver sólo conoce 'true' | 'false'.
     if (field.resolver === 'pricing-option-tone') return false
@@ -91,9 +95,17 @@ const synthesize = (slot: SlotContract): unknown => {
       const count = constraints.minItems ?? 1
       const shape = slot.item?.shape as Record<string, Record<string, unknown>> | undefined
 
-      return Array.from({ length: count }, () =>
+      const items = Array.from({ length: count }, () =>
         shape ? objectFrom(shape) : clamp(constraints.maxCharactersPerItem, 'Item')
       )
+
+      // ChartSplit exige exactamente una serie destacada: el probe debe ejercer la geometría válida,
+      // no inventar un payload que ningún autor podría aprobar.
+      if (slot.resolver === 'chart-bar-geometry' && shape && items.length > 0) {
+        ;(items[items.length - 1] as Record<string, unknown>).highlight = 'sky'
+      }
+
+      return items
     }
 
     case 'paired-array': {
@@ -137,19 +149,15 @@ afterAll(async () => {
  *   (a) una plantilla sana se rompe (regresión), **o**
  *   (b) una de éstas se arregla y nadie la saca de acá (la lista mentiría).
  *
- * Se vacía en **TASK-1394**. Mientras tenga entradas, el catálogo **NO** es "25/25 componible".
+ * Está vacía desde **TASK-1394**: el catálogo sólo puede declararse "25/25 componible" cuando cada
+ * plantilla llena su contrato real. El caso condicional se conserva para que una futura rotura pueda
+ * declararse temporalmente y el guard obligue a retirarla cuando se arregle.
  */
-const KNOWN_BROKEN: Record<string, string> = {
-  ChartSplit:
-    'el callout `.gap` sólo existe en la 3ª fila del prototipo y no tiene resolver de geometría: de dónde sale su posición es una DECISIÓN DE DISEÑO (¿contra qué se mide la brecha?), no un fix mecánico. TASK-1394.'
-}
+const KNOWN_BROKEN: Record<string, string> = {}
 
 describe('componibilidad del catálogo', () => {
   it('el inventario de plantillas rotas está declarado (no se esconde)', () => {
-    // Si esto sorprende a alguien: el catálogo declaraba "25/25 con contrato ✅" y la doc decía que
-    // el composer podía llenarlas todas. No era cierto — se descubrió componiendo la primera oferta
-    // real (SKY, 2026-07-12), a tres días de entregar.
-    expect(Object.keys(KNOWN_BROKEN).length).toBeLessThanOrEqual(1)
+    expect(Object.keys(KNOWN_BROKEN)).toHaveLength(0)
   })
 
   it.each(registry.templates.map(t => [t.name, t] as const))(

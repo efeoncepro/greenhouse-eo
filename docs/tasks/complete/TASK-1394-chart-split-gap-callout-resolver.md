@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `commercial`
 - Blocked by: `none`
@@ -37,7 +37,9 @@ Composer: el catálogo está **24/25**. Esta task la cierra y lleva el catálogo
 
 Pero la razón por la que está rota **no es la que dice el guard hoy**. La razón declarada
 (*"de dónde sale la posición del callout es una decisión de diseño"*) es **falsa** — el contrato ya
-la responde. Lo que falta son **dos huecos del MOTOR de resolvers**, no una decisión de producto.
+la responde. Lo que falta son **tres huecos genéricos del MOTOR/filler**, no una decisión de producto.
+El tercero se confirmó al tomar la task: el contrato ya declara `itemSelector` y `fixedChildren`, pero
+el filler los ignora y clona la `.refline` fija como si fuera la fila-blueprint.
 
 ## Why This Task Exists
 
@@ -77,7 +79,13 @@ destacada), y las filas son **items clonados de un array**. Un slot top-level no
 nodo que sólo existe en una fila de una repetición — no es ni un campo de item ni un nodo estable de
 la lámina. **El modelo del contrato es el bug**, no sólo el resolver.
 
-**Hueco 3 (menor, misma raíz) — el resolver está incompleto respecto de su propio contrato.**
+**Hueco 3 — el filler ignora el contrato de repetición.** `chart-split.slots.json` declara
+`itemSelector: "[data-slot='series'] > .row"` y `fixedChildren: [".refline"]`, pero el filler toma
+siempre `firstElementChild` y limpia todo el host. En ChartSplit eso convierte la `.refline` en el
+blueprint y elimina la línea fija. El motor debe honrar ambos campos de contrato de forma genérica;
+ninguna plantilla puede depender del orden casual de hijos del HTML.
+
+**Hueco 4 (menor, misma raíz) — el resolver está incompleto respecto de su propio contrato.**
 `chart-bar-geometry` declara que **posee** `.row .track .fill`, `.row .track .gap`,
 `.row .track .gap .glabel`, `.refline` y la clase de tono `sky|muted` de la `.row`. Su `build()` hoy
 emite **una sola op**: el `width` del `.fill`. No emite el tono, ni la geometría del `.gap`, ni el
@@ -87,8 +95,9 @@ miente** — la misma enfermedad del `KNOWN_BROKEN` que originó esta task.
 
 ## Goal
 
-- Cerrar los dos huecos del motor: **op de remoción** en el vocabulario de resolvers, y
-  **`gapCallout` re-modelado** como derivado del item destacado, no como slot top-level.
+- Cerrar los tres huecos del motor: honor genérico de `itemSelector`/`fixedChildren`, **op de remoción**
+  en el vocabulario de resolvers, y **`gapCallout` re-modelado** como derivado del item destacado, no
+  como slot top-level.
 - Completar `chart-bar-geometry` para que honre **todo** el ownership que declara (tono, `.gap`,
   `.glabel`, y la aserción `value ↔ valuePct`).
 - Vaciar `KNOWN_BROKEN`: el catálogo del Artifact Composer queda **25/25 componible**, verificado en CI.
@@ -136,7 +145,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `src/lib/commercial/tenders/deck/resolvers.ts` — motor de resolvers (op vocabulary + `chart-bar-geometry`)
-- `src/lib/commercial/tenders/deck/compose.ts` — el filler que ejecuta las ops
+- `src/lib/commercial/tenders/deck/render.ts` — el filler que ejecuta las ops
 - `src/lib/commercial/tenders/deck/contracts.ts` — tipos del contrato de slots
 - `docs/architecture/tender-deck-composer-prototypes/chart-split.slots.json`
 
@@ -156,7 +165,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `src/lib/commercial/tenders/deck/resolvers.ts`
-- `src/lib/commercial/tenders/deck/compose.ts`
+- `src/lib/commercial/tenders/deck/render.ts`
 - `src/lib/commercial/tenders/deck/contracts.ts` (si el tipo de op vive ahí)
 - `src/lib/commercial/tenders/deck/__tests__/template-composability.test.ts`
 - `docs/architecture/tender-deck-composer-prototypes/chart-split.slots.json`
@@ -182,6 +191,8 @@ Reglas obligatorias:
 
 - **No hay op de remoción.** El motor no sabe quitar un nodo del DOM. El `.gap` del blueprint se clona
   a las 3 filas.
+- **El filler no honra `itemSelector` ni `fixedChildren`.** Una refline fija puede convertirse en
+  blueprint o desaparecer al limpiar el host; el contrato no gobierna realmente la repetición.
 - **`gapCallout` es un slot top-level con selector dentro de un item repetido** — estructuralmente
   irresoluble como está modelado.
 - **`chart-bar-geometry` no honra su propio ownership:** no emite tono, ni `.gap`, ni `.glabel`, ni
@@ -194,7 +205,7 @@ Reglas obligatorias:
 
 ## Modular Placement Contract
 
-- Topology impact: `domain-package`
+- Topology impact: `none`
 - Current home: `src/lib/commercial/tenders/deck/` (motor del composer, hoy bajo el dominio comercial)
 - Future candidate home: `domain-package`
   - Destino concreto: `src/lib/artifact-composer/**`, por `TASK-1393`. El motor es domain-free: no
@@ -216,6 +227,17 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
+
+### Slice 0 — El contrato de repetición gobierna el filler (motor, genérico)
+
+- Extender el contrato serializable y `FillInstruction` con `itemSelector` y `fixedChildren`. El
+  selector de ChartSplit apunta al blueprint estructural completo (`.row.sky`), que contiene el
+  `.gap`; el resolver limpia esa clase y nodo cuando el dato no los sostiene.
+- Para arrays, elegir el blueprint declarado por `itemSelector` y preservar clones de los hijos fijos
+  al limpiar el host. Si un selector declarado no existe, abortar la lámina: el orden casual del HTML no
+  es un fallback válido.
+- Test unitario/integración: una colección con un hijo fijo antes de la fila conserva el fijo y repite
+  sólo la fila indicada.
 
 ### Slice 1 — La op de remoción (motor, genérica)
 
@@ -320,7 +342,9 @@ verificación en staging/prod que hacer.
 
 ### Slice ordering hard rule
 
-- **Slice 1 (op de remoción) → Slice 3 (resolver completo).** El Slice 3 **no puede** cerrar sin la op:
+- **Slice 0 (contrato de repetición) → Slice 1 (op de remoción) → Slice 3 (resolver completo).** El
+  Slice 3 **no puede** cerrar sin ambos: sin blueprint/fijos correctos el chart no tiene filas válidas,
+  y sin la op el `.gap` se clona a todas las filas y la lámina fabrica dos brechas que el dato no sostiene.
   sin ella el `.gap` se clona a todas las filas y la lámina fabrica dos brechas que el dato no sostiene.
 - **Slice 2 (re-modelado de `gapCallout`) → Slice 3.** El resolver no puede escribir el `.glabel`
   mientras siga siendo un slot top-level con selector dentro de un item repetido.
@@ -368,20 +392,22 @@ quien esté ejecutando `TASK-1393`: ambas tocan `resolvers.ts`.
 
 ## Acceptance Criteria
 
-- [ ] El vocabulario de ops del resolver soporta **remoción explícita** de un nodo, y la op es
+- [x] El vocabulario de ops del resolver soporta **remoción explícita** de un nodo, y la op es
       **genérica del motor** — no un caso especial de `ChartSplit`.
-- [ ] Una op desconocida **sigue abortando** la lámina (fail-closed intacto; sin `default:` silencioso).
-- [ ] `gapCallout` **ya no es** un slot top-level con selector dentro de un item repetido.
-- [ ] `chart-bar-geometry` emite: ancho del `.fill`, clase de tono (`sky`/`muted`), geometría del `.gap`
+- [x] El filler honra `itemSelector` y `fixedChildren` declarados por el contrato; nunca toma el primer
+      hijo accidental como blueprint ni elimina un hijo fijo al repetir un array.
+- [x] Una op desconocida **sigue abortando** la lámina (fail-closed intacto; sin `default:` silencioso).
+- [x] `gapCallout` **ya no es** un slot top-level con selector dentro de un item repetido.
+- [x] `chart-bar-geometry` emite: ancho del `.fill`, clase de tono (`sky`/`muted`), geometría del `.gap`
       en la fila destacada, **remoción** del `.gap` en toda fila no destacada, y el texto del `.glabel`
       derivado de `leader.valuePct − highlighted.valuePct`.
-- [ ] Un `value` impreso **inconsistente** con su `valuePct` **aborta** la lámina (test que lo prueba).
-- [ ] El caso borde `destacada === líder` (brecha = 0) está **declarado en el contrato** y el `.gap` no
+- [x] Un `value` impreso **inconsistente** con su `valuePct` **aborta** la lámina (test que lo prueba).
+- [x] El caso borde `destacada === líder` (brecha = 0) está **declarado en el contrato** y el `.gap` no
       se dibuja.
-- [ ] `KNOWN_BROKEN` queda **vacío**. `template-composability.test.ts` pasa con **25/25**.
-- [ ] La razón falsa (*"no tiene resolver de geometría"*) está corregida en el guard **y** en
+- [x] `KNOWN_BROKEN` queda **vacío**. `template-composability.test.ts` pasa con **25/25**.
+- [x] La razón falsa (*"no tiene resolver de geometría"*) está corregida en el guard **y** en
       `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` (§3ª bug class y §El guard, que además dicen 24/25).
-- [ ] **Se compuso una lámina `ChartSplit` real y se MIRÓ el frame** (PNG + PDF), con brecha > 0 **y**
+- [x] **Se compuso una lámina `ChartSplit` real y se MIRÓ el frame** (PNG + PDF), con brecha > 0 **y**
       con brecha = 0. La barra de cada serie mide lo que dice su `valuePct`; la brecha arranca donde
       termina la barra destacada y llega a la líder; sólo hay **una** brecha. Evidencia adjunta al cierre.
 
@@ -396,14 +422,29 @@ quien esté ejecutando `TASK-1393`: ambas tocan `resolvers.ts`.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] **`TASK-1393` revisada**: si ya movió el motor, esta task rebaseó sobre `src/lib/artifact-composer/**`
-- [ ] **La doc de arquitectura ya no declara 24/25** ni repite la razón falsa
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] **`TASK-1393` revisada**: sigue pendiente; el motor aún vive en la ruta actual y la task 1393 lleva esta primitive consigo al moverla.
+- [x] **La doc de arquitectura ya no declara 24/25** ni repite la razón falsa
+
+## Completion Evidence — 2026-07-12
+
+- Motor: `FieldEffect.remove`, `resolver-only`, `itemSelector` y `fixedChildren` son primitives
+  genéricas; ChartSplit sólo las consume. El blueprint completo es `.row.sky`; la refline se preserva
+  como hijo fijo y el resolver limpia clase/gap según el dato.
+- Tests: `pnpm vitest run src/lib/commercial/tenders` → **8 files / 102 tests** verdes; incluye los
+  nuevos tests de DOM para brecha `> 0`, brecha `= 0`, refline única, tonos y geometría, más el guard
+  de componibilidad **25/25**. `pnpm local:check` verde.
+- Revisión visual: `pnpm deck:compose` sobre
+  `chart-split-{gap,zero-gap}-fixture.json` emitió PNG + PDF de una página (~0,2 MB cada uno) en
+  `.captures/task-1394-chart-{gap,zero-gap}/`; ambos frames fueron revisados. El primero muestra sólo
+  la brecha `+32 pts a cerrar` de SKY (18% vs líder 50%); el segundo no dibuja callout al liderar SKY.
+- Cierre: repo-only; sin flag, migración, API, worker ni rollout pendiente. `TASK-1393` puede mover el
+  motor una vez sin reimplementar este contrato.
 
 ## Follow-ups
 

@@ -40,6 +40,11 @@ export interface FieldEffect {
   styleValue?: string
   /** Escribe el valor como TEXTO del nodo (para ordinales derivados, que no son un atributo). */
   asText?: boolean
+  /**
+   * Quita el nodo explícitamente cuando el dato no lo sostiene. No es un fallback: un resolver
+   * debe declararlo para que el filler jamás deje chrome del blueprint fingiendo que existe.
+   */
+  remove?: true
 }
 
 /**
@@ -294,16 +299,67 @@ const RESOLVERS: Record<string, { known: string[]; build: ResolverDef }> = {
     known: ['<derivado de valuePct>'],
     build: (_value, ctx) => {
       const series = Array.isArray(ctx.slots.series) ? (ctx.slots.series as Record<string, unknown>[]) : []
-      const values = series.map(item => toNumber(item.valuePct)).filter((n): n is number => n !== null)
-      const max = Math.max(...values, 0)
+      const values = series.map(item => toNumber(item.valuePct))
+
+      if (values.some(value => value === null)) {
+        throw new Error('chart-bar-geometry requiere valuePct numérico en cada serie; no se puede dibujar una barra sin dato.')
+      }
+
+      const max = Math.max(...(values as number[]), 0)
       const own = toNumber(ctx.item.valuePct)
+      const printed = toNumber(ctx.item.value)
+      const highlighted = series.filter(item => item.highlight === 'sky')
 
       if (own === null || max <= 0) return null
 
+      if (printed === null || Math.abs(printed - own) > 0.001) {
+        throw new Error(
+          `chart-bar-geometry detectó value inconsistente: "${String(ctx.item.value)}" no representa valuePct=${own}. ` +
+            'La etiqueta y la barra deben afirmar el mismo dato.'
+        )
+      }
+
+      if (highlighted.length !== 1) {
+        throw new Error(
+          `chart-bar-geometry requiere exactamente una serie destacada (highlight="sky"); recibió ${highlighted.length}.`
+        )
+      }
+
+      if (ctx.item.highlight !== 'sky' && ctx.item.highlight !== 'muted') {
+        throw new Error(`chart-bar-geometry no conoce el tono "${String(ctx.item.highlight)}".`)
+      }
+
       const REFLINE_PCT = 88
       const width = Math.round((own / max) * REFLINE_PCT)
+      const isHighlighted = ctx.item.highlight === 'sky'
+      const highlightedValue = toNumber(highlighted[0]!.valuePct)
 
-      return [{ selector: '.fill', styleProp: 'width', styleValue: `${width}%` }]
+      if (highlightedValue === null) {
+        throw new Error('chart-bar-geometry no puede derivar la brecha: la serie destacada no tiene valuePct numérico.')
+      }
+
+      const highlightedWidth = Math.round((highlightedValue / max) * REFLINE_PCT)
+      const gapWidth = REFLINE_PCT - highlightedWidth
+      const pointDelta = max - highlightedValue
+      const pointLabel = Number.isInteger(pointDelta) ? String(pointDelta) : pointDelta.toFixed(1).replace('.', ',')
+
+      const effects: FieldEffect[] = [
+        { selector: ':self', toneGroup: ['sky'], ...(isHighlighted ? { toneClass: 'sky' } : {}) },
+        { selector: '.fill', toneClass: isHighlighted ? 'sky' : 'muted', toneGroup: ['sky', 'muted'] },
+        { selector: '.fill', styleProp: 'width', styleValue: `${width}%` }
+      ]
+
+      if (isHighlighted && gapWidth > 0) {
+        effects.push(
+          { selector: '.gap', styleProp: 'left', styleValue: `${highlightedWidth}%` },
+          { selector: '.gap', styleProp: 'width', styleValue: `${gapWidth}%` },
+          { selector: '.gap .glabel', asText: true, value: `+${pointLabel} pts a cerrar` }
+        )
+      } else {
+        effects.push({ selector: '.gap', remove: true })
+      }
+
+      return effects
     }
   },
 
@@ -406,7 +462,7 @@ export class UnknownResolverValueError extends Error {
  * cifra) NUNCA se pinta en la lámina — es munición interna, no copy para el comité.
  */
 export const resolveFieldDirective = (
-  field: { resolver?: string; consumer?: string },
+  field: { resolver?: string; consumer?: 'validation-only' | 'resolver-only' },
   value: unknown,
   ctx: ResolverContext = { item: {}, index: 0, itemCount: 1, slots: {} }
 ): FieldDirective => {
@@ -415,6 +471,8 @@ export const resolveFieldDirective = (
   }
 
   if (!field.resolver) {
+    if (field.consumer === 'resolver-only') return { mode: 'skip' }
+
     return { mode: 'text' }
   }
 

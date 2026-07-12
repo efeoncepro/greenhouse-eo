@@ -64,8 +64,11 @@ export interface SlotFieldContract {
   requires?: string[]
   /** Traduce el valor semántico a presentación (ej. `kind` → ícono). Ver `resolvers.ts`. */
   resolver?: string
-  /** `validation-only`: el campo se exige pero NUNCA se pinta (ej. `evidenceRef`). */
-  consumer?: string
+  /**
+   * `validation-only`: se exige pero NUNCA se pinta (ej. `evidenceRef`).
+   * `resolver-only`: es semántica que sólo consume un resolver; tampoco busca un ancla de copy.
+   */
+  consumer?: 'validation-only' | 'resolver-only'
 }
 
 export interface SlotItemContract {
@@ -81,6 +84,10 @@ export interface SlotContract {
   required?: boolean
   constraints?: SlotConstraints
   item?: SlotItemContract
+  /** Selector del blueprint de un item repetido; evita depender del orden casual de hijos del HTML. */
+  itemSelector?: string
+  /** Hijos fijos del host de repetición que se preservan al reconstruir los items (ej. una refline). */
+  fixedChildren?: string[]
   defaultAsset?: string
   resolver?: string
   /**

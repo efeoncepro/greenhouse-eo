@@ -1,0 +1,24 @@
+{
+  "tenderId": "chart-split-zero-gap-fixture",
+  "slides": [
+    {
+      "slideId": "chart-zero-gap",
+      "contentType": "chart",
+      "template": "ChartSplit",
+      "slots": {
+        "eyebrow": "Diagnóstico ilustrativo",
+        "title": "La serie destacada <em>ya lidera</em>",
+        "narrative": ["Cuando la brecha es cero, el gráfico no dibuja un callout ficticio."],
+        "chartEyebrow": "Distribución por marca",
+        "chartTitle": "Share of Voice",
+        "chartSubtitle": "Fixture visual sin brecha",
+        "hero": { "value": "1,0×", "label": "la serie destacada ya concentra el máximo" },
+        "series": [
+          { "name": "SKY", "value": "50%", "valuePct": 50, "highlight": "sky", "evidenceRef": "fixture-sky" },
+          { "name": "Competidor", "value": "27%", "valuePct": 27, "highlight": "muted", "evidenceRef": "fixture-competitor" }
+        ],
+        "source": "Fuente: fixture visual; no representa una medición de cliente."
+      }
+    }
+  ]
+}

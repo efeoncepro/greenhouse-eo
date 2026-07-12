@@ -15,7 +15,7 @@
 | Pieza | Estado |
 |---|---|
 | Deck composer (selector · validate · slot-fill · 15 resolvers · geometría · render · **PDF de N páginas**) | ✅ shipped, `src/lib/commercial/tenders/deck/**` |
-| 25 plantillas con `data-slot` + `*.slots.json` + `registry.json` | ✅ 25/25 built |
+| 25 plantillas con `data-slot` + `*.slots.json` + `registry.json` | ✅ **25/25 componibles** (TASK-1394) |
 | CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ **único consumer hoy** |
 | State machine (12 estados, 3 gates humanos) | ⚠️ **TS puro — NO hay tabla `tenders` en DB** |
 | API routes · UI · migración · capability · outbox | ❌ **no existen** |
@@ -99,6 +99,10 @@ del contrato si se adjudica. De ahí salen los tres principios; todo lo demás s
 - **NUNCA** asumas que una plantilla es usable porque tiene `slots.json`. **Bug class 3:** el catálogo se
   declaraba "25/25 con contrato ✅" y **7 de 25 no componían** — se descubrió con la primera oferta real, a
   tres días de entregar. El gate es `pnpm vitest run src/lib/commercial/tenders` (intenta llenar las 25).
+- **NUNCA** ignores `itemSelector` o `fixedChildren` de un contrato de array ni tomes el primer hijo por
+  casualidad como blueprint. El filler preserva el chrome fijo y repite sólo el nodo declarado; si un
+  contrato no matchea el DOM, aborta. Un `.gap`/callout que el dato no sostiene se **remueve** mediante
+  una op explícita del resolver, nunca queda como residuo del blueprint.
 - **NUNCA** cierres un deck porque "los tests pasan". Cuatro pasos numerados todos como "01" y unos
   párrafos aplanados con comas **pasaban todos los tests**. **MIRA LOS FRAMES, TODOS.**
 - **SIEMPRE** la firma de URL vive **dentro** del `.slide`. **Bug class 4:** `mix-blend-mode` se mezcla con

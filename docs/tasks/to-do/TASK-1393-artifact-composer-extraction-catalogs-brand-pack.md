@@ -22,14 +22,14 @@
 - Status real: `Diseno`
 - Rank: `TBD — predecesora de TASK-1391; independiente de TASK-1392`
 - Domain: `platform|commercial|growth`
-- Blocked by: `none — ADR GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md (Accepted 2026-07-12) fija la direccion`
+- Blocked by: `TASK-1394 debe cerrar antes de mover el resolver; ADR GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md (Accepted 2026-07-12) fija la direccion`
 - Branch: `task/TASK-1393-artifact-composer-extraction`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Extrae el motor de composicion de `src/lib/commercial/tenders/deck/**` a `src/lib/artifact-composer/**` como **primitive domain-free**, convierte las superficies en **catalogos (= dato)** con `outputTarget` declarado, y hace que **la marca sea un input (brand pack)** en vez de una constante horneada. No agrega features: mueve la frontera para que un catalogo nuevo (carrusel IG) **no obligue a tocar el motor** y para que la capability pueda operar as-a-service.
+Extrae el motor de composicion de `src/lib/commercial/tenders/deck/**` a `src/lib/artifact-composer/**` como **primitive domain-free**, convierte las superficies en **catalogos (= dato)** con `outputTarget` declarado, y hace que **la marca sea un input (brand pack)** en vez de una constante horneada. Sella además el contrato reproducible que necesita cualquier consumer: input semántico sin plantilla elegible por el autor, snapshot inmutable de catálogo/contratos/brand pack/fuentes y extensión de validación semántica inyectada por catálogo. No agrega features de una propuesta concreta: mueve la frontera para que un catalogo nuevo (carrusel IG) **no obligue a tocar el motor** y para que la capability pueda operar as-a-service.
 
 ## Why This Task Exists
 
@@ -48,6 +48,8 @@ La ventana es ahora: no existe el segundo catalogo, ni la tabla, ni la API. Extr
 - Sacar `pdf-lib` del camino unico: el merge PDF pasa a ser **un `outputTarget`** (`pdf-merged`), junto a `png-set`.
 - **La marca es un input**: los catalogos consumen un pack compilado desde su SoT declarado; ninguna plantilla hardcodea un HEX de marca. El catálogo es dueño de sus **gradient recipes**, que sólo referencian roles del pack.
 - Dejar puestas las costuras multi-tenant (`owner_org_id` en el catalogo, brand pack parametrizable) **sin construir** UI de cliente, billing ni lane externo.
+- Separar el plan **autorable** (`slideId`, `contentType`, `slots`) del plan **resuelto**: sólo el catálogo puede elegir plantilla, fijar su versión/hash, el brand pack, las fuentes y los validadores que aplicaron. Un consumer/agente no puede bypassear el selector declarando una plantilla distinta.
+- Proveer un kernel de validación semántica inyectable por catálogo —sin conocimiento de Proposal/Tender dentro del motor— para que `deck-axis` pueda exigir invariantes entre campos y referencias de evidencia antes de renderizar.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -72,7 +74,9 @@ Reglas obligatorias:
 - **NUNCA** hornear AXIS/Efeonce como constante ni hardcodear un HEX de marca: **mata el as-a-service**. La marca es un **input** (brand pack); AXIS es *el brand pack de Efeonce*, no *el* brand pack.
 - **NUNCA** degradar las dos bug classes ya cerradas: `overflow: reject` (nunca truncar), filler que **aborta** ante un slot desconocido, y `assertSlideFitsCanvas` (la lamina no puede amputar copy en silencio). Son del **motor** → el carrusel las hereda gratis.
 - **NUNCA** un catalogo consume assets de otro dominio/org. El scope se declara.
-- Refactor **sin cambio de comportamiento**: el deck SKY debe componer **byte-a-byte equivalente** antes y despues (mismo `DeckPlan` → mismo PDF).
+- El autor humano/agente declara intención (`contentType` + slots), **nunca** autoridad de presentación (`template`). El único plan que llega al render es un `ResolvedCompositionManifest` con hashes de catálogo, contrato, template, brand pack y fuentes.
+- Un validador semántico puede rechazar un plan, pero el motor no conoce reglas de pricing, staffing, requirements ni evidencia: esas reglas viven declaradas y versionadas en el catálogo/consumer que las aporta.
+- Refactor **sin regresión de comportamiento**: antes de la migración hermética de fuentes, el deck SKY debe conservar el mismo artefacto lógico y composición visible. La migración de fuentes puede cambiar bytes de PDF o píxeles de forma deliberada sólo mediante una nueva revisión explícita de catálogo y su baseline, nunca silenciosamente.
 
 ## Normative Docs
 
@@ -86,6 +90,7 @@ Reglas obligatorias:
 ### Depends on
 
 - ADR `GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md` (Accepted): fija las 3 capas, el brand pack como input y la frontera con Creative Studio.
+- `TASK-1394` — cierra el único contrato de plantilla aún no componible y su vocabulario de resolver antes del move; evita resolver el mismo conflicto durante la extracción.
 - Motor ya materializado y testeado: `src/lib/commercial/tenders/deck/{contracts,selector,validate,resolvers,render,compose,solar-icons}.ts` + 5 suites.
 - SoT de presentación: Figma `Sistema Axis - PPT` (`GXYeJaRjotmFuczfnd8hLi`), `Color Primitives` `33:2`; el commit `b38a8d0e2` los llevó como aliases CSS locales a las primeras plantillas y `e78e9dfb2` extendió el patrón a las 25.
 - Mirror UI: `src/@core/theme/axis-tokens.ts`, procedente de otro Figma AXIS. Sólo puede participar mediante crosswalk de igualdad exacta; no se redondean ni sustituyen valores PPT (p. ej. `#0375D9 ≠ #0375DB`).
@@ -97,6 +102,7 @@ Reglas obligatorias:
 - **Bloquea a TASK-1391** (renderer productivo): el worker debe rendear **catalogos**, no "el deck". Si 1391 arranca antes, cablea el nombre viejo al Cloud Run Job.
 - **Desbloquea el catalogo `social-carousel`** (growth/social) sin fork del motor.
 - **No bloquea a TASK-1392** (aggregate `Proposal`): son ortogonales — 1392 es DB/dominio, esta es plataforma. Pueden ir en paralelo.
+- **Bloquea el contrato de render de TASK-1391**: el worker debe persistir/renderizar el `ResolvedCompositionManifest`, no el `DeckPlan` histórico mutable.
 - Creative Studio (EPIC-028) queda como **consumer futuro del paquete**, nunca como reimplementacion.
 
 ### Files owned
@@ -126,6 +132,10 @@ Reglas obligatorias:
 - Los resolvers y el icon set (`solar-icons.ts`) son **semanticos del deck** pero viven en el motor: deben pasar a ser **inyectables por catalogo**.
 - **51 HEX de marca hardcodeados** repartidos por los 25 archivos, con la paleta re-declarada en cada uno. No hay capa de tokens compartida (solo `deck-signature.css`). La auditoría posterior demuestra que ese conteo no cubre todos los `rgba()`: la migración debe gobernar las **80 bases RGB normalizadas**, no sólo los literales HEX.
 - No existe el concepto de **brand pack** ni de `owner_org_id` en el catalogo → hoy la capability no puede servir a un cliente.
+- El renderer todavía acepta un `DeckPlan` cuyo `template` llega desde el archivo/CLI: `planSlides()` sabe derivarlo por `contentType`, pero `composeDeck()` no exige que el valor declarado coincida con el selector. Un agente podría elegir una plantilla semánticamente incorrecta mientras sus slots pasen validación de forma.
+- El artefacto guardado no fija todavía un `CatalogSnapshot` completo: faltan hashes/versiones de contrato, template, brand pack, fuentes y validadores semánticos que expliquen por qué un replay era elegible.
+- Las plantillas importan Poppins/Geist por red. El propio renderer declara que el resultado no es hermético; un worker aislado no puede depender de Google Fonts para un PDF contractual.
+- La validación actual cubre estructura, cardinalidad, enums y parte de la evidencia, pero no ofrece un punto de extensión catalog-owned para invariantes cruzados como plan propuesto único, monto héroe consistente, FTE derivado, cobertura de requisitos o fuente visible.
 
 ### Línea base descubierta — AXIS-PPT: color y gradientes (2026-07-12)
 
@@ -187,7 +197,11 @@ Reglas obligatorias:
   - ⚠️ **Blocker concreto ya detectado:** `solar-icons.ts` hace `import 'server-only'` — es un **Next-ism** que **no resuelve fuera de Next**. El CLI ya lo esquiva con un shim (`--require ./scripts/lib/server-only-shim.cjs`), y ese shim **viajaria a Creative Studio**. Sacarlo del motor (el boundary server/client se marca en el **consumer**, no en un primitive portable) o aislarlo tras el contrato del catalogo.
   - Verificacion de portabilidad: el motor debe poder ejecutarse **en Node puro, sin Next y sin el shim**.
 - Actualizar el CLI y `deck:compose`; mantener el comando y su comportamiento **identicos** (el operador no debe notar el refactor).
-- Gate de equivalencia: el `DeckPlan` de SKY produce el **mismo PDF** que antes del move.
+- Gate de equivalencia: el `DeckPlan` de SKY conserva geometría, texto seleccionable, contenido y frames aprobados antes del move; el hash byte-a-byte se exige sólo mientras fuente/assets no cambien de revisión.
+- Introducir dos tipos explícitos y browser-safe cuando corresponda:
+  - `CompositionPlanInput`: `slideId`, `contentType`, `slots`; es la única forma que un autor/agente puede producir.
+  - `ResolvedCompositionManifest`: input canónico + template seleccionado + `catalogVersion`/hash + contrato/template/brand-pack/font hashes + validadores ejecutados y resultado. Es la única forma que puede persistirse, confirmarse o renderizarse.
+- Mantener compatibilidad del CLI local con el `DeckPlan` histórico sólo como adaptador: si trae `template`, debe ser exactamente el resultado del selector para su `contentType`; una discrepancia aborta. Ninguna ruta nueva acepta `template` como autoridad de un author.
 
 ### Slice 1b — Los ASSETS también se mudan: `docs/` deja de ser un directorio de runtime
 
@@ -227,7 +241,7 @@ después excluir `docs/`.** Al revés es un build roto días después, en silenc
 - El resolver de paths deja de apuntar a `docs/` (y deja de depender del `cwd` del proceso, que es
   otra fragilidad latente del `readFileSync` actual).
 - **Recién entonces:** agregar `docs/` a `.vercelignore` y verificar que el build de Vercel siga
-  verde. Gate: el `DeckPlan` de SKY produce **el mismo PDF** antes y después.
+  verde. Gate: el `DeckPlan` de SKY conserva geometría, texto seleccionable, contenido y frames aprobados antes y después; un cambio de revisión de fuente/asset debe quedar explícito en el manifest.
 
 > **La regla que deja escrita este slice: si un directorio de documentación se lee con `fs` en
 > runtime, no es documentación — es un asset store mal ubicado.**
@@ -238,6 +252,8 @@ después excluir `docs/`.** Al revés es un build roto días después, en silenc
 - Extraer los 15 resolvers y el icon set del motor → **catalogo `deck-axis`**. El motor deja de conocer `stat-goal-icon` o `four-pillars`.
 - Sacar el merge `pdf-lib` de `compose.ts` → `outputTarget: 'pdf-merged' | 'png-set'`. `png-set` emite N PNG y **ningun PDF**.
 - Test de la regla que define la task: **agregar un catalogo nuevo no toca un archivo del motor**.
+- Definir el punto de extensión `CatalogSemanticValidator`: recibe exclusivamente el plan ya resuelto, el snapshot de catálogo y referencias de evidencia que el consumer autorizó; retorna violaciones tipadas, deterministas y serializables. El motor ejecuta/serializa el resultado, pero no contiene `if` de pricing, equipo, SLA o propuesta.
+- `deck-axis` debe declarar, versionar y probar sus invariantes semánticas: plantilla compatible con `contentType`; referencias de evidencia requeridas; exactamente una opción propuesta y monto héroe consistente; porcentaje/FTE derivable; cobertura trazable de requisitos. Las reglas que dependan de datos de `Proposal` se evalúan aguas arriba con sus referencias congeladas, nunca consultando DB/red dentro del render.
 
 ### Slice 3 — Brand pack de presentación + gradient recipes (la costura ASaaS)
 
@@ -250,6 +266,74 @@ después excluir `docs/`.** Al revés es un build roto días después, en silenc
 - Guard: un test/lint que falla si una plantilla reintroduce un HEX de marca.
 - Verificacion visual **obligatoria**: componer el deck SKY con el brand pack AXIS y **mirar las 4 laminas** — la tokenizacion no puede cambiar el pixel.
 
+### Slice 3b — El MOLDE también se tokeniza, en la MISMA pasada que el color
+
+> ⚠️ **Lo exige el ADR** (`GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md` → **Delta b, §7**), y
+> esta task **no lo tenía en el Scope**. Sin él, el trabajo queda **a medias**: se tokeniza el color y el
+> **espaciado se sigue midiendo a ojo**.
+
+**La razón de que vaya acá y no en una task aparte es aritmética: el color y la geometría tocan LOS MISMOS
+25 ARCHIVOS.** Hacerlo en dos pasadas = **tocar las 25 plantillas dos veces = dos regresiones visuales
+sobre todo el catálogo.** Es el error que hay que evitar, no una preferencia de scoping.
+
+**El molde vive hoy como CONVENCIÓN** (las 5 reglas de `deck-visual-system.md`) que **cada plantilla
+re-implementa a mano**. Medido: el **lienzo** (`1920×1080` + `overflow:hidden`) y el **degradado** están
+re-declarados **25/25**; la **safe-area**, 20/25; el **glass**, en las 8 que lo usan.
+
+> **Un contrato que hay que re-implementar 25 veces no es un contrato: es una sugerencia.** Y la evidencia
+> dice que las sugerencias se violan — la firma estaba **fuera de su contexto de blend en 21 de 22
+> plantillas**.
+
+**Entregables:**
+
+- **Lienzo, safe-area, escala de espaciado, glass y roles tipográficos** se compilan **una vez** y las
+  plantillas los **componen**. Dejan de dibujarlos.
+- 🔴 **Regiones DIRECCIONABLES, y el chrome se ancla a una REGIÓN, no a un píxel.** Los cinco
+  `calc(100% - 912px)` de `deck-signature.css` eran la **confesión** de que la firma no podía preguntarle
+  al layout dónde termina el campo oscuro: alguien **midió cada panel con la regla**.
+  *(✅ **Codex ya lo empezó** con `data-url-bubble-backdrop` — ese patrón es el correcto y se generaliza acá.)*
+- **La geometría ilegal pasa de VIGILADA a IRREPRESENTABLE.** Hoy `template-geometry.test.ts` **prohíbe**
+  `%`+`gap` en las 25. Con un primitive de layout que emite `minmax(0, Nfr)`, **no puedes escribirlo porque
+  no escribes el grid.** El guard se queda (defense-in-depth) pero deja de ser lo único entre el comité y
+  una tesis guillotinada.
+- ⚠️ **Dónde parar:** el molde llega a lienzo/regiones/safe-area/espaciado/chrome/glass/roles de tipo.
+  **NO** llega a una librería de **átomos de contenido** (stat, bullet, card). **Un átomo se extrae sólo
+  cuando ya está duplicado ≥3 veces Y es idéntico.** Si hay que parametrizarlo para que calce, no es un
+  átomo: es una plantilla nueva, y eso lo decide el catálogo.
+- 🔴 **La frontera que NO se cruza:** las primitivas del molde son **detalle INTERNO del catálogo**, **NO
+  una superficie de autoría**. El `Plan` sigue eligiendo **una plantilla por nombre**; **nunca** ensambla
+  primitivas. **Modularizar por dentro es lo contrario de abrir por fuera** — un comité **compara**, y un
+  collage resta.
+- **Gate de merge: diff visual de las 25** (`pnpm fe:capture:diff`). El refactor debe ser **visualmente
+  neutro** salvo donde corrige un bug conocido, y esa excepción se declara **lámina por lámina**.
+
+### Slice 4 — Font pack hermético y manifest de replay
+
+> 🔴 **CORRECCIÓN DE CAPA (Delta b · §2): las FUENTES pertenecen al BRAND PACK, no al catálogo.**
+>
+> Este slice decía *"font pack local versionado **del `deck-axis`**"* — o sea, **el catálogo dueño de las
+> fuentes**. **Está mal asignado, y rompe la premisa entera del as-a-service:**
+>
+> **La tipografía ES marca.** Si el font pack cuelga del **catálogo**, entonces cambiar el brand pack
+> **NO cambia las fuentes** → **el deck de un cliente saldría en Poppins/Geist, que son las fuentes de
+> Efeonce.** Un cliente con su propio brand pack **trae sus propias fuentes**.
+>
+> **Canónico: el `BrandPack` es dueño de `{ colorPrimitives, roles, opacities, FONTS, typeRoles }`.**
+> El **catálogo** es dueño del **molde** (lienzo, regiones, espaciado, recipes de gradiente) y **referencia
+> roles**, nunca valores. **AXIS es el brand pack de Efeonce, no *el* brand pack** — y eso incluye su
+> tipografía.
+>
+> ⚠️ **Corolario que hay que declarar:** las fuentes de un cliente **probablemente NO son de licencia
+> abierta** (Poppins y Geist sí lo son). El contrato del `BrandPack` debe llevar **licencia y derecho de
+> embebido por fuente**, y **fallar cerrado** si un pack declara una fuente sin derecho de embebido. Es un
+> problema **legal**, no técnico — y con el motor sirviendo a un cliente, es nuestro.
+
+- Incorporar Poppins/Geist como assets locales versionados **del brand pack `axis` (NO del catálogo)**, con licencia, derecho de embebido, variante, checksum y `@font-face` declarativos. No introducir una dependencia implícita de Google Fonts ni asumir que la imagen de Chromium tendrá una fuente instalada.
+- **Los roles tipográficos** (título · lead · cuerpo · numerales tabulares) **son del brand pack**, igual que los roles de color. Una plantilla pide `typeRole: 'title'`, **nunca** `font-family: Poppins`.
+- El snapshot de catálogo incluye manifest de fuentes y su checksum. El render bloquea red de fuentes y falla cerrado si una fuente declarada no carga; el PDF no puede degradar silenciosamente a fallback tipográfico.
+- Emitir junto al PDF/PNG el `ResolvedCompositionManifest` canónico. Su hash contiene input, catálogo, templates/contratos, brand pack, fuentes y resultado de los validadores; el manifiesto permite explicar y repetir el mismo artefacto sin consultar el reloj, Figma, red ni una base de datos.
+- El baseline de equivalencia aplica a la migración de assets: comparar geometría, texto seleccionable, fuentes embebidas y frames. Un cambio de píxel deliberado por eliminar la red se versiona como nueva revisión de catálogo, nunca se presenta como replay idéntico.
+
 ## Out of Scope
 
 - **El catalogo `social-carousel`** (plantillas, molde visual, resolvers y consumer de growth). Esta task deja el motor **listo para recibirlo**; construirlo es su propia task.
@@ -257,7 +341,7 @@ después excluir `docs/`.** Al revés es un build roto días después, en silenc
 - El aggregate `Proposal`, su tabla, sus commands y el rename `Tender → Proposal` — **TASK-1392** (ortogonal).
 - Crear `packages/*` o cualquier deployable. Esta task **prepara** la extraccion; **no la ejecuta** (eso lo autoriza EPIC-027).
 - UI de cliente, billing/creditos por render, editor de plantillas y el lane `api/platform/ecosystem/*`. Se dejan las **costuras**, no el producto.
-- Embeber las fuentes (el render sigue **no hermetico**) — deuda declarada, no se cierra aca.
+- Variantes de contenido de `deck-axis` para una propuesta concreta (portada contextual, nota de evidencia visible, capacidad de equipo, ciclo con feedback y paginación de cumplimiento). Requieren una task `ui-ux` sucesora sobre el catálogo ya sellado, con sus wireframes, pruebas visuales y un consumer Proposal; no se agregan como slots ad-hoc dentro de este refactor.
 
 ## Detailed Spec
 
@@ -290,17 +374,17 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
   directorio del deploy antes de mudarlo deja el read **roto en runtime**, y el síntoma aparece días
   después, en silencio, cuando un consumer server-side (o el worker de **TASK-1391**) lo toque.
 - Slice 2 MUST cerrar antes de Slice 3: el brand pack se inyecta **por catalogo**; sin el contrato de catalogo no hay donde colgarlo.
-- El gate de equivalencia (mismo `DeckPlan` → mismo PDF) corre en **cada** slice, no solo al final.
+- El gate de equivalencia visual/lógica corre en **cada** slice, no solo al final; la igualdad byte-a-byte es un subgate sólo cuando las revisiones de fuentes/assets son idénticas.
 - **NO** empezar el catalogo `social-carousel` hasta que Slice 2 este verde: construirlo antes es exactamente el fork que este trabajo evita.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| El refactor cambia el pixel del deck (regresion visual silenciosa) | composer/render | medium | gate de equivalencia byte-a-byte + **mirar** las 4 laminas SKY en cada slice | PDF distinto al baseline; lamina que cambia sin motivo |
+| El refactor cambia el pixel del deck (regresion visual silenciosa) | composer/render | medium | manifest/versiones + gate de geometría, texto seleccionable y frame diff + **mirar** las 4 láminas SKY en cada slice | frame distinto sin nueva revisión de catálogo; lámina que cambia sin motivo |
 | Se degrada una bug class ya cerrada (fallo silencioso / geometria) | composer | low | las 5 suites viajan con el motor; `template-geometry.test.ts` corre sobre las 25 | test rojo; una lamina vuelve a amputar copy |
 | El motor "se lleva" un pedazo de dominio al moverse | boundary | medium | **lint/test de frontera**: import de `commercial/**` o `growth/**` rompe el build | build rojo en el gate de frontera |
-| **Se excluye `docs/` del deploy antes de mudar los assets** → el `readFileSync` del composer queda roto en runtime, y el síntoma no aparece hasta que un consumer server-side lo toque (días después, en silencio) | Vercel / composer | **high** si nadie lee el ordering rule | **Slice 1b: mudar los assets PRIMERO, `.vercelignore` DESPUÉS.** Gate: mismo `DeckPlan` → mismo PDF, y build de Vercel verde tras la exclusión | `ENOENT` en un route/worker que compone; PDF que sale sin íconos |
+| **Se excluye `docs/` del deploy antes de mudar los assets** → el `readFileSync` del composer queda roto en runtime, y el síntoma no aparece hasta que un consumer server-side lo toque (días después, en silencio) | Vercel / composer | **high** si nadie lee el ordering rule | **Slice 1b: mudar los assets PRIMERO, `.vercelignore` DESPUÉS.** Gate: mismo artefacto lógico/frame aprobado cuando la revisión no cambia, y build de Vercel verde tras la exclusión | `ENOENT` en un route/worker que compone; PDF que sale sin íconos |
 | Los **retratos del squad** (PII de personas reales) se replican a un paquete portable "porque estaban en la carpeta" | privacidad | medium | declarar home + política de acceso al mudarlos; **no** viajan por inercia a un paquete que Creative Studio pueda consumir | foto de un colaborador en un artefacto/paquete donde no debía estar |
 | La tokenizacion cambia colores sin querer | brand/plantillas | medium | ledger 80/80 + diff visual lamina por lamina; el token debe resolver al **mismo HEX/RGB y alpha** que reemplaza | lamina con color corrido o base sin mapping |
 | Una recipe cambia geometría/orden de capas al tokenizar | deck KV/PDF | medium | recipe declarativa + snapshot de CSS calculado + revisión de cover/rich/back/light | glow, grain o contraste visualmente distinto |
@@ -325,7 +409,7 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 **N/A — la task no toca produccion** (no hay runtime desplegado del composer; el unico consumer es el CLI). La verificacion es local:
 
 1. `pnpm vitest run src/lib/artifact-composer` verde (las 5 suites, 66 tests).
-2. `pnpm deck:compose examples/sky-deck-plan.json` produce el **mismo PDF** que antes del refactor.
+2. `pnpm deck:compose examples/sky-deck-plan.json` conserva el artefacto lógico, geometría, texto seleccionable y frames aprobados; sólo exige el mismo hash de PDF si fuente/assets mantienen la misma revisión.
 3. **Mirar** las 4 laminas del deck SKY (no basta con que el test pase: una regresion de color o de crop no la ve un assert).
 4. Gate de frontera: un import de dominio dentro del motor **rompe el build**.
 5. `pnpm local:check` + `pnpm test` (full) + `pnpm build` (prod).
@@ -344,6 +428,8 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 
 - [ ] El motor vive en `src/lib/artifact-composer/**` y **no importa nada** de `src/lib/commercial/**` ni `src/lib/growth/**`; un import de dominio **rompe el build** (gate mecanico, no criterio de reviewer).
 - [ ] El motor **corre en Node puro, sin Next y sin el shim de `server-only`** — es la prueba de que Creative Studio podra consumirlo como paquete sin arrastrar un workaround.
+- [ ] `CompositionPlanInput` no permite a un author elegir `template`; el adaptador histórico rechaza cualquier `template` que no sea el resultado del selector para el `contentType`.
+- [ ] Sólo un `ResolvedCompositionManifest` puede llegar a persistencia/render productivo, y contiene hashes/versiones de catálogo, contrato, template, brand pack, fuentes y validadores aplicados.
 - [ ] Un **catalogo de prueba** con canvas y `outputTarget` distintos compone **sin tocar un solo archivo del motor**.
 - [ ] `outputTarget` soporta `pdf-merged` (deck) y `png-set`; `png-set` emite N PNG y **ningun** PDF.
 - [ ] Los 15 resolvers y el icon set viven en el catalogo `deck-axis`, no en el motor.
@@ -354,14 +440,16 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 - [ ] Las 25 plantillas importan el CSS compilado y seleccionan una recipe; no contienen ningun HEX de marca ni gradient local.
 - [ ] El mapping contiene el crosswalk PPT ↔ AXIS UI, prohíbe substituciones no exactas y exige que todo color actual del deck tenga variable/node dentro del Sistema Axis-PPT; las altas extienden las colecciones `Deck` existentes, no crean otra paleta, y los claims `Empower your*` no crean una paleta ni una regla cromática implícita.
 - [ ] El brand pack es **parametro** de la composicion; nada en el motor ni en las plantillas nombra "AXIS"/"Efeonce" como constante.
-- [ ] El deck SKY compone **identico** al baseline pre-refactor (mismo `DeckPlan` → mismo PDF) y las 4 laminas fueron **miradas**, no solo testeadas.
+- [ ] El motor ofrece `CatalogSemanticValidator` sin reglas de Proposal/Tender embebidas; `deck-axis` versiona y prueba sus reglas de compatibilidad, evidencia, pricing, staffing y cobertura de requisitos contra fixtures.
+- [ ] Poppins/Geist se cargan desde el font pack local versionado, con licencia/variante/checksum declarados; el renderer bloquea la red de fuentes y falla cerrado ante fallback o asset ausente.
+- [ ] El deck SKY conserva contenido, geometría, texto seleccionable y frames aprobados respecto del baseline pre-refactor; si el font/asset pack cambia de revisión, el manifest y baseline versionados declaran la diferencia y las 4 láminas fueron **miradas**, no sólo testeadas.
 - [ ] Las 2 bug classes siguen cerradas: filler que aborta ante slot desconocido, `overflow: reject`, y `assertSlideFitsCanvas` (66 tests verdes).
 - [ ] `pnpm deck:compose` conserva nombre, argumentos y outDir por defecto.
 
 ## Verification
 
 - Antes de implementar: leer el ADR completo; `pnpm task:lint --task TASK-1393`.
-- Durante: `pnpm vitest run src/lib/artifact-composer`; gate de equivalencia del PDF; gate de frontera; composicion del catalogo de prueba.
+- Durante: `pnpm vitest run src/lib/artifact-composer`; gate de equivalencia visual/lógica (y hash de PDF cuando aplique); gate de frontera; composición del catálogo de prueba.
 - Antes de cerrar: `pnpm local:check` + `pnpm test` (full) + `pnpm build` (prod) + revision visual de las 4 laminas SKY + `pnpm docs:closure-check`.
 
 ## Closing Protocol
@@ -375,7 +463,7 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 
 - Catalogo `social-carousel` (4:5 → `png-set`) + su molde visual + su consumer en growth.
 - TASK-1391 — renderer productivo, ahora sobre **catalogos**.
-- Embeber las fuentes (Poppins/Geist) para que el render sea **hermetico**.
+- Task `ui-ux` de extensión de `deck-axis` posterior a esta extracción: portada con contexto/fecha, nota visible de evidencia, capacidad de equipo, proceso cíclico y matriz de cumplimiento paginable. Debe consumir los contratos semánticos ya sellados; nunca editar HTML/slots de SKY como excepción.
 - Extraccion a `packages/artifact-composer` cuando EPIC-027 lo autorice (Creative Studio lo consume desde ahi).
 
 ## Open Questions

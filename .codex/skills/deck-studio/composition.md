@@ -124,6 +124,24 @@ composer DEBE abortar la lámina.**
 
 **Una barra sin dato es una barra que miente.**
 
+### Colecciones y brechas derivadas — el contrato gobierna el DOM
+
+Un array no se rellena tomando “el primer hijo que haya” en el HTML. Si el contrato declara
+`itemSelector`, ese es el blueprint repetible; si declara `fixedChildren`, esos nodos se preservan al
+reconstruir la colección. Un selector o fijo que no matchea el DOM **aborta**: el orden casual del
+prototipo no es un fallback válido.
+
+El chrome que el dato no sostiene se elimina mediante una operación **explícita del resolver**, nunca se
+deja como residuo del blueprint. En un gráfico comparativo:
+
+- el valor visible debe coincidir con el número que determina la barra;
+- el callout de brecha se deriva de las mismas series, no lo escribe el autor;
+- si la serie destacada ya lidera, la brecha es cero y **no se dibuja** un callout ficticio;
+- si falta una serie destacada única, el dato no puede explicarse y el composer aborta.
+
+El caso canónico es `ChartSplit` (TASK-1394): 25/25 plantillas componibles, con fixtures revisados
+visualmente para brecha positiva y cero. Esta regla es del **Composer**, no de una plantilla concreta.
+
 ---
 
 ## `TimelineFull` — cronograma data-driven
