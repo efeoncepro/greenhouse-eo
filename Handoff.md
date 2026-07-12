@@ -1,3 +1,13 @@
+## Sesión 2026-07-12 (cont. 12) — TASK-1391 EN CURSO: intake + discovery (Claude)
+
+- TASK-1391 (Artifact Renderer: Cloud Run Job `artifact-worker` + cola + artifact pipeline) movida a
+  `in-progress/`. Trabajo en `develop` local-first, sin push automático.
+- ⚠️ El gate de Slice 0 sigue vigente: **NO se crea `services/artifact-worker/` ni ningún recurso GCP
+  sin la autorización de frontera de EPIC-027 documentada** — el checkpoint humano del plan la va a
+  pedir explícitamente antes de tocar Slice 2.
+- Discovery en curso: marco EPIC-027/build-units, patrones Cloud Run Job, contrato real del manifest
+  del composer + asset store write path.
+
 ## Sesión 2026-07-12 (cont. 11) — fix CI preexistente: Chromium para las suites del composer (Claude)
 
 - El job de unit tests de `ci.yml` NO instalaba browsers de Playwright → las suites del composer que
