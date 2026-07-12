@@ -51,6 +51,13 @@ export class ProposalQuoteMismatchError extends Error {
   }
 }
 
+export class ProposalAudienceError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ProposalAudienceError'
+  }
+}
+
 export class ProposalEntitlementError extends Error {
   constructor(public readonly ownerOrgId: string) {
     super(
