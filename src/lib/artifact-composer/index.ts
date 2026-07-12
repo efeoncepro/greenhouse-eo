@@ -109,3 +109,11 @@ export {
 
 // Sintetizador de payloads mínimos (guard de composability + gate visual: un solo probe)
 export { synthesizeProbeSlots, synthesizeSlotValue } from './synthesize'
+export {
+  assertAllImagesResolved,
+  assertNoFontFallback,
+  assertSlideHasInk,
+  measureSlideInk,
+  SlideQualityError,
+  type SlideInkMetrics
+} from './quality-gates'

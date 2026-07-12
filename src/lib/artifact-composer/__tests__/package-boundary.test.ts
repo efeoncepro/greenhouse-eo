@@ -25,7 +25,8 @@ import { describe, expect, it } from 'vitest'
 
 const PACKAGE_DIR = path.resolve(__dirname, '..')
 
-const ALLOWED_BARE_IMPORTS = new Set(['playwright', 'pdf-lib'])
+// pngjs: decodificador PNG puro-JS para los quality gates (blank_slide) — decisión TASK-1391 1b.
+const ALLOWED_BARE_IMPORTS = new Set(['playwright', 'pdf-lib', 'pngjs'])
 
 const listSourceFiles = (dir: string): string[] => {
   const out: string[] = []

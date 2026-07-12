@@ -25,6 +25,7 @@ import { chromium, type Browser, type Page } from 'playwright'
 
 import type { CatalogLayoutHook } from './catalog'
 import type { SlideSpec, SlotContract, SlotValue, TemplateContract } from './contracts'
+import { assertAllImagesResolved, assertNoFontFallback, assertSlideHasInk } from './quality-gates'
 import { resolveFieldDirective, type FieldDirective, type ResolverRegistry } from './resolver-contract'
 
 /**
@@ -935,8 +936,15 @@ export const renderSlide = async (
     // peor que un fallo — se ve terminado, y nadie lo revisa dos veces.
     await assertSlideFitsCanvas(page, slide, contract)
 
+    // Quality gates mecánicos (TASK-1391 · 1b): en régimen nadie mira cada render — estos
+    // detectores reemplazan el "mirar los frames". Gates de publicación, no advertencias.
+    await assertAllImagesResolved(page, slide.slideId)
+    await assertNoFontFallback(page, slide.slideId)
+
     if (target.kind === 'png') {
-      await page.screenshot({ path: target.outPath })
+      const buffer = await page.screenshot({ path: target.outPath })
+
+      assertSlideHasInk(buffer, slide.slideId)
     } else {
       await page.pdf({
         path: target.outPath,
