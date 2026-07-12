@@ -49,10 +49,14 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 Al tocar licitaciones, cargar `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` y el §0 de la arquitectura de Tender.
 Para cualquier deck cargar además `deck-studio`; en `TimelineFull` el plan declara `timeUnit`, eje, fases,
 hitos y `barLabel` editable, mientras el compiler deriva la geometría y falla cerrado si ese copy se recorta.
-El composer F1 es sólo CLI. `TASK-1394` está completa: cerró ChartSplit 25/25 con geometría fail-closed,
-`itemSelector`/`fixedChildren` y remoción explícita. Luego `TASK-1393` convierte
-la intención semántica en `ResolvedCompositionManifest` inmutable (selector, contratos/hashes, validadores,
-brand/font pack): un autor/agente nunca elige `template`. El runtime empieza con `TASK-1392`:
+El composer sigue siendo sólo CLI. `TASK-1394` está completa (ChartSplit 25/25). **`TASK-1393` está APLICADA
+(code complete; falta validar en Figma las 71 altas de color propuestas):** el motor vive en
+`src/lib/artifact-composer/**` (primitive domain-free) y el deck es el catálogo `catalogs/deck-axis/` con
+brand/font pack `axis` (cero HEX/fuentes literales; render hermético). Un autor/agente nunca elige `template`
+(selector + `TemplateAuthorityError`) y junto al PDF/PNG se emite el `ResolvedCompositionManifest` inmutable
+(hashes de catálogo/contratos/brand pack/fuentes + validadores). Al tocar el dominio: `pnpm composer:visual-gate`
+a CERO píxeles contra el baseline committeado (rebaseline sólo declarado en `BASELINE_DELTAS.md`) + la suite
+del paquete. El runtime empieza con `TASK-1392`:
 `tender_asset.audience` y evidencia versionada/allowlisted → contexto permitido → propuesta tipada →
 confirmación humana → command canónico. El LLM no escribe ni cruza gates. `TASK-1391` sólo renderiza ese
 manifest y es después un candidato bloqueado de `EPIC-027` para `tender-worker`; no autoriza

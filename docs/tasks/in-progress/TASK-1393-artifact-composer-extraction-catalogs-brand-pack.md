@@ -694,8 +694,11 @@ pierdan por accidente — no que las próximas estén bien invertidas.
 | **1b** — assets fuera de `docs/` | `a50eecb60` | ✅ catálogo runtime (12,4MB) → `catalogs/deck-axis/`; política PII squad declarada; el gate ATRAPÓ una regresión real del move (logo efeonce escapaba vía `../../../public/`) → catálogo autocontenido |
 | **2** — catálogo como dato | `88b80c678` | ✅ `ArtifactCatalog` + `outputTarget` fail-closed (`png-set` sin PDF; `pptx-native`/`adobe-express-rest` declarados abortan); 16 resolvers + icon set + timeline al catálogo; `CatalogSemanticValidator` con 4 reglas reales de deck-axis probadas (pricing-integrity, team-dedication, requirements-coverage, template-compatibility — el deck SKY pasa las 4); `resolvePlan` → manifest con hashes; toy catalog test (la regla que define la task, probada) |
 | **3a** — snapshot + ledger | `2d633819d` | ✅ snapshot AXIS-PPT verificado vía Figma MCP (68 primitives `33:2` + 50 semantic `33:129` + Deck/Foundations `39:2`); `pnpm composer:color-ledger` (contrato de dos vías) |
-| 3b/3c — clasificación + compilador + recipes + molde | — | ⏳ **siguiente**; ver gate de decisión abajo |
-| 4 — font pack + manifest emitido | — | ⏳ |
+| **3b-i** — clasificación + compilador BrandPack | `2860f2c7c` | ✅ 78/78 clasificadas (naming mecánico por familia+luminosidad, convención `--axis-deck-*`; 71 `figma.status=proposed`); `brand-pack.ts` (compilador determinista + guard WCAG — **AXIS pasa HOY los 7 pares declarados**, advisory sin violaciones; blocking probado con pack ilegible); `deck-tokens.css` committeado + sync test + **0e** (token ≡ literal exacto, hex + triple RGB) |
+| **3b-ii** — tokenización de las 25 | `1f50bd8e3` | ✅ **671 literales → tokens a CERO píxeles** (reescritura mecánica dirigida por el ledger; alphas exactos vía `calc(AA/255)`; SVG attrs → style). Guard post-migración: cualquier literal reintroducido rompe (`composer:color-ledger` + test CI) |
+| **3c** — recipes como dato | `94a5bb682` | ✅ `gradient-recipes.json` (rich-content · cover-hero · back-cover · light-surface; stops SOLO role:/token:) → tokens `--axis-deck-recipe-*`; 19 plantillas recableadas a 0 px; inventario RATCHET de los 96 gradientes de contenido restantes (dos vías) |
+| **3b-molde** — molde compilado | `17cedc90c` | ✅ `deck-mold.css`: lienzo (re-declarado 25/25 → compilado 1 vez, `overflow:hidden` unificado 25/25 a 0 px) + `--deck-safe` + escala de espaciado medida + escala de blur del glass adoptada. **Los 5 `calc(100% - NNNpx)` del chrome YA NO EXISTÍAN** (la firma ancla a región vía `data-url-bubble-backdrop` — patrón Codex generalizado); los 3 `calc()` restantes son geometría interna de contenedor, no chrome midiendo paneles |
+| **4** — font pack + manifest | `31d35fbe2` | ✅ Poppins/Geist TTF locales OFL en el PACK (licencia+`embedRights` fail-closed+sha256); type roles (`var(--axis-deck-type-display\|text)` — cero `'Poppins'` literal); render **BLOQUEA http(s)** + aborta ante fuente no cargada (prueba negativa); **rebaseline DECLARADO** (38 frames, rasterización sub-visual TTF vs woff2, mirado contra baseline; `--freeze` se negó hasta declararlos); `ResolvedCompositionManifest` **emitido** junto al PDF/PNG con brandPack hash + 13 checksums de fuentes + validadores |
 
 **Recalibraciones (medidas, no opiniones):**
 
@@ -704,7 +707,19 @@ pierdan por accidente — no que las próximas estén bien invertidas.
 3. **`docs/` NO se puede excluir completo de `.vercelignore`**: el Roadmap reader (TASK-1152) lee `docs/{epics,tasks,mini-tasks,issues}/**/*.md` en runtime vía `outputFileTracingIncludes`. Se excluyó sólo `tender-deck-composer-prototypes/` (~40MB post-move). El texto del Slice 1b queda recalibrado así.
 4. **Los alphas son composicionales**: el blanco aparece con 54 alphas distintos — la "opacidad nombrada" por base×alpha sería ruido. Se tokeniza la BASE (`--x` + `--x-rgb`) y el alpha queda en la composición; las opacidades nombradas se reservan para las recipes.
 
-**🔴 Gate de decisión del operador antes de 3b (propose → confirm):** las **71 altas** del ledger deben nombrarse extendiendo la colección `Deck` del `Sistema Axis - PPT`, cuya convención existente es CSS-custom-property (`--axis-deck-empower-*`, descubierta en `39:2`). Nombrar y crear ~71 variables en la biblioteca de marca del operador NO es un write silencioso de agente: la clasificación propuesta se entregará como tabla (`figma.status: proposed` en el ledger) para validación antes de hornearse en las 25 plantillas. Las 20 altas estructurales ya venían pre-nombradas por esta task (navy/teal/violet/surfaces/halo/back-cover).
+**🔴 Gate de decisión del operador — LO ÚNICO que separa la task de `complete` (propose → confirm):**
+las **71 altas** del ledger están nombradas (naming mecánico familia+luminosidad extendiendo la
+convención `--axis-deck-*` de `39:2`) y **horneadas en el CSS compilado bajo `figma.status: proposed`**
+(el operador autorizó continuar; los valores son EXACTOS a los literales que reemplazan — test 0e).
+Falta el paso que NO es de agente: **crear/validar esas variables en las colecciones `Deck` del
+`Sistema Axis - PPT`** y registrar sus `nodeId` en `color-ledger.json` (sin cambiar valores — igualdad
+exacta o nada). Es el acceptance criterion "todo color actual del deck tiene variable/node dentro del
+Sistema Axis-PPT". La tabla propuesta completa vive en `catalogs/deck-axis/brand/color-ledger.json`.
+
+**Estado al 2026-07-12 (fin de sesión de implementación): `code complete, validación Figma pendiente`.**
+Gates: suite full **9281 tests verdes** · `pnpm vitest run src/lib/artifact-composer` 12 suites/125 ·
+`composer:visual-gate` 0 px · `composer:color-ledger --strict` 0 sin mapping · `composer:brand-pack
+--check` sincronizado · lint 0 · tsc 0 · build prod verde · CLI `deck:compose` idéntico + manifest.
 
 ## Open Questions
 

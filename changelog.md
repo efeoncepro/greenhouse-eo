@@ -2,6 +2,36 @@
 
 ## 2026-07-12
 
+- **Artifact Composer nace como primitive de plataforma (TASK-1393, Slices 0-4 — code complete, validación Figma pendiente).**
+  El motor de composición dejó `commercial/tenders/deck/**` por `src/lib/artifact-composer/**`
+  (domain-free, package-shaped, frontera mecánica, cero Next-isms) y el deck pasó a ser el catálogo
+  `deck-axis` (plantillas + registry + 16 resolvers + validadores semánticos + molde compilado +
+  assets — `docs/` dejó de ser un directorio de runtime). La marca es un INPUT: brand pack `axis`
+  (snapshot Figma PPT verificado + ledger de 78 bases + roles + guard WCAG + font pack OFL local) →
+  las 25 plantillas quedaron sin un solo HEX/`'Poppins'` literal y el render es HERMÉTICO (bloquea la
+  red, falla cerrado ante fuente no cargada). Los gradientes son tokens (4 recipes canónicas como dato
+  + inventario ratchet). Todo protegido por el gate estético nuevo: baseline de 40 frames committeado
+  + `pnpm composer:visual-gate` a CERO píxeles + `BASELINE_DELTAS.md` de dos vías — cada refactor
+  verificado a 0 px, y el único cambio de píxel (fuentes locales) fue declarado lámina por lámina.
+  Junto al PDF/PNG ahora se emite el `ResolvedCompositionManifest` (hashes de catálogo/contratos/
+  brand pack/fuentes + validadores) — el único contrato que TASK-1391 debe aceptar. `outputTarget`
+  fail-closed deja las costuras para `png-set` (carrusel social sin fork), `pptx-native` (TASK-1395)
+  y `adobe-express-rest` (TASK-1396). Pendiente para `complete`: validar las 71 altas de color
+  propuestas en las colecciones `Deck` del `Sistema Axis - PPT` (operador).
+
+- **Surround Discovery™ — corrección de fidelidad post-review.** `main` ahora sirve el commit `025a711`: glyphs Tabler inline sin dependencia de CDN, tokens/gradientes y CTA del HTML aprobado, wrap del hero alineado al artefacto visual y hover del CTA secundario restaurado. Verificación Think local/productiva en 1440, 390 y reduced-motion sin overflow; el smoke humano del Growth Form permanece pendiente.
+
+- **Surround Discovery™ — disponible en Think desde `main`, cierre E2E pendiente.**
+  `TASK-1386` publica la instancia gobernada `efeonce-surround-discovery-ebook`
+  (asset privado, surface Think, CORS y `form_key` opaco); `TASK-1387` compone
+  fielmente `/seo-surround-discovery` sobre el renderer existente. El commit
+  `3a52256160a9aa808e45a1dc15e44fcfc2794356` quedó en `main` y Vercel sirve la
+  ruta en producción. El form conserva su `success_card` v2 con recuperación por
+  correo; el consumer reutilizable entrega un enlace gated por submission, nunca
+  un adjunto ni una URL GCS. La verificación productiva sin PII pasó en 1440,
+  390 y reduced-motion; falta el smoke humano Turnstile → descarga → correo →
+  `generate_lead` antes del cierre operativo.
+
 - **ADR — Tender Deck destinations: PDF → PPTX → Adobe Express REST.** El PDF permanece contractual;
   se acepta `pptx-native` como próximo renderer automático y `adobe-express-rest` como destino posterior
   por API server-to-server sobre templates etiquetados. No hay Add-on en el flujo de producto. El

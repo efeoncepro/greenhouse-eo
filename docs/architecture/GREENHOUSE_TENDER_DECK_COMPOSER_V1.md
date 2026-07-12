@@ -9,6 +9,26 @@
 > **Spec raíz:** `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (§4 deck pipeline, Apéndices A/B)
 > **Fuente de layouts y primitivas de presentación:** Figma `Sistema Axis - PPT` (fileKey `GXYeJaRjotmFuczfnd8hLi`; `Color Primitives` `33:2`). Sus aliases se llevaron locales a las primeras plantillas en `b38a8d0e2` y se replicaron al catálogo de 25 en `e78e9dfb2`; TASK-1393 los centraliza sin sustituirlos por el mirror UI.
 
+## Delta 2026-07-12 — TASK-1393 APLICADA (Slices 0-4): el motor es `artifact-composer`, el deck es un CATÁLOGO y la marca es un INPUT
+
+> ⚠️ **Este doc conserva paths/números históricos en varias secciones; lo vigente es esto.**
+> ADR: `GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`. Bitácora completa con commits: Delta (d)
+> de `docs/tasks/in-progress/TASK-1393-artifact-composer-extraction-catalogs-brand-pack.md`.
+
+| Antes (F1) | Vigente (TASK-1393) |
+|---|---|
+| `src/lib/commercial/tenders/deck/**` | **Motor:** `src/lib/artifact-composer/**` (primitive domain-free, package-shaped, frontera por allowlist test + eslint, cero Next-isms) |
+| plantillas/registry/assets en `docs/architecture/tender-deck-composer-prototypes/` (leídos con `fs` en runtime) | **Catálogo `deck-axis`:** `src/lib/artifact-composer/catalogs/deck-axis/` — plantillas + registry + contratos + **16 resolvers + icon set + timeline hooks** (ya no viven en el motor) + validadores semánticos versionados + molde compilado (`deck-mold.css`) + assets (política PII squad declarada). En `docs/` quedaron sólo PREVIEWs/refs (excluidos de Vercel) |
+| 51/80 HEX hardcodeados por plantilla; paleta re-declarada 25× | **Brand pack `axis`** (`src/lib/artifact-composer/brand-packs/axis/`): snapshot Figma PPT verificado + ledger de **78 bases medidas** (`pnpm composer:color-ledger`) + roles + guard WCAG (advisory para axis) → `deck-tokens.css` compilado (`pnpm composer:brand-pack`). **Cero literales de marca en plantillas** (guard post-migración) |
+| gradientes re-declarados por plantilla | **Recipes como DATO** (`gradient-recipes.json` → tokens `--axis-deck-recipe-*`: rich-content · cover-hero · back-cover · light-surface) + inventario RATCHET de los 96 gradientes de contenido restantes |
+| Poppins/Geist por red (render no hermético) | **Font pack del brand pack** (OFL, checksums, `embedRights` fail-closed) → `deck-fonts.css` + type roles `var(--axis-deck-type-display\|text)`; el render **BLOQUEA http(s)** y aborta si una fuente no carga. Rebaseline declarado (38 frames, rasterización sub-visual) |
+| el autor podía declarar `template` | El autor declara **intención** (`CompositionPlanInput`); el selector resuelve (`TemplateAuthorityError` si contradice). Junto al PDF/PNG se emite el **`ResolvedCompositionManifest`** (hashes de catálogo/contratos/templates + brand pack + fuentes + validadores) — lo único que TASK-1391 debe aceptar |
+| "mirar las láminas" como criterio | **Gate estético mecánico:** baseline de 40 frames committeado + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` de dos vías (digest sellado); determinismo garantizado por `launchComposerBrowser()` (raster por software — la GPU variaba subpíxeles) |
+
+- **Extensión probada:** `catalog-extensibility.test.ts` compone un catálogo de juguete (800×1000 → `png-set`) **sin tocar un archivo del motor**; `outputTarget` es fail-closed (`pptx-native`/`adobe-express-rest` declarados abortan — TASK-1395/1396 los llenan).
+- ⚠️ **Pendiente del operador:** las **71 altas** del ledger (`figma.status=proposed`) deben validarse/crearse en las colecciones `Deck` del `Sistema Axis - PPT` (convención `--axis-deck-*`); al validarlas se registra su `nodeId` en el ledger sin cambiar valores.
+- Gates del dominio: `pnpm vitest run src/lib/artifact-composer` + `pnpm composer:visual-gate` + `pnpm composer:color-ledger` + `pnpm composer:brand-pack --check`.
+
 ## Qué es esto
 
 El **composer** arma cada slide de una propuesta de licitación **componiendo módulos pre-diseñados** del sistema AXIS PPT, NO generando freehand. Cada módulo = una **plantilla de layout** con slots de contenido. El agente elige la plantilla adecuada por tipo de contenido y llena los slots.

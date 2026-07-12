@@ -1,3 +1,25 @@
+## Sesión 2026-07-12 (cont. 8) — TASK-1393 IMPLEMENTACIÓN COMPLETA (Slices 0→4, 12 commits): code complete, validación Figma pendiente (Claude)
+
+- **Todos los slices aplicados** en `develop` local-first (SIN push): 3b-i `2860f2c7c` (BrandPack +
+  guard WCAG — AXIS pasa los 7 pares HOY — + `deck-tokens.css` + test 0e token≡literal), 3b-ii
+  `1f50bd8e3` (**671 literales → tokens a 0 px**; guard anti-reintroducción), 3c `94a5bb682`
+  (**los gradientes son tokens**: 4 recipes canónicas como dato + ratchet dos-vías de los 96 de
+  contenido), 3b-molde `17cedc90c` (lienzo compilado 25/25 + escalas; los `calc(100% - N)` del chrome
+  ya no existían — firma anclada a región), 4 `31d35fbe2` (**render HERMÉTICO**: font pack OFL del
+  brand pack con `embedRights` fail-closed, bloqueo http(s), rebaseline DECLARADO de 38 frames
+  mirado, y el **`ResolvedCompositionManifest` emitido** junto al PDF/PNG).
+- **Gates:** suite full **9281 verdes** · paquete 12 suites/125 · visual gate 0 px · ledger --strict
+  0 sin mapping · pack --check sync · lint/tsc 0 · build prod verde · CLI idéntico.
+- **Docs vivos sincronizados:** `.claude/rules/tenders.md` (paths+gates nuevos),
+  `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` (estado real post-1393), Delta vigente en
+  `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md`, bitácora Delta (d) completa en la task.
+- 🔴 **Lo ÚNICO pendiente para `complete`:** el gate del operador — crear/validar las **71 altas**
+  (`figma.status=proposed`, tabla en `catalogs/deck-axis/brand/color-ledger.json`) en las colecciones
+  `Deck` del Figma `Sistema Axis - PPT` y registrar sus `nodeId` (igualdad exacta o nada).
+- ⚠️ Codex: el motor es `src/lib/artifact-composer/**` + catálogo `catalogs/deck-axis/`; carrusel =
+  catálogo nuevo (ver `catalog-extensibility.test.ts`), NUNCA fork; al tocar el dominio corren
+  `pnpm composer:visual-gate` (0 px) y la suite del paquete.
+
 ## Sesión 2026-07-12 (cont. 7) — TASK-1393 EN CURSO: Slices 0→3a COMPLETOS (Claude)
 
 - **Hecho (local-first en `develop`, SIN push):** Slice 0 `b59df463d` (baseline 40 frames + `pnpm

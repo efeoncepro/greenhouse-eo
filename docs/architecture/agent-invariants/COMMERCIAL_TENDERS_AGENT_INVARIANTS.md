@@ -10,14 +10,17 @@
 
 ---
 
-## Estado real del dominio (2026-07-12) — no asumas de más
+## Estado real del dominio (2026-07-12, post TASK-1393 Slices 0-4) — no asumas de más
 
 | Pieza | Estado |
 |---|---|
-| Deck composer (selector · validate · slot-fill · 15 resolvers · geometría · render · **PDF de N páginas**) | ✅ shipped, `src/lib/commercial/tenders/deck/**` |
-| 25 plantillas con `data-slot` + `*.slots.json` + `registry.json` | ✅ **25/25 componibles** (TASK-1394) |
-| CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ **único consumer hoy** |
-| State machine (12 estados, 3 gates humanos) | ⚠️ **TS puro — NO hay tabla `tenders` en DB** |
+| **Artifact Composer** (selector · validate · slot-fill · dispatch de resolvers · geometría · render hermético · output targets) | ✅ shipped, **`src/lib/artifact-composer/**`** — primitive domain-free package-shaped; frontera mecánica (allowlist test + eslint); **cero Next-isms** (sin `server-only`/shim) |
+| **Catálogo `deck-axis`** (25 plantillas + registry + contratos + 16 resolvers + validadores semánticos + timeline hooks + molde compilado + assets) | ✅ **`src/lib/artifact-composer/catalogs/deck-axis/`** — 25/25 componibles; **cero HEX de marca** (todo sale de `deck-tokens.css`); recipes de gradiente como dato; fuentes locales del pack |
+| **Brand pack `axis`** (snapshot Figma PPT + ledger 78 bases + roles + font pack OFL + guard WCAG advisory) | ✅ `src/lib/artifact-composer/brand-packs/axis/` — compilado por `pnpm composer:brand-pack`; ⚠️ **71 altas `figma.status=proposed`** pendientes de validación del operador en `Sistema Axis - PPT` |
+| **Gate estético**: baseline 40 frames + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` dos-vías | ✅ `scripts/frontend/baselines/artifact-composer/**` — corre en cada cambio del dominio |
+| `ResolvedCompositionManifest` (input + hashes de catálogo/contratos/brand pack/fuentes + validadores) | ✅ **se emite junto al PDF/PNG** (`<artifactId>.manifest.json`); es lo único que TASK-1391 debe aceptar |
+| CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ **único consumer hoy** — nombre/args/salida idénticos pre-refactor |
+| State machine (12 estados, 3 gates humanos) | ⚠️ **TS puro — NO hay tabla en DB** (`src/lib/commercial/tenders/tender-state-machine.ts`, terminales `won`/`lost`) |
 | API routes · UI · migración · capability · outbox | ❌ **no existen** |
 | Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ no existen |
 | Renderer productivo: Cloud Run Job + cola + artifact store + señales | 📋 **TASK-1391** (`to-do`, P1) — **bloqueada por EPIC-027** |
@@ -175,8 +178,16 @@ El **Tender Intake Agent** es el molde de toda fase agéntica futura del dominio
   un PNG. El fondo es un **degradado tokenizado en CSS**. (El Apéndice B del ADR del Studio todavía
   describe esa táctica: está marcado **SUPERSEDED** — manda el composer.)
 - **NUNCA** mezcles dos content-types en una lámina. Se divide en dos.
-- **NUNCA** toques `src/lib/commercial/tenders/**` sin correr `pnpm vitest run src/lib/commercial/tenders`
-  (las 5 suites cubren las bug classes que ya nos costaron un deck roto).
+- **NUNCA** toques `src/lib/artifact-composer/**` ni `src/lib/commercial/tenders/**` sin correr
+  `pnpm vitest run src/lib/artifact-composer src/lib/commercial/tenders` (las suites cubren las bug
+  classes que ya nos costaron un deck roto) **y `pnpm composer:visual-gate`** (0 píxeles contra el
+  baseline; rebaseline sólo declarado en `BASELINE_DELTAS.md` + `--freeze`).
+- **NUNCA** reintroduzcas un HEX/rgb de marca, un `@import` de Google Fonts o `'Poppins'/'Geist'`
+  literal en una plantilla: color = `deck-tokens.css` (brand pack), gradientes = recipes/inventario
+  ratchet, tipografía = `var(--axis-deck-type-display|text)` + font pack local (render bloquea red).
+- **NUNCA** un autor/agente declara `template`: declara `contentType` + slots; el selector del
+  catálogo resuelve (`TemplateAuthorityError` si contradice). Lo único persistible/renderizable
+  productivo es el `ResolvedCompositionManifest` emitido junto al artefacto.
 
 ## Registro y copy
 
