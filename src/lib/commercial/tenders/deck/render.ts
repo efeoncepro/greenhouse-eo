@@ -328,6 +328,36 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
           continue
         }
 
+        // Un campo con valor ARRAY dentro de un objeto (los `paragraphs` de una columna) es una LISTA
+        // REPETIDA, no un texto: su ancla es el CONTENEDOR y su primer hijo es el blueprint del item.
+        // Pasarlo por `String(array)` —lo que hacía antes— aplanaba los `<p>` del diseñador en un
+        // solo bloque y dejaba las comas del join a la vista. Es la misma semántica de un slot array:
+        // el markup del item vive en el HTML.
+        if (Array.isArray(fieldValue)) {
+          const blueprint = field.firstElementChild
+
+          if (!blueprint) {
+            problems.push(
+              `${instruction.selector}: el campo "${fieldName}" es una lista, pero su ancla no tiene un item-template en el HTML.`
+            )
+
+            continue
+          }
+
+          const itemTemplate = blueprint.cloneNode(true) as Element
+
+          field.innerHTML = ''
+
+          for (const entry of fieldValue) {
+            const node = itemTemplate.cloneNode(true) as Element
+
+            node.innerHTML = sanitize(String(entry))
+            field.appendChild(node)
+          }
+
+          continue
+        }
+
         field.innerHTML = sanitize(String(fieldValue))
       }
 
@@ -546,11 +576,22 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
           }
 
           // Un campo opcional que no vino se ELIMINA del DOM (no se deja el placeholder del blueprint).
+          //
+          // ⚠️ Pero un campo **DERIVADO** (el ordinal de un paso, la escala de una barra) tampoco
+          // "viene" del autor —lo escribe el resolver— y borrarlo destruye chrome legítimo. Es lo que
+          // hacía desaparecer los números de `ProcessStepsFull`: el resolver escribía "01", y el
+          // barrido inmediatamente le quitaba el nodo.
+          //
+          // La regla correcta: **un campo está provisto si lo dio el AUTOR o si lo derivó un
+          // RESOLVER.** Vale para cualquier plantilla con chrome derivado, no sólo ésta.
           for (const field of Array.from(node.querySelectorAll('[data-slot-field]'))) {
             const name = field.getAttribute('data-slot-field')!
-            const provided = (item as Record<string, unknown>)[name]
+            const authored = (item as Record<string, unknown>)[name]
+            const derived = instruction.fieldPlan?.[`${index}.${name}`] !== undefined
 
-            if (provided === undefined || provided === null || provided === '') {
+            if (derived) continue
+
+            if (authored === undefined || authored === null || authored === '') {
               field.remove()
             }
           }

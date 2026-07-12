@@ -1,11 +1,78 @@
 {
   "template": "ProcessStepsFull",
   "version": "0.1",
-  "viewport": { "width": 1920, "height": 1080 },
-  "slots": {
-    "sectionLabel": { "selector": "[data-slot='sectionLabel']", "type": "string", "required": false, "constraints": { "maxCharacters": 48, "maxLines": 1, "overflow": "reject" } },
-    "title": { "selector": "[data-slot='title']", "type": "rich-string", "required": true, "constraints": { "maxCharacters": 70, "maxLines": 3, "allowedTags": ["em"], "overflow": "reject" } },
-    "steps": { "selector": "[data-slot='steps']", "type": "array", "required": true, "constraints": { "minItems": 3, "maxItems": 5, "overflow": "reject", "order": "execution sequence; renderer supplies ordinal chrome" }, "item": { "type": "object", "shape": { "title": { "type": "string", "required": true, "maxCharacters": 34, "maxLines": 2 }, "description": { "type": "string", "required": true, "maxCharacters": 108, "maxLines": 5 }, "deliverable": { "type": "string", "required": true, "maxCharacters": 54, "maxLines": 2 } } } }
+  "viewport": {
+    "width": 1920,
+    "height": 1080
   },
-  "presentation": { "brandSurface": "timeline-full-approved-navy-gradient", "composition": "one ordered methodological rail with 3–5 steps; no dates, duration, Gantt bars, or overlapping work", "evidencePolicy": "each step declares a concrete deliverable" }
+  "slots": {
+    "sectionLabel": {
+      "selector": "[data-slot='sectionLabel']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 70,
+        "maxLines": 3,
+        "allowedTags": [
+          "em"
+        ],
+        "overflow": "reject"
+      }
+    },
+    "steps": {
+      "selector": "[data-slot='steps']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 3,
+        "maxItems": 5,
+        "overflow": "reject",
+        "order": "execution sequence; renderer supplies ordinal chrome"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "number": {
+            "type": "string",
+            "required": false,
+            "resolver": "ordinal-number",
+            "description": "Derivado del índice (01, 02, 03…). El autor NO lo escribe: si lo hiciera, dos pasos podrían decir \"01\" — que es exactamente lo que pasaba cuando el contrato prometía el ordinal y nadie lo aportaba."
+          },
+          "title": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 34,
+            "maxLines": 2
+          },
+          "description": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 108,
+            "maxLines": 5
+          },
+          "deliverable": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 54,
+            "maxLines": 2
+          }
+        }
+      }
+    }
+  },
+  "presentation": {
+    "brandSurface": "timeline-full-approved-navy-gradient",
+    "composition": "one ordered methodological rail with 3–5 steps; no dates, duration, Gantt bars, or overlapping work",
+    "evidencePolicy": "each step declares a concrete deliverable"
+  }
 }
