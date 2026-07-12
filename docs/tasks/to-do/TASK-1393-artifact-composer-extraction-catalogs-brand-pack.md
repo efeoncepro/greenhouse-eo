@@ -131,7 +131,7 @@ Reglas obligatorias:
 ### Gap
 
 - El motor vive bajo `commercial/tenders/**`: un dominio de growth que lo importe crea una **dependencia invertida** (growth → commercial).
-- `outputTarget` no existe: el merge `pdf-lib` esta **cableado** en `compose.ts` como el unico final posible. Un `png-set` no tiene por donde salir.
+- `outputTarget` no existe: el merge `pdf-lib` esta **cableado** en `compose.ts` como el unico final posible. Un `png-set` no tiene por donde salir. **ADR posterior aceptado:** el registry debe dejar costura para `pptx-native` y `adobe-express`, pero esta task sólo habilita `pdf-merged`/`png-set`; no implementa un renderer editable ni credenciales externas.
 - Los resolvers y el icon set (`solar-icons.ts`) son **semanticos del deck** pero viven en el motor: deben pasar a ser **inyectables por catalogo**.
 - **51 HEX de marca hardcodeados** repartidos por los 25 archivos, con la paleta re-declarada en cada uno. No hay capa de tokens compartida (solo `deck-signature.css`). La auditoría posterior demuestra que ese conteo no cubre todos los `rgba()`: la migración debe gobernar las **80 bases RGB normalizadas**, no sólo los literales HEX.
 - No existe el concepto de **brand pack** ni de `owner_org_id` en el catalogo → hoy la capability no puede servir a un cliente.
@@ -441,7 +441,7 @@ El refactor es **sin cambio de comportamiento**: las dos bug classes ya cerradas
 - [ ] `CompositionPlanInput` no permite a un author elegir `template`; el adaptador histórico rechaza cualquier `template` que no sea el resultado del selector para el `contentType`.
 - [ ] Sólo un `ResolvedCompositionManifest` puede llegar a persistencia/render productivo, y contiene hashes/versiones de catálogo, contrato, template, brand pack, fuentes y validadores aplicados.
 - [ ] Un **catalogo de prueba** con canvas y `outputTarget` distintos compone **sin tocar un solo archivo del motor**.
-- [ ] `outputTarget` soporta `pdf-merged` (deck) y `png-set`; `png-set` emite N PNG y **ningun** PDF.
+- [ ] `outputTarget` soporta `pdf-merged` (deck) y `png-set`; `png-set` emite N PNG y **ningun** PDF. El registry queda extensible y fail-closed para futuros `pptx-native`/`adobe-express`: declarar un target no implementado aborta, nunca cae silenciosamente a PDF.
 - [ ] Los 15 resolvers y el icon set viven en el catalogo `deck-axis`, no en el motor.
 - [ ] Existe un snapshot versionado de las 68 primitives PPT `33:2` y de las colecciones extendidas `Deck / Primitives` + `Deck / Semantic`, con `fileKey`/`nodeId`/colección/checksum; el compilador y el worker no dependen de red/Figma.
 - [ ] El compilador produce CSS local con primitives, roles y opacidades nombradas; un test comprueba que la salida generada está sincronizada con el manifest.

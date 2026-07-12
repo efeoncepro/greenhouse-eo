@@ -1,9 +1,10 @@
 # GREENHOUSE — Tender Deck Composer (design system del composer)
 
 > **Tipo:** Working design doc + **contrato del runtime F1** (parte de Tender Proposal Studio F4 — deck pipeline)
-> **Versión:** 0.2 · **Status:** **Implementado (F1)** — el composer compone: `src/lib/commercial/tenders/deck/**` (~1.800 LOC) + CLI `pnpm deck:compose` + 4 suites de tests. **NO es doc-only.** El molde visual sigue en co-creación.
+> **Versión:** 0.3 · **Status:** **Implementado (F1, PDF)** — el composer compone: `src/lib/commercial/tenders/deck/**` (~1.800 LOC) + CLI `pnpm deck:compose` + 4 suites de tests. **NO es doc-only.** El molde visual sigue en co-creación.
 > **Creado:** 2026-07-11 por Claude (skills `typography-design`, `modern-ui`) con Julio Reyes
 > **v0.2 (2026-07-12):** se corrige el status (decía `doc-only` con el runtime ya shipped), se declara el **entregable PDF real** (merge `pdf-lib` de N páginas + gate de peso), el **CLI canónico `pnpm deck:compose`**, el **inventario de los 15 resolvers**, la **state machine** (12 estados, sin DB) y la **2ª bug class** (geometría). Se elimina el bloque muerto que decía "slotsRef sólo en CoverFull".
+> **v0.3 (2026-07-12):** se acepta la secuencia de destinos **PDF contractual → PPTX nativo editable → Adobe Express editable**. No existe todavía un renderer PPTX ni una integración Adobe: la decisión fija sus límites para que no nazcan como conversión frágil de HTML/PDF.
 > **Siguiente hardening de plataforma y marca:** `TASK-1393` extrae el Artifact Composer, formaliza el catálogo `deck-axis` y materializa AXIS como `brandPack` reutilizable; conserva el output aprobado y no construye el catálogo social.
 > **Spec raíz:** `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (§4 deck pipeline, Apéndices A/B)
 > **Fuente de layouts y primitivas de presentación:** Figma `Sistema Axis - PPT` (fileKey `GXYeJaRjotmFuczfnd8hLi`; `Color Primitives` `33:2`). Sus aliases se llevaron locales a las primeras plantillas en `b38a8d0e2` y se replicaron al catálogo de 25 en `e78e9dfb2`; TASK-1393 los centraliza sin sustituirlos por el mirror UI.
@@ -13,6 +14,95 @@
 El **composer** arma cada slide de una propuesta de licitación **componiendo módulos pre-diseñados** del sistema AXIS PPT, NO generando freehand. Cada módulo = una **plantilla de layout** con slots de contenido. El agente elige la plantilla adecuada por tipo de contenido y llena los slots.
 
 Los slides se renderizan **HTML → Chromium `print-to-pdf`** (stack que Greenhouse ya domina; fidelidad de navegador real; mismo HTML → N salidas). Slides 16:9 = **1920×1080**.
+
+## Architecture Decision 2026-07-12 — PDF contractual, luego PPTX nativo y Adobe Express
+
+- **Status:** Accepted
+- **Owner:** Commercial / Tender Proposal Studio + Artifact Composer
+- **Scope:** `CompositionPlanInput` · futuro `ResolvedCompositionManifest` · catálogos de deck · renderers de salida · integración Adobe Express
+- **Reversibility:** two-way-but-slow
+- **Confidence:** high para el contrato PPTX; medium para Adobe Express mientras su REST API siga beta
+- **Validated as of:** 2026-07-12 — runtime local + documentación oficial Adobe Express
+
+### Context
+
+El renderer vigente produce el PDF contractual y PNGs de revisión; no existe `.pptx`, documento de
+Adobe Express ni un adaptador de salida fuera de Chromium. El `DeckPlan`/futuro manifest contiene la
+semántica del deck, pero las 25 plantillas HTML usan CSS rico: no hay una conversión genérica y fiel
+HTML→PPTX ni HTML→Express. `TimelineFull` además deriva barras, grilla, conectores e hitos desde el
+schedule; un destino editable debe conservar esa derivación, no congelar una captura.
+
+**Evidencia de proveedor verificada:** la [Adobe Express API](https://developer.adobe.com/firefly-services/docs/express-api/)
+beta genera variaciones de documentos con elementos taggeados; el
+[Add-on Document API](https://developer.adobe.com/express-add-on-apis/docs/) puede crear/modificar
+páginas, texto y formas nativas; [PptxGenJS](https://github.com/beautifulai/PptxGenJS) permite generar
+PPTX desde objetos de presentación. Estas capacidades no cambian el estado del runtime actual.
+
+### Decision
+
+1. **PDF sigue siendo el entregable contractual y de máxima fidelidad.** PNGs son sólo revisión.
+2. **PPTX nativo es el siguiente renderer productivo.** El renderer crea texto, formas, tablas,
+   imágenes y gráficos como objetos PowerPoint editables desde el mismo manifest; nunca convierte
+   PDF/PNG/HTML. Las plantillas se implementan por target dentro del catálogo y declaran qué queda
+   `native-editable`, `brand-locked` o es un asset reemplazable.
+3. **Adobe Express es el destino editable posterior, no el motor del deck.** Tiene dos carriles que
+   no se confunden:
+   - **Add-on Document API:** carril nativo e interactivo. Un usuario en Express invoca el add-on; éste
+     crea páginas 16:9, texto y formas desde el manifest. Es el único carril Adobe apto para
+     `TimelineFull` con cardinalidad/rangos/hitos variables.
+   - **Express REST API:** carril headless de variaciones sobre una plantilla Express ya creada y con
+     tags de texto/imagen/video. Sirve para un POC de variantes fijas; no compone HTML, no crea la
+     estructura variable de un Gantt y, mientras sea beta/evaluation-only, no es un output comercial
+     productivo.
+4. **La fuente de verdad siempre queda en Greenhouse:** `CompositionPlanInput` y, después de
+   `TASK-1393`, `ResolvedCompositionManifest`. El agente cambia slots/datos y vuelve a emitir; no
+   edita un `.pptx` o documento Adobe como fuente. Una edición humana externa es una variante con
+   conflicto/override explícito, no una actualización silenciosa del manifest.
+5. Los targets futuros se agregan como adapters versionados y fail-closed: si un `contentType` o su
+   geometría no tiene implementación declarada para un target, el render aborta. La geometría
+   semántica reusable (por ejemplo el schedule de `TimelineFull`) se extrae de Chromium antes de
+   implementar el segundo target; no se duplican porcentajes manuales por renderer.
+
+### Alternatives considered
+
+| Alternativa | Decisión |
+|---|---|
+| Importar el PDF actual a Express | Rechazada como renderer: Adobe puede editarlo, pero puede sustituir fuentes/layouts complejos y rompe la fidelidad contractual. Sirve sólo como importación manual puntual. |
+| Convertir HTML/CSS automáticamente a PPTX/Express | Rechazada: los gradientes, filtros y blend del catálogo no son un contrato portable. Generaría outputs parcialmente rasterizados o con drift silencioso. |
+| Adobe Express REST como renderer universal | Rechazada: sólo sustituye tags de plantillas Express nativas y la API está beta; no resuelve estructura ni Gantt dinámico. |
+| Renderer PPTX separado que recibe copy libre | Rechazada: abriría una segunda vía de autoría y rompería trazabilidad, anti-fabricación y replay. |
+
+### Consequences
+
+- `TASK-1393` sigue siendo el prerequisito: debe sacar el target del final cableado PDF y dejar un
+  registry extensible, **sin** implementar PPTX ni Adobe dentro de ese refactor.
+- El primer slice PPTX debe cubrir al menos `TimelineFull`, `ChartSplit` y texto/imagen base con tests
+  de objetos editables y comparación visual contra PDF en PowerPoint macOS/Windows.
+- Un add-on Adobe requiere credenciales, distribución privada/pública, autenticación y un mapa de
+  metadatos por nodo (`manifestHash`, `slideId`, `slotId`, `targetRevision`). La API de Add-on permite
+  esos metadatos, pero no permite borrar páginas directamente: cada versión de deck se crea como
+  documento nuevo o se sincroniza con una política explícita.
+- Cada render externo debe registrar `manifestHash`, target/revisión, artefacto o `documentId`, actor,
+  estado y error; ningún token Adobe ni contenido de licitación cruza al browser sin contrato de
+  acceso, retención y confirmación humana.
+
+### Runtime contract
+
+- **Hoy:** `pdf-merged` + `png-set` locales desde CLI; sin credenciales Adobe, dependencias PPTX,
+  rutas API, worker, capability ni documento externo.
+- **Próximos targets aprobados:** `pptx-native` primero; `adobe-express` después (Add-on nativo como
+  camino productivo; `express-variation` REST sólo POC hasta GA y autorización comercial).
+- La vieja hipótesis `MCP html→Express` queda descartada: el MCP de Adobe ayuda a desarrollar la
+  integración, no es un renderer runtime HTML→Express.
+
+### Revisit when
+
+- Adobe Express REST alcance GA y soporte creación/estructura dinámica verificable, o autorice uso
+  comercial productivo.
+- Un primer PPTX nativo no logre fidelidad aceptada en macOS y Windows, o una plantilla revele una
+  primitive que no pueda expresar el target sin rasterizar un componente declarado.
+- Se defina un flujo de edición humana bidireccional con resolución de conflictos y ownership de
+  versiones.
 
 ## Decisión de fondo — layout del Figma + reglas propias (NO clonar el raster)
 
@@ -862,7 +952,7 @@ pnpm deck:compose docs/architecture/tender-deck-composer-prototypes/examples/sky
 está horneado en el script — invocar `tsx` a mano sin él **revienta** (`solar-icons.ts` importa
 `server-only`). Si `--out` no se pasa, el `outDir` por defecto es **`.captures/tender-deck`**.
 
-### El entregable: UN PDF de N páginas (no un puñado de PNGs)
+### El entregable vigente: UN PDF de N páginas (no un puñado de PNGs)
 
 Esto es lo que hace del composer un motor y no un previsualizador:
 
@@ -877,6 +967,13 @@ pisen a los de otra. **Imprimir + mergear no tiene ese modo de falla.**
 **Gate de peso = regla de admisibilidad, no estética.** `maxPdfMb` (default 20 MB) existe porque los
 portales de licitación **rechazan** adjuntos sobre su límite. Un deck hermoso de 40 MB que el portal no
 acepta es un deck que no existe. Hoy emite *warning*; el límite duro lo fija cada licitación.
+
+### Destinos posteriores aprobados — todavía no son comandos ni artefactos
+
+El siguiente output productivo será **PPTX nativo editable**; después, **Adobe Express editable**.
+Ambos consumen el mismo manifest y son renderers nuevos, no una opción de `pnpm deck:compose` actual.
+El detalle, límites beta de Adobe y contrato de edición viven en el ADR
+[*PDF contractual, luego PPTX nativo y Adobe Express*](#architecture-decision-2026-07-12--pdf-contractual-luego-pptx-nativo-y-adobe-express).
 
 ### Los módulos
 
@@ -912,6 +1009,10 @@ El **`DeckPlan` es el artefacto auditable**; el PDF es una derivación suya. Eje
 event. **El único consumer del composer hoy es el CLI.** Cuando nazca la primera ruta o capability,
 aplica **Full API Parity** completa: el composer ya es el primitive canónico en `src/lib/**` — la UI,
 Nexa y MCP lo **consumen**, no lo reimplementan.
+
+**Tampoco existe PPTX ni Adobe Express.** No hay dependencia de generación PPTX, credenciales Adobe,
+Add-on, REST client ni importación PDF como output soportado. Son destinos posteriores aceptados, no
+promesas disponibles para un deck de hoy.
 
 ### ⚠️ La bug class del composer: el FALLO SILENCIOSO
 
@@ -1068,5 +1169,10 @@ desborde del `thesis` de `FourPillarsFull` quedó **cerrado de raíz** (ver "La 
 - **Embeber fuentes** (Poppins/Geist) para runtime self-contained — hoy Chromium las pide a Google
   Fonts por red, así que el render **no es hermético**: sin red, el deck sale con la tipografía de
   fallback. Al embeberlas se puede bloquear `http(s)://**` en el render y cerrar el determinismo.
+- **`pptx-native`** como primer renderer editable, posterior a `TASK-1393`: objetos PowerPoint nativos,
+  matriz de editabilidad por plantilla y comparación visual macOS/Windows contra el PDF.
+- **`adobe-express`** posterior al PPTX: Add-on Document API para composición nativa interactiva;
+  Express REST sólo POC de tags fijos mientras siga beta. No usar importación PDF ni una conversión
+  HTML→Express como sustituto.
 - **Ritmo vertical de `PricingFull`**: hay un vacío grande entre el header y el panel de planes.
 - Jugar con el token `--axis-violet` en variantes.

@@ -1,9 +1,9 @@
 # Tender Deck Composer — Cómo se arma el deck de una propuesta
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-12 por Claude (con Julio Reyes)
-> **Ultima actualizacion:** 2026-07-12 — `TimelineFull` data-driven y `barLabel` editable
+> **Ultima actualizacion:** 2026-07-12 — destinos PDF → PPTX → Adobe Express documentados
 > **Documentacion tecnica:** [GREENHOUSE_TENDER_DECK_COMPOSER_V1.md](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md) · ADR: [GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md §5-ter](../../architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md)
 > **Manual de uso:** [comercial/componer-deck-de-licitacion.md](../../manual-de-uso/comercial/componer-deck-de-licitacion.md)
 
@@ -72,7 +72,7 @@ texto no cabe en la barra real, el composer se detiene; no lo oculta ni modifica
 
 ## Qué produce
 
-- **Un PDF** de N páginas, en 16:9 — el entregable.
+- **Un PDF** de N páginas, en 16:9 — el entregable vigente y contractual.
 - **Las láminas sueltas en PNG** — para revisar antes de entregar.
 - **El "plan del deck"** (un archivo de datos) — el registro de qué decía cada lámina. Es lo que
   permite reconstruir el deck idéntico más adelante, o auditar qué se afirmó.
@@ -80,6 +80,22 @@ texto no cabe en la barra real, el composer se detiene; no lo oculta ni modifica
 El composer también **avisa si el PDF pesa demasiado**. No es un capricho de rendimiento: los
 portales de licitación (Mercado Público, Wherex) rechazan archivos sobre cierto tamaño, y **una
 oferta que no sube queda fuera del proceso**.
+
+### Próximos destinos editables (aún no disponibles)
+
+Después del PDF, el producto tendrá dos destinos:
+
+1. **PPTX nativo editable:** textos, barras, hitos y tablas serán objetos reales de PowerPoint. Por
+   ejemplo, la etiqueta de una barra del Gantt seguirá siendo editable, pero su posición nace del
+   mismo schedule que usa el PDF.
+2. **Adobe Express editable:** permitirá continuar el trabajo dentro de Express sin convertir el PDF
+   en fuente. El camino productivo previsto es un Add-on que crea elementos nativos; la API REST de
+   Adobe sólo sirve hoy para probar variaciones sobre plantillas taggeadas y no para un Gantt variable.
+
+En ambos casos, la persona o el agente cambia el **plan del deck** y reemite. Si alguien modifica a
+mano el PPTX o documento Express, crea una variante externa que debe declararse; esa edición no
+reescribe los datos de Greenhouse en silencio. Detalle técnico y estado de disponibilidad: ADR de
+destinos en la [documentación técnica](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md#architecture-decision-2026-07-12--pdf-contractual-luego-pptx-nativo-y-adobe-express).
 
 ## Las fotos del equipo
 

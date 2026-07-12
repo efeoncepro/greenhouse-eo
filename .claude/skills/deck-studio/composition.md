@@ -41,6 +41,24 @@ molde se corrige, el deck **se re-emite** sin re-autorarlo.
 parte del contrato: **los portales rechazan adjuntos sobre su límite** — el peso es **admisibilidad**,
 no cosmética. *(Y el límite lo fijan **las bases**, no el portal. Ver [`evidence-integrity.md`](evidence-integrity.md).)*
 
+### Destinos editables posteriores — no confundir fuente, conversión ni renderer
+
+**Hoy sólo existe PDF contractual + PNG de revisión.** Los dos destinos siguientes aceptados son
+**PPTX nativo editable** y, después, **Adobe Express editable**. En ambos, el `Plan`/manifest sigue
+siendo la fuente de verdad: agente o persona cambia slots y vuelve a emitir; nunca usa un archivo
+externo como nueva fuente silenciosa.
+
+- **PPTX:** se genera con texto, formas, barras e hitos nativos; no se convierte PDF/PNG/HTML. Un
+  `TimelineFull` mantiene su geometría derivada del schedule y su `barLabel` como texto editable.
+- **Adobe Express:** un Add-on Document API puede crear páginas/formas/texto nativos e interactivos;
+  la REST API beta sólo reemplaza tags sobre plantillas Express ya creadas y no sirve para composición
+  estructural variable. Importar un PDF puede ser un gesto manual, nunca el renderer del catálogo.
+- Todo target declara soporte por plantilla y falla cerrado si no puede representar el contenido. No se
+  rasteriza o simplifica una lámina en silencio para "hacerla exportar".
+
+Fuente canónica: `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` → ADR *PDF contractual, luego PPTX nativo y
+Adobe Express*.
+
 ---
 
 ## Las bug classes del motor — lecciones que costaron caro

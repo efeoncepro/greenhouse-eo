@@ -1,17 +1,22 @@
 # Componer el deck de una licitación
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-12 por Claude (con Julio Reyes)
 > **Documentacion funcional:** [tender-deck-composer.md](../../documentation/comercial/tender-deck-composer.md)
 > **Documentacion tecnica:** [GREENHOUSE_TENDER_DECK_COMPOSER_V1.md](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md)
-> **Última actualización:** 2026-07-12 — `TimelineFull` data-driven y `barLabel` editable
+> **Última actualización:** 2026-07-12 — PDF vigente; PPTX y Adobe Express son destinos posteriores
 > **Método del bid:** skill `greenhouse-public-private-tenders` → `deck-visual-system.md`
 
 ## Para qué sirve
 
 Producir el **deck de una propuesta** (técnica o de presentación ejecutiva) a partir de un archivo de
 contenido. El resultado es un **PDF de N páginas** listo para revisar y entregar.
+
+> **Alcance actual:** este manual opera sólo el PDF y PNGs. PPTX nativo y Adobe Express son los dos
+> destinos posteriores aprobados, pero no hay comando, credencial ni paso manual que los produzca aún.
+> No importe el PDF esperando preservar edición/fidelidad: cuando existan, ambos nacerán del mismo
+> plan de datos. Ver [ADR de destinos](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md#architecture-decision-2026-07-12--pdf-contractual-luego-pptx-nativo-y-adobe-express).
 
 ## Antes de empezar
 
