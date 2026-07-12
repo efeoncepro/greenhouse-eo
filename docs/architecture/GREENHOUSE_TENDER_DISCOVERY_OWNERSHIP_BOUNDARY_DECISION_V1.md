@@ -8,6 +8,18 @@
 > **Confidence:** `high`
 > **Validated as of:** 2026-07-12 — verificado contra el repo: `grep` de nombres de tabla en ambos programas, `src/lib/commercial/tenders/**` (13 archivos, sin migración) y `migrations/` (cero tablas `tender*`).
 
+> **Delta 2026-07-12 — vocabulario superseded por el ADR del Artifact Composer (Accepted, posterior) y TASK-1392.**
+> El OWNERSHIP de este ADR sigue vigente tal cual (RESEARCH-007 descubre · el Studio construye · la
+> promoción es un command human-gated). Lo que queda superseded es el VOCABULARIO:
+>
+> - el aggregate es **`Proposal`** (`greenhouse_commercial.proposals` + `proposal_*`), no `Tender`/`tenders`;
+> - **`origin ∈ {public_tender, private_rfp, direct_sales}`** — los valores `manual`/`public_discovery`
+>   de este doc NO existen en el enum canónico. La promoción es
+>   `createProposal(origin='public_tender', publicOpportunityId)`; **SKY/Wherex es `private_rfp`**;
+> - los estados terminales son **`won`/`lost`** (el copy visible se resuelve por `origin`).
+>
+> TASK-1392 materializa el schema con este vocabulario; leer sus Deltas como fuente del enum.
+
 ---
 
 ## Context

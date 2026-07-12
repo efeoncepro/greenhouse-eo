@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -479,6 +479,20 @@ accesibilidad** derivan del *requisito-set* y **fallan cerrado** cuando el requi
 - ~~¿`awarded`/`not_awarded` se renombran a `won`/`lost`?~~ ✅ **CERRADA 2026-07-12: `won`/`lost`**, aplicado
   en `tender-state-machine.ts` (102 tests verdes). El copy visible se resuelve por `origin`. **El CHECK del
   enum se escribe con `won`/`lost`.**
-- ¿RESEARCH-007 escribe `proposals` directamente mediante el command F0 o emite un handoff/outbox que el Studio consume? Resolverlo en Slice 0 con una sola escritura canónica.
-- ¿Cuáles contextos exactos de `GreenhouseAssetContext` y retention/prefix deben añadirse para RFP fuente y outputs, sin proliferar tipos por deliverable?
-- ¿Qué rol(es) internos reciben los grants iniciales de create/ingest/read/transition y cuáles gates requieren capability separada?
+- ~~¿RESEARCH-007 escribe `proposals` directamente mediante el command F0 o emite un handoff/outbox?~~
+  ✅ **CERRADA (Slice 0, 2026-07-12): command F0.** La promoción ES `createProposal(origin='public_tender',
+  publicOpportunityId)` con actor humano — el ADR de ownership define el GO como el momento de la promoción,
+  y un handoff async por outbox no tendría actor humano en el write (contradice el gate). Una sola escritura
+  canónica; idempotencia por UNIQUE parcial sobre `public_opportunity_id`. **Sin FK** hoy: RESEARCH-007 es
+  doc-only (cero tablas `public_tender*` — verificado contra PG real); la FK se agrega cuando el radar exista.
+- ~~¿Cuáles contextos de `GreenhouseAssetContext`?~~ ✅ **CERRADA (Slice 0): 4 contextos mínimos** —
+  `proposal_rfp_draft`/`proposal_rfp` (input RFP, user-uploadable, **scan REQUERIDO al attach** — entra a
+  `SCAN_REQUIRED_ATTACH_CONTEXTS`) y `proposal_deliverable_draft`/`proposal_deliverable` (outputs). Retention
+  class **`document_vault`** (la misma familia que contratos/quotes: documentos comerciales confidenciales de
+  larga retención — no se prolifera una clase nueva sin política distinta que la justifique).
+- ~~¿Qué roles reciben los grants iniciales?~~ ✅ **CERRADA (Slice 0): 3 capabilities least-privilege** —
+  `commercial.proposal.read` [read] · `commercial.proposal.manage` [create/update/execute] (create + ingest +
+  evidencia + requisitos + transiciones no-gated) · `commercial.proposal.gate` [approve] (los 3 gates
+  humanos). Grants: `EFEONCE_ADMIN` + `EFEONCE_ACCOUNT` (las 3), `EFEONCE_OPERATIONS` (read). **La puerta es
+  el entitlement per-ORG** (`module_assignments`, module `proposal_studio_v1`, patrón AI Visibility); el rol
+  sólo abre dentro de una org habilitada.
