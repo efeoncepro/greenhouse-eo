@@ -1,5 +1,13 @@
 # TASK-1371 — Hiring Vacancy Publication Operator Command
 
+## Delta 2026-07-13 — Lifecycle correction after release evidence
+
+La task ya estaba entregada y liberada; el estado documental había quedado stale.
+
+- **Release verificado:** Handoff registra PR #152 `Release: TASK-1371 careers structured public fields and copy polish`, squash merge a `main` en `fa2581eaf5367f2c25b6fb5bd5b14add3335253c`.
+- **Producción corregida:** el release dejó activo el bundle con campos públicos estructurados, copy Careers y compatibilidad `public_location_mode=LATAM` → `Modalidad=Remoto`.
+- **Corrección de lifecycle:** se mueve a `docs/tasks/complete/`, se sincroniza registry/contexto y se conserva la evidencia histórica de ejecución/smoke.
+
 ## Delta 2026-07-08 — Revisión 3-lentes (arch-architect + talent/people-ops + product-design)
 
 Hechos verificados contra el repo real. Task bien encuadrada (Full API Parity: un command, muchos wrappers); ajustes:
@@ -18,7 +26,7 @@ Hechos verificados contra el repo real. Task bien encuadrada (Full API Parity: u
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -31,11 +39,11 @@ Hechos verificados contra el repo real. Task bien encuadrada (Full API Parity: u
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Implementado local / rollout pendiente`
+- Status real: `Complete; entregada y liberada via PR #152 el 2026-07-09`
 - Rank: `TBD`
 - Domain: `hr|ops`
 - Blocked by: `none`
-- Branch: `task/TASK-1371-hiring-vacancy-publication-operator-command`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -509,7 +517,7 @@ Lo que NO debe hacer el siguiente agente:
 
 - No corregir `Modalidad=LATAM` cambiando copy JSX/CSS o reemplazando `public_location_mode` por `Remoto`; eso mezcla ubicacion y modalidad otra vez.
 - No volver a inferir `Área` o competencias desde copy como solucion final. Es fallback temporal para legacy; la solucion canonica es publicar/republicar con `public_area` y `public_skill_tags`.
-- No cerrar `TASK-1371` como complete si falta push/release/smoke productivo del bundle que contiene estos cambios. Estado correcto: `in-progress`, code complete local, rollout pendiente.
+- No reabrir `TASK-1371` por la nota histórica de rollout pendiente: ese estado fue superseded por el release acotado PR #152. Si aparece una regresión nueva, crear issue/task de fix con evidencia runtime.
 
 Commits locales relevantes en `develop`:
 
@@ -518,12 +526,12 @@ Commits locales relevantes en `develop`:
 - `a78a41861` — endurecimiento de migraciones, smoke runtime y cierre local.
 - `971494c27` — compatibilidad Careers: modalidad legacy `LATAM` -> `Remoto` y chips canonicos.
 
-Diagnostico live posterior:
+Diagnostico live posterior — superseded por PR #152:
 
 - Produccion `https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0009` seguia mostrando el bug con Sentry release `915be02a86abfd49c71365af8a647f9fdfa35207`.
 - Ese release no selecciona `public_work_mode`, `public_hiring_region` ni `public_skill_tags` en `src/lib/hiring/publication.ts`; su `PublicOpeningPayload` solo incluye `locationMode`.
 - Con ese bundle viejo no existe mitigacion de datos que muestre simultaneamente `Ubicacion=LATAM` y `Modalidad=Remoto`, porque ambos labels derivan del mismo `public_location_mode`.
-- Estado operativo correcto: corregido en codigo local, **bug todavia presente en produccion hasta release/hotfix de codigo**.
+- Estado operativo final: el release PR #152 actualizó producción con el bundle corregido; esta nota queda como contexto histórico de la causa raíz.
 
 ## UI Pre-release Review 2026-07-09
 
@@ -545,19 +553,19 @@ Evidencia durable:
 - Playwright audit: `.captures/2026-07-09T10-49-careers-product-ui-audit/audit.json` (`failed=[]`).
 - Invalid submit screenshots: `.captures/2026-07-09T-careers-apply-invalid-state`.
 
-## Closure State 2026-07-09
+## Closure State 2026-07-13
 
-- Estado: `in-progress`, con implementacion, migraciones y smoke runtime local/Cloud SQL verificados.
-- Motivo de no cierre: por instruccion operativa, no mover a `complete/` en este corte; queda lista para revision/commit/release posterior.
+- Estado: `complete`, con implementación, migraciones, smoke runtime local/Cloud SQL y release productivo PR #152 verificados en Handoff.
+- Motivo del cierre: el bloqueo documental de rollout pendiente quedó superseded por el release acotado PR #152 (`fa2581eaf5367f2c25b6fb5bd5b14add3335253c`).
 - Nota `publicLocationMode`: para remoto se setea intencionalmente a `LATAM` como fallback legacy de ubicacion. La modalidad canonica ya no vive ahi: vive en `public_work_mode='remote'`.
-- Rollout pendiente: `develop` contiene los commits locales y estaba ahead de `origin/develop`; produccion seguira mostrando el bundle anterior hasta push/release gobernado. Si se pide release, usar `greenhouse-production-release` y medir tiempo agente end-to-end.
+- Criterio operativo vigente: publicar una nueva vacante real no requiere release si el runtime ya está live; se usa el operador `pnpm hiring:publish-vacancy`/API gobernada y no SQL manual.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado si cambia lifecycle o path
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado si cambia lifecycle o path
 - [x] `Handoff.md` quedo actualizado con evidencia, tiempos y cualquier bloqueo
 - [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [x] `project_context.md` quedo actualizado si cambia el proceso operativo de talento

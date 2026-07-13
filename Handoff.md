@@ -1,3 +1,13 @@
+## Sesión 2026-07-13 — TASK-1371 lifecycle correction + TASK-1365 intake preflight (Codex)
+
+> **Pedido:** el operador confirmó que `TASK-1371` ya estaba entregada y pidió cerrarla antes de iniciar `TASK-1365`.
+>
+> **Corrección aplicada:** `TASK-1371` estaba releaseada por PR #152 (`fa2581eaf5367f2c25b6fb5bd5b14add3335253c`), pero seguía marcada como `in-progress` en la metadata documental. Se movió a `docs/tasks/complete/`, se cambió `Lifecycle: complete`, y se sincronizaron `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `project_context.md`, `changelog.md` y EPIC-011.
+>
+> **Evidencia base reutilizada:** la implementación/smoke runtime y el release productivo ya estaban documentados en las sesiones del 2026-07-09. Este corte no toca runtime ni trabajo ajeno; sólo corrige lifecycle/documentación.
+>
+> **TASK-1365:** antes de ejecutar, el protocolo del repo exige preflight de `/goal` + `pnpm codex:task-hook TASK-1365`. Queda pendiente la confirmación del operador del goal recomendado.
+
 ## Sesión 2026-07-13 — TASK-1363 Assessment Taking + Review Surface COMPLETE local (Codex)
 
 > **Inicio formal:** el operador confirmó ejecutar `TASK-1363` en `develop` (sin worktree ni subagentes). Se corrió `pnpm codex:task-hook TASK-1363 --develop`; la excepción de rama queda documentada aquí.
