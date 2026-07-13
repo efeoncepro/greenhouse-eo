@@ -126,6 +126,15 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Preferencias personales de notificaciones. Link en UserDropdown pendiente (TASK-983 follow-up); alcanzable por URL directa mientras tanto.'
   },
   {
+    // TASK-1400 post-push CI triage: employee self-service onboarding surface exists
+    // behind `my.onboarding`, but is not a top-level My menu item yet.
+    route: '/my/onboarding',
+    parent: '/my',
+    via: 'inline-link',
+    reason:
+      'Mi Onboarding — self-service checklist for the authenticated member, gated by viewCode `mi_ficha.onboarding`. Kept as a child route of Mi Greenhouse until TASK-1388 rebalances personal navigation.'
+  },
+  {
     route: '/design-system/colors',
     parent: '/design-system',
     via: 'inline-link',
