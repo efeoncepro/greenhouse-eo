@@ -1,16 +1,18 @@
-## Sesión 2026-07-13 — TASK-1365 Fairness Monitor code complete / rollout pendiente (Codex)
+## Sesión 2026-07-13 — TASK-1365 Fairness Monitor staging live + TASK-1409 registrada (Codex)
 
-> **Estado:** `TASK-1365` quedó `complete` en repo/dev con veredicto QA `CONDITIONAL PASS`. Se ejecutó en `develop` por override explícito, secuencial, sin subagentes ni worktree. `TASK-1360`/`TASK-1364` se verificaron complete; `TASK-1371` no se reabrió ni modificó.
+> **Estado:** `TASK-1365` sigue `complete`; rollout a `develop`/staging completado en SHA `242f8a5d8`, Vercel deployment `dpl_AuMv2KrDuMKXt5GUp91gr1QZhQLq` `Ready`. Produccion no fue solicitada ni tocada. `TASK-1371` no se reabrio ni modifico.
 >
 > **Implementado:** `src/lib/hiring/assessment/fairness/**` entrega command self-ID voluntario con consentimiento/policy fail-closed, reader agregado con k=10 + mínimo dos grupos + regla 4/5 + drift, evidence append-only y signal `assessment.fairness.adverse_impact_detected`. `GET/POST /api/hiring/assessments/fairness` exige `hiring.assessment.fairness_read`, grant role-only a Admin/HR Manager/Operations; el POST público de assessment resuelve application+identity desde el token y nunca acepta esos IDs.
 >
 > **Privacidad:** `hiring_demographic_selfid` está físicamente separado del score/decisión y queda anclado a la application que presentó el consentimiento. El hardening DB `20260713173500000` agrega `UNIQUE(application_id, dimension_key)` + trigger application/identity, evitando que un consentimiento posterior proyecte atributos sobre postulaciones históricas. El self-ID raw no entra al outbox; queda en audit sensible append-only. La view `assessment_fairness` expone solo 7 columnas agregadas, suprime en PostgreSQL buckets `<10` y el DTO suprime dimensiones con menos de dos categorías reportables. El monitor no escribe score, application, decisión ni cuotas.
 >
-> **DB dev:** migraciones `20260713165547000` y `20260713173500000` aplicadas en Cloud SQL dev; `pnpm pg:connect:status` terminó `No migrations to run`. `pnpm hiring:fairness-smoke` PASS: contrato aggregate-only + ratio sintético `0.5` + drift `-0.4`.
+> **DB/runtime:** dev y staging usan la misma instancia/base Cloud SQL para este carril; no se reaplicaron migraciones. Post-deploy `pnpm hiring:fairness-smoke` PASS: contrato aggregate-only + ratio sintetico `0.5` + drift `-0.4`. Reader autenticado del deployment exacto: `HTTP 200`, privacy `k=10`, minimo dos grupos, `sampleSize=0`, verdict `insufficient_sample`.
 >
 > **Evidencia:** lint y typecheck PASS; build PASS (warning preexistente de patrón amplio en roadmap); Vitest full `1312 passed | 26 skipped`, `9445 passed | 136 skipped`; flags strict 83/83 registrados; route reachability 219/0; task/ops/QA gates mecánicos PASS. `pnpm secrets:audit` no fue concluyente porque este checkout no carga los 8 secretos base del portal; TASK-1365 no agrega/modifica secretos y el carril DB autenticado sí fue verificado.
 >
-> **Rollout pendiente (owners Legal/Privacy + Talent/People + Release):** definir y aprobar categorías por jurisdicción, versión/copy final de consentimiento y retención; configurar `HIRING_FAIRNESS_POLICY_VERSION`, `HIRING_FAIRNESS_RETENTION_DAYS`, `HIRING_FAIRNESS_ALLOWED_CATEGORIES_JSON`; migrar staging, prender `HIRING_FAIRNESS_MONITOR_ENABLED`, redeploy y smoke API/DB; solo después evaluar prod. El flag permanece OFF/ausente en staging y production. Esta implementación es postura técnica, no reemplaza revisión legal habilitada en cada jurisdicción.
+> **Policy/rollout:** staging quedo ON con `efeonce-privacy-2025-04-19-staging-synthetic-v1`, retencion 30 dias y allowlist exclusiva `synthetic_cohort: group_a|group_b`. La politica publica vigente de Efeonce cubre postulantes y retencion general de 12 meses, pero no declara categorias demograficas sensibles ni la finalidad especifica de fairness; no se uso como autorizacion implicita. Produccion permanece sin las cuatro variables. Para self-ID real/prod se necesita notice/consent especifico, categorias por jurisdiccion y retencion aprobada.
+>
+> **Follow-up:** `TASK-1409` registrada para descomponer `GREENHOUSE_EVENT_CATALOG_V1.md` en router estable + current state por dominio + `HISTORIAL.md`, con gates de inventario/links/regrowth y cero cambio runtime. `pnpm task:lint --task TASK-1409` y `pnpm ops:lint --changed` pasan con cero findings.
 
 ## Sesión 2026-07-13 — TASK-1371 lifecycle correction + TASK-1365 intake preflight (Codex)
 

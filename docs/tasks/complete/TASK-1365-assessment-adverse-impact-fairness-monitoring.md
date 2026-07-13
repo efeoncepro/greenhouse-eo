@@ -1,10 +1,12 @@
 # TASK-1365 — Adverse-Impact & Fairness Monitoring
 
-## Delta 2026-07-13 — code complete / rollout pendiente
+## Delta 2026-07-13 — staging live / produccion no solicitada
 
 - Implementados command self-ID tokenizado, reader agregado k-anon, regla 4/5 + drift, capability role-only, evidence append-only y signal agregado. El self-ID queda anclado a la application del assessment, fuera de score/decisión y fuera del outbox; el hardening DB impide aplicar un consentimiento posterior a postulaciones históricas.
 - Migraciones `20260713165547000` + `20260713173500000` aplicadas en Cloud SQL dev. Smoke DB: columnas aggregate-only, `ratio=0.5`, `drift=-0.4`; sin migraciones pendientes.
-- QA release auditor: `CONDITIONAL PASS`. Código, schema dev, tests y documentación están completos. Rollout staging/prod requiere revisión legal/privacidad por jurisdicción, categorías definitivas, versión/copy de consentimiento, retención final, configuración y flip explícito del flag.
+- Rollout `develop` completado en SHA `242f8a5d8`: Vercel staging deployment `dpl_AuMv2KrDuMKXt5GUp91gr1QZhQLq` `Ready`; reader autenticado `HTTP 200`, `k=10`, minimo dos grupos, cohorte vacia y verdict `insufficient_sample`. Smoke DB post-deploy PASS (`ratio=0.5`, `drift=-0.4`).
+- Staging usa policy `efeonce-privacy-2025-04-19-staging-synthetic-v1`, retencion 30 dias y solo `synthetic_cohort: group_a|group_b`. La politica publica de Efeonce cubre postulantes y retencion general de 12 meses, pero no autoriza categorias demograficas sensibles ni la finalidad especifica de fairness; por eso staging no habilita self-ID real. Produccion permanece sin las cuatro variables y no fue tocada.
+- QA de rollout: `PASS` para staging sintetico. Activacion demografica real/prod sigue fuera de alcance hasta publicar notice/consent especifico, categorias por jurisdiccion y retencion aprobada.
 
 ## Delta 2026-07-13 — preflight de dependencias resuelto
 
