@@ -114,8 +114,32 @@ llena. Ahí entra Efeonce.**
 7. **Cuándo el modelo de precio NO te sirve** — base B2C de millones de contactos *(Ent a 500K+ = USD 60 por
    cada 10.000; envío capado a 20×)*: ahí **Adobe o Salesforce salen más baratos a escala. Te lo decimos.**
 
-**No dice:** un cotizador self-serve. **Explica, no cotiza.**
 🔴 **Reverificar todos los precios el día de publicación.**
+
+### 🎯 Delta 2026-07-13 — el simulador (y la corrección de "explica, no cotiza")
+
+La versión original decía: *"**No dice:** un cotizador self-serve. **Explica, no cotiza.**"*
+**Ese juicio era correcto a medias**, y la corrección es la mitad interesante:
+
+| | ¿Miente si lo calculamos? | Por qué |
+|---|---|---|
+| **Licencia HubSpot + onboarding** | **No** | Es **aritmética sobre precios que HubSpot publica** — y **nuestra suma es más completa que la suya** (seats view-only gratis, saltos de banda, créditos que no se acumulan, onboarding obligatorio). **No mentimos: corregimos** |
+| 🔴 **Nuestro honorario de implementación** | **Sí** | Depende del scope. **Un número exacto ahí es exactamente lo que la página denuncia** → sale como *"te la cotizamos con tus números"* |
+
+**La página estática sigue siendo la entrega base** (TASK-1401): completa, honesta y **citable sin JavaScript**.
+El **simulador** (TASK-1406, sobre el pricebook de TASK-1405) se monta **encima**, como enhancement:
+🔴 **sin JS, la página es exactamente la misma — más un ejemplo resuelto en el HTML servido.**
+
+🎯 **Y su razón de ser es un momento:** el waiver deja de argumentarse y **se ve ponerse en cero.**
+
+```
+Onboarding obligatorio de HubSpot     USD 3.000
+Con Efeonce (partner certificado)     USD     0     ← 31% del año 1
+```
+
+**Dos motores, dos mitades** — la licencia sale del **pricebook nuevo**; la implementación, del **cotizador que
+Greenhouse ya tiene** (`src/lib/finance/pricing/`, cost-plus, audiencia `public`), cuando TASK-1407 le abra su
+puerta anónima. **Meter una licencia de vendor dentro del engine cost-plus contaminaría el modelo de margen.**
 
 ---
 

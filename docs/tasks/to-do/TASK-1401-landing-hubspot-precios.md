@@ -96,10 +96,17 @@ Meterlo en el pillar es explicarlo en el vacío. **Acá aterriza solo.**
 
 **Contenido**
 
-1. 🔴 **Explica, no cotiza.** **NO** se construye un cotizador self-serve ni una calculadora interactiva que
-   escupa un precio final. El precio real depende de descuentos, term y bundle: una calculadora **miente con
-   precisión** y quema la credibilidad que la página existe para construir. *(La calculadora de TCO sí existe —
-   pero es un artefacto de venta 1:1, no una feature pública. Ver Follow-ups.)*
+1. 🔴 **La página, por sí sola, explica — no cotiza.** **NO** se construye acá ninguna calculadora.
+   🎯 **Delta 2026-07-13:** la regla original decía *"no cotiza"* con el argumento *"una calculadora miente con
+   precisión"*. **Ese argumento era correcto a medias, y la corrección importa:**
+   - **Falso para el precio de lista de HubSpot.** Es **aritmética sobre números que HubSpot ya publica** — y
+     **nuestra suma es más completa que la suya** (seats view-only gratis, saltos de banda, créditos que no se
+     acumulan, onboarding obligatorio). **Calcular eso no miente: corrige.** → **TASK-1405 + TASK-1406.**
+   - 🔴 **Sigue siendo cierto para NUESTRO honorario.** La implementación depende del scope: **un número exacto
+     ahí es exactamente lo que esta página denuncia.** → sale como *"te la cotizamos con tus números"*.
+
+   **Lo que esta task entrega sigue siendo la página estática y citable.** El simulador es **enhancement encima**
+   (TASK-1406), y 🔴 **si lo rompe la citabilidad, el simulador está mal construido, no la página.**
 2. 🔴 **Todo precio se reverifica el día de publicación** (WebSearch a fuente primaria) y **lleva su `as-of`
    visible en la página**. Un precio stale en una página de precios **es peor que no tener la página**.
 3. 🔴 **Marcado de evidencia obligatorio** (protocolo de la skill): ✅ verificado en fuente primaria ·
@@ -370,7 +377,11 @@ igual** y enlaza a `/servicios-contratar-hubspot/` hasta el 301.
 
 ## Out of Scope
 
-- **Un cotizador self-serve / calculadora pública de precio** (regla dura 1).
+- 🎯 **El simulador de precios** → **TASK-1406** (sobre el pricebook de **TASK-1405**).
+  **Esta task entrega la página estática y citable; el simulador se monta encima, después.**
+  🔴 **Y si el simulador rompe la citabilidad, el simulador está mal construido — no la página.**
+- 🔴 **Cotizar NUESTRO honorario de implementación** (regla dura 1: depende del scope; un número exacto ahí es
+  *"mentir con precisión"*). El número real llega con **TASK-1407** (la puerta anónima del cotizador).
 - El cutover de HubSpot delivery del form · la variante `en-US` · el pillar de categoría CRM en Think ·
   **la calculadora de TCO 1:1** (es un artefacto de venta de la skill, `templates/tco-3y.md`, no una feature web).
 
