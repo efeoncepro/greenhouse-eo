@@ -147,3 +147,12 @@ El equivalente real ya existe en Think y hay que seguirlo: `scripts/verify-brand
 - [ ] Implementation mapping names primitive, copy source, data contract and route/surface.
 - [ ] GVC scenario plan is specific enough for `pnpm fe:capture` or a new scenario file.
 - [ ] Design decision log explains reuse/extend/new before JSX starts.
+
+
+## Delta 2026-07-13 — La implementación real difiere de este wireframe en tres puntos
+
+1. **Dos zonas de marca** (no estaba en el wireframe). Izquierda = espécimen del cliente (claro, su acento); derecha + chrome = instrumento de Efeonce (navy `#001a33` + azul `#0375db`). El wireframe pintaba los dos paneles iguales — y por eso el operador no sabía dónde mirar.
+2. **Cero React.** El wireframe declaraba una island (`XrayCoupling`, `client:idle`). Chocaba con la regla dura de Astro (*"NEVER over-hydrate"*): el contenido es estático. Es un `<script>` de ~40 líneas que conmuta un atributo; el CSS hace el resaltado.
+3. **Tres niveles de nodo + el stat como héroe.** No estaban. Ver `TASK-1410` → `## Delta 2026-07-13 (4)`.
+
+El resto del wireframe (regiones, momento héroe, contrato de accesibilidad, plan de verificación) se implementó como está escrito.

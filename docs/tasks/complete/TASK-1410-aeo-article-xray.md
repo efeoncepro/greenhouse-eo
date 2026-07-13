@@ -521,3 +521,54 @@ Captura de producción: `efeonce-think/.captures/aeo-xray/PROD-couple.png`.
 - Meter la captura (`hero-desktop.png` / `PROD-hero.png`) a una lámina del deck de SKY.
 - Decidir si la muestra se enlaza **solo desde el deck** (recomendado: no reabre nada) o también desde la oferta técnica, cerrada desde el 11/07.
 - Subir a Wherex (regla dura del bid: el agente prepara, el humano sube y firma).
+
+
+## Delta 2026-07-13 (4) — Dirección de arte: la pieza es un instrumento y ahora lo parece
+
+Feedback del operador sobre la V1 desplegada: *"falta jerarquía, falta branding de Efeonce, y cuando paso el cursor no sé si mirar a la izquierda o a la derecha"*. Los tres eran correctos, y el tercero era un error de encoding, no de gusto. Se auditó con las skills `modern-ui` + `typography-design`.
+
+### El diagnóstico: se llama Radiografía y estaba diseñada como dos tarjetas blancas
+
+**Un solo movimiento resolvió casi todo: DOS ZONAS DE MARCA.**
+
+- **Izquierda = la muestra del CLIENTE.** Fondo claro, su acento. Es el **espécimen**.
+- **Derecha + todo el chrome = el INSTRUMENTO de Efeonce.** Navy `#001a33` + azul `#0375db`, Geist/Poppins. Es la **máquina que lo lee**.
+
+La V1 usaba el magenta de SKY para **todo** — incluidas *nuestras propias anotaciones*. El análisis de Efeonce hablaba con la voz del cliente. Estaba invertido.
+
+La separación hace tres cosas de una: pone la marca donde corresponde, vuelve los dos lados **inconfundibles** (por eso el ojo ya sabe dónde mirar), y **refuerza el disclaimer sin decir una palabra** — se *ve* que el artefacto del cliente está contenido dentro de nuestro instrumento. Es el patrón de las DevTools / el inspector de Figma: lee como **herramienta**, no como dos cards.
+
+### El acoplamiento era simétrico, y por eso era ambiguo
+
+Fuente y destino recibían **el mismo tratamiento**. Si los dos gritan igual, el ojo no sabe cuál es la causa y cuál el efecto.
+
+**Regla nueva: la fuente susurra, el destino grita.**
+
+| | Antes | Ahora |
+|---|---|---|
+| **Fuente** (bajo el cursor) | outline + tinte | tinte + barra lateral, **sin outline** — ya la estás tocando |
+| **Destino** (el pago) | outline + tinte | outline + **pulso** + **marca de origen `←`** |
+| **Dirección** | ninguna | **chip `→ 3 datos`** que apunta a través de la canaleta y dice *cuánto* hay |
+| **En reposo** | **nada avisaba que el artículo era interactivo** | punto discreto en el borde derecho de cada bloque acoplable |
+| **Apilado (móvil)** | igual que desktop | el chip apunta `↓` y la marca de origen `↑` — **el dato viene de arriba, no de la izquierda** |
+
+Se descartaron las líneas SVG conectoras: exigen geometría en cada scroll/resize, se rompen con el panel scrolleando por dentro, y apiladas no significan nada.
+
+### Jerarquía
+
+- **Escala real** (base 16 × 1.25) en vez de **seis tamaños dentro de 4px** — con esos saltos la jerarquía era imposible por construcción. El cuerpo sube a 16px (estaba **bajo el piso** que exige `typography-design`).
+- **El número es el héroe:** `72,4%` · `2,3×` · `8/100` a 40px, Geist con `tabular-nums` (**nunca monoespaciada** — regla dura de la skill: lee como editor de código). La prosa pasó a ser la nota al pie del número, no al revés.
+- **Tres niveles de nodo** (`tier`, y es **dato**, no código): el 1 mueve un número del diagnóstico; el 3 es *prueba de completitud, no argumento*, y va callado. Antes `og:title` pesaba **exactamente igual** que `FAQPage`. Esa era la planitud.
+- **El JSON se colapsa** bajo "Ver el código". El argumento es el stat + el para qué; el código es su prueba. Con el JSON abierto el panel era un muro y el argumento quedaba enterrado bajo su propia evidencia.
+- **La evidencia SUBE:** el instrumento **abre** con tres KPIs (`18.100` / `+100` / `0`). Era el argumento —*"venimos a aportarles"*— y estaba al fondo de 3.000px de scroll.
+- **El h1 de la página deja de robarle el título al artículo.** Ahora la página se llama por lo que es (*"Radiografía AEO · muestra para SKY"*) y el título del artículo vive solo dentro de su panel.
+
+### Lo que emergió sin diseñarlo
+
+Al pasar por el bloque de **Preguntas frecuentes**, el acoplamiento enciende el KPI **"0 citas en 35 respuestas"**. La pieza conecta sola el FAQ del artículo con la evidencia de que hoy nadie cita a SKY. No estaba planeado: salió del grafo de acoplamiento.
+
+### Verificación
+
+`verify:aeo-xray` **16/16**. El assert nuevo: *en táctil el copy no habla de "cursor"*. Playwright reportaba `hover: hover` en un viewport de 390px (Chromium de escritorio con ventana chica), así que **la captura mentía** — mostraba "Pasa el cursor" en un teléfono. Ahora emula táctil (`hasTouch` + `isMobile`) y lo assertea.
+
+Desplegado y verificado contra producción. Commit `efeonce-think` `d2cb4f8`.

@@ -143,3 +143,20 @@
 - [ ] Performance guardrails avoid layout thrash and excessive animation.
 - [ ] GVC/micro evidence proves the meaningful interaction, not only a static screenshot.
 - [ ] Design decision log explains why this motion is needed and what was rejected.
+
+
+## Delta 2026-07-13 — El acoplamiento pasó de simétrico a asimétrico
+
+Este contrato describía un resaltado **simétrico**: fuente y destino con el mismo tratamiento. **Era el bug.** Si los dos lados gritan igual, el ojo no sabe cuál es la causa y cuál el efecto — el operador lo reportó como *"no sé si mirar a la izquierda o a la derecha"*.
+
+**La regla vigente: la fuente susurra, el destino grita.**
+
+| Elemento | Tratamiento |
+|---|---|
+| **Fuente** (bajo el cursor) | tinte + barra lateral. **Sin outline** — ya la estás tocando |
+| **Destino** (el pago) | outline + **pulso 320ms** + **marca de origen `←`** |
+| **Dirección** | **chip `→ N datos`** en el borde derecho de la fuente: apunta a través de la canaleta y dice *cuánto* hay |
+| **En reposo** | punto discreto en el borde derecho de cada bloque acoplable. **Antes no había afordancia: nada avisaba que el artículo era interactivo** |
+| **Apilado (móvil)** | el chip apunta `↓` y la marca de origen `↑`. Apilado, el dato viene de arriba, no de la izquierda — la flecha dice la verdad |
+
+Sigue siendo **CSS puro + un script mínimo**. GSAP sigue prohibido. El contrato de reduced-motion no cambia: todo a 0ms, y **el significado se conserva íntegro** porque nunca estuvo en el movimiento, estuvo en la correspondencia.
