@@ -161,6 +161,27 @@ es el moat.**
 
 🔴 **Es lo único que un freelancer no puede tener. NUNCA se descuenta.**
 
+### 🔴 Pero cuidado — la plataforma HOY solo existe para AEO
+
+**Auditado 2026-07-13** *(→ `12_ACTIVOS.md` § 2)*:
+
+| | ¿Existe en el portal? |
+|---|---|
+| 🎯 **AEO** *(el Grader: 7 dimensiones · 14 probes · 5 motores · **el reporte del cliente en `/aeo`**)* | ✅ **Live en producción** |
+| 🔴 **SEO** *(rank tracking · site audit · backlinks · E-E-A-T · reportería)* | 🔴 **NADA.** EPIC-022 son **19 tasks, todas en `to-do`, cero código** |
+| Search Console | ⚠️ Panel de conexión — **staging ON, producción OFF** |
+
+> 🔴 **Cuando vendes un retainer de SEO y dices *"puedes entrar al portal y ver todo"*, para SEO eso todavía
+> NO es cierto. NO lo prometas.**
+
+🎯 **Y la versión honesta vende igual de bien:**
+
+> *"En visibilidad de IA te doy transparencia total: entras cualquier día y ves los siete ejes, los cinco
+> motores y qué se movió. **En SEO todavía te doy el reporte del equipo** — la capa de autoservicio está en
+> construcción, **y cuando salga la tienes sin costo adicional.**"*
+
+🔴 **Decirlo así te cuesta cero y te ahorra la promesa que después no puedes cumplir.**
+
 ---
 
 ### Capa 4 — **La expansión.** La palanca de crecimiento.

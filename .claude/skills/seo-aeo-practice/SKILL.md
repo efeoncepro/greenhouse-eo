@@ -148,6 +148,7 @@ mueve, y este es el orden"* sí.
 | **Canales, prospección y outbound** — de dónde salen los deals | **`modules/09_CANALES_OUTBOUND.md`** |
 | **La conversación** — discovery *(las 9 preguntas)*, propuesta, negociación, QBR | **`modules/10_CONVERSACION.md`** |
 | **El retainer que sobrevive** — por qué la mayoría muere al mes 9 | **`modules/11_RETENCION.md`** |
+| 🎯 **El arsenal** — qué activos tenemos DE VERDAD *(auditado contra el repo: el Grader ya da los Fix-It, el SEO no tiene plataforma, la landing de SEO no entrega leads)* | **`modules/12_ACTIVOS.md`** |
 | 🔴 **El estado real de la práctica** — Berel, SKY, el Grader, **cero casos citables** | **`efeonce/ESTADO_ACTUAL.md`** |
 | **Qué se puede afirmar y con qué evidencia** *(+ § Datos que NO se citan)* | **`SOURCES.md`** |
 
@@ -155,7 +156,7 @@ mueve, y este es el orden"* sí.
 | **El vocabulario de la práctica** *(loaded cost, piso, la cuña, la cicatriz, el puente…)* | **`GLOSSARY.md`** |
 
 **Artefactos listos:** `templates/calculadora-piso.md` · `templates/secuencia-outbound.md` ·
-`templates/guion-reunion-grader.md`
+`templates/guion-reunion-grader.md` · `templates/propuesta-tipo.md`
 
 🔴 **Carga solo el módulo que la tarea necesita.** `SOURCES.md` se carga **siempre** que vayas a citar un número.
 

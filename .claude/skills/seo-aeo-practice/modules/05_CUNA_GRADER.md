@@ -33,19 +33,34 @@ Todo el mercado:   promesa → propuesta → (si te creen) evidencia
 > 🔴 **Nuestro Grader compite con un checker gratis de Semrush en la dimensión "medir".**
 > **Ahí no gana. Y no tiene por qué.**
 
-### 🎯 A dónde tiene que migrar
+### 🎯 Y acá la buena noticia: **el Grader YA migró. Y llegó más lejos de lo que creíamos.**
 
-| | Score *(lo que hace hoy)* | **Prescripción** *(a dónde va)* |
-|---|---|---|
-| Qué entrega | *"Estás en 34/100"* | *"Estás invisible en 4 de 7 motores. **Esto es lo que lo mueve, en este orden, y esto cuesta.**"* |
-| Se comoditiza | 🔴 **Sí** — Semrush lo regala | ✅ **No** — es criterio, y el criterio no se descarga |
-| Vale | USD 0 | **El mercado paga USD 900+/mes por esto** ✅ |
+**Auditado contra el repo el 2026-07-13** *(la primera versión de este módulo decía "tiene que migrar de score
+a prescripción". **Estaba desactualizada: ya migró.**)*
 
-> ## Un score es un commodity. Un plan, no.
-> **Nadie paga 900 dólares por un número. Pagan por saber qué hacer con él.**
+| Capa | Qué entrega, hoy |
+|---|---|
+| **Score** | Los 7 ejes de percepción + 14 probes técnicos + 5 motores |
+| ✅ **Prescripción determinista** *(no LLM)* | **6 gaps mapeados `gap → acción → motion`, priorizados RICE** |
+| 🎯 **Fix-It Artifacts** *(TASK-1269)* | 🔴 **4 ENTREGABLES DESCARGABLES:** el **`json_ld` listo para pegar** · el **`llms.txt` listo para subir** · el **content brief AEO** · el **entity action brief** |
+| ✅ **Tracking de ejecución** | Estado por gap: `not_started \| in_progress \| blocked \| done` |
 
-🔴 **Acción de producto:** el Grader tiene que salir con **prescripción priorizada + delta esperado**, no con
-un número. *(Es la diferencia entre un termómetro y un diagnóstico médico.)*
+> ## 🎯 No le damos un diagnóstico. Le damos el código para arreglarlo.
+>
+> **Semrush le da un número por USD 99.**
+> **Nosotros le damos el `json_ld` que tiene que pegar en su sitio. Gratis. Antes de cobrarle.**
+>
+> **Eso no es un lead magnet: es "evidencia antes que promesa" llevada a su límite —
+> y ningún competidor en LATAM lo está haciendo.**
+
+### 🔴 Y está apagado
+
+**Los Fix-It Artifacts están detrás de flag, y el flag solo está ON en staging.**
+
+🔴 **Prenderlos en producción es la acción de producto con mejor ROI de toda la práctica.**
+🎯 **Es el arma de venta más fuerte que tenemos, y está guardada en un cajón.**
+
+> **Un score es un commodity. Un plan, no. Y el código listo para pegar, mucho menos.**
 
 ---
 

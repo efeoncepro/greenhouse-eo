@@ -23,7 +23,25 @@
 
 ---
 
-## 2. 🔴 Cero casos citables
+## 2. 🔴 Cero casos citables — **pero no partimos de cero**
+
+### 🎯 Delta 2026-07-13 — hay DOS candidatos con número, sin verificar
+
+| Candidato | El número *(en `docs/context/01_quienes-somos.md`)* | 🔴 Qué le falta para ser citable |
+|---|---|---|
+| **Sky** | **+127% de tráfico orgánico** *(vs LATAM)* | ⚠️ **Es tráfico, no AEO.** Verificar contra su GSC · **declarar denominador y ventana** · **autorización** |
+| **Bresler** | **+180% de ventas digitales** | Lo mismo — **y la atribución al SEO** |
+| **Berel** | Retainer SEO+AEO adjudicado *(wherEX #5234, may-2026)* | 🔴 **Sin métrica de resultado.** Es el candidato para construirlo bien **desde el baseline** |
+
+🎯 **El trabajo pendiente NO es "conseguir un caso": es VERIFICAR dos números que ya tenemos.**
+🔴 **Pero la regla no cambia: sin las 3 condiciones, no se usa.** Ni "ilustrativo", ni redondeado.
+
+**Logos usables** *(sin métrica)*: Sky · ANAM · Berel · Carozzi · Bresler · Marca Chile · Aguas Andinas ·
+BeFUN · Gobierno de Santiago · Universidad de Temuco. 🎯 **No prueban resultados, pero prueban que empresas
+serias nos dejan entrar — y en una categoría con déficit de confianza, eso vale.**
+
+🔴 **Testimoniales: no existe ninguno en el repo.**
+
 
 **No tenemos ni un solo caso de SEO/AEO con las tres condiciones:**
 **(a)** métrica verificable · **(b)** relación sana · **(c)** autorización del cliente.
@@ -56,7 +74,19 @@ con el cliente que ya tienes.)*
 
 ---
 
-## 4. 🔴 Los tres bugs vivos
+## 4. 🔴🔴 LA HEMORRAGIA — el bug más caro, y es de una línea
+
+> **La landing de SEO (`/servicios/posicionamiento-seo`, live) tiene su form `efeonce-seo-diagnostic` con
+> `deliveryMode = disabled`.**
+>
+> ## Los leads entran a Greenhouse y NUNCA llegan al CRM. Desde que se publicó.
+>
+> 🔴 **Nadie los está trabajando. Es una línea de configuración.**
+> *(La de AEO sí entrega: `efeonce-aeo-diagnostic` → HubSpot + auto-grader.)*
+
+---
+
+## 4b. 🔴 Los otros bugs vivos
 
 1. **La oferta de SKY tiene un plan dominado.** El "ampliado" (12 art · 6,9M) **cuesta CLP 660.000 MÁS** que
    comprar base + 4 ad-hoc (6,24M). **Un analista de compras lo ve en 30 segundos.**
