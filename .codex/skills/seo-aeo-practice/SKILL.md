@@ -151,6 +151,9 @@ mueve, y este es el orden"* sí.
 | 🔴 **El estado real de la práctica** — Berel, SKY, el Grader, **cero casos citables** | **`efeonce/ESTADO_ACTUAL.md`** |
 | **Qué se puede afirmar y con qué evidencia** *(+ § Datos que NO se citan)* | **`SOURCES.md`** |
 
+| 🔴 **Lo que NUNCA se hace** *(+ los bugs vivos de Efeonce marcados 🩸)* | **`ANTIPATTERNS.md`** |
+| **El vocabulario de la práctica** *(loaded cost, piso, la cuña, la cicatriz, el puente…)* | **`GLOSSARY.md`** |
+
 **Artefactos listos:** `templates/calculadora-piso.md` · `templates/secuencia-outbound.md` ·
 `templates/guion-reunion-grader.md`
 
