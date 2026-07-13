@@ -1,3 +1,21 @@
+## Sesión 2026-07-13 — TASK-1373 Careers native Growth Form — STAGING LIVE (Codex)
+
+> **Goal confirmado:** ejecutar `TASK-1373` en `develop`, sin subagentes ni worktree nuevo, preservando la estética rica del apply actual como contrato duro. Hook inicial bloqueó por `Blocked by: TASK-1372`; se verificó que TASK-1372 quedó staging live y se resolvió el blocker documental antes de reintentar.
+>
+> **Hook:** `pnpm codex:task-hook TASK-1373 --develop` PASS. Excepción documentada: la task declara branch `task/TASK-1373-careers-native-growth-form-apply`, pero el operador pidió mantenerse en `develop`.
+>
+> **Ownership/cierre:** task movida a `docs/tasks/complete/TASK-1373-careers-native-growth-form-apply.md`; `Lifecycle: complete`; `UI ready: yes`; `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` sincronizados. Se agregó `## Modular Placement Contract`: current home en ruta pública Next.js/Careers + renderer Growth Forms; future candidate `public`; sin crear `apps/*` ni paquetes.
+>
+> **Implementado:** se publicó el Growth Form real `efeonce-careers-application` en DB (`form_key=9f7a8fc0-6fa7-4670-8e2d-efe0ce354001`, version `2`, `styleVariant=careers-html-fidelity`, surface `public-careers-nextjs`, destinations `0`) por lifecycle gobernado; `/public/careers/[publicId]/apply` renderiza `<greenhouse-form>` con `appearance='bare'`, `initial-values` server-derived para `openingPublicId` y el `CareersApplyClient` custom queda como rollback detrás de `CAREERS_NATIVE_GROWTH_FORM_ENABLED`.
+>
+> **Rollout staging:** flag `CAREERS_NATIVE_GROWTH_FORM_ENABLED=true` quedó ON solo en Vercel `staging` (se corrigió un valor con `\n` literal y se verificó exacto `"true"`). Redeploy Ready: `dpl_3hdhDYu6VxvadTHbXXH595gstjKj`, URL `https://greenhouse-ldqkedyia-efeonce-7670142f.vercel.app`, alias `https://dev-greenhouse.efeoncepro.com`, commit `838950916b270c47d1dc7a5f1bc36ce02b9d704f`. Producción no fue tocada.
+>
+> **Evidencia:** local smoke Growth Forms -> ATS + CV privado PASS (`fsub-a4c97070-bd98-41d8-84e5-3a32f58d88f7` -> `happ-27d24373-8a65-4c70-82b0-6cbb13dc7abd`, asset `asset-531441d6-d20d-498f-8897-af33c76e8975`, destinations `0`); `vercel curl` staging confirma native host/form-key y helper legacy ausente; API contract version 2 + `cvFile` + Turnstile required; submit sin captcha falla cerrado `{ outcome: "captcha_failed", message: "missing_token" }`. GVC local PASS `.captures/2026-07-13T21-01-34_task354-careers-runtime-audit`; GVC staging PASS `.captures/2026-07-13T22-07-38_task354-careers-runtime-audit`, desktop/mobile 390, `apply-form` + `cv-uploader`, sin runtime/layout findings.
+>
+> **QA/tooling:** se corrigió `scripts/frontend/lib/browser.ts` para que GVC no filtre `x-vercel-protection-bypass` a terceros como Sentry; el header queda limitado al origin capturado. GitHub Actions del commit remoto `838950916` verdes: `CI`, `Task Contract`, `Playwright E2E smoke`, `Artifact Worker Deploy`, `Commercial Cost Worker Deploy`, `Ops Worker Deploy`. Build mantiene el warning histórico de roadmap/work-item-index; no es de TASK-1373.
+>
+> **Rollout policy:** production permanece OFF hasta sign-off explícito de release/paridad/privacidad y smoke público con Turnstile real. Rollback staging: remover/apagar flag + redeploy; fallback custom sigue en código.
+
 ## Sesión 2026-07-13 — TASK-1372 Growth Forms application upload + ATS projection — STAGING LIVE (Codex)
 
 > **Goal confirmado:** ejecutar `TASK-1372` en `develop`, sin subagentes ni worktree nuevo, como backend-data de EPIC-011. Hook ejecutado: `pnpm codex:task-hook TASK-1372 --develop`.
@@ -16,7 +34,7 @@
 >
 > **Evidencia worker/DB staging:** `ops-worker` procesó el evento `growth.forms.submission_accepted` y coalesció `fsub-324c40a5-3ab3-4c7a-be1e-871b76c9398e` -> application `happ-072a61fc-dfda-4278-8955-af12dbb35b42`. Asset `asset-74e85693-916f-4dd4-8a5e-86d934d05cd8` quedó `private`/`attached`, owner `hiring_application_cv`, scan verdict `clean`, destinations `0`.
 >
-> **Rollout policy:** producción no fue tocada. Siguiente task del epic: `TASK-1373` (migrar `/public/careers/[publicId]/apply` al renderer nativo `<greenhouse-form>` y publicar/usar el form real por lifecycle gobernado). `TASK-1378` decide si se provisiona ClamAV; structural scan ya corre y gatea attach.
+> **Rollout policy:** producción no fue tocada. `TASK-1373` ya migró `/public/careers/[publicId]/apply` al renderer nativo en staging; el paso a producción queda como release explícito posterior. `TASK-1378` decide si se provisiona ClamAV; structural scan ya corre y gatea attach.
 >
 > **Docs residual:** `pnpm docs:closure-check` pasa, pero advierte `architecture_doc_monolith` para `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md` (11 secciones `## Delta`, 1347 líneas). No bloquea TASK-1372; abrir follow-up formal para separar current state + `HISTORIAL.md` requiere OK del operador.
 >

@@ -98,7 +98,7 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 
 - `TASK-1371` — **Hiring Vacancy Publication Operator Command**: structured backend-data operator `dryRun|execute|publish` for publishing openings from approved briefs without release/SQL/UI-only flow. Adds structured public fields (`public_work_mode`, `public_hiring_region`, location, `public_area`, `public_skill_tags`, optional compensation band), publish guards, CLI/API internal surface and idempotency via the API Platform command ledger. **✓ complete/released (PR #152, 2026-07-09).**
 - `TASK-1372` — **Growth Forms Application Upload + ATS Projection Foundation**: complete local; Growth Forms is now the application-form source of truth for CV/private upload and the `growth_hiring_application_from_submission` projection into Hiring/ATS.
-- `TASK-1373` — **Careers Apply Native Growth Form Migration**: migrates `/public/careers/[publicId]/apply` to the native `<greenhouse-form>` renderer after `TASK-1372`.
+- `TASK-1373` — **Careers Apply Native Growth Form Migration**: complete/staging live; `/public/careers/[publicId]/apply` renders the native `<greenhouse-form>` behind `CAREERS_NATIVE_GROWTH_FORM_ENABLED`, with production still OFF pending explicit release sign-off.
 
 ## Existing Related Work
 

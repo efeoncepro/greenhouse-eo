@@ -43,7 +43,7 @@ La directiva del operador es que migrar a Growth Form **no puede perder la rique
 - Baseline custom local: `.captures/2026-07-13T20-42-47_task354-careers-runtime-audit`, desktop 1440 + mobile 390, sin overflow ni runtime findings.
 - Post-cutover native local: `.captures/2026-07-13T21-01-34_task354-careers-runtime-audit`, desktop 1440 + mobile 390, native host visible, CV uploader marker visible, sin overflow ni runtime/layout findings.
 - El host no agregó motion propio; preserva feedback esencial del renderer (`pending`, focus, errors, success). La validación de success real se cubrió por smoke sintético Growth Forms → ATS.
-- Staging GVC queda como post-deploy gate porque el ambiente protegido no tenía `VERCEL_AUTOMATION_BYPASS_SECRET` disponible durante el preflight.
+- Post-cutover staging: `.captures/2026-07-13T22-07-38_task354-careers-runtime-audit`, desktop 1440 + mobile 390, native host visible, CV uploader marker visible, sin runtime/layout findings. Durante QA se corrigio el helper GVC para limitar `x-vercel-protection-bypass` al origin Greenhouse/Vercel y evitar falsos errores CORS de Sentry.
 
 ## Design Decision Log
 

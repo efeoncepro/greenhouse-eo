@@ -55,11 +55,12 @@ Candidate applies to a public Efeonce opening through native Growth Forms. Caree
 - Viewports: desktop 1440 and mobile 390.
 - Required evidence: host chrome, native `<greenhouse-form>`, CV uploader marker, success marker when submit path is exercised, and explicit `scrollWidth === clientWidth` checks.
 - Latest local evidence: `.captures/2026-07-13T21-01-34_task354-careers-runtime-audit` PASS with native flag ON, no runtime/layout findings, no horizontal overflow.
+- Latest staging evidence: `.captures/2026-07-13T22-07-38_task354-careers-runtime-audit` PASS on `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`, desktop 1440 + mobile 390, `apply-form` and `cv-uploader` marked, no runtime/layout findings.
 
 ## Design Decision Log
 
 - Careers owns only opening context, brand shell, fallback and the `openingPublicId` initial value; Growth Forms owns fields, validation, captcha, upload, submit, success and telemetry.
-- The cutover is guarded by `CAREERS_NATIVE_GROWTH_FORM_ENABLED`; custom `CareersApplyClient` remains the rollback path while staging validates.
+- The cutover is guarded by `CAREERS_NATIVE_GROWTH_FORM_ENABLED`; custom `CareersApplyClient` remains the rollback path while production sign-off is pending.
 - `form_destination` is intentionally unused for ATS. The accepted Growth Forms event is projected by `growth_hiring_application_from_submission`, preserving a single Hiring command path.
 - Success remains generic for accepted and deduped submissions; no candidate state or internal IDs are exposed to the browser.
 

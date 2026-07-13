@@ -62,14 +62,38 @@ export const launchCaptureSession = async (opts: LaunchOptions): Promise<Launche
     storageState: opts.envConfig.storageStatePath,
     viewport: effectiveViewport,
     deviceScaleFactor: devicePreset?.deviceScaleFactor ?? opts.deviceScaleFactor ?? 2,
-    extraHTTPHeaders: opts.envConfig.bypassSecret
-      ? { 'x-vercel-protection-bypass': opts.envConfig.bypassSecret }
-      : undefined,
     recordVideo: {
       dir: opts.recordVideoDir,
       size: effectiveViewport
     }
   })
+
+  const bypassSecret = opts.envConfig.bypassSecret
+
+  if (bypassSecret) {
+    const captureOrigin = new URL(opts.envConfig.baseUrl).origin
+
+    await context.route('**/*', async route => {
+      const request = route.request()
+
+      try {
+        if (new URL(request.url()).origin === captureOrigin) {
+          await route.continue({
+            headers: {
+              ...request.headers(),
+              'x-vercel-protection-bypass': bypassSecret
+            }
+          })
+
+          return
+        }
+      } catch {
+        // If Playwright ever hands us a non-URL request, continue unchanged.
+      }
+
+      await route.continue()
+    })
+  }
 
   // esbuild keepNames shim: los bodies de page.evaluate compilados por tsx pueden
   // referenciar el helper `__name`, que no existe en el contexto del browser.

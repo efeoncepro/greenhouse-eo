@@ -466,7 +466,7 @@ OPEN QUESTIONS RESUELTAS:
 
 - `TASK-1373` migrates Careers apply UI to native `<greenhouse-form>` using this contract.
 - `TASK-1378` decides whether to provision the optional ClamAV service; structural scan already runs and gates attach.
-- Production rollout remains a separate release step. Staging is live and smoked; production was not touched. Before switching Careers UI, `TASK-1373` must publish/consume the real `efeonce-careers-application` form by the governed lifecycle.
+- Production rollout remains a separate release step. Staging is live and smoked; production was not touched. `TASK-1373` now publishes/consumes the real `efeonce-careers-application` form in staging by the governed lifecycle; production cutover remains explicit.
 
 ## Open Questions
 
