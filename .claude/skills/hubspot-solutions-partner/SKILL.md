@@ -38,13 +38,33 @@ Gartner 2025 pone a HubSpot en **Niche Players** del MQ de *Sales Force Automati
 Microsoft, Oracle) y en **Leaders** del MQ de *B2B Marketing Automation* por **5.º año consecutivo**.
 Los dos datos son ciertos y son reportes distintos. Un AE de Salesforce va a llegar con el primero impreso.
 
-La entrada correcta a mid-market y enterprise:
-
-> **Marketing y visibilidad en IA → CRM como consecuencia → expansión a Sales/Service/Data.**
-
 Es el terreno donde el argumento de HubSpot es defendible frente a un comité, y es exactamente lo que
-Efeonce **es** (agencia / Growth OS, no un integrador de CRM). La estrategia y la identidad coinciden.
-El vehículo concreto de esa entrada es la **cuña AEO** → `modules/07_CUNA_AEO.md`.
+Efeonce **es** (agencia / Growth OS, no un integrador de CRM).
+
+### 🔴 Pero vendes la PLATAFORMA, no un Hub
+
+**Nunca vendes un Hub. Vendes la salida de un dolor.** Y **nunca estrechas la conversación a una sola
+puerta** — al CRO que no sabe cuánto pipeline tiene **no le importa ChatGPT**; al RevOps con datos sucios,
+tampoco. **Siete dolores, siete puertas, un HubSpot** → el mapa completo en `modules/07_CUNA_AEO.md` § 2.
+
+### La postura: **evidencia antes que promesa**
+
+> **"Todos los partners te van a prometer que HubSpot va a funcionar.
+> Nosotros te vamos a mostrar, antes de cobrarte un peso, si te sirve o no."**
+
+Es **JOLT hecho posicionamiento** (el 40-60% de las pérdidas B2B son contra la **indecisión**, no contra un
+competidor). La categoría compite prometiendo resultados y presumiendo tier. **Nadie compite quitando riesgo.**
+Y Efeonce puede hacerlo **hoy**, con cuatro activos que ya tiene:
+
+| Activo | Qué le quita al comprador | Verificable |
+|---|---|---|
+| **El waiver del onboarding** — el cargo obligatorio **desaparece de su contrato** (USD 3.000 = **31% del año 1**) | Riesgo económico | ✅ **El HubSpot directo no puede igualarlo** |
+| **Los dos graders** (AI Visibility · Portal Grader) | Riesgo de no saber | ✅ Ningún partner de la región tiene uno |
+| **La descalificación honesta** (los límites por escrito) | Riesgo de elegir mal | ✅ Documentados — **y nadie lo hace, porque asusta** |
+| **Kortex** (versionado, trazable, reversible) | Riesgo de quedar atrapado | ⚠️ **n=1 → describe el mecanismo, NUNCA implica escala** |
+
+**Los cuatro aplican a toda la plataforma, no a un Hub.** Doctrina completa:
+[`PDR-006`](../../../docs/public-site/decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md).
 
 ---
 
@@ -137,7 +157,7 @@ rehacerla, no memorizarla. Por eso la calculadora vive en `templates/tier-calcul
 | A quién le vendes: ICP, señales de compra, comité, triggers regulatorios | `modules/04_ICP_Y_SENALES.md` |
 | Contra quién compites: battlecards + TCO 3 años + los mitos que te hacen perder | `modules/05_DISPLACEMENT.md` |
 | Cómo se compra en **cada mercado** (el método, no el país) | `modules/06_MAPA_DE_DEMANDA.md` + `markets/` |
-| **La cuña AEO** — la entrada diferenciada de Efeonce | `modules/07_CUNA_AEO.md` |
+| **Las entradas** — el mapa **dolor → Hub** (los 7) + la cuña AEO + el wedge de HubSpot | `modules/07_CUNA_AEO.md` |
 | Prospección a cuenta, señales, secuencias, la base instalada como territorio | `modules/08_OUTBOUND_ABM.md` |
 | Captura de demanda, directorio, partner matching, co-marketing | `modules/09_INBOUND_DEMANDA.md` |
 | Discovery, dimensionar sin sub-cotizar, **descalificar** | `modules/10_DISCOVERY_SCOPING.md` |
