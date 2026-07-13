@@ -31,6 +31,8 @@ export const hiringActivation: HiringActivationCopy = {
     subtitle: 'contrataciones aprobadas, listas para revisar',
     emptyTitle: 'Sin contrataciones pendientes',
     emptyBody: 'Cuando Hiring apruebe un handoff internal_hire, aparecerá aquí para activar su paso a HRIS.',
+    targetNotReadyTitle: 'Esta contratación aún no está en la cola',
+    targetNotReadyBody: 'El master flow exige que N10 materialice y apruebe el handoff antes de entrar a N11. Vuelve al Hiring Desk si necesitas revisar la decisión o aprobar el handoff.',
     flagOffTitle: 'Bridge de activación deshabilitado',
     flagOffBody: 'La cola existe, pero los flags HIRING_ACTIVATION_ENABLED / HIRING_HANDOFF_BRIDGES_ENABLED no están activos en este ambiente.',
     errorTitle: 'No se pudo cargar la cola',
@@ -40,6 +42,7 @@ export const hiringActivation: HiringActivationCopy = {
     title: 'Detalle de activación',
     pendingTitle: 'Selecciona una contratación',
     pendingBody: 'Abre un caso de la cola para revisar su journey, readiness y próximas acciones.',
+    application360: 'Ver postulación 360',
     people360: 'Ver People 360',
     source: 'Fuente',
     handoff: 'Handoff',
@@ -118,8 +121,14 @@ export const hiringActivation: HiringActivationCopy = {
     cancelBody: 'Registra un motivo para dejar trazabilidad del cierre manual.',
     cancelReasonLabel: 'Motivo de cancelación',
     resolveTitle: 'Resolución de blocker',
-    resolveBody: 'Este blocker necesita un command backend con payload gobernado. Hasta que TASK-1400 cierre, esta UI sólo puede guiarte a la surface correcta.',
-    resolvePendingTask: 'Follow-up backend: TASK-1400.'
+    resolveBody: 'Usa las acciones disponibles del command gobernado. Si un blocker pertenece a otra surface, la UI te redirige sin simular resolución.',
+    resolvePendingTask: 'El detalle se actualiza desde el contrato real de TASK-1400.',
+    resolveAvailable: 'Resolución automática disponible',
+    resolveManual: 'Resolución manual',
+    resolveReasonLabel: 'Nota operativa opcional',
+    resolveReasonHint: 'Se audita como digest/shape; evita PII.',
+    resolveNoActiveBlockers: 'No hay blockers activos',
+    resolveNoActiveBlockersBody: 'Refresca el detalle si esperabas un blocker pendiente.'
   },
   feedback: {
     reviewOk: 'Contratación tomada para revisión.',
@@ -127,6 +136,9 @@ export const hiringActivation: HiringActivationCopy = {
     openOnboardingOk: 'Onboarding abierto.',
     completeOk: 'Bridge de activación cerrado.',
     cancelOk: 'Activación cancelada.',
+    resolveOk: 'Blocker resuelto y detalle actualizado.',
+    resolveStillBlocked: 'Se reintentó la resolución, pero el blocker sigue vigente. Revisa el detalle actualizado.',
+    resolveStale: 'El blocker cambió antes del retry. Actualicé el detalle; revisa y vuelve a intentar si aplica.',
     commandError: 'No se pudo completar la acción.',
     loadError: 'No se pudo cargar Hiring Activation.'
   },

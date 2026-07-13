@@ -44,6 +44,7 @@ import type {
   HiringDeskApplicationSummary,
   HiringFulfillmentMode,
 } from '@/types/hiring'
+import type { HiringHandoff } from '@/lib/hiring/handoff/types'
 import type { Assessment, AssessmentResponse, AssessmentTemplate, Competency } from '@/types/hiring-assessment'
 import type { AiProposal } from '@/types/hiring-assessment-ai'
 
@@ -150,10 +151,114 @@ interface Application360ViewProps {
   initialItem: HiringDeskApplicationSummary
   initialAssessments: Assessment[]
   templates: AssessmentTemplate[]
+  initialHandoff: HiringHandoff | null
+  canApproveHandoff: boolean
 }
 
-const Application360View = ({ copy, initialItem, initialAssessments, templates }: Application360ViewProps) => {
+const handoffTone = (handoff: HiringHandoff | null) => {
+  if (!handoff) return 'info' as const
+  if (handoff.state === 'blocked' || handoff.state === 'cancelled') return 'warning' as const
+  if (handoff.state === 'approved' || handoff.state === 'in_setup' || handoff.state === 'completed') return 'success' as const
+
+  return 'info' as const
+}
+
+const HandoffBridgeCard = ({
+  copy,
+  handoff,
+  activationHref,
+  canApproveHandoff,
+  approving,
+  onApprove,
+}: {
+  copy: HiringDeskCopy
+  handoff: HiringHandoff | null
+  activationHref: string
+  canApproveHandoff: boolean
+  approving: boolean
+  onApprove: () => void
+}) => {
+  const ready = handoff ? ['approved', 'in_setup', 'completed'].includes(handoff.state) : false
+  const blocked = handoff ? ['blocked', 'cancelled'].includes(handoff.state) : false
+  const pending = handoff?.state === 'pending'
+
+  const title = !handoff
+    ? copy.application.handoffMaterializingTitle
+    : blocked
+      ? copy.application.handoffBlockedTitle
+      : ready
+        ? copy.application.handoffReadyTitle
+        : copy.application.handoffPendingTitle
+
+  const body = !handoff
+    ? copy.application.handoffMaterializingBody
+    : blocked
+      ? copy.application.handoffBlockedBody
+      : ready
+        ? copy.application.handoffReadyBody
+        : copy.application.handoffPendingBody
+
+  return (
+    <Alert
+      severity={handoffTone(handoff)}
+      icon={<i className={ready ? 'tabler-route-square-2' : blocked ? 'tabler-alert-triangle' : 'tabler-git-branch'} />}
+      data-capture='hiring-application-handoff-bridge'
+      sx={(theme) => ({
+        border: `1px solid ${theme.palette[handoffTone(handoff)].lightOpacity}`,
+        color: 'text.primary',
+        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+        '& .MuiAlert-message': { inlineSize: '100%' },
+      })}
+    >
+      <Stack spacing={2.5}>
+        <Box>
+          <Typography fontWeight={700}>{title}</Typography>
+          <Typography variant='body2' color='text.secondary'>{body}</Typography>
+        </Box>
+        <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
+          <GreenhouseChip
+            size='small'
+            kind='status'
+            variant='label'
+            tone={blocked ? 'warning' : ready ? 'success' : 'info'}
+            label={handoff?.state ?? 'materializing'}
+          />
+          <GreenhouseChip size='small' kind='attribute' label='N9 → N10 → N11' />
+          {handoff?.blockedReason ? <GreenhouseChip size='small' kind='status' tone='warning' label={handoff.blockedReason} /> : null}
+        </Stack>
+        {pending && !canApproveHandoff ? (
+          <Typography variant='body2' color='text.secondary'>{copy.application.handoffNoCapability}</Typography>
+        ) : null}
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          {pending && canApproveHandoff ? (
+            <GreenhouseButton
+              kind='primaryAction'
+              leadingIcon={approving ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
+              leadingIconClassName={approving ? undefined : 'tabler-check'}
+              disabled={approving}
+              onClick={onApprove}
+            >
+              {approving ? copy.common.loading : copy.application.approveHandoff}
+            </GreenhouseButton>
+          ) : null}
+          <Button
+            component={NextLink}
+            href={activationHref}
+            variant={ready ? 'contained' : 'tonal'}
+            color={ready ? 'success' : 'info'}
+            startIcon={<i className='tabler-users-plus' />}
+          >
+            {copy.application.openActivationLane}
+          </Button>
+        </Stack>
+      </Stack>
+    </Alert>
+  )
+}
+
+const Application360View = ({ copy, initialItem, initialAssessments, templates, initialHandoff, canApproveHandoff }: Application360ViewProps) => {
   const [item, setItem] = useState(initialItem)
+  const [handoff, setHandoff] = useState(initialHandoff)
   const [tab, setTab] = useState<TabKey>('overview')
   const [assessments, setAssessments] = useState(initialAssessments)
   const [assignOpen, setAssignOpen] = useState(false)
@@ -176,6 +281,7 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
   const [overrideAdvisory, setOverrideAdvisory] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deciding, setDeciding] = useState(false)
+  const [approvingHandoff, setApprovingHandoff] = useState(false)
   const [showDecisionForm, setShowDecisionForm] = useState(!item.application.decision)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
@@ -197,6 +303,11 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
   }
 
   const decisionHistory = useMemo(() => historyFrom(item.application.explainability), [item.application.explainability])
+  const isInternalHireDecision = item.application.decision === 'selected' && item.application.selectedDestination === 'internal_hire'
+
+  const activationHref = handoff
+    ? `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}&handoffId=${encodeURIComponent(handoff.handoffId)}`
+    : `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}`
 
   const assessmentScorecard = useMemo(() => {
     const value = item.application.explainability.assessment
@@ -383,6 +494,7 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
       )
 
       setItem((current) => ({ ...current, application: result.application }))
+      setHandoff(null)
       setConfirmOpen(false)
       setToast(copy.application.decided)
       setReason('')
@@ -394,6 +506,33 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
       setConfirmOpen(false)
     } finally {
       setDeciding(false)
+    }
+  }
+
+  const approveHandoff = async () => {
+    if (!handoff || handoff.state !== 'pending') return
+
+    setApprovingHandoff(true)
+    setError(null)
+
+    try {
+      const result = await hiringRequest<{ handoff: HiringHandoff; idempotentReplay: boolean }>(
+        `/api/hiring/handoffs/${handoff.handoffId}/approve`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            reasonCode: 'application_360_master_flow',
+            reasonDetail: 'Aprobado desde Application 360 para continuar N10 → N11.',
+          }),
+        },
+      )
+
+      setHandoff(result.handoff)
+      setToast(copy.application.handoffApproved)
+    } catch (handoffError) {
+      setError(handoffError instanceof Error ? handoffError.message : copy.application.handoffApproveError)
+    } finally {
+      setApprovingHandoff(false)
     }
   }
 
@@ -582,6 +721,16 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
           <Typography variant='body2'>{item.application.decision} · {formatDateTime(item.application.decisionAt, { dateStyle: 'medium', timeStyle: 'short' }, 'es-CL')}</Typography>
         </Alert>
       ) : null}
+      {isInternalHireDecision ? (
+        <HandoffBridgeCard
+          copy={copy}
+          handoff={handoff}
+          activationHref={activationHref}
+          canApproveHandoff={canApproveHandoff}
+          approving={approvingHandoff}
+          onApprove={() => void approveHandoff()}
+        />
+      ) : null}
       {showDecisionForm ? <Paper variant='outlined' sx={{ p: { xs: 2.5, md: 3.5 }, borderRadius: 3 }}>
         <Stack spacing={3}>
           <Grid container spacing={2.5}>
@@ -708,7 +857,20 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates }
           </Stack>
         </Box>
       </Stack>
-      <GreenhouseButton kind='primaryAction' reserveInlineSize={130} leadingIconClassName='tabler-gavel' onClick={() => { setShowDecisionForm(true); setTab('decision') }}>{copy.application.decideAction}</GreenhouseButton>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { xs: 'stretch', sm: 'center' } }}>
+        {isInternalHireDecision ? (
+          <Button
+            component={NextLink}
+            href={activationHref}
+            variant='tonal'
+            color='success'
+            startIcon={<i className='tabler-users-plus' />}
+          >
+            {copy.application.openActivationLane}
+          </Button>
+        ) : null}
+        <GreenhouseButton kind='primaryAction' reserveInlineSize={130} leadingIconClassName='tabler-gavel' onClick={() => { setShowDecisionForm(true); setTab('decision') }}>{copy.application.decideAction}</GreenhouseButton>
+      </Stack>
     </Stack>
   )
 

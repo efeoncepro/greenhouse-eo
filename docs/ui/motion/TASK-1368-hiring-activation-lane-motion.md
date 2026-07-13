@@ -5,7 +5,7 @@
 - Task: `TASK-1368`
 - Superficie: activation lane "Contrataciones listas". Wireframe: `docs/ui/wireframes/TASK-1368-hiring-activation-lane.md` · Flow: `docs/ui/flows/TASK-1368-hiring-activation-lane-flow.md` · Master: `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md`
 - Rigor de motion: **fidelidad alta controlada al HTML fuente + sobriedad operacional**. Se porta el vocabulario real del canvas (`fade`, `rise`, `slide-right`, `pop`, `toast`, `skeleton`) sin reemplazar el chrome Greenhouse/Vuexy ni convertir acciones críticas en motion decorativa. Todo tokenizado + reduced-motion-aware.
-- Estado: `ready for implementation` (UI ready: yes; evidencia GVC durante ejecución)
+- Estado: `code-complete local` (UI ready: yes; staging smoke post-push pendiente)
 
 ## Motion Brief
 
@@ -84,7 +84,8 @@ Notas:
 
 - Captura base code-complete: `.captures/2026-07-13T09-21-19_hiring-activation-lane` — desktop/mobile, dossier apto/0 findings.
 - Captura de polish de fidelidad: `.captures/2026-07-13T09-53-44_hiring-activation-lane` — 28 frames; desktop/mobile; hover + keyboard + reduced-motion sobre tab "Contrataciones listas"; click + keyboard + reduced-motion sobre refresh de cola; dossier apto/0 findings.
-- Pendiente para cierre remoto: con flags/data reales validar selección de caso, acciones pending reales, detail sidecar con data y rollback/error real en staging.
+- Captura master-flow seam local/staging-env: `.captures/2026-07-13T11-35-04_hiring-activation-lane` + Application 360 bridge `.captures/2026-07-13T11-38-59_inline-agency-hiring-applications-happ-ab583c21-13a5-4f21-af41-814528ee4452` + deep link N11 `.captures/2026-07-13T11-39-22_inline-hr-onboarding-lane-hiring-activation-applicationid-happ-ab583c21-13a5-4f21-af41-814528ee4452-handoffid-hhof-949edeaf-b1f1-46c0-a016-e76c9b40baf6`.
+- Pendiente para cierre remoto: con deploy post-push validar flags ON, selección de caso, acciones pending reales, detail sidecar con data y rollback/error real en staging.
 
 ## Design Decision Log
 
@@ -101,4 +102,5 @@ Notas:
 - [x] Reduced-motion: cortes directos, feedback esencial conservado.
 - [x] Solo `opacity`/`transform`; sin reflow intencional.
 - [x] GVC micro-evidencia local para hover/click/keyboard/reduced-motion no-mutante desktop+mobile.
-- [ ] Staging/data-real: acción en vuelo (M4), rollback (M7) y detail sidecar con caso real capturados antes de mover TASK-1368 a `complete`.
+- [x] GVC local/staging-env para Application 360 bridge + deep link Activation Lane.
+- [ ] Staging post-push/data-real: acción en vuelo (M4), rollback (M7) y detail sidecar con caso real capturados antes de mover TASK-1368 a `complete`.

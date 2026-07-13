@@ -7,6 +7,7 @@ import type { Metadata } from 'next'
 import Application360View from '@/views/greenhouse/hiring/Application360View'
 import { can } from '@/lib/entitlements/runtime'
 import { getHiringApplicationById, getHiringDeskSnapshot } from '@/lib/hiring'
+import { getHiringHandoffByApplicationId } from '@/lib/hiring/handoff'
 import { listAssessmentsForApplication, listTemplates } from '@/lib/hiring/assessment'
 import { getMicrocopy } from '@/lib/copy'
 import { normalizeLocale } from '@/i18n/locales'
@@ -40,12 +41,14 @@ export default async function HiringApplicationPage({ params }: Props) {
 
   const canReadAssessment = can(tenant, 'hiring.assessment.read', 'read', 'tenant')
   const canAuthorAssessment = can(tenant, 'hiring.assessment.author', 'create', 'tenant')
+  const canApproveHandoff = can(tenant, 'hiring.handoff.approve', 'execute', 'tenant')
 
-  const [locale, snapshot, assessments, templates] = await Promise.all([
+  const [locale, snapshot, assessments, templates, handoff] = await Promise.all([
     getLocale(),
     getHiringDeskSnapshot({ openingId: application.openingId, openingLimit: 80, applicationLimit: 120 }),
     canReadAssessment ? listAssessmentsForApplication(applicationId) : Promise.resolve([]),
     canAuthorAssessment ? listTemplates() : Promise.resolve([]),
+    getHiringHandoffByApplicationId(applicationId),
   ])
 
   const item = snapshot.applications.find((entry) => entry.application.applicationId === applicationId)
@@ -58,6 +61,8 @@ export default async function HiringApplicationPage({ params }: Props) {
       initialItem={item}
       initialAssessments={assessments}
       templates={templates}
+      initialHandoff={handoff}
+      canApproveHandoff={canApproveHandoff}
     />
   )
 }

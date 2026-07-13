@@ -115,6 +115,8 @@ export interface HiringActivationCopy {
     subtitle: string
     emptyTitle: string
     emptyBody: string
+    targetNotReadyTitle: string
+    targetNotReadyBody: string
     flagOffTitle: string
     flagOffBody: string
     errorTitle: string
@@ -124,6 +126,7 @@ export interface HiringActivationCopy {
     title: string
     pendingTitle: string
     pendingBody: string
+    application360: string
     people360: string
     source: string
     handoff: string
@@ -184,6 +187,12 @@ export interface HiringActivationCopy {
     resolveTitle: string
     resolveBody: string
     resolvePendingTask: string
+    resolveAvailable: string
+    resolveManual: string
+    resolveReasonLabel: string
+    resolveReasonHint: string
+    resolveNoActiveBlockers: string
+    resolveNoActiveBlockersBody: string
   }
   feedback: {
     reviewOk: string
@@ -191,6 +200,9 @@ export interface HiringActivationCopy {
     openOnboardingOk: string
     completeOk: string
     cancelOk: string
+    resolveOk: string
+    resolveStillBlocked: string
+    resolveStale: string
     commandError: string
     loadError: string
   }
@@ -351,6 +363,20 @@ export interface HiringDeskCopy {
     confirmBody: string
     decided: string
     supersede: string
+    handoffTitle: string
+    handoffMaterializingTitle: string
+    handoffMaterializingBody: string
+    handoffPendingTitle: string
+    handoffPendingBody: string
+    handoffReadyTitle: string
+    handoffReadyBody: string
+    handoffBlockedTitle: string
+    handoffBlockedBody: string
+    handoffNoCapability: string
+    approveHandoff: string
+    openActivationLane: string
+    handoffApproved: string
+    handoffApproveError: string
     history: string
     activityTitle: string
   }

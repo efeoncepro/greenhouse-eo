@@ -4,7 +4,7 @@
 > **Version:** 1.0
 > **Creado:** 2026-07-10 por Claude (TASK-770)
 > **Ultima actualizacion:** 2026-07-13 por Codex (TASK-1368)
-> **Documentacion tecnica:** [Greenhouse_HRIS_Architecture_v1](../../architecture/Greenhouse_HRIS_Architecture_v1.md) · [Task TASK-770](../../tasks/complete/TASK-770-hiring-to-hris-collaborator-activation.md)
+> **Documentacion tecnica:** [Greenhouse_HRIS_Architecture_v1](../../architecture/Greenhouse_HRIS_Architecture_v1.md) · [Task TASK-770](../../tasks/complete/TASK-770-hiring-to-hris-collaborator-activation.md) · [Task TASK-1400](../../tasks/complete/TASK-1400-hiring-activation-blocker-resolution-api.md) · [Task TASK-1368](../../tasks/in-progress/TASK-1368-hiring-activation-lane-ui.md)
 > **Manual hermano:** [Operar el Hiring Handoff](operar-hiring-handoff.md) (el tramo anterior: decisión → handoff aprobado)
 
 ## Para qué sirve
@@ -19,20 +19,23 @@ Cuando un handoff de **contratación interna** queda aprobado, este bridge convi
 
 ## Paso a paso
 
-1. Entrar a **HR → Onboarding & Offboarding → Contrataciones listas** (`/hr/onboarding?lane=hiring-activation`).
-2. **Revisar la cola**: handoffs de contratación interna aprobados con el estado del caso. Si la cola está vacía o los flags están apagados, la pantalla lo declara; no hay activación implícita.
-3. Abrir un caso para ver **journey**, readiness y próximos pasos.
-4. **Reclamar el caso** (`review`): crea la solicitud de activación (una por handoff; repetir no duplica).
-5. **Crear la ficha** (`create-member`): Greenhouse busca si la persona ya tiene ficha (misma identidad, o mismo correo sin identidad enlazada) y **enlaza o reactiva antes que crear**. La ficha nace pendiente de intake — nómina y capacidad no la ven. Si hay conflicto de identidad, el caso queda **bloqueado con motivo** y lo resuelve People Ops (nunca se fusiona solo).
-6. **Abrir onboarding** (`open-onboarding`): asegura el checklist (si no hay template aplicable, el caso queda bloqueado con motivo — crea el template y reintenta).
-7. **Completar la ficha laboral** en Workforce Activation (`/hr/workforce/activation`), como cualquier intake: readiness + completar ficha. **Este paso NO es del bridge** — es el flujo canónico existente.
-8. **Cerrar** (`complete`): el bridge verifica que la ficha esté completa y marca el handoff como completado con la evidencia (`member:<id>`). Si la ficha no está completa, rechaza con mensaje claro.
+1. Desde Hiring Desk, abre la postulación en **Application 360 → Decisión**. Si está `selected` + destino `internal_hire`, revisa el bridge de handoff. Si aparece pendiente y tienes permiso, usa **Aprobar handoff**; luego usa **Abrir Activation Lane**.
+2. También puedes entrar directo a **HR → Onboarding & Offboarding → Contrataciones listas** (`/hr/onboarding?lane=hiring-activation`). Los deep links desde el desk llevan `applicationId`/`handoffId` para abrir el caso correcto.
+3. **Revisar la cola**: handoffs de contratación interna aprobados con el estado del caso. Si la cola está vacía, el target aún no está aprobado o los flags están apagados, la pantalla lo declara; no hay fallback silencioso al primer caso.
+4. Abrir un caso para ver **journey**, readiness y próximos pasos. Usa **Ver postulación 360** si necesitas volver al origen de la decisión.
+5. **Reclamar el caso** (`review`): crea la solicitud de activación (una por handoff; repetir no duplica).
+6. **Crear la ficha** (`create-member`): Greenhouse busca si la persona ya tiene ficha (misma identidad, o mismo correo sin identidad enlazada) y **enlaza o reactiva antes que crear**. La ficha queda con intake pendiente — nómina y capacidad no la ven. Si hay conflicto de identidad, el caso queda **bloqueado con motivo** y lo resuelve People Ops (nunca se fusiona solo).
+7. **Abrir onboarding** (`open-onboarding`): asegura el checklist (si no hay template aplicable, el caso queda bloqueado con motivo — crea el template y reintenta).
+8. **Completar la ficha laboral** en Workforce Activation (`/hr/workforce/activation`), como cualquier intake: readiness + completar ficha. **Este paso NO es del bridge** — es el flujo canónico existente.
+9. **Cerrar** (`complete`): el bridge verifica que la ficha esté completa y marca el handoff como completado con la evidencia (`member:<id>`). Si la ficha no está completa, rechaza con mensaje claro.
 
 ## Resolver blockers desde la lane
 
-La UI de TASK-1368 no simula resolución de blockers. Cuando un caso está bloqueado, el dialog de remediación explica la causa, apunta a la ficha de Workforce Activation o a templates cuando aplica, y deja claro que el command rico de resolución pertenece a `TASK-1400`.
+La UI de TASK-1368 consume el resolver real de TASK-1400. Cuando un caso está bloqueado:
 
-Hasta que `TASK-1400` cierre, resolver blockers significa corregir el dato en la superficie dueña y reintentar la acción del bridge.
+- Si el blocker es accionable (`retry-create-member` o `retry-open-onboarding`), el dialog envía `POST /api/hr/hiring-activation/[id]/resolve-blocker` con motivo opcional, refresca el detalle y muestra si quedó resuelto o sigue bloqueado.
+- Si el blocker es manual/no resoluble por API, la lane muestra la surface alternativa (por ejemplo Workforce Activation o templates) y no promete éxito falso.
+- Si el blocker quedó stale por cambios concurrentes, la lane refresca el detail antes de permitir otro intento.
 
 ## Qué significan los estados
 
@@ -62,6 +65,6 @@ Señal de operaciones: *Activaciones de hiring atascadas* (`workforce.hiring_act
 
 ## Referencias técnicas
 
-- Dominio: `src/lib/workforce/hiring-activation/**` · API: `POST /api/hr/hiring-activation/[id]/(review|create-member|open-onboarding|complete|cancel)`
+- Dominio: `src/lib/workforce/hiring-activation/**` · API: `POST /api/hr/hiring-activation/[id]/(review|create-member|open-onboarding|complete|cancel|resolve-blocker)`
 - Flags: `HIRING_ACTIVATION_ENABLED` + `HIRING_HANDOFF_BRIDGES_ENABLED` (ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
 - Maquinaria reusada: `completeWorkforceMemberIntake` · `resolveWorkforceActivationReadiness` · `createOnboardingInstance`

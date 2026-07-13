@@ -1,12 +1,16 @@
 ## Estado vigente para agentes
 
-- **TASK-1368 Hiring Activation Lane code-complete local + microinteracciones de alta fidelidad (2026-07-13):** `/hr/onboarding?lane=hiring-activation`
-  es la nueva lane "Contrataciones listas" dentro de `HR > Onboarding & Offboarding`, no reemplaza
-  `/hr/workforce/activation`. Consume el bridge de TASK-770 y muestra flag-off/empty/error de forma
-  honesta; `resolver blocker` real queda en `TASK-1400`, sin simulación client-side. UI local verificada
-  con GVC desktop/mobile `.captures/2026-07-13T09-21-19_hiring-activation-lane` y polish de fidelidad al
-  HTML fuente en `.captures/2026-07-13T09-53-44_hiring-activation-lane` (28 frames: hover/click/keyboard/
-  reduced-motion). Staging/flags/data reales pendientes antes de mover la task a `complete/`.
+- **TASK-1368 Hiring Activation Lane code-complete local + master flow N10→N11 cableado (2026-07-13):** `/hr/onboarding?lane=hiring-activation`
+  es la lane "Contrataciones listas" dentro de `HR > Onboarding & Offboarding`, no reemplaza
+  `/hr/workforce/activation`. Application 360 ahora es el seam correcto de EPIC-011: decisión
+  `selected` + `internal_hire` muestra el handoff real, puede aprobarlo con `hiring.handoff.approve`
+  y abre `/hr/onboarding?lane=hiring-activation&applicationId=...&handoffId=...`. La lane selecciona
+  el caso por `handoffId`/`applicationId` o muestra "todavía no está en la cola"; no cae a un caso
+  random. Consume TASK-770 + resolver real TASK-1400 (`resolve-blocker`), con microinteracciones de
+  alta fidelidad al HTML fuente. Evidencia local: GVC `.captures/2026-07-13T11-35-04_hiring-activation-lane`,
+  Application 360 bridge `.captures/2026-07-13T11-38-59_inline-agency-hiring-applications-happ-ab583c21-13a5-4f21-af41-814528ee4452`,
+  deep link N11 `.captures/2026-07-13T11-39-22_inline-hr-onboarding-lane-hiring-activation-applicationid-happ-ab583c21-13a5-4f21-af41-814528ee4452-handoffid-hhof-949edeaf-b1f1-46c0-a016-e76c9b40baf6`.
+  Staging smoke post-push pendiente antes de mover la task a `complete/`.
 - **Tender Deck Composer — `TimelineFull` v0.2: schedule y labels data-driven (2026-07-12):** el
   cronograma ya acepta `timeUnit` (`day|week|month|quarter|custom`), un eje discreto de 3..8 unidades,
   rangos enteros y hitos de frontera; su compiler deriva grilla, barras, diamantes y conectores de ese único

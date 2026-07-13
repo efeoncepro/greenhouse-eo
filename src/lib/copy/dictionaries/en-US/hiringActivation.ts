@@ -31,6 +31,8 @@ export const hiringActivation: HiringActivationCopy = {
     subtitle: 'approved hires ready for review',
     emptyTitle: 'No hires pending activation',
     emptyBody: 'When Hiring approves an internal_hire handoff, it will appear here for HRIS activation.',
+    targetNotReadyTitle: 'This hire is not in the queue yet',
+    targetNotReadyBody: 'The master flow requires N10 to materialize and approve the handoff before it enters N11. Go back to Hiring Desk if you need to review the decision or approve the handoff.',
     flagOffTitle: 'Activation bridge disabled',
     flagOffBody: 'The queue exists, but HIRING_ACTIVATION_ENABLED / HIRING_HANDOFF_BRIDGES_ENABLED are not enabled in this environment.',
     errorTitle: 'Could not load the queue',
@@ -40,6 +42,7 @@ export const hiringActivation: HiringActivationCopy = {
     title: 'Activation detail',
     pendingTitle: 'Select a hire',
     pendingBody: 'Open a queue case to review its journey, readiness, and next actions.',
+    application360: 'View application 360',
     people360: 'View People 360',
     source: 'Source',
     handoff: 'Handoff',
@@ -118,8 +121,14 @@ export const hiringActivation: HiringActivationCopy = {
     cancelBody: 'Record a reason so the manual closure remains traceable.',
     cancelReasonLabel: 'Cancellation reason',
     resolveTitle: 'Blocker resolution',
-    resolveBody: 'This blocker needs a backend command with governed payloads. Until TASK-1400 is complete, this UI can only guide you to the right surface.',
-    resolvePendingTask: 'Backend follow-up: TASK-1400.'
+    resolveBody: 'Use the available governed command actions. If a blocker belongs to another surface, the UI redirects without simulating resolution.',
+    resolvePendingTask: 'The detail is refreshed from the real TASK-1400 contract.',
+    resolveAvailable: 'Automatic resolution available',
+    resolveManual: 'Manual resolution',
+    resolveReasonLabel: 'Optional operational note',
+    resolveReasonHint: 'Audited as digest/shape; avoid PII.',
+    resolveNoActiveBlockers: 'No active blockers',
+    resolveNoActiveBlockersBody: 'Refresh the detail if you expected a pending blocker.'
   },
   feedback: {
     reviewOk: 'Hire taken for review.',
@@ -127,6 +136,9 @@ export const hiringActivation: HiringActivationCopy = {
     openOnboardingOk: 'Onboarding opened.',
     completeOk: 'Activation bridge closed.',
     cancelOk: 'Activation cancelled.',
+    resolveOk: 'Blocker resolved and detail refreshed.',
+    resolveStillBlocked: 'Resolution was retried, but the blocker is still active. Review the refreshed detail.',
+    resolveStale: 'The blocker changed before retry. I refreshed the detail; review it and try again if needed.',
     commandError: 'Could not complete the action.',
     loadError: 'Could not load Hiring Activation.'
   },

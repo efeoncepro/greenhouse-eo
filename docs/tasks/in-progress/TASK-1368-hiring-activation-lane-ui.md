@@ -1,5 +1,14 @@
 # TASK-1368 — Hiring Activation Lane UI (People/HRIS)
 
+## Delta 2026-07-13 — Master flow cableado N10→N11 + resolver blocker real
+
+- Se corrigió el enfoque de navegación: TASK-1368 no queda como lane aislada; Application 360 ahora cablea el master flow EPIC-011 desde decisión `selected` + destino `internal_hire` hacia N11.
+- En `/agency/hiring/applications/[applicationId]`, la pestaña **Decisión** lee `getHiringHandoffByApplicationId`, muestra el estado real del `HiringHandoff`, permite aprobar handoff pendiente con `POST /api/hiring/handoffs/[handoffId]/approve` cuando el actor tiene `hiring.handoff.approve`, y abre `/hr/onboarding?lane=hiring-activation&applicationId=...&handoffId=...` cuando corresponde.
+- La Activation Lane soporta deep link por `handoffId`/`applicationId`, selecciona el caso correcto en la cola de 770 y muestra un estado honesto de "todavía no está en la cola" si N10 no materializó/aprobó el handoff; desde el detalle vuelve a Application 360 con `Ver postulación 360`.
+- `Resolver blocker` ya no es placeholder: consume `POST /api/hr/hiring-activation/[id]/resolve-blocker` de TASK-1400 con `blockers[]` accionables, payload `reason`, estados `resolved|still_blocked|stale`, error stale con refresh del detail y surface alternativa para blockers manuales.
+- Evidencia local nueva: `pnpm typecheck`, `pnpm lint`, Vitest focal hiring-activation 3 files/30 tests, `pnpm build`, `task:lint`/`ui:*` checks PASS; GVC `hiring-activation-lane` PASS en `.captures/2026-07-13T11-35-04_hiring-activation-lane`; Application 360 bridge PASS en `.captures/2026-07-13T11-38-59_inline-agency-hiring-applications-happ-ab583c21-13a5-4f21-af41-814528ee4452`; deep link N11 PASS en `.captures/2026-07-13T11-39-22_inline-hr-onboarding-lane-hiring-activation-applicationid-happ-ab583c21-13a5-4f21-af41-814528ee4452-handoffid-hhof-949edeaf-b1f1-46c0-a016-e76c9b40baf6`.
+- Se usó fixture sintético local/staging-env para validar el seam y se limpió completo (`remaining=[0,0,0,0,0,0]`). Estado honesto: **code complete local; staging smoke post-push pendiente** antes de mover a `complete/`.
+
 ## Delta 2026-07-13 — Microinteracciones del HTML fuente portadas con fidelidad alta
 
 - Se auditó el HTML recién extraído en `/Users/jreye/Documents/carreers/Hiring-activation/Ejecutar tarea 1368/Hiring Activation Lane.dc.html` y se identificó su vocabulario real de motion: `ha-fade`, `ha-rise`, `ha-slide-right`, `ha-pop`, `ha-toast` y `ha-skel`.
@@ -67,11 +76,11 @@
 - Flow: `docs/ui/flows/TASK-1368-hiring-activation-lane-flow.md`
 - Motion: `docs/ui/motion/TASK-1368-hiring-activation-lane-motion.md`
 - Epic: `EPIC-011`
-- Status real: `Code complete local; rollout/staging smoke con flags/data reales pendiente`
+- Status real: `Code complete local; master flow N10→N11 + resolver real cableados; staging smoke post-push pendiente`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
-- Branch: `task/TASK-1368-hiring-activation-lane-ui`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -87,7 +96,8 @@ TASK-770 deja el bridge de activación gobernado (readers + commands), pero un/a
 
 - Renderizar la cola de activación (`listHiringActivationQueue`, 770) en list-detail + KPIs `LaneCard`.
 - Mostrar el journey (selección → handoff → member/onboarding → activo) y el readiness checklist honesto (✓/⚠/✗).
-- Exponer las acciones de 770 (crear colaborador, abrir onboarding, resolver blocker, activar) con **Activar gated por readiness** (disabled-con-motivo, no botón mudo).
+- Exponer las acciones de 770 (crear colaborador, abrir onboarding, activar) y el resolver de TASK-1400 con **Activar gated por readiness** (disabled-con-motivo, no botón mudo).
+- Cablear Application 360 → handoff approval → Activation Lane según el master flow EPIC-011; no abrir N11 fuera de N10 salvo entrada directa a la cola.
 - Reflejar el estado derivado en People 360 sin card paralela.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -139,7 +149,9 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/app/(dashboard)/hr/onboarding/page.tsx` (query lane selector)
+- `src/app/(dashboard)/hr/onboarding/page.tsx` (query lane selector + deep links)
+- `src/app/(dashboard)/agency/hiring/applications/[applicationId]/page.tsx` (handoff prefetch + capability)
+- `src/views/greenhouse/hiring/Application360View.tsx` (bridge card N10→N11)
 - `src/views/greenhouse/hr-onboarding/**` (solo la lane "Contrataciones listas")
 - `src/lib/copy/dictionaries/{es-CL,en-US}/hiringActivation.ts`
 - `src/lib/person-360/**` solo para la card derivada del journey (consumiendo reader de 770)
@@ -176,7 +188,7 @@ Reglas obligatorias:
 - Composition Shell: `aplica` — regiones cola/detalle bajo el shell existente
 - Primitive decision: `reuse` — `LaneCard`, list-detail existente, dialogs, `CompositionShell`
 - Adaptive density / The Seam: `aplica` — cards de cola adaptables a su ancho
-- Floating/Sidecar/Dialog decision: detalle como ruta hija `[id]` o sidecar; resolver-blocker + activar = dialog
+- Floating/Sidecar/Dialog decision: detalle dentro de la lane; resolver-blocker + activar = dialog; Application 360 bridge como card inline
 - Copy source: `src/lib/copy/dictionaries/{es-CL,en-US}/hiringActivation.ts`
 - Access impact: `views` (viewCode `hr` existente / lane; seed si se agrega ruta alcanzable nueva, TASK-827/982)
 
@@ -195,7 +207,7 @@ Reglas obligatorias:
 
 ### Interaction contract
 
-- Primary interaction: revisar cola → abrir detalle → crear colaborador → abrir onboarding → resolver blockers → activar
+- Primary interaction: Application 360 selected/internal_hire → aprobar handoff si aplica → abrir Activation Lane → revisar cola/detalle → crear colaborador → abrir onboarding → resolver blockers → activar
 - Hover / focus / active: claros (mockup 763)
 - Pending / disabled: **Activar disabled-con-motivo** hasta readiness OK; botones "Creando…/Activando…"
 - Escape / click-away: cierra dialogs
@@ -216,7 +228,7 @@ Reglas obligatorias:
 - Primitive / variant / kind: `CompositionShell` + `LaneCard` + list-detail + dialogs (reuse)
 - Component candidates: `HrOnboardingView` extendido; detalle nuevo
 - Copy source: `getMicrocopy(locale).hiringActivation`
-- Data reader / command: readers + `POST /api/hr/hiring-activation/[id]/*` (TASK-770)
+- Data reader / command: readers + `POST /api/hr/hiring-activation/[id]/*` (TASK-770), `POST /api/hr/hiring-activation/[id]/resolve-blocker` (TASK-1400), `POST /api/hiring/handoffs/[id]/approve` (TASK-356)
 - API parity: consume commands gobernados de 770 (Nexa opera lo mismo por parity)
 - Access / capability: reusa `workforce.member.*` + `hiring.activation.review` (770); PII reveal `person.legal_profile.reveal_sensitive`
 - States to implement: los del State inventory
@@ -227,8 +239,8 @@ Reglas obligatorias:
 - Route: `/hr/onboarding?lane=hiring-activation`
 - Viewports: 1440 + 390
 - Required steps: cola → detalle → readiness (con blocker) → resolver → activar (confirmación)
-- Required captures: lane (loaded/empty/blocked), detalle (journey + readiness + Activar disabled-con-motivo), resolver-blocker, people-360 journey
-- Required `data-capture` markers: `data-capture="activation-lane"`, `"activation-detail"`
+- Required captures: lane (loaded/empty/blocked), detalle (journey + readiness + Activar disabled-con-motivo), resolver-blocker, people-360 journey, Application 360 handoff bridge
+- Required `data-capture` markers: `data-capture="activation-lane"`, `"activation-detail"`, `"hiring-application-handoff-bridge"`
 - Assertions: `scrollWidth==clientWidth`, consola limpia, a11y (tabs/dialogs/Activar no-mudo), foco
 - Scroll-width checks: desktop 1440 + 390px
 - Reduced-motion / focus evidence: capturar reduced-motion + foco de dialog
@@ -239,7 +251,7 @@ Reglas obligatorias:
 - Alternatives considered: página dedicada nueva (rechazada — duplica surface + rompe el mockup 763)
 - Why this pattern: alineación al mockup aprobado + reuse máximo + cliente delgado de 770
 - Reuse / extend / new primitive: reuse (`LaneCard`, list-detail, dialogs, CompositionShell)
-- Open risks: validar en runtime los flags de 770/356 y los estados `enabled:false`; el contrato de readers/commands ya está disponible.
+- Open risks: validar en staging post-push que los flags de 770/356 siguen ON en el deployment nuevo y que el seam Desk→Lane responde con sesión real; el contrato de readers/commands ya está disponible.
 
 ### Visual verification
 
@@ -268,17 +280,18 @@ Reglas obligatorias:
 ### Slice 3 — Acciones + dialogs (crear / onboarding / resolver / activar)
 
 - Botones + dialogs (`react-hook-form`): crear colaborador, abrir onboarding, resolver blocker, **activar** (gated por readiness, disabled-con-motivo, confirmación `alertdialog`).
-- Consumen `POST /api/hr/hiring-activation/[id]/*` (770); errores canónicos es-CL; rollback honesto.
+- Consumen `POST /api/hr/hiring-activation/[id]/*` (770) y `POST /api/hr/hiring-activation/[id]/resolve-blocker` (1400); errores canónicos es-CL; rollback honesto.
 
-### Slice 4 — People 360 card derivada + GVC
+### Slice 4 — Master flow seam + People 360 + GVC
 
+- Application 360 bridge N10→N11: handoff real, approve command y deep link a Activation Lane por `applicationId`/`handoffId`.
 - Card derivada de journey de contratación en People 360 (`getHiringJourneyForPerson`), sin card paralela.
 - Loop GVC desktop+mobile hasta enterprise; scenario nuevo.
 
 ## Out of Scope
 
 - El bridge/service de activación, creación de member, readiness, onboarding, API, eventos → **TASK-770**.
-- Reacción/handoff (356), desk (355), careers (354), assessment (1360-1363).
+- Reacción/handoff backend (356), desk base (355), careers (354), assessment (1360-1363).
 - Payroll/compensation.
 
 ## Detailed Spec
@@ -287,7 +300,7 @@ Ver wireframe + flow declarados. La UI refleja la state-machine de 770 (`pending
 
 ## Rollout Plan & Risk Matrix
 
-N/A — additive UI change, sin runtime backend nuevo (consume contratos de 770). Sin migración, sin flag propio (hereda el flag de 770 `HIRING_ACTIVATION_ENABLED`: la lane no muestra data hasta que 770 esté activo). Rollback = revert PR. TASK-770 ya está `complete`; el riesgo vivo es que staging/prod tengan flags OFF o no tengan data de handoff para el smoke real.
+Additive UI change, sin migración ni flag propio (hereda `HIRING_ACTIVATION_ENABLED` y `HIRING_HANDOFF_BRIDGES_ENABLED`). Consume contratos de 356/770/1400. Rollback = revert PR. Riesgo vivo: staging/prod pueden tener flags OFF en el deployment nuevo o no tener data de handoff para smoke real.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -296,10 +309,11 @@ N/A — additive UI change, sin runtime backend nuevo (consume contratos de 770)
 ## Acceptance Criteria
 
 - [x] Lane "Contrataciones listas" en `HR > Onboarding & Offboarding`/`/hr/onboarding?lane=hiring-activation` (deep link, bilingüe, extiende la view existente, `CompositionShell`).
+- [x] Application 360 cablea selected/internal_hire → handoff bridge → approve → Activation Lane según EPIC-011.
 - [x] Cola (`listHiringActivationQueue`) list-detail + KPIs `LaneCard`; empty/error/flag-off honestos.
 - [x] Detalle: journey + readiness ✓/⚠/✗ (reusa resolvers de 770); anti silent-catch.
 - [x] Acciones vía commands de 770; **Activar** solo con readiness OK (disabled-con-motivo, no botón mudo); confirmación accesible.
-- [x] Resolver-blocker dialog accesible y honesto; command real split a `TASK-1400`.
+- [x] Resolver-blocker dialog accesible y honesto; command real de `TASK-1400` cableado.
 - [x] People 360 muestra journey derivado sin card paralela.
 - [x] Copy desde `hiringActivation` dictionary; tokens AXIS; PII masked/reveal (sin revelar PII desde esta lane).
 - [x] GVC desktop+mobile mirado; `scrollWidth==clientWidth` (1440+390); consola limpia; motion no decorativa/reduced-motion por CSS.
@@ -307,17 +321,21 @@ N/A — additive UI change, sin runtime backend nuevo (consume contratos de 770)
 
 ## Verification
 
-- `pnpm lint` · `pnpm tsc --noEmit` · `pnpm test` · `pnpm local:check:ui`
-- `pnpm ui:wireframe-check --task TASK-1368` · `pnpm ui:flow-check --task TASK-1368`
-- `pnpm fe:capture hiring-activation-lane --env=staging` (desktop+mobile) + frames mirados
-- Gates Figma (token-mapping + primitive lookup)
+- `pnpm typecheck`
+- `pnpm lint`
+- `pnpm exec vitest run src/lib/workforce/hiring-activation/service.test.ts src/lib/workforce/hiring-activation/boundary.test.ts 'src/app/api/hr/hiring-activation/[id]/[action]/route.test.ts'`
+- `pnpm task:lint --task TASK-1368`
+- `pnpm ui:wireframe-check --task TASK-1368` · `pnpm ui:flow-check --task TASK-1368` · `pnpm ui:motion-check --task TASK-1368` · `pnpm ui:readiness-check --task TASK-1368`
+- `pnpm build`
+- `pnpm fe:capture hiring-activation-lane --env=local --task=TASK-1368` + inline captures de Application 360 bridge y deep link Activation Lane; frames mirados.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle`/carpeta sincronizados; `README.md`; `Handoff.md`; `changelog.md`
-- [ ] `## Delta` al master flow EPIC-011 (N11) si cambia un nodo/regla
-- [ ] doc funcional + manual HR (lane de activación) actualizados si cambia comportamiento visible
-- [ ] `## Delta` a TASK-770 si el consumo de readers/commands cambia supuestos
+- [ ] `Lifecycle`/carpeta sincronizados tras staging smoke post-push; `README.md`; `Handoff.md`; `changelog.md`
+- [x] `## Delta` al master flow EPIC-011 (N11) si cambia un nodo/regla
+- [x] doc funcional + manual HR (lane de activación) actualizados si cambia comportamiento visible
+- [x] skills Codex/Claude del dominio talent/people sincronizadas con TASK-1368 + TASK-1400
+- [ ] Smoke staging post-push con flags ON y sesión real antes de mover a `complete/`
 
 ## Follow-ups
 

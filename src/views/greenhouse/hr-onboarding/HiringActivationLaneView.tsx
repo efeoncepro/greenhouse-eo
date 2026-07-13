@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
@@ -36,7 +37,11 @@ import { getMicrocopy } from '@/lib/copy'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
 import type { WorkforceActivationIssue, WorkforceActivationLane, WorkforceActivationReadiness } from '@/lib/workforce/activation/types'
 import type {
+  HiringActivationActionableBlocker,
   HiringActivationBlockedReason,
+  HiringActivationBlockerActionContract,
+  HiringActivationBlockerResolutionAction,
+  HiringActivationBlockerResolutionResultStatus,
   HiringActivationRequest,
   HiringActivationState
 } from '@/lib/workforce/hiring-activation/types'
@@ -91,8 +96,20 @@ interface HiringHandoffDto {
 interface HiringActivationDetail {
   handoff: HiringHandoffDto
   request: HiringActivationRequest | null
+  blockers: HiringActivationActionableBlocker[]
   readiness: WorkforceActivationReadiness | null
   readyToActivate: boolean
+}
+
+interface ResolveHiringActivationBlockerResult {
+  status: HiringActivationBlockerResolutionResultStatus
+  resolved: boolean
+  blockerKey: string
+  action: HiringActivationBlockerResolutionAction
+  payloadDigest: string
+  blocker: HiringActivationActionableBlocker
+  request: HiringActivationRequest | null
+  detail: HiringActivationDetail
 }
 
 type SnackState = { severity: 'success' | 'error' | 'info'; message: string } | null
@@ -300,6 +317,20 @@ const getStatusLabel = (state: string) => copy.statuses[state] ?? state
 const getBlockedReasonLabel = (reason?: string | null) =>
   copy.blockedReasons[reason ?? 'unknown'] ?? copy.blockedReasons.unknown
 
+class HiringActivationApiError extends Error {
+  status: number
+  code: string | null
+  detail: unknown
+
+  constructor(message: string, status: number, code: string | null, detail: unknown) {
+    super(message)
+    this.name = 'HiringActivationApiError'
+    this.status = status
+    this.code = code
+    this.detail = detail
+  }
+}
+
 const readJson = async <T,>(response: Response, fallbackError: string): Promise<T> => {
   const payload = await response.json().catch(() => null)
 
@@ -311,7 +342,12 @@ const readJson = async <T,>(response: Response, fallbackError: string): Promise<
           ? payload.message
           : fallbackError
 
-    throw new Error(message)
+    throw new HiringActivationApiError(
+      message,
+      response.status,
+      typeof payload?.code === 'string' ? payload.code : null,
+      payload?.detail
+    )
   }
 
   return payload as T
@@ -824,6 +860,88 @@ const ActionStatusIcon = ({ icon, loading }: { icon: string; loading: boolean })
   )
 )
 
+const blockerActionLoadingKey = (blocker: HiringActivationActionableBlocker) =>
+  `resolve-blocker:${blocker.key}`
+
+const blockerOwnerLabel = (owner?: HiringActivationActionableBlocker['owner']) =>
+  owner ?? copy.detail.blockerTitle
+
+const ResolveBlockerCard = ({
+  blocker,
+  busy,
+  reason,
+  onReasonChange,
+  onResolve
+}: {
+  blocker: HiringActivationActionableBlocker
+  busy: boolean
+  reason: string
+  onReasonChange: (value: string) => void
+  onResolve: (blocker: HiringActivationActionableBlocker, action: HiringActivationBlockerActionContract) => void
+}) => {
+  const primaryAction = blocker.supportedActions[0] ?? null
+
+  return (
+    <Alert
+      severity={primaryAction ? 'warning' : 'info'}
+      data-capture='activation-resolve-blocker'
+      sx={{ borderRadius: 'var(--mui-shape-customBorderRadius-lg)' }}
+    >
+      <AlertTitle>{blocker.label}</AlertTitle>
+      <Stack spacing={3} sx={{ mt: 1 }}>
+        <Typography variant='body2'>{blocker.detail}</Typography>
+        <Stack direction='row' spacing={1.5} useFlexGap flexWrap='wrap'>
+          <CustomChip
+            round='true'
+            size='small'
+            variant='tonal'
+            color={blocker.status === 'resolvable' ? 'warning' : 'secondary'}
+            label={blocker.status === 'resolvable' ? copy.dialogs.resolveAvailable : copy.dialogs.resolveManual}
+          />
+          <CustomChip round='true' size='small' variant='tonal' color='info' label={blockerOwnerLabel(blocker.owner)} />
+        </Stack>
+
+        {primaryAction ? (
+          <Stack spacing={2}>
+            <Typography variant='body2' color='text.secondary'>{primaryAction.description}</Typography>
+            <TextField
+              fullWidth
+              multiline
+              minRows={2}
+              value={reason}
+              label={copy.dialogs.resolveReasonLabel}
+              onChange={event => onReasonChange(event.target.value)}
+              slotProps={{ htmlInput: { maxLength: 240 } }}
+              helperText={copy.dialogs.resolveReasonHint}
+            />
+            <Button
+              variant='contained'
+              color='warning'
+              onClick={() => onResolve(blocker, primaryAction)}
+              disabled={busy}
+              startIcon={<ActionStatusIcon icon='tabler-refresh' loading={busy} />}
+              sx={{ alignSelf: { xs: 'stretch', sm: 'flex-start' } }}
+            >
+              {busy ? copy.actions.loading : primaryAction.label}
+            </Button>
+          </Stack>
+        ) : blocker.alternativeSurface ? (
+          <Button
+            component={Link}
+            href={blocker.alternativeSurface.href}
+            variant='tonal'
+            color='info'
+            startIcon={<Box component='i' className='tabler-external-link' />}
+            sx={{ alignSelf: { xs: 'stretch', sm: 'flex-start' } }}
+          >
+            {blocker.alternativeSurface.label}
+          </Button>
+        ) : null}
+      </Stack>
+    </Alert>
+  )
+}
+
 const DetailPanel = ({
   actionLoading,
   detail,
@@ -1003,6 +1121,15 @@ const DetailPanel = ({
               </Box>
             </Stack>
             <Stack direction='row' spacing={2} useFlexGap flexWrap='wrap'>
+              <Button
+                component={Link}
+                href={`/agency/hiring/applications/${encodeURIComponent(detail.handoff.applicationId)}`}
+                variant='tonal'
+                size='small'
+                startIcon={<Box component='i' className='tabler-clipboard-text' />}
+              >
+                {copy.detail.application360}
+              </Button>
               {memberId ? (
                 <Button component={Link} href={`/people/${encodeURIComponent(memberId)}`} variant='tonal' size='small' startIcon={<Box component='i' className='tabler-user-circle' />}>
                   {copy.detail.people360}
@@ -1106,10 +1233,14 @@ const DetailPanel = ({
 }
 
 const HiringActivationLaneView = () => {
+  const searchParams = useSearchParams()
+  const targetApplicationId = searchParams.get('applicationId')
+  const targetHandoffId = searchParams.get('handoffId')
   const [enabled, setEnabled] = useState(true)
   const [items, setItems] = useState<HiringActivationQueueItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [targetMiss, setTargetMiss] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [detail, setDetail] = useState<HiringActivationDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
@@ -1119,6 +1250,7 @@ const HiringActivationLaneView = () => {
   const [cancelOpen, setCancelOpen] = useState(false)
   const [resolveOpen, setResolveOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState('')
+  const [resolveReason, setResolveReason] = useState('')
 
   const selectedItem = useMemo(
     () => items.find(item => item.handoffId === selectedId) ?? null,
@@ -1161,10 +1293,22 @@ const HiringActivationLaneView = () => {
         copy.feedback.loadError
       )
 
+      const handoffMatch = targetHandoffId && payload.items.some(item => item.handoffId === targetHandoffId)
+
+      const applicationMatch = targetApplicationId
+        ? payload.items.find(item => item.applicationId === targetApplicationId)
+        : null
+
+      const hasTarget = Boolean(targetHandoffId || targetApplicationId)
+
       setEnabled(payload.enabled)
       setItems(payload.items)
+      setTargetMiss(Boolean(payload.enabled && hasTarget && !handoffMatch && !applicationMatch))
       setSelectedId(current => {
         if (!payload.enabled || payload.items.length === 0) return null
+        if (handoffMatch && targetHandoffId) return targetHandoffId
+        if (applicationMatch) return applicationMatch.handoffId
+        if (hasTarget) return null
         if (current && payload.items.some(item => item.handoffId === current)) return current
 
         return payload.items[0]?.handoffId ?? null
@@ -1174,11 +1318,12 @@ const HiringActivationLaneView = () => {
 
       setError(message)
       setItems([])
+      setTargetMiss(false)
       setDetail(null)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [targetApplicationId, targetHandoffId])
 
   useEffect(() => {
     void loadQueue()
@@ -1225,8 +1370,58 @@ const HiringActivationLaneView = () => {
     setCancelReason('')
   }
 
+  const handleResolveBlocker = async (
+    blocker: HiringActivationActionableBlocker,
+    actionContract: HiringActivationBlockerActionContract
+  ) => {
+    if (!selectedId) return
+
+    const loadingKey = blockerActionLoadingKey(blocker)
+
+    setActionLoading(loadingKey)
+
+    try {
+      const result = await readJson<ResolveHiringActivationBlockerResult>(
+        await fetch(`/api/hr/hiring-activation/${encodeURIComponent(selectedId)}/resolve-blocker`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            blockerKey: blocker.key,
+            action: actionContract.action,
+            payload: resolveReason.trim() ? { reason: resolveReason.trim() } : {}
+          })
+        }),
+        copy.feedback.commandError
+      )
+
+      setDetail(result.detail)
+      setResolveReason('')
+      setResolveOpen(!result.resolved)
+      setSnack({
+        severity: result.resolved ? 'success' : 'info',
+        message: result.resolved ? copy.feedback.resolveOk : copy.feedback.resolveStillBlocked
+      })
+      await loadQueue()
+    } catch (err) {
+      if (err instanceof HiringActivationApiError && err.code === 'hiring_activation_blocker_stale') {
+        if (err.detail && typeof err.detail === 'object') {
+          setDetail(err.detail as HiringActivationDetail)
+        }
+
+        setSnack({ severity: 'info', message: copy.feedback.resolveStale })
+      } else {
+        setSnack({ severity: 'error', message: err instanceof Error ? err.message : copy.feedback.commandError })
+      }
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   const blockedReason = detail?.request?.blockedReason ?? detail?.handoff.blockedReason
-  const memberId = detail?.request?.memberId ?? null
+  const blockers = detail?.blockers ?? []
+  const resolvableBlockers = blockers.filter(blocker => blocker.status === 'resolvable' && blocker.supportedActions.length > 0)
+  const manualBlockers = blockers.filter(blocker => blocker.status !== 'resolvable' || blocker.supportedActions.length === 0)
+  const resolvingBlocker = Boolean(actionLoading?.startsWith('resolve-blocker:'))
 
   const dialogPaperProps = {
     sx: {
@@ -1328,6 +1523,18 @@ const HiringActivationLaneView = () => {
         >
           <AlertTitle>{copy.queue.errorTitle}</AlertTitle>
           {error}
+        </Alert>
+      ) : null}
+
+      {targetMiss ? (
+        <Alert
+          severity='info'
+          icon={<Box component='i' className='tabler-git-branch' />}
+          sx={{ borderRadius: 'var(--mui-shape-customBorderRadius-lg)' }}
+          data-capture='activation-target-not-ready'
+        >
+          <AlertTitle>{copy.queue.targetNotReadyTitle}</AlertTitle>
+          {copy.queue.targetNotReadyBody}
         </Alert>
       ) : null}
 
@@ -1446,32 +1653,44 @@ const HiringActivationLaneView = () => {
         <DialogTitle id='activation-resolve-title'>{copy.dialogs.resolveTitle}</DialogTitle>
         <DialogContent>
           <Stack spacing={3}>
-            <Alert severity='warning' sx={{ borderRadius: 'var(--mui-shape-customBorderRadius-lg)' }}>
+            <Alert severity='info' sx={{ borderRadius: 'var(--mui-shape-customBorderRadius-lg)' }}>
               <AlertTitle>{blockedReason ? getBlockedReasonLabel(blockedReason as HiringActivationBlockedReason) : copy.detail.blockerTitle}</AlertTitle>
               {copy.dialogs.resolveBody}
             </Alert>
             <Typography variant='body2' color='text.secondary'>{copy.dialogs.resolvePendingTask}</Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              {blockedReason === 'onboarding_template_missing' ? (
-                <Button component={Link} href='/hr/onboarding/templates' variant='contained' startIcon={<Box component='i' className='tabler-template' />}>
-                  {copy.actions.openTemplates}
-                </Button>
-              ) : null}
-              {memberId ? (
-                <Button component={Link} href={`/hr/workforce/activation?memberId=${encodeURIComponent(memberId)}`} variant='tonal' startIcon={<Box component='i' className='tabler-clipboard-check' />}>
-                  {copy.actions.goToWorkforceActivation}
-                </Button>
-              ) : null}
-              {memberId ? (
-                <Button component={Link} href={`/people/${encodeURIComponent(memberId)}`} variant='text' startIcon={<Box component='i' className='tabler-user-circle' />}>
-                  {copy.detail.people360}
-                </Button>
-              ) : null}
-            </Stack>
+
+            {blockers.length === 0 ? (
+              <Alert severity='info' sx={{ borderRadius: 'var(--mui-shape-customBorderRadius-lg)' }}>
+                <AlertTitle>{copy.dialogs.resolveNoActiveBlockers}</AlertTitle>
+                {copy.dialogs.resolveNoActiveBlockersBody}
+              </Alert>
+            ) : null}
+
+            {resolvableBlockers.map(blocker => (
+              <ResolveBlockerCard
+                key={blocker.key}
+                blocker={blocker}
+                busy={actionLoading === blockerActionLoadingKey(blocker)}
+                reason={resolveReason}
+                onReasonChange={setResolveReason}
+                onResolve={(nextBlocker, actionContract) => void handleResolveBlocker(nextBlocker, actionContract)}
+              />
+            ))}
+
+            {manualBlockers.map(blocker => (
+              <ResolveBlockerCard
+                key={blocker.key}
+                blocker={blocker}
+                busy={false}
+                reason={resolveReason}
+                onReasonChange={setResolveReason}
+                onResolve={(nextBlocker, actionContract) => void handleResolveBlocker(nextBlocker, actionContract)}
+              />
+            ))}
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setResolveOpen(false)}>{copy.actions.close}</Button>
+          <Button onClick={() => setResolveOpen(false)} disabled={resolvingBlocker}>{copy.actions.close}</Button>
         </DialogActions>
       </Dialog>
 

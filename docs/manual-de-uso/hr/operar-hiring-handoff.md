@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.0
 > **Creado:** 2026-07-10 por Claude (TASK-356)
-> **Ultima actualizacion:** 2026-07-10 por Claude (TASK-356)
+> **Ultima actualizacion:** 2026-07-13 por Codex (TASK-1368)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) · [Task TASK-356](../../tasks/complete/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md)
 > **Documentacion funcional:** [Hiring Desk](../../documentation/hr/hiring-desk.md) §Handoff downstream
 
@@ -14,16 +14,16 @@ Cuando decides una postulación como **seleccionada** en el Hiring Desk, Greenho
 ## Antes de empezar
 
 - Necesitas la capability `hiring.handoff.approve` (la tienen los roles internos de gobernanza de hiring: admin, HR manager, operaciones — los mismos que pueden decidir una postulación).
-- La UI de la cola llega con TASK-770. Mientras tanto el handoff se opera por API interna (`POST /api/hiring/handoffs/[id]/<acción>`) o vía Nexa cuando su action esté publicada.
-- Los lectores de la cola (bridges) están detrás del flag `HIRING_HANDOFF_BRIDGES_ENABLED` (hoy apagado). El handoff se **materializa siempre**, con o sin flag — el flag solo controla quién puede leer la cola.
+- Application 360 muestra el estado del handoff para decisiones `selected` + `internal_hire` y permite aprobarlo si tienes la capability. La cola de activación vive en `HR → Onboarding & Offboarding → Contrataciones listas`.
+- Los lectores de la cola (bridges) están detrás del flag `HIRING_HANDOFF_BRIDGES_ENABLED`. El handoff se **materializa siempre**, con o sin flag — el flag solo controla quién puede leer la cola.
 
 ## Paso a paso
 
 1. **Decidir la postulación** en el Hiring Desk (`selected` + destino). No hay paso extra: el handoff aparece solo.
 2. **Revisar el handoff**: verifica destino, fecha tentativa y entidad legal propuesta. La entidad legal es **propuesta no vinculante** — la clasificación del contrato la hace el equipo receptor con Legal, nunca reclutamiento.
-3. **Aprobar** (`approve`): habilita el handoff para el equipo receptor. Solo destinos con equipo receptor en Greenhouse (`internal_hire`, `staff_augmentation`) se pueden aprobar.
+3. **Aprobar** (`approve`): habilita el handoff para el equipo receptor. Solo destinos con equipo receptor en Greenhouse (`internal_hire`, `staff_augmentation`) se pueden aprobar. Para `internal_hire`, puedes aprobar desde Application 360 si el bridge card muestra el estado pendiente.
 4. *(Opcional)* **Iniciar preparación** (`setup`): marca que el receptor ya está trabajando la incorporación.
-5. **Completar** (`complete`): SOLO el equipo receptor, y siempre con la **referencia de evidencia** (`downstreamRef`: el id del colaborador creado o del placement). Sin evidencia el sistema lo rechaza.
+5. **Completar** (`complete`): SOLO el equipo receptor, y siempre con la **referencia de evidencia** (`downstreamRef`: el id del colaborador creado o del placement). Para `internal_hire`, el cierre normal ocurre desde Activation Lane tras completar el intake. Sin evidencia el sistema lo rechaza.
 6. **Cancelar** (`cancel`): si el proceso no sigue (candidato desiste, se resolvió fuera del sistema). Se puede desde pendiente, aprobado o bloqueado.
 
 ## Qué significan los estados

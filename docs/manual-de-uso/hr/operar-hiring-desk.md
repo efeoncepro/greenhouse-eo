@@ -24,7 +24,8 @@ Necesitas una vista `gestion.hiring*` asignada y las capabilities correspondient
 2. En `Evaluación`, asigna un test si hay plantilla activa. El token se muestra una sola vez. En una evaluación respondida, abre `Revisar evaluación`, edita/confirma cada score humano o sugerencia IA y finaliza el scorecard cuando no queden respuestas pendientes.
 3. En `Documentos`, usa enlaces públicos permitidos. No intentes revelar identidad hasta que TASK-1362 entregue resolver, capability, motivo y auditoría; el botón deshabilitado es intencional.
 4. En `Decisión`, elige avanzar, rechazar o esperar; completa destino cuando aplique, razón y evidencia. Revisa el diálogo antes de confirmar.
-5. Usa `Actividad` e `Historial de decisiones` para verificar la trazabilidad append-only.
+5. Si seleccionas (`selected`) con destino `internal_hire`, revisa el bridge de handoff que aparece en la misma pestaña. Cuando el handoff esté pendiente y tengas `hiring.handoff.approve`, usa **Aprobar handoff**; cuando esté aprobado, usa **Abrir Activation Lane** para continuar en `HR → Onboarding & Offboarding → Contrataciones listas`.
+6. Usa `Actividad` e `Historial de decisiones` para verificar la trazabilidad append-only.
 
 ## Gobernar una publicación
 
@@ -40,6 +41,7 @@ Necesitas una vista `gestion.hiring*` asignada y las capabilities correspondient
 - **La tarjeta volvió:** el write de etapa falló y el rollback protegió el estado real.
 - **No hay plantilla/scorecard:** es un vacío real del motor de assessment, no datos de demostración.
 - **No puedes revelar un documento:** TASK-1362 sigue pendiente; no se debe bypassar el control.
+- **No ves "Abrir Activation Lane":** la postulación debe estar decidida como `selected`, con destino `internal_hire`, y el handoff N10 debe existir/aprobarse. Si todavía no aparece en N11, espera la materialización reactiva o revisa el estado del handoff.
 
 ## Verificación operativa
 

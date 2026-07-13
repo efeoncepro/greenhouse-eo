@@ -20,7 +20,7 @@ La experiencia reemplaza la lectura plana de checklists por un overview operativ
 ## Fuentes de verdad
 
 - Los checklists viven en `greenhouse_hr.onboarding_*`.
-- La cola de contrataciones listas se lee desde el bridge `hiring-activation` (`GET /api/hr/hiring-activation`) y sus commands gobernados.
+- La cola de contrataciones listas se lee desde el bridge `hiring-activation` (`GET /api/hr/hiring-activation`) y sus commands gobernados. La entrada desde Hiring usa el handoff real de Application 360 y deep link por `applicationId`/`handoffId`.
 - La salida formal vive en `greenhouse_hr.work_relationship_offboarding_cases`.
 - El calculo y documento de finiquito viven en `greenhouse_payroll.final_settlements` y `final_settlement_documents`.
 - People 360 lee `contractEndDate` como senal contractual y `effectiveDate` / `lastWorkingDay` desde el caso activo de offboarding.
@@ -32,7 +32,7 @@ La experiencia reemplaza la lectura plana de checklists por un overview operativ
 - Desactivar usuario o acceso no reemplaza offboarding laboral.
 - El checklist de offboarding es una herramienta hija para coordinar tareas, no el source of truth legal ni payroll.
 - La lane "Contrataciones listas" no completa fichas por fuera: crea/enlaza member, abre onboarding y cierra el bridge solo cuando Workforce Activation confirma readiness.
-- Resolver blockers desde esta lane es remediacion honesta hasta que cierre `TASK-1400`; no se simula un command cliente.
+- Resolver blockers desde esta lane consume el command real de TASK-1400 (`POST /api/hr/hiring-activation/[id]/resolve-blocker`) cuando el blocker es accionable; los blockers manuales muestran la surface dueña sin prometer resolución automática.
 
 ## Access model
 
@@ -44,7 +44,8 @@ La experiencia reemplaza la lectura plana de checklists por un overview operativ
 ## Superficies
 
 - `/hr/onboarding`: overview Lifecycle con carriles, KPIs, roster operativo y lane visible de offboarding.
-- `/hr/onboarding?lane=hiring-activation`: lane "Contrataciones listas" con cola/detalle, readiness, journey y acciones del bridge de activacion.
+- `/agency/hiring/applications/[applicationId]`: bridge de handoff en Application 360 para selected/internal_hire; puede aprobar handoff pendiente y abrir la Activation Lane.
+- `/hr/onboarding?lane=hiring-activation`: lane "Contrataciones listas" con cola/detalle, readiness, journey, resolver blockers y acciones del bridge de activacion.
 - `/hr/onboarding/templates`: editor list-detail de plantillas, tareas, owner, vencimiento y obligatoriedad.
 - `/my/onboarding`: tareas asignadas al colaborador, con siguiente accion y estados.
 - People 360: card compacta de lifecycle laboral con ingreso, fin de contrato, salida programada, ultimo dia trabajado, journey derivado desde Hiring cuando exista y CTA autorizado.
