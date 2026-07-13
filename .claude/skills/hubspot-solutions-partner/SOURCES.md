@@ -100,7 +100,7 @@ Core (pagado, USD 45–USD 75) · Sales · Service · **Revenue** (requerido par
 ⚠️ El accounting de core seats cross-hub (Sales + Marketing Enterprise juntos) es **ambiguo en la web pública**.
 Si el deal es multi-hub, **exige la cotización oficial antes de prometer un número**.
 
-### Créditos Breeze ✅ — dos trampas de cotización
+### HubSpot Credits ✅ — dos trampas de cotización
 - **USD 0,010 por crédito** · capacity pack **USD 10 / 1.000 créditos**.
 - Incluidos: Starter 500 · Pro 3.000 · **Enterprise 5.000** (Data Hub y Customer Platform: Pro 5.000 / Ent 10.000).
 - 🔴 **Los créditos NO se suman entre hubs.** *"Credits do not combine across multiple subscriptions.
@@ -135,6 +135,46 @@ Lanzamientos: **HubSpot AEO** · Breeze Assistant para Loop Marketing · Prospec
 **Smart Deal Progression (GA)** · Customer Agent con canal email y multi-brand.
 Dato de HubSpot para el pitch AEO: **tráfico orgánico −27% YoY · tráfico de referencia IA ×3.**
 ✅ [company-news — Spring 2026 Spotlight](https://www.hubspot.com/company-news/spring-2026-spotlight)
+
+### 🎯 **"Agentic Customer Platform"** — HubSpot **soltó la etiqueta "CRM"** ✅
+Posicionamiento oficial 2026. Objetivo declarado a inversionistas (2026-05-07): ser
+**"la #1 agentic customer platform para empresas en crecimiento"**.
+**Definición de HubSpot:** *"software que captura todos tus datos de cliente y contexto de negocio en un solo
+lugar, y los pone a disposición **tanto de tu equipo como de agentes de IA** para que trabajen juntos"*.
+
+**Su arquitectura oficial — tres capas:**
+| Capa | Qué es |
+|---|---|
+| **1 · Smart CRM** *(contexto)* | Fuente única de verdad: estructurado **+ no estructurado** (emails, transcripts, chats) |
+| **2 · Breeze Agents** | *"AI teammates que hacen trabajo real"* |
+| **3 · Agent Coordination / Management** | 🎯 *"**Decidir qué tareas manejan los agentes de forma autónoma y cuáles quedan con humanos**"* |
+
+> 🎯 **LA CAPA 3 ES EL SERVICIO QUE VENDE EFEONCE.** HubSpot **nombra** el gobierno de agentes y **no lo llena**.
+> La doctrina `propose → confirmación humana → execute` no es un invento de Efeonce: **es la capa que la
+> arquitectura oficial de HubSpot dice que necesitas.**
+> Y su propio diferenciador declarado lo remata: *"lo que la IA no puede replicar es la combinación de tus
+> datos, tu conocimiento del negocio y las prácticas probadas"* → **armar ese contexto es implementación.**
+
+✅ [company-news — Introducing the Agentic Customer Platform](https://www.hubspot.com/company-news/introducing-the-agentic-customer-platform) ·
+⚠️ [Q1 2026 investor slides](https://www.investing.com/news/company-news/hubspot-q1-2026-slides-agentic-platform-drives-23-revenue-growth-93CH-4670893)
+
+### 🎯 HubSpot Agent CLI ✅ — public beta, **2026-06-23**
+*"Una CLI construida **para que agentes de IA** interactúen con tus datos de HubSpot"* — diseñada para
+**Claude Code, Claude Cowork y OpenAI Codex**; para *"automatizaciones agendadas, operaciones masivas y tareas
+de fondo que corren **sin un humano en el loop**"*.
+**Comandos:** CRUD sobre cualquier objeto · **pipelines y stages** · **properties** · **associations**.
+**Auth:** OAuth (scoped) o **`admin mode` via service key** (requerido para schema y deletes).
+**Salida JSONL. Todos los writes soportan `--dry-run`.** ⚠️ No reemplaza al MCP (conversacional vs agéntico).
+🔴 **Comoditiza el mecanismo de deployment programático de Kortex** — pero **valida la forma de trabajar de
+Efeonce**. → `modules/13_AGENTES.md`.
+✅ [changelog — Agent CLI public beta](https://developers.hubspot.com/changelog/hubspot-agent-cli-available-in-public-beta)
+
+### Agent Tools ⚠️ BETA
+*"Custom workflow action hecha para agentes de IA"*: empaqueta API calls + pasos de LLM + contexto en una
+herramienta que un agente de HubSpot puede llamar. Developer project framework (`hs project create/upload`,
+versión `2025.2` o `2026.03`); requiere **developer account con opt-in a la beta**.
+🎯 **Es "te construimos tu agente" — un servicio, no una licencia.**
+✅ [developers.hubspot.com — create an agent tool](https://developers.hubspot.com/docs/apps/developer-platform/add-features/agent-tools/create-an-agent-tool)
 
 ### Developer platform ✅ — para la conversación con IT
 Cadencia fija: **2 releases mayores/año (marzo y septiembre)**, APIs con formato `/YYYY-MM/`.

@@ -144,6 +144,36 @@ Siete meses sin crear uno.**
 
 ---
 
+## 7b. 🎯 ANAM — el caso que existía y nadie había conectado
+
+**Hay UN caso de CRM citable, y es fuerte:**
+
+> **ANAM · Customer Agent en producción.**
+> **El equipo de atención redujo su carga un 56% en promedio** (76% en el mejor mes).
+> Implementación, gobierno del agente y modelado de costo: **Efeonce**.
+
+🔴 **Reglas al citarlo** (→ `modules/13_AGENTES.md` § 2):
+- **Lidera con el 56%, NUNCA con el 76%.** *"Hasta X"* le dice al comprador *"cherry-picking"* y descuenta
+  todo lo demás. **El conservador vende más — y es literalmente la tesis de la landing.**
+- **Declara período y línea base.** Falta sacarlos del portal de ANAM (`19893546`).
+- **Requiere autorización de ANAM** para nombrarlos. Se pide **en el QBR**.
+- **Contraste:** HubSpot solo se atreve a decir *"50% más tickets resueltos"* — una métrica de **herramienta**.
+  Efeonce mide **reducción de carga humana**: una métrica de **negocio**.
+
+### 🔴 Y la concentración de riesgo que esto revela
+
+**ANAM es, a la vez:** la venta más reciente (USD 8.400) · **el único cliente sobre Kortex** · **el caso del
+Customer Agent** · el próximo cross-sell (**no tiene Marketing Hub**) · y la única relación gestionada sana.
+
+**Si ANAM se va, se caen CINCO cosas de un golpe** — más el tier. **Toda la historia de Efeonce está en un
+solo cliente**, y eso no estaba declarado en ningún risk matrix.
+
+**La contracara: un QBR con ANAM ordena el negocio entero.** Verifica el número, consigue la autorización,
+reinicia los puntos managed, abre el cross-sell de Marketing Hub Pro y convierte a Kortex de promesa en caso.
+**Dos horas, cinco resultados.**
+
+---
+
 ## 8. Lo que está sobre la mesa y no cuesta dinero
 
 1. 🥇 **Dos cross-sells de Marketing Hub Pro** — ANAM y Ecoriles, ambos con Sales Hub y **sin Marketing Hub**,

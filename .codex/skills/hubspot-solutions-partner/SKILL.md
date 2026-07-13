@@ -160,6 +160,7 @@ rehacerla, no memorizarla. Por eso la calculadora vive en `templates/tier-calcul
 | Discovery, dimensionar sin sub-cotizar, **descalificar** | `modules/10_DISCOVERY_SCOPING.md` |
 | Armar la oferta, el arbitraje del onboarding fee, negociar **con** HubSpot, objeciones | `modules/11_PROPUESTA_PRICING.md` |
 | La implementación como argumento de venta y como negocio | `modules/12_IMPLEMENTACION.md` |
+| 🎯 **Agentes** — implementar los 3 GA · operar con la **Agent CLI** · construir **Agent Tools** · el gobierno · **el caso ANAM** | `modules/13_AGENTES.md` |
 | **El estado real de Efeonce hoy y el plan de rescate** | `efeonce/ESTADO_ACTUAL.md` · `efeonce/PLAN_RESCATE_6M.md` |
 
 Carga solo lo que la tarea necesita. `SOURCES.md` se carga **siempre** que vayas a citar un número.
