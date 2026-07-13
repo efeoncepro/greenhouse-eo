@@ -3,7 +3,7 @@
 > **Tipo:** Product Decision Record (posicionamiento/GTM de una superficie del sitio público).
 > **Estado:** Accepted (posicionamiento) — sesión de diseño con el operador, 2026-07-06.
 > **Skills:** `social-media-studio`, `growth-marketing-cro`, `digital-marketing`, `product-design-loop`, `commercial-expert`, `efeonce-agency`, `seo-aeo`, `efeonce-public-site-wordpress`.
-> **Ejecución:** [`TASK-1351`](../../tasks/to-do/TASK-1351-landing-redes-sociales.md) (spoke de servicio; v1 live/noindex en WordPress page `251300`, cierre formal de lifecycle pendiente). Epic: `EPIC-019`. Guía pillar "community manager" en Think = follow-up (ver §Consecuencias).
+> **Ejecución:** [`TASK-1351`](././tasks/to-do/TASK-1351-landing-redes-sociales.md) (spoke de servicio; v1 live/noindex en WordPress page `251300`, cierre formal de lifecycle pendiente). Epic: `EPIC-019`. Guía pillar "community manager" en Think = follow-up (ver §Consecuencias).
 > **No-duplicación:** el sustrato estratégico vive en el context pack y en PDR-004 — este PDR **cita**, no copia: `docs/context/09_marca-agencia.md` (masterbrand Efeonce; Globe = Creatividad/Contenido, Reach = Amplificación), `docs/context/07_ico.md` (cadena de eficiencia → outcome medible), `docs/context/13_icp-buyer-personas-jtbd.md` (Globe ICP), [PDR-004](PDR-004-landing-agencia-creativa-posicionamiento.md) (paraguas creativo + doctrina de marca/CTA/prueba), [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md) (patrón hub `/servicios` + spoke por keyword real; pillar de autoridad va a Think).
 
 ## Contexto
@@ -45,7 +45,7 @@ Build en el patrón de la familia de spokes (`posicionamiento-seo`/`desarrollo-s
 
 - **Lidera la masterbrand Efeonce** (`09`): Globe/Reach nunca solos; capabilities nombradas descriptivamente ("nuestro equipo de creatividad y contenido"). Tuteo es-CL neutro, sin voseo.
 - **Oferta de dos escalones:** CTA primario **"Agenda una reunión"** (HubSpot Meetings + UTM, consistente con `PDR-004`); CTA secundario **"Pide una auditoría de tus redes"** como oferta liviana de captura para el que aún no quiere reunión. Reusa `<greenhouse-form>` + Turnstile + atribución HubSpot portal 48713323 (Full API Parity por reuso, no motor nuevo).
-- **Solo casos/resultados citables.** Sky, Bresler, Berel, SSilva u otros con métrica real. **NUNCA GEA** ni cifras infladas. Si no hay resultado social citable, usar cifras **ilustrativas del modelo** declarándolo (mismo patrón que `PDR-004`).
+- **Solo casos/resultados citables.** Sky, Bresler, Berel u otros con métrica real. Si no hay resultado social citable, usar cifras **ilustrativas del modelo** declarándolo (mismo patrón que `PDR-004`).
 
 ## Consecuencias
 
@@ -79,5 +79,5 @@ Build en el patrón de la familia de spokes (`posicionamiento-seo`/`desarrollo-s
 - No lidera con volumen de posts / seguidores ni con "somos ágiles" sin prueba.
 - No usa `elementor_canvas`, custom sticky header, ni header/wrapper overrides.
 - No migra a Astro ni cambia de host.
-- No cita GEA ni cifras infladas; no inventa resultados sociales.
+- No infla cifras; no inventa resultados sociales.
 - No construye un motor de forms nuevo (reusa Growth Forms).

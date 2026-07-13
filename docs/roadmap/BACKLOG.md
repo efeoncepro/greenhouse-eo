@@ -19,13 +19,13 @@ Last updated: March 2026.
 ## Master Reference
 
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` is the source of truth for:
-  - product direction
-  - role model
-  - route structure
-  - multi-tenant architecture
-  - semantic marts direction
-  - phased roadmap
-  - parallelization rules for agents
+ - product direction
+ - role model
+ - route structure
+ - multi-tenant architecture
+ - semantic marts direction
+ - phased roadmap
+ - parallelization rules for agents
 
 ## Current Product Position
 
@@ -122,7 +122,7 @@ Status:
 - **SUBSTANTIALLY COMPLETE**
 
 Completed:
-- People module operational with route group and `canAccessPeopleModule()` access
+- People module operational with route group and `canAccessPeopleModule` access
 - team directory with search and filters
 - Person 360 with tabbed views (overview, projects, capacity, activity)
 - capacity views per person and per team
@@ -182,9 +182,9 @@ Completed:
 - `/admin/users`, `/admin/users/[id]`
 - `/admin/roles`
 - tenant-centric admin views backed by `clients`, `client_users`, `client_service_modules`, and `client_feature_flags`
-- capability module administration with `verifyCapabilityModuleAccess()`
+- capability module administration with `verifyCapabilityModuleAccess`
 - AI tools catalog and license management
-- `requireAdminTenantContext()` enforcing both admin route group and efeonce_admin role
+- `requireAdminTenantContext` enforcing both admin route group and efeonce_admin role
 
 Remaining:
 - SCIM provisioning for automated user lifecycle from IdP
@@ -322,7 +322,7 @@ The following modules were not in the original phased roadmap but are now operat
 - `/auth/landing` redirect by `portalHomePath`
 - `/internal/dashboard` and `/admin/users` as minimum guarded surfaces
 - HubSpot closedwon companies bootstrapped as Greenhouse tenants
-- confident project scopes bootstrapped for DDSoft, SSilva, and Sky Airline
+- confident project scopes bootstrapped for DDSoft, and Sky Airline
 - SSO (Microsoft + Google) operational
 - PostgreSQL `greenhouse_core` as auth store
 - finance module (40+ routes), HR/payroll module (25+ routes)

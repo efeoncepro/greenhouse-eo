@@ -44,10 +44,10 @@
 ```
 LICENCIA (lo que HubSpot les cobra)
   Hubs y tiers:              ______     ✅ verificar precio a la fecha
-  Seats:                     ______     (view-only = $0 — REGÁLALOS)
+  Seats:                     ______     (view-only = USD 0 — REGÁLALOS)
   Contactos de marketing:    ______     🔴 modelar el CRECIMIENTO (saltos escalonados)
   Créditos de Breeze:        ______     🔴 NO sumar entre hubs (5.000, no 20.000)
-  🔴 ONBOARDING OBLIGATORIO: ______     Marketing Ent = $7.000 ✅
+  🔴 ONBOARDING OBLIGATORIO: ______     Marketing Ent = USD 7.000 ✅
                                         ❌ Bundle Customer Platform: NO publicado — PÍDELO
 
 IMPLEMENTACIÓN (por fases)              ← AQUÍ ESTÁ EL MARGEN
@@ -70,7 +70,7 @@ CRM INTELLIGENCE (Kortex)               ← premium
 
 ## 🎯 § 5b · El arbitraje del onboarding — el argumento de cierre
 
-> *"HubSpot les va a cobrar **$7.000 de onboarding obligatorio**. Es un onboarding estándar, remoto,
+> *"HubSpot les va a cobrar **USD 7.000 de onboarding obligatorio**. Es un onboarding estándar, remoto,
 > genérico. Por un monto comparable nosotros hacemos la implementación completa —migración de datos,
 > arquitectura de objetos, propiedades, pipelines, permisos, reporting, integraciones— **y nos quedamos
 > operándolo**.
@@ -104,9 +104,9 @@ que **ya van a hacer de todas formas**.
 
 - [ ] ✅ **Onboarding fee incluido**
 - [ ] 🔴 **Créditos NO sumados entre hubs**
-- [ ] 🔴 **Crecimiento de contactos modelado** (2.000 → 2.001 = **+$250/mo**)
+- [ ] 🔴 **Crecimiento de contactos modelado** (2.000 → 2.001 = **+USD 250/mo**)
 - [ ] ✅ Cap de envío verificado (10× Pro / 20× Ent)
-- [ ] ✅ **View-only seats regalados** ($0)
+- [ ] ✅ **View-only seats regalados** (USD 0)
 - [ ] ⚠️ **Cotización oficial de HubSpot** si es multi-hub
 - [ ] 🔴 **Anual vs mensual declarado**
 - [ ] 🔴 **§ 4 (los límites) escrito**, no omitido

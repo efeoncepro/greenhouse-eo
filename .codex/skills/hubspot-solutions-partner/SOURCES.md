@@ -73,46 +73,46 @@ y que le hacen perder el deal y la credibilidad en la misma frase.
 
 ### Portafolio ✅
 Smart CRM · Marketing Hub · Sales Hub · Service Hub · Content Hub · **Data Hub** · **Revenue Hub** ·
-Breeze (capa IA) · **HubSpot AEO** (producto nuevo, $50/mo standalone; **incluido en Marketing Pro/Ent**).
+Breeze (capa IA) · **HubSpot AEO** (producto nuevo, USD 50/mo standalone; **incluido en Marketing Pro/Ent**).
 Bundle: **Customer Platform**. Ningún Hub agregado ni retirado en 2026 — hubo renames + expansión.
 ✅ [legal.hubspot.com — Product & Services Catalog](https://legal.hubspot.com/hubspot-product-and-services-catalog)
 
 ### Pricing ✅ (anual; el precio mayor suele ser mes-a-mes — confírmalo en la cotización)
 | Hub | Starter | Professional | Enterprise | Onboarding **obligatorio** |
 |---|---|---|---|---|
-| Marketing | $20/seat (promo $7) · 1.000 contactos | **$800/mo** · 3 core seats · 2.000 contactos | **desde $3.600/mo** · 5 seats · 10.000 contactos | **$3.000 / $7.000** ✅ |
-| Sales | $20/seat | **$90/seat** | **desde $150/seat** | **$1.500 / $3.500** ✅ |
-| Service | $20/seat | **$90/seat** | **desde $150/seat** | **$1.500 / $3.500** ✅ |
-| Content | $20/seat | **$450/mo** | desde $1.500/mo | ❌ no declarado |
-| Data | $20/seat | **$720/mo** · 5.000 créditos | desde $2.000/mo · 10.000 créditos | ❌ no declarado |
-| Revenue | Free tier | desde $95/mo | desde $140/mo | ❌ no declarado |
-| **Customer Platform** | $20/seat | **$1.300/mo** · 6 seats | **desde $4.700/mo** · 8 seats | ❌ **NO PUBLICADO — PÍDELO** |
+| Marketing | USD 20/seat (promo USD 7) · 1.000 contactos | **USD 800/mo** · 3 core seats · 2.000 contactos | **desde USD 3.600/mo** · 5 seats · 10.000 contactos | **USD 3.000 / USD 7.000** ✅ |
+| Sales | USD 20/seat | **USD 90/seat** | **desde USD 150/seat** | **USD 1.500 / USD 3.500** ✅ |
+| Service | USD 20/seat | **USD 90/seat** | **desde USD 150/seat** | **USD 1.500 / USD 3.500** ✅ |
+| Content | USD 20/seat | **USD 450/mo** | desde USD 1.500/mo | ❌ no declarado |
+| Data | USD 20/seat | **USD 720/mo** · 5.000 créditos | desde USD 2.000/mo · 10.000 créditos | ❌ no declarado |
+| Revenue | Free tier | desde USD 95/mo | desde USD 140/mo | ❌ no declarado |
+| **Customer Platform** | USD 20/seat | **USD 1.300/mo** · 6 seats | **desde USD 4.700/mo** · 8 seats | ❌ **NO PUBLICADO — PÍDELO** |
 
-❌ **Unidad de cobro de Revenue Hub** ($95/$140: ¿por seat, por cuenta?). Existe un **Revenue Seat** formal ✅,
+❌ **Unidad de cobro de Revenue Hub** (USD 95/USD 140: ¿por seat, por cuenta?). Existe un **Revenue Seat** formal ✅,
 lo que sugiere que escala por seat. **Confírmalo con el rep antes de cotizar.**
-❌ **Contactos de marketing adicionales**: las fuentes públicas discrepan **10×** ($100 vs $1.000 por 10K/mes).
-Los bloques ✅ del catálogo legal: Pro = +5.000 por $250 (escalonado a la baja); Ent = +10.000 por $100 (→$60).
-**Los saltos son escalonados, no lineales**: un Pro que pasa de 2.000 a 2.001 contactos salta **+$250/mo**.
+❌ **Contactos de marketing adicionales**: las fuentes públicas discrepan **10×** (USD 100 vs USD 1.000 por 10K/mes).
+Los bloques ✅ del catálogo legal: Pro = +5.000 por USD 250 (escalonado a la baja); Ent = +10.000 por USD 100 (→USD 60).
+**Los saltos son escalonados, no lineales**: un Pro que pasa de 2.000 a 2.001 contactos salta **+USD 250/mo**.
 
 ### Seats ✅
-Core (pagado, $45–$75) · Sales · Service · **Revenue** (requerido para crear/editar quotes) ·
-**View-Only ($0)** · **Partner Seat ($0)**.
+Core (pagado, USD 45–USD 75) · Sales · Service · **Revenue** (requerido para crear/editar quotes) ·
+**View-Only (USD 0)** · **Partner Seat (USD 0)**.
 ⚠️ El accounting de core seats cross-hub (Sales + Marketing Enterprise juntos) es **ambiguo en la web pública**.
 Si el deal es multi-hub, **exige la cotización oficial antes de prometer un número**.
 
 ### Créditos Breeze ✅ — dos trampas de cotización
-- **$0,010 por crédito** · capacity pack **$10 / 1.000 créditos**.
+- **USD 0,010 por crédito** · capacity pack **USD 10 / 1.000 créditos**.
 - Incluidos: Starter 500 · Pro 3.000 · **Enterprise 5.000** (Data Hub y Customer Platform: Pro 5.000 / Ent 10.000).
 - 🔴 **Los créditos NO se suman entre hubs.** *"Credits do not combine across multiple subscriptions.
   The system uses your highest subscription tier."* **Cuatro hubs Enterprise = 5.000 créditos, no 20.000.**
 - 🔴 **No hay rollover.** Los créditos no usados expiran al final del período.
-- Consumo: Data Agent 10/prompt ($0,10) · **Customer Agent 50/resolución ($0,50)** ·
-  **Prospecting Agent 100/lead ($1,00)** · Content Agent 1.000/pieza ($10).
+- Consumo: Data Agent 10/prompt (USD 0,10) · **Customer Agent 50/resolución (USD 0,50)** ·
+  **Prospecting Agent 100/lead (USD 1,00)** · Content Agent 1.000/pieza (USD 10).
 ✅ [KB — HubSpot credits & billing](https://knowledge.hubspot.com/account-management/understand-hubspot-credits-and-billing) (act. 2026-06-16)
 
 ### Outcome-based pricing ✅ — anunciado 2026-04-02, efectivo 2026-04-14
-Customer Agent: de $1,00/conversación → **$0,50 por conversación RESUELTA** (las que no resuelven no cuestan).
-Prospecting Agent: de cargo mensual por contacto → **$1,00 por lead recomendado**.
+Customer Agent: de USD 1,00/conversación → **USD 0,50 por conversación RESUELTA** (las que no resuelven no cuestan).
+Prospecting Agent: de cargo mensual por contacto → **USD 1,00 por lead recomendado**.
 Definición ✅ de "resuelta": el agente respondió o ejecutó una acción **y no hubo handoff a humano en 72 h**.
 Cita utilizable (Jon Dick, CCO): *"Outcome-based pricing removes that risk. You pay when it works, full stop."*
 ✅ [company-news — outcome-based agent pricing](https://www.hubspot.com/company-news/hubspots-customer-agent-and-prospecting-agent-now-you-pay-when-the-task-is-complete)
@@ -143,7 +143,7 @@ Ciclo: 6 meses current → 12 meses supported → **a los 18 meses los builds fa
 ✅ [developers.hubspot.com — Spring 2026 changelog](https://developers.hubspot.com/changelog/spring-2026-spotlight)
 
 ### Contexto financiero ✅ (Q1 2026, publicado 2026-05-07)
-Revenue **$881,0M** (+23%) · **299.458 clientes** · **ARPU $11.722/año** (+6%).
+Revenue **USD 881,0M** (+23%) · **299.458 clientes** · **ARPU USD 11.722/año** (+6%).
 Management, en filing público: *"Scaling companies are increasingly choosing HubSpot… to **reduce total
 cost of ownership**, and that's reflected in our **upmarket momentum** and multi-hub adoption."*
 🎯 **Lectura comercial:** un deal de seis cifras es **~10× su cliente promedio**. Dos cosas ciertas a la vez:
@@ -177,7 +177,7 @@ cargo de la implementación, y HubSpot elimina el cargo obligatorio del contrato
 (te lo construyen).
 ⚠️ **Desde el 2026-07-15, solo los partners CERTIFICADOS pueden waivear el onboarding del cliente.**
 ✅ **Efeonce TIENE la Partner Certification** (confirmado por el operador, 2026-07-13) → **el waiver está
-disponible**. 🎯 En un **Marketing Hub Pro** le borras **$3.000 de un costo anual de $9.600 = 31% de descuento
+disponible**. 🎯 En un **Marketing Hub Pro** le borras **USD 3.000 de un costo anual de USD 9.600 = 31% de descuento
 en el año 1**, y **el HubSpot directo no puede igualarlo**. **Es la ventaja estructural del canal partner.**
 → `modules/11` § 2 (tabla de dimensionamiento del waiver por producto).
 
@@ -197,9 +197,9 @@ sin importar quién trajo la cuenta originalmente.
 ### Puntos ✅ (growth market = **×2**; **LATAM ES growth market** — confirmado por el operador 2026-07-13)
 | Crédito | No-growth | **Growth (LATAM)** | Caducidad |
 |---|---|---|---|
-| **Sourced** | 5 pts / $100 MRR | **10 pts / $100** | 1 año desde el cierre |
-| **Assisted** | 3 pts / $100 | **6 pts / $100** | 1 año desde el cierre |
-| **Managed** | 1 pt / $100 | **2 pts / $100** | **60 días desde la última acción sobre la cuenta** |
+| **Sourced** | 5 pts / USD 100 MRR | **10 pts / USD 100** | 1 año desde el cierre |
+| **Assisted** | 3 pts / USD 100 | **6 pts / USD 100** | 1 año desde el cierre |
+| **Managed** | 1 pt / USD 100 | **2 pts / USD 100** | **60 días desde la última acción sobre la cuenta** |
 ✅ [hubspot.com/partners/how-tiers-work](https://www.hubspot.com/partners/how-tiers-work)
 ❌ **La lista oficial de growth markets no está publicada** en ninguna página pública. Confirmada
 verbalmente para LATAM. **Pídesela por escrito al PDM.**
@@ -218,9 +218,9 @@ revisión, conservas el tier"*). **Se sube rápido y se cae lento.**
 
 ### Membership ✅ — **desde 2026-07-15**
 **USD 400/mes**, obligatoria, renovación anual. **Se exonera si la suscripción neta propia del partner
-supera los $400/mes *post-discount*.**
-⚠️ **Trampa:** *"post-discount"* es la palabra operativa. Si tu plan es de $412 **de lista** y tienes
-descuento de partner, el **neto** puede caer bajo $400 y pierdes el waiver → **$4.800/año**.
+supera los USD 400/mes *post-discount*.**
+⚠️ **Trampa:** *"post-discount"* es la palabra operativa. Si tu plan es de USD 412 **de lista** y tienes
+descuento de partner, el **neto** puede caer bajo USD 400 y pierdes el waiver → **USD 4.800/año**.
 ✅ [2026 Entry and Tiers Policy](https://www.hubspot.com/2026-entry-and-tiers-policy-for-hubspot-solutions-partners)
 
 ### Fechas críticas ✅
@@ -260,20 +260,20 @@ descuento de partner, el **neto** puede caer bajo $400 y pierdes el waiver → *
 
 | Vendor | Dato clave | Marca |
 |---|---|---|
-| **Salesforce** Sales Cloud EE | **$175** usr/mes (subió de $165 el 2025-08-01) | ⚠️ (salesforce.com da 403) |
-| Agentforce | **$125** usr/mes add-on · Flex Credits **$500/100k** (acción = 20 créditos = **$0,10**) | ⚠️ |
+| **Salesforce** Sales Cloud EE | **USD 175** usr/mes (subió de USD 165 el 2025-08-01) | ⚠️ (salesforce.com da 403) |
+| Agentforce | **USD 125** usr/mes add-on · Flex Credits **USD 500/100k** (acción = 20 créditos = **USD 0,10**) | ⚠️ |
 | **Adobe Marketo** | ❌ **NO publica precios.** Cobra **por tamaño de base de datos, no por uso** ✅ | ✅ el modelo / ❌ el precio |
-| **Microsoft D365 Sales EE** | **$105,00** usr/mes · Customer Insights **$1.000/mes attach** (usuarios ilimitados) | ✅ **fuente primaria** |
-| **Zoho CRM Enterprise** | ~$40 usr/mes · **Visionary en el MQ SFA — por encima de HubSpot** | ⚠️ / ✅ el MQ |
-| **Pipedrive Premium** | ~$49 seat/mes. ⚠️ **Renombró sus tiers en jul-2025** (Essential→Lite, Professional→Premium) | ⚠️ |
-| **Odoo Custom** | ~$13,60 usr/mes ✅ · implementación real en Chile **USD 20-50k** ⚠️ · **32 partners certificados en Chile** ⚠️ | ✅/⚠️ |
+| **Microsoft D365 Sales EE** | **USD 105,00** usr/mes · Customer Insights **USD 1.000/mes attach** (usuarios ilimitados) | ✅ **fuente primaria** |
+| **Zoho CRM Enterprise** | ~USD 40 usr/mes · **Visionary en el MQ SFA — por encima de HubSpot** | ⚠️ / ✅ el MQ |
+| **Pipedrive Premium** | ~USD 49 seat/mes. ⚠️ **Renombró sus tiers en jul-2025** (Essential→Lite, Professional→Premium) | ⚠️ |
+| **Odoo Custom** | ~USD 13,60 usr/mes ✅ · implementación real en Chile **USD 20-50k** ⚠️ · **32 partners certificados en Chile** ⚠️ | ✅/⚠️ |
 
 **TCO 3 años, 30 usuarios** (supuestos declarados en `modules/05`):
-HubSpot ≈ **$295k** · Salesforce ≈ **$611k** · **Microsoft ≈ $290k** · Adobe ≈ $420k **y sin CRM** ·
-Zoho ≈ $118k · Pipedrive ≈ $98k · Odoo ≈ $100k.
+HubSpot ≈ **USD 295k** · Salesforce ≈ **USD 611k** · **Microsoft ≈ USD 290k** · Adobe ≈ USD 420k **y sin CRM** ·
+Zoho ≈ USD 118k · Pipedrive ≈ USD 98k · Odoo ≈ USD 100k.
 
 > ⚠️ **Las tres advertencias que hay que internalizar:**
-> 1. **El delta contra Salesforce lo hace el ADMIN, no la licencia** ($162k vs $189k = solo 17%). Si el
+> 1. **El delta contra Salesforce lo hace el ADMIN, no la licencia** (USD 162k vs USD 189k = solo 17%). Si el
 >    prospecto ya tiene admin de Salesforce en planilla, **medio argumento se cae**. Pregúntalo en discovery.
 > 2. **Contra Microsoft, Zoho, Pipedrive y Odoo, HubSpot NO gana por precio.** Si tu pitch es TCO, pierdes.
 > 3. **Ningún número incluye descuento.** Salesforce descuenta 20-40% en enterprise sin despeinarse.
@@ -292,7 +292,7 @@ Zoho ≈ $118k · Pipedrive ≈ $98k · Odoo ≈ $100k.
 | **API** | Enterprise: 190 req/10s · 1M/día (add-on hasta 3M). 🔴 **Las apps públicas OAuth topan en 110 req/10s y el add-on NO levanta ese límite** | Sync bidireccional en tiempo real con ERP/core bancario |
 | **Permisos** | Teams + permission sets. ⚠️ **No hay role hierarchy ni territory management** como Salesforce | Organización matricial global con visibilidad por territorio |
 | **Config** | 1.000 custom properties/objeto · 100 deal pipelines · 300 teams · 200 calculated properties | Enterprise global con muchas BUs come 100 pipelines rápido |
-| **Contactos B2C masivos** | Ent a 500k+: **$60 por cada 10.000**. Envío capado a **20× el tier** | Base B2C de millones: **Adobe/Salesforce salen más baratos a escala.** Ese es el terreno donde HubSpot pierde |
+| **Contactos B2C masivos** | Ent a 500k+: **USD 60 por cada 10.000**. Envío capado a **20× el tier** | Base B2C de millones: **Adobe/Salesforce salen más baratos a escala.** Ese es el terreno donde HubSpot pierde |
 
 ⚠️ **Secundario, verifícalo con el SE antes de comprometerte:** ~20 definiciones de custom object y
 ~1,5M registros totales de custom object en Enterprise; throttling de workflows con enrolamientos masivos.
@@ -313,10 +313,10 @@ Zoho ≈ $118k · Pipedrive ≈ $98k · Odoo ≈ $100k.
 | Comisión Q1'26 | **US$ 927,20** (▼65%) | ídem |
 | Comisión Q2'26 (est.) | **US$ 378** (▼59%) | ídem |
 | 🔴 **Causa del derrumbe** | **La cascada Provider** — vendieron 2025 siendo Provider (comisión de **solo 12 meses**), y esos plazos están venciendo. **NO es churn ni mala gestión** | operador + política HubSpot |
-| Suscripción propia | **$412/mes** — ⚠️ **12 dólares sobre el umbral del waiver.** Verificar si es neto post-discount | operador |
+| Suscripción propia | **USD 412/mes** — ⚠️ **12 dólares sobre el umbral del waiver.** Verificar si es neto post-discount | operador |
 | Clientes gestionados | **3**: ANAM (Sales Hub Pro) · Ecoriles (Sales Hub Pro) · GyT Group (**churneó, sin champion**) | portal |
 | 🔴 **BeFUN** | Compró **Marketing Hub Pro** (jun-2025), partner admin activo, **NO está en el libro gestionado** → puntos managed **regalados** | CRM |
-| Cuentas soltadas | **SSilva** (mayor libro de licencias, ~USD 5.000/año; sigue en HubSpot; comisión Provider **vencida**) · **GeaAmbiental** (Starter, empresa muy pequeña) | operador + portal |
+| Cuentas soltadas | **SSilva** (mayor libro de licencias, ~USD 5.000/año; sigue en HubSpot; comisión Provider **vencida**) · **un cliente pequeño** (Starter, empresa muy pequeña) | operador + portal |
 | 🔴 Deal registration | **NO vive en el CRM.** El pipeline `HubSpot Shared Selling` tiene **1 deal en toda su historia** (Closed Lost, may-2025). Todo se registra en el portal de partner → **canal ciego** | CRM (API) |
 | ⚠️ "Win rate partner-led 40-50%" | **NO verificable.** `docs/context/02_gtm.md:111` lo afirma, pero **no hay respaldo en el CRM**. **No lo lleves a un board** | CRM (API) |
 | ⚠️ Drift documental | `prospect_source` y `modalidad_venta` (`docs/context/11_hubspot-bowtie.md:45-47`) **NO existen** en deals | CRM (API) |

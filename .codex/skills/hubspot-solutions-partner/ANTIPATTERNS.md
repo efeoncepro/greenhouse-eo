@@ -22,9 +22,9 @@ Cada uno de estos costó algo real. Están ordenados por lo que cuesta el error.
 | Anti-patrón | Costo |
 |---|---|
 | **Sumar créditos entre hubs** | Los créditos **NO se acumulan**: manda el tier más alto. Cuatro hubs Enterprise = **5.000 créditos, no 20.000** ✅. Si cotizaste sobre la suma, la diferencia sale de tu bolsillo o de tu credibilidad |
-| **Olvidar el onboarding fee obligatorio** | Marketing Enterprise = **$7.000** one-time ✅. Aparece en la primera factura del cliente. Si no lo cotizaste, la conversación que sigue es horrible |
-| **Cotizar el bundle Customer Platform asumiendo el fee** | ❌ **No está publicado.** Puede ser $7K o $14K+. **Pídelo por escrito antes de cotizar** |
-| **Cotizar contactos de marketing de memoria** | Las fuentes públicas discrepan **10×**. Y los saltos son **escalonados**: un Pro que pasa de 2.000 a 2.001 contactos salta **+$250/mo** ✅. Modela el crecimiento de la base, no el número de hoy |
+| **Olvidar el onboarding fee obligatorio** | Marketing Enterprise = **USD 7.000** one-time ✅. Aparece en la primera factura del cliente. Si no lo cotizaste, la conversación que sigue es horrible |
+| **Cotizar el bundle Customer Platform asumiendo el fee** | ❌ **No está publicado.** Puede ser USD 7K o USD 14K+. **Pídelo por escrito antes de cotizar** |
+| **Cotizar contactos de marketing de memoria** | Las fuentes públicas discrepan **10×**. Y los saltos son **escalonados**: un Pro que pasa de 2.000 a 2.001 contactos salta **+USD 250/mo** ✅. Modela el crecimiento de la base, no el número de hoy |
 | **Prometer "flota de agentes de IA"** | Solo **tres** Breeze Agents están en GA ✅. El resto es beta. Si el cliente firma seis cifras esperando una flota, tienes un problema contractual |
 | **Cotizar multi-hub sin cotización oficial** | ⚠️ El accounting de core seats cross-hub es **ambiguo en la web pública**. Exige la cotización de HubSpot antes de prometer un número |
 
@@ -35,13 +35,13 @@ Cada uno de estos costó algo real. Están ordenados por lo que cuesta el error.
 | Anti-patrón | Por qué pierdes |
 |---|---|
 | **Entrar a enterprise vendiendo el CRM** | Ahí HubSpot es **Niche Player** y Salesforce/Microsoft/Oracle son Leaders. **Entra por marketing y AEO**, donde HubSpot es Leader hace 5 años → `modules/07` |
-| **Pelear por precio contra Microsoft** | D365 Sales Enterprise es **$105/usr/mes vs $150 de HubSpot** ✅, ambos verificados. **Pierdes.** El eje es adopción y time-to-value |
+| **Pelear por precio contra Microsoft** | D365 Sales Enterprise es **USD 105/usr/mes vs USD 150 de HubSpot** ✅, ambos verificados. **Pierdes.** El eje es adopción y time-to-value |
 | **Pelear por precio contra Zoho/Pipedrive/Odoo** | Pierdes **3× a 4×**. El único eje que funciona es **el techo**: qué pasa en 18 meses cuando necesiten marketing automation, servicio y atribución sobre el mismo dato |
 | **Subestimar a Zoho** | Gartner lo puso **Visionary en el MQ de SFA — por encima de HubSpot**. Ya no es un juguete |
-| **Presentar el TCO contra Salesforce sin preguntar por el admin** | El delta lo hace el **admin**, no la licencia ($162k vs $189k = solo 17%). Si ya tienen admin en planilla, **medio argumento se cae**. Pregúntalo en discovery, no en la propuesta |
+| **Presentar el TCO contra Salesforce sin preguntar por el admin** | El delta lo hace el **admin**, no la licencia (USD 162k vs USD 189k = solo 17%). Si ya tienen admin en planilla, **medio argumento se cae**. Pregúntalo en discovery, no en la propuesta |
 | **Comparar el TCO contra la lista de Salesforce** | Salesforce descuenta **20-40%** en enterprise sin despeinarse. Prepara el TCO contra **su cotización real** |
 | **Vender features a quien no tiene CRM** | No está comparando features: **no está comparando nada.** Está evaluando si vale la pena el dolor del cambio. **Tu competidor es la indecisión** → `modules/05` § Sin CRM |
-| **Vender Enterprise a quien no tiene CRM** | Vende **Starter**, consigue adopción real en 60 días, y **expande**. La expansión es el motor: el ARPU de HubSpot subió de $11.038 a $11.722 ✅ |
+| **Vender Enterprise a quien no tiene CRM** | Vende **Starter**, consigue adopción real en 60 días, y **expande**. La expansión es el motor: el ARPU de HubSpot subió de USD 11.038 a USD 11.722 ✅ |
 
 ---
 
@@ -54,10 +54,10 @@ Cada uno de estos costó algo real. Están ordenados por lo que cuesta el error.
 | 🔴 **Cortar la relación de licencia por un problema de la relación de servicio** | Pierdes **comisión + puntos managed + GRR**, y **regalas la cuenta a otro partner** bajo Best Partner Wins. **Degrada a licencia + toque mínimo, no cortes** → `modules/03` § 2 |
 | **Dejar una cuenta gestionada sin tocar >60 días** | Sus puntos managed **se evaporan en silencio**. El cliente sigue pagando y tú sigues sin puntos. No hay alerta |
 | **Tener un "cliente gestionado" sin productos activos** | Es una fila en un reporte, no un activo. **Genera cero.** Si aparece uno, investígalo hoy |
-| **Medir el libro en número de clientes** | Se mide en **MRR gestionado**. Tres clientes con Sales Hub Pro para 2 seats son ~$400 de MRR = **8 puntos** |
+| **Medir el libro en número de clientes** | Se mide en **MRR gestionado**. Tres clientes con Sales Hub Pro para 2 seats son ~USD 400 de MRR = **8 puntos** |
 | **Cerrar sin deal registration** | Sin registro **no hay comisión ni puntos**. Es obligatorio y exclusivo ✅ |
 | **Cerrar sin POI firmado** | Rige **Best Partner Wins**: gana quien obtiene la firma. Puedes trabajar seis meses un deal y perderlo con un partner que llegó tarde y firmó primero |
-| **Bajar tu propia suscripción de HubSpot para ahorrar** | El waiver de la membership exige **>$400/mes neto post-discount**. Ahorrar $20 te puede costar **$4.800/año** |
+| **Bajar tu propia suscripción de HubSpot para ahorrar** | El waiver de la membership exige **>USD 400/mes neto post-discount**. Ahorrar USD 20 te puede costar **USD 4.800/año** |
 | **Implementar y soltar** | La implementación es el evento; **el libro es el negocio**. Un cliente implementado y no gestionado se te evapora en 60 días |
 
 ---

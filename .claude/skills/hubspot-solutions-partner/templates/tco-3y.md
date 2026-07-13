@@ -9,7 +9,7 @@
 ## Las tres reglas antes de abrir la calculadora
 
 1. 🔴 **Pregunta primero: "¿ya tienen un admin de Salesforce en planilla?"**
-   El delta lo hace el **admin**, no la licencia: $162k vs $189k a 3 años = **17%**.
+   El delta lo hace el **admin**, no la licencia: USD 162k vs USD 189k a 3 años = **17%**.
    **Si ya lo tienen, la mitad de tu argumento se cae.** Cambia el eje a **adopción**.
 2. 🔴 **No compares contra la lista de Salesforce.** Descuentan **20-40%** en enterprise sin despeinarse.
    **Pídele al prospecto su cotización real y compara contra esa.**
@@ -30,14 +30,14 @@ Incluye marketing:     [sí/no]
 
 | Línea | HubSpot | Competidor | Nota |
 |---|---|---|---|
-| **Licencia (3a)** | | | ✅ HubSpot Sales EE = $150/usr/mes |
-| **Onboarding obligatorio** | ✅ **$1.500-$7.000** — **publicado** | ❓ *"contacta ventas"* | 🎯 *"Yo te digo hoy cuánto cuesta arrancar. Ellos no."* |
-| **Implementación** | ~$20.000 | ⚠️ **1,5×-3× la licencia anual** | |
-| **Admin (3a)** | ~0,35 FTE | ⚠️ **~0,75-1 FTE** | 🔴 **Este es el número.** $150k-$250k de delta |
+| **Licencia (3a)** | | | ✅ HubSpot Sales EE = USD 150/usr/mes |
+| **Onboarding obligatorio** | ✅ **USD 1.500-USD 7.000** — **publicado** | ❓ *"contacta ventas"* | 🎯 *"Yo te digo hoy cuánto cuesta arrancar. Ellos no."* |
+| **Implementación** | ~USD 20.000 | ⚠️ **1,5×-3× la licencia anual** | |
+| **Admin (3a)** | ~0,35 FTE | ⚠️ **~0,75-1 FTE** | 🔴 **Este es el número.** USD 150k-USD 250k de delta |
 | **Support premium** | incluido | ⚠️ **+30% de la licencia** (Salesforce Premier) | |
-| **Add-ons** | — | ⚠️ **$20-$100/usr/mes** (CPQ, doc gen, e-sign) | |
-| **Storage overage** | — | ⚠️ **$125/mes por 500MB** (Salesforce) | |
-| **Créditos de IA** | ✅ **$0,50 por conversación RESUELTA** | ⚠️ **$0,10 por acción** (Flex Credits) o **$125/usr/mes** | 🎯 *"Pagas cuando funciona, no cuando lo intenta"* |
+| **Add-ons** | — | ⚠️ **USD 20-USD 100/usr/mes** (CPQ, doc gen, e-sign) | |
+| **Storage overage** | — | ⚠️ **USD 125/mes por 500MB** (Salesforce) | |
+| **Créditos de IA** | ✅ **USD 0,50 por conversación RESUELTA** | ⚠️ **USD 0,10 por acción** (Flex Credits) o **USD 125/usr/mes** | 🎯 *"Pagas cuando funciona, no cuando lo intenta"* |
 | **TOTAL 3 AÑOS** | | | |
 
 ---
@@ -46,13 +46,13 @@ Incluye marketing:     [sí/no]
 
 | | Licencia 3a | Implement. | Admin 3a | **TCO 3a** |
 |---|---|---|---|---|
-| **HubSpot** Sales EE | $162.000 ✅ | ~$20.000 | ~$95.000 (0,35 FTE) | **≈ $295.000** |
-| **Salesforce** Sales EE | $189.000 ⚠️ | ~$75.000 | ~$248.000 (0,75 FTE) | **≈ $611.000** *(+$57k Premier +$43k add-ons)* |
-| **Adobe** Marketo | ~$120.000 ⚠️ | ~$30.000 | ~$270.000 | **≈ $420.000 — y SIN CRM** |
-| **Microsoft** D365 EE | $113.400 ✅ | ~$60.000 | ~$115.000 | **≈ $290.000** 🔴 **empate/derrota** |
-| Zoho EE | $43.200 ⚠️ | ~$15.000 | ~$60.000 | ≈ $118.000 🔴 |
-| Pipedrive Premium | $52.920 ⚠️ | ~$5.000 | ~$40.000 | ≈ $98.000 🔴 |
-| Odoo Custom (Chile) | $14.700 ✅ | $20-50k | ~$50.000 | ≈ $100.000 🔴 |
+| **HubSpot** Sales EE | USD 162.000 ✅ | ~USD 20.000 | ~USD 95.000 (0,35 FTE) | **≈ USD 295.000** |
+| **Salesforce** Sales EE | USD 189.000 ⚠️ | ~USD 75.000 | ~USD 248.000 (0,75 FTE) | **≈ USD 611.000** *(+USD 57k Premier +USD 43k add-ons)* |
+| **Adobe** Marketo | ~USD 120.000 ⚠️ | ~USD 30.000 | ~USD 270.000 | **≈ USD 420.000 — y SIN CRM** |
+| **Microsoft** D365 EE | USD 113.400 ✅ | ~USD 60.000 | ~USD 115.000 | **≈ USD 290.000** 🔴 **empate/derrota** |
+| Zoho EE | USD 43.200 ⚠️ | ~USD 15.000 | ~USD 60.000 | ≈ USD 118.000 🔴 |
+| Pipedrive Premium | USD 52.920 ⚠️ | ~USD 5.000 | ~USD 40.000 | ≈ USD 98.000 🔴 |
+| Odoo Custom (Chile) | USD 14.700 ✅ | USD 20-50k | ~USD 50.000 | ≈ USD 100.000 🔴 |
 
 ---
 
@@ -79,7 +79,7 @@ La comparación honesta es **Marketo + Salesforce vs HubSpot solo.**
 
 | Mercado | Costo de un admin de CRM | Fuerza del eje TCO |
 |---|---|---|
-| 🇺🇸 EEUU | $70k-$130k/año | 🟢 **Demoledor** |
+| 🇺🇸 EEUU | USD 70k-USD 130k/año | 🟢 **Demoledor** |
 | 🇨🇱 🇲🇽 🇨🇴 LATAM | **una fracción de eso** | 🔴 **Débil. Cambia el eje a adopción y time-to-value** |
 
 → `modules/06_MAPA_DE_DEMANDA.md` Lente 5.
@@ -94,4 +94,4 @@ La comparación honesta es **Marketo + Salesforce vs HubSpot solo.**
 | **Precio de Marketo** | ❌ Adobe **no lo publica** |
 | **"HubSpot es 3,4× más barato"** | Blog. La dirección es correcta; **el número no es citable** |
 | **El estudio TCO de Aptitude 8 como dato 2026** | ⚠️ Es de **diciembre de 2022** |
-| **Cualquier TCO contra Microsoft como argumento de venta** | 🔴 **Pierdes.** $105 vs $150. **Cambia de eje** |
+| **Cualquier TCO contra Microsoft como argumento de venta** | 🔴 **Pierdes.** USD 105 vs USD 150. **Cambia de eje** |

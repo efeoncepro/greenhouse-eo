@@ -34,7 +34,7 @@ contenido (Verk) → **expansión de licencia**.
 | **Portal** | **48713323** · Owners: Julio (75788512), Luis/BDR (86856220) |
 | **Pipeline** | **"HubSpot Shared Selling"** — deal registrations co-vendidos. **Ya existe, no se modifica** (`docs/context/11_hubspot-bowtie.md:21`) |
 | **Win rate del canal partner-led** | ✅ **40-50% histórico** (`docs/context/02_gtm.md:111`) |
-| **Suscripción propia** | $412/mes — ⚠️ **12 dólares sobre el umbral del waiver** |
+| **Suscripción propia** | USD 412/mes — ⚠️ **12 dólares sobre el umbral del waiver** |
 | **Listing** | [ecosystem.hubspot.com/marketplace/solutions/efeoncepro](https://ecosystem.hubspot.com/marketplace/solutions/efeoncepro) — 🔴 **0 reviews** |
 
 ### 🔴 El anti-caso: Berel

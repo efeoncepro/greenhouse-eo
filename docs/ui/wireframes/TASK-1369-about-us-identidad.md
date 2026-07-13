@@ -76,7 +76,7 @@ Copy id conceptual `publicsite.about.<sección>.<slot>` (autoría en WordPress, 
 | `about.medicion.h2` | 8 | Si no lo podemos medir, no te lo vendemos como resultado. | — | filo |
 | `about.medicion.body` | 8 | Nada de "mejora significativa" ni de gráficos que suben sin decir de qué. Atribución conectada a tu pipeline: cuánto revenue habilitó cada peso. Las vanity metrics son un pacto de silencio entre agencia y cliente. Nosotros no lo firmamos. | — | — |
 | `about.prueba.h2` | 9 | Diez años. Cuatro países. Marcas que no perdonan. | — | — |
-| `about.prueba.body` | 9 | +120 empresas · HubSpot Solutions Partner. Sky: +127% de tráfico orgánico frente a LATAM Airlines. Bresler: +180% en ventas digitales. Berel nos adjudicó su retainer de SEO y AEO por licitación. Cuentas ancla que renuevan año tras año —no campaña tras campaña. | +120, +127%, +180% | solo casos citables; NUNCA GEA |
+| `about.prueba.body` | 9 | +120 empresas · HubSpot Solutions Partner. Sky: +127% de tráfico orgánico frente a LATAM Airlines. Bresler: +180% en ventas digitales. Berel nos adjudicó su retainer de SEO y AEO por licitación. Cuentas ancla que renuevan año tras año —no campaña tras campaña. | +120, +127%, +180% | solo casos citables;|
 | `about.equipo.h2` | 10 | Detrás del sistema, la gente que lo opera. | — | — |
 | `about.equipo.body` | 10 | *(bios reales de liderazgo + equipo — pendiente de input)* | nombre, rol, bio, foto por persona | **bloqueante E-E-A-T** |
 | `about.cierre.h2` | 11 | El crecimiento se orquesta. Hablemos de orquestar el tuyo. | — | callback al claim |
@@ -127,7 +127,7 @@ Página mayormente estática de contenido; los estados relevantes son del bloque
 - Required steps: cargar → scroll por cada `data-capture` → capturar sección.
 - Required captures: hero, 7 creencias (accordion abierto/cerrado), 3 pilares, un-cerebro, en-vivo (captura del portal legible), casos, equipo.
 - Required `data-capture` markers: los 11 de arriba.
-- Assertions: `h1` = el Why (no "se orquesta"); las capacidades NO nombran Globe/Reach/Wave como sub-marcas; casos NO contienen "GEA"; sin scroll horizontal de página.
+- Assertions: `h1` = el Why (no "se orquesta"); las capacidades NO nombran Globe/Reach/Wave como sub-marcas; sin scroll horizontal de página.
 - Scroll-width checks: `document.scrollingElement.scrollWidth <= viewport` en ambos viewports.
 - Accessibility/focus checks: heading order un solo h1; accordion operable por teclado.
 - Reduced-motion evidence: si hay scroll-reveal, respeta `prefers-reduced-motion` (capturar con RM on).
@@ -146,7 +146,7 @@ Página mayormente estática de contenido; los estados relevantes son del bloque
 - [x] All visible strings are in the copy ledger.
 - [x] Dynamic values are named and bounded (+120, +127%, +180%; bios por persona).
 - [x] Partial/degraded states are explicit (equipo oculto si no hay bios; embed degrada a texto).
-- [x] No copy implies a guarantee when data is estimated (casos citables reales; sin GEA).
+- [x] No copy implies a guarantee when data is estimated (casos citables reales;).
 - [x] Charts have table/text alternatives (Loop/capacidades tienen equivalente en lista).
 - [x] State and aria copy is ready for implementation.
 - [x] Implementation mapping names primitive, copy source, data contract and route/surface.

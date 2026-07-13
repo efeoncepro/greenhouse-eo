@@ -2,7 +2,7 @@
 
 > **Tipo:** Product Decision Record (posicionamiento + IA de una superficie del sitio público).
 > **Estado:** Accepted (posicionamiento + IA + arco de copy) — sesión con el operador, 2026-07-08. **Ejecución `UI ready: no`** (bloqueada por dependencias abajo).
-> **Ejecución:** [`TASK-1369`](../../tasks/to-do/TASK-1369-about-us-identidad.md) + wireframe. Epic: `EPIC-019`.
+> **Ejecución:** [`TASK-1369`](././tasks/to-do/TASK-1369-about-us-identidad.md) + wireframe. Epic: `EPIC-019`.
 > **Depende de / refina:** [PDR-010](PDR-010-home-es-el-pitch-agencia-se-pliega.md) (la Home es el pitch; el About Us es el gap real). El **Why** que estructura esta página es SSOT de `docs/context/09_marca-agencia.md` → §El Golden Circle de Efeonce.
 > **No-duplicación:** cita el context pack (`01`, `05`, `09`, `10`) y PDR-008/010; no recopia su sustrato.
 
@@ -36,7 +36,7 @@ El copy final vive en el wireframe `docs/ui/wireframes/TASK-1369-about-us-identi
 
 - **Capabilities, no sub-marcas** (PDR-008 + skill `efeonce-agency`): NUNCA nombrar Globe/Reach/Wave como marcas/proveedores al cliente. Se describen por función. Los *"Empower your Brand/Growth/Voice/Engine"* son la voz que Efeonce adopta al operar cada capability, no taglines de sub-marca. *En una página de identidad* sí se puede explicar la operación interna, pero la marca que lidera es **Efeonce**.
 - **Nunca el Why sin su mecanismo** (regla anti-humo del Golden Circle, `09`): "co-creación/integralidad/partner" van siempre encadenados a su prueba (el login, el grader, el número, el ciclo).
-- **Solo casos citables** (Sky/Bresler/Berel/SSilva). **NUNCA GEA.**
+- **Solo casos citables** (Sky/Bresler/Berel).
 - **es-LATAM neutro**, tuteo, sin voseo. `hreflang`-ready.
 - **Voz** validada con `greenhouse-ux-writing`; copy no expone marca del portal interno.
 
@@ -49,7 +49,7 @@ El copy final vive en el wireframe `docs/ui/wireframes/TASK-1369-about-us-identi
 
 - **About Us ≠ Home:** la Home vende (pitch, categoría SEO); el About Us da identidad/confianza (intención marca/navegacional). No compiten (PDR-010).
 - **Slug:** hoy `/about-us-efeonce/` (249770). Sugerencia: `/nosotros` (consistencia es-LATAM) con 301 del viejo. Decisión menor, se confirma en la task.
-- Registrar en el [route-ownership matrix](../../operations/public-site-route-ownership-matrix-20260616.md) + SEO preflight (JSON-LD `Organization` + `Person` para liderazgo = entidad citable) antes de indexar.
+- Registrar en el [route-ownership matrix](././operations/public-site-route-ownership-matrix-20260616.md) + SEO preflight (JSON-LD `Organization` + `Person` para liderazgo = entidad citable) antes de indexar.
 
 ## Dependencias duras (por qué `UI ready: no`)
 
@@ -66,7 +66,7 @@ El copy final vive en el wireframe `docs/ui/wireframes/TASK-1369-about-us-identi
 
 - **NUNCA** convertir el About Us en un segundo pitch (duplica la Home). Es identidad/confianza.
 - **NUNCA** nombrar las unidades como sub-marcas/proveedores; capabilities descriptivas, Efeonce lidera.
-- **NUNCA** el Why sin su mecanismo (anti-humo); **NUNCA** GEA como caso.
+- **NUNCA** el Why sin su mecanismo (anti-humo)
 - **NUNCA** marcar `UI ready: yes` sin bios reales + dirección de arte aprobada + GVC desktop/mobile.
 - **SIEMPRE** ejecutar vía `efeonce-public-site-wordpress`, validar copy con `greenhouse-ux-writing`, y estructurar el copy como Golden Circle (Why→How→What).
 
@@ -74,5 +74,5 @@ El copy final vive en el wireframe `docs/ui/wireframes/TASK-1369-about-us-identi
 
 - SSOT del Why: `docs/context/09_marca-agencia.md` → §El Golden Circle de Efeonce.
 - PDR hermanos: [PDR-010](PDR-010-home-es-el-pitch-agencia-se-pliega.md), [PDR-008](PDR-008-landing-agencia-marketing-digital-posicionamiento.md), [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md).
-- Ejecución: [`TASK-1369`](../../tasks/to-do/TASK-1369-about-us-identidad.md) + wireframe `docs/ui/wireframes/TASK-1369-about-us-identidad.md`.
+- Ejecución: [`TASK-1369`](././tasks/to-do/TASK-1369-about-us-identidad.md) + wireframe `docs/ui/wireframes/TASK-1369-about-us-identidad.md`.
 - Contexto: `docs/context/01_quienes-somos.md`, `05_voz-tono-estilo.md`, `09_marca-agencia.md`, `10_experiencia-cliente.md`.

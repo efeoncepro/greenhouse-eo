@@ -9,7 +9,7 @@
 
 | # | Pregunta | Qué decide |
 |---|---|---|
-| **1** | *"¿Ya tienen un **admin de Salesforce en planilla**?"* | Si sí → **se te cae medio argumento de TCO** (el delta lo hace el admin, no la licencia: $162k vs $189k = 17%). **Cambia el eje a adopción.** Mejor saberlo ahora que en el comité |
+| **1** | *"¿Ya tienen un **admin de Salesforce en planilla**?"* | Si sí → **se te cae medio argumento de TCO** (el delta lo hace el admin, no la licencia: USD 162k vs USD 189k = 17%). **Cambia el eje a adopción.** Mejor saberlo ahora que en el comité |
 | **2** | *"¿Tienen **Dynamics 365 en producción**, o tienen **Microsoft 365**?"* | En el ~80% es lo segundo → **no hay sinergia que perder**. Si corren D365 sobre Dataverse con el ERP → **retírate** |
 | **3** | *"¿**Cuántos custom objects, cuántos registros, qué throughput de API**?"* | *"'No escala' es una afirmación **sin unidades**."* Te posiciona como el adulto de la sala **y** te da los datos para descalificar honestamente |
 
@@ -42,19 +42,19 @@
 **Cada línea que no preguntes es margen que pagas tú.**
 
 ### Seats
-- [ ] ¿Cuántos **crean/editan** vs solo **ven**? *(View-only = **$0** ✅ — **regálalos**)*
+- [ ] ¿Cuántos **crean/editan** vs solo **ven**? *(View-only = **USD 0** ✅ — **regálalos**)*
 - [ ] ¿Cuántos crean/editan **quotes**? → **Revenue Seat**
 - [ ] ¿Sales Hub Pro/Ent? → **Sales Seat**. ¿Service? → **Service Seat**
 - [ ] ⚠️ **Multi-hub → cotización oficial.** El accounting de core seats cross-hub es ambiguo
 
 ### Contactos de marketing
 - [ ] ¿Cuántos contactos **comercializables** hoy?
-- [ ] 🔴 **¿A cuántos llegan en 12 meses?** Saltos **escalonados**: 2.000 → 2.001 = **+$250/mo** ✅
+- [ ] 🔴 **¿A cuántos llegan en 12 meses?** Saltos **escalonados**: 2.000 → 2.001 = **+USD 250/mo** ✅
 - [ ] ¿Cuántos emails al mes? Cap: **10× (Pro) / 20× (Ent)** el tier ✅
 
 ### Créditos de Breeze
-- [ ] ¿Customer Agent? → **$0,50 por conversación resuelta** ✅. ¿Cuántas al mes?
-- [ ] ¿Prospecting Agent? → **$1,00 por lead** ✅
+- [ ] ¿Customer Agent? → **USD 0,50 por conversación resuelta** ✅. ¿Cuántas al mes?
+- [ ] ¿Prospecting Agent? → **USD 1,00 por lead** ✅
 - [ ] 🔴 **NO sumar créditos entre hubs.** Cuatro hubs Ent = **5.000, no 20.000** ✅. **Sin rollover**
 
 ### Implementación
@@ -66,7 +66,7 @@
 - [ ] 🔴 **¿Los datos están sucios?** → **cotiza la limpieza o no migres**
 
 ### Onboarding
-- [ ] 🔴 **Es obligatorio** ✅. Marketing **$3.000/$7.000** · Sales y Service $1.500/$3.500
+- [ ] 🔴 **Es obligatorio** ✅. Marketing **USD 3.000/USD 7.000** · Sales y Service USD 1.500/USD 3.500
 - [ ] ❌ **Bundle Customer Platform: NO publicado. PÍDELO.**
 
 ---

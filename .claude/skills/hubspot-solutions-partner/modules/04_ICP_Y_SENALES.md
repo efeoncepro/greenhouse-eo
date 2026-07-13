@@ -7,7 +7,7 @@
 
 ## 1. El ICP — y el dato que lo enmarca
 
-✅ **ARPU de HubSpot: $11.722/año.** Un deal de seis cifras es **10× su cliente promedio**.
+✅ **ARPU de HubSpot: USD 11.722/año.** Un deal de seis cifras es **10× su cliente promedio**.
 
 > **El producto está diseñado para el mid-market.** Vender enterprise es vender en el extremo derecho de su
 > distribución. Se puede — HubSpot lo declara como su tesis de crecimiento en un filing público — pero
@@ -43,14 +43,14 @@ Nunca Pro ni Enterprise.
 | Señal | Por qué |
 |---|---|
 | **No hay un champion interno identificable** | 🔴 **El más caro de todos.** GyT Group. Adopción cero → churn → comisión cortada → tier |
-| **Cliente muy chico en tier Starter** | ⚠️ **Caso GeaAmbiental:** suite Starter, empresa demasiado pequeña. MRR mínimo → comisión mínima → **puntos managed mínimos**. El costo de servir supera el retorno. **No todo cliente que se puede cerrar vale la pena cerrarlo** |
+| **Cliente muy chico en tier Starter** | ⚠️ **Caso real (cliente en Starter):** suite Starter, empresa demasiado pequeña. MRR mínimo → comisión mínima → **puntos managed mínimos**. El costo de servir supera el retorno. **No todo cliente que se puede cerrar vale la pena cerrarlo** |
 | **>10 entidades de negocio propias** | Techo de 10 custom objects ✅. Seguros, manufactura, healthcare, logística, banca |
 | **Gobernanza formal de cambios** (dev→QA→staging→prod) o auditoría regulatoria | **1 sandbox, 200K registros, sync inicial de 5.000 contactos** ✅. No puedes hacer UAT representativo |
 | **El pliego exige ISO 27001 del proveedor de software** | ✅ **HubSpot no lo reclama para sí mismo.** Verifica bajo NDA — no lo afirmes |
 | **Requisito de residencia de datos en LATAM / Brasil (LGPD) / UK / India** | ✅ **No existe.** Y con HIPAA activo, **nunca** puedes migrar de datacenter |
 | **Sync bidireccional en tiempo real con ERP o core bancario** | Límites de API. 🔴 Las apps públicas OAuth topan en 110 req/10s **y el add-on no lo levanta** |
 | **Organización matricial global con territory management** | ⚠️ No hay role hierarchy ni territorios como Salesforce |
-| **B2C con millones de contactos** | Ent a 500K+ = $60 por cada 10.000; envío capado a 20×. **Adobe/Salesforce salen más baratos a escala** |
+| **B2C con millones de contactos** | Ent a 500K+ = USD 60 por cada 10.000; envío capado a 20×. **Adobe/Salesforce salen más baratos a escala** |
 | **Corren D365 Finance/Supply Chain (ERP)** | El CRM en el mismo Dataverse es un argumento legítimo. **Retírate** |
 | **Casa Adobe real** (AEM + Analytics + Target en producción, con equipo) | Retírate elegante. *(Ojo: **Creative Cloud NO es "ser casa Adobe"**)* |
 | **<30 personas, sin equipo de marketing, presupuesto duro** | Zoho/Pipedrive es más barato **y tienen razón**. Perder rápido es ganar tiempo |
@@ -126,7 +126,7 @@ proyecto.** → `modules/03_MOTOR_LIBRO.md`.
 
 | Prioridad | Segmento | Por qué |
 |---|---|---|
-| 🥇 | **Tus propios clientes con un solo Hub** | Ya eres partner admin. Cross-sell paga **sourced** (10 pts/$100) *y* engorda tu managed. **Suma a los dos motores con un movimiento** |
+| 🥇 | **Tus propios clientes con un solo Hub** | Ya eres partner admin. Cross-sell paga **sourced** (10 pts/USD 100) *y* engorda tu managed. **Suma a los dos motores con un movimiento** |
 | 🥈 | **Tus clientes dormidos / con acceso desactivado** | Siguen en HubSpot. Siguen siendo comisión. Y bajo **Best Partner Wins** son **territorio abierto para otro partner** |
 | 🥉 | **La base instalada de HubSpot que vendió otro partner** | ✅ El deal-based model te deja comisionar igual. Nadie les está vendiendo el segundo Hub |
 | 4️⃣ | **Prospectos con trigger activo** (§ 2) | La ventana está abierta ahora |

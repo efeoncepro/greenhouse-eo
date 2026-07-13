@@ -52,8 +52,8 @@ SUS 3 OBJECIONES         →  MI REBATE
 |---|---|
 | **Salesforce** — Gartner | *"Correcto, en el MQ de **SFA**. El mismo Gartner nos puso **Leader en B2B Marketing Automation, 5.º año**. ¿Cuál de los dos cuadrantes describe **su** problema? **Si necesitan CPQ de ocho niveles y territorios, honestamente Salesforce es mejor.**"* |
 | **Salesforce** — TCO | *"El delta no está en la licencia. Está en el **admin**."* 🔴 **Pero pregunta primero si ya lo tienen** |
-| **Salesforce** — onboarding | *"Yo les digo **hoy** cuánto cuesta arrancar: $3.500, publicado. **Ellos les dicen 'contacta ventas'.**"* |
-| **Salesforce** — Agentforce | *"Ellos cobran **$0,10 por acción**. Nosotros **$0,50 por conversación RESUELTA**. **Pagan cuando funciona, no cuando lo intenta.** Pregúntenle a su AE cuánto será su factura de Flex Credits el mes 14. **No lo sabe.**"* |
+| **Salesforce** — onboarding | *"Yo les digo **hoy** cuánto cuesta arrancar: USD 3.500, publicado. **Ellos les dicen 'contacta ventas'.**"* |
+| **Salesforce** — Agentforce | *"Ellos cobran **USD 0,10 por acción**. Nosotros **USD 0,50 por conversación RESUELTA**. **Pagan cuando funciona, no cuando lo intenta.** Pregúntenle a su AE cuánto será su factura de Flex Credits el mes 14. **No lo sabe.**"* |
 | **Salesforce** — portafolio | ❌ **No digas que Pardot está muerto.** ✅ Di: *"Tienen **tres** productos de marketing de Salesforce conviviendo, y su AE no les puede decir en cuál estarán en tres años. **Yo tengo uno.**"* |
 | **Adobe / Marketo** | 🎯 *"Marketo les cobra por el **tamaño de su base**, no por uso. ¿Cuántos de esos 80.000 contactos tocaron un email este trimestre? **Están pagando por ochenta mil.**"* Y: ✅ **"Marketo no es un CRM."** |
 | **Adobe** — el Wave | *"Cierto, y ese reporte mide **profundidad de capacidad**, no **costo de operarla**. ¿Su equipo de cuatro personas va a usar el 15% de Marketo y pagar el 100%?"* 🔴 **Si son casa Adobe real (AEM+Analytics+Target), retírate** |

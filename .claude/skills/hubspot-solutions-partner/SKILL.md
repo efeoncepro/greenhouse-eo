@@ -55,9 +55,9 @@ El tier de partner tiene **dos puertas simultáneas**: un mínimo de *sourced po
 
 | Motor | Qué es | Puntos (growth market ×2) | Caducidad | Rol |
 |---|---|---|---|---|
-| **Venta** (*sourced*) | MRR nuevo que tú originas: net-new, upgrades y **cross-sells** | **10 pts / $100 MRR** | **1 año** desde el cierre del deal | Te hace **subir** |
-| **Asistido** (*assisted*) | Deals donde ayudas pero no originas | 6 pts / $100 MRR | 1 año | Complemento |
-| **Libro** (*managed*) | MRR de licencias bajo tu gestión activa | **2 pts / $100 MRR** | **60 días desde tu última acción sobre la cuenta** | Te impide **caer** |
+| **Venta** (*sourced*) | MRR nuevo que tú originas: net-new, upgrades y **cross-sells** | **10 pts / USD 100 MRR** | **1 año** desde el cierre del deal | Te hace **subir** |
+| **Asistido** (*assisted*) | Deals donde ayudas pero no originas | 6 pts / USD 100 MRR | 1 año | Complemento |
+| **Libro** (*managed*) | MRR de licencias bajo tu gestión activa | **2 pts / USD 100 MRR** | **60 días desde tu última acción sobre la cuenta** | Te impide **caer** |
 
 **Sourced rinde 5× más por dólar que managed.** Pero sourced **expira** y te obliga a correr para siempre.
 Managed **no expira mientras toques la cuenta cada 60 días** — y eso es literalmente lo que hace un
@@ -80,8 +80,8 @@ retainer de Managed CRM Ops.
 **Cotización**
 4. **NUNCA** sumes créditos entre hubs. **No se acumulan**: manda el tier más alto. Cuatro hubs Enterprise
    dan **5.000 créditos, no 20.000**. Y no hay rollover.
-5. **NUNCA** omitas el **onboarding fee obligatorio** (Marketing Ent = **$7.000**; Pro = $3.000; Sales/Service
-   Ent = $3.500 / Pro = $1.500). El fee del bundle **Customer Platform no está publicado** — pídelo por escrito.
+5. **NUNCA** omitas el **onboarding fee obligatorio** (Marketing Ent = **USD 7.000**; Pro = USD 3.000; Sales/Service
+   Ent = USD 3.500 / Pro = USD 1.500). El fee del bundle **Customer Platform no está publicado** — pídelo por escrito.
 6. **NUNCA** cotices contactos de marketing adicionales de memoria: las fuentes públicas discrepan 10×.
 7. **NUNCA** prometas "flota de agentes de IA". Solo **tres** Breeze Agents están en GA
    (Customer, Prospecting, Data). El resto está en beta. No firmes SLA sobre beta.
@@ -92,9 +92,9 @@ retainer de Managed CRM Ops.
    **no hay data residency en LATAM**, **no hay jerarquía de roles ni territory management**.
    Perder un deal honestamente te da la referencia para los próximos tres. → `modules/10_DISCOVERY_SCOPING.md`.
 9. **NUNCA** pelees por precio contra **Microsoft, Zoho, Pipedrive u Odoo**. Pierdes. D365 Sales Enterprise
-   es **$105/usuario/mes vs $150 de HubSpot** (ambos verificados). El eje es adopción y time-to-value.
+   es **USD 105/usuario/mes vs USD 150 de HubSpot** (ambos verificados). El eje es adopción y time-to-value.
 10. **NUNCA** presentes el TCO contra Salesforce sin preguntar antes **"¿ya tienen un admin de Salesforce en
-    planilla?"**. El delta lo hace el admin, no la licencia ($162k vs $189k a 3 años = solo 17%).
+    planilla?"**. El delta lo hace el admin, no la licencia (USD 162k vs USD 189k a 3 años = solo 17%).
 
 **Programa**
 11. **NUNCA** leas la insignia de tier sin leer la **curva de expiración de puntos**. El badge dice
@@ -175,9 +175,9 @@ Fuente canónica: `docs/context/02_gtm.md:45-54`. CRM Solutions es la **5.ª lí
 
 | Capa | Qué es | Revenue | Puntos de tier |
 |---|---|---|---|
-| **1 · Licencia** | Venta/gestión de licencias como Solutions Partner | **Referral fee 20% + margen** — hasta **3 años** por deal sourced (1 año si es assisted upmarket) | **Sourced** (10/$100) |
+| **1 · Licencia** | Venta/gestión de licencias como Solutions Partner | **Referral fee 20% + margen** — hasta **3 años** por deal sourced (1 año si es assisted upmarket) | **Sourced** (10/USD 100) |
 | **2 · Implementación** | Onboarding, migración, pipelines, properties, workflows, integraciones, training | Proyecto on-demand. **Aquí está el margen real.** | — |
-| **3 · Managed CRM Ops** | Operación continua post-implementación | **Retainer** | **Managed** (2/$100) — **el piso del tier** |
+| **3 · Managed CRM Ops** | Operación continua post-implementación | **Retainer** | **Managed** (2/USD 100) — **el piso del tier** |
 | **4 · CRM Intelligence** | Auditorías, scoring, recomendaciones (Kortex) | Premium tier | Habilita expansión → más sourced |
 
 **Flywheel:** licencia → implementación → managed ops → intelligence → contenido → **expansión de licencia**.

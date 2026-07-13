@@ -56,7 +56,7 @@
 | `publicsite.agencia.proof_engine.headline` | Diferenciador | "Las agencias te entregan informes. Nosotros te damos login." | RpA/OTD/FTR ilustrativos | Cifras **ilustrativas declaradas**, no live |
 | `publicsite.agencia.audience.headline` | Para quién | "Para equipos de marketing que ya tienen todo —menos un sistema que lo una." | — | Auto-calificación mid-market/enterprise |
 | `publicsite.agencia.cta.headline` | CTA | "Hablemos de cómo orquestar tu crecimiento." | — | — |
-| `publicsite.agencia.faq.q{1..6}` | FAQ | 6 objeciones de categoría (ver Detailed Spec de la task) | — | Coincide 1:1 con FAQPage JSON-LD |
+| `publicsite.agencia.faq.q{1.6}` | FAQ | 6 objeciones de categoría (ver Detailed Spec de la task) | — | Coincide 1:1 con FAQPage JSON-LD |
 
 ## State Copy
 

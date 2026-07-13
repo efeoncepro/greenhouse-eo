@@ -57,8 +57,8 @@ Cuando el operador ejecute `pnpm tsx --require ./scripts/lib/server-only-shim.cj
 
 1. SELECT pre-UPSERT del estado actual (`active/active/regular`).
 2. Mapper resuelve `hs_pipeline_stage` real desde HubSpot. Para los 6 services Globe activos en HubSpot, se espera que la mayoría queden en `pipeline_stage='active'`. Algunos podrían pasar a:
-   - `pipeline_stage='renewal_pending'` si HubSpot los movió a "En renovación".
-   - `pipeline_stage='closed', active=FALSE` si HubSpot los cerró.
+ - `pipeline_stage='renewal_pending'` si HubSpot los movió a "En renovación".
+ - `pipeline_stage='closed', active=FALSE` si HubSpot los cerró.
 3. Cascade preserva `engagement_kind='regular'` (caso 4 de la cascade — fila ya existe, regular por default histórico).
 4. Outbox `lifecycle_changed v1` se emite SOLO para services cuyo stage real difiere del `'active'` hardcoded. Si los 6 quedan en `active`, el outbox se silencia (cero diff). Si alguno cambia, los consumers downstream (P&L, attribution) reaccionan.
 
@@ -93,8 +93,8 @@ Cuando el operador ejecute `pnpm tsx --require ./scripts/lib/server-only-shim.cj
 SELECT service_id, SUM(amount_clp) AS total_clp
 FROM greenhouse_serving.commercial_cost_attribution_v2
 WHERE service_id IS NOT NULL
-  AND period_year = 2026
-  AND period_month BETWEEN 3 AND 5
+ AND period_year = 2026
+ AND period_month BETWEEN 3 AND 5
 GROUP BY 1
 ORDER BY total_clp DESC;
 ```
@@ -110,39 +110,39 @@ ORDER BY total_clp DESC;
 ### Procedimiento
 
 1. **Capturar evidencia**:
-   - Re-ejecutar las queries del pre-snapshot.
-   - Diff completo `pre vs post`.
-   - Lista de services específicos afectados.
-   - Reliability signals rojos.
+ - Re-ejecutar las queries del pre-snapshot.
+ - Diff completo `pre vs post`.
+ - Lista de services específicos afectados.
+ - Reliability signals rojos.
 
 2. **Revert via outbox lifecycle_changed reverse** (NUNCA DELETE/UPDATE ad-hoc):
-   - Por cada service afectado, emitir un evento `lifecycle_changed` reverse via el helper canónico:
-     ```ts
-     await publishOutboxEvent({
-       aggregateType: 'service_engagement',
-       aggregateId: serviceId,
-       eventType: 'commercial.service_engagement.lifecycle_changed',
-       payload: {
-         version: 1,
-         serviceId,
-         hubspotServiceId,
-         previousPipelineStage: nextValueAfterApply,
-         nextPipelineStage: previousValueBeforeApply,
-         previousActive: nextActiveAfterApply,
-         nextActive: previousActiveBeforeApply,
-         /* ... */
-         triggeredBy: 'manual_command',
-         occurredAt: new Date().toISOString()
-       }
-     })
-     ```
-   - Ejecutar `upsertServiceFromHubSpot` con los valores previos forzados (vía un wrapper que pasa el stage ID equivalente al previous).
-   - Cada revert es atomic + outbox; los consumers downstream se materializan automáticamente.
+ - Por cada service afectado, emitir un evento `lifecycle_changed` reverse via el helper canónico:
+ ```ts
+ await publishOutboxEvent({
+ aggregateType: 'service_engagement',
+ aggregateId: serviceId,
+ eventType: 'commercial.service_engagement.lifecycle_changed',
+ payload: {
+ version: 1,
+ serviceId,
+ hubspotServiceId,
+ previousPipelineStage: nextValueAfterApply,
+ nextPipelineStage: previousValueBeforeApply,
+ previousActive: nextActiveAfterApply,
+ nextActive: previousActiveBeforeApply,
+ /* .. */
+ triggeredBy: 'manual_command',
+ occurredAt: new Date.toISOString
+ }
+ })
+ ```
+ - Ejecutar `upsertServiceFromHubSpot` con los valores previos forzados (vía un wrapper que pasa el stage ID equivalente al previous).
+ - Cada revert es atomic + outbox; los consumers downstream se materializan automáticamente.
 
 3. **NO hacer**:
-   - `UPDATE greenhouse_core.services SET active=TRUE WHERE...` directo.
-   - `DELETE FROM greenhouse_core.services WHERE...`.
-   - Cualquier mutación que no pase por `upsertServiceFromHubSpot()` o por el helper canónico.
+ - `UPDATE greenhouse_core.services SET active=TRUE WHERE..` directo.
+ - `DELETE FROM greenhouse_core.services WHERE..`.
+ - Cualquier mutación que no pase por `upsertServiceFromHubSpot` o por el helper canónico.
 
 ### Helper revert recomendado (no implementado en V1, scope follow-up si necesario)
 
@@ -167,17 +167,17 @@ El operador con acceso a runtime ejecuta:
 
 # Dry-run obligatorio (no muta PG):
 HUBSPOT_ACCESS_TOKEN=$(gcloud secrets versions access latest \
-  --secret=hubspot-access-token --project=efeonce-group) \
+ --secret=hubspot-access-token --project=efeonce-group) \
 pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
-  scripts/services/backfill-from-hubspot.ts
+ scripts/services/backfill-from-hubspot.ts
 
 # Revisar dry-run output. Si OK:
 
 # Apply idempotente:
 HUBSPOT_ACCESS_TOKEN=$(gcloud secrets versions access latest \
-  --secret=hubspot-access-token --project=efeonce-group) \
+ --secret=hubspot-access-token --project=efeonce-group) \
 pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
-  scripts/services/backfill-from-hubspot.ts --apply --create-missing-spaces
+ scripts/services/backfill-from-hubspot.ts --apply --create-missing-spaces
 
 # Post-snapshot — ejecutar las mismas queries del pre-snapshot.
 # Diff debe alinearse con `Diff esperado post-apply` arriba.
@@ -199,27 +199,27 @@ pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
 === TASK-813 Slice 3 — backfill services from HubSpot (APPLY) ===
 Found 12 clients with hubspot_company_id.
 
-  ✓ Aguas Andinas: created=0 updated=2 unmapped=0
-  ✓ ANAM: created=0 updated=1 unmapped=0
-  ✓ BeFUN: created=0 updated=0 unmapped=0
-  ✓ Corp Aldea del Encuentro: created=0 updated=0 unmapped=0
-  ✓ DDSoft: created=0 updated=0 unmapped=0
-  ✓ Ecoriles: created=0 updated=0 unmapped=0
-  ✓ Gobierno regional region metropolitana: created=0 updated=0 unmapped=0
-  ✓ LOYAL Solutions: created=0 updated=1 unmapped=0
-  ✓ Motogas SpA: created=0 updated=1 unmapped=0
-  ✓ Municipalidad Pedro Aguirre Cerda: created=0 updated=0 unmapped=0
-  ✓ Sky Airline: created=0 updated=1 unmapped=0
-  ✓ SSilva: created=0 updated=0 unmapped=0
+ ✓ Aguas Andinas: created=0 updated=2 unmapped=0
+ ✓ ANAM: created=0 updated=1 unmapped=0
+ ✓ BeFUN: created=0 updated=0 unmapped=0
+ ✓ Corp Aldea del Encuentro: created=0 updated=0 unmapped=0
+ ✓ DDSoft: created=0 updated=0 unmapped=0
+ ✓ Ecoriles: created=0 updated=0 unmapped=0
+ ✓ Gobierno regional region metropolitana: created=0 updated=0 unmapped=0
+ ✓ LOYAL Solutions: created=0 updated=1 unmapped=0
+ ✓ Motogas SpA: created=0 updated=1 unmapped=0
+ ✓ Municipalidad Pedro Aguirre Cerda: created=0 updated=0 unmapped=0
+ ✓ Sky Airline: created=0 updated=1 unmapped=0
+ ✓ SSilva: created=0 updated=0 unmapped=0
 
 === Summary ===
-  Clients processed:    12
-  Services fetched:     6
-  Services created:     0
-  Services updated:     6
-  Services unmapped:    0
-  Spaces auto-created:  0
-  Errors:               0
+ Clients processed: 12
+ Services fetched: 6
+ Services created: 0
+ Services updated: 6
+ Services unmapped: 0
+ Spaces auto-created: 0
+ Errors: 0
 ```
 
 ### Post-snapshot — distribución real

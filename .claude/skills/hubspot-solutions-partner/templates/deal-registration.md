@@ -65,9 +65,9 @@ Habilita **toda** la motion de base instalada — es de lo más valioso que pued
 
 | Crédito | Cuándo | Puntos | Comisión |
 |---|---|---|---|
-| **Sourced** | Tú originas el deal (net-new, upgrade o cross-sell) | **10 / $100 MRR** | **20%, hasta 3 años** |
-| **Assisted** | Ayudas pero no originas | **6 / $100 MRR** | 20%, **hasta 1 año** *(upmarket)* |
-| **Managed** | MRR bajo tu gestión activa | **2 / $100 MRR** | — *(pero es **el piso del tier**)* |
+| **Sourced** | Tú originas el deal (net-new, upgrade o cross-sell) | **10 / USD 100 MRR** | **20%, hasta 3 años** |
+| **Assisted** | Ayudas pero no originas | **6 / USD 100 MRR** | 20%, **hasta 1 año** *(upmarket)* |
+| **Managed** | MRR bajo tu gestión activa | **2 / USD 100 MRR** | — *(pero es **el piso del tier**)* |
 
 **Legacy** (líneas vendidas **antes del 2023-04-01**): 20% **vitalicio** — pero **solo mientras sigas
 gestionando al cliente** ✅. **Si tienes cuentas de esa era, ese ingreso es frágil. Protégelo.**

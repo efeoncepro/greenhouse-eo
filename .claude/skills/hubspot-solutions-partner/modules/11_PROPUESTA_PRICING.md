@@ -32,9 +32,9 @@ y no gestionado te da **cero puntos managed a los 60 días**, aunque siga pagand
 
 | Hub | Professional | Enterprise |
 |---|---|---|
-| Marketing | **$3.000** | **$7.000** |
-| Sales | $1.500 | $3.500 |
-| Service | $1.500 | $3.500 |
+| Marketing | **USD 3.000** | **USD 7.000** |
+| Sales | USD 1.500 | USD 3.500 |
+| Service | USD 1.500 | USD 3.500 |
 | Customer Platform (bundle) | ❌ **NO PUBLICADO — PÍDELO** | ❌ **NO PUBLICADO** |
 
 ### Los dos hechos que hacen el argumento
@@ -47,7 +47,7 @@ y no gestionado te da **cero puntos managed a los 60 días**, aunque siga pagand
    procesos, arma el sistema.
 
 > **La conversación:**
-> *"HubSpot les va a cobrar **$7.000 de onboarding obligatorio**. Y ese onboarding es **coaching**: les
+> *"HubSpot les va a cobrar **USD 7.000 de onboarding obligatorio**. Y ese onboarding es **coaching**: les
 > enseñan a ustedes a configurarlo, y ustedes lo configuran.*
 >
 > *Si trabajan con nosotros, **ese cargo desaparece de su contrato** — nosotros le notificamos a HubSpot que
@@ -55,7 +55,7 @@ y no gestionado te da **cero puntos managed a los 60 días**, aunque siga pagand
 > arquitectura de objetos, propiedades, pipelines, permisos, reporting, integraciones. **Y nos quedamos
 > operándolo.**"*
 
-**Le estás quitando $7.000 de la factura Y entregando más.** No compites contra su presupuesto: **liberas**
+**Le estás quitando USD 7.000 de la factura Y entregando más.** No compites contra su presupuesto: **liberas**
 presupuesto que él ya tenía comprometido, y lo rediriges a un trabajo que sí vale.
 
 ### ✅ Efeonce TIENE la Partner Certification — el waiver está disponible. Úsalo.
@@ -67,16 +67,16 @@ presupuesto que él ya tenía comprometido, y lo rediriges a un trabajo que sí 
 
 | Producto | Precio año 1 | Onboarding que borras | **Descuento efectivo** |
 |---|---|---|---|
-| **Marketing Hub Pro** | $9.600 ($800/mo) | **$3.000** | 🎯 **31% en el año 1** |
-| Marketing Hub Enterprise | $43.200 | **$7.000** | 16% |
-| Sales / Service Pro (10 seats) | $10.800 | $1.500 | 14% |
-| Sales / Service Enterprise (10 seats) | $18.000 | $3.500 | 19% |
+| **Marketing Hub Pro** | USD 9.600 (USD 800/mo) | **USD 3.000** | 🎯 **31% en el año 1** |
+| Marketing Hub Enterprise | USD 43.200 | **USD 7.000** | 16% |
+| Sales / Service Pro (10 seats) | USD 10.800 | USD 1.500 | 14% |
+| Sales / Service Enterprise (10 seats) | USD 18.000 | USD 3.500 | 19% |
 
 > **En un Marketing Hub Pro le estás borrando casi un tercio del costo del primer año.**
 > Y es un descuento que **el HubSpot directo no puede igualar** — solo existe si el cliente pasa por un
 > partner certificado. **Es la ventaja estructural de tu canal. Ponla en la primera lámina, no en la letra chica.**
 
-🔴 **El fee del bundle Customer Platform sigue sin publicarse**: si es $7K o $14K+, cambia el tamaño de tu
+🔴 **El fee del bundle Customer Platform sigue sin publicarse**: si es USD 7K o USD 14K+, cambia el tamaño de tu
 propuesta **y el tamaño del waiver que puedes ofrecer**. Pídeselo al PDM por escrito.
 
 ---
@@ -85,14 +85,14 @@ propuesta **y el tamaño del waiver que puedes ofrecer**. Pídeselo al PDM por e
 
 **Antes de mandar cualquier número:**
 
-- [ ] ✅ **Onboarding fee incluido** (Marketing Ent = $7.000)
+- [ ] ✅ **Onboarding fee incluido** (Marketing Ent = USD 7.000)
 - [ ] 🔴 **Créditos NO sumados entre hubs.** Cuatro hubs Enterprise = **5.000, no 20.000**. Y **no hay rollover**
-- [ ] 🔴 **Crecimiento de la base de contactos modelado.** Los saltos son escalonados: 2.000 → 2.001 = **+$250/mo**
+- [ ] 🔴 **Crecimiento de la base de contactos modelado.** Los saltos son escalonados: 2.000 → 2.001 = **+USD 250/mo**
 - [ ] ✅ **Cap de envío de email verificado**: 10× (Pro) / 20× (Ent) el tier de contactos
-- [ ] ✅ **View-only seats regalados** ($0). **Regálalos con generosidad: adopción es tu métrica**
+- [ ] ✅ **View-only seats regalados** (USD 0). **Regálalos con generosidad: adopción es tu métrica**
 - [ ] ✅ **Revenue Seats** contados si van a crear/editar quotes
 - [ ] ⚠️ **Cotización oficial de HubSpot** si es multi-hub (el accounting de core seats cross-hub es ambiguo)
-- [ ] ✅ **Consumo de créditos de Breeze estimado** ($0,50/resolución · $1/lead)
+- [ ] ✅ **Consumo de créditos de Breeze estimado** (USD 0,50/resolución · USD 1/lead)
 - [ ] 🔴 **Anual vs mensual declarado** (el precio de lista menor es **anual**)
 - [ ] ❌ **Contactos adicionales NO cotizados de memoria** (las fuentes discrepan **10×** — pídelo por escrito)
 
@@ -102,7 +102,7 @@ propuesta **y el tamaño del waiver que puedes ofrecer**. Pídeselo al PDM por e
 
 **Casi ningún partner hace esto, y es plata sobre la mesa.**
 
-✅ El **ARPU de HubSpot es $11.722/año**. Un deal de seis cifras es **~10× su cliente promedio**.
+✅ El **ARPU de HubSpot es USD 11.722/año**. Un deal de seis cifras es **~10× su cliente promedio**.
 
 > **Le estás trayendo un outlier. Tienes palanca. Úsala.**
 
@@ -144,7 +144,7 @@ Ponlo en el checklist de cierre, junto a la firma del SOW.
 | **"HubSpot no escala"** | *"'No escala' es una afirmación **sin unidades**. Díganme el número, y si no les damos el ancho **se los digo en esta reunión y no les vendo**."* | `modules/05` § 7 |
 | **"Es más caro que [Microsoft/Zoho/Odoo]"** | **Es cierto. No pelees el precio.** Cambia el eje a adopción, time-to-value y profundidad de marketing | `modules/05` § 4-6 |
 | **"Ya tenemos Salesforce, el costo de cambiar es alto"** | *"El costo de **quedarse** también. ¿Cuánto les cuesta el admin al año? ¿Y los add-ons?"* — **pero primero verifica si ya tienen el admin** | `modules/10` § 1 |
-| **"Con Agentforce tenemos agentes de verdad"** | **Pégale al modelo de precio.** *"Ellos cobran $0,10 por acción. HubSpot cobra $0,50 por conversación **resuelta**. Pagas cuando funciona."* | `modules/01` § 3 |
+| **"Con Agentforce tenemos agentes de verdad"** | **Pégale al modelo de precio.** *"Ellos cobran USD 0,10 por acción. HubSpot cobra USD 0,50 por conversación **resuelta**. Pagas cuando funciona."* | `modules/01` § 3 |
 
 ---
 

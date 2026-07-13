@@ -17,7 +17,7 @@ La revisión del Home público live contra el Why y PDR-012 confirma que el cont
 - PDR-010 y PDR-012 mandan sobre cualquier texto de este documento que suene a landing separada `/agencia`.
 
 > **Skills:** `commercial-expert` (overlay GH), `growth-marketing-cro`, `copywriting`, `digital-marketing`, `seo-aeo`, `product-design-loop`, `efeonce-public-site-wordpress`.
-> **Ejecución:** [`TASK-1358`](../../tasks/to-do/TASK-1358-landing-agencia.md) (+ wireframe + flow + motion). Epic: `EPIC-019`.
+> **Ejecución:** [`TASK-1358`](././tasks/to-do/TASK-1358-landing-agencia.md) (+ wireframe + flow + motion). Epic: `EPIC-019`.
 > **No-duplicación:** el sustrato ya vive en el context pack — este PDR **cita**, no copia: `docs/context/09_marca-agencia.md` (masterbrand + categoría "growth partner"), `docs/context/05_voz-tono-estilo.md` (voz + clichés a evitar), `docs/context/13_icp-buyer-personas-jtbd.md` (ICP mid-market/enterprise + BPs), `docs/context/02_gtm.md`, `docs/context/14_modelo-negocio-asaas.md` (oferta productizada).
 
 ## Contexto
@@ -66,7 +66,7 @@ El scope es **full-service** — creatividad y contenido, **performance marketin
 - Comprador: equipos de marketing **mid-market/enterprise** (ICP `13`). Decisores primarios (comité de compra `13`): **CMO bajo presión de revenue** (BP1), **Dir. Marketing / Head of Growth** (BP2), **CEO/GM** (BP3); validador Compras (BP-procurement). El dolor núcleo es **fragmentación de proveedores + falta de visibilidad de retorno** (no "necesito otra agencia").
 - **Anti-ICP explícito por copy** (mitiga el riesgo #1 de `PDR-001`): sin señales de precio commodity ("desde $X/mes"), sin lenguaje SMB. El posicionamiento premium repele al comprador que el modelo ASaaS no sirve con margen.
 - **Diferenciador que se *demuestra*, no se afirma:** el ecosistema de producto (Greenhouse + Kortex + Verk) y la operación medible en vivo (ICO: RpA/OTD%/FTR, Revenue Enabled) — *"las agencias te entregan informes; nosotros te damos login a tres plataformas donde ves tu operación en tiempo real"* (`09` variante ASaaS). La transparencia operativa como **mínimo, no diferenciador** (`05` creencia 7).
-- **Solo casos citables:** Sky (+127% tráfico orgánico), Bresler (+180% ventas digitales), Pinturas Berel (retainer SEO+AEO), SSilva (CRM). **NUNCA GEA ni cifras infladas** (`13`).
+- **Solo casos citables:** Sky (+127% tráfico orgánico), Bresler (+180% ventas digitales), Pinturas Berel (retainer SEO+AEO). **** (`13`).
 
 ### 4. Marca, conversión y CRO
 
@@ -80,21 +80,21 @@ El scope es **full-service** — creatividad y contenido, **performance marketin
 `/agencia` es un **pillar de nivel superior** (apex, `efeoncepro.com/agencia`), distinto de sus vecinos:
 
 ```text
-efeoncepro.com/  (home)                     marca + ecosistema ASaaS · entrada primaria
-├── /agencia                                PILLAR de categoría · "agencia de marketing digital" · growth partner · full-service
-│     └── reparte ↓ hacia las spokes (link equity + nav)
-├── /servicios                              hub navegacional (SEO-neutro · PDR-002)
-│     ├── /servicios/posicionamiento-seo    spoke SEO (TASK-1343)
-│     ├── /servicios/aeo                    spoke AEO (← 301 /aeo-2)
-│     └── … creativa · redes · web · hubspot
-├── /about-us-efeonce/                      nodo de confianza / E-E-A-T (identidad, no captura de categoría)
-└── think.efeoncepro.com → AI Visibility Grader   NODO de conversión compartido (costura del funnel)
+efeoncepro.com/ (home) marca + ecosistema ASaaS · entrada primaria
+├── /agencia PILLAR de categoría · "agencia de marketing digital" · growth partner · full-service
+│ └── reparte ↓ hacia las spokes (link equity + nav)
+├── /servicios hub navegacional (SEO-neutro · PDR-002)
+│ ├── /servicios/posicionamiento-seo spoke SEO (TASK-1343)
+│ ├── /servicios/aeo spoke AEO (← 301 /aeo-2)
+│ └── … creativa · redes · web · hubspot
+├── /about-us-efeonce/ nodo de confianza / E-E-A-T (identidad, no captura de categoría)
+└── think.efeoncepro.com → AI Visibility Grader NODO de conversión compartido (costura del funnel)
 ```
 
 - **`/agencia` ≠ `/servicios`:** `/servicios` se decidió **navegacional/SEO-neutro** (`PDR-002`); cargarle el head-term "agencia de marketing digital" + la narrativa full-service rompería su rol de directorio. `/agencia` es el **pillar narrativo + puerta SEO de la categoría**, canonical limpio y linkeable; `/servicios` queda como hub funcional. Cross-link explícito entre ambos.
 - **`/agencia` ≠ about-us:** intención de búsqueda distinta (comercial vs marca/navegacional). Un about-us compitiendo por "agencia de marketing digital" pierde ranking por *mismatch* de intención y convierte mal el tráfico frío. El about-us queda como **respaldo E-E-A-T** que `/agencia` enlaza para confianza.
 - **Slug:** `/agencia` (simple, memorable, evergreen) sobre `/agencia-de-marketing-digital` (más literal para SEO pero frágil/largo); el head-term se carga en `<title>`/H1/meta, no en el path (mismo patrón que las spokes: slug categoría, keyword en title). Preferencia del operador confirmada.
-- **Canonical/301:** `/agencia` es página **nueva** → sin 301 entrante. Registrar en el [route-ownership matrix](../../operations/public-site-route-ownership-matrix-20260616.md) (fila service/pillar pages) + SEO preflight (crawl inventory, canonical apex, HubSpot IDs/UTM, GVC desktop+mobile) antes de indexar. Preparar `hreflang`-ready (es-LATAM neutro) para la fase EEUU/mundo (`PDR-002` §alcance regional).
+- **Canonical/301:** `/agencia` es página **nueva** → sin 301 entrante. Registrar en el [route-ownership matrix](././operations/public-site-route-ownership-matrix-20260616.md) (fila service/pillar pages) + SEO preflight (crawl inventory, canonical apex, HubSpot IDs/UTM, GVC desktop+mobile) antes de indexar. Preparar `hreflang`-ready (es-LATAM neutro) para la fase EEUU/mundo (`PDR-002` §alcance regional).
 - **Alcance regional:** copy **es-LATAM neutro** (tuteo, sin voseo, sin chilenismos) — "agencia de marketing digital" es head-term pan-LATAM (gana en EC/MX/CO/PE/AR además de CL). NO hardcodear referencias Chile-only.
 
 ## Consecuencias
@@ -128,7 +128,7 @@ efeoncepro.com/  (home)                     marca + ecosistema ASaaS · entrada 
 - **NUNCA** dejar "somos una agencia de marketing digital" como promesa sin el reencuadre *no-es-X-es-Y* en la misma sección — el H1 captura la keyword; el remate desmarca del commodity.
 - **NUNCA** liderar con siglas/metodologías (ICO/RpA/FTR/Loop) en los primeros 30s — beneficios primero, nombres en el bloque de prueba (`09`).
 - **NUNCA** poner señales de precio commodity ("desde $X/mes") ni lenguaje SMB — repele al ICP mid-market/enterprise.
-- **NUNCA** usar GEA como caso ni inflar cifras — solo casos citables (Sky/Bresler/Berel/SSilva).
+- **NUNCA** inflar cifras — solo casos citables (Sky/Bresler/Berel).
 - **NUNCA** reconstruir/duplicar el nodo grader — se enlaza como diagnóstico compartido (`PDR-002/003`).
 - **NUNCA** nombrar Globe/Reach/Wave solos ni como proveedores separados — masterbrand Efeonce lidera, capabilities descriptivas.
 - **SIEMPRE** copy es-LATAM neutro (tuteo, sin voseo/chilenismos) + `hreflang`-ready.
@@ -140,6 +140,6 @@ efeoncepro.com/  (home)                     marca + ecosistema ASaaS · entrada 
 
 - Posicionamiento/GTM: `docs/context/09_marca-agencia.md`, `05_voz-tono-estilo.md`, `13_icp-buyer-personas-jtbd.md`, `02_gtm.md`, `14_modelo-negocio-asaas.md`.
 - PDR hermanos: [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md) (IA/dos capas), [PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md) (ecosistema), [PDR-004](PDR-004-landing-agencia-creativa-posicionamiento.md) (creativa · patrón de landing de marca).
-- IA/rutas: [route-ownership matrix](../../operations/public-site-route-ownership-matrix-20260616.md).
-- Ejecución: [`TASK-1358`](../../tasks/to-do/TASK-1358-landing-agencia.md) bajo `EPIC-019`.
+- IA/rutas: [route-ownership matrix](././operations/public-site-route-ownership-matrix-20260616.md).
+- Ejecución: [`TASK-1358`](././tasks/to-do/TASK-1358-landing-agencia.md) bajo `EPIC-019`.
 - Skills: `commercial-expert`, `growth-marketing-cro`, `copywriting`, `digital-marketing`, `seo-aeo`, `product-design-loop`, `efeonce-public-site-wordpress`, `greenhouse-ux-writing`.

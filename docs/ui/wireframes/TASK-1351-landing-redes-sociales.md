@@ -24,11 +24,11 @@
 |---|---|---|---|---|
 | 0 | Header | Nav Ohio nativo `header-3` variante clara heredada (sin override, sin sticky custom) | Ohio native header | Tema |
 | 1 | Hero | Promesa outcome+craft+prueba + CTA dual (reunión / auditoría) + proof row | `modern-ui` hero (patrón AEO/SEO), badge flotante | Estático |
-| 2 | Trust strip | Logos citables de clientes (Sky, Bresler, Berel, SSilva…) temprano para bajar barrera | Logo wall con divisores finos | Assets locales de marca |
+| 2 | Trust strip | Logos citables de clientes (Sky, Bresler, Berel…) temprano para bajar barrera | Logo wall con divisores finos | Assets locales de marca |
 | 3 | Stakes | El problema: "manejar redes ≠ construir marca y demanda" (commodity vs medible) | Two-card contrast band | Estático |
 | 4 | Qué incluye | Los 5 bloques de capability como answer capsules: Community Management · Creators/Influencers · Trendjacking · Reels/Contenido · Social listening | Feature card grid (container-query) | Estático |
 | 5 | Muro social vivo (SIGNATURE) | Show-don't-tell: mosaico animado de reels/feed/formatos reales, prueba de craft | Sección firma custom page-scoped (islands ligeras / CSS motion) | Assets art-dirigidos (stack IA propio) |
-| 6 | Prueba | Casos/resultados citables (solo reales; NUNCA GEA) en ledger editorial abierto | Proof shell + ledger (patrón TASK-1343) | Casos reales publicables |
+| 6 | Prueba | Casos/resultados citables (solo reales;) en ledger editorial abierto | Proof shell + ledger (patrón TASK-1343) | Casos reales publicables |
 | 7 | Cómo medimos | Transparencia: presencia/engagement/output medidos, coherente con outcome Efeonce (ICO); el número que prueba que la velocidad no cuesta calidad | Operating row + signal cards | Cifras ilustrativas del modelo (declaradas) |
 | 8 | Puente / cross-sell | Enlace al paraguas Agencia Creativa + servicios hermanos (SEO, desarrollo) | Card-on-section links | Estático |
 | 9 | FAQ | Objeciones y queries reales (answer capsules citables) | `<details>/<summary>` accordion | Semrush `phrase_questions` CL |

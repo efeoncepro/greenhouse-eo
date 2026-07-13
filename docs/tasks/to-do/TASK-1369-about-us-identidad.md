@@ -1,8 +1,8 @@
 # TASK-1369 — About Us: página de identidad (Golden Circle)
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 0 — IDENTITY & TRIAGE
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
@@ -41,8 +41,8 @@ Reconstruye la página pública `/about-us-efeonce/` (page_id 249770) como **pá
 - CTA suave de identidad ("Agenda una reunión" transversal PDR-009 + "Únete al equipo").
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 1 — CONTEXT & CONSTRAINTS
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Architecture Alignment
 
@@ -57,8 +57,7 @@ Reglas obligatorias:
 
 - **Capabilities, no sub-marcas:** NUNCA nombrar Globe/Reach/Wave como marcas/proveedores; describir por función. Los "Empower your…" son la voz de cada capability, no taglines de sub-marca.
 - **Nunca el Why sin su mecanismo** (regla anti-humo del Golden Circle): "co-creación/integralidad/partner" siempre encadenadas a su prueba (login, grader, número, ciclo).
-- **Solo casos citables** (Sky/Bresler/Berel/SSilva). NUNCA GEA.
-- es-LATAM neutro, tuteo, sin voseo; `hreflang`-ready. Voz validada con `greenhouse-ux-writing`.
+- **Solo casos citables** (Sky/Bresler/Berel). - es-LATAM neutro, tuteo, sin voseo; `hreflang`-ready. Voz validada con `greenhouse-ux-writing`.
 
 ## Normative Docs
 
@@ -165,7 +164,7 @@ Reglas obligatorias:
 - Required steps: cargar → scroll por cada `data-capture` → capturar.
 - Required captures: hero, creencias, pilares, un-cerebro, en-vivo, casos, equipo, cierre.
 - Required `data-capture` markers: `about-hero/why/beliefs/pillars/brain/metodo/envivo/medicion/prueba/equipo/cierre`.
-- Assertions: `h1` = el Why (no "se orquesta"); capacidades sin nombres de sub-marca; sin "GEA"; sin scroll horizontal.
+- Assertions: `h1` = el Why (no "se orquesta"); capacidades sin nombres de sub-marca; sin scroll horizontal.
 - Scroll-width checks: `scrollWidth <= viewport` desktop + mobile.
 - Reduced-motion / focus evidence: heading order un solo h1; accordion por teclado.
 
@@ -189,14 +188,14 @@ Reglas obligatorias:
 - Known visual debt: hero sin dirección de arte hasta el follow-up.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     El agente que toma esta task ejecuta Discovery y produce
-     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 2 — PLAN MODE
+ El agente que toma esta task ejecuta Discovery y produce
+ plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+ ═══════════════════════════════════════════════════════════ -->
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 3 — EXECUTION SPEC
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
 
@@ -241,7 +240,7 @@ Página de contenido público (WordPress), aditiva. Riesgo runtime bajo; el ries
 |---|---|---|---|---|
 | Reslug `/nosotros` pierde equity del `/about-us-efeonce/` | SEO / public-site | medium | 301 correcto + registrar en route-ownership matrix + SEO preflight | caída de tráfico/posición del brand SERP |
 | Copy suelta "co-creación/integralidad" sin su mecanismo | marca | medium | regla anti-humo del Golden Circle; revisión `greenhouse-ux-writing` | lectura de humo en review |
-| Bios inventadas o GEA como caso | E-E-A-T / marca | low | empty state = ocultar equipo; solo casos citables | review + GVC assertion "sin GEA" |
+| Bios inventadas o caso sin métrica verificable | E-E-A-T / marca | low | empty state = ocultar equipo; solo casos citables | review + GVC assertion "" |
 | Nombrar unidades como sub-marcas | marca | low | regla dura PDR-008; GVC assertion | review + GVC |
 
 ### Feature flags / cutover
@@ -258,7 +257,7 @@ Página de contenido público (WordPress), aditiva. Riesgo runtime bajo; el ries
 
 ### Production verification sequence
 
-1. Build en borrador WordPress + preview privado; revisar copy vs wireframe (sin GEA, sin sub-marcas).
+1. Build en borrador WordPress + preview privado; revisar copy vs wireframe ( sin sub-marcas).
 2. GVC desktop+mobile en staging del sitio; verificar assertions (h1=Why, sin scroll horizontal).
 3. Publicar; verificar JSON-LD válido (`Organization`+`Person`) con test de datos estructurados.
 4. Aplicar reslug `/nosotros` + 301; verificar redirect 301 y brand SERP.
@@ -270,8 +269,8 @@ Página de contenido público (WordPress), aditiva. Riesgo runtime bajo; el ries
 - Publicación en WordPress + SEO preflight (crawl inventory, canonical, HubSpot IDs/UTM del CTA).
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 4 — VERIFICATION & CLOSING
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 4 — VERIFICATION & CLOSING
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
 
@@ -279,7 +278,7 @@ Página de contenido público (WordPress), aditiva. Riesgo runtime bajo; el ries
 - [ ] Todo el copy visible coincide con el Copy Ledger del wireframe; es-LATAM neutro, sin voseo.
 - [ ] Las capacidades se describen por función; NO aparecen Globe/Reach/Wave como sub-marcas.
 - [ ] "Co-creación/integralidad/partner" aparecen siempre con su mecanismo al lado (regla anti-humo).
-- [ ] Solo casos citables (Sky/Bresler/Berel/SSilva); NO aparece GEA (GVC assertion).
+- [ ] Solo casos citables (Sky/Bresler/Berel); solo casos con **métrica verificable**, **relación vigente o cerrada en buenos términos** y **autorización del cliente** (GVC assertion).
 - [ ] Bloque equipo con bios reales; si faltan, el bloque se oculta (no placeholders).
 - [ ] JSON-LD `Organization` + `Person` válidos; entity capsule presente.
 - [ ] Sin scroll horizontal de página en desktop ni mobile 390px.

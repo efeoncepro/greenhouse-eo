@@ -233,8 +233,17 @@ La visibilidad se escala por tier (alineado con el modelo ASaaS). **Directamente
 
 **Producto/marca:** `Greenhouse` (nunca "Greenhouse EO") · `Kortex` · `Verk` · `Nexa` (capa AI de Greenhouse: Nexa Insights + Nexa Chat; **nunca "Nexus"**, sub-marca deprecada) · Globe · Globe Studio · Efeonce Digital · Reach · Wave.
 
-**Casos citables (reales):** Sky Airlines · Bresler · Pinturas Berel · SSilva Activos Inmobiliarios.
-**Prohibido:** ❌ GEA Grupo / GEA Ambiental (prospecto que nunca cerró; "+340% leads" es métrica falsa).
+**Casos citables (reales):** Sky Airlines · Bresler · Pinturas Berel.
+
+> ⚠️ **SSilva Activos Inmobiliarios (regla 2026-07-13):** el **resultado es real y usable — pero SOLO
+> anonimizado** (ej. *"una inmobiliaria del Cono Sur: Marketing Hub Professional + 35 asientos de Sales"*).
+> **NUNCA con nombre ni testimonio firmado:** la relación quedó fracturada y **no controlamos qué responde
+> si el prospecto llama a pedir referencia** — y en mid-market/enterprise, llaman.
+> *(El testimonio publicado hoy en `/servicios-contratar-hubspot/` además es de **branding**, no de CRM.)*
+>
+> **Regla positiva que reemplaza toda lista negra:** un caso es citable si tiene **(a)** métrica verificable,
+> **(b)** relación vigente o cerrada en buenos términos, y **(c)** autorización del cliente. Si le falta una,
+> se usa anonimizado o no se usa.
 
 | Constante | Valor |
 |---|---|

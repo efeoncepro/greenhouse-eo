@@ -1,9 +1,9 @@
 # TASK-1358 — Landing "Agencia" (`/agencia`) — pillar de categoría + growth partner
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     "Que task es y puedo tomarla?"
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 0 — IDENTITY & TRIAGE
+ "Que task es y puedo tomarla?"
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
@@ -45,8 +45,8 @@ Publicar en WordPress una landing `/agencia/` que:
 4. Nazca `hreflang`-ready (es-LATAM neutro) y con JSON-LD (`Organization`+`Service`+`BreadcrumbList`+`FAQPage`) para descubrimiento humano y agéntico.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 1 — CONTEXT & CONSTRAINTS
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Architecture Alignment
 
@@ -173,14 +173,14 @@ Publicar en WordPress una landing `/agencia/` que:
 - Known visual debt: contrato de Motion pendiente (Slice 2).
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     El agente que toma esta task ejecuta Discovery y produce
-     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 2 — PLAN MODE
+ El agente que toma esta task ejecuta Discovery y produce
+ plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+ ═══════════════════════════════════════════════════════════ -->
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 3 — EXECUTION SPEC
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
 
@@ -188,7 +188,7 @@ Publicar en WordPress una landing `/agencia/` que:
 
 - Crawl vivo de `efeoncepro.com`: confirmar que `/agencia` no colisiona, estado de la nav, equity del about-us para el cross-link. Registrar en el route-ownership matrix.
 - Art direction del hero + sección firma con `product-design-loop` (3 conceptos → el operador elige) y `design-studio`; producir assets con el stack IA propio (evitar "AI slop"); color tokenizado.
-- Definir FAQ data (6 objeciones de categoría) + casos citables a usar (Sky/Bresler/Berel/SSilva).
+- Definir FAQ data (6 objeciones de categoría) + casos citables a usar (Sky/Bresler/Berel).
 
 ### Slice 2 — Copy final (es-LATAM) + contrato de Motion
 
@@ -226,7 +226,7 @@ Publicar en WordPress una landing `/agencia/` que:
 
 Estructura de página (12 regiones, ver [wireframe](../../ui/wireframes/TASK-1358-landing-agencia.md) §Layout Skeleton): Header Ohio → Hero (reframe + 2 CTAs + proof) → Trust bar (logos) → Problema (fragmentación) → Reframe (*no-es-X-es-Y*) → **Motor full-service** (4 capabilities incl. performance, sección firma) → **Diferenciador medible** (ecosistema + ICO ilustrativo, sección firma) → Cómo trabajamos → Casos citables → Ecosistema/foso ASaaS → Para quién (mid-market/enterprise + anti-ICP suave) → CTA `#agenda` (`<greenhouse-form>`) → FAQ (`<details>` + JSON-LD) → Footer Ohio.
 
-Reglas duras de copy (de PDR-008): el H1/section captura la keyword pero **remata con el reframe** que desmarca del commodity; beneficios antes que siglas (ICO/RpA/FTR solo en el bloque de prueba); sin precios commodity; solo casos citables (NUNCA GEA); masterbrand Efeonce lidera (Globe/Reach/Wave nunca solos ni como proveedores separados); es-LATAM neutro; CTA nunca muerto.
+Reglas duras de copy (de PDR-008): el H1/section captura la keyword pero **remata con el reframe** que desmarca del commodity; beneficios antes que siglas (ICO/RpA/FTR solo en el bloque de prueba); sin precios commodity; solo casos citables; masterbrand Efeonce lidera (Globe/Reach/Wave nunca solos ni como proveedores separados); es-LATAM neutro; CTA nunca muerto.
 
 ## Rollout Plan & Risk Matrix
 
@@ -268,15 +268,15 @@ Playwright live sobre preview → SEO preflight (canonical, JSON-LD válido, Hub
 - Confirmar estado del cutover del dispatcher HubSpot (TASK-1264) para el flujo del lead.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 4 — VERIFICATION & CLOSING
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 4 — VERIFICATION & CLOSING
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
 
 - [ ] `/agencia/` publicada en WP, canonical apex, index/follow.
 - [ ] Hero captura la categoría en `<title>`/meta y remata con el reframe growth-partner (no queda "somos una agencia digital" como promesa).
 - [ ] Full-service presentado como un motor incl. **performance marketing** como capability; cada capability enlaza su spoke cuando existe.
-- [ ] Diferenciador medible (ecosistema + ICO ilustrativo declarado) + casos citables (Sky/Bresler/Berel/SSilva), NUNCA GEA.
+- [ ] Diferenciador medible (ecosistema + ICO ilustrativo declarado) + casos citables (Sky/Bresler/Berel)
 - [ ] CTA "Agenda una reunión" funcional (mecanismo resuelto) + fallback `mailto`/`/contacto/`; CTA nunca muerto.
 - [ ] Copy es-LATAM neutro validado con `greenhouse-ux-writing`; beneficios antes que siglas; sin precios commodity.
 - [ ] JSON-LD `Organization`+`Service`+`BreadcrumbList`+`FAQPage` válido; FAQ 1:1 con lo visible.

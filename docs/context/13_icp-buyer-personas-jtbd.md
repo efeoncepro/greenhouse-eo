@@ -106,7 +106,7 @@ Cada job mapea a una capacidad del portal. Esto es lo accionable:
 | "Visibilidad en motores de IA" (AEO) | Métricas AEO (Otterly.ai) expuestas como otra capa del dashboard. |
 | "Una sola fuente de verdad" (BP5) | Confiabilidad del dato = por qué el test coverage en finance/identity no es opcional; revisar arquitectura vigente y `04` antes de tocar esos dominios. |
 
-**Regla para el agente:** antes de construir una feature, pregúntate *de qué BP es el job y en qué tier entró*. Una feature que no sirve a un job de BP1/BP2/BP5/BP6 (los que usan el portal) probablemente no es prioridad. Para casos reales por ICP usa solo los confirmados (`01`/`06`): Sky (Globe ICP3), Bresler, Berel (Digital ICP3/AEO+SEO), SSilva (CRM). **GEA no es caso.**
+**Regla para el agente:** antes de construir una feature, pregúntate *de qué BP es el job y en qué tier entró*. Una feature que no sirve a un job de BP1/BP2/BP5/BP6 (los que usan el portal) probablemente no es prioridad. Para casos reales por ICP usa solo los confirmados (`01`/`06`): Sky (Globe ICP3), Bresler, Berel (Digital ICP3/AEO+SEO). 
 
 ---
 

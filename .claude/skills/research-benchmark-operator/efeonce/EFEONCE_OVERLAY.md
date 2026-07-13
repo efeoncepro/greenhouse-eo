@@ -5,7 +5,7 @@ La skill es genérica y reutilizable, pero Efeonce tiene fuentes, un producto de
 ## Doble audiencia (recordatorio)
 
 - **Para Efeonce (interno):** pitch, GTM, inteligencia competitiva vs. otras agencias, decisiones de servicio/pricing, tendencias.
-- **Para clientes (servicio billable):** benchmark competitivo, AI visibility, market research, VoC, CI continua, data studies. Aplica `../modules/11_RESEARCH_AS_A_SERVICE`.
+- **Para clientes (servicio billable):** benchmark competitivo, AI visibility, market research, VoC, CI continua, data studies. Aplica `./modules/11_RESEARCH_AS_A_SERVICE`.
 
 ## El producto de benchmark real: AI Visibility Grader
 
@@ -30,7 +30,7 @@ Efeonce ya tiene un **benchmark productizado**: el **AI Visibility Grader** (sco
 
 ## Casos y contexto (delegado)
 
-- **ICP/segmentos, casos citables (Sky/Bresler/Berel), naming de métricas** → `efeonce-agency` + `docs/context/` (`06_glosario-metricas`, `13_icp-buyer-personas-jtbd`). **GEA no es caso** (nunca usarlo como prueba).
+- **ICP/segmentos, casos citables (Sky/Bresler/Berel), naming de métricas** → `efeonce-agency` + `docs/context/` (`06_glosario-metricas`, `13_icp-buyer-personas-jtbd`). (nunca usarlo como prueba).
 - **Business lines (Globe/Reach/Wave/Digital)** para segmentar research por unidad → `efeonce-agency`.
 
 ## Research/benchmark como diferenciador comercial
@@ -57,5 +57,5 @@ Aprendizajes canónicos de ese caso (aplican a futuros benchmarks de industria):
 
 ## Cross-links
 
-- Método → `../modules/01`–`11`; AI SoV → `../modules/07`; CI → `../modules/10`; servicio a cliente → `../modules/11`.
+- Método → `./modules/01`–`11`; AI SoV → `./modules/07`; CI → `./modules/10`; servicio a cliente → `./modules/11`.
 - Grader/AEO → `seo-aeo`; datos → `gcp-bigquery`/`greenhouse-ico`/HubSpot; comercial → `commercial-expert`; privacidad → `legal-privacy-ip-operator`; visual → `dataviz`; negocio/ICP → `efeonce-agency`.

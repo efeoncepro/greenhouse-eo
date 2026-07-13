@@ -73,8 +73,8 @@ aunque la marca no, **hay inbound — pero entrando por el problema, no por HubS
 ### Lente 5 · Moneda y sensibilidad de precio
 - ¿HubSpot cotiza en USD o en moneda local en ese mercado?
 - ¿Cuál es el TCO **relativo** al costo de un FTE local? 🎯 **Esta es la lente que más cambia el pitch:**
-  el argumento *"HubSpot te ahorra un admin de $110k/año"* es demoledor en EEUU y **mucho más débil** donde
-  un admin cuesta $25k. **En mercados de salario bajo, el eje del TCO se debilita y el eje de adopción y
+  el argumento *"HubSpot te ahorra un admin de USD 110k/año"* es demoledor en EEUU y **mucho más débil** donde
+  un admin cuesta USD 25k. **En mercados de salario bajo, el eje del TCO se debilita y el eje de adopción y
   velocidad se fortalece.**
 - ¿Compite Odoo u otro ERP local barato? *(En Chile: 32 partners certificados de Odoo ⚠️.)*
 
@@ -145,6 +145,6 @@ Trigger: [...]  ·  🔴 ¿Exige residencia local? [SÍ = DESCALIFICADOR]
 | **Aplicar el playbook de un mercado a otro** | Chile y México tienen el **canal opuesto** con el mismo producto |
 | **Hacer contenidos bottom-funnel sin correr la Lente 1** | 20 búsquedas al mes. Es dinero prendido fuego |
 | **Asumir que un mercado grande = demanda grande** | Brasil es enorme y **podría exigir residencia de datos** — que es un descalificador, no una oportunidad |
-| **Usar el argumento de TCO del admin en mercados de salario bajo** | Si un admin cuesta $25k, tu argumento vale menos de la mitad. **Cambia al eje de adopción** |
+| **Usar el argumento de TCO del admin en mercados de salario bajo** | Si un admin cuesta USD 25k, tu argumento vale menos de la mitad. **Cambia al eje de adopción** |
 | **Hardcodear un país en la skill** | El mercado es **dato**. El método es la doctrina. Un perfil nuevo se agrega, no se reescribe la skill |
 | **Confiar en un perfil viejo** | Los perfiles llevan `as-of` porque **caducan** |

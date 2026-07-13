@@ -58,7 +58,7 @@ Enterprise LATAM → **formal, de usted**.
 
 ### 5 · Moneda y sensibilidad de precio
 🎯 **La lente que más cambia el pitch:** ¿cuánto cuesta un admin de CRM local?
-*"HubSpot te ahorra un admin de $110k/año"* es demoledor en EEUU y **débil donde un admin cuesta $25k**.
+*"HubSpot te ahorra un admin de USD 110k/año"* es demoledor en EEUU y **débil donde un admin cuesta USD 25k**.
 **En mercados de salario bajo: cambia el eje del TCO al eje de adopción y velocidad.**
 ¿Compite un ERP local barato? *(Chile: 32 partners de Odoo.)*
 

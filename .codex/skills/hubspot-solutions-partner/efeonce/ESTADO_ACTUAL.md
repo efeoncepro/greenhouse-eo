@@ -65,8 +65,8 @@ SSilva Marketing Hub cerró en feb-2025 → venció en feb-2026. Los asientos de
 
 ### 🎯 La lectura que sí importa hacia adelante
 **Cada deal que cierres ahora vale el TRIPLE en duración.**
-Un Marketing Hub Pro de $800/mes paga **$160/mes × 36 meses = $5.760** — no $1.920.
-Los dos cross-sells del plan no son solo 160 puntos: son **~$11.500 de comisión a tres años.**
+Un Marketing Hub Pro de USD 800/mes paga **USD 160/mes × 36 meses = USD 5.760** — no USD 1.920.
+Los dos cross-sells del plan no son solo 160 puntos: son **~USD 11.500 de comisión a tres años.**
 
 ⚠️ **2026-08-15:** muere el Provider Program y a los no convertidos se les cortan las comisiones activas.
 **Verificar que ninguna comisión viva siga colgando de ese esquema.**
@@ -105,10 +105,10 @@ Siete meses sin crear uno.**
 | **Ecoriles** (7724659) | Sales Hub Pro + licencias | ✅ desde 03-05-2026 | ✅ Partner admin activo. 🎯 **Sin Marketing Hub** |
 | **BeFUN** (242864773) | **Marketing Hub Pro** (ganado jun-2025) | 🔴 **NO gestionado** | ✅ Partner admin activo → **puntos managed gratis, sin usar** |
 | **GyT Group** (47141477) | 🔴 **sin productos activos** | "gestionado" desde 29-06-2026 | ❌ **CHURNEÓ.** Sin champion interno → cero adopción. **No recuperable** |
-| **GeaAmbiental** (49108807) | suite **Starter** | — | ❌ Acceso desactivado. **Empresa demasiado pequeña** — MRR mínimo |
+| **Cliente pequeño** (Starter) | suite **Starter** | — | ❌ Acceso desactivado. **Empresa demasiado pequeña** — MRR mínimo |
 | **SSilva** (49222084) | Marketing Hub + Sales | — | ❌ Acceso desactivado. **Sigue en HubSpot.** Comisión Provider **vencida** |
 
-**Suscripción propia:** $412/mes — ⚠️ **12 dólares sobre el umbral del waiver de la membership**.
+**Suscripción propia:** USD 412/mes — ⚠️ **12 dólares sobre el umbral del waiver de la membership**.
 ⚠️ Hay un **trial corriendo** que podría estar inflando ese número. **Verificar si son netos post-discount.**
 
 ---
@@ -137,7 +137,7 @@ Siete meses sin crear uno.**
 | Caso | Lección | Dónde vive |
 |---|---|---|
 | **GyT Group** | 🔴 **Sin champion no hay adopción. Sin adopción hay churn.** No es un detalle de delivery: es un **requisito de ICP** | `modules/10` § 0 · `modules/04` |
-| **GeaAmbiental** | ⚠️ **Un cliente muy chico en Starter no paga el costo de servir.** No todo deal que se puede cerrar vale la pena | `modules/04` |
+| **un cliente pequeño** | ⚠️ **Un cliente muy chico en Starter no paga el costo de servir.** No todo deal que se puede cerrar vale la pena | `modules/04` |
 | **SSilva** | 🔴 **La comisión venció por plazo Provider, no por tu gestión.** Verifica el término antes de culpar a tu decisión. *(Lo que sí perdiste al soltarlo: puntos managed, GRR y territorio)* | `modules/03` § 2 · `modules/02` § 1 |
 | **La cartera** | 🔴 **Implementar y soltar.** 100+ implementaciones, **cero puntos managed** | `modules/03` |
 | **El pipeline** | 🔴 **Registrar fuera del CRM te deja ciego al canal** | § 6 |
@@ -147,7 +147,7 @@ Siete meses sin crear uno.**
 ## 8. Lo que está sobre la mesa y no cuesta dinero
 
 1. 🥇 **Dos cross-sells de Marketing Hub Pro** — ANAM y Ecoriles, ambos con Sales Hub y **sin Marketing Hub**,
-   ambos con tu partner admin activo. **160 puntos sourced + ~$11.500 de comisión a 3 años.**
+   ambos con tu partner admin activo. **160 puntos sourced + ~USD 11.500 de comisión a 3 años.**
 2. 🥈 **Registrar a BeFUN como cliente gestionado.** Ya te compró Marketing Hub Pro, ya tienes acceso.
    **Puntos managed que estás regalando.**
 3. 🥉 **El listing del directorio**: 0 reviews, solo español, "Any Budget", 28 servicios, certificaciones solo
@@ -160,8 +160,8 @@ Siete meses sin crear uno.**
 
 | # | Pregunta | Por qué importa |
 |---|---|---|
-| ~~1~~ | ✅ **RESUELTA: Efeonce TIENE la Partner Certification.** → **el waiver del onboarding está disponible y no se está usando** | En un Marketing Hub Pro **borras $3.000 de $9.600 = 31% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. **Ponlo en la primera lámina** → `modules/11` § 2 |
-| 2 | **¿Los $412 son netos post-discount?** ¿El trial que vence los infla? | Define si hay que presupuestar **$4.800/año** de membership |
+| ~~1~~ | ✅ **RESUELTA: Efeonce TIENE la Partner Certification.** → **el waiver del onboarding está disponible y no se está usando** | En un Marketing Hub Pro **borras USD 3.000 de USD 9.600 = 31% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. **Ponlo en la primera lámina** → `modules/11` § 2 |
+| 2 | **¿Los USD 412 son netos post-discount?** ¿El trial que vence los infla? | Define si hay que presupuestar **USD 4.800/año** de membership |
 | 3 | **La lista oficial de growth markets, por escrito** | El ×2 duplica o reduce a la mitad el esfuerzo de cada tier |
 | 4 | **El proceso operativo del shared deal** (Growth Specialist, link de confirmación) | Habilita **toda** la motion de base instalada |
 | 5 | **¿Alguna comisión viva sigue colgando del esquema Provider?** | El Provider Program **muere el 2026-08-15** |

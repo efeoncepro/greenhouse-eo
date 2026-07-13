@@ -12,7 +12,7 @@
 
 **Carga selectiva (uso diario):**
 
-| Si vas a... | Lee |
+| Si vas a. | Lee |
 |---|---|
 | Decidir si una feature vale la pena / priorizar | `00_INDEX` (este archivo) + `02_gtm` + `08_estrategia-comercial` + `13_icp-buyer-personas-jtbd` + `14_modelo-negocio-asaas` |
 | Tocar UX copy, microcopy, vacíos, errores, emails | `05_voz-tono-estilo` + `09_marca-agencia` |
@@ -101,7 +101,6 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 - **Altitud del pack (regla anti-drift).** Este pack fija **dirección estratégica** (negocio, marca, GTM, voz), no **valores de runtime**. Conteos, %, schemas, rutas, gaps abiertos/cerrados, strings de métrica, rótulos de UI y fechas de roadmap **NO se hardcodean aquí** — se referencian al SoT técnico (`CLAUDE.md`, `DESIGN.md`, specs de `docs/architecture/`, el glosario vivo, `project_context.md`). Si un valor de runtime aparece hardcodeado, es drift: reemplazar por puntero. Regla de CLAUDE.md: cuando el pack y el contrato técnico difieran, **prevalece el contrato técnico verificado**.
 - **El producto se llama `Greenhouse`. Nunca "Greenhouse EO".** "EO" es solo la abreviatura del repo en GitHub; no es nombre de producto ni va en UI, docs de cliente ni copy.
 - **RpA = Rounds per Asset** (rondas de revisión por entregable; menor es mejor). El string canónico es "Rounds per Asset". El naming vivo de métricas vive en `06` + el glosario de runtime — no fijar aquí estados de rótulo del dashboard (driftean).
-- **Casos reales y citables:** Sky Airlines, Bresler, Pinturas Berel, SSilva. **GEA Grupo NO es caso** (fue prospecto cotizado que nunca cerró; cualquier métrica tipo "+340% leads" asociada a GEA es falsa y no se usa).
 - **Treatment "tú"** en todo el copy de cliente (el "usted" solo en legales/contratos). Ver `05`.
 - **Dominios canónicos:** Greenhouse → `greenhouse.efeoncepro.com`. Agencia → `efeoncepro.com`. (El corpus antiguo decía `efeonce.com`; queda obsoleto.) Igual léelo desde env var (`NEXT_PUBLIC_APP_URL`), no lo hardcodees.
 
@@ -125,7 +124,7 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 | `11_hubspot-bowtie.md` | Arquitectura HubSpot: 3 pipelines de deals, properties custom, y Bow-tie (lifecycle dual 7/12 stages + motion booleans) con los **internal names exactos** para el sync de Account 360. |
 | `13_icp-buyer-personas-jtbd.md` | ICPs, buyer personas y Jobs-to-be-Done. Traduce dolores comerciales en prioridades de producto por usuario y tier de entrada. |
 | `14_modelo-negocio-asaas.md` | Modelo ASaaS recalibrado: switching cost, self-service, tiers, monetizacion recurrente y roadmap de exposicion/adopcion. |
-| `../operations/EFEONCE_OPERATING_CODE_V1.md` | Codigo operativo interno: hiring, onboarding, performance, rituales y conductas que vuelven cultura el Why. |
+| `./operations/EFEONCE_OPERATING_CODE_V1.md` | Codigo operativo interno: hiring, onboarding, performance, rituales y conductas que vuelven cultura el Why. |
 
 ---
 

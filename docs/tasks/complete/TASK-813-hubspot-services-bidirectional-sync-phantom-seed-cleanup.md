@@ -49,8 +49,8 @@ Hard dep TASK-801 cerrada en `develop` (migration `20260506200742463_task-801-en
 Soft dep TASK-555 sigue pendiente. Si se ejecuta antes de TASK-555, las capabilities de TASK-813 (`commercial.service_engagement.{sync,resolve_orphan,archive_legacy}`) viven temporalmente en namespace `finanzas.*` con TODO de migración.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 0 — IDENTITY & TRIAGE
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
@@ -91,8 +91,8 @@ User hypothesis original ("Greenhouse mapeó contra deals, no contra services") 
 - Reliability signals nuevos: `commercial.service_engagement.sync_lag`, `commercial.service_engagement.organization_unresolved`, `commercial.service_engagement.legacy_residual_reads`.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 1 — CONTEXT & CONSTRAINTS
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Architecture Alignment
 
@@ -186,13 +186,13 @@ Reglas obligatorias:
 - **Operador HubSpot nunca pobló `ef_*` properties**, así que la materialización inicial requerirá heurística + manual queue para los unresolved.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     (Reservada para el agente que toma la task)
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 2 — PLAN MODE
+ (Reservada para el agente que toma la task)
+ ═══════════════════════════════════════════════════════════ -->
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 3 — EXECUTION SPEC
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Execution Spec (Roadmap por slices)
 
@@ -203,12 +203,12 @@ Reglas obligatorias:
 
 -- Reliability metadata para 3 nuevos signals (TASK-807 fallback hasta que cierre)
 INSERT INTO greenhouse_reliability.signals (signal_key, kind, severity, steady_value, subsystem, description) VALUES
-  ('commercial.service_engagement.sync_lag', 'lag', 'warning', 0,
-   'commercial_health', 'Servicios HubSpot 0-162 con last_synced_at > 24h o NULL.'),
-  ('commercial.service_engagement.organization_unresolved', 'drift', 'error', 0,
-   'commercial_health', 'Servicios HubSpot sin organization Greenhouse resoluble por > 7 dias.'),
-  ('commercial.service_engagement.legacy_residual_reads', 'drift', 'error', 0,
-   'commercial_health', 'Filas legacy_seed_archived todavia leidas por consumers downstream.')
+ ('commercial.service_engagement.sync_lag', 'lag', 'warning', 0,
+ 'commercial_health', 'Servicios HubSpot 0-162 con last_synced_at > 24h o NULL.'),
+ ('commercial.service_engagement.organization_unresolved', 'drift', 'error', 0,
+ 'commercial_health', 'Servicios HubSpot sin organization Greenhouse resoluble por > 7 dias.'),
+ ('commercial.service_engagement.legacy_residual_reads', 'drift', 'error', 0,
+ 'commercial_health', 'Filas legacy_seed_archived todavia leidas por consumers downstream.')
 ON CONFLICT (signal_key) DO NOTHING;
 
 -- (no DDL nuevo en core.services — TASK-801 ya agrego engagement_kind y commitment_terms_json)
@@ -220,27 +220,27 @@ Acceptance: 3 reliability signals registrados, queryable desde `/admin/operation
 
 ```bash
 pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
-  scripts/services/archive-legacy-seed.ts --dry-run
+ scripts/services/archive-legacy-seed.ts --dry-run
 ```
 
 Lógica:
 1. SELECT services WHERE `service_id LIKE 'svc-________-____-____-____-____________'` AND `hubspot_service_id IS NULL` AND `created_at::date = '2026-03-16'`.
 2. Esperado: 30 rows.
 3. UPSERT idempotente:
-   ```sql
-   UPDATE greenhouse_core.services SET
-     active = FALSE,
-     status = 'legacy_seed_archived',
-     engagement_kind = 'discovery',  -- TASK-801 column
-     commitment_terms_json = jsonb_build_object(
-       'legacy_seed_origin', '2026-03-16-cross-product',
-       'archived_by_task', 'TASK-813',
-       'archived_at', NOW()::text,
-       'rationale', 'Cross-product service_modules x clients seed sin contraparte HubSpot real'
-     ),
-     updated_at = NOW()
-   WHERE service_id = $1 AND status != 'legacy_seed_archived';
-   ```
+ ```sql
+ UPDATE greenhouse_core.services SET
+ active = FALSE,
+ status = 'legacy_seed_archived',
+ engagement_kind = 'discovery', -- TASK-801 column
+ commitment_terms_json = jsonb_build_object(
+ 'legacy_seed_origin', '2026-03-16-cross-product',
+ 'archived_by_task', 'TASK-813',
+ 'archived_at', NOW::text,
+ 'rationale', 'Cross-product service_modules x clients seed sin contraparte HubSpot real'
+ ),
+ updated_at = NOW
+ WHERE service_id = $1 AND status != 'legacy_seed_archived';
+ ```
 4. Outbox event per row: `commercial.service_engagement.archived_legacy_seed` v1.
 5. Reporte counts pre/post + dry-run mode.
 
@@ -251,15 +251,15 @@ Acceptance: 30 rows con `active=FALSE` + `status='legacy_seed_archived'`. Idempo
 Script idempotente:
 ```bash
 pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
-  scripts/services/backfill-from-hubspot.ts --dry-run
+ scripts/services/backfill-from-hubspot.ts --dry-run
 ```
 
 Lógica:
 1. Llamar HubSpot bridge `GET /v3/objects/0-162?limit=100&properties=hs_name,ef_*,hs_pipeline_stage` (paginado).
 2. Para cada service:
-   - Resolver `space_id` via `organizations.hubspot_company_id`.
-   - Si no resuelve y `ef_organization_id` está poblado, usar ese.
-   - Si no resuelve, mark como `commercial.service_engagement.organization_unresolved` reliability item (no insert; queue manual).
+ - Resolver `space_id` via `organizations.hubspot_company_id`.
+ - Si no resuelve y `ef_organization_id` está poblado, usar ese.
+ - Si no resuelve, mark como `commercial.service_engagement.organization_unresolved` reliability item (no insert; queue manual).
 3. Resolver `module_id` desde `ef_linea_de_servicio` o `ef_servicio_especifico`. Si NULL, default `'unknown'`.
 4. UPSERT vía `syncServicesForCompany` existente.
 5. Reporte: créated / updated / skipped / unresolved.
@@ -270,15 +270,15 @@ Acceptance: 13 de 16 services materializados (los 3 huérfanos quedan en queue m
 
 1. **HubSpot Developer Portal**: agregar suscripciones `p_services.creation`, `p_services.propertyChange`. Target URL: `https://greenhouse.efeoncepro.com/api/webhooks/hubspot-services`.
 2. INSERT en `greenhouse_sync.webhook_endpoints`:
-   ```sql
-   INSERT INTO greenhouse_sync.webhook_endpoints (endpoint_key, provider, auth_mode, signature_secret_ref, ...)
-   VALUES ('hubspot-services', 'hubspot', 'provider_native', 'hubspot-app-client-secret', ...);
-   ```
+ ```sql
+ INSERT INTO greenhouse_sync.webhook_endpoints (endpoint_key, provider, auth_mode, signature_secret_ref, ..)
+ VALUES ('hubspot-services', 'hubspot', 'provider_native', 'hubspot-app-client-secret', ..);
+ ```
 3. Handler `src/lib/webhooks/handlers/hubspot-services.ts`:
-   - Validar firma v3 (clonar de `hubspot-companies.ts`).
-   - Extraer `objectId` per event.
-   - Llamar `syncSingleHubSpotService(objectId)` (nuevo helper, reusa `service-sync.ts`).
-   - Sentry: `captureWithDomain(err, 'commercial', { tags: { source: 'hubspot_services_webhook' }})`.
+ - Validar firma v3 (clonar de `hubspot-companies.ts`).
+ - Extraer `objectId` per event.
+ - Llamar `syncSingleHubSpotService(objectId)` (nuevo helper, reusa `service-sync.ts`).
+ - Sentry: `captureWithDomain(err, 'commercial', { tags: { source: 'hubspot_services_webhook' }})`.
 
 Acceptance: crear/editar service en HubSpot manualmente y ver fila aparecer en Greenhouse < 10s.
 
@@ -298,15 +298,15 @@ Acceptance: deploy ops-worker exitoso, scheduler job creado, primera corrida < 3
 
 ```typescript
 // services-sync-lag.ts
-export async function getServicesSyncLag(): Promise<ReliabilityResult> {
-  const { count } = await runGreenhousePostgresQuery<{ count: number }>(`
-    SELECT COUNT(*) AS count
-    FROM greenhouse_core.services
-    WHERE active = TRUE
-      AND hubspot_service_id IS NOT NULL
-      AND (hubspot_last_synced_at IS NULL OR hubspot_last_synced_at < NOW() - INTERVAL '24 hours')
-  `)
-  return { value: count, severity: count > 0 ? 'warning' : 'ok', ... }
+export async function getServicesSyncLag: Promise<ReliabilityResult> {
+ const { count } = await runGreenhousePostgresQuery<{ count: number }>(`
+ SELECT COUNT(*) AS count
+ FROM greenhouse_core.services
+ WHERE active = TRUE
+ AND hubspot_service_id IS NOT NULL
+ AND (hubspot_last_synced_at IS NULL OR hubspot_last_synced_at < NOW - INTERVAL '24 hours')
+ `)
+ return { value: count, severity: count > 0 ? 'warning' : 'ok', .. }
 }
 ```
 
@@ -390,7 +390,7 @@ Acceptance: contenido en lenguaje simple, sin jerga técnica, operador puede ope
 - **NUNCA** sincronizar Greenhouse → HubSpot `0-162`. Solo back-fill de propiedades `ef_*`.
 - **NUNCA** matchear servicios por nombre (colisión real demostrada: SSilva tiene 3 services HubSpot y 4 services GH con naming diferente).
 - **NUNCA** borrar las 30 filas legacy. Solo archivar.
-- **NUNCA** invocar `Sentry.captureException` directo en code path commercial. Usar `captureWithDomain(err, 'commercial', ...)`.
+- **NUNCA** invocar `Sentry.captureException` directo en code path commercial. Usar `captureWithDomain(err, 'commercial', ..)`.
 - **SIEMPRE** que un consumer Finance/Delivery necesite "el servicio del cliente X período Y", filtrar `WHERE active=TRUE AND status != 'legacy_seed_archived'`. O mejor: crear VIEW `services_active_v1` y consumir solo de ahí.
 
 ## Lessons / Pattern Reuse
@@ -402,8 +402,8 @@ Acceptance: contenido en lenguaje simple, sin jerga técnica, operador puede ope
 - TASK-768 (economic_category dimension separada) — patrón "no mezclar dimensiones ortogonales" (engagement_kind ≠ commercial_terms ≠ outcome).
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 4 — VERIFICATION & CLOSURE
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 4 — VERIFICATION & CLOSURE
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Verification
 

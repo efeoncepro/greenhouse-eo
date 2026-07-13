@@ -11,7 +11,7 @@
 En mid-market y enterprise **nadie compra un CRM: compran salir del problema en el que están.**
 La licencia es la consecuencia de haber ganado el argumento de **cómo se sale**.
 
-Y el arbitraje lo hace concreto: ✅ **HubSpot ya le va a cobrar $3.000-$7.000 de onboarding obligatorio.**
+Y el arbitraje lo hace concreto: ✅ **HubSpot ya le va a cobrar USD 3.000-USD 7.000 de onboarding obligatorio.**
 La pregunta no es si va a pagar por arrancar — es **quién lo va a arrancar**. → `modules/11` § 2.
 
 **Tu diferenciador real, y no es genérico:**
@@ -51,9 +51,9 @@ el proyecto se ponga aburrido. *(Un dashboard que el CEO abre. Un reporte que an
 | Con Apex complejo | 3-6 meses |
 
 ### Costo ⚠️
-Rango **$25.000-$150.000+**. Mid-market con 3-4 integraciones: **$40.000-$75.000**
+Rango **USD 25.000-USD 150.000+**. Mid-market con 3-4 integraciones: **USD 40.000-USD 75.000**
 (migración de datos + config + training + 30 días de hypercare).
-✅ **Más el onboarding obligatorio de HubSpot** ($1.500-$7.000).
+✅ **Más el onboarding obligatorio de HubSpot** (USD 1.500-USD 7.000).
 
 ### 🔴 Qué se rompe — **dilo tú antes de que lo descubran**
 1. **Apex triggers, managed packages, Visualforce.** **No migran.** Se reescriben como workflows o se pierden.

@@ -9,9 +9,9 @@
 
 | Crédito | Puntos | Caduca | Regla rápida |
 |---|---|---|---|
-| **Sourced** | 10 / $100 MRR | 1 año desde el cierre | **1 punto = $10 de MRR** |
-| **Assisted** | 6 / $100 MRR | 1 año desde el cierre | 1 punto = $16,7 |
-| **Managed** | 2 / $100 MRR | 🔴 **60 días desde tu última acción** | **1 punto = $50 de MRR** |
+| **Sourced** | 10 / USD 100 MRR | 1 año desde el cierre | **1 punto = USD 10 de MRR** |
+| **Assisted** | 6 / USD 100 MRR | 1 año desde el cierre | 1 punto = USD 16,7 |
+| **Managed** | 2 / USD 100 MRR | 🔴 **60 días desde tu última acción** | **1 punto = USD 50 de MRR** |
 
 **Umbrales:**
 
@@ -22,8 +22,8 @@
 | Diamond | 950 / 3.100 | 1.250 / 3.750 | ≥75% |
 | Elite | 2.100 / 9.000 | 2.750 / 11.000 | ≥80% + 100 certs + invitación |
 
-**Referencias de producto:** Marketing Hub Pro = **$800/mo = 80 pts sourced** ·
-Marketing Hub Ent = $3.600/mo = 360 pts · Sales Hub Pro = $90/seat/mo = **9 pts por seat**.
+**Referencias de producto:** Marketing Hub Pro = **USD 800/mo = 80 pts sourced** ·
+Marketing Hub Ent = USD 3.600/mo = 360 pts · Sales Hub Pro = USD 90/seat/mo = **9 pts por seat**.
 
 ---
 
@@ -64,13 +64,13 @@ BRECHA SOURCED = umbral_sourced − proyectado_sourced  = ______
 
 ### Paso 5 · Traduce a plata
 ```
-Vía VENTA   →  brecha_total × $10   = $______ de MRR nuevo sourced
-Vía LIBRO   →  brecha_total × $50   = $______ de MRR bajo gestión activa
+Vía VENTA   →  brecha_total × USD 10   = $______ de MRR nuevo sourced
+Vía LIBRO   →  brecha_total × USD 50   = $______ de MRR bajo gestión activa
 ```
 
 ### Paso 6 · Traduce a deals
 ```
-Marketing Hub Pro ($800/mo) = 80 pts   →  brecha ÷ 80 = ____ deals
+Marketing Hub Pro (USD 800/mo) = 80 pts   →  brecha ÷ 80 = ____ deals
 Sales Hub Pro (por seat)    = 9 pts    →  brecha ÷ 9  = ____ seats
 ```
 
@@ -94,10 +94,10 @@ Paso 4   Umbral enero 2027: 345 total / 115 sourced
          BRECHA TOTAL ≈ 345 − 140 = ~205 puntos
          BRECHA SOURCED: 0 (143,58 > 115) ✅
 
-Paso 5   Vía venta:  205 × $10 = $2.050 de MRR nuevo sourced
-         Vía libro:  205 × $50 = $10.250 de MRR bajo gestión
+Paso 5   Vía venta:  205 × USD 10 = USD 2.050 de MRR nuevo sourced
+         Vía libro:  205 × USD 50 = USD 10.250 de MRR bajo gestión
 
-Paso 6   $2.050 ÷ $800 = ~2,5 Marketing Hub Pro
+Paso 6   USD 2.050 ÷ USD 800 = ~2,5 Marketing Hub Pro
 
 Paso 7   ✅ Coherente: el motor de venta está sobre cuota; el que está en cero es el de LIBRO.
 ```
@@ -111,8 +111,8 @@ Paso 7   ✅ Coherente: el motor de venta está sobre cuota; el que está en cer
 
 ```
 Platinum total:  925 hasta el 2026-12-31   →   1.275 desde el 2027-01-15
-Con 196,72 hoy:  brecha de 728  →  $7.283 de MRR sourced
-                 brecha de 1.078 →  $10.783 de MRR sourced   (48% MÁS CARO)
+Con 196,72 hoy:  brecha de 728  →  USD 7.283 de MRR sourced
+                 brecha de 1.078 →  USD 10.783 de MRR sourced   (48% MÁS CARO)
 ```
 > 🎯 **Llegar a Platinum antes de enero cuesta un 48% menos.** Y Platinum abre las **acreditaciones**, que son
 > criterio de prioridad del **Partner Matching**. → `modules/02` § 7.

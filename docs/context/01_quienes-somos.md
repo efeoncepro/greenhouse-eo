@@ -67,8 +67,8 @@ Loop Marketing es el framework estratégico (impulsado por HubSpot como sucesor 
 ICO opera **dos cadenas causales** que se cruzan en cada campaña:
 
 ```
-Producción (eficiencia):  BCS ↑ → FTR ↑ → RpA ↓ → Cycle Time ↓ → TTM ↓ → Revenue Enabled ↑
-Outcome (efectividad):    Insight → Concepto → Ejecución → Distribución → Engagement → Outcome cliente → Revenue Enabled ↑
+Producción (eficiencia): BCS ↑ → FTR ↑ → RpA ↓ → Cycle Time ↓ → TTM ↓ → Revenue Enabled ↑
+Outcome (efectividad): Insight → Concepto → Ejecución → Distribución → Engagement → Outcome cliente → Revenue Enabled ↑
 ```
 
 > Brief más claro (BCS) → más piezas bien a la primera (FTR) → menos rondas (RpA) → ciclo más corto → menor time-to-market → más revenue habilitado. La cadena de outcome mide si la idea, además, mueve el negocio del cliente. **Greenhouse materializa el subconjunto de drivers en el ICO Engine** y el modelo de pesos por rol alimenta los bonos en payroll. El sistema completo (4 dimensiones, ~16+ siglas, umbrales, cláusulas de excepción, tiers de visibilidad) está en `06`.
@@ -84,9 +84,7 @@ Los 4 pilares operativos de ICO (stack real): **Brand Intelligence Hub** (Notion
 | **Sky Airlines** | Chile | +127% tráfico orgánico vs. LATAM Airlines (mercado asimétrico). Cuenta ancla desde 2023. | Modelo de expansión validado: licitación privada → retainer → expansión por trato directo. |
 | **Bresler** | Chile | +180% ventas digitales. | Integración de estrategia creativa con performance. |
 | **Pinturas Berel** | México | Retainer SEO + AEO mensual adjudicado vía licitación (#5234 wherEX, may-2026). | Cuenta ancla en México. Valida la oferta AEO. Cierre directo Efeonce — sin co-selling HubSpot. |
-| **SSilva Activos Inmobiliarios** | — | Reestructuración CRM. | — |
-
-> ⚠️ **GEA Grupo NO es caso.** Fue prospecto cotizado, nunca cerró. No se usa como prueba ni se le atribuye métrica alguna. Ver `00`.
+| **SSilva Activos Inmobiliarios** | Chile | Reestructuración CRM: Marketing Hub Professional + 35 asientos de Sales. | ⚠️ **Solo citable ANONIMIZADO** ("una inmobiliaria del Cono Sur"). Relación fracturada (2026); **nunca con nombre ni testimonio firmado** — no controlamos la referencia. Ver `06`. |
 
 ---
 

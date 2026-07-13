@@ -1,10 +1,10 @@
 # TASK-1352 — Reposicionar la landing HubSpot (`/servicios-contratar-hubspot/`) al mundo Agentic Customer Platform
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     "Que task es y puedo tomarla?"
-     Un agente lee esto primero. Si Lifecycle = complete, STOP.
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 0 — IDENTITY & TRIAGE
+ "Que task es y puedo tomarla?"
+ Un agente lee esto primero. Si Lifecycle = complete, STOP.
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
@@ -69,20 +69,20 @@ partner falso es riesgo de **compliance del programa**, no de marketing.
 
 - ✅ **Se puede afirmar "HubSpot Solutions Partner Gold"** (la página ya lo hace y es cierto).
 - 🔴 **Condición:** revisar el claim en la revisión de tier del **2027-01-15**. Si Efeonce baja de tier, **el
-  badge sale de la página el mismo día**. Registrar el recordatorio en el landing file.
+ badge sale de la página el mismo día**. Registrar el recordatorio en el landing file.
 - Estado real y plan de recuperación: `.claude/skills/hubspot-solutions-partner/efeonce/ESTADO_ACTUAL.md`.
 
-### 🔴 D3 · SSilva NO es caso citable. Va junto a GEA.
+### 🔴 D3 · SSilva no puede ir como testimonio con nombre
 
 La regla actual (§Architecture Alignment) dice *"Solo casos citables (Sky, Bresler, **SSilva**…)"*. **Corregir:**
 
 - **SSilva es la cuenta que Efeonce cortó** (mal pago de servicios, ~1 año). Acceso de partner admin
-  desactivado. **Si un prospecto llama a pedir referencia, no controlamos qué le dicen.**
+ desactivado. **Si un prospecto llama a pedir referencia, no controlamos qué le dicen.**
 - Y el testimonio que hoy está en la página **es de branding**, no de CRM: *"modernizaron nuestra identidad
-  visual… el tono y estilo"*. Igual que el de **Eusari** (*"una idea en papel… narrativa de marca"*).
+ visual… el tono y estilo"*. Igual que el de **Eusari** (*"una idea en papel… narrativa de marca"*).
 - 🔴 **Resultado: hoy la landing de CRM tiene CERO prueba social de CRM.**
 
-→ **NUNCA GEA. NUNCA SSilva.** Conseguir un caso de CRM/HubSpot real con métrica, o usar cifras ilustrativas
+→ **NUNCA SSilva.** Conseguir un caso de CRM/HubSpot real con métrica, o usar cifras ilustrativas
 del modelo **declaradas como tales**.
 
 ### 🎯 D4 · Falta la oferta más fuerte del canal: el **waiver del onboarding**
@@ -179,13 +179,13 @@ movimiento de la página que un competidor no va a copiar.
 
 - Auditoría de la página viva `244079`: REST autenticado (`context=edit`) + captura Playwright, 2026-07-13.
 - Producto, programa y competencia verificados: `.claude/skills/hubspot-solutions-partner/SOURCES.md`
-  (marcado ✅ fuente primaria / ⚠️ secundario / ❌ no publicado; **§ "Datos que NO se citan"**).
+ (marcado ✅ fuente primaria / ⚠️ secundario / ❌ no publicado; **§ "Datos que NO se citan"**).
 - Estado real del partnership: `.claude/skills/hubspot-solutions-partner/efeonce/ESTADO_ACTUAL.md`.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     "Que necesito entender antes de planificar?"
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 1 — CONTEXT & CONSTRAINTS
+ "Que necesito entender antes de planificar?"
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Architecture Alignment
 
@@ -209,10 +209,10 @@ Reglas obligatorias:
 - **NUNCA** presentar la integración interna Greenhouse↔Kortex como productiva (es staging); el claim público es sobre el producto Kortex y su capability de deployment.
 - **NO hardcodear** el roster ni el pricing de Breeze (volátiles; cambiaron a pay-per-result en abr-2026): describir categorías de agentes y el trabajo de gobernarlos; reverificar cualquier cifra de HubSpot (WebSearch) el día de publicación. 🔴 **Solo TRES Breeze Agents están en GA** (Customer, Prospecting, Data); el resto es **beta** → **NUNCA prometer "flota de agentes de IA"**.
 - **Nomenclatura 2026 obligatoria** (Delta D6): **Revenue Hub** (ex-Commerce Hub) · **Data Hub** (ex-Operations Hub) · **UNBOUND** (ex-INBOUND). Usar el nombre viejo delata desactualización.
-- Solo casos/resultados citables (Sky, Bresler…); **NUNCA GEA**; 🔴 **NUNCA SSilva** (Delta D3 — cuenta cortada por mal pago, acceso de partner admin desactivado; no controlamos la referencia; su testimonio actual además es de *branding*, no de CRM); **Berel NO como prueba de co-selling** (se cerró directo, sin PDM). Si no hay resultado citable con número, cifras ilustrativas del modelo declaradas.
+- Solo casos/resultados citables (Sky, Bresler…); 🔴 **NUNCA SSilva** (Delta D3 — cuenta cortada por mal pago, acceso de partner admin desactivado; no controlamos la referencia; su testimonio actual además es de *branding*, no de CRM); **Berel NO como prueba de co-selling** (se cerró directo, sin PDM). Si no hay resultado citable con número, cifras ilustrativas del modelo declaradas.
 - 🎯 **El waiver del onboarding es región obligatoria del copy** (Delta D4): Efeonce está **certificada** → puede entregar el onboarding **en lugar de HubSpot** y **el cargo obligatorio desaparece del contrato del cliente** (USD 3.000 en Marketing Pro = **31% del año 1**; USD 7.000 en Enterprise). **El HubSpot directo no puede igualarlo.** No es "descuento preferente": es un número.
 - 🔴 **Todo número citable debe estar en el HTML servido** (Delta D7): los contadores animados por JS renderizan **`00 %`** sin JavaScript, y los crawlers de IA **no ejecutan JS**. Si la task pide ser citable por motores de respuesta, **un número que solo existe tras ejecutar JS no es citable**.
-- Build spoke Ohio nativo (`template default`, header claro heredado), CSS page-scoped; **NO** `elementor_canvas`, sin header/wrapper overrides. Mutación Elementor vía `Document::save()` (nunca `_elementor_data` directo), snapshot + Kinsta purge + rollback documentado.
+- Build spoke Ohio nativo (`template default`, header claro heredado), CSS page-scoped; **NO** `elementor_canvas`, sin header/wrapper overrides. Mutación Elementor vía `Document::save` (nunca `_elementor_data` directo), snapshot + Kinsta purge + rollback documentado.
 - Ejecutar en el sitio público vía la skill `efeonce-public-site-wordpress`; NO usar AXIS/MUI/`src/lib/copy` (eso es portal).
 - Idioma **es-LATAM neutro** (pan-hispano), tuteo, sin voseo ni chilenismos; preparar `hreflang` desde el build (fase `en-US` futura donde sí hay demanda de partner), sin traducción máquina.
 
@@ -367,14 +367,14 @@ Reglas obligatorias:
 - Known visual debt: ninguna al crear; el diseño final se valida en loop GVC.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     El agente que toma esta task ejecuta Discovery y produce
-     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 2 — PLAN MODE
+ El agente que toma esta task ejecuta Discovery y produce
+ plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+ ═══════════════════════════════════════════════════════════ -->
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 3 — EXECUTION SPEC
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
 
@@ -390,11 +390,11 @@ Reglas obligatorias:
 ### Slice 2 — Copy final (greenhouse-ux-writing)
 
 - Draftear el copy del copy ledger (hero teach-first, las 4 capas con answer capsule, tabla de diferenciación, prueba con Kortex Marketplace + casos, "cómo trabajamos", FAQ) validado con `greenhouse-ux-writing` + context pack 05.
-- Reglas duras: NUNCA tier de partner; NUNCA GEA; Berel no como co-sell; no hardcodear pricing/roster Breeze; solo casos reales publicables; cifras del modelo declaradas como ilustrativas.
+- Reglas duras: NUNCA tier de partner; Berel no como co-sell; no hardcodear pricing/roster Breeze; solo casos reales publicables; cifras del modelo declaradas como ilustrativas.
 
 ### Slice 3 — Build / reposición de la página
 
-- Reescribir las regiones del wireframe en Ohio nativo (`template default`, sin `elementor_canvas`) vía `Document::save()`, evolucionando el Partner Proof Module existente; patrones marketing `modern-ui`; sección firma "stack agéntico"; embed del `<greenhouse-form>` de diagnóstico + link a HubSpot Meetings + fallback.
+- Reescribir las regiones del wireframe en Ohio nativo (`template default`, sin `elementor_canvas`) vía `Document::save`, evolucionando el Partner Proof Module existente; patrones marketing `modern-ui`; sección firma "stack agéntico"; embed del `<greenhouse-form>` de diagnóstico + link a HubSpot Meetings + fallback.
 - On-page SEO/AEO: H1/title del servicio, answer capsules bajo cada H2, internal links (→ AEO, SEO, Agencia Creativa, desarrollo, pillar CRM en Think), markers `data-capture`; preservar canonical de la URL existente.
 
 ### Slice 4 — Form de diagnóstico + structured data
@@ -475,8 +475,8 @@ Reposición aditiva de contenido de una página pública existente (misma URL), 
 - Equipo de delivery: definir el entregable operativo del "diagnóstico de portal HubSpot" antes de prometerlo en producción.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 4 — VERIFICATION & CLOSING
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 4 — VERIFICATION & CLOSING
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
 
@@ -485,7 +485,7 @@ Reposición aditiva de contenido de una página pública existente (misma URL), 
 - [ ] Cada H2 principal tiene una answer capsule (answer-first, 40–60 palabras) citable.
 - [ ] La sección firma "stack agéntico" se anima en default y queda estática (diagrama) bajo `prefers-reduced-motion`, sin degradar CWV (LCP<2.5s / INP<200ms).
 - [ ] La tabla de diferenciación **RevOps consultivo vs RevOps programático** está presente y comunica el mecanismo (definido como configuración versionada, desplegado con trazabilidad, operado por Kortex/Greenhouse), sin superlativos ni denigrar competidores nombrados.
-- [ ] Prueba: **Kortex validado y en el HubSpot Marketplace** (con enlace al listing) + **"HubSpot Solutions Partner Gold"** + casos citables **de CRM/HubSpot** (no de branding); **NUNCA GEA**; 🔴 **NUNCA SSilva**; Berel no como co-sell.
+- [ ] Prueba: **Kortex validado y en el HubSpot Marketplace** (con enlace al listing) + **"HubSpot Solutions Partner Gold"** + casos citables **de CRM/HubSpot** (no de branding); 🔴 **NUNCA SSilva**; Berel no como co-sell.
 - [ ] 🔴 **Delta D1 — ningún claim falso sobre HubSpot.** La página **NO** dice "Líder en CRM según Gartner" (HubSpot es *Niche Player* en el MQ de Sales Force Automation), **NO** cita el Forrester Wave, **NO** afirma **ISO 27001** de HubSpot (solo **SOC 2 Type II / SOC 3**), **NO** promete residencia de datos en LATAM, **NO** promete "flota de agentes de IA" (solo 3 Breeze Agents en GA). ✅ Sí dice **"Leader en B2B Marketing Automation (Gartner, 5.º año)"**.
 - [ ] 🔴 **Delta D2 — el badge Gold tiene fecha de revisión.** El claim "Solutions Partner Gold" queda registrado en el landing file **con recordatorio de revisar el 2027-01-15**; si Efeonce baja de tier, el badge sale de la página ese día.
 - [ ] 🎯 **Delta D4 — la región `waiver` existe** y comunica que el onboarding **obligatorio** de HubSpot **desaparece del contrato** al trabajar con un partner certificado (USD 3.000 en Marketing Hub Pro ≈ **31% del año 1**), con el fee **reverificado el día de publicación**.
@@ -536,5 +536,5 @@ Reposición aditiva de contenido de una página pública existente (misma URL), 
 - ¿Cuál es el link canónico de HubSpot Meetings + UTM para el CTA de reunión? (mismo que Agencia Creativa/Redes Sociales `[verificar]`).
 - ¿Cuál es la URL pública del listing de **Kortex en el HubSpot Marketplace** (para el proof point)?
 - ¿El CORS/surface-allowlist del `<greenhouse-form>` cubre `efeoncepro.com/servicios-contratar-hubspot/*` o hay que agregar el origin (probable gap vs `/servicios/*`)?
-- ¿Qué resultados HubSpot/CRM citables reales tenemos (Sky/Bresler/SSilva u otros)? Si no hay, ¿se aprueban cifras ilustrativas del modelo declaradas?
+- ¿Qué resultados HubSpot/CRM citables reales tenemos (Sky/Bresler u otros)? Si no hay, ¿se aprueban cifras ilustrativas del modelo declaradas?
 - ¿El "diagnóstico de portal HubSpot" existe operativamente? → **RESUELTO (2026-07-07): se construye como EPIC-024 (HubSpot Portal Grader). Fase 1 = self-assessment público sin OAuth — no bloquea esta landing; el CTA interino usa el `<greenhouse-form>`/fallback hasta que la superficie de Think esté live.**

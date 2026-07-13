@@ -1,10 +1,10 @@
 # TASK-1351 — Landing pública de servicio Redes Sociales (`/servicios/redes-sociales`)
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     "Que task es y puedo tomarla?"
-     Un agente lee esto primero. Si Lifecycle = complete, STOP.
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 0 — IDENTITY & TRIAGE
+ "Que task es y puedo tomarla?"
+ Un agente lee esto primero. Si Lifecycle = complete, STOP.
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
@@ -42,9 +42,9 @@ Efeonce presta gestión de redes (Community Management, Creators/Influencers, Tr
 - Entregar al usuario a la oferta de dos escalones —"Agenda una reunión" (HubSpot Meetings) y "Pide una auditoría de tus redes" (`<greenhouse-form>` embebido)— reusando contratos gobernados, con fallback honesto.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     "Que necesito entender antes de planificar?"
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 1 — CONTEXT & CONSTRAINTS
+ "Que necesito entender antes de planificar?"
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Architecture Alignment
 
@@ -62,7 +62,7 @@ Reglas obligatorias:
 - Full API Parity: la captura de lead (auditoría) YA es contrato gobernado (Growth Forms + pipeline); el agendamiento reusa HubSpot Meetings. La landing es cliente, NO owner — NO reconstruir el form ni el agendador. El form `efeonce-social-audit` es una config de form instance del contrato existente (como `efeonce-seo-diagnostic`).
 - Lidera la masterbrand **Efeonce**; capabilities descriptivas ("nuestro equipo de creatividad y contenido"); Globe/Reach nunca solos.
 - Ángulo outcome+craft+prueba; NUNCA liderar con volumen de posts/seguidores ni "somos ágiles" sin prueba.
-- Solo casos/resultados citables (Sky, Bresler, Berel, SSilva…); **NUNCA GEA** ni cifras infladas; si no hay resultado social citable, cifras ilustrativas del modelo declaradas.
+- Solo casos/resultados citables (Sky, Bresler, Berel…); ni cifras infladas; si no hay resultado social citable, cifras ilustrativas del modelo declaradas.
 - Doctrina social 2026 (autenticidad > pulido, social search, community como alcance, micro/nano creadores, watch-time/saves sobre likes) reverificando cifras volátiles antes de citarlas (`social-media-studio/SOURCES.md`).
 - Build spoke Ohio nativo (`template default`, header `header-3` claro heredado), CSS page-scoped; **NO** `elementor_canvas`, sin header/wrapper overrides, sin hero oscuro forzado.
 - Ejecutar en el sitio público vía la skill `efeonce-public-site-wordpress`; NO usar AXIS/MUI/`src/lib/copy` (eso es portal).
@@ -217,14 +217,14 @@ Reglas obligatorias:
 - Known visual debt: ninguna al crear; el diseño final se valida en loop GVC.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     El agente que toma esta task ejecuta Discovery y produce
-     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 2 — PLAN MODE
+ El agente que toma esta task ejecuta Discovery y produce
+ plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+ ═══════════════════════════════════════════════════════════ -->
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 3 — EXECUTION SPEC
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
 
@@ -238,7 +238,7 @@ Reglas obligatorias:
 ### Slice 2 — Copy final (greenhouse-ux-writing)
 
 - Draftear el copy pendiente del copy ledger (hero, los 5 bloques con answer capsule, prueba/casos con números reales, "cómo medimos", FAQ) validado con `greenhouse-ux-writing` + context pack 05.
-- Regla dura: no inventar cifras de resultados; solo casos reales publicables; NUNCA GEA. Cifras de "cómo medimos" declaradas como ilustrativas del modelo.
+- Regla dura: no inventar cifras de resultados; solo casos reales publicables; Cifras de "cómo medimos" declaradas como ilustrativas del modelo.
 
 ### Slice 3 — Build de la página
 
@@ -319,8 +319,8 @@ Cambio aditivo de contenido en el sitio público (nueva ruta), sin runtime de da
 - Equipo de delivery social: definir el entregable operativo de la "auditoría de redes" antes de prometerla en producción.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 4 — VERIFICATION & CLOSING
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 4 — VERIFICATION & CLOSING
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
 
@@ -333,7 +333,7 @@ Cambio aditivo de contenido en el sitio público (nueva ruta), sin runtime de da
 - [ ] CTA dual funciona: "Agenda una reunión" → HubSpot Meetings + UTM; "Pide una auditoría de tus redes" → `<greenhouse-form>` embebido con fallback honesto si no carga.
 - [ ] NO se reconstruyó el form ni el agendador; la captura reusa el contrato gobernado (Full API Parity por reuso); HubSpot delivery del form `disabled` hasta cutover.
 - [ ] Lidera la marca Efeonce (Globe/Reach no aparecen solos); copy es-LATAM neutro sin voseo, sin clichés de voz (context pack 05); sin cifras inventadas; validado `greenhouse-ux-writing`.
-- [ ] Solo casos/resultados citables (NUNCA GEA); cifras de "cómo medimos" declaradas como ilustrativas.
+- [ ] Solo casos/resultados citables; cifras de "cómo medimos" declaradas como ilustrativas.
 - [ ] FAQ poblado con queries reales (Semrush `phrase_questions` CL).
 - [ ] Internal links a `/agencia-creativa`, servicios hermanos y guía pillar en Think presentes.
 - [ ] GVC desktop + mobile capturado y mirado; sin scroll horizontal (1440 y 390px); reduced-motion respeta el contenido; muro en movimiento evidenciado en 2+ frames.
@@ -371,5 +371,5 @@ Cambio aditivo de contenido en el sitio público (nueva ruta), sin runtime de da
 ## Open Questions
 
 - ¿Cuál es el link canónico de HubSpot Meetings + UTM para el CTA de reunión? (mismo que Agencia Creativa `[verificar]`).
-- ¿Qué resultados sociales citables reales tenemos (Sky/Bresler/Berel/SSilva u otros)? Si no hay, ¿se aprueban cifras ilustrativas del modelo declaradas?
+- ¿Qué resultados sociales citables reales tenemos (Sky/Bresler/Berel u otros)? Si no hay, ¿se aprueban cifras ilustrativas del modelo declaradas?
 - ¿El entregable de la "auditoría de redes" existe operativamente o requiere definirse antes de prometerlo? Resolver antes de Slice 4.

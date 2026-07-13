@@ -36,7 +36,7 @@
 hay en el directorio, qué tiers, y **quién rankea para `crm para empresas` y `software crm`** — que es donde
 está la demanda real.
 
-**Esa keyword tiene CPC de $4,24** ⚠️: hay gente pagando por ella. Vale la pena ver quiénes.
+**Esa keyword tiene CPC de USD 4,24** ⚠️: hay gente pagando por ella. Vale la pena ver quiénes.
 
 ---
 
@@ -60,9 +60,9 @@ que el chileno** — no relajes el trato.
 ## 5. Moneda y sensibilidad de precio
 
 - HubSpot cotiza en **USD**.
-- ⚠️ **El eje del TCO se debilita**, igual que en Chile: un admin de CRM local no cuesta $110k.
+- ⚠️ **El eje del TCO se debilita**, igual que en Chile: un admin de CRM local no cuesta USD 110k.
   **Cambia el eje a adopción y time-to-value.**
-- ⚠️ **CPC alto en las keywords de problema** ($4,24 en `crm para empresas`): el mercado está siendo
+- ⚠️ **CPC alto en las keywords de problema** (USD 4,24 en `crm para empresas`): el mercado está siendo
   trabajado. **No es un océano azul — es un mercado con demanda real y competencia real.**
 
 ---
@@ -96,7 +96,7 @@ residencia local de datos**, porque ✅ **HubSpot no tiene datacenter en LATAM**
 | **Aplicar el playbook de Chile tal cual** | 🔴 **En Chile el inbound es plata quemada. Acá NO.** Es el error inverso, y cuesta igual |
 | **Entrar por la marca** | Entra por el **problema**. `crm para empresas` = 1.600/mes; `hubspot partner` = 30 |
 | **Asumir que Berel prueba que el canal partner funciona en México** | Fue un **cierre directo**. No hay evidencia del canal acá |
-| **Subestimar la competencia inbound** | CPC de $4,24. **Hay gente pagando.** No es un océano azul |
+| **Subestimar la competencia inbound** | CPC de USD 4,24. **Hay gente pagando.** No es un océano azul |
 | **Liderar con el TCO del admin** | Se debilita, igual que en Chile |
 
 ---

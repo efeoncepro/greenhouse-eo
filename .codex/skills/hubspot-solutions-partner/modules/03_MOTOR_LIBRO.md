@@ -13,7 +13,7 @@ estaban 30% sobre la cuota de Gold. Fue de **libro**: managed points = **0**. Ve
 
 | Propiedad | Valor | Implicación |
 |---|---|---|
-| Rendimiento | **2 pts / $100 MRR** en growth market (1 fuera) | 5× menos eficiente por dólar que sourced |
+| Rendimiento | **2 pts / USD 100 MRR** en growth market (1 fuera) | 5× menos eficiente por dólar que sourced |
 | **Caducidad** | 🔴 **60 días desde tu última acción sobre la cuenta** | **No expira mientras la toques.** Es la única fuente de puntos que **no te obliga a correr** |
 | Requisito | Ser **partner admin** de la cuenta y **actuar** sobre ella | Un cliente que paga y del que no eres admin te da comisión pero **cero puntos** |
 
@@ -25,7 +25,7 @@ una cadencia. Ese asimetría es toda la tesis del módulo.
 
 ### La cuenta que nadie hace
 
-Un libro de **$20.000 de MRR** gestionado activamente en LATAM = **400 puntos managed permanentes**.
+Un libro de **USD 20.000 de MRR** gestionado activamente en LATAM = **400 puntos managed permanentes**.
 Eso es, por sí solo, **más que el umbral total de Gold (345 desde enero 2027)** — sin vender nada.
 
 ---
@@ -125,23 +125,23 @@ Hoy Efeonce es Gold y el GRR **no lo gatea**. Pero:
 ## 5. Expansión — el health check es el motor de cross-sell
 
 Bajo el **deal-based model**, un cross-sell a un cliente que ya administras **te paga como sourced**
-(10 pts/$100 en LATAM) *y* engorda tu managed MRR. **Es la jugada más eficiente que existe en el programa:**
+(10 pts/USD 100 en LATAM) *y* engorda tu managed MRR. **Es la jugada más eficiente que existe en el programa:**
 suma a los dos motores con un solo movimiento, sobre alguien que ya te dio acceso a su portal.
 
 ### Matriz de señal → oferta
 
 | Lo que ves en el portal | Lo que significa | Qué le vendes |
 |---|---|---|
-| Tiene Sales Hub, **no tiene Marketing Hub** | Su pipeline no se alimenta solo | **Marketing Hub Pro** ($800/mo = **80 pts**). Entra por la **cuña AEO** → `07` |
+| Tiene Sales Hub, **no tiene Marketing Hub** | Su pipeline no se alimenta solo | **Marketing Hub Pro** (USD 800/mo = **80 pts**). Entra por la **cuña AEO** → `07` |
 | Marketing sin **HubSpot AEO** activo | Su tráfico orgánico se cae (−27% YoY es el dato de HubSpot) y no aparece en ChatGPT | AEO — **viene incluido en Marketing Pro/Ent** ✅. Es un argumento de *upgrade*, no de add-on |
-| Tickets por email suelto, sin Service Hub | Servicio invisible, sin SLA | **Service Hub** + Customer Agent ($0,50/resolución ✅) |
+| Tickets por email suelto, sin Service Hub | Servicio invisible, sin SLA | **Service Hub** + Customer Agent (USD 0,50/resolución ✅) |
 | Datos sucios, duplicados, sync manual | Su CRM está podrido | **Data Hub** + Data Agent |
 | Quotes en Word/Excel, descuentos sin control | Fuga de margen | **Revenue Hub** (CPQ, contratos, e-signature) |
 | Seats sin usar | Está pagando por aire | **No le vendas: quítaselo.** Genera la confianza que financia los otros cinco |
 | Créditos agotados / topando el tier | Está usando Breeze de verdad | Upgrade de tier o capacity pack |
 
 > **El último punto no es blando, es estratégico.** El partner que dice *"desactiva esos 4 seats, te estás
-> gastando $600 al año en nada"* se gana el derecho a decir *"y ahora súbete a Marketing Hub"*.
+> gastando USD 600 al año en nada"* se gana el derecho a decir *"y ahora súbete a Marketing Hub"*.
 
 ---
 
@@ -168,7 +168,7 @@ adopción y uso de seats → lo que funcionó → lo que está roto → el riesg
 | **Cortar licencia por un problema de servicio** | Pierdes comisión + puntos + GRR, y regalas la cuenta a otro partner (§ 2) |
 | **"Cliente gestionado" sin productos activos** | Es una fila en un reporte, no un activo. Genera **cero** puntos. Si aparece uno, **investígalo hoy** |
 | **Implementar y soltar** | La implementación es el evento; el libro es el negocio. Un cliente implementado y no gestionado es un activo que se te evapora en 60 días |
-| **Medir el libro en número de clientes** | **Se mide en MRR gestionado.** Tres clientes con Sales Hub Pro para 2 seats no son un libro: son ~$400 de MRR = 8 puntos |
+| **Medir el libro en número de clientes** | **Se mide en MRR gestionado.** Tres clientes con Sales Hub Pro para 2 seats no son un libro: son ~USD 400 de MRR = 8 puntos |
 | **Esperar a que el cliente pida el QBR** | No lo va a pedir. Y cuando llame, será para cancelar |
 | **Dejar de ser partner admin "para no molestar"** | Sin acceso de admin no hay acción, sin acción no hay puntos. **El acceso ES el activo** |
 

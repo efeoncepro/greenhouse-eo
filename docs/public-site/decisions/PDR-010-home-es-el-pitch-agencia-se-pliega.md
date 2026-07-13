@@ -31,13 +31,13 @@ Conclusión operativa: **el Home no requiere un retoque de copy; requiere rework
 ## Decisión
 
 1. **La Home ES el pitch de la agencia.** El copy trabajado "para `/agencia`" se convierte en el copy de la Home. La Home absorbe las tres funciones que PDR-008 le asignó a `/agencia`:
-   - **Posicionamiento de categoría** (growth partner con sistema propio, no commodity).
-   - **Captura del head term** "agencia de marketing digital" (~2.400/mes de cluster de categoría, Semrush CL) en `<title>`/H1/meta de la Home — es la página con más autoridad del sitio, el mejor candidato para rankearlo.
-   - **Repartición de link equity** hacia las spokes `/servicios/*`.
+ - **Posicionamiento de categoría** (growth partner con sistema propio, no commodity).
+ - **Captura del head term** "agencia de marketing digital" (~2.400/mes de cluster de categoría, Semrush CL) en `<title>`/H1/meta de la Home — es la página con más autoridad del sitio, el mejor candidato para rankearlo.
+ - **Repartición de link equity** hacia las spokes `/servicios/*`.
 
 2. **`/agencia` como URL separada no se construye.** Su contenido vive en la Home. **TASK-1358 se reorienta** de "crear `/agencia`" a "rework de la Home como el pitch". No se crea una página near-duplicada (habría sido canibalización de keyword Home↔`/agencia`).
 
-3. **Toda la doctrina de PDR-008 sigue vigente — solo cambia el contenedor.** El reencuadre *no-es-X-es-Y*, las dos capas (posicionamiento vs descubrimiento), el anti-ICP (sin señales de precio SMB), los casos citables (Sky/Bresler/Berel/SSilva, NUNCA GEA), las reglas de voz es-LATAM, el JSON-LD (`Organization`+`Service`), la doctrina CRO y el grader como nodo compartido — **se aplican a la Home**.
+3. **Toda la doctrina de PDR-008 sigue vigente — solo cambia el contenedor.** El reencuadre *no-es-X-es-Y*, las dos capas (posicionamiento vs descubrimiento), el anti-ICP (sin señales de precio SMB), los casos citables (Sky/Bresler/Berel), las reglas de voz es-LATAM, el JSON-LD (`Organization`+`Service`), la doctrina CRO y el grader como nodo compartido — **se aplican a la Home**.
 
 4. **La Home vende el sistema, no el catálogo interno.** Tras PDR-012, el encuadre público de la Home es **Growth Operating System / ASaaS**: estrategia, creatividad, medios, datos y software propio como una sola operación. Eso NO significa convertir la Home en una página de producto ni listar Greenhouse/Kortex/Verk como inventario. La Home debe vender el mecanismo y la prueba; el detalle de identidad (4 unidades, ICO, Loop Marketing, ecosistema de producto nombrado) va al About Us.
 
@@ -77,11 +77,11 @@ La Home no es un tercer género de página: es la fachada = el pitch.
 - **NUNCA** meter el material de identidad profunda (4 unidades, ICO, Loop, Greenhouse/Kortex/Verk nombrados como catálogo) en la Home — va al About Us. La Home conserva el mecanismo: operación visible, software propio, datos, aprendizaje y memoria.
 - **NUNCA** dejar residuos de template o demo (`Quality fonts`, `WooCommerce`, `WPBakery`, ThemeForest reviews, links a demos/theme docs, categorías dummy) en contenido visible/indexable.
 - **SIEMPRE** preservar la doctrina de PDR-008 (dos capas, anti-ICP, casos citables, voz es-LATAM, JSON-LD, CRO, grader compartido) aplicada a la Home.
-- **SIEMPRE** registrar el cambio de owner de ruta (`/agencia` → no se crea; Home asume el rol) en el [route-ownership matrix](../../operations/public-site-route-ownership-matrix-20260616.md) antes de indexar.
+- **SIEMPRE** registrar el cambio de owner de ruta (`/agencia` → no se crea; Home asume el rol) en el [route-ownership matrix](././operations/public-site-route-ownership-matrix-20260616.md) antes de indexar.
 
 ## Enlaces
 
 - Refina: [PDR-008](PDR-008-landing-agencia-marketing-digital-posicionamiento.md) (ver su Delta 2026-07-08).
 - Hermanos: [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md) (IA/dos capas), [PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md) (ecosistema/capas).
-- Ejecución: [`TASK-1358`](../../tasks/to-do/TASK-1358-landing-agencia.md) reorientada (Home = pitch). About Us → PDR + task por definir.
+- Ejecución: [`TASK-1358`](././tasks/to-do/TASK-1358-landing-agencia.md) reorientada (Home = pitch). About Us → PDR + task por definir.
 - Contexto: `docs/context/09_marca-agencia.md`, `05_voz-tono-estilo.md`, `13_icp-buyer-personas-jtbd.md`.

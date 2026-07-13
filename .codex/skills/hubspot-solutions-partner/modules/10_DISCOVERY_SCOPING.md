@@ -42,7 +42,7 @@ causa técnica. **El 75%+ de los fracasos son de personas y proceso, no de tecno
 Si no haces estas tres en la **primera** llamada, vas a descubrir la respuesta en la propuesta — tarde.
 
 ### 1️⃣ *"¿Ya tienen un admin de Salesforce en planilla?"*
-🔴 **El delta de TCO contra Salesforce lo hace el admin, no la licencia** ($162k vs $189k a 3 años = **17%**).
+🔴 **El delta de TCO contra Salesforce lo hace el admin, no la licencia** (USD 162k vs USD 189k a 3 años = **17%**).
 Si ya lo tienen y no lo van a despedir, **la mitad de tu argumento se cae.**
 **Mejor saberlo ahora que en el comité.** Y si la respuesta es sí → cambia el eje a **adopción y velocidad**.
 
@@ -64,7 +64,7 @@ descalificar honestamente**, y **desarma la objeción antes de que la levanten**
 **Cada línea que no preguntes es margen que pagas tú.**
 
 ### Seats
-- ¿Cuántas personas necesitan **crear/editar** vs solo **ver**? *(View-only seats: **$0** ✅ — regálalos)*
+- ¿Cuántas personas necesitan **crear/editar** vs solo **ver**? *(View-only seats: **USD 0** ✅ — regálalos)*
 - ¿Cuántas van a crear/editar **quotes**? → **necesitan Revenue Seat** ✅
 - ¿Cuántas usan Sales Hub Pro/Ent? → **Sales Seat**. ¿Service? → **Service Seat**
 - ⚠️ **Multi-hub:** el accounting de core seats cross-hub es **ambiguo en la web pública**.
@@ -73,19 +73,19 @@ descalificar honestamente**, y **desarma la objeción antes de que la levanten**
 ### Contactos de marketing
 - ¿Cuántos contactos **comercializables** tienen hoy? *(No cuántos contactos: cuántos **marketing contacts**)*
 - 🔴 **¿A cuántos van a llegar en 12 meses?** Los saltos son **escalonados**: un Pro que pasa de 2.000 a
-  2.001 salta **+$250/mo** ✅. **Modela el crecimiento, no la foto.**
+  2.001 salta **+USD 250/mo** ✅. **Modela el crecimiento, no la foto.**
 - ¿Cuántos emails mandan al mes? ✅ El cap es **10× (Pro)** / **20× (Ent)** el tier de contactos.
   **Si lo exceden, el modelo de precio no les sirve.**
 
 ### Créditos de Breeze
-- ¿Van a usar Customer Agent? → **$0,50 por conversación resuelta** ✅. ¿Cuántas conversaciones al mes?
-- ¿Prospecting Agent? → **$1,00 por lead recomendado** ✅
+- ¿Van a usar Customer Agent? → **USD 0,50 por conversación resuelta** ✅. ¿Cuántas conversaciones al mes?
+- ¿Prospecting Agent? → **USD 1,00 por lead recomendado** ✅
 - 🔴 **Los créditos NO se suman entre hubs.** Cuatro hubs Enterprise = **5.000 créditos, no 20.000** ✅.
   **Y no hay rollover.** Si cotizaste sobre la suma, la diferencia sale de tu bolsillo.
 
 ### Onboarding
-- 🔴 **Es obligatorio en Pro y Enterprise** ✅. Marketing: **$3.000 / $7.000**. Sales y Service: $1.500 / $3.500.
-- ❌ **El fee del bundle Customer Platform NO está publicado.** Es la diferencia entre $7K y $14K+ en la
+- 🔴 **Es obligatorio en Pro y Enterprise** ✅. Marketing: **USD 3.000 / USD 7.000**. Sales y Service: USD 1.500 / USD 3.500.
+- ❌ **El fee del bundle Customer Platform NO está publicado.** Es la diferencia entre USD 7K y USD 14K+ en la
   primera factura. **Pídelo por escrito antes de cotizar.** → `modules/11` § 2 (el arbitraje).
 
 ### Implementación
@@ -109,7 +109,7 @@ descalificar honestamente**, y **desarma la objeción antes de que la levanten**
 | ¿Exigen **residencia de datos** en LATAM/Brasil/UK/India? | Sí | ❌ **No existe.** Y con HIPAA activo, **nunca** puedes migrar de datacenter |
 | ¿Necesitan **sync bidireccional en tiempo real** con ERP o core bancario? | Sí | ❌ Límites de API. 🔴 Las apps públicas OAuth topan en **110 req/10s** y **el add-on NO lo levanta** |
 | ¿Tienen **territory management** o jerarquía de roles compleja? | Sí | ❌ ⚠️ HubSpot tiene teams + permission sets, **no role hierarchy** |
-| ¿**Cuántos contactos B2C**? | Millones | ❌ Ent a 500K+ = $60 por cada 10.000. **Adobe/Salesforce salen más baratos a escala** |
+| ¿**Cuántos contactos B2C**? | Millones | ❌ Ent a 500K+ = USD 60 por cada 10.000. **Adobe/Salesforce salen más baratos a escala** |
 | ¿Corren **D365 Finance/Supply Chain**? | Sí | ❌ **Retírate.** El CRM en Dataverse es legítimo |
 | ¿Corren **AEM + Analytics + Target** con equipo? | Sí | ❌ Casa Adobe real. *(⚠️ **Creative Cloud NO cuenta**)* |
 | ¿**Cuántas personas** y hay **equipo de marketing**? | <30 y no | ❌ Zoho/Pipedrive es más barato **y tienen razón** |
@@ -162,7 +162,7 @@ es una auditoría.**
 
 | Anti-patrón | Costo |
 |---|---|
-| **Cotizar sin preguntar por el crecimiento de la base de contactos** | +$250/mo de sorpresa en el mes 3 |
+| **Cotizar sin preguntar por el crecimiento de la base de contactos** | +USD 250/mo de sorpresa en el mes 3 |
 | **Sumar créditos entre hubs** | La diferencia sale de tu bolsillo |
 | **Olvidar el onboarding fee** | La conversación de la primera factura es horrible |
 | **Cotizar multi-hub sin cotización oficial** | El accounting de seats cross-hub es ambiguo |

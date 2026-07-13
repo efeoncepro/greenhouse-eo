@@ -144,4 +144,4 @@ sin usarse todos los meses.
 | **Trabajar un deal sin POI firmado** | **Best Partner Wins.** Puedes perder seis meses de trabajo ante quien firmó primero |
 | **Mandar el grader con datos `unknown`** | Un dato malo en una reunión enterprise cuesta más que no tener dato |
 | **Prometer una posición en un LLM** | Nadie controla lo que responde un LLM. Prometes medición y mejora relativa |
-| **Usar el argumento del admin de $110k en un mercado de salario bajo** | Se debilita. Cambia al eje de adopción → `modules/06` Lente 5 |
+| **Usar el argumento del admin de USD 110k en un mercado de salario bajo** | Se debilita. Cambia al eje de adopción → `modules/06` Lente 5 |

@@ -4,7 +4,7 @@
 > **Traducción: dos o tres Marketing Hub Pro.** No es una hazaña. Es un trimestre normal de una práctica viva.
 >
 > 🎯 **Y ahora valen el triple:** como Solutions Partner, un deal sourced paga **36 meses** de comisión,
-> no los 12 de la era Provider. **Los dos cross-sells del Carril A valen ~$11.500 a tres años.**
+> no los 12 de la era Provider. **Los dos cross-sells del Carril A valen ~USD 11.500 a tres años.**
 
 ---
 
@@ -12,8 +12,8 @@
 
 | # | Acción | Por qué ahora |
 |---|---|---|
-| 1 | ✅ **Partner Certification: LA TIENEN.** Poner el **waiver del onboarding** en la primera lámina de toda propuesta | En un Marketing Hub Pro le **borras $3.000 de un costo anual de $9.600 = 31% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. Es el cierre de A1 y A2. **Hoy no está en el pitch** → `modules/11` § 2 |
-| 2 | **Verificar si los $412 son netos post-discount** y si el trial que vence los infla | El waiver de la membership exige **>$400 neto**. Si cae, son **$4.800/año** |
+| 1 | ✅ **Partner Certification: LA TIENEN.** Poner el **waiver del onboarding** en la primera lámina de toda propuesta | En un Marketing Hub Pro le **borras USD 3.000 de un costo anual de USD 9.600 = 31% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. Es el cierre de A1 y A2. **Hoy no está en el pitch** → `modules/11` § 2 |
+| 2 | **Verificar si los USD 412 son netos post-discount** y si el trial que vence los infla | El waiver de la membership exige **>USD 400 neto**. Si cae, son **USD 4.800/año** |
 | 3 | 🥇 **Registrar a BeFUN como cliente gestionado** | Ya te compró Marketing Hub Pro. Ya tienes partner admin. **Estás regalando puntos managed.** Cuesta cero |
 | 4 | **Mail al PDM (Simón Suárez)** con las 6 preguntas de `ESTADO_ACTUAL.md` § 9 | La lista de growth markets y el proceso del *shared deal* **desbloquean todo lo demás** |
 | 5 | **Pedir 5-10 reviews del directorio** a clientes actuales y pasados | Cuesta **un email**. Es criterio del Partner Matching. **Cero reviews con 6 años es la señal más cara que estás emitiendo** |
@@ -28,7 +28,7 @@
 ### A1 · ANAM — Marketing Hub Pro
 - **Hoy:** Sales Hub Professional + créditos + Service Hubs (ganado en marzo por USD 8.400). **Sin Marketing Hub.**
 - **Eres partner admin.** Ya tienes acceso al portal.
-- **$800/mo = 80 puntos sourced + $5.760 de comisión a 3 años.**
+- **USD 800/mo = 80 puntos sourced + USD 5.760 de comisión a 3 años.**
 - **La entrada:** 🎯 **corre el AI Visibility Grader sobre ANAM y sus competidores.**
   *"Su pipeline de ventas está ordenado. Pero cuando su comprador le pregunta a ChatGPT quién hace lo suyo,
   aparece [competidor] y ustedes no. El 27% del tráfico orgánico se evaporó este año — el dato es de HubSpot.
@@ -37,7 +37,7 @@
 
 ### A2 · Ecoriles — Marketing Hub Pro
 - **Hoy:** Sales Hub Professional + licencias. **Sin Marketing Hub.**
-- **Misma jugada. Mismo guion. Otros 80 puntos y otros $5.760.**
+- **Misma jugada. Mismo guion. Otros 80 puntos y otros USD 5.760.**
 
 **A1 + A2 = 160 de los ~205 puntos**, sobre dos clientes que **ya te dieron acceso a su portal**.
 
@@ -70,7 +70,7 @@ Cada uno que se reactive es managed MRR que **no expira mientras lo toques**.
 |---|---|---|
 | **SSilva** | Sigue en HubSpot. **La comisión venció por plazo Provider** — no hay comisión que recuperar. Relación desgastada | ⚠️ **Decide explícitamente.** Si la sueltas, la sueltas sabiendo que bajo **Best Partner Wins** otro partner puede firmarla y cross-venderle un Hub |
 | **GyT Group** | ❌ **Churneó. Sin champion, cero adopción. No recuperable** | **Limpia el registro**: figura como "cliente gestionado" sin productos activos. Es un fantasma en tu reporte |
-| **GeaAmbiental** | ❌ Starter, empresa demasiado pequeña. **El costo de servir supera el retorno** | Cierra el caso. **No es tu ICP** |
+| **un cliente pequeño** | ❌ Starter, empresa demasiado pequeña. **El costo de servir supera el retorno** | Cierra el caso. **No es tu ICP** |
 
 > **Las tres son lecciones, no recuperaciones.** Están en la skill como doctrina de calificación
 > (`modules/04`, `modules/10` § 0) para que no se repitan.
@@ -110,12 +110,12 @@ todas**, mientras había clientes con un solo Hub esperando un cross-sell.
 
 | Camino | Puntos | Comisión a 3 años | Costo |
 |---|---|---|---|
-| **A1 · Marketing Hub Pro → ANAM** | **+80** | **+$5.760** | Una conversación con un cliente que ya administras |
-| **A2 · Marketing Hub Pro → Ecoriles** | **+80** | **+$5.760** | Ídem |
+| **A1 · Marketing Hub Pro → ANAM** | **+80** | **+USD 5.760** | Una conversación con un cliente que ya administras |
+| **A2 · Marketing Hub Pro → Ecoriles** | **+80** | **+USD 5.760** | Ídem |
 | **B1 · BeFUN al libro gestionado** | **+** | — | **Cero.** Ya es tuyo |
-| **B2 · Libro reactivado** (~$5.000 MRR) | **+100** *(y **no expiran** mientras lo toques)* | — | 2 h por cuenta por trimestre |
+| **B2 · Libro reactivado** (~USD 5.000 MRR) | **+100** *(y **no expiran** mientras lo toques)* | — | 2 h por cuenta por trimestre |
 | **Brecha a cubrir** | **~205** | | |
-| **Total del plan** | **~260+** | **~$11.500** | **Con margen** |
+| **Total del plan** | **~260+** | **~USD 11.500** | **Con margen** |
 
 > **A1 + A2 solos te dejan a 45 puntos.** El carril B cierra el resto **y construye el piso** que impide que
 > esto vuelva a pasar.

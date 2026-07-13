@@ -1,8 +1,8 @@
 # TASK-1350 — Landing pública "Agencia Creativa" (Efeonce · Design Engineer)
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 0 — IDENTITY & TRIAGE
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
@@ -47,8 +47,8 @@ El 68% de los compradores B2B dice que todas las agencias suenan igual (`docs/co
 - Dejar la superficie indexable + citable (SEO/AEO: schema, answer capsules) y medible (conversión + GA4/GSC).
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 1 — CONTEXT & CONSTRAINTS
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Architecture Alignment
 
@@ -65,7 +65,7 @@ Reglas obligatorias:
 
 - **Lidera Efeonce** (masterbrand). Globe/Reach/Wave nunca solos; Globe Studio solo como "| Efeonce". No exponer las capabilities como proveedores separados.
 - **Beneficios antes que siglas.** ICO/RpA/FTR solo en el bloque de prueba/procurement, nunca en el hero. Tuteo ("tú"), sin voseo.
-- **Solo casos citables:** Sky Airlines, Bresler, Pinturas Berel, SSilva. **NUNCA GEA Grupo** ni métricas inventadas. No inflar cifras; para la barra de prueba de Creative V2 usar `+90 empresas` + países visibles, no el claim largo `120+ / 4 países / 80% / HubSpot`.
+- **Solo casos citables:** Sky Airlines, Bresler, Pinturas Berel. No inflar cifras; para la barra de prueba de Creative V2 usar `+90 empresas` + países visibles, no el claim largo `120+ / 4 países / 80% / HubSpot`.
 - **Assets IA producidos con el stack propio y gobernados:** dirección de arte con `design-studio`; generación con `fal.ai` (`GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`) / Higgsfield / Magnific; terminación Adobe. Producción **out-of-band** (no runtime del producto); paleta tokenizada, no HEX inventados; nunca logos de operating-entity generados por IA.
 - **Design Engineer bar:** performance (LCP/INP) es señal de craft, no opcional; motion respeta `prefers-reduced-motion` (WCAG 2.3.3); contraste de texto sobre media (WCAG 1.4.3).
 
@@ -208,14 +208,14 @@ Reglas obligatorias:
 - Known visual debt: cutover/redirección y verificación final post-cutover pendientes; la candidata mantiene `noindex` hasta aprobación.
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     El agente que toma esta task ejecuta Discovery y produce
-     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 2 — PLAN MODE
+ El agente que toma esta task ejecuta Discovery y produce
+ plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+ ═══════════════════════════════════════════════════════════ -->
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 3 — EXECUTION SPEC
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
 
@@ -283,7 +283,7 @@ Cambio **aditivo, público, sin runtime de producto Greenhouse**: publicación d
 |---|---|---|---|---|
 | Performance pobre (video de frontera pesado) mata el claim de "ingeniería" | UI / público | medium | poster + lazy AV1/WebM, islands, budget LCP/INP, Kinsta CDN | Lighthouse/CWV en verificación live; degradación visible |
 | "AI slop" (visual genérico) lee barato, no premium | UI / marca | medium | art direction primero (design-studio), color tokenizado, restraint de motion, revisión humana del KV | rechazo del operador en Slice 1 |
-| Copy filtra siglas/infla cifras/usa caso no citable (GEA) | marca | low | reglas duras de `09_marca-agencia`; validación `greenhouse-ux-writing`; solo casos citables | review de copy pre-publicación |
+| Copy filtra siglas/infla cifras/usa un caso no citable | marca | low | reglas duras de `09_marca-agencia`; validación `greenhouse-ux-writing`; solo casos citables | review de copy pre-publicación |
 | Contraste/a11y sobre media rica falla | UI / a11y | medium | contraste AA verificado, reduced-motion, foco visible | Playwright live + audit a11y |
 | CTA muerto si el embed de Meetings falla | conversión | low | fallback a `/contacto/` + WhatsApp/mailto | verificación del booking en live |
 
@@ -315,8 +315,8 @@ Sin flag de producto. Candidato live additive en `/agencia-creativa-v2/` con `no
 - Decisión del slug/URL + registro SEO (canonical, sitemap).
 
 <!-- ═══════════════════════════════════════════════════════════
-     ZONE 4 — VERIFICATION & CLOSING
-     ═══════════════════════════════════════════════════════════ -->
+ ZONE 4 — VERIFICATION & CLOSING
+ ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
 
@@ -353,7 +353,7 @@ Sin flag de producto. Candidato live additive en `/agencia-creativa-v2/` con `no
 - [ ] La landing lidera **Efeonce** (no Globe/Reach/Wave sueltos) y el hero no usa siglas.
 - [ ] CTA primario = **"Agenda una reunión"** → HubSpot Meetings con UTM; fallback si el embed falla.
 - [ ] Bloque diferenciador de operaciones creativas medibles presente (cifras honestas/ilustrativas, no live del portal).
-- [ ] Solo casos citables (Sky/Bresler/Berel/SSilva); ninguna métrica de GEA; cifras coherentes con el doc de autoridad.
+- [ ] Solo casos citables (Sky/Bresler/Berel); cifras coherentes con el doc de autoridad.
 - [ ] Assets producidos con el stack IA propio (fal.ai/Higgsfield/Magnific/Adobe), art-dirigidos, color tokenizado; sin logos de operating-entity generados por IA.
 - [x] Motion respeta `prefers-reduced-motion`; sin scroll horizontal desktop/390 en candidata live.
 - [ ] CWV dentro de budget (LCP/INP) verificado en live.

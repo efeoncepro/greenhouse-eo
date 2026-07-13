@@ -28,7 +28,7 @@ No churneó nadie ese trimestre. **Vencieron los plazos Provider de las ventas d
 > Diagnosticar mal te hace arreglar lo que no estaba roto — y dejar roto lo que sí estaba.
 
 **Y la lectura optimista, que es la que importa:** **cada deal que cierras ahora vale el triple en duración.**
-Un Marketing Hub Pro de $800/mes te paga **$160/mes × 36 meses = $5.760** — no $1.920.
+Un Marketing Hub Pro de USD 800/mes te paga **USD 160/mes × 36 meses = USD 5.760** — no USD 1.920.
 
 ⚠️ **Fecha:** el **Provider Program muere el 2026-08-15**, y a los no convertidos **se les cortan las
 comisiones activas ese día** ✅. Si migraste, verifica que **ninguna comisión viva tuya siga colgando del
@@ -67,11 +67,11 @@ venta a cliente **nuevo o existente**, en cualquier región y línea, con crédi
 
 | Crédito | Puntos (LATAM) | Caduca |
 |---|---|---|
-| **Sourced** | **10 / $100 MRR** | 1 año desde el cierre del deal |
-| **Assisted** | **6 / $100 MRR** | 1 año desde el cierre |
-| **Managed** | **2 / $100 MRR** | **60 días desde tu última acción sobre la cuenta** |
+| **Sourced** | **10 / USD 100 MRR** | 1 año desde el cierre del deal |
+| **Assisted** | **6 / USD 100 MRR** | 1 año desde el cierre |
+| **Managed** | **2 / USD 100 MRR** | **60 días desde tu última acción sobre la cuenta** |
 
-**Regla de conversión rápida (LATAM):** `1 punto sourced = $10 de MRR`. `1 punto managed = $50 de MRR`.
+**Regla de conversión rápida (LATAM):** `1 punto sourced = USD 10 de MRR`. `1 punto managed = USD 50 de MRR`.
 
 ### Umbrales — **suben dos veces** ✅
 
@@ -112,9 +112,9 @@ lo golpeó. → `efeonce/ESTADO_ACTUAL.md` para ver este colapso dibujado con da
 2. Lee la curva:    saldo de puntos por ventas antiguos, mes a mes hasta que llega a 0
 3. Proyecta:        total en la próxima fecha de downtier (15-ene / 15-jul), con legacy = 0
 4. Usa el umbral de ESA fecha (suben en enero 2027), no el de hoy
-5. Brecha en MRR:   brecha_de_puntos × $10   → si la cierras vendiendo (sourced, LATAM)
-                    brecha_de_puntos × $50   → si la cierras con libro (managed, LATAM)
-6. Traduce a deals: Marketing Hub Pro = $800/mo = 80 pts. Sales Hub Pro = $90/seat/mo = 9 pts/seat
+5. Brecha en MRR:   brecha_de_puntos × USD 10   → si la cierras vendiendo (sourced, LATAM)
+                    brecha_de_puntos × USD 50   → si la cierras con libro (managed, LATAM)
+6. Traduce a deals: Marketing Hub Pro = USD 800/mo = 80 pts. Sales Hub Pro = USD 90/seat/mo = 9 pts/seat
 ```
 
 **Verificación de sanidad:** si el resultado dice que necesitas menos de dos deals, revísalo — probablemente
@@ -149,15 +149,15 @@ cuenta + un link de confirmación del cliente. ❌ **El proceso operativo no est
 ## 6. La membership ✅ — desde 2026-07-15
 
 **USD 400/mes**, obligatoria, renovación anual.
-**Se exonera si la suscripción neta propia del partner supera los $400/mes *post-discount*.**
+**Se exonera si la suscripción neta propia del partner supera los USD 400/mes *post-discount*.**
 
-⚠️ **"Post-discount" es la palabra que importa.** Un plan de **$412 de lista** con descuento de partner
-puede tener un **neto bajo $400** → adiós waiver → **$4.800/año**.
+⚠️ **"Post-discount" es la palabra que importa.** Un plan de **USD 412 de lista** con descuento de partner
+puede tener un **neto bajo USD 400** → adiós waiver → **USD 4.800/año**.
 
 **Regla:** trata tu propia suscripción de HubSpot como **infraestructura de la práctica**, no como un gasto
-a optimizar. Bajarla $20 para "ahorrar" te puede costar $4.800.
+a optimizar. Bajarla USD 20 para "ahorrar" te puede costar USD 4.800.
 Y ojo con los **trials**: si un trial infla temporalmente tu suscripción por encima del umbral, cuando
-termine puedes caer bajo los $400 **sin darte cuenta**.
+termine puedes caer bajo los USD 400 **sin darte cuenta**.
 
 ---
 
@@ -206,9 +206,9 @@ Fuente: `docs/context/02_gtm.md:45-54`.
 
 | Capa | Revenue | Puntos | Fragilidad |
 |---|---|---|---|
-| **1 · Licencia** | Referral 20%, hasta 3 años | **Sourced** (10/$100) | Muere si el cliente cancela. Expira a los 3 años |
+| **1 · Licencia** | Referral 20%, hasta 3 años | **Sourced** (10/USD 100) | Muere si el cliente cancela. Expira a los 3 años |
 | **2 · Implementación** | Proyecto on-demand — **aquí está el margen** | — | Es un evento, no un negocio recurrente |
-| **3 · Managed CRM Ops** | **Retainer** | **Managed** (2/$100) — **el piso** | Solo si mantienes la cadencia de 60 días |
+| **3 · Managed CRM Ops** | **Retainer** | **Managed** (2/USD 100) — **el piso** | Solo si mantienes la cadencia de 60 días |
 | **4 · CRM Intelligence** | Premium (Kortex) | Habilita expansión → más sourced | — |
 
 **Una práctica que solo vende licencias es un negocio sin piso.** Una que solo implementa es un negocio sin
@@ -226,9 +226,9 @@ Cosas que ❌ **no están publicadas** y que cambian decisiones de plata. **Píd
 2. **El proceso operativo del shared deal para cross-sell** a cuentas existentes (Growth Specialist, link de
    confirmación, plazos). Habilita toda la motion de base instalada.
 3. **El onboarding fee del bundle Customer Platform** (Pro y Enterprise). ❌ No publicado. Es la diferencia
-   entre $7K y $14K+ en la primera factura del cliente.
+   entre USD 7K y USD 14K+ en la primera factura del cliente.
 4. **El precio real de los contactos de marketing adicionales.** Las fuentes públicas discrepan **10×**.
 5. **Tu MRR gestionado y tus sourced points exactos** según los registros de HubSpot — para cerrar la
    calculadora sin estimaciones.
-6. **La mecánica exacta del waiver de la membership**: ¿el umbral de $400 se evalúa sobre el bruto o sobre el
+6. **La mecánica exacta del waiver de la membership**: ¿el umbral de USD 400 se evalúa sobre el bruto o sobre el
    neto post-discount? ¿Los trials cuentan?

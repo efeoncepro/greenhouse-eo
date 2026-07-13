@@ -41,7 +41,7 @@
 
 **Si encuentras que está pagando por seats que no usa, díselo y quítaselos.**
 
-> *"Tienen ocho seats y usan cuatro. Les estoy sacando cuatro. Son $2.160 al año que no deberían estar
+> *"Tienen ocho seats y usan cuatro. Les estoy sacando cuatro. Son USD 2.160 al año que no deberían estar
 > gastando."*
 
 **Ese gesto te compra el derecho a decir, en la misma reunión:**
@@ -59,7 +59,7 @@ Es la mejor inversión de credibilidad que existe, y cuesta cero.
 |---|---|---|
 | Sales Hub sin Marketing Hub | **Marketing Hub Pro** — entra por la **cuña AEO** → `modules/07` | **+80 sourced** |
 | Marketing sin AEO activo | **Ya lo está pagando.** Es adopción, no venta — y te compra credibilidad | — |
-| Tickets por email suelto | **Service Hub** + Customer Agent ($0,50/resolución ✅) | + |
+| Tickets por email suelto | **Service Hub** + Customer Agent (USD 0,50/resolución ✅) | + |
 | Datos sucios, sync manual | **Data Hub** + Data Agent | + |
 | Quotes en Word, descuentos sin control | **Revenue Hub** (CPQ, contratos, e-signature) | + |
 | **Seats sin usar** | 🎯 **Nada. Quítaselos.** *(Ver arriba)* | — |

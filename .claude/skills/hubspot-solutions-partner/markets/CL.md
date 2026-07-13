@@ -11,22 +11,22 @@
 
 | Keyword | Volumen/mes | CPC |
 |---|---|---|
-| `hubspot` (marca) | 14.800 | $1,39 |
-| **`hubspot partner`** | **20** | $1,89 |
+| `hubspot` (marca) | 14.800 | USD 1,39 |
+| **`hubspot partner`** | **20** | USD 1,89 |
 | `agencia hubspot` | 20 | — |
-| `hubspot chile` | 20 | $2,91 |
-| `hubspot vs salesforce` | 20 | $2,87 |
-| `hubspot precio` | 90 | $1,77 |
-| `hubspot crm precio` | 30 | $1,43 |
-| `certificacion hubspot` | 20 | $0,66 |
-| **`crm para empresas`** | **20** | $4,75 |
-| `software crm` | 140 | $1,83 |
-| `crm ventas` | 140 | $2,85 |
-| `plataforma crm` | 170 | $1,34 |
-| `mejor crm` | 20 | $2,66 |
-| `automatizacion de marketing` | 20 | $0,93 |
-| `crm b2b` | 30 | $2,10 |
-| `salesforce` (marca) | 18.100 | $1,03 |
+| `hubspot chile` | 20 | USD 2,91 |
+| `hubspot vs salesforce` | 20 | USD 2,87 |
+| `hubspot precio` | 90 | USD 1,77 |
+| `hubspot crm precio` | 30 | USD 1,43 |
+| `certificacion hubspot` | 20 | USD 0,66 |
+| **`crm para empresas`** | **20** | USD 4,75 |
+| `software crm` | 140 | USD 1,83 |
+| `crm ventas` | 140 | USD 2,85 |
+| `plataforma crm` | 170 | USD 1,34 |
+| `mejor crm` | 20 | USD 2,66 |
+| `automatizacion de marketing` | 20 | USD 0,93 |
+| `crm b2b` | 30 | USD 2,10 |
+| `salesforce` (marca) | 18.100 | USD 1,03 |
 
 **Demanda de categoría: 🔴 NO.** `hubspot partner` = **20/mes**. Rankear #1 te da **20 impresiones**.
 **Demanda de problema: 🔴 CASI NO.** `crm para empresas` = **20/mes**. `software crm` = 140.
@@ -68,7 +68,7 @@ Español. **Cliente enterprise → trato formal de usted**, institucional. Forma
 ## 5. Moneda y sensibilidad de precio
 
 - HubSpot cotiza en **USD**.
-- ⚠️ **El eje del TCO se debilita acá.** El argumento *"HubSpot te ahorra un admin de $110k/año"* es
+- ⚠️ **El eje del TCO se debilita acá.** El argumento *"HubSpot te ahorra un admin de USD 110k/año"* es
   demoledor en EEUU y **mucho más débil** en Chile, donde un admin de CRM cuesta una fracción de eso.
   🎯 **Cambia el eje a adopción, time-to-value y profundidad de marketing.**
 - 🔴 **Odoo es el competidor real por presupuesto**: ⚠️ implementación de USD 20.000-50.000 el primer año,
@@ -108,8 +108,8 @@ sobre bases que hoy viven en planillas) **o un descalificador** si exige residen
 | No hagas | Por qué |
 |---|---|
 | **SEO / contenidos bottom-funnel sobre "hubspot partner chile"** | **20 búsquedas al mes.** Es dinero prendido fuego |
-| **Ads sobre keywords de categoría** | Mismo problema, y con CPC de $2-$5 |
-| **Liderar con el argumento del TCO del admin** | Un admin local no cuesta $110k. **El argumento se debilita** |
+| **Ads sobre keywords de categoría** | Mismo problema, y con CPC de USD 2-USD 5 |
+| **Liderar con el argumento del TCO del admin** | Un admin local no cuesta USD 110k. **El argumento se debilita** |
 | **Competir con Odoo en precio** | Pierdes. **Divide el deal**: ERP para ellos, front para ti |
 | **Dejar el listing con 0 reviews** | **En un mercado sin búsqueda, el directorio ES el canal.** Es el error más caro que se está cometiendo hoy |
 | **Prometer residencia de datos local** | ✅ **No existe.** Verifica antes de responder cualquier pliego |

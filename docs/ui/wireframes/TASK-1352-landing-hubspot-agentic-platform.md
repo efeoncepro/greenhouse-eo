@@ -36,7 +36,7 @@ Cambios obligatorios (fuente: TASK-1352 §Delta + skill `hubspot-solutions-partn
 |---|---|---|---|---|
 | 0 | Header | Nav Ohio nativo (variante clara heredada, sin override, sin sticky custom) | Ohio native header | Tema |
 | 1 | Hero | Teach-first: "HubSpot dejó de ser un CRM: hoy es una plataforma con agentes de IA" + outcome (la operamos con software propio) + CTA dual (reunión / diagnóstico) + proof row (Solutions Partner **Gold** + Kortex en Marketplace) | `modern-ui` hero (patrón AEO/SEO), badge flotante | Estático (evoluciona hero existente) |
-| 2 | Trust strip | Logos citables (Sky, Bresler…) 🔴 **NUNCA SSilva · NUNCA GEA · Berel no como co-sell** + badge "HubSpot Solutions Partner **Gold**" + badge "Kortex en el HubSpot Marketplace" | Logo wall + proof badges | Assets locales de marca |
+| 2 | Trust strip | Logos citables (Sky, Bresler…) 🔴 **NUNCA SSilva · Berel no como co-sell** + badge "HubSpot Solutions Partner **Gold**" + badge "Kortex en el HubSpot Marketplace" | Logo wall + proof badges | Assets locales de marca |
 | **2b** | 🎯 **Waiver del onboarding** *(NUEVA — Delta D4)* | **La oferta más fuerte del canal, y no estaba.** HubSpot cobra un onboarding **obligatorio**; un partner **certificado** lo entrega en su lugar y **el cargo desaparece del contrato**. En Marketing Hub Pro son **USD 3.000 de USD 9.600 = 31% del año 1**. Y el suyo es *coaching*; el nuestro es *implementación*. **El HubSpot directo no puede igualarlo.** | Offer band con la cifra en **texto servido** (no contador JS) | Estático (verificar el fee el día de publicación) |
 | 3 | Stakes | "Encenderla no basta": comprar licencia ≠ operar plataforma agéntica (datos limpios + arquitectura + gobierno de agentes). **Anclar con el dato de HubSpot: orgánico −27% YoY · referidos desde IA ×3** (Delta D5) | Two-card contrast band | Estático |
 | 4 | Las 4 capas | El recorrido de valor como answer capsules: Licencia → Implementación (deployment programático) → Operación continua (managed ops) → Inteligencia (auditoría + agente sobre el portal) | Feature card grid / stepper (container-query) | Estático |
@@ -54,7 +54,7 @@ Cambios obligatorios (fuente: TASK-1352 §Delta + skill `hubspot-solutions-partn
 
 ## Copy Ledger
 
-> Dirección de copy (no final — el craft lo pule `greenhouse-ux-writing` sobre `docs/context/05_voz-tono-estilo.md`). Ids de documentación, no tokens de `src/lib/copy` (sitio público). es-LATAM neutro, tuteo, sin voseo. **NUNCA** GEA; **NUNCA SSilva**; no hardcodear pricing/roster de Breeze.
+> Dirección de copy (no final — el craft lo pule `greenhouse-ux-writing` sobre `docs/context/05_voz-tono-estilo.md`). Ids de documentación, no tokens de `src/lib/copy` (sitio público). es-LATAM neutro, tuteo, sin voseo. **NUNCA SSilva**; no hardcodear pricing/roster de Breeze.
 >
 > 🔴 **Claims prohibidos (Delta D1):** "Líder en CRM según Gartner" (HubSpot es **Niche Player** en el MQ de *Sales Force Automation*) · "Leader en Forrester Wave" (no verificable 2026) · **ISO 27001 de HubSpot** (no la reclama para sí; solo su infra AWS) · residencia de datos en LATAM (no existe) · "flota de agentes de IA" (solo **3** Breeze Agents en GA).
 > ✅ **Permitido y correcto:** **"Leader en B2B Marketing Automation (Gartner, 5.º año consecutivo)"** · **SOC 2 Type II + SOC 3** · **"HubSpot Solutions Partner Gold"** *(revisar el 2027-01-15)*.

@@ -81,11 +81,11 @@ Antes de construir, poder responder **sí a ≥1 verde** y **no a todas las roja
 - **Las 4 unidades = organización interna de operaciones, NO marcas hacia afuera** (al cliente/mercado se lidera con "Efeonce", una sola marca; las unidades se presentan como **capabilities** descritas por su función, nunca como sub-marcas ni proveedores separados): **Efeonce Digital** (núcleo estratégico/digital, orquesta) · **Globe** (creatividad/contenido, Globe Studio) · **Reach** (medios/PR) · **Wave** (infraestructura digital/IDD). 5ª línea transversal: **CRM Solutions** (vive en Kortex). Hoy las capabilities **exceden estas unidades** (software propio Greenhouse/Kortex/Verk/Creative Studio, AEO, data/medición…) y siguen creciendo — el relato externo NO se reduce a "cuatro unidades".
 - **ICO — Intelligent Creative Operations**: capa de inteligencia operativa **transversal a las 4 unidades** (no solo Globe; el origen Globe es histórico). Gobernanza por IA + métricas en vivo por pieza + visibilidad total al cliente. 4 dimensiones: **Production · Concept · Outcome · Anticipation**. No se vende suelto: *es la forma en que Efeonce opera.*
 - **Ecosistema de producto (4 plataformas independientes; integración por BigQuery autorizado + REST/eventos versionados, no runtimes compartidos):**
-  - **Greenhouse** = el hub (lo nuestro): experiencia del cliente + operaciones internas. Genera el switching cost. ~77% madurez ASaaS.
-  - **Kortex** = CRM Intelligence sobre HubSpot (manifests YAML, agente Claude). `portal_id → space_id`. Alimenta Account 360.
-  - **Verk** = Content + Distribution OS (Surround Map™). `brand_id → greenhouse_space_id`. Embed card en el dashboard.
-  - **Efeonce Creative Studio** *(nombre de trabajo)* = producción creativa agentic de imagen/video/audio: templates, assets/runs/review y créditos; UI y MCP son consumers del mismo contrato. Primero interno, luego cliente gobernado. EPIC-028; runtime separado de Greenhouse.
-  - Regla: cada plataforma opera sola; **cuando el cliente está en el ecosistema completo, Greenhouse es donde todo converge.** No acoplar Greenhouse al runtime de Kortex/Verk/Creative Studio; consumir sólo contratos/proyecciones autorizadas.
+ - **Greenhouse** = el hub (lo nuestro): experiencia del cliente + operaciones internas. Genera el switching cost. ~77% madurez ASaaS.
+ - **Kortex** = CRM Intelligence sobre HubSpot (manifests YAML, agente Claude). `portal_id → space_id`. Alimenta Account 360.
+ - **Verk** = Content + Distribution OS (Surround Map™). `brand_id → greenhouse_space_id`. Embed card en el dashboard.
+ - **Efeonce Creative Studio** *(nombre de trabajo)* = producción creativa agentic de imagen/video/audio: templates, assets/runs/review y créditos; UI y MCP son consumers del mismo contrato. Primero interno, luego cliente gobernado. EPIC-028; runtime separado de Greenhouse.
+ - Regla: cada plataforma opera sola; **cuando el cliente está en el ecosistema completo, Greenhouse es donde todo converge.** No acoplar Greenhouse al runtime de Kortex/Verk/Creative Studio; consumir sólo contratos/proyecciones autorizadas.
 - **ASaaS (Agency Service as a Software)**: el servicio de agencia empaquetado como producto de software. 6 directrices: acceso permanente · datos en vivo · experiencia estandarizada · **valor acumulativo (el historial es feature)** · **switching cost creciente (North Star)** · monetización recurrente (tier pricing Basic/Pro/Enterprise = capability flags por tenant).
 
 > Detalle: `01_quienes-somos` · `03_ecosistema-producto` · `04_greenhouse-producto` · `07_ico` · `14_modelo-negocio-asaas`.
@@ -95,8 +95,8 @@ Antes de construir, poder responder **sí a ≥1 verde** y **no a todas las roja
 ## Las dos cadenas causales de ICO (memorizar la dirección)
 
 ```
-Producción (eficiencia):  BCS ↑ → FTR ↑ → RpA ↓ → Cycle Time ↓ → TTM ↓ → Revenue Enabled ↑
-Outcome (efectividad):    Insight → Concepto → Ejecución → Distribución → Engagement → Outcome cliente → Revenue Enabled ↑
+Producción (eficiencia): BCS ↑ → FTR ↑ → RpA ↓ → Cycle Time ↓ → TTM ↓ → Revenue Enabled ↑
+Outcome (efectividad): Insight → Concepto → Ejecución → Distribución → Engagement → Outcome cliente → Revenue Enabled ↑
 ```
 
 Brief más claro → más piezas bien a la primera → menos rondas → ciclo más corto → menor time-to-market → más revenue habilitado. Cada rol recibe un **perfil de pesos sobre las 4 dimensiones** que define su bono variable mensual (alimenta payroll). **Greenhouse materializa hoy:** RpA, OTD%, FTR, Cycle Time, Stuck Assets. El resto (scoring por rol, Outcome/Anticipation, ~16+ siglas) es la dirección de expansión.
@@ -116,7 +116,6 @@ Si un string del producto contradice esto, **el string está mal** (fuente: `06_
 - **"Head of Creative"**, nunca "ICO Lead" (aunque los addenda viejos lo rotulen así).
 - **AEO = AI Engine Optimization** (no "Answer Engine"). Medición: Otterly.ai.
 - **BCS ≠ BQS** (Clarity Score automático vs Quality Score humano): no usarlas como sinónimos en código.
-- **Casos citables (reales):** Sky Airlines · Bresler · Pinturas Berel · SSilva. **❌ GEA Grupo NO es caso** (prospecto que nunca cerró; "+340% leads" es métrica falsa — no usar jamás).
 - **Tratamiento "tú"** en todo copy de cliente (el "usted" solo en legales/contratos).
 - **Dominios:** Greenhouse → `greenhouse.efeoncepro.com`; agencia → `efeoncepro.com` (`efeonce.com` obsoleto). Leer de env var (`NEXT_PUBLIC_APP_URL`), no hardcodear.
 - **Constantes:** Portal HubSpot Efeonce `48713323` · owner Julio `75788512`, Luis (BDR) `86856220` · GCP data lake BigQuery `efeonce-group` · tenant key `space_id` → `company_id` (HubSpot) / `portal_id` (Kortex) / `brand_id` (Verk).
@@ -146,7 +145,7 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 - **Pulse Dashboard** = motor de detección de cross-sell (Motor 1). Construirlo/mejorarlo es de las features de mayor leverage comercial.
 - **Bow-tie / HubSpot:** sync a nivel **empresa** (`company_id ↔ space_id`). El motion (`is_in_expansion`, `is_in_renewal`, `is_at_risk`, `is_advocate`) se modela como **booleanos sobre el lifecycle stage**, NUNCA como stage que reemplace `active_account`. NRR >110% es la métrica reina. **No inventar stages ni properties** — usar los internal names exactos de `11`.
 - **Experiencia = sistema, no portal de métricas.** Artefactos de producto con peso de marca directo: **Ecosystem Tour** (primer login guiado, el "wow" = ver sus métricas ICO) · **Feedback Review en vivo** (dentro del portal, no PPT) · **Ecosystem Learning Layer** (contenido/tools/webinars/podcast/social conectados al journey) · **"Tu año con Efeonce"** (reporte de renovación autogenerado = máximo switching cost) · **Protocolo de transparencia con datos** (en tensión, mostrar Stuck Assets/Cycle Time/OTD% caído).
-- **Posicionamiento público de la capability creativa (Globe):** partner de **producción que escala** el output de equipos de marketing/creativos in-house mid-market/enterprise (no reemplazo, sin perder control) + **Time-to-Market medible** como ventaja competitiva (output de la cadena de eficiencia ICO: FTR guardrail → RpA↓ → ciclo↓ → TTM↓ → Revenue Enabled; "producir más rápido sin perder calidad, probado con el número") + ejecución **Design Engineer** (arte+color+ingeniería, assets con el stack IA propio). Lidera Efeonce; CTA "Agenda una reunión". Decisión canónica: **[PDR-004](../../../docs/public-site/decisions/PDR-004-landing-agencia-creativa-posicionamiento.md)** (ejecución `TASK-1350`). Sustrato en `07_ico` (TTM) · `13` (Globe ICP1/ICP3) · `09_marca-agencia`.
+- **Posicionamiento público de la capability creativa (Globe):** partner de **producción que escala** el output de equipos de marketing/creativos in-house mid-market/enterprise (no reemplazo, sin perder control) + **Time-to-Market medible** como ventaja competitiva (output de la cadena de eficiencia ICO: FTR guardrail → RpA↓ → ciclo↓ → TTM↓ → Revenue Enabled; "producir más rápido sin perder calidad, probado con el número") + ejecución **Design Engineer** (arte+color+ingeniería, assets con el stack IA propio). Lidera Efeonce; CTA "Agenda una reunión". Decisión canónica: **[PDR-004](./././docs/public-site/decisions/PDR-004-landing-agencia-creativa-posicionamiento.md)** (ejecución `TASK-1350`). Sustrato en `07_ico` (TTM) · `13` (Globe ICP1/ICP3) · `09_marca-agencia`.
 
 > Detalle: `02_gtm` · `08_estrategia-comercial` · `09_marca-agencia` · `10_experiencia-cliente` · `11_hubspot-bowtie` · `13_icp-buyer-personas-jtbd`.
 
@@ -154,7 +153,7 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 
 ## Router de carga selectiva (qué `docs/context/*` leer)
 
-| Si vas a... | Lee |
+| Si vas a.. | Lee |
 |---|---|
 | Decidir si una feature vale la pena / priorizar | `00_INDEX` + `02_gtm` + `08_estrategia-comercial` + `13_icp-buyer-personas-jtbd` + `14_modelo-negocio-asaas` |
 | Tocar UX copy, microcopy, vacíos, errores, emails | `05_voz-tono-estilo` + `09_marca-agencia` (y la skill `greenhouse-ux-writing`) |

@@ -13,11 +13,11 @@ guided selling **"static"**, IA predictiva limitada, brecha entre el foco SMB y 
 Es Leader en el MQ de **B2B Marketing Automation**, 5.º año — **otro reporte**. Nombra siempre cuál.
 
 **2. Contra Microsoft, Zoho, Pipedrive y Odoo, HubSpot NO gana por precio.** ✅
-D365 Sales Enterprise es **$105/usuario/mes vs $150 de HubSpot**, ambos verificados en fuente primaria.
+D365 Sales Enterprise es **USD 105/usuario/mes vs USD 150 de HubSpot**, ambos verificados en fuente primaria.
 **Si tu pitch es TCO, pierdes.**
 
 **3. El delta de TCO contra Salesforce lo hace el ADMIN, no la licencia.** ✅
-$162k vs $189k a 3 años = **solo 17%**. El resto son implementación + 1 FTE de admin + add-ons.
+USD 162k vs USD 189k a 3 años = **solo 17%**. El resto son implementación + 1 FTE de admin + add-ons.
 **Si el prospecto ya tiene admin de Salesforce en planilla y no lo va a despedir, medio argumento se cae.**
 **Pregúntalo en discovery, no lo descubras en la propuesta.**
 
@@ -26,18 +26,18 @@ $162k vs $189k a 3 años = **solo 17%**. El resto son implementación + 1 FTE de
 ## 1. Tabla maestra — TCO 3 años
 
 **Supuestos declarados:** 100 empleados · 30 usuarios de CRM · precio de lista **sin descuento** · 3 años
-facturación anual · admin fully-loaded $110k/año · sin CPQ pesado · sin marketing en la columna base.
+facturación anual · admin fully-loaded USD 110k/año · sin CPQ pesado · sin marketing en la columna base.
 
 | | Licencia 3a | Implement. | Admin 3a | **TCO 3a** | Confianza |
 |---|---|---|---|---|---|
-| **HubSpot** Sales Hub EE | $162.000 ✅ | ~$20.000 ⚠️ | ~$95.000 (0,35 FTE) ⚠️ | **≈ $295.000** | media |
-| **Salesforce** Sales Cloud EE | $189.000 ⚠️ | ~$75.000 ⚠️ | ~$248.000 (0,75 FTE) ⚠️ | **≈ $611.000** *(+$57k Premier +$43k add-ons)* | media |
-| **Microsoft** D365 Sales EE | $113.400 ✅ | ~$60.000 ⚠️ | ~$115.000 ⚠️ | **≈ $290.000** | media-alta |
-| **Adobe** Marketo *(marketing only)* | ~$120.000 ⚠️ | ~$30.000 ⚠️ | ~$270.000 ⚠️ | **≈ $420.000 — y SIN CRM** | baja |
-| **Zoho** CRM Enterprise | $43.200 ⚠️ | ~$15.000 ⚠️ | ~$60.000 ⚠️ | **≈ $118.000** | media |
-| **Pipedrive** Premium | $52.920 ⚠️ | ~$5.000 ⚠️ | ~$40.000 ⚠️ | **≈ $98.000** | media |
-| **Odoo** Custom (Chile) | $14.700 ✅ | $20-50k ⚠️ | ~$50.000 ⚠️ | **≈ $100.000** | media |
-| **Sin CRM** | $0 | $0 | $0 | **$0 + el costo de no saber** | — |
+| **HubSpot** Sales Hub EE | USD 162.000 ✅ | ~USD 20.000 ⚠️ | ~USD 95.000 (0,35 FTE) ⚠️ | **≈ USD 295.000** | media |
+| **Salesforce** Sales Cloud EE | USD 189.000 ⚠️ | ~USD 75.000 ⚠️ | ~USD 248.000 (0,75 FTE) ⚠️ | **≈ USD 611.000** *(+USD 57k Premier +USD 43k add-ons)* | media |
+| **Microsoft** D365 Sales EE | USD 113.400 ✅ | ~USD 60.000 ⚠️ | ~USD 115.000 ⚠️ | **≈ USD 290.000** | media-alta |
+| **Adobe** Marketo *(marketing only)* | ~USD 120.000 ⚠️ | ~USD 30.000 ⚠️ | ~USD 270.000 ⚠️ | **≈ USD 420.000 — y SIN CRM** | baja |
+| **Zoho** CRM Enterprise | USD 43.200 ⚠️ | ~USD 15.000 ⚠️ | ~USD 60.000 ⚠️ | **≈ USD 118.000** | media |
+| **Pipedrive** Premium | USD 52.920 ⚠️ | ~USD 5.000 ⚠️ | ~USD 40.000 ⚠️ | **≈ USD 98.000** | media |
+| **Odoo** Custom (Chile) | USD 14.700 ✅ | USD 20-50k ⚠️ | ~USD 50.000 ⚠️ | **≈ USD 100.000** | media |
+| **Sin CRM** | USD 0 | USD 0 | USD 0 | **USD 0 + el costo de no saber** | — |
 
 ⚠️ **Ningún número incluye descuento. Salesforce descuenta 20-40% en enterprise sin despeinarse.**
 Prepara el TCO contra **su cotización real**, no contra su lista.
@@ -47,19 +47,19 @@ Prepara el TCO contra **su cotización real**, no contra su lista.
 ## 2. SALESFORCE
 
 ### Pricing 2026 (⚠️ salesforce.com devuelve **403** a fetch — **abre su página y saca screenshot antes de la reunión**)
-Sales Cloud Enterprise **$175**/usr/mes (subió de $165 el 2025-08-01) · Unlimited **$350** ·
-**Agentforce $125**/usr/mes add-on · **Flex Credits $500/100.000** (acción estándar = 20 créditos = **$0,10**) ·
-Agentforce 1 Edition **$550**/usr/mes · MCAE/Pardot Growth **$1.250**/mes · Marketing Cloud Growth **$1.500**/org/mes.
+Sales Cloud Enterprise **USD 175**/usr/mes (subió de USD 165 el 2025-08-01) · Unlimited **USD 350** ·
+**Agentforce USD 125**/usr/mes add-on · **Flex Credits USD 500/100.000** (acción estándar = 20 créditos = **USD 0,10**) ·
+Agentforce 1 Edition **USD 550**/usr/mes · MCAE/Pardot Growth **USD 1.250**/mes · Marketing Cloud Growth **USD 1.500**/org/mes.
 
 ### Costos ocultos — el verdadero campo de batalla ⚠️
-**Premier Support = 30% de la licencia** · **Storage overage $125/mes por 500MB** ·
-**Implementación = 1,5× a 3× tu licencia anual** · **Admin dedicado $70k-$130k/año** ·
-consultores $100-$500/h · add-ons (CPQ, doc gen, e-sign) **$20-$100/usr/mes** encima del core.
+**Premier Support = 30% de la licencia** · **Storage overage USD 125/mes por 500MB** ·
+**Implementación = 1,5× a 3× tu licencia anual** · **Admin dedicado USD 70k-USD 130k/año** ·
+consultores USD 100-USD 500/h · add-ons (CPQ, doc gen, e-sign) **USD 20-USD 100/usr/mes** encima del core.
 
 ### Dónde HubSpot GANA
 1. ✅ **Costo de admin.** Salesforce a 30 usuarios con customización pide ~1 FTE; HubSpot corre con 0,25-0,5.
-   **Ese solo delta es $150k-$250k a 3 años.** Tu número más fuerte y el más defendible.
-2. ✅ **Onboarding con precio publicado.** HubSpot: $1.500 / $3.500, **en la web**. Salesforce: "contacta ventas".
+   **Ese solo delta es USD 150k-USD 250k a 3 años.** Tu número más fuerte y el más defendible.
+2. ✅ **Onboarding con precio publicado.** HubSpot: USD 1.500 / USD 3.500, **en la web**. Salesforce: "contacta ventas".
    *"Yo te digo hoy cuánto cuesta arrancar. Ellos no."*
 3. ⚠️ **Adopción post-migración.** Caso publicado: 120 empleados, migración en 8 semanas, **adopción 48% → 94%
    en 60 días**, 200 automatizaciones consolidadas en 34 workflows. *(Fuente: agencia partner — **interesada**.
@@ -86,8 +86,8 @@ B2B muy complejos.
 
 **「Con Agentforce tenemos agentes de verdad; Breeze es un chatbot.」**
 > **Pégale al modelo de precio, no al modelo.**
-> *"Agentforce te cobra **$0,10 por acción** o **$125/usuario/mes**. Es un contador corriendo. HubSpot cobra
-> **por resultado**: $0,50 por conversación **resuelta**, $1 por lead recomendado. **Pagas cuando funciona,
+> *"Agentforce te cobra **USD 0,10 por acción** o **USD 125/usuario/mes**. Es un contador corriendo. HubSpot cobra
+> **por resultado**: USD 0,50 por conversación **resuelta**, USD 1 por lead recomendado. **Pagas cuando funciona,
 > no cuando lo intenta.** Y Enterprise ya incluye 5.000 créditos. Pregúntale a tu AE cuánto va a ser tu
 > factura de Flex Credits el mes 14. No lo sabe."*
 
@@ -102,8 +102,8 @@ en su propio pricing.
 
 ## 3. ADOBE — Marketo Engage + Real-Time CDP
 
-❌ **Adobe NO publica precios.** Confirmado. ⚠️ Rango mid-market (50-100K contactos): **$36k-$60k/año**.
-Implementación **$10k-$50k+**, 60-90 días.
+❌ **Adobe NO publica precios.** Confirmado. ⚠️ Rango mid-market (50-100K contactos): **USD 36k-USD 60k/año**.
+Implementación **USD 10k-USD 50k+**, 60-90 días.
 
 > **Que no publiquen precio ES tu argumento:** *"Adobe no te dice cuánto cuesta antes de que entres a un
 > ciclo de ventas de tres meses. HubSpot tiene el precio en la web."*
@@ -119,7 +119,7 @@ mandas email."*
 
 ### Y el hecho que casi nadie dice
 ✅ **Marketo NO es un CRM.** La comparación honesta es **Marketo + Salesforce vs HubSpot solo**.
-Marketing Hub Enterprise ($3.600/mo = $129.600 a 3 años) **incluye el CRM**.
+Marketing Hub Enterprise (USD 3.600/mo = USD 129.600 a 3 años) **incluye el CRM**.
 
 ### Dónde HubSpot PIERDE — y hay que aceptarlo
 ✅ **Forrester Wave Q1 2026: Adobe es Leader y sacó el máximo puntaje posible en NUEVE criterios** del Current
@@ -132,19 +132,19 @@ licencia de diseño, no un ecosistema. **El argumento se cae y el deal vuelve a 
 
 **El rebate al Wave:** *"Cierto. Y ese reporte mide **profundidad de capacidad**, no **costo de operarla**.
 La pregunta es si su equipo de cuatro personas de marketing va a usar el 15% de Marketo y pagar el 100%,
-con un Marketo Ops de $120k que hoy no tienen."*
+con un Marketo Ops de USD 120k que hoy no tienen."*
 
 ---
 
 ## 4. MICROSOFT DYNAMICS 365
 
 ### Pricing ✅ **verificado en fuente primaria (microsoft.com, 2026-07-13)**
-Sales Professional **$65** · **Sales Enterprise $105** · Sales Premium **$150** (incl. 1.000 Copilot Credits/usr/mes) ·
-**Customer Insights $1.700/tenant/mes** — o **$1.000/mes en attach** si ya tienen una app D365 (usuarios ilimitados).
+Sales Professional **USD 65** · **Sales Enterprise USD 105** · Sales Premium **USD 150** (incl. 1.000 Copilot Credits/usr/mes) ·
+**Customer Insights USD 1.700/tenant/mes** — o **USD 1.000/mes en attach** si ya tienen una app D365 (usuarios ilimitados).
 
 ### ⚠️ ADVERTENCIA: aquí NO ganas por precio
-TCO 3a ≈ **$270k-$380k** vs HubSpot ≈ $295k. **Es un empate técnico o una derrota.** Microsoft es **más barato
-en licencia** ($105 vs $150) y el attach de Customer Insights es agresivo. **Cambia de eje.**
+TCO 3a ≈ **USD 270k-USD 380k** vs HubSpot ≈ USD 295k. **Es un empate técnico o una derrota.** Microsoft es **más barato
+en licencia** (USD 105 vs USD 150) y el attach de Customer Insights es agresivo. **Cambia de eje.**
 
 ### Cómo se rebate el "ya tenemos Microsoft" — el argumento real
 
@@ -177,7 +177,7 @@ están comprando marketing.**"*
 
 ## 5. ZOHO y PIPEDRIVE — la competencia por abajo
 
-⚠️ Zoho CRM Enterprise ~$40/usr/mes · Pipedrive Premium ~$49/seat/mes.
+⚠️ Zoho CRM Enterprise ~USD 40/usr/mes · Pipedrive Premium ~USD 49/seat/mes.
 ⚠️ **Pipedrive renombró sus tiers en julio 2025** (Essential→Lite, Advanced→Growth, Professional+Power→Premium,
 Enterprise→Ultimate). **Si citas "Professional" en 2026, quedas desactualizado.**
 
@@ -206,7 +206,7 @@ seria, sin servicio, sin CMS. El argumento no es *"Pipedrive es malo"* — es:
 
 ## 6. ODOO / ERPs — el frente LATAM
 
-✅ Odoo Custom ~**$13,60**/usr/mes. ⚠️ Realidad Chile: implementación **USD 20.000-50.000** el primer año ·
+✅ Odoo Custom ~**USD 13,60**/usr/mes. ⚠️ Realidad Chile: implementación **USD 20.000-50.000** el primer año ·
 consultoría **UF 1-2/hora** · proyecto de **3-5 meses** · **32 partners certificados en Chile**.
 
 **Es peligroso porque no compite contra tu CRM — compite contra tu presupuesto.** El CFO ve *"ERP + CRM +
@@ -229,8 +229,8 @@ tributaria (SII/DTE en Chile) es un argumento que HubSpot no tiene.**
 
 ### Respuesta honesta: **es medio falso y medio cierto — y necesitas saber cuál mitad te toca.**
 
-**Evidencia de que SÍ escala** ✅ (SEC/BusinessWire, Q1 2026): revenue **$881,0M (+23%)** · **299.458 clientes** ·
-ARPU $11.038 → **$11.722**. Y en el filing, el management: *"Scaling companies are increasingly choosing
+**Evidencia de que SÍ escala** ✅ (SEC/BusinessWire, Q1 2026): revenue **USD 881,0M (+23%)** · **299.458 clientes** ·
+ARPU USD 11.038 → **USD 11.722**. Y en el filing, el management: *"Scaling companies are increasingly choosing
 HubSpot… to **reduce total cost of ownership**, and that's reflected in our **upmarket momentum**."*
 **Es material, auditado, y puedes citarlo.**
 
@@ -282,14 +282,14 @@ Quien no tiene CRM **no está comparando nada**. Está evaluando si vale la pena
 3. *"¿Cuántas horas por semana pasa su equipo comercial armando reportes en vez de vender?"*
 
 **El TCO invertido:**
-> *"Su CRM cuesta $0 de licencia. Pero les cuesta [X] en pipeline que no ven, [Y] en leads que no se siguen,
+> *"Su CRM cuesta USD 0 de licencia. Pero les cuesta [X] en pipeline que no ven, [Y] en leads que no se siguen,
 > y el riesgo de que la memoria comercial de la empresa viva en la cabeza de tres personas.
-> **HubSpot Free también cuesta $0. Empecemos ahí.**"*
+> **HubSpot Free también cuesta USD 0. Empecemos ahí.**"*
 
 ### 🎯 La jugada táctica que gana este segmento
-✅ **HubSpot Free (2 usuarios, $0) y Starter ($7/seat/mes anual) existen exactamente para esto.**
+✅ **HubSpot Free (2 usuarios, USD 0) y Starter (USD 7/seat/mes anual) existen exactamente para esto.**
 **NO le vendas Enterprise a alguien que no tiene CRM.** Vende **Starter**, consigue adopción real en 60 días,
-**y expande.** El ARPU de HubSpot subió de $11.038 a $11.722 ✅: **la expansión es el motor, no el land.**
+**y expande.** El ARPU de HubSpot subió de USD 11.038 a USD 11.722 ✅: **la expansión es el motor, no el land.**
 
 Y el land te da **partner admin** desde el día uno → **puntos managed desde el día uno**
 → `modules/03_MOTOR_LIBRO.md`.
@@ -298,7 +298,7 @@ Y el land te da **partner admin** desde el día uno → **puntos managed desde e
 **El único argumento que funciona: el costo de mantenerlo.**
 > *"¿Quién lo mantiene? ¿Qué pasa cuando esa persona se va? ¿Cuánto le cuesta al año en horas de ingeniería
 > que podrían estar en el producto?"*
-Un CRM casero de 30 usuarios consume 0,25-0,5 FTE de ingeniería: **$40k-$90k/año que nadie está contando.**
+Un CRM casero de 30 usuarios consume 0,25-0,5 FTE de ingeniería: **USD 40k-USD 90k/año que nadie está contando.**
 
 ---
 
@@ -308,9 +308,9 @@ Un CRM casero de 30 usuarios consume 0,25-0,5 FTE de ingeniería: **$40k-$90k/a�
 mid-market con custom objects = **4-8 semanas** · **enterprise 100+ usuarios = 16-24 semanas** ·
 con Apex complejo = 3-6 meses.
 
-⚠️ **Costo**: rango **$25.000-$150.000+**. Mid-market con 3-4 integraciones: **$40.000-$75.000**
+⚠️ **Costo**: rango **USD 25.000-USD 150.000+**. Mid-market con 3-4 integraciones: **USD 40.000-USD 75.000**
 (data migration + config + training + 30 días de hypercare).
-✅ **Más el onboarding obligatorio de HubSpot** ($1.500-$7.000 según hub y tier).
+✅ **Más el onboarding obligatorio de HubSpot** (USD 1.500-USD 7.000 según hub y tier).
 
 ### Qué se rompe — **dilo tú antes de que lo descubran**
 1. **Apex triggers, managed packages, Visualforce.** No migran. Se reescriben o se pierden.

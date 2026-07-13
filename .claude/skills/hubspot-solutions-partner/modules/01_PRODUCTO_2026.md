@@ -19,7 +19,7 @@
 
 | Producto | Qué hace | Por qué te importa comercialmente |
 |---|---|---|
-| **Smart CRM** | Sistema de registro base | Se vende standalone ($20/$50/$75 por seat) |
+| **Smart CRM** | Sistema de registro base | Se vende standalone (USD 20/USD 50/USD 75 por seat) |
 | **Marketing Hub** | Demand gen, automation, campañas, email, **AEO** | 🎯 **Tu punta de lanza.** Es donde HubSpot es Leader de Gartner hace 5 años |
 | **Sales Hub** | Pipeline, secuencias, forecasting, **Smart Deal Progression (GA)** | Aterriza después del marketing, no antes |
 | **Service Hub** | Help desk, SLAs, KB, **Customer Agent** | Expansión natural post-implementación |
@@ -30,14 +30,14 @@
 | **Breeze** | Capa de IA transversal | Ver § 3 — y el cuidado con los betas |
 
 **Bundle: Customer Platform** ✅ — Marketing + Sales + Service + Content + Data.
-Pro **$1.300/mo** (6 seats) · Enterprise **desde $4.700/mo** (8 seats).
+Pro **USD 1.300/mo** (6 seats) · Enterprise **desde USD 4.700/mo** (8 seats).
 
 **Ningún Hub se agregó ni se retiró en 2026.** Hubo renames, expansión (Commerce→Revenue con CPQ) y el
 nacimiento de **HubSpot AEO** como producto vendible aparte.
 
 ### Fees de pagos ✅ (si vendes Revenue Hub, esto sale en la mesa)
 HubSpot payments: **2,9% processing + 0,5% platform fee** (tarjeta). Stripe vía HubSpot: **0,75% platform fee**
-*encima* del processing de Stripe. **El platform fee es adicional.** Un cobro de $9.000 por tarjeta = **$306**.
+*encima* del processing de Stripe. **El platform fee es adicional.** Un cobro de USD 9.000 por tarjeta = **USD 306**.
 
 ---
 
@@ -45,17 +45,17 @@ HubSpot payments: **2,9% processing + 0,5% platform fee** (tarjeta). Stripe vía
 
 | Hub | Starter | Professional | Enterprise | 🔴 Onboarding **obligatorio** |
 |---|---|---|---|---|
-| **Marketing** | $20/seat (promo $7) · 1.000 contactos | **$800/mo** · 3 core seats · 2.000 contactos | **desde $3.600/mo** · 5 seats · 10.000 contactos | **$3.000 / $7.000** |
-| **Sales** | $20/seat | **$90/seat** | **desde $150/seat** | **$1.500 / $3.500** |
-| **Service** | $20/seat | **$90/seat** | **desde $150/seat** | **$1.500 / $3.500** |
-| **Content** | $20/seat | **$450/mo** | desde $1.500/mo | ❌ no declarado |
-| **Data** | $20/seat | **$720/mo** | desde $2.000/mo | ❌ no declarado |
-| **Revenue** | Free tier | desde $95/mo | desde $140/mo | ❌ no declarado |
-| **Customer Platform** | $20/seat | **$1.300/mo** | **desde $4.700/mo** | ❌ **NO PUBLICADO — PÍDELO** |
-| **HubSpot AEO** | — | **$50/mo standalone** — **incluido en Marketing Pro/Ent** ✅ | — | — |
+| **Marketing** | USD 20/seat (promo USD 7) · 1.000 contactos | **USD 800/mo** · 3 core seats · 2.000 contactos | **desde USD 3.600/mo** · 5 seats · 10.000 contactos | **USD 3.000 / USD 7.000** |
+| **Sales** | USD 20/seat | **USD 90/seat** | **desde USD 150/seat** | **USD 1.500 / USD 3.500** |
+| **Service** | USD 20/seat | **USD 90/seat** | **desde USD 150/seat** | **USD 1.500 / USD 3.500** |
+| **Content** | USD 20/seat | **USD 450/mo** | desde USD 1.500/mo | ❌ no declarado |
+| **Data** | USD 20/seat | **USD 720/mo** | desde USD 2.000/mo | ❌ no declarado |
+| **Revenue** | Free tier | desde USD 95/mo | desde USD 140/mo | ❌ no declarado |
+| **Customer Platform** | USD 20/seat | **USD 1.300/mo** | **desde USD 4.700/mo** | ❌ **NO PUBLICADO — PÍDELO** |
+| **HubSpot AEO** | — | **USD 50/mo standalone** — **incluido en Marketing Pro/Ent** ✅ | — | — |
 
 ⚠️ El precio menor es **anual**; el mayor es **mes a mes**. Confírmalo en la cotización.
-❌ **La unidad de cobro de Revenue Hub** ($95/$140: ¿seat o cuenta?) no está clara. Existe un **Revenue Seat**
+❌ **La unidad de cobro de Revenue Hub** (USD 95/USD 140: ¿seat o cuenta?) no está clara. Existe un **Revenue Seat**
 formal ✅ — lo que sugiere que escala por seat. **Pregúntalo antes de cotizar.**
 
 ### 🔴 Trampa 1 — los créditos NO se suman entre hubs
@@ -64,15 +64,15 @@ formal ✅ — lo que sugiere que escala por seat. **Pregúntalo antes de cotiza
 Incluidos: Starter 500 · Pro 3.000 · Enterprise 5.000 (Data Hub y Customer Platform: Pro 5.000 / Ent 10.000).
 
 ### 🔴 Trampa 2 — los contactos de marketing saltan escalonado
-✅ Pro: incluye 2.000; el bloque adicional es de **5.000 por $250**.
-**Un Pro que pasa de 2.000 a 2.001 contactos salta +$250/mo.** Modela el **crecimiento** de la base, no el número de hoy.
-Enterprise: incluye 10.000; bloques de 10.000 desde $100 (bajando a $60 sobre 500K).
+✅ Pro: incluye 2.000; el bloque adicional es de **5.000 por USD 250**.
+**Un Pro que pasa de 2.000 a 2.001 contactos salta +USD 250/mo.** Modela el **crecimiento** de la base, no el número de hoy.
+Enterprise: incluye 10.000; bloques de 10.000 desde USD 100 (bajando a USD 60 sobre 500K).
 ✅ **Límite de envío:** Starter 5× · Pro 10× · **Enterprise 20×** el tier de contactos, por mes.
 Si el cliente envía más, **el modelo de precio no le sirve** — descalifícalo o rediseña.
 
 ### Seats ✅
-Core (pagado, $45-$75) · Sales · Service · **Revenue** (requerido para crear/editar quotes) ·
-**View-Only ($0)** · **Partner Seat ($0)**.
+Core (pagado, USD 45-USD 75) · Sales · Service · **Revenue** (requerido para crear/editar quotes) ·
+**View-Only (USD 0)** · **Partner Seat (USD 0)**.
 ⚠️ El accounting de core seats cross-hub es **ambiguo en la web pública**. Multi-hub → **cotización oficial**.
 
 ---
@@ -89,10 +89,10 @@ Cross-sell/Upsell, Customer Health, Deal Loss, RFP, Sales-to-Marketing Feedback.
 
 ### Lo que sí puedes vender con confianza — el outcome-based pricing ✅
 Anunciado 2026-04-02, efectivo **2026-04-14**:
-- **Customer Agent: $0,50 por conversación RESUELTA** (bajó de $1,00 por conversación). **Las que no
+- **Customer Agent: USD 0,50 por conversación RESUELTA** (bajó de USD 1,00 por conversación). **Las que no
   resuelven no cuestan nada.** Datos de HubSpot: 50% más tickets resueltos, 29% más rápido, **resuelve el
   70% de las conversaciones** (los mejores equipos llegan a 90%).
-- **Prospecting Agent: $1,00 por lead recomendado** (antes: cargo mensual recurrente por contacto enrolado).
+- **Prospecting Agent: USD 1,00 por lead recomendado** (antes: cargo mensual recurrente por contacto enrolado).
   Early users con **response rate 2× el benchmark**.
 - Cita para el pitch (Jon Dick, Chief Customer Officer): *"Outcome-based pricing removes that risk.
   **You pay when it works, full stop.**"*
@@ -100,8 +100,8 @@ Anunciado 2026-04-02, efectivo **2026-04-14**:
 ✅ **Definición de "resuelta"** (necesaria para modelar el costo): el agente respondió compartiendo una fuente
 o ejecutó una acción **y no hubo handoff a humano dentro de 72 horas** del último mensaje.
 
-> 🎯 **Este es tu mejor golpe contra Agentforce.** Salesforce cobra **$0,10 por acción** (Flex Credits) o
-> **$125/usuario/mes**. Es un contador corriendo. *"Pregúntale a tu AE de Salesforce cuánto va a ser tu
+> 🎯 **Este es tu mejor golpe contra Agentforce.** Salesforce cobra **USD 0,10 por acción** (Flex Credits) o
+> **USD 125/usuario/mes**. Es un contador corriendo. *"Pregúntale a tu AE de Salesforce cuánto va a ser tu
 > factura de Flex Credits el mes 14. No lo sabe."*
 
 ### 🔴 Custom Assistants: sunset ✅ — y es un gancho de discovery
@@ -186,7 +186,7 @@ Detalle y uso en `modules/10_DISCOVERY_SCOPING.md`.
 | **API**: Ent 190 req/10s · 1M/día (add-on hasta 3M). 🔴 **Las apps públicas OAuth topan en 110 req/10s y el add-on NO levanta ese límite** | Sync bidireccional en tiempo real con ERP o core bancario |
 | **Sin role hierarchy ni territory management** ⚠️ | Organización matricial global, ventas por territorio con visibilidad compleja |
 | **100 deal pipelines · 1.000 custom properties/objeto · 300 teams · 200 calculated properties** | Enterprise global con muchas BUs come 100 pipelines más rápido de lo que crees |
-| **B2C masivo**: Ent a 500K+ contactos = $60 por cada 10.000; envío capado a 20× | Base de millones. **Adobe/Salesforce salen más baratos a escala.** Ese es el terreno donde HubSpot pierde |
+| **B2C masivo**: Ent a 500K+ contactos = USD 60 por cada 10.000; envío capado a 20× | Base de millones. **Adobe/Salesforce salen más baratos a escala.** Ese es el terreno donde HubSpot pierde |
 | **Sin capa de código server-side tipo Apex** ⚠️ | Motores de reglas, pricing regulado, lógica de negocio compleja |
 | ❌ **BYOK / claves gestionadas por el cliente: no encontrado** | Si el pliego lo exige, **asume que no y verifica** |
 
@@ -197,7 +197,7 @@ totales en Enterprise; throttling de workflows con enrolamientos masivos.
 
 ## 7. El dato que enmarca todo ✅
 
-**ARPU de HubSpot: $11.722/año** (Q1 2026, 299.458 clientes, revenue $881,0M +23%).
+**ARPU de HubSpot: USD 11.722/año** (Q1 2026, 299.458 clientes, revenue USD 881,0M +23%).
 
 > Un deal de seis cifras es **~10× su cliente promedio**. Dos cosas ciertas al mismo tiempo:
 > **(a)** tienes **palanca real** negociando con el rep de HubSpot — le estás trayendo un outlier;

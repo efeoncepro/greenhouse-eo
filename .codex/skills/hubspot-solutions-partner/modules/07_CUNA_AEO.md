@@ -9,7 +9,7 @@
 
 | Hecho | Fuente |
 |---|---|
-| **HubSpot lanzó AEO como producto** (abr-2026): mide visibilidad de marca en ChatGPT, Gemini y Perplexity, con benchmark competitivo y análisis de citaciones. **$50/mo standalone — incluido en Marketing Pro/Enterprise** | ✅ Spring 2026 Spotlight |
+| **HubSpot lanzó AEO como producto** (abr-2026): mide visibilidad de marca en ChatGPT, Gemini y Perplexity, con benchmark competitivo y análisis de citaciones. **USD 50/mo standalone — incluido en Marketing Pro/Enterprise** | ✅ Spring 2026 Spotlight |
 | **Su propio dato de justificación:** tráfico orgánico **−27% interanual**; tráfico de referencia desde IA **×3** | ✅ HubSpot |
 | **Efeonce ya tiene el diagnóstico construido**: el **AI Visibility Grader** (`src/lib/growth/ai-visibility/**`), 7 dimensiones, multi-motor, brand-aware | Repo Greenhouse |
 | **En los mercados de Efeonce la búsqueda de categoría casi no existe** — Chile: `crm para empresas` = **20/mes** | ✅ Semrush 2026-07-13 |
@@ -43,11 +43,11 @@ región tenga esta combinación armada.
 
 ## 3. El giro de precio que cierra la conversación
 
-**HubSpot AEO cuesta $50/mes standalone. Viene incluido desde Marketing Hub Professional.** ✅
+**HubSpot AEO cuesta USD 50/mes standalone. Viene incluido desde Marketing Hub Professional.** ✅
 
 Eso convierte una conversación de compra en una conversación de **aritmética**:
 
-> *"AEO suelto son $50 al mes. Marketing Hub Pro son $800 y lo trae adentro, más automation, más
+> *"AEO suelto son USD 50 al mes. Marketing Hub Pro son USD 800 y lo trae adentro, más automation, más
 > atribución, más el CRM. La pregunta no es si compras AEO. Es si tiene sentido comprarlo suelto."*
 
 Y para un cliente que **ya tiene Marketing Hub Pro**: *"ya lo estás pagando. No lo estás usando."*
@@ -123,6 +123,6 @@ reunión enterprise cuesta más que no tener dato.
 | **Mostrar el grader como reporte de marketing** | Es **evidencia forense**. En cuanto huele a folleto, pierde todo su poder |
 | **Correrlo y no mostrar a los competidores** | El número absoluto no duele. **El gap relativo, sí** |
 | **Mostrar un run con `unknown`** | Un dato malo en una reunión enterprise cuesta más que no tener dato |
-| **Vender AEO suelto** | $50/mo es un ticket que no paga tu implementación. **La cuña es la entrada a Marketing Hub**, no el destino |
+| **Vender AEO suelto** | USD 50/mo es un ticket que no paga tu implementación. **La cuña es la entrada a Marketing Hub**, no el destino |
 | **Reimplementar el método AEO acá** | Es de `seo-aeo`. Esta skill lo consume |
 | **Prometer posiciones en LLM** | Nadie controla lo que responde un LLM. Prometes **medición, método y mejora relativa** — jamás un ranking |
