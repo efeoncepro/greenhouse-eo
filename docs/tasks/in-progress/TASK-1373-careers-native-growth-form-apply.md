@@ -4,7 +4,7 @@
 
 Hechos verificados contra el repo real + el contrato canónico de Growth Forms. Task bien encuadrada (Careers = host del renderer, no segundo motor); ajustes:
 
-- **⚠️ HALLAZGO — el form de careers es un HELPER DE CÓDIGO, no un Growth Form publicado (prerequisito duro):** `src/lib/hiring/public-careers/growth-form-contract.ts` **sintetiza el render contract en código** (`buildCareersApplicationFormContract`, con `CAREERS_APPLICATION_FORM_KEY='9f7a8fc0-…'`, `SURFACE_ID='public-careers-nextjs'` hardcodeados) y el `CareersApplyClient` lo consume directo. **NO** es un `form_definition`/`form_version` publicado en `greenhouse_growth.*` servido por `GET /api/public/growth/forms/<formKey>`. Regla dura de la skill: *los forms se autoran/versionan/gobiernan en la DB (draft→publish), no hardcodeados en código.* Para que `<greenhouse-form>` renderice nativo, **hay que autorar+publicar** el form `efeonce-careers-application` (mismo `form_key` + surface `public-careers-nextjs` + origin en `form_host_surface`) por el lifecycle gobernado. Esto es Slice 4 de TASK-1372 (seed del form) o un **prerequisito explícito de 1373** — declararlo, porque el render path exige un form publicado en DB, no el helper de código.
+- **⚠️ HALLAZGO — el form de careers es un HELPER DE CÓDIGO, no un Growth Form publicado (trabajo propio de 1373):** `src/lib/hiring/public-careers/growth-form-contract.ts` **sintetiza el render contract en código** (`buildCareersApplicationFormContract`, con `CAREERS_APPLICATION_FORM_KEY='9f7a8fc0-…'`, `SURFACE_ID='public-careers-nextjs'` hardcodeados) y el `CareersApplyClient` lo consume directo. **NO** es un `form_definition`/`form_version` publicado en `greenhouse_growth.*` servido por `GET /api/public/growth/forms/<formKey>`. Regla dura de la skill: *los forms se autoran/versionan/gobiernan en la DB (draft→publish), no hardcodeados en código.* Para que `<greenhouse-form>` renderice nativo, 1373 debe **autorar+publicar** el form `efeonce-careers-application` (mismo `form_key` + surface `public-careers-nextjs` + origin en `form_host_surface`) por el lifecycle gobernado.
 - **⚠️ Coordinación viva con TASK-354 (in-progress):** `src/components/greenhouse/careers/CareersApplyClient.tsx` (+166) y `careers.module.css` (+126) están **modificados sin commitear** (trabajo 354 en curso) — son los archivos exactos que 1373 migra. Secuenciar: 1373 arranca **después** de que la UI de apply de 354 aterrice/commitee Y de que 1372 publique el form. No migrar un archivo que 354 tiene mid-flight.
 - **`.ghf-scope` / `hosted` (TASK-1298, el bug recurrente de theming):** al hostear `<greenhouse-form>`, el core NO debe re-declarar `.ghf-scope` (el host es el scope, `hosted=true`). El override de tokens va en `greenhouse-form { --ghf-* }`. Careers usa `appearance='bare'` + `color-scheme='light'` (bien) pero debe respetar explícitamente este contrato o los overrides no propagan al contenido.
 - **Surface same-origin (gate más liviano que WordPress/AEO):** `SURFACE_ID='public-careers-nextjs'` = embed same-origin en una page Next.js de Greenhouse (NO un host WordPress cross-origin). CORS es trivial (mismo origin) pero el `form_host_surface` igual debe existir. NO cargar la ceremonia AEO/`heroans`/`verify-aeo-live-contract` — usar el gate proporcional (smoke API + GVC desktop/mobile 390 + overflow + captcha/upload smoke).
@@ -35,23 +35,23 @@ Hechos verificados contra el repo real + el contrato canónico de Growth Forms. 
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1373-careers-native-growth-form.md`
 - Flow: `docs/ui/flows/TASK-1373-careers-native-growth-form-flow.md`
 - Motion: `docs/ui/motion/TASK-1373-careers-native-growth-form-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Code complete local; staging env set; redeploy develop pendiente`
 - Rank: `TBD`
 - Domain: `ui|hr|growth`
-- Blocked by: `TASK-1372`
+- Blocked by: `none`
 - Branch: `task/TASK-1373-careers-native-growth-form-apply`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -68,7 +68,7 @@ El apply de Careers ya se ve como Growth Form, pero no lo es de punta a punta: m
 
 - Usar `<greenhouse-form>` como renderer real del apply de Careers.
 - Mantener alta fidelidad al HTML fuente: iconos, jerarquia, progreso, telefono con pais y estetica Efeonce.
-- Eliminar duplicacion local de validacion/submit/CV cuando `TASK-1372` entregue soporte de application upload + ATS destination.
+- Eliminar duplicacion local de validacion/submit/CV usando el soporte de application upload + ATS projection entregado por `TASK-1372`.
 - Verificar desktop/mobile y submit E2E sin scroll horizontal ni regresiones de privacidad.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -85,7 +85,7 @@ Revisar y respetar:
 - `docs/architecture/ui-platform/PATTERNS.md`
 - `docs/ui/wireframes/TASK-354-public-careers-landing.md`
 - `docs/ui/flows/TASK-354-public-careers-landing-flow.md`
-- `docs/tasks/to-do/TASK-1372-growth-forms-application-upload-ats-destination.md`
+- `docs/tasks/complete/TASK-1372-growth-forms-application-upload-ats-destination.md`
 - `docs/tasks/in-progress/TASK-354-public-careers-landing-apply-intake.md`
 
 Reglas obligatorias:
@@ -107,7 +107,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1372` for native Growth Forms file/CV and ATS projection support + el form publicado (`efeonce-careers-application`).
+- `TASK-1372` for native Growth Forms file/CV and ATS projection support. **Satisfied 2026-07-13:** staging live in SHA `25c7e246c`, with multipart submit + worker projection smoke. 1373 owns authoring/publishing the real `efeonce-careers-application` form by the governed lifecycle.
 - **Coordinación con `TASK-354` (in-progress):** `CareersApplyClient.tsx` + `careers.module.css` están modificados uncommitted por 354 — 1373 los migra. Secuenciar 1373 después de que 354 aterrice/commitee su apply UI; no migrar un archivo mid-flight.
 - Existing Careers public shell/components in `src/components/greenhouse/careers/**`.
 - Existing Growth Forms renderer in `src/growth-forms-renderer/**`.
@@ -131,6 +131,16 @@ Reglas obligatorias:
 - `docs/manual-de-uso/hr/operar-careers-publicas.md`
 - `docs/documentation/hr/careers-publicas.md`
 
+## Modular Placement Contract
+
+- Topology impact: `public`
+- Current home: `src/app/public/careers/[publicId]/apply` + `src/components/greenhouse/careers/**` inside the current Next.js portal/public runtime; Growth Forms renderer lives in `src/growth-forms-renderer/**`.
+- Future candidate home: `public`
+- Boundary: Careers public apply is a thin host of the governed Growth Forms render/submit contract; authorized consumers are the Careers public route, Growth Forms public API/renderer, and Hiring ATS projection from TASK-1372.
+- Server/browser split: browser code may import only renderer/browser-safe contract and public DTOs; DB, Growth Forms publication lifecycle, asset stores, Turnstile secret, worker projection and Hiring writes stay server/worker-side.
+- Build impact: no new apps/packages or heavy dependencies; adds/updates public route/component/scenario assets only.
+- Extraction blocker: Careers route and Growth Forms public API currently share the same Next.js deployment/sessionless public origin and repo-local renderer bundle; extraction requires a governed public-app boundary but no new topology is authorized here.
+
 ## Current Repo State
 
 ### Already exists
@@ -146,7 +156,7 @@ Reglas obligatorias:
 - Apply page is not using `<greenhouse-form>` as the real renderer/source of truth (hoy `CareersApplyClient` hace POST directo a `/api/public/hiring/applications` + usa `TurnstileTokenClient` local).
 - Field icons and Growth Forms phone country UI are not guaranteed by the current custom component.
 - The local component duplicates submit, errors, validation and CV handling.
-- Native migration is blocked until `TASK-1372` supports upload + ATS projection **y** el form está publicado.
+- Native migration is unblocked because `TASK-1372` supports upload + ATS projection; 1373 still must publish the governed `efeonce-careers-application` form before cutover.
 
 ## UI/UX Contract
 
@@ -250,6 +260,29 @@ Reglas obligatorias:
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Audit
+
+- 2026-07-13: `pnpm codex:task-hook TASK-1373 --develop` inicialmente bloqueó por `TASK-1372`; se verificó `TASK-1372` staging live y se sincronizó el blocker documental antes de reintentar.
+- 2026-07-13: Hook re-ejecutado PASS en `develop`, sin subagentes ni worktree nuevo por instrucción del operador.
+- 2026-07-13: Baseline visual local del apply custom capturado con `pnpm fe:capture task354-careers-runtime-audit --env=local --task=TASK-1373`: `.captures/2026-07-13T20-42-47_task354-careers-runtime-audit`, desktop/mobile PASS, sin overflow (`scrollWidth === clientWidth` en 1440 y 390).
+- 2026-07-13: Staging GVC previo bloqueado por falta de `VERCEL_AUTOMATION_BYPASS_SECRET`; se usó baseline local proporcional antes de cutover y se dejó runtime staging para post-deploy.
+
+## Plan
+
+1. Publicar el form real `efeonce-careers-application` por lifecycle gobernado Growth Forms, no por helper hardcodeado.
+2. Mantener el componente custom como rollback detrás de `CAREERS_NATIVE_GROWTH_FORM_ENABLED` default OFF.
+3. Hostear `<greenhouse-form>` con `appearance='bare'`, tokens scoped en Careers y binding server-derived de `openingPublicId`.
+4. Validar fail-closed de captcha, submit Growth Forms, CV privado, projection ATS y ausencia de destinos externos.
+5. Cerrar con GVC desktop/mobile, lint/typecheck/tests/build/flags/QA/docs, y rollout sólo a `develop`/staging.
+
+## Execution Log
+
+- 2026-07-13: Publicado en dev DB el form `efeonce-careers-application` con `form_key=9f7a8fc0-6fa7-4670-8e2d-efe0ce354001`, version `fver-94aa599b-6cb6-48bd-be59-25159e1a2da0`, `composition=static`, `styleVariant=careers-html-fidelity`, surface `public-careers-nextjs`, `form_destination` count `0`.
+- 2026-07-13: Se creó `CareersNativeGrowthFormClient` como host visual del renderer y se activó el cutover por `CAREERS_NATIVE_GROWTH_FORM_ENABLED`; el `CareersApplyClient` custom queda como fallback flag OFF.
+- 2026-07-13: Smoke sintético PASS: submit sin captcha por API devuelve `403 captcha_failed/missing_token`; submit directo con verifier sintético crea `growth_form_submission`, projection `growth_hiring_application_from_submission` genera `hiring_application`, adjunta CV privado y mantiene destinations `0`.
+- 2026-07-13: GVC post-cutover local PASS: `.captures/2026-07-13T21-01-34_task354-careers-runtime-audit`; desktop/mobile sin runtime findings, sin layout findings, `scrollWidth === clientWidth` en 1440 y 390, host nativo y uploader marcados.
+- 2026-07-13: `CAREERS_NATIVE_GROWTH_FORM_ENABLED=true` agregado en Vercel `staging`; producción no tocada. Redeploy queda pendiente del push a `develop`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
@@ -257,9 +290,10 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Renderer readiness and form contract binding
+### Slice 1 — Renderer readiness and governed form publication
 
 - Confirm `TASK-1372` application form contract can render all Careers fields including CV.
+- Author and publish `efeonce-careers-application` by the Growth Forms governed lifecycle.
 - Replace local field definitions/state with native Growth Forms render contract.
 - Preserve host chrome: header, hero, page title and no-JS fallback.
 
@@ -301,7 +335,7 @@ Reglas obligatorias:
 
 ### Slice ordering hard rule
 
-- Slice 1 can start only after `TASK-1372` contract is available.
+- Slice 1 can start because `TASK-1372` contract is available in staging; publish the real Careers Growth Form before UI cutover.
 - Slice 2 must not ship until Growth Forms submit creates ATS applications.
 - Slice 3 visual/a11y polish must happen before production rollout.
 - Slice 4 closes only after GVC and submit evidence.

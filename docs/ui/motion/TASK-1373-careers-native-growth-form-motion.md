@@ -5,7 +5,7 @@
 - Task: `TASK-1373`
 - Superficie: apply de Careers migrado a `<greenhouse-form>` nativo. Wireframe: `docs/ui/wireframes/TASK-1373-careers-native-growth-form.md` · Flow: `docs/ui/flows/TASK-1373-careers-native-growth-form-flow.md`
 - Rigor de motion: **preservación**, no autoría. 1373 es un host: NO agrega motion nuevo. El motion vive en el **renderer + el `styleVariant` premium** (owned por TASK-1372). Este contrato existe para **blindar** que la migración no degrade el motion actual del apply.
-- Estado: `draft` (UI ready: no)
+- Estado: `verified-local` (UI ready: yes; staging post-deploy pendiente)
 
 ## Motion Brief
 
@@ -38,11 +38,12 @@ La directiva del operador es que migrar a Growth Form **no puede perder la rique
 - El feedback (foco, error, pending, éxito) sobrevive por texto/aria por construcción del renderer; el motion es aditivo, nunca el único canal.
 - El foco visible y el orden de tabulación (heading → campos → país → CV → consent → submit) se preservan; el motion no interfiere.
 
-## GVC / Micro Evidence (before/after — es el gate de paridad)
+## GVC / Micro Evidence
 
-- Capturar el CTA (M1), el combobox premium (M3) y la validación inline (M4) **antes** (form custom actual) y **después** (migrado), desktop 1440 + mobile 390.
-- El motion migrado debe ser **igual o mejor**; cualquier degradación (CTA plano, select nativo, foco perdido) bloquea el cierre.
-- Verificar reduced-motion post-migración: feedback esencial conservado.
+- Baseline custom local: `.captures/2026-07-13T20-42-47_task354-careers-runtime-audit`, desktop 1440 + mobile 390, sin overflow ni runtime findings.
+- Post-cutover native local: `.captures/2026-07-13T21-01-34_task354-careers-runtime-audit`, desktop 1440 + mobile 390, native host visible, CV uploader marker visible, sin overflow ni runtime/layout findings.
+- El host no agregó motion propio; preserva feedback esencial del renderer (`pending`, focus, errors, success). La validación de success real se cubrió por smoke sintético Growth Forms → ATS.
+- Staging GVC queda como post-deploy gate porque el ambiente protegido no tenía `VERCEL_AUTOMATION_BYPASS_SECRET` disponible durante el preflight.
 
 ## Design Decision Log
 

@@ -147,6 +147,8 @@ export type FormDestinationAttemptRow = {
 
 export interface InsertFormDefinitionInput {
   slug: string
+  /** Identidad pública estable (`form_key`). Si no se entrega, la DB genera un UUID. */
+  formKey?: string | null
   name: string
   formKind: string
   purpose: string
@@ -165,11 +167,12 @@ export interface InsertFormDefinitionInput {
 export const insertFormDefinition = async (input: InsertFormDefinitionInput): Promise<FormDefinitionRow> => {
   const rows = await query<FormDefinitionRow>(
     `INSERT INTO greenhouse_growth.form_definition
-       (slug, name, form_kind, purpose, risk_profile, owner_team, default_locale, created_by)
-     VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, 'es-CL'), $8)
+       (slug, form_key, name, form_kind, purpose, risk_profile, owner_team, default_locale, created_by)
+     VALUES ($1, COALESCE($2::uuid, gen_random_uuid()), $3, $4, $5, $6, $7, COALESCE($8, 'es-CL'), $9)
      RETURNING *`,
     [
       input.slug,
+      input.formKey ?? null,
       input.name,
       input.formKind,
       input.purpose,

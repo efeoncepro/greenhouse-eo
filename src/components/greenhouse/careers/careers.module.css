@@ -1685,6 +1685,51 @@
   box-shadow: 0 26px 64px rgba(0, 64, 112, 0.13), 0 6px 18px rgba(16, 24, 40, 0.05);
 }
 
+.growthFormCard {
+  position: relative;
+  overflow: visible;
+  gap: 18px;
+  --ghf-font: var(--font-sans);
+  --ghf-accent: var(--primary);
+  --ghf-accent-contrast: var(--surface);
+  --ghf-fg: var(--text-primary);
+  --ghf-muted: var(--text-secondary);
+  --ghf-bg: transparent;
+  --ghf-field-bg: var(--surface);
+  --ghf-border: var(--border-subtle);
+  --ghf-border-strong: var(--border-strong);
+  --ghf-error: var(--error-ink);
+  --ghf-error-bg: var(--error-tonal);
+  --ghf-success: var(--success);
+  --ghf-celebration: var(--brand-green);
+  --ghf-radius: var(--radius-md);
+  --ghf-gap: 16px;
+  --ghf-focus: var(--primary);
+  --ghf-field-shadow: var(--shadow-raised);
+  --ghf-field-shadow-focus: 0 0 0 3px rgba(3, 117, 219, 0.14), var(--shadow-floating);
+  --ghf-action-shadow: 0 14px 26px rgba(3, 117, 219, 0.22), 0 3px 10px rgba(16, 24, 40, 0.07);
+  --ghf-action-shadow-hover: 0 18px 34px rgba(3, 117, 219, 0.28), 0 5px 14px rgba(16, 24, 40, 0.09);
+}
+
+.growthFormCard greenhouse-form {
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+
+.nativeFallback {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.nativeFallback strong {
+  color: var(--text-primary);
+}
+
 .progressWrap {
   display: flex;
   flex-direction: column;

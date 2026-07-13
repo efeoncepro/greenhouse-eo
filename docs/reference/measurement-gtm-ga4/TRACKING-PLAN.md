@@ -27,6 +27,7 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 | Slug | Kind | Nombre | Página / surface | Emite dataLayer | Evento GTM → GA4 | Key event | Tagging | Notas |
 |---|---|---|---|---|---|---|---|---|
 | `efeonce-aeo-diagnostic` | diagnostic_intake | Diagnóstico AEO | `/aeo-2/` (servicio AEO) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | Form comercial AEO → HubSpot. |
+| `efeonce-careers-application` | application | Careers Application | `/public/careers/[publicId]/apply` (surface `public-careers-nextjs`) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | TASK-1373. Form de postulación Careers por Growth Forms; submit técnico probado con ATS projection + CV privado, sin destinos externos. |
 | `ai-visibility-grader` | diagnostic_intake | AI Visibility Grader | grader (lead magnet self-serve) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | Lead magnet del grader. |
 | `efeonce-seo-diagnostic` | diagnostic_intake | Diagnóstico SEO | landing SEO (agencia SEO) | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | Form comercial SEO. |
 | `efeonce-desarrollo-web-cotizacion` | quote_request | Cotización desarrollo web | landing desarrollo web | ✅ default | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ genérico | 2 versiones publicadas. |

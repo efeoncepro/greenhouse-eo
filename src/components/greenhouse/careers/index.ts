@@ -1,5 +1,6 @@
 export { CareersApplyClient } from './CareersApplyClient'
 export { CareersDetailView } from './CareersDetailView'
 export { CareersHomeClient } from './CareersHomeClient'
+export { CareersNativeGrowthFormClient } from './CareersNativeGrowthFormClient'
 export { CareersPublicShell } from './CareersPublicShell'
 export { CareersUnavailableView } from './CareersUnavailableView'

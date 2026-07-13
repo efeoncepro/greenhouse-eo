@@ -31,7 +31,16 @@ const el = (doc: Document, tag: string, attrs: Record<string, string> = {}, text
 }
 
 export class GreenhouseFormElement extends HTMLElement {
-  static readonly observedAttributes = ['form', 'form-key', 'surface', 'locale', 'base-url', 'embed-key', 'appearance']
+  static readonly observedAttributes = [
+    'form',
+    'form-key',
+    'surface',
+    'locale',
+    'base-url',
+    'embed-key',
+    'appearance',
+    'initial-values',
+  ]
 
   private internals: ElementInternals | null = null
   private renderer: FormRenderer | null = null
@@ -146,6 +155,7 @@ export class GreenhouseFormElement extends HTMLElement {
       api: this.apiConfig,
       locale: this.getAttribute('locale') ?? undefined,
       pageContext: this.pageContext(),
+      initialValues: this.initialValues(),
       colorScheme: this.getAttribute('color-scheme') === 'light' ? 'light' : undefined,
       doc,
       // El custom element ES el scope (declara tokens + container-type + box-sizing vía
@@ -166,6 +176,33 @@ export class GreenhouseFormElement extends HTMLElement {
     }
   }
 
+  private initialValues(): Record<string, string | number | boolean | string[]> {
+    const raw = this.getAttribute('initial-values')
+
+    if (!raw) return {}
+
+    try {
+      const parsed = JSON.parse(raw) as unknown
+
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+
+      return Object.fromEntries(
+        Object.entries(parsed).filter((entry): entry is [string, string | number | boolean | string[]] => {
+          const value = entry[1]
+
+          return (
+            typeof value === 'string' ||
+            typeof value === 'number' ||
+            typeof value === 'boolean' ||
+            (Array.isArray(value) && value.every(item => typeof item === 'string'))
+          )
+        }),
+      )
+    } catch {
+      return {}
+    }
+  }
+
   private renderLoading(text: string, ariaLabel: string): void {
     const doc = this.ownerDocument
 
@@ -183,7 +220,7 @@ export class GreenhouseFormElement extends HTMLElement {
     wrap.appendChild(el(doc, 'span', { class: 'ghf-skeleton-row' }))
     wrap.appendChild(el(doc, 'span', { class: 'ghf-skeleton-row' }))
     // Texto accesible (no decorativo) para SR; visualmente oculto en favor del skeleton.
-    wrap.appendChild(el(doc, 'span', { class: 'ghf-honeypot' }, text))
+    wrap.appendChild(el(doc, 'span', { class: 'ghf-sr-only' }, text))
     this.appendChild(wrap)
   }
 

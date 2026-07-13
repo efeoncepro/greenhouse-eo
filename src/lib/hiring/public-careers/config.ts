@@ -10,6 +10,10 @@ import type { IntakeLimits } from '@/lib/growth/public-submission/abuse-guard'
 export const isHiringPublicApplicationsEnabled = (): boolean =>
   process.env.HIRING_PUBLIC_APPLICATIONS_ENABLED === 'true'
 
+/** TASK-1373 — cutover del apply público al renderer nativo Growth Forms. Default OFF. */
+export const isCareersNativeGrowthFormEnabled = (): boolean =>
+  process.env.CAREERS_NATIVE_GROWTH_FORM_ENABLED === 'true'
+
 // Salts byte-estables: cambiarlos orfana los contadores de ventana en vuelo.
 export const HIRING_INTAKE_EMAIL_SALT = 'gh-hiring-apply-intake-email-v1'
 export const HIRING_INTAKE_IP_SALT = 'gh-hiring-apply-intake-ip-v1'

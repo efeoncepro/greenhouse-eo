@@ -45,6 +45,8 @@ export interface FormRendererOptions {
   locale?: string
   /** Contexto de página (browser-safe) para telemetría/submit. */
   pageContext?: { pageUri?: string; pageName?: string; referrer?: string }
+  /** Valores iniciales browser-safe que el host conoce (p.ej. public IDs en campos hidden). */
+  initialValues?: Record<string, string | number | boolean | string[]>
   /** Inyector de fetch (tests). */
   fetchImpl?: typeof fetch
   doc?: Document
@@ -159,6 +161,19 @@ export class FormRenderer {
       if (field.type === 'consent' || field.type === 'checkbox') this.values[field.key] = false
       else if (field.type === 'multiselect') this.values[field.key] = []
       else this.values[field.key] = ''
+    }
+
+    for (const [key, value] of Object.entries(opts.initialValues ?? {})) {
+      const field = this.contract.fields.find(candidate => candidate.key === key)
+
+      if (!field) continue
+      if (field.type === 'file' || field.type === 'consent' || field.type === 'checkbox') continue
+
+      if (field.type === 'multiselect') {
+        this.values[key] = Array.isArray(value) ? value.map(String) : []
+      } else if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        this.values[key] = String(value)
+      }
     }
 
     // Restaura un borrador PII-safe (sin cédula/consent) si existe (TASK-1256 Slice 1d).
@@ -414,7 +429,8 @@ export class FormRenderer {
     const wrap = el(this.doc, 'div', {
       class: `ghf-field${fullWidth ? ' ghf-field--full' : ''}`,
       'data-invalid': error ? 'true' : 'false',
-      'data-status': this.fieldStatus.get(field.key) ?? 'neutral'
+      'data-status': this.fieldStatus.get(field.key) ?? 'neutral',
+      'data-ghf-field-key': field.key,
     })
 
     const label = this.fieldLabel(field)

@@ -41,7 +41,7 @@ export const buildCareersApplicationFormContract = ({
     locale,
     formKind: 'application',
   },
-  composition: 'multi_step_light',
+  composition: 'static',
   fields: [
     {
       key: 'openingPublicId',
@@ -157,15 +157,6 @@ export const buildCareersApplicationFormContract = ({
       validator: 'text',
       maxLength: 4000,
     },
-  ],
-  steps: [
-    { key: 'personal', label: copy.apply.sections.personal, fieldKeys: ['firstName', 'lastName', 'email', 'phone'] },
-    {
-      key: 'profile',
-      label: copy.apply.sections.profile,
-      fieldKeys: ['portfolioUrl', 'linkedinUrl', 'availability', 'cvFile'],
-    },
-    { key: 'message', label: copy.apply.sections.message, fieldKeys: ['message'] },
   ],
   copy: {
     title: copy.apply.titleTemplate.replace('{role}', opening.title),

@@ -6,6 +6,8 @@ Confirma:
 
 - existe un opening publicado por el flujo de Hiring/ATS;
 - `HIRING_PUBLIC_APPLICATIONS_ENABLED` está en el estado esperado del ambiente;
+- `CAREERS_NATIVE_GROWTH_FORM_ENABLED` está en el estado esperado del ambiente
+  si quieres probar el apply con el renderer nativo de Growth Forms;
 - Turnstile y consentimiento están aprobados para el ambiente objetivo;
 - la ruta pública que vas a probar corresponde al ambiente correcto.
 
@@ -191,11 +193,15 @@ Contrato programatico del submit:
   `multipart/form-data`, guarda el CV como asset privado
   `hiring_application_cv_draft`, escanea los bytes y emite
   `growth.forms.submission_accepted`.
+- Desde TASK-1373, el apply de Careers puede renderizar el Growth Form real
+  `efeonce-careers-application` con `form-key`
+  `9f7a8fc0-6fa7-4670-8e2d-efe0ce354001` y surface
+  `public-careers-nextjs`, detrás de `CAREERS_NATIVE_GROWTH_FORM_ENABLED`.
 - La projection `growth_hiring_application_from_submission` crea/dedupea la
   `hiring_application` llamando `submitPublicHiringApplication`; no hay
   `form_destination` interno para ATS.
 - `POST /api/public/hiring/applications` queda como endpoint publico
-  legacy/compat hasta que TASK-1373 migre la UI de Careers al renderer nativo.
+  legacy/compat para rollback mientras el flag nativo se estabiliza.
 - En produccion ambos caminos publicos exigen Turnstile; sin token valido fallan
   cerrado con `403 captcha_failed`.
 - El CV opcional debe ser PDF, maximo 10 MB, y nunca expone URL publica ni

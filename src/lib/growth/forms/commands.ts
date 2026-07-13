@@ -73,6 +73,8 @@ import {
 
 export interface AuthorDraftFormInput {
   slug: string
+  /** Identidad pública estable (`form_key`) para first-publish de consumers externos. */
+  formKey?: string
   name: string
   formKind: FormKind
   purpose: string
@@ -101,10 +103,15 @@ export interface AuthorDraftFormInput {
 export const authorDraftForm = async (input: AuthorDraftFormInput): Promise<{ formId: string; formVersionId: string }> => {
   const existing = await getFormDefinitionBySlug(input.slug)
 
+  if (existing && input.formKey && existing.form_key !== input.formKey) {
+    throw new Error(`form_key_mismatch:${input.slug}`)
+  }
+
   const definition =
     existing ??
     (await insertFormDefinition({
       slug: input.slug,
+      formKey: input.formKey,
       name: input.name,
       formKind: input.formKind,
       purpose: input.purpose,

@@ -1238,6 +1238,100 @@ export const RENDERER_CSS = `
     font-size: 0.8125rem;
   }
 
+  [data-ghf-style-variant="careers-html-fidelity"] {
+    --ghf-radius: 6px;
+    --ghf-gap: 16px;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-field {
+    gap: 7px;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-label {
+    font-size: 0.875rem;
+    font-weight: 800;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-field-icon {
+    inline-size: 30px;
+    block-size: 30px;
+    border-radius: 10px;
+    border-color: color-mix(in srgb, var(--ghf-border) 82%, transparent);
+    background: color-mix(in srgb, var(--ghf-accent) 10%, var(--ghf-field-bg));
+    color: color-mix(in srgb, var(--ghf-accent) 82%, var(--ghf-fg));
+    font-size: 0.75rem;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-input,
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-textarea,
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-select,
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-file-input {
+    min-height: 48px;
+    padding: 12px 14px;
+    border-width: 1.5px;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-file {
+    padding: 16px 18px;
+    border: 1.5px dashed var(--ghf-border-strong);
+    border-radius: var(--ghf-radius);
+    background: color-mix(in srgb, var(--ghf-field-bg) 72%, var(--ghf-border));
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-file-input {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-file-status {
+    font-weight: 700;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-check {
+    border-width: 1.5px;
+    background: color-mix(in srgb, var(--ghf-field-bg) 86%, var(--ghf-border));
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-actions {
+    justify-content: flex-start;
+    padding-block-start: 10px;
+    border-block-start: 1px solid var(--ghf-border);
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 12px 20px;
+    font-weight: 800;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-btn:not(.ghf-btn--ghost) {
+    flex: 1 1 260px;
+    max-width: 340px;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-readiness {
+    font-weight: 700;
+  }
+
+  @container (max-width: 520px) {
+    [data-ghf-style-variant="careers-html-fidelity"] .ghf-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    [data-ghf-style-variant="careers-html-fidelity"] .ghf-btn,
+    [data-ghf-style-variant="careers-html-fidelity"] .ghf-btn:not(.ghf-btn--ghost) {
+      width: 100%;
+      max-width: none;
+    }
+  }
+
   @container (max-width: 420px) {
     .ghf-success-card {
       gap: 12px;
@@ -1267,7 +1361,17 @@ export const RENDERER_CSS = `
     background-size: 200% 100%; animation: ghf-shimmer 1.4s ease-in-out infinite; opacity: 0.5; }
   .ghf-skeleton-row:nth-child(1) { width: 60%; height: 28px; }
 
-  .ghf-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .ghf-honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
   @keyframes ghf-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   @keyframes ghf-spin { to { transform: rotate(360deg); } }

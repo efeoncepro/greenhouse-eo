@@ -33,15 +33,15 @@ export const turnstileCaptchaVerifier = (env: NodeJS.ProcessEnv = process.env): 
   async verify(token, remoteIp) {
     const secret = env[TURNSTILE_SECRET_ENV]
 
+    if (!token) {
+      return { ok: false, reason: 'missing_token' }
+    }
+
     if (!secret) {
       // Sin secret: bypass en dev/test, fail-closed en prod (no abrir sin captcha real).
       return isProduction(env)
         ? { ok: false, reason: 'captcha_not_configured' }
         : { ok: true, reason: 'bypass_no_secret_non_prod' }
-    }
-
-    if (!token) {
-      return { ok: false, reason: 'missing_token' }
     }
 
     try {

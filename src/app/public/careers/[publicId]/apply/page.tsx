@@ -1,11 +1,13 @@
 import { notFound } from 'next/navigation'
+import { headers } from 'next/headers'
 
 import type { Metadata } from 'next'
 
 import { getLocale } from 'next-intl/server'
 
-import { CareersApplyClient, CareersPublicShell } from '@/components/greenhouse/careers'
+import { CareersApplyClient, CareersNativeGrowthFormClient, CareersPublicShell } from '@/components/greenhouse/careers'
 import { getMicrocopy, type Locale } from '@/lib/copy'
+import { isCareersNativeGrowthFormEnabled } from '@/lib/hiring/public-careers/config'
 import { buildCareersApplicationFormContract } from '@/lib/hiring/public-careers/growth-form-contract'
 import { buildCareersOpeningViewModel, formatCareersTemplate } from '@/lib/hiring/public-careers/view-model'
 import { getPublicOpeningByPublicId } from '@/lib/hiring/publication'
@@ -34,6 +36,17 @@ const loadPublicOpening = async (publicId: string, source: string) => {
   }
 }
 
+const resolvePublicBaseUrl = async (): Promise<string> => {
+  const requestHeaders = await headers()
+  const host = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host')
+
+  if (!host) return process.env.NEXT_PUBLIC_APP_URL ?? 'https://greenhouse.efeoncepro.com'
+
+  const proto = requestHeaders.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https')
+
+  return `${proto}://${host}`
+}
+
 export const generateMetadata = async ({ params }: PageProps): Promise<Metadata> => {
   const { publicId } = await params
   const { copy } = await loadCareersContext()
@@ -55,6 +68,7 @@ export default async function PublicCareersApplyPage({ params }: PageProps) {
   if (!opening) notFound()
 
   const viewModel = buildCareersOpeningViewModel(opening, copy)
+  const nativeGrowthFormEnabled = isCareersNativeGrowthFormEnabled()
 
   const formContract = buildCareersApplicationFormContract({
     copy,
@@ -65,7 +79,11 @@ export default async function PublicCareersApplyPage({ params }: PageProps) {
 
   return (
     <CareersPublicShell copy={copy} locale={locale} backHref={viewModel.detailHref} backLabel={copy.header.backToDetail}>
-      <CareersApplyClient copy={copy} formContract={formContract} opening={viewModel} />
+      {nativeGrowthFormEnabled ? (
+        <CareersNativeGrowthFormClient baseUrl={await resolvePublicBaseUrl()} copy={copy} locale={locale} opening={viewModel} />
+      ) : (
+        <CareersApplyClient copy={copy} formContract={formContract} opening={viewModel} />
+      )}
     </CareersPublicShell>
   )
 }

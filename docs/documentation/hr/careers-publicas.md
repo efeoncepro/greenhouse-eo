@@ -3,8 +3,10 @@
 ## Estado
 
 TASK-354 dejó la interfaz pública de careers implementada en código y validada en
-local. El rollout real queda pendiente hasta activar el apply público de Hiring
-en el ambiente objetivo y completar sign-off de consentimiento/privacidad.
+local. TASK-1373 migra el apply a un Growth Form nativo detrás de flag
+(`CAREERS_NATIVE_GROWTH_FORM_ENABLED`) para rollout gradual por ambiente. El
+rollout productivo queda pendiente de sign-off de paridad visual y
+consentimiento/privacidad.
 
 ## Qué hace
 
@@ -17,8 +19,10 @@ Careers públicas es la puerta externa de candidatos para Efeonce:
 - permite postular mediante un formulario público con confirmación genérica.
 
 La UI no crea un pipeline paralelo. Listing y detalle leen el contrato público
-allowlist de Hiring (`PublicOpeningPayload`), y el formulario postea al endpoint
-gobernado `POST /api/public/hiring/applications` de TASK-1367.
+allowlist de Hiring (`PublicOpeningPayload`), y el apply primario postea por el
+motor gobernado `POST /api/public/growth/forms/[formSlug]/submit` cuando el flag
+nativo está ON. `POST /api/public/hiring/applications` queda como compatibilidad
+de rollback del componente custom.
 
 ## Rutas
 
@@ -54,8 +58,10 @@ La escritura ATS no es un `form_destination`: la projection
 `growth_hiring_application_from_submission` consume
 `growth.forms.submission_accepted` y llama `submitPublicHiringApplication`.
 `form_destination` sigue reservado para delivery externo como HubSpot/email.
-Hasta que TASK-1373 migre la UI pública, el endpoint directo de Hiring queda
-como compatibilidad del apply actual.
+El Growth Form real de Careers se publica como `efeonce-careers-application`
+(`form_key=9f7a8fc0-6fa7-4670-8e2d-efe0ce354001`, surface
+`public-careers-nextjs`). El endpoint directo de Hiring queda como
+compatibilidad de rollback mientras el flag nativo se estabiliza por ambiente.
 
 El Banco de Talento sigue la misma regla: si captura datos no puede ser solo
 decoracion visual. Debe tener un contrato Growth Forms propio o un command Hiring
@@ -157,7 +163,7 @@ El proceso queda con paridad programatica para publicar y recibir postulaciones:
   despublica el opening.
 - `POST /api/public/growth/forms/[formSlug]/submit` es el path gobernado de
   Growth Forms para postulaciones `application`; `POST /api/public/hiring/applications`
-  queda como legacy/compat hasta TASK-1373.
+  queda como legacy/compat para rollback del apply custom.
 
 Los endpoints internos tienen doble gate: tenant interno + capability
 `hiring.demand.write`, `hiring.opening.write` o `hiring.opening.publish`. El

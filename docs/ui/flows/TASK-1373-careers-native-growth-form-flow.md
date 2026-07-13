@@ -48,6 +48,21 @@ Candidate applies to a public Efeonce opening through native Growth Forms. Caree
 - `careers-cv-uploader`
 - `careers-apply-success`
 
+## GVC Scenario Plan
+
+- Scenario: `task354-careers-runtime-audit`.
+- Route: `/public/careers/EO-OPN-0057/apply` or another published opening returned by the public Careers reader.
+- Viewports: desktop 1440 and mobile 390.
+- Required evidence: host chrome, native `<greenhouse-form>`, CV uploader marker, success marker when submit path is exercised, and explicit `scrollWidth === clientWidth` checks.
+- Latest local evidence: `.captures/2026-07-13T21-01-34_task354-careers-runtime-audit` PASS with native flag ON, no runtime/layout findings, no horizontal overflow.
+
+## Design Decision Log
+
+- Careers owns only opening context, brand shell, fallback and the `openingPublicId` initial value; Growth Forms owns fields, validation, captcha, upload, submit, success and telemetry.
+- The cutover is guarded by `CAREERS_NATIVE_GROWTH_FORM_ENABLED`; custom `CareersApplyClient` remains the rollback path while staging validates.
+- `form_destination` is intentionally unused for ATS. The accepted Growth Forms event is projected by `growth_hiring_application_from_submission`, preserving a single Hiring command path.
+- Success remains generic for accepted and deduped submissions; no candidate state or internal IDs are exposed to the browser.
+
 ## Non-Goals
 
 - No candidate account login.
