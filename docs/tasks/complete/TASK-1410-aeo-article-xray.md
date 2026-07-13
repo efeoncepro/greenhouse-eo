@@ -614,3 +614,41 @@ Con el hero editorial la correspondencia queda bajo el pliegue. **La página se 
 - **`slide-competencia.png`** — el H2 de *«cómo se llega»* ↔ **quién ocupa hoy ese espacio**.
 
 `verify:aeo-xray` **17/17**. Desplegado y verificado en producción. Commit `efeonce-think` `d492f6e`.
+
+
+## Delta 2026-07-13 (6) — Auditoría con `a11y-architect` + `seo-aeo` + `copywriting`
+
+### 🔴 El hallazgo más grave: sobre-declaré una táctica
+
+El nodo **«+41% de visibilidad con citas textuales — la táctica GEO de mayor lift medido»** estaba **mal aplicado**. La investigación GEO (Princeton + Georgia Tech + Allen Institute, KDD 2024) mide *Quotation Addition* = **citas de fuentes o expertos entre comillas**. La cita destacada de la muestra es **una frase nuestra resaltada**. Le atribuí un lift medido a una técnica que **no apliqué** — en la pieza cuyo valor entero es *no exagerar*, y que un evaluador técnico caza en un minuto.
+
+**La salida no fue maquillar el claim: fue declarar las tácticas que SÍ aplicamos y no estábamos reclamando.**
+
+- **Cite Sources (+30%)** — tres fuentes enlazadas y verificables. El comité las puede comprobar en el acto.
+- **Statistics Addition (+32%)** — cada dato con unidad y fuente (1.247 km · 56 km · 40 min · 5 h).
+
+La cita destacada queda declarada **por lo que es** (un pasaje extraíble y atribuible) y su nodo dice **explícitamente por qué NO es el +41%**.
+
+### 🔴 E-E-A-T del autor: la debilidad convertida en aporte
+
+El artículo firma «Equipo editorial SKY» —la práctica actual del blog— y el schema **solo puede declarar lo que es cierto**. Pero es la versión **más débil posible de E-E-A-T**, justo en el eje donde SKY saca **37/100**.
+
+En vez de **inventar una persona** (fabricación) o **esconder el hueco** (deshonestidad), la muestra **lo declara**: nodo nuevo `author → Person (recomendación)` que arregla el 37 y dice que es **el primer cambio que propondríamos**. *La muestra dice también lo que le falta* — que es exactamente el "venimos a aportarles".
+
+### 🔴 Dos fallos WCAG 2.2 AA
+
+- **El chip direccional es `content` de CSS** → la afordancia central de la pieza era **sighted-only**. Un usuario ciego no sabía que el artículo produce datos, ni cuántos. Ahora cada bloque acoplable lo anuncia.
+- **El `<pre>` scrollea pero no era enfocable** (2.1.1). Un usuario de teclado **no podía leer el JSON completo**.
+
+*(Los dos anteriores —el header pegajoso tapando el nodo (2.4.11) y el mouse quieto robándole el foco al teclado— eran de la misma familia.)*
+
+### 🟡 Menores
+
+Sin JS el *hint* prometía interactividad que no ocurre (ahora se revela solo cuando el JS carga) · texto de 10px → 12px · un cierre que conecta la muestra con la oferta · *«La diferencia no es menor»* reescrito (**decía** que algo importa en vez de **mostrarlo**).
+
+### Dos bugs que solo se vieron MIRANDO
+
+1. **La regla CSS `.sr` nunca se agregó**: el reemplazo apuntaba a una clase que ya no existía tras el rediseño → **no-op silencioso**, y los textos para lectores de pantalla **se veían en pantalla**. → assert 24.
+2. **El assert 20 pasaba por la razón equivocada** (por distancia entre strings). Y *«que la cadena +41% no exista»* habría sido un test **falso**: la muestra **nombra** esa táctica a propósito, dentro de la frase que declara que **no la aplica**. Lo que no puede existir es un **stat** que la reclame. → assert 20 parsea los stats renderizados, y el **20b** exige lo simétrico: que sí se declaren las que sí aplicamos.
+
+`verify:aeo-xray` **25/25**. Desplegado y verificado en producción. Commit `efeonce-think` `3c42109`.
