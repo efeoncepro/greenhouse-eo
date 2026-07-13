@@ -572,3 +572,45 @@ Al pasar por el bloque de **Preguntas frecuentes**, el acoplamiento enciende el 
 `verify:aeo-xray` **16/16**. El assert nuevo: *en táctil el copy no habla de "cursor"*. Playwright reportaba `hover: hover` en un viewport de 390px (Chromium de escritorio con ventana chica), así que **la captura mentía** — mostraba "Pasa el cursor" en un teléfono. Ahora emula táctil (`hasTouch` + `isMobile`) y lo assertea.
 
 Desplegado y verificado contra producción. Commit `efeonce-think` `d2cb4f8`.
+
+
+## Delta 2026-07-13 (5) — El espécimen es EDITORIAL, no product UI
+
+Feedback: *"el área del artículo se ve super plana"*. Correcto, y la causa era estructural: **le apliqué densidad de producto a un artefacto editorial.**
+
+El panel izquierdo es un **mockup de un blog real** — eso es *marketing UI* (cuerpo 18–21px, interlineado generoso, imágenes que respiran), no *product UI* (13–16px, denso, compacto). `modern-ui` separa los dos explícitamente, y yo mezclé: diseñé el artículo con la densidad del instrumento **porque vive dentro del instrumento**. Resultado: le estábamos mostrando al comité **un wireframe del contenido que produciríamos, no el contenido**.
+
+### 🔴 Y había un error de CORRECCIÓN, no solo estético
+
+El `BlogPosting` declara `author`, `datePublished` y `articleSection` — y **ninguno de los tres estaba visible en el artículo**. El schema **solo puede marcar contenido visible** (marcar contenido oculto es violación de política de Google). **La muestra estaba violando su propia tesis.**
+
+La firma (categoría · autor · fecha · tiempo de lectura) **no es adorno: es lo que hace legal ese schema.** Que además haga que el artículo se lea como un post publicado es la consecuencia, no el motivo.
+
+### Qué cambió
+
+| | Antes | Ahora |
+|---|---|---|
+| Cuerpo | 16px / 1.65 | **18px / 1.7**, medida 64ch |
+| H1 | 25px | **36px Poppins**, `text-wrap: balance` |
+| Hero | thumbnail recortado a **150px** | **a sangre, 21:9** |
+| Ritmo | márgenes de 0.45rem | aire **antes** de cada H2 (el ojo agrupa por proximidad) |
+| Firma | **no existía** (y el schema la declaraba) | categoría · autor · fecha · lectura calculada |
+| Cita destacada | no existía | **bloque nuevo** (es DATO) + su nodo **+41%** — la táctica GEO de mayor lift medido |
+| Tabla | planilla de 13px | presencia editorial: bordes, aire, primera columna fuerte |
+| Lista | viñetas | contadores en el acento del cliente |
+| URL | chip con el dominio | **barra con la URL canónica completa**, en contexto |
+
+### Tres bugs que el gate cazó — y que yo mismo introduje
+
+1. **Al reescribir el CSS borré las reglas del lado FUENTE del acoplamiento** (chip, marca en reposo, resaltado). **No se notaba** porque la cápsula tiene fondo tintado propio y *parecía* encendida. → **assert 17**: el chip direccional tiene que ser **visible**, no solo existir en el CSS.
+2. **El mouse QUIETO le robaba el acoplamiento al teclado.** Al enfocar con Tab la página scrollea, los elementos pasan bajo el cursor inmóvil y disparan un `mouseover` fantasma que repinta encima de lo que el teclado acababa de seleccionar. Un usuario que navega con teclado y dejó el mouse apoyado **no podía conducir la pieza**. → seguimiento de modalidad de entrada. El assert 12 ahora ejercita el caso real (teclado **con el mouse apoyado en otra parte**).
+3. **El chip contaba de menos** (no incluía los nodos de evidencia ni del fan-out, que **sí** se encienden) y decía **"1 datos"**.
+
+### Frames para la lámina
+
+Con el hero editorial la correspondencia queda bajo el pliegue. **La página se diseña para leerse; la lámina se captura donde argumenta.** El verify produce dos frames deliberados:
+
+- **`slide-oficio.png`** — la cápsula de respuesta ↔ el **72,4%** de las páginas que ChatGPT cita.
+- **`slide-competencia.png`** — el H2 de *«cómo se llega»* ↔ **quién ocupa hoy ese espacio**.
+
+`verify:aeo-xray` **17/17**. Desplegado y verificado en producción. Commit `efeonce-think` `d492f6e`.
