@@ -1,5 +1,11 @@
 # TASK-1365 — Adverse-Impact & Fairness Monitoring
 
+## Delta 2026-07-13 — code complete / rollout pendiente
+
+- Implementados command self-ID tokenizado, reader agregado k-anon, regla 4/5 + drift, capability role-only, evidence append-only y signal agregado. El self-ID queda anclado a la application del assessment, fuera de score/decisión y fuera del outbox; el hardening DB impide aplicar un consentimiento posterior a postulaciones históricas.
+- Migraciones `20260713165547000` + `20260713173500000` aplicadas en Cloud SQL dev. Smoke DB: columnas aggregate-only, `ratio=0.5`, `drift=-0.4`; sin migraciones pendientes.
+- QA release auditor: `CONDITIONAL PASS`. Código, schema dev, tests y documentación están completos. Rollout staging/prod requiere revisión legal/privacidad por jurisdicción, categorías definitivas, versión/copy de consentimiento, retención final, configuración y flip explícito del flag.
+
 ## Delta 2026-07-13 — preflight de dependencias resuelto
 
 - `TASK-1360` y `TASK-1364` están `complete` y sus contratos as-built están disponibles; el `Blocked by` y las rutas `to-do` eran drift documental.
@@ -23,7 +29,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -36,11 +42,11 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-011`
-- Status real: `Parcial`
+- Status real: `Cerrada — code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`
-- Branch: `task/TASK-1365-assessment-adverse-impact-fairness-monitoring`
+- Branch: `develop` (override explícito del operador; sin subagentes ni worktree)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -119,9 +125,9 @@ Reglas obligatorias:
 - Current home: `src/lib/hiring/assessment/fairness/**` para command/reader server-only; `src/app/api/hiring/assessments/fairness/**` como adapter HTTP; persistencia en `greenhouse_hiring`
 - Future candidate home: `domain-package`
 - Boundary: `captureVoluntaryDemographicSelfId` para la escritura consentida y `getSelectionFairness` para agregados k-anon; API/Nexa/People Ops solo consumen esos contratos, nunca las tablas
-- Server/browser split: contratos de input/output sin imports de DB pueden ser browser-safe; command, reader, store, audit/outbox y evidencia permanecen server-only
+- Server/browser split: contratos de input/output sin imports de DB pueden ser browser-safe; command, reader, store, audit y evidencia permanecen server-only
 - Build impact: `none` (sin SDK, dependencia pesada, filesystem input ni entrypoint global nuevo)
-- Extraction blocker: transacciones y joins co-localizados con `greenhouse_hiring.hiring_application`, capabilities de sesión y outbox/audit del portal
+- Extraction blocker: transacciones y joins co-localizados con `greenhouse_hiring.hiring_application`, capabilities de sesión y audit/evidence del portal
 
 ## Backend/Data Contract
 
@@ -142,19 +148,19 @@ Reglas obligatorias:
 
 ### Data model and invariants
 
-- Entidades afectadas: `hiring_demographic_selfid` (`identity_profile_id` FK, categorías self-declaradas, `consent`, `captured_at`) **separada del scorecard**; read model `assessment_fairness` (agregado por grupo × stage)
+- Entidades afectadas: `hiring_demographic_selfid` (`identity_profile_id` + `application_id` FKs, categorías self-declaradas, consentimiento y retención) **separada del scorecard**; read model `assessment_fairness` (agregado por grupo × stage)
 - Invariantes:
   - la demografía NUNCA se une al score/decisión a nivel individual; el evaluador NUNCA la ve
   - el reader solo devuelve agregados con grupo ≥ umbral mínimo (sin reidentificación)
   - el monitor observa/alerta; NUNCA aplica cuotas ni ajusta decisiones automáticamente
   - consentimiento explícito + minimización + retención acotada
 - Tenant/space boundary: interno; capability dedicada `hiring.assessment.fairness_read` (least-privilege, más restringida que `read`)
-- Idempotency/concurrency: self-ID upsert transaccional por profile + dimensión; reader read-only
-- Audit/outbox/history: acceso al monitor auditado; evidencia AI-Act append-only
+- Idempotency/concurrency: self-ID upsert transaccional por application + dimensión; trigger DB valida que application e identity correspondan; reader read-only
+- Audit/outbox/history: self-ID en audit sensible append-only y nunca en outbox; evidencia AI-Act agregada append-only; solo el verdict adverso emite signal agregado
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive` (tabla self-ID + view fairness)
+- Migration posture: `additive` (tabla self-ID + view fairness + hardening application-scoped irreversible por privacidad)
 - Default state: `flag OFF` (`HIRING_FAIRNESS_MONITOR_ENABLED`) hasta revisión legal/privacidad
 - Backfill plan: `none` (self-ID es prospectivo + voluntario)
 - Rollback path: `flag off`; reverse migration solo antes de captura real. Tras rollout, preservar evidencia y ejecutar cualquier borrado con política legal/auditada
@@ -177,22 +183,22 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth (self-ID separado + read model fairness) + contract surface + consumers nombrados.
-- [ ] Invariante "demografía separada de la decisión + solo agregado + observa-no-decide" explícito y con test.
-- [ ] Flag OFF default + revisión legal/privacidad como coordinación externa.
-- [ ] Evidencia DB del cómputo 4/5 sobre datos sintéticos.
-- [ ] PII de categoría especial con consentimiento + minimización + k-anon; sin reidentificación.
+- [x] Source of truth (self-ID separado + read model fairness) + contract surface + consumers nombrados.
+- [x] Invariante "demografía separada de la decisión + solo agregado + observa-no-decide" explícito y con test.
+- [x] Flag OFF default + revisión legal/privacidad como coordinación externa.
+- [x] Evidencia DB del cómputo 4/5 sobre datos sintéticos.
+- [x] PII de categoría especial con consentimiento + minimización + k-anon; sin reidentificación.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en `src/lib/hiring/assessment/fairness/**`, no en UI.
-- [ ] Modelado como reader (fairness) + command consentido (self-ID), no click-handler.
-- [ ] Read = reader agregado; write (self-ID) = command con consentimiento + capability.
-- [ ] Capability `hiring.assessment.fairness_read` + grant a rol real (least-privilege) + coverage test mismo PR.
-- [ ] Camino programático: `/api/hiring/assessments/fairness/**`; Nexa por construcción (solo agregado).
-- [ ] N/A auto-decision (prohibido por diseño).
-- [ ] Un reader, muchos consumers.
-- [ ] Parity check = SÍ.
+- [x] Lógica en `src/lib/hiring/assessment/fairness/**`, no en UI.
+- [x] Modelado como reader (fairness) + command consentido (self-ID), no click-handler.
+- [x] Read = reader agregado; write = command tokenizado con consentimiento explícito, sin IDs públicos.
+- [x] Capability `hiring.assessment.fairness_read` + grant a rol real (least-privilege) + coverage test mismo PR.
+- [x] Camino programático: `/api/hiring/assessments/fairness/**`; Nexa por construcción (solo agregado).
+- [x] N/A auto-decision (prohibido por diseño).
+- [x] Un reader, muchos consumers.
+- [x] Parity check = SÍ.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -274,30 +280,35 @@ La demografía self-declarada es **categoría especial de PII**: consentimiento 
 
 ## Acceptance Criteria
 
-- [ ] La demografía es voluntaria, consentida, self-declarada y **separada** del scorecard/decisión; el evaluador NUNCA la ve.
-- [ ] El reader devuelve solo agregados con grupo ≥ umbral mínimo (sin reidentificación).
-- [ ] Se computa la heurística 4/5 (impact ratio) + drift; el monitor **alerta**, NUNCA ajusta decisiones/cuotas.
-- [ ] Signal `assessment.fairness.adverse_impact_detected` cuando ratio < 0.8.
-- [ ] Flag `HIRING_FAIRNESS_MONITOR_ENABLED` default OFF + registrado en el ledger; revisión legal antes de prod.
-- [ ] PII de categoría especial con consentimiento + minimización + retención; test de no-join a la decisión individual.
+- [x] La demografía es voluntaria, consentida, self-declarada y **separada** del scorecard/decisión; el evaluador NUNCA la ve.
+- [x] El reader devuelve solo agregados con grupo ≥ umbral mínimo (sin reidentificación).
+- [x] Se computa la heurística 4/5 (impact ratio) + drift; el monitor **alerta**, NUNCA ajusta decisiones/cuotas.
+- [x] Signal `assessment.fairness.adverse_impact_detected` cuando ratio < 0.8.
+- [x] Flag `HIRING_FAIRNESS_MONITOR_ENABLED` default OFF + registrado en el ledger; revisión legal antes de prod.
+- [x] PII de categoría especial con consentimiento + minimización + retención; test de no-join a la decisión individual.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm typecheck`
-- `pnpm test`
-- `pnpm flags:audit --strict --no-vercel` (flag registrado)
-- Smoke DB del cómputo 4/5 sobre datos sintéticos
+- `pnpm lint` — PASS.
+- `pnpm typecheck` — PASS.
+- `pnpm test` — PASS: 1312 files passed, 26 skipped; 9445 tests passed, 136 skipped.
+- `pnpm build` — PASS; warning preexistente de patrón amplio en `roadmap/work-item-index/reader.ts`.
+- `pnpm flags:audit --strict --no-vercel` — PASS: 83 flags, 0 sin registrar.
+- `pnpm pg:connect:status` — PASS: Cloud SQL dev sin migraciones pendientes.
+- `pnpm hiring:fairness-smoke` — PASS: view aggregate-only + ratio `0.5` + drift `-0.4`.
+- `pnpm route-reachability-gate` — PASS: 219 rutas, 0 huérfanas.
+- `pnpm task:lint --task TASK-1365`, `pnpm ops:lint --changed`, `pnpm qa:gates --changed` — PASS mecánico; QA final `CONDITIONAL PASS` por rollout externo pendiente.
+- `pnpm secrets:audit` — no concluyente en este checkout: falla por 8 secretos base no configurados localmente; TASK-1365 no agrega/modifica secretos y el DB smoke autenticado pasó por el carril canónico.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1360/1364)
-- [ ] flag registrado en `FEATURE_FLAG_STATE_LEDGER.md`
+- [x] `Lifecycle` sincronizado
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1360/1364)
+- [x] flag registrado en `FEATURE_FLAG_STATE_LEDGER.md`
 
 ## Follow-ups
 

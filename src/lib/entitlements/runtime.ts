@@ -496,6 +496,16 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     for (const capability of ['hiring.opening.publish', 'hiring.application.decide', 'hiring.assessment.score', 'hiring.handoff.approve'] as const) {
       addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: 'role' })
     }
+
+    // TASK-1365 — demographic fairness is more sensitive than the ordinary assessment
+    // scorecard. Role-only governance read; never routeGroup internal or client roles.
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.assessment.fairness_read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role',
+    })
   }
 
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {

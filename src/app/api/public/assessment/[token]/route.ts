@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import {
+  capturePublicAssessmentSelfId,
   resolvePublicAssessmentViewByToken,
   savePublicAssessmentResponse,
   startPublicAssessment,
@@ -12,9 +13,12 @@ import { captureWithDomain } from '@/lib/observability/capture'
 export const dynamic = 'force-dynamic'
 
 interface PublicAssessmentBody {
-  action?: 'start' | 'save' | 'submit'
+  action?: 'start' | 'save' | 'submit' | 'self_id'
   questionId?: string
   answer?: unknown
+  consentGranted?: boolean
+  consentPolicyVersion?: string
+  selections?: Array<{ dimensionKey: string; categoryKey: string }>
 }
 
 const PUBLIC_MESSAGES = {
@@ -83,6 +87,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
 
     if (body.action === 'submit') {
       return NextResponse.json({ ok: true, assessment: await submitPublicAssessment(token) })
+    }
+
+    if (body.action === 'self_id') {
+      const result = await capturePublicAssessmentSelfId(token, {
+        consentGranted: body.consentGranted,
+        consentPolicyVersion: body.consentPolicyVersion,
+        selections: body.selections,
+      })
+
+      return NextResponse.json({ ok: true, selfId: result }, { status: 201 })
     }
 
     return NextResponse.json({ ok: false, code: 'assessment_invalid_action', message: PUBLIC_MESSAGES.invalid }, { status: 400 })

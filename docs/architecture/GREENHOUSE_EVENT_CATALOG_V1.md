@@ -1224,3 +1224,11 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | `hiring.assessment.ai_confirmed` | v1 | `hiring_assessment_ai_proposal` | `confirmAiProposal` (`ai/confirm.ts`) — decisión humana confirm/reject | — |
 
 **Payload v1**: `proposalId` + `kind` (`question_draft`/`response_score`) + `targetRef` + provider/model + decisión/estado, **sin la salida cruda del LLM ni respuestas del candidato** (evidencia sensible se re-lee del ledger). Emitidos transaccionalmente (propose en su tx; confirm en la misma tx que aplica `createQuestion`/`recordHumanScore`). **Sin consumer reactivo en V1** (audit/observabilidad del loop propose→confirm). Aggregate type nuevo: `hiring_assessment_ai_proposal`. Boundary: la IA PROPONE (evidencia); el `ai_confirmed` es el único que refleja una mutación aplicada por un humano. `captureWithDomain(err, 'hiring', …)`.
+
+## Delta 2026-07-13 — TASK-1365: fairness adverse-impact evidence
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `hiring.assessment.fairness.adverse_impact_detected` | v1 | `assessment_fairness_evidence` (`evidence_id`) | `persistFairnessEvidence` cuando verdict=`adverse_impact` | — (evidencia AI-Act + revisión humana; nunca auto-decisión) |
+
+**Payload adverse-impact v1:** `{ schemaVersion, signalId, evidenceId, stage, templateId, windowMonths, computedAt }`; solo scope agregado y emitido transaccionalmente con el snapshot. El self-ID crudo nunca entra al outbox: su trazabilidad permanece en `hiring_demographic_selfid_audit`, dentro de la frontera sensible. El reporte completo es k-anon y vive en evidence append-only.

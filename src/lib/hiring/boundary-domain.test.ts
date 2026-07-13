@@ -44,9 +44,13 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_hiring.hiring_assessment_response',
   'greenhouse_hiring.hiring_competency_result',
   'greenhouse_hiring.hiring_assessment_ai_proposal',
+  // TASK-1365 — self-ID sensitive source + append-only audit, physically separate from decision.
+  'greenhouse_hiring.hiring_demographic_selfid',
+  'greenhouse_hiring.hiring_demographic_selfid_audit',
 
-  // Evidencia de validez AI-Act (TASK-1364; append-only, greenhouse_hr por gobernanza HR).
+  // Evidencia AI-Act (TASK-1364/1365; append-only, greenhouse_hr por gobernanza HR).
   'greenhouse_hr.assessment_validity_evidence',
+  'greenhouse_hr.assessment_fairness_evidence',
 
   // Plataforma compartida (uploads de candidato, TASK-1362 — writes vía helpers de assets).
   'greenhouse_core.assets',

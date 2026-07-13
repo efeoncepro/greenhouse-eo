@@ -11,6 +11,14 @@ import {
 import { buildPublicQuestion } from '@/lib/hiring/assessment/store'
 import { submitAssessment } from '@/lib/hiring/assessment/scoring'
 import { HiringNotFoundError, HiringValidationError } from '@/lib/hiring/errors'
+import {
+  captureVoluntaryDemographicSelfId,
+  getSelfIdSubjectByAssessment,
+} from '@/lib/hiring/assessment/fairness/capture-self-id'
+import type {
+  CaptureVoluntaryDemographicSelfIdResult,
+  DemographicSelection,
+} from '@/lib/hiring/assessment/fairness/contracts'
 import type {
   Assessment,
   AssessmentResponse,
@@ -374,6 +382,44 @@ export const resolvePublicAssessmentViewByToken = async (token: string): Promise
   const assessment = await resolveAssessmentByToken(token)
 
   return assessment ? buildPublicAssessmentView(assessment) : null
+}
+
+export const capturePublicAssessmentSelfId = async (
+  token: string,
+  input: {
+    consentGranted?: boolean
+    consentPolicyVersion?: string
+    selections?: DemographicSelection[]
+  },
+): Promise<CaptureVoluntaryDemographicSelfIdResult> => {
+  const assessment = await resolveAssessmentByToken(token)
+
+  if (!assessment) {
+    throw new HiringValidationError('La evaluación no está disponible.', 'assessment_selfid_unavailable', 404)
+  }
+
+  if (input.consentGranted !== true) {
+    throw new HiringValidationError(
+      'Se requiere consentimiento explícito para registrar la autoidentificación.',
+      'hiring_fairness_consent_required',
+      422,
+    )
+  }
+
+  const subject = await getSelfIdSubjectByAssessment(assessment.assessmentId)
+
+  if (!subject) {
+    throw new HiringValidationError('La evaluación no está disponible.', 'assessment_selfid_unavailable', 404)
+  }
+
+  return captureVoluntaryDemographicSelfId({
+    identityProfileId: subject.identityProfileId,
+    applicationId: subject.applicationId,
+    consentGranted: true,
+    consentPolicyVersion: input.consentPolicyVersion?.trim() ?? '',
+    selections: input.selections ?? [],
+    actorKind: 'candidate_token',
+  })
 }
 
 export const startPublicAssessment = async (token: string): Promise<PublicAssessmentView> => {

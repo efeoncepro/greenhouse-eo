@@ -7102,6 +7102,16 @@ export interface GreenhouseGrowthSearchConsoleOauthStates {
   state_id: Generated<string>;
 }
 
+export interface GreenhouseHiringAssessmentFairness {
+  advanced_count: number | null;
+  category_key: string | null;
+  cohort_month: Timestamp | null;
+  dimension_key: string | null;
+  eligible_count: number | null;
+  stage: string | null;
+  template_id: string | null;
+}
+
 export interface GreenhouseHiringCandidateFacet {
   availability: string | null;
   candidate_facet_id: Generated<string>;
@@ -7264,6 +7274,30 @@ export interface GreenhouseHiringHiringCompetencyResult {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHiringHiringDemographicSelfid {
+  application_id: string;
+  category_key: string;
+  consent_granted_at: Timestamp;
+  consent_policy_version: string;
+  created_at: Generated<Timestamp>;
+  dimension_key: string;
+  identity_profile_id: string;
+  retention_expires_at: Timestamp;
+  selfid_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  withdrawn_at: Timestamp | null;
+}
+
+export interface GreenhouseHiringHiringDemographicSelfidAudit {
+  action: string;
+  actor_kind: string;
+  actor_user_id: string | null;
+  audit_id: Generated<string>;
+  consent_policy_version: string;
+  occurred_at: Generated<Timestamp>;
+  selfid_id: string;
+}
+
 export interface GreenhouseHiringHiringHandoff {
   blocked_detail: string | null;
   blocked_reason: string | null;
@@ -7416,6 +7450,17 @@ export interface GreenhouseHiringTalentDemand {
   target_start_date: Timestamp | null;
   timezone: string | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrAssessmentFairnessEvidence {
+  computed_at: Generated<Timestamp>;
+  computed_by: string | null;
+  evidence_id: Generated<string>;
+  result_json: Generated<Json>;
+  sample_size: number;
+  scope_json: Generated<Json>;
+  verdict: string;
+  window_months: number;
 }
 
 export interface GreenhouseHrAssessmentValidityEvidence {
@@ -11644,6 +11689,7 @@ export interface DB {
   "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;
   "greenhouse_growth.search_console_connections": GreenhouseGrowthSearchConsoleConnections;
   "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
+  "greenhouse_hiring.assessment_fairness": GreenhouseHiringAssessmentFairness;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
   "greenhouse_hiring.hiring_application_intake_events": GreenhouseHiringHiringApplicationIntakeEvents;
@@ -11654,11 +11700,14 @@ export interface DB {
   "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;
   "greenhouse_hiring.hiring_competency": GreenhouseHiringHiringCompetency;
   "greenhouse_hiring.hiring_competency_result": GreenhouseHiringHiringCompetencyResult;
+  "greenhouse_hiring.hiring_demographic_selfid": GreenhouseHiringHiringDemographicSelfid;
+  "greenhouse_hiring.hiring_demographic_selfid_audit": GreenhouseHiringHiringDemographicSelfidAudit;
   "greenhouse_hiring.hiring_handoff": GreenhouseHiringHiringHandoff;
   "greenhouse_hiring.hiring_handoff_audit": GreenhouseHiringHiringHandoffAudit;
   "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
+  "greenhouse_hr.assessment_fairness_evidence": GreenhouseHrAssessmentFairnessEvidence;
   "greenhouse_hr.assessment_validity_evidence": GreenhouseHrAssessmentValidityEvidence;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
   "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;

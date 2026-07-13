@@ -255,7 +255,10 @@ export const AGGREGATE_TYPES = {
   hiringAssessment: 'hiring_assessment',
 
   // TASK-1361 — Assessment AI Assist. Identity: proposal_id ('aip-{uuid}').
-  hiringAssessmentAiProposal: 'hiring_assessment_ai_proposal'
+  hiringAssessmentAiProposal: 'hiring_assessment_ai_proposal',
+
+  // TASK-1365 — aggregate-only evidence snapshot. Raw self-ID never enters the outbox.
+  assessmentFairnessEvidence: 'assessment_fairness_evidence'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -1150,7 +1153,10 @@ export const EVENT_TYPES = {
 
   // TASK-1361 — Assessment AI Assist. propose→confirm (audit/observabilidad, sin consumer reactivo V1).
   hiringAssessmentAiProposed: 'hiring.assessment.ai_proposed',
-  hiringAssessmentAiConfirmed: 'hiring.assessment.ai_confirmed'
+  hiringAssessmentAiConfirmed: 'hiring.assessment.ai_confirmed',
+
+  // TASK-1365 — payload contains only aggregate report scope/evidence references.
+  hiringAssessmentFairnessAdverseImpactDetected: 'hiring.assessment.fairness.adverse_impact_detected'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
