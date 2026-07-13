@@ -198,7 +198,8 @@ KV, campaña) **no es la cuña correcta** — abre la puerta, pero no prueba que
 
 | Caso | Qué se puede decir |
 |---|---|
-| **SKY** | ✅ Cliente real. Licitación Wherex, TCV **CLP 124,8M / 2 años**. Informe AI Visibility público. ⚠️ **El trabajo es de contenido/SEO, no de creatividad de marca.** |
+| **SKY** *(performance)* | ✅ **Cliente real y vigente.** Efeonce ya opera un equipo de performance para SKY. Informe AI Visibility público y citable. ⚠️ **No es trabajo de creatividad de marca.** |
+| **SKY** *(blog — Wherex)* | 🔴 **OFERTA EN CURSO, NO ADJUDICADA.** Los CLP 5,2M/mes y el TCV de 124,8M/2años son **el precio que ofertamos**, no un contrato ganado. **NUNCA lo cites como caso, ni como cliente del blog, ni como TCV asegurado.** Es **expansión** de una cuenta existente, no cliente nuevo. |
 | **Bresler** | ✅ **+180% de tráfico orgánico** *(dato duro, citable)*. ⚠️ Es SEO, no creativo. |
 | **Berel** | ✅ Cliente real. |
 | 🔴 **Casos creativos con métrica de negocio verificable + autorización del cliente** | 🔴 **Hoy: no hay ninguno formalizado.** |

@@ -98,6 +98,20 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 
 **Es nuestro único squad creativo dimensionado con rigor. Estúdialo antes de armar el siguiente.**
 
+> 🔴 **PERO LEE ESTO PRIMERO — son dos cosas distintas de SKY:**
+>
+> | | Qué es |
+> |---|---|
+> | **SKY performance** | ✅ **Cliente vigente.** Efeonce ya opera un equipo de performance para SKY **hoy** |
+> | **SKY blog (Wherex)** | 🔴 **OFERTA EN CURSO — NO adjudicada.** Cierra **15/07/2026** |
+>
+> **Los CLP 5,2M/mes y el TCV de 124,8M son el precio que OFERTAMOS, no un contrato ganado.**
+> 🔴 **NUNCA lo cites como caso ni como TCV asegurado.**
+>
+> 🎯 **Y el squad del blog es explícitamente OTRO equipo** — *"NO las mismas personas del equipo de
+> performance que Efeonce ya opera para SKY"* *(squad blueprint)*. **Esto es EXPANSIÓN de una cuenta
+> existente, no un cliente nuevo** — que es exactamente el 70% del motor comercial *(§4)*.
+
 | | |
 |---|---|
 | **Alcance** | 8 artículos/mes + editorial + SEO/AEO + imagen + multimedia + social + reportería |

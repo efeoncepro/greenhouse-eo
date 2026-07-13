@@ -8,9 +8,21 @@
 
 ## 1. 🩸 Bugs vivos — lo que está roto hoy
 
+> # 🔴 A, B, C y D NO son historia. Son una oferta que todavía no se sube.
+>
+> **La licitación del blog de SKY (Wherex) cierra el 15/07/2026 y AÚN NO SE PRESENTA.**
+> Los cuatro bugs de abajo están **en la oferta que está por subirse** — con **2 años de contrato, en CLP,
+> sin reajuste, y con costos en USD.**
+>
+> 🔴 **Un error de piso en un contrato sin reajuste no se corrige después. Se paga 24 meses.**
+>
+> **Si estás leyendo esto y la oferta no se ha subido: para y arregla A, B, C — y sobre todo confirma D.**
+
 ### 🩸 A. Publicamos un precio unitario, y le dimos al cliente la calculadora
 
 **Qué pasó:** la oferta económica de SKY publica **"artículo adicional: CLP 260.000"**.
+⚠️ **Y agrava:** SKY **ya es cliente** *(performance)*. **Le estamos enseñando a comprarnos por unidad a una
+cuenta con la que queremos expandir durante años.**
 
 **Por qué es grave:** desde ese día, SKY puede **dividir cualquier propuesta futura por 260.000** y
 preguntarnos por qué el plan de 8 artículos no cuesta CLP 2,08M. **Le enseñamos a comprarnos por unidad**, que
