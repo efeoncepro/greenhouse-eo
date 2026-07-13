@@ -1,8 +1,15 @@
-# TASK-1352 / `efeoncepro.com/servicios-contratar-hubspot/` — Landing HubSpot: **evidencia antes que promesa**
+# TASK-1352 / `efeoncepro.com/servicios/hubspot/` — **Pillar del hub HubSpot**: evidencia antes que promesa
 
 > **Reescrito desde cero el 2026-07-13.** No es un delta: la tesis cambió de eje.
 > Fuente: **[PDR-006](../../public-site/decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md)
 > reescrito** + skill `hubspot-solutions-partner` + auditoría de la página viva (REST + Playwright).
+>
+> 🔴 **URL: `/servicios/hubspot/`** — **301 desde `/servicios-contratar-hubspot/`**
+> ([PDR-013](../../public-site/decisions/PDR-013-hub-hubspot-pillar-cluster-arquitectura.md)). La URL vieja tiene
+> **0 rankings y 0 backlinks** (medido): la migración **no cuesta nada**.
+> Es el **pillar** de un hub de 5 páginas; los 4 clusters son **TASK-1401** (`/precios/`), **TASK-1402**
+> (`/cuando-no-usar-hubspot/`), **TASK-1403** (`/agentes/`), **TASK-1404** (`/hubspot-vs-salesforce/`).
+> **SSOT de contenido:** [`HUBSPOT_HUB_LANDINGS_SPEC.md`](../../public-site/HUBSPOT_HUB_LANDINGS_SPEC.md).
 
 ## Meta
 

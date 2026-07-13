@@ -10,7 +10,11 @@
 
 - Status: `draft`
 - Owner task: `TASK-1352`
-- Surface: `efeoncepro.com/servicios-contratar-hubspot/` (público, WordPress/Ohio)
+- Surface: **`efeoncepro.com/servicios/hubspot/`** (público, WordPress/Ohio; **301 desde
+  `/servicios-contratar-hubspot/`** — [PDR-013](../../public-site/decisions/PDR-013-hub-hubspot-pillar-cluster-arquitectura.md))
+- 🎯 **Este motion contract es el del pillar y es la BASE del hub.** Los 4 clusters (TASK-1401…1404) heredan
+  esta escala, este easing y este contrato de `reduced-motion`. **Un hub que anima distinto en cada página no
+  es un hub: es cinco páginas sueltas.**
 - Motion primitive: **CSS + IntersectionObserver**. 🔴 **NO** los wrappers de motion del portal
   (`motionCss`/`MOTION_EASE` son del portal Greenhouse, no del sitio público).
 - Tier: **restraint**. Una sola pieza con carácter (el mapa). Todo lo demás es reveal sobrio.

@@ -8,8 +8,9 @@
 
 - Status: `draft`
 - Owner task: `TASK-1352`
-- Surfaces: `efeoncepro.com/servicios-contratar-hubspot/` (público) → HubSpot Meetings (externo) ·
-  `<greenhouse-form>` embebido (Growth Forms) · Portal Grader en Think *(futuro, EPIC-024)*
+- Surfaces: **`efeoncepro.com/servicios/hubspot/`** (público; **301 desde `/servicios-contratar-hubspot/`**) →
+  HubSpot Meetings (externo) · `<greenhouse-form>` embebido (Growth Forms) · **los 4 clusters del hub**
+  (TASK-1401…1404) · Portal Grader en Think *(futuro, EPIC-024)*
 - Coordina: **una** navegación externa (Meetings) · **un** submit gobernado (form) · **una** interacción
   in-page (el mapa dolor→Hub)
 - **NO** coordina: modal, drawer, sidecar, popover, ni ninguna superficie del portal
@@ -115,7 +116,12 @@ es un objetivo declarado de la task (ser citable por motores de respuesta).
 
 ## Routing Contract
 
-- **Misma URL, sin 301.** Canonical preservado.
+- 🔴 **URL canónica: `/servicios/hubspot/`.** `/servicios-contratar-hubspot/` → **301** (un solo salto, sin
+  cadena). El canonical apunta a la **nueva**. **Ningún enlace interno queda apuntando a la vieja**
+  (menú, home, `/servicios/`, `/aeo-2/`, footer, posts).
+- 🎯 **Reparto a los clusters** (mismo hub, navegación interna, sin UTM — es tráfico propio):
+  `/servicios/hubspot/precios/` · `/cuando-no-usar-hubspot/` · `/agentes/` · `/hubspot-vs-salesforce/`.
+  🔴 **Un enlace a un cluster que todavía no existe NO se pinta.** Nunca un link a 404.
 - Ancla única de navegación: `#diagnostico`. Los `data-capture` **no** son anclas.
 - HubSpot Meetings → **pestaña nueva** (el usuario no pierde la página).
 - `/aeo-2/` → navegación **interna** con UTM (`utm_source=hubspot-landing`).
