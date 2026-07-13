@@ -9,15 +9,20 @@
 
 ## 0. El mapa de canales, ordenado por lo que funciona
 
+> 🎯 **La regla que atraviesa TODOS los canales:**
+> ## En ningún canal vendes el servicio. En todos regalas el Grader.
+> **El servicio se vende en la reunión. El canal solo tiene un trabajo: conseguir que acepte el diagnóstico.**
+
 | # | Canal | Fricción | Volumen | Calidad | Veredicto |
 |---|---|---|---|---|---|
 | **1** | 🎯 **Outbound con el Grader ya corrido** | Baja | Medio | 🎯 **Altísima** | **El motor** |
 | **2** | 🎯 **Cross-sell a la cartera actual** | 🎯 **Mínima** | Bajo | **Altísima** | **La fruta al alcance** |
-| **3** | **Licitaciones** *(Wherex / Mercado Público)* | Media | Medio | Alta | ✅ **Ya lo hacemos (SKY)** |
-| **4** | **Inbound propio** *(nuestro SEO/AEO)* | Alta *(tarda)* | Medio | Alta | 🔴 **Obligatorio — es la prueba** |
-| **5** | **Referidos y partners** | Baja | Bajo | Alta | Subutilizado |
-| **6** | **LinkedIn / contenido de autoridad** | Media | Medio | Media | Sostiene a los demás |
-| **7** | 🔴 **Cold email genérico** | Baja | Alto | 🔴 **Basura** | **NO** |
+| **3** | 🎯 **PAID al Grader** *(LinkedIn + retargeting Meta + Google al DOLOR)* | Baja | 🎯 **Alto** | Media-alta | 🎯 **La aritmética es abrumadora — y no lo estamos usando** *(§ 5)* |
+| **4** | **Licitaciones** *(Wherex / Mercado Público)* | Media | Medio | Alta | ✅ **Ya lo hacemos (SKY, Berel)** |
+| **5** | **Inbound propio** *(nuestro SEO/AEO)* | Alta *(tarda)* | Medio | Alta | 🔴 **Obligatorio — es la prueba** |
+| **6** | **Referidos y partners** | Baja | Bajo | Alta | Subutilizado |
+| **7** | **LinkedIn orgánico / autoridad** | Media | Medio | Media | Sostiene a los demás |
+| **8** | 🔴 **Cold email genérico** · 🔴 **Ads a "agencia SEO"** | Baja | Alto | 🔴 **Basura** | **NO** *(§ 5b)* |
 
 ---
 
@@ -122,14 +127,80 @@ vendemos** *(→ `05_CUNA_GRADER` regla 3)*.
 
 ---
 
-## 5. Los canales que NO
+## 5. 🎯 PAID — y la regla que decide si funciona o si tiras la plata
+
+> ## En paid NO vendes SEO. En paid REGALAS el Grader.
+> **Nadie hace clic en *"contrata nuestra agencia de SEO"*.**
+> **Sí hace clic en *"¿tu marca aparece cuando le preguntan a ChatGPT por tu categoría? Averígualo gratis."***
+
+🎯 **Y acá está la asimetría:** para pautear así **necesitas un diagnóstico gratis, instantáneo y
+personalizado.** **Casi ninguna agencia lo tiene. Nosotros sí — y no lo estamos pauteando.**
+
+### La aritmética *(por qué esto no es una apuesta)*
+
+**LTV de un cliente:** USD 3.000/mes × 18 meses × 55% de margen = **USD 29.700 de margen bruto.**
+**Regla de la industria:** LTV:CAC ≥ **3:1** es sano.
+
+| Costo por lead *(un Grader corrido)* | Clientes / 100 graders* | **CAC** | **LTV:CAC** |
+|---|---|---|---|
+| USD 30 | 6 | **500** | **59:1** ✅ |
+| USD 50 | 6 | 833 | **36:1** ✅ |
+| USD 100 | 6 | 1.667 | **18:1** ✅ |
+| USD 150 | 6 | 2.500 | **12:1** ✅ |
+
+*\* Supuesto: 30% acepta la reunión · 20% de esas cierran.* ⚠️ **Son HIPÓTESIS, no data. No tenemos el número.**
+
+> 🎯 **La lectura correcta no es "vamos a hacer 59:1".**
+> **Es: incluso si mis supuestos están 3× inflados, el canal SIGUE funcionando.**
+> **Esa holgura es la señal.** *(En el peor escenario razonable —10% reunión, 10% cierre, lead a USD 100—
+> queda en ~3:1, que es el umbral. **Y es el peor escenario.**)*
+
+### El veredicto por canal
+
+| Canal | Veredicto | Cómo |
+|---|---|---|
+| 🎯 **LinkedIn** | ✅ **Sí — ahí está el comprador** | Targeting por **cargo** (CMO · Head of Growth · **CFO**) + tamaño de empresa. **CPC alto (USD 8-15), pero el lead califica solo.** La oferta: **el Grader**, nunca el servicio |
+| 🎯 **Meta** | ✅ **Sí, pero para lo que sirve** | 🔴 **Mal targeting B2B para prospección fría.** ✅ **Excelente para: retargeting** *(los que visitaron `/aeo-2/`, `/servicios/posicionamiento-seo` o Think)* **y lookalike sobre la lista de clientes.** Barato, y el Grader es una oferta que Meta sí sabe mover |
+| 🔴 **Google Ads a "agencia SEO"** | 🔴 **NO** | CPC alto, **intención comoditizada, compites con freelancers** — y encima **el CTR pagado cayó 68%** |
+| 🎯 **Google Ads al DOLOR** | ✅ **Sí — y casi nadie lo hace** | 🔴 **No pujes por la categoría. Puja por el problema:** *"por qué bajó mi tráfico orgánico"* · *"aparecer en ChatGPT"* · *"AI Overviews tráfico"* · *"mi web perdió visitas"*. **Son queries de dolor, no de categoría — y el que las busca ya tiene el incendio** |
+
+### 🔴 El guardrail que nadie va a mirar: **el Grader cuesta plata**
+
+**Cada run consume 5 motores + DataForSEO + los probes.**
+
+| Si un run cuesta… | 1.000 runs/mes son… |
+|---|---|
+| USD 2 | **USD 2.000/mes de API** |
+| USD 5 | **USD 5.000/mes** |
+| USD 10 | 🔴 **USD 10.000/mes** |
+
+🔴 **Antes de escalar paid: modelar el costo marginal del Grader y ponerle un techo.**
+🎯 **Es el mismo error que denunciamos en HubSpot con los créditos — no lo cometamos nosotros.**
+*(Rate-limit y captcha ya existen en `public-intake`. **El techo de presupuesto, no.**)*
+
+### 🔴 El protocolo: se testea antes de escalar
+
+```
+1. USD 500-1.000 en LinkedIn + retargeting Meta, 3 semanas
+2. Medir: costo por Grader · % que acepta reunión · % que cierra
+   🔴 (Hoy NO tenemos ninguno de los tres números)
+3. Recién con eso, calcular el CAC REAL y escalar — o cortar
+```
+
+🔴 **Nunca escales paid con las hipótesis de esta tabla. Escálalo con TUS números.**
+*(Es exactamente lo que le exigimos a un cliente. **Aplicárnoslo a nosotros no es opcional.**)*
+
+---
+
+## 5b. Los canales que NO
 
 | ❌ | Por qué |
 |---|---|
 | 🔴 **Cold email genérico masivo** | Reply rate <1%. **No es escala: es gasto** *(`commercial-expert`)*. **Y quema el dominio** |
-| 🔴 **Ads a "agencia SEO"** | 🎯 **CPC altísimo, intención comoditizada, compites con freelancers.** *(Además: el CTR pagado cayó 68%)* |
+| 🔴 **Ads a "agencia SEO"** *(la categoría)* | 🎯 **CPC altísimo, intención comoditizada, compites con freelancers** |
 | 🔴 **Directorios / marketplaces de agencias** | Te ponen a competir **solo por precio** |
 | ⚠️ **Webinars genéricos de SEO** | Ya los hace todo el mundo. **Solo funciona con un ángulo contrario** *(ej: "por qué el AEO que te están vendiendo es humo")* |
+| 🔴 **Paid vendiendo el SERVICIO** | 🎯 **Nadie hace clic en "contrata una agencia de SEO".** **La oferta es el Grader, siempre** |
 
 ---
 
@@ -164,6 +235,8 @@ vendemos** *(→ `05_CUNA_GRADER` regla 3)*.
 
 ## 8. Reglas duras
 
+0. 🎯 **En NINGÚN canal vendes el servicio. En todos regalas el Grader.**
+   **El canal tiene un solo trabajo: que acepte el diagnóstico. El servicio se vende en la reunión.**
 1. 🔴 **Nunca outbound sin el Grader corrido.** **El dato es la entrada.**
 2. 🔴 **Nunca la palabra "SEO" en un asunto de correo.** Está quemada.
 3. 🎯 **Siempre lleva el dato del paid (−68%).** **Es lo que hace entrar al CFO.**
@@ -171,3 +244,8 @@ vendemos** *(→ `05_CUNA_GRADER` regla 3)*.
 5. 🔴 **Máximo 5 toques. Breakup honesto.** El toque 5 es el que más produce.
 6. 🔴 **La personalización no se automatiza.** **Si la automatizas, te comoditizas tú.**
 7. 🔴 **Corre nuestro propio Grader.** 🎯 **Una agencia de AEO invisible no tiene argumento.**
+8. 🔴 **Nunca escales paid con las hipótesis de este módulo.** **Testea con USD 500-1.000, mide TUS tres
+   números (costo por Grader · % que acepta reunión · % que cierra) y recién ahí escala.**
+   🎯 **Es lo mismo que le exigimos a un cliente. Aplicárnoslo no es opcional.**
+9. 🔴 **Antes de escalar paid, ponle techo de presupuesto al costo marginal del Grader.**
+   *(5 motores + DataForSEO por run. **Es el mismo error de los créditos de HubSpot que denunciamos.**)*
