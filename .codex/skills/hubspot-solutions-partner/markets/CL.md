@@ -51,7 +51,7 @@ keywords con volumen (`phrase_organic`).
 
 | | |
 |---|---|
-| ✅ **Growth market** | **SÍ** → multiplicador **×2** en todos los puntos. *(❌ Lista oficial no publicada — pedirla al PDM)* |
+| ✅ **Growth market** | **SÍ** → multiplicador **×2** en todos los puntos. **Hecho establecido.** |
 | **PDM asignado** | **Simón Suárez** |
 | **Partner matching útil** | ✅ Sí, y **es de los pocos canales que funcionan acá**. Efeonce califica (Gold+) pero **sin acreditaciones queda al final de la fila** |
 | **Win rate partner-led** | ✅ **40-50% histórico** (`docs/context/02_gtm.md:111`) |

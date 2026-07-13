@@ -59,7 +59,7 @@ aunque la marca no, **hay inbound — pero entrando por el problema, no por HubS
 ### Lente 3 · Presencia de HubSpot (¿tienes co-selling?)
 - ¿Hay equipo local? ¿Growth Specialists que hablen el idioma?
 - ¿El mercado califica como **growth market** (multiplicador ×2)? ✅ **LATAM sí.**
-  ❌ La lista oficial no está publicada — **pídesela al PDM por escrito.**
+  ✅ **LATAM lo es (×2).** Hecho establecido — no volver a preguntarlo.
 - ¿Hay eventos, PUGs, co-marketing en ese mercado?
 - **Sin presencia local de HubSpot, el partner matching vale poco ahí.**
 

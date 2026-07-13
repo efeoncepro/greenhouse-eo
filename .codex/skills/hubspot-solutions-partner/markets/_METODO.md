@@ -49,7 +49,7 @@ en el matching).
 ### 3 · Presencia de HubSpot
 ¿Growth market (**×2**)? ¿Equipo local? ¿Growth Specialists? ¿Eventos?
 **Sin presencia local, el partner matching vale poco ahí.**
-✅ LATAM es growth market. ❌ La lista oficial no está publicada — **pídesela al PDM**.
+✅ LATAM es growth market. ✅ **LATAM lo es (×2).** Hecho establecido — no volver a preguntarlo.
 
 ### 4 · Idioma y registro
 En qué idioma **se firma un contrato de software** (no en qué idioma se habla).

@@ -241,8 +241,7 @@ sin importar quién trajo la cuenta originalmente.
 | **Assisted** | 3 pts / USD 100 | **6 pts / USD 100** | 1 año desde el cierre |
 | **Managed** | 1 pt / USD 100 | **2 pts / USD 100** | **60 días desde la última acción sobre la cuenta** |
 ✅ [hubspot.com/partners/how-tiers-work](https://www.hubspot.com/partners/how-tiers-work)
-❌ **La lista oficial de growth markets no está publicada** en ninguna página pública. Confirmada
-verbalmente para LATAM. **Pídesela por escrito al PDM.**
+✅ **LATAM ES growth market (multiplicador ×2)** — confirmado por el operador (Efeonce es partner Gold en LATAM). ⚠️ HubSpot no publica la lista de growth markets en ninguna página pública, pero **el hecho está establecido: NO volver a preguntarlo ni tratarlo como pendiente.**
 
 ### Umbrales de tier ✅ — **suben dos veces**
 | Tier | Desde 2026-07-15 (sourced / total) | Desde **2027-01-15** (sourced / total) | GRR |

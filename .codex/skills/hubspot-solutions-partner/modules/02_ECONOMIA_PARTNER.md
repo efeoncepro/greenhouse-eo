@@ -63,7 +63,7 @@ venta a cliente **nuevo o existente**, en cualquier región y línea, con crédi
 ## 3. Los puntos ✅ — la aritmética completa
 
 **LATAM es growth market → multiplicador ×2** (confirmado por el operador 2026-07-13;
-❌ **la lista oficial de growth markets no está publicada** — pídesela por escrito al PDM).
+✅ **LATAM ES growth market (×2)** — hecho establecido por el operador. **No es una pregunta abierta; no volver a preguntarlo.**
 
 | Crédito | Puntos (LATAM) | Caduca |
 |---|---|---|
@@ -221,7 +221,6 @@ licencia → implementación → managed ops → intelligence → **expansión d
 
 Cosas que ❌ **no están publicadas** y que cambian decisiones de plata. **Pídelas por escrito.**
 
-1. **La lista oficial de growth markets.** Confirmado verbalmente para LATAM; el multiplicador ×2 duplica o
    reduce a la mitad el esfuerzo de cada tier. **Necesitas esto por escrito.**
 2. **El proceso operativo del shared deal para cross-sell** a cuentas existentes (Growth Specialist, link de
    confirmación, plazos). Habilita toda la motion de base instalada.

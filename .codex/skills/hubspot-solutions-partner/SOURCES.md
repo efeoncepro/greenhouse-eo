@@ -241,7 +241,7 @@ sin importar quién trajo la cuenta originalmente.
 | **Assisted** | 3 pts / USD 100 | **6 pts / USD 100** | 1 año desde el cierre |
 | **Managed** | 1 pt / USD 100 | **2 pts / USD 100** | **60 días desde la última acción sobre la cuenta** |
 ✅ [hubspot.com/partners/how-tiers-work](https://www.hubspot.com/partners/how-tiers-work)
-❌ **La lista oficial de growth markets no está publicada** en ninguna página pública. Confirmada
+✅ **LATAM ES growth market (×2)** — hecho establecido por el operador. **No es una pregunta abierta; no volver a preguntarlo.**
 verbalmente para LATAM. **Pídesela por escrito al PDM.**
 
 ### Umbrales de tier ✅ — **suben dos veces**

@@ -70,7 +70,7 @@ no funcione. Es un cierre directo, y punto.
 - **Oficinas**: Providencia (Chile) · Bogotá (Colombia).
 - **Declarado en el listing**: APAC, EMEA, Norteamérica, Sudamérica — ⚠️ **con el listing solo en español**.
 - ✅ **LATAM es growth market** → multiplicador **×2** en todos los puntos.
-  ❌ La lista oficial no está publicada. **Pídesela al PDM por escrito.**
+  ✅ **LATAM lo es (×2).** Hecho establecido — no volver a preguntarlo.
 - 🔴 **Chile no tiene demanda de categoría** (`hubspot partner` = 20/mes). **El canal es outbound +
   partner-sourced + AEO.** → `markets/CL.md`.
 - ✅ **México sí tiene demanda de problema** (`crm para empresas` = 1.600/mes). → `markets/MX.md`.

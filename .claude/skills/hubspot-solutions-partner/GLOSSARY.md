@@ -9,7 +9,7 @@
 | **Sourced point** | Punto por MRR que **tú originas** (net-new, upgrade o **cross-sell**). **10 pts / USD 100 MRR** en growth market. **Expira 1 año** después del cierre del deal |
 | **Assisted point** | Punto por un deal en el que ayudas pero no originas. 6 pts / USD 100 en growth market. Expira 1 año |
 | **Managed point** | Punto por MRR de licencias **bajo tu gestión activa**. 2 pts / USD 100 en growth market. 🔴 **Expira a los 60 días de tu última acción sobre la cuenta** |
-| **Growth market** | Mercado con **multiplicador ×2** sobre todos los puntos. **LATAM lo es.** ❌ La lista oficial no está publicada — pídesela al PDM |
+| **Growth market** | Mercado con **multiplicador ×2** sobre todos los puntos. **LATAM lo es.** ✅ **LATAM lo es (×2).** Hecho establecido — no volver a preguntarlo.
 | **Legacy / puntos por ventas antiguas** | Puntos concedidos **antes del 2025-11-17**. Valen 12 meses. **Llegan a cero en diciembre de 2026.** Se ven en la pestaña *"Puntos por ventas antiguos"* del portal |
 | **Deal-Based Model** | Modelo vigente desde el **2025-11-17**: comisionas por **cada deal que cierras**, incluso en cuentas que trajo otro partner. Reemplazó el modelo por cuenta |
 | **Deal registration** | **Obligatorio y exclusivo.** Sin registro no hay comisión ni puntos |
