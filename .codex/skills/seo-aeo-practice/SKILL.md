@@ -109,7 +109,8 @@ mueve, y este es el orden"* sí.
 4. 🔴 **NUNCA descuentes la línea de plataforma.** Costo marginal ≈ 0 **y es lo único que un freelancer no
    puede tener.** Descontarla es regalar margen puro **y devaluar tu único diferenciador.**
    **Descuenta horas. Nunca la plataforma.**
-5. 🔴 **NUNCA cierres bajo el piso.** El piso se **computa**, no se siente. → `modules/04_PRICING.md` § 4.
+5. 🔴 **NUNCA cierres bajo el 45% de margen bruto.** **Piso aprobado por el dueño el 2026-07-13.**
+   **No es una guía: es la regla.** El piso se **computa**, no se siente. → `modules/04_PRICING.md` § 4.
 6. 🔴 **NUNCA pricing por performance** *(pago por ranking/tráfico/lead)* sin leer § 9 del módulo de pricing.
    **Es una trampa** — y en AEO, además, **no hay atribución que la sostenga.**
 7. 🔴 **NUNCA "todo incluido… etc".** Un alcance sin borde es cómo mueren las agencias: las expectativas se

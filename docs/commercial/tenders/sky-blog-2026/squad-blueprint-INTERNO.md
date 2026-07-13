@@ -66,7 +66,31 @@ Responsable de Cuenta (Account Lead)
 ## 5. Hand-offs
 
 - **Loaded cost** (%dedic × costo/rol de nómina) → `greenhouse-finance-accounting-operator`. *(Ya calculado en la Parte C del borrador económico: loaded delivery ≈ CLP 2,26M/mes.)*
-- **Margen / precio** → `commercial-expert`. *(Precio FINAL de oferta: **CLP 5,2M/mes lista**, plan ampliado 6,9M, piso de negociación **3,9M**. Loaded delivery ≈ 2,26M/mes → margen sano incluso absorbiendo el buffer de penalidades de las bases (hasta 10–15% del valor mensual) + comisiones Wherex. Drift corregido 2026-07-11: la versión previa citaba 4,9M/3,5M.)*
+- **Margen / precio** → `commercial-expert` + 🔴 **`seo-aeo-practice` → `modules/04_PRICING.md`**.
+  *(Precio FINAL de oferta: **CLP 5,2M/mes lista**, plan ampliado 6,9M. Loaded delivery ≈ 2,26M/mes.)*
+
+  > 🔴 **DELTA 2026-07-13 — el piso de 3,9M queda DEROGADO. No pasa la política.**
+  >
+  > **El dueño aprobó un piso duro de 45% de margen bruto** (`seo-aeo-practice/modules/04_PRICING.md` § 4;
+  > respaldo de mercado: **50%+ es el margen sano de una agencia; bajo 40% el delivery está roto**).
+  >
+  > | Escenario | Costo | **Piso a 45%** | Margen real si cerramos a 3,9M |
+  > |---|---|---|---|
+  > | Sin buffer | 2.260.000 | **4.110.000** | **42,1%** 🔴 |
+  > | **Buffer 12%** *(penalidades 10-15% + Wherex)* | 2.531.200 | 🎯 **4.602.000** | 🔴 **35,1%** |
+  > | Buffer 15% | 2.599.000 | 4.725.000 | 🔴 **33,4%** |
+  >
+  > 🔴 **PISO VIGENTE: CLP 4.600.000.** *(No 3,9M.)*
+  > 🔴 **Margen de negociación real: CLP 598.000 (11%), no 1,3M (25%).**
+  > **Creíamos tener el doble de espacio del que tenemos. Hay que saberlo ANTES de negociar.**
+  >
+  > ⚠️ **Y dos bugs vivos de la oferta económica, a corregir antes del cierre:**
+  > **(1)** el plan **ampliado está dominado** — 12 art a 6,9M **cuesta 660.000 MÁS** que base + 4 ad-hoc
+  > (6,24M); **un analista de compras lo ve en 30 segundos**. **(2)** el **ad-hoc (260k) es más barato que el
+  > marginal del plan (425k)** — premiamos salirse del plan **y le entregamos al cliente la calculadora para
+  > comoditizarnos**. **Fix: ad-hoc ≥ 550k, o mejor, sin precio unitario publicado.**
+  >
+  > *(Drift previo corregido 2026-07-11: una versión anterior citaba 4,9M/3,5M.)*
 - **Sección de equipo del bid** → `greenhouse-public-private-tenders`. *(Aplicado en §10 de la Oferta Técnica, roles + seniority sin nombres.)*
 - **Reconciliación de capacity** → `greenhouse-ico` + `engagement-wellbeing.md`.
 - **Demanda runtime** → `TalentDemand` (stakeholder=client, fulfillment=managed).

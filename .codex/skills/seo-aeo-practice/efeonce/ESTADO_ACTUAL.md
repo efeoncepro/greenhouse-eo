@@ -14,7 +14,7 @@
 | **USD equivalente** | **≈ 2.965** | **≈ 5.591** |
 | Alcance declarado | medición · portal · contenido · posteo · SEO técnico *"si necesitasen"* 🔴 | 8 artículos + SEO/AEO + multimedia + reportería + portal |
 | **Loaded cost** | 🔴 **DESCONOCIDO** | CLP **2.260.000** (2,2 FTE) |
-| **Piso** | 🔴 **NO EXISTE** | CLP **3.900.000** |
+| **Piso** | 🔴 **NO EXISTE** | 🔴 **3.900.000 declarado → NO PASA la regla del 45%.** El piso real es **≈ CLP 4.602.000** *(45% + buffer 12% de penalidades/Wherex)* |
 | **Margen** | 🔴 **NO SABEMOS** | **56%** (lista) · **42%** (piso) |
 | Contrato | Sin cláusula FX conocida | **2 años, CLP, SIN reajuste** ⚠️ |
 
@@ -88,7 +88,8 @@ con el cliente que ya tienes.)*
 |---|---|---|---|
 | **1** | 🔴 **Squad blueprint de Berel** — saber si ganamos o perdemos plata | Finance + Delivery | **Podría estar al 18%** |
 | **2** | 🔴 **Arreglar la oferta de SKY** *(plan dominado + ad-hoc invertido)* — **está viva** | Comercial | Reputacional en una licitación |
-| **3** | 🔴 **Declarar el piso (45%) y sembrarlo en el motor** | **Dueño** | Convierte la política en gate automático |
+| **3** | ✅ **Piso del 45% APROBADO (2026-07-13)** → **sembrarlo en el motor** | Dueño ✅ / Ingeniería | Convierte la política en gate automático |
+| **3b** | 🔴 **URGENTE — corregir el piso de SKY: 3,9M → 4,6M** | Comercial | **A 3,9M cerramos al 35%. La negociación real es de CLP 598.000, no de 1,3M** |
 | **4** | 🎯 **Desagregar AEO como línea propia** *(USD 900+/mes)* | Comercial | **+30% de revenue en Berel** |
 | **5** | 🎯 **Conseguir el primer caso citable** *(Berel es el candidato)* | Delivery + Cliente | **Desbloquea vender con prueba** |
 

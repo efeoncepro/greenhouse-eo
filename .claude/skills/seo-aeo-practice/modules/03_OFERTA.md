@@ -31,6 +31,70 @@ futura.**
 
 ---
 
+## 1.5 🔴 "Entonces… ¿no vendemos AEO?" — la objeción INTERNA
+
+**La va a tener el operador, el vendedor y todo el que lea `01_MERCADO`.
+Contéstala antes de que la pregunten.**
+
+### La respuesta: **vendemos MÁS AEO, y se queda.**
+
+**Lo que está muerto no es el producto. Es el pitch.**
+
+| | |
+|---|---|
+| 🔴 **Humo** *(lo que vende todo el mercado)* | *"Hacemos AEO y **ChatGPT te va a traer clientes**"* — **el canal** |
+| ✅ **Vendible, urgente y verificable** | *"**Tus clics se están desplomando**, y estar citado es lo que los recupera — y de paso **te abarata el paid**"* — **la defensa** |
+
+### Por qué el pitch honesto vende MÁS
+
+| | |
+|---|---|
+| **1. La urgencia es mayor** | *"Hay un canal nuevo con el 1% del tráfico"* **se posterga.** *"Estás perdiendo el 58% de tus clics"* **es un incendio. Nadie posterga un incendio** |
+| **2. El presupuesto es mayor** | 🎯 El **−68% del CTR pagado** saca la plata del **presupuesto de medios**, no del de marketing. **Una bolsa 10× más grande — y es plata que ya está gastando mal** |
+| **3. Sobrevive al mes 6** | 🔴 El que compró *"tráfico de ChatGPT"* abre su GA4, ve el 1%, **y cancela.** El que compró *"recupero mis clics"* abre su GA4 **y ve exactamente lo que le prometiste** |
+| **4. Cobras más** | El mercado vende el AEO **como línea aparte desde USD 900/mes** ✅. **Nosotros lo regalamos adentro** |
+
+### 🔴 Y lo que de verdad está en juego
+
+```
+2015-2022   "Te llevamos a la primera página"
+            → no funcionó → hoy el 100% de los prospectos tiene una cicatriz
+            → y por eso vender SEO es tan difícil
+
+2025-2026   "Te hacemos AEO, ChatGPT te va a recomendar"
+            → el tráfico es el 1% → NO va a funcionar
+            → 🔴 en 18 meses "AEO" va a ser una palabra tan quemada como "SEO"
+```
+
+> 🎯 **Todas las agencias que hoy venden la fantasía del canal están fabricando la cicatriz de 2028.**
+> **Esta práctica está construida para ser la que sobrevive a eso — la que no va a tener que cambiarse el
+> nombre en dos años, porque nunca prometió lo que no podía.**
+
+### El pitch de AEO, palabra por palabra
+
+> *"Google ya pone un resumen de IA en la mitad de las búsquedas. Y donde lo pone, **el que está primero
+> pierde el 58% de sus clics.** Hace ocho meses perdía el 34%. **Va hacia abajo y no ha parado.**
+>
+> Y no es solo el orgánico: **tus anuncios perdieron el 68% del CTR.** Estás pagando lo mismo por un tercio
+> del resultado.
+>
+> **Lo único que lo compensa es aparecer citado dentro del resumen.** Las marcas que están adentro reciben
+> **35% más clics orgánicos y 91% más clics pagados.**
+>
+> **Hoy tú no estás citado en {N} de 7 motores. Eso es lo que hacemos: que estés adentro.**"*
+
+🎯 **Mismo trabajo, misma capa técnica, mismo contenido. Cambia de qué le sirve — y por eso se queda.**
+
+### 🔴 La precisión que hace la diferencia
+
+| ✅ | 🔴 |
+|---|---|
+| *"**Las marcas citadas reciben** 35% más clics orgánicos y 91% más pagados"* | *"**Tú vas a recibir** 35% más clics"* |
+| **Es una correlación fuerte, verificable, de un estudio** | **Es una promesa que no controlas** |
+| **Dicho así, es imbatible** | 🔴 **Dicho así, volvemos al humo** |
+
+---
+
 ## 2. 🔴 El reframe que cambia la venta
 
 | ❌ Lo que dice todo el mercado | ✅ Lo que decimos nosotros |

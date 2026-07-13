@@ -246,22 +246,44 @@ PISO = loaded cost del pod          ← del squad blueprint (nómina real, %dedi
      ÷ (1 − margen mínimo)
 ```
 
-**Aplicado a SKY, con los números reales:**
+### 🔴 Aplicado a SKY — y el piso declarado NO pasa la regla
 
-| | CLP |
+**Loaded delivery: CLP 2.260.000/mes (2,2 FTE).**
+**Las bases del tender reconocen un riesgo de penalidades del 10-15% + comisión Wherex.**
+
+| Escenario | Costo | **PISO a 45%** | Si cerramos a **3,9M**, el margen real es… |
+|---|---|---|---|
+| **Sin buffer** | 2.260.000 | **CLP 4.110.000** | **42,1%** 🔴 |
+| **Buffer 10%** | 2.486.000 | **CLP 4.520.000** | **36,3%** 🔴 |
+| **Buffer 12%** | 2.531.200 | 🎯 **CLP 4.602.000** | **35,1%** 🔴 |
+| **Buffer 15%** | 2.599.000 | **CLP 4.725.000** | **33,4%** 🔴🔴 |
+
+> ## 🔴 El piso declarado (3,9M) da entre 33% y 42% de margen. La regla dice 45%.
+> **Y el mercado dice que bajo 40% el delivery está roto.** ✅
+>
+> **El piso real de SKY no es 3,9M. Es ≈ CLP 4,6M.**
+
+### 🔴 Y la consecuencia que hay que ver antes de negociar
+
+| | |
 |---|---|
-| Loaded delivery *(2,2 FTE)* | 2.260.000 |
-| ⚠️ **Overhead absorbido** | **falta — el modelo existe (`full absorption`), no se aplicó** |
-| ⚠️ **Buffer de riesgo** *(penalidades de las bases: 10-15% · comisión Wherex)* | **estimado, no computado** |
-| **Piso declarado en el blueprint** | **3.900.000** → margen **42%** |
+| Precio de lista | **CLP 5.200.000** *(margen 56,5% ✅ — **el precio de lista está bien**)* |
+| **Piso real** *(45% + buffer 12%)* | **CLP 4.602.000** |
+| 🔴 **Margen de negociación REAL** | 🔴 **CLP 598.000 — un 11%, no un 25%** |
 
-🔴 **Ese piso de 3,9M da 42% de margen bruto — por DEBAJO del piso de política que propongo (45%).**
-Y **no incluye overhead absorbido**, así que **el margen real en el piso es más bajo todavía.**
+**Creíamos tener CLP 1,3M de espacio para negociar. Tenemos 598 mil.**
 
-> 🎯 **Traducción: si SKY negocia hasta el piso, probablemente ganamos menos de lo que creemos.**
-> **No porque el piso esté mal calculado — sino porque está mal *completado*.**
+🔴 **Si SKY aprieta y bajamos a 3,9M creyendo que hay colchón, cerramos al 35% — con penalidades encima.**
+🎯 **Esto hay que saberlo ANTES de entrar a la negociación, no después.**
 
-### La política de margen — ✅ **confirmada por el mercado, ya no es opinión**
+### 🔴 La política de margen — **APROBADA POR EL DUEÑO, 2026-07-13**
+
+> ## 🔴 PISO DURO: 45% de margen bruto. Debajo de eso, no se cotiza.
+> **Firmado por el operador el 2026-07-13. No es una recomendación: es la regla.**
+>
+> **Cualquier agente que produzca una cotización bajo 45% está violando la política, no interpretándola.**
+
+### El respaldo — ✅ **confirmado por el mercado, ya no es opinión**
 
 **Benchmark verificado 2026-07-13** *(fuentes al pie)*:
 
