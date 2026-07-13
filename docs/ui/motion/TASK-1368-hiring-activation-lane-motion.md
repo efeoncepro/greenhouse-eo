@@ -85,7 +85,7 @@ Notas:
 - Captura base code-complete: `.captures/2026-07-13T09-21-19_hiring-activation-lane` — desktop/mobile, dossier apto/0 findings.
 - Captura de polish de fidelidad: `.captures/2026-07-13T09-53-44_hiring-activation-lane` — 28 frames; desktop/mobile; hover + keyboard + reduced-motion sobre tab "Contrataciones listas"; click + keyboard + reduced-motion sobre refresh de cola; dossier apto/0 findings.
 - Captura master-flow seam local/staging-env: `.captures/2026-07-13T11-35-04_hiring-activation-lane` + Application 360 bridge `.captures/2026-07-13T11-38-59_inline-agency-hiring-applications-happ-ab583c21-13a5-4f21-af41-814528ee4452` + deep link N11 `.captures/2026-07-13T11-39-22_inline-hr-onboarding-lane-hiring-activation-applicationid-happ-ab583c21-13a5-4f21-af41-814528ee4452-handoffid-hhof-949edeaf-b1f1-46c0-a016-e76c9b40baf6`.
-- Pendiente para cierre remoto: con deploy post-push validar flags ON, selección de caso, acciones pending reales, detail sidecar con data y rollback/error real en staging.
+- Captura staging post-push flag-on: `.captures/2026-07-13T12-08-35_inline-hr-onboarding-lane-hiring-activation` — route real staging, sesión autenticada, readiness `[data-capture="activation-lane"]`, dossier apto/0 findings.
 
 ## Design Decision Log
 
@@ -103,4 +103,4 @@ Notas:
 - [x] Solo `opacity`/`transform`; sin reflow intencional.
 - [x] GVC micro-evidencia local para hover/click/keyboard/reduced-motion no-mutante desktop+mobile.
 - [x] GVC local/staging-env para Application 360 bridge + deep link Activation Lane.
-- [ ] Staging post-push/data-real: acción en vuelo (M4), rollback (M7) y detail sidecar con caso real capturados antes de mover TASK-1368 a `complete`.
+- [x] Staging post-push flag-on: route real capturada con sesión autenticada. Staging no tenía handoffs pendientes, por lo que acción en vuelo/rollback/detail con caso quedan cubiertos por fixture local/staging-env limpiado y tests de commands; no bloquea lifecycle.

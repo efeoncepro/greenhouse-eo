@@ -1,6 +1,6 @@
 ## Estado vigente para agentes
 
-- **TASK-1368 Hiring Activation Lane code-complete local + master flow N10→N11 cableado (2026-07-13):** `/hr/onboarding?lane=hiring-activation`
+- **TASK-1368 Hiring Activation Lane complete + master flow N10→N11 cableado (2026-07-13):** `/hr/onboarding?lane=hiring-activation`
   es la lane "Contrataciones listas" dentro de `HR > Onboarding & Offboarding`, no reemplaza
   `/hr/workforce/activation`. Application 360 ahora es el seam correcto de EPIC-011: decisión
   `selected` + `internal_hire` muestra el handoff real, puede aprobarlo con `hiring.handoff.approve`
@@ -10,7 +10,10 @@
   alta fidelidad al HTML fuente. Evidencia local: GVC `.captures/2026-07-13T11-35-04_hiring-activation-lane`,
   Application 360 bridge `.captures/2026-07-13T11-38-59_inline-agency-hiring-applications-happ-ab583c21-13a5-4f21-af41-814528ee4452`,
   deep link N11 `.captures/2026-07-13T11-39-22_inline-hr-onboarding-lane-hiring-activation-applicationid-happ-ab583c21-13a5-4f21-af41-814528ee4452-handoffid-hhof-949edeaf-b1f1-46c0-a016-e76c9b40baf6`.
-  Staging smoke post-push pendiente antes de mover la task a `complete/`.
+  Staging post-push verificado sobre `f09fd7039`: deploy Vercel `Ready`, flags ON, API autenticada
+  `GET /api/hr/hiring-activation?limit=5` → `200 enabled:true`, y GVC staging PASS en
+  `.captures/2026-07-13T12-08-35_inline-hr-onboarding-lane-hiring-activation`. Task movida a
+  `complete/`.
 - **Tender Deck Composer — `TimelineFull` v0.2: schedule y labels data-driven (2026-07-12):** el
   cronograma ya acepta `timeUnit` (`day|week|month|quarter|custom`), un eje discreto de 3..8 unidades,
   rangos enteros y hitos de frontera; su compiler deriva grilla, barras, diamantes y conectores de ese único

@@ -40,7 +40,7 @@
 >
 > **Evidencia nueva TASK-1368:** `pnpm typecheck`, `pnpm lint`, Vitest focal hiring-activation 3 files/30 tests, `pnpm build`, `task:lint TASK-1368`, `ui:wireframe/flow/motion/readiness` PASS. GVC local/staging-env: `.captures/2026-07-13T11-35-04_hiring-activation-lane`; Application 360 bridge `.captures/2026-07-13T11-38-59_inline-agency-hiring-applications-happ-ab583c21-13a5-4f21-af41-814528ee4452`; deep link N11 `.captures/2026-07-13T11-39-22_inline-hr-onboarding-lane-hiring-activation-applicationid-happ-ab583c21-13a5-4f21-af41-814528ee4452-handoffid-hhof-949edeaf-b1f1-46c0-a016-e76c9b40baf6`. Fixture sintético limpiado (`remaining=[0,0,0,0,0,0]`).
 >
-> **Pendiente inmediato:** commit + push a `develop`, esperar deployment staging nuevo, smoke con flags ON y sesión real. No mover TASK-1368 a `complete/` hasta ese smoke post-push.
+> **Cierre TASK-1368 post-push (Codex 2026-07-13):** commit remoto `f09fd7039` quedó desplegado en Vercel `staging` (`Ready`, `dpl_KG4KgUWcLcyc9AdmKBc8SbwJLqVD`). Flags confirmados ON: `HIRING_HANDOFF_BRIDGES_ENABLED=true` y `HIRING_ACTIVATION_ENABLED=true`. Smoke API autenticado con sesión real y bypass canónico de Vercel API: `GET /api/hr/hiring-activation?limit=5` → `HTTP 200`, `enabled:true`, cola vacía. GVC staging PASS: `.captures/2026-07-13T12-08-35_inline-hr-onboarding-lane-hiring-activation`, dossier `Apto para implementar`, 0 findings. TASK-1368 queda movida a `docs/tasks/complete/`; producción sigue pendiente de sign-off/release separado, no de esta task.
 
 ## Sesión 2026-07-12 (cont. 19) — Creative Operations y agentes: investigación canonizada (Codex)
 

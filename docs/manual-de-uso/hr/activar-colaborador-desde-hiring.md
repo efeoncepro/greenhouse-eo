@@ -4,7 +4,7 @@
 > **Version:** 1.0
 > **Creado:** 2026-07-10 por Claude (TASK-770)
 > **Ultima actualizacion:** 2026-07-13 por Codex (TASK-1368)
-> **Documentacion tecnica:** [Greenhouse_HRIS_Architecture_v1](../../architecture/Greenhouse_HRIS_Architecture_v1.md) · [Task TASK-770](../../tasks/complete/TASK-770-hiring-to-hris-collaborator-activation.md) · [Task TASK-1400](../../tasks/complete/TASK-1400-hiring-activation-blocker-resolution-api.md) · [Task TASK-1368](../../tasks/in-progress/TASK-1368-hiring-activation-lane-ui.md)
+> **Documentacion tecnica:** [Greenhouse_HRIS_Architecture_v1](../../architecture/Greenhouse_HRIS_Architecture_v1.md) · [Task TASK-770](../../tasks/complete/TASK-770-hiring-to-hris-collaborator-activation.md) · [Task TASK-1400](../../tasks/complete/TASK-1400-hiring-activation-blocker-resolution-api.md) · [Task TASK-1368](../../tasks/complete/TASK-1368-hiring-activation-lane-ui.md)
 > **Manual hermano:** [Operar el Hiring Handoff](operar-hiring-handoff.md) (el tramo anterior: decisión → handoff aprobado)
 
 ## Para qué sirve

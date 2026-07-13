@@ -70,7 +70,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
 - `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`
 - `docs/tasks/complete/TASK-770-hiring-to-hris-collaborator-activation.md`
-- `docs/tasks/in-progress/TASK-1368-hiring-activation-lane-ui.md`
+- `docs/tasks/complete/TASK-1368-hiring-activation-lane-ui.md`
 
 Reglas obligatorias:
 

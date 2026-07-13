@@ -141,7 +141,7 @@
 - `src/lib/person-360/get-person-hr.ts` and/or `src/lib/people/get-person-detail.ts` if Person 360 enrichment needs server wiring.
 - `src/lib/copy/types.ts`
 - `src/lib/copy/dictionaries/{es-CL,en-US}/index.ts`
-- `docs/tasks/in-progress/TASK-1368-hiring-activation-lane-ui.md`
+- `docs/tasks/complete/TASK-1368-hiring-activation-lane-ui.md`
 - `docs/tasks/README.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `Handoff.md`

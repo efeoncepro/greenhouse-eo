@@ -34,7 +34,7 @@ Load whenever the work happens *inside* the Greenhouse repo (not pure advisory).
 - **Ops aids**: backfill `scripts/hiring/backfill-handoffs.ts` (dry-run→apply); live smoke `scripts/hiring/_sanity-handoff-reactive.ts`.
 - Manual: `docs/manual-de-uso/hr/operar-hiring-handoff.md`. Functional doc: `docs/documentation/hr/hiring-desk.md` §Handoff downstream.
 
-## The activation bridge (handoff → collaborator, TASK-770 ✓ complete; UI TASK-1368 code-complete local)
+## The activation bridge (handoff → collaborator, TASK-770 ✓ complete; UI TASK-1368 ✓ complete)
 
 - **Home**: `src/lib/workforce/hiring-activation/**` (NOT hr-core). Mapping `greenhouse_hr.hiring_activation_request` (UNIQUE per handoff) + append-only events. Commands `review → create-member → open-onboarding → complete` + `cancel` via `POST /api/hr/hiring-activation/[id]/[action]`. Resolver `resolve-blocker` (TASK-1400) retries governed actions (`retry-create-member`, `retry-open-onboarding`) or returns `not_resolvable` with surface alternativa. Flag `HIRING_ACTIVATION_ENABLED` stacks on 356's bridges flag.
 - **Member core source-neutral** (`member-core.ts`): sibling of the SCIM D-2 cascade — resolve by `identity_profile_id` → legacy email without profile → reactivate inactive → INSERT mirroring SCIM (**`active=TRUE` + `workforce_intake_status='pending_intake'`** — the payroll/capacity gate is the intake status, NOT the active column; `members.active` is NOT a generated column, that was a misread of kysely's `Generated<>`). Identity conflicts → request `blocked` (`ambiguous_identity|member_conflict|member_already_active`), NEVER auto-merge. D-2 discoverability by construction (profile populated → SCIM backfills `azure_oid` later, no dup).

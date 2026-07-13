@@ -1,5 +1,13 @@
 # TASK-1368 — Hiring Activation Lane UI (People/HRIS)
 
+## Delta 2026-07-13 — Staging post-push aprobado; lifecycle completo
+
+- Commit remoto verificado: `f09fd7039 feat(hr): connect hiring activation master flow` desplegado en Vercel `staging` como `Ready` (`dpl_KG4KgUWcLcyc9AdmKBc8SbwJLqVD`; alias `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app` / `https://dev-greenhouse.efeoncepro.com`).
+- Flags de staging verificados ON: `HIRING_HANDOFF_BRIDGES_ENABLED=true` y `HIRING_ACTIVATION_ENABLED=true`.
+- Smoke API autenticado con sesión real y bypass de protección obtenido por el canal canónico de Vercel API, sin imprimir secretos: `GET /api/hr/hiring-activation?limit=5` respondió `HTTP 200` con `{ "enabled": true, "items": [] }`. La cola está vacía en staging, por lo que la evidencia de detalle/bridge/resolver con caso real sigue cubierta por fixture sintético local/staging-env ya limpiado.
+- GVC staging post-push PASS: `pnpm fe:capture --route='/hr/onboarding?lane=hiring-activation' --env=staging --hold=3000 --ready='[data-capture="activation-lane"]' --task=TASK-1368` → `.captures/2026-07-13T12-08-35_inline-hr-onboarding-lane-hiring-activation`; `fe:capture:review` = `Apto para implementar`, 0 findings.
+- Con la evidencia local + staging, TASK-1368 queda cerrada end-to-end como UI del nodo N11 del master flow EPIC-011.
+
 ## Delta 2026-07-13 — Master flow cableado N10→N11 + resolver blocker real
 
 - Se corrigió el enfoque de navegación: TASK-1368 no queda como lane aislada; Application 360 ahora cablea el master flow EPIC-011 desde decisión `selected` + destino `internal_hire` hacia N11.
@@ -7,7 +15,7 @@
 - La Activation Lane soporta deep link por `handoffId`/`applicationId`, selecciona el caso correcto en la cola de 770 y muestra un estado honesto de "todavía no está en la cola" si N10 no materializó/aprobó el handoff; desde el detalle vuelve a Application 360 con `Ver postulación 360`.
 - `Resolver blocker` ya no es placeholder: consume `POST /api/hr/hiring-activation/[id]/resolve-blocker` de TASK-1400 con `blockers[]` accionables, payload `reason`, estados `resolved|still_blocked|stale`, error stale con refresh del detail y surface alternativa para blockers manuales.
 - Evidencia local nueva: `pnpm typecheck`, `pnpm lint`, Vitest focal hiring-activation 3 files/30 tests, `pnpm build`, `task:lint`/`ui:*` checks PASS; GVC `hiring-activation-lane` PASS en `.captures/2026-07-13T11-35-04_hiring-activation-lane`; Application 360 bridge PASS en `.captures/2026-07-13T11-38-59_inline-agency-hiring-applications-happ-ab583c21-13a5-4f21-af41-814528ee4452`; deep link N11 PASS en `.captures/2026-07-13T11-39-22_inline-hr-onboarding-lane-hiring-activation-applicationid-happ-ab583c21-13a5-4f21-af41-814528ee4452-handoffid-hhof-949edeaf-b1f1-46c0-a016-e76c9b40baf6`.
-- Se usó fixture sintético local/staging-env para validar el seam y se limpió completo (`remaining=[0,0,0,0,0,0]`). Estado honesto: **code complete local; staging smoke post-push pendiente** antes de mover a `complete/`.
+- Se usó fixture sintético local/staging-env para validar el seam y se limpió completo (`remaining=[0,0,0,0,0,0]`). El smoke staging post-push posterior cerró el gate de lifecycle.
 
 ## Delta 2026-07-13 — Microinteracciones del HTML fuente portadas con fidelidad alta
 
@@ -63,7 +71,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -76,7 +84,7 @@
 - Flow: `docs/ui/flows/TASK-1368-hiring-activation-lane-flow.md`
 - Motion: `docs/ui/motion/TASK-1368-hiring-activation-lane-motion.md`
 - Epic: `EPIC-011`
-- Status real: `Code complete local; master flow N10→N11 + resolver real cableados; staging smoke post-push pendiente`
+- Status real: `Complete; master flow N10→N11 + resolver real cableados; staging deploy Ready + API/GVC smoke post-push PASS`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -328,14 +336,16 @@ Additive UI change, sin migración ni flag propio (hereda `HIRING_ACTIVATION_ENA
 - `pnpm ui:wireframe-check --task TASK-1368` · `pnpm ui:flow-check --task TASK-1368` · `pnpm ui:motion-check --task TASK-1368` · `pnpm ui:readiness-check --task TASK-1368`
 - `pnpm build`
 - `pnpm fe:capture hiring-activation-lane --env=local --task=TASK-1368` + inline captures de Application 360 bridge y deep link Activation Lane; frames mirados.
+- `pnpm staging:request '/api/hr/hiring-activation?limit=5' --pretty` contra staging con flags ON y sesión real → `HTTP 200`, `enabled:true`, cola vacía.
+- `pnpm fe:capture --route='/hr/onboarding?lane=hiring-activation' --env=staging --hold=3000 --ready='[data-capture="activation-lane"]' --task=TASK-1368` → `.captures/2026-07-13T12-08-35_inline-hr-onboarding-lane-hiring-activation`, review dossier `Apto para implementar`, 0 findings.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle`/carpeta sincronizados tras staging smoke post-push; `README.md`; `Handoff.md`; `changelog.md`
+- [x] `Lifecycle`/carpeta sincronizados tras staging smoke post-push; `README.md`; `Handoff.md`; `changelog.md`
 - [x] `## Delta` al master flow EPIC-011 (N11) si cambia un nodo/regla
 - [x] doc funcional + manual HR (lane de activación) actualizados si cambia comportamiento visible
 - [x] skills Codex/Claude del dominio talent/people sincronizadas con TASK-1368 + TASK-1400
-- [ ] Smoke staging post-push con flags ON y sesión real antes de mover a `complete/`
+- [x] Smoke staging post-push con flags ON y sesión real antes de mover a `complete/`
 
 ## Follow-ups
 
