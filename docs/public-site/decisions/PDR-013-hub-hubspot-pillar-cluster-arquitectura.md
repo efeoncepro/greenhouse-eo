@@ -106,13 +106,19 @@ hispano) — la conclusión de PDR-006 se sostiene.
 > Si los evalúas por sesiones de Google, los vas a matar injustamente en tres meses. **`hubspot sales hub`
 > tiene diez búsquedas al mes: como jugada de SEO es plata quemada. Su valor está en otra parte.**
 
-### Las tres razones reales de los clusters
+### Por qué existen los clusters (y por qué NO son uno por Hub)
 
-1. **AEO — la fuerte.** Los LLMs citan **contenido profundo y específico**. Una página que cubre siete Hubs
-   superficialmente **no se cita para nada**. Siete páginas que responden bien **una** pregunta cada una, sí.
-   **En 2026 el cluster no es una jugada de ranking: es una jugada de recuperación.**
-2. **Assets de co-sell.** Simón (PDM) tiene un deal de Service Hub → le mandas **la página de Service Hub**.
-3. **Assets de cross-sell.** QBR con ANAM → le mandas **la página de Marketing**.
+**Los LLMs citan contenido profundo y específico** — pero solo te citan **donde la fuente oficial no puede o
+no quiere hablar** (§2). Por eso:
+
+- ❌ **Una página por Hub NO se justifica.** *"¿Qué hace Service Hub?"* lo responde hubspot.com **mejor que tú**.
+  Los 7 Hubs viven en **el mapa del pillar**, con la profundidad suficiente para decidir.
+- ✅ **Los 4 clusters SÍ**, porque cada uno ocupa un espacio que hubspot.com **no puede ocupar**: el costo real
+  y sus trampas · qué agentes funcionan de verdad · **cuándo NO usar HubSpot** · la comparación contra
+  Salesforce, donde los dos vendors son parte interesada.
+
+**Y para el canal:** si Simón necesita un asset de Service Hub para un deal, **es un deck o un one-pager** —
+no una landing pública. Herramienta distinta, trabajo distinto.
 
 ---
 
