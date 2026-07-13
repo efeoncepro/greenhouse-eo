@@ -110,19 +110,45 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 > *(El squad del blog incluye roles creativos —diseñador, audiovisual, social— porque un servicio de
 > contenido necesita imágenes y video. **Eso no lo convierte en un servicio creativo.**)*
 
-### 🔴 La consecuencia incómoda: la práctica creativa NO tiene caso económico propio
+### 🎯 EL CASO ECONÓMICO DE REFERENCIA DE LA PRÁCTICA — SKY Agencia Creativa
 
-**Tenemos un cliente creativo vigente (SKY) y no sabemos documentar su economía.**
+**Éste, y NO la licitación del blog, es el caso económico de esta práctica.**
 
-| | Estado |
+| | |
 |---|---|
-| ¿Cuánto le cobramos a SKY por el servicio creativo? | ⚠️ **[VERIFICAR — no está en el repo]** |
-| ¿Cuál es el loaded cost de ese squad *(Daniela + 2 designers)*? | ⚠️ **[VERIFICAR]** |
-| ¿Cuál es el margen real de ese engagement? | ⚠️ **[VERIFICAR]** |
-| ¿Está sobre el piso de 45%? | 🔴 **No lo sabemos.** |
+| **Precio** | **CLP 5.800.000 / mes + IVA** *(operador, 2026-07-13)* |
+| 🔴 **Base de cálculo del margen** | **CLP 5.800.000 (NETO).** **NUNCA sobre los 6.902.000 con IVA** — el IVA se recauda para el fisco, **no es ingreso.** *(Calcular margen sobre el bruto infla el resultado 19% y es un error clásico.)* |
+| **Squad** | Daniela Ferreira *(Creative Ops Lead)* · Melkin Hernández y Andrés Carlosama *(Senior Visual Designers)* |
+| **Costo de nómina de esos roles** | USD 1.250 + USD 800 + USD 927 = **USD 2.977/mes** *(a 100% de dedicación)* |
+| **FX** | **924,94 CLP/USD** ✅ *verificado 2026-07-13* → **CLP 2.753.147** |
 
-> 🔴 **Esto es lo primero que hay que cerrar.** No podemos vender una práctica cuya economía no conocemos.
-> **Y ya la estamos entregando.**
+### 🩸 Y acá está el problema: NO sabemos si este contrato está sobre el piso
+
+**El margen depende enteramente de qué incluya ese loaded cost — y eso nadie lo ha respondido:**
+
+| Escenario | Costo | **Margen sobre 5,8M** | ¿Pasa el piso de 45%? |
+|---|---|---|---|
+| Es **costo empresa** *(ya incluye cargas/herramientas)* | 2.753.147 | **52,5%** | ✅ **Sí** |
+| Son **contractors** + herramientas/overhead *(~15%)* | 3.166.119 | **45,4%** | ⚠️ **Justo en el piso** |
+| Es **sueldo bruto** y faltan cargas *(~30%)* | 3.579.091 | 🔴 **38,3%** | 🔴 **NO — bajo el piso** |
+
+> ## 🔴 El margen de nuestro único contrato creativo oscila entre 38% y 52%. El piso es 45%.
+> **No es un problema teórico: es el contrato que estamos entregando hoy, y no sabemos de qué lado del piso
+> está.**
+
+**Los dos datos que faltan — y ninguno se puede estimar:**
+
+1. **La dedicación REAL de cada uno.** *(Si no están al 100% en SKY, el costo baja y el margen mejora.
+   Si están al 100% y además cubren otras cuentas, hay sobre-asignación.)* → `greenhouse-ico` / capacity.
+2. 🩸 **Qué incluye `loaded_monthly_cost_usd`** en `sellable-roles-store`: **¿bruto o costo empresa?**
+   ¿Incluye herramientas? ¿Descuenta la utilización real? → **`greenhouse-finance-accounting-operator`.**
+
+🔴 **Hasta responder (2), cualquier cotización creativa nueva se está haciendo a ciegas — y este contrato
+también.**
+
+⚠️ **Y ojo con el FX:** el precio está en **CLP** y el costo del squad en **USD**. **Si el peso se deprecia, el
+margen se erosiona solo.** *(A 1.000 CLP/USD, el costo sube a CLP 2.977.000 y el margen cae a 48,7% incluso en
+el escenario optimista.)* → `modules/04_PRICING.md` §9.
 
 ### 🎯 Y lo mejor: el engagement creativo SÍ produce telemetría — y el número es bueno
 

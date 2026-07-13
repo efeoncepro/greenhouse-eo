@@ -12,13 +12,13 @@
 > **Se usan acá SOLO como demostración de la aritmética** *(la fórmula del piso, el buffer, el margen de
 > negociación y los errores de estructura son idénticos en cualquier práctica)*.
 >
-> 🔴 **NO son el caso económico de referencia de la práctica creativa. Esta práctica todavía NO TIENE uno.**
+> 🔴 **NO son el caso económico de referencia de la práctica creativa.**
 >
-> 🩸 **Y ese es el trabajo #1:** tenemos un **engagement creativo vigente** *(SKY — `agencia_creativa` +
-> `globe`: Daniela + 2 Senior Visual Designers, desde ago-2025)* **y no está documentado cuánto le cobramos,
-> cuál es su loaded cost, ni si está sobre el piso.** → `efeonce/EFEONCE_OVERLAY.md` §5 · `ANTIPATTERNS.md` I.
+> 🎯 **El caso económico de ESTA práctica es SKY Agencia Creativa: CLP 5.800.000/mes + IVA**
+> *(squad: Daniela + Melkin + Andrés)*. **Está en `efeonce/EFEONCE_OVERLAY.md` §5. Úsalo a él.**
 >
-> **No se puede vender bien una práctica cuya economía no se conoce. Y ya la estamos entregando.**
+> 🩸 **Y trae el hallazgo que bloquea todo:** según qué incluya el loaded cost, **su margen va de 38% a 52%
+> — con el piso en 45%.** **No sabemos de qué lado estamos.** → `ANTIPATTERNS.md` I.
 
 ---
 

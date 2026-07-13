@@ -156,16 +156,33 @@ toda la maduración del pipeline. **Un doc obsoleto se citó como si fuera el ru
 
 ---
 
-### 🩸 I. No sabemos la economía de nuestro propio engagement creativo vigente
+### 🩸 I. 🔴 No sabemos si nuestro único contrato creativo está sobre el piso
 
-**Tenemos un cliente creativo (SKY) al que le estamos entregando servicio — y no está documentado en el repo
-cuánto le cobramos, cuál es el loaded cost de ese squad, ni si está sobre el piso de 45%.**
+**SKY Agencia Creativa: CLP 5.800.000/mes + IVA.** *(Precio confirmado por el operador, 2026-07-13.)*
+Squad: Daniela *(Creative Ops Lead, USD 1.250)* + Melkin y Andrés *(Senior Visual Designers, USD 800 + 927)*
+= **USD 2.977/mes** a 100% de dedicación → **CLP 2.753.147** *(FX 924,94 ✅ verificado)*.
 
-🔴 **Estamos vendiendo una práctica cuya economía real no conocemos. Y ya la estamos entregando.**
+🔴 **El margen depende de qué incluya ese loaded cost — y nadie lo ha respondido:**
 
-**Fix:** documentarla con **`greenhouse-finance-accounting-operator`** *(y ojo: el loaded cost de Daniela +
-2 Senior Visual Designers **no es el del squad del blog** — ese es de la licitación de SEO)*.
-**Ese, y no el de SKY blog, es el caso económico de referencia que esta práctica necesita.**
+| Escenario | Costo | **Margen sobre 5,8M neto** | ¿Piso 45%? |
+|---|---|---|---|
+| Es **costo empresa** *(todo incluido)* | 2.753.147 | **52,5%** | ✅ Sí |
+| Son **contractors** + herramientas/overhead *(~15%)* | 3.166.119 | **45,4%** | ⚠️ **Justo en el piso** |
+| Es **sueldo bruto**, faltan cargas *(~30%)* | 3.579.091 | 🔴 **38,3%** | 🔴 **NO** |
+
+> ## Oscila entre 38% y 52%. El piso es 45%. **No sabemos de qué lado estamos — y ya lo estamos entregando.**
+
+🔴 **Y dos errores de cálculo que hay que evitar sí o sí:**
+1. **NUNCA calcules el margen sobre los 6.902.000 con IVA.** El IVA **no es ingreso**: se recauda para el
+   fisco. **Calcularlo sobre el bruto infla el margen 19% y te hace creer que estás cómodo cuando no lo estás.**
+2. ⚠️ **El precio está en CLP y el costo en USD.** **Si el peso se deprecia, el margen se erosiona solo, y nadie
+   se entera hasta el cierre del año.** *(A 1.000 CLP/USD el margen cae a 48,7% incluso en el mejor escenario.)*
+
+**Fix — los dos datos que faltan:**
+1. La **dedicación real** de cada uno *(→ `greenhouse-ico` / capacity)*.
+2. 🩸 **Qué incluye `loaded_monthly_cost_usd`** en `sellable-roles-store` *(→ `greenhouse-finance-accounting-operator`)*.
+
+🔴 **Hasta responder (2), toda cotización creativa nueva se hace a ciegas — y este contrato también.**
 
 ---
 
