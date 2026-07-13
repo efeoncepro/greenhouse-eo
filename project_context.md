@@ -1,11 +1,12 @@
 ## Estado vigente para agentes
 
-- **TASK-1368 Hiring Activation Lane code-complete local (2026-07-13):** `/hr/onboarding?lane=hiring-activation`
+- **TASK-1368 Hiring Activation Lane code-complete local + microinteracciones de alta fidelidad (2026-07-13):** `/hr/onboarding?lane=hiring-activation`
   es la nueva lane "Contrataciones listas" dentro de `HR > Onboarding & Offboarding`, no reemplaza
   `/hr/workforce/activation`. Consume el bridge de TASK-770 y muestra flag-off/empty/error de forma
   honesta; `resolver blocker` real queda en `TASK-1400`, sin simulación client-side. UI local verificada
-  con GVC desktop/mobile `.captures/2026-07-13T09-21-19_hiring-activation-lane`; staging/flags/data reales
-  pendientes antes de mover la task a `complete/`.
+  con GVC desktop/mobile `.captures/2026-07-13T09-21-19_hiring-activation-lane` y polish de fidelidad al
+  HTML fuente en `.captures/2026-07-13T09-53-44_hiring-activation-lane` (28 frames: hover/click/keyboard/
+  reduced-motion). Staging/flags/data reales pendientes antes de mover la task a `complete/`.
 - **Tender Deck Composer — `TimelineFull` v0.2: schedule y labels data-driven (2026-07-12):** el
   cronograma ya acepta `timeUnit` (`day|week|month|quarter|custom`), un eje discreto de 3..8 unidades,
   rangos enteros y hitos de frontera; su compiler deriva grilla, barras, diamantes y conectores de ese único

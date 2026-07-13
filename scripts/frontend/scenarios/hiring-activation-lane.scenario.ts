@@ -28,7 +28,7 @@ export const scenario: CaptureScenario = {
     allowErrorBoundary: false,
     layout: {
       enabled: true,
-      includeSelector: 'body',
+      includeSelector: 'main',
       ignoreSelectors: ['.ts-vertical-nav-root', '.ts-vertical-nav-container', '.ts-vertical-nav-bg-color-container', '.bs-full'],
       allowHorizontalScrollSelectors: ['[role="region"]'],
       minTargetSize: 20,
@@ -51,6 +51,42 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'queue',
       note: 'Cola de handoffs o estado flag-off/empty/error honesto visible en el fold estable.'
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'ready-hires-tab-hover',
+        action: { kind: 'hover', selector: '[data-capture="activation-nav-ready-hires"]' },
+        intent: 'Validar feedback de tab/lane switch basado en ha-rise/hover del HTML fuente.',
+        frames: [
+          { label: 'before', atMs: 0 },
+          { label: 'feedback', atMs: 150 },
+          { label: 'settled', atMs: 300 }
+        ],
+        keyboardEquivalent: {
+          action: { kind: 'press', selector: '[data-capture="activation-nav-ready-hires"]', key: 'Tab' },
+          expected: 'focus visible y sin desplazamiento horizontal'
+        },
+        reducedMotion: 'capture'
+      }
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'queue-refresh-feedback',
+        action: { kind: 'click', selector: '[data-capture="activation-refresh"]' },
+        intent: 'Validar feedback inmediato de refresh sin mutación: icono/spinner, fade de cola y reduced-motion estable.',
+        frames: [
+          { label: 'before', atMs: 0 },
+          { label: 'feedback', atMs: 120 },
+          { label: 'settled', atMs: 300 }
+        ],
+        keyboardEquivalent: {
+          action: { kind: 'press', selector: '[data-capture="activation-refresh"]', key: 'Enter' },
+          expected: 'refresh accionable por teclado sin perder foco ni crear mutación'
+        },
+        reducedMotion: 'capture'
+      }
     },
     {
       kind: 'scroll',

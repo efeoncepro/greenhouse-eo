@@ -4,25 +4,44 @@
 
 - Task: `TASK-1368`
 - Superficie: activation lane "Contrataciones listas". Wireframe: `docs/ui/wireframes/TASK-1368-hiring-activation-lane.md` · Flow: `docs/ui/flows/TASK-1368-hiring-activation-lane-flow.md` · Master: `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md`
-- Rigor de motion: **funcional mínima** (mandato del mockup aprobado TASK-763: "motion mínima, sin loaders apilados ni motion decorativa"). Todo tokenizado + reduced-motion-aware.
+- Rigor de motion: **fidelidad alta controlada al HTML fuente + sobriedad operacional**. Se porta el vocabulario real del canvas (`fade`, `rise`, `slide-right`, `pop`, `toast`, `skeleton`) sin reemplazar el chrome Greenhouse/Vuexy ni convertir acciones críticas en motion decorativa. Todo tokenizado + reduced-motion-aware.
 - Estado: `ready for implementation` (UI ready: yes; evidencia GVC durante ejecución)
 
 ## Motion Brief
 
-El movimiento acá solo confirma cambios de estado de una acción sensible (crear colaborador, abrir onboarding, activar) y el resultado del readiness. Nada decorativo: cada motion comunica "esto se está guardando / esto quedó listo / esto falta / esto se revirtió". Es una superficie de operación HR crítica (activa a un colaborador) — la sobriedad es intencional.
+El movimiento acá conserva el carácter visual del HTML de Documents, pero sólo como feedback operacional: entrada del canvas, transición list-detail, estados de carga, dialogs y toasts. Cada motion comunica "esto apareció / esto se seleccionó / esto se está guardando / esto quedó listo / esto falta / esto se revirtió". Es una superficie de operación HR crítica (activa a un colaborador) — la fidelidad no debe sacrificar calma, a11y ni reduced-motion.
+
+## Source HTML Microinteraction Parity
+
+Fuente revisada: `/Users/jreye/Documents/carreers/Hiring-activation/Ejecutar tarea 1368/Hiring Activation Lane.dc.html`.
+
+| HTML fuente | Runtime TASK-1368 | Contrato |
+|---|---|---|
+| `ha-fade` | `ghActivationFade` | Hero, empty states, backdrop/dialog support |
+| `ha-rise` | `ghActivationRise` | Métricas, cola, filas, readiness lanes, journey |
+| `ha-slide-right` | `ghActivationSlideRight` | Detail inspector/list→detail |
+| `ha-pop` | `ghActivationPop` | Dialog paper |
+| `ha-toast` | `ghActivationToast` | Snackbar/alert de resultado |
+| `ha-skel` | `ghActivationSkeleton` | Skeletons de cola/detalle |
+
+Notas:
+
+- `support.js` es runtime genérico del export Design Component; no se porta.
+- La equivalencia usa `motionCss`/tokens Greenhouse y sólo anima `opacity`/`transform`.
+- El chrome global, nav bar y menú vertical quedan fuera de fidelidad por decisión explícita del operador.
 
 ## Motion Inventory
 
 | # | Elemento | Comportamiento | Cuándo |
 |---|---|---|---|
-| M1 | Tab/lane switch | Cross-fade breve del contenido | Cambio de tab (Onboarding/Offboarding/Contrataciones listas) |
-| M2 | Detalle (list→detail) | Transición corta al abrir el caso | Click en fila |
+| M1 | Tab/lane switch | Feedback hover/focus + fade/rise breve del canvas | Cambio de tab (Onboarding/Offboarding/Contrataciones listas) |
+| M2 | Detalle (list→detail) | Slide-in corto desde derecha (`ha-slide-right` equivalente) | Click en fila |
 | M3 | Readiness ítem | Cambio de estado ✓/⚠/✗ (sin llamar la atención) | Al resolver un blocker / recompute |
 | M4 | Botón de acción (crear/onboarding/activar) | Estado de carga ("Creando…"/"Activando…") + confirmación | Command en vuelo |
 | M5 | Activar — bloqueado | Sin animación de "shake"; el motivo aparece estático junto al botón | readiness incompleto |
-| M6 | Dialog (resolver/activar) | Entrada/salida estándar del dialog primitive | Abrir/cerrar |
-| M7 | Rollback de acción | El estado vuelve + toast de error (`role=alert`) | Command falla |
-| M8 | KPIs `LaneCard` | Skeleton al cargar | Cola loading |
+| M6 | Dialog (resolver/activar) | Backdrop fade + paper pop (`ha-pop` equivalente) | Abrir/cerrar |
+| M7 | Rollback de acción | El estado vuelve + toast desde abajo (`role=alert`) | Command falla |
+| M8 | KPIs/cola/detail loading | Skeleton pulse tokenizado (`ha-skel` equivalente) | Cola/detail loading |
 
 ## Microinteraction States
 
@@ -37,8 +56,9 @@ El movimiento acá solo confirma cambios de estado de una acción sensible (crea
 
 ## Primitive & Token Mapping
 
-- Dialog (M6): dialog primitive existente (motion propio). Skeleton (M8): primitive de skeleton.
-- Botones (M4): estado pending del botón canónico. Duración/easing: tokens de motion; 0 magic numbers inline.
+- Dialog (M6): MUI dialog canónico con `PaperProps`/`BackdropProps` tokenizados para preservar `ha-pop`/`ha-fade`.
+- Skeleton (M8): MUI skeleton canónico con animación propia desactivada y pulso tokenizado para preservar `ha-skel`.
+- Botones (M4): estado pending del botón canónico con spinner inline/label de progreso. Duración/easing: tokens de motion; 0 magic numbers inline.
 
 ## Reduced Motion Contract
 
@@ -62,21 +82,23 @@ El movimiento acá solo confirma cambios de estado de una acción sensible (crea
 
 ## GVC / Micro Evidence
 
-- Capturar M4 (acción en vuelo), M5 (Activar bloqueado-con-motivo), M7 (rollback) en desktop 1440 + mobile 390.
-- Verificar reduced-motion: cortes directos, feedback (label/toast/estado) conservado.
+- Captura base code-complete: `.captures/2026-07-13T09-21-19_hiring-activation-lane` — desktop/mobile, dossier apto/0 findings.
+- Captura de polish de fidelidad: `.captures/2026-07-13T09-53-44_hiring-activation-lane` — 28 frames; desktop/mobile; hover + keyboard + reduced-motion sobre tab "Contrataciones listas"; click + keyboard + reduced-motion sobre refresh de cola; dossier apto/0 findings.
+- Pendiente para cierre remoto: con flags/data reales validar selección de caso, acciones pending reales, detail sidecar con data y rollback/error real en staging.
 
 ## Design Decision Log
 
-- **Funcional mínima** (mandato mockup 763): el motion solo confirma acciones sensibles.
+- **Fidelidad alta controlada**: port del vocabulario motion del HTML de Documents dentro de los primitives/contratos Greenhouse; no se copia chrome ni `support.js`.
+- **Sobriedad HR crítica**: el motion no distrae ni reemplaza el feedback textual de una acción sensible.
 - **Activar bloqueado = feedback textual, no cinético** (calma en acción crítica + a11y).
 - **Feedback esencial sobrevive a reduced-motion.**
 - **Todo tokenizado**; reusar motion de los primitives (dialog/botón/skeleton), no rodar motion paralelo.
 
 ## Acceptance Checklist
 
-- [ ] M1–M8 con tokens de motion (0 magic numbers inline).
-- [ ] Activar bloqueado comunica por texto (M5), sin shake/parpadeo.
-- [ ] Acción en vuelo (M4) + rollback (M7) con feedback claro.
-- [ ] Reduced-motion: cortes directos, feedback esencial conservado.
-- [ ] Solo `opacity`/`transform`; sin reflow.
-- [ ] GVC micro-evidencia (acción/bloqueado/rollback) desktop+mobile + reduced-motion mirada.
+- [x] M1/M2/M6/M8 con tokens de motion (0 magic numbers inline en JSX; helper route-local tokenizado).
+- [x] Activar bloqueado comunica por texto (M5), sin shake/parpadeo.
+- [x] Reduced-motion: cortes directos, feedback esencial conservado.
+- [x] Solo `opacity`/`transform`; sin reflow intencional.
+- [x] GVC micro-evidencia local para hover/click/keyboard/reduced-motion no-mutante desktop+mobile.
+- [ ] Staging/data-real: acción en vuelo (M4), rollback (M7) y detail sidecar con caso real capturados antes de mover TASK-1368 a `complete`.

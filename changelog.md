@@ -2,7 +2,7 @@
 
 ## 2026-07-13
 
-- **TASK-1368 — Hiring Activation Lane code-complete local.** `/hr/onboarding?lane=hiring-activation` implementa la lane "Contrataciones listas" como consumer UI del bridge de TASK-770: hero propio, navegación Lifecycle mobile-safe, KPIs, cola/detalle en `CompositionShell`, journey/readiness, actions gobernadas y estado flag-off honesto. Se refrescó el shell de Onboarding para no heredar la UI vieja; People 360 muestra el journey derivado; `resolver blocker` queda split a TASK-1400 sin simulación client-side. GVC local desktop/mobile PASS (`.captures/2026-07-13T09-21-19_hiring-activation-lane`); staging/flags/data reales siguen pendientes para mover TASK-1368 a complete.
+- **TASK-1368 — Hiring Activation Lane code-complete local + fidelity polish.** `/hr/onboarding?lane=hiring-activation` implementa la lane "Contrataciones listas" como consumer UI del bridge de TASK-770: hero propio, navegación Lifecycle mobile-safe, KPIs, cola/detalle en `CompositionShell`, journey/readiness, actions gobernadas y estado flag-off honesto. Se refrescó el shell de Onboarding para no heredar la UI vieja; People 360 muestra el journey derivado; `resolver blocker` queda split a TASK-1400 sin simulación client-side. Se portaron las microinteracciones del HTML fuente de Documents (`fade`, `rise`, `slide-right`, `pop`, `toast`, `skeleton`) con tokens/reduced-motion y sin copiar el chrome global. GVC local desktop/mobile PASS (`.captures/2026-07-13T09-21-19_hiring-activation-lane`) + polish microinteractions PASS (`.captures/2026-07-13T09-53-44_hiring-activation-lane`, 28 frames); staging/flags/data reales siguen pendientes para mover TASK-1368 a complete.
 
 ## 2026-07-12
 

@@ -4,7 +4,7 @@
 >
 > **Follow-up creado por instrucción del operador:** `TASK-1400` (`docs/tasks/to-do/TASK-1400-hiring-activation-blocker-resolution-api.md`) cubre el gap backend/API de `resolver blocker` con payloads ricos, command gobernado, capability gates por acción y audit redacted. TASK-1368 no debe simular ese command client-side; hasta que TASK-1400 cierre, la UI sólo puede mostrar remediación honesta/links y ejecutar acciones reales de TASK-770.
 >
-> **Evidencia local:** GVC PASS desktop/mobile `.captures/2026-07-13T09-21-19_hiring-activation-lane` + `fe:capture:review` apto/0 findings; `pnpm lint`; `pnpm typecheck`; Vitest People 360 2 files/6 tests; Vitest hiring-activation bridge 3 files/28 tests; `task:lint` TASK-1368/TASK-1400; `ui:*` checks; `ops:lint --changed`. `ScrollToTop` se corrigió para desmontar el botón oculto y no dejar targets de 0px.
+> **Evidencia local:** GVC PASS desktop/mobile `.captures/2026-07-13T09-21-19_hiring-activation-lane` + polish de fidelidad/microinteracciones `.captures/2026-07-13T09-53-44_hiring-activation-lane` (28 frames: hover/click/keyboard/reduced-motion; dossier apto/0 findings); `pnpm lint`; `pnpm typecheck`; Vitest People 360 2 files/6 tests; Vitest hiring-activation bridge 3 files/28 tests; `task:lint` TASK-1368/TASK-1400; `ui:*` checks; `ops:lint --changed`. `ScrollToTop` se corrigió para desmontar el botón oculto y no dejar targets de 0px.
 >
 > **Estado:** `code complete local; rollout/staging smoke con flags/data reales pendiente`. La task sigue `in-progress` hasta smoke remoto o decisión explícita de cerrar con evidencia local flag-off. Push remoto autorizado por el operador al cierre del commit.
 

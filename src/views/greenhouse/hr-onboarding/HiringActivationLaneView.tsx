@@ -30,6 +30,7 @@ import Typography from '@mui/material/Typography'
 import { alpha, type Theme } from '@mui/material/styles'
 
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+import { motionCss } from '@/components/greenhouse/motion/core/tokens'
 import { CompositionShell, GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import { getMicrocopy } from '@/lib/copy'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
@@ -102,6 +103,87 @@ const cardBorderSx = {
   border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
   borderRadius: 'var(--mui-shape-customBorderRadius-lg)'
 }
+
+const activationMotionRootSx = {
+  '@keyframes ghActivationFade': {
+    from: { opacity: 0 },
+    to: { opacity: 1 }
+  },
+  '@keyframes ghActivationRise': {
+    from: { opacity: 0, transform: 'translateY(6px)' },
+    to: { opacity: 1, transform: 'translateY(0)' }
+  },
+  '@keyframes ghActivationSlideRight': {
+    from: { opacity: 0, transform: 'translateX(24px)' },
+    to: { opacity: 1, transform: 'translateX(0)' }
+  },
+  '@keyframes ghActivationPop': {
+    from: { opacity: 0, transform: 'translateY(10px) scale(0.985)' },
+    to: { opacity: 1, transform: 'translateY(0) scale(1)' }
+  },
+  '@keyframes ghActivationToast': {
+    from: { opacity: 0, transform: 'translateY(14px)' },
+    to: { opacity: 1, transform: 'translateY(0)' }
+  },
+  '@keyframes ghActivationSkeleton': {
+    '0%': { opacity: 0.5 },
+    '50%': { opacity: 1 },
+    '100%': { opacity: 0.5 }
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    '& [data-motion^="activation-"]': {
+      animation: 'none !important',
+      transitionDuration: '0.01ms !important'
+    },
+    '& .MuiSkeleton-root': {
+      animation: 'none !important'
+    }
+  }
+}
+
+const activationFadeSx = {
+  animation: `ghActivationFade ${motionCss.duration.standard} ${motionCss.ease.emphasized} both`,
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none'
+  }
+}
+
+const activationRiseSx = {
+  animation: `ghActivationRise ${motionCss.duration.medium} ${motionCss.ease.emphasized} both`,
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none'
+  }
+}
+
+const activationSlideRightSx = {
+  animation: `ghActivationSlideRight ${motionCss.duration.medium} ${motionCss.ease.emphasized} both`,
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none'
+  }
+}
+
+const activationPopSx = {
+  animation: `ghActivationPop ${motionCss.duration.medium} ${motionCss.ease.emphasized} both`,
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none'
+  }
+}
+
+const activationToastSx = {
+  animation: `ghActivationToast ${motionCss.duration.medium} ${motionCss.ease.emphasized} both`,
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none'
+  }
+}
+
+const activationSkeletonSx = {
+  animation: `ghActivationSkeleton calc(${motionCss.duration.extended} * 2) ${motionCss.ease.standard} infinite`,
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none'
+  }
+}
+
+const activationStaggerDelay = (index: number) => `calc(${motionCss.duration.instant} * ${Math.min(index, 5)})`
 
 const activationNavShellSx = {
   inlineSize: '100%',
@@ -285,8 +367,10 @@ const MetricCard = ({
 }) => (
   <Card
     elevation={0}
+    data-motion='activation-rise'
     sx={{
       ...cardBorderSx,
+      ...activationRiseSx,
       minInlineSize: 0,
       transition: theme => theme.transitions.create(['border-color', 'background-color', 'transform'], {
         duration: theme.transitions.duration.shorter
@@ -333,7 +417,17 @@ const MetricCard = ({
 const QueueSkeleton = () => (
   <Stack spacing={2} data-capture='activation-lane-loading'>
     {[0, 1, 2, 3].map(item => (
-      <Skeleton key={item} variant='rounded' height={86} />
+      <Skeleton
+        key={item}
+        variant='rounded'
+        height={86}
+        animation={false}
+        data-motion='activation-skeleton'
+        sx={{
+          ...activationSkeletonSx,
+          animationDelay: activationStaggerDelay(item)
+        }}
+      />
     ))}
   </Stack>
 )
@@ -352,7 +446,8 @@ const EmptyStateCard = ({
   <Alert
     severity={severity}
     icon={<Box component='i' className={icon} sx={iconSx(22)} />}
-    sx={{ borderRadius: 'var(--mui-shape-customBorderRadius-lg)' }}
+    data-motion='activation-fade'
+    sx={{ borderRadius: 'var(--mui-shape-customBorderRadius-lg)', ...activationFadeSx }}
   >
     <AlertTitle>{title}</AlertTitle>
     {body}
@@ -376,7 +471,12 @@ const QueuePanel = ({
   onSelect: (id: string) => void
   selectedId: string | null
 }) => (
-  <Card elevation={0} sx={{ ...cardBorderSx, overflow: 'hidden' }} data-capture='activation-lane'>
+  <Card
+    elevation={0}
+    sx={{ ...cardBorderSx, ...activationRiseSx, overflow: 'hidden' }}
+    data-capture='activation-lane'
+    data-motion='activation-rise'
+  >
     <CardHeader
       title={copy.queue.title}
       subheader={`${items.length} ${copy.queue.subtitle}`}
@@ -412,6 +512,7 @@ const QueuePanel = ({
               size='small'
               onClick={onRetry}
               aria-label={copy.queue.retry}
+              data-capture='activation-refresh'
               sx={{
                 minInlineSize: 44,
                 inlineSize: 44,
@@ -442,7 +543,7 @@ const QueuePanel = ({
         <EmptyStateCard icon='tabler-inbox' title={copy.queue.emptyTitle} body={copy.queue.emptyBody} severity='success' />
       ) : (
         <Stack spacing={2} aria-label={copy.aria.queue}>
-          {items.map(item => {
+          {items.map((item, index) => {
             const state = deriveItemState(item)
             const selected = selectedId === item.handoffId
 
@@ -453,8 +554,11 @@ const QueuePanel = ({
                 type='button'
                 onClick={() => onSelect(item.handoffId)}
                 data-capture='activation-queue-row'
+                data-motion='activation-rise'
                 aria-pressed={selected}
                 sx={{
+                  ...activationRiseSx,
+                  animationDelay: activationStaggerDelay(index),
                   width: '100%',
                   display: 'block',
                   textAlign: 'left',
@@ -604,7 +708,11 @@ const JourneyTimeline = ({ detail, item }: { detail: HiringActivationDetail; ite
 
   return (
     <Stack spacing={1} data-capture='activation-journey'>
-      {steps.map(step => <JourneyStep key={step.label} {...step} />)}
+      {steps.map((step, index) => (
+        <Box key={step.label} data-motion='activation-rise' sx={{ ...activationRiseSx, animationDelay: activationStaggerDelay(index) }}>
+          <JourneyStep {...step} />
+        </Box>
+      ))}
     </Stack>
   )
 }
@@ -670,10 +778,13 @@ const ReadinessPanel = ({
       </Stack>
 
       <Stack spacing={2}>
-        {readiness.lanes.map(lane => (
+        {readiness.lanes.map((lane, index) => (
           <Box
             key={lane.key}
+            data-motion='activation-rise'
             sx={{
+              ...activationRiseSx,
+              animationDelay: activationStaggerDelay(index),
               border: theme => `1px solid ${theme.palette.divider}`,
               borderRadius: 'var(--mui-shape-customBorderRadius-md)',
               p: 3,
@@ -705,6 +816,14 @@ const ReadinessPanel = ({
   )
 }
 
+const ActionStatusIcon = ({ icon, loading }: { icon: string; loading: boolean }) => (
+  loading ? (
+    <CircularProgress size={16} color='inherit' data-capture='activation-action-spinner' />
+  ) : (
+    <Box component='i' className={icon} />
+  )
+)
+
 const DetailPanel = ({
   actionLoading,
   detail,
@@ -730,12 +849,22 @@ const DetailPanel = ({
 }) => {
   if (detailLoading) {
     return (
-      <Card elevation={0} sx={cardBorderSx} data-capture='activation-detail-loading'>
+      <Card elevation={0} sx={{ ...cardBorderSx, ...activationSlideRightSx }} data-capture='activation-detail-loading' data-motion='activation-slide-right'>
         <CardContent>
           <Stack spacing={4}>
-            <Skeleton variant='rounded' height={92} />
-            <Skeleton variant='rounded' height={180} />
-            <Skeleton variant='rounded' height={260} />
+            {[92, 180, 260].map((height, index) => (
+              <Skeleton
+                key={height}
+                variant='rounded'
+                height={height}
+                animation={false}
+                data-motion='activation-skeleton'
+                sx={{
+                  ...activationSkeletonSx,
+                  animationDelay: activationStaggerDelay(index)
+                }}
+              />
+            ))}
           </Stack>
         </CardContent>
       </Card>
@@ -744,7 +873,7 @@ const DetailPanel = ({
 
   if (!detail) {
     return (
-      <Card elevation={0} sx={cardBorderSx} data-capture='activation-detail-empty'>
+      <Card elevation={0} sx={{ ...cardBorderSx, ...activationFadeSx }} data-capture='activation-detail-empty' data-motion='activation-fade'>
         <CardContent sx={{ py: 10 }}>
           <Stack alignItems='center' spacing={2} textAlign='center'>
             <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity', color: 'primary.main' }}>
@@ -770,17 +899,21 @@ const DetailPanel = ({
 
   const renderPrimaryAction = () => {
     if (!request) {
+      const loading = actionLoading === 'review'
+
       return (
-        <Button variant='contained' onClick={onReview} disabled={busy} startIcon={<Box component='i' className='tabler-eye-check' />}>
-          {actionLoading === 'review' ? copy.actions.loading : copy.actions.review}
+        <Button variant='contained' onClick={onReview} disabled={busy} startIcon={<ActionStatusIcon icon='tabler-eye-check' loading={loading} />}>
+          {loading ? copy.actions.loading : copy.actions.review}
         </Button>
       )
     }
 
     if (request.state === 'pending_hr_review') {
+      const loading = actionLoading === 'create-member'
+
       return (
-        <Button variant='contained' onClick={onCreateMember} disabled={busy} startIcon={<Box component='i' className='tabler-user-plus' />}>
-          {actionLoading === 'create-member' ? copy.actions.loading : copy.actions.createMember}
+        <Button variant='contained' onClick={onCreateMember} disabled={busy} startIcon={<ActionStatusIcon icon='tabler-user-plus' loading={loading} />}>
+          {loading ? copy.actions.loading : copy.actions.createMember}
         </Button>
       )
     }
@@ -794,9 +927,11 @@ const DetailPanel = ({
     }
 
     if (request.state === 'member_created') {
+      const loading = actionLoading === 'open-onboarding'
+
       return (
-        <Button variant='contained' onClick={onOpenOnboarding} disabled={busy} startIcon={<Box component='i' className='tabler-list-check' />}>
-          {actionLoading === 'open-onboarding' ? copy.actions.loading : copy.actions.openOnboarding}
+        <Button variant='contained' onClick={onOpenOnboarding} disabled={busy} startIcon={<ActionStatusIcon icon='tabler-list-check' loading={loading} />}>
+          {loading ? copy.actions.loading : copy.actions.openOnboarding}
         </Button>
       )
     }
@@ -828,14 +963,17 @@ const DetailPanel = ({
 
   return (
     <Card
+      key={detail.handoff.handoffId}
       elevation={0}
       sx={{
         ...cardBorderSx,
+        ...activationSlideRightSx,
         overflow: 'hidden',
         position: 'sticky',
         top: theme => theme.spacing(4)
       }}
       data-capture='activation-detail'
+      data-motion='activation-slide-right'
     >
       <CardContent>
         <Stack spacing={5}>
@@ -1090,16 +1228,31 @@ const HiringActivationLaneView = () => {
   const blockedReason = detail?.request?.blockedReason ?? detail?.handoff.blockedReason
   const memberId = detail?.request?.memberId ?? null
 
+  const dialogPaperProps = {
+    sx: {
+      borderRadius: 'var(--mui-shape-customBorderRadius-lg)',
+      ...activationPopSx
+    }
+  }
+
+  const backdropProps = {
+    sx: {
+      ...activationFadeSx
+    }
+  }
+
   return (
-    <Stack spacing={6}>
+    <Stack spacing={6} sx={activationMotionRootSx} data-motion='activation-fade'>
       <Card
         elevation={0}
         sx={{
           ...cardBorderSx,
+          ...activationFadeSx,
           overflow: 'hidden',
           background: theme => `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.09)} 0%, ${alpha(theme.palette.background.paper, 0.96)} 46%, ${alpha(theme.palette.success.main, 0.08)} 100%)`
         }}
         data-capture='activation-hero'
+        data-motion='activation-fade'
       >
         <CardContent>
           <Stack spacing={4}>
@@ -1126,13 +1279,13 @@ const HiringActivationLaneView = () => {
               <Stack spacing={2} alignItems={{ xs: 'stretch', lg: 'flex-end' }}>
                 <Box component='nav' aria-label={copy.aria.activationTabs} sx={activationNavShellSx}>
                   <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
-                    <Button component={Link} href='/hr/onboarding' sx={activationNavButtonSx(false)}>
+                    <Button component={Link} href='/hr/onboarding' data-capture='activation-nav-onboarding' sx={activationNavButtonSx(false)}>
                       {copy.tabs.onboarding}
                     </Button>
-                    <Button component={Link} href='/hr/offboarding' sx={activationNavButtonSx(false)}>
+                    <Button component={Link} href='/hr/offboarding' data-capture='activation-nav-offboarding' sx={activationNavButtonSx(false)}>
                       {copy.tabs.offboarding}
                     </Button>
-                    <Button component={Link} href='/hr/onboarding?lane=hiring-activation' aria-current='page' sx={activationNavButtonSx(true)}>
+                    <Button component={Link} href='/hr/onboarding?lane=hiring-activation' aria-current='page' data-capture='activation-nav-ready-hires' sx={activationNavButtonSx(true)}>
                       {copy.tabs.readyHires}
                     </Button>
                   </Stack>
@@ -1152,7 +1305,9 @@ const HiringActivationLaneView = () => {
       </Card>
 
       <Box
+        data-motion='activation-rise'
         sx={{
+          ...activationRiseSx,
           display: 'grid',
           gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' },
           gap: 4,
@@ -1211,7 +1366,14 @@ const HiringActivationLaneView = () => {
         }}
       />
 
-      <Dialog open={activateOpen} onClose={() => setActivateOpen(false)} aria-labelledby='activation-confirm-title'>
+      <Dialog
+        open={activateOpen}
+        onClose={() => setActivateOpen(false)}
+        aria-labelledby='activation-confirm-title'
+        PaperProps={dialogPaperProps}
+        BackdropProps={backdropProps}
+        data-capture='activation-dialog'
+      >
         <DialogTitle id='activation-confirm-title'>{copy.dialogs.activateTitle}</DialogTitle>
         <DialogContent>
           <DialogContentText>{copy.dialogs.activateBody}</DialogContentText>
@@ -1226,14 +1388,23 @@ const HiringActivationLaneView = () => {
               setActivateOpen(false)
             }}
             disabled={actionLoading === 'complete'}
-            startIcon={actionLoading === 'complete' ? <CircularProgress size={16} color='inherit' /> : <Box component='i' className='tabler-shield-check' />}
+            startIcon={<ActionStatusIcon icon='tabler-shield-check' loading={actionLoading === 'complete'} />}
           >
             {actionLoading === 'complete' ? copy.actions.loading : copy.actions.activate}
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={cancelOpen} onClose={() => setCancelOpen(false)} aria-labelledby='activation-cancel-title' fullWidth maxWidth='sm'>
+      <Dialog
+        open={cancelOpen}
+        onClose={() => setCancelOpen(false)}
+        aria-labelledby='activation-cancel-title'
+        fullWidth
+        maxWidth='sm'
+        PaperProps={dialogPaperProps}
+        BackdropProps={backdropProps}
+        data-capture='activation-dialog'
+      >
         <DialogTitle id='activation-cancel-title'>{copy.dialogs.cancelTitle}</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ pt: 1 }}>
@@ -1255,14 +1426,23 @@ const HiringActivationLaneView = () => {
             color='error'
             onClick={() => void handleCancel()}
             disabled={actionLoading === 'cancel'}
-            startIcon={actionLoading === 'cancel' ? <CircularProgress size={16} color='inherit' /> : <Box component='i' className='tabler-circle-x' />}
+            startIcon={<ActionStatusIcon icon='tabler-circle-x' loading={actionLoading === 'cancel'} />}
           >
             {actionLoading === 'cancel' ? copy.actions.loading : copy.actions.cancel}
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={resolveOpen} onClose={() => setResolveOpen(false)} aria-labelledby='activation-resolve-title' fullWidth maxWidth='sm'>
+      <Dialog
+        open={resolveOpen}
+        onClose={() => setResolveOpen(false)}
+        aria-labelledby='activation-resolve-title'
+        fullWidth
+        maxWidth='sm'
+        PaperProps={dialogPaperProps}
+        BackdropProps={backdropProps}
+        data-capture='activation-dialog'
+      >
         <DialogTitle id='activation-resolve-title'>{copy.dialogs.resolveTitle}</DialogTitle>
         <DialogContent>
           <Stack spacing={3}>
@@ -1302,7 +1482,15 @@ const HiringActivationLaneView = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         {snack ? (
-          <Alert severity={snack.severity} variant='filled' onClose={() => setSnack(null)}>
+          <Alert
+            severity={snack.severity}
+            variant='filled'
+            role={snack.severity === 'error' ? 'alert' : 'status'}
+            data-capture='activation-snackbar'
+            data-motion='activation-toast'
+            onClose={() => setSnack(null)}
+            sx={activationToastSx}
+          >
             {snack.message}
           </Alert>
         ) : undefined}

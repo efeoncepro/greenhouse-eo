@@ -1,5 +1,13 @@
 # TASK-1368 — Hiring Activation Lane UI (People/HRIS)
 
+## Delta 2026-07-13 — Microinteracciones del HTML fuente portadas con fidelidad alta
+
+- Se auditó el HTML recién extraído en `/Users/jreye/Documents/carreers/Hiring-activation/Ejecutar tarea 1368/Hiring Activation Lane.dc.html` y se identificó su vocabulario real de motion: `ha-fade`, `ha-rise`, `ha-slide-right`, `ha-pop`, `ha-toast` y `ha-skel`.
+- El runtime conserva el chrome global Greenhouse/Vuexy por instrucción del operador, pero porta el comportamiento visual del canvas Hiring Activation: entrada del hero/metrics/cola, stagger de filas, slide-in del detalle, skeleton pulse, dialog pop/backdrop fade, toast desde abajo y feedback inline en acciones pending.
+- La implementación usa tokens Greenhouse (`motionCss`), `opacity`/`transform`, `data-motion` estable y `prefers-reduced-motion` explícito; no copia `support.js` ni valores crudos del HTML.
+- Evidencia GVC nueva: `pnpm fe:capture hiring-activation-lane --env=local --task=TASK-1368` PASS con 28 frames en `.captures/2026-07-13T09-53-44_hiring-activation-lane`; incluye hover/keyboard/reduced-motion del tab "Contrataciones listas" y click/keyboard/reduced-motion del refresh de cola. Dossier `fe:capture:review` = `Apto para implementar`, 0 findings, enterprise rubric pass.
+- Límite honesto: el ambiente local sigue flag-off, por lo que la captura valida shell/canvas/microfeedback no mutante; el smoke staging con flags/data reales debe validar selección de caso, acciones reales, detail sidecar con data y errores/rollback antes de mover la task a `complete`.
+
 ## Delta 2026-07-13 — Implementación Codex code-complete local, rollout pendiente
 
 - Se implementó la lane en `/hr/onboarding?lane=hiring-activation` como consumer del bridge de TASK-770: hero propio, navegación Lifecycle sin `MuiTabs` scroll/translate en mobile, KPIs, cola/detalle con `CompositionShell`, journey/readiness, dialogs de acciones reales (`review`, `create-member`, `open-onboarding`, `complete`, `cancel`) y estado flag-off honesto.
@@ -7,7 +15,7 @@
 - `Resolver blocker` queda deliberadamente no-simulado: la UI abre un dialog honesto con remediación/links y referencia a `TASK-1400`, que cubre el command/API con payloads ricos.
 - People 360 ahora puede leer `getHiringJourneyForPerson` desde el contexto HR y mostrar el journey derivado dentro de `Lifecycle laboral`, sin card paralela.
 - Se corrigió un bug global detectado por GVC: `ScrollToTop` desmonta el botón mientras está oculto para no dejar un target interactivo de 0px en el DOM.
-- Evidencia local: `pnpm fe:capture hiring-activation-lane --env=local --task=TASK-1368` PASS desktop/mobile en `.captures/2026-07-13T09-21-19_hiring-activation-lane`; dossier `fe:capture:review` = `Apto para implementar`, 0 findings, enterprise rubric pass.
+- Evidencia local: `pnpm fe:capture hiring-activation-lane --env=local --task=TASK-1368` PASS desktop/mobile en `.captures/2026-07-13T09-21-19_hiring-activation-lane`; polish de fidelidad/microinteracciones PASS en `.captures/2026-07-13T09-53-44_hiring-activation-lane`; dossier `fe:capture:review` = `Apto para implementar`, 0 findings, enterprise rubric pass.
 - Estado honesto: **code complete local; task permanece `in-progress`** hasta smoke en staging con flags/data reales o decisión explícita de cerrar la UI con evidencia local flag-off.
 
 ## Delta 2026-07-13 — Ejecución Codex: route y fuente UI reconciliadas antes de código
