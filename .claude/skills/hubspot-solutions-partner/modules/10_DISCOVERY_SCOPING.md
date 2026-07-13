@@ -5,6 +5,38 @@
 
 ---
 
+## 0. 🔴 La pregunta que va ANTES de las otras tres: ¿quién es el champion?
+
+> **Sin champion no hay adopción. Sin adopción hay churn. Y el churn te corta la comisión y te mata el tier.**
+
+**Caso GyT Group (Efeonce, 2026):** compraron HubSpot, lo probaron, **nunca hubo adopción real**.
+*"Faltó un champion que liderara el proyecto adentro."* Churnearon. **No es recuperable.**
+Y en el camino se llevaron: la comisión, los puntos, el GRR, y el costo hundido de la implementación.
+
+⚠️ Y no es anecdótico: la **baja adopción explica ~38% de los fracasos de proyectos CRM** — más que cualquier
+causa técnica. **El 75%+ de los fracasos son de personas y proceso, no de tecnología.**
+
+### Las cuatro preguntas del champion
+
+1. **¿Quién, con nombre y apellido, va a liderar esto adentro?** *(No "el área de marketing". Una persona.)*
+2. **¿Qué le pasa a esa persona si el proyecto funciona? ¿Y si fracasa?**
+   Si la respuesta a las dos es "nada", **no tienes champion: tienes un contacto.**
+3. **¿Tiene autoridad para pedirle al equipo que cambie cómo trabaja?** Si no, el CRM se compra y no se usa.
+4. **¿Cuánto tiempo semanal le va a dedicar?** Si es "lo que pueda", el proyecto ya fracasó.
+
+### 🔴 La regla dura
+
+| Situación | Qué haces |
+|---|---|
+| **No hay champion identificable** | ❌ **No vendas Pro ni Enterprise.** Vende **Starter** o **Free**, consigue adopción real primero, y **expande** cuando el champion emerja |
+| **El champion es el que firma pero no el que opera** | ⚠️ Bandera roja. Necesitas al **operador** comprometido, no solo al pagador |
+| **El champion se va durante el proyecto** | 🔴 **Para y renegocia.** Un proyecto sin champion es un churn con fecha |
+
+> **Un deal que cierras sin champion no es un ingreso: es un churn diferido con costo de implementación
+> hundido.** Perderlo a tiempo es más barato que ganarlo.
+
+---
+
 ## 1. Las tres preguntas que cambian el deal
 
 Si no haces estas tres en la **primera** llamada, vas a descubrir la respuesta en la propuesta — tarde.

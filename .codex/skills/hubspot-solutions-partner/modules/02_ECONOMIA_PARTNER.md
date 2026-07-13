@@ -11,7 +11,28 @@
 |---|---|---|
 | **Sourced** (tú lo originas) | **20%** | **hasta 3 años** |
 | **Assisted upmarket** | 20% | **hasta 1 año** |
+| 🔴 **Vendido como PROVIDER** *(no Solutions Partner)* | 20% | **solo 12 meses** |
 | **Legacy** (línea vendida antes del **2023-04-01**) | 20% | **vitalicio** — *"as long as the partner continues to manage the customer"* |
+
+### 🔴 La cascada Provider — el acantilado que nadie ve venir
+
+**Un mismo cliente vale 3× más vendido como Solutions Partner que como Provider.** Y si tu práctica hizo su
+mejor año siendo Provider, esa comisión **se está evaporando en cascada**, deal por deal, a los 12 meses de
+cada cierre — **sin que pierdas un solo cliente**.
+
+**Caso Efeonce:** la comisión trimestral cayó de **US$ 927 (Q1'26) a US$ 378 (Q2'26 est.)** — un 59%.
+No churneó nadie ese trimestre. **Vencieron los plazos Provider de las ventas de 2025.**
+
+> **La trampa de diagnóstico:** cuando el ingreso cae justo después de una decisión tuya (soltaste un cliente,
+> bajaste el ritmo), **la correlación te grita causalidad**. **Verifica el término contractual primero.**
+> Diagnosticar mal te hace arreglar lo que no estaba roto — y dejar roto lo que sí estaba.
+
+**Y la lectura optimista, que es la que importa:** **cada deal que cierras ahora vale el triple en duración.**
+Un Marketing Hub Pro de $800/mes te paga **$160/mes × 36 meses = $5.760** — no $1.920.
+
+⚠️ **Fecha:** el **Provider Program muere el 2026-08-15**, y a los no convertidos **se les cortan las
+comisiones activas ese día** ✅. Si migraste, verifica que **ninguna comisión viva tuya siga colgando del
+esquema Provider**.
 
 **Tres consecuencias que casi nadie internaliza:**
 

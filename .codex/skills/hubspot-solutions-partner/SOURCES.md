@@ -157,12 +157,32 @@ los descalificadores importan tanto.
 ## Programa de Solutions Partner — as-of 2026-07-13
 
 ### Comisión ✅
-- **20% revenue share, hasta TRES años** en deals *sourced*.
+- **20% revenue share, hasta TRES años** en deals *sourced*. Payout **trimestral, ~45 días** tras el cierre del trimestre.
 - **Assisted upmarket: 20%, hasta UN año.**
+- 🔴 **PROVIDER (no Solutions Partner): 20%, solo DOCE MESES.**
 - **Legacy** (líneas vendidas **antes del 2023-04-01**): 20% **vitalicio**, *"as long as the partner
   continues to manage the customer"*. **Ese ingreso es frágil — protégelo.**
 - ✅ Si el cliente cancela, **la comisión se termina**. Si baja de plan, **la comisión baja igual**.
 ✅ [hubspot.com/deal-based-commissions](https://www.hubspot.com/deal-based-commissions)
+
+> 🔴 **La cascada Provider.** Si la práctica vendió su mejor año siendo Provider, esa comisión **se evapora en
+> cascada a los 12 meses de cada cierre — sin que pierdas un solo cliente**. Es lo que le pasó a Efeonce
+> (Q1'26 US$ 927 → Q2'26 US$ 378). **Verifica el término contractual antes de culpar a tu gestión.**
+> **Un mismo cliente vale 3× más vendido como Solutions Partner.** → `modules/02` § 1.
+
+### 🎯 Waiver del onboarding — el mejor argumento de cierre
+⚠️ **Un Solutions Partner puede entregar el onboarding en lugar de HubSpot: le notifica a HubSpot que se hace
+cargo de la implementación, y HubSpot elimina el cargo obligatorio del contrato del cliente.**
+⚠️ **El onboarding de HubSpot es *coaching*** (te enseñan y tú lo haces); **el del partner es *implementación***
+(te lo construyen).
+🔴 ⚠️ **Desde el 2026-07-15, solo los partners CERTIFICADOS pueden waivear el onboarding del cliente.**
+**Verifica el estado de la Partner Certification.** Sin ella, pierdes el argumento. → `modules/11` § 2.
+
+### ❌ NO existe una API pública de partners
+Los tier points, las comisiones, el libro gestionado y el deal registration **viven solo en el partner
+dashboard (UI)**. La API pública de HubSpot cubre CRM, marketing y contenido — **el programa de partners no**.
+**Consecuencia:** si no registras los deals también en tu propio CRM, **quedas ciego al canal**: sin forecast,
+sin win rate, sin atribución. → `efeonce/ESTADO_ACTUAL.md` § 6.
 
 ### Deal-Based Model ✅ — lanzamiento global **2025-11-17**
 Cualquier venta a cliente **nuevo o existente**, en cualquier región y línea de producto, se procesa bajo
@@ -288,10 +308,15 @@ Zoho ≈ $118k · Pipedrive ≈ $98k · Odoo ≈ $100k.
 | Δ puntos 15-jun → 15-jul | sourced **0** · managed **0** · legacy **−260,36** | ídem |
 | Pipeline (1-13 jul) | **0** deals creados · **1** sourced inflight · **0** cerrados | ídem |
 | Comisión Q1'26 | **US$ 927,20** (▼65%) | ídem |
-| Comisión Q2'26 (est.) | **US$ 378** (▼59%) → implica base comisionable de ~**$630 MRR** | derivado a 20% |
+| Comisión Q2'26 (est.) | **US$ 378** (▼59%) | ídem |
+| 🔴 **Causa del derrumbe** | **La cascada Provider** — vendieron 2025 siendo Provider (comisión de **solo 12 meses**), y esos plazos están venciendo. **NO es churn ni mala gestión** | operador + política HubSpot |
 | Suscripción propia | **$412/mes** — ⚠️ **12 dólares sobre el umbral del waiver.** Verificar si es neto post-discount | operador |
-| Clientes gestionados | **3**: ANAM (Sales Hub Pro) · Ecoriles (Sales Hub Pro) · GyT Group (**sin productos activos**) | portal |
-| Accesos desactivados | **GeaAmbiental · SSilva** | portal |
+| Clientes gestionados | **3**: ANAM (Sales Hub Pro) · Ecoriles (Sales Hub Pro) · GyT Group (**churneó, sin champion**) | portal |
+| 🔴 **BeFUN** | Compró **Marketing Hub Pro** (jun-2025), partner admin activo, **NO está en el libro gestionado** → puntos managed **regalados** | CRM |
+| Cuentas soltadas | **SSilva** (mayor libro de licencias, ~USD 5.000/año; sigue en HubSpot; comisión Provider **vencida**) · **GeaAmbiental** (Starter, empresa muy pequeña) | operador + portal |
+| 🔴 Deal registration | **NO vive en el CRM.** El pipeline `HubSpot Shared Selling` tiene **1 deal en toda su historia** (Closed Lost, may-2025). Todo se registra en el portal de partner → **canal ciego** | CRM (API) |
+| ⚠️ "Win rate partner-led 40-50%" | **NO verificable.** `docs/context/02_gtm.md:111` lo afirma, pero **no hay respaldo en el CRM**. **No lo lleves a un board** | CRM (API) |
+| ⚠️ Drift documental | `prospect_source` y `modalidad_venta` (`docs/context/11_hubspot-bowtie.md:45-47`) **NO existen** en deals | CRM (API) |
 | Listing | **0 reviews** · solo español · "Any Budget" · 28 servicios · certs solo de marketing | [ecosystem.hubspot.com/marketplace/solutions/efeoncepro](https://ecosystem.hubspot.com/marketplace/solutions/efeoncepro) |
 | PDM | **Simón Suárez** (ssuarez@hubspot.com) | `docs/context/02_gtm.md:112` |
 | Portal | **48713323** | `docs/context/02_gtm.md:115` |

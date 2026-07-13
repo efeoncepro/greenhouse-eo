@@ -41,21 +41,39 @@ Eso es, por sí solo, **más que el umbral total de Gold (345 desde enero 2027)*
 | Costo de mantenerla | Alto — equipo, horas, gestión | **Casi cero** — un check-in trimestral, un reporte de salud |
 | Cuándo se termina | Cuando el cliente no paga o no vale la pena | **Solo cuando el cliente cancela HubSpot o te reemplaza como partner** |
 
-### El error caro (caso real, Efeonce 2026)
+### El caso SSilva (Efeonce) — y la trampa de diagnóstico que casi nos come
 
-> **SSilva pagaba mal los servicios. Se cortó la relación completa. SSilva sigue en HubSpot.**
->
-> Al cortar todo se perdieron **tres cosas a la vez**, y ninguna era el problema:
-> 1. La **comisión** de su licencia (ingreso pasivo, cero costo de servir).
-> 2. Los **puntos managed** que sostenían el tier.
-> 3. El **GRR**, que gatea Diamond y Elite más adelante.
->
-> Y se ganó una cuarta pérdida, invisible: bajo **Best Partner Wins**, SSilva quedó como **territorio
-> abierto**. Cualquier partner puede firmarle un POI, cross-venderle Marketing Hub y llevarse los
-> puntos *sourced* de una cuenta **que tú originaste**.
+**Los hechos:** SSilva pagaba mal los *servicios*. Se cortó la relación completa hace ~un año.
+**SSilva sigue en HubSpot.** Y la comisión se cortó en **marzo de 2026**.
+
+🔴 **La inferencia tentadora, y FALSA:** *"la comisión se cortó porque dejaron de gestionarlo"*.
+
+✅ **La causa real: cuando vendieron SSilva, Efeonce era PROVIDER, no Solutions Partner.**
+El **Provider Program paga 20% por solo 12 meses** ✅ (vs. **hasta 3 años** del Solutions Partner).
+SSilva Marketing Hub cerró en **feb-2025**; los asientos de Sales en **abr-2025**. Doce meses después:
+**feb y abr de 2026**. **La comisión venció en su plazo. Exactamente cuando tenía que vencer.**
+
+> **La lección de método, y vale más que la del caso:** cuando un ingreso cae justo después de una decisión
+> tuya, **la correlación te va a gritar causalidad**. Verifica el **término contractual** antes de concluir
+> que fue tu gestión. **Diagnosticar mal te hace arreglar lo que no estaba roto.**
+
+### Lo que SÍ se pierde al cortar la relación (y esto no cambia)
+
+De las cuatro pérdidas, **la comisión de SSilva no era una de ellas** — esa ya estaba condenada por el plazo.
+Las otras tres siguen en pie, y son reales:
+
+1. 🔴 **Los puntos managed.** Expiran a los **60 días de tu última acción** ✅. Esto **sí** es causado por
+   soltar la cuenta, y es lo que hoy tiene a Efeonce en **cero puntos managed**.
+2. **El GRR**, que gatea Diamond y Elite más adelante.
+3. 🔴 **El territorio.** Bajo **Best Partner Wins**, una cuenta que sueltas queda abierta: cualquier partner
+   puede firmarle un POI, cross-venderle un Hub y llevarse los puntos *sourced* de **un logo que tú trajiste**.
+
+**Y la comisión sí importa hacia adelante:** hoy, como Solutions Partner, un deal sourced paga **36 meses,
+no 12**. La comisión de un cliente que sueltas hoy es **tres veces más cara de perder** que la de uno vendido
+en la era Provider.
 
 **La jugada correcta con un mal pagador de servicios:** no lo echas — **lo degradas a licencia + toque mínimo.**
-Cortas la sangría operativa y conservas comisión, puntos y retención.
+Cortas la sangría operativa (que era el problema real) y conservas los puntos, el GRR y el territorio.
 
 ### 🔴 Regla dura
 **NUNCA** termines la relación de licencia por un problema de la relación de servicio.

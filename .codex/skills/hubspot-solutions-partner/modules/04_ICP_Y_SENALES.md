@@ -24,10 +24,26 @@
 | **Ambición** | Quieren una **plataforma**, no un tracker. Van a necesitar marketing + servicio en 18 meses |
 | **Cultura** | Valoran **adopción** y velocidad por sobre configurabilidad infinita |
 
+### 🔴 El requisito que no aparece en ninguna tabla: **el champion**
+
+> **Sin champion no hay adopción. Sin adopción hay churn. El churn te corta la comisión y te mata el tier.**
+
+**Caso GyT Group (Efeonce, 2026):** compraron, probaron, **nunca hubo adopción real**. *"Faltó un champion
+que liderara el proyecto adentro."* Churnearon, y **no es recuperable**.
+
+**Es un requisito de ICP, no un detalle de delivery.** Una empresa con el tamaño perfecto, el dolor perfecto
+y el presupuesto perfecto **pero sin un dueño interno del proyecto NO es tu ICP**.
+→ Las cuatro preguntas del champion: `modules/10_DISCOVERY_SCOPING.md` § 0.
+
+**Sin champion:** vende **Starter** o **Free**, consigue adopción, **expande cuando el champion emerja**.
+Nunca Pro ni Enterprise.
+
 ### 🔴 Perfil que NO deberías vender — descalifica temprano
 
 | Señal | Por qué |
 |---|---|
+| **No hay un champion interno identificable** | 🔴 **El más caro de todos.** GyT Group. Adopción cero → churn → comisión cortada → tier |
+| **Cliente muy chico en tier Starter** | ⚠️ **Caso GeaAmbiental:** suite Starter, empresa demasiado pequeña. MRR mínimo → comisión mínima → **puntos managed mínimos**. El costo de servir supera el retorno. **No todo cliente que se puede cerrar vale la pena cerrarlo** |
 | **>10 entidades de negocio propias** | Techo de 10 custom objects ✅. Seguros, manufactura, healthcare, logística, banca |
 | **Gobernanza formal de cambios** (dev→QA→staging→prod) o auditoría regulatoria | **1 sandbox, 200K registros, sync inicial de 5.000 contactos** ✅. No puedes hacer UAT representativo |
 | **El pliego exige ISO 27001 del proveedor de software** | ✅ **HubSpot no lo reclama para sí mismo.** Verifica bajo NDA — no lo afirmes |

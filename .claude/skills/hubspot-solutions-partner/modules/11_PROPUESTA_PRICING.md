@@ -24,7 +24,9 @@ y no gestionado te da **cero puntos managed a los 60 días**, aunque siga pagand
 
 ---
 
-## 2. 🎯 El arbitraje del onboarding fee — tu mejor argumento de cierre
+## 2. 🎯 El waiver del onboarding — tu mejor argumento de cierre
+
+**Esto NO es un arbitraje de precio. Es que le quitas al cliente un cargo obligatorio de su contrato.**
 
 ✅ **HubSpot cobra un onboarding obligatorio** en Pro y Enterprise:
 
@@ -35,17 +37,37 @@ y no gestionado te da **cero puntos managed a los 60 días**, aunque siga pagand
 | Service | $1.500 | $3.500 |
 | Customer Platform (bundle) | ❌ **NO PUBLICADO — PÍDELO** | ❌ **NO PUBLICADO** |
 
+### Los dos hechos que hacen el argumento
+
+1. ⚠️ **Un Solutions Partner puede entregar el onboarding en lugar de HubSpot, y el cargo desaparece del
+   contrato del cliente.** El partner le notifica a HubSpot que se hace cargo de la implementación, y HubSpot
+   **elimina esa línea del contrato**.
+2. ⚠️ **El onboarding de HubSpot es *coaching*; el del partner es *implementación*.**
+   HubSpot **te enseña a hacerlo y tú lo haces**. El partner **te lo construye**: migra los datos, mapea los
+   procesos, arma el sistema.
+
 > **La conversación:**
-> *"HubSpot les va a cobrar $7.000 de onboarding obligatorio. Es un onboarding estándar, remoto, genérico.
-> Por un monto comparable nosotros hacemos la implementación completa: migración de datos, arquitectura de
-> objetos, propiedades, pipelines, permisos, reporting e integraciones. **Y nos quedamos operándolo.**
-> La pregunta no es si van a pagar por arrancar. Es **quién los va a arrancar**."*
+> *"HubSpot les va a cobrar **$7.000 de onboarding obligatorio**. Y ese onboarding es **coaching**: les
+> enseñan a ustedes a configurarlo, y ustedes lo configuran.*
+>
+> *Si trabajan con nosotros, **ese cargo desaparece de su contrato** — nosotros le notificamos a HubSpot que
+> nos hacemos cargo de la implementación. Y en vez de enseñarles, **se lo construimos**: migración de datos,
+> arquitectura de objetos, propiedades, pipelines, permisos, reporting, integraciones. **Y nos quedamos
+> operándolo.**"*
 
-**Es el argumento más limpio que existe**, porque no compites contra el presupuesto del cliente: compites
-contra un gasto que **ya va a hacer de todas formas**.
+**Le estás quitando $7.000 de la factura Y entregando más.** No compites contra su presupuesto: **liberas**
+presupuesto que él ya tenía comprometido, y lo rediriges a un trabajo que sí vale.
 
-🔴 **Y por eso el fee del bundle es crítico:** si es $7K o $14K+, cambia el tamaño de tu propuesta.
-**No lo asumas. Pídeselo al PDM por escrito.**
+### 🔴 La letra chica que te toca — verifícala HOY
+
+⚠️ **Desde el 2026-07-15, solo los partners CERTIFICADOS pueden waivear el onboarding del cliente.**
+La *Partner Certification* es la que acredita la expertise para reemplazar el onboarding de HubSpot.
+
+> **Sin la certificación vigente, pierdes tu mejor argumento de cierre — justo cuando más lo necesitas.**
+> **Verifica el estado de la Partner Certification de Efeonce. Es la pregunta #0 al PDM.**
+
+🔴 **Y el fee del bundle sigue sin publicarse**: si es $7K o $14K+, cambia el tamaño de tu propuesta **y el
+tamaño del waiver que puedes ofrecer**. Pídeselo al PDM por escrito.
 
 ---
 
