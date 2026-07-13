@@ -59,6 +59,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Deep coverage executes the artifact-composer suites too. Those tests
+      # launch Playwright's pinned Chromium headless shell, so this workflow
+      # must provision the same browser cache as the main CI gate.
+      - name: Resolve Playwright version
+        id: playwright-version
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright chromium headless shell
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-shell-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+
+      - name: Provision Playwright chromium headless shell
+        run: pnpm exec playwright install chromium --only-shell
+
       - name: Coverage
         run: pnpm test:coverage
         timeout-minutes: 10
