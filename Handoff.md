@@ -6,7 +6,7 @@
 >
 > **Evidencia base reutilizada:** la implementación/smoke runtime y el release productivo ya estaban documentados en las sesiones del 2026-07-09. Este corte no toca runtime ni trabajo ajeno; sólo corrige lifecycle/documentación.
 >
-> **TASK-1365:** antes de ejecutar, el protocolo del repo exige preflight de `/goal` + `pnpm codex:task-hook TASK-1365`. Queda pendiente la confirmación del operador del goal recomendado.
+> **TASK-1365:** goal confirmado por el operador. El primer hook detectó `Blocked by: TASK-1360` stale; se verificó que TASK-1360 y TASK-1364 están complete, se corrigieron lifecycle/rutas/registry y `pnpm codex:task-hook TASK-1365 --develop` pasó (`develop override: yes`, sin subagentes). Excepción documentada: ejecución secuencial sobre `develop`, sin worktree. Plan autoaprobado en `docs/tasks/plans/TASK-1365-plan.md`; implementación privacy-safe detrás de flag OFF, rollout condicionado a sign-off legal/privacidad y policy final.
 
 ## Sesión 2026-07-13 — TASK-1363 Assessment Taking + Review Surface COMPLETE local (Codex)
 

@@ -1,5 +1,11 @@
 # TASK-1365 — Adverse-Impact & Fairness Monitoring
 
+## Delta 2026-07-13 — preflight de dependencias resuelto
+
+- `TASK-1360` y `TASK-1364` están `complete` y sus contratos as-built están disponibles; el `Blocked by` y las rutas `to-do` eran drift documental.
+- La ejecución queda autorizada en `develop`, secuencial, sin subagentes ni worktree nuevo. Las decisiones finales de categorías, consentimiento y retención siguen siendo gate de rollout, no blocker para dejar el código completo detrás del flag OFF.
+- Resolución técnica privacy-safe: `k=10`; una dimensión solo se reporta si al menos dos categorías alcanzan el umbral; drift contra la ventana inmediatamente anterior de igual duración. Categorías, versión de política y retención son configuración obligatoria y allowlisted: flag ON con política incompleta falla cerrado.
+
 ## Delta 2026-07-10 — TASK-1364 completa: el join score↔outcome existe y es reusable
 
 - `getAssessmentValidity` (`src/lib/hiring/assessment/validity/get-validity.ts`) implementó el join canónico activation_request(770)→member→outcome (ICO rpa_avg primario / eval_summaries secundario, fuente etiquetada) — el `[opcional]` de esta task ya no requiere construirlo. Umbrales de muestra resueltos (n<10 sin reporte / 10-29 preliminar / ≥30 establecida) reusables para el k-anon del monitor. Evidencia AI-Act append-only en `greenhouse_hr.assessment_validity_evidence` (mismo patrón para el bias testing).
@@ -17,7 +23,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -30,10 +36,10 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Parcial`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-1360`
+- Blocked by: `none`
 - Branch: `task/TASK-1365-assessment-adverse-impact-fairness-monitoring`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -62,7 +68,7 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (§Assessment + invariantes fairness)
 - `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` (PII sensible)
-- `docs/tasks/to-do/TASK-1360-assessment-engine-foundation.md`
+- `docs/tasks/complete/TASK-1360-assessment-engine-foundation.md`
 
 Reglas obligatorias:
 
@@ -74,14 +80,14 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md`
-- `docs/tasks/to-do/TASK-1364-assessment-validity-feedback-loop.md` (reusa el join application↔outcome)
+- `docs/tasks/complete/TASK-1364-assessment-validity-feedback-loop.md` (reusa el join application↔outcome)
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- `TASK-1360` (pipeline de assessment + `hiring_application` stages)
-- `TASK-1364` (join application↔outcome, reusable) `[opcional, no bloqueante]`
+- `TASK-1360` (complete: pipeline de assessment + `hiring_application` stages)
+- `TASK-1364` (complete: join application↔outcome reusable)
 
 ### Blocks / Impacts
 
@@ -106,6 +112,16 @@ Reglas obligatorias:
 - No hay captura de demografía voluntaria separada de la decisión.
 - No hay cómputo de adverse impact (4/5) ni drift.
 - No hay evidencia de bias testing para el AI Act.
+
+## Modular Placement Contract
+
+- Topology impact: `none`
+- Current home: `src/lib/hiring/assessment/fairness/**` para command/reader server-only; `src/app/api/hiring/assessments/fairness/**` como adapter HTTP; persistencia en `greenhouse_hiring`
+- Future candidate home: `domain-package`
+- Boundary: `captureVoluntaryDemographicSelfId` para la escritura consentida y `getSelectionFairness` para agregados k-anon; API/Nexa/People Ops solo consumen esos contratos, nunca las tablas
+- Server/browser split: contratos de input/output sin imports de DB pueden ser browser-safe; command, reader, store, audit/outbox y evidencia permanecen server-only
+- Build impact: `none` (sin SDK, dependencia pesada, filesystem input ni entrypoint global nuevo)
+- Extraction blocker: transacciones y joins co-localizados con `greenhouse_hiring.hiring_application`, capabilities de sesión y outbox/audit del portal
 
 ## Backend/Data Contract
 
@@ -133,7 +149,7 @@ Reglas obligatorias:
   - el monitor observa/alerta; NUNCA aplica cuotas ni ajusta decisiones automáticamente
   - consentimiento explícito + minimización + retención acotada
 - Tenant/space boundary: interno; capability dedicada `hiring.assessment.fairness_read` (least-privilege, más restringida que `read`)
-- Idempotency/concurrency: self-ID upsert por profile; reader read-only
+- Idempotency/concurrency: self-ID upsert transaccional por profile + dimensión; reader read-only
 - Audit/outbox/history: acceso al monitor auditado; evidencia AI-Act append-only
 
 ### Migration, backfill and rollout
@@ -141,13 +157,13 @@ Reglas obligatorias:
 - Migration posture: `additive` (tabla self-ID + view fairness)
 - Default state: `flag OFF` (`HIRING_FAIRNESS_MONITOR_ENABLED`) hasta revisión legal/privacidad
 - Backfill plan: `none` (self-ID es prospectivo + voluntario)
-- Rollback path: `flag off` + revert PR + drop tabla
+- Rollback path: `flag off`; reverse migration solo antes de captura real. Tras rollout, preservar evidencia y ejecutar cualquier borrado con política legal/auditada
 - External coordination: **revisión legal/privacidad** (qué categorías, consentimiento, retención por jurisdicción — Chile + global) antes de habilitar
 
 ### Security and access
 
 - Auth/access gate: `hiring.assessment.fairness_read` (más restringida que `read`); self-ID capture = consentimiento del candidato
-- Sensitive data posture: **categoría especial de PII**; separada, agregada, k-anon básico; NUNCA per-candidato al evaluador
+- Sensitive data posture: **categoría especial de PII**; separada, agregada con `k=10`; NUNCA per-candidato al evaluador. Categorías sin texto libre y solo desde allowlist aprobada
 - Error contract: `toHiringErrorResponse` + `captureWithDomain(err, 'hiring')`
 - Abuse/rate-limit posture: N/A (reader interno); self-ID opcional
 
@@ -197,7 +213,7 @@ Reglas obligatorias:
 
 ### Slice 2 — Fairness read model + 4/5 monitor
 
-- Read model `assessment_fairness` (agregado por grupo × stage/template) con umbral mínimo de grupo.
+- Read model `assessment_fairness` (agregado por grupo × stage/template) con `k=10` enforced antes de exponer filas.
 - `getSelectionFairness(stage|template, window)`: tasas por grupo + impact ratio (4/5) + drift; verdict + degradación honesta si muestra baja.
 
 ### Slice 3 — Signal + AI-Act evidence + governance
@@ -213,7 +229,7 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-La demografía self-declarada es **categoría especial de PII**: consentimiento explícito, minimización, retención acotada, separación física del pipeline de decisión, agregación con k-anon básico. El monitor computa la heurística 4/5 (impact ratio = tasa del grupo con menor selección / tasa del grupo con mayor selección; < 0.8 = señal de adverse impact) — que es una **alerta para revisión humana del paso**, no un umbral que ajuste decisiones. Cumple el bias-testing del AI Act sin crear un riesgo de privacidad.
+La demografía self-declarada es **categoría especial de PII**: consentimiento explícito, minimización, retención acotada, separación física del pipeline de decisión, agregación con `k=10`. Ninguna dimensión se reporta si no existen al menos dos categorías reportables. El monitor computa la heurística 4/5 (impact ratio = tasa del grupo con menor selección / tasa del grupo con mayor selección; < 0.8 = señal de adverse impact) — que es una **alerta para revisión humana del paso**, no un umbral que ajuste decisiones. Cumple el bias-testing del AI Act sin crear un riesgo de privacidad.
 
 ## Rollout Plan & Risk Matrix
 
@@ -290,5 +306,6 @@ La demografía self-declarada es **categoría especial de PII**: consentimiento 
 
 ## Open Questions
 
-- ¿Qué categorías demográficas capturar por jurisdicción (Chile + global) y con qué base legal? Requiere revisión legal antes de implementar.
-- ¿Umbral mínimo de grupo (k) para agregación segura? Definir con criterio de privacidad.
+- Resuelta para code-complete: el schema/command no hardcodea categorías; una allowlist de policy config define dimensión + valores aprobados. Sin definición legal, la allowlist queda ausente y el runtime falla cerrado aunque el flag se encienda.
+- Resuelta para code-complete: `k=10`, con mínimo dos categorías reportables por dimensión y supresión completa bajo k.
+- Pendiente de rollout: revisión legal/privacidad por jurisdicción, categorías definitivas, versión/copy de consentimiento y retención final. Mantener el flag OFF hasta sign-off y configuración completa.
