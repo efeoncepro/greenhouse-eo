@@ -41,6 +41,147 @@ Efeonce presta servicios de HubSpot en cuatro capas (`docs/context/02_gtm.md`) y
 - Ser citable por motores de respuesta (answer capsules answer-first + JSON-LD `Service`/`Organization`/`FAQPage`/`BreadcrumbList`) sin depender de keyword bottom-funnel (que no existe): la captura de categoría se juega en Think.
 - Entregar al usuario a la oferta de dos escalones —"Agenda una reunión" (HubSpot Meetings) y "Solicita un diagnóstico de tu portal HubSpot" (`<greenhouse-form>` embebido)— reusando contratos gobernados, con fallback honesto.
 
+## Delta 2026-07-13 — auditoría de la página viva + skill `hubspot-solutions-partner`
+
+Auditoría de la página `244079` **desde la fuente** (REST autenticado + captura Playwright) cruzada con la
+skill nueva **`hubspot-solutions-partner`** (research verificado del producto y del programa, as-of 2026-07).
+**Tres reglas duras de esta task quedaron obsoletas o peligrosas, y falta la oferta más fuerte del canal.**
+Todo esto es **input obligatorio de Slice 2 (copy)**.
+
+### 🔴 D1 · La página viva afirma cosas FALSAS y verificables. No las heredes.
+
+| Claim en la página hoy | Por qué es falso | Qué decir en su lugar |
+|---|---|---|
+| **"Líder en CRM según Gartner y G2"** *(sección "Elegido por líderes", con trofeo)* | 🔴 En el **Gartner MQ de Sales Force Automation 2025, HubSpot es NICHE PLAYER**. Leaders: Salesforce, Microsoft, Oracle. Zoho está por encima | ✅ **"Leader en B2B Marketing Automation (Gartner, 5.º año consecutivo)"** — es cierto, es citable, y es el cuadrante donde queremos pelear |
+| **"Avalado por G2, Gartner y Forrester"** | ❌ La posición de HubSpot en el **Forrester Wave Q1 2026 NO es verificable** (la propia landing de HubSpot que lo promociona cita el Wave de **2024**) | No citar Forrester hasta abrir el reporte |
+| **"Seguridad y cumplimiento: ISO 27001, SOC 2, GDPR, CCPA"** | 🔴 **HubSpot NO reclama ISO 27001 para sí mismo.** Su página de seguridad dice que sus *proveedores de infraestructura cloud* (AWS) la tienen. **Es un claim de compliance sobre un tercero que el tercero no hace** | ✅ **SOC 2 Type II + SOC 3** (los que HubSpot sí reclama). Si el pliego exige ISO 27001 *del proveedor de software*, verificar bajo NDA en trust.hubspot.com |
+| **"Datacenters regionales (UE/US)"** | Correcto — pero **NO hay datacenter en LATAM** | No prometer residencia de datos local. Es un **descalificador**, no una feature |
+
+> **Un CIO que compra por Magic Quadrant verifica el primero en dos minutos. Un equipo de seguridad pide el
+> certificado del segundo. En los dos casos, el que queda desacreditado es Efeonce, no HubSpot.**
+
+### 🔴 D2 · La regla "NUNCA afirmar un tier" quedó obsoleta — pero el riesgo cambió de forma
+
+**Efeonce ES Gold** (verificado en el portal Partner, 2026-07-13). El claim ya está documentado.
+**Pero el Gold está acreditado hasta el 2027-01-15 y hoy Efeonce está bajo el umbral de puntos totales**
+(196,72 de 325 requeridos). Si no se cierra la brecha, en enero el badge se vuelve **falso** — y un badge de
+partner falso es riesgo de **compliance del programa**, no de marketing.
+
+- ✅ **Se puede afirmar "HubSpot Solutions Partner Gold"** (la página ya lo hace y es cierto).
+- 🔴 **Condición:** revisar el claim en la revisión de tier del **2027-01-15**. Si Efeonce baja de tier, **el
+  badge sale de la página el mismo día**. Registrar el recordatorio en el landing file.
+- Estado real y plan de recuperación: `.claude/skills/hubspot-solutions-partner/efeonce/ESTADO_ACTUAL.md`.
+
+### 🔴 D3 · SSilva NO es caso citable. Va junto a GEA.
+
+La regla actual (§Architecture Alignment) dice *"Solo casos citables (Sky, Bresler, **SSilva**…)"*. **Corregir:**
+
+- **SSilva es la cuenta que Efeonce cortó** (mal pago de servicios, ~1 año). Acceso de partner admin
+  desactivado. **Si un prospecto llama a pedir referencia, no controlamos qué le dicen.**
+- Y el testimonio que hoy está en la página **es de branding**, no de CRM: *"modernizaron nuestra identidad
+  visual… el tono y estilo"*. Igual que el de **Eusari** (*"una idea en papel… narrativa de marca"*).
+- 🔴 **Resultado: hoy la landing de CRM tiene CERO prueba social de CRM.**
+
+→ **NUNCA GEA. NUNCA SSilva.** Conseguir un caso de CRM/HubSpot real con métrica, o usar cifras ilustrativas
+del modelo **declaradas como tales**.
+
+### 🎯 D4 · Falta la oferta más fuerte del canal: el **waiver del onboarding**
+
+La página dice, vagamente, *"acceso a descuentos preferentes como partners"*. Hay algo **cuantificable,
+verificable y exclusivo**, y no está:
+
+> **HubSpot cobra un onboarding OBLIGATORIO. Un Solutions Partner certificado puede entregarlo en lugar de
+> HubSpot, y el cargo DESAPARECE del contrato del cliente.** Y el de HubSpot es *coaching* (te enseñan y tú
+> lo haces); el del partner es *implementación* (te lo construyen).
+
+| Producto | Costo año 1 | Onboarding que se borra | **Descuento efectivo** |
+|---|---|---|---|
+| **Marketing Hub Pro** | USD 9.600 | **USD 3.000** | 🎯 **31% en el año 1** |
+| Marketing Hub Enterprise | USD 43.200 | **USD 7.000** | 16% |
+| Sales / Service Enterprise | — | USD 3.500 | — |
+
+✅ **Efeonce TIENE la Partner Certification** (confirmado por el operador) → el waiver está disponible.
+⚠️ Desde el **2026-07-15 solo los partners certificados pueden waivearlo** → es una ventaja **estructural del
+canal** que el HubSpot directo **no puede igualar**.
+
+**Debe ser una región propia del wireframe** (o el ancla del trust strip), no una línea perdida. Es el
+argumento de cierre más limpio que existe: **no compite contra el presupuesto del cliente — libera
+presupuesto que él ya tenía comprometido.**
+→ `.claude/skills/hubspot-solutions-partner/modules/11_PROPUESTA_PRICING.md` § 2.
+
+### 🎯 D5 · La cuña AEO — el puente que esta landing no está usando
+
+**HubSpot lanzó AEO como producto** (Spring Spotlight, abr-2026): mide visibilidad de marca en ChatGPT,
+Gemini y Perplexity. **USD 50/mo standalone — incluido en Marketing Hub Pro/Enterprise.**
+Dato de HubSpot para el copy: **tráfico orgánico −27% interanual · tráfico de referencia desde IA ×3.**
+
+Efeonce **ya tiene el AI Visibility Grader construido** (`src/lib/growth/ai-visibility/**`) y su landing
+`/aeo-2/`. **Esa es la puerta de entrada natural a esta página**, y encaja con la etapa **Amplify** de
+**Loop Marketing** (el marco con que HubSpot enterró el funnel lineal — es el idioma que hay que hablar).
+
+→ Reforzar el **internal link bidireccional** AEO ↔ HubSpot en §Puente/cross-sell, y usar el dato del −27%
+como *stake* en la región "encenderla no basta".
+→ `.claude/skills/hubspot-solutions-partner/modules/07_CUNA_AEO.md`.
+
+### 🔴 D6 · Nomenclatura 2026 — la página describe un HubSpot que ya no existe
+
+| La página dice | Hoy se llama | |
+|---|---|---|
+| **Commerce Hub** | **Revenue Hub** ✅ | y ahora es **quote-to-cash completo con CPQ** |
+| **Operations Hub** | **Data Hub** ✅ | no coexisten; migración automática |
+| **INBOUND** | **UNBOUND** ✅ | 16-18 sep 2026, Boston |
+
+Y **no menciona en ninguna parte**: **Smart CRM**, **HubSpot AEO**, **Loop Marketing**, **Breeze Assistant**.
+
+> Para un partner cuya venta entera es *"sabemos de esto más que tú"*, usar la nomenclatura retirada es una
+> **fuga de credibilidad silenciosa**. Quien está al día lo nota.
+
+⚠️ **Y el guardrail de Breeze sigue vigente y se refuerza:** solo **TRES** Breeze Agents están en **GA**
+(Customer, Prospecting, Data). El resto es **beta**. **NUNCA prometer "flota de agentes de IA"** ni firmar SLA
+sobre beta. Y **NUNCA sumar créditos entre hubs** (no se acumulan: manda el tier más alto).
+→ `.claude/skills/hubspot-solutions-partner/modules/01_PRODUCTO_2026.md`.
+
+### 🔴 D7 · Los contadores animados son **invisibles para los motores de respuesta**
+
+La página usa contadores Ohio animados por JS (`data-counter`). **Sin JavaScript renderizan `00 %` y `0`.**
+Un visitante ve `258000 / 86% / 97%`; **un crawler de IA que no ejecuta JS ve ceros** — lo verificamos.
+
+> **Esta task pide explícitamente "ser citable por motores de respuesta". Un número que solo existe tras
+> ejecutar JS no es citable.**
+
+🔴 **Requisito de build:** **toda cifra que queramos que un LLM cite debe estar en el HTML servido**, no en un
+`data-attribute` animado. Si se usan contadores, el valor va **también** como texto (o en el JSON-LD).
+**Agregar como assertion del GVC scenario: fetch sin JS → los números aparecen.**
+
+### 🔴 D8 · Basura del template que hay que matar al reposicionar
+
+El botón **"Más testimonios"** de la página viva apunta a
+**`https://themeforest.net/user/colabrio/reviews`** — las reviews del **tema Ohio en ThemeForest**.
+Un prospecto que hace clic en tu prueba social **aterriza en un marketplace de temas de WordPress.**
+
+→ En Slice 1, **auditar TODOS los `href` de la página** buscando otros leftovers del template antes de mutar.
+
+### 🎯 D9 · Descalificar honestamente ES una palanca de conversión (JOLT)
+
+La página hoy es 100% entusiasmo. Pero **quien decide un CRM en mid-market es RevOps, y RevOps decide por
+miedo — miedo a migrar dos veces.** El partner que dice *"si necesitan más de 10 objetos custom, HubSpot no
+les da el ancho, y se lo digo ahora"* **se gana ese deal**; el que solo elogia lo pierde en el mes cuatro.
+
+Considerar una región (o un bloque del FAQ) **"cuándo HubSpot NO es para ti"**, con los límites reales y
+documentados: **10 custom objects · 1 sandbox (200K registros, sync inicial de 5.000 contactos) · sin
+residencia de datos en LATAM · sin jerarquía de roles ni territory management**.
+
+**Es exactamente el ángulo JOLT que esta task ya adoptó** (reducir el miedo a elegir mal), y es el único
+movimiento de la página que un competidor no va a copiar.
+→ `.claude/skills/hubspot-solutions-partner/modules/10_DISCOVERY_SCOPING.md` § 3.
+
+### Fuentes del Delta
+
+- Auditoría de la página viva `244079`: REST autenticado (`context=edit`) + captura Playwright, 2026-07-13.
+- Producto, programa y competencia verificados: `.claude/skills/hubspot-solutions-partner/SOURCES.md`
+  (marcado ✅ fuente primaria / ⚠️ secundario / ❌ no publicado; **§ "Datos que NO se citan"**).
+- Estado real del partnership: `.claude/skills/hubspot-solutions-partner/efeonce/ESTADO_ACTUAL.md`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
@@ -63,10 +204,14 @@ Reglas obligatorias:
 - **Reposicionar en sitio, misma URL** `/servicios-contratar-hubspot/` (id `244079`); **NO** crear spoke nueva ni gastar 301 (PDR-006 §Alternativas descartadas). Evolucionar el "Partner Proof Module" existente, no botarlo a ciegas.
 - Full API Parity por reuso: la captura de lead (diagnóstico) YA es contrato gobernado (Growth Forms + pipeline); el agendamiento reusa HubSpot Meetings. La landing es cliente, NO owner — NO reconstruir el form ni el agendador. El form `efeonce-hubspot-portal-audit` es una config de form instance del contrato existente (como `efeonce-seo-diagnostic`/`efeonce-social-audit`), HubSpot delivery `disabled` hasta cutover.
 - Lidera la masterbrand **Efeonce**; Kortex/Greenhouse/Verk se nombran como el **software propio que sostiene el servicio**, no como productos que el cliente compra aparte.
-- **NUNCA afirmar un tier** de partner (Diamond/Platinum/Gold) — no está documentado. El claim de partner es "HubSpot Solutions Partner"; el claim de producto es "Kortex validado y en el HubSpot Marketplace" (con enlace al listing).
+- **Tier de partner — regla ACTUALIZADA (Delta 2026-07-13, deroga el "NUNCA afirmar tier"):** Efeonce **es Gold** (verificado en el portal Partner) → **se puede afirmar "HubSpot Solutions Partner Gold"**. 🔴 **Condición dura:** el Gold está acreditado **hasta el 2027-01-15** y hoy Efeonce está **bajo el umbral de puntos totales**. **Revisar el claim en la revisión de tier del 2027-01-15; si baja de tier, el badge sale de la página ese día.** Dejar el recordatorio en el landing file. Estado: `.claude/skills/hubspot-solutions-partner/efeonce/ESTADO_ACTUAL.md`.
+- 🔴 **NUNCA afirmar claims de HubSpot que HubSpot no hace** (Delta D1). Prohibidos: **"Líder en CRM según Gartner"** (es **Niche Player** en el MQ de *Sales Force Automation*), **"Leader en Forrester Wave"** (no verificable para 2026), **"ISO 27001"** (HubSpot no la reclama para sí — solo su infra AWS; HubSpot reclama **SOC 2 Type II + SOC 3**), **residencia de datos en LATAM** (no existe). Permitido y correcto: **"Leader en B2B Marketing Automation (Gartner, 5.º año)"**. Fuente: `.claude/skills/hubspot-solutions-partner/SOURCES.md` § *Datos que NO se citan*.
 - **NUNCA** presentar la integración interna Greenhouse↔Kortex como productiva (es staging); el claim público es sobre el producto Kortex y su capability de deployment.
-- **NO hardcodear** el roster ni el pricing de Breeze (volátiles; cambiaron a pay-per-result en abr-2026): describir categorías de agentes y el trabajo de gobernarlos; reverificar cualquier cifra de HubSpot (WebSearch) el día de publicación.
-- Solo casos/resultados citables (Sky, Bresler, SSilva…); **NUNCA GEA**; **Berel NO como prueba de co-selling** (se cerró directo, sin PDM). Si no hay resultado citable con número, cifras ilustrativas del modelo declaradas.
+- **NO hardcodear** el roster ni el pricing de Breeze (volátiles; cambiaron a pay-per-result en abr-2026): describir categorías de agentes y el trabajo de gobernarlos; reverificar cualquier cifra de HubSpot (WebSearch) el día de publicación. 🔴 **Solo TRES Breeze Agents están en GA** (Customer, Prospecting, Data); el resto es **beta** → **NUNCA prometer "flota de agentes de IA"**.
+- **Nomenclatura 2026 obligatoria** (Delta D6): **Revenue Hub** (ex-Commerce Hub) · **Data Hub** (ex-Operations Hub) · **UNBOUND** (ex-INBOUND). Usar el nombre viejo delata desactualización.
+- Solo casos/resultados citables (Sky, Bresler…); **NUNCA GEA**; 🔴 **NUNCA SSilva** (Delta D3 — cuenta cortada por mal pago, acceso de partner admin desactivado; no controlamos la referencia; su testimonio actual además es de *branding*, no de CRM); **Berel NO como prueba de co-selling** (se cerró directo, sin PDM). Si no hay resultado citable con número, cifras ilustrativas del modelo declaradas.
+- 🎯 **El waiver del onboarding es región obligatoria del copy** (Delta D4): Efeonce está **certificada** → puede entregar el onboarding **en lugar de HubSpot** y **el cargo obligatorio desaparece del contrato del cliente** (USD 3.000 en Marketing Pro = **31% del año 1**; USD 7.000 en Enterprise). **El HubSpot directo no puede igualarlo.** No es "descuento preferente": es un número.
+- 🔴 **Todo número citable debe estar en el HTML servido** (Delta D7): los contadores animados por JS renderizan **`00 %`** sin JavaScript, y los crawlers de IA **no ejecutan JS**. Si la task pide ser citable por motores de respuesta, **un número que solo existe tras ejecutar JS no es citable**.
 - Build spoke Ohio nativo (`template default`, header claro heredado), CSS page-scoped; **NO** `elementor_canvas`, sin header/wrapper overrides. Mutación Elementor vía `Document::save()` (nunca `_elementor_data` directo), snapshot + Kinsta purge + rollback documentado.
 - Ejecutar en el sitio público vía la skill `efeonce-public-site-wordpress`; NO usar AXIS/MUI/`src/lib/copy` (eso es portal).
 - Idioma **es-LATAM neutro** (pan-hispano), tuteo, sin voseo ni chilenismos; preparar `hreflang` desde el build (fase `en-US` futura donde sí hay demanda de partner), sin traducción máquina.
@@ -340,8 +485,15 @@ Reposición aditiva de contenido de una página pública existente (misma URL), 
 - [ ] Cada H2 principal tiene una answer capsule (answer-first, 40–60 palabras) citable.
 - [ ] La sección firma "stack agéntico" se anima en default y queda estática (diagrama) bajo `prefers-reduced-motion`, sin degradar CWV (LCP<2.5s / INP<200ms).
 - [ ] La tabla de diferenciación **RevOps consultivo vs RevOps programático** está presente y comunica el mecanismo (definido como configuración versionada, desplegado con trazabilidad, operado por Kortex/Greenhouse), sin superlativos ni denigrar competidores nombrados.
-- [ ] Prueba: **Kortex validado y en el HubSpot Marketplace** (con enlace al listing) + "HubSpot Solutions Partner" (**sin tier**) + casos citables; **NUNCA GEA**; Berel no como co-sell.
-- [ ] No se afirma un tier de partner; no se presenta la integración interna Greenhouse↔Kortex como productiva; no se hardcodea pricing/roster de Breeze (reverificado el día de publicación).
+- [ ] Prueba: **Kortex validado y en el HubSpot Marketplace** (con enlace al listing) + **"HubSpot Solutions Partner Gold"** + casos citables **de CRM/HubSpot** (no de branding); **NUNCA GEA**; 🔴 **NUNCA SSilva**; Berel no como co-sell.
+- [ ] 🔴 **Delta D1 — ningún claim falso sobre HubSpot.** La página **NO** dice "Líder en CRM según Gartner" (HubSpot es *Niche Player* en el MQ de Sales Force Automation), **NO** cita el Forrester Wave, **NO** afirma **ISO 27001** de HubSpot (solo **SOC 2 Type II / SOC 3**), **NO** promete residencia de datos en LATAM, **NO** promete "flota de agentes de IA" (solo 3 Breeze Agents en GA). ✅ Sí dice **"Leader en B2B Marketing Automation (Gartner, 5.º año)"**.
+- [ ] 🔴 **Delta D2 — el badge Gold tiene fecha de revisión.** El claim "Solutions Partner Gold" queda registrado en el landing file **con recordatorio de revisar el 2027-01-15**; si Efeonce baja de tier, el badge sale de la página ese día.
+- [ ] 🎯 **Delta D4 — la región `waiver` existe** y comunica que el onboarding **obligatorio** de HubSpot **desaparece del contrato** al trabajar con un partner certificado (USD 3.000 en Marketing Hub Pro ≈ **31% del año 1**), con el fee **reverificado el día de publicación**.
+- [ ] 🎯 **Delta D9 — la región `limites` existe** ("cuándo HubSpot NO es para ti") con los límites documentados: 10 custom objects · 1 sandbox · sin residencia LATAM · sin territory management.
+- [ ] 🔴 **Delta D6 — nomenclatura 2026:** la página dice **Revenue Hub** y **Data Hub** (no "Commerce Hub" ni "Operations Hub") y **UNBOUND** (no "INBOUND").
+- [ ] 🔴 **Delta D7 — citabilidad sin JS:** un `fetch` de la URL **sin ejecutar JavaScript** devuelve **todas las cifras citables en el HTML servido** (ningún número vive solo en un contador animado).
+- [ ] 🔴 **Delta D8 — sin leftovers del template:** ningún `href` sale del dominio salvo los intencionales (HubSpot Meetings, listing de Kortex). *(La página viva tiene "Más testimonios" → `themeforest.net`.)*
+- [ ] No se presenta la integración interna Greenhouse↔Kortex como productiva; no se hardcodea pricing/roster de Breeze (reverificado el día de publicación).
 - [ ] JSON-LD válido `Service` + `Organization` + `FAQPage` + `BreadcrumbList` (pasa Rich Results Test).
 - [ ] CTA dual funciona: "Agenda una reunión" → HubSpot Meetings + UTM; "Solicita un diagnóstico de tu portal HubSpot" → `<greenhouse-form>` embebido con fallback honesto si no carga.
 - [ ] NO se reconstruyó el form ni el agendador; la captura reusa el contrato gobernado (Full API Parity por reuso); HubSpot delivery del form `disabled` hasta cutover.
