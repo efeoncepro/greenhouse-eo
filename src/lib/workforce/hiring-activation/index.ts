@@ -3,12 +3,21 @@
 
 export {
   HIRING_ACTIVATION_BLOCKED_REASONS,
+  HIRING_ACTIVATION_BLOCKER_RESOLUTION_ACTIONS,
   HIRING_ACTIVATION_COMMAND_ACTIONS,
   HIRING_ACTIVATION_MEMBER_OUTCOMES,
   HIRING_ACTIVATION_STATES,
 } from './types'
 export type {
+  HiringActivationActionableBlocker,
+  HiringActivationAlternativeSurface,
   HiringActivationBlockedReason,
+  HiringActivationBlockerActionContract,
+  HiringActivationBlockerPayloadSchema,
+  HiringActivationBlockerResolutionAction,
+  HiringActivationBlockerResolutionResultStatus,
+  HiringActivationBlockerResolutionStatus,
+  HiringActivationBlockerSource,
   HiringActivationCommandAction,
   HiringActivationMemberOutcome,
   HiringActivationRequest,
@@ -27,5 +36,17 @@ export {
   openOnboardingForHiringActivation,
   reviewHiringActivation,
 } from './service'
+export {
+  deriveHiringActivationBlockers,
+  findHiringActivationBlocker,
+  getHiringActivationBlockerActionContract,
+  isHiringActivationBlockerResolutionAction,
+  normalizeHiringActivationBlockerKey,
+} from './blockers'
+export {
+  computeHiringActivationBlockerPayloadDigest,
+  resolveHiringActivationBlocker,
+} from './resolve-blocker'
+export type { ResolveHiringActivationBlockerResult } from './resolve-blocker'
 export { getHiringActivationDetail, listHiringActivationQueue } from './readers'
 export type { HiringActivationDetail, HiringActivationQueueItem, HiringActivationQueueResult } from './readers'

@@ -20,6 +20,16 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-13 — TASK-1400: resolución gobernada de blockers de Hiring Activation
+
+El bridge de TASK-770 ganó el contrato programático para que UI/Nexa no simulen "resolver blocker":
+
+- **Reader actionable:** `getHiringActivationDetail()` ahora devuelve `blockers[]` browser-safe con `key`, `source`, `status`, payload schema, capability requerida, action contract y surface alternativa. `readyToActivate` sigue derivado live desde Workforce Activation; no se persiste readiness paralelo.
+- **Command:** `resolveHiringActivationBlocker` ejecuta sólo acciones recuperables que componen primitives existentes: `retry-create-member` → `createMemberForHiringActivation`; `retry-open-onboarding` → `openOnboardingForHiringActivation`. Legal data, handoff no aprobado y readiness lanes ajenas quedan `not_resolvable` con deep link/surface alternativa.
+- **API:** `POST /api/hr/hiring-activation/[id]/resolve-blocker` se sirve por el route-handler canónico `[action]`. La autorización es por acción delegada, no coarse admin: `workforce.member.intake.update:update` para member retry y `hr.onboarding_instance:create` para onboarding retry.
+- **Audit/PII:** el request event trail guarda actor, blocker/action, digest SHA-256 del payload normalizado y shape redacted; no guarda valores sensibles ni `value_full`. El payload permitido V1 sólo acepta `reason` opcional, y legal/PII se redirige a su primitive dueño.
+- **Invariantes:** resolver blocker no activa members, no completa intake, no auto-mergea identidad y no escribe payroll/compensation/access. Reintentos son state-safe por los commands delegados; el audit registra intentos con digest para trazabilidad.
+
 ## Delta 2026-07-10 — TASK-1383: Assessment Engine hardening + invariante de versionado de templates
 
 Auditoría 2026-07-10 (código real + specs downstream) → hardening pre-TASK-1363:

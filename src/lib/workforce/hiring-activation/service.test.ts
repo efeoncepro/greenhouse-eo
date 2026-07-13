@@ -10,6 +10,7 @@ const getHandoffMock = vi.fn()
 const transitionHandoffMock = vi.fn()
 const materializeMemberMock = vi.fn()
 const createOnboardingInstanceMock = vi.fn()
+const resolveReadinessMock = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   withGreenhousePostgresTransaction: (...args: unknown[]) => withTransactionMock(...args),
@@ -39,6 +40,14 @@ vi.mock('@/lib/hr-onboarding/store', () => ({
   createOnboardingInstance: (...args: unknown[]) => createOnboardingInstanceMock(...args),
 }))
 
+vi.mock('@/lib/workforce/activation/readiness', () => ({
+  resolveWorkforceActivationReadiness: (...args: unknown[]) => resolveReadinessMock(...args),
+}))
+
+vi.mock('./config', () => ({
+  isHiringActivationEnabled: () => true,
+}))
+
 const { HiringActivationIdentityConflictError } = await import('./errors')
 
 const {
@@ -47,6 +56,8 @@ const {
   openOnboardingForHiringActivation,
   reviewHiringActivation,
 } = await import('./service')
+
+const { computeHiringActivationBlockerPayloadDigest, resolveHiringActivationBlocker } = await import('./resolve-blocker')
 
 const handoff = (overrides: Record<string, unknown> = {}) => ({
   handoffId: 'hhof-1',
@@ -79,6 +90,21 @@ const requestRow = (overrides: Record<string, unknown> = {}) => ({
   created_by_user_id: 'user-hr',
   created_at: '2026-07-10T12:00:00.000Z',
   updated_at: '2026-07-10T12:00:00.000Z',
+  ...overrides,
+})
+
+const readiness = (overrides: Record<string, unknown> = {}) => ({
+  member: { memberId: 'mbr-9' },
+  status: 'blocked',
+  ready: false,
+  readinessScore: 50,
+  blockerCount: 0,
+  warningCount: 0,
+  topBlockerLane: null,
+  lanes: [],
+  blockers: [],
+  warnings: [],
+  evaluatedAt: '2026-07-10T12:00:00.000Z',
   ...overrides,
 })
 
@@ -133,6 +159,7 @@ describe('hiring activation service', () => {
     vi.clearAllMocks()
     getHandoffMock.mockResolvedValue(handoff())
     transitionHandoffMock.mockResolvedValue({ handoff: {}, idempotentReplay: false })
+    resolveReadinessMock.mockResolvedValue(readiness())
   })
 
   it('review reclama el request (claim) y es idempotente', async () => {
@@ -251,5 +278,122 @@ describe('hiring activation service', () => {
       expect.objectContaining({ eventType: 'hiring.activation.completed' }),
       expect.anything(),
     )
+  })
+
+  it('resolve-blocker reintenta onboarding, audita sólo digest y devuelve detail fresco', async () => {
+    const blocked = requestRow({
+      member_id: 'mbr-9',
+      state: 'blocked',
+      blocked_reason: 'onboarding_template_missing',
+      blocked_detail: 'No hay template aplicable.',
+    })
+
+    const opened = requestRow({
+      member_id: 'mbr-9',
+      state: 'onboarding_open',
+      blocked_reason: null,
+      blocked_detail: null,
+      onboarding_instance_id: 'onb-1',
+    })
+
+    const txClients: Array<ReturnType<typeof buildTxClient>> = []
+
+    runQueryMock
+      .mockResolvedValueOnce([blocked])
+      .mockResolvedValueOnce([blocked])
+      .mockResolvedValueOnce([opened])
+
+    createOnboardingInstanceMock.mockResolvedValue({ instanceId: 'onb-1' })
+    withTransactionMock.mockImplementation(async (cb) => {
+      const client = buildTxClient({ existing: blocked })
+
+      txClients.push(client)
+
+      return cb(client)
+    })
+
+    const result = await resolveHiringActivationBlocker({
+      hiringHandoffId: 'hhof-1',
+      actorUserId: 'user-hr',
+      blockerKey: 'activation:onboarding_template_missing',
+      action: 'retry-open-onboarding',
+      payload: { reason: 'Plantilla corregida, reintentar.' },
+    })
+
+    expect(result.status).toBe('resolved')
+    expect(result.resolved).toBe(true)
+    expect(result.detail.request?.state).toBe('onboarding_open')
+    expect(createOnboardingInstanceMock).toHaveBeenCalledWith(expect.objectContaining({
+      input: expect.objectContaining({ memberId: 'mbr-9' }),
+    }))
+
+    const auditCall = txClients[0]?.query.mock.calls.find(([sql]) =>
+      /hiring_activation_request_events/.test(String(sql)),
+    )
+
+    const auditMetadata = String((auditCall?.[1] as unknown[] | undefined)?.[10] ?? '')
+
+    expect(auditMetadata).toContain('payloadDigest')
+    expect(auditMetadata).toContain('"reason":"provided"')
+    expect(auditMetadata).not.toContain('Plantilla corregida')
+  })
+
+  it('resolve-blocker devuelve not_resolvable cuando el blocker pertenece a otra surface', async () => {
+    const blocked = requestRow({
+      member_id: 'mbr-9',
+      state: 'blocked',
+      blocked_reason: 'legal_data_missing',
+      blocked_detail: 'Falta completar datos legales.',
+    })
+
+    runQueryMock.mockResolvedValue([blocked])
+    withTransactionMock.mockImplementation(async (cb) => cb(buildTxClient({ existing: blocked })))
+
+    const result = await resolveHiringActivationBlocker({
+      hiringHandoffId: 'hhof-1',
+      actorUserId: 'user-hr',
+      blockerKey: 'legal_data_missing',
+      action: 'retry-open-onboarding',
+      payload: {},
+    })
+
+    expect(result.status).toBe('not_resolvable')
+    expect(result.resolved).toBe(false)
+    expect(result.blocker.alternativeSurface?.href).toBe('/hr/workforce/activation?memberId=mbr-9')
+    expect(createOnboardingInstanceMock).not.toHaveBeenCalled()
+  })
+
+  it('resolve-blocker falla cerrado si el blocker ya no está vigente', async () => {
+    runQueryMock.mockResolvedValue([requestRow({ state: 'pending_hr_review', blocked_reason: null })])
+
+    await expect(
+      resolveHiringActivationBlocker({
+        hiringHandoffId: 'hhof-1',
+        actorUserId: 'user-hr',
+        blockerKey: 'activation:onboarding_template_missing',
+        action: 'retry-open-onboarding',
+        payload: {},
+      }),
+    ).rejects.toMatchObject({ code: 'hiring_activation_blocker_stale' })
+
+    expect(withTransactionMock).not.toHaveBeenCalled()
+  })
+
+  it('payload digest de resolve-blocker es estable y no depende del orden de llaves', () => {
+    const left = computeHiringActivationBlockerPayloadDigest({
+      hiringHandoffId: 'hhof-1',
+      blockerKey: 'onboarding_template_missing',
+      action: 'retry-open-onboarding',
+      payload: { reason: 'ok', extra: { b: 2, a: 1 } },
+    })
+
+    const right = computeHiringActivationBlockerPayloadDigest({
+      hiringHandoffId: 'hhof-1',
+      blockerKey: 'activation:onboarding_template_missing',
+      action: 'retry-open-onboarding',
+      payload: { extra: { a: 1, b: 2 }, reason: 'ok' },
+    })
+
+    expect(left).toBe(right)
   })
 })

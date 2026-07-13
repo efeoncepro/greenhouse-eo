@@ -10,6 +10,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { resolveWorkforceActivationReadiness } from '@/lib/workforce/activation/readiness'
 import type { WorkforceActivationReadiness } from '@/lib/workforce/activation/types'
 
+import { deriveHiringActivationBlockers } from './blockers'
 import { isHiringActivationEnabled } from './config'
 import {
   getActivationRequestByHandoffId,
@@ -17,7 +18,7 @@ import {
   HIRING_ACTIVATION_COLUMNS,
   type HiringActivationRequestRow,
 } from './store'
-import type { HiringActivationRequest } from './types'
+import type { HiringActivationActionableBlocker, HiringActivationRequest } from './types'
 
 export interface HiringActivationQueueItem extends InternalHireQueueItem {
   request: HiringActivationRequest | null
@@ -69,6 +70,9 @@ export interface HiringActivationDetail {
   handoff: HiringHandoff
   request: HiringActivationRequest | null
 
+  /** Blockers accionables para UI/Nexa: contrato payload + capability + surface alternativa. */
+  blockers: HiringActivationActionableBlocker[]
+
   /** Readiness LIVE del member (si existe) — fuente: resolver workforce canónico. */
   readiness: WorkforceActivationReadiness | null
 
@@ -96,6 +100,7 @@ export const getHiringActivationDetail = async (
   return {
     handoff,
     request,
+    blockers: deriveHiringActivationBlockers({ request, readiness }),
     readiness,
     readyToActivate: readiness?.ready ?? false,
   }

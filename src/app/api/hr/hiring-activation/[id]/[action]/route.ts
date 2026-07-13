@@ -11,22 +11,26 @@ import {
   cancelHiringActivation,
   completeHiringActivation,
   createMemberForHiringActivation,
+  getHiringActivationBlockerActionContract,
   isHiringActivationEnabled,
   isHiringActivationError,
   openOnboardingForHiringActivation,
   reviewHiringActivation,
+  resolveHiringActivationBlocker,
 } from '@/lib/workforce/hiring-activation'
 
 export const dynamic = 'force-dynamic'
 
 /**
- * TASK-770 — Commands del bridge: POST /api/hr/hiring-activation/[id]/(review|create-member|
- * open-onboarding|complete|cancel). [id] = hiring_handoff_id (UNIQUE del request).
+ * TASK-770/1400 — Commands del bridge: POST /api/hr/hiring-activation/[id]/(review|
+ * create-member|open-onboarding|resolve-blocker|complete|cancel). [id] = hiring_handoff_id
+ * (UNIQUE del request).
  *
  * Capabilities least-privilege por acción (matriz TASK-873, sin proliferar):
  * - review / complete / cancel → `hiring.activation.review` (la única nueva de 770)
  * - create-member → `workforce.member.intake.update` (reusada — es trabajo de intake)
  * - open-onboarding → `hr.onboarding_instance` create (reusada, TASK-030)
+ * - resolve-blocker → capability del action contract interno (`retry-*`, TASK-1400)
  *
  * La ACTIVACIÓN del colaborador NO vive acá: pasa por completeWorkforceMemberIntake +
  * readiness (path existente). `complete` solo cierra el bridge con evidencia.
@@ -42,7 +46,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return hiringNotFoundResponse('El bridge de activación no está habilitado.', 'hiring_activation_disabled')
   }
 
-  let body: { reasonDetail?: string } = {}
+  let body: { reasonDetail?: string; blockerKey?: string; action?: string; payload?: unknown } = {}
 
   try {
     const raw = await request.text()
@@ -83,6 +87,62 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         return NextResponse.json(await openOnboardingForHiringActivation({ hiringHandoffId: id, actorUserId: actor }))
       }
 
+      case 'resolve-blocker': {
+        const actionContract = getHiringActivationBlockerActionContract(body.action)
+
+        if (!actionContract) {
+          if (!can(tenant, 'hiring.activation.review', 'execute', 'tenant')) {
+            return canonicalErrorResponse('forbidden', { extra: { requiredCapability: 'hiring.activation.review' } })
+          }
+        } else if (
+          !can(
+            tenant,
+            actionContract.requiredCapability,
+            actionContract.requiredCapabilityAction,
+            actionContract.requiredScope,
+          )
+        ) {
+          return canonicalErrorResponse('forbidden', {
+            extra: {
+              requiredCapability: actionContract.requiredCapability,
+              requiredAction: actionContract.requiredCapabilityAction,
+            },
+          })
+        }
+
+        if (typeof body.blockerKey !== 'string' || !body.blockerKey.trim()) {
+          return NextResponse.json(
+            {
+              error: 'Debes indicar blockerKey para resolver un blocker de activación.',
+              code: 'hiring_activation_blocker_payload_invalid',
+              actionable: false,
+            },
+            { status: 400 },
+          )
+        }
+
+        if (typeof body.action !== 'string' || !body.action.trim()) {
+          return NextResponse.json(
+            {
+              error: 'Debes indicar action para resolver un blocker de activación.',
+              code: 'hiring_activation_blocker_payload_invalid',
+              actionable: false,
+            },
+            { status: 400 },
+          )
+        }
+
+        return NextResponse.json(
+          await resolveHiringActivationBlocker({
+            hiringHandoffId: id,
+            actorUserId: actor,
+            blockerKey: body.blockerKey,
+            action: body.action,
+            payload: body.payload,
+          }),
+        )
+      }
+
       case 'complete': {
         if (!can(tenant, 'hiring.activation.review', 'execute', 'tenant')) {
           return canonicalErrorResponse('forbidden', { extra: { requiredCapability: 'hiring.activation.review' } })
@@ -106,8 +166,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
   } catch (error) {
     if (isHiringActivationError(error)) {
+      const safeDetail =
+        action === 'resolve-blocker' && error.code === 'hiring_activation_blocker_stale'
+          ? (error.details as { detail?: unknown } | undefined)?.detail
+          : undefined
+
       return NextResponse.json(
-        { error: error.message, code: error.code, actionable: false },
+        { error: error.message, code: error.code, actionable: false, ...(safeDetail ? { detail: safeDetail } : {}) },
         { status: error.statusCode },
       )
     }
