@@ -474,3 +474,21 @@ También quedó anotado un **falso rojo** del propio verify: `locator.hover()` d
 - [ ] Verificación post-deploy contra la URL de producción: `view-source` sin `application/ld+json`, `/muestras/` fuera de `sitemap-index.xml`, rótulo visible sin scrollear.
 - [ ] Entregar el enlace al operador + la captura `hero-desktop.png` a la lámina del deck.
 - [ ] Registrar el enlace como artefacto `client_facing` en `docs/commercial/tenders/sky-blog-2026/README.md`.
+
+## Delta 2026-07-13 (2) — URL tokenizada, por decisión del operador
+
+La ruta pasa de `/muestras/<slug>` a **`/muestras/<slug>-<token>`**.
+
+**Por qué.** La URL sin token es adivinable: quien recibe `/muestras/sky-…` puede probar `/muestras/jetsmart-…`. Hoy no encontraría nada. El día que le hagamos una muestra a un **competidor directo de un cliente vigente**, sí — y esa es una conversación que no queremos tener. El operador decidió tokenizar desde el arranque en vez de dejarlo como regla escrita.
+
+**Slug + token, no token opaco.** Se conserva el slug legible porque el evaluador **lee la URL antes que el H1**: `sky-carretera-austral` se lee como *"esto lo hicieron para nosotros"*, no como una plantilla con el logo cambiado. Un token opaco (`/muestras/r/<token>`, el patrón del grader) no aportaría nada extra — la página revela el cliente apenas carga.
+
+**🔴 El token se DECLARA en el payload, jamás se genera en el build.** Un token aleatorio por build cambiaría la URL en cada deploy, y esta URL va a una **lámina y a una propuesta**. Está validado por el schema (12 hex, `openssl rand -hex 6`). El `verify` lo **lee del payload** en vez de hardcodearlo, para que el gate y la URL real no se separen en silencio.
+
+**Es oscuridad, no seguridad.** No hay auth: quien tenga el enlace, entra. Para una muestra de trabajo, es exactamente lo que queremos — no queremos que el comité tenga que loguearse.
+
+**URL del primer caso:** `https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37`
+
+*(Las imágenes siguen en un path legible, `/muestras/sky-carretera-austral/*.jpg`. Es deliberado: el token protege la **página**, que es la pieza. Un JPEG suelto no prueba nada y hay que adivinar su nombre igual.)*
+
+Commit: `efeonce-think` `2133154`. `verify:aeo-xray` 15/15 · `type-check` limpio.
