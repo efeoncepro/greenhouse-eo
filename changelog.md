@@ -10,6 +10,14 @@
 
 - **Release control plane — Deep Verification ahora provisiona Playwright Chromium.** El primer intento productivo detectó que `ci-deep.yml` ejecutaba tests que lanzan Chromium sin instalar el browser. Se agregó provisioning/cache del headless shell de Playwright y el SHA final pasó CI `29294733436` + Deep Verification `29294733458`. Watchdog manual `29296256877` conserva el residual conocido de `ops-worker` (`838950916b27` vs target `a3b5ea3adb30`), validado como no funcional por diff runtime vacío, `deploy_needed=false` y `Ready=True` en `ops-worker-00487-rjm`; los demás workers están synced.
 
+## 2026-07-13 — TASK-1410 · Radiografía AEO (muestra reutilizable "artículo + su capa de máquina")
+
+Muestra de trabajo para propuestas comerciales, viva en `think.efeoncepro.com/muestras/<slug>-<token>` (repo `efeonce-think`). Tres paneles acoplados: el artículo, su capa de máquina (JSON-LD, metadatos, `alt`, encabezados, cluster) y **la evidencia** de por qué ese artículo existe. Primer caso: licitación SKY. El artículo (Carretera Austral) lo eligió la investigación Semrush, no el redactor.
+
+**Invariante nuevo:** el JSON-LD se renderiza como **texto escapado**, jamás dentro de un `<script type="application/ld+json">`. Emitirlo declararía, en nuestro dominio, que Efeonce publicó un artículo del cliente: un dato estructurado falso, ingerible por crawlers, justo en la pieza cuya tesis es el rigor técnico.
+
+El cliente es un **payload** (Content Collection + Zod), no código: un payload sin `alt`, sin licencia de imagen o sin `as-of` en una cifra rompe el build. URL tokenizada (`openssl rand -hex 6`, declarada en el payload, nunca generada en el build) para que la muestra de un cliente no sea adivinable desde la de otro. Verificado en producción: cero `ld+json`, `noindex`, fuera del sitemap, rótulo visible y acoplamiento vivo.
+
 ## 2026-07-13
 
 - **TASK-1373 STAGING LIVE — Careers apply ahora usa Growth Forms nativo.** `/public/careers/[publicId]/apply` renderiza `<greenhouse-form>` real para `efeonce-careers-application` (`form_key=9f7a8fc0-6fa7-4670-8e2d-efe0ce354001`, version 2, `styleVariant=careers-html-fidelity`) y conserva el form custom como rollback por `CAREERS_NATIVE_GROWTH_FORM_ENABLED`. Rollout sólo a `develop`/staging: Vercel `greenhouse-ldqkedyia` (`dpl_3hdhDYu6VxvadTHbXXH595gstjKj`) Ready en commit `838950916b270c47d1dc7a5f1bc36ce02b9d704f`, alias `dev-greenhouse.efeoncepro.com`; production OFF. Evidencia: GVC staging desktop/mobile PASS (`.captures/2026-07-13T22-07-38_task354-careers-runtime-audit`), API contract PASS, submit sin captcha fail-closed `captcha_failed/missing_token`, smoke sintético Growth Forms → ATS + CV privado PASS con destinations `0`. Se corrigió el helper GVC para no filtrar `x-vercel-protection-bypass` a Sentry.
