@@ -145,18 +145,20 @@ mueve, y este es el orden"* sí.
 | 🔴 **Descalificación** — los 8 casos en que NO vendemos | **`modules/06_DESCALIFICACION.md`** |
 | **Displacement** — el freelancer · la herramienta · el in-house · la agencia titular · **no hacer nada** | **`modules/07_DISPLACEMENT.md`** |
 | 🎯 **Prueba sin mentir** — el puente de atribución que SÍ existe | **`modules/08_PRUEBA.md`** |
-| **Canales, prospección y outbound** — de dónde salen los deals | **`modules/09_CANALES_OUTBOUND.md`** |
+| **Canales** — outbound · cross-sell · 🎯 **PAID al Grader (la aritmética)** · licitaciones · inbound propio | **`modules/09_CANALES_OUTBOUND.md`** |
+| 🎯 **PROSPECCIÓN — el manual del vendedor** *(cómo se construye la lista, las señales de compra, el ritmo semanal, la matemática del pipeline)* | **`modules/13_PROSPECCION.md`** |
 | **La conversación** — discovery *(las 9 preguntas)*, propuesta, negociación, QBR | **`modules/10_CONVERSACION.md`** |
 | **El retainer que sobrevive** — por qué la mayoría muere al mes 9 | **`modules/11_RETENCION.md`** |
-| 🎯 **El arsenal** — qué activos tenemos DE VERDAD *(auditado contra el repo: el Grader ya da los Fix-It, el SEO no tiene plataforma, la landing de SEO no entrega leads)* | **`modules/12_ACTIVOS.md`** |
+| 🎯 **El arsenal Y CÓMO SE USA CADA ACTIVO** — la cadena Semrush → Grader → Fix-It → reporte → portal *(auditado contra el repo)* | **`modules/12_ACTIVOS.md`** |
 | 🔴 **El estado real de la práctica** — Berel, SKY, el Grader, **cero casos citables** | **`efeonce/ESTADO_ACTUAL.md`** |
 | **Qué se puede afirmar y con qué evidencia** *(+ § Datos que NO se citan)* | **`SOURCES.md`** |
 
 | 🔴 **Lo que NUNCA se hace** *(+ los bugs vivos de Efeonce marcados 🩸)* | **`ANTIPATTERNS.md`** |
 | **El vocabulario de la práctica** *(loaded cost, piso, la cuña, la cicatriz, el puente…)* | **`GLOSSARY.md`** |
 
-**Artefactos listos:** `templates/calculadora-piso.md` · `templates/secuencia-outbound.md` ·
-`templates/guion-reunion-grader.md` · `templates/propuesta-tipo.md`
+**Artefactos listos:** `templates/hoja-de-cuenta.md` *(se llena ANTES de tocar la puerta)* ·
+`templates/secuencia-outbound.md` · `templates/guion-reunion-grader.md` ·
+`templates/propuesta-tipo.md` · `templates/calculadora-piso.md`
 
 🔴 **Carga solo el módulo que la tarea necesita.** `SOURCES.md` se carga **siempre** que vayas a citar un número.
 

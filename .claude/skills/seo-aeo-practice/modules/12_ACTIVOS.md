@@ -177,7 +177,68 @@ Aguas Andinas · BeFUN · Gobierno de Santiago · Universidad de Temuco.**
 
 ---
 
-## 8. Las cinco acciones que este inventario ordena
+## 8. 🎯 CÓMO SE USA CADA ACTIVO — la cadena, no la lista
+
+> 🔴 **Los activos no son un catálogo. Son una SECUENCIA.**
+> **Cada uno mueve al prospecto un paso — y cada uno se entrega a cambio de algo distinto.**
+
+```
+PROSPECCIÓN         Semrush            → encuentras el incendio (caída de tráfico)
+   ↓
+EL GANCHO           El Grader          → "estás invisible en 4 de 7"      [GRATIS, sin pedir nada]
+   ↓
+LA REUNIÓN          Reporte público    → lo abre y lo comparte con su comité SIN NOSOTROS
+   + los Fix-It     json_ld · llms.txt → 🎯 EL CÓDIGO PARA ARREGLARLO     [GRATIS, sin pedir nada]
+   + la escalera    5-Be               → el mapa mental de dónde está
+   + los logos      Sky · ANAM · …     → "empresas serias nos dejan entrar"
+   ↓
+LA PROPUESTA        Deck (estructura SKY) + el cotizador
+   ↓
+EL CIERRE           El portal          → "vas a poder ver todo, sin creernos nada"
+   ↓
+SI NO CIERRA        Ebooks + Glitch    → nurturing                        [a cambio del email]
+```
+
+### Activo por activo
+
+| Activo | 🎯 **Cuándo se usa** | Cómo | Qué pides a cambio |
+|---|---|---|---|
+| **Semrush** | 🎯 **Prospección, antes de tocar** | **Encontrar el incendio**: caída de tráfico >20% en 12 meses + si paga Ads. **Los 5 filtros se verifican sin hablar con nadie** *(→ `13_PROSPECCION`)* | — |
+| 🎯 **El Grader** | 🎯 **El gancho Y la reunión** | **Corrido sobre él Y sobre 2-3 competidores.** El primer correo dice algo que él no sabe de su propio negocio | 🔴 **NADA. Y decirlo: *"si está bien, te lo digo y no te molesto más"*** |
+| 🎯 **Los Fix-It Artifacts** | 🎯 **El cierre de la reunión 1** | 🔴 **El movimiento más fuerte que tenemos:** *"Acá está el `json_ld` que necesitas y el `llms.txt`. **Son tuyos, aunque no me contrates.**"* | 🔴 **NADA.** *(Y por eso funciona)* |
+| **El reporte público** *(Think)* | **Reunión 1 + la propuesta** | 🎯 **Se lo mandas con link.** **Lo abre y lo comparte con su comité SIN nosotros presentes** — y ahí es donde se vende solo | — |
+| **La escalera 5-Be** | **Reunión 1, al abrir** | Le da **un mapa mental**: *ser encontrada → legible → correcta → accionable → intrínseca*. **Le ordena la cabeza antes de darle el score** | — |
+| **Los logos** *(Sky · ANAM · Berel · Carozzi · Bresler · Marca Chile · Aguas Andinas…)* | **Reunión 1, al cerrar** | 🎯 **No prueban resultados. Prueban que empresas serias nos dejan entrar** — y en una categoría con déficit de confianza, **eso vale** | — |
+| **La landing de AEO** *(`/aeo-2/`)* | **Paid + inbound** | **La puerta del Grader.** El destino de LinkedIn / retargeting Meta / Google al dolor | El form |
+| 🔴 **La landing de SEO** | **Paid + inbound** | 🔴🔴 **HOY NO SIRVE: los leads no llegan al CRM** *(`deliveryMode=disabled`)* | 🔴 **Arreglar antes de pautear** |
+| **Los 2 ebooks** *(«El fin de la web» · «Surround Discovery»)* | 🎯 **Nurturing — el que NO está listo** | **El "ahora no" no se pierde: se nutre.** Y el ebook mantiene la conversación viva 6 meses | **El email** |
+| **Blog + Glitch** | **Autoridad, de fondo** | Sostiene todo lo demás. **Una agencia de AEO invisible no tiene argumento** | — |
+| **El portal / `/aeo`** | 🎯 **El cierre y la retención** | *"Vas a poder entrar cualquier día y ver qué hicimos y qué se movió — **sin pedirme un reporte y sin creerme nada**"*. 🔴 **Solo AEO. NO prometas la capa de SEO** | — |
+| **El deck de SKY** | **La propuesta** | **La estructura** *(diagnóstico → dónde NO ayudamos → el terreno → el método → la inversión)*. → `templates/propuesta-tipo.md` | — |
+| **El cotizador** | **La propuesta** | 🔴 **Piso 45%.** Ninguna cotización sale sin pasar por él | — |
+| **HubSpot** | **Todo el recorrido** | 🔴 **Toda cuenta tocada se registra, incluido el "no".** **Sin data no hay escala** | — |
+
+---
+
+### 🎯 La escalera de regalos — y por qué es el arma
+
+| Momento | Le das… | Le pides… |
+|---|---|---|
+| **Frío** | 🎯 **El diagnóstico completo** | 🔴 **Nada** |
+| **Reunión** | 🎯 **El código para arreglarlo** *(Fix-It)* | 🔴 **Nada** |
+| **Reunión** | **La verdad de para qué NO le sirve** | 🔴 **Nada** |
+| **Nurturing** | Los ebooks | El email |
+| **Propuesta** | El plan y el precio, con método | **La reunión** |
+
+> ## Le regalas dos veces antes de pedirle una sola cosa. Y la segunda vez le regalas la solución.
+>
+> 🔴 **Eso es lo que ningún competidor puede copiar sin construir un Grader.**
+> **Y es exactamente por eso que los Fix-It están apagados en producción: nadie se dio cuenta de que eran
+> el arma.**
+
+---
+
+## 9. Las cinco acciones que este inventario ordena
 
 | # | Acción | Por qué |
 |---|---|---|
