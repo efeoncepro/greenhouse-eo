@@ -34,6 +34,7 @@ Efeonce **no es SaaS puro** — es agencia + Growth OS/ASaaS. Su motion natural 
 - **Wedge PLG:** AI Visibility Grader (self-serve, AEO) — el "caballo de Troya" que adquiere a near-zero CAC.
 - **Sales-led / relationship:** el retainer de agencia (alto valor, bow-tie, expansión de cuenta — el motor real; win rate 50% en cuentas vs 2–3% en licitaciones frías, `docs/context/08`).
 - **Ecosystem-led:** Kortex/Verk/Greenhouse + integraciones + el ecosistema Think→efeoncepro→experiencia (PDR-003).
+- **Partner-led (HubSpot Solutions Partner):** Efeonce es **Gold** y vende/implementa licencias HubSpot (win rate histórico 40–50%, `docs/context/02_gtm.md:111`). Es una motion con **economía propia** (referral fee 20% hasta 3 años · tier points sourced/managed · deal registration + Proof of Involvement · Best Partner Wins) y **dos motores distintos**: venta nueva (*sourced*) y libro administrado (*managed*, el piso del tier). **Ejecución completa → `hubspot-solutions-partner`** (GTM decide *si* es la motion; esa skill la opera).
 - **Licitaciones (público/privado):** un **canal** de adquisición propio → `greenhouse-public-private-tenders` (no confundir canal con motion).
 La doctrina de `client_kind` (Active/Self-Serve/Project) ya define motions distintas por audiencia → `commercial-expert`.
 

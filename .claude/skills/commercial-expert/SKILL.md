@@ -112,11 +112,12 @@ Toda operación CRM (deals, properties, pipeline) vive en HubSpot portal 4871332
 
 Skill defers a:
 
+- `hubspot-solutions-partner` para **vender/implementar/retener HubSpot como línea de negocio** (licencias, referral fee, tier points, deal registration, battlecards, managed CRM ops). Esta skill aporta el **método** de venta; esa aporta el **dominio** HubSpot.
 - `hubspot-greenhouse-bridge` para mecánica del bridge Cloud Run
 - `hubspot-ops` para CLI ops del portal
 - claude.ai HubSpot MCP para fetching live data
 
-Detalle en `greenhouse-overlay/hubspot-portal-operations.md`.
+⚠️ **Distingue los dos HubSpot:** (a) HubSpot **como CRM interno** de Efeonce — es esta sección; (b) HubSpot **como producto que Efeonce vende** siendo Solutions Partner — es `hubspot-solutions-partner`. No las mezcles.
 
 ### 8. Nubox billing reality
 
@@ -231,7 +232,9 @@ Ad-hoc deal reviews / MEDDPICC cards / forecasts: discutir vía conversation, no
     ├── globe-clients-icp.md           # ICP Globe + anti-ICP
     ├── asaas-positioning.md           # narrative + pitch + pricing ASaaS
     ├── product-suite-positioning.md   # decision tree 4 productos
-    └── (futuros: ico-health-score-integration.md, hubspot-portal-operations.md, nubox-billing-implications.md)
+    └── (futuros: ico-health-score-integration.md, nubox-billing-implications.md)
 ```
 
-V1.0 prioriza los 5 archivos arriba. V1.1 agrega los 3 que faltan según necesidad.
+V1.0 prioriza los 5 archivos arriba. V1.1 agrega los 2 que faltan según necesidad.
+
+**Nota (2026-07-13):** el antiguo pendiente `hubspot-portal-operations.md` quedó **resuelto fuera de este overlay**: el negocio HubSpot (vender/implementar/retener como Solutions Partner) vive ahora en la skill **`hubspot-solutions-partner`**, y la operación técnica del portal en `hubspot-ops`.

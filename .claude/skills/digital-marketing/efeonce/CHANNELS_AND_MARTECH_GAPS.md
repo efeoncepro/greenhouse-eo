@@ -26,7 +26,12 @@
   app source (solo la captura de UTM en forms, arriba). El tracking engine que gobernaría esto
   está **propuesto**, no implementado (`growth-marketing-cro/efeonce/MEASUREMENT_IN_GREENHOUSE.md`).
 - **HubSpot marketing:** **no hay** marketing-email/campaign/landing-page code. HubSpot es
-  CRM-only in-repo. No asumas un módulo de campañas HubSpot.
+  CRM-only **in-repo**. No asumas un módulo de campañas HubSpot.
+  ⚠️ **Delta 2026-07-13 — no confundas dos cosas distintas:** lo anterior describe el **runtime del repo**
+  y sigue siendo cierto. Pero HubSpot **también es un producto que Efeonce vende** (Solutions Partner Gold:
+  licencias + implementación + managed CRM ops). Ese negocio **no es un canal de marketing de este módulo** —
+  vive en la skill **`hubspot-solutions-partner`**. Si la tarea es *vender o implementar HubSpot en un cliente*,
+  no es de `digital-marketing`.
 - **Ad platforms (Google/Meta/LinkedIn/TikTok):** **no hay** integración de ads en el repo. La
   ejecución de pauta es externa (plataformas + MCP donde exista).
 
