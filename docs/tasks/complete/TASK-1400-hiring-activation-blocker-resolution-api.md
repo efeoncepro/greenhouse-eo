@@ -391,6 +391,7 @@ La respuesta del command debe incluir:
 - [x] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible.
 - [x] Se ejecutó chequeo de impacto cruzado sobre TASK-1368 y TASK-770.
 - [x] Si se agregó flag nuevo, quedó registrado en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` — N/A, no se agregó flag.
+- [x] Rollout staging posterior autorizado por operador: `HIRING_HANDOFF_BRIDGES_ENABLED=true` + `HIRING_ACTIVATION_ENABLED=true` en Vercel `staging`; redeploy remoto `greenhouse-ird9fygnf` sobre commit `16d0dc154`; smoke autenticado `/api/hr/hiring-activation?limit=5` → `200 { enabled, items }`; smoke no-mutante `resolve-blocker` con ID inexistente → `404 hiring_activation_not_found`, no disabled.
 
 ## Follow-ups
 
