@@ -12,10 +12,27 @@
 
 ## 0. 🔴 La regla que decide qué páginas existen
 
-> ## Efeonce solo se cita donde HubSpot **no puede o no quiere hablar**.
+> ## Efeonce solo se cita donde HubSpot **no puede o no quiere hablar** — **y donde ese vacío no esté ya lleno.**
 
 Si escribes una página explicando *"qué hace Service Hub"*, **compites con hubspot.com en su propia cancha —
 y pierdes.** Ningún LLM te va a citar a ti sobre eso: la página oficial existe y es mejor.
+
+### 🎯 Delta 2026-07-13 — la segunda mitad de la regla
+
+La regla original decía solo *"donde HubSpot no puede o no quiere hablar"*. **Eso es necesario pero no
+suficiente**, y el hueco apareció al medir *"hubspot vs salesforce"*: HubSpot y Salesforce **efectivamente** no
+pueden hablar ahí (son parte interesada) — **pero el vacío ya lo llenaron veinte millones de páginas.**
+
+| Pieza | ¿HubSpot no puede hablar? | ¿El vacío sigue vacío? | Fuerza |
+|---|---|---|---|
+| **Cuándo NO usar HubSpot** | ✅ jamás lo escribirán | ✅ **vacío real** | 🎯 **La más fuerte** |
+| **Precios de verdad** | ✅ no publican sus trampas | ✅ nadie lo hace en español | Fuerte **+ la única con demanda** |
+| **Agentes: cuáles funcionan** | ✅ no dirán que solo 3 en GA | ✅ vacío (es nuevo) | Fuerte |
+| **HubSpot vs Salesforce** | ✅ son parte interesada | 🔴 **el vacío está LLENO** *(ES 70/mes · MX 20/mes · **20,8M resultados**)* | **La más débil — sobrevive como asset de venta, no por citabilidad** |
+
+🔴 **Consecuencia:** antes de decidir que una página *"llena un vacío"*, **medirlo**. Si ya hay veinte millones
+de resultados, no hay vacío: hay **saturación** — y entonces la pieza necesita **otra** justificación
+(en el caso de vs-Salesforce: **se envía, no se encuentra**).
 
 | La pregunta | ¿La responde hubspot.com? | ¿Vale una página? |
 |---|---|---|
@@ -178,7 +195,13 @@ murieron el 2026-07-13 — no es hipotético)*.
 
 ---
 
-## 🚫 4 · `/servicios/hubspot/cuando-no-usar-hubspot/` — **la bomba**
+## 🚫 4 · **ARTÍCULO** `/hubspot/cuando-no-usar-hubspot/` — **la bomba**
+
+> 🎯 **Delta 2026-07-13 — vive en el BLOG, no en `/servicios/`.** Una página dentro del directorio de lo que
+> vendemos, diciendo *"no nos contrates para esto"*, es **estructuralmente rara** — y el lector (un escéptico
+> profesional) **lee la URL antes que el H1**. Como **artículo firmado y fechado** es un experto publicando un
+> análisis: **más creíble, más citable (E-E-A-T)** y **con dueño de mantenimiento** (Content Factory, revisión
+> trimestral). **Categoría `hubspot`, Gutenberg.** Task: **TASK-1402**.
 
 | | |
 |---|---|
@@ -219,7 +242,19 @@ Y si el problema cambia en dos años, acá estamos."*
 
 ---
 
-## ⚔️ 5 · `/servicios/hubspot/hubspot-vs-salesforce/`
+## ⚔️ 5 · **ARTÍCULO** `/hubspot/hubspot-vs-salesforce/` — **la más débil del hub**
+
+> 🎯 **Delta 2026-07-13 — vive en el BLOG, y hay que ser honestos sobre por qué existe.**
+> Medido: *"hubspot vs salesforce"* mueve **70/mes en ES + 20/mes en MX**, contra **20,8 millones de resultados**.
+> 🔴 **Esta pieza nunca va a ser encontrada. Solo va a ser ENVIADA** — a un CFO, en un correo nuestro, antes de la
+> reunión del comité. **No tiene embudo: tiene un remitente.** Y por eso la URL pesa: `/servicios/...` **le grita
+> "material de ventas" al CFO antes de que lea una palabra**, saboteando la tesis del texto.
+>
+> 🔴 **Su condición de existencia:** frente a esas 20,8M de páginas, **la única diferencia son dos gestos** —
+> **abrir con el Niche Player de Gartner** y **declarar que nuestro propio TCO se cae** si ya tienes un admin de
+> Salesforce. 🎯 **Si se ablandan, esto es la 4.001 del montón, y lo correcto es no publicarlo.**
+> **Categoría `hubspot`, Gutenberg. Task: TASK-1404.** *(Y el blog **no** la exime de la pasada legal: el folder
+> no cambia el marco de la publicidad comparativa.)*
 
 | | |
 |---|---|
@@ -250,15 +285,43 @@ verificar *(su sitio bloquea el fetch: **abre la página y saca screenshot con f
 
 ---
 
+## La forma final del hub
+
+```
+🏛️  efeoncepro.com/servicios/hubspot/          ← PILLAR (landing · 301 desde la URL vieja)
+     "Antes de venderte HubSpot, te mostramos si te sirve."
+     🎯 EL MAPA de los 7 dolores  ← ACÁ VIVEN LOS 7 HUBS. No hay página por Hub.
+     │
+     ├── 💰 /servicios/hubspot/precios/        ← LANDING (+ simulador, TASK-1406)
+     │        "Cuánto cuesta HubSpot de verdad"   ~1.500/mes · la única con demanda
+     │
+     ├── 🤖 /servicios/hubspot/agentes/        ← LANDING
+     │        "Cuáles funcionan de verdad"       (caso ANAM 56%)
+     │
+     ├── 🚫 efeoncepro.com/hubspot/cuando-no-usar-hubspot/     ← ARTÍCULO (blog)
+     │        Los 8 límites, con la fuente al lado.  La más citable.
+     │
+     └── ⚔️ efeoncepro.com/hubspot/hubspot-vs-salesforce/      ← ARTÍCULO (blog)
+              Se envía, no se encuentra.  La más débil.
+```
+
+🎯 **Dos landings (venden) + dos artículos (convencen).** El corte no es de formato: es de **qué queremos que
+haga el lector al terminar**. Las landings piden algo; los artículos, no *(el `/cuando-no-usar/` ni siquiera
+tiene formulario, y su éxito **incluye que el lector se vaya**)*.
+
+🔴 **Los enlaces de vuelta al pillar son obligatorios en los cuatro** — y en los dos artículos, **más**: como
+viven fuera de `/servicios/hubspot/`, **son la única puerta de regreso al hub.**
+
 ## Faseo
 
 | | Qué | Bloqueado por |
 |---|---|---|
 | **F0** | 🎯 **El caso de ANAM verificado + autorizado** | El operador |
 | **F1** | **Pillar (con 301) + `/precios/`** | — |
-| **F2** | 🚫 **`/cuando-no-usar-hubspot/`** | — *(cuesta poco y es la más citable)* |
+| **F2** | 🚫 **Artículo `cuando-no-usar-hubspot`** | — *(cuesta poco y es lo más citable)* |
 | **F3** | 🤖 **`/agentes/`** | **F0** *(sin el caso, es capability sin prueba)* |
-| **F4** | ⚔️ **`/hubspot-vs-salesforce/`** | — |
+| **F4** | ⚔️ **Artículo `hubspot-vs-salesforce`** | — 🔴 **Y si hay que cortar algo, es esta** |
+| **F5** | 💰 **El simulador de precios** (TASK-1405 + 1406) | **F1** |
 
 ---
 

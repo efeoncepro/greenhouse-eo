@@ -1,4 +1,4 @@
-# TASK-1404 — Cluster `/servicios/hubspot/hubspot-vs-salesforce/`: **la comparación que ninguno de los dos te va a dar**
+# TASK-1404 — Artículo `/hubspot/hubspot-vs-salesforce/`: **la comparación que ninguno de los dos te va a dar**
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -8,71 +8,104 @@
 
 - Lifecycle: `to-do`
 - Priority: `P2`
-- Impact: `Alto`
+- Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `layout`
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1404-landing-hubspot-vs-salesforce.md`
-- Flow: `docs/ui/flows/TASK-1404-landing-hubspot-vs-salesforce-flow.md`
-- Motion: `docs/ui/motion/TASK-1404-landing-hubspot-vs-salesforce-motion.md`
+- Flow: `none`
+- Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-019`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `public-site`
+- Domain: `content`
 - Blocked by: `none`
-- Branch: `task/TASK-1404-landing-hubspot-vs-salesforce`
+- Branch: `task/TASK-1404-articulo-hubspot-vs-salesforce`
 
-> **Cluster 4 de 4** del hub HubSpot. Pillar: **TASK-1352** (`/servicios/hubspot/`).
-> **Arquitectura:** [PDR-013](../../public-site/decisions/PDR-013-hub-hubspot-pillar-cluster-arquitectura.md) ·
-> **SSOT de contenido:** [`HUBSPOT_HUB_LANDINGS_SPEC.md`](../../public-site/HUBSPOT_HUB_LANDINGS_SPEC.md) § 5 ·
-> **Dominio:** skill `hubspot-solutions-partner` → `modules/05_DISPLACEMENT.md` + `templates/tco-3y.md`.
+> **Cluster del hub HubSpot que vive en el blog.** Pillar: **TASK-1352** (`/servicios/hubspot/`).
+> **SSOT de contenido:** [`HUBSPOT_HUB_LANDINGS_SPEC.md`](../../public-site/HUBSPOT_HUB_LANDINGS_SPEC.md) § 5.
 >
-> 🔴 **Es la única página del hub que habla de un competidor. Eso trae obligaciones legales concretas** —
-> ver reglas duras 9-10 y la dependencia con `legal-privacy-ip-operator`.
+> 🔴 **La pieza más débil del hub — y ahora sabemos exactamente por qué.** Ver el delta.
+
+## 🔴 Delta 2026-07-13 — de landing a artículo, y una advertencia
+
+**Era** una landing en `/servicios/hubspot/hubspot-vs-salesforce/`. **Ahora es un post del blog:**
+**`efeoncepro.com/hubspot/hubspot-vs-salesforce/`** *(categoría `hubspot`, Gutenberg)*.
+
+**El cambio lo forzó un dato, no una preferencia** (Semrush, 2026-07-13):
+
+| Mercado | *"hubspot vs salesforce"* | Resultados compitiendo |
+|---|---|---|
+| **España** | **70/mes** | 🔴 **20.800.000** |
+| **México** | **20/mes** | — |
+| **EE.UU.** | 2.400/mes · **CPC USD 12,67** | Dominado por G2 + los dos vendors |
+
+🎯 **En todo el bloque hispano esa query mueve menos de 100 búsquedas al mes, y hay veinte millones de páginas
+peleando por ellas.** El espacio está **saturado**: es el contenido más comoditizado del B2B SaaS.
+
+**Tres consecuencias, y hay que decirlas sin adornos:**
+
+1. 🔴 **Esta pieza NUNCA va a ser encontrada. Solo va a ser ENVIADA.** No tiene embudo: **tiene un remitente.**
+   Su lector llega **en un correo nuestro, a un CFO, antes de la reunión del comité.**
+2. 🎯 **Y por eso la URL importa más de lo que parece.** Un CFO que recibe un link a
+   `/servicios/hubspot/hubspot-vs-salesforce/` **lee "material de ventas" en la barra de direcciones antes de
+   leer una palabra** — **saboteando justo la tesis del texto**, que es *"créenos porque abrimos con el dato que
+   nos hace daño"*. Como artículo, es **nuestro análisis**, no nuestro folleto.
+3. 🔴 **La regla de PDR-013 tenía un hueco.** *"Efeonce solo se cita donde HubSpot no puede o no quiere hablar"*
+   es **necesario pero no suficiente**. Falta: **"…y donde ese vacío no lo haya llenado ya todo el mundo."**
+   Aplicada, esta pieza es **la más débil de las cuatro** *(ver `Why This Task Exists`)*.
+
+🔴 **Se mantiene pública, no se convierte en PDF.** 🎯 **Una página que cualquiera puede leer es una posición;
+un PDF es un pitch.** Que el CFO pueda verificar que esto lo publicamos **para todo el mundo** — y no que se lo
+escribimos a él — **es parte del argumento.**
+
+**Y una regla nueva, que es la condición de existencia de la pieza** → ver regla dura 11.
 
 ## Summary
 
-Construye **`/servicios/hubspot/hubspot-vs-salesforce/`**: la comparación **creíble** donde los dos vendors son
-parte interesada. Para el comité que está decidiendo — **CFO, RevOps y CIO**.
+Publica **la comparación creíble donde los dos vendors son parte interesada**. Para el comité que decide —
+**CFO, RevOps y CIO**.
 
 **Abre con la verdad incómoda para nuestro propio lado:** **Gartner puso a HubSpot en Niche Players** del MQ de
 *Sales Force Automation* 2025; los Leaders son **Salesforce, Microsoft y Oracle**. *(Y HubSpot **es** Leader del
-MQ de **B2B Marketing Automation**, 5.º año consecutivo. **Son dos reportes distintos** — y la mitad de los
-partners los mezcla, a propósito.)*
+MQ de **B2B Marketing Automation**, 5.º año. **Son dos reportes distintos** — y la mitad de los partners los
+mezcla, a propósito.)*
 
-Después, **el TCO a 3 años con supuestos declarados** (HubSpot ≈ USD 295k · Salesforce ≈ USD 611k, 30 usuarios,
-lista sin descuento) — **y la honestidad que nadie pone: el delta no lo hace la licencia** (USD 162k vs 189k =
-**solo 17%**). **Lo hace el admin.** 🎯 ***"Si ya tienes un admin de Salesforce en planilla, la mitad de este
-argumento se te cae."***
+Después, **el TCO a 3 años con supuestos declarados** (HubSpot ≈ USD 295k · Salesforce ≈ USD 611k) — **y la
+honestidad que nadie pone: el delta no lo hace la licencia** (USD 162k vs 189k = **solo 17%**). **Lo hace el
+admin.** 🎯 ***"Si ya tienes un admin de Salesforce en planilla, la mitad de este argumento se te cae."***
 
 Y cierra con **dónde gana Salesforce, sin adornos** · **dónde gana HubSpot** · **Agentforce vs Breeze** ·
 **qué se rompe al migrar**.
 
 ## Why This Task Exists
 
-**1. El comité ya vio el Magic Quadrant, y nosotros salimos mal.** El AE de Salesforce **va a llegar con el MQ
-de SFA impreso** — y tiene razón. **Si no lo decimos nosotros primero, nos lo dicen a nosotros.**
-🎯 **La única forma de sobrevivir a un dato que juega en tu contra es traerlo tú, con contexto.** Y el contexto
-existe y es real: **son dos reportes distintos, y HubSpot lidera el otro.**
+**1. El comité ya vio el Magic Quadrant, y nosotros salimos mal.** El AE de Salesforce **va a llegar con el MQ de
+SFA impreso** — y tiene razón. 🎯 **La única forma de sobrevivir a un dato que juega en tu contra es traerlo tú,
+con contexto.** Si lo trae él, el contexto es suyo y nosotros quedamos escondiendo información.
 
 **2. El argumento del TCO, como lo usa el mercado, es deshonesto — y frágil.** Todos los partners muestran
-*"HubSpot cuesta la mitad"*. **Lo que casi nadie dice es que la diferencia no está en la licencia** (17%),
-**sino en el costo del administrador**. Y ese argumento **se cae entero si el cliente ya tiene un admin de
-Salesforce en planilla**. 🎯 **Decirlo antes de que el CFO lo descubra solo nos hace la única fuente creíble
-de la mesa** — y nos ahorra perder el deal en la última reunión.
+*"HubSpot cuesta la mitad"*. **Casi nadie dice que la diferencia no está en la licencia (17%), sino en el costo
+del administrador** — y que **ese argumento se cae entero si el cliente ya tiene un admin de Salesforce en
+planilla**. 🎯 **Decirlo antes de que el CFO lo descubra solo nos hace la única fuente creíble de la mesa.**
 
-**3. Es la página que un LLM necesita para responder "¿HubSpot o Salesforce?".** Hoy solo encuentra a los dos
-vendors y a partners de cada lado. **Falta la comparación con supuestos declarados.**
+**3. 🔴 Pero seamos exactos sobre lo que NO justifica esta pieza.** La versión anterior decía *"es la página que
+un LLM necesita para responder ¿HubSpot o Salesforce?"*. **Eso era una exageración.** El espacio está saturado:
+un LLM que responde esa pregunta **tiene cien fuentes y no necesita la nuestra**. *(Contrastar con
+**TASK-1402**, donde el modelo **no tiene nada** — ese sí es un vacío real.)*
+
+**Lo que sobrevive como justificación es una sola cosa, y es suficiente:** 🎯 **es el asset que se le manda a un
+CFO antes de la reunión decisiva** — y **llega diciendo lo que juega en nuestra contra.** No hay otro documento
+en el mercado que haga eso.
 
 ## Goal
 
-- Ser **creíble donde los dos vendors son parte interesada** — abriendo con lo que juega en nuestra contra.
+- Ser **creíble donde los dos vendors son parte interesada** — abriendo con lo que nos hace daño.
 - Publicar **un TCO con supuestos declarados** y **su límite honesto** (el admin).
-- **Decir dónde gana Salesforce, sin adornos.** *(Una comparación que gana en las 6 dimensiones no es una
-  comparación: es un folleto — y el comité lo sabe.)*
+- **Decir dónde gana Salesforce, sin adornos.**
 - Convertir: **"te armamos el TCO con tus números"** → reunión.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -81,75 +114,77 @@ vendors y a partners de cada lado. **Falta la comparación con supuestos declara
 
 ## Architecture Alignment
 
-**Normativos:**
-
-- 🔴 **[SPEC del hub](../../public-site/HUBSPOT_HUB_LANDINGS_SPEC.md) § 5** — las 6 secciones y qué **no** dice.
-- 🔴 **Skill `hubspot-solutions-partner` → `modules/05_DISPLACEMENT.md`** (battlecards + TCO 3 años + **los mitos
-  que te hacen perder**) + **`templates/tco-3y.md`** + **`SOURCES.md` § *Datos que NO se citan***.
-- **Skill `commercial-expert`** — `frameworks/command-of-the-message.md` (anclar a capacidades requeridas y
-  outcomes, **no a listas de features**) + `negotiation/objection-handling.md`.
-- 🔴 **Skill `legal-privacy-ip-operator`** — **publicidad comparativa**. Es la única página del hub con
-  exposición legal real (regla dura 9).
-- **[PDR-013](../../public-site/decisions/PDR-013-hub-hubspot-pillar-cluster-arquitectura.md)** ·
-  **[PDR-006](../../public-site/decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md)**.
+- 🔴 **[PDR-013](../../public-site/decisions/PDR-013-hub-hubspot-pillar-cluster-arquitectura.md)** — la regla del
+  hub **y su hueco recién descubierto** (*"…y donde ese vacío no esté ya lleno"*).
+- **[PDR-003](../../public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md)** — el blog como
+  superficie de autoridad.
+- **[PDR-006](../../public-site/decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md)** —
+  *evidencia antes que promesa*.
+- 🔴 **Skill `legal-privacy-ip-operator`** — **publicidad comparativa.** 🎯 **Y ojo: el cambio a blog NO cambia el
+  marco legal.** Un claim comparativo con un CTA comercial **es publicidad comparativa esté en la carpeta que
+  esté** — el regulador mira la sustancia, no el folder. **La pasada legal sigue siendo obligatoria.**
 
 ## Normative Docs
 
-- 🔴 `docs/public-site/HUBSPOT_HUB_LANDINGS_SPEC.md` § 5 — **las 6 secciones y qué NO dice.**
-- 🔴 `.claude/skills/hubspot-solutions-partner/modules/05_DISPLACEMENT.md` — battlecards + el TCO a 3 años +
+- 🔴 `docs/public-site/HUBSPOT_HUB_LANDINGS_SPEC.md` § 5 — las 6 secciones y qué **no** dice.
+- 🔴 `.claude/skills/hubspot-solutions-partner/modules/05_DISPLACEMENT.md` — battlecards + el TCO +
   **los mitos que te hacen perder**.
 - 🔴 `.claude/skills/hubspot-solutions-partner/templates/tco-3y.md` — la plantilla del TCO con sus supuestos.
 - 🔴 `.claude/skills/hubspot-solutions-partner/SOURCES.md` § *Datos que NO se citan* — **el MQ verificado.**
-- `.claude/skills/commercial-expert/frameworks/command-of-the-message.md` — anclar a **capacidades requeridas y
-  outcomes**, no a listas de features.
-- 🔴 **Skill `legal-privacy-ip-operator`** — **publicidad comparativa.** Pasada obligatoria antes del publish.
+- `.claude/skills/commercial-expert/frameworks/command-of-the-message.md` — anclar a **capacidades y outcomes**.
+- `docs/documentation/public-site/wordpress-blog-content-hub-search.md` — taxonomía y permalinks del blog.
 
 ## 🔴 Reglas duras
 
 **El dato**
 
-1. 🔴 **Se abre con el dato que juega en nuestra contra.** **Gartner: HubSpot = Niche Player** en el MQ de
-   *Sales Force Automation* 2025 (Leaders: Salesforce, Microsoft, Oracle) ✅.
-   **Y el contexto, que es cierto:** HubSpot **es Leader** en el MQ de **B2B Marketing Automation**, 5.º año ✅.
-   🎯 **Son dos reportes distintos. Decirlo así es lo que nos hace creíbles.**
-   🔴 **NUNCA** *"Líder en CRM según Gartner"* — es falso y **verificable en dos minutos**.
-2. 🔴 **NUNCA citar el Forrester Wave 2026.** **No es verificable** — la propia landing de HubSpot que lo
-   promociona cita, al abrirla, el Wave de **Q3 2024**.
-3. 🔴 **El TCO lleva TODOS sus supuestos declarados, arriba y visibles:** 30 usuarios · **lista sin descuento** ·
-   3 años · qué incluye y qué no. **Un TCO sin supuestos es propaganda con decimales.**
-4. 🎯 **El límite del TCO se declara en la misma región, no en una nota al pie:** *"el delta no lo hace la
-   licencia (USD 162k vs 189k = 17%). **Lo hace el admin.** Si ya tienes un admin de Salesforce en planilla,
-   **la mitad de este argumento se te cae.**"* 🔴 **Esta frase no se suaviza ni se mueve al final.**
-5. 🔴 **NUNCA *"Pardot está muerto"*** ni ninguna afirmación falsa sobre Salesforce. **Es falso, es verificable
-   en nuestra contra, y nos borra la credibilidad de la página entera** *(que es lo único que la página tiene)*.
-6. 🔴 **Ningún dato de Salesforce sin verificar.** ⚠️ **Su sitio bloquea el fetch programático** → **abrir la
-   página en un navegador real y guardar screenshot con fecha.** Los datos sin verificar **no se publican**.
-7. 🔴 **Se dice dónde gana Salesforce, sin adornos:** CPQ complejo · territorios · forecasting multinivel ·
-   extensibilidad (Apex, AppExchange) · modelos de datos B2B muy complejos.
-   🎯 **Una comparación que gana en las 6 dimensiones no es una comparación: es un folleto. Y el comité lo sabe.**
-8. 🔴 **Claims prohibidos** del hub + **nomenclatura 2026**.
+1. 🔴 **Se abre con el dato que juega en nuestra contra.** **Niche Player** en el MQ de *SFA* 2025 ✅ (Leaders:
+   Salesforce, Microsoft, Oracle) — **y el contexto: Leader en el MQ de B2B Marketing Automation, 5.º año** ✅.
+   **Son dos reportes distintos, y se dice.** 🔴 **NUNCA *"Líder en CRM según Gartner"*.**
+2. 🔴 **NUNCA el Forrester Wave 2026** — **no es verificable** (la landing de HubSpot que lo promociona cita, al
+   abrirla, el Wave de **Q3 2024**).
+3. 🔴 **El TCO lleva TODOS sus supuestos declarados, arriba.** **Un TCO sin supuestos es propaganda con decimales.**
+4. 🎯 **El límite del TCO va en la misma sección, sin suavizar:** *"el delta no lo hace la licencia (162k vs 189k
+   = 17%). **Lo hace el admin.** Si ya tienes un admin de Salesforce en planilla, **la mitad de este argumento se
+   te cae.**"* 🔴 **No se mueve al final. No va en una nota al pie.**
+5. 🔴 **NUNCA *"Pardot está muerto"*** ni ninguna afirmación falsa sobre Salesforce. **Falso, verificable en
+   nuestra contra, y borra la credibilidad de todo el texto** — que es lo único que tiene.
+6. 🔴 **Ningún dato de Salesforce sin verificar en navegador real** (su sitio bloquea el fetch) **+ screenshot
+   fechado y archivado.**
+7. 🔴 **Se dice dónde gana Salesforce, sin adornos y sin ironía.** 🎯 **Una comparación que gana 6-0 no es una
+   comparación: es un folleto — y el comité lo huele en diez segundos.**
+8. 🔴 **Registro técnico. Cero adjetivos.** *"USD 189k a 3 años"* es un hecho; *"carísimo"* es una opinión —
+   **y una opinión acá es publicidad comparativa denigrante, que en Chile y LATAM tiene reglas.**
+   **La frialdad no es un tono: es una defensa.**
 
-**Legal (la única página del hub con esta exposición)**
+**Legal**
 
-9. 🔴 **Publicidad comparativa: se rige por reglas, no por ganas.** En Chile y en la mayoría de LATAM, la
-   comparación con un competidor **debe ser objetiva, verificable y no engañosa**, y **no puede denigrar** al
-   competidor. Traducción operativa:
-   - **Todo claim comparativo cita su fuente y su fecha.**
-   - **Cero adjetivos denigrantes** sobre Salesforce (*"caro"*, *"pesado"*, *"obsoleto"*, *"un dinosaurio"*).
-     🎯 **Los hechos, sin editorializar: "USD 189k a 3 años" no es un insulto. "Carísimo" sí.**
-   - **Cero uso de marcas ajenas más allá de la mención nominativa** (nombrar para comparar es legítimo;
-     **usar su logo, su tipografía o su identidad, no**).
-   - 🔴 **Antes de publicar, pasada de `legal-privacy-ip-operator`.** *(Es orientación, no asesoría legal — pero
-     la revisión no es opcional.)*
-10. 🎯 **La página se escribe asumiendo que un abogado de Salesforce la va a leer.** Y **también asumiendo que
-    la va a leer el AE de Salesforce que compite con nosotros por el deal.** 🎯 **Si al leerla él no puede
-    señalar ni un solo error, ganamos** — porque entonces el comité tampoco puede.
+9. 🔴 **Publicidad comparativa: objetiva, verificable, no engañosa, no denigrante.**
+   **Cero logos, cero identidad visual de Salesforce** (mención nominativa ✅ · marca ajena ❌).
+   🔴 **Pasada de `legal-privacy-ip-operator` antes del publish** — 🎯 **y el cambio a blog NO la exime:
+   el folder no cambia el marco legal.**
+10. 🎯 **Se escribe asumiendo dos lectores hostiles:** un **abogado de Salesforce** y **el AE de Salesforce que
+    compite por el deal**. **Si ninguno de los dos puede señalar un solo error, el comité tampoco puede.**
 
-**Build**
+**La condición de existencia (nueva, y es la más importante)**
 
-- Ohio nativo bajo el pillar. CSS page-scoped. `Document::save()`. Snapshot + purge + rollback.
-- **Sin logos de Salesforce.** Texto. **Full API Parity por reuso.** **es-LATAM neutro.**
-- **Hereda el motion contract del pillar.** Tier **restraint**.
+11. 🔴 **Los dos movimientos son la pieza. Si se ablandan, la pieza no vale nada.**
+    Frente a veinte millones de páginas iguales, **nuestra única diferencia real son dos gestos**:
+    **(a)** abrir con el **Niche Player** de Gartner, y **(b)** declarar que **nuestro propio argumento del TCO
+    se cae** si ya tienes un admin de Salesforce.
+    🎯 **Es exactamente lo que se ablanda en la última revisión** — alguien va a decir *"¿no suena muy negativo
+    abrir así?"*. **La respuesta es no, y es la única razón por la que el texto existe.**
+    🔴 **Si al escribirla cualquiera de los dos se suaviza, la pieza es la 4.001 del montón — y entonces
+    lo correcto es NO publicarla.**
+
+**Formato (del cambio a blog)**
+
+12. 🔴 **Es un `post`, no una `page`.** Categoría **`hubspot`**. Permalink **`/hubspot/hubspot-vs-salesforce/`**.
+    **Gutenberg.** **Byline de persona real** + `Article` con `author`/`datePublished`/`dateModified`.
+13. 🔴 **Sin formulario embebido.** El CTA es **un enlace a HubSpot Meetings**.
+    🎯 **Un artículo que termina en un form embebido se lee como un post de lead-gen; un enlace para agendar se
+    lee como una oferta.** *(Y el lector que más importa —el CFO— **ya está hablando con nosotros**: el link se
+    lo mandamos.)*
 
 ## Dependencies & Impact
 
@@ -157,21 +192,23 @@ vendors y a partners de cada lado. **Falta la comparación con supuestos declara
 
 - 🔴 **Verificación manual de los datos de Salesforce** — ⚠️ **su sitio bloquea el fetch programático** →
   **navegador real + screenshot fechado + archivado** (Slice 1, bloqueante).
-- 🔴 **Pasada de `legal-privacy-ip-operator`** (Slice 2) — **bloquea el publish**, no el build.
-- Reverificación de precios de HubSpot + del MQ · `<greenhouse-form>` + Meetings (reuso) · CORS `/servicios/*`.
+- 🔴 **Pasada de `legal-privacy-ip-operator`** (Slice 2) — **bloquea el publish**.
+- 🔴 **La decisión del byline.**
+- Reverificación de precios de HubSpot + del MQ.
 
 ### Blocks / Impacts
 
-- **Arma al equipo comercial para el comité.** 🎯 **Es el asset que se le manda a un CFO antes de la reunión
-  decisiva** — llega diciendo lo que juega en nuestra contra.
-- Alimenta a `/precios/` (el TCO) y a `/cuando-no-usar-hubspot/` (**"dónde gana Salesforce" es la mitad de esos
+- 🎯 **Arma al equipo comercial para el comité.** **Es el asset que se le manda a un CFO antes de la reunión
+  decisiva** — y ese es, hoy, **su único uso real**.
+- Alimenta a TASK-1401 (el TCO) y **se apoya en TASK-1402** (*"dónde gana Salesforce"* **es la mitad de esos
   límites**).
+- **Alimenta la categoría `hubspot` del blog.**
 
 ### Files owned
 
-- Esta task · `docs/ui/wireframes/TASK-1404-*` · `docs/ui/flows/TASK-1404-*` · `docs/ui/motion/TASK-1404-*`.
-- La página WordPress nueva · su scenario GVC · su fila en el landing registry · **los screenshots fechados de
-  Salesforce** (evidencia interna, archivada, **no publicada**).
+- Esta task · `docs/ui/wireframes/TASK-1404-landing-hubspot-vs-salesforce.md`.
+- El post de WordPress (`post`, categoría `hubspot`) · **los screenshots fechados de Salesforce** (evidencia
+  interna, archivada, **no publicada**).
 
 ## Current Repo State
 
@@ -179,21 +216,21 @@ vendors y a partners de cada lado. **Falta la comparación con supuestos declara
 
 - `modules/05_DISPLACEMENT.md` (battlecards + el TCO a 3 años + **los mitos que te hacen perder**) ·
   `templates/tco-3y.md` · `SOURCES.md` con **el MQ verificado** (SFA = Niche · B2B MA = Leader).
-- El patrón de build bajo `/servicios/` (TASK-1343) · Growth Forms.
+- **La categoría `hubspot`** del blog · **el write path de Content Factory** (Gutenberg).
 
 ### Gap
 
-- La página no existe · el copy sin draftear · JSON-LD sin definir.
+- El artículo no existe · el copy sin draftear · el **byline** sin decidir.
 - 🔴 **Los datos de Salesforce sin verificar en navegador real** (sin screenshots fechados).
 - 🔴 **La pasada legal sin hacer.**
 
 ## Modular Placement Contract
 
 - Topology impact: `public`
-- Current home: sitio público WordPress/Ohio en Kinsta; página nueva bajo el pillar `/servicios/hubspot/`.
+- Current home: WordPress en Kinsta; `post` en Gutenberg, categoría `hubspot`, permalink `/hubspot/hubspot-vs-salesforce/`.
 - Future candidate home: `public`
-- Boundary: la landing es consumer del renderer público de Growth Forms y del agendador HubSpot Meetings; el TCO es contenido editorial verificado, no un cálculo en vivo.
-- Server/browser split: `n/a` — sitio público sin Client Components de portal; cero secretos, cero SDK, cero DB, cero librería de charts.
+- Boundary: el artículo no consume ningún contrato del repo; es contenido editorial con enlaces externos a fuentes oficiales y un enlace de vuelta al pillar.
+- Server/browser split: `n/a` — contenido estático servido por WordPress; cero secretos, cero DB, cero form, cero JavaScript propio, cero librería de charts.
 - Build impact: `none`
 - Extraction blocker: `none`
 
@@ -201,138 +238,128 @@ vendors y a partners de cada lado. **Falta la comparación con supuestos declara
 
 ### Experience brief
 
-- UI rigor: `ui-standard`
-- Usuario / rol: 🎯 **el comité que decide — tres cabezas con tres criterios:** **el CFO** (le importa el número
-  a 3 años, **y va a auditar los supuestos**) · **RevOps** (le importa si se van a quedar cortos) · **el CIO**
-  (extensibilidad y riesgo de migración; **probablemente ya tiene Salesforce en la casa**).
-- Momento del flujo: *"tengo dos vendedores diciéndome cosas opuestas y los dos tienen un PDF que lo prueba."*
+- UI rigor: `ui-lite` 🎯 **(bajó al pasar a blog: el tema resuelve tipografía, jerarquía y responsive. Lo único
+  con requisito propio es la tabla del TCO y la simetría de las dos secciones "dónde gana X".)**
+- Usuario / rol: 🎯 **el comité — CFO** (audita los supuestos), **RevOps** (¿nos quedamos cortos?), **CIO**
+  (extensibilidad y migración; **probablemente ya tiene Salesforce en la casa**).
+- Momento del flujo: 🔴 **le llegó el link en un correo nuestro.** *"Tengo dos vendedores diciéndome cosas
+  opuestas y los dos tienen un PDF que lo prueba."*
 - Resultado perceptible esperado: 🎯 **poder defender la decisión ante su directorio sin quedar expuesto.**
-  **No está eligiendo un CRM: está protegiendo su carrera.**
-- Fricción que debe reducir: el miedo a que **el vendedor le esté ocultando algo** — que es el miedo por defecto
-  de un comité, **y el correcto**.
-- No-goals UX: no compara con Microsoft/Zoho/Pipedrive/Odoo · **no denigra a Salesforce** · no publica una
-  calculadora de TCO.
+  **No está eligiendo un CRM: está protegiendo su carrera.** Que pueda decir: *"sí, sabía lo del Magic Quadrant.
+  Y acá está por qué elegí igual."*
+- Fricción que debe reducir: el miedo a que **el vendedor le esté ocultando algo**.
+- No-goals UX: no compara con Microsoft/Zoho/Pipedrive/Odoo · **no denigra a Salesforce** · **no publica una
+  calculadora de TCO** · **no lleva form embebido**.
 
 ### Surface & system decision
 
-- Surface: `efeoncepro.com/servicios/hubspot/hubspot-vs-salesforce/`.
-- Composition Shell: `no aplica` (sitio público).
-- Primitive decision: `reuse` — section header + `<table>` + `<greenhouse-form>`. **Cero primitives nuevas.**
-- Adaptive density / The Seam: `no aplica`.
-- Floating/Sidecar/Dialog decision: **ninguno.**
-- Copy source: contenido de página pública. 🔴 **Registro técnico y frío. CERO adjetivos.**
-- Access impact: `none` (pública).
+- Surface: **post de WordPress**, categoría `hubspot`, `/hubspot/hubspot-vs-salesforce/`. **Gutenberg.**
+- Composition Shell: `no aplica`.
+- Primitive decision: `reuse` — **bloques Gutenberg nativos** (`core/heading`, `core/paragraph`, **`core/table`**,
+  `core/list`). 🔴 **Cero bloques custom, cero CSS de página, cero librería de charts.**
+- Floating/Sidecar/Dialog decision: 🔴 **ninguno.** Y **verificar que el tema no inyecte pop-up/sticky CTA**.
+- Copy source: contenido del post. 🔴 **Registro técnico y frío. CERO adjetivos.**
+- Access impact: `none`.
 
 ### State inventory
 
-- Default: todo visible. 🔴 **Sin JS también** (TCO + supuestos + la frase del admin + R4).
-- Loading / Empty / Permission denied: `n/a`.
-- Error: el form falla → Error Card del renderer.
-- Degraded / partial: el form no monta → 🔴 **fallback link visible**.
-- Long content: la tabla del TCO scrollea dentro de su contenedor.
-- Mobile / compact (390 px): la tabla colapsa a tarjetas, **con los supuestos siempre visibles**.
-- Keyboard / focus: tabla alcanzable por teclado; **el ganador de cada fila va escrito**, no solo por color.
-- Reduced motion: **todo visible y estático**, sin pérdida.
-- 🔴 **Un claim resulta incorrecto:** **se corrige Y se anota la corrección en la página.**
+- Default: todo visible. 🔴 **Sin JS es idéntico.**
+- Loading / Empty / Error / Permission denied: `n/a` — **no hay form ni estado async.**
+- Long content: la tabla del TCO scrollea **dentro de su contenedor**.
+- Mobile (390 px): la tabla colapsa a tarjetas, **con los supuestos siempre visibles**.
+- Keyboard / focus: tabla alcanzable; **el ganador de cada fila va escrito**, no solo por color.
+- Reduced motion: **idéntico** (no hay motion propio).
+- 🔴 **Un claim resulta incorrecto:** **se corrige Y se anota la corrección** (`dateModified` + nota).
   🎯 **NUNCA una corrección silenciosa** — con archivo web de por medio, callarla **es peor que el error**.
-- **Salesforce cambia sus precios:** el `as-of` + los screenshots fechados **nos protegen**: dijimos la verdad
-  el día que la dijimos.
+- **Salesforce cambia sus precios:** el `as-of` + los screenshots fechados **nos protegen**: **dijimos la verdad
+  el día que la dijimos.**
 
 ### Interaction contract
 
-- Primary interaction: **leer y auditar.** Ninguna interacción revela contenido.
-- Hover / focus / active: hover de fila (ayuda a leer una tabla comparativa) · CTA con micro-lift + focus ring.
-- Pending / disabled: solo en el form.
-- Escape / click-away: `n/a`.
-- Focus restore: al volver de Meetings, el navegador restaura solo.
-- Toast / alert behavior: `n/a`.
+- Primary interaction: **leer y auditar.** Cero interacciones.
+- Hover / focus / active: los del tema.
+- 🔴 **Prohibido:** pop-up, exit-intent, sticky bar, form embebido.
 
 ### Motion & microinteracciones
 
-- Motion primitive: `CSS` + IntersectionObserver. **Cero librerías de animación y cero librerías de charts.**
-- Enter / exit: fade + rise sobrio (hero 400 ms · regiones 300 ms).
-- Layout morph: **ninguno.**
-- Stagger: hero (60 ms). 🔴 **Entre R4 y R5: CERO. Entran juntas, sin orden.**
-  🎯 **Si "dónde gana Salesforce" entra después o con menos gracia, la honestidad era decorativa** — y el lector
-  lo percibe aunque no sepa nombrarlo. **La simetría del motion es la prueba de que la del contenido era en serio.**
-- Timing / easing token: `--gh-hs-dur-fast: 150ms` · `--gh-hs-dur-base: 300ms` ·
-  `--gh-hs-ease: cubic-bezier(0.2,0,0,1)`.
-- Reduced-motion fallback: todo visible y estático.
-- 🔴 Non-goal motion: **barras que crecen · charts animados · contadores · columnas entrando desde los lados ·
-  transiciones "versus" · flip cards.** 🔴 **Prohibido animar `width`** — *es literalmente cómo se construye la
-  barra comparativa que esta página no puede tener*. 🔴 **Y ninguna cifra puede aparecer antes que sus
-  supuestos**: eso sería, literalmente, **la manipulación que la página denuncia**. Detalle:
-  `docs/ui/motion/TASK-1404-landing-hubspot-vs-salesforce-motion.md`.
+- Motion primitive: 🔴 **`none`.** El tema resuelve hover/focus. **No se agrega ni una animación.**
+- Enter / exit / Layout morph / Stagger: **ninguno.**
+- Reduced-motion fallback: **idéntico.**
+- 🔴 **Non-goal motion (guardrail heredado, y no es estético — es de integridad):** **cero barras que crecen,
+  cero charts animados, cero contadores.** 🎯 **Y la razón grave: una animación que hace que el número "611k"
+  aparezca ANTES que sus supuestos es, literalmente, la manipulación que el texto denuncia.**
+  🔴 **El TCO es una tabla. No un gráfico.** *(Y le regalaría al AE de Salesforce la línea: "mira el show que te
+  montaron".)* **Por eso esta task declara `Motion: none`.**
 
 ### Implementation mapping
 
-- Route / surface: página WordPress nueva bajo el pillar, Ohio nativo, CSS page-scoped.
-- Primitive / variant / kind: `reuse`.
-- Component candidates: **`<table>` del TCO con los supuestos en el `<caption>`** + dos bandas simétricas
-  (R4/R5) + `<details>` (FAQ) + `<greenhouse-form>`. 🔴 **Cero logos de terceros. Cero `<canvas>`.**
-- Copy source: contenido de página pública.
+- Route / surface: `post` WordPress, categoría `hubspot`, Gutenberg, vía **Content Factory** (`wpcli eval-file`).
+- Primitive / variant / kind: `reuse` — bloques nativos.
+- Component candidates: `core/heading` · `core/paragraph` · **`core/table`** (el TCO, con los supuestos en el
+  `<caption>`) · `core/list`. 🔴 **Cero logos de terceros. Cero `<canvas>`.**
+- Copy source: contenido del post.
 - Data reader / command: 🔴 **NINGUNO.** El TCO es **contenido editorial verificado con evidencia archivada**,
-  **no un cálculo en vivo**. *(Una calculadora **miente con precisión** — y en una página comparativa, **un
-  número mal calculado no es un bug de UX: es publicidad engañosa**.)*
-- API parity: **por reuso** (form + Meetings).
+  **no un cálculo en vivo**. *(Una calculadora **miente con precisión** — y en una pieza comparativa, **un número
+  mal calculado no es un bug de UX: es publicidad engañosa**.)*
+- API parity: `n/a`.
 - Access / capability: `none`.
-- States to implement: default · sin-JS · reduced-motion · form-no-monta · 390 px · claim corregido ·
-  `as-of` viejo.
+- States to implement: default · 390 px · claim corregido · `as-of` viejo.
 
 ### GVC scenario plan
 
-- Scenario file: `scripts/frontend/scenarios/public-servicios-hubspot-vs-salesforce.*`
-- Route: `/servicios/hubspot/hubspot-vs-salesforce/` · Viewports: **1440 + 390**
-- Required steps: cargar → capturar R2 (Gartner) → click *"Ver el TCO"* (**verificar scroll + focus a R3**) →
-  🎯 **capturar el TCO con sus supuestos y la frase del admin** → 🎯 **capturar R4 y R5 juntas (simetría)** →
-  abrir 2 FAQs → click CTA.
-- Required captures: full-page (desktop + mobile) · **R2** · 🎯 **el TCO completo** · 🎯 **R4 + R5 lado a lado** ·
-  FAQ abierto · **reduced-motion** · **tarjetas en 390 px**.
-- Required `data-capture` markers: `hero` · **`gartner`** · **`tco`** · **`sf-gana`** · **`hs-gana`** ·
-  `agentes` · `migrar` · `cta`.
+- Scenario file: `scripts/frontend/scenarios/public-blog-hubspot-vs-salesforce.*`
+- Route: `/hubspot/hubspot-vs-salesforce/` · Viewports: **1440 + 390**
+- Required steps: cargar → capturar la apertura (Gartner) → 🎯 **capturar el TCO con sus supuestos y la frase del
+  admin** → 🎯 **capturar "dónde gana Salesforce" y "dónde gana HubSpot" juntas (simetría)** → click al pillar.
+- Required captures: full-page (desktop + mobile) · **la apertura** · 🎯 **el TCO completo** ·
+  🎯 **las dos secciones lado a lado** · **tarjetas en 390 px** · **el byline + las fechas**.
 - Assertions:
-  - 🔴 **`"Líder en CRM"` NO existe** en el DOM · 🔴 **`Forrester` NO existe** en el DOM.
+  - 🔴 **`"Líder en CRM"` y `Forrester` NO existen** en el DOM.
   - 🔴 **`Pardot` no aparece junto a `muerto`/`obsoleto`/`descontinuado`.**
   - 🔴 **La frase del admin existe** *(assertion literal)*.
   - 🔴 **La sección "Dónde gana Salesforce" existe** *(assertion literal)*.
-  - 🎯 **R4 y R5 tienen el mismo `font-size` de encabezado y el mismo `transition-delay`** *(la simetría,
-    verificada — no asumida)*.
-  - 🔴 **Sin JS:** el TCO, sus supuestos, la frase del admin y R4 **en el HTML servido**.
-  - 🔴 **Ningún `<img>` ni SVG con la marca o el logo de Salesforce** · **ningún `<canvas>`** · **ningún elemento
-    anima `width`**.
-  - **Los supuestos están en el `<caption>`** de la tabla · **cero contadores** · `as-of` visible.
-- Scroll-width checks: sin scroll horizontal de página (1440 y 390).
-- Reduced-motion / focus evidence: captura `prefers-reduced-motion` + tabulación con ring visible.
+  - 🎯 **Las dos secciones tienen el mismo peso tipográfico** *(la simetría, verificada — no asumida)*.
+  - 🔴 **Sin JS:** el TCO, sus supuestos y la frase del admin **en el HTML servido**.
+  - 🔴 **Ningún `<img>`/SVG con la marca o el logo de Salesforce** · **ningún `<canvas>`** · **cero contadores**.
+  - 🔴 **No existe ningún `<form>`, pop-up ni sticky bar** *(incluido el chrome del tema)*.
+  - **`author`/`datePublished`/`dateModified`** presentes · **enlace al pillar presente** · `as-of` visible.
+- Scroll-width checks: sin scroll horizontal de página.
 
 ### Design decision log
 
-- Decision: 🎯 **se abre con el dato que nos hace daño** (Niche Player en el MQ de SFA), **y el límite de nuestro
-  propio TCO se declara en la misma región del TCO**.
-- Alternatives considered: *(a)* **no mencionar el MQ** — es lo que hace todo el mercado, **y es exactamente por
-  lo que ningún comité les cree**. El AE de Salesforce **va a llegar con ese gráfico impreso**: si lo trae él, el
-  contexto es suyo. *(b)* **Poner el límite del admin en una nota al pie** — la versión cobarde, **y el CFO lee
-  las notas al pie**. *(c)* **Barras comparativas animadas** — se ven espectaculares y (i) dramatizan en vez de
-  informar, (ii) animan `width`, (iii) **borran el número para el crawler**, (iv) **le regalan al AE de
-  Salesforce la línea *"mira el show que te montaron"***.
-- Why this pattern: 🎯 **la página se escribe para tres lectores hostiles** — el comité escéptico, **el AE de
-  Salesforce** y **un abogado de Salesforce**. **Si ninguno puede señalar un solo error, el comité tampoco
-  puede.** Y **R4/R5 son simétricas con assertion que lo verifica**: *"confiamos en que quedó parejo"* **no es un
-  contrato**.
-- Reuse / extend / new primitive: `reuse`.
-- Open risks: 🔴 **un dato falso sobre Salesforce** *(se cae la página entera)* · 🔴 **denigración / publicidad
-  comparativa ilícita** *(riesgo real, no teórico)* · 🎯 **que la comparación gane 6-0 y se lea como folleto**
-  *(la tentación por defecto)* · **el argumento del TCO se cae en la reunión** *(mitigado: lo decimos primero)*.
+- 🎯 **Decisión: es un artículo, no una landing — y lo forzó el dato.** Con **<100 búsquedas/mes en español y
+  20,8M de resultados**, **esta pieza nunca va a ser encontrada: solo va a ser enviada.** Y un CFO que recibe un
+  link a `/servicios/...` **lee "material de ventas" antes de leer una palabra** — saboteando la tesis del texto.
+  **Alternativa descartada:** *landing bajo el pillar* — la URL contradice el contenido.
+  **Alternativa descartada:** *PDF adjunto* — 🎯 **una página pública es una posición; un PDF es un pitch.**
+  Que el CFO verifique que esto lo publicamos para todos **es parte del argumento**.
+- 🎯 **Decisión: se abre con el dato que nos hace daño.** El AE de Salesforce **llega con el MQ impreso**.
+  **La única forma de sobrevivir a un dato en contra es traerlo tú, con contexto.**
+  **Alternativa descartada:** *no mencionar el MQ* — es lo que hace todo el mercado, **y es exactamente por lo
+  que ningún comité les cree.**
+- 🎯 **Decisión: el límite de nuestro propio TCO va en la misma sección, sin suavizar.** **Un argumento que se
+  derrumba solo en la última reunión es peor que uno declarado frágil desde el principio** — y este se derrumba
+  **en el 100% de los deals donde el cliente ya tiene Salesforce**, que son **justo los que esta pieza persigue**.
+- 🔴 **Decisión: sin form embebido.** Un artículo que termina en un form se lee como lead-gen; **un enlace para
+  agendar se lee como una oferta.** Y el lector que importa **ya está hablando con nosotros**.
+- 🔴 **Decisión: las dos secciones "dónde gana X" son simétricas, y hay assertion que lo verifica.**
+  🎯 **Si la de Salesforce se ve más chica o más corta, la honestidad era decorativa** — y un comité entrenado lo
+  detecta antes que cualquier argumento. **La simetría no es estética: es el argumento hecho layout.**
+- 🔴 **Decisión: `Motion: none` y `Flow: none`, declarados.** No hay flujo que coordinar, y **la ausencia de
+  motion es de integridad**: una animación que muestre el número **antes** que sus supuestos **es la manipulación
+  que el texto denuncia**. **No son stubs: son decisiones con razón escrita.**
+- **Command of the Message:** no compara features. Compara **capacidades requeridas y outcomes** (adopción,
+  time-to-value, costo de admin, riesgo de migración) — donde vive la decisión real del comité.
 
 ### Visual verification
 
-- GVC scenario: `public-servicios-hubspot-vs-salesforce` · Viewports 1440 + 390.
+- GVC scenario: `public-blog-hubspot-vs-salesforce` · Viewports 1440 + 390.
 - Required captures / markers: ver *GVC scenario plan*.
-- Scroll-width check: sin scroll horizontal de página.
+- Scroll-width check: sin scroll horizontal.
 - Accessibility/focus checks: supuestos en el `<caption>` *(el lector de pantalla los recibe **antes** que los
   números)*; **el ganador de cada fila escrito, no solo por color**; focus ring AA.
-- Before/after evidence: `n/a` (página nueva).
-- Known visual debt: 🎯 **test del revisor** — ¿puede el AE de Salesforce decir *"mira el show que te montaron"*?
-  **Si sí, sobra motion.**
+- Before/after evidence: `n/a` (post nuevo).
+- Known visual debt: 🔴 **verificar que el chrome del tema no inyecte CTA/pop-up en este post.**
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -348,64 +375,59 @@ vendors y a partners de cada lado. **Falta la comparación con supuestos declara
 
 ### Slice 1 — 🔴 Verificación (los dos lados) + evidencia archivada
 
-- **Salesforce:** ⚠️ **su sitio bloquea el fetch programático.** → **Abrir en navegador real, guardar screenshot
-  con fecha** de: precio por edición · costo típico de admin · Agentforce (**USD 0,10 por acción**) · lo que no
-  migra (Apex, managed packages, CPQ, reportes históricos).
-  🔴 **Archivar los screenshots.** Son **la evidencia** de que el claim comparativo era exacto **en su fecha**.
-  *(Y si Salesforce cambia sus precios mañana, la fecha nos protege: dijimos la verdad el día que la dijimos.)*
+- **Salesforce:** ⚠️ **su sitio bloquea el fetch.** → **Abrir en navegador real, guardar screenshot con fecha**
+  de: precio por edición · costo típico de admin · **Agentforce (USD 0,10 por acción)** · lo que no migra (Apex,
+  managed packages, CPQ, reportes históricos).
+  🔴 **Archivar los screenshots.** 🎯 **La fecha es la defensa: si Salesforce cambia sus precios mañana, dijimos
+  la verdad el día que la dijimos.**
 - **HubSpot:** reverificar precios + el MQ (SFA = Niche · B2B MA = Leader).
 - **Rehacer el TCO** con `templates/tco-3y.md` y **declarar cada supuesto**.
 
 ### Slice 2 — 🔴 Pasada legal (`legal-privacy-ip-operator`)
 
-- Revisar **cada claim comparativo**: ¿objetivo? ¿verificable? ¿fechado? ¿no denigrante?
-- Revisar el **uso de la marca Salesforce** (mención nominativa ✅ · logo/identidad ❌).
-- 🔴 **Bloquea el publish**, no el build.
+- Cada claim comparativo: ¿objetivo? ¿verificable? ¿fechado? ¿no denigrante?
+- Uso de la marca Salesforce (mención nominativa ✅ · logo/identidad ❌).
+- 🔴 **Bloquea el publish.** 🎯 **El cambio a blog NO exime: el folder no cambia el marco legal.**
 
 ### Slice 3 — Copy final (`copywriting` + `commercial-expert` + `greenhouse-ux-writing`)
 
-- Copy ledger completo. 🔴 **Registro técnico y frío.** 🎯 **Cero adjetivos.** *"USD 189k a 3 años"* es un hecho;
-  *"carísimo"* es una opinión — **y una opinión en esta página nos cuesta la credibilidad y, potencialmente,
-  una carta.**
-- Answer capsule por H2.
+- 🔴 **Registro técnico y frío. Cero adjetivos.**
+- 🔴 **Guardia de la regla 11:** al revisar, **alguien va a proponer suavizar la apertura de Gartner o la frase
+  del admin.** **La respuesta es no** — y si se suavizan, **la pieza no se publica.**
+- **Decidir el byline** + bio con la credencial.
 
-### Slice 4 — Build
+### Slice 4 — Publicación (Content Factory / Gutenberg) + schema
 
-- Página nueva bajo el pillar, Ohio nativo, `Document::save()`.
-- 🎯 **La región firma: el TCO con sus supuestos Y su límite** — tabla, **texto servido**, con la frase del admin
-  **dentro de la misma región**.
-- Las regiones: **Gartner (la verdad incómoda)** · **dónde gana Salesforce** · **dónde gana HubSpot** ·
-  **Agentforce vs Breeze** · **qué se rompe al migrar**.
+- Post en Gutenberg, categoría `hubspot`, slug `hubspot-vs-salesforce`.
+- 🎯 **El TCO como `core/table`, con los supuestos en el `<caption>`** y la frase del admin **en la misma sección**.
+- Las dos secciones **"dónde gana X"**, **simétricas**.
+- JSON-LD `Article` (`author`/`datePublished`/`dateModified`) + `FAQPage` + `BreadcrumbList`.
+- 🔴 **Enlace al pillar** (única puerta de vuelta) + a TASK-1402 y TASK-1401.
 
-### Slice 5 — AEO + form + schema + verificación
+### Slice 5 — GVC + cierre
 
-- JSON-LD `FAQPage` + `Article` + `BreadcrumbList`. Internal links (pillar obligatorio · `/precios/` ·
-  `/cuando-no-usar-hubspot/` · `/agentes/`). 🔴 **El que no exista, no se pinta.**
-- Form (*"te armamos el TCO con tus números"*) + fallback.
-- Scenario GVC. 🔴 **Assertions:** sin-JS · **`"Líder en CRM"` ausente** · **`Forrester` ausente** ·
-  **`Pardot` + "muerto/obsoleto" ausente** · **la frase del admin presente** *(assertion literal)* ·
-  **la sección "dónde gana Salesforce" presente** *(assertion literal)* · **sin logos de terceros** ·
-  `as-of` visible.
-- Landing registry + landing file + matrix. Purge Kinsta.
+- Assertions (ver GVC plan). Purge Kinsta.
+- 🔴 **Screenshots archivados** + **pasada legal registrada** + **recordatorios** (trimestral: precios ·
+  anual: el MQ).
 
 ## Out of Scope
 
-- Comparaciones con **Microsoft, Zoho, Pipedrive u Odoo** *(**no se pelea por precio contra ellos: se pierde.**
-  Si emerge demanda, es **otra** task)*.
-- El detalle de los agentes (**`/agentes/`**) · los precios completos (**`/precios/`**) · variante `en-US` ·
+- Comparaciones con **Microsoft, Zoho, Pipedrive u Odoo** *(**no se pelea por precio contra ellos: se pierde**)*.
+- El detalle de los agentes (**→ TASK-1403**) · los precios completos (**→ TASK-1401**) ·
   **la calculadora de TCO pública** *(el TCO 1:1 es artefacto de venta, no feature web)*.
+- Variante `en-US` — 🎯 **pero ver Follow-ups: 2.400/mes y CPC USD 12,67.**
 
 ## Detailed Spec
 
-### Las 11 regiones
+### Estructura del artículo
 
-Detalle completo en **`docs/ui/wireframes/TASK-1404-landing-hubspot-vs-salesforce.md`**. El arco:
+Detalle completo en `docs/ui/wireframes/TASK-1404-landing-hubspot-vs-salesforce.md`. El arco:
 
-`hero (la promesa)` → 🎯 **LA VERDAD INCÓMODA, PRIMERO (firma)** → 🎯 **el TCO con sus supuestos Y su límite** →
+`H1` → 🎯 **LA VERDAD INCÓMODA, PRIMERO** → 🎯 **el TCO con sus supuestos Y su límite** →
 🔴 **dónde gana Salesforce** *(obligatoria, simétrica)* → dónde gana HubSpot → Agentforce vs Breeze →
-**qué se rompe al migrar** → cómo decidimos nosotros → FAQ → puente → CTA.
+**qué se rompe al migrar** → cómo decidimos nosotros → FAQ → **enlace al pillar** → CTA.
 
-### R2 — el dato que compra toda la credibilidad de la página
+### La apertura (la mitad de la pieza)
 
 > **Gartner puso a HubSpot en *Niche Players*** del Magic Quadrant de **Sales Force Automation 2025**.
 > Los *Leaders* son **Salesforce, Microsoft y Oracle**. ✅
@@ -415,87 +437,55 @@ Detalle completo en **`docs/ui/wireframes/TASK-1404-landing-hubspot-vs-salesforc
 > 🎯 **La mitad de los partners de HubSpot los mezcla y dice "líder según Gartner". Eso es falso, y se verifica
 > en dos minutos.**
 
-🔴 **Sin peros. Sin suavizar. Sin "pero en realidad…".**
+🔴 **Sin peros. Sin suavizar.** *(Regla dura 11.)*
 
-### R3 — el TCO, con sus supuestos y su límite
+### El TCO, con su límite
 
-**Supuestos, declarados arriba (y en el `<caption>` de la tabla):** 30 usuarios · **lista sin descuento** ·
-3 años · incluye licencias, onboarding y **el costo del administrador** · **no incluye** integraciones custom ni
-migración de datos. 🔴 **Un TCO sin supuestos es propaganda con decimales.**
+**Supuestos declarados** (y en el `<caption>`): 30 usuarios · **lista sin descuento** · 3 años · incluye
+licencias, onboarding y **el costo del administrador** · **no incluye** integraciones custom ni migración.
 
 | | HubSpot | Salesforce |
 |---|---|---|
 | **TCO 3 años** | ≈ **USD 295k** | ≈ **USD 611k** |
 | **Solo licencias** | ≈ USD 162k | ≈ USD 189k → **solo 17% de diferencia** |
 
-🎯 **Y la frase que ningún partner pone, en la misma región y sin suavizar:**
-
-> **El delta no lo hace la licencia. Lo hace el admin.**
+> 🎯 **El delta no lo hace la licencia. Lo hace el admin.**
 > **Si ya tienes un admin de Salesforce en planilla, la mitad de este argumento se te cae.**
-> Y preferimos decírtelo nosotros a que lo descubras tú en la última reunión.
 
-🔴 **No se mueve al final. No va en una nota al pie.** *(Ese argumento se derrumba en el **100%** de los deals
-donde el cliente ya tiene Salesforce — que son **justo los que esta página persigue**.)*
-
-### R4/R5 — la simetría es el argumento
-
-**Dónde gana Salesforce:** CPQ complejo · territorios · forecasting multinivel · extensibilidad (Apex,
-AppExchange) · modelos de datos B2B muy complejos. 🔴 **Sin ironía, sin "pero".**
-**Dónde gana HubSpot:** costo de administración · adopción *(⚠️ el 38% de los fracasos de CRM son de adopción)* ·
-time-to-value · marketing como ciudadano de primera *(y ahí **sí** es Leader)*.
-
-🎯 **Mismo peso tipográfico, mismo tratamiento, mismo instante de entrada — con assertion GVC que lo verifica.**
-**Una comparación que gana 6-0 no es una comparación: es un folleto, y el comité lo huele en diez segundos.**
+🔴 **En la misma sección. Sin suavizar.** *(Regla dura 11.)*
 
 ### Contrato de datos (el que NO existe)
 
-🔴 **Cero reader, cero command, cero endpoint, cero calculadora.** El TCO es **contenido editorial verificado**
-con `as-of` y **evidencia archivada** (los screenshots fechados de Salesforce).
-
-### Evidencia legal (Slice 1 + 2)
-
-⚠️ **El sitio de Salesforce bloquea el fetch programático** → **navegador real + screenshot con fecha + archivo.**
-🎯 **La fecha es la defensa:** si Salesforce cambia sus precios mañana, **dijimos la verdad el día que la dijimos.**
-🔴 **Enlazar a su fuente ✅ · reproducir su logo/identidad ❌.** Son cosas distintas y la página las distingue.
-
-### Structured data
-
-`FAQPage` + `Article` + `BreadcrumbList`.
+🔴 **Cero reader, cero command, cero endpoint, cero calculadora, cero form.**
 
 ## Rollout Plan & Risk Matrix
 
-Página nueva. Riesgo técnico bajo. 🔴 **Riesgo legal y reputacional: el más alto del hub.**
+Post nuevo. Riesgo técnico bajo. 🔴 **Riesgo legal y reputacional: el más alto del hub.**
 
 ### Slice ordering hard rule
 
-🔴 **Slice 1 (verificación, con screenshots archivados) bloquea el copy.**
+🔴 **Slice 1 (verificación con screenshots) bloquea el copy.**
 🔴 **Slice 2 (pasada legal) bloquea el publish.**
-Luego 3 (copy) → 4 (build) → 5 (AEO + GVC).
 
 ### Risk matrix
 
 | Riesgo | Prob. | Mitigación | Señal |
 |---|---|---|---|
-| 🔴 **Un dato falso o desactualizado sobre Salesforce** | **media** | Slice 1: **navegador real + screenshot fechado + archivado**. Sin evidencia, **no se publica** | Salesforce o un cliente nos corrige → **se cae la página entera** |
-| 🔴 **Denigración / publicidad comparativa ilícita** | **media** | Regla dura 9 + **Slice 2 (pasada legal) bloqueante** + registro frío, cero adjetivos | Carta de Salesforce. **Riesgo real, no teórico** |
-| 🔴 **Repetir el mito "Pardot está muerto"** | media | Regla dura 5 + **assertion de DOM** | Verificable en nuestra contra en 30 segundos |
-| 🎯 **Que la comparación gane 6-0 y se lea como folleto** | **alta** *(es la tentación por defecto)* | Regla dura 7 + **assertion literal: la sección "dónde gana Salesforce" debe existir** | El comité deja de creernos en la primera lectura |
-| **El argumento del TCO se cae en la reunión** *(el cliente ya tiene admin de SF)* | **alta** | 🎯 **Lo decimos nosotros primero, en la misma región** (regla dura 4). **Un argumento que se cae solo es peor que uno que se declara frágil** | El CFO lo descubre y perdemos el deal |
-| **Salesforce cambia precios y el TCO envejece** | alta | `as-of` visible + screenshots fechados + revisión trimestral | Drift |
-| **HubSpot cambia de cuadrante en el MQ** | media | `as-of` + revisión anual *(el MQ es anual)* | Nuevo MQ |
+| 🔴 **Alguien suaviza la apertura de Gartner o la frase del admin** | **alta** 🎯 *(es lo que pasa en toda última revisión)* | **Regla dura 11: si se suavizan, NO se publica.** Assertions literales en GVC | **La pieza se vuelve la 4.001 del montón** |
+| 🔴 **Un dato falso sobre Salesforce** | media | Navegador real + screenshot fechado + archivado | **Se cae el texto entero** |
+| 🔴 **Denigración / publicidad comparativa ilícita** | media | Regla dura 9 + **pasada legal bloqueante** + registro frío | Carta de Salesforce |
+| 🎯 **Que gane 6-0 y se lea como folleto** | **alta** | Regla dura 7 + **assertion: la sección "dónde gana Salesforce" debe existir y ser simétrica** | El comité deja de creernos |
+| **El argumento del TCO se cae en la reunión** | alta | 🎯 **Lo decimos nosotros primero** (regla dura 4) | El CFO lo descubre solo |
+| **Salesforce cambia precios / cambia el MQ** | alta / media | `dateModified` + screenshots fechados + revisión (trimestral / anual) | Drift |
+| 🔴 **El tema inyecta un pop-up/sticky CTA** | media | Assertion GVC | Contradice el registro del texto |
 
-### Rollback
+### Rollback plan per slice
 
 | Slice | Rollback | Tiempo |
 |---|---|---|
-| 1-3 | N/A (verificación / legal / copy) | — |
-| 4-5 | Despublicar (`draft`) + purge Kinsta | <5 min |
-| 🔴 **Un claim resulta incorrecto** | **Corregir + anotar la corrección en la página.** **NUNCA editar en silencio** | <30 min |
-
-> 🔴 **Rollback reputacional:** si un claim comparativo resulta incorrecto, se corrige **y se dice**.
-> 🎯 **Una página que existe para ser la fuente creíble no puede corregirse a escondidas** — hacerlo la
-> convierte en lo que denuncia. **Y si alguien archivó la versión anterior, la corrección silenciosa es peor
-> que el error.**
+| 1-3 | N/A | — |
+| 4-5 | Despublicar el post (`draft`) + purge Kinsta | <5 min |
+| 🔴 **Un claim resulta incorrecto** | **Corregir + anotar la corrección** (`dateModified` + nota). **NUNCA en silencio** | <30 min |
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -503,68 +493,57 @@ Luego 3 (copy) → 4 (build) → 5 (AEO + GVC).
 
 ## Acceptance Criteria
 
-- [ ] `/servicios/hubspot/hubspot-vs-salesforce/` responde **200**, cuelga del pillar, con breadcrumb.
-- [ ] 🎯 **Abre con la verdad incómoda:** **Niche Player en el MQ de SFA** ✅ + el contexto (**Leader en B2B
-      Marketing Automation, 5.º año**) ✅. **Los dos, y dicho que son reportes distintos.**
-- [ ] 🔴 **`"Líder en CRM"` NO existe en el DOM.** 🔴 **`Forrester` NO existe en el DOM** (assertions).
-- [ ] 🔴 **`"Pardot"` no aparece junto a "muerto" / "obsoleto" / "descontinuado"** (assertion).
-- [ ] 🎯 **El TCO tiene TODOS sus supuestos declarados y visibles** (30 usuarios · lista sin descuento · 3 años ·
-      qué incluye).
-- [ ] 🔴 **La frase del admin está, en la misma región del TCO, sin suavizar** *(assertion literal:
-      *"si ya tienes un admin de Salesforce en planilla, la mitad de este argumento se te cae"* o su equivalente
-      aprobado)*.
-- [ ] 🔴 **Existe la sección "dónde gana Salesforce"** *(assertion literal)*, sin adornos y sin ironía.
+- [ ] El post responde **200** en `/hubspot/hubspot-vs-salesforce/` (categoría `hubspot`, Gutenberg).
+- [ ] 🎯 **Abre con la verdad incómoda** (Niche Player en SFA) **y su contexto** (Leader en B2B MA, 5.º año),
+      **dicho que son reportes distintos**. 🔴 **Sin suavizar** *(regla 11)*.
+- [ ] 🔴 **`"Líder en CRM"` y `Forrester` NO existen en el DOM.** **`Pardot` no aparece con "muerto/obsoleto".**
+- [ ] 🎯 **El TCO tiene sus supuestos declarados** (y en el `<caption>` de la tabla).
+- [ ] 🔴 **La frase del admin está en la misma sección del TCO, sin suavizar** *(assertion literal)*.
+- [ ] 🔴 **"Dónde gana Salesforce" existe, sin adornos**, y es **visualmente simétrica** a "dónde gana HubSpot"
+      *(assertion verificada, no asumida)*.
 - [ ] 🔴 **Todo dato de Salesforce verificado en navegador real, con screenshot fechado y archivado.**
-- [ ] 🔴 **Cero adjetivos denigrantes** sobre Salesforce. **Cero logos ni identidad visual de terceros.**
+- [ ] 🔴 **Cero adjetivos denigrantes. Cero logos ni identidad visual de terceros. Cero charts, cero contadores.**
 - [ ] 🔴 **Pasada de `legal-privacy-ip-operator` hecha y registrada** antes del publish.
-- [ ] **Agentforce vs Breeze** presente con las dos cifras verificadas (**USD 0,10 por acción** vs
-      **USD 0,50 por conversación resuelta**) y el argumento (*pagas cuando funciona, no cuando lo intenta*).
-- [ ] **Qué se rompe al migrar** presente (Apex · managed packages · CPQ · reportes históricos).
-- [ ] 🔴 **`as-of` visible** para el TCO, el MQ y los datos de Salesforce.
-- [ ] 🔴 **Citabilidad sin JS:** el TCO, la frase del admin y "dónde gana Salesforce" **están en el HTML servido**.
-      **Cero contadores.**
-- [ ] Enlace al pillar presente. Ningún `href` a página inexistente. Ningún claim prohibido.
-- [ ] Cada H2 con answer capsule. JSON-LD válido (Rich Results Test).
-- [ ] CTA dual con **fallback honesto**. **NO** se reconstruyó form ni agendador.
+- [ ] 🔴 **No existe ningún `<form>`, pop-up ni sticky bar** *(incluido el chrome del tema)*. El CTA es un enlace.
+- [ ] 🔴 **Byline de persona real** + **`author`/`datePublished`/`dateModified`** en el JSON-LD y visibles.
+- [ ] **Agentforce vs Breeze** con las dos cifras verificadas. **"Qué se rompe al migrar"** presente.
+- [ ] 🔴 **Sin JS el artículo se lee entero.** **`as-of` visible.** **Enlace al pillar presente.**
+- [ ] JSON-LD `Article` + `FAQPage` + `BreadcrumbList` válido (Rich Results Test).
 - [ ] Copy es-LATAM neutro, **registro técnico y frío**, validado con `greenhouse-ux-writing`.
-- [ ] GVC 1440 + 390 + reduced-motion capturado **y mirado**. Sin scroll horizontal.
+- [ ] GVC 1440 + 390 capturado **y mirado**. Sin scroll horizontal.
 - [ ] `UI ready: yes` solo si `pnpm task:lint --task TASK-1404` queda sin findings.
-- [ ] Landing registry + landing file + matrix actualizados, **con recordatorio de revisión trimestral (precios)
-      y anual (MQ)**.
 
 ## Verification
 
-`pnpm task:lint --task TASK-1404` · `pnpm ops:lint --changed` ·
-`pnpm ui:wireframe-check|flow-check|motion-check --task TASK-1404` ·
-Playwright/GVC live (1440 + 390; **assertion sin-JS**; **assertions de claims prohibidos**;
-**assertion de la frase del admin**; **assertion de la sección "dónde gana Salesforce"**) ·
-Rich Results Test · HTTP 200 + breadcrumb + canonical.
+`pnpm task:lint --task TASK-1404` · `pnpm ops:lint --changed` · `pnpm ui:wireframe-check --task TASK-1404` ·
+Playwright/GVC live (1440 + 390; **assertion sin-JS**; **assertions de claims prohibidos**; **assertion de la
+frase del admin**; **assertion de la sección "dónde gana Salesforce" + su simetría**; **assertion sin
+form/pop-up**) · Rich Results Test · HTTP 200 + canonical.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con la carpeta · `docs/tasks/README.md` sincronizado
+- [ ] `Lifecycle` sincronizado · `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
 - [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] Chequeo de impacto cruzado (TASK-1352 pillar · TASK-1401/1402/1403)
-- [ ] Página registrada en route-ownership matrix + landing registry + landing file
-- [ ] 🔴 **Los screenshots fechados de Salesforce archivados** (dónde viven, de qué fecha)
-- [ ] 🔴 **La pasada legal registrada** (quién, cuándo, qué se cambió)
-- [ ] 🔴 **Recordatorios de revisión** (trimestral: precios · anual: el MQ)
+- [ ] Chequeo de impacto cruzado (TASK-1352 · TASK-1401/1402/1403 · **PDR-013 y el SPEC**)
+- [ ] 🔴 **Screenshots fechados de Salesforce archivados** (dónde viven, de qué fecha)
+- [ ] 🔴 **Pasada legal registrada** (quién, cuándo, qué se cambió)
+- [ ] 🔴 **Recordatorios:** trimestral (precios) · anual (el MQ). **Content Factory como dueño.**
 
 ## Follow-ups
 
-- 🎯 **Convertir esta página en el asset de outbound del comité.** Mandársela a un CFO **antes** de la reunión
-  decisiva es el movimiento más fuerte del arsenal: **llega diciendo lo que juega en nuestra contra.**
-- **La calculadora de TCO 1:1** (`templates/tco-3y.md`) — artefacto de venta, no feature pública.
-- **Otras comparaciones** solo si emerge demanda medible. 🔴 **Nunca por precio contra Microsoft, Zoho,
-  Pipedrive u Odoo: esa pelea se pierde.**
-- Versión **en-US**.
+- 🎯 **Convertirlo en el asset de outbound del comité.** **Es su único uso real, y es fuerte:** mandárselo a un
+  CFO **antes** de la reunión decisiva. Llega diciendo lo que juega en nuestra contra.
+- 🎯 **Versión `en-US`: 2.400 búsquedas/mes con CPC USD 12,67.** 🔴 **No podemos pelear ese SERP** (no tenemos
+  autoridad de dominio: G2 + los dos vendors lo dominan) — **pero la citación en LLM no depende de autoridad de
+  dominio.** Ese es el ángulo, y **no el tráfico orgánico**. **No prometer rankings.**
+- 🔴 **Si hay que cortar algo del hub, es esta pieza.** Es la más débil *(P2, y la última fase)*.
+  **Su valor es el asset de venta, no la citabilidad** — el vacío que llenaría **ya está lleno**.
 
 ## Open Questions
 
-- ¿La página muestra el TCO **en USD** o localizado? *(Recomendado: **USD**, que es como facturan ambos, y
-  decirlo.)*
-- ¿Se publica el **TCO de 30 usuarios** como caso único, o **dos escenarios** (10 y 30)?
-  *(Recomendado: **uno solo, bien declarado.** Dos escenarios duplican la superficie de error y **el CFO igual
-  va a querer el suyo** — que es exactamente el CTA.)*
-- 🔴 **¿Alguien de Salesforce compite hoy en un deal nuestro?** *(Si sí, esta página sube de prioridad — y su
+- 🔴 **¿Quién firma?** Debe ser una persona con credencial *(mismo criterio que TASK-1402)*.
+- ¿El TCO va **en USD** o localizado? *(Recomendado: **USD**, que es como facturan ambos, y decirlo.)*
+- ¿**Un** escenario de TCO (30 usuarios) o **dos** (10 y 30)? *(Recomendado: **uno solo, bien declarado.** Dos
+  duplican la superficie de error, **y el CFO igual va a querer el suyo** — que es exactamente el CTA.)*
+- 🔴 **¿Alguien de Salesforce compite hoy en un deal nuestro?** *(Si sí, esta pieza sube de prioridad — y su
   pasada legal también.)*

@@ -1,11 +1,33 @@
-# TASK-1404 / `efeoncepro.com/servicios/hubspot/hubspot-vs-salesforce/` — **"HubSpot o Salesforce: la comparación que ninguno de los dos te va a dar"**
+# TASK-1404 / `efeoncepro.com/hubspot/hubspot-vs-salesforce/` — **"HubSpot o Salesforce"** *(artículo)*
 
-> **Cluster 4 de 4** del hub HubSpot. Pillar: **TASK-1352** (`/servicios/hubspot/`).
+> **Cluster del hub HubSpot que vive en el blog.** Pillar: **TASK-1352** (`/servicios/hubspot/`).
 > Fuente: **[SPEC del hub](../../public-site/HUBSPOT_HUB_LANDINGS_SPEC.md) § 5** +
 > skill `hubspot-solutions-partner` → **`modules/05_DISPLACEMENT.md`** + **`templates/tco-3y.md`** + `SOURCES.md`.
 >
-> 🔴 **Única página del hub que habla de un competidor.** Exposición legal real (publicidad comparativa) →
+> 🔴 **Única pieza del hub que habla de un competidor.** Exposición legal real (publicidad comparativa) →
 > pasada obligatoria de **`legal-privacy-ip-operator`** antes del publish.
+> 🎯 **Y el cambio a blog NO la exime: el folder no cambia el marco legal.**
+
+## 🔴 Delta 2026-07-13 — de landing a artículo, y la condición de existencia
+
+**Era** una landing en `/servicios/hubspot/hubspot-vs-salesforce/`. **Ahora es un post del blog**
+(`post`, categoría **`hubspot`**, permalink **`/hubspot/hubspot-vs-salesforce/`**, **Gutenberg**).
+
+**Lo forzó un dato** (Semrush, 2026-07-13): *"hubspot vs salesforce"* mueve **70/mes en España, 20/mes en México**
+— y compite contra **20.800.000 resultados**. 🎯 **Esta pieza nunca va a ser encontrada. Solo va a ser ENVIADA.**
+No tiene embudo: **tiene un remitente.** Su lector llega **en un correo nuestro, a un CFO**.
+
+Y entonces la URL pesa: un CFO que recibe un link a `/servicios/...` **lee "material de ventas" en la barra de
+direcciones antes de leer una palabra** — **saboteando la tesis del texto**, que es *"créenos porque abrimos con
+el dato que nos hace daño"*.
+
+🔴 **La condición de existencia (regla dura 11 de la task):** frente a veinte millones de páginas iguales,
+**nuestra única diferencia son dos gestos** — **abrir con el Niche Player de Gartner** y **declarar que nuestro
+propio argumento del TCO se cae** si ya tienes un admin de Salesforce.
+🎯 **Es exactamente lo que alguien va a querer suavizar en la última revisión.**
+**Si se suaviza cualquiera de los dos, esta pieza es la 4.001 del montón — y entonces lo correcto es no publicarla.**
+
+🔴 **`Flow: none` / `Motion: none`** — sus guardrails quedan absorbidos abajo, en *Reglas duras de forma*.
 
 ## Meta
 
@@ -13,17 +35,20 @@
 - Owner task: `TASK-1404`
 - **Product Design asset:** ✅ **no requerido — y prohibido el que sería obvio.** 🔴 **Cero logos, cero identidad
   visual de Salesforce, cero "vs" con dos escudos enfrentados.** Eso es (a) uso de marca ajena más allá de la
-  mención nominativa y (b) el registro visual de un folleto de guerra. 🎯 **Esta página se ve como un
-  informe, no como un combate.** Tipografía y una tabla.
-- Intended consumers: sitio público (WordPress/Ohio, **marketing lane** `modern-ui`) + **motores de respuesta
-  (LLMs)** + 🎯 **el AE de Salesforce que compite con nosotros** *(sí: es un lector real, y diseñar para él nos
-  hace mejores)*. **NO** el portal Greenhouse.
-- Copy source: contenido de página pública (**NO** `src/lib/copy`), validado con `copywriting` +
-  `commercial-expert` + `greenhouse-ux-writing`. **es-LATAM neutro, tuteo, sin voseo.**
+  mención nominativa y (b) el registro visual de un folleto de guerra. 🎯 **Esto se lee como un informe, no como
+  un combate.** Tipografía del blog y una tabla.
+- Intended consumers: **blog de efeoncepro.com** (WordPress, Gutenberg) + **motores de respuesta (LLMs)** +
+  🎯 **el AE de Salesforce que compite con nosotros** *(sí: es un lector real, y diseñar para él nos hace
+  mejores)* + 🎯 **un abogado de Salesforce**.
+- Copy source: contenido del post (**NO** `src/lib/copy`), validado con `copywriting` + `commercial-expert` +
+  `greenhouse-ux-writing`. **es-LATAM neutro, tuteo, sin voseo.**
   🔴 **Registro técnico y frío. Cero adjetivos.**
-- Primitive decision: `reuse` — section header + `<table>` + `<greenhouse-form>`. **Cero primitives nuevas.**
-- Motion: **hereda el contract del pillar**. Tier **restraint**.
-- UI ready target: `yes` una vez cerrados **Slice 1 (verificación con screenshots)** y **Slice 2 (pasada legal)**.
+- Primitive decision: `reuse` — 🔴 **bloques Gutenberg nativos** (`core/heading`, `core/paragraph`,
+  **`core/table`**, `core/list`). **Cero bloques custom, cero CSS de página, cero librería de charts,
+  cero form embebido.**
+- Motion: 🔴 **`none`.** *(No es "poco motion": **es de integridad** — ver reglas de forma.)*
+- UI ready target: `yes` una vez cerrados **Slice 1 (verificación con screenshots)**, **Slice 2 (pasada legal)**
+  y el **byline**.
 
 ## Brief
 
@@ -67,13 +92,32 @@
 9. 🔴 **Cero logos, cero identidad visual de Salesforce.** Mención nominativa ✅ · marca ajena ❌.
 10. 🔴 **`as-of` visible** para el TCO, el MQ y cada dato de Salesforce. 🔴 **Toda cifra en el HTML servido.**
 
+### 🔴 Reglas duras de forma *(absorbidas del flow y el motion, que ya no existen como docs)*
+
+11. 🔴 **La condición de existencia:** los **dos gestos** — abrir con el **Niche Player** y declarar que **el
+    propio TCO se cae** con un admin de Salesforce — **son la pieza**. 🎯 **Si se ablandan, esto es la 4.001 de
+    veinte millones, y lo correcto es no publicarlo.**
+12. 🔴 **El TCO es una tabla, no un gráfico. Cero barras que crecen, cero charts, cero contadores.**
+    🎯 **Y la razón no es estética, es de integridad: una animación que hace aparecer el "611k" ANTES que sus
+    supuestos es, literalmente, la manipulación que el texto denuncia.** *(Y le regalaría al AE de Salesforce la
+    línea: **"mira el show que te montaron"**.)*
+13. 🔴 **Las dos secciones "dónde gana X" son simétricas** — mismo peso tipográfico, misma extensión, mismo
+    tratamiento. **Y hay assertion GVC que lo verifica**, porque *"confiamos en que quedó parejo"* **no es un
+    contrato**. 🎯 **Si la de Salesforce se ve más chica, la honestidad era decorativa** — y un comité entrenado
+    lo detecta antes que cualquier argumento.
+14. 🔴 **Sin form embebido, sin pop-up, sin exit-intent, sin sticky bar** *(verificar el chrome del **tema**)*.
+    El CTA es **un enlace a Meetings**. 🎯 *Un artículo que termina en un form se lee como lead-gen; un enlace
+    para agendar se lee como una oferta.*
+15. 🎯 **Enlazar a la fuente de Salesforce fortalece la pieza** (demuestra que el dato es **suyo**, no nuestro).
+    🔴 **Reproducir su logo o su identidad visual, no.** **Enlazar ≠ usar la marca.**
+
 ---
 
 ## Layout Skeleton
 
 | R | Slot | Propósito | Componente | Fuente |
 |---|---|---|---|---|
-| **0** | Header + **breadcrumb** | `Servicios › HubSpot › HubSpot o Salesforce` | Ohio native + breadcrumb | Tema |
+| **0** | **Cabecera del post** | Título · 🔴 **byline con credencial** · **fecha de publicación + de revisión** · categoría `hubspot` | Tema del blog | 🎯 **El byline es parte del argumento** |
 | **1** | **Hero — la promesa** | 🎯 H1 = *"HubSpot o Salesforce: la comparación que ninguno de los dos te va a dar."* Sub: *"Somos partner de HubSpot. **Y vamos a empezar por lo que juega en nuestra contra.**"* + **`as-of`** | `modern-ui` editorial header. **Sin logos** | SPEC § 5 |
 | **2** | 🎯 **LA VERDAD INCÓMODA, PRIMERO** *(SIGNATURE)* | **La región que compra toda la credibilidad de la página.** *"**Gartner puso a HubSpot en Niche Players** del Magic Quadrant de Sales Force Automation 2025. Los Leaders son **Salesforce, Microsoft y Oracle**. Si tu comité compra por Magic Quadrant, **empieza por saber esto**."* Y el contexto: *"HubSpot **sí es Leader** del Magic Quadrant de **B2B Marketing Automation**, quinto año consecutivo. **Son dos reportes distintos — y la mitad de los partners los mezcla a propósito.**"* | Truth band, texto servido | ✅ verificado |
 | **3** | 🎯 **EL TCO A 3 AÑOS — con sus supuestos Y su límite** | `<table>`: HubSpot ≈ **USD 295k** · Salesforce ≈ **USD 611k**. **Supuestos declarados arriba** (30 usuarios · lista sin descuento · 3 años · qué incluye). 🔴 **Y en la misma región, sin suavizar:** *"el delta **no lo hace la licencia** — USD 162k vs 189k es **solo 17%**. **Lo hace el admin.** Si ya tienes un admin de Salesforce en planilla, **la mitad de este argumento se te cae.**"* | 🎯 **Tabla + la frase del admin, DENTRO de la región** | `templates/tco-3y.md` |
@@ -160,20 +204,22 @@
 
 ## Implementation Mapping
 
-| Región | Implementación | Notas |
+| Región | Implementación (Gutenberg) | Notas |
 |---|---|---|
-| R0 breadcrumb | Yoast + `BreadcrumbList` | Señal de hub |
-| R1 hero | Ohio section + editorial header | 🔴 **Sin logos. LCP = texto** |
-| 🎯 R2 Gartner | Truth band, texto servido | **Arriba. Sin peros** |
-| 🎯 R3 TCO | **`<table>` + supuestos en el `<caption>` + la frase del admin en la misma región** | 🔴 **Texto servido. Cero contadores** |
-| R4/R5 | **Dos bandas simétricas, mismo peso visual** | 🔴 **La simetría ES el argumento** |
-| R6 agentes | Dos cifras, texto | Enlaza a `/agentes/` |
-| R7 migración | Risk band | — |
-| R9 FAQ | `<details>` + JSON-LD `FAQPage` | — |
-| R11 form | `<greenhouse-form>` (reuso) + fallback | **NO** se reconstruye |
-| Motion | **Hereda el contract del pillar** | 🔴 **Cero motion de "versus"** — ver motion contract |
+| R0 cabecera | **Título + byline + fechas** del tema del blog | 🎯 **El byline con credencial es parte del argumento** |
+| R1 hero | `core/heading` (H1) + `core/paragraph` | 🔴 **Sin logos. LCP = texto** |
+| 🎯 R2 Gartner | `core/paragraph` destacado, texto servido | **Arriba. Sin peros** *(regla 11)* |
+| 🎯 R3 TCO | **`core/table` + supuestos en el `<caption>` + la frase del admin en la misma sección** | 🔴 **Texto servido. Cero contadores, cero charts** |
+| R4/R5 | **Dos secciones simétricas, mismo peso tipográfico** | 🔴 **La simetría ES el argumento — y hay assertion** |
+| R6 agentes | Dos cifras, texto | Enlaza a TASK-1403 |
+| R7 migración | `core/paragraph` + `core/list` | — |
+| R9 FAQ | `core/heading` + `core/paragraph` + JSON-LD `FAQPage` | — |
+| R11 CTA | 🔴 **Un enlace a HubSpot Meetings.** **Sin form embebido** | 🎯 *Un form se lee como lead-gen; un enlace, como una oferta* |
+| Motion | 🔴 **`none`** | 🎯 **De integridad, no de estilo** *(regla 12)* |
+| **Publicación** | **Content Factory** (`wpcli eval-file`), categoría `hubspot`, slug `hubspot-vs-salesforce` | Content Factory = dueño del mantenimiento |
 
-🔴 **Cero primitives nuevas. Cero backend. Cero logos de terceros. Cero JS de librería.**
+🔴 **Cero bloques custom. Cero CSS de página. Cero backend. Cero logos de terceros. Cero librería de charts.
+Cero form.**
 
 ---
 
