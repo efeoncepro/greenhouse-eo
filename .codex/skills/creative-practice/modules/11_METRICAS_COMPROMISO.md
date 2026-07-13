@@ -53,17 +53,38 @@ una garantía — está pidiendo **dejar de estar a ciegas.** Ninguna otra agenc
 
 ---
 
-## 3. 🔴 Nunca prometas un umbral sin baseline
+## 3. 🎯 La capa de medición es REAL y robusta — úsala, y después decide qué firmas
 
-**La pregunta que hay que responder ANTES de escribir "OTD ≥ 90%" en una propuesta:**
+> ✅ **Verificado contra el runtime (BigQuery + el código), 2026-07-13. NO contra un doc.**
+>
+> **Esto no es un roadmap. Está corriendo hace meses:**
+>
+> | Lo que se mide | Estado |
+> |---|---|
+> | **RpA** *(rondas por activo)* | ✅ Serie mensual continua. **Operamos entre 0,02 y 0,38** *(umbral de atención: 1,5)* |
+> | **Cumplimiento / completitud** | ✅ `completitud` con **100% de cobertura** de tareas |
+> | **Días de retraso** | ✅ Se calcula por tarea |
+> | **Rondas de cambio del cliente** | ✅ `client_change_round` + `client_change_round_final` |
+> | **OTD · FTR · Cycle Time · SLO de ciclo** | ✅ Helpers vivos en `src/lib/notion-metrics/` |
+> | **Transiciones de estado · atraso imputable** | ✅ `task_status_transitions`, `calculate-attributable-lateness` |
+> | **Writeback a Notion** | ✅ El cliente lo ve **en su propio Notion** *(`[GH] RpA v2`)* |
+>
+> ## 🎯 Ninguna agencia del mercado tiene esto. Y nosotros lo teníamos apagado como argumento de venta.
+> **El RpA real —casi ninguna pieza necesita rondas— es la mejor prueba comercial de la casa.**
 
-> ## ¿Cuál es nuestro OTD real hoy?
+### 🔴 Pero medir ≠ firmar. La pregunta sigue en pie:
 
-⚠️ **[VERIFICAR — y es urgente: no tenemos publicado un baseline de OTD / FTR / RpA propio, agregado, de los
-engagements creativos vivos. Sin ese número, cualquier umbral que firmemos es una apuesta.]**
+> ## ¿Cuál es nuestro OTD real **con ESTE cliente**?
+
+**Que la capa de medición sea robusta NO significa que puedas firmar un umbral el día uno.** El OTD de una
+cuenta con briefs maduros y el de una cuenta caótica **no son el mismo número** — y el que hace la diferencia
+**no somos nosotros: es él.**
 
 **El umbral óptimo del registry** (OTD 90-100%, FTR 80-100%, RpA 0-1,5) **es una meta de producto, NO una
-declaración de nuestro desempeño actual.** Confundir las dos cosas es cómo se firma un SLA imposible.
+promesa contractual.** Confundir las dos cosas es cómo se firma un SLA imposible.
+
+🎯 **La ventaja de tener la capa robusta es que el baseline se construye SOLO, y rápido:** desde el día 1 la
+cuenta está midiendo. **A los 3 meses tienes el número real de ese cliente** — y recién ahí conversas umbrales.
 
 🔴 **Regla dura:** **antes de comprometer un umbral con un cliente, mide 3 meses de baseline real con ESE
 cliente.** El OTD de una cuenta con briefs maduros y el de una cuenta caótica **no son el mismo número** — y

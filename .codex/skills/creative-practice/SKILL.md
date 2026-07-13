@@ -21,6 +21,9 @@ description: >-
   "el cliente tiene equipo interno", "el cliente dice que lo hace con IA",
   "credenciales", "case study", "portafolio", "descuento", "el cliente dice que
   es caro", "squad creativo", "FTE dedicado", "staff augmentation creativo".
+type: skill
+user-invocable: true
+argument-hint: "[la pregunta comercial o la pieza que necesitas]"
 ---
 
 # Creative Practice — el negocio, no el oficio
@@ -48,6 +51,63 @@ que cumpla y que él pueda ver cumplir.**
 > ## La creatividad es el requisito de entrada. La confiabilidad es el producto.
 > **Todos los que llegan a la mesa saben diseñar.** Ninguno puede demostrar que cumple.
 > **Ese es el hueco, y es el único que sabemos llenar mejor que nadie.**
+
+---
+
+## 0.1 🎯 El Why — y por qué NO es decoración de marca
+
+**Esta práctica no vende "capacidad gobernada" porque suene bien. La vende porque es el mecanismo de una
+creencia** *(SSOT: `efeonce-agency` → El Why · `docs/context/09_marca-agencia.md`)*:
+
+> # No te entregamos crecimiento. Lo construimos contigo — y te dejamos más capaz de sostenerlo.
+
+**Los tres pilares, y su mecanismo EN CREATIVO** *(sin mecanismo, son palabras de agencia commodity)*:
+
+| Pilar | 🔴 Lo que dice cualquier agencia | 🎯 Nuestro mecanismo — **el que se puede mostrar** |
+|---|---|---|
+| **Co-creación** | *"Somos tu partner"* | **El cliente opera con nosotros en vivo, en el login.** No recibe un PDF: ve la cola, el estado, lo trabado |
+| **Educación** | *"Te asesoramos"* | 🎯 **Lo hacemos más capaz, no más dependiente** |
+| **Integralidad** | *"Servicio 360"* | **Un solo cerebro:** un brief alimenta contenido, visual, audiovisual y social en un mismo flujo — no cuatro proveedores que no se hablan |
+
+### 🎯 El pilar de Educación es, literalmente, el motor económico de esta práctica
+
+**Y hasta ahora yo lo estaba contando al revés.** El Why lo dice explícito:
+
+```
+Cliente más capaz  →  mejores briefs  →  FTR↑  →  RpA↓  →  menos rondas
+                                                              ↓
+                                          mejor trabajo · mejor margen · menos quema de equipo
+```
+
+> ## Educar al cliente NO es caridad: es lo que hace que el trabajo salga bien.
+> **Cada ronda de cambio que evitas educándolo es margen que no se evapora y gente que no se quema.**
+
+**Esto reencuadra TODA la mecánica dura de esta skill:**
+
+| Lo que parece… | …y lo que en realidad es |
+|---|---|
+| El **cap de rondas** *(módulo 05)* | 🔴 No es un candado contra un cliente abusivo. **Es el contrato de la co-creación:** define cómo trabajamos juntos |
+| El **owner del brief** *(módulo 05)* | **No es una exigencia burocrática. Es la condición de que el cliente pueda ser capaz** |
+| El **RpA en su login** *(módulo 11)* | 🔴 **No es un látigo. Es el espejo que lo hace mejorar** — *la métrica no acusa: enseña* |
+| El **diagnóstico regalado** *(módulo 06)* | **Es educación antes de la venta.** Por eso funciona |
+
+### 🔴 La regla anti-humo — es dura y es del Why
+
+> ## NUNCA digas el Why sin su mecanismo.
+> **"Co-creación", "integralidad", "partner", "somos una extensión de tu equipo" — dichas solas, son
+> exactamente lo que dice la agencia commodity de la que queremos diferenciarnos.**
+>
+> **Cada vez que uses una de esas palabras, TIENE que ir pegada a su prueba:**
+> el **login**, el **número** *(RpA/OTD/FTR)*, el **ciclo**, el **diagnóstico**.
+>
+> **Sin mecanismo, no eres distinto. Eres el mismo folleto con mejor tipografía.**
+
+### Y el switching cost, bien entendido
+
+🔴 **NO se gana por dependencia ni por opacidad** *(la agencia tradicional retiene porque el cliente no
+entiende lo que hace)*. **Se gana haciendo al cliente más capaz + guardándole su historial** — **capacidad +
+memoria**. Por eso el mes 6 sabemos más que el mes 1, y por eso irse duele: **no porque lo tengamos atado,
+sino porque perdería lo que construyó.**
 
 ---
 

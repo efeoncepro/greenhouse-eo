@@ -132,8 +132,12 @@ mínimo no entra a producción")* **que no opera en el producto.** No se mencion
 no es confiable** (benchmark, sample size, quality gate) en vez de pintarlo bonito.
 > **Un dashboard que nunca falla es un dashboard en el que nadie cree.**
 
-**Baseline** — el desempeño **real** de una cuenta, medido. 🔴 **Sin baseline, cualquier umbral que firmes es
-una apuesta.** *(Y hoy no tenemos baseline creativo propio: 🩸 `ANTIPATTERNS.md` G.)*
+**Baseline** — el desempeño **real de una cuenta concreta**, medido. 🔴 **Sin baseline, cualquier umbral que
+firmes es una apuesta** — porque el OTD de una cuenta con briefs maduros y el de una caótica no son el mismo
+número, y **quien hace la diferencia es el cliente, no nosotros.**
+🎯 **La buena noticia: la capa de medición es robusta y corre desde el día 1** *(RpA, cumplimiento, días de
+retraso, rondas, OTD/FTR/cycle time, writeback a Notion)*, **así que el baseline se construye solo.**
+**A los 3 meses tienes el número real de ese cliente.** → `modules/11_METRICAS_COMPROMISO.md` §3.
 
 **La escalera de compromiso** — **Nivel 0** transparencia *(sin umbral)* → **1** target declarado → **2** SLA
 con remedio → **3** SLA con penalidad. 🔴 **No se saltan escalones para ganar un deal.**

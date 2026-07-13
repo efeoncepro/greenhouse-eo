@@ -8,15 +8,17 @@
 
 ## 1. 🩸 Bugs vivos — lo que está roto hoy
 
-> # 🔴 A, B, C y D NO son historia. Son una oferta que todavía no se sube.
+> # 🔴 A, B y C son de la LICITACIÓN DE SEO — no de esta práctica.
 >
-> **La licitación del blog de SKY (Wherex) cierra el 15/07/2026 y AÚN NO SE PRESENTA.**
-> Los cuatro bugs de abajo están **en la oferta que está por subirse** — con **2 años de contrato, en CLP,
-> sin reajuste, y con costos en USD.**
+> **Su dueño es `seo-aeo-practice/modules/04_PRICING.md`.** Se documentan acá **solo porque la aritmética
+> es idéntica y el error es replicable** — pero **NO son el caso económico de la práctica creativa.**
+> *(Y sí: al escribir esta skill los tomé como si lo fueran. **Ese fue el error.** Ver `efeonce/EFEONCE_OVERLAY.md` §5.)*
 >
-> 🔴 **Un error de piso en un contrato sin reajuste no se corrige después. Se paga 24 meses.**
+> ⏰ **Y son urgentes para quien lleve esa licitación:** la oferta del blog de SKY (Wherex) **cierra el
+> 15/07/2026 y aún no se sube**, con **2 años en CLP, sin reajuste y costos en USD.**
+> 🔴 **Un error de piso en un contrato sin reajuste no se corrige después: se paga 24 meses.**
 >
-> **Si estás leyendo esto y la oferta no se ha subido: para y arregla A, B, C — y sobre todo confirma D.**
+> 🩸 **Los bugs que SÍ son de esta práctica son F, G e I** — y son peores.
 
 ### 🩸 A. Publicamos un precio unitario, y le dimos al cliente la calculadora
 
@@ -101,24 +103,69 @@ tiempo** que alguien lo prometa. Y el día del onboarding, el cliente abre el me
 
 ### 🩸 F. Cero casos creativos citables — y nadie está construyendo el primero
 
-**No hay ni un solo caso creativo con métrica verificable + relación sana + autorización escrita.**
-*(Sky, Bresler y Berel son casos de SEO/contenido, no de creatividad de marca.)*
+🎯 **Ojo — SÍ tenemos trabajo creativo vigente:** **SKY** tiene los service modules **`agencia_creativa` +
+`globe`** activos, con un squad nombrado *(Daniela Ferreira como Creative Operations Lead + Melkin Hernández
+y Andrés Carlosama como Senior Visual Designers)* y un proyecto que corre **ago-2025 → jul-2026.**
+
+🔴 **Pero no tenemos un CASO** — porque un caso exige **métrica verificable** + relación sana +
+**autorización escrita**, y **la métrica no existe** *(ver G)*.
 
 **Por qué es grave:** cada engagement que cierra sin iniciar su caso es **munición perdida para siempre**.
 Rescatar un caso un año después es pedir un favor; documentarlo desde el día 1 es un proceso.
+**Llevamos ~1 año con SKY y no hay nada capturado.**
 
 **Fix:** **todo engagement creativo arranca su `templates/caso-estudio.md` el día 1**, y **la autorización de
 portafolio se pide EN EL CONTRATO** *(cláusula, no favor)*. → `modules/05_SCOPE_SOW.md` §4.
+🎯 **SKY es el candidato natural al primer caso — en cuanto G esté resuelto.**
 
 ---
 
-### 🩸 G. No tenemos baseline propio de OTD / FTR / RpA creativo
+### 🩸 G. **NO es un bug: es el activo.** *(Y acá se documenta el error de haberlo creído bug.)*
 
-**Y sin baseline, cualquier umbral que firmemos es una apuesta.** El umbral óptimo del registry
-(OTD 90-100%) es **una meta de producto, no una declaración de nuestro desempeño real.**
+🔴 **Una versión anterior de este archivo afirmaba que "el RpA está vacío" y que "el moat es una lámina de
+PowerPoint". ERA FALSO — y es el mejor ejemplo de cómo se rompe una skill.**
 
-**Fix:** **Nivel 0 de la escalera de compromiso** *(transparencia sin umbral)* hasta tener 3 meses de baseline.
-→ `modules/11_METRICAS_COMPROMISO.md` §3.
+**De dónde salió el error:** de leer `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`, que dice que el RpA es sparse
+— **pero su fecha de validación es `2026-03-10`.** Cuatro meses viejo, **anterior a RpA v2 (TASK-916)** y a
+toda la maduración del pipeline. **Un doc obsoleto se citó como si fuera el runtime.**
+
+✅ **El dato REAL, verificado contra BigQuery (`notion_ops.tareas`) el 2026-07-13:**
+
+| Mes | Tareas | Con rondas | **RpA promedio** |
+|---|---|---|---|
+| 2026-07 | 121 | 3 | **0,02** |
+| 2026-06 | 660 | 26 | **0,05** |
+| 2026-05 | 467 | 86 | **0,22** |
+| 2026-04 | 819 | 47 | **0,06** |
+| 2025-12 | 113 | 32 | **0,38** |
+
+**Serie continua, mes a mes. Umbral de atención: 1,5. Operamos entre 0,02 y 0,38.**
+
+> ## 🎯 El RpA no es un problema: es la prueba. Y estaba sin usar.
+> **Casi ninguna pieza necesita rondas de cambio. Eso es lo que esta práctica vende — y es verdad, está
+> medido, y el cliente lo ve en su login.**
+
+🔴 **LA REGLA QUE NACE DE ESTE ERROR — y aplica a TODA la skill:**
+
+> ## El estado de una métrica se verifica contra el RUNTIME. NUNCA contra un doc.
+> **`SOURCES.md` ya obliga a verificar los datos de MERCADO. Esta regla lo extiende a los datos PROPIOS.**
+> **Un doc de arquitectura describe el mundo del día que se escribió. El runtime describe el de hoy.**
+>
+> **Antes de afirmar que una métrica nuestra está vacía, rota o madura: consúltala.**
+> *(BigQuery `notion_ops.*` · `greenhouse_delivery.*` · el materializer. **No el doc.**)*
+
+---
+
+### 🩸 I. No sabemos la economía de nuestro propio engagement creativo vigente
+
+**Tenemos un cliente creativo (SKY) al que le estamos entregando servicio — y no está documentado en el repo
+cuánto le cobramos, cuál es el loaded cost de ese squad, ni si está sobre el piso de 45%.**
+
+🔴 **Estamos vendiendo una práctica cuya economía real no conocemos. Y ya la estamos entregando.**
+
+**Fix:** documentarla con **`greenhouse-finance-accounting-operator`** *(y ojo: el loaded cost de Daniela +
+2 Senior Visual Designers **no es el del squad del blog** — ese es de la licitación de SEO)*.
+**Ese, y no el de SKY blog, es el caso económico de referencia que esta práctica necesita.**
 
 ---
 

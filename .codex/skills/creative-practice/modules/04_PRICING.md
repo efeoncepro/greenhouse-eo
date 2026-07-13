@@ -3,6 +3,23 @@
 > **La regla que ordena todo el módulo:**
 > **Un precio sin loaded cost detrás no es un precio: es una corazonada con decimales.**
 
+> # 🔴 ANTES DE USAR LOS NÚMEROS DE ESTE MÓDULO, LEE ESTO
+>
+> **Los ejemplos numéricos de SKY que aparecen abajo *(loaded 2,26M · piso 4,6M · lista 5,2M · el ad-hoc de
+> 260k · el plan dominado)* vienen de la LICITACIÓN DEL BLOG, que es un servicio de SEO/CONTENIDO — NO de
+> creatividad.** Su dueño es **`seo-aeo-practice/modules/04_PRICING.md`**.
+>
+> **Se usan acá SOLO como demostración de la aritmética** *(la fórmula del piso, el buffer, el margen de
+> negociación y los errores de estructura son idénticos en cualquier práctica)*.
+>
+> 🔴 **NO son el caso económico de referencia de la práctica creativa. Esta práctica todavía NO TIENE uno.**
+>
+> 🩸 **Y ese es el trabajo #1:** tenemos un **engagement creativo vigente** *(SKY — `agencia_creativa` +
+> `globe`: Daniela + 2 Senior Visual Designers, desde ago-2025)* **y no está documentado cuánto le cobramos,
+> cuál es su loaded cost, ni si está sobre el piso.** → `efeonce/EFEONCE_OVERLAY.md` §5 · `ANTIPATTERNS.md` I.
+>
+> **No se puede vender bien una práctica cuya economía no se conoce. Y ya la estamos entregando.**
+
 ---
 
 ## 1. La tesis — el precio no se elige, se computa

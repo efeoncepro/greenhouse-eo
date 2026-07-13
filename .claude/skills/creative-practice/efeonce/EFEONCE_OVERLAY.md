@@ -94,45 +94,72 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 
 ---
 
-## 5. El caso SKY — lo que enseña
+## 5. SKY — 🔴 **son DOS servicios distintos. No los mezcles (yo los mezclé).**
 
-**Es nuestro único squad creativo dimensionado con rigor. Estúdialo antes de armar el siguiente.**
+> # 🔴 La corrección más importante de este archivo.
+>
+> | | Qué es | ¿De quién es? |
+> |---|---|---|
+> | 🎯 **SKY — Agencia Creativa** | ✅ **CLIENTE CREATIVO VIGENTE.** Service modules **`agencia_creativa` + `globe`** activos. Squad: **Daniela Ferreira** *(Creative Operations Lead / directora de arte)* + **Melkin Hernández** y **Andrés Carlosama** *(Senior Visual Designers)*. Proyecto ago-2025 → jul-2026 | 🎯 **ESTA práctica** |
+> | **SKY — Blog (Wherex)** | 🔴 **Licitación de SEO/CONTENIDO.** Oferta en curso, no adjudicada. CLP 5,2M/mes · piso 4,6M · loaded 2,26M | 🔴 **`seo-aeo-practice` — NO es de acá** |
+>
+> 🔴 **Los CLP 5,2M, el loaded de 2,26M, el piso de 4,6M y los bugs de precio (ad-hoc, plan dominado,
+> precio unitario) son de la LICITACIÓN DE SEO.** Su dueño es **`seo-aeo-practice/modules/04_PRICING.md`**
+> — así lo declara el propio squad blueprint. **NO son el caso económico de la práctica creativa.**
+>
+> *(El squad del blog incluye roles creativos —diseñador, audiovisual, social— porque un servicio de
+> contenido necesita imágenes y video. **Eso no lo convierte en un servicio creativo.**)*
 
-> 🔴 **PERO LEE ESTO PRIMERO — son dos cosas distintas de SKY:**
->
-> | | Qué es |
-> |---|---|
-> | **SKY performance** | ✅ **Cliente vigente.** Efeonce ya opera un equipo de performance para SKY **hoy** |
-> | **SKY blog (Wherex)** | 🔴 **OFERTA EN CURSO — NO adjudicada.** Cierra **15/07/2026** |
->
-> **Los CLP 5,2M/mes y el TCV de 124,8M son el precio que OFERTAMOS, no un contrato ganado.**
-> 🔴 **NUNCA lo cites como caso ni como TCV asegurado.**
->
-> 🎯 **Y el squad del blog es explícitamente OTRO equipo** — *"NO las mismas personas del equipo de
-> performance que Efeonce ya opera para SKY"* *(squad blueprint)*. **Esto es EXPANSIÓN de una cuenta
-> existente, no un cliente nuevo** — que es exactamente el 70% del motor comercial *(§4)*.
+### 🔴 La consecuencia incómoda: la práctica creativa NO tiene caso económico propio
 
-| | |
+**Tenemos un cliente creativo vigente (SKY) y no sabemos documentar su economía.**
+
+| | Estado |
 |---|---|
-| **Alcance** | 8 artículos/mes + editorial + SEO/AEO + imagen + multimedia + social + reportería |
-| **Squad** | **9 roles · 224% ≈ 2,2 FTE** · Managed Squad *(no staff-aug)* |
-| **Lanes** | Cuenta · Estrategia/SEO · Contenido · Diseño · Audiovisual · Social |
-| **Loaded delivery** | **≈ CLP 2,26M/mes** 🩸 *(pendiente de confirmar qué incluye)* |
-| **Precio de lista** | **CLP 5,2M/mes** *(ampliado 6,9M)* |
-| **Piso vigente** | **CLP 4,6M** *(45% + buffer 12%)* |
-| **Margen de negociación** | **CLP 598.000 (11%)** — **no 1,3M, como se creía** |
-| **TCV** | **CLP 124,8M / 2 años** |
+| ¿Cuánto le cobramos a SKY por el servicio creativo? | ⚠️ **[VERIFICAR — no está en el repo]** |
+| ¿Cuál es el loaded cost de ese squad *(Daniela + 2 designers)*? | ⚠️ **[VERIFICAR]** |
+| ¿Cuál es el margen real de ese engagement? | ⚠️ **[VERIFICAR]** |
+| ¿Está sobre el piso de 45%? | 🔴 **No lo sabemos.** |
 
-🎯 **Lo que SKY hace bien:** el squad es un **sistema con sinergias declaradas** *(un brief alimenta contenido,
-visual, audiovisual y social en un mismo flujo)*, con **RACI**, **jerarquía** y **un account lead único**.
-**Eso es exactamente lo que hay que mostrar en una propuesta — y casi nadie lo hace.**
+> 🔴 **Esto es lo primero que hay que cerrar.** No podemos vender una práctica cuya economía no conocemos.
+> **Y ya la estamos entregando.**
 
-🩸 **Lo que SKY hace mal, y hay que arreglar antes de repetirlo:**
-1. **Publica precio unitario** *(CLP 260.000/artículo)* → le dimos la calculadora.
-2. **El ad-hoc es más barato que el marginal del plan** → premiamos romper la planificación.
-3. **El plan ampliado está dominado** → cuesta CLP 660.000 **más** que base + 4 ad-hoc.
-4. **El loaded cost puede estar subestimado** → y entonces el piso está mal.
-→ **`ANTIPATTERNS.md` §1.**
+### 🎯 Y lo mejor: el engagement creativo SÍ produce telemetría — y el número es bueno
+
+**El moat que esta skill vende —OTD/FTR/RpA en el login del cliente— NO es una promesa. Está corriendo.**
+
+✅ **Verificado contra el runtime (BigQuery `notion_ops.tareas`), 2026-07-13:**
+
+| Mes | Tareas | Con rondas de cambio | **RpA promedio** |
+|---|---|---|---|
+| 2026-07 | 121 | 3 | **0,02** |
+| 2026-06 | 660 | 26 | **0,05** |
+| 2026-05 | 467 | 86 | **0,22** |
+| 2026-04 | 819 | 47 | **0,06** |
+
+**Y no es solo RpA:** `completitud` con **100% de cobertura**, días de retraso calculados por tarea,
+`client_change_round` registrado, helpers vivos de **OTD · FTR · Cycle Time · SLO de ciclo · transiciones de
+estado · atraso imputable**, y **writeback a Notion** *(el cliente lo ve en su propio Notion)*.
+
+> ## Operamos con un RpA entre 0,02 y 0,38. El umbral de atención es 1,5.
+> **Casi ninguna pieza necesita rondas de cambio. Eso es exactamente lo que esta práctica vende — y es
+> verdad, está medido, y el cliente lo puede ver.**
+>
+> 🎯 **Es el activo comercial más fuerte de la casa, y estaba apagado como argumento de venta.**
+
+⚠️ **Nota de método** *(el error se documenta para que no se repita)*: una versión anterior de este archivo
+afirmaba que el RpA estaba vacío. **Era falso** — salía de `SKY_TENANT_EXECUTIVE_SLICE_V1.md`, cuya fecha de
+validación es **2026-03-10**, anterior a **RpA v2 (TASK-916)**.
+🔴 **El estado de una métrica se verifica contra el RUNTIME, nunca contra un doc.**
+
+**Lo que falta, en orden:**
+
+1. 🩸 **Documentar la economía del engagement creativo de SKY** *(→ `greenhouse-finance-accounting-operator`)*.
+   **Es el bug real de esta práctica** *(`ANTIPATTERNS.md` I)*.
+2. 🎯 **Formalizar a SKY como el primer caso creativo citable** — un año de relación, squad nombrado, **y
+   telemetría real que ya existe.** Falta la **autorización escrita** *(cláusula de portafolio)* y armar el
+   caso. → `templates/caso-estudio.md`.
+3. 🎯 **Empezar a usar el RpA en la venta.** Está medido, es bueno, y nadie más lo tiene.
 
 ---
 
