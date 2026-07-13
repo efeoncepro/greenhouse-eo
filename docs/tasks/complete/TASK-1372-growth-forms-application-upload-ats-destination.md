@@ -59,7 +59,7 @@ Hechos verificados contra el repo real + el contrato canónico de Growth Forms. 
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `Code complete local / rollout staging-prod pendiente`
+- Status real: `Complete / staging live / production pendiente`
 - Rank: `TBD`
 - Domain: `growth|hr|data`
 - Blocked by: `none`
@@ -444,6 +444,16 @@ OPEN QUESTIONS RESUELTAS:
   - application `happ-a2637a89-3bf1-499b-9693-fb63ea7ab257`
   - asset `asset-1a0adc1c-ecc3-46d1-ac43-e32627a385ca`
   - asset `private`, `attached`, scan verdict `clean`, destinations `0`.
+- Rollout staging on `develop` SHA `25c7e246cbf059847639b5f82ac5c431192685f8` -> PASS:
+  - Vercel staging deployment `greenhouse-os2okrbyn-efeonce-7670142f.vercel.app` / `dpl_6eeZa7TE9ptXTzdnUAcBYGsWmszQ` -> `Ready`, alias `dev-greenhouse.efeoncepro.com`.
+  - GitHub checks -> PASS: `CI`, `Playwright E2E smoke`, `Task Contract`, `CLAUDE.md governance`, `Artifact Worker Deploy`, `Commercial Cost Worker Deploy`, `Ops Worker Deploy`.
+  - Cloud Run `ops-worker` revision `ops-worker-00486-n96` -> `Ready`, `GIT_SHA=25c7e246cbf059847639b5f82ac5c431192685f8`.
+  - Exact deployment render -> `200` for `/public/careers`, `/public/careers/EO-OPN-0009/apply` and synthetic `GET /api/public/growth/forms/task-1372-application-smoke-1783972561941?...`.
+  - Target apply contract includes `efeonce-careers-application`, `cvFile`, `accept="application/pdf"` and `uploadPolicy.scanPolicy="scan_required"`.
+  - Multipart submit without token -> expected `403 captcha_failed/missing_token`.
+  - Multipart submit with staging dummy token -> `202 accepted`, submission `fsub-324c40a5-3ab3-4c7a-be1e-871b76c9398e`.
+  - Worker projection -> `coalesced:growth_hiring_application` to application `happ-072a61fc-dfda-4278-8955-af12dbb35b42`.
+  - Asset `asset-74e85693-916f-4dd4-8a5e-86d934d05cd8` -> `private`, `attached`, owner `hiring_application_cv`, scan verdict `clean`, destinations `0`.
 
 ## Closing Protocol
 
@@ -456,7 +466,7 @@ OPEN QUESTIONS RESUELTAS:
 
 - `TASK-1373` migrates Careers apply UI to native `<greenhouse-form>` using this contract.
 - `TASK-1378` decides whether to provision the optional ClamAV service; structural scan already runs and gates attach.
-- Staging/production rollout remains a release step: push/deploy the Next.js app plus ops-worker and smoke `efeonce-careers-application` against the target environment before switching Careers UI.
+- Production rollout remains a separate release step. Staging is live and smoked; production was not touched. Before switching Careers UI, `TASK-1373` must publish/consume the real `efeonce-careers-application` form by the governed lifecycle.
 
 ## Open Questions
 
