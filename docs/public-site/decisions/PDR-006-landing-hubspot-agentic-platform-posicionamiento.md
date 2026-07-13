@@ -265,7 +265,7 @@ el miedo a elegir mal se combate **quitando riesgo**, no prometiendo más.
 
 - La landing es un **nodo de adquisición** (demand-capture + habilitación de venta) del ecosistema
   ([PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md)), **no una spoke SEO**. Instrumentar UTMs por canal.
-- **Slug canónico:** se mantiene `/servicios-contratar-hubspot/` (id `244079`). Reposición **in-place**, sin 301.
+- 🔴 **Slug — DEROGADO por [PDR-013](PDR-013-hub-hubspot-pillar-cluster-arquitectura.md) (2026-07-13).** Se decía *"reposición in-place, sin 301"* para preservar equity. **Ese equity no existe**: la URL tiene **0 rankings orgánicos y 0 backlinks** (Semrush, medido). **Migra a `/servicios/hubspot/` con 301.** El slug actual además optimiza para un fantasma (`contratar hubspot` ≈ 0 búsquedas). Todo lo demás de este PDR sigue vigente y se aplica al pillar en su URL nueva.
 - 🔴 **Riesgo de concentración (nuevo):** **ANAM es a la vez el único cliente Kortex, el único caso de CRM
   citable, la venta más reciente (USD 8.400, mar-2026) y el próximo cross-sell.** Si ANAM se va, se caen las
   cuatro cosas **más el tier**. **Un QBR con ANAM es el movimiento de mayor retorno por hora disponible hoy** —

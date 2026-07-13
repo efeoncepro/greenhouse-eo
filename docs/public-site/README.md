@@ -44,6 +44,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   - [PDR-010 — La Home es el pitch; `/agencia` se pliega](decisions/PDR-010-home-es-el-pitch-agencia-se-pliega.md)
   - [PDR-011 — About Us como identidad Golden Circle](decisions/PDR-011-about-us-identidad-golden-circle.md)
   - [PDR-012 — Growth Operating System como posicionamiento global](decisions/PDR-012-growth-operating-system-global-positioning.md)
+- [PDR-013](decisions/PDR-013-hub-hubspot-pillar-cluster-arquitectura.md) — **El Hub de HubSpot: pillar + cluster.** Migración a `/servicios/hubspot/*` con 301 (la URL actual tiene **0 rankings y 0 backlinks**, medido). `/precios/` es la única con demanda SEO real (~1.500/mes, 30× todos los Hubs juntos); `/agentes/` es la más diferenciada (caso ANAM + Agent CLI). 🔴 Los clusters se miden por **citación en LLM y uso en el canal**, NO por tráfico orgánico. Deroga el "sin 301" de PDR-006.
 
 ## Contexto canónico (fuentes que este espacio NO reimplementa)
 
