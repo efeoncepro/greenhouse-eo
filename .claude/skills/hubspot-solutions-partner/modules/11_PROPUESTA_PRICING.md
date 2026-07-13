@@ -58,16 +58,26 @@ y no gestionado te da **cero puntos managed a los 60 días**, aunque siga pagand
 **Le estás quitando $7.000 de la factura Y entregando más.** No compites contra su presupuesto: **liberas**
 presupuesto que él ya tenía comprometido, y lo rediriges a un trabajo que sí vale.
 
-### 🔴 La letra chica que te toca — verifícala HOY
+### ✅ Efeonce TIENE la Partner Certification — el waiver está disponible. Úsalo.
 
-⚠️ **Desde el 2026-07-15, solo los partners CERTIFICADOS pueden waivear el onboarding del cliente.**
-La *Partner Certification* es la que acredita la expertise para reemplazar el onboarding de HubSpot.
+⚠️ Desde el **2026-07-15, solo los partners CERTIFICADOS pueden waivear el onboarding del cliente**.
+**Efeonce está certificada** (confirmado por el operador, 2026-07-13). **El arma está cargada.**
 
-> **Sin la certificación vigente, pierdes tu mejor argumento de cierre — justo cuando más lo necesitas.**
-> **Verifica el estado de la Partner Certification de Efeonce. Es la pregunta #0 al PDM.**
+### 🎯 Dimensiona el waiver antes de cada propuesta — es tu descuento gratis
 
-🔴 **Y el fee del bundle sigue sin publicarse**: si es $7K o $14K+, cambia el tamaño de tu propuesta **y el
-tamaño del waiver que puedes ofrecer**. Pídeselo al PDM por escrito.
+| Producto | Precio año 1 | Onboarding que borras | **Descuento efectivo** |
+|---|---|---|---|
+| **Marketing Hub Pro** | $9.600 ($800/mo) | **$3.000** | 🎯 **31% en el año 1** |
+| Marketing Hub Enterprise | $43.200 | **$7.000** | 16% |
+| Sales / Service Pro (10 seats) | $10.800 | $1.500 | 14% |
+| Sales / Service Enterprise (10 seats) | $18.000 | $3.500 | 19% |
+
+> **En un Marketing Hub Pro le estás borrando casi un tercio del costo del primer año.**
+> Y es un descuento que **el HubSpot directo no puede igualar** — solo existe si el cliente pasa por un
+> partner certificado. **Es la ventaja estructural de tu canal. Ponla en la primera lámina, no en la letra chica.**
+
+🔴 **El fee del bundle Customer Platform sigue sin publicarse**: si es $7K o $14K+, cambia el tamaño de tu
+propuesta **y el tamaño del waiver que puedes ofrecer**. Pídeselo al PDM por escrito.
 
 ---
 

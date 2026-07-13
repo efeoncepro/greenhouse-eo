@@ -160,7 +160,7 @@ Siete meses sin crear uno.**
 
 | # | Pregunta | Por qué importa |
 |---|---|---|
-| 1 | 🔴 **¿Efeonce tiene la Partner Certification vigente?** | Desde el **2026-07-15, solo los certificados pueden waivear el onboarding del cliente**. **Es tu mejor argumento de cierre** |
+| ~~1~~ | ✅ **RESUELTA: Efeonce TIENE la Partner Certification.** → **el waiver del onboarding está disponible y no se está usando** | En un Marketing Hub Pro **borras $3.000 de $9.600 = 31% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. **Ponlo en la primera lámina** → `modules/11` § 2 |
 | 2 | **¿Los $412 son netos post-discount?** ¿El trial que vence los infla? | Define si hay que presupuestar **$4.800/año** de membership |
 | 3 | **La lista oficial de growth markets, por escrito** | El ×2 duplica o reduce a la mitad el esfuerzo de cada tier |
 | 4 | **El proceso operativo del shared deal** (Growth Specialist, link de confirmación) | Habilita **toda** la motion de base instalada |

@@ -12,7 +12,7 @@
 
 | # | Acción | Por qué ahora |
 |---|---|---|
-| 1 | 🔴 **Verificar la Partner Certification** | Desde el **15 de julio, solo los partners certificados pueden waivear el onboarding del cliente.** Sin ella pierdes tu mejor argumento de cierre (le quitas $3.000-$7.000 de la factura al cliente) → `modules/11` § 2 |
+| 1 | ✅ **Partner Certification: LA TIENEN.** Poner el **waiver del onboarding** en la primera lámina de toda propuesta | En un Marketing Hub Pro le **borras $3.000 de un costo anual de $9.600 = 31% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. Es el cierre de A1 y A2. **Hoy no está en el pitch** → `modules/11` § 2 |
 | 2 | **Verificar si los $412 son netos post-discount** y si el trial que vence los infla | El waiver de la membership exige **>$400 neto**. Si cae, son **$4.800/año** |
 | 3 | 🥇 **Registrar a BeFUN como cliente gestionado** | Ya te compró Marketing Hub Pro. Ya tienes partner admin. **Estás regalando puntos managed.** Cuesta cero |
 | 4 | **Mail al PDM (Simón Suárez)** con las 6 preguntas de `ESTADO_ACTUAL.md` § 9 | La lista de growth markets y el proceso del *shared deal* **desbloquean todo lo demás** |

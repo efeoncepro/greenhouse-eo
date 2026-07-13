@@ -175,8 +175,11 @@ los descalificadores importan tanto.
 cargo de la implementación, y HubSpot elimina el cargo obligatorio del contrato del cliente.**
 ⚠️ **El onboarding de HubSpot es *coaching*** (te enseñan y tú lo haces); **el del partner es *implementación***
 (te lo construyen).
-🔴 ⚠️ **Desde el 2026-07-15, solo los partners CERTIFICADOS pueden waivear el onboarding del cliente.**
-**Verifica el estado de la Partner Certification.** Sin ella, pierdes el argumento. → `modules/11` § 2.
+⚠️ **Desde el 2026-07-15, solo los partners CERTIFICADOS pueden waivear el onboarding del cliente.**
+✅ **Efeonce TIENE la Partner Certification** (confirmado por el operador, 2026-07-13) → **el waiver está
+disponible**. 🎯 En un **Marketing Hub Pro** le borras **$3.000 de un costo anual de $9.600 = 31% de descuento
+en el año 1**, y **el HubSpot directo no puede igualarlo**. **Es la ventaja estructural del canal partner.**
+→ `modules/11` § 2 (tabla de dimensionamiento del waiver por producto).
 
 ### ❌ NO existe una API pública de partners
 Los tier points, las comisiones, el libro gestionado y el deal registration **viven solo en el partner
