@@ -57,6 +57,8 @@ export type MicrocopyNamespace =
   | 'emails' // Copy institucional compartido por templates y notification delivery
   | 'careers' // TASK-354: Careers pública Efeonce (attract, listing, detail, apply)
   | 'hiringDesk' // TASK-355: workspace interno de Hiring
+  | 'hiringActivation' // TASK-1368: lane People Ops para activar hires seleccionados
+;
 
 /**
  * Estructura raíz de un dictionary completo por locale.
@@ -79,6 +81,126 @@ export interface MicrocopyDictionary {
   emails: EmailsCopy
   careers: CareersCopy
   hiringDesk: HiringDeskCopy
+  hiringActivation: HiringActivationCopy
+}
+
+export interface HiringActivationCopy {
+  title: string
+  eyebrow: string
+  subtitle: string
+  tabs: {
+    onboarding: string
+    offboarding: string
+    readyHires: string
+  }
+  navigation: {
+    hr: string
+    lifecycle: string
+    overview: string
+    templates: string
+  }
+  kpis: {
+    queue: string
+    queueHint: string
+    ready: string
+    readyHint: string
+    blockers: string
+    blockersHint: string
+    activated: string
+    activatedHint: string
+    unavailable: string
+  }
+  queue: {
+    title: string
+    subtitle: string
+    emptyTitle: string
+    emptyBody: string
+    flagOffTitle: string
+    flagOffBody: string
+    errorTitle: string
+    retry: string
+  }
+  detail: {
+    title: string
+    pendingTitle: string
+    pendingBody: string
+    people360: string
+    source: string
+    handoff: string
+    decision: string
+    entity: string
+    manager: string
+    area: string
+    journeyTitle: string
+    readinessTitle: string
+    readinessDegraded: string
+    blockerTitle: string
+    noBlockers: string
+    activateDisabled: string
+    activateReady: string
+    completeWorkforceProfile: string
+  }
+  journey: {
+    selection: string
+    handoff: string
+    member: string
+    onboarding: string
+    activation: string
+    done: string
+    waiting: string
+    blocked: string
+  }
+  readiness: {
+    ready: string
+    warning: string
+    blocked: string
+    notApplicable: string
+    noRowsTitle: string
+    score: string
+    blockers: string
+    warnings: string
+  }
+  statuses: Record<string, string>
+  blockedReasons: Record<string, string>
+  actions: {
+    review: string
+    createMember: string
+    openOnboarding: string
+    resolveBlocker: string
+    activate: string
+    cancel: string
+    close: string
+    confirm: string
+    goToWorkforceActivation: string
+    openTemplates: string
+    loading: string
+  }
+  dialogs: {
+    activateTitle: string
+    activateBody: string
+    cancelTitle: string
+    cancelBody: string
+    cancelReasonLabel: string
+    resolveTitle: string
+    resolveBody: string
+    resolvePendingTask: string
+  }
+  feedback: {
+    reviewOk: string
+    createMemberOk: string
+    openOnboardingOk: string
+    completeOk: string
+    cancelOk: string
+    commandError: string
+    loadError: string
+  }
+  aria: {
+    closeDetail: string
+    closeDialog: string
+    activationTabs: string
+    queue: string
+    readiness: string
+  }
 }
 
 export interface HiringDeskCopy {

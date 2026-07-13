@@ -48,7 +48,7 @@ const ScrollToTop = (props: ScrollToTopProps) => {
   }
 
   return (
-    <Zoom in={trigger}>
+    <Zoom in={trigger} mountOnEnter unmountOnExit>
       <ScrollToTopStyled className={className} docked={docked} onClick={handleClick} role='presentation'>
         {children}
       </ScrollToTopStyled>

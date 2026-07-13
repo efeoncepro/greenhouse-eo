@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.0
 > **Creado:** 2026-07-10 por Claude (TASK-770)
-> **Ultima actualizacion:** 2026-07-10 por Claude (TASK-770)
+> **Ultima actualizacion:** 2026-07-13 por Codex (TASK-1368)
 > **Documentacion tecnica:** [Greenhouse_HRIS_Architecture_v1](../../architecture/Greenhouse_HRIS_Architecture_v1.md) · [Task TASK-770](../../tasks/complete/TASK-770-hiring-to-hris-collaborator-activation.md)
 > **Manual hermano:** [Operar el Hiring Handoff](operar-hiring-handoff.md) (el tramo anterior: decisión → handoff aprobado)
 
@@ -14,17 +14,25 @@ Cuando un handoff de **contratación interna** queda aprobado, este bridge convi
 ## Antes de empezar
 
 - Necesitas la capability `hiring.activation.review` (HR, admins). Crear la ficha usa además `workforce.member.intake.update`; abrir onboarding usa `hr.onboarding_instance`.
-- Los flags `HIRING_ACTIVATION_ENABLED` y `HIRING_HANDOFF_BRIDGES_ENABLED` deben estar prendidos (hoy OFF por defecto — la UI llega con TASK-1368).
+- Los flags `HIRING_ACTIVATION_ENABLED` y `HIRING_HANDOFF_BRIDGES_ENABLED` deben estar prendidos para operar casos reales. Si están apagados, la UI muestra un estado honesto de bridge deshabilitado.
 - El handoff debe estar **aprobado** (ver manual hermano).
 
 ## Paso a paso
 
-1. **Revisar la cola** (`GET /api/hr/hiring-activation`): handoffs de contratación interna aprobados con el estado del caso.
-2. **Reclamar el caso** (`review`): crea la solicitud de activación (una por handoff; repetir no duplica).
-3. **Crear la ficha** (`create-member`): Greenhouse busca si la persona ya tiene ficha (misma identidad, o mismo correo sin identidad enlazada) y **enlaza o reactiva antes que crear**. La ficha nace pendiente de intake — nómina y capacidad no la ven. Si hay conflicto de identidad, el caso queda **bloqueado con motivo** y lo resuelve People Ops (nunca se fusiona solo).
-4. **Abrir onboarding** (`open-onboarding`): asegura el checklist (si no hay template aplicable, el caso queda bloqueado con motivo — crea el template y reintenta).
-5. **Completar la ficha laboral** en Workforce Activation (`/hr/workforce/activation`), como cualquier intake: readiness + completar ficha. **Este paso NO es del bridge** — es el flujo canónico existente.
-6. **Cerrar** (`complete`): el bridge verifica que la ficha esté completa y marca el handoff como completado con la evidencia (`member:<id>`). Si la ficha no está completa, rechaza con mensaje claro.
+1. Entrar a **HR → Onboarding & Offboarding → Contrataciones listas** (`/hr/onboarding?lane=hiring-activation`).
+2. **Revisar la cola**: handoffs de contratación interna aprobados con el estado del caso. Si la cola está vacía o los flags están apagados, la pantalla lo declara; no hay activación implícita.
+3. Abrir un caso para ver **journey**, readiness y próximos pasos.
+4. **Reclamar el caso** (`review`): crea la solicitud de activación (una por handoff; repetir no duplica).
+5. **Crear la ficha** (`create-member`): Greenhouse busca si la persona ya tiene ficha (misma identidad, o mismo correo sin identidad enlazada) y **enlaza o reactiva antes que crear**. La ficha nace pendiente de intake — nómina y capacidad no la ven. Si hay conflicto de identidad, el caso queda **bloqueado con motivo** y lo resuelve People Ops (nunca se fusiona solo).
+6. **Abrir onboarding** (`open-onboarding`): asegura el checklist (si no hay template aplicable, el caso queda bloqueado con motivo — crea el template y reintenta).
+7. **Completar la ficha laboral** en Workforce Activation (`/hr/workforce/activation`), como cualquier intake: readiness + completar ficha. **Este paso NO es del bridge** — es el flujo canónico existente.
+8. **Cerrar** (`complete`): el bridge verifica que la ficha esté completa y marca el handoff como completado con la evidencia (`member:<id>`). Si la ficha no está completa, rechaza con mensaje claro.
+
+## Resolver blockers desde la lane
+
+La UI de TASK-1368 no simula resolución de blockers. Cuando un caso está bloqueado, el dialog de remediación explica la causa, apunta a la ficha de Workforce Activation o a templates cuando aplica, y deja claro que el command rico de resolución pertenece a `TASK-1400`.
+
+Hasta que `TASK-1400` cierre, resolver blockers significa corregir el dato en la superficie dueña y reintentar la acción del bridge.
 
 ## Qué significan los estados
 
@@ -49,6 +57,7 @@ Señal de operaciones: *Activaciones de hiring atascadas* (`workforce.hiring_act
 
 - **"Ya es colaborador activo" al crear la ficha**: la persona ya trabaja en Efeonce — el destino correcto era reasignación interna, no contratación. Cancela y corrige la decisión en Hiring.
 - **"Sin template de onboarding aplicable"**: crea/activa un template para el contract type del colaborador en HR → Onboarding → Templates y reintenta.
+- **"Bridge de activación deshabilitado"**: revisa los flags `HIRING_ACTIVATION_ENABLED` y `HIRING_HANDOFF_BRIDGES_ENABLED`; la UI no inventa datos mientras estén apagados.
 - **Smoke de diagnóstico** (con proxy PG): `scripts/hiring/_sanity-hiring-activation.ts` valida el flujo completo con datos sintéticos y limpieza automática.
 
 ## Referencias técnicas

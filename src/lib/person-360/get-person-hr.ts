@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { resolveCurrentWorkClassification } from '@/lib/account-360/current-work-classification'
+import { getHiringJourneyForPerson, type HiringJourneyForPerson } from '@/lib/hiring/handoff/journey'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -41,6 +42,7 @@ export interface PersonHrContext {
     effectiveFrom: string
     effectiveTo: string | null
   }>
+  hiringJourney?: HiringJourneyForPerson | null
   supervisorMemberId: string | null
   supervisorName: string | null
   compensation: {
@@ -248,6 +250,17 @@ export const getPersonHrContext = async (identifier: string): Promise<PersonHrCo
     }
   }
 
+  let hiringJourney: HiringJourneyForPerson | null = null
+
+  try {
+    hiringJourney = await getHiringJourneyForPerson(row.identity_profile_id)
+  } catch (error) {
+    captureWithDomain(error, 'hiring', {
+      tags: { source: 'person_hr_hiring_journey' },
+      extra: { profileId: row.identity_profile_id }
+    })
+  }
+
   return {
     identityProfileId: row.identity_profile_id,
     eoId: row.eo_id,
@@ -284,6 +297,7 @@ export const getPersonHrContext = async (identifier: string): Promise<PersonHrCo
       effectiveFrom: toDateStr(relationship.effective_from) ?? '',
       effectiveTo: toDateStr(relationship.effective_to)
     })),
+    hiringJourney,
     supervisorMemberId: row.reports_to_member_id,
     supervisorName: row.supervisor_name,
     compensation: {

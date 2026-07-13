@@ -39,6 +39,7 @@ import PersonLegalProfileSection from './PersonLegalProfileSection'
 import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
+const HIRING_ACTIVATION_COPY = GREENHOUSE_COPY.hiringActivation
 
 type Props = {
   memberId: string
@@ -75,6 +76,15 @@ const offboardingLaneLabel: Record<string, string> = {
   identity_only: 'Solo acceso',
   relationship_transition: 'Transición',
   unknown: 'Por revisar'
+}
+
+const hiringActivationStatusColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
+  pending: 'secondary',
+  approved: 'info',
+  in_setup: 'primary',
+  completed: 'success',
+  blocked: 'error',
+  cancelled: 'default'
 }
 
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
@@ -290,6 +300,10 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
   const bankValue = viewModel.personal.bankAccountNumberMasked
     ? `${viewModel.personal.bankAccountType ?? ''} ${viewModel.personal.bankAccountNumberMasked}`.trim()
     : '—'
+
+  const hiringJourney = hrContext?.hiringJourney ?? null
+  const latestHiringApplication = hiringJourney?.applications[0] ?? null
+  const latestHiringHandoff = hiringJourney?.handoffs[0] ?? null
 
   const handleOpenEmploymentDialog = () => {
     setHireDateDraft(effectiveHireDate ?? '')
@@ -512,6 +526,80 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
                 ))}
               </Stack>
             )}
+
+            {hiringJourney && (latestHiringApplication || latestHiringHandoff) ? (
+              <Stack spacing={3} sx={{ mt: 4 }} data-capture='people-hiring-journey'>
+                <Divider />
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }}>
+                  <Box>
+                    <Typography variant='subtitle2'>Journey desde Hiring</Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      Señal derivada del handoff de contratación; no reemplaza la ficha laboral.
+                    </Typography>
+                  </Box>
+                  {latestHiringHandoff ? (
+                    <CustomChip
+                      round='true'
+                      size='small'
+                      variant='tonal'
+                      color={hiringActivationStatusColor[latestHiringHandoff.state] ?? 'secondary'}
+                      label={HIRING_ACTIVATION_COPY.statuses[latestHiringHandoff.state] ?? latestHiringHandoff.state}
+                    />
+                  ) : null}
+                </Stack>
+
+                <Box
+                  sx={{
+                    border: theme => `1px solid ${theme.palette.divider}`,
+                    borderRadius: 'var(--mui-shape-customBorderRadius-lg)',
+                    p: 3,
+                    minInlineSize: 0
+                  }}
+                >
+                  <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} justifyContent='space-between'>
+                    <Box sx={{ minInlineSize: 0 }}>
+                      <Typography fontWeight={700}>{latestHiringApplication?.openingTitle ?? latestHiringHandoff?.selectedDestination ?? 'Contratación'}</Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        {latestHiringApplication
+                          ? `${latestHiringApplication.publicId} · ${latestHiringApplication.stage}`
+                          : latestHiringHandoff?.handoffId ?? 'Sin aplicación visible'}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        {latestHiringHandoff?.tentativeStartDate
+                          ? `Inicio tentativo ${formatDate(latestHiringHandoff.tentativeStartDate.slice(0, 10))}`
+                          : latestHiringApplication?.decisionAt
+                            ? `Decisión ${formatDate(latestHiringApplication.decisionAt.slice(0, 10))}`
+                            : 'Sin fecha de decisión disponible'}
+                      </Typography>
+                    </Box>
+                    <Stack direction='row' spacing={2} alignItems='center' useFlexGap flexWrap='wrap'>
+                      {latestHiringHandoff ? (
+                        <CustomChip
+                          round='true'
+                          size='small'
+                          variant='tonal'
+                          color={latestHiringHandoff.blockedReason ? 'error' : 'info'}
+                          label={latestHiringHandoff.blockedReason
+                            ? HIRING_ACTIVATION_COPY.blockedReasons[latestHiringHandoff.blockedReason] ?? latestHiringHandoff.blockedReason
+                            : latestHiringHandoff.selectedDestination}
+                        />
+                      ) : null}
+                      {latestHiringApplication ? (
+                        <Button
+                          component={Link}
+                          href={`/agency/hiring/applications/${latestHiringApplication.applicationId}`}
+                          size='small'
+                          variant='tonal'
+                          startIcon={<i className='tabler-external-link' />}
+                        >
+                          Ver aplicación
+                        </Button>
+                      ) : null}
+                    </Stack>
+                  </Stack>
+                </Box>
+              </Stack>
+            ) : null}
           </CardContent>
         </Card>
       </Grid>

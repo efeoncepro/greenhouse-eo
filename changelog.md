@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-07-13
+
+- **TASK-1368 — Hiring Activation Lane code-complete local.** `/hr/onboarding?lane=hiring-activation` implementa la lane "Contrataciones listas" como consumer UI del bridge de TASK-770: hero propio, navegación Lifecycle mobile-safe, KPIs, cola/detalle en `CompositionShell`, journey/readiness, actions gobernadas y estado flag-off honesto. Se refrescó el shell de Onboarding para no heredar la UI vieja; People 360 muestra el journey derivado; `resolver blocker` queda split a TASK-1400 sin simulación client-side. GVC local desktop/mobile PASS (`.captures/2026-07-13T09-21-19_hiring-activation-lane`); staging/flags/data reales siguen pendientes para mover TASK-1368 a complete.
+
 ## 2026-07-12
 
 - **Creative Studio / Creative Operations — investigación de workflows y agentes canonizada.** `RESEARCH-009` reúne evidencia de Adobe, Magnific, Canva, Google Flow, Runway, ComfyUI y MCP, y fija la doctrina de dos velocidades: explorar no es ejecutar; un agente propone planes editables, dirección creativa construye templates/rúbricas y un runner sólo opera inputs semánticos con aprobación humana. Arquitectura, EPIC-028, manual y skills espejo lo referencian. Sin cambio de runtime, proveedor, ADR, gasto ni publicación.

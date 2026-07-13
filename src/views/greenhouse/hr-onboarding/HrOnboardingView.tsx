@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
@@ -30,7 +30,9 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
+import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import { getMicrocopy } from '@/lib/copy'
+import HiringActivationLaneView from './HiringActivationLaneView'
 
 import CustomChip from '@core/components/mui/Chip'
 
@@ -46,8 +48,9 @@ import type {
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
+const HIRING_ACTIVATION_COPY = GREENHOUSE_COPY.hiringActivation
 
-type ViewMode = 'overview' | 'templates'
+type ViewMode = 'overview' | 'templates' | 'activation'
 
 type TemplatesResponse = { templates: HrOnboardingTemplate[] }
 type InstancesResponse = { instances: HrOnboardingInstance[] }
@@ -55,6 +58,128 @@ type MembersResponse = { members: HrMemberOption[] }
 type CasesResponse = { cases: OffboardingCase[] }
 
 const cardBorderSx = { border: (theme: Theme) => `1px solid ${theme.palette.divider}` }
+
+const lifecycleNavShellSx = {
+  inlineSize: '100%',
+  maxInlineSize: '100%',
+  bgcolor: 'background.paper',
+  border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
+  borderRadius: 'var(--mui-shape-customBorderRadius-lg)',
+  p: 1,
+  overflow: 'hidden'
+}
+
+const lifecycleNavButtonSx = (active: boolean) => ({
+  flex: { xs: '1 1 100%', sm: '1 1 auto' },
+  minBlockSize: (theme: Theme) => theme.spacing(9),
+  minInlineSize: { xs: 0, sm: 160 },
+  justifyContent: 'flex-start',
+  borderRadius: 'var(--mui-shape-customBorderRadius-md)',
+  color: active ? 'primary.main' : 'text.secondary',
+  bgcolor: active ? 'primary.lightOpacity' : 'transparent',
+  fontWeight: 700,
+  textTransform: 'none',
+  transition: (theme: Theme) =>
+    theme.transitions.create(['background-color', 'color', 'transform'], {
+      duration: theme.transitions.duration.shorter
+    }),
+  '&:hover': {
+    bgcolor: active ? 'primary.lightOpacity' : 'action.hover',
+    transform: 'translateY(-1px)'
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
+    '&:hover': { transform: 'none' }
+  }
+})
+
+const LifecycleNavigation = ({ mode }: { mode: ViewMode }) => (
+  <Box component='nav' aria-label={HIRING_ACTIVATION_COPY.aria.activationTabs} sx={lifecycleNavShellSx}>
+    <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
+      <Button
+        component={Link}
+        href='/hr/onboarding'
+        aria-current={mode === 'overview' ? 'page' : undefined}
+        sx={lifecycleNavButtonSx(mode === 'overview')}
+      >
+        {HIRING_ACTIVATION_COPY.navigation.overview}
+      </Button>
+      <Button
+        component={Link}
+        href='/hr/onboarding/templates'
+        aria-current={mode === 'templates' ? 'page' : undefined}
+        sx={lifecycleNavButtonSx(mode === 'templates')}
+      >
+        {HIRING_ACTIVATION_COPY.navigation.templates}
+      </Button>
+      <Button
+        component={Link}
+        href='/hr/onboarding?lane=hiring-activation'
+        aria-current={mode === 'activation' ? 'page' : undefined}
+        sx={lifecycleNavButtonSx(mode === 'activation')}
+      >
+        {HIRING_ACTIVATION_COPY.tabs.readyHires}
+      </Button>
+    </Stack>
+  </Box>
+)
+
+const LifecycleHeader = ({
+  actions,
+  mode,
+  subtitle,
+  title
+}: {
+  actions?: ReactNode
+  mode: ViewMode
+  subtitle: string
+  title: string
+}) => (
+  <Card
+    elevation={0}
+    sx={{
+      ...cardBorderSx,
+      borderRadius: 'var(--mui-shape-customBorderRadius-lg)',
+      overflow: 'hidden',
+      background: theme =>
+        `linear-gradient(135deg, ${theme.palette.primary.lightOpacity} 0%, ${theme.palette.background.paper} 46%, ${theme.palette.success.lightOpacity} 100%)`
+    }}
+    data-capture={`hr-onboarding-${mode}-hero`}
+  >
+    <CardContent>
+      <Stack spacing={4}>
+        <GreenhouseBreadcrumbs
+          kind='pageHierarchy'
+          motion='subtle'
+          dataCapture={`hr-onboarding-${mode}-breadcrumbs`}
+          items={[
+            { label: HIRING_ACTIVATION_COPY.navigation.hr, href: '/hr', iconClassName: 'tabler-users-group' },
+            { label: HIRING_ACTIVATION_COPY.navigation.lifecycle }
+          ]}
+        />
+
+        <Stack direction={{ xs: 'column', lg: 'row' }} spacing={5} justifyContent='space-between' alignItems={{ xs: 'stretch', lg: 'flex-end' }}>
+          <Box sx={{ maxInlineSize: 760 }}>
+            <Typography variant='overline' color='primary.main'>Lifecycle / Onboarding & Offboarding</Typography>
+            <Typography variant='h3' sx={{ mt: 1 }}>{title}</Typography>
+            <Typography color='text.secondary' sx={{ mt: 2 }}>
+              {subtitle}
+            </Typography>
+          </Box>
+
+          <Stack spacing={2} alignItems={{ xs: 'stretch', lg: 'flex-end' }}>
+            <LifecycleNavigation mode={mode} />
+            {actions ? (
+              <Stack direction='row' spacing={2} justifyContent={{ xs: 'flex-start', lg: 'flex-end' }} useFlexGap flexWrap='wrap'>
+                {actions}
+              </Stack>
+            ) : null}
+          </Stack>
+        </Stack>
+      </Stack>
+    </CardContent>
+  </Card>
+)
 
 const typeLabel: Record<string, string> = {
   onboarding: 'Onboarding',
@@ -124,21 +249,40 @@ const LaneCard = ({
   tone: 'primary' | 'success' | 'warning' | 'error' | 'info'
   icon: string
 }) => (
-  <Card elevation={0} sx={cardBorderSx}>
+  <Card
+    elevation={0}
+    sx={{
+      ...cardBorderSx,
+      borderRadius: 'var(--mui-shape-customBorderRadius-lg)',
+      minInlineSize: 0,
+      transition: theme => theme.transitions.create(['border-color', 'background-color', 'transform'], {
+        duration: theme.transitions.duration.shorter
+      }),
+      '&:hover': {
+        borderColor: `${tone}.main`,
+        bgcolor: `${tone}.lightOpacity`,
+        transform: 'translateY(-2px)'
+      },
+      '@media (prefers-reduced-motion: reduce)': {
+        transition: 'none',
+        '&:hover': { transform: 'none' }
+      }
+    }}
+  >
     <CardContent>
       <Stack direction='row' spacing={3} alignItems='center'>
         <Box
           sx={{
             inlineSize: 44,
             blockSize: 44,
-            borderRadius: 1.5,
+            borderRadius: 'var(--mui-shape-customBorderRadius-lg)',
             display: 'grid',
             placeItems: 'center',
             bgcolor: `${tone}.lightOpacity`,
             color: `${tone}.main`
           }}
         >
-          <i className={icon} style={{ fontSize: 24 }} />
+          <Box component='i' className={icon} sx={{ fontSize: theme => theme.typography.pxToRem(24), lineHeight: 1 }} />
         </Box>
         <Box sx={{ minWidth: 0 }}>
           <Typography variant='h5'>{value}</Typography>
@@ -218,15 +362,16 @@ const HrOnboardingView = ({ mode = 'overview' }: { mode?: ViewMode }) => {
   }, [])
 
   useEffect(() => {
+    if (mode === 'activation') return
+
     void loadData()
-  }, [loadData])
+  }, [loadData, mode])
 
   const selectedTemplate = useMemo(
     () => templates.find(template => template.templateId === selectedTemplateId) ?? templates[0] ?? null,
     [selectedTemplateId, templates]
   )
 
-  const onboardingInstances = useMemo(() => instances.filter(instance => instance.type === 'onboarding'), [instances])
   const offboardingInstances = useMemo(() => instances.filter(instance => instance.type === 'offboarding'), [instances])
   const overdueInstances = useMemo(() => instances.filter(instance => instance.progress.overdue > 0), [instances])
   const blockedItems = useMemo(() => instances.flatMap(instance => instance.items.filter(item => item.status === 'blocked').map(item => ({ instance, item }))), [instances])
@@ -428,6 +573,10 @@ const HrOnboardingView = ({ mode = 'overview' }: { mode?: ViewMode }) => {
     }
   }
 
+  if (mode === 'activation') {
+    return <HiringActivationLaneView />
+  }
+
   if (loading) {
     return (
       <Stack spacing={6}>
@@ -447,17 +596,16 @@ const HrOnboardingView = ({ mode = 'overview' }: { mode?: ViewMode }) => {
   if (mode === 'templates') {
     return (
       <Stack spacing={6}>
-        <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' spacing={4}>
-          <Box>
-            <Typography variant='h4'>Plantillas Lifecycle</Typography>
-            <Typography variant='body2' color='text.secondary'>
-              Edita tareas operativas de onboarding y offboarding sin cambiar el caso formal de salida ni el motor de finiquitos.
-            </Typography>
-          </Box>
-          <Button component={Link} href='/hr/onboarding' variant='tonal' startIcon={<i className='tabler-layout-dashboard' />}>
-            Volver al overview
-          </Button>
-        </Stack>
+        <LifecycleHeader
+          mode='templates'
+          title='Plantillas Lifecycle'
+          subtitle='Edita tareas operativas de onboarding y offboarding sin cambiar el caso formal de salida ni el motor de finiquitos.'
+          actions={
+            <Button component={Link} href='/hr/onboarding' variant='tonal' startIcon={<i className='tabler-layout-dashboard' />}>
+              Volver al overview
+            </Button>
+          }
+        />
 
         {error && <Alert severity='error' onClose={() => setError(null)}>{error}</Alert>}
 
@@ -613,56 +761,24 @@ const HrOnboardingView = ({ mode = 'overview' }: { mode?: ViewMode }) => {
 
   return (
     <Stack spacing={6}>
-      <Card elevation={0} sx={{ ...cardBorderSx, bgcolor: 'background.paper' }}>
-        <CardContent>
-          <Grid container spacing={5} alignItems='center'>
-            <Grid size={{ xs: 12, md: 7 }}>
-              <Stack spacing={3}>
-                <Box>
-                  <Typography variant='overline' color='primary.main'>Lifecycle / Onboarding & Offboarding</Typography>
-                  <Typography variant='h3' sx={{ mt: 1 }}>Entradas y salidas con carriles separados</Typography>
-                  <Typography color='text.secondary' sx={{ mt: 2, maxWidth: 720 }}>
-                    Gestiona checklists operativos de ingreso y salida sin confundirlos con el caso formal de offboarding, payroll o finiquito.
-                  </Typography>
-                </Box>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                  <Button component={Link} href='/hr/onboarding/templates' variant='contained' startIcon={<i className='tabler-template' />}>
-                    Editar plantillas
-                  </Button>
-                  <Button component={Link} href='/hr/offboarding' variant='tonal' color='warning' startIcon={<i className='tabler-door-exit' />}>
-                    Operar offboarding formal
-                  </Button>
-                  <Button component={Link} href='/my/onboarding' variant='text' startIcon={<i className='tabler-user-check' />}>
-                    Ver My Onboarding
-                  </Button>
-                </Stack>
-              </Stack>
-            </Grid>
-            <Grid size={{ xs: 12, md: 5 }}>
-              <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, bgcolor: 'action.hover' }}>
-                <CardContent>
-                  <Stack spacing={3}>
-                    <Stack direction='row' justifyContent='space-between' spacing={3}>
-                      <Box>
-                        <Typography variant='caption' color='text.secondary'>Carril onboarding</Typography>
-                        <Typography variant='h4'>{onboardingInstances.length}</Typography>
-                      </Box>
-                      <Box sx={{ textAlign: 'right' }}>
-                        <Typography variant='caption' color='text.secondary'>Carril offboarding</Typography>
-                        <Typography variant='h4'>{offboardingCases.length}</Typography>
-                      </Box>
-                    </Stack>
-                    <Divider />
-                    <Typography variant='body2' color='text.secondary'>
-                      El checklist de salida es una herramienta hija. La salida laboral vive en el caso canónico y sus lanes de acceso, handoff, payroll y documento.
-                    </Typography>
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+      <LifecycleHeader
+        mode='overview'
+        title='Entradas y salidas con carriles separados'
+        subtitle='Gestiona checklists operativos de ingreso y salida sin confundirlos con el caso formal de offboarding, payroll o finiquito.'
+        actions={
+          <>
+            <Button component={Link} href='/hr/onboarding/templates' variant='contained' startIcon={<i className='tabler-template' />}>
+              Editar plantillas
+            </Button>
+            <Button component={Link} href='/hr/onboarding?lane=hiring-activation' variant='tonal' startIcon={<i className='tabler-users-plus' />}>
+              Contrataciones listas
+            </Button>
+            <Button component={Link} href='/hr/offboarding' variant='tonal' color='warning' startIcon={<i className='tabler-door-exit' />}>
+              Offboarding formal
+            </Button>
+          </>
+        }
+      />
 
       {error && <Alert severity='error' onClose={() => setError(null)}>{error}</Alert>}
 

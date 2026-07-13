@@ -1,3 +1,13 @@
+## Sesión 2026-07-13 — TASK-1368 Plan Mode + TASK-1400 resolver blockers (Codex)
+
+> **Hecho:** TASK-1368 quedó code-complete local en `develop`: `/hr/onboarding?lane=hiring-activation` implementa la lane "Contrataciones listas" como consumer del bridge de TASK-770, con hero propio, navegación Lifecycle sin tabs scroll/translate, KPIs, cola/detalle en `CompositionShell`, journey/readiness, dialogs de acciones reales y estado flag-off honesto. También se refrescó el shell visible de `HrOnboardingView` para no heredar la UI plana del onboarding viejo, y People 360 ahora muestra el journey derivado dentro de `Lifecycle laboral`.
+>
+> **Follow-up creado por instrucción del operador:** `TASK-1400` (`docs/tasks/to-do/TASK-1400-hiring-activation-blocker-resolution-api.md`) cubre el gap backend/API de `resolver blocker` con payloads ricos, command gobernado, capability gates por acción y audit redacted. TASK-1368 no debe simular ese command client-side; hasta que TASK-1400 cierre, la UI sólo puede mostrar remediación honesta/links y ejecutar acciones reales de TASK-770.
+>
+> **Evidencia local:** GVC PASS desktop/mobile `.captures/2026-07-13T09-21-19_hiring-activation-lane` + `fe:capture:review` apto/0 findings; `pnpm lint`; `pnpm typecheck`; Vitest People 360 2 files/6 tests; Vitest hiring-activation bridge 3 files/28 tests; `task:lint` TASK-1368/TASK-1400; `ui:*` checks; `ops:lint --changed`. `ScrollToTop` se corrigió para desmontar el botón oculto y no dejar targets de 0px.
+>
+> **Estado:** `code complete local; rollout/staging smoke con flags/data reales pendiente`. La task sigue `in-progress` hasta smoke remoto o decisión explícita de cerrar con evidencia local flag-off. Push remoto autorizado por el operador al cierre del commit.
+
 ## Sesión 2026-07-12 (cont. 19) — Creative Operations y agentes: investigación canonizada (Codex)
 
 > **Hecho:** se abrió `RESEARCH-009-creative-operations-agentic-workflows.md` con el scan de Adobe, Magnific, Canva, Google Flow, Runway, ComfyUI y conectores MCP. La tesis operativa separa exploración divergente de producción convergente; formaliza builder (dirección/diseño), agent, runner (producción) e ingeniería. Está enlazada desde la arquitectura Creative Studio, EPIC-028, documentación funcional/manual e índices; los espejos Codex/Claude de `motion-design-studio` obligan que un agent entregue plan editable y no eleve conversación/prompt a workflow sin evidencia.

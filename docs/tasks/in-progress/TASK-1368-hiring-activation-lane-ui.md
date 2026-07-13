@@ -1,5 +1,23 @@
 # TASK-1368 — Hiring Activation Lane UI (People/HRIS)
 
+## Delta 2026-07-13 — Implementación Codex code-complete local, rollout pendiente
+
+- Se implementó la lane en `/hr/onboarding?lane=hiring-activation` como consumer del bridge de TASK-770: hero propio, navegación Lifecycle sin `MuiTabs` scroll/translate en mobile, KPIs, cola/detalle con `CompositionShell`, journey/readiness, dialogs de acciones reales (`review`, `create-member`, `open-onboarding`, `complete`, `cancel`) y estado flag-off honesto.
+- Se corrigió el shell visible de `HrOnboardingView` para no heredar la UI plana/fea del onboarding anterior: breadcrumbs canónicos, header gradient tokenizado, navegación segmented/wrapping, `LaneCard` con hover/reduced-motion y targets mobile estables.
+- `Resolver blocker` queda deliberadamente no-simulado: la UI abre un dialog honesto con remediación/links y referencia a `TASK-1400`, que cubre el command/API con payloads ricos.
+- People 360 ahora puede leer `getHiringJourneyForPerson` desde el contexto HR y mostrar el journey derivado dentro de `Lifecycle laboral`, sin card paralela.
+- Se corrigió un bug global detectado por GVC: `ScrollToTop` desmonta el botón mientras está oculto para no dejar un target interactivo de 0px en el DOM.
+- Evidencia local: `pnpm fe:capture hiring-activation-lane --env=local --task=TASK-1368` PASS desktop/mobile en `.captures/2026-07-13T09-21-19_hiring-activation-lane`; dossier `fe:capture:review` = `Apto para implementar`, 0 findings, enterprise rubric pass.
+- Estado honesto: **code complete local; task permanece `in-progress`** hasta smoke en staging con flags/data reales o decisión explícita de cerrar la UI con evidencia local flag-off.
+
+## Delta 2026-07-13 — Ejecución Codex: route y fuente UI reconciliadas antes de código
+
+- TASK tomada en `develop` por instrucción del operador, sin subagentes; push remoto autorizado solo al cierre final.
+- Drift verificado: `/hr/workforce/activation` ya es Workforce Activation canónico (`equipo.workforce_activation`) y no debe pisarse. La fuente UI de TASK-1368 corresponde visualmente a `HR > Onboarding & Offboarding`; el target de implementación se normaliza a `/hr/onboarding?lane=hiring-activation` bajo `equipo.onboarding`, con deep links a Workforce Activation solo cuando exista `memberId`/ficha pendiente.
+- Fuente visual revisada en `/Users/jreye/Documents/carreers/Hiring-activation/Ejecutar tarea 1368.zip`; `support.js` es runtime genérico de Design Component y no se porta. El comportamiento de dominio se toma del script embebido del HTML y se reimplementa sobre APIs reales de TASK-770.
+- El botón/flujo real de `resolver blocker` queda split a `TASK-1400`; TASK-1368 no debe simular esa resolución en cliente hasta que exista el command backend.
+- Plan formal: `docs/tasks/plans/TASK-1368-plan.md`; pendiente checkpoint humano P1 antes de escribir UI funcional.
+
 ## Delta 2026-07-12 — UI design ready for implementation
 
 - La fuente visual de Hiring Activation fue revisada junto con su wireframe, flow y motion contract. El list-detail, estados, interaction contract, implementation mapping, GVC scenario plan y design decision log son ejecutables.
@@ -19,7 +37,7 @@
 ## Delta 2026-07-08
 
 - **Split de TASK-770** (decisión operador 2026-07-08): 770 quedó backend-data (bridge de activación); esta task es su **consumer ui-ux** = la activation lane que People Ops opera. Patrón 354(UI)/1367(backend).
-- **Extiende surface existente**, no greenfield: `HrOnboardingView` / `(dashboard)/hr/workforce/activation`. Alineada al **mockup aprobado de TASK-763** (`docs/mockups/onboarding-module-mockup.html`): first-fold dominante, lanes reales, list-detail, motion mínima, copy operacional honesta.
+- **Extiende surface existente**, no greenfield: `HrOnboardingView` / `/hr/onboarding?lane=hiring-activation`. Alineada al **mockup aprobado de TASK-763** (`docs/mockups/onboarding-module-mockup.html`): first-fold dominante, lanes reales, list-detail, motion mínima, copy operacional honesta. `/hr/workforce/activation` queda intacta como Workforce Activation canónico.
 - **Cliente delgado de 770:** cero lógica de activación en la UI; readiness/activación reusan los primitives workforce vía los readers/commands de 770.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -28,7 +46,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -41,7 +59,7 @@
 - Flow: `docs/ui/flows/TASK-1368-hiring-activation-lane-flow.md`
 - Motion: `docs/ui/motion/TASK-1368-hiring-activation-lane-motion.md`
 - Epic: `EPIC-011`
-- Status real: `UI design ready for implementation; backend contract TASK-770 available`
+- Status real: `Code complete local; rollout/staging smoke con flags/data reales pendiente`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -51,7 +69,7 @@
 
 ## Summary
 
-La cara People Ops del cierre del pipeline de Hiring: una lane **"Contrataciones listas"** en `HR > Onboarding & Offboarding` (extiende `HrOnboardingView`/`hr/workforce/activation`) que muestra la cola de handoffs `internal_hire` aprobados, el journey, el readiness checklist y las acciones de activación — **todo cliente delgado de los readers/commands de TASK-770** (crear colaborador, abrir onboarding, activar). Nada de lógica de activación en la UI.
+La cara People Ops del cierre del pipeline de Hiring: una lane **"Contrataciones listas"** en `HR > Onboarding & Offboarding` (extiende `HrOnboardingView`; target `/hr/onboarding?lane=hiring-activation`) que muestra la cola de handoffs `internal_hire` aprobados, el journey, el readiness checklist y las acciones de activación — **todo cliente delgado de los readers/commands de TASK-770** (crear colaborador, abrir onboarding, activar). Nada de lógica de activación en la UI. `/hr/workforce/activation` se conserva como workbench canónico de Workforce Activation.
 
 ## Why This Task Exists
 
@@ -95,25 +113,25 @@ Reglas obligatorias:
 - `Handoff.md`
 - `docs/ui/wireframes/TASK-1368-hiring-activation-lane.md`
 - `docs/ui/flows/TASK-1368-hiring-activation-lane-flow.md`
-- `docs/tasks/to-do/TASK-770-hiring-to-hris-collaborator-activation.md`
+- `docs/tasks/complete/TASK-770-hiring-to-hris-collaborator-activation.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
 - `TASK-770` — readers (`listHiringActivationQueue`, `getHiringActivationDetail`, `getHiringJourneyForPerson`) + commands (`POST /api/hr/hiring-activation/[id]/*`) + `resolveWorkforceActivationReadiness` reuse.
-- `src/views/greenhouse/hr-onboarding/HrOnboardingView.tsx` + `LaneCard` (surface a extender).
+- `src/views/greenhouse/hr-onboarding/HrOnboardingView.tsx` + lane `Contrataciones listas` (surface a extender).
 - `CompositionShell` (`src/components/greenhouse/primitives/composition-shell/`).
 - `src/lib/person-legal-profile/` (reveal PII).
 
 ### Blocks / Impacts
 
 - Cierra el funnel visible de EPIC-011 (nodo N11).
-- Impacta `HrOnboardingView`, `(dashboard)/hr/workforce/activation`, People 360.
+- Impacta `HrOnboardingView`, `(dashboard)/hr/onboarding`, People 360; no reemplaza `(dashboard)/hr/workforce/activation`.
 
 ### Files owned
 
-- `src/app/(dashboard)/hr/workforce/activation/**` (lane + detalle)
+- `src/app/(dashboard)/hr/onboarding/page.tsx` (query lane selector)
 - `src/views/greenhouse/hr-onboarding/**` (solo la lane "Contrataciones listas")
 - `src/lib/copy/dictionaries/{es-CL,en-US}/hiringActivation.ts`
 - `src/lib/person-360/**` solo para la card derivada del journey (consumiendo reader de 770)
@@ -122,7 +140,7 @@ Reglas obligatorias:
 
 ### Already exists
 
-- `src/views/greenhouse/hr-onboarding/HrOnboardingView.tsx` (lanes + `LaneCard` + list-detail) + rutas `(dashboard)/hr/onboarding`, `(dashboard)/hr/workforce/activation`.
+- `src/views/greenhouse/hr-onboarding/HrOnboardingView.tsx` (lanes + `LaneCard` + list-detail) + ruta `(dashboard)/hr/onboarding`; `(dashboard)/hr/workforce/activation` existe pero pertenece a Workforce Activation.
 - Mockup aprobado TASK-763 (SoT visual).
 - `CompositionShell`, `LaneCard`, `GreenhouseDatePicker`, dialogs canónicos.
 - Los readers/commands de 770 (dependencia — deben existir antes de implementar).
@@ -146,7 +164,7 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: lane "Contrataciones listas" en `HR > Onboarding & Offboarding` / `hr/workforce/activation`
+- Surface: lane "Contrataciones listas" en `HR > Onboarding & Offboarding` / `/hr/onboarding?lane=hiring-activation`
 - Composition Shell: `aplica` — regiones cola/detalle bajo el shell existente
 - Primitive decision: `reuse` — `LaneCard`, list-detail existente, dialogs, `CompositionShell`
 - Adaptive density / The Seam: `aplica` — cards de cola adaptables a su ancho
@@ -186,7 +204,7 @@ Reglas obligatorias:
 
 ### Implementation mapping
 
-- Route / surface: `src/app/(dashboard)/hr/workforce/activation/**`
+- Route / surface: `src/app/(dashboard)/hr/onboarding/page.tsx` + `src/views/greenhouse/hr-onboarding/**`
 - Primitive / variant / kind: `CompositionShell` + `LaneCard` + list-detail + dialogs (reuse)
 - Component candidates: `HrOnboardingView` extendido; detalle nuevo
 - Copy source: `getMicrocopy(locale).hiringActivation`
@@ -198,7 +216,7 @@ Reglas obligatorias:
 ### GVC scenario plan
 
 - Scenario file: `scripts/frontend/scenarios/hiring-activation-lane.scenario.ts` (nuevo)
-- Route: `/hr/workforce/activation`
+- Route: `/hr/onboarding?lane=hiring-activation`
 - Viewports: 1440 + 390
 - Required steps: cola → detalle → readiness (con blocker) → resolver → activar (confirmación)
 - Required captures: lane (loaded/empty/blocked), detalle (journey + readiness + Activar disabled-con-motivo), resolver-blocker, people-360 journey
@@ -261,7 +279,7 @@ Ver wireframe + flow declarados. La UI refleja la state-machine de 770 (`pending
 
 ## Rollout Plan & Risk Matrix
 
-N/A — additive UI change, sin runtime backend nuevo (consume contratos de 770). Sin migración, sin flag propio (hereda el flag de 770 `HIRING_ACTIVATION_ENABLED`: la lane no muestra data hasta que 770 esté activo). Rollback = revert PR. Riesgo principal: implementar la UI antes de que 770 exponga los readers/commands → **Blocked by TASK-770** lo previene.
+N/A — additive UI change, sin runtime backend nuevo (consume contratos de 770). Sin migración, sin flag propio (hereda el flag de 770 `HIRING_ACTIVATION_ENABLED`: la lane no muestra data hasta que 770 esté activo). Rollback = revert PR. TASK-770 ya está `complete`; el riesgo vivo es que staging/prod tengan flags OFF o no tengan data de handoff para el smoke real.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -269,15 +287,15 @@ N/A — additive UI change, sin runtime backend nuevo (consume contratos de 770)
 
 ## Acceptance Criteria
 
-- [ ] Lane "Contrataciones listas" en `HR > Onboarding & Offboarding`/`hr/workforce/activation` (deep link, bilingüe, extiende la view existente, `CompositionShell`).
-- [ ] Cola (`listHiringActivationQueue`) list-detail + KPIs `LaneCard`; empty/error honestos.
-- [ ] Detalle: journey + readiness ✓/⚠/✗ (reusa resolvers de 770); anti silent-catch.
-- [ ] Acciones vía commands de 770; **Activar** solo con readiness OK (disabled-con-motivo, no botón mudo); confirmación accesible.
-- [ ] Resolver-blocker drawer/dialog (forms-ux) accesible.
-- [ ] People 360 muestra journey derivado sin card paralela.
-- [ ] Copy desde `hiringActivation` dictionary; tokens AXIS; PII masked/reveal.
-- [ ] GVC desktop+mobile mirado; `scrollWidth==clientWidth` (1440+390); consola limpia; reduced-motion + foco.
-- [ ] `UI ready: yes` solo con lo anterior + `pnpm task:lint --task TASK-1368` sin findings.
+- [x] Lane "Contrataciones listas" en `HR > Onboarding & Offboarding`/`/hr/onboarding?lane=hiring-activation` (deep link, bilingüe, extiende la view existente, `CompositionShell`).
+- [x] Cola (`listHiringActivationQueue`) list-detail + KPIs `LaneCard`; empty/error/flag-off honestos.
+- [x] Detalle: journey + readiness ✓/⚠/✗ (reusa resolvers de 770); anti silent-catch.
+- [x] Acciones vía commands de 770; **Activar** solo con readiness OK (disabled-con-motivo, no botón mudo); confirmación accesible.
+- [x] Resolver-blocker dialog accesible y honesto; command real split a `TASK-1400`.
+- [x] People 360 muestra journey derivado sin card paralela.
+- [x] Copy desde `hiringActivation` dictionary; tokens AXIS; PII masked/reveal (sin revelar PII desde esta lane).
+- [x] GVC desktop+mobile mirado; `scrollWidth==clientWidth` (1440+390); consola limpia; motion no decorativa/reduced-motion por CSS.
+- [x] `UI ready: yes` conservado con `pnpm task:lint --task TASK-1368` sin findings.
 
 ## Verification
 
