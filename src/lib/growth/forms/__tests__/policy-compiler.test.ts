@@ -156,6 +156,52 @@ describe('render_contract — browser-safe', () => {
     })
     expect(JSON.stringify(result.renderContract).toLowerCase()).not.toContain('secret')
   })
+
+  it('publica application forms con upload policy escaneada sin destination interno', () => {
+    const result = compileFormVersion(
+      definition({ form_kind: 'application' }),
+      version({
+        field_schema_json: [
+          { key: 'openingPublicId', type: 'hidden', required: true },
+          { key: 'firstName', type: 'text', required: true },
+          { key: 'lastName', type: 'text', required: true },
+          { key: 'email', type: 'email', required: true },
+          {
+            key: 'cvFile',
+            type: 'file',
+            required: false,
+            dataClass: 'uploaded_file',
+            uploadPolicy: {
+              acceptedMimeTypes: ['application/pdf'],
+              maxBytes: 10 * 1024 * 1024,
+              multiple: false,
+              storageContext: 'hiring_application_cv_draft',
+              scanPolicy: 'scan_required',
+            },
+          },
+        ],
+        destination_policy_json: null,
+      }),
+      [],
+      { forPublication: true },
+    )
+
+    expect(result.ok).toBe(true)
+    expect(result.blockingReasons).toHaveLength(0)
+    expect(result.destinationPlan?.destinations).toEqual([])
+    expect(result.renderContract?.fields.find(field => field.key === 'cvFile')).toMatchObject({
+      type: 'file',
+      dataClass: 'uploaded_file',
+      uploadPolicy: {
+        acceptedMimeTypes: ['application/pdf'],
+        storageContext: 'hiring_application_cv_draft',
+        scanPolicy: 'scan_required',
+      },
+    })
+    expect(JSON.stringify(result.renderContract)).not.toContain('hubspot_prop')
+    expect(JSON.stringify(result.renderContract).toLowerCase()).not.toContain('mapping_json')
+    expect(JSON.stringify(result.renderContract).toLowerCase()).not.toContain('adapter_kind')
+  })
 })
 
 describe('render_contract — multi_step_light composition', () => {

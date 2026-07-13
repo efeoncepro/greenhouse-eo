@@ -474,7 +474,8 @@ export const createPrivatePendingAsset = async ({
   ownerClientId,
   ownerSpaceId,
   ownerMemberId,
-  metadata
+  metadata,
+  dedupe = true
 }: {
   contextType: DraftUploadContext
   uploadedByUserId: string | null
@@ -485,6 +486,7 @@ export const createPrivatePendingAsset = async ({
   ownerSpaceId?: string | null
   ownerMemberId?: string | null
   metadata?: Record<string, unknown>
+  dedupe?: boolean
 }) => {
   const ownershipScope = normalizeGreenhouseAssetOwnershipScope({
     ownerClientId,
@@ -502,7 +504,7 @@ export const createPrivatePendingAsset = async ({
 
   // TASK-721 — content-hash dedup: same SHA-256 → reuse existing pending asset.
   const contentHash = computeContentHash(bytes)
-  const existing = await findAssetByContentHash(contentHash)
+  const existing = dedupe ? await findAssetByContentHash(contentHash) : null
 
   if (existing && existing.status === 'pending' && existing.ownerAggregateType === contextType) {
     // Identical pending upload by hash + same context → reuse to avoid duplicate

@@ -186,14 +186,24 @@ instancia en Hiring Desk.
 
 Contrato programatico del submit:
 
-- `POST /api/public/hiring/applications` es publico y no requiere sesion.
-- En produccion exige Turnstile; sin token valido responde `403 captcha_failed`.
-- Acepta JSON sin CV o `multipart/form-data` con `cvFile`.
-- El CV opcional debe ser PDF, maximo 10 MB, y queda como asset privado
-  `hiring_application_cv`.
-- El command autoritativo es `submitPublicHiringApplication`: resuelve opening
-  publicado, reconcilia Person por email, upsertea `candidate_facet`, crea o
-  dedupea `hiring_application` y devuelve siempre una respuesta publica generica.
+- Desde TASK-1372, el path platform para formularios `application` es
+  `POST /api/public/growth/forms/[formSlug]/submit`: Growth Forms acepta JSON o
+  `multipart/form-data`, guarda el CV como asset privado
+  `hiring_application_cv_draft`, escanea los bytes y emite
+  `growth.forms.submission_accepted`.
+- La projection `growth_hiring_application_from_submission` crea/dedupea la
+  `hiring_application` llamando `submitPublicHiringApplication`; no hay
+  `form_destination` interno para ATS.
+- `POST /api/public/hiring/applications` queda como endpoint publico
+  legacy/compat hasta que TASK-1373 migre la UI de Careers al renderer nativo.
+- En produccion ambos caminos publicos exigen Turnstile; sin token valido fallan
+  cerrado con `403 captcha_failed`.
+- El CV opcional debe ser PDF, maximo 10 MB, y nunca expone URL publica ni
+  filename en la telemetria/browser payload.
+- El command autoritativo de Hiring sigue siendo `submitPublicHiringApplication`:
+  resuelve opening publicado, reconcilia Person por email, upsertea
+  `candidate_facet`, crea o dedupea `hiring_application` y devuelve siempre una
+  respuesta publica generica.
 
 No pedir documentos de identidad ni datos personales sensibles en el apply
 público. TASK-1362 queda para document capture completo, scan/quarantine y

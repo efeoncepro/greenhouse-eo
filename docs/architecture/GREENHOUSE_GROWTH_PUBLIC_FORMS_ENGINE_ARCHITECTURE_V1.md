@@ -9,6 +9,17 @@
 > Domain: `growth` (`GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`)
 > Runtime contract: `greenhouse-growth-public-forms.v1` (planned)
 
+## Delta 2026-07-13 — TASK-1372 application forms, private file upload and Hiring projection
+
+Growth Forms can now act as the write-path source of truth for `form_kind='application'` forms that collect a CV/file.
+
+- Browser-safe contracts support `type='file'`, `dataClass='uploaded_file'`, `uploadPolicy` (`acceptedMimeTypes`, `maxBytes`, `multiple=false`, `storageContext='hiring_application_cv_draft'`, `scanPolicy='scan_required'`) and `field.presentation.icon`.
+- Public submit accepts JSON normally and `multipart/form-data` only when files are present. The JSON payload never contains the file object, filename, private URL, destination mapping or internal ATS IDs.
+- File bytes are handled synchronously in the public submit command: create private pending asset, run `scanAndGateUploadedAsset`, persist only a safe uploaded-file descriptor in `normalized_fields_json`, and never make the asset public.
+- Creating a `hiring_application` is not a `form_destination`. It is the reactive projection `growth_hiring_application_from_submission` over `growth.forms.submission_accepted`, and it calls `submitPublicHiringApplication`.
+- Internal application forms should have `form_destination` rows `0`; destinations remain for external delivery such as HubSpot/email/webhooks.
+- Runtime smoke evidence in Cloud SQL dev: submission `fsub-460f074e-5f47-403e-97b5-725f18c3fef2` -> application `happ-a2637a89-3bf1-499b-9693-fb63ea7ab257`, asset `asset-1a0adc1c-ecc3-46d1-ac43-e32627a385ca`, asset private/attached, scan `clean`, destinations `0`.
+
 ## Delta 2026-06-25 — TASK-1232 admin cockpit runtime
 
 The planned Admin UI family `/admin/growth/forms` is now implemented as the internal Growth Forms command center. It is a **consumer of the engine**, not a new source of truth.
@@ -169,6 +180,7 @@ flowchart TB
 | Visual renderer package | Greenhouse Growth / UI implementation task | Portable and tokenized for Efeonce brand. |
 | Submission acceptance | Greenhouse Growth | Validation, consent, dedupe, audit. |
 | Destination delivery | Greenhouse Growth | Attempts, retries, dead letters, adapter outcomes. |
+| Internal domain projection | Target Greenhouse domain via reactive consumer | Example: `growth_hiring_application_from_submission` creates Hiring applications from accepted application submissions. Not modeled as `form_destination`. |
 | CRM contact/company/deal truth | HubSpot | HubSpot owns CRM identity and lifecycle. |
 | Qualified revenue motion | `commercial` | Starts after explicit handoff/acceptance. |
 | Public site deployment | `public_site` | Does not own submissions ledger. |
@@ -205,6 +217,7 @@ Rules:
 - WordPress, Astro and Greenhouse Next.js are host surfaces, not destinations.
 - A surface adapter never owns fields, validation, consent, destination mapping or submissions.
 - A destination never dictates public UI directly; it only contributes server-side constraints to the compiled plan.
+- Internal Greenhouse domain objects created from accepted submissions are reactive projections, not destinations.
 
 ### 7.2 Host surface registry
 
@@ -424,7 +437,7 @@ Every published form version must declare `form_kind`. The kind is not a visual 
 | `event_registration` | Webinar, workshop, private session | Medium | Contact + event registration state | Capacity/waitlist policy required when seats are limited. |
 | `survey` | Feedback, NPS, diagnostic questionnaire | Variable | Response ledger + optional analytics/CRM sync | CRM sync must be explicit; avoid polluting HubSpot with low-signal answers by default. |
 | `preference` | Consent, unsubscribe, communication preferences | High legal | Consent/preference update | Must be auditable and idempotent; success/failure copy cannot be ambiguous. |
-| `application` | Partner, supplier, hiring, vendor intake | High | Review queue + restricted submission | Requires PII review, retention policy and human review before external sync. |
+| `application` | Partner, supplier, hiring, vendor intake | High | Growth submission + restricted reactive projection | Requires PII review, retention policy, private upload scan when files exist and human review before any external sync. Internal object creation uses a projection, not `form_destination`. |
 
 Future kinds require either a small ADR delta or a versioned update to this architecture if they introduce new risk classes, destinations or persistence rules.
 

@@ -157,6 +157,7 @@
     "pg:connect:shell": "bash scripts/pg-connect.sh --shell",
     "hiring:question-bank-coverage": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/question-bank-coverage.ts",
     "hiring:fairness-smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/verify-assessment-fairness-smoke.ts",
+    "hiring:growth-forms-application-smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/verify-growth-forms-application-smoke.ts",
     "pg:doctor": "bash scripts/gcloud-auth-preflight.sh && tsx --require ./scripts/lib/server-only-shim.cjs scripts/pg-doctor.ts",
     "gcp:doctor": "tsx scripts/gcp-auth-doctor.ts",
     "sync:outbox": "tsx scripts/run-outbox-consumer.ts",

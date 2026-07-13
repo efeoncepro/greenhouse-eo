@@ -1,3 +1,21 @@
+## Sesión 2026-07-13 — TASK-1372 Growth Forms application upload + ATS projection — COMPLETE local (Codex)
+
+> **Goal confirmado:** ejecutar `TASK-1372` en `develop`, sin subagentes ni worktree nuevo, como backend-data de EPIC-011. Hook ejecutado: `pnpm codex:task-hook TASK-1372 --develop`.
+>
+> **Ownership/cierre:** task movida a `docs/tasks/complete/TASK-1372-growth-forms-application-upload-ats-destination.md`; `Lifecycle: complete`; `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` sincronizados. Excepción documentada: ejecución sobre `develop`, sin worktree ni subagentes.
+>
+> **Implementado:** no se creó `form_destination` interno. `growth_hiring_application_from_submission` consume `growth.forms.submission_accepted`, re-lee `greenhouse_growth.form_submission`, llama `submitPublicHiringApplication` y adjunta sólo CVs privados con scan limpio. El submit público de Growth Forms parsea JSON o multipart, crea asset `hiring_application_cv_draft`, corre `scanAndGateUploadedAsset` mientras aún tiene los bytes, persiste sólo descriptor seguro en PG y no filtra filename/URL/IDs internos al browser. Renderer/contract soportan `type='file'`, `uploadPolicy`, `field.presentation.icon` y multipart sólo cuando hay archivos; TASK-1373 ya puede consumir esta foundation.
+>
+> **Evidencia local:** focused Vitest 4 files/83 tests PASS; `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm worker:runtime-deps-gate`, `pnpm pg:connect:status`, `pnpm task:lint --task TASK-1372`, `pnpm ops:lint --changed` PASS. QA gate ejecutado con `pnpm qa:gates --changed --agent codex --task TASK-1372 --runtime --data --integration --security --docs`; dominios high-risk revisados. Build conserva warning histórico del reader de roadmap por patrón amplio, no introducido por esta task.
+>
+> **Smoke DB sintético:** Cloud SQL dev via proxy, `pnpm hiring:growth-forms-application-smoke` PASS. Submission `fsub-460f074e-5f47-403e-97b5-725f18c3fef2` -> application `happ-a2637a89-3bf1-499b-9693-fb63ea7ab257`, asset `asset-1a0adc1c-ecc3-46d1-ac43-e32627a385ca`, asset `private`/`attached`, scan verdict `clean`, destinations `0`. Proxy PG cerrado al final.
+>
+> **Rollout:** code complete local en `develop`; staging/prod pendiente de push/deploy Next + ops-worker y smoke target con el form real `efeonce-careers-application`. Producción no fue tocada. Siguiente task del epic: `TASK-1373` (migrar `/public/careers/[publicId]/apply` al renderer nativo `<greenhouse-form>`). `TASK-1378` decide si se provisiona ClamAV; structural scan ya corre y gatea attach.
+>
+> **Docs residual:** `pnpm docs:closure-check` pasa, pero advierte `architecture_doc_monolith` para `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md` (11 secciones `## Delta`, 1347 líneas). No bloquea TASK-1372; abrir follow-up formal para separar current state + `HISTORIAL.md` requiere OK del operador.
+>
+> **No tocar:** untracked `.claude/skills/seo-aeo-practice/`; no stagear ni borrar salvo instrucción explícita.
+
 ## Sesión 2026-07-13 — TASK-1365 Fairness Monitor staging live + TASK-1409 registrada (Codex)
 
 > **Estado:** `TASK-1365` sigue `complete`; rollout a `develop`/staging completado en SHA `242f8a5d8`, Vercel deployment `dpl_AuMv2KrDuMKXt5GUp91gr1QZhQLq` `Ready`. Produccion no fue solicitada ni tocada. `TASK-1371` no se reabrio ni modifico.

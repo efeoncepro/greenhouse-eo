@@ -161,6 +161,54 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.querySelector('[role="status"]')?.textContent).toContain('Listo')
   })
 
+  it('submits file fields as multipart files, never as scalar field values', async () => {
+    const base = staticContractFixture()
+
+    const contract = staticContractFixture({
+      fields: [
+        ...base.fields,
+        {
+          key: 'cvFile',
+          type: 'file',
+          label: 'CV',
+          dataClass: 'uploaded_file',
+          uploadPolicy: {
+            acceptedMimeTypes: ['application/pdf'],
+            maxBytes: 10 * 1024 * 1024,
+            multiple: false,
+            storageContext: 'hiring_application_cv_draft',
+            scanPolicy: 'scan_required'
+          }
+        }
+      ]
+    })
+
+    const fetchImpl = vi.fn(async (_url: string, init: RequestInit) => {
+      expect(init.body).toBeInstanceOf(FormData)
+      const data = init.body as FormData
+      const payload = JSON.parse(data.get('payload') as string)
+
+      expect(payload.fields.cvFile).toBeUndefined()
+      expect(JSON.stringify(payload)).not.toContain('cv.pdf')
+      expect(data.get('file:cvFile')).toBeInstanceOf(File)
+
+      return new Response(JSON.stringify({ outcome: 'accepted', submissionId: 'sub_file' }), { status: 202 })
+    }) as unknown as typeof fetch
+
+    const { root } = mountInto(contract, fetchImpl)
+
+    fillStaticRequiredFields(root)
+
+    const cv = new File(['%PDF-1.7'], 'cv.pdf', { type: 'application/pdf' })
+    const input = root.querySelector<HTMLInputElement>('[name="cvFile"]')!
+
+    Object.defineProperty(input, 'files', { configurable: true, value: [cv] })
+    input.dispatchEvent(new Event('change'))
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    await vi.waitFor(() => expect(fetchImpl).toHaveBeenCalled())
+  })
+
   it('emits the tokenized_report handoff (run_handle + absolute status_url) on accepted — TASK-1336', async () => {
     const fetchImpl = okFetch('accepted', 'fsub-abc-123')
 

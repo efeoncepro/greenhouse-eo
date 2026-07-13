@@ -3,6 +3,10 @@ import type { CareersCopy, Locale } from '@/lib/copy'
 import type { CareersOpeningViewModel } from '@/lib/hiring/public-careers/view-model'
 import type { RenderContract } from '@/growth-forms-renderer/contract'
 import { RENDERER_CONTRACT_VERSION } from '@/growth-forms-renderer/version'
+import {
+  PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES,
+  PUBLIC_CAREERS_CV_MAX_BYTES,
+} from './cv-upload-contract'
 
 export const CAREERS_APPLICATION_FORM_SLUG = 'efeonce-careers-application'
 export const CAREERS_APPLICATION_FORM_KEY = '9f7a8fc0-6fa7-4670-8e2d-efe0ce354001'
@@ -11,11 +15,10 @@ export const CAREERS_APPLICATION_FORM_VERSION_ID = 'growth-form-careers-applicat
 export const CAREERS_APPLICATION_SURFACE_ID = 'public-careers-nextjs'
 
 /**
- * TASK-354 — Careers apply uses the Growth Forms browser contract as its UX,
- * consent, captcha, and telemetry schema, while the authoritative submit command
- * remains the Hiring intake endpoint from TASK-1367. A future backend-data slice
- * can add a Growth Forms destination adapter for Hiring if the submission ledger
- * itself must become the write path.
+ * TASK-1372 — Careers apply exposes the Growth Forms browser contract as its UX,
+ * consent, captcha, telemetry, and private CV upload schema. The authoritative
+ * write path is the accepted Growth Forms submission, projected reactively into
+ * Hiring ATS; no internal destination adapter or browser mapping is exposed.
  */
 export const buildCareersApplicationFormContract = ({
   copy,
@@ -45,12 +48,15 @@ export const buildCareersApplicationFormContract = ({
       type: 'hidden',
       label: 'Opening public id',
       required: true,
+      dataClass: 'public',
     },
     {
       key: 'firstName',
       type: 'text',
       label: copy.apply.fields.firstName,
       required: true,
+      dataClass: 'contact_pii',
+      presentation: { icon: 'user' },
       autocomplete: 'given-name',
       validator: 'text',
       maxLength: 200,
@@ -60,6 +66,8 @@ export const buildCareersApplicationFormContract = ({
       type: 'text',
       label: copy.apply.fields.lastName,
       required: true,
+      dataClass: 'contact_pii',
+      presentation: { icon: 'user' },
       autocomplete: 'family-name',
       validator: 'text',
       maxLength: 200,
@@ -70,6 +78,8 @@ export const buildCareersApplicationFormContract = ({
       label: copy.apply.fields.email,
       placeholder: copy.apply.placeholders.email,
       required: true,
+      dataClass: 'contact_pii',
+      presentation: { icon: 'mail' },
       autocomplete: 'email',
       inputMode: 'email',
       validator: 'email_syntax',
@@ -80,6 +90,8 @@ export const buildCareersApplicationFormContract = ({
       type: 'tel',
       label: copy.apply.fields.phone,
       placeholder: copy.apply.placeholders.phone,
+      dataClass: 'contact_pii',
+      presentation: { icon: 'phone' },
       autocomplete: 'tel',
       inputMode: 'tel',
       validator: 'e164_phone',
@@ -91,6 +103,8 @@ export const buildCareersApplicationFormContract = ({
       type: 'url',
       label: copy.apply.fields.portfolio,
       placeholder: copy.apply.placeholders.portfolio,
+      dataClass: 'public',
+      presentation: { icon: 'link' },
       autocomplete: 'url',
       inputMode: 'url',
       validator: 'url',
@@ -101,6 +115,8 @@ export const buildCareersApplicationFormContract = ({
       type: 'url',
       label: copy.apply.fields.linkedin,
       placeholder: copy.apply.placeholders.linkedin,
+      dataClass: 'public',
+      presentation: { icon: 'linkedin' },
       autocomplete: 'url',
       inputMode: 'url',
       validator: 'url',
@@ -111,14 +127,33 @@ export const buildCareersApplicationFormContract = ({
       type: 'select',
       label: copy.apply.fields.availability,
       placeholder: copy.apply.placeholders.availability,
+      dataClass: 'company',
+      presentation: { icon: 'calendar' },
       options: copy.apply.availabilityOptions.map(option => ({ value: option, label: option })),
       maxLength: 200,
+    },
+    {
+      key: 'cvFile',
+      type: 'file',
+      label: copy.apply.cv.label,
+      required: false,
+      dataClass: 'uploaded_file',
+      presentation: { icon: 'file' },
+      uploadPolicy: {
+        acceptedMimeTypes: [...PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES],
+        maxBytes: PUBLIC_CAREERS_CV_MAX_BYTES,
+        multiple: false,
+        storageContext: 'hiring_application_cv_draft',
+        scanPolicy: 'scan_required',
+      },
     },
     {
       key: 'message',
       type: 'textarea',
       label: copy.apply.fields.message,
       placeholder: copy.apply.placeholders.message,
+      dataClass: 'free_text',
+      presentation: { icon: 'message' },
       validator: 'text',
       maxLength: 4000,
     },
@@ -128,7 +163,7 @@ export const buildCareersApplicationFormContract = ({
     {
       key: 'profile',
       label: copy.apply.sections.profile,
-      fieldKeys: ['portfolioUrl', 'linkedinUrl', 'availability'],
+      fieldKeys: ['portfolioUrl', 'linkedinUrl', 'availability', 'cvFile'],
     },
     { key: 'message', label: copy.apply.sections.message, fieldKeys: ['message'] },
   ],

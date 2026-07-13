@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { scanAndGateUploadedAsset } from '@/lib/storage/asset-scan/gate'
 import { attachAssetToAggregate, createPrivatePendingAsset } from '@/lib/storage/greenhouse-assets'
 
@@ -25,9 +26,30 @@ const resolveCvFileName = (file: File, applicationId: string) => {
   return fileName || `cv-${applicationId}.pdf`
 }
 
+const annotateDraftCvAsset = async (assetId: string, metadata: Record<string, unknown>) => {
+  await runGreenhousePostgresQuery(
+    `
+      UPDATE greenhouse_core.assets
+      SET metadata_json = COALESCE(metadata_json, '{}'::jsonb) || $2::jsonb
+      WHERE asset_id = $1
+        AND owner_aggregate_type = 'hiring_application_cv_draft'
+        AND status <> 'deleted'
+    `,
+    [assetId, JSON.stringify(metadata)],
+  )
+}
+
 export type PublicCareersCvOutcome =
   | { outcome: 'attached'; assetId: string }
   | { outcome: 'quarantined'; assetId: string; scanId: string }
+
+export type ScannedPublicCareersCvAssetReference = {
+  assetId: string
+  status: 'clean' | 'quarantined'
+  scanId: string
+  scanner?: string
+  advisoryFindingCodes?: string[]
+}
 
 /**
  * TASK-1362 — Adjunta el CV del apply público, escaneando ANTES del attach.
@@ -127,4 +149,53 @@ export const attachPublicCareersCvToApplication = async ({
   })
 
   return { outcome: 'attached', assetId: uploaded.assetId }
+}
+
+export const attachScannedPublicCareersCvAssetToApplication = async ({
+  asset,
+  applicationId,
+  openingId,
+  openingPublicId,
+  identityProfileId,
+  candidateFacetId,
+}: {
+  asset: ScannedPublicCareersCvAssetReference
+  applicationId: string
+  openingId: string
+  openingPublicId: string
+  identityProfileId: string
+  candidateFacetId: string
+}): Promise<PublicCareersCvOutcome> => {
+  const documentMetadata = {
+    source: 'growth_forms',
+    privacyClass: 'candidate_cv',
+    openingId,
+    openingPublicId,
+    identityProfileId,
+    candidateFacetId,
+    applicationId,
+    scanStatus: asset.status,
+    scanId: asset.scanId,
+  } as const
+
+  await annotateDraftCvAsset(asset.assetId, documentMetadata)
+
+  if (asset.status !== 'clean') {
+    return { outcome: 'quarantined', assetId: asset.assetId, scanId: asset.scanId }
+  }
+
+  await attachAssetToAggregate({
+    assetId: asset.assetId,
+    ownerAggregateType: 'hiring_application_cv',
+    ownerAggregateId: applicationId,
+    actorUserId: null,
+    metadata: {
+      ...documentMetadata,
+      scanStatus: 'clean',
+      scanner: asset.scanner,
+      advisoryFindingCodes: asset.advisoryFindingCodes ?? [],
+    },
+  })
+
+  return { outcome: 'attached', assetId: asset.assetId }
 }

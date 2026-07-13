@@ -62,6 +62,51 @@ const parseFields = (raw: unknown): { fields: FieldDefinition[]; invalid: number
 return { fields, invalid }
 }
 
+const validateUploadFields = (fields: FieldDefinition[]): CompileWarning[] => {
+  const warnings: CompileWarning[] = []
+
+  for (const field of fields.filter(candidate => candidate.type === 'file')) {
+    if (!field.uploadPolicy) {
+      warnings.push({
+        code: 'upload_policy_missing',
+        dimension: 'upload',
+        message: `campo ${field.key} requiere uploadPolicy`,
+        blocking: true,
+      })
+      continue
+    }
+
+    if (field.dataClass !== 'uploaded_file') {
+      warnings.push({
+        code: 'upload_data_class_invalid',
+        dimension: 'upload',
+        message: `campo ${field.key} debe declarar dataClass=uploaded_file`,
+        blocking: true,
+      })
+    }
+
+    if (field.uploadPolicy.multiple !== false) {
+      warnings.push({
+        code: 'upload_multiple_not_supported',
+        dimension: 'upload',
+        message: `campo ${field.key} debe declarar multiple=false`,
+        blocking: true,
+      })
+    }
+
+    if (field.uploadPolicy.scanPolicy !== 'scan_required') {
+      warnings.push({
+        code: 'upload_scan_policy_invalid',
+        dimension: 'upload',
+        message: `campo ${field.key} debe declarar scanPolicy=scan_required`,
+        blocking: true,
+      })
+    }
+  }
+
+  return warnings
+}
+
 /**
  * Compila la versión. `forPublication=true` aplica el gate completo (errores
  * bloquean). `forPublication=false` (preview/draft) compila best-effort y reporta
@@ -91,7 +136,12 @@ export const compileFormVersion = (
     addWarning({ code: 'consent_policy_missing', dimension: 'consent', message: 'falta consent_policy_version', blocking: true })
   }
 
-  if (Object.keys(destinationPolicy).length === 0 && destinations.length === 0 && definition.form_kind !== 'survey') {
+  if (
+    Object.keys(destinationPolicy).length === 0 &&
+    destinations.length === 0 &&
+    definition.form_kind !== 'survey' &&
+    definition.form_kind !== 'application'
+  ) {
     addWarning({
       code: 'destination_policy_missing',
       dimension: 'destination',
@@ -128,16 +178,7 @@ export const compileFormVersion = (
   }
 
   // — Upload policy (solo si hay campos de archivo) —
-  const hasFileField = fields.some(f => f.type === 'hidden' && f.key.includes('file')) // V1 no soporta uploads reales
-
-  if (hasFileField) {
-    addWarning({
-      code: 'upload_not_supported_v1',
-      dimension: 'upload',
-      message: 'document_upload requiere upload policy + scan/quarantine (no soportado en V1)',
-      blocking: true,
-    })
-  }
+  validateUploadFields(fields).forEach(addWarning)
 
   // — Consent display (browser-safe) —
   const consentDisplay = consentDisplaySchema.safeParse({

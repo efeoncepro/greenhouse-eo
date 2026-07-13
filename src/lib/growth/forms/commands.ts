@@ -35,6 +35,11 @@ import { evaluateFormEmailGate } from './email-verification'
 import { applyNameNormalizationPolicy } from './name-normalization'
 import { compileFormVersion } from './policy-compiler'
 import {
+  GrowthFormUploadError,
+  type GrowthFormUploadedFiles,
+  prepareGrowthFormUploadedFiles,
+} from './file-uploads'
+import {
   type CaptchaVerifier,
   decideAbuse,
   hashIdentifier,
@@ -265,6 +270,7 @@ export interface SubmitContext {
   ip?: string | null
   captchaToken?: string | null
   requestId?: string | null
+  uploadedFiles?: GrowthFormUploadedFiles
   /** Inyectable para tests; default = Turnstile (bypass dev / fail-closed prod). */
   verifier?: CaptchaVerifier
 }
@@ -491,6 +497,37 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
   const duplicate = await findRecentDuplicate(version.form_id, fingerprint)
 
   if (duplicate) return { outcome: 'accepted', submissionId: duplicate.submission_id, reason: 'dedupe (submission previa)' }
+
+  const hasUploadedFiles = Object.keys(context.uploadedFiles ?? {}).length > 0
+  const hasFileFields = parsedFieldDefs.success && parsedFieldDefs.data.some(field => field.type === 'file')
+
+  if (hasUploadedFiles || hasFileFields) {
+    if (!parsedFieldDefs.success) {
+      captureWithDomain(new Error('growth.forms upload: field_schema_json no parseable'), 'growth', {
+        extra: { formId: version.form_id, formVersionId: version.form_version_id },
+      })
+
+      return { outcome: 'invalid', reason: 'Revisa los archivos del formulario.' }
+    }
+
+    try {
+      const uploadedDescriptors = await prepareGrowthFormUploadedFiles({
+        formId: version.form_id,
+        formVersionId: version.form_version_id,
+        surfaceId,
+        fields: parsedFieldDefs.data,
+        uploadedFiles: context.uploadedFiles ?? {},
+      })
+
+      normalizedFields = { ...normalizedFields, ...uploadedDescriptors }
+    } catch (error) {
+      if (error instanceof GrowthFormUploadError) {
+        return { outcome: 'invalid', reason: 'Revisa los archivos del formulario.' }
+      }
+
+      throw error
+    }
+  }
 
   const submission = await persistAcceptedSubmission({
     formId: version.form_id,

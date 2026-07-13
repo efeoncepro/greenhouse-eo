@@ -137,6 +137,7 @@ export const verifyPublicEmail = async (
 
 export interface SubmitPayload {
   fields: Record<string, string | number | boolean | string[]>
+  files?: Record<string, File>
   consent: boolean
   consentCheckboxes: string[]
   /** Honeypot anti-bot: si trae valor, el server rechaza silenciosamente. */
@@ -172,14 +173,33 @@ export const submitPublicForm = async (
     captchaToken: payload.captchaToken,
   }
 
+  const files = payload.files ?? {}
+  const hasFiles = Object.keys(files).length > 0
+
   let response: Response
 
   try {
-    response = await fetchImpl(url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', accept: 'application/json' },
-      body: JSON.stringify(body),
-    })
+    if (hasFiles) {
+      const formData = new FormData()
+
+      formData.append('payload', JSON.stringify(body))
+
+      for (const [fieldKey, file] of Object.entries(files)) {
+        formData.append(`file:${fieldKey}`, file)
+      }
+
+      response = await fetchImpl(url, {
+        method: 'POST',
+        headers: { accept: 'application/json' },
+        body: formData,
+      })
+    } else {
+      response = await fetchImpl(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', accept: 'application/json' },
+        body: JSON.stringify(body),
+      })
+    }
   } catch {
     return { outcome: 'invalid', reason: 'network_error' }
   }

@@ -93,6 +93,7 @@ export class FormRenderer {
   private errors: FieldErrors = {}
   /** Estado de los checkboxes de consentimiento (en state, no en DOM: sobrevive re-render). */
   private readonly consentState: Record<string, boolean> = {}
+  private readonly fileValues = new Map<string, File>()
   /** Campos que ya perdieron foco al menos una vez (stage 2 del timing). */
   private readonly touched = new Set<string>()
   private currentStep = 0
@@ -419,7 +420,20 @@ export class FormRenderer {
     const label = this.fieldLabel(field)
 
     if (field.type !== 'checkbox' && field.type !== 'consent') {
-      const labelEl = el(this.doc, 'label', { class: 'ghf-label', for: fieldId }, label)
+      const labelEl = el(this.doc, 'label', { class: 'ghf-label', for: fieldId })
+
+      if (field.presentation?.icon) {
+        labelEl.appendChild(
+          el(
+            this.doc,
+            'span',
+            { class: 'ghf-field-icon', 'aria-hidden': 'true', 'data-icon': field.presentation.icon },
+            this.fieldIconGlyph(field.presentation.icon)
+          )
+        )
+      }
+
+      labelEl.appendChild(el(this.doc, 'span', {}, label))
 
       if (required) labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-required', 'aria-hidden': 'true' }, '*'))
       else labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-optional' }, '(opcional)'))
@@ -486,7 +500,8 @@ export class FormRenderer {
       field.type === 'textarea' ||
       field.type === 'multiselect' ||
       field.type === 'checkbox' ||
-      field.type === 'consent'
+      field.type === 'consent' ||
+      field.type === 'file'
     ) {
       return true
     }
@@ -581,6 +596,9 @@ export class FormRenderer {
       case 'tel':
         return this.renderTelControl(field, common)
 
+      case 'file':
+        return this.renderFileControl(field, common)
+
       default: {
         const inputType =
           field.type === 'number'
@@ -606,7 +624,34 @@ export class FormRenderer {
   }
 
   private usesPremiumSelect(): boolean {
-    return this.contract.styleVariant === 'diagnostic_premium'
+    return this.contract.styleVariant === 'diagnostic_premium' || this.contract.styleVariant === 'careers-html-fidelity'
+  }
+
+  private fieldIconGlyph(icon: NonNullable<RendererFieldDefinition['presentation']>['icon']): string {
+    switch (icon) {
+      case 'mail':
+        return '@'
+      case 'phone':
+        return '+'
+      case 'link':
+      case 'globe':
+        return '↗'
+      case 'linkedin':
+        return 'in'
+      case 'briefcase':
+        return '·'
+      case 'calendar':
+        return '31'
+      case 'clock':
+        return '12'
+      case 'message':
+        return '…'
+      case 'file':
+        return 'CV'
+      case 'user':
+      default:
+        return 'ID'
+    }
   }
 
   private selectOptionsFor(field: RendererFieldDefinition): { value: string; label: string }[] {
@@ -885,6 +930,103 @@ export class FormRenderer {
     wrap.appendChild(list)
     wrap.appendChild(input)
     renderTags()
+
+    return wrap
+  }
+
+  private renderFileControl(field: RendererFieldDefinition, common: Record<string, string>): HTMLElement {
+    const wrap = el(this.doc, 'div', { class: 'ghf-file' })
+    const input = el(this.doc, 'input', { ...common, type: 'file', class: 'ghf-file-input' })
+    const status = el(this.doc, 'p', { class: 'ghf-file-status', 'aria-live': 'polite' })
+    const policy = field.uploadPolicy
+    const selected = this.fileValues.get(field.key)
+
+    if (policy?.acceptedMimeTypes.length) input.setAttribute('accept', policy.acceptedMimeTypes.join(','))
+    if (selected) status.textContent = this.copy.fileSelected
+    else if (policy?.maxBytes) status.textContent = this.copy.fileHint(policy.maxBytes)
+
+    input.addEventListener('change', () => {
+      const file = input.files?.[0] ?? null
+
+      delete this.errors[field.key]
+
+      if (!file) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        status.textContent = policy?.maxBytes ? this.copy.fileHint(policy.maxBytes) : ''
+        this.touched.add(field.key)
+        this.revalidateField(field)
+        this.onValueChange(field)
+
+        return
+      }
+
+      if (!policy) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        this.errors[field.key] = this.copy.fileUnsupported
+        status.textContent = ''
+        this.touched.add(field.key)
+        this.patchFieldErrorDom(field.key)
+        this.setFieldStatus(field, 'error')
+        this.maybeStart()
+        this.onFieldEdited()
+
+        return
+      }
+
+      if (file.size <= 0) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        this.errors[field.key] = this.copy.fileEmpty
+        status.textContent = ''
+        this.touched.add(field.key)
+        this.patchFieldErrorDom(field.key)
+        this.setFieldStatus(field, 'error')
+        this.maybeStart()
+        this.onFieldEdited()
+
+        return
+      }
+
+      if (file.size > policy.maxBytes) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        this.errors[field.key] = this.copy.fileTooLarge(policy.maxBytes)
+        status.textContent = ''
+        this.touched.add(field.key)
+        this.patchFieldErrorDom(field.key)
+        this.setFieldStatus(field, 'error')
+        this.maybeStart()
+        this.onFieldEdited()
+
+        return
+      }
+
+      if (file.type && !policy.acceptedMimeTypes.includes(file.type)) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        this.errors[field.key] = this.copy.fileUnsupported
+        status.textContent = ''
+        this.touched.add(field.key)
+        this.patchFieldErrorDom(field.key)
+        this.setFieldStatus(field, 'error')
+        this.maybeStart()
+        this.onFieldEdited()
+
+        return
+      }
+
+      this.fileValues.set(field.key, file)
+      this.values[field.key] = 'selected'
+      status.textContent = this.copy.fileSelected
+      this.touched.add(field.key)
+      this.revalidateField(field)
+      this.onValueChange(field)
+    })
+
+    wrap.appendChild(input)
+    wrap.appendChild(status)
 
     return wrap
   }
@@ -1204,6 +1346,7 @@ export class FormRenderer {
   private isDraftablePersisted(field: RendererFieldDefinition): boolean {
     if (field.type === 'national_id' || resolveValidatorName(field) === 'national_id') return false
     if (field.type === 'consent' || field.type === 'checkbox' || field.type === 'hidden') return false
+    if (field.type === 'file') return false
 
     return true
   }
@@ -1933,6 +2076,7 @@ export class FormRenderer {
       this.api,
       {
         fields: this.collectFieldValues(),
+        files: this.collectFileValues(),
         consent: this.contract.consent
           ? consentCheckboxes.length > 0 || (this.contract.consent.checkboxes ?? []).length === 0
           : true,
@@ -1993,12 +2137,27 @@ export class FormRenderer {
     const out: Record<string, string | number | boolean | string[]> = {}
 
     for (const field of this.contract.fields) {
+      if (field.type === 'file') continue
       const value = this.values[field.key]
 
       if (value === '' || value === false || (Array.isArray(value) && value.length === 0)) continue
       // Solo enviar campos visibles (el server re-evalúa condiciones — Arch §20).
       if (!isFieldVisible(field, this.values)) continue
       out[field.key] = value
+    }
+
+    return out
+  }
+
+  private collectFileValues(): Record<string, File> {
+    const out: Record<string, File> = {}
+
+    for (const field of this.contract.fields) {
+      if (field.type !== 'file') continue
+      if (!isFieldVisible(field, this.values)) continue
+      const file = this.fileValues.get(field.key)
+
+      if (file) out[field.key] = file
     }
 
     return out

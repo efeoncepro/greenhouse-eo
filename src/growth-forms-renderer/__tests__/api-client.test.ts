@@ -107,4 +107,35 @@ describe('growth-forms-renderer · submitPublicForm', () => {
     expect(body.captchaToken).toBe('turnstile-token')
     expect(body.fields.email).toBe('ana@empresa.com')
   })
+
+  it('uses multipart only when files are present and keeps files out of the JSON payload', async () => {
+    const cv = new File(['%PDF-1.7'], 'ana-cv.pdf', { type: 'application/pdf' })
+
+    const fetchImpl = vi.fn(async (_url: string, init: RequestInit) => {
+      expect(init.headers).toEqual({ accept: 'application/json' })
+      expect(init.body).toBeInstanceOf(FormData)
+
+      const body = init.body as FormData
+      const payload = JSON.parse(body.get('payload') as string)
+
+      expect(payload.fields).toEqual({ email: 'ana@empresa.com' })
+      expect(JSON.stringify(payload)).not.toContain('ana-cv.pdf')
+      expect(body.get('file:cvFile')).toBe(cv)
+
+      return jsonResponse({ outcome: 'accepted', submissionId: 'sub_file' }, 202)
+    }) as unknown as typeof fetch
+
+    const result = await submitPublicForm(
+      api,
+      {
+        fields: { email: 'ana@empresa.com' },
+        files: { cvFile: cv },
+        consent: true,
+        consentCheckboxes: [],
+      },
+      fetchImpl,
+    )
+
+    expect(result.outcome).toBe('accepted')
+  })
 })

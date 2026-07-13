@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/public/growth/forms/cors'
 import { type PublicSubmitInput, type PublicSubmitOutcome } from '@/lib/growth/forms/contracts'
 import { submitForm } from '@/lib/growth/forms/commands'
+import type { GrowthFormUploadedFiles } from '@/lib/growth/forms/file-uploads'
 import { isFormsPublicApiEnabled } from '@/lib/growth/forms/flags'
 import { resolveFormSlugFromRef } from '@/lib/growth/forms/readers'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -18,6 +19,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 export const dynamic = 'force-dynamic'
 
 const METHODS = 'POST, OPTIONS'
+const MAX_PUBLIC_SUBMIT_BODY_BYTES = 12 * 1024 * 1024
 
 const STATUS_BY_OUTCOME: Record<PublicSubmitOutcome, number> = {
   accepted: 202,
@@ -34,6 +36,42 @@ const STATUS_BY_OUTCOME: Record<PublicSubmitOutcome, number> = {
 
 const getClientIp = (request: Request): string | null =>
   request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || null
+
+const parsePublicSubmitRequest = async (
+  request: Request,
+): Promise<{ body: Record<string, unknown>; uploadedFiles: GrowthFormUploadedFiles }> => {
+  const contentLength = Number(request.headers.get('content-length') ?? 0)
+
+  if (Number.isFinite(contentLength) && contentLength > MAX_PUBLIC_SUBMIT_BODY_BYTES) {
+    throw new Error('public_submit_body_too_large')
+  }
+
+  const contentType = request.headers.get('content-type') ?? ''
+
+  if (contentType.toLowerCase().includes('multipart/form-data')) {
+    const formData = await request.formData()
+    const payload = formData.get('payload')
+
+    if (typeof payload !== 'string') throw new Error('public_submit_payload_missing')
+
+    const parsed = JSON.parse(payload) as Record<string, unknown>
+    const uploadedFiles: GrowthFormUploadedFiles = {}
+
+    for (const [key, value] of formData.entries()) {
+      if (!key.startsWith('file:')) continue
+      if (!(value instanceof File)) throw new Error('public_submit_file_invalid')
+
+      const fieldKey = key.slice('file:'.length)
+
+      if (!fieldKey || uploadedFiles[fieldKey]) throw new Error('public_submit_file_invalid')
+      uploadedFiles[fieldKey] = value
+    }
+
+    return { body: parsed, uploadedFiles }
+  }
+
+  return { body: (await request.json()) as Record<string, unknown>, uploadedFiles: {} }
+}
 
 export function OPTIONS(request: Request) {
   return publicFormsOptionsResponse(request, METHODS)
@@ -56,9 +94,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
   }
 
   let body: Record<string, unknown>
+  let uploadedFiles: GrowthFormUploadedFiles
 
   try {
-    body = (await request.json()) as Record<string, unknown>
+    const parsed = await parsePublicSubmitRequest(request)
+
+    body = parsed.body
+    uploadedFiles = parsed.uploadedFiles
   } catch {
     return NextResponse.json({ outcome: 'invalid', message: 'Solicitud inválida.' }, { status: 400, headers })
   }
@@ -87,6 +129,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
       ip: getClientIp(request),
       captchaToken: typeof body.captchaToken === 'string' ? body.captchaToken : null,
       requestId: null,
+      uploadedFiles,
     })
 
     return NextResponse.json(

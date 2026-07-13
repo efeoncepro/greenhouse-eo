@@ -43,6 +43,12 @@ export interface RendererSystemCopy {
   emailSuggestion: (suggested: string) => string
   /** aria-label del selector de país del teléfono internacional. */
   phoneCountryAria: string
+  /** Hint genérico para upload; no muestra nombres de archivo. */
+  fileHint: (maxBytes: number) => string
+  fileSelected: string
+  fileEmpty: string
+  fileUnsupported: string
+  fileTooLarge: (maxBytes: number) => string
   stepProgress: (current: number, total: number) => string
   stepEffort: (total: number) => string
   stepperAria: string
@@ -104,6 +110,11 @@ const esCL: RendererSystemCopy = {
   emailVerifying: 'Verificando correo…',
   emailSuggestion: suggested => `¿Quisiste decir ${suggested}?`,
   phoneCountryAria: 'País del teléfono',
+  fileHint: maxBytes => `PDF, máximo ${Math.max(1, Math.floor(maxBytes / 1024 / 1024))} MB.`,
+  fileSelected: 'Archivo listo para enviar.',
+  fileEmpty: 'El archivo está vacío. Selecciona otro PDF.',
+  fileUnsupported: 'Selecciona un PDF válido.',
+  fileTooLarge: maxBytes => `El archivo supera ${Math.max(1, Math.floor(maxBytes / 1024 / 1024))} MB.`,
   stepProgress: (current, total) => `Paso ${current} de ${total}`,
   stepEffort: total => `${total} pantallas breves`,
   stepperAria: 'Progreso del formulario',
@@ -179,6 +190,11 @@ const enUS: RendererSystemCopy = {
   emailVerifying: 'Checking email…',
   emailSuggestion: suggested => `Did you mean ${suggested}?`,
   phoneCountryAria: 'Phone country',
+  fileHint: maxBytes => `PDF, ${Math.max(1, Math.floor(maxBytes / 1024 / 1024))} MB max.`,
+  fileSelected: 'File ready to send.',
+  fileEmpty: 'The file is empty. Select another PDF.',
+  fileUnsupported: 'Select a valid PDF.',
+  fileTooLarge: maxBytes => `The file is over ${Math.max(1, Math.floor(maxBytes / 1024 / 1024))} MB.`,
   stepProgress: (current, total) => `Step ${current} of ${total}`,
   stepEffort: total => `${total} short screens`,
   stepperAria: 'Form progress',

@@ -7,7 +7,11 @@ import { createHiringApplication, reconcileCandidateFacet } from '@/lib/hiring/s
 import { resolvePublishedOpeningIdByPublicId } from '@/lib/hiring/publication'
 import { isHiringError } from '@/lib/hiring/errors'
 
-import { attachPublicCareersCvToApplication } from './cv-upload'
+import {
+  attachPublicCareersCvToApplication,
+  attachScannedPublicCareersCvAssetToApplication,
+  type ScannedPublicCareersCvAssetReference,
+} from './cv-upload'
 import type { NormalizedApplicationInput } from './schema'
 
 export type SubmitApplicationOutcome = 'accepted' | 'not_open'
@@ -22,6 +26,7 @@ export interface SubmitApplicationResult {
 
 type SubmitPublicHiringApplicationOptions = {
   cvFile?: File | null
+  cvAsset?: ScannedPublicCareersCvAssetReference | null
 }
 
 const getDuplicateApplicationId = (error: unknown): string | null => {
@@ -86,6 +91,19 @@ export const submitPublicHiringApplication = async (
   const dedupeFingerprint = createHash('sha256').update(`${openingId}|${input.email}`).digest('hex')
 
   const attachCv = async (applicationId: string) => {
+    if (options.cvAsset) {
+      await attachScannedPublicCareersCvAssetToApplication({
+        asset: options.cvAsset,
+        applicationId,
+        openingId,
+        openingPublicId: input.openingPublicId,
+        identityProfileId,
+        candidateFacetId: facet.candidateFacetId,
+      })
+
+      return
+    }
+
     if (!options.cvFile) return
 
     await attachPublicCareersCvToApplication({

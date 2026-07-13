@@ -110,10 +110,50 @@ export const FIELD_TYPES = [
   'radio',
   'number',
   'date',
+  'file',
   'hidden',
   'consent',
 ] as const
 export type FieldType = (typeof FIELD_TYPES)[number]
+
+export const FIELD_PRESENTATION_ICONS = [
+  'user',
+  'mail',
+  'phone',
+  'link',
+  'linkedin',
+  'briefcase',
+  'calendar',
+  'clock',
+  'message',
+  'file',
+  'globe',
+] as const
+export type FieldPresentationIcon = (typeof FIELD_PRESENTATION_ICONS)[number]
+
+export const FILE_UPLOAD_STORAGE_CONTEXTS = ['hiring_application_cv_draft'] as const
+export type FileUploadStorageContext = (typeof FILE_UPLOAD_STORAGE_CONTEXTS)[number]
+
+export const FILE_UPLOAD_SCAN_POLICIES = ['scan_required'] as const
+export type FileUploadScanPolicy = (typeof FILE_UPLOAD_SCAN_POLICIES)[number]
+
+export const fileUploadPolicySchema = z
+  .object({
+    acceptedMimeTypes: z.array(z.string().min(1).max(120)).min(1).max(12),
+    maxBytes: z.number().int().positive().max(10 * 1024 * 1024),
+    multiple: z.literal(false).default(false),
+    storageContext: z.enum(FILE_UPLOAD_STORAGE_CONTEXTS),
+    scanPolicy: z.enum(FILE_UPLOAD_SCAN_POLICIES).default('scan_required'),
+  })
+  .strict()
+export type FileUploadPolicy = z.infer<typeof fileUploadPolicySchema>
+
+export const fieldPresentationSchema = z
+  .object({
+    icon: z.enum(FIELD_PRESENTATION_ICONS).optional(),
+  })
+  .strict()
+export type FieldPresentation = z.infer<typeof fieldPresentationSchema>
 
 // ─── Telemetry contract (browser-safe) — Arch §15, §15.1, §19 ─────────────────
 
@@ -232,6 +272,9 @@ export const fieldDefinitionSchema = z.object({
   freeEntry: z.boolean().optional(),
   maxItems: z.number().int().positive().max(50).optional(),
   maxLength: z.number().int().positive().max(10_000).optional(),
+  dataClass: z.enum(FIELD_DATA_CLASSES).optional(),
+  uploadPolicy: fileUploadPolicySchema.optional(),
+  presentation: fieldPresentationSchema.optional(),
   autocomplete: z.string().max(40).optional(),
   inputMode: z.string().max(20).optional(),
   // Validador declarativo (catálogo CURADO, anti-ReDoS): el admin elige de

@@ -26,6 +26,7 @@ export type RendererFieldType =
   | 'radio'
   | 'number'
   | 'date'
+  | 'file'
   | 'hidden'
   | 'consent'
 
@@ -62,6 +63,41 @@ export interface RendererFieldOption {
   copyRef?: string
 }
 
+export type RendererFieldPresentationIcon =
+  | 'user'
+  | 'mail'
+  | 'phone'
+  | 'link'
+  | 'linkedin'
+  | 'briefcase'
+  | 'calendar'
+  | 'clock'
+  | 'message'
+  | 'file'
+  | 'globe'
+
+export type RendererFieldDataClass =
+  | 'public'
+  | 'company'
+  | 'contact_pii'
+  | 'free_text'
+  | 'financial_hint'
+  | 'file_metadata'
+  | 'uploaded_file'
+  | 'consent_evidence'
+
+export interface RendererFileUploadPolicy {
+  acceptedMimeTypes: string[]
+  maxBytes: number
+  multiple?: false
+  storageContext: 'hiring_application_cv_draft'
+  scanPolicy?: 'scan_required'
+}
+
+export interface RendererFieldPresentation {
+  icon?: RendererFieldPresentationIcon
+}
+
 export interface RendererFieldDefinition {
   key: string
   type: RendererFieldType
@@ -75,6 +111,9 @@ export interface RendererFieldDefinition {
   /** Límite de items para multiselect/chips. */
   maxItems?: number
   maxLength?: number
+  dataClass?: RendererFieldDataClass
+  uploadPolicy?: RendererFileUploadPolicy
+  presentation?: RendererFieldPresentation
   /** Token WHATWG (`email`, `name`, `tel`, `organization`, …). Lo declara el contract. */
   autocomplete?: string
   /** `email | tel | numeric | decimal | url | text`. Lo declara el contract. */
@@ -242,6 +281,7 @@ export type PublicSubmitOutcome =
   | 'captcha_failed'
   | 'form_not_published'
   | 'disabled'
+  | 'error'
 
 export interface PublicSubmitResult {
   outcome: PublicSubmitOutcome

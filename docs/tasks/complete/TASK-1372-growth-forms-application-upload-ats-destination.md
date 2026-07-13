@@ -46,7 +46,7 @@ Hechos verificados contra el repo real + el contrato canónico de Growth Forms. 
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -59,26 +59,26 @@ Hechos verificados contra el repo real + el contrato canónico de Growth Forms. 
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Code complete local / rollout staging-prod pendiente`
 - Rank: `TBD`
 - Domain: `growth|hr|data`
 - Blocked by: `none`
-- Branch: `task/TASK-1372-growth-forms-application-upload-ats-destination`
+- Branch: `develop` (operator override)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Convertir Growth Forms en el source of truth real para formularios de postulacion: soporte de campos de archivo/CV, validacion y almacenamiento privado, y destination adapter hacia Hiring/ATS. Esto elimina el form custom de careers como write path especial y deja `application` como una capability reusable de Growth Forms.
+Convertir Growth Forms en el source of truth real para formularios de postulacion: soporte de campos de archivo/CV, validacion, almacenamiento privado y proyeccion reactiva hacia Hiring/ATS. Esto elimina el form custom de careers como write path especial y deja `application` como una capability reusable de Growth Forms.
 
 ## Why This Task Exists
 
-`TASK-354` usa un contrato browser de Growth Forms, pero el formulario de postulacion todavia implementa submit, validacion de CV y handoff ATS de forma local. Eso rompe la promesa de Growth Forms como motor gobernado y obliga a repetir capacidades por host. La raiz es que Growth Forms no tiene aun soporte completo para `application` con upload privado y destination interna `hiring_application`.
+`TASK-354` usa un contrato browser de Growth Forms, pero el formulario de postulacion todavia implementa submit, validacion de CV y handoff ATS de forma local. Eso rompe la promesa de Growth Forms como motor gobernado y obliga a repetir capacidades por host. La raiz era que Growth Forms no tenia aun soporte completo para `application` con upload privado y projection reactiva a `hiring_application`.
 
 ## Goal
 
 - Agregar soporte de archivo/CV a Growth Forms sin exponer URLs publicas ni secretos.
-- Permitir que un Growth Form `formKind='application'` entregue accepted submissions al ATS mediante un destination/command adapter gobernado.
+- Permitir que un Growth Form `formKind='application'` entregue accepted submissions al ATS mediante una projection reactiva gobernada.
 - Mantener Turnstile, rate-limit, consent snapshot, PII posture y telemetry de Growth Forms como unico camino.
 - Dejar listo el contrato que `TASK-1373` consumira para reemplazar el form local de careers por `<greenhouse-form>`.
 
@@ -104,7 +104,7 @@ Reglas obligatorias:
 
 - El renderer, Careers, Nexa y futuros hosts consumen el mismo Growth Form contract; no se acepta otro submit local paralelo.
 - HubSpot sigue siendo un destination adapter, no el source of truth del formulario ni del ATS.
-- El ATS se escribe por command/adapter gobernado, no por SQL ni por tabla expuesta a Growth Forms.
+- El ATS se escribe por command/projection gobernado, no por SQL ni por tabla expuesta a Growth Forms.
 - CV/archivos deben usar assets privados, consent, audit, retention y policy de scan/quarantine proporcional al estado real de `TASK-1362`.
 - El browser nunca recibe mapping de destination, internal IDs no publicables, secretos ni URLs privadas.
 
@@ -122,7 +122,7 @@ Reglas obligatorias:
 - Growth Forms engine runtime: `src/lib/growth/forms/**`, `src/growth-forms-renderer/**`, `/api/public/growth/forms/**`.
 - Hiring apply command: `src/lib/hiring/public-careers/submit-application.ts`.
 - Private asset foundation: `src/lib/storage/greenhouse-assets.ts`, `src/types/assets.ts`.
-- **Coordinación con `TASK-1362`** (no blocker duro pero acoplado): 1362 owns los hiring asset contexts + el scan/quarantine (su Slice 4) que el upload público de 1372 necesita. 1372 consume; PDF-only V1 + quarantine = compensating control compartido hasta que 1362 endurezca el scan.
+- **TASK-1362 completo como dependencia consumida:** 1362 owns los hiring asset contexts + el scan/quarantine que el upload público de 1372 necesita. 1372 consume `scanAndGateUploadedAsset`; no redefine contexts ni escaner.
 - CV upload contract currently used by careers: `src/lib/hiring/public-careers/cv-upload-contract.ts`.
 
 ### Blocks / Impacts
@@ -162,6 +162,16 @@ Reglas obligatorias:
 - CV handling is route-local to Careers instead of reusable platform behavior.
 - The current Careers form duplicates field validation and submit orchestration that should belong to Growth Forms.
 
+## Modular Placement Contract
+
+- Topology impact: `cross-runtime`
+- Current home: `src/lib/growth/forms/**`, `src/growth-forms-renderer/**`, `src/app/api/public/growth/forms/**`, `src/lib/sync/projections/**` y `src/lib/hiring/public-careers/**` dentro del runtime Greenhouse actual; ops-worker drena la projection `growth` existente.
+- Future candidate home: `domain-package`
+- Boundary: Growth Forms owns the browser-safe render/submit contract and private upload bridge; Hiring owns `submitPublicHiringApplication` and candidate document attachment; renderer, Careers, Nexa/MCP and future hosts consume the same contract and never write ATS tables directly.
+- Server/browser split: `contracts.ts`/`src/growth-forms-renderer/contract.ts` expose only browser-safe field policy and presentation metadata; multipart parsing, asset upload, scan, PG persistence, ATS projection and asset attach remain server-only.
+- Build impact: no new heavy dependency or filesystem input; changes must keep the portable renderer light and keep `src/lib/growth/forms/**` plus the new projection covered by ops-worker deploy path filters.
+- Extraction blocker: a single submit spans Vercel public API, private asset bucket, `greenhouse_growth.form_submission`, outbox, ops-worker reactive processing and Hiring command idempotency; extraction requires preserving those transaction/event boundaries.
+
 ## Backend/Data Contract
 
 ### Backend/data brief
@@ -175,13 +185,13 @@ Reglas obligatorias:
 ### Contract surface
 
 - Contrato existente a respetar: `src/lib/growth/forms/contracts.ts`, `src/growth-forms-renderer/contract.ts`, `submitPublicHiringApplication`.
-- Contrato nuevo o modificado: file/upload field policy + Growth Forms destination adapter `greenhouse_hiring_application` or final approved name.
+- Contrato nuevo o modificado: file/upload field policy + projection `growth_hiring_application_from_submission` sobre `growth.forms.submission_accepted`.
 - Backward compatibility: `compatible|gated` — existing forms must keep rendering/submitting unchanged.
-- Full API parity: application submissions are accepted by Growth Forms and delivered to ATS through a single server-side adapter; renderer/UI/Nexa do not implement ATS writes.
+- Full API parity: application submissions are accepted by Growth Forms and delivered to ATS through a single server-side projection; renderer/UI/Nexa do not implement ATS writes.
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `greenhouse_growth.form_submission`, `greenhouse_growth.form_destination`, `greenhouse_growth.form_destination_attempt`, `greenhouse_core.assets`, `greenhouse_hiring.hiring_application`.
+- Entidades/tablas/views afectadas: `greenhouse_growth.form_submission`, `greenhouse_core.assets`, `greenhouse_core.asset_scan_results`, `greenhouse_hiring.hiring_application`; `greenhouse_growth.form_destination` debe permanecer en `0` para application forms internos.
 - Invariantes que no se pueden romper:
   - Uploaded files never expose public storage URLs.
   - File policy is declared in the published form contract and enforced server-side.
@@ -189,31 +199,31 @@ Reglas obligatorias:
   - The ATS **projection** (`growth_hiring_application_from_submission`, reactive consumer sobre `growth.forms.submission_accepted` — NO un `form_destination`) uses `submitPublicHiringApplication`, never duplicate SQL, never inline en submit.
   - Duplicate form submits must still resolve to generic accepted/dedupe behavior.
   - File fields are omitted from browser telemetry and never logged raw.
-- Tenant/space boundary: public anonymous submit writes only through the authorized public form surface and destination adapter; ATS internal access remains downstream.
+- Tenant/space boundary: public anonymous submit writes only through the authorized public form surface; ATS internal access remains downstream in the server-only projection.
 - Idempotency/concurrency: submission id/correlation id + ATS dedupe fingerprint + asset pending->attached transition must be retry-safe.
-- Audit/outbox/history: Growth Forms submission ledger + destination attempt ledger + asset access/audit; ATS emits existing hiring events.
+- Audit/outbox/history: Growth Forms submission ledger + outbox accepted event + private asset scan/audit; ATS emits existing hiring events.
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive` if a file attachment relation or destination type needs persistence; otherwise contract-only plus destination adapter.
-- Default state: feature gated by form version/destination config; no existing form gains upload behavior automatically.
+- Migration posture: no new migration; contract-only plus projection registration and private asset reuse.
+- Default state: feature gated by form version/file policy; no existing form gains upload behavior automatically.
 - Backfill plan: `N/A` for existing form submissions; no historical files to migrate.
-- Rollback path: disable/deprecate the form destination, republish previous form version, or flag off the new adapter.
+- Rollback path: republish previous form version without file field, disable the application form, or remove the projection from worker registration before rollout.
 - External coordination: Turnstile config stays existing; no HubSpot requirement for ATS destination.
 
 ### Security and access
 
 - Auth/access gate: public form surface + Turnstile + CORS/surface allowlist; admin authoring via Growth Forms capabilities.
 - Sensitive data posture: candidate PII + uploaded file metadata; no identity docs in public apply V1.
-- Error contract: generic public errors, canonical destination attempt errors, no raw provider/storage/SQL errors.
+- Error contract: generic public errors, sanitized projection failures, no raw provider/storage/SQL errors.
 - Abuse/rate-limit posture: existing Growth Forms public submit controls plus file size/type limits; no unlimited multipart endpoint.
 
 ### Runtime evidence
 
-- Local checks: renderer contract parity, file policy validation, ATS adapter unit/integration tests.
+- Local checks: renderer contract parity, file policy validation, ATS projection unit/integration tests.
 - DB/runtime checks: accepted application form submission creates/uses private asset and Hiring application in staging or local PG.
-- Integration checks: destination attempt status reflects accepted/delivered/retry/dead-letter.
-- Reliability signals/logs: Growth Forms destination failures and ATS adapter failures are observable without PII.
+- Integration checks: accepted submission event can be replayed by `growth_hiring_application_from_submission` without duplicate applications.
+- Reliability signals/logs: Growth Forms upload/projection failures are observable without PII.
 - Production verification sequence: publish test application form version -> submit with small PDF -> verify Growth submission, asset, ATS application, and generic success response.
 
 ### Acceptance criteria additions
@@ -229,6 +239,78 @@ Reglas obligatorias:
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Plan
+
+### Audit
+
+=== AUDIT: TASK-1372 ===
+
+SUPUESTOS CORRECTOS:
+- Growth Forms is the source of truth for public form definition, published render contract, public submit, consent snapshot, submission ledger and outbox event `growth.forms.submission_accepted`.
+- Creating a Hiring application from an accepted application form is a reactive domain projection, not a `form_destination`; `form_destination` remains for external delivery such as HubSpot/email/webhook.
+- TASK-1362 already owns the scan/quarantine invariant. TASK-1372 must call `scanAndGateUploadedAsset` while the public submit route still has file bytes, then let the worker attach only a clean private asset.
+
+SUPUESTOS DESACTUALIZADOS:
+- The original spec's `scanPolicy='pdf_only_v1'` and "destination adapter" language are stale. Runtime now has a mandatory structural scanner and the canonical pattern is `growth_hiring_application_from_submission`.
+- The contract already has `formKind='application'`, `document_upload`, `uploaded_file`, `styleVariant` and phone-country UI support in pieces. The gap is submit handling, upload policy, file renderer, asset bridge and projection registration.
+- The task predated `## Modular Placement Contract`; this execution adds it before implementation per EPIC-026 enforcement.
+
+ARQUITECTURA / DOCS OBLIGATORIOS:
+- `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md` — Growth Forms source-of-truth, browser leak boundary, public submit and async delivery.
+- `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` — Hiring owns application creation, candidate documents and handoff boundaries.
+- `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — UI/renderer/Nexa consume primitives; no UI-only application write path.
+- `MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` — build in current runtime, extraction-ready, no opportunistic `apps/*`/`packages/*`.
+- `TASK-1362`, `TASK-1367`, `TASK-1373` — scan invariant, public Hiring command, and downstream Careers UI consumer.
+
+CÓDIGO EXISTENTE PARA REUTILIZAR:
+- `submitForm` + `persistAcceptedSubmission` + `FORM_SUBMISSION_ACCEPTED_EVENT` for public Growth Forms acceptance.
+- `createPrivatePendingAsset`, `scanAndGateUploadedAsset`, `attachAssetToAggregate` and the TASK-1362 attach guard for CV assets.
+- `submitPublicHiringApplication` and `parsePublicHiringApplication` for Person/facet/application reconciliation and dedupe.
+- Existing reactive projections `growth_grader_run_from_submission` and `growth_ebook_delivery_from_submission` as the outbox consumer pattern.
+- Renderer `styleVariant`, premium select and phone-country UI as reusable visual capabilities for TASK-1373.
+
+SCHEMA / RUNTIME REAL:
+- `greenhouse_growth.form_submission.normalized_fields_json` stores the accepted submission and emits `growth.forms.submission_accepted`.
+- `greenhouse_core.assets` supports `hiring_application_cv_draft` pending/quarantined and final `hiring_application_cv` attachment.
+- `greenhouse_core.asset_scan_results` is append-only; final attach contexts reject missing/blocking scans.
+- `ops-reactive-growth` drains growth-domain projections in the ops-worker.
+
+ACCESS MODEL:
+- Public submit remains anonymous but gated by Growth Forms flag, CORS/surface, Turnstile, consent and rate limits.
+- The projection uses server-only commands and does not expose internal Hiring IDs, asset IDs, private URLs, destination mapping or file names to the browser.
+
+SKILLS A USAR:
+- `greenhouse-task-execution-hook` — hook/goal contract.
+- `greenhouse-growth-forms` — Growth Forms engine, renderer and leak-boundary rules.
+- `greenhouse-agent` — repo/runtime boundaries and Greenhouse implementation conventions.
+- `greenhouse-task-planner` — task lifecycle/doc format while editing the formal task.
+- `greenhouse-qa-release-auditor` and `greenhouse-documentation-governor` at closure.
+
+SUBAGENTES:
+- `sequential` — subagents were not authorized; slices touch overlapping Growth Forms contract/renderer/submit/projection boundaries.
+
+RIESGOS / BLAST RADIUS:
+- Public file upload abuse, file-name/PII telemetry leaks, duplicate Hiring applications, ops-worker stale deploy filters, and existing non-file form regressions.
+
+OPEN QUESTIONS RESUELTAS:
+- Multipart vs token flow -> multipart in the generic public submit route for this slice: Vercel has the bytes and can scan before persistence; no long-lived pre-submit upload token is introduced.
+- PDF-only V1 -> resolved as declared MIME/size policy plus mandatory structural scan/quarantine; scanner result, not browser MIME, decides attachability.
+- ATS destination key -> no provider key; implement `growth_hiring_application_from_submission` projection.
+
+===
+
+### Plan de ejecucion
+
+1. **Task/docs intake:** keep execution on `develop` per operator override, no worktree/subagents; move task to `in-progress`, add Modular Placement Contract and handoff note.
+2. **Contract + compiler:** extend the Growth Forms field contract with browser-safe file upload policy and field presentation icon metadata; remove the V1 blocker for correctly declared file fields; keep renderer contract parity.
+3. **Renderer file field:** add governed file/CV visual language, client validation for declared policy, multipart submit only when a file is present, and preserve telemetry no-values/no-file-name.
+4. **Public submit + asset bridge:** parse JSON or multipart, enforce declared file policy server-side, create private pending asset, scan/gate bytes immediately, persist only safe file descriptors in `normalized_fields_json`, and accept quarantined assets without exposing details.
+5. **Hiring projection:** add `growth_hiring_application_from_submission`, scoped to application forms, re-read the submission, call `submitPublicHiringApplication`, then attach/link clean scanned CV assets idempotently; no ATS SQL or inline creation from submit route.
+6. **Seed/contract support:** update the Careers application form contract/foundation so TASK-1373 can consume icon policy, `careers-html-fidelity`, phone-country and CV field capability without migrating the UI yet.
+7. **Ops/release filters:** ensure the new projection path and Growth Forms runtime paths are included in ops-worker deploy filters.
+8. **Verification:** focused unit tests for contract/compiler, renderer multipart/no-leak, submit asset bridge, projection mapping/idempotency and existing Hiring submit; DB smoke for submission+PDF+asset+application where runtime credentials allow.
+9. **Closure:** update manuals/docs/changelog/project context/Handoff, run `task:lint`, `ops:lint`, lint/typecheck/tests/QA/docs gates, move to `complete` only with evidence; otherwise leave code complete / rollout pending.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -283,13 +365,13 @@ Reglas obligatorias:
   - `required`.
   - `multiple=false` for Careers V1.
   - `dataClass='uploaded_file'`.
-  - `storageContext` or destination-owned asset context.
-  - `scanPolicy='pdf_only_v1' | 'quarantine_required' | final approved enum`.
-- Destination adapter:
-  - Provider key: `greenhouse_hiring_application` or final approved key.
-  - Server-only mapping from form field keys to ATS input.
-  - Opening binding by public id or destination config, not browser-supplied internal IDs.
-  - Idempotent delivery using submission id + ATS dedupe.
+  - `storageContext='hiring_application_cv_draft'`.
+  - `scanPolicy='scan_required'`.
+- Reactive ATS projection:
+  - Consumer key: `growth_hiring_application_from_submission`.
+  - Server-only mapping from accepted normalized fields to `submitPublicHiringApplication`.
+  - Opening binding by public id in the accepted submission, not browser-supplied internal IDs.
+  - Idempotent delivery using submission replay safety + ATS dedupe.
 
 ### Guards
 
@@ -303,8 +385,8 @@ Reglas obligatorias:
 ### Slice ordering hard rule
 
 - Slice 1 contract must land before submit/runtime changes.
-- Slice 2 file bridge must land before ATS adapter.
-- Slice 3 adapter must land before any Careers migration.
+- Slice 2 file bridge must land before ATS projection.
+- Slice 3 projection must land before any Careers migration.
 - Slice 4 evidence/docs closes only after runtime smoke or explicit blocker is documented.
 
 ### Risk matrix
@@ -312,7 +394,7 @@ Reglas obligatorias:
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal |
 |---|---|---|---|---|
 | File endpoint becomes abuse vector | Growth/Public API | medium | size/type/rate limits, Turnstile, no public URL | rejected upload counts |
-| Duplicate ATS applications | Hiring | medium | ATS dedupe + destination idempotency | duplicate destination outcome |
+| Duplicate ATS applications | Hiring | medium | ATS dedupe + projection replay safety | duplicate application smoke |
 | PII/file name leaks in telemetry | Data/Privacy | low | telemetry allowlist tests | telemetry payload tests |
 | Existing Growth Forms regress | Growth renderer | medium | contract parity + existing fixture tests | renderer test failures |
 | CV accepted without scan posture | Security | medium | PDF-only V1 + scan policy marker + TASK-1362 hook | scanStatus/asset metadata |
@@ -328,7 +410,7 @@ Reglas obligatorias:
 |---|---|---|
 | Slice 1 | Revert contract extension before publish | yes |
 | Slice 2 | Disable file field policy / revert submit handling | yes |
-| Slice 3 | Disable destination adapter / republish form without destination | yes |
+| Slice 3 | Remove projection registration / republish form without file field | yes |
 | Slice 4 | Correct docs and disable test form | yes |
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -337,38 +419,47 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Growth Forms supports a governed file/CV field in the published render/submit contract.
-- [ ] Public submit accepts file payloads only under declared file policy and stores them as private assets.
-- [ ] A Growth Forms destination adapter can create a Hiring application through the ATS command path.
-- [ ] The browser receives no destination mapping, no internal ATS IDs, no private file URLs and no secrets.
-- [ ] Existing non-file Growth Forms keep passing renderer contract and submit tests.
-- [ ] Submit with a PDF creates Growth submission, private asset and ATS application in a controlled smoke.
-- [ ] **Capacidades de riqueza expuestas (bloqueante de la paridad de TASK-1373):** el render contract/renderer soporta (a) `field.presentation.icon` (iconos por campo), (b) un `styleVariant` premium reutilizable por careers (input/foco/error tokenizados + combobox custom de selects + motion CTA + copy field-level), (c) phone-country UI, y (d) file/CV field con visual language gobernado. 1372 NO está completa si el renderer no puede reproducir la riqueza actual del apply de Careers.
-- [ ] The implementation is documented for Growth Forms and Careers operators.
+- [x] Growth Forms supports a governed file/CV field in the published render/submit contract.
+- [x] Public submit accepts file payloads only under declared file policy and stores them as private assets.
+- [x] The reactive projection creates a Hiring application through the ATS command path.
+- [x] The browser receives no destination mapping, no internal ATS IDs, no private file URLs and no secrets.
+- [x] Existing non-file Growth Forms keep passing renderer contract and submit tests.
+- [x] Submit with a PDF creates Growth submission, private asset and ATS application in a controlled smoke.
+- [x] **Capacidades de riqueza expuestas (bloqueante de la paridad de TASK-1373):** el render contract/renderer soporta (a) `field.presentation.icon` (iconos por campo), (b) `careers-html-fidelity`/premium select existente reutilizable por Careers, (c) phone-country UI existente, y (d) file/CV field con visual language gobernado. 1372 NO está completa si el renderer no puede reproducir la riqueza actual del apply de Careers.
+- [x] The implementation is documented for Growth Forms and Careers operators.
 
 ## Verification
 
-- `pnpm task:lint --task TASK-1372`
-- `pnpm ops:lint --changed`
-- Growth Forms contract parity tests.
-- Growth Forms renderer tests.
-- Hiring public careers application tests.
-- Runtime smoke with application form + PDF + ATS destination in local/staging.
+- `pnpm test src/lib/growth/forms/__tests__/policy-compiler.test.ts src/growth-forms-renderer/__tests__/api-client.test.ts src/growth-forms-renderer/__tests__/renderer.test.ts src/lib/sync/projections/__tests__/growth-hiring-application-from-submission.test.ts` -> PASS, 4 files / 83 tests.
+- `pnpm typecheck` -> PASS.
+- `pnpm lint` -> PASS.
+- `pnpm build` -> PASS; warning residual historico en `src/lib/roadmap/work-item-index/reader.ts` por patron amplio, no introducido por TASK-1372.
+- `pnpm worker:runtime-deps-gate` -> PASS, 3 workers.
+- `pnpm pg:connect:status` -> PASS, `No migrations to run!`.
+- `pnpm qa:gates --changed --agent codex --task TASK-1372 --runtime --data --integration --security --docs` -> advisory high-risk domains identified; required gates executed.
+- `pnpm task:lint --task TASK-1372` -> PASS (`errors=0`, `warnings=0`).
+- `pnpm ops:lint --changed` -> PASS (`errors=0`, `warnings=0`).
+- Runtime smoke with application form + PDF + ATS projection in Cloud SQL dev via proxy -> PASS:
+  - submission `fsub-460f074e-5f47-403e-97b5-725f18c3fef2`
+  - application `happ-a2637a89-3bf1-499b-9693-fb63ea7ab257`
+  - asset `asset-1a0adc1c-ecc3-46d1-ac43-e32627a385ca`
+  - asset `private`, `attached`, scan verdict `clean`, destinations `0`.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` and folder are synchronized.
-- [ ] `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md` are synchronized.
-- [ ] `Handoff.md`, `changelog.md` and `project_context.md` reflect the new application form capability.
-- [ ] Manuals and Growth Forms/talent docs tell operators to use Growth Forms, not a custom form path.
+- [x] `Lifecycle` and folder are synchronized.
+- [x] `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md` are synchronized.
+- [x] `Handoff.md`, `changelog.md` and `project_context.md` reflect the new application form capability.
+- [x] Manuals and Growth Forms/talent docs tell operators to use Growth Forms, not a custom form path.
 
 ## Follow-ups
 
-- `TASK-1373` migrates Careers apply UI to native `<greenhouse-form>`.
-- `TASK-1362` continues broader candidate document capture, identity docs and formal scan/quarantine.
+- `TASK-1373` migrates Careers apply UI to native `<greenhouse-form>` using this contract.
+- `TASK-1378` decides whether to provision the optional ClamAV service; structural scan already runs and gates attach.
+- Staging/production rollout remains a release step: push/deploy the Next.js app plus ops-worker and smoke `efeonce-careers-application` against the target environment before switching Careers UI.
 
 ## Open Questions
 
 - **[RESUELTA 2026-07-08]** "Provider key name for the ATS destination" → disuelta: NO es un destination. Es una projection reactiva `growth_hiring_application_from_submission` sobre `growth.forms.submission_accepted` (patrón grader). `DESTINATIONS: []`.
-- Whether file upload should be multipart submit or a pre-submit upload token flow.
-- Whether PDF-only V1 is sufficient until `TASK-1362` completes full scan/quarantine (coordinar el compensating control con 1362, que owns el scan).
+- **[RESUELTA 2026-07-13]** File upload flow -> multipart submit for this slice. The public route has the bytes and can scan before persisting the accepted submission; no pre-submit upload token was introduced.
+- **[RESUELTA 2026-07-13]** PDF-only V1 -> replaced by declared MIME/size policy plus mandatory structural scan/quarantine from TASK-1362. `scanPolicy='scan_required'`; clean scan is required before final attach.

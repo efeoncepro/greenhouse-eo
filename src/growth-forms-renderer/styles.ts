@@ -133,7 +133,21 @@ export const RENDERER_CSS = `
   .ghf-field:focus-within { z-index: 40; }
   .ghf-field[data-overlay-open="true"] { z-index: 80; }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-field { gap: 8px; }
-  .ghf-label { font-size: 0.875rem; font-weight: 600; line-height: 1.3; color: var(--ghf-fg); }
+  .ghf-label { display: inline-flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600; line-height: 1.3; color: var(--ghf-fg); }
+  .ghf-field-icon {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    inline-size: 22px;
+    block-size: 22px;
+    border: 1px solid color-mix(in srgb, var(--ghf-border) 72%, transparent);
+    border-radius: 999px;
+    color: var(--ghf-muted);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1;
+  }
   .ghf-required { color: var(--ghf-error); margin-inline-start: 2px; }
   .ghf-optional { color: var(--ghf-muted); font-weight: 400; margin-inline-start: 4px; }
   .ghf-help { font-size: 0.8125rem; color: var(--ghf-muted); line-height: 1.4; }
@@ -159,7 +173,8 @@ export const RENDERER_CSS = `
 
   .ghf-input,
   .ghf-textarea,
-  .ghf-select {
+  .ghf-select,
+  .ghf-file-input {
     font: inherit;
     color: var(--ghf-fg);
     background: var(--ghf-field-bg);
@@ -174,7 +189,8 @@ export const RENDERER_CSS = `
   }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-input,
   [data-ghf-style-variant="diagnostic_premium"] .ghf-textarea,
-  [data-ghf-style-variant="diagnostic_premium"] .ghf-select {
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-select,
+  [data-ghf-style-variant="diagnostic_premium"] .ghf-file-input {
     min-height: 52px;
     padding: 14px 16px;
     border-radius: var(--ghf-radius);
@@ -184,11 +200,13 @@ export const RENDERER_CSS = `
   .ghf-select { appearance: none; }
   .ghf-input:hover,
   .ghf-textarea:hover,
-  .ghf-select:hover { border-color: var(--ghf-border-strong); }
+  .ghf-select:hover,
+  .ghf-file-input:hover { border-color: var(--ghf-border-strong); }
 
   .ghf-input:focus-visible,
   .ghf-textarea:focus-visible,
   .ghf-select:focus-visible,
+  .ghf-file-input:focus-visible,
   .ghf-tel-country:focus-visible,
   .ghf-btn:focus-visible {
     outline: 2px solid var(--ghf-focus);
@@ -197,6 +215,7 @@ export const RENDERER_CSS = `
   .ghf-input:focus-visible,
   .ghf-textarea:focus-visible,
   .ghf-select:focus-visible,
+  .ghf-file-input:focus-visible,
   .ghf-tag-input:focus-within {
     box-shadow: var(--ghf-field-shadow-focus);
   }
@@ -204,6 +223,7 @@ export const RENDERER_CSS = `
   .ghf-field[data-invalid="true"] .ghf-input,
   .ghf-field[data-invalid="true"] .ghf-textarea,
   .ghf-field[data-invalid="true"] .ghf-select,
+  .ghf-field[data-invalid="true"] .ghf-file-input,
   .ghf-field[data-invalid="true"] .ghf-tag-input {
     border-color: var(--ghf-error);
     background: var(--ghf-field-bg);
@@ -353,6 +373,24 @@ export const RENDERER_CSS = `
     background: rgba(54, 200, 191, 0.18);
     color: var(--ghf-fg);
     font-weight: 700;
+  }
+
+  .ghf-file { display: grid; gap: 6px; min-width: 0; }
+  .ghf-file-input::file-selector-button {
+    margin-inline-end: 12px;
+    border: 1px solid var(--ghf-border);
+    border-radius: calc(var(--ghf-radius) - 2px);
+    background: color-mix(in srgb, var(--ghf-accent) 8%, var(--ghf-field-bg));
+    color: var(--ghf-fg);
+    font: inherit;
+    font-weight: 700;
+    padding: 7px 10px;
+  }
+  .ghf-file-status {
+    margin: 0;
+    color: var(--ghf-muted);
+    font-size: 0.8125rem;
+    line-height: 1.4;
   }
 
   .ghf-tag-input {
@@ -1273,7 +1311,7 @@ export const RENDERER_CSS = `
   }
 
   @media (forced-colors: active) {
-    .ghf-input, .ghf-textarea, .ghf-select, .ghf-tag-input, .ghf-check { border-color: ButtonText; }
+    .ghf-input, .ghf-textarea, .ghf-select, .ghf-file-input, .ghf-tag-input, .ghf-check { border-color: ButtonText; }
     .ghf-btn { border-color: ButtonText; }
     .ghf-field[data-invalid="true"] .ghf-input { border-color: Mark; }
     .ghf-success-card,

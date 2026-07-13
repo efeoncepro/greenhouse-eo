@@ -43,11 +43,19 @@ gobernado `POST /api/public/hiring/applications` de TASK-1367.
 
 ## Growth Forms
 
-El formulario de postulación usa un `RenderContract` compatible con Growth Forms
-para gobernar campos, consentimiento, captcha y telemetría (`gh_form_*`), pero la
-fuente autoritativa de escritura sigue siendo Hiring. Un adapter Growth
-Forms→Hiring puede abrirse como backend-data follow-up si se quiere mover el
-ledger de submit al dominio Growth Forms.
+El formulario de postulación tiene foundation backend en Growth Forms desde
+TASK-1372. Para `formKind='application'`, Growth Forms gobierna campos,
+consentimiento, captcha, telemetría (`gh_form_*`), file policy y el ledger de
+submit. Si el contrato incluye CV, el submit público usa multipart, crea asset
+privado `hiring_application_cv_draft`, escanea los bytes y persiste sólo un
+descriptor seguro.
+
+La escritura ATS no es un `form_destination`: la projection
+`growth_hiring_application_from_submission` consume
+`growth.forms.submission_accepted` y llama `submitPublicHiringApplication`.
+`form_destination` sigue reservado para delivery externo como HubSpot/email.
+Hasta que TASK-1373 migre la UI pública, el endpoint directo de Hiring queda
+como compatibilidad del apply actual.
 
 El Banco de Talento sigue la misma regla: si captura datos no puede ser solo
 decoracion visual. Debe tener un contrato Growth Forms propio o un command Hiring
@@ -147,16 +155,19 @@ El proceso queda con paridad programatica para publicar y recibir postulaciones:
 - `POST /api/hiring/openings/{openingId}/publish` publica el opening.
 - `DELETE /api/hiring/openings/{openingId}/publish?mode=paused|closed`
   despublica el opening.
-- `POST /api/public/hiring/applications` recibe postulaciones publicas.
+- `POST /api/public/growth/forms/[formSlug]/submit` es el path gobernado de
+  Growth Forms para postulaciones `application`; `POST /api/public/hiring/applications`
+  queda como legacy/compat hasta TASK-1373.
 
 Los endpoints internos tienen doble gate: tenant interno + capability
 `hiring.demand.write`, `hiring.opening.write` o `hiring.opening.publish`. El
 endpoint publico no requiere sesion, pero en produccion exige Turnstile y falla
 cerrado con `captcha_failed` si no hay token valido.
 
-El submit publico acepta JSON o `multipart/form-data`. Cuando incluye `cvFile`,
-el PDF se guarda en `greenhouse_core.assets` como asset privado
-`hiring_application_cv` y queda adjunto a la `hiring_application`.
+El submit publico de Growth Forms acepta JSON o `multipart/form-data`. Cuando
+incluye `cvFile`, el PDF se guarda primero en `greenhouse_core.assets` como
+asset privado `hiring_application_cv_draft`, se escanea y sólo si está `clean`
+la projection lo adjunta como `hiring_application_cv` a la `hiring_application`.
 
 Esto significa que publicar otra vacante no necesita tocar codigo ni deploy. El
 wrapper de operador/CLI ya existe localmente; un futuro Publication Desk o Nexa
