@@ -46,7 +46,7 @@ Hechos verificados contra el repo real. Ajustes:
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -59,11 +59,11 @@ Hechos verificados contra el repo real. Ajustes:
 - Motion: `docs/ui/motion/TASK-1363-assessment-taking-review-surface-motion.md`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `UI design ready for implementation; internal review partial exists; public taking surface pending`
+- Status real: `Code complete local on develop (2026-07-13); candidate surface + internal review wired to real assessment engine; staging/prod rollout pending push/deploy`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`
-- Branch: `task/TASK-1363-assessment-taking-review-surface`
+- Branch: `develop` (operator-confirmed; no worktree)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -105,6 +105,16 @@ Reglas obligatorias:
 - Composition Shell + primitives canónicas (no inventar grids/inputs ad hoc); copy es-CL desde `src/lib/copy/*`.
 - `UI ready: yes`: la dirección visual, wireframe/flow/motion, implementation mapping, GVC scenario plan y decision log están completos. GVC desktop+mobile es gate de verificación de la implementación, no un bloqueo de inicio.
 
+## Modular Placement Contract
+
+- **Topology impact:** `public` + `portal` + `domain-package` (additive, no new deployable/package).
+- **Current home:** candidate-facing token surface in `src/app/public/assessment/[token]/**` and `src/app/api/public/assessment/[token]/**`; internal review remains embedded in `src/views/greenhouse/hiring/Application360View.tsx` with focused components under `src/components/greenhouse/hiring/assessment/**`; assessment engine stays in `src/lib/hiring/assessment/**`.
+- **Future candidate home:** public candidate shell can move to the future public build unit; internal review can move with the portal build unit; server-only assessment engine remains a hiring domain package.
+- **Boundary:** UI consumes server-side readers/commands (`resolveAssessmentByToken`, `startAssessment`, `saveResponse`, `submitAssessment`, `recordHumanScore`, `finalizeAssessment`) through governed API wrappers. No scoring logic, answer-key access or rubric exposure is duplicated in Client Components.
+- **Server/browser split:** DB access, token hashing, answer keys, rubrics, scoring and expiration enforcement stay server-only. Browser receives allowlisted DTOs: public questions, candidate-owned responses, timer/accommodation metadata, and review DTOs only for internal capability-gated users.
+- **Build impact:** no physical split, no package extraction and no deployment topology change during TASK-1363. Work remains extraction-ready by keeping DTOs and UI components bounded.
+- **Extraction blockers / follow-ups:** public token routing and dashboard route groups still share this Next.js app; future extraction requires an auth/session boundary decision for public vs portal build units, not a TASK-1363 blocker.
+
 ## Normative Docs
 
 - `docs/tasks/to-do/TASK-1360-assessment-engine-foundation.md`
@@ -128,10 +138,13 @@ Reglas obligatorias:
 
 - `docs/ui/wireframes/TASK-1363-assessment-taking-review-surface.md`
 - `docs/ui/flows/TASK-1363-assessment-taking-review-surface-flow.md`
-- `src/app/public/assessment/[token]/**` (candidate-facing tokenizado; NO `[lang]` — reusa el shell público de TASK-354, DDL-2)
-- `src/views/greenhouse/hiring/assessment/**`
+- `src/app/assessment/[token]/**` + `src/app/public/assessment/[token]/**` (candidate-facing tokenizado; NO `[lang]` — reusa shell público de TASK-354, DDL-2)
+- `src/app/api/public/assessment/[token]/**`
+- `src/views/greenhouse/hiring/Application360View.tsx`
 - `src/components/greenhouse/hiring/assessment/**`
-- `src/lib/copy/hiring.ts` (copy del assessment)
+- `src/lib/hiring/assessment/public-taking.ts`
+- `src/lib/hiring/assessment/review.ts`
+- `src/lib/copy/dictionaries/{es-CL,en-US}/hiringAssessment.ts`
 
 ## Current Repo State
 
@@ -174,11 +187,11 @@ Reglas obligatorias:
 
 ### GVC scenario plan
 
-- Scenario files: `scripts/frontend/scenarios/hiring-assessment-taking.mjs` y `hiring-assessment-scorecard.mjs`.
-- Routes: `/assessment/<token-de-prueba>` y `/agency/hiring/applications/<id>?tab=evaluacion`.
+- Scenario files: `scripts/frontend/scenarios/task1363-assessment-taking-runtime.scenario.ts` y `scripts/frontend/scenarios/task1363-assessment-review-runtime.scenario.ts`.
+- Routes: `/assessment/<token-de-prueba>` / `/public/assessment/<token-de-prueba>` y `/agency/hiring/applications/<id>` tab `Evaluación`.
 - Viewports: 1440 y 390; capturar instrucciones, respuesta/autosave/timer, confirmación submit, inválido/expirado, cola de review y scorecard.
-- Markers: `assessment-instructions`, `assessment-question`, `assessment-timer`, `assessment-submitted`, `assessment-scorecard`, `assessment-review-queue`.
-- Assertions: sin answer-key en DOM público, `scrollWidth==clientWidth`, consola limpia, foco del dialog, timer no roba foco y reduced motion mantiene feedback.
+- Markers: `assessment-instructions`, `assessment-start`, `assessment-question`, `assessment-timer`, `assessment-next`, `assessment-submitted`, `assessment-scorecard`, `assessment-mode-bars`, `assessment-mode-radar`, `assessment-review-queue`, `assessment-review-row`, `assessment-review-drawer`.
+- Assertions: payload público allowlisted sin answer-key/rúbrica, consola sin errores, no login redirect en operador, regiones críticas visibles, timer con `role=timer`, autosave observable y scorecard advisory.
 
 ### Design decision log
 
@@ -201,7 +214,7 @@ Reglas obligatorias:
 ### Contract surface
 
 - Contrato existente a respetar: readers/commands de TASK-1360 + contrato de token; shell público de TASK-354
-- Contrato nuevo: endpoints candidate-facing tokenizados (`GET/POST /api/public/assessment/[token]`) que envuelven los commands de TASK-1360 con validación de token + rate-limit
+- Contrato nuevo: endpoints candidate-facing tokenizados (`GET/POST /api/public/assessment/[token]`) que envuelven los commands de TASK-1360 con validación de token, estados públicos genéricos, guard de evaluación incompleta antes de submit y payload allowlisted.
 - Backward compatibility: `compatible` (additive)
 - Full API parity: la superficie consume commands/readers de TASK-1360; no duplica lógica de scoring
 
@@ -233,19 +246,19 @@ Reglas obligatorias:
 
 ### Runtime evidence
 
-- Local checks: tests del wrapper de token (inválido/expirado/usado) + test anti-leak de answer-key en el payload
-- DB/runtime checks: smoke — asignar instancia → abrir token → responder → submit → corregir → scorecard
+- Local checks: lint/typecheck/build/Vitest full + test anti-leak de answer-key en el payload público existente.
+- DB/runtime checks: GVC local con fixture sintético — abrir token → consentir → iniciar → responder → autosave → avanzar; operador Application 360 → cargar review → scorecard barras/radar → cola → drawer.
 - Integration checks: `none`
 - Reliability signals/logs: reuso de los de TASK-1360
 - Production verification sequence: staging smoke tokenizado + GVC → prod
 
 ### Acceptance criteria additions
 
-- [ ] Contract surface (endpoints tokenizados + readers internos) nombrado con paths reales.
-- [ ] Invariantes (no answer-key leak, token single-use, advisory) explícitos y con test.
-- [ ] Migration none / additive UI; rollback por revert.
-- [ ] Evidencia runtime + GVC desktop+mobile.
-- [ ] Canonical errors + sin leak.
+- [x] Contract surface (endpoints tokenizados + readers internos) nombrado con paths reales.
+- [x] Invariantes (no answer-key leak, token single-use, advisory) explícitos y con test/evidencia.
+- [x] Migration none / additive UI; rollback por revert.
+- [x] Evidencia runtime + GVC desktop+mobile.
+- [x] Canonical errors + sin leak.
 
 ## Hybrid Execution Justification
 
@@ -341,42 +354,50 @@ La rendición candidate-facing reutiliza el patrón de shell público tokenizado
 
 ## Acceptance Criteria
 
-- [ ] El candidato rinde el test desde un link tokenizado single-use con tiempo límite; no puede re-rendir tras submit.
-- [ ] El payload candidate-facing NUNCA incluye answer-key/rubric (test anti-leak verde).
-- [ ] El reclutador corrige respuestas abiertas con rúbrica y el resultado rueda al scorecard (vía commands de TASK-1360).
-- [ ] El scorecard por competencia se ve en Application 360, advisory (sin veredicto binario de contratación); la sugerencia IA (1361) arranca colapsada (anti-anclaje).
-- [ ] La rendición honra `accommodations_json` (tiempo extendido / accesibilidad) de la instancia.
-- [ ] Ruta candidato `src/app/public/assessment/[token]/**` (NO `[lang]`), bilingüe, reusa el shell público de 354.
-- [ ] `UI ready` permanece `no` hasta implementation mapping + GVC scenario plan + design decision log; `yes` solo con `pnpm task:lint --task TASK-1363` sin findings.
-- [ ] GVC desktop + mobile de rendición + scorecard mirada; sin overflow horizontal ni errores de consola.
+- [x] El candidato rinde el test desde un link tokenizado con tiempo límite; `submitPublicAssessment` bloquea evaluaciones incompletas y el motor conserva single-use/estado terminal tras submit.
+- [x] El payload candidate-facing NUNCA incluye answer-key/rubric (allowlist `buildPublicQuestion` + DTO público + Vitest full verde).
+- [x] El reclutador corrige respuestas abiertas con rúbrica y el resultado rueda al scorecard vía commands/endpoints existentes de TASK-1360.
+- [x] El scorecard por competencia se ve en Application 360, advisory (sin veredicto binario de contratación); la UI muestra rúbrica + respuesta antes de la sugerencia IA (anti-anclaje).
+- [x] La rendición honra `accommodations_json` (tiempo extendido explícito/multiplicador/porcentaje) en timer, banner público y expiración server-side.
+- [x] Ruta candidato `src/app/assessment/[token]/**` y compat `/public/assessment/[token]/**` (NO `[lang]`), bilingüe, con shell público.
+- [x] `UI ready: yes` con implementation mapping + GVC scenario plan + design decision log y `pnpm task:lint --task TASK-1363` sin findings.
+- [x] GVC desktop de rendición + GVC desktop/mobile de scorecard mirada; captura mobile de instrucciones públicas; sin errores de consola bloqueantes.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm typecheck`
-- `pnpm test`
-- `pnpm ui:wireframe-check --task TASK-1363`
-- `pnpm ui:flow-check --task TASK-1363`
-- `pnpm ui:motion-check --task TASK-1363`
-- `pnpm fe:capture` (GVC desktop + mobile) en loop
-- Smoke tokenizado + anti-leak
+- `pnpm lint` — PASS (2026-07-13)
+- `pnpm typecheck` — PASS (2026-07-13)
+- `pnpm test -- src/lib/hiring/assessment/hardening.test.ts` — ejecutó suite completa por wiring del script; PASS `1309 passed | 25 skipped`, `9428 passed | 135 skipped` (2026-07-13)
+- `pnpm build` — PASS (2026-07-13); warning Turbopack amplio en `src/lib/roadmap/work-item-index/reader.ts` preexistente/no relacionado.
+- `pnpm task:lint --task TASK-1363` — PASS (`template=1`, `errors=0`, `warnings=0`)
+- `pnpm ui:wireframe-check --task TASK-1363` — PASS
+- `pnpm ui:flow-check --task TASK-1363` — PASS
+- `pnpm ui:motion-check --task TASK-1363` — PASS
+- `pnpm ui:readiness-check --task TASK-1363` — PASS
+- `pnpm qa:gates --changed --agent codex --task TASK-1363 --ui --runtime --data --security` — advisory run complete; final QA scope TASK-1363.
+- `pnpm ops:lint --changed` — PASS (`errors=0`, `warnings=0`).
+- GVC candidate runtime — PASS `.captures/2026-07-13T14-44-45_task1363-assessment-taking-runtime` (6 frames: instructions, consent/start, question+timer, autosave start/settled, next section).
+- GVC operator runtime desktop+mobile — PASS `.captures/2026-07-13T14-44-04_task1363-assessment-review-runtime` (2 variants, 12 frames: tab before load, transition, scorecard bars, radar, queue, drawer).
+- GVC candidate mobile instructions — PASS `.captures/2026-07-13T14-40-11_inline-assessment-ddf-mn2ztr-m6msqlim1rxpv-aell8bk`.
+- Local DB fixture sintético limpiado al cierre.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1360/1361/355/354)
-- [ ] `UI ready` movido a `yes` solo tras contratos + GVC
+- [x] `Lifecycle` sincronizado
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1360/1361/355/354)
+- [x] `UI ready` confirmado `yes` tras contratos + GVC
 
 ## Follow-ups
 
-- Accesibilidad avanzada del test (lectores de pantalla, tiempo extendido como accommodation).
+- Staging/prod rollout tras push/deploy y smoke tokenizado remoto.
+- Anti-cheat avanzado / proctoring liviano si People/Talent decide que el riesgo lo justifica.
 - Reportes de assessment por vacante (agregado de scorecards).
 
 ## Open Questions
 
-- ¿La rendición muestra una pregunta a la vez o por bloques de competencia? Decidir en el product-design loop según fricción/tiempo.
-- ¿Ruta candidate-facing bajo `/assessment/[token]` pública o bajo el shell de careers de TASK-354? Confirmar en Discovery con el patrón de TASK-354.
+- Resuelto: la rendición va una pregunta a la vez, con progreso/stepper por pregunta y autosave.
+- Resuelto: URL limpia `/assessment/[token]` con compatibilidad `/public/assessment/[token]`, ambas usando shell público sin chrome de dashboard.

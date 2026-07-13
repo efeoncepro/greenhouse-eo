@@ -174,10 +174,22 @@ return rows.map(normalizeAssessment)
 /** Vigencia del link tokenizado del candidato (TASK-1383; 1363 comunica la fecha). */
 const TOKEN_TTL_DAYS = 14
 
+const ACCOMMODATION_EXTRA_MINUTES_SQL = `GREATEST(0, COALESCE(
+  CASE WHEN (accommodations_json->>'extraMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
+    THEN FLOOR((accommodations_json->>'extraMinutes')::numeric)::int END,
+  CASE WHEN (accommodations_json->>'timeExtensionMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
+    THEN FLOOR((accommodations_json->>'timeExtensionMinutes')::numeric)::int END,
+  CASE WHEN (accommodations_json->>'additionalMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
+    THEN FLOOR((accommodations_json->>'additionalMinutes')::numeric)::int END,
+  CASE WHEN (accommodations_json->>'extendedTimeMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
+    THEN FLOOR((accommodations_json->>'extendedTimeMinutes')::numeric)::int END,
+  0
+))`
+
 const OVERDUE_PREDICATE = `(
   (token_expires_at IS NOT NULL AND token_expires_at < NOW())
   OR (started_at IS NOT NULL AND time_limit_minutes IS NOT NULL
-      AND started_at + make_interval(mins => time_limit_minutes) < NOW())
+      AND started_at + make_interval(mins => time_limit_minutes + ${ACCOMMODATION_EXTRA_MINUTES_SQL}) < NOW())
 )`
 
 /**

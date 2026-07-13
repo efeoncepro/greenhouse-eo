@@ -20,6 +20,18 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-13 — TASK-1363: Assessment Taking + Review Surface
+
+El assessment dejó de ser sólo motor y ahora tiene dos superficies runtime sobre los mismos primitives de dominio:
+
+- **Candidato público:** `/assessment/[token]` (compat `/public/assessment/[token]`) + `GET/POST /api/public/assessment/[token]`. El wrapper público consume `resolveAssessmentByToken`, `startAssessment`, `saveResponse` y `submitAssessment`; no reimplementa scoring. Payload browser-safe en `src/lib/hiring/assessment/public-taking.ts`: preguntas públicas, respuestas propias, timer/accommodation y contexto mínimo. Nunca viajan `answer_key_json`, `rubric_json`, token hash ni datos internos.
+- **Asignación real:** la plantilla de assessment puede ser la recomendada del rol/opening, pero la ejecución siempre es `template × hiring_application`. No existe un "assessment de la vacante" con respuestas compartidas; cada candidato obtiene su propia instancia, token, estado, tiempo y scorecard.
+- **Guard de completitud:** `submitPublicAssessment` verifica que todas las preguntas del set público tengan respuesta guardada antes de llamar `submitAssessment`; evita que una UI/cliente salte pasos y cierre una instancia incompleta.
+- **Accommodations:** el tiempo efectivo se deriva de `accommodations_json` (`extraMinutes`, `timeExtensionMinutes`, `additionalMinutes`, `extendedTimeMinutes`, `timeMultiplier`, `extendedTimeMultiplier`, `extendedTimePercent`, `timeExtensionPercent`) y se refleja en timer, banner público y expiración server-side.
+- **Operador interno:** Application 360 (`/agency/hiring/applications/[id]`, tab `Evaluación`) carga `reviewItems` y `competencyModules` desde `GET /api/hiring/assessments/[id]`. El scorecard es advisory, con barras/radar + tabla sr-only, y la cola/drawer de corrección mantiene anti-anclaje: pregunta/respuesta/rúbrica antes de la sugerencia IA.
+- **Contrato de error público:** errores públicos son genéricos y no revelan si el token expiró, fue usado o no existe; el diagnóstico interno queda en logging/capture del dominio.
+- **Evidencia local:** GVC candidate `.captures/2026-07-13T14-44-45_task1363-assessment-taking-runtime`; GVC operator desktop/mobile `.captures/2026-07-13T14-44-04_task1363-assessment-review-runtime`; lint/typecheck/build/Vitest full verdes. Rollout remoto queda pendiente de push/deploy, no de arquitectura.
+
 ## Delta 2026-07-13 — TASK-1400: resolución gobernada de blockers de Hiring Activation
 
 El bridge de TASK-770 ganó el contrato programático para que UI/Nexa no simulen "resolver blocker":
@@ -1041,8 +1053,8 @@ Modelo canónico (schema `greenhouse_hiring`):
 
 - **Competency catalog** — reutilizable, agnóstico de cargo. Dos ejes **ortogonales** (NUNCA en un solo enum): `category` (`attitudinal` | `aptitude` | `skill`) × `level` (`nociones` | `intermedio` | `avanzado`).
 - **Question bank** — por competencia+nivel, `type` ∈ `single_choice`|`multi_choice`|`likert`|`situational`|`open_text`. `answer_key`/`rubric` **sensible**: se persiste separada de lo que ve el candidato (misma disciplina allowlist que el opening público). Objetivo (`single/multi/likert`) auto-corregido; `situational`/`open_text` corrección humana (o IA-propuesta, TASK-1361).
-- **Assessment template** — composición de módulos `competencia + nivel objetivo + peso` (ej. "Account Manager L2"). Reutilizable por vacante.
-- **Assessment instance** — plantilla ⨯ `hiring_application` → estados `assigned → sent → in_progress → submitted → scored | expired`; token single-use + tiempo límite para el modo remoto.
+- **Assessment template** — composición de módulos `competencia + nivel objetivo + peso` (ej. "Account Manager L2"). Reutilizable por rol/vacante como plan de evaluación, no como instancia ejecutada.
+- **Assessment instance** — plantilla ⨯ `hiring_application` → estados `assigned → sent → in_progress → submitted → scored | expired`; token single-use + tiempo límite para el modo remoto. Este es el objeto que se asigna, rinde, guarda respuestas y se corrige.
 - **Response** + **competency result** — respuestas por pregunta; resultado por competencia + overall que **rueda hacia** `hiring_application.score` / `match_score` / `explainability_json` (SSOT del headline en la postulación; el assessment es el detalle que lo alimenta).
 
 ### Document capture — reutilización, no plataformas nuevas

@@ -102,6 +102,7 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 ## Hard rules (anti-regression, fairness + legality first)
 
 - **NEVER** let an assessment/interview score auto-reject or auto-hire. It is **input to a human decision** (AI-Act human-oversight; also the Greenhouse invariant).
+- **NEVER** say or implement "assign the assessment to the vacancy" as the executable runtime action. A vacancy/opening can recommend a template, but the real Greenhouse action is assigning an assessment template to a concrete `hiring_application`, which creates a candidate-specific `hiring_assessment` instance and token.
 - **NEVER** use — or recommend — emotion recognition, facial/voice "personality" inference, or social scoring of candidates (AI-Act prohibited + indefensible).
 - **NEVER** design a selection step that isn't **job-related and validity-oriented**; avoid anything that is a proxy for a protected class (adverse impact). Prefer structured interviews + work samples over unstructured "culture fit".
 - **NEVER** use "culture fit" as vague affinity. If evaluating Operating Code alignment, tie it to job-related evidence: transparency, education, memory, impact and system behavior.

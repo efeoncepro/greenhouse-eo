@@ -11,6 +11,40 @@ Hiring Desk es el espacio interno para operar la demanda de talento, el pipeline
 - **Application 360:** resumen con PII enmascarada, assessment/scorecard advisory, documentos, decisión estructurada, handoff bridge hacia Activation Lane y actividad append-only.
 - **Publicación:** compara la verdad interna con el payload público allowlist y confirma publicar, pausar o cerrar.
 
+## Modelo assessment operativo
+
+El assessment runtime se divide en cuatro objetos. Esta distinción es obligatoria para humanos y agentes:
+
+| Objeto | Qué representa | Qué NO representa |
+|---|---|---|
+| `hiring_assessment_template` | Plantilla lista para un rol: competencias, pesos, nivel objetivo y pool de preguntas. | No es una rendición ni guarda respuestas. |
+| `hiring_opening` | La vacante publicada o interna que recibe postulaciones. | No es el target de ejecución del test. |
+| `hiring_application` | La postulación concreta del candidato dentro del pipeline. | No duplica la identidad de la persona. |
+| `hiring_assessment` | Instancia template × application, con token, tiempo, estado, respuestas y scorecard. | No es reusable entre candidatos. |
+
+Regla práctica: si una vacante ya tiene la plantilla "lista", todavía hay que asignar esa plantilla a cada postulación que deba rendir. El command de asignación crea una instancia por `hiring_application`; el token crudo se muestra una vez y luego sólo existe su hash.
+
+## Flujo assessment end-to-end
+
+1. El operador abre Application 360 de la postulación.
+2. En la pestaña `Evaluación`, asigna una plantilla activa (`POST /api/hiring/assessments` con `applicationId`, `templateId`, `method='candidate_test'` y tiempo límite si aplica).
+3. Greenhouse crea `hiring_assessment`, evita duplicados abiertos por aplicación/plantilla y devuelve el link limpio `/assessment/<token>`.
+4. El candidato rinde por `GET/POST /api/public/assessment/[token]`. El payload público es allowlisted: pregunta, opciones públicas, respuestas propias, progreso, timer y accommodation. Nunca incluye `answer_key_json`, `rubric_json`, token hash ni datos internos.
+5. El autosave llama `saveResponse`; el submit exige que todas las preguntas públicas tengan respuesta guardada y que la instancia siga `in_progress`.
+6. Application 360 carga el review interno por `GET /api/hiring/assessments/[id]`: scorecard, módulos, respuestas abiertas, rúbrica interna y sugerencias IA si existen.
+7. El humano confirma/ajusta score por respuesta y finaliza el scorecard. El rollup actualiza el headline advisory en `hiring_application`.
+8. La decisión se toma en `Decisión`, no en el scorecard.
+
+## Endpoints y capabilities principales
+
+- `POST /api/hiring/assessments`: asigna template a postulación. Requiere `hiring.assessment.author`.
+- `GET /api/hiring/assessments?applicationId=...`: lista instancias de la postulación. Requiere `hiring.assessment.read`.
+- `GET /api/hiring/assessments/[id]`: detalle de review interno. Requiere `hiring.assessment.read`.
+- `POST /api/hiring/assessments/[id]/score`: registra/cierra score humano. Requiere `hiring.assessment.score`.
+- `GET/POST /api/public/assessment/[token]`: superficie pública por token; no usa sesión de dashboard.
+
+No crear instancias por SQL, no leer tokens desde logs y no exponer rúbricas/answer keys al browser candidato.
+
 ## Reglas de negocio
 
 - La IA puede sugerir un score; una persona lo confirma o edita antes de que cuente. El scorecard orienta y nunca rechaza automáticamente.
@@ -25,7 +59,7 @@ Las vistas `gestion.hiring*` controlan visibilidad de rutas. Cada reader y comma
 
 ## Estados y límites
 
-La interfaz diferencia loading, vacío inicial, filtros sin resultados, error recuperable, write optimista/rollback y dependencia degradada. La UI candidate-facing para rendir tests sigue en TASK-1363; captura/reveal documental completo sigue en TASK-1362.
+La interfaz diferencia loading, vacío inicial, filtros sin resultados, error recuperable, write optimista/rollback y dependencia degradada. La UI candidate-facing para rendir tests quedó implementada en TASK-1363; captura/reveal documental completo sigue en TASK-1362.
 
 ## Handoff downstream (TASK-356)
 

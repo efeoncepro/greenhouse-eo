@@ -20,7 +20,25 @@ Load whenever the work happens *inside* the Greenhouse repo (not pure advisory).
 - `TASK-1360` Assessment Engine — competency catalog (category × level), question bank (**answer_key sensitive, separate, never candidate-facing**), templates (compose per role; Account Manager seed), instances, objective + human scoring, competency-result rollup into `hiring_application` (**advisory**).
 - `TASK-1361` Assessment AI Assist — AI **proposes** questions + open-answer scores; **human confirms**; eval baseline; flag OFF default. (This is the AI-Act-safe pattern — see `assessment-interviewing.md`.)
 - `TASK-1362` Candidate Document Capture — CV/portfolio on the **private assets platform** (reuse, don't build buckets); **identity docs reuse `person_identity_documents`** (masked/reveal + capability `person.legal_profile.reveal_sensitive` + audit), captured **post-decision**; quarantine/scan for public uploads.
-- `TASK-1363` Assessment Taking + Review Surface — candidate takes the test via a **public tokenized Greenhouse link** (`/assessment/[token]`, single-use, time-limited); internal review in Application 360. `UI ready: no` until product-design loop.
+- `TASK-1363` Assessment Taking + Review Surface — candidate takes the test via a **public tokenized Greenhouse link** (`/assessment/[token]`, single-use, time-limited); internal review in Application 360 with advisory scorecard, queue and correction drawer. Complete local on 2026-07-13; rollout depends on push/deploy.
+
+### Assessment operating flow (humans + agents)
+
+Use this language precisely:
+
+1. **Template** (`hiring_assessment_template`) = reusable plan for a role/opening, e.g. Account Manager L2. It has modules, weights and question bank.
+2. **Opening/vacancy** (`hiring_opening`) = where candidates apply. It can imply which template to use, but it does not hold answers or tokens.
+3. **Application** (`hiring_application`) = the concrete candidate in the pipeline.
+4. **Instance** (`hiring_assessment`) = template × application. This is what gets assigned, tokenized, taken, scored and rolled up.
+
+Operational sequence:
+
+- Open Application 360 (`/agency/hiring/applications/[applicationId]`) → tab `Evaluación`.
+- Assign an active template with `POST /api/hiring/assessments` (`applicationId`, `templateId`, `method='candidate_test'`, optional time limit). Requires `hiring.assessment.author`.
+- Copy `/assessment/<token>` immediately; raw token is shown once, backend stores hash only.
+- Candidate completes via `GET/POST /api/public/assessment/[token]`; payload is allowlisted and never contains answer key/rubric.
+- Operator reviews via `GET /api/hiring/assessments/[id]`; score/finish via `/score` under `hiring.assessment.score`.
+- Decision remains human in Application 360. `selected + internal_hire` → handoff → Hiring Activation Lane. Assessment never activates anyone directly.
 
 ## The handoff (decision → downstream runtime, TASK-356 ✓ complete)
 

@@ -3,7 +3,12 @@ import { NextResponse } from 'next/server'
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
 import { hiringNotFoundResponse, toHiringErrorResponse } from '@/lib/hiring'
-import { getAssessmentById, listResponses } from '@/lib/hiring/assessment'
+import {
+  getAssessmentById,
+  listAssessmentReviewCompetencyModules,
+  listAssessmentReviewItems,
+  listResponses,
+} from '@/lib/hiring/assessment'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
 /**
@@ -27,10 +32,15 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     const assessment = await getAssessmentById(id)
 
     if (!assessment) return hiringNotFoundResponse('La evaluación no existe.', 'assessment_not_found')
-    const responses = await listResponses(id, tenant.userId)
+
+    const [responses, reviewItems, competencyModules] = await Promise.all([
+      listResponses(id, tenant.userId),
+      listAssessmentReviewItems(id),
+      listAssessmentReviewCompetencyModules(id),
+    ])
 
     
-return NextResponse.json({ assessment, responses })
+return NextResponse.json({ assessment, responses, reviewItems, competencyModules })
   } catch (error) {
     return toHiringErrorResponse(error, 'assessment_detail')
   }

@@ -149,6 +149,29 @@ pedir la ejecucion a un operador con permisos.
 6. Confirma que el formulario muestra el contrato `application` y el slug
    `efeonce-careers-application`.
 
+## Verificar evaluación pública por token
+
+Cuando una postulación tiene assessment asignado, el link público preferido es
+`/assessment/<token>`; `/public/assessment/<token>` queda como ruta compatible.
+No usa sesión de dashboard ni segmento `[lang]`.
+
+La evaluación pública no se asigna directamente a la página de la vacante. El
+operador asigna una plantilla de assessment a la `hiring_application` del
+candidato desde Application 360; ese command crea una instancia independiente
+con token, tiempo, respuestas y scorecard propios. Si una vacante publicada ya
+tiene plantilla lista pero una postulación no muestra link, falta asignar la
+instancia en Hiring Desk.
+
+1. Abre `/assessment/<token>` en el ambiente correcto.
+2. Confirma instrucciones, consentimiento, secciones, tiempo efectivo y banda de
+   accommodation si la instancia tiene minutos extra.
+3. Inicia la evaluación, responde una pregunta y espera el feedback de autosave.
+4. Avanza de sección y confirma que el timer sigue visible y no roba foco.
+5. No esperes ver rúbrica ni respuesta correcta: el payload candidato es
+   allowlisted y nunca incluye `answer_key_json`/`rubric_json`.
+6. Si el token expiró o ya no está disponible, la UI debe responder genérico
+   (`Este enlace no está disponible`) sin revelar causa interna.
+
 ## Verificar formulario
 
 1. Intenta enviar vacío.

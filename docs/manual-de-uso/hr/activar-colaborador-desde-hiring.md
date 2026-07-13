@@ -11,6 +11,8 @@
 
 Cuando un handoff de **contratación interna** queda aprobado, este bridge convierte a la persona seleccionada en colaborador **sin duplicar identidad y sin activar nada antes de tiempo**: crea la ficha de colaborador en estado "pendiente de intake" (invisible para nómina y capacidad), abre el checklist de onboarding y cierra solo cuando HR completó la ficha por el flujo normal de Workforce Activation.
 
+Este flujo empieza después de la decisión humana. Un assessment enviado o scorecard finalizado no activa a nadie por sí solo: el assessment alimenta la decisión; la decisión `selected` + destino `internal_hire` crea/aprueba el handoff; el handoff aprobado alimenta esta lane.
+
 ## Antes de empezar
 
 - Necesitas la capability `hiring.activation.review` (HR, admins). Crear la ficha usa además `workforce.member.intake.update`; abrir onboarding usa `hr.onboarding_instance`.

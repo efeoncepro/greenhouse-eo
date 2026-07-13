@@ -2,13 +2,13 @@
 
 ## Meta
 
-- Status: `draft`
+- Status: `implemented`
 - Owner task: `TASK-1363 — Assessment Taking + Review Surface`
-- Product Design asset: `pendiente` (product-design loop = Slice 1 de la task; este wireframe fija estructura/estados/copy, no el skin final)
+- Product Design asset: `/Users/jreye/Documents/carreers/Assesment/Task execution request/Superficie de evaluación.dc.html` + `support.js` + screenshots (`scorecard-markers`, `radar`, `radar2`)
 - Intended consumers: candidato (público tokenizado), reclutador (desk Application 360)
-- Copy source: `src/lib/copy/hiring.ts` (es-CL, tuteo)
-- Primitive decision: reuse (shell público TASK-354 + `CompositionShell` + drawer canónico + barras horizontales); timer accesible = evaluar reuse vs primitive nueva en Discovery
-- UI ready target: `no` (hasta product-design + GVC)
+- Copy source: `src/lib/copy/dictionaries/{es-CL,en-US}/hiringAssessment.ts` (es-CL, tuteo)
+- Primitive decision: reuse (shell público TASK-354 + Application360/Hiring Desk chrome + drawer/review surface + barras horizontales/radar inline); timer accesible implementado route-local por ser surface-specific.
+- UI ready target: `yes` (source HTML reviewed; runtime GVC evidence attached in task)
 
 ## Brief
 
@@ -85,48 +85,48 @@
 
 ## Implementation Mapping
 
-- Route / surface: candidato `src/app/public/assessment/[token]/**` (URL `/assessment/[token]`, NO `[lang]`, bilingüe vía `getMicrocopy`, shell de 354/DDL-2); interno `(dashboard)/agency/hiring/applications/[id]` tab `Evaluación`
-- Primitives: shell público tokenizado (TASK-354), `CompositionShell`, drawer/Adaptive Sidecar, barras horizontales (Recharts/`AppRecharts` o barras MUI), timer accesible
+- Route / surface: candidato `src/app/assessment/[token]/**` + compat `src/app/public/assessment/[token]/**` (URL limpia `/assessment/[token]`, NO `[lang]`, bilingüe vía `getMicrocopy`, shell público); interno `(dashboard)/agency/hiring/applications/[id]` tab `Evaluación`
+- Primitives: shell público tokenizado, Application360/Hiring Desk host, drawer MUI contextual, barras horizontales tokenizadas y radar SVG inline con tabla sr-only; timer accesible `role=timer`
 - Variants / kinds: scorecard bar = tono semáforo por competencia (`success/warning/error` como estado, no color-only)
 - Component candidates: `CustomTextField`, radios/checkbox nativos, `CustomChip`, progress indicator, `EmptyState`
-- Copy source: `src/lib/copy/hiring.ts` (todas las ids del ledger)
-- Data reader / command: `getAssessmentInstanceForToken`, `getAssessmentScorecard`, `saveAssessmentResponse`, `submitAssessment`, `confirmHumanScore`/`confirmAiProposal` (TASK-1360/1361)
+- Copy source: `src/lib/copy/dictionaries/{es-CL,en-US}/hiringAssessment.ts` (todas las ids del ledger)
+- Data reader / command: `resolveAssessmentByToken`, `startAssessment`, `saveResponse`, `submitAssessment`, review DTOs internos y endpoints de score existentes de TASK-1360/1361
 - API parity: la superficie consume commands/readers server-side; sin lógica de scoring en el cliente
 - Access / capability: candidato = token single-use; interno = `hiring.assessment.read`/`score`
 - Runtime consumers: candidato (público), reclutador (desk), Nexa (por parity, lectura del scorecard)
 - Print/email/PDF considerations: el reporte agregado por vacante es follow-up; el email con el link es de TASK-354
-- GVC markers: `assessment-instructions`, `assessment-question`, `assessment-timer`, `assessment-submitted`, `assessment-scorecard`, `assessment-review-queue`
+- GVC markers: `assessment-instructions`, `assessment-start`, `assessment-question`, `assessment-timer`, `assessment-next`, `assessment-submitted`, `assessment-scorecard`, `assessment-mode-bars`, `assessment-mode-radar`, `assessment-review-queue`, `assessment-review-row`, `assessment-review-drawer`
 
 ## GVC Scenario Plan
 
-- Scenario file: `scripts/frontend/scenarios/hiring-assessment-taking.mjs` + `hiring-assessment-scorecard.mjs`
-- Route: `/assessment/<token>` (staging seed) + `/agency/hiring/applications/<id>?tab=evaluacion`
+- Scenario file: `scripts/frontend/scenarios/task1363-assessment-taking-runtime.scenario.ts` + `scripts/frontend/scenarios/task1363-assessment-review-runtime.scenario.ts`
+- Route: `/assessment/<token>` (fixture) + `/agency/hiring/applications/<id>` tab `Evaluación`
 - Viewports: desktop 1440 + mobile 390
-- Required steps: token → instrucciones → responder → enviar → corregir → scorecard
-- Required captures: instrucciones, wizard+timer, confirmación, scorecard, cola
-- Required `data-capture` markers: (los 6 de arriba)
-- Assertions: sin answer-key en el DOM candidato; sin overflow; sin console.error
+- Required steps: token → instrucciones → consentir → iniciar → responder → autosave → avanzar; operador → tab Evaluación → cargar review → scorecard barras/radar → cola → drawer
+- Required captures: instrucciones, wizard+timer, autosave, avance, scorecard barras/radar, cola, drawer
+- Required `data-capture` markers: ver markers arriba
+- Assertions: payload público allowlisted sin answer-key/rúbrica; sin console.error/pageerror bloqueante; no login redirect; regiones esperadas visibles
 - Scroll-width checks: sí (desktop + 390)
 - Accessibility/focus checks: foco inicial; timer no roba foco; drawer restaura foco; contraste semáforo
 - Reduced-motion evidence: transición de paso estática
 
 ## Design Decision Log
 
-- Decision: rendición como wizard por competencia (single-column, timer, autosave, envío irreversible); review como scorecard de barras horizontales + cola de corrección en drawer.
+- Decision: rendición como wizard single-column por pregunta/competencia (timer, autosave, envío irreversible); review como scorecard de barras horizontales + modo radar secundario + cola de corrección en drawer.
 - Alternatives considered: scroll largo único (rechazado por fricción/forms-ux); radar en vez de barras (barras ganan en legibilidad/comparación por Cleveland & McGill; radar opcional secundario); test dentro del portal con login (rechazado, candidato externo).
 - Why this pattern: honesto, accesible, sin filtrar answer-key, respeta "humano decide" (scorecard advisory).
-- Reuse / extend / new primitive: reuse mayoritario; timer accesible posible primitive nueva (Discovery).
-- Open risks: anti-cheat V1 limitado; contenido de pruebas y fairness = gobernanza (no UI); accesibilidad del timer bajo estrés.
-- Follow-up: accommodations (tiempo extendido), reportes agregados por vacante, sonification del scorecard (opcional).
+- Reuse / extend / new primitive: reuse mayoritario; timer accesible se mantuvo local porque no hay aún patrón reutilizable de evaluación cronometrada en otras surfaces.
+- Open risks: anti-cheat V1 limitado; contenido de pruebas y fairness = gobernanza continua; rollout remoto pendiente de push/deploy.
+- Follow-up: reportes agregados por vacante; anti-cheat/proctoring liviano sólo si People/Talent lo justifica.
 
 ## Acceptance Checklist
 
-- [ ] All visible strings are in the copy ledger.
-- [ ] Dynamic values are named and bounded.
-- [ ] Partial/degraded states are explicit.
-- [ ] No copy implies a guarantee when data is estimated.
-- [ ] Charts have table/text alternatives.
-- [ ] State and aria copy is ready for implementation.
-- [ ] Implementation mapping names primitive, copy source, data contract and route/surface.
-- [ ] GVC scenario plan is specific enough for `pnpm fe:capture` or a new scenario file.
-- [ ] Design decision log explains reuse/extend/new before JSX starts.
+- [x] All visible strings are in the copy ledger.
+- [x] Dynamic values are named and bounded.
+- [x] Partial/degraded states are explicit.
+- [x] No copy implies a guarantee when data is estimated.
+- [x] Charts have table/text alternatives.
+- [x] State and aria copy is ready for implementation.
+- [x] Implementation mapping names primitive, copy source, data contract and route/surface.
+- [x] GVC scenario plan is specific enough for `pnpm fe:capture` or a new scenario file.
+- [x] Design decision log explains reuse/extend/new before JSX starts.

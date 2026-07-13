@@ -1,5 +1,17 @@
 ## Estado vigente para agentes
 
+- **TASK-1363 Assessment Taking + Review Surface complete local (2026-07-13):** candidato rinde en
+  `/assessment/[token]` (+ compat `/public/assessment/[token]`) con timer/accommodations, autosave,
+  submit fail-closed y payload público allowlisted; operador revisa en Application 360 con scorecard
+  advisory, barras/radar, cola y drawer de corrección anti-anclaje. Modelo operativo: la plantilla de
+  assessment es reusable por rol/vacante, pero la ejecución real se asigna a cada `hiring_application`
+  y crea una instancia `hiring_assessment` con token/estado/respuestas propias; no existe un test
+  "rendido por la vacante". Manual/functional doc/skills Codex+Claude quedaron sincronizados con el
+  flujo: asignar template → copiar token una vez → candidato rinde → humano corrige → decisión →
+  handoff → Hiring Activation Lane. Evidencia local vigente: GVC candidate
+  `.captures/2026-07-13T16-09-34_task1363-assessment-taking-runtime`, GVC operator
+  `.captures/2026-07-13T14-44-04_task1363-assessment-review-runtime`, lint/typecheck/build/Vitest
+  focales verdes; staging/prod quedan pendientes de push/deploy.
 - **TASK-1368 Hiring Activation Lane complete + master flow N10→N11 cableado (2026-07-13):** `/hr/onboarding?lane=hiring-activation`
   es la lane "Contrataciones listas" dentro de `HR > Onboarding & Offboarding`, no reemplaza
   `/hr/workforce/activation`. Application 360 ahora es el seam correcto de EPIC-011: decisión

@@ -14,7 +14,7 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import Divider from '@mui/material/Divider'
+import Drawer from '@mui/material/Drawer'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
@@ -35,7 +35,7 @@ import {
   isCardDensityAtLeast,
   useContainerDensity,
 } from '@/components/greenhouse/primitives'
-import type { HiringDeskCopy } from '@/lib/copy'
+import type { HiringAssessmentCopy, HiringDeskCopy } from '@/lib/copy'
 import { formatDate, formatDateTime } from '@/lib/format'
 import type {
   DecideHiringApplicationResult,
@@ -46,6 +46,10 @@ import type {
 } from '@/types/hiring'
 import type { HiringHandoff } from '@/lib/hiring/handoff/types'
 import type { Assessment, AssessmentResponse, AssessmentTemplate, Competency } from '@/types/hiring-assessment'
+import type {
+  AssessmentReviewCompetencyModule,
+  AssessmentReviewItem,
+} from '@/lib/hiring/assessment/review'
 import type { AiProposal } from '@/types/hiring-assessment-ai'
 
 import HiringDeskFrame from './HiringDeskFrame'
@@ -86,6 +90,8 @@ const historyFrom = (explainability: Record<string, unknown>) => {
 interface AssessmentReview {
   responses: AssessmentResponse[]
   competencies: Competency[]
+  reviewItems: AssessmentReviewItem[]
+  competencyModules: AssessmentReviewCompetencyModule[]
   proposals: AiProposal[]
 }
 
@@ -104,6 +110,49 @@ const responseAnswerText = (answer: Record<string, unknown>) => {
   }
 
   return Object.keys(answer).length > 0 ? JSON.stringify(answer) : '—'
+}
+
+const formatTemplate = (template: string, values: Record<string, string | number>) =>
+  Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, String(value)), template)
+
+const effectiveResponseScore = (response: AssessmentResponse): number | null =>
+  response.humanScore ?? response.autoScore ?? null
+
+const targetScoreForLevel = (level: string | null): number => {
+  if (level === 'avanzado') return 82
+  if (level === 'nociones') return 62
+
+  return 72
+}
+
+const scoreTone = (score: number | null): 'success' | 'warning' | 'error' | 'info' => {
+  if (score == null) return 'info'
+  if (score >= 75) return 'success'
+  if (score >= 60) return 'warning'
+
+  return 'error'
+}
+
+const rubricLinesFrom = (rubric: Record<string, unknown>): string[] => {
+  const candidates = [rubric.criteria, rubric.levels, rubric.scale, rubric.items]
+
+  for (const value of candidates) {
+    if (Array.isArray(value)) {
+      return value.map((entry) => {
+        if (typeof entry === 'string') return entry
+
+        if (entry && typeof entry === 'object') {
+          const record = entry as Record<string, unknown>
+
+          return String(record.label ?? record.title ?? record.description ?? record.criterion ?? JSON.stringify(record))
+        }
+
+        return String(entry)
+      }).filter(Boolean)
+    }
+  }
+
+  return Object.entries(rubric).slice(0, 4).map(([key, value]) => `${key}: ${typeof value === 'string' ? value : JSON.stringify(value)}`)
 }
 
 interface CandidateContextCardProps {
@@ -148,6 +197,7 @@ const CandidateContextCard = ({ item, copy }: CandidateContextCardProps) => {
 
 interface Application360ViewProps {
   copy: HiringDeskCopy
+  assessmentCopy: HiringAssessmentCopy
   initialItem: HiringDeskApplicationSummary
   initialAssessments: Assessment[]
   templates: AssessmentTemplate[]
@@ -256,7 +306,7 @@ const HandoffBridgeCard = ({
   )
 }
 
-const Application360View = ({ copy, initialItem, initialAssessments, templates, initialHandoff, canApproveHandoff }: Application360ViewProps) => {
+const Application360View = ({ assessmentCopy, copy, initialItem, initialAssessments, templates, initialHandoff, canApproveHandoff }: Application360ViewProps) => {
   const [item, setItem] = useState(initialItem)
   const [handoff, setHandoff] = useState(initialHandoff)
   const [tab, setTab] = useState<TabKey>('overview')
@@ -270,6 +320,8 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates, 
   const [reviewingAssessmentId, setReviewingAssessmentId] = useState<string | null>(null)
   const [scoreDrafts, setScoreDrafts] = useState<Record<string, string>>({})
   const [savingResponseId, setSavingResponseId] = useState<string | null>(null)
+  const [selectedResponseId, setSelectedResponseId] = useState<string | null>(null)
+  const [scorecardMode, setScorecardMode] = useState<'bars' | 'radar'>('bars')
   const [finalizingAssessmentId, setFinalizingAssessmentId] = useState<string | null>(null)
   const [decision, setDecision] = useState<HiringDecision>(item.application.decision ?? 'selected')
   const [destination, setDestination] = useState<HiringFulfillmentMode | ''>(item.application.selectedDestination ?? '')
@@ -309,11 +361,12 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates, 
     ? `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}&handoffId=${encodeURIComponent(handoff.handoffId)}`
     : `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}`
 
-  const assessmentScorecard = useMemo(() => {
-    const value = item.application.explainability.assessment
+  const oneTimeAssessmentLink = useMemo(() => {
+    if (!oneTimeToken) return null
+    const base = typeof window === 'undefined' ? '' : window.location.origin
 
-    return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null
-  }, [item.application.explainability])
+    return `${base}/assessment/${oneTimeToken}`
+  }, [oneTimeToken])
 
   const assignAssessment = async () => {
     if (!templateId) return
@@ -348,7 +401,12 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates, 
 
     try {
       const [detail, proposalResult, competencyResult] = await Promise.all([
-        hiringRequest<{ assessment: Assessment; responses: AssessmentResponse[] }>(`/api/hiring/assessments/${assessmentId}`),
+        hiringRequest<{
+          assessment: Assessment
+          responses: AssessmentResponse[]
+          reviewItems: AssessmentReviewItem[]
+          competencyModules: AssessmentReviewCompetencyModule[]
+        }>(`/api/hiring/assessments/${assessmentId}`),
         hiringRequest<{ items: AiProposal[] }>('/api/hiring/assessments/ai/proposals?kind=response_score&status=proposed'),
         hiringRequest<{ items: Competency[] }>('/api/hiring/assessments/competencies'),
       ])
@@ -358,7 +416,13 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates, 
 
       setAssessmentReviews((current) => ({
         ...current,
-        [assessmentId]: { responses: detail.responses, competencies: competencyResult.items, proposals },
+        [assessmentId]: {
+          responses: detail.responses,
+          competencies: competencyResult.items,
+          reviewItems: detail.reviewItems,
+          competencyModules: detail.competencyModules,
+          proposals,
+        },
       }))
       setScoreDrafts((current) => {
         const next = { ...current }
@@ -417,11 +481,14 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates, 
           [assessmentId]: {
             ...existing,
             responses: existing.responses.map((item) => item.responseId === response.responseId ? { ...item, humanScore: score } : item),
+            reviewItems: existing.reviewItems,
+            competencyModules: existing.competencyModules,
             proposals: existing.proposals.filter((item) => item.targetRef !== response.responseId),
           },
         }
       })
-      setToast(copy.application.scoreConfirmed)
+      setSelectedResponseId(null)
+      setToast(assessmentCopy.review.confirmed)
     } catch (scoreError) {
       setError(scoreError instanceof Error ? scoreError.message : 'No se pudo confirmar el puntaje.')
     } finally {
@@ -574,97 +641,349 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates, 
   const assessment = (
     <Stack spacing={3}>
       <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2}>
-        <Box><Typography variant='h5'>Scorecard por competencia</Typography><Typography color='text.primary' variant='body2'>Advisory — orienta, no decide. La decisión siempre es humana; el scorecard nunca bloquea.</Typography></Box>
-        <GreenhouseButton kind='secondaryAction' leadingIconClassName='tabler-plus' onClick={() => setAssignOpen(true)} sx={{ color: 'text.primary' }}>{copy.application.assignAssessment}</GreenhouseButton>
+        <Box>
+          <Typography variant='h5'>{assessmentCopy.review.title}</Typography>
+          <Typography color='text.secondary' variant='body2'>{assessmentCopy.review.subtitle}</Typography>
+        </Box>
+        <GreenhouseButton kind='secondaryAction' leadingIconClassName='tabler-plus' onClick={() => setAssignOpen(true)} sx={{ color: 'text.primary' }}>
+          {copy.application.assignAssessment}
+        </GreenhouseButton>
       </Stack>
-      {oneTimeToken ? (
+
+      {oneTimeAssessmentLink ? (
         <Alert severity='success' icon={<i className='tabler-key' />}>
-          <Stack spacing={1}>
+          <Stack spacing={1.25}>
             <Typography fontWeight={700}>{copy.application.assignmentLink}</Typography>
-            <Typography variant='body2' sx={{ overflowWrap: 'anywhere' }}>{oneTimeToken}</Typography>
-            <Button size='small' onClick={() => { void navigator.clipboard.writeText(oneTimeToken); setToast('Token copiado.') }} sx={{ alignSelf: 'flex-start' }}>{copy.application.copyLink}</Button>
-            <Typography variant='caption'>Se muestra una sola vez. La superficie de rendición tokenizada se completa en TASK-1363.</Typography>
+            <Typography variant='body2' sx={{ overflowWrap: 'anywhere' }}>{oneTimeAssessmentLink}</Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+              <Button
+                size='small'
+                onClick={() => {
+                  void navigator.clipboard.writeText(oneTimeAssessmentLink)
+                  setToast('Enlace copiado.')
+                }}
+                sx={{ alignSelf: 'flex-start' }}
+              >
+                {copy.application.copyLink}
+              </Button>
+              <Button component='a' href={oneTimeAssessmentLink} size='small' target='_blank' rel='noreferrer' endIcon={<i className='tabler-external-link' />}>
+                Abrir superficie
+              </Button>
+            </Stack>
+            <Typography variant='caption'>Se muestra una sola vez; el token crudo no se guarda en claro.</Typography>
           </Stack>
         </Alert>
       ) : null}
+
       {assessments.length === 0 ? (
-        <Paper variant='outlined' sx={{ p: 5, borderRadius: 3, textAlign: 'center' }}>
-          <Stack alignItems='center' spacing={2}><i aria-hidden='true' className='tabler-clipboard-off' /><Typography variant='h6'>{copy.application.assessmentPending}</Typography><Typography color='text.secondary'>Asigna un test para generar el link tokenizado de un solo uso del candidato.</Typography></Stack>
+        <Paper variant='outlined' sx={(theme) => ({ p: 5, borderRadius: `${theme.shape.customBorderRadius.lg}px`, textAlign: 'center' })}>
+          <Stack alignItems='center' spacing={2}>
+            <Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 58, blockSize: 58, borderRadius: '50%', color: 'primary.main', bgcolor: 'primary.lightOpacity' }}>
+              <i aria-hidden='true' className='tabler-clipboard-off' />
+            </Box>
+            <Typography variant='h6'>{copy.application.assessmentPending}</Typography>
+            <Typography color='text.secondary'>Asigna un test para generar el link tokenizado de un solo uso del candidato.</Typography>
+          </Stack>
         </Paper>
       ) : assessments.map((entry) => {
         const review = assessmentReviews[entry.assessmentId]
         const pendingHumanResponses = review?.responses.filter((response) => response.needsHumanRating && response.humanScore == null) ?? []
+        const selectedResponse = review?.responses.find((response) => response.responseId === selectedResponseId) ?? null
+
+        const selectedReviewItem = selectedResponse
+          ? review?.reviewItems.find((item) => item.responseId === selectedResponse.responseId) ?? null
+          : null
+
+        const selectedProposal = selectedResponse
+          ? review?.proposals.find((proposal) => proposal.targetRef === selectedResponse.responseId)
+          : undefined
+
+        const modules = review?.competencyModules ?? []
+
+        const scoreRows = modules.map((module) => {
+          const responses = review?.responses.filter((response) => response.competencyId === module.competencyId) ?? []
+          const scores = responses.map(effectiveResponseScore).filter((score): score is number => score != null)
+          const score = scores.length > 0 ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : null
+          const target = targetScoreForLevel(module.targetLevel)
+          const pending = responses.some((response) => response.needsHumanRating && response.humanScore == null) || score == null
+
+          return { ...module, responses, score, target, pending }
+        })
+
+        const scoredRows = scoreRows.filter((row) => row.score != null)
+        const totalWeight = scoredRows.reduce((sum, row) => sum + row.weight, 0)
+
+        const overall = scoredRows.length === 0
+          ? null
+          : totalWeight > 0
+            ? Math.round(scoredRows.reduce((sum, row) => sum + (row.score ?? 0) * row.weight, 0) / totalWeight)
+            : Math.round(scoredRows.reduce((sum, row) => sum + (row.score ?? 0), 0) / scoredRows.length)
+
+        const radarPoints = scoreRows.map((row, index) => {
+          const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
+          const radius = ((row.score ?? 0) / 100) * 72
+
+          return `${100 + Math.cos(angle) * radius},${100 + Math.sin(angle) * radius}`
+        }).join(' ')
+
+        const targetPoints = scoreRows.map((row, index) => {
+          const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
+          const radius = (row.target / 100) * 72
+
+          return `${100 + Math.cos(angle) * radius},${100 + Math.sin(angle) * radius}`
+        }).join(' ')
 
         return (
-          <Paper key={entry.assessmentId} variant='outlined' sx={{ p: { xs: 2.5, md: 3 }, borderRadius: 3 }}>
-            <Stack spacing={2.5}>
+          <Paper
+            key={entry.assessmentId}
+            variant='outlined'
+            data-capture='assessment-scorecard'
+            sx={(theme) => ({
+              p: { xs: 2.5, md: 4 },
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+              overflowX: 'clip',
+            })}
+          >
+            <Stack spacing={3}>
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2}>
-                <Box><Typography variant='h6'>{entry.method === 'candidate_test' ? 'Candidate test' : 'Scorecard de entrevista'}</Typography><Typography variant='caption' color='text.secondary'>{entry.publicId}</Typography></Box>
-                <GreenhouseChip kind='status' variant='label' tone={entry.status === 'scored' ? 'success' : entry.status === 'submitted' ? 'warning' : 'info'} label={entry.status} />
+                <Box>
+                  <Stack direction='row' spacing={1.25} alignItems='center' flexWrap='wrap' useFlexGap>
+                    <Typography variant='h6'>{entry.method === 'candidate_test' ? 'Candidate test' : 'Scorecard de entrevista'}</Typography>
+                    <GreenhouseChip
+                      kind='status'
+                      variant='label'
+                      tone={entry.status === 'scored' ? 'success' : entry.status === 'submitted' ? 'warning' : entry.status === 'expired' ? 'error' : 'info'}
+                      label={entry.status}
+                    />
+                  </Stack>
+                  <Typography variant='caption' color='text.secondary'>{entry.publicId}{entry.timeLimitMinutes ? ` · ${entry.timeLimitMinutes} minutos` : ''}</Typography>
+                </Box>
+                {!review ? (
+                  <GreenhouseButton
+                    kind='secondaryAction'
+                    data-capture='assessment-load-review'
+                    leadingIcon={reviewingAssessmentId === entry.assessmentId ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
+                    disabled={reviewingAssessmentId === entry.assessmentId}
+                    onClick={() => void loadAssessmentReview(entry.assessmentId)}
+                    sx={{ alignSelf: { xs: 'stretch', sm: 'center' } }}
+                  >
+                    {copy.application.reviewAssessment}
+                  </GreenhouseButton>
+                ) : (
+                  <Stack direction='row' spacing={1} justifyContent={{ xs: 'stretch', sm: 'flex-end' }}>
+                    <Button data-capture='assessment-mode-bars' variant={scorecardMode === 'bars' ? 'contained' : 'tonal'} size='small' onClick={() => setScorecardMode('bars')}>
+                      {assessmentCopy.review.bars}
+                    </Button>
+                    <Button data-capture='assessment-mode-radar' variant={scorecardMode === 'radar' ? 'contained' : 'tonal'} size='small' onClick={() => setScorecardMode('radar')}>
+                      {assessmentCopy.review.radar}
+                    </Button>
+                  </Stack>
+                )}
               </Stack>
-              {entry.timeLimitMinutes ? <Typography variant='body2' color='text.secondary'>{entry.timeLimitMinutes} minutos</Typography> : null}
-              {assessmentScorecard && typeof assessmentScorecard.overallScore === 'number' ? (
-                <Box><Stack direction='row' justifyContent='space-between'><Typography variant='body2'>{copy.application.overallScore}</Typography><Typography fontWeight={700}>{assessmentScorecard.overallScore}</Typography></Stack><LinearProgress aria-label={copy.application.overallScore} variant='determinate' value={Math.min(Number(assessmentScorecard.overallScore), 100)} sx={(theme) => ({ mt: 1, blockSize: 8, borderRadius: `${theme.shape.customBorderRadius.lg}px` })} /></Box>
-              ) : <Alert severity='info'>{entry.status === 'assigned' || entry.status === 'sent' || entry.status === 'in_progress' ? 'El candidato aún no completa la evaluación.' : 'El scorecard aparecerá cuando la corrección esté completa.'}</Alert>}
 
               {!review ? (
-                <GreenhouseButton
-                  kind='secondaryAction'
-                  leadingIcon={reviewingAssessmentId === entry.assessmentId ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
-                  disabled={reviewingAssessmentId === entry.assessmentId}
-                  onClick={() => void loadAssessmentReview(entry.assessmentId)}
-                  sx={{ alignSelf: { xs: 'stretch', sm: 'flex-start' } }}
-                >
-                  {copy.application.reviewAssessment}
-                </GreenhouseButton>
+                <Alert severity='info'>
+                  {entry.status === 'assigned' || entry.status === 'sent' || entry.status === 'in_progress'
+                    ? 'El candidato aún no completa la evaluación.'
+                    : 'Carga la revisión para ver respuestas, rúbricas y scorecard por competencia.'}
+                </Alert>
               ) : (
-                <Stack spacing={2.5}>
-                  <Divider />
-                  {review.responses.length === 0 ? <Alert severity='info'>Aún no hay respuestas para revisar.</Alert> : review.responses.map((response) => {
-                    const proposal = review.proposals.find((item) => item.targetRef === response.responseId)
-                    const competency = review.competencies.find((item) => item.competencyId === response.competencyId)
-                    const proposedScore = proposedScoreFrom(proposal)
-                    const rationale = proposal?.proposed.rationale
-
-                    return (
-                      <Paper key={response.responseId} variant='outlined' sx={{ p: 2.5, borderRadius: 2.5 }}>
-                        <Stack spacing={2}>
-                          <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1}>
-                            <Box><Typography fontWeight={700}>{competency?.name ?? 'Competencia'}</Typography><Typography variant='caption' color='text.secondary'>{response.needsHumanRating ? copy.application.reviewPending : 'Corrección automática'}</Typography></Box>
-                            {response.humanScore != null || response.autoScore != null ? <GreenhouseChip kind='status' variant='label' tone='success' label={`${copy.application.scoreLabel}: ${response.humanScore ?? response.autoScore}`} /> : null}
+                <>
+                  <Grid container spacing={3} sx={{ '& > *': { minWidth: 0 } }}>
+                    <Grid size={{ xs: 12, md: 7 }}>
+                      <Paper
+                        variant='outlined'
+                        sx={(theme) => ({
+                          position: 'relative',
+                          p: { xs: 2.5, md: 3 },
+                          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+                          overflowX: 'clip',
+                        })}
+                      >
+                        <Stack spacing={3}>
+                          <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={2}>
+                            <Box>
+                              <Typography variant='subtitle2' color='text.secondary' textTransform='uppercase' letterSpacing='0.08em'>
+                                {assessmentCopy.review.overall}
+                              </Typography>
+                              <Stack direction='row' alignItems='baseline' spacing={1}>
+                                <Typography variant='h2' sx={{ fontVariantNumeric: 'tabular-nums' }}>{overall ?? '—'}</Typography>
+                                <Typography color='text.secondary'>/100</Typography>
+                              </Stack>
+                            </Box>
+                            <GreenhouseChip
+                              kind='status'
+                              variant='label'
+                              tone={scoreTone(overall)}
+                              label={overall == null ? assessmentCopy.review.statuses.pending : overall >= 75 ? assessmentCopy.review.statuses.optimal : overall >= 60 ? assessmentCopy.review.statuses.attention : assessmentCopy.review.statuses.critical}
+                            />
                           </Stack>
-                          <Typography variant='body2' sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{responseAnswerText(response.answer)}</Typography>
-                          {proposal ? (
-                            <Alert severity='info' icon={<i className='tabler-sparkles' />}>
-                              <Typography fontWeight={700}>{copy.application.aiSuggestion}{proposedScore == null ? '' : ` · ${proposedScore}`}</Typography>
-                              <Typography variant='body2'>{typeof rationale === 'string' ? rationale : copy.application.aiSuggestionNote}</Typography>
-                            </Alert>
-                          ) : null}
-                          {response.needsHumanRating ? (
-                            <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretch', sm: 'center' }} spacing={1.5}>
-                              <TextField
-                                size='small'
-                                type='number'
-                                label={copy.application.scoreLabel}
-                                value={scoreDrafts[response.responseId] ?? ''}
-                                onChange={(event) => setScoreDrafts((current) => ({ ...current, [response.responseId]: event.target.value }))}
-                                slotProps={{ htmlInput: { min: 0, max: 100 } }}
-                                sx={{ inlineSize: { xs: '100%', sm: 150 } }}
-                              />
-                              <GreenhouseButton
-                                kind='primaryAction'
-                                leadingIcon={savingResponseId === response.responseId ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
-                                disabled={savingResponseId === response.responseId}
-                                onClick={() => void confirmResponseScore(entry.assessmentId, response)}
-                              >
-                                {copy.application.confirmScore}
-                              </GreenhouseButton>
+
+                          {scoreRows.length === 0 ? (
+                            <Alert severity='info'>Aún no hay módulos de competencia para esta evaluación.</Alert>
+                          ) : scorecardMode === 'radar' ? (
+                            <Box
+                              role='img'
+                              aria-label={assessmentCopy.review.title}
+                              sx={{ display: 'grid', placeItems: 'center', minBlockSize: 280, overflowX: 'clip' }}
+                            >
+                              <svg viewBox='0 0 200 200' width='100%' height='280' aria-hidden='true' focusable='false'>
+                                <circle cx='100' cy='100' r='72' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='1' />
+                                <circle cx='100' cy='100' r='48' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='1' opacity='0.7' />
+                                <circle cx='100' cy='100' r='24' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='1' opacity='0.45' />
+                                {targetPoints ? <polygon points={targetPoints} fill='none' stroke='var(--mui-palette-warning-main)' strokeDasharray='4 5' strokeWidth='2' /> : null}
+                                {radarPoints ? <polygon points={radarPoints} fill='rgb(var(--mui-palette-primary-mainChannel) / 0.18)' stroke='var(--mui-palette-primary-main)' strokeWidth='2.5' /> : null}
+                                {scoreRows.map((row, index) => {
+                                  const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
+                                  const x = 100 + Math.cos(angle) * 86
+                                  const y = 100 + Math.sin(angle) * 86
+
+                                  return <text key={row.competencyId} x={x} y={y} fontSize='7' textAnchor='middle' fill='currentColor'>{row.competencyKey.slice(0, 7)}</text>
+                                })}
+                              </svg>
+                            </Box>
+                          ) : (
+                            <Stack spacing={2.25}>
+                              {scoreRows.map((row) => (
+                                <Box key={row.competencyId}>
+                                  <Stack direction='row' justifyContent='space-between' spacing={2} sx={{ mb: 1 }}>
+                                    <Stack direction='row' spacing={1.25} alignItems='center' sx={{ minWidth: 0 }}>
+                                      <Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 32, blockSize: 32, borderRadius: '50%', color: 'primary.main', bgcolor: 'primary.lightOpacity' }}>
+                                        <i className={row.competencyCategory === 'attitudinal' ? 'tabler-heart-handshake' : 'tabler-target-arrow'} />
+                                      </Box>
+                                      <Box sx={{ minWidth: 0 }}>
+                                        <Typography fontWeight={700} noWrap>{row.competencyName}</Typography>
+                                        <Typography variant='caption' color='text.secondary'>{assessmentCopy.review.objective} {row.target}% · peso {row.weight}%</Typography>
+                                      </Box>
+                                    </Stack>
+                                    <Stack direction='row' spacing={1} alignItems='center'>
+                                      <Typography fontWeight={800} sx={{ fontVariantNumeric: 'tabular-nums' }}>{row.score ?? assessmentCopy.review.pending}</Typography>
+                                      <GreenhouseChip
+                                        size='small'
+                                        kind='status'
+                                        variant='label'
+                                        tone={row.pending ? 'info' : scoreTone(row.score)}
+                                        label={row.pending ? assessmentCopy.review.statuses.pending : row.score != null && row.score >= 75 ? assessmentCopy.review.statuses.optimal : row.score != null && row.score >= 60 ? assessmentCopy.review.statuses.attention : assessmentCopy.review.statuses.critical}
+                                      />
+                                    </Stack>
+                                  </Stack>
+                                  <Box sx={{ position: 'relative', minWidth: 0 }}>
+                                    <LinearProgress
+                                      variant='determinate'
+                                      value={row.score ?? 0}
+                                      color={scoreTone(row.score)}
+                                      sx={(theme) => ({ blockSize: 10, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
+                                    />
+                                    <Box
+                                      aria-hidden='true'
+                                      sx={{
+                                        position: 'absolute',
+                                        insetBlockStart: -4,
+                                        insetInlineStart: `${row.target}%`,
+                                        inlineSize: 2,
+                                        blockSize: 18,
+                                        borderRadius: 1,
+                                        bgcolor: 'warning.main',
+                                      }}
+                                    />
+                                  </Box>
+                                </Box>
+                              ))}
                             </Stack>
-                          ) : null}
+                          )}
+
+                          <Alert severity='info' icon={<i className='tabler-info-circle' />}>
+                            <Typography variant='body2'>{assessmentCopy.review.advisory}</Typography>
+                          </Alert>
+
+                          <Box
+                            component='table'
+                            sx={{
+                              position: 'absolute',
+                              inlineSize: 1,
+                              blockSize: 1,
+                              m: -1,
+                              overflow: 'hidden',
+                              clip: 'rect(0 0 0 0)',
+                              whiteSpace: 'nowrap',
+                              border: 0,
+                            }}
+                          >
+                            <caption>{assessmentCopy.review.title}</caption>
+                            <tbody>
+                              {scoreRows.map((row) => (
+                                <tr key={row.competencyId}>
+                                  <td>{row.competencyName}</td>
+                                  <td>{row.target}</td>
+                                  <td>{row.score ?? assessmentCopy.review.pending}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </Box>
                         </Stack>
                       </Paper>
-                    )
-                  })}
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 5 }}>
+                      <Paper
+                        variant='outlined'
+                        data-capture='assessment-review-queue'
+                        sx={(theme) => ({ p: { xs: 2.5, md: 3 }, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
+                      >
+                        <Stack spacing={2.25}>
+                          <Box>
+                            <Typography variant='h6'>{formatTemplate(assessmentCopy.review.queueTitle, { count: pendingHumanResponses.length })}</Typography>
+                            <Typography variant='body2' color='text.secondary'>{assessmentCopy.review.subtitle}</Typography>
+                          </Box>
+                          {pendingHumanResponses.length === 0 ? (
+                            <Alert severity='success' icon={<i className='tabler-circle-check' />}>
+                              <Typography fontWeight={700}>{assessmentCopy.review.queueEmptyTitle}</Typography>
+                              <Typography variant='body2'>{assessmentCopy.review.queueEmptyBody}</Typography>
+                            </Alert>
+                          ) : pendingHumanResponses.map((response) => {
+                            const item = review.reviewItems.find((entryItem) => entryItem.responseId === response.responseId)
+
+                            return (
+                              <Box
+                                key={response.responseId}
+                                component='button'
+                                type='button'
+                                data-capture='assessment-review-row'
+                                onClick={() => setSelectedResponseId(response.responseId)}
+                                sx={(theme) => ({
+                                  display: 'grid',
+                                  gridTemplateColumns: 'auto minmax(0, 1fr) auto',
+                                  alignItems: 'center',
+                                  gap: 2,
+                                  inlineSize: '100%',
+                                  p: 2,
+                                  border: `1px solid ${theme.palette.divider}`,
+                                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                                  bgcolor: 'background.paper',
+                                  color: 'text.primary',
+                                  textAlign: 'start',
+                                  cursor: 'pointer',
+                                  transition: theme.transitions.create(['border-color', 'background-color', 'transform'], { duration: theme.transitions.duration.shorter }),
+                                  '&:hover': { borderColor: 'primary.main', bgcolor: 'action.hover', transform: 'translateY(-1px)' },
+                                  '@media (prefers-reduced-motion: reduce)': { transition: 'none', '&:hover': { transform: 'none' } },
+                                })}
+                              >
+                                <Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 34, blockSize: 34, borderRadius: '50%', color: 'warning.main', bgcolor: 'warning.lightOpacity' }}>
+                                  <i className='tabler-edit-circle' />
+                                </Box>
+                                <Box sx={{ minWidth: 0 }}>
+                                  <Typography fontWeight={700} noWrap>{item?.competencyName ?? 'Competencia'}</Typography>
+                                  <Typography variant='body2' color='text.secondary' noWrap>{item?.questionPrompt ?? responseAnswerText(response.answer)}</Typography>
+                                </Box>
+                                <i className='tabler-chevron-right' aria-hidden='true' />
+                              </Box>
+                            )
+                          })}
+                        </Stack>
+                      </Paper>
+                    </Grid>
+                  </Grid>
+
                   {review.responses.length > 0 && entry.status !== 'scored' ? (
                     <GreenhouseButton
                       kind='primaryAction'
@@ -673,10 +992,124 @@ const Application360View = ({ copy, initialItem, initialAssessments, templates, 
                       onClick={() => void finalizeScorecard(entry.assessmentId)}
                       sx={{ alignSelf: { xs: 'stretch', sm: 'flex-end' } }}
                     >
-                      {copy.application.finalizeScorecard}
+                      {assessmentCopy.review.finalize}
                     </GreenhouseButton>
                   ) : null}
-                </Stack>
+
+                  <Drawer
+                    anchor='right'
+                    open={Boolean(selectedResponse && selectedReviewItem)}
+                    onClose={() => setSelectedResponseId(null)}
+                    PaperProps={{
+                      'data-capture': 'assessment-review-drawer',
+                      sx: (theme: Theme) => ({
+                        inlineSize: { xs: '100%', sm: 520 },
+                        p: 0,
+                        borderStart: `1px solid ${theme.palette.divider}`,
+                        boxShadow: theme.greenhouseElevation.modal.boxShadow,
+                      }),
+                    }}
+                  >
+                    {selectedResponse && selectedReviewItem ? (
+                      <Stack spacing={0} sx={{ minBlockSize: '100%' }}>
+                        <Box sx={{ p: 3, borderBlockEnd: 1, borderColor: 'divider' }}>
+                          <Stack direction='row' justifyContent='space-between' spacing={2}>
+                            <Box>
+                              <Typography variant='overline' color='text.secondary'>{assessmentCopy.review.correctionTitle}</Typography>
+                              <Typography variant='h5'>{selectedReviewItem.competencyName}</Typography>
+                              <Typography variant='body2' color='text.secondary'>{item.candidateName}</Typography>
+                            </Box>
+                            <Button aria-label={copy.common.close} onClick={() => setSelectedResponseId(null)} sx={{ minInlineSize: 36, alignSelf: 'flex-start' }}>
+                              <i className='tabler-x' />
+                            </Button>
+                          </Stack>
+                        </Box>
+                        <Stack spacing={3} sx={{ p: 3, flex: 1, overflowY: 'auto' }}>
+                          <Box>
+                            <Typography variant='subtitle2'>{assessmentCopy.review.question}</Typography>
+                            <Typography color='text.secondary' sx={{ mt: 1 }}>{selectedReviewItem.questionPrompt ?? '—'}</Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant='subtitle2'>{assessmentCopy.review.answer}</Typography>
+                            <Paper variant='outlined' sx={(theme) => ({ mt: 1, p: 2.5, borderRadius: `${theme.shape.customBorderRadius.md}px`, bgcolor: 'action.hover' })}>
+                              <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{responseAnswerText(selectedResponse.answer)}</Typography>
+                            </Paper>
+                          </Box>
+                          <Box>
+                            <Typography variant='subtitle2'>{assessmentCopy.review.rubric}</Typography>
+                            <Stack spacing={1.25} sx={{ mt: 1 }}>
+                              {rubricLinesFrom(selectedReviewItem.rubric).length > 0 ? rubricLinesFrom(selectedReviewItem.rubric).map((line) => (
+                                <Stack key={line} direction='row' spacing={1.25}>
+                                  <i className='tabler-point-filled text-primary' aria-hidden='true' />
+                                  <Typography variant='body2' color='text.secondary'>{line}</Typography>
+                                </Stack>
+                              )) : <Typography variant='body2' color='text.secondary'>Sin rúbrica detallada disponible.</Typography>}
+                            </Stack>
+                          </Box>
+                          <Box>
+                            <Typography variant='subtitle2'>{assessmentCopy.review.score}</Typography>
+                            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mt: 1.5 }}>
+                              {[
+                                ['No cumple', 45],
+                                ['Parcial', 62],
+                                ['Cumple', 78],
+                                ['Supera', 90],
+                              ].map(([label, value]) => (
+                                <Button
+                                  key={label}
+                                  variant={Number(scoreDrafts[selectedResponse.responseId]) === value ? 'contained' : 'tonal'}
+                                  onClick={() => setScoreDrafts((current) => ({ ...current, [selectedResponse.responseId]: String(value) }))}
+                                >
+                                  {label} · {value}
+                                </Button>
+                              ))}
+                            </Stack>
+                            <TextField
+                              fullWidth
+                              sx={{ mt: 2 }}
+                              type='number'
+                              label={assessmentCopy.review.score}
+                              value={scoreDrafts[selectedResponse.responseId] ?? ''}
+                              onChange={(event) => setScoreDrafts((current) => ({ ...current, [selectedResponse.responseId]: event.target.value }))}
+                              slotProps={{ htmlInput: { min: 0, max: 100 } }}
+                            />
+                          </Box>
+                          {selectedProposal ? (
+                            <Alert severity='info' icon={<i className='tabler-sparkles' />}>
+                              <Stack spacing={1}>
+                                <Typography fontWeight={700}>{assessmentCopy.review.aiSuggestion}</Typography>
+                                <Typography variant='body2'>{typeof selectedProposal.proposed.rationale === 'string' ? selectedProposal.proposed.rationale : assessmentCopy.review.aiSuggestionBody}</Typography>
+                                {proposedScoreFrom(selectedProposal) != null ? (
+                                  <Button
+                                    size='small'
+                                    onClick={() => setScoreDrafts((current) => ({
+                                      ...current,
+                                      [selectedResponse.responseId]: String(proposedScoreFrom(selectedProposal)),
+                                    }))}
+                                    sx={{ alignSelf: 'flex-start' }}
+                                  >
+                                    {assessmentCopy.review.useSuggestion} · {proposedScoreFrom(selectedProposal)}
+                                  </Button>
+                                ) : null}
+                              </Stack>
+                            </Alert>
+                          ) : null}
+                        </Stack>
+                        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='flex-end' spacing={1.5} sx={{ p: 3, borderBlockStart: 1, borderColor: 'divider' }}>
+                          <Button onClick={() => setSelectedResponseId(null)}>{assessmentCopy.review.cancel}</Button>
+                          <GreenhouseButton
+                            kind='primaryAction'
+                            leadingIcon={savingResponseId === selectedResponse.responseId ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
+                            disabled={savingResponseId === selectedResponse.responseId}
+                            onClick={() => void confirmResponseScore(entry.assessmentId, selectedResponse)}
+                          >
+                            {assessmentCopy.review.confirmScore}
+                          </GreenhouseButton>
+                        </Stack>
+                      </Stack>
+                    ) : null}
+                  </Drawer>
+                </>
               )}
             </Stack>
           </Paper>

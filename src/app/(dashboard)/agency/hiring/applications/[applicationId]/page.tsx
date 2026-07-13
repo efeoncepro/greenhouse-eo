@@ -58,6 +58,7 @@ export default async function HiringApplicationPage({ params }: Props) {
   return (
     <Application360View
       copy={getMicrocopy(normalizeLocale(locale) ?? undefined).hiringDesk}
+      assessmentCopy={getMicrocopy(normalizeLocale(locale) ?? undefined).hiringAssessment}
       initialItem={item}
       initialAssessments={assessments}
       templates={templates}

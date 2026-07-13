@@ -57,6 +57,7 @@ export type MicrocopyNamespace =
   | 'emails' // Copy institucional compartido por templates y notification delivery
   | 'careers' // TASK-354: Careers pública Efeonce (attract, listing, detail, apply)
   | 'hiringDesk' // TASK-355: workspace interno de Hiring
+  | 'hiringAssessment' // TASK-1363: rendición pública + review interno del assessment
   | 'hiringActivation' // TASK-1368: lane People Ops para activar hires seleccionados
 ;
 
@@ -81,7 +82,82 @@ export interface MicrocopyDictionary {
   emails: EmailsCopy
   careers: CareersCopy
   hiringDesk: HiringDeskCopy
+  hiringAssessment: HiringAssessmentCopy
   hiringActivation: HiringActivationCopy
+}
+
+export interface HiringAssessmentCopy {
+  taking: {
+    metadataTitle: string
+    headerTitle: string
+    loadingTitle: string
+    loadingBody: string
+    invalidTitle: string
+    invalidBody: string
+    errorTitle: string
+    errorBody: string
+    retry: string
+    instructionsTitle: string
+    instructionsBody: string
+    accommodation: string
+    sectionsTitle: string
+    consent: string
+    start: string
+    progressLabel: string
+    saved: string
+    saving: string
+    answerRequired: string
+    previous: string
+    next: string
+    submit: string
+    submitting: string
+    submitTitle: string
+    submitBody: string
+    cancel: string
+    submittedTitle: string
+    submittedBody: string
+    expiredTitle: string
+    expiredBody: string
+    timeRemaining: string
+    timeWarningFive: string
+    timeWarningOne: string
+    textareaPlaceholder: string
+    characterCount: string
+    noQuestionsTitle: string
+    noQuestionsBody: string
+  }
+  review: {
+    title: string
+    subtitle: string
+    overall: string
+    bars: string
+    radar: string
+    objective: string
+    pending: string
+    advisory: string
+    queueTitle: string
+    queueEmptyTitle: string
+    queueEmptyBody: string
+    correctionTitle: string
+    question: string
+    answer: string
+    rubric: string
+    score: string
+    confirmScore: string
+    aiSuggestion: string
+    aiSuggestionBody: string
+    useSuggestion: string
+    cancel: string
+    confirmed: string
+    finalize: string
+    statuses: {
+      optimal: string
+      attention: string
+      critical: string
+      pending: string
+      corrected: string
+    }
+  }
 }
 
 export interface HiringActivationCopy {
