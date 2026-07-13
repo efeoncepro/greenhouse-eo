@@ -43,6 +43,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Legal: privacidad de datos (CL/CO/MX/PE/EEUU) · contratos (MSA/SOW/NDA) · IP y derechos de uso · publicidad/consumidor — **NO laboral** | `legal-privacy-ip-operator` (+ `payroll-auditor` para laboral) | inline (orientador, NO asesoría legal; privacidad web-verificada as-of 2026-07) |
 | Research + Benchmark (market/competitive/VoC · benchmark/AI SoV · CI · para Efeonce y clientes) | `research-benchmark-operator` (+ `deep-research` harness, `seo-aeo`, `commercial-expert`) | inline (2 carriles; método+rigor, ejecución→deep-research; evidencia con as-of, NO memoria) |
 | Go-to-Market (segmento/ICP · positioning/category · offer/pricing · motion PLG/sales/ecosystem · funnel/bow-tie · launch · GTM economics · para Efeonce y clientes) | `gtm-architect` (orquesta `commercial-expert`/demanda/`research-benchmark`/`gtm-ga4`) | inline (estrategia+orquestación; commercial-expert ejecuta la venta; doctrina ASaaS/bow-tie manda) |
+| **VENTA del servicio creativo** (pricing de squad · SOW: rondas/derechos de uso · spec work · displacement in-house/Superside/IA) | `creative-practice` (+ `commercial-expert`, `deck-studio`) | inline (**capacidad gobernada, NUNCA horas ni piezas**; piso 45%; los studios ejecutan, ésta vende) |
 
 ### Tender pointer — composer + Proposal Studio (TASK-1393/1392 complete)
 
