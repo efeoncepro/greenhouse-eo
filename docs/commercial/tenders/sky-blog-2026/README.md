@@ -30,6 +30,15 @@
 
 ---
 
+## 🚀 ¿Sesión nueva? Empezá acá
+
+**`SESSION-BRIEF.md`** — el brief de arranque. Está escrito para que una sesión nueva **NO empiece a
+hacer**: primero explora, mapea las piezas contra las láminas, presenta el diagnóstico y **espera**.
+Trae el estado real, los hilos abiertos que señaló el operador (el informe del grader sin lámina, los
+enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay que volver a aprender**.
+
+---
+
 ## ⚠️ Lo primero que tienes que saber
 
 | | |
