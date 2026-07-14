@@ -353,6 +353,19 @@ Regla dura del helper: si `description` **contradice** el claim, lanza — aunqu
 ### Out-of-band coordination required
 
 - 🔴 **Rotar las 3 credenciales de Shutterstock.** Se pegaron en un chat el 2026-07-14 (transcript + logs). El token `v2/` **no expira solo**: hay que revocarlo en el portal de Shutterstock, regenerarlo, y republicar las 3 versiones con `printf %s "$V" | gcloud secrets versions add <id> --data-file=-` (escalar crudo, sin newline). **Bloquea el flip en producción.**
+
+  **🔴 Verificado en vivo el 2026-07-14 09:0x: el token filtrado SIGUE ACTIVO.** `GET /v2/user` responde **HTTP 200** contra la cuenta `Efeonce Group` (`id 472116829`). Radio de exposición actual, a nombre de quien tenga ese chat:
+
+  | Pool | Disponible |
+  |---|---|
+  | Imágenes (`standard`) | **94** / 100 |
+  | Video (`footage_standard`) | 94 / 100 |
+  | Audio (`audio_standard`) · SFX (`sfx_standard`) | 94 / 100 · 94 / 100 |
+  | `integrated_media` | **500** / 500 |
+
+  🔴 **Republicar en Secret Manager NO es rotar.** Ninguna acción en GCP invalida ese token: solo cambia lo que *nosotros* leemos. El credential filtrado sigue siendo válido **en Shutterstock** hasta que se regenere la app en su portal. El paso que cierra la fuga es el del portal, y **solo lo puede dar un humano** (requiere login).
+
+  ⚠️ **Y las credenciales nuevas NO se pegan en un chat** — es exactamente cómo se filtraron las primeras. El operador las publica él mismo, directo desde el portal a Secret Manager (comandos abajo); el agente nunca las ve.
 - `vercel env add SHUTTERSTOCK_SOURCING_ENABLED` en `Production` + `Preview (develop)`.
 - Confirmar con el rep de Shutterstock **de qué suscripción salen los créditos API** — la web y la API pueden tener pools distintos. Hoy el token ve 4 pools de 100 (imagen / video / música / SFX) y quedan **96** imágenes tras TASK-1410.
 
