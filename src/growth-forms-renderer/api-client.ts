@@ -204,7 +204,7 @@ export const submitPublicForm = async (
     return { outcome: 'invalid', reason: 'network_error' }
   }
 
-  let parsed: Partial<PublicSubmitResult> = {}
+  let parsed: Partial<PublicSubmitResult> & { message?: unknown } = {}
 
   try {
     parsed = (await response.json()) as Partial<PublicSubmitResult>
@@ -214,5 +214,9 @@ export const submitPublicForm = async (
 
   const outcome = (parsed.outcome as PublicSubmitOutcome | undefined) ?? (response.ok ? 'accepted' : 'invalid')
 
-  return { outcome, submissionId: parsed.submissionId, reason: parsed.reason }
+  return {
+    outcome,
+    submissionId: parsed.submissionId,
+    reason: parsed.reason ?? (typeof parsed.message === 'string' ? parsed.message : undefined),
+  }
 }

@@ -11,7 +11,7 @@
  * cómo se arregla", sin códigos crudos. El preview de Greenhouse puede sobreponer el
  * copy canónico; los hosts públicos usan `locale=` del embed.
  */
-import type { RendererFormKind } from './contract'
+import type { PublicSubmitOutcome, RendererFormKind } from './contract'
 
 export interface RendererSystemCopy {
   loadingForm: string
@@ -22,6 +22,7 @@ export interface RendererSystemCopy {
   noScriptFallback: string
   submitPending: string
   submitError: string
+  submitErrorByOutcome: Partial<Record<PublicSubmitOutcome, string>>
   formRegionAria: string
   successFallback: string
   successCardTitle: string
@@ -35,6 +36,7 @@ export interface RendererSystemCopy {
   fieldsRemaining: (count: number) => string
   /** Afirmación cuando no quedan campos pendientes. */
   readyToSend: string
+  readyToSendByKind: Partial<Record<RendererFormKind, string>>
   /** Aviso de borrador recuperado desde localStorage (PII-safe). */
   draftRestored: string
   /** Estado inline mientras corre la verificación de correo (TASK-1256 Slice 2). */
@@ -92,6 +94,15 @@ const esCL: RendererSystemCopy = {
   noScriptFallback: 'Este formulario necesita JavaScript para funcionar. Actívalo e intenta de nuevo.',
   submitPending: 'Preparando solicitud…',
   submitError: 'No pudimos enviar tu formulario. Intenta de nuevo en unos minutos.',
+  submitErrorByOutcome: {
+    captcha_failed: 'No pudimos verificar el envío. Recarga la página e intenta otra vez.',
+    consent_required: 'Acepta el aviso de privacidad para enviar tu información.',
+    rate_limited: 'Recibimos muchos intentos en poco tiempo. Intenta de nuevo más tarde.',
+    surface_unauthorized: 'Este formulario no está disponible desde esta página.',
+    form_not_published: 'Este formulario no está disponible.',
+    disabled: 'Este formulario no está disponible.',
+    error: 'No pudimos procesar tus datos de forma segura. Intenta de nuevo más tarde.'
+  },
   formRegionAria: 'Formulario',
   successFallback: 'Recibimos tu información. Gracias.',
   successCardTitle: 'Recibimos tu información',
@@ -106,6 +117,13 @@ const esCL: RendererSystemCopy = {
   errorSummaryTitle: 'Revisa estos campos para continuar',
   fieldsRemaining: count => (count === 1 ? 'Falta 1 campo' : `Faltan ${count} campos`),
   readyToSend: 'Listo: ya puedes solicitar tu diagnóstico',
+  readyToSendByKind: {
+    application: 'Listo: ya puedes enviar tu postulación',
+    contact: 'Listo: ya puedes enviar tu mensaje',
+    subscribe: 'Listo: ya puedes suscribirte',
+    survey: 'Listo: ya puedes enviar tus respuestas',
+    preference: 'Listo: ya puedes guardar tus preferencias'
+  },
   draftRestored: 'Recuperamos lo que habías escrito.',
   emailVerifying: 'Verificando correo…',
   emailSuggestion: suggested => `¿Quisiste decir ${suggested}?`,
@@ -172,6 +190,15 @@ const enUS: RendererSystemCopy = {
   noScriptFallback: 'This form needs JavaScript to work. Enable it and try again.',
   submitPending: 'Preparing request…',
   submitError: 'We couldn’t send your form. Please try again in a few minutes.',
+  submitErrorByOutcome: {
+    captcha_failed: 'We couldn’t verify this submission. Reload the page and try again.',
+    consent_required: 'Accept the privacy notice to send your information.',
+    rate_limited: 'We received too many attempts in a short time. Try again later.',
+    surface_unauthorized: 'This form is not available from this page.',
+    form_not_published: 'This form is not available.',
+    disabled: 'This form is not available.',
+    error: 'We couldn’t process your data safely. Please try again later.'
+  },
   formRegionAria: 'Form',
   successFallback: 'We received your information. Thank you.',
   successCardTitle: 'We received your information',
@@ -186,6 +213,13 @@ const enUS: RendererSystemCopy = {
   errorSummaryTitle: 'Review these fields to continue',
   fieldsRemaining: count => (count === 1 ? '1 field left' : `${count} fields left`),
   readyToSend: 'Ready to request the diagnostic',
+  readyToSendByKind: {
+    application: 'Ready to send your application',
+    contact: 'Ready to send your message',
+    subscribe: 'Ready to subscribe',
+    survey: 'Ready to send your answers',
+    preference: 'Ready to save your preferences'
+  },
   draftRestored: 'We restored what you had typed.',
   emailVerifying: 'Checking email…',
   emailSuggestion: suggested => `Did you mean ${suggested}?`,

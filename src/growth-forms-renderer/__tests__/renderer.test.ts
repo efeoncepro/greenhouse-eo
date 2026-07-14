@@ -839,7 +839,11 @@ describe('growth-forms-renderer · FormRenderer', () => {
     const honey = root.querySelector<HTMLInputElement>('[data-ghf-honeypot]')!
 
     expect(honey.getAttribute('tabindex')).toBe('-1')
-    expect(honey.getAttribute('autocomplete')).toBe('off')
+    expect(honey.name).not.toBe('company_website')
+    expect(honey.name).toMatch(/^ghf-\d+_url_optional$/)
+    expect(honey.getAttribute('autocomplete')).toBe('new-password')
+    expect(honey.readOnly).toBe(true)
+    expect(honey.getAttribute('data-lpignore')).toBe('true')
     expect(honey.closest('.ghf-honeypot')).not.toBeNull()
   })
 
@@ -1140,6 +1144,24 @@ describe('growth-forms-renderer · FormRenderer', () => {
 
     expect(readiness.getAttribute('data-ready')).toBe('true')
     expect(readiness.textContent).toBe('Listo: ya puedes solicitar tu diagnóstico')
+  })
+
+  it('uses application-specific readiness copy for careers/application forms', () => {
+    const base = staticContractFixture()
+
+    const contract = staticContractFixture({
+      form: { ...base.form, formKind: 'application' },
+      fields: [{ key: 'email', type: 'email', label: 'Correo', required: true, autocomplete: 'email' }],
+      consent: undefined
+    })
+
+    const { root } = mountInto(contract)
+    const email = root.querySelector<HTMLInputElement>('[name="email"]')!
+
+    email.value = 'candidate@efeonce.org'
+    email.dispatchEvent(new Event('input'))
+
+    expect(root.querySelector('[data-ghf-readiness]')?.textContent).toBe('Listo: ya puedes enviar tu postulación')
   })
 
   it('updates the character counter live for maxLength fields', () => {

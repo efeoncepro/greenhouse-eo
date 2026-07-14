@@ -37,6 +37,17 @@ const STATUS_BY_OUTCOME: Record<PublicSubmitOutcome, number> = {
 const getClientIp = (request: Request): string | null =>
   request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || null
 
+const publicSubmitReasonClass = (outcome: PublicSubmitOutcome, reason?: string): string => {
+  if (outcome === 'captcha_failed') return reason ?? 'captcha_failed'
+  if (reason === 'honeypot') return 'honeypot'
+  if (reason?.toLocaleLowerCase('es-CL').includes('consent')) return 'consent_required'
+  if (reason?.toLocaleLowerCase('es-CL').includes('correo')) return 'email_gate'
+  if (reason?.toLocaleLowerCase('es-CL').includes('archivo')) return 'upload_invalid'
+  if (reason?.toLocaleLowerCase('es-CL').includes('surface')) return 'surface_unauthorized'
+
+  return outcome
+}
+
 const parsePublicSubmitRequest = async (
   request: Request,
 ): Promise<{ body: Record<string, unknown>; uploadedFiles: GrowthFormUploadedFiles }> => {
@@ -131,6 +142,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
       requestId: null,
       uploadedFiles,
     })
+
+    if (result.outcome !== 'accepted') {
+      console.info('growth_forms_public_submit_rejected', {
+        formSlug,
+        surfaceId: input.surfaceId ?? null,
+        outcome: result.outcome,
+        reasonClass: publicSubmitReasonClass(result.outcome, result.reason),
+        hasUploadedFiles: Object.keys(uploadedFiles).length > 0,
+      })
+    }
 
     return NextResponse.json(
       { outcome: result.outcome, submissionId: result.submissionId, message: result.reason },
