@@ -11,13 +11,24 @@
 
 ## Para qué sirve
 
-Es una **muestra de trabajo** que se le entrega a un cliente o a un comité de licitación **por enlace**, y de la que se saca una **captura para una lámina** del deck.
+Es una **muestra de trabajo** que se le entrega **por enlace** a un cliente, a un prospecto o a un comité de licitación.
 
 Muestra, en cuatro pantallas: **el hueco** que encontramos en su espacio de búsqueda, **el artículo** que lo tapa, **la capa técnica** que lo hace citable por motores de respuesta con IA, y **dónde más vive** esa pieza (video, social, imágenes).
 
-**La usan:** el equipo comercial (envía el enlace, presenta en vivo) y el equipo que arma el deck (toma las capturas).
+### Hace DOS trabajos — no los confundas
 
-**No es** un lead magnet: no captura, no pide email, no tiene formulario.
+| | Trabajo | Cuándo la alcanzas |
+|---|---|---|
+| **1** | **Educar** (cliente y potencial cliente) | Cuando alguien **no entiende** qué significa "aparecer en ChatGPT" — lo confunde con SEO, o cree que es magia. La pieza enseña la diferencia **sin una lámina de teoría**. Sirve **sin venta en curso**: educar a un prospecto, o explicarle a un cliente vigente qué le estamos haciendo |
+| **2** | **Habilitar la venta** | Licitación, RFP o pitch. Le da al comercial un **enlace**, una **lámina** para el deck, algo que **presentar en vivo**, y una prueba que el comité **puede verificar solo** |
+
+**La usan:** el equipo comercial (envía el enlace, presenta en vivo), Growth/AEO (elige el hueco y escribe el artículo) y el equipo que arma el deck.
+
+🔴 **Gate humano: el operador elige el ángulo.** El agente no elige el artículo.
+
+**No es** un lead magnet: no captura, no pide email, no tiene formulario — **y no debe tenerlo.**
+
+> **Encuadre completo (los dos trabajos, cuándo NO usarla, qué la hace frágil):** [documentación funcional](../documentation/comercial/radiografia-aeo-muestra-de-trabajo.md).
 
 ---
 

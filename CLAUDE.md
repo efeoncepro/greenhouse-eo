@@ -39,6 +39,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Sitio público (landings/posicionamiento/roadmap del sitio) | `efeonce-public-site-wordpress` + `seo-aeo`/`commercial-expert` | `docs/public-site/` (README índice + PRODUCT_ROADMAP + `decisions/` PDR ≠ ADR) |
 | Licitaciones / RFP-RFQ · **Artifact Composer** (motor de composición domain-free; catálogos deck/carrusel) + aggregate `Proposal` (`src/lib/commercial/tenders/**` → `artifact-composer/**`) | `greenhouse-public-private-tenders` (+ `commercial-expert`) | `architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` |
 | **Decks / presentaciones / láminas** (cualquier deck: oferta a comité · pitch · QBR · board · readout · webinar) — **domain-free** | `deck-studio` (+ `copywriting`/`dataviz-design`/`typography-design`) | inline (craft del oficio; la skill de licitaciones es **consumer**, no dueña) |
+| **Radiografía AEO** — muestra de trabajo viva (`think.efeoncepro.com/muestras/…`): **educación** de cliente/prospecto **+ habilitación de ventas**. Runtime en el repo **`efeonce-think`**, NO acá; el cliente es un **payload JSON**, cero código | `seo-aeo-practice` (dueña del oficio) · `greenhouse-public-private-tenders` (consumer) · `commercial-expert` · `astro` (+overlay) | `docs/think/radiografia-aeo-architecture.md` (12 invariantes + gate 46 asserts) · manual `radiografia-aeo-manual.md` · funcional `documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` |
 | Content marketing: motor de contenidos (editorial/ops/atomización/distribución/medición, blog/newsletter/ebook/webinar) | `content-marketing-studio` (+ `digital-marketing`/`copywriting`/`seo-aeo`) | inline (studio de ejecución; `digital-marketing` módulo 02 le hace hand-off) |
 | Legal: privacidad de datos (CL/CO/MX/PE/EEUU) · contratos (MSA/SOW/NDA) · IP y derechos de uso · publicidad/consumidor — **NO laboral** | `legal-privacy-ip-operator` (+ `payroll-auditor` para laboral) | inline (orientador, NO asesoría legal; privacidad web-verificada as-of 2026-07) |
 | Research + Benchmark (market/competitive/VoC · benchmark/AI SoV · CI · para Efeonce y clientes) | `research-benchmark-operator` (+ `deep-research` harness, `seo-aeo`, `commercial-expert`) | inline (2 carriles; método+rigor, ejecución→deep-research; evidencia con as-of, NO memoria) |
@@ -1125,39 +1126,9 @@ Estos CLIs están autenticados localmente. Cuando una task toca su dominio, **ú
 
 **MCP creativos (solo sesiones Claude):** conectores `claude.ai` de edición/diseño de assets (Adobe, Figma, Higgsfield, Magnific…), session-scoped y solo-Claude, **out-of-band** (NUNCA a runtime; imágenes runtime = `src/lib/ai/image-generator.ts`). Inventario + reglas: **AGENTS.md → §0**.
 
-### Auth resilience invariants (TASK-742)
+### Auth resilience — invariantes (TASK-742)
 
-7 capas defensivas que protegen el flujo de autenticación. Cualquier cambio que toque NextAuth, secrets de auth, o el flujo de sign-in debe respetar estos invariantes — son los que evitan que una rotación mal hecha o un cambio en Azure App registration vuelva a romper login silenciosamente como en el incidente 2026-04-30.
-
-**⚠️ Reglas duras**:
-
-- **NUNCA** cambiar `signInAudience` de la Azure AD App Registration a `AzureADMyOrg` (single-tenant). Greenhouse es multi-tenant por arquitectura — clientes Globe (Sky, etc.) entran desde sus propios tenants Azure. El valor canónico es **`AzureADMultipleOrgs`** (work/school accounts de cualquier tenant; rechaza personal Microsoft Accounts). El callback `signIn` en `auth.ts` rechaza tenants no provisionados via lookup en `client_users` por `microsoft_oid`/`microsoft_email`/alias — la autorización fina vive en Greenhouse, no en Azure. El 2026-04-30 alguien flipeó esto a `AzureADMyOrg` y rompió SSO para todos los users. `pnpm auth:audit-azure-app` detecta drift en segundos.
-- **NUNCA** remover redirect URIs registradas en la Azure App. Las canónicas son `https://greenhouse.efeoncepro.com/api/auth/callback/azure-ad` (production) y `https://dev-greenhouse.efeoncepro.com/api/auth/callback/azure-ad` (staging). El auditor las verifica como dura.
-- **NO** llamar `Sentry.captureException(err)` en code paths de auth. Usar siempre `captureWithDomain(err, 'identity', { extra: { provider, stage } })` desde `src/lib/observability/capture.ts`. El subsystem `Identity` rolls up por `domain=identity`.
-- **NO** publicar secretos críticos sin pasar por `validateSecretFormat` (`src/lib/secrets/format-validators.ts`). Si agregas un secret crítico nuevo, agregá su rule al catálogo `FORMAT_RULES`. `resolveSecret` rechaza payloads que no pasan validation.
-- **NO** rotar un secret en producción manualmente. Usar `pnpm secrets:rotate <gcp-secret-id> --validate-as <ENV_NAME> --vercel-redeploy <project> --health-url <url>`. El playbook hace verify-before-cutover y revert automático si health falla.
-- **NUNCA** mutar el JWT/signIn callbacks de NextAuth sin envolverlos en try/catch + `recordAuthAttempt(...)`. NextAuth swallow-ea errores → opaque `?error=Callback`. El wrapping garantiza que la próxima falla emita stage + reason_code estable a `greenhouse_serving.auth_attempts` y a Sentry.
-- **NUNCA** computar SSO health en el cliente. La UI de Login lee `/api/auth/health` (contract `auth-readiness.v1`) y oculta/deshabilita botones degradados. Single source of truth.
-- **NUNCA** persistir el raw token de un magic-link. Solo `bcrypt(token)` con cost 10. TTL=15min, single-use enforced en consume time. Usar `src/lib/auth/magic-link.ts` — no inventar tokens nuevos.
-- **NUNCA** crear un `client_users` row con `auth_mode='both'` sin `password_hash`, ni `auth_mode='microsoft_sso'` sin `microsoft_oid`. La CHECK constraint `client_users_auth_mode_invariant` lo bloquea. Si necesitas estado transicional, usar `auth_mode='sso_pending'` (sin password ni SSO link, ready para link en próximo signIn).
-- **NO** depender de `process.env.NEXTAUTH_SECRET` plano en producción si existe `NEXTAUTH_SECRET_SECRET_REF`. El resolver prefiere Secret Manager. Tener ambos crea drift.
-
-**Helpers canónicos**:
-
-- `validateSecretFormat(envName, value)` — Capa 1
-- `getCurrentAuthReadiness()` desde `src/lib/auth-secrets.ts` — Capa 2
-- `recordAuthAttempt({ provider, stage, outcome, reasonCode, ... })` desde `src/lib/auth/attempt-tracker.ts` — Capa 3
-- `requestMagicLink({ email, ip })` / `consumeMagicLink({ tokenId, rawToken, ip })` — Capa 5
-- `pnpm secrets:audit` / `pnpm secrets:rotate` — Capa 7
-
-**Observability surfaces**:
-
-- `/api/auth/health` — public read-only readiness
-- `greenhouse_serving.auth_attempts` — append-only ledger (90-day retention)
-- `greenhouse_sync.smoke_lane_runs` con `lane_key='identity.auth.providers'` — synthetic monitor cada 5min via Cloud Scheduler
-- Sentry `domain=identity` — todos los errors de auth
-
-**Spec completa**: `docs/tasks/complete/TASK-742-auth-resilience-7-layers.md`.
+Las **7 capas defensivas** del flujo de autenticación (formato de secretos · readiness · ledger `auth_attempts` · magic-link · CHECK de `auth_mode` · rotación con verify-before-cutover · observabilidad) viven en **`docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` → §`Auth resilience`**. **NUNCA** poner `signInAudience` de la Azure App en `AzureADMyOrg` (Greenhouse es multi-tenant: rompe SSO para todos — pasó el 2026-04-30; el canónico es `AzureADMultipleOrgs`); **NUNCA** rotar un secret de auth a mano (usar `pnpm secrets:rotate`, que hace verify-before-cutover y revierte solo); **NUNCA** computar la salud de SSO en el cliente (`/api/auth/health` es el único source of truth). Auditor de drift: `pnpm auth:audit-azure-app`.
 
 ### UI/feature platforms — invariantes (home rollout TASK-780, nexa insights detail TASK-947, quick access TASK-553, table density TASK-743, final settlement TASK-863, real-artifact loop TASK-863, semantic column TASK-863, sample sprints runtime TASK-835, account-360 facet readers TASK-1059)
 

@@ -553,6 +553,43 @@ estar a un día del cierre.
 
 **Gate: 43/43.** Desplegado y verificado contra producción.
 
+## Delta 2026-07-14 (d) — es una CAPACIDAD (educa + habilita la venta), y el instrumento no enfocaba
+
+### 1. 🔴 El reencuadre que faltaba: dos trabajos, no uno
+
+La pieza nació dentro de una licitación y se estaba archivando como *"la muestra de SKY"*. **No lo es.** Es una **capacidad reutilizable** con **dos** trabajos, y confundirlos lleva a usarla mal:
+
+| | Trabajo | Qué significa |
+|---|---|---|
+| **1** | **Educación** — cliente **y potencial** cliente | Casi nadie entiende qué significa *"aparecer en ChatGPT"*: lo confunde con SEO o lo cree magia. La pieza **enseña la diferencia sin una lámina de teoría**. Sirve **sin venta en curso**: educar a un prospecto, o retener explicándole a un cliente vigente qué le hacemos |
+| **2** | **Habilitación de ventas** | Enlace + lámina de deck + demo en vivo + prueba que el comité **verifica solo** |
+
+**Consecuencia de diseño, no cosmética:** la pieza tiene que **sostenerse sola** — sin nuestra oferta al lado y sin que el lector sepa SEO. De ahí salen los dos hallazgos de abajo.
+
+**Y estaba invisible: CERO skills la conocían.** Registrada en `seo-aeo-practice` (dueña del oficio), `greenhouse-public-private-tenders` (consumer), `commercial-expert` (la vende) y el overlay de `astro` (donde vive el runtime), en **ambos namespaces**, + fila en el router de `CLAUDE.md` + doc funcional nueva (`docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`).
+
+### 2. 🔴 El instrumento ATENUABA pero no ENFOCABA — 44 de 51 datos no se veían nunca
+
+Lo cazó el operador **mirando**: tocas un H2, el chip promete «4 datos» y el panel se queda arriba mostrando uno. Medido sobre los 22 bloques: el `h1` prometía **11 y mostraba 0**; el `faq`, 5 y 0.
+
+**La causa era de arquitectura de información, no de tamaño de letra:** el panel se ordena **por FAMILIA** (Metadatos · Datos estructurados · Estructura · Evidencia), pero al tocar un bloque la pregunta es *«¿qué produce ESTO?»* — **por PRODUCTOR**. Los datos de un bloque **nunca son contiguos**. El código atenuaba lo demás y scrolleaba al **primer match**, que en el DOM es casi siempre el más **tautológico** (*«tu H2 está en la lista de H2»*): para quien no sabe SEO, **no pasaba nada**.
+
+**Los dos modos del instrumento** (invariante **12b**): **MAPA** al llegar (el panel entero — el argumento de masa) · **ENFOQUE** al interrogar (colapsa a lo que ese bloque produce, y nada más). *Primero ves la máquina entera. Después la apuntas.* Salida descubrible: botón «Ver toda la capa» + Escape.
+
+**Resultado medido: 44 → 7 invisibles.** 21 de 22 bloques muestran el **100%**. Asserts **11b/11c**.
+
+### 3. 🔴 La muestra se defiende sola (invariante 12c)
+
+La ④ abría con *«**Nuestra oferta** dice, textual…»* — le hablaba al comité sobre **nuestro PDF**. Y el reemplazo seguía enfermo: *«**cada pieza de abajo** nace de un bloque…»* — eso **narra la interfaz**, es copy escrito desde la silla del que construyó la herramienta.
+
+**La línea, que es fina:** hablar del artefacto **para ser HONESTO** ✅ (el disclaimer, el schema que no se emite, *«especifica el entregable y no lo simula»* — invariantes 1, 4 y 9). **Narrar la interfaz** ❌. Un barrido dio 8 coincidencias: **7 eran honestidad legítima**. Assert **34b**.
+
+### 4. El deck: la muestra entra por ENLACE, no por captura
+
+15 → **16 láminas**. Entra `12-muestra` (`contentType: highlight`) tras `11-seo-aeo`: la 11 **declara** la capacidad AEO, la 12 la **prueba**. El catálogo del composer **no tiene plantilla capaz de mostrar una captura de UI** — y la pieza es **interactiva**: un PNG estático mata justo el acoplamiento que viene a demostrar. Visual-gate en **CERO píxeles**. *Follow-up: falta una plantilla de artifact showcase.*
+
+**Gate: 46/46.** Desplegado y verificado contra producción.
+
 ## Open Questions
 
 - **El ángulo del artículo está sin resolver por diseño** y lo resuelve el gate humano del Slice 1. El agente **no debe** elegirlo.

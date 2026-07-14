@@ -1,3 +1,18 @@
+## Sesión 2026-07-14 (b) — Radiografía AEO: capacidad, no anexo · el instrumento ahora ENFOCA (Claude)
+
+> **Pedido:** dejar lista la Radiografía para la licitación de SKY (**cierra 15/07**) y documentarla como lo que es: **herramienta de educación de clientes/prospectos + habilitación de ventas**.
+>
+> **Lo que se hizo:** (1) **Reencuadre** — deja de ser "la muestra de SKY" y se documenta como **capacidad con dos trabajos** (educar · vender). Doc funcional nueva `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`; **cero skills la conocían** → registrada en `seo-aeo-practice`, `greenhouse-public-private-tenders`, `commercial-expert` y el overlay de `astro` (ambos namespaces) + fila en el router de `CLAUDE.md`. (2) **El instrumento atenuaba pero no enfocaba**: de **51 datos prometidos por los chips, 44 no se veían nunca** (el `h1` prometía 11, mostraba 0). Causa: el panel se ordena **por familia**, la pregunta es **por productor**. Ahora **dos modos** (MAPA / ENFOQUE) → **44 → 7**; asserts 11b/11c. (3) La coherencia **tampoco es propiedad del artículo**: el «tres transbordadores» vivía en 6 lugares de la capa de máquina y los átomos; `read:aeo-xray` ahora lee las **tres capas**. (4) **La muestra se defiende sola**: fuera la autorreferencia a nuestra oferta y las acotaciones de escenario (assert 34b). (5) **Deck 15 → 16 láminas** (`12-muestra`, por **enlace**, no captura) con visual-gate en **cero píxeles**.
+>
+> **Evidencia:** gate `pnpm verify:aeo-xray` **46/46**; `pnpm composer:visual-gate` 41 frames a 0 px; verificado contra **producción** (cero JSON-LD activo, 3 citas en la ④, FAQ en el índice, botón "Ver toda la capa" vivo). Runtime desplegado desde `efeonce-think` (`origin/main`).
+>
+> **Estado:** **complete.** El operador sube a Wherex (gate humano).
+>
+> **Pendientes / riesgos:**
+> - 🔴 **Shutterstock: el token filtrado SIGUE ACTIVO** (verificado: `GET /v2/user` → 200; expuestos 94 licencias de imagen + 500 `integrated_media`). **Republicar en Secret Manager NO rota** — hay que regenerar la app **en el portal de Shutterstock** (requiere login humano). **Diferido por decisión del operador.** Bloquea el flip del flag en producción de `TASK-1411`; runbook completo ahí.
+> - ⚠️ **Follow-up del composer:** falta una plantilla de *artifact showcase* (captura a sangre + copy). La Radiografía no será el último artefacto que queramos mostrar en un deck. Declarado en `BASELINE_DELTAS.md`.
+> - ⚠️ **Un solo payload:** mientras exista un único cliente cargado, la reutilización del motor es **hipótesis, no hecho**.
+
 ## Sesión 2026-07-14 — Reconciliación de `develop` divergido (Codex)
 
 > **Pedido:** aclarar por qué `develop` estaba divergida y avanzar con la resolución sin tocar el frente legal/payroll/fairness.

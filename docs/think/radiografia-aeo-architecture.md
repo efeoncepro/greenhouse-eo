@@ -13,13 +13,24 @@
 
 ## Qué es
 
-Una **muestra de trabajo reutilizable** para propuestas comerciales. Recorre en cuatro pantallas un artículo de blog real —escrito de cero para el cliente— y **expone la capa técnica que lo hace citable por motores de respuesta**, junto con la evidencia de por qué ese artículo existe.
+Una **muestra de trabajo reutilizable**. Recorre en cuatro pantallas un artículo de blog real —escrito de cero para el cliente— y **expone la capa técnica que lo hace citable por motores de respuesta**, junto con la evidencia de por qué ese artículo existe.
 
 **El motor es reutilizable: el cliente es un payload, no código.** Primer caso: la licitación SKY (blog, vía Wherex, 2026).
 
+## 🔴 No es un anexo de un bid: es una CAPACIDAD con DOS trabajos
+
+Nació dentro de una licitación, y por eso es fácil archivarla como *"la muestra de SKY"*. **No lo es.** Hace dos trabajos distintos, y confundirlos lleva a usarla mal:
+
+| | Trabajo | Qué significa |
+|---|---|---|
+| **1** | **Educación** — cliente **y potencial cliente** | Casi nadie entiende qué significa *"aparecer en ChatGPT"*: se confunde con SEO, o se cree magia. La pieza **enseña la diferencia sin una sola lámina de teoría** — el evaluador *ve* que el schema solo puede marcar contenido visible, *ve* que la cápsula es un texto concreto y no un truco. Es **formación disfrazada de demostración**, y sirve **sin venta en curso** (educar a un prospecto, o explicarle a un cliente vigente qué le estamos haciendo) |
+| **2** | **Habilitación de ventas** *(sales enablement)* | Le da al comercial un **enlace** que se manda antes/durante/después de la reunión, una **lámina** para el deck, algo que **presentar en vivo** (se navega, se toca, responde), y una prueba que el comité **puede verificar por su cuenta** |
+
+**Consecuencia de diseño:** la pieza tiene que **sostenerse sola**. No puede depender de que el lector tenga nuestra oferta al lado, ni de que sepa SEO. Eso no es cosmética — es lo que hace que funcione en los dos trabajos (ver invariante **12c**).
+
 ## Por qué existe
 
-En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimizamos para SEO y AEO"). Ninguna lo muestra. Las promesas viven como texto en un PDF, exactamente igual que las de la competencia.
+En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimizamos para SEO y AEO"). Ninguna lo muestra. Las promesas viven como texto en un PDF, exactamente igual que las de la competencia. **Y el competidor de fondo no es la otra agencia: es la indecisión** — el comité necesita algo concreto que defender internamente.
 
 La Radiografía cierra esa distancia: **cada elemento técnico apunta al número del diagnóstico que arregla**. El `potentialAction` no es "un campo más" — *es* el `Ser accionable: 8/100` que el AI Visibility Grader ya midió. El `FAQPage` es el 37.
 

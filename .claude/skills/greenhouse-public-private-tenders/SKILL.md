@@ -48,6 +48,20 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 
 Carga **solo** el/los companions relevantes a la etapa. No cargues los 9 de una.
 
+### 🔴 La Radiografía AEO — la muestra de trabajo que ya existe (no la reinventes)
+
+En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimizamos para SEO y AEO") y **ninguna lo muestra**. Ya tenemos la herramienta que cierra esa distancia: escribe un artículo **real** para el cliente y lo **abre en canal** en cuatro pantallas (el hueco · el artículo · la capa de máquina acoplada · dónde más vive). Live: `think.efeoncepro.com/muestras/<slug>-<token>` (primer caso: SKY, Wherex 2026).
+
+**Es una CAPACIDAD con dos trabajos, no un anexo del bid:** *(1)* **educar** al cliente/prospecto que no entiende qué significa "aparecer en ChatGPT" —sirve **sin venta en curso**— y *(2)* **habilitar la venta** (enlace + lámina de deck + demo en vivo + prueba verificable por el comité).
+
+- **Un cliente nuevo NO requiere código:** el cliente es un **payload** JSON. Cero componentes.
+- **Runtime en el repo `efeonce-think`**, NO en `greenhouse-eo`.
+- **En el deck va por ENLACE, no por captura** (el catálogo del composer no tiene plantilla para capturas de UI, y la pieza es **interactiva**: un PNG estático mata justo lo que demuestra). Ver la lámina `muestra` (`contentType: highlight`) del deck de SKY.
+- 🔴 **NUNCA** dejar que la muestra cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola** (invariante 12c + assert 34b).
+- 🔴 **Gate humano:** el operador elige el ángulo del artículo. El agente no lo elige.
+
+**Antes de tocarla, cargar:** `docs/think/radiografia-aeo-architecture.md` (los invariantes) + `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente). Encuadre comercial: `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`.
+
 ## Reglas duras (hard rules)
 
 1. **Nada de norma/umbral/plazo/monto como verdad eterna.** El derecho de compras cambia (Chile: **Ley 21.634/2023** modernizó la 19.886; Compra Ágil pasó de 30 a **100 UTM**; LATAM reforma seguido). Cita la fuente y su año, y recomienda verificar la versión vigente antes de actuar. Si no puedes verificar, dilo explícito.

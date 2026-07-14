@@ -180,6 +180,27 @@ mueve, y este es el orden"* sí.
 
 ---
 
+## 4b. 🔴 La Radiografía AEO — el activo que ya tenemos (educa Y vende)
+
+En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es la pieza que la hace **tangible**. Escribe un artículo **real** para el cliente y lo **abre en canal** en cuatro pantallas: el hueco de búsqueda medido · el artículo · la capa de máquina **acoplada** (tocas un párrafo y ves qué produce) · dónde más vive.
+
+**Live:** `think.efeoncepro.com/muestras/<slug>-<token>` · runtime en el repo **`efeonce-think`** (NO `greenhouse-eo`) · **el cliente es un payload JSON, cero código.**
+
+**Dos trabajos — no los confundas:**
+
+| | Trabajo | Cuándo |
+|---|---|---|
+| **1** | **Educar** al cliente/prospecto | Casi nadie entiende qué significa *"aparecer en ChatGPT"*: lo confunde con SEO o lo cree magia. La pieza enseña la diferencia **sin una lámina de teoría**, y sirve **sin venta en curso** (educar un prospecto, o retener explicándole a un cliente vigente qué le hacemos) |
+| **2** | **Habilitar la venta** | Enlace + lámina de deck + demo en vivo + prueba que el comité **verifica solo** |
+
+**Por qué funciona, y por qué es frágil:** el schema **solo puede marcar contenido visible** — esa restricción **es** el argumento, y por eso la pantalla partida demuestra algo que un PDF no puede. Todo su valor es **no exagerar**: cifra sin fuente = opinión con dígitos; reclamar una táctica que no aplicaste es el error más caro (nos pasó con el *+41% Quotation Addition*); y **la muestra dice también lo que le FALTA** (si el cliente no tiene autor con credencial, se declara — no se inventa).
+
+🔴 **NUNCA** prometer el rich snippet de FAQ de Google (restringido desde 2023 a gobierno/salud). 🔴 **NUNCA** dejar que la pieza cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola**. 🔴 **Gate humano:** el operador elige el ángulo del artículo.
+
+**Cargar al tocarla:** `docs/think/radiografia-aeo-architecture.md` (12 invariantes + gate de 46 asserts) · `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente) · `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` (encuadre comercial).
+
+---
+
 ## 5. Antes de responder cualquier cosa
 
 1. ¿Vas a decir un precio? → **cotizador primero.** `modules/04_PRICING.md`.

@@ -28,6 +28,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Comercial
 
+- [Radiografía AEO — Muestra de Trabajo, Educación y Habilitación de Ventas](comercial/radiografia-aeo-muestra-de-trabajo.md) — la pieza de 4 pantallas que escribe un artículo REAL para el cliente y lo abre en canal (el hueco medido · el artículo · la capa de máquina acoplada · dónde más vive). Hace DOS trabajos: educar al cliente/prospecto que no entiende qué significa "aparecer en ChatGPT" (sirve sin venta en curso) y habilitar la venta (enlace + lámina de deck + demo en vivo + prueba verificable por el comité). Runtime en el repo `efeonce-think`; el cliente es un payload JSON, cero código.
 - [Tender Deck Composer](comercial/tender-deck-composer.md) — como se arma el deck de una licitacion: catalogo cerrado de 25 plantillas (el deck se compone, no se dibuja), las tres cosas que el composer NO deja pasar (cifra sin fuente, texto truncado, grafico que exagera una mejora que no ocurrio), el PDF entregable y el gate de peso (admisibilidad del portal), y el guardrail de fotos reales del equipo.
 
 ### Admin Center

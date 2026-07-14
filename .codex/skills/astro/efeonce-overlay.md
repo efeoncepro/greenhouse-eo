@@ -110,6 +110,35 @@ working, hardened widget-embed is a legitimate choice. C1 is not a correctness f
 - Proprietary illustrations / isotypes follow repo brand-asset rules — don't
   hand-transcribe third-party marks; import per the repo's brand SSOT.
 
+## La Radiografía AEO (`/muestras/<slug>-<token>`) — la OTRA cosa que vive en este repo
+
+efeonce-think no es solo el render del Brand Grader. También aloja la **Radiografía AEO**: una muestra
+de trabajo de 4 pantallas que es, a la vez, **herramienta de educación** (cliente y prospecto) y
+**herramienta de habilitación de ventas**. Escribe un artículo real para un cliente y lo abre en canal
+mostrando su capa de máquina acoplada. Primer caso: SKY (licitación Wherex 2026).
+
+- **El cliente es un PAYLOAD, no código.** Colección Content Layer `aeoXray` (`src/content.config.ts`)
+  + un JSON en `src/content/aeo-xray/<cliente>-<slug>.json`. **NUNCA** `if (cliente === 'sky')` en un
+  componente: eso rompe la frontera del motor.
+- **El schema Zod ES el gate de calidad**: `alt`, `credit`, `source`+`asOf` por cifra, `why`, `tier`,
+  `token`. Un payload incompleto **rompe el build** — no publica una muestra a medias.
+- **Gate propio:** `pnpm build && pnpm verify:aeo-xray` → **46 asserts** (Playwright real). Y
+  `pnpm read:aeo-xray` es **OBLIGATORIO antes de tocar el texto**: la coherencia no es una propiedad
+  estructural, y la prosa vive en **tres capas** (artículo · capa de máquina · átomos).
+- 🔴 **El JSON-LD se renderiza como TEXTO ESCAPADO, jamás en un `<script type="application/ld+json">`**:
+  emitirlo declararía en NUESTRO dominio que Efeonce publicó un artículo del cliente. Dato estructurado
+  falso, en la pieza cuya tesis es el rigor. `noindex` + fuera del sitemap.
+- 🔴 **La muestra se defiende sola:** ni cita nuestros documentos ("nuestra oferta dice…") ni narra su
+  propia interfaz ("cada pieza de abajo…"). Hablar del artefacto **para ser honesto** sí (el disclaimer,
+  el schema no emitido); narrarlo, no.
+- **Imágenes por `astro:assets`** (helper `image()` de la colección), **NUNCA** desde `public/`: la pieza
+  no puede reprobar su propio PageSpeed.
+
+**Invariantes completos (cargar antes de tocarla):** `greenhouse-eo/docs/think/radiografia-aeo-architecture.md`
++ el manual `radiografia-aeo-manual.md`. Encuadre comercial:
+`docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`. Skills: `seo-aeo-practice` (dueña
+del oficio) · `greenhouse-public-private-tenders` (consumer) · `commercial-expert` (la vende).
+
 ## Primitives
 
 - **`MaturityLadder`** (TASK-1325) — self-contained primitive + adapter pattern.
