@@ -72,3 +72,40 @@ Se crea **Efeonce Creative Studio** como nombre de trabajo de una **plataforma h
 
 Los documentos Greenhouse de Media Foundry, Creative Flow Studio y Creative Video Studio quedan **superseded como ubicación de runtime**. Sus principios útiles (provider neutrality, async, aprobación, historial del piloto) son evidencia histórica; no autorizan implementar media en Greenhouse.
 
+
+---
+
+## Delta 2026-07-14 — la frontera con el *sourcing* de stock: **generar** y **adquirir** son lo mismo, **buscar** no
+
+**Por qué esta Delta.** Este ADR habla de *"producir, revisar y operar"* media. Un agente lo leyó y preguntó lo obvio: **¿y comprar una foto de stock?** No es generación. ¿Cae fuera?
+
+**No cae fuera.** El §5 ya lo dice —*"assets, linaje y **derechos**… ledger append-only"*— y el §3 también —*"una acción **con coste**… `propose → reserve → approve → execute`"*. **Adquirir derechos es dominio del Studio, igual que generarlos.** Esta Delta lo deja escrito para que nadie lo relea al revés.
+
+**Pero la Delta también abre una puerta, y es deliberado.** Una capability de stock **no es una sola cosa**. Se parte limpio por **costo y derechos**:
+
+| | Buscar | Licenciar |
+|---|---|---|
+| ¿Cuesta? | No | **Sí, e irreversible** |
+| ¿Crea derechos? | No | **Sí** |
+| ¿Necesita ledger/linaje? | No | **Sí** |
+| ¿Estado? | Stateless | Asset durable |
+| **Dueño** | **Greenhouse** | **Creative Studio** |
+
+**Buscar vive en Greenhouse.** Es un adapter de tercero read-only, gratis y sin estado — lo mismo que `src/lib/ai/dataforseo.ts`. No toca ningún invariante de este ADR: no hay asset, no hay costo, no hay derechos, no hay ledger. Nace con contrato gobernado (capability + entitlement + ruta) y con eso lo operan UI, Nexa, MCP y los agentes por construcción.
+
+**Licenciar no.** Construir el ledger de créditos, el registro de derechos y el linaje de assets dentro de Greenhouse es **exactamente el acoplamiento que este ADR rechazó** — y sería construirlo dos veces, porque `EPIC-028` lo va a construir igual.
+
+**Y esa frontera es la que se quiere de todas formas.** Un agente que **busca y propone** es útil y barato. Un agente que **gasta plata solo** no lo es. Lo demostró la sesión del 2026-07-14: el guardrail dejó buscar libremente y **bloqueó dos veces al licenciar**. Esta Delta convierte esa frontera accidental en arquitectura.
+
+### Invariantes que agrega
+
+- 🔴 **NUNCA** llamar a un endpoint de proveedor que **consuma crédito** desde `src/lib/**`, `src/app/**` ni ningún runtime de Greenhouse. El adapter de búsqueda **ni siquiera recibe la credencial que gasta**: no es una convención, es lo que vuelve el bug **irrepresentable**.
+- 🔴 **NUNCA** persistir en Greenhouse un ledger de créditos, un registro de derechos ni assets durables de un proveedor de media. Son aggregates del Studio.
+- **SIEMPRE** que el Studio exponga su contrato de licenciamiento, **retirar** el puente out-of-band de Greenhouse (CLI + ledger-en-archivo). Es un workaround **declarado**, no una capa permanente.
+
+### Puente temporal, mientras `EPIC-028` no exista
+
+Licenciar queda **out-of-band, con gate humano**: CLI (precedente `pnpm ai:image`, que este repo ya trata como tooling fuera del runtime) + ledger append-only en archivo, commiteado — **git es el audit log** hasta que exista el del Studio. Declarado **temporal, con dueño (Growth/Content) y condición de retiro** según `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
+
+**Implementación:** `docs/tasks/to-do/TASK-1411-shutterstock-stock-sourcing-capability.md`.
+**Origen:** TASK-1410 (Radiografía AEO) usó Shutterstock ad-hoc con `curl` y destapó tres bug classes silenciosas — entre ellas una foto de la **Ruta 40 de Argentina** que la búsqueda devolvió para "Carretera Austral" porque traía `carretera` y `chile` entre sus keywords.
