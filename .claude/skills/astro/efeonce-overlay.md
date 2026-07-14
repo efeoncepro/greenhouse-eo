@@ -120,8 +120,19 @@ mostrando su capa de máquina acoplada. Primer caso: SKY (licitación Wherex 202
 - **El cliente es un PAYLOAD, no código.** Colección Content Layer `aeoXray` (`src/content.config.ts`)
   + un JSON en `src/content/aeo-xray/<cliente>-<slug>.json`. **NUNCA** `if (cliente === 'sky')` en un
   componente: eso rompe la frontera del motor.
-- **El schema Zod ES el gate de calidad**: `alt`, `credit`, `source`+`asOf` por cifra, `why`, `tier`,
-  `token`. Un payload incompleto **rompe el build** — no publica una muestra a medias.
+- **El schema Zod ES el gate de calidad, y ahora lo es DE VERDAD** (auditoría 2026-07-14). Un
+  `superRefine` en la raíz rompe el build ante: **cualquier `stat` sin `source`+`asOf`** (el hueco por
+  donde entraron 3 cifras que no resistían verificación — vivían en `machine.craft`, la única familia
+  que el schema no miraba), **bloques huérfanos y nodos fantasma** (el contrato del acoplamiento se
+  verificaba en un navegador DESPUÉS del build: un payload roto **pasaba**), **headline sin cifra**,
+  **anclas duplicadas**, y un **accent del cliente bajo 4,5:1** (entra como color de TEXTO).
+- 🔴 **El motor NO puede conocer al cliente — y la trampa está en cuatro sitios, no en uno:** un
+  `switch` de literales sobre el `flow` (**un step renombrado servía una página EN BLANCO, sin
+  ruido** → ahora es un `enum`), **la tipografía del cliente en el CSS** (era un `if (cliente ===
+  'sky')` escrito en una hoja de estilos → ahora sale del payload), una **constante con un `coupleId`
+  del cliente** (`HERO`), y **el gate exigiendo literalmente `Assistant`** — o sea, era el test de
+  regresión de SKY, no el del motor. ✅ Verificado con **el ejercicio del segundo cliente**: un payload
+  de clínica dental entra **sin tocar una línea de código**.
 - **Gate propio:** `pnpm build && pnpm verify:aeo-xray` → **46 asserts** (Playwright real). Y
   `pnpm read:aeo-xray` es **OBLIGATORIO antes de tocar el texto**: la coherencia no es una propiedad
   estructural, y la prosa vive en **tres capas** (artículo · capa de máquina · átomos).

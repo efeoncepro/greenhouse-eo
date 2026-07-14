@@ -5,6 +5,50 @@
 > reputacional, pérdida de confianza de modelos IA) no compensa el atajo.
 > Sello: as-of 2026-06.
 
+## 🔴 Sobre-declarar una cifra (el error más caro del oficio)
+
+> **Auditado en vivo el 2026-07-14** sobre una muestra de trabajo real: **de las 6 cifras que la pieza
+> exhibía, 3 no resistían una verificación**. Todas venían de *esta skill*. Se corrigieron acá para que
+> no vuelvan a salir. En una categoría de humo, la honestidad es el producto — y una cifra
+> sobre-declarada la destruye más rápido que la prosa plana.
+
+### 1. Una PREVALENCIA no es un LIFT
+
+**El error:** el estudio dice *«las páginas que ChatGPT cita **contienen** una tabla 2,3× más seguido
+que las que rankean en Google»* (30% vs 13%) — una **razón de prevalencia entre dos corpus**. Y se
+publica como *«poner una tabla te da 2,3× más citas»* — un **lift causal** que nadie midió.
+
+Es la misma operación mental que convirtió el **`Quotation Addition` (+41%)** —que mide **citar
+FUENTES o EXPERTOS entre comillas**— en *«nuestra cita destacada da +41%»*. Tomar una descripción y
+venderla como palanca.
+
+- 🔴 **NUNCA** conviertas una correlación/prevalencia en una recomendación causal.
+- 🔴 **NUNCA** le agregues variables al hallazgo (*«tabla **+ lista numerada** → 2,3×»* — la lista
+  **no estaba** en el estudio).
+- ✅ Si el mecanismo se sostiene solo (*una fila tabulada **es** la respuesta, se extrae sin
+  ambigüedad*), **argumenta el mecanismo y suelta el número**. Es más fuerte y no te pueden cazar.
+
+### 2. El nombre de la fuente tiene que poder GOOGLEARSE
+
+**El error:** se publicó *«AI Platform Citation Source Index 2026 — 680 millones de citas, 6 estudios
+independientes»*. **Ese estudio no existe con ese nombre.** El dato era de **Bluefish** (reportado por
+Adweek), los **6,1M** de citas eran de **Goodie AI** (otro sub-hallazgo del mismo artículo), y eran **4
+firmas**, no 6 estudios. Un resumen de búsqueda había fundido dos datasets en uno, y se transcribió.
+
+- 🔴 **NUNCA** publiques una fuente cuyo nombre no puedas encontrar buscándolo. El evaluador **va a
+  buscarlo** — y si no lo encuentra, **se cae todo lo demás que dijiste**, no solo ese dato.
+- 🔴 **NUNCA** confíes en el resumen de un buscador para atribuir: **abre la fuente primaria**. Los
+  resúmenes sintetizan varios estudios en una frase y no lo avisan.
+- ✅ Cita **quién midió**, **sobre qué muestra** y **con qué fecha**. Si la muestra no incluye tu
+  dominio (p. ej. el estudio de 66 marcas de consumo/gaming/salud/fintech **no tenía turismo**),
+  **dilo**.
+
+### 3. Un base rate sin grupo de control no prueba nada
+
+*«El 72,4% de las páginas citadas tiene cápsula de respuesta»* **no dice** qué porcentaje de las **NO
+citadas** también la tiene. Casi cualquier post bien escrito abre con un resumen. **Sin el
+contrafactual, el número describe un patrón — no prueba un lift.** Decláralo así, o no lo uses.
+
 ## Borde black-hat / spam (riesgo de penalización Google)
 
 - **Cloaking** — mostrar a Googlebot/bots IA algo distinto que al usuario.

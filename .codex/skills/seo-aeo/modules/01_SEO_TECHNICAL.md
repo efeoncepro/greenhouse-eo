@@ -87,7 +87,14 @@ recuperar? → ¿se entiende? → ¿es rápido y estable?**
   motores IA a *entender y citar* la entidad. El schema es de los pocos puentes
   donde ganas en SEO y AEO con el mismo trabajo.
 - **Tipos de mayor valor:** `Organization` (+ `sameAs`, logo, founder),
-  `WebSite` (+ `SearchAction`), `Article`/`BlogPosting` (+ `author` con
+  `WebSite`, `Article`/`BlogPosting` (+ `author` con
+  ⚠️ **`SearchAction` está MUERTO en Google:** el cuadro de búsqueda de sitelinks que alimentaba
+  se anunció deprecado el **21-oct-2024** y se retiró el **21-nov-2024**. Y **no hay evidencia
+  pública** de que ChatGPT, Perplexity o Gemini lean `potentialAction` para operar un sitio.
+  Declararlo es higiene de grafo barata y correcta — pero **NUNCA lo vendas como la palanca que
+  mueve el eje agéntico**. El eje agéntico se gana donde hay algo que un agente pueda EJECUTAR
+  de verdad (WebMCP, `.well-known/mcp`, una API descubrible, un `FlightReservation`), no en el
+  buscador del blog. Ver `efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md`.
   `Person`), `Person` (autor con credenciales), `Product`+`Offer`+`AggregateRating`,
   `FAQPage`, `HowTo`, `BreadcrumbList`, `LocalBusiness`, `Service`.
 - **Reglas:** marca solo contenido **visible** en la página (marcar contenido

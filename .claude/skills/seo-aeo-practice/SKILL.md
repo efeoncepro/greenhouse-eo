@@ -193,7 +193,17 @@ En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es
 | **1** | **Educar** al cliente/prospecto | Casi nadie entiende qué significa *"aparecer en ChatGPT"*: lo confunde con SEO o lo cree magia. La pieza enseña la diferencia **sin una lámina de teoría**, y sirve **sin venta en curso** (educar un prospecto, o retener explicándole a un cliente vigente qué le hacemos) |
 | **2** | **Habilitar la venta** | Enlace + lámina de deck + demo en vivo + prueba que el comité **verifica solo** |
 
-**Por qué funciona, y por qué es frágil:** el schema **solo puede marcar contenido visible** — esa restricción **es** el argumento, y por eso la pantalla partida demuestra algo que un PDF no puede. Todo su valor es **no exagerar**: cifra sin fuente = opinión con dígitos; reclamar una táctica que no aplicaste es el error más caro (nos pasó con el *+41% Quotation Addition*); y **la muestra dice también lo que le FALTA** (si el cliente no tiene autor con credencial, se declara — no se inventa).
+**Por qué funciona, y por qué es frágil:** el schema **solo puede marcar contenido visible** — esa restricción **es** el argumento, y por eso la pantalla partida demuestra algo que un PDF no puede. Todo su valor es **no exagerar**.
+
+🔴 **Y ya nos pasó DOS veces.** Auditoría 2026-07-14: **de las 6 cifras que la pieza exhibía, 3 no resistían una verificación** — y venían de la propia skill `seo-aeo` (ya corregidas ahí). Las tres clases de error, que son las que hay que conocer para vender esto sin quemarse:
+
+| Error | Ejemplo real |
+|---|---|
+| **Una PREVALENCIA vendida como LIFT** | *«tabla + lista → 2,3× más citas»*. El estudio (Nectiv) dice que las páginas citadas por ChatGPT **contienen** una tabla 2,3× más seguido que las que rankean en Google (30% vs 13%): una razón **entre corpus**, no un lift por poner una tabla. Y **la lista se la agregamos nosotros** |
+| **Una fuente cuyo NOMBRE no se puede googlear** | Se publicó *«AI Platform Citation Source Index 2026, 680M de citas»*. **Ese estudio no existe con ese nombre** (el dato es de Bluefish vía Adweek). El evaluador **va a buscarlo** — y si no lo encuentra, **se cae todo lo demás** |
+| **Reclamar una táctica que no aplicaste** | El *+41% Quotation Addition* mide **citar FUENTES o EXPERTOS entre comillas**, no «poner una cita destacada propia» |
+
+✅ **El movimiento honesto vende MÁS:** *«la muestra dice también lo que le FALTA»* (si el cliente no tiene autor con credencial, **se declara — no se inventa**), y *«el `SearchAction` es higiene de grafo, pero Google mató la feature que alimentaba: el eje agéntico se gana en el motor de reservas, no en el buscador del blog»*. **Decirlo tú antes de que lo encuentre el evaluador es lo que construye la credibilidad que la pieza vino a construir.**
 
 🔴 **NUNCA** prometer el rich snippet de FAQ de Google (restringido desde 2023 a gobierno/salud). 🔴 **NUNCA** dejar que la pieza cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola**. 🔴 **Gate humano:** el operador elige el ángulo del artículo.
 

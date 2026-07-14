@@ -59,6 +59,18 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 - **En el deck va por ENLACE, no por captura** (el catálogo del composer no tiene plantilla para capturas de UI, y la pieza es **interactiva**: un PNG estático mata justo lo que demuestra). Ver la lámina `muestra` (`contentType: highlight`) del deck de SKY.
 - 🔴 **NUNCA** dejar que la muestra cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola** (invariante 12c + assert 34b).
 - 🔴 **Gate humano:** el operador elige el ángulo del artículo. El agente no lo elige.
+- 🔴 **CERO cifras sin fuente googleable.** Auditoría 2026-07-14: **de las 6 cifras que la pieza
+  exhibía, 3 no resistían una verificación** — y una tenía un **nombre de estudio que no existe**. En
+  una licitación, el evaluador **va a buscar la fuente**: si no la encuentra, **se cae todo lo demás**.
+  El schema ahora rompe el build ante cualquier cifra sin `source`+`asOf`. ⚠️ Y **una prevalencia no es
+  un lift** (ver `seo-aeo` → `ANTIPATTERNS`).
+- 🔴 **Pásale `axe` antes de mandarla.** El fallo de accesibilidad va a aparecer **en la línea que
+  prueba el cumplimiento** (el crédito de foto —que demuestra el requisito de «imagen con licencia
+  verificable»— daba 3,3:1). En una agencia que vende rigor, eso no es un bug: es el titular.
+- ⚠️ **Si invitas al comité a verificar el schema, mándalo a `validator.schema.org` — NUNCA al Rich
+  Results Test de Google.** Ese reportaría el `FAQPage` como *«no elegible para resultado
+  enriquecido»*, que es exactamente el autogol que la pieza evita (Google restringió esa cajita en
+  2023 a gobierno y salud), **con el evaluador de testigo**.
 
 **Antes de tocarla, cargar:** `docs/think/radiografia-aeo-architecture.md` (los invariantes) + `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente). Encuadre comercial: `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`.
 
