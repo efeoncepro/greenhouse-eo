@@ -75,6 +75,7 @@ stop  = release comunicado con evidencia + docs/handoff actualizados
 
 | Fecha | Agente | Release ID | Run ID | Target SHA | Scope | Tiempo agente E2E (principal) | Workflow | Manifest | Runtime verde | Bloqueo principal | Aprendizaje |
 |---|---|---|---|---|---|---:|---:|---:|---:|---|---|
+| 2026-07-14 | Codex | `baac9c394560-956e2934-0e8f-4773-9448-3f82df5f8a17` | `29314539625` | `baac9c3945604b2bd113aaa8ae294f68924866fd` | TASK-1373 visual fidelity hotfix: restaurar iconos de campos, uploader rico y CTA del Careers apply nativo + release develop→main | No medido formalmente; estimación ~1h25m incluyendo hotfix, gates, release, smoke visual y docs | 11m14s (`07:26:01Z`→`07:37:15Z`) | ~9m01s (`07:28:06Z`→`07:37:07Z`) | 10m13s (`07:26:01Z`→post-release health `07:36:14Z`) | Primer dispatch `29313599777` se lanzó antes de CI/Deep/Vercel READY y falló por Vercel `BUILDING`; watchdog V1 conserva residual `ops-worker` label drift aunque el job probó diff runtime vacío y `deploy_needed=false`. | (1) Para hotfix visual también esperar CI/Deep + Vercel READY antes del orquestador. (2) La regresión estética requería métrica DOM, no sólo screenshot: `controlIcons=8`, dropzone/CTA/icon/tel shell y `scrollOverflow=false`. (3) El watchdog aún debe modelar `ops-worker` change-gated: `838950916b27`→`baac9c394560` sin cambios en runtime paths, deploy skipped y health/Ready OK. |
 | 2026-07-14 | Codex | `a3b5ea3adb30-afed291d-c084-4192-aed9-5de9905b8a64` | `29295658046` | `a3b5ea3adb307076c0a44b1be33051005d619ffd` | TASK-1373 production cutover: `CAREERS_NATIVE_GROWTH_FORM_ENABLED` ON en Production + release develop→main + workers/control plane | ~1h20m medido (`2026-07-13T23:20:52Z` → cierre docs/handoff) | 12m16s (`00:20:40Z`→`00:32:56Z`) | ~10m11s (`00:22:39Z`→`00:32:50Z`) | 11m15s (`00:20:40Z`→post-release health `00:31:55Z`) | Primer dispatch `29293287410` corrió antes de CI/Vercel READY; `ci-deep.yml` no provisionaba Chromium y falló con Playwright browser missing; watchdog V1 marcó `ops-worker` drift aunque el job probó diff runtime vacío y `deploy_needed=false`. | (1) Para production release esperar CI + Vercel READY antes del orquestador. (2) Deep Verification necesita provisioning explícito de Playwright Chromium igual que CI. (3) Vercel congela env vars al crear build: `CAREERS_NATIVE_GROWTH_FORM_ENABLED=true` se agregó antes del build productivo. (4) El residual `ops-worker` debe tratarse por evidencia: `838950916b27`→`a3b5ea3adb30` sin cambios en runtime paths, `Ready=True`, no redeploy. (5) GVC prod requiere triple gate + `AGENT_AUTH_SECRET`; sin secreto se usó Playwright directo público como evidencia visual complementaria, no reemplazo canónico. |
 | 2026-07-09 | Codex | `433cfa2b0fd3-9964d4e9-438e-4b69-bd62-f068a05c8b97` | `28991488376` | `433cfa2b0fd3a022143ff869448b901042db530d` | TASK-354 public careers route + flags iniciales | No medido formalmente | 12m14s | 10m09s | 11m05s | Ninguno critico; workers normales | Happy path tecnico: workflow cerca de 12m, pero no sirve para evaluar eficiencia del agente porque no mide preparacion/revision/cierre. |
 | 2026-07-09 | Codex | `915be02a86ab-7c6aa11e-b9c1-4990-8086-cdfacb3a763b` | `28999468657` | `915be02a86abfd49c71365af8a647f9fdfa35207` | Release acoplado PR #151: fix de inferencia/responsabilidades careers + vacante Account Manager | No medido formalmente; **estimacion operador >=2h** incluyendo revisar, analizar, release, diagnostico, watchdog, docs y respuesta | 26m47s | 21m50s | 13m04s | `transition-released` queued/stale + persecucion innecesaria de watchdog/`ops-worker` residual | La duracion relevante para eficiencia por agente fue >=2h, no 21m50s. Separar agente E2E de control plane. Desde este punto el agente debe cronometrar E2E. |
@@ -94,6 +95,38 @@ smoke/verificacion: verifier Playwright 1440/390/reduced-motion, sin submit
 docs/handoff/final: en curso al registrar esta fila
 total agente E2E: no medido formalmente
 ```
+
+### Desglose 2026-07-14 — Codex TASK-1373 visual fidelity hotfix
+
+```text
+preparacion/revision: no medido formalmente; incluye comparar captura productiva vs contrato visual original
+PR/merge: hotfix directo en develop, push, merge no-ff a main y push main
+orquestador/control-plane: 11m14s en run final 29314539625, con gates Production aprobados
+post-release diagnosis/watchdog: watchdog 29315298479 reporto solo residual ops-worker label drift; diff runtime vacio y Ready=True
+smoke/verificacion: API contract productivo, submit sin CAPTCHA fail-closed, Playwright desktop/mobile con metricas visuales
+docs/handoff/final: registrado en Handoff, changelog y este ledger sobre develop
+total agente E2E: no medido formalmente; estimacion ~1h25m
+```
+
+Evidencia operativa:
+
+- Release final: `baac9c394560-956e2934-0e8f-4773-9448-3f82df5f8a17`,
+  orchestrator `29314539625`, target SHA
+  `baac9c3945604b2bd113aaa8ae294f68924866fd`, conclusion `success`.
+- Vercel Production deployment `dpl_AnpzdFMincYdE2rWYdfHJv7amLiF`
+  sirve `https://greenhouse.efeoncepro.com`.
+- CI `29313569777` y Deep Verification `29313569799` verdes en el SHA final.
+- Smoke productivo TASK-1373: API contract
+  `styleVariant=careers-html-fidelity`, `composition=static`, `cvFile=true`;
+  submit sin captcha responde `403 captcha_failed/missing_token`.
+- Visual productivo Playwright: desktop 1440 y mobile 390 en
+  `/tmp/task1373-prod-visual-fidelity-hotfix`; métricas desktop/mobile
+  `controlIcons=8`, `labelIcons=0`, `fileDropzone=true`, `fileIcon=true`,
+  `buttonIcon=true`, `phoneShell=true`, `duplicatedOptionalLabels=0`,
+  `scrollOverflow=false`.
+- Watchdog `29315298479` falla con `worker_revision_drift` solo para
+  `ops-worker`; orquestador job `87025848976` saltó el deploy por
+  `deploy_needed=false`, verificó health/Ready y registró deployment commit.
 
 ### Desglose 2026-07-14 — Codex TASK-1373 production cutover
 
