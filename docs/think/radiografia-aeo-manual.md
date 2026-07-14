@@ -92,7 +92,7 @@ Copia `sky-carretera-austral.json` como referencia. Contiene: el flow, el hueco 
 
 #### 🔴 Cómo se ESCRIBE (y no es lo mismo que cumplir el checklist)
 
-**Un artículo puede pasar los 45 asserts y ser ilegible.** Cargar la skill **`copywriting`** (módulos 03 hooks · 04 storytelling · 07 craft) y **`seo-aeo`** es obligatorio.
+**Un artículo puede pasar los 46 asserts y ser ilegible.** Cargar la skill **`copywriting`** (módulos 03 hooks · 04 storytelling · 07 craft) y **`seo-aeo`** es obligatorio.
 
 **Son dos capas, no una voz:**
 
@@ -140,7 +140,7 @@ pnpm build
 XRAY_SAMPLE=<cliente>-<slug> pnpm verify:aeo-xray
 ```
 
-**45 asserts.** Si el payload está incompleto, **el build falla** — no publica una muestra a medias.
+**46 asserts.** Si el payload está incompleto, **el build falla** — no publica una muestra a medias.
 
 ### 5b. 🔴 LEER el artículo (el paso que el gate NO puede hacer)
 
@@ -214,6 +214,8 @@ curl -s -L "https://think.efeoncepro.com/muestras/<cliente>-<slug>-<token>" | gr
 🔴 **NUNCA escribir el narrador sin releer el artículo completo.** Es exactamente cómo la pieza terminó **desmintiéndose a sí misma en siete puntos** con el gate en verde. Corre `pnpm read:aeo-xray` y **léelo**.
 
 🔴 **NUNCA corregir un dato del artículo sin buscarlo en TODO el payload.** La prosa vive en **tres capas** —el artículo, la capa de máquina y los átomos— y las tres las lee el evaluador. Nos pasó: el artículo se corrigió a «los **dos** transbordadores» y el «**tres**» sobrevivió en **seis** lugares (meta description, `BlogPosting`, y el título/descripción/guion/`VideoObject` del video). En la ③ quedaban **lado a lado**: la cápsula decía dos, la meta description decía tres. Cuando cambies un número, `grep` el viejo en el payload entero.
+
+🔴 **NUNCA hacer que la muestra hable de NUESTROS documentos, ni que narre su propia interfaz.** La pregunta ante cada línea: *¿esto se lo digo al cliente, o se lo estoy explicando al que construyó la herramienta?* Nos pasó dos veces seguidas: la ④ abría con *«**Nuestra oferta** dice, textual…»* (le hablaba al comité sobre nuestro PDF — la muestra queda como nota al pie de la propuesta, y huérfana si mandas el enlace sin ella), y el reemplazo seguía enfermo: *«**cada pieza de abajo** nace de un bloque…»* (eso **narra la pantalla**). ⚠️ **La línea es fina:** hablar del artefacto para ser **honesto** es correcto y obligatorio (el disclaimer, el schema que no se emite, *«especifica el entregable y no lo simula»*). **Narrar la interfaz, no.** El copy **argumenta**. Citar las **bases del cliente** sí vale — es su documento. El assert **34b** caza la autorreferencia; la acotación de escenario es **juicio**, no tiene gate.
 
 🔴 **NUNCA inventar color narrativo.** *«Google te promete dos horas»* era falso — un hombre de paja para tener un gancho. En una pieza cuya tesis es el rigor, **el color inventado la destruye más rápido que la prosa plana**. Los específicos que hacen sonar al narrador *(la calamina, los 231 km sin bomba)* **se verifican y se citan**.
 

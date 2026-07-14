@@ -86,7 +86,7 @@ efeonce-think/
 │   ├─ Article.astro                          ← el espécimen (editorial)
 │   └─ Instrument.astro                       ← la capa de máquina (navy)
 ├─ src/styles/aeo-xray.css                    ← tokens + acoplamiento + view transitions
-└─ scripts/verify-aeo-xray.mjs                ← 45 asserts (el gate)
+└─ scripts/verify-aeo-xray.mjs                ← 46 asserts (el gate)
 ```
 
 **El motor NUNCA conoce a un cliente.** Un `if (cliente === 'sky')` en un componente significa que la frontera se rompió.
@@ -183,6 +183,30 @@ Y el daño es el que importa: **con la anotación encima, nadie aprecia el artí
 ⚠️ **Un recuadro de color grita «acá hay una técnica aplicada» tan fuerte como el letrero que la nombra.** Sacar el rótulo y dejar la caja no arregla nada.
 
 🔴 **Y no cuesta NADA en AEO**: el valor de la cápsula vive en el **texto** (answer-first, 40-60 palabras, bajo su H2). **El motor lee el texto, no el CSS.** Perder la caja no cuesta una sola cita.
+
+### 12c. 🔴 La muestra se defiende sola: ni cita nuestros documentos, ni narra su propia interfaz
+
+**La pregunta que hay que hacerse ante cada línea de copy: *¿esto se lo estoy diciendo al cliente, o se lo estoy explicando al que construyó la herramienta?***
+
+Se cometieron **las dos** variantes del error, una encima de la otra (2026-07-14):
+
+**1. Autorreferencia.** La ④ abría con *«**Nuestra oferta** dice, textual: …»*. Le hablaba al comité sobre **nuestro PDF**, no sobre su negocio. Convierte la muestra en una **nota al pie de la propuesta** en vez de una pieza que se sostiene sola — y queda **huérfana** el día que se manda el enlace sin la oferta adjunta. Además rompe la reutilización: el motor es genérico, esa línea era de la licitación de SKY.
+
+> ✅ **Citar las BASES del cliente sí vale** — es **su** documento, y hablar su idioma suma (*«Requisito 5 de las bases»*).
+> ❌ **Citar la oferta propia, no.**
+
+**2. Acotaciones de escenario.** El primer reemplazo seguía enfermo: *«**Cada pieza de abajo** nace de un bloque concreto del artículo que **acaba de leer**…»*. Eso **narra la interfaz**. Es copy escrito desde la silla del que construyó la herramienta.
+
+**La línea que separa las dos cosas** (y es fina, porque la pieza *sí* tiene bloques que deben hablar de sí misma):
+
+| | |
+|---|---|
+| **Hablar del artefacto para ser HONESTO** ✅ | El disclaimer · el schema que no se emite · *«esto especifica el entregable y no lo simula»*. Esos bloques **tienen** que hablar de la muestra: es su trabajo (invariantes 1, 4 y 9) |
+| **NARRAR la interfaz al lector** ❌ | *«cada pieza de abajo»* · *«esto es lo que significa»* · *«a la derecha verás»*. **Fuera.** La interfaz se explica sola; el copy tiene que **argumentar** |
+
+Un barrido del payload dio 8 coincidencias: **7 eran honestidad legítima**, una sola estaba enferma. El copy correcto **argumenta**: *«El pasajero no busca en un solo lugar: le pregunta a un chat, mira un video, escanea un feed. Un artículo publicado alcanza uno de esos lugares. El mismo trabajo, repartido, los alcanza todos.»*
+
+El **assert 34b** caza la autorreferencia. La acotación de escenario **no tiene gate** — es juicio, y hay que hacerse la pregunta de arriba en cada línea.
 
 ### 12b. 🔴 El instrumento ENFOCA. Atenuar no es enfocar
 
@@ -383,7 +407,7 @@ Ahora el instrumento **sube como hoja inferior** al tocar, con tirador, botón d
 
 ## El gate: `pnpm verify:aeo-xray`
 
-**45 asserts.** No son cosméticos: cada uno nació de un bug real. Los que más importan:
+**46 asserts.** No son cosméticos: cada uno nació de un bug real. Los que más importan:
 
 | # | Qué impide |
 |---|---|
