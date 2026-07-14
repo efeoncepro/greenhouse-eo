@@ -74,6 +74,18 @@
 >
 > **Rollout policy:** production permanece OFF hasta sign-off explícito de release/paridad/privacidad y smoke público con Turnstile real. Rollback staging: remover/apagar flag + redeploy; fallback custom sigue en código.
 
+## Sesión 2026-07-13 — SKY primer año: primer Efeonce Wrapper cliente documentado (Codex)
+
+> **Pedido:** documentar el sitio/experiencia de SKY como el primer **Efeonce Wrapper** creado para un cliente por su primer año con Efeonce, dejando memoria en handoff, carpeta de experiencia y skills relacionadas.
+>
+> **Repo satélite actualizado:** `/Users/jreye/Documents/sky-efeonce` ahora tiene `Handoff.md`, `docs/experiencia/README.md`, `docs/experiencia/sky-primer-ano-wrapper.md`, `README.md` actualizado, `docs/handoff/claude-design-source.md` enlazando al canon vivo y `docs/video-hosting.md` con el dominio real en CORS. La lectura correcta queda fijada: no es una landing genérica, es una experiencia anual cliente-facing, manual y compartible.
+>
+> **Runtime documentado:** URL principal `https://experiencia.efeoncepro.com`; fallback `https://sky-efeonce.vercel.app`; Vercel project `sky-efeonce`; commit productivo conocido `39365cb`; DNS HostGator `experiencia.efeoncepro.com A 76.76.21.21`; video self-hosted en GCS con HLS adaptativo + fallback MP4. CORS del bucket actualizado/verificado para incluir `https://experiencia.efeoncepro.com` (metageneration 4). Fix posterior de reproducción: media apuntada a ruta versionada `campaigns/sky-anniversary-2026/video/v20260713-cors/` para esquivar caché vieja de segmentos/playlist sin CORS.
+>
+> **Canon Greenhouse sincronizado:** `docs/context/10_experiencia-cliente.md`, `project_context.md`, `changelog.md`, skills espejo `.codex/.claude/skills/efeonce-agency/SKILL.md` y `.codex/.claude/skills/creative-practice/efeonce/{ESTADO_ACTUAL,EFEONCE_OVERLAY}.md`. Regla explícita: este wrapper valida la dirección de `"Tu año con Efeonce"`, pero Greenhouse todavía no lo genera automáticamente y SKY no queda autorizado como caso público sin permiso escrito.
+>
+> **Pendientes:** decidir si abrir task formal para productizar el contrato reusable de wrappers anuales; conseguir autorización escrita de SKY antes de convertirlo en caso/testimonio; si el video/dominio cambia, actualizar el repo satélite y este canon.
+
 ## Sesión 2026-07-13 — TASK-1372 Growth Forms application upload + ATS projection — STAGING LIVE (Codex)
 
 > **Goal confirmado:** ejecutar `TASK-1372` en `develop`, sin subagentes ni worktree nuevo, como backend-data de EPIC-011. Hook ejecutado: `pnpm codex:task-hook TASK-1372 --develop`.
