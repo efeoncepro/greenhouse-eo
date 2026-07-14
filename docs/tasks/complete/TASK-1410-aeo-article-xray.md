@@ -644,7 +644,7 @@ El schema es genuinamente genérico, pero **cuatro cadenas de SKY vivían en el 
 - **Slice 2** ✅ Artículo escrito de cero + payload validado por schema Zod.
 - **Slice 3** ✅ 4 fotos de Wikimedia Commons con licencia CC verificable y crédito visible. Cero IA.
 - **Slice 4** ✅ Motor de render en `/muestras/[slug]`.
-- **Slice 5** ⏳ `pnpm build` + `type-check` limpios, `pnpm verify:aeo-xray` **15/15**, frame héroe **mirado**. **Falta el push + deploy: la URL todavía no existe.**
+- **Slice 5** ✅ `pnpm build` + `type-check` limpios, `pnpm verify:aeo-xray` **15/15**, frame héroe **mirado**. Push/deploy cerrados después en `efeonce-think` `main` (`7113c34`) con Vercel Production `Ready` (`dpl_5mPZLmAR7uZrpy5MvV8shPaBuvgC`).
 
 ### Dos desvíos del wireframe, ambos deliberados
 
@@ -664,8 +664,8 @@ También quedó anotado un **falso rojo** del propio verify: `locator.hover()` d
 
 ### Lo que falta para cerrar
 
-- [ ] `git push` de `efeonce-think` + deploy en Vercel → **la URL no existe todavía**.
-- [ ] Verificación post-deploy contra la URL de producción: `view-source` sin `application/ld+json`, `/muestras/` fuera de `sitemap-index.xml`, rótulo visible sin scrollear.
+- [x] `git push` de `efeonce-think` + deploy en Vercel → `main` `7113c34`, Vercel Production `Ready` (`dpl_5mPZLmAR7uZrpy5MvV8shPaBuvgC`).
+- [x] Verificación post-deploy contra la URL de producción: cuatro pantallas sin `application/ld+json`, `/muestras/` fuera de `sitemap-index.xml`, rótulo visible sin scrollear y `overflow=0` en 1440/390.
 - [ ] Entregar el enlace al operador + la captura `hero-desktop.png` a la lámina del deck.
 - [ ] Registrar el enlace como artefacto `client_facing` en `docs/commercial/tenders/sky-blog-2026/README.md`.
 
@@ -924,4 +924,4 @@ Después de invocar las skills de producto/diseño, se hizo una pasada de compos
 
 ### Estado
 
-Local `code complete` en `efeonce-think`. No hubo push, deploy ni commit en esta pasada.
+Runtime publicado en `efeonce-think` `main` (`7113c34`). Vercel Production quedó `Ready` (`dpl_5mPZLmAR7uZrpy5MvV8shPaBuvgC`) y `https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37/` respondió verde en smoke post-deploy: 4 pantallas sin JSON-LD, `noindex`, sitemap sin `/muestras/`, rótulo visible y sin overflow en desktop/mobile.

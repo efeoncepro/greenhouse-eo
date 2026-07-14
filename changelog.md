@@ -7,11 +7,12 @@
 - **Capturas de lámina menos frágiles.** Los frames `slide-oficio` y `slide-competencia` se posicionan desde el bloque acoplado, no desde offsets manuales; `slide-oficio` vuelve a mostrar H1 + cápsula sin recorte. Evidencia local: `pnpm build`, `pnpm verify:aeo-xray` **46/46**, `pnpm verify:aeo-xray:scenarios` **2/2**, `pnpm read:aeo-xray sky-carretera-austral`. `pnpm type-check` sigue rojo por deuda previa de Astro/Zod en `src/content.config.ts`.
 - **Docs sincronizadas.** Arquitectura, manual, doc comercial, routers (`AGENTS.md`, `CLAUDE.md`, `project_context.md`), task/wireframe e handoff dejan de fijar cifras congeladas de invariantes, cambian el color del instrumento a tokens AXIS y separan fixture técnica de segundo cliente vs. segundo payload comercial real.
 
-## 2026-07-14 — Radiografía AEO product/design iteration
+## 2026-07-14 — Radiografía AEO product/design iteration + push Think
 
 - La muestra de trabajo en `efeonce-think` recibió ajustes UI sobre sus cuatro pantallas: CTA integrado en ①, ③ móvil article-first con hoja inferior bajo demanda, riel móvil que centra el paso activo y ④ con pieza social protagonista.
 - La solución mantiene el motor payload-driven: sin condiciones por cliente, sin cambios de payload y con `class="atom"` exacto preservado para los gates. El destacado usa `data-featured`.
-- Verificación local: `pnpm build`, `pnpm verify:aeo-xray` (`46/46`) y `pnpm verify:aeo-xray:scenarios` (`2/2`). Sin push ni deploy en esta pasada.
+- Verificación local: `pnpm build`, `pnpm verify:aeo-xray` (`46/46`) y `pnpm verify:aeo-xray:scenarios` (`2/2`).
+- Push publicado a `efeonce-think` `main` (`7113c34`); Vercel Production `Ready` (`dpl_5mPZLmAR7uZrpy5MvV8shPaBuvgC`). Smoke live: cuatro pantallas sin JSON-LD, `noindex`, `/muestras/` fuera del sitemap, rótulo visible y `overflow=0` en 1440/390.
 
 ## 2026-07-14 — Radiografía AEO: la auditoría de seis lentes (3 de 6 cifras no resistían verificación)
 
