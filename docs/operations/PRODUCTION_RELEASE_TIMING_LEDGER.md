@@ -75,6 +75,7 @@ stop  = release comunicado con evidencia + docs/handoff actualizados
 
 | Fecha | Agente | Release ID | Run ID | Target SHA | Scope | Tiempo agente E2E (principal) | Workflow | Manifest | Runtime verde | Bloqueo principal | Aprendizaje |
 |---|---|---|---|---|---|---:|---:|---:|---:|---|---|
+| 2026-07-14 | Codex | `a3b5ea3adb30-afed291d-c084-4192-aed9-5de9905b8a64` | `29295658046` | `a3b5ea3adb307076c0a44b1be33051005d619ffd` | TASK-1373 production cutover: `CAREERS_NATIVE_GROWTH_FORM_ENABLED` ON en Production + release develop→main + workers/control plane | ~1h20m medido (`2026-07-13T23:20:52Z` → cierre docs/handoff) | 12m16s (`00:20:40Z`→`00:32:56Z`) | ~10m11s (`00:22:39Z`→`00:32:50Z`) | 11m15s (`00:20:40Z`→post-release health `00:31:55Z`) | Primer dispatch `29293287410` corrió antes de CI/Vercel READY; `ci-deep.yml` no provisionaba Chromium y falló con Playwright browser missing; watchdog V1 marcó `ops-worker` drift aunque el job probó diff runtime vacío y `deploy_needed=false`. | (1) Para production release esperar CI + Vercel READY antes del orquestador. (2) Deep Verification necesita provisioning explícito de Playwright Chromium igual que CI. (3) Vercel congela env vars al crear build: `CAREERS_NATIVE_GROWTH_FORM_ENABLED=true` se agregó antes del build productivo. (4) El residual `ops-worker` debe tratarse por evidencia: `838950916b27`→`a3b5ea3adb30` sin cambios en runtime paths, `Ready=True`, no redeploy. (5) GVC prod requiere triple gate + `AGENT_AUTH_SECRET`; sin secreto se usó Playwright directo público como evidencia visual complementaria, no reemplazo canónico. |
 | 2026-07-09 | Codex | `433cfa2b0fd3-9964d4e9-438e-4b69-bd62-f068a05c8b97` | `28991488376` | `433cfa2b0fd3a022143ff869448b901042db530d` | TASK-354 public careers route + flags iniciales | No medido formalmente | 12m14s | 10m09s | 11m05s | Ninguno critico; workers normales | Happy path tecnico: workflow cerca de 12m, pero no sirve para evaluar eficiencia del agente porque no mide preparacion/revision/cierre. |
 | 2026-07-09 | Codex | `915be02a86ab-7c6aa11e-b9c1-4990-8086-cdfacb3a763b` | `28999468657` | `915be02a86abfd49c71365af8a647f9fdfa35207` | Release acoplado PR #151: fix de inferencia/responsabilidades careers + vacante Account Manager | No medido formalmente; **estimacion operador >=2h** incluyendo revisar, analizar, release, diagnostico, watchdog, docs y respuesta | 26m47s | 21m50s | 13m04s | `transition-released` queued/stale + persecucion innecesaria de watchdog/`ops-worker` residual | La duracion relevante para eficiencia por agente fue >=2h, no 21m50s. Separar agente E2E de control plane. Desde este punto el agente debe cronometrar E2E. |
 | 2026-07-10 | Claude Opus 4.8 | `4e7e9093d169-a2238744-44…` | `29089153955` | `4e7e9093d169ac35193e9eb882c3ee8c8a517896` | develop→main completo (50+ commits): **TASK-1362** scan/quarantine de CV (cierra superficie de abuso VIVA: el upload público validaba con `file.type`, nunca inspeccionaba bytes) + TASK-355 Hiring Desk + TASK-1371/1374/1375 + batch develop. 2 migraciones. | **1h 16m** (10:30:27Z→11:46:20Z; cierre operativo con evidencia = push de docs) | 10m 35s (11:21:06→11:31:41) | 8m 32s (512s) | 9m 37s (11:21:06→11:30:43 health OK) | **Gate estricto de `CLAUDE.md` (35k tokens) rompió el CI del PR.** Causa real: `main` estaba **exactamente** en el tope (34.999/35.000) — cualquier línea de cualquier agente lo reventaba. No era deuda de esta task. | (1) **Fix de raíz, no parche:** en vez de exprimir mi texto hasta que entrara, moví el bloque más pesado del archivo (TASK-893 SQL Signal Reader Gate, 1.648 tok / 125 líneas de runbook inline) **verbatim** a `agent-invariants/SQL_DATE_MATH_AGENT_INVARIANTS.md` y dejé pointer. 103%→97%, ~1.400 tok de margen recuperados **para todos**. `claude-md audit --strict`: 0 huérfanas. (2) **Los dos gates `production` se aprobaron en 22s de diferencia** (11:23:13 y 11:23:35) con un loop sobre `pending_deployments` (NO sobre `run.status`). Manifest 512s vs 2.782s del release anterior, que se comió el stall de 43 min del 2do gate. **El loop de aprobación debe ser el default.** (3) **El pre-push hook (lint+tsc, ~2 min) se pagó 3 veces.** Hacer el merge canónico del gotcha #1 ANTES del primer push lo reduce a 1. (4) Gotcha #2 confirmado: preflight local dio `requires_break_glass` por 4 migraciones (diff 3-dot resucita 1 ya desplegada); post-merge = `ship`, 0 archivos. Las migraciones reales eran 2. (5) Gotcha #4 confirmado: `ops-worker` quedó en `92a35daec`; diff runtime vacío + no importa el código nuevo + `asset.quarantined` sin consumer reactivo ⇒ residual de label, NO drift. No se forzó redeploy. (6) **Coste dominante = espera de CI** (17m40s develop + 16m59s main = 34m39s, ~46% del E2E). El trabajo del agente fue ~15 min. (7) **Post-release (8 min):** configurar el observer del watchdog destapó **ISSUE-118** — el GitHub App least-privilege está provisionado desde 2026-05 (app 3665723, secreto activo, 3 env vars en Vercel) pero los 3 readers llaman `resolveGithubTokenSync`, PAT-only, que nunca mintea el installation token. Se documentó el gap + mitigación en vez de meter un PAT atado a un usuario. (8) **Colisión multi-agente:** el push de docs falló porque el pre-push corre `eslint .` sobre TODO el repo y Codex tenía un archivo a medio editar con 4 errores. El commit quedó local hasta que Codex lo arregló. Un hook repo-wide convierte el WIP ajeno en un bloqueo propio. |
@@ -93,6 +94,41 @@ smoke/verificacion: verifier Playwright 1440/390/reduced-motion, sin submit
 docs/handoff/final: en curso al registrar esta fila
 total agente E2E: no medido formalmente
 ```
+
+### Desglose 2026-07-14 — Codex TASK-1373 production cutover
+
+```text
+preparacion/revision: ~22m (release skills + playbook + branch/main/develop state + flag/env preflight)
+PR/merge: ~18m (merge main->develop sin diff runtime, push develop/main, fix CI Deep Playwright)
+orquestador/control-plane: 12m16s en run final 29295658046, con dos approvals production aprobados
+post-release diagnosis/watchdog: ~8m (watchdog run 29296256877, residual ops-worker validado con logs)
+smoke/verificacion: ~7m (HTTP/API fail-closed + Playwright desktop/mobile; GVC prod bloqueado por auth local)
+docs/handoff/final: ~13m
+total agente E2E: ~1h20m
+```
+
+Evidencia operativa:
+
+- Release final: `a3b5ea3adb30-afed291d-c084-4192-aed9-5de9905b8a64`,
+  orchestrator `29295658046`, target SHA
+  `a3b5ea3adb307076c0a44b1be33051005d619ffd`, conclusion `success`.
+- Vercel Production deployment `dpl_7Wpv3vSPoDXnTQq8Za2Xfw2ZHkt2`
+  sirve `https://greenhouse.efeoncepro.com` con
+  `CAREERS_NATIVE_GROWTH_FORM_ENABLED=true`.
+- CI `29294733436` y Deep Verification `29294733458` verdes en el SHA final.
+- Watchdog `29296256877` falla con `worker_revision_drift` solo para
+  `ops-worker`; orquestador job `86968856985` dejo evidencia de
+  `deploy_needed=false`, diff runtime vacío desde `838950916b27` hasta
+  `a3b5ea3adb30`, revision `ops-worker-00487-rjm` `Ready=True`.
+- Smoke productivo TASK-1373: pagina `/public/careers/EO-OPN-0009/apply`
+  monta `<greenhouse-form>` con form key
+  `9f7a8fc0-6fa7-4670-8e2d-efe0ce354001`, surface
+  `public-careers-nextjs`, sin `gh-application-form-helper`; API contract
+  `styleVariant=careers-html-fidelity`, `composition=static`, `cvFile=true`;
+  submit sin captcha responde `403 captcha_failed/missing_token`.
+- Visual complementario Playwright directo: desktop 1440 y mobile 390 guardados
+  en `/tmp/task1373-prod-visual-smoke`, native form/input/button presentes y
+  `scrollWidth == clientWidth` en ambos.
 
 ### Nota 2026-07-09 — Codex release acoplado PR #151
 
