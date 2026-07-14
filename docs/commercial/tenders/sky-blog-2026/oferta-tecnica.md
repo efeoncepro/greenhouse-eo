@@ -239,6 +239,12 @@ Dentro de los primeros 10 días hábiles de cada mes entregamos un informe de de
 - **Seguimiento de páginas a un paso del top 3** (las que están en posiciones 6–12 en búsquedas de alto volumen) y su progreso mes a mes.
 - **Cobertura técnica**: datos estructurados y metadatos aplicados, por artículo.
 
+**Y por encima del informe: SKY no espera al día 10.**
+
+El servicio incluye acceso a **Greenhouse**, el portal de clientes de Efeonce, donde SKY ve **la misma verdad que ve el equipo que opera la cuenta** —no una versión resumida para el cliente—: posicionamiento, palabras clave, salud técnica y citabilidad en los motores de IA, en un solo lugar y actualizado. Cada artículo con su estado, su responsable y su fecha comprometida.
+
+Eso cambia la naturaleza de la relación. SKY no tiene que **confiar** en que el trabajo se está haciendo: **lo ve**. Y al final de los dos años no queda una carpeta de informes sueltos, sino el historial completo de la operación, consultable.
+
 Las fuentes son Google Analytics 4 y Google Search Console. El informe es accionable: cada métrica termina en una decisión para la grilla siguiente, no en un dato que decora una diapositiva.
 
 ## 10. Equipo asignado y gobernanza

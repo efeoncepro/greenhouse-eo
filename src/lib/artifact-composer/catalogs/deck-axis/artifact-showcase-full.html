@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
+  <link rel="stylesheet" href="deck-signature.css">
+  <meta charset="utf-8">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0} body{overflow:hidden;font-family:var(--axis-deck-type-text)}
+    .slide{color:var(--axis-ppt-neutral-50);background:var(--axis-deck-recipe-rich-content)}
+
+    /* El texto ENMARCA; no compite. El protagonista es el artefacto — y por eso la columna de texto
+       se CENTRA contra él en vez de colgar del techo: anclada arriba deja un hueco muerto debajo y
+       la lámina se ve descosida (se vio en el frame, no en un test). */
+    .intro{position:absolute;top:50%;left:132px;width:520px;transform:translateY(-50%)}
+    .eyebrow{margin-bottom:16px;color:var(--axis-deck-teal-200);font-size:16px;font-weight:700;letter-spacing:.13em;line-height:1;text-transform:uppercase}
+    .title{font-family:var(--axis-deck-type-display);font-size:52px;font-weight:600;letter-spacing:-.05em;line-height:1.06}
+    .title em{color:var(--axis-deck-teal-200);font-style:italic}
+    .lead{margin-top:22px;color:rgba(var(--axis-ppt-neutral-50-rgb), .74);font-size:19px;line-height:1.46}
+    .note{margin-top:26px;padding-top:18px;border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .22);color:var(--axis-deck-teal-200);font-size:15px;font-weight:600;letter-spacing:.03em}
+
+    /* El artefacto flota sobre el campo: sombra profunda + un borde tenue que lo despega del navy.
+       `object-fit:contain` + alto/ancho acotados = la captura NUNCA se deforma ni se recorta. */
+    .stage{position:absolute;top:104px;left:700px;right:88px;bottom:146px;display:flex;align-items:center;justify-content:center}
+    .artifact{max-width:100%;max-height:100%;display:block;border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .18);border-radius:18px;box-shadow:0 46px 110px rgba(var(--axis-deck-navy-990-rgb), .55),0 8px 26px rgba(var(--axis-deck-navy-990-rgb), .32);object-fit:contain}
+
+    /* 🔴 El rótulo. Una captura con cifras adentro AFIRMA algo; sin rótulo, el evaluador puede leer
+       los números del demo como si fueran los suyos. Es la misma disciplina del crédito de una foto. */
+    .caption{position:absolute;left:700px;right:88px;bottom:92px;display:flex;align-items:baseline;gap:10px;color:rgba(var(--axis-ppt-neutral-50-rgb), .56);font-size:14px;line-height:1.4}
+    .caption::before{content:'';flex:0 0 auto;width:6px;height:6px;margin-top:6px;border-radius:50%;background:rgba(var(--axis-deck-teal-200-rgb), .8)}
+  </style>
+</head>
+<body>
+  <main class="slide" data-template="ArtifactShowcaseFull" data-url-bubble-backdrop>
+    <section class="intro">
+      <p class="eyebrow" data-slot="sectionLabel" data-slot-type="string">El artefacto</p>
+      <h1 class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">Esto <em>existe</em>. No es una promesa.</h1>
+      <p class="lead" data-slot="lead" data-slot-type="string" data-slot-required="true">Qué es el artefacto y por qué importa para quien lee esta propuesta.</p>
+      <p class="note" data-slot="note" data-slot-type="string">Dónde vive · anclaje verificable</p>
+    </section>
+
+    <div class="stage">
+      <img class="artifact" data-slot="artifact" data-slot-type="asset" data-slot-required="true" src="assets/product/greenhouse-seo-dashboard.png" alt="">
+    </div>
+
+    <p class="caption" data-slot="caption" data-slot-type="string" data-slot-required="true">Rótulo obligatorio: qué es exactamente lo que se está viendo.</p>
+
+    <img class="deck-url-bubble signature-ArtifactShowcaseFull" src="assets/url-lum.svg" alt="efeoncepro.com">
+  </main>
+</body>
+</html>

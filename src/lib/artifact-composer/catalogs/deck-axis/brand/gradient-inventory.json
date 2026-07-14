@@ -1,6 +1,6 @@
 {
   "$comment": "Inventario RATCHET de gradientes locales del catálogo deck-axis (TASK-1393 Slice 3c). Las 4 recipes canónicas viven como tokens (gradient-recipes.json → deck-tokens.css); estos son los gradientes de CONTENIDO/variante que quedan declarados localmente (fills de barras derivadas, variantes de grano deliberadas, glass). Sus COLORES ya salen del pack. Contrato de dos vías: un gradiente nuevo o cambiado sin actualizar este inventario ROMPE el build — crecer el molde exige declararlo (recipe o inventario con rationale), nunca colarse.",
-  "total": 96,
+  "total": 101,
   "files": {
     "agenda-full.html": [
       "4558229106b6ab20 radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .07) .55px, transparent .8p",
@@ -84,6 +84,13 @@
     "highlight-wave.html": [
       "217da9fa1b166df4 radial-gradient(130% 100% at 70% -10%, var(--axis-ppt-blue-800) 0%, var(--axis-d",
       "e64f593bbcf2b368 radial-gradient(64% 52% at 96% 100%, rgba(var(--axis-deck-teal-500-rgb), .22) 0%"
+    ],
+    "maturity-ladder-full.html": [
+      "2c4bf5d03502135a linear-gradient(145deg,rgba(var(--axis-deck-teal-500-rgb), .14),rgba(var(--axis-",
+      "5f2488e84989dfb3 linear-gradient(90deg,rgba(var(--axis-deck-teal-500-rgb), .9),var(--axis-deck-te",
+      "b6cbe04e306bf438 linear-gradient(145deg,rgba(var(--axis-ppt-neutral-50-rgb), .10),rgba(var(--axis",
+      "c6c030248644b58e linear-gradient(90deg,rgba(var(--axis-deck-violet-550-rgb), .85),var(--axis-deck",
+      "f1c51e7d03ca11ac linear-gradient(145deg,rgba(var(--axis-deck-teal-500-rgb), .28),rgba(var(--axis-"
     ],
     "metrics-split.html": [
       "1f03d54e347f73c6 linear-gradient(160deg, rgba(var(--axis-deck-teal-500-rgb), .22) 0%, rgba(var(--",

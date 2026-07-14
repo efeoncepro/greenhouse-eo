@@ -108,6 +108,13 @@
   bottom:30px;
 }
 
+/* La escalera ocupa la izquierda y la lectura la derecha: la firma se va al margen inferior
+   derecho, bajo el readout, donde no compite con ningún peldaño ni con su score. */
+.signature-MaturityLadderFull {
+  right:56px;
+  bottom:30px;
+}
+
 /* La matriz termina antes de la firma: la URL Bubble no puede leerse como una sexta fila. */
 .signature-RequirementsTableFull {
   right:0;
@@ -122,4 +129,12 @@
   left:0;
   margin-inline:auto;
   bottom:36px;
+}
+
+/* El artefacto ocupa la derecha entera: la firma se va al margen inferior IZQUIERDO, bajo el texto,
+   donde no se superpone a la captura ni se lee como parte del producto mostrado. */
+.signature-ArtifactShowcaseFull {
+  right:auto;
+  left:132px;
+  bottom:52px;
 }

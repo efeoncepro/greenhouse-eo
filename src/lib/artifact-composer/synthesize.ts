@@ -45,7 +45,10 @@ export const synthesizeSlotValue = (slot: SlotContract): unknown => {
       'timeline-phase-span',
       'timeline-milestone-position',
       'chart-bar-geometry',
-      'case-study-before-after-bar-scale'
+      'case-study-before-after-bar-scale',
+      // La escalera de madurez deriva TODO del score: el ancho de la barra, la severidad y el
+      // "usted está aquí". Un score de texto la aborta — correctamente.
+      'maturity-rung-geometry'
     ]
 
     if (typeof field.resolver === 'string' && GEOMETRY_RESOLVERS.includes(field.resolver)) return '1'

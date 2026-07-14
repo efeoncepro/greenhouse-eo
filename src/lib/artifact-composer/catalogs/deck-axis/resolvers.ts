@@ -22,6 +22,20 @@ import { solarIconPath } from './solar-icons'
 const SOLAR = (name: string) => `assets/solar/${name}-bold.svg`
 
 /**
+ * Umbrales de la escalera de madurez. Son los MISMOS que `severityFromScore` del informe de AI
+ * Visibility (`report-artifact/model.ts`): la escalera del deck y la del informe tienen que decir
+ * lo mismo del mismo número, o la propuesta se contradice con su propio anexo.
+ */
+const OPTIMAL_THRESHOLD = 70
+const ATTENTION_THRESHOLD = 45
+
+const SEVERITY_LABEL: Record<'optimo' | 'atencion' | 'critico', string> = {
+  optimo: 'Óptimo',
+  atencion: 'Atención',
+  critico: 'Crítico'
+}
+
+/**
  * `stat-goal-icon` — los 5 peldaños de la escalera Be X → su ícono.
  *
  * El mapa refleja el HTML de `StatSplit`, que ya trae un ícono por goal. Acá se hace explícito y
@@ -191,6 +205,80 @@ export const deckAxisResolvers: ResolverRegistry = {
   'timeline-phase-ordinal': {
     known: ['<derivado del índice>'],
     build: (_value, ctx) => [{ selector: '.n', value: String(ctx.index + 1).padStart(2, '0'), asText: true }]
+  },
+
+  // ── Escalera de madurez: el SCORE es la única verdad ─────────────────────────────────────────
+  //
+  // Todo lo demás de un peldaño —el ancho de su barra, su severidad, y cuál es el "usted está
+  // aquí"— se DERIVA del score. Nada de eso es autorable, y no es celo: es la misma bug class que
+  // ya nos costó caro tres veces. Si el autor pudiera rotular la severidad, una lámina podría
+  // decir "óptimo" sobre un 37. Eso no es un bug de layout: es **fabricación** — el evaluador ve
+  // una fortaleza que no existe. Y si pudiera marcar el peldaño destacado, dos podrían reclamar
+  // ser "el próximo" (exactamente lo que pasó con los dos planes marcados como "el propuesto").
+
+  'maturity-rung-geometry': {
+    known: ['<derivado del score>'],
+    build: (value, ctx) => {
+      const score = toNumber(value)
+
+      if (score === null) {
+        throw new Error(
+          'maturity-rung-geometry requiere un score numérico: no se puede dibujar un peldaño sin dato.'
+        )
+      }
+
+      if (score < 0 || score > 100) {
+        throw new Error(`maturity-rung-geometry recibió un score fuera de rango (0-100): ${score}.`)
+      }
+
+      const rungs = Array.isArray(ctx.slots.rungs) ? (ctx.slots.rungs as Record<string, unknown>[]) : []
+      const scores = rungs.map(rung => toNumber(rung.score))
+
+      if (scores.some(entry => entry === null)) {
+        throw new Error(
+          'maturity-rung-geometry: un peldaño sin score rompe la escalera entera — el "usted está aquí" se deriva de TODOS.'
+        )
+      }
+
+      // El "usted está aquí" es el PRIMER peldaño no-óptimo desde abajo. Es la única marca de la
+      // lámina, y es lo que convierte un boletín de notas en un alcance: la escalera es
+      // acumulativa, así que el trabajo empieza abajo, no en el peor score.
+      const firstBelowOptimal = (scores as number[]).findIndex(entry => entry < OPTIMAL_THRESHOLD)
+      const isNext = firstBelowOptimal === ctx.index
+
+      // La barra sale del dato. El prototipo trae anchos a mano; si el composer sólo cambiara el
+      // número, un 8 se seguiría dibujando con el ancho del ejemplo.
+      const MIN_PCT = 1.5 // un 0 tiene que verse como una raya, no como la nada
+
+      // ⚠️ `data-next` se escribe SIEMPRE, con 'true' o 'false'. Nunca "sólo cuando aplica": el
+      // prototipo trae un peldaño marcado, y un atributo que no se sobreescribe deja la marca del
+      // EJEMPLO sobre un peldaño real. La lámina saldría destacando el peldaño equivocado — y
+      // pareciendo terminada.
+      return [
+        { selector: '.fill', styleProp: 'width', styleValue: `${Math.max(MIN_PCT, score)}%` },
+        { selector: ':field', value: String(Math.round(score)), asText: true },
+        { selector: ':self', attr: 'data-next', value: isNext ? 'true' : 'false' }
+      ]
+    }
+  },
+
+  'maturity-rung-severity': {
+    known: ['<derivado del score: >=70 óptimo · >=45 atención · <45 crítico>'],
+    build: (_value, ctx) => {
+      const score = toNumber(ctx.item.score)
+
+      if (score === null) {
+        throw new Error('maturity-rung-severity requiere el score del peldaño; la severidad no es autorable.')
+      }
+
+      const severity =
+        score >= OPTIMAL_THRESHOLD ? 'optimo' : score >= ATTENTION_THRESHOLD ? 'atencion' : 'critico'
+
+      return [
+        { selector: ':field', value: SEVERITY_LABEL[severity], asText: true },
+        { selector: ':self', attr: 'data-severity', value: severity }
+      ]
+    }
   },
 
   'section-number': {

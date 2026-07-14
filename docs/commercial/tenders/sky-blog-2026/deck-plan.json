@@ -115,45 +115,85 @@
           "Medimos el blog de SKY antes de escribir esta propuesta, con las mismas herramientas con las que vamos a operarlo: nuestro AI Visibility Grader sobre los cinco motores de respuesta y Semrush.",
           "El hallazgo duro: <strong>el blog no aparece citado ni una sola vez</strong> en las 35 respuestas analizadas. La marca se entiende; el activo de esta licitación no es la fuente."
         ],
-        "outcomesEyebrow": "ESCALERA BE X",
-        "outcomesTitle": "Dónde está SKY hoy, medido",
+        "outcomesEyebrow": "LO QUE MEDIMOS",
+        "outcomesTitle": "Tres hechos, antes de proponer nada",
         "goals": [
           {
-            "kind": "visibility",
-            "title": "Ser encontrada",
-            "metric": "40/100",
-            "body": "Aparece en <strong>menos de la mitad</strong> de las respuestas de descubrimiento de la categoría.",
-            "evidenceRef": "aeo-run-sky-2026-07"
-          },
-          {
             "kind": "citability",
-            "title": "Ser legible",
-            "metric": "70/100",
-            "body": "La IA entiende quién es SKY y se apoya en fuentes creíbles. <strong>Fortaleza a defender.</strong>",
-            "evidenceRef": "aeo-run-sky-2026-07"
-          },
-          {
-            "kind": "coherence",
-            "title": "Ser correcta",
-            "metric": "37/100",
-            "body": "Cuando habla de SKY, <strong>no usa su narrativa</strong>. Se corrige con contenido propio.",
-            "evidenceRef": "aeo-run-sky-2026-07"
-          },
-          {
-            "kind": "learning",
-            "title": "Ser accionable",
-            "metric": "8/100",
-            "body": "La <strong>frontera agéntica</strong>, casi intacta. El mayor espacio en blanco.",
-            "evidenceRef": "aeo-run-sky-2026-07"
+            "title": "El blog no es la fuente",
+            "metric": "0 citas",
+            "body": "En <strong>35 respuestas</strong>, <strong>ninguna</strong> cita al blog. La IA responde con Despegar y TripAdvisor.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
           },
           {
             "kind": "growth",
-            "title": "Ser intrínseca",
-            "metric": "76/100",
-            "body": "SKY <strong>ya es opción por defecto</strong> en la categoría. Su otra fortaleza.",
-            "evidenceRef": "aeo-run-sky-2026-07"
+            "title": "LATAM domina la categoría",
+            "metric": "17 vs 9",
+            "body": "LATAM se menciona <strong>17 veces</strong> y JetSMART 9. El terreno de la categoría está en disputa.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+          },
+          {
+            "kind": "visibility",
+            "title": "El blog ya trae tráfico",
+            "metric": "~40.000",
+            "body": "Visitas orgánicas al mes, con páginas <strong>a un paso del top 3</strong>. No partimos de cero: partimos de un activo desaprovechado.",
+            "evidenceRef": "Semrush · database CL · 2026-07-11"
           }
         ]
+      }
+    },
+    {
+      "slideId": "escalera",
+      "contentType": "maturity-ladder",
+      "template": "MaturityLadderFull",
+      "slots": {
+        "sectionLabel": "DÓNDE ESTÁ SKY HOY",
+        "title": "Dos peldaños <em>firmes</em>. Tres por construir.",
+        "subject": {
+          "name": "SKY Airline",
+          "context": "5 motores de IA · julio 2026"
+        },
+        "rungs": [
+          {
+            "label": "Ser encontrada",
+            "anchor": "Be Found",
+            "score": 40,
+            "body": "Aparece en menos de la mitad de las respuestas de descubrimiento de la categoría.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+          },
+          {
+            "label": "Ser legible",
+            "anchor": "Be Readable",
+            "score": 70,
+            "body": "La IA entiende quién es SKY y se apoya en fuentes creíbles. Fortaleza a defender.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+          },
+          {
+            "label": "Ser correcta",
+            "anchor": "Be Correct",
+            "score": 37,
+            "body": "Cuando la IA habla de SKY, no usa su narrativa. Se corrige con contenido propio.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+          },
+          {
+            "label": "Ser accionable",
+            "anchor": "Be Actionable",
+            "score": 8,
+            "body": "Un agente de IA no puede operar con su sitio. La frontera agéntica, casi intacta.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+          },
+          {
+            "label": "Ser intrínseca",
+            "anchor": "Be Intrinsic",
+            "score": 76,
+            "body": "SKY ya es opción por defecto dentro de la categoría. Su otra fortaleza.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+          }
+        ],
+        "readout": {
+          "title": "Por eso el alcance",
+          "body": "La escalera es acumulativa: un peldaño no subido bloquea los de arriba. El servicio ataca los tres críticos, empezando por el primero."
+        }
       }
     },
     {
@@ -400,6 +440,72 @@
         "highlight": "Lo escribimos.",
         "statementTail": "Está publicado y puede recorrerlo.",
         "supporting": "<strong>think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37</strong> — cuatro pantallas sobre «carretera austral»: el hueco, el artículo, su capa técnica y dónde más vive."
+      }
+    },
+    {
+      "slideId": "portal",
+      "contentType": "comparison",
+      "template": "ComparisonSplit",
+      "slots": {
+        "leftTitle": "Cómo reporta una agencia de contenido",
+        "rightTitle": "Greenhouse: SKY ve la misma verdad que vemos nosotros",
+        "rows": [
+          {
+            "left": {
+              "lead": "Un informe el día 10",
+              "body": "El desempeño del mes llega en un PDF, semanas después de que ocurrió."
+            },
+            "right": {
+              "lead": "El tablero, en vivo",
+              "body": "Ranking, keywords, salud SEO y citabilidad en IA, en un solo lugar."
+            }
+          },
+          {
+            "left": {
+              "lead": "SKY ve lo que le muestran",
+              "body": "El proveedor elige qué entra al informe y qué queda fuera."
+            },
+            "right": {
+              "lead": "SKY audita lo que se hizo",
+              "body": "Cada artículo con su estado, su responsable y su fecha comprometida."
+            }
+          },
+          {
+            "left": {
+              "lead": "¿Un dato a mitad de mes?",
+              "body": "Se pide por correo y se espera la respuesta."
+            },
+            "right": {
+              "lead": "¿Un dato a mitad de mes?",
+              "body": "SKY entra y lo mira. Sin pedirle nada a nadie."
+            }
+          },
+          {
+            "left": {
+              "lead": "Al cierre: una carpeta de PDF",
+              "body": "Dos años de informes sueltos que nadie vuelve a abrir."
+            },
+            "right": {
+              "lead": "Al cierre: el historial completo",
+              "body": "Dos años de operación, acumulada y consultable."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "portal-vista",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "EL PORTAL",
+        "title": "El tablero <em>ya existe</em>. Y SKY entra cuando quiera.",
+        "lead": "Posición, keywords, salud técnica y citabilidad en los motores de IA, en un solo lugar. La misma verdad que ve el equipo que opera la cuenta — no una versión resumida para el cliente.",
+        "artifact": {
+          "src": "assets/product/greenhouse-seo-dashboard.png"
+        },
+        "caption": "Vista de ejemplo del portal. El tablero de SKY se puebla con los datos de SKY desde el mes 1.",
+        "note": "Greenhouse · el portal de clientes de Efeonce"
       }
     },
     {
