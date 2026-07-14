@@ -49,8 +49,8 @@ La Radiografía cierra esa distancia. Le da al equipo comercial:
 |---|---|---|
 | ① | **El hueco** | El resultado de búsqueda real del término: quién ocupa hoy ese espacio y por qué el cliente no está. Es la portada y es el golpe |
 | ② | **El artículo** | El artículo completo, a ancho completo, **sin anotaciones**. Acá se LEE. El cliente juzga lo que está comprando |
-| ③ | **La radiografía** | La pantalla partida. Tocas un párrafo y ves **qué produce** en la capa de máquina. Es la demostración |
-| ④ | **Dónde más vive** | El video, la pieza social y el set de imágenes que nacen del mismo artículo |
+| ③ | **La radiografía** | Tocas un párrafo y ves **qué produce** en la capa de máquina. En móvil primero se ve el artículo; la máquina aparece como hoja inferior al tocar |
+| ④ | **Dónde más vive** | El video, la pieza social y el set de imágenes que nacen del mismo artículo. La pieza social es el protagonista visual porque muestra el entregable más inmediato |
 
 Cada pantalla es **una URL propia**: el deck o el correo pueden enlazar directo a la que convenga.
 
@@ -91,7 +91,7 @@ La pieza **entera** se apoya en una sola cosa: **no exagera**. Por eso, tres reg
 
 El motor es genérico: **el cliente es un payload** (un archivo JSON), no código. Crear la muestra del siguiente cliente es escribir ese payload. Los pasos están en el [manual](../../think/radiografia-aeo-manual.md).
 
-⚠️ Mientras exista **un solo** cliente cargado, la reutilización del motor es **una hipótesis, no un hecho**. El segundo payload es lo que la comprueba.
+⚠️ Ya existe una **fixture no publicada** de segundo cliente para probar que el gate no depende de IDs de SKY. Mientras exista **un solo** cliente comercial publicado, falta comprobar la reutilización operativa completa con otro payload real.
 
 ## Lo que NO hay que hacer
 
@@ -100,4 +100,4 @@ El motor es genérico: **el cliente es un payload** (un archivo JSON), no códig
 - **Nunca** compartir el patrón de URL sin el token: es lo único que impide que un cliente adivine la URL de la muestra de otro.
 - **Nunca** dejar que la pieza hable de **nuestros** documentos ("nuestra oferta dice…") ni que le narre la interfaz al lector. La muestra **se defiende sola**.
 
-> **Detalle técnico:** los 12 invariantes, el gate de 46 asserts y las razones de cada decisión están en la [arquitectura](../../think/radiografia-aeo-architecture.md). Cómo se crea la muestra de un cliente nuevo, paso a paso, en el [manual](../../think/radiografia-aeo-manual.md). El caso vivo (SKY, licitación Wherex 2026) en [`TASK-1410`](../../tasks/complete/TASK-1410-aeo-article-xray.md).
+> **Detalle técnico:** los invariantes vigentes, el gate de 46 asserts y las razones de cada decisión están en la [arquitectura](../../think/radiografia-aeo-architecture.md). Cómo se crea la muestra de un cliente nuevo, paso a paso, en el [manual](../../think/radiografia-aeo-manual.md). El caso vivo (SKY, licitación Wherex 2026) en [`TASK-1410`](../../tasks/complete/TASK-1410-aeo-article-xray.md).

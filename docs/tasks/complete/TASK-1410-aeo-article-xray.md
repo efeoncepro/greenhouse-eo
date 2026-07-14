@@ -435,7 +435,7 @@ En **`greenhouse-eo`**:
 
 - **Probe a nivel de artículo en el AI Visibility Grader.** Hoy los probes son **site-level** (homepage + `robots.txt` + `sitemap.xml` + `llms.txt` + `.well-known/*`). No existe *"dame la URL de un artículo y evalúa su capa AEO"*. Esa capacidad convertiría esta muestra estática en una **herramienta** — y ya existe la mitad del motor (`src/lib/growth/ai-visibility/probes/html.ts` sabe extraer y aplanar JSON-LD). Encaja con `PRODUCT_ROADMAP.md:183` (extender el grader al eje SEO, EPIC-022).
 - **Versión genérica sin marca de cliente**, indexable, como activo de captación en Think. La versión con marca de cliente es `noindex` por diseño; una genérica sí puede hacer el trabajo de hub. Conecta con `PDR-001` (landing SEO complementaria a `/aeo-2/`, hoy sin demo).
-- **Segundo payload (Berel u otro)** — es la prueba real de que el motor es reutilizable. Mientras exista un solo payload, la reutilización es una hipótesis, no un hecho.
+- **Segundo payload comercial (Berel u otro)** — ya existe una fixture técnica no publicada para probar que el motor/gate no dependen de IDs de SKY; falta una muestra real de otro cliente para validar contenido, marca, imágenes, venta y operación end-to-end.
 
 ## Delta 2026-07-14 (b) — la sesión de pulido: tipografía, fotografía, voz y la frontera ②/③
 
@@ -623,11 +623,11 @@ En la pieza cuyo valor **entero** es no exagerar:
 
 El instrumento **leía a 13px** (el argumento en letra de product UI — el mismo error que la pieza ya había diagnosticado y arreglado **sólo en el artículo**) · el **bloque interrogado era indistinguible del que está en reposo** (misma declaración CSS) · **la ③ no tenía titular y el `thesis` estaba MUERTO en el payload** · **en móvil la ③ era la ② otra vez** · **el recorrido moría en la ④** → ahora cierra con *«No hace falta que nos crea. Compruébelo usted»* + tres verificaciones (⚠️ **Schema.org, NUNCA el Rich Results Test** — reportaría el FAQ como no elegible: el autogol del invariante 6 con el evaluador de testigo).
 
-### 🟢 Tier 3 — El motor: la hipótesis pasó a ser un hecho
+### 🟢 Tier 3 — El motor: la hipótesis técnica pasó a smoke verificable
 
 El schema es genuinamente genérico, pero **cuatro cadenas de SKY vivían en el CÓDIGO**: el `flow` era dato y el render un `switch` de literales (**un step renombrado servía una página en blanco, sin ruido**) · **la tipografía del cliente vivía en el CSS** (y el gate exigía literalmente `Assistant`: era **el test de regresión de SKY, no el del motor**) · `HERO = 'capsule-main'` · y **el contrato del acoplamiento no rompía el build**.
 
-✅ **Verificado con el ejercicio del segundo cliente:** un payload de clínica dental entra **sin tocar una línea de código**.
+✅ **Verificado con fixture no publicada de segundo cliente:** una clínica dental usa IDs distintos y el selector del gate resuelve sus escenarios **sin tocar código**. El segundo payload comercial real sigue como follow-up operativo.
 
 **Gate: 46/46.** Desplegado y verificado contra producción. Invariantes **13-17** en la arquitectura.
 
@@ -726,7 +726,7 @@ Feedback del operador sobre la V1 desplegada: *"falta jerarquía, falta branding
 **Un solo movimiento resolvió casi todo: DOS ZONAS DE MARCA.**
 
 - **Izquierda = la muestra del CLIENTE.** Fondo claro, su acento. Es el **espécimen**.
-- **Derecha + todo el chrome = el INSTRUMENTO de Efeonce.** Navy `#001a33` + azul `#0375db`, Geist/Poppins. Es la **máquina que lo lee**.
+- **Derecha + todo el chrome = el INSTRUMENTO de Efeonce.** Tokens AXIS (rampa del acento para navy/blue), Geist/Poppins. Es la **máquina que lo lee**.
 
 La V1 usaba el magenta de SKY para **todo** — incluidas *nuestras propias anotaciones*. El análisis de Efeonce hablaba con la voz del cliente. Estaba invertido.
 
@@ -896,9 +896,32 @@ Y cada uno declara su **línea de sangre**: de qué bloque del artículo nació.
 
 ### Documentación en Greenhouse (para que sobreviva a la sesión)
 
-- **`docs/think/radiografia-aeo-architecture.md`** — los 10 invariantes, el flow, la arquitectura de datos, los CWV, la a11y, el gate.
+- **`docs/think/radiografia-aeo-architecture.md`** — los invariantes vigentes, el flow, la arquitectura de datos, los CWV, la a11y, el gate.
 - **`docs/think/radiografia-aeo-manual.md`** — cómo se crea la muestra del siguiente cliente, qué significan las señales, qué NO hacer, problemas comunes.
 - **`docs/ui/flows/TASK-1410-aeo-article-xray-flow.md`** — el contrato de flow. La task pasa de `UI impact: interaction` a **`flow`**.
 - **`docs/think/README.md`** — índice + tabla de herramientas vivas en Think + dos principios nuevos (*un gate verde con una captura ilegible no es un cierre válido* · *una muestra con marca de cliente NUNCA emite su schema como marcado activo*).
 
 `verify:aeo-xray` **36/36**. Desplegado y verificado en producción. Commit `efeonce-think` `60b7784`.
+
+## Delta 2026-07-14 (f) — Product/design pass sobre las cuatro pantallas
+
+Después de invocar las skills de producto/diseño, se hizo una pasada de composición sobre el flow completo sin cambiar el payload ni introducir lógica por cliente.
+
+### Ajustes implementados en `efeonce-think`
+
+- **① El hueco:** el CTA `Siguiente` dejó de vivir como footer genérico en una zona baja y se integró en la columna derecha, después del punch y la objeción. La portada conserva el golpe y reduce el vacío final.
+- **③ La radiografía móvil:** se revirtió el orden machine-first. En reposo móvil se ve el artículo; el instrumento queda oculto con JS y sube como hoja inferior solo al tocar un bloque. Sin JS, sigue renderizado después del artículo como contenido estático.
+- **Riel móvil:** el paso activo se centra al cargar en pantallas compactas. Deep-links a `radiografia` o `atomizacion` ya no esconden el estado activo.
+- **④ Dónde más vive:** el átomo social se volvió protagonista: en desktop queda al centro con columna más ancha y tratamiento destacado; en mobile sube primero visualmente. Se mantiene `class="atom"` exacto para los gates y el destaque vive en `data-featured`, no en una condición de cliente.
+
+### Evidencia
+
+- `pnpm build` — PASS.
+- `pnpm verify:aeo-xray` — PASS `46/46`.
+- `pnpm verify:aeo-xray:scenarios` — PASS `2/2` (`sky-carretera-austral` + fixture dental no publicada).
+- Capturas Playwright revisadas: `/tmp/aeo-design-iteration-20260714/01-hueco-desktop-viewport.png`, `03-radiografia-mobile-viewport.png`, `03-radiografia-mobile-sheet.png`, `04-atomizacion-desktop-viewport-v2.png`, `04-atomizacion-mobile-viewport-v2.png`.
+- Métricas de captura: sin overflow en desktop/mobile; ③ móvil `instrumentDisplay=none` en reposo y `position=fixed` con `data-sheet=open` al tocar; ④ móvil `activeStepVisibleInRail=true`.
+
+### Estado
+
+Local `code complete` en `efeonce-think`. No hubo push, deploy ni commit en esta pasada.

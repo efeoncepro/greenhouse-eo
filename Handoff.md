@@ -1,3 +1,17 @@
+## Sesión 2026-07-14 (c) — Radiografía AEO: hardening Codex de reusabilidad + cierre documental
+
+> **Pedido:** aplicar los ajustes detectados en la revisión de la Radiografía SEO/AEO construida con Claude, tanto en `efeonce-think` como en la documentación de Greenhouse.
+>
+> **Runtime (`efeonce-think`):** `verify:aeo-xray` dejó de hardcodear IDs de SKY (`capsule-main`, `img-hero`, `h2-como-llegar`, `table-entradas`, `faq`, `h1`) y ahora deriva escenarios desde el payload por tipo de bloque. Se agregó `scripts/lib/aeo-xray-scenarios.mjs`, `pnpm verify:aeo-xray:scenarios` y una fixture no publicada `scripts/fixtures/aeo-xray/clinica-dental-demo.json` para probar segundo cliente sin publicar URL. `src/content.config.ts` ahora valida `atoms[].coupleId` contra `article.blocks[]`, cerrando el hueco de línea de sangre de la ④. Las capturas de lámina se posicionan desde el bloque acoplado y `slide-oficio.png` ya no corta el H1.
+>
+> **Docs (`greenhouse-eo`):** sincronizados `docs/think/radiografia-aeo-architecture.md`, manual, doc comercial, `project_context.md`, `AGENTS.md`, `CLAUDE.md`, `TASK-1410`, wireframe, changelog y este handoff. Se reemplazaron cifras congeladas por “invariantes vigentes”, el instrumento dejó de documentarse con hex viejo y quedó como tokens AXIS, y el estado correcto es: fixture técnica no publicada ✅; segundo payload comercial real todavía follow-up.
+>
+> **Evidencia:** `pnpm build` PASS; `pnpm verify:aeo-xray` **46/46**; `pnpm verify:aeo-xray:scenarios` **2/2**; `pnpm read:aeo-xray sky-carretera-austral` revisado sin contradicción obvia de transbordadores; `node --check` en scripts nuevos PASS. `pnpm type-check` sigue rojo por deuda previa Astro/Zod en `src/content.config.ts` (`z.RefinementCtx`, `ImageFn`, `.refine`), no introducida por este ajuste.
+>
+> **Estado:** code/docs complete local. No se desplegó ni se pusheó.
+>
+> **Pendiente:** segundo payload comercial real (Berel u otro) para validar contenido/operación end-to-end; rotación Shutterstock sigue pendiente humano como en sesiones previas.
+
 ## Sesión 2026-07-14 (b) — Radiografía AEO: capacidad, no anexo · el instrumento ahora ENFOCA (Claude)
 
 > **Pedido:** dejar lista la Radiografía para la licitación de SKY (**cierra 15/07**) y documentarla como lo que es: **herramienta de educación de clientes/prospectos + habilitación de ventas**.
@@ -11,7 +25,7 @@
 > **Pendientes / riesgos:**
 > - 🔴 **Shutterstock: el token filtrado SIGUE ACTIVO** (verificado: `GET /v2/user` → 200; expuestos 94 licencias de imagen + 500 `integrated_media`). **Republicar en Secret Manager NO rota** — hay que regenerar la app **en el portal de Shutterstock** (requiere login humano). **Diferido por decisión del operador.** Bloquea el flip del flag en producción de `TASK-1411`; runbook completo ahí.
 > - ⚠️ **Follow-up del composer:** falta una plantilla de *artifact showcase* (captura a sangre + copy). La Radiografía no será el último artefacto que queramos mostrar en un deck. Declarado en `BASELINE_DELTAS.md`.
-> - ⚠️ **Un solo payload:** mientras exista un único cliente cargado, la reutilización del motor es **hipótesis, no hecho**.
+> - ⚠️ **Un solo payload comercial:** ya existe una fixture técnica no publicada para probar motor/gate con IDs distintos, pero falta una muestra completa de otro cliente para validar contenido, marca, imágenes y operación comercial.
 
 ## Sesión 2026-07-14 — Reconciliación de `develop` divergido (Codex)
 
@@ -37602,3 +37616,9 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 - El operador autorizó publicar Think desde `main`. Se subió el commit `3a52256160a9aa808e45a1dc15e44fcfc2794356` (`feat(think): add surround discovery landing`) sin incluir el WIP ajeno del checkout. Vercel creó `dpl_Cw5AExrqsyFxViPtUFHUSGrVEqPd`, estado `Ready`; `think.efeoncepro.com` ya resuelve a ese deployment y la ruta pública es `https://think.efeoncepro.com/seo-surround-discovery`.
 - Evidencia productiva sin submit: `production-main` ejecutó el verifier en 1440, 390 y `prefers-reduced-motion`; HTTP 200, renderer Growth Forms presente, `scrollWidth===clientWidth` y cero errores de consola. No se enviaron PII, token ni formulario simulado.
 - Pendiente de cierre operativo: una persona autorizada debe enviar el formulario real para ejercitar Turnstile → `gh_form_submission_accepted` → descarga gated → correo de respaldo → `/g/collect` `generate_lead`. No afirmar entrega de correo, HubSpot ni GA4 hasta tener esa evidencia.
+
+## Sesión 2026-07-14 — Radiografía AEO: product/design iteration local
+
+- En `efeonce-think` se aplicó la pasada de producto/diseño sobre las cuatro pantallas de la Radiografía AEO: ① integra el CTA en la columna derecha; ③ móvil vuelve a ser article-first y abre el instrumento sólo como hoja inferior al tocar; el riel móvil centra el paso activo; ④ destaca la pieza social como protagonista (centro/ancho mayor en desktop, primero visualmente en mobile) sin hardcodear cliente ni tocar payload.
+- Evidencia local: `pnpm build` PASS, `pnpm verify:aeo-xray` PASS `46/46`, `pnpm verify:aeo-xray:scenarios` PASS `2/2`. Capturas revisadas en `/tmp/aeo-design-iteration-20260714/`, con ③ móvil `instrumentDisplay=none` en reposo y `position=fixed`/`data-sheet=open` al tocar; ④ móvil `activeStepVisibleInRail=true`; sin overflow desktop/mobile.
+- Docs sincronizados: wireframe TASK-1410, arquitectura/manual Think, doc funcional comercial, task, changelog y handoff. No hubo push, commit ni deploy en esta pasada; runtime queda `code complete` local.

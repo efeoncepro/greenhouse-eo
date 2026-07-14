@@ -207,7 +207,7 @@ curl -s -L "https://think.efeoncepro.com/muestras/<cliente>-<slug>-<token>" | gr
 | **Nivel 3** (nodos callados) | Prueba de **completitud**, no argumento (`og:title`, canónica) |
 | **Bloque amarillo** ⚠️ | **Honestidad**: algo que la muestra NO puede fingir, y lo dice |
 
-**En móvil**: tocas un bloque y el instrumento **sube como hoja inferior** con lo que ese bloque produce.
+**En móvil**: la ③ abre con el artículo. Tocas un bloque y el instrumento **sube como hoja inferior** con lo que ese bloque produce; si no tocas nada, la máquina no compite con la lectura.
 
 ---
 
@@ -263,12 +263,15 @@ curl -s -L "https://think.efeoncepro.com/muestras/<cliente>-<slug>-<token>" | gr
 | **Una ruta nueva da 404 recién desplegada** | Carrera con el CDN. Espera un minuto y reverifica — **la ruta nueva se cachea como 404 antes de existir** |
 | **El verify pasa pero la captura se ve mal** | **El verify no mira.** Abre el PNG |
 | **La página pesa mucho en móvil** | Las imágenes están en `public/` (salta el pipeline) o la fuente está mal recortada |
+| **La ③ móvil abre mostrando primero la máquina** | Regresión de arquitectura de información. En reposo debe verse el artículo; la capa de máquina sólo sube como hoja al tocar un bloque |
+| **En la ④ móvil no se ve el paso activo del riel** | El riel horizontal debe centrar `aria-current="step"` al cargar. Un deep-link no puede esconder la pantalla actual |
+| **La ④ se lee como tres tarjetas iguales** | El átomo social debe actuar como protagonista: desktop al centro y más ancho; mobile primero visualmente. No hardcodear el cliente para lograrlo |
 
 ---
 
 ## Referencias
 
-- [Arquitectura](radiografia-aeo-architecture.md) — los 10 invariantes, el flow, el gate
+- [Arquitectura](radiografia-aeo-architecture.md) — los invariantes vigentes, el flow, el gate
 - [`TASK-1410`](../tasks/complete/TASK-1410-aeo-article-xray.md) — la historia completa, con los seis deltas de diseño y los bugs que cazó el gate
 - [Investigación Semrush del blog de SKY](../commercial/research/sky-blog-aeo-gap-2026-07.md) — ejemplo de cómo se elige el artículo
 - Skills a cargar al tocar esto: **`seo-aeo`** (el oficio · el schema tiene que ser defendible ante un comité que lo puede verificar), **`astro`** + su `efeonce-overlay.md` (el repo), `copywriting`, `modern-ui`, `typography-design`, `a11y-architect`

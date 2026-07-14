@@ -36,7 +36,7 @@
 
 **Momento héroe (restricción de diseño, no adorno).** La pieza se va a **capturar para una lámina 16:9**, y una pantalla partida densa reducida a ese tamaño se vuelve papilla ilegible. Por eso el estado inicial **no** es "todo apagado": al cargar, **un acoplamiento viene preseleccionado** (el bloque FAQ del artículo ↔ su nodo `FAQPage` en el panel), con ambos lados resaltados. Ese es el frame que se captura. Si el estado inicial no lee a tamaño de lámina, el diseño falló, aunque la página se vea bien en pantalla completa.
 
-**Mobile (≤768px).** Los paneles se apilan: artículo primero, capa de máquina después, evidencia al final. El acoplamiento deja de ser *hover* y pasa a ser *tap*: tocar un elemento del artículo salta (scroll suave) a su dato, con el dato resaltado y un botón "volver al artículo". La correspondencia se preserva; el gesto cambia.
+**Mobile (≤768px).** La ③ abre con el artículo primero. Con JavaScript, la capa de máquina **no compite en reposo**: espera cerrada y sube como hoja inferior al tocar un bloque del artículo. Sin JavaScript, el instrumento queda después del artículo como contenido estático. La correspondencia se preserva; el gesto cambia.
 
 ## Copy Ledger
 
@@ -151,8 +151,19 @@ El equivalente real ya existe en Think y hay que seguirlo: `scripts/verify-brand
 
 ## Delta 2026-07-13 — La implementación real difiere de este wireframe en tres puntos
 
-1. **Dos zonas de marca** (no estaba en el wireframe). Izquierda = espécimen del cliente (claro, su acento); derecha + chrome = instrumento de Efeonce (navy `#001a33` + azul `#0375db`). El wireframe pintaba los dos paneles iguales — y por eso el operador no sabía dónde mirar.
+1. **Dos zonas de marca** (no estaba en el wireframe). Izquierda = espécimen del cliente (claro, su acento); derecha + chrome = instrumento de Efeonce (tokens AXIS + Geist/Poppins). El wireframe pintaba los dos paneles iguales — y por eso el operador no sabía dónde mirar.
 2. **Cero React.** El wireframe declaraba una island (`XrayCoupling`, `client:idle`). Chocaba con la regla dura de Astro (*"NEVER over-hydrate"*): el contenido es estático. Es un `<script>` de ~40 líneas que conmuta un atributo; el CSS hace el resaltado.
 3. **Tres niveles de nodo + el stat como héroe.** No estaban. Ver `TASK-1410` → `## Delta 2026-07-13 (4)`.
 
 El resto del wireframe (regiones, momento héroe, contrato de accesibilidad, plan de verificación) se implementó como está escrito.
+
+## Delta 2026-07-14 — Product/design iteration de las cuatro pantallas
+
+La revisión de producto completa mantuvo el flow de cuatro pantallas y ajustó jerarquía/ergonomía:
+
+1. **① El hueco:** el CTA "Siguiente" se integró en la columna derecha, después del punch y la objeción, usando el copy existente del flow. Ya no flota como bloque genérico al final de una zona vacía.
+2. **③ La radiografía móvil:** vuelve a ser *article-first*. El instrumento no aparece primero ni ocupa el arranque de la pantalla; se abre como hoja inferior solo cuando el evaluador toca un bloque. Esto protege el trabajo educativo: primero se ve el contenido que se interroga.
+3. **④ Dónde más vive:** el átomo social es protagonista. Desktop lo mantiene al centro con columna más ancha; mobile lo sube primero visualmente sin cambiar el orden del payload ni la clase contractual `class="atom"`.
+4. **Riel móvil:** el paso activo se centra al cargar en pantallas compactas, para que deep-links a la ④ no escondan `Dónde más vive`.
+
+Evidencia local `efeonce-think`: `pnpm build`, `pnpm verify:aeo-xray` (`46/46`), `pnpm verify:aeo-xray:scenarios` (`2/2`), capturas revisadas en `/tmp/aeo-design-iteration-20260714/`.

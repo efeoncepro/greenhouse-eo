@@ -54,9 +54,17 @@ Cada pantalla hace **un solo trabajo**, y cada una es **una lámina** para el de
 ### La navegación
 
 - **Riel pegajoso** con los cuatro pasos. Su trabajo no es navegar: es **avisar que el recorrido tiene más pantallas**.
+- En móvil, el riel centra el paso activo al cargar. Un deep-link a la ④ debe mostrar `Dónde más vive`, no dejar el estado activo fuera de la primera mirada.
 - **"Siguiente" grande** al pie, con la frase que engancha a la siguiente.
+- En la ①, ese CTA se integra en la columna derecha del contenido: aparece después del punch y la objeción. La portada no debe terminar en un hueco blanco con un CTA flotante.
 - **Cada paso es una URL propia** → el deck puede enlazar directo a la que quiera.
 - **View Transitions cross-document, CSS puro, cero JS** (`@view-transition { navigation: auto }`). La que cuenta la historia es la **② → ③**: el artículo que acabas de leer **se encoge y se convierte en el espécimen** bajo el instrumento. El chrome y el riel **no** se animan: son el marco estable del recorrido.
+
+### Contrato móvil y jerarquía de la ④
+
+- **③ en móvil abre con el artículo.** Con JavaScript, el instrumento queda cerrado en reposo y sube como hoja inferior al tocar un bloque. Sin JavaScript, queda después del artículo como contenido estático. La pantalla educa por interrogación: primero se ve el contenido; luego la máquina responde.
+- **④ tiene un protagonista visual.** La pieza social es el átomo demostrable más concreto; en desktop vive al centro con columna más ancha y en móvil sube primero visualmente. El DOM/payload conserva el orden original y cada tarjeta mantiene `class="atom"` para los gates.
+- La reordenación visual nunca puede depender del nombre del cliente. Se resuelve por propiedad del payload (`post`) / atributo semántico, no por `SKY`, slug ni `coupleId`.
 
 ---
 
@@ -67,7 +75,7 @@ La pieza es un **instrumento**, y la separación de marca **es** el diseño.
 | Zona | Marca | Rol |
 |---|---|---|
 | El artículo (izquierda / pantalla ②) | **Del CLIENTE** — fondo claro, su acento | Es el **espécimen** |
-| Chrome + instrumento + átomos | **EFEONCE** — navy `#001a33` + azul `#0375db`, Geist/Poppins | Es la **máquina que lo lee** |
+| Chrome + instrumento + átomos | **EFEONCE** — tokens AXIS (rampa del acento para navy/blue), Geist/Poppins | Es la **máquina que lo lee** |
 
 Hace tres cosas de una: pone la marca donde corresponde (**el análisis es nuestro: no puede hablar en el color del cliente**), vuelve los dos lados **inconfundibles** (por eso el ojo sabe dónde mirar), y **refuerza el disclaimer sin decir una palabra** — se *ve* que el artefacto del cliente está contenido dentro de nuestro instrumento.
 
@@ -239,16 +247,16 @@ Además de *qué* se ve (invariante 12b), importa **qué se lee primero**. Los n
 
 **Y el argumento no puede leerse en letra de product UI.** El instrumento entero corría a 13px — la misma densidad que la pieza YA había diagnosticado como el error del artículo, **arreglado allá y dejado entero acá**. La ③ se proyecta como lámina: 13px escalados son ~9px.
 
-### 17. 🔴 El motor era reutilizable en el papel: cuatro cadenas de SKY vivían en el CÓDIGO
+### 17. 🔴 El motor era reutilizable en el papel: cadenas de cliente vivían en el CÓDIGO
 
-El schema Zod es **genuinamente genérico** (una clínica dental entra sin tocar el modelo de datos). Pero había **cuatro acoplamientos duros escritos en código**, justo en la frontera que la tesis declara sagrada:
+El schema Zod es **genuinamente genérico** (una clínica dental entra sin tocar el modelo de datos). Pero había acoplamientos duros escritos en código, justo en la frontera que la tesis declara sagrada:
 
 1. **El `flow` era dato y el render un `switch` de literales** → un step renombrado generaba la ruta, **pasaba el build** y servía una **página en blanco**. Sin ruido. Ahora es un `enum`.
 2. **La tipografía del cliente vivía en el CSS** — y el propio comentario lo confesaba (*«cuando la muestra sea de otro, cambia acá»*). El cliente #2 dibujaría **su** artículo en la fuente de SKY… **y el gate lo bendecía**: el assert exigía literalmente `Assistant`, o sea era **el test de regresión de SKY, no el del motor**.
-3. **`HERO = 'capsule-main'`** — el motor conocía un `coupleId` del cliente. Un payload que llamara distinto a su cápsula **perdía el argumento zero-JS en silencio**.
-4. **El contrato del acoplamiento no rompía el BUILD** (sólo el gate de Playwright, que corre después). La promesa *«un payload incompleto rompe el build»* era **falsa para el invariante más load-bearing de la pieza**.
+3. **El gate visual conocía `coupleId` de SKY** (`capsule-main`, `img-hero`, `h2-como-llegar`, `table-entradas`, `faq`). Un payload que nombrara distinto sus bloques podía pasar el modelo de datos y fallar como falso rojo — o peor, dejar sin probar el rol correcto. Ahora los escenarios del gate se derivan del payload por tipo de bloque.
+4. **El contrato del acoplamiento no rompía el BUILD** (sólo el gate de Playwright, que corre después). La promesa *«un payload incompleto rompe el build»* era **falsa para el invariante más load-bearing de la pieza**; ahora incluye también la línea de sangre de los átomos (`atoms[].coupleId`).
 
-✅ **Verificado con el ejercicio del segundo cliente:** un payload de clínica dental —otra tipografía, otro acento— entra **sin tocar una línea de código** y genera sus cuatro rutas. **La reutilización dejó de ser una hipótesis.**
+✅ **Verificado con fixture no publicada de segundo cliente:** una clínica dental usa IDs distintos y el selector del gate resuelve sus escenarios sin tocar código ni depender de SKY. **El siguiente payload comercial real sigue siendo el proof operativo de contenido, marca, imágenes y distribución.**
 
 ### 12c. 🔴 La muestra se defiende sola: ni cita nuestros documentos, ni narra su propia interfaz
 
@@ -497,7 +505,7 @@ Ver el **[manual](radiografia-aeo-manual.md)**. Resumen: `openssl rand -hex 6` +
 - **Probe a nivel de artículo en el AI Visibility Grader.** Hoy los probes son **site-level**. No existe *"dame la URL de un artículo y evalúa su capa AEO"*. Esa capacidad convertiría esta muestra estática en una **herramienta** — y ya existe la mitad del motor (`src/lib/growth/ai-visibility/probes/html.ts` sabe extraer y aplanar JSON-LD).
 - **Versión genérica sin marca de cliente**, indexable, como activo de captación en Think.
 - **Pantalla ⑤ "Cómo se mide"** — los 8 indicadores que promete la oferta. Cierra el ciclo: propuesta → pieza → capa → distribución → **prueba**.
-- **Un segundo payload.** Mientras exista un solo cliente, la reutilización del motor es **una hipótesis, no un hecho**.
+- **Un segundo payload comercial real.** Ya existe una fixture no publicada para probar el motor/gate sin IDs de SKY, pero falta una muestra completa de otro cliente para validar contenido, marca, imágenes, venta y operación end-to-end.
 
 ## Cross-links
 
