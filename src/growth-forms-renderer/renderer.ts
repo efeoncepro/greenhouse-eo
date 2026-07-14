@@ -11,6 +11,7 @@
  * element (`element.ts`) lo instancia y le pasa el host + el contrato ya cargado.
  */
 import type {
+  PublicSubmitOutcome,
   RenderContract,
   RendererFieldDefinition,
   RendererSuccessBehavior,
@@ -293,14 +294,18 @@ export class FormRenderer {
       if (consentNode) form.appendChild(consentNode)
     }
 
-    // Honeypot anti-bot (oculto, no requerido, autocomplete off).
+    // Honeypot anti-bot (oculto, no requerido). Nombre impredecible para evitar autofill legítimo.
     const honey = el(this.doc, 'div', { class: 'ghf-honeypot', 'aria-hidden': 'true' })
 
     const honeyInput = el(this.doc, 'input', {
       type: 'text',
-      name: 'company_website',
+      name: `${this.instanceId}_url_optional`,
       tabindex: '-1',
-      autocomplete: 'off'
+      autocomplete: 'new-password',
+      readonly: 'readonly',
+      'data-lpignore': 'true',
+      'data-1p-ignore': 'true',
+      'data-bwignore': 'true'
     })
 
     honeyInput.dataset.ghfHoneypot = 'true'
@@ -1709,7 +1714,7 @@ export class FormRenderer {
     const remaining = this.remainingBlockers()
 
     if (remaining === 0) {
-      node.textContent = this.copy.readyToSend
+      node.textContent = this.readyToSendLabel()
       node.dataset.ready = 'true'
       // Sin bloqueos: limpia el summary assertive de un intento de envío previo.
       this.setSummary('')
@@ -2472,7 +2477,7 @@ export class FormRenderer {
       this.submitting = false
       this.telemetry.emit('gh_form_submission_rejected', { reason_class: 'captcha_failed' })
       this.renderForm()
-      this.setSummary(this.copy.submitError)
+      this.setSummary(this.submitErrorMessage('captcha_failed'))
       this.focusPrimary()
 
       return
@@ -2523,8 +2528,18 @@ export class FormRenderer {
 
     this.telemetry.emit('gh_form_submission_rejected', { reason_class: result.outcome })
     this.renderForm()
-    this.setSummary(this.copy.submitError)
+    this.setSummary(this.submitErrorMessage(result.outcome))
     this.focusPrimary()
+  }
+
+  private readyToSendLabel(): string {
+    return this.copy.readyToSendByKind[this.contract.form.formKind] ?? this.copy.readyToSend
+  }
+
+  private submitErrorMessage(outcome?: PublicSubmitOutcome): string {
+    if (outcome && this.copy.submitErrorByOutcome[outcome]) return this.copy.submitErrorByOutcome[outcome]
+
+    return this.copy.submitError
   }
 
   private async resolveCaptchaToken(): Promise<string | undefined> {

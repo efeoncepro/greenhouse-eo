@@ -108,6 +108,24 @@ describe('growth-forms-renderer · submitPublicForm', () => {
     expect(body.fields.email).toBe('ana@empresa.com')
   })
 
+  it('maps the public route message field into the sanitized reason', async () => {
+    const fetchImpl = vi.fn(async () =>
+      jsonResponse({ outcome: 'consent_required', message: 'consent requerido' }, 422),
+    ) as unknown as typeof fetch
+
+    const result = await submitPublicForm(
+      api,
+      {
+        fields: { email: 'ana@empresa.com' },
+        consent: false,
+        consentCheckboxes: [],
+      },
+      fetchImpl,
+    )
+
+    expect(result).toMatchObject({ outcome: 'consent_required', reason: 'consent requerido' })
+  })
+
   it('uses multipart only when files are present and keeps files out of the JSON payload', async () => {
     const cv = new File(['%PDF-1.7'], 'ana-cv.pdf', { type: 'application/pdf' })
 
