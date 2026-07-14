@@ -391,6 +391,17 @@
       }
     },
     {
+      "slideId": "muestra",
+      "contentType": "highlight",
+      "slots": {
+        "eyebrow": "LA MUESTRA DE TRABAJO",
+        "statementLead": "No le describimos el artículo que escribiríamos.",
+        "highlight": "Lo escribimos.",
+        "statementTail": "Está publicado y puede recorrerlo.",
+        "supporting": "<strong>think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37</strong> — cuatro pantallas sobre «carretera austral»: el hueco, el artículo, su capa técnica y dónde más vive."
+      }
+    },
+    {
       "slideId": "equipo",
       "contentType": "team",
       "template": "TeamSplit",

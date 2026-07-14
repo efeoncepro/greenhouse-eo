@@ -480,6 +480,79 @@ Y **4 de las 6 cápsulas eran huérfanas** — acoplables, pero sin contraparte 
 **Gate: 42/42.** Vive en `https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37`.
 
 
+## Delta 2026-07-14 (c) — recorrer el acoplamiento a mano: la coherencia tampoco es propiedad del ARTÍCULO
+
+El gate estaba en 42/42 y el acoplamiento en cero huérfanos y cero fantasmas. Pero nadie había
+recorrido **qué se ilumina**: los asserts 40-41 prueban que cada bloque tiene contraparte, **no que
+la contraparte sea la correcta**. Recorrerlo a mano destapó seis bugs más — cinco de ellos en las
+pantallas ① y ④, que nunca habían recibido la pasada de voz.
+
+### 1. 🔴 El «tres transbordadores» sobrevivía en SEIS lugares — y la lección anterior era incompleta
+
+El Delta (b) cerró la contradicción **dentro del artículo** («TRES transbordadores» vs «los DOS del
+norte»). La corrección **se detuvo ahí**. Siguieron diciendo «los tres», con el gate en verde:
+la **meta description**, el **`BlogPosting.description`**, y el **título / descripción / guion /
+`VideoObject`** del átomo de video.
+
+Y aterrizaba en el peor lugar posible: en la ③, al pasar el cursor por la cápsula principal se
+encendía la meta description **a diez centímetros**. La cápsula decía dos. La máquina decía tres.
+**En la pantalla partida cuya tesis entera es que la capa de máquina corresponde a lo que está en la
+página.**
+
+**La raíz:** `read:aeo-xray` **solo leía el artículo**. La herramienta que existe para cazar
+contradicciones no podía ver dos de las tres capas donde vive la prosa — por eso el bug sobrevivió a
+la pasada de coherencia anterior. Ahora imprime también la **capa de máquina** y los **átomos**, y
+pregunta si las tres cuentan la misma historia.
+
+> **La capa de máquina y los átomos NO son metadata: son PROSA que el evaluador LEE.**
+
+### 2. 🔴 El hero encendía dos nodos que se contradecían entre sí
+
+`og:image` apuntaba a `/muestras/sky-carretera-austral/carretera-austral-ruta7.jpg` — el hero
+**viejo** (pre-Shutterstock) y en **NUESTRA** ruta. El `ImageObject`, acoplado al **mismo bloque**,
+apuntaba correctamente a `capillas-de-marmol…` en el CDN de SKY. Los dos se encendían juntos.
+
+### 3. 🔴 La ④ afirmaba tres cifras con CERO citas
+
+La ① cita 3 veces y la ③ cinco. La ④ —la pantalla que **cierra** el argumento— afirmaba `#1`, `3×` y
+`4` sin una sola fuente, en la pieza cuya tesis es que *una cifra sin fuente es una opinión con
+números*. `source` + `asOf` ahora son **obligatorios en el schema del átomo**; el **assert 42b**
+verifica que además se rendericen.
+
+Y el `#1` de YouTube estaba **sobre-declarado** (el error más caro de esta pieza, otra vez): el dato
+real es **16% de las respuestas citan YouTube vs 10% Reddit** (AI Platform Citation Source Index
+2026 — 680M citas, 6 estudios). El número honesto es **más fuerte** que el superlativo.
+
+### 4. El FAQ: la capa de máquina declaraba un encabezado que la página no tenía
+
+El árbol lo declara como H2 y era la **única** sección que renderizaba como `<p>`, sin ancla y fuera
+del índice. Ahora es sección real (mismo `p-h2` + ancla + entrada en el índice).
+
+### 5. La cápsula de Balmaceda no se declaraba como cápsula
+
+Cinco de las seis cápsulas encendían «Cápsula de respuesta». La sexta —la que **carga el ángulo
+propio de SKY**, la que un motor tiene más probabilidad de extraer— solo encendía «Datos con unidad y
+fuente».
+
+### 6. La marca de SKY firmaba nuestro disclaimer
+
+`.pc-brand` es `absolute` y `.post-card` no tenía `position: relative`: el wordmark se colgaba del
+`.atom` y aterrizaba **sobre nuestra nota de honestidad**.
+
+### Y en el deck: la muestra entra por ENLACE, no por captura
+
+El catálogo del Artifact Composer **no tiene plantilla capaz de mostrar una captura de UI** (el único
+slot de imagen, `leftVisual` en `StatSplit`, está dimensionado para las ilustraciones clay3d). Y de
+fondo: la pieza es **interactiva** — un PNG estático mata justo el acoplamiento que viene a demostrar.
+Se agregó la lámina **`12-muestra`** (`contentType: highlight`) después de `11-seo-aeo`: la 11 declara
+la capacidad AEO, la 12 la prueba con la URL viva. Deck: **16 láminas**, visual-gate en **CERO
+píxeles** (delta declarado en `BASELINE_DELTAS.md`).
+
+**Follow-up abierto:** falta una plantilla de *artifact showcase* en el composer. No se construyó por
+estar a un día del cierre.
+
+**Gate: 43/43.** Desplegado y verificado contra producción.
+
 ## Open Questions
 
 - **El ángulo del artículo está sin resolver por diseño** y lo resuelve el gate humano del Slice 1. El agente **no debe** elegirlo.

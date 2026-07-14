@@ -86,7 +86,7 @@ efeonce-think/
 │   ├─ Article.astro                          ← el espécimen (editorial)
 │   └─ Instrument.astro                       ← la capa de máquina (navy)
 ├─ src/styles/aeo-xray.css                    ← tokens + acoplamiento + view transitions
-└─ scripts/verify-aeo-xray.mjs                ← 36 asserts (el gate)
+└─ scripts/verify-aeo-xray.mjs                ← 43 asserts (el gate)
 ```
 
 **El motor NUNCA conoce a un cliente.** Un `if (cliente === 'sky')` en un componente significa que la frontera se rompió.
@@ -262,13 +262,32 @@ Lo que pasó, y va a volver a pasar si no se hace el paso:
 
 **La raíz:** se escribió la capa del narrador **sin releer el artículo completo**, y se inventó una tesis que sonaba bien sin verificar que la pieza la sostuviera. **En una muestra cuya tesis entera es el rigor.**
 
-🔴 **`pnpm read:aeo-xray` es OBLIGATORIO antes de tocar el texto de una muestra.** Imprime cada párrafo del narrador **pegado a su cápsula** y cierra con las tres preguntas:
+🔴 **`pnpm read:aeo-xray` es OBLIGATORIO antes de tocar el texto de una muestra.** Imprime cada párrafo del narrador **pegado a su cápsula** y cierra con las cuatro preguntas:
 
 1. ¿Algún párrafo **afirma** algo que otro bloque desmiente? *(la peor)*
 2. ¿Algún párrafo **repite** su cápsula en vez de aportar? *(sobra)*
 3. ¿Algún párrafo discute con un adversario **inventado**?
+4. ¿La **capa de máquina** y los **átomos** cuentan la misma historia que el artículo?
 
 **No verifica nada. Hace que la contradicción salte a la vista en 30 segundos.** Un verify verde sobre un artículo incoherente **es peor que uno rojo**: te deja tranquilo.
+
+### 🔴 Y la coherencia tampoco es una propiedad del ARTÍCULO: la prosa vive en TRES capas
+
+**La lección de la primera pasada fue incompleta, y el bug volvió por el hueco que dejó.**
+
+Se arregló el artículo —cápsula, tabla, narrador— para que dijera «los **dos** transbordadores del tramo norte». La corrección **se detuvo ahí**. Siguieron diciendo «los **tres**», durante días y con el gate en verde:
+
+- la **meta description** (capa de máquina),
+- el **`BlogPosting.description`** (capa de máquina),
+- el **título, la descripción, el guion y el `VideoObject`** del átomo de video (④).
+
+Y el sitio donde eso aterriza es el peor posible: en la ③, al pasar el cursor por la cápsula principal se encendía la meta description **a diez centímetros de distancia**. La cápsula decía dos. La máquina decía tres. **En la pantalla partida cuya tesis entera es que cada dato de la capa de máquina corresponde a lo que está en la página.**
+
+**La raíz:** `read:aeo-xray` solo leía el artículo. Por eso el bug **sobrevivió a la pasada de coherencia anterior** — la herramienta que existe para cazar contradicciones no podía ver dos de las tres capas donde vive la prosa.
+
+> **La capa de máquina y los átomos NO son metadata: son PROSA que el evaluador LEE.** Se releen igual que el artículo, y en la misma pasada.
+
+Cerrado: `read:aeo-xray` ahora imprime también la capa de máquina y los átomos, y pregunta explícitamente si las tres cuentan la misma historia. **Cuando cambie un dato del artículo, `grep` el número viejo en el payload completo** — no solo en `article.blocks`.
 
 ---
 
@@ -336,7 +355,7 @@ Ahora el instrumento **sube como hoja inferior** al tocar, con tirador, botón d
 
 ## El gate: `pnpm verify:aeo-xray`
 
-**36 asserts.** No son cosméticos: cada uno nació de un bug real. Los que más importan:
+**43 asserts.** No son cosméticos: cada uno nació de un bug real. Los que más importan:
 
 | # | Qué impide |
 |---|---|

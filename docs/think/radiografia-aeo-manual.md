@@ -92,7 +92,7 @@ Copia `sky-carretera-austral.json` como referencia. Contiene: el flow, el hueco 
 
 #### 🔴 Cómo se ESCRIBE (y no es lo mismo que cumplir el checklist)
 
-**Un artículo puede pasar los 42 asserts y ser ilegible.** Cargar la skill **`copywriting`** (módulos 03 hooks · 04 storytelling · 07 craft) y **`seo-aeo`** es obligatorio.
+**Un artículo puede pasar los 43 asserts y ser ilegible.** Cargar la skill **`copywriting`** (módulos 03 hooks · 04 storytelling · 07 craft) y **`seo-aeo`** es obligatorio.
 
 **Son dos capas, no una voz:**
 
@@ -140,7 +140,7 @@ pnpm build
 XRAY_SAMPLE=<cliente>-<slug> pnpm verify:aeo-xray
 ```
 
-**42 asserts.** Si el payload está incompleto, **el build falla** — no publica una muestra a medias.
+**43 asserts.** Si el payload está incompleto, **el build falla** — no publica una muestra a medias.
 
 ### 5b. 🔴 LEER el artículo (el paso que el gate NO puede hacer)
 
@@ -212,6 +212,8 @@ curl -s -L "https://think.efeoncepro.com/muestras/<cliente>-<slug>-<token>" | gr
 🔴 **NUNCA dejar anotación en la pantalla ②.** Se llama *«El artículo — lo que ve el lector»*. Si lleva rótulos de «Respuesta directa» o **recuadros de color**, entonces **no es lo que ve el lector**: es lo que ve el analista, y la pieza se contradice en su propio título. Con la anotación encima **nadie aprecia el artículo — solo ve la anotación**. Todo el aparato va en la ③, que es donde el trabajo *debe* verse. ⚠️ **Sacar el rótulo y dejar la caja no arregla nada**: un recuadro de color grita «acá hay una técnica aplicada» igual de fuerte.
 
 🔴 **NUNCA escribir el narrador sin releer el artículo completo.** Es exactamente cómo la pieza terminó **desmintiéndose a sí misma en siete puntos** con el gate en verde. Corre `pnpm read:aeo-xray` y **léelo**.
+
+🔴 **NUNCA corregir un dato del artículo sin buscarlo en TODO el payload.** La prosa vive en **tres capas** —el artículo, la capa de máquina y los átomos— y las tres las lee el evaluador. Nos pasó: el artículo se corrigió a «los **dos** transbordadores» y el «**tres**» sobrevivió en **seis** lugares (meta description, `BlogPosting`, y el título/descripción/guion/`VideoObject` del video). En la ③ quedaban **lado a lado**: la cápsula decía dos, la meta description decía tres. Cuando cambies un número, `grep` el viejo en el payload entero.
 
 🔴 **NUNCA inventar color narrativo.** *«Google te promete dos horas»* era falso — un hombre de paja para tener un gancho. En una pieza cuya tesis es el rigor, **el color inventado la destruye más rápido que la prosa plana**. Los específicos que hacen sonar al narrador *(la calamina, los 231 km sin bomba)* **se verifican y se citan**.
 
