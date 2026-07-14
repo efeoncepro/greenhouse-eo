@@ -199,6 +199,11 @@ const SUCCESS_BEHAVIOR = {
   presentation: 'success_card' as const,
   title: copy.apply.successTitle,
   body: copy.apply.successBody,
+  steps: [
+    { label: 'Guardamos tu postulación de forma segura.' },
+    { label: 'Revisamos tu experiencia frente al rol publicado.' },
+    { label: 'Si avanzas a la siguiente etapa, te contactamos por correo.' },
+  ],
   actions: [
     {
       kind: 'external_link' as const,
