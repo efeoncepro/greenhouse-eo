@@ -1,4 +1,16 @@
-## Sesión 2026-07-14 — TASK-1373 visual fidelity hotfix en release (Codex)
+## Sesión 2026-07-14 — TASK-1373 follow-up visual regression hotfix preparado (Codex)
+
+> **Pedido:** el operador comparó la captura productiva contra la referencia de `Documents/carreers` y detectó que el hotfix anterior aún había cambiado colores, CTA y estructura: el botón no era negro y el form debía seguir siendo una mejora incremental, no rediseño.
+>
+> **Referencia usada:** `/Users/jreye/Documents/carreers/Efeonce Carrers/Efeonce Careers.dc.html` + captura `/tmp/task1373-reference-apply-form.png`. Tokens medidos: CTA `#0375db`, accent dark `#024c8f`, navy `#004070`, green `#6ec207`, uploader `#fafafa` con borde `#c4c3cc`, radius `6px`, botón `46px`, uploader `80px`.
+>
+> **Fix preparado:** `src/growth-forms-renderer` ahora restaura para `styleVariant=careers-html-fidelity` la paleta AXIS/Efeonce del HTML original, la barra "Completa tu postulación", secciones `01 Tus datos` / `02 Tu perfil` / `03 Cuéntanos más`, layout `Nombre/Apellido` en dos columnas y CTA azul full-width. Se conserva la mejora previa de iconos inline/uploader rico/CTA con icono; no cambia contrato backend, submit, Turnstile, ATS ni flags.
+>
+> **Evidencia pre-release:** Vitest renderer `45/45`, `pnpm exec tsc --noEmit --pretty false`, ESLint focused, `pnpm lint`, `pnpm design:lint`, `pnpm build` PASS (warning histórico roadmap/work-item-index), `pnpm renderer:build`, `pnpm task:lint --task TASK-1373`, `pnpm qa:gates --changed --agent codex --task TASK-1373 --ui --runtime --release --production`, `pnpm ops:lint --changed`. Captura local con contrato productivo + bundle corregido: `/tmp/task1373-careers-style-fix-local.png`; métricas: CTA `rgb(3,117,219)`, uploader `rgb(250,250,250)`/dashed `rgb(196,195,204)`, markers `01/02/03`, `controlIcons=8`, `fileIcon=true`, `scrollOverflow=false`.
+>
+> **Estado:** commit y release productivo pendientes. El release debe seguir `greenhouse-production-release`, usar el orquestador para el SHA exacto en `main`, validar visual production desktop/mobile y actualizar `PRODUCTION_RELEASE_TIMING_LEDGER.md` al cierre.
+
+## Sesión 2026-07-14 — TASK-1373 visual fidelity hotfix PRODUCTION LIVE (Codex)
 
 > **Pedido:** el operador revisó la captura productiva del apply form y detectó regresión estética: los iconos ya no estaban dentro de los campos y el uploader perdió el estilo rico del form original.
 >
@@ -6,7 +18,17 @@
 >
 > **Evidencia local previa al release:** Vitest focused PASS, `pnpm exec tsc --noEmit --pretty false` PASS, ESLint focused PASS, `pnpm lint` PASS, `pnpm build` PASS con warning histórico del reader roadmap/work-item-index, `pnpm renderer:build` PASS, `pnpm qa:gates --changed --agent codex --task TASK-1373 --ui --runtime --release --production` PASS advisory, `pnpm task:lint --task TASK-1373` PASS, `pnpm docs:closure-check` PASS. Capturas harness con contrato productivo + bundle local: `/tmp/task1373-form-fidelity-fix/desktop-form-card.png` y `/tmp/task1373-form-fidelity-fix/mobile-390-form-card.png`; métricas desktop/mobile `controlIcons=8`, `labelIcons=0`, `fileDropzone=true`, `fileIcon=true`, `buttonIcon=true`, `phoneShell=true`, `duplicatedOptionalLabels=0`, `scrollOverflow=false`.
 >
-> **Release:** en curso por el playbook de producción. No tocar el untracked `.claude/skills/seo-aeo-practice/`.
+> **Release:** `develop` quedó en `f96ced615` y se promovió a `main` por merge commit `baac9c3945604b2bd113aaa8ae294f68924866fd` (`release: promote careers form visual fidelity`). Vercel Production deployment `dpl_AnpzdFMincYdE2rWYdfHJv7amLiF` quedó `Ready` sirviendo `https://greenhouse.efeoncepro.com`. Release manifest `baac9c394560-956e2934-0e8f-4773-9448-3f82df5f8a17`; Production Release Orchestrator `29314539625` success. El primer dispatch `29313599777` falló correctamente porque se lanzó mientras Vercel Production seguía `BUILDING` y CI/Deep estaban corriendo.
+>
+> **CI/control plane:** `CI` `29313569777` success y `CI Deep Verification` `29313569799` success. Orchestrator aprobó gates Production, Vercel READY, post-release health y transición de manifest a released. Workers: `commercial-cost-worker`, `ico-batch-worker` y `hubspot-greenhouse-integration` deploy/health/Ready/record success; `ops-worker` success con deploy skipped por diff runtime vacío contra sus paths gobernados, health OK y `Ready=True`; Azure Teams Bot/Notifications validaron Bicep y saltaron apply por no diff.
+>
+> **Smoke producción:** `GET /public/careers/EO-OPN-0009/apply` responde `200` y sirve assets del deployment productivo. API contract `GET /api/public/growth/forms/9f7a8fc0-6fa7-4670-8e2d-efe0ce354001?surface=public-careers-nextjs` devuelve `styleVariant=careers-html-fidelity`, `composition=static`, version `2`, 10 campos, `cvFile` PDF 10 MB y 1 consentimiento. Submit sin CAPTCHA falla cerrado `403 {"outcome":"captcha_failed","message":"missing_token"}`.
+>
+> **Visual producción:** Playwright público desktop/mobile PASS con capturas `/tmp/task1373-prod-visual-fidelity-hotfix/desktop-form-card.png` y `/tmp/task1373-prod-visual-fidelity-hotfix/mobile-390-form-card.png`. Métricas en `/tmp/task1373-prod-visual-fidelity-hotfix/metrics.json`: `controlIcons=8`, `labelIcons=0`, `fileDropzone=true`, `fileIcon=true`, `buttonIcon=true`, `phoneShell=true`, `duplicatedOptionalLabels=0`, `scrollOverflow=false` en desktop y mobile 390.
+>
+> **Watchdog residual:** run manual `29315298479` falló sólo por el residual conocido `platform.release.worker_revision_drift` de `ops-worker` (`838950916b27` vs `baac9c394560`). El job del orquestador confirmó que no había cambios en paths runtime de `ops-worker`, omitió redeploy y verificó health/Ready. Los otros workers quedaron synced. No es drift funcional del hotfix visual.
+>
+> **No tocar:** el untracked `.claude/skills/seo-aeo-practice/` sigue ajeno; no stagear ni borrar salvo instrucción explícita.
 
 ## Sesión 2026-07-14 — TASK-1373 production release completo (Codex)
 
