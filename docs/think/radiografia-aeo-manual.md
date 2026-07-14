@@ -92,13 +92,16 @@ Copia `sky-carretera-austral.json` como referencia. Contiene: el flow, el hueco 
 
 **El artículo se escribe contra un checklist medido, no "bonito":**
 
-| Requisito | Por qué |
+> ⚠️ **Las cifras de abajo son las CORREGIDAS.** La versión anterior de esta tabla sobre-declaraba: decía *«2,3× más citas con una tabla»* (era una **prevalencia entre corpus**, no un lift) y atribuía el 72,4% sin citarlo. Ver el invariante **13**.
+
+| Requisito | Por qué (con su fuente) |
 |---|---|
-| **Cápsula de respuesta de 40–60 palabras** bajo cada H2 | Patrón presente en el **72,4%** de las páginas que ChatGPT cita |
-| **Cada H2 = una sub-pregunta del fan-out**, autocontenida | El motor recupera **pasajes, no páginas**: el pasaje viaja solo (nada de *"como vimos arriba"*) |
-| **≥1 tabla y ≥1 lista numerada** | ≈ **2,3×** más citas |
-| **Datos con unidad y fuente** | *Statistics Addition*: **+32%** |
-| **Fuentes autoritativas enlazadas** | *Cite Sources*: **+30%** |
+| **Cápsula de respuesta** bajo cada H2 | El **mecanismo** es lo que la sostiene, y no necesita cifra: el motor recupera **pasajes**, y un pasaje que se entiende solo se puede citar. *(El 72,4% de las entradas citadas por ChatGPT tiene una — Search Engine Land, 15 dominios — pero es un **base rate sin grupo de control**: describe el patrón, no prueba el lift.)* |
+| **Cada H2 = una sub-pregunta del fan-out**, autocontenida | La evidencia primaria más fuerte: sobre **1,4M de prompts**, lo que más separa a una página citada de una recuperada-y-no-citada es la **relevancia semántica del TÍTULO** frente a la sub-pregunta (0,656 vs 0,484 — Ahrefs) |
+| **≥1 tabla** | El **30%** de las páginas que ChatGPT cita contienen una tabla, contra el **13%** de las que rankean en Google *(Nectiv)*. ⚠️ Es una razón de **prevalencia**, NO un lift por agregar una tabla — y **no incluye listas** |
+| **Datos con unidad y fuente** | *Statistics Addition*: **+32%** *(Aggarwal et al., KDD 2024)*. ⚠️ Medido sobre **GPT-3.5 + top-5 de Google**, en *participación dentro de la respuesta* (no citas), y con lift que **varía por dominio** |
+| **Fuentes autoritativas enlazadas** | *Cite Sources*: **+30%** *(mismo paper, mismas advertencias)* |
+| **Entidades ancladas al Knowledge Graph** | `about` + `mentions` con `sameAs` a **Wikidata**. Un motor razona con **entidades**, no con palabras clave: «Balmaceda» es una cadena de texto hasta que se la ancla a un identificador que la máquina ya conoce |
 | **Índice con anclas** | Un mapa para el humano; un ancla por sección para el motor |
 
 #### 🔴 Cómo se ESCRIBE (y no es lo mismo que cumplir el checklist)
@@ -227,6 +230,16 @@ curl -s -L "https://think.efeoncepro.com/muestras/<cliente>-<slug>-<token>" | gr
 🔴 **NUNCA corregir un dato del artículo sin buscarlo en TODO el payload.** La prosa vive en **tres capas** —el artículo, la capa de máquina y los átomos— y las tres las lee el evaluador. Nos pasó: el artículo se corrigió a «los **dos** transbordadores» y el «**tres**» sobrevivió en **seis** lugares (meta description, `BlogPosting`, y el título/descripción/guion/`VideoObject` del video). En la ③ quedaban **lado a lado**: la cápsula decía dos, la meta description decía tres. Cuando cambies un número, `grep` el viejo en el payload entero.
 
 🔴 **NUNCA hacer que la muestra hable de NUESTROS documentos, ni que narre su propia interfaz.** La pregunta ante cada línea: *¿esto se lo digo al cliente, o se lo estoy explicando al que construyó la herramienta?* Nos pasó dos veces seguidas: la ④ abría con *«**Nuestra oferta** dice, textual…»* (le hablaba al comité sobre nuestro PDF — la muestra queda como nota al pie de la propuesta, y huérfana si mandas el enlace sin ella), y el reemplazo seguía enfermo: *«**cada pieza de abajo** nace de un bloque…»* (eso **narra la pantalla**). ⚠️ **La línea es fina:** hablar del artefacto para ser **honesto** es correcto y obligatorio (el disclaimer, el schema que no se emite, *«especifica el entregable y no lo simula»*). **Narrar la interfaz, no.** El copy **argumenta**. Citar las **bases del cliente** sí vale — es su documento. El assert **34b** caza la autorreferencia; la acotación de escenario es **juicio**, no tiene gate.
+
+🔴 **NUNCA publicar una cifra cuya FUENTE no se pueda googlear.** No basta con poner *una* fuente: el evaluador va a buscar el nombre del estudio. Nos pasó — se publicó *«AI Platform Citation Source Index 2026, 680M de citas, 6 estudios»* y **ese estudio no existe con ese nombre** (el dato es de Bluefish vía Adweek; los 6,1M de citas son de otro sub-hallazgo; son 4 firmas). Un nombre de fuente inventado, en la pantalla cuyo producto es la verificabilidad, **es peor que no poner el dato**. ⚠️ Y una **prevalencia** no es un **lift**: el «2,3× más citas con una tabla» era en realidad *«el 30% de las páginas que ChatGPT cita CONTIENEN una tabla, contra el 13% de las que rankean en Google»* — una razón entre corpus. Confundirlas es **el error del +41% otra vez**. El schema ahora exige `source` + `asOf` en **toda** cifra y **rompe el build** sin ellas.
+
+🔴 **NUNCA dejar que el instrumento se repinte a sí mismo.** El acoplamiento nace en el **ARTÍCULO** y viaja al instrumento — nunca al revés. Si el panel escucha el foco de su propio lado, **se colapsa bajo el usuario de teclado** y lo expulsa. Y **NUNCA ocultar bajo el foco**: `display:none` saca el nodo del árbol de accesibilidad, el foco cae al `<body>`, y el evaluador aparece al inicio de una página de 9.000px sin entender qué pasó.
+
+🔴 **NUNCA un control que desaparece al usarse.** El botón «Ver toda la capa» sólo existía en modo enfoque: al presionarlo salías del enfoque y **el CSS lo borraba bajo tu propio foco**. Queda `disabled` en su sitio.
+
+🔴 **NUNCA `white-space: nowrap` en algo que puede crecer.** Decidió el ancho de la página **dos veces** (la píldora de métrica; el pie de licencias), las dos con el assert en verde — porque medía el **documento** y no los paneles, y a **390px** en vez de a los **320** que exige WCAG 1.4.10.
+
+⚠️ **El fallo de accesibilidad va a aparecer en la línea que PRUEBA el cumplimiento.** El crédito de foto daba 3,3:1 — y el crédito visible **es** la demostración del requisito 5 de las bases. En una agencia que vende rigor, eso no es un bug: es el titular. **Pásale `axe` a la muestra antes de mandarla.**
 
 🔴 **NUNCA inventar color narrativo.** *«Google te promete dos horas»* era falso — un hombre de paja para tener un gancho. En una pieza cuya tesis es el rigor, **el color inventado la destruye más rápido que la prosa plana**. Los específicos que hacen sonar al narrador *(la calamina, los 231 km sin bomba)* **se verifican y se citan**.
 

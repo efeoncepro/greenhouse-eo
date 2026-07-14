@@ -590,6 +590,47 @@ La ④ abría con *«**Nuestra oferta** dice, textual…»* — le hablaba al co
 
 **Gate: 46/46.** Desplegado y verificado contra producción.
 
+## Delta 2026-07-14 (e) — la auditoría de seis lentes: 3 de las 6 cifras no resistían una verificación
+
+El operador pidió una revisión profunda de las cuatro pantallas con **todas** las skills (product design · a11y · SEO/AEO · copywriting · arquitectura · Astro). Seis revisores en paralelo, cada uno mirando el frame real y el código. **~45 hallazgos. Todos cerrados.**
+
+### 🔴 Tier 0 — Credibilidad: la mitad de los números no aguantaba que el comité los googleara
+
+En la pieza cuyo valor **entero** es no exagerar:
+
+- **El `16%` de YouTube: la fuente que se publicó NO EXISTE.** Se escribió *«AI Platform Citation Source Index 2026 — 680M de citas, 6 estudios»*. Verificado contra Adweek: el dato es de **Bluefish**, los **6,1M** de citas son de **Goodie AI** (otro sub-hallazgo), son **4 firmas**, y **no hay ningún estudio con ese nombre**. Se sintetizaron dos datasets en uno y se le puso a la pieza **un nombre de fuente que no se puede googlear** — en la pantalla cuyo producto es la verificabilidad. **Lo introdujo el agente el mismo día que arreglaba el error del `+41%` en otro lado.**
+- **El `2,3×` era el `+41%` otra vez.** Nectiv midió que las citas de ChatGPT **contienen** una tabla 2,3× más seguido que los resultados de Google: una **razón de prevalencia entre corpus**, no un lift. Y **la lista numerada no estaba en el hallazgo**: se le agregó. Iba en **tier 1 y en grande**.
+- **El `72,4%`** existe (Search Engine Land) pero **no se citaba**, y es un **base rate sin grupo de control**. El estudio primario más grande (Ahrefs, 1,4M de prompts) **no encuentra la cápsula entre los predictores** — lo que encuentra es la **relevancia semántica del título**, que es regalo puro para esta pieza.
+- **El `28%`** (frescura) no tenía fuente rastreable → **cortado**.
+- **`+30/+32%` (GEO):** bien atribuidos, **mal enmarcados** (GPT-3.5 + top-5 de Google, *participación en la respuesta* ≠ citas, lift que varía por dominio).
+
+**El hueco era ESTRUCTURAL:** el schema obligaba `source`+`asOf` en `evidence.facts` y en los átomos, **pero no en `machine.craft[].stat`** — donde viven los números **grandes**. La ③, la pantalla del rigor, era **la única donde las cifras flotaban**. Cerrado con un **`superRefine` en la raíz** que rompe el build (probado en vivo).
+
+**Y tres sobre-declaraciones que se verificaban scrolleando:** *«cada H2 escrito como pregunta»* (2 de 6 no lo eran) · *«3 fuentes»* (el artículo lista 5) · *«Top 12»* que enumeraba 10. Más la **cita destacada** —el pasaje insignia— que afirmaba *«la única parte del viaje que no depende de ti»*: **falso** si sigues al sur.
+
+**El `WebSite` + `SearchAction`** (tier 1, *«el nodo que ataca el 8/100»*) se apoyaba en una feature que **Google mató el 21-nov-2024**. Reencuadrado, bajado de tier, y ahora la pieza **lo dice ella misma** antes de que lo encuentre el evaluador.
+
+**🟢 Upside:** entity linking al Knowledge Graph (`about` + `mentions` → Wikidata), `Organization` → `Airline` con `iataCode`, nodo `WebPage` (había **dos referencias colgantes**), `FAQPage` marcando las **5** preguntas visibles (marcaba 3).
+
+### 🔴 Tier 1 — Accesibilidad: `axe` lo encuentra en 90 segundos
+
+- **El fallo AA estaba en la línea que PRUEBA el cumplimiento.** El crédito de foto daba **3,3:1** — y el crédito visible **es** la demostración del requisito 5 de las bases. *En una agencia que vende rigor, eso no es un bug: es el titular.*
+- **Dos bloqueantes los introdujo el agente con el modo enfoque:** el panel **se colapsaba a sí mismo** (el `focusin` escuchaba los dos lados del split) y **expulsaba al usuario de teclado** del instrumento; y el botón «Ver toda la capa» **se borraba bajo su propio foco** al presionarlo.
+- **Los bloques eran `div[tabindex=0]` sin rol ni nombre**, y «fijar» el acoplamiento era **exclusivo del mouse**. Ahora **un `<button>` real por bloque** (disclosure remoto, `aria-controls` + `aria-expanded`). Y el panel tenía **55 tab-stops muertos**.
+- **Sin JS, la afordancia mentía.** Todo cuelga de `[data-js]`.
+
+### 🟡 Tier 2 — Los dos trabajos
+
+El instrumento **leía a 13px** (el argumento en letra de product UI — el mismo error que la pieza ya había diagnosticado y arreglado **sólo en el artículo**) · el **bloque interrogado era indistinguible del que está en reposo** (misma declaración CSS) · **la ③ no tenía titular y el `thesis` estaba MUERTO en el payload** · **en móvil la ③ era la ② otra vez** · **el recorrido moría en la ④** → ahora cierra con *«No hace falta que nos crea. Compruébelo usted»* + tres verificaciones (⚠️ **Schema.org, NUNCA el Rich Results Test** — reportaría el FAQ como no elegible: el autogol del invariante 6 con el evaluador de testigo).
+
+### 🟢 Tier 3 — El motor: la hipótesis pasó a ser un hecho
+
+El schema es genuinamente genérico, pero **cuatro cadenas de SKY vivían en el CÓDIGO**: el `flow` era dato y el render un `switch` de literales (**un step renombrado servía una página en blanco, sin ruido**) · **la tipografía del cliente vivía en el CSS** (y el gate exigía literalmente `Assistant`: era **el test de regresión de SKY, no el del motor**) · `HERO = 'capsule-main'` · y **el contrato del acoplamiento no rompía el build**.
+
+✅ **Verificado con el ejercicio del segundo cliente:** un payload de clínica dental entra **sin tocar una línea de código**.
+
+**Gate: 46/46.** Desplegado y verificado contra producción. Invariantes **13-17** en la arquitectura.
+
 ## Open Questions
 
 - **El ángulo del artículo está sin resolver por diseño** y lo resuelve el gate humano del Slice 1. El agente **no debe** elegirlo.

@@ -195,6 +195,61 @@ Y el daño es el que importa: **con la anotación encima, nadie aprecia el artí
 
 🔴 **Y no cuesta NADA en AEO**: el valor de la cápsula vive en el **texto** (answer-first, 40-60 palabras, bajo su H2). **El motor lee el texto, no el CSS.** Perder la caja no cuesta una sola cita.
 
+### 13. 🔴 De las 6 cifras de la pieza, 3 no resistían una verificación
+
+**La auditoría de seis lentes (2026-07-14) encontró que la mitad de los números no aguantaba que el comité los googleara** — en la pieza cuyo valor ENTERO es no exagerar. Y una de esas cifras la introdujo el propio agente **el mismo día que arreglaba el error en otro lado**.
+
+| Cifra | Qué pasaba |
+|---|---|
+| **16%** (YouTube) | La fuente publicada —«AI Platform Citation Source Index 2026, 680M de citas, 6 estudios»— **NO EXISTE con ese nombre**. El dato es de **Bluefish** (vía Adweek); los 6,1M de citas son de **Goodie AI** (otro sub-hallazgo); son **4 firmas**. Se sintetizaron dos datasets en uno y se publicó **un nombre de fuente que no se puede googlear** — en la pantalla cuyo producto es la verificabilidad |
+| **2,3×** (tablas) | **Era el +41% otra vez.** Nectiv midió que las citas de ChatGPT **contienen** una tabla 2,3× más seguido que los resultados de Google: una **razón de prevalencia entre corpus**, no un lift por poner una tabla. Y **la lista numerada no estaba en el hallazgo**: se le agregó. Iba en **tier 1 y en grande** |
+| **72,4%** (cápsula) | Existe (Search Engine Land) pero **la pieza no lo citaba**, y es un **base rate sin grupo de control**. El estudio primario más grande (Ahrefs, 1,4M de prompts) **no encuentra la cápsula entre los predictores** |
+| **28%** (frescura) | Sin fuente rastreable. **Cortado** — el argumento no lo necesitaba |
+| **+30 / +32%** (GEO) | Bien atribuidos, **mal enmarcados**: el paper mide sobre **GPT-3.5 + top-5 de Google** (2024), en *participación dentro de la respuesta* —**no en citas**— y con lift que **varía por dominio** |
+
+**El hueco era ESTRUCTURAL, no un descuido de copy.** El schema obligaba `source` + `asOf` en `evidence.facts` y en los átomos… **pero no en `machine.craft[].stat`**, que es donde viven los números **grandes** del instrumento. Por eso la ③ —**la pantalla del rigor**— era la única donde las cifras flotaban.
+
+🔴 **Cerrado con un `superRefine` en la RAÍZ del schema** que recorre el payload entero y **rompe el build** ante cualquier `stat` sin fuente. Ningún bloque futuro puede escaparse por olvido.
+
+> **La regla, entonces:** *sin fuente y sin fecha, una cifra es una opinión con dígitos.* Y **el nombre de la fuente tiene que poder googlearse**: si el evaluador la busca y no la encuentra, se cae todo lo demás.
+
+### 14. 🔴 El instrumento no puede repintarse a sí mismo (y no se oculta bajo el foco)
+
+**El modo enfoque volvió la capa de máquina INUSABLE con teclado.** El `focusin` escuchaba los **dos** lados del split, así que el panel **se colapsaba a sí mismo**: tabulabas a un nodo del instrumento → eso disparaba el enfoque → el 90% del panel se ponía `display:none` → el siguiente Tab **te sacaba del panel**. El evaluador con teclado **nunca podía recorrer la capa de máquina**: se le deshacía cada vez que la tocaba.
+
+- 🔴 **El acoplamiento nace en el ARTÍCULO y viaja al instrumento. Nunca al revés.**
+- 🔴 **NUNCA ocultar bajo el foco.** `display:none` saca el nodo del árbol de accesibilidad Y del orden de tabulación: si el elemento activo cae dentro de lo que se colapsa, **el foco cae al `<body>`**. Se mueve ANTES, explícitamente.
+- 🔴 **Un control que desaparece al usarse nunca es la respuesta.** El botón «Ver toda la capa» sólo existía en modo enfoque: lo presionabas → salías → el CSS **lo borraba bajo tu propio foco**. Ahora queda `disabled` en su sitio.
+- 🔴 **El panel es CONTENIDO: se LEE.** Sus nodos eran focusables sólo para disparar el acoplamiento desde ese lado — eran **55 tab-stops muertos**. Los controles viven en el artículo: **un `<button>` real por bloque** (disclosure remoto, con `aria-controls` + `aria-expanded`), no un `div[tabindex=0]` sin rol ni nombre — que además hacía que «fijar» el acoplamiento fuera **exclusivo del mouse** (un `div` no dispara `click` con Enter).
+- 🔴 **Sin JS, la afordancia no puede mentir.** El artículo se leía bien, pero el `cursor:pointer`, el punto y el anuncio *«produce 4 datos»* se servían igual, **prometiendo un acoplamiento que sin JS no existe**. Todo cuelga de `[data-js]`.
+
+### 15. 🔴 El fallo de accesibilidad estaba en la línea que PRUEBA el cumplimiento
+
+El crédito de foto usaba un token de **3,3:1** (WCAG 1.4.3 pide 4,5:1). Y el crédito visible **es** la demostración del requisito 5 de las bases. Un evaluador que le pasa `axe` a la muestra encontraba su fallo AA **exactamente en el texto que existe para probar que cumplimos**.
+
+> **En una agencia que vende rigor, eso no es un bug: es el titular.**
+
+⚠️ Y el `white-space: nowrap` decidió el ancho de la página **dos veces** (la píldora de métrica a 390px; el pie de licencias a 320px) — las dos veces con el assert en verde, porque **medía el documento y no los paneles**, y **a 390px en vez de a los 320 que exige WCAG 1.4.10**.
+
+### 16. 🔴 Atenuar no es enfocar — y VER no es LEER PRIMERO
+
+Además de *qué* se ve (invariante 12b), importa **qué se lee primero**. Los nodos supervivientes quedaban en orden de **familia**, así que al interrogar un H2 lo primero que leía el comité era jerga (*«sub-pregunta del fan-out… el motor recupera PASAJES»*) y los dos nodos que **argumentan** (*«cero aerolíneas en ese resultado»*, *«Balmaceda es el ángulo que sólo SKY tiene»*) iban 2.º y 3.º.
+
+⚠️ **Y el `tier` sólo no alcanza**: la evidencia y el árbol de encabezados son **ambos tier 2**. El tier mide la importancia en la **capa de máquina**; lo que decide si el comité sigue leyendo es otra cosa. **Para quien no sabe SEO, la EVIDENCIA es el argumento: va primero, siempre.**
+
+**Y el argumento no puede leerse en letra de product UI.** El instrumento entero corría a 13px — la misma densidad que la pieza YA había diagnosticado como el error del artículo, **arreglado allá y dejado entero acá**. La ③ se proyecta como lámina: 13px escalados son ~9px.
+
+### 17. 🔴 El motor era reutilizable en el papel: cuatro cadenas de SKY vivían en el CÓDIGO
+
+El schema Zod es **genuinamente genérico** (una clínica dental entra sin tocar el modelo de datos). Pero había **cuatro acoplamientos duros escritos en código**, justo en la frontera que la tesis declara sagrada:
+
+1. **El `flow` era dato y el render un `switch` de literales** → un step renombrado generaba la ruta, **pasaba el build** y servía una **página en blanco**. Sin ruido. Ahora es un `enum`.
+2. **La tipografía del cliente vivía en el CSS** — y el propio comentario lo confesaba (*«cuando la muestra sea de otro, cambia acá»*). El cliente #2 dibujaría **su** artículo en la fuente de SKY… **y el gate lo bendecía**: el assert exigía literalmente `Assistant`, o sea era **el test de regresión de SKY, no el del motor**.
+3. **`HERO = 'capsule-main'`** — el motor conocía un `coupleId` del cliente. Un payload que llamara distinto a su cápsula **perdía el argumento zero-JS en silencio**.
+4. **El contrato del acoplamiento no rompía el BUILD** (sólo el gate de Playwright, que corre después). La promesa *«un payload incompleto rompe el build»* era **falsa para el invariante más load-bearing de la pieza**.
+
+✅ **Verificado con el ejercicio del segundo cliente:** un payload de clínica dental —otra tipografía, otro acento— entra **sin tocar una línea de código** y genera sus cuatro rutas. **La reutilización dejó de ser una hipótesis.**
+
 ### 12c. 🔴 La muestra se defiende sola: ni cita nuestros documentos, ni narra su propia interfaz
 
 **La pregunta que hay que hacerse ante cada línea de copy: *¿esto se lo estoy diciendo al cliente, o se lo estoy explicando al que construyó la herramienta?***
