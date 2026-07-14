@@ -393,6 +393,7 @@
     {
       "slideId": "muestra",
       "contentType": "highlight",
+      "template": "HighlightWave",
       "slots": {
         "eyebrow": "LA MUESTRA DE TRABAJO",
         "statementLead": "No le describimos el artículo que escribiríamos.",
