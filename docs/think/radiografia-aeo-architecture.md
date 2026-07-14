@@ -168,6 +168,37 @@ Un `if (cliente === '...')` = la frontera se rompió.
 
 ---
 
+## Tipografía: la ruta carga los pesos que pide, y el CSS no declara ninguno crudo
+
+**El bug que hay que conocer (silencioso, y volvería solo).** La ruta pedía `Poppins` en peso **600/700** para cada H1, H2, H3 y cifra — y **nunca importó ninguno de los dos**. Los únicos `@font-face` de Poppins llegaban de rebote, desde `EfeonceSlogan` (**800 / 800i / 900i**, que son del lockup de marca).
+
+**Un `@font-face` que falta no falla: sustituye.** El algoritmo de matching de **CSS Fonts L4 §5.2** busca, para un peso >500, el primer cut **≥ objetivo en orden ascendente**. Con solo {800, 900} disponibles, `600` → **800** y `700` → **800**. Las cuatro pantallas se dibujaban **ExtraBold** mientras el CSS decía 600, y como el 800 es un **cut real** (no una negrita sintética) se veía *pesado pero bien dibujado*. No lo cazó el build, ni el lint, ni un assert de string — el CSS **no mentía**; mentía el navegador.
+
+Y la otra mitad del síntoma era la misma causa: contra un 800, la **Geist 400** —atenuada, a 13px, sobre navy, con `-webkit-font-smoothing: antialiased` adelgazando los trazos— leía como un hilo. El salto real era de **~400 puntos** donde el diseño quería ~200. No era una pareja tipográfica: era una **colisión**.
+
+**Las reglas:**
+
+1. 🔴 **La ruta importa explícitamente cada peso que su CSS usa.** Nunca heredarlos de un componente vecino: los pesos de ese componente son **suyos**, no un servicio.
+2. 🔴 **Cero pesos crudos en la pieza.** Seis tokens con rol, no trece valores sueltos:
+
+   | Token | Valor | Rol |
+   |---|---|---|
+   | `--w-display` | 600 | Poppins: H2/H3, cifras (17–40px). **Techo.** |
+   | `--w-display-lg` | 500 | Poppins: titulares ≥40px |
+   | `--w-quote` | 500 | Poppins: la cita — una voz, no un rótulo |
+   | `--w-body` | 400 | Geist sobre claro |
+   | `--w-body-dark` | 500 | Geist sobre navy |
+   | `--w-label` | 600 | Geist: rótulos, `th`, overlines |
+
+3. **Poppins es geométrica: engorda mucho más rápido que una grotesca.** Su 600 pesa ópticamente lo que en Geist sería un 700. **600 es su techo de display**; el 700/800 pertenece *solo* al lockup de marca.
+4. **Compensación óptica: a mayor tamaño, MENOS peso.** El mismo 600 que sostiene un H3 de 19px se vuelve macizo a 48px y le cierra los ojales a la geométrica. El **tamaño ya carga la jerarquía**; el peso no tiene que repetirla.
+5. **Sobre navy el texto sube un paso: `500` = el `400` del lado claro.** El texto claro sobre oscuro se percibe —y con antialiasing en gris se *rasteriza*— más fino. Misma voz, distinto sustrato.
+6. **El artículo recupera el rasterizado del sistema** (`font-smoothing: auto`). Sobre claro, `antialiased` es **pérdida neta**: cambia subpíxel por gris y adelgaza. El panel oscuro **sí lo conserva** (ahí evita el florecimiento) y compensa con `--w-body-dark`.
+
+**Lo blindan los asserts 36 y 37**, que comparan el peso **computado por el navegador** contra el sistema. Un assert de string no habría visto nada.
+
+---
+
 ## Core Web Vitals: la pieza no puede reprobar su propio examen
 
 Argumenta rigor técnico. Si el comité —o su área de TI— le corre un PageSpeed y sale mal, **se cae todo lo demás**.

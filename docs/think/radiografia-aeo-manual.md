@@ -163,6 +163,8 @@ curl -s -L "https://think.efeoncepro.com/muestras/<cliente>-<slug>-<token>" | gr
 
 🔴 **NUNCA hardcodear un cliente en un componente.** Si escribes `if (cliente === '...')`, la frontera se rompió y el motor dejó de ser reutilizable.
 
+🔴 **NUNCA escribir un `font-weight` crudo, ni asumir que una fuente "ya está cargada".** Nos pasó: la ruta pedía Poppins 600/700 y **no había importado ninguno de los dos** — solo heredaba los 800/900 del slogan. **Un `@font-face` que falta no falla: sustituye.** Todos los titulares salieron **ExtraBold** durante días mientras el CSS decía 600, y se veía *pesado pero bien dibujado*, así que ningún gate lo cazó. Los pesos salen de los tokens (`--w-display`, `--w-body-dark`, `--w-label`…) y **la ruta importa cada peso que usa**.
+
 ⚠️ **Si le haces una muestra a un competidor directo de un cliente vigente**, recuerda que el token es lo único que impide que uno adivine la URL del otro. **No compartas el patrón de URL sin el token.**
 
 ---
