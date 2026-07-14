@@ -109,6 +109,11 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 >
 > *(El squad del blog incluye roles creativos —diseñador, audiovisual, social— porque un servicio de
 > contenido necesita imágenes y video. **Eso no lo convierte en un servicio creativo.**)*
+>
+> **Wrapper de experiencia vivo:** `https://experiencia.efeoncepro.com` es el primer **Efeonce Wrapper**
+> anual para un cliente, creado para SKY por su primer año con Efeonce. Sirve como memoria/retención y
+> prueba de dirección para `"Tu año con Efeonce"`; NO convierte automáticamente a SKY en caso público
+> citable sin autorización escrita.
 
 ### 🎯 EL CASO ECONÓMICO DE REFERENCIA DE LA PRÁCTICA — SKY Agencia Creativa
 
@@ -184,7 +189,8 @@ validación es **2026-03-10**, anterior a **RpA v2 (TASK-916)**.
    **Es el bug real de esta práctica** *(`ANTIPATTERNS.md` I)*.
 2. 🎯 **Formalizar a SKY como el primer caso creativo citable** — un año de relación, squad nombrado, **y
    telemetría real que ya existe.** Falta la **autorización escrita** *(cláusula de portafolio)* y armar el
-   caso. → `templates/caso-estudio.md`.
+   caso. El wrapper `experiencia.efeoncepro.com` ayuda a contar la memoria del año, pero no reemplaza ese
+   permiso. → `templates/caso-estudio.md`.
 3. 🎯 **Empezar a usar el RpA en la venta.** Está medido, es bueno, y nadie más lo tiene.
 
 ---

@@ -60,6 +60,8 @@ El crecimiento no se entrega: se **co-construye**. Tres pilares (una creencia):
 
 **El Why como EXPERIENCIA EFECTIVA DEL CLIENTE.** La **Experiencia Efeonce** significa que el cliente no contrató solo una agencia: contrató su entrada a un ecosistema de crecimiento. Capas: operación, software, aprendizaje, red y memoria. Canales: Greenhouse/Kortex/Verk/Creative Studio, Think, blog `efeoncepro.com/blog`, tools, YouTube, sociales, ebooks, webinars y futuro podcast. Greenhouse no reemplaza todos esos canales: los conecta, los hace visibles y convierte interacciones útiles en memoria de Account 360 / madurez / expansión. SSOT: `docs/context/10_experiencia-cliente.md`.
 
+**Primer wrapper vivo de la Experiencia Efeonce (SKY, 2026-07-13).** `https://experiencia.efeoncepro.com` es el primer **Efeonce Wrapper** cliente-facing: una experiencia anual creada para SKY por su primer año con Efeonce, operada desde el repo satélite `efeoncepro/sky-efeonce` y documentada en `sky-efeonce/docs/experiencia/`. Tratarlo como prueba de dirección para `"Tu año con Efeonce"`, no como automatización ya existente en Greenhouse ni como caso público autorizado sin permiso escrito.
+
 ---
 
 ## Filtro de decisión para una feature nueva

@@ -225,7 +225,7 @@ KV, campaña) **no es la cuña correcta** — abre la puerta, pero no prueba que
 
 | Caso | Qué se puede decir |
 |---|---|
-| 🎯 **SKY — Agencia Creativa** | ✅ **CLIENTE CREATIVO VIGENTE.** Service modules **`agencia_creativa` + `globe`**. Squad: **Daniela Ferreira** *(Creative Ops Lead / dir. de arte)* + **Melkin Hernández** y **Andrés Carlosama** *(Senior Visual Designers)*. Proyecto **ago-2025 → jul-2026**. 🎯 **Y la telemetría EXISTE** *(§1: RpA medido, muy bajo el umbral)*. **Es el candidato #1 al primer caso creativo** — falta solo la **autorización escrita** y armarlo. → `templates/caso-estudio.md` |
+| 🎯 **SKY — Agencia Creativa** | ✅ **CLIENTE CREATIVO VIGENTE.** Service modules **`agencia_creativa` + `globe`**. Squad: **Daniela Ferreira** *(Creative Ops Lead / dir. de arte)* + **Melkin Hernández** y **Andrés Carlosama** *(Senior Visual Designers)*. Proyecto **ago-2025 → jul-2026**. 🎯 **Y la telemetría EXISTE** *(§1: RpA medido, muy bajo el umbral)*. Además ya existe el primer **Efeonce Wrapper** anual para cliente (`https://experiencia.efeoncepro.com`), creado para SKY por su primer año. **Es el candidato #1 al primer caso creativo** — pero el wrapper NO reemplaza la **autorización escrita** ni la formalización del caso. → `templates/caso-estudio.md` |
 | **SKY — Blog (Wherex)** | 🔴 **Es una licitación de SEO/CONTENIDO, NO creativa.** Oferta en curso, **no adjudicada**. Su economía *(5,2M · piso 4,6M · loaded 2,26M)* pertenece a **`seo-aeo-practice`**. 🔴 **NUNCA la cites como caso creativo ni como TCV asegurado.** |
 | **Bresler** | ✅ **+180% de tráfico orgánico** *(dato duro, citable)*. ⚠️ Es SEO, no creativo. |
 | **Berel** | ✅ Cliente real. |
