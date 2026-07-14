@@ -88,6 +88,32 @@ Copia `sky-carretera-austral.json` como referencia. Contiene: el flow, el hueco 
 | **≥1 tabla y ≥1 lista numerada** | ≈ **2,3×** más citas |
 | **Datos con unidad y fuente** | *Statistics Addition*: **+32%** |
 | **Fuentes autoritativas enlazadas** | *Cite Sources*: **+30%** |
+| **Índice con anclas** | Un mapa para el humano; un ancla por sección para el motor |
+
+#### 🔴 Cómo se ESCRIBE (y no es lo mismo que cumplir el checklist)
+
+**Un artículo puede pasar los 42 asserts y ser ilegible.** Cargar la skill **`copywriting`** (módulos 03 hooks · 04 storytelling · 07 craft) y **`seo-aeo`** es obligatorio.
+
+**Son dos capas, no una voz:**
+
+> **La cápsula RESPONDE. El párrafo cuenta lo que la respuesta NO dice.**
+
+La cápsula **no se puede conversacionalizar** —es seca y answer-first por diseño, y es lo que el motor extrae—. Pero si dejas *todo* en voz de cápsula, la pieza se lee como un manual. El párrafo que la sigue es donde vive el **narrador**.
+
+**La cápsula puede SER el hook.** Answer-first ≠ voz de diccionario:
+
+```
+❌  «La Carretera Austral (Ruta 7) recorre 1.247 km entre Puerto Montt y…»   ← enciclopedia
+✅  «Hay dos formas de empezar la Carretera Austral. Una: manejar los 1.247
+     km y subir el auto a dos barcazas. La otra: volar a Balmaceda y estar
+     en la mitad de la Ruta 7 antes del almuerzo.»                          ← gancho
+```
+
+Las dos son answer-first, autocontenidas, 40-60 palabras. **Solo una engancha.**
+
+**El lector es el héroe; el artículo es el guía (StoryBrand).** Nunca al revés. Y **un hilo conductor** que se enuncia al principio, cruza todas las secciones y **cierra**.
+
+**Y el registro conversacional es oficio, no adorno:** preguntas al lector, remates cortos (*«Son agua.» «Por lado.»*), antítesis, anáfora, apartes con humor, y **cadencia** (una frase larga que fluye; después una corta; **golpea**). Un artículo correcto y aburrido no lo lee nadie.
 
 ### 4. Las imágenes
 
@@ -97,11 +123,15 @@ src/assets/muestras/<cliente>-<slug>/
 
 🔴 **NUNCA en `public/`** — salta el pipeline de Astro y la pieza reprueba su propio PageSpeed.
 
-- **Recorta la fuente al formato que se muestra**: hero **21:9**, inline **16:9**. *Optimizar no arregla una fuente mal recortada.*
+- 🔴 **TODAS a 16:9, hero incluido.** Sacar una franja 21:9 de una foto 3:2 **tira el 60% del alto**: se va el primer plano y queda cielo. Desde 3:2, un 16:9 recorta apenas **16%**. **El formato se elige por la foto, no al revés.**
+- **Recorta la fuente al formato que se muestra, a 2× retina** (hero 2800×1575, inline 2000×1125). El source de 5760px **nunca se sirve**: Astro emite AVIF al ancho exacto vía `srcset`.
+- ⚠️ **NO uses recorte por entropía (`sharp.strategy.attention`)** — se comió la carretera del hero. Centrado, o desde el borde donde vive el sujeto.
 - **Cero imágenes generadas con IA.** Licencia verificable + crédito visible.
-- El `alt` **es contenido** de la muestra (se exhibe): descríbelo de verdad. *"Paisaje"* no sirve; *"las agujas de roca del Cerro Castillo nevadas sobre un lago"* sí.
+- El `alt` **es contenido** de la muestra (se exhibe): descríbelo de verdad, **desde el metadata de la foto, nunca desde su título**.
 
-Fuente recomendada: Wikimedia Commons (API con licencia y autor verificables).
+**Fuente: Shutterstock** (credenciales en Secret Manager; ver `TASK-1411`). Wikimedia sirve de respaldo pero sus fotos son de aficionado — **y sus miniaturas se ven pixeladas** (bájate el **original**, no el thumb).
+
+🔴 **Verifica cada foto contra su `description`, NUNCA contra sus keywords.** Nos pasó: `789778528` se buscó como «Carretera Austral» y **era la Ruta 40 de ARGENTINA** — con `carretera` **y** `chile` entre sus keywords. De 13 candidatos "obvios", **9 eran de otra región o de otro país** (Torres del Paine, Argentina, Atacama). Y **`is_editorial` debe ser `false`**: una editorial no se puede usar comercialmente.
 
 ### 5. Construir y verificar
 
@@ -110,7 +140,23 @@ pnpm build
 XRAY_SAMPLE=<cliente>-<slug> pnpm verify:aeo-xray
 ```
 
-**36 asserts.** Si el payload está incompleto, **el build falla** — no publica una muestra a medias.
+**42 asserts.** Si el payload está incompleto, **el build falla** — no publica una muestra a medias.
+
+### 5b. 🔴 LEER el artículo (el paso que el gate NO puede hacer)
+
+```bash
+pnpm read:aeo-xray <cliente>-<slug>
+```
+
+**El gate dio 40/40 con un artículo que se contradecía a sí mismo en siete puntos.** Y no podía verlo: los asserts verifican **estructura**, y **la coherencia argumental no es una propiedad estructural**.
+
+El script imprime cada párrafo del narrador **pegado a su cápsula**. Léelo y responde tres preguntas:
+
+1. ¿Algún párrafo **afirma** algo que otro bloque desmiente? *(la peor)*
+2. ¿Algún párrafo **repite** su cápsula en vez de aportar? *(sobra)*
+3. ¿Algún párrafo discute con un adversario **inventado**?
+
+⚠️ **Un verify verde sobre un artículo incoherente es peor que uno rojo: te deja tranquilo.**
 
 ### 6. Mirar el frame
 
@@ -162,6 +208,16 @@ curl -s -L "https://think.efeoncepro.com/muestras/<cliente>-<slug>-<token>" | gr
 🔴 **NUNCA inventar datos para tapar un hueco.** Si al cliente le falta algo (un autor con credencial, un video producido), **la muestra lo declara**. Decir lo que falta **suma**; simularlo **la destruye**.
 
 🔴 **NUNCA hardcodear un cliente en un componente.** Si escribes `if (cliente === '...')`, la frontera se rompió y el motor dejó de ser reutilizable.
+
+🔴 **NUNCA dejar anotación en la pantalla ②.** Se llama *«El artículo — lo que ve el lector»*. Si lleva rótulos de «Respuesta directa» o **recuadros de color**, entonces **no es lo que ve el lector**: es lo que ve el analista, y la pieza se contradice en su propio título. Con la anotación encima **nadie aprecia el artículo — solo ve la anotación**. Todo el aparato va en la ③, que es donde el trabajo *debe* verse. ⚠️ **Sacar el rótulo y dejar la caja no arregla nada**: un recuadro de color grita «acá hay una técnica aplicada» igual de fuerte.
+
+🔴 **NUNCA escribir el narrador sin releer el artículo completo.** Es exactamente cómo la pieza terminó **desmintiéndose a sí misma en siete puntos** con el gate en verde. Corre `pnpm read:aeo-xray` y **léelo**.
+
+🔴 **NUNCA inventar color narrativo.** *«Google te promete dos horas»* era falso — un hombre de paja para tener un gancho. En una pieza cuya tesis es el rigor, **el color inventado la destruye más rápido que la prosa plana**. Los específicos que hacen sonar al narrador *(la calamina, los 231 km sin bomba)* **se verifican y se citan**.
+
+🔴 **NUNCA dejar un bloque acoplable sin contraparte.** Un huérfano **promete** algo al otro lado —se ilumina, invita a pasar el cursor— y **no cumple**, en silencio. Los asserts 40-41 lo cazan.
+
+⚠️ **NUNCA abrir una cápsula definiendo el sujeto** (*«La Carretera Austral es…»*). Eso es una **entrada de enciclopedia** — la radiografía filtrándose al artículo. Es el tic más difícil de soltar cuando vienes de descomponer.
 
 🔴 **NUNCA escribir un `font-weight` crudo, ni asumir que una fuente "ya está cargada".** Nos pasó: la ruta pedía Poppins 600/700 y **no había importado ninguno de los dos** — solo heredaba los 800/900 del slogan. **Un `@font-face` que falta no falla: sustituye.** Todos los titulares salieron **ExtraBold** durante días mientras el CSS decía 600, y se veía *pesado pero bien dibujado*, así que ningún gate lo cazó. Los pesos salen de los tokens (`--w-display`, `--w-body-dark`, `--w-label`…) y **la ruta importa cada peso que usa**.
 

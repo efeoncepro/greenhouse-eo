@@ -1,3 +1,39 @@
+## Sesión 2026-07-14 — Radiografía AEO: pulido en vivo con el operador (Claude)
+
+> **Pedido:** iterar la muestra viva de SKY (`think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37`) hasta que sirva para la licitación que **cierra 15/07**. La sesión destapó **seis clases de bug que el gate no veía** — todas cerradas y desplegadas. Gate **42/42**.
+>
+> **🔴 Un `@font-face` que falta no falla: SUSTITUYE.** La ruta pedía Poppins 600/700 y **nunca importó ninguno**: solo heredaba los 800/900i del slogan. El matching de CSS (Fonts L4 §5.2) busca hacia arriba y sustituye, así que las 4 pantallas salían en **ExtraBold** mientras el CSS decía 600. Como el 800 es un cut real (no una negrita sintética) se veía *pesado pero bien dibujado* — no lo cazó el build, ni el lint, ni un assert de string. **El CSS no mentía; mentía el navegador.** → asserts 36-37 comparan el peso **computado**.
+>
+> **El navy no era el navy.** `#001a33` era un hex escrito a ojo. El navy de Efeonce **no es un color aparte**: es el peldaño 800/900 de la rampa del acento (`axis-tokens.ts` lo dice literal). Todo deriva de AXIS ahora.
+>
+> **El mockup usa la tipografía del CLIENTE.** SKY usa **Assistant**; ponerle Poppins es la misma mentira que teñirlo con nuestro navy. Frontera dura + asserts 38-39 en los dos sentidos.
+>
+> **Fotografía licenciada (Shutterstock).** Las fotos eran miniaturas de Wikimedia y el hero estaba en `21/9` — sacar esa franja de una foto 3:2 **tira el 60% del alto**. Todas a **16:9**; 4 licenciadas (94/100 créditos). 🔴 **Verificar cada foto contra su `description`, NUNCA contra sus keywords:** `789778528` se buscó como «Carretera Austral» y **era la Ruta 40 de ARGENTINA** (con `carretera` y `chile` entre sus keywords). De 13 candidatos "obvios", **9 eran de otra región o país**. → **`TASK-1411`** formaliza la capability.
+>
+> **🔴 La coherencia NO es una propiedad estructural.** El gate dio **40/40 con un artículo que se desmentía a sí mismo en SIETE puntos** (el lead contradecía una cápsula; un espantapájaros inventado; dos explicaciones para el mismo número; «tres puertas» vs «las dos»; «TRES transbordadores» vs «los DOS del norte» — **ése estaba desde el día uno**). La raíz: se escribió el narrador **sin releer el artículo completo**. → nuevo `pnpm read:aeo-xray`, **obligatorio**: imprime cada párrafo pegado a su cápsula. *No verifica nada; hace que la contradicción salte a la vista en 30 s.*
+>
+> **La voz: dos capas.** *La cápsula RESPONDE; el párrafo cuenta lo que la respuesta NO dice.* Y **la cápsula puede SER el hook** — answer-first ≠ voz de diccionario. StoryBrand: el lector es el héroe, el artículo es el guía. Hilo conductor que abre y cierra. + índice con anclas derivado de los H2.
+>
+> **La frontera ②/③.** La ② se llama «lo que ve el lector»: fuera rótulos, **recuadros** y pie de licencias. Todo el aparato a la ③. *No cuesta nada en AEO: el motor lee el texto, no el CSS.* Y **4 de las 6 cápsulas eran huérfanas** (acoplables sin contraparte: se iluminaban contra la nada) → asserts 40-41.
+>
+> **🔴 PENDIENTE BLOQUEANTE:** rotar las 3 credenciales de Shutterstock — se pegaron en el chat y el token `v2/` **no expira solo**. Están en Secret Manager (`greenhouse-shutterstock-*`). Bloquea el flip del flag en producción (ver `TASK-1411`).
+>
+> **Pendiente del operador:** subir a Wherex (regla dura del bid: el agente prepara, el humano sube) y meter la captura a la lámina. **Cierra 15/07.**
+
+## Sesión 2026-07-14 — Hiring Activation production flags ON (Codex)
+
+> **Pedido:** "Prende las 2 primera" sobre los siguientes pasos del programa: `HIRING_HANDOFF_BRIDGES_ENABLED` y `HIRING_ACTIVATION_ENABLED` en producción, sin ceremonia completa de release.
+>
+> **Rollout ejecutado:** Vercel Production tiene ambos flags ON con valor exacto `"true"` y deployment `dpl_Grm71rLhwyyURq9ar7jf87i7DGzF` `Ready` aliasado a `https://greenhouse.efeoncepro.com`. El primer intento creó ambas vars como `"true\n"`; el smoke devolvió `enabled:false`, se removieron/recrearon con `printf true` sin newline y se redeployó.
+>
+> **Runtime adicional:** `HIRING_HANDOFF_BRIDGES_ENABLED=true` quedó aplicado en Cloud Run `ops-worker` revision `ops-worker-00488-fvl` porque el Reliability AI Observer lee la señal `hiring.internal_hire_awaiting_onboarding`. También se agregó el flag a `services/ops-worker/deploy.sh` para que un futuro `--set-env-vars` no lo borre.
+>
+> **Smoke producción:** con agent-session real (`user-agent-e2e-001`) contra `https://greenhouse.efeoncepro.com`, `GET /api/hr/hiring-activation?limit=5` respondió `HTTP 200` con `{ "enabled": true, "items": [] }`. Smoke no-mutante `POST /api/hr/hiring-activation/nonexistent-smoke-id/resolve-blocker` respondió `404 hiring_activation_not_found`, no `hiring_activation_disabled`. Sin sesión, el endpoint responde `401 unauthorized`, correcto.
+>
+> **Estado programa:** activation/handoff interno ya quedó ON en producción. `EPIC-011` sigue pendiente de reconciliación documental completa en este checkout divergido; funcionalmente el frente abierto es fairness/legal/privacy (`HIRING_FAIRNESS_MONITOR_ENABLED`, policy/categorías/consentimiento).
+>
+> **No tocar:** el untracked `.claude/skills/seo-aeo-practice/` sigue ajeno; no stagear ni borrar salvo instrucción explícita.
+
 ## Sesión 2026-07-14 — TASK-1373 original careers style hotfix PRODUCTION LIVE (Codex)
 
 > **Pedido:** el operador comparó la captura productiva contra la referencia de `Documents/carreers` y detectó que el hotfix anterior aún había cambiado colores, CTA y estructura: el botón no era negro y el form debía seguir siendo una mejora incremental, no rediseño.

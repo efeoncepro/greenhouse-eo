@@ -166,6 +166,110 @@ Lo mismo con el video: la tarjeta dice explícito que **especifica el entregable
 
 Un `if (cliente === '...')` = la frontera se rompió.
 
+### 11. 🔴 La ② muestra lo que ve el LECTOR. La ③ muestra el trabajo. Nunca al revés
+
+La pantalla ② se llama **«El artículo — lo que ve el lector»**. Si lleva rótulos de «Respuesta directa» o recuadros de color, **entonces no es lo que ve el lector**: es lo que ve el analista. La pieza se contradice en su propio título.
+
+Y el daño es el que importa: **con la anotación encima, nadie aprecia el artículo — solo ve la anotación.** La ② existe justamente para que el artículo **se defienda solo**.
+
+| | ② El artículo (`coupled=false`) | ③ La radiografía (`coupled=true`) |
+|---|---|---|
+| Rótulo «Respuesta directa» | ❌ | ✅ |
+| Recuadro/tinte de la cápsula | ❌ (es el 1.er párrafo de la sección) | ✅ |
+| Pie con el inventario de licencias | ❌ | ✅ |
+| Crédito de cada foto | ✅ *(un blog real acredita)* | ✅ |
+| Bloque de fuentes | ✅ *(un artículo serio cita — y es la táctica «Cite Sources» +30%: es CONTENIDO)* | ✅ |
+
+⚠️ **Un recuadro de color grita «acá hay una técnica aplicada» tan fuerte como el letrero que la nombra.** Sacar el rótulo y dejar la caja no arregla nada.
+
+🔴 **Y no cuesta NADA en AEO**: el valor de la cápsula vive en el **texto** (answer-first, 40-60 palabras, bajo su H2). **El motor lee el texto, no el CSS.** Perder la caja no cuesta una sola cita.
+
+### 12. 🔴 El contrato del acoplamiento: cero huérfanos, cero fantasmas
+
+Un bloque acoplable **promete** que hay algo al otro lado: se ilumina, invita a pasar el cursor, ofrece foco de teclado. Si el instrumento no lo referencia, **la promesa se rompe en silencio** — no falla nada, simplemente no pasa nada. **Es peor que no acoplarlo.**
+
+- **Huérfano** — bloque acoplable **sin** contraparte en el instrumento → *se ilumina contra la nada.*
+- **Fantasma** — nodo del instrumento que apunta a un bloque que **ya no existe** → pasa al renombrar un `coupleId`.
+
+**Pasó de verdad (2026-07-14):** al agregar secciones, **4 de las 6 cápsulas** quedaron huérfanas — el instrumento declaraba la técnica **una vez** y el artículo la aplica **seis**. Cerrado + mecanizado en los **asserts 40-41** (`artIds` vs `instIds`).
+
+---
+
+## Las dos voces del artículo: la cápsula responde, el narrador cuenta
+
+**La tensión que hay que resolver antes de escribir una sola línea:** la cápsula de respuesta **no se puede conversacionalizar**. Es seca y answer-first **por diseño**, y es lo que el motor extrae (el patrón está en el **72,4%** de las páginas que ChatGPT cita). Si la ablandas, pierdes la citabilidad. Si dejas *todo* en voz de cápsula, la pieza se lee como un manual.
+
+**No es una voz: son dos capas.**
+
+> **La cápsula RESPONDE. El párrafo cuenta lo que la respuesta NO dice.**
+
+No es esquizofrénico — **es exactamente cómo habla una persona**: primero el dato, después el matiz. Y para AEO es **mejor**: la máquina extrae la cápsula intacta, y la prosa le da al humano una razón para quedarse.
+
+### El movimiento de craft que casi siempre se pierde: **la cápsula puede SER el hook**
+
+**Answer-first NO significa voz de diccionario.** Una cápsula que abre definiendo el sujeto —*«La Carretera Austral (Ruta 7) recorre 1.247 km…»*— es una **entrada de enciclopedia**, no un artículo. Es **la radiografía filtrándose al artículo**, y es el tic más difícil de soltar cuando vienes de descomponer.
+
+```
+❌ «La Carretera Austral (Ruta 7) recorre 1.247 km entre Puerto Montt y Villa O'Higgins…»
+✅ «Hay dos formas de empezar la Carretera Austral. Una: manejar los 1.247 km y subir el
+    auto a dos barcazas. La otra: volar a Balmaceda y estar en la mitad de la Ruta 7
+    antes del almuerzo.»
+```
+
+Las dos son answer-first, autocontenidas y de 40-60 palabras. **Solo una engancha.**
+
+**Truco:** alternar los nombres de la entidad (*«La Carretera Austral»* / *«La Ruta 7»*). Es la **misma entidad** —el motor la recupera igual— y mata el tic sin perder autocontención.
+
+### El artículo lo cuenta un GUÍA (StoryBrand SB7)
+
+**El lector es el héroe. El artículo es el guía. Nunca al revés.**
+
+| | |
+|---|---|
+| **Héroe** | el lector, con lo que quiere hacer |
+| **Problema** | externo (el obstáculo real) · interno (la frustración) |
+| **Guía** | el artículo: empatía + autoridad, **jamás protagonista** |
+| **Plan** | el itinerario concreto |
+| **Fracaso** | qué pierde si lo hace mal *(los stakes: sin ellos no hay tensión)* |
+| **Éxito** | la escena concreta de la transformación |
+
+Y **un hilo conductor** que se enuncia en el primer párrafo, atraviesa todas las secciones y **cierra**.
+
+### El registro conversacional no es opcional: es el oficio
+
+Un artículo *correcto* y **aburrido** no lo lee nadie. Los recursos —y hay que usarlos, no solo saberlos—:
+
+- **Preguntas al lector** — *«¿Diez días para 1.247 kilómetros?»*
+- **Remates cortos** — *«Son agua.» · «Por lado.» · «El barco, no.»*
+- **Antítesis** — *«La Carretera Austral no se conquista: se empieza.»*
+- **Anáfora** — *«El barco, no. El barco se llena, cambia el horario…»*
+- **Apartes con humor** — *«(Sí: otra vez los transbordadores.)»*
+- **Cadencia** — frases de 1 a 34 palabras. Una larga que fluye. Después una corta. **Golpea.** *La monotonía de largo es lo que mata el ritmo.*
+
+### 🔴 La coherencia NO es una propiedad estructural
+
+**El gate dio 40/40 con un artículo que se contradecía a sí mismo en siete puntos.** Y no podía cazarlo: los asserts verifican **estructura** (¿hay cápsula? ¿hay tabla? ¿hay fuente?). **No hay regex que vea una contradicción argumental.**
+
+Lo que pasó, y va a volver a pasar si no se hace el paso:
+
+1. El lead abría con *«en ripio no se maneja a 90»* y tres secciones más abajo la cápsula decía *«está pavimentada por tramos»*. **El artículo desmentía su propio lead.**
+2. *«Los 1.247 km **parecen** tres días»* — un **espantapájaros**: ninguna cápsula dijo eso.
+3. **Dos explicaciones distintas para el mismo número** (diez días) en la misma pieza.
+4. *«Google te promete dos horas»* — **falso**. Google Maps conoce la ruta.
+5. *«Ningún día pasa de cinco horas al volante»* — **no describía el itinerario que estaba justo arriba**.
+6. Una cápsula decía *«hay TRES puertas»* y el narrador de al lado *«las DOS puertas»*.
+7. *«Los TRES transbordadores del norte»* (cápsula + tabla) vs *«los DOS del tramo norte»* (cápsula de transbordadores). **Ese estaba desde el día uno.**
+
+**La raíz:** se escribió la capa del narrador **sin releer el artículo completo**, y se inventó una tesis que sonaba bien sin verificar que la pieza la sostuviera. **En una muestra cuya tesis entera es el rigor.**
+
+🔴 **`pnpm read:aeo-xray` es OBLIGATORIO antes de tocar el texto de una muestra.** Imprime cada párrafo del narrador **pegado a su cápsula** y cierra con las tres preguntas:
+
+1. ¿Algún párrafo **afirma** algo que otro bloque desmiente? *(la peor)*
+2. ¿Algún párrafo **repite** su cápsula en vez de aportar? *(sobra)*
+3. ¿Algún párrafo discute con un adversario **inventado**?
+
+**No verifica nada. Hace que la contradicción salte a la vista en 30 segundos.** Un verify verde sobre un artículo incoherente **es peor que uno rojo**: te deja tranquilo.
+
 ---
 
 ## Tipografía: la ruta carga los pesos que pide, y el CSS no declara ninguno crudo

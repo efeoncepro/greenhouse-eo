@@ -437,6 +437,49 @@ En **`greenhouse-eo`**:
 - **Versión genérica sin marca de cliente**, indexable, como activo de captación en Think. La versión con marca de cliente es `noindex` por diseño; una genérica sí puede hacer el trabajo de hub. Conecta con `PDR-001` (landing SEO complementaria a `/aeo-2/`, hoy sin demo).
 - **Segundo payload (Berel u otro)** — es la prueba real de que el motor es reutilizable. Mientras exista un solo payload, la reutilización es una hipótesis, no un hecho.
 
+## Delta 2026-07-14 (b) — la sesión de pulido: tipografía, fotografía, voz y la frontera ②/③
+
+La pieza estaba **viva y funcionando**, y una sesión de pulido con el operador destapó **seis clases de bug** que el gate no veía. Todas cerradas y desplegadas. Detalle completo en [`docs/think/radiografia-aeo-architecture.md`](../../think/radiografia-aeo-architecture.md).
+
+### 1. 🔴 Un `@font-face` que falta no falla: **sustituye**
+
+La ruta pedía Poppins **600/700** y **nunca importó ninguno de los dos** — solo heredaba los 800/900i del slogan. El matching de CSS (Fonts L4 §5.2) busca hacia arriba y **sustituye**: los cuatro pantallas salían en **ExtraBold** mientras el CSS decía 600. Como el 800 es un cut real (no una negrita sintética), se veía *pesado pero bien dibujado* — no lo cazó el build, ni el lint, ni un assert de string. **El CSS no mentía; mentía el navegador.** Sistema de pesos con rol + compensación óptica (titulares ≥40px bajan a 500). Asserts **36-37** (peso **computado**, no declarado).
+
+### 2. El color no era el color: `#001a33` no existe en AXIS
+
+El navy de Efeonce **no es un color aparte**: es el peldaño **800/900 de la rampa del acento** (`axis-tokens.ts` lo dice literal). Lo que había era rgb(0,26,51) — casi negro-azul, **otra marca**. Todo deriva ahora de AXIS. De 24 hex crudos quedan la rampa y el blanco.
+
+### 3. La tipografía del cliente: **el mockup usa la fuente del cliente**
+
+SKY usa **Assistant** (700 titulares / 400 cuerpo a 18px). Ponerle Poppins es **la misma mentira** que teñirlo con nuestro navy: muestra un resultado que el cliente nunca vería. **Frontera dura:** Assistant vive **solo** bajo `.xr-article`; el chrome, el instrumento y las pantallas ①/④ siguen en Poppins + Geist. Asserts **38-39** (en los dos sentidos).
+
+### 4. Fotografía licenciada (Shutterstock) + tres bug classes silenciosas
+
+Las fotos eran **miniaturas** de Wikimedia (hero 1400×600) → pixelado. Y el hero estaba en **`21/9`**: sacar esa franja de una foto 3:2 **tira el 60% del alto**. Ahora **todas a 16:9**, y cuatro fotos licenciadas (96 → 94 créditos).
+
+🔴 **Verificar cada foto contra su `description`, nunca contra sus keywords.** `789778528` se buscó como «Carretera Austral» y **era la Ruta 40 de ARGENTINA** (con `carretera` y `chile` entre sus keywords). De 13 candidatos "obvios", **9 eran de otra región o país**. Y `is_editorial` debe ser `false`. → **`TASK-1411`** formaliza la capability.
+
+### 5. 🔴 La coherencia NO es una propiedad estructural
+
+**El gate dio 40/40 con un artículo que se desmentía a sí mismo en SIETE puntos** (el lead contradecía una cápsula; un espantapájaros inventado; dos explicaciones para el mismo número; *«Google te promete dos horas»* — falso; «tres puertas» vs «las dos puertas»; «TRES transbordadores» vs «los DOS del norte» — **ése estaba desde el día uno**).
+
+**La raíz:** se escribió la capa del narrador **sin releer el artículo completo**. Nuevo script **obligatorio**: `pnpm read:aeo-xray` — imprime cada párrafo **pegado a su cápsula**. *No verifica nada: hace que la contradicción salte a la vista en 30 segundos.*
+
+### 6. La voz: dos capas, y el hook vive en la cápsula
+
+> **La cápsula RESPONDE. El párrafo cuenta lo que la respuesta NO dice.**
+
+Y **la cápsula puede SER el hook**: *answer-first ≠ voz de diccionario*. Abrir con *«La Carretera Austral (Ruta 7) recorre 1.247 km…»* es una **entrada de enciclopedia** — la radiografía filtrándose al artículo. StoryBrand: **el lector es el héroe, el artículo es el guía**. Hilo conductor que abre y **cierra**. Registro conversacional real (preguntas, remates cortos, antítesis, anáfora, cadencia de 1 a 34 palabras). **+ índice con anclas**, derivado de los H2 (drift imposible).
+
+### 7. La frontera ②/③, y el contrato del acoplamiento
+
+La ② se llama **«lo que ve el lector»**: fuera los rótulos, **los recuadros** y el pie de licencias. Todo el aparato va en la ③. *No cuesta nada en AEO: el motor lee el texto, no el CSS.*
+
+Y **4 de las 6 cápsulas eran huérfanas** — acoplables, pero sin contraparte en el instrumento: se iluminaban **contra la nada**. Asserts **40-41** (huérfanos y fantasmas).
+
+**Gate: 42/42.** Vive en `https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37`.
+
+
 ## Open Questions
 
 - **El ángulo del artículo está sin resolver por diseño** y lo resuelve el gate humano del Slice 1. El agente **no debe** elegirlo.
