@@ -1,3 +1,13 @@
+## Sesión 2026-07-14 — TASK-1373 visual fidelity hotfix en release (Codex)
+
+> **Pedido:** el operador revisó la captura productiva del apply form y detectó regresión estética: los iconos ya no estaban dentro de los campos y el uploader perdió el estilo rico del form original.
+>
+> **Fix:** `src/growth-forms-renderer` recupera fidelidad para `styleVariant=careers-html-fidelity`: iconos inline dentro de inputs/select/textarea/teléfono, sin icon badges en labels; uploader como dropzone con icon tile/copy/hint/status; CTA primario con icono/spinner; guard contra labels con `(opcional)` duplicado. No cambia contrato backend, submit, captcha ni proyección ATS.
+>
+> **Evidencia local previa al release:** Vitest focused PASS, `pnpm exec tsc --noEmit --pretty false` PASS, ESLint focused PASS, `pnpm lint` PASS, `pnpm build` PASS con warning histórico del reader roadmap/work-item-index, `pnpm renderer:build` PASS, `pnpm qa:gates --changed --agent codex --task TASK-1373 --ui --runtime --release --production` PASS advisory, `pnpm task:lint --task TASK-1373` PASS, `pnpm docs:closure-check` PASS. Capturas harness con contrato productivo + bundle local: `/tmp/task1373-form-fidelity-fix/desktop-form-card.png` y `/tmp/task1373-form-fidelity-fix/mobile-390-form-card.png`; métricas desktop/mobile `controlIcons=8`, `labelIcons=0`, `fileDropzone=true`, `fileIcon=true`, `buttonIcon=true`, `phoneShell=true`, `duplicatedOptionalLabels=0`, `scrollOverflow=false`.
+>
+> **Release:** en curso por el playbook de producción. No tocar el untracked `.claude/skills/seo-aeo-practice/`.
+
 ## Sesión 2026-07-14 — TASK-1373 production release completo (Codex)
 
 > **Pedido:** release completo a producción usando skills de release y leyendo el playbook de paso a producción. Skills usadas: `greenhouse-production-release`, `vercel-operations`, `greenhouse-qa-release-auditor`, `greenhouse-documentation-governor` y `greenhouse-secret-hygiene`. Playbooks leídos: `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md`, `docs/operations/runbooks/production-release.md`, `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`, `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` y `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`.

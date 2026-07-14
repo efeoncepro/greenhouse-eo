@@ -79,6 +79,10 @@ const el = <K extends keyof HTMLElementTagNameMap>(
 }
 
 let idSeq = 0
+const SVG_NS = 'http://www.w3.org/2000/svg'
+
+type PresentationIcon = NonNullable<NonNullable<RendererFieldDefinition['presentation']>['icon']>
+type RendererIconName = PresentationIcon | 'send' | 'spinner'
 
 export class FormRenderer {
   private readonly doc: Document
@@ -420,7 +424,13 @@ export class FormRenderer {
   private renderField(field: RendererFieldDefinition): HTMLElement {
     const fieldId = `${this.instanceId}-${field.key}`
     const errorId = `${fieldId}-error`
-    const helpText = this.contract.copy?.[`${field.key}.help`]
+    const rawHelpText = this.contract.copy?.[`${field.key}.help`]
+
+    const helpText =
+      rawHelpText && !(this.contract.styleVariant === 'careers-html-fidelity' && field.type === 'file')
+        ? rawHelpText
+        : undefined
+
     const helpId = helpText ? `${fieldId}-help` : undefined
     const required = isFieldRequired(field, this.values)
     const error = this.errors[field.key]
@@ -438,7 +448,7 @@ export class FormRenderer {
     if (field.type !== 'checkbox' && field.type !== 'consent') {
       const labelEl = el(this.doc, 'label', { class: 'ghf-label', for: fieldId })
 
-      if (field.presentation?.icon) {
+      if (field.presentation?.icon && !this.usesInlineControlIcons()) {
         labelEl.appendChild(
           el(
             this.doc,
@@ -452,7 +462,8 @@ export class FormRenderer {
       labelEl.appendChild(el(this.doc, 'span', {}, label))
 
       if (required) labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-required', 'aria-hidden': 'true' }, '*'))
-      else labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-optional' }, '(opcional)'))
+      else if (!this.labelAlreadyMarksOptional(label))
+        labelEl.appendChild(el(this.doc, 'span', { class: 'ghf-optional' }, '(opcional)'))
       wrap.appendChild(labelEl)
     }
 
@@ -472,18 +483,41 @@ export class FormRenderer {
     } else if (control.classList.contains('ghf-tag-input')) {
       wrap.appendChild(control)
     } else if (field.type === 'select' || field.type === 'multiselect') {
-      const controlWrap = el(this.doc, 'div', { class: 'ghf-control ghf-control--select' })
+      const hasLeadingIcon = this.shouldRenderControlIcon(field)
+
+      const controlWrap = el(this.doc, 'div', {
+        class: `ghf-control ghf-control--select${hasLeadingIcon ? ' ghf-control--with-icon' : ''}`
+      })
+
       const customSelect = control.classList.contains('ghf-select-composite')
+
+      if (hasLeadingIcon && field.presentation?.icon) {
+        controlWrap.appendChild(this.renderIcon(field.presentation.icon, 'ghf-control-icon'))
+      }
 
       controlWrap.appendChild(control)
       if (field.type === 'select' && !customSelect)
         controlWrap.appendChild(el(this.doc, 'span', { class: 'ghf-select-icon', 'aria-hidden': 'true' }))
       wrap.appendChild(controlWrap)
     } else if (supportsStatusIcon) {
-      const controlWrap = el(this.doc, 'div', { class: 'ghf-control' })
+      const hasLeadingIcon = this.shouldRenderControlIcon(field) && field.type !== 'tel'
+
+      const controlWrap = el(this.doc, 'div', {
+        class: `ghf-control${field.type === 'tel' ? ' ghf-control--tel' : ''}${hasLeadingIcon ? ' ghf-control--with-icon' : ''}`
+      })
+
+      if (hasLeadingIcon && field.presentation?.icon) {
+        controlWrap.appendChild(this.renderIcon(field.presentation.icon, 'ghf-control-icon'))
+      }
 
       controlWrap.appendChild(control)
       controlWrap.appendChild(el(this.doc, 'span', { class: 'ghf-status-icon', 'aria-hidden': 'true' }))
+      wrap.appendChild(controlWrap)
+    } else if (this.shouldRenderControlIcon(field)) {
+      const controlWrap = el(this.doc, 'div', { class: 'ghf-control ghf-control--textarea ghf-control--with-icon' })
+
+      if (field.presentation?.icon) controlWrap.appendChild(this.renderIcon(field.presentation.icon, 'ghf-control-icon'))
+      controlWrap.appendChild(control)
       wrap.appendChild(controlWrap)
     } else {
       wrap.appendChild(control)
@@ -536,6 +570,10 @@ export class FormRenderer {
     if (field.copyRef && this.contract.copy?.[field.copyRef]) return this.contract.copy[field.copyRef]
 
     return field.key
+  }
+
+  private labelAlreadyMarksOptional(label: string): boolean {
+    return /\b(opcional|optional)\b/i.test(label)
   }
 
   private renderControl(
@@ -643,7 +681,100 @@ export class FormRenderer {
     return this.contract.styleVariant === 'diagnostic_premium' || this.contract.styleVariant === 'careers-html-fidelity'
   }
 
-  private fieldIconGlyph(icon: NonNullable<RendererFieldDefinition['presentation']>['icon']): string {
+  private usesInlineControlIcons(): boolean {
+    return this.contract.styleVariant === 'careers-html-fidelity'
+  }
+
+  private shouldRenderControlIcon(field: RendererFieldDefinition): boolean {
+    if (!this.usesInlineControlIcons() || !field.presentation?.icon) return false
+
+    return ['text', 'email', 'tel', 'url', 'national_id', 'number', 'date', 'textarea', 'select'].includes(field.type)
+  }
+
+  private renderIcon(icon: RendererIconName, className: string): HTMLElement {
+    const wrap = el(this.doc, 'span', { class: className, 'aria-hidden': 'true', 'data-icon': icon })
+
+    if (icon === 'linkedin') {
+      wrap.appendChild(el(this.doc, 'span', { class: 'ghf-icon-text' }, 'in'))
+
+      return wrap
+    }
+
+    const svg = this.doc.createElementNS(SVG_NS, 'svg')
+
+    const append = (tag: string, attrs: Record<string, string>) => {
+      const node = this.doc.createElementNS(SVG_NS, tag)
+
+      for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value)
+      svg.appendChild(node)
+    }
+
+    svg.setAttribute('viewBox', '0 0 24 24')
+    svg.setAttribute('fill', 'none')
+    svg.setAttribute('stroke', 'currentColor')
+    svg.setAttribute('stroke-width', '2')
+    svg.setAttribute('stroke-linecap', 'round')
+    svg.setAttribute('stroke-linejoin', 'round')
+
+    switch (icon) {
+      case 'mail':
+        append('rect', { x: '3', y: '5', width: '18', height: '14', rx: '2' })
+        append('path', { d: 'm4 7 8 6 8-6' })
+        break
+      case 'phone':
+        append('path', {
+          d: 'M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z'
+        })
+        break
+      case 'link':
+        append('path', { d: 'M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.2 1.2' })
+        append('path', { d: 'M14 11a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.2-1.2' })
+        break
+      case 'globe':
+        append('circle', { cx: '12', cy: '12', r: '10' })
+        append('path', { d: 'M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20' })
+        break
+      case 'briefcase':
+        append('path', { d: 'M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1' })
+        append('rect', { x: '3', y: '7', width: '18', height: '13', rx: '2' })
+        append('path', { d: 'M3 13h18M12 13v2' })
+        break
+      case 'calendar':
+        append('rect', { x: '3', y: '4', width: '18', height: '18', rx: '2' })
+        append('path', { d: 'M16 2v4M8 2v4M3 10h18' })
+        break
+      case 'clock':
+        append('circle', { cx: '12', cy: '12', r: '10' })
+        append('path', { d: 'M12 6v6l4 2' })
+        break
+      case 'message':
+        append('path', { d: 'M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z' })
+        break
+      case 'file':
+        append('path', { d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' })
+        append('path', { d: 'M17 8a5 5 0 0 0-9.8-1.5A4.5 4.5 0 0 0 7.5 15H9' })
+        append('path', { d: 'M12 12v7M8.5 15.5 12 12l3.5 3.5' })
+        break
+      case 'send':
+        append('path', { d: 'm22 2-7 20-4-9-9-4Z' })
+        append('path', { d: 'M22 2 11 13' })
+        break
+      case 'spinner':
+        append('path', { d: 'M21 12a9 9 0 1 1-6.2-8.6' })
+        break
+      case 'user':
+      default:
+        append('circle', { cx: '12', cy: '7', r: '4' })
+        append('path', { d: 'M5.5 21a6.5 6.5 0 0 1 13 0' })
+        break
+    }
+
+    wrap.appendChild(svg)
+
+    return wrap
+  }
+
+  private fieldIconGlyph(icon: PresentationIcon): string {
     switch (icon) {
       case 'mail':
         return '@'
@@ -951,6 +1082,8 @@ export class FormRenderer {
   }
 
   private renderFileControl(field: RendererFieldDefinition, common: Record<string, string>): HTMLElement {
+    if (this.contract.styleVariant === 'careers-html-fidelity') return this.renderCareersFileControl(field, common)
+
     const wrap = el(this.doc, 'div', { class: 'ghf-file' })
     const input = el(this.doc, 'input', { ...common, type: 'file', class: 'ghf-file-input' })
     const status = el(this.doc, 'p', { class: 'ghf-file-status', 'aria-live': 'polite' })
@@ -1047,6 +1180,124 @@ export class FormRenderer {
     return wrap
   }
 
+  private renderCareersFileControl(field: RendererFieldDefinition, common: Record<string, string>): HTMLElement {
+    const wrap = el(this.doc, 'div', { class: 'ghf-file' })
+    const input = el(this.doc, 'input', { ...common, type: 'file', class: 'ghf-file-input' })
+    const dropzone = el(this.doc, 'label', { class: 'ghf-file-dropzone', for: common.id })
+    const copyWrap = el(this.doc, 'span', { class: 'ghf-file-dropzone-copy' })
+    const status = el(this.doc, 'p', { class: 'ghf-file-status', 'aria-live': 'polite' })
+    const policy = field.uploadPolicy
+    const selected = this.fileValues.get(field.key)
+    const help = this.contract.copy?.[`${field.key}.help`]?.trim()
+    const [headline] = help ? help.split('. ') : []
+
+    if (policy?.acceptedMimeTypes.length) input.setAttribute('accept', policy.acceptedMimeTypes.join(','))
+
+    copyWrap.appendChild(
+      el(this.doc, 'span', { class: 'ghf-file-dropzone-title' }, headline?.replace(/\.$/, '') || this.fieldLabel(field))
+    )
+
+    if (policy?.maxBytes) {
+      copyWrap.appendChild(el(this.doc, 'span', { class: 'ghf-file-dropzone-hint' }, this.copy.fileHint(policy.maxBytes)))
+    }
+
+    dropzone.appendChild(this.renderIcon(field.presentation?.icon ?? 'file', 'ghf-file-dropzone-icon'))
+    dropzone.appendChild(copyWrap)
+
+    const setStatus = (hasSelectedFile: boolean) => {
+      wrap.dataset.selected = hasSelectedFile ? 'true' : 'false'
+      status.textContent = hasSelectedFile ? this.copy.fileSelected : ''
+    }
+
+    setStatus(Boolean(selected))
+
+    input.addEventListener('change', () => {
+      const file = input.files?.[0] ?? null
+
+      delete this.errors[field.key]
+
+      if (!file) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        setStatus(false)
+        this.touched.add(field.key)
+        this.revalidateField(field)
+        this.onValueChange(field)
+
+        return
+      }
+
+      if (!policy) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        this.errors[field.key] = this.copy.fileUnsupported
+        setStatus(false)
+        this.touched.add(field.key)
+        this.patchFieldErrorDom(field.key)
+        this.setFieldStatus(field, 'error')
+        this.maybeStart()
+        this.onFieldEdited()
+
+        return
+      }
+
+      if (file.size <= 0) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        this.errors[field.key] = this.copy.fileEmpty
+        setStatus(false)
+        this.touched.add(field.key)
+        this.patchFieldErrorDom(field.key)
+        this.setFieldStatus(field, 'error')
+        this.maybeStart()
+        this.onFieldEdited()
+
+        return
+      }
+
+      if (file.size > policy.maxBytes) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        this.errors[field.key] = this.copy.fileTooLarge(policy.maxBytes)
+        setStatus(false)
+        this.touched.add(field.key)
+        this.patchFieldErrorDom(field.key)
+        this.setFieldStatus(field, 'error')
+        this.maybeStart()
+        this.onFieldEdited()
+
+        return
+      }
+
+      if (file.type && !policy.acceptedMimeTypes.includes(file.type)) {
+        this.fileValues.delete(field.key)
+        this.values[field.key] = ''
+        this.errors[field.key] = this.copy.fileUnsupported
+        setStatus(false)
+        this.touched.add(field.key)
+        this.patchFieldErrorDom(field.key)
+        this.setFieldStatus(field, 'error')
+        this.maybeStart()
+        this.onFieldEdited()
+
+        return
+      }
+
+      this.fileValues.set(field.key, file)
+      this.values[field.key] = 'selected'
+      setStatus(true)
+      this.touched.add(field.key)
+      this.revalidateField(field)
+      this.onValueChange(field)
+    })
+
+    wrap.appendChild(input)
+    wrap.appendChild(dropzone)
+    wrap.appendChild(status)
+
+    return wrap
+  }
+
   /**
    * Campo de teléfono internacional (estilo HubSpot): selector de país in-field
    * (bandera + calling code) + input nacional. El valor almacenado/enviado es E.164
@@ -1130,7 +1381,16 @@ export class FormRenderer {
     })
 
     wrapper.appendChild(select)
-    wrapper.appendChild(input)
+
+    if (this.shouldRenderControlIcon(field) && field.presentation?.icon) {
+      const inputShell = el(this.doc, 'div', { class: 'ghf-tel-input-shell ghf-control--with-icon' })
+
+      inputShell.appendChild(this.renderIcon(field.presentation.icon, 'ghf-control-icon'))
+      inputShell.appendChild(input)
+      wrapper.appendChild(inputShell)
+    } else {
+      wrapper.appendChild(input)
+    }
 
     return wrapper
   }
@@ -1694,6 +1954,10 @@ export class FormRenderer {
       button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-arrow', 'aria-hidden': 'true' }, '→'))
 
       return
+    }
+
+    if (this.contract.styleVariant === 'careers-html-fidelity' && button.dataset.ghfPrimary === 'true') {
+      button.appendChild(this.renderIcon(this.submitting ? 'spinner' : 'send', 'ghf-btn-icon'))
     }
 
     button.appendChild(el(this.doc, 'span', { class: 'ghf-btn-label' }, label))
