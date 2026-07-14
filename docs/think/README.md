@@ -14,6 +14,14 @@ herramientas, reportes y superficies de lectura ejecutiva.
 - [Arquitectura de patrones UI Think](architecture-ui-patterns.md)
 - [Landing Brand Visibility](brand-visibility-landing.md)
 - [Manual para reutilizar patrones UI Think](reuse-ui-patterns-manual.md)
+- **[Radiografía AEO — Arquitectura](radiografia-aeo-architecture.md)** · **[Manual](radiografia-aeo-manual.md)**
+
+## Herramientas vivas en Think
+
+| Herramienta | Qué es | Ruta |
+|---|---|---|
+| **AI Visibility Grader** | Informe público de visibilidad en motores de respuesta, por token. Greenhouse calcula, Think presenta. | `/brand-visibility` · `/brand-visibility/r/<token>` |
+| **Radiografía AEO** | **Muestra de trabajo para propuestas comerciales.** Recorre en 4 pantallas un artículo real y expone su capa técnica + la evidencia de por qué existe. El **cliente es un payload**, no código. Primer caso: licitación SKY. | `/muestras/<slug>-<token>` |
 
 ## Principios
 
@@ -33,6 +41,15 @@ herramientas, reportes y superficies de lectura ejecutiva.
 - **La UI se valida como producto vivo.** Cada patron visible debe verificarse en
   desktop y mobile con captura visual, overflow check, estados degradados y una
   prueba del contrato browser que consuma.
+- **Un gate verde con una captura ilegible no es un cierre valido.** El gate no
+  mira. Varios bugs de la Radiografia AEO solo aparecieron al ABRIR el PNG — entre
+  ellos una regla CSS que nunca se agrego (el reemplazo apuntaba a una clase que ya
+  no existia = no-op silencioso) y que dejaba los textos de lector de pantalla
+  visibles en pantalla.
+- **Una muestra con marca de cliente NUNCA emite su schema como marcado activo.**
+  Publicar en `think.efeoncepro.com` un `application/ld+json` que declare
+  `author: <cliente>` es un dato estructurado FALSO en nuestro propio dominio,
+  ingerible por crawlers. Se muestra como texto escapado. Ver Radiografia AEO.
 
 ## Contratos relacionados
 

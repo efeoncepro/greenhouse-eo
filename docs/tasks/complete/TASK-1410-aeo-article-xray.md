@@ -12,10 +12,10 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
-- UI impact: `interaction`
+- UI impact: `flow`
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1410-aeo-article-xray.md`
-- Flow: `none`
+- Flow: `docs/ui/flows/TASK-1410-aeo-article-xray-flow.md`
 - Motion: `docs/ui/motion/TASK-1410-aeo-article-xray-motion.md`
 - Backend impact: `none`
 - Epic: `none`
@@ -652,3 +652,59 @@ Sin JS el *hint* prometía interactividad que no ocurre (ahora se revela solo cu
 2. **El assert 20 pasaba por la razón equivocada** (por distancia entre strings). Y *«que la cadena +41% no exista»* habría sido un test **falso**: la muestra **nombra** esa táctica a propósito, dentro de la frase que declara que **no la aplica**. Lo que no puede existir es un **stat** que la reclame. → assert 20 parsea los stats renderizados, y el **20b** exige lo simétrico: que sí se declaren las que sí aplicamos.
 
 `verify:aeo-xray` **25/25**. Desplegado y verificado en producción. Commit `efeonce-think` `3c42109`.
+
+
+## Delta 2026-07-14 (7) — De una pantalla a un FLOW de cuatro. Y documentado en Greenhouse.
+
+*"En vez de una pantalla, debes pensar entonces en un flow de pantallas."* Correcto, y es una corrección de **arquitectura**, no de layout.
+
+La V1 metía **cinco trabajos en una página**. Y el síntoma que el operador venía reportando —*"el artículo se ve plano"*— tenía su causa raíz **acá**: **el artículo nunca tuvo espacio para ser LEÍDO**, porque el panel de máquina le comía el 46% del ancho. Le puse tipografía editorial a un contenedor que no era editorial.
+
+### Las cuatro pantallas
+
+| # | Ruta | Trabajo |
+|---|---|---|
+| ① | `/muestras/<slug>-<token>` | **El hueco.** El SERP real: Wikipedia, Instagram, gochile, chile.travel, TripAdvisor. **Cero aerolíneas.** Y SKY es la que vuela a Balmaceda. Vivía comprimido en una cajita; ahora es la portada y es el golpe |
+| ② | `…/articulo` | **El artículo.** Ancho completo, **sin acoplamiento**. Acá por fin respira |
+| ③ | `…/radiografia` | **La radiografía.** El split. Funciona 10× mejor porque el evaluador **ya leyó** el artículo: la revelación aterriza en vez de competir por su atención |
+| ④ | `…/atomizacion` | **Dónde más vive.** *«Este artículo no vive solo en una URL»* — la frase **textual** de la oferta, que la muestra hasta hoy **contradecía** |
+
+### La atomización no es una lista de entregables
+
+Cada átomo es **una superficie más donde el motor de respuesta puede encontrar a SKY**, con su dato medido:
+
+- **Video** ← del H2 *«¿Cómo se llega?»*. **YouTube superó a Reddit** como la plataforma social más citada. El video **es un canal de búsqueda**, no contenido extra.
+- **Pieza social** ← de la cita destacada. Las **menciones off-site correlacionan ~3× más que los backlinks** con la visibilidad en IA. La distribución social se hace **por entidad**, no por alcance.
+- **Set de imágenes** ← las 4 fotos, con el `alt` **como contenido**, no como trámite.
+
+Y cada uno declara su **línea de sangre**: de qué bloque del artículo nació. **No son entregables sueltos: son derivados con trazabilidad.**
+
+**Honestidad:** la tarjeta del video dice explícito que **especifica el entregable y NO lo simula** — la producción va en el mes 1. Un reproductor con play y nada detrás sería la trampa que esta pieza existe para no cometer.
+
+### Navegación y transiciones
+
+**Riel pegajoso** cuyo trabajo no es navegar sino **avisar que el recorrido tiene más**. **"Siguiente"** grande con la frase que engancha. **Cada paso es una URL** (el deck enlaza directo) y **la URL que ya circulaba sigue viva**: es la portada.
+
+**View Transitions cross-document, CSS puro, CERO JavaScript.** La que cuenta la historia es la **② → ③**: el artículo que acabas de leer **se encoge y se convierte en el espécimen** bajo el instrumento. El chrome y el riel **no** se animan: son el marco estable.
+
+### Lo inmediato que se cerró antes
+
+**Core Web Vitals.** La pieza **reprobaba su propio examen**: 1,5 MB de JPEG crudos desde `public/`, que salta el pipeline de Astro (sin `width`/`height` → CLS; sin `srcset` → el teléfono bajaba los 527 KB del hero de escritorio; sin AVIF). Y **optimizar no arregla una fuente mal recortada**: el hero era **933×1400 vertical** para pintarse como franja 21:9.
+
+| | Antes | Ahora |
+|---|---|---|
+| Imágenes en móvil | 1.536 KB | **78 KB** (20×) |
+| Imágenes en desktop | 1.536 KB | **128 KB** |
+| LCP | — | **52 ms** móvil · **112 ms** desktop |
+| CLS | garantizado | **0** |
+
+**El acoplamiento no existía en móvil.** Apilado, el instrumento queda a **diez pantallas**. Tocabas un bloque, se encendía el chip… y nada más. Ahora **sube como hoja inferior**. Y otro falso verde propio: lo medía con `isVisible()`, que **solo mira el CSS** y devolvía `true` para un nodo diez pantallas fuera de vista.
+
+### Documentación en Greenhouse (para que sobreviva a la sesión)
+
+- **`docs/think/radiografia-aeo-architecture.md`** — los 10 invariantes, el flow, la arquitectura de datos, los CWV, la a11y, el gate.
+- **`docs/think/radiografia-aeo-manual.md`** — cómo se crea la muestra del siguiente cliente, qué significan las señales, qué NO hacer, problemas comunes.
+- **`docs/ui/flows/TASK-1410-aeo-article-xray-flow.md`** — el contrato de flow. La task pasa de `UI impact: interaction` a **`flow`**.
+- **`docs/think/README.md`** — índice + tabla de herramientas vivas en Think + dos principios nuevos (*un gate verde con una captura ilegible no es un cierre válido* · *una muestra con marca de cliente NUNCA emite su schema como marcado activo*).
+
+`verify:aeo-xray` **36/36**. Desplegado y verificado en producción. Commit `efeonce-think` `60b7784`.
