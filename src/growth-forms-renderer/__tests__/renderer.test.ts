@@ -5,6 +5,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import type { RendererApiConfig } from '../api-client'
 import { FormRenderer } from '../renderer'
 import { conditionalContractFixture, multiStepContractFixture, staticContractFixture } from '../fixtures'
+import { RENDERER_CSS } from '../styles'
 import { resetTurnstileLoaderForTests } from '../turnstile'
 
 const api: RendererApiConfig = {
@@ -108,6 +109,14 @@ describe('growth-forms-renderer · FormRenderer', () => {
           dataClass: 'contact_pii'
         },
         {
+          key: 'lastName',
+          type: 'text',
+          label: 'Apellido',
+          required: true,
+          presentation: { icon: 'user' },
+          dataClass: 'contact_pii'
+        },
+        {
           key: 'phone',
           type: 'tel',
           label: 'Teléfono',
@@ -120,6 +129,14 @@ describe('growth-forms-renderer · FormRenderer', () => {
           type: 'url',
           label: 'LinkedIn (opcional)',
           presentation: { icon: 'linkedin' },
+          dataClass: 'public'
+        },
+        {
+          key: 'availability',
+          type: 'select',
+          label: 'Disponibilidad (opcional)',
+          presentation: { icon: 'calendar' },
+          options: [{ value: 'immediate', label: 'Inmediata' }],
           dataClass: 'public'
         },
         {
@@ -154,6 +171,17 @@ describe('growth-forms-renderer · FormRenderer', () => {
     const { root } = mountInto(contract)
     const email = root.querySelector<HTMLInputElement>('[name="email"]')!
 
+    expect(root.querySelector('.ghf-careers-progress-shell')).toBeTruthy()
+    expect(Array.from(root.querySelectorAll('.ghf-careers-section-marker')).map(node => node.textContent)).toEqual([
+      '01',
+      '02',
+      '03'
+    ])
+    expect(root.querySelector('[data-ghf-field-key="firstName"]')?.classList.contains('ghf-field--full')).toBe(false)
+    expect(root.querySelector('[data-ghf-field-key="lastName"]')?.classList.contains('ghf-field--full')).toBe(false)
+    expect(root.querySelector('[data-ghf-field-key="email"]')?.classList.contains('ghf-field--full')).toBe(true)
+    expect(root.querySelector('[data-ghf-field-key="phone"]')?.classList.contains('ghf-field--full')).toBe(true)
+    expect(root.querySelector('[data-ghf-field-key="availability"]')?.classList.contains('ghf-field--full')).toBe(true)
     expect(root.querySelector('[data-ghf-field-key="email"] .ghf-label .ghf-field-icon')).toBeNull()
     expect(root.querySelector('[data-ghf-field-key="email"] .ghf-control-icon[data-icon="mail"]')).toBeTruthy()
     expect(
@@ -166,6 +194,14 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.querySelector('[data-ghf-primary] .ghf-btn-icon[data-icon="send"]')).toBeTruthy()
     expect(root.querySelector('[data-ghf-field-key="linkedinUrl"] .ghf-optional')).toBeNull()
     expect(root.querySelector('[data-ghf-field-key="linkedinUrl"] .ghf-label')?.textContent).toBe('LinkedIn (opcional)')
+  })
+
+  it('maps careers fidelity to AXIS/Efeonce tokens instead of the renderer default dark CTA', () => {
+    expect(RENDERER_CSS).toContain('[data-ghf-style-variant="careers-html-fidelity"]')
+    expect(RENDERER_CSS).toContain('--ghf-accent: #0375db;')
+    expect(RENDERER_CSS).toContain('--ghf-accent-contrast: #ffffff;')
+    expect(RENDERER_CSS).toContain('--ghf-border-strong: #c4c3cc;')
+    expect(RENDERER_CSS).toContain('--ghf-action-shadow: none;')
   })
 
   it('renders labels above inputs with autocomplete + inputmode from the contract', () => {

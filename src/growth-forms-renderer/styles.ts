@@ -1278,8 +1278,116 @@ export const RENDERER_CSS = `
   }
 
   [data-ghf-style-variant="careers-html-fidelity"] {
+    --ghf-font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --ghf-accent: #0375db;
+    --ghf-accent-contrast: #ffffff;
+    --ghf-fg: #2f2b3d;
+    --ghf-muted: #6b6876;
+    --ghf-bg: #ffffff;
+    --ghf-field-bg: #ffffff;
+    --ghf-border: #dbdbdb;
+    --ghf-border-strong: #c4c3cc;
+    --ghf-error: #dc2e39;
+    --ghf-error-bg: #fbe1e3;
+    --ghf-success: #157f47;
+    --ghf-celebration: #6ec207;
+    --ghf-focus: #0375db;
     --ghf-radius: 6px;
     --ghf-gap: 16px;
+    --ghf-field-shadow: none;
+    --ghf-field-shadow-focus: 0 0 0 3px rgba(3, 117, 219, 0.14);
+    --ghf-action-shadow: none;
+    --ghf-action-shadow-hover: 0 16px 32px rgba(0, 36, 63, 0.26), 0 5px 12px rgba(0, 36, 63, 0.14);
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-progress-shell {
+    display: grid;
+    gap: 9px;
+    min-width: 0;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-progress-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--ghf-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    line-height: 1.167;
+    text-transform: uppercase;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-progress-percent {
+    color: #396504;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-progress-track {
+    position: relative;
+    block-size: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #fafafa;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-progress-bar {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #0375db, #6ec207);
+    transition: width 300ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-fields,
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-section {
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-fields {
+    gap: 28px;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-section-marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    inline-size: 28px;
+    block-size: 28px;
+    border-radius: 9px;
+    background: #004070;
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-section-title {
+    flex: 0 0 auto;
+    color: var(--ghf-fg);
+    font-size: 1.02rem;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  [data-ghf-style-variant="careers-html-fidelity"] .ghf-careers-section-rule {
+    flex: 1 1 auto;
+    block-size: 1px;
+    background: var(--ghf-border);
   }
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-field {
@@ -1288,7 +1396,7 @@ export const RENDERER_CSS = `
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-label {
     font-size: 0.875rem;
-    font-weight: 800;
+    font-weight: 600;
   }
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-field-icon {
@@ -1317,7 +1425,7 @@ export const RENDERER_CSS = `
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-file-input {
     min-height: 48px;
     padding: 12px 14px;
-    border-width: 1.5px;
+    border-width: 1px;
   }
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-file {
@@ -1341,11 +1449,11 @@ export const RENDERER_CSS = `
     display: flex;
     align-items: center;
     gap: 14px;
-    min-height: 88px;
+    min-height: 80px;
     padding: 16px 18px;
     border: 1.5px dashed var(--ghf-border-strong);
     border-radius: var(--ghf-radius);
-    background: color-mix(in srgb, var(--ghf-field-bg) 78%, var(--ghf-border));
+    background: #fafafa;
     color: var(--ghf-fg);
     cursor: pointer;
     transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
@@ -1370,8 +1478,8 @@ export const RENDERER_CSS = `
     inline-size: 46px;
     block-size: 46px;
     border-radius: 13px;
-    color: color-mix(in srgb, var(--ghf-accent) 86%, var(--ghf-fg));
-    background: color-mix(in srgb, var(--ghf-accent) 11%, var(--ghf-field-bg));
+    color: #024c8f;
+    background: #d7e9f9;
   }
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-file-dropzone-copy {
@@ -1417,12 +1525,12 @@ export const RENDERER_CSS = `
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-check {
     border-width: 1.5px;
-    background: color-mix(in srgb, var(--ghf-field-bg) 86%, var(--ghf-border));
+    background: #fafafa;
   }
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-actions {
-    justify-content: flex-start;
-    padding-block-start: 10px;
+    justify-content: stretch;
+    padding-block-start: 18px;
     border-block-start: 1px solid var(--ghf-border);
   }
 
@@ -1431,9 +1539,9 @@ export const RENDERER_CSS = `
     align-items: center;
     justify-content: center;
     gap: 10px;
-    min-height: 48px;
+    min-height: 46px;
     padding: 12px 20px;
-    font-weight: 800;
+    font-weight: 600;
   }
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-btn-icon {
@@ -1450,8 +1558,9 @@ export const RENDERER_CSS = `
   }
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-btn:not(.ghf-btn--ghost) {
-    flex: 1 1 260px;
-    max-width: 340px;
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
   }
 
   [data-ghf-style-variant="careers-html-fidelity"] .ghf-readiness {

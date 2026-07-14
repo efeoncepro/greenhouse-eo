@@ -1,3 +1,15 @@
+## Sesión 2026-07-14 — TASK-1373 follow-up visual regression hotfix preparado (Codex)
+
+> **Pedido:** el operador comparó la captura productiva contra la referencia de `Documents/carreers` y detectó que el hotfix anterior aún había cambiado colores, CTA y estructura: el botón no era negro y el form debía seguir siendo una mejora incremental, no rediseño.
+>
+> **Referencia usada:** `/Users/jreye/Documents/carreers/Efeonce Carrers/Efeonce Careers.dc.html` + captura `/tmp/task1373-reference-apply-form.png`. Tokens medidos: CTA `#0375db`, accent dark `#024c8f`, navy `#004070`, green `#6ec207`, uploader `#fafafa` con borde `#c4c3cc`, radius `6px`, botón `46px`, uploader `80px`.
+>
+> **Fix preparado:** `src/growth-forms-renderer` ahora restaura para `styleVariant=careers-html-fidelity` la paleta AXIS/Efeonce del HTML original, la barra "Completa tu postulación", secciones `01 Tus datos` / `02 Tu perfil` / `03 Cuéntanos más`, layout `Nombre/Apellido` en dos columnas y CTA azul full-width. Se conserva la mejora previa de iconos inline/uploader rico/CTA con icono; no cambia contrato backend, submit, Turnstile, ATS ni flags.
+>
+> **Evidencia pre-release:** Vitest renderer `45/45`, `pnpm exec tsc --noEmit --pretty false`, ESLint focused, `pnpm lint`, `pnpm design:lint`, `pnpm build` PASS (warning histórico roadmap/work-item-index), `pnpm renderer:build`, `pnpm task:lint --task TASK-1373`, `pnpm qa:gates --changed --agent codex --task TASK-1373 --ui --runtime --release --production`, `pnpm ops:lint --changed`. Captura local con contrato productivo + bundle corregido: `/tmp/task1373-careers-style-fix-local.png`; métricas: CTA `rgb(3,117,219)`, uploader `rgb(250,250,250)`/dashed `rgb(196,195,204)`, markers `01/02/03`, `controlIcons=8`, `fileIcon=true`, `scrollOverflow=false`.
+>
+> **Estado:** commit y release productivo pendientes. El release debe seguir `greenhouse-production-release`, usar el orquestador para el SHA exacto en `main`, validar visual production desktop/mobile y actualizar `PRODUCTION_RELEASE_TIMING_LEDGER.md` al cierre.
+
 ## Sesión 2026-07-14 — TASK-1373 visual fidelity hotfix PRODUCTION LIVE (Codex)
 
 > **Pedido:** el operador revisó la captura productiva del apply form y detectó regresión estética: los iconos ya no estaban dentro de los campos y el uploader perdió el estilo rico del form original.

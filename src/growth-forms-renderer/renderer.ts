@@ -268,15 +268,20 @@ export class FormRenderer {
       form.appendChild(this.renderStepProgress(steps))
     }
 
-    const fieldsWrap = el(this.doc, 'div', { class: 'ghf-fields' })
+    if (this.usesCareersStaticFidelity()) {
+      form.appendChild(this.renderCareersStaticProgress())
+      form.appendChild(this.renderCareersStaticFields())
+    } else {
+      const fieldsWrap = el(this.doc, 'div', { class: 'ghf-fields' })
 
-    for (const field of this.fieldsForStep()) {
-      if (field.type === 'hidden') continue
-      if (!isFieldVisible(field, this.values)) continue
-      fieldsWrap.appendChild(this.renderField(field))
+      for (const field of this.fieldsForStep()) {
+        if (field.type === 'hidden') continue
+        if (!isFieldVisible(field, this.values)) continue
+        fieldsWrap.appendChild(this.renderField(field))
+      }
+
+      form.appendChild(fieldsWrap)
     }
-
-    form.appendChild(fieldsWrap)
 
     if (steps && this.currentStep > 0) {
       form.appendChild(this.renderIntakeSummary(steps))
@@ -319,6 +324,123 @@ export class FormRenderer {
     }
 
     this.patchReadinessHint()
+  }
+
+  private usesCareersStaticFidelity(): boolean {
+    return (
+      this.contract.styleVariant === 'careers-html-fidelity' &&
+      this.contract.form.formKind === 'application' &&
+      this.contract.composition === 'static'
+    )
+  }
+
+  private renderCareersStaticProgress(): HTMLElement {
+    const percent = this.careersStaticProgressPercent()
+    const shell = el(this.doc, 'div', { class: 'ghf-careers-progress-shell' })
+    const meta = el(this.doc, 'div', { class: 'ghf-careers-progress-meta' })
+
+    const track = el(this.doc, 'div', {
+      class: 'ghf-careers-progress-track',
+      role: 'progressbar',
+      'aria-label': 'Progreso de postulación',
+      'aria-valuemin': '0',
+      'aria-valuemax': '100',
+      'aria-valuenow': String(percent)
+    })
+
+    const bar = el(this.doc, 'div', { class: 'ghf-careers-progress-bar' })
+
+    bar.dataset.ghfCareersProgressBar = 'true'
+    bar.style.width = `${percent}%`
+    meta.appendChild(el(this.doc, 'span', {}, 'Completa tu postulación'))
+    meta.appendChild(
+      el(this.doc, 'span', { class: 'ghf-careers-progress-percent', 'data-ghf-careers-progress-percent': 'true' }, `${percent}%`)
+    )
+    track.appendChild(bar)
+    shell.appendChild(meta)
+    shell.appendChild(track)
+
+    return shell
+  }
+
+  private careersStaticProgressPercent(): number {
+    const total = Math.max(1, this.remainingBlockers() + this.completedRequiredBlockers())
+    const completed = Math.max(0, total - this.remainingBlockers())
+
+    return Math.round((completed / total) * 100)
+  }
+
+  private patchCareersStaticProgress(): void {
+    if (!this.usesCareersStaticFidelity()) return
+    const percent = this.careersStaticProgressPercent()
+    const label = this.opts.root.querySelector<HTMLElement>('[data-ghf-careers-progress-percent]')
+    const bar = this.opts.root.querySelector<HTMLElement>('[data-ghf-careers-progress-bar]')
+    const track = this.opts.root.querySelector<HTMLElement>('.ghf-careers-progress-track')
+
+    if (label) label.textContent = `${percent}%`
+    if (bar) bar.style.width = `${percent}%`
+    if (track) track.setAttribute('aria-valuenow', String(percent))
+  }
+
+  private completedRequiredBlockers(): number {
+    let count = 0
+
+    for (const field of this.contract.fields) {
+      if (field.type === 'hidden') continue
+      if (!isFieldVisible(field, this.values)) continue
+      if (!isFieldRequired(field, this.values)) continue
+      if (!validateField(field, this.values, this.copy)) count += 1
+    }
+
+    for (const box of this.contract.consent?.checkboxes ?? []) {
+      if (box.required !== false && this.consentState[box.key] === true) count += 1
+    }
+
+    return count
+  }
+
+  private renderCareersStaticFields(): HTMLElement {
+    const visibleFields = this.fieldsForStep().filter(field => field.type !== 'hidden' && isFieldVisible(field, this.values))
+    const byKey = new Map(visibleFields.map(field => [field.key, field]))
+    const consumed = new Set<string>()
+    const shell = el(this.doc, 'div', { class: 'ghf-careers-fields' })
+
+    const sections = [
+      { marker: '01', title: 'Tus datos', fieldKeys: ['firstName', 'lastName', 'email', 'phone'] },
+      { marker: '02', title: 'Tu perfil', fieldKeys: ['portfolioUrl', 'linkedinUrl', 'availability', 'cvFile'] },
+      { marker: '03', title: 'Cuéntanos más', fieldKeys: ['message'] }
+    ]
+
+    for (const section of sections) {
+      const fields = section.fieldKeys.map(key => byKey.get(key)).filter((field): field is RendererFieldDefinition => Boolean(field))
+
+      if (fields.length === 0) continue
+      fields.forEach(field => consumed.add(field.key))
+      shell.appendChild(this.renderCareersStaticSection(section.marker, section.title, fields))
+    }
+
+    const fallback = visibleFields.filter(field => !consumed.has(field.key))
+
+    if (fallback.length > 0) shell.appendChild(this.renderCareersStaticSection('04', 'Datos adicionales', fallback))
+
+    return shell
+  }
+
+  private renderCareersStaticSection(marker: string, title: string, fields: RendererFieldDefinition[]): HTMLElement {
+    const section = el(this.doc, 'section', { class: 'ghf-careers-section', 'aria-label': title })
+    const header = el(this.doc, 'div', { class: 'ghf-careers-section-header' })
+    const fieldsWrap = el(this.doc, 'div', { class: 'ghf-fields ghf-careers-section-fields' })
+
+    header.appendChild(el(this.doc, 'span', { class: 'ghf-careers-section-marker', 'aria-hidden': 'true' }, marker))
+    header.appendChild(el(this.doc, 'span', { class: 'ghf-careers-section-title' }, title))
+    header.appendChild(el(this.doc, 'span', { class: 'ghf-careers-section-rule', 'aria-hidden': 'true' }))
+
+    for (const field of fields) fieldsWrap.appendChild(this.renderField(field))
+
+    section.appendChild(header)
+    section.appendChild(fieldsWrap)
+
+    return section
   }
 
   private renderStepProgress(steps: RendererStep[]): HTMLElement {
@@ -546,6 +668,11 @@ export class FormRenderer {
   }
 
   private fieldPrefersFullWidth(field: RendererFieldDefinition): boolean {
+    if (this.usesCareersStaticFidelity()) {
+      if (field.key === 'firstName' || field.key === 'lastName') return false
+      if (['email', 'tel', 'select', 'url', 'date', 'number'].includes(field.type)) return true
+    }
+
     if (
       field.type === 'textarea' ||
       field.type === 'multiselect' ||
@@ -1546,6 +1673,7 @@ export class FormRenderer {
 
   /** Llamar tras cualquier edición de campo: refresca hint de listo + guarda borrador. */
   private onFieldEdited(): void {
+    this.patchCareersStaticProgress()
     this.patchReadinessHint()
     this.patchIntakeSummary()
     this.scheduleDraftSave()
