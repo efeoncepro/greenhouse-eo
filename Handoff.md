@@ -1,3 +1,31 @@
+## Sesión 2026-07-14 — TASK-1373 visual fidelity hotfix en release (Codex)
+
+> **Pedido:** el operador revisó la captura productiva del apply form y detectó regresión estética: los iconos ya no estaban dentro de los campos y el uploader perdió el estilo rico del form original.
+>
+> **Fix:** `src/growth-forms-renderer` recupera fidelidad para `styleVariant=careers-html-fidelity`: iconos inline dentro de inputs/select/textarea/teléfono, sin icon badges en labels; uploader como dropzone con icon tile/copy/hint/status; CTA primario con icono/spinner; guard contra labels con `(opcional)` duplicado. No cambia contrato backend, submit, captcha ni proyección ATS.
+>
+> **Evidencia local previa al release:** Vitest focused PASS, `pnpm exec tsc --noEmit --pretty false` PASS, ESLint focused PASS, `pnpm lint` PASS, `pnpm build` PASS con warning histórico del reader roadmap/work-item-index, `pnpm renderer:build` PASS, `pnpm qa:gates --changed --agent codex --task TASK-1373 --ui --runtime --release --production` PASS advisory, `pnpm task:lint --task TASK-1373` PASS, `pnpm docs:closure-check` PASS. Capturas harness con contrato productivo + bundle local: `/tmp/task1373-form-fidelity-fix/desktop-form-card.png` y `/tmp/task1373-form-fidelity-fix/mobile-390-form-card.png`; métricas desktop/mobile `controlIcons=8`, `labelIcons=0`, `fileDropzone=true`, `fileIcon=true`, `buttonIcon=true`, `phoneShell=true`, `duplicatedOptionalLabels=0`, `scrollOverflow=false`.
+>
+> **Release:** en curso por el playbook de producción. No tocar el untracked `.claude/skills/seo-aeo-practice/`.
+
+## Sesión 2026-07-14 — TASK-1373 production release completo (Codex)
+
+> **Pedido:** release completo a producción usando skills de release y leyendo el playbook de paso a producción. Skills usadas: `greenhouse-production-release`, `vercel-operations`, `greenhouse-qa-release-auditor`, `greenhouse-documentation-governor` y `greenhouse-secret-hygiene`. Playbooks leídos: `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md`, `docs/operations/runbooks/production-release.md`, `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`, `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` y `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`.
+>
+> **Release:** final target `a3b5ea3adb307076c0a44b1be33051005d619ffd`; `develop` y `main` apuntan a ese SHA. Release manifest `a3b5ea3adb30-afed291d-c084-4192-aed9-5de9905b8a64`; Production Release Orchestrator `29295658046` success. Vercel Production deployment `dpl_7Wpv3vSPoDXnTQq8Za2Xfw2ZHkt2` sirve `https://greenhouse.efeoncepro.com`. Flag `CAREERS_NATIVE_GROWTH_FORM_ENABLED=true` agregado a Vercel Production antes del build.
+>
+> **Fix de release:** el primer intento de release (`29293287410`, target `8c1b503e`) fue demasiado temprano: CI/Vercel aún no estaban READY. Además `CI Deep Verification` falló por falta de Chromium de Playwright. Se corrigió `.github/workflows/ci-deep.yml` para provisionar/cachear Playwright Chromium headless shell; commit `a3b5ea3adb307076c0a44b1be33051005d619ffd` (`ci(release): provision playwright in deep verification`) pasó CI `29294733436` y Deep Verification `29294733458`.
+>
+> **Orquestador:** aprobados los gates production; Vercel READY, post-release health, release summary y transición de manifest a released en verde. Cloud Run: `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration` deploy/health/Ready/record success; `ops-worker` success con deploy skipped por diff runtime vacío. Azure Teams Notifications/Bot validaron Bicep y saltaron apply por `no_infra_diff`.
+>
+> **Watchdog:** run manual `29296256877` con `fail_on_error=true` falló sólo por `platform.release.worker_revision_drift` en `ops-worker`: Cloud Run sirve `838950916b27` vs target `a3b5ea3adb30`. No se redeployó porque el job `86968856985` probó `deploy_needed=false`, diff runtime vacío en paths de `ops-worker`, revision `ops-worker-00487-rjm` `Ready=True`. Los otros workers están synced. Este es el residual V1 documentado en el runbook, no drift funcional.
+>
+> **Smoke producción TASK-1373:** `/public/careers/EO-OPN-0009/apply` monta `<greenhouse-form>` real con `form-key=9f7a8fc0-6fa7-4670-8e2d-efe0ce354001`, `surface=public-careers-nextjs`, `base-url=https://greenhouse.efeoncepro.com`, sin `gh-application-form-helper`. API contract responde `styleVariant=careers-html-fidelity`, `composition=static`, `cvFile=true`, 10 campos, 1 consentimiento. Submit sin CAPTCHA falla cerrado `403 { outcome: "captcha_failed", message: "missing_token" }`.
+>
+> **Visual:** GVC production se intentó con triple gate, pero el clon temporal no tenía `AGENT_AUTH_SECRET` y no se improvisaron secretos. Verificación complementaria Playwright pública PASS: desktop 1440 y mobile 390, native form/input/button presentes, sin overflow horizontal; screenshots en `/tmp/task1373-prod-visual-smoke/desktop.png` y `/tmp/task1373-prod-visual-smoke/mobile-390.png`.
+>
+> **Docs/ledger:** `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` actualizado: `CAREERS_NATIVE_GROWTH_FORM_ENABLED` sale de pendientes y queda Production ✅. `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` registra timing y aprendizajes. `changelog.md` actualizado.
+
 ## Sesión 2026-07-13 — TASK-1373 Careers native Growth Form — STAGING LIVE (Codex)
 
 > **Goal confirmado:** ejecutar `TASK-1373` en `develop`, sin subagentes ni worktree nuevo, preservando la estética rica del apply actual como contrato duro. Hook inicial bloqueó por `Blocked by: TASK-1372`; se verificó que TASK-1372 quedó staging live y se resolvió el blocker documental antes de reintentar.

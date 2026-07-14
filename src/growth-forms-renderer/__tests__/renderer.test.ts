@@ -86,6 +86,88 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.getAttribute('data-ghf-style-variant')).toBe('diagnostic_premium')
   })
 
+  it('renders careers fidelity icons inside fields, the uploader dropzone, and the primary CTA', () => {
+    const contract = staticContractFixture({
+      styleVariant: 'careers-html-fidelity',
+      form: { ...staticContractFixture().form, formKind: 'application' },
+      fields: [
+        {
+          key: 'firstName',
+          type: 'text',
+          label: 'Nombre',
+          required: true,
+          presentation: { icon: 'user' },
+          dataClass: 'contact_pii'
+        },
+        {
+          key: 'email',
+          type: 'email',
+          label: 'Correo electrónico',
+          required: true,
+          presentation: { icon: 'mail' },
+          dataClass: 'contact_pii'
+        },
+        {
+          key: 'phone',
+          type: 'tel',
+          label: 'Teléfono',
+          presentation: { icon: 'phone' },
+          validatorParams: { country: 'CL' },
+          dataClass: 'contact_pii'
+        },
+        {
+          key: 'linkedinUrl',
+          type: 'url',
+          label: 'LinkedIn (opcional)',
+          presentation: { icon: 'linkedin' },
+          dataClass: 'public'
+        },
+        {
+          key: 'cvFile',
+          type: 'file',
+          label: 'Currículum',
+          presentation: { icon: 'file' },
+          dataClass: 'uploaded_file',
+          uploadPolicy: {
+            acceptedMimeTypes: ['application/pdf'],
+            maxBytes: 10 * 1024 * 1024,
+            multiple: false,
+            storageContext: 'hiring_application_cv_draft',
+            scanPolicy: 'scan_required'
+          }
+        },
+        {
+          key: 'message',
+          type: 'textarea',
+          label: 'Mensaje',
+          presentation: { icon: 'message' },
+          dataClass: 'free_text'
+        }
+      ],
+      copy: {
+        submit: 'Enviar postulación',
+        'cvFile.help': 'Arrastra o selecciona tu CV en PDF. PDF, máximo 10 MB.'
+      },
+      consent: undefined
+    })
+
+    const { root } = mountInto(contract)
+    const email = root.querySelector<HTMLInputElement>('[name="email"]')!
+
+    expect(root.querySelector('[data-ghf-field-key="email"] .ghf-label .ghf-field-icon')).toBeNull()
+    expect(root.querySelector('[data-ghf-field-key="email"] .ghf-control-icon[data-icon="mail"]')).toBeTruthy()
+    expect(
+      root.querySelector('[data-ghf-field-key="email"] .ghf-control-icon')!.compareDocumentPosition(email) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    expect(root.querySelector('[data-ghf-field-key="phone"] .ghf-tel-input-shell .ghf-control-icon[data-icon="phone"]')).toBeTruthy()
+    expect(root.querySelector('[data-ghf-field-key="cvFile"] .ghf-file-dropzone .ghf-file-dropzone-icon[data-icon="file"]')).toBeTruthy()
+    expect(root.querySelector('[data-ghf-field-key="message"] .ghf-control--textarea .ghf-control-icon[data-icon="message"]')).toBeTruthy()
+    expect(root.querySelector('[data-ghf-primary] .ghf-btn-icon[data-icon="send"]')).toBeTruthy()
+    expect(root.querySelector('[data-ghf-field-key="linkedinUrl"] .ghf-optional')).toBeNull()
+    expect(root.querySelector('[data-ghf-field-key="linkedinUrl"] .ghf-label')?.textContent).toBe('LinkedIn (opcional)')
+  })
+
   it('renders labels above inputs with autocomplete + inputmode from the contract', () => {
     const { root } = mountInto()
     const email = root.querySelector<HTMLInputElement>('[name="work_email"]')!
