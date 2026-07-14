@@ -1,3 +1,13 @@
+## Sesión 2026-07-14 — Reconciliación de `develop` divergido (Codex)
+
+> **Pedido:** aclarar por qué `develop` estaba divergida y avanzar con la resolución sin tocar el frente legal/payroll/fairness.
+>
+> **Causa:** el remoto `origin/develop` recibió la cadena productiva de TASK-1373 Careers/Growth Forms (`CAREERS_NATIVE_GROWTH_FORM_ENABLED` en Production + hotfixes visuales) mientras el `develop` local conservaba commits documentales de AEO/SKY/TASK-1410/TASK-1411 y cambios no comprometidos del rollout Hiring Activation.
+>
+> **Resolución segura:** se creó la rama backup `codex/safety-develop-diverged-20260714-ff4877`, se abrió `codex/reconcile-develop-20260714` desde `origin/develop`, se cherry-pickearon los commits locales útiles y se omitieron los duplicados/superseded de TASK-1373. El stash `codex/hiring-activation-production-rollout-docs-20260714` se aplicó encima y se resolvieron los ledgers combinando Careers Production ON + Hiring Activation Production ON.
+>
+> **Estado:** la reconciliación inicial se dejó sin push hasta revisión humana. El operador autorizó revisión final + push; el stash original y el patch `/tmp/greenhouse-hiring-activation-rollout-uncommitted-20260714.patch` siguen como respaldo hasta confirmar que el remoto quedó bien.
+
 ## Sesión 2026-07-14 — Radiografía AEO: pulido en vivo con el operador (Claude)
 
 > **Pedido:** iterar la muestra viva de SKY (`think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37`) hasta que sirva para la licitación que **cierra 15/07**. La sesión destapó **seis clases de bug que el gate no veía** — todas cerradas y desplegadas. Gate **42/42**.
