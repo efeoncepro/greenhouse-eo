@@ -92,7 +92,7 @@ Copia `sky-carretera-austral.json` como referencia. Contiene: el flow, el hueco 
 
 #### 🔴 Cómo se ESCRIBE (y no es lo mismo que cumplir el checklist)
 
-**Un artículo puede pasar los 43 asserts y ser ilegible.** Cargar la skill **`copywriting`** (módulos 03 hooks · 04 storytelling · 07 craft) y **`seo-aeo`** es obligatorio.
+**Un artículo puede pasar los 45 asserts y ser ilegible.** Cargar la skill **`copywriting`** (módulos 03 hooks · 04 storytelling · 07 craft) y **`seo-aeo`** es obligatorio.
 
 **Son dos capas, no una voz:**
 
@@ -140,7 +140,7 @@ pnpm build
 XRAY_SAMPLE=<cliente>-<slug> pnpm verify:aeo-xray
 ```
 
-**43 asserts.** Si el payload está incompleto, **el build falla** — no publica una muestra a medias.
+**45 asserts.** Si el payload está incompleto, **el build falla** — no publica una muestra a medias.
 
 ### 5b. 🔴 LEER el artículo (el paso que el gate NO puede hacer)
 

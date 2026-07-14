@@ -86,7 +86,7 @@ efeonce-think/
 │   ├─ Article.astro                          ← el espécimen (editorial)
 │   └─ Instrument.astro                       ← la capa de máquina (navy)
 ├─ src/styles/aeo-xray.css                    ← tokens + acoplamiento + view transitions
-└─ scripts/verify-aeo-xray.mjs                ← 43 asserts (el gate)
+└─ scripts/verify-aeo-xray.mjs                ← 45 asserts (el gate)
 ```
 
 **El motor NUNCA conoce a un cliente.** Un `if (cliente === 'sky')` en un componente significa que la frontera se rompió.
@@ -183,6 +183,34 @@ Y el daño es el que importa: **con la anotación encima, nadie aprecia el artí
 ⚠️ **Un recuadro de color grita «acá hay una técnica aplicada» tan fuerte como el letrero que la nombra.** Sacar el rótulo y dejar la caja no arregla nada.
 
 🔴 **Y no cuesta NADA en AEO**: el valor de la cápsula vive en el **texto** (answer-first, 40-60 palabras, bajo su H2). **El motor lee el texto, no el CSS.** Perder la caja no cuesta una sola cita.
+
+### 12b. 🔴 El instrumento ENFOCA. Atenuar no es enfocar
+
+**El chip promete `→ N datos`. Si no ves N, el chip miente** — y en la pieza cuya tesis entera es el rigor, esa es la mentira más cara.
+
+**Pasó de verdad (2026-07-14), y lo cazó el operador MIRANDO:** tocas un H2, el chip dice «4 datos», y el panel se queda arriba mostrando **uno**. Medido sobre los 22 bloques acoplables: **de 51 datos prometidos, 44 no eran visibles JAMÁS.** El `h1` prometía **11 y mostraba 0**. El `faq`, 5 y 0.
+
+**La causa no era el tamaño de letra: era de arquitectura de información.**
+
+> El panel se ordena **por FAMILIA** (Metadatos · Datos estructurados · Estructura · Evidencia). Pero al tocar un bloque, la pregunta del evaluador es **«¿qué produce ESTO?»** — una consulta **por PRODUCTOR** contra un layout **por FAMILIA**. Los datos de un bloque **nunca son contiguos**.
+
+El código atenuaba lo demás y scrolleaba al **primer match**, que en el DOM suele ser el más **tautológico** (*«tu H2 está en la lista de H2»*). Para quien no sabe SEO, **no pasaba nada**. Y el argumento de verdad —*«nadie en ese resultado resuelve la llegada»*, *«Balmaceda es el ángulo que solo SKY tiene»*— quedaba **1.000px abajo, invisible**.
+
+**Los dos modos del instrumento:**
+
+| Modo | Cuándo | Qué muestra |
+|---|---|---|
+| **MAPA** | Al llegar (héroe pintado desde el HTML) · Escape · botón *«Ver toda la capa»* | El panel **entero**, agrupado por familia. Es el **argumento de masa**: *«miren todo lo que hay que poner para que una máquina cite esto»* |
+| **ENFOQUE** | Al **interrogar** un bloque | El panel **COLAPSA** a lo que ese bloque produce. **Nada más** |
+
+**Primero ves la máquina entera. Después la apuntas.**
+
+- 🔴 **NUNCA volver a atenuar en vez de colapsar.** El atenuado se retiró: apagaba justo las explicaciones *«Para qué sirve»* de los contenedores que sí se conservan. **En modo enfoque, todo lo visible ES la respuesta**; si algo no aporta se **colapsa**, no se atenúa a medias.
+- 🔴 **El header DICE la cuenta en palabras** (*«Lo que produce este bloque · 4 datos»*). Un realce sutil sobre la fila de un árbol de encabezados **no le comunica nada a un comprador que no sabe SEO** — y ése es el lector real.
+- 🔴 **Si la pila enfocada desborda, hay que decirlo.** El `h1` produce 11 y en pantalla caben 4: sin el degradado al pie, el header promete 11 y el ojo ve 4 — la misma mentira, más chica.
+- 🔴 **El acoplamiento es pegajoso a propósito** (no hay `mouseout`: así puedes mover el mouse al panel y leer sin perderlo). Por eso **la salida tiene que ser descubrible**: `Escape` funcionaba pero nadie lo descubre. Botón real.
+
+Lo blindan los **asserts 11b y 11c**, que recorren **todos** los bloques: cero ruido ajeno en el panel enfocado, y el header declara **la cuenta exacta** que promete el chip.
 
 ### 12. 🔴 El contrato del acoplamiento: cero huérfanos, cero fantasmas
 
@@ -355,7 +383,7 @@ Ahora el instrumento **sube como hoja inferior** al tocar, con tirador, botón d
 
 ## El gate: `pnpm verify:aeo-xray`
 
-**43 asserts.** No son cosméticos: cada uno nació de un bug real. Los que más importan:
+**45 asserts.** No son cosméticos: cada uno nació de un bug real. Los que más importan:
 
 | # | Qué impide |
 |---|---|
