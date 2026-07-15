@@ -1091,8 +1091,9 @@
           { "client": "carozzi", "emphasis": "none" },
           { "client": "marca-chile", "emphasis": "none" },
           { "client": "gobierno-santiago", "emphasis": "none" },
-          { "client": "aguas-andinas", "emphasis": "none" },
+          { "client": "berel", "emphasis": "none" },
           { "client": "bresler", "emphasis": "none" },
+          { "client": "aguas-andinas", "emphasis": "none" },
           { "client": "universidad-temuco", "emphasis": "none" },
           { "client": "anam", "emphasis": "none" }
         ],

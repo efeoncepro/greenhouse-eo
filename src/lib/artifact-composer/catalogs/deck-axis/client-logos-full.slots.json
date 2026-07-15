@@ -25,7 +25,7 @@
       "selector": "[data-slot='logos']",
       "type": "array",
       "required": true,
-      "constraints": { "minItems": 4, "maxItems": 8, "overflow": "reject" },
+      "constraints": { "minItems": 4, "maxItems": 9, "overflow": "reject" },
       "item": {
         "type": "object",
         "shape": {
@@ -38,6 +38,7 @@
               "marca-chile",
               "gobierno-santiago",
               "bresler",
+              "berel",
               "aguas-andinas",
               "universidad-temuco",
               "anam"

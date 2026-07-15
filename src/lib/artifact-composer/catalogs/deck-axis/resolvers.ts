@@ -163,6 +163,7 @@ const CLIENT_LOGO: Record<string, { src: string; label: string }> = {
   'marca-chile': { src: 'assets/clients/marca-chile.svg', label: 'Marca Chile' },
   'gobierno-santiago': { src: 'assets/clients/gobierno-santiago.svg', label: 'Gobierno de Santiago' },
   bresler: { src: 'assets/clients/bresler.svg', label: 'Bresler' },
+  berel: { src: 'assets/clients/berel.svg', label: 'Grupo Berel' },
   'aguas-andinas': { src: 'assets/clients/aguas-andinas.svg', label: 'Aguas Andinas' },
   'universidad-temuco': { src: 'assets/clients/universidad-temuco.svg', label: 'Universidad Católica de Temuco' },
   anam: { src: 'assets/clients/anam.svg', label: 'ANAM' }

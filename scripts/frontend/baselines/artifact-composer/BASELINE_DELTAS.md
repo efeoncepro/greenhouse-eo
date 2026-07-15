@@ -1,5 +1,23 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-07-15 (b) — Muro de clientes: +Grupo Berel (caballo de batalla MX) → grilla 3×3
+
+**Feedback del operador (mismo día):** faltaba **Grupo Berel** (cliente clave de México) en el muro. Se
+agrega como **9º logo**, en el **centro del 3×3** (el spot más prominente tras SKY). El grid pasa de 4×2
+a **3×3** (9 entra simétrico). Sizing **por peso óptico**: los logos compactos/apilados (`berel`,
+`marca-chile`, `universidad-temuco`) reciben `max-height` mayor vía selector `[data-client]` — un lockup
+cuadrado a 46px se ve diminuto al lado de un wordmark ancho. `berel.svg` internalizado (allowlist
+`client-logo-asset` +1); `maxItems` del muro 8→9. Berel queda **doblemente representado**: su lámina de
+referencia (`berel`, "Grupo Berel ya lo compra vía Wherex") + el muro de confianza. PDF regenerado y
+re-entregado a OneDrive (deadline mismo día).
+
+**Frames re-promovidos (2):**
+
+- `sky/23-clientes.png` — muro con Berel + grilla 3×3
+- `templates/ClientLogosFull.png` — probe del molde (grid 3-col)
+
+---
+
 ## 2026-07-15 — Deck SKY 26 → 28: muro de clientes + testimonios del equipo de SKY (prueba social)
 
 **Aprobación del operador (sesión 2026-07-15):** dos plantillas reutilizables de prueba social entran
@@ -270,7 +288,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 44aedd8f767493b097b1a1d96e18eb5afd5e8974bcb6dffc03f0b0d76aacf624 -->
+<!-- manifest-digest: eaf06f6bcc47a9fb740de787859d37b01546aed5e46d61b3c27520a311c6e1a9 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

@@ -27,15 +27,20 @@
     box-shadow:0 34px 66px rgba(var(--axis-deck-navy-990-rgb), .40), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .9);
   }
   .wall {
-    display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); grid-auto-rows:1fr; gap:1px;
+    display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); grid-auto-rows:1fr; gap:1px;
     height:100%; background:var(--divider);
   }
   .client-tile {
-    position:relative; min-width:0; display:grid; place-items:center; padding:34px 44px;
+    position:relative; min-width:0; display:grid; place-items:center; padding:26px 44px;
     background:var(--axis-ppt-neutral-50);
   }
   /* Logos a color, alineados por ALTURA para un muro parejo. */
   .client-logo { display:block; max-width:78%; max-height:46px; object-fit:contain; }
+  /* Logos compactos/apilados: alinear por PESO ÓPTICO, no por altura fija (un lockup cuadrado a 46px
+     se ve diminuto al lado de un wordmark ancho). El data-client lo pone el resolver. */
+  .client-logo[data-client='berel'] { max-height:92px; max-width:62%; }
+  .client-logo[data-client='marca-chile'] { max-height:68px; }
+  .client-logo[data-client='universidad-temuco'] { max-height:64px; }
 
   /* SKY destacado — el prospecto ya es cliente: su celda va en NAVY (dark) con la versión dark del
      logo, para que resalte como la celda oscura entre las claras. Anillo teal + chip. Destaque = DATO. */
