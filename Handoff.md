@@ -1,3 +1,19 @@
+## Sesión 2026-07-14 (d) — Licitación SKY: oferta iterada de punta a punta + composer con enlaces, anti-fuga y hooks con plan (Claude)
+
+> **Pedido:** iterar la oferta de SKY (Wherex, **cierra 15/07**) siguiendo el SESSION-BRIEF: mapear → diagnosticar → esperar confirmación → ejecutar por frente, con las skills de tenders/deck/seo-aeo-practice/commercial/copywriting.
+>
+> **Documentos del bid:** oferta técnica REESCRITA (SEO primero; cifras del run publicado `EO-GRUN-00046` — el claim «0 citas» contradecía al informe que la propia lámina invitaba a abrir → ahora **«citabilidad propia 0%»**, dato publicado; diagnóstico técnico verificado EN VIVO sobre el blog: sin plugin SEO, sin meta description, cero schema, robots 404; §5 «qué compra el valor mensual»; matriz → anexo; 2 piezas vivas enlazadas). Económica a **capacidad** (cero unitario; ad-hoc dentro de la capacidad — bugs `04_PRICING` §6 cerrados) + Excel **generado** (`scripts/commercial/build-sky-economica-xlsx.mjs`). Blueprint interno: piso real a 2 años sin reajuste **≈ 5,0M** (BAFO 20/07: carta interna de 6 piezas a 4,3M).
+>
+> **Deck 19 → 23** (todo por el composer, con feedback del operador aplicado): `citas` muerta · `near-miss` + `capa-tecnica` + `informe` nuevas · muestra e informe como **showcases con captura real + chrome de navegador + URL horneada + enlace clickeable** · agenda con **páginas derivadas del plan** · equipo `TeamGalleryFull` con **fotos reales** (mapeo confirmado: Julio 12% · María Fernanda/SEO Copywriter 50% · Daniela/Creative Ops Lead 12% · Melkin/Sr Visual Designer 30% · Andrés/SEO Specialist 25%; foto de MF encontrada en OneDrive, fondo removido) · Berel con nombre · penalidades como statement.
+>
+> **Motor (domain-free):** (1) `<a href>` https → **/Link reales en el PDF** (dos bugs: sanitizador sin `A` + `copyPages` de pdf-lib que DESCARTA anotaciones — el merge las re-crea; ⚠️ verificar vía API pdf-lib, nunca grep: object streams); (2) **anti-fuga de prototipo** (slot opcional ausente se limpia + guard de 28 probes required-only — garantía de reutilización entre licitaciones); (3) `CatalogLayoutHook` con `deckPlan`; (4) catálogo **28 plantillas** (+`TeamGalleryFull` con resolver `squad-person` allowlist cerrada, +`dual-concept-icon`).
+>
+> **Evidencia:** vitest **195/195** · visual gate **51 frames a 0 px** (2 promociones declaradas en `BASELINE_DELTAS.md`; renombres verificados con shasum 18/18 y 6/7+1 declarado) · typecheck limpio · PDF 23 páginas/12.5 MB con **4 `/URI` vivas** · frames MIRADOS (los 10+ cambiados, dos rondas).
+>
+> **Docs:** `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` §Delta 2026-07-14 · README + SESSION-BRIEF del bid (delta de cierre) · skills `greenhouse-public-private-tenders` (SKILL + deck-visual-system + playbook) y `deck-studio` (SKILL + composition) en **ambos namespaces** · changelog.
+>
+> **Estado:** listo para entrega. **Pendiente humano:** copiar PDFs a OneDrive y **subir a Wherex antes del 15/07** (el agente prepara; el humano sube y firma). Ronda de negociación 20/07: NO publicar el plan de 6 piezas — es la carta.
+
 ## Sesión 2026-07-14 (c) — Radiografía AEO: hardening Codex de reusabilidad + cierre documental
 
 > **Pedido:** aplicar los ajustes detectados en la revisión de la Radiografía SEO/AEO construida con Claude, tanto en `efeonce-think` como en la documentación de Greenhouse.
@@ -37624,3 +37640,19 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 - Docs sincronizados: wireframe TASK-1410, arquitectura/manual Think, doc funcional comercial, task, changelog y handoff.
 - Push publicado a `efeonce-think` `main` (`7113c34`). Vercel Production quedó `Ready` (`dpl_5mPZLmAR7uZrpy5MvV8shPaBuvgC`) para `think.efeoncepro.com`.
 - Smoke live post-deploy verde: cuatro pantallas sin `application/ld+json`, `noindex` presente, `/muestras/` fuera de `sitemap-index.xml`, rótulo visible y `overflow=0` en 1440/390. Working tree Think limpio; rama local actual sigue `feat/web-agentica-landing` ahead de su remoto porque el push fue `HEAD:main`.
+
+## Sesión 2026-07-14 — Radiografía AEO: ④ artifact-first + iconografía funcional
+
+- En `efeonce-think` la pantalla ④ (`/muestras/sky-carretera-austral-861c18cc0e37/atomizacion`) pasó de cards explicativas a demostración de repurposing: línea de sangre visual `Artículo original → video / social / imágenes`, iconos funcionales de canal y artefactos antes de métricas.
+- Implementación payload-driven en `src/pages/muestras/[slug]/[...step].astro`: sin condiciones por cliente, sin tocar el payload, `class="atom"` preservado y `data-artifact` derivado por forma del átomo (`VideoObject`, `post`, `showsImages`).
+- Evidencia local Think: `git diff --check`, `pnpm build`, `pnpm verify:aeo-xray` PASS `46/46`, `pnpm verify:aeo-xray:scenarios` PASS `2/2`; capturas revisadas en `/tmp/aeo-atomizacion-repurpose-20260714/` desktop/mobile sin overflow y con social visible en mobile.
+- Push publicado a `efeonce-think` `main` (`64e42b2`). Vercel Production quedó `Ready` (`dpl_6RJePVjNMiVcXJsreHZRg8vWkeMU`) y el alias `https://think.efeoncepro.com` apunta al nuevo deployment.
+- Smoke live post-deploy verde: las cuatro pantallas responden `200`, sin `application/ld+json`, con `noindex` y rótulo visible; la ④ no tiene overflow en 1440/390, la línea de sangre y la pieza social quedan visibles, y la iconografía funcional renderiza 7 SVGs.
+
+## Sesión 2026-07-14 — Creative Studio: operating model producto + servicio
+
+- Se incorporó en RESEARCH-009 y en la ADR/arquitectura de Creative Studio una experiencia creative-native: el creativo preserva, explora, rechaza y aprueba; el sistema compila una receta, y el DAG queda como vista avanzada.
+- Un solo runtime soporta `efeonce-managed`, `co-operated` y `client-operated`. Cada run resuelve operador, aprobadores de creatividad/gasto, autoridad de template/derechos y owner de delivery; cambiar de modo conserva contexto y no amplía permisos por sí solo.
+- El context pack, PDR-004 y `creative-practice` separan modo operativo de modalidad comercial: On-Going, On-Demand, Staff Augmentation y Sample Sprint siguen vigentes; OTD/FTR sólo se comprometen sobre el scope controlado por Efeonce.
+- Documentación funcional, manual de pilotos, EPIC-028 y skills espejo Codex/Claude quedaron sincronizados. No se creó runtime ni se habilitó acceso cliente; bootstrap, legal/finance/rights, pricing y rollout siguen pendientes de EPIC-028.
+- Validación: `git diff --check` PASS; `pnpm ops:lint --changed` PASS (`epic canonical=1`, `errors=0`, `warnings=0`); cierre documental acotado PASS con un advisory genérico de task lifecycle aunque no se modificó ninguna `TASK-*`; `pnpm docs:context-check` PASS con sólo los warnings históricos por tamaño de `Handoff.md`.
