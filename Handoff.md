@@ -1,3 +1,27 @@
+## Sesión 2026-07-15 — Oferta económica: builder de Excel brandeado reusable (Claude)
+
+> **Pedido:** el Excel de la económica salía "vago y poco profesional"; el operador quiere la CAPACIDAD de generar Excels profesionales (hay clientes que exigen Excel). "arranca".
+>
+> **Entregado:** builder domain-free reusable `scripts/commercial/lib/economic-offer-xlsx.mjs` (ExcelJS) — banda navy + wordmark Efeonce (imagen embebida), paleta AXIS real (`#00345F`/`#36C8BF` desde deck-tokens.css), tabla zebra + montos, bloque Neto/IVA/Total destacado, formato CLP, print A4 fit-to-width + footer. CLI `pnpm economica:build <caso>/economica.json` (data-driven, cada deal es un JSON). SKY migrado: `build-sky-economica-xlsx.mjs` → wrapper delgado + `economica.json` con las cifras. `tender:new` scaffoldea el `economica.json`. Tercer artefacto de la familia productizado.
+>
+> **Verificación:** no hay LibreOffice para convertir xlsx→imagen, así que validé (a) estructuralmente con read-back ExcelJS (logo embebido, celda Total, print A4) y (b) con un **proxy HTML fiel** capturado con Chromium — se ve enterprise (mostrado al operador). El Excel real produce esa misma estructura; el operador debería abrirlo en Excel para feedback fino (spacing/row-heights pueden variar levemente vs el proxy).
+>
+> **Techo honesto:** las fuentes no se embeben en `.xlsx`; brand pixel-perfect = PDF del composer (pendiente si lo quiere), con el Excel como planilla editable. 🔴 NUNCA precio unitario. Confirmar si las bases exigen SU planilla antes de brandear libre (modo "formato exigido" = extensión futura del builder). Documentado en workspace template + skill tenders (ambos namespaces). Sin push.
+
+## Sesión 2026-07-15 — TASK-1414 / Proposal Studio: plantilla reusable de herramientas (Codex)
+
+> **Corrección de rumbo del operador:** no seguir creando láminas en Figma/Product Design; invocar `deck-studio` y sumar una plantilla reusable al catálogo del Proposal Studio. La disposición radial previa no sirve: la lámina de Tools necesita isotipos/logos de herramientas + nombres.
+>
+> **Entregado:** `deck-axis` suma `contentType: tool-stack` → `ToolStackFull` (`tool-stack-full.html` + `tool-stack-full.slots.json`) como mapa operativo por etapas (`stages[] -> tools[]`): planificar, investigar, producir, abastecer y revisar. El Composer se extendió de forma reusable para validar, sintetizar y llenar colecciones anidadas dentro de slots `array`/`object`; no hay lógica especial para esta plantilla. Registry/selector actualizados y docs de Proposal Studio corregidas a 29 plantillas. El resolver cerrado `tool-logo-asset` mapea claves semánticas a assets autocontenidos en `assets/tools/` y declara la placa de contraste (`light|dark`) de cada isotipo (Notion, Frame.io, Adobe suite, Microsoft 365, Semrush, Ahrefs, Brand Visibility Grader, Screaming Frog, Shutterstock, Adobe Stock, Envato, Firefly, Higgsfield, Magnific, Teams, Slack).
+>
+> **Preview:** `docs/commercial/tenders/sky-blog-2026/reusable-slides/tool-stack-preview.json` compone 1 slide en `.captures/sky-tools-template/01-tools-stack.png` + PDF. El deck SKY completo recompuso sin regresión en `.captures/sky-bid-regression/`.
+>
+> **Gates:** `pnpm exec vitest run src/lib/artifact-composer/__tests__/selector.test.ts src/lib/artifact-composer/__tests__/template-composability.test.ts src/lib/artifact-composer/__tests__/catalog-extensibility.test.ts src/lib/artifact-composer/__tests__/validate.test.ts src/lib/artifact-composer/__tests__/resolvers.test.ts` → 5 files / 94 tests passed. `pnpm deck:compose` preview PASS. `pnpm deck:compose docs/commercial/tenders/sky-blog-2026/deck-plan.json --out .captures/sky-bid-regression` PASS (23 láminas). `pnpm exec eslint` focal PASS. `pnpm typecheck` PASS. `pnpm task:lint --task TASK-1414` PASS. `pnpm ops:lint --changed` PASS. `pnpm docs:closure-check` PASS. `git diff --check` PASS.
+>
+> **Assets de marca:** Frame.io usa el SVG del header oficial de `frame.io`; Screaming Frog usa SVG de Worldvectorlogo contrastado contra el PNG oficial de `screamingfrog.co.uk`. No hay logos alucinados ni fallback genérico para esas dos marcas.
+>
+> **Pendiente creativo:** falta iterar las otras dos plantillas reusable de TASK-1414 (`día a día con Efeonce` y `content hub / workflow`), y decidir si `tool-stack` entra al deck SKY real o queda solo como módulo complementario.
+
 ## Sesión 2026-07-15 — DSR interno: workspace canónico del deal + scaffolder (Claude)
 
 > **Pedido:** el operador refinó el Digital Sales Room — hacerlo INTERNO primero, después piloteo para clientes; para nosotros un DSR debe tener technical offer + deck-plan.json + proposal versionada + económica + quote + otros, EN CARPETAS, con subfolders de bases y research, y manifiestos de artefactos vivos (Radiografía, Grader).

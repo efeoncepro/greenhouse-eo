@@ -105,8 +105,35 @@ for (const sub of ['bases', 'research', 'anexos']) {
   writeFileSync(join(dealDir, sub, '.gitkeep'), '')
 }
 
+const economicaStub = {
+  $comment: 'Datos de la oferta económica. FUENTE única; el .xlsx brandeado se emite con `pnpm economica:build <este archivo>`. NUNCA un precio unitario por artículo (04_PRICING #2).',
+  output: 'propuesta-economica.xlsx',
+  title: 'PROPUESTA ECONÓMICA',
+  subtitle: '<Servicio> — <Cliente>',
+  currency: 'CLP',
+  ivaRate: 0.19,
+  meta: {
+    Oferente: 'Efeonce Group SpA',
+    Licitación: '<nombre de la licitación>',
+    Fecha: '<mes año>',
+    'Validez de la oferta': '<N días desde su recepción>'
+  },
+  sections: [
+    {
+      type: 'value-table',
+      title: '1. Valor del servicio',
+      columns: ['Plan', 'Alcance de la operación mensual', 'Valor mensual (neto, sin IVA)'],
+      rows: [{ cells: ['Plan propuesto', '<alcance de la operación>', 0], strong: true }]
+    },
+    { type: 'totals', title: 'Detalle del valor mensual', basis: 0, label: 'Valor mensual neto' },
+    { type: 'keyvalue', title: '2. Condiciones comerciales', rows: [{ cells: ['Precio', '<condición>'] }] }
+  ],
+  footerNote: 'Documento integrante de la oferta económica. Valores en pesos chilenos (CLP), netos sin IVA.'
+}
+
 writeFileSync(join(dealDir, 'README.md'), readme)
 writeFileSync(join(dealDir, 'artifact-manifest.json'), `${JSON.stringify(artifactManifest, null, 2)}\n`)
+writeFileSync(join(dealDir, 'economica.json'), `${JSON.stringify(economicaStub, null, 2)}\n`)
 
 if (existsSync(TECHNICAL_OFFER_TEMPLATE)) {
   copyFileSync(TECHNICAL_OFFER_TEMPLATE, join(dealDir, 'oferta-tecnica.md'))

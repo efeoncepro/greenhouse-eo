@@ -33,8 +33,9 @@ docs/commercial/tenders/<slug>/
   research/                        # 🔒 taller INTERNO: diagnóstico, benchmark, VoC, fuentes crudas
   artifact-manifest.json           # 📄 artefactos VIVOS (Radiografía, Grader report) — por ENLACE, nunca archivo
   oferta-tecnica.md                # ➡️ client-facing (narrativa + ledger de evidencia) — FUENTE
-  oferta-economica.md              # ➡️ client-facing
-  propuesta-economica.xlsx         # ➡️ entregable (generado, no a mano)
+  oferta-economica.md              # ➡️ client-facing (narrativa de la económica)
+  economica.json                   # 📄 FUENTE de datos del Excel (cifras, condiciones)
+  propuesta-economica.xlsx         # ➡️ entregable BRANDEADO (generado: `pnpm economica:build economica.json`)
   deck-plan.json                   # fuente de composición del deck (slots, SSOT del deck)
   anexos/                          # ➡️ administrativos: declaraciones, poderes, certificados
   squad-blueprint-INTERNO.md       # 🔒 loaded cost + piso — NUNCA se entrega
@@ -74,6 +75,23 @@ deck-plan.json  →  pnpm deck:compose  →  PDF
         ▼
 registrar como Proposal en el Studio  →  adjuntar salidas (versionadas)  →  portal /admin/commercial/proposals
 ```
+
+## La oferta económica en Excel (brandeada, no a mano)
+
+Hay clientes que **exigen Excel** (documento integrante de las bases). El `.xlsx` **no se mantiene a
+mano** (se desincroniza): las cifras y condiciones viven en **`economica.json`** (la fuente) y el Excel
+brandeado se emite con:
+
+```bash
+pnpm economica:build docs/commercial/tenders/<slug>/economica.json
+```
+
+El builder (`scripts/commercial/lib/economic-offer-xlsx.mjs`, domain-free y reusable) aplica el oficio de
+marca: banda navy con el wordmark Efeonce, paleta AXIS, tabla con zebra, **bloque de total Neto/IVA/Total**,
+formato CLP y print setup A4. **Techo de Excel:** las fuentes no se embeben en `.xlsx` (degradan a la del
+lector); si querés brand pixel-perfect, ese lugar es un PDF del composer, con el Excel como la planilla
+editable. **Antes de brandear libre, confirmá si las bases exigen SU planilla** (formato equivocado =
+inadmisible). 🔴 **NUNCA** un precio unitario por artículo (el schema no tiene ese campo).
 
 ## Reglas duras
 

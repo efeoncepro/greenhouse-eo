@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — Oferta económica: builder de Excel BRANDEADO reusable
+
+- Hay clientes que exigen Excel (documento integrante). El que se generaba era vago y SKY-hardcodeado. Ahora hay un **builder domain-free reusable** ([economic-offer-xlsx.mjs](scripts/commercial/lib/economic-offer-xlsx.mjs)): banda navy con el wordmark Efeonce (imagen embebida, se ve igual en todo lector), paleta AXIS (navy `#00345F` + teal `#36C8BF`), tabla con zebra + montos alineados, **bloque Neto/IVA/Total** destacado, formato CLP y **print setup A4** (fit-to-width + footer confidencial + página). Verificado con un proxy HTML fiel (salto de ~4/10 a ~8/10).
+- **`pnpm economica:build <caso>/economica.json`**: cada licitación es un `economica.json` (fuente única), el código no cambia. SKY migrado (`build-sky-economica-xlsx.mjs` → wrapper delgado; cifras a `economica.json`). `pnpm tender:new` ahora scaffoldea también el `economica.json`. Tercer artefacto de la familia productizado (deck ✓ · oferta técnica ✓ · económica ✓).
+- **Techo honesto de Excel:** las fuentes no se embeben en `.xlsx` (degradan a la del lector); brand pixel-perfect = PDF del composer, con el Excel como planilla editable. 🔴 NUNCA precio unitario por artículo (el schema no tiene ese campo). Antes de brandear libre, confirmar si las bases exigen SU planilla. Documentado en workspace template + skill de tenders (ambos namespaces).
+
 ## 2026-07-15 — DSR interno / workspace del deal: cierre documental (triple capa + skills)
 
 - Documentación funcional: [digital-sales-room-y-workspace-del-deal.md](docs/documentation/comercial/digital-sales-room-y-workspace-del-deal.md) (las tres capas en lenguaje simple + el workspace + el manifiesto). Manual de uso: [armar-el-workspace-de-un-deal.md](docs/manual-de-uso/comercial/armar-el-workspace-de-un-deal.md) (paso a paso `pnpm tender:new` → oferta → deck → Proposal). Ambos registrados en sus índices.
@@ -7,9 +13,9 @@
 
 ## 2026-07-15 — Proposal Studio: plantilla reusable de stack de herramientas
 
-- El catálogo `deck-axis` suma `contentType: tool-stack` → `ToolStackFull`: lámina 16:9 reutilizable para mostrar 6–20 herramientas con isotipo/logo aprobado + nombre visible, sin descripciones por herramienta ni layout radial.
-- Se agregó resolver cerrado `tool-logo-asset` y assets autocontenidos en el catálogo para Notion, Frame.io, Adobe suite, Microsoft 365, Semrush, Ahrefs, Brand Visibility Grader, Screaming Frog, bancos licenciados y suites AI. La plantilla nace como gap de TASK-1414/SKY: `CardGridFull` describe capacidades con íconos Solar, no marcas reales.
-- Preview reusable: `docs/commercial/tenders/sky-blog-2026/reusable-slides/tool-stack-preview.json` (`pnpm deck:compose ... --out .captures/sky-tools-template`). Gates: composability/selector/catalog tests `72/72`, preview compuesto, deck SKY completo recompuesto, `task:lint TASK-1414`, `ops:lint --changed`.
+- El catálogo `deck-axis` suma `contentType: tool-stack` → `ToolStackFull`: lámina 16:9 reutilizable para mostrar herramientas como sistema operativo por etapas (`stages[] -> tools[]`), con isotipo/logo aprobado + nombre visible. Reemplaza la pared de logos por un flujo: planificar, investigar, producir, abastecer y revisar.
+- El Artifact Composer ahora valida, sintetiza y llena colecciones anidadas dentro de slots `array`/`object`; esto queda como capacidad reusable del motor, no como excepción de `ToolStackFull`. Se agregó resolver cerrado `tool-logo-asset` y assets autocontenidos en el catálogo para Notion, Frame.io, Adobe suite, Microsoft 365, Semrush, Ahrefs, Brand Visibility Grader, Screaming Frog, bancos licenciados y suites AI. El resolver también declara placa de contraste `light|dark` para evitar isotipos claros sobre contenedores claros.
+- Preview reusable: `docs/commercial/tenders/sky-blog-2026/reusable-slides/tool-stack-preview.json` (`pnpm deck:compose ... --out .captures/sky-tools-template`). Gates: Composer focal `94/94`, preview compuesto, deck SKY completo recompuesto, ESLint focal, `pnpm typecheck`, `task:lint TASK-1414`, `ops:lint --changed`, `docs:closure-check`, `git diff --check`.
 
 ## 2026-07-15 — DSR interno: workspace canónico del deal + scaffolder + manifiesto de artefactos
 
