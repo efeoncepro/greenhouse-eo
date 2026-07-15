@@ -1,5 +1,10 @@
 # changelog.md
 
+## 2026-07-14 — Proposal Studio: la versión se deriva y la descarga es gobernada (TASK-1412)
+
+- `attachProposalAsset` deriva la versión (MAX+1 por proposal+kind, misma tx; FOR UPDATE serializa + índice único `(proposal_id, kind, version)` como cinturón) y el campo `version` desaparece del input público — el `artifact-worker` ya llamaba attach con el PDF del render, así que el pipeline completo quedó versionado sin tocarlo. Migración con renumeración determinista de duplicados + DO guard, aplicada en dev.
+- Reader `readProposalArtifactVersions` (historial por kind, `current`, CERO URLs de storage) + `GET /assets/versions` + `GET /assets/[proposalAssetId]/download` con stream vía `downloadPrivateAsset` (gate único + capability `read` + audience gate: un `internal` jamás cruza a un principal client). Gates: módulo 68/68 · full 9497 · build prod limpio. **TASK-1413 (la superficie) desbloqueada.**
+
 ## 2026-07-14 — Licitación SKY: la oferta completa iterada + el composer gana enlaces, anti-fuga y hooks con plan
 
 - **Oferta técnica reescrita** (SEO primero — es lo que piden las Bases; el AEO entra como la segunda conversación del mismo hallazgo): cifras del run publicado `EO-GRUN-00046` (el claim «0 citas» que el informe público contradecía → **«citabilidad propia 0%»**, dato publicado), diagnóstico técnico verificado en vivo sobre `blog.skyairline.com` (sin plugin SEO, sin meta description, cero schema, robots.txt 404), método con forma (base técnica → autoridad temática → E-E-A-T), §5 «qué compra el valor mensual», §14 riesgos con cobertura, matriz de cumplimiento movida a anexo, los 9 SLA completos y las 2 piezas vivas enlazadas (Radiografía + informe). **Económica reescrita a capacidad** (cero precio unitario: el ad-hoc de 260k dominaba al plan ampliado — bugs de `04_PRICING` §6 cerrados); el Excel ahora se **genera** (`scripts/commercial/build-sky-economica-xlsx.mjs`). Piso de negociación recalculado a 2 años sin reajuste: **≈ CLP 5,0M** (carta BAFO interna: 6 piezas a 4,3M).

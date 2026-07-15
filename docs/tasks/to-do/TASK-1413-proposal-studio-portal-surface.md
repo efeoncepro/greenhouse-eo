@@ -27,6 +27,11 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-07-14
+
+- **TASK-1412 COMPLETE** — desbloqueada: reader `/assets/versions` y download por stream ya viven
+  (`artifact-versions.ts`; download con audience gate). El attach ahora retorna `version`.
+
 ## Summary
 
 El runtime de Proposal Studio (aggregate + render pipeline + versionado/descarga de TASK-1412) no tiene

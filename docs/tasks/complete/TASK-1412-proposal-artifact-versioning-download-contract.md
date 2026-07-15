@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -277,6 +277,19 @@ aplica; el de tenders sí: `pnpm vitest run src/lib/artifact-composer` sigue ver
 - Nexa tool `proposal_artifact_versions` sobre el reader (post TASK-1399 flip).
 - Retención/purga del asset store (política, no runtime).
 
+## Delta 2026-07-14 (cierre)
+
+- **Slice 5 resuelto por descubrimiento:** el `artifact-worker` YA llamaba `attachProposalAsset`
+  con el PDF del render (`services/artifact-worker/main.ts:182`, kind `deck`) — con la derivación
+  del Slice 2, el pipeline completo queda versionado sin tocar el worker.
+- **Recalibración:** descarga por STREAM vía `downloadPrivateAsset` (patrón canónico del repo), no
+  URL firmada. Cero URLs de storage en ningún camino.
+- **Evidencia:** migración aplicada en dev con DO guard (0 duplicados + índice, verificado in-band)
+  · módulo 68/68 · full suite 9497 · build prod limpio. **Rollout:** dev completo; staging/prod
+  toman la migración con el release control plane (endpoint inerte hasta TASK-1413).
+- Follow-up menor: el worker fija `kind='deck'` — mapping `artifact_purpose→kind` cuando haya un
+  segundo purpose real.
+
 ## Open Questions
 
-- ¿El PDF del worker ya queda linkeado en `proposal_assets`? (Slice 5 `[verificar]` — decide su alcance.)
+- (resueltas — ver Delta)

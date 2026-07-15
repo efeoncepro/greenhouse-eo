@@ -1,3 +1,11 @@
+## Sesión 2026-07-14 (e) — TASK-1412 complete: versionado derivado + descarga gobernada de proposals (Claude)
+
+> **Pedido:** control de versiones de proposals + espacio en el portal para descargarlas (creadas TASK-1412 backend + TASK-1413 UI vía task-planner, lint template=1/0/0; /implement-task sobre 1412).
+>
+> **Hecho (1412):** migración unicidad+renumeración (aplicada dev, DO guard in-band) · derivación MAX+1 en el command (input sin `version`; retorna versión) · reader de historial sin URLs de storage · `GET /versions` + `GET /download` (stream, audience gate) · Slice 5 resuelto por descubrimiento (el worker ya attacheaba el PDF → pipeline versionado gratis). Módulo 68/68 · full 9497 · build limpio. Rollout: staging/prod toman la migración con el release control plane; endpoint inerte hasta la UI.
+>
+> **Siguiente:** TASK-1413 — `/admin/commercial/proposals` (DataTableShell + ContextualSidecar + descarga; viewCode+seed mismo PR; wireframe/flow ya escritos y robustos). Desbloqueada.
+
 ## Sesión 2026-07-14 (d) — Licitación SKY: oferta iterada de punta a punta + composer con enlaces, anti-fuga y hooks con plan (Claude)
 
 > **Pedido:** iterar la oferta de SKY (Wherex, **cierra 15/07**) siguiendo el SESSION-BRIEF: mapear → diagnosticar → esperar confirmación → ejecutar por frente, con las skills de tenders/deck/seo-aeo-practice/commercial/copywriting.
