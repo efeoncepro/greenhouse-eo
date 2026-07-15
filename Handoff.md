@@ -1,3 +1,15 @@
+## Sesión 2026-07-15 — Kinsta SSH deja de depender de memoria y `.env.local` (Codex)
+
+> **Problema:** durante el cierre de Creative Workflows se interpretó la ausencia de variables SSH y del Kinsta API token como indisponibilidad general de Kinsta, aunque la llave SSH seguía vigente. La causa fue doble: el script temporal leyó el rail REST/Vercel equivocado y `.env.local`, regenerado por Vercel CLI, ya no conservaba `PUBLIC_WEBSITE_KINSTA_*`.
+>
+> **Guardrail:** nuevo `pnpm public-website:ssh-check` verifica read-only perfil local, llave, autenticación batch, WP-CLI y `home=https://efeoncepro.com`. Los comandos públicos cargan primero `.env.public-website.local`, luego `.env.local` y `.env`; `runtime-status.v2` separa `sshWpCli` de `kinstaApi` y nombra los bloqueos API como `*_via_api`.
+>
+> **Memoria cross-agent:** regla en `AGENTS.md`, router `CLAUDE.md`, mirrors Codex/Claude de `efeonce-public-site-wordpress` y canon `docs/architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md`. Principio: un API token ausente nunca prueba que SSH esté caído.
+>
+> **Provisioning local:** `.env.public-website.local` quedó creado y gitignored en este equipo; `~/.ssh/config` suma alias `efeonce-kinsta`, ambos sin copiar la llave al repo. Evidencia real: `ssh-check` PASS; alias PASS; wrapper completo `scp -> wp eval-file -> cleanup` devolvió `home=https://efeoncepro.com` y `theme=ohio-child`.
+>
+> **Gates:** ESLint focal, `pnpm typecheck`, help-smoke de seis entrypoints, validación de ambas skills, `diff -rq` de mirrors, `pnpm claude-md check`, `pnpm docs:closure-check`, `pnpm ops:lint --changed` y QA gates advisory verdes. `pnpm secrets:audit` sigue fallando porque este shell no tiene configuradas ocho credenciales generales de la app; no es regresión ni consumidor del perfil SSH local.
+
 ## Sesión 2026-07-15 — Roadmap cockpit runtime OFF (Codex)
 
 > **Pedido:** apagar/eliminar el módulo Roadmap porque el warning Turbopack por patrón amplio hacía el build demasiado molesto y lento para una superficie de bajo uso.

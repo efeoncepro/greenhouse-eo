@@ -15,6 +15,10 @@ import {
   readLatestPublicSiteDriftReport,
   readPublicSiteRuntimeBinding
 } from '../../src/lib/public-site/runtime-binding'
+import { inspectKinstaSshReadiness } from './kinsta-ssh-config'
+import { loadPublicWebsiteEnvFiles } from './local-env'
+
+const loadedEnvFiles = loadPublicWebsiteEnvFiles()
 
 type CliOptions = {
   repoRoot: string
@@ -93,27 +97,36 @@ const main = () => {
   const repoBranch = existsSync(repoRoot) ? git(repoRoot, ['rev-parse', '--abbrev-ref', 'HEAD']) : null
   const repoHead = existsSync(repoRoot) ? git(repoRoot, ['rev-parse', '--short', 'HEAD']) : null
   const repoStatusShort = existsSync(repoRoot) ? git(repoRoot, ['status', '--short']) : null
+  const sshReadiness = inspectKinstaSshReadiness()
+  const kinstaApiConfigured = Boolean(process.env.PUBLIC_WEBSITE_KINSTA_API_TOKEN_SECRET_REF?.trim())
 
   const blockedCapabilities = [
-    {
-      capability: 'kinsta_cache_clear',
-      status: 'blocked',
-      reason: 'Kinsta API token is not configured yet.'
-    },
-    {
-      capability: 'kinsta_backup_create',
-      status: 'blocked',
-      reason: 'Kinsta API token is not configured yet.'
-    },
+    ...(!kinstaApiConfigured
+      ? [
+          {
+            capability: 'kinsta_cache_clear_via_api',
+            lane: 'kinsta_api',
+            status: 'blocked',
+            reason: 'Kinsta API token is not configured. This does not block SSH/WP-CLI cache purge.'
+          },
+          {
+            capability: 'kinsta_backup_create_via_api',
+            lane: 'kinsta_api',
+            status: 'blocked',
+            reason: 'Kinsta API token is not configured. This does not describe SSH/WP-CLI readiness.'
+          }
+        ]
+      : []),
     {
       capability: 'production_deploy_apply',
+      lane: 'release',
       status: 'blocked',
       reason: 'Only no-mutation dry-run is allowed until Kinsta deploy/cache/backup controls are verified.'
     }
   ]
 
   const report = {
-    contractVersion: 'public-site-runtime-status.v1',
+    contractVersion: 'public-site-runtime-status.v2',
     generatedAt: new Date().toISOString(),
     bindingPath,
     site: binding.site,
@@ -137,6 +150,23 @@ const main = () => {
           releaseSafety: latestDrift.report.releaseSafety ?? null
         }
       : null,
+    accessLanes: {
+      sshWpCli: {
+        status: sshReadiness.ready ? 'configured_not_verified' : 'not_configured',
+        configured: Boolean(sshReadiness.config),
+        keyExists: sshReadiness.keyExists,
+        missing: sshReadiness.missing,
+        invalid: sshReadiness.invalid,
+        verificationCommand: 'pnpm public-website:ssh-check',
+        kinstaApiTokenRequired: false
+      },
+      kinstaApi: {
+        status: kinstaApiConfigured ? 'configured_not_verified' : 'not_configured',
+        configured: kinstaApiConfigured,
+        sshRequired: false
+      }
+    },
+    loadedEnvFiles,
     blockedCapabilities,
     pending: binding.pending
   }
@@ -157,6 +187,7 @@ const main = () => {
         repository: report.repository.url,
         runtimeRepo: report.runtimeRepo,
         latestDrift: report.latestDrift,
+        accessLanes: report.accessLanes,
         blockedCapabilities: report.blockedCapabilities.map(item => item.capability)
       },
       null,

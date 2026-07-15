@@ -1,5 +1,12 @@
 ## Estado vigente para agentes
 
+- **Kinsta SSH/WP-CLI con preflight durable (2026-07-15):** antes de cualquier operación SSH/WP-CLI del sitio
+  público ejecutar `pnpm public-website:ssh-check`. Kinsta API y SSH son carriles independientes: la ausencia de
+  `PUBLIC_WEBSITE_KINSTA_API_TOKEN_SECRET_REF` no demuestra que SSH esté caído. La configuración local estable
+  vive en `.env.public-website.local` (gitignored, prioridad sobre `.env.local` para resistir `vercel env pull`),
+  mientras la llave permanece en `~/.ssh/`. `public-website:runtime-status.v2` reporta ambos carriles por separado.
+  Canon: `docs/architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md` + skill
+  `efeonce-public-site-wordpress` sincronizada en Codex/Claude.
 - **Roadmap cockpit runtime OFF (2026-07-15):** por bajo uso y warning/performance recurrente de Turbopack, `/roadmap`
   salio del menu y del runtime del portal. `GET /api/roadmap/work-items*` conserva auth/capability pero responde
   `410 roadmap_disabled`; `next.config.ts` ya no bundlea `docs/{epics,tasks,mini-tasks,issues}/**/*.md` con

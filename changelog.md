@@ -1,5 +1,12 @@
 # changelog.md
 
+## 2026-07-15 — Preflight Kinsta SSH/WP-CLI resistente a Vercel
+
+- Se agrega `pnpm public-website:ssh-check`, smoke read-only que valida configuración, llave, autenticación SSH y el WordPress esperado antes de operar Kinsta.
+- Los entrypoints del sitio público cargan primero `.env.public-website.local`, aislando la metadata SSH de `.env.local`, que Vercel CLI puede regenerar.
+- `public-website:runtime-status.v2` separa explícitamente Kinsta API de SSH/WP-CLI; la ausencia del API token ya no puede interpretarse como caída de SSH.
+- `AGENTS.md`, `CLAUDE.md` y las skills espejo WordPress enrutan al nuevo contrato cross-agent y su árbol de diagnóstico.
+
 ## 2026-07-15 — Roadmap cockpit sale del runtime del portal
 
 - Se deshabilito `/roadmap` y `GET /api/roadmap/work-items*`: el menu ya no ofrece el cockpit y los endpoints preservan auth/capability pero responden `410 roadmap_disabled`.

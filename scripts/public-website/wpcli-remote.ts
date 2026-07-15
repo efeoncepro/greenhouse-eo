@@ -2,9 +2,9 @@
 /**
  * Run a local PHP file through remote Kinsta WP-CLI for efeoncepro.com.
  *
- * This avoids fragile inline shell/PHP quoting. The script loads `.env.local`
- * and `.env`, uploads the PHP file to `/tmp`, executes `wp eval-file`, and
- * removes the remote temporary file.
+ * This avoids fragile inline shell/PHP quoting. The script loads the stable
+ * public-site local env profile before Vercel-managed env files, uploads the PHP
+ * file to `/tmp`, executes `wp eval-file`, and removes the remote temporary file.
  *
  * Usage:
  *   pnpm public-website:wpcli -- --eval-file ./tmp/read-only.php
@@ -13,46 +13,18 @@
 
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { basename, resolve } from 'node:path'
 
-const loadEnvFile = (relativePath: string) => {
-  try {
-    const contents = readFileSync(resolve(process.cwd(), relativePath), 'utf8')
+import {
+  buildKinstaScpArgs,
+  buildKinstaSshArgs,
+  formatKinstaSshReadinessError,
+  inspectKinstaSshReadiness
+} from './kinsta-ssh-config'
+import { loadPublicWebsiteEnvFiles } from './local-env'
 
-    for (const rawLine of contents.split('\n')) {
-      const line = rawLine.trim()
-
-      if (!line || line.startsWith('#')) continue
-
-      const normalizedLine = line.startsWith('export ') ? line.slice('export '.length).trim() : line
-      const eq = normalizedLine.indexOf('=')
-
-      if (eq <= 0) continue
-
-      const key = normalizedLine.slice(0, eq).trim()
-
-      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key) || process.env[key] !== undefined) continue
-
-      let value = normalizedLine.slice(eq + 1).trim()
-
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1)
-      }
-
-      process.env[key] = value
-    }
-
-    return true
-  } catch {
-    return false
-  }
-}
-
-const loadedEnvFiles = ['.env.local', '.env'].filter(loadEnvFile)
+const loadedEnvFiles = loadPublicWebsiteEnvFiles()
 
 type CliOptions = {
   evalFile: string | null
@@ -114,28 +86,20 @@ Required env:
   PUBLIC_WEBSITE_KINSTA_SSH_KEY_PATH
   PUBLIC_WEBSITE_KINSTA_WORDPRESS_PATH
 
-Loaded env files: ${loadedEnvFiles.length ? loadedEnvFiles.join(', ') : '(none)'}`)
+Loaded env files: ${loadedEnvFiles.length ? loadedEnvFiles.join(', ') : '(none)'}
+
+Run pnpm public-website:ssh-check before remote operations.`)
 }
 
 const shellQuote = (value: string) => `'${value.replace(/'/g, `'\\''`)}'`
-
-const requireEnv = (name: string) => {
-  const value = process.env[name]?.trim()
-
-  if (!value) {
-    throw new Error(`${name} is required. Configure it in .env.local or the shell.`)
-  }
-
-  return value
-}
 
 const main = () => {
   const options = parseArgs(process.argv.slice(2))
 
   if (options.help) {
     printHelp()
-    
-return
+
+    return
   }
 
   if (!options.evalFile) {
@@ -148,37 +112,20 @@ return
     throw new Error(`Eval file does not exist: ${evalFilePath}`)
   }
 
-  const host = requireEnv('PUBLIC_WEBSITE_KINSTA_SSH_HOST')
-  const port = requireEnv('PUBLIC_WEBSITE_KINSTA_SSH_PORT')
-  const user = requireEnv('PUBLIC_WEBSITE_KINSTA_SSH_USER')
-  const keyPath = requireEnv('PUBLIC_WEBSITE_KINSTA_SSH_KEY_PATH')
-  const wordpressPath = requireEnv('PUBLIC_WEBSITE_KINSTA_WORDPRESS_PATH')
+  const readiness = inspectKinstaSshReadiness()
+
+  if (!readiness.ready || !readiness.config) {
+    throw new Error(formatKinstaSshReadinessError(readiness))
+  }
+
+  const { host, user, wordpressPath } = readiness.config
   const remoteHash = createHash('sha256').update(evalFilePath).update(String(Date.now())).digest('hex').slice(0, 12)
   const remoteFileName = basename(evalFilePath).replace(/[^A-Za-z0-9_.-]/g, '-')
   const remotePath = `/tmp/greenhouse-wpcli-${remoteHash}-${remoteFileName}`
   const sshTarget = `${user}@${host}`
 
-  const sshBaseArgs = [
-    '-i',
-    keyPath,
-    '-o',
-    'BatchMode=yes',
-    '-o',
-    'IdentitiesOnly=yes',
-    '-p',
-    port
-  ]
-
-  const scpBaseArgs = [
-    '-i',
-    keyPath,
-    '-o',
-    'BatchMode=yes',
-    '-o',
-    'IdentitiesOnly=yes',
-    '-P',
-    port
-  ]
+  const sshBaseArgs = buildKinstaSshArgs(readiness.config)
+  const scpBaseArgs = buildKinstaScpArgs(readiness.config)
 
   execFileSync('scp', [...scpBaseArgs, evalFilePath, `${sshTarget}:${remotePath}`], { stdio: 'inherit' })
 

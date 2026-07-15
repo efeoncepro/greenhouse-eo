@@ -302,6 +302,7 @@ Do not use `efeonce-web` as the live public-site source unless an ADR changes th
 ## Common Discovery Commands
 
 ```bash
+pnpm public-website:ssh-check
 pnpm public-website:discover
 pnpm public-website:discover -- --authenticated --wpcli --write
 pnpm public-website:bridge-inspect -- --page-id <id>
@@ -312,7 +313,14 @@ pnpm public-website:runtime-status
 pnpm public-website:deploy-dry-run
 ```
 
-`public-website:*` commands load `.env.local` / `.env` safely. Do not paste secrets into command lines.
+Kinsta has two independent access lanes: SSH/WP-CLI and the Kinsta API. An absent API token never
+proves that SSH is unavailable. Run `pnpm public-website:ssh-check` before SSH/WP-CLI work; it performs
+a read-only connection and verifies the expected WordPress home URL.
+
+`public-website:*` commands load `.env.public-website.local`, then `.env.local`, then `.env`. Keep SSH
+metadata in the dedicated first file because Vercel CLI may regenerate `.env.local`. Do not paste
+secrets into command lines. Canonical invariant:
+`docs/architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md`.
 
 ## Local/Live Sync Contract
 
