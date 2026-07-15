@@ -51,7 +51,7 @@ DB: greenhouse_commercial.proposals + proposal_{state_transitions,assets,evidenc
 | **Repo / CLI / scripts** (un agente Claude o un dev) | ✅ **El camino vivo hoy.** Todo lo de este doc |
 | **API interna** (`/api/commercial/proposals/**`) | ✅ Existe y está gateada (capability + entitlement per-ORG) |
 | **Nexa (conversación)** | ⚙️ **Code-complete, flag OFF** (TASK-1399). Registradas en `NEXA_ACTION_REGISTRY`: `register_proposal`, `attach_proposal_rfp`, `record_proposal_evidence`, `request_proposal_render` + el tool read-only `proposal_status`. Se prenden con **`NEXA_PROPOSAL_ACTIONS_ENABLED`** (default OFF, además del master `NEXA_ACTION_RUNTIME_ENABLED`) — y el render exige además `ARTIFACT_RENDER_JOBS_ENABLED` en el MISMO target |
-| **UI del portal** | ❌ No existe (F5). El read model del día a día ya está listo para ella: `proposals/operator-view.ts` |
+| **UI del portal** | ✅ **Read + descarga** (TASK-1413, 2026-07-15): `/admin/commercial/proposals` — lista operator-view + sidecar con historial de versiones por artefacto + descarga del archivo real. viewCode `administracion.commercial_proposals` (efeonce_admin+efeonce_account). La ESCRITURA desde UI sigue siendo F5: crear/gates/render se opera por repo/API/Nexa |
 
 **Consecuencia práctica:** si alguien pregunta *"¿puedo pedirle un deck a Nexa?"* — el código está, la
 puerta se abre con el flag. Mientras esté OFF, Nexa lo dice honestamente (gap `runtime_disabled`) y el
@@ -210,7 +210,7 @@ gcloud run jobs execute artifact-worker --project=efeonce-group --region=us-east
 | **Una constraint nueva del RFP** (p. ej. formato de archivo) | `render-constraints.ts` (`extractRenderConstraints` + su test) → viaja FIJADA en el job → el worker la enforcea | Leerla "fresca" en el worker (rompe determinismo) |
 | **Una fase agéntica nueva** (análisis F1, packaging F2…) | El MOLDE: contexto allowlisted tipado → propuesta tipada que cita inputs y declara blockers → validación fail-closed que recomputa → confirm member-only → EL MISMO command canónico → eval fixture. Copiar `render-agent.ts`, no inventar | Un prompt suelto; un tool con acceso a DB/storage/jobs.run |
 | **Una acción nueva operable desde Nexa** | Copiar el molde de `actions/proposal-studio.ts`: schema Zod SIN ids de organización (el scope se deriva) + `isEnabled` con flag propio default-OFF + `isPermitted` sync (capability) + `buildPreview` que **cruza la puerta y ejercita los gates del command** (bloqueo → `NexaActionBlockedError`) + `execute` que re-cruza la puerta y delega en el command **sin** `idempotencyKey` (la pone el confirm) → registrar en `NEXA_ACTION_REGISTRY` **y en la descripción del tool `propose_action`** (la lista está hardcodeada ahí: si no la actualizás, el LLM no sabe que existe) | Un `ownerOrgId` en el schema; reglas de dominio nuevas dentro de la acción; un preview que "avisa" de un bloqueo en vez de bloquear |
-| **Una UI del Studio (F5)** | Consumir `operator-view.ts` (el read model ya existe) + `assertProposalStudioAccessForSubject` (la misma puerta) + `assertProposalRenderAdmissible` para deshabilitar "Generar" **con el motivo real** | Reimplementar los gates en el componente (drift garantizado: el día que se agregue uno, la UI miente) |
+| **Una UI del Studio (F5 — la parte WRITE)** | La lectura+descarga YA existe (TASK-1413) y es LA prueba del camino correcto: consumió `operator-view.ts` + `readProposalArtifactVersions` + el endpoint de descarga sin reimplementar un solo gate. Para el write: consumir `operator-view.ts` + `assertProposalStudioAccessForSubject` (la misma puerta) + `assertProposalRenderAdmissible` para deshabilitar "Generar" **con el motivo real** | Reimplementar los gates en el componente (drift garantizado: el día que se agregue uno, la UI miente) |
 | **Batch de renders** (30 carruseles) | Open Question CON DIENTES en TASK-1391: `png-set` probablemente quiere batch por ejecución (cold start de Chromium domina). Decidir CON DATOS de carga | Subir `tasks`/`parallelism` a ojo |
 | **Otro detector de QA visual** | `quality-gates.ts` + calibrarlo contra los 40 frames del baseline (como blank_slide: reales ≥2,41%, sintético 0%) + código de fallo | Un warning que nadie lee |
 
@@ -221,3 +221,27 @@ gcloud run jobs execute artifact-worker --project=efeonce-group --region=us-east
 2. `propose → confirm → execute` con confirm humano — en el contrato, en el command Y en la DB.
 3. El `audience` por referencia: un artefacto client_facing jamás contiene una referencia
    internal. Es la diferencia entre ganar una licitación y regalar el piso de negociación.
+
+## Delta 2026-07-15 — la versión se DERIVA y la descarga es gobernada (TASK-1412/1413)
+
+**Cambio de contrato en `attachProposalAsset`:** el input **ya NO acepta `version`** — se deriva
+`MAX(version)+1` por `(proposal_id, kind)` dentro de la misma tx (`FOR UPDATE` serializa; índice
+único `(proposal_id, kind, version)` como cinturón) y el command la retorna. Si un agente/consumer
+intenta pasarla, el tipo lo rechaza; NUNCA reintroducirla "para fijar una versión a mano" — v1/v2/v3
+son historia derivada, no opinión del caller. El `artifact-worker` ya adjunta el PDF del render por
+este camino, así que **todo render productivo queda versionado solo**.
+
+**Leer/descargar (los dos contratos nuevos, mismos gates de siempre):**
+
+- `readProposalArtifactVersions` (`proposals/artifact-versions.ts`): historial por kind + `current`,
+  con filename/size/fecha — **CERO URLs de storage en el shape** (invariante).
+- `GET /api/commercial/proposals/[id]/assets/[proposalAssetId]/download`: valida pertenencia del
+  asset a la proposal, re-cruza `assertProposalStudioAccess` y **el audience gate manda**: un
+  `internal` responde 403 a cualquier principal client aunque tenga el link. Verificado en runtime
+  (matriz client 403 / superadmin 200 con el PDF real de SKY).
+
+**La superficie del portal** (`/admin/commercial/proposals`, TASK-1413) es un consumer de esos dos
+contratos — no tiene lógica propia de dominio. Manual del operador:
+`docs/manual-de-uso/comercial/descargar-propuestas-portal.md`. Si el día a día pide ver evidencia,
+requirements o render jobs en vivo, el follow-up declarado es la ruta detalle `[proposalId]`, no
+engordar el sidecar.

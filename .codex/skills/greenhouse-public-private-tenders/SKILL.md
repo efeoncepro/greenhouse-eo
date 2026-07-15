@@ -8,7 +8,7 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 
 # greenhouse-public-private-tenders — Operador de Licitaciones
 
-> **Skill de dominio (método + conocimiento), NO un módulo runtime.** Esta skill es el "cerebro" reutilizable del ciclo de licitación. Hay DOS runtimes que alimenta: (a) el **discovery público** (ingesta Mercado Público, `public_tenders*`) del programa **RESEARCH-007** (TASK-673/675–687), y (b) el **Proposal Studio SHIPPED** (TASK-1392/1393/1391, 2026-07-12): aggregate `Proposal` + Artifact Composer + render pipeline gobernado — su manual de uso/evolución es el companion **`proposal-studio-runtime.md`**. Esta skill *alimenta y opera* esos módulos; **no los reimplementa**. Si te piden construir/extender runtime, carga también `arch-architect` (overlay Greenhouse) y `greenhouse-backend`.
+> **Skill de dominio (método + conocimiento), NO un módulo runtime.** Esta skill es el "cerebro" reutilizable del ciclo de licitación. Hay DOS runtimes que alimenta: (a) el **discovery público** (ingesta Mercado Público, `public_tenders*`) del programa **RESEARCH-007** (TASK-673/675–687), y (b) el **Proposal Studio SHIPPED** (TASK-1392/1393/1391 + 1412/1413, 2026-07-12→15): aggregate `Proposal` + Artifact Composer + render pipeline gobernado + versionado derivado de artefactos y superficie de portal para ver/descargar (`/admin/commercial/proposals`) — su manual de uso/evolución es el companion **`proposal-studio-runtime.md`**. Esta skill *alimenta y opera* esos módulos; **no los reimplementa**. Si te piden construir/extender runtime, carga también `arch-architect` (overlay Greenhouse) y `greenhouse-backend`.
 
 ## Cuándo invocar
 
@@ -124,7 +124,7 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 | `privado-plataformas-sectores.md` | E-procurement (SAP Ariba, Coupa, Jaggaer, GEP, Oracle, SAP Fieldglass/VMS), precalificación y registros (Achilles, SICEP, REPRO, TVEC privado), y playbooks por sector (minería, energía, retail, banca, telco, salud privada) |
 | `compliance-riesgo-integridad.md` | Checklist de admisibilidad, inhabilidades, probidad/conflicto de interés, subcontratación, PI/confidencialidad, multas y sanciones |
 | `data-sources-apis.md` | API Mercado Público v1 (ticket DCCP) + Compra Ágil v2 Beta, adjuntos WebForms, POC `scripts/research/mercadopublico-poc/`, conexión al módulo RESEARCH-007, MCP Legal Data Hunter, HubSpot/Notion |
-| `proposal-studio-runtime.md` | **El runtime SHIPPED (TASK-1392/1393/1391, 2026-07-12)**: cómo USAR el pipeline completo (Proposal → evidencia → manifest → render job gobernado → `artifact-worker` → PDF en asset store) y cómo EVOLUCIONARLO (costuras: catálogo nuevo, outputTarget, brand pack, fase agéntica con el molde propose→confirm→execute, failure codes, constraints del RFP) — lo primero que lee un agente nuevo que va a tocar el motor |
+| `proposal-studio-runtime.md` | **El runtime SHIPPED (TASK-1392/1393/1391, 2026-07-12)**: cómo USAR el pipeline completo (Proposal → evidencia → manifest → render job gobernado → `artifact-worker` → PDF versionado en asset store → ver/descargar en el portal) y cómo EVOLUCIONARLO (costuras: catálogo nuevo, outputTarget, brand pack, fase agéntica con el molde propose→confirm→execute, failure codes, constraints del RFP) — lo primero que lee un agente nuevo que va a tocar el motor |
 
 ## Reglas duras (hard rules)
 
