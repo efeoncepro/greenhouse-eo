@@ -47,6 +47,7 @@ Eso hacia que las lecturas se truncaran y que reglas importantes quedaran enterr
     elementor-mutation.md
     growth-forms-wordpress.md
     content-factory-gutenberg.md
+    agentic-blogpost-end-to-end.md
     custom-elementor-widgets.md
     layout-incidents.md
     runtime-and-discovery.md
@@ -72,6 +73,7 @@ La copia Claude debe espejar esta estructura:
 | `elementor-mutation.md` | Carril seguro para `Document::save()`, backups, metas Ohio, CSS scoped, controles Ohio y riesgos. |
 | `growth-forms-wordpress.md` | Contrato WordPress como host surface de Growth Forms y limites del bridge AEO. |
 | `content-factory-gutenberg.md` | AI Content Factory, Gutenberg posts, maps, draft/private clones y comandos `public-website:content-factory:*`. |
+| `agentic-blogpost-end-to-end.md` | Orquestacion completa idea→publicacion: skills, metadata, media, autorizacion humana, snapshot/rollback y QA live. |
 | `custom-elementor-widgets.md` | Plugin contenedor `eo-elementor-widgets`, widgets server-rendered vs host adapters y deploy rail. |
 | `layout-incidents.md` | Incidentes layout historicos aun utiles: Blog, Contacto y lecciones de Ohio/meta vs CSS global. |
 | `runtime-and-discovery.md` | Inventario runtime, WP Abilities, Application Password reference, bridge, Kinsta, repo binding y WordPress React boundary. |
@@ -95,6 +97,7 @@ Ejemplos:
 | Cambiar spacing de AEO `/aeo-2/` | `landing-workflow.md`, `landing-registry.md`, `elementor-mutation.md`, `landings/aeo.md` |
 | Revisar submit Growth Forms en WordPress | `growth-forms-wordpress.md`, landing file si aplica |
 | Editar un post Gutenberg existente | `content-factory-gutenberg.md`, `runtime-and-discovery.md` |
+| Crear y publicar un blogpost agentic end to end | `content-factory-gutenberg.md`, `agentic-blogpost-end-to-end.md`, `runtime-and-discovery.md` |
 | Crear un custom widget Elementor | `custom-elementor-widgets.md`, `elementor-mutation.md`, landing file si aplica |
 | Investigar WP/Kinsta/bridge | `runtime-and-discovery.md` |
 | Corregir un layout antiguo Blog/Contacto | `layout-incidents.md`, `elementor-mutation.md` |

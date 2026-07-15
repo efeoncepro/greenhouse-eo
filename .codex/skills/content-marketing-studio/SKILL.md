@@ -1,6 +1,7 @@
 ---
 name: content-marketing-studio
-description: Studio de EJECUCIÓN del motor de contenidos al estado del arte 2026 — el "estudio" que operacionaliza la estrategia editorial y produce, orquesta, distribuye, repurposea, opera y mide contenido formato-por-formato (blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video, podcast). Dos manos: (1) conocimiento profundo del content engine y content ops; (2) ejecución real (pipeline brief→draft→asset→review→publish→distribute→measure + motor de atomización). Complementa `digital-marketing` (que decide el rol del contenido en el mix y le hace hand-off a este studio, igual que su módulo de social apunta a `social-media-studio`). Se apoya directo en `growth-marketing-cro` (conversión/loops), `seo-aeo` (descubribilidad/citabilidad), `copywriting` (craft), `social-media-studio` (distribución social), los studios de asset (design/motion/audio/ai-image) y el runtime de publicación/medición. Triggers: "content marketing", "estrategia de contenidos", "calendario editorial", "pillar/cluster", "topical authority", "content ops", "content engine", "repurposing", "atomización", "content atomization", "distribución de contenido", "content calendar", "newsletter", "ebook", "whitepaper", "lead magnet", "case study", "webinar", "podcast", "thought leadership", "content brief", "editorial", "content ROI", "influenced pipeline", "AI content", "content factory", "content-led growth".
+description: >-
+  Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye el sistema visual editorial: función contextual, coherencia, concept IDs/manifest, prompts GPT Image 2, masters/derivados WebP/JPEG, Media Library y QA público. Complementa `digital-marketing`; encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y assets/publicación a sus skills dueñas. Usar para content marketing, estrategia/calendario editorial, pillar/cluster, topical authority, content ops/engine, repurposing/atomización, distribución, content brief, editorial, featured/OG images, newsletter, ebook, whitepaper, lead magnet, case study, webinar, podcast, thought leadership, content ROI, influenced pipeline, AI content, content factory y content-led growth.
 ---
 
 # Content Marketing Studio — el estudio del motor de contenidos (2026)
@@ -19,6 +20,12 @@ description: Studio de EJECUCIÓN del motor de contenidos al estado del arte 202
 2. Carga **solo** el/los módulos de la etapa (árbol de decisión).
 3. Aplica las **reglas duras** + la **tabla de sinergias** (nombra y encadena el hand-off).
 4. Cierra con un **artefacto** (`templates/`) y el hand-off a la skill dueña del siguiente paso.
+
+**Routing visual:** si una pieza necesita hero, imágenes de cuerpo, diagramas editoriales o derivados sociales/OG, carga `references/agentic-editorial-visual-system.md` **antes** de escribir prompts o generar assets. Este studio define función, sistema, manifest, selección e integración; la skill de imagen/diseño ejecuta el craft visual.
+
+**Routing knowledge-to-product:** si una Pillar puede evolucionar a ebook, workbook, tool o soporte intelectual
+de un producto futuro, carga `references/knowledge-to-product-ladder.md`. Esa evolución exige trabajos y gates
+distintos; una tool no se trata como repurposing ni el contenido como product spec.
 
 ## Intake (correr SIEMPRE antes de recomendar)
 
@@ -39,6 +46,8 @@ description: Studio de EJECUCIÓN del motor de contenidos al estado del arte 202
 ├─ Distribuir/amplificar una pieza (owned/earned/paid, syndication, comunidades) ... 05_DISTRIBUTION_AMPLIFICATION
 ├─ Medir contenido→pipeline (leading/lagging, influenced pipeline, content ROI) .... 06_MEASUREMENT
 ├─ Producir con IA sin slop (Content Factory, fidelidad de voz, gobernanza) ........ 07_AI_CONTENT
+├─ Diseñar/producir el sistema visual editorial, hero/body/OG y Media Library ..... references/agentic-editorial-visual-system
+├─ Madurar Pillar→ebook→tool→producto sin mezclar sources of truth ................. references/knowledge-to-product-ladder
 ├─ Qué NO hacer .................................................................... ANTIPATTERNS
 ├─ Vocabulario .................................................................... GLOSSARY
 ├─ Fuentes/benchmarks 2026 ........................................................ SOURCES
@@ -57,6 +66,9 @@ Carga selectiva: no traigas los 7 módulos de una.
 5. **IA con gobernanza.** Contenido asistido por IA con fidelidad de voz + barra de edición humana; nunca output crudo. Nunca reimplementar el Content Factory ni el publishing — operarlos vía su skill dueña.
 6. **Todo mapea a etapa de funnel + ICP.** Contenido sin JTBD, etapa ni ICP es ruido. El *encaje al negocio/bow-tie* se valida con `efeonce-agency`/`commercial-expert`, no se inventa aquí.
 7. **es-CL neutro, tuteo**, sin voseo. Copy visible se valida con `copywriting` / `greenhouse-ux-writing`. Para clientes internacionales, transcreación, no traducción literal.
+8. **Contenido no es producto.** Una Pillar puede crear lenguaje, demanda e hipótesis; un ebook debe agregar
+   método y una tool requiere PDR, modelo, privacidad, analytics, QA y ejecución formal. Nunca conviertas una
+   buena respuesta editorial en feature o claim de disponibilidad por inferencia.
 
 ## Tabla de sinergias (nombra y encadena el hand-off)
 
@@ -99,6 +111,8 @@ Carga selectiva: no traigas los 7 módulos de una.
 | `modules/05_DISTRIBUTION_AMPLIFICATION.md` | Owned/earned/paid content distribution, syndication, comunidades, PR de contenido — con hand-offs |
 | `modules/06_MEASUREMENT.md` | Leading/lagging, engagement→influenced pipeline, content ROI, atribución — hand-off a gtm-ga4/growth |
 | `modules/07_AI_CONTENT.md` | Content Factory/Media Foundry, contenido asistido por IA, anti AI-slop, fidelidad de voz, gobernanza |
+| `references/agentic-editorial-visual-system.md` | Flujo visual editorial: función contextual→sistema coherente→concept IDs/manifest→GPT Image 2→masters/derivados→Media Library→QA público |
+| `references/knowledge-to-product-ladder.md` | Escalera Pillar→satélites→ebook/workbook→tool diagnóstica→producto, con separación de evidencia y gates |
 | `ANTIPATTERNS.md` · `GLOSSARY.md` · `SOURCES.md` | Antipatrones, vocabulario, fuentes/benchmarks 2026 |
 | `efeonce/EFEONCE_OVERLAY.md` | Ecosistema Efeonce: Think, Marketing con Manzanitas, Glitch, Content Factory, ebooks/lead magnets, bow-tie, ICPs |
 | `templates/` | content-strategy-brief, pillar-cluster-map, editorial-calendar, content-brief, repurposing-map, distribution-plan, measurement-dashboard |

@@ -45,7 +45,7 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 
 ## Child Tasks
 
-> Las tasks nacen en el repositorio nuevo, después de aprobar el bootstrap y registrar su gobernanza allí. Se mantienen aquí como slices de ownership; **no autorizar implementación Greenhouse bajo estos nombres**.
+> Las tasks nacen en el repositorio nuevo, después de aprobar el bootstrap y registrar su gobernanza allí. Se mantienen aquí como slices de ownership; **no autorizar implementación Greenhouse bajo estos nombres**. La Pillar y los satélites de PDR-014 son un programa editorial de soporte: sus secciones, diagramas, checklists o títulos **no crean child tasks ni especificaciones ejecutables**.
 
 - `TASK-###` — **Creative Studio repository and cloud boundary.** Crear repositorio privado, CI, proyectos GCP, IAM/Secret Manager, Cloud Run, Cloud SQL, buckets, IaC y observabilidad base.
 - `TASK-###` — **Identity, workspace and canonical command foundation.** Tenant/RLS, roles/capabilities, actor/audit/idempotency y API contract base para UI/MCP.
@@ -62,6 +62,7 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 
 - Pilotos y evidencia: `ai-generations/2026-07-11_glitch-microphone-intro/` y el workflow RRSS documentado en sus manifests/retrospectivos.
 - Investigación activa de Creative Operations, agentes y patrón builder/runner: [RESEARCH-009](../../research/RESEARCH-009-creative-operations-agentic-workflows.md). Es input de bootstrap; no habilita implementación dentro de Greenhouse.
+- Territorio científico/editorial: [PDR-014](../../public-site/decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md) + [brief Pillar/cluster](../../public-site/CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md). Puede informar lenguaje, hipótesis y prioridades de investigación; no implementa workflows ni autoriza runtime/backlog.
 - Skills operativas: `.codex/skills/motion-design-studio/` y `.codex/skills/audio-studio/` (con espejos Claude).
 - Propuestas históricas ahora superseded como runtime Greenhouse: `GREENHOUSE_CONTENT_FACTORY_MEDIA_GENERATION_*`, `GREENHOUSE_CREATIVE_FLOW_STUDIO_DECISION_V1.md` y `GREENHOUSE_CREATIVE_VIDEO_STUDIO_V1.md`.
 - `TASK-996` conserva historia del piloto HyperFrames; no es el vehículo de implementación de este epic.
@@ -86,6 +87,7 @@ El producto no sustituye la capacidad de agencia. Crea un flywheel: Efeonce prue
 - No vender créditos ni procesar pagos antes de definir propiedad comercial, impuestos, refund y derechos.
 - No prometer publicación autónoma, aprobación creativa automática ni reemplazar dirección/criterio humano.
 - No declarar que un modelo es “mejor” globalmente: la evaluación es por contrato de fidelidad y evidencia de fixture.
+- No inferir features, schemas, commands, templates ejecutables ni tasks desde artículos o assets editoriales.
 
 ## Delta 2026-07-11
 

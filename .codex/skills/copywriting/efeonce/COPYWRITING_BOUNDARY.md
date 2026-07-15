@@ -24,6 +24,13 @@
   doctrina de marca** → **es la skill dueña**.
 - En medio (siempre, en escritura): **nómbralo y encadena**. Craftea aquí → gobierna/ubica allá.
 
+## Precedencia de speaker: Julio vs Efeonce
+
+La doctrina institucional sigue gobernada por `efeonce-agency` y `docs/context/05_voz-tono-estilo.md`.
+La voz autoral de Julio vive en `JULIO_REYES_VOICE_SYSTEM.md` y solo se aplica cuando el byline o speaker es
+Julio. En thought leadership firmado por él, Copywriting mantiene su narración personal y atribuye la doctrina
+como `En Efeonce...`; en superficies institucionales usa Efeonce aunque el tema haya sido desarrollado por Julio.
+
 ## Nota sobre la skill de UX writing (precisión de runtime)
 
 - **`greenhouse-ux-writing`** es la skill **canónica de UX writing** que usa el equipo. Vive

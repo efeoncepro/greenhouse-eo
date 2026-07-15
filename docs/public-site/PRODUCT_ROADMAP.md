@@ -157,6 +157,20 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 ## Next
 
+- **Territorio editorial “Creative Workflows”** (PDR-014, Pillar V4 publicada; satélites siguientes): la
+ Pillar educativa en Marketing con Manzanitas define la categoría desde la
+ tesis **“un sistema de decisiones creativas humanas vuelto ejecutable”** y se
+ expandirá en tres olas de satélites sobre neurociencia, fronteras humano/sistema,
+ implementación, medición, gobierno y evidencia. Content Factory creó y verificó el
+ post `251363`, publicado con autoría de Julio Reyes, 111 bloques, TOC, fuentes primarias,
+ caso SKY medido, disclosure metodológico/IA, tres imágenes, entidad de autor corregida y SEO/Open Graph.
+ Canonical WordPress, render desktop/mobile y elegibilidad de indexación pasaron; no existe duplicado en Think. La Pillar educa y enlaza
+ la landing de Agencia Creativa; no anuncia Creative Studio ni reemplaza la superficie
+ comercial. Este frente construye soporte científico/editorial para el producto futuro;
+ no implementa workflows ni crea backlog de EPIC-028. Ver [PDR-014](decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md)
+ + [brief maestro](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md) +
+ [Knowledge-to-Product Ladder](CREATIVE_WORKFLOWS_KNOWLEDGE_TO_PRODUCT_LADDER_V1.md).
+
 - **Refresh del content hub WordPress/Think**: la auditoria read-only del
  2026-07-09 confirma que el blog vive hoy en WordPress nativo con Gutenberg,
  permalinks `/%category%/%postname%/`, archivos Ohio por categoria y busqueda
@@ -168,9 +182,9 @@ capability dentro del sistema, no presentarse como agencia suelta.
  layout y no como contenido final: requiere reemplazar posts demo/attachments,
  corregir CTAs/rutas `/demo35/category/..`, conectar suscripcion y validar
  desktop/mobile. Ver
- [`wordpress-blog-content-hub-search.md`](./documentation/public-site/wordpress-blog-content-hub-search.md)
+ [`wordpress-blog-content-hub-search.md`](../documentation/public-site/wordpress-blog-content-hub-search.md)
  y la auditoria
- [`2026-07-09-demo35-blog-magazine-layout-review.md`](./audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md).
+ [`2026-07-09-demo35-blog-magazine-layout-review.md`](../audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md).
 
 - **Guía pillar "community manager" en Think** (PDR-005 §Consecuencias): captura el
  término de alto volumen e intención job/how-to (Semrush CL 4.400/mes) como autoridad
@@ -188,6 +202,12 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 ## Later
 
+- **Creative Workflows: ebook/workbook y eventual Opportunity Mapper.** El cluster puede madurar a un ebook
+  con método, casos y ejercicios; después, una tool diagnóstica podría ayudar a elegir qué workflow abordar
+  primero y qué decisiones conservar humanas. No están iniciados ni autorizados como runtime: ebook exige
+  cobertura y demanda; tool exige PDR propio, modelo explicable, privacidad, evals, analytics y task formal.
+  Ambos preparan comprensión y adopción de Creative Studio, pero no sustituyen evidencia de producto. Ver
+  [Knowledge-to-Product Ladder](CREATIVE_WORKFLOWS_KNOWLEDGE_TO_PRODUCT_LADDER_V1.md).
 - Cutover del sitio público a **Astro** (tratar como migración: baseline,
  redirects 1:1, paridad de contenido, preservar entidad/schema). Ver ADR Astro
  runtime strategy.

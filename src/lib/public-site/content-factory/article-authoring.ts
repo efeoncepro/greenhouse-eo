@@ -24,9 +24,17 @@ import {
 } from './gutenberg-blocks'
 import { slugifyPublicSiteDraft } from './gutenberg-planner'
 
+export type GutenbergRichTextSegment = {
+  text: string
+  href?: string
+  strong?: boolean
+}
+
+export type GutenbergRichText = string | GutenbergRichTextSegment[]
+
 export type GutenbergArticleBlock =
-  | { kind: 'paragraph'; text: string }
-  | { kind: 'list'; items: string[]; ordered?: boolean }
+  | { kind: 'paragraph'; text: GutenbergRichText }
+  | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean }
   | { kind: 'quote'; text: string }
   | { kind: 'pullquote'; text: string }
   | { kind: 'separator' }
@@ -51,12 +59,12 @@ export type GutenbergArticleSpec = {
     indexPolicy?: 'index' | 'noindex'
   }
   /** Intro paragraphs framing the piece, rendered before the TOC. */
-  intro: string[]
+  intro: GutenbergRichText[]
   sections: GutenbergArticleSection[]
   /** Defaults to true when there are >= 2 H2 sections. */
   tableOfContents?: boolean
   /** Optional closing CTA paragraph, separated by a rule. */
-  cta?: { text: string }
+  cta?: { text: GutenbergRichText }
   intent?: 'create'
   attribution?: {
     campaignId?: string
@@ -65,12 +73,34 @@ export type GutenbergArticleSpec = {
   }
 }
 
-const paragraphBlock = (text: string): string =>
-  ['<!-- wp:paragraph -->', `<p>${escapeGutenbergHtml(text)}</p>`, '<!-- /wp:paragraph -->'].join('\n')
+const renderRichText = (value: GutenbergRichText): string => {
+  if (typeof value === 'string') return escapeGutenbergHtml(value)
 
-const listBlock = (items: string[], ordered = false): string => {
+  return value
+    .map(segment => {
+      const text = segment.strong
+        ? `<strong>${escapeGutenbergHtml(segment.text)}</strong>`
+        : escapeGutenbergHtml(segment.text)
+
+      if (!segment.href) return text
+
+      const url = new URL(segment.href)
+
+      if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) {
+        throw new Error(`content_factory_article_link_protocol_invalid:${url.protocol}`)
+      }
+
+      return `<a href="${escapeGutenbergHtml(segment.href)}">${text}</a>`
+    })
+    .join('')
+}
+
+const paragraphBlock = (text: GutenbergRichText): string =>
+  ['<!-- wp:paragraph -->', `<p>${renderRichText(text)}</p>`, '<!-- /wp:paragraph -->'].join('\n')
+
+const listBlock = (items: GutenbergRichText[], ordered = false): string => {
   const tag = ordered ? 'ol' : 'ul'
-  const lis = items.map(item => `<li>${escapeGutenbergHtml(item)}</li>`).join('')
+  const lis = items.map(item => `<li>${renderRichText(item)}</li>`).join('')
   const attr = ordered ? ' {"ordered":true}' : ''
 
   return [`<!-- wp:list${attr} -->`, `<${tag}>${lis}</${tag}>`, '<!-- /wp:list -->'].join('\n')
@@ -91,9 +121,11 @@ const pullquoteBlock = (text: string): string =>
   ].join('\n')
 
 const separatorBlock = (): string =>
-  ['<!-- wp:separator -->', '<hr class="wp-block-separator has-alpha-channel-opacity"/>', '<!-- /wp:separator -->'].join(
-    '\n'
-  )
+  [
+    '<!-- wp:separator -->',
+    '<hr class="wp-block-separator has-alpha-channel-opacity"/>',
+    '<!-- /wp:separator -->'
+  ].join('\n')
 
 const imageBlock = (block: Extract<GutenbergArticleBlock, { kind: 'image' }>): string => {
   const sizeSlug = block.sizeSlug ?? 'large'

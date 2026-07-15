@@ -1,22 +1,22 @@
 # Operar Public Site y Content Factory
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 2.0
+> **Version:** 3.0
 > **Creado:** 2026-06-15 por Codex
-> **Ultima actualizacion:** 2026-07-03 por Claude (pipeline ideate → author → run)
+> **Ultima actualizacion:** 2026-07-15 por Codex (primer ciclo agentic end to end publicado)
 > **Modulo:** Public Site / Content Factory / Astro binding
 > **Comandos/API:** `pnpm public-website:content-factory:{ideate,author,run,validate,plan}`, `pnpm public-website:*`, `GET /api/admin/public-site/binding`
-> **Documentacion relacionada:** `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`, `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`, `docs/documentation/public-site/wordpress-blog-content-hub-search.md`, `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
+> **Documentacion relacionada:** `docs/operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md`, `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`, `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`, `docs/documentation/public-site/wordpress-blog-content-hub-search.md`, `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
 
 ## Antes de empezar
 
-Asume modo no mutante hasta que una task diga lo contrario. El sitio publico no se toca por accidente. El pipeline de creacion de articulos es DRY por default; solo escribe cuando pasas `--send` explicito.
+Asume modo no mutante hasta que exista una instruccion explicita. El sitio publico no se toca por accidente. El pipeline de creacion es DRY por default; `--send` escribe un post privado, no lo publica. La transicion a `publish` es otra operacion y exige autorizacion humana explicita, snapshot y rollback.
 
 ## Crear y publicar un articulo de blog (pipeline ideate → co-crear → publicar)
 
 Este es el flujo operador para llevar una idea a un post del blog `efeoncepro.com`,
 bien armado con bloques Gutenberg y firmado por ti. El pipeline produce un **borrador
-privado**; publicar es siempre tu paso final.
+privado**. La publicacion siempre es una decision humana final; el operador puede ejecutarla en WP-Admin o pedirle al agente que la aplique por el write path sancionado y verifique el resultado.
 
 ### Modo 1 — autonomo (el agente produce solo)
 
@@ -70,9 +70,23 @@ privado**; publicar es siempre tu paso final.
    WordPress (ID `1`, `jreysgo`). Idempotente: re-correr con el mismo `--manifest` no
    duplica. Te devuelve un `edit_url`.
 
-5. **Publicar (tu paso manual):** abre el `edit_url` en WP-Admin, asigna categoria y
-   opcionalmente una imagen destacada, revisa, y dale **Publicar**. El pipeline nunca
-   publica solo.
+5. **Completar el gate privado:** antes de publicar, confirma categoria, slug/permalink,
+   tags solo si aportan una taxonomia real, featured/OG, ALT/captions, excerpt, meta title,
+   meta description, canonical, robots, schema, CTA, links, fuentes, permisos de casos y
+   entidad del autor. Haz readback autenticado y revisa desktop/mobile.
+
+6. **Autorizar la publicacion:** la instruccion debe ser explicita para la version y URL
+   concretas. `validation=pass`, `--send`, "me gusta" o una revision parcial no equivalen
+   a autorizacion para publicar.
+
+7. **Publicar por separado:** toma un snapshot completo del post privado y aplica
+   `private → publish` mediante WP-Admin o un write path REST/WP-CLI sancionado. Si lo
+   ejecuta un agente, la operacion debe revertir a `private` ante cualquier fallo central.
+
+8. **Verificar como publico:** comprueba `HTTP 200`, canonical unico, `index, follow`,
+   `Article` schema, Open Graph/Twitter, imagen social `200`, TOC y anchors, links, imagenes,
+   consola y overflow en desktop/mobile. Comprueba tambien que WordPress/Think no sirvan una
+   segunda copia indexable.
 
 ### Que significan los estados
 
@@ -82,6 +96,8 @@ privado**; publicar es siempre tu paso final.
 - `readback.outcome`: `created` (escribio) / `already_exists` (idempotencia:
   ya existia ese manifest) / `error` (revisa `message`).
 - Post `status=private` + HTTP 404 anonimo = correcto (borrador no publico).
+- Post `status=publish` + HTTP 200 anonimo no basta: canonical, robots, schema, OG, media,
+  links y render deben pasar antes de cerrar.
 
 ## Inspeccionar el sitio
 
@@ -123,13 +139,13 @@ Este reader es solo lectura. No dispara builds, deploys, rollback, alias, DNS ni
 
 ## Que no hacer
 
-- No publicar desde el pipeline: el write termina en `private`; publicar es tu paso manual.
+- No publicar desde `ideate`, `author` o `run --send`: el write termina en `private`; la publicacion es una operacion separada y autorizada.
 - No usar el usuario de servicio (`12`, `Greenhouse INTEGRATION`) como autor; el autor es tu usuario (`1`, `jreysgo`).
 - No escribir markup Gutenberg a mano: usa los CLIs / la spec (evita el TOC roto y acentos mal codificados).
 - No correr `--send` sin `validation=pass` ni sin `--author-id`.
 - No usar WP admin manual para saltarse manifests.
 - No editar published source sin clone/backup/aprobacion.
-- No limpiar cache ni deployar si la task no lo pide.
+- No limpiar cache ni publicar si la instruccion no lo pide. Despues de una mutacion autorizada, limpia cache solo por el mecanismo sancionado y repite el readback.
 - No usar el binding reader como permiso implicito para tocar Vercel/GitHub.
 - No meter secrets en prompts o docs.
 - No asumir que un plan local ya esta publicado.
@@ -138,7 +154,9 @@ Este reader es solo lectura. No dispara builds, deploys, rollback, alias, DNS ni
 
 ### `ideate` falla o no devuelve JSON
 
-Falta `ANTHROPIC_API_KEY`/`_SECRET_REF`, o la sesion `gcloud` (ADC) esta vencida. Reautentica ADC y reintenta. `author`/`run --spec` NO necesitan LLM (solo `ideate`).
+Falta `ANTHROPIC_API_KEY`/`_SECRET_REF`, o la autenticacion GCP esta desalineada. Ejecuta ambos flujos
+`gcloud auth login` y `gcloud auth application-default login`, y reintenta. `author`/`run --spec` NO necesitan
+LLM; solo `ideate`.
 
 ### El TOC sale vacio o los acentos se rompen
 
@@ -150,7 +168,8 @@ Es la idempotencia: ya existe un post con ese `--manifest`. Es correcto. Si quie
 
 ### El post no aparece en el sitio
 
-Correcto: quedo `private` (404 a anonimos). Abrelo con el `edit_url` logueado y dale Publicar cuando este listo.
+Si quedo `private`, el `404` anonimo es correcto. Completa el gate y obten autorizacion antes de publicar. Si ya
+esta `publish`, revisa permalink, categoria, cache y readback; no repitas writes a ciegas.
 
 ### El layout se rompe
 
@@ -165,5 +184,7 @@ Puede estar en modo draft-only o sin rollout. Eso es correcto; documenta blocker
 - Skill owner: `.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md`
 - Documentacion funcional: `docs/documentation/public-site/content-factory-ideation-and-cocreation.md`
 - Recipes de bloques: `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
+- Runbook agentic completo: `docs/operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md`
+- Caso de referencia: `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EEAT_AUDIT_V4.md`
 - Codigo: `src/lib/public-site/content-factory/{article-ideation,article-authoring,gutenberg-blocks,draft-write-eval,gutenberg-validator}.ts`
 - Spec/task: `docs/tasks/in-progress/TASK-1123-greenhouse-ai-content-factory-agent-kit.md` (Slices 8-9)

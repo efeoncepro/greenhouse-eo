@@ -1,25 +1,27 @@
 # Public Site y Content Factory end-to-end
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.1
+> **Version:** 2.0
 > **Creado:** 2026-06-15 por Codex
+> **Ultima actualizacion:** 2026-07-15, despues del primer blogpost agentic publicado end to end
 > **Modulo:** Public Site / WordPress / Astro / Content Factory
 > **Rutas/scripts principales:** `/admin/public-site`, `GET /api/admin/public-site/binding`, `pnpm public-website:*`, `docs/operations/public-site-*`
 > **Arquitectura relacionada:** `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`, `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`, `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`
 
 ## Para que sirve
 
-Public Site conecta Greenhouse con `efeoncepro.com` en WordPress/Kinsta. Content Factory ayuda a inspeccionar, planificar y preparar drafts o patches gobernados sin mutar el sitio publico por accidente.
+Public Site conecta Greenhouse con `efeoncepro.com` en WordPress/Kinsta. Content Factory ayuda a inspeccionar, planificar y preparar drafts o patches gobernados sin mutar el sitio publico por accidente. Un agente puede orquestar tambien research, redaccion, media, metadata, revision y publicacion, pero la transicion a `publish` es una operacion separada: exige autorizacion humana explicita, snapshot, rollback y verificacion live.
 
 Desde TASK-1161, Public Site tambien tiene una lectura gobernada del rail objetivo Astro/Vercel. Ese reader no reemplaza WordPress live: permite ver desde Greenhouse el binding `efeoncepro/efeonce-web` ↔ Vercel, el estado live de deploy y la matriz de ownership de rutas antes de cualquier comando de deploy/cutover.
 
 La postura actual es conservadora:
 
-- Greenhouse observa, planifica y prepara drafts.
+- Greenhouse observa, planifica, valida y prepara drafts privados.
 - WordPress/Kinsta sirven el sitio publico.
 - Astro/Vercel es el rail frontend objetivo y se observa read-only desde Greenhouse.
 - GitHub/runtime repo gobierna codigo.
-- Writes/publicacion siguen gated por tareas de rollout y aprobacion humana.
+- Content Factory nunca publica como efecto de `ideate`, `author`, `validate` o `run --send`.
+- La publicacion puede ejecutarla un agente por un write path WordPress sancionado solo despues de aprobacion humana explicita y con rollback fail-closed.
 
 ## Evidencia revisada
 
@@ -44,18 +46,25 @@ DB agregada:
 | Runtime binding | docs/operations + repo runtime | Declara repo y baseline live |
 | Astro binding reader | `GET /api/admin/public-site/binding` | Observa repo `efeonce-web`, Vercel deployments y route ownership sin writes |
 | Content Factory | planners/validators | Genera planes y drafts, no publica por defecto |
+| Orquestacion editorial agentic | agente + skills + artefactos | Conecta research, voz, Gutenberg, media, SEO/E-E-A-T y QA sin quitar autoridad al autor humano |
+| Publication gate | WordPress REST/WP-CLI sancionado | Transicion separada `private → publish`, con snapshot, autorizacion, readback y rollback |
 | Bridge plugin | foundation draft-only | Health/readiness y writes limitados cuando este habilitado |
 | Kinsta/GitOps | target | Deploy/rollback futuro gobernado |
 
 ## Flujo seguro
 
-1. Descubrir runtime actual (`public-website:discover`).
-2. Inspeccionar post/page o bloque.
-3. Generar refresh plan o patch plan.
-4. Validar draft/plan.
-5. Preparar draft/private clone cuando el bridge lo permita.
-6. Revisar evidencia.
-7. Publicar solo por flujo aprobado futuro; no como efecto lateral del plan.
+1. Definir intencion, audiencia, ownership editorial, voz y frontera producto/contenido.
+2. Investigar SERP, fuentes, claims, permisos de casos y canonical sin inventar evidencia.
+3. Construir o revisar una `GutenbergArticleSpec` y resolver media real.
+4. Ejecutar Content Factory en `dry-run`; corregir todo finding antes de escribir.
+5. Crear o actualizar el post como `private`, con autor humano, manifest idempotente y snapshot.
+6. Completar categoria, excerpt, metadata Yoast, featured/OG y entidad de autor.
+7. Hacer readback autenticado y revision editorial/SEO/visual antes de publicar.
+8. Obtener autorizacion humana explicita para la version y URL concretas.
+9. Tomar snapshot pre-publicacion y ejecutar la transicion separada a `publish` por un write path sancionado.
+10. Si falla cualquier check central, revertir a `private` y conservar evidencia del fallo.
+11. Verificar como anonimo: `200`, canonical, robots, schema, Open Graph, links, media, TOC y render desktop/mobile.
+12. Cerrar skills, docs, changelog, contexto y handoff con el estado runtime real.
 
 ## Que hace automatico Greenhouse
 
@@ -64,13 +73,15 @@ DB agregada:
 - Valida Gutenberg blocks y operaciones permitidas.
 - Distingue draft/private/published.
 - Evita mutar published source por defecto.
+- Conserva la publicacion como una operacion posterior, auditable y reversible; nunca la infiere de una spec valida.
 
 ## Que hace el operador
 
 - Decide objetivo editorial.
 - Revisa plan y evidencia.
-- Aprueba drafts o publica por canal autorizado.
+- Aprueba la version final y la transicion a publico con una instruccion explicita.
 - Verifica layout/cache/SEO/HubSpot despues de cambios.
+- Conserva la decision sobre tesis, claims, fuentes, limites y criterio creativo aunque el agente ejecute la operacion.
 
 ## Fronteras importantes
 
@@ -78,8 +89,10 @@ DB agregada:
 - `efeonce-web` si es el rail frontend objetivo Astro/Vercel; observarlo no autoriza deploy, rollback ni cutover.
 - No editar Elementor/Ohio por HTML crudo sin ownership.
 - No publicar ni limpiar cache como parte de un plan read-only.
+- No interpretar `validation=pass`, `--send`, un post privado o una aprobacion editorial parcial como permiso de publicacion.
 - No tratar drafts como contenido publicado.
 - No exponer secrets o application passwords en docs/prompts.
+- No documentar hosts, llaves, tokens, passwords, JWTs ni material de autenticacion observado durante la operacion.
 
 ## Preguntas que Nexa debe responder
 
@@ -88,12 +101,15 @@ DB agregada:
 - Que diferencia hay entre refresh plan, patch plan y draft clone?
 - Que comandos son read-only?
 - Como veo el estado Astro/Vercel sin abrir GitHub/Vercel?
-- Por que no puedo publicar desde Nexa todavia?
+- Que confirmacion necesita un agente antes de publicar?
+- Que checks provocan rollback a privado?
 - Que evidencia necesito antes de tocar el sitio publico?
 
 ## Documentacion relacionada
 
 - `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
+- `docs/operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md`
+- `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EEAT_AUDIT_V4.md`
 - `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`

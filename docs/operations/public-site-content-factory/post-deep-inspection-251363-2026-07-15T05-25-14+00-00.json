@@ -1,0 +1,1909 @@
+{
+  "contractVersion": "contentFactoryPostDeepInspection.v1",
+  "scannedAt": "2026-07-15T05:25:14+00:00",
+  "source": "wp_cli_parse_blocks",
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "post": {
+    "id": 251363,
+    "type": "post",
+    "status": "private",
+    "slug": "creative-workflows",
+    "title": "Privado: Creative Workflows: qué son, cómo funcionan y cómo escalar la creatividad sin automatizar el criterio",
+    "modified": "2026-07-15T05:25:00+00:00",
+    "permalink": "https://efeoncepro.com/uncategorized/creative-workflows/",
+    "contentLength": 27199
+  },
+  "seo": {
+    "yoastTitle": "Creative Workflows: qué son y cómo escalan la creatividad",
+    "yoastDescription": "Qué es un Creative Workflow, cómo combina creatividad humana, IA y automatización, y qué decisiones deben seguir bajo criterio de las personas.",
+    "primaryCategory": ""
+  },
+  "summary": {
+    "totalBlocks": 149,
+    "topLevelBlocks": 149,
+    "counts": {
+      "core/freeform": 74,
+      "core/heading": 20,
+      "core/list": 8,
+      "core/paragraph": 42,
+      "core/pullquote": 2,
+      "core/quote": 1,
+      "core/separator": 1,
+      "yoast-seo/table-of-contents": 1
+    },
+    "maxDepth": 0,
+    "linkCount": 20,
+    "nonEmptyFreeformCount": 0,
+    "mediaIssueCount": 0
+  },
+  "headingOutline": [
+    {
+      "path": "8",
+      "level": 2,
+      "text": "Qué es un Creative Workflow"
+    },
+    {
+      "path": "18",
+      "level": 2,
+      "text": "Por qué este concepto aparece ahora"
+    },
+    {
+      "path": "26",
+      "level": 2,
+      "text": "Qué puede decir la neurociencia, y qué no"
+    },
+    {
+      "path": "34",
+      "level": 3,
+      "text": "Externalizar no es dejar de pensar"
+    },
+    {
+      "path": "42",
+      "level": 2,
+      "text": "Creative Workflow no es simplemente automatización"
+    },
+    {
+      "path": "50",
+      "level": 2,
+      "text": "Dos velocidades: explorar y producir"
+    },
+    {
+      "path": "58",
+      "level": 2,
+      "text": "Los seis momentos de un Creative Workflow"
+    },
+    {
+      "path": "66",
+      "level": 2,
+      "text": "Qué debe ejecutar el sistema y qué debe decidir una persona"
+    },
+    {
+      "path": "74",
+      "level": 2,
+      "text": "Cómo lo usa un creativo sin pensar como ingeniero"
+    },
+    {
+      "path": "82",
+      "level": 2,
+      "text": "Un sistema, distintos modos de operación"
+    },
+    {
+      "path": "90",
+      "level": 2,
+      "text": "Cómo medir sin reducir creatividad a volumen"
+    },
+    {
+      "path": "98",
+      "level": 2,
+      "text": "Riesgos que un buen workflow debe hacer visibles"
+    },
+    {
+      "path": "104",
+      "level": 2,
+      "text": "Cómo empezar con un primer Creative Workflow"
+    },
+    {
+      "path": "112",
+      "level": 2,
+      "text": "Preguntas frecuentes"
+    },
+    {
+      "path": "116",
+      "level": 3,
+      "text": "¿Un Creative Workflow reemplaza a los creativos?"
+    },
+    {
+      "path": "120",
+      "level": 3,
+      "text": "¿Necesito un equipo de ingeniería para usarlo?"
+    },
+    {
+      "path": "124",
+      "level": 3,
+      "text": "¿Es lo mismo que Creative Operations?"
+    },
+    {
+      "path": "128",
+      "level": 3,
+      "text": "¿Cómo sé si un proceso está listo?"
+    },
+    {
+      "path": "132",
+      "level": 2,
+      "text": "Fuentes y límites de esta definición"
+    },
+    {
+      "path": "138",
+      "level": 2,
+      "text": "La infraestructura de la creatividad debe proteger lo que no puede automatizar"
+    }
+  ],
+  "blocks": [
+    {
+      "path": "0",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Nunca había sido tan fácil producir una imagen, una voz, un video o diez variaciones de una pieza. Sin embargo, producir más alternativas no resuelve por sí solo el problema creativo. También hay que entender qué queremos decir, qué dirección merece avanzar, q…",
+      "innerBlockCount": 0,
+      "fingerprint": "e9eb728f9d0aea334a7a854d01a20fdcefa14ccd5d2b94eed1ae1f211a973d1f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "1",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2da24f92367f7c2b0e4f76ad392b66fce9027bfa35a81485910e5d0ae882d5b9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "2",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Los equipos no necesitan solamente otra herramienta de inteligencia artificial. Necesitan una manera de conectar brief, referencias, exploración, producción, revisión, derechos y aprendizaje sin convertir al creativo en operador de un diagrama técnico ni a la …",
+      "innerBlockCount": 0,
+      "fingerprint": "877aabf0d03840ac19a21edb9e8202c8d7ad519775124c9016591983d23b5584",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "3",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4b5c99f6fafba03d9973d68018f691c628527b5b6e25c9e4fe26fedf312548a7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "4",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "A ese sistema lo llamamos Creative Workflow: una forma de volver ejecutables decisiones creativas humanas para que lo repetible pueda moverse, la exploración conserve espacio y el criterio siga teniendo una persona responsable.",
+      "innerBlockCount": 0,
+      "fingerprint": "954633f117c9be92a90a1877836f7bef2d1e9526be0e3d4d1dfe44784f2859d3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "5",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "62db42a028e487a080771dcb8308c877e830521c7e072b6dbfb3206756272e1f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "6",
+      "depth": 0,
+      "blockName": "yoast-seo/table-of-contents",
+      "attrs": {},
+      "text": "Tabla de contenidosQué es un Creative WorkflowPor qué este concepto aparece ahoraQué puede decir la neurociencia, y qué noExternalizar no es dejar de pensarCreative Workflow no es simplemente automatizaciónDos velocidades: explorar y producirLos seis momentos …",
+      "innerBlockCount": 0,
+      "fingerprint": "783f860335b2b471a3b7725f8d4177ce138ec439c1c755b25da50d6d08f7bd49",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "#h-que-es-un-creative-workflow"
+    },
+    {
+      "path": "7",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c284c4c12aefa43352f47d5ae193ebd4c3db1e74bc665ace910fdbfd6b7ca2b5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "8",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Qué es un Creative Workflow",
+      "innerBlockCount": 0,
+      "fingerprint": "3a996a3995e2599d4f75a7fc622c2038514b92443982fa3fa8c9ec29bb5253de",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "9",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "83858823bfd43358305f10f00874c21d546e0764e53e599d4a1bd2a8983cbaf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "10",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un Creative Workflow es un sistema de decisiones creativas humanas vuelto ejecutable. Conecta intención, exploración, criterio, producción, revisión y aprendizaje para automatizar lo repetible sin delegar a la máquina qué merece ser creado, descartado o aproba…",
+      "innerBlockCount": 0,
+      "fingerprint": "b1b8a2542dd27a7799e2406fe65b9f4079d9cb0e686b77e7cb9d2ce876e8f229",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "11",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4dca91fafb9af976b35ddc2b0ddb37e1f98fde38c886593c5707d32d12d69ea5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "12",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La unidad importante no es el prompt ni el archivo final. Es el recorrido completo: por qué existe la pieza, qué referencias la orientaron, qué alternativas se exploraron, cuál fue rechazada, qué dirección aprobó una persona, qué transformaciones se repiten y …",
+      "innerBlockCount": 0,
+      "fingerprint": "009fe52b25ae8ec0cffc053c9bfe6328faa3df739359c6c0c70ff5b648d66ae7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "13",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e84eb997543a7dd41514d773b9cbe2137fd6e32c2a54cbfc9ac8bcce9e94bbd1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "14",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "La creatividad crea posibilidades. La automatización les da movimiento. El Creative Workflow convierte decisiones en resultados sin borrar su origen.",
+      "innerBlockCount": 0,
+      "fingerprint": "fca44f24780333b553292bee3f0f25f8e6ae1e3b3990a090dabf6dc92d19187b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "15",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "661e12f5c6529bc71e7e349b071d9e1cb7932b3ca81965ead12f9a6463eb2414",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "16",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Imagina una campaña con una idea aprobada. El equipo puede explorar tratamientos visuales libremente, seleccionar uno, definir qué elementos no deben cambiar y después producir formatos, idiomas o tamaños mediante una secuencia gobernada. El workflow no invent…",
+      "innerBlockCount": 0,
+      "fingerprint": "a23b1a82a39212289866f4858b43a5a8709fe07b7b541159729bd62e39196e33",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "17",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c423d4f29c415e75245bec0f0485223b01d85f2f11644b45cb4ac281d90df4a9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "18",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Por qué este concepto aparece ahora",
+      "innerBlockCount": 0,
+      "fingerprint": "0e2522ee6f47aae584ad5f3e92a66a84431cdb315301a3313452f91fd4f2d438",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "19",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd6e2c3c76a82830321d48de818f635d83749645c0a63b252f31832eb9b0e432",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "20",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La demanda de contenido creció en canales, formatos, mercados y velocidades, mientras las herramientas generativas redujeron el costo de producir una primera versión. El nuevo cuello de botella no es únicamente generar: es conservar contexto, coordinar decisio…",
+      "innerBlockCount": 0,
+      "fingerprint": "45cc008ec84f29867fd415fba83cf4370f98b98acfaa72796e62c5a7b42c66a0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "21",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "657f90f2163e0fe357d624219a016dabec7eba7d57a79f1d2f960c7347b2f9c0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "22",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El mercado describe partes de este problema con nombres distintos. Creative Operations organiza personas, capacidad y procesos. Content Supply Chain conecta creación, gestión y distribución de contenido. Creative automation sistematiza transformaciones y varia…",
+      "innerBlockCount": 0,
+      "fingerprint": "c85e22124efd6a188e1c783862b5882b56e142e3d1d574e92e64fdff026104cb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "23",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7d6d371d4dbfcfb1428409fff1c4c0037a77055eea9e723c3624f004292b3ab9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "24",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Adobe, Magnific y Canva ya empaquetan workflows, contexto persistente, ejecución por lotes, separación entre quien construye y quien corre, y experiencias donde la complejidad queda detrás de inputs más simples. Esa convergencia muestra una dirección de mercad…",
+      "innerBlockCount": 0,
+      "fingerprint": "e133a0cb3ee2d6960f833538e280bd573e4e7069c823d65d8e3512ad08979e0f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "25",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ac173ffb8869f6666f0831d325010b26566cbc77a3518c6dd8636efafccb6d9f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "26",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Qué puede decir la neurociencia, y qué no",
+      "innerBlockCount": 0,
+      "fingerprint": "b811cab88eb8f5c15e86cb08bffd8eacc410cec6b52211602c10cbc6ce6e4116",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "27",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "34b63d36ab5e5d57165076da458251645e23ae7836216c9ccd095ad047698b78",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "28",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No existe un cerebro creativo opuesto a un cerebro ingeniero. Tampoco una red que imagine mientras otra solamente estorba. La investigación contemporánea describe la creatividad como una interacción dinámica entre procesos espontáneos, asociación, atención, me…",
+      "innerBlockCount": 0,
+      "fingerprint": "94d831e53a7f24628e5511f0694a2f1c3687df29b14214fe87344bb45642dcbf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "29",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2c9b09a2ebe532e3b49c51beea30f1663a68278c4920f7d960e01431c62b5ad5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "30",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Estudios de neuroimagen sobre pensamiento divergente han observado cooperación entre redes asociadas al pensamiento autogenerado y al control ejecutivo. Un análisis multicéntrico publicado en 2025, con 10 muestras y 2.433 participantes, encontró que la capacid…",
+      "innerBlockCount": 0,
+      "fingerprint": "4277217c6c9742741493000ce4c44bbdb60dd816b5aa3c0fd3537ce86920f21f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "31",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c50c720347dfe52776431315bb77275805c25a8c8e5cf37883a52413c5ae9cf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "32",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La consecuencia práctica es sobria: crear necesita generar posibilidades y también evaluarlas. Si un proceso obliga a juzgar cada idea antes de que pueda desarrollarse, cierra demasiado pronto. Si nunca introduce restricciones, intención o selección, acumula o…",
+      "innerBlockCount": 0,
+      "fingerprint": "d1ec5a8c44570dc085493fb677423c41c6f714c5d30577608efe39f4e7b170ec",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "33",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ea2bb7516e325cff7952d2b45196e71af3c6fb7d59bbe5d55cbea5e58566194",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "34",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Externalizar no es dejar de pensar",
+      "innerBlockCount": 0,
+      "fingerprint": "c237166476f5ee2a8e5a3d86624a58d7575866fba54f379d3beab58a9f3223cf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "35",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e26d65395fc27b4cdb43da753a28c83ff1ed8e1720f59373d9f081535d704e9b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "36",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La psicología cognitiva llama cognitive offloading a usar acciones o herramientas externas para modificar los requerimientos de procesamiento de una tarea. Una lista, un calendario, una biblioteca de referencias o un sistema que recuerda versiones pueden reduc…",
+      "innerBlockCount": 0,
+      "fingerprint": "6056123ff5ab852d4a5bae7335c10f5dd9341bd894b82d1e5d521dcb8aff31bd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "37",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a41c767a763d456d376dc318669e5ccca6a466b5acc4b23642d9b763fa2e27b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "38",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Pero externalizar tiene un intercambio. Experimentos publicados en 2021 encontraron beneficios en desempeño inmediato y posibles costos en memoria posterior cuando la información se descargaba en una herramienta. Cuando las personas sabían que necesitarían rec…",
+      "innerBlockCount": 0,
+      "fingerprint": "c9d679bea484503df484dee1a1b5c7496d4de9bedde3253735b9e4fd285051f7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "39",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2afbc9c9b8b1f9a4db9b0885d7a6a3c499d8d7c426782fa741759d88ba945d32",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "40",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "El objetivo no es que el cerebro deje de trabajar. Es que deje de gastar atención en fricciones que no necesitan criterio y conserve participación en las decisiones que sí construyen comprensión.",
+      "innerBlockCount": 0,
+      "fingerprint": "04ab254d8695017eade2f758330e42c62ccffc1663190a87c1ae746c8afcd44a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "41",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2aefea39ecf1a11ef2f202e026852cabf742c3f2d9ea99480c5d5e3e7c11600a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "42",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Creative Workflow no es simplemente automatización",
+      "innerBlockCount": 0,
+      "fingerprint": "67de947845f4cf8f31f7d9db2b67c880dece831599c8c3cba6d80a9782bbfb42",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "43",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "053abf8768233eaab98513ddafe75724ac6e5a9754b362a36113ff86ff23aa9c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "44",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Automatizar una tarea puede ser útil, pero un Creative Workflow coordina tres capas diferentes. Confundirlas lleva a medir éxito únicamente por volumen o velocidad.",
+      "innerBlockCount": 0,
+      "fingerprint": "81e1569efec22ee28a587d0b4ed455bb88c32072645587a49b909e16bb1a0eb9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "45",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "68a75eb3f45f83dd0fe0c8e79b4d72535a63bf009602dcfaf8963630ec2959fd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "46",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Automatización operativa: organiza briefs, mueve archivos, prepara formatos, nombra versiones, distribuye entregables y recuerda aprobaciones.Aumentación cognitiva: propone rutas, encuentra conexiones, genera variaciones, cuestiona supuestos y contrasta una pi…",
+      "innerBlockCount": 0,
+      "fingerprint": "5a88f1a1aa1e66bb98f7536648f439da90e3309b7f304cb333907463b3d18198",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "47",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd8802fd51e15ee6daa5843253bfee36601c7e5d5c167c34afb0e54024ba8074",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "48",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La primera capa elimina repetición. La segunda amplía el espacio que una persona puede explorar. La tercera hace que el sistema completo sea gobernable. Ninguna de ellas debería apropiarse de la intención, la sensibilidad o la aprobación final por defecto.",
+      "innerBlockCount": 0,
+      "fingerprint": "431c283683d73e2f60deefae86d42a10fe14a5e6bfa8bd015b2650b38d0a1de2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "49",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "51d2e1d1ec468a4a30e27f807594cf18daf531538b5a74412f461defc02da878",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "50",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Dos velocidades: explorar y producir",
+      "innerBlockCount": 0,
+      "fingerprint": "c1abac398b6c365b1a4b86fb0cb2599c1322eb2b8c1391f95b3e292a376896fb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "51",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7ba90849d64f044316abde25f63291386e97caf3d0b2f4bc32e552b379c84d6e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "52",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La exploración creativa es divergente. Permite bifurcar, volver atrás, combinar referencias, probar tratamientos y descartar sin tener que justificar todavía una línea de producción. La ambigüedad no siempre es un defecto: en esta fase puede ser el espacio don…",
+      "innerBlockCount": 0,
+      "fingerprint": "717fbe8cf0a2f8f1cf5c9a260668a1f86d61645ad9cfb74c745d2d289df5600c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "53",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b119eb48acea4a3b75f200a5ef0ca220944809eb1d1e82d6e4522038affe3534",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "54",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La producción es convergente. Cuando una persona con autoridad decide una dirección, aparecen invariantes, inputs acotados, formatos, versiones, presupuesto, revisión y entrega. Aquí sí importan repetibilidad, trazabilidad y control de excepciones.",
+      "innerBlockCount": 0,
+      "fingerprint": "6e34762521e5779c32e16ac4943127005b05b62fd91fdcce585c16bfc60e6071",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "55",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a6da1b32f6ea8e7fd1c94a558978854bfa24ac0739e981e4cc06507499a05ec1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "56",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El error común es optimizar antes de decidir. Si el sistema convierte la primera respuesta de una IA en plantilla, no escala una idea: escala una fijación. Un experimento de Science Advances con historias breves encontró que las ideas de un LLM podían mejorar …",
+      "innerBlockCount": 0,
+      "fingerprint": "1cdeea601d140d54423c32ea667ed8ec885975202db7667a8ba3cc8a29998633",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "57",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "75037fef1c327667189dd5ef37d294d327bade37501c34cce9bcc52874496345",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "58",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Los seis momentos de un Creative Workflow",
+      "innerBlockCount": 0,
+      "fingerprint": "c4b4e5f5da858e4162f27829700951723ab088e6bbcdbcb43b2bc3319714337e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "59",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e6a500b950175889a31e84bef00f32729137a3e72a0ae1cf00247d3fe075d19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "60",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un Creative Workflow completo puede representarse como seis momentos. No son pantallas ni componentes de software: son decisiones que cualquier equipo puede reconocer en su trabajo.",
+      "innerBlockCount": 0,
+      "fingerprint": "20943dea7e23da167c23444539554d79e2a1c0d18e1c55739eb0130f6bd94d6c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "61",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "46f36295e3cbaa7c9e9ad0514540c3421360fd75423cf1ea4fe33e95b0faa19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "62",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Intención: qué problema resolvemos, para quién y con qué efecto esperado.Exploración divergente: referencias, rutas conceptuales, tratamientos, preguntas y alternativas.Decisión creativa humana: qué dirección avanza, qué se rechaza y qué no debe cambiar.Produc…",
+      "innerBlockCount": 0,
+      "fingerprint": "9de19f46f99eb3e26e59ab399323c398c2238f05d1287d5bf520569adf1b1611",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "63",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5503c0d261d1094800218d8e78d04fb56062b8419231c2207c9ffbe69e5804dd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "64",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El valor aparece en las transiciones. Una exploración no debería entrar a producción sin una decisión. Un archivo técnicamente terminado no debería convertirse en entrega sin review. Un aprendizaje no debería quedarse perdido en comentarios o en la memoria de …",
+      "innerBlockCount": 0,
+      "fingerprint": "46f0768783d68dce84ee7a8acea5634cb64e223fb4ef8e404570578792380fdc",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "65",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a5f8311ec9417dccecf2995f705067795727f7edef69c275364ed0defcc1ddef",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "66",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Qué debe ejecutar el sistema y qué debe decidir una persona",
+      "innerBlockCount": 0,
+      "fingerprint": "bfbb9c49cce154f8aaa3422ef61905601e88943f91363c4dede85d3adf958aa4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "67",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "af5e91bed563afbeea9b1cddea107c5d64754d0a04856862e6fab84195a380a2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "68",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La frontera no se define por si una tarea parece creativa o técnica, sino por repetibilidad, ambigüedad, impacto, derechos y autoridad. Una misma acción puede automatizarse en un contexto y requerir dirección experta en otro.",
+      "innerBlockCount": 0,
+      "fingerprint": "468ecb883642cc1d8d90138eb2df589518cfd3e5554949abcc73e8a018dbc7a7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "69",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ca60a7609bbfb11d8627a3d860f2a22668122c737494981d54b2a242342d3c40",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "70",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "El sistema puede conservar contexto, recuperar assets aprobados, preparar formatos, ejecutar transformaciones repetibles, registrar versiones, estimar costo, detectar faltantes y mover el trabajo hacia la siguiente revisión.La IA puede proponer alternativas, r…",
+      "innerBlockCount": 0,
+      "fingerprint": "85d9419cfbbb61f3bb19532af8d471493f2e87acdff4ae99f6502b5b4a3513fa",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "71",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "105166651fb600bf3c74595e4f3f53ff5313c12bd32f55b2f008e23c26c97583",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "72",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La regla no es mantener humanos en cada clic. Es mantener responsabilidad humana donde una decisión cambia significado, riesgo o compromiso. Automatizamos la repetición, ampliamos la exploración y reservamos el juicio para quien puede responder por él.",
+      "innerBlockCount": 0,
+      "fingerprint": "d5d4ab7bda7054d214855771a05d8ba5cc0933c33625083741baa2185786d1ad",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "73",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d6367186a13e4adf1313064870ec2f9d5efbcf34905718193c8bafc772658859",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "74",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cómo lo usa un creativo sin pensar como ingeniero",
+      "innerBlockCount": 0,
+      "fingerprint": "5a39473e44eccada8167749dd345623bae4f7f8aa2ac02b10968a165aa24a573",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "75",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "21d5b1cde23c059d575b599a99f6b62c70c799468fe8461ce8b71605710aef0e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "76",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un workflow no debería presentarse primero como nodos, providers y conexiones. La persona creativa piensa en briefs, referencias, tratamientos, intensidad, encuadres, variantes, comentarios, rechazos y aprobaciones. Esa es la interfaz natural.",
+      "innerBlockCount": 0,
+      "fingerprint": "5708030f53fa002158e5d4c1ffae3c722072ea05487ec4f6e82775abf874a908",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "77",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "30bd06b0c23989fc42cec59b28bf9d88f3bd5114f51c7bdf3666368594a25612",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "78",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El sistema puede compilar por debajo una receta versionada, pero quien corre el proceso necesita ver inputs semánticos: sube la fotografía aprobada, elige el territorio visual, define el idioma, marca qué elementos deben preservarse y envía a revisión. La comp…",
+      "innerBlockCount": 0,
+      "fingerprint": "886888f93c5d013afdef8ea1624ffd1d885f897a1cebfed8a69bb2bfd93e250b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "79",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "531cc3f2648ef4e2beed396e1be6521a6ee1e794405a59b6466133fda5d9f05a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "80",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Aquí resulta útil distinguir Builder y Runner. Builder posee autoridad para diseñar, probar y versionar la receta. Runner opera variables permitidas dentro de límites claros. No son sinónimos de ingeniero y creativo: una dirección creativa puede ser Builder si…",
+      "innerBlockCount": 0,
+      "fingerprint": "b4909df8e58669a25ba9c5ec9afeb534c58e97c8d1f500a6b314f1a28cd70d94",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "81",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "edf656e8ae68f518cb6260d407b80f346334dc715042fa2ba07031b95b6b4659",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "82",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Un sistema, distintos modos de operación",
+      "innerBlockCount": 0,
+      "fingerprint": "470c2a67dcb200b733b7c4985c76be3d26901eb3011ed1b79735859eaedad5b9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "83",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4d895cca29deb52cf5cc39c09167eeefe4a1b73c382911c8c0246b8e59ac92f6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "84",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No todo workflow debería entregarse como autoservicio. La autonomía puede crecer cuando disminuyen la ambigüedad, el riesgo y la necesidad de excepciones, y cuando el proceso ya tiene evidencia suficiente.",
+      "innerBlockCount": 0,
+      "fingerprint": "abd4b6cf72a27e57597080b46c092fca917845429b2df0494ec7320f8d5dfa5d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "85",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e52f8a52551e6ae5e34e99987696aa1dbcd9a5954928292d8c03ebacb72215c5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "86",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Efeonce-managed: Efeonce dirige y opera el workflow; el cliente conserva brief, autoridad de marca y aprobación final. Es adecuado para alta incertidumbre o producción crítica.Co-operated: cliente y Efeonce se reparten etapas o lanes con una persona operadora …",
+      "innerBlockCount": 0,
+      "fingerprint": "5fd653363e85ffc0ede46ac4e84c03ce3d7376438185202f14f4da2ac992afb2",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "87",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "36cf66906e25b0a6dfc7c1e530ac775708d129ab1b67eafc44c250585befb53f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "88",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Estos modos describen autoridad y responsabilidad, no tres tecnologías distintas ni una promesa de que Creative Studio ya esté disponible. La implementación operativa del producto vendrá después; esta guía construye su fundamento editorial.",
+      "innerBlockCount": 0,
+      "fingerprint": "f03da49ab609b29dfb71ea11151f8973da53d1428df1e594075a49aee7e8931b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "89",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "287605b0d2f91e486ba16b88b418797425d607bc5d7a34631202951d8b40e187",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "90",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cómo medir sin reducir creatividad a volumen",
+      "innerBlockCount": 0,
+      "fingerprint": "8457567892b4b24c74500d89bdb36ecaaced02b9cfb370d8b5d464f6a7b2f2fd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "91",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9c6d7b896a27b18208a07cbac18aa839f6278ce7b773532190a8fff22aa914cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "92",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un sistema que entrega cien piezas parecidas puede parecer eficiente mientras empobrece el lenguaje de una marca. Por eso las métricas operativas necesitan convivir con señales de calidad, diversidad y responsabilidad.",
+      "innerBlockCount": 0,
+      "fingerprint": "f82ca53dabd4ac9e187e08a8e1592d75cb724f976aca19da707db342ee1c2a11",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "93",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ed3fc775d6bb7ad3db99d75e8c04e6f24fa56c04d9760d4e6cecf0d97e12e945",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "94",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Time-to-Market: tiempo desde una intención aprobable hasta una entrega lista para activarse.First Time Right: proporción de entregables que superan el criterio acordado sin rehacer el trabajo completo.Revisions per Asset: rondas necesarias antes de aprobación,…",
+      "innerBlockCount": 0,
+      "fingerprint": "83cf7be5ac510102f272f3023c38af18041ce6c44049443c21107b8592d0e8b8",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "95",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1ddea7324634514aa124d436a81cf3e415d0fd7360be45ffde752f239d2e584b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "96",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ninguna métrica aislada representa creatividad. El objetivo es observar si el sistema reduce fricción sin esconder retrabajo, trasladar costo a revisión o premiar únicamente la similitud con el pasado.",
+      "innerBlockCount": 0,
+      "fingerprint": "412beda1292f263fabc767e94b59b81d6676fab790e6f31dd4ff49c38e25c398",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "97",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "17e26bb627e0497b9be3bcaac2a3f7e56f1365f0c71328adaa2b00fc39fc93fb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "98",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Riesgos que un buen workflow debe hacer visibles",
+      "innerBlockCount": 0,
+      "fingerprint": "5b7edec69f24789e47e1970376fb103494d6816198d9b98dbfe4a0e25ac395bd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "99",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a46f77a24f2314e2fd5bf7725c605caa94c3d9150085a29b1aa0f18e3743274a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "100",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Fijación temprana: convertir la primera propuesta plausible en dirección por defecto.Homogeneización: aprender solamente de aprobaciones históricas y estrechar el espacio de posibilidades.Falsa confianza: tratar un output técnicamente completo como pieza creat…",
+      "innerBlockCount": 0,
+      "fingerprint": "d1c593c7356738bdf369d7faddd3b263fa003ef71eae94c15e37a427c42dbd52",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "101",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "db7925d6b513298e9ea46e69f85b5845985facfab1aa040002acc371f5a2b9e6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "102",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La respuesta no es agregar una aprobación humana simbólica al final. Es diseñar gates donde la decisión todavía puede cambiar el resultado, conservar evidencia y permitir que una excepción escale sin reiniciar el proyecto ni perder contexto.",
+      "innerBlockCount": 0,
+      "fingerprint": "4795ec197eb76c377c6ab44786b4b17aaf34b8ad0a1069c0f2652f4c2a1a7909",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "103",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1959bf9e19c1edd11f2267ce3b54644c6ba4c12aa8f4ab41e8deb0025330d067",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "104",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cómo empezar con un primer Creative Workflow",
+      "innerBlockCount": 0,
+      "fingerprint": "4bb409b4930b628abb06c20d56de1510eb50092ac60bdbb5fbd5cc169fb7fe6b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "105",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ced5d98af983eb64e922fdd84692386306703c12f3f1d5cf40820c5602bebaf",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "106",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El mejor primer caso no suele ser la campaña más importante ni la identidad completa de una marca. Conviene empezar con una producción frecuente, suficientemente estable para reconocer patrones y suficientemente valiosa para medir la fricción.",
+      "innerBlockCount": 0,
+      "fingerprint": "63a5f037558498b31f462a1a2c8dbbd4819375eea5c8fc77d190a8fc1dab4bdd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "107",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "87f0142c5e3df57803f7f74b79e46f3248ccbaacac9b26151406b05336b84bbd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "108",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Elegir un proceso con repetición real y una decisión creativa identificable.Mapear el recorrido actual, incluyendo esperas, búsquedas, versiones, rechazos y excepciones.Separar exploración divergente de producción convergente.Definir qué contexto debe conserva…",
+      "innerBlockCount": 0,
+      "fingerprint": "8aa817992bc7fc9c981951dd14374bd5034865ddedbe1765bad86df5d01b2e7b",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "109",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e1b837899b752aeeb8cd013957906ad6fbbaf1c724bbdf66cb10bc914bd0c36f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "110",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esta secuencia es un marco de adopción, no una especificación de Creative Studio. Los workflows ejecutables, templates y contratos de producto deberán diseñarse y validarse más adelante dentro de su propio programa de implementación.",
+      "innerBlockCount": 0,
+      "fingerprint": "f249033bcfca1e5250054396b507d3bf4a928fe57e1d5a3f7bed5682e5ab1091",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "111",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9cf788d29fec49f8018b7d53e14c3fc1c7bb2af271d22775a0a0ff9c73ff4ec3",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "112",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Preguntas frecuentes",
+      "innerBlockCount": 0,
+      "fingerprint": "a0a0af1b27348fd843fbf6c66899c62008681983ad5f076250bd86340ea52823",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "113",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "95cb33b8bebf19d5c934600164126ebf6728802a2624e38101c49fe3cc8105c2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "114",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Estas respuestas resumen las fronteras más importantes del concepto.",
+      "innerBlockCount": 0,
+      "fingerprint": "90809d20f44fc733b2ea634c10e1fb9a06527d978fadb11f2b1e4f358d6650c5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "115",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7c5479807141885b2c36596d125591d304e01f0a310426b9837ae9d479f9af82",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "116",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Un Creative Workflow reemplaza a los creativos?",
+      "innerBlockCount": 0,
+      "fingerprint": "1b4ce3f03f10105666a6ffd00e1ee2a9cbfc9d33879ac6e939812781ebf87c2b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "117",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6622ba2ebe1cf9fe53fd8e10ce2f57552747e2cf74d1d6b70be576b9711f106c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "118",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No debería. Puede reemplazar tareas repetitivas, coordinación manual y transformaciones previsibles. La intención, la selección, el descarte, la sensibilidad de marca y la aprobación necesitan autoridad humana explícita.",
+      "innerBlockCount": 0,
+      "fingerprint": "5ff290d32b79db14c535121d96ba6098c54f51cc80c403e0f961a4eb5fbbc533",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "119",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3ca2b238e216764b7f46b31a9322ff950a2dc80d81fc6b29f46c49d09cc37ae8",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "120",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Necesito un equipo de ingeniería para usarlo?",
+      "innerBlockCount": 0,
+      "fingerprint": "622f910d512693f4c07ce65069f4278ec71c0fa9f8af498057e21040c49835b9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "121",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "009639836dc483ec5c02bb5e9898398a96830d008e8d82501c9a16e359a91df9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "122",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No para operar un workflow bien diseñado. Quien lo construye y mantiene sí necesita resolver integraciones, seguridad, costos y observabilidad, pero el Runner debería trabajar con lenguaje e inputs propios del oficio creativo.",
+      "innerBlockCount": 0,
+      "fingerprint": "c5b1efe88ce788cae255b0397082d1f634667e3d01328d7da89de207ad499132",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "123",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3881fd435acf85c67ae5b3a334de9d356bcdc0da442f9e8e886a8d885e5e8246",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "124",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Es lo mismo que Creative Operations?",
+      "innerBlockCount": 0,
+      "fingerprint": "c8cbcea5d5a892c12a3c2b47ab845b9c655c21804209ad2c67f9513da91036ce",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "125",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b0c539d38d5ec2644dac80d0619c8448f39d709a8fd52772a758df4d3fbd5ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "126",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No exactamente. Creative Operations gobierna la capacidad completa de personas, procesos, herramientas y recursos. Un Creative Workflow es una unidad más acotada que vuelve ejecutable un recorrido de decisiones y producción dentro de esa operación.",
+      "innerBlockCount": 0,
+      "fingerprint": "0f220d528fef58e9d5f9aabd2a09eab40e30a141037a739d9d28074e6613ca0a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "127",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6b680ddb15dc40099b3c99799ecbe4e2d028a327d564cd6f7900c203bbc09f2d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "128",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "¿Cómo sé si un proceso está listo?",
+      "innerBlockCount": 0,
+      "fingerprint": "cdc5876469c09ccdfba4dbab48184f7295343f44856275d5d72987a0286d4653",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "129",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "da5d3241cb2c536a1be47a54db49d9e3bc6478765dc712651867f323d2c164e0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "130",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Está más cerca cuando ocurre con frecuencia, tiene inputs reconocibles, una dirección que puede aprobarse, transformaciones repetibles, riesgos conocidos y una ruta clara para escalar excepciones. Alta ambigüedad o identidad crítica suelen requerir operación m…",
+      "innerBlockCount": 0,
+      "fingerprint": "859ea126dfcbddce13222f531856b868cd4f37a9311beb6e15b7a62c38c414f9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "131",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7fef66948211ecbada4de13e162bbba23d3a1adc739239b3c5dd5b00b0b8c28f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "132",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Fuentes y límites de esta definición",
+      "innerBlockCount": 0,
+      "fingerprint": "0b5151f94105b46cfe929740f15291df80bf2b40ead10168aa2f0d1f7f77715c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "133",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a0637bbada41357a6850030ebcbce8af4913f2e33a38f6f782c27f7047ce496",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "134",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esta guía combina una tesis editorial de Efeonce con literatura científica y documentación primaria de mercado. Las fuentes científicas respaldan claims acotados; no demuestran el producto ni convierten el modelo editorial en una arquitectura ejecutable.",
+      "innerBlockCount": 0,
+      "fingerprint": "17c79484a8f7daa2ffbaad549052f121acdf4f4b09839be138e8beebd64eee16",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "135",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "15f118194aa682ad05207926a72fd00b64a43e15ee33f6c2d0b2b33067b84f6d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "136",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Risko y Gilbert, Cognitive Offloading, Trends in Cognitive Sciences, 2016: https://pubmed.ncbi.nlm.nih.gov/27542527/Grinschgl, Papenmeier y Meyerhoff, Consequences of cognitive offloading, 2021: https://doi.org/10.1177/17470218211008060Beaty et al., Default an…",
+      "innerBlockCount": 0,
+      "fingerprint": "697ec409a68c16ea370312ea446bed0d8ffa0cf66c932eae2252dfeeb2143432",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "137",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "32a95ae48e3d9252220f0ddc2faa1741c07518eeb2ef56e5c6ef96f2eb1a6b05",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "138",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "La infraestructura de la creatividad debe proteger lo que no puede automatizar",
+      "innerBlockCount": 0,
+      "fingerprint": "df748f6d5449a34d4301bcd999745fec0daf4fbec5cdb27190ca5a68ff1c5a0c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "139",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9b9c3a65a2df3a5cb7cf7ccb2169bc4f219252abe0b305cdcc17db3b4354a24e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "140",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La oportunidad no está en llenar todos los espacios con contenido generado. Está en diseñar una manera superior de crear: con más capacidad para explorar, menos fricción para producir, mejor memoria para aprender y responsabilidad clara para decidir.",
+      "innerBlockCount": 0,
+      "fingerprint": "fd3f01c8dedbedde40a22a25140f05aeb2a4a8d1e0b5e2eece55a635d50603f4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "141",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6e7d637f57e683b96f493a2f0ad3d26f56840948b6bcb47aed3c6a0447be7726",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "142",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un Creative Workflow bien diseñado no le pide al creativo que se convierta en ingeniero. Tampoco le pide a la ingeniería que invente el significado. Hace que ambas capacidades puedan colaborar: la creatividad abre posibilidades, el sistema les da continuidad y…",
+      "innerBlockCount": 0,
+      "fingerprint": "ae6c4352181403a6a25755b99114cd4c8ccc1d71906690b66aed45d477ef2e16",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "143",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "41b0089c4c96bc1e59cf38c2b12a8870d533ed9211c0e0762fd42db8faa31d12",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "144",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Automatizamos lo repetible para potenciar lo irrepetible.",
+      "innerBlockCount": 0,
+      "fingerprint": "4816a5711e18d58318089f6e5c00b1aab0dd420c0eacddec3b748cf04d1759fb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "145",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cbd6f54bc110dc810e2b8ae8dfb7c77a17cbbbf49ee90578cdea9928e586b4d5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "146",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "eab9e10541aa67eb8813b362ec4df109eaa87c141ea132d1e7d6eaf14f4d67b4",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "147",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d75b590cb7556b082384145305e5dddca92e6cdc619599ee7f10bf53b94ce5c7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "148",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si tu equipo ya tiene criterio pero la operación no escala, conversemos sobre dónde se pierde capacidad y qué parte del proceso está lista para convertirse en workflow. Creative Studio todavía no se ofrece como producto; hoy esta conversación aterriza en la ca…",
+      "innerBlockCount": 0,
+      "fingerprint": "6b3d7ba64367bfd26c26462e37591f206f3924c89d64d9bd50282d5ebff7cc96",
+      "editability": "safe_text_edit",
+      "risks": []
+    }
+  ],
+  "links": [
+    {
+      "href": "#h-que-es-un-creative-workflow",
+      "text": "Qué es un Creative Workflow",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-por-que-este-concepto-aparece-ahora",
+      "text": "Por qué este concepto aparece ahora",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-puede-decir-la-neurociencia-y-que-no",
+      "text": "Qué puede decir la neurociencia, y qué no",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-externalizar-no-es-dejar-de-pensar",
+      "text": "Externalizar no es dejar de pensar",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-creative-workflow-no-es-simplemente-automatizacion",
+      "text": "Creative Workflow no es simplemente automatización",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-dos-velocidades-explorar-y-producir",
+      "text": "Dos velocidades: explorar y producir",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-los-seis-momentos-de-un-creative-workflow",
+      "text": "Los seis momentos de un Creative Workflow",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-debe-ejecutar-el-sistema-y-que-debe-decidir-una-persona",
+      "text": "Qué debe ejecutar el sistema y qué debe decidir una persona",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-lo-usa-un-creativo-sin-pensar-como-ingeniero",
+      "text": "Cómo lo usa un creativo sin pensar como ingeniero",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-un-sistema-distintos-modos-de-operacion",
+      "text": "Un sistema, distintos modos de operación",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-medir-sin-reducir-creatividad-a-volumen",
+      "text": "Cómo medir sin reducir creatividad a volumen",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-riesgos-que-un-buen-workflow-debe-hacer-visibles",
+      "text": "Riesgos que un buen workflow debe hacer visibles",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-empezar-con-un-primer-creative-workflow",
+      "text": "Cómo empezar con un primer Creative Workflow",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-preguntas-frecuentes",
+      "text": "Preguntas frecuentes",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-un-creative-workflow-reemplaza-a-los-creativos",
+      "text": "¿Un Creative Workflow reemplaza a los creativos?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-necesito-un-equipo-de-ingenieria-para-usarlo",
+      "text": "¿Necesito un equipo de ingeniería para usarlo?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-es-lo-mismo-que-creative-operations",
+      "text": "¿Es lo mismo que Creative Operations?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-se-si-un-proceso-esta-listo",
+      "text": "¿Cómo sé si un proceso está listo?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-fuentes-y-limites-de-esta-definicion",
+      "text": "Fuentes y límites de esta definición",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-la-infraestructura-de-la-creatividad-debe-proteger-lo-que-no-puede-automatizar",
+      "text": "La infraestructura de la creatividad debe proteger lo que no puede automatizar",
+      "kind": "internal_anchor"
+    }
+  ],
+  "mediaIssues": [],
+  "editabilityLegend": {
+    "safe_text_edit": "Agent may propose text changes while preserving block type, path and surrounding structure.",
+    "safe_attrs_edit": "Agent may propose constrained attribute changes after validating the native block setting.",
+    "media_requires_reconcile": "Agent must reconcile WordPress media id, rendered src, alt text and source brief before write.",
+    "preserve_structure": "Agent should preserve structure and patch child blocks or attrs only with explicit intent.",
+    "inspect_only": "Agent should preserve by default until serialization/plugin behavior is understood."
+  }
+}

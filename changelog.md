@@ -1,8 +1,32 @@
 # changelog.md
 
+## 2026-07-15 — El primer blogpost agentic end to end se convierte en canon operativo
+
+- La Pillar publicada recibe su pasada final de lectura: `99` énfasis `<strong>` distribuidos por todo el
+  artículo y una sección metodológica reescrita en tres párrafos conversacionales. Content Factory incorpora
+  `strong?: boolean` en rich text estructurado para intro, párrafos, listas y CTA, con tests para énfasis, links
+  y su combinación; QA live pasó en `1440x1000` y `390x844`.
+- La voz de Julio formaliza la firma visual de su running motif: toda activación visible de `con manzanitas` o
+  su familia lleva exactamente `🍏🍏🍏` antes de la puntuación. La regla vive en los mirrors de `copywriting`,
+  el authoring agentic y el context pack; no se extiende a Efeonce institucional ni a menciones documentales.
+- Creative Workflows gana una escalera de madurez gobernada: `Pillar -> satélites -> ebook/workbook -> tool
+  diagnóstica -> Creative Studio`. El nuevo `CREATIVE_WORKFLOWS_KNOWLEDGE_TO_PRODUCT_LADDER_V1.md` define el
+  trabajo, evidencia y gate de cada capa; propone el ebook como método enseñable y un eventual `Creative
+  Workflow Opportunity Mapper` como diagnóstico, sin autorizar runtime ni confundir autoridad editorial con
+  evidencia de producto. PDR-014, brief, roadmap, retrospectiva y `content-marketing-studio` quedaron conectados.
+- Creative Workflows deja dos sources of truth distintos: `CREATIVE_WORKFLOWS_AGENTIC_END_TO_END_RETROSPECTIVE_V1.md` conserva V1→V4, decisiones, incidentes, métricas, artefactos y residuos; `AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md` define el proceso reusable desde research hasta publicación y cierre.
+- El contrato de Public Site queda corregido: Content Factory conserva dry/private por defecto y `run --send` no publica; un agente puede ejecutar después `private → publish` solo con autorización humana explícita, snapshot, rollback fail-closed, cache/readback y QA live desktop/mobile.
+- Skills WordPress, SEO/AEO, copywriting y Content Marketing reciben referencias cargables para publicación, E-E-A-T, autoría/voz y sistema visual. `AGENTS.md`, `CLAUDE.md`, PDR-014, arquitectura del skill router, docs funcionales, manuales e índices enlazan el canon sin convertir el artículo en product spec de Creative Studio.
+
+## 2026-07-15 — Creative Workflows V4 incorpora evidencia, experiencia y transparencia E-E-A-T
+
+- La Pillar `251363` suma fuentes primarias inline con tamaño de muestra y límites, evidencia de mercado Adobe/Advanis y Asana/GWI, resultados experimentales de Doshi/Hauser y Grinschgl, y el estudio correlacional de Chen et al. La sección SKY aporta `178` piezas, cinco mercados y una reducción observada de `21–25%` con caveat explícito de caso no controlado.
+- Se incorporaron autoría, límites de la guía, disclosure del uso de IA y bibliografía contextual. WP-CLI corrigió la entidad Yoast de Julio: Instagram, cargo, `worksFor=Efeonce Group`, `knowsAbout`, title y descripción, con snapshot de rollback.
+- Content Factory ahora renderiza enlaces inline y énfasis semántico seguros desde segmentos estructurados. La V4 pasó con 111 bloques, tres imágenes, 39 enlaces y cero findings; se publicó en `https://efeoncepro.com/creative/creative-workflows/` con canonical único, `index, follow`, CTA final gobernado, Open Graph y render desktop/mobile verificados.
+
 ## 2026-07-15 — Creative Workflows V3 suma sistema visual y voz autoral de Julio
 
-- GPT Image 2 produjo el sistema editorial `La señal seleccionada`: cuatro masters, cinco WebP y un JPEG social; WordPress conserva los WebP `251365–251368` y usa `251370` como featured/OG JPEG con ALT/caption. La V3 pasó Content Factory con 101 bloques y cero findings y quedó aplicada al post privado `251363`: tres `core/image`, categoría Creative, extracto, focus keyphrase, meta title separado del H1, meta description y Open Graph/schema verificados. Permanece `private`, `noindex, follow` y anónimo `404`; publicación y render autenticado siguen pendientes.
+- GPT Image 2 produjo el sistema editorial `La señal seleccionada`: cuatro masters, cinco WebP y un JPEG social; WordPress conserva los WebP `251365–251368` y usa `251370` como featured/OG JPEG con ALT/caption. La V3 pasó Content Factory con 101 bloques y cero findings y quedó aplicada al post privado `251363`: tres `core/image`, categoría Creative, extracto, focus keyphrase, meta title separado del H1, meta description y Open Graph/schema verificados. Ese corte `private`, `noindex, follow` y anónimo `404` queda preservado como snapshot histórico; V4 lo supersede con publicación y QA live.
 - La skill espejo `copywriting` registra `JULIO_REYES_VOICE_SYSTEM.md` y un router explícito Julio/Efeonce. Marketing con Manzanitas y piezas firmadas usan voz Julio; UI, landings, producto y copy institucional usan Efeonce. `con manzanitas` / `te lo explico con manitas` quedan protegidos como motivos personales, no como tono corporativo genérico.
 
 ## 2026-07-15 — Radiografía AEO: playbook comercial + cadena Grader→demo→propuesta
@@ -21,8 +45,8 @@
 - PDR-014 separa los trabajos del sistema: la Pillar educa y crea categoría, los satélites profundizan intenciones independientes, la landing Agencia Creativa convierte y Creative Studio permanece como arquitectura futura sin promesa de disponibilidad.
 - El brief maestro fija la tesis **“un sistema de decisiones creativas humanas vuelto ejecutable”**, la estructura de la Pillar y 12 satélites en tres olas, además de enlaces, evidencia, CTA, medición, atomización y flujo de producción.
 - El dossier de publicación registra la muestra SERP, cinco claims científicos con sus límites, evidencia primaria de mercado y claims prohibidos; no inventa volúmenes ni convierte neurociencia en prueba del producto.
-- Content Factory validó la `GutenbergArticleSpec` y creó el post WordPress `251363` como privado, autor `1`, manifest idempotente `greenhouse-cf-creative-workflows-pillar-v1`. Readback e inspección profunda confirman 75 bloques gobernados, TOC, 20 headings y metadata SEO; acceso anónimo `404`. Sigue sin publicar y requiere revisión humana, enlaces, media, taxonomía y canonical.
-- Estado editorial: listo para redactar en privado, no para publicar. Keyword/intent/SERP, taxonomía y canonical único entre WordPress y Think son gates explícitos; el roadmap público y PDR-004 quedaron conectados.
+- Content Factory validó la `GutenbergArticleSpec` y creó el post WordPress `251363` como privado, autor `1`, manifest idempotente `greenhouse-cf-creative-workflows-pillar-v1`. Ese readback inicial confirmó 75 bloques gobernados, TOC, 20 headings, metadata SEO y acceso anónimo `404`; queda como evidencia histórica del draft antes de V2-V4.
+- En ese corte el estado editorial era listo para redactar en privado, no para publicar. Keyword/intent/SERP, taxonomía y canonical único entre WordPress y Think quedaron como gates explícitos; V4 los cerró y el roadmap público y PDR-004 permanecen conectados.
 - Frontera reforzada: este trabajo crea soporte científico/editorial para Creative Studio futuro; no implementa workflows ni convierte artículos, diagramas o templates conceptuales en product specs o tasks. La ejecución operativa permanece exclusivamente bajo RESEARCH-009, arquitectura vigente y EPIC-028 en el repositorio de Creative Studio.
 
 ## 2026-07-14 — Proposal Studio: la versión se deriva y la descarga es gobernada (TASK-1412)

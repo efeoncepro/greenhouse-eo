@@ -14,6 +14,7 @@
 - **Confidence:** `high` en la frontera y contrato agentic; `medium` en el orden exacto de proveedores/modelos y en pricing comercial, que requieren evidencia por modalidad.
 - **Validated as of:** 2026-07-14 — pilotos reales de RRSS y Glitch, investigación RESEARCH-009 y decisión de operating model documentados.
 - **Program:** [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md).
+- **Editorial support:** [PDR-014](../public-site/decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md) construye soporte científico y editorial; no modifica esta ADR ni autoriza implementación.
 
 ### Context
 
@@ -64,6 +65,9 @@ Se crea **Efeonce Creative Studio** como nombre de trabajo de una **plataforma h
 - Cada run resuelve antes de ejecutar quién opera, quién aprueba creatividad, quién autoriza gasto, quién gobierna el template, quién responde por derechos y quién autoriza delivery.
 - Cambiar de modo operativo conserva workspace, brief, assets, lineage, review y ledger; no crea un handoff paralelo ni eleva permisos por sí solo.
 - Efeonce sólo compromete métricas de delivery sobre el scope cuya dirección y ejecución controla. `Client-operated` no hereda por defecto el SLA de un Managed Squad.
+- El contenido editorial puede informar lenguaje e hipótesis, pero nunca crea commands, schemas, templates,
+  provider routes, acceptance criteria o tasks por inferencia. La implementación sólo se autoriza por EPIC-028
+  y sus tasks en el repositorio de Creative Studio.
 
 ### Revisit When
 

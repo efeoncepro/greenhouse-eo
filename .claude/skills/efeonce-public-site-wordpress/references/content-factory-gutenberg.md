@@ -94,6 +94,7 @@ pnpm public-website:content-factory:post-tool -- edit-pullquote --post-url <url>
 - Use `yoast-seo/table-of-contents` on long editorial posts when the composition profile requires it.
 - Treat `core/freeform` as observable legacy debt for inspection/refresh, not as a generated block for new drafts.
 - Validate drafts before any bridge write.
+- Author inline links and restrained semantic emphasis as structured rich-text segments (`{ text, href?, strong? }`) in intros, paragraphs, lists and CTAs. Let Content Factory escape them, render `strong: true` as `<strong>` and enforce `http:`, `https:` or `mailto:`; never inject raw anchor or emphasis HTML into a spec.
 - `status=block` from validation is a hard stop; `status=warning` requires review.
 - For Glitch POV, prefer `efeoncepro/glitch-drop`; it is an editorial aside, not a quote.
 

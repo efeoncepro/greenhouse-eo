@@ -39,6 +39,7 @@ Read the minimal set:
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
 | Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |
+| Agentic blogpost from governed write through human publication and live QA | `references/agentic-blogpost-end-to-end.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |

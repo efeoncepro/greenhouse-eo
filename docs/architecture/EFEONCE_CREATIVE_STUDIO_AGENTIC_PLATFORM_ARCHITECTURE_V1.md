@@ -5,6 +5,7 @@
 > **Audiencia:** Creative Technology, producto, operaciones creativas y futuros integradores de Efeonce.
 > **Principio rector:** una capacidad operable por una persona debe ser operable por un agente autorizado mediante el mismo contrato gobernado.
 > **Investigación de producto:** [RESEARCH-009 — Creative Operations y workflows agentic](../research/RESEARCH-009-creative-operations-agentic-workflows.md) registra el landscape y las hipótesis de bootstrap; no modifica esta ADR ni autoriza runtime nuevo.
+> **Soporte editorial:** [PDR-014 — Creative Workflows](../public-site/decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md) construye la base científica, conceptual y pública del producto futuro. Sus artículos no son workflows, templates ni especificaciones operativas.
 
 ## 1. Resultado que se está construyendo
 

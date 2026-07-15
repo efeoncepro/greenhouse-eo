@@ -4,6 +4,10 @@
 > ante cualquier duda, ese doc manda. La *doctrina* de la voz es de `efeonce-agency`; aquí la
 > **crafteas** en copy real.
 
+> **Frontera de speaker:** este sistema rige copy institucional de Efeonce/Greenhouse. No se aplica
+> automáticamente a contenido firmado por Julio Reyes; resolver primero el router de
+> `JULIO_REYES_VOICE_SYSTEM.md`. Las convicciones pueden compartirse, los giros personales no.
+
 ## El principio raíz
 
 La voz de Efeonce **no nace de adjetivos genéricos** ("profesional y cercano") sino de
@@ -76,4 +80,6 @@ creencias contra el status quo de la industria (`../modules/04`).
 - **NUNCA** decorar/rellenar: cada oración tiene un trabajo (obsesión por concisión, `../modules/07`).
 - **NUNCA** afirmar sin prueba (obsesión por la prueba es parte de la voz).
 - **NUNCA** voseo/modismos argentinos; tuteo es-CL neutro.
+- **NUNCA** usar `con manzanitas`, `te lo explico con manitas` u otros running motifs de Julio en
+  copy institucional o de terceros, salvo cita textual atribuida.
 - **SIEMPRE** validar el wording final de superficies de producto con `greenhouse-ux-writing`.

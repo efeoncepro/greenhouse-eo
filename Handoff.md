@@ -1,3 +1,80 @@
+## Sesión 2026-07-15 — Creative Workflows: jerarquía de lectura y firma `🍏🍏🍏` (Codex)
+
+> **Pedido:** aplicar negritas equilibradas en todo el artículo, resolver la sección metodológica que rompía el
+> ritmo, formalizar la firma visual de `con manzanitas` y cerrar skills/docs + commit/push.
+>
+> **Editorial:** la transparencia E-E-A-T se conserva, pero deja de mostrarse como checklist Who/How/Why. La
+> sección live se llama `Antes de cerrar: qué sostiene esta guía y qué no` y condensa autoría, fuentes, límites,
+> disclosure de IA y necesidad de piloto en tres párrafos conversacionales. La spec V4 mantiene 111 bloques,
+> tres imágenes y metadata previa; suma `99` segmentos `<strong>` distribuidos por todo el artículo.
+>
+> **Motif:** toda activación visible de `con manzanitas` / `te lo explico con manitas` en voz Julio lleva
+> exactamente `🍏🍏🍏` antes de la puntuación. Canon sincronizado en los mirrors `copywriting`, authoring
+> agentic, context pack, runbook, retrospectiva y spec: `Vamos con manzanitas 🍏🍏🍏:`. Menciones documentales y
+> la marca editorial Marketing con Manzanitas no activan por sí solas la firma.
+>
+> **Capability:** `GutenbergRichTextSegment` incorpora `strong?: boolean`; intro, párrafos, listas y CTA aceptan
+> rich text estructurado. El renderer conserva escaping y allowlist `http|https|mailto`; `strong + link` tiene
+> cobertura focal. La receta Gutenberg y referencias WordPress Codex/Claude documentan el contrato.
+>
+> **Publicación y aprendizaje runtime:** post `251363` actualizado en
+> `https://efeoncepro.com/creative/creative-workflows/` con snapshot y rollback fail-closed. El primer readback
+> detectó caché Kinsta stale y el segundo, serialización de `🍏` como `&#x1f34f;`; ambos writes se revirtieron. La
+> ejecución final purgó caché y aceptó únicamente esa equivalencia conocida, manteniendo exactitud para el resto.
+> Estado final: `publish`, canonical exacto, `index, follow`, author/category/featured/Yoast intactos.
+>
+> **QA live:** desktop `1440x1000` y mobile `390x844`; `99` strong, tres emojis convertidos por WordPress a
+> `img.emoji[alt="🍏"]` y cargados, tres imágenes editoriales cargadas, sección antigua/lista ausentes, consola
+> sin errores y cero overflow dentro del artículo en mobile. Las negritas representan `16,6%` de 4.488 palabras
+> visibles, máximo dos por bloque; es evidencia del caso, no umbral universal. El mega menú desktop oculto del
+> theme conserva ancho intrínseco fuera del viewport, residual preexistente ajeno al artículo.
+>
+> **Gates locales:** PASS Content Factory dry (`111` bloques, cero findings), Vitest focal `9/9`, suite Content
+> Factory `66/66`, `pnpm typecheck`, `pnpm build`, `git diff --check`, `docs:context-check`,
+> `docs:closure-check`, `ops:lint --changed` y `qa:gates --changed`. Warnings no bloqueantes: patrón Turbopack
+> preexistente en `roadmap/work-item-index/reader.ts`, tamaño histórico de `Handoff.md` y frontmatter legacy
+> `argument-hint/user-invocable` de la skill `copywriting`; las otras tres skills Codex validan con
+> `quick_validate.py` y los mirrors operativos son equivalentes.
+
+## Sesión 2026-07-15 — Creative Workflows: del territorio intelectual al ebook, la tool y Creative Studio (Codex)
+
+> **Pedido:** documentar la intención de que la Pillar y sus satélites construyan soporte académico/intelectual,
+> maduren eventualmente a ebook o ebook+tool y preparen el terreno para el lanzamiento de Creative Studio.
+>
+> **Decisión:** la progresión queda gobernada como `Pillar -> satélites -> ebook/workbook -> tool diagnóstica ->
+> Creative Studio`, equivalente a aprender -> profundizar/diseñar -> diagnosticar -> operar/escalar. Cada capa
+> resuelve un trabajo nuevo y conserva gates y sources of truth propios.
+>
+> **Canon:** `docs/public-site/CREATIVE_WORKFLOWS_KNOWLEDGE_TO_PRODUCT_LADDER_V1.md`; conectado desde PDR-014,
+> brief maestro, roadmap, README Public Site y retrospectiva. `content-marketing-studio` Codex/Claude incorpora
+> `references/knowledge-to-product-ladder.md` para reutilizar el patrón en otros territorios.
+>
+> **Frontera:** ebook no es concatenación de artículos; tool no es repurposing ni builder prematuro. La candidata
+> `Creative Workflow Opportunity Mapper` requiere PDR, modelo explicable, privacidad, evals, analytics y task
+> separados. Creative Studio necesita evidencia propia de producto y sigue exclusivamente bajo RESEARCH-009,
+> arquitectura y EPIC-028 en su repositorio. No se creó runtime, task, CTA, waitlist ni fecha.
+>
+> **Verificación:** PASS `git diff --check`, 84 enlaces locales, paridad byte a byte de la referencia y paridad
+> del cuerpo de las skills Codex/Claude. `quick_validate.py` valida Codex; sobre Claude sólo rechaza las claves
+> propias preexistentes `type`, `user-invocable` y `argument-hint`. `pnpm docs:context-check` y
+> `pnpm docs:closure-check` pasan; quedan warnings no bloqueantes por el tamaño histórico de `Handoff.md` y por
+> lifecycle de tasks ajenas presentes en el worktree compartido. No se requirieron build, deploy ni QA runtime:
+> el cambio es exclusivamente estratégico, documental y de routing de skill.
+
+## Sesión 2026-07-15 — Primer blogpost agentic end to end canonizado (Codex + subagentes)
+
+> **Pedido:** documentar absolutamente todo el aprendizaje del ciclo Creative Workflows en las skills y docs correspondientes, como primer blogpost Efeonce producido end to end por un agente, usando subagentes en paralelo.
+>
+> **Canon:** el proceso reusable vive en `docs/operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md`; el caso, sus cuatro versiones, incidentes, métricas, artefactos y residuos viven en `docs/public-site/CREATIVE_WORKFLOWS_AGENTIC_END_TO_END_RETROSPECTIVE_V1.md`. El runbook no sustituye las auditorías V2/V3/V4; las enruta como evidencia.
+>
+> **Skills:** `efeonce-public-site-wordpress` incorpora el write/publication/rollback/readback; `seo-aeo`, dossier/claims/E-E-A-T/Person/schema; `copywriting`, contrato de autoría humana, voz Julio/Efeonce, hook/CTA/disclosure; `content-marketing-studio`, job map visual, manifest, GPT Image 2, derivados, Media Library y QA público. En `seo-aeo`, la fuente original sigue siendo `~/.claude/skills/seo-aeo/` y `.codex/skills/seo-aeo/` su espejo adaptado; no se creó una tercera skill repo-local para Claude.
+>
+> **Regla central:** Content Factory sigue fail-safe: dry por defecto y `run --send` termina en `private`. La publicación agentic es una transacción posterior que requiere autorización humana explícita, snapshot, rollback fail-closed y verificación live. Los scripts temporales del caso no son una primitive durable.
+>
+> **Docs conectados:** `AGENTS.md`, `CLAUDE.md`, `project_context.md`, changelog, PDR-014, README Public Site, arquitectura/manual del skill router, documentación funcional y manual de Content Factory. No cambia la frontera de Creative Studio ni crea implementación bajo EPIC-028.
+>
+> **Verificación final:** seis subagentes integrados y auditados. PASS: `pnpm build` (con warning Turbopack preexistente por patrón amplio en `roadmap/work-item-index/reader.ts`), `pnpm typecheck`, ESLint focal, Content Factory `65/65`, dry-run V4 `111` bloques/cero findings, `git diff --check`, `pnpm claude-md check`, `pnpm docs:context-check`, `pnpm docs:closure-check`, `pnpm ops:lint --changed` y `pnpm qa:gates --changed --agent codex --docs --runtime --integration`. Se comprobaron 101 enlaces canónicos sin faltantes, paridad de referencias y skills válidas. Live: `HTTP 200`, canonical exacto, `index, follow`, un H1, `Article`/`BlogPosting`/`Person`, OG y cuatro assets `200`, caso SKY, disclosure IA y CTA gobernado. Estado SEO honesto: publicado y elegible para indexación; no hay evidencia de indexación efectiva todavía. Único warning documental no bloqueante: lifecycle de tasks ajenas dentro del worktree compartido; `ops:lint` confirmó cero errores/warnings en esos artefactos.
+
 ## Sesión 2026-07-15 — Radiografía AEO documentada como educación + sales enablement (Codex)
 
 > **Pedido:** complementar en Greenhouse skills, documentación y manuales de uso para que la Radiografía AEO quede entendida como herramienta educativa y de habilitación comercial para servicios SEO/AEO.
@@ -28,7 +105,13 @@
 >
 > **Brief:** [Creative Workflows Pillar + Cluster Brief V1](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md) deja listos audiencia/JTBD, gran idea, metadata de trabajo, estructura H2, profundidad, prioridades, matriz de enlaces, research SEO/AEO, evidencia, CTA, medición, atomización, producción y gates. La landing Agencia Creativa conserva conversión; Creative Studio no se promete disponible.
 >
-> **Estado:** primer borrador privado creado y verificado; no está listo para publicación. La muestra SERP y el claim ledger viven en el [dossier](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_RESEARCH_DOSSIER_V1.md); la [spec](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V1.json) pasó Content Factory con `validation=pass` y creó el post WordPress `251363` (`private`, autor `1`, manifest `greenhouse-cf-creative-workflows-pillar-v1`, 75 bloques). La reejecución devolvió `already_exists`, el permalink anónimo `404` y la [inspección profunda](docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-15T05-25-14+00-00.json) confirmó TOC, 20 headings, SEO y cero freeform no vacío. Pendientes de publicación: demanda regional, revisión editorial/claims, enlaces reales, media, taxonomía y canonical WP↔Think.
+> **Historia editorial:** el primer borrador privado fue creado y verificado. La muestra SERP y el claim ledger viven en el [dossier](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_RESEARCH_DOSSIER_V1.md); la [spec V1](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V1.json) pasó Content Factory y creó el post WordPress `251363` (`private`, autor `1`, manifest `greenhouse-cf-creative-workflows-pillar-v1`, 75 bloques). La reejecución devolvió `already_exists`, el permalink anónimo `404` y la [inspección profunda](docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-15T05-25-14+00-00.json) confirmó TOC, 20 headings, SEO y cero freeform no vacío. Después se construyó una [V2 editorial local](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V2.json), acompañada por su [contrato de reescritura](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EDITORIAL_REWRITE_V2.md) y [auditoría](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EDITORIAL_AUDIT_V2.md): 3.767 palabras, hook conversacional, caso conductor y claims revisados; Content Factory `dry-run` pasó con 98 bloques.
+>
+> **Corte visual/V3/SEO (histórico):** se diseñó [La señal seleccionada](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_SYSTEM_V1.md) y se generaron cuatro assets con GPT Image 2: hero, interfaz creativa, dos velocidades y seis momentos. Los cuatro masters, cinco derivados WebP y un JPEG social quedaron trazados en [`ai-generations/2026-07-15_creative-workflows-pillar`](ai-generations/2026-07-15_creative-workflows-pillar/); WordPress Media Library contiene `251365–251368` y `251370`, todos bajo autor `1`. La [spec V3](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V3.json) pasó Content Factory con 101 bloques y cero findings y fue aplicada al post privado `251363` con snapshot previo. Ese readback privado quedó supersedido por V4.
+>
+> **Estado vigente V4:** `https://efeoncepro.com/creative/creative-workflows/` está publicado e indexable. La [spec V4](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V4.json) pasó con 111 bloques, tres imágenes, 39 enlaces y cero findings; canonical, CTA, autor Yoast, schema, Open Graph, render desktop/mobile y ausencia de duplicado en Think fueron verificados en vivo. Canon: [auditoría E-E-A-T V4](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EEAT_AUDIT_V4.md).
+>
+> **Voz autoral registrada:** la skill `copywriting` quedó actualizada en mirrors `.codex` y `.claude` con [`JULIO_REYES_VOICE_SYSTEM.md`](.codex/skills/copywriting/efeonce/JULIO_REYES_VOICE_SYSTEM.md). El router separa voz Julio de voz institucional Efeonce, define híbridos atribuidos y registra `con manzanitas` / `te lo explico con manitas` como running motifs personales que no deben trasladarse a UI, landings institucionales, otros autores ni copy corporativo genérico. Mirrors verificados byte a byte.
 >
 > **Aclaración del operador:** este frente construye el soporte científico, conceptual y editorial de Creative Studio futuro. **No estamos implementando Creative Workflows todavía.** Ningún artículo, satélite, diagrama, checklist o template conceptual crea backlog, product spec o runtime. La única vía futura de implementación es RESEARCH-009 validado → arquitectura vigente → EPIC-028 → task formal en el repositorio de Creative Studio.
 
@@ -37698,3 +37781,29 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 - El context pack, PDR-004 y `creative-practice` separan modo operativo de modalidad comercial: On-Going, On-Demand, Staff Augmentation y Sample Sprint siguen vigentes; OTD/FTR sólo se comprometen sobre el scope controlado por Efeonce.
 - Documentación funcional, manual de pilotos, EPIC-028 y skills espejo Codex/Claude quedaron sincronizados. No se creó runtime ni se habilitó acceso cliente; bootstrap, legal/finance/rights, pricing y rollout siguen pendientes de EPIC-028.
 - Validación: `git diff --check` PASS; `pnpm ops:lint --changed` PASS (`epic canonical=1`, `errors=0`, `warnings=0`); cierre documental acotado PASS con un advisory genérico de task lifecycle aunque no se modificó ninguna `TASK-*`; `pnpm docs:context-check` PASS con sólo los warnings históricos por tamaño de `Handoff.md`.
+## Sesión 2026-07-15 — Creative Workflows V4: cierre E-E-A-T aplicado en WordPress (Codex)
+
+> **Pedido:** incorporar las mejoras E-E-A-T de la Pillar, usando o creando bloques Gutenberg según hiciera falta.
+>
+> **Resultado editorial:** la [spec V4](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V4.json) quedó aplicada al post privado `251363`. Añade evidencia Adobe/Advanis y Asana/GWI; muestras, resultados y caveats de Doshi/Hauser, Grinschgl y Chen; un caso SKY medido (`178` piezas, cinco mercados, `21–25%` de reducción observada, `13,9–17,2` horas) con límite de caso no controlado; Who/How/Why; declaración de límites y uso de IA; y fuentes primarias enlazadas en contexto. No se creó un bloque custom: los bloques nativos cubrían la necesidad.
+>
+> **Cambio de plataforma:** `GutenbergArticleSpec` admite segmentos de rich text con enlaces inline seguros en párrafos y listas; escapa texto/atributos, allowlist `http/https/mailto` y falla con protocolos inseguros. Tests focales `7/7`.
+>
+> **Evidencia runtime:** Content Factory `pass`, `111` bloques, `3` imágenes, `38` links y cero findings. Dos lecturas WordPress autenticadas verifican autor `1`, categoría `193`, featured/OG `251370` (`1440×757`), meta title/descripción, caso SKY, disclosure, fuentes, `noindex, follow` y Open Graph. El acceso anónimo sigue `404`.
+>
+> **Autor y residuo honesto:** el perfil REST de Julio ahora declara fundador/Managing & GTM Director y más de 12 años de experiencia. Yoast conserva tres user-meta legados no expuestos por REST: Instagram malformado/LinkedIn legado en `sameAs`, `jobTitle=Inbound Marketing Expert` y `worksFor=Grupo Security`. Requieren WP-CLI/Kinsta SSH o acceso admin; no están corregidos. Auditoría: [Creative Workflows Pillar E-E-A-T Audit V4](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EEAT_AUDIT_V4.md).
+>
+> **Estado de ese corte:** contenido E-E-A-T y metadata aplicados. Este bloqueo quedó supersedido por la publicación y el cierre live documentados en la entrada siguiente.
+## Sesión 2026-07-15 — Creative Workflows V4 publicada y verificada live (Codex)
+
+> **Autorización:** el operador pidió resolver los pendientes y publicar de inmediato.
+>
+> **Autor E-E-A-T:** se recuperó el write path WP-CLI/Kinsta y se corrigieron `instagram`, `job_title`, `wpseo_title`, `wpseo_metadesc` y `wpseo_user_schema` del usuario `1`. El schema público confirma `sameAs` válido, `jobTitle=Fundador y Managing & GTM Director`, `worksFor=Efeonce Group` y seis áreas `knowsAbout`. Backup remoto: `/tmp/efeonce-julio-author-eeat-before-20260715T091347Z.json`.
+>
+> **Publicación:** post `251363` cambió de `private` a `publish` con rollback automático a privado si fallaban los checks. URL live: `https://efeoncepro.com/creative/creative-workflows/`; `200`, canonical único, `index, follow`, Article schema, featured/OG `251370` y social image JPEG `1440×757` verificados. Snapshot local pre-publicación: `tmp/creative-workflows-post-251363-before-publish-2026-07-15T09-15-34.821Z.json`.
+>
+> **QA live:** Playwright desktop `1440×1000` y mobile `390×844`: H1 contenido, cero overflow horizontal, tres imágenes de cuerpo cargadas, TOC `21/21` destinos, caso SKY/disclosure y CTA final enlazado visibles, consola sin errores. Link check sobre 34 URLs: cero `404/5xx`; 29 `2xx/3xx`, tres `403` anti-bot y dos timeouts de origen. Think no tiene rutas duplicadas para el slug.
+>
+> **Cierre técnico:** `pnpm typecheck`, ESLint focal y Vitest `8/8` pasaron; Content Factory regeneró V4 con 111 bloques, 21 headings, tres imágenes, `indexPolicy=index` y cero findings. `git diff --check`, `docs:context-check`, `docs:closure-check`, `ops:lint --changed` y `qa:gates --changed --agent codex --docs --runtime --integration` pasaron. El único advisory de docs corresponde a cambios de lifecycle ajenos en el worktree compartido; task/epic lint quedó en cero errores y cero warnings. Veredicto scoped: `PASS`, cierre completo.
+>
+> **Estado:** publicado y operativo. Canon: [E-E-A-T Audit V4](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EEAT_AUDIT_V4.md).

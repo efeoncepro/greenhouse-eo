@@ -6,9 +6,9 @@
 >
 > **Owner:** Efeonce Creative Studio / Creative Technology
 >
-> **Relacionado:** [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md) · [arquitectura objetivo](../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md) · [documentación funcional](../documentation/ai-tooling/estudio-de-flujos-creativos.md)
+> **Relacionado:** [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md) · [arquitectura objetivo](../architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md) · [documentación funcional](../documentation/ai-tooling/estudio-de-flujos-creativos.md) · [territorio editorial PDR-014](../public-site/decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md)
 >
-> **Alcance:** investigación estratégica y de producto. No autoriza runtime, gasto de proveedores, cambios de ADR ni el uso de un canvas libre.
+> **Alcance:** investigación estratégica y de producto. No autoriza runtime, gasto de proveedores, cambios de ADR ni el uso de un canvas libre. La Pillar y sus satélites aportan soporte científico/editorial y señales de audiencia; **no son implementación, product spec ni evidencia empírica suficiente para abrir una task**.
 
 ## Pregunta de investigación
 
@@ -187,6 +187,10 @@ Estas son hipótesis de bootstrap alineadas con la ADR vigente; no agregan schem
 ## Criterio de paso a task
 
 Este brief pasa de `Active` a `Validated` cuando exista una primera respuesta empírica para al menos un patrón builder/runner y un rol agentic acotado, con fixture, gasto, review humana y criterio de reversión documentados. La implementación sólo nace como task en el repositorio de Creative Studio después del bootstrap de EPIC-028.
+
+La investigación y publicación editorial pueden mejorar lenguaje, hipótesis y preguntas de validación, pero no
+satisfacen por sí solas este criterio. Un artículo publicado, una buena recepción o un template conceptual no
+reemplazan el piloto operativo ni autorizan convertir su estructura en backlog.
 
 ## Fuentes primarias consultadas
 
