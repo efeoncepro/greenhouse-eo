@@ -167,7 +167,7 @@ describe('runOtdWritebackBatch (TASK-927)', () => {
     expect(mocks.patchNotionPage).not.toHaveBeenCalled()
   })
 
-  it('PATCH error → marca failed + capture + sigue (per-task resiliente)', async () => {
+  it('PATCH retryable error → marca failed sin captura Sentry directa y sigue', async () => {
     vi.stubEnv('NOTION_OTD_WRITEBACK_ENABLED_EFEONCE', 'true')
     routePg({
       cohort: [{ task_source_id: 't1', workspace_id: 'efeonce' }],
@@ -179,7 +179,30 @@ describe('runOtdWritebackBatch (TASK-927)', () => {
 
     expect(result.failed).toBe(1)
     expect(result.written).toBe(0)
-    expect(mocks.captureWithDomain).toHaveBeenCalled()
+    expect(mocks.captureWithDomain).not.toHaveBeenCalled()
+  })
+
+  it('PATCH archived block → marca terminal skip sin retry ni captura Sentry', async () => {
+    vi.stubEnv('NOTION_OTD_WRITEBACK_ENABLED_EFEONCE', 'true')
+    routePg({
+      cohort: [{ task_source_id: 't1', workspace_id: 'efeonce' }],
+      freshByTask: { t1: { bucket_attributable: 'late_drop', data_status: 'valid' } }
+    })
+
+    const notionErr = new Error(
+      "Notion API PATCH 400: Can't edit block that is archived. You must unarchive the block before editing."
+    ) as Error & { status?: number; code?: string }
+
+    notionErr.status = 400
+    notionErr.code = 'validation_error'
+    mocks.patchNotionPage.mockRejectedValueOnce(notionErr)
+
+    const result = await runOtdWritebackBatch()
+
+    expect(result.skippedTerminal).toBe(1)
+    expect(result.failed).toBe(0)
+    expect(result.written).toBe(0)
+    expect(mocks.captureWithDomain).not.toHaveBeenCalled()
   })
 
   it('per-cliente: solo procesa workspaces con flag ON', async () => {

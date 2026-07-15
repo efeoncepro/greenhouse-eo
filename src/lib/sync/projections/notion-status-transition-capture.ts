@@ -4,6 +4,7 @@ import { normalizeTaskStatus } from '@/lib/delivery/task-status-canonical'
 import { resolveProductiveWorkspace } from '@/lib/notion-metrics/notion-productive-workspaces'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { isRetryableNotionError } from '@/lib/space-notion/notion-errors'
 import { fetchPageStatus } from '@/lib/space-notion/notion-client'
 
 import { EVENT_TYPES } from '../event-catalog'
@@ -179,11 +180,13 @@ export const notionStatusTransitionCaptureProjection: ProjectionDefinition = {
     } catch (err) {
       // 429 / 5xx / network → throw → outbox retry exponencial. Reliability
       // signal `transition_capture_refetch_failed` lo detecta en dead-letter.
-      captureWithDomain(err, 'integrations.notion', {
-        level: 'error',
-        tags: { source: 'status_transition_capture', stage: 'refetch' },
-        extra: { taskSourceId, sourceEventId }
-      })
+      if (!isRetryableNotionError(err)) {
+        captureWithDomain(err, 'integrations.notion', {
+          level: 'error',
+          tags: { source: 'status_transition_capture', stage: 'refetch' },
+          extra: { taskSourceId, sourceEventId }
+        })
+      }
 
       throw err
     }

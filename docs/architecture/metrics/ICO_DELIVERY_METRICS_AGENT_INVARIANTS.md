@@ -634,6 +634,16 @@ notion.task.status_transitioned (captura TASK-912)
 
 **Spec canónica**: `docs/tasks/complete/TASK-903-ftr-writeback-notion-gh-property.md`. Pattern fuente: TASK-916 (RpA productive writeback). Consumer real de `calculateFtr` (TASK-909).
 
+### Notion writeback/re-fetch error taxonomy (incidente Sentry 2026-07-15)
+
+El contrato de errores Notion para captura y writeback vive en `src/lib/space-notion/notion-errors.ts` y aplica a los carriles productivo/demo de status re-fetch, due-date re-fetch, RpA, FTR y OTD.
+
+- **Retryable**: timeouts (`AbortSignal.timeout`), 408/409/425/429/5xx, `rate_limited` y fallos de red transitorios. El consumer debe **throw** para que `outbox_reactive_log` aplique retry/dead-letter y los reliability signals midan agotamiento; no debe abrir Sentry directo en cada intento retryable.
+- **Terminal Notion archived block**: Notion 400 `validation_error` con mensaje "Can't edit block that is archived..." no se reintenta. El writeback persiste `notion_writeback_last_error` con prefijo `[terminal:notion_archived_block]`, retorna skip auditable y no captura Sentry directo.
+- **Non-retryable no terminal**: se captura con `captureWithDomain(err, 'integrations.notion', ...)` y se propaga si el flujo necesita retry/dead-letter o bloqueo visible.
+- Los signals `notion.metrics.writeback_*`, `ftr_writeback_*`, `otd_writeback_*` y sus siblings demo excluyen el prefijo terminal de lag/dead-letter. Una página/bloque archivado es deuda operativa de Notion (unarchive o dejar de escribir), no prueba que el worker esté caído.
+- El cliente Notion productivo y demo debe construir errores estructurados (`status`, `code`, `retryable`, `path`, `method`) con `buildNotionApiErrorFromResponse` / `buildNotionFetchError`; no volver a parsear strings ad hoc en cada proyección.
+
 ### OTD Bucket Classifier Ownership invariants (TASK-923, M1, desde 2026-05-24)
 
 Greenhouse es el **clasificador autoritativo del bucket OTD** (`on_time` / `late_drop` / `overdue` / `carry_over` / `na`). El cómputo del bucket vive en un helper canónico TS + su espejo BQ — NUNCA en una fórmula Notion. M1 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16: movió el clasificador desde la fórmula Notion `Indicador de Performance` (→ synced `performance_indicator_code`) a Greenhouse en **modo paridad** (freeze-off, replica la semántica cruda actual), escrito a la columna shadow `gh_otd_bucket`. Es aditivo: el bono sigue leyendo `otd_pct` legacy intacto.

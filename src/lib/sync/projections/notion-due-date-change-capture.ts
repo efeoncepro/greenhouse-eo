@@ -12,6 +12,7 @@ import { isNotionDueDateCaptureEnabled } from '@/lib/notion-metrics/status-trans
 import { resolveProductiveWorkspace } from '@/lib/notion-metrics/notion-productive-workspaces'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { isRetryableNotionError } from '@/lib/space-notion/notion-errors'
 import { fetchPageDueDate } from '@/lib/space-notion/notion-client'
 
 import type { ProjectionDefinition } from '../projection-registry'
@@ -266,11 +267,13 @@ export const notionDueDateChangeCaptureProjection: ProjectionDefinition = {
     try {
       page = await fetchPageDueDate(taskSourceId)
     } catch (err) {
-      captureWithDomain(err, 'integrations.notion', {
-        level: 'error',
-        tags: { source: 'due_date_change_capture', stage: 'refetch' },
-        extra: { taskSourceId, sourceEventId }
-      })
+      if (!isRetryableNotionError(err)) {
+        captureWithDomain(err, 'integrations.notion', {
+          level: 'error',
+          tags: { source: 'due_date_change_capture', stage: 'refetch' },
+          extra: { taskSourceId, sourceEventId }
+        })
+      }
 
       throw err
     }

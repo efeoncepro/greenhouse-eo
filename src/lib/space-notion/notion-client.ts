@@ -1,7 +1,14 @@
 import 'server-only'
 
+import {
+  buildNotionApiErrorFromResponse,
+  buildNotionFetchError
+} from './notion-errors'
+
 const NOTION_API = 'https://api.notion.com/v1'
 const NOTION_VERSION = '2022-06-28'
+const NOTION_WRITE_TIMEOUT_MS = 30_000
+const NOTION_READ_TIMEOUT_MS = 15_000
 
 const notionHeaders = () => {
   const token = process.env.NOTION_TOKEN?.trim()
@@ -31,19 +38,25 @@ export async function notionRequest<T>(
   path: string,
   init?: RequestInit & { searchParams?: URLSearchParams }
 ): Promise<T> {
-  const response = await fetch(buildUrl(path, init?.searchParams), {
-    ...init,
-    headers: {
-      ...notionHeaders(),
-      ...(init?.headers ?? {})
-    },
-    signal: AbortSignal.timeout(30_000)
-  })
+  const { searchParams, ...fetchInit } = init ?? {}
+  const method = fetchInit.method ?? 'GET'
+  let response: Response
+
+  try {
+    response = await fetch(buildUrl(path, searchParams), {
+      ...fetchInit,
+      headers: {
+        ...notionHeaders(),
+        ...(fetchInit.headers ?? {})
+      },
+      signal: AbortSignal.timeout(NOTION_WRITE_TIMEOUT_MS)
+    })
+  } catch (error) {
+    throw buildNotionFetchError(error, { method, path, timeoutMs: NOTION_WRITE_TIMEOUT_MS })
+  }
 
   if (!response.ok) {
-    const text = await response.text().catch(() => '')
-
-    throw new Error(`Notion API ${response.status}: ${text}`)
+    throw await buildNotionApiErrorFromResponse(response, { method, path })
   }
 
   if (response.status === 204) {
@@ -145,24 +158,28 @@ export const fetchPageStatus = async (pageId: string): Promise<ProductivePageSta
     throw new Error('NOTION_TOKEN not configured (cannot re-fetch productive page status)')
   }
 
-  const response = await fetch(`${NOTION_API}/pages/${pageId}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Notion-Version': NOTION_READ_VERSION
-    },
-    signal: AbortSignal.timeout(15_000)
-  })
+  const path = `/pages/${pageId}`
+  let response: Response
+
+  try {
+    response = await fetch(`${NOTION_API}${path}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Notion-Version': NOTION_READ_VERSION
+      },
+      signal: AbortSignal.timeout(NOTION_READ_TIMEOUT_MS)
+    })
+  } catch (error) {
+    throw buildNotionFetchError(error, { method: 'GET', path, timeoutMs: NOTION_READ_TIMEOUT_MS })
+  }
 
   if (response.status === 404) {
     return null
   }
 
   if (!response.ok) {
-    const error = new Error(`Notion API GET page ${response.status}`)
-
-    ;(error as Error & { status?: number }).status = response.status
-    throw error
+    throw await buildNotionApiErrorFromResponse(response, { method: 'GET', path })
   }
 
   const body = (await response.json()) as {
@@ -259,24 +276,28 @@ export const fetchPageDueDate = async (pageId: string): Promise<ProductivePageRe
     throw new Error('NOTION_TOKEN not configured (cannot re-fetch productive page due-date)')
   }
 
-  const response = await fetch(`${NOTION_API}/pages/${pageId}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Notion-Version': NOTION_READ_VERSION
-    },
-    signal: AbortSignal.timeout(15_000)
-  })
+  const path = `/pages/${pageId}`
+  let response: Response
+
+  try {
+    response = await fetch(`${NOTION_API}${path}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Notion-Version': NOTION_READ_VERSION
+      },
+      signal: AbortSignal.timeout(NOTION_READ_TIMEOUT_MS)
+    })
+  } catch (error) {
+    throw buildNotionFetchError(error, { method: 'GET', path, timeoutMs: NOTION_READ_TIMEOUT_MS })
+  }
 
   if (response.status === 404) {
     return null
   }
 
   if (!response.ok) {
-    const error = new Error(`Notion API GET page ${response.status}`)
-
-    ;(error as Error & { status?: number }).status = response.status
-    throw error
+    throw await buildNotionApiErrorFromResponse(response, { method: 'GET', path })
   }
 
   const body = (await response.json()) as {

@@ -38,5 +38,14 @@ CREATE INDEX IF NOT EXISTS idx_person_ops_metrics_member
   ON greenhouse_serving.person_operational_metrics (member_id);
 
 -- Grants
+GRANT USAGE ON SCHEMA greenhouse_serving TO greenhouse_app;
+GRANT USAGE ON SCHEMA greenhouse_serving TO greenhouse_runtime;
+GRANT USAGE ON SCHEMA greenhouse_serving TO greenhouse_ops;
+
 GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.person_operational_metrics TO greenhouse_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.person_operational_metrics TO greenhouse_runtime;
 GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.person_operational_metrics TO greenhouse_ops;
+
+GRANT SELECT ON greenhouse_serving.ico_member_metrics TO greenhouse_app;
+GRANT SELECT ON greenhouse_serving.ico_member_metrics TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_serving.ico_member_metrics TO greenhouse_ops;

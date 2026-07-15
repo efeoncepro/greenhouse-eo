@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — Sentry: Notion writeback/re-fetch y performance reader endurecidos
+
+- Se corrigen tres familias de alertas productivas: timeouts retryable en `/reactive/process-domain`, errores Notion 400 por bloques archivados y `permission denied for schema greenhouse_serving` en `GET /api/my/performance`.
+- Notion ahora usa errores tipados (`status`, `code`, `retryable`) y las proyecciones no capturan en Sentry los timeouts/429/5xx que el outbox debe reintentar. Los writebacks RpA/FTR/OTD marcan bloques archivados con prefijo terminal auditable y los signals de lag/dead-letter los excluyen.
+- El reader de performance deja de ejecutar DDL runtime sobre `greenhouse_serving.person_operational_metrics`; la tabla/grants pasan a migración y el endpoint cae a `ico_member_metrics` si el read model derivado no está disponible. Rollout pendiente: aplicar migración `20260715161000000_incident-person-operational-serving-runtime-ddl.sql` y redeploy app/ops-worker.
+
 ## 2026-07-15 — `CoverFull` canonizada y deck SKY v6
 
 - La portada reusable conserva su lockup centrado de cuatro elementos y sube la jerarquía de marca: wordmark Efeonce de 650 a 840px, marca cliente on-dark nativa, tipo de propuesta y URL Bubble fija. La recipe `cover-hero` concentra un halo cyan/teal detrás del lockup y controla la presencia violeta sin recuperar el gradiente multicolor histórico.

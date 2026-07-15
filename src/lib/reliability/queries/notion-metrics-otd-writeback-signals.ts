@@ -2,6 +2,7 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { NOTION_TERMINAL_ARCHIVED_BLOCK_ERROR_PREFIX } from '@/lib/space-notion/notion-errors'
 
 import type { ReliabilitySignal } from '@/types/reliability'
 
@@ -26,6 +27,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
  */
 
 const MODULE_KEY = 'delivery' as const
+const TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN = `${NOTION_TERMINAL_ARCHIVED_BLOCK_ERROR_PREFIX}%`
 
 const buildErrorSignal = (
   signalId: string,
@@ -63,7 +65,9 @@ export const getNotionMetricsOtdWritebackDeadLetterSignal = async (): Promise<Re
        WHERE written_to_notion_at IS NULL
          AND notion_writeback_last_error IS NOT NULL
          AND otd_data_status = 'valid'
-         AND computed_at < NOW() - INTERVAL '3 days'`
+         AND computed_at < NOW() - INTERVAL '3 days'
+         AND COALESCE(notion_writeback_last_error, '') NOT LIKE $1`,
+      [TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN]
     )
 
     const count = Number(rows[0]?.count ?? 0)
@@ -121,7 +125,9 @@ export const getNotionMetricsOtdWritebackLagSignal = async (): Promise<Reliabili
        WHERE written_to_notion_at IS NULL
          AND otd_data_status = 'valid'
          AND otd_bucket IS NOT NULL
-         AND computed_at < NOW() - INTERVAL '26 hours'`
+         AND computed_at < NOW() - INTERVAL '26 hours'
+         AND COALESCE(notion_writeback_last_error, '') NOT LIKE $1`,
+      [TERMINAL_NOTION_WRITEBACK_ERROR_PATTERN]
     )
 
     const count = Number(rows[0]?.count ?? 0)

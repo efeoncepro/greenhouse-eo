@@ -278,10 +278,10 @@ describe('TASK-921 — notion-due-date-change-capture', () => {
     expect(result).toContain('noop:unchanged')
   })
 
-  it('re-fetch error → throw + captureWithDomain', async () => {
+  it('re-fetch retryable error → throw sin captura Sentry directa', async () => {
     mocks.fetchPageDueDate.mockRejectedValue(new Error('429'))
 
     await expect(notionDueDateChangeCaptureProjection.refresh(scope, signal)).rejects.toThrow('429')
-    expect(mocks.captureWithDomain).toHaveBeenCalled()
+    expect(mocks.captureWithDomain).not.toHaveBeenCalled()
   })
 })

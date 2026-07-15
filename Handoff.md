@@ -1,3 +1,13 @@
+## Sesión 2026-07-15 — Sentry Notion/writeback + `/api/my/performance` hardening (Codex)
+
+> **Pedido:** revisar alertas Sentry productivas y corregir causa raíz de forma robusta, segura y escalable. Screenshots: `TimeoutError` en `POST /reactive/process-domain`, Notion API 400 "Can't edit block that is archived" y `permission denied for schema greenhouse_serving` en `GET /api/my/performance`.
+>
+> **Causa raíz:** los re-fetches Notion (`fetchPageStatus`, `fetchPageDueDate`, `fetchDemoPageStatus`) capturaban timeouts/429 en Sentry antes de que el outbox retry/dead-letter hiciera su trabajo; los writebacks RpA/FTR/OTD trataban bloques archivados como retryable y ruido Sentry; el reader `getPersonOperationalServing` ejecutaba `CREATE TABLE IF NOT EXISTS greenhouse_serving.person_operational_metrics` dentro de un GET runtime, lo que requiere permisos DDL que `greenhouse_runtime` no debe tener.
+>
+> **Fix en repo:** nuevo helper tipado `src/lib/space-notion/notion-errors.ts`; clientes Notion productivo/demo devuelven errores estructurados; proyecciones de captura solo reportan errores no retryable; writebacks RpA/FTR/demo/OTD persisten `[terminal:notion_archived_block] ...`, no reintentan ese caso y los signals de reliability lo excluyen de lag/dead-letter. `getPersonOperationalServing` deja de hacer DDL runtime y degrada al fallback `greenhouse_serving.ico_member_metrics`; `ensurePersonOperationalSchema` queda read-only para proyecciones. Nueva migración `migrations/20260715161000000_incident-person-operational-serving-runtime-ddl.sql` crea/asegura tabla + grants sin dar `CREATE` al runtime.
+>
+> **Verificación local:** focal vitest `10 passed / 158 tests`; `pnpm typecheck` PASS; `pnpm ops:lint --changed` PASS; `pnpm qa:gates --changed --agent codex` advisory sin blocker de código. Pendiente para cerrar producción/Sentry live: aplicar migración en la DB del entorno, redeploy app + ops-worker y confirmar que los issues Sentry no reabren. Untracked ajeno conservado: `docs/commercial/tenders/sky-blog-2026/SKY-Oferta-Blog-2026.pdf`.
+
 ## Sesión 2026-07-15 — `CoverFull` canonizada + SKY v6 (Codex)
 
 > **Aprobación del operador:** la portada centrada queda como dirección definitiva. Se amplía el wordmark Efeonce (650→840px), se fortalece la recipe AXIS `cover-hero` y se conserva la URL Bubble sin cambios. El primer vistazo mantiene solo Efeonce, marca cliente y tipo de propuesta.

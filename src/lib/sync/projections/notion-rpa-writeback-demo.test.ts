@@ -243,7 +243,7 @@ describe('TASK-913 Slice 2 — notion-rpa-writeback-demo canonical', () => {
   })
 
   describe('refresh — error handling + retry policy', () => {
-    it('marca snapshot failed + throw cuando PATCH Notion falla', async () => {
+    it('marca snapshot failed + throw sin captura Sentry directa cuando PATCH Notion falla con error retryable', async () => {
       mocks.runGreenhousePostgresQuery
         .mockResolvedValueOnce([snapshotRow]) // readSnapshotForWriteback
         .mockResolvedValueOnce([]) // markSnapshotFailed
@@ -263,15 +263,33 @@ describe('TASK-913 Slice 2 — notion-rpa-writeback-demo canonical', () => {
       const failedCallArgs = mocks.runGreenhousePostgresQuery.mock.calls[1]
 
       expect(failedCallArgs[0]).toContain('notion_writeback_last_error')
-      expect(mocks.captureWithDomain).toHaveBeenCalledWith(
-        expect.any(Error),
-        'integrations.notion',
-        expect.objectContaining({
-          level: 'error',
-          tags: expect.objectContaining({ stage: 'patch_notion' }),
-          extra: expect.objectContaining({ status: 429 })
-        })
-      )
+      expect(mocks.captureWithDomain).not.toHaveBeenCalled()
+    })
+
+    it('marca terminal archived block y no reintenta cuando Notion no permite editar el bloque', async () => {
+      mocks.runGreenhousePostgresQuery
+        .mockResolvedValueOnce([snapshotRow]) // readSnapshotForWriteback
+        .mockResolvedValueOnce([]) // markSnapshotFailed terminal
+
+      const notionErr = new Error(
+        "Notion API PATCH 400: Can't edit block that is archived. You must unarchive the block before editing."
+      ) as Error & { status?: number; code?: string }
+
+      notionErr.status = 400
+      notionErr.code = 'validation_error'
+      mocks.patchNotionDemoPage.mockRejectedValueOnce(notionErr)
+
+      await expect(
+        notionRpaWritebackDemoProjection.refresh(
+          { entityType: 'rpa_snapshot_demo', entityId: 'snap-uuid-001' },
+          validWritebackPayload
+        )
+      ).resolves.toBe('rpa_writeback_demo:snap-uuid-001:skipped:archived_notion_block')
+
+      const failedCallArgs = mocks.runGreenhousePostgresQuery.mock.calls[1]
+
+      expect(failedCallArgs[1][1]).toMatch(/^\[terminal:notion_archived_block\]/)
+      expect(mocks.captureWithDomain).not.toHaveBeenCalled()
     })
 
     it('throw cuando read snapshot falla', async () => {

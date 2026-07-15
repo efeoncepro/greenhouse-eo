@@ -3,6 +3,11 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { computeAttributableLatenessForTask } from '@/lib/sync/projections/notion-attributable-lateness-compute'
 import { patchNotionPage } from '@/lib/space-notion/notion-client'
+import {
+  formatTerminalNotionWritebackError,
+  isNotionArchivedBlockError,
+  isRetryableNotionError
+} from '@/lib/space-notion/notion-errors'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import {
@@ -65,6 +70,7 @@ export interface OtdWritebackBatchResult {
   written: number
   skippedUnchanged: number
   skippedNotValid: number
+  skippedTerminal: number
   failed: number
 }
 
@@ -192,6 +198,7 @@ export const runOtdWritebackBatch = async (): Promise<OtdWritebackBatchResult> =
     written: 0,
     skippedUnchanged: 0,
     skippedNotValid: 0,
+    skippedTerminal: 0,
     failed: 0
   }
 
@@ -254,13 +261,24 @@ return result
         result.written += 1
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err)
+        const isTerminalArchivedBlock = isNotionArchivedBlockError(err)
+        const persistedMessage = isTerminalArchivedBlock ? formatTerminalNotionWritebackError(err) : message
 
-        await markFailed(snapshotId, message).catch(() => undefined)
-        captureWithDomain(err, 'integrations.notion', {
-          level: 'error',
-          tags: { source: 'otd_writeback', stage: 'patch_notion' },
-          extra: { taskSourceId, workspaceId, bucket }
-        })
+        await markFailed(snapshotId, persistedMessage).catch(() => undefined)
+
+        if (isTerminalArchivedBlock) {
+          result.skippedTerminal += 1
+          continue
+        }
+
+        if (!isRetryableNotionError(err)) {
+          captureWithDomain(err, 'integrations.notion', {
+            level: 'error',
+            tags: { source: 'otd_writeback', stage: 'patch_notion' },
+            extra: { taskSourceId, workspaceId, bucket }
+          })
+        }
+
         result.failed += 1
       }
     } catch (err) {
