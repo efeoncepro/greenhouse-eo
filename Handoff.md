@@ -1,3 +1,13 @@
+## Sesión 2026-07-15 — Radiografía AEO documentada como educación + sales enablement (Codex)
+
+> **Pedido:** complementar en Greenhouse skills, documentación y manuales de uso para que la Radiografía AEO quede entendida como herramienta educativa y de habilitación comercial para servicios SEO/AEO.
+>
+> **Hecho:** nuevo manual comercial `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` con cuándo usarla, cuándo no, demo de 5 minutos, objeciones, follow-up, uso en Proposal Studio y límites de promesa. Docs funcionales/comerciales/Growth/Think conectan explícitamente la cadena **Grader mide → Radiografía demuestra → propuesta/deck convierte → servicio opera**.
+>
+> **Skills:** actualizadas `seo-aeo`, `seo-aeo-practice` (Codex+Claude) y `greenhouse-public-private-tenders` (Codex+Claude). Routers `AGENTS.md`/`CLAUDE.md` corrigen ownership: `seo-aeo` = oficio/schema/citabilidad; `seo-aeo-practice` = uso comercial/sales enablement.
+>
+> **Validación:** `pnpm docs:closure-check` PASS con warning no bloqueante `task_lifecycle_check` por cambios bajo `docs/tasks/**` en el worktree completo; `pnpm ops:lint --changed` PASS (task/epic/mini-task lint sin errores ni warnings); `git diff --check` PASS. No se tocó runtime `efeonce-think`.
+
 ## Sesión 2026-07-15 — TASK-1413 complete: Propuestas en el portal — lista + versiones + descarga (Claude)
 
 > **Pedido:** cerrar el par TASK-1412/1413 — la ventana operador del Proposal Studio en el portal.

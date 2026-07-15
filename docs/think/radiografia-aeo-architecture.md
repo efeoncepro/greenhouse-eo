@@ -8,6 +8,7 @@
 > **Task:** [`TASK-1410`](../tasks/complete/TASK-1410-aeo-article-xray.md)
 > **Repo del runtime:** `efeonce-think` (NO `greenhouse-eo`)
 > **Vive en:** `think.efeoncepro.com/muestras/<slug>-<token>`
+> **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
 
 ---
 

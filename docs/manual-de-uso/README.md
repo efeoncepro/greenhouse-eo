@@ -40,6 +40,7 @@ La diferencia con otras capas de documentacion:
 - [Pipeline comercial](comercial/pipeline-comercial.md) — como usar la lane dedicada de forecast comercial sin confundirla con revenue reconocido ni cierre financiero.
 - [Sample Sprints](comercial/sample-sprints.md) — como declarar, aprobar, registrar progreso y cerrar outcomes de pilotos/trials/POCs/discovery.
 - [Construir una licitación paso a paso](comercial/construir-una-licitacion.md) — runbook para armar una propuesta de licitación (pública/privada, RFP/RFQ) end-to-end: leer bases, admisibilidad, bid/no-bid, alcance, squad, precio, redacción, económica y presentación human-in-control.
+- [Usar la Radiografía AEO en venta y educación](comercial/usar-radiografia-aeo-en-venta.md) — manual comercial para usar la muestra como educación, demo en vivo, evidencia en licitaciones, follow-up del Grader y herramienta de sales enablement SEO/AEO.
 
 ### Growth
 

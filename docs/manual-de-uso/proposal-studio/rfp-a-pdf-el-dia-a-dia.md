@@ -136,6 +136,8 @@ kind rfp_source. Usa ingestProposalRfp. Actor: member julio-reyes.
 
 **La evidencia** es otra cosa: es **cada dato duro que la propuesta va a afirmar**, con su fuente. "El blog de SKY no aparece citado por ningún motor de IA" no es una opinión: es un número que salió del AI Visibility Grader, con fecha. Eso se registra.
 
+La **Radiografía AEO** también puede ser evidencia cuando el enlace viaja al comité: no mide el hueco, sino que demuestra la ejecución sobre un hueco concreto. Regístrala como `client_facing` sólo si la muestra está autorizada para ser vista por el comprador y conserva su URL tokenizada.
+
 ```text
 Registra esta evidencia en la propuesta [proposalId]:
 
@@ -154,7 +156,7 @@ Usa recordProposalEvidence.
 
 | Evidencia | `audience` | Por qué |
 |---|---|---|
-| La oferta técnica, el diagnóstico que le muestras al cliente, un caso citable | `client_facing` | Es lo que el comité va a leer |
+| La oferta técnica, el diagnóstico que le muestras al cliente, un caso citable, la Radiografía AEO autorizada | `client_facing` | Es lo que el comité va a leer o abrir |
 | **El squad blueprint** | **`internal`** | Lleva el **loaded cost por rol**: es tu estructura de costos |
 | **El scoring bid/no-bid, el margen, el walk-away** | **`internal`** | Es tu **piso de negociación** |
 | El diagnóstico técnico interno (la lente que justifica el scope) | **`internal`** | Al cliente va sólo la lente medida |
@@ -182,6 +184,8 @@ bid-construction-playbook para la propuesta [proposalId]:
 diagnóstico del activo real (corre el AI Visibility Grader), benchmark competitivo,
 squad, pricing sobre loaded cost real, oferta técnica y oferta económica.
 Registro formal (de usted), NO tuteo — es un documento que evalúa un comité.
+Si el servicio es SEO/AEO, evalúa si corresponde incluir la Radiografía AEO como
+muestra viva: Grader mide el hueco; Radiografía demuestra la ejecución.
 ```
 
 Al final de esta fase tienes la **oferta técnica** y la **oferta económica** escritas. El deck viene después: **el deck no es la propuesta, es su presentación**.

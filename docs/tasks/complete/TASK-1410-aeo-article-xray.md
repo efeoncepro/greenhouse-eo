@@ -566,7 +566,7 @@ La pieza nació dentro de una licitación y se estaba archivando como *"la muest
 
 **Consecuencia de diseño, no cosmética:** la pieza tiene que **sostenerse sola** — sin nuestra oferta al lado y sin que el lector sepa SEO. De ahí salen los dos hallazgos de abajo.
 
-**Y estaba invisible: CERO skills la conocían.** Registrada en `seo-aeo-practice` (dueña del oficio), `greenhouse-public-private-tenders` (consumer), `commercial-expert` (la vende) y el overlay de `astro` (donde vive el runtime), en **ambos namespaces**, + fila en el router de `CLAUDE.md` + doc funcional nueva (`docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`).
+**Y estaba invisible: CERO skills la conocían.** Registrada en `seo-aeo` (oficio/schema/citabilidad), `seo-aeo-practice` (uso comercial/sales enablement), `greenhouse-public-private-tenders` (consumer), `commercial-expert` (la vende) y el overlay de `astro` (donde vive el runtime), en **ambos namespaces**, + fila en el router de `CLAUDE.md` + doc funcional nueva (`docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`).
 
 ### 2. 🔴 El instrumento ATENUABA pero no ENFOCABA — 44 de 51 datos no se veían nunca
 

@@ -8,6 +8,16 @@
 
 Cierra el loop comercial del diagnóstico AEO: después de correr y **publicar** el análisis de un cliente o prospecto, el operador (Growth/Account) **envía el informe** al contacto y **abre un Lead en HubSpot** de forma trazable y gobernada. El objeto que se crea es un **Lead** (objeto `leads`, asociado a Contacto y/o Empresa) — **NUNCA un Negocio (Deal)**: el diagnóstico es pre-pitch (tope del embudo); el Deal es un momento posterior y crearlo acá ensuciaría el pipeline.
 
+## Siguiente activo: Radiografía AEO
+
+Si el contacto responde o ya existe una reunión de venta, el siguiente activo no es otro score: es la **Radiografía AEO**. Úsala cuando el informe haya mostrado un hueco y el comprador necesite ver cómo se trabaja.
+
+- El informe del Grader mide la brecha.
+- La Radiografía muestra un artículo real, su capa de máquina y sus piezas derivadas.
+- La propuesta convierte esa demostración en alcance y precio.
+
+Manual comercial: [Usar la Radiografía AEO en venta y educación](../comercial/usar-radiografia-aeo-en-venta.md).
+
 ## Antes de empezar
 
 1. **Capability:** tu usuario debe tener `growth.ai_visibility.lead.open` (set operador: `efeonce_account`, `efeonce_admin`, `efeonce_operations`, internal, `ai_tooling_admin`). Es el mismo set que corre el motor sobre cualquier org.

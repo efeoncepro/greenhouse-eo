@@ -60,6 +60,12 @@ Guía operativa para **armar una propuesta de licitación** (pública o privada 
 - Si se corrió el **AI Visibility Grader** (paso 5), pídele al agente que lo presente en la propuesta con tres capas: **números concretos** (¿la IA conoce la marca?, ¿el blog del cliente aparece como fuente?, ¿quién lidera la categoría?), **el enlace vivo** al informe del cliente, y **la escalera Be X** (Ser encontrada / legible / correcta / accionable / intrínseca) con los **valores reales** del cliente y qué significa cada uno.
 - **Importante para el agente:** el informe completo (con tono y categoría) lo genera el **worker** al encolar el run; **no** se debe puntuar ni publicar el informe "a mano" (sale sin tono ni categoría). Los valores de la escalera se toman del informe publicado, no se inventan.
 
+### 8-ter. Usar la Radiografía AEO como muestra de trabajo
+- Si la licitación necesita probar ejecución —no solo diagnóstico— suma la **Radiografía AEO** (`think.efeoncepro.com/muestras/<slug>-<token>`). El Grader mide el hueco; la Radiografía muestra cómo se tapa con un artículo real, su capa de máquina y sus piezas derivadas.
+- En la propuesta, úsala como **evidencia `client_facing`** si el enlace puede viajar al comité. No metas el diagnóstico interno, el razonamiento de margen ni el squad blueprint como evidencia externa.
+- En el deck, preséntala como showcase: "no describimos el artículo; lo escribimos". Mantén la URL viva para que el comité pueda revisarla solo.
+- Manual comercial: [Usar la Radiografía AEO en venta y educación](usar-radiografia-aeo-en-venta.md).
+
 ### 9. Armar la económica y el paquete
 - El agente crea la **planilla económica** (en el formato exigido; si no hay, diseña una limpia) con el precio confirmado.
 - Se re-corre la **matriz de cumplimiento** (todos los obligatorios ✅) y se **exporta a PDF** la técnica + la económica.

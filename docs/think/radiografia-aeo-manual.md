@@ -5,6 +5,7 @@
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
 > **Última actualización:** 2026-07-14
 > **Documentación técnica:** [Radiografía AEO — Arquitectura](radiografia-aeo-architecture.md)
+> **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
 > **Repo del runtime:** `efeonce-think` (**NO** `greenhouse-eo`)
 
 ---

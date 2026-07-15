@@ -186,6 +186,8 @@ En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es
 
 **Live:** `think.efeoncepro.com/muestras/<slug>-<token>` · runtime en el repo **`efeonce-think`** (NO `greenhouse-eo`) · **el cliente es un payload JSON, cero código.**
 
+**Cadena comercial:** **Grader mide → Radiografía demuestra → propuesta/deck convierte → servicio opera.** Si el prospecto todavía no tiene diagnóstico, primero Grader. Si ya vio un score y pregunta *"¿cómo se arregla?"*, entra la Radiografía. En licitaciones y QBR se registra como evidencia `client_facing` sólo si el enlace tokenizado puede viajar al comité.
+
 **Dos trabajos — no los confundas:**
 
 | | Trabajo | Cuándo |
@@ -207,7 +209,7 @@ En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es
 
 🔴 **NUNCA** prometer el rich snippet de FAQ de Google (restringido desde 2023 a gobierno/salud). 🔴 **NUNCA** dejar que la pieza cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola**. 🔴 **Gate humano:** el operador elige el ángulo del artículo.
 
-**Cargar al tocarla:** `docs/think/radiografia-aeo-architecture.md` (12 invariantes + gate de 46 asserts) · `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente) · `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` (encuadre comercial).
+**Cargar al tocarla:** `docs/think/radiografia-aeo-architecture.md` (invariantes vigentes + gate de 46 asserts) · `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente) · `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` (encuadre funcional) · `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` (playbook comercial).
 
 ---
 

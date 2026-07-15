@@ -20,13 +20,16 @@ herramientas, reportes y superficies de lectura ejecutiva.
 
 | Herramienta | Qué es | Ruta |
 |---|---|---|
-| **AI Visibility Grader** | Informe público de visibilidad en motores de respuesta, por token. Greenhouse calcula, Think presenta. | `/brand-visibility` · `/brand-visibility/r/<token>` |
-| **Radiografía AEO** | **Muestra de trabajo para propuestas comerciales.** Recorre en 4 pantallas un artículo real y expone su capa técnica + la evidencia de por qué existe. El **cliente es un payload**, no código. Primer caso: licitación SKY. | `/muestras/<slug>-<token>` |
+| **AI Visibility Grader** | Diagnóstico público de visibilidad en motores de respuesta, por token. Greenhouse calcula, Think presenta. Mide el hueco: presencia, citación, competidores, readiness y próximos pasos. | `/brand-visibility` · `/brand-visibility/r/<token>` |
+| **Radiografía AEO** | Herramienta de educación y sales enablement SEO/AEO. Recorre en 4 pantallas un artículo real, expone su capa técnica y demuestra cómo un hueco medido se convierte en contenido visible, citable y distribuible. El **cliente es un payload**, no código. | `/muestras/<slug>-<token>` |
 
 ## Principios
 
 - **Greenhouse calcula; Think presenta.** Los modelos, contratos, formularios,
   status, tokens e informes vienen de Greenhouse.
+- **Grader diagnostica; Radiografía demuestra.** El Grader responde "qué hueco
+  existe"; la Radiografía responde "cómo se tapa con trabajo visible". No son
+  sustitutos ni dos lead magnets.
 - **Think puede tener lenguaje visual propio.** Las landing pages publicas pueden
   usar ritmo editorial, hero inmersivo, motion y assets de marca que no pertenecen
   al portal operacional Vuexy.

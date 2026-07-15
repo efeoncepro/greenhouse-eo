@@ -59,6 +59,19 @@ El diagnóstico del grader (Fase 4) es un diferencial brutal, pero **cómo se pr
 
 **Regla de operación (Fase 4, recordatorio):** el informe completo (con tono + categoría percibida) SOLO sale del **camino del worker** (encolar run async → el worker ejecuta, puntúa CON extracción de prosa y **auto-publica** el snapshot). **NUNCA** `POST /score` ni `report/publish` manual desde local/Vercel: la extracción de prosa solo corre en el worker, y un score manual congela un informe incompleto (tono/categoría en blanco) — caso real SKY 2026-07-11.
 
+### Fase 4-ter — Radiografía AEO como demostración de ejecución
+
+Cuando la propuesta necesita probar que Efeonce no sólo diagnostica, sino que **ejecuta**, usa la **Radiografía AEO** (`think.efeoncepro.com/muestras/<slug>-<token>`). El Grader mide el hueco; la Radiografía muestra un artículo real, su capa de máquina y sus piezas derivadas.
+
+Uso correcto:
+
+1. Elige un hueco medido o defendible (Semrush, SERP, Grader, benchmark).
+2. Presenta la muestra como **método visible**, no como promesa de ranking.
+3. En Proposal Studio, registra el enlace como evidencia `client_facing` sólo si puede viajar al comité.
+4. En el deck, úsala como showcase vivo: URL tokenizada + contexto de qué demuestra.
+
+**NUNCA** la uses como lead magnet, reemplazo del Grader, promesa de rich snippet o garantía de cita en ChatGPT. Manual comercial: `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md`.
+
 ### Fase 5 — Diseño del squad (Managed Squad)
 - Diseña el **equipo que se asigna al cliente**: roles, seniority, % dedicación, jerarquía, RACI y sinergias. Un servicio licitado = **Managed Squad** (Efeonce opera), no staff-aug.
 - De cara al cliente: **rol + seniority** (sin nombres, salvo consentimiento). Internamente: mapeo a roles de nómina para trazar el loaded cost.
@@ -99,6 +112,7 @@ entregarle a la contraparte munición contra ti.
 | Oferta técnica · económica · deck · anexos | `client_facing` | Es lo que evalúa el comité |
 | **Squad blueprint** | **`internal`** | Lleva el **loaded cost** por rol: es tu estructura de costos |
 | **Diagnóstico interno** (lente técnica del Be X) | **`internal`** | Al cliente va **sólo la lente medida** (Fase 4-bis) |
+| **Radiografía AEO autorizada** | `client_facing` | Es una muestra viva que el comité puede abrir; conservar URL tokenizada |
 | Scoring bid/no-bid, walk-away, margen | **`internal`** | Revela tu piso de negociación |
 
 **NUNCA** adjuntes al paquete un archivo que no hayas clasificado explícitamente. Cuando exista el
@@ -201,11 +215,12 @@ Si el método cambia (nueva fase, nueva skill en la orquesta, nueva regla), actu
 
 ## Caso de referencia (primera destilación)
 
-Primer caso end-to-end que produjo este playbook: **SKY Airline — Producción de Contenido Blog** (Wherex, jul-2026; cliente existente de Efeonce en otra área). Ejercitó las 10 fases + la Fase 4-bis:
+Primer caso end-to-end que produjo este playbook: **SKY Airline — Producción de Contenido Blog** (Wherex, jul-2026; cliente existente de Efeonce en otra área). Ejercitó las 10 fases + la Fase 4-bis + la Fase 4-ter:
 
 - **Bases → admisibilidad → fit → diferenciadores** (Berel como caso SEO+AEO por Wherex, portal Greenhouse, Surround Discovery, WordPress + partner de Automattic).
 - **Alcance (Fase 4):** `content-marketing-studio` + `seo-aeo` (cadencia pillar/cluster); **análisis del activo real** con Semrush (~13,5K keywords, ~40K visitas/mes, near-miss como Antofagasta 110K en pos 12) + **AI Visibility Grader real** (2 runs de 5 motores) + **benchmark de competencia** (JetSMART rival directo mismos destinos; LATAM lidera la conversación en IA; nadie ganó la carrera AEO).
 - **Fase 4-bis (presentación del diagnóstico):** bullets duros (claridad de marca 100, **blog = 0 citas en 35 respuestas**, ownership 20 con LATAM 16 / JetSMART 9) + **informe público en vivo** incrustado + **escalera Be X con valores reales** (Ser encontrada 40 · Ser legible 70 · Ser correcta 37 · Ser accionable 8 · Ser intrínseca 76).
+- **Fase 4-ter (demostración):** Radiografía AEO viva como muestra de ejecución: artículo real, capa de máquina y atomización derivados de un hueco medido.
 - **Squad (`client-squad-design`, ≈2,2 FTE) → pricing sobre loaded cost real de nómina → redacción + pase `copywriting` → económica → export.**
 
 **Lecciones que este caso grabó en el método (aplican a toda licitación futura):**

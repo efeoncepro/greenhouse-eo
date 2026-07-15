@@ -130,6 +130,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | **Framework + metodología propietaria Efeonce** (los 5 niveles para existir en un internet de agentes: Be Found · Readable · Correct · Actionable · Intrinsic; narrativa pública + modelo de 2 ejes del grader) | `efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md` ⭐ |
 | Caso Efeonce: WordPress/Kinsta + AI Content Factory + HubSpot + ICP Globe | `efeonce/EFEONCE_OVERLAY.md` |
 | **Producto Greenhouse que operacionaliza esta skill** (AI Visibility Grader / dominio `growth`, TASK-1226/1227) | `efeonce/AI_VISIBILITY_GRADER.md` |
+| **Radiografía AEO** (Think): muestra viva que educa y demuestra ejecución SEO/AEO sobre un hueco medido; no reemplaza al Grader | `docs/think/radiografia-aeo-architecture.md` + manual comercial `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` |
 | **Web agéntica**: WebMCP, exponer tools a agentes, agentic-web *readiness* (¿los agentes pueden *usar* el sitio, no solo *citarlo*?), Lighthouse API programática + audit `registered-webmcp-tools` | **skill `webmcp`** (cross-skill) |
 | Artefactos listos para usar | `templates/` (jsonld, llms-txt, briefs, checklists) |
 
@@ -177,6 +178,10 @@ Effort     = persona-semanas (dev + contenido + PR)
 - **(Overlay Efeonce)** — WordPress REST/WP-CLI vía la skill
   `efeonce-public-site-wordpress`; BigQuery para export GSC; HubSpot MCP para
   atribución a leads. No dupliques esa lógica: enlaza.
+- **Radiografía AEO (Think)** — si el trabajo pasa de diagnóstico a demostración,
+  recuerda la cadena: **Grader mide el hueco; Radiografía muestra el método**.
+  Runtime en `efeonce-think`, documentación/governance en `greenhouse-eo`.
+  Nunca la trates como lead magnet ni como promesa de ranking/cita.
 
 **Regla de honestidad de datos:** si no puedes medir algo (no hay GSC, no hay
 herramienta SoV), dilo explícito y marca el dato como *estimado*. Nunca presentes
