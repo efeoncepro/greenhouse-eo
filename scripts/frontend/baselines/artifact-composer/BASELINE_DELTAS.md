@@ -1,5 +1,27 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-07-15 — Fotos del squad: los avatares CANÓNICOS de Entra reemplazan a los recortes
+
+**Feedback del operador (deck SKY, lámina equipo):** los recortes sobre fondo claro no se veían bien;
+el equipo YA tiene un set uniforme de avatares (Entra/Greenhouse: hoodie azul Efeonce sobre degradado
+violeta→naranja vibrante; Julio con su propio degradado azul coherente). Se usan TAL CUAL —
+cuadrados, full-bleed, el degradado viene EN la foto (raster), no en CSS (gradient-inventory intacto).
+
+**Assets (allowlist `squad-person` sin cambios de claves):** `squad-julio/maria-fernanda/daniela/
+melkin/andres.png` reemplazados por los avatares canónicos servidos por `/api/media/users/*/avatar`
+(source of truth de la foto de cada persona — la misma que ve todo el portal).
+
+**Template `team-gallery-full.html`:** `object-position: center bottom → center` (avatares centrados,
+no recortes anclados al piso) + comentario actualizado (el lavado ice queda como fallback para
+transparencias). Cero cambios de color/gradiente CSS.
+
+**Frames re-promovidos (2, exactamente los esperados):**
+
+- `templates/TeamGalleryFull.png` — probe con fotos nuevas
+- `sky/18-equipo.png` — lámina real del deck SKY
+
+---
+
 ## 2026-07-14 (2ª promoción) — Feedback del operador: deck SKY 22 → 23 + agenda funcional + showcases vivos
 
 **Motor:** los `layoutHooks` del catálogo ganan acceso opcional al `deckPlan` completo
@@ -102,7 +124,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: bb0971593ddfb48a5469d7361c141761ed63c272408ca0fc5c65fba4d84514ea -->
+<!-- manifest-digest: 7e2acf7a814bbc57dbe8ab8c5203fddb0abadc93566962aef039042be2c5d6d2 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.
