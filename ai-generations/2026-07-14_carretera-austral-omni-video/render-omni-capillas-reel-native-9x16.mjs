@@ -123,8 +123,8 @@ async function main() {
 
   if (mode === 'plan') {
     process.stdout.write(`${JSON.stringify({ ...plan, prompt }, null, 2)}\n`)
-    
-return
+
+    return
   }
 
   verifyAdc()
