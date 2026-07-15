@@ -1,0 +1,104 @@
+{
+  "ok": true,
+  "runId": "2026-07-14_carretera-austral-omni-video",
+  "take": "capillas-kayak-omni-v2-master",
+  "mode": "execute",
+  "provider": "Google Cloud / Vertex AI / Gemini Omni generateContent",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "task": "image_to_video continuity fix: no glasses / no eyewear",
+  "firstFramePath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/keyframes/capillas-kayak-no-glasses-first-frame-16x9.png",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-omni-v2-master.mp4",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/prompts/omni-capillas-kayak-no-glasses.md",
+  "constraints": [
+    "No glasses or sunglasses on either traveler at any moment.",
+    "Illustrative generated asset, not documentary SKY footage.",
+    "No logos, text overlays, UI, SKY uniforms, or recognizable real people."
+  ],
+  "startedAt": "2026-07-14T19:47:04.984Z",
+  "completedAt": "2026-07-14T19:47:46.576Z",
+  "response": {
+    "responseId": "OZJWauWQMa_IobIPmaeb0QE",
+    "modelVersion": "gemini-omni-flash-preview",
+    "usageMetadata": {
+      "promptTokenCount": 1477,
+      "candidatesTokenCount": 57920,
+      "totalTokenCount": 59643,
+      "trafficType": "ON_DEMAND",
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 377
+        },
+        {
+          "modality": "IMAGE",
+          "tokenCount": 1100
+        }
+      ],
+      "candidatesTokensDetails": [
+        {
+          "modality": "VIDEO",
+          "tokenCount": 57920
+        }
+      ],
+      "thoughtsTokenCount": 246
+    },
+    "promptFeedback": null,
+    "candidates": [
+      {
+        "finishReason": "STOP",
+        "finishMessage": null,
+        "safetyRatings": null,
+        "parts": [
+          {
+            "text": "**Crafting the Cinematic Sequence**\n\nI'll start with the exact image, focusing on the kayak and travelers. I'll animate the water, add wind effects, and include subtle human movements. A slow camera push-in, with natural parallax, will build towards a final hero frame. I'll add layers of audio, including water and wind, to the scene. The entire sequence will be ten seconds long with a 16:9 aspect ratio.\n\n\n",
+            "mimeType": null,
+            "hasData": false
+          },
+          {
+            "text": null,
+            "mimeType": "video/mp4",
+            "hasData": true
+          }
+        ]
+      }
+    ]
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-omni-v2-master.mp4",
+    "bytes": 2486311,
+    "mimeType": "video/mp4",
+    "probe": {
+      "ok": true,
+      "data": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 720,
+            "r_frame_rate": "24/1",
+            "avg_frame_rate": "24/1"
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "duration": "10.005000",
+          "size": "2486311",
+          "bit_rate": "1988054"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "ok": true,
+  "runId": "2026-07-14_carretera-austral-omni-video",
+  "take": "capillas-kayak-omni-master",
+  "mode": "execute",
+  "provider": "Google Cloud / Vertex AI / Gemini Omni generateContent",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-flash-preview",
+  "endpoint": "https://aiplatform.googleapis.com/v1/projects/efeonce-group/locations/global/publishers/google/models/gemini-omni-flash-preview:generateContent",
+  "task": "image_to_video using a generated first frame anchored to the article image",
+  "firstFramePath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/keyframes/capillas-kayak-first-frame-16x9.png",
+  "outputPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-omni-master.mp4",
+  "promptPath": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/prompts/omni-capillas-kayak.md",
+  "constraints": [
+    "Illustrative generated asset, not documentary SKY footage.",
+    "No logos, text overlays, UI, SKY uniforms, or recognizable real people.",
+    "Native audio is reviewed as a candidate before publication."
+  ],
+  "startedAt": "2026-07-14T19:27:39.554Z",
+  "completedAt": "2026-07-14T19:28:25.383Z",
+  "response": {
+    "responseId": "rI1Waty7G6_IobIPmaeb0QE",
+    "modelVersion": "gemini-omni-flash-preview",
+    "usageMetadata": {
+      "promptTokenCount": 1399,
+      "candidatesTokenCount": 57920,
+      "totalTokenCount": 59815,
+      "trafficType": "ON_DEMAND",
+      "promptTokensDetails": [
+        {
+          "modality": "IMAGE",
+          "tokenCount": 1100
+        },
+        {
+          "modality": "TEXT",
+          "tokenCount": 299
+        }
+      ],
+      "candidatesTokensDetails": [
+        {
+          "modality": "VIDEO",
+          "tokenCount": 57920
+        }
+      ],
+      "thoughtsTokenCount": 496
+    },
+    "promptFeedback": null,
+    "candidates": [
+      {
+        "finishReason": "STOP",
+        "finishMessage": null,
+        "safetyRatings": null,
+        "parts": [
+          {
+            "text": "**Detailing Cinematic Sequence Creation**\n\nI will generate a 10-second video from the image. I will start by matching the scene precisely, adding subtle movements like water shifting to create a living feel. A 35mm push-in with a rightward drift will highlight character actions, ensuring natural reactions like fabric movement. I'll describe the parallax effect, slowing the camera to focus on textures and colors. The final frame will be a still, serene shot. The audio will feature gentle environmental sounds. The video's format will be 16:9.\n\n\n",
+            "mimeType": null,
+            "hasData": false
+          },
+          {
+            "text": null,
+            "mimeType": "video/mp4",
+            "hasData": true
+          }
+        ]
+      }
+    ]
+  },
+  "output": {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-omni-master.mp4",
+    "bytes": 2591754,
+    "mimeType": "video/mp4",
+    "probe": {
+      "ok": true,
+      "data": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 1280,
+            "height": 720,
+            "r_frame_rate": "24/1",
+            "avg_frame_rate": "24/1"
+          },
+          {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "duration": "10.005000",
+          "size": "2591754",
+          "bit_rate": "2072367"
+        }
+      }
+    }
+  }
+}

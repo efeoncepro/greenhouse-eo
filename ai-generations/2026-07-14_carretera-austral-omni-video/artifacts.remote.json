@@ -1,0 +1,467 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-07-15T00:11:30.805Z",
+  "run": "ai-generations/2026-07-14_carretera-austral-omni-video",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-14_carretera-austral-omni-video",
+  "totalBytes": 54179463,
+  "fileCount": 76,
+  "files": [
+    {
+      "path": "keyframes/capillas-kayak-first-frame-16x9.png",
+      "sizeBytes": 4293186,
+      "sha256": "32a84ac9fbab490730a0bb36c0ee4750343f5eeeac2acf7cff101adfa9651e6c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/keyframes/capillas-kayak-first-frame-16x9.png"
+    },
+    {
+      "path": "keyframes/capillas-kayak-gpt-image-2.png",
+      "sizeBytes": 4293186,
+      "sha256": "32a84ac9fbab490730a0bb36c0ee4750343f5eeeac2acf7cff101adfa9651e6c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/keyframes/capillas-kayak-gpt-image-2.png"
+    },
+    {
+      "path": "keyframes/capillas-kayak-no-glasses-first-frame-16x9.png",
+      "sizeBytes": 4515208,
+      "sha256": "855ce27128c7c4d9f358c0b752a43a7c20b345395c8f1c26e82aa58f7a3409b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/keyframes/capillas-kayak-no-glasses-first-frame-16x9.png"
+    },
+    {
+      "path": "keyframes/capillas-kayak-no-glasses-from-article-gpt-image-2.png",
+      "sizeBytes": 4515208,
+      "sha256": "855ce27128c7c4d9f358c0b752a43a7c20b345395c8f1c26e82aa58f7a3409b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/keyframes/capillas-kayak-no-glasses-from-article-gpt-image-2.png"
+    },
+    {
+      "path": "keyframes/capillas-kayak-no-glasses-gpt-image-2.png",
+      "sizeBytes": 4227086,
+      "sha256": "7b1fb2afa6a7833ab7e287e2d84674b3ddd45bb0a636d1969af286565da56bdf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/keyframes/capillas-kayak-no-glasses-gpt-image-2.png"
+    },
+    {
+      "path": "masters/carretera-austral-capillas-kayak-omni-master.mp4",
+      "sizeBytes": 2591754,
+      "sha256": "254544c12359818961a40c5bade2ea36969f37ae429ae79299e1dd27882c9108",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-omni-master.mp4"
+    },
+    {
+      "path": "masters/carretera-austral-capillas-kayak-omni-v2-master.mp4",
+      "sizeBytes": 2486311,
+      "sha256": "65dfe2338b8eb2f8a81a8146689e09040c8b7e81f0a93a347856aeabf412a706",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-omni-v2-master.mp4"
+    },
+    {
+      "path": "masters/carretera-austral-capillas-kayak-reel-9x16-master.mp4",
+      "sizeBytes": 3148927,
+      "sha256": "b69d8b386ab0abc36b86d1eccbf1899f1633fe9c0fd23784732867fec0c4737f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-reel-9x16-master.mp4"
+    },
+    {
+      "path": "masters/carretera-austral-capillas-kayak-reel-9x16-poster.jpg",
+      "sizeBytes": 44112,
+      "sha256": "53e41d43f805cdf9a59c17055a016227de4060d5aea3e7cb052eefc9133bc39a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-reel-9x16-poster.jpg"
+    },
+    {
+      "path": "masters/carretera-austral-capillas-kayak-reel-omni-native-9x16-master.mp4",
+      "sizeBytes": 2630340,
+      "sha256": "d86816f3de50db59ed6a78182769e2ed11b4ff79cde867f5b6b1c14fd2aa8ac0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-reel-omni-native-9x16-master.mp4"
+    },
+    {
+      "path": "masters/carretera-austral-capillas-kayak-reel-omni-native-9x16-v2-master.mp4",
+      "sizeBytes": 2401852,
+      "sha256": "316d0094f18bf99a723e25e4dfcf99911ad27b109efb167cc322b27f246e16f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-reel-omni-native-9x16-v2-master.mp4"
+    },
+    {
+      "path": "masters/carretera-austral-capillas-kayak-reel-omni-native-9x16-v2-poster.jpg",
+      "sizeBytes": 78524,
+      "sha256": "33f9aa7ce5bd1c9518d98c403c7fa25b4c619cacf39fd471db9e02b3437b0be4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/masters/carretera-austral-capillas-kayak-reel-omni-native-9x16-v2-poster.jpg"
+    },
+    {
+      "path": "portrait-refs/capillas-kayak-native-reel-ref-x610.png",
+      "sizeBytes": 1531609,
+      "sha256": "d683474014823c274462df18c4fcac420b2ebf3b425fff417c661fd0f25dae94",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/portrait-refs/capillas-kayak-native-reel-ref-x610.png"
+    },
+    {
+      "path": "portrait-refs/capillas-kayak-native-reel-ref-x700.png",
+      "sizeBytes": 1548874,
+      "sha256": "59bc8cd3fe5bb69a30ff3a3864f6ec55b18f72233c58a7e0c304f49f03a2836e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/portrait-refs/capillas-kayak-native-reel-ref-x700.png"
+    },
+    {
+      "path": "portrait-refs/capillas-kayak-native-reel-ref-x780.png",
+      "sizeBytes": 1569038,
+      "sha256": "24d35108efbfccbcffe80fdcde409ce4a7695632d5e3f8320cdbc0c9e667faa2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/portrait-refs/capillas-kayak-native-reel-ref-x780.png"
+    },
+    {
+      "path": "portrait-refs/capillas-kayak-native-reel-ref-x860.png",
+      "sizeBytes": 1597652,
+      "sha256": "95fd51ece8cfbc3b07eef69a5705ac76b1dfc1c167d7748f502a7290241584a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/portrait-refs/capillas-kayak-native-reel-ref-x860.png"
+    },
+    {
+      "path": "refs/capillas-de-marmol-article-reference.jpg",
+      "sizeBytes": 1668461,
+      "sha256": "fd2ff5c4bedc3a40f5c8776e93de43b59fe9eb2968a32b2735bc3c3ce901451c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/refs/capillas-de-marmol-article-reference.jpg"
+    },
+    {
+      "path": "review/contact-sheet-native-reel-9x16-v2.jpg",
+      "sizeBytes": 81497,
+      "sha256": "ae4b1ad0b8457bf27497af40197254412bc6f39c731d63870f7a8c454bef7314",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/contact-sheet-native-reel-9x16-v2.jpg"
+    },
+    {
+      "path": "review/contact-sheet-native-reel-9x16.jpg",
+      "sizeBytes": 78922,
+      "sha256": "e389aa77754c77709207f2336cc402121fbec7ae5fbf31a7b5ace87cc14ae78b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/contact-sheet-native-reel-9x16.jpg"
+    },
+    {
+      "path": "review/contact-sheet-v2.jpg",
+      "sizeBytes": 151246,
+      "sha256": "5c4291f4d9419de17a5e2a9174d60dc8a2846209cbd7ae4e12e4ae216ed2818e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/contact-sheet-v2.jpg"
+    },
+    {
+      "path": "review/contact-sheet.jpg",
+      "sizeBytes": 156855,
+      "sha256": "d00531c81578da98eb757c9956f6346850aaa26f2086ce32f767afdfd0304bcb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/contact-sheet.jpg"
+    },
+    {
+      "path": "review/frames/frame-01.jpg",
+      "sizeBytes": 39854,
+      "sha256": "c5af94595a55582a789876690b7938c401f7b84b1583b34da440ebc148dcc822",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-01.jpg"
+    },
+    {
+      "path": "review/frames/frame-02.jpg",
+      "sizeBytes": 47999,
+      "sha256": "2310de8e693e8550611fcfdc186822c83ca2778960dcc93325e9824b688dc5bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-02.jpg"
+    },
+    {
+      "path": "review/frames/frame-03.jpg",
+      "sizeBytes": 52328,
+      "sha256": "5a18cfe158d29d065920c77df89dc132651e35a86e23576e7a0c8844c4d00453",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-03.jpg"
+    },
+    {
+      "path": "review/frames/frame-04.jpg",
+      "sizeBytes": 64071,
+      "sha256": "c7ca647c0bf721b721dd72d8934972f56627fa64602fa07b3c65367103472f8a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-04.jpg"
+    },
+    {
+      "path": "review/frames/frame-05.jpg",
+      "sizeBytes": 65287,
+      "sha256": "8ee8a2f68f8b28aa962f32626231592faa0a3a9f0ccfbf6c6704f777c0adcac3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-05.jpg"
+    },
+    {
+      "path": "review/frames/frame-06.jpg",
+      "sizeBytes": 64745,
+      "sha256": "81111b0b03f5f6bd4700552ff8453e9b94baab05b91e3c9b323b6b5bc94a6905",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-06.jpg"
+    },
+    {
+      "path": "review/frames/frame-07.jpg",
+      "sizeBytes": 68235,
+      "sha256": "d0b6ece6ec7eb9bcf7dbd27dd92cd67309db33b17eaccc6a48660c1009c78c06",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-07.jpg"
+    },
+    {
+      "path": "review/frames/frame-08.jpg",
+      "sizeBytes": 53675,
+      "sha256": "8262c9e881a2d23b8c93a0a38e0f66679de8df7f8ad329e7f252b04d66a5159b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-08.jpg"
+    },
+    {
+      "path": "review/frames/frame-09.jpg",
+      "sizeBytes": 42770,
+      "sha256": "da724762728670cfc5635fdc9bf1469fea43a9f18bc2b7333e6374ea63725696",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-09.jpg"
+    },
+    {
+      "path": "review/frames/frame-10.jpg",
+      "sizeBytes": 37264,
+      "sha256": "1a01afb4fa7019c292397b2bd3734323a4ac82d277f5d68a9634d476f1c206bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/frames/frame-10.jpg"
+    },
+    {
+      "path": "review/glasses-00.jpg",
+      "sizeBytes": 108133,
+      "sha256": "bc3d32237b926d8a2168ed644962aa64dd22c3c0e461d5d8057cb05cf96db1f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/glasses-00.jpg"
+    },
+    {
+      "path": "review/glasses-04.jpg",
+      "sizeBytes": 72131,
+      "sha256": "17277ef7ce079cb1953b840add050c5d76f442fadeec14dfc258aa3399e948d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/glasses-04.jpg"
+    },
+    {
+      "path": "review/glasses-05.jpg",
+      "sizeBytes": 71112,
+      "sha256": "d28205177585ad4348d40aa8a0baad49fa1a27d122e54c6ec83df2d7bbbb37c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/glasses-05.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-01.jpg",
+      "sizeBytes": 93437,
+      "sha256": "7657bffe5a2e964c7237ce34630c20a46469b84d6dd4328458b68e4234fd68a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-01.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-02.jpg",
+      "sizeBytes": 100897,
+      "sha256": "d9016b2b88f9b38ba5c14694462b27efaac70a08d208e95e0b51b8d35e3e5c35",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-02.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-03.jpg",
+      "sizeBytes": 126346,
+      "sha256": "bd80eda31393d2ad79c6e862bc0ec5cc734a68989ad935fae0f2d2de08b16df3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-03.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-04.jpg",
+      "sizeBytes": 158353,
+      "sha256": "3f2449ed7e5ee03ec4689510af45a28a9021f57f1e96c21174474e21f0b0e88e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-04.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-05.jpg",
+      "sizeBytes": 110774,
+      "sha256": "fe34e5efbc824a034d8d9ce397b49367fc086b5fc2ae2988412b06ced20bd63e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-05.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-06.jpg",
+      "sizeBytes": 76805,
+      "sha256": "23f9e0104c356cde4a1f8be3a7839d72f1bf2a37d9375401d60fb3c85f9d5db1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-06.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-07.jpg",
+      "sizeBytes": 57846,
+      "sha256": "f0b6e483db80c14c6137411f2fd3fafdcf7f8060667d23c4024ecb50ccb062d1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-07.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-08.jpg",
+      "sizeBytes": 57655,
+      "sha256": "f3467ac9f3fda248b6470960214887c24c807ba04ce8fb0a15297fdc7651d38a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-08.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-09.jpg",
+      "sizeBytes": 50071,
+      "sha256": "746beabbbe038ec0061bb6abfd6c5dc07a6e1e88cc9fd710ef0138a2fefb7836",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-09.jpg"
+    },
+    {
+      "path": "review/native-reel-frame-10.jpg",
+      "sizeBytes": 42059,
+      "sha256": "3592646f1a6e45428c930b820353fd91d8dfae0fc3228f03b36060a98c05a900",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-frame-10.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-01.jpg",
+      "sizeBytes": 91646,
+      "sha256": "51596865ee2f4b5095edac1299ded550e32534f801de45429350cc63924b48c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-01.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-02.jpg",
+      "sizeBytes": 109744,
+      "sha256": "878ce36d0b8a7985c3c67dac98073e243b9f4f512e58d8a95bed28233605ef41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-02.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-03.jpg",
+      "sizeBytes": 129164,
+      "sha256": "4a9cb3f3f329e6ca85a37376685b999b1ce770da439c4377bb2fcbfed9c99ec8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-03.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-04-logo-crop.jpg",
+      "sizeBytes": 14501,
+      "sha256": "50b608ad40b3eb7113d1715efb4cde2be90c597f958a0cdea4a22591776f6384",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-04-logo-crop.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-04.jpg",
+      "sizeBytes": 159338,
+      "sha256": "3aee68e337bf129ee7b251351439f93fb37b26e1d50fe9a2c307bfdbd9ba1a6f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-04.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-05.jpg",
+      "sizeBytes": 126932,
+      "sha256": "f7ad1d53195c648d68eb0ce8cd1826d989b7dca127b33888806f514135fbda1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-05.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-06.jpg",
+      "sizeBytes": 93175,
+      "sha256": "32c647b408d5944d178826f5176cd9aa58b3440b378d475780e1a849e741241c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-06.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-07.jpg",
+      "sizeBytes": 66242,
+      "sha256": "17fa1b5ee1ba2367a65ef152efcf03c0208e07e5691c758b178f52fd6ec0d465",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-07.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-08.jpg",
+      "sizeBytes": 53772,
+      "sha256": "d9024800e8f8eabb0e7c89afcd1a056279faeba8856f4225416b1d6f5a6cbc3a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-08.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-09.jpg",
+      "sizeBytes": 47877,
+      "sha256": "21a09f88c561b95cfade42d8c185b79cd0bd9ddb608e439b16651821f04bb6db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-09.jpg"
+    },
+    {
+      "path": "review/native-reel-v2-frame-10.jpg",
+      "sizeBytes": 40844,
+      "sha256": "fb16f2c8df97d67bafde1735004a3e819ec76d8b82b218eb9ff88daca3e788d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/native-reel-v2-frame-10.jpg"
+    },
+    {
+      "path": "review/reel-crop-x520-sheet.jpg",
+      "sizeBytes": 61268,
+      "sha256": "e9db0f6e519a21e4eaedfaf0238a0b76bf7ae11ed5c14c07365b0644b2ea7fc2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/reel-crop-x520-sheet.jpg"
+    },
+    {
+      "path": "review/reel-crop-x520.mp4",
+      "sizeBytes": 1817252,
+      "sha256": "23a1c35f61f0e02f496519a81596003e1c76110c79c8b9d8a1e08d55760444a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/reel-crop-x520.mp4"
+    },
+    {
+      "path": "review/reel-crop-x700-sheet.jpg",
+      "sizeBytes": 61447,
+      "sha256": "86f89104d1d4e2e76a7121b7ffdd21c4d3f1850220e85c74ee5ee697c2654be7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/reel-crop-x700-sheet.jpg"
+    },
+    {
+      "path": "review/reel-crop-x700.mp4",
+      "sizeBytes": 1755414,
+      "sha256": "b148ecec1716108b243126ffb9e5a03da7ae1d8fbc141166133af71e2a7741a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/reel-crop-x700.mp4"
+    },
+    {
+      "path": "review/reel-crop-x780-sheet.jpg",
+      "sizeBytes": 62150,
+      "sha256": "2f6ab0f1fa4226425a0de71c956cfeca3ad709713878701c7f2546bb2bc310e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/reel-crop-x780-sheet.jpg"
+    },
+    {
+      "path": "review/reel-crop-x780.mp4",
+      "sizeBytes": 1743474,
+      "sha256": "fcca1543e49d13e37ba6892f6b5148b8f62098c1c2a621169a2a7e55679e8e21",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/reel-crop-x780.mp4"
+    },
+    {
+      "path": "review/reel-crop-x880-sheet.jpg",
+      "sizeBytes": 61230,
+      "sha256": "c6d7524473a0d9481ae30a9d6f50d7ce879c35deaf1e78b82f075bded3482145",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/reel-crop-x880-sheet.jpg"
+    },
+    {
+      "path": "review/reel-crop-x880.mp4",
+      "sizeBytes": 1707370,
+      "sha256": "0f5e3f85f8566d271d110377e34fad90dedebacc4635324a04ba2f6336747735",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/reel-crop-x880.mp4"
+    },
+    {
+      "path": "review/v2-04.jpg",
+      "sizeBytes": 64309,
+      "sha256": "1dbd50f61a9ce846c423a71cc23bd414b677f1156ea8749ea47f4ff85e29aeea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-04.jpg"
+    },
+    {
+      "path": "review/v2-05.jpg",
+      "sizeBytes": 67530,
+      "sha256": "9e850a5ea0033414804f295cf5506ab094b00abbd998d219d52d806a349f6a7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-05.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-01.jpg",
+      "sizeBytes": 42734,
+      "sha256": "f3bde82495efa6d7f963a8345fa4457b7683973b5727e21d2a4382fe9f04e0ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-01.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-02.jpg",
+      "sizeBytes": 42029,
+      "sha256": "120778f91d7b8ec3adaf3613b3f19224bef180e38c472212df0ca7f1706e004c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-02.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-03.jpg",
+      "sizeBytes": 51855,
+      "sha256": "ba2cb59f5c4d5ed29a39ac5cdfb36e35fe32ba00f673cb19e5e27fa937858544",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-03.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-04.jpg",
+      "sizeBytes": 53866,
+      "sha256": "4494f4681e7c25d931d33dce7349ba93c26ef5ed5c426651b5a837fb2d0a9300",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-04.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-05.jpg",
+      "sizeBytes": 56217,
+      "sha256": "7dba00fa8840e5f8a0583023c78043aa383732c9ba8dc641b2595fb66e9c5d2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-05.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-06.jpg",
+      "sizeBytes": 57451,
+      "sha256": "5103de09eb72c2044e899e9a941a85bc93d5ba796aac01a38903629d64a6ec14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-06.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-07.jpg",
+      "sizeBytes": 58546,
+      "sha256": "8bc696b7c2dee0f733a26996505f2a533183254cc4570e2c5be30da9df6432a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-07.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-08.jpg",
+      "sizeBytes": 61883,
+      "sha256": "e92678a00f1f830a30b2ba9801d0950d538ff91b2a80380580b1e81b4a454d46",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-08.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-09.jpg",
+      "sizeBytes": 47851,
+      "sha256": "2b2cc66ea54d703344bd60c1c14e9d41d98bc3c8fbe50cef2517cdd07048368c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-09.jpg"
+    },
+    {
+      "path": "review/v2-frames/frame-10.jpg",
+      "sizeBytes": 39341,
+      "sha256": "2548f29557f73be7cda92844c38352dba2b5fe7887876e682e646cda7b0d9d38",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-frames/frame-10.jpg"
+    },
+    {
+      "path": "review/v2-source-contact-sheet.jpg",
+      "sizeBytes": 61316,
+      "sha256": "38c39018ed31c9caec6ea9a916453e627d9fb91484da0049dcf8e12dc047f750",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-14_carretera-austral-omni-video/review/v2-source-contact-sheet.jpg"
+    }
+  ]
+}
