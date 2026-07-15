@@ -347,8 +347,11 @@ Assert and inspect:
 - TOC link count matches valid unique destinations;
 - headings, lists, quotes, captions, evidence, disclosures, and CTA are visible;
 - no article/footer collision, clipping, unreadable overlay, or mobile overlap;
+- every text-bearing diagram has passed a `100%` source-raster review: no connector crosses copy, lists,
+  figures, or ordinals unless semantically intentional; no missing/clipped label; no card/divider collision;
+  and no display-punctuation collision;
 - no critical diagram labels under Ohio's floating Next Post widget or other
-  theme chrome; audit the live composition, not only the source raster;
+  theme chrome; source-raster and live-composition reviews are separate mandatory gates;
 - canonical, robots, schema, and Open Graph are present in the anonymous page;
 - browser console and page errors are empty;
 - screenshots show the intended first viewport, body composition, and ending.

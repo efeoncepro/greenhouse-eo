@@ -1,0 +1,76 @@
+.decision-grid {
+  top: 330px;
+  bottom: 156px;
+}
+
+.decision-card {
+  padding: 30px 30px 28px;
+}
+
+.decision-card.system,
+.decision-card.ai,
+.decision-card.human {
+  transform: none;
+}
+
+.decision-card.human {
+  padding-right: 40px;
+}
+
+.card-index {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.decision-card h2 {
+  font-size: 33px;
+}
+
+.decision-card p {
+  min-height: 52px;
+  margin-bottom: 18px;
+  font-size: 19px;
+}
+
+.decision-card ul {
+  gap: 11px;
+}
+
+.decision-card li {
+  font-size: 21px;
+}
+
+.decision-thread {
+  top: auto;
+  right: 0;
+  bottom: -44px;
+  left: 0;
+  height: 8px;
+  transform: none;
+  transform-origin: center;
+}
+
+.decision-thread::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  padding-right: 22px;
+  background: var(--paper);
+  color: var(--graphite);
+  content: 'Más ambigüedad e impacto';
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.2;
+  transform: translateY(-50%);
+}
+
+.decision-thread::after {
+  top: -13px;
+  right: -3px;
+  width: 34px;
+  height: 34px;
+  border-width: 7px;
+}

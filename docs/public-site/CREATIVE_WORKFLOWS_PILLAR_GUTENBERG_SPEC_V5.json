@@ -649,9 +649,9 @@
         },
         {
           "kind": "image",
-          "mediaId": 251389,
-          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v2.webp",
-          "alt": "Diagrama de tres niveles: el sistema ejecuta, la IA amplía y una persona decide según ambigüedad e impacto.",
+          "mediaId": 251393,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v3.webp",
+          "alt": "Tres niveles de decisión: el sistema ejecuta, la IA amplía y una persona decide a medida que aumentan la ambigüedad y el impacto.",
           "sizeSlug": "large",
           "caption": "A mayor ambigüedad e impacto, mayor autoridad humana.",
           "linkDestination": "media"
@@ -822,9 +822,9 @@
         },
         {
           "kind": "image",
-          "mediaId": 251390,
-          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v2.webp",
-          "alt": "Diagrama de tres grados de autonomía: gestionado, co-operado y operado por cliente, conectados por evidencia acumulada.",
+          "mediaId": 251392,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v3.webp",
+          "alt": "Tres grados de autonomía: gestionado, co-operado y operado por cliente, con más autonomía a medida que se acumula evidencia.",
           "sizeSlug": "large",
           "caption": "La misma capacidad puede cambiar de operador sin perder límites, trazabilidad ni escalamiento.",
           "linkDestination": "media"

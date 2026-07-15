@@ -1,8 +1,20 @@
-## Sesión 2026-07-15 — Creative Workflows V5: diagramas, scorecard y QA live (Codex)
+## Sesión 2026-07-15 — Creative Workflows: corrección visual V3 de diagramas (Codex)
+
+> **Hallazgo humano:** la revisión posterior invalidó el `PASS` de los diagramas V2. En frontera de decisión, la línea lima atravesaba copy/listas, la tarjeta central invadía el cierre y `¿Q` colisionaba visualmente. En autonomía, la diagonal ocultaba `01`, atravesaba tarjetas y el label vertical de evidencia quedaba recortado.
+>
+> **Corrección publicada:** post `251363` conserva 114 bloques y reemplaza sólo ambos attachments por V3: frontera `251393` y autonomía `251392`. Los conectores/progresiones quedan fuera del texto, todos los ordinales y labels son visibles, las tarjetas respetan sus cierres y la esquina inferior derecha sigue siendo prescindible bajo el widget Ohio. V1 `251386–251387` y V2 `251389–251390` permanecen superseded, no borrados.
+>
+> **Runtime/rollback:** preflight SSH PASS; snapshot `/tmp/greenhouse-creative-workflows-251363-before-autonomy-v3-20260715-204423.json`, SHA-256 `813ea681c9a15b8d4a6d5f48b3385c46440b66932df470f05f0eb7fcfc5b76cd`; runtime final `98299f2948f6671b89ebc50e03b846ba6f150be74c6cb61d37a7bee8847f67a3`; caché Kinsta purgada. Status, slug, autor, categoría, featured/OG y metadata Yoast se preservaron por readback.
+>
+> **QA:** masters/WebP inspeccionados a resolución original y live en desktop `1440×1000` + mobile `390×844`; cinco imágenes, seis captions, tabla, enlaces full-size, tres manzanitas, canonical/robots/OG y cero overflow. Evidencia: `ai-generations/2026-07-15_creative-workflows-pillar/review/v5-diagrams-v3/qa-report.json` y `docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-15T20-51-28+00-00.json`.
+>
+> **Canon promovido:** un chequeo de safe area no alcanza para diagramas con texto. Las skills y el runbook ahora exigen revisar raster original + runtime y auditar conectores sobre copy/listas, ordinales, labels recortados, divisores/tarjetas y colisiones de puntuación.
+
+## Sesión 2026-07-15 — Creative Workflows V5: diagramas, scorecard y QA live (Codex; corte V2 superseded)
 
 > **Pedido:** evaluar si una Pillar de más de 4.500 palabras necesitaba más apoyo visual y ejecutar la intervención completa. La V4 tenía tres imágenes, todas antes de la palabra `1961`; aproximadamente el `57%` final quedaba sin una pausa visual explicativa.
 >
-> **Publicado:** `https://efeoncepro.com/creative/creative-workflows/` (post `251363`) conserva las tres imágenes análogas y suma dos diagramas deterministas: frontera de decisión (`251389`) y grados de autonomía (`251390`). También incorpora captions en las cinco imágenes y un scorecard nativo `core/table` de métricas de capacidad vs. contramétricas de criterio. El video se difiere hasta que exista una demo, transición o prueba que no pueda explicarse mejor de forma estática.
+> **Publicado en ese corte:** `https://efeoncepro.com/creative/creative-workflows/` (post `251363`) conservó las tres imágenes análogas y sumó dos diagramas deterministas V2: frontera de decisión (`251389`) y grados de autonomía (`251390`). Ambos attachments fueron reemplazados posteriormente por la V3 documentada en la sesión superior. También incorporó captions en las cinco imágenes y un scorecard nativo `core/table` de métricas de capacidad vs. contramétricas de criterio. El video se difiere hasta que exista una demo, transición o prueba que no pueda explicarse mejor de forma estática.
 >
 > **Iteración visual:** los primeros attachments `251386–251387` fueron supersedidos después de que el QA live revelara que el widget flotante Next Post de Ohio cubría la esquina inferior derecha. Los masters V2 reservan esa safe area. En mobile, ambos diagramas enlazan al WebP completo para ampliación; la tabla se mantiene semántica y sin overflow.
 >

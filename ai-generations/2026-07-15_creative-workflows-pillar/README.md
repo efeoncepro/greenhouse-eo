@@ -25,8 +25,8 @@ campaign case studies.
 | `CW-V02` | Creative craft / hidden recipe | Explain the interface boundary | `selected-uploaded-integrated` (`mediaId=251366`) |
 | `CW-V03` | Two speeds | Explain divergence → decision → convergence | `selected-uploaded-integrated` (`mediaId=251367`) |
 | `CW-V04` | Six moments | Explain continuity and learning | `selected-uploaded-integrated` (`mediaId=251368`) |
-| `CW-V05` | Decision boundary | Explain what the system executes, what AI expands and what people decide | `selected-uploaded-integrated` (`mediaId=251389`) |
-| `CW-V06` | Autonomy ladder | Explain managed, co-operated and client-operated modes | `selected-uploaded-integrated` (`mediaId=251390`) |
+| `CW-V05` | Decision boundary | Explain what the system executes, what AI expands and what people decide | `selected-uploaded-integrated` (`mediaId=251393`, V3) |
+| `CW-V06` | Autonomy ladder | Explain managed, co-operated and client-operated modes | `selected-uploaded-integrated` (`mediaId=251392`, V3) |
 
 ## Source of prompts
 
@@ -43,8 +43,10 @@ paths, selected outputs, dimensions, hashes, review verdicts and derivative loca
 - The four editorial WebP derivatives and the hero JPEG derivative were uploaded to the WordPress Media
   Library under author `1` with stable slugs, ALT, caption and description.
 - Two deterministic explanatory diagrams were added in V5. Their text is typeset, not generated, and their
-  lower-right safe area accounts for Ohio's floating Next Post widget. The diagrams link to their full-size
-  WebP on mobile.
+  lower-right safe area accounts for Ohio's floating Next Post widget. A human reread invalidated V2 after
+  finding internal line/text crossings, a clipped evidence label and a punctuation collision; V3 corrected
+  those defects and was inspected both at original resolution and in the live theme. The diagrams link to
+  their full-size WebP on mobile.
 - `CW-V02–V06` are integrated in the published
   `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V5.json`; V3 remains the private visual snapshot
   and V4 the first public snapshot.
@@ -55,7 +57,7 @@ paths, selected outputs, dimensions, hashes, review verdicts and derivative loca
   metadata and verified Open Graph. It is published at
   `https://efeoncepro.com/creative/creative-workflows/` with `index, follow`, canonical exact and anonymous
   `HTTP 200`.
-- V5 desktop/mobile evidence and the machine-readable QA report live in `review/v5/`. QA covered five loaded
+- Final V3 desktop/mobile evidence and the machine-readable QA report live in `review/v5-diagrams-v3/`. QA covered five loaded
   body images, six visible captions, one native table, full-size diagram links, canonical/robots/OG and
   horizontal overflow at `1440x1000` and `390x844`.
 

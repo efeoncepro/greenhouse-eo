@@ -3,7 +3,7 @@
 > **Fecha:** 2026-07-15.
 > **Veredicto:** `PASS VISUAL / PASS MEDIA / PASS SPEC / PASS WORDPRESS / PASS LIVE RENDER`.
 > **Sistema:** [Visual System V1](CREATIVE_WORKFLOWS_PILLAR_VISUAL_SYSTEM_V1.md).
-> **Spec integrada:** [GutenbergArticleSpec V4](CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V4.json).
+> **Spec integrada:** [GutenbergArticleSpec V5](CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V5.json).
 > **Manifest:** `ai-generations/2026-07-15_creative-workflows-pillar/manifest.json`.
 
 ## 1. Alcance
@@ -19,7 +19,9 @@ Esta auditoría verifica las cuatro imágenes conceptuales originales y los dos 
 - se integran en bloques Gutenberg soportados por Content Factory.
 
 El cierre live verificó el tema Ohio en desktop `1440×1000` y mobile `390×844`. El post `251363` está publicado,
-responde `200`, no presenta overflow horizontal y carga las cinco imágenes de cuerpo sin errores.
+responde `200`, no presenta overflow horizontal y carga las cinco imágenes de cuerpo sin errores. El veredicto
+actual corresponde a los diagramas V3; el `PASS` previo de V2 fue invalidado por la revisión humana descrita en
+la sección 4.
 
 ## 2. Sistema evaluado
 
@@ -39,8 +41,8 @@ dashboards ficticios, neón y metáforas industriales de sustitución humana.
 | `CW-V02` Interfaz | Se distinguen oficio visible y receta conservada | La capa creativa mantiene prioridad sobre la estructural | La señal conecta ambas capas | Sin UI falsa, nodos técnicos ni tipografía defectuosa | Aclara la frontera persona/sistema | `PASS` |
 | `CW-V03` Dos velocidades | Divergencia, decisión y convergencia se leen sin labels | Tres zonas claras con decisión humana como bisagra | La señal se ramifica y luego ordena | Mano plausible; formatos nativamente recompuestos | Explica un mecanismo, no una secuencia automática | `PASS` |
 | `CW-V04` Seis momentos | Los seis estados son distinguibles | Grilla 2×3 estable y legible a ancho de artículo | La misma campaña persiste desde selección a entrega | Sin palabras deformadas, marcas ni capturas falsas | Da memoria visual al caso conductor | `PASS` |
-| `CW-V05` Frontera | Sistema, IA y autoridad humana se distinguen | Tres zonas y un hilo continuo; esquina inferior derecha prescindible | Conserva cobalto/lima/coral | Labels deterministas, sin claims visuales inventados | Resume la regla de delegación y escalamiento | `PASS` |
-| `CW-V06` Autonomía | Managed, co-operated y client-operated se leen como progresión | Tres alturas y roles Builder/Runner fuera del overlay Ohio | Conserva el hilo de evidencia | Labels deterministas y sin UI ficticia | Conecta servicio gestionado y operación por cliente | `PASS` |
+| `CW-V05` Frontera | Sistema, IA y autoridad humana se distinguen | Tres zonas alineadas; progresión debajo del copy y esquina inferior derecha prescindible | Conserva cobalto/lima/coral | Labels, listas y puntuación deterministas sin cruces | Resume la regla de delegación y escalamiento | `PASS V3` |
+| `CW-V06` Autonomía | Managed, co-operated y client-operated se leen como progresión | Tres alturas, ordinales completos y roles Builder/Runner fuera del overlay Ohio | Conserva el hilo de evidencia sin atravesar copy | Labels deterministas, completos y sin UI ficticia | Conecta servicio gestionado y operación por cliente | `PASS V3` |
 
 ## 4. Selección y archivos
 
@@ -55,8 +57,8 @@ revisó a resolución original y cada WebP se volvió a inspeccionar después de
 | `CW-V02` | `creative-workflows-interface-master-v1.png` | `creative-workflows-interface-web-1440-v1.webp` | `1440×960` | `167700 B` |
 | `CW-V03` | `creative-workflows-two-speeds-master-v1.png` | `creative-workflows-two-speeds-web-1440-v1.webp` | `1440×960` | `81336 B` |
 | `CW-V04` | `creative-workflows-six-moments-master-v1.png` | `creative-workflows-six-moments-web-1440-v1.webp` | `1440×960` | `164628 B` |
-| `CW-V05` | `creative-workflows-decision-boundary-master-v2.png` | `creative-workflows-decision-boundary-web-1440-v2.webp` | `1440×960` | `80570 B` |
-| `CW-V06` | `creative-workflows-autonomy-ladder-master-v2.png` | `creative-workflows-autonomy-ladder-web-1440-v2.webp` | `1440×960` | `65792 B` |
+| `CW-V05` | `creative-workflows-decision-boundary-master-v3.png` | `creative-workflows-decision-boundary-web-1440-v3.webp` | `1440×960` | `75474 B` |
+| `CW-V06` | `creative-workflows-autonomy-ladder-master-v3.png` | `creative-workflows-autonomy-ladder-web-1440-v3.webp` | `1440×960` | `68120 B` |
 
 Hashes SHA-256, rutas de origen y pesos de master viven en el manifest de la corrida.
 
@@ -72,11 +74,11 @@ caption y descripción. Los URLs respondieron `HTTP 200`, el MIME esperado y el 
 | `CW-V02` | `251366` | `https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-interface-web-1440-v1.webp` | cuerpo V4 |
 | `CW-V03` | `251367` | `https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-two-speeds-web-1440-v1.webp` | cuerpo V4 |
 | `CW-V04` | `251368` | `https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-six-moments-web-1440-v1.webp` | cuerpo V4 |
-| `CW-V05` | `251389` | `https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v2.webp` | cuerpo V5 + enlace a media |
-| `CW-V06` | `251390` | `https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v2.webp` | cuerpo V5 + enlace a media |
+| `CW-V05` | `251393` | `https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v3.webp` | cuerpo V5 + enlace a media |
+| `CW-V06` | `251392` | `https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v3.webp` | cuerpo V5 + enlace a media |
 
-Los attachments V1 `251386–251387` permanecen como candidatos superseded y no están referenciados por el post.
-No se borran como parte normal del rollback.
+Los attachments V1 `251386–251387` y V2 `251389–251390` permanecen como candidatos superseded y no están
+referenciados por el post. No se borran como parte normal del rollback.
 
 ## 6. Accesibilidad editorial
 
@@ -87,8 +89,8 @@ presencia de colores. Evitan comenzar con “imagen de” y no duplican captions
 - Interfaz: `Capas de un proceso creativo: referencias y decisiones visibles sobre un sistema ordenado que conserva versiones.`
 - Dos velocidades: `Exploración divergente que converge en una decisión humana y luego se transforma en formatos repetibles.`
 - Seis momentos: `Seis momentos de una campaña, desde el brief y la exploración hasta la revisión, entrega y aprendizaje.`
-- Frontera: `Diagrama de tres niveles: el sistema ejecuta, la IA amplía y una persona decide según ambigüedad e impacto.`
-- Autonomía: `Diagrama de tres grados de autonomía: gestionado, co-operado y operado por cliente, conectados por evidencia acumulada.`
+- Frontera: `Tres niveles de decisión: el sistema ejecuta, la IA amplía y una persona decide a medida que aumentan la ambigüedad y el impacto.`
+- Autonomía: `Tres grados de autonomía: gestionado, co-operado y operado por cliente, con más autonomía a medida que se acumula evidencia.`
 
 ## 7. Validación Gutenberg
 
@@ -107,7 +109,7 @@ Resultado:
 - `blockCount=114`;
 - `hasMedia=true`;
 - cinco bloques de cuerpo `core/image` y un `core/table`;
-- los diagramas `251389–251390` usan `linkDestination=media` para lectura completa en mobile;
+- los diagramas `251393` y `251392` usan `linkDestination=media` para lectura completa en mobile;
 - seis captions visibles, incluidos tres captions añadidos a los assets existentes;
 - `core/image` aparece en `observedBlocks`;
 - TOC y jerarquía de 21 headings conservados;
@@ -121,8 +123,11 @@ Resultado:
 - La continuidad entre las cuatro piezas depende principalmente del sistema cromático y geométrico; no de una
   persona idéntica. Esto es aceptable para una serie editorial, pero no para un caso narrativo de personaje.
 - El tema Ohio no muestra el featured dentro del cuerpo del single post; lo usa correctamente como featured/OG.
-- El widget flotante Next Post ocupa la esquina inferior derecha en desktop. Los diagramas V2 reservan esa zona;
-  futuros assets deben auditar el chrome real del tema, no sólo el raster aislado.
+- El widget flotante Next Post ocupa la esquina inferior derecha en desktop. Los diagramas V3 reservan esa zona;
+  futuros assets deben auditar el chrome real del tema y también el raster original al `100%`.
+- El `PASS` de V2 fue un falso positivo: la frontera tenía una línea sobre copy/listas, una tarjeta sobre el cierre
+  y una colisión de puntuación; autonomía ocultaba el ordinal `01` y recortaba un label vertical. Un chequeo de
+  safe area no sustituye la inspección semántica de todos los labels, conectores, divisores y signos.
 - El texto dentro de los diagramas horizontales es una síntesis en mobile; ALT, caption y enlace al WebP completo
   evitan depender de labels diminutos.
 - El derivado OG WebP `1200×630` permanece local como alternativa. WordPress/Yoast usa el JPEG `1440×757`

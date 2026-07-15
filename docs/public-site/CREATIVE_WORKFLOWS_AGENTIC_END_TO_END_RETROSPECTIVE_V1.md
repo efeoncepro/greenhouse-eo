@@ -128,6 +128,10 @@ limites y conectar identidad de autor, experiencia aplicada y trazabilidad tecni
 - La primera composición pasó QA aislado, pero el QA live reveló que el widget flotante Next Post de Ohio
   cubría información en la esquina inferior derecha. La V2 reservó esa zona y los attachments V1 quedaron
   superseded, no borrados.
+- La V2 también recibió inicialmente un `PASS` incorrecto. La revisión humana encontró una línea sobre
+  copy/listas, un ordinal oculto, un label recortado, una tarjeta sobre el cierre y una colisión de puntuación.
+  La V3 separó conectores y contenido, preservó todos los labels y volvió a pasar inspección original + live;
+  V1/V2 permanecen como lineage superseded.
 - Los diagramas enlazan a su WebP completo para que el lector mobile pueda ampliar labels; ALT y captions
   conservan el significado sin depender del texto rasterizado.
 - La sección de medición incorporó un `core/table` nativo con capacidad y contramétricas de criterio. El builder
@@ -139,9 +143,11 @@ limites y conectar identidad de autor, experiencia aplicada y trazabilidad tecni
 - El helper WP-CLI ganó `--input-file` repetible para transferir assets a `/tmp` sin improvisar una segunda vía
   SSH ni exponer credenciales.
 
-**Aprendizaje:** la densidad visual se diseña por trabajo editorial y por runtime real. Un raster aprobado fuera
-del sitio aún puede fallar por el chrome del tema; una tabla accesible puede enriquecer más que otra imagen; y
-los hashes de write/readback deben distinguir normalización conocida de drift real.
+**Aprendizaje:** la densidad visual se diseña por trabajo editorial y por runtime real. Un raster puede fallar
+por el chrome del tema o por su propia composición interna. Safe area, carga y ausencia de overflow no prueban
+que todos los labels sean legibles: los diagramas textuales exigen inspección al `100%`, label por label,
+conector por conector. Una tabla accesible puede enriquecer más que otra imagen; y los hashes de write/readback
+deben distinguir normalización conocida de drift real.
 
 ## 4. Decisiones que se vuelven canon
 

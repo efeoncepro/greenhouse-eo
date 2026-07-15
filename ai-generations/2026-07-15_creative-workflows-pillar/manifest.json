@@ -180,35 +180,45 @@
       "status": "selected-uploaded-integrated",
       "editorialRole": "in-article explanatory diagram for system, AI and human decision authority",
       "productionMethod": "deterministic HTML/CSS composition rendered with Playwright; no generated text",
-      "sourcePath": "sources/diagram-production-v2.html",
+      "sourcePath": "sources/render-decision-v3.mjs",
+      "baseSourcePath": "sources/diagram-production-v2.html",
+      "overridePath": "sources/decision-boundary-v3-overrides.css",
       "master": {
-        "path": "masters/creative-workflows-decision-boundary-master-v2.png",
+        "path": "masters/creative-workflows-decision-boundary-master-v3.png",
         "width": 1440,
         "height": 960,
-        "bytes": 209226,
-        "sha256": "c5df4322bc6963fb5aa2da8febe0f1921c0efafd1c528e221ab08048a0af417a"
+        "bytes": 145666,
+        "sha256": "9fc7db9f7a5570f7823600112b3b7e4251be45cc2b6fc9c010fb0837c1801c7c"
       },
       "web": {
-        "path": "exports/creative-workflows-decision-boundary-web-1440-v2.webp",
+        "path": "exports/creative-workflows-decision-boundary-web-1440-v3.webp",
         "width": 1440,
         "height": 960,
-        "bytes": 80570,
-        "sha256": "cb3d92e71cf8bd9bef1d7a5874ec35dcff289767c18d25e1c94a3c48f37243d7"
+        "bytes": 75474,
+        "sha256": "1db4a810dbdba75229086974531d5d9dc965116fd3e83cebcd82a0151148af31"
       },
       "media": {
-        "id": 251389,
-        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v2.webp",
+        "id": 251393,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v3.webp",
         "authorId": 1,
-        "alt": "Diagrama de tres niveles: el sistema ejecuta, la IA amplía y una persona decide según ambigüedad e impacto.",
+        "alt": "Tres niveles de decisión: el sistema ejecuta, la IA amplía y una persona decide a medida que aumentan la ambigüedad y el impacto.",
         "caption": "A mayor ambigüedad e impacto, mayor autoridad humana."
       },
-      "supersedes": {
-        "mediaId": 251386,
-        "reason": "V2 protege la esquina inferior derecha ocupada por el widget flotante de Next Post en Ohio."
-      },
+      "supersedes": [
+        {
+          "mediaId": 251386,
+          "revision": "V1",
+          "reason": "La composición no protegía la esquina inferior derecha ocupada por el widget flotante de Next Post en Ohio."
+        },
+        {
+          "mediaId": 251389,
+          "revision": "V2",
+          "reason": "La línea lima atravesaba copy y listas, la tarjeta central invadía el cierre y el signo de apertura colisionaba visualmente con la Q."
+        }
+      ],
       "review": {
         "verdict": "pass",
-        "notes": "Jerarquía legible, labels deterministas y zona inferior derecha sin información crítica; abre el WebP completo desde mobile."
+        "notes": "V3 inspeccionada a resolución original y en runtime live: labels y listas sin cruces, tres tarjetas alineadas, puntuación legible y zona Ohio sin información crítica."
       }
     },
     {
@@ -217,35 +227,45 @@
       "status": "selected-uploaded-integrated",
       "editorialRole": "in-article explanatory diagram for managed, co-operated and client-operated autonomy",
       "productionMethod": "deterministic HTML/CSS composition rendered with Playwright; no generated text",
-      "sourcePath": "sources/diagram-production-v2.html",
+      "sourcePath": "sources/render-autonomy-v3.mjs",
+      "baseSourcePath": "sources/diagram-production-v2.html",
+      "overridePath": "sources/autonomy-ladder-v3-overrides.css",
       "master": {
-        "path": "masters/creative-workflows-autonomy-ladder-master-v2.png",
+        "path": "masters/creative-workflows-autonomy-ladder-master-v3.png",
         "width": 1440,
         "height": 960,
-        "bytes": 160147,
-        "sha256": "8d4f3c2f5fb9a95f87d3e4ea7423ed5e6e2b8f15f9c7a0bab1d198005a485d1d"
+        "bytes": 155042,
+        "sha256": "177b46e7184f2cc7be178bde9631fb800506981fdc37128ec02dbd3f5bdd795f"
       },
       "web": {
-        "path": "exports/creative-workflows-autonomy-ladder-web-1440-v2.webp",
+        "path": "exports/creative-workflows-autonomy-ladder-web-1440-v3.webp",
         "width": 1440,
         "height": 960,
-        "bytes": 65792,
-        "sha256": "81cdcc879345dae6fe29990b34d9f01b75ed2e5292725f38728e23228669086f"
+        "bytes": 68120,
+        "sha256": "4c944fd0d7915b76bdaa67cf78de02ea40cc609965adec461a3b438d186fa1c4"
       },
       "media": {
-        "id": 251390,
-        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v2.webp",
+        "id": 251392,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v3.webp",
         "authorId": 1,
-        "alt": "Diagrama de tres grados de autonomía: gestionado, co-operado y operado por cliente, conectados por evidencia acumulada.",
-        "caption": "La misma capacidad puede cambiar de operador sin perder límites, trazabilidad ni escalamiento."
+        "alt": "Tres grados de autonomía: gestionado, co-operado y operado por cliente, con más autonomía a medida que se acumula evidencia.",
+        "caption": "La autonomía aumenta con evidencia, límites y rutas de escalamiento verificadas."
       },
-      "supersedes": {
-        "mediaId": 251387,
-        "reason": "V2 concentra Builder/Runner fuera de la esquina cubierta por el widget flotante de Next Post."
-      },
+      "supersedes": [
+        {
+          "mediaId": 251387,
+          "revision": "V1",
+          "reason": "Builder/Runner quedaba bajo la esquina cubierta por el widget flotante de Next Post."
+        },
+        {
+          "mediaId": 251390,
+          "revision": "V2",
+          "reason": "La diagonal ocultaba el ordinal 01, atravesaba las tarjetas y el label vertical de evidencia quedaba recortado."
+        }
+      ],
       "review": {
         "verdict": "pass",
-        "notes": "Los tres grados se distinguen, Builder/Runner permanecen visibles y el asset abre a resolución completa desde mobile."
+        "notes": "V3 inspeccionada a resolución original y en runtime live: tres ordinales visibles, progresión fuera del copy, label horizontal completo y Builder/Runner legibles."
       }
     }
   ],
@@ -286,7 +306,9 @@
       "desktopViewport": "1440x1000",
       "mobileViewport": "390x844",
       "liveRender": "pass",
-      "desktopEvidence": "review/live-desktop-1440x1000.png",
+      "desktopEvidence": "review/v5-diagrams-v3/qa-report.json",
+      "contentRuntimeSha256": "98299f2948f6671b89ebc50e03b846ba6f150be74c6cb61d37a7bee8847f67a3",
+      "diagramMediaIds": [251393, 251392],
       "verifiedAt": "2026-07-15"
     }
   }

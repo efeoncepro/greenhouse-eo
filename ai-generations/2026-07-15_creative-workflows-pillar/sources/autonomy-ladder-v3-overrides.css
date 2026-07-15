@@ -1,0 +1,40 @@
+.autonomy-thread {
+  top: auto;
+  right: 88px;
+  bottom: 204px;
+  left: 405px;
+  height: 8px;
+  transform: none;
+  transform-origin: center;
+}
+
+.autonomy-thread::before,
+.autonomy-thread::after {
+  width: 26px;
+  height: 26px;
+  border-width: 7px;
+}
+
+.evidence-tab {
+  right: auto;
+  bottom: 190px;
+  left: 88px;
+  padding: 0;
+  background: transparent;
+  color: var(--graphite);
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.2;
+  transform: none;
+  transform-origin: center;
+}
+
+.role-strip {
+  right: 88px;
+  grid-template-columns: 0.9fr 1.1fr;
+}
+
+.role:last-child {
+  padding-right: 172px;
+}

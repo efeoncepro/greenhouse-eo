@@ -382,15 +382,17 @@ de medición en una superficie comparativa:
 
 | ID | Trabajo editorial | Producción | WordPress | Placement |
 |---|---|---|---|---|
-| `CW-V05` | Frontera entre ejecución del sistema, ampliación con IA y autoridad humana | HTML/CSS determinista + Playwright; WebP V2 | `251389` | después de la lista de delegación/escalamiento |
-| `CW-V06` | Escalera managed → co-operated → client-operated y roles Builder/Runner | HTML/CSS determinista + Playwright; WebP V2 | `251390` | después de “Se gana con evidencia” |
+| `CW-V05` | Frontera entre ejecución del sistema, ampliación con IA y autoridad humana | HTML/CSS determinista + Playwright; WebP V3 | `251393` | después de la lista de delegación/escalamiento |
+| `CW-V06` | Escalera managed → co-operated → client-operated y roles Builder/Runner | HTML/CSS determinista + Playwright; WebP V3 | `251392` | después de “Se gana con evidencia” |
 | `CW-T01` | Scorecard de capacidad y contramétricas de criterio | `core/table` nativo | n/a | sección de medición |
 
 Los diagramas preservan cobalto, lima, coral, papel y la señal continua del sistema original. El texto no fue
 generado dentro del raster: se compuso con Poppins/Geist locales para conservar labels, acentos y cifras
 exactas. La primera exportación (`251386–251387`) quedó superseded, no borrada, porque el QA live reveló que el
-widget flotante Next Post de Ohio ocupa la esquina inferior derecha. La V2 mueve toda información crítica fuera
-de esa zona y mantiene la esquina como espacio prescindible.
+widget flotante Next Post de Ohio ocupa la esquina inferior derecha. La V2 (`251389–251390`) protegió esa zona,
+pero una relectura humana invalidó su `PASS`: aún cruzaba conectores sobre copy, ocultaba un ordinal, recortaba
+un label y producía una colisión de puntuación. La V3 (`251393` y `251392`) corrige esas relaciones internas y
+mantiene la esquina Ohio como espacio prescindible.
 
 En mobile, el diagrama horizontal funciona como síntesis visual y cada `core/image` enlaza al WebP completo
 para permitir lectura a resolución original. ALT y caption sostienen el significado sin obligar a interpretar
@@ -400,7 +402,7 @@ convertirse en una captura inaccesible.
 La V5 validó 114 bloques gobernados, cinco `core/image`, seis captions y un `core/table`. El readback live
 preservó H1, slug, autor, categoría, featured/OG, SEO title, metadescription, canonical e `index, follow`. El QA
 anónimo pasó en `1440×1000` y `390×844`; evidencia en
-`ai-generations/2026-07-15_creative-workflows-pillar/review/v5/qa-report.json`.
+`ai-generations/2026-07-15_creative-workflows-pillar/review/v5-diagrams-v3/qa-report.json`.
 
 El video queda deliberadamente fuera de V5. Debe entrar sólo cuando muestre una demostración o transición que
 una imagen estática no pueda explicar, con poster, captions, transcript, carga diferida y sin autoplay; no como

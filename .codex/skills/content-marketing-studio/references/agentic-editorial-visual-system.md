@@ -264,6 +264,10 @@ Subir solo derivados que pasaron QA. Después del upload:
 Antes de declarar cierre:
 
 - inspeccionar desktop y mobile reales, incluido el crop social/featured;
+- inspeccionar cada diagrama textual al `100%` de su raster original antes del runtime: ningún conector debe
+  cruzar copy, listas, cifras u ordinales salvo que esa superposición sea el significado deliberado; todos los
+  labels deben estar completos y sin clipping; tarjetas/divisores no deben colisionar; y la puntuación display
+  debe leerse sin ligaduras visuales accidentales;
 - revisar el asset dentro del chrome real del tema: sidebars, share rails, widgets sticky/Next Post y overlays
   también forman parte de la safe area;
 - confirmar imágenes de cuerpo, featured y OG esperados, sin duplicados ni placeholders;
@@ -276,6 +280,9 @@ Antes de declarar cierre:
 - si labels horizontales quedan pequeños en mobile, mantener ALT/caption autosuficientes y enlazar al raster
   completo o producir una variante responsive gobernada;
 - repetir readback después de publicar o cambiar featured/OG.
+
+El QA standalone y el QA live son complementarios. La safe area del tema no prueba la composición interna del
+raster, y un raster limpio no prueba su convivencia con el theme chrome. Ambos deben pasar por separado.
 
 Una validación local o `dry-run` no prueba Media Library ni render público. Si falta publicación o readback live, cerrar como `code/content complete; rollout verification pending`.
 

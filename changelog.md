@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — Creative Workflows: diagramas V3 corregidos en producción
+
+- Se reemplazan los dos diagramas V2 después de que una revisión humana detectara cruces de conectores sobre copy/listas, un ordinal oculto, un label recortado, una tarjeta sobre el cierre y una colisión de puntuación que el QA anterior no capturó.
+- La Pillar publicada usa ahora frontera `251393` y autonomía `251392`; V1/V2 permanecen superseded para trazabilidad. Se preservaron los 114 bloques, metadata SEO, featured/OG, categoría, autor y estado del post.
+- Snapshot y rollback fail-closed, cache purge y QA live desktop/mobile completados. El canon visual suma inspección al `100%` del raster original más runtime real, incluyendo labels, conectores, divisores y puntuación.
+
 ## 2026-07-15 — Creative Workflows V5: enriquecimiento visual y tabla Gutenberg nativa
 
 - La Pillar publicada suma dos diagramas editoriales deterministas en la mitad inferior, captions para las cinco imágenes de cuerpo y un scorecard semántico `core/table`; la intervención corrige el tramo final sin apoyo visual sin convertir el artículo en una secuencia decorativa.

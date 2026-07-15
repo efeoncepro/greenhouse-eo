@@ -1389,9 +1389,17 @@ bloques con más de uno. Es evidencia del caso, no un umbral universal. El gate 
 - Body V4: `251366`, `251367`, `251368`; el hero no se duplicó dentro del artículo.
 - Todos los assets pasaron concepto, composición, continuidad, integridad y uso editorial según la
   [auditoría visual](../../public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_AUDIT_V1.md).
-- V5 agregó `CW-V05–V06` como diagramas HTML/CSS deterministas renderizados con Playwright. Media V2 final:
-  `251389–251390`; los candidatos `251386–251387` quedaron superseded por safe-area del widget Next Post.
+- V5 agregó `CW-V05–V06` como diagramas HTML/CSS deterministas renderizados con Playwright. Media V3 final:
+  frontera `251393` y autonomía `251392`; V1 `251386–251387` quedó superseded por la safe area del widget Next
+  Post y V2 `251389–251390` por defectos internos de composición detectados en revisión humana.
 - Los diagramas enlazan al WebP completo para ampliación mobile y el scorecard usa `core/table`, no una captura.
+
+**Corrección promovida a canon:** el QA de V2 fue un falso positivo porque protegía el theme chrome, pero no
+detectó conectores sobre copy/listas, un ordinal oculto, un label recortado, una tarjeta sobre el cierre y una
+colisión de puntuación. Para todo diagrama con texto, inspeccionar primero el raster original al `100%` y luego
+el runtime live. Los gates son independientes: todos los ordinales/labels deben estar completos; ningún
+conector cruza contenido salvo intención semántica explícita; tarjetas/divisores no colisionan; y la puntuación
+display no forma ligaduras visuales accidentales.
 
 El manifest visual conserva el snapshot histórico V3 y declara por separado el estado publicado V4; la
 auditoría V4 sigue siendo la evidencia detallada de publicación, sin reemplazar hashes ni provenance.
