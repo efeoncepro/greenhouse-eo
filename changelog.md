@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — DSR interno: workspace canónico del deal + scaffolder + manifiesto de artefactos
+
+- Se canoniza el **workspace del deal** (el "DSR interno", F0 del Digital Sales Room): estructura de carpeta estándar + **`pnpm tender:new <slug>`** que la scaffoldea (`bases/` RFP · `research/` investigación INTERNA · `oferta-tecnica.md` copiada del template · `deck-plan.json` · `anexos/` · `*-INTERNO`). Contrato: [TENDER_WORKSPACE_TEMPLATE.md](docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md).
+- **`artifact-manifest.json`** ([schema](docs/commercial/tenders/ARTIFACT_MANIFEST_SCHEMA.md)): SSOT de las piezas VIVAS del deal (Radiografía AEO, informe del Grader) por **enlace, nunca captura** (`render: by_link`). Ata el ledger de evidencia (un run del Grader es fuente reproducible) + el deck (`artifact-showcase`/`highlight` las referencian) + el DSR externo futuro.
+- **Framing de tres capas** (refinamiento del operador) grabado en el ADR: (1) taller/fuentes = la carpeta git · (2) registro gobernado = el aggregate `Proposal` (la `Proposal` **es** el contenedor, no un doc adentro) · (3) DSR externo = proyección al comprador. **Decisión horneada:** las fuentes (`.md`, `deck-plan.json`) se quedan como archivos git, NO `proposal_assets` (conservan git-review; el composer las lee directo; el aggregate referencia por `proposal_id`; reversible). F0 redefinido a "workspace interno primero" (✅ hecho); la sala del comprador pasa a F1.
+
 ## 2026-07-15 — Método: la oferta técnica se itera en Markdown y el deck es su proyección
 
 - Se canoniza como plantilla lo que el caso SKY ya hizo a mano: **[TECHNICAL_OFFER_TEMPLATE.md](docs/commercial/tenders/TECHNICAL_OFFER_TEMPLATE.md)** — la oferta técnica se escribe/itera (idea, investigación, evidencia, narrativa) en un `.md` con taxonomía canónica (15 secciones destiladas de SKY), y el deck se compone **desde** ahí.

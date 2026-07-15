@@ -1,3 +1,13 @@
+## Sesión 2026-07-15 — DSR interno: workspace canónico del deal + scaffolder (Claude)
+
+> **Pedido:** el operador refinó el Digital Sales Room — hacerlo INTERNO primero, después piloteo para clientes; para nosotros un DSR debe tener technical offer + deck-plan.json + proposal versionada + económica + quote + otros, EN CARPETAS, con subfolders de bases y research, y manifiestos de artefactos vivos (Radiografía, Grader).
+>
+> **Corrección clave que di:** la `Proposal` NO es un doc dentro del DSR — es el CONTENEDOR. El "DSR interno" son dos capas que ya existían: (1) taller/fuentes = la carpeta git, (2) registro gobernado = el aggregate `Proposal`. El "DSR para clientes" es la 3ª capa (proyección al comprador, el ADR ya la modela).
+>
+> **Decisión que tomé por el operador** (dijo "no sé qué responderte"): las fuentes (`.md`, `deck-plan.json`) se quedan como **archivos git**, NO `proposal_assets` — conservan git-review, el composer las lee directo, el aggregate referencia por `proposal_id`. Reversible.
+>
+> **Entregado:** **`pnpm tender:new <slug>`** (`scripts/commercial/new-tender.mjs`, smoke verde: árbol + JSON válido + template copiado + idempotente) scaffoldea la carpeta canónica. Contrato [TENDER_WORKSPACE_TEMPLATE.md](docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md) + [ARTIFACT_MANIFEST_SCHEMA.md](docs/commercial/tenders/ARTIFACT_MANIFEST_SCHEMA.md) (piezas vivas por enlace, `render: by_link` invariante). ADR actualizado con la framing de tres capas + F0 redefinido a "workspace interno" (✅ hecho); sala del comprador → F1; ruta detalle `[proposalId]` → F0.5. Costura en la skill de tenders (ambos namespaces). Sin push.
+
 ## Sesión 2026-07-15 — Método: plantilla canónica de oferta técnica (md → deck es proyección) (Claude)
 
 > **Pedido:** el operador propuso que la metodología de proposals incluya crear primero la oferta técnica en Markdown con taxonomía, iterar ahí idea/investigación/evidencia, y de ahí el deck; preguntó si ya lo teníamos.

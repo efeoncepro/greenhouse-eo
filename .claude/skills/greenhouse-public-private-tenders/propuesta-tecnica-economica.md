@@ -24,10 +24,12 @@ Nada se declara "listo" hasta que todos los excluyentes están ✅.
 
 ## La oferta técnica se ITERA en Markdown, y el deck es su PROYECCIÓN (método canónico)
 
-**Antes del deck va el Markdown.** La oferta técnica se escribe y se itera —idea,
-investigación, evidencia, narrativa— en un `.md` con taxonomía canónica, y el deck se
-compone **desde** ahí. Plantilla: **`docs/commercial/tenders/TECHNICAL_OFFER_TEMPLATE.md`**
-(destilada del caso SKY; copiala a `docs/commercial/tenders/<caso>/oferta-tecnica.md`).
+**Antes del deck va el Markdown, y antes del Markdown va el WORKSPACE.** El deal vive en una carpeta
+canónica (el "DSR interno"): `pnpm tender:new <slug>` la scaffoldea con `bases/` (RFP), `research/`
+(investigación INTERNA), `oferta-tecnica.md` (copiada del template), `artifact-manifest.json` (piezas
+vivas por enlace) y `anexos/`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`. La
+oferta técnica se escribe/itera —idea, investigación, evidencia, narrativa— en ese `.md` con taxonomía
+canónica (`TECHNICAL_OFFER_TEMPLATE.md`), y el deck se compone **desde** ahí.
 
 Regla híbrida de la plantilla: las **secciones son GUÍA** (cada RFP ordena distinto hacia
 sus criterios ponderados), pero la **evidencia es CONTRATO** — toda cifra vive primero en el

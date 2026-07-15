@@ -237,8 +237,9 @@ token (§3), fuera del modelo de entitlements.
 
 | Fase | Alcance | Depende de |
 |---|---|---|
-| **F0** | Sala interna sobre un deal real: proyección + token HMAC + render en Think + audience gate. **Sin tracking.** Vertical delgado (SKY o el siguiente deal). | Proposal Studio (aggregate), rail Think |
-| **F1** | Tracking analítico: `sales_room_events` + ingest forjable-por-diseño + intent score + `read_analytics`. | F0 |
+| **F0** ✅ | **Workspace interno del deal (capa 1) — IMPLEMENTADO 2026-07-15.** Carpeta canónica + `pnpm tender:new` + `artifact-manifest.json`. Fuentes = archivos git; el aggregate referencia por `proposal_id`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`. | — |
+| **F0.5** | Cara interna en el portal: ruta detalle `[proposalId]` (el deal completo para el equipo). | TASK-1413 |
+| **F1** | Sala del comprador (capa 3): proyección + token HMAC + render en Think + audience gate + tracking analítico (`sales_room_events` + ingest forjable + intent score + `read_analytics`). | F0, rail Think |
 | **F2** | Full API Parity + Nexa: las 6 capabilities + acciones gobernadas + signal "el comité abrió". | F1 |
 | **F3** | Bow-tie: reutilizar la sala en onboarding/renovación/expansión (no solo cierre). | F2 |
 | **F4** | ASaaS: salas de marca del cliente (brand-pack multi-tenant del Composer). | Creative Studio (EPIC-028) |

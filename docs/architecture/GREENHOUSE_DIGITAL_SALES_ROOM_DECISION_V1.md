@@ -41,6 +41,37 @@ ahora cuesta cero.
 `High` en la forma (es un clon estructural de decisiones ya aceptadas — ver §"Precedentes"). `Medium`
 en el *timing* y en build-vs-buy (ver Open Questions — es la pregunta honesta).
 
+## Delta 2026-07-15 — tres capas, no dos cosas llamadas "DSR" (refinamiento del operador)
+
+El operador refinó la secuencia: **DSR interno primero, después piloteo para clientes.** Eso obliga a
+separar honestamente lo que se llamaba "DSR" en **tres capas** — la del medio es la que ya existe:
+
+```
+1. El taller (fuentes, git)          docs/commercial/tenders/<slug>/  ← "DSR interno" (workspace)
+   bases/ · research/ · oferta-tecnica.md · deck-plan.json · artifact-manifest.json · anexos/ · *-INTERNO
+        │  autora el humano/agente
+        ▼
+2. El registro gobernado             el aggregate `Proposal` (DB+GCS): salidas versionadas + quote + estado
+   su cara interna = portal /admin/commercial/proposals (TASK-1413) + ruta detalle [proposalId] (follow-up)
+        │  proyección client_facing + tracking
+        ▼
+3. El DSR externo (Trumpet-style)    el micrositio del comprador, trackeado  ← "DSR para clientes"
+```
+
+**La `Proposal` NO es un doc dentro del DSR — es el contenedor** (capa 2); los docs (RFP, oferta
+técnica, económica, deck-plan, quote) son sus miembros. El "DSR interno" son las capas 1+2, **ya
+existentes**; el "DSR para clientes" es la capa 3 (proyección), lo que este ADR modela.
+
+**Decisión horneada:** las **fuentes** (`.md`, `deck-plan.json`) se quedan como **archivos git del
+repo**, NO como `proposal_assets` (conservan git-diff/review; el composer las lee directo; el aggregate
+referencia la carpeta por `proposal_id`). Reversible (migración aditiva si se quisiera lo contrario).
+
+**Consecuencia en el roadmap:** **F0 se redefine** como *canonizar el workspace interno del deal*
+(carpeta estándar + `pnpm tender:new` + `artifact-manifest.json`) — más temprano y seguro que la sala
+del comprador. La capa 3 (comprador + tracking) empieza en F1+. Contrato de la capa 1:
+[`docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`](../../commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md)
+(ya implementado, 2026-07-15).
+
 ## Context
 
 Hoy, cuando una propuesta de Efeonce sale por la puerta, entra en un **agujero negro**: se sube el
@@ -270,10 +301,18 @@ igual; el Composer y el artifact-worker no se tocan.
 
 ## Roadmap por fases (indicativo — no autoriza tasks)
 
-- **F0 — Sala interna sobre un deal real.** Proyección + token + render en Think + audience gate, sin
-  tracking. Prueba el split con la propuesta de SKY (o la siguiente). Vertical delgado.
-- **F1 — Tracking analítico.** Event log de dos niveles + ingest forjable-por-diseño + intent score +
-  reader de analytics + capability `read_analytics`.
+- **F0 — Workspace interno del deal (capa 1). ✅ IMPLEMENTADO 2026-07-15.** Carpeta canónica estándar
+  (`bases/` · `research/` · `oferta-tecnica.md` · `deck-plan.json` · `artifact-manifest.json` · `anexos/`
+  · `*-INTERNO`) + scaffolder `pnpm tender:new <slug>` + schema del manifiesto de artefactos vivos.
+  Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`. Fuentes = archivos git; el aggregate
+  referencia por `proposal_id`. (Antes F0 era "sala del comprador"; el operador lo refinó a workspace
+  interno primero — más temprano y seguro.)
+- **F0.5 — Cara interna en el portal.** Ruta detalle `[proposalId]`: el deal completo (RFP, ofertas,
+  deck, quote, evidencia, artefactos vivos) en una vista para el equipo — la evolución del portal de
+  TASK-1413 (hoy lista + versiones; falta el detalle).
+- **F1 — Sala del comprador (capa 3) + tracking analítico.** Proyección `client_facing` + token + render
+  en Think + audience gate + event log de dos niveles + ingest forjable-por-diseño + intent score +
+  capability `read_analytics`.
 - **F2 — Full API Parity + Nexa.** Las 6 capabilities + acciones gobernadas de Nexa + signal reactiva
   "el comité abrió la sala".
 - **F3 — Bow-tie.** Reutilizar la sala en onboarding/renovación/expansión (no solo cierre).
