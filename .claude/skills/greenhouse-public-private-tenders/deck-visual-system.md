@@ -370,6 +370,12 @@ operar. El resumen:
 - **La QA visual es MECÁNICA**: `missing_asset` (todo `<img>` resolvió), `font_fallback_detected`
   (familia sin FontFace), `blank_slide` (contraste local por tiles) — gates de publicación dentro
   del render, calibrados contra los 40 frames del baseline.
+- **El gate visual + el `--freeze` tienen runbook propio** (`docs/operations/runbooks/composer-visual-gate.md`,
+  fuente única — leelo ANTES de `--freeze`). Bug class `ISSUE-122`: el `--freeze` es **SINGLE-OWNER + atómico**
+  (freeze + commit juntos; NUNCA con el composer sucio por otro agente → co-mingla su WIP); y las láminas con
+  **fotos** (`TeamGalleryFull`/equipo) **driftean píxeles entre corridas** aunque no las toques (el `--selftest`
+  de 2 corridas juntas NO lo atrapa) — si el gate flagea solo el área de foto de una lámina que no cambiaste,
+  **es ISSUE-122, NO tu regresión: NO la rebaselines**.
 - **NUNCA** el render pesado en **Vercel** ni en el **`ops-worker`**: vive en el `artifact-worker`
   (frontera autorizada por excepción documentada de EPIC-027).
 - **El deadline viaja FIJADO en el job** y un deadline vencido no compite ni se encola.
