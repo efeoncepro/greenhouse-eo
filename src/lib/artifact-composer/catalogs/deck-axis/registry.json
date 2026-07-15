@@ -40,7 +40,9 @@
     "pricing",
     "requirements-table",
     "evidence-story",
-    "human-impact"
+    "human-impact",
+    "client-logos",
+    "testimonials"
   ],
   "templates": [
     {
@@ -491,6 +493,34 @@
       "prototype": "human-impact-full.html",
       "slotsRef": "human-impact-full.slots.json",
       "note": "PROVISIONAL: layout antes→después humano por rol/persona; prototipo con contenido de ejemplo IDD/Think, no SKY. Confirmar content-type y fit (Codex)."
+    },
+    {
+      "name": "ClientLogosFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "client-logos"
+      ],
+      "prototype": "client-logos-full.html",
+      "slotsRef": "client-logos-full.slots.json",
+      "note": "Muro de confianza: grilla 4×2 de logos de clientes aprobados (resolver client-logo-asset + placa de contraste) + banda de amplitud. Nace por gap TASK-1414/SKY: ToolStackFull es un sistema de herramientas por etapas, no un muro de marcas. Exactamente un logo lleva emphasis='primary' (el prospecto que ya es cliente)."
+    },
+    {
+      "name": "TestimonialsFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "testimonials"
+      ],
+      "prototype": "testimonials-full.html",
+      "slotsRef": "testimonials-full.slots.json",
+      "note": "Dos testimonios verbatim de terceros reales en una lámina + enlace a la muestra viva (fuente verificable). Nace por gap TASK-1414/SKY: QuoteSplit es UNA cita (split); acá se enfrentan dos voces del mismo cliente. Anti-fabricación: cita verbatim, atribución real, proofLink con href obligatorio (validador testimonials-sourced)."
     }
   ],
   "selector": {
@@ -526,7 +556,9 @@
       "pricing": "PricingFull",
       "requirements-table": "RequirementsTableFull",
       "evidence-story": "EvidenceStoryGrid",
-      "human-impact": "HumanImpactFull"
+      "human-impact": "HumanImpactFull",
+      "client-logos": "ClientLogosFull",
+      "testimonials": "TestimonialsFull"
     },
     "disambiguation": [
       "métrica: UNA hero sola => StatSplit; VARIOS KPIs (3-5) de diagnóstico => MetricsSplit; una métrica que necesita GRÁFICO/comparación => ChartSplit; una métrica como RESULTADO de un caso => CaseStudySplit.",
@@ -537,7 +569,8 @@
       "anatomía de entregable editorial: research y fuentes + artículo answer-first + metadata/schema/QA en una misma radiografía => ContentHubAnatomyFull. No usar DailyOpsHubFull: aquí se demuestra la profundidad interna de UNA pieza, no la colaboración entre plataformas.",
       "texto fuerte: STATEMENT/compromiso/pull-quote/testimonial => QuoteSplit; una IDEA/frase destacada => HighlightWave; PROSA narrativa (enfoque/método) => NarrativeSplit; DOS ideas enfrentadas (contexto+solución) => DualTextSplit.",
       "comparación: vs COMPETENCIA en pares exactos => ComparisonSplit (no tabla libre); cumplimiento REQUISITO x SLA item por item => RequirementsTableFull.",
-      "equipo: ROLES con dedicación (tarjetas con glifo, sin foto) => TeamSplit; el roster con FOTOS REALES del squad (resolver squad-person, allowlist cerrada) => TeamGalleryFull. NUNCA una cara generada por IA en ninguna de las dos."
+      "equipo: ROLES con dedicación (tarjetas con glifo, sin foto) => TeamSplit; el roster con FOTOS REALES del squad (resolver squad-person, allowlist cerrada) => TeamGalleryFull. NUNCA una cara generada por IA en ninguna de las dos.",
+      "prueba social: MURO de logos de clientes aprobados (confianza + amplitud, un logo destacado como el prospecto que ya es cliente) => ClientLogosFull; DOS testimonios verbatim de un tercero real, enfrentados, con enlace a la muestra viva => TestimonialsFull; UN statement propio de Efeonce o UNA sola cita => QuoteSplit. Logos y testimonios salen de allowlist/fuente real: NUNCA un cliente inventado ni una cita sin fuente."
     ],
     "rules": [
       "Un slide = un content-type = una plantilla. Si el contenido mezcla dos intenciones, dividir en dos slides (no forzar una plantilla híbrida).",

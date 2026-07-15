@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
+
+  :root { --safe-x:132px; --teal:var(--axis-deck-teal-500); --violet:var(--axis-deck-violet-550); --divider:rgba(var(--axis-ppt-indigo-950-rgb), .09); }
+
+  .slide {
+    position:relative; display:flex; flex-direction:column; min-height:100vh; padding:78px var(--safe-x) 82px;
+    color:var(--axis-ppt-neutral-50); background:var(--axis-deck-recipe-rich-content);
+  }
+
+  .header { display:grid; grid-template-columns:minmax(0, 1fr) 460px; gap:58px; align-items:end; }
+  .section-label { margin-bottom:14px; color:var(--teal); font-size:17px; font-weight:700; letter-spacing:.06em; line-height:1; text-transform:uppercase; }
+  .title { max-width:1000px; font-family:var(--axis-deck-type-display); font-size:56px; font-weight:600; letter-spacing:-.01em; line-height:1.05; }
+  .title em { color:var(--teal); font-style:italic; }
+  .lead { align-self:end; padding:0 0 8px 30px; border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .28); color:rgba(var(--axis-ppt-neutral-50-rgb), .74); font-size:18px; line-height:1.42; }
+
+  /* ===== Un solo estante claro cohesivo con los logos a color ===== */
+  .panel {
+    position:relative; flex:1 1 auto; margin-top:40px; min-height:0; border-radius:28px; overflow:hidden;
+    background:var(--axis-deck-recipe-light-surface);
+    box-shadow:0 34px 66px rgba(var(--axis-deck-navy-990-rgb), .40), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .9);
+  }
+  .wall {
+    display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); grid-auto-rows:1fr; gap:1px;
+    height:100%; background:var(--divider);
+  }
+  .client-tile {
+    position:relative; min-width:0; display:grid; place-items:center; padding:34px 44px;
+    background:var(--axis-ppt-neutral-50);
+  }
+  /* Logos a color, alineados por ALTURA para un muro parejo. */
+  .client-logo { display:block; max-width:78%; max-height:46px; object-fit:contain; }
+
+  /* SKY destacado — el prospecto ya es cliente: su celda va en NAVY (dark) con la versión dark del
+     logo, para que resalte como la celda oscura entre las claras. Anillo teal + chip. Destaque = DATO. */
+  .client-tile.is-primary {
+    background:var(--axis-deck-navy-900);
+  }
+  .client-tile.is-primary::after {
+    content:''; position:absolute; inset:0; border:2px solid rgba(var(--axis-deck-teal-400-rgb), .60);
+    box-shadow:inset 0 0 40px rgba(var(--axis-deck-teal-400-rgb), .16);
+  }
+  .client-flag {
+    position:absolute; top:16px; right:16px; display:none; align-items:center; gap:6px; z-index:3;
+    padding:6px 14px; border-radius:999px; background:var(--axis-deck-teal-500);
+    color:var(--axis-ppt-neutral-50); font-size:11px; font-weight:800; letter-spacing:.08em; line-height:1; text-transform:uppercase;
+    box-shadow:0 8px 16px rgba(var(--axis-deck-teal-600-rgb), .30);
+  }
+  .client-tile.is-primary .client-flag { display:inline-flex; }
+
+  /* ===== Amplitud: la señal "hay muchos más", sin caja ===== */
+  .breadth { display:flex; align-items:baseline; gap:22px; margin-top:30px; padding-top:24px; border-top:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .16); }
+  .breadth-value { font-family:var(--axis-deck-type-display); font-size:50px; font-weight:700; line-height:.9; color:var(--teal); }
+  .breadth-copy { display:flex; flex-direction:column; gap:6px; }
+  .breadth-kicker { color:rgba(var(--axis-ppt-neutral-50-rgb), .58); font-size:12px; font-weight:800; letter-spacing:.1em; line-height:1; text-transform:uppercase; }
+  .breadth-caption { color:rgba(var(--axis-ppt-neutral-50-rgb), .88); font-size:21px; font-weight:520; letter-spacing:-.005em; line-height:1.25; }
+</style></head>
+<body>
+  <main class="slide" data-template="ClientLogosFull" data-url-bubble-backdrop>
+    <header class="header">
+      <div>
+        <p class="section-label" data-slot="sectionLabel" data-slot-type="string">Quiénes confían en Efeonce</p>
+        <h1 class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">SKY ya está en <em>muy buena compañía</em></h1>
+      </div>
+      <p class="lead" data-slot="lead" data-slot-type="string">Consumo masivo, gobierno, servicios y educación operan su contenido, su marca o su visibilidad con Efeonce.</p>
+    </header>
+
+    <section class="panel">
+      <div class="wall" data-slot="logos" data-slot-type="array" data-slot-required="true" aria-label="Marcas que confían en Efeonce">
+        <article class="client-tile">
+          <span class="client-flag">Cliente</span>
+          <img class="client-logo" data-slot-field="client" src="assets/clients/sky.svg" alt="SKY Airline" data-client="sky">
+        </article>
+      </div>
+    </section>
+
+    <section class="breadth" data-slot="breadth" data-slot-type="object" data-slot-required="true" aria-label="Alcance regional">
+      <p class="breadth-value" data-slot-field="value">+90</p>
+      <div class="breadth-copy">
+        <p class="breadth-kicker" data-slot-field="kicker">Presencia regional</p>
+        <p class="breadth-caption" data-slot-field="caption">empresas en Chile, Colombia, México y Perú operan con Efeonce.</p>
+      </div>
+    </section>
+
+    <img class="deck-url-bubble signature-ClientLogosFull" src="assets/url-lum.svg" alt="efeoncepro.com">
+  </main>
+</body></html>

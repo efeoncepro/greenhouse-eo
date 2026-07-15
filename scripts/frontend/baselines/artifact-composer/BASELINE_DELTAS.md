@@ -1,5 +1,57 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-07-15 — Deck SKY 26 → 28: muro de clientes + testimonios del equipo de SKY (prueba social)
+
+**Aprobación del operador (sesión 2026-07-15):** dos plantillas reutilizables de prueba social entran
+en el cluster de cierre, entre `berel` y `seguro`. El deck pasa de 26 a 28 láminas. Ambos moldes son
+**domain-free** (cualquier propuesta los consume desde su `deck-plan`); SKY no queda embebido en la
+plantilla.
+
+**Plantilla `ClientLogosFull` (nueva):** panel claro cohesivo con hasta 8 logos de clientes **a color**
+(resolver cerrado `client-logo-asset` + allowlist `CLIENT_LOGO`), alineados por altura, grilla de
+hairlines. Exactamente un logo lleva `emphasis='primary'` (resolver `client-logo-emphasis`, DATO del
+plan — no hardcode): en SKY su celda va en **navy con la versión dark del logo** + anillo teal + chip
+"Cliente" (el prospecto que ya es cliente). Banda de amplitud **"+90 empresas en Chile, Colombia, México
+y Perú"** — cifra **verificada** del sitio público, no fabricada. Superficie navy = recipe canónica
+`rich-content`; **cero gradientes literales, cero HEX** (color-ledger + gradient-inventory verdes sin
+tocar el inventario).
+
+**Plantilla `TestimonialsFull` (nueva):** dos tarjetas de cita **verbatim** de terceros reales + enlace a
+la muestra viva. Validador semántico `testimonials-sourced`: exige atribución nombrada + `proofLink` con
+href absoluto (la fuente verificable). El testimonio NO se pule el tono (sería fabricación). Framing
+honesto: **relación/confianza de un año, NUNCA "resultados de nuestro SEO"** (las citas hablan de
+automatizaciones/herramientas/procesos).
+
+**Assets del catálogo (allowlist `client-logo-asset`):** internalizados `carozzi/marca-chile/
+gobierno-santiago/bresler/aguas-andinas/universidad-temuco/anam.svg`. `sky.svg` → versión dark (letras
+blancas + chevron verde) con viewBox recortado (venía con espacio en blanco que lo achicaba).
+`aguas-andinas.svg` → desenmascarado (traía una máscara de luminancia VACÍA que ocultaba todo el logo —
+SVG roto de export) + wordmark recoloreado a navy para el panel claro.
+
+**Frames nuevos promovidos (4):**
+
+- `templates/ClientLogosFull.png` — probe del molde reutilizable
+- `templates/TestimonialsFull.png` — probe del molde reutilizable
+- `sky/23-clientes.png` — muro de clientes real del deck SKY
+- `sky/24-testimonios.png` — testimonios reales del equipo de SKY
+
+**Renumerados por la inserción (+2, sólo desplazamiento, contenido sin cambio):**
+
+- `sky/25-seguro.png` (era `23-seguro`) · `sky/26-cumplimiento.png` (era `24-cumplimiento`) ·
+  `sky/27-economica.png` (era `25-economica`) · `sky/28-contraportada.png` (era `26-contraportada`)
+
+**Retirados por el corrimiento** (su contenido vive ahora en el número +2): `sky/23-seguro.png`,
+`sky/24-cumplimiento.png`, `sky/25-economica.png`, `sky/26-contraportada.png`.
+
+**`sky/02-agenda.png` re-derivado:** el hook de agenda deriva números de página REALES del plan; al
+insertar 2 láminas, el capítulo «La inversión» corre su página `economica` de 25 → 27. No es cambio de
+molde: es la agenda haciendo su trabajo (páginas derivadas, no autoradas).
+
+Iteración de logos aprobada por el operador: color en panel claro cohesivo (no cajas ni monocromo),
+SKY destacado con celda navy + logo dark.
+
+---
+
 ## 2026-07-15 — `CoverFull` canonizada: lockup centrado, marca principal ampliada y cliente on-dark nativo
 
 **Aprobación del operador (sesión 2026-07-15):** la portada conserva la composición centrada y reduce
@@ -218,7 +270,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 95dfb6ecd779808c69cbd9529c65af7e6a45cf396d915a072f7be3a5056b2030 -->
+<!-- manifest-digest: 44aedd8f767493b097b1a1d96e18eb5afd5e8974bcb6dffc03f0b0d76aacf624 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

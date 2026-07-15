@@ -145,6 +145,29 @@ const TOOL_LOGO: Record<string, { src: string; label: string; plate: ToolLogoPla
   slack: { src: 'assets/tools/slack-isotype.svg', label: 'Slack', plate: 'light' }
 }
 
+/**
+ * `CLIENT_LOGO` — el muro de clientes de `ClientLogosFull`. Misma disciplina que `TOOL_LOGO` y que
+ * `squad-person`: la clave resuelve a un SVG APROBADO por allowlist cerrada; una marca nueva exige
+ * asset nuevo, no un fallback genérico. Son logos que Efeonce ya exhibe públicamente en su sitio
+ * (clientes reales) — presentar un logo de un cliente que no lo es sería tergiversación en un
+ * documento que evalúa un comité. Plate uniforme `light` (placa blanca) para un muro parejo y
+ * premium; cada logo va en sus colores de marca reales sobre la placa.
+ */
+const CLIENT_LOGO: Record<string, { src: string; label: string }> = {
+  // Marca SKY: `sky.svg` es la versión DARK (letras blancas + chevron verde), para celda oscura
+  // (así se usa acá: SKY va destacado con emphasis='primary' → su celda es navy). En FONDO CLARO el
+  // lockup de SKY lleva las letras en MORADO, no navy — si algún día SKY va sin destacar sobre el
+  // panel claro, hace falta una variante `sky-light` morada; no recolorear ésta a navy.
+  sky: { src: 'assets/clients/sky.svg', label: 'SKY Airline' },
+  carozzi: { src: 'assets/clients/carozzi.svg', label: 'Carozzi' },
+  'marca-chile': { src: 'assets/clients/marca-chile.svg', label: 'Marca Chile' },
+  'gobierno-santiago': { src: 'assets/clients/gobierno-santiago.svg', label: 'Gobierno de Santiago' },
+  bresler: { src: 'assets/clients/bresler.svg', label: 'Bresler' },
+  'aguas-andinas': { src: 'assets/clients/aguas-andinas.svg', label: 'Aguas Andinas' },
+  'universidad-temuco': { src: 'assets/clients/universidad-temuco.svg', label: 'Universidad Católica de Temuco' },
+  anam: { src: 'assets/clients/anam.svg', label: 'ANAM' }
+}
+
 
 export const deckAxisResolvers: ResolverRegistry = {
   'stat-goal-icon': {
@@ -309,6 +332,41 @@ export const deckAxisResolvers: ResolverRegistry = {
           ]
         : null
     }
+  },
+
+  /**
+   * `client-logo-asset` — gemelo de `tool-logo-asset` para el muro de clientes: la clave cerrada
+   * resuelve al SVG aprobado. Sin fallback a genérico: un cliente nuevo exige asset nuevo en
+   * `CLIENT_LOGO`. No se pega un logo ad-hoc ni se inventa un cliente. La plantilla lo pinta
+   * monocromo (filtro CSS) para un muro uniforme, así que el resolver no decide placa: sólo el asset.
+   */
+  'client-logo-asset': {
+    known: Object.keys(CLIENT_LOGO),
+    build: value => {
+      const client = CLIENT_LOGO[value]
+
+      return client
+        ? [
+            { selector: ':field', attr: 'src', value: client.src },
+            { selector: ':field', attr: 'alt', value: client.label },
+            { selector: ':field', attr: 'data-client', value }
+          ]
+        : null
+    }
+  },
+
+  /**
+   * `client-logo-emphasis` — cuál logo del muro va DESTACADO es DATO del plan, no un literal en el
+   * template ni en el CSS (el test del segundo consumidor: hardcodear "sky" acá acoplaría el motor
+   * al primer cliente). 'primary' pinta la clase `.is-primary` sobre la tarjeta; cualquier otro
+   * valor la limpia — si no, el destaque del blueprint contagiaría a un logo equivocado.
+   */
+  'client-logo-emphasis': {
+    known: ['primary', 'none'],
+    build: value =>
+      value === 'primary'
+        ? [{ selector: ':self', toneClass: 'is-primary', toneGroup: ['is-primary'] }]
+        : [{ selector: ':self', toneGroup: ['is-primary'] }]
   },
 
   /**

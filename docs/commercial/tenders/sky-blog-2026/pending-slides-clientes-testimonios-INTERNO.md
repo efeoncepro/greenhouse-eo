@@ -1,10 +1,15 @@
-# Pendiente de construir — 2 láminas del deck SKY: clientes + testimonios (build-ready)
+# 2 láminas del deck SKY: clientes + testimonios — ✅ CONSTRUIDAS Y CANONIZADAS (2026-07-15)
 
-> **Estado:** diseño confirmado por el operador (2026-07-15), **build bloqueado** hasta que el composer
-> quede limpio (Codex mid-flight en TASK-1414 → regla single-owner de `ISSUE-122` / runbook
-> `docs/operations/runbooks/composer-visual-gate.md`). Este doc es para no perder nada + construir rápido.
-> **Ambos slides necesitan PLANTILLA NUEVA en el catálogo** (`registry.json` + `resolvers.ts` + `.html`/
-> `.slots.json`) + internalizar assets → es trabajo del composer, que hoy es área activa de Codex.
+> **Estado: COMPLETO.** Ambas plantillas (`ClientLogosFull` + `TestimonialsFull`) canonizadas en el
+> catálogo `deck-axis`, aprobadas por el operador, baseline congelado (61 frames · 0 px) y commiteadas.
+> El deck SKY quedó en **28 láminas**. Delta canónico en `scripts/frontend/baselines/artifact-composer/
+> BASELINE_DELTAS.md` (§2026-07-15 · Deck SKY 26 → 28). Este doc queda como registro del diseño + las
+> decisiones de marca (curaduría de logos, SKY navy + logo dark, framing honesto de testimonios).
+>
+> **Iteración de logos (aprobada):** el muro pasó por 2 rechazos (cajas blancas genéricas → monocromo
+> con renders rotos) hasta el diseño final: **panel claro cohesivo, 8 logos a color alineados por
+> altura, SKY destacado en celda navy con su versión dark del logo**. `sky.svg` recoloreado a versión
+> dark + viewBox recortado; `aguas-andinas.svg` desenmascarado (máscara vacía) + wordmark a navy.
 
 ## Lámina A — "SKY ya está en buena compañía" (clientes)
 

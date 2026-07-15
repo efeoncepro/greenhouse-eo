@@ -1079,6 +1079,54 @@
       }
     },
     {
+      "slideId": "clientes",
+      "contentType": "client-logos",
+      "template": "ClientLogosFull",
+      "slots": {
+        "sectionLabel": "QUIÉNES CONFÍAN EN EFEONCE",
+        "title": "SKY ya está en <em>muy buena compañía</em>",
+        "lead": "Consumo masivo, gobierno, servicios y educación: marcas que operan su contenido, su marca o su visibilidad con Efeonce.",
+        "logos": [
+          { "client": "sky", "emphasis": "primary" },
+          { "client": "carozzi", "emphasis": "none" },
+          { "client": "marca-chile", "emphasis": "none" },
+          { "client": "gobierno-santiago", "emphasis": "none" },
+          { "client": "aguas-andinas", "emphasis": "none" },
+          { "client": "bresler", "emphasis": "none" },
+          { "client": "universidad-temuco", "emphasis": "none" },
+          { "client": "anam", "emphasis": "none" }
+        ],
+        "breadth": {
+          "value": "+90",
+          "kicker": "Presencia regional",
+          "caption": "empresas en Chile, Colombia, México y Perú operan con Efeonce."
+        }
+      }
+    },
+    {
+      "slideId": "testimonios",
+      "contentType": "testimonials",
+      "template": "TestimonialsFull",
+      "slots": {
+        "sectionLabel": "LA VOZ DE SKY",
+        "title": "Un año trabajando con SKY. <em>Esto dice su equipo.</em>",
+        "lead": "La relación no empieza con esta licitación: el equipo de SKY ya trabaja con Efeonce.",
+        "testimonials": [
+          {
+            "quote": "Super contenta con el trabajo que hemos realizado este año. Nos han ayudado harto en las automatizaciones y en agilizar procesos. Hemos formado un muy bonito equipo, son personas super cálidas. Le agradezco a todo el equipo por estar siempre dispuestos a trabajar con nosotros y entregar lo mejor de si.",
+            "who": "Constanza Rojas",
+            "role": "Team SKY"
+          },
+          {
+            "quote": "Agradezco el super trabajo que hemos estado haciendo con efeonce. Hemos mejorado muchísimo en cuanto a las herramientas tecnológicas. Siento que hemos podido gracias a ellos agilizar mucho la carga de trabajo. Espero que a futuro vengan muchísimas cosas grandes y que siempre podamos estar trabajando de la mano.",
+            "who": "Adriana Contreras",
+            "role": "Team SKY"
+          }
+        ],
+        "proofLink": "<a href=\"https://experiencia.efeoncepro.com\">Vea el <strong>primer año completo</strong> con SKY &nbsp;&rarr;</a>"
+      }
+    },
+    {
       "slideId": "seguro",
       "contentType": "statement",
       "template": "QuoteSplit",
