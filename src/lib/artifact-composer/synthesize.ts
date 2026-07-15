@@ -23,6 +23,14 @@ export const synthesizeSlotValue = (slot: SlotContract): unknown => {
   const clamp = (max: number | undefined, text: string) => (max ? text.slice(0, Math.min(text.length, max)) : text)
 
   const fieldValue = (field: Record<string, unknown>, fallback: string): unknown => {
+    if (field.type === 'array') {
+      const constraints = (field.constraints ?? {}) as { minItems?: number }
+      const item = field.item as { shape?: Record<string, Record<string, unknown>> } | undefined
+      const count = constraints.minItems ?? 1
+
+      return Array.from({ length: count }, () => objectFrom(item?.shape))
+    }
+
     // `values` viene en DOS formas según el contrato: array (`['lead','strategy']` en los campos de
     // item) u objeto clave→etiqueta (`{combined: 'Propuesta…'}` en los slots enum). Confundirlas
     // devuelve el ÍNDICE en vez del valor — y el resolver revienta con un `"0"` que no conoce.

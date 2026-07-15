@@ -93,6 +93,58 @@ const CARD_GRID_ICON: Record<string, string> = {
   governance: 'shield-check'
 }
 
+const DAILY_WORKFLOW_TONES = ['done', 'active', 'next'] as const
+const CONTENT_ANATOMY_CHECK_TONES = ['ready', 'review', 'evidence'] as const
+const CONTENT_ANATOMY_LAYER_TONES = ['research', 'reader', 'machine'] as const
+
+const CONTENT_ANATOMY_CLUSTER_WIDTH: Record<string, string> = {
+  high: '92%',
+  medium: '72%',
+  focused: '56%'
+}
+
+type ToolLogoPlate = 'light' | 'dark' | 'brand-dark'
+
+const TOOL_LOGO: Record<string, { src: string; label: string; plate: ToolLogoPlate; accentRgb?: string }> = {
+  notion: { src: 'assets/tools/notion-isotype.svg', label: 'Notion', plate: 'light' },
+  frameio: { src: 'assets/tools/frameio-isotype.svg', label: 'Frame.io', plate: 'light' },
+  'adobe-illustrator': {
+    src: 'assets/tools/adobe-illustrator-isotype.svg',
+    label: 'Adobe Illustrator',
+    plate: 'brand-dark',
+    accentRgb: '255, 154, 0'
+  },
+  'adobe-photoshop': { src: 'assets/tools/adobe-photoshop-isotype.svg', label: 'Adobe Photoshop', plate: 'dark' },
+  'adobe-premiere-pro': {
+    src: 'assets/tools/adobe-premiere-isotype.svg',
+    label: 'Adobe Premiere Pro',
+    plate: 'dark'
+  },
+  'adobe-after-effects': {
+    src: 'assets/tools/adobe-after-effects-isotype.svg',
+    label: 'Adobe After Effects',
+    plate: 'dark'
+  },
+  'adobe-express': { src: 'assets/tools/adobe-express-isotype.svg', label: 'Adobe Express', plate: 'dark' },
+  'microsoft-365': { src: 'assets/tools/microsoft-365-isotype.svg', label: 'Microsoft 365', plate: 'light' },
+  semrush: { src: 'assets/tools/semrush-isotype.svg', label: 'Semrush', plate: 'dark' },
+  ahrefs: { src: 'assets/tools/ahrefs-isotype.svg', label: 'Ahrefs', plate: 'light' },
+  'brand-visibility-grader': {
+    src: 'assets/tools/brand-visibility-grader-isotype.svg',
+    label: 'Brand Visibility Grader',
+    plate: 'dark'
+  },
+  'screaming-frog': { src: 'assets/tools/screaming-frog-isotype.svg', label: 'Screaming Frog', plate: 'light' },
+  shutterstock: { src: 'assets/tools/shutterstock-isotype.svg', label: 'Shutterstock', plate: 'light' },
+  'adobe-stock': { src: 'assets/tools/adobe-isotype.svg', label: 'Adobe Stock', plate: 'light' },
+  'envato-elements': { src: 'assets/tools/envato-isotype.svg', label: 'Envato Elements', plate: 'dark' },
+  'adobe-firefly': { src: 'assets/tools/adobe-firefly-isotype.svg', label: 'Adobe Firefly', plate: 'dark' },
+  higgsfield: { src: 'assets/tools/higgsfield-isotype.svg', label: 'Higgsfield', plate: 'dark' },
+  magnific: { src: 'assets/tools/magnific-isotype.svg', label: 'Magnific', plate: 'light' },
+  'microsoft-teams': { src: 'assets/tools/teams-isotype.svg', label: 'Microsoft Teams', plate: 'light' },
+  slack: { src: 'assets/tools/slack-isotype.svg', label: 'Slack', plate: 'light' }
+}
+
 
 export const deckAxisResolvers: ResolverRegistry = {
   'stat-goal-icon': {
@@ -234,6 +286,69 @@ export const deckAxisResolvers: ResolverRegistry = {
 
       return icon ? [{ selector: '.ic svg path', attr: 'd', value: solarIconPath(icon) }] : null
     }
+  },
+
+  /**
+   * `tool-logo-asset` — el autor declara la herramienta por clave cerrada; el catálogo pinta el
+   * isotipo/asset aprobado. No hay fallback a ícono genérico: una marca nueva exige asset nuevo.
+   */
+  'tool-logo-asset': {
+    known: Object.keys(TOOL_LOGO),
+    build: value => {
+      const tool = TOOL_LOGO[value]
+
+      return tool
+        ? [
+            { selector: ':field', attr: 'src', value: tool.src },
+            { selector: ':field', attr: 'alt', value: tool.label },
+            { selector: ':field', attr: 'data-tool', value },
+            { selector: '.logo-mark', attr: 'data-logo-plate', value: tool.plate },
+            ...(tool.accentRgb
+              ? [{ selector: '.logo-mark', styleProp: '--tool-logo-accent-rgb', styleValue: tool.accentRgb }]
+              : [])
+          ]
+        : null
+    }
+  },
+
+  /**
+   * `daily-workflow-step-tone` — el estado del ciclo es dato del DeckPlan; la plantilla decide
+   * cómo distinguir lo completado, el trabajo activo y lo que sigue. Nunca se autoran clases CSS.
+   */
+  'daily-workflow-step-tone': {
+    known: [...DAILY_WORKFLOW_TONES],
+    build: value =>
+      DAILY_WORKFLOW_TONES.includes(value as (typeof DAILY_WORKFLOW_TONES)[number])
+        ? [{ selector: ':self', toneClass: value, toneGroup: [...DAILY_WORKFLOW_TONES] }]
+        : null
+  },
+
+  /** Intensidad visual derivada del cluster; el autor declara prioridad, nunca porcentaje CSS. */
+  'content-anatomy-cluster-strength': {
+    known: Object.keys(CONTENT_ANATOMY_CLUSTER_WIDTH),
+    build: value => {
+      const width = CONTENT_ANATOMY_CLUSTER_WIDTH[value]
+
+      return width ? [{ selector: ':field', styleProp: '--cluster-width', styleValue: width }] : null
+    }
+  },
+
+  /** Estado del QA técnico dentro del inspector machine-readable. */
+  'content-anatomy-check-tone': {
+    known: [...CONTENT_ANATOMY_CHECK_TONES],
+    build: value =>
+      CONTENT_ANATOMY_CHECK_TONES.includes(value as (typeof CONTENT_ANATOMY_CHECK_TONES)[number])
+        ? [{ selector: ':self', toneClass: value, toneGroup: [...CONTENT_ANATOMY_CHECK_TONES] }]
+        : null
+  },
+
+  /** Las tres capas conservan semántica y tono aunque cambie su copy visible. */
+  'content-anatomy-layer-tone': {
+    known: [...CONTENT_ANATOMY_LAYER_TONES],
+    build: value =>
+      CONTENT_ANATOMY_LAYER_TONES.includes(value as (typeof CONTENT_ANATOMY_LAYER_TONES)[number])
+        ? [{ selector: ':self', toneClass: value, toneGroup: [...CONTENT_ANATOMY_LAYER_TONES] }]
+        : null
   },
 
   // ── Ordinales: chrome derivado, no dato autorable ────────────────────────────────────────────

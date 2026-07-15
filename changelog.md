@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — `CoverFull` canonizada y deck SKY v6
+
+- La portada reusable conserva su lockup centrado de cuatro elementos y sube la jerarquía de marca: wordmark Efeonce de 650 a 840px, marca cliente on-dark nativa, tipo de propuesta y URL Bubble fija. La recipe `cover-hero` concentra un halo cyan/teal detrás del lockup y controla la presencia violeta sin recuperar el gradiente multicolor histórico.
+- `clientLogo` deja de depender de `filter: brightness/invert`: el contrato exige `native-on-dark` y el template preserva el color del asset. SKY suma `sky-on-dark.svg`, derivado de la geometría y el verde del SVG oficial; un test focal bloquea recoloración CSS y drift del asset.
+- Baseline promovido únicamente para `templates/CoverFull.png` y `sky/01-portada.png`: selftest y gate final pasan 57 frames con 0 píxeles; Composer 215/215 y typecheck limpio. Proposal Studio adjunta el PDF de 26 páginas como `deck` v6 `client_facing`; v5 y toda la historia anterior se conservan.
+
 ## 2026-07-15 — Oferta económica: builder de Excel BRANDEADO reusable
 
 - Hay clientes que exigen Excel (documento integrante). El que se generaba era vago y SKY-hardcodeado. Ahora hay un **builder domain-free reusable** ([economic-offer-xlsx.mjs](scripts/commercial/lib/economic-offer-xlsx.mjs)): banda navy con el wordmark Efeonce (imagen embebida, se ve igual en todo lector), paleta AXIS (navy `#00345F` + teal `#36C8BF`), tabla con zebra + montos alineados, **bloque Neto/IVA/Total** destacado, formato CLP y **print setup A4** (fit-to-width + footer confidencial + página). Verificado con un proxy HTML fiel (salto de ~4/10 a ~8/10).
@@ -13,9 +19,29 @@
 
 ## 2026-07-15 — Proposal Studio: plantilla reusable de stack de herramientas
 
-- El catálogo `deck-axis` suma `contentType: tool-stack` → `ToolStackFull`: lámina 16:9 reutilizable para mostrar herramientas como sistema operativo por etapas (`stages[] -> tools[]`), con isotipo/logo aprobado + nombre visible. Reemplaza la pared de logos por un flujo: planificar, investigar, producir, abastecer y revisar.
-- El Artifact Composer ahora valida, sintetiza y llena colecciones anidadas dentro de slots `array`/`object`; esto queda como capacidad reusable del motor, no como excepción de `ToolStackFull`. Se agregó resolver cerrado `tool-logo-asset` y assets autocontenidos en el catálogo para Notion, Frame.io, Adobe suite, Microsoft 365, Semrush, Ahrefs, Brand Visibility Grader, Screaming Frog, bancos licenciados y suites AI. El resolver también declara placa de contraste `light|dark` para evitar isotipos claros sobre contenedores claros.
-- Preview reusable: `docs/commercial/tenders/sky-blog-2026/reusable-slides/tool-stack-preview.json` (`pnpm deck:compose ... --out .captures/sky-tools-template`). Gates: Composer focal `94/94`, preview compuesto, deck SKY completo recompuesto, ESLint focal, `pnpm typecheck`, `task:lint TASK-1414`, `ops:lint --changed`, `docs:closure-check`, `git diff --check`.
+- El catálogo `deck-axis` suma `contentType: tool-stack` → `ToolStackFull`: lámina 16:9 reutilizable para mostrar herramientas como sistema operativo, no como pared de logos. La versión vigente usa flujo de cinco etapas (`stages[] -> tools[]`) y una `supportLayer` transversal para colaboración, comentarios, versionamiento, licencias y fuentes aprobadas.
+- El Artifact Composer ahora valida, sintetiza y llena colecciones anidadas dentro de slots `array`/`object`; esto queda como capacidad reusable del motor, no como excepción de `ToolStackFull`. Se agregó resolver cerrado `tool-logo-asset` y assets autocontenidos en el catálogo para Notion, Frame.io, Adobe suite, Microsoft 365, Semrush, Ahrefs, Brand Visibility Grader, Screaming Frog, bancos licenciados y suites AI. El resolver también declara placa de contraste `light|dark|brand-dark` para evitar isotipos claros sobre contenedores claros y permitir bases oscuras con acento de marca.
+- Se corrigió un bug del motor: resolvers dentro de arrays anidados en un `object` top-level generaban paths con punto inicial, por lo que el blueprint podía conservar el logo de ejemplo. `tool-stack-full.test.ts` cubre que `supportLayer.tools[]` resuelva isotipos distintos. También se retiró la línea decorativa que se cruzaba con la URL bubble.
+- Preview reusable: `docs/commercial/tenders/sky-blog-2026/reusable-slides/tool-stack-preview.json` (`pnpm deck:compose ... --out .captures/sky-tools-template`). Gates: Composer focal `96/96`, preview compuesto, deck SKY completo recompuesto, ESLint focal, `pnpm typecheck`, `task:lint TASK-1414`, `ops:lint --changed`, `docs:closure-check`, `git diff --check`.
+
+## 2026-07-15 — Proposal Studio: plantilla reusable de operación diaria
+
+- El catálogo `deck-axis` suma `contentType: daily-operations` → `DailyOpsHubFull`: una escena operativa única, con conversación Teams/Slack, artículo vivo en Notion, revisión visual en Frame.io y ruta de estados dentro del mismo workspace. El wordmark de Efeonce es señal de primer viewport dentro de la interfaz, no sólo firma de cierre.
+- La plantilla es slot-driven: cliente/canal, cadencia, artículo, responsables, keyword, intención, estructura, checklist, asset, comentarios y estado del ciclo cambian desde el DeckPlan. `daily-workflow-step-tone` y los ordinales derivados impiden autorar clases o numeración a mano; el test focal cubre logos, pines, estados y ausencia de SKY en el prototipo.
+- Preview reusable: `docs/commercial/tenders/sky-blog-2026/reusable-slides/daily-ops-preview.json` → `.captures/sky-daily-ops-template/01-daily-ops.png` + PDF. El inventario ratchet de gradientes incorpora `ToolStackFull` y `DailyOpsHubFull`; la documentación funcional/manual refleja 30 plantillas vigentes y diferencia `tool-stack` (con qué sistema), `daily-operations` (cómo se trabaja) y `process-sequential` (secuencia abstracta).
+- Aprobación visual recibida y baseline promovido para `templates/ToolStackFull.png` + `templates/DailyOpsHubFull.png`, con delta declarado y manifest sellado. Ambos frames nuevos compararon a cero píxeles en ese checkpoint. El gate global también detectó drift concurrente fuera de estos moldes (`sky/10-operacion`) y el selftest aisló 54 píxeles no deterministas en el borde de avatares; el cierre y su corrección raíz se documentan en la entrada de integración SKY v5.
+
+## 2026-07-15 — Proposal Studio: radiografía reusable del Content Hub
+
+- El catálogo `deck-axis` suma `contentType: content-hub-anatomy` → `ContentHubAnatomyFull`: una lámina 16:9 que abre un único artículo en corte, con research trazable como banda horizontal, respuesta editorial answer-first a sangre e inspector machine-readable lateral con metadata, schema y QA SEO/AEO. No repite el workspace de tres paneles de `DailyOpsHubFull`: aquella explica cómo se colabora; ésta demuestra qué contiene el entregable.
+- El contrato es domain-free y slot-driven: pregunta de negocio, keyword, intención, clusters, fuentes, título, respuesta directa, tres secciones, comentario, metadata, tipos de schema y cuatro checks cambian por `DeckPlan`. Los resolvers `content-anatomy-cluster-strength`, `content-anatomy-check-tone` y `content-anatomy-layer-tone` derivan geometría y estado; el prototipo no contiene SKY ni la keyword del preview.
+- Preview SKY: `docs/commercial/tenders/sky-blog-2026/reusable-slides/content-hub-anatomy-preview.json` → `.captures/sky-content-hub-anatomy-template/01-content-hub-anatomy.png` + PDF. El inventario ratchet declara sus cinco gradientes tokenizados. El catálogo queda en 31 plantillas; la entrada SKY v5 documenta su integración y canonización final.
+
+## 2026-07-15 — SKY: integración operativa y deck v5 versionado
+
+- `deck-plan.json` integra `ToolStackFull`, `DailyOpsHubFull` y `ContentHubAnatomyFull` en las páginas 11, 13 y 17. La Radiografía AEO existente queda inmediatamente después, en la 18, con el mismo enlace vivo. El derivado vigente tiene 26 páginas, 12.2 MB y 11 enlaces (6 internos + 5 externos).
+- Proposal Studio adjuntó el PDF como artefacto `deck` v5, `client_facing` y `draft`; el número se derivó en transacción y v1-v4 permanecen disponibles. No se activó un render-job apagado ni se reemplazó el historial.
+- El visual selftest detectó no determinismo real en `TeamGalleryFull` por anchos fraccionales y clipping de radios. La causa raíz se corrigió antes de sellar el baseline: 57 frames comparan a 0 píxeles y el Composer pasa 213/213. TASK-1414 queda completa; Wherex continúa como acción humana de revisión, carga y firma.
 
 ## 2026-07-15 — DSR interno: workspace canónico del deal + scaffolder + manifiesto de artefactos
 

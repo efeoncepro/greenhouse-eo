@@ -34,6 +34,27 @@ const contract: TemplateContract = {
           evidenceRef: { type: 'string', required: false }
         }
       }
+    },
+    support: {
+      selector: "[data-slot='support']",
+      type: 'object',
+      required: false,
+      shape: {
+        label: { type: 'string', required: true, maxCharacters: 24 },
+        summary: { type: 'string', required: true, maxCharacters: 80 },
+        tools: {
+          type: 'array',
+          required: true,
+          constraints: { minItems: 1, maxItems: 2, overflow: 'reject' },
+          item: {
+            type: 'object',
+            shape: {
+              kind: { type: 'enum', values: ['notion', 'frameio'], required: true },
+              name: { type: 'string', maxCharacters: 20, required: true }
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -127,5 +148,21 @@ describe('deck slot validation', () => {
     )
 
     expect(violations[0]?.code).toBe('missing_required_field')
+  })
+
+  it('valida los campos requeridos de un object top-level', () => {
+    const violations = validateSlide(
+      slide({
+        ...valid,
+        support: {
+          summary: 'Capa transversal para trazabilidad',
+          tools: [{ kind: 'notion', name: 'Notion' }]
+        }
+      }),
+      contract
+    )
+
+    expect(violations[0]?.code).toBe('missing_required_field')
+    expect(violations[0]?.message).toContain('el objeto')
   })
 })

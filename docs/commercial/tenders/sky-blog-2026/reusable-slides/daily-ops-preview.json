@@ -1,0 +1,102 @@
+{
+  "_readme": [
+    "Preview reutilizable para la plantilla DailyOpsHubFull.",
+    "Componer: pnpm deck:compose docs/commercial/tenders/sky-blog-2026/reusable-slides/daily-ops-preview.json --out .captures/sky-daily-ops-template"
+  ],
+  "tenderId": "SKY-BLOG-2026-REUSABLE-DAILY-OPS",
+  "slides": [
+    {
+      "slideId": "daily-ops",
+      "contentType": "daily-operations",
+      "template": "DailyOpsHubFull",
+      "slots": {
+        "sectionLabel": "EL DÍA A DÍA CON EFEONCE",
+        "title": "El trabajo diario queda <em>visible, comentable y versionado</em> desde un solo hub",
+        "lead": "Conversaciones, research SEO/AEO, redacción y revisión visual avanzan sobre el mismo artículo, con una ruta de aprobación compartida.",
+        "workspaceName": "Content Hub editorial",
+        "liveStatus": "Operación compartida",
+        "conversation": {
+          "tool": "microsoft-teams",
+          "toolName": "Teams",
+          "channel": "#proyecto-editorial",
+          "cadence": "Ritual semanal · martes 10:00",
+          "messages": [
+            {
+              "initials": "EO",
+              "author": "Equipo Efeonce",
+              "time": "09:42",
+              "message": "La estructura SEO/AEO y las fuentes ya están listas para revisión."
+            },
+            {
+              "initials": "CL",
+              "author": "Equipo cliente",
+              "time": "10:06",
+              "message": "Dejamos un comentario en el H2 de recomendaciones y otro sobre el visual."
+            },
+            {
+              "initials": "EO",
+              "author": "Equipo Efeonce",
+              "time": "10:18",
+              "message": "Perfecto. La v03 queda hoy en Frame.io con los ajustes aplicados."
+            }
+          ],
+          "composerLabel": "Responder en el canal"
+        },
+        "workspace": {
+          "tool": "notion",
+          "toolName": "Notion · Content Hub",
+          "status": "En revisión",
+          "articleTitle": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesita",
+          "version": "Borrador v03",
+          "owner": "Owner · Equipo editorial",
+          "due": "Entrega · jueves",
+          "keyword": "carretera austral",
+          "intent": "planificación de viaje",
+          "excerpt": "El mismo espacio reúne brief, KW mining, fuentes, estructura, schema y texto; el cliente comenta donde el equipo produce.",
+          "outline": [
+            { "tag": "H1", "title": "Carretera Austral: guía para planificar el viaje" },
+            { "tag": "H2", "title": "Cómo llegar y desde dónde comenzar la ruta" },
+            { "tag": "H2", "title": "Cuántos días necesita según el itinerario" },
+            { "tag": "H2", "title": "Cuándo viajar: clima, temporada y reservas" }
+          ],
+          "checklist": [
+            { "label": "KW mining", "state": "Listo" },
+            { "label": "Schema Article + FAQ", "state": "Listo" },
+            { "label": "Respuesta directa AEO", "state": "Revisión" }
+          ],
+          "commentInitials": "CL",
+          "commentText": "Aclarar la diferencia entre temporada alta y clima favorable."
+        },
+        "reviewAsset": {
+          "src": "assets/product/radiografia-sky-xray.png"
+        },
+        "review": {
+          "tool": "frameio",
+          "toolName": "Frame.io",
+          "version": "Visual v03",
+          "status": "2 comentarios",
+          "assetTitle": "Visual principal · artículo ilustrativo",
+          "comments": [
+            {
+              "author": "Equipo cliente",
+              "message": "Mantener la fotografía, pero dar más aire al título."
+            },
+            {
+              "author": "Dirección de arte",
+              "message": "Ajuste aplicado. La licencia y el crédito quedan documentados."
+            }
+          ]
+        },
+        "workflowLabel": "Ruta visible del artículo",
+        "workflow": [
+          { "label": "Brief", "state": "done" },
+          { "label": "Research SEO/AEO", "state": "done" },
+          { "label": "Redacción", "state": "done" },
+          { "label": "Revisión cliente", "state": "active" },
+          { "label": "Visuales", "state": "next" },
+          { "label": "Publicar + aprender", "state": "next" }
+        ]
+      }
+    }
+  ]
+}

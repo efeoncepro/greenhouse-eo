@@ -43,7 +43,7 @@
       ]
     },
     "cover-hero": {
-      "description": "La portada: grano finísimo + luz central teal + HALO navy alto (cover-halo-navy) + brillo teal abajo-derecha + barrido base 135% (fieldMid → fieldEdge → field). El halo es la firma visual de la portada aprobada por el operador.",
+      "description": "La portada: grano finísimo + luz central cyan/teal detrás del lockup + presencia violeta controlada arriba-izquierda + brillo teal abajo-derecha + campo navy simétrico. Recupera profundidad e impacto sin copiar el gradiente multicolor histórico.",
       "layers": [
         {
           "fn": "radial-gradient",
@@ -55,37 +55,37 @@
         },
         {
           "fn": "radial-gradient",
-          "geometry": "58% 46% at 50% 47%",
+          "geometry": "72% 58% at 50% 34%",
           "stops": [
-            { "ref": "role:accent", "alpha": 0.115, "at": "0%" },
-            { "ref": "role:accent", "alpha": 0.035, "at": "37%" },
-            { "ref": "transparent", "at": "71%" }
+            { "ref": "token:--axis-deck-recipe-cover-halo-teal", "alpha": 0.34, "at": "0%" },
+            { "ref": "role:accent", "alpha": 0.13, "at": "36%" },
+            { "ref": "transparent", "at": "74%" }
           ]
         },
         {
           "fn": "radial-gradient",
-          "geometry": "92% 76% at 50% -8%",
+          "geometry": "52% 58% at 6% 2%",
           "stops": [
-            { "ref": "token:--axis-deck-recipe-cover-halo-navy", "alpha": 0.92, "at": "0%" },
-            { "ref": "role:fieldEdge", "alpha": 0.16, "at": "53%" },
-            { "ref": "transparent", "at": "72%" }
+            { "ref": "role:accentAlt", "alpha": 0.34, "at": "0%" },
+            { "ref": "role:accentAlt", "alpha": 0.1, "at": "44%" },
+            { "ref": "transparent", "at": "73%" }
           ]
         },
         {
           "fn": "radial-gradient",
-          "geometry": "58% 44% at 92% 94%",
+          "geometry": "54% 48% at 94% 92%",
           "stops": [
-            { "ref": "role:accent", "alpha": 0.14, "at": "0%" },
-            { "ref": "transparent", "at": "52%" }
+            { "ref": "role:accent", "alpha": 0.2, "at": "0%" },
+            { "ref": "transparent", "at": "64%" }
           ]
         },
         {
           "fn": "radial-gradient",
-          "geometry": "135% 100% at 70% -10%",
+          "geometry": "135% 108% at 50% -8%",
           "stops": [
             { "ref": "role:fieldMid", "at": "0%" },
-            { "ref": "role:fieldEdge", "at": "55%" },
-            { "ref": "role:field", "at": "100%" }
+            { "ref": "role:fieldEdge", "at": "50%" },
+            { "ref": "role:fieldDeep", "at": "100%" }
           ]
         }
       ]

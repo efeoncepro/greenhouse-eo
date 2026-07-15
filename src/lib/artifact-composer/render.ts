@@ -23,7 +23,14 @@ import { PDFArray, PDFDict, PDFDocument, PDFName, PDFNumber, PDFString } from 'p
 import { chromium, type Browser, type Page } from 'playwright'
 
 import type { CatalogLayoutHook } from './catalog'
-import type { DeckPlan, SlideSpec, SlotContract, SlotValue, TemplateContract } from './contracts'
+import type {
+  DeckPlan,
+  SlideSpec,
+  SlotContract,
+  SlotFieldContract,
+  SlotValue,
+  TemplateContract
+} from './contracts'
 import { assertAllImagesResolved, assertNoFontFallback, assertSlideHasInk } from './quality-gates'
 import { resolveFieldDirective, type FieldDirective, type ResolverRegistry } from './resolver-contract'
 
@@ -102,6 +109,54 @@ const buildFieldPlan = (
   slots: Record<string, unknown>,
   resolvers: ResolverRegistry
 ): Record<string, FieldDirective> | undefined => {
+  const joinFieldPath = (...parts: Array<string | number | undefined>): string =>
+    parts.filter(part => part !== undefined && String(part) !== '').join('.')
+
+  const addFieldPlan = (
+    plan: Record<string, FieldDirective>,
+    pathPrefix: string,
+    shape: Record<string, SlotFieldContract>,
+    item: Record<string, unknown>,
+    index: number,
+    itemCount: number
+  ) => {
+    const ctx = { item, index, itemCount, slots }
+
+    for (const [fieldName, field] of Object.entries(shape)) {
+      const fieldValue = item[fieldName]
+
+      if (field.type === 'array' && Array.isArray(fieldValue) && field.item?.shape) {
+        fieldValue.forEach((nested, nestedIndex) => {
+          if (!isPlainRecord(nested)) return
+
+          addFieldPlan(
+            plan,
+            joinFieldPath(pathPrefix, fieldName, nestedIndex),
+            field.item!.shape!,
+            nested,
+            nestedIndex,
+            fieldValue.length
+          )
+        })
+
+        continue
+      }
+
+      // Un resolver DERIVADO (ordinal, geometría) corre aunque el campo no venga: el número de fase
+      // sale del índice, no de un dato que el autor tenga que escribir.
+      const derived = Boolean(field.resolver) || field.consumer === 'resolver-only'
+
+      if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
+
+      plan[joinFieldPath(pathPrefix, fieldName)] = resolveFieldDirective(
+        resolvers,
+        field,
+        fieldValue,
+        ctx
+      )
+    }
+  }
+
   // Un slot `object` tiene EL MISMO contrato de campo que un item de array: puede declarar evidencia
   // (`validation-only`) y campos DERIVADOS por resolver (la escala de una barra before/after). Que el
   // filler sólo honrara eso en los arrays dejaba a los objetos como ciudadanos de segunda — y era el
@@ -113,19 +168,7 @@ const buildFieldPlan = (
     const plan: Record<string, FieldDirective> = {}
     const record = value as unknown as Record<string, unknown>
 
-    for (const [fieldName, field] of Object.entries(objectShape)) {
-      const fieldValue = record[fieldName]
-      const derived = Boolean((field as { resolver?: string }).resolver)
-
-      if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
-
-      plan[fieldName] = resolveFieldDirective(resolvers, field, fieldValue, {
-        item: record,
-        index: 0,
-        itemCount: 1,
-        slots
-      })
-    }
+    addFieldPlan(plan, '', objectShape, record, 0, 1)
 
     return Object.keys(plan).length > 0 ? plan : undefined
   }
@@ -141,24 +184,7 @@ const buildFieldPlan = (
   value.forEach((item, index) => {
     if (typeof item !== 'object' || item === null) return
 
-    const ctx = {
-      item: item as Record<string, unknown>,
-      index,
-      itemCount: value.length,
-      slots
-    }
-
-    for (const [fieldName, field] of Object.entries(shape)) {
-      const fieldValue = (item as Record<string, unknown>)[fieldName]
-
-      // Un resolver DERIVADO (ordinal, geometría) corre aunque el campo no venga: el número de fase
-      // sale del índice, no de un dato que el autor tenga que escribir.
-      const derived = Boolean(field.resolver) || field.consumer === 'resolver-only'
-
-      if (!derived && (fieldValue === undefined || fieldValue === null || fieldValue === '')) continue
-
-      plan[`${index}.${fieldName}`] = resolveFieldDirective(resolvers, field, fieldValue, ctx)
-    }
+    addFieldPlan(plan, String(index), shape, item as Record<string, unknown>, index, value.length)
   })
 
   return plan
@@ -282,6 +308,188 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
     return container.innerHTML
   }
 
+  const directFieldAnchors = (node: Element): Element[] =>
+    Array.from(node.querySelectorAll('[data-slot-field]')).filter(field => {
+      const parentField = field.parentElement?.closest('[data-slot-field]')
+
+      return parentField === null
+    })
+
+  const applyDirective = (
+    scope: Element,
+    fieldName: string,
+    directive: FieldDirective,
+    selectorLabel: string
+  ): boolean => {
+    let ok = true
+
+    if (directive.mode !== 'apply') return ok
+
+    for (const effect of directive.effects) {
+      const target =
+        effect.selector === ':self'
+          ? scope
+          : effect.selector === ':field'
+            ? scope.querySelector(`[data-slot-field="${fieldName}"]`)
+            : scope.querySelector(effect.selector)
+
+      if (!target) {
+        problems.push(
+          `${selectorLabel}: el resolver de "${fieldName}" apunta a "${effect.selector}", que no existe en el item del HTML.`
+        )
+        ok = false
+        continue
+      }
+
+      if (effect.attr && effect.value !== undefined) {
+        target.setAttribute(effect.attr, effect.value)
+      }
+
+      if (effect.remove) {
+        target.remove()
+        continue
+      }
+
+      if (effect.styleProp && effect.styleValue !== undefined) {
+        ;(target as HTMLElement).style.setProperty(effect.styleProp, effect.styleValue)
+      }
+
+      if (effect.asText && effect.value !== undefined) {
+        target.textContent = effect.value
+      }
+
+      for (const other of effect.toneGroup ?? []) {
+        target.classList.remove(other)
+      }
+
+      if (effect.toneClass) {
+        target.classList.add(effect.toneClass)
+      }
+    }
+
+    return ok
+  }
+
+  function fillArrayHost(
+    host: Element,
+    entries: unknown[],
+    instruction: FillInstruction,
+    pathPrefix: string,
+    selectorLabel: string
+  ) {
+    const itemHost = (host.querySelector('[data-slot-items]') as Element | null) ?? host
+    const itemTemplate = itemHost.firstElementChild
+
+    if (!itemTemplate) {
+      problems.push(`${selectorLabel}: el campo array "${pathPrefix}" no tiene item-template en el HTML.`)
+
+      return
+    }
+
+    const blueprint = itemTemplate.cloneNode(true) as Element
+
+    itemHost.innerHTML = ''
+
+    entries.forEach((entry, nestedIndex) => {
+      const node = blueprint.cloneNode(true) as Element
+
+      if (typeof entry === 'string') {
+        const field = node.querySelector('[data-slot-field]') ?? node
+
+        field.innerHTML = sanitize(entry)
+      } else if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+        fillRecordFields(
+          node,
+          entry as Record<string, unknown>,
+          instruction,
+          `${pathPrefix}.${nestedIndex}`,
+          selectorLabel
+        )
+      } else {
+        problems.push(`${selectorLabel}: el campo array "${pathPrefix}" trae un item no soportado.`)
+      }
+
+      itemHost.appendChild(node)
+    })
+  }
+
+  function fillRecordFields(
+    node: Element,
+    record: Record<string, unknown>,
+    instruction: FillInstruction,
+    pathPrefix: string,
+    selectorLabel: string
+  ) {
+    const plannedPrefix = pathPrefix ? `${pathPrefix}.` : ''
+
+    const planned = Object.keys(instruction.fieldPlan ?? {})
+      .filter(key => key.startsWith(plannedPrefix))
+      .map(key => key.slice(plannedPrefix.length).split('.')[0])
+
+    const fieldNames = new Set([...Object.keys(record), ...planned])
+
+    for (const fieldName of fieldNames) {
+      const fieldValue = record[fieldName]
+      const pathKey = pathPrefix ? `${pathPrefix}.${fieldName}` : fieldName
+      const directive = instruction.fieldPlan?.[pathKey] ?? { mode: 'text' as const }
+
+      if (directive.mode === 'skip') continue
+
+      if (directive.mode === 'text' && (fieldValue === undefined || fieldValue === null || fieldValue === '')) {
+        continue
+      }
+
+      if (directive.mode === 'apply') {
+        applyDirective(node, fieldName, directive, selectorLabel)
+        continue
+      }
+
+      const field = node.querySelector(`[data-slot-field="${fieldName}"]`)
+
+      if (!field) {
+        problems.push(
+          `${selectorLabel}: el campo "${fieldName}" no tiene [data-slot-field="${fieldName}"] en el HTML. ` +
+            `Sin ancla, quedaría el contenido de ejemplo del prototipo.`
+        )
+        continue
+      }
+
+      if (Array.isArray(fieldValue)) {
+        fillArrayHost(field, fieldValue, instruction, pathKey, selectorLabel)
+        continue
+      }
+
+      const nested = field.querySelector('[data-slot-field]')
+
+      if (nested) {
+        for (const child of Array.from(field.childNodes)) {
+          if (child.nodeType === Node.TEXT_NODE) child.remove()
+        }
+
+        field.insertBefore(document.createTextNode(String(fieldValue) + ' '), field.firstChild)
+        continue
+      }
+
+      field.innerHTML = sanitize(String(fieldValue))
+    }
+
+    for (const field of directFieldAnchors(node)) {
+      const name = field.getAttribute('data-slot-field')!
+      const authored = record[name]
+      const fieldPath = pathPrefix ? `${pathPrefix}.${name}` : name
+
+      const derived = Object.keys(instruction.fieldPlan ?? {}).some(
+        key => key === fieldPath || key.startsWith(`${fieldPath}.`)
+      )
+
+      if (derived) continue
+
+      if (authored === undefined || authored === null || authored === '') {
+        field.remove()
+      }
+    }
+  }
+
   for (const instruction of instructions) {
     const el = document.querySelector(instruction.selector)
 
@@ -371,96 +579,7 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
         continue
       }
 
-      // Se recorre el PLAN además del objeto: un campo DERIVADO (la escala de la barra before/after)
-      // no tiene valor propio —se calcula—, así que iterar sólo el objeto lo dejaría fuera. Es la
-      // misma regla que ya regía en los arrays: **objeto y array honran el mismo contrato de campo**.
-      const record = value as Record<string, unknown>
-      const fieldNames = new Set([...Object.keys(record), ...Object.keys(instruction.fieldPlan ?? {})])
-
-      for (const fieldName of fieldNames) {
-        const fieldValue = record[fieldName]
-        const directive = instruction.fieldPlan?.[fieldName] ?? { mode: 'text' as const }
-
-        // Evidencia dentro de un objeto (el `evidenceRef` de un KPI): se exige, pero NUNCA se pinta.
-        // La fuente de una cifra no tiene por qué existir en el HTML — no es copy para el comité.
-        if (directive.mode === 'skip') continue
-
-        if (directive.mode === 'text' && (fieldValue === undefined || fieldValue === null || fieldValue === '')) {
-          continue
-        }
-
-        if (directive.mode === 'apply') {
-          for (const effect of directive.effects) {
-            const target = effect.selector === ':self' ? el : el.querySelector(effect.selector)
-
-            if (!target) {
-              problems.push(
-                `${instruction.selector}: el resolver de "${fieldName}" apunta a "${effect.selector}", que no existe en el HTML.`
-              )
-
-              continue
-            }
-
-            if (effect.attr) target.setAttribute(effect.attr, String(effect.value))
-
-            if (effect.remove) {
-              target.remove()
-              continue
-            }
-
-            if (effect.styleProp) (target as HTMLElement).style.setProperty(effect.styleProp, String(effect.styleValue))
-            if (effect.toneGroup) for (const cls of effect.toneGroup) target.classList.remove(cls)
-            if (effect.toneClass) target.classList.add(effect.toneClass)
-            if (effect.asText) target.textContent = String(effect.value)
-          }
-
-          continue
-        }
-
-        const field = el.querySelector(`[data-slot-field="${fieldName}"]`)
-
-        if (!field) {
-          problems.push(
-            `${instruction.selector}: el campo "${fieldName}" no tiene [data-slot-field="${fieldName}"] ` +
-              `en el HTML. Sin ancla, quedaría el valor de ejemplo del prototipo (un KPI falso en la lámina).`
-          )
-
-          continue
-        }
-
-        // Un campo con valor ARRAY dentro de un objeto (los `paragraphs` de una columna) es una LISTA
-        // REPETIDA, no un texto: su ancla es el CONTENEDOR y su primer hijo es el blueprint del item.
-        // Pasarlo por `String(array)` —lo que hacía antes— aplanaba los `<p>` del diseñador en un
-        // solo bloque y dejaba las comas del join a la vista. Es la misma semántica de un slot array:
-        // el markup del item vive en el HTML.
-        if (Array.isArray(fieldValue)) {
-          const blueprint = field.firstElementChild
-
-          if (!blueprint) {
-            problems.push(
-              `${instruction.selector}: el campo "${fieldName}" es una lista, pero su ancla no tiene un item-template en el HTML.`
-            )
-
-            continue
-          }
-
-          const itemTemplate = blueprint.cloneNode(true) as Element
-
-          field.innerHTML = ''
-
-          for (const entry of fieldValue) {
-            const node = itemTemplate.cloneNode(true) as Element
-
-            node.innerHTML = sanitize(String(entry))
-            field.appendChild(node)
-          }
-
-          continue
-        }
-
-        field.innerHTML = sanitize(String(fieldValue))
-      }
-
+      fillRecordFields(el, value as Record<string, unknown>, instruction, '', instruction.selector)
       continue
     }
 
@@ -578,150 +697,27 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
       host.innerHTML = ''
       host.append(...fixedChildren)
 
-      for (const item of items) {
+      items.forEach((item, index) => {
         const node = blueprint.cloneNode(true) as Element
 
         if (typeof item === 'string') {
           const field = node.querySelector('[data-slot-field]') ?? node
 
           field.innerHTML = sanitize(item)
-        } else if (item && typeof item === 'object') {
-          const index = items.indexOf(item)
-          const record = item as Record<string, unknown>
-
-          // Se recorre el PLAN, no los campos del item: los resolvers derivados (el ordinal de una
-          // fase, la altura de una barra) no tienen valor propio en el item — se calculan desde el
-          // índice o desde la serie. Iterar el item los dejaría fuera.
-          const planned = Object.keys(instruction.fieldPlan ?? {})
-            .filter(key => key.startsWith(`${index}.`))
-            .map(key => key.slice(String(index).length + 1))
-
-          const fieldNames = new Set([...Object.keys(record), ...planned])
-
-          for (const fieldName of fieldNames) {
-            const fieldValue = record[fieldName]
-            const directive = instruction.fieldPlan?.[`${index}.${fieldName}`] ?? { mode: 'text' }
-
-            // Un campo sin valor y sin resolver no se escribe (lo limpia el barrido de abajo).
-            if (directive.mode === 'text' && (fieldValue === undefined || fieldValue === null || fieldValue === '')) {
-              continue
-            }
-
-            // `validation-only` (ej. evidenceRef): se exige, pero NUNCA se pinta. Es munición
-            // interna — la fuente de una cifra no es copy para el comité.
-            if (directive.mode === 'skip') continue
-
-            if (directive.mode === 'apply') {
-              for (const effect of directive.effects) {
-                const target =
-                  effect.selector === ':self'
-                    ? node
-                    : effect.selector === ':field'
-                      ? // El nodo del propio campo. Escribir texto en `:self` (la raíz del item)
-                        // borraría todos los hijos y con ellos las anclas del resto de los campos.
-                        node.querySelector(`[data-slot-field="${fieldName}"]`)
-                      : node.querySelector(effect.selector)
-
-                if (!target) {
-                  problems.push(
-                    `${instruction.selector} item ${index}: el resolver de "${fieldName}" apunta a ` +
-                      `"${effect.selector}", que no existe en el item del HTML.`
-                  )
-
-                  continue
-                }
-
-                if (effect.attr && effect.value !== undefined) {
-                  target.setAttribute(effect.attr, effect.value)
-                }
-
-                if (effect.remove) {
-                  target.remove()
-                  continue
-                }
-
-                // Geometría: la barra se DERIVA del dato (ver el comentario en resolvers.ts —
-                // una barra que no se recalcula es fabricación gráfica).
-                if (effect.styleProp && effect.styleValue !== undefined) {
-                  ;(target as HTMLElement).style.setProperty(effect.styleProp, effect.styleValue)
-                }
-
-                if (effect.asText && effect.value !== undefined) {
-                  target.textContent = effect.value
-                }
-
-                // El tono es excluyente. Se limpia el grupo SIEMPRE (aunque no venga un tono nuevo):
-                // el blueprint puede traer la clase del item destacado, y sin esta limpieza TODOS los
-                // items salen marcados como "el propuesto" — que en la lámina económica es una
-                // afirmación falsa sobre cuál plan se está ofreciendo.
-                for (const other of effect.toneGroup ?? []) {
-                  target.classList.remove(other)
-                }
-
-                if (effect.toneClass) {
-                  target.classList.add(effect.toneClass)
-                }
-              }
-
-              continue
-            }
-
-            const field = node.querySelector(`[data-slot-field="${fieldName}"]`)
-
-            if (!field) {
-              // ⚠️ Fallo RUIDOSO a propósito. Si el campo no tiene ancla en el HTML, el item se
-              // renderizaría con el COPY DE EJEMPLO del blueprint — un deck que sale al cliente con
-              // el relleno del prototipo y nadie se entera. Es el peor fallo posible acá.
-              problems.push(
-                `${instruction.selector} item ${index}: el campo "${fieldName}" no tiene ` +
-                  `[data-slot-field="${fieldName}"] en el HTML de la plantilla. ` +
-                  `Sin ancla, quedaría el contenido de ejemplo del prototipo.`
-              )
-
-              continue
-            }
-
-            // Un campo puede CONTENER a otro (`<p field="label">Base <span field="status">…</span></p>`).
-            // Escribirlo con innerHTML borraría al hijo anotado y el status desaparecería. Cuando eso
-            // pasa, sólo se reemplazan los nodos de TEXTO propios y los hijos anotados quedan intactos.
-            const nested = field.querySelector('[data-slot-field]')
-
-            if (nested) {
-              for (const child of Array.from(field.childNodes)) {
-                if (child.nodeType === Node.TEXT_NODE) child.remove()
-              }
-
-              field.insertBefore(document.createTextNode(String(fieldValue) + ' '), field.firstChild)
-              continue
-            }
-
-            field.innerHTML = sanitize(String(fieldValue))
-          }
-
-          // Un campo opcional que no vino se ELIMINA del DOM (no se deja el placeholder del blueprint).
-          //
-          // ⚠️ Pero un campo **DERIVADO** (el ordinal de un paso, la escala de una barra) tampoco
-          // "viene" del autor —lo escribe el resolver— y borrarlo destruye chrome legítimo. Es lo que
-          // hacía desaparecer los números de `ProcessStepsFull`: el resolver escribía "01", y el
-          // barrido inmediatamente le quitaba el nodo.
-          //
-          // La regla correcta: **un campo está provisto si lo dio el AUTOR o si lo derivó un
-          // RESOLVER.** Vale para cualquier plantilla con chrome derivado, no sólo ésta.
-          for (const field of Array.from(node.querySelectorAll('[data-slot-field]'))) {
-            const name = field.getAttribute('data-slot-field')!
-            const authored = (item as Record<string, unknown>)[name]
-            const derived = instruction.fieldPlan?.[`${index}.${name}`] !== undefined
-
-            if (derived) continue
-
-            if (authored === undefined || authored === null || authored === '') {
-              field.remove()
-            }
-          }
+        } else if (item && typeof item === 'object' && !Array.isArray(item)) {
+          fillRecordFields(
+            node,
+            item as Record<string, unknown>,
+            instruction,
+            String(index),
+            `${instruction.selector} item ${index}`
+          )
+        } else {
+          problems.push(`el slot array "${instruction.selector}" trae un item no soportado.`)
         }
 
         host.appendChild(node)
-      }
+      })
 
       continue
     }

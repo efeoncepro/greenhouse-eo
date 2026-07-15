@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es"><head>
+  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="deck-signature.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
+
+  :root { --safe-x:132px; --teal:var(--axis-deck-teal-500); --violet:var(--axis-deck-violet-550); }
+
+  .slide {
+    position:relative; color:var(--axis-ppt-neutral-50);
+    background:
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .065) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(58% 66% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .43) 0%, rgba(var(--axis-deck-teal-550-rgb), .12) 44%, transparent 72%),
+      radial-gradient(50% 64% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .44) 0%, rgba(var(--axis-deck-violet-550-rgb), .13) 47%, transparent 76%),
+      linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-880) 44%, var(--axis-deck-navy-980) 100%);
+  }
+
+  .header { position:absolute; top:60px; left:var(--safe-x); right:var(--safe-x); display:grid; grid-template-columns:minmax(0, 1fr) 420px; gap:54px; align-items:end; }
+  .section-label { margin-bottom:12px; color:var(--teal); font-size:17px; font-weight:750; line-height:1; text-transform:uppercase; }
+  .title { max-width:1120px; font-family:var(--axis-deck-type-display); font-size:50px; font-weight:600; letter-spacing:0; line-height:1.02; }
+  .title em { color:var(--teal); font-style:italic; }
+  .proof-context { align-self:end; padding:0 0 2px 28px; border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .30); }
+  .lead { color:rgba(var(--axis-ppt-neutral-50-rgb), .76); font-size:16px; line-height:1.34; }
+  .proof-bridge { margin-top:11px; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:9px 11px; border:1px solid rgba(var(--axis-deck-teal-200-rgb), .24); border-radius:9px; background:rgba(var(--axis-deck-teal-500-rgb), .09); }
+  .proof-kicker { flex:0 0 auto; color:rgba(var(--axis-deck-teal-100-rgb), .72); font-size:8px; font-weight:850; text-transform:uppercase; }
+  .proof-link { min-width:0; overflow:hidden; font-size:10px; font-weight:800; white-space:nowrap; text-overflow:ellipsis; }
+  .proof-link a { color:var(--axis-deck-teal-100); text-decoration:underline; text-decoration-color:rgba(var(--axis-deck-teal-100-rgb), .52); text-underline-offset:3px; }
+
+  .xray-shell {
+    position:absolute; top:232px; left:var(--safe-x); right:var(--safe-x); height:754px; overflow:hidden;
+    border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .24); border-radius:22px;
+    background:var(--axis-deck-navy-990);
+    box-shadow:0 28px 68px rgba(var(--axis-deck-navy-990-rgb), .34), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .12);
+  }
+  .xray-shell::before { content:''; position:absolute; z-index:8; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, var(--teal), rgba(var(--axis-deck-teal-300-rgb), .82) 48%, var(--violet)); }
+
+  .app-bar { height:58px; display:flex; align-items:center; gap:15px; padding:0 22px; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .14); background:rgba(var(--axis-deck-navy-910-rgb), .88); }
+  .window-dots { display:none; }
+  .window-dots i { width:8px; height:8px; border-radius:50%; background:rgba(var(--axis-ppt-neutral-50-rgb), .26); }
+  .brand-logo { width:118px; height:30px; object-fit:contain; object-position:left center; }
+  .bar-separator { width:1px; height:28px; background:rgba(var(--axis-ppt-neutral-50-rgb), .20); }
+  .workspace-name { color:rgba(var(--axis-ppt-neutral-50-rgb), .86); font-size:14px; font-weight:750; }
+  .breadcrumb { color:rgba(var(--axis-ppt-neutral-50-rgb), .44); font-size:11px; font-weight:650; }
+  .breadcrumb::before { content:'/'; margin-right:14px; color:rgba(var(--axis-ppt-neutral-50-rgb), .24); }
+  .version-chip { margin-left:auto; padding:8px 11px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .15); border-radius:8px; color:rgba(var(--axis-ppt-neutral-50-rgb), .58); font-size:10px; font-weight:750; }
+  .status-chip { padding:9px 13px; border:1px solid rgba(var(--axis-deck-teal-200-rgb), .30); border-radius:999px; background:rgba(var(--axis-deck-teal-500-rgb), .11); color:var(--axis-deck-teal-100); font-size:10px; font-weight:800; text-transform:uppercase; }
+
+  .anatomy { height:696px; display:grid; grid-template-columns:minmax(0, 1fr) 448px; grid-template-rows:164px 532px; }
+  .research-rail, .machine-rail { min-width:0; position:relative; overflow:hidden; background:rgba(var(--axis-deck-navy-950-rgb), .72); }
+  .research-rail { grid-column:1 / 3; grid-row:1; display:grid; grid-template-columns:286px minmax(0, 1fr); border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .13); background:rgba(var(--axis-deck-navy-920-rgb), .92); }
+  .machine-rail { grid-column:2; grid-row:2; border-left:1px solid rgba(var(--axis-deck-teal-300-rgb), .40); box-shadow:inset 10px 0 30px rgba(var(--axis-deck-teal-500-rgb), .055); }
+  .machine-rail::before { content:''; position:absolute; z-index:3; top:0; bottom:0; left:-1px; width:2px; background:var(--teal); box-shadow:0 0 18px rgba(var(--axis-deck-teal-300-rgb), .78); }
+
+  .rail-head { height:72px; display:flex; align-items:center; gap:11px; padding:15px 18px; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .12); }
+  .research-rail .rail-head { height:164px; padding:20px 22px; border-right:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .12); border-bottom:0; }
+  .rail-icon { width:34px; height:34px; flex:0 0 auto; display:grid; place-items:center; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .16); border-radius:10px; background:rgba(var(--axis-ppt-neutral-50-rgb), .05); }
+  .rail-icon img { width:21px; height:21px; object-fit:contain; filter:brightness(0) invert(1); opacity:.82; }
+  .machine-rail .rail-icon { border-color:rgba(var(--axis-deck-teal-300-rgb), .28); background:rgba(var(--axis-deck-teal-500-rgb), .11); }
+  .rail-kicker { color:rgba(var(--axis-ppt-neutral-50-rgb), .42); font-size:8px; font-weight:850; text-transform:uppercase; }
+  .rail-title { margin-top:4px; color:var(--axis-ppt-neutral-50); font-size:14px; font-weight:780; line-height:1.1; }
+  .rail-state { margin-left:auto; padding:6px 8px; border-radius:7px; background:rgba(var(--axis-ppt-neutral-50-rgb), .06); color:rgba(var(--axis-ppt-neutral-50-rgb), .50); font-size:8px; font-weight:750; text-transform:uppercase; }
+
+  .research-body { min-width:0; display:grid; grid-template-columns:270px 220px minmax(250px, 1fr) minmax(270px, 1.08fr); gap:14px; align-items:center; padding:13px 18px; }
+  .research-summary { min-width:0; padding:12px 13px; border-left:3px solid var(--teal); background:rgba(var(--axis-deck-teal-500-rgb), .075); }
+  .micro-label { color:rgba(var(--axis-ppt-neutral-50-rgb), .40); font-size:8px; font-weight:850; text-transform:uppercase; }
+  .research-question { margin-top:6px; color:rgba(var(--axis-ppt-neutral-50-rgb), .86); font-size:11px; font-weight:700; line-height:1.28; }
+  .research-facts { display:grid; grid-template-columns:1fr; gap:7px; margin-top:0; }
+  .research-fact { min-width:0; padding:9px 10px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .09); border-radius:9px; background:rgba(var(--axis-ppt-neutral-50-rgb), .035); }
+  .fact-label { color:rgba(var(--axis-ppt-neutral-50-rgb), .36); font-size:7px; font-weight:850; text-transform:uppercase; }
+  .fact-value { margin-top:4px; overflow:hidden; color:rgba(var(--axis-ppt-neutral-50-rgb), .74); font-size:9px; font-weight:700; line-height:1.2; white-space:nowrap; text-overflow:ellipsis; }
+  .research-section { min-width:0; margin-top:0; }
+  .section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .section-label-small { color:rgba(var(--axis-ppt-neutral-50-rgb), .44); font-size:8px; font-weight:850; text-transform:uppercase; }
+  .section-count { color:var(--axis-deck-teal-100); font-size:8px; font-weight:800; }
+  .cluster-list, .source-list { display:flex; flex-direction:column; gap:5px; }
+  .cluster { padding:6px 8px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .09); border-radius:8px; background:rgba(var(--axis-ppt-neutral-50-rgb), .035); }
+  .cluster-top { display:flex; align-items:center; gap:8px; }
+  .cluster-name { min-width:0; flex:1; overflow:hidden; color:rgba(var(--axis-ppt-neutral-50-rgb), .74); font-size:9px; font-weight:700; white-space:nowrap; text-overflow:ellipsis; }
+  .cluster-signal { color:rgba(var(--axis-ppt-neutral-50-rgb), .36); font-size:7px; font-weight:750; text-transform:uppercase; }
+  .cluster-track { height:3px; margin-top:5px; overflow:hidden; border-radius:3px; background:rgba(var(--axis-ppt-neutral-50-rgb), .08); }
+  .cluster-bar { display:block; height:100%; width:var(--cluster-width, 72%); border-radius:3px; background:var(--teal); }
+  .source { display:grid; grid-template-columns:32px minmax(0, 1fr); gap:8px; align-items:center; padding:5px 7px; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .075); }
+  .source-type { display:grid; place-items:center; height:22px; border-radius:7px; background:rgba(var(--axis-deck-violet-550-rgb), .20); color:var(--axis-deck-violet-50); font-size:7px; font-weight:850; text-transform:uppercase; }
+  .source-title { overflow:hidden; color:rgba(var(--axis-ppt-neutral-50-rgb), .70); font-size:8px; font-weight:700; white-space:nowrap; text-overflow:ellipsis; }
+  .source-note { margin-top:3px; color:rgba(var(--axis-ppt-neutral-50-rgb), .34); font-size:7px; }
+
+  .article-lane { grid-column:1; grid-row:2; min-width:0; padding:0; background:var(--axis-ppt-neutral-50); }
+  .article-sheet { position:relative; height:532px; overflow:hidden; border-radius:0; background:var(--axis-ppt-neutral-50); color:var(--axis-deck-navy-950); box-shadow:none; }
+  .article-toolbar { height:46px; display:flex; align-items:center; gap:9px; padding:0 24px; border-bottom:1px solid rgba(var(--axis-deck-navy-900-rgb), .10); }
+  .article-toolbar img { width:18px; height:18px; opacity:.72; }
+  .article-tool-label { color:rgba(var(--axis-deck-navy-950-rgb), .52); font-size:9px; font-weight:800; text-transform:uppercase; }
+  .article-owner { margin-left:auto; color:rgba(var(--axis-deck-navy-950-rgb), .42); font-size:8px; font-weight:650; }
+  .article-content { padding:16px 30px 18px; }
+  .article-eyebrow { color:var(--axis-deck-teal-750); font-size:8px; font-weight:850; text-transform:uppercase; }
+  .article-title { max-width:820px; margin-top:7px; font-family:var(--axis-deck-type-display); font-size:28px; font-weight:650; letter-spacing:0; line-height:1.08; }
+  .article-deck { max-width:700px; margin-top:9px; color:rgba(var(--axis-deck-navy-950-rgb), .58); font-size:10px; line-height:1.4; }
+  .answer-block { position:relative; margin-top:12px; padding:11px 15px 11px 44px; border:1px solid rgba(var(--axis-deck-teal-500-rgb), .22); border-radius:10px; background:rgba(var(--axis-deck-teal-500-rgb), .07); }
+  .answer-mark { position:absolute; top:12px; left:13px; width:23px; height:23px; display:grid; place-items:center; border-radius:7px; background:var(--teal); color:var(--axis-deck-navy-990); font-size:12px; font-weight:900; }
+  .answer-label { color:var(--axis-deck-teal-750); font-size:7px; font-weight:850; text-transform:uppercase; }
+  .answer-copy { margin-top:4px; color:rgba(var(--axis-deck-navy-950-rgb), .78); font-size:10px; font-weight:650; line-height:1.35; }
+  .article-sections { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+  .article-section { padding-bottom:7px; border-bottom:1px solid rgba(var(--axis-deck-navy-900-rgb), .08); }
+  .section-tag { color:rgba(var(--axis-deck-navy-950-rgb), .38); font-size:7px; font-weight:850; text-transform:uppercase; }
+  .section-title-main { margin-top:3px; color:var(--axis-deck-navy-950); font-size:13px; font-weight:780; line-height:1.18; }
+  .section-copy { margin-top:5px; color:rgba(var(--axis-deck-navy-950-rgb), .56); font-size:9px; line-height:1.38; }
+  .evidence-callout { margin-top:9px; display:grid; grid-template-columns:4px minmax(0, 1fr); gap:10px; align-items:stretch; }
+  .evidence-rule { border-radius:4px; background:var(--violet); }
+  .evidence-copy { color:rgba(var(--axis-deck-navy-950-rgb), .62); font-size:9px; font-weight:650; line-height:1.35; }
+  .inline-comment { position:absolute; right:18px; bottom:14px; max-width:360px; display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid rgba(var(--axis-deck-violet-550-rgb), .18); border-radius:10px; background:var(--axis-ppt-neutral-50); box-shadow:0 8px 22px rgba(var(--axis-deck-navy-990-rgb), .13); }
+  .comment-avatar { width:23px; height:23px; flex:0 0 auto; display:grid; place-items:center; border-radius:8px; background:rgba(var(--axis-deck-violet-550-rgb), .12); color:var(--axis-deck-violet-650); font-size:8px; font-weight:850; }
+  .comment-text { color:rgba(var(--axis-deck-navy-950-rgb), .66); font-size:8px; font-weight:650; line-height:1.25; }
+
+  .machine-body { padding:10px 15px 10px; }
+  .machine-block { margin-bottom:8px; padding:8px 10px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .09); border-radius:9px; background:rgba(var(--axis-ppt-neutral-50-rgb), .035); }
+  .machine-block-label { color:rgba(var(--axis-ppt-neutral-50-rgb), .36); font-size:7px; font-weight:850; text-transform:uppercase; }
+  .machine-value { margin-top:4px; color:rgba(var(--axis-ppt-neutral-50-rgb), .76); font-size:8px; font-weight:650; line-height:1.28; }
+  .schema-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .schema-dot { width:7px; height:7px; border-radius:50%; background:var(--teal); box-shadow:0 0 12px rgba(var(--axis-deck-teal-300-rgb), .72); }
+  .schema-title { color:var(--axis-deck-teal-100); font-size:9px; font-weight:800; }
+  .schema-list { display:flex; flex-wrap:wrap; gap:6px; }
+  .schema-type { padding:6px 8px; border:1px solid rgba(var(--axis-deck-teal-300-rgb), .20); border-radius:7px; background:rgba(var(--axis-deck-teal-500-rgb), .08); color:rgba(var(--axis-deck-teal-100-rgb), .84); font-size:8px; font-weight:750; }
+  .json-preview { margin-top:7px; padding:7px 9px; border-radius:8px; background:rgba(var(--axis-deck-navy-990-rgb), .68); font-family:var(--axis-deck-type-mono); }
+  .json-line { display:flex; gap:7px; color:rgba(var(--axis-ppt-neutral-50-rgb), .44); font-size:7px; line-height:1.55; }
+  .json-key { color:var(--axis-deck-teal-100); }
+  .json-value { color:rgba(var(--axis-deck-violet-50-rgb), .86); }
+  .check-title { margin-bottom:7px; color:rgba(var(--axis-ppt-neutral-50-rgb), .38); font-size:7px; font-weight:850; text-transform:uppercase; }
+  .check-list { display:flex; flex-direction:column; gap:6px; }
+  .machine-check { display:grid; grid-template-columns:16px minmax(0, 1fr) auto; gap:7px; align-items:center; padding-bottom:6px; border-bottom:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .07); }
+  .check-icon { width:15px; height:15px; display:grid; place-items:center; border-radius:5px; background:rgba(var(--axis-ppt-neutral-50-rgb), .06); color:rgba(var(--axis-ppt-neutral-50-rgb), .40); font-size:8px; font-weight:900; }
+  .check-label { min-width:0; overflow:hidden; color:rgba(var(--axis-ppt-neutral-50-rgb), .65); font-size:8px; font-weight:650; white-space:nowrap; text-overflow:ellipsis; }
+  .check-state { color:rgba(var(--axis-ppt-neutral-50-rgb), .36); font-size:7px; font-weight:800; text-transform:uppercase; }
+  .machine-check.ready .check-icon { background:rgba(var(--axis-deck-teal-500-rgb), .16); color:var(--axis-deck-teal-100); }
+  .machine-check.ready .check-state { color:var(--axis-deck-teal-100); }
+  .machine-check.review .check-icon { background:rgba(var(--axis-deck-violet-550-rgb), .20); color:var(--axis-deck-violet-50); }
+  .machine-check.review .check-state { color:var(--axis-deck-violet-50); }
+  .machine-check.evidence .check-icon { background:rgba(var(--axis-ppt-blue-300-rgb), .16); color:var(--axis-ppt-blue-100); }
+  .machine-check.evidence .check-state { color:var(--axis-ppt-blue-100); }
+  .machine-comment { display:flex; align-items:center; gap:8px; padding:9px 10px; border:1px solid rgba(var(--axis-deck-violet-550-rgb), .18); border-radius:9px; background:rgba(var(--axis-deck-violet-550-rgb), .07); }
+  .machine-comment-mark { width:20px; height:20px; flex:0 0 auto; display:grid; place-items:center; border-radius:7px; background:rgba(var(--axis-deck-violet-550-rgb), .24); color:var(--axis-deck-violet-50); font-size:8px; font-weight:850; }
+  .machine-comment-copy { color:rgba(var(--axis-ppt-neutral-50-rgb), .58); font-size:8px; font-weight:650; line-height:1.28; }
+
+  .layer-story { position:absolute; z-index:7; top:12px; left:672px; width:620px; height:34px; padding:0; border:0; background:transparent; }
+  .layer-list { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:9px; }
+  .layer { min-width:0; position:relative; display:grid; grid-template-columns:22px minmax(0, 1fr); gap:7px; align-items:center; height:34px; padding:0 8px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .09); border-radius:8px; background:rgba(var(--axis-ppt-neutral-50-rgb), .035); }
+  .layer:not(:last-child)::after { content:'→'; position:absolute; right:-8px; color:rgba(var(--axis-ppt-neutral-50-rgb), .24); font-size:10px; }
+  .layer-index { width:20px; height:20px; display:grid; place-items:center; border-radius:6px; background:rgba(var(--axis-ppt-neutral-50-rgb), .07); color:rgba(var(--axis-ppt-neutral-50-rgb), .52); font-size:7px; font-weight:850; }
+  .layer-label { overflow:hidden; color:rgba(var(--axis-ppt-neutral-50-rgb), .68); font-size:8px; font-weight:800; white-space:nowrap; text-overflow:ellipsis; }
+  .layer-copy { display:none; }
+  .layer.research .layer-index { background:rgba(var(--axis-deck-teal-500-rgb), .15); color:var(--axis-deck-teal-100); }
+  .layer.reader .layer-index { background:rgba(var(--axis-ppt-neutral-50-rgb), .12); color:var(--axis-ppt-neutral-50); }
+  .layer.machine .layer-index { background:rgba(var(--axis-deck-violet-550-rgb), .22); color:var(--axis-deck-violet-50); }
+</style></head>
+<body>
+  <main class="slide" data-template="ContentHubAnatomyFull" data-url-bubble-backdrop>
+    <header class="header">
+      <div>
+        <p class="section-label" data-slot="sectionLabel" data-slot-type="string">ANATOMÍA DEL CONTENT HUB</p>
+        <h1 class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">Cada artículo nace con su <em>research, estructura y capa de máquina</em></h1>
+      </div>
+      <aside class="proof-context">
+        <p class="lead" data-slot="lead" data-slot-type="string" data-slot-required="true">Lo que lee la audiencia y lo que interpretan buscadores y asistentes se construye en el mismo artefacto.</p>
+        <div class="proof-bridge">
+          <span class="proof-kicker" data-slot="proofKicker" data-slot-type="string" data-slot-required="true">Prueba viva</span>
+          <p class="proof-link" data-slot="proofLink" data-slot-type="rich-string" data-slot-required="true"><a href="#proof">Abrir el artefacto verificable ↗</a></p>
+        </div>
+      </aside>
+    </header>
+
+    <section class="xray-shell">
+      <div class="app-bar">
+        <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        <img class="brand-logo" data-slot="brandLogo" src="assets/brand/logo-negative.svg" alt="Efeonce">
+        <span class="bar-separator" aria-hidden="true"></span>
+        <span class="workspace-name" data-slot="workspaceName" data-slot-type="string">Content Hub editorial</span>
+        <span class="breadcrumb" data-slot="documentPath" data-slot-type="string">Artículos / En revisión</span>
+        <span class="version-chip" data-slot="version" data-slot-type="string">v07</span>
+        <span class="status-chip" data-slot="status" data-slot-type="string">Listo para revisión</span>
+      </div>
+
+      <div class="anatomy">
+        <aside class="research-rail" data-slot="research" data-slot-type="object">
+          <div class="rail-head">
+            <span class="rail-icon"><img src="assets/solar/magnifer-bold.svg" alt="" aria-hidden="true"></span>
+            <div><p class="rail-kicker" data-slot-field="kicker">01 · Research trail</p><p class="rail-title" data-slot-field="title">La decisión editorial</p></div>
+            <span class="rail-state" data-slot-field="state">Trazable</span>
+          </div>
+          <div class="research-body">
+            <div class="research-summary"><p class="micro-label">Pregunta de negocio</p><p class="research-question" data-slot-field="question">¿Qué necesita resolver la audiencia antes de actuar?</p></div>
+            <div class="research-facts">
+              <div class="research-fact"><p class="fact-label">Keyword principal</p><p class="fact-value" data-slot-field="primaryKeyword">keyword principal</p></div>
+              <div class="research-fact"><p class="fact-label">Intención</p><p class="fact-value" data-slot-field="intent">intención informacional</p></div>
+            </div>
+            <section class="research-section">
+              <div class="section-head"><p class="section-label-small">Clusters de consulta</p><span class="section-count" data-slot-field="clusterCount">3 señales</span></div>
+              <div data-slot-field="clusters"><div class="cluster-list" data-slot-items>
+                <div class="cluster"><div class="cluster-top"><span class="cluster-name" data-slot-field="name">Consulta prioritaria</span><span class="cluster-signal" data-slot-field="signal">Alta</span></div><span class="cluster-track"><i class="cluster-bar" data-slot-field="strength"></i></span></div>
+              </div></div>
+            </section>
+            <section class="research-section">
+              <div class="section-head"><p class="section-label-small">Fuentes que sostienen</p><span class="section-count" data-slot-field="sourceCount">3 fuentes</span></div>
+              <div data-slot-field="sources"><div class="source-list" data-slot-items>
+                <div class="source"><span class="source-type" data-slot-field="type">SRC</span><div><p class="source-title" data-slot-field="title">Fuente verificable</p><p class="source-note" data-slot-field="note">Vigencia documentada</p></div></div>
+              </div></div>
+            </section>
+          </div>
+        </aside>
+
+        <section class="article-lane" data-slot="article" data-slot-type="object">
+          <article class="article-sheet">
+            <div class="article-toolbar"><img src="assets/solar/pen-new-square-bold.svg" alt="" aria-hidden="true"><span class="article-tool-label" data-slot-field="toolLabel">Artículo vivo</span><span class="article-owner" data-slot-field="owner">Owner · Equipo editorial</span></div>
+            <div class="article-content">
+              <p class="article-eyebrow" data-slot-field="eyebrow">Guía práctica</p>
+              <h2 class="article-title" data-slot-field="title">Título del artículo que responde una necesidad real</h2>
+              <p class="article-deck" data-slot-field="deck">La promesa editorial explica qué resolverá el contenido y por qué vale la pena leerlo.</p>
+              <div class="answer-block"><span class="answer-mark">↳</span><div><p class="answer-label" data-slot-field="answerLabel">Respuesta directa</p><p class="answer-copy" data-slot-field="directAnswer">Una respuesta clara y autocontenida abre el artículo antes de desarrollar la evidencia.</p></div></div>
+              <div data-slot-field="sections"><div class="article-sections" data-slot-items>
+                <section class="article-section"><p class="section-tag" data-slot-field="tag">H2</p><h3 class="section-title-main" data-slot-field="title">Sección editorial</h3><p class="section-copy" data-slot-field="copy">El desarrollo conecta evidencia, contexto y una recomendación concreta.</p></section>
+              </div></div>
+              <div class="evidence-callout"><span class="evidence-rule"></span><p class="evidence-copy" data-slot-field="evidenceCallout">Cada afirmación relevante conserva su fuente y su vigencia dentro del mismo documento.</p></div>
+              <div class="inline-comment"><span class="comment-avatar" data-slot-field="commentInitials">CL</span><span class="comment-text" data-slot-field="commentText">Comentario contextual sobre el texto, no en un correo separado.</span></div>
+            </div>
+          </article>
+        </section>
+
+        <aside class="machine-rail" data-slot="machine" data-slot-type="object">
+          <div class="rail-head">
+            <span class="rail-icon"><img src="assets/solar/cpu-bold.svg" alt="" aria-hidden="true"></span>
+            <div><p class="rail-kicker" data-slot-field="kicker">03 · Machine layer</p><p class="rail-title" data-slot-field="title">Lo que interpreta la máquina</p></div>
+            <span class="rail-state" data-slot-field="state">Validado</span>
+          </div>
+          <div class="machine-body">
+            <div class="machine-block"><p class="machine-block-label">Meta title</p><p class="machine-value" data-slot-field="metaTitle">Título preparado para recuperación y clic</p></div>
+            <div class="machine-block"><p class="machine-block-label">Meta description</p><p class="machine-value" data-slot-field="metaDescription">Descripción precisa de la respuesta y su valor para la consulta.</p></div>
+            <div class="machine-block">
+              <div class="schema-head"><span class="schema-dot"></span><p class="schema-title" data-slot-field="schemaLabel">Schema conectado</p></div>
+              <div data-slot-field="schemaTypes"><div class="schema-list" data-slot-items><span class="schema-type" data-slot-field="value">Article</span></div></div>
+              <div class="json-preview">
+                <p class="json-line"><span class="json-key">@type</span><span class="json-value" data-slot-field="schemaType">Article</span></p>
+                <p class="json-line"><span class="json-key">about</span><span class="json-value" data-slot-field="schemaAbout">Entidad principal</span></p>
+                <p class="json-line"><span class="json-key">mainEntity</span><span class="json-value" data-slot-field="schemaEntity">Respuesta prioritaria</span></p>
+              </div>
+            </div>
+            <section class="machine-block">
+              <p class="check-title">QA SEO / AEO</p>
+              <div data-slot-field="checks"><div class="check-list" data-slot-items>
+                <div class="machine-check"><span class="check-icon">✓</span><span class="check-label" data-slot-field="label">Chequeo técnico</span><span class="check-state" data-slot-field="stateLabel">Listo</span></div>
+              </div></div>
+            </section>
+            <div class="machine-comment"><span class="machine-comment-mark" data-slot-field="commentInitials">EO</span><span class="machine-comment-copy" data-slot-field="comment">La capa técnica también queda revisada y comentable antes de publicar.</span></div>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="layer-story">
+        <div class="layer-list" data-slot="layers" data-slot-type="array"><article class="layer">
+          <span class="layer-index" data-slot-field="ordinal">01</span><div><p class="layer-label" data-slot-field="label">Research trazable</p><p class="layer-copy" data-slot-field="description">La decisión parte de evidencia.</p></div>
+        </article></div>
+      </footer>
+    </section>
+
+    <img class="deck-url-bubble signature-ContentHubAnatomyFull" src="assets/url-lum.svg" alt="efeoncepro.com">
+  </main>
+</body></html>

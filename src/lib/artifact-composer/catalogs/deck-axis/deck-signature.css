@@ -139,6 +139,15 @@
   bottom:36px;
 }
 
+/* La anatomía abre un artefacto simétrico y ya concentra peso en el inspector derecho: la firma
+   cierra sobre el eje del canvas, fuera del shell, sin competir con la capa técnica. */
+.signature-ContentHubAnatomyFull {
+  right:0;
+  left:0;
+  margin-inline:auto;
+  bottom:28px;
+}
+
 /* El artefacto ocupa la derecha entera: la firma se va al margen inferior IZQUIERDO, bajo el texto,
    donde no se superpone a la captura ni se lee como parte del producto mostrado. */
 .signature-ArtifactShowcaseFull {

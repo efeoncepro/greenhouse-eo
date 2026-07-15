@@ -1,0 +1,215 @@
+{
+  "template": "DailyOpsHubFull",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "sectionLabel": {
+      "selector": "[data-slot='sectionLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 34, "maxLines": 1, "overflow": "reject" }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 98,
+        "maxLines": 2,
+        "allowedTags": ["em"],
+        "overflow": "reject"
+      }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 156, "maxLines": 4, "overflow": "reject" }
+    },
+    "brandLogo": {
+      "selector": "[data-slot='brandLogo']",
+      "type": "fixed-asset",
+      "required": true,
+      "resolver": "efeonce-negative-logo",
+      "agentMayOverride": false,
+      "note": "Template-owned wordmark del brand pack; vive dentro del workspace, no sólo como firma de footer."
+    },
+    "workspaceName": {
+      "selector": "[data-slot='workspaceName']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 38, "maxLines": 1, "overflow": "reject" }
+    },
+    "liveStatus": {
+      "selector": "[data-slot='liveStatus']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 30, "maxLines": 1, "overflow": "reject" }
+    },
+    "conversation": {
+      "selector": "[data-slot='conversation']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "tool": {
+          "type": "enum",
+          "required": true,
+          "values": ["microsoft-teams", "slack"],
+          "resolver": "tool-logo-asset"
+        },
+        "toolName": { "type": "string", "required": true, "maxCharacters": 20 },
+        "channel": { "type": "string", "required": true, "maxCharacters": 30 },
+        "cadence": { "type": "string", "required": true, "maxCharacters": 34 },
+        "messages": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 3, "maxItems": 3, "overflow": "reject" },
+          "item": {
+            "type": "object",
+            "shape": {
+              "initials": { "type": "string", "required": true, "maxCharacters": 3 },
+              "author": { "type": "string", "required": true, "maxCharacters": 24 },
+              "time": { "type": "string", "required": true, "maxCharacters": 8 },
+              "message": { "type": "string", "required": true, "maxCharacters": 86 }
+            }
+          }
+        },
+        "composerLabel": { "type": "string", "required": true, "maxCharacters": 32 }
+      }
+    },
+    "workspace": {
+      "selector": "[data-slot='workspace']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "tool": {
+          "type": "enum",
+          "required": true,
+          "values": ["notion"],
+          "resolver": "tool-logo-asset"
+        },
+        "toolName": { "type": "string", "required": true, "maxCharacters": 28 },
+        "status": { "type": "string", "required": true, "maxCharacters": 18 },
+        "articleTitle": { "type": "string", "required": true, "maxCharacters": 86 },
+        "version": { "type": "string", "required": true, "maxCharacters": 12 },
+        "owner": { "type": "string", "required": true, "maxCharacters": 34 },
+        "due": { "type": "string", "required": true, "maxCharacters": 32 },
+        "keyword": { "type": "string", "required": true, "maxCharacters": 42 },
+        "intent": { "type": "string", "required": true, "maxCharacters": 42 },
+        "excerpt": { "type": "string", "required": true, "maxCharacters": 150 },
+        "outline": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 4, "maxItems": 4, "overflow": "reject" },
+          "item": {
+            "type": "object",
+            "shape": {
+              "tag": { "type": "string", "required": true, "maxCharacters": 4 },
+              "title": { "type": "string", "required": true, "maxCharacters": 58 }
+            }
+          }
+        },
+        "checklist": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 3, "maxItems": 3, "overflow": "reject" },
+          "item": {
+            "type": "object",
+            "shape": {
+              "label": { "type": "string", "required": true, "maxCharacters": 28 },
+              "state": { "type": "string", "required": true, "maxCharacters": 12 }
+            }
+          }
+        },
+        "commentInitials": { "type": "string", "required": true, "maxCharacters": 3 },
+        "commentText": { "type": "string", "required": true, "maxCharacters": 72 }
+      }
+    },
+    "reviewAsset": {
+      "selector": "[data-slot='reviewAsset']",
+      "type": "asset",
+      "required": true,
+      "constraints": {
+        "allowedKinds": ["article-visual", "image", "video-frame", "artifact"],
+        "fit": "cover",
+        "noHumanPortrait": true,
+        "overflow": "reject"
+      }
+    },
+    "review": {
+      "selector": "[data-slot='review']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "tool": {
+          "type": "enum",
+          "required": true,
+          "values": ["frameio"],
+          "resolver": "tool-logo-asset"
+        },
+        "toolName": { "type": "string", "required": true, "maxCharacters": 20 },
+        "version": { "type": "string", "required": true, "maxCharacters": 12 },
+        "status": { "type": "string", "required": true, "maxCharacters": 22 },
+        "assetTitle": { "type": "string", "required": true, "maxCharacters": 58 },
+        "comments": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 2, "maxItems": 2, "overflow": "reject" },
+          "item": {
+            "type": "object",
+            "shape": {
+              "pin": {
+                "type": "string",
+                "required": false,
+                "resolver": "ordinal-number",
+                "consumer": "resolver-only"
+              },
+              "author": { "type": "string", "required": true, "maxCharacters": 22 },
+              "message": { "type": "string", "required": true, "maxCharacters": 68 }
+            }
+          }
+        }
+      }
+    },
+    "workflowLabel": {
+      "selector": "[data-slot='workflowLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 28, "maxLines": 1, "overflow": "reject" }
+    },
+    "workflow": {
+      "selector": "[data-slot='workflow']",
+      "type": "array",
+      "required": true,
+      "constraints": { "minItems": 6, "maxItems": 6, "overflow": "reject" },
+      "item": {
+        "type": "object",
+        "shape": {
+          "ordinal": {
+            "type": "string",
+            "required": false,
+            "resolver": "ordinal-number",
+            "consumer": "resolver-only"
+          },
+          "label": { "type": "string", "required": true, "maxCharacters": 22 },
+          "state": {
+            "type": "enum",
+            "required": true,
+            "values": ["done", "active", "next"],
+            "resolver": "daily-workflow-step-tone",
+            "consumer": "resolver-only"
+          }
+        }
+      }
+    }
+  },
+  "presentation": {
+    "brandSurface": "timeline-full-approved-navy-gradient",
+    "composition": "Una única interfaz operativa en uso: conversación, Content Hub, revisión visual y ruta de estados comparten el mismo workspace.",
+    "reusability": "Cliente, canal, cadencia, artículo, responsables, asset, comentarios y estado del ciclo viven en slots. El HTML no contiene nombres de cliente.",
+    "motionPolicy": "El PDF sugiere actividad mediante estados, versiones, comentarios, timestamps y marcadores; el argumento no depende de animación."
+  }
+}

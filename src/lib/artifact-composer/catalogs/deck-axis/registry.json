@@ -27,6 +27,9 @@
     "chart",
     "comparison",
     "capabilities-grid",
+    "tool-stack",
+    "daily-operations",
+    "content-hub-anatomy",
     "four-pillars",
     "process-sequential",
     "timeline",
@@ -304,6 +307,48 @@
       "slotsRef": "card-grid-full.slots.json"
     },
     {
+      "name": "ToolStackFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "tool-stack"
+      ],
+      "prototype": "tool-stack-full.html",
+      "slotsRef": "tool-stack-full.slots.json",
+      "note": "Plantilla reutilizable para stack operativo con isotipos/logos aprobados + nombres visibles. Nace por gap de TASK-1414/SKY: CardGridFull no soporta 15-20 herramientas ni marcas reales."
+    },
+    {
+      "name": "DailyOpsHubFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "daily-operations"
+      ],
+      "prototype": "daily-ops-hub-full.html",
+      "slotsRef": "daily-ops-hub-full.slots.json",
+      "note": "Plantilla reutilizable para mostrar la operación diaria como un workspace vivo: conversación, Content Hub, revisión visual y workflow. Nace por gap de TASK-1414; ProcessStepsFull no representa colaboración simultánea ni artefactos versionados."
+    },
+    {
+      "name": "ContentHubAnatomyFull",
+      "kind": "full-bleed",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "codex",
+      "status": "built",
+      "contentTypes": [
+        "content-hub-anatomy"
+      ],
+      "prototype": "content-hub-anatomy-full.html",
+      "slotsRef": "content-hub-anatomy-full.slots.json",
+      "note": "Plantilla reutilizable para abrir un entregable editorial en tres capas: research trazable, artículo answer-first e inspector machine-readable con metadata, schema y QA. Nace por gap de TASK-1414; DailyOpsHubFull muestra colaboración, no la profundidad interna del artefacto."
+    },
+    {
       "name": "TimelineFull",
       "kind": "full-bleed",
       "source": "gap",
@@ -468,6 +513,9 @@
       "chart": "ChartSplit",
       "comparison": "ComparisonSplit",
       "capabilities-grid": "CardGridFull",
+      "tool-stack": "ToolStackFull",
+      "daily-operations": "DailyOpsHubFull",
+      "content-hub-anatomy": "ContentHubAnatomyFull",
       "four-pillars": "FourPillarsFull",
       "process-sequential": "ProcessStepsFull",
       "timeline": "TimelineFull",
@@ -484,6 +532,9 @@
       "métrica: UNA hero sola => StatSplit; VARIOS KPIs (3-5) de diagnóstico => MetricsSplit; una métrica que necesita GRÁFICO/comparación => ChartSplit; una métrica como RESULTADO de un caso => CaseStudySplit.",
       "estructura de N ítems: PILARES paralelos (4, no secuenciales) => FourPillarsFull; PASOS secuenciales (1->2->3) => ProcessStepsFull; fases en el TIEMPO (con fechas) => TimelineFull.",
       "listas: UNA lista de puntos => BulletListSplit; DOS listas paralelas => DualListSplit; capacidades con ícono en GRID => CardGridFull.",
+      "herramientas: sistema operativo por etapas (planificar, investigar, producir, abastecer, revisar) con isotipo + nombre por herramienta => ToolStackFull. No usar CardGridFull: sus íconos Solar describen capacidades, no marcas.",
+      "operación diaria: un workspace compartido con conversación, artículo vivo, revisión de assets y estados => DailyOpsHubFull. No usar ProcessStepsFull: aquí la simultaneidad, los comentarios y el versionamiento son parte del argumento.",
+      "anatomía de entregable editorial: research y fuentes + artículo answer-first + metadata/schema/QA en una misma radiografía => ContentHubAnatomyFull. No usar DailyOpsHubFull: aquí se demuestra la profundidad interna de UNA pieza, no la colaboración entre plataformas.",
       "texto fuerte: STATEMENT/compromiso/pull-quote/testimonial => QuoteSplit; una IDEA/frase destacada => HighlightWave; PROSA narrativa (enfoque/método) => NarrativeSplit; DOS ideas enfrentadas (contexto+solución) => DualTextSplit.",
       "comparación: vs COMPETENCIA en pares exactos => ComparisonSplit (no tabla libre); cumplimiento REQUISITO x SLA item por item => RequirementsTableFull.",
       "equipo: ROLES con dedicación (tarjetas con glifo, sin foto) => TeamSplit; el roster con FOTOS REALES del squad (resolver squad-person, allowlist cerrada) => TeamGalleryFull. NUNCA una cara generada por IA en ninguna de las dos."

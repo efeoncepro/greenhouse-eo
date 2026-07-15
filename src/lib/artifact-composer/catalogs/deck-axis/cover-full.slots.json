@@ -18,7 +18,7 @@
         "boxWidth": 500,
         "boxHeight": 132,
         "fit": "contain",
-        "normalization": "monochrome-light",
+        "normalization": "native-on-dark",
         "opticalAlignment": "center",
         "altFrom": "clientDisplayName"
       }

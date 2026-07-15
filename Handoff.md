@@ -1,3 +1,13 @@
+## Sesión 2026-07-15 — `CoverFull` canonizada + SKY v6 (Codex)
+
+> **Aprobación del operador:** la portada centrada queda como dirección definitiva. Se amplía el wordmark Efeonce (650→840px), se fortalece la recipe AXIS `cover-hero` y se conserva la URL Bubble sin cambios. El primer vistazo mantiene solo Efeonce, marca cliente y tipo de propuesta.
+>
+> **Contrato reusable:** `CoverFull` conserva dos slots (`clientLogo`, `proposalKind`) y no incorpora copy ni lógica SKY. `clientLogo` pasa de recoloración CSS a `native-on-dark`: cada cliente aporta una variante aprobada para fondo oscuro. SKY usa `assets/clients/sky-on-dark.svg`, con geometría y verde `#46DC28` del SVG oficial servido por `skyairline.com`; el componente violeta se adapta a blanco. Test focal bloquea filtros CSS y drift del asset.
+>
+> **Canonización visual:** delta declarado antes del freeze para exactamente `templates/CoverFull.png` y `sky/01-portada.png`; selftest determinista 57/57 a 0 píxeles, freeze sellado y gate posterior 57/57 a 0 píxeles. Artifact Composer 215/215 y typecheck PASS.
+>
+> **Proposal Studio:** PDF canónico de 26 páginas, 12.800.710 bytes y 11 links (6 GoTo + 5 URI) adjunto como `deck` **v6**, `client_facing`, `draft`; asset `asset-b58c1233-e705-e667-ca78-5e7816f4f058`, proposal asset `prasset-2701112b-9137-4183-8bde-1604c1464994`. PDF SHA-256 `b58c1233e705e667ca785e7816f4f058d885666f2ae7bb0399461fa1ae110daa`; manifest canónico `22ede119a65ddafa31721a4aaf8bb0dfe7aca9ee3ac25f86487be70a6bc59258`. La v5 permanece adjunta e inalterada. Wherex sigue siendo revisión/carga/firma humana. Sin push.
+
 ## Sesión 2026-07-15 — Oferta económica: builder de Excel brandeado reusable (Claude)
 
 > **Pedido:** el Excel de la económica salía "vago y poco profesional"; el operador quiere la CAPACIDAD de generar Excels profesionales (hay clientes que exigen Excel). "arranca".
@@ -8,19 +18,29 @@
 >
 > **Techo honesto:** las fuentes no se embeben en `.xlsx`; brand pixel-perfect = PDF del composer (pendiente si lo quiere), con el Excel como planilla editable. 🔴 NUNCA precio unitario. Confirmar si las bases exigen SU planilla antes de brandear libre (modo "formato exigido" = extensión futura del builder). Documentado en workspace template + skill tenders (ambos namespaces). Sin push.
 
-## Sesión 2026-07-15 — TASK-1414 / Proposal Studio: plantilla reusable de herramientas (Codex)
+## Sesión 2026-07-15 — TASK-1414 / Proposal Studio: tres patrones operativos + SKY v5 (Codex)
 
 > **Corrección de rumbo del operador:** no seguir creando láminas en Figma/Product Design; invocar `deck-studio` y sumar una plantilla reusable al catálogo del Proposal Studio. La disposición radial previa no sirve: la lámina de Tools necesita isotipos/logos de herramientas + nombres.
 >
-> **Entregado:** `deck-axis` suma `contentType: tool-stack` → `ToolStackFull` (`tool-stack-full.html` + `tool-stack-full.slots.json`) como mapa operativo por etapas (`stages[] -> tools[]`): planificar, investigar, producir, abastecer y revisar. El Composer se extendió de forma reusable para validar, sintetizar y llenar colecciones anidadas dentro de slots `array`/`object`; no hay lógica especial para esta plantilla. Registry/selector actualizados y docs de Proposal Studio corregidas a 29 plantillas. El resolver cerrado `tool-logo-asset` mapea claves semánticas a assets autocontenidos en `assets/tools/` y declara la placa de contraste (`light|dark`) de cada isotipo (Notion, Frame.io, Adobe suite, Microsoft 365, Semrush, Ahrefs, Brand Visibility Grader, Screaming Frog, Shutterstock, Adobe Stock, Envato, Firefly, Higgsfield, Magnific, Teams, Slack).
+> **Entregado:** `deck-axis` suma `contentType: tool-stack` → `ToolStackFull` (`tool-stack-full.html` + `tool-stack-full.slots.json`) como mapa operativo reusable `stages[] -> tools[]` + `supportLayer`. La iteración vigente separa 5 etapas (`Planificar`, `Investigar`, `Producir`, `Enriquecer`, `Revisar`) de una **capa transversal** para comentarios, aprobaciones, licencias y fuentes aprobadas. El Composer se extendió de forma reusable para validar, sintetizar y llenar colecciones anidadas dentro de slots `array`/`object`; no hay lógica especial para esta plantilla. Registry/selector actualizados y docs de Proposal Studio corregidas a 31 plantillas. El resolver cerrado `tool-logo-asset` mapea claves semánticas a assets autocontenidos en `assets/tools/` y declara la placa de contraste (`light|dark|brand-dark`) de cada isotipo (Notion, Frame.io, Adobe suite, Microsoft 365, Semrush, Ahrefs, Brand Visibility Grader, Screaming Frog, Shutterstock, Adobe Stock, Envato, Firefly, Higgsfield, Magnific, Teams, Slack).
 >
-> **Preview:** `docs/commercial/tenders/sky-blog-2026/reusable-slides/tool-stack-preview.json` compone 1 slide en `.captures/sky-tools-template/01-tools-stack.png` + PDF. El deck SKY completo recompuso sin regresión en `.captures/sky-bid-regression/`.
+> **Segunda plantilla:** `contentType: daily-operations` → `DailyOpsHubFull` (`daily-ops-hub-full.html` + `.slots.json`) muestra una única interfaz operativa en uso: Teams o Slack, artículo vivo en Notion, revisión visual en Frame.io y ruta de seis estados. El wordmark de Efeonce vive dentro del workspace; canal, cadencia, artículo, responsables, asset, comentarios y estado del ciclo son slots. Los ordinales, pines y tonos de workflow se derivan; el prototipo no contiene SKY.
 >
-> **Gates:** `pnpm exec vitest run src/lib/artifact-composer/__tests__/selector.test.ts src/lib/artifact-composer/__tests__/template-composability.test.ts src/lib/artifact-composer/__tests__/catalog-extensibility.test.ts src/lib/artifact-composer/__tests__/validate.test.ts src/lib/artifact-composer/__tests__/resolvers.test.ts` → 5 files / 94 tests passed. `pnpm deck:compose` preview PASS. `pnpm deck:compose docs/commercial/tenders/sky-blog-2026/deck-plan.json --out .captures/sky-bid-regression` PASS (23 láminas). `pnpm exec eslint` focal PASS. `pnpm typecheck` PASS. `pnpm task:lint --task TASK-1414` PASS. `pnpm ops:lint --changed` PASS. `pnpm docs:closure-check` PASS. `git diff --check` PASS.
+> **Tercera plantilla:** `contentType: content-hub-anatomy` → `ContentHubAnatomyFull` abre un solo artículo en corte: research trazable como banda horizontal de evidencia, documento editorial answer-first a sangre e inspector machine-readable como única capa lateral. Esta composición se diferenció deliberadamente del workspace de tres paneles de `DailyOpsHubFull`. Keyword, intención, clusters, fuentes, estructura H2, comentario, metadata, schema y QA son slots. `content-anatomy-cluster-strength`, `content-anatomy-check-tone` y `content-anatomy-layer-tone` derivan ancho/estado/semántica; el HTML no contiene SKY. Preview: `.captures/sky-content-hub-anatomy-template/01-content-hub-anatomy.png` + PDF.
+>
+> **Previews:** `tool-stack-preview.json`, `daily-ops-preview.json` y `content-hub-anatomy-preview.json` conservan pruebas aisladas de los tres patrones. La línea que cruzaba la URL bubble se retiró de Tools y la banda transversal ya resuelve isotipos propios (Teams/Slack/stock). La integración final vive en el DeckPlan de SKY, no en los previews.
+>
+> **Canonización:** los tres templates y sus frames viven en el baseline canónico, con delta declarado y manifest sellado. La guía fija la separación semántica: `tool-stack` responde **con qué sistema**, `daily-operations` **cómo se vive el trabajo**, `content-hub-anatomy` **qué contiene el entregable**, y `ProcessStepsFull` conserva la secuencia abstracta. El drift detectado durante la iteración quedó resuelto por causa raíz antes del sello final.
 >
 > **Assets de marca:** Frame.io usa el SVG del header oficial de `frame.io`; Screaming Frog usa SVG de Worldvectorlogo contrastado contra el PNG oficial de `screamingfrog.co.uk`. No hay logos alucinados ni fallback genérico para esas dos marcas.
 >
-> **Pendiente creativo:** falta iterar las otras dos plantillas reusable de TASK-1414 (`día a día con Efeonce` y `content hub / workflow`), y decidir si `tool-stack` entra al deck SKY real o queda solo como módulo complementario.
+> **Integración SKY:** las tres plantillas entraron en `deck-plan.json` como páginas 11 (`stack-operativo`), 13 (`dia-a-dia`) y 17 (`content-hub-anatomy`). La Radiografía AEO existente pasa a la 18, conserva el enlace vivo y recibe el relevo narrativo de la anatomía. El deck queda en 26 páginas, 12.2 MB y 11 enlaces (6 GoTo + 5 URI); agenda derivada: 04, 09, 10, 14, 21 y 25.
+>
+> **Versionamiento:** el PDF no reemplazó el artefacto anterior. Se adjuntó por el contrato canónico de Proposal Studio como `deck` **v5**, `client_facing`, `draft`, asset `asset-82b6a9c1-a4d6-5afa-b6b7-e24766acfd21`; v1-v4 siguen disponibles. PDF SHA-256 `82b6a9c1a4d65afab6b7e24766acfd21f8cc01cb1f263e06a2e133d9e6aed978`; manifest `5315fddc3c5257e35da317b237c77567343744e9282eaac30ab3c8c6e6dd121a`. No se habilitó el render-job apagado ni se autoró el número de versión: `MAX+1` se derivó en transacción.
+>
+> **Determinismo y gates:** el visual gate reveló drift real en `TeamGalleryFull`: cards con ancho fraccional más `overflow:hidden` producían antialias variable en las esquinas. Se corrigió la geometría raíz (gap que deriva anchos enteros; radio y clipping en la foto), y sólo después se promovió baseline. `composer:visual-gate --selftest` PASS 57/57 a 0 píxeles; gate contra baseline PASS 57/57; Artifact Composer 213/213; typecheck PASS. No se relajó el umbral ni se usó el freeze para esconder diferencias.
+>
+> **Cierre:** TASK-1414 completa y movida a `docs/tasks/complete/`. Pendiente fuera de la task: revisión humana de v5 y carga/firma en Wherex. Sin push.
 
 ## Sesión 2026-07-15 — DSR interno: workspace canónico del deal + scaffolder (Claude)
 

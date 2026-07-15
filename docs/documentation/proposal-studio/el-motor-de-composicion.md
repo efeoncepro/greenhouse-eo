@@ -64,7 +64,7 @@ Un **catálogo** es una superficie visual completa, empaquetada como datos:
 | **Molde** | El lienzo, las regiones, la safe-area, el chrome, la tipografía — compilado **una vez** |
 | **Destino de salida** | `pdf-merged` o `png-set` |
 
-El catálogo `deck-axis` tiene **29 plantillas**. Es un **catálogo cerrado**: si un contenido no calza
+El catálogo `deck-axis` tiene **31 plantillas**. Es un **catálogo cerrado**: si un contenido no calza
 en ninguna, eso **no** significa "improvisa un layout" — significa que **falta una plantilla**, y eso
 se decide en el catálogo, no en la lámina.
 
@@ -72,9 +72,25 @@ se decide en el catálogo, no en la lámina.
 visual cada tres láminas se lee como un collage y **resta**. Si cualquier autor (o agente) pudiera
 apilar piezas y armar un layout nuevo, el freehand vuelve por la puerta de atrás.
 
-> **Detalle técnico:** `src/lib/artifact-composer/catalogs/deck-axis/` (29 plantillas + `registry.json`
+> **Detalle técnico:** `src/lib/artifact-composer/catalogs/deck-axis/` (31 plantillas + `registry.json`
 > + `resolvers.ts` + `semantic-validators.ts` + `deck-mold.css`). El contrato del catálogo está en
 > `src/lib/artifact-composer/catalog.ts`.
+
+### Patrones reutilizables de operación
+
+Dos content types cercanos cuentan argumentos diferentes y no son intercambiables:
+
+| Content type | Plantilla | Úsalo para responder | No lo conviertas en |
+|---|---|---|---|
+| `tool-stack` | `ToolStackFull` | **Con qué sistema operamos:** herramientas por etapa y capacidades transversales | Una pared de logos o un inventario de licencias |
+| `daily-operations` | `DailyOpsHubFull` | **Cómo se vive el trabajo diario:** conversación, artefacto, revisión y avance en una misma escena | Un proceso abstracto de cajas y flechas |
+| `content-hub-anatomy` | `ContentHubAnatomyFull` | **Qué contiene realmente el entregable:** research, respuesta editorial y capa machine-readable | Otra captura de herramientas o una lista de features |
+
+`DailyOpsHubFull` no reemplaza `ProcessStepsFull`: el primero demuestra colaboración visible sobre un
+entregable; el segundo explica una secuencia. `ContentHubAnatomyFull` tampoco repite la operación: abre
+una única pieza editorial para mostrar qué sostiene su calidad. Los tres moldes son domain-free. Los
+nombres de cliente, artículos, canales, screenshots, fuentes y comentarios pertenecen al `DeckPlan`
+consumidor.
 
 ---
 

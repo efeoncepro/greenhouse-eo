@@ -7,9 +7,38 @@
 
 ---
 
-## 🔴 DELTA 2026-07-14 (sesión de iteración — LEE ESTO PRIMERO, supersede §3/§4/§6)
+## DELTA 2026-07-15 (estado vigente — LEE ESTO PRIMERO, supersede §3/§4/§6)
 
-**Los tres hilos del §4 están CERRADOS**, y el deck quedó en **23 láminas · PDF 12.5 MB**:
+El deck quedó en **26 láminas · PDF 12.2 MB**. Se integraron tres patrones reutilizables del catálogo:
+
+- `11-stack-operativo` (`ToolStackFull`): herramientas reales ordenadas por etapa y una capa transversal
+  de colaboración, licencias y control.
+- `13-dia-a-dia` (`DailyOpsHubFull`): Teams/Slack, Notion y Frame.io dentro de una sola escena de trabajo.
+- `17-content-hub-anatomy` (`ContentHubAnatomyFull`): research, artículo y capa machine-readable; conversa
+  directamente con `18-muestra`, la Radiografía AEO viva.
+
+La portada `CoverFull` quedó canonizada con el lockup centrado aprobado: wordmark Efeonce ampliado,
+marca SKY `native-on-dark` derivada del SVG oficial, recipe AXIS con halo cyan/teal concentrado y URL
+Bubble intacta. El molde no contiene copy ni lógica propia de SKY y conserva únicamente los slots de
+marca cliente y tipo de propuesta.
+
+La versión vigente está registrada en Proposal Studio como **deck v6 · client-facing · draft**. El
+versionado es append-only: v1-v5 siguen disponibles; `deck-plan.json` continúa como fuente y el PDF es
+un derivado reproducible. Asset v6: `asset-b58c1233-e705-e667-ca78-5e7816f4f058`.
+
+**Estado de gates:** Artifact Composer 215/215 · typecheck limpio · visual gate 57 frames a 0 píxeles ·
+selftest determinista 57/57 · PDF con 26 páginas, 6 enlaces internos y 5 externos. El drift de
+`TeamGalleryFull` no se toleró ni se ocultó: se corrigió su causa raíz (anchos fraccionales + clipping de
+radio) antes de sellar el baseline.
+
+**Pendiente humano:** revisión final de v6 y carga/firma en Wherex. El agente prepara y versiona; el
+humano presenta.
+
+---
+
+## DELTA 2026-07-14 (histórico — supersedido por el estado vigente)
+
+**Los tres hilos del §4 quedaron cerrados en esa iteración**, cuando el deck tenía **23 láminas · PDF 12.5 MB**:
 
 - **(a) el informe del grader** tiene lámina propia (`08-informe`, artifact-showcase con captura real
   del gauge + logos de motores + URL tokenizada horneada en chrome de navegador) **y** enlace clickeable.
@@ -77,7 +106,7 @@ institucional en 3ª persona). Nada de tuteo. Es un documento contractual que ev
 
 | Pieza | Dónde | Estado |
 |---|---|---|
-| **Deck** — 19 láminas | `deck-plan.json` (FUENTE) → `pnpm deck:compose` | ✅ compone; PDF 4 MB |
+| **Deck** — 26 láminas | `deck-plan.json` (FUENTE) → `pnpm deck:compose` | ✅ compone; PDF 12.2 MB; Proposal Studio v6 draft |
 | **Oferta técnica** | `oferta-tecnica.md` (13 secciones) | ✅ (§9 recién sincronizada con el portal) |
 | **Oferta económica** + Excel | `oferta-economica.md` · `propuesta-economica.xlsx` | ✅ |
 | **Radiografía AEO** (muestra de trabajo) | 🌐 **VIVA:** `think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37/` | ✅ en producción |
@@ -91,33 +120,32 @@ institucional en 3ª persona). Nada de tuteo. Es un documento contractual que ev
 
 ---
 
-## 3. Las 19 láminas de hoy
+## 3. Las 26 láminas vigentes
 
 ```
- 1 portada          11 lineas            (bullet-list)
- 2 agenda           12 seo-aeo           (capabilities-grid)
- 3 entendimiento    13 muestra           (highlight — la Radiografía)
- 4 diagnostico      14 portal            (comparison — el argumento)
- 5 escalera    🆕   15 portal-vista 🆕   (artifact-showcase — el tablero)
- 6 citas            16 equipo
- 7 terreno          17 cumplimiento
- 8 metodo           18 economica
- 9 ciclo            19 contraportada
-10 arranque
+ 1 portada            10 operacion          19 portal
+ 2 agenda             11 stack-operativo    20 portal-vista
+ 3 entendimiento      12 ciclo              21 equipo
+ 4 near-miss          13 dia-a-dia          22 berel
+ 5 capa-tecnica       14 arranque           23 seguro
+ 6 diagnostico        15 lineas             24 cumplimiento
+ 7 escalera           16 seo-aeo            25 economica
+ 8 informe            17 content-hub        26 contraportada
+ 9 terreno            18 muestra
 ```
 
 ---
 
-## 4. 🔴 Lo que el operador señaló como suelto (VERIFICALO, no lo asumas)
+## 4. Hilos que originaron la iteración (cerrados)
 
 Palabras textuales del operador al cerrar la sesión:
 
 > *«tenemos el informe del grader que **no lo veo aquí en ninguna parte en las slides**, tenemos el
 > informe o lo tenemos disgregado, deberíamos también poner **el link clickeable**»*
 
-**Tres hilos abiertos, y el trabajo de la sesión nueva es mapearlos antes de tocar nada:**
+Los tres hilos quedaron resueltos. Se conservan aquí como contexto histórico de decisión:
 
-### (a) El informe del grader no tiene lámina propia
+### (a) El informe del grader no tenía lámina propia
 
 Está **disgregado**: sus cifras alimentan la lámina 4 (tres hechos) y la 5 (la escalera), pero **el
 informe como artefacto no aparece**. Y existe, vivo, publicado, verificable por el comité.
@@ -125,7 +153,7 @@ informe como artefacto no aparece**. Y existe, vivo, publicado, verificable por 
 **Pregunta a resolver:** ¿va como lámina (`artifact-showcase` — la plantilla ya existe) o como enlace
 desde la escalera? ¿O ambas? Ojo con la regla del oficio: **dos enlaces diluyen ambos**.
 
-### (b) Los enlaces no son clickeables
+### (b) Los enlaces no eran clickeables
 
 La Radiografía (lámina 13) y el informe del grader **viven en la web** — ése es su valor: el comité los
 verifica solo. Pero el PDF del deck **hoy no emite anotaciones de link**.
@@ -185,16 +213,18 @@ que entre.
 
 ---
 
-## 6. Estado de los gates al cerrar
+## 6. Estado de los gates vigente
 
 ```
-✓ pnpm vitest run src/lib/artifact-composer   → 163/163
-✓ pnpm composer:visual-gate                   → 46 frames · 0 píxeles
-✓ pnpm deck:compose                           → 19 láminas · PDF 4 MB
+✓ pnpm vitest run src/lib/artifact-composer   → 215/215
+✓ pnpm composer:visual-gate --selftest        → 57 frames deterministas · 0 píxeles
+✓ pnpm composer:visual-gate                   → 57 frames · 0 píxeles
+✓ pnpm deck:compose                           → 26 láminas · PDF 12.2 MB
+✓ PDF links                                   → 6 GoTo + 5 URI
 ```
 
-**Commit:** `a9bc52adc` — dos plantillas nuevas + fix del `--freeze` + deck a 19.
-**Sin pushear.**
+**Proposal Studio:** deck v6 `client_facing` / `draft`, adjunto sin reemplazar v1-v5.
+**Sin push; la carga y firma en Wherex siguen siendo humanas.**
 
 ---
 

@@ -1,0 +1,228 @@
+{
+  "template": "ContentHubAnatomyFull",
+  "version": "0.1",
+  "viewport": { "width": 1920, "height": 1080 },
+  "slots": {
+    "sectionLabel": {
+      "selector": "[data-slot='sectionLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 34, "maxLines": 1, "overflow": "reject" }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": { "maxCharacters": 98, "maxLines": 2, "allowedTags": ["em"], "overflow": "reject" }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 132, "maxLines": 3, "overflow": "reject" }
+    },
+    "proofKicker": {
+      "selector": "[data-slot='proofKicker']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 28, "maxLines": 1, "overflow": "reject" }
+    },
+    "proofLink": {
+      "selector": "[data-slot='proofLink']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 56,
+        "maxLines": 1,
+        "allowedTags": ["a"],
+        "overflow": "reject",
+        "linkPolicy": "El enlace https:// debe apuntar a la evidencia viva que demuestra la anatomía; Chromium lo preserva como anotación /Link clickeable en el PDF."
+      }
+    },
+    "brandLogo": {
+      "selector": "[data-slot='brandLogo']",
+      "type": "fixed-asset",
+      "required": true,
+      "resolver": "efeonce-negative-logo",
+      "agentMayOverride": false,
+      "note": "Wordmark template-owned dentro del chrome del Content Hub."
+    },
+    "workspaceName": {
+      "selector": "[data-slot='workspaceName']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 34, "maxLines": 1, "overflow": "reject" }
+    },
+    "documentPath": {
+      "selector": "[data-slot='documentPath']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 42, "maxLines": 1, "overflow": "reject" }
+    },
+    "version": {
+      "selector": "[data-slot='version']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 12, "maxLines": 1, "overflow": "reject" }
+    },
+    "status": {
+      "selector": "[data-slot='status']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 24, "maxLines": 1, "overflow": "reject" }
+    },
+    "research": {
+      "selector": "[data-slot='research']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "kicker": { "type": "string", "required": true, "maxCharacters": 24 },
+        "title": { "type": "string", "required": true, "maxCharacters": 28 },
+        "state": { "type": "string", "required": true, "maxCharacters": 14 },
+        "question": { "type": "string", "required": true, "maxCharacters": 86 },
+        "primaryKeyword": { "type": "string", "required": true, "maxCharacters": 32 },
+        "intent": { "type": "string", "required": true, "maxCharacters": 30 },
+        "clusterCount": { "type": "string", "required": true, "maxCharacters": 14 },
+        "clusters": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 3, "maxItems": 3, "overflow": "reject" },
+          "item": {
+            "type": "object",
+            "shape": {
+              "name": { "type": "string", "required": true, "maxCharacters": 34 },
+              "signal": { "type": "string", "required": true, "maxCharacters": 12 },
+              "strength": {
+                "type": "enum",
+                "required": true,
+                "values": ["high", "medium", "focused"],
+                "resolver": "content-anatomy-cluster-strength",
+                "consumer": "resolver-only"
+              }
+            }
+          }
+        },
+        "sourceCount": { "type": "string", "required": true, "maxCharacters": 14 },
+        "sources": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 3, "maxItems": 3, "overflow": "reject" },
+          "item": {
+            "type": "object",
+            "shape": {
+              "type": { "type": "string", "required": true, "maxCharacters": 5 },
+              "title": { "type": "string", "required": true, "maxCharacters": 36 },
+              "note": { "type": "string", "required": true, "maxCharacters": 30 }
+            }
+          }
+        }
+      }
+    },
+    "article": {
+      "selector": "[data-slot='article']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "toolLabel": { "type": "string", "required": true, "maxCharacters": 22 },
+        "owner": { "type": "string", "required": true, "maxCharacters": 34 },
+        "eyebrow": { "type": "string", "required": true, "maxCharacters": 26 },
+        "title": { "type": "string", "required": true, "maxCharacters": 86 },
+        "deck": { "type": "string", "required": true, "maxCharacters": 142 },
+        "answerLabel": { "type": "string", "required": true, "maxCharacters": 22 },
+        "directAnswer": { "type": "string", "required": true, "maxCharacters": 170 },
+        "sections": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 3, "maxItems": 3, "overflow": "reject" },
+          "item": {
+            "type": "object",
+            "shape": {
+              "tag": { "type": "string", "required": true, "maxCharacters": 18 },
+              "title": { "type": "string", "required": true, "maxCharacters": 64 },
+              "copy": { "type": "string", "required": true, "maxCharacters": 150 }
+            }
+          }
+        },
+        "evidenceCallout": { "type": "string", "required": true, "maxCharacters": 138 },
+        "commentInitials": { "type": "string", "required": true, "maxCharacters": 3 },
+        "commentText": { "type": "string", "required": true, "maxCharacters": 82 }
+      }
+    },
+    "machine": {
+      "selector": "[data-slot='machine']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "kicker": { "type": "string", "required": true, "maxCharacters": 24 },
+        "title": { "type": "string", "required": true, "maxCharacters": 34 },
+        "state": { "type": "string", "required": true, "maxCharacters": 14 },
+        "metaTitle": { "type": "string", "required": true, "maxCharacters": 64 },
+        "metaDescription": { "type": "string", "required": true, "maxCharacters": 142 },
+        "schemaLabel": { "type": "string", "required": true, "maxCharacters": 24 },
+        "schemaTypes": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 3, "maxItems": 3, "overflow": "reject" },
+          "item": { "type": "string", "maxCharacters": 18 }
+        },
+        "schemaType": { "type": "string", "required": true, "maxCharacters": 22 },
+        "schemaAbout": { "type": "string", "required": true, "maxCharacters": 28 },
+        "schemaEntity": { "type": "string", "required": true, "maxCharacters": 34 },
+        "checks": {
+          "type": "array",
+          "required": true,
+          "constraints": { "minItems": 4, "maxItems": 4, "overflow": "reject" },
+          "item": {
+            "type": "object",
+            "shape": {
+              "label": { "type": "string", "required": true, "maxCharacters": 30 },
+              "stateLabel": { "type": "string", "required": true, "maxCharacters": 12 },
+              "tone": {
+                "type": "enum",
+                "required": true,
+                "values": ["ready", "review", "evidence"],
+                "resolver": "content-anatomy-check-tone",
+                "consumer": "resolver-only"
+              }
+            }
+          }
+        },
+        "commentInitials": { "type": "string", "required": true, "maxCharacters": 3 },
+        "comment": { "type": "string", "required": true, "maxCharacters": 90 }
+      }
+    },
+    "layers": {
+      "selector": "[data-slot='layers']",
+      "type": "array",
+      "required": true,
+      "constraints": { "minItems": 3, "maxItems": 3, "overflow": "reject" },
+      "item": {
+        "type": "object",
+        "shape": {
+          "ordinal": {
+            "type": "string",
+            "required": false,
+            "resolver": "ordinal-number",
+            "consumer": "resolver-only"
+          },
+          "label": { "type": "string", "required": true, "maxCharacters": 28 },
+          "description": { "type": "string", "required": true, "maxCharacters": 64 },
+          "kind": {
+            "type": "enum",
+            "required": true,
+            "values": ["research", "reader", "machine"],
+            "resolver": "content-anatomy-layer-tone",
+            "consumer": "resolver-only"
+          }
+        }
+      }
+    }
+  },
+  "presentation": {
+    "brandSurface": "timeline-full-approved-navy-gradient",
+    "composition": "Un solo artículo abierto en corte: research oscuro a la izquierda, documento editorial protagonista al centro e inspector machine-readable a la derecha.",
+    "reusability": "Tema, consultas, fuentes, artículo, metadata, schema, checks y comentarios viven en slots. El HTML no contiene cliente, industria ni keyword específica.",
+    "narrativeRole": "Tercera pieza de la secuencia operativa y antesala de una prueba viva: después de con qué trabajamos y cómo colaboramos, abre la anatomía del entregable y entrega el relevo al showcase verificable.",
+    "motionPolicy": "La línea luminosa de escaneo sugiere la transición humano-máquina en un frame estático; el argumento no depende de animación."
+  }
+}

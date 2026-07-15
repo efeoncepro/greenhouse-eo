@@ -1,0 +1,79 @@
+{
+  "_readme": [
+    "Preview reutilizable para la plantilla ToolStackFull.",
+    "Componer: pnpm deck:compose docs/commercial/tenders/sky-blog-2026/reusable-slides/tool-stack-preview.json --out .captures/sky-tools-template"
+  ],
+  "tenderId": "SKY-BLOG-2026-REUSABLE-TOOLS",
+  "slides": [
+    {
+      "slideId": "tools-stack",
+      "contentType": "tool-stack",
+      "template": "ToolStackFull",
+      "slots": {
+        "sectionLabel": "STACK OPERATIVO",
+        "title": "Un sistema operativo para producir, revisar y <em>optimizar contenido</em>",
+        "badge": "Biblioteca reutilizable",
+        "lead": "La herramienta no es el mensaje: cada plataforma entra en una etapa concreta del ciclo, con una capa transversal de trazabilidad y control.",
+        "stages": [
+          {
+            "stage": "Planificar",
+            "outcome": "Brief, calendario, responsables y conversaciones quedan visibles desde el inicio.",
+            "tools": [
+              { "tool": "microsoft-365", "name": "Microsoft 365" }
+            ]
+          },
+          {
+            "stage": "Investigar",
+            "outcome": "KW mining, auditoría técnica y señales AEO sostienen cada decisión editorial.",
+            "tools": [
+              { "tool": "semrush", "name": "Semrush" },
+              { "tool": "ahrefs", "name": "Ahrefs" },
+              { "tool": "screaming-frog", "name": "Screaming Frog" },
+              { "tool": "brand-visibility-grader", "name": "Brand Visibility Grader" }
+            ]
+          },
+          {
+            "stage": "Producir",
+            "outcome": "Texto, diseño y piezas derivadas avanzan sobre una misma ruta de contenido.",
+            "tools": [
+              { "tool": "adobe-illustrator", "name": "Illustrator" },
+              { "tool": "adobe-photoshop", "name": "Photoshop" },
+              { "tool": "adobe-premiere-pro", "name": "Premiere Pro" },
+              { "tool": "adobe-after-effects", "name": "After Effects" },
+              { "tool": "adobe-express", "name": "Adobe Express" }
+            ]
+          },
+          {
+            "stage": "Enriquecer",
+            "outcome": "Exploración visual y mejoras asistidas amplían el territorio creativo sin perder marca.",
+            "tools": [
+              { "tool": "adobe-firefly", "name": "Adobe Firefly" },
+              { "tool": "higgsfield", "name": "Higgsfield" },
+              { "tool": "magnific", "name": "Magnific" }
+            ]
+          },
+          {
+            "stage": "Revisar",
+            "outcome": "Versiones, comentarios y mejoras se cierran antes de publicar y aprender.",
+            "tools": [
+              { "tool": "frameio", "name": "Frame.io" }
+            ]
+          }
+        ],
+        "supportLayer": {
+          "label": "Capa transversal",
+          "summary": "Comentarios, aprobaciones, licencias y fuentes aprobadas se mantienen trazables entre brief, contenido y assets.",
+          "tools": [
+            { "tool": "notion", "name": "Notion" },
+            { "tool": "microsoft-teams", "name": "Teams" },
+            { "tool": "slack", "name": "Slack" },
+            { "tool": "shutterstock", "name": "Shutterstock" },
+            { "tool": "adobe-stock", "name": "Adobe Stock" },
+            { "tool": "envato-elements", "name": "Envato Elements" }
+          ]
+        },
+        "footerNote": "Cada herramienta se activa segun alcance, licencias y fuentes aprobadas; el criterio humano gobierna el ciclo."
+      }
+    }
+  ]
+}

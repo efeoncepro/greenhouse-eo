@@ -1,11 +1,11 @@
 # Componer el deck de una licitación
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-12 por Claude (con Julio Reyes)
 > **Documentacion funcional:** [tender-deck-composer.md](../../documentation/comercial/tender-deck-composer.md)
 > **Documentacion tecnica:** [GREENHOUSE_TENDER_DECK_COMPOSER_V1.md](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md)
-> **Última actualización:** 2026-07-12 — PDF vigente; PPTX y Adobe Express son destinos posteriores
+> **Última actualización:** 2026-07-15 — patrones reutilizables de stack y operación diaria
 > **Método del bid:** skill `greenhouse-public-private-tenders` → `deck-visual-system.md`
 
 ## Para qué sirve
@@ -21,10 +21,24 @@ contenido. El resultado es un **PDF de N páginas** listo para revisar y entrega
 
 ## Antes de empezar
 
-- El deck se **compone**, no se dibuja: se elige entre **25 plantillas** del catálogo.
+- El deck se **compone**, no se dibuja: se elige entre **31 plantillas** del catálogo.
 - Necesitas el contenido **ya decidido** (qué dice cada lámina, con qué datos y con qué evidencia).
 - Las cifras deben ser **reales del proceso** o **ilustrativas marcadas**. El composer rechaza una
   métrica sin su fuente.
+
+Cuando el argumento sea operativo, elige por intención:
+
+- `tool-stack` / `ToolStackFull`: para explicar herramientas y fuentes por etapa, con nombres e
+  isotipos resueltos desde el catálogo.
+- `daily-operations` / `DailyOpsHubFull`: para mostrar colaboración viva alrededor de un artículo,
+  sus comentarios, versiones y revisión visual.
+- `content-hub-anatomy` / `ContentHubAnatomyFull`: para abrir un único entregable y mostrar research,
+  respuesta directa, fuentes, metadata, schema y QA técnico en una misma radiografía.
+- `process-sequential` / `ProcessStepsFull`: para explicar una secuencia abstracta sin simular una
+  interfaz de trabajo.
+
+Los previews de una licitación pueden usar nombres y capturas reales; la plantilla no. Si aparece el
+nombre del cliente dentro del HTML del molde, la lámina dejó de ser reutilizable.
 
 ## Paso a paso
 

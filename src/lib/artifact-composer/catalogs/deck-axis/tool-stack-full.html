@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es"><head>  <link rel="stylesheet" href="deck-fonts.css">
+  <link rel="stylesheet" href="deck-tokens.css">
+  <link rel="stylesheet" href="deck-mold.css">
+<meta charset="utf-8"><link rel="stylesheet" href="deck-signature.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--axis-deck-type-text); overflow:hidden; }
+
+  :root { --safe-x:132px; --teal:var(--axis-deck-teal-500); --violet:var(--axis-deck-violet-550); }
+
+  .slide {
+    position:relative; display:flex; flex-direction:column; min-height:100vh; padding:72px var(--safe-x) 88px;
+    color:var(--axis-ppt-neutral-50);
+    background:
+      radial-gradient(rgba(var(--axis-ppt-neutral-50-rgb), .07) .55px, transparent .8px) 0 0 / 5px 5px,
+      radial-gradient(54% 62% at 100% 0%, rgba(var(--axis-deck-teal-550-rgb), .46) 0%, rgba(var(--axis-deck-teal-550-rgb), .14) 42%, transparent 70%),
+      radial-gradient(48% 58% at 0% 104%, rgba(var(--axis-deck-violet-550-rgb), .48) 0%, rgba(var(--axis-deck-violet-550-rgb), .15) 45%, transparent 74%),
+      linear-gradient(226deg, var(--axis-deck-navy-800) 0%, var(--axis-deck-navy-880) 43%, var(--axis-deck-navy-980) 100%);
+  }
+
+  .header { display:grid; grid-template-columns:minmax(0, 1fr) 430px; gap:58px; align-items:end; }
+  .section-label { margin-bottom:14px; color:var(--teal); font-size:18px; font-weight:700; letter-spacing:0; line-height:1; text-transform:uppercase; }
+  .title { max-width:1100px; font-family:var(--axis-deck-type-display); font-size:54px; font-weight:600; letter-spacing:0; line-height:1.04; }
+  .title em { color:var(--teal); font-style:italic; }
+  .lead { align-self:end; padding:0 0 4px 30px; border-left:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .30); color:rgba(var(--axis-ppt-neutral-50-rgb), .76); font-size:18px; line-height:1.38; }
+  .badge { display:inline-flex; width:max-content; max-width:100%; margin-bottom:16px; padding:10px 18px; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .18); border-radius:999px; background:rgba(var(--axis-ppt-neutral-50-rgb), .08); color:rgba(var(--axis-ppt-neutral-50-rgb), .78); font-size:12px; font-weight:800; letter-spacing:0; line-height:1; text-transform:uppercase; }
+
+  .flow {
+    position:relative; display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:18px;
+    flex:0 0 auto; height:438px; min-height:0; margin-top:34px; align-items:stretch;
+  }
+  .flow::before {
+    content:''; position:absolute; left:46px; right:46px; top:49px; height:2px;
+    background:linear-gradient(90deg, rgba(var(--axis-deck-teal-300-rgb), .95), rgba(var(--axis-deck-violet-550-rgb), .78));
+    opacity:.58;
+  }
+  .stage-card {
+    position:relative; min-width:0; display:flex; flex-direction:column; gap:12px; padding:20px 16px 18px;
+    border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .20); border-radius:22px;
+    background:
+      linear-gradient(180deg, rgba(var(--axis-deck-navy-990-rgb), .58), rgba(var(--axis-deck-navy-990-rgb), .28)),
+      linear-gradient(150deg, rgba(var(--axis-ppt-neutral-50-rgb), .105), rgba(var(--axis-ppt-neutral-50-rgb), .045));
+    box-shadow:inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .13), 0 18px 34px rgba(var(--axis-deck-navy-990-rgb), .18);
+    backdrop-filter:blur(var(--deck-blur-l)); -webkit-backdrop-filter:blur(var(--deck-blur-l));
+  }
+  .stage-card::after {
+    content:''; position:absolute; inset:auto 18px 0; height:4px; border-radius:99px 99px 0 0;
+    background:linear-gradient(90deg, rgba(var(--axis-deck-teal-300-rgb), .76), rgba(var(--axis-deck-violet-550-rgb), .72));
+    opacity:.9;
+  }
+  .stage-head { position:relative; z-index:1; display:flex; flex-direction:column; gap:12px; min-height:134px; }
+  .stage-index {
+    width:50px; height:50px; display:grid; place-items:center; border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .28);
+    border-radius:16px; background:linear-gradient(145deg, rgba(var(--axis-deck-teal-300-rgb), .25), rgba(var(--axis-deck-violet-550-rgb), .22));
+    color:var(--axis-ppt-neutral-50); font-family:var(--axis-deck-type-display); font-size:17px; font-weight:700; letter-spacing:0; line-height:1;
+    box-shadow:0 14px 28px rgba(var(--axis-deck-navy-990-rgb), .22), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .16);
+  }
+  .stage-title { color:var(--axis-ppt-neutral-50); font-family:var(--axis-deck-type-display); font-size:24px; font-weight:650; letter-spacing:0; line-height:1.03; }
+  .stage-outcome { margin-top:8px; color:rgba(var(--axis-ppt-neutral-50-rgb), .70); font-size:13px; font-weight:500; letter-spacing:0; line-height:1.28; }
+
+  .tool-row { position:relative; z-index:1; min-width:0; display:flex; flex-direction:column; gap:7px; margin-top:6px; }
+  .tool-chip {
+    min-width:0; display:flex; align-items:center; gap:9px; min-height:38px; padding:5px 8px 5px 5px;
+    border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .14); border-radius:13px;
+    background:rgba(var(--axis-deck-navy-990-rgb), .38);
+    box-shadow:inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .06);
+  }
+  .logo-mark {
+    flex:0 0 auto; width:28px; height:28px; display:grid; place-items:center; border-radius:9px;
+    border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .56);
+    box-shadow:0 10px 16px rgba(var(--axis-deck-navy-990-rgb), .20), inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .35);
+  }
+  .logo-mark[data-logo-plate='light'] {
+    background:linear-gradient(180deg, rgba(var(--axis-ppt-neutral-50-rgb), .96), rgba(var(--axis-ppt-neutral-50-rgb), .84));
+  }
+  .logo-mark[data-logo-plate='dark'] {
+    border-color:rgba(var(--axis-deck-teal-200-rgb), .34);
+    background:linear-gradient(145deg, rgba(var(--axis-deck-navy-980-rgb), .95), rgba(var(--axis-deck-navy-800-rgb), .82));
+  }
+  .logo-mark[data-logo-plate='brand-dark'] {
+    border-color:rgba(var(--tool-logo-accent-rgb), .48);
+    background:
+      radial-gradient(80% 90% at 16% 8%, rgba(var(--tool-logo-accent-rgb), .20), transparent 62%),
+      linear-gradient(145deg, rgba(var(--axis-deck-navy-990-rgb), .97), rgba(var(--axis-deck-navy-880-rgb), .84));
+  }
+  .tool-logo { display:block; width:20px; height:20px; object-fit:contain; }
+  .tool-logo[data-tool='frameio'] { width:19px; height:23px; }
+  .tool-logo[data-tool='screaming-frog'] { width:24px; height:24px; }
+  .tool-logo[data-tool='brand-visibility-grader'] { width:23px; height:23px; }
+  .tool-name { min-width:0; color:var(--axis-ppt-neutral-50); font-family:var(--axis-deck-type-display); font-size:13px; font-weight:600; letter-spacing:0; line-height:1.05; white-space:normal; }
+
+  .support-layer {
+    position:relative; display:grid; grid-template-columns:420px minmax(0, 1fr); gap:30px; align-items:center;
+    min-height:146px; margin-top:24px; padding:22px 26px;
+    border:1px solid rgba(var(--axis-ppt-neutral-50-rgb), .18); border-radius:22px;
+    background:
+      linear-gradient(90deg, rgba(var(--axis-deck-navy-990-rgb), .56), rgba(var(--axis-deck-navy-990-rgb), .24)),
+      linear-gradient(135deg, rgba(var(--axis-deck-teal-300-rgb), .13), rgba(var(--axis-deck-violet-550-rgb), .10));
+    box-shadow:inset 0 1px 0 rgba(var(--axis-ppt-neutral-50-rgb), .10), 0 18px 38px rgba(var(--axis-deck-navy-990-rgb), .14);
+    backdrop-filter:blur(var(--deck-blur-l)); -webkit-backdrop-filter:blur(var(--deck-blur-l));
+  }
+  .support-layer::before {
+    content:''; position:absolute; left:26px; right:26px; top:0; height:3px; border-radius:0 0 99px 99px;
+    background:linear-gradient(90deg, rgba(var(--axis-deck-teal-300-rgb), .76), rgba(var(--axis-deck-violet-550-rgb), .68));
+  }
+  .support-copy { min-width:0; }
+  .support-kicker { color:var(--teal); font-size:13px; font-weight:800; letter-spacing:0; line-height:1; text-transform:uppercase; }
+  .support-summary { margin-top:11px; color:rgba(var(--axis-ppt-neutral-50-rgb), .76); font-size:17px; font-weight:520; letter-spacing:0; line-height:1.34; }
+  .support-tools { min-width:0; display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:10px; }
+  .support-chip { min-height:46px; padding:7px 10px 7px 7px; border-color:rgba(var(--axis-ppt-neutral-50-rgb), .17); background:rgba(var(--axis-deck-navy-990-rgb), .34); }
+  .support-chip .logo-mark { width:30px; height:30px; }
+  .support-chip .tool-logo { width:21px; height:21px; }
+  .support-chip .tool-name { font-size:13px; }
+
+  .footer-note { position:absolute; left:var(--safe-x); bottom:54px; max-width:920px; color:rgba(var(--axis-ppt-neutral-50-rgb), .52); font-size:13px; font-weight:600; letter-spacing:0; line-height:1.25; text-transform:uppercase; }
+</style></head>
+<body>
+  <main class="slide" data-template="ToolStackFull" data-url-bubble-backdrop>
+    <header class="header">
+      <div>
+        <p class="section-label" data-slot="sectionLabel" data-slot-type="string">Stack operativo</p>
+        <h1 class="title" data-slot="title" data-slot-type="rich-string" data-slot-required="true">Un sistema operativo para producir, revisar y <em>optimizar contenido</em></h1>
+      </div>
+      <div class="lead-wrap">
+        <p class="badge" data-slot="badge" data-slot-type="string">Biblioteca reutilizable</p>
+        <p class="lead" data-slot="lead" data-slot-type="string">Las herramientas entran en una etapa concreta del ciclo: coordinación, investigación, producción, activos y revisión.</p>
+      </div>
+    </header>
+
+    <section class="flow" data-slot="stages" data-slot-type="array" data-slot-required="true" aria-label="Sistema operativo de herramientas por etapa">
+      <article class="stage-card">
+        <div class="stage-head">
+          <span class="stage-index" data-slot-field="step">01</span>
+          <div>
+            <h2 class="stage-title" data-slot-field="stage">Planificar</h2>
+            <p class="stage-outcome" data-slot-field="outcome">Brief, calendario, responsables y conversaciones quedan visibles desde el inicio.</p>
+          </div>
+        </div>
+        <div class="tool-row" data-slot-field="tools" data-slot-type="array" aria-label="Herramientas de la etapa">
+          <div class="tool-chip">
+            <span class="logo-mark" data-logo-plate="light">
+              <img class="tool-logo" data-slot-field="tool" src="assets/tools/notion-isotype.svg" alt="Notion" data-tool="notion">
+            </span>
+            <span class="tool-name" data-slot-field="name">Notion</span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="support-layer" data-slot="supportLayer" data-slot-type="object" data-slot-required="true" aria-label="Capa transversal de colaboración y licencias">
+      <div class="support-copy">
+        <p class="support-kicker" data-slot-field="label">Capa transversal</p>
+        <p class="support-summary" data-slot-field="summary">Comentarios, aprobaciones, licencias y fuentes aprobadas se mantienen trazables entre brief, contenido y assets.</p>
+      </div>
+      <div class="support-tools" data-slot-field="tools" data-slot-type="array" aria-label="Herramientas transversales">
+        <div class="tool-chip support-chip">
+          <span class="logo-mark" data-logo-plate="light">
+            <img class="tool-logo" data-slot-field="tool" src="assets/tools/notion-isotype.svg" alt="Notion" data-tool="notion">
+          </span>
+          <span class="tool-name" data-slot-field="name">Notion</span>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer-note" data-slot="footerNote" data-slot-type="string">Cada herramienta se activa segun alcance, licencias y fuentes aprobadas; el criterio humano gobierna el ciclo.</p>
+    <img class="deck-url-bubble signature-ToolStackFull" src="assets/url-lum.svg" alt="efeoncepro.com">
+  </main>
+</body></html>

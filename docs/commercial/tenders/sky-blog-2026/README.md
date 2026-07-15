@@ -13,14 +13,16 @@
 > | | Dónde | Qué es |
 > |---|---|---|
 > | **FUENTE** | **este repo** (`.md` · `deck-plan.json` · `.xlsx` · las bases) | **Lo único que se edita.** Versionado, auditable, con historia |
-> | **DERIVADO** | OneDrive (`.pdf`, `.html`) | **Se re-emite con un comando. NUNCA se edita a mano** |
+> | **DERIVADO VERSIONADO** | **Proposal Studio** (`proposal_assets`) | PDF client-facing adjunto con versión derivada `MAX+1`; nunca se reemplaza una versión anterior |
+> | **COPIA DE ENTREGA** | OneDrive (`.pdf`, `.html`) | Se re-emite desde la fuente y se copia para Wherex. NUNCA se edita a mano |
 >
 > ```bash
 > pnpm tender:render docs/commercial/tenders/sky-blog-2026/oferta-tecnica.md --out .captures/sky-oferta
 > pnpm deck:compose  docs/commercial/tenders/sky-blog-2026/deck-plan.json  --out .captures/sky-bid
 > ```
 >
-> Después se copian los PDF a OneDrive, **que es de donde el operador los sube a Wherex**.
+> Después de componer, el PDF se adjunta como una nueva versión en Proposal Studio. La copia de entrega se
+> lleva a OneDrive, **que es de donde el operador la sube a Wherex**.
 > *(Es el mismo principio del Artifact Composer: el Plan es el artefacto auditable; el PDF es derivado y
 > re-componible.)*
 >
@@ -54,7 +56,7 @@ enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay
 
 | # | Entregable | Estado |
 |---|---|---|
-| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ✅ **23 láminas, PDF 12.5 MB** (2026-07-14: cifras del run 46 publicado, showcases vivos del x-ray y del informe, agenda con páginas, equipo con fotos reales, 4 enlaces clickeables) |
+| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ✅ **26 láminas, PDF 12.2 MB** (2026-07-15: suma stack operativo, día a día y anatomía del Content Hub; conserva los showcases vivos, agenda derivada, equipo real y 11 enlaces: 6 internos + 5 externos). La portada canónica amplía Efeonce, usa el logo SKY on-dark derivado del SVG oficial y conserva la URL Bubble. Registrado como **deck v6 · client-facing · draft** en Proposal Studio; v1-v5 se conservan. |
 | 2 | Subir a Wherex | ⏳ **Operador** (regla dura: el agente prepara; el humano sube y firma) |
 | — | Oferta técnica (PDF) | ✅ 2026-07-11 |
 | — | Oferta económica (PDF) | ✅ 2026-07-11 |
@@ -86,7 +88,7 @@ enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay
 | [`oferta-tecnica.md`](oferta-tecnica.md) | **La oferta técnica.** Abre con la **matriz de cumplimiento** (cruza cada requisito de las Bases con la sección donde se responde) y cierra el **régimen de penalidades** aceptado. Es además el **contenido fuente del deck**. |
 | [`oferta-economica.md`](oferta-economica.md) | **La oferta económica.** Cifras reales (ver abajo). |
 | [`propuesta-economica.xlsx`](propuesta-economica.xlsx) | **El Excel de la económica.** ⚠️ **Es FUENTE, no derivado** (Wherex no trae plantilla, se creó a mano). Las Bases lo listan como **documento integrante** (§1.2). |
-| [`deck-plan.json`](deck-plan.json) | El plan del deck — **artefacto auditable**; el PDF de 23 láminas es derivado. |
+| [`deck-plan.json`](deck-plan.json) | El plan del deck — **artefacto auditable**; el PDF de 26 láminas es derivado. La composición vigente está adjunta como versión 6 del artefacto `deck` en Proposal Studio; el número se deriva transaccionalmente y no se autora en el plan. |
 | **Radiografía AEO** (enlace vivo) | **Muestra de trabajo.** Un artículo nuevo (Carretera Austral) con **su capa de máquina visible y acoplada** al lado, más la **evidencia Semrush** de por qué existe. Es la prueba de lo que la §7 de la técnica promete. `noindex`, con rótulo *«Ejemplo ilustrativo de Efeonce»* y URL tokenizada.<br>🔗 https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37<br>**Recorrido de 4 pantallas:** ① el hueco (el SERP real: Wikipedia, Instagram, TripAdvisor — cero aerolíneas) · ② el artículo · ③ la radiografía (el acoplamiento) · ④ dónde más vive (video, social, imágenes).<br>Owner: `TASK-1410`. Fuente: repo `efeonce-think`. Docs: [`docs/think/`](../../think/radiografia-aeo-architecture.md). |
 
 > ⚠️ **Antes de subir el Excel: verificar que las Bases NO impongan un formato para la económica.** El
@@ -140,7 +142,7 @@ una cara generada con IA es **tergiversación**, no un tema estético.
 
 ## Cómo se compone el deck
 
-El deck **no se dibuja**: se compone con el **Artifact Composer** desde el catálogo de 28 plantillas.
+El deck **no se dibuja**: se compone con el **Artifact Composer** desde el catálogo de 31 plantillas.
 
 ```bash
 pnpm deck:compose docs/commercial/tenders/sky-blog-2026/deck-plan.json --out .captures/sky-bid

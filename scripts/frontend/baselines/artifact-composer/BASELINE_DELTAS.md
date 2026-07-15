@@ -1,5 +1,99 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-07-15 — `CoverFull` canonizada: lockup centrado, marca principal ampliada y cliente on-dark nativo
+
+**Aprobación del operador (sesión 2026-07-15):** la portada conserva la composición centrada y reduce
+el primer vistazo a lo esencial: Efeonce, marca cliente, tipo de propuesta y URL Bubble. El wordmark
+Efeonce crece de 650px a 840px; la marca cliente se sirve como asset `native-on-dark` aprobado, sin
+filtros CSS; y la recipe `cover-hero` concentra el halo cyan/teal detrás del lockup con presencia
+violeta controlada. La URL Bubble no cambia.
+
+**Contrato reutilizable:** no se agregan slots ni copy propio de SKY al molde. `CoverFull` sigue
+resolviendo el logo de cada cliente y el tipo de propuesta desde el `deck-plan`; cada cliente debe
+entregar una variante on-dark canónica. Para SKY se incorpora `sky-on-dark.svg`, derivado de la
+geometría y el verde del SVG oficial, con el componente violeta llevado a blanco para fondos oscuros.
+
+**Frames aprobados (exactamente 2):**
+
+- `templates/CoverFull.png` — nuevo lockup y recipe canónica del molde reutilizable.
+- `sky/01-portada.png` — consumo del asset oficial on-dark de SKY en el deck real.
+
+---
+
+## 2026-07-15 — Deck SKY 23 → 26: operación reusable + anatomía antes de la prueba viva
+
+**Aprobación del operador (sesión 2026-07-15):** las tres plantillas reutilizables se integran en la
+narrativa existente, sin crear una segunda Radiografía. `ToolStackFull` entra después de los cuatro
+frentes; `DailyOpsHubFull`, después del ciclo mensual; y `ContentHubAnatomyFull`, entre la capacidad
+SEO/AEO y el showcase vivo. La lámina `muestra` conserva `ArtifactShowcaseFull`: sólo cambia su rótulo
+a **LA PRUEBA VIVA** y el lead recibe explícitamente el relevo de las tres capas anteriores.
+
+**Cambios canónicos:**
+
+- `ContentHubAnatomyFull` entra al catálogo como molde slot-driven para research, artículo y capa
+  machine-readable, con `proofLink` autorado por propuesta y URL Bubble centrado.
+- El deck SKY pasa de 23 a 26 páginas. La agenda deriva nuevamente sus páginas reales.
+- La captura y el enlace de la Radiografía existente se conservan; no se duplica el artefacto.
+- El PDF compuesto pesa 12.2 MB y conserva 11 anotaciones `/Link`: 6 `GoTo` de agenda y 5 `/URI`.
+- `TeamGalleryFull` elimina anchos fraccionarios y el clip redondeado del contenedor padre: gaps de
+  24px producen tarjetas enteras con 4/5 integrantes y el radio vive en la foto. El self-test del
+  set completo pasa dos renders consecutivos con cero píxeles distintos.
+
+**Frames promovidos o renumerados:**
+
+`templates/ContentHubAnatomyFull.png` · `templates/TeamGalleryFull.png` ·
+`sky/02-agenda.png` · `sky/11-stack-operativo.png` · `sky/12-ciclo.png` ·
+`sky/13-dia-a-dia.png` · `sky/14-arranque.png` · `sky/15-lineas.png` ·
+`sky/16-seo-aeo.png` · `sky/17-content-hub-anatomy.png` · `sky/18-muestra.png` ·
+`sky/19-portal.png` · `sky/20-portal-vista.png` · `sky/21-equipo.png` ·
+`sky/22-berel.png` · `sky/23-seguro.png` · `sky/24-cumplimiento.png` ·
+`sky/25-economica.png` · `sky/26-contraportada.png`
+
+---
+
+## 2026-07-15 — Stack operativo + día a día: dos plantillas reutilizables de operación
+
+**Aprobación del operador (sesión 2026-07-15):** se canonizan como dos argumentos distintos y
+complementarios. `ToolStackFull` explica **con qué sistema se trabaja**; `DailyOpsHubFull` muestra
+**cómo se vive el trabajo diario** dentro de un artefacto compartido. SKY consume ambos moldes desde
+JSON de propuesta, pero ni el cliente, ni su artículo, ni sus capturas quedan embebidos en la plantilla.
+
+**Plantilla `ToolStackFull`:** sistema operativo de cinco etapas con herramientas identificadas por
+isotipo y nombre, más una capa transversal de colaboración, comentarios, versionamiento, licencias y
+fuentes aprobadas. Las placas de contraste son parte del contrato del resolver para que logos claros y
+oscuros sigan siendo legibles sin parches por marca.
+
+**Plantilla `DailyOpsHubFull`:** escena de trabajo viva en un solo workspace: conversación Teams/Slack,
+artículo y research en Notion, revisión visual en Frame.io y rail de seis estados. El wordmark Efeonce
+vive en el chrome del producto y el asset de revisión es un slot; la captura SKY existe sólo en el
+preview consumidor.
+
+**Frames nuevos promovidos (2):**
+
+- `templates/ToolStackFull.png` — molde canónico del stack operativo reutilizable
+- `templates/DailyOpsHubFull.png` — molde canónico del día a día colaborativo
+
+**Re-promociones colaterales auditadas (2):**
+
+- `templates/DualTextSplit.png` — el probe sintético materializa los íconos resolver-backed de ambos
+  conceptos después de generalizar el llenado de colecciones anidadas; coincide con el contrato ya
+  declarado para esta plantilla.
+- `sky/22-economica.png` — el segundo plan vuelve a mostrar su estado `PROPUESTO`; antes el resolver
+  del segundo elemento no se ejecutaba por el bug de paths anidados que este cambio corrige de raíz.
+
+**Manifiesto literal de la promoción:**
+
+`templates/ToolStackFull.png` · `templates/DailyOpsHubFull.png` · `templates/DualTextSplit.png` ·
+`sky/22-economica.png`
+
+**Residual fuera de esta promoción:** durante el freeze cambió concurrentemente el copy de
+`sky/10-operacion.png`, por lo que ese frame no se atribuye a esta aprobación. Además,
+`pnpm composer:visual-gate --selftest` detectó 54 píxeles no deterministas en el borde superior de
+los avatares de `sky/18-equipo.png`. Ninguno afecta a los dos moldes nuevos, que sí compararon a cero
+píxeles en la corrida posterior; el umbral global no se relaja.
+
+---
+
 ## 2026-07-15 — Fotos del squad: los avatares CANÓNICOS de Entra reemplazan a los recortes
 
 **Feedback del operador (deck SKY, lámina equipo):** los recortes sobre fondo claro no se veían bien;
@@ -124,7 +218,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 7e2acf7a814bbc57dbe8ab8c5203fddb0abadc93566962aef039042be2c5d6d2 -->
+<!-- manifest-digest: 95dfb6ecd779808c69cbd9529c65af7e6a45cf396d915a072f7be3a5056b2030 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.
