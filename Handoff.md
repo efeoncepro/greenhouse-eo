@@ -1,3 +1,13 @@
+## Sesión 2026-07-15 — Método: plantilla canónica de oferta técnica (md → deck es proyección) (Claude)
+
+> **Pedido:** el operador propuso que la metodología de proposals incluya crear primero la oferta técnica en Markdown con taxonomía, iterar ahí idea/investigación/evidencia, y de ahí el deck; preguntó si ya lo teníamos.
+>
+> **Assessment (era la pregunta):** sí, el instinto es correcto y en gran parte ya existía como PRÁCTICA (SKY: research → `oferta-tecnica.md` 44KB → `deck-plan.json`; el README ya decía "`.md` = FUENTE"), como MÉTODO (companion `propuesta-tecnica-economica.md`) y como MODELO (`proposal_evidence`/`proposal_requirements`/`proposal_assets.kind`). El hueco: no había template reusable ni la costura md→deck declarada.
+>
+> **Entregado (docs-only):** **[docs/commercial/tenders/TECHNICAL_OFFER_TEMPLATE.md](docs/commercial/tenders/TECHNICAL_OFFER_TEMPLATE.md)** — destilado del caso SKY. Decisión híbrida (el operador dijo "hazlo" sin elegir guía-vs-contrato → elegí la robusta): **secciones = GUÍA, evidencia = CONTRATO** (Zona 0 = ledger de evidencia con fuente+as-of, mapea a `proposal_evidence` y al gate `missing_evidence_ref` del composer). Zona 1 = narrativa (15 secciones con marcadores `[admisibilidad]`/`[criterio]`/`[deck→contentType]`). Zona 2 = costura al deck. Regla clave: **el deck NO auto-deriva** — SSOT del deck = slots del `deck-plan.json`; el `.md` es fuente narrativa+evidencia; el plan se autora DESDE la oferta (propose→confirm). Costura documentada en la skill de tenders (`propuesta-tecnica-economica.md`, ambos namespaces).
+>
+> **Estado:** completo. Familia de tres (técnica = plantilla nueva; económica → pricing companion + Excel; administrativa → compliance companion). Sin push.
+
 ## Sesión 2026-07-15 — Digital Sales Room (Sala de Ventas): ADR + spec, Proposed/deferred (Claude)
 
 > **Pedido:** tras investigar Trumpet (Digital Sales Room), el operador endosó la dirección ("me encanta, podemos hacer el nuestro, no ahora pero podría estar en planes") y pidió crear el ADR + documentación.

@@ -22,6 +22,35 @@ Cómo ensamblar el paquete que gana. La skill decide **qué va y con qué estruc
 
 Nada se declara "listo" hasta que todos los excluyentes están ✅.
 
+## La oferta técnica se ITERA en Markdown, y el deck es su PROYECCIÓN (método canónico)
+
+**Antes del deck va el Markdown.** La oferta técnica se escribe y se itera —idea,
+investigación, evidencia, narrativa— en un `.md` con taxonomía canónica, y el deck se
+compone **desde** ahí. Plantilla: **`docs/commercial/tenders/TECHNICAL_OFFER_TEMPLATE.md`**
+(destilada del caso SKY; copiala a `docs/commercial/tenders/<caso>/oferta-tecnica.md`).
+
+Regla híbrida de la plantilla: las **secciones son GUÍA** (cada RFP ordena distinto hacia
+sus criterios ponderados), pero la **evidencia es CONTRATO** — toda cifra vive primero en el
+**Ledger de evidencia** (Zona 0) con fuente googleable + as-of, mapeable 1:1 a
+`proposal_evidence`. Es el mismo gate que el composer ya aplica en el deck
+(`missing_evidence_ref` rompe el build), pero atrapado **antes**, en el Markdown.
+
+**El deck NO auto-deriva del Markdown.** SSOT del deck = los **slots del `deck-plan.json`**
+(mismos slots → mismo PDF; un humano firma). El `.md` es la fuente **narrativa + evidencia**;
+el `deck-plan.json` es la fuente de **composición**. Comparten el ledger, pero son archivos
+independientes y revisables por separado. El autor/agente construye el plan **desde** la
+oferta (propose→confirm), eligiendo qué secciones se vuelven lámina y con qué `contentType`
+(declara INTENCIÓN, nunca `template`). El mapa sección→contentType vive en la Zona 2 de la
+plantilla; el catálogo de content-types, en `deck-visual-system.md`.
+
+```
+investigación (INTERNO) → oferta-tecnica.md (ledger + narrativa + mapa) → deck-plan.json (slots) → PDF
+```
+
+**Familia de tres, no un archivo:** la técnica es un sobre. La **económica** se arma con
+`pricing-garantias-finance.md` + el generador de Excel; la **administrativa** con
+`compliance-riesgo-integridad.md`. No las metas en el `.md` técnico.
+
 ## Oferta técnica — anatomía que puntúa
 
 Modela cada sección **hacia el criterio ponderado que la evalúa** (lee primero la tabla de ponderaciones en `chile-publico-operativo.md`).

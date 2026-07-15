@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — Método: la oferta técnica se itera en Markdown y el deck es su proyección
+
+- Se canoniza como plantilla lo que el caso SKY ya hizo a mano: **[TECHNICAL_OFFER_TEMPLATE.md](docs/commercial/tenders/TECHNICAL_OFFER_TEMPLATE.md)** — la oferta técnica se escribe/itera (idea, investigación, evidencia, narrativa) en un `.md` con taxonomía canónica (15 secciones destiladas de SKY), y el deck se compone **desde** ahí.
+- **Regla híbrida:** secciones = GUÍA (cada RFP ordena hacia sus criterios ponderados); evidencia = CONTRATO — toda cifra vive primero en el «Ledger de evidencia» (Zona 0) con fuente googleable + as-of, mapeable 1:1 a `proposal_evidence` y al gate `missing_evidence_ref` del composer, pero atrapado antes. El deck **NO** auto-deriva: SSOT del deck = los slots del `deck-plan.json`; el `.md` es la fuente narrativa+evidencia; el autor/agente construye el plan DESDE la oferta (propose→confirm) con el mapa sección→contentType de la Zona 2.
+- Costura documentada en la skill `greenhouse-public-private-tenders` → `propuesta-tecnica-economica.md` (ambos namespaces `.claude`/`.codex`). Familia de tres: técnica (esta plantilla) · económica (`pricing-garantias-finance.md` + Excel) · administrativa (`compliance-riesgo-integridad.md`).
+
 ## 2026-07-15 — Digital Sales Room (Sala de Ventas): decisión de arquitectura + spec (Proposed, deferred)
 
 - Tras comparar con Trumpet, se documenta la **Sala de Ventas Digital**: un micrositio por deal servido al comprador que reemplaza el PDF estático de una `Proposal` por una superficie viva, versionada y trackeable. La tesis: es **`quote-share` generalizado** de un PDF de cotización a una sala completa de `Proposal` — el repo ya tiene las 3 piezas (token HMAC + `quote_share_views` append-only + página pública `/public/quote/.../[token]`, el modelo headless `render-projection.ts`, y el audience gate del Proposal Studio); la sala las **combina**, no las inventa.
