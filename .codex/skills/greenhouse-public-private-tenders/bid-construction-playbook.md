@@ -117,7 +117,7 @@ Regla: si las tres lentes no pasaron, la propuesta **no está lista** aunque el 
 ### Fase 9-bis — El deck (composición, no diseño)
 
 **Cargar `deck-visual-system.md`.** El deck de la propuesta (técnica o de presentación ejecutiva)
-**se compone desde un catálogo cerrado de 25 plantillas** — **nunca** se dibuja freehand. Se elige la
+**se compone desde un catálogo cerrado de 28 plantillas** — **nunca** se dibuja freehand. Se elige la
 plantilla por el tipo de contenido (selector determinista, `registry.json`) y se rellenan sus slots.
 
 Las que **puntúan o evitan el descarte** son T1 y no son opcionales: **matriz de cumplimiento**
@@ -171,7 +171,7 @@ Regla para no perder el plano: **cada mejora del método manual documentada aqu�
 
 | Pieza | Estado | Qué es |
 |---|---|---|
-| **Artifact Composer (Fase 9-bis)** | ✅ **Shipped** (TASK-1393) | Motor domain-free en `src/lib/artifact-composer/**`; el deck es el catálogo `deck-axis` (25 plantillas + selector + brand pack + fuentes herméticas). CLI exploratorio: `pnpm deck:compose`. Ver `deck-visual-system.md` |
+| **Artifact Composer (Fase 9-bis)** | ✅ **Shipped** (TASK-1393) | Motor domain-free en `src/lib/artifact-composer/**`; el deck es el catálogo `deck-axis` (28 plantillas + selector + brand pack + fuentes herméticas). CLI exploratorio: `pnpm deck:compose`. Ver `deck-visual-system.md` |
 | **Aggregate `Proposal` (F0)** | ✅ **Shipped** (TASK-1392) | `greenhouse_commercial.proposal*`: state machine EN DB (gates humanos que la DB misma exige), RFP/evidencia/requisitos por asset store, entitlement per-ORG, API parity, **Proposal Intake Agent** |
 | **Renderer productivo** | ✅ **Code-complete** (TASK-1391; staging deploy pendiente) | `requestProposalRender` → cola con prioridad deadline+aging → Cloud Run Job `artifact-worker` (Chromium pinneado) → PDF versionado en asset store. **La propuesta SKY real ya salió por este camino** |
 | **Manual de USO y EVOLUCIÓN** | 📖 | **`proposal-studio-runtime.md`** — lo primero que lee un agente nuevo: las 6 recetas de uso + las costuras de extensión |

@@ -220,6 +220,23 @@ Fuentes canónicas: `docs/architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` �
 
 ---
 
+## Enlaces, páginas de agenda y la garantía de reutilización (2026-07-14)
+
+Tres capacidades del motor que cambian lo que un deck puede afirmar:
+
+1. **Un deck que se LEE puede enlazar su evidencia viva.** `<a href="https://…">` en un rich-slot
+   sobrevive el sanitizador (sólo `https://`; todo otro atributo se borra), Chromium lo imprime como
+   anotación `/Link` y el merge la porta al PDF final (pdf-lib `copyPages` la descartaba — bug real,
+   medido). El molde estila el anchor (color heredado + subrayado). ⚠️ Verificar anotaciones **vía API
+   pdf-lib** (`page.node.Annots()`), nunca grep sobre los bytes: los object streams comprimen los dicts.
+2. **La agenda funge como agenda**: cada capítulo lleva su número de página REAL, derivado por hook del
+   plan (`targetSlideId` → posición viva). Reordenar el deck recalcula las páginas. **NUNCA** se autoran
+   — un deck reordenado con páginas a mano se contradice solo (misma bug class que los ordinales).
+3. **El copy del prototipo no puede fugarse a otra propuesta.** Un slot opcional no provisto se LIMPIA
+   en el render (`absent-optional`): los prototipos están escritos contra un cliente real, y sin el
+   barrido, el deck del siguiente cliente heredaba ese copy. Guard mecánico: un probe por plantilla que
+   llena **sólo los required** y falla si un opcional conserva texto/imagen del prototipo.
+
 ## Hard rules
 
 - **NUNCA** dibujes una lámina freehand. Si no hay plantilla, **hay un gap de catálogo**.

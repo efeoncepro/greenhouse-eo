@@ -87,7 +87,7 @@ qué segundo y qué es soporte. Si todo pesa lo mismo, la lámina no comunica.
 
 ---
 
-## El catálogo — 25 plantillas
+## El catálogo — 28 plantillas
 
 Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 
@@ -127,6 +127,27 @@ descarte**:
 - **T3 — nice-to-have:** `CredentialsFull`.
 
 ---
+
+## Delta 2026-07-14 — iterando la oferta SKY (el catálogo pasó a 28)
+
+- **`TeamGalleryFull`** (`team-gallery`): el roster con **FOTOS REALES** del squad — materializa el
+  `personaAssetContract` que quote/narrative tenían pendiente. Resolver `squad-person` con **allowlist
+  cerrada** (8 personas → `assets/squad/squad-<nombre>.png`; desconocido → `UnknownResolverValueError`:
+  una cara IA no puede entrar ni por typo). El binding foto↔nombre↔rol **lo confirma el operador**.
+  Desambiguación: roles con glifo → `TeamSplit`; caras reales → `TeamGalleryFull`.
+- **Enlaces clickeables en el PDF**: `<a href>` (sólo `https://`) en rich-strings → anotación `/Link`
+  real. Eran DOS bugs del motor (sanitizador + `copyPages` que descartaba anotaciones) — arreglados.
+  ⚠️ Verificar anotaciones **vía API pdf-lib**, nunca grep (object streams comprimidos).
+- **Agenda funcional**: números de página **derivados del plan** (hook con `deckPlan`; `targetSlideId`
+  → posición viva). **NUNCA** autorar páginas.
+- **Anti-fuga de prototipo**: slot opcional no provisto → su nodo **se limpia** en el render. Antes,
+  el copy de ejemplo («Propuesta técnica · SKY») viajaba al PDF de la siguiente licitación. Guard: 28
+  probes required-only en `template-composability`.
+- **Patrón «pieza viva»** (`ArtifactShowcaseFull`): captura real con **chrome de navegador y la URL
+  horneada** + `lead` rich con enlace clickeable (así van la Radiografía y el informe del grader).
+- **`dual-concept-icon`** (DualTextSplit): semántica de columna (`search|ai|data|users|target`) → Solar.
+
+Detalle completo: `docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` → §Delta 2026-07-14.
 
 ## El selector — cómo se elige la plantilla
 
@@ -354,7 +375,7 @@ operar. El resumen:
 
 ### Estado del catálogo — 25/25 componibles ✅ (verificado en CI + frame real)
 
-Las 25 plantillas tienen `data-slot` en el HTML y su `*.slots.json`, enlazado en el `registry.json`.
+Las 28 plantillas tienen `data-slot` en el HTML y su `*.slots.json`, enlazado en el `registry.json`.
 El composer las puede llenar todas. En arrays, el contrato declara el blueprint repetible
 (`itemSelector`) y cualquier chrome fijo (`fixedChildren`); el filler no infiere por orden de DOM ni
 conserva el chrome de ejemplo si el dato no lo sostiene.

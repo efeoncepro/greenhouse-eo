@@ -15,9 +15,9 @@
 | Pieza | Estado |
 |---|---|
 | **Artifact Composer** (selector · validate · slot-fill · dispatch de resolvers · geometría · render hermético · output targets) | ✅ shipped, **`src/lib/artifact-composer/**`** — primitive domain-free package-shaped; frontera mecánica (allowlist test + eslint); **cero Next-isms** (sin `server-only`/shim) |
-| **Catálogo `deck-axis`** (25 plantillas + registry + contratos + 16 resolvers + validadores semánticos + timeline hooks + molde compilado + assets) | ✅ **`src/lib/artifact-composer/catalogs/deck-axis/`** — 25/25 componibles; **cero HEX de marca** (todo sale de `deck-tokens.css`); recipes de gradiente como dato; fuentes locales del pack |
+| **Catálogo `deck-axis`** (28 plantillas + registry + contratos + 18 resolvers + validadores semánticos + timeline/agenda hooks + molde compilado + assets) | ✅ **`src/lib/artifact-composer/catalogs/deck-axis/`** — 28/28 componibles (2026-07-14: +`TeamGalleryFull`, +2 en la sesión previa); **cero HEX de marca** (todo sale de `deck-tokens.css`); recipes de gradiente como dato; fuentes locales del pack |
 | **Brand pack `axis`** (snapshot Figma PPT + ledger 78 bases + roles + font pack OFL + guard WCAG advisory) | ✅ `src/lib/artifact-composer/brand-packs/axis/` — compilado por `pnpm composer:brand-pack`; ⚠️ **71 altas `figma.status=proposed`** pendientes de validación del operador en `Sistema Axis - PPT` |
-| **Gate estético**: baseline 40 frames + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` dos-vías | ✅ `scripts/frontend/baselines/artifact-composer/**` — corre en cada cambio del dominio |
+| **Gate estético**: baseline 51 frames (28 sintéticos + deck SKY 23) + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` dos-vías | ✅ `scripts/frontend/baselines/artifact-composer/**` — corre en cada cambio del dominio |
 | `ResolvedCompositionManifest` (input + hashes de catálogo/contratos/brand pack/fuentes + validadores) | ✅ **se emite junto al PDF/PNG** (`<artifactId>.manifest.json`); es lo único que TASK-1391 debe aceptar |
 | CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ shipped — **ya NO es el único consumer** (ver renderer productivo abajo); no depende de ningún flag: es el camino local y el modo degradado |
 | State machine (12 estados, 3 gates humanos) | ✅ **PERSISTIDA** (TASK-1392): matriz en `proposal_state_matrix` + trigger de enforcement + historial append-only; TS ↔ DB con test de paridad. Terminales `won`/`lost` |
@@ -38,6 +38,44 @@ referencia · accesibilidad · deadline vencido · validadores) y **en el worker
 font_fallback · blank_slide · peso · páginas). **El PDF NO es PDF/UA**: si el RFP exige accesibilidad, el
 render se rechaza al encolar (`accessibility_unsupported`) — *mejor no ofertar que entregar un artefacto
 inadmisible*.
+
+---
+
+## Delta 2026-07-14 — enlaces clickeables · anti-fuga de prototipo · hooks con plan · fotos del squad
+
+Capacidades nuevas del motor/catálogo (nacidas iterando la oferta SKY; TODAS domain-free y con gate):
+
+1. **Enlaces clickeables en el PDF.** El sanitizador de rich-strings admite `<a href>` (**sólo**
+   `https://` o ancla interna; todo otro atributo se sigue borrando). `deck-mold.css` estila el anchor
+   (color heredado + subrayado — el default UA azul sobre navy era ilegible). Y `mergeSlidePdfs`
+   **re-crea las anotaciones `/Link → /URI`** sobre la página copiada, porque `copyPages` de pdf-lib
+   las **descarta** (medido: Chromium emite la anotación, el merge llegaba con 0). ⚠️ Al verificar
+   anotaciones, **NUNCA grep sobre los bytes del PDF**: `deck.save()` usa object streams comprimidos y
+   el regex no ve adentro — se cuenta **vía API pdf-lib** (`page.node.Annots()`).
+2. **Anti-fuga de prototipo (la garantía de reutilización entre licitaciones).** Los prototipos están
+   escritos contra un cliente real («Propuesta técnica · SKY»). Un slot **opcional no provisto** ahora
+   **se limpia** en el render (`absent-optional` en `fillDom`) — antes el copy de ejemplo viajaba al
+   PDF de la siguiente licitación. Guard mecánico: `template-composability` incluye un probe por
+   plantilla que la llena **sólo con los required** y falla si un slot opcional conserva texto/imagen
+   del prototipo. **NUNCA** escribas copy de cliente en un prototipo esperando que "nadie lo va a ver".
+3. **Hooks con acceso al plan.** `CatalogLayoutHook` recibe `deckPlan` opcional (3er parámetro): el
+   chrome que depende de OTRAS láminas se **deriva** — `agenda-hooks.ts` pinta el número de página real
+   de cada capítulo desde la posición viva de su `targetSlideId`. **NUNCA** autorar números de página
+   (un deck reordenado se contradice solo). Render standalone sin plan → el hook no pinta, jamás inventa.
+4. **`TeamGalleryFull`** (contentType `team-gallery`): roster de **FOTOS REALES** del squad vía resolver
+   `squad-person` — allowlist **cerrada** (`andres, daniela, humberly, julio, luis, maria-fernanda,
+   melkin, valentina` → `assets/squad/squad-<nombre>.png`); nombre desconocido →
+   `UnknownResolverValueError`, una cara IA no puede entrar ni por error. El binding foto↔nombre↔rol
+   **lo confirma el operador humano, nunca lo asume un agente**. Persona nueva = foto real (recorte con
+   alpha) + entrada en la allowlist + enum del contrato. Desambiguación: roles con glifo → `TeamSplit`;
+   caras reales → `TeamGalleryFull`.
+5. **`dual-concept-icon`** (DualTextSplit): el autor declara la **semántica** de la columna
+   (`search|ai|data|users|target`) y el catálogo pinta el Solar; ausente → glifo neutro del prototipo;
+   typo → error. **NUNCA** autorar nombres de ícono.
+6. **`ArtifactShowcaseFull.lead`** es rich-string (`em/strong/a`) — el patrón «pieza viva» es captura
+   real con **chrome de navegador y la URL horneada en la barra** (assets `radiografia-sky-xray.png`,
+   `informe-grader-sky.png`) + enlace clickeable en el lead. La pieza interactiva se muestra Y se
+   enlaza; el screenshot solo, sin URL, no es verificable por el comité.
 
 ---
 

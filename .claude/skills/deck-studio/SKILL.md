@@ -233,7 +233,7 @@ layout para una lámina puntual.
 visual es señal de rigor; un deck que cambia de lenguaje cada tres láminas se lee como un collage y
 **resta**.
 
-Detalle completo (catálogo, selector, CLI, PDF, las bug classes del motor): **[`composition.md`](composition.md)**. Para el camino **productivo en Greenhouse** (el deck como entregable gobernado de una `Proposal`:
+Detalle completo (catálogo, selector, CLI, PDF, las bug classes del motor): **[`composition.md`](composition.md)**. Desde 2026-07-14 el motor además garantiza tres cosas que cambian lo que un deck puede afirmar: **enlaces `https://` clickeables en el PDF** (la evidencia viva se enlaza, no se describe), **páginas de agenda derivadas del plan** (nunca autoradas) y **anti-fuga de prototipo** (un slot opcional omitido se limpia — el copy de ejemplo de un cliente no puede viajar al deck del siguiente). Para el camino **productivo en Greenhouse** (el deck como entregable gobernado de una `Proposal`:
 render job → Cloud Run Job `artifact-worker` → PDF en el asset store, con gates de audience/
 accesibilidad/peso y QA visual mecánica) el manual es
 `greenhouse-public-private-tenders/proposal-studio-runtime.md` — shipped 2026-07-12.
@@ -300,6 +300,9 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
   BBC lo rastreó hasta un sitio SEO que citaba 25 personas abandonando webs en 2008.)*
 - **NUNCA** dibujes una lámina freehand. Se **compone** desde el catálogo. Si no hay plantilla, hay un
   **gap de catálogo**, no una licencia.
+- **NUNCA** verifiques las anotaciones /Link de un PDF con grep sobre sus bytes: pdf-lib comprime en
+  object streams y el regex no ve adentro — **se cuenta vía API** (`page.node.Annots()`). Un enlace
+  prometido que no llegó al PDF es evidencia inalcanzable para el comité.
 - **NUNCA** declares un deck "listo" sin **MIRAR LOS FRAMES — todos.** Los tests verdes **no** son el
   gate de un deck: cuatro pasos numerados "01", párrafos aplanados con comas y una firma sin blend
   **pasaban los 92 tests** del composer. Los encontró una revisión visual.
