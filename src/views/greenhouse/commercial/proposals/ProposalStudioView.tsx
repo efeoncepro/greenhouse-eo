@@ -147,7 +147,7 @@ const ProposalStudioView = ({ ownerOrgId }: { ownerOrgId: string | null }) => {
 
     try {
       const res = await fetch(
-        `/api/commercial/proposals/operator-view?ownerOrgId=${encodeURIComponent(ownerOrgId)}&includeClosed=1`
+        `/api/commercial/proposals/operator-view?ownerOrgId=${encodeURIComponent(ownerOrgId)}&includeClosed=true`
       )
 
       if (!res.ok) throw new Error(String(res.status))
@@ -288,8 +288,11 @@ const ProposalStudioView = ({ ownerOrgId }: { ownerOrgId: string | null }) => {
                             </Tooltip>
                           )}
                         </Box>
-                        <Typography variant='body2' color='text.secondary' noWrap>
-                          {version.fileName ?? '—'} · {formatBytes(version.sizeBytes)} · {formatDeadline(version.createdAt)}
+                        <Typography variant='body2' color='text.secondary' noWrap title={version.fileName ?? undefined}>
+                          {version.fileName ?? '—'}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          {formatBytes(version.sizeBytes)} · {formatDeadline(version.createdAt)}
                         </Typography>
                       </Box>
                       <Button
@@ -316,7 +319,16 @@ const ProposalStudioView = ({ ownerOrgId }: { ownerOrgId: string | null }) => {
   // ── Tabla (S3) ────────────────────────────────────────────────────────────────────────────────
 
   return (
-    <AdaptiveSidecarLayout open={selectedId !== null} onOpenChange={open => !open && setSelectedId(null)} sidecar={sidecar}>
+    <AdaptiveSidecarLayout
+      open={selectedId !== null}
+      onOpenChange={open => !open && setSelectedId(null)}
+      kind='inspector'
+      preferredMode='temporary'
+      sidecarWidth={480}
+      sidecarMinWidth={420}
+      sidecarMaxWidth={560}
+      sidecar={sidecar}
+    >
       <Card>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 4, flexWrap: 'wrap' }}>
@@ -411,9 +423,6 @@ const ProposalStudioView = ({ ownerOrgId }: { ownerOrgId: string | null }) => {
                     >
                       <TableCell>
                         <Typography variant='subtitle2'>{row.title}</Typography>
-                        <Typography variant='caption' color='text.secondary'>
-                          {row.proposalId}
-                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant='body2'>{ORIGIN_LABEL[row.origin] ?? row.origin}</Typography>
