@@ -50,7 +50,7 @@ La Radiografía cierra esa distancia. Le da al equipo comercial:
 | ① | **El hueco** | El resultado de búsqueda real del término: quién ocupa hoy ese espacio y por qué el cliente no está. Es la portada y es el golpe |
 | ② | **El artículo** | El artículo completo, a ancho completo, **sin anotaciones**. Acá se LEE. El cliente juzga lo que está comprando |
 | ③ | **La radiografía** | Tocas un párrafo y ves **qué produce** en la capa de máquina. En móvil primero se ve el artículo; la máquina aparece como hoja inferior al tocar |
-| ④ | **Dónde más vive** | El video, la pieza social y el set de imágenes que nacen del mismo artículo. La pieza social es el protagonista visual porque muestra el entregable más inmediato |
+| ④ | **Dónde más vive** | El video, la pieza social y el set de imágenes que nacen del mismo artículo. La pantalla muestra primero los artefactos derivados en su hábitat, con iconografía funcional de canal y línea de sangre desde el artículo |
 
 Cada pantalla es **una URL propia**: el deck o el correo pueden enlazar directo a la que convenga.
 

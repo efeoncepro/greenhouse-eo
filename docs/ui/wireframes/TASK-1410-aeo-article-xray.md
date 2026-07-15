@@ -163,7 +163,8 @@ La revisión de producto completa mantuvo el flow de cuatro pantallas y ajustó 
 
 1. **① El hueco:** el CTA "Siguiente" se integró en la columna derecha, después del punch y la objeción, usando el copy existente del flow. Ya no flota como bloque genérico al final de una zona vacía.
 2. **③ La radiografía móvil:** vuelve a ser *article-first*. El instrumento no aparece primero ni ocupa el arranque de la pantalla; se abre como hoja inferior solo cuando el evaluador toca un bloque. Esto protege el trabajo educativo: primero se ve el contenido que se interroga.
-3. **④ Dónde más vive:** el átomo social es protagonista. Desktop lo mantiene al centro con columna más ancha; mobile lo sube primero visualmente sin cambiar el orden del payload ni la clase contractual `class="atom"`.
-4. **Riel móvil:** el paso activo se centra al cargar en pantallas compactas, para que deep-links a la ④ no escondan `Dónde más vive`.
+3. **④ Dónde más vive:** pasa a `artifact-first`. Antes de las cards aparece una línea de sangre visual (`Artículo original → video / social / imágenes`) y cada átomo muestra primero su artefacto: video con thumbnail + guion/transcripción, pieza social como mockup de feed, set de imágenes como pack con ALT. La métrica queda debajo como prueba, no como protagonista.
+4. **Iconografía funcional de canal:** documento, video, conversación social e imágenes aparecen como señales pequeñas en la línea de sangre y headers de átomo. No reemplazan el contenido real ni agregan ilustración decorativa.
+5. **Riel móvil:** el paso activo se centra al cargar en pantallas compactas, para que deep-links a la ④ no escondan `Dónde más vive`.
 
-Evidencia local `efeonce-think`: `pnpm build`, `pnpm verify:aeo-xray` (`46/46`), `pnpm verify:aeo-xray:scenarios` (`2/2`), capturas revisadas en `/tmp/aeo-design-iteration-20260714/`.
+Evidencia local `efeonce-think`: `pnpm build`, `pnpm verify:aeo-xray` (`46/46`), `pnpm verify:aeo-xray:scenarios` (`2/2`), capturas revisadas en `/tmp/aeo-atomizacion-repurpose-20260714/`.

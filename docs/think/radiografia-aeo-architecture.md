@@ -63,7 +63,8 @@ Cada pantalla hace **un solo trabajo**, y cada una es **una lámina** para el de
 ### Contrato móvil y jerarquía de la ④
 
 - **③ en móvil abre con el artículo.** Con JavaScript, el instrumento queda cerrado en reposo y sube como hoja inferior al tocar un bloque. Sin JavaScript, queda después del artículo como contenido estático. La pantalla educa por interrogación: primero se ve el contenido; luego la máquina responde.
-- **④ tiene un protagonista visual.** La pieza social es el átomo demostrable más concreto; en desktop vive al centro con columna más ancha y en móvil sube primero visualmente. El DOM/payload conserva el orden original y cada tarjeta mantiene `class="atom"` para los gates.
+- **④ es artifact-first, no explicación-first.** Arranca con una línea de sangre visual (`Artículo original → video / social / imágenes`) y cada átomo muestra primero el artefacto en su hábitat: thumbnail + guion/transcripción para video, mockup de feed para social y pack visual con ALT para imágenes. La métrica baja a prueba/fuente.
+- **La iconografía de la ④ es funcional.** Usa señales pequeñas de canal (documento, video, conversación social, imágenes) para lectura rápida; no reemplaza los artefactos reales ni agrega decoración. La pieza social sigue siendo el átomo demostrable más concreto: en desktop vive al centro con columna más ancha y en móvil sube primero visualmente. El DOM/payload conserva el orden original y cada tarjeta mantiene `class="atom"` para los gates.
 - La reordenación visual nunca puede depender del nombre del cliente. Se resuelve por propiedad del payload (`post`) / atributo semántico, no por `SKY`, slug ni `coupleId`.
 
 ---
