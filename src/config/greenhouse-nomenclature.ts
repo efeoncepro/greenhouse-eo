@@ -55,6 +55,7 @@ export const GH_INTERNAL_NAV = {
   adminProductSyncConflicts: { label: 'Product Sync Conflicts', subtitle: 'Drift del catálogo comercial, auto-heal y resolución operativa con HubSpot Products' },
   adminPaymentInstruments: { label: 'Instrumentos de pago', subtitle: 'Cuentas bancarias, tarjetas, fintech y plataformas' },
   adminPricingCatalog: { label: 'Catálogo de pricing', subtitle: 'Roles, tools, overheads y gobierno comercial' },
+  adminCommercialProposals: { label: 'Propuestas', subtitle: 'Estado, versiones por artefacto y descarga de propuestas comerciales' },
   adminTalentReview: { label: 'Verificación de talento', subtitle: 'Skills, herramientas y certificaciones por revisar' },
   adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' },
   adminIdentityAccess: { label: 'Identidad y acceso', subtitle: 'Usuarios, roles, vistas y cuentas' },
