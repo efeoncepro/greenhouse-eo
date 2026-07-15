@@ -48,7 +48,14 @@ explica, no se propone). **El manifest se valida, NO se reescribe** (`.passthrou
 - **`pnpm composer:visual-gate` a CERO píxeles** contra el baseline committeado
   (`scripts/frontend/baselines/artifact-composer/**`). Un cambio de píxel intencional se declara
   lámina por lámina en `BASELINE_DELTAS.md` y se re-promueve con `--freeze` — **NUNCA** se muta el
-  baseline a mano (el digest sellado también falla el gate).
+  baseline a mano (el digest sellado también falla el gate). **Antes de `--freeze`, leé el runbook
+  `docs/operations/runbooks/composer-visual-gate.md`** (fuente única del proceso). Dos reglas duras de
+  ese runbook (bug class `ISSUE-122`): **(1)** el `--freeze` es **SINGLE-OWNER, serializado y atómico**
+  (freeze + commit juntos) — **NUNCA** congeles con el composer sucio por otro agente (`git status` en
+  `src/lib/artifact-composer`/`scripts/frontend/baselines` con `M` ajenos = coordiná, no congeles); **(2)**
+  las láminas con **fotos** (`TeamGalleryFull`/equipo) **driftean píxeles entre corridas/entornos** aunque
+  no las toques (el `--selftest` de 2 corridas juntas NO lo atrapa) — si el gate flagea SOLO el área de foto
+  de una lámina que no cambiaste, **es `ISSUE-122`, NO tu regresión: NO la rebaselines**.
 - **NUNCA** un HEX/rgb de marca en una plantilla (`pnpm composer:color-ledger`): el color sale de
   `deck-tokens.css` (brand pack); los gradientes son recipes (`gradient-recipes.json`) o inventario
   ratchet. **NUNCA** `'Poppins'/'Geist'` literal: type roles `var(--axis-deck-type-display|text)`.

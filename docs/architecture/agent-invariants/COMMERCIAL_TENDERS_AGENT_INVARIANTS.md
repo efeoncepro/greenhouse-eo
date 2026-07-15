@@ -277,6 +277,13 @@ command canónico y cruza la MISMA puerta que las rutas.
   `pnpm vitest run src/lib/artifact-composer src/lib/commercial/tenders` (las suites cubren las bug
   classes que ya nos costaron un deck roto) **y `pnpm composer:visual-gate`** (0 píxeles contra el
   baseline; rebaseline sólo declarado en `BASELINE_DELTAS.md` + `--freeze`).
+- **ANTES de cualquier `--freeze`, leé el runbook `docs/operations/runbooks/composer-visual-gate.md`**
+  (fuente única del proceso — cualquier agente lo carga al tocar el composer). Bug class `ISSUE-122`, dos
+  reglas duras: **(a)** el `--freeze` es **SINGLE-OWNER, serializado y atómico** (freeze + commit juntos);
+  **NUNCA** congeles con el composer sucio por otro agente (co-mingla su WIP → baseline corrupto). **(b)**
+  las láminas con **fotos** (`TeamGalleryFull`/equipo) driftean píxeles entre corridas/entornos aunque no
+  las toques; el `--selftest` de 2 corridas juntas NO lo atrapa. Si el gate flagea SOLO el área de foto de
+  una lámina que no cambiaste, **es `ISSUE-122`, NO tu regresión — NO la rebaselines** (oculta el bug).
 - **NUNCA** reintroduzcas un HEX/rgb de marca, un `@import` de Google Fonts o `'Poppins'/'Geist'`
   literal en una plantilla: color = `deck-tokens.css` (brand pack), gradientes = recipes/inventario
   ratchet, tipografía = `var(--axis-deck-type-display|text)` + font pack local (render bloquea red).
