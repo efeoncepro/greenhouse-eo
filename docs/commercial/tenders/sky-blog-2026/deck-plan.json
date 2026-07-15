@@ -1,9 +1,12 @@
 {
   "_readme": [
     "DeckPlan REAL de la licitación SKY — Servicio de Producción de Contenido Blog (Wherex).",
-    "TODAS las cifras son reales y trazables: el diagnóstico sale del AI Visibility Grader (5 motores,",
-    "35 respuestas) y de Semrush; la económica sale de la oferta aprobada. NADA es ilustrativo.",
+    "TODAS las cifras son reales y trazables: el diagnóstico IA sale del informe PUBLICADO del",
+    "AI Visibility Grader (run EO-GRUN-00046, 5 motores, 35 respuestas) y el SEO de Semrush +",
+    "auditoría técnica directa (2026-07-14, meta/schema/robots verificados sobre el código fuente).",
     "Registro formal (de usted): es un documento contractual que evalúa un comité.",
+    "Mapeo persona↔rol del equipo CONFIRMADO por el operador (2026-07-14): Julio·Responsable de Cuenta,",
+    "María Fernanda·SEO Copywriter, Daniela·Creative Operations Lead, Melkin·Senior Visual Designer, Andrés·SEO Specialist.",
     "Componer: pnpm deck:compose docs/commercial/tenders/sky-blog-2026/deck-plan.json --out .captures/sky-bid"
   ],
   "tenderId": "SKY-BLOG-2026",
@@ -32,7 +35,7 @@
             "number": "01",
             "title": "El diagnóstico",
             "description": "Dónde está el blog hoy, medido",
-            "targetSlideId": "diagnostico"
+            "targetSlideId": "near-miss"
           },
           {
             "number": "02",
@@ -42,9 +45,9 @@
           },
           {
             "number": "03",
-            "title": "El método",
+            "title": "La operación",
             "description": "Cómo se opera el servicio",
-            "targetSlideId": "metodo"
+            "targetSlideId": "operacion"
           },
           {
             "number": "04",
@@ -80,23 +83,120 @@
           "<b>Un blog bien operado captura esa intención y la convierte en tráfico.</b> Uno que solo acumula textos sin estrategia ni medición se vuelve un archivo que nadie encuentra."
         ],
         "closing": "Leemos el blog como lo que es para SKY: <em>un canal de adquisición</em>.",
-        "conceptLabel": "CÓMO SE OPERA",
-        "conceptTitle": "Tres capas encadenadas",
+        "conceptLabel": "CÓMO SE TRABAJA",
+        "conceptTitle": "El método, en tres capas",
         "conceptLegend": [
           {
-            "layer": "Estrategia",
-            "definition": "Qué publicar y por qué",
+            "layer": "Base técnica",
+            "definition": "Que la máquina pueda leer cada pieza",
             "tone": "outer"
           },
           {
-            "layer": "Producción",
-            "definition": "Cómo se escribe para posicionar",
+            "layer": "Autoridad",
+            "definition": "Temática: el destino como cluster enlazado",
             "tone": "middle"
           },
           {
-            "layer": "Medición",
-            "definition": "Qué funcionó y qué optimizar",
+            "layer": "Entidad",
+            "definition": "E-E-A-T: que el contenido merezca rankear",
             "tone": "core"
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "near-miss",
+      "contentType": "several-kpis",
+      "template": "MetricsSplit",
+      "slots": {
+        "title": "Atascado en la segunda página",
+        "subtitle": {
+          "client": "Blog de SKY Airline",
+          "context": "Semrush · database CL"
+        },
+        "kpis": [
+          {
+            "kind": "gap",
+            "value": "Pos. 12",
+            "unit": "hoy",
+            "label": "«Antofagasta» · 110.000 búsq/mes",
+            "qual": "La mayor búsqueda del blog queda en la segunda página de Google.",
+            "evidenceRef": "Semrush · database CL · 2026-07-11"
+          },
+          {
+            "kind": "gap",
+            "value": "Pos. 9",
+            "unit": "hoy",
+            "label": "«Terminal Sur» · 33.100 búsq/mes",
+            "qual": "Al fondo de la primera página, donde casi no llegan clics.",
+            "evidenceRef": "Semrush · database CL · 2026-07-11"
+          },
+          {
+            "kind": "gap",
+            "value": "Pos. 6",
+            "unit": "hoy",
+            "label": "«Camboriú» · 22.200 búsq/mes",
+            "qual": "A tres posiciones del tramo que concentra el tráfico.",
+            "evidenceRef": "Semrush · database CL · 2026-07-11"
+          },
+          {
+            "kind": "gap",
+            "value": "Pos. 6",
+            "unit": "hoy",
+            "label": "«Puerto Fuy» · 22.200 búsq/mes",
+            "qual": "Misma foto: la página existe, rankea, y se queda corta.",
+            "evidenceRef": "Semrush · database CL · 2026-07-11"
+          }
+        ],
+        "readEyebrow": "LA LECTURA",
+        "readLead": "El mejor tráfico del blog <em>ya casi es suyo</em>",
+        "readBody": "Estas páginas existen y rankean. Subirlas de la segunda página al tramo alto es el mayor retorno disponible — y es exactamente donde apunta la grilla editorial del primer trimestre.",
+        "source": "Semrush, base de datos Chile, medido el 11 de julio de 2026"
+      }
+    },
+    {
+      "slideId": "capa-tecnica",
+      "contentType": "dual-list",
+      "template": "DualListSplit",
+      "slots": {
+        "leftEyebrow": "LO QUE SU BLOG NO EMITE HOY",
+        "leftTitle": "La capa que el buscador lee no está escrita",
+        "leftItems": [
+          {
+            "lead": "Meta descripción: ausente",
+            "body": "El requisito 4 de estas Bases. Google redacta por su cuenta el texto del resultado."
+          },
+          {
+            "lead": "Datos estructurados: cero",
+            "body": "Sin schema, buscadores y motores de IA tienen que adivinar de qué trata cada pieza."
+          },
+          {
+            "lead": "robots.txt: responde 404",
+            "body": "El blog no declara política alguna para los rastreadores."
+          },
+          {
+            "lead": "llms.txt: no existe",
+            "body": "La declaración equivalente para los motores de respuesta con IA."
+          }
+        ],
+        "rightEyebrow": "LO QUE LA OPERACIÓN INSTALA",
+        "rightTitle": "Implementado sobre su WordPress — no recomendado en un informe",
+        "rightItems": [
+          {
+            "lead": "Meta título y descripción",
+            "body": "En el 100% de los artículos, nuevos y existentes. La diferencia se ve el primer mes."
+          },
+          {
+            "lead": "Datos estructurados por pieza",
+            "body": "La capa que permite que un motor de respuesta cite el contenido de SKY."
+          },
+          {
+            "lead": "Política de rastreo",
+            "body": "robots.txt y llms.txt declarados: qué pueden leer los buscadores y las IA."
+          },
+          {
+            "lead": "Enlazado interno del cluster",
+            "body": "Cada artículo nuevo empuja a la página que ya existe, y hacia las rutas de SKY."
           }
         ]
       }
@@ -110,27 +210,27 @@
         "leftVisual": {
           "src": "assets/clay3d/clay-ai-visibility.png"
         },
-        "title": "La IA <em>conoce</em> a SKY. Pero su blog <em>no aparece</em> en la respuesta",
+        "title": "La IA <em>conoce</em> a SKY. Pero su contenido <em>no está</em> en la respuesta",
         "narrative": [
-          "Medimos el blog de SKY antes de escribir esta propuesta, con las mismas herramientas con las que vamos a operarlo: nuestro AI Visibility Grader sobre los cinco motores de respuesta y Semrush.",
-          "El hallazgo duro: <strong>el blog no aparece citado ni una sola vez</strong> en las 35 respuestas analizadas. La marca se entiende; el activo de esta licitación no es la fuente."
+          "Medimos la marca antes de escribir esta propuesta, con el mismo instrumento con el que vamos a operar: nuestro AI Visibility Grader, sobre los cinco motores de respuesta, 35 respuestas resueltas.",
+          "La conversación sobre viajes la alimentan fuentes de terceros — <strong>la citabilidad del contenido propio es 0%</strong>. El informe está publicado: <a href=\"https://think.efeoncepro.com/brand-visibility/r/grt-9892e5684c394557a63f8171926871c26d3278216daf42a2a8100951ccb5537f\">puede recorrerlo entero</a>."
         ],
         "outcomesEyebrow": "LO QUE MEDIMOS",
         "outcomesTitle": "Tres hechos, antes de proponer nada",
         "goals": [
           {
             "kind": "citability",
-            "title": "El blog no es la fuente",
-            "metric": "0 citas",
-            "body": "En <strong>35 respuestas</strong>, <strong>ninguna</strong> cita al blog. La IA responde con Despegar y TripAdvisor.",
-            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+            "title": "Contenido propio citado",
+            "metric": "0%",
+            "body": "De las <strong>254 citas</strong> del estudio, ninguna es contenido editorial de SKY. Responden Trustpilot, Wikipedia e Instagram.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07"
           },
           {
             "kind": "growth",
             "title": "LATAM domina la categoría",
-            "metric": "17 vs 9",
-            "body": "LATAM se menciona <strong>17 veces</strong> y JetSMART 9. El terreno de la categoría está en disputa.",
-            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+            "metric": "16 vs 9",
+            "body": "LATAM se menciona <strong>16 veces</strong> y JetSMART 9. La conversación de categoría tiene dueño, y no es SKY.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07"
           },
           {
             "kind": "visibility",
@@ -151,43 +251,43 @@
         "title": "Dos peldaños <em>firmes</em>. Tres por construir.",
         "subject": {
           "name": "SKY Airline",
-          "context": "5 motores de IA · julio 2026"
+          "context": "5 motores · 35 respuestas · julio 2026"
         },
         "rungs": [
           {
-            "label": "Ser encontrada",
+            "label": "Que te encuentre",
             "anchor": "Be Found",
             "score": 40,
             "body": "Aparece en menos de la mitad de las respuestas de descubrimiento de la categoría.",
-            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
           },
           {
-            "label": "Ser legible",
+            "label": "Que te entienda",
             "anchor": "Be Readable",
             "score": 70,
-            "body": "La IA entiende quién es SKY y se apoya en fuentes creíbles. Fortaleza a defender.",
-            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+            "body": "La IA sabe quién es SKY y se apoya en fuentes creíbles. Fortaleza a defender.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
           },
           {
-            "label": "Ser correcta",
+            "label": "Que te describa bien",
             "anchor": "Be Correct",
             "score": 37,
             "body": "Cuando la IA habla de SKY, no usa su narrativa. Se corrige con contenido propio.",
-            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
           },
           {
-            "label": "Ser accionable",
+            "label": "Que pueda actuar",
             "anchor": "Be Actionable",
             "score": 8,
-            "body": "Un agente de IA no puede operar con su sitio. La frontera agéntica, casi intacta.",
-            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+            "body": "La capa técnica ausente, medida: un agente de IA no puede operar con su sitio.",
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
           },
           {
-            "label": "Ser intrínseca",
+            "label": "Que te prefiera",
             "anchor": "Be Intrinsic",
             "score": 76,
             "body": "SKY ya es opción por defecto dentro de la categoría. Su otra fortaleza.",
-            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07-11"
+            "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046"
           }
         ],
         "readout": {
@@ -197,15 +297,18 @@
       }
     },
     {
-      "slideId": "citas",
-      "contentType": "highlight",
-      "template": "HighlightWave",
+      "slideId": "informe",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
       "slots": {
-        "eyebrow": "EL HALLAZGO",
-        "statementLead": "En 35 respuestas de los motores con IA, el blog de SKY",
-        "highlight": "no aparece ni una sola vez",
-        "statementTail": "como fuente citada.",
-        "supporting": "Las respuestas se arman con <strong>fuentes de terceros</strong> —BioBioChile, YouTube, Instagram, Despegar, Trustpilot—. Ese es exactamente el terreno que este servicio trabaja."
+        "sectionLabel": "LA MEDICIÓN",
+        "title": "El diagnóstico está <em>publicado</em>. Y se repite cada mes.",
+        "lead": "El informe completo del AI Visibility Grader — las siete dimensiones, los cinco motores y las fuentes citadas, una a una — <a href=\"https://think.efeoncepro.com/brand-visibility/r/grt-9892e5684c394557a63f8171926871c26d3278216daf42a2a8100951ccb5537f\">puede recorrerse en línea</a>. Es el instrumento del avance mensual.",
+        "artifact": {
+          "src": "assets/product/informe-grader-sky.png"
+        },
+        "caption": "Informe real de SKY Airline · run EO-GRUN-00046 · julio 2026",
+        "note": "AI Visibility Grader · Efeonce"
       }
     },
     {
@@ -220,15 +323,17 @@
           "paragraphs": [
             "El blog de SKY es el <strong>mayor de la categoría</strong>: ~40.000 visitas orgánicas al mes, frente a ~19.000 de Flybondi.",
             "Pero JetSMART publica contenido de <strong>idéntica intención</strong> justo donde SKY hoy rankea en segunda página. Quien optimiza primero, se lleva el tráfico."
-          ]
+          ],
+          "icon": "search"
         },
         "rightConcept": {
           "label": "LA CARRERA DE LA IA",
           "title": "El espacio está abierto: nadie es la fuente citada",
           "paragraphs": [
             "En la conversación de categoría dentro de la IA, hoy quien más aparece es <strong>LATAM</strong>: 16 menciones frente a 9 de JetSMART.",
-            "Y las respuestas se arman con <strong>fuentes de terceros</strong>: ningún blog de aerolínea aparece citado. El primero que logre ser la fuente, gana el canal."
-          ]
+            "Y las respuestas se arman con <strong>reseñas, enciclopedia y redes</strong>: ningún contenido editorial de viaje aparece citado. El primero que logre ser la fuente, gana el canal."
+          ],
+          "icon": "ai"
         },
         "outcome": {
           "label": "LA JUGADA",
@@ -237,11 +342,11 @@
       }
     },
     {
-      "slideId": "metodo",
+      "slideId": "operacion",
       "contentType": "four-pillars",
       "template": "FourPillarsFull",
       "slots": {
-        "sectionLabel": "EL MÉTODO",
+        "sectionLabel": "LA OPERACIÓN",
         "title": "Cuatro frentes que se sostienen <em>entre sí</em>",
         "context": [
           "No proponemos publicar artículos: proponemos operar un activo comercial que rinda mes a mes.",
@@ -291,7 +396,7 @@
           },
           {
             "title": "Producción",
-            "description": "Artículos originales con SEO/AEO desde el primer borrador, su recurso visual y doble control de calidad.",
+            "description": "Artículos originales con SEO/AEO desde el primer borrador, su recurso visual y triple control de calidad.",
             "deliverable": "Artículos + recursos visuales"
           },
           {
@@ -338,7 +443,7 @@
             "kind": "work",
             "startUnit": 1,
             "endUnit": 1,
-            "title": "Diagnóstico y quick wins",
+            "title": "Capa técnica y quick wins",
             "description": "Capa técnica + páginas a un paso del top 3.",
             "barLabel": "Movimiento desde la primera semana"
           },
@@ -432,14 +537,17 @@
     },
     {
       "slideId": "muestra",
-      "contentType": "highlight",
-      "template": "HighlightWave",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
       "slots": {
-        "eyebrow": "LA MUESTRA DE TRABAJO",
-        "statementLead": "No le describimos el artículo que escribiríamos.",
-        "highlight": "Lo escribimos.",
-        "statementTail": "Está publicado y puede recorrerlo.",
-        "supporting": "<strong>think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37</strong> — cuatro pantallas sobre «carretera austral»: el hueco, el artículo, su capa técnica y dónde más vive."
+        "sectionLabel": "LA MUESTRA DE TRABAJO",
+        "title": "No le describimos el artículo: <em>lo escribimos</em>",
+        "lead": "Un artículo real para el blog de SKY, publicado y abierto en canal: la pieza terminada y, al lado, la capa de máquina que hoy le falta al blog. <a href=\"https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37\">Puede recorrerlo en línea</a>.",
+        "artifact": {
+          "src": "assets/product/radiografia-sky-xray.png"
+        },
+        "caption": "La Radiografía: el artículo (izquierda) y lo que lee una máquina (derecha), acoplados",
+        "note": "Radiografía SEO/AEO · Efeonce"
       }
     },
     {
@@ -510,47 +618,71 @@
     },
     {
       "slideId": "equipo",
-      "contentType": "team",
-      "template": "TeamSplit",
+      "contentType": "team-gallery",
+      "template": "TeamGalleryFull",
       "slots": {
         "sectionLabel": "EL EQUIPO",
-        "headline": "Un squad dedicado, <em>no una bolsa de horas</em>",
-        "lead": "Cada rol tiene una dedicación declarada y responde ante un único responsable de cuenta.",
-        "highlight": "Usted sabe <em>a quién preguntarle</em> cada cosa.",
-        "rosterLabel": "EL SQUAD",
-        "rosterMeta": "≈ 2,2 FTE dedicados",
+        "title": "Las personas que <em>responden</em> por su cuenta",
+        "rosterMeta": "El núcleo del equipo de SKY",
         "members": [
           {
-            "kind": "lead",
+            "photo": "julio",
+            "name": "Julio",
             "role": "Responsable de Cuenta",
-            "description": "Interlocutor único. Responde por el servicio completo.",
             "dedication": "12%"
           },
           {
-            "kind": "strategy",
-            "role": "Estratega Editorial / SEO Lead",
-            "description": "Grilla editorial, estrategia de keywords y autoridad temática.",
-            "dedication": "20%"
-          },
-          {
-            "kind": "content",
-            "role": "Editor / Redactor SEO",
-            "description": "Redacción y control de calidad editorial.",
+            "photo": "maria-fernanda",
+            "name": "María Fernanda",
+            "role": "SEO Copywriter",
             "dedication": "50%"
           },
           {
-            "kind": "technical",
-            "role": "Especialista SEO/AEO",
-            "description": "Optimización on-page, citabilidad en IA y capa técnica.",
-            "dedication": "25%"
+            "photo": "daniela",
+            "name": "Daniela",
+            "role": "Creative Operations Lead",
+            "dedication": "12%"
           },
           {
-            "kind": "data",
-            "role": "Analítica y Medición",
-            "description": "GA4, Search Console y el AI Visibility Grader.",
+            "photo": "melkin",
+            "name": "Melkin",
+            "role": "Senior Visual Designer",
+            "dedication": "30%"
+          },
+          {
+            "photo": "andres",
+            "name": "Andrés",
+            "role": "SEO Specialist",
             "dedication": "25%"
           }
         ]
+      }
+    },
+    {
+      "slideId": "berel",
+      "contentType": "highlight",
+      "template": "HighlightWave",
+      "slots": {
+        "eyebrow": "LA REFERENCIA",
+        "statementLead": "Este servicio no es una promesa nuestra:",
+        "highlight": "Grupo Berel ya lo compra",
+        "statementTail": "a través de Wherex.",
+        "supporting": "Servicio recurrente de contenido con <strong>SEO y AEO</strong> para Grupo Berel (México), adjudicado por la misma plataforma. Mismo tipo de servicio, mismo mecanismo de compra, cliente vigente."
+      }
+    },
+    {
+      "slideId": "seguro",
+      "contentType": "statement",
+      "template": "QuoteSplit",
+      "slots": {
+        "mode": "statement",
+        "statement": "Aceptamos <em>íntegro</em> el régimen de penalidades de las Bases, sin excepciones ni reservas — no porque confiemos en que no se aplicarán, sino porque el servicio está diseñado para <em>no gatillarlas</em>.",
+        "attribution": {
+          "label": "COMPROMISO",
+          "who": "Efeonce Group SpA",
+          "detail": "La grilla se aprueba antes de producir; cada pieza pasa triple control antes de entregarse"
+        },
+        "sourceRef": "Régimen de penalidades §3.3.4 de las Bases — aceptado cláusula por cláusula en la §13 de la Oferta Técnica"
       }
     },
     {
@@ -561,9 +693,9 @@
         "sectionLabel": "NIVELES DE SERVICIO",
         "title": "Requisito por requisito, <em>con su compromiso</em>",
         "summary": {
-          "value": "100%",
-          "label": "de los SLA exigidos, comprometidos",
-          "detail": "Los indicadores de las bases se responden uno a uno, con el mismo umbral."
+          "value": "9 de 9",
+          "label": "SLA aceptados con el umbral de las Bases",
+          "detail": "Los nueve, uno a uno, en la §13 de la Oferta Técnica."
         },
         "requirements": [
           {
@@ -605,30 +737,24 @@
       "template": "PricingFull",
       "slots": {
         "sectionLabel": "OFERTA ECONÓMICA",
-        "title": "La inversión, <em>desglosada</em>",
+        "title": "La inversión: <em>una operación</em>, no un precio por pieza",
         "summary": {
           "amount": "$5.200.000",
-          "period": "mensual · plan base (8 artículos/mes)",
+          "period": "mensual · plan propuesto",
           "taxNote": "CLP, valor neto sin IVA y sin reajuste"
         },
         "pricingOptions": [
           {
-            "label": "Plan base",
+            "label": "Plan propuesto",
             "status": "PROPUESTO",
-            "scope": "8 artículos/mes + SEO/AEO + recursos visuales + reportería",
+            "scope": "Operación completa: estrategia, capa técnica, medición y portal · hasta 8 artículos/mes",
             "amount": "$5.200.000",
             "isProposed": true
           },
           {
             "label": "Plan ampliado",
-            "scope": "12 artículos/mes + SEO/AEO + recursos visuales + reportería",
+            "scope": "La misma operación, con capacidad de hasta 12 artículos publicados al mes",
             "amount": "$6.900.000",
-            "isProposed": false
-          },
-          {
-            "label": "Artículo adicional",
-            "scope": "Por artículo, sobre el plan contratado",
-            "amount": "$260.000",
             "isProposed": false
           }
         ],
@@ -638,8 +764,8 @@
             "value": "30 días desde la aceptación conforme de la factura"
           },
           {
-            "label": "Reajustes",
-            "value": "Sin reajuste durante la vigencia del contrato"
+            "label": "Contenidos ad-hoc",
+            "value": "Dentro de la capacidad mensual contratada, sin costo adicional"
           },
           {
             "label": "Desembolsos",

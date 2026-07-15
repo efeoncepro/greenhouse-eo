@@ -54,7 +54,7 @@ enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay
 
 | # | Entregable | Estado |
 |---|---|---|
-| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ✅ **15 láminas, PDF 3.5 MB** — pendiente de ajustes visuales |
+| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ✅ **23 láminas, PDF 12.5 MB** (2026-07-14: cifras del run 46 publicado, showcases vivos del x-ray y del informe, agenda con páginas, equipo con fotos reales, 4 enlaces clickeables) |
 | 2 | Subir a Wherex | ⏳ **Operador** (regla dura: el agente prepara; el humano sube y firma) |
 | — | Oferta técnica (PDF) | ✅ 2026-07-11 |
 | — | Oferta económica (PDF) | ✅ 2026-07-11 |
@@ -86,7 +86,7 @@ enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay
 | [`oferta-tecnica.md`](oferta-tecnica.md) | **La oferta técnica.** Abre con la **matriz de cumplimiento** (cruza cada requisito de las Bases con la sección donde se responde) y cierra el **régimen de penalidades** aceptado. Es además el **contenido fuente del deck**. |
 | [`oferta-economica.md`](oferta-economica.md) | **La oferta económica.** Cifras reales (ver abajo). |
 | [`propuesta-economica.xlsx`](propuesta-economica.xlsx) | **El Excel de la económica.** ⚠️ **Es FUENTE, no derivado** (Wherex no trae plantilla, se creó a mano). Las Bases lo listan como **documento integrante** (§1.2). |
-| [`deck-plan.json`](deck-plan.json) | El plan del deck — **artefacto auditable**; el PDF de 15 láminas es derivado. |
+| [`deck-plan.json`](deck-plan.json) | El plan del deck — **artefacto auditable**; el PDF de 23 láminas es derivado. |
 | **Radiografía AEO** (enlace vivo) | **Muestra de trabajo.** Un artículo nuevo (Carretera Austral) con **su capa de máquina visible y acoplada** al lado, más la **evidencia Semrush** de por qué existe. Es la prueba de lo que la §7 de la técnica promete. `noindex`, con rótulo *«Ejemplo ilustrativo de Efeonce»* y URL tokenizada.<br>🔗 https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37<br>**Recorrido de 4 pantallas:** ① el hueco (el SERP real: Wikipedia, Instagram, TripAdvisor — cero aerolíneas) · ② el artículo · ③ la radiografía (el acoplamiento) · ④ dónde más vive (video, social, imágenes).<br>Owner: `TASK-1410`. Fuente: repo `efeonce-think`. Docs: [`docs/think/`](../../think/radiografia-aeo-architecture.md). |
 
 > ⚠️ **Antes de subir el Excel: verificar que las Bases NO impongan un formato para la económica.** El
@@ -118,7 +118,7 @@ enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay
 |---|---|---|
 | **Base** (propuesto) | 8 artículos/mes + SEO/AEO + multimedia + reportería | **5.200.000** |
 | Ampliado (opcional) | 12 artículos/mes | 6.900.000 |
-| Artículo adicional / ad-hoc | por artículo | 260.000 |
+| ~~Artículo adicional~~ | ⚠️ **SIN precio unitario publicado** (2026-07-14): el ad-hoc se produce **dentro de la capacidad contratada**. El unitario de 260k dominaba al plan ampliado y le entregaba la calculadora al comprador (regla dura #2 de `seo-aeo-practice/04_PRICING`) | — |
 
 Pago 30 días desde aceptación conforme de la factura · facturación mensual · transferencia ·
 **2 años** renovables (aviso 60 días) · validez **120 días** · **desembolsos: no aplican** (todo incluido).
@@ -126,8 +126,8 @@ Pago 30 días desde aceptación conforme de la factura · facturación mensual �
 **Diagnóstico medido (AI Visibility Grader, 5 motores, 35 respuestas):**
 
 - Claridad de marca **100/100** · Ownership de categoría **20/100** (LATAM 16 menciones, JetSMART 9)
-- **El blog de SKY: 0 citas en 35 respuestas.** Las fuentes son terceros (BioBioChile 8, YouTube 8, Instagram 8, Despegar 7, Trustpilot 7).
-- **Escalera Be X:** Ser encontrada **40** · Ser legible **70** · Ser correcta **37** · Ser accionable **8** · Ser intrínseca **76**
+- **Citabilidad propia: 0%** (dato publicado del informe — de las 254 citas del estudio, ninguna es contenido editorial de SKY). Fuentes reales del run 46: skyairline.com 15 (corporativo, la #1), Trustpilot 14, Wikipedia 13, Instagram 11, BioBioChile 10, YouTube 8. ⚠️ NUNCA volver al claim «0 citas / no aparece ni una vez»: el informe que el comité abre muestra a skyairline.com como fuente #1.
+- **Escalera Be X** (vocabulario del informe publicado, NO «Ser encontrada…»): Que te encuentre **40** · Que te entienda **70** · Que te describa bien **37** · Que pueda actuar **8** · Que te prefiera **76**
 - Informe público en vivo: `think.efeoncepro.com/brand-visibility/r/grt-9892e5684c394557a63f8171926871c26d3278216daf42a2a8100951ccb5537f`
 
 **Semrush (el blog ya tiene tracción):** ~13.000 keywords · ~40.000 visitas orgánicas/mes.
@@ -140,7 +140,7 @@ una cara generada con IA es **tergiversación**, no un tema estético.
 
 ## Cómo se compone el deck
 
-El deck **no se dibuja**: se compone con el **Artifact Composer** desde el catálogo de 25 plantillas.
+El deck **no se dibuja**: se compone con el **Artifact Composer** desde el catálogo de 28 plantillas.
 
 ```bash
 pnpm deck:compose docs/commercial/tenders/sky-blog-2026/deck-plan.json --out .captures/sky-bid

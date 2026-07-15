@@ -7,6 +7,44 @@
 
 ---
 
+## 🔴 DELTA 2026-07-14 (sesión de iteración — LEE ESTO PRIMERO, supersede §3/§4/§6)
+
+**Los tres hilos del §4 están CERRADOS**, y el deck quedó en **23 láminas · PDF 12.5 MB**:
+
+- **(a) el informe del grader** tiene lámina propia (`08-informe`, artifact-showcase con captura real
+  del gauge + logos de motores + URL tokenizada horneada en chrome de navegador) **y** enlace clickeable.
+  La muestra (`15-muestra`) es el x-ray real con el mismo tratamiento.
+- **(b) los enlaces SON clickeables** — eran DOS bugs del motor: el sanitizador no admitía `<a>` **y**
+  `copyPages` de pdf-lib descartaba las anotaciones al fusionar. Ambos arreglados en el motor; el PDF
+  lleva 4 anotaciones `/URI` vivas. ⚠️ Verificar anotaciones **vía API pdf-lib**, nunca grep (object streams).
+- **(c) la §3 de la técnica** ya no dice «tres capas encadenadas»: la oferta completa se reescribió
+  (SEO primero · cifras del run 46 publicado · §5 «qué compra el valor mensual» · §14 riesgos · matriz
+  de cumplimiento → anexo). La económica vende **capacidad, no piezas** (cero precio unitario; el ad-hoc
+  de 260k dominaba al plan ampliado). El Excel se **genera** (`scripts/commercial/build-sky-economica-xlsx.mjs`).
+
+**Más allá de los hilos:** lámina `citas` MUERTA (su claim contradecía el informe público) · claim
+canónico ahora = **«citabilidad propia 0%»** (dato publicado; skyairline.com es la fuente #1 con 15
+citas — nunca decir «no aparece») · escalera con el vocabulario del informe («Que te encuentre»…) ·
+agenda con **números de página derivados del plan** (hook, nunca autorados) · equipo = `TeamGalleryFull`
+con **fotos reales** (mapeo CONFIRMADO por el operador: Julio·Responsable 12% / María Fernanda·SEO
+Copywriter 50% / Daniela·Creative Operations Lead 12% / Melkin·Senior Visual Designer 30% /
+Andrés·SEO Specialist 25%) · Grupo Berel **con nombre autorizado** (`19-berel`) · penalidades como
+statement (`20-seguro`).
+
+**Piso de negociación ACTUALIZADO** (squad blueprint): a 2 años sin reajuste el piso real es
+**≈ CLP 5,0M** (no 4,6M ni 3,9M) — espacio de negociación 130-320k. **La carta del BAFO (20/07) es el
+plan de 6 piezas a 4,3M** (interno, NO se publica). Los 3 bugs de `04_PRICING` §6: cerrados.
+
+**Garantía de reutilización:** slot opcional no provisto se LIMPIA (el copy del prototipo ya no puede
+fugarse a otra licitación) + guard de 28 probes en `template-composability`. Delta completo:
+`COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` → §`Delta 2026-07-14`.
+
+**Estado de gates al cierre:** vitest 195/195 · visual gate 51 frames a 0 px (2 promociones declaradas
+en `BASELINE_DELTAS.md`) · typecheck limpio · PDF con 4 `/URI`. **Pendiente humano:** subir a Wherex
+(cierra **15/07**) — el agente prepara, el humano sube y firma.
+
+---
+
 ## 0. Lo primero: NO EJECUTES
 
 Tu primer turno es de **exploración**, no de producción. El operador va a pedir explícitamente cuándo
