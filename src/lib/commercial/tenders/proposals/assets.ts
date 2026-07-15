@@ -69,14 +69,13 @@ export interface AttachProposalAssetInput {
   kind: ProposalAssetKind
   /** Sin declarar ⇒ default SEGURO por kind (interno salvo técnica/económica/deck). */
   audience?: ProposalAudience
-  version?: number
   actorUserId: string
   actor: ProposalActor
 }
 
 export const attachProposalAsset = async (
   input: AttachProposalAssetInput
-): Promise<{ proposalAssetId: string; audience: ProposalAudience; idempotent: boolean }> => {
+): Promise<{ proposalAssetId: string; audience: ProposalAudience; version: number; idempotent: boolean }> => {
   const audience = input.audience ?? defaultAudienceForKind(input.kind)
   const context = assetContextForKind(input.kind)
 
@@ -90,8 +89,8 @@ export const attachProposalAsset = async (
     await assertProposalExists(client, input.ownerOrgId, input.proposalId)
 
     // Idempotencia del attach: el vínculo ya existe → no-op.
-    const existing = await client.query<{ proposal_asset_id: string; audience: ProposalAudience }>(
-      `SELECT proposal_asset_id, audience FROM greenhouse_commercial.proposal_assets
+    const existing = await client.query<{ proposal_asset_id: string; audience: ProposalAudience; version: number }>(
+      `SELECT proposal_asset_id, audience, version FROM greenhouse_commercial.proposal_assets
         WHERE owner_org_id = $1 AND proposal_id = $2 AND asset_id = $3`,
       [input.ownerOrgId, input.proposalId, input.assetId]
     )
@@ -100,6 +99,7 @@ export const attachProposalAsset = async (
       return {
         proposalAssetId: existing.rows[0].proposal_asset_id,
         audience: existing.rows[0].audience,
+        version: existing.rows[0].version,
         idempotent: true
       }
     }
@@ -122,18 +122,24 @@ export const attachProposalAsset = async (
       )
     }
 
-    const inserted = await client.query<{ proposal_asset_id: string }>(
+    // La versión se DERIVA de la historia (MAX+1 por proposal+kind), nunca del caller — misma bug
+    // class que los ordinales del composer: un número autorado se contradice al reordenar/reintentar.
+    // El FOR UPDATE de assertProposalExists serializa los attach concurrentes de la misma proposal,
+    // y el índice único (proposal_id, kind, version) es el cinturón si algo se le escapa al lock.
+    const inserted = await client.query<{ proposal_asset_id: string; version: number }>(
       `INSERT INTO greenhouse_commercial.proposal_assets
          (proposal_id, owner_org_id, asset_id, kind, audience, version, created_by_member_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING proposal_asset_id`,
+       VALUES ($1, $2, $3, $4, $5,
+         COALESCE((SELECT MAX(version) FROM greenhouse_commercial.proposal_assets
+                    WHERE proposal_id = $1 AND kind = $4), 0) + 1,
+         $6)
+       RETURNING proposal_asset_id, version`,
       [
         input.proposalId,
         input.ownerOrgId,
         input.assetId,
         input.kind,
         audience,
-        input.version ?? 1,
         input.actor.memberId ?? null
       ]
     )
@@ -157,7 +163,7 @@ export const attachProposalAsset = async (
       client
     )
 
-    return { proposalAssetId: inserted.rows[0]!.proposal_asset_id, audience, idempotent: false }
+    return { proposalAssetId: inserted.rows[0]!.proposal_asset_id, audience, version: inserted.rows[0]!.version, idempotent: false }
   })
 }
 
