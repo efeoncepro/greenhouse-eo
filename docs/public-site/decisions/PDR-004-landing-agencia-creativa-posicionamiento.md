@@ -41,10 +41,12 @@ El **medio es el mensaje**: la landing debe *probar* craft técnico, no describi
 - La landing es un **nodo de la capa de adquisición** (demand-capture) del ecosistema ([PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md)) en `efeoncepro.com`.
 - El bloque diferenciador usa cifras **ilustrativas** del modelo (no live del portal); conectar data real sería una decisión/task aparte.
 - Coherencia de marca: el bloque de operaciones medibles debe *verse* como el producto real (Greenhouse) — el claim de transparencia que el portal materializa.
+- La landing vigente adquiere demanda para capacidad **Efeonce-managed/co-operated**: “Tu equipo dirige. Nosotros producimos a escala.” El futuro acceso client-operated a Creative Studio es una ruta de adopción del mismo sistema, no una promesa actual ni un reemplazo de esta oferta. Cuando exista, requerirá su propia decisión de packaging y conversión.
 
 ## No-goals
 
 - No es self-serve, no expone el portal ni datos de cliente, no vende un servicio puntual (esos son otras landings del EPIC-019).
+- No presenta client-operated como “agencia más barata” ni promete el SLA de Managed Squad cuando el cliente controla la ejecución.
 - No lidera con "somos ágiles/rápidos" sin la prueba medible.
 - No migra a Astro ni cambia de host. El candidato 2026-07-07 queda en WP/Elementor modular por override explícito del operador; una variante code-custom futura requeriría nueva decisión de ejecución.
 - No genera logos de operating-entity por IA.

@@ -12,6 +12,11 @@
 > puede proponer un plan editable, pero no elevarlo a workflow compartible sin evidencia, rúbrica,
 > owner builder y límites de gasto/approval. Doctrina: `docs/research/RESEARCH-009-creative-operations-agentic-workflows.md`.
 
+> **Cómo nace una receta.** La persona creativa preserva, explora, rechaza y aprueba; el sistema compila
+> esas decisiones. No se le exige construir nodos. Esta biblioteca registra evidencia `efeonce-managed`;
+> graduar una receta a `co-operated` o `client-operated` requiere responsabilidades, variables permitidas,
+> derechos, costo, rúbrica y ruta de escalamiento explícitos sobre el mismo run.
+
 ---
 
 ## ⭐ Workflow A — "Reference-Video → Omni Enhance" (VALIDADO 2026-07-05, spot AEO Grader)

@@ -9,7 +9,7 @@ Efeonce tiene cuatro plataformas de software propietario, en distinta madurez:
 | **Greenhouse** | Experiencia de cliente + operaciones internas | Clientes activos de servicio Efeonce | B2B directo (parte del servicio) | Operativo (~77% madurez ASaaS) |
 | **Kortex** | CRM Intelligence Platform (sobre HubSpot) | Fase 1: clientes Efeonce Digital. Fase 2: agencias HubSpot (B2B2B) | B2B2B → HubSpot Marketplace | Operativo (validado en producción) |
 | **Verk** | Content + Distribution Operating System | Fase 1: interno. Fase 2: empresas con 20+ piezas/mes (B2B standalone) | B2B standalone | P0 en construcción |
-| **Efeonce Creative Studio** *(nombre de trabajo)* | Producción creativa agentic: imagen, video, audio, assets, review y créditos | Fase 1: equipo Efeonce. Fase 2: equipos creativos/marketing de clientes | Capability Efeonce; futuro acceso/credits B2B gobernado | Dirección aprobada; bootstrap pendiente (EPIC-028) |
+| **Efeonce Creative Studio** *(nombre de trabajo)* | Producción creativa agentic: imagen, video, audio, assets, review y créditos | Fase 1: equipo Efeonce. Fase 2: equipos creativos/marketing de clientes | Capability Efeonce operada en modo managed, co-operated o client-operated; acceso B2B futuro y gobernado | Dirección aprobada; bootstrap pendiente (EPIC-028) |
 
 **Por qué cuatro plataformas independientes y no un monolito:** ICP y ritmo de producto distintos; narrativa ASaaS más potente (ecosistema de producto, no "agencia con portal"); independencia técnica (Creative Studio no hereda el runtime pesado de Greenhouse; Verk no hereda su test coverage; Kortex no depende del ciclo de releases de Verk); patrón ya probado (Kortex corre como plataforma independiente con integración bidireccional con Greenhouse).
 
@@ -51,12 +51,27 @@ Content + Distribution Operating System. Donde la estrategia de distribución se
 
 Capability para dirigir y operar generación de imagen, video, audio y extensiones futuras mediante templates, referencias, assets, review y crédito gobernado. Nace con una superficie UI y una superficie MCP/agente sobre el mismo contrato; no es una galería de prompts ni un módulo de Greenhouse.
 
+La interfaz primaria habla el lenguaje de una persona creativa: brief, referencias, tratamiento, candidatos, variantes, feedback y aprobación. El sistema compila esas decisiones en un workflow ejecutable; no exige diseñar nodos ni conocer providers. Un canvas técnico queda como authoring avanzado cuando la evidencia lo justifique.
+
+### Modelo operativo
+
+| Modo | Quién opera | Qué conserva el cliente | Qué responde Efeonce |
+|---|---|---|---|
+| **Client-operated** | Equipo creativo/marketing del cliente sobre templates acotados | Dirección, ejecución y delivery que controla | Plataforma, policy, soporte y límites pactados |
+| **Co-operated** | Cliente y Efeonce se reparten lanes/etapas con owner explícito | Brand authority y aprobaciones definidas | El tramo de producción/delivery que controla |
+| **Efeonce-managed** | Efeonce construye y opera; el cliente aprueba | Brief, marca y decisión final | Delivery pactado, OTD/FTR y gobierno del scope controlado |
+
+Los modos usan el mismo workspace, run, assets, review y ledger. Son asignaciones de autoridad, no plataformas ni modalidades comerciales distintas. On-Going, On-Demand, Staff Augmentation y Sample Sprint siguen siendo los vehículos de engagement; el modo operativo declara quién dirige, ejecuta y responde dentro de ellos.
+
 **Lo que el agente de Greenhouse necesita saber:**
 
 - Creative Studio es dueño de `studio_workspace_id`, assets, runs, provider attempts, revisión y ledger de créditos. Greenhouse puede enlazar una organización/espacio mediante binding explícito, nunca por tablas compartidas.
+- Cada run debe declarar operador, aprobadores de creatividad/gasto, autoridad de template/derechos y owner de delivery. Cambiar de modo conserva contexto y no eleva permisos por sí solo.
 - Un output `candidate_ready` no significa aprobable/publicable. Sólo se proyectan a Greenhouse o Verk entregables con la decisión y scope autorizados.
 - El primer acceso es interno. Cliente, upload externo, pagos y venta de créditos quedan sujetos a los gates del [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md).
 - Arquitectura/ADR: `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_*.md`.
+
+El flywheel de producto y servicio es deliberado: Efeonce opera y valida craft → el Studio conserva el patrón → el cliente gana autonomía sobre trabajo repetible → el uso produce evidencia → Efeonce absorbe complejidad, excepciones y picos → los templates mejoran. El acceso cliente no canibaliza la agencia: desplaza valor desde repetición manual hacia dirección, sistemas creativos, QA y capacidad elástica.
 
 ---
 
@@ -98,7 +113,7 @@ Cada plataforma productiza un tipo de servicio distinto:
 
 | Dimensión ASaaS | Greenhouse | Kortex | Verk | Creative Studio |
 |---|---|---|---|
-| Servicio que productiza | Operación de cuenta + transparencia + gobernanza | Implementación y gestión de CRM | Producción de contenido + distribución | Dirección y producción de media agentic |
+| Servicio que productiza | Operación de cuenta + transparencia + gobernanza | Implementación y gestión de CRM | Producción de contenido + distribución | Dirección, producción y autonomía progresiva sobre media agentic |
 | Valor acumulativo (= switching cost) | Historial ICO + inteligencia financiera + Person/Account 360 | Schema CRM + workflows + UI Extensions instaladas | Brand profiles + keyword universe + performance histórico | Reference packs + templates + lineage de assets + decisiones/revisión creativa |
 | Intelligence layer | AI Tools + recomendaciones proactivas (roadmap → Nexa) | Agente Claude (manifests YAML) | Verk Agent (roadmap) | Agentes/MCP con `propose→approve→execute` |
 
@@ -122,4 +137,4 @@ Cada plataforma productiza un tipo de servicio distinto:
 
 *Fuente: Efeonce Product Ecosystem v1.0 (documento ancla — prevalece sobre downstream en conflictos de arquitectura de producto).*
 
-*Última verificación de drift contra runtime: 2026-07-11 — Creative Studio es dirección aprobada/EPIC-028, no runtime existente; targets/fechas comerciales son intencionales.*
+*Última verificación de drift contra runtime: 2026-07-14 — Creative Studio es dirección aprobada/EPIC-028, no runtime existente; sus tres modos operativos son contrato objetivo, no acceso cliente habilitado. Targets/fechas comerciales son intencionales.*

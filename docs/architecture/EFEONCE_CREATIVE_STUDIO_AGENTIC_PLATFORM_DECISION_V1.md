@@ -12,7 +12,7 @@
 - **Scope:** plataforma independiente para producir, revisar y operar imágenes, video, audio y, cuando corresponda, 3D. Incluye interfaz humana, agentes y MCP; no incluye el runtime de Greenhouse.
 - **Reversibility:** `two-way-but-slow` — los proveedores, el modelo de rutas y la UI son intercambiables; separar la propiedad de assets, créditos, identidad operativa y contratos cross-platform no debe revertirse sin migración explícita.
 - **Confidence:** `high` en la frontera y contrato agentic; `medium` en el orden exacto de proveedores/modelos y en pricing comercial, que requieren evidencia por modalidad.
-- **Validated as of:** 2026-07-11 — pilotos reales de RRSS y Glitch documentados en `ai-generations/2026-07-11_glitch-microphone-intro/`.
+- **Validated as of:** 2026-07-14 — pilotos reales de RRSS y Glitch, investigación RESEARCH-009 y decisión de operating model documentados.
 - **Program:** [EPIC-028](../epics/to-do/EPIC-028-efeonce-creative-studio-agentic-platform.md).
 
 ### Context
@@ -31,10 +31,11 @@ Se crea **Efeonce Creative Studio** como nombre de trabajo de una **plataforma h
 1. **Runtime y propiedad separados.** Creative Studio tendrá repositorio, despliegue, base de datos, buckets, secretos, provider adapters y ledger propios. Greenhouse, Think, Verk y el sitio público podrán consumir contratos versionados, pero no alojarán la lógica ni escribirán sus tablas.
 2. **Una capability, tres superficies equivalentes.** La UI humana, el servidor MCP y los agentes son clientes del mismo command/reader contract. Ninguna acción de negocio será UI-only; MCP no recibe atajos ni privilegios distintos de la UI.
 3. **Autonomía gobernada, no chat que gasta.** El agente puede investigar, componer un brief, elegir una plantilla, proponer proveedor, estimar créditos y preparar una corrida. Una acción con coste, acceso a material restringido, entrega externa o publicación exige autorización explícita: `propose → reserve → approve → execute`.
-4. **Plantillas y agents primero; canvas después.** El V1 ofrece flujos curados y parametrizables (por ejemplo, still-to-video, video repair, audio/foley, set de RRSS). Un canvas DAG libre es una capa posterior sobre el mismo runner, no el MVP ni el centro de gravedad.
+4. **Experiencia creativa y agents primero; canvas después.** El V1 se opera con briefs, referencias, tratamientos, candidatos, revisión y flujos curados parametrizables (por ejemplo, still-to-video, video repair, audio/foley, set de RRSS). El sistema compila decisiones aprobadas en una receta. Un canvas DAG libre es una proyección posterior sobre el mismo runner, no el MVP ni el centro de gravedad.
 5. **Assets, linaje y créditos son dominio first-class.** El sistema conserva una copia durable autorizada, hash, derechos, referencias, modelo/proveedor, prompt/brief versionado, revisiones y derivaciones. El crédito vendible se registra en un ledger append-only independiente del costo bruto del proveedor.
 6. **Cloud-native y async.** El control plane es un servicio web/API; las corridas de media viven en workers separados, idempotentes y observables. Cloud Tasks sólo despacha; Cloud Run Jobs ejecuta o supervisa trabajo largo. No se introduce Kubernetes, un bus complejo ni una plataforma de workflow externa en la fundación.
 7. **Multi-tenant antes de ser externo.** Aunque el acceso inicial es interno, cada aggregate nace con `workspace_id`, roles, policy de asset y límites de gasto. El cliente no se habilita por un bypass futuro: se activa con entitlements, permisos, aprobaciones y cuotas ya existentes en el contrato.
+8. **Un producto, tres modos de operación.** `client-operated`, `co-operated` y `efeonce-managed` usan los mismos runs, assets, templates, commands y policies. Son asignaciones de autoridad y responsabilidad, no deployables, tiers ni una nueva modalidad comercial.
 
 ### Alternatives Considered
 
@@ -60,6 +61,9 @@ Se crea **Efeonce Creative Studio** como nombre de trabajo de una **plataforma h
 - Un asset o run no cruza workspaces por URL, prompt, cache, log, evento ni herramienta MCP.
 - `completed` por un proveedor significa candidato técnico, no aprobación creativa ni permiso de publicación.
 - Greenhouse consume proyecciones o contratos del Studio; no hay DB compartida, sesión compartida ni acceso administrativo implícito.
+- Cada run resuelve antes de ejecutar quién opera, quién aprueba creatividad, quién autoriza gasto, quién gobierna el template, quién responde por derechos y quién autoriza delivery.
+- Cambiar de modo operativo conserva workspace, brief, assets, lineage, review y ledger; no crea un handoff paralelo ni eleva permisos por sí solo.
+- Efeonce sólo compromete métricas de delivery sobre el scope cuya dirección y ejecución controla. `Client-operated` no hereda por defecto el SLA de un Managed Squad.
 
 ### Revisit When
 
@@ -109,3 +113,21 @@ Licenciar queda **out-of-band, con gate humano**: CLI (precedente `pnpm ai:image
 
 **Implementación:** `docs/tasks/to-do/TASK-1411-shutterstock-stock-sourcing-capability.md`.
 **Origen:** TASK-1410 (Radiografía AEO) usó Shutterstock ad-hoc con `curl` y destapó tres bug classes silenciosas — entre ellas una foto de la **Ruta 40 de Argentina** que la búsqueda devolvió para "Carretera Austral" porque traía `carretera` y `chile` entre sus keywords.
+
+---
+
+## Delta 2026-07-14 — un Studio, tres modos de operación
+
+**Decisión aceptada.** Creative Studio debe poder ser operado por el equipo Efeonce, por el cliente o por ambos sin bifurcar plataforma, memoria ni modelo de dominio. La distinción vive en autoridad y accountability por run:
+
+| Modo | Dirección / operación | Frontera de responsabilidad |
+| --- | --- | --- |
+| `client-operated` | El cliente dirige y corre templates dentro de sus entitlements. | Efeonce responde por plataforma y policy; el cliente por la ejecución y delivery que controla. |
+| `co-operated` | Cliente y Efeonce se reparten lanes o etapas con un operador explícito. | Cada parte responde por el tramo controlado; budget, review y escalation se fijan antes de ejecutar. |
+| `efeonce-managed` | Efeonce dirige la operación; el cliente conserva brief, brand authority y aprobación final. | Efeonce responde por el delivery pactado y puede comprometer OTD/FTR sobre ese scope. |
+
+La autonomía se habilita de manera progresiva: mayor incertidumbre creativa, riesgo de marca, costo o complejidad de derechos exige más gobierno Efeonce; repetición aprobada y variables acotadas permiten operación cliente. Escalar entre modos debe conservar todo el contexto y no requiere reconstruir el proyecto.
+
+**No cambia el modelo comercial por sí sola.** Los modos se asignan dentro de On-Going, On-Demand, Staff Augmentation o Sample Sprint respetando sus fronteras. Si Efeonce controla delivery, es capacidad gestionada; si una persona queda bajo dirección cotidiana del cliente, aplica Staff Augmentation y no puede etiquetarse como managed. Un acceso client-operated no es “Managed Squad más barato” ni hereda sus compromisos.
+
+Los nombres exactos de roles/fields y el packaging quedan diferidos al bootstrap de EPIC-028, pero el contrato semántico no: todo run debe identificar operador, aprobadores de creatividad y presupuesto, autoridad de template/derechos y owner de delivery.

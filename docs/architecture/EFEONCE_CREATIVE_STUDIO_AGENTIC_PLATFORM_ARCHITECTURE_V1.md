@@ -8,7 +8,7 @@
 
 ## 1. Resultado que se está construyendo
 
-Creative Studio no es una galería de prompts ni un SaaS de generación. Es el **sistema operativo de producción creativa asistida** de Efeonce: convierte una intención aprobable en una corrida trazable de imagen, video, audio o 3D; conserva su evidencia; y deja al equipo y, luego, al cliente operar la misma capacidad desde UI, MCP o agentes.
+Creative Studio no es una galería de prompts ni un SaaS de generación. Es el **sistema operativo de producción creativa asistida** de Efeonce: convierte una intención aprobable en una corrida trazable de imagen, video, audio o 3D; conserva su evidencia; y deja al equipo y, luego, al cliente operar la misma capacidad desde UI, MCP o agentes. La persona creativa trabaja con briefs, referencias, tratamientos, candidatos y decisiones; la ingeniería del workflow permanece como infraestructura.
 
 La primera oferta es interna. El modelo de datos, autorización, presupuesto y asset rights nace listo para workspaces de cliente, pero ningún cliente se habilita hasta completar los gates de EPIC-028.
 
@@ -23,6 +23,9 @@ La primera oferta es interna. El modelo de datos, autorización, presupuesto y a
 | Fidelity before provider preference | El router recibe un contrato explícito: preserve-set, human-action, exact-text, flexible-style, audio-foley, etc. |
 | Exploration before repeatability | El agente puede explorar y proponer planes editables; sólo una decisión creativa humana convierte una hipótesis en template/run repetible. |
 | Builder / runner separation | Dirección creativa versiona la receta y sus límites; el runner sólo opera inputs semánticos expuestos, nunca el grafo o secretos internos. |
+| Creative-native interaction | El sistema compila acciones creativas aprobadas en recipes/runs; un DAG técnico es una proyección avanzada, no la interfaz inicial. |
+| One platform, multiple operating modes | Cliente, Efeonce o ambos operan los mismos aggregates y commands; el modo cambia autoridad y accountability, no el runtime. |
+| Progressive autonomy | A mayor ambigüedad, riesgo, costo o complejidad de derechos, mayor gobierno humano/Efeonce; la repetición acotada puede graduarse a operación cliente. |
 | Own the durable record | Asset, lineage, review y ledger viven en el Studio aun si la inferencia ocurre en un tercero. |
 | Separate runtime, connected ecosystem | Integra por API/evento/deep link; nunca por tablas, credenciales o sesiones compartidas. |
 
@@ -33,6 +36,7 @@ Creative Studio es un backbone peer junto a Greenhouse, Kortex y Verk. Greenhous
 ```mermaid
 flowchart LR
   team["Equipo Efeonce"] --> ui["Creative Studio UI"]
+  client["Equipo creativo / marketing cliente"] --> ui
   agent["Agente autorizado / MCP client"] --> mcp["Creative Studio MCP"]
   ui --> api["Command + Reader API"]
   mcp --> api
@@ -93,7 +97,7 @@ The target is separate GCP projects (for example `efeonce-creative-dev` and `efe
 | `creative_template` / `format_spec` | Curated Efeonce workflow and output format | Versioned inputs, fidelity contract, slots/safe areas, export profiles, review gates, allowed providers and cost policy. |
 | `composition_spec` / `artifact_manifest` | Repeatable composition and its delivered result | Immutable template + semantic slots/assets/copy input; output files, dimensions, hashes, lineage, render/review evidence and approved delivery use. |
 | `reference_asset` / `asset_version` | Original and derived media | Content hash, source, rights, lineage, storage policy and derivative parent are recorded. |
-| `creative_run` / `run_step` / `provider_attempt` | Execution and recovery | One logical run can have several attempts; a retry never erases evidence. |
+| `creative_run` / `run_step` / `provider_attempt` | Execution, operating-mode assignment and recovery | One logical run has explicit operator/approvers/owners and can have several attempts; a retry or mode escalation never erases evidence. |
 | `review_decision` | Craft/rights/delivery approval | Technical completion cannot self-approve a deliverable. |
 | `credit_ledger` / `credit_reservation` | Commercial allowance and settlement | Append-only entries; reservation and settlement are idempotent. |
 | `command_execution` / `audit_event` | Programmatic safety | Actor, authority, payload fingerprint, outcome and correlation are durable. |
@@ -139,6 +143,29 @@ stateDiagram-v2
 ```
 
 The provider's `succeeded` maps only to `candidate_ready`. The words **approved**, **delivered** and **published** are separate business decisions.
+
+### Operating modes and accountability
+
+Operating mode is a governed property of a project/run, not a separate product or commercial tier:
+
+| Mode | Typical control | Platform implication |
+| --- | --- | --- |
+| `client-operated` | Client creative/marketing roles direct and run curated templates. | Entitlements expose only approved variables/actions; Efeonce platform support does not imply managed-delivery accountability. |
+| `co-operated` | Client owns brand direction while client and Efeonce split execution by lane or stage. | Every active stage has one operator of record; escalation and handback preserve the same run, assets and audit trail. |
+| `efeonce-managed` | Efeonce builds/operates the workflow; client retains brief, brand authority and final approval. | Managed delivery can bind OTD/FTR and support commitments to the scope Efeonce controls. |
+
+Before a run may reserve or execute spend, policy must resolve these semantic responsibilities even if the final schema uses different names:
+
+- operator of record;
+- creative approver;
+- budget approver;
+- template authority;
+- rights authority;
+- delivery owner/approver.
+
+One actor may hold several responsibilities when policy allows, but none may be inferred silently from the UI surface or operating mode. Switching modes never grants additional capability by itself. It changes assignments through an audited command and keeps brief, reference pack, lineage, review and ledger intact.
+
+Autonomy is risk-routed. High creative ambiguity, identity/hero work, restricted assets, expensive routes or uncertain rights default to `efeonce-managed` or a tighter co-operated gate. Approved direction with complex production fits `co-operated`. Low-ambiguity, high-repetition variants can graduate to `client-operated` after evidence proves the template, rubric and escalation path.
 
 ## 5. The canonical capability contract
 
@@ -217,7 +244,7 @@ allocation → estimate → reservation hold → approval → execution
 
 ## 9. Observability, evaluation and review
 
-Each run produces a correlated record across API, agent/MCP call, queue dispatch, worker, provider attempt, storage ingest and review. Required dimensions include `workspace_id`, `project_id`, `run_id`, `template_version`, `provider`, `model`, `attempt`, `actor_type`, `credit_reservation_id` and error class (never raw secret or public asset URL).
+Each run produces a correlated record across API, agent/MCP call, queue dispatch, worker, provider attempt, storage ingest and review. Required dimensions include `workspace_id`, `project_id`, `run_id`, `operating_mode`, responsibility assignment IDs, `template_version`, `provider`, `model`, `attempt`, `actor_type`, `credit_reservation_id` and error class (never raw secret or public asset URL).
 
 ### Quality gates
 
@@ -225,6 +252,7 @@ Each run produces a correlated record across API, agent/MCP call, queue dispatch
 | --- | --- | --- |
 | Technical | File integrity, duration/ratio, codec, hash, ingest completion | Reject if it is unusable despite valid metadata |
 | Fidelity | Template-specific evaluators/fixtures, reference pack checks | Direction decides set continuity, anatomy/action and practical authenticity |
+| Creative breadth | Similarity/duplication signals and recorded branch coverage | Direction decides whether exploration was meaningfully diverse rather than merely voluminous |
 | Audio | Loudness/duration/waveform and sync markers | Sound review decides foley realism, absence of unwanted music/ambience |
 | Rights and delivery | Asset policy, destination and approval state | Authorized reviewer approves delivery/publication |
 | Economics | Estimate versus reservation versus actual cost | Owner resolves exception before further spend |
@@ -281,7 +309,7 @@ sequenceDiagram
 | --- | --- | --- |
 | 0 — foundation | New repo, project boundaries, tenant/auth, assets, ledger skeleton, audit/telemetry, provider contract, one internal template | Client access, payments, free canvas |
 | 1 — prove craft | Image/video/audio runs, route estimate/approval, review, provider evidence, **Instagram carousel** + RRSS/Glitch fixtures | Autonomous publishing, arbitrary model marketplace |
-| 2 — client-ready | Scoped client roles, asset intake/rights, client review, contracts/events for Greenhouse and Verk | Unbounded self-serve spend, cross-tenant collaboration |
+| 2 — client-ready | Scoped client roles, asset intake/rights, client review, co-operated runs and bounded client-operated templates, contracts/events for Greenhouse and Verk | Unbounded self-serve spend, client authoring of arbitrary workflows, cross-tenant collaboration |
 | 3 — scale IP | Batch/variants, curated flow composition, evaluation registry, commercial credit allocation | General-purpose automation platform |
 | 4 — advanced authoring | Governed canvas/DAG and richer agent collaboration if evidence warrants it | Replacing professional direction/review |
 
@@ -291,6 +319,7 @@ sequenceDiagram
 - Exact PostgreSQL tenancy enforcement mechanism (RLS policy design and ORM/runtime integration).
 - Provider adapter order and contract tests from live accounts, not marketing claims.
 - Credit currency, expiry/refund policy, tax/invoicing and commercial packaging.
+- Exact responsibility schema, operating-mode entitlements, escalation commands and which metrics/SLA attach to each controlled scope.
 - Data retention, licensed asset policy, consent/deepfake policy and external upload scanner.
 - Whether an audio-specific runtime later merits Python/GPU tooling. TypeScript/Cloud Run Jobs is the default until evidence proves otherwise.
 

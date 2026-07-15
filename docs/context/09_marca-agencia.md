@@ -32,13 +32,14 @@ El Why sin mecanismo es humo de agencia. Cada faceta se sostiene en algo concret
 - **Transparencia como piso** — login a tu operación en vivo, no un PDF el viernes. Así la co-creación es real, no un eslogan.
 - **Método** — Loop Marketing (el crecimiento compuesto, ningún trimestre desde cero) + ICO (medir cada pieza en vivo).
 - **Medición honesta** — Revenue Enabled: la creatividad medida se **defiende**; nada de vanity.
-- **Software propio** — Greenhouse/Kortex/Verk: donde el servicio se ejecuta, se hace visible y guarda tu historial.
+- **Software propio** — Greenhouse/Kortex/Verk, con Creative Studio como dirección aprobada: donde el servicio se ejecuta, se hace visible, convierte aprendizaje en capacidad y guarda tu historial.
+- **Automatización con autoría** — en Creative Studio automatizamos fricción y repetición, ampliamos exploración y reservamos criterio/aprobación para las personas.
 - **Educación como sistema** — Think educa al mercado; el protocolo de transparencia + los frameworks compartidos educan al cliente.
 - **Experiencia Efeonce** — el cliente no entra solo a una agencia: entra a un ecosistema de crecimiento con operación, software, aprendizaje, contenido, tools, networking y memoria.
 
 ### WHAT — lo tangible
 
-Las cuatro capabilities (creatividad y contenido · estrategia y crecimiento · medios y amplificación · infraestructura y medición), las tres plataformas de software y los casos con dato. El What es la **consecuencia** del Why, no el punto de partida.
+Las cuatro capabilities (creatividad y contenido · estrategia y crecimiento · medios y amplificación · infraestructura y medición), las tres plataformas operativas, Creative Studio como dirección aprobada y los casos con dato. El What es la **consecuencia** del Why, no el punto de partida.
 
 ### Disciplina anti-humo (regla dura de esta creencia)
 
@@ -114,6 +115,8 @@ Tagline master: **Empower your Growth**. La palabra final rota según la capabil
 | **Empower your Brand** | Lidera creatividad/contenido. |
 | **Empower your Voice** | Lidera medios/amplificación. |
 | **Empower your Engine** | Lidera web/CRM/infraestructura (= contexto típico de Greenhouse/Wave). |
+
+**Línea de compromiso para la capability creativa:** *“Automatizamos lo repetible para potenciar lo irrepetible.”* Funciona como principio/manifesto de Creative Studio, no reemplaza el tagline master **Empower your Growth** ni debe prometer automatización total. Siempre debe aterrizarse en su mecanismo: fricción y repetición al sistema; exploración, criterio y aprobación a las personas.
 
 Las 4 capas verbales (en secuencia natural de conversación):
 

@@ -30,6 +30,16 @@ La receta es IP creativa, no una lista opaca de prompts. El output de un agente 
 ajustarse, versionarse y volver a correrse. Investigación y doctrina canónica:
 `docs/research/RESEARCH-009-creative-operations-agentic-workflows.md`.
 
+**La persona creativa no diseña infraestructura.** Trabaja preservando referencias, explorando ramas,
+explicando rechazos y aprobando entregables; el sistema compila esas decisiones en una receta. Builder
+y runner son autoridades creativas, no sinónimos de ingeniero y usuario. El builder puede ser un Head
+of Creative del cliente o Efeonce; el runner puede ser producción/marketing de cualquiera de los dos.
+
+**Un Studio, tres modos:** `efeonce-managed`, `co-operated` y `client-operated` usan la misma corrida y
+memoria. Antes de gastar, declara operador, aprobadores de creatividad/gasto, autoridad de derechos y
+owner de delivery. Los pilotos manuales actuales son `efeonce-managed`; no improvises acceso cliente.
+Escalar de un modo a otro conserva brief, assets, review y lineage.
+
 ---
 
 ## 1. El loop de producción
