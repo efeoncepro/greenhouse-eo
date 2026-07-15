@@ -215,9 +215,17 @@ const ProposalStudioView = ({ ownerOrgId }: { ownerOrgId: string | null }) => {
       title={selected.title}
       eyebrow={ORIGIN_LABEL[selected.origin] ?? selected.origin}
       subtitle={
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-          <Chip size='small' label={stateLabelFor(selected)} color={STATE_COLOR[selected.state] ?? 'secondary'} variant='tonal' />
-          <Typography variant='body2' color='text.secondary'>
+        // El primitive envuelve subtitle en <Typography> (<p>): la composición interna debe ser
+        // inline (span) — un div/p anidado es HTML inválido e hidrata con error.
+        <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <Chip
+            component='span'
+            size='small'
+            label={stateLabelFor(selected)}
+            color={STATE_COLOR[selected.state] ?? 'secondary'}
+            variant='tonal'
+          />
+          <Typography component='span' variant='body2' color='text.secondary'>
             {GH_PROPOSALS.col_deadline}: {formatDeadline(selected.deadline)}
           </Typography>
         </Box>
