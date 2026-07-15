@@ -9,6 +9,7 @@
  * Usage:
  *   pnpm public-website:wpcli -- --eval-file ./tmp/read-only.php
  *   pnpm public-website:wpcli -- --eval-file ./tmp/patch.php --wp-user 12
+ *   pnpm public-website:wpcli -- --eval-file ./tmp/import.php --input-file ./asset.webp
  */
 
 import { execFileSync } from 'node:child_process'
@@ -28,6 +29,7 @@ const loadedEnvFiles = loadPublicWebsiteEnvFiles()
 
 type CliOptions = {
   evalFile: string | null
+  inputFiles: string[]
   wpUser: string
   keepRemoteFile: boolean
   help: boolean
@@ -38,6 +40,7 @@ const parseArgs = (argv: string[]): CliOptions => {
 
   const options: CliOptions = {
     evalFile: null,
+    inputFiles: [],
     wpUser: process.env.PUBLIC_WEBSITE_WORDPRESS_WPCLI_USER?.trim() || '12',
     keepRemoteFile: false,
     help: false
@@ -63,6 +66,16 @@ const parseArgs = (argv: string[]): CliOptions => {
       continue
     }
 
+    if (arg === '--input-file') {
+      const inputFile = normalizedArgv[i + 1]
+
+      if (!inputFile) throw new Error('--input-file requires a path')
+
+      options.inputFiles.push(inputFile)
+      i += 1
+      continue
+    }
+
     if (arg === '--keep-remote-file') {
       options.keepRemoteFile = true
       continue
@@ -78,6 +91,11 @@ const printHelp = () => {
   console.log(`Usage:
   pnpm public-website:wpcli -- --eval-file ./tmp/read-only.php
   pnpm public-website:wpcli -- --eval-file ./tmp/patch.php --wp-user 12
+  pnpm public-website:wpcli -- --eval-file ./tmp/import.php --input-file ./asset.webp
+
+Options:
+  --input-file <path>  Copy a local input to remote /tmp and pass its path to wp eval-file. Repeatable.
+  --keep-remote-file   Preserve the remote PHP and input files for explicit debugging.
 
 Required env:
   PUBLIC_WEBSITE_KINSTA_SSH_HOST
@@ -112,6 +130,12 @@ const main = () => {
     throw new Error(`Eval file does not exist: ${evalFilePath}`)
   }
 
+  const inputFilePaths = options.inputFiles.map(inputFile => resolve(process.cwd(), inputFile))
+
+  for (const inputFilePath of inputFilePaths) {
+    if (!existsSync(inputFilePath)) throw new Error(`Input file does not exist: ${inputFilePath}`)
+  }
+
   const readiness = inspectKinstaSshReadiness()
 
   if (!readiness.ready || !readiness.config) {
@@ -122,6 +146,13 @@ const main = () => {
   const remoteHash = createHash('sha256').update(evalFilePath).update(String(Date.now())).digest('hex').slice(0, 12)
   const remoteFileName = basename(evalFilePath).replace(/[^A-Za-z0-9_.-]/g, '-')
   const remotePath = `/tmp/greenhouse-wpcli-${remoteHash}-${remoteFileName}`
+
+  const remoteInputPaths = inputFilePaths.map((inputFilePath, index) => {
+    const inputFileName = basename(inputFilePath).replace(/[^A-Za-z0-9_.-]/g, '-')
+
+    return `/tmp/greenhouse-wpcli-${remoteHash}-${index}-${inputFileName}`
+  })
+
   const sshTarget = `${user}@${host}`
 
   const sshBaseArgs = buildKinstaSshArgs(readiness.config)
@@ -129,19 +160,30 @@ const main = () => {
 
   execFileSync('scp', [...scpBaseArgs, evalFilePath, `${sshTarget}:${remotePath}`], { stdio: 'inherit' })
 
+  for (const [index, inputFilePath] of inputFilePaths.entries()) {
+    execFileSync('scp', [...scpBaseArgs, inputFilePath, `${sshTarget}:${remoteInputPaths[index]}`], {
+      stdio: 'inherit'
+    })
+  }
+
   const wpCommand = [
     `cd ${shellQuote(wordpressPath)}`,
-    `wp --user=${shellQuote(options.wpUser)} eval-file ${shellQuote(remotePath)}`
+    `wp --user=${shellQuote(options.wpUser)} eval-file ${shellQuote(remotePath)} ${remoteInputPaths
+      .map(shellQuote)
+      .join(' ')}`.trim()
   ].join(' && ')
 
-  const cleanupCommand = options.keepRemoteFile ? '' : `; rm -f ${shellQuote(remotePath)}`
+  const remoteFiles = [remotePath, ...remoteInputPaths]
+  const cleanupCommand = options.keepRemoteFile ? '' : `; rm -f ${remoteFiles.map(shellQuote).join(' ')}`
 
   try {
     execFileSync('ssh', [...sshBaseArgs, sshTarget, `${wpCommand}${cleanupCommand}`], { stdio: 'inherit' })
   } catch (error) {
     if (!options.keepRemoteFile) {
       try {
-        execFileSync('ssh', [...sshBaseArgs, sshTarget, `rm -f ${shellQuote(remotePath)}`], { stdio: 'ignore' })
+        execFileSync('ssh', [...sshBaseArgs, sshTarget, `rm -f ${remoteFiles.map(shellQuote).join(' ')}`], {
+          stdio: 'ignore'
+        })
       } catch {
         // Best-effort cleanup only.
       }

@@ -1,0 +1,211 @@
+{
+  "ok": true,
+  "scannedAt": "2026-07-15T20:17:12.052Z",
+  "url": "https://efeoncepro.com/creative/creative-workflows/",
+  "results": [
+    {
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "runtime": {
+        "h1Count": 1,
+        "title": "Creative Workflows: cómo escalar la creatividad sin automatizar el criterio",
+        "pageOverflow": false,
+        "pageScrollWidth": 1440,
+        "pageClientWidth": 1440,
+        "bodyOverflow": false,
+        "articleOverflow": false,
+        "images": [
+          {
+            "id": 251366,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 1440,
+            "naturalHeight": 960,
+            "alt": "Capas de un proceso creativo: referencias y decisiones visibles sobre un sistema ordenado que conserva versiones."
+          },
+          {
+            "id": 251367,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 1440,
+            "naturalHeight": 960,
+            "alt": "Exploración divergente que converge en una decisión humana y luego se transforma en formatos repetibles."
+          },
+          {
+            "id": 251368,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 1440,
+            "naturalHeight": 960,
+            "alt": "Seis momentos de una campaña, desde el brief y la exploración hasta la revisión, entrega y aprendizaje."
+          },
+          {
+            "id": 251389,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 1440,
+            "naturalHeight": 960,
+            "alt": "Diagrama de tres niveles: el sistema ejecuta, la IA amplía y una persona decide según ambigüedad e impacto."
+          },
+          {
+            "id": 251390,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 1440,
+            "naturalHeight": 960,
+            "alt": "Diagrama de tres grados de autonomía: gestionado, co-operado y operado por cliente, conectados por evidencia acumulada."
+          }
+        ],
+        "captions": [
+          "El creativo trabaja con significado; el sistema conserva la receta.",
+          "Primero se amplía el espacio de posibilidades. Después se produce con límites.",
+          "El valor aparece en las transiciones entre intención, decisión, producción y aprendizaje.",
+          "A mayor ambigüedad e impacto, mayor autoridad humana.",
+          "La misma capacidad puede cambiar de operador sin perder límites, trazabilidad ni escalamiento.",
+          "Cada métrica de capacidad necesita una contramétrica que proteja calidad, criterio y aprendizaje."
+        ],
+        "captionCount": 6,
+        "tableFound": true,
+        "tableHeaders": ["Dimensión", "Métrica de capacidad", "Contramétrica de criterio"],
+        "tableRows": 4,
+        "tableFigureOverflowX": "auto",
+        "tableNeedsScroll": false,
+        "tableClientWidth": 1112,
+        "tableScrollWidth": 1112,
+        "applesRendered": true,
+        "appleTextCount": 0,
+        "appleImageCount": 3,
+        "diagramLinkHrefs": [
+          "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v2.webp",
+          "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v2.webp"
+        ],
+        "canonical": "https://efeoncepro.com/creative/creative-workflows/",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "ogImage": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-hero-featured-1440-v1.jpg"
+      },
+      "checks": {
+        "oneH1": true,
+        "expectedTitle": true,
+        "noPageOverflow": true,
+        "imagesLoaded": true,
+        "fiveBodyCaptions": true,
+        "decisionCaption": true,
+        "autonomyCaption": true,
+        "nativeTable": true,
+        "diagramsOpenFullSize": true,
+        "tableHeaders": true,
+        "tableContained": true,
+        "applesRendered": true,
+        "canonical": true,
+        "indexable": true,
+        "openGraphPreserved": true
+      },
+      "failedChecks": []
+    },
+    {
+      "viewport": {
+        "name": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "runtime": {
+        "h1Count": 1,
+        "title": "Creative Workflows: cómo escalar la creatividad sin automatizar el criterio",
+        "pageOverflow": false,
+        "pageScrollWidth": 390,
+        "pageClientWidth": 390,
+        "bodyOverflow": false,
+        "articleOverflow": false,
+        "images": [
+          {
+            "id": 251366,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 390,
+            "naturalHeight": 260,
+            "alt": "Capas de un proceso creativo: referencias y decisiones visibles sobre un sistema ordenado que conserva versiones."
+          },
+          {
+            "id": 251367,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 390,
+            "naturalHeight": 260,
+            "alt": "Exploración divergente que converge en una decisión humana y luego se transforma en formatos repetibles."
+          },
+          {
+            "id": 251368,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 390,
+            "naturalHeight": 260,
+            "alt": "Seis momentos de una campaña, desde el brief y la exploración hasta la revisión, entrega y aprendizaje."
+          },
+          {
+            "id": 251389,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 390,
+            "naturalHeight": 260,
+            "alt": "Diagrama de tres niveles: el sistema ejecuta, la IA amplía y una persona decide según ambigüedad e impacto."
+          },
+          {
+            "id": 251390,
+            "found": true,
+            "complete": true,
+            "naturalWidth": 390,
+            "naturalHeight": 260,
+            "alt": "Diagrama de tres grados de autonomía: gestionado, co-operado y operado por cliente, conectados por evidencia acumulada."
+          }
+        ],
+        "captions": [
+          "El creativo trabaja con significado; el sistema conserva la receta.",
+          "Primero se amplía el espacio de posibilidades. Después se produce con límites.",
+          "El valor aparece en las transiciones entre intención, decisión, producción y aprendizaje.",
+          "A mayor ambigüedad e impacto, mayor autoridad humana.",
+          "La misma capacidad puede cambiar de operador sin perder límites, trazabilidad ni escalamiento.",
+          "Cada métrica de capacidad necesita una contramétrica que proteja calidad, criterio y aprendizaje."
+        ],
+        "captionCount": 6,
+        "tableFound": true,
+        "tableHeaders": ["Dimensión", "Métrica de capacidad", "Contramétrica de criterio"],
+        "tableRows": 4,
+        "tableFigureOverflowX": "auto",
+        "tableNeedsScroll": false,
+        "tableClientWidth": 358,
+        "tableScrollWidth": 358,
+        "applesRendered": true,
+        "appleTextCount": 0,
+        "appleImageCount": 3,
+        "diagramLinkHrefs": [
+          "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v2.webp",
+          "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v2.webp"
+        ],
+        "canonical": "https://efeoncepro.com/creative/creative-workflows/",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "ogImage": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-hero-featured-1440-v1.jpg"
+      },
+      "checks": {
+        "oneH1": true,
+        "expectedTitle": true,
+        "noPageOverflow": true,
+        "imagesLoaded": true,
+        "fiveBodyCaptions": true,
+        "decisionCaption": true,
+        "autonomyCaption": true,
+        "nativeTable": true,
+        "diagramsOpenFullSize": true,
+        "tableHeaders": true,
+        "tableContained": true,
+        "applesRendered": true,
+        "canonical": true,
+        "indexable": true,
+        "openGraphPreserved": true
+      },
+      "failedChecks": []
+    }
+  ]
+}

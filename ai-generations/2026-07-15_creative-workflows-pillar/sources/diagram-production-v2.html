@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Creative Workflows: diagramas editoriales V1</title>
+    <style>
+      @font-face {
+        font-family: 'Poppins';
+        src: url('../../../src/assets/fonts/Poppins-Bold.ttf') format('truetype');
+        font-weight: 700;
+      }
+
+      @font-face {
+        font-family: 'Poppins';
+        src: url('../../../src/assets/fonts/Poppins-ExtraBold.ttf') format('truetype');
+        font-weight: 800;
+      }
+
+      @font-face {
+        font-family: 'Geist';
+        src: url('../../../src/assets/fonts/Geist-Regular.ttf') format('truetype');
+        font-weight: 400;
+      }
+
+      @font-face {
+        font-family: 'Geist';
+        src: url('../../../src/assets/fonts/Geist-SemiBold.ttf') format('truetype');
+        font-weight: 600;
+      }
+
+      :root {
+        --paper: #f2efe8;
+        --paper-bright: #fbfaf6;
+        --graphite: #171917;
+        --muted: #5d615b;
+        --cobalt: #1747d1;
+        --cobalt-dark: #12358f;
+        --lime: #b8ed3d;
+        --coral: #ed604c;
+        --rule: #c8c6bd;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #d9d8d2;
+      }
+
+      body {
+        display: grid;
+        gap: 80px;
+        justify-content: center;
+        padding: 80px;
+        color: var(--graphite);
+        font-family: 'Geist', Arial, sans-serif;
+      }
+
+      .artboard {
+        position: relative;
+        width: 1440px;
+        height: 960px;
+        overflow: hidden;
+        background: var(--paper);
+        box-shadow: 0 24px 64px rgb(23 25 23 / 18%);
+      }
+
+      .artboard::before {
+        position: absolute;
+        inset: 0;
+        border: 18px solid rgb(255 255 255 / 24%);
+        content: '';
+        pointer-events: none;
+      }
+
+      .kicker {
+        margin: 0 0 14px;
+        color: var(--cobalt);
+        font-size: 22px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 1120px;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 62px;
+        font-weight: 800;
+        line-height: 1.05;
+      }
+
+      .dek {
+        margin: 16px 0 0;
+        max-width: 980px;
+        color: var(--muted);
+        font-size: 25px;
+        line-height: 1.35;
+      }
+
+      .paper-shadow {
+        box-shadow:
+          0 16px 0 rgb(23 25 23 / 7%),
+          0 22px 32px rgb(23 25 23 / 10%);
+      }
+
+      .decision-header,
+      .autonomy-header {
+        position: absolute;
+        top: 74px;
+        left: 86px;
+        z-index: 4;
+      }
+
+      .decision-grid {
+        position: absolute;
+        top: 320px;
+        right: 86px;
+        bottom: 96px;
+        left: 86px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.12fr;
+        gap: 26px;
+      }
+
+      .decision-card {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        padding: 38px 34px 34px;
+        border: 2px solid var(--graphite);
+        background: var(--paper-bright);
+      }
+
+      .decision-card.system {
+        border-color: var(--cobalt);
+        background: var(--cobalt);
+        color: white;
+        transform: rotate(-1deg);
+      }
+
+      .decision-card.ai {
+        transform: translateY(24px) rotate(0.6deg);
+      }
+
+      .decision-card.human {
+        padding-right: 48px;
+        background: var(--graphite);
+        color: white;
+        transform: translateY(-12px) rotate(-0.4deg);
+      }
+
+      .card-index {
+        display: grid;
+        width: 54px;
+        height: 54px;
+        margin-bottom: 28px;
+        place-items: center;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .decision-card h2 {
+        margin: 0 0 8px;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 35px;
+        line-height: 1.08;
+      }
+
+      .decision-card p {
+        min-height: 56px;
+        margin: 0 0 22px;
+        color: inherit;
+        font-size: 20px;
+        line-height: 1.35;
+        opacity: 0.78;
+      }
+
+      .decision-card ul {
+        display: grid;
+        gap: 13px;
+        margin: auto 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .decision-card li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 23px;
+        font-weight: 600;
+      }
+
+      .decision-card li::before {
+        width: 11px;
+        height: 11px;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        background: var(--lime);
+        content: '';
+      }
+
+      .decision-card.human li::before {
+        background: var(--coral);
+      }
+
+      .decision-thread {
+        position: absolute;
+        z-index: 3;
+        top: 283px;
+        right: -6px;
+        left: -24px;
+        height: 10px;
+        background: var(--lime);
+        transform: rotate(-2deg);
+        transform-origin: center;
+      }
+
+      .decision-thread::after {
+        position: absolute;
+        top: -15px;
+        right: -5px;
+        width: 40px;
+        height: 40px;
+        border: 9px solid var(--lime);
+        border-radius: 50%;
+        background: var(--coral);
+        content: '';
+      }
+
+      .decision-note {
+        position: absolute;
+        z-index: 4;
+        right: 86px;
+        bottom: 33px;
+        left: 86px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 20px;
+        border-top: 2px solid var(--graphite);
+        font-size: 21px;
+        font-weight: 600;
+      }
+
+      .autonomy-board {
+        background: var(--paper-bright);
+      }
+
+      .autonomy-board::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 246px;
+        height: 246px;
+        border-radius: 0 0 0 100%;
+        background: var(--coral);
+        content: '';
+      }
+
+      .autonomy-header {
+        max-width: 1020px;
+      }
+
+      .autonomy-header h1 {
+        max-width: 920px;
+      }
+
+      .autonomy-stages {
+        position: absolute;
+        z-index: 2;
+        top: 330px;
+        right: 88px;
+        left: 88px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        align-items: end;
+        gap: 28px;
+      }
+
+      .autonomy-stage {
+        position: relative;
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 30px 30px 28px;
+        border: 2px solid var(--graphite);
+        background: var(--paper);
+      }
+
+      .autonomy-stage.managed {
+        height: 252px;
+        transform: rotate(-0.8deg);
+      }
+
+      .autonomy-stage.cooperated {
+        height: 304px;
+        border-color: var(--cobalt);
+        background: var(--cobalt);
+        color: white;
+        transform: translateY(-18px) rotate(0.4deg);
+      }
+
+      .autonomy-stage.client {
+        height: 356px;
+        background: var(--graphite);
+        color: white;
+        transform: translateY(-36px) rotate(-0.4deg);
+      }
+
+      .stage-number {
+        position: absolute;
+        top: 26px;
+        left: 30px;
+        color: var(--coral);
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .autonomy-stage.cooperated .stage-number {
+        color: var(--lime);
+      }
+
+      .autonomy-stage h2 {
+        margin: 0 0 10px;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 34px;
+        line-height: 1.08;
+      }
+
+      .autonomy-stage p {
+        margin: 0;
+        max-width: 330px;
+        color: inherit;
+        font-size: 21px;
+        line-height: 1.35;
+        opacity: 0.8;
+      }
+
+      .autonomy-thread {
+        position: absolute;
+        z-index: 4;
+        top: 322px;
+        right: 88px;
+        left: 88px;
+        height: 9px;
+        background: var(--lime);
+        transform: rotate(-7.2deg);
+        transform-origin: right center;
+      }
+
+      .autonomy-thread::before,
+      .autonomy-thread::after {
+        position: absolute;
+        top: 50%;
+        width: 34px;
+        height: 34px;
+        border: 8px solid var(--lime);
+        border-radius: 50%;
+        background: var(--paper-bright);
+        content: '';
+        transform: translateY(-50%);
+      }
+
+      .autonomy-thread::before {
+        left: -4px;
+      }
+
+      .autonomy-thread::after {
+        right: -4px;
+        background: var(--coral);
+      }
+
+      .role-strip {
+        position: absolute;
+        z-index: 3;
+        right: 260px;
+        bottom: 64px;
+        left: 88px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border: 2px solid var(--graphite);
+        background: var(--paper-bright);
+      }
+
+      .role {
+        display: grid;
+        grid-template-columns: 134px 1fr;
+        gap: 20px;
+        align-items: center;
+        min-width: 0;
+        padding: 24px 28px;
+      }
+
+      .role + .role {
+        border-left: 2px solid var(--graphite);
+      }
+
+      .role-label {
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+      }
+
+      .role p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 19px;
+        line-height: 1.35;
+      }
+
+      .evidence-tab {
+        position: absolute;
+        z-index: 5;
+        right: 260px;
+        bottom: 110px;
+        padding: 16px 18px;
+        background: var(--lime);
+        font-size: 17px;
+        font-weight: 600;
+        transform: rotate(-90deg);
+        transform-origin: right bottom;
+      }
+    </style>
+  </head>
+  <body>
+    <section
+      class="artboard decision-board"
+      data-artboard="decision-boundary"
+      aria-label="Diagrama de frontera de decisión"
+    >
+      <header class="decision-header">
+        <p class="kicker">Frontera de decisión</p>
+        <h1>¿Qué ejecuta el sistema y qué decide una persona?</h1>
+        <p class="dek">La frontera cambia con la ambigüedad, el impacto y la autoridad necesaria.</p>
+      </header>
+
+      <div class="decision-grid">
+        <article class="decision-card system paper-shadow">
+          <span class="card-index">01</span>
+          <h2>El sistema ejecuta</h2>
+          <p>Cuando el trabajo puede observarse, revertirse y gobernarse con reglas claras.</p>
+          <ul>
+            <li>Frecuente</li>
+            <li>Observable</li>
+            <li>Reversible</li>
+            <li>Acotado</li>
+          </ul>
+        </article>
+
+        <article class="decision-card ai paper-shadow">
+          <span class="card-index">02</span>
+          <h2>La IA amplía</h2>
+          <p>Cuando hay ambigüedad, pero una persona puede comparar y evaluar las opciones.</p>
+          <ul>
+            <li>Propone</li>
+            <li>Contrasta</li>
+            <li>Adapta</li>
+            <li>Explica</li>
+          </ul>
+        </article>
+
+        <article class="decision-card human paper-shadow">
+          <span class="card-index">03</span>
+          <h2>La persona decide</h2>
+          <p>Cuando la elección compromete significado, recursos, derechos o reputación.</p>
+          <ul>
+            <li>Intención y sentido</li>
+            <li>Derechos y presupuesto</li>
+            <li>Riesgo de marca</li>
+            <li>Excepciones</li>
+          </ul>
+        </article>
+
+        <div class="decision-thread" aria-hidden="true"></div>
+      </div>
+
+      <div class="decision-note">
+        <span>Automatizar no elimina la autoridad: la hace explícita.</span>
+      </div>
+    </section>
+
+    <section
+      class="artboard autonomy-board"
+      data-artboard="autonomy-ladder"
+      aria-label="Diagrama de grados de autonomía"
+    >
+      <header class="autonomy-header">
+        <p class="kicker">Grados de autonomía</p>
+        <h1>La autonomía no se instala. Se gana con evidencia.</h1>
+        <p class="dek">
+          La misma capacidad puede cambiar de operador sin perder límites, trazabilidad ni escalamiento.
+        </p>
+      </header>
+
+      <div class="autonomy-thread" aria-hidden="true"></div>
+
+      <div class="autonomy-stages">
+        <article class="autonomy-stage managed paper-shadow">
+          <span class="stage-number">01</span>
+          <h2>Gestionado</h2>
+          <p>Efeonce construye, opera y responde por el resultado.</p>
+        </article>
+
+        <article class="autonomy-stage cooperated paper-shadow">
+          <span class="stage-number">02</span>
+          <h2>Co-operado</h2>
+          <p>Efeonce gobierna; el equipo ejecuta partes acotadas.</p>
+        </article>
+
+        <article class="autonomy-stage client paper-shadow">
+          <span class="stage-number">03</span>
+          <h2>Operado por cliente</h2>
+          <p>El equipo opera dentro de límites, permisos y rutas de escalamiento.</p>
+        </article>
+      </div>
+
+      <div class="role-strip paper-shadow">
+        <div class="role">
+          <span class="role-label">Builder</span>
+          <p>Diseña la receta, prueba sus límites y cambia el sistema.</p>
+        </div>
+        <div class="role">
+          <span class="role-label">Runner</span>
+          <p>Ejecuta, documenta y escala lo que sale de lo previsto.</p>
+        </div>
+      </div>
+
+      <div class="evidence-tab">evidencia acumulada</div>
+    </section>
+  </body>
+</html>

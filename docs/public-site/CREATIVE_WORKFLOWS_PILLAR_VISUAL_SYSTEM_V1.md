@@ -1,7 +1,7 @@
 # Creative Workflows Pillar: sistema visual V1
 
-> **Estado:** producción cerrada; cuatro assets seleccionados, auditados y cargados en WordPress. La V4 pública
-> integra tres imágenes de cuerpo y usa el hero como featured/Open Graph image.
+> **Estado:** producción V5 cerrada; seis assets seleccionados, auditados y cargados en WordPress. La V5 pública
+> integra cinco imágenes de cuerpo, seis captions y usa el hero como featured/Open Graph image.
 > **Fecha:** 2026-07-15.
 > **Artículo fuente:** [GutenbergArticleSpec V2](CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V2.json).
 > **Artículo integrado:** [GutenbergArticleSpec V4](CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V4.json).
@@ -373,3 +373,35 @@ La V4 fue aplicada al post `251363` y luego publicada con autorización explíci
 guard: autor `1`, estado `publish`, `index, follow`, 111 bloques, tres imágenes de cuerpo y featured `251370`.
 Yoast expone el mismo JPEG como `og:image` `1440×757`, además de `summary_large_image` para Twitter. El render
 live fue inspeccionado en desktop `1440×1000` y mobile `390×844`, sin overflow ni imágenes rotas.
+
+## 14. Extensión editorial V5
+
+La lectura live mostró que las tres imágenes de cuerpo terminaban antes del 43% del texto. La solución no fue
+agregar decoración, sino cubrir dos modelos que la segunda mitad todavía exigía imaginar y convertir la lista
+de medición en una superficie comparativa:
+
+| ID | Trabajo editorial | Producción | WordPress | Placement |
+|---|---|---|---|---|
+| `CW-V05` | Frontera entre ejecución del sistema, ampliación con IA y autoridad humana | HTML/CSS determinista + Playwright; WebP V2 | `251389` | después de la lista de delegación/escalamiento |
+| `CW-V06` | Escalera managed → co-operated → client-operated y roles Builder/Runner | HTML/CSS determinista + Playwright; WebP V2 | `251390` | después de “Se gana con evidencia” |
+| `CW-T01` | Scorecard de capacidad y contramétricas de criterio | `core/table` nativo | n/a | sección de medición |
+
+Los diagramas preservan cobalto, lima, coral, papel y la señal continua del sistema original. El texto no fue
+generado dentro del raster: se compuso con Poppins/Geist locales para conservar labels, acentos y cifras
+exactas. La primera exportación (`251386–251387`) quedó superseded, no borrada, porque el QA live reveló que el
+widget flotante Next Post de Ohio ocupa la esquina inferior derecha. La V2 mueve toda información crítica fuera
+de esa zona y mantiene la esquina como espacio prescindible.
+
+En mobile, el diagrama horizontal funciona como síntesis visual y cada `core/image` enlaza al WebP completo
+para permitir lectura a resolución original. ALT y caption sostienen el significado sin obligar a interpretar
+texto diminuto dentro del raster. La tabla permanece semántica, visible a `390px`, sin overflow de página y sin
+convertirse en una captura inaccesible.
+
+La V5 validó 114 bloques gobernados, cinco `core/image`, seis captions y un `core/table`. El readback live
+preservó H1, slug, autor, categoría, featured/OG, SEO title, metadescription, canonical e `index, follow`. El QA
+anónimo pasó en `1440×1000` y `390×844`; evidencia en
+`ai-generations/2026-07-15_creative-workflows-pillar/review/v5/qa-report.json`.
+
+El video queda deliberadamente fuera de V5. Debe entrar sólo cuando muestre una demostración o transición que
+una imagen estática no pueda explicar, con poster, captions, transcript, carga diferida y sin autoplay; no como
+relleno para compensar longitud.

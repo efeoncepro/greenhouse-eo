@@ -78,7 +78,7 @@ or lower and must preserve heading order.
 
 Use the governed native vocabulary, including `core/heading`,
 `core/paragraph`, `core/list`, `core/quote`, `core/pullquote`, `core/image`,
-`core/separator`, and `yoast-seo/table-of-contents`. Use a populated Yoast TOC
+`core/table`, `core/separator`, and `yoast-seo/table-of-contents`. Use a populated Yoast TOC
 whose links resolve to deterministic heading anchors. Treat `core/freeform` as
 legacy inspection debt, not generated content.
 
@@ -163,6 +163,16 @@ smallest mutation through an authenticated governed REST operation when the
 fields are exposed; otherwise use the repository WP-CLI wrapper with a reviewed
 eval file. Always perform an independent readback after the write.
 
+When a remote eval needs a local asset or payload, use the repeatable
+`--input-file <path>` option on `public-website:wpcli`. The wrapper copies inputs
+to remote `/tmp`, passes their paths in PHP `$args`, and cleans them with the eval
+file. Do not open a parallel ad hoc SCP path.
+
+WordPress may canonicalize emoji in raw content. A confirmed example is
+`🍏` becoming `&#x1f34f;` before the frontend renders `img.emoji[alt="🍏"]`.
+Accept this only after proving the exact byte diff and unchanged structure; do
+not weaken the normal post hash guard.
+
 ## 6. Media Contract
 
 Resolve real WordPress Media Library assets before the post references them.
@@ -179,6 +189,11 @@ For every asset, verify:
 Body images use native `core/image` with the real attachment ID and URL. If a
 visible caption is required but the current spec cannot emit it, stop and extend
 the governed renderer first.
+
+Use `linkDestination=media` selectively for text-bearing diagrams that need
+full-resolution reading on mobile. Keep ordinary editorial photography at
+`none` unless the click has a clear reader job. A measurement comparison should
+prefer semantic `core/table` over a screenshot when native markup can express it.
 
 Assign featured and social media deliberately:
 
@@ -332,6 +347,8 @@ Assert and inspect:
 - TOC link count matches valid unique destinations;
 - headings, lists, quotes, captions, evidence, disclosures, and CTA are visible;
 - no article/footer collision, clipping, unreadable overlay, or mobile overlap;
+- no critical diagram labels under Ohio's floating Next Post widget or other
+  theme chrome; audit the live composition, not only the source raster;
 - canonical, robots, schema, and Open Graph are present in the anonymous page;
 - browser console and page errors are empty;
 - screenshots show the intended first viewport, body composition, and ending.

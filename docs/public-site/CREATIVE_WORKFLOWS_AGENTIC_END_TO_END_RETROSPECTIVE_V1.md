@@ -53,7 +53,7 @@ Meta title, deliberadamente mas corto:
 
 `Creative Workflows: qué son y cómo funcionan - Efeonce`
 
-## 3. Evolucion V1 a V4
+## 3. Evolucion V1 a V5
 
 ### V1: estructura gobernada y borrador privado
 
@@ -118,6 +118,30 @@ no`, conservando la transparencia sin interrumpir el argumento.
 
 **Aprendizaje:** E-E-A-T no se agrega como una bibliografia decorativa. Debe cambiar la forma del claim, mostrar
 limites y conectar identidad de autor, experiencia aplicada y trazabilidad tecnica.
+
+### V5: densidad visual, diagramas y comparación
+
+- La auditoría de distribución encontró que los tres assets de cuerpo terminaban antes del 43% del artículo.
+- Se añadieron dos diagramas con trabajos distintos: frontera de decisión y grados de autonomía.
+- Los diagramas se compusieron con HTML/CSS y tipografía local determinista; GPT Image no recibió labels ni
+  claims que pudiera deformar.
+- La primera composición pasó QA aislado, pero el QA live reveló que el widget flotante Next Post de Ohio
+  cubría información en la esquina inferior derecha. La V2 reservó esa zona y los attachments V1 quedaron
+  superseded, no borrados.
+- Los diagramas enlazan a su WebP completo para que el lector mobile pueda ampliar labels; ALT y captions
+  conservan el significado sin depender del texto rasterizado.
+- La sección de medición incorporó un `core/table` nativo con capacidad y contramétricas de criterio. El builder
+  y validator se extendieron con columnas consistentes, rich text seguro y tests.
+- Las tres imágenes anteriores recibieron captions visibles; el total quedó en cinco imágenes, seis captions y
+  una tabla dentro de 114 bloques gobernados.
+- El updater detectó la normalización de `🍏` a `&#x1f34f;` en WordPress. Se aceptó sólo esa equivalencia exacta,
+  con diferencia de 15 bytes y el resto del contenido idéntico.
+- El helper WP-CLI ganó `--input-file` repetible para transferir assets a `/tmp` sin improvisar una segunda vía
+  SSH ni exponer credenciales.
+
+**Aprendizaje:** la densidad visual se diseña por trabajo editorial y por runtime real. Un raster aprobado fuera
+del sitio aún puede fallar por el chrome del tema; una tabla accesible puede enriquecer más que otra imagen; y
+los hashes de write/readback deben distinguir normalización conocida de drift real.
 
 ## 4. Decisiones que se vuelven canon
 

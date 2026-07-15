@@ -1,3 +1,17 @@
+## Sesión 2026-07-15 — Creative Workflows V5: diagramas, scorecard y QA live (Codex)
+
+> **Pedido:** evaluar si una Pillar de más de 4.500 palabras necesitaba más apoyo visual y ejecutar la intervención completa. La V4 tenía tres imágenes, todas antes de la palabra `1961`; aproximadamente el `57%` final quedaba sin una pausa visual explicativa.
+>
+> **Publicado:** `https://efeoncepro.com/creative/creative-workflows/` (post `251363`) conserva las tres imágenes análogas y suma dos diagramas deterministas: frontera de decisión (`251389`) y grados de autonomía (`251390`). También incorpora captions en las cinco imágenes y un scorecard nativo `core/table` de métricas de capacidad vs. contramétricas de criterio. El video se difiere hasta que exista una demo, transición o prueba que no pueda explicarse mejor de forma estática.
+>
+> **Iteración visual:** los primeros attachments `251386–251387` fueron supersedidos después de que el QA live revelara que el widget flotante Next Post de Ohio cubría la esquina inferior derecha. Los masters V2 reservan esa safe area. En mobile, ambos diagramas enlazan al WebP completo para ampliación; la tabla se mantiene semántica y sin overflow.
+>
+> **Capability y canon:** Content Factory acepta `kind=table`, captions de imagen y `linkDestination=none|media`; el helper SSH `public-website:wpcli` acepta `--input-file` repetible. Canon en `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_ENRICHMENT_V5.md`, spec `CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V5.json`, runbook agentic y referencias de skills WordPress/content marketing.
+>
+> **Runtime/rollback:** preflight SSH PASS; snapshot pre-V5 `/tmp/greenhouse-creative-workflows-251363-before-v5-20260715-200344.json` con SHA-256 `d0a23ce1e5bc0e873f0dbc8b50f7c84f97c9dec87cc79eac456aa6b0dbd065f7`; caché Kinsta purgada. La única diferencia authored/runtime probada es la normalización de tres `🍏` a entidades HTML por WordPress.
+>
+> **QA:** Content Factory V5 PASS (`114` bloques, cero findings), Vitest focal `18/18`, ESLint focal, `pnpm typecheck`, `pnpm build`, `docs:closure-check`, `docs:context-check`, `ops:lint --changed` e inspección profunda sin freeform no vacío ni media issues. Playwright anónimo desktop `1440×1000` + mobile `390×844`: un H1, cinco imágenes, seis captions, tabla 3×4, enlaces a media, tres manzanitas, canonical/robots/OG y cero overflow. El PDF ajeno `docs/commercial/tenders/sky-blog-2026/SKY-Oferta-Blog-2026.pdf` quedó intacto y fuera del commit.
+
 ## Sesión 2026-07-15 — Sentry Notion/writeback + `/api/my/performance` hardening (Codex)
 
 > **Pedido:** revisar alertas Sentry productivas y corregir causa raíz de forma robusta, segura y escalable. Screenshots: `TimeoutError` en `POST /reactive/process-domain`, Notion API 400 "Can't edit block that is archived" y `permission denied for schema greenhouse_serving` en `GET /api/my/performance`.
@@ -215,7 +229,7 @@
 >
 > **Corte visual/V3/SEO (histórico):** se diseñó [La señal seleccionada](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_SYSTEM_V1.md) y se generaron cuatro assets con GPT Image 2: hero, interfaz creativa, dos velocidades y seis momentos. Los cuatro masters, cinco derivados WebP y un JPEG social quedaron trazados en [`ai-generations/2026-07-15_creative-workflows-pillar`](ai-generations/2026-07-15_creative-workflows-pillar/); WordPress Media Library contiene `251365–251368` y `251370`, todos bajo autor `1`. La [spec V3](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V3.json) pasó Content Factory con 101 bloques y cero findings y fue aplicada al post privado `251363` con snapshot previo. Ese readback privado quedó supersedido por V4.
 >
-> **Estado vigente V4:** `https://efeoncepro.com/creative/creative-workflows/` está publicado e indexable. La [spec V4](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V4.json) pasó con 111 bloques, tres imágenes, 39 enlaces y cero findings; canonical, CTA, autor Yoast, schema, Open Graph, render desktop/mobile y ausencia de duplicado en Think fueron verificados en vivo. Canon: [auditoría E-E-A-T V4](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EEAT_AUDIT_V4.md).
+> **Corte V4 histórico:** `https://efeoncepro.com/creative/creative-workflows/` quedó publicado e indexable. La [spec V4](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V4.json) pasó con 111 bloques, tres imágenes, 39 enlaces y cero findings; canonical, CTA, autor Yoast, schema, Open Graph, render desktop/mobile y ausencia de duplicado en Think fueron verificados en vivo. La versión vigente es V5; V4 se conserva como evidencia del corte E-E-A-T.
 >
 > **Voz autoral registrada:** la skill `copywriting` quedó actualizada en mirrors `.codex` y `.claude` con [`JULIO_REYES_VOICE_SYSTEM.md`](.codex/skills/copywriting/efeonce/JULIO_REYES_VOICE_SYSTEM.md). El router separa voz Julio de voz institucional Efeonce, define híbridos atribuidos y registra `con manzanitas` / `te lo explico con manitas` como running motifs personales que no deben trasladarse a UI, landings institucionales, otros autores ni copy corporativo genérico. Mirrors verificados byte a byte.
 >

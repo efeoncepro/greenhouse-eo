@@ -168,6 +168,11 @@ Reglas de prompt:
 
 GPT Image 2 produce raster. Generar un master suficientemente grande para los derivados previstos; no prometer vector, transparencia o fidelidad exacta que el runtime no soporte. Si se usa una referencia visual, registrar su licencia y revisar drift de identidad, marca y composición.
 
+**Diagramas con texto:** componer labels, cifras y claims con tipografía determinista. La IA puede producir una
+base conceptual sin texto, pero no debe decidir ni rasterizar contenido que necesita exactitud. Un diagrama
+puede producirse completamente en HTML/CSS, canvas o herramienta de diseño gobernada y luego capturarse como
+raster; registrar fuente, renderer, fonts, hash y versión igual que cualquier master.
+
 ### Paso 5: generar, seleccionar y auditar masters
 
 Generar por concept ID, no como una bolsa anónima de imágenes. Seleccionar en dos pasadas:
@@ -259,6 +264,8 @@ Subir solo derivados que pasaron QA. Después del upload:
 Antes de declarar cierre:
 
 - inspeccionar desktop y mobile reales, incluido el crop social/featured;
+- revisar el asset dentro del chrome real del tema: sidebars, share rails, widgets sticky/Next Post y overlays
+  también forman parte de la safe area;
 - confirmar imágenes de cuerpo, featured y OG esperados, sin duplicados ni placeholders;
 - comprobar URLs públicas `200`, MIME, dimensiones y archivo correcto;
 - validar `srcset`/`sizes`, width/height o aspect ratio estable, lazy loading de body y prioridad del hero según runtime;
@@ -266,6 +273,8 @@ Antes de declarar cierre:
 - comprobar que el hero no provoque LCP evitable y que no haya CLS por dimensiones faltantes;
 - verificar ALT en DOM, captions visibles cuando correspondan y metadata social/schema;
 - revisar overflow horizontal y render en viewport móvil, no solo captura `fullPage`;
+- si labels horizontales quedan pequeños en mobile, mantener ALT/caption autosuficientes y enlazar al raster
+  completo o producir una variante responsive gobernada;
 - repetir readback después de publicar o cambiar featured/OG.
 
 Una validación local o `dry-run` no prueba Media Library ni render público. Si falta publicación o readback live, cerrar como `code/content complete; rollout verification pending`.

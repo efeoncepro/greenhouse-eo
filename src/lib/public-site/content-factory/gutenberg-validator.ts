@@ -39,6 +39,7 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   'core/quote',
   'core/separator',
   'core/spacer',
+  'core/table',
   'yoast-seo/table-of-contents'
 ]
 
@@ -48,7 +49,7 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
   description:
     'Efeonce blog posts should be generated as structured Gutenberg editorial pieces, not plain paragraph dumps.',
   requiredBlocks: ['core/heading', 'core/paragraph', 'core/list', 'yoast-seo/table-of-contents'],
-  recommendedBlocks: ['core/quote', 'core/pullquote', 'core/separator', 'core/image', 'core/embed'],
+  recommendedBlocks: ['core/quote', 'core/pullquote', 'core/separator', 'core/table', 'core/image', 'core/embed'],
   tableOfContentsBlock: 'yoast-seo/table-of-contents',
   minHeadingCount: 3,
   minLevel2HeadingCount: 2,
@@ -56,7 +57,15 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
   maxHeadingJump: 1,
   disallowedGeneratedBlocks: ['core/freeform'],
   mediaBlocks: ['core/image', 'core/embed'],
-  enrichmentBlocks: ['core/list', 'core/quote', 'core/pullquote', 'core/separator', 'core/image', 'core/embed']
+  enrichmentBlocks: [
+    'core/list',
+    'core/quote',
+    'core/pullquote',
+    'core/separator',
+    'core/table',
+    'core/image',
+    'core/embed'
+  ]
 }
 
 const BLOCK_COMMENT_PATTERN = /<!--\s*(\/)?wp:([A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)?)(?:\s+({[\s\S]*?}))?\s*(\/)?-->/gi
@@ -94,10 +103,7 @@ export const parseGutenbergBlockComments = (postContent: string): ParsedGutenber
 
 const getOpeningBlocks = (blocks: ParsedGutenbergBlockComment[]) => blocks.filter(block => !block.closing)
 
-const validateBlockBalance = (
-  blocks: ParsedGutenbergBlockComment[],
-  findings: ContentFactoryValidationFinding[]
-) => {
+const validateBlockBalance = (blocks: ParsedGutenbergBlockComment[], findings: ContentFactoryValidationFinding[]) => {
   const stack: ParsedGutenbergBlockComment[] = []
 
   for (const block of blocks) {
@@ -236,7 +242,12 @@ const validateMetadata = (draft: ContentFactoryGeneratedDraft, findings: Content
   }
 
   if (!draft.seo?.title?.trim()) {
-    findings.push({ severity: 'block', code: 'seo_title_required', message: 'SEO title is required.', path: 'seo.title' })
+    findings.push({
+      severity: 'block',
+      code: 'seo_title_required',
+      message: 'SEO title is required.',
+      path: 'seo.title'
+    })
   }
 
   if (!draft.seo?.description?.trim()) {
@@ -353,7 +364,8 @@ const validateBlogpostCompositionProfile = ({
     findings.push({
       severity: 'info',
       code: 'blogpost_media_slot_recommended',
-      message: 'Efeonce blogposts can include image or embed slots; resolve real media before write when the brief calls for visual proof.',
+      message:
+        'Efeonce blogposts can include image or embed slots; resolve real media before write when the brief calls for visual proof.',
       path: 'draft.postContent'
     })
   }
@@ -362,7 +374,8 @@ const validateBlogpostCompositionProfile = ({
     findings.push({
       severity: 'block',
       code: 'blogpost_enrichment_block_missing',
-      message: 'Generated post needs at least one enrichment block such as list, quote, separator, image or embed.',
+      message:
+        'Generated post needs at least one enrichment block such as list, quote, separator, table, image or embed.',
       path: 'draft.postContent'
     })
   }

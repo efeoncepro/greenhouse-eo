@@ -132,6 +132,96 @@ describe('authorGutenbergDraft', () => {
     expect(postContent).toContain('class="wp-image-249787"')
   })
 
+  it('renders governed image captions as semantic figcaptions', () => {
+    const withCaption = authorGutenbergDraft({
+      ...kungFuSpec,
+      sections: [
+        {
+          heading: 'Con evidencia visual explicada',
+          level: 2,
+          blocks: [
+            {
+              kind: 'image',
+              mediaId: 249787,
+              url: 'https://efeoncepro.com/wp-content/uploads/x.png',
+              alt: 'grafico',
+              caption: [{ text: 'La selección ', strong: true }, { text: 'ocurre antes de escalar.' }],
+              linkDestination: 'media'
+            }
+          ]
+        },
+        ...kungFuSpec.sections.slice(1)
+      ]
+    })
+
+    const postContent = withCaption.draft.kind === 'gutenberg_post' ? withCaption.draft.postContent : ''
+
+    expect(postContent).toContain(
+      '<figcaption class="wp-element-caption"><strong>La selección </strong>ocurre antes de escalar.</figcaption>'
+    )
+    expect(postContent).toContain('"linkDestination":"media"')
+    expect(postContent).toContain('<a href="https://efeoncepro.com/wp-content/uploads/x.png"><img')
+  })
+
+  it('renders a semantic native Gutenberg table with governed rich text', () => {
+    const withTable = authorGutenbergDraft({
+      ...kungFuSpec,
+      sections: [
+        {
+          heading: 'Con métricas emparejadas',
+          level: 2,
+          blocks: [
+            {
+              kind: 'table',
+              headers: ['Dimensión', 'Velocidad', 'Calidad'],
+              rows: [
+                [
+                  [{ text: 'Producción', strong: true }],
+                  'Tiempo hasta mercado',
+                  [{ text: 'Aprobación', href: 'https://efeoncepro.com/creative/' }]
+                ]
+              ],
+              caption: 'Cada métrica de volumen necesita una contramétrica de criterio.'
+            }
+          ]
+        },
+        ...kungFuSpec.sections
+      ]
+    })
+
+    const postContent = withTable.draft.kind === 'gutenberg_post' ? withTable.draft.postContent : ''
+    const validation = validateGeneratedGutenbergDraft(withTable)
+
+    expect(postContent).toContain('<!-- wp:table -->')
+    expect(postContent).toContain('<th scope="col">Dimensión</th>')
+    expect(postContent).toContain('<td><strong>Producción</strong></td>')
+    expect(postContent).toContain('<a href="https://efeoncepro.com/creative/">Aprobación</a>')
+    expect(postContent).toContain('<figcaption class="wp-element-caption">Cada métrica')
+    expect(withTable.draft.kind === 'gutenberg_post' && withTable.draft.observedBlocks).toContain('core/table')
+    expect(validation.status).toBe('pass')
+  })
+
+  it('rejects malformed tables before Gutenberg markup is assembled', () => {
+    expect(() =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [
+          {
+            heading: 'Tabla incompleta',
+            level: 2,
+            blocks: [
+              {
+                kind: 'table',
+                headers: ['Dimensión', 'Métrica'],
+                rows: [['Velocidad']]
+              }
+            ]
+          }
+        ]
+      })
+    ).toThrow('content_factory_article_table_column_count_mismatch')
+  })
+
   it('renders safe inline links without opening a raw HTML escape hatch', () => {
     const withCitation = authorGutenbergDraft({
       ...kungFuSpec,

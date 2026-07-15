@@ -1,8 +1,8 @@
-# Creative Workflows Pillar — GPT Image generation run
+# Creative Workflows Pillar — editorial visual production run
 
 ## Objective
 
-Produce the four-asset editorial visual system defined in:
+Produce and extend the editorial visual system defined in:
 
 ```text
 docs/public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_SYSTEM_V1.md
@@ -13,10 +13,9 @@ campaign case studies.
 
 ## Engine
 
-- Path: built-in `image_gen` tool.
-- Requested model family: GPT Image 2.
-- Mode: new raster generation, no reference images.
-- Output: generated master first, then project-local copies and web derivatives.
+- `CW-V01–V04`: built-in `image_gen`, GPT Image 2, new raster generation without reference images.
+- `CW-V05–V06`: deterministic HTML/CSS composition with local Poppins/Geist and Playwright raster capture.
+- Output: inspected master first, then project-local WebP derivatives and WordPress Media Library attachments.
 
 ## Selected assets
 
@@ -26,6 +25,8 @@ campaign case studies.
 | `CW-V02` | Creative craft / hidden recipe | Explain the interface boundary | `selected-uploaded-integrated` (`mediaId=251366`) |
 | `CW-V03` | Two speeds | Explain divergence → decision → convergence | `selected-uploaded-integrated` (`mediaId=251367`) |
 | `CW-V04` | Six moments | Explain continuity and learning | `selected-uploaded-integrated` (`mediaId=251368`) |
+| `CW-V05` | Decision boundary | Explain what the system executes, what AI expands and what people decide | `selected-uploaded-integrated` (`mediaId=251389`) |
+| `CW-V06` | Autonomy ladder | Explain managed, co-operated and client-operated modes | `selected-uploaded-integrated` (`mediaId=251390`) |
 
 ## Source of prompts
 
@@ -41,17 +42,22 @@ paths, selected outputs, dimensions, hashes, review verdicts and derivative loca
   `exports/`.
 - The four editorial WebP derivatives and the hero JPEG derivative were uploaded to the WordPress Media
   Library under author `1` with stable slugs, ALT, caption and description.
-- `CW-V02`, `CW-V03` and `CW-V04` are integrated in the published
-  `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V4.json`; V3 remains the private visual snapshot.
+- Two deterministic explanatory diagrams were added in V5. Their text is typeset, not generated, and their
+  lower-right safe area accounts for Ohio's floating Next Post widget. The diagrams link to their full-size
+  WebP on mobile.
+- `CW-V02–V06` are integrated in the published
+  `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V5.json`; V3 remains the private visual snapshot
+  and V4 the first public snapshot.
 - `CW-V01` uses JPEG attachment `251370` as the WordPress featured/Open Graph image; WebP `251365` remains the
   optimized source/fallback. The hero is not duplicated in the article body.
 - The historical V3 Content Factory dry-run passed with 101 blocks, `core/image` support and zero findings.
-- WordPress post `251363` now contains V4, category `Creative`, featured media `251370`, Yoast SEO/E-E-A-T
+- WordPress post `251363` now contains V5, category `Creative`, featured media `251370`, Yoast SEO/E-E-A-T
   metadata and verified Open Graph. It is published at
   `https://efeoncepro.com/creative/creative-workflows/` with `index, follow`, canonical exact and anonymous
   `HTTP 200`.
-- The live desktop evidence is preserved in `review/live-desktop-1440x1000.png`; mobile QA was also completed
-  at `390x844` and recorded in the V4 audit and retrospective.
+- V5 desktop/mobile evidence and the machine-readable QA report live in `review/v5/`. QA covered five loaded
+  body images, six visible captions, one native table, full-size diagram links, canonical/robots/OG and
+  horizontal overflow at `1440x1000` and `390x844`.
 
 Full asset metadata and checksums live in `manifest.json`; the human-readable verdict lives in
 `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_AUDIT_V1.md`. The private WordPress/SEO snapshot lives in
@@ -61,7 +67,7 @@ readback live in `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EEAT_AUDIT_V4.md`.
 ## Guardrails
 
 - No logos or client marks.
-- No readable in-image text.
+- GPT Image rasters contain no readable text; explanatory diagrams use deterministic typography only.
 - No claims that the images represent real clients or measured outcomes.
 - Generated binaries remain local/runtime artifacts under the `ai-generations` policy.
 - Approved public assets are uploaded to WordPress/CDN; they are not committed as heavy source binaries.

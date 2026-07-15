@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — Creative Workflows V5: enriquecimiento visual y tabla Gutenberg nativa
+
+- La Pillar publicada suma dos diagramas editoriales deterministas en la mitad inferior, captions para las cinco imágenes de cuerpo y un scorecard semántico `core/table`; la intervención corrige el tramo final sin apoyo visual sin convertir el artículo en una secuencia decorativa.
+- El Content Factory incorpora tablas nativas validadas, captions de imagen y enlaces opcionales a media; `public-website:wpcli` acepta `--input-file` repetible para transportar payloads y archivos por el rail SSH gobernado.
+- Post `251363` actualizado con snapshot y rollback fail-closed, caché Kinsta purgada y QA live desktop/mobile: cinco imágenes cargadas, seis captions, tabla 3×4, tres `🍏`, canonical/robots/OG preservados y cero overflow. El video queda deliberadamente diferido hasta tener una demostración que aporte movimiento o evidencia real.
+
 ## 2026-07-15 — Sentry: Notion writeback/re-fetch y performance reader endurecidos
 
 - Se corrigen tres familias de alertas productivas: timeouts retryable en `/reactive/process-domain`, errores Notion 400 por bloques archivados y `permission denied for schema greenhouse_serving` en `GET /api/my/performance`.

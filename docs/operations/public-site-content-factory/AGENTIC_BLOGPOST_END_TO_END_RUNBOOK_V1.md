@@ -454,10 +454,11 @@ Bloques autorables por el primitive actual:
 
 - `paragraph`;
 - `list`;
+- `table` nativa con headers, filas de ancho consistente y caption opcional;
 - `quote`;
 - `pullquote`;
 - `separator`;
-- `image` con media real;
+- `image` con media real, caption opcional y `linkDestination: none|media`;
 - `embed` YouTube con URL aprobada.
 
 Reglas duras:
@@ -493,7 +494,8 @@ El renderer vigente:
 - admite sólo `http:`, `https:` y `mailto:`;
 - rechaza protocolos inseguros antes de producir Gutenberg;
 - usa `new URL(...)`, por lo que el `href` debe ser absoluto en el contrato actual;
-- aplica rich text a párrafos y items de lista; `intro[]`, quote y pullquote siguen siendo texto plano.
+- aplica rich text a intro, párrafos, items de lista, celdas/caption de tabla, captions de imagen y CTA; quote y
+  pullquote siguen siendo texto plano.
 
 No insertar `<a>` manual, `target`, `onclick`, iframe, script ni `javascript:` dentro de la spec. Si una
 capacidad falta, abrir trabajo del primitive; no rodearla con freeform.
@@ -627,6 +629,15 @@ WP-CLI remoto usar el wrapper:
 pnpm public-website:wpcli -- --eval-file ./tmp/<scoped-operation>.php --wp-user 12
 ```
 
+Cuando el eval necesita assets o un payload local, usar `--input-file <path>` de forma repetible. El wrapper
+copia cada input a `/tmp`, pasa sus rutas como `$args` a `wp eval-file` y elimina PHP + inputs al terminar. Esto
+evita abrir una segunda vía SCP/SSH ad hoc y mantiene el mismo preflight/cleanup.
+
+El hash authored puede diferir del hash raw de WordPress por normalizaciones deterministas. Caso confirmado:
+WordPress convierte cada `🍏` a `&#x1f34f;` al persistir (`15` bytes de diferencia para tres emojis) y el frontend
+lo renderiza como `img.emoji[alt="🍏"]`. Aceptar una equivalencia sólo si se demuestra el diff exacto y el resto
+de los bytes/estructura coincide; nunca relajar el guard porque “WordPress suele normalizar”.
+
 El script temporal debe fallar si no coinciden ID, manifest, owner o hash. Debe eliminarse local y remotamente
 al terminar; el wrapper ya elimina su copia remota por defecto.
 
@@ -649,6 +660,12 @@ Cada imagen declara:
 - si es ilustración, diagrama, fotografía o evidencia real.
 
 No agregar imágenes para “romper texto”. Si no aportan comprensión, no se generan.
+
+Para diagramas con labels, cifras o claims, separar arte y tipografía: usar imagen generada sólo como base si
+aplica y componer el texto de forma determinista, o producir todo el diagrama con una herramienta de layout
+determinista. Revisar el asset dentro del tema real. Safe area no significa sólo crop: incluye sidebars, widgets
+sticky, barras sociales y overlays del template. Si un diagrama horizontal pierde legibilidad en mobile,
+proveer ALT/caption suficiente y un enlace a la media completa o una variante responsive gobernada.
 
 #### 10.2 Generación
 
@@ -1339,10 +1356,15 @@ Esta sección demuestra la aplicación del runbook. No reemplaza los artefactos 
 | V3            | Update explícito al mismo privado con snapshot; `101` bloques, tres imágenes, featured/OG, categoría y SEO; aún `private/noindex`.                                        |
 | V4            | `111` bloques, 21 headings, tres imágenes, fuentes inline, caso SKY, metodología/IA y CTA; publicación humana autorizada; `publish`, `index, follow`.                     |
 | V4 lectura    | misma estructura y metadata; `99` énfasis semánticos, metodología condensada en tres párrafos y firma visible `Vamos con manzanitas 🍏🍏🍏:`; QA `1440x1000` + `390x844`. |
+| V5 visual     | `114` bloques, cinco imágenes, seis captions y un `core/table`; dos diagramas deterministas con enlace a media; QA live `1440x1000` + `390x844`.                        |
 
 La [inspección profunda V1](post-deep-inspection-251363-2026-07-15T05-25-14+00-00.json) es evidencia histórica,
 no estado live. La [spec V4](../../public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V4.json) y la auditoría
-E-E-A-T registran el corte publicado.
+E-E-A-T registran el primer corte publicado.
+
+La [spec V5](../../public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V5.json) es el corte live vigente. La
+[inspección profunda V5](post-deep-inspection-251363-2026-07-15T20-17-52+00-00.json) confirmó cinco
+`core/image`, un `core/table`, cero freeform no vacío y cero media issues.
 
 ### 12.5 Rich text seguro y jerarquía de lectura
 
@@ -1367,6 +1389,9 @@ bloques con más de uno. Es evidencia del caso, no un umbral universal. El gate 
 - Body V4: `251366`, `251367`, `251368`; el hero no se duplicó dentro del artículo.
 - Todos los assets pasaron concepto, composición, continuidad, integridad y uso editorial según la
   [auditoría visual](../../public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_AUDIT_V1.md).
+- V5 agregó `CW-V05–V06` como diagramas HTML/CSS deterministas renderizados con Playwright. Media V2 final:
+  `251389–251390`; los candidatos `251386–251387` quedaron superseded por safe-area del widget Next Post.
+- Los diagramas enlazan al WebP completo para ampliación mobile y el scorecard usa `core/table`, no una captura.
 
 El manifest visual conserva el snapshot histórico V3 y declara por separado el estado publicado V4; la
 auditoría V4 sigue siendo la evidencia detallada de publicación, sin reemplazar hashes ni provenance.
@@ -1409,6 +1434,7 @@ no nombres universales.
 - URL pública `200`, canonical exacto y `index, follow`.
 - Desktop `1440×1000` y mobile `390×844` sin overflow horizontal.
 - Un H1, tres imágenes cargadas y TOC con 21 destinos válidos.
+- V5: cinco imágenes cargadas, seis captions, una tabla de cuatro filas y dos enlaces a media completa.
 - 34 enlaces HTTP únicos: 29 `2xx/3xx`; tres `403` protegidos y dos timeout clasificados; cero `404/5xx`
   confirmados.
 - Open Graph `article`, Twitter `summary_large_image`, JPEG social `200`.

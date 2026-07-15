@@ -6,7 +6,7 @@
     "modelFamily": "gpt-image-2"
   },
   "articleSpecSource": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V2.json",
-  "articleSpecIntegrated": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V4.json",
+  "articleSpecIntegrated": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V5.json",
   "historicalPrivateSpec": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V3.json",
   "visualSystem": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_SYSTEM_V1.md",
   "visualAudit": "docs/public-site/CREATIVE_WORKFLOWS_PILLAR_VISUAL_AUDIT_V1.md",
@@ -16,11 +16,11 @@
   "generatedAt": "2026-07-15",
   "wordpress": {
     "postId": 251363,
-    "postState": "publish-v4",
+    "postState": "publish-v5",
     "authorId": 1,
     "categoryId": 193,
     "featuredMediaId": 251370,
-    "integrationState": "V4 published; anonymous desktop/mobile render, SEO/AEO, E-E-A-T and Open Graph verified",
+    "integrationState": "V5 published; five body images, six captions, native measurement table, anonymous desktop/mobile render, SEO/AEO, E-E-A-T and Open Graph verified",
     "url": "https://efeoncepro.com/creative/creative-workflows/"
   },
   "assets": [
@@ -173,6 +173,80 @@
         "verdict": "pass",
         "notes": "Los seis momentos son distinguibles y la señal visual conserva continuidad desde la decisión hasta el aprendizaje."
       }
+    },
+    {
+      "id": "CW-V05",
+      "slug": "decision-boundary",
+      "status": "selected-uploaded-integrated",
+      "editorialRole": "in-article explanatory diagram for system, AI and human decision authority",
+      "productionMethod": "deterministic HTML/CSS composition rendered with Playwright; no generated text",
+      "sourcePath": "sources/diagram-production-v2.html",
+      "master": {
+        "path": "masters/creative-workflows-decision-boundary-master-v2.png",
+        "width": 1440,
+        "height": 960,
+        "bytes": 209226,
+        "sha256": "c5df4322bc6963fb5aa2da8febe0f1921c0efafd1c528e221ab08048a0af417a"
+      },
+      "web": {
+        "path": "exports/creative-workflows-decision-boundary-web-1440-v2.webp",
+        "width": 1440,
+        "height": 960,
+        "bytes": 80570,
+        "sha256": "cb3d92e71cf8bd9bef1d7a5874ec35dcff289767c18d25e1c94a3c48f37243d7"
+      },
+      "media": {
+        "id": 251389,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-decision-boundary-web-1440-v2.webp",
+        "authorId": 1,
+        "alt": "Diagrama de tres niveles: el sistema ejecuta, la IA amplía y una persona decide según ambigüedad e impacto.",
+        "caption": "A mayor ambigüedad e impacto, mayor autoridad humana."
+      },
+      "supersedes": {
+        "mediaId": 251386,
+        "reason": "V2 protege la esquina inferior derecha ocupada por el widget flotante de Next Post en Ohio."
+      },
+      "review": {
+        "verdict": "pass",
+        "notes": "Jerarquía legible, labels deterministas y zona inferior derecha sin información crítica; abre el WebP completo desde mobile."
+      }
+    },
+    {
+      "id": "CW-V06",
+      "slug": "autonomy-ladder",
+      "status": "selected-uploaded-integrated",
+      "editorialRole": "in-article explanatory diagram for managed, co-operated and client-operated autonomy",
+      "productionMethod": "deterministic HTML/CSS composition rendered with Playwright; no generated text",
+      "sourcePath": "sources/diagram-production-v2.html",
+      "master": {
+        "path": "masters/creative-workflows-autonomy-ladder-master-v2.png",
+        "width": 1440,
+        "height": 960,
+        "bytes": 160147,
+        "sha256": "8d4f3c2f5fb9a95f87d3e4ea7423ed5e6e2b8f15f9c7a0bab1d198005a485d1d"
+      },
+      "web": {
+        "path": "exports/creative-workflows-autonomy-ladder-web-1440-v2.webp",
+        "width": 1440,
+        "height": 960,
+        "bytes": 65792,
+        "sha256": "81cdcc879345dae6fe29990b34d9f01b75ed2e5292725f38728e23228669086f"
+      },
+      "media": {
+        "id": 251390,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/creative-workflows-autonomy-ladder-web-1440-v2.webp",
+        "authorId": 1,
+        "alt": "Diagrama de tres grados de autonomía: gestionado, co-operado y operado por cliente, conectados por evidencia acumulada.",
+        "caption": "La misma capacidad puede cambiar de operador sin perder límites, trazabilidad ni escalamiento."
+      },
+      "supersedes": {
+        "mediaId": 251387,
+        "reason": "V2 concentra Builder/Runner fuera de la esquina cubierta por el widget flotante de Next Post."
+      },
+      "review": {
+        "verdict": "pass",
+        "notes": "Los tres grados se distinguen, Builder/Runner permanecen visibles y el asset abre a resolución completa desde mobile."
+      }
     }
   ],
   "validation": {
@@ -196,12 +270,14 @@
       "anonymousStatus": 404
     },
     "currentPublication": {
-      "snapshot": "v4-published",
+      "snapshot": "v5-published",
       "status": "pass",
       "postStatus": "publish",
-      "blockCount": 111,
+      "blockCount": 114,
       "headingCount": 21,
-      "imageBlockCount": 3,
+      "imageBlockCount": 5,
+      "captionCount": 6,
+      "tableBlockCount": 1,
       "featuredMediaId": 251370,
       "anonymousStatus": 200,
       "robots": "index, follow",
