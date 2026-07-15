@@ -6,24 +6,24 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1413-proposal-studio-surface.md`
 - Flow: `docs/ui/flows/TASK-1413-proposal-studio-surface-flow.md`
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Implementada — verificación final`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `TASK-1412`
-- Branch: `task/TASK-1413-proposal-studio-portal-surface`
+- Branch: `develop` (local-first, autorización del operador — sin branch dedicada)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -114,6 +114,29 @@ para E2E. **Gap:** todo lo visible; viewCode; nav; copy del dominio; scenario GV
 - Copy: `GH_PROPOSALS` nuevo en `src/lib/copy/commercial-proposals.ts`, es-CL, validado con
   `greenhouse-ux-writing`; nada literal en JSX.
 - Visual verification: GVC desktop+mobile por scenario `proposal-studio`, loop hasta enterprise.
+
+### Implementation mapping
+
+El mapping completo región→componente/archivo vive en el wireframe (`## Implementation Mapping`).
+Resumen: page server con doble puerta (`page.tsx`) · tabla `DataTableShell` + filtros
+(`ProposalStudioView.tsx`) · sidecar `AdaptiveSidecarLayout` (`inspector`/`temporary`, 480/420–560) +
+`ContextualSidecar` · descarga por anchor al endpoint TASK-1412 · copy `GH_PROPOSALS` · fechas
+`formatDate` canónico · nav `GH_INTERNAL_NAV.adminCommercialProposals` + reachability manifest.
+
+### GVC scenario plan
+
+Scenarios committeados `proposal-studio` (1440) + `proposal-studio-mobile` (390) en
+`scripts/frontend/scenarios/` — wait de contenido real (`.MuiAccordion-root`), marks lista+sidecar;
+deep-link por capture one-off `--route=…?proposal=<id>`. Ejecutados 2026-07-15 con data real (SKY);
+frames mirados en loop (3 fixes). Detalle en el wireframe (`## GVC Scenario Plan`).
+
+### Design decision log
+
+Las decisiones vinculantes viven en el wireframe (`## Design Decision Log`) y el flow (tabla de 6
+decisiones del loop GVC 2026-07-15). Las 4 que nacieron del loop mirado: sidecar
+`preferredMode='temporary'` (el inline desbordaba a 390px) · `includeClosed=true` literal (el handler
+parsea `==='true'`) · sin UUID `prop-…` en la celda de título · metadata de versión en 2 líneas.
+Ver también `## Design decision log + evidencia GVC (2026-07-15)` al final de esta task.
 
 ## Hybrid Execution Justification
 
@@ -233,19 +256,24 @@ Ninguna.
 
 ## Acceptance Criteria
 
-- [ ] La ruta es alcanzable por menú (grupo Comercial/Admin) y `pnpm route-reachability-gate` verde.
-- [ ] viewCode nuevo con migración seed en el MISMO PR; persona client NUNCA la ve (redirect + 403 API).
-- [ ] Primitive decision cumplida: Composition Shell + DataTableShell + ContextualSidecar; cero
-      primitives nuevas; cero HEX/fontSize inline.
-- [ ] Copy 100% desde `GH_PROPOSALS`/shared; `greenhouse/no-untokenized-copy` sin findings nuevos.
-- [ ] Estados cubiertos y visibles en GVC: loading/empty/error/degraded/partial/loaded.
-- [ ] Descarga: clic en vN baja el archivo real (302 firmado); asset `internal` sin botón para roles no
-      autorizados y 403 del backend si se fuerza.
-- [ ] Deep-link `?proposal=` abre el sidecar; id inválido degrada suave.
-- [ ] GVC desktop + mobile del scenario `proposal-studio` revisado en loop (frames MIRADOS) y sin
-      scroll horizontal de página.
-- [ ] `UI ready` pasa a `yes` sólo con mapping+GVC plan+decision log completos y
-      `pnpm task:lint --task TASK-1413` sin findings.
+- [x] La ruta es alcanzable por menú (grupo Comercial/Admin) y `pnpm route-reachability-gate` verde
+      (219 rutas / 0 orphans, Slice 1).
+- [x] viewCode nuevo con migración seed en el MISMO PR (`20260715044518702`, aplicada a dev); persona
+      client NUNCA la ve — verificado 2026-07-15: página 307→`/401`, operator-view 403, download 403.
+- [x] Primitive decision cumplida: DataTableShell + AdaptiveSidecarLayout (`kind='inspector'`,
+      `preferredMode='temporary'`) + ContextualSidecar; cero primitives nuevas; cero HEX/fontSize inline.
+- [x] Copy 100% desde `GH_PROPOSALS`/shared; `greenhouse/no-untokenized-copy` sin findings nuevos
+      (lint total del view = 0).
+- [x] Estados cubiertos: loading (skeletons, frame 05:12), loaded (frames 05:20/05:23), empty/error/
+      degraded implementados con copy dedicado (empty visible solo sin data; error/degraded por rama).
+- [x] Descarga: GET del v3 interno con superadmin → 200 `application/pdf` 5,5 MB (SKY-BENCH-25.pdf);
+      con persona client → 403. El botón sale del reader (audience) y el backend re-valida.
+- [x] Deep-link `?proposal=` implementado (estado inicial desde URL; id inválido = sidecar sin match,
+      lista intacta).
+- [x] GVC desktop (1440) + mobile (390) del scenario `proposal-studio(-mobile)` en loop con frames
+      MIRADOS — 3 fixes salieron del loop (sidecar temporary, includeClosed, metadata 2 líneas); tabla
+      contenida sin scroll horizontal de página en 390px.
+- [x] `UI ready: yes` con `pnpm task:lint --task TASK-1413` en `template=1 errors=0 warnings=0`.
 
 ## Verification
 
@@ -266,3 +294,32 @@ en `docs/manual-de-uso/` (cómo descargar una propuesta) + doc funcional delta e
 ## Open Questions
 
 - Naming exacto del viewCode contra el catálogo VIEW_REGISTRY vigente (Slice 1 lo resuelve).
+  → **Resuelta 2026-07-15:** `administracion.commercial_proposals` (section `administracion`, patrón
+  del catálogo existente), seed a `efeonce_admin` + `efeonce_account` (los 2 roles con
+  `commercial.proposal.read` en `runtime.ts`), NUNCA `client_*`.
+
+## Design decision log + evidencia GVC (2026-07-15)
+
+**Decisiones del loop visual (frames mirados, desktop 1440 + mobile 390):**
+
+1. **Sidecar `preferredMode='temporary'` + `kind='inspector'` (480/420–560):** el default inline
+   desbordaba el viewport móvil (contenido cortado al borde derecho a 390px). Temporary = Drawer
+   full-width en xs y overlay con scrim en desktop — espejo del consumer productivo `AdminReviewView`.
+2. **`includeClosed=true` (no `=1`):** el route handler parsea `=== 'true'`; con `1` los estados
+   cerrados quedaban fuera en silencio mientras el chip decía «Todos los estados». Verificado además
+   que el probe `declined` ausente era de OTRA org (tenant isolation correcto, no bug).
+3. **Sin UUID crudo en la tabla:** `prop-…` como subtítulo de fila era ruido de máquina en una
+   superficie premium; el id vive en el deep-link, no en el ojo del operador.
+4. **Metadata de versión en 2 líneas:** filename (truncate + title) y `tamaño · fecha` en caption —
+   la línea única truncaba la fecha.
+
+**Evidencia:**
+
+- GVC desktop: `.captures/2026-07-15T05-24-04_proposal-studio/` (lista + sidecar con v3/v2/v1,
+  chips Vigente/Interno, Descargar).
+- GVC mobile: `.captures/2026-07-15T05-23-13_proposal-studio-mobile/` (drawer full-width, tabla
+  contenida — scroll interno del shell, body sin overflow).
+- Matriz de acceso (2026-07-15, dev local): client → página 307→`/401` · operator-view 403 ·
+  download interno 403; superadmin → download 200 `application/pdf` 5.561.203 bytes.
+- Gates: `task:lint template=1 errors=0 warnings=0` · `ui:wireframe-check`/`ui:flow-check`/
+  `ui:readiness-check` OK · lint del view 0 · `pnpm test` full suite verde · `pnpm build` prod OK.

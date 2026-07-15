@@ -1,5 +1,19 @@
 # changelog.md
 
+## 2026-07-15 — Proposal Studio llega al portal: Propuestas con versiones y descarga (TASK-1413)
+
+- **`/admin/commercial/proposals`** (Administración → Propuestas): tabla operator-view con estados de la state machine (el terminal resuelto por origin — una venta directa no se «adjudica»), deadline risk en rojo con tooltip de deadline asumido, filtros por estado y contador de artefactos; **sidecar temporary** (Drawer full-width en mobile, overlay con scrim en desktop) con el historial de versiones por artefacto (chips Vigente/Interno) y **descarga del archivo real** por anchor nativo al endpoint gobernado de TASK-1412 — la UI jamás conoce URLs de storage. Deep-link `?proposal=` abre el panel directo.
+- Gobernanza completa en el mismo PR: viewCode `administracion.commercial_proposals` + seed a `efeonce_admin`/`efeonce_account` (NUNCA `client_*`), nav `GH_INTERNAL_NAV`, reachability 219/0, copy `GH_PROPOSALS` es-CL. **Matriz de acceso verificada en runtime**: persona client → página 307→`/401`, API 403, download interno 403; superadmin → PDF real de SKY 200 (5,5 MB). GVC desktop+mobile en loop con frames mirados (3 fixes: sidecar temporary, `includeClosed=true` — con `=1` los estados cerrados se caían en silencio —, metadata legible); scenarios committeados. Gates: 9497 tests + build prod + task:lint 0/0. Manual: `docs/manual-de-uso/comercial/descargar-propuestas-portal.md`. Con esto **ver dónde está una propuesta y bajarla ya no depende de escribirle a un agente.**
+
+## 2026-07-15 — Creative Workflows nace como territorio editorial Pillar + cluster
+
+- PDR-014 separa los trabajos del sistema: la Pillar educa y crea categoría, los satélites profundizan intenciones independientes, la landing Agencia Creativa convierte y Creative Studio permanece como arquitectura futura sin promesa de disponibilidad.
+- El brief maestro fija la tesis **“un sistema de decisiones creativas humanas vuelto ejecutable”**, la estructura de la Pillar y 12 satélites en tres olas, además de enlaces, evidencia, CTA, medición, atomización y flujo de producción.
+- El dossier de publicación registra la muestra SERP, cinco claims científicos con sus límites, evidencia primaria de mercado y claims prohibidos; no inventa volúmenes ni convierte neurociencia en prueba del producto.
+- Content Factory validó la `GutenbergArticleSpec` y creó el post WordPress `251363` como privado, autor `1`, manifest idempotente `greenhouse-cf-creative-workflows-pillar-v1`. Readback e inspección profunda confirman 75 bloques gobernados, TOC, 20 headings y metadata SEO; acceso anónimo `404`. Sigue sin publicar y requiere revisión humana, enlaces, media, taxonomía y canonical.
+- Estado editorial: listo para redactar en privado, no para publicar. Keyword/intent/SERP, taxonomía y canonical único entre WordPress y Think son gates explícitos; el roadmap público y PDR-004 quedaron conectados.
+- Frontera reforzada: este trabajo crea soporte científico/editorial para Creative Studio futuro; no implementa workflows ni convierte artículos, diagramas o templates conceptuales en product specs o tasks. La ejecución operativa permanece exclusivamente bajo RESEARCH-009, arquitectura vigente y EPIC-028 en el repositorio de Creative Studio.
+
 ## 2026-07-14 — Proposal Studio: la versión se deriva y la descarga es gobernada (TASK-1412)
 
 - `attachProposalAsset` deriva la versión (MAX+1 por proposal+kind, misma tx; FOR UPDATE serializa + índice único `(proposal_id, kind, version)` como cinturón) y el campo `version` desaparece del input público — el `artifact-worker` ya llamaba attach con el PDF del render, así que el pipeline completo quedó versionado sin tocarlo. Migración con renumeración determinista de duplicados + DO guard, aplicada en dev.

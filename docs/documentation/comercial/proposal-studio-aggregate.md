@@ -28,6 +28,16 @@ Antes de esta capacidad, una licitación o propuesta comercial vivía repartida 
 
 `intake` (recién registrada) → análisis y fit → construcción de la oferta → empaquetado → presentada → en evaluación → **`won`** o **`lost`** (terminales) — con salidas laterales `declined` (decidimos no participar) y `withdrawn` (nos retiramos). Una propuesta en estado terminal no puede moverse más.
 
+## Dónde se ve en el portal (Delta 2026-07-15, TASK-1412/1413)
+
+Cada artefacto de una propuesta (deck, oferta técnica, oferta económica…) ahora **versiona solo**: al
+adjuntar un archivo nuevo del mismo tipo, el sistema deriva la próxima versión (v1, v2, v3…) — nadie la
+declara a mano y no puede haber duplicados. La página **Administración → Propuestas**
+(`/admin/commercial/proposals`, roles `efeonce_admin`/`efeonce_account`) muestra la lista con estados y
+deadlines, y un panel lateral con el historial de versiones por tipo y **descarga del archivo real**.
+Los documentos marcados **Interno** nunca cruzan a un usuario cliente (la página completa es invisible
+para tenants client, y el endpoint devuelve 403). Manual: [Propuestas en el portal](../../manual-de-uso/comercial/descargar-propuestas-portal.md).
+
 ## Qué no hacer
 
 - No subir documentos de una propuesta fuera del almacén canónico de archivos.

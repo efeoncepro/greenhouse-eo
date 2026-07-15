@@ -1,3 +1,27 @@
+## Sesión 2026-07-15 — TASK-1413 complete: Propuestas en el portal — lista + versiones + descarga (Claude)
+
+> **Pedido:** cerrar el par TASK-1412/1413 — la ventana operador del Proposal Studio en el portal.
+>
+> **Entregado:** `/admin/commercial/proposals` (Administración → Propuestas). Tabla operator-view (estados con label por origin, deadline risk, filtros por estado, contador de artefactos) + sidecar `AdaptiveSidecarLayout` `inspector`/`temporary` (Drawer full-width en mobile, overlay en desktop) con historial de versiones por artefacto (chips Vigente/Interno) y descarga por anchor nativo al endpoint gobernado de TASK-1412. Deep-link `?proposal=`. Gobernanza en el mismo PR: viewCode `administracion.commercial_proposals` seed a `efeonce_admin`+`efeonce_account`, nav + reachability 219/0, copy `GH_PROPOSALS`.
+>
+> **Verificado en runtime (dev local, data real SKY):** matriz de acceso — client 307→`/401` + API 403 + download interno 403; superadmin download 200 `application/pdf` 5,5 MB. GVC desktop+mobile con frames MIRADOS en loop → 3 fixes reales (sidecar temporary porque el inline desbordaba a 390px; `includeClosed=true` porque `=1` excluía cerrados en silencio; metadata en 2 líneas). Deep-link capturado con el sidecar abierto. Gates: 9497 tests + build prod + `task:lint 0/0` + wireframe/flow/readiness checks.
+>
+> **Estado:** complete (lifecycle + registry + README sincronizados). Manual nuevo `docs/manual-de-uso/comercial/descargar-propuestas-portal.md`; delta funcional en `proposal-studio-aggregate.md`; el «hoy no hay UI» del índice de manuales quedó corregido. **Sin push** (pendiente de señal del operador). Nota operativa: `AGENT_AUTH_SECRET` no estaba en `.env.local` — se agregó desde Vercel prod para GVC local.
+>
+> **Follow-ups:** ruta detalle `[proposalId]` (evidencia/requirements/render jobs + timeline de transitions) si el sidecar queda corto · linkear la superficie desde Nexa `proposal_status` cuando flip el flag (TASK-1399).
+
+## Sesión 2026-07-15 — Creative Workflows: territorio editorial + Pillar/cluster brief (Codex)
+
+> **Pedido:** documentar el nuevo territorio Creative Workflows, definir su Pillar y satélites y avanzar al brief maestro antes de redactar.
+>
+> **Decisión:** [PDR-014](docs/public-site/decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md) acepta Creative Workflows como territorio de category creation y autoridad: la Pillar define **“un sistema de decisiones creativas humanas vuelto ejecutable”**; 12 satélites en tres olas profundizan neurociencia, categorías vecinas, frontera humano/sistema, implementación, Builder/Runner, medición, homogeneización, modos operativos, derechos, templates, agentes y casos.
+>
+> **Brief:** [Creative Workflows Pillar + Cluster Brief V1](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md) deja listos audiencia/JTBD, gran idea, metadata de trabajo, estructura H2, profundidad, prioridades, matriz de enlaces, research SEO/AEO, evidencia, CTA, medición, atomización, producción y gates. La landing Agencia Creativa conserva conversión; Creative Studio no se promete disponible.
+>
+> **Estado:** primer borrador privado creado y verificado; no está listo para publicación. La muestra SERP y el claim ledger viven en el [dossier](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_RESEARCH_DOSSIER_V1.md); la [spec](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V1.json) pasó Content Factory con `validation=pass` y creó el post WordPress `251363` (`private`, autor `1`, manifest `greenhouse-cf-creative-workflows-pillar-v1`, 75 bloques). La reejecución devolvió `already_exists`, el permalink anónimo `404` y la [inspección profunda](docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-15T05-25-14+00-00.json) confirmó TOC, 20 headings, SEO y cero freeform no vacío. Pendientes de publicación: demanda regional, revisión editorial/claims, enlaces reales, media, taxonomía y canonical WP↔Think.
+>
+> **Aclaración del operador:** este frente construye el soporte científico, conceptual y editorial de Creative Studio futuro. **No estamos implementando Creative Workflows todavía.** Ningún artículo, satélite, diagrama, checklist o template conceptual crea backlog, product spec o runtime. La única vía futura de implementación es RESEARCH-009 validado → arquitectura vigente → EPIC-028 → task formal en el repositorio de Creative Studio.
+
 ## Sesión 2026-07-14 (e) — TASK-1412 complete: versionado derivado + descarga gobernada de proposals (Claude)
 
 > **Pedido:** control de versiones de proposals + espacio en el portal para descargarlas (creadas TASK-1412 backend + TASK-1413 UI vía task-planner, lint template=1/0/0; /implement-task sobre 1412).

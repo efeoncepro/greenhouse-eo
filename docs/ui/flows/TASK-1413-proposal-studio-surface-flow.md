@@ -43,3 +43,28 @@
 | reader lista falla | error page-level canónico | n/a |
 | reader versiones falla | intacta | bloque `versions_unavailable` (degraded) |
 | descarga 403 (audience interno / rol) | intacta | snackbar `audience` — botón oculto para no autorizados desde el reader (defensa doble) |
+
+## GVC Scenario Plan
+
+Dos scenarios committeados como contrato repetible (`scripts/frontend/scenarios/`):
+
+| Scenario | Viewport | Pasos | Marks |
+|---|---|---|---|
+| `proposal-studio` | 1440×900 | wait `tbody tr` → mark → click primera fila → wait `.MuiAccordion-root` (contenido real, no skeleton) → mark | `lista`, `sidecar` |
+| `proposal-studio-mobile` | 390×844 | idéntico al desktop | `lista-mobile`, `sidecar-mobile` |
+
+Complemento one-off: `pnpm fe:capture --route="/admin/commercial/proposals?proposal=<id>"` para el
+deep-link (sidecar abierto al cargar). Ejecutado 2026-07-15 contra dev local con data real de SKY
+(deck v1–v3). Gotcha operativo: tras editar el view, la primera corrida puede caer por timeout de
+compile frío de Turbopack — calentar la ruta con `curl` y reintentar.
+
+## Design Decision Log
+
+| # | Decisión | Por qué |
+|---|---|---|
+| 1 | `AdaptiveSidecarLayout` con `kind='inspector'` + `preferredMode='temporary'` + anchos 480/420–560 | El default inline desbordaba el viewport móvil (contenido cortado a 390px). Temporary = Drawer full-width en xs + overlay con scrim en desktop; espejo del consumer productivo `AdminReviewView`. |
+| 2 | `includeClosed=true` literal en el fetch | El route handler parsea `=== 'true'`; `=1` excluía los estados cerrados en silencio mientras el chip decía «Todos los estados». |
+| 3 | Sin UUID `prop-…` en la celda de título | Ruido de máquina en superficie premium; el id vive en el deep-link `?proposal=`, no en el ojo del operador. |
+| 4 | Metadata de versión en 2 líneas (filename / `tamaño · fecha`) | La línea única truncaba la fecha con ellipsis. |
+| 5 | Descarga por anchor nativo (`component='a'` → endpoint 302) | Cero blob en memoria; el browser gestiona la descarga; la UI jamás conoce URLs de storage (invariante TASK-1412). |
+| 6 | Fechas vía `formatDate` canónico de `@/lib/format` | Regla `no-raw-locale-formatting`; consistencia es-CL en tabla y sidecar. |
