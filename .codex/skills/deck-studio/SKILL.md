@@ -238,6 +238,15 @@ render job → Cloud Run Job `artifact-worker` → PDF en el asset store, con ga
 accesibilidad/peso y QA visual mecánica) el manual es
 `greenhouse-public-private-tenders/proposal-studio-runtime.md` — shipped 2026-07-12.
 
+**De dónde viene el `deck-plan`: es una PROYECCIÓN de la oferta técnica, no se auto-genera.** En una
+licitación el deck-plan vive en el **workspace del deal** (`docs/commercial/tenders/<slug>/`, scaffoldeado
+con `pnpm tender:new`) junto a la `oferta-tecnica.md`. El autor/agente arma el plan **desde** esa oferta
+(propose→confirm): comparten el **ledger de evidencia** (ninguna cifra sin fuente googleable), pero son
+archivos independientes y revisables por separado — el `.md` es la fuente narrativa, el `deck-plan.json` la
+de composición. Las piezas vivas (Radiografía, informe del Grader) que alimentan `artifact-showcase`/
+`highlight` salen del **`artifact-manifest.json`** del deal, **por enlace, nunca captura**. Contrato:
+`docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
+
 **Cronogramas `TimelineFull`.** El autor o agente escribe el schedule (`timeUnit`, eje, fases, hitos y
 `barLabel`); nunca porcentajes, líneas de grilla ni conectores. `barLabel` es copy editable en barras
 sólidas **y** punteadas, incluso si una fase ocupa una sola unidad. La geometría real decide si cabe y el

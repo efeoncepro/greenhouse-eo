@@ -1,5 +1,16 @@
 # changelog.md
 
+## 2026-07-15 — DSR interno / workspace del deal: cierre documental (triple capa + skills)
+
+- Documentación funcional: [digital-sales-room-y-workspace-del-deal.md](docs/documentation/comercial/digital-sales-room-y-workspace-del-deal.md) (las tres capas en lenguaje simple + el workspace + el manifiesto). Manual de uso: [armar-el-workspace-de-un-deal.md](docs/manual-de-uso/comercial/armar-el-workspace-de-un-deal.md) (paso a paso `pnpm tender:new` → oferta → deck → Proposal). Ambos registrados en sus índices.
+- Skills enganchadas (ambos namespaces `.claude`/`.codex`): **deck-studio** (de dónde viene el `deck-plan`: es una proyección de la oferta técnica, no se auto-genera; el manifiesto alimenta `artifact-showcase`/`highlight` por enlace), **tenders** SKILL.md (árbol de decisión + regla dura #9 del workspace), **bid-construction-playbook** (Fase 0 arranca con `pnpm tender:new`), **proposal-studio-runtime** (las dos capas: taller/carpeta git vs registro/aggregate). `propuesta-tecnica-economica` ya tenía la costura md→deck.
+
+## 2026-07-15 — Proposal Studio: plantilla reusable de stack de herramientas
+
+- El catálogo `deck-axis` suma `contentType: tool-stack` → `ToolStackFull`: lámina 16:9 reutilizable para mostrar 6–20 herramientas con isotipo/logo aprobado + nombre visible, sin descripciones por herramienta ni layout radial.
+- Se agregó resolver cerrado `tool-logo-asset` y assets autocontenidos en el catálogo para Notion, Frame.io, Adobe suite, Microsoft 365, Semrush, Ahrefs, Brand Visibility Grader, Screaming Frog, bancos licenciados y suites AI. La plantilla nace como gap de TASK-1414/SKY: `CardGridFull` describe capacidades con íconos Solar, no marcas reales.
+- Preview reusable: `docs/commercial/tenders/sky-blog-2026/reusable-slides/tool-stack-preview.json` (`pnpm deck:compose ... --out .captures/sky-tools-template`). Gates: composability/selector/catalog tests `72/72`, preview compuesto, deck SKY completo recompuesto, `task:lint TASK-1414`, `ops:lint --changed`.
+
 ## 2026-07-15 — DSR interno: workspace canónico del deal + scaffolder + manifiesto de artefactos
 
 - Se canoniza el **workspace del deal** (el "DSR interno", F0 del Digital Sales Room): estructura de carpeta estándar + **`pnpm tender:new <slug>`** que la scaffoldea (`bases/` RFP · `research/` investigación INTERNA · `oferta-tecnica.md` copiada del template · `deck-plan.json` · `anexos/` · `*-INTERNO`). Contrato: [TENDER_WORKSPACE_TEMPLATE.md](docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md).

@@ -222,6 +222,18 @@ gcloud run jobs execute artifact-worker --project=efeonce-group --region=us-east
 3. El `audience` por referencia: un artefacto client_facing jamás contiene una referencia
    internal. Es la diferencia entre ganar una licitación y regalar el piso de negociación.
 
+## Delta 2026-07-15 — dos capas: el taller (carpeta git) y el registro (este aggregate)
+
+El deal tiene **dos capas**, y este runtime es la segunda: (1) el **taller** = la carpeta git del deal
+(`docs/commercial/tenders/<slug>/`, `pnpm tender:new`) donde viven las **fuentes** (`oferta-tecnica.md`,
+`deck-plan.json`) que el equipo/agente itera y revisa; (2) el **registro gobernado** = este aggregate
+`Proposal`, que guarda las **salidas versionadas** (los PDF renderizados) + el snapshot de la quote + el
+estado. **Decisión (2026-07-15): las fuentes se quedan como archivos git, NO se vuelven `proposal_assets`**
+(conservan git-review; el composer las lee directo). El aggregate **referencia** la carpeta por
+`proposal_id`; NO la absorbe. La `Proposal` ES el contenedor del deal, no un doc dentro de una carpeta.
+Es también el **F0 del Digital Sales Room** (workspace interno primero; la sala del comprador es una
+proyección posterior — `GREENHOUSE_DIGITAL_SALES_ROOM_*_V1.md`).
+
 ## Delta 2026-07-15 — la versión se DERIVA y la descarga es gobernada (TASK-1412/1413)
 
 **Cambio de contrato en `attachProposalAsset`:** el input **ya NO acepta `version`** — se deriva

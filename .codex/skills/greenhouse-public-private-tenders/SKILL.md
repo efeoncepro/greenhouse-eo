@@ -26,6 +26,7 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 
 ```
 ¿En qué estás?
+├─ Arrancar un deal (workspace/carpeta canónica: bases/research/ofertas/deck/manifiesto)  `pnpm tender:new <slug>` → TENDER_WORKSPACE_TEMPLATE.md
 ├─ Construir la propuesta COMPLETA end-to-end (director de orquesta) . bid-construction-playbook.md
 ├─ Marco legal / norma / inhabilidades / recursos (Chile) ...... chile-publico-marco-legal.md
 ├─ Cómo opera ChileCompra: modalidades, códigos, bases,
@@ -84,6 +85,8 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 6. **Human-in-control en la presentación.** La skill/agente **prepara** el paquete; **nunca** envía una oferta ni firma sin confirmación humana explícita. No almacenar credenciales ni cookies de los portales.
 7. **Evidence-first.** Toda clasificación (fit, monto, plazo, riesgo) cita el campo/documento que la sustenta (nombre vs bases técnicas vs items). Nombre pesa menos que bases técnicas.
 8. **es-CL neutro, tuteo.** Sin voseo ni modismos rioplatenses. Copy visible pasa por `copywriting` / `greenhouse-ux-writing`.
+
+9. **El deal vive en un workspace canónico (el "DSR interno").** Arráncalo con `pnpm tender:new <slug>`: carpeta con `bases/` (RFP) · `research/` (investigación 🔒) · `oferta-tecnica.md` (fuente + ledger de evidencia) · `deck-plan.json` · `artifact-manifest.json` (piezas vivas por enlace) · `anexos/` · `*-INTERNO`. El discriminador que manda es **audiencia**: `research/` + `*-INTERNO` **nunca** cruzan al cliente. Las fuentes son archivos git (NO `proposal_assets`); el aggregate `Proposal` referencia la carpeta por `proposal_id`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
 
 ## Sinergias — tabla de hand-off
 

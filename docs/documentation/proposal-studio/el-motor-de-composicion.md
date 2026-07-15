@@ -64,7 +64,7 @@ Un **catálogo** es una superficie visual completa, empaquetada como datos:
 | **Molde** | El lienzo, las regiones, la safe-area, el chrome, la tipografía — compilado **una vez** |
 | **Destino de salida** | `pdf-merged` o `png-set` |
 
-El catálogo `deck-axis` tiene **25 plantillas**. Es un **catálogo cerrado**: si un contenido no calza
+El catálogo `deck-axis` tiene **29 plantillas**. Es un **catálogo cerrado**: si un contenido no calza
 en ninguna, eso **no** significa "improvisa un layout" — significa que **falta una plantilla**, y eso
 se decide en el catálogo, no en la lámina.
 
@@ -72,7 +72,7 @@ se decide en el catálogo, no en la lámina.
 visual cada tres láminas se lee como un collage y **resta**. Si cualquier autor (o agente) pudiera
 apilar piezas y armar un layout nuevo, el freehand vuelve por la puerta de atrás.
 
-> **Detalle técnico:** `src/lib/artifact-composer/catalogs/deck-axis/` (25 plantillas + `registry.json`
+> **Detalle técnico:** `src/lib/artifact-composer/catalogs/deck-axis/` (29 plantillas + `registry.json`
 > + `resolvers.ts` + `semantic-validators.ts` + `deck-mold.css`). El contrato del catálogo está en
 > `src/lib/artifact-composer/catalog.ts`.
 

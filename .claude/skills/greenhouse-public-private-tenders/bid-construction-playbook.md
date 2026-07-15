@@ -13,6 +13,7 @@ Cárgalo cuando el encargo es **"armar/construir la propuesta de esta licitació
 Cada fase declara: **qué se hace**, **qué skill/companion entra**, y **el output** que alimenta la siguiente.
 
 ### Fase 0 — Intake y lectura de bases
+- **Arranca el workspace del deal:** `pnpm tender:new <slug>` crea la carpeta canónica (el "DSR interno") con `bases/`, `research/`, `oferta-tecnica.md` (del template), `deck-plan.json`, `artifact-manifest.json` y `anexos/`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
 - Ubica la carpeta de la licitación y **lee las bases completas** (objeto, calendario, requisitos, criterios de evaluación, SLA, penalidades, plazo del contrato, garantías/comisiones, formato y plataforma).
 - Extrae lo load-bearing: **fecha de entrega**, cierre de consultas, formato de oferta (PDF/planilla), validez, y quién asume comisiones.
 - **Output:** resumen ejecutivo de las bases + tabla de plazos. Detecta inconsistencias (fechas que chocan) → candidatas a consulta si el plazo aún abre.
