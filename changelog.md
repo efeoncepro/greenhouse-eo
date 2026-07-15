@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — Digital Sales Room (Sala de Ventas): decisión de arquitectura + spec (Proposed, deferred)
+
+- Tras comparar con Trumpet, se documenta la **Sala de Ventas Digital**: un micrositio por deal servido al comprador que reemplaza el PDF estático de una `Proposal` por una superficie viva, versionada y trackeable. La tesis: es **`quote-share` generalizado** de un PDF de cotización a una sala completa de `Proposal` — el repo ya tiene las 3 piezas (token HMAC + `quote_share_views` append-only + página pública `/public/quote/.../[token]`, el modelo headless `render-projection.ts`, y el audience gate del Proposal Studio); la sala las **combina**, no las inventa.
+- Docs nuevos: [GREENHOUSE_DIGITAL_SALES_ROOM_DECISION_V1.md](docs/architecture/GREENHOUSE_DIGITAL_SALES_ROOM_DECISION_V1.md) (decisión + alternativas rechazadas + 4-pilar) + [GREENHOUSE_DIGITAL_SALES_ROOM_ARCHITECTURE_V1.md](docs/architecture/GREENHOUSE_DIGITAL_SALES_ROOM_ARCHITECTURE_V1.md) (split, schema propuesto, carril por token, tracking, capabilities, roadmap F0-F4); registrado en `DECISIONS_INDEX.md`.
+- **Estado: `Proposed (direction endorsed, implementation deferred)` — cero runtime, cero schema, cero task.** Build-vs-buy Trumpet queda como open question honesta. Brecha real identificada: el acceso del comprador necesita un carril por token nuevo (el gate de sesión `canAccessProposalDocument` niega `client`). No autoriza `apps/*`/`packages/*` ni implementación hasta un EPIC formal.
+
 ## 2026-07-15 — Preflight Kinsta SSH/WP-CLI resistente a Vercel
 
 - Se agrega `pnpm public-website:ssh-check`, smoke read-only que valida configuración, llave, autenticación SSH y el WordPress esperado antes de operar Kinsta.

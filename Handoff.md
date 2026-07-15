@@ -1,3 +1,13 @@
+## Sesión 2026-07-15 — Digital Sales Room (Sala de Ventas): ADR + spec, Proposed/deferred (Claude)
+
+> **Pedido:** tras investigar Trumpet (Digital Sales Room), el operador endosó la dirección ("me encanta, podemos hacer el nuestro, no ahora pero podría estar en planes") y pidió crear el ADR + documentación.
+>
+> **Entregado (docs-only, cero runtime):** [GREENHOUSE_DIGITAL_SALES_ROOM_DECISION_V1.md](docs/architecture/GREENHOUSE_DIGITAL_SALES_ROOM_DECISION_V1.md) + [GREENHOUSE_DIGITAL_SALES_ROOM_ARCHITECTURE_V1.md](docs/architecture/GREENHOUSE_DIGITAL_SALES_ROOM_ARCHITECTURE_V1.md) + entrada en `DECISIONS_INDEX.md` + changelog. Diseñado con `arch-architect` (overlay Greenhouse) + subagente de discovery (file:line reales).
+>
+> **La tesis central:** una Sala de Ventas es **`quote-share` generalizado** de un PDF de cotización a una sala completa de `Proposal`. El repo YA tiene las 3 piezas por separado — `quote-share` (token HMAC `qr-verification.ts` + `quote_share_views` append-only `view-tracker.ts` + página `/public/quote/.../[token]` + `/accept` donde el token ES la auth), el modelo headless (`render-projection.ts:90` + `assertEvidenceAllowedForAudience:223` fail-closed), y el audience gate del Proposal Studio — la sala las **combina**. Split: modelo-headless-en-Greenhouse / render-tonto-en-efeonce-think (el de la Radiografía y el informe del Grader). Brecha real: el acceso del comprador necesita carril por token nuevo (el gate de sesión `canAccessProposalDocument:16` niega `client`; el comprador no es tenant).
+>
+> **Estado:** `Proposed (direction endorsed, implementation deferred)`. NO autoriza schema/tasks/apps. Roadmap F0-F4 (F0 = sala interna sin tracking; F4 = salas de marca del cliente, ASaaS, depende de Creative Studio). **Build-vs-buy Trumpet = open question honesta** (construir se justifica por el backend ya existente + ASaaS + loop Nexa; para solo tracking interno, Trumpet es más rápido). Docs funcional/manual diferidas hasta F0 (Platform Documentation Protocol). Sin push.
+
 ## Sesión 2026-07-15 — Kinsta SSH deja de depender de memoria y `.env.local` (Codex)
 
 > **Problema:** durante el cierre de Creative Workflows se interpretó la ausencia de variables SSH y del Kinsta API token como indisponibilidad general de Kinsta, aunque la llave SSH seguía vigente. La causa fue doble: el script temporal leyó el rail REST/Vercel equivocado y `.env.local`, regenerado por Vercel CLI, ya no conservaba `PUBLIC_WEBSITE_KINSTA_*`.
