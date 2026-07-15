@@ -31,6 +31,7 @@
     "process-sequential",
     "timeline",
     "team",
+    "team-gallery",
     "case-study",
     "credentials",
     "pricing",
@@ -333,6 +334,22 @@
       ]
     },
     {
+      "name": "TeamGalleryFull",
+      "kind": "full",
+      "source": "gap",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "team-gallery"
+      ],
+      "prototype": "team-gallery-full.html",
+      "slotsRef": "team-gallery-full.slots.json",
+      "memberAvatar": [
+        "PhotoAsset"
+      ]
+    },
+    {
       "name": "CaseStudySplit",
       "kind": "split",
       "source": "gap",
@@ -455,6 +472,7 @@
       "process-sequential": "ProcessStepsFull",
       "timeline": "TimelineFull",
       "team": "TeamSplit",
+      "team-gallery": "TeamGalleryFull",
       "case-study": "CaseStudySplit",
       "credentials": "CredentialsFull",
       "pricing": "PricingFull",
@@ -467,7 +485,8 @@
       "estructura de N ítems: PILARES paralelos (4, no secuenciales) => FourPillarsFull; PASOS secuenciales (1->2->3) => ProcessStepsFull; fases en el TIEMPO (con fechas) => TimelineFull.",
       "listas: UNA lista de puntos => BulletListSplit; DOS listas paralelas => DualListSplit; capacidades con ícono en GRID => CardGridFull.",
       "texto fuerte: STATEMENT/compromiso/pull-quote/testimonial => QuoteSplit; una IDEA/frase destacada => HighlightWave; PROSA narrativa (enfoque/método) => NarrativeSplit; DOS ideas enfrentadas (contexto+solución) => DualTextSplit.",
-      "comparación: vs COMPETENCIA en pares exactos => ComparisonSplit (no tabla libre); cumplimiento REQUISITO x SLA item por item => RequirementsTableFull."
+      "comparación: vs COMPETENCIA en pares exactos => ComparisonSplit (no tabla libre); cumplimiento REQUISITO x SLA item por item => RequirementsTableFull.",
+      "equipo: ROLES con dedicación (tarjetas con glifo, sin foto) => TeamSplit; el roster con FOTOS REALES del squad (resolver squad-person, allowlist cerrada) => TeamGalleryFull. NUNCA una cara generada por IA en ninguna de las dos."
     ],
     "rules": [
       "Un slide = un content-type = una plantilla. Si el contenido mezcla dos intenciones, dividir en dos slides (no forzar una plantilla híbrida).",

@@ -163,6 +163,49 @@ export const deckAxisResolvers: ResolverRegistry = {
     }
   },
 
+  // ── Fotos REALES del squad ───────────────────────────────────────────────────────────────────
+  //
+  // GUARDRAIL DURO DEL DOMINIO (materializa el `personaAssetContract` pre-declarado en
+  // quote-split/narrative-split): la clave resuelve a `assets/squad/squad-<nombre>.png` por
+  // allowlist CERRADA. Un nombre fuera de la lista → `UnknownResolverValueError` — una cara
+  // generada por IA no puede entrar ni por error de autor, porque su archivo no existe en la
+  // allowlist. Presentar una cara fabricada como parte del equipo es tergiversación.
+
+  'squad-person': {
+    known: ['andres', 'daniela', 'humberly', 'julio', 'luis', 'maria-fernanda', 'melkin', 'valentina'],
+    build: value =>
+      ['andres', 'daniela', 'humberly', 'julio', 'luis', 'maria-fernanda', 'melkin', 'valentina'].includes(value)
+        ? [{ selector: '.photo img', attr: 'src', value: `assets/squad/squad-${value}.png` }]
+        : null
+  },
+
+  /**
+   * `dual-concept-icon` — el glifo de cada columna de DualTextSplit deja de ser chrome fijo (• / ✓):
+   * el autor declara la SEMÁNTICA de la columna y el catálogo pinta el Solar correspondiente.
+   * (Caso fuente: «LA CARRERA DEL BUSCADOR» salía con un bullet genérico — el ícono no decía nada.)
+   */
+  'dual-concept-icon': {
+    known: ['search', 'ai', 'data', 'users', 'target'],
+    build: value => {
+      // Campo OPCIONAL: ausente (el filler planifica los derivados aunque no vengan y el valor
+      // llega como "undefined") → no-op y queda el glifo neutro del prototipo. Un valor real
+      // fuera del mapa sigue siendo UnknownResolverValueError: el typo no degrada en silencio.
+      if (value === 'undefined' || value === '') return []
+
+      const DUAL_CONCEPT_ICON: Record<string, string> = {
+        search: 'magnifer',
+        ai: 'cpu',
+        data: 'chart-2',
+        users: 'users-group-rounded',
+        target: 'target'
+      }
+
+      const icon = DUAL_CONCEPT_ICON[value]
+
+      return icon ? [{ selector: '.cicon svg path', attr: 'd', value: solarIconPath(icon) }] : null
+    }
+  },
+
   // ── Íconos SVG inline ────────────────────────────────────────────────────────────────────────
   // Estas plantillas no usan `<img src>` sino `<svg><path d="…">`: hay que reescribir el `d`.
 

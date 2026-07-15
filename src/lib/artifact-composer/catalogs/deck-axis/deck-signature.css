@@ -70,6 +70,14 @@
   bottom:36px;
 }
 
+/* TeamGalleryFull: canvas navy completo; el padding inferior de la lámina reserva la banda. */
+.signature-TeamGalleryFull {
+  left:0;
+  right:0;
+  margin-inline:auto;
+  bottom:36px;
+}
+
 /* La banda inferior está ocupada: firma lateral superior, antes del recorrido de lectura. */
 .signature-DualTextSplit {
   top:48px;

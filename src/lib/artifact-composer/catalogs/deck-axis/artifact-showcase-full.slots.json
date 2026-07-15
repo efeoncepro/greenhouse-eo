@@ -31,12 +31,18 @@
     },
     "lead": {
       "selector": "[data-slot='lead']",
-      "type": "string",
+      "type": "rich-string",
       "required": true,
       "constraints": {
         "maxCharacters": 190,
         "maxLines": 5,
-        "overflow": "reject"
+        "overflow": "reject",
+        "allowedTags": [
+          "em",
+          "strong",
+          "a"
+        ],
+        "linkPolicy": "un <a href> https:// se imprime como anotación /Link clickeable en el PDF (sanitizador + merge del motor, 2026-07-14); el subrayado del molde es el affordance"
       }
     },
     "artifact": {

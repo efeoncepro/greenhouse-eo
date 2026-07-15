@@ -19,11 +19,11 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import { PDFDocument } from 'pdf-lib'
+import { PDFArray, PDFDict, PDFDocument, PDFName, PDFNumber, PDFString } from 'pdf-lib'
 import { chromium, type Browser, type Page } from 'playwright'
 
 import type { CatalogLayoutHook } from './catalog'
-import type { SlideSpec, SlotContract, SlotValue, TemplateContract } from './contracts'
+import type { DeckPlan, SlideSpec, SlotContract, SlotValue, TemplateContract } from './contracts'
 import { assertAllImagesResolved, assertNoFontFallback, assertSlideHasInk } from './quality-gates'
 import { resolveFieldDirective, type FieldDirective, type ResolverRegistry } from './resolver-contract'
 
@@ -191,7 +191,18 @@ const buildInstructions = (
   for (const [slotName, slotContract] of Object.entries(contract.slots)) {
     const value = slide.slots[slotName]
 
-    if (value === undefined || value === null) continue
+    if (value === undefined || value === null) {
+      // 🔴 Slot OPCIONAL no provisto → se LIMPIA su nodo. Sin esto, el copy de EJEMPLO del
+      // prototipo se imprime tal cual — y los prototipos están escritos contra un cliente real
+      // («Propuesta técnica · SKY» en el footer de la agenda): la siguiente licitación que omita
+      // ese slot le entregaría a SU comité el nombre de OTRO cliente. Es la misma bug class que
+      // el filler ya cerraba para campos de item («quedaría el contenido de ejemplo del
+      // prototipo»), pero a nivel de slot top-level.
+      if (slotContract.consumer === 'validation-only' || slotContract.type.startsWith('fixed-')) continue
+
+      instructions.push({ selector: slotContract.selector, type: 'absent-optional', value: null })
+      continue
+    }
 
     // Evidencia: se valida, NUNCA se pinta. Sin esto, el `sourceRef` de QuoteSplit se escribía sobre
     // el nodo `[data-slot='mode']` —que es la lámina entera— y la borraba.
@@ -234,7 +245,7 @@ const buildInstructions = (
 const fillDom = (instructions: FillInstruction[]): string[] => {
   const problems: string[] = []
 
-  const ALLOWED_TAGS = ['EM', 'STRONG', 'BR', 'SPAN']
+  const ALLOWED_TAGS = ['EM', 'STRONG', 'BR', 'SPAN', 'A']
 
   const sanitize = (html: string): string => {
     const container = document.createElement('div')
@@ -249,7 +260,16 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
         }
 
         for (const attr of Array.from(child.attributes)) {
-          // Un tag permitido no trae atributos: nada de `onclick`, `style`, `href`.
+          // Un tag permitido no trae atributos: nada de `onclick`, `style`, `class`.
+          // Única excepción: `href` en <a>, y sólo hacia https:// o un ancla interna.
+          // Chromium lo imprime como anotación /Link — es lo que hace clickeable el PDF
+          // (la Radiografía y el informe del grader viven en la web; ése es su valor).
+          if (child.tagName === 'A' && attr.name === 'href') {
+            const href = attr.value.trim()
+
+            if (href.startsWith('https://') || href.startsWith('#')) continue
+          }
+
           child.removeAttribute(attr.name)
         }
 
@@ -265,12 +285,36 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
   for (const instruction of instructions) {
     const el = document.querySelector(instruction.selector)
 
+    // Un slot opcional AUSENTE con nodo ausente no es un problema: el prototipo puede no pintarlo.
+    if (!el && instruction.type === 'absent-optional') continue
+
     if (!el) {
       problems.push(`selector sin match en el DOM: ${instruction.selector}`)
       continue
     }
 
     const { type, value } = instruction
+
+    // Slot opcional NO provisto: el copy de ejemplo del prototipo NO puede llegar al PDF.
+    if (type === 'absent-optional') {
+      if (el.tagName === 'IMG') {
+        el.remove()
+        continue
+      }
+
+      // Si el nodo envuelve OTRO slot declarado, arrasarlo destruiría slots vivos: se limpian sólo
+      // los nodos de texto propios (mismo trato que un campo con hijo anotado).
+      if (el.querySelector('[data-slot]')) {
+        for (const child of Array.from(el.childNodes)) {
+          if (child.nodeType === Node.TEXT_NODE) child.remove()
+        }
+
+        continue
+      }
+
+      el.innerHTML = ''
+      continue
+    }
 
     if (type === 'string') {
       el.textContent = String(value)
@@ -712,7 +756,8 @@ export const fillSlide = async (
   templateHtmlPath: string,
   slide: SlideSpec,
   contract: TemplateContract,
-  runtime: CatalogRenderRuntime
+  runtime: CatalogRenderRuntime,
+  deckPlan?: DeckPlan
 ): Promise<void> => {
   // esbuild/tsx compila las funciones con `keepNames`, que las envuelve en un helper `__name`.
   // Ese helper existe en el bundle de Node, NO dentro del browser — y `page.evaluate` serializa la
@@ -739,7 +784,7 @@ export const fillSlide = async (
 
   // Layout derivado post-fill del catálogo (los conectores de TimelineFull no pueden ser un slot
   // autorado: labels, rombos y conectores deben salir del MISMO schedule o podrían discrepar).
-  await runtime.layoutHooks?.[slide.template]?.(page, slide)
+  await runtime.layoutHooks?.[slide.template]?.(page, slide, deckPlan)
 
   // Las fuentes pueden re-layoutear tras escribir el copy: esperar de nuevo evita capturar un frame
   // con el fallback de sistema (un deck con la tipografía equivocada es un deck fuera de marca).
@@ -782,8 +827,52 @@ export const mergeSlidePdfs = async (slidePdfPaths: string[], outPath: string): 
     const slideDoc = await PDFDocument.load(bytes)
     const pages = await deck.copyPages(slideDoc, slideDoc.getPageIndices())
 
-    for (const page of pages) {
+    for (const [index, page] of pages.entries()) {
       deck.addPage(page)
+
+      // ⚠️ `copyPages` DESCARTA las anotaciones (medido: un slide con /URI llega al merge con 0).
+      // Los enlaces del deck son su valor probatorio —la Radiografía y el informe del grader viven
+      // en la web para que el comité los verifique solo—, así que se re-crean a mano. Sólo se
+      // porta la clase que el catálogo produce (Link → URI https); todo lo demás se ignora.
+      const sourceAnnots = slideDoc.getPage(index).node.Annots()
+
+      if (!sourceAnnots) continue
+
+      const portedRefs = []
+
+      for (let i = 0; i < sourceAnnots.size(); i++) {
+        const annot = sourceAnnots.lookup(i)
+
+        if (!(annot instanceof PDFDict)) continue
+        if (annot.lookup(PDFName.of('Subtype')) !== PDFName.of('Link')) continue
+
+        const action = annot.lookup(PDFName.of('A'))
+
+        if (!(action instanceof PDFDict)) continue
+        if (action.lookup(PDFName.of('S')) !== PDFName.of('URI')) continue
+
+        const uri = action.lookup(PDFName.of('URI'))
+        const rect = annot.lookup(PDFName.of('Rect'))
+
+        if (!(uri instanceof PDFString) || !(rect instanceof PDFArray)) continue
+        if (!uri.decodeText().startsWith('https://')) continue
+
+        portedRefs.push(
+          deck.context.register(
+            deck.context.obj({
+              Type: 'Annot',
+              Subtype: 'Link',
+              Rect: rect.asArray().map(value => (value instanceof PDFNumber ? value.asNumber() : 0)),
+              Border: [0, 0, 0],
+              A: { Type: 'Action', S: 'URI', URI: PDFString.of(uri.decodeText()) }
+            })
+          )
+        )
+      }
+
+      if (portedRefs.length > 0) {
+        page.node.set(PDFName.of('Annots'), deck.context.obj(portedRefs))
+      }
     }
   }
 
@@ -931,7 +1020,8 @@ export const renderSlide = async (
   slide: SlideSpec,
   contract: TemplateContract,
   target: RenderTarget,
-  runtime: CatalogRenderRuntime
+  runtime: CatalogRenderRuntime,
+  deckPlan?: DeckPlan
 ): Promise<void> => {
   const page = await browser.newPage({
     viewport: contract.viewport,
@@ -940,7 +1030,7 @@ export const renderSlide = async (
   })
 
   try {
-    await fillSlide(page, templateHtmlPath, slide, contract, runtime)
+    await fillSlide(page, templateHtmlPath, slide, contract, runtime, deckPlan)
 
     // Antes de imprimir NADA: si el copy no cabe, se rechaza. Un PDF con una palabra cortada es
     // peor que un fallo — se ve terminado, y nadie lo revisa dos veces.

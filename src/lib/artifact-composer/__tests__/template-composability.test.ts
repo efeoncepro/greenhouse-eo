@@ -159,4 +159,75 @@ return
     },
     60_000
   )
+
+  /**
+   * ANTI-FUGA DE PROTOTIPO (2026-07-14) — la garantía de REUTILIZACIÓN entre licitaciones.
+   *
+   * Los prototipos están escritos contra un cliente real («Propuesta técnica · SKY» en el footer de
+   * la agenda, «5 roles enfocados en SKY» en team-split). El probe de arriba llena TODOS los slots,
+   * así que nunca podía ver la fuga: un deck REAL que omita un slot OPCIONAL heredaría el copy de
+   * ejemplo — y la siguiente licitación le entregaría a su comité el nombre de OTRO cliente.
+   *
+   * Este probe se pone en los zapatos del autor MÁS PEREZOSO legal: sólo los required. Ningún slot
+   * opcional puede conservar texto del prototipo (el filler los limpia — `absent-optional`).
+   */
+  it.each(registry.templates.map(t => [t.name, t] as const))(
+    '%s — un slot opcional omitido NO filtra el copy del prototipo',
+    async (_name, entry) => {
+      const contract: TemplateContract = JSON.parse(await fs.readFile(path.join(DIR, entry.slotsRef), 'utf8'))
+
+      const slots: Record<string, unknown> = {}
+      const optionalSelectors: string[] = []
+
+      for (const [slotName, slotContract] of Object.entries(contract.slots)) {
+        if (slotContract.type.startsWith('fixed-')) continue
+
+        if (slotContract.required) {
+          slots[slotName] = synthesize(slotContract)
+        } else if (slotContract.consumer !== 'validation-only') {
+          optionalSelectors.push(slotContract.selector)
+        }
+      }
+
+      if (optionalSelectors.length === 0) return
+
+      const page = await browser.newPage({ viewport: contract.viewport })
+
+      try {
+        const slide = {
+          slideId: 'prototype-leak-probe',
+          contentType: entry.contentTypes[0],
+          template: entry.name,
+          slots
+        } as unknown as SlideSpec
+
+        await fillSlide(page, path.join(DIR, entry.prototype), slide, contract, deckAxisCatalog)
+
+        const leaks = await page.evaluate(selectors => {
+          const found: string[] = []
+
+          for (const selector of selectors) {
+            const node = document.querySelector(selector)
+
+            if (!node) continue
+
+            const text = (node.textContent ?? '').trim()
+
+            if (text.length > 0) found.push(`${selector} → "${text.slice(0, 60)}"`)
+            if (node.tagName === 'IMG' || node.querySelector('img')) found.push(`${selector} → <img> del prototipo`)
+          }
+
+          return found
+        }, optionalSelectors)
+
+        expect(
+          leaks,
+          `${entry.name}: slots opcionales omitidos conservan contenido del prototipo — eso viaja al PDF de la PRÓXIMA licitación:\n  ${leaks.join('\n  ')}`
+        ).toEqual([])
+      } finally {
+        await page.close()
+      }
+    },
+    60_000
+  )
 })

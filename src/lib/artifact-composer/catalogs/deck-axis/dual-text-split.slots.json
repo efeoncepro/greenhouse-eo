@@ -2,34 +2,111 @@
   "template": "DualTextSplit",
   "figmaNodeId": "8:14102",
   "version": "0.1",
-  "viewport": { "width": 1920, "height": 1080 },
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
   "slots": {
     "title": {
       "selector": "[data-slot='title']",
       "type": "string",
       "required": true,
-      "constraints": { "maxCharacters": 72, "maxLines": 3, "overflow": "reject" }
+      "constraints": {
+        "maxCharacters": 72,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
     },
     "leftConcept": {
       "selector": "[data-slot='leftConcept']",
       "type": "object",
       "required": true,
-      "constraints": { "paragraphCount": { "min": 1, "max": 2 }, "overflow": "reject" },
+      "constraints": {
+        "paragraphCount": {
+          "min": 1,
+          "max": 2
+        },
+        "overflow": "reject"
+      },
       "shape": {
-        "label": { "type": "string", "maxCharacters": 34, "required": true },
-        "title": { "type": "string", "maxCharacters": 46, "maxLines": 2, "required": true },
-        "paragraphs": { "type": "array", "itemType": "rich-string", "maxCharactersPerItem": 165, "allowedTags": ["strong"] }
+        "label": {
+          "type": "string",
+          "maxCharacters": 34,
+          "required": true
+        },
+        "title": {
+          "type": "string",
+          "maxCharacters": 46,
+          "maxLines": 2,
+          "required": true
+        },
+        "paragraphs": {
+          "type": "array",
+          "itemType": "rich-string",
+          "maxCharactersPerItem": 165,
+          "allowedTags": [
+            "strong"
+          ]
+        },
+        "icon": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "search",
+            "ai",
+            "data",
+            "users",
+            "target"
+          ],
+          "resolver": "dual-concept-icon",
+          "description": "semántica de la columna → glifo Solar del disco (search=magnifer, ai=cpu, data=chart, users=grupo, target=diana); ausente = el glifo neutro del prototipo (punto/check). NUNCA autorado como nombre de ícono."
+        }
       }
     },
     "rightConcept": {
       "selector": "[data-slot='rightConcept']",
       "type": "object",
       "required": true,
-      "constraints": { "paragraphCount": { "min": 1, "max": 2 }, "overflow": "reject" },
+      "constraints": {
+        "paragraphCount": {
+          "min": 1,
+          "max": 2
+        },
+        "overflow": "reject"
+      },
       "shape": {
-        "label": { "type": "string", "maxCharacters": 34, "required": true },
-        "title": { "type": "string", "maxCharacters": 52, "maxLines": 2, "required": true },
-        "paragraphs": { "type": "array", "itemType": "rich-string", "maxCharactersPerItem": 165, "allowedTags": ["strong"] }
+        "label": {
+          "type": "string",
+          "maxCharacters": 34,
+          "required": true
+        },
+        "title": {
+          "type": "string",
+          "maxCharacters": 52,
+          "maxLines": 2,
+          "required": true
+        },
+        "paragraphs": {
+          "type": "array",
+          "itemType": "rich-string",
+          "maxCharactersPerItem": 165,
+          "allowedTags": [
+            "strong"
+          ]
+        },
+        "icon": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "search",
+            "ai",
+            "data",
+            "users",
+            "target"
+          ],
+          "resolver": "dual-concept-icon",
+          "description": "semántica de la columna → glifo Solar del disco (search=magnifer, ai=cpu, data=chart, users=grupo, target=diana); ausente = el glifo neutro del prototipo (punto/check). NUNCA autorado como nombre de ícono."
+        }
       }
     },
     "outcome": {
@@ -37,8 +114,20 @@
       "type": "object",
       "required": true,
       "shape": {
-        "label": { "type": "string", "maxCharacters": 22, "required": true },
-        "text": { "type": "rich-string", "maxCharacters": 90, "maxLines": 2, "allowedTags": ["strong"], "required": true }
+        "label": {
+          "type": "string",
+          "maxCharacters": 22,
+          "required": true
+        },
+        "text": {
+          "type": "rich-string",
+          "maxCharacters": 90,
+          "maxLines": 2,
+          "allowedTags": [
+            "strong"
+          ],
+          "required": true
+        }
       }
     }
   }

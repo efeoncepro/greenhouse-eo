@@ -1,6 +1,108 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
-<!-- manifest-digest: f38c1ab079609bf049f249dac0974fa622c63a115ff3fe5298daa99912102aed -->
+## 2026-07-14 (2ª promoción) — Feedback del operador: deck SKY 22 → 23 + agenda funcional + showcases vivos
+
+**Motor:** los `layoutHooks` del catálogo ganan acceso opcional al `deckPlan` completo
+(`CatalogLayoutHook` 3er parámetro) — chrome que depende de OTRAS láminas (el número de página real
+de un capítulo) se DERIVA, nunca se autora. Render standalone sin plan → el hook no pinta.
+
+**templates/:**
+
+- `AgendaFull.png` — **sin cambio de píxel** (el hook de páginas no pinta sin plan; sólo CSS nuevo `.pg`)
+- `DualTextSplit.png` — los glifos de texto (• / ✓) pasan a **SVG resolvibles** (`dual-concept-icon`:
+  search/ai/data/users/target → Solar); el probe sintético llena el `icon` opcional → glifo nuevo
+- `TeamGalleryFull.png` — lavado ice detrás de las fotos (los recortes flotando sobre blanco puro se
+  veían inconclusos — feedback del operador) + `object-position: bottom`
+- `ArtifactShowcaseFull.png` — `lead` pasa a rich-string (`em/strong/a`); el probe llena texto plano
+  → **sin cambio de píxel esperado**
+
+**sky/ (22 → 23):**
+
+| Frame | Qué pasó |
+|---|---|
+| `08-informe` | 🆕 ArtifactShowcaseFull — **el informe del grader como artefacto**: screenshot real (gauge 61 + dimensiones + motores con logos) con chrome de navegador y la URL tokenizada horneada + **enlace clickeable** en el lead. Pedido explícito del operador (no estaba en la PPT) |
+| `15-muestra` | de HighlightWave a **ArtifactShowcaseFull**: el x-ray real (artículo \| capa de máquina, con chrome + URL) — «ese layout no le hacía justicia al X-ray» (operador) |
+| `18-equipo` | mapeo CONFIRMADO por el operador: Julio (Responsable de Cuenta 12%) · **María Fernanda (SEO Copywriter 50%** — foto encontrada en OneDrive Kit media, fondo removido vía Adobe, allowlist +1) · Daniela (Creative Operations Lead 12%) · Melkin (Senior Visual Designer 30%) · Andrés (SEO Specialist 25%). **Sale Valentina.** + lavado ice tras las fotos |
+| `02-agenda` | **números de página reales por capítulo** (hook derivado del plan: pág. 04/09/10/12/18/22→ posiciones vivas) — «la agenda no está fungiendo como agenda» (operador) |
+| `09-terreno` | íconos con semántica: buscador → lupa (magnifer), IA → cpu — el bullet genérico no decía nada (operador) |
+| renombres byte-idénticos | los 18 frames restantes verificados con `shasum -a 256` contra su baseline previo (18/18 idénticos, sólo desplazamiento por la inserción de `informe` en la posición 8) |
+
+Assets nuevos del catálogo: `assets/squad/squad-maria-fernanda.png` (recorte real) ·
+`assets/product/radiografia-sky-xray.png` · `assets/product/informe-grader-sky.png` (capturas en vivo
+2026-07-14 con chrome + URL horneada).
+
+Aprobado por el operador en sesión 2026-07-14 (feedback sobre los 6 frentes, con mapeo de nombres dictado).
+
+**Manifiesto literal (nombres completos para el matcher del freeze):**
+
+`templates/DualTextSplit.png` · `templates/TeamGalleryFull.png` · `templates/ArtifactShowcaseFull.png` ·
+`templates/AgendaFull.png` ·
+`sky/02-agenda.png` · `sky/08-terreno.png` · `sky/08-informe.png` · `sky/09-operacion.png` ·
+`sky/09-terreno.png` · `sky/10-ciclo.png` · `sky/10-operacion.png` · `sky/11-arranque.png` ·
+`sky/11-ciclo.png` · `sky/12-arranque.png` · `sky/12-lineas.png` · `sky/13-lineas.png` ·
+`sky/13-seo-aeo.png` · `sky/14-muestra.png` · `sky/14-seo-aeo.png` · `sky/15-muestra.png` ·
+`sky/15-portal.png` · `sky/16-portal.png` · `sky/16-portal-vista.png` · `sky/17-equipo.png` ·
+`sky/17-portal-vista.png` · `sky/18-berel.png` · `sky/18-equipo.png` · `sky/19-berel.png` ·
+`sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/20-seguro.png` · `sky/21-cumplimiento.png` ·
+`sky/21-economica.png` · `sky/22-contraportada.png` · `sky/22-economica.png` · `sky/23-contraportada.png`
+
+## 2026-07-14 — Deck SKY 19 → 22 + TeamGalleryFull + enlaces clickeables (iteración de la oferta, licitación Wherex)
+
+**Motor (afecta render, no baseline per-se):** el sanitizador de rich-strings admite `<a href>`
+(sólo `https://` o ancla), `deck-mold.css` estila el anchor (color heredado + subrayado — el default
+UA azul era ilegible sobre navy), y `mergeSlidePdfs` porta las anotaciones `/Link → /URI` que
+`copyPages` de pdf-lib descartaba (medido: Chromium emite 2, el merge llegaba con 0). El PDF final
+lleva 4 anotaciones vivas (informe del grader en `diagnostico`, Radiografía en `muestra`).
+
+**templates/ (27 → 28):**
+
+- `TeamGalleryFull.png` — **NUEVO**. Materializa el `personaAssetContract` pre-declarado en
+  quote-split/narrative-split: roster de FOTOS REALES del squad vía resolver `squad-person`
+  (allowlist cerrada de 7; nombre desconocido → `UnknownResolverValueError`). Canvas navy de
+  TimelineFull (gradientes declarados en `gradient-inventory.json`, 3/4 hashes ya aprobados).
+
+**sky/ (19 → 22) — la iteración completa de la oferta (cifras del run publicado EO-GRUN-00046):**
+
+| Frame | Qué pasó |
+|---|---|
+| `06-citas` | ❌ **MUERTA** — su claim («no aparece ni una sola vez») contradecía el informe público que la lámina invitaba a abrir (skyairline.com = fuente #1, 15 citas). Redundante con `diagnostico` |
+| `04-near-miss` | 🆕 MetricsSplit — las 4 páginas atascadas (Antofagasta 110k/pos12…), evidencia Semrush |
+| `05-capa-tecnica` | 🆕 DualListSplit — no hay capa de SEO técnico instalada (verificado sobre el código fuente 2026-07-14) vs lo que la operación instala |
+| `17-equipo` | 🆕 TeamGalleryFull — 5 fotos reales con rol+nombre+dedicación (⚠️ mapeo persona↔rol = propuesta; lo confirma el operador). Reemplaza al TeamSplit de glifos |
+| `18-berel` | 🆕 HighlightWave — Grupo Berel como referencia verificable (nombre autorizado por el operador 2026-07-14; sin métrica inventada) |
+| `19-seguro` | 🆕 QuoteSplit — penalidades aceptadas íntegras «porque el servicio está diseñado para no gatillarlas» |
+| `02-agenda` | targets re-apuntados (cap 01 → near-miss) + cap 03 «El método» → «La operación» |
+| `03-entendimiento` | el anillo pasa de Estrategia/Producción/Medición al método real de la técnica §4: Base técnica / Autoridad / Entidad (E-E-A-T) |
+| `06-diagnostico` | cifras del run 46: LATAM 17→**16**, «Despegar y TripAdvisor» → fuentes reales (Trustpilot/Wikipedia/Instagram), claim nuevo = **citabilidad propia 0%** (dato publicado del informe) + **enlace clickeable** al informe |
+| `07-escalera` | labels alineados al informe público («Que te encuentre»… antes «Ser encontrada»…) |
+| `08-terreno` | «ningún blog de aerolínea» → «ningún contenido editorial de viaje» (defendible contra el informe) |
+| `09-operacion` | ex-`metodo`: sectionLabel «EL MÉTODO» → «LA OPERACIÓN» (el método de 3 capas vive en `entendimiento`; los 4 frentes son la operación) |
+| `10-ciclo` | «doble» → «triple» control de calidad (alineado con técnica §5: QA editorial + posicionamiento + marca). Atrapado por el shasum de renombre |
+| `11-arranque` | fase 1 «Diagnóstico y quick wins» → «Capa técnica y quick wins» |
+| `14-muestra` | la URL de la Radiografía ahora es **enlace clickeable** (subrayado del molde) |
+| `20-cumplimiento` | summary honesto: «100%» → «9 de 9 · Los nueve, uno a uno, en la §13 de la Oferta Técnica» (mostraba 5 afirmando el total) |
+| `21-economica` | ad-hoc a $260.000 **eliminado** (dominaba al plan ampliado: base+4 ad-hoc = 6,24M < 6,9M; y publicaba el precio unitario — regla dura #2 de pricing). 2 opciones excluyentes + ad-hoc «dentro de la capacidad» en condiciones |
+| renombres byte-idénticos | `portada`(=01) · `ciclo`→10 *(ver arriba)* · `lineas`→12 · `seo-aeo`→13 · `portal`→15 · `portal-vista`→16 · `contraportada`→22 — verificados con `shasum -a 256` contra su baseline previo (6/7 idénticos; ciclo declarado) |
+
+Aprobado por el operador en sesión 2026-07-14 (Berel con nombre · gap del catálogo · href al motor).
+
+**Manifiesto literal de la promoción** (el gate matchea el nombre completo del frame; el renombre
+19→22 desplaza casi toda la numeración — cada nombre viejo que desaparece y cada nombre nuevo que
+aparece está cubierto por la tabla de arriba):
+
+`templates/TeamGalleryFull.png` ·
+`sky/02-agenda.png` · `sky/03-entendimiento.png` · `sky/04-diagnostico.png` · `sky/04-near-miss.png` ·
+`sky/05-escalera.png` · `sky/05-capa-tecnica.png` · `sky/06-citas.png` · `sky/06-diagnostico.png` ·
+`sky/07-terreno.png` · `sky/07-escalera.png` · `sky/08-metodo.png` · `sky/08-terreno.png` ·
+`sky/09-ciclo.png` · `sky/09-operacion.png` · `sky/10-arranque.png` · `sky/10-ciclo.png` ·
+`sky/11-lineas.png` · `sky/11-arranque.png` · `sky/12-seo-aeo.png` · `sky/12-lineas.png` ·
+`sky/13-muestra.png` · `sky/13-seo-aeo.png` · `sky/14-portal.png` · `sky/14-muestra.png` ·
+`sky/15-portal-vista.png` · `sky/15-portal.png` · `sky/16-equipo.png` · `sky/16-portal-vista.png` ·
+`sky/17-cumplimiento.png` · `sky/17-equipo.png` · `sky/18-economica.png` · `sky/18-berel.png` ·
+`sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
+`sky/22-contraportada.png`
+
+<!-- manifest-digest: bb0971593ddfb48a5469d7361c141761ed63c272408ca0fc5c65fba4d84514ea -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.
