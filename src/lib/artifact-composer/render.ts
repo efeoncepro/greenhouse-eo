@@ -819,10 +819,29 @@ export const fillSlide = async (
  * impresión a merced de cómo Chromium pagina iframes y de que las fuentes de cada frame estén listas
  * a tiempo. Imprimir + mergear no tiene ninguno de esos modos de falla.
  */
-export const mergeSlidePdfs = async (slidePdfPaths: string[], outPath: string): Promise<void> => {
+/**
+ * Sentinel de link INTERNO del deck (lo emite el resolver `chapter-anchor` del catálogo): Chromium
+ * sólo imprime anotaciones para URLs absolutas, así que el salto de agenda viaja como URI y el merge
+ * lo convierte en GoTo a la página real. Si el `slideId` no existe en el plan, la anotación se
+ * DESCARTA — el sentinel jamás puede llegar al PDF entregado.
+ */
+const INTERNAL_LINK_SENTINEL = 'https://deck.internal/'
+
+export const mergeSlidePdfs = async (
+  slidePdfPaths: string[],
+  outPath: string,
+  slideIds: string[] = []
+): Promise<void> => {
   const deck = await PDFDocument.create()
 
-  for (const slidePath of slidePdfPaths) {
+  // ⚠️ `copyPages` DESCARTA las anotaciones (medido: un slide con /URI llega al merge con 0).
+  // Los enlaces del deck son su valor probatorio —la Radiografía y el informe del grader viven en
+  // la web para que el comité los verifique solo—, así que se re-crean a mano en DOS pasadas:
+  // primero se agregan TODAS las páginas (un GoTo de la agenda necesita el ref de una página que
+  // aún no existe al copiar la lámina 2), después se materializan las anotaciones.
+  const pending: { pageIndex: number; uri: string; rect: number[] }[] = []
+
+  for (const [slideIndex, slidePath] of slidePdfPaths.entries()) {
     const bytes = await fs.readFile(slidePath)
     const slideDoc = await PDFDocument.load(bytes)
     const pages = await deck.copyPages(slideDoc, slideDoc.getPageIndices())
@@ -830,15 +849,9 @@ export const mergeSlidePdfs = async (slidePdfPaths: string[], outPath: string): 
     for (const [index, page] of pages.entries()) {
       deck.addPage(page)
 
-      // ⚠️ `copyPages` DESCARTA las anotaciones (medido: un slide con /URI llega al merge con 0).
-      // Los enlaces del deck son su valor probatorio —la Radiografía y el informe del grader viven
-      // en la web para que el comité los verifique solo—, así que se re-crean a mano. Sólo se
-      // porta la clase que el catálogo produce (Link → URI https); todo lo demás se ignora.
       const sourceAnnots = slideDoc.getPage(index).node.Annots()
 
       if (!sourceAnnots) continue
-
-      const portedRefs = []
 
       for (let i = 0; i < sourceAnnots.size(); i++) {
         const annot = sourceAnnots.lookup(i)
@@ -857,23 +870,58 @@ export const mergeSlidePdfs = async (slidePdfPaths: string[], outPath: string): 
         if (!(uri instanceof PDFString) || !(rect instanceof PDFArray)) continue
         if (!uri.decodeText().startsWith('https://')) continue
 
-        portedRefs.push(
-          deck.context.register(
-            deck.context.obj({
-              Type: 'Annot',
-              Subtype: 'Link',
-              Rect: rect.asArray().map(value => (value instanceof PDFNumber ? value.asNumber() : 0)),
-              Border: [0, 0, 0],
-              A: { Type: 'Action', S: 'URI', URI: PDFString.of(uri.decodeText()) }
-            })
-          )
-        )
-      }
-
-      if (portedRefs.length > 0) {
-        page.node.set(PDFName.of('Annots'), deck.context.obj(portedRefs))
+        pending.push({
+          pageIndex: slideIndex,
+          uri: uri.decodeText(),
+          rect: rect.asArray().map(value => (value instanceof PDFNumber ? value.asNumber() : 0))
+        })
       }
     }
+  }
+
+  // Segunda pasada: URI externo se porta tal cual; el sentinel interno se convierte en GoTo a la
+  // página del `slideId` (índice en el plan = índice de página: cada lámina es UNA página).
+  const annotsByPage = new Map<number, ReturnType<typeof deck.context.register>[]>()
+
+  for (const { pageIndex, uri, rect } of pending) {
+    let ref
+
+    if (uri.startsWith(INTERNAL_LINK_SENTINEL)) {
+      const targetId = uri.slice(INTERNAL_LINK_SENTINEL.length)
+      const targetIndex = slideIds.indexOf(targetId)
+
+      // Fail-closed: sin destino real no hay anotación — un sentinel nunca se entrega como URL.
+      if (targetIndex < 0 || targetIndex >= deck.getPageCount()) continue
+
+      ref = deck.context.register(
+        deck.context.obj({
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: rect,
+          Border: [0, 0, 0],
+          A: { Type: 'Action', S: 'GoTo', D: deck.context.obj([deck.getPage(targetIndex).ref, 'Fit']) }
+        })
+      )
+    } else {
+      ref = deck.context.register(
+        deck.context.obj({
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: rect,
+          Border: [0, 0, 0],
+          A: { Type: 'Action', S: 'URI', URI: PDFString.of(uri) }
+        })
+      )
+    }
+
+    const refs = annotsByPage.get(pageIndex) ?? []
+
+    refs.push(ref)
+    annotsByPage.set(pageIndex, refs)
+  }
+
+  for (const [pageIndex, refs] of annotsByPage) {
+    deck.getPage(pageIndex).node.set(PDFName.of('Annots'), deck.context.obj(refs))
   }
 
   await fs.writeFile(outPath, await deck.save())

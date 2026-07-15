@@ -138,8 +138,10 @@ descarte**:
 - **Enlaces clickeables en el PDF**: `<a href>` (sólo `https://`) en rich-strings → anotación `/Link`
   real. Eran DOS bugs del motor (sanitizador + `copyPages` que descartaba anotaciones) — arreglados.
   ⚠️ Verificar anotaciones **vía API pdf-lib**, nunca grep (object streams comprimidos).
-- **Agenda funcional**: números de página **derivados del plan** (hook con `deckPlan`; `targetSlideId`
-  → posición viva). **NUNCA** autorar páginas.
+- **Agenda funcional y NAVEGABLE**: números de página **derivados del plan** (hook con `deckPlan`;
+  `targetSlideId` → posición viva) **y salto GoTo a la página real de cada capítulo** (sentinel
+  `deck.internal` del resolver `chapter-anchor`, convertido en el merge; sin destino → se descarta).
+  **NUNCA** autorar páginas.
 - **Anti-fuga de prototipo**: slot opcional no provisto → su nodo **se limpia** en el render. Antes,
   el copy de ejemplo («Propuesta técnica · SKY») viajaba al PDF de la siguiente licitación. Guard: 28
   probes required-only en `template-composability`.

@@ -51,7 +51,11 @@ Capacidades nuevas del motor/catálogo (nacidas iterando la oferta SKY; TODAS do
    **re-crea las anotaciones `/Link → /URI`** sobre la página copiada, porque `copyPages` de pdf-lib
    las **descarta** (medido: Chromium emite la anotación, el merge llegaba con 0). ⚠️ Al verificar
    anotaciones, **NUNCA grep sobre los bytes del PDF**: `deck.save()` usa object streams comprimidos y
-   el regex no ve adentro — se cuenta **vía API pdf-lib** (`page.node.Annots()`).
+   el regex no ve adentro — se cuenta **vía API pdf-lib** (`page.node.Annots()`). **La agenda además
+   SALTA**: el resolver `chapter-anchor` emite el sentinel `https://deck.internal/<slideId>` (Chromium
+   sólo imprime anotaciones para URLs absolutas) y el merge lo convierte en **GoTo a la página real**
+   del slideId — coherente por construcción con los chips «pág. NN» (ambos derivan del plan). Un
+   sentinel sin destino se **DESCARTA**: jamás llega al PDF entregado.
 2. **Anti-fuga de prototipo (la garantía de reutilización entre licitaciones).** Los prototipos están
    escritos contra un cliente real («Propuesta técnica · SKY»). Un slot **opcional no provisto** ahora
    **se limpia** en el render (`absent-optional` en `fillDom`) — antes el copy de ejemplo viajaba al

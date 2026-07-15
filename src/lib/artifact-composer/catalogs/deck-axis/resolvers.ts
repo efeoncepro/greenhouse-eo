@@ -330,9 +330,13 @@ export const deckAxisResolvers: ResolverRegistry = {
   },
 
   'chapter-anchor': {
-    // No es texto: alimenta el `href="#<id>"` — la nav del HTML y el link interno del PDF.
+    // No es texto: alimenta el `href` del capítulo. Se emite como SENTINEL `https://deck.internal/<id>`
+    // porque Chromium sólo imprime anotaciones /Link para URLs absolutas (un `#ancla` cuyo destino
+    // vive en OTRA lámina no emite nada — cada lámina se imprime como documento propio). El merge
+    // (`mergeSlidePdfs`) convierte el sentinel en una anotación GoTo a la PÁGINA REAL del slideId,
+    // y si el destino no existe en el plan, la DESCARTA: el sentinel jamás llega al PDF entregado.
     known: ['<slideId destino>'],
-    build: value => [{ selector: ':self', attr: 'href', value: `#${value}` }]
+    build: value => [{ selector: ':self', attr: 'href', value: `https://deck.internal/${value}` }]
   },
 
   // ── Geometría: lo que impide que la lámina MIENTA ────────────────────────────────────────────

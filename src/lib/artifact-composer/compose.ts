@@ -211,7 +211,8 @@ export const composeArtifact = async (
 
     await mergeSlidePdfs(
       rendered.map(slide => slide.pdf!),
-      pdfPath
+      pdfPath,
+      deckPlan.slides.map(slide => slide.slideId)
     )
 
     const { size: pdfBytes } = await fs.stat(pdfPath)

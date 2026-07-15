@@ -224,7 +224,7 @@ Fuentes canónicas: `docs/architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` �
 
 Tres capacidades del motor que cambian lo que un deck puede afirmar:
 
-1. **Un deck que se LEE puede enlazar su evidencia viva.** `<a href="https://…">` en un rich-slot
+1. **Un deck que se LEE puede enlazar su evidencia viva — y navegarse.** La agenda salta a la página real de cada capítulo (anotaciones GoTo derivadas del plan vía sentinel `deck.internal`, convertidas en el merge; un sentinel sin destino se descarta). Además: `<a href="https://…">` en un rich-slot
    sobrevive el sanitizador (sólo `https://`; todo otro atributo se borra), Chromium lo imprime como
    anotación `/Link` y el merge la porta al PDF final (pdf-lib `copyPages` la descartaba — bug real,
    medido). El molde estila el anchor (color heredado + subrayado). ⚠️ Verificar anotaciones **vía API
