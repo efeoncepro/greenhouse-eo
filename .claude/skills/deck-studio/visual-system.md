@@ -179,6 +179,47 @@ paleta, objeto único, **cero texto/letras/números/logos**. Recorte con `pnpm a
 — **nunca** color-key ni `trim` (dejan halo). Ojo: **el matting devora los objetos blancos** sobre
 fondo claro.
 
+### El muro de logos de clientes — la confianza, y los gotchas de SVG
+
+Un muro de *"quiénes confían en nosotros"* es prueba social ante el comité. Mismo guardrail que las
+fotos: **el logo es de un cliente REAL** (allowlist cerrada). Un cliente que no lo es es tergiversación.
+
+**El craft para un set HETEROGÉNEO** (logos de colores, tamaños y construcciones distintas — el caso
+real). Se probaron tres tratamientos; **sólo uno aguanta "premium"** (aprendizaje en vivo 2026-07-15,
+el muro tomó 3 iteraciones con el operador diciendo "HORRIBLE" hasta acertar):
+
+| Tratamiento | Veredicto |
+|---|---|
+| **Cajas blancas** por logo | ❌ genérico — el *"trusted-by"* de plantilla 2015 |
+| **Monocromo** (todos a un tinte) | ❌ para un set con logos de **ícono sólido** (un cuadrado, un sello, una hoja): el filtro los vuelve **manchas/bloques**. Sólo sirve si TODOS son wordmarks limpios |
+| **Color en UN solo panel claro cohesivo** | ✅ un estante claro, logos a color **alineados por ALTURA**, grilla de hairlines. El color da reconocimiento; el panel único da cohesión |
+
+> **Alinea por ALTURA, no por ancho.** Un muro parejo se lee cuando todos los logos comparten la misma
+> altura óptica — no el mismo ancho (un wordmark ancho y un ícono cuadrado al mismo ancho se ven
+> disparejos).
+
+**Destacar UN logo** (el prospecto que ya es cliente): su celda va **oscura con la versión dark del
+logo** — resalta como la única celda oscura entre las claras, más limpio que un anillo sobre claro. Y
+el destaque es **DATO del plan, nunca un literal en el CSS** (es el acoplamiento al primer cliente que
+mata el test del segundo consumidor de `arch-architect`).
+
+**⚠️ Los 3 gotchas de SVG de logos** — queman horas si no los conocés, los tres vistos en vivo:
+
+1. **Máscara de luminancia vacía = logo invisible.** Un export con `<mask style="mask-type:luminance">`
+   SIN contenido enmascara **todo** el grupo a negro → el logo entero desaparece. Fix: quitar la
+   referencia de máscara. *(Un tile "vacío" misterioso casi siempre es esto.)*
+2. **viewBox con espacio en blanco = logo chico.** Si el `viewBox` es más grande que la marca (mucho
+   padding), con `object-fit:contain` la marca sale **diminuta** rodeada de aire. Fix: recortar el
+   viewBox al bounding-box real del trazo.
+3. **Logo diseñado en blanco = se desvanece en claro.** Muchos logos oficiales vienen en su versión
+   *para fondo oscuro* (trazos blancos). Sobre un panel claro **no se ven**. Fix: usar su lockup para
+   fondo claro (recolorear a su color de marca en claro) **o** darle una celda oscura. Ojo con la guía
+   de marca: p. ej. SKY en claro va **morado**, no navy.
+
+> **La regla que los une:** un logo **se mira renderizado sobre el fondo real**, nunca se asume por el
+> archivo. Es el mismo *"míralo en el SET, sobre el fondo real"* de los assets clay — un SVG puede
+> compilar, pasar el build y aun así salir invisible, diminuto o roto.
+
 ### Lo que se lee a stock (y a IA)
 
 Gente-que-no-existe sonriendo · manos estrechándose · gráficos genéricos flotando · el mismo
@@ -228,6 +269,8 @@ MUERE; nunca diseñes dependiendo de él*.
 | 8 | **Deck oscuro que se va a proyectar** sin verificar en sala | el proyector no proyecta negro |
 | 9 | **Motion como parte del argumento** | en el PDF muere |
 | 10 | **Densidad de escenario en un deck que se lee** | lámina muda |
+| 11 | **Muro de logos monocromo con íconos sólidos** | los vuelve manchas/bloques; color en panel claro |
+| 12 | **Logo asumido por el archivo, no mirado renderizado** | máscara vacía / viewBox con aire / trazo blanco en claro = invisible o diminuto |
 
 ---
 
@@ -242,6 +285,10 @@ MUERE; nunca diseñes dependiendo de él*.
   se pide.**
 - **NUNCA** un asset clay sin pasar los 3 filtros, y **NUNCA** lo juzgues suelto: **míralo en el SET,
   sobre el fondo real**.
+- **NUNCA** un logo de cliente que no sea un cliente real (allowlist), ni un logo **asumido por el
+  archivo**: míralo renderizado sobre el fondo real (máscara vacía, viewBox con aire o trazo blanco en
+  claro lo dejan invisible/diminuto aunque el SVG "compile"). Muro de logos heterogéneo → **color en
+  panel claro**, alineados por altura; monocromo sólo si TODOS son wordmarks limpios.
 - **NUNCA** contraste bajo 4,5:1 en texto normal. Es piso, no aspiración.
 - **SIEMPRE** curar antes que generar. La librería del equipo es la primera parada.
 - **SIEMPRE** que dudes si algo aporta: **la carga extraneous es presupuesto robado a la

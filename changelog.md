@@ -6,6 +6,13 @@
 - Notion ahora usa errores tipados (`status`, `code`, `retryable`) y las proyecciones no capturan en Sentry los timeouts/429/5xx que el outbox debe reintentar. Los writebacks RpA/FTR/OTD marcan bloques archivados con prefijo terminal auditable y los signals de lag/dead-letter los excluyen.
 - El reader de performance deja de ejecutar DDL runtime sobre `greenhouse_serving.person_operational_metrics`; la tabla/grants pasan a migración y el endpoint cae a `ico_member_metrics` si el read model derivado no está disponible. Rollout pendiente: aplicar migración `20260715161000000_incident-person-operational-serving-runtime-ddl.sql` y redeploy app/ops-worker.
 
+## 2026-07-15 — Composer: 2 plantillas de prueba social (`ClientLogosFull` + `TestimonialsFull`) + 🏆 primera licitación enviada programáticamente
+
+- 🏆 **Hito:** la oferta SKY Airline (blog, plataforma Wherex) se compuso y **envió end-to-end con el Artifact Composer** — la primera licitación de Efeonce armada de forma programática. El deck vigente tiene 28 láminas y el PDF quedó entregado en OneDrive `Licitaciones/Sky Airlines/`.
+- Dos plantillas **domain-free** nuevas en el catálogo `deck-axis`: `ClientLogosFull` (contentType `client-logos`) arma un muro de logos de clientes a color sobre panel claro, con allowlist `client-logo-asset`, destaque por `emphasis` como dato y una banda «+90 empresas» verificada; `TestimonialsFull` (contentType `testimonials`) rinde 2 citas verbatim con el validador `testimonials-sourced`, que exige atribución nombrada + `proofLink` con `href`. El framing es honesto — relación y confianza, no resultados SEO.
+- El deck SKY pasa de 26 a 28 láminas: clientes y testimonios entran en el cluster de prueba social (berel → clientes → testimonios → seguro). Para las plantillas se internalizaron 7 logos; `sky.svg` migró a su versión dark + `viewBox` recortado y `aguas-andinas.svg` quedó desenmascarado (una máscara de luminancia vacía ocultaba el logo) + wordmark recoloreado.
+- Gates: suite Composer `223` verde, color-ledger + gradient-inventory verdes (recipes/tokens canónicos, cero HEX ni gradientes literales), visual-gate `--freeze` 61 frames a 0 píxeles (single-owner, ISSUE-122). Commit `297de0261`; delta canónico en [BASELINE_DELTAS.md](scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md) (§2026-07-15 · Deck SKY 26→28).
+
 ## 2026-07-15 — `CoverFull` canonizada y deck SKY v6
 
 - La portada reusable conserva su lockup centrado de cuatro elementos y sube la jerarquía de marca: wordmark Efeonce de 650 a 840px, marca cliente on-dark nativa, tipo de propuesta y URL Bubble fija. La recipe `cover-hero` concentra un halo cyan/teal detrás del lockup y controla la presencia violeta sin recuperar el gradiente multicolor histórico.

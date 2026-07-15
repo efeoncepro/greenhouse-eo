@@ -87,7 +87,7 @@ qué segundo y qué es soporte. Si todo pesa lo mismo, la lámina no comunica.
 
 ---
 
-## El catálogo — 28 plantillas
+## El catálogo — 33 plantillas
 
 Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 
@@ -112,7 +112,8 @@ Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 | `CaseStudySplit` | **caso acreditado** (contexto → acción → resultado + métrica) |
 | `PricingFull` | **oferta económica** (total · desglose · condiciones) |
 | `RequirementsTableFull` | **matriz de cumplimiento** técnico × SLA |
-| `CredentialsFull` | clientes / credenciales (prueba social) |
+| `CredentialsFull` · `ClientLogosFull` · `TestimonialsFull` | prueba social (credenciales · **muro de logos de clientes** · **testimonios verbatim**) |
+| `ToolStackFull` · `DailyOpsHubFull` · `ContentHubAnatomyFull` | stack operativo · día a día colaborativo · anatomía de entregable |
 | `EvidenceStoryGrid` · `HumanImpactFull` | provisionales |
 
 ### Las que puntúan (no son opcionales)
@@ -150,6 +151,46 @@ descarte**:
 - **`dual-concept-icon`** (DualTextSplit): semántica de columna (`search|ai|data|users|target`) → Solar.
 
 Detalle completo: `docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` → §Delta 2026-07-14.
+
+## Delta 2026-07-15 — prueba social reusable + 🏆 PRIMERA oferta enviada programáticamente
+
+**🏆 Hito:** la oferta **SKY Airline** (blog, plataforma **Wherex**) se **compuso y ENVIÓ** end-to-end con
+el composer — **la primera licitación de Efeonce hecha de forma programática.** Deck de 28 láminas, PDF a
+OneDrive `Licitaciones/Sky Airlines/`. Prueba viva de que el motor sirve para un entregable real de alto
+riesgo.
+
+Dos plantillas **domain-free** de prueba social entran al catálogo, en el cluster de cierre
+(`berel → clientes → testimonios → seguro`, antes de la económica):
+
+- **`ClientLogosFull`** (`client-logos`): muro de confianza — panel claro cohesivo con hasta 8 logos de
+  clientes **a color** alineados por altura. El logo sale de la **allowlist cerrada** `client-logo-asset`
+  (`CLIENT_LOGO` en `resolvers.ts`): **un cliente nuevo exige asset nuevo — NUNCA un cliente inventado ni
+  un logo ad-hoc.** Exactamente uno lleva `emphasis='primary'` (resolver `client-logo-emphasis`) — es
+  **DATO del plan, no un literal** en el template/CSS (hardcodear "el destacado" es el acoplamiento al
+  primer cliente que el motor existe para evitar). Banda de amplitud con cifra **verificada del sitio**,
+  no fabricada. Desambiguación: muro de logos → `ClientLogosFull`; credenciales con texto → `CredentialsFull`.
+- **`TestimonialsFull`** (`testimonials`): dos citas **verbatim** de terceros reales + enlace a la muestra
+  viva. Validador semántico `testimonials-sourced`: **atribución nombrada** (un genérico "un cliente" es
+  rechazo) + `proofLink` con **href absoluto** (la fuente verificable). El testimonio **NO se pule el
+  tono** — editar la cita de un tercero es fabricación. Desambiguación: DOS testimonios enfrentados →
+  `TestimonialsFull`; UNA cita/statement propio → `QuoteSplit`.
+
+**Invariantes tender-específicos (anti-fabricación):**
+
+- El muro de clientes es prueba social ante un comité: **el logo es de un cliente REAL** (allowlist) — la
+  misma disciplina que las fotos del squad. Un cliente que no lo es = tergiversación.
+- El testimonio se enmarca por lo que **ES**: **relación / confianza**, NUNCA "resultados de nuestro
+  servicio". Las citas de SKY hablan de automatizaciones/procesos → se venden como un año de relación,
+  no como SEO/AEO.
+- **Marca SKY:** destacado = celda **navy + versión dark del logo** (letras blancas + chevron verde); en
+  fondo claro las letras de SKY van **MORADO** (variante `sky-light` pendiente). Anotado en `resolvers.ts`.
+
+**El CRAFT (reusable, NO tender)** — cómo se arma un muro de logos premium para un set heterogéneo (color
+en panel claro cohesivo; nunca monocromo ni cajas sueltas) y los **gotchas de SVG de logos** (máscara de
+luminancia vacía que oculta todo, viewBox con espacio en blanco que achica el logo, logos diseñados en
+blanco que se desvanecen en claro) → **[`deck-studio/visual-system.md`](../deck-studio/visual-system.md)**.
+
+Detalle completo: `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` → §Delta 2026-07-15.
 
 ## El selector — cómo se elige la plantilla
 

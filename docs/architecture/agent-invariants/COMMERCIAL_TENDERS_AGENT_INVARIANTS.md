@@ -83,6 +83,40 @@ Capacidades nuevas del motor/catálogo (nacidas iterando la oferta SKY; TODAS do
 
 ---
 
+## Delta 2026-07-15 — prueba social reusable (muro de logos + testimonios) · 🏆 primera oferta enviada programáticamente
+
+**🏆 Hito:** la oferta **SKY Airline** (blog, plataforma **Wherex**) se compuso y **ENVIÓ** end-to-end con
+el composer — la primera licitación de Efeonce hecha de forma programática. Dos plantillas nuevas
+domain-free, con gate, en el cluster de prueba social del cierre (`berel → clientes → testimonios → seguro`):
+
+1. **`ClientLogosFull`** (contentType `client-logos`): muro de logos de clientes **a color** en panel
+   claro cohesivo. El logo sale de la **allowlist cerrada** `client-logo-asset` (`CLIENT_LOGO` en
+   `resolvers.ts`) — misma disciplina que `squad-person`: **un cliente nuevo exige asset nuevo; NUNCA un
+   cliente inventado ni un logo ad-hoc.** Presentar como "cliente" a quien no lo es es tergiversación
+   ante el comité. El logo destacado se declara por `emphasis='primary'` (resolver `client-logo-emphasis`)
+   — es **DATO del plan, NUNCA un literal** en el template/CSS (hardcodear "el destacado" acopla el motor
+   al primer cliente). La banda de amplitud lleva una **cifra verificada** del sitio público, no fabricada.
+   Desambiguación: muro de logos → `ClientLogosFull`; credenciales con texto → `CredentialsFull`.
+2. **`TestimonialsFull`** (contentType `testimonials`): dos citas **verbatim** de terceros reales + enlace
+   a la muestra viva. Validador semántico `testimonials-sourced`: exige **atribución nombrada** (un
+   genérico "un cliente" = rechazo) + `proofLink` con **href absoluto** (la fuente verificable). El
+   testimonio **NO se edita ni se pule el registro** — alterar la cita de un tercero es fabricación. **Se
+   enmarca por lo que ES: relación/confianza, NUNCA "resultados de nuestro servicio"** (las citas de SKY
+   hablan de automatizaciones/procesos → un año de relación, no SEO/AEO). Desambiguación: DOS testimonios
+   enfrentados → `TestimonialsFull`; UNA cita/statement propio → `QuoteSplit`.
+
+**Marca del cliente en el muro:** el destacado va en **celda oscura con la versión dark del logo**; en
+fondo claro respetar la guía del cliente (SKY = letras **moradas**, no navy). Fixes de asset vistos en
+vivo (el craft reusable vive en `deck-studio/visual-system.md`): máscara de luminancia vacía que oculta
+el logo, viewBox con espacio en blanco que lo achica, logo diseñado en blanco que se desvanece en claro.
+**Un logo se mira RENDERIZADO sobre el fondo real** — puede compilar y aun así salir invisible/diminuto.
+
+**Gate/canon:** cero HEX y cero gradientes literales en las plantillas (recipes/tokens canónicos);
+`color-ledger` + `gradient-inventory` verdes **sin tocar el inventario**; `visual-gate --freeze` a 0 px
+(single-owner, `ISSUE-122`); delta en `BASELINE_DELTAS.md` §2026-07-15.
+
+---
+
 ## ⚠️ Dirección canónica (ADR `GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`, Accepted 2026-07-12)
 
 **El motor NO es del dominio comercial.** Se extrae como primitive de plataforma y las superficies pasan a
@@ -127,6 +161,14 @@ del contrato si se adjudica. De ahí salen los tres principios; todo lo demás s
   gigante del prototipo es **fabricación gráfica**: el evaluador ve una mejora que no ocurrió.
 - **NUNCA** generes una cara del squad con IA. El evaluador cruza el CV contra la persona. Si falta la
   foto de alguien, **se pide la foto**. No se fabrica. (Fotos reales: `assets/squad/squad-<nombre>.png`.)
+- **NUNCA** pongas en el muro de clientes (`ClientLogosFull`) un logo de quien **no es un cliente real**.
+  Sale de la allowlist cerrada `client-logo-asset` — misma disciplina que las fotos del squad. Un
+  "cliente" que no lo es es tergiversación, y la cifra de amplitud ("+N empresas") va **verificada**, no
+  inventada.
+- **NUNCA** publiques un testimonio (`TestimonialsFull`) sin **atribución nombrada** + fuente verificable
+  (`proofLink` con href), y **NUNCA edites el registro de la cita** de un tercero (pulir el tono = fabricar
+  la cita). El testimonio se enmarca por lo que **ES** (relación/confianza), nunca como un resultado del
+  servicio que no prueba.
 - **NUNCA** afirmes un negativo sin medirlo. Decir "la IA no cita a la marca" sin correr el AI Visibility
   Grader es afirmar algo falso en un documento contractual. **Mide, no infieras** (caso SKY: la primera
   versión afirmó un negativo que el grader desmintió).
