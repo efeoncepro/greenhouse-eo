@@ -1,3 +1,13 @@
+## Sesión 2026-07-15 — Roadmap cockpit runtime OFF (Codex)
+
+> **Pedido:** apagar/eliminar el módulo Roadmap porque el warning Turbopack por patrón amplio hacía el build demasiado molesto y lento para una superficie de bajo uso.
+>
+> **Cambio:** `/roadmap` fue retirado del App Router y sale del menú/catálogo de vistas. `GET /api/roadmap/work-items` y `GET /api/roadmap/work-items/[id]` preservan auth/capability pero responden `410 roadmap_disabled`. `next.config.ts` eliminó `outputFileTracingIncludes` para `docs/{epics,tasks,mini-tasks,issues}/**/*.md`, sacando el backlog Markdown del trace runtime.
+>
+> **Frontera:** no se borró `src/lib/roadmap/**` ni `src/views/greenhouse/roadmap/**`; quedan como referencia histórica para una futura proyección externa/materializada/local-first. No reactivar leyendo `docs/**` desde Next runtime.
+>
+> **Evidencia:** `pnpm build` verde sin warning Turbopack de `work-item-index/reader.ts`; `/roadmap` ya no aparece en la tabla de rutas. Tambien pasaron ESLint puntual, `pnpm route-reachability-gate`, `pnpm design:lint`, `pnpm docs:closure-check`, `pnpm docs:context-check`, `pnpm ops:lint --changed` y `pnpm qa:gates --changed --agent codex --runtime --auth --docs` como advisory. No se corrio GVC porque se retiro una ruta/superficie en vez de introducir UI nueva.
+
 ## Sesión 2026-07-15 — Creative Workflows: jerarquía de lectura y firma `🍏🍏🍏` (Codex)
 
 > **Pedido:** aplicar negritas equilibradas en todo el artículo, resolver la sección metodológica que rompía el

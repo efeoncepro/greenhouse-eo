@@ -660,15 +660,6 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'internal'
   },
   {
-    viewCode: 'plataforma.roadmap',
-    section: 'plataforma',
-    label: 'Roadmap',
-    description:
-      'Cockpit del backlog operativo (epics, tasks, mini-tasks e incidentes) leído del índice Markdown read-only. Recurso interno transversal — clientes no acceden.',
-    routePath: '/roadmap',
-    routeGroup: 'internal'
-  },
-  {
     viewCode: 'plataforma.knowledge',
     section: 'plataforma',
     label: 'Knowledge',

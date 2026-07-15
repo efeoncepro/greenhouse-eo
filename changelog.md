@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — Roadmap cockpit sale del runtime del portal
+
+- Se deshabilito `/roadmap` y `GET /api/roadmap/work-items*`: el menu ya no ofrece el cockpit y los endpoints preservan auth/capability pero responden `410 roadmap_disabled`.
+- `next.config.ts` deja de bundlear `docs/{epics,tasks,mini-tasks,issues}/**/*.md` con `outputFileTracingIncludes`. El reader filesystem de TASK-1152/1153 queda como referencia historica fuera del grafo vivo.
+- Motivo: el modulo tenia bajo uso y disparaba el warning Turbopack de patron dinamico amplio, trazando decenas de miles de archivos durante build. La solucion futura debe mover el indice a una herramienta externa/materializada/local-first, no volver a leer `docs/**` desde el runtime del portal.
+
 ## 2026-07-15 — El primer blogpost agentic end to end se convierte en canon operativo
 
 - La Pillar publicada recibe su pasada final de lectura: `99` énfasis `<strong>` distribuidos por todo el

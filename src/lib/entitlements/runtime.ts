@@ -138,11 +138,10 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
     })
 
-    // TASK-1152 — Roadmap work item index (backlog operativo interno repo-native).
-    // Read-only para usuarios internos (route_group internal ∪ admin). El backlog
-    // es operación interna del repo; los clientes (`client_*`) NO lo ven por
-    // construcción del grant. Gated en GET /api/roadmap/work-items + future cockpit
-    // (TASK-1153, "main menu, non-admin" → internal collaborators incluidos).
+    // TASK-1152 — capability histórica del Roadmap work item index.
+    // Runtime OFF desde 2026-07-15; se conserva el grant interno para que los
+    // endpoints apagados puedan responder 410 después de auth/capability y para
+    // evitar una deprecación de access sin migration dedicada.
     addEntitlement(entries, {
       module: 'roadmap',
       capability: 'roadmap.work_items.read',

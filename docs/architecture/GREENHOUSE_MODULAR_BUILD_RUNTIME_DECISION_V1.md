@@ -27,6 +27,8 @@ La decisión debe optimizar tres resultados a la vez: costo remoto, ergonomía l
 
 **Resultado final 2026-07-10:** la propuesta queda rechazada en este evidence gate. TASK-1379 mejoró clean p50 19,9% y redujo 88,6–96,2% los artifacts Roadmap, pero warm RSS p95 empeoró 9,8% hasta 8,25 GB. Como el gate exigía reducir RSS al menos 10%, no se autoriza workspace foundation, `apps/*`, `packages/*` ni nuevos deployables. El cutover experimental fue revertido.
 
+**Delta 2026-07-15:** el operador decidió apagar el cockpit Roadmap por bajo uso y fricción recurrente de Turbopack. `/roadmap` queda fuera del menú/runtime, `GET /api/roadmap/work-items*` responde `410 roadmap_disabled` y se retira `outputFileTracingIncludes` para `docs/{epics,tasks,mini-tasks,issues}/**/*.md`. Esto no acepta el artifact gzip de TASK-1379 ni habilita multi-deployable; solo elimina el hotspot runtime actual. Cualquier reactivación debe diseñar una proyección fuera del runtime del portal.
+
 Si `TASK-1376` confirma el baseline y una primera frontera con beneficio neto, Greenhouse evolucionará incrementalmente desde una única aplicación Next.js hacia un **modular monorepo con múltiples unidades desplegables**, manteniendo por defecto un **modular monolith de dominio y datos**.
 
 La migración seguirá un patrón strangler y estas reglas:

@@ -7,9 +7,9 @@ import 'server-only'
  * salud → índice tipado `roadmap-work-item-index.v1`, read-only y cacheado por
  * fingerprint. NUNCA muta archivos, lifecycle ni Markdown (invariante de la task).
  *
- * Filesystem en runtime: en Vercel los `docs/**` se bundlean vía
- * `outputFileTracingIncludes` (ver `next.config.ts`). El root se resuelve con
- * `process.cwd()`.
+ * Estado vigente: el runtime Roadmap esta deshabilitado y `docs/**` ya no se
+ * bundlea en Next. Este reader queda como referencia historica; no importarlo
+ * desde rutas/paginas vivas sin redisenar primero una proyeccion materializada.
  */
 import type { Dirent } from 'node:fs'
 import { readFile, readdir, stat } from 'node:fs/promises'

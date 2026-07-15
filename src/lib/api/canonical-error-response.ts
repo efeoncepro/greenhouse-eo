@@ -76,6 +76,7 @@ export type CanonicalErrorCode =
   | 'nexa_action_failed'
   // Roadmap cockpit — work item Markdown lookup (TASK-1153 follow-up).
   | 'roadmap_work_item_not_found'
+  | 'roadmap_disabled'
   // ICO sync activation gobernada (TASK-1171 Slice 3).
   | 'ico_sync_client_not_found'
   | 'ico_sync_source_not_connected'
@@ -294,6 +295,11 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   roadmap_work_item_not_found: {
     status: 404,
     message: 'No encontramos ese work item en el backlog. Puede que se haya movido o renombrado.',
+    actionable: false
+  },
+  roadmap_disabled: {
+    status: 410,
+    message: 'El cockpit de Roadmap está deshabilitado mientras se mueve fuera del runtime del portal.',
     actionable: false
   },
   ico_sync_client_not_found: {
