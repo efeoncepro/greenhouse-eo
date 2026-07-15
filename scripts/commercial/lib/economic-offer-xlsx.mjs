@@ -165,7 +165,16 @@ return c
   const money = data.currency === 'CLP' ? clpFmt : `"${data.currency ?? ''}"#,##0`
 
   // ── Render de secciones ─────────────────────────────────────────────────────
+  const KNOWN_SECTION_TYPES = new Set(['value-table', 'totals', 'keyvalue'])
+
   for (const section of data.sections || []) {
+    // Fail-loud: un type desconocido NO puede renderizar un cuerpo en blanco en silencio.
+    if (!KNOWN_SECTION_TYPES.has(section.type)) {
+      throw new Error(
+        `economica.json: tipo de sección desconocido "${section.type}". Válidos: ${[...KNOWN_SECTION_TYPES].join(', ')}.`
+      )
+    }
+
     if (section.title) sectionTitle(section.title)
 
     if (section.type === 'value-table') {
