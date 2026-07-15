@@ -255,11 +255,30 @@ Esto no reemplaza el SEO que las Bases solicitan: **es la forma de cumplir el ob
 
 ## 5. Qué compra el valor mensual
 
-Esta sección responde de forma explícita **qué opera Efeonce cada mes**. El compromiso de publicación es de
-**ocho artículos mensuales como mínimo**; el servicio, sin embargo, es considerablemente más amplio que la
-redacción de esas ocho piezas. Se detalla aquí para que la evaluación disponga de la información completa.
+Esta sección detalla **todo lo que su valor mensual pone a trabajar** sobre la visibilidad de SKY. El
+compromiso visible son ocho artículos al mes; debajo de esa superficie opera un sistema completo — sin que
+SKY tenga que contratar, licenciar ni administrar nada.
 
-El servicio lo opera un **squad dedicado de ≈ 2,2 FTE distribuidos en nueve roles** (§12).
+**El valor mensual incluye cuatro cosas, no ocho piezas:**
+
+- **Un equipo dedicado — SKY no contrata ni gestiona a nadie.** Un squad de **nueve especialistas
+  (≈ 2,2 FTE) dedicados al blog de SKY** (§12): estrategia editorial y SEO, especialista en SEO/AEO y
+  analítica, edición senior, redacción, dirección creativa, diseño visual, producción audiovisual, estrategia
+  de contenido social y un responsable de cuenta como interlocutor único. El equipo llega operando.
+- **Un stack de herramientas y una plataforma propia.** Todas las herramientas de la operación, incluidas y
+  administradas por Efeonce (SEO y análisis de palabras clave, Google Analytics 4 y Search Console, diseño y
+  multimedia). Y la capa que ninguna agencia ni profesional independiente puede ofrecer: el **AI Visibility
+  Grader de Efeonce**, que mide en vivo la presencia de SKY en los cinco motores de respuesta con IA, y un
+  **portal de cliente** donde SKY ve el trabajo y sus resultados sin depender de un informe.
+- **Un proceso, no una redacción.** Cada pieza recorre un proceso de **nueve controles** por cinco roles
+  distintos; y un ciclo mensual que aprende, en el que la medición de cada mes construye la grilla del
+  siguiente. Ningún mes empieza de cero.
+- **Una superficie completa, no ocho piezas.** El servicio opera sobre **Google, los cinco motores de
+  respuesta con IA y el blog completo** — auditoría técnica, datos estructurados, declaración para motores de
+  IA y arquitectura de enlazado. Las ocho piezas son un borde del alcance; lo que SKY compra es su
+  visibilidad, operada de punta a punta.
+
+A continuación, el detalle de esa operación.
 
 ### Antes de escribir una sola línea — Estrategia editorial
 
