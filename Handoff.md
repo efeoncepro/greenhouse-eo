@@ -88,6 +88,21 @@
 > `recurring`/`mixed`; una prestación one-time repetible no se transforma en revenue recurrente. La fórmula no
 > valida Company/Deal associations: el gate final las combina aparte. HubSpot no ofrece endpoint dry-run del
 > parser, por lo que aceptación y propagación siguen pendientes de aprobación + create/readback. No hubo writes.
+>
+> **Convención de propiedades ratificada por el operador:** `name` es el identificador interno `snake_case`,
+> `label` es el nombre visible legible y `groupName` referencia un grupo propio del objeto. Para native Service,
+> el change set usa grupo interno `anam_service_contract`, label visible `Contrato y renovación ANAM`; se crea y
+> verifica el grupo antes de las propiedades. No usar `snake_case` como label ni mezclar este schema en el grupo
+> genérico `service_information`.
+>
+> **Service schema EJECUTADO (17:23 UTC):** con autorización explícita del operador se creó en el portal ANAM
+> `19893546` el grupo native Service `anam_service_contract` / `Contrato y renovación ANAM` y 10 properties:
+> nueve escalares + `anam_service_field_readiness` calculada. Readback confirmó internal names, labels visibles,
+> group, types, field types, uniqueness y options; HubSpot normalizó `displayOrder -1 -> 1` y sólo agregó
+> paréntesis redundantes a la fórmula. Límites calculados post-write: 3/40 total (Deal 2, Service 1). Tras la
+> ventana inicial `null`, el único Service preexistente propagó naturalmente a `incomplete_core`; no se lo tocó
+> para forzar recálculo. **Cero record, workflow, association-label, report o pipeline
+> writes.** No autoriza Services ni backfill. Ejecución/readback: `anam-service-change-set-2026-07-16.md`.
 
 > **Roadmap y Fase 1 — CERRADA:** el plan completo quedó canonizado en
 > `anam-revops-implementation-roadmap-phases-2026-07-16.md` y el contrato/evidencia final en

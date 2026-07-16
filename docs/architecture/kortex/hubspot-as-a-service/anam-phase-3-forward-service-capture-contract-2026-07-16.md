@@ -3,9 +3,9 @@
 > **Date:** 2026-07-16
 > **Client:** ANAM, client of Efeonce
 > **Client portal:** HubSpot `19893546`
-> **Status:** proposed contract; approval required before schema, workflow or record writes
+> **Status:** property schema executed/read back; forward record pilot still requires separate approval
 > **Mode:** live read-only evidence plus deterministic design
-> **HubSpot writes:** none
+> **HubSpot writes:** one Service property group and ten Service property definitions; zero CRM record/workflow/association/report writes
 
 ## Purpose and boundary
 
@@ -66,7 +66,7 @@ Therefore:
 
 ## Proposed Service properties
 
-Native Service fields remain the first choice. The minimum custom set is:
+Native Service fields remain the first choice. The minimum custom set belongs to native Service group `anam_service_contract`, visible as `Contrato y renovación ANAM`. Internal property names use `snake_case`; visible labels use human-readable sentence case.
 
 | Internal name | Mechanism | Purpose |
 |---|---|---|
@@ -83,7 +83,7 @@ Native Service fields remain the first choice. The minimum custom set is:
 
 The calculated readiness property checks the custom fields plus native name, stage, delivery status, dates and owner on the same Service. `review_pending` is distinct from missing deterministic data. `recurring_value_missing` applies only when the reviewed revenue model is `recurring` or `mixed` and ARR is absent or non-positive; a repeatable one-time service is not silently converted into recurring revenue. It cannot prove exactly-one Company, originating Deal, association labels or absence of conflicts; those remain creation/readback gates.
 
-The exact API formula preview and truth table now live in the reconciled Service change set. Its syntax was checked against HubSpot's current API grammar and the live Phase 1 calculated enumeration, but HubSpot has no non-mutating formula-validation endpoint. Parser acceptance, propagation and representative-record readback therefore remain execution gates after separate schema approval. The portal currently uses 2 of 40 calculated-property slots and zero on Service, so capacity is not the blocker.
+The exact API formula and truth table live in the reconciled Service change set. HubSpot accepted the formula and normalized redundant parentheses without changing its semantics. The portal now uses 3 of 40 calculated-property slots: two on Deal and one on Service. After the immediate propagation delay, the sole sample-like Service naturally resolved to `incomplete_core`; no record was modified to trigger it.
 
 Do not create a duplicate custom billing-frequency field merely for convenience. Consumers should follow the originating line item unless a later report proves that a governed read-only projection is necessary.
 
@@ -98,8 +98,8 @@ A later Loyalty experiment may summarize cited activity or transcript evidence o
 Run the forward pilot on 3–5 future won Deal line items:
 
 1. dry-run award-gate output and quarantines;
-2. approve schema separately;
-3. create and read back properties only;
+2. schema creation/readback — completed on 2026-07-16;
+3. calculated-value propagation without modifying the sample-like Service — completed (`incomplete_core`);
 4. approve first Service records separately;
 5. review activation fields with ANAM's designated operator;
 6. rerun idempotency and association checks;
@@ -115,7 +115,7 @@ The following decisions still require ANAM/operator ratification:
 | Blank billing frequency | Treat as unknown and review; never coerce to one-time. |
 | Activation reviewer | Assign an explicit ANAM RevOps/operations owner before workflow activation. |
 
-Schema approval does not approve Service creation, workflow activation, historical migration, legacy-property archival or dashboard publication.
+The completed schema execution does not approve Service creation, workflow activation, historical migration, association-label creation, legacy-property archival or dashboard publication.
 
 ## Official HubSpot references
 

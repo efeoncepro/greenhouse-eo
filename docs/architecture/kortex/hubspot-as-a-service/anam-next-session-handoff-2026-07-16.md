@@ -97,9 +97,9 @@ Kortex repo task `TASK-0130` is in progress.
 
 Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-product-oauth-diagnosis-2026-07-16.md): all three prior grants failed with `Please provide a valid recaptcha value`. A newly generated control-plane URL also omitted required `crm.objects.products.read`, proving deployed Kortex runtime drift from HubSpot build `#13`. With explicit authorization, the operator completed a manually corrected consent. Callback/activation succeeded, the installation is active with 110 scopes and Product properties/search now return HTTP 200 (65 properties, 22 Products). No Product write, deploy or credential rotation occurred. The durable Kortex URL-generation drift remains to be fixed.
 
-## Proposed Phase 3 change set
+## Executed Phase 3 property schema
 
-- Service: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md). Reconciled property enums, renewal/Deal association labels and deterministic line-item provenance; approval is still required and no schema or record writes were executed.
+- Service: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md). Group `anam_service_contract` plus nine scalar and one calculated Service property were created/read back at 17:23 UTC. Calculated readiness propagated naturally to `incomplete_core` on the sample. No CRM records, workflows, association labels or reports were written.
 - Forward capture: [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md). Separates the commercial award gate from human-confirmed Service activation, uses TCV for portfolio value and ARR only for reviewed recurring Retention comparisons, and keeps AI/smart properties out of authoritative controls.
 
 ## Current Phase 1 reporting state
@@ -123,10 +123,8 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 
 ## Next execution order
 
-1. Ratify the five Phase 3 decisions in the forward-capture contract: TCV, ARR, owner inheritance, blank-frequency handling and activation reviewer.
-2. Approve the reconciled Service schema separately. The calculated readiness formula and truth table are previewed; parser acceptance and propagation must be tested only after approval because HubSpot exposes no non-mutating formula-validation endpoint.
-3. Execute schema creation/readback only after approval. Schema approval does not approve Service records or workflows.
-4. Run a 3–5-line-item forward pilot, first as a no-write dry run and then with separate approval for the first Service records.
+1. Ratify the remaining operational decisions in the forward-capture contract: owner inheritance and named activation reviewer. TCV/ARR and blank-frequency semantics are already encoded in the executed schema contract.
+2. Run a 3–5-line-item forward pilot first as a no-write dry run; first Service records still require separate approval.
 5. Confirm activation fields with the named ANAM operator; keep new awards in `New` until operational start is real.
 6. Publish Portfolio/Expiry first after coverage reconciles; Retention and Loyalty remain gated by a complete renewable cohort and ratified signals.
 7. Keep funnel reporting deferred until stage-entry/exit semantics are verified. Do not substitute current-stage counts for true conversion.
@@ -142,4 +140,4 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 
 ## Recommended opening instruction
 
-Continue ANAM HubSpot from this handoff and finish Phase 1 before catalog or Service implementation. Read the Phase 1 contract and report-design reference, inspect current git/runtime state, then audit the `Radar 0%` stage and its report dependencies without writing. Prepare the exact exclusion-or-correction proposal, build won/lost outcome reports only from explicit eligible stage IDs and verify every denominator. Do not create a funnel, pipeline mutation, backfill or other CRM write without the documented gate and explicit approval. Treat the duplicate ANAM Company records as out-of-scope and do not correct or merge them.
+Continue ANAM HubSpot from this handoff without restarting discovery. Phase 1 is complete and the Phase 3 Service property schema plus calculated propagation are live. Prepare the 3–5-line-item forward pilot as a no-write dry run. Do not create Service records, workflows, association labels, historical backfill or final panels without the next documented approval. Treat duplicate ANAM Company records as out-of-scope and do not correct or merge them.

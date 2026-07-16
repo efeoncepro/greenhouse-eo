@@ -14,6 +14,14 @@ Do not use “property type” as one undifferentiated concept. Record all four 
 
 A smart property is not a new deterministic storage type. It is an eligible custom property whose values are filled by a Breeze/Data Agent prompt. API property metadata alone may show the underlying field but not prove the prompt, source selection, credit policy or auto-fill configuration.
 
+## Naming and grouping contract
+
+- `name` is the immutable/internal API identifier and uses stable `snake_case`, for example `anam_awarded_contract_value`.
+- `label` is the human-visible property name and uses readable sentence case, for example `Valor contractual adjudicado`. Never expose `snake_case` as the label.
+- `groupName` is the internal API identifier of an object-specific property group. The group also has its own human-visible `label`.
+- Group properties by business meaning inside the object that owns the fact. Do not place a managed schema in a generic/default group merely because it already exists.
+- Create/read back the group before creating its properties. Record both internal group name and visible label in the change set.
+
 ## Selection matrix
 
 | Mechanism | Use when | Avoid when | Required evidence |

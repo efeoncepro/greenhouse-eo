@@ -25,6 +25,9 @@
   rollup, sync, score y smart fill; una smart property es evidencia AI con créditos, nunca verdad contractual.
   Readiness calculada separa `incomplete_core`, `review_pending`, `recurring_value_missing` y `fields_ready`;
   no valida asociaciones y ARR sólo es obligatorio para revenue model `recurring`/`mixed`.
+  Schema live desde 2026-07-16 17:23 UTC: grupo Service `anam_service_contract` (`Contrato y renovación ANAM`),
+  9 properties escalares + 1 calculada leídas de vuelta. La calculada propagó naturalmente a `incomplete_core`
+  sobre el Service sample. Cero records/workflows/associations/reports; el piloto forward requiere otra aprobación.
   Canon: `anam-phase-3-forward-service-capture-contract-2026-07-16.md` bajo el índice anterior.
 
 - **HubSpot Solutions Partner / narrativa agéntica sincronizada (2026-07-16):** las skills espejo

@@ -3,7 +3,8 @@
 > **Date:** 2026-07-16
 > **Portal:** `19893546`
 > **Object:** native Service `0-162`
-> **Status:** reconciled proposal; approval required; no schema or record writes executed
+> **Status:** Service property schema executed and read back; record/workflow/association writes not executed
+> **Execution:** 2026-07-16 17:23 UTC
 
 > **2026-07-16 semantic correction:** the forward-capture evidence in [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md) supersedes the earlier single comparable-value and service-frequency model. TCV and ARR are separate facts, blank billing frequency is unknown, and billing cadence is not delivery frequency. Do not execute an older copy of this change set.
 
@@ -33,12 +34,32 @@ Native fields retained:
 
 ## Property data dictionary
 
-All properties belong to `service_information` and are non-form fields. Provenance/value projections are integration-managed; revenue model, renewal facts and activation evidence require governed human review; calculated readiness is API-managed.
+All properties belong to the native Service object and the dedicated property group below. They are non-form fields. Provenance/value projections are integration-managed; revenue model, renewal facts and activation evidence require governed human review; calculated readiness is API-managed.
+
+| Group contract | Value |
+|---|---|
+| Object | native Service `0-162` |
+| Internal group name | `anam_service_contract` |
+| Visible group label | `Contrato y renovación ANAM` |
+| Requested display order | `-1` |
+| Live display order after HubSpot normalization | `1` |
+
+Create/read back the group before any property:
+
+```json
+{
+  "name": "anam_service_contract",
+  "label": "Contrato y renovación ANAM",
+  "displayOrder": -1
+}
+```
+
+Property `name` values are stable internal identifiers in `snake_case`; property `label` values are human-readable sentence-case names shown to ANAM users.
 
 | Internal name | Label | Type / field type | Contract |
 |---|---|---|---|
 | `anam_service_external_key` | Clave externa de servicio ANAM | string / text, unique | deterministic idempotency key; required for migrated production Services |
-| `anam_source_line_item_id` | ID line item de origen | string / text | immutable HubSpot line-item provenance |
+| `anam_source_line_item_id` | ID del line item de origen | string / text | immutable HubSpot line-item provenance |
 | `anam_service_family` | Familia de servicio ANAM | enumeration / select | exact commercial family |
 | `anam_revenue_model` | Modelo de ingreso del servicio | enumeration / select | reviewed one-time/recurring/usage/mixed classification; blank billing cadence does not decide it |
 | `anam_service_currency` | Moneda del servicio | enumeration / select | original currency of TCV and ARR projections |
@@ -55,7 +76,7 @@ The scalar-property requests below are the current approval preview. Send each a
 ```json
 [
   {
-    "groupName": "service_information",
+    "groupName": "anam_service_contract",
     "name": "anam_service_external_key",
     "label": "Clave externa de servicio ANAM",
     "description": "Clave determinística e idempotente del servicio materializado desde el Deal y line item de origen.",
@@ -65,9 +86,9 @@ The scalar-property requests below are the current approval preview. Send each a
     "formField": false
   },
   {
-    "groupName": "service_information",
+    "groupName": "anam_service_contract",
     "name": "anam_source_line_item_id",
-    "label": "ID line item de origen",
+    "label": "ID del line item de origen",
     "description": "ID inmutable del line item de HubSpot que originó este servicio.",
     "type": "string",
     "fieldType": "text",
@@ -75,7 +96,7 @@ The scalar-property requests below are the current approval preview. Send each a
     "formField": false
   },
   {
-    "groupName": "service_information",
+    "groupName": "anam_service_contract",
     "name": "anam_service_family",
     "label": "Familia de servicio ANAM",
     "description": "Familia comercial aprobada del alcance adjudicado.",
@@ -92,7 +113,7 @@ The scalar-property requests below are the current approval preview. Send each a
     ]
   },
   {
-    "groupName": "service_information",
+    "groupName": "anam_service_contract",
     "name": "anam_revenue_model",
     "label": "Modelo de ingreso del servicio",
     "description": "Clasificación revisada del modelo económico del servicio; no se infiere desde una frecuencia de cobro vacía.",
@@ -109,7 +130,7 @@ The scalar-property requests below are the current approval preview. Send each a
     ]
   },
   {
-    "groupName": "service_information",
+    "groupName": "anam_service_contract",
     "name": "anam_service_currency",
     "label": "Moneda del servicio",
     "description": "Moneda original de TCV y ARR del servicio; CLF representa UF en el contrato CRM.",
@@ -124,7 +145,7 @@ The scalar-property requests below are the current approval preview. Send each a
     ]
   },
   {
-    "groupName": "service_information",
+    "groupName": "anam_service_contract",
     "name": "anam_awarded_contract_value",
     "label": "Valor contractual adjudicado",
     "description": "TCV del line item de origen en la moneda original del servicio; no representa facturación.",
@@ -134,7 +155,7 @@ The scalar-property requests below are the current approval preview. Send each a
     "formField": false
   },
   {
-    "groupName": "service_information",
+    "groupName": "anam_service_contract",
     "name": "anam_annual_recurring_value",
     "label": "Valor recurrente anual",
     "description": "ARR del line item de origen en la moneda original; usar sólo en alcances recurrentes o renovables revisados.",
@@ -144,7 +165,7 @@ The scalar-property requests below are the current approval preview. Send each a
     "formField": false
   },
   {
-    "groupName": "service_information",
+    "groupName": "anam_service_contract",
     "name": "anam_renewal_eligibility",
     "label": "Elegibilidad de renovación",
     "description": "Define si el alcance contratado puede participar en una cohorte de renovación.",
@@ -160,7 +181,7 @@ The scalar-property requests below are the current approval preview. Send each a
     ]
   },
   {
-    "groupName": "service_information",
+    "groupName": "anam_service_contract",
     "name": "anam_renewal_status",
     "label": "Estado de renovación",
     "description": "Estado actual de la renovación del servicio; no reemplaza la etapa del Service ni del Deal.",
@@ -186,7 +207,7 @@ The formula classifies same-record readiness only. It does not inspect associati
 
 ```json
 {
-  "groupName": "service_information",
+    "groupName": "anam_service_contract",
   "name": "anam_service_field_readiness",
   "label": "Preparación de datos del servicio",
   "description": "Clasifica completitud determinística, revisión humana pendiente y ausencia de ARR para modelos recurrentes o mixtos. No valida asociaciones.",
@@ -204,12 +225,12 @@ The formula classifies same-record readiness only. It does not inspect associati
 }
 ```
 
-Static validation basis:
+Validation basis:
 
 - native Service fields and types were read back live on 2026-07-16;
 - enumeration/string casting, `is_present`, `not`, `and`/`or`, comparisons and `if`/`elseif` branches match HubSpot's current Properties API grammar;
 - the live Phase 1 property `resultado_comercial_reportable_anam` proves this portal accepts calculated-enumeration branches and internal option values;
-- HubSpot parser acceptance is still unproven until an approved create request is made, because there is no formula dry-run endpoint.
+- HubSpot accepted the create request and normalized only redundant parentheses around `is_present(...)`; all branches, comparisons and internal option values survived readback.
 
 Representative truth table:
 
@@ -232,7 +253,23 @@ AND no external-key or source-line-item conflict
 AND the panel-specific Service lifecycle-stage filter
 ```
 
-Do not create this calculated property before the scalar properties it references exist and pass readback. If the create request fails parser validation, stop; do not simplify the formula by removing null or review branches merely to make it pass.
+The calculated property was created only after all nine scalar properties passed readback. Its value remained `null` through the immediate four-read/~30-second window, then propagated naturally to `incomplete_core` on the sole sample-like Service. No record was touched to force recalculation.
+
+## Schema execution readback
+
+Execution through the approved Kortex portal-scoped runtime produced:
+
+| Surface | Result |
+|---|---|
+| Property group | `anam_service_contract` / `Contrato y renovación ANAM`, active; HubSpot normalized display order `-1` to `1` |
+| Scalar properties | 9 created; names, labels, group, types, field types, uniqueness and option values passed readback |
+| Calculated property | `anam_service_field_readiness` created; enumeration options and normalized formula passed semantic readback |
+| Calculated-property limits | 3 / 40 overall: Deal 2, Service 1 |
+| CRM record writes | 0 |
+| Workflow/association/report writes | 0 |
+| Existing Service value | naturally propagated to `incomplete_core`, as expected for missing core fields |
+
+Created timestamps range from `2026-07-16T17:23:15.159Z` to `2026-07-16T17:23:21.125Z`. `anam_service_external_key` is the only new unique property. All ten properties are in the dedicated native Service group and their visible labels are human-readable rather than `snake_case`.
 
 Do not archive `fecha_de_vencimiento_del_contrato`, `monto_original` or populate `hs_total_cost` in this slice. First inventory consumers and compare their semantics with `hs_target_end_date`, `anam_awarded_contract_value` and `anam_annual_recurring_value`.
 
@@ -303,7 +340,7 @@ Quarantine, with no write, when Company cardinality is not one, mapping is `Otro
 
 ## Gates and acceptance
 
-Before execution:
+Before any record execution:
 
 - approve the two remaining catalog mappings, TCV as portfolio value and ARR as the recurring Retention comparison value;
 - snapshot current Service schema, association definitions and records;
@@ -311,9 +348,12 @@ Before execution:
 - zero duplicate external keys;
 - no sample-like Service is silently reused as production data.
 
-After schema execution:
+Schema execution acceptance — completed:
 
-- GET every property and compare type, options, order, uniqueness and visibility;
+- [x] GET every property and compare type, options, uniqueness and group;
+- [x] verify visible labels and internal names separately;
+- [x] verify the calculated formula after HubSpot normalization;
+- [x] verify calculated-value propagation on the existing sample-like Service without forcing a record write (`incomplete_core`);
 - GET all association label definitions and record returned type IDs in the execution log;
 - create no Service until schema readback passes.
 
@@ -327,4 +367,4 @@ After a separately approved migration:
 
 Rollback: property/label creation is reversible only before consumers and records depend on it. Record migration rollback must archive only IDs emitted by the execution ledger; it must never delete or mutate pre-existing Services.
 
-Approving schema creation does not approve migration writes, workflows, pipeline changes, archival of legacy properties or dashboard publication.
+Executed schema approval did not approve migration writes, workflows, pipeline changes, association-label creation, archival of legacy properties or dashboard publication.

@@ -46,6 +46,10 @@
 - El schema preview de Service incorpora una fórmula calculada de readiness con cuatro salidas accionables:
   core incompleto, revisión humana pendiente, ARR faltante para modelos recurrentes/mixtos y campos preparados.
   La fórmula no suplanta los gates de asociaciones; su aceptación por el parser requiere create/readback aprobado.
+- Con autorización del operador se ejecutó el schema native Service en ANAM: grupo visible `Contrato y renovación
+  ANAM`, nueve propiedades escalares y una calculada. Readback de definición pasó; HubSpot normalizó orden y
+  paréntesis sin cambiar semántica. Readiness propagó a `incomplete_core` sobre el sample sin tocar el registro.
+  Cero records/workflows/associations/reports.
 - Se registra `TASK-1423` y la spec `client-billing-intake-data-model-spec-v1.md` para la foundation tenant-scoped
   del workbook ANAM: modelo reusable `client_billing_*`, assets/scan compartidos, parser versionado y profiler
   no-write. Se fija la frontera correcta: ANAM es cliente y dueño de source/CRM data; Greenhouse sólo opera el

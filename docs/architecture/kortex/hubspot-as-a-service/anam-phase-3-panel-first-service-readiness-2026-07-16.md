@@ -4,8 +4,8 @@
 > **Client:** ANAM, client of Efeonce
 > **Client portal:** HubSpot `19893546`
 > **Mode:** live read-only audit and dashboard contract design
-> **Status:** panel contracts and forward-capture contract defined; historical Service migration `NO-GO`
-> **HubSpot writes:** none
+> **Status:** panel contracts defined; property schema subsequently executed; historical Service migration `NO-GO`
+> **HubSpot writes in this audit cut:** none; later schema execution is recorded in the linked change set
 
 ## Client-engagement boundary
 
@@ -137,7 +137,7 @@ HubSpot can return the same Company twice for a Deal through different associati
 - Manually review the two strongest historical examples that contain Company, Product, amount/currency, frequency and dates; they are examples, not approved migration records.
 - Ratify TCV as portfolio contract value and ARR as the recurring Retention comparison value.
 - Rerun the Service dry run on the governed forward cohort.
-- Propose Service schema only after a separate approval, then execute and read back before publishing final panels.
+- Service property schema was subsequently approved, executed and read back; calculated readiness propagated naturally to `incomplete_core` on the sample-like Service. This does not authorize Service records or final panels.
 - Keep the existing Deal-based Renewal report labeled as a proxy until then.
 
 Detailed next-slice contract: [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md).
