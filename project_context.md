@@ -23,6 +23,8 @@
   moneda y Retention usa ARR sólo en una cohorte recurrente/renovable revisada. Ganar el Deal propone Service en
   `New`, pero la activación requiere confirmación humana. La skill distingue storage/field type de calculation,
   rollup, sync, score y smart fill; una smart property es evidencia AI con créditos, nunca verdad contractual.
+  Readiness calculada separa `incomplete_core`, `review_pending`, `recurring_value_missing` y `fields_ready`;
+  no valida asociaciones y ARR sólo es obligatorio para revenue model `recurring`/`mixed`.
   Canon: `anam-phase-3-forward-service-capture-contract-2026-07-16.md` bajo el índice anterior.
 
 - **HubSpot Solutions Partner / narrativa agéntica sincronizada (2026-07-16):** las skills espejo

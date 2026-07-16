@@ -60,6 +60,7 @@ For every requested fact:
 - API-created calculation properties are API-managed and cannot be edited in the HubSpot UI.
 - Match all formula branches to the declared output type. Numeric formulas cannot return a blank string.
 - Use `is_present`/`is_known` deliberately for null handling and read back representative positive, negative and unknown records after propagation.
+- Keep deterministic absence, pending human review and semantic inconsistency as different outputs. A single “not ready” bucket hides the action required.
 - A calculation can derive field readiness but cannot prove Company/Deal associations unless those facts are first materialized through a separately governed mechanism.
 - Do not create time-until merely for a 30/60/90 report when direct date filters answer the question more portably.
 
@@ -80,7 +81,7 @@ For ANAM Phase 3:
 - Reuse native line-item `hs_product_id`, `amount`, `hs_tcv`, `hs_arr`, `hs_line_item_currency_code`, `recurringbillingfrequency`, `hs_recurring_billing_period` and billing dates as source evidence.
 - Reuse native Service `hs_start_date`, `hs_target_end_date`, `hubspot_owner_id`, `hs_pipeline_stage` and `hs_status`.
 - Use a unique custom Service external key for idempotency and custom scalar properties only for ANAM facts that have no exact native Service home.
-- Use a calculated Service field-readiness classifier only for same-record completeness. Associations remain a separate creation/readback gate.
+- Use a calculated Service field-readiness classifier only for same-record completeness, separating missing core fields, pending human review and missing recurring value. Associations remain a separate creation/readback gate.
 - Defer rollups until Billing Events and association eligibility are live.
 - Defer Loyalty scoring until signals, weights and actions are ratified.
 - A smart property may later summarize cited activity/transcript risk evidence for human review on an officially supported associated object, or on Service only if the live portal proves that support. The current HubSpot eligibility documentation does not list Service. It must not set renewal eligibility, churn, revenue, lifecycle stage or a red/amber/green health state.

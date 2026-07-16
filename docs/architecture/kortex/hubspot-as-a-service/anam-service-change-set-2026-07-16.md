@@ -50,7 +50,7 @@ All properties belong to `service_information` and are non-form fields. Provenan
 
 ### Exact property-create requests
 
-The scalar-property requests below are the current approval preview. Send each approved object independently as `POST /crm/v3/properties/0-162`; do not translate or regenerate options at execution time. The calculated readiness property is intentionally excluded until its exact equation passes formula/null-branch QA and receives separate approval.
+The scalar-property requests below are the current approval preview. Send each approved object independently as `POST /crm/v3/properties/0-162`; do not translate or regenerate options at execution time. The calculated readiness request is previewed separately because HubSpot does not expose a non-mutating parser-validation endpoint.
 
 ```json
 [
@@ -179,6 +179,60 @@ The scalar-property requests below are the current approval preview. Send each a
   }
 ]
 ```
+
+### Calculated readiness preview
+
+The formula classifies same-record readiness only. It does not inspect associations.
+
+```json
+{
+  "groupName": "service_information",
+  "name": "anam_service_field_readiness",
+  "label": "Preparación de datos del servicio",
+  "description": "Clasifica completitud determinística, revisión humana pendiente y ausencia de ARR para modelos recurrentes o mixtos. No valida asociaciones.",
+  "type": "enumeration",
+  "fieldType": "calculation_equation",
+  "calculationFormula": "if (not is_present(string(hs_name)) or not is_present(string(hs_pipeline_stage)) or not is_present(string(hs_status)) or not is_present(string(hubspot_owner_id)) or not is_present(hs_start_date) or not is_present(hs_target_end_date) or not is_present(string(anam_service_external_key)) or not is_present(string(anam_source_line_item_id)) or not is_present(string(anam_service_family)) or not is_present(string(anam_service_currency)) or not is_present(anam_awarded_contract_value) or anam_awarded_contract_value <= 0 or not is_present(string(anam_revenue_model)) or not is_present(string(anam_renewal_eligibility)) or not is_present(string(anam_renewal_status))) then 'incomplete_core'\nelseif (string(anam_revenue_model) equals 'pending_review' or string(anam_renewal_eligibility) equals 'pending_review') then 'review_pending'\nelseif ((string(anam_revenue_model) equals 'recurring' or string(anam_revenue_model) equals 'mixed') and (not is_present(anam_annual_recurring_value) or anam_annual_recurring_value <= 0)) then 'recurring_value_missing' else 'fields_ready'",
+  "hasUniqueValue": false,
+  "formField": false,
+  "options": [
+    { "label": "Datos base incompletos", "value": "incomplete_core", "displayOrder": 0, "hidden": false },
+    { "label": "Revisión humana pendiente", "value": "review_pending", "displayOrder": 1, "hidden": false },
+    { "label": "ARR recurrente faltante", "value": "recurring_value_missing", "displayOrder": 2, "hidden": false },
+    { "label": "Campos preparados", "value": "fields_ready", "displayOrder": 3, "hidden": false }
+  ]
+}
+```
+
+Static validation basis:
+
+- native Service fields and types were read back live on 2026-07-16;
+- enumeration/string casting, `is_present`, `not`, `and`/`or`, comparisons and `if`/`elseif` branches match HubSpot's current Properties API grammar;
+- the live Phase 1 property `resultado_comercial_reportable_anam` proves this portal accepts calculated-enumeration branches and internal option values;
+- HubSpot parser acceptance is still unproven until an approved create request is made, because there is no formula dry-run endpoint.
+
+Representative truth table:
+
+| Case | Expected output | Reason |
+|---|---|---|
+| Missing Company or originating Deal association, all fields complete | `fields_ready` | Associations are deliberately outside the calculation; final creation/readback gate still fails. |
+| Missing name, owner, dates, TCV or another required same-record field | `incomplete_core` | Deterministic core is absent or TCV is non-positive. |
+| Revenue model or renewal eligibility equals `pending_review` | `review_pending` | A human decision remains; it is not a data-ingestion error. |
+| `recurring` or `mixed` with missing/zero ARR | `recurring_value_missing` | Recurring comparison value is not usable. |
+| `one_time` or `usage_based` with ARR empty, all other fields reviewed | `fields_ready` | ARR is not fabricated for a non-recurring model. |
+| Complete reviewed `recurring`/`mixed` Service with positive ARR | `fields_ready` | Same-record field contract passes; association gates still apply. |
+
+Final panel eligibility is:
+
+```text
+anam_service_field_readiness = fields_ready
+AND exactly one distinct Company association
+AND exactly one originating Deal association
+AND no external-key or source-line-item conflict
+AND the panel-specific Service lifecycle-stage filter
+```
+
+Do not create this calculated property before the scalar properties it references exist and pass readback. If the create request fails parser validation, stop; do not simplify the formula by removing null or review branches merely to make it pass.
 
 Do not archive `fecha_de_vencimiento_del_contrato`, `monto_original` or populate `hs_total_cost` in this slice. First inventory consumers and compare their semantics with `hs_target_end_date`, `anam_awarded_contract_value` and `anam_annual_recurring_value`.
 

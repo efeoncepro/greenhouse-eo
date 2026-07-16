@@ -43,6 +43,9 @@
 - Las skills espejo agregan una matriz de propiedades HubSpot que separa storage type, field type, mecanismo de
   población y gobierno, y decide entre native/custom/unique/calculation/rollup/sync/score/workflow/smart. Smart
   queda como evidencia AI con créditos y revisión humana, nunca como identidad, dinero, lifecycle o elegibilidad.
+- El schema preview de Service incorpora una fórmula calculada de readiness con cuatro salidas accionables:
+  core incompleto, revisión humana pendiente, ARR faltante para modelos recurrentes/mixtos y campos preparados.
+  La fórmula no suplanta los gates de asociaciones; su aceptación por el parser requiere create/readback aprobado.
 - Se registra `TASK-1423` y la spec `client-billing-intake-data-model-spec-v1.md` para la foundation tenant-scoped
   del workbook ANAM: modelo reusable `client_billing_*`, assets/scan compartidos, parser versionado y profiler
   no-write. Se fija la frontera correcta: ANAM es cliente y dueño de source/CRM data; Greenhouse sólo opera el

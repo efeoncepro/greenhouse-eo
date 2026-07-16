@@ -80,6 +80,14 @@
 > fuentes, prompt y revisión humana; nunca como identidad, dinero, lifecycle, elegibilidad, contabilidad o salud
 > determinística. La documentación oficial actual no lista native Service entre los objetos elegibles para smart
 > properties, por lo que ese soporte no se presume.
+>
+> **Readiness calculada — preview exacto, sin write:** se verificaron live los tipos de `hs_name`, stage,
+> `hs_status`, owner, inicio y fin, y se contrastó la gramática con la property calculada de Fase 1 ya operativa.
+> El change set ahora contiene payload, fórmula y truth table para `anam_service_field_readiness`: separa
+> `incomplete_core`, `review_pending`, `recurring_value_missing` y `fields_ready`. ARR se exige sólo para modelos
+> `recurring`/`mixed`; una prestación one-time repetible no se transforma en revenue recurrente. La fórmula no
+> valida Company/Deal associations: el gate final las combina aparte. HubSpot no ofrece endpoint dry-run del
+> parser, por lo que aceptación y propagación siguen pendientes de aprobación + create/readback. No hubo writes.
 
 > **Roadmap y Fase 1 — CERRADA:** el plan completo quedó canonizado en
 > `anam-revops-implementation-roadmap-phases-2026-07-16.md` y el contrato/evidencia final en

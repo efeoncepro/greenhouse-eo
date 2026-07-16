@@ -79,9 +79,11 @@ Native Service fields remain the first choice. The minimum custom set is:
 | `anam_revenue_model` | custom enumeration | `one_time`, `recurring`, `usage_based`, `mixed`, `pending_review`. |
 | `anam_renewal_eligibility` | custom enumeration | `eligible`, `not_eligible`, `conditional`, `pending_review`. |
 | `anam_renewal_status` | custom enumeration | Renewal work/outcome state; does not replace Service or Deal stage. |
-| `anam_service_field_readiness` | calculated enumeration | Same-record completeness only: `incomplete_core`, `renewable_value_missing`, `fields_ready`. |
+| `anam_service_field_readiness` | calculated enumeration | Same-record completeness only: `incomplete_core`, `review_pending`, `recurring_value_missing`, `fields_ready`. |
 
-The calculated readiness property may check the custom fields plus native dates/owner on the same Service. It cannot prove exactly-one Company, originating Deal, association labels or absence of conflicts; those remain creation/readback gates. Its exact HubSpot formula must be previewed, tested against representative null branches and approved before creation. The portal currently uses 2 of 40 calculated-property slots and zero on Service, so capacity is not the blocker.
+The calculated readiness property checks the custom fields plus native name, stage, delivery status, dates and owner on the same Service. `review_pending` is distinct from missing deterministic data. `recurring_value_missing` applies only when the reviewed revenue model is `recurring` or `mixed` and ARR is absent or non-positive; a repeatable one-time service is not silently converted into recurring revenue. It cannot prove exactly-one Company, originating Deal, association labels or absence of conflicts; those remain creation/readback gates.
+
+The exact API formula preview and truth table now live in the reconciled Service change set. Its syntax was checked against HubSpot's current API grammar and the live Phase 1 calculated enumeration, but HubSpot has no non-mutating formula-validation endpoint. Parser acceptance, propagation and representative-record readback therefore remain execution gates after separate schema approval. The portal currently uses 2 of 40 calculated-property slots and zero on Service, so capacity is not the blocker.
 
 Do not create a duplicate custom billing-frequency field merely for convenience. Consumers should follow the originating line item unless a later report proves that a governed read-only projection is necessary.
 

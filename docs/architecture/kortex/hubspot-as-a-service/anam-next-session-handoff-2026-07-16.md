@@ -124,7 +124,7 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 ## Next execution order
 
 1. Ratify the five Phase 3 decisions in the forward-capture contract: TCV, ARR, owner inheritance, blank-frequency handling and activation reviewer.
-2. Approve the reconciled Service schema separately; preview and test the calculated readiness formula before including it.
+2. Approve the reconciled Service schema separately. The calculated readiness formula and truth table are previewed; parser acceptance and propagation must be tested only after approval because HubSpot exposes no non-mutating formula-validation endpoint.
 3. Execute schema creation/readback only after approval. Schema approval does not approve Service records or workflows.
 4. Run a 3–5-line-item forward pilot, first as a no-write dry run and then with separate approval for the first Service records.
 5. Confirm activation fields with the named ANAM operator; keep new awards in `New` until operational start is real.
