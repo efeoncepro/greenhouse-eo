@@ -1,5 +1,19 @@
 # changelog.md
 
+## 2026-07-16 — Tender Proposal Studio: motor de chapter-authors servicio-agnóstico (TASK-1415)
+
+- El Studio ahora puede AUTORAR la lámina de diagnóstico (antes se escribía a mano en el `deck-plan.json`): nuevo
+  motor `src/lib/commercial/tenders/proposals/authoring/**` — interface `ChapterAuthor` servicio-agnóstica en el
+  molde propose→confirm (el LLM sólo enmarca; las cifras y `evidenceRef` se inyectan desde hechos derivados
+  determinísticamente; una cifra o URL huérfana rechaza la propuesta completa; confirm exige actor member).
+- Primera implementación completa: **diagnóstico (SEO/AEO)** — mapper `Grader → hechos` que reusa el mapeo canónico
+  dim→peldaño del Report Artifact, verificado contra el run real `EO-GRUN-00046` (reproduce el golden SKY
+  40/70/37/8/76 exacto). Segundo author (`credenciales`, otro servicio) prueba que el motor no está AEO-fitted.
+- Eval baseline determinista en CI (golden frozen = láminas SKY autoradas a mano) + corrida REAL end-to-end en
+  local: propose (claude-sonnet-5) → confirm → `composeArtifact` renderizó las 2 láminas (PNG+PDF, 0 warnings).
+- Flag `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF (registrado en el ledger); capability reusa
+  `commercial.proposal.manage`. Orquestador y verifier de §5-ter siguen pendientes (tasks hermanas).
+
 ## 2026-07-15 — Creative Workflows: diagramas V3 corregidos en producción
 
 - Se reemplazan los dos diagramas V2 después de que una revisión humana detectara cruces de conectores sobre copy/listas, un ordinal oculto, un label recortado, una tarjeta sobre el cierre y una colisión de puntuación que el QA anterior no capturó.

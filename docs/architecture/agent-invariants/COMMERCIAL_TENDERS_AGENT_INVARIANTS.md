@@ -23,7 +23,7 @@
 | State machine (12 estados, 3 gates humanos) | ✅ **PERSISTIDA** (TASK-1392): matriz en `proposal_state_matrix` + trigger de enforcement + historial append-only; TS ↔ DB con test de paridad. Terminales `won`/`lost` |
 | Aggregate `Proposal` · API routes · migración · capabilities · entitlement per-ORG · outbox | ✅ **existen** (TASK-1392): `greenhouse_commercial.proposal*`, `/api/commercial/proposals/**`, `commercial.proposal.{read,manage,gate,render}`, módulo `proposal_studio_v1`, 9 eventos `commercial.proposal.*` |
 | UI · Nexa/MCP surface | ❌ **no existen** (F5) |
-| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | ❌ no existen (F1/F2) |
+| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | 🟡 el nodo **chapter-author** existe (TASK-1415, `proposals/authoring/**`, flag OFF); orquestador y verifier no |
 | **Renderer productivo**: Cloud Run **Job** `artifact-worker` + cola con prioridad + asset store + 2 signals | ✅ **TASK-1391 `complete`** — **staging E2E verificado en Cloud Run** (15 láminas 25,2 s / 3,16 MB · bench 25 láminas 32,3 s / 5,56 MB). **Producción explícitamente gateada** (release control plane + sign-off). Spec: **`GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`** |
 
 ⚠️ **NUNCA** corras el render pesado (Chromium) en **Vercel** ni en el **`ops-worker`** — bloquearía el
@@ -382,3 +382,28 @@ Los invariantes que dejaron:
   `file://`, paths absolutos y referencias que escapen del árbol en TODA plantilla.
 - Chromium en contenedor como root exige `--no-sandbox` — vive en el launch canónico UNIFORME
   (es aislamiento de proceso, no rasterización; visual gate 0 px lo prueba).
+
+## Chapter-author engine — invariantes (TASK-1415)
+
+El motor de autoría de láminas (`src/lib/commercial/tenders/proposals/authoring/**`, nodo de
+§5-ter del arch doc del Studio) es **servicio-agnóstico**: la interface `ChapterAuthor` sirve a
+cualquier línea de servicio; diagnóstico (SEO/AEO) y credenciales son implementaciones, no el motor.
+
+- **NUNCA** hornear una suposición de servicio en `chapter-author.ts` / `eval-harness.ts` (ni
+  "Grader", ni "escalera", ni "credencial"). Si un author nuevo te obliga a tocar la interface o
+  el harness, la abstracción está mal: STOP y revisar el diseño, no acomodar.
+- **NUNCA** dejar que una cifra viaje por el framing del LLM hacia los slots: `metric`/`score`/
+  `evidenceRef` se inyectan en `toSlides` DESDE los hechos de `deriveFacts` (puro, la única
+  fábrica de cifras). El guard compartido rechaza la propuesta COMPLETA ante una cifra o URL
+  sin hecho que la respalde (las URLs entran como hechos-allowlist).
+- **NUNCA** tocar el prompt/schema de un author sin su eval verde (patrón eval-fixture-como-gate,
+  determinista, golden frozen en `__tests__/fixtures/`). El golden de diagnóstico son las láminas
+  SKY autoradas a mano — no se edita para "hacer pasar" un eval.
+- **NUNCA** un hecho externo sin `evidenceRef` (los del operador entran pre-evidenciados,
+  passthrough verbatim); **NUNCA** el agente confirma (`confirmChapter` exige `actor.kind==='member'`).
+- El author declara `contentType` + slots (plan canónico del composer, tipo `AuthoredSlide` con
+  `SlotValues`), **NUNCA** `template`. Los límites del validador por-author son los REALES del
+  slot contract del catálogo; los targets del prompt van ~85% por debajo (el modelo no cuenta
+  caracteres — el contrato duro vive en `validate`, no en el prompt).
+- Flag `TENDER_CHAPTER_AUTHOR_ENABLED` (default OFF) gatea SOLO `proposeChapter` (costo LLM).
+  Capability: se reusa `commercial.proposal.manage` — NO existe `commercial.proposal.author`.

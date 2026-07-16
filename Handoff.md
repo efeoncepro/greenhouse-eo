@@ -1,3 +1,64 @@
+## Sesión 2026-07-16 — TASK-1415 COMPLETE: motor de chapter-authors (servicio-agnóstico) — Claude
+
+> **Qué se construyó:** el nodo chapter-author de §5-ter, materializado como motor servicio-agnóstico en
+> `src/lib/commercial/tenders/proposals/authoring/**` (5 slices, commits atómicos): interface `ChapterAuthor`
+> + máquina compartida (propose con retry N=2 y feedback de violación · confirm member-only · guards mecánicos:
+> cifra huérfana rechaza TODO, URLs sólo desde hechos-allowlist) + harness de eval domain-free + mapper de
+> diagnóstico (`deriveDiagnosticoFacts`) + author LLM de diagnóstico + author de credenciales (prueba de
+> agnosticismo) + loop integrado al composer.
+>
+> **Aprendizajes del mapeo dim→rung:** NO hubo que inventarlo ni coordinarlo out-of-band — el mapeo canónico ya
+> era código (`report-artifact/model.ts`: `REPORT_LEVEL_DIMENSIONS` + `readiness.agentic.overallScore` para
+> Be Actionable). Verificado contra el run real `EO-GRUN-00046`: reproduce el golden SKY exacto con redondeo
+> (40/70.4/36.8/8.4/76.375 → 40/70/37/8/76). El hecho Semrush (~40.000) NO es derivable del Grader → entra como
+> `operatorFact` pre-evidenciado (passthrough; el LLM jamás lo produce). El período del run ("julio 2026") SÍ es
+> evidencia legítima → hecho `context.study-period` (el guard lo exigió en la primera corrida real).
+>
+> **Corridas LLM reales (3):** la 1ª rechazó por "2026" huérfano (guard funcionando; faltaba el hecho del
+> período); la 2ª rechazó por overflow (eyebrow 45>32 y rung 99>96 — el modelo no cuenta caracteres: se bajaron
+> los targets del prompt a ~85% del contrato real, validador intacto); la 3ª pasó completa y `composeArtifact`
+> renderizó 2 PNG + PDF (759 KB, 0 warnings), frames revisados a ojo (guardrail semántico por peldaño agregado:
+> "Be Actionable" ahora se enmarca como readiness técnico-agéntico, no citabilidad).
+>
+> **Rollout:** code complete + verificado end-to-end en LOCAL; flag `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF
+> en todos los environments (ledger actualizado, fila en Pendientes de acción). Staging flip = sign-off del
+> operador; prod = decisión de negocio posterior (Move 0). SIN push (local-first).
+>
+> **Follow-ups declarados:** governed action Nexa + tool MCP del chapter-author (parity) · authors productivos
+> por servicio (creativo/social/web-CRM/HubSpot/contenido/económica/squad — cambia sólo deriveFacts/validate/
+> toSlides) · orquestador + verifier (§5-ter) · F1 canónica (admisibilidad) · ¿EPIC-029 dedicado?
+
+# HubSpot Solutions Partner — narrativa agéntica 2026 (2026-07-16)
+
+- Codex y Claude quedaron sincronizados con el nuevo módulo `14_NARRATIVA_AGENTICA_Y_MOTION_2026.md`:
+  tesis ejecutiva de Yamini/Duncan/Dharmesh/Angela, Growth Context, workspaces, motion por outcome, cinco
+  wedges de prospección e incentivos H2 2026. El motion comercial ahora explicita entrada por Champion uno o
+  dos niveles bajo C-Level, criterios de Champion real, mapa Champion→sponsor, multithreading de 3–5 roles y
+  gate de acceso al sponsor antes de propuesta; 70/20/10 queda documentado como hipótesis Efeonce, no benchmark.
+- `SOURCES.md` en ambos namespaces quedó actualizado al 2026-07-16 con fuentes primarias y límites de prueba.
+  No hubo cambios de runtime ni escrituras en HubSpot. Pendiente comercial natural: aplicar los wedges al
+  shortlist de cuentas Chile/México/Perú/Colombia.
+- Corrección de método: la revisión de cartera no puede depender de `country` en HubSpot. `modules/08_OUTBOUND_ABM.md`
+  exige enriquecer cada cuenta en tres pasadas (CRM + sitio oficial + fuentes públicas), conservar el valor raw,
+  separar sede de mercados operativos y registrar URLs, fecha y confianza. Cuentas con país vacío quedan en
+  investigación y no se excluyen; ninguna inferencia se escribe al CRM sin confirmación.
+
+## Sesión 2026-07-16 — ANAM landing: routing por `anam_intent` + logo (Codex)
+
+> **Pedido:** avanzar por la vía soportada para que los botones abran chatflows con contexto, y ajustar el logo porque se veía montado en la línea del header.
+>
+> **Cambio publicado:** proyecto externo `/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project`, build `#22`. Los botones de categoría ahora usan `data-chat-intent-key` estable y actualizan la URL antes de abrir el chat:
+>
+> - `cotizar` -> `?anam_intent=cotizar`
+> - `seguimiento_servicio` -> `?anam_intent=seguimiento_servicio`
+> - `requerimiento_calidad` -> `?anam_intent=requerimiento_calidad`
+>
+> Después llaman `HubSpotConversations.widget.refresh({ openToNewThread: true })` y `widget.open()`. El CTA general limpia `anam_intent` y no fuerza refresh. El logo se redujo/subió en desktop y mobile para quedar separado de la línea inferior del header.
+>
+> **Verificación:** `hs project validate --profile anam` PASS; `hs project upload --profile anam` PASS; `hs project info --account 19893546 --json` reporta `deployedBuildId: 22`; URL pública sirve `kortex-cms-react/22`. Playwright live confirmó cada `anam_intent`, `sessionStorage`, refresh con `openToNewThread: true`, CTA general sin refresh, H1 vigente, sin overflow horizontal y logo con margen respecto al header. Capturas: `/tmp/anam-build22-desktop.png`, `/tmp/anam-build22-mobile.png`.
+>
+> **Pendiente operativo:** configurar en HubSpot Chatflows target rules/branches que consuman `anam_intent`. El composer no se prellena de forma confiable: el widget expone internamente `setInputText`, pero el iframe actual lo descarta en esta configuración (`inApp53=false` / no closing-agent system chatflow).
+
 ## Sesión 2026-07-16 — ANAM landing HubSpot: `Agente Virtual ANAM` live (Codex)
 
 > **Pedido:** revisar correos de Maria Paz Haeger, entrar al HubSpot de ANAM y aplicar el cambio solicitado en la landing.

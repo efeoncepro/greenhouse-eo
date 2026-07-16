@@ -150,6 +150,18 @@ fallos no-reintentables (audience/semántica/peso/geometría/drift) exigen un ma
   con datos medidos) → `ProposalRenderAgentProposal` con **`blockers` obligatorios** (la
   validación recomputa los bloqueos reales; una propuesta que ESCONDE uno se rechaza entera) →
   `confirmProposalRender` (member, rechaza bloqueos vivos) ejecuta `requestProposalRender`.
+- **Chapter-author (TASK-1415, 2026-07-16)**: `proposals/authoring/**` — el motor
+  SERVICIO-AGNÓSTICO del nodo de autoría de §5-ter. `ChapterAuthor<Source, Facts, Framing>`:
+  `deriveFacts` (puro, única fábrica de cifras con `evidenceRef`) → `proposeChapter`
+  (structured output compartido, retry N=2 con feedback) → `confirmChapter` (member-only) →
+  `toSlides` (determinista: cifras/evidenceRefs se inyectan DESDE los hechos). Guards
+  compartidos: cifra huérfana rechaza TODO; URLs sólo desde hechos-allowlist. Emite
+  `contentType`+slots (plan canónico; el selector asigna plantilla). Primera implementación:
+  **diagnóstico** (Grader→`one-metric`+`maturity-ladder`; mapeo canónico dim→peldaño del
+  Report Artifact); 2º author `credenciales` prueba el agnosticismo. Flag
+  `TENDER_CHAPTER_AUTHOR_ENABLED` OFF (gatea sólo el propose). Un author nuevo = implementar
+  la interface (deriveFacts + validate + toSlides + prompt) + su eval con golden — si te
+  obliga a tocar `chapter-author.ts`/`eval-harness.ts`, la abstracción está mal: STOP.
 - **Cada agente tiene su eval fixture** (`__tests__/*-agent-eval.test.ts`) — ES el gate para
   tocar prompt/schema.
 
@@ -209,6 +221,7 @@ gcloud run jobs execute artifact-worker --project=efeonce-group --region=us-east
 | **Un failure_code nuevo** del render | Migración additive al CHECK de `proposal_render_jobs.failure_code` + el union `RenderJobFailureCode` + decidir si entra a `NON_RETRYABLE_FAILURES` | Un string ad-hoc en failure_detail |
 | **Una constraint nueva del RFP** (p. ej. formato de archivo) | `render-constraints.ts` (`extractRenderConstraints` + su test) → viaja FIJADA en el job → el worker la enforcea | Leerla "fresca" en el worker (rompe determinismo) |
 | **Una fase agéntica nueva** (análisis F1, packaging F2…) | El MOLDE: contexto allowlisted tipado → propuesta tipada que cita inputs y declara blockers → validación fail-closed que recomputa → confirm member-only → EL MISMO command canónico → eval fixture. Copiar `render-agent.ts`, no inventar | Un prompt suelto; un tool con acceso a DB/storage/jobs.run |
+| **Un chapter-author nuevo** (creativo, social, económica, squad…) | Implementar la interface `ChapterAuthor` de `proposals/authoring/chapter-author.ts` (deriveFacts puro + validate fail-closed con los límites REALES del slot contract + toSlides que inyecta cifras desde hechos + prompt) + eval con golden en el harness domain-free. El molde vivo: `diagnostico-chapter-author.ts` | Tocar `chapter-author.ts`/`eval-harness.ts` para acomodar TU servicio (si hace falta, la abstracción está mal — STOP); una cifra que viaje por el framing del LLM |
 | **Una acción nueva operable desde Nexa** | Copiar el molde de `actions/proposal-studio.ts`: schema Zod SIN ids de organización (el scope se deriva) + `isEnabled` con flag propio default-OFF + `isPermitted` sync (capability) + `buildPreview` que **cruza la puerta y ejercita los gates del command** (bloqueo → `NexaActionBlockedError`) + `execute` que re-cruza la puerta y delega en el command **sin** `idempotencyKey` (la pone el confirm) → registrar en `NEXA_ACTION_REGISTRY` **y en la descripción del tool `propose_action`** (la lista está hardcodeada ahí: si no la actualizás, el LLM no sabe que existe) | Un `ownerOrgId` en el schema; reglas de dominio nuevas dentro de la acción; un preview que "avisa" de un bloqueo en vez de bloquear |
 | **Una UI del Studio (F5 — la parte WRITE)** | La lectura+descarga YA existe (TASK-1413) y es LA prueba del camino correcto: consumió `operator-view.ts` + `readProposalArtifactVersions` + el endpoint de descarga sin reimplementar un solo gate. Para el write: consumir `operator-view.ts` + `assertProposalStudioAccessForSubject` (la misma puerta) + `assertProposalRenderAdmissible` para deshabilitar "Generar" **con el motivo real** | Reimplementar los gates en el componente (drift garantizado: el día que se agregue uno, la UI miente) |
 | **Batch de renders** (30 carruseles) | Open Question CON DIENTES en TASK-1391: `png-set` probablemente quiere batch por ejecución (cold start de Chromium domina). Decidir CON DATOS de carga | Subir `tasks`/`parallelism` a ojo |

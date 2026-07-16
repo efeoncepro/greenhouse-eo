@@ -1,12 +1,22 @@
 # TASK-1415 — Tender Proposal Studio: el motor de chapter-authors (servicio-agnóstico) — con diagnóstico (SEO/AEO) como primera implementación de prueba
 
+
+## Delta 2026-07-16 — CIERRE (implementada completa)
+
+- **Los 5 slices shipped** en `develop` local (commits atómicos, sin push): interface + máquina compartida → mapper → 2º author (agnosticismo) → author LLM diagnóstico + eval golden → loop integrado + flag.
+- **Open Questions resueltas en Discovery:** (1) 1ª implementación = diagnóstico (como especificaba la task); (2) 2º author = credenciales (bullet-list, no lee el Grader); (3) capability = REUSA `commercial.proposal.manage` (el catálogo ya fijó el criterio "propose no escribe"; NO se creó `commercial.proposal.author`); (4) el mapeo dim→peldaño **NO requirió coordinación out-of-band**: ya era código canónico (`report-artifact/model.ts` `REPORT_LEVEL_DIMENSIONS` + `readiness.agentic` para Be Actionable) y verificado contra el run real reproduce el golden 40/70/37/8/76 exacto; (5) "F1" conversacional no se filtró a código/docs; (6) EPIC-029 queda como decisión del operador (follow-up).
+- **Runtime evidence:** 3 corridas LLM reales contra `EO-GRUN-00046` (las 2 primeras rechazadas por el guard — cifra huérfana "2026" y overflow — probaron el fail-closed en vivo; la 3ª renderizó 2 PNG + PDF 759 KB, 0 warnings, frames revisados a ojo). Sanity committeado: `scripts/commercial/_sanity-diagnostico-chapter-author.ts`.
+- **Gates:** test full 9572/0 · build prod OK · `composer:visual-gate` 61 frames a 0 px · `docs:closure-check` limpio · `flags:audit` 0 sin registrar · `ops:lint` 0/0.
+- **Capas documentales:** técnica = Delta §5-ter + §0 del arch doc + invariantes en `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` + companion `proposal-studio-runtime.md` (espejado a `.codex/`); funcional/manual = **diferidas con razón** (flag OFF, sin superficie de usuario; llegan con la governed action Nexa/UI — follow-up declarado; el manual de operación del motor es el companion de la skill + el sanity script).
+- **Rollout:** `code complete, rollout pendiente` sólo en el sentido del flag (OFF por diseño en esta task; prender en prod es decisión de negocio posterior — Move 0). No hay migraciones, env vars requeridas ni redeploy pendiente para el estado declarado.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +29,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none` (el Tender Proposal Studio no tiene EPIC dedicado — ver Open Questions)
-- Status real: `Diseno`
+- Status real: `COMPLETE 2026-07-16 en develop local (sin push) — code complete verificado end-to-end en local; rollout: flag OFF en todos los environments (flip staging = sign-off operador)`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `none`
@@ -180,22 +190,22 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth (reader Grader), contract surface (`deriveDiagnosticoFacts` + `diagnosticoChapterAuthor`) y consumers nombrados con paths reales.
-- [ ] Invariante anti-fabricación explícito (todo hecho traza al run; el LLM sólo enmarca) y cubierto por test.
-- [ ] Flag `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF + fila en el ledger, mismo PR.
-- [ ] Eval baseline verde contra el golden SKY **y** contra un segundo consumidor NO-SKY.
-- [ ] Runtime evidence: corrida real contra `EO-GRUN-00046` que el composer renderiza.
+- [x] Source of truth (reader Grader), contract surface (`deriveDiagnosticoFacts` + `diagnosticoChapterAuthor`) y consumers nombrados con paths reales.
+- [x] Invariante anti-fabricación explícito (todo hecho traza al run; el LLM sólo enmarca) y cubierto por test.
+- [x] Flag `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF + fila en el ledger, mismo PR.
+- [x] Eval baseline verde contra el golden SKY **y** contra un segundo consumidor NO-SKY.
+- [x] Runtime evidence: corrida real contra `EO-GRUN-00046` que el composer renderiza.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive (`authoring/**`), no en UI.
-- [ ] Modelada como command (`propose`/`confirm`), no click-handler.
-- [ ] Read (reader Grader) + write (confirm humano) con authorization fina (capability), idempotencia por hash, errores canónicos, observabilidad.
-- [ ] Capability + grant en el mismo PR si se crea `commercial.proposal.author` (+ coverage test).
-- [ ] Camino programático declarado: **governed action Nexa + MCP = follow-up explícito** (esta task deja el primitive; la superficie Nexa/MCP es task hermana). Deuda documentada.
-- [ ] Write apto para `propose → confirm → execute` (ya es el molde). NO construir integración Nexa-específica.
-- [ ] Un primitive, muchos consumers: cero lógica duplicada.
-- [ ] Parity check = SÍ (el contrato gobernado existe; Nexa/MCP lo operan por construcción cuando se cablee su acción).
+- [x] Lógica en el primitive (`authoring/**`), no en UI.
+- [x] Modelada como command (`propose`/`confirm`), no click-handler.
+- [x] Read (reader Grader) + write (confirm humano) con authorization fina (capability), idempotencia por hash, errores canónicos, observabilidad.
+- [x] Capability + grant en el mismo PR si se crea `commercial.proposal.author` (+ coverage test).
+- [x] Camino programático declarado: **governed action Nexa + MCP = follow-up explícito** (esta task deja el primitive; la superficie Nexa/MCP es task hermana). Deuda documentada.
+- [x] Write apto para `propose → confirm → execute` (ya es el molde). NO construir integración Nexa-específica.
+- [x] Un primitive, muchos consumers: cero lógica duplicada.
+- [x] Parity check = SÍ (el contrato gobernado existe; Nexa/MCP lo operan por construcción cuando se cablee su acción).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -328,15 +338,15 @@ El eval mide dos cosas distintas: **hechos** (exactos, string/número-equality c
 
 ## Acceptance Criteria
 
-- [ ] La interface `ChapterAuthor` + el harness de eval **no contienen ninguna suposición AEO** (ni `Grader`, ni `escalera`, ni `dimensión` en la abstracción), y un **segundo author de otro servicio** implementa la misma interface y pasa el harness **sin tocar la interface** (prueba de servicio-agnosticismo).
-- [ ] `deriveDiagnosticoFacts` es puro, deriva los 5 peldaños + los hero-goals **cada uno con `evidenceRef`**, y su test contra el run real `EO-GRUN-00046` pasa.
-- [ ] El chapter-author usa `generateStructuredAnthropic` (cliente canónico `src/lib/ai/`), NO un SDK paralelo ni el router de Nexa, y **sólo enmarca** hechos del mapper.
-- [ ] `validateDiagnosticoProposal` rechaza fail-closed: cifra huérfana, `evidenceRef` faltante, overflow. Test lo cubre.
-- [ ] El eval baseline es verde contra el golden SKY **y** contra un segundo consumidor NO-SKY.
-- [ ] El `confirm` exige `actor.kind==='member'`; el agente no puede confirmar (test).
-- [ ] Corrida integrada: run → propose → confirm → `composeArtifact` renderiza la lámina, frame revisado.
-- [ ] `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF + fila en `FEATURE_FLAG_STATE_LEDGER.md`, mismo PR.
-- [ ] El composer y su visual gate (`pnpm composer:visual-gate`) siguen a 0 px (esta task no toca el catálogo).
+- [x] La interface `ChapterAuthor` + el harness de eval **no contienen ninguna suposición AEO** (ni `Grader`, ni `escalera`, ni `dimensión` en la abstracción), y un **segundo author de otro servicio** implementa la misma interface y pasa el harness **sin tocar la interface** (prueba de servicio-agnosticismo).
+- [x] `deriveDiagnosticoFacts` es puro, deriva los 5 peldaños + los hero-goals **cada uno con `evidenceRef`**, y su test contra el run real `EO-GRUN-00046` pasa.
+- [x] El chapter-author usa `generateStructuredAnthropic` (cliente canónico `src/lib/ai/`), NO un SDK paralelo ni el router de Nexa, y **sólo enmarca** hechos del mapper.
+- [x] `validateDiagnosticoProposal` rechaza fail-closed: cifra huérfana, `evidenceRef` faltante, overflow. Test lo cubre.
+- [x] El eval baseline es verde contra el golden SKY **y** contra un segundo consumidor NO-SKY.
+- [x] El `confirm` exige `actor.kind==='member'`; el agente no puede confirmar (test).
+- [x] Corrida integrada: run → propose → confirm → `composeArtifact` renderiza la lámina, frame revisado.
+- [x] `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF + fila en `FEATURE_FLAG_STATE_LEDGER.md`, mismo PR.
+- [x] El composer y su visual gate (`pnpm composer:visual-gate`) siguen a 0 px (esta task no toca el catálogo).
 
 ## Verification
 
@@ -349,14 +359,14 @@ El eval mide dos cosas distintas: **hechos** (exactos, string/número-equality c
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomarla, `complete` al cerrarla).
-- [ ] El archivo vive en la carpeta correcta.
-- [ ] `docs/tasks/README.md` sincronizado.
-- [ ] `Handoff.md` actualizado (el primer nodo agéntico de autoría, aprendizajes del mapeo dim→rung).
-- [ ] `changelog.md` actualizado (cambio de comportamiento: el Studio ahora puede autorar la lámina de diagnóstico).
-- [ ] Chequeo de impacto cruzado (tasks del Studio: 1391/1392/1393/1399/1412/1413/1414).
-- [ ] Delta en `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`: el nodo chapter-author de §5-ter, materializado para diagnóstico.
-- [ ] Follow-up creado: governed action Nexa + tool MCP del chapter-author (Full API Parity).
+- [x] `Lifecycle` sincronizado (`in-progress` al tomarla, `complete` al cerrarla).
+- [x] El archivo vive en la carpeta correcta.
+- [x] `docs/tasks/README.md` sincronizado.
+- [x] `Handoff.md` actualizado (el primer nodo agéntico de autoría, aprendizajes del mapeo dim→rung).
+- [x] `changelog.md` actualizado (cambio de comportamiento: el Studio ahora puede autorar la lámina de diagnóstico).
+- [x] Chequeo de impacto cruzado (tasks del Studio: 1391/1392/1393/1399/1412/1413/1414).
+- [x] Delta en `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`: el nodo chapter-author de §5-ter, materializado para diagnóstico.
+- [x] Follow-up creado: governed action Nexa + tool MCP del chapter-author (Full API Parity).
 
 ## Follow-ups
 
