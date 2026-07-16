@@ -5,6 +5,8 @@
 > **Status:** canonical delivery sequence
 > **Priority:** Commercial first; Operations second
 
+> **Client boundary:** ANAM is an Efeonce client. This roadmap governs work in ANAM's HubSpot portal; it does not define a Greenhouse product capability, tenant dashboard or Efeonce CRM dataset.
+
 ## Outcome
 
 HubSpot must connect the complete ANAM lifecycle:
@@ -22,10 +24,10 @@ The phases below are delivery increments, not separate projects. Each phase must
 |---|---|---|---|
 | 0. Customer Agent and landing | Resolve documented demand and gather context before human handoff. | Live landing, configured agent, Markdown knowledge, QA and Maria Paz handoff. | Complete; monitor in operation. |
 | 1. Commercial reporting foundation | Turn already-ratified business definitions into trustworthy current-state reports. | Existing-report inventory, Data Quality control tower and Commercial Growth dashboard. | Complete: Data Quality, Growth, Renewal proxy, Q1-Q2 queue and exact-stage outcome reporting are published and verified. |
-| 2. Catalog and sale composition | Confirm what each Deal sold without relying on uncontrolled free text. | Product/line-item mapping and governed service-family catalog. | Next: Product read is active; reconcile the 22 Products against 506 line items/20 normalized names before proposing any write. |
-| 3. Service and contract portfolio | Represent each awarded service after the Deal is won. | Approved Service dictionary and no-write Deal/line-item-to-Service dry run. | Proposal exists; not approved or executed. |
+| 2. Catalog and sale composition | Confirm what each Deal sold without relying on uncontrolled free text. | Product/line-item mapping and governed service-family catalog. | Minimum mapping is sufficient: 505/506 line items reference Products and all 220 Closed Won line items resolve to known Products. Full catalog rebuild is deferred. |
+| 3. Service and contract portfolio | Represent each awarded service after the Deal is won. | Approved Service dictionary and no-write Deal/line-item-to-Service dry run. | In progress, panel-first/read-only: panel contracts are defined; historical migration is `NO-GO` because Company, dates, recurrence and renewal facts are incomplete. |
 | 4. Renewal automation | Create a controlled path from expiring Service to renewal Deal and renewed Service. | Expiry queue, owner tasks, renewal linkage and exception handling. | Blocked by Phase 3. |
-| 5. Commercial management dashboards | Measure portfolio, renewal, Retention and Loyalty from reliable Services. | Service portfolio, Renewal, Retention and Loyalty dashboards. | Growth begins in Phase 1; the rest is blocked by Service coverage. |
+| 5. Commercial management dashboards | Measure portfolio, renewal, Retention and Loyalty from reliable Services. | Service portfolio, Renewal, Retention and Loyalty dashboards. | Panel contracts are defined; publication is blocked by real Service coverage, not Product identity. |
 | 6. Tickets and operational cases | Connect customer cases to the right Company, Contact and Service. | Ticket taxonomy, routing, SLA, resolution and Customer Agent escalation evidence. | Planned after commercial foundations. |
 | 7. Billing integration | Connect sold and contracted value with billing execution. | Governed Billing Event sync and billing/EDP dashboards. | Proposed; 16,898-row migration remains no-go. |
 | 8. Governance and continuous improvement | Preserve data quality, adoption and conversational accuracy. | Owners, definitions, monitoring cadence, QA regressions and change control. | Runs across every phase. |
@@ -51,9 +53,13 @@ Detailed execution contract: [`anam-phase-1-commercial-reporting-foundation-2026
 
 Products are checked only to explain the content of a sale. If the 22 Products and 506 line items already provide stable identity and service-family mapping, they are reused without mutation. Any ambiguity is quarantined and presented for approval; this phase must not become a catalog rebuild by default.
 
+The live readback confirms that the minimum mapping is already usable: 505 of 506 line items reference a Product and all 220 Closed Won line items resolve to known Products. Full Product cleanup, renaming or creation is therefore deferred as standalone work rather than blocking the panels.
+
 ## Phase 3 - Service and contract portfolio
 
 Deal remains the commercial opportunity. Native Service (`0-162`) becomes the awarded service/contract grain. A Deal can produce more than one Service when it contains multiple awarded components. No schema or Service records are created until the dry run proves deterministic identity, associations, dates, owner, currency and comparable value.
+
+The panel-first contract and live no-write evidence are documented in [`anam-phase-3-panel-first-service-readiness-2026-07-16.md`](anam-phase-3-panel-first-service-readiness-2026-07-16.md). The current historical cohort has zero fully migration-ready line items without inference, so the next slice is governed forward capture plus manual review—not bulk backfill.
 
 ## Phase 4 - Renewal automation
 

@@ -24,6 +24,17 @@ This decision is required because the work changes billing semantics, source of 
 
 ## Decision
 
+### Refinement after joint candidate analysis
+
+The segmentation and billing candidates were reconciled together after this initial proposal. Their shared Código ANAM/CeCo evidence proves that the code is not safely modeled as one unique Company property: the segmentation source expands to 2,882 unique codes, 72 rows contain multiple codes, and one legal Company can have multiple operational codes. The refined proposed chain is:
+
+```text
+Company -> Account Unit ANAM -> Billing Event
+Deal -> Service -> Billing Event
+```
+
+Billing Event retains direct Company association after reviewed reconciliation and optional deterministic Service/Deal associations. The provisional Account Unit custom object is specified in [`anam-account-unit-billing-event-converged-model-2026-07-16.md`](anam-account-unit-billing-event-converged-model-2026-07-16.md). This refinement supersedes any assumption that `anam_account_unit_code` should be unique on Company; the ADR remains `Proposed` and authorizes no writes.
+
 ### Proposed target
 
 Create a HubSpot custom object with singular label `Evento de facturación` and plural label `Eventos de facturación` as the operational CRM representation of one source ledger item.
@@ -46,6 +57,7 @@ Invoices and Commerce Payments may be added later as native projections when ANA
 | Object | Grain | Business owner |
 |---|---|---|
 | Company | Legal/account or governed ANAM operating unit. | Commercial / account governance. |
+| Account Unit ANAM | One normalized operational ANAM/CeCo code associated to a governed Company. | Commercial Data Steward / source-system owner. |
 | Deal | One opportunity, quotation and award. | Commercial. |
 | Line item | One quoted service component, quantity, frequency and price. | Commercial. |
 | Service | One awarded service/contract scope with term and renewal lineage. | Service & Contracts. |
@@ -62,13 +74,16 @@ The current numeric `ID` is unique in the snapshot but is not globally safe if a
 
 Proposed related keys:
 
-- Company: HubSpot record ID plus governed ANAM external account/unit code; normalized RUT is secondary matching evidence, not universal identity.
+- Company: HubSpot record ID plus governed legal identity; normalized RUT is secondary matching evidence, not universal identity.
+- Account Unit: unique normalized ANAM/CeCo code after lifecycle/cardinality ratification.
 - Deal: HubSpot record ID plus normalized quotation ID and version.
 - Service: `ANAM-SVC:<source>:<contract-or-quotation>:<awarded-line>` or another stable key approved by ANAM.
 
 ### Associations
 
-- Company `1:N` Billing Event.
+- Company `1:N` Account Unit.
+- Account Unit `1:N` Billing Event.
+- Company `1:N` Billing Event after reviewed Unit-to-Company reconciliation.
 - Deal `1:N` Service.
 - Service `1:N` Billing Event.
 - Billing Event `0:1` originating Deal for reporting convenience, constrained to match its Service lineage.
@@ -124,6 +139,8 @@ If Greenhouse or Kortex executes the sync, use the native integration pattern:
 Source Adapter -> Sync Planner -> Raw Ledger -> Conformed Snapshot
 -> HubSpot Projection -> Readiness -> Replay
 ```
+
+The proposed monthly file-drop and target direct-List operating contract is documented in [`anam-monthly-billing-etl-operating-model-2026-07-16.md`](anam-monthly-billing-etl-operating-model-2026-07-16.md). An integration service performs this pipeline; it must not create one HubSpot Service per Billing Event.
 
 The connector requires watermark/overlap, idempotent upsert, partial-success handling, schema-drift detection, retry/dead-letter, replay and an unresolved-association queue.
 

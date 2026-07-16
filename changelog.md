@@ -36,6 +36,16 @@
 
 ## 2026-07-16 — HubSpot as a Service: skill gestionada, QA ANAM y discovery RevOps
 
+- Se registra `TASK-1423` y la spec `client-billing-intake-data-model-spec-v1.md` para la foundation tenant-scoped
+  del workbook ANAM: modelo reusable `client_billing_*`, assets/scan compartidos, parser versionado y profiler
+  no-write. Se fija la frontera correcta: ANAM es cliente y dueño de source/CRM data; Greenhouse sólo opera el
+  control plane y no proyecta estas filas a su CRM, Finance, Income o Account 360. UI queda como `TASK-1424` futura.
+- Se reemplaza SharePoint como dependencia preferida del intake mensual ANAM por una UI administrada: superficie
+  autenticada en Greenhouse, upload firmado a GCS privado, validación/ledger en Cloud Run + Cloud SQL y aprobación
+  explícita antes de sincronizar HubSpot mediante Kortex OAuth. SharePoint queda como adaptador opcional y Cloud Run
+  + IAP como fallback de acceso. Arquitectura en `anam-managed-billing-intake-ui-2026-07-16.md`; no se provisionó
+  infraestructura ni se realizaron writes HubSpot.
+
 - Nace la skill espejo `.codex/.claude/skills/hubspot-as-a-service` como capa de delivery gestionado: intake,
   inventario, diseño RevOps, change sets, Customer Agent, conocimiento Markdown, landing/chat, QA, handoff,
   medición y reporting; mantiene fronteras explícitas con `hubspot-solutions-partner`, Kortex CMS y el bridge.
@@ -106,6 +116,18 @@
   columnas por línea, tabla exacta y pivot responsable x línea. Los activos reconcilian 29 Deals y CLF 2.443,89;
   no se alteraron informes legacy ni registros CRM. Tendencias, funnel y gauges se aplazan hasta que sus contratos
   de serie temporal, estado Radar y denominador dinámico sean válidos.
+- Los 12 adjuntos no-agent de ANAM quedan clasificados sin modificar los originales: dos candidatos de migración
+  aún `NO-GO`, tres insumos de configuración, cinco referencias y dos exclusiones. La vista Finder usa enlaces y
+  el dictamen documenta granularidad, destino HubSpot, calidad y gates. Las skills espejo incorporan la regla de
+  no confundir adjunto útil, registro importable, insumo de configuración y evidencia administrativa.
+- La reconciliación cruzada de `Segmentación clientes` y `Ticket facturación` reemplaza la hipótesis de Código
+  ANAM único en Company por un custom object propuesto `Cuenta/Unidad ANAM`: 2.882 códigos fuente, 772 compartidos
+  con billing y 7.971 eventos cubiertos. Billing Event enlaza por código exacto a la Unidad y sólo después a Company
+  revisada; 106 códigos con múltiples RUT quedan en cuarentena. ADR/schema preview se mantienen `Proposed`.
+- Se define el operating model mensual: file drop SharePoint full-snapshot como MVP, target Graph/List incremental,
+  raw y run ledger inmutables, staging/crosswalk/exceptions, batch upsert/readback HubSpot y métricas por grano y
+  moneda. El ETL es un servicio de integración y no crea Services por fila; promedio de factura agrega primero
+  eventos por invoice+currency y la mediana acompaña al mean por outliers severos.
 
 ## 2026-07-16 — Tender Proposal Studio: motor de chapter-authors servicio-agnóstico (TASK-1415)
 

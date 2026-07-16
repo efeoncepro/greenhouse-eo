@@ -19,7 +19,7 @@ These files are not an approved import package. Before any HubSpot write, each c
 | Jose Pedro de Oliveira | 2025-04-24 | RV: Tu factura N. 613551177 | `HubSpot-INVOICE-613551177.0.pdf` | `jose-pedro-de-oliveira/2025-04-24_hubspot-invoice-613551177.pdf` | HubSpot billing provenance |
 | Jose Pedro de Oliveira | 2025-04-24 | RV: Tu memorandum de credito de HubSpot #1726706 | `HubSpot-CREDIT_MEMO-1726706.0.pdf` | `jose-pedro-de-oliveira/2025-04-24_hubspot-credit-memo-1726706.pdf` | HubSpot billing adjustment provenance |
 | Jose Pedro de Oliveira | 2025-04-24 | Correo de voz (9 segundos) | `audio.mp3` | `jose-pedro-de-oliveira/2025-04-24_voicemail-9-seconds.mp3` | Preserved non-inline source artifact; not a direct backfill source |
-| Jose Pedro de Oliveira | 2025-03-24 | Formulario y proximos pasos | `image001.png` | `jose-pedro-de-oliveira/2025-03-24_formulario-proximos-pasos.png` | Form and implementation context screenshot |
+| Jose Pedro de Oliveira | 2025-03-24 | Formulario y proximos pasos | `image001.png` | `jose-pedro-de-oliveira/2025-03-24_formulario-proximos-pasos.png` | Email-signature banner; excluded from HubSpot work after visual inspection |
 | Pablo Puga | 2026-04-01 | Segmentacion de mercado | `Segmentacion clientes.xlsx` | `pablo-puga/2026-04-01_segmentacion-clientes.xlsx` | Customer segmentation and commercial enrichment candidate |
 | Pablo Puga | 2025-06-19 | RE: Formulario y proximos pasos | `Observaciones plantilla Hubspot.docx` | `pablo-puga/2025-06-19_observaciones-plantilla-hubspot.docx` | HubSpot field and process design input |
 
@@ -36,3 +36,7 @@ The following attachments were intentionally not copied because they belong to t
 ## Integrity
 
 `SHA256SUMS` contains hashes for the 12 original binary files. The local names are normalized for traceability; original filenames and email provenance remain recorded above.
+
+## HubSpot classification
+
+The non-destructive classified view is in [`classification/`](classification/). The detailed migration/configuration decision is documented in [`../anam-attachment-hubspot-classification-2026-07-16.md`](../anam-attachment-hubspot-classification-2026-07-16.md).

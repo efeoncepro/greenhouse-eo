@@ -3,7 +3,7 @@
 > **Date:** 2026-07-16
 > **Portal:** `19893546`
 > **Status:** Proposed change set; no writes authorized
-> **Depends on:** acceptance of [`anam-billing-event-hubspot-decision-v1.md`](anam-billing-event-hubspot-decision-v1.md)
+> **Depends on:** acceptance of [`anam-billing-event-hubspot-decision-v1.md`](anam-billing-event-hubspot-decision-v1.md) and the Account Unit refinement in [`anam-account-unit-billing-event-converged-model-2026-07-16.md`](anam-account-unit-billing-event-converged-model-2026-07-16.md)
 
 ## Purpose
 
@@ -25,7 +25,7 @@ The proposed custom object represents one SharePoint billing-list item, not a cu
 | Primary display property | `anam_billing_event_name` |
 | Secondary display properties | `anam_source_status`, `anam_original_net_amount`, `anam_original_currency` |
 | Searchable properties | `anam_source_item_id`, `anam_anam_code_source`, `anam_rut_source`, `anam_quotation_edp_source`, `anam_purchase_order_source`, `anam_invoice_number` |
-| Required associations | Company after identity remediation |
+| Required associations | Account Unit by exact code; Company after reviewed Unit reconciliation |
 | Optional deterministic associations | Service and originating Deal |
 | User editing during staging | Disabled by permissions/process |
 | Initial workflows | None |
@@ -38,11 +38,10 @@ HubSpot may assign an account-specific fully qualified object type after schema 
 
 | Label | Internal name | Type | Source / owner | Requiredness |
 |---|---|---|---|---|
-| Código de cuenta/unidad ANAM | `anam_account_unit_code` | string / text; uniqueness pending | ANAM master / Commercial Data Steward | Required where governed by this code |
 | RUT normalizado | `anam_normalized_rut` | string / text | Legal RUT / Commercial Data Steward | Required for applicable Chilean entities |
 | Estado de conciliación de identidad | `anam_identity_reconciliation_status` | enumeration / select | RevOps reconciliation | Required during remediation |
 
-The existing Company `rut` remains the visible/form field during migration. Only 18 Companies use it and one normalized duplicate pair affects two records. Do not create or mark `anam_normalized_rut` unique until that duplicate is reconciled. Do not declare `anam_account_unit_code` unique until ANAM confirms whether one legal Company can own multiple codes and whether codes are reassigned. If its grain is an operating unit, model that unit explicitly rather than concatenating codes.
+The existing Company `rut` remains the visible/form field during migration. Only 18 Companies use it and one normalized duplicate pair affects two records. Do not create or mark `anam_normalized_rut` unique until that duplicate is reconciled. Código ANAM is no longer proposed on Company: model each normalized code as an Account Unit using the converged model, then associate the reviewed Unit to Company.
 
 ### Deal
 
@@ -151,6 +150,8 @@ These remain blank in staging. HubSpot company currency is `CLF`, while the sour
 
 | From | To | Cardinality | Creation rule |
 |---|---|---|---|
+| Account Unit | Company | zero or one during staging; exactly one after review | Reviewed code/RUT/legal-identity crosswalk |
+| Billing Event | Account Unit | exactly one when source code is present | Exact normalized code only |
 | Billing Event | Company | exactly one after remediation | Governed key, reviewed exact mapping or manual review |
 | Billing Event | Service | zero or one initially | Stable Service key or reviewed awarded-line mapping |
 | Billing Event | Deal | zero or one originating Deal | Structured quotation ID/version consistent with Service |
@@ -179,7 +180,7 @@ No fuzzy or numeric-token match creates an association. Ambiguous records remain
 ### Blocked before schema creation
 
 1. Confirm custom-object entitlement in ANAM's live subscription.
-2. Confirm whether Código ANAM identifies Company, operating unit or another entity, and whether it is unique/reassignable.
+2. Ratify Account Unit naming and confirm Código ANAM/CeCo lifecycle, uniqueness and reassignment policy.
 3. Ratify Deal `amount`, quotation/version source, Service grain and external key.
 4. Ratify `Refacturado`, cancellation and credit-note treatment.
 5. Confirm whether one source item can cover multiple Services.

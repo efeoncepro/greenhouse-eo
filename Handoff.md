@@ -47,6 +47,22 @@
 
 ## Sesión 2026-07-16 — HubSpot as a Service + QA/RevOps ANAM (Codex)
 
+> **Frontera cliente — no confundir con Greenhouse:** ANAM es cliente de Efeonce y dueño de su portal HubSpot
+> `19893546`, sus registros y sus futuros paneles. Este trabajo no crea una capability, tenant, dashboard ni
+> dataset ANAM dentro del producto Greenhouse. Greenhouse conserva solamente el canon, decisiones, QA y skills
+> del engagement; Kortex aporta OAuth/runtime ejecutable limitado al portal. Ningún dato cliente se proyectó a
+> CRM, Finance, Income, Account 360 ni analytics de Greenhouse.
+>
+> **Fase 3 panel-first — dry run read-only:** se definieron los contratos exactos para Portafolio de Services,
+> Vencimientos/Renovación, Retention y cola preventiva de Loyalty. El readback live encontró 22 Products, 506
+> line items, 494 Deals Closed Won, 219 ganados con line items y 220 line items ganados. La identidad Product no
+> bloquea: 220/220 resuelven a Products existentes. Sí bloquea la evidencia Service: 186/220 tienen una Company
+> única, sólo 5 frecuencia, 3 inicio, 3 fin y **0/220** están listos para migrar sin inferencia. Los 13 ganados de
+> Q3-to-date no tienen line items. Veredicto: `NO-GO` para backfill masivo y paneles finales; `GO` para captura
+> forward gobernada y revisión manual de los dos ejemplos más completos. HubSpot puede devolver una misma Company
+> bajo `deal_to_company` y `deal_to_company_unlabeled`; la cardinalidad se deduplica por object ID. No hubo writes
+> HubSpot. Canon: `anam-phase-3-panel-first-service-readiness-2026-07-16.md`.
+
 > **Roadmap y Fase 1 — CERRADA:** el plan completo quedó canonizado en
 > `anam-revops-implementation-roadmap-phases-2026-07-16.md` y el contrato/evidencia final en
 > `anam-phase-1-commercial-reporting-foundation-2026-07-16.md`. La Fase 1 cerró con inventario de consumidores,
@@ -105,6 +121,42 @@
 > línea con monto+conteo (`340830124`). Todos usan Growth explícito; el pivot fija Q3 2026 y reconcilia 29/CLF
 > 2.443,89. No se alteraron informes legacy ni registros CRM. Combinación/área se aplazan porque Q3 solo contiene
 > julio; funnel hasta resolver/excluir Radar 0%; gauges DQ hasta disponer de denominador dinámico y meta aprobada.
+>
+> **Clasificación de adjuntos ANAM:** los 12 originales permanecen inmutables y ahora tienen una vista Finder
+> no destructiva en `anam-source-attachments-2026-07-16/classification/`. Sólo `Ticket facturación` y
+> `Segmentación clientes` son candidatos de migración, ambos `NO-GO` hasta cerrar identidad, mapping, dry-run y
+> aprobación. El flujo operativo+Calidad, las observaciones del formulario y el workbook TAM/SAM sirven para
+> configuración/taxonomía, no como registros. Cinco archivos quedan sólo como referencia y se excluyen la firma
+> PNG y el voicemail. Dictamen: `anam-attachment-hubspot-classification-2026-07-16.md`. No hubo writes HubSpot.
+>
+> **Modelo convergente de los dos candidatos:** documentado en
+> `docs/architecture/kortex/hubspot-as-a-service/anam-account-unit-billing-event-converged-model-2026-07-16.md`.
+> No se cargan ambos Excel directamente a Company. `Segmentación clientes` se expande de 2.611 filas a 2.882
+> códigos únicos y alimenta el custom object propuesto `Cuenta/Unidad ANAM`; `Ticket facturación` alimenta
+> `Billing Event`, enlazado por código exacto a la Unidad y luego a Company revisada, con Service/Deal sólo cuando
+> sea determinístico. Intersección: 772 códigos y 7.971 filas billing (47,2%); cohorte fuente más estricta:
+> 629 códigos/3.444 filas con un RUT y un título normalizados. Hay 106 códigos billing con múltiples RUT y quedan
+> en cuarentena. ADR y schema preview Billing Event fueron refinados; todo permanece `Proposed/NO-GO` para writes.
+>
+> **ETL mensual de facturación:** contrato en
+> `docs/architecture/kortex/hubspot-as-a-service/anam-monthly-billing-etl-operating-model-2026-07-16.md`.
+> El modelo físico/tenant y el contrato exacto del workbook quedaron en
+> `docs/architecture/kortex/hubspot-as-a-service/client-billing-intake-data-model-spec-v1.md`; ejecución registrada
+> como `TASK-1423` en `docs/tasks/to-do/TASK-1423-anam-client-billing-data-foundation.md`. ANAM es cliente y dueño
+> del dato; Greenhouse es sólo control plane tenant-scoped. Tablas reusable `client_billing_*`, `space_id` de sesión,
+> target fijo por dataset al portal ANAM `19893546`, assets/scan compartidos y cero writes a Efeonce CRM/Finance.
+> La task inicial termina en no-write profiler; UI será `TASK-1424` y approval/sync una task posterior.
+> La recomendación de intake evolucionó a una UI administrada, documentada en
+> `docs/architecture/kortex/hubspot-as-a-service/anam-managed-billing-intake-ui-2026-07-16.md`: superficie ANAM
+> autenticada dentro de Greenhouse, upload directo a GCS privado, Cloud Run + raw inmutable + staging/control
+> PostgreSQL + revisión/aprobación explícita + adapter Kortex OAuth + batch upsert/readback. SharePoint queda como
+> adaptador opcional, no dependencia. Una app Cloud Run + IAP es fallback sólo si Greenhouse aún no puede provisionar
+> usuarios externos ANAM. No hubo infraestructura, UI ni writes HubSpot.
+> El “servicio” es la integración ETL, no un HubSpot Service por fila. Billing Event se upsertea por source key y
+> Service nace de Deal/line item adjudicado. La data exige mediana además de promedio: CLP mean 2.427.724,65 vs
+> median 454.093; UF mean 1.790,48 vs median 14,84 por outliers. 132 facturas agrupan 428 filas (máximo 10), por
+> lo que promedio por factura requiere agrupar invoice+currency primero. Faltan `Modified`, fecha factura y status
+> timestamp para incremental/lead-time real.
 >
 > **Aprendizaje reusable de cierre:** HubSpot 2026 exige ramas del mismo tipo en fórmulas calculadas; una propiedad
 > numérica no puede devolver `''`. La tasa usa por eso base 1/0 y filtro obligatorio Ganado+Perdido. `Current quarter
