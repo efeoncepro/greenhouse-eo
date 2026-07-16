@@ -100,6 +100,38 @@ commands: `publishHiringVacancyFromBrief`, `POST /api/hiring/vacancy-publication
 and `pnpm hiring:publish-vacancy`. This replaces one-off SQL scripts, ad-hoc
 payloads and production releases as the normal vacancy publication path.
 
+### AI-assisted vacancy copy (TASK-1385 backend + TASK-1422 UI, ✓ complete 2026-07-16)
+
+Drafting the public `public_*` copy of an opening is now an AI-assisted, governed
+propose→confirm capability — prefer it over hand-writing the post from scratch:
+
+- **Propose**: `proposeOpeningPublicCopy` (`src/lib/hiring/vacancy-ai/**`) /
+  `POST /api/hiring/openings/{openingId}/ai/propose-public-copy` (optional
+  `templateId` to align the post with the assessment competencies). Capability
+  `hiring.opening.ai_assist`; flag `HIRING_VACANCY_AI_ENABLED` (OFF in staging/prod
+  until the 1385 ledger flip; ON in local dev). The AI receives ONLY an
+  allowlist-safe projection (`VacancyPromptInput`: role, skills, public facts,
+  template competencies) — **never budget/rate/risk/internal notes/client refs**
+  (negative test with sentinels). It drafts COPY, never facts: location/work
+  mode/compensation are operator-authored; compensation is never proposed.
+- **Confirm**: shared proposals queue (`kind='opening_public_copy'` in the 1361
+  ledger, dedupe by digest) → `POST /api/hiring/assessments/ai/proposals/{id}/confirm`
+  with `publicCopyOverride` (the human's edits). Requires `hiring.opening.write`;
+  NOT flag-gated. Applies via `updateHiringOpening` — the LLM never writes the
+  opening; **publish remains the separate human action** with its 422 gate.
+- **UI (desk)**: Publication Desk (`/agency/hiring/publication`) → opening selector →
+  CTA `✨ Redactar con IA` in the public diff column (locked+tooltip when flag OFF;
+  `Revisar borrador pendiente` when the ledger has a proposed draft) → drawer:
+  "Lo que la IA verá" context block → optional template → honest progress (draft
+  survives "seguir en segundo plano" as a pending proposal) → editable form →
+  Aplicar/Descartar. Manual: `docs/manual-de-uso/hr/operar-hiring-desk.md`
+  §Redactar el aviso con IA.
+- The prompt embeds the Efeonce voice (context pack 05/09) + the anti-bias job-post
+  checklist (no gender/age codes or proxies, job-related-only requirements) —
+  the human reviewer re-checks both before applying (the bias reminder is in the UI).
+- This composes with (not replaces) the structured publication operator (TASK-1371):
+  AI drafts the copy → human confirms → publish/pause/close stays the same.
+
 Location/modality rule for public offers: agents must not author a single free
 text string such as "remote / hybrid by agreement". Vacancy creation must carry
 structured fields (`workMode`, `hiringRegion`, `officeLocation/cityCountry`).

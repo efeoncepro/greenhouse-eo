@@ -179,6 +179,7 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 - **Hardening abierto (tasks):** TASK-1125 (corpus prod) · TASK-1127 (QA nightly + eval wrong-source/cross-doc) · TASK-1128 (signal de drift de términos del corpus).
 - **Hardening cerrado (reciente):** TASK-1126 (golden snapshot del prompt + gate de version/changelog) · TASK-1138 (módulo `answerFormatting` del prompt V2 → v2.1.0) · TASK-1131 (contrato de error canónico es-CL + `captureWithDomain('home')` en los 5 handlers del chat) · TASK-1129 (telemetría de turno: ledger `nexa_turn_telemetry` + signal `nexa.turn.degraded_outcomes`) · TASK-1134 (model selection truth: `modelMode` auto/manual → el auto-router se alcanza en el chat).
 - **Acciones gobernadas:** runtime vivo (`NEXA_ACTION_RUNTIME_ENABLED` ON en staging y prod). `author_quote`
+- **Candidatos de actionKey con parity lista (no registrados aún):** `confirm_assessment_ai_proposal` (TASK-1361) y el confirm del **borrador IA del aviso público** (`opening_public_copy`, TASK-1385/1422 — propose `hiring.opening.ai_assist`, confirm `hiring.opening.write` con `publicCopyOverride`; flag `HIRING_VACANCY_AI_ENABLED`). El contrato gobernado ya existe (mismo ledger 1361 + confirm por kind); registrarlos es wiring de `NexaActionDefinition`, NUNCA lógica hiring dentro de Nexa.
 - **Follow-ups de la lente:** `unhelpful` → selector de motivo; `share` → permalink real; multi-turno con compactación (TASK-1102); token-streaming real por el provider (TASK-1091). Ninguno toca la primitive.
 
 ## Required reads (en orden)

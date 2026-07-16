@@ -184,6 +184,7 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
   `proposal_status`, gateado por `NEXA_PROPOSAL_ACTIONS_ENABLED`. **Runtime único: Vercel** (el chat es un
   route handler de Next; ningún Cloud Run lee estos flags). `request_proposal_render` exige además
   `ARTIFACT_RENDER_JOBS_ENABLED` en el MISMO target (ON en staging, OFF en prod por diseño).
+- **Candidatos de actionKey con parity lista (no registrados aún):** `confirm_assessment_ai_proposal` (TASK-1361) y el confirm del **borrador IA del aviso público** (`opening_public_copy`, TASK-1385/1422 — propose `hiring.opening.ai_assist`, confirm `hiring.opening.write` con `publicCopyOverride`; flag `HIRING_VACANCY_AI_ENABLED`). El contrato gobernado ya existe (mismo ledger 1361 + confirm por kind); registrarlos es wiring de `NexaActionDefinition`, NUNCA lógica hiring dentro de Nexa.
 - **Follow-ups de la lente:** `unhelpful` → selector de motivo; `share` → permalink real; multi-turno con compactación (TASK-1102); token-streaming real por el provider (TASK-1091). Ninguno toca la primitive.
 
 ## Required reads (en orden)
