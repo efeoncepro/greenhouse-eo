@@ -12,6 +12,8 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 
 ## Categorias
 
+- [ANAM Customer Agent QA — 2026-07-16](ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)
+
 - [Design Tokens](design-tokens/README.md)
 - [Cloud Cost](cloud-cost/README.md)
 - [Client Lifecycle](client-lifecycle/README.md)

@@ -47,6 +47,12 @@ Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 - [`developer-platform-research.md`](hubspot-cms/developer-platform-research.md): investigacion oficial de HubSpot Developer Platform para landing pages, modulos, templates, CMS React y CLI.
 - [`landing-page-runbook.md`](hubspot-cms/landing-page-runbook.md): carril seguro para crear landing pages como `DRAFT` y publicar solo con aprobacion.
 - [`anam-portal-access.md`](hubspot-cms/anam-portal-access.md): estado del acceso OAuth Kortex al portal ANAM `19893546`.
+- [`anam-chat-landing.md`](hubspot-cms/anam-chat-landing.md): estado live, intents, builds, QA y guardrails de la landing del Agente Virtual ANAM.
+
+### [`hubspot-as-a-service/`](hubspot-as-a-service/README.md) — operación HubSpot gestionada para clientes
+
+- Conecta diseño RevOps, configuración del portal, Customer Agent, landing/chat, QA, handoff y medición.
+- Mantiene separadas las fronteras de Kortex CMS, el bridge Greenhouse y la oferta comercial de Solutions Partner.
 
 ## Estado operativo vigente
 

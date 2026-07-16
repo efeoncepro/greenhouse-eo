@@ -1,3 +1,45 @@
+## Sesión 2026-07-16 — HubSpot as a Service + QA/RevOps ANAM (Codex)
+
+> **Capability creada:** skills espejo `.codex/.claude/skills/hubspot-as-a-service` con referencias separadas
+> para managed delivery, Customer Agent, RevOps schema y el caso ANAM. La skill orquesta `intake -> inventory ->
+> design -> propose -> approve -> dry-run/draft -> execute -> verify -> document -> measure`; no duplica la
+> oferta de `hubspot-solutions-partner`, la ejecución CMS de Kortex ni el bridge Greenhouse.
+>
+> **Kortex/docs:** nuevo canon `docs/architecture/kortex/hubspot-as-a-service/README.md` + discovery
+> `anam-revops-discovery-2026-07-16.md`. Se corrigió el drift de landing en `project_context.md` y
+> `anam-portal-access.md`: runtime vigente build `#22`, tres intents y prefill del composer no garantizado.
+>
+> **QA cliente:** `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`. El Customer Agent fue probado en
+> aguas/RILES, sólidos/lodos, facturación, administración, reclamo y mixed intent; el informe separa escenarios
+> distintos de re-ejecuciones/regresiones. Limitación nativa: HubSpot puede disparar un transfer antes de una
+> short answer. Mensajes de handoff quedaron empáticos, con contexto preservado y asignación a Maria Paz.
+>
+> **Correo + Notion (solo lectura):** Gmail personal no contenía los hilos; Outlook corporativo
+> `jreyes@efeoncepro.com` sí. Se localizaron 52 mensajes de Maria Paz y seis hilos RevOps sustantivos. Notion
+> confirma FASE 1 Arquitectura de Datos + FASE 2 Service Hub/Tickets/Eventos y revela estados contradictorios.
+> Definiciones confirmadas: `Tipo de ingreso`, Growth/Retention, `Variación vs. cotizado`, matriz/hija y 40
+> acciones comerciales por ejecutivo. Abiertos: compound Cross-sell, sectores, metas SyC y modelo de 16.898
+> registros de facturación.
+>
+> **Secuencia actualizada:** el readback quedó documentado en `anam-hubspot-schema-readback-2026-07-16.md` y la
+> cronología completa de reuniones en `anam-revops-meeting-synthesis-2026-07-16.md`. El modelo converge en
+> Contact -> Lead -> Company -> Deal -> Service, con Ticket para casos/SLA. El objeto estándar Service (`0-162`)
+> ya está activo, pero sólo tiene un registro de prueba, pipeline inglés y dos custom properties sin cobertura;
+> el próximo change set debe ser su data dictionary + asociaciones + migración dry-run. ANAM confirmó Customer
+> Agent + 30.000 créditos comprados: el aviso de un día marcaba
+> el inicio del consumo pagado, no expiración ni desactivación. No hay bloqueo actual de licencia.
+>
+> **Follow-up schema:** dependency audit API quedó limitado por scopes de Automation, Forms, Lists, Tickets,
+> Services y pipeline v3. Se midieron 10 Deals activos en `Radar 0%` aunque la etapa está `isClosed=true`, 8 sin
+> `tipo_de_ingreso`. Corrección semántica del operador: `Down-sell` no es tipo de ingreso y había sido retirado por
+> esa razón; la exposición transitoria fue revertida y el readback final confirma `hidden=true` a
+> `2026-07-16T09:13:40.908Z`. `variacion_contrato` sí permanece como `Variación vs. cotizado` con labels
+> Igual/Mayor/Menor e internal values preservados. Readback: 1.240 Deals; distribución 446/141/87/234/0 y
+> variación 0, sin writes de records ni activación de workflows. Canon nuevo
+> `anam-commercial-first-operating-model-2026-07-16.md`: ANAM se secuencia comercial primero (identidad, Lead,
+> Deal/line items, Service/renovación, Data Quality/Growth/Retention/Loyalty) y Operaciones después (Ticket, SLA,
+> billing sync y paneles operativos). Down-sell se deriva como movimiento de Retención sobre Services comparables.
+
 ## Sesión 2026-07-16 — TASK-1415 COMPLETE: motor de chapter-authors (servicio-agnóstico) — Claude
 
 > **Qué se construyó:** el nodo chapter-author de §5-ter, materializado como motor servicio-agnóstico en

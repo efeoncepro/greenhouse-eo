@@ -1,0 +1,4 @@
+interface:
+  display_name: "HubSpot as a Service"
+  short_description: "Operate client HubSpot with governed delivery"
+  default_prompt: "Use $hubspot-as-a-service to plan and execute this client HubSpot work with RevOps, QA, and evidence."

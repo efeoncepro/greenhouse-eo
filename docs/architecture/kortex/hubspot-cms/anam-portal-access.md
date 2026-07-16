@@ -85,7 +85,7 @@ URL publica: https://anam-2.hubspotpagebuilder.com/agente-anam
 Developer Project: kortex-cms-react
 Project ID: 103589049
 Theme UID: kortex-anam-cms-react-theme
-Build live: 19
+Build live: 22
 ```
 
 Limitacion observada: el endpoint `POST /cms/pages/2026-03/landing-pages/{objectId}/draft/push-live` requiere scopes `content` y `content.landing_pages.write`; el PAK usado para Developer Projects no los tenia al momento de la prueba.

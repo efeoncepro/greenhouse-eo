@@ -1,13 +1,13 @@
 # ANAM Chat Landing - CMS React Project
 
-> **Fecha:** 2026-07-03
+> **Fecha:** 2026-07-16
 > **Portal HubSpot:** ANAM / `19893546`
 > **URL publica:** `https://anam-2.hubspotpagebuilder.com/agente-anam`
 > **Proyecto HubSpot:** `kortex-cms-react`
 > **Project ID:** `103589049`
 > **Theme component UID:** `kortex-anam-cms-react-theme`
 > **Plataforma:** HubSpot Developer Projects / CMS React `2026.03`
-> **Estado:** live en build `#19`
+> **Estado:** live en build `#22`
 
 ## Resumen
 
@@ -72,6 +72,9 @@ Builds relevantes:
 #17  Paleta navy/teal + logo ANAM mas presente.
 #18  UX writing completo, eliminando copy interna como "widget de HubSpot".
 #19  Microajuste final del logo/header. Live publico verificado.
+#20  Ajuste solicitado por Maria Paz Haeger: titulo "Agente Virtual ANAM" y tres categorias operativas.
+#21  Compactacion mobile de las tarjetas de categoria para evitar solapamiento con el globo fijo de chat.
+#22  Routing por query param `anam_intent` + `widget.refresh({ openToNewThread: true })`; logo reducido/subido.
 ```
 
 Estado final verificado:
@@ -81,7 +84,7 @@ Estado final verificado:
   "projectName": "kortex-cms-react",
   "platformVersion": "2026.03",
   "projectId": 103589049,
-  "deployedBuildId": 19,
+  "deployedBuildId": 22,
   "autoDeployEnabled": true,
   "components": [
     {
@@ -95,7 +98,7 @@ Estado final verificado:
 La URL publica fue verificada sirviendo assets:
 
 ```text
-kortex-cms-react/19
+kortex-cms-react/22
 ```
 
 ## Direccion de producto y UX
@@ -105,11 +108,10 @@ Decision de experiencia:
 - primera pantalla funcional, no landing de marketing;
 - copy orientada a tarea y confianza;
 - CTA principal unico: `Iniciar chat`;
-- categorias de entrada con verbos:
+- categorias de entrada segun operacion ANAM:
   - `Cotizar`;
-  - `Consultar servicio`;
-  - `Enviar requerimiento`;
-  - `Revisar seguimiento`;
+  - `Seguimiento del Servicio`;
+  - `Requerimientos de Calidad`;
 - evitar lenguaje de implementacion como `widget`, `HubSpot`, `boton flotante` o explicaciones tecnicas.
 
 Copy final clave:
@@ -117,9 +119,9 @@ Copy final clave:
 ```text
 Canal seguro · Respuesta asistida
 Atencion digital
-Atencion ANAM por chat
-Cuéntanos qué necesitas y te orientamos para cotizar, consultar servicios, enviar un requerimiento o revisar un seguimiento.
-Elige una categoría para iniciar con más contexto.
+Agente Virtual ANAM
+Cuéntanos qué necesitas y te orientamos para cotizar, hacer seguimiento de un servicio o enviar un requerimiento de calidad.
+Elige una categoría para iniciar con el contexto correcto.
 Te conectamos con el canal de atención
 ¿Qué necesitas resolver?
 Canal listo para atender
@@ -145,6 +147,7 @@ Sistema visual final:
 - Poppins como tipografia de la landing;
 - footer simple para cerrar el espacio inferior;
 - header con logo ANAM visible y jerarquia institucional;
+- logo reducido/subido desde build #22 para no montarse sobre la linea inferior del header;
 - panel derecho con ejecutivo virtual 3D y estado de canal.
 
 Asset generado:
@@ -163,23 +166,33 @@ No regenerar el avatar salvo pedido explicito; si se regenera, conservar torso s
 
 ## Interaccion del chat
 
-Los botones usan `data-chat-intent` para guardar la intencion seleccionada y abrir el chat:
+Los botones usan `data-chat-intent` para guardar la intencion seleccionada y `data-chat-intent-key` para enrutar el chatflow por URL:
 
 ```text
-Iniciar chat
-Cotizar
-Consultar servicio
-Enviar requerimiento
-Revisar seguimiento
+general -> sin query param
+cotizar -> ?anam_intent=cotizar
+seguimiento_servicio -> ?anam_intent=seguimiento_servicio
+requerimiento_calidad -> ?anam_intent=requerimiento_calidad
 ```
 
-El layout base define `window.anamOpenHubSpotChat(intent)` y usa:
+El layout base define `window.anamOpenHubSpotChat(intent, intentKey)` y usa el patron oficial de HubSpot Conversations SDK:
 
 ```text
+window.history.replaceState(... ?anam_intent=<intentKey>)
+window.HubSpotConversations.widget.refresh({ openToNewThread: true })
 window.HubSpotConversations.widget.open()
 window.HubSpotConversations.widget.load({ widgetOpen: true })
 window.hsConversationsOnReady
 ```
+
+Nota importante:
+
+- El composer no se puede prellenar de forma confiable en esta configuracion. El widget expone internamente `setInputText(text, sendMessage)`, pero el iframe actual lo descarta cuando no es `portal53` o un `closing agent system chatflow`.
+- La ruta soportada es configurar target rules/branches en HubSpot Chatflows para leer `anam_intent`.
+- Pendiente operativo fuera del Developer Project: configurar en HubSpot los chatflows/branches:
+  - `anam_intent=cotizar`
+  - `anam_intent=seguimiento_servicio`
+  - `anam_intent=requerimiento_calidad`
 
 Mensajes accesibles finales:
 
@@ -205,21 +218,54 @@ curl -s -L https://anam-2.hubspotpagebuilder.com/agente-anam | rg -o "kortex-cms
 Verificacion browser con Playwright desde el runtime local de Codex:
 
 ```text
-hasNewCopy: true
-hasOldWidgetCopy: false
-h1: Atencion ANAM por chat
-primaryText: Iniciar chat
-scrollWidth: 1440
-clientWidth: 1440
+desktop:
+  h1: Agente Virtual ANAM
+  hasQuote: true
+  hasFollowUp: true
+  hasQuality: true
+  hasOldTitle: false
+  scrollWidth: 1440
+  clientWidth: 1440
+mobile:
+  h1: Agente Virtual ANAM
+  hasQuote: true
+  hasFollowUp: true
+  hasQuality: true
+  hasOldTitle: false
+  scrollWidth: 390
+  clientWidth: 390
+intent routing:
+  cotizar:
+    urlParam: cotizar
+    refresh: { openToNewThread: true }
+  seguimiento_servicio:
+    urlParam: seguimiento_servicio
+    refresh: { openToNewThread: true }
+  requerimiento_calidad:
+    urlParam: requerimiento_calidad
+    refresh: { openToNewThread: true }
+  general:
+    urlParam: null
+    refreshCalls: []
+logo:
+  desktop:
+    logoBottom: 116
+    headerBottom: 125
+  mobile:
+    logoBottom: 90
+    headerBottom: 135
 ```
 
 Captura visual temporal revisada:
 
 ```text
-/tmp/anam-build18-desktop.png
+/tmp/anam-build21-desktop.png
+/tmp/anam-build21-mobile.png
+/tmp/anam-build22-desktop.png
+/tmp/anam-build22-mobile.png
 ```
 
-La captura confirmo la experiencia ya equilibrada antes del microajuste final del logo. El build #19 fue verificado por asset path publico.
+Las capturas confirmaron la copy solicitada, las tres categorias y ausencia de overflow horizontal. En mobile, el globo fijo de HubSpot queda fuera de las tarjetas de categoria; puede superponerse al bloque visual del agente por ser un iframe fijo externo.
 
 ## Publish API y scopes
 
@@ -259,8 +305,8 @@ Estado final al cierre de la sesion:
 
 ```text
 URL publica: https://anam-2.hubspotpagebuilder.com/agente-anam
-Build publico: kortex-cms-react/19
-Project deployedBuildId: 19
+Build publico: kortex-cms-react/22
+Project deployedBuildId: 22
 Estado: live
-Pendiente: ninguno conocido
+Pendiente: configurar chatflow target rules/branches en HubSpot para `anam_intent`.
 ```

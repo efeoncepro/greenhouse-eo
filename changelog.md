@@ -1,5 +1,45 @@
 # changelog.md
 
+## 2026-07-16 — HubSpot as a Service: skill gestionada, QA ANAM y discovery RevOps
+
+- Nace la skill espejo `.codex/.claude/skills/hubspot-as-a-service` como capa de delivery gestionado: intake,
+  inventario, diseño RevOps, change sets, Customer Agent, conocimiento Markdown, landing/chat, QA, handoff,
+  medición y reporting; mantiene fronteras explícitas con `hubspot-solutions-partner`, Kortex CMS y el bridge.
+- Kortex suma `docs/architecture/kortex/hubspot-as-a-service/` con el modelo operativo, el seam de la landing
+  ANAM y el discovery combinado de seis hilos RevOps corporativos + tareas Notion. No se ejecutaron properties,
+  backfills, workflows ni otros writes CRM durante el discovery.
+- Se corrige el estado operativo de la landing ANAM a build `#22` y tres intents. El informe cliente de QA queda
+  versionado en `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`, con conteo de escenarios/turnos,
+  resultados y limitaciones nativas. ANAM confirmó Customer Agent y 30.000 créditos comprados; el aviso de un
+  día correspondía al inicio del consumo pagado, no a expiración o desactivación.
+- El readback de schema del portal `19893546` inventaría Deal/Company/Contact, asociaciones y pipelines accesibles,
+  mide cobertura de propiedades clave y documenta drift de opciones, duplicidades y límites de scope sin ejecutar
+  escrituras CRM.
+- El dependency audit confirma que Workflows, Forms, Lists, Ticket v3 y reglas de pipeline requieren scopes de
+  lectura adicionales. Se versiona un change set dividido: reconciliación reversible de dos propiedades pendiente
+  de aprobación y cambios estructurales bloqueados hasta observar consumidores y cerrar decisiones de negocio.
+- La revisión RevOps posterior pausa ese Slice A antes del cambio objetivo: `Down-sell` permanece oculto y
+  `variacion_contrato` permanece intacto. El nuevo governance de propiedades clasifica Deal/Company/Contact en
+  `KEEP / CHANGE / DEFER / RETIRE`, separa movimiento de ingreso de mecanismo de expansión y define como primer
+  entregable analítico un dashboard de calidad de datos; GRR/NRR quedan bloqueados hasta contar con contratos,
+  períodos, moneda y montos comparables.
+- El portal autenticado confirma uso efectivo de `tipo_de_ingreso` en 9 recursos (4 informes, 2 workflows,
+  formulario de creación, lógica condicional y property card); `variacion_contrato` y `tipo_de_servicio` no tienen
+  consumidores declarados. Estos conteos reemplazan la incertidumbre API para esas propiedades, no autorizan retiros.
+- La lectura completa de reuniones de Maria Paz y José Pedro establece el modelo Contact -> Lead -> Company ->
+  Deal -> Service, con Ticket como caso/SLA. El objeto estándar Service (`0-162`) ya está activo: 43 properties,
+  dos custom sin cobertura, un registro de prueba y pipeline inglés sin reglas. Se documenta la síntesis en
+  `anam-revops-meeting-synthesis-2026-07-16.md`; el próximo cambio estructural exige data dictionary y dry-run.
+- Con autorización explícita se ejecuta Slice A por UI autenticada: `Down-sell` queda visible sin cambiar orden ni
+  internal value; `variacion_contrato` pasa a `Variación vs. cotizado`, descripción de adjudicación y labels
+  `Igual/Mayor/Menor`, preservando `Mismo valor/Mayor valor/Menor valor`. Readback API confirma 1.240 Deals y la
+  misma distribución 446/141/87/234/0, con variación en 0; no se tocaron records, workflows, requiredness ni pipelines.
+- **Corrección inmediata:** el operador aclara que Down-sell fue retirado porque no es tipo de ingreso. Se revierte
+  su visibilidad; readback final `tipo_de_ingreso.updatedAt=2026-07-16T09:13:40.908Z`, `Down-sell.hidden=true`,
+  sin cambios de records, valores internos u orden. `Variación vs. cotizado` permanece aplicada. El canon
+  `anam-commercial-first-operating-model-2026-07-16.md` fija la doctrina: contracción/Down-sell es movimiento de
+  Retención sobre Services comparables; implementación comercial primero y Operaciones después.
+
 ## 2026-07-16 — Tender Proposal Studio: motor de chapter-authors servicio-agnóstico (TASK-1415)
 
 - El Studio ahora puede AUTORAR la lámina de diagnóstico (antes se escribía a mano en el `deck-plan.json`): nuevo
