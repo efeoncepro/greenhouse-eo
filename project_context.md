@@ -28,6 +28,8 @@
   Schema live desde 2026-07-16 17:23 UTC: grupo Service `anam_service_contract` (`Contrato y renovación ANAM`),
   9 properties escalares + 1 calculada leídas de vuelta. La calculada propagó naturalmente a `incomplete_core`
   sobre el Service sample. Cero records/workflows/associations/reports; el piloto forward requiere otra aprobación.
+  Simulación read-only de cinco adjudicaciones recientes pasó el award gate y falló activación por ausencia de
+  fechas/modelo/renovación/status; no autoriza backfill. Esperar un award real después de ratificar owner/reviewer.
   Canon: `anam-phase-3-forward-service-capture-contract-2026-07-16.md` bajo el índice anterior.
 
 - **HubSpot Solutions Partner / narrativa agéntica sincronizada (2026-07-16):** las skills espejo

@@ -101,6 +101,7 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 
 - Service: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md). Group `anam_service_contract` plus nine scalar and one calculated Service property were created/read back at 17:23 UTC. Calculated readiness propagated naturally to `incomplete_core` on the sample. No CRM records, workflows, association labels or reports were written.
 - Forward capture: [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md). Separates the commercial award gate from human-confirmed Service activation, uses TCV for portfolio value and ARR only for reviewed recurring Retention comparisons, and keeps AI/smart properties out of authoritative controls.
+- Pilot simulation: [`anam-phase-3-forward-pilot-dry-run-2026-07-16.md`](anam-phase-3-forward-pilot-dry-run-2026-07-16.md). Five recent distinct-Company rows pass deterministic award projection and all fail activation; no historical Service record was created.
 
 ## Current Phase 1 reporting state
 
@@ -124,7 +125,7 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 ## Next execution order
 
 1. Ratify the remaining operational decisions in the forward-capture contract: owner inheritance and named activation reviewer. TCV/ARR and blank-frequency semantics are already encoded in the executed schema contract.
-2. Run a 3–5-line-item forward pilot first as a no-write dry run; first Service records still require separate approval.
+2. The five-row no-write simulation is complete. Wait for the next actual awarded line item, emit its exact dry-run payload and request approval for the first Service record.
 5. Confirm activation fields with the named ANAM operator; keep new awards in `New` until operational start is real.
 6. Publish Portfolio/Expiry first after coverage reconciles; Retention and Loyalty remain gated by a complete renewable cohort and ratified signals.
 7. Keep funnel reporting deferred until stage-entry/exit semantics are verified. Do not substitute current-stage counts for true conversion.

@@ -50,6 +50,9 @@
   ANAM`, nueve propiedades escalares y una calculada. Readback de definición pasó; HubSpot normalizó orden y
   paréntesis sin cambiar semántica. Readiness propagó a `incomplete_core` sobre el sample sin tocar el registro.
   Cero records/workflows/associations/reports.
+- Un dry run read-only sobre cinco adjudicaciones recientes de Companies distintas validó la proyección de award
+  (identidad, Company, Product/familia, owner, moneda, TCV y ARR) y bloqueó correctamente activación por ausencia
+  de fechas, revenue model, renewal facts y delivery status. Los cinco Services históricos no fueron creados.
 - Se registra `TASK-1423` y la spec `client-billing-intake-data-model-spec-v1.md` para la foundation tenant-scoped
   del workbook ANAM: modelo reusable `client_billing_*`, assets/scan compartidos, parser versionado y profiler
   no-write. Se fija la frontera correcta: ANAM es cliente y dueño de source/CRM data; Greenhouse sólo opera el

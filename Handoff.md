@@ -103,6 +103,15 @@
 > ventana inicial `null`, el único Service preexistente propagó naturalmente a `incomplete_core`; no se lo tocó
 > para forzar recálculo. **Cero record, workflow, association-label, report o pipeline
 > writes.** No autoriza Services ni backfill. Ejecución/readback: `anam-service-change-set-2026-07-16.md`.
+>
+> **Forward pilot dry run — cinco filas, cero writes:** sobre los 1.240 Deals, 186 Closed Won tienen line item y
+> una Company distinta. Se simularon las cinco adjudicaciones recientes de Companies distintas: Gasmar,
+> Hidrogistica, Härting, Golden Omega y McDonald's. Las cinco pasan identidad/Company/Product/owner/moneda/TCV/ARR
+> del award gate y producirían keys determinísticas, pero fallan activación: no hay fechas, billing cadence,
+> revenue model revisado, renewal facts ni delivery status. ARR=0 y frequency blank se conservaron como evidencia,
+> no como inferencia one-time. No se crearon los cinco Services históricos. Canon:
+> `anam-phase-3-forward-pilot-dry-run-2026-07-16.md`. Siguiente gate: regla de owner + reviewer ANAM nombrado;
+> después esperar un award real y aprobar su primer payload individual.
 
 > **Roadmap y Fase 1 — CERRADA:** el plan completo quedó canonizado en
 > `anam-revops-implementation-roadmap-phases-2026-07-16.md` y el contrato/evidencia final en
