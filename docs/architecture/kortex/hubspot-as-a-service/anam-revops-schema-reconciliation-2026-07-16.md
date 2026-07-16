@@ -74,7 +74,7 @@ The only normalized duplicate is ANAM itself:
 | `31284841882` | no name/domain; razón social `ANAM`; form-created | 2 unique Deals, 1 unique Contact |
 | `31433962165` | name `ANAM`, domain `anam.cl`; razón social incorrectly says `aguas`; form-created | 1 unique Ticket, 2 unique Contacts |
 
-This is a real association split, not a harmless duplicate value. Before enabling normalized-RUT uniqueness, choose the surviving Company, correct its legal identity and merge or reassociate the other record through a reviewed change. Do not auto-merge based on RUT alone; first check external references and overlapping Contacts. No merge was performed during this inventory.
+This is a real association split, but the operator classified it as an out-of-scope CRM data error. It is not a dependency for the commercial model, Product catalog, Service design or dashboards in this engagement. Do not correct, merge, enrich or otherwise mutate either record as part of this work. No merge was performed during this inventory.
 
 ### Lead
 

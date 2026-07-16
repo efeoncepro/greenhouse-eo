@@ -36,7 +36,7 @@ The most important findings are:
 | Invoice | 145 through Kortex OAuth | 0 | 0 |
 | Custom object schemas | 0 | 0 | 0 |
 
-The personal access key can read Deal, Company and Contact properties and records. It remains a developer-tool credential with user-selected permissions. The Kortex OAuth installation is the broad CRM read/write credential and, after reconsent on 16 July 2026, has 109 scopes including `crm.schemas.custom.write`.
+The personal access key can read Deal, Company and Contact properties and records. It remains a developer-tool credential with user-selected permissions. The Kortex OAuth installation is the broad CRM credential and, after the Product-read consent completed on 16 July 2026, has 110 scopes including `crm.schemas.custom.write` and `crm.objects.products.read` but not Product write.
 
 Resolved access findings:
 
@@ -59,7 +59,7 @@ Read attempts against Workflows, Forms and Lists returned explicit missing-scope
 
 The API-only conclusion was that consumers were **indeterminate**, not that no consumers existed. A later authenticated portal readback resolved aggregate usage for selected high-risk Deal fields: `tipo_de_ingreso` has 9 consumers (4 reports, 2 workflows, one create-record form, one dependent conditional rule and one property card); `linea_de_negocio_anam` has 4; `resultado_de_retencion` and `zona` each have one dependent rule; `variacion_contrato`, the obsolete renewal boolean and `tipo_de_servicio` report zero. Individual workflow/report contracts still require focal inspection. No matching references were found in the Greenhouse workspace or the ANAM CMS React project.
 
-The 16 July scope expansion resolved the prior access failures for Workflows, Lists, Ticket, Service, Invoice and custom schema APIs through Kortex OAuth. A subsequent Product Library read returned `403` because the installation lacks `crm.objects.products.read`; the Kortex project scope correction and ANAM reconsent are tracked separately. Forms and other optional product surfaces remain governed by their granted scopes and are not evidence that every API supports write operations such as report/dashboard creation.
+The 16 July scope expansion resolved the prior access failures for Workflows, Lists, Ticket, Service, Invoice and custom schema APIs through Kortex OAuth. Product Library initially returned `403`; the later explicitly authorized read-only consent added `crm.objects.products.read`. Post-consent readback returned HTTP 200 for Product properties (65) and Product search (22 Products). Product write remains absent. The deployed Kortex authorization generator still needs a durable fix because it omitted the required Product scope until the consent URL was manually corrected. Forms and other optional product surfaces remain governed by their granted scopes and are not evidence that every API supports write operations such as report/dashboard creation.
 
 ## Lead, Quote and line-item adoption
 

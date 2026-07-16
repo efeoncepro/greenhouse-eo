@@ -70,6 +70,7 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - QA report: [`../../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`](../../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)
 - RevOps discovery: [`anam-revops-discovery-2026-07-16.md`](anam-revops-discovery-2026-07-16.md)
 - Non-agent email attachment synthesis for Tickets, billing and market KPIs: [`anam-email-attachment-synthesis-2026-07-16.md`](anam-email-attachment-synthesis-2026-07-16.md)
+- Original non-agent Outlook attachment archive and provenance manifest: [`anam-source-attachments-2026-07-16/`](anam-source-attachments-2026-07-16/)
 - Proposed Billing Event architecture decision: [`anam-billing-event-hubspot-decision-v1.md`](anam-billing-event-hubspot-decision-v1.md)
 - Billing migration and association dry-run: [`anam-billing-event-migration-dry-run-2026-07-16.md`](anam-billing-event-migration-dry-run-2026-07-16.md)
 - Exact Billing Event schema preview and gated change set: [`anam-billing-event-schema-preview-2026-07-16.md`](anam-billing-event-schema-preview-2026-07-16.md)
@@ -80,6 +81,13 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Existing line-item to Product/Service catalog dry run: [`anam-commercial-catalog-dry-run-2026-07-16.md`](anam-commercial-catalog-dry-run-2026-07-16.md)
 - Executed low-risk RevOps change set: [`anam-revops-change-set-2026-07-16.md`](anam-revops-change-set-2026-07-16.md)
 - Property governance and dashboard gates: [`anam-revops-property-governance-2026-07-16.md`](anam-revops-property-governance-2026-07-16.md)
+- Canonical implementation roadmap by phase: [`anam-revops-implementation-roadmap-phases-2026-07-16.md`](anam-revops-implementation-roadmap-phases-2026-07-16.md)
+- Phase 1 commercial reporting foundation: [`anam-phase-1-commercial-reporting-foundation-2026-07-16.md`](anam-phase-1-commercial-reporting-foundation-2026-07-16.md)
+- Product OAuth diagnosis and Kortex runtime drift: [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-product-oauth-diagnosis-2026-07-16.md)
+- Approval-ready Service schema and migration contract: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md)
+- Final scoped QA verdict: [`../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md`](../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
+
+The Service artifact is a proposed technical contract, not a live capability. Its functional documentation and operator manuals are intentionally deferred until the proposal is accepted and executed. No new ADR is indexed for this package because native Service grain/ownership was already established by the canonical reconciliation.
 
 ## Operational dependency
 

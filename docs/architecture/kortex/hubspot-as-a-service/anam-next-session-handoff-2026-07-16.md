@@ -12,12 +12,15 @@ Continue the ANAM HubSpot RevOps implementation with commercial foundations firs
 ## Read first
 
 1. `.codex/skills/hubspot-as-a-service/SKILL.md`
-2. `docs/architecture/kortex/hubspot-as-a-service/anam-revops-schema-reconciliation-2026-07-16.md`
-3. `docs/architecture/kortex/hubspot-as-a-service/anam-commercial-catalog-dry-run-2026-07-16.md`
-4. `docs/architecture/kortex/hubspot-as-a-service/anam-hubspot-schema-readback-2026-07-16.md`
-5. `docs/architecture/kortex/hubspot-as-a-service/anam-billing-event-hubspot-decision-v1.md`
-6. `docs/architecture/kortex/hubspot-as-a-service/anam-billing-event-schema-preview-2026-07-16.md`
-7. `docs/architecture/kortex/hubspot-cms/anam-portal-access.md`
+2. `.codex/skills/hubspot-as-a-service/references/report-design.md`
+3. `docs/architecture/kortex/hubspot-as-a-service/anam-phase-1-commercial-reporting-foundation-2026-07-16.md`
+4. `docs/architecture/kortex/hubspot-as-a-service/anam-revops-implementation-roadmap-phases-2026-07-16.md`
+5. `docs/architecture/kortex/hubspot-as-a-service/anam-revops-schema-reconciliation-2026-07-16.md`
+6. `docs/architecture/kortex/hubspot-as-a-service/anam-commercial-catalog-dry-run-2026-07-16.md`
+7. `docs/architecture/kortex/hubspot-as-a-service/anam-hubspot-schema-readback-2026-07-16.md`
+8. `docs/architecture/kortex/hubspot-as-a-service/anam-billing-event-hubspot-decision-v1.md`
+9. `docs/architecture/kortex/hubspot-as-a-service/anam-billing-event-schema-preview-2026-07-16.md`
+10. `docs/architecture/kortex/hubspot-cms/anam-portal-access.md`
 
 ## Business model
 
@@ -60,14 +63,14 @@ Deal/Service/Company -> Billing Event
 - Do not create duplicate Quote number/version/status/amount properties on Deal by default.
 - Historical quote-versus-award reporting needs a governed backfill/snapshot because existing Quotes are not adopted.
 
-## Identity blocker
+## Out-of-scope CRM data anomaly
 
 RUT `96967550-1` is duplicated across two ANAM Company records:
 
 - `31284841882`: no name/domain, razón social `ANAM`; 2 unique Deals and 1 unique Contact.
 - `31433962165`: name `ANAM`, domain `anam.cl`, incorrect razón social `aguas`; 1 unique Ticket and 2 unique Contacts.
 
-No merge was executed. Before normalized-RUT uniqueness, inspect external references and approve the surviving record/legal name. Recommended direction: preserve the record with domain/name as primary only after that verification, transfer associations through governed merge and read back all related records.
+This is a data-quality error in the CRM operated by ANAM. It is not a dependency for the commercial model, Product catalog, Service design or dashboards in this engagement. Do not correct, merge, enrich or otherwise mutate either Company as part of this work. No merge was executed.
 
 ## Catalog dry run
 
@@ -78,7 +81,7 @@ The 506 line items reduce to 20 normalized names. `M&A - Integral` accounts for 
 
 Resolve `DyCO` versus approved `D&CO` display naming without changing stable internal codes blindly.
 
-## Product OAuth blocker
+## Product OAuth diagnosis and current state
 
 Kortex repo task `TASK-0130` is in progress.
 
@@ -87,19 +90,46 @@ Kortex repo task `TASK-0130` is in progress.
 - `crm.objects.products.write` is conditional.
 - Deprecated `e-commerce` was intentionally not added.
 - Three ANAM consent attempts failed in HubSpot before callback, including read-only.
-- Existing installation remains active with 109 scopes and no Product read/write.
-- Product properties/search remain `403`.
-- Do not retry blindly, rotate credentials or reduce the current installation scopes.
+- Before the final authorized consent, the installation remained active with 109 scopes and Product properties/search returned `403`.
+- Current installation is active with 110 scopes, Product read present and Product write absent.
+- Product properties/search now return HTTP 200 (65 properties, 22 Products).
+- Do not request Product write, rotate credentials or reduce the current installation scopes without a separate approved change set.
+
+Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-product-oauth-diagnosis-2026-07-16.md): all three prior grants failed with `Please provide a valid recaptcha value`. A newly generated control-plane URL also omitted required `crm.objects.products.read`, proving deployed Kortex runtime drift from HubSpot build `#13`. With explicit authorization, the operator completed a manually corrected consent. Callback/activation succeeded, the installation is active with 110 scopes and Product properties/search now return HTTP 200 (65 properties, 22 Products). No Product write, deploy or credential rotation occurred. The durable Kortex URL-generation drift remains to be fixed.
+
+## Approval-ready change set
+
+- Service: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md). Exact property enums, renewal/Deal association labels and deterministic Closed Won line-item migration dry run; no schema or record writes executed.
+
+## Current Phase 1 reporting state
+
+- `Calidad de Datos Comercial` dashboard: `21144697`; seven verified remediation controls are documented in the Phase 1 contract.
+- `Dashboard de Crecimiento`: `19708354`.
+- Current-quarter Growth cohort: Deal creation date from 2026-07-01 and `tipo_de_ingreso` in Venta nueva, Upsell or Cross-sell.
+- Verified cohort: 29 Deals and CLF 2,443.89 of current Deal amount.
+- Seven governed Growth assets are live: KPI count `340827168`, KPI amount `340827503`, income-type donut `340826108`, business-line columns `340826655`, commercial-process donut `340826976`, exact line table `340828194` and owner-by-line pivot `340830124`.
+- Existing legacy reports were not altered. No CRM records, properties, workflows, forms or pipeline metadata were changed by this reporting slice.
+- `Radar 0%` (`1034441224`) is incorrectly `isClosed=true` and currently contains ten Deals. Reports must not use generic open/closed semantics until this is corrected or explicitly excluded.
+
+## Reporting lessons that must survive a new session
+
+- Select the visual from the decision, period and denominator; visual variety is not an objective.
+- Preserve a legacy report when its editor persistence or historical contract is uncertain; create and read back a governed replacement.
+- The simple summarized table supports one measure in the observed builder. Use the custom pivot for count plus amount.
+- A selected filter is not proof of an applied filter. Verify filter count, wait for recalculation and reconcile totals before save.
+- Relative quarter filters are appropriate for pulse tiles; fixed Q3 boundaries are preferable for auditable diagnostics.
+- Do not create a monthly trend from one month, a funnel from invalid stage semantics or a gauge from a manually fixed population maximum.
 
 ## Next execution order
 
-1. Diagnose Product OAuth grant failure without altering the active 109-scope installation.
-2. Produce/approve the Company duplicate remediation change set and legal identity.
-3. Ratify the two catalog ambiguities and stable SKU codes.
-4. Prepare the exact Service property/association change set and won Deal line-item -> Service dry run.
-5. Execute only through Kortex release candidate + approval + dry-run + live execute + readback.
-6. Build Data Quality and Growth first; Retention/Loyalty only after Service cohort coverage is adequate.
-7. Implement Ticket taxonomy and Billing Event afterward.
+1. Finish Phase 1 outcome semantics. Inventory all Growth stage IDs and report dependencies around `Radar 0%`; produce a rollback-ready proposal for either correcting its metadata or temporarily excluding exact stage `1034441224`. Do not mutate pipeline metadata without explicit approval.
+2. Build won/lost count and current Deal amount using exact eligible stage IDs and the correct close-date period. Calculate win rate only from that explicit denominator and read it back against source records.
+3. Keep funnel reporting deferred until stage-entry/exit semantics are verified. Do not substitute current-stage counts for true conversion.
+4. Prepare the P1.4 Q1-Q2 adoption change set from the existing 82-Deal owner queue. Inferences remain suggestions; writes require evidence, named review and approval.
+5. After Phase 1 acceptance, reconcile the 22 Products against the 506 line items and ratify catalog ambiguities and stable SKU codes.
+6. Review the exact Service property/association proposal against the reconciled catalog, then generate the won Deal line-item -> Service dry run before any migration write.
+7. Implement Retention, Renewal and Loyalty only after Service cohort coverage is adequate; Ticket taxonomy and Billing Event follow the commercial foundation.
+8. Fix the durable Kortex authorization-URL scope drift through its own approved release; current ANAM Product read is already active and is not a Phase 1 blocker.
 
 ## Safety and repository state
 
@@ -111,4 +141,4 @@ Kortex repo task `TASK-0130` is in progress.
 
 ## Recommended opening instruction
 
-Continue ANAM HubSpot from this handoff. Start by reading the seven files above, inspect current git/runtime state, and diagnose the Product OAuth blocker without risking the active installation. Then prepare the Company identity remediation and exact Service schema as separate approval-ready change sets. Do not execute CRM writes until the exact change set and rollback are approved.
+Continue ANAM HubSpot from this handoff and finish Phase 1 before catalog or Service implementation. Read the Phase 1 contract and report-design reference, inspect current git/runtime state, then audit the `Radar 0%` stage and its report dependencies without writing. Prepare the exact exclusion-or-correction proposal, build won/lost outcome reports only from explicit eligible stage IDs and verify every denominator. Do not create a funnel, pipeline mutation, backfill or other CRM write without the documented gate and explicit approval. Treat the duplicate ANAM Company records as out-of-scope and do not correct or merge them.

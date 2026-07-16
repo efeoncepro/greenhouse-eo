@@ -14,6 +14,7 @@ Operate HubSpot as an accountable managed service, not as a collection of portal
 3. Load only the workstream reference needed:
    - Customer Agent: [customer-agent.md](references/customer-agent.md)
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
+   - Reports and dashboards: [report-design.md](references/report-design.md)
    - ANAM: [anam-case.md](references/anam-case.md)
 4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `SOURCES.md`.
 
@@ -54,6 +55,7 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 - Do not report a conversational test as passed from one prompt. Test multi-turn memory, natural phrasing, technical accuracy, escalation and failure modes.
 - Native HubSpot transfer/system messages can pre-empt trained answers. Record this as a platform behavior and improve the transfer copy; do not hide it.
 - All client-facing metrics require period, baseline, denominator, definition and evidence. ANAM naming in external case studies requires authorization.
+- Do not reduce dashboard design to scorecards and bars. Inventory the active report builder and select visualization by decision, cardinality, period and measure semantics using `report-design.md`.
 
 ## Required outputs
 
