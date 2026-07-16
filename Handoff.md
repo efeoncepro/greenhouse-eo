@@ -1,4 +1,4 @@
-## Sesión 2026-07-16 — TASK-1422 Vacancy AI Draft UI (Claude, in-progress)
+## Sesión 2026-07-16 — TASK-1422 Vacancy AI Draft UI (Claude) — COMPLETE en develop local (sin push)
 
 > **Task creada y tomada:** UI del propose→confirm de TASK-1385 en el Publication Desk
 > (`/agency/hiring/publication`). Diseño completo con skills product-design (greenhouse-ux +
@@ -93,6 +93,17 @@
 > contradictorias, tasas de abril y referencias legacy rotas; requiere catálogo, metodología, período y owner
 > aprobados antes de backfill o dashboard. Durante migración la fuente actual se preserva para reconciliar;
 > el target no puede depender de doble digitación manual fuera/dentro de HubSpot. No hubo writes en HubSpot.
+>
+> **Delta reporting Growth:** se documentó en las skills espejo `hubspot-as-a-service` una gramática obligatoria
+> de selección visual y QA (`references/report-design.md`): inventario, pregunta/periodo/denominador, decisión
+> KEEP/RESTYLE/REBUILD/RETIRE, matriz KPI/gauge/barras/columnas/línea/área/donut/tabla/combinación/pivot/scatter,
+> tres capas de lectura y readback. Ambas skills pasan `quick_validate.py` y permanecen idénticas.
+> En `Dashboard de Crecimiento` (`19708354`) se crearon y verificaron siete informes: KPI de 29 negocios
+> (`340827168`), KPI CLF 2.443,89 (`340827503`), donut 15/7/7 por tipo (`340826108`), columnas de valor por línea
+> (`340826655`), donut 27/2 por proceso (`340826976`), tabla exacta por línea (`340828194`) y pivot responsable x
+> línea con monto+conteo (`340830124`). Todos usan Growth explícito; el pivot fija Q3 2026 y reconcilia 29/CLF
+> 2.443,89. No se alteraron informes legacy ni registros CRM. Combinación/área se aplazan porque Q3 solo contiene
+> julio; funnel hasta resolver/excluir Radar 0%; gauges DQ hasta disponer de denominador dinámico y meta aprobada.
 >
 > **Billing Event discovery:** ADR `Proposed` en
 > `anam-billing-event-hubspot-decision-v1.md` y dry-run en

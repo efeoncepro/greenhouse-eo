@@ -1,5 +1,21 @@
 # changelog.md
 
+## 2026-07-16 — TASK-1422: UI de redacción del aviso con IA en el Publication Desk
+
+- El Publication Desk (`/agency/hiring/publication`) gana el CTA `✨ Redactar con IA` en la columna
+  pública del diff (variantes ready / locked con tooltip por flag / pendiente por ledger) y un
+  **drawer propose→confirm**: bloque "Lo que la IA verá" (rol + hechos + skills reales de la demanda,
+  con candado de exclusiones), template de assessment opcional, progreso honesto del LLM
+  (con "seguir en segundo plano"), formulario editable prefilled y Aplicar/Descartar. Cliente
+  delgado de TASK-1385: cero endpoints nuevos; el confirm humano escribe, el publish sigue aparte.
+- Además: selector de vacante en el header (la vista fijaba `openings[0]`) y copy bilingüe
+  `hiringDesk.publication.vacancyAi` (es-CL + en-US).
+- Diseño con contratos robustos (wireframe + flow que extiende el nodo N-publish del master
+  EPIC-011 + motion con reuso íntegro de `ghHiring*`), y **GVC en loop de 5 iteraciones** hasta
+  0 findings error + enterprise rubric PASS (desktop + mobile + teclado + reduced-motion), con
+  fixes reales salidos del loop (región scrolleable accesible, overlap mobile, generate enriquecido).
+- Rollout: gobernado por `HIRING_VACANCY_AI_ENABLED` (OFF; ledger de 1385). Dev local ON.
+
 ## 2026-07-16 — TASK-1385: redacción asistida por IA del copy público de vacantes (propose→confirm)
 
 - La IA propone los campos `public_*` del aviso de una vacante desde inputs **allowlist-safe**
@@ -75,6 +91,13 @@
   sin cambios de records, valores internos u orden. `Variación vs. cotizado` permanece aplicada. El canon
   `anam-commercial-first-operating-model-2026-07-16.md` fija la doctrina: contracción/Down-sell es movimiento de
   Retención sobre Services comparables; implementación comercial primero y Operaciones después.
+- La skill espejo incorpora `references/report-design.md` como contrato obligatorio de diseño y QA de informes:
+  pregunta, periodo, denominador, matriz de visualizaciones, capas del dashboard y readback. Codex y Claude pasan
+  validación y permanecen idénticos.
+- `Dashboard de Crecimiento` suma siete informes verificados para el cohort Growth de Q3: dos KPI, dos donuts,
+  columnas por línea, tabla exacta y pivot responsable x línea. Los activos reconcilian 29 Deals y CLF 2.443,89;
+  no se alteraron informes legacy ni registros CRM. Tendencias, funnel y gauges se aplazan hasta que sus contratos
+  de serie temporal, estado Radar y denominador dinámico sean válidos.
 
 ## 2026-07-16 — Tender Proposal Studio: motor de chapter-authors servicio-agnóstico (TASK-1415)
 

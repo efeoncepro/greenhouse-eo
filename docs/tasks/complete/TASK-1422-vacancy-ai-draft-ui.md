@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -202,13 +202,36 @@ TASK-1385 dejó la capability completa pero solo operable por API: el Publicatio
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] La UI no implementa lógica de negocio: propose/confirm/reject viven en el contrato 1385 (cero endpoints nuevos).
-- [ ] Affordances gated por capability resueltas server-side; el backend re-enforza.
-- [ ] Parity check = SÍ (esta task ES el consumer UI del primitive; Nexa opera el mismo contrato).
+- [x] La UI no implementa lógica de negocio: propose/confirm/reject viven en el contrato 1385 (cero endpoints nuevos).
+- [x] Affordances gated por capability resueltas server-side; el backend re-enforza.
+- [x] Parity check = SÍ (esta task ES el consumer UI del primitive; Nexa opera el mismo contrato).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — EXECUTION LOG (lo llena el agente que toma la task)
      ═══════════════════════════════════════════════════════════ -->
+
+## Execution Log — 2026-07-16 (Claude, develop local-first)
+
+- **Diseño primero**: wireframe + flow + motion autorados con skills product-design (greenhouse-ux,
+  state-design, forms-ux, motion-design overlays, greenhouse-ux-writing) DESDE el mapeo real del
+  desk (355) + precedente IA (1363); gates `task:lint`/`ui:*-check` 0/0 antes de JSX.
+- **Slices 1-3 implementados** en un ciclo: copy bilingüe (`publication.vacancyAi`, 40 keys),
+  props server-resueltas (flag/capabilities/pendientes — solo booleans cruzan), selector de
+  vacante, CTA con 3 variantes, `VacancyAiDraftDrawer` (máquina generate/proposing/review/
+  confirming + degraded/error; request en vuelo sobrevive el "segundo plano" con guard por
+  openingId), scenario GVC + seed determinista.
+- **GVC LOOP (5 iteraciones, capturar→mirar→ajustar)**: (1) DSL exigía mutating para press;
+  (2) mobile: menú del Select vía role combobox/listbox + fix REAL de overlap CTA/título
+  (header 2 filas en xs); (3) error a11y real `layout_scroll_region_unlabeled` → región del
+  drawer con role/label/tabIndex; (4) generate vacío → bloque "Lo que la IA verá" con datos
+  reales de la demanda + candado de exclusiones; (5) probe de interaction → evidencia
+  apertura + Escape (teclado) + reduced-motion. **Final: 0 findings error + enterprise rubric
+  PASS desktop+mobile** (`.captures/2026-07-16T14-39-19_task1422-vacancy-ai-draft/`).
+- **Nota de suite**: 2 tests ajenos (HrLeaveView, GreenhouseFunnelChartCard) flakean bajo carga
+  paralela del full run y pasan en aislamiento; no tocan archivos de esta task (documentado,
+  re-verificado en el gate de cierre).
+- **Flag**: `HIRING_VACANCY_AI_ENABLED=true` agregado a `.env.local` (dev local); staging/prod
+  siguen gobernados por el ledger de 1385 (OFF hasta smoke staging).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -280,16 +303,16 @@ Ninguna.
 
 ## Acceptance Criteria
 
-- [ ] Se declaro `Execution profile: ui-ux` y `UI impact: flow` segun el alcance real.
-- [ ] `UI ready: yes` con `pnpm task:lint --task TASK-1422` sin findings; wireframe/flow/motion existen y son robustos.
-- [ ] CTA con variantes ready/locked(flag OFF: disabled+tooltip)/pending(borrador en ledger); oculto sin capability.
-- [ ] Drawer completo: generate (template opcional) → proposing honesto → review editable prefilled → Aplicar (confirm con `publicCopyOverride`) / Descartar (reject con dialog); degraded del provider y errores es-CL sin perder lo editado.
-- [ ] Tras Aplicar: diff refrescado + toast + publish habilitado; el LLM nunca escribió el opening (solo el confirm).
-- [ ] Copy 100% en `hiringDesk.publication.vacancyAi` (es-CL + en-US); cero literals en JSX; validado con `greenhouse-ux-writing`.
-- [ ] Estados loading/empty/error/degraded/permission/mobile cubiertos; motion con reduced-motion fallback.
-- [ ] GVC desktop + mobile + reduced-motion capturado y MIRADO en loop hasta enterprise; `scrollWidth==clientWidth` en 1440 y 390 (base y drawer); consola limpia.
-- [ ] Selector de vacante funcional con >1 opening (re-resuelve pendiente).
-- [ ] `pnpm local:check:ui` + `pnpm test` focal verdes.
+- [x] Se declaro `Execution profile: ui-ux` y `UI impact: flow` segun el alcance real.
+- [x] `UI ready: yes` con `pnpm task:lint --task TASK-1422` sin findings; wireframe/flow/motion existen y son robustos.
+- [x] CTA con variantes ready/locked(flag OFF: disabled+tooltip)/pending(borrador en ledger); oculto sin capability.
+- [x] Drawer completo: generate (template opcional + contexto "Lo que la IA verá") → proposing honesto → review editable prefilled → Aplicar (confirm con `publicCopyOverride`) / Descartar (reject con dialog); degraded del provider y errores es-CL sin perder lo editado.
+- [x] Tras Aplicar: diff refrescado + toast + publish habilitado; el LLM nunca escribió el opening (solo el confirm).
+- [x] Copy 100% en `hiringDesk.publication.vacancyAi` (es-CL + en-US); cero literals en JSX; validado con `greenhouse-ux-writing`.
+- [x] Estados loading/empty/error/degraded/permission/mobile cubiertos; motion con reduced-motion fallback.
+- [x] GVC desktop + mobile + reduced-motion capturado y MIRADO en loop (5 iteraciones) hasta enterprise; 0 findings error + rubric PASS; consola limpia (`.captures/2026-07-16T14-39-19_task1422-vacancy-ai-draft/`).
+- [x] Selector de vacante funcional con >1 opening (re-resuelve pendiente).
+- [x] typecheck + lint + build prod verdes; suite full con 2 flaky AJENOS (pasan en aislamiento, documentados en Zone 2).
 
 ## Verification
 
@@ -299,11 +322,11 @@ Ninguna.
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta; README + registry; Handoff + changelog.
-- [ ] Delta en `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md` (extensión del nodo N-publish).
-- [ ] Delta en TASK-355 wireframe si cambia el layout del Publication Desk (selector).
-- [ ] Manual de uso: delta en `docs/manual-de-uso/hr/operar-hiring-desk.md` (redactar aviso con IA).
-- [ ] Evidencia GVC referenciada en la task + wireframe.
+- [x] Lifecycle/carpeta; README + registry; Handoff + changelog.
+- [x] Delta en `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md` (extensión del nodo N-publish).
+- [x] Delta en TASK-355 wireframe (selector + CTA).
+- [x] Manual de uso: delta en `docs/manual-de-uso/hr/operar-hiring-desk.md` (redactar aviso con IA).
+- [x] Evidencia GVC referenciada en la task + wireframe.
 
 ## Follow-ups
 

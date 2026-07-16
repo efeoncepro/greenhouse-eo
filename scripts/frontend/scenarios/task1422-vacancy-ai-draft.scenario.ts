@@ -66,7 +66,6 @@ export const scenario: CaptureScenario = {
     {
       kind: 'interaction',
       interaction: {
-        kind: 'interaction',
         name: 'vacancy-ai-open',
         intent: 'Apertura del drawer del borrador IA (entrada ghHiringDrawer); Escape cierra y restaura foco; bajo reduced-motion el swap es instantáneo con el mismo significado.',
         action: { kind: 'click', selector: '[data-capture="hiring-vacancy-ai-cta"] button' },

@@ -102,6 +102,12 @@ talent_demand ──▶ hiring_opening ──(publish)──▶ [público] ─�
 - La Activation Lane soporta deep link por `applicationId`/`handoffId`, selecciona el caso correcto si ya está en la cola de N11 y muestra un estado honesto de "aún no está en la cola" si N10 no materializó/aprobó el handoff. Desde el detalle vuelve a Application 360.
 - `Resolver blocker` en N11 consume `POST /api/hr/hiring-activation/[id]/resolve-blocker` de TASK-1400; no hay simulación client-side.
 
+## Delta 2026-07-16 — N-publish gana redacción asistida IA (TASK-1385 backend · TASK-1422 UI)
+
+- El nodo de publicación (Publication Desk, 355 Surface 4) ahora tiene el sub-flujo **"Redactar con IA"**: CTA en la columna pública del diff (variantes ready/locked por flag/pending por ledger) → drawer propose→confirm (`docs/ui/flows/TASK-1422-vacancy-ai-draft-flow.md`). La IA propone COPY desde inputs allowlist-safe (nunca presupuesto/notas internas); el confirm humano escribe vía `updateHiringOpening`; el publish sigue siendo la acción humana existente con su gate 422.
+- Regla transversal reafirmada: "IA propone, humano confirma" ahora cubre preguntas (1361), puntajes (1361/1363) y el aviso público (1385/1422) — mismo ledger `hiring_assessment_ai_proposal`, misma cola de proposals.
+- El Publication Desk ganó selector de vacante (antes fijaba `openings[0]`).
+
 ## Cómo se amplía este doc
 
 Cada task de superficie (354/355/1363/356/770/1368) declara en su `Flow` qué nodo(s) de este master implementa, y deja un `## Delta` acá si agrega/cambia un nodo o una regla transversal. Este flow NO reemplaza el flow por-surface; es el mapa del sistema que los conecta.

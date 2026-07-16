@@ -107,6 +107,9 @@
 | `publication.vacancyAi.templateLabel` | 2 | Plantilla de assessment (opcional) | — | |
 | `publication.vacancyAi.templateHint` | 2 | Alinea el aviso con lo que el proceso realmente evalúa. | — | |
 | `publication.vacancyAi.templatePlaceholder` | 2 | Sin plantilla | — | |
+| `publication.vacancyAi.contextTitle` | 2 | Lo que la IA verá | — | bloque de contexto (rol + chips de hechos + skills de la demanda) — agregado en el GVC loop iter. 3 |
+| `publication.vacancyAi.contextExcluded` | 2 | No verá presupuesto, tarifas ni notas internas. | — | línea con candado bajo el bloque |
+| `publication.vacancyAi.applyDisabledTooltip` | 5 | Necesitas permiso de edición del opening para aplicar el borrador. | — | sin `hiring.opening.write` |
 | `publication.vacancyAi.generate` | 2 | Generar borrador | — | CTA primaria del paso generate |
 | `publication.vacancyAi.proposing` | 3 | Redactando el aviso… esto toma unos segundos. | — | `role="status"` |
 | `publication.vacancyAi.background` | 3 | Seguir en segundo plano | — | cierra drawer; borrador quedará pendiente |
@@ -189,6 +192,13 @@
 - Scroll-width checks: página base y drawer abierto (desktop + 390px).
 - Accessibility/focus checks: foco entra al drawer al abrir; Esc cierra; foco restaurado al CTA (frames del ciclo).
 - Reduced-motion evidence: captura con `prefers-reduced-motion: reduce` (drawer sin animación — guard existente del frame).
+
+## Evidencia GVC (loop 2026-07-16 — 5 iteraciones hasta enterprise)
+
+- Captura final VERDE: `.captures/2026-07-16T14-39-19_task1422-vacancy-ai-draft/` — desktop 1440 + mobile 390, **0 findings error, enterprise rubric PASS en ambos viewports**, 8 frames por variante: `base-diff-with-cta` · `drawer-review` · `drawer-discard-dialog` · `closed-focus-restore` · `vacancy-ai-open-drawer-opened` · `vacancy-ai-open-keyboard` (Escape) · `vacancy-ai-open-reduced-motion` · `drawer-generate`.
+- Fixes que salieron del loop (capturar→mirar→ajustar): (1) región scrolleable del drawer sin role/label/tabIndex → `role='region'` + `aria-label` + `tabIndex=0` (error de teclado real detectado por el layout gate); (2) overlap del CTA con el título de la columna pública en mobile → header de dos filas en xs; (3) paso generate visualmente vacío → bloque "Lo que la IA verá" con datos reales de la demanda + candado de exclusiones; (4) chip de estado estirado en mobile → alignSelf.
+- Warnings axe restantes pertenecen al chrome global y a la columna interna disabled pre-existentes (mismo criterio documentado en TASK-355).
+- Seed determinista para re-correr el scenario: `scripts/hiring/_seed-task-1422-gvc.ts` (crear) / `--cleanup` (borrar).
 
 ## Design Decision Log
 

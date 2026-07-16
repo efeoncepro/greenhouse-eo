@@ -1,5 +1,9 @@
 # TASK-355 — Hiring Desk Wireframe
 
+## Delta 2026-07-16 — Publication Desk (TASK-1422)
+
+- La Surface 4 (Publication Desk) ganó: (1) **selector de vacante** en el header card (antes la vista fijaba `openings[0]`); (2) CTA **"Redactar con IA"** en el header de la columna pública del diff → drawer propose→confirm del copy público (contratos en `docs/ui/wireframes/TASK-1422-vacancy-ai-draft-drawer.md` + flow + motion). El diff anti-leak y las acciones de publish quedaron intactos.
+
 ## Meta
 
 - Task: `TASK-355`
