@@ -1,3 +1,19 @@
+## Sesión 2026-07-16 — ANAM landing HubSpot: `Agente Virtual ANAM` live (Codex)
+
+> **Pedido:** revisar correos de Maria Paz Haeger, entrar al HubSpot de ANAM y aplicar el cambio solicitado en la landing.
+>
+> **Cambio publicado:** en el proyecto externo `/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project`, módulo `KortexLandingHero`, la landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` ahora titula `Agente Virtual ANAM` y muestra tres categorías: `Cotizar`, `Seguimiento del Servicio` y `Requerimientos de Calidad`. Se mantuvo el chat existente y se compactaron las tarjetas mobile para que el globo fijo de HubSpot no tape las opciones.
+>
+> **HubSpot/rollout:** portal ANAM `19893546`, Developer Project `kortex-cms-react`, build `#21` auto-deployado. `hs project info --account 19893546 --json` reporta `deployedBuildId: 21`; la URL pública sirve `kortex-cms-react/21`.
+>
+> **Verificación:** `hs project validate --profile anam` PASS; `hs project upload --profile anam` PASS; Playwright live desktop `1440x1100` y mobile `390x1000` confirma H1 nuevo, tres categorías nuevas, textos antiguos ausentes y `scrollWidth === clientWidth`. Capturas temporales: `/tmp/anam-build21-desktop.png` y `/tmp/anam-build21-mobile.png`.
+>
+> **Docs:** actualizados `docs/architecture/kortex/hubspot-cms/anam-chat-landing.md`, `docs/architecture/kortex/hubspot-cms/landing-page-runbook.md` y `changelog.md`. Pendiente conocido: ninguno.
+
+## Sesión 2026-07-15 — TASK-1415: motor de chapter-authors (servicio-agnóstico) — INICIO (Claude)
+
+> **Task tomada:** `TASK-1415` movida a `in-progress/` (README + registry sincronizados). Trabajo en `develop` local-first, SIN push hasta instrucción del operador. Objetivo: la interface `ChapterAuthor` servicio-agnóstica + harness de eval domain-free, con diagnóstico (SEO/AEO, Grader→lámina) como primera implementación de prueba + un 2º author de otro servicio que prueba el agnosticismo. Molde propose→confirm de `intake-agent.ts`; flag `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF. Es el nodo chapter-author de §5-ter del arch doc del Studio (NO la F1 §9 de admisibilidad).
+
 ## Sesión 2026-07-15 — Creative Workflows: corrección visual V3 de diagramas (Codex)
 
 > **Hallazgo humano:** la revisión posterior invalidó el `PASS` de los diagramas V2. En frontera de decisión, la línea lima atravesaba copy/listas, la tarjeta central invadía el cierre y `¿Q` colisionaba visualmente. En autonomía, la diagonal ocultaba `01`, atravesaba tarjetas y el label vertical de evidencia quedaba recortado.
