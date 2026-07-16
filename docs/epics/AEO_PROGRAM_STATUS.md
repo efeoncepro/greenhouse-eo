@@ -57,13 +57,13 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 
 ---
 
-## 3. Blockers de config — encender lo que YA está hecho (días, no meses)
+## 3. Config — verificado en runtime 2026-07-16: los "blockers" estaban stale
 
-No requieren construir nada; son rollout/config que frenan lo ya construido:
+> **Los tres items que un audit doc-based reportó como blockers ya están resueltos en runtime.** El ledger/docs estaban desactualizados. Verificación en vivo:
 
-1. 🔴 **Property HubSpot `aeo_check_result` puede no existir en el portal** (verificada ausente el 2026-06-29). Sin ella el upsert de Company da 400 y **el loop cross-sell se rompe en el write.** Fix: correr `scripts/growth/provision-ai-visibility-hubspot-properties.ts` + confirmar objeto `leads` habilitado.
+1. 🟢 **Property HubSpot `aeo_check_result` — EXISTE** (verificado live 2026-07-16 en el portal `48713323`, objeto companies). Además existe el set completo `ai_visibility_score`, `ai_visibility_score_version`, `ai_visibility_primary_gap`, `ai_visibility_report_url`, `ai_visibility_recommended_motion`, `ai_visibility_last_run_at`, `ai_visibility_competitors_detected`. El doc previo decía "ausente al 2026-06-29" — stale. El write del handoff no está bloqueado por falta de property.
 2. 🟢 **Flags AEO — ya están ON en prod (verificado runtime 2026-07-16); el ledger estaba desactualizado.** Verificación en vivo: Vercel Production tiene `GRADER`, `OPERATOR_SEND`, `PORTAL_RUN`, `TRIAL`, `PUBLIC_INTAKE`, `LEAD_HANDOFF`, `REPORT_EMAIL` = todos `true`; ops-worker (revisión activa `00490`) tiene `OPERATOR_SEND`/`GRADER`/`LEAD_HANDOFF`/`REPORT_EMAIL` = `true` (los request-path `PORTAL_RUN`/`TRIAL`/`PUBLIC_INTAKE` se leen en Vercel, correcto que no estén en el worker). El ledger afirmaba que `OPERATOR_SEND` estaba ausente en Vercel — falso, está presente y `true` en los 3 environments. **Acción restante: solo actualizar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` para que refleje el runtime real** — no hay flag que prender. Higiene: los flags son multi-runtime; la verdad es `vercel env ls`/`env pull` + revisión activa del `ops-worker`, nunca el ledger.
-3. 🟠 **`TASK-1341` — DataForSEO AIO en prod** cae como `missing_secret` en el ops-worker → los informes quedan `partial`. Falta el secret en la revisión efectiva.
+3. 🟢/🟡 **DataForSEO AIO — credenciales presentes en la revisión activa del ops-worker** (`00490`, verificado 2026-07-16): `DATAFORSEO_API_LOGIN` + `DATAFORSEO_API_PASSWORD_SECRET_REF` seteados. La causa que el doc citaba (`missing_secret` por login ausente) es stale. **Pendiente menor:** confirmar con un run real que el secret resuelve (grant `secretAccessor`) y que AIO devuelve data — `TASK-1341` sigue `to-do` como guard, pero el síntoma reportado no aplica a la revisión viva.
 4. 🟠 **Rollout de la entrada pública (`TASK-1246`, único freno formal de EPIC-020):** sign-off legal de consent + secret Turnstile + resolver la decisión de ADR abierta (¿la cara pública se embebe con `<greenhouse-form>` o se hace en el repo público?) + smoke `form→run→status→report→email`.
 
 ---
@@ -106,9 +106,10 @@ No requieren construir nada; son rollout/config que frenan lo ya construido:
 
 ### Config sin task formal
 
-- Provisionar property HubSpot `aeo_check_result` (script) — ver §3.1.
-- Actualizar el ledger de flags para reflejar el runtime real (los flags ya están ON) — ver §3.2.
-- Poblar `grader_profiles.organization_id` + asignar entitlement per-ORG (los flags `PORTAL_RUN`/`TRIAL` ya están ON) — ver §2.A.
+- ✅ Property HubSpot `aeo_check_result` — **ya existe** (§3.1). Nada que hacer.
+- ✅ Flags AEO — **ya ON en prod** (§3.2). Solo actualizar el ledger para que no mienta.
+- ✅ DataForSEO creds — **presentes** en la revisión activa (§3.3). Solo confirmar con un run real.
+- Poblar `grader_profiles.organization_id` + asignar entitlement per-ORG (los flags `PORTAL_RUN`/`TRIAL` ya están ON) — ver §2.A. **← esto sí queda pendiente.**
 - Provisionar clientes/trials más allá de Berel (decisión comercial) — ver §2.C.
 
 ---
@@ -117,7 +118,7 @@ No requieren construir nada; son rollout/config que frenan lo ya construido:
 
 Ordenado por ratio impacto/esfuerzo, minimizando código nuevo:
 
-**Ola 1 — Encender lo ya hecho (config/rollout, días).** Provisionar property HubSpot (§3.1) → actualizar el ledger de flags para que refleje el runtime real (§3.2; los flags ya están ON) → cerrar DataForSEO AIO / `TASK-1341` (§3.3). Reactiva el loop CRM y sube los informes a completos. Sin esto, lo que construyas encima nace roto.
+**Ola 1 — Confirmar el loop end-to-end (verificación, no construcción; horas).** La config ya está (flags ON, property existe, DataForSEO con creds — todo verificado 2026-07-16). Lo que resta es **probar que el loop realmente corre** con un smoke real: (a) operador dispara "enviar informe + abrir oportunidad" sobre un prospecto → verificar que llega el Lead a HubSpot y que se escribe `aeo_check_result` + `ai_visibility_*`; (b) un run que ejercite Google AIO → confirmar que ya no queda `partial` por DataForSEO. Si pasan, el cross-sell está vivo. En paralelo, actualizar el `FEATURE_FLAG_STATE_LEDGER.md` para que refleje la realidad.
 
 **Ola 2 — Cara operativa interna (`TASK-1276`, UI pura sobre backend listo).** Cockpit operador + facet AEO en Account 360. Es el gap #1 y el de mejor ratio: convierte el AEO en herramienta operativa y de venta *desde donde el AM ya trabaja al cliente*.
 
@@ -132,3 +133,5 @@ Ordenado por ratio impacto/esfuerzo, minimizando código nuevo:
 ## 7. Nota de higiene documental (corregida 2026-07-16)
 
 La cabecera de `EPIC-020` y su one-liner en `docs/epics/README.md` describían las child tasks C–M como "planificadas", cuando el lifecycle real (carpeta) las tiene `complete` — el único abierto es `TASK-1246`. Corregido en esta pasada para que el estado sea legible sin re-auditar. Fuente del estado: auditoría multi-agente 2026-07-16 (motor/operabilidad, cara pública, backlog, comercial) + verificación de lifecycle por carpeta.
+
+**Lección de método (2026-07-16):** la primera pasada de este doc fue una auditoría *doc-based* y arrastró el drift del `FEATURE_FLAG_STATE_LEDGER.md`. Al verificar contra runtime, **tres "blockers" reportados resultaron falsos**: flags OFF → en realidad ON (Vercel prod + ops-worker); property HubSpot ausente → existe; DataForSEO `missing_secret` → creds presentes en la revisión activa. Regla: el estado de flags/secrets/properties se verifica en el runtime vivo (`vercel env pull`, `gcloud run services describe`, HubSpot API), **nunca desde el ledger o docs**. El ledger describe el día que se escribió; el runtime describe hoy.
