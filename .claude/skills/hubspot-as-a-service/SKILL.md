@@ -59,6 +59,7 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 - Do not reduce dashboard design to scorecards and bars. Inventory the active report builder and select visualization by decision, cardinality, period and measure semantics using `report-design.md`.
 - Treat calculated properties as governed schema, not report-local convenience. Verify the portal allowance, prefer exact business IDs over probability-derived flags, read back both definitions and representative values, and document any mandatory report filter that makes a numeric base semantically valid.
 - Treat smart properties as credit-consuming, AI-produced evidence. Never use them as authoritative identity, currency, amount, lifecycle, eligibility, compliance or accounting data.
+- Do not describe missing CRM data as a platform defect or commercial-discipline failure without separating capture design, source quality, system behavior and evidenced user adoption.
 
 ## Required outputs
 

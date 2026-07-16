@@ -12,6 +12,7 @@ La diferencia con otras capas de documentacion:
 
 ### Comercial
 
+- [Operar ANAM HubSpot Managed Service](hubspot-as-a-service/operar-anam-hubspot-managed-service.md) — rutina diaria/semanal/mensual para Customer Agent, calidad por owner, Growth, Services, automatización, pilotos y preparación read-only de billing.
 - [Componer el deck de una licitacion](comercial/componer-deck-de-licitacion.md) — `pnpm deck:compose <plan.json>`: escribir el plan, componer, revisar las laminas y entregar. Que significan `too_long` (el renderer NO trunca), `missing_evidence_ref` (una cifra sin fuente no se compone) y el aviso de peso del PDF (si el portal rechaza el archivo, la oferta queda fuera del proceso).
 - [Autorar una lámina con el chapter-author](comercial/autorar-lamina-con-chapter-author.md) — generar las láminas de diagnóstico desde un run real del Grader con el agente (propose → confirmación humana → render): prerrequisitos (proxy PG, flag, key), el script canónico, cómo entran los hechos externos del operador (siempre con fuente), qué significa cada rechazo (no son bugs: es el diseño anti-fabricación) y qué no hacer.
 

@@ -36,6 +36,52 @@
 
 ## 2026-07-16 — HubSpot as a Service: skill gestionada, QA ANAM y discovery RevOps
 
+- Se completó la triple documentación ANAM: canon técnico, overview funcional end-to-end y manual operativo.
+  Se canonizó Data Quality como cola por owner/cadencia, con causas separadas entre schema/plataforma,
+  fuente/migración, integración y captura/adopción; “disciplina comercial” exige evidencia y no autoriza inferir.
+  Las skills Codex/Claude quedaron equivalentes con matching acotado, cobertura cross-object, snapshots
+  inmutables, geografía multi-select no aditiva y moneda explícita. Excepción registrada: falta localizar/crear el
+  source pack Markdown ANAM independiente antes del próximo cambio de knowledge de Customer Agent.
+- Se reconcilió live el slice KPI de sector, mercado y región contra Notion, los adjuntos de María Paz/Pablo y
+  el portal ANAM `19893546`. Tras aprobación explícita, se creó Company `segmento_de_mercado_anam` con label
+  `Segmento de mercado` y 22 opciones. Un guard más fuerte de duplicidad del lado HubSpot dejó 471 Companies
+  seguras: import `77871653` actualizó segmento+región en 471/471 e import `77871743` actualizó 65/65 sectores
+  estratégicos directos, ambos con 0 errores, sin nuevos records, asociaciones, enriquecimiento ni merges.
+- Se retuvieron 22 Companies bajo 11 claves normalizadas duplicadas, 3 casos ambiguos de fuente y 527 no
+  emparejados. El readback completo verificó los 471 IDs y la evidencia previa quedó inmutable y separada del
+  snapshot posterior para rollback. Las ventas por segmento/sector/región siguen sin ser KPI oficial porque la
+  cobertura Deal→Company es sólo 629/1.240 (`50,73%`) y los TAM/SAM del workbook se contradicen.
+- El dry run read-only de asociación Deal→Company encontró 34 candidatos high-confidence por cadena explícita
+  Deal→Contact→Company, 113 candidatos de dominio para revisión manual y 498 held. Ninguno de los 34 apunta a
+  las Companies duplicadas conocidas. Tras aprobación exacta, import `77872707` ejecutó esos 34 pares como
+  Primary con 0 errores y 0 registros nuevos; el readback verificó 34/34, una Company por Deal y type ID `5`.
+  HubSpot reportó 68 asociaciones direccionales para los 34 pares. Los 113 candidatos por dominio y 498 held
+  quedaron intactos. El conector activo correspondía al portal `48713323` y se descartó antes de operar; toda la
+  ejecución se guardó contra ANAM `19893546`.
+- Se publicó y verificó en `Calidad de Datos Comercial` (`21144697`) el reporte reversible `DQ - Negocios sin
+  empresa asociada por responsable`, con baseline 645 Deals previo a la remediación. El schema, los dos backfills
+  y el primer slice exacto de 34 asociaciones están cerrados; los KPI oficiales y cualquier remediación adicional
+  de asociaciones/duplicados siguen approval-gated en
+  `anam-sector-geography-kpi-slice-change-set-2026-07-16.md`.
+- Con aprobación explícita se agregaron a Growth `19708354` tres diagnósticos históricos parciales: valor
+  comercial ganado por segmento `340896790` (14 categorías, CLF 41.830,35), sector estratégico `340897291`
+  (2 categorías, CLF 34.204,13) y región de sede `340897635` (12 regiones, CLF 41.830,35). Todos filtran
+  `Ganado` exacto y dimensión Company conocida. No se modificaron records, schema, asociaciones, workflows ni
+  reportes existentes. Son valor comercial cubierto, no facturación/revenue/penetración ni KPIs oficiales;
+  el gate >=95% sigue incumplido con Deal→Company en 629/1.240.
+- El relevo ANAM ahora exige comenzar con un readback live y read-only de reuniones/tareas en Notion y una matriz
+  decisión/owner/fase/evidencia/gap/aprobación antes de nuevos writes. La síntesis local queda explícitamente como
+  índice, no autorización. También se corrigió drift del roadmap: Fase 3 y Fase 5 tienen pilotos live con siete
+  reportes, pero siguen no oficiales porque sus cinco Services usan activación sintética marcada pendiente de ANAM.
+- Se crearon y verificaron los paneles cliente `ANAM — Retención (PILOTO)` (`21152855`) y `ANAM —
+  Fidelización (PILOTO)` (`21152950`). Retención contiene el Portafolio de cinco Services (`340874128`) y un
+  radar de atención/renovación (`340874425`), más summaries de cohorte recurrente elegible (`340877391` = `2`)
+  y ARR elegible (`340877588` = `22` UF). Fidelización contiene la cola de atención (`340874258`) y summaries
+  de seguimiento (`340877942` = `2`) y retrasos (`340878184` = `1`). Los action reports aplican `delivery delayed
+  OR renewal upcoming` y muestran Härting + Hidrogistica. Los inputs de
+  activación son sintéticos y están marcados en cada registro; `fields_ready` valida la fórmula, no aprobación
+  cliente. No se declararon GRR/NRR, NPS ni health score; ese slice piloto no modificó Growth, aunque el slice
+  diagnóstico posterior sí agregó los tres informes históricos parciales descritos arriba.
 - Se probó automation v4 beta y el action nativo `Create record → Service`. La definición compila, pero un Deal
   workflow no puede garantizar el grain one-Service-per-line-item; queda descartado como materializer productivo.
   Tres probes runtime no enrolaron por API y limpiaron todos sus Deals/line items/workflows temporales.
@@ -52,10 +98,11 @@
 - El readback documentó dos guardrails reutilizables: una etiqueta pareada debe verificarse en ambas direcciones
   y un search miss inmediato no prueba ausencia, porque el índice puede rezagarse mientras la unique constraint
   ya está activa. Ledger y rollback: `anam-phase-3-forward-pilot-execution-2026-07-16.md`.
-- La Fase 3 queda reconciliada para captura forward: Portafolio usa TCV por moneda original, Retention usa ARR
+- **Checkpoint de diseño previo al piloto (superado por las ejecuciones registradas arriba):** la Fase 3 quedó reconciliada para captura forward: Portafolio usa TCV por moneda original, Retention usa ARR
   sólo en cohorte recurrente/renovable revisada, billing cadence no se confunde con delivery cadence y un award
   propone Service `New` sin declarar activación. Backfill histórico continúa `NO-GO`; esquema y primer piloto
-  de 3–5 line items requieren aprobaciones separadas. No hubo writes HubSpot.
+  de 3–5 line items requerían aprobaciones separadas. En ese corte no hubo writes; schema y piloto fueron
+  posteriormente aprobados y ejecutados como documentan los bullets anteriores.
 - Las skills espejo agregan una matriz de propiedades HubSpot que separa storage type, field type, mecanismo de
   población y gobierno, y decide entre native/custom/unique/calculation/rollup/sync/score/workflow/smart. Smart
   queda como evidencia AI con créditos y revisión humana, nunca como identidad, dinero, lifecycle o elegibilidad.
@@ -66,9 +113,10 @@
   ANAM`, nueve propiedades escalares y una calculada. Readback de definición pasó; HubSpot normalizó orden y
   paréntesis sin cambiar semántica. Readiness propagó a `incomplete_core` sobre el sample sin tocar el registro.
   Cero records/workflows/associations/reports.
-- Un dry run read-only sobre cinco adjudicaciones recientes de Companies distintas validó la proyección de award
+- **Dry run histórico previo a la ejecución posterior:** cinco adjudicaciones recientes de Companies distintas validaron la proyección de award
   (identidad, Company, Product/familia, owner, moneda, TCV y ARR) y bloqueó correctamente activación por ausencia
-  de fechas, revenue model, renewal facts y delivery status. Los cinco Services históricos no fueron creados.
+  de fechas, revenue model, renewal facts y delivery status. En ese corte no fueron creados; luego el lote exacto
+  fue aprobado, creado y marcado como piloto sintético según la evidencia de ejecución anterior.
 - Se incorpora un modelo de datos ANAM vivo con diagrama, grain y source-of-truth por objeto, matriz de
   asociaciones, proyecciones permitidas/prohibidas y sinergias comerciales, Service, Loyalty, Tickets y billing.
   El reconciliation fechado queda como evidencia con aviso de drift, evitando ejecutar propuestas superadas.

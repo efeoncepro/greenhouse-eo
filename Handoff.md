@@ -53,6 +53,48 @@
 > del engagement; Kortex aporta OAuth/runtime ejecutable limitado al portal. Ningún dato cliente se proyectó a
 > CRM, Finance, Income, Account 360 ni analytics de Greenhouse.
 >
+> **Entrada obligatoria de la próxima sesión:** antes de nuevos writes o de decidir que una fase avanza, buscar
+> y leer en Notion las reuniones/tareas ANAM entre 2025-11-07 y 2026-07-06, además de cualquier página posterior,
+> empezando por los page IDs del
+> `anam-next-session-handoff-2026-07-16.md`. El primer output debe ser una matriz reunión/decisión/owner/fase/
+> evidencia runtime/gap/siguiente acción/aprobación y separar decisiones estables, notas tentativas, tareas
+> cerradas/abiertas y material superado. La síntesis local es índice, no autorización. Esta apertura es read-only:
+> no mutar Notion ni HubSpot. El roadmap ya refleja que Fase 3 y Fase 5 tienen pilotos live, pero no métricas
+> oficiales: los cinco Services usan datos sintéticos marcados y todavía requieren ratificación/reemplazo ANAM.
+>
+> **Slice KPI sector/mercado/región — schema y backfills acotados ejecutados:** tras aprobación explícita se creó
+> Company `segmento_de_mercado_anam` con label visible `Segmento de mercado` y 22 opciones. Un guard adicional
+> de unicidad del lado HubSpot redujo el cohort seguro de 484 estimados a 471 Companies; se retuvieron 22 records
+> bajo 11 claves normalizadas duplicadas, además de 3 fuentes ambiguas y 527 no emparejadas. Import `77871653`
+> actualizó segmento + `region_de_chile` en 471/471, e import `77871743` actualizó `sector_estrategico` en 65/65
+> mappings directos (Acuícola 18, Energía 9, Minería 9, Sanitarias 29). Ambos finalizaron con 0 errores, sin records
+> nuevos, asociaciones, enriquecimiento ni merge de Companies. Readback verificó propiedad, 22 opciones y los
+> 471 records; snapshot previo, manifest y readback posterior quedaron separados para rollback. El control
+> `DQ - Negocios sin empresa asociada por responsable` nació con baseline 645/1.240 Deals sin Company primaria;
+> por eso los reportes de venta por segmento/sector/región todavía no son KPI oficiales. TAM/SAM continúa
+> bloqueado por versiones contradictorias. Canon: `anam-sector-geography-kpi-slice-change-set-2026-07-16.md`.
+>
+> **Deal→Company — primer slice aprobado y ejecutado:** el conector HubSpot disponible resolvió al portal `48713323`,
+> no ANAM, y fue descartado antes de leer/escribir datos. El perfil CLI `anam-19893546` verificó portal
+> `19893546` y clasificó los 645 Deals sin Company: 34 candidatos high-confidence por convergencia explícita
+> `Deal→Contact→Company`, 113 coincidencias sólo por dominio para revisión manual y 498 held. Ningún target high
+> pertenece al cohort de Companies duplicadas. Tras aprobación separada de la tabla exacta, import `77872707`
+> creó los 34 pares Primary con 0 errores y 0 records nuevos; HubSpot contabilizó 68 asociaciones direccionales.
+> El readback API verificó 34/34 pares, una Company distinta por Deal y type ID `5`. Cobertura global queda
+> 629/1.240 (`50,73%`) y ganados 270/494 (`54,66%`), por lo que no desbloquea KPI oficial. Los 113 candidatos por
+> dominio, 498 held y Companies duplicadas no se tocaron. Manifest/rollback/evidencia:
+> `anam-deal-company-association-remediation-dry-run-2026-07-16.md`.
+>
+> **Gráficos diagnósticos sector/mercado/región EJECUTADOS:** con aprobación del operador se agregaron al
+> `Dashboard de Crecimiento` `19708354` tres barras horizontales con `histórico parcial` en el título, filtro
+> exacto `Resultado comercial reportable ANAM = Ganado` y dimensión Company conocida. Segmento `340896790`
+> reconcilia 14 categorías y CLF 41.830,35; sector estratégico `340897291` reconcilia 2 categorías y CLF
+> 34.204,13; región de sede `340897635` reconcilia 12 regiones y CLF 41.830,35. Usan valor comercial del Deal
+> en moneda de la empresa: no son facturación, revenue reconocido, penetración TAM/SAM ni población completa.
+> No se tocaron registros, propiedades, asociaciones, workflows ni informes existentes. La publicación oficial
+> sigue bloqueada por cobertura Deal→Company 629/1.240. Canon/rollback:
+> `anam-sector-geography-kpi-slice-change-set-2026-07-16.md`.
+>
 > **Fase 3 panel-first — dry run read-only:** se definieron los contratos exactos para Portafolio de Services,
 > Vencimientos/Renovación, Retention y cola preventiva de Loyalty. El readback live encontró 22 Products, 506
 > line items, 494 Deals Closed Won, 219 ganados con line items y 220 line items ganados. La identidad Product no
@@ -137,6 +179,21 @@
 > aparece. Re-enrollment sigue OFF; el workflow queda activo como cola humana, no como materializer ni promoción KPI. Canon:
 > `anam-phase-3-service-automation-workflow-test-2026-07-16.md`.
 >
+> **Paneles piloto Retención/Fidelización EJECUTADOS:** a pedido del operador se cargaron valores de activación
+> sintéticos en los cinco Services, marcados dentro de cada descripción como `DATOS DE EJEMPLO — PILOTO EFEONCE`.
+> Los cinco calculan `fields_ready`, lo que valida la fórmula pero no constituye aprobación de ANAM. Se creó
+> `ANAM — Retención (PILOTO)` (`21152855`) con Portafolio (`340874128`, cinco filas/13 campos) y Radar
+> (`340874425`, `Estado=Retrasado OR Estado de renovación=Próxima`, Härting + Hidrogistica). Se creó
+> `ANAM — Fidelización (PILOTO)` (`21152950`) con Cola de atención (`340874258`, mismos dos filtros/filas).
+> La capa ejecutiva quedó completa con cuatro summaries: Retención suma Servicios recurrentes elegibles
+> (`340877391`) = `2` y ARR elegible UF (`340877588`) = `22`; Fidelización suma Servicios en seguimiento
+> (`340877942`) = `2` y Servicios con retraso (`340878184`) = `1`. Los siete reports fueron reabiertos desde
+> sus paneles y sus títulos persistieron.
+> Ese slice de Fase 3 no tocó Growth; el slice diagnóstico posterior sí agregó los tres informes parciales
+> documentados arriba a `19708354`. No se declararon GRR/NRR, NPS ni health score: Retención carece aún de períodos
+> comparables reales y Fidelización es una cola preventiva, no una métrica oficial. Canon y gates:
+> `anam-phase-3-pilot-dashboard-execution-2026-07-16.md`.
+>
 > **Modelo de datos vivo / deuda cognitiva:** se creó
 > `anam-revops-data-model-and-object-synergies-v1.md` como current-state canon del portal cliente. Documenta
 > diagrama Contact→Lead→Company→Deal→Quote/line item→Service→renewal, Ticket, Account Unit, Billing Event e
@@ -160,6 +217,14 @@
 > para managed delivery, Customer Agent, RevOps schema y el caso ANAM. La skill orquesta `intake -> inventory ->
 > design -> propose -> approve -> dry-run/draft -> execute -> verify -> document -> measure`; no duplica la
 > oferta de `hubspot-solutions-partner`, la ejecución CMS de Kortex ni el bridge Greenhouse.
+>
+> **Canonización documental de cierre:** la triple documentación queda completa con el overview funcional
+> `docs/documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`, el manual operativo
+> `docs/manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md` y este canon técnico. Las
+> skills espejo incorporan calidad como cola con owner/cadencia, atribución causal prudente, matching acotado,
+> snapshots/manifests inmutables, cobertura cross-object, geografía multi-select no aditiva y moneda explícita.
+> Se registra una excepción: no se localizó un source pack Markdown ANAM independiente para todo el knowledge
+> live del Customer Agent; el servicio gestionado Efeonce debe versionarlo antes del próximo cambio de knowledge.
 >
 > **Canon y ownership:** Greenhouse es el repositorio canónico y visible para la documentación del servicio,
 > el caso ANAM, Customer Agent, RevOps, QA y las skills espejo Codex/Claude. Kortex conserva únicamente su
@@ -262,7 +327,8 @@
 > hasta aprobar fecha y fuente UF/FX.
 >
 > **Schema reconciliation completa:** `anam-revops-schema-reconciliation-2026-07-16.md` inventaría 8.859
-> Contacts, 1.023 Companies, 291 Leads, 1.240 Deals, 506 line items, 10 Quotes, 1 Service, 18 Tickets y 0
+> Contacts, 1.023 Companies, 291 Leads, 1.240 Deals, 506 line items, 10 Quotes, 6 Services (5 pilotos y 1
+> muestra excluida), 18 Tickets y 0
 > Invoices. Native Lead se reutiliza; Quote existe pero no está adoptado (8 drafts, 2 expired, 0 accepted,
 > 0 con line items y sólo 2 asociados al mismo Deal); Service estándar y Billing Event siguen siendo los granos
 > correctos. El único RUT duplicado parte la propia Company ANAM entre 2 Deals/1 Contact y 1 Ticket/2 Contacts
@@ -281,11 +347,11 @@
 > rotación de credenciales. Canon: `anam-product-oauth-diagnosis-2026-07-16.md`; queda pendiente el fix durable
 > del generador de scopes en Kortex.
 >
-> **Secuencia actualizada:** el readback quedó documentado en `anam-hubspot-schema-readback-2026-07-16.md` y la
+> **Checkpoint histórico superado:** el readback quedó documentado en `anam-hubspot-schema-readback-2026-07-16.md` y la
 > cronología completa de reuniones en `anam-revops-meeting-synthesis-2026-07-16.md`. El modelo converge en
 > Contact -> Lead -> Company -> Deal -> Service, con Ticket para casos/SLA. El objeto estándar Service (`0-162`)
-> ya está activo, pero sólo tiene un registro de prueba, pipeline inglés y dos custom properties sin cobertura;
-> el próximo change set debe ser su data dictionary + asociaciones + migración dry-run. ANAM confirmó Customer
+> en ese corte sólo tenía un registro de prueba, pipeline inglés y dos custom properties sin cobertura. El estado
+> vigente posterior ya incluye schema, asociaciones, cinco pilotos, workflow y paneles documentados arriba. ANAM confirmó Customer
 > Agent + 30.000 créditos comprados: el aviso de un día marcaba
 > el inicio del consumo pagado, no expiración ni desactivación. No hay bloqueo actual de licencia.
 >
@@ -300,10 +366,11 @@
 > Deal/line items, Service/renovación, Data Quality/Growth/Retention/Loyalty) y Operaciones después (Ticket, SLA,
 > billing sync y paneles operativos). Down-sell se deriva como movimiento de Retención sobre Services comparables.
 >
-> **Corrección de alcance del operador:** las dos Companies de ANAM con el mismo RUT son un error de datos del CRM
+> **Corrección de alcance del operador (límite aún vigente; estado de ejecución superado):** las dos Companies de ANAM con el mismo RUT son un error de datos del CRM
 > que ANAM opera y quedan fuera de este trabajo. No corregir, enriquecer ni fusionar esos registros; no son una
-> dependencia para catálogo, Service o dashboards. El único change set approval-ready de esta continuación es
-> Service en `anam-service-change-set-2026-07-16.md`; no fue ejecutado.
+> dependencia para catálogo, Service o dashboards. En ese checkpoint el change set de Service aún no se había
+> ejecutado; fue ejecutado después con aprobaciones separadas y el estado live/rollback está en los ledgers de
+> schema, piloto, workflow y paneles enlazados en la primera sección ANAM.
 
 ## Sesión 2026-07-16 — TASK-1415 COMPLETE: motor de chapter-authors (servicio-agnóstico) — Claude
 

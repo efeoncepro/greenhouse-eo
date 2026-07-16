@@ -46,6 +46,15 @@ Do not start with dashboard widgets or property creation.
 - For Workflows v4 beta, `201`, `crmObjectCreationStatus=COMPLETE` and `isEnabled=true` prove only stored configuration. Require a real positive enrollment/action readback plus a negative path; if API-only turn-on does not execute, disable the workflow and verify through the authenticated editor/history before rollout.
 - Never use one parent-object create-record action when the target grain is one child per associated component. A Deal-to-Service workflow needs a deterministic line-item iterator and per-line-item idempotency seam; otherwise keep materialization in a governed integration/custom action.
 
+## Matching and bounded remediation
+
+1. Normalize source and CRM keys without treating normalization as proof of identity.
+2. Require one consistent source identity and one live target record per normalized key. If the CRM has duplicate targets, hold the entire key cohort.
+3. Partition candidates into deterministic/apply, review-only and unresolved cohorts. Domain, title, owner, fuzzy name and geographic similarity are hints, never automatic identity.
+4. For association remediation, accept an explicit child -> related record -> parent chain only when all paths converge on one distinct parent ID; deduplicate labeled and unlabeled association types by target ID.
+5. Freeze the pre-change snapshot and approved manifest. Verification may create a separate readback artifact but must not rewrite approval evidence.
+6. Apply only approved record IDs and read back target IDs, distinct cardinality and required association types. Report before/after coverage without converting a partial cohort into an official KPI.
+
 ## Calculated-property execution contract
 
 - Check `/crm/limits/2026-03/calculated-properties` before proposing a calculated property; capacity is a portal runtime fact.

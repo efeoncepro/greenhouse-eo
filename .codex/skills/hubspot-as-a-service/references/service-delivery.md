@@ -32,6 +32,13 @@ Batch independently reversible writes. Separate schema creation, backfill, autom
 | Reporting | baseline, funnel/service metrics, dashboards, definitions |
 | Managed operation | backlog, release cadence, QA, incident/recovery, QBR |
 
+## Data-quality operating contract
+
+- Separate platform/schema defects, source/migration defects and operational capture/adoption debt. Attribute a gap to commercial discipline only when the required capture point, owner and expected process are documented and the omission is evidenced by record, period and owner; otherwise state the cause as unresolved.
+- A Data Quality dashboard is an operating queue, not a cosmetic scorecard or blame surface. Expose eligible denominator, exception count, coverage, owner, correction action and review cadence.
+- Keep correction approval separate from diagnosis. Apply only deterministic, independently reversible cohorts; quarantine duplicate, ambiguous and inferred matches for human review.
+- Client closeouts must separate live-and-verified, pilot/synthetic, proposed, blocked and approval-pending assets. State which population is excluded before describing any metric as official.
+
 ## Client report rules
 
 - State what was tested, not merely what was configured.

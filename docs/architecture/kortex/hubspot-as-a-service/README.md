@@ -66,6 +66,8 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 
 ## Current ANAM artifacts
 
+- Functional overview: [`../../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
+- Operator manual: [`../../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
 - Fresh-session continuation entry point: [`anam-next-session-handoff-2026-07-16.md`](anam-next-session-handoff-2026-07-16.md)
 - Living ANAM object model, fact ownership and cross-object synergies: [`anam-revops-data-model-and-object-synergies-v1.md`](anam-revops-data-model-and-object-synergies-v1.md)
 - Landing/runtime: [`../hubspot-cms/anam-chat-landing.md`](../hubspot-cms/anam-chat-landing.md)
@@ -99,9 +101,12 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Phase 3 five-row forward-pilot simulation and activation gaps: [`anam-phase-3-forward-pilot-dry-run-2026-07-16.md`](anam-phase-3-forward-pilot-dry-run-2026-07-16.md)
 - Phase 3 controlled five-Service execution, association IDs and rollback ledger: [`anam-phase-3-forward-pilot-execution-2026-07-16.md`](anam-phase-3-forward-pilot-execution-2026-07-16.md)
 - Phase 3 workflow/API probe, authenticated activation-review rollout and materialization decision: [`anam-phase-3-service-automation-workflow-test-2026-07-16.md`](anam-phase-3-service-automation-workflow-test-2026-07-16.md)
+- Phase 3 synthetic pilot data plus live Retention/Loyalty dashboard execution and official-publication gates: [`anam-phase-3-pilot-dashboard-execution-2026-07-16.md`](anam-phase-3-pilot-dashboard-execution-2026-07-16.md)
+- Sector, market and geography KPI reconciliation, attachment dry run, executed data-quality control and approval-gated backfill contract: [`anam-sector-geography-kpi-slice-change-set-2026-07-16.md`](anam-sector-geography-kpi-slice-change-set-2026-07-16.md)
+- Deal-to-Company association remediation dry run, owner queues and approval boundary: [`anam-deal-company-association-remediation-dry-run-2026-07-16.md`](anam-deal-company-association-remediation-dry-run-2026-07-16.md)
 - Final scoped QA verdict: [`../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md`](../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 
-The native Service schema, a five-record controlled pilot and its activation-review queue are live. Operational activation and official panel cohorts remain gated by ANAM review; bulk backfill, additional workflows and final dashboards are not authorized. No new ADR is indexed for this package because native Service grain/ownership was already established by the canonical reconciliation.
+The native Service schema, five-record controlled pilot, activation-review queue and visibly marked pilot Retention/Loyalty dashboards are live. Their activation facts are synthetic and remain excluded from official measurement until ANAM ratifies or replaces them. Bulk backfill, official GRR/NRR or Loyalty scoring, additional workflows and removal of `(PILOTO)` are not authorized. No new ADR is indexed for this package because native Service grain/ownership was already established by the canonical reconciliation.
 
 ## Operational dependency
 

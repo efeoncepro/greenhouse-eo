@@ -48,7 +48,7 @@ The arrows express collaboration, not automatic copying. Every object keeps its 
 |---|---|---|---|---|
 | Contact | One person/contactable identity | Personal contact data, consent, communication context and relationship roles through associations | Company legal identity, contract value or billing rows | Native and active |
 | Lead | One qualification motion for a person/account | Qualification status, disqualification and handoff into a commercial opportunity | Contract, Service delivery or support case | Native and active |
-| Company | One customer/account organization | Durable account identity, legal/HQ facts, sector and parent-child account structure | Repeated service components, invoice rows or Contact RUT as legal truth | Native and active; duplicate ANAM records remain out of scope |
+| Company | One customer/account organization | Durable account identity, legal/HQ facts, governed detailed segment, strategic sector and parent-child account structure | Repeated service components, invoice rows or Contact RUT as legal truth | Native and active; 471 exact/unique Companies have governed segment+HQ region, 65 have direct strategic-sector mapping; duplicate ANAM records remain held/out of scope |
 | Deal | One commercial opportunity/motion | Pipeline stage, commercial owner, income type, current opportunity value and originating commercial context | Delivery lifecycle, recurring retention outcome or repeated billing events | Native and active |
 | Quote | One commercial offer/version | Quote number/version/status/expiry and quoted value | Awarded delivery truth | Native but historically under-adopted; prospective use only |
 | Product | One reusable catalog definition | Stable service/catalog identity and commercial classification | A customer's purchase, contract or delivery instance | Native; 22 Products available read-only |
@@ -140,21 +140,37 @@ The source billing row becomes Billing Event, first linked by exact Account Unit
 
 | Capability | State |
 |---|---|
+| Company segment and HQ region | Live on 471/1,023 exact/unique Companies through `segmento_de_mercado_anam` + `region_de_chile`; 22 duplicate-key records, 3 source ambiguities and 527 unmatched Companies remain held |
+| Company strategic sector | Live on 65/1,023 direct mappings only: Acuícola 18, Energía 9, Minería 9 and Sanitarias 29; no inferred Desaladoras/Servicios asociados/Otros |
+| Sales by segment/sector/region KPI | Diagnostic only: Growth contains historical-partial segment `340896790`, sector `340897291` and HQ-region `340897635` charts over exact `Ganado` plus known Company dimension. They use Deal commercial value, not invoicing. Official status remains blocked because Deal→Company coverage is only 629/1,240 (`50.73%`), below the >=95% association/field gate |
+| Deal→Company remediation | First approved slice complete: import `77872707` created the exact 34 Primary pairs from explicit Deal→Contact→Company convergence and readback verified 34/34; 113 domain-only manual reviews and 498 held remain untouched |
 | Product/line-item identity | Sufficient for current Service projection; full catalog cleanup deferred |
 | Service schema | Live: group `anam_service_contract` / `Contrato y renovación ANAM`, nine scalar + one calculated property |
 | Calculated readiness | Live and propagated; sample-like Service resolves to `incomplete_core` |
 | Forward award simulation | Five rows passed deterministic award projection; later used as the separately approved controlled pilot |
-| Controlled Service pilot | Five Services live in `New`, each with one Company, one originating Deal and deterministic source lineage; all remain `incomplete_core` |
-| Production Service cohort | Not available; pilot records and the sample-like record are excluded until readiness and panel-specific gates pass |
+| Controlled Service pilot | Five Services live with one Company, one originating Deal and deterministic source lineage; example activation values are explicitly marked in-record and calculate `fields_ready` for dashboard QA only |
+| Production Service cohort | Not available; synthetic pilot values and the sample-like record remain excluded until ANAM ratifies/replaces facts and panel-specific gates pass |
 | Historical Service migration | `NO-GO` |
 | Renewal association labels/workflow | Association labels live; renewal workflow/records not executed |
 | Service creation automation | Plain Deal workflow rejected: it cannot safely emit one Service per line item; Kortex idempotent materializer/custom action required |
 | Activation-review automation | Workflow `1852406585` active; authenticated positive/negative simulation passed; five pilot executions completed and created five associated tasks; re-enrollment disabled |
 | Ticket taxonomy/SLA | Proposed, not executed |
 | Account Unit / Billing Event | Proposed and gated; not live |
-| Final Portfolio/Retention/Loyalty panels | Blocked by real governed Service coverage |
+| Pilot Retention/Loyalty panels | Live: Retention `21152855` with portfolio `340874128`, radar `340874425`, eligible recurring count `340877391` and eligible ARR `340877588`; Loyalty `21152950` with action queue `340874258`, follow-up count `340877942` and delayed count `340878184`; all visibly marked `PILOTO` |
+| Official Portfolio/Retention/Loyalty measurement | Blocked by real governed Service coverage, approved period/denominators and ratified Loyalty signals |
 
 ## Change discipline
+
+Data Quality is an owner-operated queue, not a cosmetic score or permission to infer. Every control exposes the
+eligible denominator, exception population, owner, correction action and review cadence. Separate schema/platform
+defects, source/migration defects, integration behavior and capture/adoption debt. Describe a gap as commercial
+discipline only when the expected capture point, accountable owner and concrete omission are evidenced; otherwise
+leave causation unresolved. Deterministic corrections use approved, reversible cohorts, while duplicate,
+ambiguous, domain-only and inferred candidates remain held for human review.
+
+For the current Deal→Company queue, 645 is the verified pre-remediation dashboard baseline. The 34 approved
+associations yield an expected/calculated 611 missing Deals and coverage 629/1,240, but a new dashboard readback
+is still required before calling 611 a live widget value.
 
 When an object/property/association changes:
 
@@ -165,4 +181,4 @@ When an object/property/association changes:
 5. record runtime state in `Handoff.md` and `changelog.md`;
 6. never rewrite a source of truth merely to satisfy a report.
 
-The next model delta must document Maria Paz's activation review and the first records that reach `fields_ready` before any official dashboard publication. The active workflow creates a human work queue; it does not promote lifecycle, fill contractual facts or make a Service KPI-eligible.
+The next model delta must document Maria Paz/ANAM ratification or replacement of the synthetic activation values before any official dashboard publication. `fields_ready` over example values proves calculation behavior only. The active workflow creates a human work queue; it does not promote lifecycle, fill contractual facts or make a Service officially KPI-eligible.
