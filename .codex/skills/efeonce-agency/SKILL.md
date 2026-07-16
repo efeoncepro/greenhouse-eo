@@ -60,6 +60,8 @@ El crecimiento no se entrega: se **co-construye**. Tres pilares (una creencia):
 
 **El Why como EXPERIENCIA EFECTIVA DEL CLIENTE.** La **Experiencia Efeonce** significa que el cliente no contrató solo una agencia: contrató su entrada a un ecosistema de crecimiento. Capas: operación, software, aprendizaje, red y memoria. Canales: Greenhouse/Kortex/Verk/Creative Studio, Think, blog `efeoncepro.com/blog`, tools, YouTube, sociales, ebooks, webinars y futuro podcast. Greenhouse no reemplaza todos esos canales: los conecta, los hace visibles y convierte interacciones útiles en memoria de Account 360 / madurez / expansión. SSOT: `docs/context/10_experiencia-cliente.md`.
 
+**El Why como CONTENT ENGINEERING.** Efeonce adopta Content Engineering como doctrina editorial emergente: el contenido deja de ser una entrega estática y se diseña para volver a la persona más capaz de comprender, verificar y decidir, mientras agentes/motores consumen la misma verdad estructurada. Es territorio de thought leadership y método en construcción, no sub-marca, producto ni oferta empaquetada todavía. Decisión: `docs/public-site/decisions/PDR-015-content-engineering-territorio-editorial.md`; doctrina reusable: `content-marketing-studio/references/content-engineering.md`.
+
 **Primer wrapper vivo de la Experiencia Efeonce (SKY, 2026-07-13).** `https://experiencia.efeoncepro.com` es el primer **Efeonce Wrapper** cliente-facing: una experiencia anual creada para SKY por su primer año con Efeonce, operada desde el repo satélite `efeoncepro/sky-efeonce` y documentada en `sky-efeonce/docs/experiencia/`. Tratarlo como prueba de dirección para `"Tu año con Efeonce"`, no como automatización ya existente en Greenhouse ni como caso público autorizado sin permiso escrito.
 
 ---
@@ -165,6 +167,7 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 | Entender cómo Greenhouse conversa con Kortex/Verk/Creative Studio/HubSpot | `03_ecosistema-producto` |
 | Priorizar features con justificación comercial (cuentas, cross-sell, Pulse) | `08_estrategia-comercial` |
 | Cuidar marca/branding en el portal (Ecosystem Tour, onboarding, naming) | `09_marca-agencia` |
+| Definir Content Engineering como territorio, método u oferta | `09_marca-agencia` + `docs/public-site/decisions/PDR-015-content-engineering-territorio-editorial.md` + skill `content-marketing-studio` |
 | Diseñar la experiencia/onboarding del cliente | `10_experiencia-cliente` |
 | Tocar sync HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |

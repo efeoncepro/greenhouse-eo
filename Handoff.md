@@ -1,3 +1,31 @@
+## Sesión 2026-07-16 — Content Engineering canonizado + futura Pillar definida (Codex)
+
+> **Pedido:** profundizar y documentar la tesis de que el blog tradicional debe resignificar su propósito en un
+> mundo de abundancia generativa, atención fragmentada y agentes; convertirla en una futura masterpiece editorial.
+>
+> **Decisión:** Content Engineering ya existía como disciplina de structured content/modelos/metadata/gobernanza.
+> Efeonce extiende esa base hacia sistemas de conocimiento y experiencias de comprensión/decisión para una audiencia
+> dual, humana y computable. Frase ancla: **“Un post ya no es sólo una página. Es una interfaz hacia el conocimiento.”**
+>
+> **Canon y skills:** `content-marketing-studio` posee la doctrina y su escalera de complejidad; `efeonce-agency`
+> gobierna marca/límite comercial; `seo-aeo`, estructura computable y citabilidad; `growth-marketing-cro`, fricción,
+> acción cualificada y medición. Codex/Claude quedaron sincronizados donde existe espejo; el repo no tiene skill
+> Claude `seo-aeo`, por lo que el adapter SEO/AEO se registró sólo en la skill Codex dueña existente.
+>
+> **Artefactos:** PDR-015 + PDR-016 Accepted y `CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md`. PDR-016 redefine la Pillar
+> como hogar durable para aprender, explorar y decidir; distingue Think como producto editorial del runtime
+> `think.efeoncepro.com`, que queda reservado por defecto para tools, reportes y experiencias enfocadas. Creative
+> Workflows conserva su canonical WordPress y evoluciona en la misma URL; Content Engineering pertenece
+> editorialmente a Think, pero host, slug y renderer quedan abiertos hasta resolver IA del hub y route ownership.
+> **Delta Cluster/conversión:** PDR-016 y el canon reusable definen Cluster Experience como un sistema de nodos
+> heterogéneos — artículos, casos, templates, research, diagnósticos y tools — unidos por JTBD, valor autónomo y
+> progreso. Conversión se modela como `reconocimiento -> comprensión -> orientación -> aplicación -> diagnóstico ->
+> evidencia -> decisión -> handoff`; cada nodo tiene una conversión natural y no existe CTA universal.
+> La futura Pillar debe demostrar la
+> tesis como documento canónico accesible/indexable y experiencia sobria; no puede ser una colección ornamental de
+> widgets. Estado F0 documental: no hay research dossier, wireframe, draft WordPress, custom block, tool, oferta,
+> write live ni publicación. Próximo checkpoint: research/claim ledger + autor/voz + diseño de experiencia y fallback.
+
 ## Sesión 2026-07-16 — Creative Workflows: FAQ V6 publicada con `core/details` + `FAQPage` (Codex)
 
 > **Pedido:** documentar, commitear y aplicar la FAQ como acordeón/disclosure en el post publicado; revisar si se despliega schema de preguntas frecuentes.

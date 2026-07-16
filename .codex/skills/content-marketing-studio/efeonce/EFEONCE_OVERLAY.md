@@ -10,7 +10,8 @@ Layering canónico del ecosistema digital (SSOT: `docs/public-site/decisions/PDR
 
 | Superficie | Rol en el funnel | Qué contenido |
 |---|---|---|
-| **Think** (`think.efeoncepro.com`) — hub Astro | demand-gen + nurturing top-of-funnel | El hogar del contenido editorial; render "tonto" de un modelo headless. Repo/Vercel dedicado (NO greenhouse-eo). Marca = tokens AXIS copiados. Ver skill `astro`/efeonce-think |
+| **Think** — producto/hub editorial multi-runtime | demand-gen + nurturing top-of-funnel | Agrupa Marketing con Manzanitas, Glitch, tools y lead magnets. No equivale al host `think.efeoncepro.com`; placement de Pillars por PDR-016 |
+| **`think.efeoncepro.com`** — runtime Astro especializado | tools, reportes y experiencias enfocadas | Repo/Vercel `efeonce-think`; no es el destino automático de artículos o Pillars |
 | **Marketing con Manzanitas** — blog | thought leadership / autoridad / demanda | El blog de contenido; pillars y clusters viven aquí |
 | **Glitch** — newsletter semanal (IA / Marketing / Negocios) | audiencia propia / nurturing | Canal owned de mayor ROI; consume átomos del pillar y genera piezas |
 | **Tools / lead magnets** (AI Visibility Grader, ebooks, webinars) | demand-capture / captura | Contenido gated que convierte audiencia en lead |
@@ -75,7 +76,8 @@ El baseline competitivo de la agencia vive en `docs/context/15_panorama-competit
 - **NUNCA** subir un PDF de ebook al repo (bucket privado + entrega por link).
 - **NUNCA** confundir `/aeo-2/` (servicio) con el grader (lead magnet).
 - **NUNCA** publicar output IA crudo (gate de REVIEW + barra de insight/voz).
-- El contenido de Think vive en su **repo dedicado** (efeonce-think, Astro), no en greenhouse-eo.
+- El contenido pertenece al **producto Think**, pero su authoring/render puede vivir en WordPress/apex o Astro.
+  Sólo las rutas especializadas del subdominio viven en `efeonce-think`; nunca asumir host desde la marca.
 
 ## Cross-links
 

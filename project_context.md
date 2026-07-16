@@ -1,5 +1,19 @@
 ## Estado vigente para agentes
 
+- **Content Engineering canonizado como doctrina editorial (2026-07-16):** Efeonce adopta la definición
+  **“diseñar, construir y operar sistemas de conocimiento que personas y agentes puedan encontrar, comprender,
+  verificar, explorar, reutilizar y convertir en decisiones”**. El término ya existía en structured content;
+  la extensión Efeonce agrega experiencia de comprensión/decisión, audiencia dual y medición sin borrar esa base.
+  Canon reusable: `.codex/.claude/skills/content-marketing-studio/references/content-engineering.md`; decisión y
+  futura Pillar: `docs/public-site/decisions/PDR-015-content-engineering-territorio-editorial.md` +
+  `docs/public-site/decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md` +
+  `docs/public-site/CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md`. Estado F0 documental: no hay draft, custom block,
+  tool, oferta comercial, write live ni publicación autorizada. Think es el producto editorial; no equivale al
+  subdominio `think.efeoncepro.com`. Creative Workflows permanece en su canonical actual y el host/renderer de la
+  futura Pillar Content Engineering sigue abierto hasta resolver IA del hub y route ownership. PDR-016 también
+  define Cluster Experience: artículos, casos, templates, research, diagnósticos y tools sólo pertenecen por JTBD,
+  valor autónomo y relación gobernada. Conversión se mide como progresión desde reconocimiento hasta handoff, no
+  como clic, captura o CTA universal.
 - **Creative Workflows FAQ disclosure + schema V6 publicada (2026-07-16):** el runtime WordPress `7.0.1`/Ohio del post
   `251363` registra `core/details`, `core/accordion`, `essential-blocks/accordion` y `yoast/faq-block`; para la FAQ editorial
   de la Pillar se eligió `kind: "faq"` en Content Factory: fuente única que renderiza cuatro `core/details` bajo el H2

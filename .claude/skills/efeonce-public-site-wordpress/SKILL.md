@@ -5,7 +5,7 @@ description: Operate and update the Efeonce public WordPress site safely. Use fo
 
 # Efeonce Public Site WordPress
 
-> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
+> **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema. Para Pillars, cargar también `PDR-016`: Think como producto editorial no equivale al host `think.efeoncepro.com`.
 
 This skill is a **router**, not the full memory store. Keep this file short.
 Load only the references required by the current landing, widget, or operation.
@@ -23,6 +23,8 @@ Load only the references required by the current landing, widget, or operation.
 - Before any live mutation, identify post/page id, snapshot relevant Elementor data/settings, Ohio metas, `_thumbnail_id`, and any landing-specific guard hashes.
 - After live mutation, purge Kinsta cache, verify browser render, and document rollback.
 - Prefer page-scoped Elementor/Ohio controls and page-scoped CSS. Do not patch global header/footer/sidebar seams for a local landing issue.
+- For Pillar Experience work, keep Gutenberg/Content Factory or another structured model as the editorial source.
+  Elementor may compose a template/shell, but must not duplicate the body, cluster registry, canonical or schema.
 - Do not use `efeonce-web` as deploy source for the live public site unless a new ADR moves the runtime to Astro/headless.
 - Treat direct Kinsta filesystem edits as emergency-only and backport governed runtime code changes to `efeoncepro/efeonce-public-site-runtime`.
 - For visual landing work, pair with `greenhouse-gvc-playwright`; close with Playwright/GVC-style evidence on desktop and mobile 390px, including overflow checks.
@@ -40,6 +42,7 @@ Read the minimal set:
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
 | Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |
+| Pillar Experience, cluster map or post-vs-page/Think placement | `docs/public-site/decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md` + `references/content-factory-gutenberg.md`; add `references/landing-workflow.md` only if Elementor composition is actually chosen |
 | Agentic blogpost from governed write through human publication and live QA | `references/agentic-blogpost-end-to-end.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
@@ -69,6 +72,7 @@ Use repo docs as source of truth for long-lived contracts:
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
 - `docs/operations/public-site-repository-control-plane-discovery-20260614.md`
 - `docs/architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md`
+- `docs/public-site/decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md`
 
 For AEO/Growth Forms also use:
 

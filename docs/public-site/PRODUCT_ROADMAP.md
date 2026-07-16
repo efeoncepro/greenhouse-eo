@@ -47,7 +47,8 @@ capability dentro del sistema, no presentarse como agencia suelta.
  `/servicios` (no `/soluciones` — cliché de voz) con spokes por keyword real
  (Semrush CL): `/servicios/posicionamiento-seo` (title→"agencia seo" 880) +
  `/servicios/aeo` (term 320, uncontested ← 301 desde `/aeo-2`). El pillar de
- autoridad = **guía de contenido en Think**, no página de servicio. El grader es
+ autoridad pertenece al **producto editorial Think**, no a la página de servicio;
+ su host/canonical se decide por PDR-016. El grader es
  el nodo de conversión compartido. Ver [PDR-002](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md).
 
 - **TASK-1343 — Landing SEO `/servicios/posicionamiento-seo`** (to-do, ui-ux):
@@ -74,10 +75,10 @@ capability dentro del sistema, no presentarse como agencia suelta.
  redes"); build spoke Ohio + sección firma "muro social vivo"; oferta de dos escalones
  ("Agenda una reunión" + "Pide una auditoría de tus redes"). Head term comercial
  "agencia de redes sociales" (Semrush CL 170); "community manager" (4.400, job/how-to)
- → guía pillar en Think. Estado runtime: página WordPress `251300` publicada con
+ → guía pillar del producto editorial Think, host por PDR-016. Estado runtime: página WordPress `251300` publicada con
  `noindex`, hero artístico `El mural que alza vuelo` y muro social con 8 assets WebP
  premium ficticios. Pendiente: aprobar indexación/canonical, cutover HubSpot delivery,
- cierre formal de TASK-1351 y guía pillar Think.
+ cierre formal de TASK-1351 y guía pillar editorial.
  Ver [PDR-005](decisions/PDR-005-landing-redes-sociales-posicionamiento.md),
  `docs/tasks/to-do/TASK-1351-landing-redes-sociales.md` y
  `docs/operations/public-site-social-wall-media-production-20260708.md`.
@@ -157,6 +158,19 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 ## Next
 
+- **Territorio editorial “Content Engineering”** (PDR-015/PDR-016, foundation brief listo): Efeonce resignifica el blog
+  como sistema de conocimiento y experiencia de decisión para personas y agentes. La futura Pillar deberá demostrar
+  la tesis — documento canónico accesible/indexable + primitives sobrias de comprensión y autoevaluación local —
+  y abrir una Cluster Experience con artículos, casos, templates, research y tools gobernados por JTBD. Cada nodo
+  debe producir progreso y un siguiente paso proporcional; el cluster no es una lista de posts ni un catálogo de
+  assets. Esto se implementará sin convertir interactividad en decoración ni una tool editorial en producto. Nace como Pillar Experience del
+  producto Think/Marketing con Manzanitas, pero no se asigna por defecto a `think.efeoncepro.com`: host, slug y
+  renderer se resuelven con la IA del content hub y route ownership. F0 documental completada; research,
+  diseño, draft privado y publicación siguen pendientes. Ver
+  [PDR-015](decisions/PDR-015-content-engineering-territorio-editorial.md) +
+  [PDR-016](decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md) +
+  [brief](CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md).
+
 - **Territorio editorial “Creative Workflows”** (PDR-014, Pillar V4 publicada; satélites siguientes): la
  Pillar educativa en Marketing con Manzanitas define la categoría desde la
  tesis **“un sistema de decisiones creativas humanas vuelto ejecutable”** y se
@@ -168,6 +182,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
  la landing de Agencia Creativa; no anuncia Creative Studio ni reemplaza la superficie
  comercial. Este frente construye soporte científico/editorial para el producto futuro;
  no implementa workflows ni crea backlog de EPIC-028. Ver [PDR-014](decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md)
+ + [PDR-016](decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md)
  + [brief maestro](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md) +
  [Knowledge-to-Product Ladder](CREATIVE_WORKFLOWS_KNOWLEDGE_TO_PRODUCT_LADDER_V1.md).
 
@@ -177,7 +192,8 @@ capability dentro del sistema, no presentarse como agencia suelta.
  nativa `noindex, follow` que mezcla posts/paginas/portfolio. Antes de
  redisenar el hub, ejecutar tareas separadas para taxonomia editorial canonica,
  limpieza de demo posts/tags/sidebar, buscador editorial `post` only y decision
- de hub canonico WP vs Think/Astro. El layout visual elegido como candidato es
+ de hub canónico y marca, distinguiendo Think producto de `think.efeoncepro.com` runtime. PDR-016 fija que nuevas
+ Pillars no se asignan al subdominio por defecto. El layout visual elegido como candidato es
  `Demo 35: Blog Magazine` (`page_id=225984`), pero debe tratarse como base de
  layout y no como contenido final: requiere reemplazar posts demo/attachments,
  corregir CTAs/rutas `/demo35/category/..`, conectar suscripcion y validar
@@ -186,10 +202,10 @@ capability dentro del sistema, no presentarse como agencia suelta.
  y la auditoria
  [`2026-07-09-demo35-blog-magazine-layout-review.md`](../audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md).
 
-- **Guía pillar "community manager" en Think** (PDR-005 §Consecuencias): captura el
+- **Guía pillar "community manager" bajo el producto editorial Think** (PDR-005 §Consecuencias): captura el
  término de alto volumen e intención job/how-to (Semrush CL 4.400/mes) como autoridad
  top-of-funnel que enlaza a la spoke `/servicios/redes-sociales`. TASK aparte bajo el
- eje Think/EPIC-020; no bloquea el diseño de la landing.
+ eje Think/EPIC-020; host/canonical según PDR-016; no bloquea el diseño de la landing.
 - **Crawl vivo** de `efeoncepro.com` (route-ownership matrix): confirmar si
  `/servicios` ya existe con contenido propio y el equity de `/aeo-2` para el 301.
  Los slugs ya están cerrados con datos (Semrush CL); el crawl es confirmación, no
@@ -197,7 +213,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
 - Extender el **nodo grader** del eje AEO al eje SEO (EPIC-022 "Search Visibility
  360") para que la spoke SEO tenga un diagnóstico de producto real detrás.
 - Bajar PDR-001/PDR-002 a **TASK** bajo EPIC-019 (landing control plane) /
- EPIC-022 (SEO): guía pillar en Think + spoke `/servicios/posicionamiento-seo` +
+ EPIC-022 (SEO): guía pillar editorial Think con host por resolver + spoke `/servicios/posicionamiento-seo` +
  301 de `/aeo-2` → `/servicios/aeo`, con copy y build.
 
 ## Later

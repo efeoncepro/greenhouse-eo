@@ -3,7 +3,7 @@
 > **Tipo:** Product Decision Record (posicionamiento/GTM de una superficie del sitio público).
 > **Estado:** Accepted (posicionamiento) — sesión de diseño con el operador, 2026-07-06.
 > **Skills:** `social-media-studio`, `growth-marketing-cro`, `digital-marketing`, `product-design-loop`, `commercial-expert`, `efeonce-agency`, `seo-aeo`, `efeonce-public-site-wordpress`.
-> **Ejecución:** [`TASK-1351`](././tasks/to-do/TASK-1351-landing-redes-sociales.md) (spoke de servicio; v1 live/noindex en WordPress page `251300`, cierre formal de lifecycle pendiente). Epic: `EPIC-019`. Guía pillar "community manager" en Think = follow-up (ver §Consecuencias).
+> **Ejecución:** [`TASK-1351`](././tasks/to-do/TASK-1351-landing-redes-sociales.md) (spoke de servicio; v1 live/noindex en WordPress page `251300`, cierre formal de lifecycle pendiente). Epic: `EPIC-019`. Guía pillar "community manager" bajo el producto editorial Think = follow-up; host/canonical según [PDR-016](PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md) (ver §Consecuencias).
 > **No-duplicación:** el sustrato estratégico vive en el context pack y en PDR-004 — este PDR **cita**, no copia: `docs/context/09_marca-agencia.md` (masterbrand Efeonce; Globe = Creatividad/Contenido, Reach = Amplificación), `docs/context/07_ico.md` (cadena de eficiencia → outcome medible), `docs/context/13_icp-buyer-personas-jtbd.md` (Globe ICP), [PDR-004](PDR-004-landing-agencia-creativa-posicionamiento.md) (paraguas creativo + doctrina de marca/CTA/prueba), [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md) (patrón hub `/servicios` + spoke por keyword real; pillar de autoridad va a Think).
 
 ## Contexto
@@ -14,14 +14,14 @@ Efeonce presta gestión de redes sociales (Community Management, Influencers/Cre
 
 | Término | Vol/mes | Intención | Rol |
 |---|---:|---|---|
-| community manager | 4.400 | job / how-to (ambigua) | **Guía pillar en Think**, no página de servicio |
+| community manager | 4.400 | job / how-to (ambigua) | **Guía pillar editorial Think**, no página de servicio; host por resolver |
 | agencia de marketing digital | 720 | comercial (broad) | Head term amplio, no específico |
 | **agencia de redes sociales** | 170 | **comercial, alta intención** | **Head term de conversión de la spoke** |
 | gestión / manejo de redes sociales | 140 c/u | comercial | Cluster secundario |
 | agencia de influencers | 140 | comercial | Sub-bloque (Creators/Influencers) |
 | community management | 110 | comercial | Sub-bloque (Community) |
 
-Igual que PDR-002 mandó el término de alto volumen e intención informacional a Think y reservó la página de servicio para el head term comercial, esta spoke se ordena sobre **"agencia de redes sociales" + "gestión de redes sociales"**, y "community manager" (4.400) se captura como guía pillar en Think.
+Igual que PDR-002 mandó el término de alto volumen e intención informacional al producto editorial Think y reservó la página de servicio para el head term comercial, esta spoke se ordena sobre **"agencia de redes sociales" + "gestión de redes sociales"**, y "community manager" (4.400) se captura como guía pillar cuyo host se resuelve por PDR-016.
 
 ## Decisión — cuatro capas que se refuerzan
 
@@ -51,7 +51,7 @@ Build en el patrón de la familia de spokes (`posicionamiento-seo`/`desarrollo-s
 
 - La landing es un **nodo de la capa de adquisición** (demand-capture) del ecosistema ([PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md)) en `efeoncepro.com`, spoke bajo el hub `/servicios` (patrón PDR-002).
 - **Slug canónico:** `/servicios/redes-sociales`. Registrar en el landing registry de la skill `efeonce-public-site-wordpress` antes del segundo cambio.
-- **Follow-up de contenido (Think):** guía pillar "community manager" (4.400/mes, intención job/how-to) como autoridad top-of-funnel que enlaza a la spoke — bajar a TASK aparte bajo el eje Think/EPIC-020, no bloquea el diseño de la landing.
+- **Follow-up de contenido (Think):** guía pillar "community manager" (4.400/mes, intención job/how-to) como autoridad top-of-funnel que enlaza a la spoke — bajar a TASK aparte bajo el eje Think/EPIC-020, resolver canonical por PDR-016 y no bloquear el diseño de la landing.
 - **Gap a resolver en ejecución:** confirmar qué resultados sociales citables existen; si no, cifras ilustrativas declaradas.
 - Coherencia con el paraguas creativo (`PDR-004`): la spoke social es una capability *dentro* de la agencia creativa, no una marca paralela.
 

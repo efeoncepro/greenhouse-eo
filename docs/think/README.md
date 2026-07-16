@@ -1,13 +1,22 @@
 # Think Docs
 
-`docs/think/` documenta los patrones de producto, UI y operacion del hub publico
-Think (`think.efeoncepro.com`) cuando una experiencia vive fuera del portal
+`docs/think/` documenta los patrones de producto, UI y operacion del runtime publico
+`think.efeoncepro.com` cuando una experiencia vive fuera del portal
 Greenhouse pero depende de contratos, datos o renderers gobernados por
 Greenhouse.
 
-Think no es el sitio principal de Efeonce. El sitio principal sigue siendo
-`efeoncepro.com`; Think es un satelite publico para experiencias enfocadas,
-herramientas, reportes y superficies de lectura ejecutiva.
+Este directorio documenta el **runtime del subdominio**, no toda la superficie
+editorial Think. Según [PDR-003](../public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md),
+Think es el producto/hub de demand generation que agrupa Marketing con
+Manzanitas, Glitch, newsletter, tools y lead magnets. Esa identidad puede
+materializarse en más de un host con canonical única.
+
+El sitio principal sigue siendo `efeoncepro.com`; el subdominio
+`think.efeoncepro.com` es hoy un satélite público para experiencias enfocadas,
+tools, reportes, muestras y superficies de lectura ejecutiva. **No es el destino
+automático de toda guía o Pillar editorial.** El placement de Pillars se decide
+con [PDR-016](../public-site/decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md)
+y la route-ownership matrix.
 
 ## Indice
 
@@ -25,6 +34,9 @@ herramientas, reportes y superficies de lectura ejecutiva.
 
 ## Principios
 
+- **Producto ≠ host.** Una pieza puede pertenecer editorialmente a Think y
+  mantener canonical en `efeoncepro.com`; nunca duplicar una pieza indexable
+  entre WordPress, el dominio principal y el subdominio.
 - **Greenhouse calcula; Think presenta.** Los modelos, contratos, formularios,
   status, tokens e informes vienen de Greenhouse.
 - **Grader diagnostica; Radiografía demuestra.** El Grader responde "qué hueco
@@ -56,6 +68,8 @@ herramientas, reportes y superficies de lectura ejecutiva.
 
 ## Contratos relacionados
 
+- [Pillar Experience: arquitectura y runtime](../public-site/decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md)
+- [Public Site Route Ownership Matrix](../operations/public-site-route-ownership-matrix-20260616.md)
 - [Growth AI Visibility Grader - documentacion funcional](../documentation/growth/ai-visibility-grader.md)
 - [Growth AI Visibility Grader - smoke manual](../manual-de-uso/growth/ai-visibility-grader-smoke.md)
 - [Public AI Visibility Grader Architecture](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)

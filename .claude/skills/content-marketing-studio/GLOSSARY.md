@@ -5,7 +5,8 @@ Vocabulario del motor de contenidos. Definiciones operativas, no académicas.
 ## Estrategia editorial
 
 - **Content-market fit** — cruce de lo que el negocio vende × lo que la audiencia busca × donde tienes autoridad real. Sin esto, el contenido no compite.
-- **Pillar** — pieza ancla amplia y profunda sobre un tema núcleo; se atomiza y distribuye por siempre.
+- **Pillar** — hogar canónico y durable de un territorio; define el mapa amplio y conecta satélites sin depender
+  del feed cronológico ni de un post type concreto.
 - **Cluster** — piezas satélite que cubren subtemas y enlazan al pillar; densifican el tema.
 - **Topical authority** — autoridad temática ganada por cobertura profunda y estructurada de un tema (pillar+clusters).
 - **JTBD (Jobs To Be Done)** — el trabajo/problema que la audiencia intenta resolver; el contenido responde a eso.
@@ -26,7 +27,30 @@ Vocabulario del motor de contenidos. Definiciones operativas, no académicas.
 - **Gated / ungated** — con/sin formulario de captura antes de acceder.
 - **Case study** — prueba con nombre: contexto → problema → solución → resultados cuantificados → quote.
 - **Data study** — research con dato propio; originalidad instantánea, munición para PR y GEO.
-- **Pillar page** — la página sede de un tema (formato blog long-form).
+- **Pillar page** — término histórico para la página sede de un topic cluster; puede tomar forma 10X, resource o
+  hub, pero no implica el post type `page` de WordPress.
+
+## Content Engineering
+
+- **Content Engineering** — disciplina de diseñar, construir y operar sistemas de conocimiento que personas y agentes puedan encontrar, comprender, verificar, explorar, reutilizar y convertir en decisiones. Canon: `references/content-engineering.md`.
+- **Pillar Experience** — hogar canónico de un territorio que integra tres trabajos: aprender, explorar y decidir.
+  Conserva documento completo y enlaces HTML aunque añada navegación, mapa de cluster o primitives interactivas.
+- **Document Pillar** — corte válido de Pillar centrado en la guía canónica, TOC, evidencia y enlaces contextuales;
+  puede evolucionar a Pillar Experience sin cambiar URL ni duplicar contenido.
+- **Cluster Experience** — sistema navegable de experiencias conectadas que permite avanzar alrededor de un
+  territorio mediante trabajos de aprendizaje, aplicación, evaluación, verificación y decisión.
+- **Cluster node** — destino autónomo gobernado dentro de un cluster. Puede ser artículo, guía, caso, template,
+  checklist, dataset, diagnóstico, calculadora o tool; pertenece por JTBD y relación, no por formato o keyword.
+- **Cluster registry** — fuente estructurada de nodos, estados, URLs, intenciones y relaciones que alimenta mapa,
+  validación, analytics y schema sin mantener cards manuales por renderer.
+- **Experiencia de contenido** — representación editorial que ayuda a hacer un trabajo, no sólo a leer: puede explicar, comparar, diagnosticar o guiar una decisión.
+- **Interfaz hacia el conocimiento** — artículo o superficie que conserva una fuente canónica legible y añade estructura, profundidad elegible o utilidad sin esconder el contenido.
+- **Audiencia dual** — personas y agentes/motores consumen la misma verdad mediante interfaces distintas: experiencia humana y estructura computable.
+- **Primitive de comprensión** — tabla, diagrama, disclosure, timeline o interacción cuyo trabajo es reducir carga cognitiva.
+- **Primitive de decisión** — comparador, scorecard, calculadora o diagnóstico que devuelve una salida útil y explicable.
+- **Progreso del usuario** — cambio observable en comprensión, confianza, decisión o acción; reemplaza a la pieza publicada como unidad primaria de valor.
+- **Momento de conversión** — cambio observable entre estados de reconocimiento, comprensión, orientación,
+  aplicación, diagnóstico, evidencia, decisión o handoff; no equivale automáticamente a clic, formulario o compra.
 
 ## Multiplicación / distribución
 

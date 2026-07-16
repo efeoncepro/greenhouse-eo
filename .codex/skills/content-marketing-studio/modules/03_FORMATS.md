@@ -17,10 +17,15 @@ Cada formato es una herramienta distinta con una anatomía y un trabajo propio. 
 
 ## Blog / Pillar
 
-- **Trabajo:** ser la sede de un tema y el activo que se atomiza y distribuye por siempre.
-- **Anatomía:** título answer-first · promesa/hook · tesis con POV · desarrollo con datos/ejemplos/originalidad · takeaways accionables · CTA a la siguiente etapa.
+- **Trabajo:** ser la sede durable de un territorio: aprender, explorar y, cuando corresponda, decidir; además se
+  atomiza y distribuye por siempre.
+- **Anatomía:** entrada answer-first · orientación/rutas · núcleo canónico con POV y evidencia · mapa de cluster
+  desde registry · profundidad contextual · siguiente paso útil. No cada función necesita una card o interacción.
 - **2026:** escríbelo para ser **citable por IA** (respuestas autocontenidas, datos, fuentes, estructura escaneable). La *táctica técnica* (schema, chunking, entidad) es de `seo-aeo`.
-- **Regla:** un pillar sin plan de atomización (`04`) está a medio construir.
+- **Regla:** un pillar sin plan de cluster, atomización (`04`) y mantenimiento está a medio construir. El renderer
+  no define el formato; aplica `references/content-engineering.md` y PDR-016 en Efeonce.
+- **Cluster Experience:** los nodos no se limitan a posts. Artículos, casos, templates, datasets, diagnósticos y
+  tools pertenecen sólo si completan un JTBD del territorio y componen una progresión medible, no un inventario.
 
 ## Ebook / Whitepaper / Lead magnet
 

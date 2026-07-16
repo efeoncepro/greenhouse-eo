@@ -226,12 +226,21 @@ medible y validar desktop/mobile con `scrollWidth == clientWidth`.
 ## Relacion Con Think
 
 Segun `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`,
-Think es el hub de contenido/demand gen y el blog forma parte de esa superficie,
-aunque hoy el runtime este dividido entre WP y Astro.
+Think es el producto/hub de contenido y demand gen, y el blog forma parte de esa
+superficie aunque hoy el runtime este dividido entre WordPress, el dominio
+principal y experiencias Astro especializadas.
 
-Regla: cada pieza tiene una sola URL canonica. Si una pieza migra a Think/Astro,
-WordPress debe redirigir o quedar como backend/source no indexable para esa pieza,
-no duplicar contenido indexado.
+PDR-016 distingue producto de host: pertenecer a Think no asigna una guía o
+Pillar a `think.efeoncepro.com`. Ese subdominio sirve hoy tools, reportes y
+experiencias enfocadas. Las Pillars editoriales conservan una sola canonical,
+actualmente WordPress/apex salvo decisión de route ownership; el target es Astro
+en el dominio principal consumiendo la fuente estructurada de WordPress.
+
+Si una pieza cambia de renderer o ruta, WordPress debe redirigir o quedar como
+backend/source no indexable para esa pieza. Nunca duplicar contenido indexado ni
+crear una Page Elementor paralela para ganar libertad visual. Elementor puede
+componer un template/shell, pero Gutenberg/Content Factory o un modelo
+estructurado equivalente conservan cuerpo, relaciones y schema.
 
 ## Flujo Seguro de Refresh
 

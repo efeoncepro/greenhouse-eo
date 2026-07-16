@@ -1,7 +1,7 @@
 ---
 name: content-marketing-studio
 description: >-
-  Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye el sistema visual editorial: función contextual, coherencia, concept IDs/manifest, prompts GPT Image 2, masters/derivados WebP/JPEG, Media Library y QA público. Complementa `digital-marketing`; encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y assets/publicación a sus skills dueñas. Usar para content marketing, estrategia/calendario editorial, pillar/cluster, topical authority, content ops/engine, repurposing/atomización, distribución, content brief, editorial, featured/OG images, newsletter, ebook, whitepaper, lead magnet, case study, webinar, podcast, thought leadership, content ROI, influenced pipeline, AI content, content factory y content-led growth.
+  Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye Content Engineering para diseñar contenido como sistema de conocimiento y experiencia de comprensión/decisión, además del sistema visual editorial. Complementa `digital-marketing`; encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y assets/publicación a sus skills dueñas. Usar para content marketing, estrategia/calendario editorial, pillar/cluster, topical authority, content ops/engine, repurposing/atomización, distribución, content brief, editorial, experiencias de contenido, contenido interactivo, featured/OG images, newsletter, ebook, whitepaper, lead magnet, case study, webinar, podcast, thought leadership, content ROI, influenced pipeline, AI content, content factory y content-led growth.
 type: skill
 user-invocable: true
 argument-hint: "[etapa del content engine o pregunta concreta]"
@@ -30,6 +30,12 @@ argument-hint: "[etapa del content engine o pregunta concreta]"
 de un producto futuro, carga `references/knowledge-to-product-ladder.md`. Esa evolución exige trabajos y gates
 distintos; una tool no se trata como repurposing ni el contenido como product spec.
 
+**Routing Content Engineering:** si el trabajo pregunta cómo pasar de una pieza estática a una experiencia de
+comprensión, decisión, citabilidad o conversión, carga `references/content-engineering.md`. Usa su escalera de
+complejidad y elige el nivel mínimo que resuelva el JTBD; interacción no equivale automáticamente a valor.
+Para Efeonce, la ubicación de una Pillar se rige por `docs/public-site/decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md`:
+Think como producto editorial no implica el host `think.efeoncepro.com`.
+
 ## Intake (correr SIEMPRE antes de recomendar)
 
 - **Objetivo**: ¿awareness, demanda/generación, autoridad/thought leadership, activación, retención? Cada uno cambia formato, tono y distribución.
@@ -51,6 +57,7 @@ distintos; una tool no se trata como repurposing ni el contenido como product sp
 ├─ Producir con IA sin slop (Content Factory, fidelidad de voz, gobernanza) ........ 07_AI_CONTENT
 ├─ Diseñar/producir el sistema visual editorial, hero/body/OG y Media Library ..... references/agentic-editorial-visual-system
 ├─ Madurar Pillar→ebook→tool→producto sin mezclar sources of truth ................. references/knowledge-to-product-ladder
+├─ Diseñar contenido como experiencia humana + computable + medible ................ references/content-engineering
 ├─ Qué NO hacer .................................................................... ANTIPATTERNS
 ├─ Vocabulario .................................................................... GLOSSARY
 ├─ Fuentes/benchmarks 2026 ........................................................ SOURCES
@@ -72,6 +79,12 @@ Carga selectiva: no traigas los 7 módulos de una.
 8. **Contenido no es producto.** Una Pillar puede crear lenguaje, demanda e hipótesis; un ebook debe agregar
    método y una tool requiere PDR, modelo, privacidad, analytics, QA y ejecución formal. Nunca conviertas una
    buena respuesta editorial en feature o claim de disponibilidad por inferencia.
+9. **Utilidad antes que interactividad.** Una experiencia rica hace más trabajo por la persona; no acumula
+   componentes. Empieza en la respuesta editorial y sube de nivel sólo con una fricción o decisión demostrable.
+10. **Pillar es función, no post type.** Diseña una Pillar como hogar durable para aprender, explorar y decidir.
+    `post`, `page`, Gutenberg, Elementor o Astro son rails; no dupliques canonical, cuerpo, registry ni schema.
+11. **Cluster es sistema, no lista de posts.** Admite artículos, casos, templates, datasets, diagnósticos y tools sólo
+    cuando resuelven un JTBD del territorio. Cada nodo declara progreso y siguiente paso; no uses CTA universal.
 
 ## Tabla de sinergias (nombra y encadena el hand-off)
 
@@ -116,6 +129,7 @@ Carga selectiva: no traigas los 7 módulos de una.
 | `modules/07_AI_CONTENT.md` | Content Factory/Media Foundry, contenido asistido por IA, anti AI-slop, fidelidad de voz, gobernanza |
 | `references/agentic-editorial-visual-system.md` | Flujo visual editorial: función contextual→sistema coherente→concept IDs/manifest→GPT Image 2→masters/derivados→Media Library→QA público |
 | `references/knowledge-to-product-ladder.md` | Escalera Pillar→satélites→ebook/workbook→tool diagnóstica→producto, con separación de evidencia y gates |
+| `references/content-engineering.md` | Doctrina para contenido como sistema de conocimiento y experiencia humana/computable: capas, escalera de complejidad, conversión, medición y fronteras |
 | `ANTIPATTERNS.md` · `GLOSSARY.md` · `SOURCES.md` | Antipatrones, vocabulario, fuentes/benchmarks 2026 |
 | `efeonce/EFEONCE_OVERLAY.md` | Ecosistema Efeonce: Think, Marketing con Manzanitas, Glitch, Content Factory, ebooks/lead magnets, bow-tie, ICPs |
 | `templates/` | content-strategy-brief, pillar-cluster-map, editorial-calendar, content-brief, repurposing-map, distribution-plan, measurement-dashboard |

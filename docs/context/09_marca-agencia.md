@@ -140,6 +140,27 @@ Las 4 capas verbales (en secuencia natural de conversación):
 
 > ⚠️ Coherencia de proof points: el corpus usa "120+ empresas" y "80% de renovación" (marca-agencia) y también "10+ años" (ecosistema). El GTM cita "win rate ~50%". Mantén consistencia y no infles cifras; ante duda, usa las del documento de autoridad correspondiente.
 
+### Content Engineering como doctrina editorial emergente
+
+Efeonce adopta **Content Engineering** como territorio de thought leadership y método para diseñar contenido que
+vuelva a la persona más capaz de comprender, verificar y decidir. La tesis conecta directamente con el Why: educar
+no significa entregar más piezas, sino construir experiencias útiles y conocimiento reusable.
+
+Definición de trabajo:
+
+> Content Engineering es la disciplina de diseñar, construir y operar sistemas de conocimiento que personas y
+> agentes puedan encontrar, comprender, verificar, explorar, reutilizar y convertir en decisiones.
+
+Estado de marca: **doctrina editorial y método en construcción**. No es una sub-marca, una quinta capability, un
+producto independiente ni una oferta comercial empaquetada. Cualquier evolución comercial requiere proceso,
+evidencia, capacidad operativa y decisión de packaging propios. El PDR público gobierna el territorio:
+`docs/public-site/decisions/PDR-015-content-engineering-territorio-editorial.md`; el canon operativo reusable vive
+en `content-marketing-studio/references/content-engineering.md`.
+
+Su arquitectura editorial usa **Pillar Experience** como hogar y **Cluster Experience** como sistema de artículos,
+casos, templates, research y tools conectados por trabajos y progreso. Conversión significa avanzar desde reconocer
+y comprender hasta aplicar, verificar, decidir o pedir ayuda; no capturar un lead antes de entregar valor.
+
 ### Jerarquía de IP propietaria (cómo se nombra hacia el cliente)
 
 **Regla cardinal: el mercado escucha beneficios, no siglas.** Si mencionas una sigla en los primeros 30 segundos, hablas para ti, no para el cliente.

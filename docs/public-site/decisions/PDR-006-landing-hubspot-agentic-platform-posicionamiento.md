@@ -220,7 +220,8 @@ JavaScript, y **los crawlers de IA no lo ejecutan** — un número que solo exis
 
 **Su embudo es co-sell (PDM) + HubSpot Solutions Directory + directo/marca + outbound + cross-sell.**
 Optimizarla por keyword sería resolver el problema equivocado. La demanda de **categoría** (masiva: `crm`
-40.500/mes solo en México) se captura en **Think** como pillar (follow-up, EPIC-020).
+40.500/mes solo en México) se captura en el producto editorial **Think** como Pillar Experience; el host/canonical
+se resuelve por [PDR-016](PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md) (follow-up, EPIC-020).
 
 🔴 **Consecuencia:** en un mercado sin búsqueda de categoría, **el listing del Solutions Directory ES el canal**
 — y hoy tiene **0 reviews**, está **solo en español** (declarando servir APAC/EMEA/NA/SA), dice **"Any Budget"**
@@ -272,7 +273,7 @@ el miedo a elegir mal se combate **quitando riesgo**, no prometiendo más.
   reinicia los puntos managed, produce la medición → el caso → la prueba social de CRM que hoy no existe, abre
   el cross-sell, y **convierte a Kortex de promesa en caso demostrable**.
   → `.claude/skills/hubspot-solutions-partner/efeonce/PLAN_RESCATE_6M.md`.
-- **Follow-ups:** pillar de categoría CRM en Think (EPIC-020) · repricing del retainer de AEO ("de medimos a
+- **Follow-ups:** pillar de categoría CRM bajo Think, host/canonical según PDR-016 (EPIC-020) · repricing del retainer de AEO ("de medimos a
   movemos") · arreglo del listing del Solutions Directory · variante `en-US`.
 
 ---

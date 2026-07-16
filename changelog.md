@@ -1,5 +1,13 @@
 # changelog.md
 
+## 2026-07-16 — Content Engineering: doctrina y futura Pillar canonizadas
+
+- `content-marketing-studio` incorpora un canon reusable para diseñar contenido como sistema de conocimiento y experiencia humana/computable, con seis capas, escalera de complejidad, métricas y fronteras de producto; glosario, fuentes y skills Codex/Claude quedan sincronizados.
+- PDR-015 fija Content Engineering como territorio editorial de Efeonce y `CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md` define la futura masterpiece: debe demostrar la tesis con HTML canónico, accesibilidad, primitives sobrias de comprensión/decisión y medición de progreso.
+- PDR-016 redefine la Pillar como experiencia durable para aprender, explorar y decidir, separa producto editorial de host/runtime y evita convertir `think.efeoncepro.com` o Elementor en destinos obligatorios. Creative Workflows evoluciona sobre su canonical actual; el placement de Content Engineering permanece abierto hasta decidir la IA del hub.
+- PDR-016 y el canon reusable amplían el cluster desde artículos satélite hacia una Cluster Experience de nodos heterogéneos gobernados por JTBD. Conversión pasa de CTA final a progresión entre reconocimiento, comprensión, orientación, aplicación, diagnóstico, evidencia, decisión y handoff; cada nodo devuelve valor y posee un siguiente paso proporcional.
+- `efeonce-agency`, `seo-aeo` y `growth-marketing-cro` reciben adaptadores de ownership sin duplicar el canon. Estado F0 documental: no existe draft, tool, oferta comercial, write live ni publicación autorizada.
+
 ## 2026-07-16 — Creative Workflows FAQ V6 publicada con `core/details` + `FAQPage`
 
 - Post `251363` actualizado en producción: la sección `Preguntas frecuentes` pasa de cuatro `H3 + párrafo` a una primitive semántica `kind="faq"` de Content Factory que genera cuatro disclosures nativos `core/details` y un `FAQPage` JSON-LD sincronizado desde la misma fuente.

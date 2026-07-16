@@ -3,6 +3,7 @@
 > **Estado:** V4 editorial, visual, SEO y E-E-A-T publicada en WordPress `251363`; contenido, fuentes,
 > caso SKY, entidad de autor, render desktop/mobile, canonical y Open Graph pasan readback — 2026-07-15.
 > **Decisión de producto:** [PDR-014](decisions/PDR-014-creative-workflows-territorio-editorial-pillar-cluster.md).
+> **Arquitectura de Pillar:** [PDR-016](decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md).
 > **Evolución del conocimiento:** [Creative Workflows Knowledge-to-Product Ladder V1](CREATIVE_WORKFLOWS_KNOWLEDGE_TO_PRODUCT_LADDER_V1.md).
 > **Doctrina fuente:** [RESEARCH-009](../research/RESEARCH-009-creative-operations-agentic-workflows.md).
 > **Research de publicación:** [Creative Workflows Pillar Research Dossier V1](CREATIVE_WORKFLOWS_PILLAR_RESEARCH_DOSSIER_V1.md).
@@ -17,7 +18,8 @@
 > **Evidencia V1 histórica:** [inspección profunda inicial del post 251363](../operations/public-site-content-factory/post-deep-inspection-251363-2026-07-15T05-25-14+00-00.json).
 > **Superficie comercial hermana:** [PDR-004 — Agencia Creativa](decisions/PDR-004-landing-agencia-creativa-posicionamiento.md).
 > **Idiomas:** primera versión en español LATAM neutro; arquitectura preparada para localización futura.
-> **Owner editorial:** Efeonce / Think / Marketing con Manzanitas.
+> **Owner editorial:** Efeonce / Think / Marketing con Manzanitas; Think expresa pertenencia editorial, no obliga
+> el host `think.efeoncepro.com`.
 > **Autor inicial:** Julio Reyes (`WordPress author_id=1`).
 > **Frontera:** este brief produce contenido y evidencia editorial. No produce workflows ejecutables ni
 > autoriza implementación de Creative Studio.
@@ -376,9 +378,9 @@ pase su gate. No se abre waitlist ficticia para validar interés.
 |---|---|
 | **Descubrimiento** | Consultas no-brand, impresiones, posición, CTR, entradas y cobertura por país |
 | **AEO/autoridad** | Presencia, mención y citación en un panel estable de preguntas; calidad de la atribución |
-| **Comprensión** | Scroll útil, interacción con índice, retorno, navegación Pillar↔satélite y consumo de diagramas |
-| **Conversión** | Suscripciones, reuniones, oportunidades e ingresos influenciados con source/campaign gobernados |
-| **Topical system** | Satélites publicados, enlaces válidos, canibalización, freshness y cobertura de intenciones |
+| **Comprensión/progreso** | Scroll útil, interacción con índice, retorno, navegación Pillar↔nodo y consumo de diagramas |
+| **Conversión** | Siguientes pasos útiles, suscripciones, reuniones, oportunidades e ingresos influenciados con source/campaign gobernados |
+| **Topical system** | Nodos publicados por tipo, enlaces válidos, canibalización, freshness y cobertura de intenciones |
 | **Reutilización** | Átomos publicados, uso por ventas, formación interna y menciones ganadas |
 | **Madurez del conocimiento** | Preguntas recurrentes, cobertura del cluster, ejercicios útiles y evidencia suficiente para evaluar un ebook o diagnóstico |
 

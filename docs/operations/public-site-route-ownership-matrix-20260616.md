@@ -26,6 +26,8 @@ This matrix is a planning artifact. It does not change DNS, Vercel, Kinsta or Wo
 | Business cases / campaign pages | WordPress/Elementor or absent | Astro/Vercel | New pages start as Vercel previews, noindex until approved | HubSpot attribution and canonical required |
 | `/blog` | WordPress/Kinsta | Astro/Vercel rendering WordPress content | Do not cut over until blog listing/card/meta parity exists | Sitemap/canonical must not duplicate WordPress-rendered listing |
 | Blog posts | WordPress Gutenberg content | Astro/Vercel rendering WordPress content | Headless render preferred; proxy only temporary and gated | Preserve Yoast/meta/schema or deliberate replacement |
+| Editorial Pillars / Pillar Experience | WordPress Gutenberg + Content Factory | Astro/Vercel apex rendering structured WordPress content | Preserve existing canonical; decide new route per PDR-016 before draft public | Think product does not imply `think.efeoncepro.com`; no duplicate Page/Elementor canonical |
+| Think tools, reports and focused experiences | `think.efeoncepro.com` Astro | `think.efeoncepro.com` unless a PDR/ADR moves the route | Separate specialized runtime | A tool route does not become the default home for editorial Pillars |
 | `/wp-admin/*` | WordPress/Kinsta | `cms.efeoncepro.com/wp-admin/*` | Keep admin off public Astro runtime | Never proxy admin through public Astro unless explicitly security-reviewed |
 | `/wp-login.php` | WordPress/Kinsta | `cms.efeoncepro.com/wp-login.php` | Same as admin | Avoid public apex login exposure after cutover |
 | `/wp-json/*` | WordPress/Kinsta | `cms.efeoncepro.com/wp-json/*` or internal origin | Consumers use CMS/origin host | Public frontend should not expose API as content surface |
@@ -46,6 +48,7 @@ Before any route reaches production under Astro:
 - [ ] Existing status codes recorded for each route.
 - [ ] Current titles, descriptions, canonicals, OG tags and structured data captured.
 - [ ] Current sitemap entries captured.
+- [ ] Pillar routes classify product/surface separately from host/runtime per PDR-016.
 - [ ] Target Astro route emits canonical URL on `https://efeoncepro.com`.
 - [ ] Preview/Vercel URLs are noindex or protected.
 - [ ] Redirect map exists for every changed path.

@@ -123,6 +123,8 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Vocabulario (AEO vs GEO vs LLMO vs SGE vs AI Mode, etc.) | `GLOSSARY.md` |
 | Fuentes canónicas + qué reverificar y cada cuánto | `SOURCES.md` |
 | Blogposts, pillars y guías: dossier, metadata, E-E-A-T, publicación WordPress/Think, link health y verificación live | `references/agentic-editorial-eeat.md` |
+| Pillar Experience Efeonce: canonical, mapa de cluster, `ItemList`, enlaces y placement Think/host | `docs/public-site/decisions/PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md`; esta skill valida semántica/schema, no elige el CMS por SEO |
+| **Content Engineering**: contenido como experiencia humana + computable, sin duplicar fuentes ni esconder conocimiento | Canon editorial en `../content-marketing-studio/references/content-engineering.md`; esta skill gobierna semántica, schema, entidades, recuperación y citabilidad |
 | **Framework + metodología propietaria Efeonce** (los 5 niveles para existir en un internet de agentes: Be Found · Readable · Correct · Actionable · Intrinsic; narrativa pública + modelo de 2 ejes del grader) | `efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md` ⭐ |
 | Caso Efeonce: WordPress/Kinsta + AI Content Factory + HubSpot + ICP Globe | `efeonce/EFEONCE_OVERLAY.md` |
 | **Producto Greenhouse que operacionaliza esta skill** (AI Visibility Grader / dominio `growth`, TASK-1226/1227) | `efeonce/AI_VISIBILITY_GRADER.md` |
@@ -214,3 +216,6 @@ una estimación como medición.
    mecánicas difieren.
 6. **Mide o no existió.** GSC/GA4 para clásico; Share of Voice + tráfico IA para
    AEO. Sin medición, no hay caso.
+7. **Una verdad, dos interfaces.** En Content Engineering, la experiencia humana y la representación computable
+   deben derivar del mismo contenido gobernado. Schema, FAQ, entidades y respuestas nunca mantienen una versión
+   manual paralela a lo visible.

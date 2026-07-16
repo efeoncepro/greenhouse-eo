@@ -4,16 +4,21 @@
 
 ## Doctrina y frameworks canónicos (estables)
 
-- **Topical authority (pillar/cluster)** — modelo de autoridad temática; la ejecución técnica es de `seo-aeo`.
+- **Pillar/cluster histórico** — el guide de HubSpot documenta las variantes 10X/Resource Pillar y el modelo de
+  topic clusters; usarlo como antecedente, no como layout literal para 2026.
+- **Topical authority (pillar/cluster)** — HubSpot y Ahrefs mantienen vigente la arquitectura de pieza ancla,
+  satélites y enlaces contextuales; la ejecución técnica es de `seo-aeo` y la evolución Efeonce vive en PDR-016.
 - **Create once, distribute forever** (Ross Simmonds / Foundation) — doctrina de distribución + repurposing.
 - **Jobs To Be Done** (Christensen) — el contenido responde al trabajo de la audiencia.
 - **Niveles de consciencia** (Eugene Schwartz) — calibra el ángulo por consciencia de la audiencia (craft → `copywriting`).
 - **POE model (Paid/Owned/Earned)** — marco de distribución.
 - **They Ask, You Answer** (Marcus Sheridan) — contenido que responde las preguntas reales del comprador.
+- **Content Engineering / structured content** — Content Science Review y Digital.gov documentan la base histórica: modelos de contenido, metadata, templates, automatización, gobernanza y reutilización multicanal. La extensión Efeonce hacia experiencias humanas + computables vive en `references/content-engineering.md`.
 
 ## Qué reverificar cada vez (volátil — usar WebSearch, citar as-of)
 
 - **Comportamiento de IA-search / citabilidad:** cómo AI Overviews / AI Mode / ChatGPT Search / Perplexity / Gemini seleccionan y citan fuentes. (Táctica → `seo-aeo`.)
+- **Intermediación y verificación:** revalidar estudios conductuales de Pew sobre AI summaries y el Digital News Report de Reuters Institute antes de afirmar cómo cambian clics, profundización o confianza.
 - **Formatos y algoritmos sociales:** qué formato rinde por red este año (video corto, carruseles, etc.). (Ejecución → `social-media-studio`.)
 - **Benchmarks de engagement/conversión** por formato/industria/canal.
 - **Herramientas de IA de contenido** y sus capacidades/gobernanza.

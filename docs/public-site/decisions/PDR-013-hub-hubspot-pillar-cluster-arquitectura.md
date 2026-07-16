@@ -179,7 +179,8 @@ qué implementamos → **cuándo NO te sirve** → el caso → CTA.
 
 ## 6. Lo que NO va en este hub
 
-- **La demanda de categoría** (`crm` = **40.500/mes** en México) **va a Think**, como pillar de autoridad.
+- **La demanda de categoría** (`crm` = **40.500/mes** en México) **va al producto editorial Think**, como Pillar
+  de autoridad con host/canonical gobernado por [PDR-016](PDR-016-pillar-experience-arquitectura-editorial-y-runtime.md).
   Estos clusters son **bottom-funnel de decisión**, no captura top-of-funnel. *(Ya decidido en PDR-006.)*
 - **El listing del Solutions Directory** (0 reviews, solo español, "Any Budget") — es canal, no sitio.
   Va al plan de rescate de la práctica.
