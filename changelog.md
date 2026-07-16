@@ -78,6 +78,14 @@
 - El portal autenticado confirma uso efectivo de `tipo_de_ingreso` en 9 recursos (4 informes, 2 workflows,
   formulario de creación, lógica condicional y property card); `variacion_contrato` y `tipo_de_servicio` no tienen
   consumidores declarados. Estos conteos reemplazan la incertidumbre API para esas propiedades, no autorizan retiros.
+- Fase 1 RevOps queda cerrada con dos propiedades calculadas Deal API-managed y tres informes de outcome en
+  `Dashboard de Crecimiento`: count por Ganado/Perdido/No adjudicado (`340844496`), valor actual por outcome
+  (`340844919`) y tasa de adjudicación (`340845240`) con filtro obligatorio Ganado+Perdido. Readback al corte real:
+  13 ganados, 0 perdidos, 1 no adjudicado y 100% sobre denominador 13.
+- `Radar 0%` no fue corregido ni se movieron sus 10 Deals; la dimensión calculada los resuelve como `Abierto` y
+  evita los flags nativos basados en probabilidad. No hubo record writes, backfill, cambios de pipeline ni cambios
+  sobre las Companies ANAM duplicadas. Las skills espejo registran límites, propagación y semántica de fórmulas
+  calculadas, además del cutoff exacto de `current quarter to date`.
 - La lectura completa de reuniones de Maria Paz y José Pedro establece el modelo Contact -> Lead -> Company ->
   Deal -> Service, con Ticket como caso/SLA. El objeto estándar Service (`0-162`) ya está activo: 43 properties,
   dos custom sin cobertura, un registro de prueba y pipeline inglés sin reglas. Se documenta la síntesis en

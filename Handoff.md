@@ -47,15 +47,16 @@
 
 ## Sesión 2026-07-16 — HubSpot as a Service + QA/RevOps ANAM (Codex)
 
-> **Roadmap y Fase 1:** el plan completo quedó canonizado en
-> `anam-revops-implementation-roadmap-phases-2026-07-16.md`. La Fase 1 está en curso y no reabre definiciones:
-> Notion confirma ratificación `Listo`, `Variación vs. cotizado` `Listo` y backfill Q1-Q2 `En curso`.
-> Contrato de ejecución: `anam-phase-1-commercial-reporting-foundation-2026-07-16.md`. Los cuatro informes del
-> `Dashboard de Crecimiento` ya fueron inventariados read-only: todos son reutilizables, pero mezclan Renovación
-> con Growth; tres usan `Fecha de creación` y el informe por ejecutivo titulado "por Q" muestra el histórico de
-> 908 Deals sin periodo visible. Próximo paso live: ajustar títulos/filtros/ubicación, separar pipeline creado,
-> outcome Closed Won y proxy de Renovación; luego publicar Data Quality con denominadores explícitos. No tocar la
-> Company ANAM.
+> **Roadmap y Fase 1 — CERRADA:** el plan completo quedó canonizado en
+> `anam-revops-implementation-roadmap-phases-2026-07-16.md` y el contrato/evidencia final en
+> `anam-phase-1-commercial-reporting-foundation-2026-07-16.md`. La Fase 1 cerró con inventario de consumidores,
+> panel Data Quality, Growth por tipo/owner/línea/proceso, proxy de Renovación, cola Q1-Q2 y outcome comercial.
+> El cierre outcome creó dos propiedades calculadas API-managed y tres informes (`340844496`, `340844919`,
+> `340845240`): al corte real del trimestre muestran 13 ganados, 0 perdidos, 1 no adjudicado, CLF 5.782,97 ganado,
+> CLF 232.000 no adjudicado y tasa 100% sobre denominador explícito 13. `Radar 0%` no cambió: sus 10 Deals siguen
+> en la etapa y calculan `Abierto`; no hubo movimientos, record writes ni backfill. Ejecución, fórmulas, límites,
+> readback y screenshots: `anam-phase-1-outcome-reporting-change-set-2026-07-16.md`. La corrección de metadata
+> Radar, funnel, tendencias, gauges y validación/backfill de 82 Deals quedan para slices posteriores aprobados.
 >
 > **Capability creada:** skills espejo `.codex/.claude/skills/hubspot-as-a-service` con referencias separadas
 > para managed delivery, Customer Agent, RevOps schema y el caso ANAM. La skill orquesta `intake -> inventory ->
@@ -104,6 +105,12 @@
 > línea con monto+conteo (`340830124`). Todos usan Growth explícito; el pivot fija Q3 2026 y reconcilia 29/CLF
 > 2.443,89. No se alteraron informes legacy ni registros CRM. Combinación/área se aplazan porque Q3 solo contiene
 > julio; funnel hasta resolver/excluir Radar 0%; gauges DQ hasta disponer de denominador dinámico y meta aprobada.
+>
+> **Aprendizaje reusable de cierre:** HubSpot 2026 exige ramas del mismo tipo en fórmulas calculadas; una propiedad
+> numérica no puede devolver `''`. La tasa usa por eso base 1/0 y filtro obligatorio Ganado+Perdido. `Current quarter
+> to date` termina en el instante actual del timezone del portal, no al final del día; el readback API debe usar el
+> mismo cutoff. Estos contratos quedaron sincronizados en las skills Codex/Claude (`revops-schema.md` y
+> `report-design.md`).
 >
 > **Billing Event discovery:** ADR `Proposed` en
 > `anam-billing-event-hubspot-decision-v1.md` y dry-run en

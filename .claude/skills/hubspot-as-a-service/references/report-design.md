@@ -73,3 +73,8 @@ Verify:
 - Prefer explicit calendar boundaries in diagnostic reports that must remain auditable. Relative labels such as `current quarter` are suitable for pulse reports but can change their cohort after rollover.
 - A dashboard save confirmation is insufficient. Reopen the dashboard, confirm the report title is present and reconcile the displayed total with the source cohort.
 - Defer a sophisticated visual when the data cannot support its question: one month is not a useful trend, a closed-state anomaly invalidates a funnel, and a static population maximum invalidates a completeness gauge.
+- A relative period such as `current quarter to date` ends at the current instant in the portal timezone, not at the end of the current calendar day. API reconciliation must use the same cutoff; otherwise a future-dated record later today can create a false mismatch.
+- A calculated numeric `1/0` base can support a percentage summary only when the report visibly and mandatorily filters the eligible denominator. For adjudicated win rate, filter the calculated outcome to `won + lost`; open and no-award records must not enter through their numeric fallback.
+- HubSpot calculation values may propagate asynchronously after schema creation. Do not build or accept a report from the first null read; wait, read representative records again, and then reconcile the rendered chart.
+- In the single-object builder, selecting a visible property row may work when a hidden checkbox control does not; treat the saved filter count and rendered total as the evidence, not the transient editor control state.
+- When saving a governed duplicate, explicitly choose the destination dashboard. `Save as new report` can default to no dashboard even when the source report belongs to one.

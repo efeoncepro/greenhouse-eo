@@ -56,6 +56,7 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 - Native HubSpot transfer/system messages can pre-empt trained answers. Record this as a platform behavior and improve the transfer copy; do not hide it.
 - All client-facing metrics require period, baseline, denominator, definition and evidence. ANAM naming in external case studies requires authorization.
 - Do not reduce dashboard design to scorecards and bars. Inventory the active report builder and select visualization by decision, cardinality, period and measure semantics using `report-design.md`.
+- Treat calculated properties as governed schema, not report-local convenience. Verify the portal allowance, prefer exact business IDs over probability-derived flags, read back both definitions and representative values, and document any mandatory report filter that makes a numeric base semantically valid.
 
 ## Required outputs
 

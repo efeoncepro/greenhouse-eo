@@ -5,6 +5,10 @@
   `.codex/.claude/skills/hubspot-as-a-service`. El repo Kortex conserva sólo implementación ejecutable
   (OAuth, capability runtime, CMS source, builds y tasks) y consume este canon por referencia; no debe crear
   una copia divergente. Índice: `docs/architecture/kortex/hubspot-as-a-service/README.md`.
+  Fase 1 RevOps está cerrada: dos propiedades calculadas Deal API-managed aíslan outcome por stage ID exacto y
+  tres informes verificados publican count, valor actual y win rate con denominador Ganado+Perdido. `Radar 0%`
+  permanece sin cambios y sus 10 Deals calculan `Abierto`; no hubo record writes/backfill. Canon de ejecución:
+  `docs/architecture/kortex/hubspot-as-a-service/anam-phase-1-outcome-reporting-change-set-2026-07-16.md`.
 
 - **HubSpot Solutions Partner / narrativa agéntica sincronizada (2026-07-16):** las skills espejo
   `.codex/.claude/skills/hubspot-solutions-partner` documentan cómo se vende HubSpot en la etapa Agentic

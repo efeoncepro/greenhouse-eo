@@ -39,3 +39,12 @@ Do not start with dashboard widgets or property creation.
 - Create schema before backfill; verify internal names and option values by read-back.
 - Activate workflows only after test records pass positive and negative paths.
 - Record deprecated fields; do not delete fields with unknown consumers.
+
+## Calculated-property execution contract
+
+- Check `/crm/limits/2026-03/calculated-properties` before proposing a calculated property; capacity is a portal runtime fact.
+- Calculation properties created by API are API-managed. Preserve the exact request formula and rollback/archive path in the change set.
+- Use exact pipeline/stage IDs when native HubSpot calculations inherit unsuitable probability semantics. Do not repair a reporting defect by moving records or changing pipeline metadata unless that is separately approved.
+- The 2026 Properties API enforces a calculation formula's output type across branches. A numeric calculation cannot use `''` as its fallback even when older/native examples appear to do so.
+- When the safe numeric fallback must be `0`, define the eligible cohort through a separate calculated dimension and make that report filter mandatory. A base property whose meaning depends on a filter is not a standalone KPI.
+- Expect asynchronous propagation after creation. Read back the property definition, representative won/lost/no-award/open values, anomaly cohorts, and the calculated-property limit after execution before accepting downstream reports.

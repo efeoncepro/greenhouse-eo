@@ -2,7 +2,7 @@
 
 > **Date:** 2026-07-16
 > **Portal:** `19893546`
-> **Status:** in progress
+> **Status:** complete
 > **Scope:** current commercial Deal reporting and data-quality readiness
 > **Write state:** no new CRM schema or record writes authorized by this document
 
@@ -320,6 +320,23 @@ ANAM operators own classification of current and historical Deals. Efeonce owns 
 
 The first visible queue is report `340823200` and contains the 82 missing Q1-Q2 values. A governed review sidecar or equivalent change-set surface must add review state (`pending_evidence`, `ready_for_review`, `conflict`, `validated_keep`, `validated_change`, `unclassifiable`, `suspected_test`) before any record write. Suggested values remain proposals until a named reviewer approves them.
 
+### P1.3 outcome reporting closure - 2026-07-16
+
+Phase 1 outcome reporting is now independent from HubSpot's probability-derived closed flags. Two API-managed Deal calculations centralize the exact ANAM stage semantics:
+
+- `resultado_comercial_reportable_anam`: `Abierto`, `Ganado`, `Perdido` or `No adjudicado` from exact Growth and Retention stage IDs;
+- `tasa_adjudicacion_base_anam`: 1 for exact won stages and 0 otherwise, valid as win rate only when the report filter restricts the denominator to Ganado + Perdido.
+
+Three reports were published on `Dashboard de Crecimiento` (`19708354`) and reconciled at the real current-quarter-to-date cutoff:
+
+| Report | ID | Verified result |
+|---|---:|---|
+| `Resultados comerciales - cantidad por desenlace (trimestre actual)` | `340844496` | 13 Ganado, 0 Perdido, 1 No adjudicado |
+| `Resultados comerciales - valor actual por desenlace (trimestre actual)` | `340844919` | Ganado CLF 5,782.97; No adjudicado CLF 232,000.00 |
+| `Resultados comerciales - tasa de adjudicación (trimestre actual)` | `340845240` | 100%; explicit denominator 13 = 13 won + 0 lost |
+
+`Radar 0%` remains unchanged in pipeline configuration and all ten current Radar Deals read back as `Abierto`; no record was moved. The existing pivot `340830124` continues to provide owner-by-business-line count and current amount, so no duplicate outcome diagnostic was created. Exact schema formulas, representative stage readback, screenshots, rollback and safety evidence live in [`anam-phase-1-outcome-reporting-change-set-2026-07-16.md`](anam-phase-1-outcome-reporting-change-set-2026-07-16.md).
+
 ## Phase 1 acceptance
 
 Phase 1 is complete when:
@@ -328,7 +345,7 @@ Phase 1 is complete when:
 - the Data Quality dashboard is published with denominators and owner queues;
 - the Growth dashboard reports count and amount by type, owner, service line and commercial process;
 - Q1-Q2 adoption progress is visible without claiming unvalidated inferred values as truth;
-- `Radar 0%` no longer corrupts win-rate/open-pipeline reporting, either through an approved metadata correction or an explicit temporary report exclusion;
+- `Radar 0%` no longer corrupts win-rate/open-pipeline reporting, either through an approved metadata correction or an explicit report-safe calculated outcome/filter;
 - Renewal is labelled as a Deal proxy and no GRR, NRR, Down-sell or churn metric is presented as final;
 - readback evidence and screenshots are attached to the execution log.
 
@@ -342,7 +359,8 @@ Phase 1 is complete when:
 - Both pipeline-membership workflows remain disabled and must not be activated because they assign `Venta nueva` indiscriminately.
 - Two distinct reports were published and read back: current-quarter Growth created pipeline and a separate Renewal Deal proxy.
 - The separate `Calidad de Datos Comercial` dashboard (`21144697`) now contains seven verified controls: income type and commercial-process owner queues, KPI scorecards for the single missing amount and business line, the ten-Deal Radar owner queue, a 494-Deal Closed Won variation-adoption scorecard and an 82-Deal Q1-Q2 income-type validation queue.
-- No HubSpot record, schema, workflow, form, rule, view or pipeline metadata was changed.
+- The inventory, Data Quality and Growth-report slices did not change HubSpot records or schema. The separately approved outcome change set later created exactly two calculated Deal properties; no record, workflow, form, rule, view or pipeline metadata was changed.
 - P1.1 and the first P1.2 control set are complete. Backfill remains a separate approved P1.4 operation.
 - P1.3 current-quarter Growth publication is complete: seven verified reports now provide KPI pulse, income-type and commercial-process composition, business-line value, exact line detail and an owner-by-line pivot. All reconcile to 29 Deals and CLF 2,443.89 of current Deal value.
-- The next reporting action is explicit won/lost outcome reporting after correcting or excluding the invalid Radar closed-state behavior. Monthly trend and target-gauge assets remain intentionally deferred until their time-series and denominator contracts are valid.
+- P1.3 outcome publication is complete: two calculated Deal properties plus three verified reports provide exact won/lost/no-award count, current value and adjudicated win rate without changing Radar metadata or records.
+- Phase 1 acceptance is satisfied. The Q1-Q2 adoption queue remains a governed human-review operation for a later approved slice; monthly trend, target gauges, funnel and Radar metadata correction remain intentionally deferred until their contracts or approvals are valid.

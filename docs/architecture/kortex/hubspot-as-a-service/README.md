@@ -83,6 +83,7 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Property governance and dashboard gates: [`anam-revops-property-governance-2026-07-16.md`](anam-revops-property-governance-2026-07-16.md)
 - Canonical implementation roadmap by phase: [`anam-revops-implementation-roadmap-phases-2026-07-16.md`](anam-revops-implementation-roadmap-phases-2026-07-16.md)
 - Phase 1 commercial reporting foundation: [`anam-phase-1-commercial-reporting-foundation-2026-07-16.md`](anam-phase-1-commercial-reporting-foundation-2026-07-16.md)
+- Phase 1 outcome reporting execution: [`anam-phase-1-outcome-reporting-change-set-2026-07-16.md`](anam-phase-1-outcome-reporting-change-set-2026-07-16.md)
 - Product OAuth diagnosis and Kortex runtime drift: [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-product-oauth-diagnosis-2026-07-16.md)
 - Approval-ready Service schema and migration contract: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md)
 - Final scoped QA verdict: [`../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md`](../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
