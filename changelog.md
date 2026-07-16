@@ -5,9 +5,11 @@
 - Nace la skill espejo `.codex/.claude/skills/hubspot-as-a-service` como capa de delivery gestionado: intake,
   inventario, diseño RevOps, change sets, Customer Agent, conocimiento Markdown, landing/chat, QA, handoff,
   medición y reporting; mantiene fronteras explícitas con `hubspot-solutions-partner`, Kortex CMS y el bridge.
-- Kortex suma `docs/architecture/kortex/hubspot-as-a-service/` con el modelo operativo, el seam de la landing
-  ANAM y el discovery combinado de seis hilos RevOps corporativos + tareas Notion. No se ejecutaron properties,
-  backfills, workflows ni otros writes CRM durante el discovery.
+- Greenhouse suma y gobierna `docs/architecture/kortex/hubspot-as-a-service/` como canon visible del modelo
+  operativo, el seam de la landing ANAM y el discovery combinado de seis hilos RevOps corporativos + tareas
+  Notion. Las skills Codex/Claude y la evidencia cliente permanecen en Greenhouse; Kortex conserva sólo su
+  implementación ejecutable y referencia este canon sin duplicarlo. No se ejecutaron properties, backfills,
+  workflows ni otros writes CRM durante el discovery.
 - Se corrige el estado operativo de la landing ANAM a build `#22` y tres intents. El informe cliente de QA queda
   versionado en `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`, con conteo de escenarios/turnos,
   resultados y limitaciones nativas. ANAM confirmó Customer Agent y 30.000 créditos comprados; el aviso de un
@@ -15,6 +17,16 @@
 - El readback de schema del portal `19893546` inventaría Deal/Company/Contact, asociaciones y pipelines accesibles,
   mide cobertura de propiedades clave y documenta drift de opciones, duplicidades y límites de scope sin ejecutar
   escrituras CRM.
+- El inventario ampliado reconcilia native Lead (291), line items (506; 501 asociados a Deals), Quote (10), Service
+  (1), Ticket (18), Invoice (0) y custom schemas (0). Los 10 Quotes no forman una base histórica: ninguno tiene line
+  items, seis tienen monto cero y sólo dos están asociados al mismo Deal. Se documenta el contrato final en
+  `anam-revops-schema-reconciliation-2026-07-16.md`.
+- `anam-commercial-catalog-dry-run-2026-07-16.md` reduce los 506 line items a 20 nombres normalizados y propone un
+  seed Product/Service gobernado; `M&A - Integral` concentra 331. El RUT duplicado de ANAM se documenta como split
+  real de asociaciones y no se auto-mergea.
+- Kortex despliega builds `#12/#13` para Product Library con `crm.objects.products.read` requerido y write
+  condicional. HubSpot rechaza tres consentimientos antes del callback; la instalación ANAM permanece activa con
+  109 scopes y Product API `403`, sin recurrir al scope obsoleto `e-commerce`.
 - El dependency audit confirma que Workflows, Forms, Lists, Ticket v3 y reglas de pipeline requieren scopes de
   lectura adicionales. Se versiona un change set dividido: reconciliación reversible de dos propiedades pendiente
   de aprobación y cambios estructurales bloqueados hasta observar consumidores y cerrar decisiones de negocio.

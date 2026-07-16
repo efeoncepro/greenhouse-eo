@@ -1,8 +1,18 @@
-# HubSpot as a Service - Kortex Operating Model
+# HubSpot as a Service - Greenhouse Canon
 
 > **Created:** 2026-07-16
 > **Scope:** managed HubSpot delivery for client portals, starting with ANAM
 > **Agent entry point:** `.codex/skills/hubspot-as-a-service/SKILL.md` and Claude mirror
+
+## Canon and repository ownership
+
+This Greenhouse directory is the source of truth for the managed-service method, ANAM client context, RevOps decisions, Customer Agent evidence and cross-platform handoff. It remains here so operators and agents have one visible, reviewable record.
+
+- Codex and Claude skills are owned by Greenhouse at `.codex/skills/hubspot-as-a-service/` and `.claude/skills/hubspot-as-a-service/`.
+- Customer Agent QA is owned by Greenhouse under `docs/audits/`.
+- ANAM CMS, landing and portal-access documentation is owned by Greenhouse under `docs/architecture/kortex/hubspot-cms/`.
+- The Kortex repository owns only its executable implementation: OAuth manifests, runtime capability normalization, CMS project source, tasks, builds and deployment evidence.
+- Kortex may reference this canon but must not fork or silently duplicate the service method or client record.
 
 ## Purpose
 
@@ -54,13 +64,20 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 
 ## Current ANAM artifacts
 
+- Fresh-session continuation entry point: [`anam-next-session-handoff-2026-07-16.md`](anam-next-session-handoff-2026-07-16.md)
 - Landing/runtime: [`../hubspot-cms/anam-chat-landing.md`](../hubspot-cms/anam-chat-landing.md)
 - Portal access: [`../hubspot-cms/anam-portal-access.md`](../hubspot-cms/anam-portal-access.md)
 - QA report: [`../../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`](../../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)
 - RevOps discovery: [`anam-revops-discovery-2026-07-16.md`](anam-revops-discovery-2026-07-16.md)
+- Non-agent email attachment synthesis for Tickets, billing and market KPIs: [`anam-email-attachment-synthesis-2026-07-16.md`](anam-email-attachment-synthesis-2026-07-16.md)
+- Proposed Billing Event architecture decision: [`anam-billing-event-hubspot-decision-v1.md`](anam-billing-event-hubspot-decision-v1.md)
+- Billing migration and association dry-run: [`anam-billing-event-migration-dry-run-2026-07-16.md`](anam-billing-event-migration-dry-run-2026-07-16.md)
+- Exact Billing Event schema preview and gated change set: [`anam-billing-event-schema-preview-2026-07-16.md`](anam-billing-event-schema-preview-2026-07-16.md)
 - Meeting synthesis and target object model: [`anam-revops-meeting-synthesis-2026-07-16.md`](anam-revops-meeting-synthesis-2026-07-16.md)
 - Commercial-first operating model and gap plan: [`anam-commercial-first-operating-model-2026-07-16.md`](anam-commercial-first-operating-model-2026-07-16.md)
 - Runtime schema readback: [`anam-hubspot-schema-readback-2026-07-16.md`](anam-hubspot-schema-readback-2026-07-16.md)
+- Full live-schema reconciliation and target RevOps contract: [`anam-revops-schema-reconciliation-2026-07-16.md`](anam-revops-schema-reconciliation-2026-07-16.md)
+- Existing line-item to Product/Service catalog dry run: [`anam-commercial-catalog-dry-run-2026-07-16.md`](anam-commercial-catalog-dry-run-2026-07-16.md)
 - Executed low-risk RevOps change set: [`anam-revops-change-set-2026-07-16.md`](anam-revops-change-set-2026-07-16.md)
 - Property governance and dashboard gates: [`anam-revops-property-governance-2026-07-16.md`](anam-revops-property-governance-2026-07-16.md)
 

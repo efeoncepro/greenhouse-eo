@@ -2,7 +2,7 @@
 
 > **Date:** 2026-07-16
 > **Portal:** `19893546`
-> **Mode:** initial read-only CLI inventory plus authenticated portal readback
+> **Mode:** initial read-only CLI inventory plus Kortex OAuth schema readback
 > **Execution status:** Slice A property presentation reconciled after approval; no CRM records, pipelines, workflows or associations changed
 
 ## Executive finding
@@ -17,8 +17,8 @@ The most important findings are:
 4. technical quotation fields are duplicated between Deal and Company; the Company copies have only two records and most Deal copies have none.
 5. retention and service classifications overlap across multiple properties with different vocabularies.
 6. the Growth pipeline starts with `Radar 0%` marked as closed, which can distort reporting and automation.
-7. Ticket remains close to the HubSpot default: generic English stages and no custom Ticket properties were visible through the accessible schema endpoint.
-8. The standard Service object (`0-162`) is active but has only one sample-like record, a default English pipeline and no complete contract model.
+7. Ticket remains close to the HubSpot default: generic English stages and no custom Ticket properties were detected in the initial portal inspection; the expanded API readback now exposes 215 property definitions for complete reconciliation.
+8. The standard Service object (`0-162`) is active but has only one sample-like record, a default English pipeline and no complete contract model; the expanded API readback exposes 72 property definitions.
 
 ## Inventory and access boundary
 
@@ -27,18 +27,26 @@ The most important findings are:
 | Deal | 262 | 25 | 1,240 |
 | Company | 268 | 28 | 1,023 |
 | Contact | 406 | 6 | 8,859 |
-| Ticket | 186 through legacy readback | 0 detected | Not readable with current scope |
-| Service (`0-162`) | 43 through portal readback | 2 | 1 |
+| Lead (`0-136`) | 136 through Kortex OAuth | 0 | 291 |
+| Line item | 129 through Kortex OAuth | 0 | 506 |
+| Quote | 194 through Kortex OAuth | 0 | 10 |
+| Product | Access pending Product Library scope | Pending | Pending |
+| Ticket | 215 through Kortex OAuth | 0 | 18 |
+| Service (`0-162`) | 72 through Kortex OAuth | 2 | 1 |
+| Invoice | 145 through Kortex OAuth | 0 | 0 |
+| Custom object schemas | 0 | 0 | 0 |
 
-The personal access key can read Deal, Company and Contact properties and records. Current limitations:
+The personal access key can read Deal, Company and Contact properties and records. It remains a developer-tool credential with user-selected permissions. The Kortex OAuth installation is the broad CRM read/write credential and, after reconsent on 16 July 2026, has 109 scopes including `crm.schemas.custom.write`.
+
+Resolved access findings:
 
 - pipeline v3 endpoints reject user-level OAuth tokens;
-- Ticket v3 properties require `tickets-read` or `tickets-access`;
-- custom-object schemas require `crm.schemas.custom.read` or an equivalent custom-object read scope;
+- Ticket v3 properties are readable through the Kortex OAuth `tickets` scope;
+- custom-object schemas are readable and writable through `crm.schemas.custom.read` and `crm.schemas.custom.write`;
+- Service and Invoice property definitions are readable through their object/schema scopes;
 - stage-level required properties and conditional visibility were not exposed by the accessible endpoints.
-- Service API readback requires `crm.objects.services.read`; the current CLI credential does not have it.
 
-These limits mean requiredness and conditional rules still need an authenticated portal readback or a credential with the missing scopes before any change is approved.
+Stage-level requiredness, conditional rules and downstream consumers still need focal inspection before any property change is approved. Missing API scopes are no longer a general blocker; Product Library remains the one focal exception.
 
 ### Dependency audit result
 
@@ -51,6 +59,19 @@ Read attempts against Workflows, Forms and Lists returned explicit missing-scope
 
 The API-only conclusion was that consumers were **indeterminate**, not that no consumers existed. A later authenticated portal readback resolved aggregate usage for selected high-risk Deal fields: `tipo_de_ingreso` has 9 consumers (4 reports, 2 workflows, one create-record form, one dependent conditional rule and one property card); `linea_de_negocio_anam` has 4; `resultado_de_retencion` and `zona` each have one dependent rule; `variacion_contrato`, the obsolete renewal boolean and `tipo_de_servicio` report zero. Individual workflow/report contracts still require focal inspection. No matching references were found in the Greenhouse workspace or the ANAM CMS React project.
 
+The 16 July scope expansion resolved the prior access failures for Workflows, Lists, Ticket, Service, Invoice and custom schema APIs through Kortex OAuth. A subsequent Product Library read returned `403` because the installation lacks `crm.objects.products.read`; the Kortex project scope correction and ANAM reconsent are tracked separately. Forms and other optional product surfaces remain governed by their granted scopes and are not evidence that every API supports write operations such as report/dashboard creation.
+
+## Lead, Quote and line-item adoption
+
+- Native Lead is active with 291 records: 84 New, 5 Attempting, 117 Connected, 85 Qualified and 0 Disqualified. Its standard primary Contact and Company associations are available; no custom prospect object is needed.
+- ANAM has 506 line items, of which 501 are associated to Deals. Every line item carries name, quantity, price, amount, TCV, ACV and currency, but only eight capture recurrence frequency and six capture billing term dates.
+- Ten native Quotes exist with no custom Quote properties. HubSpot already provides quote number, version, amount/TCV, currency, status, expiry, acceptance, purchase order and native Deal/line-item associations.
+- All ten Quotes have number, title, amount/TCV and CLF currency. Eight are drafts and two expired; none is accepted, none has a type/version value, none has line items and only two are associated to a Deal, both to the same Deal. Six carry zero amount.
+- Quote adoption is below 1% of the 1,240-Deal history and does not provide a usable historical quote baseline. Adopt native Primary Quote + line items prospectively through a controlled pilot; historical quote-versus-award reporting still needs a governed source/backfill or a Deal snapshot when association reporting cannot supply it reliably.
+- Product Library inventory is the remaining scope-dependent part of the commercial catalog audit.
+
+The target is native Product -> line item -> Quote/Deal, followed by one Service per awarded service component. Do not duplicate native Quote identity, status or version fields on Deal by default. A quoted-value snapshot on Deal is justified only when the approved reporting/backfill design cannot resolve the accepted Primary Quote deterministically.
+
 ## Standard Service object
 
 The 17 June meeting identified HubSpot Service as the post-award contract/service grain. Authenticated runtime inspection confirms it is active.
@@ -61,7 +82,7 @@ The 17 June meeting identified HubSpot Service as the post-award contract/servic
 - Two custom properties exist: `fecha_de_vencimiento_del_contrato` and `monto_original`; both have zero coverage.
 - Relevant standard properties include category, total cost, state, start date, target end date, close date, paid amount, remaining amount, pipeline, stage and owner.
 
-This object should be extended through an approved data dictionary, not replaced with a new custom contract object. Repeated billing events still require their own source/grain decision.
+This object should be extended through an approved data dictionary, not replaced with a new custom contract object. Native Deal-Service, Company-Service, Ticket-Service and Service-Service associations are available. There is no native Service-line item association, so the Service needs source line-item provenance. Repeated billing events still require their own source/grain decision.
 
 ## Deal revenue and retention
 

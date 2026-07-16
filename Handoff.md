@@ -5,7 +5,10 @@
 > design -> propose -> approve -> dry-run/draft -> execute -> verify -> document -> measure`; no duplica la
 > oferta de `hubspot-solutions-partner`, la ejecución CMS de Kortex ni el bridge Greenhouse.
 >
-> **Kortex/docs:** nuevo canon `docs/architecture/kortex/hubspot-as-a-service/README.md` + discovery
+> **Canon y ownership:** Greenhouse es el repositorio canónico y visible para la documentación del servicio,
+> el caso ANAM, Customer Agent, RevOps, QA y las skills espejo Codex/Claude. Kortex conserva únicamente su
+> implementación ejecutable (OAuth, runtime, proyecto CMS, builds y tasks) y referencia este canon sin
+> duplicarlo. Índice: `docs/architecture/kortex/hubspot-as-a-service/README.md`; discovery:
 > `anam-revops-discovery-2026-07-16.md`. Se corrigió el drift de landing en `project_context.md` y
 > `anam-portal-access.md`: runtime vigente build `#22`, tres intents y prefill del composer no garantizado.
 >
@@ -15,11 +18,53 @@
 > short answer. Mensajes de handoff quedaron empáticos, con contexto preservado y asignación a Maria Paz.
 >
 > **Correo + Notion (solo lectura):** Gmail personal no contenía los hilos; Outlook corporativo
-> `jreyes@efeoncepro.com` sí. Se localizaron 52 mensajes de Maria Paz y seis hilos RevOps sustantivos. Notion
+> `jreyes@efeoncepro.com` sí. Se localizaron 52 mensajes de Maria Paz y siete hilos RevOps sustantivos. Notion
 > confirma FASE 1 Arquitectura de Datos + FASE 2 Service Hub/Tickets/Eventos y revela estados contradictorios.
 > Definiciones confirmadas: `Tipo de ingreso`, Growth/Retention, `Variación vs. cotizado`, matriz/hija y 40
 > acciones comerciales por ejecutivo. Abiertos: compound Cross-sell, sectores, metas SyC y modelo de 16.898
 > registros de facturación.
+>
+> **Adjuntos no-agent revisados:** síntesis canónica en
+> `docs/architecture/kortex/hubspot-as-a-service/anam-email-attachment-synthesis-2026-07-16.md`. El flujo
+> actualizado confirma casos de Seguimiento de Servicio, Facturación y Calidad (felicitación/apelación/queja),
+> que deben vivir como Tickets asociados a Company/Contact/Service y no como simples correos. La planilla
+> `Ticket facturación_010726.xlsx` es, en cambio, un ledger SharePoint de 16.898 eventos únicos que ANAM quiere
+> incorporar a HubSpot para conectar venta/adjudicación con monto facturable/facturado por Company, Service y
+> Deal de origen: 15.706
+> Facturado, 814 Rechazo Externo, 193 Rechazo Interno, 119 Creada, 63 Facturar, 2 EDP Enviado y 1 Refacturado;
+> mezcla CLP/UF/USD y contiene outliers de moneda/monto. El Excel de mercado usa taxonomías y cifras TAM/SAM
+> contradictorias, tasas de abril y referencias legacy rotas; requiere catálogo, metodología, período y owner
+> aprobados antes de backfill o dashboard. Durante migración la fuente actual se preserva para reconciliar;
+> el target no puede depender de doble digitación manual fuera/dentro de HubSpot. No hubo writes en HubSpot.
+>
+> **Billing Event discovery:** ADR `Proposed` en
+> `anam-billing-event-hubspot-decision-v1.md` y dry-run en
+> `anam-billing-event-migration-dry-run-2026-07-16.md`. Capacidad custom-object live: 500.000, uso 0;
+> Marketing Hub Enterprise detectado por scope inference y custom objects actuales 0. El ledger consume 3,38%
+> de capacidad, pero sólo 4.008/16.898 filas (23,7%) matchean Company de forma determinística: HubSpot tiene
+> RUT en 18/1.023 Companies y no tiene Código ANAM. Deals: 595/1.240 asociados a Company; existen 506 line items
+> y 501 están asociados a Deals, corrigiendo el corte inicial que no había auditado ese objeto,
+> 1.239 en CLF y sin clave estructurada cotización/EDP. Resultado `NO-GO` para import inmediato; primero identidad
+> Company, quotation key, Deal->Service lineage y schema preview. ADR aún no aceptado y no autoriza writes.
+> El change set exacto quedó en `anam-billing-event-schema-preview-2026-07-16.md`: propiedades prerequisite
+> de Company/Deal/Service, objeto Billing Event, asociaciones, ownership, cuarentena y gates. Sigue bloqueado crear
+> schema hasta ratificar cardinalidad de Código ANAM, semántica de Deal `amount`, grain/key de Service,
+> `Refacturado`/notas de crédito y posible multi-Service por fila; los montos normalizados quedan fuera de staging
+> hasta aprobar fecha y fuente UF/FX.
+>
+> **Schema reconciliation completa:** `anam-revops-schema-reconciliation-2026-07-16.md` inventaría 8.859
+> Contacts, 1.023 Companies, 291 Leads, 1.240 Deals, 506 line items, 10 Quotes, 1 Service, 18 Tickets y 0
+> Invoices. Native Lead se reutiliza; Quote existe pero no está adoptado (8 drafts, 2 expired, 0 accepted,
+> 0 con line items y sólo 2 asociados al mismo Deal); Service estándar y Billing Event siguen siendo los granos
+> correctos. El único RUT duplicado parte la propia Company ANAM entre 2 Deals/1 Contact y 1 Ticket/2 Contacts
+> únicos; la API repite esos IDs por tipos de asociación, por lo que el conteo está deduplicado,
+> no se hizo merge.
+>
+> **Catálogo y acceso Product:** los 506 line items se reducen a 20 nombres normalizados; `M&A - Integral`
+> concentra 331. El dry-run `anam-commercial-catalog-dry-run-2026-07-16.md` propone el seed y deja ambiguos sólo
+> `Monitoreo Integral Minero` y los catch-all. Kortex desplegó builds `#12/#13` con Product read requerido y write
+> condicional, pero HubSpot rechazó tres reconsentimientos ANAM antes del callback. La instalación queda intacta
+> con 109 scopes y Products sigue `403`; no sumar `e-commerce` ni reintentar a ciegas.
 >
 > **Secuencia actualizada:** el readback quedó documentado en `anam-hubspot-schema-readback-2026-07-16.md` y la
 > cronología completa de reuniones en `anam-revops-meeting-synthesis-2026-07-16.md`. El modelo converge en

@@ -130,7 +130,7 @@ After the commercial lifecycle is stable, implement:
 - billing source, unique key and governed synchronization;
 - operational workload, SLA, quality, billing backlog and rejection-aging dashboards.
 
-The 16,898-row billing dataset must not be flattened into Deal or Company. Its source, event grain and synchronization contract require approval.
+The 16,898-row billing dataset must be brought into the HubSpot operating model to connect sold/awarded value with billable and invoiced actuals by Company. It must not be flattened into Deal, Company or customer Ticket: each SharePoint row is a billing event with a unique source ID, seven billing statuses and mixed CLP/UF/USD amounts, associated to Company and where possible to Service and originating Deal. Historical ingestion, currency normalization, incremental sync and the future Operations cutover require approval. Customer Tickets remain a separate grain for Service follow-up, Billing inquiries and Quality cases. See [`anam-email-attachment-synthesis-2026-07-16.md`](anam-email-attachment-synthesis-2026-07-16.md).
 
 ## Immediate next slice
 

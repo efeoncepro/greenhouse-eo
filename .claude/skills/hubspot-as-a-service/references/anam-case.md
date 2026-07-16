@@ -16,6 +16,12 @@
 - `docs/architecture/kortex/hubspot-cms/landing-page-runbook.md`
 - `docs/architecture/kortex/hubspot-as-a-service/README.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-revops-meeting-synthesis-2026-07-16.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-email-attachment-synthesis-2026-07-16.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-billing-event-hubspot-decision-v1.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-billing-event-migration-dry-run-2026-07-16.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-billing-event-schema-preview-2026-07-16.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-revops-schema-reconciliation-2026-07-16.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-commercial-catalog-dry-run-2026-07-16.md`
 - `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`
 
 ## RevOps object model
@@ -27,6 +33,8 @@
 - Ticket owns support, Quality, claim, billing and administrative cases with SLA; it does not own the contract.
 - Company owns durable account, parent-child, legal/HQ geography and governed sector data.
 - Billing execution needs a source, unique key and event grain before synchronization; do not flatten repeated invoices/EDP/HES/HAS/LIMS rows into Deal or Company.
+- Billing Event is the proposed custom-object grain: one source List item, idempotent composite key, original currency preserved, direct Company association and Service/Deal association only when deterministic. Current matching coverage is insufficient for import, so identity remediation precedes backfill.
+- The SharePoint workbook called `Ticket Facturación` contains billing events, not HubSpot customer Tickets. Those events must be ingested into the HubSpot model and associated to Company plus, where deterministic, Service and originating Deal so ANAM can compare sold/awarded value with billable/invoiced actuals. Customer Tickets separately cover Service follow-up, Billing inquiries and Quality cases.
 - `tipo_de_ingreso` remains single-select and its legacy `Down-sell` option stays hidden: contraction is a Retention movement on comparable Services, not an income type, churn or an award below quote.
 - GRR/NRR remain blocked until Service has comparable recurring values, currency, periodicity, start/end dates and a complete renewable cohort.
 - ANAM delivery is commercial-first: close Company/Contact -> Lead -> Deal/line items -> Service -> renewal and the Data Quality/Growth/Retention/Loyalty dashboards before expanding Ticket, billing sync and operational dashboards.

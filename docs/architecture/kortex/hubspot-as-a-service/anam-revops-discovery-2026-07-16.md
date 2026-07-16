@@ -21,7 +21,7 @@ runtime schema inventory -> reconcile definitions -> approve target dictionary
 
 ## Sources reviewed
 
-Six non-Customer-Agent email threads contained material RevOps decisions:
+Seven non-Customer-Agent email threads contained material RevOps decisions:
 
 | Date | Subject |
 |---|---|
@@ -31,6 +31,9 @@ Six non-Customer-Agent email threads contained material RevOps decisions:
 | 2026-06-10 | `RE: Seguimiento reunión ANAM 10/06 - Ejecutivo Virtual y KPIs` |
 | 2026-06-30 | `Pendientes KPI's Hubspot` |
 | 2026-07-01 | `Ticket Facturación` |
+| 2026-07-08/09 | `Información Operativa y Administrativa` / reply with Quality requirements |
+
+The non-agent attachments were reviewed in detail after the initial discovery. See [`anam-email-attachment-synthesis-2026-07-16.md`](anam-email-attachment-synthesis-2026-07-16.md) for the source inventory, billing-ledger profile, operational case contract and market-model quality findings.
 
 Notion sources:
 
@@ -127,16 +130,18 @@ Do not accept dashboards before measuring source-field coverage and validating t
 
 The `Ticket facturación_010726.xlsx` attachment contains 16,898 rows from Services and Contracts. Source columns include company/title, owner, zone, ANAM code, RUT, quotation/EDP, OC, HAS/HES, service dates/month, description, net amount, currency, observation, LIMS, status, invoice number, item type and access path.
 
-Observed statuses include `Facturado` and `Rechazo Externo`; currencies include `CLP` and `UF`.
+The snapshot has 16,898 unique source IDs. Statuses are `Facturado` 15,706; `Rechazo Externo` 814; `Rechazo Interno` 193; `Creada` 119; `Facturar` 63; `EDP Enviado al Cliente` 2; and `Refacturado` 1. Currencies are CLP 8,667; UF 8,229; USD 1; and blank 1. Probable UF/USD amount outliers block trusted currency reporting until source validation.
 
-The emails do not decide whether this should be:
+The updated operational-flow attachment also confirms three customer-case families: Service follow-up, Billing and Quality. These belong in HubSpot Ticket with Company/Contact/Service associations and SLA/routing; they must not be conflated with billing-ledger rows.
+
+The business objective is to bring the operational amounts into HubSpot and connect them to the sale, Service and Company. The emails do not yet decide which durable HubSpot representation should hold each billing event:
 
 - a HubSpot ticket;
 - a custom object;
 - Deal properties;
-- or an externally synchronized dataset.
+- or another supported transaction/custom object synchronized during migration and then maintained in HubSpot or through governed integration.
 
-Before implementation, decide source of truth, unique key, object/association model, update semantics, retention and reporting consumers. This decision may require an ADR if Greenhouse/Kortex becomes a runtime consumer.
+Before implementation, decide migration source of truth, unique key, object/association model, update semantics, operational cutover, retention and reporting consumers. Manual dual entry is not an acceptable target. This decision may require an ADR if Greenhouse/Kortex becomes a runtime consumer.
 
 ## Data-quality dependencies
 
