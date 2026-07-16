@@ -21,8 +21,8 @@ The phases below are delivery increments, not separate projects. Each phase must
 | Phase | Purpose | Principal output | Current state |
 |---|---|---|---|
 | 0. Customer Agent and landing | Resolve documented demand and gather context before human handoff. | Live landing, configured agent, Markdown knowledge, QA and Maria Paz handoff. | Complete; monitor in operation. |
-| 1. Commercial reporting foundation | Turn already-ratified business definitions into trustworthy current-state reports. | Existing-report inventory, Data Quality control tower and Commercial Growth dashboard. | In progress: inventory, first DQ controls and current-quarter Growth are published; outcome semantics and bounded adoption remain. |
-| 2. Catalog and sale composition | Confirm what each Deal sold without relying on uncontrolled free text. | Product/line-item mapping and governed service-family catalog. | Planned after Phase 1 baseline. |
+| 1. Commercial reporting foundation | Turn already-ratified business definitions into trustworthy current-state reports. | Existing-report inventory, Data Quality control tower and Commercial Growth dashboard. | Complete: Data Quality, Growth, Renewal proxy, Q1-Q2 queue and exact-stage outcome reporting are published and verified. |
+| 2. Catalog and sale composition | Confirm what each Deal sold without relying on uncontrolled free text. | Product/line-item mapping and governed service-family catalog. | Next: Product read is active; reconcile the 22 Products against 506 line items/20 normalized names before proposing any write. |
 | 3. Service and contract portfolio | Represent each awarded service after the Deal is won. | Approved Service dictionary and no-write Deal/line-item-to-Service dry run. | Proposal exists; not approved or executed. |
 | 4. Renewal automation | Create a controlled path from expiring Service to renewal Deal and renewed Service. | Expiry queue, owner tasks, renewal linkage and exception handling. | Blocked by Phase 3. |
 | 5. Commercial management dashboards | Measure portfolio, renewal, Retention and Loyalty from reliable Services. | Service portfolio, Renewal, Retention and Loyalty dashboards. | Growth begins in Phase 1; the rest is blocked by Service coverage. |
@@ -38,7 +38,7 @@ The agent and landing are already live and tested. Ongoing work is operational m
 
 This phase does not reopen business definitions. Meetings and Notion tasks already establish Growth versus Retention, the income-type vocabulary, quote variance, growth-first reporting and the Q1-Q2 adoption commitment.
 
-Phase 1 now does four things:
+Phase 1 delivered four things:
 
 1. inventory the reports, workflows and forms already consuming the ratified properties;
 2. measure current completeness and invalid combinations;
