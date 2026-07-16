@@ -21,6 +21,7 @@ import 'server-only'
 import { ProposalInputError } from '../errors'
 import {
   visibleTextLength,
+  type AuthoredSlide,
   type ChapterAuthor,
   type EvidencedFact
 } from './chapter-author'
@@ -44,6 +45,16 @@ const RUNG_LABELS: Record<ReportLevelId, string> = {
 
 /** Visual curado del capítulo (asset del catálogo; la curaduría de assets es humana). */
 const DIAGNOSTICO_VISUAL = 'assets/clay3d/clay-ai-visibility.png'
+
+/** Qué MIDE cada peldaño (viaja al prompt: el framing no puede interpretar mal el eje). */
+const RUNG_MEANINGS: Record<ReportLevelId, string> = {
+  found: 'Presencia en las respuestas de descubrimiento de la categoría (¿aparece la marca?).',
+  readable: 'La IA entiende quién es la marca y se apoya en fuentes creíbles sobre ella.',
+  correct: 'Cuando la IA habla de la marca, usa la narrativa propia de la marca (no la de terceros).',
+  actionable:
+    'Readiness TÉCNICO-AGÉNTICO del sitio: si un agente de IA puede operar con él (APIs, acciones, semántica). NO es citabilidad de contenido.',
+  intrinsic: 'La marca es opción preferida/por defecto dentro de su categoría.'
+}
 
 /** Kinds del contrato de goals de la lámina (enum cerrado del slot contract). */
 const GOAL_KINDS = ['visibility', 'citability', 'coherence', 'learning', 'growth'] as const
@@ -89,11 +100,23 @@ const DIAGNOSTICO_SCHEMA = {
     'readout'
   ],
   properties: {
-    eyebrow: { type: 'string' },
-    title: { type: 'string' },
-    narrative: { type: 'array', items: { type: 'string' }, minItems: 1, maxItems: 2 },
-    outcomesEyebrow: { type: 'string' },
-    outcomesTitle: { type: 'string' },
+    eyebrow: {
+      type: 'string',
+      maxLength: 32,
+      description: 'Kicker corto de la lámina (apunta a ~24 caracteres, JAMÁS más de 32), estilo "EL DIAGNÓSTICO".'
+    },
+    title: {
+      type: 'string',
+      description: 'Título de la tesis (apunta a ~90 caracteres visibles, JAMÁS más de 106); único markup permitido: <em>.'
+    },
+    narrative: {
+      type: 'array',
+      items: { type: 'string', description: 'Párrafo de ~190 caracteres visibles (JAMÁS más de 220).' },
+      minItems: 1,
+      maxItems: 2
+    },
+    outcomesEyebrow: { type: 'string', maxLength: 32, description: 'Kicker corto (~24 caracteres, JAMÁS más de 32).' },
+    outcomesTitle: { type: 'string', maxLength: 74, description: 'Título de la columna de hechos (~60 caracteres, JAMÁS más de 74).' },
     goals: {
       type: 'array',
       minItems: 3,
@@ -103,15 +126,18 @@ const DIAGNOSTICO_SCHEMA = {
         additionalProperties: false,
         required: ['factId', 'kind', 'title', 'body'],
         properties: {
-          factId: { type: 'string' },
+          factId: { type: 'string', description: 'factId de un hecho-titular del listado provisto.' },
           kind: { type: 'string', enum: [...GOAL_KINDS] },
-          title: { type: 'string' },
-          body: { type: 'string' }
+          title: { type: 'string', maxLength: 42, description: 'Título del goal (~32 caracteres, JAMÁS más de 42).' },
+          body: { type: 'string', description: '~100 caracteres visibles (JAMÁS más de 118); puede citar la cifra del hecho.' }
         }
       }
     },
-    ladderSectionLabel: { type: 'string' },
-    ladderTitle: { type: 'string' },
+    ladderSectionLabel: { type: 'string', maxLength: 48, description: 'Label de sección (~38 caracteres, JAMÁS más de 48).' },
+    ladderTitle: {
+      type: 'string',
+      description: 'Título de la escalera (~64 caracteres visibles, JAMÁS más de 76); único markup permitido: <em>.'
+    },
     rungBodies: {
       type: 'array',
       minItems: 5,
@@ -122,7 +148,11 @@ const DIAGNOSTICO_SCHEMA = {
         required: ['levelId', 'body'],
         properties: {
           levelId: { type: 'string', enum: [...REPORT_LEVEL_IDS] },
-          body: { type: 'string' }
+          body: {
+            type: 'string',
+            maxLength: 96,
+            description: 'Qué significa este peldaño para la marca, UNA frase CORTA de ~75 caracteres (JAMÁS más de 96), sin markup.'
+          }
         }
       }
     },
@@ -131,8 +161,8 @@ const DIAGNOSTICO_SCHEMA = {
       additionalProperties: false,
       required: ['title', 'body'],
       properties: {
-        title: { type: 'string' },
-        body: { type: 'string' }
+        title: { type: 'string', maxLength: 30, description: '~24 caracteres (JAMÁS más de 30).' },
+        body: { type: 'string', maxLength: 150, description: '~125 caracteres (JAMÁS más de 150).' }
       }
     }
   }
@@ -144,14 +174,15 @@ comercial, derivado EXCLUSIVAMENTE de los hechos con evidencia provistos. Reglas
 - NUNCA introduzcas una cifra que no esté en los hechos. Tu trabajo es ENMARCAR los hechos,
   no producir datos. Una cifra huérfana rechaza tu propuesta completa.
 - NUNCA inventes URLs: el único link permitido es el que venga como hecho (el informe público).
-- Cada goal enmarca UN hecho-titular (factId del listado de goals). No escribas la cifra en el
-  campo metric — eso lo hace el sistema desde el hecho; tu body puede citarla textualmente.
+- Cada goal enmarca UN hecho-titular (factId del listado de goals). La cifra se pinta aparte
+  desde el hecho: tu title NO la repite (el body sí puede citarla textualmente).
 - Cada peldaño de la escalera (los 5 levelId) lleva UN body que interpreta su score sin
   repetirlo mecánicamente: qué significa ese nivel para la marca, en una frase.
 - Registro institucional formal es-CL: la propuesta se dirige al comité DE USTED y habla del
   cliente en tercera persona. Sin tuteo al comité, sin modismos.
 - Sé sobrio: es un documento contractual que evalúa un comité, no una pieza publicitaria.
-- Respeta los límites de largo declarados en el brief (el sistema rechaza overflow).
+- Respeta los límites de largo declarados en el brief y APUNTA CLARAMENTE POR DEBAJO del
+  límite (~85% del máximo), nunca al borde: el sistema rechaza overflow sin truncar.
 Tú PROPONES; un humano confirma. No des por hecho que tu propuesta se ejecuta.`
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -223,8 +254,8 @@ export const validateDiagnosticoProposal = (framing: DiagnosticoFraming, facts: 
       throw new ProposalInputError(`kind de goal fuera del enum del contrato: "${goal.kind}".`)
     }
 
-    assertLength(`goal(${goal.factId}).title`, goal.title, 40)
-    assertLength(`goal(${goal.factId}).body`, goal.body, 220)
+    assertLength(`goal(${goal.factId}).title`, goal.title, 42)
+    assertLength(`goal(${goal.factId}).body`, goal.body, 118)
     assertAllowedTags(`goal(${goal.factId}).body`, goal.body, ['strong', 'em', 'a'])
   }
 
@@ -244,12 +275,12 @@ export const validateDiagnosticoProposal = (framing: DiagnosticoFraming, facts: 
       )
     }
 
-    assertLength(`rung(${rung.levelId}).body`, body, 120)
+    assertLength(`rung(${rung.levelId}).body`, body, 96)
     assertAllowedTags(`rung(${rung.levelId}).body`, body, [])
   }
 
-  assertLength('readout.title', framing.readout.title, 40)
-  assertLength('readout.body', framing.readout.body, 220)
+  assertLength('readout.title', framing.readout.title, 30)
+  assertLength('readout.body', framing.readout.body, 150)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -268,22 +299,26 @@ export const diagnosticoChapterAuthor: ChapterAuthor<DiagnosticoSource, Diagnost
       peldanos: facts.rungs.map(rung => ({
         levelId: rung.levelId,
         anchor: rung.anchor,
+        queMide: RUNG_MEANINGS[rung.levelId],
         score: rung.numericValue,
         evidenceRef: rung.evidenceRef
       })),
       hechosTitular: facts.goals,
       municionDeContexto: facts.context,
-      limites: {
-        eyebrow: 32,
-        title: 106,
-        narrativeParrafo: 220,
-        outcomesTitle: 74,
-        goalTitle: 40,
-        goalBody: 220,
-        ladderSectionLabel: 48,
-        ladderTitle: 76,
-        rungBody: 120,
-        readoutBody: 220
+      // Targets ~85% del contrato real: el modelo no cuenta caracteres con precisión, así que
+      // se le pide MENOS de lo que el validador tolera (el contrato duro vive en validate).
+      limitesObjetivo: {
+        eyebrow: 24,
+        title: 90,
+        narrativeParrafo: 190,
+        outcomesTitle: 60,
+        goalTitle: 32,
+        goalBody: 100,
+        ladderSectionLabel: 38,
+        ladderTitle: 64,
+        rungBody: 75,
+        readoutTitle: 24,
+        readoutBody: 125
       },
       briefDelOperador: operatorBrief
     }),
@@ -292,7 +327,7 @@ export const diagnosticoChapterAuthor: ChapterAuthor<DiagnosticoSource, Diagnost
     const goalFacts = new Map(facts.goals.map(goal => [goal.factId, goal]))
     const bodiesByLevel = new Map(framing.rungBodies.map(rung => [rung.levelId, rung.body]))
 
-    return [
+    const slides: AuthoredSlide[] = [
       {
         slideId: 'diagnostico',
         contentType: 'one-metric',
@@ -328,12 +363,15 @@ export const diagnosticoChapterAuthor: ChapterAuthor<DiagnosticoSource, Diagnost
             label: RUNG_LABELS[rung.levelId],
             anchor: rung.anchor,
             score: rung.numericValue,
-            body: bodiesByLevel.get(rung.levelId),
+            // validate ya exigió el body de cada peldaño (fail-closed): acá no puede faltar.
+            body: bodiesByLevel.get(rung.levelId) as string,
             evidenceRef: rung.evidenceRef
           })),
           readout: { title: framing.readout.title, body: framing.readout.body }
         }
       }
     ]
+
+    return slides
   }
 }

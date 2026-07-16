@@ -227,7 +227,15 @@ export const deriveDiagnosticoFacts = (source: DiagnosticoSource): DiagnosticoFa
     .slice(0, 3)
     .map(domain => prettifyDomain(domain.domain))
 
+  const studyPeriod = `${MONTHS_ES[asOf.getUTCMonth()]} ${asOf.getUTCFullYear()}`
+
   const context: EvidencedFact[] = [
+    {
+      factId: 'context.study-period',
+      label: 'Período del estudio (mes del run)',
+      value: studyPeriod,
+      evidenceRef: graderRef
+    },
     {
       factId: 'context.total-citations',
       label: 'Total de citas observadas en el estudio',
@@ -269,7 +277,7 @@ export const deriveDiagnosticoFacts = (source: DiagnosticoSource): DiagnosticoFa
     })
   }
 
-  const subjectContext = `${engines} motores · ${answers} respuestas · ${MONTHS_ES[asOf.getUTCMonth()]} ${asOf.getUTCFullYear()}`
+  const subjectContext = `${engines} motores · ${answers} respuestas · ${studyPeriod}`
 
   return {
     facts: [...rungs, ...goals, ...context],

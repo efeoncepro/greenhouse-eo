@@ -7,7 +7,7 @@ import {
   type DiagnosticoFraming
 } from '../diagnostico-chapter-author'
 import { deriveDiagnosticoFacts, type DiagnosticoSource } from '../diagnostico-facts'
-import { confirmChapter, hashChapterFacts, validateChapterProposal } from '../chapter-author'
+import { confirmChapter, hashChapterFacts, validateChapterProposal, type AuthoredSlide } from '../chapter-author'
 import { ProposalInputError } from '../../errors'
 import skySnapshot from './fixtures/grader-report-sky-grun-00046.json'
 import skyGolden from './fixtures/sky-deck-golden-slides.json'
@@ -83,8 +83,8 @@ const GOLDEN_FRAMING: DiagnosticoFraming = {
   }
 }
 
-const goldenSlides = (skyGolden as { slides: Array<{ slideId: string; contentType: string; slots: Record<string, unknown> }> })
-  .slides
+// El fixture JSON es el golden verbatim; el cast lo trae al tipo del motor (slots = SlotValues).
+const goldenSlides = (skyGolden as unknown as { slides: AuthoredSlide[] }).slides
 
 describe('diagnostico chapter-author eval baseline (golden = láminas SKY reales)', () => {
   it('el golden framing + el run real reproducen EXACTAMENTE las láminas autoradas a mano', () => {

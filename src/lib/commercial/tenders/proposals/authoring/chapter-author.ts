@@ -32,6 +32,7 @@ import 'server-only'
 import crypto from 'node:crypto'
 
 import { generateStructuredAnthropic } from '@/lib/ai/anthropic'
+import type { ContentType, SlotValues } from '@/lib/artifact-composer'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { ProposalInputError } from '../errors'
@@ -82,8 +83,9 @@ export interface ChapterFactSheet {
  */
 export interface AuthoredSlide {
   slideId: string
-  contentType: string
-  slots: Record<string, unknown>
+  contentType: ContentType
+  /** Slots del composer (JSON puro, serializable, auditable): la lámina ES un plan canónico. */
+  slots: SlotValues
 }
 
 /**
@@ -237,6 +239,9 @@ export const hashChapterFacts = (facts: ChapterFactSheet): string =>
 
 const CHAPTER_AUTHOR_MODEL = 'claude-sonnet-5'
 
+/** Retry acotado del capítulo (§5-ter Resilience: N=2 reintentos). Cada reintento recibe la violación. */
+const MAX_PROPOSE_ATTEMPTS = 3
+
 export const proposeChapter = async <Source, Facts extends ChapterFactSheet, Framing>(
   author: ChapterAuthor<Source, Facts, Framing>,
   input: {
@@ -252,42 +257,61 @@ export const proposeChapter = async <Source, Facts extends ChapterFactSheet, Fra
   }
 
   const facts = author.deriveFacts(input.source)
+  const basePrompt = author.buildPrompt(facts, input.operatorBrief)
 
-  let framing: Framing
+  let rejection: ProposalInputError | null = null
 
-  try {
-    const result = await generateStructuredAnthropic<Framing>({
-      model: CHAPTER_AUTHOR_MODEL,
-      system: author.systemPrompt,
-      prompt: author.buildPrompt(facts, input.operatorBrief),
-      toolName: `propose_chapter_${author.chapterId}`,
-      toolDescription:
-        'Framing estructurado del capítulo, derivado EXCLUSIVAMENTE de los hechos con evidencia provistos.',
-      inputSchema: author.framingSchema as Parameters<
-        typeof generateStructuredAnthropic
-      >[0]['inputSchema']
-    })
+  for (let attempt = 1; attempt <= MAX_PROPOSE_ATTEMPTS; attempt += 1) {
+    let framing: Framing
 
-    framing = result.data
-  } catch (error) {
-    // Degradación honesta: si el LLM falla, NO se propone nada (jamás un framing inventado).
-    captureWithDomain(error, 'commercial', {
-      tags: { source: 'tender_chapter_author', chapter: author.chapterId }
-    })
-    throw error
-  }
+    try {
+      const result = await generateStructuredAnthropic<Framing>({
+        model: CHAPTER_AUTHOR_MODEL,
+        system: author.systemPrompt,
+        prompt: rejection
+          ? `${basePrompt}\n\nTu propuesta anterior fue RECHAZADA por el validador fail-closed. Corrige exactamente esto y vuelve a proponer:\n${rejection.message}`
+          : basePrompt,
+        toolName: `propose_chapter_${author.chapterId}`,
+        toolDescription:
+          'Framing estructurado del capítulo, derivado EXCLUSIVAMENTE de los hechos con evidencia provistos.',
+        inputSchema: author.framingSchema as Parameters<
+          typeof generateStructuredAnthropic
+        >[0]['inputSchema']
+      })
 
-  // Fail-closed: cifra huérfana o violación del contrato del author rechazan la propuesta.
-  validateChapterProposal(author, framing, facts)
+      framing = result.data
+    } catch (error) {
+      // Degradación honesta: si el LLM falla, NO se propone nada (jamás un framing inventado).
+      captureWithDomain(error, 'commercial', {
+        tags: { source: 'tender_chapter_author', chapter: author.chapterId }
+      })
+      throw error
+    }
 
-  return {
-    proposal: { chapterId: author.chapterId, facts, framing },
-    trace: {
-      factsHash: hashChapterFacts(facts),
-      model: CHAPTER_AUTHOR_MODEL,
-      proposedAt: new Date().toISOString()
+    try {
+      // Fail-closed: cifra huérfana o violación del contrato del author rechazan la propuesta.
+      validateChapterProposal(author, framing, facts)
+    } catch (error) {
+      if (error instanceof ProposalInputError && attempt < MAX_PROPOSE_ATTEMPTS) {
+        rejection = error
+        continue
+      }
+
+      throw error
+    }
+
+    return {
+      proposal: { chapterId: author.chapterId, facts, framing },
+      trace: {
+        factsHash: hashChapterFacts(facts),
+        model: CHAPTER_AUTHOR_MODEL,
+        proposedAt: new Date().toISOString()
+      }
     }
   }
+
+  // Inalcanzable (el loop retorna o lanza), pero el control-flow analysis exige el cierre.
+  throw rejection ?? new ProposalInputError('El chapter-author no produjo una propuesta válida.')
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
