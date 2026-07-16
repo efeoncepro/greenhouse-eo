@@ -17,11 +17,18 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import Tooltip from '@mui/material/Tooltip'
+
 import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
 import type { HiringDeskCopy } from '@/lib/copy'
 import type { HiringDeskSnapshot, HiringOpening } from '@/types/hiring'
 
 import HiringDeskFrame from './HiringDeskFrame'
+import VacancyAiDraftDrawer, { type VacancyAiPendingProposal, type VacancyAiSurfaceProps } from './VacancyAiDraftDrawer'
 import { hiringRequest } from './hiring-client'
 
 type PublicationAction = 'publish' | 'pause' | 'resume' | 'close' | 'reopen'
@@ -36,6 +43,8 @@ type PublicationUiAction = {
 interface PublicationDeskViewProps {
   copy: HiringDeskCopy
   initialSnapshot: HiringDeskSnapshot
+  /** TASK-1422 — affordances de la redacción asistida IA (resueltas server-side). */
+  vacancyAi: VacancyAiSurfaceProps
 }
 
 const publicationTone = (status: HiringOpening['publicationStatus']) => {
@@ -45,15 +54,32 @@ const publicationTone = (status: HiringOpening['publicationStatus']) => {
   return 'default'
 }
 
-const PublicationDeskView = ({ copy, initialSnapshot }: PublicationDeskViewProps) => {
+const PublicationDeskView = ({ copy, initialSnapshot, vacancyAi }: PublicationDeskViewProps) => {
   const [openings, setOpenings] = useState(initialSnapshot.openings)
   const [saving, setSaving] = useState(false)
   const [confirmAction, setConfirmAction] = useState<PublicationAction | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
 
-  const selected = openings[0] ?? null
+  // TASK-1422 — selector de vacante (la vista mostraba solo openings[0]) + estado del borrador IA.
+  const [selectedOpeningId, setSelectedOpeningId] = useState<string | null>(initialSnapshot.openings[0]?.opening.openingId ?? null)
+  const [aiDrawerOpen, setAiDrawerOpen] = useState(false)
+  const [pendingByOpening, setPendingByOpening] = useState<Record<string, VacancyAiPendingProposal>>(vacancyAi.pendingByOpening)
+
+  const selected = openings.find((item) => item.opening.openingId === selectedOpeningId) ?? openings[0] ?? null
   const opening = selected?.opening ?? null
+  const pendingProposal = opening ? pendingByOpening[opening.openingId] ?? null : null
+
+  const handlePendingChange = (openingId: string, pending: VacancyAiPendingProposal | null) => {
+    setPendingByOpening((current) => {
+      const next = { ...current }
+
+      if (pending) next[openingId] = pending
+      else delete next[openingId]
+
+      return next
+    })
+  }
 
   const replaceOpening = (updated: HiringOpening) => {
     setOpenings((current) => current.map((item) => item.opening.openingId === updated.openingId ? { ...item, opening: updated } : item))
@@ -172,7 +198,27 @@ const PublicationDeskView = ({ copy, initialSnapshot }: PublicationDeskViewProps
                 <Typography variant='h6'>{opening.publicTitle ?? opening.internalTitle}</Typography>
                 <Typography variant='caption' color='text.secondary'>{opening.publicId} · {opening.publicArea ?? 'Growth'} · {opening.publicHiringRegion ?? opening.publicLocationMode ?? 'Chile'}</Typography>
               </Box>
-              <GreenhouseChip kind='status' variant='label' tone={publicationTone(opening.publicationStatus)} iconClassName={opening.publicationStatus === 'published' ? 'tabler-world' : 'tabler-pencil'} label={opening.publicationStatus} />
+              {openings.length > 1 ? (
+                <FormControl size='small' sx={{ minInlineSize: { xs: '100%', md: 240 } }}>
+                  <InputLabel id='hiring-publication-opening-label'>{copy.publication.vacancyAi.openingSelector}</InputLabel>
+                  <Select
+                    labelId='hiring-publication-opening-label'
+                    label={copy.publication.vacancyAi.openingSelector}
+                    value={opening.openingId}
+                    onChange={(event) => setSelectedOpeningId(event.target.value)}
+                    data-capture='hiring-publication-opening-selector'
+                  >
+                    {openings.map((item) => (
+                      <MenuItem key={item.opening.openingId} value={item.opening.openingId}>
+                        {(item.opening.publicTitle ?? item.opening.internalTitle)} · {item.opening.publicId}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : null}
+              <Box sx={{ alignSelf: { xs: 'flex-start', md: 'center' } }}>
+                <GreenhouseChip kind='status' variant='label' tone={publicationTone(opening.publicationStatus)} iconClassName={opening.publicationStatus === 'published' ? 'tabler-world' : 'tabler-pencil'} label={opening.publicationStatus} />
+              </Box>
               {opening.publicationStatus === 'published' ? <Button component='a' href={`/public/careers/${opening.publicId}`} target='_blank' rel='noreferrer' size='small' endIcon={<i className='tabler-external-link' />}>Ver en careers</Button> : null}
             </Stack>
           </Paper>
@@ -192,7 +238,30 @@ const PublicationDeskView = ({ copy, initialSnapshot }: PublicationDeskViewProps
                 })}
               >
                 <Stack spacing={0}>
-                  <Stack direction='row' alignItems='center' spacing={2} sx={{ mb: 2 }}><i aria-hidden='true' className='tabler-world-check text-success' style={{ fontSize: 18 }} /><Typography variant='subtitle2' color='success.dark' fontWeight={750}>{copy.publication.publicPreview}</Typography></Stack>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2} sx={{ mb: 2 }}>
+                    <Stack direction='row' alignItems='center' spacing={2} sx={{ flex: 1, minInlineSize: 0 }}>
+                      <i aria-hidden='true' className='tabler-world-check text-success' style={{ fontSize: 18 }} />
+                      <Typography variant='subtitle2' color='success.dark' fontWeight={750}>{copy.publication.publicPreview}</Typography>
+                    </Stack>
+                    {vacancyAi.canPropose || pendingProposal ? (
+                      <Tooltip title={!vacancyAi.enabled && !pendingProposal ? copy.publication.vacancyAi.ctaDisabledTooltip : ''} disableHoverListener={vacancyAi.enabled || Boolean(pendingProposal)}>
+                        <Box component='span' data-capture='hiring-vacancy-ai-cta' sx={{ display: 'flex', flex: '0 0 auto' }}>
+                          <Button
+                            size='small'
+                            variant='outlined'
+                            color='primary'
+                            fullWidth
+                            disabled={!vacancyAi.enabled && !pendingProposal}
+                            startIcon={<i aria-hidden='true' className='tabler-sparkles' />}
+                            onClick={() => setAiDrawerOpen(true)}
+                            sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}
+                          >
+                            {pendingProposal ? copy.publication.vacancyAi.ctaPending : copy.publication.vacancyAi.cta}
+                          </Button>
+                        </Box>
+                      </Tooltip>
+                    ) : null}
+                  </Stack>
                   {publicFields.map(([label, value]) => (
                     <Box key={label} sx={{ py: 1.35, borderBlockEnd: 1, borderColor: 'divider' }}>
                       <Typography variant='caption' color='text.secondary' sx={{ display: 'block', lineHeight: 1.25 }}>{label}</Typography>
@@ -292,6 +361,27 @@ const PublicationDeskView = ({ copy, initialSnapshot }: PublicationDeskViewProps
           <GreenhouseButton tone={confirmation?.tone} disabled={saving} onClick={() => void runPublicationAction()} leadingIcon={saving ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}>{copy.common.confirm}</GreenhouseButton>
         </DialogActions>
       </Dialog>
+      {opening ? (
+        <VacancyAiDraftDrawer
+          open={aiDrawerOpen}
+          opening={opening}
+          demand={selected?.demand ?? null}
+          copy={copy}
+          canConfirm={vacancyAi.canConfirm}
+          pendingProposal={pendingProposal}
+          onClose={() => setAiDrawerOpen(false)}
+          onApplied={(updated) => {
+            replaceOpening(updated)
+            setToast(copy.publication.vacancyAi.applied)
+            setAiDrawerOpen(false)
+          }}
+          onDiscarded={() => {
+            setToast(copy.publication.vacancyAi.discarded)
+            setAiDrawerOpen(false)
+          }}
+          onPendingChange={handlePendingChange}
+        />
+      ) : null}
       <Snackbar
         open={Boolean(toast)}
         autoHideDuration={4000}

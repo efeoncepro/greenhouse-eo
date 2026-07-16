@@ -478,6 +478,45 @@ export interface HiringDeskCopy {
     reopenBody: string
     updated: string
     noOpening: string
+    /** TASK-1422 — redacción asistida del aviso público (propose→confirm de TASK-1385). */
+    vacancyAi: {
+      cta: string
+      ctaPending: string
+      ctaDisabledTooltip: string
+      applyDisabledTooltip: string
+      openingSelector: string
+      drawerTitle: string
+      drawerSubtitle: string
+      templateLabel: string
+      templateHint: string
+      templatePlaceholder: string
+      contextTitle: string
+      contextExcluded: string
+      generate: string
+      proposing: string
+      background: string
+      backgroundHint: string
+      reviewBanner: string
+      fieldTitle: string
+      fieldSummary: string
+      fieldDescription: string
+      fieldRequirements: string
+      fieldNiceToHave: string
+      fieldArea: string
+      fieldSeniority: string
+      fieldSkillTags: string
+      fieldProcessNotes: string
+      biasReminder: string
+      requiredHint: string
+      apply: string
+      discard: string
+      discardTitle: string
+      discardBody: string
+      applied: string
+      discarded: string
+      degraded: string
+      retry: string
+    }
   }
 }
 
