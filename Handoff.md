@@ -24,6 +24,11 @@
 > en todos los environments (ledger actualizado, fila en Pendientes de acción). Staging flip = sign-off del
 > operador; prod = decisión de negocio posterior (Move 0). SIN push (local-first).
 >
+> **Documentación (delta 2026-07-16, a pedido del operador):** triple capa completa — funcional
+> `docs/documentation/comercial/motor-chapter-authors.md` + manual
+> `docs/manual-de-uso/comercial/autorar-lamina-con-chapter-author.md` (cómo correr el flujo por
+> script, hechos externos con fuente, tabla de rechazos), ambos indexados en sus README.
+>
 > **Follow-ups declarados:** governed action Nexa + tool MCP del chapter-author (parity) · authors productivos
 > por servicio (creativo/social/web-CRM/HubSpot/contenido/económica/squad — cambia sólo deriveFacts/validate/
 > toSlides) · orquestador + verifier (§5-ter) · F1 canónica (admisibilidad) · ¿EPIC-029 dedicado?
