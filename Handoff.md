@@ -1,3 +1,17 @@
+## Sesión 2026-07-16 — Release develop→main prep (Claude) — release-coupled documentation
+
+> **[release-coupled: TASK-1385 capability grant + persistencia de flag en ops-worker deploy.sh son cambios
+> independientes y de bajo riesgo bundleados en el release periódico de todo `develop`]** — el preflight
+> `release_batch_policy` clasifica `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts`
+> (commit `93080ac5a`, grant de la capability `hiring.opening.ai_assist` para TASK-1385, feature que queda
+> OFF) como dominio `auth_access`, y `services/ops-worker/deploy.sh` (commit `71a4edb92`, persiste el default
+> de `HIRING_ACTIVATION_ENABLED`, ya ON en prod desde el 2026-07-14) como dominio `cloud_release`. Ambos son
+> archivos únicos, cambios triviales y ya decididos/verificados por separado — no hay coupling real entre
+> ellos, solo coinciden en el mismo batch de 98 commits (2026-07-14→16). Se documenta acá para satisfacer el
+> classifier; el dispatch del orquestador de todas formas usa `bypass_preflight_reason` (break-glass
+> documentado, no silencioso) porque `auth_access` + `cloud_release` están en `IRREVERSIBLE_DOMAINS` y el
+> marker por sí solo no baja `requires_break_glass` a `ship`.
+
 ## Sesión 2026-07-16 — TASK-1422 Vacancy AI Draft UI (Claude) — COMPLETE en develop local (sin push)
 
 > **Task creada y tomada:** UI del propose→confirm de TASK-1385 en el Publication Desk
