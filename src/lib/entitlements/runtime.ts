@@ -478,6 +478,10 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     // TASK-1361 — AI assist (proponer borradores/sugerencias) al mismo tier operador; el confirm
     // reusa author/score, así que quien puede autorar el banco puede pedir propuestas IA.
     addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.ai_assist', action: 'execute', scope: 'tenant', source: hiringSource })
+
+    // TASK-1385 — AI assist del copy público de una vacante al mismo tier operador; el confirm
+    // reusa opening.write, así que quien puede editar el opening puede pedir el borrador IA.
+    addEntitlement(entries, { module: 'hiring', capability: 'hiring.opening.ai_assist', action: 'execute', scope: 'tenant', source: hiringSource })
   }
 
   // TASK-353 — publish/decide: verbos de gobernanza consecuentes (execute). Least-privilege

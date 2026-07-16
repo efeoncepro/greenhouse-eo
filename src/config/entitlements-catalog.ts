@@ -2136,6 +2136,9 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'hiring.opening.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.opening.write', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
   { key: 'hiring.opening.publish', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1385 — AI assist del copy público de una vacante: proponer los public_* desde inputs
+  // allowlist-safe (propose→confirm). Solo PROPONE; el confirm reusa hiring.opening.write.
+  { key: 'hiring.opening.ai_assist', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.write', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.decide', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
