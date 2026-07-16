@@ -66,6 +66,19 @@
 - Flag `TENDER_CHAPTER_AUTHOR_ENABLED` default OFF (registrado en el ledger); capability reusa
   `commercial.proposal.manage`. Orquestador y verifier de §5-ter siguen pendientes (tasks hermanas).
 
+## 2026-07-16 — HubSpot Solutions Partner: narrativa Agentic Customer Platform sincronizada
+
+- Las skills de Codex y Claude incorporan la lectura ejecutiva 2026 de HubSpot: Growth Context, workspaces,
+  agentes/MCP/Agent CLI, motion comercial por outcomes y cinco wedges de prospección para Efeonce.
+- El motion de prospección queda definido como Champion-led: entrada por el dueño operativo uno o dos niveles
+  bajo C-Level, escalamiento al sponsor económico, multithreading de 3–5 roles y gate de sponsor antes de propuesta.
+  La distribución 70/20/10 es una hipótesis inicial de Efeonce sujeta a métricas, no un benchmark de HubSpot.
+- Outbound/ABM incorpora enriquecimiento obligatorio de tres pasadas: HubSpot aporta historial y campos raw;
+  el sitio oficial confirma identidad/contexto; Internet público corrobora mercados y triggers. `country` vacío
+  o discrepante ya no excluye una cuenta, y sede, mercados operativos, evidencia y confianza se separan.
+- El ledger de fuentes queda verificado al 2026-07-16 e incorpora State of Ecosystems, incentivos H2 2026,
+  Marketing Studio, Sales Workspace, Customer Success Workspace y límites explícitos de las betas.
+
 ## 2026-07-15 — Creative Workflows: diagramas V3 corregidos en producción
 
 - Se reemplazan los dos diagramas V2 después de que una revisión humana detectara cruces de conectores sobre copy/listas, un ordinal oculto, un label recortado, una tarjeta sobre el cierre y una colisión de puntuación que el QA anterior no capturó.

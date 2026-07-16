@@ -1,22 +1,15 @@
 ---
 name: hubspot-solutions-partner
 description: >-
-  Operador experto de la práctica HubSpot de Efeonce como Solutions Partner: vender, implementar,
-  retener y expandir. Cubre las 4 capas del negocio (licencia con referral fee + margen ·
-  implementación · managed CRM ops · CRM intelligence) y los 2 motores del tier (sourced MRR =
-  venta nueva · managed MRR = libro administrado). Incluye producto HubSpot 2026 verificado
-  (Hubs, Breeze, seats/créditos, onboarding fees), economía del programa (deal-based model,
-  tier points, comisión, Best Partner Wins, growth markets), calculadora de tier, battlecards de
-  displacement (Salesforce/Adobe/Dynamics/Zoho/Odoo/sin-CRM) con TCO a 3 años, la cuña AEO,
-  discovery + scoping sin sub-cotizar, propuesta/pricing, y descalificación honesta.
-  NO reinventa el método de venta (→ commercial-expert) ni el motion GTM (→ gtm-architect):
-  aporta el DOMINIO HubSpot encima de ellos. NO opera el portal (→ hubspot-ops).
-  Triggers: "HubSpot", "Solutions Partner", "partner tier", "Gold/Platinum/Diamond/Elite",
-  "tier points", "sourced points", "managed points", "deal registration", "Proof of Involvement",
-  "comisión HubSpot", "revenue share", "growth market", "vender HubSpot", "licencia HubSpot",
-  "implementación HubSpot", "onboarding fee", "Breeze", "Data Hub", "Revenue Hub", "HubSpot AEO",
-  "Loop Marketing", "migrar de Salesforce", "HubSpot vs Salesforce", "Marketo", "Dynamics",
-  "cross-sell HubSpot", "managed CRM ops", "PDM", "Simón Suárez", "portal 48713323".
+  Opera la práctica HubSpot de Efeonce como Solutions Partner: vender, implementar, retener y expandir.
+  Cubre licencias, implementación, Managed CRM Ops, CRM Intelligence, sourced/managed MRR, economía del
+  programa, tiers, deal registration, pricing, battlecards, AEO, discovery, scoping y descalificación.
+  Incluye la narrativa Agentic Customer Platform 2026: Growth Context, Breeze, workspaces, MCP/API,
+  Agent CLI, agentes, gobierno e incentivos. Usar ante HubSpot, Solutions Partner, vender o implementar
+  HubSpot, tier points, comisión/revenue share, Best Partner Wins, Marketing Studio, Sales Workspace,
+  Customer Success Workspace, Breeze Studio, Agent CLI, Angela O'Dowd, Duncan Lennox, Yamini Rangan,
+  Dharmesh Shah, PDM, Simón Suárez o portal 48713323. Aporta dominio; el método de venta es de
+  commercial-expert, el motion de gtm-architect y la operación del portal de hubspot-ops.
 type: skill
 user-invocable: true
 argument-hint: "[decisión, deal, cuenta o pieza concreta de la práctica HubSpot]"
@@ -158,12 +151,13 @@ rehacerla, no memorizarla. Por eso la calculadora vive en `templates/tier-calcul
 | Contra quién compites: battlecards + TCO 3 años + los mitos que te hacen perder | `modules/05_DISPLACEMENT.md` |
 | Cómo se compra en **cada mercado** (el método, no el país) | `modules/06_MAPA_DE_DEMANDA.md` + `markets/` |
 | **Las entradas** — el mapa **dolor → Hub** (los 7) + la cuña AEO + el wedge de HubSpot | `modules/07_CUNA_AEO.md` |
-| Prospección a cuenta, señales, secuencias, la base instalada como territorio | `modules/08_OUTBOUND_ABM.md` |
+| Prospección a cuenta, enriquecimiento CRM + sitio + Internet, señales, secuencias, base instalada | `modules/08_OUTBOUND_ABM.md` |
 | Captura de demanda, directorio, partner matching, co-marketing | `modules/09_INBOUND_DEMANDA.md` |
 | Discovery, dimensionar sin sub-cotizar, **descalificar** | `modules/10_DISCOVERY_SCOPING.md` |
 | Armar la oferta, el arbitraje del onboarding fee, negociar **con** HubSpot, objeciones | `modules/11_PROPUESTA_PRICING.md` |
 | La implementación como argumento de venta y como negocio | `modules/12_IMPLEMENTACION.md` |
 | 🎯 **Agentes** — implementar los 3 GA · operar con la **Agent CLI** · construir **Agent Tools** · el gobierno · **el caso ANAM** | `modules/13_AGENTES.md` |
+| **Cómo se vende HubSpot ahora** — narrativa ejecutiva · Growth Context · workspaces · motion por outcome · Champion-led prospecting · multithreading · incentivos H2 2026 | `modules/14_NARRATIVA_AGENTICA_Y_MOTION_2026.md` |
 | **El estado real de Efeonce hoy y el plan de rescate** | `efeonce/ESTADO_ACTUAL.md` · `efeonce/PLAN_RESCATE_6M.md` |
 
 Carga solo lo que la tarea necesita. `SOURCES.md` se carga **siempre** que vayas a citar un número.

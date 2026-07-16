@@ -1,3 +1,12 @@
+## Sesion 2026-07-16 - HubSpot Solutions Partner: prospeccion agentica (Codex)
+
+> **Skill sincronizada:** las copias Codex y Claude de `hubspot-solutions-partner` incorporan la narrativa
+> Agentic Customer Platform 2026, el motion Champion-led y el enriquecimiento de cuentas en tres pasadas
+> (`HubSpot -> sitio oficial -> Internet publico`). El canon nuevo es
+> `modules/14_NARRATIVA_AGENTICA_Y_MOTION_2026.md`; `modules/08_OUTBOUND_ABM.md` gobierna la prospeccion.
+> `SOURCES.md` conserva la evidencia fechada y sus limites. Es un cambio documental/operativo local: no requiere
+> deploy, migracion ni escritura en portales HubSpot. Durante la investigacion de cuentas no se hicieron writes.
+
 ## Sesión 2026-07-16 — HubSpot as a Service + QA/RevOps ANAM (Codex)
 
 > **Capability creada:** skills espejo `.codex/.claude/skills/hubspot-as-a-service` con referencias separadas

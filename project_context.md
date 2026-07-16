@@ -6,6 +6,15 @@
   (OAuth, capability runtime, CMS source, builds y tasks) y consume este canon por referencia; no debe crear
   una copia divergente. Índice: `docs/architecture/kortex/hubspot-as-a-service/README.md`.
 
+- **HubSpot Solutions Partner / narrativa agéntica sincronizada (2026-07-16):** las skills espejo
+  `.codex/.claude/skills/hubspot-solutions-partner` documentan cómo se vende HubSpot en la etapa Agentic
+  Customer Platform: Growth Context, workspaces de Marketing/Sales/Customer Success, Breeze/Agent CLI,
+  motion por outcome, entrada Champion-led, multithreading, cinco wedges de prospección e incentivos H2 2026. Canon de síntesis:
+  `modules/14_NARRATIVA_AGENTICA_Y_MOTION_2026.md`; evidencia fechada en `SOURCES.md`. Las betas no llevan SLA
+  y “full API parity” se trata como dirección anunciada, no como superficie ya completa. Para construir listas,
+  `modules/08_OUTBOUND_ABM.md` exige tres pasadas: HubSpot como intake, sitio oficial e Internet público; `country`
+  vacío/no coincidente no excluye y sede, mercados operativos, evidencia y confianza se registran por separado.
+
 - **Kinsta SSH/WP-CLI con preflight durable (2026-07-15):** antes de cualquier operación SSH/WP-CLI del sitio
   público ejecutar `pnpm public-website:ssh-check`. Kinsta API y SSH son carriles independientes: la ausencia de
   `PUBLIC_WEBSITE_KINSTA_API_TOKEN_SECRET_REF` no demuestra que SSH esté caído. La configuración local estable
