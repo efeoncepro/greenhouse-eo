@@ -9,9 +9,12 @@
 ## Qué es
 
 El motor de chapter-authors es la pieza del Tender Proposal Studio que permite que **un agente
-de IA redacte el contenido de una lámina de propuesta** — algo que hasta ahora se escribía a
-mano en el `deck-plan.json`. El agente propone el texto; **una persona lo confirma**; el
-composer lo renderiza. El agente nunca decide solo.
+de IA redacte el contenido de una lámina de propuesta** de forma gobernada. Antes esto se hacía
+en una **sesión ad-hoc** (un agente leía el informe y escribía los slots directo en el
+`deck-plan.json`, con la revisión del operador como única garantía); ahora es un **primitive
+del producto**: el agente propone el texto dentro de un carril con guards mecánicos; **una
+persona lo confirma**; el composer lo renderiza. El agente nunca decide solo, y equivocarse
+con un número es estructuralmente imposible (ver la tabla siguiente).
 
 Es **servicio-agnóstico**: el mismo motor sirve para redactar la lámina de diagnóstico
 (SEO/AEO), una de credenciales, y en el futuro las de creativo, social media, web/CRM,
@@ -42,7 +45,8 @@ externos (p. ej. tráfico de Semrush) los aporta el operador con su fuente, y vi
   Visibility Grader y produce las dos láminas del capítulo de diagnóstico (`diagnostico` +
   `escalera`, las mismas del deck de SKY). Los 5 peldaños de la escalera salen del mapeo
   canónico del informe (Be Found … Be Intrinsic); verificado contra el run real de SKY
-  reproduce exactamente los scores que un humano autoró a mano (40/70/37/8/76).
+  reproduce exactamente los scores del deck enviado (40/70/37/8/76 — los que la sesión
+  ad-hoc había derivado y el operador aprobó).
 - **Credenciales** — un segundo author mínimo, de otro servicio, que existe para probar que el
   motor no está "fiteado" a SEO/AEO.
 - **El eval como candado**: cada author tiene un set de pruebas con un "golden" (las láminas
