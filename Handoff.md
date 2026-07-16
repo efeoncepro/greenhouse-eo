@@ -124,6 +124,18 @@
 > ni reports. El search index demoró tras create aunque la unique constraint ya estaba activa; el contrato
 > reusable exige retry/direct-list read y readback de labels en ambas direcciones. Ledger/rollback:
 > `anam-phase-3-forward-pilot-execution-2026-07-16.md`.
+
+> **Service automation / workflow probe:** HubSpot v4 beta acepta/compila action `0-14` hacia Service `0-162`
+> y task action `0-3` desde Service. Sin embargo, plain Deal workflow no respeta one-Service-per-line-item y no
+> se autoriza como materializer. Tres probes aislados no enrolaron ni crearon Services; sus workflows fueron
+> borrados y Deals/line items temporales archivados. El workflow de activación `1852406585`, limitado a las cinco
+> keys piloto y sin emails/notifications/property writes, fue verificado después en el editor autenticado. HubSpot
+> predijo enrolamiento/acción para Gasmar y rechazó correctamente el Service Nestlé `564234555477`. Se activó con
+> **no enrolar existentes**, Gasmar se enroló manualmente primero y creó task `113075626559`; sólo tras ese PASS se
+> enrolaron los otros cuatro. History muestra exactamente cinco ejecuciones completas y tasks `113096134994`
+> (Hidrogistica), `113095519764` (Härting), `113082535993` (Golden Omega) y `113081914498` (McDonald's). Nestlé no
+> aparece. Re-enrollment sigue OFF; el workflow queda activo como cola humana, no como materializer ni promoción KPI. Canon:
+> `anam-phase-3-service-automation-workflow-test-2026-07-16.md`.
 >
 > **Modelo de datos vivo / deuda cognitiva:** se creó
 > `anam-revops-data-model-and-object-synergies-v1.md` como current-state canon del portal cliente. Documenta

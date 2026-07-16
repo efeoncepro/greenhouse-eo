@@ -43,6 +43,8 @@ Do not start with dashboard widgets or property creation.
 - Prefer association -> sync/rollup -> same-record calculation -> irreducible custom fact -> workflow write. Smart properties are advisory evidence, not a repair for missing deterministic data.
 - Validate paired association labels directionally: read the forward object pair for `label` and the reversed pair for `inverseLabel`; one directional GET may not return both sides.
 - After create, do not treat an immediate CRM search miss as absence. Search indexing can lag while the unique constraint and direct object read are already authoritative; retry or use direct/list readback before any second create.
+- For Workflows v4 beta, `201`, `crmObjectCreationStatus=COMPLETE` and `isEnabled=true` prove only stored configuration. Require a real positive enrollment/action readback plus a negative path; if API-only turn-on does not execute, disable the workflow and verify through the authenticated editor/history before rollout.
+- Never use one parent-object create-record action when the target grain is one child per associated component. A Deal-to-Service workflow needs a deterministic line-item iterator and per-line-item idempotency seam; otherwise keep materialization in a governed integration/custom action.
 
 ## Calculated-property execution contract
 

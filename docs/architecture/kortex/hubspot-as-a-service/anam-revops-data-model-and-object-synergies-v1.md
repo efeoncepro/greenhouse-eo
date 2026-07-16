@@ -147,7 +147,9 @@ The source billing row becomes Billing Event, first linked by exact Account Unit
 | Controlled Service pilot | Five Services live in `New`, each with one Company, one originating Deal and deterministic source lineage; all remain `incomplete_core` |
 | Production Service cohort | Not available; pilot records and the sample-like record are excluded until readiness and panel-specific gates pass |
 | Historical Service migration | `NO-GO` |
-| Renewal association labels/workflow | Association labels live; workflow and renewal records not executed |
+| Renewal association labels/workflow | Association labels live; renewal workflow/records not executed |
+| Service creation automation | Plain Deal workflow rejected: it cannot safely emit one Service per line item; Kortex idempotent materializer/custom action required |
+| Activation-review automation | Workflow `1852406585` active; authenticated positive/negative simulation passed; five pilot executions completed and created five associated tasks; re-enrollment disabled |
 | Ticket taxonomy/SLA | Proposed, not executed |
 | Account Unit / Billing Event | Proposed and gated; not live |
 | Final Portfolio/Retention/Loyalty panels | Blocked by real governed Service coverage |
@@ -163,4 +165,4 @@ When an object/property/association changes:
 5. record runtime state in `Handoff.md` and `changelog.md`;
 6. never rewrite a source of truth merely to satisfy a report.
 
-The next model delta must document ANAM's activation review and the first records that reach `fields_ready` before any official workflow or dashboard publication.
+The next model delta must document Maria Paz's activation review and the first records that reach `fields_ready` before any official dashboard publication. The active workflow creates a human work queue; it does not promote lifecycle, fill contractual facts or make a Service KPI-eligible.

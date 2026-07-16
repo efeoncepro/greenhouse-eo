@@ -36,6 +36,14 @@
 
 ## 2026-07-16 — HubSpot as a Service: skill gestionada, QA ANAM y discovery RevOps
 
+- Se probó automation v4 beta y el action nativo `Create record → Service`. La definición compila, pero un Deal
+  workflow no puede garantizar el grain one-Service-per-line-item; queda descartado como materializer productivo.
+  Tres probes runtime no enrolaron por API y limpiaron todos sus Deals/line items/workflows temporales.
+- Se creó el workflow de revisión `1852406585`, limitado a los cinco pilotos, con una task de alta prioridad y
+  cero emails/notificaciones/writes de propiedades. El API-only enable no fue evidencia suficiente; la QA posterior
+  en editor autenticado validó Gasmar como positivo y Nestlé como negativo, activó sin enrolar existentes y ejecutó
+  rollout manual 1+4. Las cinco ejecuciones completaron y crearon exactamente cinco tasks asociadas; re-enrollment
+  sigue OFF. La creación forward requiere materializer/custom action Kortex idempotente por line item.
 - Con aprobación separada se ejecutó el piloto controlado de cinco native Services en el portal ANAM: Gasmar,
   Hidrogistica, Härting, Golden Omega y McDonald's. Cada uno quedó en `New`, con Company única, Deal de origen,
   source line item, owner heredado, CLF/TCV/ARR preservados y readiness `incomplete_core`; por ello siguen fuera

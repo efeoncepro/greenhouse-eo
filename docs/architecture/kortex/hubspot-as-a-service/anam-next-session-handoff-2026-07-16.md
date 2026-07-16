@@ -103,6 +103,7 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 - Forward capture: [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md). Separates the commercial award gate from human-confirmed Service activation, uses TCV for portfolio value and ARR only for reviewed recurring Retention comparisons, and keeps AI/smart properties out of authoritative controls.
 - Pilot simulation: [`anam-phase-3-forward-pilot-dry-run-2026-07-16.md`](anam-phase-3-forward-pilot-dry-run-2026-07-16.md). Five recent distinct-Company rows passed deterministic award projection and all failed activation.
 - Controlled pilot execution: [`anam-phase-3-forward-pilot-execution-2026-07-16.md`](anam-phase-3-forward-pilot-execution-2026-07-16.md). With a separate operator approval, the exact five rows were created in `New`, each with one Company, one originating Deal, deterministic source lineage and preserved TCV/ARR. All five read back as `incomplete_core`; they are excluded from official KPIs. Paired Deal-role and Service-renewal association labels are live. No workflow, renewal record, bulk backfill or report was created.
+- Workflow execution: [`anam-phase-3-service-automation-workflow-test-2026-07-16.md`](anam-phase-3-service-automation-workflow-test-2026-07-16.md). Native `Create Service` compiles but is not safe for one-Service-per-line-item materialization and did not execute in isolated API activation tests. The separate activation-review workflow `1852406585` was verified in the authenticated editor, activated without enrolling existing records, tested first with Gasmar, and then rolled out manually to the other four pilots. Exactly five executions completed and created exactly five associated tasks; non-pilot Service `564234555477` did not qualify. Re-enrollment remains disabled. All temporary probe records were archived and probe workflows deleted.
 
 ## Current Phase 1 reporting state
 
@@ -125,10 +126,10 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 
 ## Next execution order
 
-1. Ask Maria Paz Haeger to review the five pilot Services: start/end dates, delivery status, revenue model, renewal eligibility/status and whether each should remain `New` or move to `In progress`.
+1. Maria Paz Haeger reviews the five high-priority activation tasks: start/end dates, delivery status, revenue model, renewal eligibility/status and whether each Service should remain `New` or move to `In progress`.
 2. Read back the five after review. Only records with `anam_service_field_readiness=fields_ready` plus valid Company/originating-Deal gates may enter official panel cohorts.
-3. Build a draft Data Quality/activation panel first. Publish Portfolio/Expiry only after coverage and denominators reconcile; Retention and Loyalty remain gated by a complete renewable cohort and ratified signals.
-4. For the next actual award, reuse the deterministic create/readback contract and request approval before adding workflow automation. Do not treat this pilot as bulk-backfill authorization.
+3. Build the draft Data Quality/activation panel first. Publish Portfolio/Expiry only after coverage and denominators reconcile; Retention and Loyalty remain gated by a complete renewable cohort and ratified signals.
+4. Implement the Kortex per-line-item idempotent materializer/custom workflow action before automating new Service creation. Do not activate plain Deal → Create Service or treat this pilot as bulk-backfill authorization.
 5. Keep funnel reporting deferred until stage-entry/exit semantics are verified. Do not substitute current-stage counts for true conversion.
 6. Fix the durable Kortex authorization-URL scope drift through its own approved release; current ANAM Product read is already active and is not a Phase 3 blocker.
 
@@ -142,4 +143,4 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 
 ## Recommended opening instruction
 
-Continue ANAM HubSpot from this handoff without restarting discovery. Phase 1 is complete; the Phase 3 Service schema, association labels and five-record controlled pilot are live. All five pilot Services are `New` and `incomplete_core`. Coordinate the activation review with Maria Paz, then read back readiness before drafting the Data Quality/activation panel. Do not create workflows, bulk backfill, renewal records or final panels without the next documented approval. Treat duplicate ANAM Company records as out-of-scope and do not correct or merge them.
+Continue ANAM HubSpot from this handoff without restarting discovery. Phase 1 is complete; the Phase 3 Service schema, association labels, five-record controlled pilot and activation-review workflow `1852406585` are live. All five pilot Services remain `New` and `incomplete_core`; each now has one completed workflow execution and one high-priority activation task. Coordinate the human review with Maria Paz, then read back readiness before drafting the Data Quality/activation panel. Do not add workflows, bulk backfill, renewal records or final panels without the next documented approval. Treat duplicate ANAM Company records as out-of-scope and do not correct or merge them.

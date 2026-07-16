@@ -30,8 +30,15 @@
   sobre el Service sample. Con aprobación posterior se crearon tres pares de association labels y los cinco
   Services del piloto controlado en `New`; cada uno tiene Company única, Deal de origen, key/source line item,
   owner heredado y TCV/ARR preservados. Todos siguen `incomplete_core`, fuera de KPIs oficiales. Maria Paz Haeger
-  es reviewer de activación. No hubo workflows, bulk backfill ni panels; el ledger/rollback vive en
+  es reviewer de activación. En esa creación controlada no hubo workflows, bulk backfill ni panels; el ledger/rollback vive en
   `anam-phase-3-forward-pilot-execution-2026-07-16.md`.
+  Automatización: un Deal workflow nativo no puede gobernar one-Service-per-line-item, por lo que creación
+  forward sigue por Kortex OAuth hasta implementar un materializer/custom action idempotente. El workflow de review
+  `1852406585` está activo tras QA autenticada: simulación positiva Gasmar + negativa Nestlé pasaron, se activó sin
+  backfill de existentes y luego se enrolaron manualmente los cinco pilotos. Las cinco ejecuciones completaron y
+  crearon cinco tasks asociadas; re-enrollment sigue OFF. El workflow sólo crea cola humana, no activa Services ni
+  los hace KPI-eligible. Canon:
+  `anam-phase-3-service-automation-workflow-test-2026-07-16.md`.
   Modelo current-state obligatorio antes de tocar objetos, properties, associations, workflows o panels:
   `docs/architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md`; este fija
   grain, fact ownership, proyecciones y sinergias, mientras los docs fechados conservan evidencia histórica.

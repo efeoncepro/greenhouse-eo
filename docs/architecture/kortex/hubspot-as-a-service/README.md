@@ -98,9 +98,10 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Phase 3 governed forward capture, TCV/ARR and property-mechanism contract: [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md)
 - Phase 3 five-row forward-pilot simulation and activation gaps: [`anam-phase-3-forward-pilot-dry-run-2026-07-16.md`](anam-phase-3-forward-pilot-dry-run-2026-07-16.md)
 - Phase 3 controlled five-Service execution, association IDs and rollback ledger: [`anam-phase-3-forward-pilot-execution-2026-07-16.md`](anam-phase-3-forward-pilot-execution-2026-07-16.md)
+- Phase 3 workflow/API probe, authenticated activation-review rollout and materialization decision: [`anam-phase-3-service-automation-workflow-test-2026-07-16.md`](anam-phase-3-service-automation-workflow-test-2026-07-16.md)
 - Final scoped QA verdict: [`../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md`](../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 
-The native Service schema and a five-record controlled pilot are live. Operational activation and official panel cohorts remain gated by ANAM review; bulk backfill, workflows and final dashboards are not authorized. No new ADR is indexed for this package because native Service grain/ownership was already established by the canonical reconciliation.
+The native Service schema, a five-record controlled pilot and its activation-review queue are live. Operational activation and official panel cohorts remain gated by ANAM review; bulk backfill, additional workflows and final dashboards are not authorized. No new ADR is indexed for this package because native Service grain/ownership was already established by the canonical reconciliation.
 
 ## Operational dependency
 
