@@ -1,6 +1,10 @@
 # TASK-1415 — Tender Proposal Studio: el motor de chapter-authors (servicio-agnóstico) — con diagnóstico (SEO/AEO) como primera implementación de prueba
 
 
+## Delta 2026-07-16 (b) — follow-ups materializados como programa
+
+- Los follow-ups declarados abajo ya tienen ID y épica: **`EPIC-029`** (Tender Proposal Studio) agrupa `TASK-1416` (parity Nexa/MCP del chapter-author), `TASK-1417` (author económico), `TASK-1418` (author squad), `TASK-1419` (orquestador §5-ter), `TASK-1420` (verifier §5-ter) y `TASK-1421` (F1 análisis+admisibilidad). La Open Question del EPIC quedó resuelta por el operador (2026-07-16): se creó.
+
 ## Delta 2026-07-16 — CIERRE (implementada completa)
 
 - **Los 5 slices shipped** en `develop` local (commits atómicos, sin push): interface + máquina compartida → mapper → 2º author (agnosticismo) → author LLM diagnóstico + eval golden → loop integrado + flag.
