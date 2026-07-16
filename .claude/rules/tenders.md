@@ -28,6 +28,18 @@ contrato de TASK-1391: un artefacto `client_facing` con UNA evidencia `internal`
 **NUNCA** escribir a `proposals`/hijos fuera de esos commands; **NUNCA** exponer RFP crudo, costos,
 `external_source_snapshot` ni URLs de storage en una proyección/evento.
 
+**El motor de chapter-authors EXISTE (TASK-1415, 2026-07-16 · flag `TENDER_CHAPTER_AUTHOR_ENABLED` OFF):**
+la autoría agéntica de láminas vive en `src/lib/commercial/tenders/proposals/authoring/**` — interface
+`ChapterAuthor` **servicio-agnóstica** (diagnóstico SEO/AEO y credenciales son implementaciones, NO el
+motor). Separación dura dato/framing: `deriveFacts` (puro) es la ÚNICA fábrica de cifras; el LLM sólo
+enmarca; `toSlides` inyecta `metric`/`score`/`evidenceRef` DESDE los hechos. **NUNCA** una cifra o URL
+del framing sin hecho que la respalde (guard compartido rechaza la propuesta COMPLETA); **NUNCA** tocar
+`chapter-author.ts`/`eval-harness.ts` para acomodar un servicio (si un author nuevo lo exige, la
+abstracción está mal — STOP); **NUNCA** tocar prompt/schema de un author sin su eval verde (golden
+frozen; el de diagnóstico son las láminas SKY a mano — no se edita para "pasar"). El confirm exige
+`actor.kind==='member'`. Invariantes completos: `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`
+§Chapter-author engine; costura para authors nuevos: companion `proposal-studio-runtime.md`.
+
 **El dominio se opera desde Nexa (TASK-1399, code-complete · flag `NEXA_PROPOSAL_ACTIONS_ENABLED` OFF):**
 4 acciones gobernadas (`src/lib/nexa/actions/proposal-studio.ts`) + el tool read-only `proposal_status`
 (sobre `proposals/operator-view.ts`, el read model del día a día). Nexa es **otro consumer del mismo
