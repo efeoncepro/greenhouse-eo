@@ -154,15 +154,40 @@ const QUANTIFIED_TOKEN = /\d[\d.,]*%?/g
 
 const isEnforcedToken = (token: string): boolean => token.length >= 2
 
+const URL_TOKEN = /https?:\/\/[^\s"'<)]+/g
+
+/**
+ * FAIL-CLOSED: todo link (`href` o URL cruda) del framing debe calzar EXACTAMENTE con el valor
+ * de algún hecho. Un LLM no inventa URLs en un documento contractual — el link al informe/fuente
+ * entra como hecho (allowlist), o no entra.
+ */
+export const assertLinksAreEvidenced = (framing: unknown, facts: EvidencedFact[]): void => {
+  const factValues = new Set(facts.map(fact => fact.value))
+
+  for (const leaf of collectStringLeaves(framing)) {
+    for (const url of leaf.match(URL_TOKEN) ?? []) {
+      if (!factValues.has(url)) {
+        throw new ProposalInputError(
+          `El framing introduce un link sin hecho que lo respalde: "${url}". ` +
+            'Las URLs entran como hechos con evidencia (allowlist), nunca desde el modelo.'
+        )
+      }
+    }
+  }
+}
+
 /**
  * FAIL-CLOSED: toda cifra del framing debe existir textualmente dentro del valor de algún
- * hecho. El LLM enmarca hechos; no introduce números.
+ * hecho. El LLM enmarca hechos; no introduce números. Las URLs (ya allowlisted por
+ * `assertLinksAreEvidenced`) se excluyen del scan — sus tokens no son cifras del argumento.
  */
 export const assertQuantifiedClaimsAreEvidenced = (framing: unknown, facts: EvidencedFact[]): void => {
   const factValues = facts.map(fact => fact.value)
 
   for (const leaf of collectStringLeaves(framing)) {
-    for (const token of leaf.match(QUANTIFIED_TOKEN) ?? []) {
+    const scannable = leaf.replace(URL_TOKEN, '')
+
+    for (const token of scannable.match(QUANTIFIED_TOKEN) ?? []) {
       if (!isEnforcedToken(token)) continue
 
       if (!factValues.some(value => value.includes(token))) {
@@ -174,6 +199,12 @@ export const assertQuantifiedClaimsAreEvidenced = (framing: unknown, facts: Evid
     }
   }
 }
+
+/**
+ * Largo del texto VISIBLE de un rich-string (sin markup): la vara con la que un author chequea
+ * sus constraints de longitud — el juez final sigue siendo el layout real del composer.
+ */
+export const visibleTextLength = (value: string): number => value.replace(/<[^>]+>/g, '').length
 
 /** Validación completa de una propuesta: el guard mecánico compartido + el validador del author. */
 export const validateChapterProposal = <Source, Facts extends ChapterFactSheet, Framing>(
@@ -189,6 +220,7 @@ export const validateChapterProposal = <Source, Facts extends ChapterFactSheet, 
     }
   }
 
+  assertLinksAreEvidenced(framing, facts.facts)
   assertQuantifiedClaimsAreEvidenced(framing, facts.facts)
   author.validate(framing, facts)
 }

@@ -1,0 +1,145 @@
+{
+  "_readme": "Snapshot REAL del run EO-GRUN-00046 (SKY Airline, 2026-07-11) — subset del GraderReport que consume deriveDiagnosticoFacts. Generado con readGraderReport contra PG (TASK-1415 Slice 2).",
+  "dimensions": [
+    {
+      "key": "ai_visibility",
+      "label": "AI Visibility",
+      "weight": 25,
+      "score": 40
+    },
+    {
+      "key": "entity_clarity",
+      "label": "Entity Clarity",
+      "weight": 15,
+      "score": 100
+    },
+    {
+      "key": "category_ownership",
+      "label": "Category Ownership",
+      "weight": 15,
+      "score": 20
+    },
+    {
+      "key": "competitive_sov",
+      "label": "Competitive Share of Voice",
+      "weight": 15,
+      "score": 88.5
+    },
+    {
+      "key": "citation_quality",
+      "label": "Citation Quality",
+      "weight": 15,
+      "score": 91.2
+    },
+    {
+      "key": "message_alignment",
+      "label": "Message Alignment",
+      "weight": 10,
+      "score": 36.8
+    },
+    {
+      "key": "revenue_intent_coverage",
+      "label": "Revenue Intent Coverage",
+      "weight": 5,
+      "score": 40
+    }
+  ],
+  "readiness": {
+    "structural": {
+      "overallScore": 47.1
+    },
+    "agentic": {
+      "overallScore": 8.4
+    }
+  },
+  "citationInsight": {
+    "ownDomainShare": 0,
+    "findingsWithCitations": 34,
+    "findingsCitingOwnDomain": 0
+  },
+  "citationSourceBreakdown": {
+    "totalCitations": 254,
+    "domains": [
+      {
+        "domain": "skyairline.com",
+        "count": 15,
+        "classification": "own_domain"
+      },
+      {
+        "domain": "trustpilot.com",
+        "count": 14,
+        "classification": "third_party"
+      },
+      {
+        "domain": "wikipedia.org",
+        "count": 13,
+        "classification": "third_party"
+      },
+      {
+        "domain": "instagram.com",
+        "count": 11,
+        "classification": "ugc"
+      },
+      {
+        "domain": "biobiochile.cl",
+        "count": 10,
+        "classification": "third_party"
+      },
+      {
+        "domain": "youtube.com",
+        "count": 8,
+        "classification": "ugc"
+      },
+      {
+        "domain": "facebook.com",
+        "count": 8,
+        "classification": "ugc"
+      },
+      {
+        "domain": "despegar.cl",
+        "count": 7,
+        "classification": "third_party"
+      },
+      {
+        "domain": "tripadvisor.es",
+        "count": 6,
+        "classification": "third_party"
+      },
+      {
+        "domain": "reddit.com",
+        "count": 6,
+        "classification": "ugc"
+      }
+    ]
+  },
+  "competitiveSov": {
+    "brandMentions": 23,
+    "competitors": [
+      {
+        "name": "LATAM Airlines",
+        "mentions": 16
+      },
+      {
+        "name": "JetSMART",
+        "mentions": 9
+      },
+      {
+        "name": "Flybondi",
+        "mentions": 3
+      }
+    ]
+  },
+  "provenance": {
+    "asOfDate": "2026-07-11T17:06:20.748Z",
+    "promptPackVersion": "archetype-generic.v1",
+    "scoreVersion": "ai_visibility_score_v2",
+    "providersSampled": [
+      "anthropic",
+      "gemini",
+      "google_ai_overview",
+      "openai",
+      "perplexity"
+    ],
+    "promptCount": 7
+  }
+}
