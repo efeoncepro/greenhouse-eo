@@ -1,3 +1,12 @@
+## Sesión 2026-07-16 — TASK-1385 AI-Assisted Vacancy Public Copy (Claude, in-progress)
+
+> **Task tomada:** `TASK-1385` movida a `in-progress/`. Trabajo en `develop` local-first, SIN push.
+> Objetivo: extender el patrón propose→confirm de TASK-1361 a la redacción del payload público
+> (`public_*`) de una vacante — la IA propone desde inputs allowlist-safe (demanda + competencias del
+> template + voz es-CL; NUNCA ve presupuesto/rate/notas internas), el confirm humano escribe vía
+> `updateHiringOpening`, ledger auditado con kind nuevo `opening_public_copy` + dedupe por digest,
+> checklist anti-sesgo en el prompt, flag default OFF. Publish sigue siendo acción humana (TASK-355/1371).
+
 ## Sesion 2026-07-16 - HubSpot Solutions Partner: prospeccion agentica (Codex)
 
 > **Skill sincronizada:** las copias Codex y Claude de `hubspot-solutions-partner` incorporan la narrativa
@@ -9,6 +18,16 @@
 
 ## Sesión 2026-07-16 — HubSpot as a Service + QA/RevOps ANAM (Codex)
 
+> **Roadmap y Fase 1:** el plan completo quedó canonizado en
+> `anam-revops-implementation-roadmap-phases-2026-07-16.md`. La Fase 1 está en curso y no reabre definiciones:
+> Notion confirma ratificación `Listo`, `Variación vs. cotizado` `Listo` y backfill Q1-Q2 `En curso`.
+> Contrato de ejecución: `anam-phase-1-commercial-reporting-foundation-2026-07-16.md`. Los cuatro informes del
+> `Dashboard de Crecimiento` ya fueron inventariados read-only: todos son reutilizables, pero mezclan Renovación
+> con Growth; tres usan `Fecha de creación` y el informe por ejecutivo titulado "por Q" muestra el histórico de
+> 908 Deals sin periodo visible. Próximo paso live: ajustar títulos/filtros/ubicación, separar pipeline creado,
+> outcome Closed Won y proxy de Renovación; luego publicar Data Quality con denominadores explícitos. No tocar la
+> Company ANAM.
+>
 > **Capability creada:** skills espejo `.codex/.claude/skills/hubspot-as-a-service` con referencias separadas
 > para managed delivery, Customer Agent, RevOps schema y el caso ANAM. La skill orquesta `intake -> inventory ->
 > design -> propose -> approve -> dry-run/draft -> execute -> verify -> document -> measure`; no duplica la
@@ -72,8 +91,14 @@
 > **Catálogo y acceso Product:** los 506 line items se reducen a 20 nombres normalizados; `M&A - Integral`
 > concentra 331. El dry-run `anam-commercial-catalog-dry-run-2026-07-16.md` propone el seed y deja ambiguos sólo
 > `Monitoreo Integral Minero` y los catch-all. Kortex desplegó builds `#12/#13` con Product read requerido y write
-> condicional, pero HubSpot rechazó tres reconsentimientos ANAM antes del callback. La instalación queda intacta
-> con 109 scopes y Products sigue `403`; no sumar `e-commerce` ni reintentar a ciegas.
+> condicional. Los primeros tres reconsentimientos ANAM fueron rechazados antes del callback; en ese corte la
+> instalación seguía intacta con 109 scopes y Products devolvía `403`.
+> Diagnóstico posterior: los tres grants fallaron por `Please provide a valid recaptcha value`; además, el control
+> plane desplegado generó una URL sin `crm.objects.products.read` pese al build `#13`. Con autorización explícita,
+> el operador completó el consent corregido: callback/activation success, instalación activa con 110 scopes,
+> Product properties HTTP 200 (65) y Product search HTTP 200 (22 Products). No hubo Product writes, deploy ni
+> rotación de credenciales. Canon: `anam-product-oauth-diagnosis-2026-07-16.md`; queda pendiente el fix durable
+> del generador de scopes en Kortex.
 >
 > **Secuencia actualizada:** el readback quedó documentado en `anam-hubspot-schema-readback-2026-07-16.md` y la
 > cronología completa de reuniones en `anam-revops-meeting-synthesis-2026-07-16.md`. El modelo converge en
@@ -93,6 +118,11 @@
 > `anam-commercial-first-operating-model-2026-07-16.md`: ANAM se secuencia comercial primero (identidad, Lead,
 > Deal/line items, Service/renovación, Data Quality/Growth/Retention/Loyalty) y Operaciones después (Ticket, SLA,
 > billing sync y paneles operativos). Down-sell se deriva como movimiento de Retención sobre Services comparables.
+>
+> **Corrección de alcance del operador:** las dos Companies de ANAM con el mismo RUT son un error de datos del CRM
+> que ANAM opera y quedan fuera de este trabajo. No corregir, enriquecer ni fusionar esos registros; no son una
+> dependencia para catálogo, Service o dashboards. El único change set approval-ready de esta continuación es
+> Service en `anam-service-change-set-2026-07-16.md`; no fue ejecutado.
 
 ## Sesión 2026-07-16 — TASK-1415 COMPLETE: motor de chapter-authors (servicio-agnóstico) — Claude
 
