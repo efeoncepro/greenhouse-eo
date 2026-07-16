@@ -62,6 +62,24 @@
 > forward gobernada y revisión manual de los dos ejemplos más completos. HubSpot puede devolver una misma Company
 > bajo `deal_to_company` y `deal_to_company_unlabeled`; la cardinalidad se deduplica por object ID. No hubo writes
 > HubSpot. Canon: `anam-phase-3-panel-first-service-readiness-2026-07-16.md`.
+>
+> **Fase 3 — contrato forward + taxonomía de propiedades:** el readback monetario de los 220 line items ganados
+> confirmó cobertura de `amount`, TCV, ACV, ARR y MRR. En los cinco casos con frecuencia recurrente, `amount`
+> representa el importe periódico/neto y TCV el valor total; los 215 sin frecuencia tienen ARR/MRR cero, pero
+> el vacío no prueba que sean one-time. Se corrige el diseño: Portafolio usa **TCV** por moneda original y
+> Retention usa **ARR** sólo en cohorte recurrente/renovable revisada; se elimina el concepto ambiguo de un único
+> `comparable awarded value`. Frecuencia de cobro tampoco equivale a frecuencia de entrega. El contrato separa
+> gate de adjudicación y gate humano de activación, propone piloto forward de 3–5 line items y mantiene el
+> backfill histórico en `NO-GO`. Canon:
+> `anam-phase-3-forward-service-capture-contract-2026-07-16.md` y change set reconciliado
+> `anam-service-change-set-2026-07-16.md`. **No hubo writes HubSpot.**
+>
+> Las skills espejo ahora incluyen `references/property-types.md`: distinguen storage type, field type,
+> mecanismo de población y gobierno; deciden entre native/custom/unique/calculation/time/rollup/sync/score,
+> workflow, enrichment y smart property. Las smart properties se tratan como evidencia AI con créditos,
+> fuentes, prompt y revisión humana; nunca como identidad, dinero, lifecycle, elegibilidad, contabilidad o salud
+> determinística. La documentación oficial actual no lista native Service entre los objetos elegibles para smart
+> properties, por lo que ese soporte no se presume.
 
 > **Roadmap y Fase 1 — CERRADA:** el plan completo quedó canonizado en
 > `anam-revops-implementation-roadmap-phases-2026-07-16.md` y el contrato/evidencia final en

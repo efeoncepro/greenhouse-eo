@@ -97,9 +97,10 @@ Kortex repo task `TASK-0130` is in progress.
 
 Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-product-oauth-diagnosis-2026-07-16.md): all three prior grants failed with `Please provide a valid recaptcha value`. A newly generated control-plane URL also omitted required `crm.objects.products.read`, proving deployed Kortex runtime drift from HubSpot build `#13`. With explicit authorization, the operator completed a manually corrected consent. Callback/activation succeeded, the installation is active with 110 scopes and Product properties/search now return HTTP 200 (65 properties, 22 Products). No Product write, deploy or credential rotation occurred. The durable Kortex URL-generation drift remains to be fixed.
 
-## Approval-ready change set
+## Proposed Phase 3 change set
 
-- Service: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md). Exact property enums, renewal/Deal association labels and deterministic Closed Won line-item migration dry run; no schema or record writes executed.
+- Service: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md). Reconciled property enums, renewal/Deal association labels and deterministic line-item provenance; approval is still required and no schema or record writes were executed.
+- Forward capture: [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md). Separates the commercial award gate from human-confirmed Service activation, uses TCV for portfolio value and ARR only for reviewed recurring Retention comparisons, and keeps AI/smart properties out of authoritative controls.
 
 ## Current Phase 1 reporting state
 
@@ -122,14 +123,14 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 
 ## Next execution order
 
-1. Finish Phase 1 outcome semantics. Inventory all Growth stage IDs and report dependencies around `Radar 0%`; produce a rollback-ready proposal for either correcting its metadata or temporarily excluding exact stage `1034441224`. Do not mutate pipeline metadata without explicit approval.
-2. Build won/lost count and current Deal amount using exact eligible stage IDs and the correct close-date period. Calculate win rate only from that explicit denominator and read it back against source records.
-3. Keep funnel reporting deferred until stage-entry/exit semantics are verified. Do not substitute current-stage counts for true conversion.
-4. Prepare the P1.4 Q1-Q2 adoption change set from the existing 82-Deal owner queue. Inferences remain suggestions; writes require evidence, named review and approval.
-5. After Phase 1 acceptance, reconcile the 22 Products against the 506 line items and ratify catalog ambiguities and stable SKU codes.
-6. Review the exact Service property/association proposal against the reconciled catalog, then generate the won Deal line-item -> Service dry run before any migration write.
-7. Implement Retention, Renewal and Loyalty only after Service cohort coverage is adequate; Ticket taxonomy and Billing Event follow the commercial foundation.
-8. Fix the durable Kortex authorization-URL scope drift through its own approved release; current ANAM Product read is already active and is not a Phase 1 blocker.
+1. Ratify the five Phase 3 decisions in the forward-capture contract: TCV, ARR, owner inheritance, blank-frequency handling and activation reviewer.
+2. Approve the reconciled Service schema separately; preview and test the calculated readiness formula before including it.
+3. Execute schema creation/readback only after approval. Schema approval does not approve Service records or workflows.
+4. Run a 3–5-line-item forward pilot, first as a no-write dry run and then with separate approval for the first Service records.
+5. Confirm activation fields with the named ANAM operator; keep new awards in `New` until operational start is real.
+6. Publish Portfolio/Expiry first after coverage reconciles; Retention and Loyalty remain gated by a complete renewable cohort and ratified signals.
+7. Keep funnel reporting deferred until stage-entry/exit semantics are verified. Do not substitute current-stage counts for true conversion.
+8. Fix the durable Kortex authorization-URL scope drift through its own approved release; current ANAM Product read is already active and is not a Phase 3 blocker.
 
 ## Safety and repository state
 

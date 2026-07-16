@@ -14,6 +14,7 @@ Operate HubSpot as an accountable managed service, not as a collection of portal
 3. Load only the workstream reference needed:
    - Customer Agent: [customer-agent.md](references/customer-agent.md)
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
+   - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
    - Reports and dashboards: [report-design.md](references/report-design.md)
    - ANAM: [anam-case.md](references/anam-case.md)
 4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `SOURCES.md`.
@@ -57,6 +58,7 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 - All client-facing metrics require period, baseline, denominator, definition and evidence. ANAM naming in external case studies requires authorization.
 - Do not reduce dashboard design to scorecards and bars. Inventory the active report builder and select visualization by decision, cardinality, period and measure semantics using `report-design.md`.
 - Treat calculated properties as governed schema, not report-local convenience. Verify the portal allowance, prefer exact business IDs over probability-derived flags, read back both definitions and representative values, and document any mandatory report filter that makes a numeric base semantically valid.
+- Treat smart properties as credit-consuming, AI-produced evidence. Never use them as authoritative identity, currency, amount, lifecycle, eligibility, compliance or accounting data.
 
 ## Required outputs
 

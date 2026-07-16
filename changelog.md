@@ -36,6 +36,13 @@
 
 ## 2026-07-16 — HubSpot as a Service: skill gestionada, QA ANAM y discovery RevOps
 
+- La Fase 3 queda reconciliada para captura forward: Portafolio usa TCV por moneda original, Retention usa ARR
+  sólo en cohorte recurrente/renovable revisada, billing cadence no se confunde con delivery cadence y un award
+  propone Service `New` sin declarar activación. Backfill histórico continúa `NO-GO`; esquema y primer piloto
+  de 3–5 line items requieren aprobaciones separadas. No hubo writes HubSpot.
+- Las skills espejo agregan una matriz de propiedades HubSpot que separa storage type, field type, mecanismo de
+  población y gobierno, y decide entre native/custom/unique/calculation/rollup/sync/score/workflow/smart. Smart
+  queda como evidencia AI con créditos y revisión humana, nunca como identidad, dinero, lifecycle o elegibilidad.
 - Se registra `TASK-1423` y la spec `client-billing-intake-data-model-spec-v1.md` para la foundation tenant-scoped
   del workbook ANAM: modelo reusable `client_billing_*`, assets/scan compartidos, parser versionado y profiler
   no-write. Se fija la frontera correcta: ANAM es cliente y dueño de source/CRM data; Greenhouse sólo opera el

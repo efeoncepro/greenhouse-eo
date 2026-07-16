@@ -3,7 +3,9 @@
 > **Date:** 2026-07-16
 > **Portal:** `19893546`
 > **Object:** native Service `0-162`
-> **Status:** approval-ready preview; no schema or record writes executed
+> **Status:** reconciled proposal; approval required; no schema or record writes executed
+
+> **2026-07-16 semantic correction:** the forward-capture evidence in [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md) supersedes the earlier single comparable-value and service-frequency model. TCV and ARR are separate facts, blank billing frequency is unknown, and billing cadence is not delivery frequency. Do not execute an older copy of this change set.
 
 ## Target grain
 
@@ -31,22 +33,24 @@ Native fields retained:
 
 ## Property data dictionary
 
-All properties belong to `service_information`, are non-form fields and are integration-managed unless stated otherwise.
+All properties belong to `service_information` and are non-form fields. Provenance/value projections are integration-managed; revenue model, renewal facts and activation evidence require governed human review; calculated readiness is API-managed.
 
 | Internal name | Label | Type / field type | Contract |
 |---|---|---|---|
 | `anam_service_external_key` | Clave externa de servicio ANAM | string / text, unique | deterministic idempotency key; required for migrated production Services |
 | `anam_source_line_item_id` | ID line item de origen | string / text | immutable HubSpot line-item provenance |
 | `anam_service_family` | Familia de servicio ANAM | enumeration / select | exact commercial family |
-| `anam_service_frequency` | Frecuencia del servicio | enumeration / select | contracted recurrence, not billing status |
-| `anam_service_currency` | Moneda del servicio | enumeration / select | currency of awarded comparable value |
-| `anam_comparable_awarded_value` | Monto adjudicado comparable | number / number | awarded amount in `anam_service_currency`, normalized to the approved comparison period |
+| `anam_revenue_model` | Modelo de ingreso del servicio | enumeration / select | reviewed one-time/recurring/usage/mixed classification; blank billing cadence does not decide it |
+| `anam_service_currency` | Moneda del servicio | enumeration / select | original currency of TCV and ARR projections |
+| `anam_awarded_contract_value` | Valor contractual adjudicado | number / number | line-item TCV in `anam_service_currency`; portfolio measure |
+| `anam_annual_recurring_value` | Valor recurrente anual | number / number | line-item ARR in `anam_service_currency`; only meaningful for reviewed recurring/renewable scopes |
 | `anam_renewal_eligibility` | Elegibilidad de renovación | enumeration / select | whether the scope can renew |
 | `anam_renewal_status` | Estado de renovación | enumeration / select | current renewal outcome/work state |
+| `anam_service_field_readiness` | Preparación de datos del servicio | calculated enumeration | same-record completeness only; associations remain a separate gate |
 
 ### Exact property-create requests
 
-Send each object below as an independent `POST /crm/v3/properties/0-162`. Options and their internal values are part of the approval boundary; do not translate or regenerate them at execution time.
+The scalar-property requests below are the current approval preview. Send each approved object independently as `POST /crm/v3/properties/0-162`; do not translate or regenerate options at execution time. The calculated readiness property is intentionally excluded until its exact equation passes formula/null-branch QA and receives separate approval.
 
 ```json
 [
@@ -89,27 +93,26 @@ Send each object below as an independent `POST /crm/v3/properties/0-162`. Option
   },
   {
     "groupName": "service_information",
-    "name": "anam_service_frequency",
-    "label": "Frecuencia del servicio",
-    "description": "Recurrencia contractual del alcance; no representa estado de facturación.",
+    "name": "anam_revenue_model",
+    "label": "Modelo de ingreso del servicio",
+    "description": "Clasificación revisada del modelo económico del servicio; no se infiere desde una frecuencia de cobro vacía.",
     "type": "enumeration",
     "fieldType": "select",
     "hasUniqueValue": false,
     "formField": false,
     "options": [
       { "label": "Una vez", "value": "one_time", "displayOrder": 0, "hidden": false },
-      { "label": "Mensual", "value": "monthly", "displayOrder": 1, "hidden": false },
-      { "label": "Trimestral", "value": "quarterly", "displayOrder": 2, "hidden": false },
-      { "label": "Semestral", "value": "semiannual", "displayOrder": 3, "hidden": false },
-      { "label": "Anual", "value": "annual", "displayOrder": 4, "hidden": false },
-      { "label": "Personalizada", "value": "custom", "displayOrder": 5, "hidden": false }
+      { "label": "Recurrente", "value": "recurring", "displayOrder": 1, "hidden": false },
+      { "label": "Por uso", "value": "usage_based", "displayOrder": 2, "hidden": false },
+      { "label": "Mixto", "value": "mixed", "displayOrder": 3, "hidden": false },
+      { "label": "Pendiente de revisión", "value": "pending_review", "displayOrder": 4, "hidden": false }
     ]
   },
   {
     "groupName": "service_information",
     "name": "anam_service_currency",
     "label": "Moneda del servicio",
-    "description": "Moneda original del monto adjudicado comparable; CLF representa UF en el contrato CRM.",
+    "description": "Moneda original de TCV y ARR del servicio; CLF representa UF en el contrato CRM.",
     "type": "enumeration",
     "fieldType": "select",
     "hasUniqueValue": false,
@@ -122,9 +125,19 @@ Send each object below as an independent `POST /crm/v3/properties/0-162`. Option
   },
   {
     "groupName": "service_information",
-    "name": "anam_comparable_awarded_value",
-    "label": "Monto adjudicado comparable",
-    "description": "Monto adjudicado en la moneda del servicio y normalizado al período de comparación aprobado; no usar como monto facturado.",
+    "name": "anam_awarded_contract_value",
+    "label": "Valor contractual adjudicado",
+    "description": "TCV del line item de origen en la moneda original del servicio; no representa facturación.",
+    "type": "number",
+    "fieldType": "number",
+    "hasUniqueValue": false,
+    "formField": false
+  },
+  {
+    "groupName": "service_information",
+    "name": "anam_annual_recurring_value",
+    "label": "Valor recurrente anual",
+    "description": "ARR del line item de origen en la moneda original; usar sólo en alcances recurrentes o renovables revisados.",
     "type": "number",
     "fieldType": "number",
     "hasUniqueValue": false,
@@ -167,7 +180,7 @@ Send each object below as an independent `POST /crm/v3/properties/0-162`. Option
 ]
 ```
 
-Do not archive `fecha_de_vencimiento_del_contrato`, `monto_original` or populate `hs_total_cost` in this slice. First inventory consumers and compare their semantics with `hs_target_end_date` and `anam_comparable_awarded_value`.
+Do not archive `fecha_de_vencimiento_del_contrato`, `monto_original` or populate `hs_total_cost` in this slice. First inventory consumers and compare their semantics with `hs_target_end_date`, `anam_awarded_contract_value` and `anam_annual_recurring_value`.
 
 ## Association labels
 
@@ -215,7 +228,7 @@ Candidate rule:
 1. Deal is Closed Won;
 2. Deal has one unambiguous associated Company;
 3. line item is associated to that Deal and maps to an approved service family;
-4. amount, currency and stable line-item ID are present;
+4. amount, TCV, ARR, currency and stable line-item ID are present;
 5. deterministic key is absent from existing Services.
 
 Deterministic key:
@@ -224,7 +237,7 @@ Deterministic key:
 ANAM-SVC:HS-DEAL:<dealId>:LINE:<lineItemId>
 ```
 
-One eligible line item produces one proposed Service row. The dry-run output must include Deal, Company, line item, proposed Service name/key, family, frequency, currency, comparable amount, dates, lifecycle stage and every quarantine reason.
+One eligible line item produces one proposed Service row. The dry-run output must include Deal, Company, line item, proposed Service name/key, family, reviewed revenue model, billing-cadence evidence, currency, TCV, ARR, dates, lifecycle stage and every quarantine reason. Blank billing frequency remains unknown and does not become `one_time`.
 
 Stage mapping:
 
@@ -232,13 +245,13 @@ Stage mapping:
 - `In progress`: contracted service is active;
 - `Closed`: service delivery is completed/ended, never merely because the Deal is won.
 
-Quarantine, with no write, when Company cardinality is not one, mapping is `Otros`, `Monitoreo Integral Minero` remains unratified, dates/currency/amount are missing, a source line item maps twice, or the stable key already exists with conflicting data.
+Quarantine, with no write, when Company cardinality is not one, mapping is `Otros`, `Monitoreo Integral Minero` remains unratified, dates/currency/TCV are missing, a source line item maps twice, or the stable key already exists with conflicting data. Missing ARR requires review for recurring/renewable scopes; it is not silently converted to zero.
 
 ## Gates and acceptance
 
 Before execution:
 
-- approve the two remaining catalog mappings and exact comparison-period semantics for awarded value;
+- approve the two remaining catalog mappings, TCV as portfolio value and ARR as the recurring Retention comparison value;
 - snapshot current Service schema, association definitions and records;
 - dry run reports 100% of candidate line-item value as mapped or explicitly quarantined;
 - zero duplicate external keys;
@@ -253,7 +266,7 @@ After schema execution:
 After a separately approved migration:
 
 - every created Service has exactly one Company, one originating Deal and one source line-item ID;
-- all migrated Services have unique external key, family, currency, comparable value and appropriate dates;
+- all migrated Services have unique external key, family, currency, TCV, reviewed revenue model and appropriate dates; recurring/renewable Services also have reviewed ARR semantics;
 - renewal fields are populated or explicitly pending/not applicable;
 - rerunning the migration creates zero duplicates;
 - record counts and quarantines reconcile to the approved dry run.

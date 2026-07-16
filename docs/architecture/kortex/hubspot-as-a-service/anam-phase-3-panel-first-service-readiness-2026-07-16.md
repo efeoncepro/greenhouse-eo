@@ -4,7 +4,7 @@
 > **Client:** ANAM, client of Efeonce
 > **Client portal:** HubSpot `19893546`
 > **Mode:** live read-only audit and dashboard contract design
-> **Status:** panel contracts defined; historical Service migration `NO-GO`
+> **Status:** panel contracts and forward-capture contract defined; historical Service migration `NO-GO`
 > **HubSpot writes:** none
 
 ## Client-engagement boundary
@@ -23,11 +23,11 @@ The blocker is Service evidence. The live portal does not yet contain enough det
 
 ### 1. Service and contract portfolio
 
-**Question:** what awarded services are active, for whom, under which owner and for what comparable awarded value?
+**Question:** what awarded services are active, for whom, under which owner and for what total contract value?
 
 - Grain: one native HubSpot Service (`0-162`) per awarded service component, normally one won Deal line item.
 - Required eligibility: production Service with deterministic Company and originating Deal/line item.
-- Measures: Service count and comparable awarded value, always separated by currency.
+- Measures: Service count and line-item TCV, always separated by original currency.
 - Dimensions: service family, Company, owner and Service lifecycle stage.
 - Presentation: KPI cards, family/owner distribution and an exact-record table.
 - Current gate: the sole existing Service is sample-like and must not be presented as a client portfolio.
@@ -37,7 +37,7 @@ The blocker is Service evidence. The live portal does not yet contain enough det
 **Question:** which active Services require action in the next 30, 60 or 90 days?
 
 - Grain: active Service with target end date and reviewed renewal eligibility.
-- Measures: expiring Service count and comparable amount by currency.
+- Measures: expiring Service count and TCV by original currency; ARR only for a reviewed recurring/renewable cohort.
 - Dimensions: expiry window, owner, family, Company and renewal status.
 - Presentation: 30/60/90 KPI cards plus an actionable record table.
 - Current gate: the existing Deal-based Renewal report remains explicitly a proxy until governed Service coverage exists.
@@ -48,7 +48,7 @@ The blocker is Service evidence. The live portal does not yet contain enough det
 
 - Grain: prior renewable Service linked to a reviewed outcome and, when renewed, to its successor Service.
 - Outcomes: expanded, stable, contracted and lost.
-- Measures: comparable prior and renewed value for the same period and currency.
+- Measures: prior and renewed ARR for the same original currency and a complete reviewed recurring/renewable cohort.
 - Presentation: cohort counts/value movements with the underlying lineage table.
 - Current gate: no GRR/NRR and no churn claims until the renewable cohort is complete. `Down-sell` is not Deal income; it is a derived Retention movement.
 
@@ -109,7 +109,7 @@ At the current Q3-to-date cutoff, the 13 Closed Won Deals contain no line items.
 
 ### Manual-review examples, not migration approvals
 
-Only two historical line items combine one unique Company, a known Product, amount/currency, frequency and start/end dates. They still do not prove Service lifecycle stage, renewal eligibility or the final comparable-value rule.
+Only two historical line items combine one unique Company, a known Product, amount/currency, frequency and start/end dates. They still do not prove Service lifecycle stage, renewal eligibility or reviewed revenue-model semantics.
 
 | Line item | Deal | Company | Product | Amount | Frequency / term | Dates |
 |---|---|---|---|---:|---|---|
@@ -133,12 +133,14 @@ HubSpot can return the same Company twice for a Deal through different associati
 
 ### `GO` for the next controlled slice
 
-- Define forward capture for new awarded Deals: line items, exactly one reviewed Company, dates, frequency, Service stage, owner and renewal eligibility.
+- Apply the governed forward-capture contract for new awarded Deals: line items, exactly one reviewed Company, dates, revenue model, billing-cadence evidence, Service stage, owner and renewal eligibility.
 - Manually review the two strongest historical examples that contain Company, Product, amount/currency, frequency and dates; they are examples, not approved migration records.
-- Ratify the exact meaning of comparable awarded value.
+- Ratify TCV as portfolio contract value and ARR as the recurring Retention comparison value.
 - Rerun the Service dry run on the governed forward cohort.
 - Propose Service schema only after a separate approval, then execute and read back before publishing final panels.
 - Keep the existing Deal-based Renewal report labeled as a proxy until then.
+
+Detailed next-slice contract: [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md).
 
 ## Safety and evidence
 

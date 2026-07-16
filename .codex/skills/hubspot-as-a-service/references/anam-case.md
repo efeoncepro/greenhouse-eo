@@ -32,6 +32,7 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 - `docs/architecture/kortex/hubspot-as-a-service/anam-revops-schema-reconciliation-2026-07-16.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-commercial-catalog-dry-run-2026-07-16.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-phase-3-panel-first-service-readiness-2026-07-16.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-phase-3-forward-service-capture-contract-2026-07-16.md`
 - `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`
 
 ## RevOps object model
@@ -51,6 +52,9 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 - Billing averages must declare grain and currency. Report mean plus median per Billing Event, aggregate invoice rows by invoice number+currency before computing invoice averages, and calculate per-Unit/per-Company monthly averages only from matched eligible events. Never average or sum mixed CLP/UF/USD.
 - The SharePoint workbook called `Ticket Facturación` contains billing events, not HubSpot customer Tickets. Those events must be ingested into the HubSpot model and associated to Company plus, where deterministic, Service and originating Deal so ANAM can compare sold/awarded value with billable/invoiced actuals. Customer Tickets separately cover Service follow-up, Billing inquiries and Quality cases.
 - `tipo_de_ingreso` remains single-select and its legacy `Down-sell` option stays hidden: contraction is a Retention movement on comparable Services, not an income type, churn or an award below quote.
+- For Service portfolio reporting use line-item TCV in original currency. For Retention compare ARR only inside a reviewed recurring/renewable cohort. Never collapse these into one “comparable awarded value.”
+- Blank line-item billing frequency is unknown, not proof of one-time revenue. Billing cadence is not delivery/service frequency; Deal-level service date/frequency fields are review hints, not automatic line-item truth.
+- Smart properties are credit-consuming AI evidence, never ANAM identity, money, lifecycle, renewal eligibility, churn or health-state truth. Current official eligibility does not list native Service, so Service support must be proven rather than assumed.
 - GRR/NRR remain blocked until Service has comparable recurring values, currency, periodicity, start/end dates and a complete renewable cohort.
 - ANAM delivery is commercial-first: close Company/Contact -> Lead -> Deal/line items -> Service -> renewal and the Data Quality/Growth/Retention/Loyalty dashboards before expanding Ticket, billing sync and operational dashboards.
 

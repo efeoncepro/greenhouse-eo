@@ -19,6 +19,11 @@
   Operación mensual propuesta: SharePoint full-snapshot -> ETL controlado -> Billing Event upsert/readback, con
   target Microsoft Graph/List incremental. El ETL no crea Services desde filas billing. Canon:
   `docs/architecture/kortex/hubspot-as-a-service/anam-monthly-billing-etl-operating-model-2026-07-16.md`.
+  Fase 3 avanza panel-first y forward-only: backfill histórico sigue `NO-GO`; Portafolio usa line-item TCV por
+  moneda y Retention usa ARR sólo en una cohorte recurrente/renovable revisada. Ganar el Deal propone Service en
+  `New`, pero la activación requiere confirmación humana. La skill distingue storage/field type de calculation,
+  rollup, sync, score y smart fill; una smart property es evidencia AI con créditos, nunca verdad contractual.
+  Canon: `anam-phase-3-forward-service-capture-contract-2026-07-16.md` bajo el índice anterior.
 
 - **HubSpot Solutions Partner / narrativa agéntica sincronizada (2026-07-16):** las skills espejo
   `.codex/.claude/skills/hubspot-solutions-partner` documentan cómo se vende HubSpot en la etapa Agentic

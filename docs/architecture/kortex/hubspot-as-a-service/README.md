@@ -92,8 +92,9 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Phase 1 commercial reporting foundation: [`anam-phase-1-commercial-reporting-foundation-2026-07-16.md`](anam-phase-1-commercial-reporting-foundation-2026-07-16.md)
 - Phase 1 outcome reporting execution: [`anam-phase-1-outcome-reporting-change-set-2026-07-16.md`](anam-phase-1-outcome-reporting-change-set-2026-07-16.md)
 - Product OAuth diagnosis and Kortex runtime drift: [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-product-oauth-diagnosis-2026-07-16.md)
-- Approval-ready Service schema and migration contract: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md)
+- Reconciled proposed Service schema and migration contract: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md)
 - Phase 3 panel contracts, live Service readiness and no-write verdict: [`anam-phase-3-panel-first-service-readiness-2026-07-16.md`](anam-phase-3-panel-first-service-readiness-2026-07-16.md)
+- Phase 3 governed forward capture, TCV/ARR and property-mechanism contract: [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md)
 - Final scoped QA verdict: [`../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md`](../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 
 The Service artifact is a proposed technical contract, not a live capability. Its functional documentation and operator manuals are intentionally deferred until the proposal is accepted and executed. No new ADR is indexed for this package because native Service grain/ownership was already established by the canonical reconciliation.

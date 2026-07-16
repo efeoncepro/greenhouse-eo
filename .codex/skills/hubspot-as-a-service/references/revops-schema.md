@@ -34,11 +34,13 @@ Do not start with dashboard widgets or property creation.
 ## Execution rules
 
 - Inventory existing schemas first through HubSpot APIs/Agent CLI.
+- Separate storage type, field type, population mechanism and governance. Use [property-types.md](property-types.md) before choosing calculation, rollup, sync, score or smart properties.
 - Prefer standard properties and extend mappings before creating custom fields.
 - Prepare a dry-run/change set and obtain approval.
 - Create schema before backfill; verify internal names and option values by read-back.
 - Activate workflows only after test records pass positive and negative paths.
 - Record deprecated fields; do not delete fields with unknown consumers.
+- Prefer association -> sync/rollup -> same-record calculation -> irreducible custom fact -> workflow write. Smart properties are advisory evidence, not a repair for missing deterministic data.
 
 ## Calculated-property execution contract
 
