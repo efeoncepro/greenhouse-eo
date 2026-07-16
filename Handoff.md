@@ -1,3 +1,14 @@
+## Sesión 2026-07-16 — TASK-1422 Vacancy AI Draft UI (Claude, in-progress)
+
+> **Task creada y tomada:** UI del propose→confirm de TASK-1385 en el Publication Desk
+> (`/agency/hiring/publication`). Diseño completo con skills product-design (greenhouse-ux +
+> state-design + forms-ux + motion-design overlays + ux-writing): wireframe
+> `docs/ui/wireframes/TASK-1422-vacancy-ai-draft-drawer.md` + flow (extiende nodo N-publish del
+> master EPIC-011) + motion (reuso `ghHiring*`) — gates task:lint/ui:*-check 0/0. Patrón: CTA
+> `✨ Redactar con IA` en la columna pública del diff (ready/locked/pending) → drawer route-local
+> espejo de "Nueva demanda" → template opcional → proposing honesto → form editable → confirm
+> humano. Estándar de calidad: GVC en LOOP (capturar→mirar→ajustar) desktop+mobile+reduced-motion.
+
 ## Sesión 2026-07-16 — TASK-1385 AI-Assisted Vacancy Public Copy (Claude) — COMPLETE en develop local (sin push)
 
 > **Qué se implementó (3 slices, commits en develop local):** extensión del patrón propose→confirm
@@ -38186,3 +38197,11 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 - Por línea: M&A 23 / CLF 975,09; D&CO 3 / CLF 1.232,00; FIC 3 / CLF 236,80. Por proceso: Venta Directa 27 / CLF 1.943,89; Licitación 2 / CLF 500,00. No hay vacíos en estas dos dimensiones dentro de la cohorte.
 - Cuatro Deals Growth están en el pipeline de Retention y 25 en Growth. Esto confirma que pipeline no prueba tipo de ingreso; el mismatch se trata como calidad de datos separada y no como autorización para reescribir registros.
 - Quedan definidos dos charts comparativos: Growth por línea de negocio y Growth por proceso comercial, ambos de trimestre actual. Si HubSpot no permite mostrar count y amount sin ambigüedad, se separarán; un agregado unitario debe ser scorecard.
+
+### Addendum — gramática visual de informes ANAM
+
+- Se amplió el criterio de dashboard: el editor estándar ofrece barras horizontales/verticales, línea, área, donut, pie, resumen, gauge y tabla; el constructor personalizado añade combinación, pivot, scatter y KPI según fuente/licencia. No se diseñará P1.3 como una sucesión de barras y scorecards.
+- Regla por pregunta: KPI para pulso y comparación; gauge sólo contra meta; línea para tendencia; área apilada para contribución al total; donut para composición de pocas categorías; columnas para comparación corta; combinación para count+amount en el tiempo; pivot/table para diagnóstico; scatter sólo con dos medidas confiables.
+- P1.3 queda recompuesto en capas: pulso ejecutivo, drivers/tendencias y acción/diagnóstico. Próximos assets: KPI Growth, donut por tipo, columnas de valor por línea, proceso comercial apilado por mes, combinación count+amount y pivot responsable x línea.
+- No se repetirá una métrica en barra/pie/donut para aparentar variedad. Cada visual debe aportar una decisión, denominador o drill-down distinto.
+- Calidad de Datos se enriquecerá con gauges de completitud hacia 100% y una tabla transversal de denominador/poblados/faltantes/tasa; las barras permanecen como colas por owner. No usar donut de errores por campo porque las brechas pueden solaparse. La cohorte Q1-Q2 está 337/419 poblada (80,43%), pero esto es población, no validación humana.
