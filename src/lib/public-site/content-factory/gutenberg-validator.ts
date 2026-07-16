@@ -30,6 +30,7 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   'core/embed',
   'core/gallery',
   'core/group',
+  'core/details',
   'core/heading',
   'core/image',
   'core/list',
@@ -49,7 +50,15 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
   description:
     'Efeonce blog posts should be generated as structured Gutenberg editorial pieces, not plain paragraph dumps.',
   requiredBlocks: ['core/heading', 'core/paragraph', 'core/list', 'yoast-seo/table-of-contents'],
-  recommendedBlocks: ['core/quote', 'core/pullquote', 'core/separator', 'core/table', 'core/image', 'core/embed'],
+  recommendedBlocks: [
+    'core/quote',
+    'core/pullquote',
+    'core/details',
+    'core/separator',
+    'core/table',
+    'core/image',
+    'core/embed'
+  ],
   tableOfContentsBlock: 'yoast-seo/table-of-contents',
   minHeadingCount: 3,
   minLevel2HeadingCount: 2,
@@ -61,6 +70,7 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
     'core/list',
     'core/quote',
     'core/pullquote',
+    'core/details',
     'core/separator',
     'core/table',
     'core/image',
@@ -431,6 +441,69 @@ const validateTableOfContentsIntegrity = (
   }
 }
 
+const findMatchingClosingBlockIndex = (blocks: ParsedGutenbergBlockComment[], openingIndex: number) => {
+  const opening = blocks[openingIndex]
+  let depth = 0
+
+  for (let index = openingIndex; index < blocks.length; index += 1) {
+    const block = blocks[index]
+
+    if (block.blockName !== opening.blockName) continue
+    if (!block.closing) depth += 1
+    if (block.closing) depth -= 1
+    if (depth === 0) return index
+  }
+
+  return -1
+}
+
+const validateDetailsBlocks = (
+  postContent: string,
+  blocks: ParsedGutenbergBlockComment[],
+  findings: ContentFactoryValidationFinding[]
+) => {
+  for (const [blockIndex, block] of blocks.entries()) {
+    if (block.closing || block.blockName !== 'core/details') continue
+
+    const closingIndex = findMatchingClosingBlockIndex(blocks, blockIndex)
+    const blockEnd = closingIndex >= 0 ? blocks[closingIndex + 1]?.index ?? postContent.length : postContent.length
+    const blockSlice = postContent.slice(block.index, blockEnd)
+    const summary = blockSlice.match(/<summary\b[^>]*>([\s\S]*?)<\/summary>/i)?.[1] ?? ''
+
+    if (!stripHtml(summary).trim()) {
+      findings.push({
+        severity: 'block',
+        code: 'details_summary_missing',
+        message: 'core/details blocks need a visible summary label.',
+        path: `draft.postContent[${block.index}]`
+      })
+    }
+
+    if (closingIndex >= 0) {
+      const childBlocks = blocks.slice(blockIndex + 1, closingIndex).filter(child => !child.closing)
+
+      if (childBlocks.length === 0) {
+        findings.push({
+          severity: 'block',
+          code: 'details_content_missing',
+          message: 'core/details blocks need at least one governed child block.',
+          path: `draft.postContent[${block.index}]`
+        })
+      }
+
+      if (childBlocks.some(child => child.blockName === 'core/heading')) {
+        findings.push({
+          severity: 'warning',
+          code: 'details_heading_inside_disclosure',
+          message:
+            'Avoid heading blocks inside core/details unless the TOC/outline decision explicitly owns hidden headings.',
+          path: `draft.postContent[${block.index}]`
+        })
+      }
+    }
+  }
+}
+
 export const validateGeneratedGutenbergDraft = (
   draft: ContentFactoryGeneratedDraft,
   options: GutenbergDraftValidationOptions = {}
@@ -534,6 +607,7 @@ export const validateGeneratedGutenbergDraft = (
   }
 
   validateTableOfContentsIntegrity(postContent, blocks, findings)
+  validateDetailsBlocks(postContent, blocks, findings)
 
   if (postContent.length < 600) {
     findings.push({

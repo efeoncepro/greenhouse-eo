@@ -201,6 +201,51 @@ describe('authorGutenbergDraft', () => {
     expect(validation.status).toBe('pass')
   })
 
+  it('renders native details disclosures for compact editorial FAQs without adding hidden TOC headings', () => {
+    const withDetails = authorGutenbergDraft({
+      ...kungFuSpec,
+      sections: [
+        {
+          heading: 'Preguntas frecuentes',
+          level: 2,
+          blocks: [
+            {
+              kind: 'paragraph',
+              text: 'Preguntas que conviene resolver sin alargar el recorrido principal.'
+            },
+            {
+              kind: 'details',
+              summary: '¿Un Creative Workflow reemplaza a los creativos?',
+              blocks: [
+                {
+                  kind: 'paragraph',
+                  text: [
+                    { text: 'No debería.', strong: true },
+                    { text: ' La intención, el descarte significativo y la aprobación necesitan autoridad humana.' }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        ...kungFuSpec.sections
+      ]
+    })
+
+    const postContent = withDetails.draft.kind === 'gutenberg_post' ? withDetails.draft.postContent : ''
+    const validation = validateGeneratedGutenbergDraft(withDetails)
+
+    expect(postContent).toContain('<!-- wp:details {"summary":"¿Un Creative Workflow reemplaza a los creativos?"} -->')
+    expect(postContent).toContain(
+      '<details class="wp-block-details"><summary>¿Un Creative Workflow reemplaza a los creativos?</summary>'
+    )
+    expect(postContent).toContain('<p><strong>No debería.</strong> La intención')
+    expect(postContent).toContain('<a href="#h-preguntas-frecuentes" data-level="2">Preguntas frecuentes</a>')
+    expect(postContent).not.toContain('href="#h-un-creative-workflow-reemplaza-a-los-creativos"')
+    expect(withDetails.draft.kind === 'gutenberg_post' && withDetails.draft.observedBlocks).toContain('core/details')
+    expect(validation.status).toBe('pass')
+  })
+
   it('rejects malformed tables before Gutenberg markup is assembled', () => {
     expect(() =>
       authorGutenbergDraft({
@@ -220,6 +265,34 @@ describe('authorGutenbergDraft', () => {
         ]
       })
     ).toThrow('content_factory_article_table_column_count_mismatch')
+  })
+
+  it('rejects malformed details disclosures before Gutenberg markup is assembled', () => {
+    expect(() =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [
+          {
+            heading: 'FAQ incompleta',
+            level: 2,
+            blocks: [{ kind: 'details', summary: '', blocks: [{ kind: 'paragraph', text: 'Respuesta.' }] }]
+          }
+        ]
+      })
+    ).toThrow('content_factory_article_details_summary_required')
+
+    expect(() =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [
+          {
+            heading: 'FAQ incompleta',
+            level: 2,
+            blocks: [{ kind: 'details', summary: 'Pregunta sin respuesta', blocks: [] }]
+          }
+        ]
+      })
+    ).toThrow('content_factory_article_details_blocks_required')
   })
 
   it('renders safe inline links without opening a raw HTML escape hatch', () => {

@@ -1,3 +1,17 @@
+## Sesión 2026-07-15 — Creative Workflows: FAQ disclosure V6 dry-run, sin write live (Codex)
+
+> **Pedido:** convertir la sección `Preguntas frecuentes` de la Pillar Creative Workflows en una experiencia tipo accordion/disclosure porque cuatro `H3 + párrafo` alargaban la lectura y contaminaban el TOC. El operador pidió investigar reuse antes de crear, preservar SEO/Yoast/schema/TOC/accesibilidad y detenerse antes de publicar sin autorización explícita.
+>
+> **Diagnóstico runtime:** preflight `pnpm public-website:ssh-check` PASS tras cargar el perfil local gitignored `.env.public-website.local`; WordPress `7.0.1`, theme `Ohio-Child`, plugins activos incluyen Yoast SEO Premium, Essential Blocks y Efeonce Editorial Blocks. El registry Gutenberg ya ofrece `core/details`, `core/accordion`, `essential-blocks/accordion` y `yoast/faq-block`; el post live `251363` conserva `publish`, canonical implícito, robots `index, follow`, featured/OG `251370` y sin FAQPage schema.
+>
+> **Decisión:** usar `core/details` gobernado por Content Factory para cuatro disclosures independientes: pregunta visible como `<summary>`, respuesta completa en HTML y sin JS extra. `core/accordion` queda descartado para este caso por ser más pesado y porque la apertura exclusiva no aporta valor editorial; `yoast/faq-block` se reserva para una decisión SEO explícita de `FAQPage`; Essential Blocks no se usa para evitar dependencia visual/plugin innecesaria. El TOC se simplifica a `Preguntas frecuentes` como H2; las cuatro preguntas dejan de ser headings/anchors.
+>
+> **Entregado local:** Content Factory suma `kind="details"` en authoring, allowlist/validator, pattern catalog, capability registry y tests. Nueva spec `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V6.json` transforma sólo la FAQ; decisión en `docs/public-site/CREATIVE_WORKFLOWS_FAQ_DISCLOSURE_DECISION_V1.md`; recetas y skills WordPress Codex/Claude documentan la primitive reusable.
+>
+> **Evidencia:** `public-website:content-factory:run` sobre V6 PASS dry (`114` bloques, cero findings, `core/details`, 17 headings); `content-factory:validate` del draft PASS; render remoto `do_blocks()` PASS con `detailsCount=4`, `summaryCount=4`, `accordionCount=0`, sin anchors H3 de preguntas en TOC ni scripts inseguros. Vitest Content Factory `73/73`, focal `29/29`, `pnpm typecheck`, `git diff --check` y `pnpm ops:lint --changed` PASS.
+>
+> **Pendiente:** no se modificó producción. Si el operador autoriza el write live, ejecutar snapshot del post, preparar rollback fail-closed, aplicar V6 por el rail gobernado, readback, purge cache Kinsta y QA anónima desktop `1440x1000` + mobile `390x844` validando overflow, `<details>/<summary>`, TOC, canonical/robots/OG/Yoast y contenido visible.
+
 ## Sesión 2026-07-15 — Creative Workflows: corrección visual V3 de diagramas (Codex)
 
 > **Hallazgo humano:** la revisión posterior invalidó el `PASS` de los diagramas V2. En frontera de decisión, la línea lima atravesaba copy/listas, la tarjeta central invadía el cierre y `¿Q` colisionaba visualmente. En autonomía, la diagonal ocultaba `01`, atravesaba tarjetas y el label vertical de evidencia quedaba recortado.

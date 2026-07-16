@@ -39,6 +39,11 @@ describe('getEfeonceGutenbergBlockCapabilityRegistry', () => {
           semanticOperations: ['refresh_editorial_pullquote']
         }),
         expect.objectContaining({
+          blockName: 'core/details',
+          semanticKind: 'editorial_disclosure',
+          semanticOperations: ['refresh_disclosure']
+        }),
+        expect.objectContaining({
           blockName: 'yoast-seo/table-of-contents',
           freedomLevel: 'preserve_only'
         }),
@@ -79,7 +84,12 @@ describe('getEfeonceGutenbergBlockCapabilityRegistry', () => {
 
   it('lists semantic operations for future API/MCP adapters', () => {
     expect(listGutenbergSemanticOperations()).toEqual(
-      expect.arrayContaining(['refresh_editorial_pullquote', 'preserve_or_regenerate_toc', 'review_image_asset'])
+      expect.arrayContaining([
+        'refresh_disclosure',
+        'refresh_editorial_pullquote',
+        'preserve_or_regenerate_toc',
+        'review_image_asset'
+      ])
     )
   })
 })

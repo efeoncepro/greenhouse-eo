@@ -20,6 +20,16 @@ const listExample = [
   '<!-- /wp:list -->'
 ].join('\n')
 
+const detailsExample = [
+  '<!-- wp:details {"summary":"¿Qué decide una persona?"} -->',
+  '<details class="wp-block-details"><summary>¿Qué decide una persona?</summary>',
+  '<!-- wp:paragraph -->',
+  '<p>La persona conserva intención, criterio, excepciones y aprobación final.</p>',
+  '<!-- /wp:paragraph -->',
+  '</details>',
+  '<!-- /wp:details -->'
+].join('\n')
+
 const quoteExample = [
   '<!-- wp:quote -->',
   '<blockquote class="wp-block-quote"><p>La AI aporta valor cuando trabaja con contexto, restricciones y evidencia.</p></blockquote>',
@@ -100,6 +110,20 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
     refreshPolicy: 'patch_carefully',
     description: 'Nested list item parsed by WordPress inside core/list in recent posts.',
     constraints: ['Usually generated implicitly by core/list markup.', 'Keep item text concise and semantically related.']
+  },
+  {
+    blockName: 'core/details',
+    role: 'disclosure',
+    generationPolicy: 'allowed',
+    refreshPolicy: 'patch_carefully',
+    description:
+      'Native disclosure block for compact FAQs or optional editorial detail when the answer should remain in the HTML without custom JavaScript.',
+    constraints: [
+      'Use for local question/answer or optional detail inside a section, not as a replacement for major H2/H3 article structure.',
+      'Keep the summary visible, specific and concise.',
+      'Do not put heading blocks inside the disclosure unless the TOC/outline decision explicitly owns that navigation change.'
+    ],
+    example: detailsExample
   },
   {
     blockName: 'core/quote',
@@ -249,7 +273,8 @@ export const getEfeonceGutenbergBlockPatternCatalog = (
   source: {
     recipePath: 'docs/documentation/public-site/gutenberg-post-authoring-recipes.md',
     validatorProfile: 'EFEONCE_BLOGPOST_COMPOSITION_PROFILE',
-    observedRuntimeSample: 'WP-CLI read-only sample of six latest published efeoncepro.com posts on 2026-06-14'
+    observedRuntimeSample:
+      'WP-CLI read-only sample of six latest published efeoncepro.com posts on 2026-06-14 plus Creative Workflows FAQ block registry inspection on 2026-07-15'
   },
   entries: EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES
 })

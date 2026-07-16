@@ -88,6 +88,30 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     exampleIntent: 'Make this item more concrete for a marketing operator.'
   },
   {
+    blockName: 'core/details',
+    semanticKind: 'editorial_disclosure',
+    agentRole: 'Native disclosure for compact FAQs or optional editorial detail inside a section.',
+    freedomLevel: 'guided',
+    editableSurfaces: ['text', 'children', 'attrs'],
+    semanticOperations: ['refresh_disclosure'],
+    compilesTo: ['preserve', 'update_text', 'update_attrs'],
+    requiredEvidence: [...baseEvidence, 'heading_outline'],
+    applyPolicy: draftOnlyPolicy(
+      'Disclosure changes require draft/private preview because they can alter visible reading rhythm and TOC expectations.'
+    ),
+    previewPolicy: previewRequired(
+      'Summary is visible, keyboard-focusable and specific.',
+      'Expanded content remains readable on desktop and mobile.',
+      'TOC decision is reviewed if headings are moved into or out of disclosures.'
+    ),
+    guardrails: [
+      'Use native core/details before custom accordion HTML for simple FAQs.',
+      'Do not hide critical content that must be read in sequence.',
+      'Do not put heading blocks inside details unless a reviewed outline/TOC decision owns it.'
+    ],
+    exampleIntent: 'Convert four FAQ H3s into native disclosure items under one FAQ H2.'
+  },
+  {
     blockName: 'core/quote',
     semanticKind: 'editorial_quote',
     agentRole: 'Editorial principle or point-of-view quote inside the article flow.',
@@ -299,7 +323,7 @@ export const getEfeonceGutenbergBlockCapabilityRegistry = (
     deepInspectionContract: 'contentFactoryPostDeepInspection.v1',
     refreshPlanContract: 'contentFactoryRefreshPlan.v1',
     observedRuntimeSample:
-      'WP-CLI read-only samples of recent efeoncepro.com posts plus guided inspection of post 248398 on 2026-06-14'
+      'WP-CLI read-only samples of recent efeoncepro.com posts, guided inspection of post 248398 on 2026-06-14, and Creative Workflows FAQ block registry inspection on 2026-07-15'
   },
   entries: EFEONCE_GUTENBERG_BLOCK_CAPABILITIES
 })

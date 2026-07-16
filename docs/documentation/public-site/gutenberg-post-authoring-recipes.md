@@ -22,6 +22,15 @@ render is owned by Ohio parent templates plus `global_blog_*` options. When a
 new or refreshed article is meant to support the content hub, review category,
 tags, featured image, excerpt and search/archive impact before publishing.
 
+Runtime note 2026-07-15: the live WordPress runtime for `efeoncepro.com` registers
+both `core/details` and `core/accordion` alongside `yoast/faq-block`. For compact
+editorial FAQs inside a long article, prefer `core/details` first: it saves native
+`<details><summary>` HTML, keeps the complete answer in the document, needs no
+custom JavaScript and lets the global TOC point to the parent FAQ H2 instead of
+inflating the outline with every question. Use `core/accordion` only when the
+interaction specifically needs a grouped accordion pattern, keyboard roving or
+exclusive/open-state behavior that native independent disclosures do not cover.
+
 | Example post                       | Observed structure                                                                                                                                                                               |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `249766` Glitch #02                | 81 parsed blocks, H2 intro, H3 numbered sections, 8 images, separators, many legacy `core/freeform` fragments.                                                                                   |
@@ -82,6 +91,9 @@ Recommended enrichment:
   or temporary POV fallback when no custom block is available.
 - `core/pullquote` for a short, high-signal editorial callout when the source
   post already uses highlighted claims or stats.
+- `core/details` for compact FAQ/disclosure moments inside a section when the
+  summary must remain visible and the full answer should stay in HTML without a
+  custom block.
 - `core/separator` to separate CTA/final reflection from the body.
 - `core/image`, `core/gallery` or `core/embed` only after resolving real
   WordPress media or a valid embed source from the brief/source material.
@@ -182,6 +194,30 @@ Use lists for TL;DR, checklists, steps, tradeoffs and evidence.
 </ul>
 <!-- /wp:list -->
 ```
+
+### Details / FAQ disclosures
+
+Use native `core/details` for compact question/answer or optional-detail moments
+inside a section. The block is not a replacement for major article structure:
+keep the section H2 as the navigable TOC destination, then put each question in
+the `<summary>`. Do not place hidden heading blocks inside the disclosure unless
+a reviewed outline/TOC decision owns that change.
+
+```html
+<!-- wp:details {"summary":"¿Qué decide una persona?"} -->
+<details class="wp-block-details">
+  <summary>¿Qué decide una persona?</summary>
+  <!-- wp:paragraph -->
+  <p>La persona conserva intención, criterio, excepciones y aprobación final.</p>
+  <!-- /wp:paragraph -->
+</details>
+<!-- /wp:details -->
+```
+
+`core/details` differs from `core/accordion`: the former is native disclosure
+HTML with independent open/close behavior; the latter is a grouped interactive
+block powered by WordPress' Interactivity API. Prefer the lighter primitive
+unless the editorial job requires the grouped behavior.
 
 ### Quotes
 

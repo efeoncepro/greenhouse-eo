@@ -105,6 +105,7 @@ export type GutenbergBlockPatternCatalogEntry = {
   role:
     | 'structure'
     | 'body'
+    | 'disclosure'
     | 'navigation'
     | 'media'
     | 'conversion'
@@ -135,6 +136,7 @@ export type GutenbergBlockSemanticKind =
   | 'editorial_body'
   | 'editorial_heading'
   | 'editorial_list'
+  | 'editorial_disclosure'
   | 'editorial_quote'
   | 'editorial_pullquote'
   | 'navigation_toc'
@@ -152,6 +154,7 @@ export type GutenbergBlockSemanticOperation =
   | 'rewrite_heading'
   | 'adjust_heading_level'
   | 'refresh_list_items'
+  | 'refresh_disclosure'
   | 'refresh_editorial_quote'
   | 'refresh_editorial_pullquote'
   | 'preserve_or_regenerate_toc'

@@ -35,6 +35,7 @@ export type GutenbergRichText = string | GutenbergRichTextSegment[]
 export type GutenbergArticleBlock =
   | { kind: 'paragraph'; text: GutenbergRichText }
   | { kind: 'list'; items: GutenbergRichText[]; ordered?: boolean }
+  | { kind: 'details'; summary: string; blocks: GutenbergArticleBlock[]; open?: boolean }
   | {
       kind: 'table'
       headers: GutenbergRichText[]
@@ -150,6 +151,28 @@ const tableBlock = (block: Extract<GutenbergArticleBlock, { kind: 'table' }>): s
   ].join('\n')
 }
 
+const detailsBlock = (block: Extract<GutenbergArticleBlock, { kind: 'details' }>): string => {
+  if (!block.summary.trim()) {
+    throw new Error('content_factory_article_details_summary_required')
+  }
+
+  if (block.blocks.length === 0) {
+    throw new Error('content_factory_article_details_blocks_required')
+  }
+
+  const attrs = block.open ? { summary: block.summary, showContent: true } : { summary: block.summary }
+  const open = block.open ? ' open' : ''
+  const children = block.blocks.map(child => renderArticleBlock(child)).join('\n')
+
+  return [
+    `<!-- wp:details ${JSON.stringify(attrs)} -->`,
+    `<details class="wp-block-details"${open}><summary>${escapeGutenbergHtml(block.summary)}</summary>`,
+    children,
+    '</details>',
+    '<!-- /wp:details -->'
+  ].join('\n')
+}
+
 const quoteBlock = (text: string): string =>
   [
     '<!-- wp:quote -->',
@@ -205,6 +228,8 @@ const renderArticleBlock = (block: GutenbergArticleBlock): string => {
       return paragraphBlock(block.text)
     case 'list':
       return listBlock(block.items, block.ordered)
+    case 'details':
+      return detailsBlock(block)
     case 'table':
       return tableBlock(block)
     case 'quote':

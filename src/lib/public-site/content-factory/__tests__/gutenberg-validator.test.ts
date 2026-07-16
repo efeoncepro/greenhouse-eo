@@ -167,6 +167,75 @@ describe('validateGeneratedGutenbergDraft', () => {
     )
   })
 
+  it('allows governed native details blocks when they include summary and child content', () => {
+    const base = buildDraft()
+    const postContent = base.draft.kind === 'gutenberg_post' ? base.draft.postContent : ''
+
+    const validation = validateGeneratedGutenbergDraft(
+      buildDraft({
+        draft: {
+          kind: 'gutenberg_post',
+          observedBlocks: [
+            'core/details',
+            'core/heading',
+            'core/list',
+            'core/paragraph',
+            'core/quote',
+            'yoast-seo/table-of-contents'
+          ],
+          postContent: [
+            postContent,
+            '<!-- wp:details {"summary":"¿Qué queda visible?"} -->',
+            '<details class="wp-block-details"><summary>¿Qué queda visible?</summary>',
+            '<!-- wp:paragraph -->',
+            '<p>La respuesta completa queda en HTML y se despliega con controles nativos.</p>',
+            '<!-- /wp:paragraph -->',
+            '</details>',
+            '<!-- /wp:details -->'
+          ].join('\n')
+        }
+      })
+    )
+
+    expect(validation.status).toBe('pass')
+    expect(validation.summary?.uniqueBlocks).toContain('core/details')
+  })
+
+  it('blocks details disclosures without a visible summary or child block', () => {
+    const base = buildDraft()
+    const postContent = base.draft.kind === 'gutenberg_post' ? base.draft.postContent : ''
+
+    const validation = validateGeneratedGutenbergDraft(
+      buildDraft({
+        draft: {
+          kind: 'gutenberg_post',
+          observedBlocks: [
+            'core/details',
+            'core/heading',
+            'core/list',
+            'core/paragraph',
+            'core/quote',
+            'yoast-seo/table-of-contents'
+          ],
+          postContent: [
+            postContent,
+            '<!-- wp:details {"summary":""} -->',
+            '<details class="wp-block-details"><summary></summary></details>',
+            '<!-- /wp:details -->'
+          ].join('\n')
+        }
+      })
+    )
+
+    expect(validation.status).toBe('block')
+    expect(validation.findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'details_summary_missing', severity: 'block' }),
+        expect.objectContaining({ code: 'details_content_missing', severity: 'block' })
+      ])
+    )
+  })
+
   it('blocks unsafe markup', () => {
     const validation = validateGeneratedGutenbergDraft(
       buildDraft({

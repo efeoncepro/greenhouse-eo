@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-07-15 — Creative Workflows FAQ: disclosures Gutenberg en seco
+
+- Se investigó el runtime real del post `251363`: WordPress/Ohio ya registra `core/details`, `core/accordion`, Essential Blocks accordion y Yoast FAQ. Para la FAQ editorial de Creative Workflows se decide reutilizar `core/details`, sin custom block ni JS adicional.
+- Content Factory incorpora `kind=details` como capacidad reusable con renderer, allowlist, validator, pattern catalog, capability registry, tests y documentación en skills/recetas.
+- Nueva spec local V6 convierte las cuatro preguntas de `H3 + párrafo` en disclosures bajo el H2 `Preguntas frecuentes`, preserva respuestas completas en HTML y deja el TOC limpio. Dry-run, validate y render remoto PASS; no se escribió producción ni se publicó nada.
+
 ## 2026-07-15 — Creative Workflows: diagramas V3 corregidos en producción
 
 - Se reemplazan los dos diagramas V2 después de que una revisión humana detectara cruces de conectores sobre copy/listas, un ordinal oculto, un label recortado, una tarjeta sobre el cierre y una colisión de puntuación que el QA anterior no capturó.
