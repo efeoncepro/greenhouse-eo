@@ -187,7 +187,10 @@ export const assertQuantifiedClaimsAreEvidenced = (framing: unknown, facts: Evid
   for (const leaf of collectStringLeaves(framing)) {
     const scannable = leaf.replace(URL_TOKEN, '')
 
-    for (const token of scannable.match(QUANTIFIED_TOKEN) ?? []) {
+    for (const rawToken of scannable.match(QUANTIFIED_TOKEN) ?? []) {
+      // La puntuación de la oración no es parte de la cifra ("y JetSMART 9." → "9").
+      const token = rawToken.replace(/[.,]+$/, '')
+
       if (!isEnforcedToken(token)) continue
 
       if (!factValues.some(value => value.includes(token))) {
