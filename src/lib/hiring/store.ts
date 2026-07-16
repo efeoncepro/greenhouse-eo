@@ -870,10 +870,13 @@ return opening
   })
 }
 
+// `externalClient` (TASK-1385): permite participar en la tx del caller (p.ej. el confirm del
+// ledger IA aplica el copy ATÓMICAMENTE con la marca de la propuesta). Default null = tx propia.
 export const updateHiringOpening = async (
   openingId: string,
   input: UpdateHiringOpeningInput,
   actorUserId: string | null,
+  externalClient: PoolClient | null = null,
 ): Promise<HiringOpening> => {
   const sets: string[] = []
   const values: unknown[] = []
@@ -928,13 +931,13 @@ export const updateHiringOpening = async (
     const existing = await getHiringOpeningById(openingId)
 
     if (!existing) throw new HiringNotFoundError('El opening no existe.', 'hiring_opening_not_found')
-    
+
 return existing
   }
 
   values.push(openingId)
-  
-return withGreenhousePostgresTransaction(async (client) => {
+
+  const execute = async (client: PoolClient): Promise<HiringOpening> => {
     const rows = await runQuery<HiringOpeningRow>(
       client,
       `UPDATE greenhouse_hiring.hiring_opening SET ${sets.join(', ')}
@@ -954,9 +957,11 @@ return withGreenhousePostgresTransaction(async (client) => {
       },
       client,
     )
-    
+
 return opening
-  })
+  }
+
+  return externalClient ? execute(externalClient) : withGreenhousePostgresTransaction(execute)
 }
 
 // ══════════════════════════════════════════════════════════════════════════
