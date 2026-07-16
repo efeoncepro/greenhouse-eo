@@ -3,7 +3,7 @@
 > **Date:** 2026-07-16
 > **Portal:** `19893546`
 > **Object:** native Service `0-162`
-> **Status:** Service property schema executed and read back; record/workflow/association writes not executed
+> **Status:** property schema, association labels and five-record controlled pilot executed/read back; workflows and bulk migration not executed
 > **Execution:** 2026-07-16 17:23 UTC
 
 > **2026-07-16 semantic correction:** the forward-capture evidence in [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md) supersedes the earlier single comparable-value and service-frequency model. TCV and ARR are separate facts, blank billing frequency is unknown, and billing cadence is not delivery frequency. Do not execute an older copy of this change set.
@@ -12,12 +12,12 @@
 
 One Service represents one awarded service component or contracted scope, normally derived from one Closed Won Deal line item. A Deal may therefore create several Services. Renewal creates a new Service linked to the prior Service; it never overwrites the historical Service.
 
-## Live baseline
+## Live baseline before schema/pilot execution
 
 - one sample-like Service: `Muestreo y Análisis de agua - nestlé`;
 - pipeline `ba9cdbd6-e220-45b2-a5a2-d67ebdcbade6` with stages New, In progress and Closed;
 - native Service -> Deal association type `794`, Service -> Company type `792`;
-- no Service self-association labels and no Service -> line item association labels;
+- no Service self-association labels and no Service -> line item association labels at the baseline cut;
 - legacy custom properties `fecha_de_vencimiento_del_contrato` and `monto_original`, both with zero coverage at the inventory cut.
 
 Native fields retained:
@@ -255,7 +255,7 @@ AND the panel-specific Service lifecycle-stage filter
 
 The calculated property was created only after all nine scalar properties passed readback. Its value remained `null` through the immediate four-read/~30-second window, then propagated naturally to `incomplete_core` on the sole sample-like Service. No record was touched to force recalculation.
 
-## Schema execution readback
+## Schema-only execution readback
 
 Execution through the approved Kortex portal-scoped runtime produced:
 
@@ -265,8 +265,8 @@ Execution through the approved Kortex portal-scoped runtime produced:
 | Scalar properties | 9 created; names, labels, group, types, field types, uniqueness and option values passed readback |
 | Calculated property | `anam_service_field_readiness` created; enumeration options and normalized formula passed semantic readback |
 | Calculated-property limits | 3 / 40 overall: Deal 2, Service 1 |
-| CRM record writes | 0 |
-| Workflow/association/report writes | 0 |
+| CRM record writes in the schema slice | 0 |
+| Workflow/association/report writes in the schema slice | 0 |
 | Existing Service value | naturally propagated to `incomplete_core`, as expected for missing core fields |
 
 Created timestamps range from `2026-07-16T17:23:15.159Z` to `2026-07-16T17:23:21.125Z`. `anam_service_external_key` is the only new unique property. All ten properties are in the dedicated native Service group and their visible labels are human-readable rather than `snake_case`.
@@ -367,4 +367,4 @@ After a separately approved migration:
 
 Rollback: property/label creation is reversible only before consumers and records depend on it. Record migration rollback must archive only IDs emitted by the execution ledger; it must never delete or mutate pre-existing Services.
 
-Executed schema approval did not approve migration writes, workflows, pipeline changes, association-label creation, archival of legacy properties or dashboard publication.
+The later controlled-pilot approval created the three paired label definitions and only the five records in [`anam-phase-3-forward-pilot-execution-2026-07-16.md`](anam-phase-3-forward-pilot-execution-2026-07-16.md). It did not approve bulk migration, workflows, pipeline changes, archival of legacy properties or dashboard publication.

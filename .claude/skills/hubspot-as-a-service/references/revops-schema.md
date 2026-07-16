@@ -41,6 +41,8 @@ Do not start with dashboard widgets or property creation.
 - Activate workflows only after test records pass positive and negative paths.
 - Record deprecated fields; do not delete fields with unknown consumers.
 - Prefer association -> sync/rollup -> same-record calculation -> irreducible custom fact -> workflow write. Smart properties are advisory evidence, not a repair for missing deterministic data.
+- Validate paired association labels directionally: read the forward object pair for `label` and the reversed pair for `inverseLabel`; one directional GET may not return both sides.
+- After create, do not treat an immediate CRM search miss as absence. Search indexing can lag while the unique constraint and direct object read are already authoritative; retry or use direct/list readback before any second create.
 
 ## Calculated-property execution contract
 

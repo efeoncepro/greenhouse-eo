@@ -46,7 +46,7 @@ Deal/Service/Company -> Billing Event
 - Deals: 1,240
 - Line items: 506; 501 associated to Deals
 - Quotes: 10; 8 drafts, 2 expired, 0 accepted, 0 with line items, only 2 associated to the same Deal
-- Services: 1 sample-like record
+- Services: 6 total — 5 controlled pilot records in `New` plus 1 excluded sample-like record
 - Tickets: 18
 - Invoices: 0
 - Custom object schemas: 0
@@ -99,9 +99,10 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 
 ## Executed Phase 3 property schema
 
-- Service: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md). Group `anam_service_contract` plus nine scalar and one calculated Service property were created/read back at 17:23 UTC. Calculated readiness propagated naturally to `incomplete_core` on the sample. No CRM records, workflows, association labels or reports were written.
+- Service: [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md). Group `anam_service_contract` plus nine scalar and one calculated Service property were created/read back at 17:23 UTC. Calculated readiness propagated naturally to `incomplete_core` on the sample.
 - Forward capture: [`anam-phase-3-forward-service-capture-contract-2026-07-16.md`](anam-phase-3-forward-service-capture-contract-2026-07-16.md). Separates the commercial award gate from human-confirmed Service activation, uses TCV for portfolio value and ARR only for reviewed recurring Retention comparisons, and keeps AI/smart properties out of authoritative controls.
-- Pilot simulation: [`anam-phase-3-forward-pilot-dry-run-2026-07-16.md`](anam-phase-3-forward-pilot-dry-run-2026-07-16.md). Five recent distinct-Company rows pass deterministic award projection and all fail activation; no historical Service record was created.
+- Pilot simulation: [`anam-phase-3-forward-pilot-dry-run-2026-07-16.md`](anam-phase-3-forward-pilot-dry-run-2026-07-16.md). Five recent distinct-Company rows passed deterministic award projection and all failed activation.
+- Controlled pilot execution: [`anam-phase-3-forward-pilot-execution-2026-07-16.md`](anam-phase-3-forward-pilot-execution-2026-07-16.md). With a separate operator approval, the exact five rows were created in `New`, each with one Company, one originating Deal, deterministic source lineage and preserved TCV/ARR. All five read back as `incomplete_core`; they are excluded from official KPIs. Paired Deal-role and Service-renewal association labels are live. No workflow, renewal record, bulk backfill or report was created.
 
 ## Current Phase 1 reporting state
 
@@ -124,16 +125,16 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 
 ## Next execution order
 
-1. Ratify the remaining operational decisions in the forward-capture contract: owner inheritance and named activation reviewer. TCV/ARR and blank-frequency semantics are already encoded in the executed schema contract.
-2. The five-row no-write simulation is complete. Wait for the next actual awarded line item, emit its exact dry-run payload and request approval for the first Service record.
-5. Confirm activation fields with the named ANAM operator; keep new awards in `New` until operational start is real.
-6. Publish Portfolio/Expiry first after coverage reconciles; Retention and Loyalty remain gated by a complete renewable cohort and ratified signals.
-7. Keep funnel reporting deferred until stage-entry/exit semantics are verified. Do not substitute current-stage counts for true conversion.
-8. Fix the durable Kortex authorization-URL scope drift through its own approved release; current ANAM Product read is already active and is not a Phase 3 blocker.
+1. Ask Maria Paz Haeger to review the five pilot Services: start/end dates, delivery status, revenue model, renewal eligibility/status and whether each should remain `New` or move to `In progress`.
+2. Read back the five after review. Only records with `anam_service_field_readiness=fields_ready` plus valid Company/originating-Deal gates may enter official panel cohorts.
+3. Build a draft Data Quality/activation panel first. Publish Portfolio/Expiry only after coverage and denominators reconcile; Retention and Loyalty remain gated by a complete renewable cohort and ratified signals.
+4. For the next actual award, reuse the deterministic create/readback contract and request approval before adding workflow automation. Do not treat this pilot as bulk-backfill authorization.
+5. Keep funnel reporting deferred until stage-entry/exit semantics are verified. Do not substitute current-stage counts for true conversion.
+6. Fix the durable Kortex authorization-URL scope drift through its own approved release; current ANAM Product read is already active and is not a Phase 3 blocker.
 
 ## Safety and repository state
 
-- No new CRM schema/record writes were performed in the final inventory cut.
+- Five authorized pilot Service records and three paired association-label definitions were written and read back. Their exact IDs and rollback boundary are in the execution ledger.
 - Greenhouse repo is dirty with intentional ANAM docs plus unrelated user work; do not revert unrelated changes.
 - Kortex repo has intentional uncommitted `TASK-0130`, manifest, changelog and handoff changes plus unrelated untracked `hubspot-cms-react-project/`; do not touch that unrelated folder.
 - The temporary Cloud SQL proxy was terminated.
@@ -141,4 +142,4 @@ Diagnosis completed in [`anam-product-oauth-diagnosis-2026-07-16.md`](anam-produ
 
 ## Recommended opening instruction
 
-Continue ANAM HubSpot from this handoff without restarting discovery. Phase 1 is complete and the Phase 3 Service property schema plus calculated propagation are live. Prepare the 3–5-line-item forward pilot as a no-write dry run. Do not create Service records, workflows, association labels, historical backfill or final panels without the next documented approval. Treat duplicate ANAM Company records as out-of-scope and do not correct or merge them.
+Continue ANAM HubSpot from this handoff without restarting discovery. Phase 1 is complete; the Phase 3 Service schema, association labels and five-record controlled pilot are live. All five pilot Services are `New` and `incomplete_core`. Coordinate the activation review with Maria Paz, then read back readiness before drafting the Data Quality/activation panel. Do not create workflows, bulk backfill, renewal records or final panels without the next documented approval. Treat duplicate ANAM Company records as out-of-scope and do not correct or merge them.

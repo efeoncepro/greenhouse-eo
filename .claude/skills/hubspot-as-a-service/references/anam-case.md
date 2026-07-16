@@ -59,6 +59,7 @@ Load the living data-model/synergies document before changing any ANAM object, p
 - Blank line-item billing frequency is unknown, not proof of one-time revenue. Billing cadence is not delivery/service frequency; Deal-level service date/frequency fields are review hints, not automatic line-item truth.
 - Smart properties are credit-consuming AI evidence, never ANAM identity, money, lifecycle, renewal eligibility, churn or health-state truth. Current official eligibility does not list native Service, so Service support must be proven rather than assumed.
 - GRR/NRR remain blocked until Service has comparable recurring values, currency, periodicity, start/end dates and a complete renewable cohort.
+- Five controlled pilot Services are live in `New` in portal `19893546`; all are `incomplete_core` and excluded from official KPIs until Maria Paz Haeger reviews activation facts. This is not authorization for historical backfill, workflows or final dashboards. Load `anam-phase-3-forward-pilot-execution-2026-07-16.md` for IDs and rollback.
 - ANAM delivery is commercial-first: close Company/Contact -> Lead -> Deal/line items -> Service -> renewal and the Data Quality/Growth/Retention/Loyalty dashboards before expanding Ticket, billing sync and operational dashboards.
 
 ## Landing and agent seam

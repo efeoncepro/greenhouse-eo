@@ -36,6 +36,14 @@
 
 ## 2026-07-16 — HubSpot as a Service: skill gestionada, QA ANAM y discovery RevOps
 
+- Con aprobación separada se ejecutó el piloto controlado de cinco native Services en el portal ANAM: Gasmar,
+  Hidrogistica, Härting, Golden Omega y McDonald's. Cada uno quedó en `New`, con Company única, Deal de origen,
+  source line item, owner heredado, CLF/TCV/ARR preservados y readiness `incomplete_core`; por ello siguen fuera
+  de KPIs oficiales. También quedaron live los pares `Negocio de origen/Servicio adjudicado`, `Negocio de
+  renovación/Servicio renovado` y `Renovado por/Renovación de`. No hubo workflows, backfill masivo ni reports.
+- El readback documentó dos guardrails reutilizables: una etiqueta pareada debe verificarse en ambas direcciones
+  y un search miss inmediato no prueba ausencia, porque el índice puede rezagarse mientras la unique constraint
+  ya está activa. Ledger y rollback: `anam-phase-3-forward-pilot-execution-2026-07-16.md`.
 - La Fase 3 queda reconciliada para captura forward: Portafolio usa TCV por moneda original, Retention usa ARR
   sólo en cohorte recurrente/renovable revisada, billing cadence no se confunde con delivery cadence y un award
   propone Service `New` sin declarar activación. Backfill histórico continúa `NO-GO`; esquema y primer piloto

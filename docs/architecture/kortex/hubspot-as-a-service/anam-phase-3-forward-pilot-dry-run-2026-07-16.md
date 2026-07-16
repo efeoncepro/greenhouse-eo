@@ -4,8 +4,10 @@
 > **Client:** ANAM, client of Efeonce
 > **Portal:** HubSpot `19893546`
 > **Mode:** live read-only simulation after Service property-schema execution
-> **Status:** award-gate simulation passed for five rows; activation gate failed for all five
-> **HubSpot record writes:** none
+> **Status:** superseded as execution input; the five rows were later approved as a controlled pilot
+> **HubSpot record writes in this dry-run step:** none
+
+> **Execution update:** the operator subsequently approved these exact five rows as a controlled incomplete pilot. Their creation/readback is recorded in [`anam-phase-3-forward-pilot-execution-2026-07-16.md`](anam-phase-3-forward-pilot-execution-2026-07-16.md). The dry-run evidence remains immutable; its original `NO-GO` applied before that separate approval.
 
 ## Purpose
 
@@ -84,4 +86,4 @@ If these rows were created exactly from available commercial evidence, `anam_ser
 2. Name the ANAM operator who reviews dates, revenue model, renewal eligibility/status and activation.
 3. Approve the first actual forward Service record after seeing its dry-run payload.
 
-No Company, Deal, line item, Service or other CRM record was created or updated by this dry run.
+No Company, Deal, line item, Service or other CRM record was created or updated by this dry-run operation. The later controlled execution was a separate authorized change.

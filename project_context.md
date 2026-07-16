@@ -27,9 +27,11 @@
   no valida asociaciones y ARR sólo es obligatorio para revenue model `recurring`/`mixed`.
   Schema live desde 2026-07-16 17:23 UTC: grupo Service `anam_service_contract` (`Contrato y renovación ANAM`),
   9 properties escalares + 1 calculada leídas de vuelta. La calculada propagó naturalmente a `incomplete_core`
-  sobre el Service sample. Cero records/workflows/associations/reports; el piloto forward requiere otra aprobación.
-  Simulación read-only de cinco adjudicaciones recientes pasó el award gate y falló activación por ausencia de
-  fechas/modelo/renovación/status; no autoriza backfill. Esperar un award real después de ratificar owner/reviewer.
+  sobre el Service sample. Con aprobación posterior se crearon tres pares de association labels y los cinco
+  Services del piloto controlado en `New`; cada uno tiene Company única, Deal de origen, key/source line item,
+  owner heredado y TCV/ARR preservados. Todos siguen `incomplete_core`, fuera de KPIs oficiales. Maria Paz Haeger
+  es reviewer de activación. No hubo workflows, bulk backfill ni panels; el ledger/rollback vive en
+  `anam-phase-3-forward-pilot-execution-2026-07-16.md`.
   Modelo current-state obligatorio antes de tocar objetos, properties, associations, workflows o panels:
   `docs/architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md`; este fija
   grain, fact ownership, proyecciones y sinergias, mientras los docs fechados conservan evidencia histórica.

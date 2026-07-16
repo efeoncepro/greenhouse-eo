@@ -53,7 +53,7 @@ The arrows express collaboration, not automatic copying. Every object keeps its 
 | Quote | One commercial offer/version | Quote number/version/status/expiry and quoted value | Awarded delivery truth | Native but historically under-adopted; prospective use only |
 | Product | One reusable catalog definition | Stable service/catalog identity and commercial classification | A customer's purchase, contract or delivery instance | Native; 22 Products available read-only |
 | Line item | One quoted or awarded component | Product reference, amount, TCV, ACV, ARR/MRR, currency, billing cadence and term evidence | Operational activation or customer identity | Native; source grain for proposed Service after award |
-| Service | One awarded contracted/delivery component | Contract identity, Company/Deal lineage, TCV/ARR projections, dates, owner, lifecycle, delivery status and renewal facts | Opportunity qualification, raw billing rows or AI-inferred truth | Native; dedicated ANAM group + 10 properties live; one sample-like record only |
+| Service | One awarded contracted/delivery component | Contract identity, Company/Deal lineage, TCV/ARR projections, dates, owner, lifecycle, delivery status and renewal facts | Opportunity qualification, raw billing rows or AI-inferred truth | Native; dedicated ANAM group + 10 properties live; five controlled pilot records plus one excluded sample-like record |
 | Ticket | One case requiring tracked human work | Category/subtype, priority, owner, SLA, resolution and related Service context | Contract, quotation component or billing-ledger event | Native; taxonomy/associations not yet governed |
 | Account Unit | One normalized ANAM/CeCo operational code under a Company | External unit identity and reviewed Company relationship | A duplicate Company unless business evidence proves a real account/branch | Proposed custom object; not live |
 | Billing Event | One immutable source billing-list row/event | Source key, state, amount/currency, period and invoice/EDP/OC/HES/LIMS references | Aggregated Company balance or customer Ticket | Proposed custom object; not live |
@@ -68,10 +68,10 @@ The arrows express collaboration, not automatic copying. Every object keeps its 
 | Contact / Company | Lead | Lead qualifies a person/account motion | Native association; qualification precedes Deal creation. |
 | Company | Deal | Exactly one distinct primary Company for Service materialization | Deduplicate association types by Company object ID. Different labels pointing to one ID are not multiple customers. |
 | Deal / Quote | Line item | One Deal/Quote may contain many components | Line item is the monetary/component grain; Product is its reusable definition. |
-| Deal | Service | One Deal may originate many Services | Use originating-Deal role; renewal Deal is a separate role. Association labels are designed but not yet created. |
+| Deal | Service | One Deal may originate many Services | Live paired roles: originating `Negocio de origen` / `Servicio adjudicado` and renewal `Negocio de renovación` / `Servicio renovado`; retain the standard unlabeled association. |
 | Company | Service | Exactly one distinct Company for production Service | Required creation/readback gate. |
 | Line item | Service | Logically one source line item per Service | HubSpot exposes no default association in this portal; preserve lineage with `anam_source_line_item_id` and deterministic external key. |
-| Service | Service | Prior Service to successor renewed Service | Proposed paired renewal-lineage label; do not overwrite prior Service. |
+| Service | Service | Prior Service to successor renewed Service | Paired `Renovado por` / `Renovación de` labels are live; no lineage records exist yet. Do not overwrite the prior Service. |
 | Service | Ticket | Zero to many cases | Required when the case concerns delivery/quality/billing of a specific Service. |
 | Company | Account Unit | One Company to many operational units | Proposed; relationship requires reviewed identity reconciliation. |
 | Account Unit | Billing Event | Exactly one Unit when normalized source code resolves | Proposed exact-code association. |
@@ -143,10 +143,11 @@ The source billing row becomes Billing Event, first linked by exact Account Unit
 | Product/line-item identity | Sufficient for current Service projection; full catalog cleanup deferred |
 | Service schema | Live: group `anam_service_contract` / `Contrato y renovación ANAM`, nine scalar + one calculated property |
 | Calculated readiness | Live and propagated; sample-like Service resolves to `incomplete_core` |
-| Forward award simulation | Five recent rows passed deterministic award projection; all failed activation; no Services created |
-| Production Service cohort | Not available; one sample-like record only |
+| Forward award simulation | Five rows passed deterministic award projection; later used as the separately approved controlled pilot |
+| Controlled Service pilot | Five Services live in `New`, each with one Company, one originating Deal and deterministic source lineage; all remain `incomplete_core` |
+| Production Service cohort | Not available; pilot records and the sample-like record are excluded until readiness and panel-specific gates pass |
 | Historical Service migration | `NO-GO` |
-| Renewal association labels/workflow | Designed, not executed |
+| Renewal association labels/workflow | Association labels live; workflow and renewal records not executed |
 | Ticket taxonomy/SLA | Proposed, not executed |
 | Account Unit / Billing Event | Proposed and gated; not live |
 | Final Portfolio/Retention/Loyalty panels | Blocked by real governed Service coverage |
@@ -162,4 +163,4 @@ When an object/property/association changes:
 5. record runtime state in `Handoff.md` and `changelog.md`;
 6. never rewrite a source of truth merely to satisfy a report.
 
-The next model delta must document the first real forward Service payload, its associations and resulting readiness before any workflow or dashboard publication.
+The next model delta must document ANAM's activation review and the first records that reach `fields_ready` before any official workflow or dashboard publication.

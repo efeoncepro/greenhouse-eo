@@ -110,8 +110,20 @@
 > del award gate y producirían keys determinísticas, pero fallan activación: no hay fechas, billing cadence,
 > revenue model revisado, renewal facts ni delivery status. ARR=0 y frequency blank se conservaron como evidencia,
 > no como inferencia one-time. No se crearon los cinco Services históricos. Canon:
-> `anam-phase-3-forward-pilot-dry-run-2026-07-16.md`. Siguiente gate: regla de owner + reviewer ANAM nombrado;
-> después esperar un award real y aprobar su primer payload individual.
+> `anam-phase-3-forward-pilot-dry-run-2026-07-16.md`. En ese corte, el siguiente gate era owner + reviewer y
+> aprobación individual; la ejecución controlada posterior queda registrada inmediatamente abajo.
+
+> **Forward pilot EJECUTADO — aprobación posterior y separada:** el operador aprobó usar esas cinco filas como
+> piloto controlado para preparar la capa de paneles. Se crearon Gasmar `571105526327`, Hidrogistica
+> `571100062843`, Härting `571115856266`, Golden Omega `571105038195` y McDonald's `571114173986` en native
+> Service stage `New`. Cada registro pasó readback de key/source line item, owner heredado, CLF/TCV/ARR, una
+> Company distinta y un Deal de origen con asociación estándar `794` + label `Negocio de origen` (`1`). Todos
+> calculan `incomplete_core`; fechas, delivery status y renewal status siguen vacíos, y revenue model/renewal
+> eligibility están `pending_review`. Pares live: origen `1/2`, renewal Deal `3/4`, Service lineage `5/6`.
+> Maria Paz Haeger (`166644139`) es reviewer de activación. No se crearon workflows, renovaciones, bulk backfill
+> ni reports. El search index demoró tras create aunque la unique constraint ya estaba activa; el contrato
+> reusable exige retry/direct-list read y readback de labels en ambas direcciones. Ledger/rollback:
+> `anam-phase-3-forward-pilot-execution-2026-07-16.md`.
 >
 > **Modelo de datos vivo / deuda cognitiva:** se creó
 > `anam-revops-data-model-and-object-synergies-v1.md` como current-state canon del portal cliente. Documenta
