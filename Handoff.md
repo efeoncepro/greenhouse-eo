@@ -1,3 +1,15 @@
+## Sesión 2026-07-16 — Creative Workflows: FAQ V6 publicada con `core/details` (Codex)
+
+> **Pedido:** documentar, commitear y aplicar la FAQ como acordeón/disclosure en el post publicado; revisar si se despliega schema de preguntas frecuentes.
+>
+> **Commit previo al write:** `c11d74fbd` (`Add governed FAQ details support`) dejó Content Factory `kind="details"`, validator/registry/tests, spec V6 y decisión local documentada. `pnpm build`, `pnpm typecheck`, Vitest focal y Content Factory dry/validate pasaron antes de tocar WordPress.
+>
+> **Write live:** preflight `pnpm public-website:ssh-check` PASS; snapshot remoto `/tmp/greenhouse-creative-workflows-251363-before-faq-details-20260716-053507.json`; hash previo `98299f2948f6671b89ebc50e03b846ba6f150be74c6cb61d37a7bee8847f67a3`; `wp_update_post` modificó sólo `post_content` del post `251363`. Readback: `publish`, slug `creative-workflows`, autor `1`, `core/details=4`, `core/heading=17`, `faqQuestionH3Count=0`, TOC presente.
+>
+> **Cache/QA/schema:** `wp cache flush` + `wp kinsta cache purge --all` OK. QA anónima desktop `1440x1000` + mobile `390x844` PASS: 4 `<details>/<summary>`, respuestas completas en HTML, primer disclosure abre con teclado, TOC enlaza sólo `Preguntas frecuentes`, cero overflow, consola limpia, canonical/robots/OG preservados. Schema live: `FAQPage=0`; graph mantiene `Article`, `BlogPosting`, `WebPage`, `BreadcrumbList`, `ImageObject`, `WebSite`, `Organization`, `Person`.
+>
+> **Evidencia:** inspección profunda `docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-16T05-37-28+00-00.json`; QA `.captures/2026-07-16T05-36-50-505Z_creative-workflows-faq-details-live/qa-report.json`. Pendiente si el operador lo quiere: decidir explícitamente si se agrega `FAQPage` vía Yoast FAQ block o extensión de schema; no se agregó en esta pasada.
+
 ## Sesión 2026-07-15 — Creative Workflows: FAQ disclosure V6 dry-run, sin write live (Codex)
 
 > **Pedido:** convertir la sección `Preguntas frecuentes` de la Pillar Creative Workflows en una experiencia tipo accordion/disclosure porque cuatro `H3 + párrafo` alargaban la lectura y contaminaban el TOC. El operador pidió investigar reuse antes de crear, preservar SEO/Yoast/schema/TOC/accesibilidad y detenerse antes de publicar sin autorización explícita.
