@@ -1320,72 +1320,80 @@
           "text": "Estas son las preguntas que suelen aparecer cuando dejamos la definición y llevamos el concepto a un equipo real."
         },
         {
-          "kind": "details",
-          "summary": "¿Un Creative Workflow reemplaza a los creativos?",
-          "blocks": [
+          "kind": "faq",
+          "schema": {
+            "enabled": true,
+            "name": "Preguntas frecuentes sobre Creative Workflows",
+            "canonicalUrl": "https://efeoncepro.com/creative/creative-workflows/",
+            "id": "https://efeoncepro.com/creative/creative-workflows/#faq",
+            "inLanguage": "es-CL"
+          },
+          "items": [
             {
-              "kind": "paragraph",
-              "text": [
+              "question": "¿Un Creative Workflow reemplaza a los creativos?",
+              "answer": [
                 {
-                  "text": "No debería.",
-                  "strong": true
-                },
-                {
-                  "text": " Puede absorber coordinación manual, transformaciones previsibles y parte de la búsqueda o comparación. La intención, la dirección, el descarte significativo, las excepciones y la aprobación necesitan autoridad humana explícita. Si el modelo de negocio depende de sacar a las personas de todas las decisiones, estamos hablando de otra promesa."
+                  "kind": "paragraph",
+                  "text": [
+                    {
+                      "text": "No debería.",
+                      "strong": true
+                    },
+                    {
+                      "text": " Puede absorber coordinación manual, transformaciones previsibles y parte de la búsqueda o comparación. La intención, la dirección, el descarte significativo, las excepciones y la aprobación necesitan autoridad humana explícita. Si el modelo de negocio depende de sacar a las personas de todas las decisiones, estamos hablando de otra promesa."
+                    }
+                  ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "kind": "details",
-          "summary": "¿Necesito un equipo de ingeniería para usarlo?",
-          "blocks": [
+            },
             {
-              "kind": "paragraph",
-              "text": [
+              "question": "¿Necesito un equipo de ingeniería para usarlo?",
+              "answer": [
                 {
-                  "text": "No para operarlo, si está bien diseñado.",
-                  "strong": true
-                },
-                {
-                  "text": " Quien construye y mantiene la capacidad sí debe resolver integraciones, seguridad, costos y observabilidad. Quien la usa debería trabajar con lenguaje e inputs propios de su oficio. La complejidad no desaparece; queda ubicada donde corresponde."
+                  "kind": "paragraph",
+                  "text": [
+                    {
+                      "text": "No para operarlo, si está bien diseñado.",
+                      "strong": true
+                    },
+                    {
+                      "text": " Quien construye y mantiene la capacidad sí debe resolver integraciones, seguridad, costos y observabilidad. Quien la usa debería trabajar con lenguaje e inputs propios de su oficio. La complejidad no desaparece; queda ubicada donde corresponde."
+                    }
+                  ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "kind": "details",
-          "summary": "¿Es lo mismo que Creative Operations o Content Supply Chain?",
-          "blocks": [
+            },
             {
-              "kind": "paragraph",
-              "text": [
+              "question": "¿Es lo mismo que Creative Operations o Content Supply Chain?",
+              "answer": [
                 {
-                  "text": "No exactamente.",
-                  "strong": true
-                },
-                {
-                  "text": " Creative Operations gobierna personas, capacidad, recursos, procesos y herramientas. Content Supply Chain suele mirar el recorrido más amplio desde creación hasta gestión y distribución. Un Creative Workflow es una unidad más acotada: vuelve ejecutable una secuencia de decisiones y producción dentro de esos sistemas. Las categorías se relacionan, pero no resuelven la misma pregunta."
+                  "kind": "paragraph",
+                  "text": [
+                    {
+                      "text": "No exactamente.",
+                      "strong": true
+                    },
+                    {
+                      "text": " Creative Operations gobierna personas, capacidad, recursos, procesos y herramientas. Content Supply Chain suele mirar el recorrido más amplio desde creación hasta gestión y distribución. Un Creative Workflow es una unidad más acotada: vuelve ejecutable una secuencia de decisiones y producción dentro de esos sistemas. Las categorías se relacionan, pero no resuelven la misma pregunta."
+                    }
+                  ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "kind": "details",
-          "summary": "¿Todo proceso creativo debería convertirse en workflow?",
-          "blocks": [
+            },
             {
-              "kind": "paragraph",
-              "text": [
+              "question": "¿Todo proceso creativo debería convertirse en workflow?",
+              "answer": [
                 {
-                  "text": "No.",
-                  "strong": true
-                },
-                {
-                  "text": " Un proceso infrecuente, de alta ambigüedad o con decisiones irreversibles puede necesitar conversación y dirección experta más que automatización. El workflow es útil cuando existe repetición suficiente para aprender, una dirección identificable, límites observables y una ruta para las excepciones. No todo lo valioso necesita volverse template."
+                  "kind": "paragraph",
+                  "text": [
+                    {
+                      "text": "No.",
+                      "strong": true
+                    },
+                    {
+                      "text": " Un proceso infrecuente, de alta ambigüedad o con decisiones irreversibles puede necesitar conversación y dirección experta más que automatización. El workflow es útil cuando existe repetición suficiente para aprender, una dirección identificable, límites observables y una ruta para las excepciones. No todo lo valioso necesita volverse template."
+                    }
+                  ]
                 }
               ]
             }

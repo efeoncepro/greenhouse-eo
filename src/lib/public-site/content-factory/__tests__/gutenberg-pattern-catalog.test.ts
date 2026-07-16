@@ -34,6 +34,12 @@ describe('getEfeonceGutenbergBlockPatternCatalog', () => {
           refreshPolicy: 'patch_carefully'
         }),
         expect.objectContaining({
+          blockName: 'core/html',
+          role: 'structured_data',
+          generationPolicy: 'allowed',
+          refreshPolicy: 'preserve'
+        }),
+        expect.objectContaining({
           blockName: 'core/image',
           generationPolicy: 'requires_source_asset',
           refreshPolicy: 'preserve'
@@ -53,6 +59,7 @@ describe('getEfeonceGutenbergBlockPatternCatalog', () => {
 
     expect(generatedBlocks).toEqual(expect.arrayContaining(['core/heading', 'core/paragraph', 'core/list']))
     expect(generatedBlocks).toContain('core/details')
+    expect(generatedBlocks).toContain('core/html')
     expect(generatedBlocks).not.toContain('core/freeform')
 
     for (const blockName of generatedBlocks) {

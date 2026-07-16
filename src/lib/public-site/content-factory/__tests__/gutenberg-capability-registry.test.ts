@@ -44,6 +44,11 @@ describe('getEfeonceGutenbergBlockCapabilityRegistry', () => {
           semanticOperations: ['refresh_disclosure']
         }),
         expect.objectContaining({
+          blockName: 'core/html',
+          semanticKind: 'structured_data',
+          semanticOperations: ['preserve_or_regenerate_schema']
+        }),
+        expect.objectContaining({
           blockName: 'yoast-seo/table-of-contents',
           freedomLevel: 'preserve_only'
         }),
@@ -87,6 +92,7 @@ describe('getEfeonceGutenbergBlockCapabilityRegistry', () => {
       expect.arrayContaining([
         'refresh_disclosure',
         'refresh_editorial_pullquote',
+        'preserve_or_regenerate_schema',
         'preserve_or_regenerate_toc',
         'review_image_asset'
       ])

@@ -112,6 +112,31 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     exampleIntent: 'Convert four FAQ H3s into native disclosure items under one FAQ H2.'
   },
   {
+    blockName: 'core/html',
+    semanticKind: 'structured_data',
+    agentRole:
+      'Generated JSON-LD structured data owned by a semantic Content Factory capability such as kind="faq".',
+    freedomLevel: 'preserve_only',
+    editableSurfaces: ['structure'],
+    semanticOperations: ['preserve_or_regenerate_schema'],
+    compilesTo: ['preserve'],
+    requiredEvidence: [...baseEvidence, 'structured_data_validation'],
+    applyPolicy: draftOnlyPolicy(
+      'Structured data blocks are preserve-only in refresh plans; regenerate them from the owning semantic source instead of editing JSON by hand.'
+    ),
+    previewPolicy: previewRequired(
+      'JSON-LD parses successfully.',
+      'FAQPage questions match visible core/details summaries.',
+      'No arbitrary HTML or JavaScript is present.'
+    ),
+    guardrails: [
+      'Do not use core/html as a layout or script escape hatch.',
+      'For FAQPage, edit the semantic FAQ source and let Content Factory regenerate the block.',
+      'Do not hand-author schema that can drift from visible content.'
+    ],
+    exampleIntent: 'Regenerate FAQPage JSON-LD after changing the semantic FAQ items.'
+  },
+  {
     blockName: 'core/quote',
     semanticKind: 'editorial_quote',
     agentRole: 'Editorial principle or point-of-view quote inside the article flow.',

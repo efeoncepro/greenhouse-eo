@@ -246,6 +246,93 @@ describe('authorGutenbergDraft', () => {
     expect(validation.status).toBe('pass')
   })
 
+  it('renders a semantic FAQ as native details plus synchronized FAQPage JSON-LD from one source', () => {
+    const withFaq = authorGutenbergDraft({
+      ...kungFuSpec,
+      seo: {
+        ...kungFuSpec.seo,
+        canonicalUrl: 'https://efeoncepro.com/creative/creative-workflows/',
+        inLanguage: 'es-CL'
+      },
+      sections: [
+        {
+          heading: 'Preguntas frecuentes',
+          level: 2,
+          blocks: [
+            {
+              kind: 'paragraph',
+              text: 'Preguntas que conviene resolver sin alargar el recorrido principal.'
+            },
+            {
+              kind: 'faq',
+              schema: {
+                name: 'Preguntas frecuentes sobre Creative Workflows'
+              },
+              items: [
+                {
+                  question: '¿Un Creative Workflow reemplaza a los creativos?',
+                  answer: [
+                    {
+                      kind: 'paragraph',
+                      text: [
+                        { text: 'No debería.', strong: true },
+                        { text: ' La intención, el descarte significativo y la aprobación necesitan autoridad humana.' }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  question: '¿Necesito un equipo de ingeniería para usarlo?',
+                  answer: [
+                    {
+                      kind: 'paragraph',
+                      text: 'No para operarlo si está bien diseñado; sí para construirlo y mantenerlo con gobierno.'
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        ...kungFuSpec.sections
+      ]
+    })
+
+    const postContent = withFaq.draft.kind === 'gutenberg_post' ? withFaq.draft.postContent : ''
+    const validation = validateGeneratedGutenbergDraft(withFaq)
+    const json = postContent.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? '{}'
+
+    const faqPage = JSON.parse(json) as {
+      '@type': string
+      '@id': string
+      url: string
+      inLanguage: string
+      name: string
+      mainEntity: Array<{ name: string; acceptedAnswer: { text: string } }>
+    }
+
+    expect(postContent).toContain('<!-- wp:details {"summary":"¿Un Creative Workflow reemplaza a los creativos?"} -->')
+    expect(postContent).toContain('<!-- wp:html -->')
+    expect(faqPage['@type']).toBe('FAQPage')
+    expect(faqPage['@id']).toBe('https://efeoncepro.com/creative/creative-workflows/#faq')
+    expect(faqPage.url).toBe('https://efeoncepro.com/creative/creative-workflows/')
+    expect(faqPage.inLanguage).toBe('es-CL')
+    expect(faqPage.name).toBe('Preguntas frecuentes sobre Creative Workflows')
+    expect(faqPage.mainEntity).toHaveLength(2)
+    expect(faqPage.mainEntity[0]).toMatchObject({
+      name: '¿Un Creative Workflow reemplaza a los creativos?',
+      acceptedAnswer: {
+        text: 'No debería. La intención, el descarte significativo y la aprobación necesitan autoridad humana.'
+      }
+    })
+    expect(postContent).toContain('<a href="#h-preguntas-frecuentes" data-level="2">Preguntas frecuentes</a>')
+    expect(postContent).not.toContain('href="#h-un-creative-workflow-reemplaza-a-los-creativos"')
+    expect(withFaq.draft.kind === 'gutenberg_post' && withFaq.draft.observedBlocks).toEqual(
+      expect.arrayContaining(['core/details', 'core/html'])
+    )
+    expect(validation.status).toBe('pass')
+  })
+
   it('rejects malformed tables before Gutenberg markup is assembled', () => {
     expect(() =>
       authorGutenbergDraft({
@@ -293,6 +380,41 @@ describe('authorGutenbergDraft', () => {
         ]
       })
     ).toThrow('content_factory_article_details_blocks_required')
+  })
+
+  it('rejects malformed semantic FAQs before Gutenberg markup is assembled', () => {
+    expect(() =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [{ heading: 'FAQ incompleta', level: 2, blocks: [{ kind: 'faq', items: [] }] }]
+      })
+    ).toThrow('content_factory_article_faq_items_required')
+
+    expect(() =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [
+          {
+            heading: 'FAQ incompleta',
+            level: 2,
+            blocks: [{ kind: 'faq', items: [{ question: '', answer: [{ kind: 'paragraph', text: 'Respuesta.' }] }] }]
+          }
+        ]
+      })
+    ).toThrow('content_factory_article_faq_question_required:0')
+
+    expect(() =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [
+          {
+            heading: 'FAQ incompleta',
+            level: 2,
+            blocks: [{ kind: 'faq', items: [{ question: 'Pregunta sin respuesta', answer: [] }] }]
+          }
+        ]
+      })
+    ).toThrow('content_factory_article_faq_answer_required:0')
   })
 
   it('renders safe inline links without opening a raw HTML escape hatch', () => {

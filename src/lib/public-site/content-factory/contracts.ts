@@ -110,6 +110,7 @@ export type GutenbergBlockPatternCatalogEntry = {
     | 'media'
     | 'conversion'
     | 'layout'
+    | 'structured_data'
     | 'legacy'
     | 'third_party'
   generationPolicy: 'allowed' | 'recommended' | 'requires_source_asset' | 'inspect_only'
@@ -145,6 +146,7 @@ export type GutenbergBlockSemanticKind =
   | 'layout_group'
   | 'layout_columns'
   | 'conversion_cta'
+  | 'structured_data'
   | 'section_break'
   | 'legacy_html'
   | 'third_party_module'
@@ -162,6 +164,7 @@ export type GutenbergBlockSemanticOperation =
   | 'review_embed_source'
   | 'adjust_layout_settings'
   | 'refresh_cta'
+  | 'preserve_or_regenerate_schema'
   | 'preserve_legacy_html'
   | 'preserve_third_party_module'
 
@@ -181,6 +184,7 @@ export type GutenbergBlockCapabilityEntry = {
     | 'media_reconciliation'
     | 'link_destination_review'
     | 'cta_target'
+    | 'structured_data_validation'
     | 'plugin_serialization_policy'
   >
   applyPolicy: {

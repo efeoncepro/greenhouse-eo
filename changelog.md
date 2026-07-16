@@ -1,10 +1,10 @@
 # changelog.md
 
-## 2026-07-16 — Creative Workflows FAQ V6 publicada con `core/details`
+## 2026-07-16 — Creative Workflows FAQ V6 publicada con `core/details` + `FAQPage`
 
-- Post `251363` actualizado en producción: la sección `Preguntas frecuentes` pasa de cuatro `H3 + párrafo` a cuatro disclosures nativos `core/details`, con respuestas completas como child blocks y TOC reducido al H2 de la sección.
-- Write aplicado por WP-CLI con snapshot remoto, rollback preparado, guard de hash, cache purge Kinsta y QA anónima desktop/mobile. Canonical, robots, OG, featured/OG, autor y categoría se preservaron.
-- Schema revisado: no se despliega `FAQPage`; el graph live mantiene `Article/BlogPosting`, `WebPage`, `BreadcrumbList`, `ImageObject`, `WebSite`, `Organization` y `Person`. Agregar FAQ schema queda como decisión SEO separada.
+- Post `251363` actualizado en producción: la sección `Preguntas frecuentes` pasa de cuatro `H3 + párrafo` a una primitive semántica `kind="faq"` de Content Factory que genera cuatro disclosures nativos `core/details` y un `FAQPage` JSON-LD sincronizado desde la misma fuente.
+- Content Factory ahora valida esa capacidad de forma reusable: `core/html` queda permitido sólo para JSON-LD `FAQPage` gobernado, parseable y con preguntas que coinciden con summaries visibles; no es un escape hatch de HTML libre ni schema manual.
+- Write aplicado por WP-CLI con snapshot remoto, rollback preparado, guard de hash, cache purge Kinsta y QA anónima desktop/mobile. Live QA: `FAQPage=1`, `Question=4`, canonical, robots, OG, featured/OG, autor, categoría, TOC y accesibilidad de teclado preservados.
 
 ## 2026-07-15 — Creative Workflows FAQ: disclosures Gutenberg en seco
 

@@ -1,14 +1,16 @@
-## Sesión 2026-07-16 — Creative Workflows: FAQ V6 publicada con `core/details` (Codex)
+## Sesión 2026-07-16 — Creative Workflows: FAQ V6 publicada con `core/details` + `FAQPage` (Codex)
 
 > **Pedido:** documentar, commitear y aplicar la FAQ como acordeón/disclosure en el post publicado; revisar si se despliega schema de preguntas frecuentes.
 >
-> **Commit previo al write:** `c11d74fbd` (`Add governed FAQ details support`) dejó Content Factory `kind="details"`, validator/registry/tests, spec V6 y decisión local documentada. `pnpm build`, `pnpm typecheck`, Vitest focal y Content Factory dry/validate pasaron antes de tocar WordPress.
+> **Commits previos:** `c11d74fbd` (`Add governed FAQ details support`) dejó Content Factory `kind="details"` y `bed5a4502` documentó el primer write live. En esta sesión se escaló la solución a `kind="faq"`: una fuente semántica que renderiza `core/details` y `FAQPage` JSON-LD sincronizado, sin schema manual duplicado.
 >
 > **Write live:** preflight `pnpm public-website:ssh-check` PASS; snapshot remoto `/tmp/greenhouse-creative-workflows-251363-before-faq-details-20260716-053507.json`; hash previo `98299f2948f6671b89ebc50e03b846ba6f150be74c6cb61d37a7bee8847f67a3`; `wp_update_post` modificó sólo `post_content` del post `251363`. Readback: `publish`, slug `creative-workflows`, autor `1`, `core/details=4`, `core/heading=17`, `faqQuestionH3Count=0`, TOC presente.
 >
-> **Cache/QA/schema:** `wp cache flush` + `wp kinsta cache purge --all` OK. QA anónima desktop `1440x1000` + mobile `390x844` PASS: 4 `<details>/<summary>`, respuestas completas en HTML, primer disclosure abre con teclado, TOC enlaza sólo `Preguntas frecuentes`, cero overflow, consola limpia, canonical/robots/OG preservados. Schema live: `FAQPage=0`; graph mantiene `Article`, `BlogPosting`, `WebPage`, `BreadcrumbList`, `ImageObject`, `WebSite`, `Organization`, `Person`.
+> **Schema escalable:** se agregó `kind="faq"` en `article-authoring.ts`; la spec declara las cuatro preguntas una sola vez y el renderer genera cuatro `core/details` + un `core/html` con `FAQPage`. El validator permite `core/html` sólo para `application/ld+json` parseable, exige `FAQPage.mainEntity[]` y bloquea preguntas de schema que no coinciden con un `summary` visible. Registry/pattern catalog marcan `core/html` como `structured_data`, preserve-only/regenerado desde la fuente semántica.
 >
-> **Evidencia:** inspección profunda `docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-16T05-37-28+00-00.json`; QA `.captures/2026-07-16T05-36-50-505Z_creative-workflows-faq-details-live/qa-report.json`. Pendiente si el operador lo quiere: decidir explícitamente si se agrega `FAQPage` vía Yoast FAQ block o extensión de schema; no se agregó en esta pasada.
+> **Segundo write live/schema:** preflight SSH PASS; snapshot remoto `/tmp/greenhouse-creative-workflows-251363-before-faq-details-20260716-055050.json`; hash previo `b6ef447a19f6b54353f415c25e8834d8eca41f5928e84cd56299e62ee5c67aa4`; readback apply: `core/details=4`, `core/html=1`, `FAQPage=1`, `faqQuestionCount=4`, `faqQuestionH3Count=0`, TOC presente. Cache Kinsta purgada.
+>
+> **QA/evidencia final:** QA anónima desktop `1440x1000` + mobile `390x844` PASS: `FAQPage=1`, `Question=4`, preguntas schema coinciden con summaries visibles, respuestas completas en HTML, primer disclosure abre con teclado, TOC enlaza sólo `Preguntas frecuentes`, cero overflow, consola limpia, canonical/robots/OG preservados. Inspección profunda `docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-16T05-52-24+00-00.json`; QA `.captures/2026-07-16T05-51-52-503Z_creative-workflows-faq-details-live/qa-report.json`. No push.
 
 ## Sesión 2026-07-15 — Creative Workflows: FAQ disclosure V6 dry-run, sin write live (Codex)
 

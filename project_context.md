@@ -1,14 +1,14 @@
 ## Estado vigente para agentes
 
-- **Creative Workflows FAQ disclosure V6 publicada (2026-07-16):** el runtime WordPress `7.0.1`/Ohio del post
+- **Creative Workflows FAQ disclosure + schema V6 publicada (2026-07-16):** el runtime WordPress `7.0.1`/Ohio del post
   `251363` registra `core/details`, `core/accordion`, `essential-blocks/accordion` y `yoast/faq-block`; para la FAQ editorial
-  de la Pillar se eligió `core/details` gobernado por Content Factory, no accordion JS ni custom block. La spec local
-  `docs/public-site/CREATIVE_WORKFLOWS_PILLAR_GUTENBERG_SPEC_V6.json` convierte las cuatro preguntas `H3 + párrafo` en
-  cuatro disclosures bajo el H2 `Preguntas frecuentes`, conserva el contenido completo en HTML y deja el TOC sólo en el
-  H2. Write live aplicado con snapshot/rollback, cache purge y QA anónima desktop/mobile PASS; canonical/robots/OG se
-  preservan. Schema live: `FAQPage=0`; el graph sigue en `Article/BlogPosting` + Yoast. Canon:
+  de la Pillar se eligió `kind: "faq"` en Content Factory: fuente única que renderiza cuatro `core/details` bajo el H2
+  `Preguntas frecuentes` y un `FAQPage` JSON-LD sincronizado (`FAQPage=1`, `Question=4`). No se creó un custom block
+  runtime porque el authoring vigente de posts agentic vive en la spec; un `efeonce/faq` Gutenberg block queda como fase
+  futura si humanos necesitan autorar FAQs directamente en el editor. Write live aplicado con snapshot/rollback, cache
+  purge y QA anónima desktop/mobile PASS; canonical/robots/OG se preservan y el TOC sólo apunta al H2. Canon:
   `docs/public-site/CREATIVE_WORKFLOWS_FAQ_DISCLOSURE_DECISION_V1.md`; evidencia:
-  `docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-16T05-37-28+00-00.json`.
+  `docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-16T05-52-24+00-00.json`.
 - **Kinsta SSH/WP-CLI con preflight durable (2026-07-15):** antes de cualquier operación SSH/WP-CLI del sitio
   público ejecutar `pnpm public-website:ssh-check`. Kinsta API y SSH son carriles independientes: la ausencia de
   `PUBLIC_WEBSITE_KINSTA_API_TOKEN_SECRET_REF` no demuestra que SSH esté caído. La configuración local estable

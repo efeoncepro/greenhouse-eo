@@ -1,6 +1,6 @@
-# Creative Workflows FAQ Disclosure Decision V1
+# Creative Workflows FAQ Disclosure + Schema Decision V1
 
-> Estado: publicado en producción como V6; `FAQPage` no emitido.
+> Estado: publicado en producción como V6; `FAQPage` emitido desde FAQ semántica de Content Factory.
 > Fecha de decisión: 2026-07-15.
 > Fecha de publicación: 2026-07-16.
 > Post: `251363`.
@@ -24,25 +24,32 @@ Inspección read-only por WP-CLI después de `pnpm public-website:ssh-check`:
   Editorial Blocks `0.1.0`.
 - Bloques registrados relevantes: `core/details`, `core/accordion`, `essential-blocks/accordion`,
   `yoast/faq-block`, `yoast-seo/table-of-contents`.
-- Estado actual del post: `publish`, canonical vacío en meta porque Yoast emite el permalink público, robots
+- Estado previo del post: `publish`, canonical vacío en meta porque Yoast emite el permalink público, robots
   indexable, un `yoast-seo/table-of-contents`, `21` headings H2/H3.
-- El HTML live actual no emite `FAQPage`; el graph Yoast contiene `Article/BlogPosting`, `WebPage`, `ImageObject`,
+- Antes de la intervención FAQ, el HTML live no emitía `FAQPage`; el graph Yoast contenía `Article/BlogPosting`, `WebPage`, `ImageObject`,
   `BreadcrumbList`, `WebSite`, `Organization` y `Person`.
 
 ## Decisión
 
-Usar `core/details` gobernado por Content Factory para esta FAQ:
+Usar una primitive semántica reusable de Content Factory (`kind: "faq"`) para esta clase de FAQ editorial:
 
 - Mantener `Preguntas frecuentes` como único H2 y destino del TOC global.
-- Convertir cada pregunta en un `summary` visible dentro de un bloque `core/details`.
-- Mover cada respuesta completa como child block nativo, normalmente `core/paragraph`.
+- Declarar las preguntas y respuestas una sola vez en `items[]`.
+- Renderizar cada pregunta como `summary` visible dentro de `core/details`.
+- Renderizar cada respuesta completa como child block nativo, normalmente `core/paragraph`.
+- Emitir un `FAQPage` JSON-LD desde el mismo `items[]`, dentro de un `core/html` gobernado.
 - No agregar JavaScript custom, CSS global ni bloque custom.
+- No permitir `core/html` como escape hatch: el validator sólo acepta `application/ld+json` parseable con `FAQPage`
+  y bloquea preguntas de schema que no coinciden con un `summary` visible.
 - No usar `core/accordion` para esta iteración porque su render usa WordPress Interactivity API, `button`,
   `region`, `inert` y estado runtime; es correcto cuando se necesita acordeón agrupado/exclusivo, pero más pesado
   que lo necesario para cuatro disclosures editoriales independientes.
 - No usar `essential-blocks/accordion` porque es third-party y no mejora el contrato frente a core.
-- No usar `yoast/faq-block` en esta iteración porque introduciría un owner de FAQ schema distinto. Puede evaluarse
-  después si una política SEO explícita decide emitir `FAQPage`; no debe añadirse sólo por tener una sección FAQ.
+- No usar `yoast/faq-block` porque introduciría otro owner de UI/schema y rompería la fuente única de Content
+  Factory.
+- No crear todavía un bloque Gutenberg runtime propio (`efeonce/faq`): sería correcto si humanos necesitan autorar
+  FAQs desde el editor sin pasar por Content Factory, pero exige plugin/theme runtime, editor JS, render PHP, deploy,
+  migración y soporte. Para los posts agentic actuales, la fuente de verdad es la spec de Content Factory.
 
 ## TOC y Semántica
 
@@ -59,9 +66,12 @@ preguntas como H3 visibles, pero esa decisión debe regenerar/revisar TOC y QA d
 ## SEO, Schema y Crawlers
 
 `core/details` guarda la pregunta y la respuesta completa en HTML. Los crawlers reciben el contenido en el documento,
-aunque el navegador lo muestre colapsado por defecto. No se agrega JSON-LD manual ni `FAQPage` en esta iteración.
-La regla vigente del runbook se mantiene: `FAQPage` sólo si las preguntas/respuestas visibles y la política SEO lo
-justifican, sin duplicar el graph de Yoast.
+aunque el navegador lo muestre colapsado por defecto. El `FAQPage` se emite sólo porque las cuatro preguntas y
+respuestas son visibles, editoriales y 1:1 con el contenido del artículo.
+
+La implementación no promete rich result de Google: Google retiró la visualización de FAQ rich results en Search en
+mayo de 2026 y removió su documentación en junio de 2026. `FAQPage` sigue siendo un tipo válido de Schema.org y en
+este caso se usa como dato estructurado de contenido visible, no como promesa de snippet.
 
 ## Publicación y Validación Live
 
@@ -73,7 +83,19 @@ El cambio fue aplicado al post publicado el 2026-07-16 por WP-CLI gobernado, des
 - Readback CMS: `core/details=4`, `core/heading=17`, `yoast-seo/table-of-contents=1`, `nonEmptyFreeformCount=0`, `mediaIssueCount=0`.
 - Inspección profunda: `docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-16T05-37-28+00-00.json`.
 - QA anónima desktop `1440x1000` + mobile `390x844`: PASS, sin overflow, teclado abre el primer disclosure, consola limpia, canonical/robots/OG preservados.
-- Schema live: el graph conserva `Article`, `BlogPosting`, `WebPage`, `BreadcrumbList`, `ImageObject`, `WebSite`, `Organization` y `Person`; `FAQPage=0`.
+- Schema live en ese corte: el graph conservaba `Article`, `BlogPosting`, `WebPage`, `BreadcrumbList`, `ImageObject`, `WebSite`, `Organization` y `Person`; `FAQPage=0`.
+
+El 2026-07-16 se aplicó un segundo write autorizado para agregar el schema desde la nueva primitive semántica `faq`.
+
+- Snapshot remoto previo al schema: `/tmp/greenhouse-creative-workflows-251363-before-faq-details-20260716-055050.json`.
+- Hash previo al schema: `b6ef447a19f6b54353f415c25e8834d8eca41f5928e84cd56299e62ee5c67aa4`.
+- Hash posterior WordPress: `829dce00785c373c1a182ebbb47aee2c64fc28d02a81506df7fd2a0520a50b09`.
+- Readback apply: `core/details=4`, `core/html=1`, `FAQPage=1`, `faqQuestionCount=4`, `faqQuestionH3Count=0`, TOC presente.
+- Cache Kinsta purgada: `Success: All caches were cleared`.
+- Inspección profunda: `docs/operations/public-site-content-factory/post-deep-inspection-251363-2026-07-16T05-52-24+00-00.json`.
+- QA anónima desktop `1440x1000` + mobile `390x844`: PASS; canonical, robots, OG, Article/Breadcrumb schema,
+  teclado, mobile overflow y consola preservados. El schema live contiene `FAQPage=1`, `Question=4` y las cuatro
+  preguntas del JSON-LD coinciden con los cuatro `summary` visibles.
 
 ## Validación Requerida Para Futuros Writes
 
@@ -87,5 +109,6 @@ Para otra actualización del post publicado:
 6. QA anónima desktop `1440x1000` y mobile `390x844`: contenido, toggles, foco, consola, schema, canonical, robots,
    TOC anchors y `scrollWidth <= clientWidth`.
 
-El schema `FAQPage` sigue siendo una decisión separada: debe agregarse sólo si hay política SEO explícita,
-preguntas/respuestas visibles 1:1 y un owner claro para no duplicar el graph de Yoast.
+Para futuros artículos, no duplicar FAQ visible y schema. Usar `kind: "faq"` en la spec cuando se quiera
+`core/details` + `FAQPage` sincronizado; usar `kind: "details"` sólo para disclosures que no representan una FAQ
+marcable como schema.
