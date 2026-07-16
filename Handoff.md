@@ -1,11 +1,29 @@
-## Sesión 2026-07-16 — TASK-1385 AI-Assisted Vacancy Public Copy (Claude, in-progress)
+## Sesión 2026-07-16 — TASK-1385 AI-Assisted Vacancy Public Copy (Claude) — COMPLETE en develop local (sin push)
 
-> **Task tomada:** `TASK-1385` movida a `in-progress/`. Trabajo en `develop` local-first, SIN push.
-> Objetivo: extender el patrón propose→confirm de TASK-1361 a la redacción del payload público
-> (`public_*`) de una vacante — la IA propone desde inputs allowlist-safe (demanda + competencias del
-> template + voz es-CL; NUNCA ve presupuesto/rate/notas internas), el confirm humano escribe vía
-> `updateHiringOpening`, ledger auditado con kind nuevo `opening_public_copy` + dedupe por digest,
-> checklist anti-sesgo en el prompt, flag default OFF. Publish sigue siendo acción humana (TASK-355/1371).
+> **Qué se implementó (3 slices, commits en develop local):** extensión del patrón propose→confirm
+> de TASK-1361 a la redacción del copy público (`public_*`) de una vacante. Módulo nuevo
+> `src/lib/hiring/vacancy-ai/**`: proyección allowlist-safe `VacancyPromptInput` (la IA NUNCA ve
+> presupuesto/rate/notas internas/cliente — test negativo con sentinels), prompt con voz Efeonce
+> (context pack 05/09) + checklist anti-sesgo de avisos, provider Anthropic `claude-sonnet-5`
+> honest-degrade, dedupe por digest. Confirm humano aplica vía `updateHiringOpening` (ahora acepta
+> client externo → atómico con la marca de la propuesta); la IA propone COPY, no hechos
+> (ubicación/modalidad/compensación jamás se inventan). Kind `opening_public_copy` en el ledger 1361
+> (migración `20260716131741263` aplicada + verificada en PG dev); capability nueva
+> `hiring.opening.ai_assist` (seed + grant tier operador); API
+> `POST /api/hiring/openings/[id]/ai/propose-public-copy`; el confirm reusa la ruta de proposals
+> con capability por kind (`hiring.opening.write`). Publish intacto (acción humana + gate 422).
+>
+> **Evidencia:** test full 9592/0 + lint 0 + typecheck 0 + build prod verde; live E2E PG real verde
+> (propose no muta → confirm aplica + idempotente + terminal-once 409); **smoke con provider REAL
+> (claude-sonnet-5) PASS** — copy es-CL con voz correcta, cero filtración de sentinels internos,
+> hechos respetados, verdad interna intacta (script `scripts/hiring/_smoke-task-1385-vacancy-ai.ts`,
+> cleanup total, nunca publicado). `pg:doctor` OK (nota: falla ambiental pre-existente por
+> `GOOGLE_APPLICATION_CREDENTIALS_JSON` malformada en `.env.local`, bypasseada con override vacío).
+>
+> **Rollout pendiente (por diseño):** flag `HIRING_VACANCY_AI_ENABLED` OFF en todos los
+> environments (fila en `FEATURE_FLAG_STATE_LEDGER.md` §Pendientes). Flip staging + smoke con
+> vacante real → prod tras revisión humana del primer aviso. Push a develop = decisión del operador.
+> Follow-ups: UI del desk para editar/confirmar (ui-ux) + versión en-US del aviso + actionKey Nexa.
 
 ## Sesion 2026-07-16 - HubSpot Solutions Partner: prospeccion agentica (Codex)
 
@@ -38147,3 +38165,24 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 > **Cierre técnico:** `pnpm typecheck`, ESLint focal y Vitest `8/8` pasaron; Content Factory regeneró V4 con 111 bloques, 21 headings, tres imágenes, `indexPolicy=index` y cero findings. `git diff --check`, `docs:context-check`, `docs:closure-check`, `ops:lint --changed` y `qa:gates --changed --agent codex --docs --runtime --integration` pasaron. El único advisory de docs corresponde a cambios de lifecycle ajenos en el worktree compartido; task/epic lint quedó en cero errores y cero warnings. Veredicto scoped: `PASS`, cierre completo.
 >
 > **Estado:** publicado y operativo. Canon: [E-E-A-T Audit V4](docs/public-site/CREATIVE_WORKFLOWS_PILLAR_EEAT_AUDIT_V4.md).
+
+## Sesión 2026-07-16 — ANAM HubSpot Fase 1: P1.2 Calidad de Datos en ejecución
+
+- En el portal ANAM se creó el panel compartido `Calidad de Datos Comercial` (`21144697`) y se verificaron cinco controles: tipo de ingreso (`340815405`, 332), proceso comercial (`340816805`, 11), monto (`340817239`, 1), línea de negocio (`340817563`, 1) y etapa `Radar 0%` (`340818897`, 10).
+- Decisión de presentación: scorecards para las brechas unitarias de monto y línea de negocio; barras horizontales sólo para colas accionables con varios responsables. Los informes no autorizan inferencias ni backfill automático.
+- `Radar 0%` sigue sin corregirse: el informe sólo identifica los diez Deals afectados. P1.2 continúa con el denominador exacto de `variacion_contrato` en adjudicación/cierre y la cola gobernada de validación Q1-Q2 antes de cualquier backfill.
+- Canon y evidencia: `docs/architecture/kortex/hubspot-as-a-service/anam-phase-1-commercial-reporting-foundation-2026-07-16.md`.
+
+### Addendum — P1.2 control set completo
+
+- Se agregaron y verificaron dos controles al panel `Calidad de Datos Comercial`: `DQ - Ganados sin variación vs cotizado` (`340822900`), scorecard de 494 Deals en los cierres ganados exactos de Growth y Retention; y `DQ - Q1-Q2 2026 sin tipo de ingreso por responsable` (`340823200`), cola de 82 Deals creados entre 2026-01-01 y 2026-06-30.
+- `Adjudicación` no existe como stage literal. El denominador de variación usa Growth `939574324` y Retention `939530924`; excluye perdidos/no adjudicados. El resultado mide adopción del clasificador, no una variación monetaria calculada, y no autoriza reconstruir el histórico.
+- La cola Q1-Q2 usa fecha de creación, consistente con el contrato de pipeline creado. Requiere validación humana con evidencia; pipeline, stage, owner, monto, línea de negocio o sugerencia IA no bastan por sí solos. No se modificó ningún Deal.
+- P1.1 y el primer set de P1.2 quedan completos. Siguiente: P1.3, completar Growth por línea de negocio y proceso comercial y luego outcome ganado/perdido con stages explícitos; el backfill gobernado queda en P1.4.
+
+### Addendum — P1.3 baseline de línea y proceso
+
+- La cohorte Growth creada desde 2026-07-01 reconcilia con `340814384`: 29 Deals, 15 Venta nueva, 7 Upsell y 7 Cross-sell; valor actual total CLF 2.443,89.
+- Por línea: M&A 23 / CLF 975,09; D&CO 3 / CLF 1.232,00; FIC 3 / CLF 236,80. Por proceso: Venta Directa 27 / CLF 1.943,89; Licitación 2 / CLF 500,00. No hay vacíos en estas dos dimensiones dentro de la cohorte.
+- Cuatro Deals Growth están en el pipeline de Retention y 25 en Growth. Esto confirma que pipeline no prueba tipo de ingreso; el mismatch se trata como calidad de datos separada y no como autorización para reescribir registros.
+- Quedan definidos dos charts comparativos: Growth por línea de negocio y Growth por proceso comercial, ambos de trimestre actual. Si HubSpot no permite mostrar count y amount sin ambigüedad, se separarán; un agregado unitario debe ser scorecard.

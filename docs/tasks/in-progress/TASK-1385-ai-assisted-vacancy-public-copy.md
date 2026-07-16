@@ -138,23 +138,61 @@ Redactar la vacante pública hoy es manual y desde cero (el publish exige copy p
 
 ### Acceptance criteria additions
 
-- [ ] La IA propone `public_*` completos desde inputs allowlist-safe; test negativo de no-filtración de verdad interna.
-- [ ] Confirm humano escribe vía `updateHiringOpening`; el LLM no tiene write path al opening.
-- [ ] Propuesta auditada en ledger (kind nuevo) con dedupe por digest.
-- [ ] Prompt incluye checklist anti-sesgo + voz es-CL; salida en español.
-- [ ] Flag OFF + ledger; publish sigue siendo acción humana explícita.
+- [x] La IA propone `public_*` completos desde inputs allowlist-safe; test negativo de no-filtración de verdad interna (`vacancy-ai/prompt.test.ts` con sentinels en TODOS los campos internos; smoke provider real sin filtración).
+- [x] Confirm humano escribe vía `updateHiringOpening`; el LLM no tiene write path al opening (live E2E: propose no muta; solo el confirm aplica, misma tx).
+- [x] Propuesta auditada en ledger (kind `opening_public_copy`) con dedupe por digest (reusa UNIQUE parcial 1383).
+- [x] Prompt incluye checklist anti-sesgo + voz es-CL; salida en español (smoke real claude-sonnet-5 verificado).
+- [x] Flag `HIRING_VACANCY_AI_ENABLED` OFF + fila en el ledger; publish sigue siendo acción humana explícita (gate 422 intacto).
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en `src/lib/hiring/vacancy-ai/**`; API `/api/hiring/openings/[id]/ai/propose-public-copy`.
-- [ ] Command propose gobernado por capability; confirm reusa `hiring.opening.write`.
-- [ ] ≤1 capability nueva con grant + coverage mismo PR.
-- [ ] Nexa por parity (propose→confirm ya es su forma nativa).
-- [ ] Parity check = SÍ.
+- [x] Lógica en `src/lib/hiring/vacancy-ai/**`; API `/api/hiring/openings/[id]/ai/propose-public-copy`.
+- [x] Command propose gobernado por capability (`hiring.opening.ai_assist`); confirm reusa `hiring.opening.write`.
+- [x] ≤1 capability nueva con grant + coverage mismo PR (guard verde).
+- [x] Nexa por parity (propose→confirm ya es su forma nativa; el actionKey es follow-up delgado, mismo criterio que 1361).
+- [x] Parity check = SÍ.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — EXECUTION LOG (lo llena el agente que toma la task)
      ═══════════════════════════════════════════════════════════ -->
+
+## Execution Log — 2026-07-16 (Claude, develop local-first)
+
+### Open Questions resueltas en Discovery
+
+- **Flag**: hermano dedicado `HIRING_VACANCY_AI_ENABLED` (NO reusar `HIRING_ASSESSMENT_AI_ENABLED`) —
+  el flip prod del assessment está gateado por sign-off HR/Legal EU AI Act (scoring de candidatos);
+  el copy de vacante no decide sobre personas y no debe heredar ni backdoorear ese gate.
+- **Capability**: 1 nueva `hiring.opening.ai_assist` (execute/tenant, grant tier operador hiring);
+  el confirm reusa `hiring.opening.write:update` (mismo gate que el PATCH del opening).
+- **Ledger**: reuso de `hiring_assessment_ai_proposal` con kind `opening_public_copy` (CHECK
+  ampliado); eventos `hiring.assessment.ai_proposed/confirmed` reusados (payload lleva `kind`).
+- **Modelo**: `claude-sonnet-5` vía `generateStructuredAnthropic` (copy de marca público = tier
+  calidad), seam `HIRING_VACANCY_AI_COPY_MODEL`; prompt `hiring_vacancy_ai_public_copy.v1`.
+- **La IA propone COPY, no hechos**: ubicación/modalidad entran al prompt solo si ya existen como
+  `public_*`; compensación JAMÁS se propone.
+- **Drift detectado**: TASK-1371 ya está complete (spec la citaba to-do) — complementaria, sin
+  cambio de contrato. El opening NO tiene FK a template: `templateId` es input opcional del operador.
+
+### Slices ejecutados
+
+- **Slice 1** (`93080ac5a`): migración `20260716131741263` (CHECK kind + seed capability + DO
+  guards, aplicada y verificada live en PG dev), catálogo TS + grant runtime (coverage guard verde),
+  tipos (`OpeningPublicCopyProposal`, `publicCopyOverride`).
+- **Slice 2**: módulo `src/lib/hiring/vacancy-ai/**` — `VacancyPromptInput` allowlist-safe (copia
+  explícita campo a campo), prompt voz Efeonce + checklist anti-sesgo, sanitizer frontera, adapter
+  honest-degrade con deps inyectables, `proposeOpeningPublicCopy` (flag + digest + ledger);
+  `updateHiringOpening` acepta `PoolClient` externo (backward-compatible).
+- **Slice 3**: rama `opening_public_copy` en `confirmAiProposal` → `applyOpeningPublicCopy`
+  (misma tx; `note` nunca se escribe), capability por kind en el confirm route, ruta
+  `POST /api/hiring/openings/[id]/ai/propose-public-copy`.
+
+### Evidencia
+
+- Tests unit: no-filtración con sentinels (todos los campos internos), sanitizer, honest-degrade.
+- Live E2E PG real VERDE: propose no muta el opening → confirm aplica `public_*` + override humano
+  + verdad interna intacta → doble confirm idempotente → decisión contraria 409 terminal-once.
+- `pnpm vitest run src/lib/hiring/` 254 passed; typecheck + lint 0 errores; flags:audit strict verde.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -222,8 +260,8 @@ Ninguna (providers LLM ya configurados).
 
 ## Acceptance Criteria
 
-- [ ] Los 5 criterios binarios del Backend/Data Contract verdes.
-- [ ] `pnpm test` focal + lint + typecheck; smoke live documentado.
+- [x] Los 5 criterios binarios del Backend/Data Contract verdes.
+- [x] `pnpm test` full 9592/0 + lint 0 + typecheck 0 + build prod; smoke live documentado (E2E PG + provider real, ver Execution Log).
 
 ## Verification
 

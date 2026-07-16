@@ -42,12 +42,14 @@ Regla práctica: si una vacante ya tiene la plantilla "lista", todavía hay que 
 - `GET /api/hiring/assessments/[id]`: detalle de review interno. Requiere `hiring.assessment.read`.
 - `POST /api/hiring/assessments/[id]/score`: registra/cierra score humano. Requiere `hiring.assessment.score`.
 - `GET/POST /api/public/assessment/[token]`: superficie pública por token; no usa sesión de dashboard.
+- `POST /api/hiring/openings/[id]/ai/propose-public-copy` (TASK-1385): la IA propone un borrador del copy público del aviso (título, resumen, descripción, requisitos, tags) desde inputs seguros — nunca ve presupuesto, tarifas ni notas internas. Requiere `hiring.opening.ai_assist` y el flag `HIRING_VACANCY_AI_ENABLED`. El borrador se confirma (editable) por `POST /api/hiring/assessments/ai/proposals/[id]/confirm` con `hiring.opening.write`; publicar sigue siendo la acción humana de siempre.
 
 No crear instancias por SQL, no leer tokens desde logs y no exponer rúbricas/answer keys al browser candidato.
 
 ## Reglas de negocio
 
 - La IA puede sugerir un score; una persona lo confirma o edita antes de que cuente. El scorecard orienta y nunca rechaza automáticamente.
+- La IA también puede redactar el borrador del aviso público de una vacante (TASK-1385): propone solo texto desde datos seguros, con lenguaje neutro y sin señales de género/edad; una persona lo revisa, edita y confirma. La IA nunca escribe el opening ni publica.
 - La decisión exige motivo humano estructurado, soporta re-decisión con supersede y conserva historial append-only.
 - Publicación solo expone `buildPublicOpeningPayload()`; compensación, notas y riesgo internos no se publican.
 - El correo agregado está enmascarado. El reveal de identidad/documentos requiere el resolver, capability, motivo y auditoría de TASK-1362; mientras no esté disponible, la interfaz lo comunica como degradación real.

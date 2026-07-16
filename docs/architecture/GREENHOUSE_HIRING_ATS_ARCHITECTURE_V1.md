@@ -20,6 +20,37 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-07-16 — TASK-1385: AI-assisted vacancy public copy (propose→confirm)
+
+La redacción del payload público de una vacante ahora tiene asistencia IA gobernada, extendiendo
+el patrón propose→confirm de TASK-1361 con el kind `opening_public_copy` en el MISMO ledger
+(`hiring_assessment_ai_proposal`, CHECK ampliado; eventos `hiring.assessment.ai_proposed/confirmed`
+reusados — el payload lleva `kind`):
+
+- **Propose**: `proposeOpeningPublicCopy` (`src/lib/hiring/vacancy-ai/**`) redacta los campos de
+  copy `public_*` desde una proyección **allowlist-safe** (`VacancyPromptInput`, copia explícita
+  campo a campo): demanda (rol/skills/idioma/tz/duración), hechos públicos ya seteados del opening
+  y competencias+pesos de un `templateId` opcional. La IA **NUNCA** recibe `budget_band`,
+  `rate_band`, `risk_notes`, `internal_notes`, owner ni referencias de cliente (test negativo con
+  sentinels en `vacancy-ai/prompt.test.ts`). La IA propone **COPY, no hechos**: ubicación/modalidad/
+  compensación nunca se inventan (compensación jamás se propone). Prompt con voz Efeonce (context
+  pack 05/09) + checklist anti-sesgo de avisos (género/edad/proxies/job-related), versión
+  `hiring_vacancy_ai_public_copy.v1`, provider Anthropic `claude-sonnet-5` (seam
+  `HIRING_VACANCY_AI_COPY_MODEL`), adapter honest-degrade. Dedupe por digest (mismo mecanismo 1383).
+- **Confirm**: la rama `opening_public_copy` de `confirmAiProposal` aplica el copy (merge con
+  `publicCopyOverride` humano) vía **`updateHiringOpening`** (writer canónico, ahora acepta un
+  `PoolClient` externo para atomicidad con la marca de la propuesta). El LLM nunca escribe el
+  opening; `note` de la propuesta nunca se persiste al opening; **el publish sigue siendo la acción
+  humana de TASK-355/1371 con su gate 422** intacto.
+- **API/parity**: `POST /api/hiring/openings/[id]/ai/propose-public-copy` (capability nueva
+  `hiring.opening.ai_assist`, grant tier operador hiring); el confirm reusa la ruta de proposals
+  1361 con capability least-privilege por kind (`opening_public_copy` ⇒ `hiring.opening.write`).
+  Registro del actionKey en Nexa = consecuencia de parity (follow-up, mismo criterio que 1361).
+- **Flag**: `HIRING_VACANCY_AI_ENABLED` default OFF, **hermano deliberado** de
+  `HIRING_ASSESSMENT_AI_ENABLED` (no hereda el gate regulatorio EU AI Act del scoring — el copy de
+  vacante no decide sobre personas; el riesgo de sesgo del aviso lo gobierna el checklist + confirm
+  humano). Ledger de flags actualizado.
+
 ## Delta 2026-07-13 — TASK-1363: Assessment Taking + Review Surface
 
 El assessment dejó de ser sólo motor y ahora tiene dos superficies runtime sobre los mismos primitives de dominio:

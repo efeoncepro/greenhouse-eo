@@ -1,5 +1,23 @@
 # changelog.md
 
+## 2026-07-16 — TASK-1385: redacción asistida por IA del copy público de vacantes (propose→confirm)
+
+- La IA propone los campos `public_*` del aviso de una vacante desde inputs **allowlist-safe**
+  (demanda + competencias del template de assessment + voz Efeonce es-CL); NUNCA ve presupuesto,
+  tarifas, notas internas ni referencias de cliente (test negativo con sentinels). Propone COPY,
+  no hechos: ubicación/modalidad/compensación jamás se inventan.
+- El confirm humano aplica vía `updateHiringOpening` (writer canónico, ahora acepta client externo
+  para atomicidad); el LLM no tiene write path al opening y el publish sigue siendo acción humana
+  con su gate 422 (TASK-355/1371).
+- Reusa el ledger auditado de TASK-1361 con kind nuevo `opening_public_copy` (dedupe por digest,
+  state machine terminal-once). Capability nueva `hiring.opening.ai_assist` (propose, tier operador
+  hiring); el confirm exige `hiring.opening.write`. API: `POST /api/hiring/openings/[id]/ai/propose-public-copy`.
+- Prompt con checklist anti-sesgo de avisos (género/edad/proxies/solo job-related) + voz de marca
+  (context pack 05/09); provider Anthropic `claude-sonnet-5` con adapter honest-degrade.
+- Flag `HIRING_VACANCY_AI_ENABLED` default OFF (hermano deliberado del flag de assessment — no
+  hereda su gate regulatorio), registrado en el ledger. Migración aplicada en dev; live E2E PG
+  verde (propose no muta → confirm aplica → doble confirm idempotente → terminal-once 409).
+
 ## 2026-07-16 — HubSpot as a Service: skill gestionada, QA ANAM y discovery RevOps
 
 - Nace la skill espejo `.codex/.claude/skills/hubspot-as-a-service` como capa de delivery gestionado: intake,
@@ -22,11 +40,17 @@
   items, seis tienen monto cero y sólo dos están asociados al mismo Deal. Se documenta el contrato final en
   `anam-revops-schema-reconciliation-2026-07-16.md`.
 - `anam-commercial-catalog-dry-run-2026-07-16.md` reduce los 506 line items a 20 nombres normalizados y propone un
-  seed Product/Service gobernado; `M&A - Integral` concentra 331. El RUT duplicado de ANAM se documenta como split
-  real de asociaciones y no se auto-mergea.
+  seed Product/Service gobernado; `M&A - Integral` concentra 331. El RUT duplicado de la propia Company ANAM se
+  conserva sólo como anomalía observada y fuera de alcance; no se corregirá ni fusionará en este trabajo.
 - Kortex despliega builds `#12/#13` para Product Library con `crm.objects.products.read` requerido y write
-  condicional. HubSpot rechaza tres consentimientos antes del callback; la instalación ANAM permanece activa con
-  109 scopes y Product API `403`, sin recurrir al scope obsoleto `e-commerce`.
+  condicional. En el corte inicial HubSpot rechaza tres consentimientos antes del callback; la instalación ANAM
+  permanece activa con 109 scopes y Product API `403`, sin recurrir al scope obsoleto `e-commerce`.
+- Developer Monitoring identifica la causa de esos tres grants: `Please provide a valid recaptcha value`. También
+  se detecta drift en el control plane desplegado, cuyo authorization URL omitía Product read pese al build `#13`.
+  Con autorización explícita, el operador completa un consent corregido: callback/activation success, 110 scopes,
+  Product properties/search HTTP 200, 65 propiedades y 22 Products. No hubo Product writes, deploy ni rotación.
+- Se versiona un change set approval-ready para Service: data dictionary, asociaciones de renovación/Deals y
+  migración idempotente de Closed Won line items. Ningún schema/record write fue ejecutado.
 - El dependency audit confirma que Workflows, Forms, Lists, Ticket v3 y reglas de pipeline requieren scopes de
   lectura adicionales. Se versiona un change set dividido: reconciliación reversible de dos propiedades pendiente
   de aprobación y cambios estructurales bloqueados hasta observar consumidores y cerrar decisiones de negocio.
@@ -78,6 +102,18 @@
   o discrepante ya no excluye una cuenta, y sede, mercados operativos, evidencia y confianza se separan.
 - El ledger de fuentes queda verificado al 2026-07-16 e incorpora State of Ecosystems, incentivos H2 2026,
   Marketing Studio, Sales Workspace, Customer Success Workspace y límites explícitos de las betas.
+
+## 2026-07-16 — ANAM: botones enrutan chatflows por `anam_intent` y logo ajustado
+
+- La landing ANAM queda en Developer Project build `#22`: cada botón de categoría actualiza la URL con `anam_intent` (`cotizar`, `seguimiento_servicio`, `requerimiento_calidad`) y ejecuta `HubSpotConversations.widget.refresh({ openToNewThread: true })` antes de abrir el chat.
+- El CTA general limpia `anam_intent` y abre el chat sin forzar branch. El logo se redujo/subió para dejarlo separado de la línea inferior del header en desktop y mobile.
+- Pendiente operativo fuera del Developer Project: configurar en HubSpot Chatflows las target rules/branches para consumir esos query params; el composer no se prellena en esta configuración porque el iframe actual descarta `setInputText`.
+
+## 2026-07-16 — ANAM: landing `Agente Virtual ANAM` publicada en HubSpot
+
+- La landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` pasa a titular `Agente Virtual ANAM` y reduce la entrada operativa a tres categorías: `Cotizar`, `Seguimiento del Servicio` y `Requerimientos de Calidad`, según correo de Maria Paz Haeger.
+- Developer Project `kortex-cms-react` en portal ANAM `19893546` quedó live en build `#21`; se validó con `hs project validate --profile anam`, upload/deploy automático, asset público `kortex-cms-react/21` y Playwright desktop/mobile sin overflow horizontal.
+- La documentación operativa de Kortex/HubSpot CMS queda sincronizada en `docs/architecture/kortex/hubspot-cms/anam-chat-landing.md`.
 
 ## 2026-07-15 — Creative Workflows: diagramas V3 corregidos en producción
 
