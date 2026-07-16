@@ -112,6 +112,14 @@
 > no como inferencia one-time. No se crearon los cinco Services históricos. Canon:
 > `anam-phase-3-forward-pilot-dry-run-2026-07-16.md`. Siguiente gate: regla de owner + reviewer ANAM nombrado;
 > después esperar un award real y aprobar su primer payload individual.
+>
+> **Modelo de datos vivo / deuda cognitiva:** se creó
+> `anam-revops-data-model-and-object-synergies-v1.md` como current-state canon del portal cliente. Documenta
+> diagrama Contact→Lead→Company→Deal→Quote/line item→Service→renewal, Ticket, Account Unit, Billing Event e
+> Invoice; grain, fact ownership, asociaciones/cardinalidad, proyecciones permitidas/prohibidas, sinergias por
+> flujo y readiness de paneles. Deja explícito Product=catálogo, line item=componente vendido, Service=contrato/
+> entrega, Ticket=caso humano y Billing Event=evento fuente. El reconciliation doc original queda como evidencia
+> fechada con aviso de drift; la skill ANAM carga primero el modelo vivo antes de mutar objetos o paneles.
 
 > **Roadmap y Fase 1 — CERRADA:** el plan completo quedó canonizado en
 > `anam-revops-implementation-roadmap-phases-2026-07-16.md` y el contrato/evidencia final en

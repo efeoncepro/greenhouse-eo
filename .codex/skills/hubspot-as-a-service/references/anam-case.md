@@ -19,6 +19,7 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 - `docs/architecture/kortex/hubspot-cms/anam-portal-access.md`
 - `docs/architecture/kortex/hubspot-cms/landing-page-runbook.md`
 - `docs/architecture/kortex/hubspot-as-a-service/README.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-revops-meeting-synthesis-2026-07-16.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-email-attachment-synthesis-2026-07-16.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-attachment-hubspot-classification-2026-07-16.md`
@@ -36,6 +37,8 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 - `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`
 
 ## RevOps object model
+
+Load the living data-model/synergies document before changing any ANAM object, property, association, automation or panel. It owns current grain, fact ownership and allowed projections; dated discovery documents preserve evidence but may contain superseded proposals.
 
 - Contact -> Lead -> Company -> Deal -> Service is the meeting-ratified lifecycle.
 - Deal owns opportunity, quotation, award and primary income classification.

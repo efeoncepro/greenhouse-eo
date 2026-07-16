@@ -5,6 +5,8 @@
 > **Mode:** read-only design based on live HubSpot inventory
 > **Status:** proposed implementation contract; no schema or record writes authorized by this document
 
+> **Current-state notice:** this dated reconciliation preserves the original inventory and proposal. Product access and the Service property schema subsequently advanced. Use [`anam-revops-data-model-and-object-synergies-v1.md`](anam-revops-data-model-and-object-synergies-v1.md) for the current object/fact-ownership model and [`anam-service-change-set-2026-07-16.md`](anam-service-change-set-2026-07-16.md) for live Service schema readback; do not execute the stale Service property table below.
+
 ## Outcome
 
 ANAM does not need a parallel CRM model. The correct target extends the native HubSpot chain already in use:

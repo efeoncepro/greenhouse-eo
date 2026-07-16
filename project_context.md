@@ -30,6 +30,9 @@
   sobre el Service sample. Cero records/workflows/associations/reports; el piloto forward requiere otra aprobación.
   Simulación read-only de cinco adjudicaciones recientes pasó el award gate y falló activación por ausencia de
   fechas/modelo/renovación/status; no autoriza backfill. Esperar un award real después de ratificar owner/reviewer.
+  Modelo current-state obligatorio antes de tocar objetos, properties, associations, workflows o panels:
+  `docs/architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md`; este fija
+  grain, fact ownership, proyecciones y sinergias, mientras los docs fechados conservan evidencia histórica.
   Canon: `anam-phase-3-forward-service-capture-contract-2026-07-16.md` bajo el índice anterior.
 
 - **HubSpot Solutions Partner / narrativa agéntica sincronizada (2026-07-16):** las skills espejo

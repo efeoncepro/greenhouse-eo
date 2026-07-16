@@ -67,6 +67,7 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 ## Current ANAM artifacts
 
 - Fresh-session continuation entry point: [`anam-next-session-handoff-2026-07-16.md`](anam-next-session-handoff-2026-07-16.md)
+- Living ANAM object model, fact ownership and cross-object synergies: [`anam-revops-data-model-and-object-synergies-v1.md`](anam-revops-data-model-and-object-synergies-v1.md)
 - Landing/runtime: [`../hubspot-cms/anam-chat-landing.md`](../hubspot-cms/anam-chat-landing.md)
 - Portal access: [`../hubspot-cms/anam-portal-access.md`](../hubspot-cms/anam-portal-access.md)
 - QA report: [`../../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`](../../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)
