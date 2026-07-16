@@ -27,6 +27,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 - **Radiografía AEO** (muestra de venta viva) publicada — caso SKY, en `think.efeoncepro.com/muestras/…`.
 - **Entitlement per-ORG** vía `greenhouse_client_portal.module_assignments` (módulo `ai_visibility_v1`, tiers `contracted`/`pilot`/`trial` con allowance mensual). Modelo bien construido.
 - **UI cliente `/aeo`** (workbench por tier) construida — pero deep-link, ver §2.
+- **Stack de flags AEO ON en producción** (verificado runtime 2026-07-16, no ledger): en Vercel prod `GRADER`/`OPERATOR_SEND`/`PORTAL_RUN`/`TRIAL`/`PUBLIC_INTAKE`/`LEAD_HANDOFF`/`REPORT_EMAIL` = `true`; en el `ops-worker` (rev. activa) los de write = `true`. El freno de las features no son los flags, es el rollout de superficie/binding (ver §2-§3).
 
 ---
 
@@ -38,7 +39,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 |---|---|---|
 | UI cliente `/aeo` | Construida (TASK-1248 `complete`) | Es **deep-link, no está en el menú** — diferido en el reachability manifest "hasta que exista el monitor recurrente". El cliente no la encuentra navegando. |
 | Binding de datos | — | Poblar `grader_profiles.organization_id` para que un cliente real vea su reporte. |
-| Run self-serve del cliente (PLG) | Flags `PORTAL_RUN` / `TRIAL` | Verificar/encender (probablemente OFF). Sin ellos no hay botón "correr mi diagnóstico". |
+| Run self-serve del cliente (PLG) | Flags `PORTAL_RUN` / `TRIAL` **ON en Vercel prod** (verificado 2026-07-16) | Los flags NO son el freno. Falta el binding `organization_id` + entitlement per-ORG para que el botón aparezca a un cliente real. |
 | Tiering + trial PLG | **En mockup**, no runtime | Teaser / Locked / upsell no shippeados como productivos. |
 | Monitoreo recurrente + Plan AEO status | Re-grade paused en prod; TASK-1275 sin UI | El cliente contratado no ve avance de su plan mes a mes. |
 
@@ -61,7 +62,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 No requieren construir nada; son rollout/config que frenan lo ya construido:
 
 1. 🔴 **Property HubSpot `aeo_check_result` puede no existir en el portal** (verificada ausente el 2026-06-29). Sin ella el upsert de Company da 400 y **el loop cross-sell se rompe en el write.** Fix: correr `scripts/growth/provision-ai-visibility-hubspot-properties.ts` + confirmar objeto `leads` habilitado.
-2. 🔴 **Estado de flags AEO contradictorio en el ledger** (`OPERATOR_SEND_ENABLED`, `PORTAL_RUN`, `TRIAL`). Los flags son **multi-runtime** (el write corre en `ops-worker`, no en Vercel). Nadie sabe hoy si el cross-sell está vivo. Fix: reconciliar contra `vercel env ls` + revisión activa del ops-worker y actualizar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+2. 🟢 **Flags AEO — ya están ON en prod (verificado runtime 2026-07-16); el ledger estaba desactualizado.** Verificación en vivo: Vercel Production tiene `GRADER`, `OPERATOR_SEND`, `PORTAL_RUN`, `TRIAL`, `PUBLIC_INTAKE`, `LEAD_HANDOFF`, `REPORT_EMAIL` = todos `true`; ops-worker (revisión activa `00490`) tiene `OPERATOR_SEND`/`GRADER`/`LEAD_HANDOFF`/`REPORT_EMAIL` = `true` (los request-path `PORTAL_RUN`/`TRIAL`/`PUBLIC_INTAKE` se leen en Vercel, correcto que no estén en el worker). El ledger afirmaba que `OPERATOR_SEND` estaba ausente en Vercel — falso, está presente y `true` en los 3 environments. **Acción restante: solo actualizar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` para que refleje el runtime real** — no hay flag que prender. Higiene: los flags son multi-runtime; la verdad es `vercel env ls`/`env pull` + revisión activa del `ops-worker`, nunca el ledger.
 3. 🟠 **`TASK-1341` — DataForSEO AIO en prod** cae como `missing_secret` en el ops-worker → los informes quedan `partial`. Falta el secret en la revisión efectiva.
 4. 🟠 **Rollout de la entrada pública (`TASK-1246`, único freno formal de EPIC-020):** sign-off legal de consent + secret Turnstile + resolver la decisión de ADR abierta (¿la cara pública se embebe con `<greenhouse-form>` o se hace en el repo público?) + smoke `form→run→status→report→email`.
 
@@ -106,8 +107,8 @@ No requieren construir nada; son rollout/config que frenan lo ya construido:
 ### Config sin task formal
 
 - Provisionar property HubSpot `aeo_check_result` (script) — ver §3.1.
-- Reconciliar flags AEO multi-runtime + actualizar ledger — ver §3.2.
-- Poblar `grader_profiles.organization_id` + encender `PORTAL_RUN`/`TRIAL` — ver §2.A.
+- Actualizar el ledger de flags para reflejar el runtime real (los flags ya están ON) — ver §3.2.
+- Poblar `grader_profiles.organization_id` + asignar entitlement per-ORG (los flags `PORTAL_RUN`/`TRIAL` ya están ON) — ver §2.A.
 - Provisionar clientes/trials más allá de Berel (decisión comercial) — ver §2.C.
 
 ---
@@ -116,13 +117,13 @@ No requieren construir nada; son rollout/config que frenan lo ya construido:
 
 Ordenado por ratio impacto/esfuerzo, minimizando código nuevo:
 
-**Ola 1 — Encender lo ya hecho (config/rollout, días).** Provisionar property HubSpot (§3.1) → reconciliar flags (§3.2) → cerrar DataForSEO AIO / `TASK-1341` (§3.3). Reactiva el loop CRM y sube los informes a completos. Sin esto, lo que construyas encima nace roto.
+**Ola 1 — Encender lo ya hecho (config/rollout, días).** Provisionar property HubSpot (§3.1) → actualizar el ledger de flags para que refleje el runtime real (§3.2; los flags ya están ON) → cerrar DataForSEO AIO / `TASK-1341` (§3.3). Reactiva el loop CRM y sube los informes a completos. Sin esto, lo que construyas encima nace roto.
 
 **Ola 2 — Cara operativa interna (`TASK-1276`, UI pura sobre backend listo).** Cockpit operador + facet AEO en Account 360. Es el gap #1 y el de mejor ratio: convierte el AEO en herramienta operativa y de venta *desde donde el AM ya trabaja al cliente*.
 
 **Ola 3 — Puerta pública self-serve (decidir y rematar `TASK-1321` o `TASK-1327` + `TASK-1246`).** Una sola entrada donde el prospecto entre solo. Es lo que hoy da 0 tráfico y es el corazón del AEO-como-herramienta-de-venta.
 
-**Ola 4 — Cara del cliente contratado.** Promover `/aeo` a item de nav, poblar `organization_id`, encender `PORTAL_RUN`/`TRIAL` en shadow para medir costo, shippear tiering+trial fuera de mockup, activar re-grade recurrente (`TASK-1270`). En paralelo: segundo caso real de Radiografía + runbook del ciclo AEO recurrente (hoy inexistente; el conocimiento está disperso en 3 skills y 2 manuales).
+**Ola 4 — Cara del cliente contratado.** Promover `/aeo` a item de nav, poblar `organization_id` + entitlement per-ORG, medir el costo del run self-serve (flags `PORTAL_RUN`/`TRIAL` ya ON — vigilar gasto), shippear tiering+trial fuera de mockup, activar re-grade recurrente (`TASK-1270`). En paralelo: segundo caso real de Radiografía + runbook del ciclo AEO recurrente (hoy inexistente; el conocimiento está disperso en 3 skills y 2 manuales).
 
 **Diferido (no bloquea lo anterior):** EPIC-022 (SEO clásico, empezar por `TASK-1299` schema), EPIC-023 (CRO), EPIC-024 (HubSpot Portal Grader).
 

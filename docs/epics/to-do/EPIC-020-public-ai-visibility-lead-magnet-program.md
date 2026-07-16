@@ -62,7 +62,7 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 **Blockers de config (no son tasks nuevas; encienden lo ya hecho):**
 
 - Provisionar property HubSpot `aeo_check_result` (script `scripts/growth/provision-ai-visibility-hubspot-properties.ts`) — sin ella el handoff (D) da 400 en el upsert de Company.
-- Reconciliar flags AEO multi-runtime (`OPERATOR_SEND_ENABLED`, `PORTAL_RUN`, `TRIAL`) contra `vercel env ls` + revisión activa del `ops-worker`; el write corre en el worker, no en Vercel. Actualizar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- Flags AEO: **ya están ON en prod** (verificado runtime 2026-07-16 — Vercel prod y `ops-worker` rev. activa; el ledger estaba desactualizado). Acción restante = solo actualizar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`, no prender nada.
 - `TASK-1341` (DataForSEO AIO en prod, `to-do`): hoy `missing_secret` → informes `partial`.
 - Poblar `grader_profiles.organization_id` para el consumer cliente (J).
 
