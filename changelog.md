@@ -167,12 +167,13 @@
   `notion-status-transitions`: HMAC antes del ACK, Cloud Tasks como recibo durable,
   worker OIDC y procesamiento posterior reutilizando el inbox/handlers canónicos.
 - Cloud Tasks quedó provisionado en `us-east4` con concurrencia global 5 y queue
-  pausada. Vercel staging/production tiene la configuración no sensible y el
-  kill-switch en `false`.
+  activa (`RUNNING`). Vercel staging/production tiene la configuración no
+  sensible; el kill-switch quedó `true` en Production y `false` en staging.
 - La capacidad fue desplegada a producción en el release `416b12ad140c` y pasó
-  health/control-plane; no hubo tráfico real por el path nuevo. Estado:
-  capacidad desplegada, activación pendiente. El objetivo es absorber bursts sin
-  comprar PgBouncer; el rollout de flags/queue se mantiene como paso separado.
+  health/control-plane. El rollout posterior quedó activo en el deployment
+  `dpl_DkdnLEUFwY3MvxyD9VncYwqzQNj1`: canary OIDC deduplicado, prueba pública
+  firmada `queued:true`, backlog cero, health `200` y PostgreSQL estable en 10
+  conexiones observadas. Con esto los bursts se absorben sin comprar PgBouncer.
 
 ## 2026-07-17 — ANAM Customer Agent: source pack live independiente
 

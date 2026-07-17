@@ -245,7 +245,7 @@
 > facturación ANAM; Retención/Fidelización y los cinco Services siguen piloto; billing continúa como siguiente
 > slice diseñado y no desplegado.
 
-## Sesión 2026-07-17 — Notion webhook burst protection — capacidad desplegada, activación pendiente
+## Sesión 2026-07-17 — Notion webhook burst protection — activa en producción
 
 > **Causa validada:** el burst/retry storm de `notion-tasks-demo` y
 > `notion-status-transitions` hacía que cada request Vercel tocara PostgreSQL
@@ -259,13 +259,15 @@
 > `notion-knowledge` queda fuera por fix-mínimo. Canon:
 > `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`.
 >
-> **Infra aplicada:** API Cloud Tasks habilitada; service account
+> **Infra activa:** API Cloud Tasks habilitada; service account
 > `greenhouse-webhook-worker@efeonce-group.iam.gserviceaccount.com`; queue
 > `notion-webhook-ingestion` en `us-east4`, `5 dispatch/s`, concurrencia `5`,
-> `100` intentos/`7d`, estado **PAUSED**; `greenhouse-portal` tiene sólo
+> `100` intentos/`7d`, estado **RUNNING**; `greenhouse-portal` tiene sólo
 > `roles/cloudtasks.enqueuer` + `iam.serviceAccountUser` sobre la identidad OIDC.
-> Vercel staging/production ya tiene queue/location/base URL/SA y
-> `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=false`.
+> Vercel staging/production tiene queue/location/base URL/SA. El flag
+> `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED` quedó **ON en Production** y **OFF en
+> staging**; staging conserva OFF porque su alias protegido no permite un smoke
+> Cloud Tasks válido sin agregar un bypass específico.
 >
 > **Release productivo:** PR #156 squash-merged a
 > `416b12ad140c7558e7c57d62947fd2afd23f1259`. Orquestador `29609025464` y
@@ -275,16 +277,22 @@
 > el watchdog sólo ve drift de etiqueta `b328cc1c`→`416b12ad`, con diff runtime
 > vacío, por lo que no se forzó un redeploy cosmético.
 >
-> **Estado seguro actual:** `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=false` en
-> staging/production y queue `notion-webhook-ingestion` **PAUSED**, backlog cero.
-> La ruta interna existe y falla cerrada (`403` sin identidad Cloud Run; `401`
-> tras transporte OIDC no autorizado). No hubo tráfico Notion por el path nuevo.
+> **Activación y evidencia runtime:** antes del flip se reanudó la queue y se
+> entregó un canary OIDC contra el endpoint productivo usando un evento ya
+> procesado, por lo que el inbox lo deduplicó sin ejecutar efectos de dominio.
+> Luego se actualizó el flag Production, se redeployó el mismo SHA en Vercel y
+> el alias productivo quedó en `dpl_DkdnLEUFwY3MvxyD9VncYwqzQNj1`
+> (`greenhouse-mmk0dhvln-efeonce-7670142f.vercel.app`, READY). Un payload de
+> `750001` bytes devolvió `413`, confirmando el branch asíncrono activo; un POST
+> firmado al endpoint público devolvió `200 {received:true,queued:true}`, fue
+> entregado por Cloud Tasks y el backlog volvió a cero. `/api/auth/health` =
+> `200`; PostgreSQL quedó en `10` conexiones (`1 active`, `9 idle`).
 >
-> **Pendiente/owner:** la activación es un rollout separado: reanudar queue,
-> activar primero staging, ejecutar smoke OIDC/burst y medir ACK, backlog y
-> `pg_stat_activity`; sólo después decidir producción. Rollback operativo ante
-> degradación: pausar queue primero para preservar recepción durable; el flag OFF
-> vuelve al path síncrono. Estado correcto: **capacidad desplegada, activación pendiente**.
+> **Estado/rollback:** producción está activa y el backlog está en cero. Ante
+> degradación, pausar primero la queue para conservar el recibo durable y luego
+> volver el flag Production a `false` + redeploy para retornar al path síncrono.
+> Pendiente no bloqueante: habilitar un bypass gobernado para el alias staging si
+> se quiere ejercer allí el mismo smoke; no afecta el runtime productivo.
 
 ## Sesión 2026-07-17 — ANAM Customer Agent — activación bloqueada por facturación
 
