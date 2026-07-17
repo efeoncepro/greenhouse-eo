@@ -1,3 +1,38 @@
+## Sesión 2026-07-17 — Notion webhook burst protection — código completo, rollout pendiente
+
+> **Causa validada:** el burst/retry storm de `notion-tasks-demo` y
+> `notion-status-transitions` hacía que cada request Vercel tocara PostgreSQL
+> antes del ACK y agotara `max_connections`; Notion terminaba pausando las
+> suscripciones por fallos reiterados.
+>
+> **Cambio local:** recepción asíncrona opt-in con Cloud Tasks. La ruta pública
+> valida HMAC, crea una tarea determinística y responde `200`; el worker interno
+> exige OIDC Google, reconstruye el request y reusa `processInboundWebhook`, inbox,
+> dedupe y handlers existentes. Los retries pueden reclamar inbox events fallidos.
+> `notion-knowledge` queda fuera por fix-mínimo. Canon:
+> `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`.
+>
+> **Infra aplicada:** API Cloud Tasks habilitada; service account
+> `greenhouse-webhook-worker@efeonce-group.iam.gserviceaccount.com`; queue
+> `notion-webhook-ingestion` en `us-east4`, `5 dispatch/s`, concurrencia `5`,
+> `100` intentos/`7d`, estado **PAUSED**; `greenhouse-portal` tiene sólo
+> `roles/cloudtasks.enqueuer` + `iam.serviceAccountUser` sobre la identidad OIDC.
+> Vercel staging/production ya tiene queue/location/base URL/SA y
+> `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=false`.
+>
+> **Evidencia:** smoke real de `CreateTask` PASS con payload ficticio y cero
+> dispatch; tarea eliminada después. 53 tests focales PASS; ESLint focal PASS;
+> typecheck PASS con heap 8GB; `pnpm build` compiló y registró la nueva route;
+> `git diff --check` PASS. El audit local de secretos no cargó env runtime y
+> reportó 8/8 unconfigured, por lo que no cuenta como evidencia Vercel.
+>
+> **Pendiente/owner:** no se hizo commit, push ni deployment porque el checkout
+> `develop` contiene cambios ajenos ANAM/HubSpot. Siguiente paso humano/agente:
+> aislar este diff, desplegar staging con flag OFF, reanudar la queue, ejecutar
+> smoke OIDC del worker, activar el flag sólo en staging, reproducir burst y medir
+> ACK/backlog/`pg_stat_activity`; luego decidir producción. Rollback: flag OFF +
+> pausar queue. Estado correcto: **code complete, rollout pendiente**.
+
 ## Sesión 2026-07-16 — Release develop→main prep (Claude) — release-coupled documentation
 
 > **[release-coupled: TASK-1385 capability grant + persistencia de flag en ops-worker deploy.sh son cambios

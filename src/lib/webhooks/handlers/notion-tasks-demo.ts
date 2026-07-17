@@ -1,11 +1,10 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
-
 import { DEMO_STATUS_PROPERTY_NAMES } from '@/lib/notion-metrics/notion-demo-client'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 import { registerInboundHandler } from '@/lib/webhooks/inbound'
+import { extractNotionVerificationToken, validateNotionSignature } from '@/lib/webhooks/notion-auth'
 
 /**
  * TASK-910 Slice 2 — Notion tasks-demo webhook handler.
@@ -56,15 +55,7 @@ const SIGNATURE_HEADER = 'x-notion-signature'
  *
  * Exported para tests anti-regresión.
  */
-export const extractVerificationToken = (parsedPayload: unknown): string | null => {
-  if (!parsedPayload || typeof parsedPayload !== 'object') {
-    return null
-  }
-
-  const token = (parsedPayload as { verification_token?: unknown }).verification_token
-
-  return typeof token === 'string' && token.length > 0 ? token : null
-}
+export const extractVerificationToken = extractNotionVerificationToken
 
 /**
  * Notion canonical status property names — single source of truth en el demo
@@ -96,34 +87,6 @@ interface NotionWebhookEvent {
  * - HMAC-SHA256(rawBody, secret)
  * - Timing-safe compare canonical
  */
-const validateNotionSignature = (
-  rawBody: string,
-  signature: string,
-  secret: string
-): boolean => {
-  if (!signature || !secret) {
-    return false
-  }
-
-  const prefix = 'sha256='
-  const providedHex = signature.startsWith(prefix) ? signature.slice(prefix.length) : signature
-
-  const computedHex = createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex')
-
-  const expectedBuf = Buffer.from(computedHex, 'utf8')
-  const receivedBuf = Buffer.from(providedHex, 'utf8')
-
-  if (expectedBuf.length !== receivedBuf.length) {
-    return false
-  }
-
-  try {
-    return timingSafeEqual(expectedBuf, receivedBuf)
-  } catch {
-    return false
-  }
-}
-
 interface DemoStatusChangeSignal {
   taskSourceId: string
   changedPropertyIds: readonly string[]

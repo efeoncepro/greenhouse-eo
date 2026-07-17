@@ -1,5 +1,14 @@
 ## Estado vigente para agentes
 
+- **Webhooks Notion — Cloud Tasks preparado pero no activo (2026-07-17):**
+  `notion-tasks-demo` y `notion-status-transitions` tienen un path asíncrono
+  opt-in que valida HMAC, encola y ACKea antes de tocar PostgreSQL; el worker OIDC
+  reusa inbox/dedupe/handlers. Queue GCP `notion-webhook-ingestion` (`us-east4`,
+  5/s, concurrencia 5) está **PAUSED** y Vercel mantiene
+  `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=false`. No declarar el incidente
+  resuelto hasta desplegar staging, validar OIDC + burst real y observar
+  conexiones PG. Canon: `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`.
+
 - **HubSpot as a Service / ANAM tiene canon visible en Greenhouse (2026-07-16):** este repositorio es el SSOT
   para el método de servicio, contexto cliente ANAM, decisiones RevOps, Customer Agent, QA y skills espejo
   `.codex/.claude/skills/hubspot-as-a-service`. El repo Kortex conserva sólo implementación ejecutable

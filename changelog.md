@@ -1,5 +1,16 @@
 # changelog.md
 
+## 2026-07-17 — Backpressure de webhooks Notion con Cloud Tasks
+
+- Se agregó un path asíncrono opt-in para `notion-tasks-demo` y
+  `notion-status-transitions`: HMAC antes del ACK, Cloud Tasks como recibo durable,
+  worker OIDC y procesamiento posterior reutilizando el inbox/handlers canónicos.
+- Cloud Tasks quedó provisionado en `us-east4` con concurrencia global 5 y queue
+  pausada. Vercel staging/production tiene la configuración no sensible y el
+  kill-switch en `false`; no hubo deploy ni tráfico real por el nuevo path.
+- Estado: código completo, rollout pendiente. El objetivo es absorber bursts sin
+  comprar PgBouncer; se mantiene rollback inmediato al path síncrono.
+
 ## 2026-07-16 — TASK-1422: UI de redacción del aviso con IA en el Publication Desk
 
 - El Publication Desk (`/agency/hiring/publication`) gana el CTA `✨ Redactar con IA` en la columna

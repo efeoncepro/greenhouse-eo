@@ -18,7 +18,11 @@ export const registerInboundHandler = (handlerCode: string, handler: InboundHand
 
 export const processInboundWebhook = async (
   endpointKey: string,
-  request: Request
+  request: Request,
+  options: {
+    retryFailedDuplicates?: boolean
+    surfaceHandlerFailures?: boolean
+  } = {}
 ): Promise<{ status: number; body: object }> => {
   await ensureWebhookSchema()
 
@@ -65,7 +69,12 @@ export const processInboundWebhook = async (
   })
 
   // 7. Insert inbox event (idempotent)
-  const { id: inboxEventId, isDuplicate } = await insertInboxEvent({
+  const {
+    id: inboxEventId,
+    isDuplicate,
+    status: duplicateStatus,
+    receivedAt
+  } = await insertInboxEvent({
     endpointId: endpoint.webhook_endpoint_id,
     providerCode: endpoint.provider_code,
     sourceEventId,
@@ -76,7 +85,15 @@ export const processInboundWebhook = async (
     signatureVerified
   })
 
-  if (isDuplicate) {
+  const duplicateAgeMs = Date.now() - new Date(receivedAt).getTime()
+
+  const canRetryDuplicate = options.retryFailedDuplicates && (
+    duplicateStatus === 'failed'
+    || duplicateStatus === 'received'
+    || (duplicateStatus === 'processing' && duplicateAgeMs > 5 * 60_000)
+  )
+
+  if (isDuplicate && !canRetryDuplicate) {
     return { status: 200, body: { received: true, duplicate: true } }
   }
 
@@ -86,7 +103,10 @@ export const processInboundWebhook = async (
   if (!handler) {
     await updateInboxEventStatus(inboxEventId, 'failed', `No handler registered for: ${endpoint.handler_code}`)
 
-    return { status: 200, body: { received: true, processed: false, reason: 'no handler' } }
+    return {
+      status: options.surfaceHandlerFailures ? 503 : 200,
+      body: { received: true, processed: false, reason: 'no handler' }
+    }
   }
 
   try {
@@ -117,7 +137,10 @@ export const processInboundWebhook = async (
 
     await updateInboxEventStatus(inboxEventId, 'failed', message)
 
-    return { status: 200, body: { received: true, processed: false, error: message } }
+    return {
+      status: options.surfaceHandlerFailures ? 503 : 200,
+      body: { received: true, processed: false, error: message }
+    }
   }
 }
 

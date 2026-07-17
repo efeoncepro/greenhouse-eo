@@ -1,5 +1,3 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
-
 import { isNotionStatusTransitionsWebhookEnabled } from '@/lib/notion-metrics/status-transitions-flags'
 import { isDemoTareasDataSource } from '@/lib/notion-metrics/notion-productive-workspaces'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -7,6 +5,7 @@ import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { registerInboundHandler } from '@/lib/webhooks/inbound'
+import { extractNotionVerificationToken, validateNotionSignature } from '@/lib/webhooks/notion-auth'
 
 /**
  * TASK-912 — Notion status-transitions webhook handler PRODUCTIVO (Efeonce + Sky).
@@ -61,15 +60,7 @@ const SIGNING_SECRET_ENV = 'NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF
  *
  * Exported para tests anti-regresión.
  */
-export const extractVerificationToken = (parsedPayload: unknown): string | null => {
-  if (!parsedPayload || typeof parsedPayload !== 'object') {
-    return null
-  }
-
-  const token = (parsedPayload as { verification_token?: unknown }).verification_token
-
-  return typeof token === 'string' && token.length > 0 ? token : null
-}
+export const extractVerificationToken = extractNotionVerificationToken
 
 interface NotionWebhookEvent {
   readonly id?: string
@@ -92,30 +83,6 @@ interface NotionWebhookEvent {
  * - Body raw bytes (NO parsed JSON)
  * - HMAC-SHA256(rawBody, secret) + timing-safe compare
  */
-const validateNotionSignature = (rawBody: string, signature: string, secret: string): boolean => {
-  if (!signature || !secret) {
-    return false
-  }
-
-  const prefix = 'sha256='
-  const providedHex = signature.startsWith(prefix) ? signature.slice(prefix.length) : signature
-
-  const computedHex = createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex')
-
-  const expectedBuf = Buffer.from(computedHex, 'utf8')
-  const receivedBuf = Buffer.from(providedHex, 'utf8')
-
-  if (expectedBuf.length !== receivedBuf.length) {
-    return false
-  }
-
-  try {
-    return timingSafeEqual(expectedBuf, receivedBuf)
-  } catch {
-    return false
-  }
-}
-
 interface StatusChangeSignal {
   taskSourceId: string
   changedPropertyIds: readonly string[]

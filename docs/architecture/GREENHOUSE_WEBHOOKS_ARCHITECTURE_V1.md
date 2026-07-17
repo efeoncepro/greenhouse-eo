@@ -1,5 +1,61 @@
 # GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md
 
+## Delta 2026-07-17 — Backpressure de webhooks Notion con Cloud Tasks
+
+Los endpoints `notion-tasks-demo` y `notion-status-transitions` pueden usar una
+recepción asíncrona opt-in para absorber bursts sin que cada request de Notion
+abra conexiones PostgreSQL desde un isolate Vercel distinto.
+
+Flujo cuando `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=true`:
+
+1. `POST /api/webhooks/[endpointKey]` lee el raw body y valida HMAC Notion en el edge.
+2. La ruta crea una tarea HTTP con nombre determinístico en la queue
+   `notion-webhook-ingestion` y recién entonces responde `200`.
+3. Cloud Tasks invoca `POST /api/internal/webhooks/notion-ingestion` con OIDC.
+4. El worker valida audiencia + service account, reconstruye el request original
+   y delega a `processInboundWebhook()`; no existe un segundo handler de dominio.
+5. La queue limita globalmente el dispatch a 5/s y 5 ejecuciones concurrentes.
+6. El inbox PostgreSQL mantiene dedupe, raw receipt, estados y auditoría. Un
+   evento `failed` puede ser reclamado por el worker en un retry de Cloud Tasks.
+
+Contratos de seguridad y resiliencia:
+
+- El verification handshake de Notion se encola sin HMAC porque establece el
+  signing secret; el handler existente lo persiste y ACKea.
+- La queue es el primer recibo durable durante un burst. Si `CreateTask` falla,
+  Greenhouse responde `503` para que Notion reintente; nunca ACKea un evento no
+  persistido.
+- Los nombres determinísticos deduplican reintentos del provider antes del inbox.
+- El endpoint interno no confía en headers `X-CloudTasks-*`; exige un ID token
+  Google válido para la audiencia y service account configuradas.
+- El flag default OFF preserva el path síncrono y permite rollback inmediato sin
+  cambios de schema ni de dominio.
+- El endpoint `notion-knowledge` permanece síncrono porque no participó del burst
+  observado y ampliar scope sin evidencia violaría fix-mínimo.
+
+Configuración runtime:
+
+| Variable | Contrato |
+| --- | --- |
+| `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED` | Kill-switch; default `false` |
+| `NOTION_WEBHOOK_TASKS_QUEUE` | Default `notion-webhook-ingestion` |
+| `NOTION_WEBHOOK_TASKS_LOCATION` | Default `us-east4`, misma región que Cloud SQL |
+| `NOTION_WEBHOOK_TASKS_TARGET_BASE_URL` | Alias HTTPS estable del environment |
+| `NOTION_WEBHOOK_TASKS_OIDC_AUDIENCE` | Opcional; default URL completa del worker |
+| `NOTION_WEBHOOK_TASKS_SERVICE_ACCOUNT_EMAIL` | Identidad dedicada que firma el ID token |
+
+Rollout: desplegar con flag OFF, crear queue/IAM, ejecutar una tarea firmada de
+smoke contra staging, activar el flag en staging, reproducir un burst controlado
+y medir `pg_stat_activity`, latencia de ACK, retry count y backlog. Production
+solo se activa con esa evidencia. Rollback: flag OFF; pausar la queue si hubiera
+payload pendiente que requiera investigación.
+
+Fuentes validadas 2026-07-17:
+
+- [HTTP target tasks + OIDC](https://cloud.google.com/tasks/docs/creating-http-target-tasks)
+- [Rate limits y concurrencia de queues](https://cloud.google.com/tasks/docs/configuring-queues)
+- [Pricing de Cloud Tasks](https://cloud.google.com/tasks/pricing)
+
 ## Delta 2026-05-10 — GitHub release webhooks as provider-native release evidence (TASK-857)
 
 `TASK-857` agrega una excepción acotada al scope original: los **GitHub repository webhooks usados por el Release Control Plane** sí entran a Greenhouse, pero solo como evidencia firmada para `release_manifests`.

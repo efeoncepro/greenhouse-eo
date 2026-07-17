@@ -63,12 +63,19 @@ export const insertInboxEvent = async (event: {
   payloadJson: Record<string, unknown>
   rawBodyText: string | null
   signatureVerified: boolean | null
-}): Promise<{ id: string; isDuplicate: boolean }> => {
+}): Promise<{
+  id: string
+  isDuplicate: boolean
+  status: WebhookInboxEvent['status']
+  receivedAt: string
+}> => {
   const id = `wh-inbox-${randomUUID()}`
 
   const result = await runGreenhousePostgresQuery<{
     webhook_inbox_event_id: string
     is_duplicate: boolean
+    status: WebhookInboxEvent['status']
+    received_at: string
   }>(
     `WITH inserted AS (
        INSERT INTO greenhouse_sync.webhook_inbox_events (
@@ -78,11 +85,11 @@ export const insertInboxEvent = async (event: {
          signature_verified, status
        ) VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, $9, 'received')
        ON CONFLICT (webhook_endpoint_id, idempotency_key) DO NOTHING
-       RETURNING webhook_inbox_event_id, false AS is_duplicate
+       RETURNING webhook_inbox_event_id, false AS is_duplicate, status, received_at
      )
-     SELECT webhook_inbox_event_id, is_duplicate FROM inserted
+     SELECT webhook_inbox_event_id, is_duplicate, status, received_at FROM inserted
      UNION ALL
-     SELECT webhook_inbox_event_id, true AS is_duplicate
+     SELECT webhook_inbox_event_id, true AS is_duplicate, status, received_at
        FROM greenhouse_sync.webhook_inbox_events
       WHERE webhook_endpoint_id = $2
         AND idempotency_key = $5
@@ -98,7 +105,9 @@ export const insertInboxEvent = async (event: {
 
   return {
     id: result[0]?.webhook_inbox_event_id || id,
-    isDuplicate: result[0]?.is_duplicate ?? true
+    isDuplicate: result[0]?.is_duplicate ?? true,
+    status: result[0]?.status ?? 'received',
+    receivedAt: result[0]?.received_at ?? new Date().toISOString()
   }
 }
 
