@@ -1,6 +1,8 @@
 import 'server-only'
-
 import type { PoolClient } from 'pg'
+
+import { resolveOrganizationLogoUrl } from '@/lib/account-360/resolve-organization-logo'
+
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateMembershipId, nextPublicId } from '@/lib/account-360/id-generation'
@@ -8,7 +10,6 @@ import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
-import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 import { getOrganizationOperationalServing } from './get-organization-operational-serving'
 import type { OrganizationClientFinance, OrganizationFinanceSummary } from '@/views/greenhouse/organizations/types'
 
@@ -209,7 +210,7 @@ const normalizeListItem = (r: OrgListRow): OrganizationListItem => ({
   country: r.country,
   hubspotCompanyId: r.hubspot_company_id,
   logoAssetId: r.logo_asset_id,
-  logoUrl: r.logo_asset_id ? `${buildPrivateAssetDownloadUrl(r.logo_asset_id)}?inline=1` : null,
+  logoUrl: resolveOrganizationLogoUrl(r.logo_asset_id),
   websiteUrl: r.website_url,
   isOperatingEntity: r.is_operating_entity === true,
   status: r.status,

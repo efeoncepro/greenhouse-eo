@@ -116,6 +116,7 @@ export default async function AeoOperatorDetailPage({
   const band = {
     organizationId,
     organizationName: organization.organizationName,
+    logoUrl: organization.logoUrl,
     publicId: organization.publicId ?? null,
     domain: stripProtocol(organization.websiteUrl),
     tierLabel: entitlement ? tierLabelOf(entitlement) : O.tier.none,

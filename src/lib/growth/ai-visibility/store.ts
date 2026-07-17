@@ -1,4 +1,5 @@
 import 'server-only'
+import { resolveOrganizationLogoUrl } from '@/lib/account-360/resolve-organization-logo'
 
 /**
  * TASK-1226 — Growth AI Visibility Grader · Store (Slice 4, server-only).
@@ -427,11 +428,20 @@ export interface OperatorAeoCockpitRow {
   organizationId: string
   organizationName: string
   organizationType: string
+  /** TASK-1276 polish — identidad visual real de la org (mockup aprobado): publicId + logo. */
+  organizationPublicId: string | null
+  logoUrl: string | null
   aeoTier: string | null
   assignmentStatus: string
   latestRunId: string | null
   latestRunAt: string | null
   latestScore: number | null
+  /** Últimos scores reportables (asc por fecha, máx 6) para el sparkline; [] = sin histórico. */
+  scoreHistory: number[]
+  /** Conteos del Plan AEO (TASK-1275) por org — degradación honesta: 0 = sin seguimiento. */
+  planInProgress: number
+  planDone: number
+  planTracked: number
 }
 
 export const listOperatorCrossOrgAeoScores = async (): Promise<OperatorAeoCockpitRow[]> => {
@@ -440,11 +450,17 @@ export const listOperatorCrossOrgAeoScores = async (): Promise<OperatorAeoCockpi
        ma.organization_id,
        o.organization_name,
        o.organization_type,
+       o.public_id AS organization_public_id,
+       o.logo_asset_id,
        ma.metadata_json->>'aeo_tier' AS aeo_tier,
        ma.status AS assignment_status,
        lr.run_id AS latest_run_id,
        lr.finished_at AS latest_run_at,
-       ls.overall_score AS latest_score
+       ls.overall_score AS latest_score,
+       hist.scores AS score_history,
+       COALESCE(ps.in_progress, 0) AS plan_in_progress,
+       COALESCE(ps.done, 0) AS plan_done,
+       COALESCE(ps.tracked, 0) AS plan_tracked
      FROM greenhouse_client_portal.module_assignments ma
      JOIN greenhouse_core.organizations o ON o.organization_id = ma.organization_id
      LEFT JOIN LATERAL (
@@ -462,6 +478,35 @@ export const listOperatorCrossOrgAeoScores = async (): Promise<OperatorAeoCockpi
        ORDER BY s.created_at DESC
        LIMIT 1
      ) ls ON TRUE
+     LEFT JOIN LATERAL (
+       -- Sparkline (mockup aprobado): últimos scores reportables asc por fecha. Solo runs CON score.
+       SELECT json_agg(x.overall_score ORDER BY x.finished_at) AS scores
+       FROM (
+         SELECT s2.overall_score, r2.finished_at
+         FROM greenhouse_growth.grader_runs r2
+         JOIN greenhouse_growth.grader_profiles p2 ON p2.profile_id = r2.profile_id
+         JOIN LATERAL (
+           SELECT s3.overall_score
+           FROM greenhouse_growth.grader_scores s3
+           WHERE s3.run_id = r2.run_id
+           ORDER BY s3.created_at DESC
+           LIMIT 1
+         ) s2 ON TRUE
+         WHERE p2.organization_id = ma.organization_id
+           AND r2.status = ANY($2::text[])
+           AND r2.finished_at IS NOT NULL
+         ORDER BY r2.finished_at DESC
+         LIMIT 6
+       ) x
+     ) hist ON TRUE
+     LEFT JOIN (
+       SELECT organization_id,
+              COUNT(*) FILTER (WHERE status = 'in_progress')::int AS in_progress,
+              COUNT(*) FILTER (WHERE status = 'done')::int AS done,
+              COUNT(*)::int AS tracked
+       FROM greenhouse_growth.grader_recommendation_status
+       GROUP BY organization_id
+     ) ps ON ps.organization_id = ma.organization_id
      WHERE ma.module_key = $1 AND ma.effective_to IS NULL
      ORDER BY ls.overall_score DESC NULLS LAST, o.organization_name`,
     [AI_VISIBILITY_MODULE_KEY, [...CLIENT_REPORTABLE_RUN_STATUSES]]
@@ -471,12 +516,41 @@ export const listOperatorCrossOrgAeoScores = async (): Promise<OperatorAeoCockpi
     organizationId: String(row.organization_id),
     organizationName: String(row.organization_name),
     organizationType: String(row.organization_type),
+    organizationPublicId: (row.organization_public_id as string | null) ?? null,
+    logoUrl: resolveOrganizationLogoUrl(row.logo_asset_id as string | null),
     aeoTier: (row.aeo_tier as string | null) ?? null,
     assignmentStatus: String(row.assignment_status),
     latestRunId: (row.latest_run_id as string | null) ?? null,
     latestRunAt: toIsoOrNull(row.latest_run_at),
-    latestScore: row.latest_score != null ? Number(row.latest_score) : null
+    latestScore: row.latest_score != null ? Number(row.latest_score) : null,
+    scoreHistory: Array.isArray(row.score_history) ? (row.score_history as unknown[]).map(Number) : [],
+    planInProgress: Number(row.plan_in_progress ?? 0),
+    planDone: Number(row.plan_done ?? 0),
+    planTracked: Number(row.plan_tracked ?? 0)
   }))
+}
+
+/** TASK-1276 polish — KPI "Runs este mes" del cockpit (mockup aprobado): total + atribuidos a ventas. */
+export interface OperatorAeoRunActivity {
+  runsThisMonth: number
+  salesRunsThisMonth: number
+}
+
+export const getOperatorAeoRunActivityThisMonth = async (): Promise<OperatorAeoRunActivity> => {
+  const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
+    `SELECT
+       COUNT(*)::int AS runs_this_month,
+       COUNT(*) FILTER (WHERE run_source = 'operator_sales')::int AS sales_runs_this_month
+     FROM greenhouse_growth.grader_runs
+     WHERE created_at >= date_trunc('month', CURRENT_TIMESTAMP)`
+  )
+
+  const row = rows[0] ?? {}
+
+  return {
+    runsThisMonth: Number(row.runs_this_month ?? 0),
+    salesRunsThisMonth: Number(row.sales_runs_this_month ?? 0)
+  }
 }
 
 /**

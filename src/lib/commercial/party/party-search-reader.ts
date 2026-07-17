@@ -1,8 +1,8 @@
 import 'server-only'
+import { resolveOrganizationLogoUrl } from '@/lib/account-360/resolve-organization-logo'
 
 import { query as runQuery } from '@/lib/db'
 
-import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import {
   listHubSpotCandidates,
@@ -85,7 +85,7 @@ const mapOrganizationRow = (row: OrganizationSearchRow): PartySearchItem => {
     displayName: row.organization_name || row.legal_name || row.hubspot_company_id || row.organization_id,
     lifecycleStage,
     domain: normalizeCompanyDomain(row.website_url),
-    logoUrl: row.logo_asset_id ? `${buildPrivateAssetDownloadUrl(row.logo_asset_id)}?inline=1` : null,
+    logoUrl: resolveOrganizationLogoUrl(row.logo_asset_id),
     lastActivityAt: toIsoString(row.updated_at),
     canAdopt: false
   }

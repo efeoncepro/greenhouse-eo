@@ -1,3 +1,13 @@
+## Sesión 2026-07-17 (noche) — polish cockpit AEO post-feedback + resolver canónico de logos
+
+> Feedback del operador sobre prod: cockpit no fiel al mockup, sin logos, picker=dump del CRM.
+> Aplicado y verificado local (GVC + scroll 0 + 710 tests focales): resolver canónico
+> `resolveOrganizationLogoUrl` (6 call sites consolidados), cockpit con 4 KPIs/sparkline/plan/
+> filtros segmentados, picker search-first (prospectos solo con búsqueda + sitio web). Berel scoreó
+> 44,5 con el re-run (caso "sin score" era pre-fix 04-07). Pendiente: push→staging y decidir si va
+> en un release a prod ahora o en el próximo batch. VS Code crasheó una vez por presión de memoria
+> (dev server 10GB + suite + build simultáneos) — mantener carga secuencial.
+
 ## Sesión 2026-07-17 — TASK-1276 RELEASED a producción
 
 > Release develop→main PR #157 (squash `83e4926f83dd`, 139 commits de develop, cabeza TASK-1276).

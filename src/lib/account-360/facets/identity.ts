@@ -1,7 +1,7 @@
 import 'server-only'
+import { resolveOrganizationLogoUrl } from '@/lib/account-360/resolve-organization-logo'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 import type { AccountIdentityFacet, AccountScope, AccountFacetContext } from '@/types/account-complete-360'
 
 type IdentityRow = {
@@ -93,7 +93,7 @@ export const fetchIdentityFacet = async (
     active: row.active,
     hubspotCompanyId: row.hubspot_company_id,
     logoAssetId: row.logo_asset_id,
-    logoUrl: row.logo_asset_id ? `${buildPrivateAssetDownloadUrl(row.logo_asset_id)}?inline=1` : null,
+    logoUrl: resolveOrganizationLogoUrl(row.logo_asset_id),
     websiteUrl: row.website_url,
     isOperatingEntity: row.is_operating_entity === true,
     notes: row.notes,

@@ -131,8 +131,8 @@ describe('readOperatorCrossOrgAeoScores (cockpit)', () => {
     vi.mocked(can).mockReturnValue(true)
 
     const cockpit = [
-      { organizationId: 'org-a', organizationName: 'A', organizationType: 'client', aeoTier: 'contracted', assignmentStatus: 'active', latestRunId: 'grun-1', latestRunAt: '2026-06-29T00:00:00.000Z', latestScore: 72 },
-      { organizationId: 'org-b', organizationName: 'B', organizationType: 'client', aeoTier: 'trial', assignmentStatus: 'active', latestRunId: null, latestRunAt: null, latestScore: null }
+      { organizationId: 'org-a', organizationName: 'A', organizationType: 'client', organizationPublicId: 'EO-ORG-0001', logoUrl: '/api/assets/private/asset-a?inline=1', aeoTier: 'contracted', assignmentStatus: 'active', latestRunId: 'grun-1', latestRunAt: '2026-06-29T00:00:00.000Z', latestScore: 72, scoreHistory: [65, 72], planInProgress: 1, planDone: 0, planTracked: 1 },
+      { organizationId: 'org-b', organizationName: 'B', organizationType: 'client', organizationPublicId: null, logoUrl: null, aeoTier: 'trial', assignmentStatus: 'active', latestRunId: null, latestRunAt: null, latestScore: null, scoreHistory: [], planInProgress: 0, planDone: 0, planTracked: 0 }
     ]
 
     vi.mocked(listOperatorCrossOrgAeoScores).mockResolvedValue(cockpit)
