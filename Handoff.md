@@ -1,3 +1,15 @@
+## Sesión 2026-07-17 — Aprendizajes consolidados del Customer Agent ANAM
+
+> **Editorial/publicación:** el runbook Content Factory ahora exige scan de lenguaje dependiente del lifecycle,
+> separa evidencia propia del caso, telemetría de fabricante y contexto independiente, y agrega un gate de primer
+> viewport para audiencias problem-aware. Documenta además que aún no existe un comando reusable de publish/live
+> verify: los scripts `tmp/` siguen siendo evidencia acotada y deben terminar limpiando recursos naturalmente.
+>
+> **Visual:** manifest y sistema visual ANAM quedaron reconciliados con el runtime público, assets v2
+> `251434–251445`, inspección final y QA live. `content-marketing-studio` exige ahora `explanatoryDelta` por asset;
+> `pnpm content:visual-manifest:lint -- <manifest.json>` bloquea infografías que no declaran el valor explicativo
+> adicional. Mirrors Codex/Claude sincronizados; skin HubSpot y decisiones ANAM siguen siendo locales.
+
 ## Sesión 2026-07-17 — Gate ejecutable para variantes visuales editoriales
 
 > **Problema corregido:** el método responsive/light-dark existía en la referencia, pero podía omitirse durante

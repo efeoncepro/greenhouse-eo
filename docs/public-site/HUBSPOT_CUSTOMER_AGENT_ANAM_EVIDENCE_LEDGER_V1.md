@@ -5,6 +5,10 @@
 > **Uso:** soporte editorial y E-E-A-T del segundo artículo del caso ANAM
 >
 > **Frontera:** ninguna cifra externa mide el desempeño de ANAM ni prueba que el agente esté operativo
+>
+> **Lifecycle:** snapshot histórico del ledger usado antes de publicar; el status público vigente vive en
+> [la auditoría WordPress y cierre live](./HUBSPOT_CUSTOMER_AGENT_ANAM_WORDPRESS_PRIVATE_AUDIT_V1.md). Las fuentes,
+> atribuciones y prohibiciones de extrapolación de este ledger permanecen vigentes.
 
 ## Decisión editorial
 

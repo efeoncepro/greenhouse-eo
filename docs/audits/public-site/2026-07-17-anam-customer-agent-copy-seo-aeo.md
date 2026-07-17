@@ -5,6 +5,11 @@
 **Estado:** `CONDITIONAL PASS` para carga privada; no autoriza publicación
 **Skills aplicadas:** `copywriting` y `seo-aeo`
 
+> **Lifecycle:** snapshot histórico de la revisión prepublicación.
+> **Estado público vigente:** supersedido por
+> [la auditoría WordPress y cierre live](../../public-site/HUBSPOT_CUSTOMER_AGENT_ANAM_WORDPRESS_PRIVATE_AUDIT_V1.md);
+> los hallazgos, claims y límites de este corte conservan su valor histórico.
+
 ## Veredicto
 
 El borrador tiene una promesa clara, responde a una intención de búsqueda útil y conserva la honestidad del caso.

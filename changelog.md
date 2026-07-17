@@ -1,5 +1,14 @@
 # changelog.md
 
+## 2026-07-17 — Cierre de aprendizaje editorial del Customer Agent ANAM
+
+- El runbook agentic de blogposts incorpora un scan de lenguaje de lifecycle, clasificación explícita del alcance
+  de cada claim, gate problem-aware del primer viewport y el estado honesto del tooling de publicación/QA todavía
+  acotado por caso.
+- El manifest y el sistema visual del artículo quedaron sincronizados con los assets v2 y la publicación live.
+  `content-marketing-studio` añade `explanatoryDelta` como gate ejecutable para evitar infografías decorativas o
+  redundantes; la regla se sincronizó para Codex/Claude sin convertir la estética HubSpot en default.
+
 ## 2026-07-17 — Gate de entrega para sistemas visuales editoriales
 
 - `content-marketing-studio` exige ahora un `deliveryContract` machine-readable por `conceptId`: viewport,

@@ -1,12 +1,13 @@
 ## Estado vigente para agentes
 
 - **Gate ejecutable de entrega visual editorial (2026-07-17):** todo `conceptId` producido por
-  `content-marketing-studio` debe declarar en su manifest un `deliveryContract` con `viewport`
+  `content-marketing-studio` debe declarar un `explanatoryDelta` y un `deliveryContract` con `viewport`
   (`art_directed|single_composition|crop_safe`), `theme` (`light_dark|single_theme`), `canvas`
   (`transparent|opaque`), `skin` (`efeonce_core|contextual_platform|contextual_client|campaign_specific`) y
   `rationale`. Codex y Claude comparten la instrucción y el comando
   `pnpm content:visual-manifest:lint -- <manifest.json>`. El gate bloquea matrices responsive/theme incompletas
-  y transparencia sin `qa.alpha=true`; una excepción de un solo tema, composición o fondo sigue permitida sólo
+  y transparencia sin `qa.alpha=true`; también bloquea visuales que no declaran qué mecanismo, relación, decisión
+  o frontera explican mejor que el texto adyacente. Una excepción de un solo tema, composición o fondo sigue permitida sólo
   si queda explícita y justificada. Un skin contextual —por ejemplo, vinotinto/coral para HubSpot— sólo pertenece
   a piezas cuyo tema sea esa plataforma y nunca se hereda como branding Efeonce o default de la siguiente pieza.
 

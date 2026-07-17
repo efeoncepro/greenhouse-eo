@@ -24,6 +24,10 @@ function validate(manifest) {
       continue
     }
 
+    if (typeof asset.explanatoryDelta !== 'string' || asset.explanatoryDelta.trim().length < 24) {
+      errors.push(`${id}: explanatoryDelta must state what the visual explains beyond adjacent prose or tables`)
+    }
+
     for (const field of ['viewport', 'theme', 'canvas', 'skin']) {
       if (!allowed[field].has(contract[field])) errors.push(`${id}: invalid deliveryContract.${field}`)
     }
@@ -61,6 +65,7 @@ function selfTest() {
   const valid = {
     assets: [{
       conceptId: 'TEST-01',
+      explanatoryDelta: 'Shows the mechanism and decision boundary spatially instead of repeating the paragraph.',
       deliveryContract: { viewport: 'art_directed', theme: 'light_dark', canvas: 'transparent', skin: 'contextual_platform', rationale: 'Text needs a vertical mobile composition.' },
       variants: { desktopLight: 'a', mobileLight: 'b', desktopDark: 'c', mobileDark: 'd' },
       qa: { alpha: true }

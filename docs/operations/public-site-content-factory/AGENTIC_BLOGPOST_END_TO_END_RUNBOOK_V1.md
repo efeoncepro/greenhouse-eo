@@ -313,6 +313,9 @@ Cada claim material debe tener:
 | `source_class`            | primaria, secundaria, interna aprobada o comercial                            |
 | `as_of`                   | fecha real de vigencia                                                        |
 | `method_sample`           | muestra, periodo, mercados, denominador y método cuando aplica                |
+| `evidence_scope`          | `case_first_party`, `vendor_product`, `independent_context` o `author_doctrine` |
+| `claim_subject_population` | entidad/población exacta sobre la que habla el claim                          |
+| `case_extrapolation`      | `allowed` o `forbidden`, con razón explícita                                  |
 | `allowed_wording`         | redacción máxima respaldada                                                   |
 | `forbidden_extrapolation` | lo que la fuente no demuestra                                                 |
 | `permission`              | owner/aprobación para datos internos o de cliente                             |
@@ -324,6 +327,17 @@ aparecen en la spec.
 
 **Bloqueo:** cifras sin denominador, causalidad derivada de correlación, evidencia interna sin permiso, fuente
 secundaria presentada como medición propia o volumen SEO inventado.
+
+No usar `first-party` sin calificador. Escribir `evidencia propia del caso/cliente` o `telemetría first-party del
+fabricante`, porque ambas pueden ser auténticas y aun así hablar de poblaciones distintas. Un artículo puede
+mostrar carriles separados para caso, proveedor y contexto independiente, pero debe conservar un solo inventario
+de claims materiales.
+
+Todo claim sobre una capacidad, automatización o agente debe registrar además `capability_state`, `environment`,
+`channel`, `as_of`, `runtime_readback`, `blocker` y `allowed_wording`. Publicar sólo el estado más alto demostrado:
+documentado, elegible, configurado, probado en entorno controlado o verificado en operación real. Un estado no
+hereda el siguiente por inferencia; una dependencia administrativa, técnica o comercial pendiente se nombra sin
+convertirla en una falla del producto ni ocultarla detrás de lenguaje futuro.
 
 ### Fase 2. Arquitectura pillar/cluster y query ownership
 
@@ -411,6 +425,9 @@ anécdota de Julio.
 13. Integrar metodología, límites y disclosure en prosa conversacional. Una checklist E-E-A-T puede satisfacer
     un control y aun así romper el ritmo del artículo.
 14. Hacer revisión autoral antes de diseñar el sistema visual.
+15. Para audiencia `unaware` o `problem-aware`, comprobar que título y primer viewport se entienden sin conocer
+    el término técnico: problema/JTBD reconocible primero, definición breve de la categoría después y detalle de
+    producto/caso sólo cuando el lector ya ganó vocabulario.
 
 **Gate editorial mínimo:**
 
@@ -423,6 +440,7 @@ anécdota de Julio.
 - CTA útil y de baja presión;
 - valor intacto si se elimina el CTA;
 - cero promesas de producto no disponible;
+- primer viewport comprensible al nivel de awareness declarado;
 - lectura humana del autor.
 
 **Bloqueo:** texto “correcto” pero sin autoría, hook basado en cifra no verificada, first-person inventada,
@@ -882,6 +900,12 @@ Entregar al aprobador:
 - snapshot y rollback;
 - cambio exacto que hará `publish`.
 
+Escanear además todo el copy visible dependiente del lifecycle —título, cuerpo, nota de autoría, captions, CTA y
+excerpt— contra el estado autorizado. Marcadores como `este borrador`, `antes de publicar`, `cuando se publique`,
+`pendiente de aprobación` o `se publicará` deben ser verdaderos para el estado final o eliminarse antes de congelar
+el hash. Preferir disclosures estables entre private/public. Si una variante pública es necesaria, ambos textos y
+la transición exacta forman parte del approval packet; no se improvisan después.
+
 ```bash
 shasum -a 256 docs/public-site/<SPEC>.json
 ```
@@ -911,7 +935,8 @@ requiere una nueva. Typos sin cambio semántico pueden seguir una política expl
 4. comprobar canonical/rutas duplicadas una última vez;
 5. verificar que category, tags, featured, Yoast y robots deseados ya están reconciliados;
 6. preparar script/operación de contención `publish -> private/noindex`;
-7. confirmar que el operador sigue autorizando.
+7. repetir el scan de lenguaje de estado sobre el contenido exacto que quedará público;
+8. confirmar que el operador sigue autorizando.
 
 #### 13.2 Write
 
@@ -985,6 +1010,7 @@ Verificar al menos:
 - imágenes con `naturalWidth > 0`, tamaño/crop correcto y sin duplicar featured;
 - TOC visible, navegable y con todos sus destinos existentes;
 - navegación por teclado y focus de links;
+- lenguaje de estado coherente con `publish` en cuerpo, notas, captions, CTA y excerpt;
 - consola sin errores relevantes.
 
 Una captura `fullPage` puede ocultar overflow horizontal. Medir `scrollWidth`; no inferirlo de la imagen.
@@ -1162,6 +1188,7 @@ Un blogpost está `documented_closed` sólo cuando todos los ítems aplicables s
 - [ ] Evidencia, inferencia, doctrina y límites se distinguen.
 - [ ] Autor humano revisó copy y primera persona.
 - [ ] IA y método están transparentados cuando aplica.
+- [ ] Copy visible no conserva lenguaje de borrador/aprobación futura incompatible con el estado final.
 
 ### Content Factory y Gutenberg
 
@@ -1217,6 +1244,7 @@ Un blogpost está `documented_closed` sólo cuando todos los ítems aplicables s
 - [ ] Canonical, robots, OG, schema y author verificados en HTML live.
 - [ ] Rutas duplicadas revisadas en runtime/source.
 - [ ] Consola sin errores materiales.
+- [ ] Proceso de QA terminó naturalmente y cerró browser, contexts, requests, timers y reporte.
 - [ ] Freshness/owner de revisión definidos.
 - [ ] Auditoría, handoff, changelog/roadmap/índices sincronizados cuando aplica.
 - [ ] Estado final reportado honestamente.
@@ -1249,6 +1277,8 @@ Un blogpost está `documented_closed` sólo cuando todos los ítems aplicables s
 24. **Borrar como rollback.** Restaurar/contener primero; trash sólo para private owned y con autorización.
 25. **Convertir el artículo en product spec.** El contenido informa producto; no lo implementa.
 26. **Usar Handoff como canon.** Sirve continuidad, no reemplaza PDR, código, runtime ni este runbook.
+27. **Publicar copy que describe otro lifecycle.** `Este borrador` o aprobación futura dentro de una pieza live
+    es drift editorial; detectarlo antes del hash público y repetir el scan después del publish.
 
 ## 11. Comandos y evidencia operativa
 
@@ -1306,6 +1336,23 @@ pnpm ai:image --prompt-file <prompt.txt> --out <master.png> --model gpt-image-2 
 pnpm media:webp -- --input <master.png> --out <asset.webp> --width 1440 --quality 82
 shasum -a 256 <master.png> <asset.webp>
 ```
+
+### 11.4.1 Estado actual de automatización de publicación
+
+El repositorio todavía no expone un comando genérico
+`public-website:content-factory:publish` ni un verificador live contractual único. Las operaciones acotadas en
+`tmp/` son evidencia de cada caso, no una capability reusable. Hasta que exista tooling probado:
+
+- cada publicación usa approval packet, snapshot/rollback, guards y readback propios;
+- ningún script temporal se copia como plantilla sin volver a resolver post, hashes, metadata y criterios;
+- el QA cierra recursos de Playwright/HTTP en `finally` y termina naturalmente; un proceso colgado es un finding
+  de infraestructura, no un PASS, y `process.exit(0)` no sustituye cleanup;
+- snapshots local/remoto se conservan y comprueban hasta alcanzar `live_verified`.
+
+Una futura capability durable debe consumir un approval packet machine-readable, publicar sólo el mismo post,
+emitir primero `published_unverified` y producir un reporte único para HTTP/canonical/robots, OG/Twitter, schema,
+autor, desktop/móvil, TOC/imágenes/overflow, links, archive, sitemap, duplicados y readback. Debe probar success y
+failure bajo un budget acotado, sin Chromium children, sockets o timers propios abiertos al terminar.
 
 ### 11.5 HTTP/live
 
@@ -1508,6 +1555,7 @@ Studio autorizada por el artículo.
 | Checklist Who/How/Why rompía el ritmo                 | transparencia escrita como evidencia de auditoría, no como parte del artículo | conservar autoría, límites y disclosure en tres párrafos conversacionales antes de fuentes                    |
 | Link checker devolvió `403`/timeout                   | Providers protegen bots o tardan                                              | Clasificar; no borrar fuente primaria automáticamente.                                                        |
 | Handoff/manifest parecían contradecir live            | Artefactos de fases distintas                                                 | Estado runtime + auditoría más reciente superseden sólo el status, no provenance histórica.                   |
+| Nota de autoría seguía diciendo `este borrador` live  | Copy aprobado en `private` describía una transición futura                    | Escanear lenguaje de lifecycle antes del hash público y después del publish; preferir disclosure estable.      |
 
 ### 13.3 Registro de incidente
 

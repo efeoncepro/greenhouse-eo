@@ -42,6 +42,8 @@ encoding; este método gobierna su producción editorial, derivados y QA.
 Congelar primero:
 
 - `conceptId`, slot, contexto exacto y trabajo editorial;
+- `explanatoryDelta`: qué mecanismo, relación, decisión o frontera hace visible que el párrafo, lista o tabla
+  adyacente no entrega con igual claridad;
 - afirmación que debe entenderse en menos de diez segundos;
 - datos, fuente, fecha de corte, denominadores, unidades y límites;
 - qué no demuestra la pieza;
@@ -49,6 +51,11 @@ Congelar primero:
 - columna real del artículo y destinos derivados;
 - política de firma de marca y activos oficiales;
 - criterios de descarte.
+
+Si `explanatoryDelta` sólo puede decir “resume”, “ilustra” o “decora” el contenido, no producir la infografía.
+Riqueza no significa sumar cards, flechas o cifras: significa transformar evidencia en una comprensión nueva y
+verificable. El manifest debe declarar este campo y el gate mecánico lo exige, pero la revisión humana sigue
+decidiendo si el delta es real o una paráfrasis disfrazada.
 
 ### Gate obligatorio de entrega
 
@@ -218,6 +225,7 @@ Una infografía está producida cuando:
 - original, WebP y ancho real fueron inspeccionados;
 - firma, texto, escala, tema y responsive pasaron QA;
 - manifest, ALT, caption, derechos y provenance están completos.
+- `explanatoryDelta` se cumple en el raster final sin depender de la explicación del autor.
 
 No está desplegada hasta que Media Library/CMS, `<picture>`, metadata, performance y QA live tengan readback. El
 estado honesto entre ambos momentos es `producción visual completa; integración/publicación pendiente`.

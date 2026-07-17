@@ -17,6 +17,9 @@
 > **Aprobación cliente:** [confirmada; registro interno](./HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md).
 > **Sistema visual:** [dirección visual y manifest](./HUBSPOT_CUSTOMER_AGENT_ANAM_VISUAL_SYSTEM_V1.md).
 > **Spec Gutenberg:** [versión local validada](./HUBSPOT_CUSTOMER_AGENT_ANAM_GUTENBERG_SPEC_V1.json).
+> **Lifecycle:** snapshot histórico del brief prepublicación; el status público vigente vive en
+> [la auditoría WordPress y cierre live](./HUBSPOT_CUSTOMER_AGENT_ANAM_WORDPRESS_PRIVATE_AUDIT_V1.md). El alcance,
+> la evidencia y las fronteras de este brief permanecen vigentes salvo supersesión explícita.
 
 ## 1. Decisión editorial
 

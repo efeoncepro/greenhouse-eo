@@ -1,9 +1,9 @@
 # Sistema visual editorial — Customer Agent de ANAM
 
-> **Estado:** sistema producido localmente; hero/OG opacos y tres diagramas con canvas transparente en variantes desktop/móvil × light/dark.
+> **Estado:** sistema v2 publicado y verificado; hero/OG opacos y tres diagramas con canvas transparente en variantes desktop/móvil × light/dark.
 > **Versión:** 1.0.
 > **Fecha:** 2026-07-17.
-> **Artículo:** [draft privado v4](./HUBSPOT_CUSTOMER_AGENT_ANAM_ARTICLE_DRAFT_V4.md).
+> **Artículo:** [versión publicada](https://efeoncepro.com/hubspot/ia-atencion-cliente-caso-anam/).
 > **Aprobación cliente:** [confirmada; registro interno](./HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md).
 > **Manifest:** [HUBSPOT_CUSTOMER_AGENT_ANAM_VISUAL_ASSET_MANIFEST_V1.json](./HUBSPOT_CUSTOMER_AGENT_ANAM_VISUAL_ASSET_MANIFEST_V1.json).
 > **Regla:** ningún activo debe insinuar que el agente está activo, operativo o resolviendo conversaciones reales.
@@ -156,18 +156,19 @@ OG permanecen opacos porque necesitan una composición cromática estable fuera 
 - El caso y el uso editorial del nombre ANAM están aprobados; no se requiere un nuevo envío al cliente.
 - No se utiliza logotipo de ANAM ni captura de su portal.
 - La producción local está autorizada y completa.
-- Los activos se integraron en Media Library y en el post privado `251432`; este paso no publica el artículo.
-- Publicación o promoción pública requieren la autorización humana propia del runbook, no una nueva aprobación de ANAM.
+- Los activos v2 se integraron en Media Library y en el post publicado `251432`, con IDs `251434–251445`.
+- La publicación fue autorizada y verificada; cualquier promoción social futura conserva su propio gate.
 
 ## Producción técnica ejecutada
 
 1. Se congelaron copy y relaciones por `conceptId`.
-2. `ANAM-CA-V02–V04` se produjeron como SVG accesibles con cuatro variantes cada uno: desktop/móvil × light/dark.
+2. `ANAM-CA-V02–V04` se refinaron a v2 como SVG accesibles con cuatro variantes cada uno: desktop/móvil × light/dark.
 3. El lienzo exterior de los diagramas es transparente; el hero/OG conserva fondo opaco.
 4. Se renderizaron 13 PNG masters desde los SVG y 14 derivados de entrega: 12 WebP de cuerpo, un WebP featured y un JPEG OG.
 5. Las variantes se inspeccionaron a resolución original sobre fondos `#FFFFFF` y `#111013`.
 6. El alpha se verificó en PNG y WebP (`hasAlpha=true`, rango `0–255`).
-7. Rutas, dimensiones, pesos y hashes viven en el manifest y en `ai-generations/2026-07-17_anam-customer-agent/build-report.json`.
+7. Rutas, dimensiones, pesos y hashes vigentes viven en el manifest y en
+   `ai-generations/2026-07-17_anam-customer-agent/build-report-v2.json`; el reporte v1 conserva el corte histórico.
 
 ## Gate actual
 
@@ -179,11 +180,10 @@ OG permanecen opacos porque necesitan una composición cromática estable fuera 
 | Permiso del caso | PASS | ANAM ya aprobó el caso y su uso editorial |
 | Logo y capturas | NOT REQUESTED | No son necesarios para producir la versión conceptual |
 | Producción de masters | PASS | 13 masters; 12 variantes de cuerpo con transparencia real |
-| Media/CMS | PASS | 14 attachments canónicos; portada, OG y tres `<picture>` integrados en el post privado `251432` |
-| Render privado | CONDITIONAL PASS | Fixture filtrado por WordPress pasó desktop/móvil × light/dark; falta revisar el template Ohio con sesión autenticada |
-| Verificación pública | PENDING | Sólo aplica después de una publicación autorizada |
+| Media/CMS | PASS | Portada/OG `251417–251418` y variantes v2 `251434–251445`; tres `<picture>` integrados en el post `251432` |
+| Render privado | PASS HISTÓRICO | Fixture filtrado por WordPress pasó desktop/móvil × light/dark antes de publicar |
+| Verificación pública | PASS | Ohio live pasó `1440×1000` y `390×844`, light/dark, sin imágenes rotas, errores ni overflow |
 
-**Estado honesto:** producción, Media Library, integración privada y readback estructural completos. El artículo
-sigue privado y `noindex`; la revisión autenticada del template Ohio y cualquier verificación pública permanecen
-pendientes. El estado del Customer Agent no cambia: configurado y probado en vista previa, no verificado en
-operación real al corte.
+**Estado honesto:** producción v2, Media Library, publicación y QA live completos. El artículo está `publish` e
+`index, follow`; el manifest enlaza la inspección final y la auditoría de publicación. El estado del Customer Agent
+no cambia por ello: configurado y probado en vista previa, no operativo para conversaciones nuevas al corte.
