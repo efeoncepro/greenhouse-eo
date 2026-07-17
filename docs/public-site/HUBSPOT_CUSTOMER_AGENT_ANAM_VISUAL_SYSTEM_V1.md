@@ -71,51 +71,57 @@ en HTML para conservar accesibilidad, indexación y capacidad de copia.
 - **Caption:** no aplica como featured; el sentido debe sostenerse con título, ALT y composición.
 - **Descartar si:** parece una pantalla de producto, una automatización sin límites o una conversación ya operativa.
 
-### ANAM-CA-V02 — Frontera de autonomía conversacional
+### ANAM-CA-V02 — Anatomía de una conversación mixta
 
 - **Slot:** diagrama principal dentro del cuerpo y fuente de carrusel/slide.
 - **Ubicación:** después de la definición de la frontera y antes de las cinco preguntas para evaluar transferencia.
-- **Función:** permitir que un equipo clasifique una conversación según quién conserva la responsabilidad.
+- **Función:** demostrar, sobre una consulta concreta, cómo el sistema separa intenciones, conserva contexto y cambia
+  de responsable sin pedirle al cliente que reinicie la conversación.
 - **Contenido exacto:**
-  - `Saber` — respuesta documentada; responsable: agente.
-  - `Aclarar` — existe conocimiento, faltan antecedentes; responsable: agente.
-  - `Preparar` — se necesita acción humana, el agente reúne y resume; responsable: agente → persona.
-  - `Decidir` — requiere juicio, acceso o compromiso; responsable: persona.
-- **No es:** embudo, secuencia obligatoria ni escala de madurez.
+  - consulta mixta: `cotizar agua potable + corregir una factura anterior`;
+  - `Cotización → aclarar`: pedir matriz, norma y servicio sin prometer precio ni fecha final;
+  - `Factura → preparar`: explicar lo documentado y reunir la referencia sin corregir ni confirmar una refacturación;
+  - `Memoria + handoff`: empresa, servicio, referencia y resumen útil;
+  - `Persona → decidir`: revisar la factura, confirmar la acción y asumir el compromiso.
+- **No es:** conversación real, transcripción, embudo, secuencia obligatoria ni evidencia de que el handoff esté activo.
 - **Tratamiento:** SVG determinístico con canvas exterior transparente, composición horizontal para desktop/tablet,
   vertical para móvil y variantes light/dark deliberadas.
-- **ALT preliminar:** `Cuatro zonas de autonomía: saber y aclarar quedan con el agente; preparar transfiere contexto; decidir corresponde a una persona.`
-- **Caption:** `La autonomía cambia cuando cambia la responsabilidad, no cuando la conversación acumula más turnos.`
-- **Descartar si:** sugiere que todas las conversaciones recorren las cuatro etapas o presenta lo humano como falla.
+- **ALT preliminar:** `Una consulta combina cotización y facturación: el agente aclara la primera, prepara la segunda y transfiere la decisión a una persona con empresa, servicio, referencia y resumen.`
+- **Caption:** `Un buen handoff conserva el contexto y cambia la responsabilidad sin obligar al cliente a empezar de nuevo.`
+- **Descartar si:** parece un chat real, convierte la preparación en una acción ejecutada o presenta lo humano como falla.
 
 ### ANAM-CA-V03 — Arquitectura gobernada de 23 fuentes
 
 - **Slot:** diagrama de cuerpo.
 - **Ubicación:** después del inventario de 6 archivos y 17 respuestas cortas.
 - **Función:** mostrar que el valor no está en el conteo, sino en la ruta gobernada desde la fuente hasta la conducta.
-- **Contenido exacto:** `6 archivos privados + 17 respuestas cortas = 23 fuentes en uso` → `propósito · vigencia · responsable · contradicciones` → `instrucciones y memoria` → `responder · aclarar · transferir`.
+- **Contenido exacto:** `6 archivos privados + 17 respuestas cortas = 23 fuentes en uso` → cuatro controles
+  formulados como preguntas (`propósito · vigencia · responsable · contradicciones`) → contrato de respuesta
+  (`responder · preguntar · transferir`).
 - **Aclaración visible:** `356 registros técnicos` pertenecen al catálogo; no son 356 fuentes, servicios ni promesas
   de disponibilidad.
 - **No es:** mapa de carpetas, inventario de documentos públicos ni diagrama de entrenamiento del modelo.
 - **Tratamiento:** SVG determinístico con canvas exterior transparente y variantes desktop/móvil × light/dark;
   nodos de fuente convergen en una capa de gobierno antes de llegar a las conductas.
-- **ALT preliminar:** `Seis archivos y diecisiete respuestas cortas pasan por reglas de gobierno antes de orientar, aclarar o transferir una consulta.`
+- **ALT preliminar:** `Veintitrés fuentes —seis archivos privados y diecisiete respuestas cortas— pasan por cuatro controles antes de responder, preguntar o transferir; 356 registros técnicos no equivalen a servicios disponibles.`
 - **Caption:** `Las fuentes sólo se vuelven conocimiento útil cuando tienen propósito, vigencia, responsable y reglas para resolver contradicciones.`
 - **Descartar si:** las 23 fuentes fluyen directamente a una respuesta sin mostrar gobierno o si los 356 registros
   parecen capacidades activas.
 
-### ANAM-CA-V04 — Escalera de evidencia operativa
+### ANAM-CA-V04 — Cadena de evidencia y punto de interrupción
 
 - **Slot:** diagrama de cuerpo y derivado social.
 - **Ubicación:** junto a la tabla que distingue documentado, elegible, configurado, probado y operativo.
-- **Función:** hacer visible que cada estado requiere evidencia distinta y que ANAM no alcanzaba verificación en
-  operación real al corte.
-- **Contenido exacto:** `documentado por el proveedor` → `elegible en el portal` → `configurado` → `probado en vista previa` → `verificado en operación real`.
+- **Función:** separar la evidencia disponible, la evidencia de prueba, la dependencia que interrumpe el recorrido y
+  lo que todavía debe observarse en operación real.
+- **Contenido exacto:** `documentado` → `elegible en el portal` → `configurado` → `probado en vista previa` →
+  `verificado en operación real`, enriquecido con `39 escenarios diseñados`, `≥24 recuperables` y `35 turnos o
+  ejecuciones`; la dependencia administrativa de facturación funciona como interruptor antes de runtime.
 - **Estado ANAM al corte:** llega a `probado en vista previa, con limitaciones`; `verificado en operación real = no`.
 - **No es:** roadmap temporal, progreso automático ni score de éxito.
 - **Tratamiento:** SVG determinístico con canvas exterior transparente y variantes desktop/móvil × light/dark.
   Evitar semáforo rojo/verde; diferenciar evidencia disponible, limitada y no obtenida sin convertirlo en juicio moral.
-- **ALT preliminar:** `Escalera de cinco estados: ANAM estaba configurado y probado en vista previa, pero no verificado en operación real.`
+- **ALT preliminar:** `La evidencia llega desde documentación y configuración hasta pruebas en vista previa; una dependencia administrativa de facturación interrumpe la verificación de conversaciones nuevas, resolución, handoff y medición en operación real.`
 - **Caption:** `Una configuración visible no demuestra que una conversación nueva pueda entrar, resolverse, transferirse y medirse.`
 - **Descartar si:** el recorrido parece completado, minimiza el bloqueo o usa “24/7” como resultado.
 

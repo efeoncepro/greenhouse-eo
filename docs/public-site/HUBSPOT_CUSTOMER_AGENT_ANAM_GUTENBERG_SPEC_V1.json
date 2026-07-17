@@ -338,9 +338,9 @@
         },
         {
           "kind": "image",
-          "mediaId": 251423,
-          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-web-1600-v1.webp",
-          "alt": "Seis archivos y diecisiete respuestas cortas pasan por reglas de gobierno antes de orientar, aclarar o transferir una consulta.",
+          "mediaId": 251434,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-web-1600-v2.webp",
+          "alt": "Veintitrés fuentes —seis archivos privados y diecisiete respuestas cortas— pasan por cuatro controles antes de responder, preguntar o transferir; 356 registros técnicos no equivalen a servicios disponibles.",
           "width": 1600,
           "height": 1000,
           "sizeSlug": "large",
@@ -349,17 +349,17 @@
           "sources": [
             {
               "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
-              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-mobile-dark-web-1200-v1.webp",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-mobile-dark-web-1200-v2.webp",
               "type": "image/webp"
             },
             {
               "media": "(max-width: 860px)",
-              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-mobile-web-1200-v1.webp",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-mobile-web-1200-v2.webp",
               "type": "image/webp"
             },
             {
               "media": "(prefers-color-scheme: dark)",
-              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-dark-web-1600-v1.webp",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-dark-web-1600-v2.webp",
               "type": "image/webp"
             }
           ]
@@ -568,28 +568,28 @@
         },
         {
           "kind": "image",
-          "mediaId": 251419,
-          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-web-1600-v1.webp",
-          "alt": "Cuatro zonas de autonomía: saber y aclarar quedan con el agente; preparar transfiere contexto; decidir corresponde a una persona.",
+          "mediaId": 251438,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-web-1600-v2.webp",
+          "alt": "Una consulta combina cotización y facturación: el agente aclara la primera, prepara la segunda y transfiere la decisión a una persona con empresa, servicio, referencia y resumen.",
           "width": 1600,
           "height": 1000,
           "sizeSlug": "large",
-          "caption": "La autonomía cambia cuando cambia la responsabilidad, no cuando la conversación acumula más turnos.",
+          "caption": "Un buen handoff conserva el contexto y cambia la responsabilidad sin obligar al cliente a empezar de nuevo.",
           "linkDestination": "media",
           "sources": [
             {
               "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
-              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-mobile-dark-web-1200-v1.webp",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-mobile-dark-web-1200-v2.webp",
               "type": "image/webp"
             },
             {
               "media": "(max-width: 860px)",
-              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-mobile-web-1200-v1.webp",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-mobile-web-1200-v2.webp",
               "type": "image/webp"
             },
             {
               "media": "(prefers-color-scheme: dark)",
-              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-dark-web-1600-v1.webp",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-dark-web-1600-v2.webp",
               "type": "image/webp"
             }
           ]
@@ -826,9 +826,9 @@
         },
         {
           "kind": "image",
-          "mediaId": 251427,
-          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-web-1600-v1.webp",
-          "alt": "Escalera de cinco estados: ANAM estaba configurado y probado en vista previa, pero no verificado en operación real.",
+          "mediaId": 251442,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-web-1600-v2.webp",
+          "alt": "La evidencia llega desde documentación y configuración hasta pruebas en vista previa; una dependencia administrativa de facturación interrumpe la verificación de conversaciones nuevas, resolución, handoff y medición en operación real.",
           "width": 1600,
           "height": 1000,
           "sizeSlug": "large",
@@ -837,17 +837,17 @@
           "sources": [
             {
               "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
-              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-mobile-dark-web-1200-v1.webp",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-mobile-dark-web-1200-v2.webp",
               "type": "image/webp"
             },
             {
               "media": "(max-width: 860px)",
-              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-mobile-web-1200-v1.webp",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-mobile-web-1200-v2.webp",
               "type": "image/webp"
             },
             {
               "media": "(prefers-color-scheme: dark)",
-              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-dark-web-1600-v1.webp",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-dark-web-1600-v2.webp",
               "type": "image/webp"
             }
           ]

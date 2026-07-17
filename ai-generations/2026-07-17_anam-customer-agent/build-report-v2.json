@@ -1,0 +1,707 @@
+{
+  "generatedAt": "2026-07-17T17:41:10.897Z",
+  "outputs": [
+    {
+      "asset": "anam-ca-hero",
+      "svg": "source/anam-ca-hero-v1.svg",
+      "master": "masters/anam-ca-hero-master-v1.png",
+      "width": 2048,
+      "height": 1152
+    },
+    {
+      "asset": "anam-ca-autonomy-desktop",
+      "svg": "source/anam-ca-autonomy-desktop-v2.svg",
+      "master": "masters/anam-ca-autonomy-desktop-master-v2.png",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "asset": "anam-ca-autonomy-mobile",
+      "svg": "source/anam-ca-autonomy-mobile-v2.svg",
+      "master": "masters/anam-ca-autonomy-mobile-master-v2.png",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "asset": "anam-ca-autonomy-desktop-dark",
+      "svg": "source/anam-ca-autonomy-desktop-dark-v2.svg",
+      "master": "masters/anam-ca-autonomy-desktop-dark-master-v2.png",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "asset": "anam-ca-autonomy-mobile-dark",
+      "svg": "source/anam-ca-autonomy-mobile-dark-v2.svg",
+      "master": "masters/anam-ca-autonomy-mobile-dark-master-v2.png",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "asset": "anam-ca-knowledge-desktop",
+      "svg": "source/anam-ca-knowledge-desktop-v2.svg",
+      "master": "masters/anam-ca-knowledge-desktop-master-v2.png",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "asset": "anam-ca-knowledge-mobile",
+      "svg": "source/anam-ca-knowledge-mobile-v2.svg",
+      "master": "masters/anam-ca-knowledge-mobile-master-v2.png",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "asset": "anam-ca-knowledge-desktop-dark",
+      "svg": "source/anam-ca-knowledge-desktop-dark-v2.svg",
+      "master": "masters/anam-ca-knowledge-desktop-dark-master-v2.png",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "asset": "anam-ca-knowledge-mobile-dark",
+      "svg": "source/anam-ca-knowledge-mobile-dark-v2.svg",
+      "master": "masters/anam-ca-knowledge-mobile-dark-master-v2.png",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "asset": "anam-ca-evidence-desktop",
+      "svg": "source/anam-ca-evidence-desktop-v2.svg",
+      "master": "masters/anam-ca-evidence-desktop-master-v2.png",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "asset": "anam-ca-evidence-mobile",
+      "svg": "source/anam-ca-evidence-mobile-v2.svg",
+      "master": "masters/anam-ca-evidence-mobile-master-v2.png",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "asset": "anam-ca-evidence-desktop-dark",
+      "svg": "source/anam-ca-evidence-desktop-dark-v2.svg",
+      "master": "masters/anam-ca-evidence-desktop-dark-master-v2.png",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "asset": "anam-ca-evidence-mobile-dark",
+      "svg": "source/anam-ca-evidence-mobile-dark-v2.svg",
+      "master": "masters/anam-ca-evidence-mobile-dark-master-v2.png",
+      "width": 1200,
+      "height": 1600
+    }
+  ],
+  "integrity": [
+    {
+      "path": "source/anam-ca-autonomy-desktop-dark-v1.svg",
+      "bytes": 5242,
+      "sha256": "20517360d8fb9c15e64706845e93b4ff14bbc3934a988aa3927f73fa1a78fac8",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-autonomy-desktop-dark-v2.svg",
+      "bytes": 6456,
+      "sha256": "075c1b0f32f9059d84ad2b945c7467a4b16489f17473e9fc2f081db12ed44fc8",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-autonomy-desktop-v1.svg",
+      "bytes": 5242,
+      "sha256": "045c837f035ce24c34b9ccf2a944644208cc37a32d219332b7eeb210bfe55a1b",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-autonomy-desktop-v2.svg",
+      "bytes": 6456,
+      "sha256": "e74152de403ce376438be158b186263b8352980bda05f979fd1b0094794e8a17",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-autonomy-mobile-dark-v1.svg",
+      "bytes": 4897,
+      "sha256": "7354f21abb3b53869588614accb4e5a176c4be4931b765f0f1db54ec63cf8b38",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-autonomy-mobile-dark-v2.svg",
+      "bytes": 6141,
+      "sha256": "136309802de5718be578f35f22f001063d337b3b39d4b772b387491f4136994c",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-autonomy-mobile-v1.svg",
+      "bytes": 4897,
+      "sha256": "2a65149a4e2b35fdf35dd7b730786da4ec3154c1c03adfb10398a0e8cd40ea91",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-autonomy-mobile-v2.svg",
+      "bytes": 6141,
+      "sha256": "50af442d6d68d8e0f71d896257bf743b054aa92d0b5fd880bc474737cb2a2eb3",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-evidence-desktop-dark-v1.svg",
+      "bytes": 5154,
+      "sha256": "0783723433cb2ab128470450d1fbd00d54a817a53108414844ec8bc9aed7c3aa",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-evidence-desktop-dark-v2.svg",
+      "bytes": 7288,
+      "sha256": "51ad85f6fc6c6ce5e4ca9f085f3f09d135be8f0bc8622696db904a3a6993750c",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-evidence-desktop-v1.svg",
+      "bytes": 5154,
+      "sha256": "300d4a306c179605258b42154674d808789811b564e81aa53a7c93b1f6cee226",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-evidence-desktop-v2.svg",
+      "bytes": 7288,
+      "sha256": "7a189d4257e39fba3617179f4dfa8c202aa59bd73d68a5d9d245724d76cedf3c",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-evidence-mobile-dark-v1.svg",
+      "bytes": 5221,
+      "sha256": "ae99081ea09903ff0ff02ce130b82e62f1671904c89c0e9ec3a84b6631e73701",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-evidence-mobile-dark-v2.svg",
+      "bytes": 5456,
+      "sha256": "544a0355038d1a91a4ec006eac1c20dcacc620b8f757ef3162c2e36f4dbf9061",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-evidence-mobile-v1.svg",
+      "bytes": 5221,
+      "sha256": "72dbe7c045c48c90e8f84deeff34b5529c18a44fee30e438b63b8afc11b853ca",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-evidence-mobile-v2.svg",
+      "bytes": 5456,
+      "sha256": "94507ed71300946dcbd9b6992c57518b9f9b3df1166145a7b7bbb793f268ac9b",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-hero-v1.svg",
+      "bytes": 5994,
+      "sha256": "b7eda1d62b26e6d42ef44dd313d569839ebb9e3dc288ef02c24396503e0bbfb2",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-knowledge-desktop-dark-v1.svg",
+      "bytes": 5075,
+      "sha256": "76a1389c98cefafafcf57a405431cc4a190b0e25bd9b6250802e2092e2565d0e",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-knowledge-desktop-dark-v2.svg",
+      "bytes": 6057,
+      "sha256": "1ffc1f8fe660162007d523bb4579fc234eae64520231c6bac89e299258a6bc1b",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-knowledge-desktop-v1.svg",
+      "bytes": 5075,
+      "sha256": "b6a0a0b9c1f615bbde199692f0728b619521e3945956c968d48566e026f9dfb3",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-knowledge-desktop-v2.svg",
+      "bytes": 6057,
+      "sha256": "e9a5ec6dec5bc3e56fed250163126887a277bc5d623c705cf6b65dfb109baf58",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-knowledge-mobile-dark-v1.svg",
+      "bytes": 5022,
+      "sha256": "c0c76aa66e3015818e0220bce7d5e8ccaf7af948eabdb0b5f1f8d6066abcf094",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-knowledge-mobile-dark-v2.svg",
+      "bytes": 6162,
+      "sha256": "7bf24192e23638e71f8e798b7f2adc1e81f70d5855d058f12ce26281840f1c63",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-knowledge-mobile-v1.svg",
+      "bytes": 5022,
+      "sha256": "1b866e785570eda525688c1850c2c7222007b202e6f2ae4dc3ca81df1331624b",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "source/anam-ca-knowledge-mobile-v2.svg",
+      "bytes": 6162,
+      "sha256": "76d00995f6c4cd1e6c06cde2a06be46adfe2368adc1673c2ce57acd713e77508",
+      "mime": "image/svg+xml"
+    },
+    {
+      "path": "masters/anam-ca-autonomy-desktop-dark-master-v1.png",
+      "bytes": 97210,
+      "sha256": "038c5d459273a83603e19c84e4ec27cda7a4367ebcad5debd7ab9c6e5c4c2ca4",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-autonomy-desktop-dark-master-v2.png",
+      "bytes": 119106,
+      "sha256": "d2b47e75d4de5904c03fa2b6eb009dada1ad231f3af9f39e5e1c9b021b7eaf4b",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-autonomy-desktop-master-v1.png",
+      "bytes": 98086,
+      "sha256": "11481ca67deba856393b6ae13981d9bbc867a7781653efbf9d472aa4491f7e96",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-autonomy-desktop-master-v2.png",
+      "bytes": 120252,
+      "sha256": "42f6b954a7aa7a19f22e3551cde470e56e8f91d96260e67d371620a9b30c3413",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-autonomy-mobile-dark-master-v1.png",
+      "bytes": 101001,
+      "sha256": "18f8b614ca8fd5921d3a0b549319652a4ea79d30daeab6b06a672deb4b67ea7b",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-autonomy-mobile-dark-master-v2.png",
+      "bytes": 118833,
+      "sha256": "7e189ea9ae038b9795e86d1688522107bfdaaaf90236597ea8db9dd6943397ac",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-autonomy-mobile-master-v1.png",
+      "bytes": 101566,
+      "sha256": "12f85c8d4f9f74c92cd777b8df356eba46297bfb3800f9738a7cf1dce64d371f",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-autonomy-mobile-master-v2.png",
+      "bytes": 119691,
+      "sha256": "be58f59dbf53b0655819640e1a5775adfb20bbf181ea6348999e6be9e47d2162",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-evidence-desktop-dark-master-v1.png",
+      "bytes": 94874,
+      "sha256": "b19f980dadde7f3b586b58f43ad9b14fb8e74f22e6b709d1d697aecc61f30329",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-evidence-desktop-dark-master-v2.png",
+      "bytes": 137830,
+      "sha256": "6932277f80f5d5758746a925c46bba9f5d2dff686defd16af00b3b9826565819",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-evidence-desktop-master-v1.png",
+      "bytes": 96143,
+      "sha256": "c22e77744d08b725d1ad4eaf1a589f3513eaa220b2b375b6908101e112b4d556",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-evidence-desktop-master-v2.png",
+      "bytes": 138666,
+      "sha256": "df8473e70c43d8919a41070837dae800139b62a4e07badc3b93951fa643f2dd7",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-evidence-mobile-dark-master-v1.png",
+      "bytes": 99668,
+      "sha256": "62a142a26b4146b3b4cf5c67c142ae5d2fce862e4317a7583cddfeffcbbf3537",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-evidence-mobile-dark-master-v2.png",
+      "bytes": 123101,
+      "sha256": "ebd5505976a773918062e4bdfd30ad64ed4cfdb67415efcf97ede923260de1f8",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-evidence-mobile-master-v1.png",
+      "bytes": 102381,
+      "sha256": "e2c60428ee6c933f487920cd0982421ff41a1c538715951ab0a7a073da8298b2",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-evidence-mobile-master-v2.png",
+      "bytes": 123887,
+      "sha256": "4a9cfaa3553ec20b1714226be25de45626c024d4a36fd9c00695afdb9d010310",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-hero-master-v1.png",
+      "bytes": 163430,
+      "sha256": "b2a7374eeff6a6bf7b6e97597ef50aad8c443883469e76b8056eea0140b457fc",
+      "mime": "image/png",
+      "width": 2048,
+      "height": 1152,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-knowledge-desktop-dark-master-v1.png",
+      "bytes": 92073,
+      "sha256": "c00332dcf0c2509bf537ec4fd43581e86a368169613aeb80f1d01164061a8850",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-knowledge-desktop-dark-master-v2.png",
+      "bytes": 114239,
+      "sha256": "79ee45ad353482a3ff25f41e51e029dc8b478ab89252939b7734c175c3c49405",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-knowledge-desktop-master-v1.png",
+      "bytes": 92941,
+      "sha256": "882ecf79c08a458a68ef968ab7d26fe3f27d5ff86b3481f6c4cf7ebf2ded817f",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-knowledge-desktop-master-v2.png",
+      "bytes": 115370,
+      "sha256": "37cd37207e3b5e001796ba4059087d807c645d88aa7e893be6f4cee23f7b6c21",
+      "mime": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-knowledge-mobile-dark-master-v1.png",
+      "bytes": 102334,
+      "sha256": "482edb9a044dd14bc15e016b6901c0c97176ec420945b1cd9b0a9e931cb80378",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-knowledge-mobile-dark-master-v2.png",
+      "bytes": 135061,
+      "sha256": "75377ff864b75a27936a7634b869b6787c0eab56950b90095b764c186b7500cb",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-knowledge-mobile-master-v1.png",
+      "bytes": 103184,
+      "sha256": "41fbcf9b86ce4553e693d222ef2863688fd5c0b1a83f7768240332eb8853312b",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "masters/anam-ca-knowledge-mobile-master-v2.png",
+      "bytes": 136365,
+      "sha256": "e7e35c9735b43979ec482099805cbb19b0a2f0601c4c8b97bb4bd074824cc4a4",
+      "mime": "image/png",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-desktop-dark-web-1600-v1.webp",
+      "bytes": 55898,
+      "sha256": "3ab0ec8442dd41f52818878060cb28a77edca882a2e3844c3e2aced1fa34adc3",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-desktop-dark-web-1600-v2.webp",
+      "bytes": 74316,
+      "sha256": "b33fe50898f5ea70e64321fe987abd2f9f403a1828c86012f0c66e1d019fd94e",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-desktop-web-1600-v1.webp",
+      "bytes": 58892,
+      "sha256": "cdd061bb189906b938a0fbf7dc9744911a9b9bbcbc79fd400facbb171ccd572d",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-desktop-web-1600-v2.webp",
+      "bytes": 77164,
+      "sha256": "6cad9291092601473f25399ba489e02f2e64f4e6d855821b53d4c54545cff14b",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-mobile-dark-web-1200-v1.webp",
+      "bytes": 59918,
+      "sha256": "250a816a8815c21d36aa08de3042d0e183326662295bb5ba8d60a38b777adf30",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-mobile-dark-web-1200-v2.webp",
+      "bytes": 75834,
+      "sha256": "2ae52e35f9266ab13e45bbe95e0e91632209968e765952889ca148d8b4af5cc5",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-mobile-web-1200-v1.webp",
+      "bytes": 62932,
+      "sha256": "f0dbfb0c35cd568816dbd541e43c229a79ca9977989ebfebcae79087615ccd2d",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-mobile-web-1200-v2.webp",
+      "bytes": 77186,
+      "sha256": "bf340205a55b15a94002409b116460bd4d6843fb2ec7d0dbf62e7ea9fb1788aa",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-evidence-desktop-dark-web-1600-v1.webp",
+      "bytes": 53224,
+      "sha256": "cc7c49e1909f8ab2dbc6c21a2dff5e603112a74774bbf9034d65df9348bf7e27",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-evidence-desktop-dark-web-1600-v2.webp",
+      "bytes": 83690,
+      "sha256": "77920111b925da9e6ba2c2f1fba3242b79dad4a9fc8f31f31b6731fb9e09c2c2",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-evidence-desktop-web-1600-v1.webp",
+      "bytes": 54254,
+      "sha256": "f187f9515688864a6062ee4b0f3020cd0fae0ad6d09d64958d46608010246cfc",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-evidence-desktop-web-1600-v2.webp",
+      "bytes": 84566,
+      "sha256": "1587004f7448172e2df63896307245f419dc756f658a0eea3b507e1fbe9deabb",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-evidence-mobile-dark-web-1200-v1.webp",
+      "bytes": 58608,
+      "sha256": "db2b4af69869cc4511618aed8a2e90af7476b618d58af3c5d5b67715c7282cef",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-evidence-mobile-dark-web-1200-v2.webp",
+      "bytes": 79350,
+      "sha256": "2230e82eedc1ebb021139959597567974b835f6f5bc0adede76cd0e58dca1099",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-evidence-mobile-web-1200-v1.webp",
+      "bytes": 59852,
+      "sha256": "3d500718eae037b3ba0816337d7899315214bb2f2ec42bdf309dc1f6724c0673",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-evidence-mobile-web-1200-v2.webp",
+      "bytes": 80462,
+      "sha256": "5a29617ce42dec708d3d10a0aac0610fac94a22a134c1c9f30cf73d10296e31c",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-hero-og-1440x757-v1.jpg",
+      "bytes": 65782,
+      "sha256": "0bdf2c8a4c5b45695c45c10d738721bafe8fba4e1d17305ff2be5877729dbef7",
+      "mime": "image/jpeg",
+      "width": 1440,
+      "height": 757,
+      "hasAlpha": false
+    },
+    {
+      "path": "delivery/anam-ca-hero-web-1600-v1.webp",
+      "bytes": 43254,
+      "sha256": "18065f32f9f1a6dc4b9778c4ca3f0c538c2f5b2bc0b4c157e8c6d4e2f178bb6d",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 900,
+      "hasAlpha": false
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-desktop-dark-web-1600-v1.webp",
+      "bytes": 53230,
+      "sha256": "d38ecc9e8c6418672e8e8fa63ceffbe91eae1d13848d04c0c4ea372cb309c275",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-desktop-dark-web-1600-v2.webp",
+      "bytes": 67624,
+      "sha256": "dd0cdaeee0db651b3f0d94968e2e62cdae6022db08f61e9237e1bd6e90ecc293",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-desktop-web-1600-v1.webp",
+      "bytes": 55224,
+      "sha256": "c9a60335a7f15de255f0069226710890f997959f6b78332dc15f86907b80c227",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-desktop-web-1600-v2.webp",
+      "bytes": 69398,
+      "sha256": "19f0e69f1767166014b939aa7120157927dec675c9b3bbb64ecda6ffc2d696cf",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1000,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-mobile-dark-web-1200-v1.webp",
+      "bytes": 61060,
+      "sha256": "0ee8ae778a5b66ea893715f86e5a6d478a1a18c3d88c50fd8768feb65215dd15",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-mobile-dark-web-1200-v2.webp",
+      "bytes": 84340,
+      "sha256": "d6073f23d662bbfda9da581b6cd2538e6ff71d72ee397e9e55eb3fb59fc360f5",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-mobile-web-1200-v1.webp",
+      "bytes": 63268,
+      "sha256": "1d3f125c53b89bba49c125b98070308e2e2f4a2b5b31cf781ef6a2def115b422",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-mobile-web-1200-v2.webp",
+      "bytes": 85882,
+      "sha256": "bdfd3413e69b44f33dfc2b5e307f40dcd58deefb0a4647c3a8c9e813d72b2e79",
+      "mime": "image/webp",
+      "width": 1200,
+      "height": 1600,
+      "hasAlpha": true
+    }
+  ]
+}
