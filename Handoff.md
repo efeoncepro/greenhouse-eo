@@ -1,3 +1,18 @@
+## Sesión 2026-07-17 — Gate ejecutable para variantes visuales editoriales
+
+> **Problema corregido:** el método responsive/light-dark existía en la referencia, pero podía omitirse durante
+> una producción porque no había contrato obligatorio ni validación mecánica. `content-marketing-studio` exige
+> ahora un `deliveryContract` por `conceptId` con viewport, theme, canvas y justificación, sincronizado para
+> Codex/Claude.
+>
+> **Enforcement:** `pnpm content:visual-manifest:lint -- <manifest.json>` valida art direction desktop/móvil,
+> matrices light/dark y alpha técnico para canvas transparente. El Customer Agent de ANAM pasa con cuatro assets:
+> hero opaco/crop-safe y tres diagramas transparentes desktop/móvil × light/dark. Self-test y manifest real pasan.
+> No se subió media ni se modificó WordPress.
+>
+> **Frontera de skin:** el contrato también exige `skin`. Este caso usa `contextual_platform`: vinotinto/coral
+> reconoce HubSpot, pero no es paleta Efeonce ni precedente cromático para artículos de otros temas.
+
 ## Sesión 2026-07-17 — Escenas editoriales de producto y frontera de skin
 
 > **Qué se canonizó:** `design-studio` incorpora `modules/11_PRODUCT_STORY_SCENES.md` en mirrors Codex/Claude.

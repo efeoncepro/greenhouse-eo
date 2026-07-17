@@ -50,6 +50,32 @@ Congelar primero:
 - política de firma de marca y activos oficiales;
 - criterios de descarte.
 
+### Gate obligatorio de entrega
+
+No confiar en que el agente recuerde el precedente. Cada asset debe declarar un `deliveryContract` machine-readable:
+
+```json
+{
+  "viewport": "art_directed | single_composition | crop_safe",
+  "theme": "light_dark | single_theme",
+  "canvas": "transparent | opaque",
+  "skin": "efeonce_core | contextual_platform | contextual_client | campaign_specific",
+  "rationale": "por qué estas decisiones corresponden al slot real"
+}
+```
+
+- `art_directed` exige variantes desktop y móvil.
+- `light_dark` exige variantes de ambos temas; si también hay art direction, exige las cuatro combinaciones.
+- `transparent` exige alpha verificado en master y derivado, no sólo ausencia aparente de un rectángulo.
+- `contextual_platform` y `contextual_client` sólo pueden usar señales cromáticas de esa entidad cuando el tema
+  realmente trata de ella; no se convierten en branding Efeonce ni en default para el siguiente artículo.
+- `campaign_specific` queda limitado a la campaña declarada. Reutilizar la gramática nunca autoriza heredar el skin.
+- `single_composition`, `crop_safe`, `single_theme` u `opaque` son decisiones válidas, pero nunca defaults silenciosos.
+- Al cerrar, ejecutar `pnpm content:visual-manifest:lint -- <manifest.json>` y conservar el resultado en QA.
+
+El gate valida presencia y coherencia contractual. No reemplaza inspección visual sobre fondos reales ni QA del
+`<picture>` dentro del theme.
+
 Para una visual cuantitativa, verificar aritmética y escala antes de diseñar. No truncar ejes ni amplificar un
 cambio pequeño para hacerlo más dramático. El sistema visual sirve a la conclusión; no la fabrica.
 

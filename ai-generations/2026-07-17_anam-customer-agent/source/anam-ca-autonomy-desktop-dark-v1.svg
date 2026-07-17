@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Frontera de autonomía conversacional</title><desc id="desc">Cuatro zonas muestran qué puede responder, aclarar y preparar el agente, y qué debe decidir una persona.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#101010" flood-opacity=".14"/></filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#101010" flood-opacity=".10"/></filter>
+
+  </defs>
+
+
+    <rect x="80" y="70" width="235" height="42" rx="21" fill="#214BD9"/><text x="197.5" y="98" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">AUTONOMÍA CONVERSACIONAL</text>
+    <text x="80" y="165" font-family="Poppins, Arial, sans-serif" font-size="54" font-weight="650" fill="#F7F8FA" ><tspan x="80" dy="0">La responsabilidad marca la frontera</tspan></text>
+    <text x="80" y="255" font-family="Poppins, Arial, sans-serif" font-size="22" font-weight="400" fill="#BEC6CE" >No todas las conversaciones recorren las cuatro zonas.</text>
+    <g filter="url(#softShadow)"><rect x="80" y="335" width="325" height="430" rx="22" fill="#214BD9"/></g>
+        <text x="108" y="390" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="650" fill="#A8E72E" >01</text>
+        <text x="108" y="470" font-family="Poppins, Arial, sans-serif" font-size="39" font-weight="650" fill="#FFFFFF" >Saber</text>
+        <text x="108" y="535" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="400" fill="#FFFFFF" ><tspan x="108" dy="0">Respuesta documentada.</tspan><tspan x="108" dy="26.099999999999998">No implica decisión sensible.</tspan></text>
+        <line x1="108" y1="650" x2="377" y2="650" stroke="#FFFFFF" stroke-opacity=".22"/>
+        <text x="108" y="708" font-family="Poppins, Arial, sans-serif" font-size="16" font-weight="650" fill="#A8E72E" letter-spacing="1.2">AGENTE</text><g filter="url(#softShadow)"><rect x="445" y="335" width="325" height="430" rx="22" fill="#17283C"/></g>
+        <text x="473" y="390" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="650" fill="#214BD9" >02</text>
+        <text x="473" y="470" font-family="Poppins, Arial, sans-serif" font-size="39" font-weight="650" fill="#F7F8FA" >Aclarar</text>
+        <text x="473" y="535" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="400" fill="#F7F8FA" ><tspan x="473" dy="0">Existe conocimiento.</tspan><tspan x="473" dy="26.099999999999998">Faltan antecedentes.</tspan></text>
+        <line x1="473" y1="650" x2="742" y2="650" stroke="#072A4A" stroke-opacity=".22"/>
+        <text x="473" y="708" font-family="Poppins, Arial, sans-serif" font-size="16" font-weight="650" fill="#214BD9" letter-spacing="1.2">AGENTE</text><g filter="url(#softShadow)"><rect x="810" y="335" width="325" height="430" rx="22" fill="#3A211E"/></g>
+        <text x="838" y="390" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="650" fill="#FF8A4C" >03</text>
+        <text x="838" y="470" font-family="Poppins, Arial, sans-serif" font-size="39" font-weight="650" fill="#FFC0B2" >Preparar</text>
+        <text x="838" y="535" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="400" fill="#FFC0B2" ><tspan x="838" dy="0">La acción será humana.</tspan><tspan x="838" dy="26.099999999999998">El agente reúne y resume.</tspan></text>
+        <line x1="838" y1="650" x2="1107" y2="650" stroke="#FFC0B2" stroke-opacity=".22"/>
+        <text x="838" y="708" font-family="Poppins, Arial, sans-serif" font-size="16" font-weight="650" fill="#FF8A4C" letter-spacing="1.2">AGENTE → PERSONA</text><g filter="url(#softShadow)"><rect x="1175" y="335" width="325" height="430" rx="22" fill="#2A2D2C"/></g>
+        <text x="1203" y="390" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="650" fill="#F15E4A" >04</text>
+        <text x="1203" y="470" font-family="Poppins, Arial, sans-serif" font-size="39" font-weight="650" fill="#FFFFFF" >Decidir</text>
+        <text x="1203" y="535" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="400" fill="#FFFFFF" ><tspan x="1203" dy="0">Requiere juicio, acceso</tspan><tspan x="1203" dy="26.099999999999998">o compromiso organizacional.</tspan></text>
+        <line x1="1203" y1="650" x2="1472" y2="650" stroke="#FFFFFF" stroke-opacity=".22"/>
+        <text x="1203" y="708" font-family="Poppins, Arial, sans-serif" font-size="16" font-weight="650" fill="#F15E4A" letter-spacing="1.2">PERSONA</text>
+    <line x1="1170" y1="305" x2="1170" y2="805" stroke="#F15E4A" stroke-width="4" stroke-dasharray="10 10" opacity=".40"/>
+    <text x="80" y="925" font-family="Poppins, Arial, sans-serif" font-size="23" font-weight="600" fill="#F7F8FA" >La IA se detiene antes de decidir por la organización.</text>
+
+  <!-- Official Efeonce wordmark is composited deterministically during rasterization. -->
+</svg>

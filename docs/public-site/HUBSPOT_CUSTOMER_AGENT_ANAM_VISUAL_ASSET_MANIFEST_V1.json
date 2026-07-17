@@ -1,0 +1,169 @@
+{
+  "runId": "2026-07-17_anam-customer-agent",
+  "status": "production_complete_local",
+  "article": {
+    "slug": "ia-atencion-cliente-caso-anam",
+    "sourceRef": "docs/public-site/HUBSPOT_CUSTOMER_AGENT_ANAM_ARTICLE_DRAFT_V4.md",
+    "publicationStatus": "local_private_draft"
+  },
+  "visualSystem": {
+    "name": "La conversación visible y la frontera que la sostiene",
+    "brandModel": "Efeonce-owned editorial system with contextual HubSpot accents",
+    "motif": "Una línea de conversación cambia de dueño al cruzar una frontera humana",
+    "bodyCanvas": "transparent",
+    "themeContract": "deliberate light and dark variants; never CSS inversion",
+    "responsiveContract": "desktop horizontal and mobile vertical art direction",
+    "invariants": [
+      "knowledge precedes response",
+      "human responsibility remains visible",
+      "no simulated product UI",
+      "no claim of active runtime"
+    ]
+  },
+  "permissions": {
+    "anamNameInVisuals": "approved_as_case_text",
+    "anamLogo": "not_required",
+    "portalScreenshots": "not_required",
+    "articleUse": "approved",
+    "socialDistribution": "not_in_scope"
+  },
+  "production": {
+    "directory": "ai-generations/2026-07-17_anam-customer-agent",
+    "builder": "ai-generations/2026-07-17_anam-customer-agent/build-assets.mjs",
+    "integrityReport": "ai-generations/2026-07-17_anam-customer-agent/build-report.json",
+    "renderEngine": "sharp/libvips from accessible SVG sources",
+    "brandSources": [
+      "public/branding/logo-negative.svg",
+      "public/branding/logo-full.svg"
+    ],
+    "qa": {
+      "standalone": "all light and dark proofs inspected at original resolution",
+      "alpha": "all 12 body PNG/WebP variants report hasAlpha=true, alphaMin=0 and alphaMax=255",
+      "context": "light variants proofed on #FFFFFF; dark variants proofed on #111013",
+      "pending": "theme runtime integration and live readback after Media Library upload"
+    }
+  },
+  "assets": [
+    {
+      "conceptId": "ANAM-CA-V01",
+      "slot": "hero_featured_og",
+      "function": "Show that a visible conversation depends on knowledge, limits and a change of responsibility",
+      "status": "selected_local",
+      "canvas": "opaque",
+      "deliveryContract": {
+        "viewport": "crop_safe",
+        "theme": "single_theme",
+        "canvas": "opaque",
+        "skin": "contextual_platform",
+        "rationale": "Featured y OG necesitan color estable y una zona central segura para los crops del blog y redes."
+      },
+      "source": "ai-generations/2026-07-17_anam-customer-agent/source/anam-ca-hero-v1.svg",
+      "master": "docs/assets/public-site/anam-customer-agent/anam-ca-hero-master-v1.png",
+      "derivatives": {
+        "featured": "docs/assets/public-site/anam-customer-agent/anam-ca-hero-web-1600-v1.webp",
+        "openGraph": "docs/assets/public-site/anam-customer-agent/anam-ca-hero-og-1440x757-v1.jpg"
+      },
+      "metadata": {
+        "alt": "Una conversación avanza desde 23 fuentes gobernadas y cambia de responsable al llegar a una decisión humana.",
+        "caption": null,
+        "description": "Portada conceptual Efeonce con acentos HubSpot; no representa una interfaz ni una conversación operativa real."
+      },
+      "qa": {
+        "status": "pass",
+        "cropProof": "docs/assets/public-site/anam-customer-agent/anam-ca-hero-square-proof-v1.png"
+      },
+      "media": { "id": null, "url": null, "mime": null }
+    },
+    {
+      "conceptId": "ANAM-CA-V02",
+      "slot": "body_diagram",
+      "function": "Explain the four zones of conversational autonomy and who retains responsibility",
+      "status": "selected_local",
+      "canvas": "transparent",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "light_dark",
+        "canvas": "transparent",
+        "skin": "contextual_platform",
+        "rationale": "Las cuatro zonas requieren composición horizontal en desktop, vertical en móvil y convivencia con ambos temas."
+      },
+      "variants": {
+        "desktopLight": "docs/assets/public-site/anam-customer-agent/anam-ca-autonomy-desktop-web-1600-v1.webp",
+        "mobileLight": "docs/assets/public-site/anam-customer-agent/anam-ca-autonomy-mobile-web-1200-v1.webp",
+        "desktopDark": "docs/assets/public-site/anam-customer-agent/anam-ca-autonomy-desktop-dark-web-1600-v1.webp",
+        "mobileDark": "docs/assets/public-site/anam-customer-agent/anam-ca-autonomy-mobile-dark-web-1200-v1.webp"
+      },
+      "metadata": {
+        "alt": "Cuatro zonas de autonomía: saber y aclarar quedan con el agente; preparar transfiere contexto; decidir corresponde a una persona.",
+        "caption": "La autonomía cambia cuando cambia la responsabilidad, no cuando la conversación acumula más turnos.",
+        "description": "Diagrama editorial determinístico de la frontera de autonomía conversacional."
+      },
+      "qa": { "status": "pass", "responsive": true, "themeVariants": true, "alpha": true },
+      "media": { "desktopLight": null, "mobileLight": null, "desktopDark": null, "mobileDark": null }
+    },
+    {
+      "conceptId": "ANAM-CA-V03",
+      "slot": "body_diagram",
+      "function": "Show how 23 sources pass through governance before shaping answers or handoff",
+      "status": "selected_local",
+      "canvas": "transparent",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "light_dark",
+        "canvas": "transparent",
+        "skin": "contextual_platform",
+        "rationale": "La secuencia fuentes, gobierno y conducta necesita reordenarse en móvil y conservar contraste en ambos temas."
+      },
+      "variants": {
+        "desktopLight": "docs/assets/public-site/anam-customer-agent/anam-ca-knowledge-desktop-web-1600-v1.webp",
+        "mobileLight": "docs/assets/public-site/anam-customer-agent/anam-ca-knowledge-mobile-web-1200-v1.webp",
+        "desktopDark": "docs/assets/public-site/anam-customer-agent/anam-ca-knowledge-desktop-dark-web-1600-v1.webp",
+        "mobileDark": "docs/assets/public-site/anam-customer-agent/anam-ca-knowledge-mobile-dark-web-1200-v1.webp"
+      },
+      "metadata": {
+        "alt": "Seis archivos y diecisiete respuestas cortas pasan por reglas de gobierno antes de orientar, aclarar o transferir una consulta.",
+        "caption": "Las fuentes sólo se vuelven conocimiento útil cuando tienen propósito, vigencia, responsable y reglas para resolver contradicciones.",
+        "description": "Arquitectura editorial de las 23 fuentes; 356 registros técnicos pertenecen a un catálogo y no representan capacidades activas."
+      },
+      "qa": { "status": "pass", "responsive": true, "themeVariants": true, "alpha": true, "exactSourceCount": "6 + 17 = 23" },
+      "media": { "desktopLight": null, "mobileLight": null, "desktopDark": null, "mobileDark": null }
+    },
+    {
+      "conceptId": "ANAM-CA-V04",
+      "slot": "body_diagram_social_source",
+      "function": "Separate vendor documentation, eligibility, configuration, preview testing and runtime verification",
+      "status": "selected_local",
+      "canvas": "transparent",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "light_dark",
+        "canvas": "transparent",
+        "skin": "contextual_platform",
+        "rationale": "La escalera horizontal pierde legibilidad en móvil y sus estados necesitan tratamientos deliberados para light y dark."
+      },
+      "variants": {
+        "desktopLight": "docs/assets/public-site/anam-customer-agent/anam-ca-evidence-desktop-web-1600-v1.webp",
+        "mobileLight": "docs/assets/public-site/anam-customer-agent/anam-ca-evidence-mobile-web-1200-v1.webp",
+        "desktopDark": "docs/assets/public-site/anam-customer-agent/anam-ca-evidence-desktop-dark-web-1600-v1.webp",
+        "mobileDark": "docs/assets/public-site/anam-customer-agent/anam-ca-evidence-mobile-dark-web-1200-v1.webp"
+      },
+      "metadata": {
+        "alt": "Escalera de cinco estados: ANAM estaba configurado y probado en vista previa, pero no verificado en operación real.",
+        "caption": "Una configuración visible no demuestra que una conversación nueva pueda entrar, resolverse, transferirse y medirse.",
+        "description": "Escalera de evidencia operativa con estado ANAM al corte del 17 de julio de 2026."
+      },
+      "qa": { "status": "pass", "responsive": true, "themeVariants": true, "alpha": true, "runtimeClaim": "not verified" },
+      "media": { "desktopLight": null, "mobileLight": null, "desktopDark": null, "mobileDark": null }
+    }
+  ],
+  "pictureContract": {
+    "breakpoint": "860px",
+    "sourceOrder": [
+      "(prefers-color-scheme: dark) and (max-width: 860px) -> mobileDark",
+      "(max-width: 860px) -> mobileLight",
+      "(prefers-color-scheme: dark) -> desktopDark",
+      "fallback img -> desktopLight"
+    ],
+    "accessibility": "one img fallback, one ALT and one caption per concept; never duplicate hidden img elements"
+  }
+}

@@ -1,5 +1,18 @@
 # changelog.md
 
+## 2026-07-17 — Gate de entrega para sistemas visuales editoriales
+
+- `content-marketing-studio` exige ahora un `deliveryContract` machine-readable por `conceptId`: viewport,
+  tratamiento light/dark, canvas transparente/opaco, origen del skin y justificación. La regla quedó sincronizada para Codex y
+  Claude; decisiones como una sola composición o un único tema siguen permitidas, pero ya no pueden ser defaults
+  silenciosos.
+- El comando compartido `pnpm content:visual-manifest:lint -- <manifest.json>` bloquea art direction sin variantes
+  desktop/móvil, contratos light/dark incompletos y transparencia sin verificación técnica de alpha. El manifest
+  del Customer Agent de ANAM ya pasa el gate con hero opaco y tres diagramas transparentes en cuatro variantes.
+- Los skins se clasifican como Efeonce core, contextual de plataforma/cliente o específico de campaña. El
+  vinotinto/coral de esta portada queda limitado al contexto HubSpot y no se convierte en default editorial.
+
+
 ## 2026-07-17 — Publicación del caso ANAM con portada product-story V6
 
 - El artículo `Un dashboard no arregla un proceso comercial` quedó publicado en la categoría HubSpot con autor

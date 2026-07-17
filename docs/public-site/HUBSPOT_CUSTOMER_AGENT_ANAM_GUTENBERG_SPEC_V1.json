@@ -1,0 +1,934 @@
+{
+  "title": "¿Qué necesita una IA para atender bien a tus clientes? Lo que aprendimos diseñando el Customer Agent de ANAM",
+  "slug": "ia-atencion-cliente-caso-anam",
+  "excerpt": "El caso ANAM muestra qué necesita un Customer Agent de HubSpot para responder consultas sin perder contexto, inventar compromisos ni reemplazar decisiones humanas.",
+  "seo": {
+    "title": "IA para atención al cliente: caso Customer Agent de HubSpot",
+    "description": "Qué necesita una IA para atender bien a tus clientes: conocimiento, límites, pruebas y transferencia humana en el caso Customer Agent de ANAM.",
+    "indexPolicy": "noindex"
+  },
+  "intro": [
+    "La idea suele llegar expresada más o menos así: “Queremos que la IA responda las consultas frecuentes de nuestros clientes”.",
+    "Suena razonable. Incluso simple. Conectamos el chat, cargamos los documentos de la empresa y dejamos que la IA haga lo suyo.",
+    "Hasta ahí, todo bien. El problema aparece después.",
+    [
+      {
+        "text": "Una conversación real no llega ordenada como una pregunta frecuente. Puede mezclar una cotización con una factura, omitir un antecedente técnico o pedir una decisión que compromete a la organización. Entonces la pregunta cambia: ya no es sólo qué puede responder la IA, sino "
+      },
+      {
+        "text": "hasta dónde debería llegar antes de entregarle la responsabilidad a una persona",
+        "strong": true
+      },
+      {
+        "text": "."
+      }
+    ],
+    [
+      {
+        "text": "HubSpot llama "
+      },
+      {
+        "text": "Customer Agent",
+        "strong": true
+      },
+      {
+        "text": " al agente de IA que conecta conocimiento y canales de atención. El caso ANAM nos permitió llevar esa idea a terreno concreto: fuentes, instrucciones, memoria, transferencias, pruebas y una operación que también tenía que demostrar su disponibilidad."
+      }
+    ],
+    [
+      {
+        "text": "Mi lectura de este caso es simple: "
+      },
+      {
+        "text": "el trabajo difícil no es enseñarle a la IA a responder. Es decidir con evidencia qué puede responder sola y qué debe conservar para una persona.",
+        "strong": true
+      }
+    ],
+    [
+      {
+        "text": "Respuesta corta:",
+        "strong": true
+      },
+      {
+        "text": " para atender bien, una IA necesita fuentes gobernadas, memoria conversacional, límites explícitos, transferencia humana con contexto, pruebas de varios turnos y un canal realmente disponible. Si falta una de esas piezas, puede producir respuestas convincentes sin sostener una atención confiable."
+      }
+    ],
+    [
+      {
+        "text": "Ahí está el criterio: la "
+      },
+      {
+        "text": "IA para atención al cliente",
+        "strong": true
+      },
+      {
+        "text": " no se vuelve confiable por responder más. Se vuelve confiable cuando también reconoce qué necesita preguntar, qué no puede prometer y cuándo debe detenerse."
+      }
+    ]
+  ],
+  "sections": [
+    {
+      "heading": "¿Qué es un Customer Agent y en qué se diferencia de un chatbot?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Vamos por partes."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "El "
+            },
+            {
+              "text": "Customer Agent de HubSpot",
+              "strong": true
+            },
+            {
+              "text": " es un agente de IA conectado a los canales y al conocimiento de una empresa. Puede responder consultas, reunir antecedentes y transferir la conversación cuando se necesita intervención humana."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "HubSpot lo describe",
+              "href": "https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent"
+            },
+            {
+              "text": " como un agente impulsado por Breeze que utiliza el contenido existente de la organización para responder preguntas. Si no conoce una respuesta, puede pedir que se reformule la consulta o transferir la conversación a una persona. La plataforma también permite definir fuentes de contenido y configurar la transferencia humana ("
+            },
+            {
+              "text": "handoff"
+            },
+            {
+              "text": ")."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "¿Dónde está la diferencia? Un chatbot tradicional suele conducir al visitante por árboles, botones o respuestas predefinidas. Un agente interpreta lenguaje natural y recupera información desde distintas fuentes. Puede manejar más variaciones y conversaciones menos ordenadas."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Esa flexibilidad es justamente lo que lo vuelve más útil. Y también más delicado. Si interpreta mal una intención, elige una fuente incorrecta o avanza más allá de lo que la empresa puede respaldar, el problema ya no es una mala respuesta automática. Es una conversación atendida bajo una premisa falsa."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Por eso no basta con preguntar qué sabe hacer la IA. También hay que resolver cuatro preguntas:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "¿Con qué fuentes puede responder?",
+            "¿Qué contexto debe pedir y recordar?",
+            "¿Qué no puede prometer y cuándo debe transferir?",
+            "¿Cómo comprobaremos que la operación funciona de verdad?"
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Prefiero, entonces, pensar en un Customer Agent como una operación, no como una caja de respuestas. "
+            },
+            {
+              "text": "Tiene que saber qué responder, pero también hasta dónde puede llegar.",
+              "strong": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "¿Qué problema debía resolver el Customer Agent de ANAM?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "ANAM necesitaba orientar consultas técnicas y administrativas, reunir el contexto mínimo para avanzar y transferir sólo las acciones que requerían intervención humana. El desafío era hacerlo sin convertir el chat en un formulario interminable y sin pedirle al cliente que comenzara de nuevo cuando interviniera una persona."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "En el primer artículo de esta serie sobre "
+            },
+            {
+              "text": "dashboards confiables en HubSpot",
+              "href": "https://efeoncepro.com/hubspot/dashboards-hubspot-confiables-caso-anam/"
+            },
+            {
+              "text": " mostramos por qué un dashboard convincente no demuestra que los datos debajo sean confiables. Con el Customer Agent apareció el mismo principio en otra superficie: una respuesta convincente tampoco demuestra que el sistema debajo pueda sostenerla."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Las conversaciones podían seguir rutas técnicas o administrativas. Algunas llegaban limpias. Otras mezclaban necesidades: por ejemplo, solicitar una cotización y corregir una factura anterior dentro del mismo mensaje."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Ahí aparece una diferencia que me parece central: automatizar respuestas no es lo mismo que diseñar atención. Una respuesta puede ser correcta de forma aislada y aun así producir una mala experiencia. Basta con que el agente pregunte lo mismo dos veces, transfiera demasiado pronto o prometa algo que el equipo no puede cumplir."
+        },
+        {
+          "kind": "paragraph",
+          "text": "En Efeonce abordamos el Customer Agent separando el problema en piezas. La identidad y el tono eran una; el conocimiento, otra. Las instrucciones, la memoria, las acciones, la transferencia humana, el canal y la medición también necesitaban su propio diseño y su propia prueba."
+        },
+        {
+          "kind": "pullquote",
+          "text": "Un prompt no reemplaza una arquitectura operativa."
+        }
+      ]
+    },
+    {
+      "heading": "¿Por qué cargar documentos no crea una buena respuesta?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Cargar documentos se siente como progreso porque es visible: antes no había fuentes; ahora las hay. Pero los documentos sólo cubren aquello que el agente puede recuperar. No definen por sí solos cómo debe preguntar, qué debe recordar, cuándo necesita detenerse ni cómo transferirá una conversación."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Imaginemos que una fuente describe los plazos estándar de un análisis y otra conversación pregunta por la fecha de entrega de un servicio ya contratado. El agente puede conocer el plazo de referencia y, al mismo tiempo, no tener autoridad para comprometer una fecha concreta. Si ambos conceptos se mezclan, una respuesta aparentemente útil puede transformarse en una promesa operacional."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Lo mismo ocurre con una factura. El agente puede explicar condiciones administrativas documentadas o reunir una referencia. Eso no significa que pueda corregir un documento, confirmar una refacturación o asegurar el resultado de una revisión."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La forma más clara de verlo es separar siete piezas:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            [
+              {
+                "text": "Identidad y tono:",
+                "strong": true
+              },
+              {
+                "text": " cómo se presenta y conversa."
+              }
+            ],
+            [
+              {
+                "text": "Conocimiento:",
+                "strong": true
+              },
+              {
+                "text": " qué fuentes puede utilizar."
+              }
+            ],
+            [
+              {
+                "text": "Instrucciones:",
+                "strong": true
+              },
+              {
+                "text": " cómo clasifica, pregunta y resume."
+              }
+            ],
+            [
+              {
+                "text": "Memoria conversacional:",
+                "strong": true
+              },
+              {
+                "text": " qué antecedentes conserva durante el diálogo."
+              }
+            ],
+            [
+              {
+                "text": "Acciones:",
+                "strong": true
+              },
+              {
+                "text": " qué puede ejecutar realmente en un sistema."
+              }
+            ],
+            [
+              {
+                "text": "Transferencia humana:",
+                "strong": true
+              },
+              {
+                "text": " cuándo y cómo entrega la responsabilidad."
+              }
+            ],
+            [
+              {
+                "text": "Canal y operación real:",
+                "strong": true
+              },
+              {
+                "text": " dónde atiende y si el servicio está disponible."
+              }
+            ]
+          ],
+          "ordered": true
+        },
+        {
+          "kind": "paragraph",
+          "text": "En el corte revisado, ANAM tenía conocimiento, directrices, transferencia humana y canal configurados. No tenía acciones publicadas. Había dos borradores, sí, pero un borrador todavía no hace nada."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Parece una precisión menor. No lo es. Tratar un borrador como capacidad activa nos llevaría a decir que el agente puede consultar facturas, servicios o sistemas externos cuando, en realidad, todavía no tiene ese acceso."
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo se diseñó una base de conocimiento de 23 fuentes?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "La base de conocimiento se diseñó organizando cada fuente por función, autoridad y vigencia, no por la carpeta o el correo donde apareció."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Veintitrés fuentes suena a una base robusta. Puede serlo. Pero el número, por sí solo, dice poco. Lo que importa es si esas fuentes se contradicen, quién responde por su vigencia y para qué tipo de decisión sirve cada una."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "El inventario verificado contenía "
+            },
+            {
+              "text": "23 fuentes en uso",
+              "strong": true
+            },
+            {
+              "text": ":"
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "items": [
+            "seis archivos privados en Markdown;",
+            "17 respuestas cortas para situaciones críticas o formulaciones recurrentes."
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Los seis archivos cubrían empresa, servicios y normas, preguntas frecuentes, cotización y captura de antecedentes, seguimiento/facturación/calidad y un catálogo técnico. Este último conservaba "
+            },
+            {
+              "text": "356 registros técnicos",
+              "strong": true
+            },
+            {
+              "text": ". No eran 356 servicios ni 356 promesas de disponibilidad: eran registros que debían interpretarse junto con la matriz, la norma y el objetivo de la consulta."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Las respuestas cortas cumplían otro trabajo. Permitían tratar situaciones específicas —especialmente administrativas— con un lenguaje más directo. Aun así, no se asumió que una respuesta entrenada aparecería ante cualquier formulación humana. Esa conducta debía comprobarse conversando."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Antes de sincronizar, las fuentes se reconciliaron para evitar contradicciones. También se mantuvieron privadas: podían alimentar las respuestas, pero no aparecerían como citas públicas para el visitante. "
+            },
+            {
+              "text": "HubSpot advierte",
+              "href": "https://knowledge.hubspot.com/customer-agent/manage-the-customer-agents-content-sources"
+            },
+            {
+              "text": " que el contenido privado puede utilizarse en la respuesta aunque no se cite, una razón adicional para excluir datos personales, confidenciales o sensibles."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Mi forma de resumirlo es ésta: "
+            },
+            {
+              "text": "una base de conocimiento no es un depósito de documentos. Es una arquitectura de decisiones.",
+              "strong": true
+            },
+            {
+              "text": " Cada fuente necesita propósito, vigencia, responsable y una regla para resolver contradicciones."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "¿Por qué el cliente ve tres intenciones y el agente opera con cinco?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "El cliente ve tres intenciones porque la interfaz debe simplificar la entrada; el agente conserva cinco rutas porque la operación necesita distinguirlas. Parece un detalle de interfaz. En realidad, define cuánto trabajo le traspasamos al cliente."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La página de entrada de ANAM ofrecía tres puertas visibles:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "Cotizar;",
+            "Seguimiento del Servicio;",
+            "Requerimientos de Calidad."
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "El agente, en cambio, clasificaba cinco rutas: Información, Cotización, Seguimiento, Facturación y Calidad. La diferencia era deliberada. Una consulta de facturación podía aparecer dentro de un seguimiento o en un mensaje libre. La información general tampoco necesitaba convertirse en un botón adicional para ser atendida."
+        },
+        {
+          "kind": "paragraph",
+          "text": "El cliente no debería aprender nuestro organigrama ni escoger la ruta interna correcta para obtener ayuda. Debería poder explicar lo que necesita. El trabajo de separar las rutas le corresponde al sistema."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Una de las pruebas combinó una cotización de agua potable con la corrección de una factura anterior. El agente distinguió la necesidad técnica de la gestión administrativa en vez de tratarlas como una sola solicitud. Esa capacidad es más valiosa que un menú perfecto: permite conservar la conversación mientras cambia la responsabilidad."
+        }
+      ]
+    },
+    {
+      "heading": "¿Qué debe recordar y qué no puede prometer una IA?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "El agente debía recordar los antecedentes relevantes que el cliente ya había entregado, sin convertir esa memoria en autoridad para decidir. En el diseño de ANAM eso incluía, según la conversación, empresa, identificación proporcionada, servicio, matriz, norma, referencias y montos mencionados."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Es algo que cualquier persona espera de una conversación: no tener que repetir lo que acaba de decir. Con una IA debería ocurrir lo mismo."
+        },
+        {
+          "kind": "paragraph",
+          "text": "La memoria evita preguntas repetidas y mejora el resumen antes de una transferencia. Pero recordar un dato no le da autoridad para decidir sobre él."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Ojo: "
+            },
+            {
+              "text": "memoria no es autoridad.",
+              "strong": true
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "El agente no debía prometer:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "precios finales;",
+            "fechas comprometidas;",
+            "refacturaciones o correcciones;",
+            "la solución de un reclamo;",
+            "interpretaciones legales o de cumplimiento;",
+            "resultados técnicos;",
+            "disponibilidad no documentada;",
+            "acciones que todavía no había ejecutado."
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Esta última regla es especialmente importante. Decir “registré tu solicitud” parece una cortesía inocente, pero se convierte en una afirmación falsa si ninguna acción creó el registro. Un agente confiable distingue entre lo que explicó, lo que reunió y lo que realmente ejecutó."
+        }
+      ]
+    },
+    {
+      "heading": "¿Cuándo transferir a una persona es la respuesta correcta?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Una transferencia es correcta cuando la conversación requiere juicio, acceso operativo o capacidad de comprometer a la organización, y el agente ya reunió el contexto mínimo para que una persona pueda continuar."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Es fácil leer esa transferencia como una falla: si llegó a una persona, la IA no resolvió. Yo la veo de otra manera."
+        },
+        {
+          "kind": "paragraph",
+          "text": "No debería ocurrir sólo porque el visitante escribió “factura”, “urgente”, “reclamo” o “cotización”. Primero puede existir información útil que el agente sí está en condiciones de entregar. Transferir ante la primera palabra sensible aumenta la carga del equipo y deja al cliente con la impresión de que la IA era apenas una puerta de entrada."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "En Efeonce usamos una "
+            },
+            {
+              "text": "frontera de autonomía conversacional",
+              "strong": true
+            },
+            {
+              "text": " para ordenar esa decisión:"
+            }
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Zona",
+            "Qué ocurre",
+            "Quién conserva la responsabilidad"
+          ],
+          "rows": [
+            [
+              [
+                {
+                  "text": "Saber",
+                  "strong": true
+                }
+              ],
+              "La respuesta está documentada y no implica una decisión sensible.",
+              "Agente"
+            ],
+            [
+              [
+                {
+                  "text": "Aclarar",
+                  "strong": true
+                }
+              ],
+              "Existe conocimiento, pero faltan antecedentes para aplicarlo.",
+              "Agente"
+            ],
+            [
+              [
+                {
+                  "text": "Preparar",
+                  "strong": true
+                }
+              ],
+              "Se necesita una acción humana; el agente reúne y resume el contexto.",
+              "Agente → persona"
+            ],
+            [
+              [
+                {
+                  "text": "Decidir",
+                  "strong": true
+                }
+              ],
+              "Se requiere juicio, acceso a sistemas o un compromiso de la organización.",
+              "Persona"
+            ]
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "No es un embudo ni obliga a que cada conversación pase por las cuatro zonas. Sirve para reconocer dónde está la responsabilidad en cada momento."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Una buena transferencia puede evaluarse con cinco preguntas:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "¿Era realmente necesario?",
+            "¿Ocurrió en el momento correcto?",
+            "¿El agente reunió el contexto mínimo?",
+            "¿Entregó un resumen útil?",
+            "¿La persona puede continuar sin pedir que el cliente repita todo?"
+          ],
+          "ordered": true
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "HubSpot permite configurar guías personalizadas de transferencia",
+              "href": "https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process"
+            },
+            {
+              "text": " y contempla disparadores por defecto cuando el agente no puede responder, el visitante pide hablar con una persona o el agente está pausado. En ANAM, además, se diseñó una transferencia hacia Help Desk con un responsable funcional."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Hasta acá llega el punto que me interesa: "
+            },
+            {
+              "text": "transferir no es fracasar. Es preservar la responsabilidad cuando la conversación cruza el límite de la evidencia.",
+              "strong": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "¿Cómo se prueba una conversación y no sólo una respuesta?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Se prueba con escenarios de varios turnos que exijan memoria, lenguaje natural, intención mixta, manejo de frustración, transferencia y recuperación ante fallas. Aquí es donde una demo y un sistema empiezan a separarse: una respuesta correcta, aislada, no demuestra que el agente pueda sostener una conversación."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Para ANAM se definió un guion de "
+            },
+            {
+              "text": "39 escenarios",
+              "strong": true
+            },
+            {
+              "text": ". Esa cifra describe el diseño de la batería, no 39 pruebas ejecutadas. La evidencia recuperable permite sostener un mínimo de "
+            },
+            {
+              "text": "24 escenarios distintos y 35 turnos o ejecuciones",
+              "strong": true
+            },
+            {
+              "text": " durante la sesión revisada."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "La batería técnica conjunta acreditó "
+            },
+            {
+              "text": "19 escenarios satisfactorios después de ajustes",
+              "strong": true
+            },
+            {
+              "text": ". Las pruebas cubrieron también materias administrativas, facturación, reclamos, seguimiento e intención mixta."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Los resultados no fueron uniformes:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "el comportamiento administrativo general resultó satisfactorio;",
+            "la intención mixta separó correctamente las dos necesidades;",
+            "reclamo y seguimiento resultaron satisfactorios con una limitación;",
+            "facturación mostró un resultado favorable y otro parcial."
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "En algunas iteraciones, el agente reunió contexto antes de transferir. En otras, la transferencia nativa de HubSpot se anticipó a la aclaración que habíamos diseñado. Esa limitación no se ocultó ni se convirtió en una conclusión universal sobre la plataforma. Se registró como un comportamiento observado en ese corte y como una regresión pendiente."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Tampoco contábamos con una exportación completa de las transcripciones para reconstruir cada conversación. Por eso el informe utiliza la fórmula "
+            },
+            {
+              "text": "mínimo verificable",
+              "strong": true
+            },
+            {
+              "text": " y evita presentar una cobertura estimada como una medición."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Lo valioso del QA no fue confirmar que la respuesta ideal aparecía ante la pregunta ideal. Fue encontrar estos bordes. Si una prueba no incomoda al agente, probablemente está evaluando una demo, no una atención real."
+        }
+      ]
+    },
+    {
+      "heading": "¿Qué limitaciones aparecieron durante la implementación?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Encontramos seis límites que afectaban lo que podíamos afirmar sobre el agente. No invalidaban la implementación, pero sí obligaban a describirla con precisión:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            "la transferencia nativa podía anticiparse a una aclaración entrenada;",
+            "la vista previa no representaba toda la identidad CRM de un cliente real;",
+            "una respuesta corta no garantizaba el mismo comportamiento ante cualquier formulación;",
+            "el mensaje prellenado desde la página de entrada no era suficientemente confiable para tratarlo como contrato;",
+            "faltaba una exportación completa de las transcripciones para reconstruir toda la sesión;",
+            "dos acciones permanecían como borradores y, por tanto, no constituían capacidad activa."
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Ojo con el alcance: son observaciones del corte evaluado, no defectos universales de HubSpot. Algunas pueden cambiar con nuevas versiones, configuración adicional o pruebas desde un contacto real."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Hasta aquí podemos decir qué ocurrió en ANAM. No podemos transformar ese recorte en una verdad general sobre la plataforma. Lo que sí corresponde es documentar la frontera y evitar que una posibilidad del producto se presente como una capacidad ya disponible en la cuenta."
+        }
+      ]
+    },
+    {
+      "heading": "¿Por qué configurado, probado y operativo son estados distintos?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Configurado, probado y operativo son estados distintos porque cada uno exige una evidencia diferente. Tener una configuración visible no demuestra que una conversación nueva pueda entrar, resolverse, transferirse y medirse."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Y después llegó la prueba más incómoda: la que no se resuelve dentro de la vista previa."
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Estado",
+            "Pregunta que debe responder la evidencia",
+            "ANAM al corte"
+          ],
+          "rows": [
+            [
+              [
+                {
+                  "text": "Documentado por el proveedor",
+                  "strong": true
+                }
+              ],
+              "¿HubSpot describe la capacidad?",
+              "Sí"
+            ],
+            [
+              [
+                {
+                  "text": "Elegible en el portal",
+                  "strong": true
+                }
+              ],
+              "¿La cuenta muestra la superficie?",
+              "Sí"
+            ],
+            [
+              [
+                {
+                  "text": "Configurado",
+                  "strong": true
+                }
+              ],
+              "¿Conocimiento, directrices, transferencia y canal están presentes?",
+              "Sí"
+            ],
+            [
+              [
+                {
+                  "text": "Probado en vista previa",
+                  "strong": true
+                }
+              ],
+              "¿Se observaron escenarios y límites?",
+              "Sí, con limitaciones"
+            ],
+            [
+              [
+                {
+                  "text": "Verificado en operación real",
+                  "strong": true
+                }
+              ],
+              "¿Acepta conversaciones nuevas reales y permite medir resultados?",
+              [
+                {
+                  "text": "No",
+                  "strong": true
+                }
+              ]
+            ]
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Al 17 de julio de 2026, el agente conservaba sus 23 fuentes, directrices, transferencia y canal. El canal de chat estaba configurado para todas las horas y 100% de cobertura. Eso describe la configuración, no una atención efectiva 24/7."
+        },
+        {
+          "kind": "paragraph",
+          "text": "El portal mostraba las conversaciones nuevas en pausa. El bloqueo observado era una dependencia administrativa de facturación que debía resolver ANAM antes de reactivar el uso, reanudar el agente y verificar una conversación nueva real. Este artículo no publica números, montos, fechas ni otros datos sensibles de la cuenta."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Por eso, aunque resulte menos atractivo para un caso de éxito, el estado correcto es éste: "
+            },
+            {
+              "text": "Customer Agent configurado y probado en vista previa, pero no operativo para conversaciones nuevas al corte.",
+              "strong": true
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "Y precisamente por eso vale la pena contarla. Un sistema no se vuelve operativo porque completamos la configuración o porque una demo funcionó. "
+            },
+            {
+              "text": "La operación real también forma parte del resultado.",
+              "strong": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Entonces, ¿qué necesita una IA para atender bien a tus clientes?",
+      "level": 2,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Si tuviera que condensar todo el caso en una respuesta, sería ésta: necesita mucho más que documentos y un chat."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Necesita conocimiento gobernado. Instrucciones que separen intención y responsabilidad. Memoria suficiente para no empezar de nuevo. Límites explícitos, transferencia con contexto, pruebas de varios turnos y una operación disponible para recibir conversaciones reales."
+        },
+        {
+          "kind": "paragraph",
+          "text": "El caso ANAM no demuestra que un agente deba resolver cada consulta. Demuestra algo más útil: que la autonomía puede diseñarse."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Ahí está la frontera: el agente responde donde existe conocimiento confiable, pregunta donde falta contexto, prepara lo que necesita una persona y se detiene antes de decidir por la organización."
+        },
+        {
+          "kind": "paragraph",
+          "text": "Antes de activar un Customer Agent, revisa cuatro zonas con tu equipo:"
+        },
+        {
+          "kind": "list",
+          "items": [
+            [
+              {
+                "text": "Saber:",
+                "strong": true
+              },
+              {
+                "text": " ¿qué puede responder con evidencia?"
+              }
+            ],
+            [
+              {
+                "text": "Aclarar:",
+                "strong": true
+              },
+              {
+                "text": " ¿qué antecedentes necesita pedir?"
+              }
+            ],
+            [
+              {
+                "text": "Preparar:",
+                "strong": true
+              },
+              {
+                "text": " ¿qué contexto puede reunir para una persona?"
+              }
+            ],
+            [
+              {
+                "text": "Decidir:",
+                "strong": true
+              },
+              {
+                "text": " ¿qué compromisos y acciones deben seguir siendo humanos?"
+              }
+            ]
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": "Si esa frontera no está escrita, cargar más contenido sólo hará que la IA responda con más material. No necesariamente con más criterio."
+        },
+        {
+          "kind": "separator"
+        }
+      ]
+    },
+    {
+      "heading": "Nota metodológica",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Este artículo se basa en el inventario autenticado del portal ANAM, un paquete versionado de las 23 fuentes, las directrices publicadas y el informe de QA del 16 de julio de 2026. Los conteos de prueba se presentan como mínimos verificables cuando no existe evidencia suficiente para sostener una cifra mayor. El estado operativo se revisó nuevamente el 17 de julio de 2026."
+        }
+      ]
+    },
+    {
+      "heading": "Fuentes oficiales de producto",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "list",
+          "items": [
+            [
+              {
+                "text": "HubSpot: entender Customer Agent",
+                "href": "https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent"
+              }
+            ],
+            [
+              {
+                "text": "HubSpot: gestionar las fuentes de contenido",
+                "href": "https://knowledge.hubspot.com/customer-agent/manage-the-customer-agents-content-sources"
+              }
+            ],
+            [
+              {
+                "text": "HubSpot: configurar la transferencia humana",
+                "href": "https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process"
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Nota de autoría",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Este borrador fue desarrollado con apoyo de IA a partir de la tesis y la dirección editorial aprobadas por Julio Reyes. La selección final de fuentes, la verificación de afirmaciones, la versión definitiva y cualquier decisión de publicación requieren su aprobación expresa."
+        }
+      ]
+    }
+  ],
+  "tableOfContents": true,
+  "intent": "create",
+  "attribution": {
+    "campaignId": "anam-customer-agent-case-study"
+  }
+}

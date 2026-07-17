@@ -26,6 +26,12 @@ argument-hint: "[etapa del content engine o pregunta concreta]"
 
 **Routing visual:** si una pieza necesita hero, imágenes de cuerpo, diagramas editoriales o derivados sociales/OG, carga `references/agentic-editorial-visual-system.md` **antes** de escribir prompts o generar assets. Este studio define función, sistema, manifest, selección e integración; la skill de imagen/diseño ejecuta el craft visual.
 
+Antes de producir, cada `conceptId` debe declarar en el manifest un `deliveryContract` con decisiones explícitas
+para `viewport`, `theme`, `canvas`, `skin` y su `rationale`. `skin` declara si la paleta es Efeonce core,
+contextual de una plataforma/cliente o específica de campaña; nunca heredar el skin del precedente por omisión. Al cerrar una producción local, ejecutar
+`pnpm content:visual-manifest:lint -- <manifest.json>`. No declarar un sistema visual completo si el gate falla o
+si estas decisiones sólo aparecen en prosa.
+
 **Routing de infografía determinística:** si el significado depende de texto, cifras, ejes, conectores, logos o
 variantes responsive/theme exactas, carga `references/deterministic-editorial-infographics.md`. El método gobierna
 `contrato → SVG → PNG master → WebP → QA → manifest`; `design-studio` dirige la composición y `dataviz-design`
