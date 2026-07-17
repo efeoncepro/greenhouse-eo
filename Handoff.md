@@ -25,6 +25,22 @@
 > **Frontera de skin:** el contrato también exige `skin`. Este caso usa `contextual_platform`: vinotinto/coral
 > reconoce HubSpot, pero no es paleta Efeonce ni precedente cromático para artículos de otros temas.
 
+## Sesión 2026-07-17 — Actualización directa de WordPress público
+
+> **Aplicado:** se ejecutó un mantenimiento directo en `https://efeoncepro.com` con snapshot de base de datos y
+> archivos de plugins previo. Quedaron actualizados AI `1.2.0`, Contact Form 7/Mailchimp `0.9.81.03`, Elementor
+> `4.1.5`, Elementor Pro `4.1.3`, HubSpot `11.3.65`, Jetpack `16.0.1`, Spectra `2.20.0` y SVG Support `2.5.17`.
+> Elementor y Pro fueron reactivados explícitamente tras la actualización; también AI y el conector Mailchimp.
+>
+> **Excepción/rollback:** Essential Addons for Elementor `6.7.0` quedó incompleto sin `autoload.php` y causó un
+> error crítico de arranque. Se restauró inmediatamente su copia `6.6.10`; el sitio volvió a responder y esta es
+> la única actualización pendiente. No reintentarla directamente en producción: esperar paquete corregido o
+> probar primero en staging.
+>
+> **Evidencia:** WP-CLI confirmó core sin mantenimiento, Elementor/Pro, Jetpack y HubSpot cargados; inicio,
+> contacto, servicios y Agencia Creativa respondieron HTTP 200. Snapshot remoto de la ventana de mantenimiento:
+> `/tmp/gh-wp-plugin-update-20260717T161045Z/` (base de datos + archivos de plugins).
+
 ## Sesión 2026-07-17 — Escenas editoriales de producto y frontera de skin
 
 > **Qué se canonizó:** `design-studio` incorpora `modules/11_PRODUCT_STORY_SCENES.md` en mirrors Codex/Claude.
@@ -38750,3 +38766,25 @@ El operador confirmó que el key visual 4K original ya contenía el `ON AIR` int
 > pública recorta a `1:1` con centro `50% 50%`; la composición completa se conserva en `258×258` y `358×358`.
 > Los nueve links HTTP responden `200` y Think no contiene una copia. Evidencia:
 > `.captures/anam-public-v6-2026-07-17/`.
+
+## Sesión 2026-07-17 — Caso ANAM: endurecimiento SEO live
+
+- La auditoría SEO live confirmó `200`, canonical único, `index, follow`, SEO title `56`, meta description `135`,
+  H1 único, TOC válido, schema Article/BlogPosting + Person/Organization, OG/Twitter `1440×757` y ALT completos
+  en las imágenes del cuerpo.
+- Se corrigió el breadcrumb estructurado global de posts: `wpseo_titles.post_types-post-maintax` pasó de `0` a
+  `category`, contrato confirmado en Yoast `28.0`. Tras `yoast index --reindex --skip-confirmation` y purge Kinsta,
+  ANAM expone `Portada → HubSpot → artículo`; dos posts HubSpot de muestra conservaron `200`, canonical e
+  indexación. Snapshot: `/tmp/anam-seo-breadcrumb-before-20260717.json`; rollback:
+  `tmp/rollback-anam-seo-breadcrumb-hardening.php`.
+- El contenido no cambió: SHA-256
+  `9fa2adc32896c48c6939ab682fc871c987519aec5bdf4e0b523225e03b25c8c0`. QA Playwright desktop `1440×1000` y
+  móvil `390×844`: sin media rota, consola/page errors ni overflow.
+- No se parchearon `og:image:alt`/`twitter:image:alt`: Yoast `28.0` no los emite ni ofrece campo nativo. Resolverlo
+  exige una extensión gobernada del runtime WordPress. Tampoco se inyectaron enlaces a artículos legacy sin
+  revisión editorial.
+- Incidente de higiene: una inspección read-only imprimió tokens de sesión de Yoast AI en una salida local de
+  herramienta. Los archivos locales fueron eliminados y se revocaron access/refresh token y callback hash del
+  usuario `1`; no hubo leak al repo ni degradación del sitio. Julio puede necesitar reautorizar Yoast AI.
+- Canon actualizado:
+  [auditoría WordPress ANAM](docs/public-site/HUBSPOT_REVOPS_ANAM_WORDPRESS_PRIVATE_AUDIT_V1.md).

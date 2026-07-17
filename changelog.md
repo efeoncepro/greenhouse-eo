@@ -21,6 +21,14 @@
 - Los skins se clasifican como Efeonce core, contextual de plataforma/cliente o específico de campaña. El
   vinotinto/coral de esta portada queda limitado al contexto HubSpot y no se convierte en default editorial.
 
+## 2026-07-17 — Mantenimiento directo de plugins del sitio público WordPress
+
+- Se actualizaron en `efeoncepro.com` AI 1.2.0, Contact Form 7/Mailchimp 0.9.81.03, Elementor 4.1.5,
+  Elementor Pro 4.1.3, HubSpot 11.3.65, Jetpack 16.0.1, Spectra 2.20.0 y SVG Support 2.5.17. Se verificaron
+  arranque de WordPress, plugins críticos activos, ausencia de mantenimiento/error PHP y rutas públicas clave.
+- Essential Addons for Elementor 6.7.0 produjo un paquete incompleto sin `autoload.php`; se restauró de inmediato
+  la versión 6.6.10 desde el snapshot previo. Su actualización queda pendiente hasta que el proveedor publique
+  un paquete íntegro o pueda probarse fuera de producción.
 
 ## 2026-07-17 — Publicación del caso ANAM con portada product-story V6
 
@@ -10842,3 +10850,12 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 - `GutenbergArticleSpec.image` incorpora `sources` allowlisted para compilar art direction responsive/theme dentro del bloque dueño; tests focales `14/14` y Content Factory `pass` con `81` bloques.
 - El post `251397` conserva estado privado, autor `1`, categoría `HubSpot`, tags vacíos y `noindex`; render privado desktop/mobile × light/dark sin overflow ni media rota, y acceso anónimo `404`.
 - Publicación no ejecutada. Estado: `private content complete; publication pending`.
+
+## 2026-07-17 — Caso ANAM publicado y endurecido para SEO
+
+- El post `251397` quedó live en `/hubspot/dashboards-hubspot-confiables-caso-anam/` con portada V6, canonical,
+  `index, follow`, metadata social y QA responsive sin errores ni overflow.
+- La taxonomía principal de breadcrumbs Yoast para posts se fijó en `category` y se reconstruyeron los indexables;
+  ANAM y la muestra HubSpot exponen `Portada → HubSpot → artículo` sin modificar el contenido.
+- Se revocaron preventivamente las credenciales de sesión de Yoast AI del autor tras aparecer en una salida local
+  de inspección; no llegaron al repositorio ni afectaron el sitio. El siguiente uso puede requerir reautorización.

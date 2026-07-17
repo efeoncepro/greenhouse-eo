@@ -5,7 +5,7 @@
 > **Post WordPress:** `251397`.
 > **Manifest:** `greenhouse-cf-dashboards-hubspot-confiables-caso-anam-v1`.
 > **Autor:** Julio Reyes, WordPress user `1`.
-> **Publicación:** no autorizada.
+> **Publicación:** autorizada y ejecutada el 2026-07-17; ver cierre live y endurecimiento SEO al final.
 
 ## Resultado
 
@@ -140,3 +140,40 @@ Readback live:
 Evidencia visual y reportes:
 `.captures/anam-public-v6-2026-07-17/`. Inspección post-publicación:
 `docs/operations/public-site-content-factory/post-deep-inspection-251397-2026-07-17T12-30-02+00-00.json`.
+
+## Endurecimiento SEO live — 2026-07-17
+
+La auditoría live posterior a la publicación confirmó `200`, canonical único, `index, follow`, título SEO de 56
+caracteres, meta description de 135, un solo H1, TOC resoluble, Article/BlogPosting + Person/Organization, imagen
+social `1440×757` y ALT no vacíos en todas las imágenes editoriales del cuerpo.
+
+Se corrigió una brecha real en el schema de navegación. Yoast `28.0` tenía
+`wpseo_titles.post_types-post-maintax=0`, por lo que el `BreadcrumbList` omitía la categoría aun cuando `HubSpot`
+ya era la categoría primaria del post. El source del plugin confirmó que el valor permitido es el nombre de una
+taxonomía asociada al post type. Se aplicó `category`, se reconstruyeron los indexables mediante
+`yoast index --reindex --skip-confirmation` y se purgó Kinsta.
+
+- Snapshot recuperable: `/tmp/anam-seo-breadcrumb-before-20260717.json`.
+- Rollback preparado: `tmp/rollback-anam-seo-breadcrumb-hardening.php`.
+- Hash de contenido preservado:
+  `9fa2adc32896c48c6939ab682fc871c987519aec5bdf4e0b523225e03b25c8c0`.
+- Breadcrumb final: `Portada → HubSpot → artículo`.
+- Regresión: el artículo y dos posts HubSpot de muestra respondieron `200`, conservaron canonical/indexación y
+  expusieron la misma jerarquía de categoría.
+- QA responsive repetida en `1440×1000` y `390×844`: sin imágenes rotas, errores de consola/página ni overflow.
+
+Hallazgos que se dejaron deliberadamente sin parche local:
+
+- Yoast `28.0` no emite `og:image:alt` ni `twitter:image:alt` y su código instalado no expone un campo nativo para
+  esos tags. Añadirlos requiere una extensión gobernada del runtime WordPress; no se inyectó HTML o schema
+  duplicado dentro del post.
+- `Article.description` y una representación adicional de aspectos de imagen serían enriquecimientos opcionales
+  mediante filtros de schema, no bloqueos de elegibilidad o indexación.
+- No se añadieron enlaces hacia artículos legacy del cluster HubSpot porque sus afirmaciones requieren una
+  revisión editorial separada. El CTA interno hacia el servicio HubSpot y los enlaces externos primarios se
+  mantienen.
+
+Durante una inspección read-only se imprimieron accidentalmente credenciales de sesión de Yoast AI en una salida
+local de herramienta. No se incorporaron al repositorio ni a documentación. Se eliminaron los artefactos locales
+que las contenían y se revocaron inmediatamente el access token, refresh token y callback hash del usuario `1`.
+La publicación no se degradó; el próximo uso del generador Yoast AI puede requerir reautorización.
