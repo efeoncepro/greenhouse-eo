@@ -794,6 +794,8 @@ export const GH_GROWTH_AEO_OPERATOR = {
     colTier: 'Tier',
     colScore: 'Score AEO',
     colLastRun: 'Último run',
+    searchPlaceholder: 'Buscar cliente…',
+    searchEmpty: (query: string) => `Sin resultados para "${query}". Revisa la ortografía o limpia la búsqueda.`,
     openDetailAria: 'Abrir el detalle AEO del cliente',
     scoreNoData: 'Sin medición',
     lastRunNever: 'Sin runs',
