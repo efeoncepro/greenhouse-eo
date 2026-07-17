@@ -169,7 +169,8 @@ const FACET_ICONS: Record<OrganizationFacet, string> = {
   finance: 'tabler-report-money',
   crm: 'tabler-briefcase',
   services: 'tabler-tool',
-  staffAug: 'tabler-user-check'
+  staffAug: 'tabler-user-check',
+  aeo: 'tabler-radar-2'
 }
 
 const STATUS_COLOR: Record<string, EnterpriseTone> = {
@@ -1684,7 +1685,8 @@ const buildContextRows = (facet: OrganizationFacet, detail: OrganizationDetailDa
       ['Skills', `${data360?.staffAug?.placements.filter(placement => placement.requiredSkills?.length).length ?? 0} con skills`, 'Partial', 'Workforce', 'warning']
     ],
     finance: [],
-    delivery: []
+    delivery: [],
+    aeo: []
   } satisfies Record<OrganizationFacet, Array<[string, string, string, string, EnterpriseTone]>>
 
   return rows[facet].map(([title, description, state, owner, rowTone]) => ({

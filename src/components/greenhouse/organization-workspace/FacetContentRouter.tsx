@@ -39,7 +39,8 @@ const FACET_REGISTRY: Record<OrganizationFacet, ComponentType<FacetContentProps>
   finance: dynamic(() => import('@/views/greenhouse/organizations/facets/FinanceFacet'), { ssr: false }),
   crm: dynamic(() => import('@/views/greenhouse/organizations/facets/CrmFacet'), { ssr: false }),
   services: dynamic(() => import('@/views/greenhouse/organizations/facets/ServicesFacet'), { ssr: false }),
-  staffAug: dynamic(() => import('@/views/greenhouse/organizations/facets/StaffAugFacet'), { ssr: false })
+  staffAug: dynamic(() => import('@/views/greenhouse/organizations/facets/StaffAugFacet'), { ssr: false }),
+  aeo: dynamic(() => import('@/views/greenhouse/organizations/facets/AeoFacet'), { ssr: false })
 }
 
 const isKnownFacet = (value: string): value is OrganizationFacet =>

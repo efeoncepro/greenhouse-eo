@@ -15,6 +15,7 @@ import { fetchFinanceFacet } from '@/lib/account-360/facets/finance'
 import { fetchCrmFacet } from '@/lib/account-360/facets/crm'
 import { fetchServicesFacet } from '@/lib/account-360/facets/services'
 import { fetchStaffAugFacet } from '@/lib/account-360/facets/staff-aug'
+import { fetchAeoFacet } from '@/lib/account-360/facets/aeo'
 import type {
   AccountComplete360,
   AccountComplete360Options,
@@ -75,6 +76,11 @@ const FACET_REGISTRY: Record<AccountFacetName, AccountFacetDefinition> = {
     fetch: fetchStaffAugFacet,
     cacheTTLSeconds: 600,
     sensitivityLevel: 'confidential'
+  },
+  aeo: {
+    fetch: fetchAeoFacet,
+    cacheTTLSeconds: 300,
+    sensitivityLevel: 'internal'
   }
 }
 

@@ -846,6 +846,12 @@ export const GH_GROWTH_AEO_OPERATOR = {
     partialTitle: 'Plan con seguimiento parcial',
     partialBody: 'Algunos focos del Plan AEO todavía no tienen estado registrado. Se muestran como "sin seguimiento aún".'
   },
+  facet: {
+    title: 'Diagnóstico y Plan AEO',
+    body: 'Score de visibilidad en IA, plan por foco y avance del servicio para este cliente.',
+    cta: 'Ver detalle AEO',
+    ctaAria: 'Abrir el detalle AEO de este cliente en Growth'
+  },
   states: {
     deniedTitle: 'No tienes acceso a este cliente',
     deniedBody: 'Tu scope de operador no incluye esta organización. Pide acceso a un administrador de Growth.',

@@ -520,7 +520,8 @@ export const GH_ORGANIZATION_WORKSPACE = {
       finance: 'Finanzas',
       crm: 'CRM',
       services: 'Servicios',
-      staffAug: 'Staff Aug'
+      staffAug: 'Staff Aug',
+      aeo: 'AEO'
     },
     empty: {
       crm: {
@@ -556,7 +557,8 @@ export const GH_ORGANIZATION_WORKSPACE = {
       finance: 'Resumen financiero para Agency con puente a la vista rica de Finance Clients cuando se requiere operación.',
       crm: 'Contactos, deals, pipeline y sincronización HubSpot como contexto, no como único source of truth.',
       services: 'Catálogo de servicios, cobertura activa y consumo por engagement.',
-      staffAug: 'Placements, contratos externos y baseline de capacidad aumentada con estado honesto de implementación.'
+      staffAug: 'Placements, contratos externos y baseline de capacidad aumentada con estado honesto de implementación.',
+      aeo: 'Diagnóstico de visibilidad en IA y avance del Plan AEO, con entrada directa al detalle operador en Growth.'
     },
     states: {
       loading: 'Cargando',

@@ -17,7 +17,8 @@ const ALL_FACETS: readonly AccountFacetName[] = [
   'finance',
   'crm',
   'services',
-  'staffAug'
+  'staffAug',
+  'aeo'
 ] as const
 
 // ── Role predicates ──
@@ -126,14 +127,17 @@ export const authorizeAccountFacets = (ctx: AccountFacetAuthContext): AccountFac
     )
   }
 
-  // 6. Default internal user (no special role) — identity, spaces, team, delivery, crm, services
+  // 6. Default internal user (no special role) — identity, spaces, team, delivery, crm, services, aeo
+  // (el facet aeo tiene su gate real en la capability growth.ai_visibility.report.read_operator —
+  // esta matriz legacy solo NO debe vetarlo para internos; clientes siguen sin verlo: reglas 4/5).
   const defaultAllowed: AccountFacetName[] = [
     'identity',
     'spaces',
     'team',
     'delivery',
     'crm',
-    'services'
+    'services',
+    'aeo'
   ]
 
   return buildResult(
