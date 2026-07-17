@@ -101,7 +101,7 @@ function hero() {
     ${text(520, 930, 'Conocimiento · límites · memoria · transferencia · operación real', 22, 500, '#D9C7D1')}
   `
 
-  
+
 return shell({ width: 2048, height: 1152, title: 'Customer Agent de ANAM: la frontera entre respuesta y decisión', desc: 'Una conversación avanza desde veintitrés fuentes gobernadas y cambia de responsable al cruzar una frontera humana.', body, background: C.burgundy })
 }
 
@@ -170,7 +170,7 @@ function autonomy(vertical = false) {
     ${vertical ? mobile : desktop}
   `
 
-  
+
   return shell({ width: w, height: h, title: 'Anatomía de una conversación mixta', desc: 'Una consulta de cotización y facturación se separa en dos rutas; el agente aclara y prepara, conserva memoria y transfiere la decisión con contexto.', body, background: null })
 }
 
@@ -236,7 +236,7 @@ function knowledge(vertical = false) {
     ${sourceCluster}${governance}${outcomes}
   `
 
-  
+
 return shell({ width: w, height: h, title: 'Arquitectura gobernada de las 23 fuentes', desc: 'Seis archivos y diecisiete respuestas cortas pasan por reglas de gobierno antes de orientar, aclarar o transferir una consulta.', body, background: null })
 }
 
@@ -310,7 +310,7 @@ function evidence(vertical = false) {
     ${text(80, h - 45, 'Corte: 17 de julio de 2026 · conversaciones nuevas en pausa', vertical ? 17 : 16, 500, C.muted)}
   `
 
-  
+
   return shell({ width: w, height: h, title: 'Cadena de evidencia operativa y punto de interrupción', desc: 'ANAM tenía evidencia de configuración y pruebas en vista previa; una dependencia administrativa de facturación interrumpía la verificación de conversaciones nuevas en operación real.', body, background: null })
 }
 
