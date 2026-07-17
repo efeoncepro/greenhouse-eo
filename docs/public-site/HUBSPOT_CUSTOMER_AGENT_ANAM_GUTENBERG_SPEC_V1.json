@@ -450,6 +450,21 @@
           "kind": "paragraph",
           "text": [
             {
+              "text": "Pedir una aclaración tampoco equivale a fallar. En "
+            },
+            {
+              "text": "dos experimentos publicados en Journal of Business Research",
+              "href": "https://doi.org/10.1016/j.jbusres.2020.04.030"
+            },
+            {
+              "text": " —con 386 casos analizados entre participantes estadounidenses—, un chatbot que pedía aclarar un malentendido obtuvo resultados perceptuales similares a uno sin errores; dejar el error sin resolver sí redujo la intención de adopción. El estudio utilizó un escenario ficticio y no evaluó HubSpot ni el caso ANAM, pero refuerza una decisión prudente: ante una ambigüedad, preguntar es más responsable que completar el vacío con una suposición."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
               "text": "Ojo: "
             },
             {
@@ -613,6 +628,21 @@
           "kind": "paragraph",
           "text": [
             {
+              "text": "Esa continuidad importa también fuera de este caso. En una "
+            },
+            {
+              "text": "encuesta realizada por Zendesk en junio de 2025",
+              "href": "https://cxtrends.zendesk.com/"
+            },
+            {
+              "text": " a 6.182 consumidores de 22 países —entre ellos Chile—, 74% declaró frustrarse cuando debe repetir información durante la atención. Es una percepción declarada por consumidores, no una medición causal del handoff, pero ayuda a entender por qué transferir contexto forma parte de la experiencia y no sólo de la eficiencia interna."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
               "text": "HubSpot permite configurar guías personalizadas de transferencia",
               "href": "https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process"
             },
@@ -754,6 +784,36 @@
         {
           "kind": "paragraph",
           "text": "Configurado, probado y operativo son estados distintos porque cada uno exige una evidencia diferente. Tener una configuración visible no demuestra que una conversación nueva pueda entrar, resolverse, transferirse y medirse."
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "El contraste con las cifras agregadas del proveedor es útil. "
+            },
+            {
+              "text": "HubSpot reportó en abril de 2026",
+              "href": "https://www.hubspot.com/company-news/hubspots-customer-agent-and-prospecting-agent-now-you-pay-when-the-task-is-complete"
+            },
+            {
+              "text": " que Customer Agent resolvía 65% de las conversaciones y reducía 39% el tiempo de resolución entre más de 8.000 clientes que lo habían activado. Son resultados informados por el fabricante, sin distribución ni metodología pública suficiente para extrapolarlos, y no describen el desempeño de ANAM."
+            }
+          ]
+        },
+        {
+          "kind": "paragraph",
+          "text": [
+            {
+              "text": "También importa qué significa resolver. En la "
+            },
+            {
+              "text": "documentación vigente de HubSpot",
+              "href": "https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent"
+            },
+            {
+              "text": ", la plataforma evalúa una conversación 72 horas después de la última respuesta del agente y exige que no haya ocurrido una transferencia humana durante esa ventana. Una cifra de resolución, por tanto, necesita definición, período y contexto antes de convertirse en evidencia."
+            }
+          ]
         },
         {
           "kind": "paragraph",
@@ -966,7 +1026,7 @@
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Este artículo se basa en el inventario autenticado del portal ANAM, un paquete versionado de las 23 fuentes, las directrices publicadas y el informe de QA del 16 de julio de 2026. Los conteos de prueba se presentan como mínimos verificables cuando no existe evidencia suficiente para sostener una cifra mayor. El estado operativo se revisó nuevamente el 17 de julio de 2026."
+          "text": "Este artículo se basa en el inventario autenticado del portal ANAM, un paquete versionado de las 23 fuentes, las directrices publicadas y el informe de QA del 16 de julio de 2026. Los conteos de prueba se presentan como mínimos verificables cuando no existe evidencia suficiente para sostener una cifra mayor. El estado operativo se revisó nuevamente el 17 de julio de 2026. Las cifras externas contextualizan expectativas de atención, hallazgos experimentales y métricas del producto; no miden el desempeño de ANAM. Los conteos y estados atribuidos al caso provienen exclusivamente del inventario autenticado, la evidencia versionada y el QA descritos en esta nota."
         }
       ]
     },
@@ -993,6 +1053,35 @@
               {
                 "text": "HubSpot: configurar la transferencia humana",
                 "href": "https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process"
+              }
+            ],
+            [
+              {
+                "text": "HubSpot: resultados agregados y modelo por resolución, abril de 2026",
+                "href": "https://www.hubspot.com/company-news/hubspots-customer-agent-and-prospecting-agent-now-you-pay-when-the-task-is-complete"
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "Evidencia externa consultada",
+      "level": 3,
+      "blocks": [
+        {
+          "kind": "list",
+          "items": [
+            [
+              {
+                "text": "Sheehan, Jin y Gottlieb: efecto de los errores y las aclaraciones en la adopción de chatbots",
+                "href": "https://doi.org/10.1016/j.jbusres.2020.04.030"
+              }
+            ],
+            [
+              {
+                "text": "Zendesk CX Trends 2026: contexto continuo en la atención al cliente",
+                "href": "https://cxtrends.zendesk.com/"
               }
             ]
           ]

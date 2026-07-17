@@ -1,6 +1,6 @@
 # Customer Agent ANAM — auditoría del borrador privado en WordPress
 
-> **Estado:** `private content + SEO package complete; authenticated Ohio render pending`
+> **Estado:** `private content + SEO + evidence package complete; authenticated Ohio render pending`
 > **Fecha:** 2026-07-17
 > **Post:** `251432`
 > **Publicación:** no autorizada ni ejecutada
@@ -20,8 +20,27 @@ artículo.
 - Tags: ninguno.
 - Robots: `noindex, follow`.
 - Manifest: `greenhouse-cf-ia-atencion-cliente-caso-anam-v1`.
-- SHA-256 de la spec Gutenberg: `b86fd1bf7dc9360441ce35e8392157014f4e494aa973180631050d2e7d8c5001`.
-- SHA-256 del contenido persistido: `ddcb45a25b999deff0b79dbfa6635be4fd13956b321834448d19bbd78e9c5536`.
+- SHA-256 de la spec Gutenberg: `11acacc807cc1b0cbc0f74eb1bfb42c26d10d71d5cf9826f817af6b0bee20599`.
+- SHA-256 del contenido persistido: `6bfa99a5bbbc672ef5c9edd47041419bd687a17183462aa1b9e9bdec6b8554f2`.
+
+## Evidencia externa y E-E-A-T
+
+Tres líneas de investigación paralelas revisaron fuentes oficiales de HubSpot, estudios independientes y el
+encaje editorial de cada dato. El ledger canónico es
+[HUBSPOT_CUSTOMER_AGENT_ANAM_EVIDENCE_LEDGER_V1.md](./HUBSPOT_CUSTOMER_AGENT_ANAM_EVIDENCE_LEDGER_V1.md).
+
+Se incorporaron sólo cuatro claims cuantitativos, con atribución, población y límite junto al dato:
+
+- 386 casos analizados en dos experimentos sobre aclaración frente a error no resuelto;
+- 74% de 6.182 consumidores en 22 países frustrado por repetir información durante la atención;
+- 65% de resolución y 39% menos tiempo reportados por HubSpot entre más de 8.000 clientes activados;
+- ventana de 72 horas usada por HubSpot para evaluar una resolución sin handoff.
+
+Las cifras de HubSpot se identifican como resultados agregados informados por el fabricante y no como outcomes
+de ANAM. La nota metodológica separa explícitamente evidencia externa de inventario, QA y estado operativo del
+caso. No se añadieron proyecciones de mercado, porcentajes futuros ni un cálculo sintético de éxito de ANAM.
+Las infografías no cambiaron porque representan evidencia propia del caso; mezclar benchmarks externos dentro de
+ellas rompería esa frontera semántica.
 
 ## Paquete SEO/AEO y distribución
 
@@ -77,21 +96,27 @@ el attachment canónico `251417` y se eliminó permanentemente sólo la copia cr
 
 ## Validación y readback
 
-- Content Factory: `PASS`, 108 bloques semánticos, 11 H2, 3 H3, TOC y media presentes.
-- Inspección profunda: 24 enlaces, cero problemas de medios y cero bloques freeform no vacíos.
-- Evidencia versionada vigente: [post-deep-inspection-251432-2026-07-17T17-47-24+00-00.json](../operations/public-site-content-factory/post-deep-inspection-251432-2026-07-17T17-47-24+00-00.json).
+- Content Factory: `PASS`, 114 bloques semánticos, 11 H2, 4 H3, TOC y media presentes.
+- Inspección profunda: 32 enlaces, cero problemas de medios y cero bloques freeform no vacíos.
+- Evidencia versionada vigente: [post-deep-inspection-251432-2026-07-17T18-06-00+00-00.json](../operations/public-site-content-factory/post-deep-inspection-251432-2026-07-17T18-06-00+00-00.json).
 - La actualización visual guardó además el contenido anterior en el meta privado
   `_greenhouse_content_snapshot_before_visual_v2`, con hash
   `4bdd735edbf9794effbb99a835feaddf9b2ed2c8c1367c5cea1d9b152541414f`.
 - Antes del ajuste final del meta title se guardó un snapshot SEO reversible en
   `_greenhouse_seo_snapshot_before_final_v1`.
+- Antes de incorporar evidencia externa se guardó el contenido anterior en
+  `_greenhouse_content_snapshot_before_evidence_v1`, con hash
+  `ddcb45a25b999deff0b79dbfa6635be4fd13956b321834448d19bbd78e9c5536`.
+- El reemplazo de la fuente Zendesk por su página oficial recuperable guardó un segundo snapshot en
+  `_greenhouse_content_snapshot_before_evidence_link_hardening_v1`.
 - Snapshot previo a metadata/medios: `/tmp/greenhouse-anam-customer-agent-251432-before-integration-20260717-171526.json` en el host WordPress, hash `ce6b64ccc450e349ea36621e76f6f2b7452a593a9cc47bd9a2312f45ac2a30a6`.
 
 ## QA visual privada
 
-El contenido filtrado por WordPress se revisó en `1440×1000` y `390×844`, tanto light como dark:
+El contenido filtrado por WordPress se volvió a revisar después de incorporar la evidencia, en `1440×1000` y
+`390×844`, tanto light como dark:
 
-- un H1, 11 H2 editoriales y 3 H3;
+- un H1, 11 H2 editoriales y 4 H3;
 - tres figuras, tres `<picture>` y tres captions;
 - fuente desktop/móvil y light/dark correcta en los cuatro escenarios;
 - cero imágenes rotas;
