@@ -69,6 +69,25 @@ When resuming ANAM from a handoff or deciding whether to advance a phase, first 
 - Data Quality dashboard `21144697` owns the Deal-without-Company remediation queue. The approved exact 34-pair slice moved primary Company coverage from 595/1,240 to 629/1,240 and reduced missing associations from 645 to an expected/calculated 611; the dashboard itself still preserves the verified 645 baseline until a post-remediation readback is recorded. Treat the remaining queue as operational capture/adoption debt to be worked by Deal owner, not as a HubSpot platform outage; duplicate, domain-only and ambiguous candidates remain held, and every further association write needs separate approval.
 - Do not use a plain Deal `Create record → Service` workflow as ANAM's materializer: a Deal may have multiple line items and the native action does not provide the governed per-line-item iterator/idempotency contract. Use Kortex portal-scoped materialization per line item. The active activation-review workflow does not create Services, fill contractual facts, change stages or make records KPI-eligible; load `anam-phase-3-service-automation-workflow-test-2026-07-16.md`.
 - ANAM delivery is commercial-first: close Company/Contact -> Lead -> Deal/line items -> Service -> renewal and the Data Quality/Growth/Retention/Loyalty dashboards before expanding Ticket, billing sync and operational dashboards.
+- Commercial pipeline governance is live from the approved 2026-07-17 change set. Manual Deal creation requires
+  Company and no longer receives an automatic 60-day close date. Growth `636797559` permits ordinary creation
+  only in `Potencial 10%`; `Calificado 30%` and `Interesado 50%` require `Paso siguiente`; `Hot 85%` also requires
+  `Monto original`; `Cierre ganado 100%` requires `Países de ejecución`, `Monto original` and `Variación vs.
+  cotizado` while keeping `Región` optional; both negative outcomes require `Motivo de cierres perdidos`.
+- `Radar 0%` stage `1034441224` and its ten Deals are explicitly excluded from the pipeline correction because
+  native Lead owns pre-qualification. It remains labeled `Radar 0%`, probability/lost metadata unchanged, with
+  no stage logic and outside the Growth creation rule. Do not move those Deals or reinterpret the stage without
+  a separate approval and dependency review.
+- Renewal pipeline `636594526` preserves its seven stage IDs/probabilities and now uses labels `Por revisar`,
+  `Elegibilidad confirmada`, `Contacto iniciado`, `Propuesta en negociación`, `Renovado`, `No renovado` and `No
+  aplica / Desestimado`. Ordinary creation is limited/defaulted to `Por revisar`; the four open stages require
+  `Paso siguiente`, `Renovado` requires `Países de ejecución`, and both negative outcomes require the lost reason.
+  This governs Deal capture only; it does not create prior/successor Services or make Retention official.
+- Eight stage-entry task automations are designed but not published. They remain a separate controlled slice
+  until owner, due date, notification, dedupe/re-enrollment and positive/negative future-entry tests are ratified.
+  Workflows `1805870398` and `1805693705` remain disabled because assigning `Venta nueva` from pipeline membership
+  would corrupt income classification. Canon and QA: `anam-commercial-pipeline-governance-change-set-2026-07-17.md`
+  and `docs/audits/ANAM_COMMERCIAL_PIPELINE_GOVERNANCE_QA_2026-07-17.md`.
 
 ## Landing and agent seam
 

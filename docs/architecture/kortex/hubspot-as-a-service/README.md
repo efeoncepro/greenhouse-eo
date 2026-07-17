@@ -108,6 +108,8 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Phase 3 workflow/API probe, authenticated activation-review rollout and materialization decision: [`anam-phase-3-service-automation-workflow-test-2026-07-16.md`](anam-phase-3-service-automation-workflow-test-2026-07-16.md)
 - Phase 3 synthetic pilot data plus live Retention/Loyalty dashboard execution and official-publication gates: [`anam-phase-3-pilot-dashboard-execution-2026-07-16.md`](anam-phase-3-pilot-dashboard-execution-2026-07-16.md)
 - Sector, market and geography KPI reconciliation, attachment dry run, executed data-quality control and approval-gated backfill contract: [`anam-sector-geography-kpi-slice-change-set-2026-07-16.md`](anam-sector-geography-kpi-slice-change-set-2026-07-16.md)
+- Governed Deal execution-country property, Kortex release evidence and non-additive reporting contract: [`anam-deal-execution-countries-change-set-2026-07-17.md`](anam-deal-execution-countries-change-set-2026-07-17.md)
+- Executed Deal pipeline governance, renewal-stage redesign and prospective automation boundary: [`anam-commercial-pipeline-governance-change-set-2026-07-17.md`](anam-commercial-pipeline-governance-change-set-2026-07-17.md)
 - Deal-to-Company association remediation dry run, owner queues and approval boundary: [`anam-deal-company-association-remediation-dry-run-2026-07-16.md`](anam-deal-company-association-remediation-dry-run-2026-07-16.md)
 - Final scoped QA verdict: [`../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md`](../../../audits/ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 

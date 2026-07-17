@@ -149,6 +149,11 @@ La implementación ANAM materializó una base RevOps por fases:
 
 - Growth `19708354` y Data Quality `21144697` operativos;
 - segmento/región en 471 Companies y sector estratégico en 65, sin crear records ni merges;
+- geografía de ejecución separada de la sede: `zona` para regiones chilenas y `ef_paises_de_ejecucion` para
+  países LATAM en Deal; la propiedad sigue sin población histórica ni reporte, pero ya es obligatoria en los dos
+  cierres positivos;
+- gobierno comercial live: Company requerida al crear, fecha de cierre sin default artificial, Growth iniciado
+  en `Potencial 10%`, Renovación iniciada en `Por revisar` y compuertas por etapa; `Radar 0%` quedó intacto;
 - tres gráficos por segmento, sector y región como `histórico parcial`;
 - 34 asociaciones Deal→Company determinísticas, con cobertura 629/1.240; el resto continúa en cola;
 - schema nativo de Service, cinco Services controlados y workflow de revisión `1852406585`;
@@ -164,6 +169,8 @@ como identidad automática, no se retiró `(PILOTO)` y no se convirtió un gráf
 - [Informe Word detallado](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Informe_Detallado_Arquitectura_RevOps_Paneles_2026-07-17.docx)
 - [Roadmap por fases](../../architecture/kortex/hubspot-as-a-service/anam-revops-implementation-roadmap-phases-2026-07-16.md)
 - [Modelo vivo](../../architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md)
+- [Change set de países de ejecución](../../architecture/kortex/hubspot-as-a-service/anam-deal-execution-countries-change-set-2026-07-17.md)
+- [Change set de gobierno de pipelines](../../architecture/kortex/hubspot-as-a-service/anam-commercial-pipeline-governance-change-set-2026-07-17.md)
 - [Documentación funcional](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
 - [Manual operativo](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
 - [Canon técnico](../../architecture/kortex/hubspot-as-a-service/README.md)

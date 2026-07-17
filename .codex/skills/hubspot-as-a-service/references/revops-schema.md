@@ -46,6 +46,39 @@ Do not start with dashboard widgets or property creation.
 - For Workflows v4 beta, `201`, `crmObjectCreationStatus=COMPLETE` and `isEnabled=true` prove only stored configuration. Require a real positive enrollment/action readback plus a negative path; if API-only turn-on does not execute, disable the workflow and verify through the authenticated editor/history before rollout.
 - Never use one parent-object create-record action when the target grain is one child per associated component. A Deal-to-Service workflow needs a deterministic line-item iterator and per-line-item idempotency seam; otherwise keep materialization in a governed integration/custom action.
 
+## Commercial pipeline governance contract
+
+Treat Lead qualification, Deal execution and Service delivery as different grains. If native Lead already owns
+pre-qualification, do not recreate a prospecting/radar stage inside Deal merely to obtain a visual funnel. A
+legacy Deal stage that overlaps Lead may remain temporarily when the operator explicitly excludes it from the
+change; isolate it from creation rules and reporting instead of silently moving its records.
+
+For each pipeline change set:
+
+1. Inventory stage IDs, labels, probabilities, record counts, conditional stage properties, pipeline rules,
+   creation forms and existing stage-entry workflows before writing.
+2. Define the one ordinary creation stage. Use a pipeline creation rule only after checking exceptions for
+   superadmins, workflows, APIs and integrations; do not combine it automatically with skip/backward/edit-access
+   restrictions.
+3. Put globally universal facts in the create form. Put maturity-specific evidence in conditional stage
+   properties, and remove redundant or incorrectly grained conditions rather than requiring the same field twice.
+4. Require the smallest evidence that makes the transition honest: next action on active stages, quoted-value
+   provenance before commitment, execution context at positive close, and a reason at negative close.
+5. Preserve stage IDs when semantics can be corrected safely through labels and gates. Renaming a stage must not
+   move records or change probability without a separate approved operation.
+6. Treat stage requiredness as prospective enforcement, not backfill. Read back the required checkbox and test a
+   controlled future move; a displayed rule count alone does not prove the field blocks correctly.
+7. Treat every stage-entry task as a workflow rollout. Specify title, owner resolution, due-date policy,
+   notification, re-enrollment/deduplication, positive test, negative test and historical-enrollment boundary
+   before publication. If those facts are missing, leave the automation designed but unpublished.
+8. After execution, read back creation stage/default, every dependent property and requiredness, unchanged
+   excluded stages, disabled legacy workflows and representative record counts. Record rollback separately for
+   labels, requiredness, creation rules and automations.
+
+Do not assign income type, renewal status or lifecycle truth from pipeline membership alone. Do not call a saved
+stage rule or stored workflow operational until the future-entry path is verified without an unintended
+historical task wave.
+
 ## Matching and bounded remediation
 
 1. Normalize source and CRM keys without treating normalization as proof of identity.

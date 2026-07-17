@@ -1,7 +1,7 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.1
+> **Versión:** 1.3
 > **Actualizado:** 2026-07-17
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
@@ -47,7 +47,7 @@ una eliminación de la configuración ni falta nominal de créditos. No hubo mut
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |
-| Renovación | Bloqueada | Requiere hechos reales, materialización por línea y reglas aprobadas. |
+| Renovación | Pipeline gobernado; medición bloqueada | Etapas semánticas, creación en `Por revisar` y compuertas live. GRR/NRR y lineage de Service siguen bloqueados por hechos reales y materialización por línea. |
 | Retención/Fidelización | Piloto, no oficial | Retención `21152855` (4 reports); Fidelización `21152950` (3). |
 | Tickets/SLA | Planificada | Se ejecuta después de las bases comerciales. |
 | Facturación | Diseño listo; construcción pendiente | Intake tenant-scoped, Account Unit + Billing Event y profiler read-only. |
@@ -61,6 +61,31 @@ empresa; no facturación, ingreso reconocido, TAM/SAM ni población completa.
 La cobertura Deal→Company pasó de 595/1.240 a 629/1.240 tras 34 asociaciones determinísticas. El saldo sin
 Company es **611 calculado**, no un nuevo readback del widget DQ: el reporte conserva baseline live 645. El gate
 oficial sigue siendo al menos 95% de cobertura elegible y dimensional.
+
+### Geografía de ejecución del Deal
+
+La sede y la ejecución se modelan por separado. `region_de_chile` en Company conserva la región de sede;
+`zona` (`Región`) en Deal registra una o más regiones donde se ejecuta el negocio dentro de Chile; y
+`ef_paises_de_ejecucion` (`Países de ejecución`) registra uno o más países de Latinoamérica donde se presta el
+negocio. Esta última propiedad quedó live el 2026-07-17 como multiselección de 20 países y su schema fue leído de
+vuelta desde HubSpot.
+
+La creación fue prospectiva y existen cero Deals poblados; no se agregó backfill, workflow ni reporte. Desde el
+2026-07-17 `Países de ejecución` es obligatorio al mover Growth a `Cierre ganado 100%` o Renovación a `Renovado`.
+La captura corresponde al owner/equipo comercial antes o durante la adjudicación. Como un Deal puede seleccionar varios países o regiones, estas dimensiones sirven para slicing
+diagnóstico, pero sus grupos no pueden sumarse como un total consolidado sin deduplicar por Deal.
+
+## Gobierno de los pipelines comerciales
+
+Los Deals nuevos requieren Company y una fecha de cierre elegida conscientemente; se retiró la fecha automática
+a 60 días. Growth sólo permite creación ordinaria en `Potencial 10%`. `Radar 0%` no cambió porque la
+precalificación ocurre en Lead. Calificado e Interesado exigen `Paso siguiente`; Hot agrega `Monto original`; el
+cierre ganado exige países, monto original y variación; los cierres negativos exigen motivo.
+
+Renovación conserva los stage IDs y ahora expresa el proceso real desde `Por revisar` hasta `Renovado`, `No
+renovado` o `No aplica / Desestimado`. La creación ordinaria parte en `Por revisar`; las cuatro etapas abiertas
+exigen `Paso siguiente`. Las automatizaciones de tareas por entrada futura a etapa quedaron diseñadas, no
+publicadas: requieren un slice con owner, vencimiento, notificación y prueba sin enrolamiento histórico.
 
 ## Calidad de datos y disciplina comercial
 
