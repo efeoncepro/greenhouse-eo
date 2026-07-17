@@ -1,0 +1,81 @@
+{
+  "runId": "2026-07-17_anam-revops-cover-v6-product-story",
+  "status": "selected-and-published",
+  "productionMethod": "deterministic-svg-plus-official-wordmark-composite",
+  "creativeDirection": "layered-product-story",
+  "visualContract": {
+    "grammar": "theme-agnostic product-story composition: analytical context behind, decision synthesis in front, functional overlap, deterministic charts and crop-safe hierarchy",
+    "skin": "local HubSpot-context palette for this article only; not Efeonce brand defaults and not reusable as a generic RevOps/dashboard palette"
+  },
+  "canvas": "2048x1152",
+  "squareSafe": true,
+  "references": [
+    {
+      "path": "refs/hubspot-brand-visibility-reference.svg",
+      "role": "official-structural-reference",
+      "source": "https://www.hubspot.com/products/aeo"
+    },
+    {
+      "path": "refs/hubspot-citation-analysis-reference.svg",
+      "role": "official-structural-reference",
+      "source": "https://www.hubspot.com/products/aeo"
+    },
+    {
+      "path": "refs/operator-reference-brand-visibility.png",
+      "role": "operator-selected-reference"
+    },
+    {
+      "path": "refs/operator-reference-citations.png",
+      "role": "operator-selected-reference"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "source/anam-revops-product-story-v6.svg",
+      "role": "editable-vector-source"
+    },
+    {
+      "path": "source/anam-revops-product-story-master-v6.png",
+      "role": "master-with-official-negative-efeonce-wordmark",
+      "width": 2048,
+      "height": 1152
+    },
+    {
+      "path": "delivery/anam-revops-product-story-web-1600-v6.webp",
+      "role": "featured-candidate",
+      "width": 1600,
+      "height": 900
+    },
+    {
+      "path": "delivery/anam-revops-product-story-og-1440x757-v6.jpg",
+      "role": "open-graph-candidate",
+      "width": 1440,
+      "height": 757
+    },
+    {
+      "path": "review/anam-revops-product-story-square-v6.png",
+      "role": "centered-1x1-proof",
+      "width": 1152,
+      "height": 1152
+    }
+  ],
+  "data": {
+    "coverage": "50.73%",
+    "publicationThreshold": ">=95%",
+    "classification": "diagnostico",
+    "metric": "Deal asociado a Company",
+    "source": "approved article evidence pack; final public use remains subject to the documented ANAM exact-figure approval gate"
+  },
+  "wordpress": {
+    "mutated": true,
+    "postId": 251397,
+    "postState": "publish",
+    "publishedUrl": "https://efeoncepro.com/hubspot/dashboards-hubspot-confiables-caso-anam/",
+    "featuredMediaId": 251415,
+    "featuredUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-dashboard-confiable-product-story-web-1600-v6.webp",
+    "openGraphMediaId": 251416,
+    "openGraphUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-dashboard-confiable-product-story-og-1440x757-v6.jpg",
+    "publishedAt": "2026-07-17T12:23:05+00:00",
+    "qa": "desktop/mobile article and 1:1 archive crop verified; canonical, robots, schema, social metadata, media, TOC, links and repeated anonymous readback passed"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "runId": "2026-07-17_anam-revops-cover-v2",
+  "status": "rejected-by-operator-generic-dashboard",
+  "model": "gpt-image-2",
+  "operation": "edit",
+  "quality": "high",
+  "size": "2048x1152",
+  "references": [
+    {
+      "path": "refs/composition-anchor-v1.png",
+      "role": "composition-anchor"
+    },
+    {
+      "path": "refs/hubspot-report-kpi-sanitized.png",
+      "role": "hubspot-report-anatomy"
+    },
+    {
+      "path": "refs/hubspot-report-bars-sanitized.png",
+      "role": "hubspot-chart-language"
+    },
+    {
+      "path": "refs/efeonce-editorial-system-v1.png",
+      "role": "efeonce-brand-language"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "source/anam-revops-cover-generated-v2.png",
+      "role": "raw-model-output",
+      "width": 2048,
+      "height": 1152,
+      "bytes": 2058240,
+      "sha256": "255abd3be5e24178253b967d2b8ac83c136a22befb717b965c218fe72fa2b77e"
+    },
+    {
+      "path": "source/anam-revops-cover-master-v2.png",
+      "role": "master-with-deterministic-efeonce-signature",
+      "width": 2048,
+      "height": 1152,
+      "bytes": 2325428,
+      "sha256": "6a0890df700ac987ca4ee62ef9c47235fe94f763dff3ea91d6f6c26049671780"
+    },
+    {
+      "path": "delivery/anam-dashboard-confiable-portada-web-1600-v2.webp",
+      "role": "featured-candidate",
+      "width": 1600,
+      "height": 900,
+      "bytes": 80980,
+      "sha256": "49b8682489ed2cb07de4170fe7a36de2533100b76f3e0c3e94d25ea8dd01c9c2"
+    },
+    {
+      "path": "delivery/anam-dashboard-confiable-portada-og-1440x757-v2.jpg",
+      "role": "open-graph-candidate",
+      "width": 1440,
+      "height": 757,
+      "bytes": 124444,
+      "sha256": "f8c36e7f5a07ed20dd5b3a456f5625e68568d53e1ab26f504dea255d09a92dc6"
+    },
+    {
+      "path": "review/anam-dashboard-confiable-portada-square-crop-v2.png",
+      "role": "centered-1x1-crop-proof",
+      "width": 1152,
+      "height": 1152,
+      "bytes": 1351710,
+      "sha256": "pending-final-readback"
+    }
+  ],
+  "privacy": {
+    "canonicalEvidenceModified": false,
+    "referencesSanitized": true,
+    "finalMustNotExposeExactMetrics": true
+  },
+  "metadata": {
+    "alt": "Panel de informes en perspectiva con gráficos, controles y capas de datos que representan la arquitectura detrás de un dashboard confiable.",
+    "disclosure": "Ilustración conceptual creada con IA a partir de capturas autorizadas y saneadas; no reproduce resultados ni una interfaz operativa.",
+    "wordpressState": "not-uploaded; current private post remains on V1"
+  },
+  "qa": {
+    "masterReviewed": true,
+    "centeredSquareCropReviewed": true,
+    "exactEfeonceWordmarkComposited": true,
+    "exactClientMetricsVisible": false,
+    "remotePostMutated": false,
+    "operatorSelected": false,
+    "rejectionReason": "La composición conserva el cliché visual de dashboard SaaS con paneles, cards y miniwidgets; no alcanza la originalidad ni la elegancia editorial requeridas. Se conserva únicamente como evidencia de iteración."
+  }
+}

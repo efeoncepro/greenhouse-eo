@@ -23,5 +23,13 @@
 - **Mapa de átomos:** (→ `04`)
 - **CTA / siguiente etapa:**
 
+## Utilidad citable (si busca backlinks, menciones, autoridad o citas)
+- **Usuario de la cita + trabajo:**
+- **Objeto reutilizable:** (framework/escala/checklist/dato/tabla/diagrama/template/protocolo)
+- **Evidencia original + límites:**
+- **Pasaje HTML + anchor estable:**
+- **Revisión por pares + medición 30/60/90:**
+- **Contrato completo:** `templates/citation-utility-contract.md`
+
 ## Gate de review (02)
 - [ ] insight original  [ ] voz de marca  [ ] factcheck+fuentes  [ ] brand safety  [ ] descubribilidad  [ ] distribución+medición asignadas  [ ] accesibilidad

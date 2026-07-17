@@ -1,0 +1,18 @@
+Refine the first reference into the final premium editorial key visual.
+
+REFERENCE ROLES ARE NOT EQUAL:
+- Reference 1 is the POSITIVE MASTER DIRECTION. Preserve its core idea: one sculptural horizontal bar chart, translucent precision materials, warm-white studio background, Efeonce blues, one coral-orange focal bar, one wine-colored joint and one tiny green validation marker.
+- Reference 2 is an explicitly REJECTED NEGATIVE REFERENCE. It shows exactly what must NOT appear. Do not inherit its dashboard composition, software window, cards, panels, widgets, navigation, UI density, perspective-screen metaphor or generic SaaS language. Its only purpose is to define the rejected visual territory.
+- Reference 3 is positive evidence only for authentic horizontal-bar rhythm.
+- Reference 4 is positive evidence only for disciplined geometry, color balance and white editorial restraint. Do not copy its typography, values, cards or layout.
+
+MAKE THESE PRECISE CHANGES TO REFERENCE 1:
+1. Recompose the complete data sculpture inside the centered square-safe area of a 16:9 canvas. Leave generous warm-white negative space on both sides. A centered 1:1 crop must preserve every important bar end, the focal coral bar, the wine joint, the blue structure and the green marker.
+2. Remove the literal equipment-rack feeling. Eliminate the heavy rectangular outer frame, vertical mounting rail, shelf legs and mechanical cabinet cues. Replace them with one elegant thin floating measurement plane and a few precise transparent underlayers.
+3. Increase editorial abstraction: six horizontal bars should float as a coherent architectural composition, supported by subtle glass strata and fine datum lines, not attached to a machine.
+4. Keep the controlled three-quarter depth, premium material realism, crisp edges and high-key studio lighting. The object must feel calm, novel, elegant and enterprise-grade.
+5. Keep all meaningful geometry away from the canvas edges. No bar may be clipped.
+
+ABSOLUTE EXCLUSIONS: no dashboard, no interface, no browser, no screen, no sidebar, no cards, no KPI tiles, no widgets, no buttons, no menus, no tables, no labels, no text, no numbers, no axes, no logos, no pseudo-writing, no people, no robots, no hands, no laptop, no phone, no bubbles, no decorative circles, no node network, no neon, no dark background, no generic AI SaaS illustration, no rack, no cabinet, no server equipment, no outer frame, no clutter.
+
+Output one borderless 2048x1152 editorial artwork with no embedded typography.

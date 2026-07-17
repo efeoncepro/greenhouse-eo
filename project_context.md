@@ -1,5 +1,79 @@
 ## Estado vigente para agentes
 
+- **Gate ejecutable de entrega visual editorial (2026-07-17):** todo `conceptId` producido por
+  `content-marketing-studio` debe declarar un `explanatoryDelta` y un `deliveryContract` con `viewport`
+  (`art_directed|single_composition|crop_safe`), `theme` (`light_dark|single_theme`), `canvas`
+  (`transparent|opaque`), `skin` (`efeonce_core|contextual_platform|contextual_client|campaign_specific`) y
+  `rationale`. Codex y Claude comparten la instrucción y el comando
+  `pnpm content:visual-manifest:lint -- <manifest.json>`. El gate bloquea matrices responsive/theme incompletas
+  y transparencia sin `qa.alpha=true`; también bloquea visuales que no declaran qué mecanismo, relación, decisión
+  o frontera explican mejor que el texto adyacente. Una excepción de un solo tema, composición o fondo sigue permitida sólo
+  si queda explícita y justificada. Un skin contextual —por ejemplo, vinotinto/coral para HubSpot— sólo pertenece
+  a piezas cuyo tema sea esa plataforma y nunca se hereda como branding Efeonce o default de la siguiente pieza.
+
+- **Método de infografía editorial determinística canonizado (2026-07-17):** cuando una pieza depende de copy,
+  cifras, ejes, conectores, taxonomías o logos exactos, `content-marketing-studio` carga
+  `references/deterministic-editorial-infographics.md` y gobierna el pipeline `contrato editorial/datos -> SVG
+  accesible -> Chromium/PNG master -> WebP -> QA original/contextual -> manifest -> integración`. `design-studio`
+  dirige la composición y `dataviz-design` conserva el encoding analítico complejo. El método es reusable; la
+  estética de ANAM no lo es. Los mirrors Codex/Claude están sincronizados.
+
+- **Firma de marca editorial canonizada (2026-07-17):** el sistema visual de `content-marketing-studio` exige
+  una `brand signature policy` por pieza: activos oficiales, contraste, zona de respeto, jerarquía por superficie
+  y separación entre firma Efeonce, cliente y plataforma. Para Efeonce sólo se usan wordmarks de
+  `public/branding/`; `AxisWordmark` queda fuera de piezas públicas. La marca se sostiene primero con composición,
+  tipografía, color y voz; el logo firma sin invadir evidencia. El mismo contrato exige medir la columna real y
+  usar art direction con `<picture>` cuando un solo ratio falla: no dos imágenes ocultas ni crop CSS. Primera
+  aplicación: `docs/public-site/HUBSPOT_REVOPS_ANAM_VISUAL_SYSTEM_V1.md`; `ANAM-V02` usa horizontal `3:2` y
+  `ANAM-V03` horizontal `16:9` en desktop/tablet; ambas usan vertical `3:4` en móvil. Cada una existe en light/dark,
+  con integración Content Factory todavía pendiente.
+
+- **Experiencia editorial integrada, no look universal (2026-07-17):** `content-marketing-studio` exige que
+  texto, imagen, placement, ritmo, caption, responsive, tema y derivados formen una sola lectura, pero cada
+  artículo/serie define su propio lenguaje visual. Fondos blanco/plomo, transparencia, cards, gradientes o su
+  ausencia nunca se promueven automáticamente a regla global. En ANAM, retirar círculos/gradiente preservando
+  cards y composición aplica sólo a `ANAM-V02`–`V04`; `ANAM-V02` y `ANAM-V03` ya existen como cuatro derivados
+  desktop/mobile × light/dark cada una, todavía sin integración en WordPress.
+
+- **Prospecting Agent canon reusable (2026-07-17):** `hubspot-solutions-partner` tiene una referencia
+  client-agnostic compartida por Codex/Claude en `references/prospecting-agent.md`. Separa la superficie general
+  de la beta Buying Signals/Contact Sourcing y gobierna readiness, selling profiles/plays, señales, sourcing,
+  outreach, exclusiones, créditos, piloto, KPIs y autonomía gradual. Distingue además entrenamiento comercial/
+  grounding de fine-tuning: Customer Agent usa content sources para respuestas; Prospecting Agent configura
+  selling context, audiencia, señales e instrucciones, sin prometer autoaprendizaje no documentado. `SOURCES.md`
+  conserva packaging, límites y precios con `as-of`; cualquier propuesta o rollout debe revalidarlos.
+
+- **Método de utilidad citable canonizado (2026-07-17):** `content-marketing-studio` ahora gobierna el diseño de
+  piezas orientadas a link earning, menciones y citas mediante el contrato `usuario de la cita -> objeto
+  reutilizable -> evidencia/límites -> pasaje/anchor -> revisión por pares -> distribución -> medición`. El
+  detalle load-on-demand vive en `references/citation-utility-method.md` y su template en
+  `templates/citation-utility-contract.md`, espejados para Codex/Claude. `seo-aeo` hace hand-off desde off-page;
+  el método aumenta probabilidad, nunca garantiza backlinks, ranking ni citas. Primera aplicación:
+  `docs/public-site/HUBSPOT_REVOPS_ANAM_CASE_STUDY_BRIEF_V1.md`.
+
+- **Método de traducción editorial de metadata canonizado (2026-07-17):** `content-marketing-studio` separa el
+  problema que el lector ya reconoce del concepto técnico que la pieza enseña, y reparte una tesis entre H1,
+  SEO title, OG/Twitter, excerpt, descriptions, slug y taxonomía sin copiarlos mecánicamente. El gate evita que
+  jerga no buscada o categorías/tags de una sola pieza se conviertan en peaje de entrada; `copywriting` gobierna
+  el craft por superficie y `seo-aeo` conserva intent, canonical, robots, schema y readback. Canon load-on-demand:
+  `.codex/.claude/skills/content-marketing-studio/references/metadata-translation-method.md`.
+
+- **Catálogo de servicios Efeonce activo (2026-07-17):** `docs/services/` define las capacidades que Efeonce
+  entrega y opera para clientes, separadas de arquitectura, documentación funcional/manuales, propuestas y
+  catálogos runtime. HubSpot as a Service tiene dos servicios canónicos independientes: Customer Agent
+  gestionado (`hubspot.customer-agent-managed`) y arquitectura RevOps, automatización y paneles
+  (`hubspot.revops-managed`). ANAM/portal `19893546` es implementación de referencia; sus datos siguen siendo
+  del cliente. Índice: `docs/services/hubspot-as-a-service/README.md`.
+
+- **Webhooks Notion — Cloud Tasks preparado pero no activo (2026-07-17):**
+  `notion-tasks-demo` y `notion-status-transitions` tienen un path asíncrono
+  opt-in que valida HMAC, encola y ACKea antes de tocar PostgreSQL; el worker OIDC
+  reusa inbox/dedupe/handlers. Queue GCP `notion-webhook-ingestion` (`us-east4`,
+  5/s, concurrencia 5) está **PAUSED** y Vercel mantiene
+  `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=false`. No declarar el incidente
+  resuelto hasta desplegar staging, validar OIDC + burst real y observar
+  conexiones PG. Canon: `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`.
+
 - **HubSpot as a Service / ANAM tiene canon visible en Greenhouse (2026-07-16):** este repositorio es el SSOT
   para el método de servicio, contexto cliente ANAM, decisiones RevOps, Customer Agent, QA y skills espejo
   `.codex/.claude/skills/hubspot-as-a-service`. El repo Kortex conserva sólo implementación ejecutable
@@ -7,6 +81,18 @@
   una copia divergente. Índice: `docs/architecture/kortex/hubspot-as-a-service/README.md`; overview funcional:
   `docs/documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`; manual:
   `docs/manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`.
+  Source pack Customer Agent reconciliado el 2026-07-17:
+  `docs/architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/`, con 23 fuentes en uso,
+  17 respuestas cortas y catálogo técnico de 356 registros. El mismo readback mostró 33.000 créditos mensuales,
+  pero cuenta vencida por factura `#760627868` (vencimiento 2026-06-07), uso de créditos `DESACTIVADA` y dos
+  intentos de activación rechazados por HubSpot. El bloqueo actual es administrativo de facturación; un
+  administrador ANAM debe regularizarlo antes del retry/readback, aunque fuentes y chatflow permanezcan presentes.
+  Las skills espejo distinguen `Deployment > Workflows and bots` como enrutamiento selectivo de conversaciones:
+  no es knowledge, una acción externa del Customer Agent ni `Run Agent` dentro de una automatización. Para ANAM,
+  cualquier pre-flow por intención continúa como diseño approval-gated y requiere inventario/readback runtime.
+  El discovery de capacidades 2026 también canoniza reply recommendations, permisos Contact (máximo documentado
+  de 10), acciones API, QA por Contact/segmento, analítica/coaching, cobertura escalonada y nuevos canales. Ninguna
+  está asumida live: el backlog ANAM exige elegibilidad/readback, aprobación y prueba runtime por separado.
   La próxima continuación ANAM debe comenzar con una búsqueda live de reuniones y tareas en Notion y producir
   una matriz reunión→decisión/owner→fase→evidencia runtime→gap/aprobación antes de cualquier write. La síntesis
   fechada sirve como índice, no reemplaza el readback de Notion ni constituye autorización. Contrato de entrada:
@@ -396,6 +482,8 @@
 - **Browser diagnostics hook vigente:** Codex tiene la skill local `.codex/skills/greenhouse-browser-diagnostics/SKILL.md`. Cualquier pedido de revisar/abrir/diagnosticar/capturar/testear una ruta Greenhouse debe usar automáticamente Agent Auth + `scripts/playwright-auth-setup.mjs` + Playwright/Chromium, eligiendo la persona agente de menor privilegio que represente el caso: superadmin `agent@greenhouse.efeonce.org` para admin/permisos/diagnóstico transversal, collaborator `agent-collaborator@greenhouse.efeonce.org` para `/my`/self-service, y client `agent-client@greenhouse.efeonce.org` para portal cliente general. Para `dev-greenhouse.efeoncepro.com`, automatizar contra la URL staging `.vercel.app` con bypass; no pedir login al usuario ni usar navegación anónima como primer intento.
 - **Greenhouse Visual Capture vigente:** `pnpm fe:capture` es la CLI de **Greenhouse Visual Capture** (`GVC`), herramienta canónica para evidencia visual con Playwright + agent auth. Cuando una tarea toca UI visible, microinteractions, responsive, screenshots, secuencias de frames, design QA o revisión visual, la evidencia primaria debe pasar por `pnpm fe:capture` / `pnpm fe:capture:review` y relacionados (`fe:capture:diff`, `fe:capture:health`, `fe:capture:gc`). Si existe scenario, usarlo; si no, `pnpm fe:capture --route=<path> --env=staging --hold=3000` para evidencia rápida y crear scenario bajo `scripts/frontend/scenarios/` cuando el flujo sea repetible, interactivo o requiera scroll/captura de secciones. Para pantallas largas usar `scroll selector`, `scrollTo`, `mark fullPage` y `mark clipSelector`, preferentemente con `data-capture="<seccion>"`. Desde V1.4, scenarios críticos deben preferir `readiness`, `assertions`, `interaction`, `viewports` y metadata `baseline` cuando reduzcan evidencia falsa; cada run genera `index.html` y failure taxonomy. Playwright ad-hoc queda como complemento para consola/red/API payloads o DSL insuficiente, con artifacts igualmente bajo `.captures/` y explicación del bypass. Arquitectura: `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`.
 - **AI Visual Asset Generator vigente:** `src/lib/ai/image-generator.ts` es el entrypoint canonico para assets visuales generados por agentes. Las skills `greenhouse-ai-image-generator` (Codex `.codex/skills/greenhouse-ai-image-generator/SKILL.md`, Claude `.claude/skills/greenhouse-ai-image-generator/SKILL.md`) son el carril operativo para direccion de arte, prompt engineering profesional, acabados, materiales, composicion, iteracion y QA de iconos, UI elements, empty states, banners, assets transparentes y reference edits. Guia compartida: `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`. `generateImage()` soporta `google-imagen` y `openai-image`; `GREENHOUSE_IMAGE_PROVIDER=openai-image` quedo configurado en Vercel Production, Development y Preview `develop`, con key resuelta via `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key` en GCP Secret Manager. `src/lib/ai/openai-image.ts` agrega `generateOpenAIImage()` (text-to-image), `editOpenAIImage()` (referencias/mascara) y `runOpenAIImageTool()` (Responses API multi-turn). Para PNG transparente, pedir `background='transparent'`; como `gpt-image-2` no soporta transparencia, el helper aplica fallback a `gpt-image-1.5` y devuelve `modelFallbackReason`. Arquitectura: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+- **Escenas editoriales de producto vigentes:** `.codex/.claude/skills/design-studio/modules/11_PRODUCT_STORY_SCENES.md` gobierna portadas/heroes con analítica o producto. Antes de emular una referencia exige inspeccionar sus assets originales y separa la gramática compositiva agnóstica del skin contextual. Texto, cifras, gráficos y logos exactos se producen por SVG/composición determinística; las anti-referencias son instrucciones semánticas, no pesos negativos nativos. Una paleta HubSpot sólo aplica a contenido realmente HubSpot y no se convierte en branding Efeonce ni default de dashboards/RevOps.
+- **Caso público ANAM vigente:** WordPress post `251397` está publicado en `/hubspot/dashboards-hubspot-confiables-caso-anam/` con autor Julio Reyes, categoría HubSpot, featured V6 media `251415` y OG/Twitter `251416`. El contenido conserva SHA-256 `9fa2adc32896c48c6939ab682fc871c987519aec5bdf4e0b523225e03b25c8c0`; canonical, `index, follow`, schema, TOC, imágenes, links, desktop/móvil y crop `1:1` del archivo pasaron QA live. Snapshot/rollback y evidencia: `docs/public-site/HUBSPOT_REVOPS_ANAM_WORDPRESS_PRIVATE_AUDIT_V1.md`.
 - **Reactive replay scoped vigente:** `processReactiveEvents()` acepta `handlerKeys` + `replayFailedHandlers` para reprocesar filas activas `retry/dead-letter` sin drenar backlog global. La ruta admin `/api/admin/ops/replay-reactive` acepta `domain`, `batchSize`, `handlerKeys` y `replayFailedHandlers`. Usar este camino para recovery quirúrgico de proyecciones; no borrar/editar `outbox_reactive_log` a mano salvo corrección auditable de datos contaminados.
 - **Journey Intelligence Layer vigente (arquitectura aceptada, runtime pendiente):** Greenhouse adopta `docs/architecture/GREENHOUSE_JOURNEY_INTELLIGENCE_LAYER_V1.md` como capa transversal read-only para trazar journeys y touchpoints cross-domain. La capa observa outbox, audit logs, Notification Hub, Email Delivery, Teams Bot y Webhooks para componer milestones, blockers, SLA, next expected event y touchpoints causales. V1 NO reemplaza sources of truth ni ejecuta workflows: no envia emails, no dispara Teams, no muta HR/Finance/Commercial; cualquier accion futura debe llamar al dominio owner. No guardar cuerpos completos de email/Teams por default; persistir evidencia redacted y `evidence_quality`.
 - **TASK-637/TASK-931 GitHub Billing & Actions observability vigente:** Greenhouse lee GitHub Billing Usage en modo read-only via `/organizations/{org}/settings/billing/usage` + `/usage/summary` desde `src/lib/cloud/github-billing.ts`, sin persistencia PostgreSQL ni migraciones. El endpoint admin es `/api/admin/cloud/github-billing`; las surfaces son `/admin/integrations`, `/admin/ops-health` y Admin Center via signal `cloud.billing.github`. Env vars: `GREENHOUSE_GITHUB_BILLING_TOKEN_SECRET_REF` o `GREENHOUSE_GITHUB_BILLING_TOKEN`, `GREENHOUSE_GITHUB_BILLING_ORG` (scope canonico `efeoncepro`) y umbrales `GREENHOUSE_GITHUB_BILLING_MONTHLY_WARN_USD=100`, `GREENHOUSE_GITHUB_BILLING_MONTHLY_CRITICAL_USD=150`, `GREENHOUSE_GITHUB_ACTIONS_DAILY_SPIKE_PCT=100` en Vercel `production`, `staging` y `development`. `grossAmount` muestra consumo bruto y `netAmount` impacto facturable tras cuota/descuentos; workflow/job hotspots se diagnostican con `pnpm actions:cost:audit`. El contrato CI vigente evita duplicate build minutes en `push:develop`: GitHub mantiene lint/typecheck/tests como señal rápida y Vercel actúa como build gate de staging; GitHub conserva build en PRs, `main` y dispatch manual. El watchdog productivo queda manual-only en repo desde 2026-05-24 hasta TASK-920 por 72 fallos en los últimos 100 runs scheduled; runtime GitHub quedó `disabled_manually` como emergency stop hasta que `main` tenga el workflow sin `schedule`.

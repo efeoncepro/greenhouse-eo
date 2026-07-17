@@ -1,0 +1,13 @@
+Create a premium editorial key visual for an enterprise RevOps implementation case study.
+
+CORE IDEA: THE CHART THAT HOLDS. Create one single horizontal bar chart transformed into a refined architectural data sculpture. It must be the only hero object. Six long horizontal bars emerge from one continuous warm-white measurement plane, viewed in a controlled three-quarter perspective. The bars are constructed from precision-cut translucent acrylic, frosted glass and anodized metal layers, revealing that the visible result is supported by structured data underneath. This is data architecture expressed as an elegant physical product.
+
+Use reference 1 only for the authentic rhythm and proportion of a real HubSpot horizontal bar chart and its coral-orange accent. Use reference 2 for rigorous bar geometry, confident Efeonce blue, restrained green validation, generous white space and information-design discipline. Use reference 3 only for the clean Efeonce editorial atmosphere and brand color relationships. Do not reproduce any text, numbers, UI, logos, data values or layouts from the references.
+
+COMPOSITION: 16:9 landscape, 2048x1152. Center the entire sculpture inside an imaginary square safe zone so a centered 1:1 crop preserves the complete idea. Low but refined three-quarter camera, like a premium Adobe product campaign or a museum-grade editorial still life. One dominant coral-orange bar with a deep wine-colored structural joint creates the focal point. Deep Efeonce blue and electric blue bars form the main architecture. Use bright green exactly once as a tiny precise validation inlay or terminal marker. Let layered edges, subtle joins and thin under-structures become visible below the primary bars. No separate panels.
+
+LIGHTING AND CRAFT: high-key studio lighting, warm white seamless background, soft accurate contact shadows, crisp machined edges, sophisticated material separation, restrained reflections, excellent negative space, calm enterprise confidence. Contemporary Swiss editorial rigor combined with high-end product visualization. The result should feel novel, elegant and professional, not decorative.
+
+ABSOLUTE EXCLUSIONS: no dashboard, no software interface, no browser window, no sidebar, no cards, no KPI tiles, no widgets, no buttons, no menus, no table, no screens, no laptop, no phone, no people, no robots, no hands, no text, no numbers, no labels, no axes, no logos, no pseudo-writing, no bubbles, no decorative circles, no node network, no neon glow, no dark or black background, no generic AI SaaS illustration, no childish isometric style, no clay 3D, no clutter.
+
+Render as a single polished editorial artwork with no border and no embedded typography.

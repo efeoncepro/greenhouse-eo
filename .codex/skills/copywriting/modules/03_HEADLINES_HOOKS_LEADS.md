@@ -53,7 +53,23 @@ Un headline que clava los cuatro gana aunque el resto de la página sea idéntic
 Usa la fórmula como punto de partida y **crafteala con specificity + voice-of-customer** (`01`).
 Banco emitible en `templates/headline-bank.md`.
 
-## 6. El lead (lo segundo más importante)
+## 6. Sistema de titulares por superficie
+
+Un artículo no necesita el mismo titular repetido en H1, SEO y social. Todos comparten una tesis, pero cada uno
+trabaja en un contexto distinto:
+
+- **H1:** sostiene la tesis completa y la voz del autor.
+- **SEO title:** resuelve intent y entidad con claridad.
+- **OG/Twitter title:** gana la lectura cuando otra persona comparte la pieza.
+- **Slug:** identifica el tema de forma estable; no intenta ser un headline.
+
+Antes de usar jerga en una superficie de baja paciencia, pregunta si el lector la busca, la entiende sin
+definición y la necesita antes de interesarse. Si el término se enseña dentro de la pieza pero no nombra el
+problema que el lector reconoce, no lo conviertas en peaje de entrada. El método completo de metadata y
+taxonomía vive en `content-marketing-studio/references/metadata-translation-method.md`; `seo-aeo` gobierna la
+decisión final de intent y runtime.
+
+## 7. El lead (lo segundo más importante)
 
 El **lead** = los primeros párrafos tras el headline. Su trabajo: **ganar el siguiente párrafo**.
 - Entra en la conversación que ya está en la mente del lector (Robert Collier).
@@ -61,14 +77,14 @@ El **lead** = los primeros párrafos tras el headline. Su trabajo: **ganar el si
   frase corta y magnética; sin fricción.
 - Tipos de lead: historia, promesa grande, pregunta, dato impactante, "secret/mecanismo".
 
-## 7. Hooks (para social/video)
+## 8. Hooks (para social/video)
 
 - El **hook** son los primeros ~3 segundos que deciden si siguen. Es la palanca #1 del video/
   social (converge con `digital-marketing/05`; aquí el **craft** del hook).
 - Tipos: pregunta/dolor, resultado/promesa, patrón roto/contra-intuitivo, dato/prueba, POV.
 - Testea muchos hooks (matriz de variantes); el hook manda sobre la producción.
 
-## 8. Subject lines (email)
+## 9. Subject lines (email)
 
 - El asunto es el "headline del email": decide la apertura. Inbox = ambiente de alta intención.
 - Rinden: **"Tu/Ti", "hoy", "ahora"**, personalización, curiosidad específica, brevedad
@@ -81,6 +97,8 @@ El **lead** = los primeros párrafos tras el headline. Su trabajo: **ganar el si
 - [ ] 10–25 variantes generadas; elegida la mejor.
 - [ ] Pasa ≥3 de las 4 U's; ultra-específica.
 - [ ] Beneficio + curiosidad + relevancia al momento.
+- [ ] H1, SEO title y OG title comparten tesis, pero cumplen trabajos distintos.
+- [ ] La jerga no desplaza el problema que el lector ya reconoce.
 - [ ] Lead con slippery slide (gana el siguiente párrafo).
 - [ ] (Email) subject con "tu/ahora", específico, sin clickbait.
 

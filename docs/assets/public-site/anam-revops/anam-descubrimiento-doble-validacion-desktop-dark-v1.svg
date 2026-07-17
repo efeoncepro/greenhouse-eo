@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960" role="img" aria-labelledby="title desc">
+  <title id="title">Descubrimiento operativo con doble validación</title>
+  <desc id="desc">Cinco movimientos avanzan desde las señales iniciales hasta una implementación comprobada. El recorrido se valida con las personas que conocen la operación y con los datos registrados en el CRM.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F8FBFF"/>
+      <stop offset="1" stop-color="#EFF6FC"/>
+    </linearGradient>
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0375DB"/>
+      <stop offset="0.78" stop-color="#024C8F"/>
+      <stop offset="1" stop-color="#6EC207"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="960" fill="#111013"/>
+  <image href="../../../../public/branding/logo-negative.svg" x="1138" y="58" width="220" height="52" preserveAspectRatio="xMidYMid meet"/>
+
+  <text x="72" y="82" font-family="Poppins, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3.2" fill="#0375DB">CASO ANAM · MÉTODO</text>
+  <text x="72" y="146" font-family="Poppins, Arial, sans-serif" font-size="48" font-weight="700" fill="#F7F8FA">Del pedido visible a una decisión confiable</text>
+  <text x="72" y="192" font-family="Geist, Arial, sans-serif" font-size="25" fill="#BEC6CE">Cinco movimientos. Dos fuentes de validación.</text>
+  <rect x="72" y="224" width="1296" height="2" fill="#343238"/>
+
+  <path d="M122 302 H1318" stroke="url(#flow)" stroke-width="10" stroke-linecap="round"/>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="282" width="232" height="286" rx="24" fill="#1B1A1E"/>
+    <rect x="338" y="282" width="232" height="286" rx="24" fill="#1B1A1E"/>
+    <rect x="604" y="282" width="232" height="286" rx="24" fill="#1B1A1E"/>
+    <rect x="870" y="282" width="232" height="286" rx="24" fill="#1B1A1E"/>
+    <rect x="1136" y="282" width="232" height="286" rx="24" fill="#1B1A1E"/>
+  </g>
+
+  <g font-family="Poppins, Arial, sans-serif" font-size="25" font-weight="700" text-anchor="middle">
+    <circle cx="118" cy="302" r="31" fill="#0375DB"/><text x="118" y="311" fill="#FFFFFF">1</text>
+    <circle cx="384" cy="302" r="31" fill="#0375DB"/><text x="384" y="311" fill="#FFFFFF">2</text>
+    <circle cx="650" cy="302" r="31" fill="#0375DB"/><text x="650" y="311" fill="#FFFFFF">3</text>
+    <circle cx="916" cy="302" r="31" fill="#0375DB"/><text x="916" y="311" fill="#FFFFFF">4</text>
+    <circle cx="1182" cy="302" r="31" fill="#6EC207"/><text x="1182" y="311" fill="#173900">5</text>
+  </g>
+
+  <g font-family="Poppins, Arial, sans-serif" font-size="28" font-weight="700" fill="#F7F8FA">
+    <text x="102" y="382"><tspan x="102">Escuchar</tspan><tspan x="102" dy="38">las señales</tspan></text>
+    <text x="368" y="382"><tspan x="368">Recorrer</tspan><tspan x="368" dy="38">el proceso</tspan></text>
+    <text x="634" y="382"><tspan x="634">Construir</tspan><tspan x="634" dy="38">opciones</tspan></text>
+    <text x="900" y="382"><tspan x="900">Contrastar</tspan><tspan x="900" dy="38">con el CRM</tspan></text>
+    <text x="1166" y="382"><tspan x="1166">Implementar</tspan><tspan x="1166" dy="38">y comprobar</tspan></text>
+  </g>
+
+  <g font-family="Geist, Arial, sans-serif" font-size="21" fill="#BEC6CE">
+    <text x="102" y="492"><tspan x="102">Agente, KPI, paneles</tspan><tspan x="102" dy="29">y automatizaciones.</tspan></text>
+    <text x="368" y="492"><tspan x="368">El go-to-market</tspan><tspan x="368" dy="29">real del cliente.</tspan></text>
+    <text x="634" y="492"><tspan x="634">Alternativas corregidas</tspan><tspan x="634" dy="29">y priorizadas juntos.</tspan></text>
+    <text x="900" y="492"><tspan x="900">Objetos, asociaciones</tspan><tspan x="900" dy="29">y cobertura real.</tspan></text>
+    <text x="1166" y="492"><tspan x="1166">Cambios acotados</tspan><tspan x="1166" dy="29">y verificación.</tspan></text>
+  </g>
+
+  <text x="72" y="635" font-family="Poppins, Arial, sans-serif" font-size="23" font-weight="600" letter-spacing="2.5" fill="#BEC6CE">DOBLE VALIDACIÓN</text>
+  <path d="M720 568 V615 M720 615 L430 676 M720 615 L1010 676" stroke="#6F7E89" stroke-width="4" stroke-linecap="round" fill="none"/>
+
+  <rect x="170" y="666" width="520" height="134" rx="26" fill="#13263A" stroke="#245D8F" stroke-width="2"/>
+  <rect x="750" y="666" width="520" height="134" rx="26" fill="#182512" stroke="#4A722B" stroke-width="2"/>
+  <text x="430" y="716" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="28" font-weight="700" fill="#7CC0FF">Validación humana</text>
+  <text x="430" y="760" text-anchor="middle" font-family="Geist, Arial, sans-serif" font-size="22" fill="#BEC6CE">Quienes conocen la operación</text>
+  <text x="1010" y="716" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="28" font-weight="700" fill="#A4E35A">Validación del dato</text>
+  <text x="1010" y="760" text-anchor="middle" font-family="Geist, Arial, sans-serif" font-size="22" fill="#BEC6CE">Cómo quedó registrada en el CRM</text>
+
+  <text x="720" y="870" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="27" font-weight="600" fill="#F7F8FA">Cuando no coinciden, la diferencia suele ser el hallazgo.</text>
+</svg>

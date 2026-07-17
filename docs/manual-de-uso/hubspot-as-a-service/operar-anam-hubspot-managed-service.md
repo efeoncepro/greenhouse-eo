@@ -1,10 +1,11 @@
 # Operar ANAM HubSpot Managed Service
 
 > **Tipo:** Manual de uso / runbook
-> **Versión:** 1.0
-> **Actualizado:** 2026-07-16
+> **Versión:** 1.3
+> **Actualizado:** 2026-07-17
 > **Portal obligatorio:** ANAM `19893546`
 > **Funcional:** [`../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
+> **Servicios:** [Customer Agent gestionado](../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md) · [RevOps, automatización y paneles](../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
 
 ## Antes de empezar
 
@@ -14,6 +15,11 @@
 4. Antes de escribir, prepara change set con lote, impacto, aprobación, evidencia y rollback.
 
 ## Cadencia operativa
+
+Para priorizar trabajo abierto y comprobar criterios de salida, usa el
+[backlog canónico ANAM](../../architecture/kortex/hubspot-as-a-service/anam-open-work-and-exit-gates-2026-07-17.md).
+En este manual, **Calidad de Datos (DQ)** siempre significa una cola operativa con denominador, excepción, owner,
+acción y cadencia; no un score cosmético ni una atribución automática de culpa.
 
 ### Diaria
 
@@ -27,7 +33,8 @@
 2. Clasifica causa: schema/plataforma, fuente/migración, integración o captura/adopción.
 3. Separa Deal sin Company: convergencia explícita = candidata approval-gated; dominio = revisión; duplicidad,
    ambigüedad o inferencia por título/nombre/owner = held.
-4. Revisa Growth `19708354`. Segmento/sector/región siguen parciales mientras cobertura sea menor a 95%.
+4. Revisa Growth `19708354`. Segmento/sector/región siguen parciales mientras cobertura sea menor a 95%; país
+   de ejecución aún no tiene reporte ni cobertura histórica.
 5. Revisa Retención `21152855` y Fidelización `21152950` sólo como pilotos/colas.
 
 ### Mensual
@@ -68,12 +75,41 @@ esperado/calculado.
 - La creación forward debe ser idempotente por línea y tolerar reintentos/search lag.
 - Retira marcas sintéticas o `(PILOTO)` sólo con aprobación ANAM y cobertura real leída de vuelta.
 
+## Registrar geografía de ejecución
+
+1. Abre el Deal y completa `Países de ejecución` con todos los países donde se ejecutará o se ejecutó el negocio.
+2. Si incluye Chile, completa además `Región` con una o más regiones chilenas de ejecución.
+3. No sustituyas estos campos con `region_de_chile`: esa propiedad pertenece a Company y representa su sede.
+4. Completa o ratifica la geografía antes o durante la adjudicación/cierre; no la infieras desde dirección,
+   dominio, nombre, notas ni Company para registros históricos.
+5. Si un Deal contiene varios países/regiones, consérvalo como un solo Deal. Los cortes por cada selección no
+   deben sumarse entre sí como un total consolidado sin deduplicación.
+
+`Países de ejecución` (`ef_paises_de_ejecucion`) está activa y al 2026-07-17 tiene cero Deals poblados. Es
+obligatoria al cerrar Growth como ganado o Renovación como renovada; no existe backfill, workflow ni reporte
+aditivo por selección.
+
+## Operar los pipelines gobernados
+
+- Crea Growth únicamente en `Potencial 10%`; la precalificación se administra en Lead y `Radar 0%` permanece intacto.
+- Crea Renovación únicamente en `Por revisar` y avanza por las nuevas etapas semánticas.
+- Completa `Paso siguiente` antes de avanzar por las etapas abiertas que lo exigen.
+- En Hot completa además `Monto original`; al ganar completa `Países de ejecución`, `Monto original` y
+  `Variación vs. cotizado`. `Región` permanece visible y opcional cuando corresponde a Chile.
+- En `Cierre perdido`, `Desestimado`, `No renovado` o `No aplica / Desestimado`, registra el motivo de cierre.
+- No actives los workflows heredados que asignan `Venta nueva` por pertenencia al pipeline.
+- Las tareas automáticas por futura entrada a etapa aún no están publicadas. Hasta ese slice, el owner ejecuta
+  el checklist manual y no debe crear tareas retrospectivas para todo el histórico.
+
 ## Monitorear Customer Agent
 
+- Abre el [source pack live](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md) y compara inventario, fecha de sincronización y directrices publicadas contra HubSpot.
 - Prueba lenguaje natural, memoria multi-turno, exactitud, administración/facturación, reclamos y mixed intent.
 - Distingue limitación nativa de transferencia de defecto de configuración.
 - Antes de cambiar knowledge, reconcilia el source pack; no lo reconstruyas desde memoria o adjuntos no clasificados.
 - Publicación, permisos, acciones y handoff requieren aprobación explícita.
+- El readback del 2026-07-17 mostró el agente pausado, uso de créditos `DESACTIVADA`, cuenta vencida y factura `#760627868` vencida desde el 2026-06-07. Dos activaciones confirmadas fallaron en HubSpot. Escala la regularización a un administrador de facturación ANAM; no pagues ni cambies la suscripción con permisos operativos.
+- Tras la regularización, activa `Uso de créditos`, exige readback `ACTIVADA`, vuelve al agente, pulsa `Reanudar` si aparece habilitado y verifica que el canal acepte conversaciones nuevas. La presencia del chatflow por sí sola no demuestra disponibilidad.
 
 ## Facturación prevista
 
@@ -95,8 +131,11 @@ y a plataforma sólo con evidencia runtime de defecto. Incluye IDs, período, es
 
 ## Referencias
 
+- [Catálogo HubSpot as a Service](../../services/hubspot-as-a-service/README.md)
 - [Modelo vivo](../../architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md)
 - [Roadmap](../../architecture/kortex/hubspot-as-a-service/anam-revops-implementation-roadmap-phases-2026-07-16.md)
 - [Sector/geografía](../../architecture/kortex/hubspot-as-a-service/anam-sector-geography-kpi-slice-change-set-2026-07-16.md)
+- [Países de ejecución del Deal](../../architecture/kortex/hubspot-as-a-service/anam-deal-execution-countries-change-set-2026-07-17.md)
 - [Deal→Company](../../architecture/kortex/hubspot-as-a-service/anam-deal-company-association-remediation-dry-run-2026-07-16.md)
 - [Paneles piloto](../../architecture/kortex/hubspot-as-a-service/anam-phase-3-pilot-dashboard-execution-2026-07-16.md)
+- [Customer Agent source pack](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md)

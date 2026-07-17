@@ -3,7 +3,7 @@
 > **Owner:** Efeonce delivery for client ANAM
 > **Portal:** HubSpot `19893546`
 > **Status:** living canonical current-state model
-> **Validated:** 2026-07-16
+> **Validated:** 2026-07-17
 > **Boundary:** this models ANAM's HubSpot portal; it is not a Greenhouse product data model or Efeonce CRM dataset
 
 ## Purpose
@@ -49,7 +49,7 @@ The arrows express collaboration, not automatic copying. Every object keeps its 
 | Contact | One person/contactable identity | Personal contact data, consent, communication context and relationship roles through associations | Company legal identity, contract value or billing rows | Native and active |
 | Lead | One qualification motion for a person/account | Qualification status, disqualification and handoff into a commercial opportunity | Contract, Service delivery or support case | Native and active |
 | Company | One customer/account organization | Durable account identity, legal/HQ facts, governed detailed segment, strategic sector and parent-child account structure | Repeated service components, invoice rows or Contact RUT as legal truth | Native and active; 471 exact/unique Companies have governed segment+HQ region, 65 have direct strategic-sector mapping; duplicate ANAM records remain held/out of scope |
-| Deal | One commercial opportunity/motion | Pipeline stage, commercial owner, income type, current opportunity value and originating commercial context | Delivery lifecycle, recurring retention outcome or repeated billing events | Native and active |
+| Deal | One commercial opportunity/motion | Pipeline stage, commercial owner, income type, current opportunity value, originating commercial context and execution geography | Delivery lifecycle, recurring retention outcome or repeated billing events | Native and active; Chile execution regions use `zona` and LATAM execution countries use `ef_paises_de_ejecucion` |
 | Quote | One commercial offer/version | Quote number/version/status/expiry and quoted value | Awarded delivery truth | Native but historically under-adopted; prospective use only |
 | Product | One reusable catalog definition | Stable service/catalog identity and commercial classification | A customer's purchase, contract or delivery instance | Native; 22 Products available read-only |
 | Line item | One quoted or awarded component | Product reference, amount, TCV, ACV, ARR/MRR, currency, billing cadence and term evidence | Operational activation or customer identity | Native; source grain for proposed Service after award |
@@ -96,6 +96,8 @@ The arrows express collaboration, not automatic copying. Every object keeps its 
 | Support/quality outcome | Ticket | Loyalty evidence associated to Company/Service | Storing cases as Deal notes or Billing Events |
 | Billing execution | Billing Event | Aggregated reporting and optional finalized Invoice projection | Repeated billing rows flattened into Company/Deal properties |
 | Relationship/risk evidence | Activities, conversations and Tickets | Human-reviewed Loyalty queue; optional attributed smart summary | AI-generated red/amber/green truth or automatic churn |
+| Company HQ geography | Company `region_de_chile` | Account segmentation when verified | Treating headquarters as the Deal execution location |
+| Deal execution geography | Deal `zona` + `ef_paises_de_ejecucion` | Diagnostic slicing with Deal-level deduplication | Summing one multi-country/multi-region Deal once per selected value |
 
 ## Synergy by operating flow
 
@@ -128,7 +130,7 @@ The source billing row becomes Billing Event, first linked by exact Account Unit
 | Panel | Primary object/grain | Supporting objects | What it must not do |
 |---|---|---|---|
 | Data Quality | Eligible records per object | Associations and readiness properties | Hide missing denominators behind percentages |
-| Growth | Deal + line items | Company, Product, owner | Claim delivery, invoicing or Retention outcomes |
+| Growth | Deal + line items | Company, Product, owner; Deal execution geography when covered | Claim delivery/invoicing/Retention outcomes or add multi-select groups as a consolidated total |
 | Service Portfolio | Service | Company, originating Deal/line item | Include sample/quarantined Services or mix currencies |
 | Expiry/Renewal | Active eligible Service | Company, owner, renewal Deal | Use Deal close date as contract end |
 | Retention | Prior/successor Service cohort | Renewal Deal, Company | Compute GRR/NRR from Deal labels alone |
@@ -142,6 +144,8 @@ The source billing row becomes Billing Event, first linked by exact Account Unit
 |---|---|
 | Company segment and HQ region | Live on 471/1,023 exact/unique Companies through `segmento_de_mercado_anam` + `region_de_chile`; 22 duplicate-key records, 3 source ambiguities and 527 unmatched Companies remain held |
 | Company strategic sector | Live on 65/1,023 direct mappings only: Acuícola 18, Energía 9, Minería 9 and Sanitarias 29; no inferred Desaladoras/Servicios asociados/Otros |
+| Deal execution geography | `zona` remains the multi-select for Chilean execution regions. `ef_paises_de_ejecucion` (`Países de ejecución`) is live as a 20-option LATAM multi-select on Deal; direct readback verified the schema and zero populated Deals. No backfill or report was added. On 2026-07-17 it became required prospectively at Growth `Cierre ganado 100%` and Renewal `Renovado` |
+| Deal pipeline governance | Live: Company is required on manual Deal creation; automatic 60-day close date is off; Growth creation starts at `Potencial 10%`; Renewal starts at `Por revisar`; stage gates require `Paso siguiente`, quote-to-award fields and loss reason at the approved transitions. `Radar 0%` remains unchanged and outside the creation rule. Eight future-entry task automations remain designed but not published |
 | Sales by segment/sector/region KPI | Diagnostic only: Growth contains historical-partial segment `340896790`, sector `340897291` and HQ-region `340897635` charts over exact `Ganado` plus known Company dimension. They use Deal commercial value, not invoicing. Official status remains blocked because Deal→Company coverage is only 629/1,240 (`50.73%`), below the >=95% association/field gate |
 | Deal→Company remediation | First approved slice complete: import `77872707` created the exact 34 Primary pairs from explicit Deal→Contact→Company convergence and readback verified 34/34; 113 domain-only manual reviews and 498 held remain untouched |
 | Product/line-item identity | Sufficient for current Service projection; full catalog cleanup deferred |
@@ -151,7 +155,7 @@ The source billing row becomes Billing Event, first linked by exact Account Unit
 | Controlled Service pilot | Five Services live with one Company, one originating Deal and deterministic source lineage; example activation values are explicitly marked in-record and calculate `fields_ready` for dashboard QA only |
 | Production Service cohort | Not available; synthetic pilot values and the sample-like record remain excluded until ANAM ratifies/replaces facts and panel-specific gates pass |
 | Historical Service migration | `NO-GO` |
-| Renewal association labels/workflow | Association labels live; renewal workflow/records not executed |
+| Renewal association labels/workflow | Association labels live. Renewal Deal stages were renamed in-place to `Por revisar` → `Elegibilidad confirmada` → `Contacto iniciado` → `Propuesta en negociación` → `Renovado` / `No renovado` / `No aplica / Desestimado`, with required stage properties and creation limited to `Por revisar`; Service lineage task automation and renewal records were not executed |
 | Service creation automation | Plain Deal workflow rejected: it cannot safely emit one Service per line item; Kortex idempotent materializer/custom action required |
 | Activation-review automation | Workflow `1852406585` active; authenticated positive/negative simulation passed; five pilot executions completed and created five associated tasks; re-enrollment disabled |
 | Ticket taxonomy/SLA | Proposed, not executed |

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600" viewBox="0 0 1200 1600" role="img" aria-labelledby="title desc">
+  <title id="title">Cobertura de Deals asociados a Company</title>
+  <desc id="desc">En una escala completa de cero a cien por ciento, la cobertura sube de 47,98 por ciento, 595 de 1.240 Deals, a 50,73 por ciento, 629 de 1.240. El cambio verificado es de 34 asociaciones y 2,75 puntos porcentuales. Quedan 611 Deals sin Company y el gate de KPI oficial se ubica en al menos 95 por ciento.</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.26"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="1600" fill="#111013"/>
+  <image href="../../../../public/branding/logo-negative.svg" x="875" y="84" width="225" height="53" preserveAspectRatio="xMidYMid meet"/>
+  <text x="96" y="108" font-family="Poppins, Arial, sans-serif" font-size="26" font-weight="600" letter-spacing="3.2" fill="#65B7FF">CASO ANAM · CALIDAD DEL DATO</text>
+  <text x="96" y="188" font-family="Poppins, Arial, sans-serif" font-size="54" font-weight="700" fill="#F7F8FA">Mejorar la cobertura</text>
+  <text x="96" y="252" font-family="Poppins, Arial, sans-serif" font-size="54" font-weight="700" fill="#F7F8FA">no equivale a completarla</text>
+  <text x="96" y="310" font-family="Geist, Arial, sans-serif" font-size="31" fill="#BEC6CE">Deals asociados a Company · escala 0–100%</text>
+  <rect x="96" y="352" width="1008" height="2" fill="#343238"/>
+
+  <path d="M1039 430 V876" stroke="#8EDB34" stroke-width="5" stroke-dasharray="11 11"/>
+  <rect x="786" y="388" width="310" height="58" rx="29" fill="#21311A" stroke="#557D2E" stroke-width="2"/>
+  <text x="941" y="426" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="23" font-weight="700" fill="#A8E866">GATE KPI OFICIAL · ≥95%</text>
+
+  <text x="96" y="486" font-family="Poppins, Arial, sans-serif" font-size="31" font-weight="700" fill="#F7F8FA">Antes · 595 de 1.240 Deals</text>
+  <rect x="112" y="518" width="976" height="84" rx="20" fill="#2A292E"/>
+  <rect x="112" y="518" width="468" height="84" rx="20" fill="#0375DB"/>
+  <text x="548" y="572" text-anchor="end" font-family="Poppins, Arial, sans-serif" font-size="31" font-weight="700" fill="#FFFFFF">47,98%</text>
+
+  <text x="96" y="690" font-family="Poppins, Arial, sans-serif" font-size="31" font-weight="700" fill="#F7F8FA">Después · 629 de 1.240 Deals</text>
+  <rect x="112" y="722" width="976" height="84" rx="20" fill="#2A292E"/>
+  <path d="M132 722 H580 V806 H132 Q112 806 112 786 V742 Q112 722 132 722Z" fill="#0375DB"/>
+  <rect x="580" y="722" width="27" height="84" fill="#6EC207"/>
+  <text x="575" y="776" text-anchor="end" font-family="Poppins, Arial, sans-serif" font-size="31" font-weight="700" fill="#FFFFFF">50,73%</text>
+  <path d="M594 714 V674 H650" stroke="#8EDB34" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <rect x="650" y="642" width="205" height="64" rx="32" fill="#21311A" stroke="#557D2E" stroke-width="2"/>
+  <text x="752" y="684" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="27" font-weight="700" fill="#A8E866">+2,75 pp</text>
+
+  <path d="M112 864 H1088" stroke="#55525A" stroke-width="2"/>
+  <g font-family="Geist, Arial, sans-serif" font-size="22" fill="#9DA7B0" text-anchor="middle">
+    <path d="M112 856 V872 M356 856 V872 M600 856 V872 M844 856 V872 M1088 856 V872" stroke="#55525A" stroke-width="2"/>
+    <text x="112" y="904">0%</text><text x="356" y="904">25%</text><text x="600" y="904">50%</text><text x="844" y="904">75%</text><text x="1088" y="904">100%</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="96" y="970" width="480" height="190" rx="28" fill="#1B1A1E"/>
+    <rect x="624" y="970" width="480" height="190" rx="28" fill="#1B1A1E"/>
+    <rect x="96" y="1200" width="1008" height="170" rx="28" fill="#1B1A1E"/>
+  </g>
+  <text x="132" y="1016" font-family="Poppins, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="2" fill="#9DA7B0">CAMBIO VERIFICADO</text>
+  <text x="132" y="1080" font-family="Poppins, Arial, sans-serif" font-size="42" font-weight="700" fill="#A8E866">+34 asociaciones</text>
+  <text x="132" y="1125" font-family="Geist, Arial, sans-serif" font-size="27" fill="#BEC6CE">34/34 comprobadas</text>
+  <text x="660" y="1016" font-family="Poppins, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="2" fill="#9DA7B0">BRECHA VISIBLE</text>
+  <text x="660" y="1080" font-family="Poppins, Arial, sans-serif" font-size="42" font-weight="700" fill="#F7F8FA">611 Deals</text>
+  <text x="660" y="1125" font-family="Geist, Arial, sans-serif" font-size="27" fill="#BEC6CE">todavía sin Company</text>
+  <text x="132" y="1248" font-family="Poppins, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="2" fill="#9DA7B0">CONDICIÓN DE PUBLICACIÓN</text>
+  <text x="132" y="1316" font-family="Poppins, Arial, sans-serif" font-size="44" font-weight="700" fill="#F7F8FA">≥95% de cobertura</text>
+  <text x="650" y="1316" font-family="Geist, Arial, sans-serif" font-size="28" fill="#BEC6CE">para el alcance definido</text>
+
+  <text x="96" y="1450" font-family="Poppins, Arial, sans-serif" font-size="34" font-weight="600" fill="#F7F8FA">Mejora comprobable.</text>
+  <text x="96" y="1495" font-family="Poppins, Arial, sans-serif" font-size="34" font-weight="600" fill="#F7F8FA">El dato sigue en categoría diagnóstica.</text>
+  <text x="1104" y="1545" text-anchor="end" font-family="Geist, Arial, sans-serif" font-size="24" fill="#9DA7B0">Corte: 16 de julio de 2026</text>
+</svg>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600" viewBox="0 0 1200 1600" role="img" aria-labelledby="title desc">
+  <title id="title">Descubrimiento operativo con doble validación</title>
+  <desc id="desc">Cinco movimientos conectan las señales iniciales con una implementación comprobada. Las decisiones se validan con las personas que conocen la operación y con los datos registrados en el CRM.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F8FBFF"/>
+      <stop offset="1" stop-color="#EFF6FC"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0375DB"/>
+      <stop offset="1" stop-color="#024C8F"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="1600" fill="#111013"/>
+  <image href="../../../../public/branding/logo-negative.svg" x="875" y="88" width="225" height="53" preserveAspectRatio="xMidYMid meet"/>
+
+  <text x="96" y="110" font-family="Poppins, Arial, sans-serif" font-size="27" font-weight="600" letter-spacing="3.4" fill="#0375DB">CASO ANAM · MÉTODO</text>
+  <text x="96" y="186" font-family="Poppins, Arial, sans-serif" font-size="56" font-weight="700" fill="#F7F8FA">Del pedido visible a una</text>
+  <text x="96" y="252" font-family="Poppins, Arial, sans-serif" font-size="56" font-weight="700" fill="#F7F8FA">decisión confiable</text>
+  <text x="96" y="310" font-family="Geist, Arial, sans-serif" font-size="34" fill="#BEC6CE">Cinco movimientos. Dos fuentes de validación.</text>
+
+  <rect x="96" y="355" width="1008" height="2" fill="#343238"/>
+  <rect x="119" y="408" width="12" height="775" rx="6" fill="url(#line)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="174" y="390" width="930" height="150" rx="28" fill="#1B1A1E"/>
+    <rect x="174" y="570" width="930" height="150" rx="28" fill="#1B1A1E"/>
+    <rect x="174" y="750" width="930" height="150" rx="28" fill="#1B1A1E"/>
+    <rect x="174" y="930" width="930" height="150" rx="28" fill="#1B1A1E"/>
+    <rect x="174" y="1110" width="930" height="150" rx="28" fill="#1B1A1E"/>
+  </g>
+
+  <g font-family="Poppins, Arial, sans-serif" font-size="28" font-weight="700" text-anchor="middle">
+    <circle cx="125" cy="465" r="38" fill="#0375DB"/><text x="125" y="475" fill="#FFFFFF">1</text>
+    <circle cx="125" cy="645" r="38" fill="#0375DB"/><text x="125" y="655" fill="#FFFFFF">2</text>
+    <circle cx="125" cy="825" r="38" fill="#0375DB"/><text x="125" y="835" fill="#FFFFFF">3</text>
+    <circle cx="125" cy="1005" r="38" fill="#0375DB"/><text x="125" y="1015" fill="#FFFFFF">4</text>
+    <circle cx="125" cy="1185" r="38" fill="#6EC207"/><text x="125" y="1195" fill="#173900">5</text>
+  </g>
+
+  <g font-family="Poppins, Arial, sans-serif" font-size="46" font-weight="700" fill="#F7F8FA">
+    <text x="226" y="479">Escuchar las señales</text>
+    <text x="226" y="659">Recorrer el proceso propio</text>
+    <text x="226" y="839">Construir opciones con el cliente</text>
+    <text x="226" y="1019">Contrastar con el CRM</text>
+    <text x="226" y="1199">Implementar y comprobar</text>
+  </g>
+
+  <path d="M600 1260 V1312" stroke="#6F7E89" stroke-width="4" stroke-linecap="round"/>
+  <path d="M600 1312 L420 1375" stroke="#6F7E89" stroke-width="4" stroke-linecap="round"/>
+  <path d="M600 1312 L780 1375" stroke="#6F7E89" stroke-width="4" stroke-linecap="round"/>
+
+  <rect x="96" y="1360" width="480" height="132" rx="28" fill="#13263A" stroke="#245D8F" stroke-width="2"/>
+  <rect x="624" y="1360" width="480" height="132" rx="28" fill="#182512" stroke="#4A722B" stroke-width="2"/>
+  <text x="336" y="1438" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="40" font-weight="700" fill="#7CC0FF">Validación humana</text>
+  <text x="864" y="1438" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="40" font-weight="700" fill="#A4E35A">Validación del dato</text>
+
+  <text x="600" y="1530" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="38" font-weight="600" fill="#F7F8FA"><tspan x="600">Cuando no coinciden,</tspan><tspan x="600" dy="44">la diferencia suele ser el hallazgo.</tspan></text>
+</svg>

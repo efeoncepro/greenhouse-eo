@@ -49,6 +49,17 @@ La forma legítima y escalable de ganar autoridad en 2026:
 - Resultado: backlinks de autoridad **+** menciones de marca **+** señales de
   entidad, todo de una. El digital PR es donde SEO, AEO y branding convergen.
 
+### Producción del activo enlazable — hand-off canónico
+
+Este módulo diagnostica la oportunidad off-page y mide autoridad; no inventa el activo editorial. Cuando el
+objetivo sea que colegas, medios o especialistas compartan, mencionen, enlacen o citen una pieza, cargar el
+[`Método de utilidad citable`](../../content-marketing-studio/references/citation-utility-method.md) de
+`content-marketing-studio` y completar su `citation-utility-contract` antes del draft.
+
+Regla: **caso real -> objeto reutilizable -> evidencia/límites -> superficie enlazable -> revisión por pares ->
+distribución ganada -> medición**. No prometer backlinks y no usar compra, intercambio o outreach masivo como
+sustituto de utilidad editorial.
+
 ## Brand SERP (lo que sale al buscar tu marca)
 
 La SERP de tu propio nombre es tu "tarjeta de presentación" ante usuarios *y*

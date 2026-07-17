@@ -1,5 +1,191 @@
 # changelog.md
 
+## 2026-07-17 — Cierre de aprendizaje editorial del Customer Agent ANAM
+
+- El runbook agentic de blogposts incorpora un scan de lenguaje de lifecycle, clasificación explícita del alcance
+  de cada claim, gate problem-aware del primer viewport y el estado honesto del tooling de publicación/QA todavía
+  acotado por caso.
+- El manifest y el sistema visual del artículo quedaron sincronizados con los assets v2 y la publicación live.
+  `content-marketing-studio` añade `explanatoryDelta` como gate ejecutable para evitar infografías decorativas o
+  redundantes; la regla se sincronizó para Codex/Claude sin convertir la estética HubSpot en default.
+
+## 2026-07-17 — Gate de entrega para sistemas visuales editoriales
+
+- `content-marketing-studio` exige ahora un `deliveryContract` machine-readable por `conceptId`: viewport,
+  tratamiento light/dark, canvas transparente/opaco, origen del skin y justificación. La regla quedó sincronizada para Codex y
+  Claude; decisiones como una sola composición o un único tema siguen permitidas, pero ya no pueden ser defaults
+  silenciosos.
+- El comando compartido `pnpm content:visual-manifest:lint -- <manifest.json>` bloquea art direction sin variantes
+  desktop/móvil, contratos light/dark incompletos y transparencia sin verificación técnica de alpha. El manifest
+  del Customer Agent de ANAM ya pasa el gate con hero opaco y tres diagramas transparentes en cuatro variantes.
+- Los skins se clasifican como Efeonce core, contextual de plataforma/cliente o específico de campaña. El
+  vinotinto/coral de esta portada queda limitado al contexto HubSpot y no se convierte en default editorial.
+
+## 2026-07-17 — Mantenimiento directo de plugins del sitio público WordPress
+
+- Se actualizaron en `efeoncepro.com` AI 1.2.0, Contact Form 7/Mailchimp 0.9.81.03, Elementor 4.1.5,
+  Elementor Pro 4.1.3, HubSpot 11.3.65, Jetpack 16.0.1, Spectra 2.20.0 y SVG Support 2.5.17. Se verificaron
+  arranque de WordPress, plugins críticos activos, ausencia de mantenimiento/error PHP y rutas públicas clave.
+- Essential Addons for Elementor 6.7.0 produjo un paquete incompleto sin `autoload.php`; se restauró de inmediato
+  la versión 6.6.10 desde el snapshot previo. Su actualización queda pendiente hasta que el proveedor publique
+  un paquete íntegro o pueda probarse fuera de producción.
+
+## 2026-07-17 — Publicación del caso ANAM con portada product-story V6
+
+- El artículo `Un dashboard no arregla un proceso comercial` quedó publicado en la categoría HubSpot con autor
+  Julio Reyes, canonical estable y contenido preservado. La portada SVG product-story usa media `251415` como
+  featured y `251416` como Open Graph/Twitter.
+- La publicación tuvo snapshot/rollback, guards de identidad, fingerprint, taxonomía y media, purge Kinsta y QA
+  live desktop/móvil. Pasaron robots, schema, social metadata, TOC, imágenes, links, overflow y el crop cuadrado
+  real del archivo.
+
+## 2026-07-17 — ANAM: backlog operativo y criterios de cierre
+
+- Se consolidó en una fuente canónica el trabajo abierto posterior al rollout comercial: automatizaciones y QA
+  de pipeline, Calidad de Datos, Service/renovación, KPI oficiales, Customer Agent, facturación y Tickets/SLA.
+  Cada frente explicita owner, dependencias, aprobación y exit gate; el cambio es documental y no autoriza ni
+  ejecuta nuevos writes en HubSpot.
+
+## 2026-07-17 — Borrador privado del artículo Customer Agent de ANAM
+
+- El segundo artículo de la serie ANAM quedó integrado como post privado `251432`, con autor Julio Reyes,
+  categoría HubSpot, `noindex`, featured/OG y tres diagramas responsive light/dark desde Media Library.
+- La validación autoral, inspección profunda, acceso anónimo `404` y QA visual desktop/móvil pasaron. La revisión
+  autenticada del template Ohio y cualquier publicación continúan pendientes y requieren un paso separado.
+
+## 2026-07-17 — Escenas editoriales de producto: método agnóstico y skin contextual
+
+- `design-studio` suma un módulo espejo Codex/Claude para auditar referencias desde sus assets originales,
+  construir escenas de producto con gráficos determinísticos, gobernar referencias positivas/negativas y validar
+  `16:9`/`1:1`/responsive. `content-marketing-studio`, `greenhouse-ai-image-generator` y el runbook editorial
+  consumen el mismo contrato.
+- La gramática de dashboards/escenas queda agnóstica al tema. Las paletas de plataforma se tratan como skins
+  locales: vino/lavanda/naranja puede contextualizar un artículo sobre HubSpot, pero no se convierte en branding
+  Efeonce ni default para RevOps, CRM o futuros artículos.
+- La portada ANAM V6 quedó registrada con source, master, derivados, crop y auditoría; después fue seleccionada
+  e integrada en la publicación con QA live.
+
+## 2026-07-17 — ANAM: gobierno de pipelines Growth y Renovación
+
+- En el portal ANAM `19893546`, Deal ahora exige Company al crear y ya no recibe fecha de cierre automática a
+  60 días. Growth sólo se crea ordinariamente en `Potencial 10%`; las etapas posteriores exigen `Paso siguiente`,
+  datos quote-to-award y motivo de cierre según corresponda. `Radar 0%` y sus diez Deals permanecieron intactos.
+- Renovación conservó IDs/probabilidades y adoptó siete etapas semánticas desde `Por revisar` hasta los resultados
+  `Renovado`, `No renovado` y `No aplica / Desestimado`; creación y requiredness quedaron gobernados sin mover
+  registros históricos. Las ocho tareas de acompañamiento por entrada futura a etapa siguen diseñadas pero no
+  publicadas, evitando una ola retrospectiva sin contrato de owner/vencimiento/notificación.
+
+## 2026-07-17 — Método de infografía editorial determinística
+
+- `content-marketing-studio` incorpora una referencia reusable para producir infografías con copy, datos y marca
+  exactos mediante `contrato -> SVG accesible -> Chromium/PNG master -> WebP -> QA original/contextual -> manifest`.
+  Incluye art direction responsive/light-dark, espera de fuentes y assets, hashes, provenance, accesibilidad y
+  separación explícita entre producción visual completa e integración/publicación.
+- `design-studio` enruta estas piezas al método y conserva la dirección de composición; `dataviz-design` sigue
+  siendo dueño del encoding analítico complejo. La estética de ANAM queda como precedente local, no como regla
+  global. Referencia y routing quedaron espejados para Codex/Claude.
+
+## 2026-07-17 — ANAM: geografía de ejecución LATAM en Deal
+
+- El portal ANAM `19893546` incorporó `Países de ejecución` (`ef_paises_de_ejecucion`) como multiselección Deal
+  de 20 países LATAM, creada mediante release gobernado de Kortex y verificada por readback directo de HubSpot.
+  Complementa `Región` (`zona`) para ejecución chilena y mantiene separada la sede de Company.
+- El cambio fue estrictamente aditivo: una propiedad, cero errores y ningún workflow, pipeline, formulario,
+  reporte, record o backfill. Al cierre existen cero Deals poblados; adopción, requiredness por etapa y reporting
+  deduplicado son slices futuros approval-gated, no capacidades declaradas como listas.
+
+## 2026-07-17 — Firma de marca para el sistema visual editorial
+
+- `content-marketing-studio` incorpora una política reutilizable para firmar hero/OG, diagramas y capturas con
+  activos oficiales, contraste y espacio de respeto, sin convertir el logo en watermark ni mezclarlo con marcas
+  de clientes o plataformas. Los mirrors Codex/Claude quedaron sincronizados.
+- El sistema visual del caso ANAM aplica la regla con el wordmark oficial de Efeonce; `ANAM-V02` fue regenerado,
+  revisado a resolución original y registrado con nuevos hashes. Una medición del tema Ohio descartó usar el
+  master vertical en desktop (`1483 px` de alto a ancho de columna): ahora existe variante horizontal `3:2` para
+  desktop/tablet y vertical `3:4` para móvil. La skill canoniza `<picture>` para art direction; su soporte en el
+  renderer sigue pendiente. No se subió a WordPress ni se publicó el post.
+- Se aclaró la frontera estilística: la regla reusable es una experiencia editorial integrada, no fondos ni
+  formas universales. El retiro de círculos/gradiente conserva el estilo de las infografías ANAM y queda limitado
+  a `ANAM-V02`–`V04`; otros artículos pueden usar sistemas visuales completamente distintos.
+- `ANAM-V02` ya materializa esa corrección: cuatro derivados determinísticos —desktop/mobile × light/dark—,
+  sin círculos ni gradiente de canvas, con cards y composición preservadas y logos oficiales positivo/negativo.
+  Masters y WebP fueron inspeccionados; la integración WordPress continúa pendiente.
+- `ANAM-V03` quedó producido como cuatro variantes determinísticas —horizontal `1600×900` y vertical
+  `1200×1600`, ambas light/dark—. La gráfica mantiene una escala íntegra `0–100%`, muestra el cambio real de
+  `2,75 pp`, explicita `611` Deals pendientes y sitúa el gate de KPI en `≥95%`. Los logos oficiales se verificaron
+  desde los masters finales; todavía no se cargó ni integró en WordPress.
+
+## 2026-07-17 — Prospecting Agent: contrato reusable de implementación
+
+- `hubspot-solutions-partner` incorpora una referencia client-agnostic para evaluar e implementar Prospecting
+  Agent con separación explícita entre superficie general y beta Buying Signals/Contact Sourcing. Canoniza
+  readiness, plays/perfiles, sourcing, outreach, exclusiones, créditos, piloto, KPIs y gobierno humano. También
+  distingue entrenamiento comercial/grounding de fine-tuning y autoaprendizaje, comparándolo con las content
+  sources y el coaching del Customer Agent.
+- Los mirrors Codex/Claude y `SOURCES.md` quedan sincronizados para esta capacidad. No hubo cambios en portales,
+  enrollments, automatizaciones, créditos ni envíos.
+
+## 2026-07-17 — Método de traducción editorial de metadata
+
+- `content-marketing-studio` suma un contrato load-on-demand para traducir una tesis técnica a H1, SEO/OG,
+  excerpt, descriptions, slug, categoría y tags con trabajos distintos. El método prioriza el problema que el
+  lector reconoce, somete la jerga a un gate explícito, evita taxonomía de una sola pieza y exige snapshot,
+  rollback y readback al mutar runtime.
+- La referencia quedó espejada para Codex/Claude; `copywriting` incorpora el sistema de titulares por superficie
+  y `seo-aeo` enlaza el método desde su contrato editorial manteniendo autoridad sobre intent/canonical/robots.
+
+## 2026-07-17 — Método de utilidad citable para contenido enlazable
+
+- `content-marketing-studio` incorpora un contrato reusable para link earning/citación: identificar usuario y
+  trabajo de la cita, diseñar un objeto reutilizable, sostenerlo con evidencia/límites, publicarlo como pasaje
+  HTML enlazable, validarlo con pares y medir su circulación a 30/60/90 días. Se agregó template y mirror
+  Codex/Claude; `seo-aeo` consume el método desde off-page y mantiene la regla de no garantizar backlinks.
+- El brief del caso ANAM es la primera aplicación: Escala de confianza `KPI oficial / Diagnóstico / Piloto`,
+  checklist público, evidencia negativa y Definition of Done de citabilidad. No hubo write en WordPress.
+
+## 2026-07-17 — Customer Agent: canon de Workflows y bots
+
+- Las skills espejo de HubSpot as a Service distinguen `Deployment > Workflows and bots` como enrutamiento
+  selectivo de conversaciones, separado de knowledge, acciones del Customer Agent y `Run Agent` en workflows.
+  Se agregó el contrato de diseño/QA y el patrón ANAM por intención sin afirmar ni activar un despliegue live.
+- Se canonizó además el mapa 2026 de capacidades no exploradas —reply recommendations, permisos Contact, acciones
+  API, QA contextual, analítica/coaching, rollout escalonado y multicanal— con estados de evidencia, límites de
+  seguridad y un backlog ANAM que mantiene betas, writes y publicación bajo aprobación separada.
+
+## 2026-07-17 — Catálogo de servicios Efeonce y dos servicios HubSpot as a Service
+
+- Se creó `docs/services/` como capa canónica para definir resultados, alcance, entregables, responsabilidades,
+  evidencia y continuidad de servicios operables, sin confundirlos con arquitectura, manuales, propuestas,
+  catálogos runtime u objetos CRM.
+- Customer Agent gestionado y arquitectura RevOps/automatización/paneles quedaron registrados como dos servicios
+  separados y reutilizables, con ANAM `19893546` como implementación de referencia y los informes Word como
+  evidencia detallada.
+
+## 2026-07-17 — Backpressure de webhooks Notion con Cloud Tasks
+
+- Se agregó un path asíncrono opt-in para `notion-tasks-demo` y
+  `notion-status-transitions`: HMAC antes del ACK, Cloud Tasks como recibo durable,
+  worker OIDC y procesamiento posterior reutilizando el inbox/handlers canónicos.
+- Cloud Tasks quedó provisionado en `us-east4` con concurrencia global 5 y queue
+  pausada. Vercel staging/production tiene la configuración no sensible y el
+  kill-switch en `false`; no hubo deploy ni tráfico real por el nuevo path.
+- Estado: código completo, rollout pendiente. El objetivo es absorber bursts sin
+  comprar PgBouncer; se mantiene rollback inmediato al path síncrono.
+
+## 2026-07-17 — ANAM Customer Agent: source pack live independiente
+
+- Se retiró la excepción documental del Customer Agent con un source pack Markdown independiente bajo
+  `docs/architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/`: 23 fuentes privadas en uso,
+  seis documentos de dominio, 17 respuestas cortas completas y catálogo técnico de 356 registros/métodos/plazos.
+- El pack separa knowledge de identidad, directrices, handoff, canales y acciones; incorpora IDs de archivo,
+  fechas de sincronización, reglas de sincronización y checks de republicación. No se mutó HubSpot.
+- El readback autenticado del portal ANAM `19893546` reveló drift de continuidad: HubSpot muestra término de
+  acceso gratuito, agente pausado, nuevas conversaciones pausadas y `Reanudar` deshabilitado, pese a la compra y
+  30.000 créditos confirmados el día anterior. Configuración, 23 fuentes y chatflow 24/7/100% siguen presentes;
+  la cuenta sí muestra 33.000 créditos mensuales, pero está vencida por la factura `#760627868` (venció el
+  2026-06-07). Dos intentos confirmados de activar el uso fallaron en HubSpot; facturación ANAM debe regularizarla
+  antes del retry y readback. No se pagó ni cambió la suscripción.
+
 ## 2026-07-16 — TASK-1422: UI de redacción del aviso con IA en el Publication Desk
 
 - El Publication Desk (`/agency/hiring/publication`) gana el CTA `✨ Redactar con IA` en la columna
@@ -10649,3 +10835,27 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 ## 2026-07-11 — Glitch intro source-state audit
 
 - Se documentó la causa raíz del piloto de video: el key visual de contacto/señal contradecía el frame inicial hover/señal posterior del brief. Se congeló el gasto, se descartó 3D y se añadió un workflow reusable de preflight, still precontacto, prueba de un tap y stop rule antes de cualquier nueva generación.
+
+## 2026-07-17 — Caso ANAM RevOps creado como artículo privado
+
+- Se ensambló y creó en WordPress el post privado `251397`, con autor Julio Reyes, categoría `HubSpot`, TOC poblado, tabla de escala de confianza, manifest idempotente y metadata Yoast privada/noindex.
+- Se fijaron el slug `dashboards-hubspot-confiables-caso-anam`, extracto, meta description y metadata Open Graph/Twitter; `HubSpot` permanece como categoría primaria y no se añadieron tags de una sola pieza. El cambio tuvo snapshot, rollback preparado y readback independiente sin alterar el cuerpo.
+- Se inició el sistema visual con `ANAM-V02`, diagrama determinístico del método y su doble validación: fuente SVG, master PNG `1200×1600`, WebP de cuerpo y manifest con hashes/metadata/rights/QA. Su integración sigue pendiente hasta completar el set y revisar mobile/live.
+- El artículo permanece inaccesible anónimamente y pendiente de media, revisión editorial/cliente, QA privado y autorización separada de publicación. Canon: `docs/public-site/HUBSPOT_REVOPS_ANAM_WORDPRESS_PRIVATE_AUDIT_V1.md`.
+
+## 2026-07-17 — Caso ANAM: sistema visual integrado en el artículo privado
+
+- Se completaron `ANAM-V01–V04` con producción determinística SVG → Chromium → PNG → WebP/JPEG, firma oficial Efeonce y variantes desktop/mobile light/dark para los tres diagramas de cuerpo.
+- Media Library quedó reconciliada en `251399–251412`; featured `251399`, Open Graph/Twitter `251400` y figuras principales `251401`, `251405`, `251409`.
+- `GutenbergArticleSpec.image` incorpora `sources` allowlisted para compilar art direction responsive/theme dentro del bloque dueño; tests focales `14/14` y Content Factory `pass` con `81` bloques.
+- El post `251397` conserva estado privado, autor `1`, categoría `HubSpot`, tags vacíos y `noindex`; render privado desktop/mobile × light/dark sin overflow ni media rota, y acceso anónimo `404`.
+- Publicación no ejecutada. Estado: `private content complete; publication pending`.
+
+## 2026-07-17 — Caso ANAM publicado y endurecido para SEO
+
+- El post `251397` quedó live en `/hubspot/dashboards-hubspot-confiables-caso-anam/` con portada V6, canonical,
+  `index, follow`, metadata social y QA responsive sin errores ni overflow.
+- La taxonomía principal de breadcrumbs Yoast para posts se fijó en `category` y se reconstruyeron los indexables;
+  ANAM y la muestra HubSpot exponen `Portada → HubSpot → artículo` sin modificar el contenido.
+- Se revocaron preventivamente las credenciales de sesión de Yoast AI del autor tras aparecer en una salida local
+  de inspección; no llegaron al repositorio ni afectaron el sitio. El siguiente uso puede requerir reautorización.

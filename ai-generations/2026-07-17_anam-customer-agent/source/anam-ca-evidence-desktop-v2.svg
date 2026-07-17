@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Cadena de evidencia operativa y punto de interrupción</title><desc id="desc">ANAM tenía evidencia de configuración y pruebas en vista previa; una dependencia administrativa de facturación interrumpía la verificación de conversaciones nuevas en operación real.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#101010" flood-opacity=".14"/></filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#101010" flood-opacity=".10"/></filter>
+
+  </defs>
+
+
+    <rect x="80" y="70" width="270" height="42" rx="21" fill="#214BD9"/><text x="215" y="98" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">CADENA DE EVIDENCIA</text>
+    <text x="80" y="165" font-family="Poppins, Arial, sans-serif" font-size="51" font-weight="650" fill="#171918" ><tspan x="80" dy="0">Lo que falta probar también es un resultado</tspan></text>
+    <text x="80" y="255" font-family="Poppins, Arial, sans-serif" font-size="20" font-weight="400" fill="#5E625F" >La configuración y la vista previa no sustituyen una conversación nueva en operación real.</text>
+
+    <path d="M115 365 H1455" stroke="#214BD9" stroke-width="5" stroke-linecap="round" opacity=".28"/>
+    <circle cx="115" cy="365" r="13" fill="#214BD9"/><text x="115" y="410" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="650" fill="#171918" text-anchor="middle" letter-spacing="1">DOC</text><circle cx="415" cy="365" r="13" fill="#214BD9"/><text x="415" y="410" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="650" fill="#171918" text-anchor="middle" letter-spacing="1">PORTAL</text><circle cx="715" cy="365" r="13" fill="#214BD9"/><text x="715" y="410" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="650" fill="#171918" text-anchor="middle" letter-spacing="1">CONFIG</text><circle cx="1015" cy="365" r="18" fill="#F15E4A"/><text x="1015" y="410" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="650" fill="#171918" text-anchor="middle" letter-spacing="1">PREVIEW</text><circle cx="1385" cy="365" r="13" fill="#9A9D99"/><text x="1385" y="410" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="650" fill="#5E625F" text-anchor="middle" letter-spacing="1">RUNTIME</text>
+
+    <g filter="url(#softShadow)"><rect x="80" y="455" width="335" height="330" rx="26" fill="#E7EDF9"/></g>
+    <text x="115" y="510" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="650" fill="#214BD9" letter-spacing="1.3">EVIDENCIA DISPONIBLE</text>
+    <text x="115" y="575" font-family="Poppins, Arial, sans-serif" font-size="19" font-weight="550" fill="#072A4A" ><tspan x="115" dy="0">Documentación oficial</tspan><tspan x="115" dy="32.3">Superficie elegible</tspan><tspan x="115" dy="32.3">23 fuentes + directrices</tspan><tspan x="115" dy="32.3">Canal y handoff configurados</tspan></text>
+
+    <g filter="url(#softShadow)"><rect x="445" y="455" width="430" height="330" rx="26" fill="#FFE1D6" stroke="#F15E4A" stroke-width="3"/></g>
+    <text x="480" y="510" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="650" fill="#F15E4A" letter-spacing="1.3">EVIDENCIA DE PRUEBA</text>
+    <text x="480" y="580" font-family="Poppins, Arial, sans-serif" font-size="62" font-weight="700" fill="#6A2418" >39</text><text x="595" y="558" font-family="Poppins, Arial, sans-serif" font-size="19" font-weight="600" fill="#6A2418" >escenarios diseñados</text>
+    <text x="480" y="655" font-family="Poppins, Arial, sans-serif" font-size="44" font-weight="700" fill="#6A2418" >≥24</text><text x="595" y="640" font-family="Poppins, Arial, sans-serif" font-size="17" font-weight="550" fill="#6A2418" >escenarios recuperables</text>
+    <text x="480" y="715" font-family="Poppins, Arial, sans-serif" font-size="44" font-weight="700" fill="#6A2418" >35</text><text x="570" y="700" font-family="Poppins, Arial, sans-serif" font-size="17" font-weight="550" fill="#6A2418" >turnos o ejecuciones</text>
+    <rect x="480" y="735" width="230" height="42" rx="21" fill="#F15E4A"/><text x="595" y="763" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">ANAM AL CORTE</text>
+
+    <g filter="url(#softShadow)"><rect x="905" y="455" width="290" height="330" rx="26" fill="#111614"/></g>
+    <text x="940" y="510" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="650" fill="#F15E4A" letter-spacing="1.3">INTERRUPTOR</text>
+    <circle cx="1050" cy="610" r="58" fill="none" stroke="#F15E4A" stroke-width="7"/>
+    <line x1="1050" y1="535" x2="1050" y2="600" stroke="#F15E4A" stroke-width="10" stroke-linecap="round"/>
+    <text x="940" y="690" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="600" fill="#FFFFFF" ><tspan x="940" dy="0">Dependencia</tspan><tspan x="940" dy="24.3">administrativa</tspan><tspan x="940" dy="24.3">de facturación</tspan></text>
+
+    <path d="M1195 620 H1255" stroke="#F15E4A" stroke-width="5" stroke-dasharray="11 9"/>
+    <g filter="url(#softShadow)"><rect x="1255" y="455" width="265" height="330" rx="26" fill="#E7EDF9" stroke="#9A9D99" stroke-width="3" stroke-dasharray="12 10"/></g>
+    <text x="1290" y="510" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="650" fill="#5E625F" letter-spacing="1.2">FALTA DEMOSTRAR</text>
+    <text x="1290" y="590" font-family="Poppins, Arial, sans-serif" font-size="29" font-weight="650" fill="#5E625F" >Operación real</text>
+    <text x="1290" y="645" font-family="Poppins, Arial, sans-serif" font-size="17" font-weight="500" fill="#5E625F" ><tspan x="1290" dy="0">Conversación nueva</tspan><tspan x="1290" dy="26.35">Resolución y handoff</tspan><tspan x="1290" dy="26.35">Medición de resultados</tspan></text>
+    <text x="1290" y="745" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="650" fill="#5E625F" letter-spacing="1">NO VERIFICADO</text>
+
+    <text x="80" y="855" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="650" fill="#F15E4A" letter-spacing="1.4">NO SE PUEDE INFERIR</text>
+    <text x="290" y="855" font-family="Poppins, Arial, sans-serif" font-size="17" font-weight="500" fill="#5E625F" >horario configurado = atención 24/7</text>
+    <text x="700" y="855" font-family="Poppins, Arial, sans-serif" font-size="17" font-weight="500" fill="#5E625F" >vista previa = operación real</text>
+    <text x="1065" y="855" font-family="Poppins, Arial, sans-serif" font-size="17" font-weight="500" fill="#5E625F" >acción en borrador = capacidad activa</text>
+
+    <text x="80" y="955" font-family="Poppins, Arial, sans-serif" font-size="16" font-weight="500" fill="#5E625F" >Corte: 17 de julio de 2026 · conversaciones nuevas en pausa</text>
+
+  <!-- Official Efeonce wordmark is composited deterministically during rasterization. -->
+</svg>

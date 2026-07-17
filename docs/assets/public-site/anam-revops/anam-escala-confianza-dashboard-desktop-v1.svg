@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Escala de confianza de un dashboard comercial</title><desc id="desc">Piloto, diagnóstico y KPI oficial se distinguen por la evidencia que permite sostener una decisión.</desc>
+  <rect width="1600" height="900" fill="#FFF"/>
+  <image href="../../../../public/branding/logo-full.svg" x="1280" y="54" width="240" height="56"/>
+  <text x="80" y="84" font-family="Poppins,Arial,sans-serif" font-size="24" font-weight="600" letter-spacing="3" fill="#0375DB">CASO ANAM · TAXONOMÍA</text>
+  <text x="80" y="150" font-family="Poppins,Arial,sans-serif" font-size="46" font-weight="700" fill="#102A43">Un gráfico gradúa por evidencia</text>
+  <text x="80" y="196" font-family="Geist,Arial,sans-serif" font-size="25" fill="#52697A">No por el tiempo que lleva funcionando.</text>
+  <path d="M190 710 H1410" stroke="#D5E1EA" stroke-width="8" stroke-linecap="round"/>
+  <g font-family="Poppins,Arial,sans-serif">
+    <g><rect x="80" y="285" width="430" height="350" rx="28" fill="#F5F8FA" stroke="#C9D8E3" stroke-width="2"/><circle cx="140" cy="345" r="26" fill="#7995AA"/><text x="140" y="354" text-anchor="middle" font-size="23" font-weight="700" fill="#FFF">1</text><text x="185" y="355" font-size="32" font-weight="700" fill="#102A43">Piloto</text><text x="120" y="420" font-family="Geist,Arial,sans-serif" font-size="24" fill="#52697A"><tspan x="120">Prueba la configuración.</tspan><tspan x="120" dy="52">Declara supuestos.</tspan><tspan x="120" dy="52">Define su gate de salida.</tspan></text></g>
+    <g><rect x="585" y="255" width="430" height="380" rx="28" fill="#EDF6FD" stroke="#8CC3EC" stroke-width="3"/><circle cx="645" cy="315" r="26" fill="#0375DB"/><text x="645" y="324" text-anchor="middle" font-size="23" font-weight="700" fill="#FFF">2</text><text x="690" y="325" font-size="32" font-weight="700" fill="#102A43">Diagnóstico</text><text x="625" y="392" font-family="Geist,Arial,sans-serif" font-size="24" fill="#52697A"><tspan x="625">Usa datos reales parciales.</tspan><tspan x="625" dy="52">Declara su cobertura.</tspan><tspan x="625" dy="52">Explicita la acción siguiente.</tspan></text></g>
+    <g><rect x="1090" y="225" width="430" height="410" rx="28" fill="#F1F8E9" stroke="#A7D56F" stroke-width="3"/><circle cx="1150" cy="285" r="26" fill="#6EC207"/><text x="1150" y="294" text-anchor="middle" font-size="23" font-weight="700" fill="#173900">3</text><text x="1195" y="295" font-size="32" font-weight="700" fill="#102A43">KPI oficial</text><text x="1130" y="362" font-family="Geist,Arial,sans-serif" font-size="23" fill="#52697A"><tspan x="1130">Definición y período.</tspan><tspan x="1130" dy="44">Población y denominador.</tspan><tspan x="1130" dy="44">Cobertura y fuente.</tspan><tspan x="1130" dy="44">Responsable resuelto.</tspan></text></g>
+  </g>
+  <g fill="#0375DB"><path d="M510 710 H575 L555 690 M575 710 L555 730" stroke="#0375DB" stroke-width="5" fill="none"/><path d="M1015 710 H1080 L1060 690 M1080 710 L1060 730" stroke="#0375DB" stroke-width="5" fill="none"/></g>
+  <text x="800" y="790" text-anchor="middle" font-family="Poppins,Arial,sans-serif" font-size="28" font-weight="600" fill="#102A43">La categoría cambia cuando la evidencia sostiene la decisión.</text>
+</svg>

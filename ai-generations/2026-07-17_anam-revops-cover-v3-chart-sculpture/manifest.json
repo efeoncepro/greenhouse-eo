@@ -1,0 +1,21 @@
+{
+  "runId": "2026-07-17_anam-revops-cover-v3-chart-sculpture",
+  "status": "planned",
+  "model": "gpt-image-2",
+  "operation": "edit",
+  "quality": "high",
+  "size": "2048x1152",
+  "concept": "the-chart-that-holds",
+  "references": [
+    { "path": "refs/01-hubspot-bars-sanitized.png", "role": "authentic-horizontal-bar-rhythm" },
+    { "path": "refs/02-efeonce-data-discipline.png", "role": "efeonce-information-design-and-color" },
+    { "path": "refs/03-efeonce-editorial-language.png", "role": "efeonce-editorial-atmosphere" }
+  ],
+  "constraints": {
+    "dashboardChrome": false,
+    "singleVisualization": true,
+    "centeredSquareSafe": true,
+    "exactMetricsVisible": false,
+    "logoAddedAfterGeneration": true
+  }
+}

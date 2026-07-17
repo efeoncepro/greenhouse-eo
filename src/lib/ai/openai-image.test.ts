@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  editOpenAIImage,
   getOpenAIImageModel,
   isOpenAIImageModel,
   resolveOpenAIImageBackground,
@@ -10,6 +11,16 @@ import {
 } from '@/lib/ai/openai-image'
 
 vi.mock('server-only', () => ({}))
+vi.mock('@/lib/secrets/secret-manager', () => ({
+  resolveSecret: vi.fn().mockResolvedValue({
+    value: 'test-openai-key',
+    source: 'env'
+  })
+}))
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('openai-image helpers', () => {
   const testEnv = (env: Record<string, string | undefined>) => env as unknown as NodeJS.ProcessEnv
@@ -67,5 +78,77 @@ describe('openai-image helpers', () => {
         transparentBackgroundStrategy: 'throw'
       })
     ).toThrow('gpt-image-2 does not support transparent backgrounds')
+  })
+})
+
+describe('editOpenAIImage multi-reference requests', () => {
+  it('serializes multiple references as ordered image[] multipart fields', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [{ b64_json: 'aW1hZ2U=' }]
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
+    )
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await editOpenAIImage({
+      prompt: 'Use the first image for composition and the second for product detail.',
+      image: [
+        {
+          bytes: new Uint8Array([1, 2, 3]),
+          filename: 'composition.png',
+          mimeType: 'image/png'
+        },
+        {
+          bytes: new Uint8Array([4, 5, 6]),
+          filename: 'product-detail.jpg',
+          mimeType: 'image/jpeg'
+        }
+      ],
+      model: 'gpt-image-2',
+      size: '1536x1024',
+      quality: 'high'
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    const [url, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+    const body = request.body as FormData
+    const references = body.getAll('image[]') as File[]
+
+    expect(url).toBe('https://api.openai.com/v1/images/edits')
+    expect(body.get('image')).toBeNull()
+    expect(references.map(reference => reference.name)).toEqual(['composition.png', 'product-detail.jpg'])
+    expect(references.map(reference => reference.type)).toEqual(['image/png', 'image/jpeg'])
+    expect(body.get('model')).toBe('gpt-image-2')
+    expect(body.get('quality')).toBe('high')
+  })
+
+  it('rejects more than ten references before making a paid API request', async () => {
+    const fetchMock = vi.fn()
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    const references = Array.from({ length: 11 }, (_, index) => ({
+      bytes: new Uint8Array([index]),
+      filename: `reference-${index + 1}.png`,
+      mimeType: 'image/png'
+    }))
+
+    await expect(
+      editOpenAIImage({
+        prompt: 'Combine these references.',
+        image: references,
+        model: 'gpt-image-2'
+      })
+    ).rejects.toThrow('OpenAI image editing supports at most 10 input images per request.')
+
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 })

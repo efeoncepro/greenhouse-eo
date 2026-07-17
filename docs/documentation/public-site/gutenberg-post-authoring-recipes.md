@@ -44,6 +44,10 @@ Runtime implication:
   in new drafts unless a migration task explicitly approves it.
 - Media blocks (`core/image`, `core/gallery`, `core/embed`) require real asset
   resolution. Do not invent image IDs or decorative video URLs.
+- `GutenbergArticleSpec.image.sources` admite art direction opcional por viewport y
+  `prefers-color-scheme`; cada source exige URL real y una media query allowlisted.
+  El attachment fallback conserva el ownership del bloque `core/image`, ALT y caption.
+  Declarar también `width` y `height` intrínsecos del fallback para reservar espacio y reducir CLS.
 
 ## Composition Contract
 
@@ -85,6 +89,8 @@ Recommended enrichment:
 - `core/separator` to separate CTA/final reflection from the body.
 - `core/image`, `core/gallery` or `core/embed` only after resolving real
   WordPress media or a valid embed source from the brief/source material.
+- Para diagramas con composiciones independientes desktop/mobile o light/dark,
+  declarar `image.sources` en el spec; no insertar `<picture>` manualmente.
 - CTA paragraph or governed button only when the conversion target is known.
 
 ## Block Recipes

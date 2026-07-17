@@ -14,6 +14,13 @@ Indice maestro de la documentacion no operativa del repo.
 
 ## Mapa por categoria
 
+### Services
+
+- [Catálogo de servicios Efeonce](services/README.md)
+- [HubSpot as a Service](services/hubspot-as-a-service/README.md)
+- Esta categoría define qué servicio asume Efeonce, con qué alcance, entregables, evidencia y gobierno; no
+  reemplaza arquitectura, documentación funcional, manuales ni catálogos runtime.
+
 ### Architecture
 
 - [Architecture Decisions Index](architecture/DECISIONS_INDEX.md)

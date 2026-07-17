@@ -26,6 +26,12 @@
   itera lo que funciona. Gasto gobernado.
 - ❌ **Delegar el juicio de marca a la IA.** ✅ IA diverge; el humano cura, decide y da el craft final.
 - ❌ **Pasar IA como foto real sin criterio de disclosure** cuando el contexto lo exige. ✅ "Ante la duda, revela".
+- ❌ **Prompting antes de inspeccionar la referencia.** Una captura puede esconder que el original es SVG/Lottie
+  determinístico. ✅ Audita source, geometría, responsive y motion antes de elegir la mano.
+- ❌ **Usar una anti-referencia como si tuviera peso negativo nativo.** El modelo puede contaminarse con ella.
+  ✅ Declara el rol y el rasgo prohibido; revisa contaminación y cambia a composición determinística si persiste.
+- ❌ **Confundir “escena de producto” con dashboard SaaS genérico.** Muchas cards, miniwidgets, vidrio, glow o
+  racks isométricos no comunican producto. ✅ Construye una relación legible entre contexto e interpretación.
 
 ## Boundaries (duras)
 
@@ -49,3 +55,5 @@
 - ❌ **Entregar sin spec** (resolución/color-space/formato/safe zone equivocados; RGB a print, sin sangrado).
   ✅ Cierra con `templates/asset-delivery-spec.md` y checklist de pre-entrega.
 - ❌ **Prometer un look sin auditar el resultado.** ✅ Audita el KV con la rúbrica (`modules/05`) antes de aprobar.
+- ❌ **Universalizar una paleta contextual.** El vino/naranja/lavanda de HubSpot puede enriquecer una pieza sobre
+  HubSpot, pero rompe la identidad si se vuelve default Efeonce. ✅ Gramática agnóstica; skin decidido por tema.

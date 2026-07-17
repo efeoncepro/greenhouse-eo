@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="720" viewBox="0 0 1800 720">
+  <defs>
+    <linearGradient id="blue" x1="0" x2="1"><stop stop-color="#0668E1"/><stop offset="1" stop-color="#25A8F7"/></linearGradient>
+    <linearGradient id="warm" x1="0" x2="1"><stop stop-color="#7E1F3D"/><stop offset=".28" stop-color="#FF6846"/><stop offset="1" stop-color="#FF9A75"/></linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="14"/></filter>
+    <clipPath id="a"><rect x="40" y="92" width="540" height="540" rx="8"/></clipPath>
+    <clipPath id="b"><rect x="630" y="92" width="540" height="540" rx="8"/></clipPath>
+    <clipPath id="c"><rect x="1220" y="92" width="540" height="540" rx="8"/></clipPath>
+  </defs>
+  <rect width="1800" height="720" fill="#F2F6F9"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#12304D">
+    <text x="40" y="54" font-size="22" font-weight="700" letter-spacing="3">A · SEÑALES → DECISIÓN</text>
+    <text x="630" y="54" font-size="22" font-weight="700" letter-spacing="3">B · CAMPO DE DATOS</text>
+    <text x="1220" y="54" font-size="22" font-weight="700" letter-spacing="3">C · BARRAS EDITORIALES</text>
+  </g>
+
+  <!-- A: raw signals converge into a trusted bar -->
+  <g clip-path="url(#a)">
+    <rect x="40" y="92" width="540" height="540" fill="#FFFDF9"/>
+    <circle cx="130" cy="212" r="82" fill="#0B74DE" opacity=".06" filter="url(#soft)"/>
+    <g fill="#0B74DE" opacity=".78">
+      <circle cx="102" cy="176" r="6"/><circle cx="138" cy="208" r="4"/><circle cx="88" cy="252" r="5"/>
+      <circle cx="164" cy="154" r="3"/><circle cx="190" cy="278" r="6"/><circle cx="120" cy="326" r="4"/>
+      <circle cx="208" cy="222" r="4"/><circle cx="146" cy="382" r="6"/><circle cx="92" cy="430" r="3"/>
+      <circle cx="220" cy="472" r="5"/><circle cx="180" cy="532" r="4"/><circle cx="116" cy="558" r="6"/>
+    </g>
+    <g fill="#FF6846" opacity=".88">
+      <circle cx="224" cy="170" r="5"/><circle cx="256" cy="238" r="7"/><circle cx="236" cy="350" r="4"/>
+      <circle cx="274" cy="420" r="6"/><circle cx="244" cy="536" r="5"/>
+    </g>
+    <g fill="none" stroke="#6E91AD" stroke-width="2" opacity=".45">
+      <path d="M102 176 C260 176 278 305 350 330"/><path d="M88 252 C250 260 286 314 350 330"/>
+      <path d="M190 278 C270 285 302 318 350 330"/><path d="M146 382 C248 370 290 342 350 330"/>
+      <path d="M92 430 C236 410 288 354 350 330"/><path d="M180 532 C282 470 304 360 350 330"/>
+      <path d="M256 238 C292 258 316 302 350 330"/><path d="M274 420 C306 390 328 348 350 330"/>
+    </g>
+    <circle cx="350" cy="330" r="12" fill="#79D400"/>
+    <rect x="382" y="298" width="250" height="64" rx="5" fill="url(#warm)"/>
+    <rect x="382" y="380" width="184" height="24" rx="3" fill="#0A2F65"/>
+    <rect x="382" y="422" width="218" height="24" rx="3" fill="url(#blue)"/>
+    <path d="M350 330 H382" stroke="#79D400" stroke-width="6"/>
+  </g>
+
+  <!-- B: editorial scatter field and one confident trajectory -->
+  <g clip-path="url(#b)">
+    <rect x="630" y="92" width="540" height="540" fill="#FFFDF9"/>
+    <g stroke="#B9CBDA" stroke-width="1" opacity=".45"><path d="M690 156V572"/><path d="M690 572H1110"/></g>
+    <g fill="#0C6FD8" opacity=".55">
+      <circle cx="720" cy="514" r="5"/><circle cx="754" cy="468" r="4"/><circle cx="782" cy="504" r="7"/>
+      <circle cx="814" cy="422" r="5"/><circle cx="842" cy="454" r="4"/><circle cx="878" cy="376" r="7"/>
+      <circle cx="906" cy="402" r="4"/><circle cx="934" cy="322" r="6"/><circle cx="966" cy="358" r="4"/>
+      <circle cx="994" cy="270" r="7"/><circle cx="1030" cy="304" r="4"/><circle cx="1064" cy="212" r="6"/>
+      <circle cx="1090" cy="246" r="4"/><circle cx="746" cy="370" r="4"/><circle cx="864" cy="530" r="5"/>
+      <circle cx="1038" cy="446" r="4"/><circle cx="912" cy="218" r="5"/><circle cx="798" cy="278" r="4"/>
+    </g>
+    <path d="M698 530 C782 500 838 438 902 378 S1024 254 1104 186" fill="none" stroke="url(#warm)" stroke-width="34" stroke-linecap="round" opacity=".94"/>
+    <path d="M698 530 C782 500 838 438 902 378 S1024 254 1104 186" fill="none" stroke="#FFFDF9" stroke-width="2" opacity=".75"/>
+    <circle cx="902" cy="378" r="13" fill="#79D400" stroke="#FFFDF9" stroke-width="6"/>
+  </g>
+
+  <!-- C: flat bars with editorial scale and overlap -->
+  <g clip-path="url(#c)">
+    <rect x="1220" y="92" width="540" height="540" fill="#FFFDF9"/>
+    <g opacity=".12" fill="#0B74DE" transform="translate(14 14)">
+      <rect x="1270" y="170" width="396" height="70"/><rect x="1270" y="266" width="278" height="70"/>
+      <rect x="1270" y="362" width="352" height="70"/><rect x="1270" y="458" width="224" height="70"/>
+    </g>
+    <rect x="1270" y="170" width="396" height="70" fill="url(#warm)"/>
+    <rect x="1270" y="266" width="278" height="70" fill="#092E63"/>
+    <rect x="1270" y="362" width="352" height="70" fill="url(#blue)"/>
+    <rect x="1270" y="458" width="224" height="70" fill="#0A3B77"/>
+    <rect x="1548" y="266" width="22" height="70" fill="#79D400"/>
+    <path d="M1270 150H1690M1270 548H1690" stroke="#9CB5C8" stroke-width="2"/>
+    <g fill="#7E1F3D"><rect x="1270" y="170" width="32" height="70"/><rect x="1270" y="362" width="18" height="70"/></g>
+  </g>
+</svg>

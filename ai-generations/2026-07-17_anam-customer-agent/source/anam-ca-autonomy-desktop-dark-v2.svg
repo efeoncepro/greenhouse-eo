@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Anatomía de una conversación mixta</title><desc id="desc">Una consulta de cotización y facturación se separa en dos rutas; el agente aclara y prepara, conserva memoria y transfiere la decisión con contexto.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#101010" flood-opacity=".14"/></filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#101010" flood-opacity=".10"/></filter>
+
+  </defs>
+
+
+    <rect x="80" y="70" width="260" height="42" rx="21" fill="#214BD9"/><text x="210" y="98" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">CONVERSACIÓN MIXTA</text>
+    <text x="80" y="165" font-family="Poppins, Arial, sans-serif" font-size="51" font-weight="650" fill="#F7F8FA" ><tspan x="80" dy="0">Una conversación puede cambiar de responsable</tspan></text>
+    <text x="80" y="255" font-family="Poppins, Arial, sans-serif" font-size="21" font-weight="400" fill="#BEC6CE" >El sistema separa intenciones sin pedirle al cliente que empiece de nuevo.</text>
+
+    <g filter="url(#softShadow)"><rect x="80" y="330" width="1090" height="120" rx="26" fill="#17283C"/></g>
+    <text x="120" y="372" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="650" fill="#214BD9" letter-spacing="1.4">MENSAJE DEL CLIENTE</text>
+    <text x="120" y="420" font-family="Poppins, Arial, sans-serif" font-size="23" font-weight="600" fill="#F7F8FA" >“Necesito cotizar agua potable y corregir una factura anterior.”</text>
+    <path d="M625 450 L625 492 M625 492 L350 520 M625 492 L900 520" fill="none" stroke="#214BD9" stroke-width="4" stroke-linecap="round"/>
+
+    <g filter="url(#softShadow)"><rect x="80" y="520" width="520" height="235" rx="26" fill="#17283C" stroke="#214BD9" stroke-width="2"/></g>
+    <rect x="115" y="548" width="145" height="42" rx="21" fill="#214BD9"/><text x="187.5" y="576" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">COTIZACIÓN</text>
+    <text x="115" y="630" font-family="Poppins, Arial, sans-serif" font-size="29" font-weight="650" fill="#F7F8FA" >ACLARAR</text>
+    <text x="115" y="670" font-family="Poppins, Arial, sans-serif" font-size="17" font-weight="450" fill="#F7F8FA" ><tspan x="115" dy="0">Pregunta matriz, norma y servicio.</tspan><tspan x="115" dy="24.65">No promete precio ni fecha final.</tspan></text>
+
+    <g filter="url(#softShadow)"><rect x="650" y="520" width="520" height="235" rx="26" fill="#3A211E" stroke="#F15E4A" stroke-width="2"/></g>
+    <rect x="685" y="548" width="145" height="42" rx="21" fill="#F15E4A"/><text x="757.5" y="576" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">FACTURA</text>
+    <text x="685" y="630" font-family="Poppins, Arial, sans-serif" font-size="29" font-weight="650" fill="#FFC0B2" >PREPARAR</text>
+    <text x="685" y="670" font-family="Poppins, Arial, sans-serif" font-size="17" font-weight="450" fill="#FFC0B2" ><tspan x="685" dy="0">Explica lo documentado y reúne referencia.</tspan><tspan x="685" dy="24.65">No corrige ni confirma una refacturación.</tspan></text>
+
+    <line x1="1205" y1="315" x2="1205" y2="830" stroke="#F15E4A" stroke-width="4" stroke-dasharray="11 10"/>
+    <rect x="1120" y="300" width="170" height="42" rx="21" fill="#F15E4A"/><text x="1205" y="328" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">FRONTERA</text>
+    <path d="M1168 665 L1231 665" stroke="#F15E4A" stroke-width="4" stroke-linecap="round"/><path d="M1229 656 L1245 665 L1229 674" fill="none" stroke="#F15E4A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <g filter="url(#softShadow)"><rect x="1245" y="470" width="275" height="360" rx="28" fill="#2A2D2C"/></g>
+    <text x="1280" y="530" font-family="Poppins, Arial, sans-serif" font-size="16" font-weight="650" fill="#F15E4A" letter-spacing="1.4">PERSONA</text>
+    <text x="1280" y="600" font-family="Poppins, Arial, sans-serif" font-size="36" font-weight="650" fill="#FFFFFF" >Decidir</text>
+    <text x="1280" y="650" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="400" fill="#FFFFFF" ><tspan x="1280" dy="0">Revisa la factura,</tspan><tspan x="1280" dy="26.099999999999998">confirma la acción</tspan><tspan x="1280" dy="26.099999999999998">y asume el compromiso.</tspan></text>
+
+    <g filter="url(#softShadow)"><rect x="80" y="790" width="1090" height="120" rx="24" fill="#082D50"/></g>
+    <text x="120" y="832" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="650" fill="#87C1F2" letter-spacing="1.4">MEMORIA + HANDOFF</text>
+    <rect x="120" y="852" width="170" height="42" rx="21" fill="#214BD9"/><text x="205" y="880" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">EMPRESA</text><rect x="310" y="852" width="170" height="42" rx="21" fill="#214BD9"/><text x="395" y="880" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">SERVICIO</text><rect x="500" y="852" width="190" height="42" rx="21" fill="#214BD9"/><text x="595" y="880" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">REFERENCIA</text><rect x="710" y="852" width="210" height="42" rx="21" fill="#F15E4A"/><text x="815" y="880" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">RESUMEN ÚTIL</text><rect x="940" y="852" width="190" height="42" rx="21" fill="#214BD9"/><text x="1035" y="880" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">SIN REINICIAR</text>
+
+
+  <!-- Official Efeonce wordmark is composited deterministically during rasterization. -->
+</svg>

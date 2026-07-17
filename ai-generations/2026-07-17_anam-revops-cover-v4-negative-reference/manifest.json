@@ -1,0 +1,16 @@
+{
+  "runId": "2026-07-17_anam-revops-cover-v4-negative-reference",
+  "status": "planned",
+  "model": "gpt-image-2",
+  "operation": "edit",
+  "quality": "high",
+  "size": "2048x1152",
+  "method": "positive-reference-plus-semantic-negative-reference",
+  "references": [
+    { "path": "refs/01-positive-chart-sculpture-v3.png", "polarity": "positive", "role": "master-direction" },
+    { "path": "refs/02-negative-rejected-dashboard-v2.png", "polarity": "negative", "role": "rejected-visual-territory" },
+    { "path": "refs/03-positive-hubspot-bars.png", "polarity": "positive", "role": "bar-rhythm" },
+    { "path": "refs/04-positive-efeonce-data-discipline.png", "polarity": "positive", "role": "information-design-discipline" }
+  ],
+  "note": "GPT Image 2 has no native negative-image weight. Polarity is communicated semantically in the prompt and must be verified visually."
+}

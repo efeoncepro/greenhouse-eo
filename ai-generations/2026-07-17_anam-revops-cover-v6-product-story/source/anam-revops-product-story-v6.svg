@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="1152" viewBox="0 0 2048 1152" role="img" aria-labelledby="title desc">
+  <title id="title">Caso ANAM: cobertura y confianza del indicador</title>
+  <desc id="desc">Dos superficies analíticas superpuestas muestran la cobertura observada en HubSpot y su clasificación diagnóstica frente al umbral de un KPI oficial.</desc>
+  <defs>
+    <radialGradient id="campaignGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1610 100) rotate(142) scale(920 650)">
+      <stop stop-color="#C93700" stop-opacity=".34"/>
+      <stop offset=".48" stop-color="#6E173B" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#290519" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="deepCard" x1="510" y1="160" x2="1270" y2="750" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071D35"/>
+      <stop offset="1" stop-color="#041326"/>
+    </linearGradient>
+    <linearGradient id="gaugeBlue" x1="1032" y1="0" x2="1392" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#024C8F"/>
+      <stop offset="1" stop-color="#0375DB"/>
+    </linearGradient>
+    <filter id="backShadow" x="470" y="128" width="840" height="670" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="5" stdDeviation="10" flood-color="#10000A" flood-opacity=".28"/>
+    </filter>
+    <filter id="frontShadow" x="795" y="375" width="800" height="640" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="4" dy="24" stdDeviation="20" flood-color="#10000A" flood-opacity=".32"/>
+    </filter>
+    <clipPath id="backClip"><rect x="510" y="160" width="760" height="590" rx="28"/></clipPath>
+  </defs>
+
+  <rect width="2048" height="1152" fill="#290519"/>
+  <rect width="2048" height="1152" fill="url(#campaignGlow)"/>
+
+  <!-- Back product surface: context and evolution -->
+  <g filter="url(#backShadow)">
+    <rect x="510" y="160" width="760" height="590" rx="28" fill="url(#deepCard)"/>
+    <rect x="511" y="161" width="758" height="588" rx="27" fill="none" stroke="#FFFFFF" stroke-opacity=".12" stroke-width="2"/>
+  </g>
+  <g clip-path="url(#backClip)">
+    <text x="575" y="220" fill="#7FBDF4" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="3">CASO ANAM · HUBSPOT</text>
+    <text x="575" y="272" fill="#FFFFFF" font-family="Poppins, Arial, sans-serif" font-size="36" font-weight="600">Cobertura del dato</text>
+
+    <circle cx="582" cy="322" r="7" fill="#FF6846"/>
+    <text x="602" y="329" fill="#E7F1FA" font-family="Geist, Arial, sans-serif" font-size="20">Cobertura observada</text>
+    <line x1="824" y1="322" x2="856" y2="322" stroke="#6EC207" stroke-width="4" stroke-dasharray="8 7"/>
+    <text x="870" y="329" fill="#E7F1FA" font-family="Geist, Arial, sans-serif" font-size="20">Umbral KPI · 95%</text>
+
+    <g font-family="Geist, Arial, sans-serif" font-size="16" fill="#B7CADB">
+      <text x="567" y="389" text-anchor="end">100%</text>
+      <text x="567" y="459" text-anchor="end">75%</text>
+      <text x="567" y="529" text-anchor="end">50%</text>
+      <text x="567" y="599" text-anchor="end">25%</text>
+      <text x="567" y="669" text-anchor="end">0%</text>
+    </g>
+    <g stroke="#FFFFFF" stroke-opacity=".15" stroke-width="1.5">
+      <line x1="590" y1="384" x2="1200" y2="384"/>
+      <line x1="590" y1="454" x2="1200" y2="454"/>
+      <line x1="590" y1="524" x2="1200" y2="524"/>
+      <line x1="590" y1="594" x2="1200" y2="594"/>
+      <line x1="590" y1="664" x2="1200" y2="664"/>
+    </g>
+
+    <line x1="590" y1="398" x2="1200" y2="398" stroke="#6EC207" stroke-width="3" stroke-dasharray="10 9" opacity=".88"/>
+    <path d="M680 529.7 C760 527.5 830 524.5 900 521.2 S1045 516.8 1120 514.0" fill="none" stroke="#FF6846" stroke-width="7" stroke-linecap="round"/>
+    <g fill="#F8FBFE" stroke="#FF6846" stroke-width="6">
+      <circle cx="680" cy="529.7" r="10"/>
+      <circle cx="900" cy="521.2" r="10"/>
+      <circle cx="1120" cy="514" r="10"/>
+    </g>
+    <g fill="#B7CADB" font-family="Geist, Arial, sans-serif" font-size="17">
+      <text x="680" y="706" text-anchor="middle">Antes</text>
+      <text x="900" y="706" text-anchor="middle">Ajuste</text>
+      <text x="1120" y="706" text-anchor="middle">Verificación</text>
+    </g>
+  </g>
+
+  <!-- Front product surface: decision and confidence -->
+  <g filter="url(#frontShadow)">
+    <rect x="880" y="420" width="665" height="520" rx="28" fill="#D9EAF8"/>
+    <rect x="881" y="421" width="663" height="518" rx="27" fill="none" stroke="#FFFFFF" stroke-opacity=".74" stroke-width="2"/>
+  </g>
+  <text x="925" y="490" fill="#06315B" font-family="Poppins, Arial, sans-serif" font-size="36" font-weight="600">Confianza del indicador</text>
+
+  <circle cx="932" cy="540" r="7" fill="#0375DB"/>
+  <text x="952" y="547" fill="#244B70" font-family="Geist, Arial, sans-serif" font-size="19">Cobertura actual</text>
+  <circle cx="1150" cy="540" r="7" fill="#6EC207"/>
+  <text x="1170" y="547" fill="#244B70" font-family="Geist, Arial, sans-serif" font-size="19">KPI oficial · ≥95%</text>
+
+  <path d="M1032 790 A180 180 0 0 1 1392 790" fill="none" stroke="#B8CEE0" stroke-width="52" stroke-linecap="butt"/>
+  <path d="M1032 790 A180 180 0 0 1 1392 790" fill="none" stroke="url(#gaugeBlue)" stroke-width="52" stroke-linecap="butt" stroke-dasharray="286.88 278.61"/>
+  <path d="M1032 790 A180 180 0 0 1 1392 790" fill="none" stroke="#6EC207" stroke-width="52" stroke-linecap="butt" stroke-dasharray="28.27 537.22" stroke-dashoffset="28.27"/>
+
+  <g fill="#244B70" font-family="Geist, Arial, sans-serif" font-size="17">
+    <text x="1006" y="824" text-anchor="middle">0</text>
+    <text x="1085" y="650" text-anchor="middle">25</text>
+    <text x="1212" y="598" text-anchor="middle">50</text>
+    <text x="1339" y="650" text-anchor="middle">75</text>
+    <text x="1418" y="824" text-anchor="middle">100</text>
+  </g>
+
+  <line x1="1212" y1="790" x2="1216" y2="620" stroke="#FF6846" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="1212" cy="790" r="13" fill="#06315B"/>
+  <path d="M1216 620 L1201 651 L1232 650 Z" fill="#FF6846"/>
+
+  <text x="1212" y="852" fill="#06315B" font-family="Geist, Arial, sans-serif" font-size="66" font-weight="700" text-anchor="middle">50,73%</text>
+  <text x="1212" y="894" fill="#06315B" font-family="Poppins, Arial, sans-serif" font-size="21" font-weight="600" letter-spacing="3" text-anchor="middle">DIAGNÓSTICO</text>
+  <text x="1212" y="926" fill="#426787" font-family="Geist, Arial, sans-serif" font-size="17" text-anchor="middle">Deal asociado a Company</text>
+
+  <!-- The official negative Efeonce wordmark is composited after rasterization. -->
+</svg>

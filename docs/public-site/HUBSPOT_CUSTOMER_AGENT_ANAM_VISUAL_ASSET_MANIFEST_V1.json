@@ -1,0 +1,246 @@
+{
+  "runId": "2026-07-17_anam-customer-agent",
+  "status": "public_verified",
+  "article": {
+    "slug": "ia-atencion-cliente-caso-anam",
+    "sourceRef": "docs/public-site/HUBSPOT_CUSTOMER_AGENT_ANAM_ARTICLE_DRAFT_V4.md",
+    "publicationStatus": "wordpress_public_verified"
+  },
+  "visualSystem": {
+    "name": "La conversación visible y la frontera que la sostiene",
+    "brandModel": "Efeonce-owned editorial system with contextual HubSpot accents",
+    "motif": "Una línea de conversación cambia de dueño al cruzar una frontera humana",
+    "bodyCanvas": "transparent",
+    "themeContract": "deliberate light and dark variants; never CSS inversion",
+    "responsiveContract": "desktop horizontal and mobile vertical art direction",
+    "invariants": [
+      "knowledge precedes response",
+      "human responsibility remains visible",
+      "no simulated product UI",
+      "no claim of active runtime"
+    ]
+  },
+  "permissions": {
+    "anamNameInVisuals": "approved_as_case_text",
+    "anamLogo": "not_required",
+    "portalScreenshots": "not_required",
+    "articleUse": "approved",
+    "socialDistribution": "not_in_scope"
+  },
+  "production": {
+    "directory": "ai-generations/2026-07-17_anam-customer-agent",
+    "builder": "ai-generations/2026-07-17_anam-customer-agent/build-assets.mjs",
+    "integrityReport": "ai-generations/2026-07-17_anam-customer-agent/build-report-v2.json",
+    "renderEngine": "sharp/libvips from accessible SVG sources",
+    "brandSources": [
+      "public/branding/logo-negative.svg",
+      "public/branding/logo-full.svg"
+    ],
+    "qa": {
+      "standalone": "all light and dark proofs inspected at original resolution",
+      "alpha": "all 12 body PNG/WebP variants report hasAlpha=true, alphaMin=0 and alphaMax=255",
+      "context": "light variants proofed on #FFFFFF; dark variants proofed on #111013",
+      "privateIntegration": "Historical WordPress filtered-content fixture passed desktop/mobile × light/dark",
+      "publicIntegration": "Live Ohio render passed desktop/mobile × light/dark; each picture selected the expected v2 source",
+      "pending": "none for publication; Customer Agent runtime remains a separate operational state"
+    }
+  },
+  "history": {
+    "privateIntegratedV1": {
+      "status": "superseded_for_runtime",
+      "bodyMediaIds": "251419–251430",
+      "integrityReport": "ai-generations/2026-07-17_anam-customer-agent/build-report.json",
+      "deepInspection": "docs/operations/public-site-content-factory/post-deep-inspection-251432-2026-07-17T17-16-19+00-00.json",
+      "note": "Conserva provenance del primer corte privado; no describe los assets que sirve el post publicado."
+    }
+  },
+  "assets": [
+    {
+      "conceptId": "ANAM-CA-V01",
+      "slot": "hero_featured_og",
+      "function": "Show that a visible conversation depends on knowledge, limits and a change of responsibility",
+      "explanatoryDelta": "Instala en una sola escena la dependencia entre conversación visible, fuentes y cambio de responsabilidad sin simular una interfaz.",
+      "status": "integrated_public",
+      "canvas": "opaque",
+      "deliveryContract": {
+        "viewport": "crop_safe",
+        "theme": "single_theme",
+        "canvas": "opaque",
+        "skin": "contextual_platform",
+        "rationale": "Featured y OG necesitan color estable y una zona central segura para los crops del blog y redes."
+      },
+      "source": "ai-generations/2026-07-17_anam-customer-agent/source/anam-ca-hero-v1.svg",
+      "master": "docs/assets/public-site/anam-customer-agent/anam-ca-hero-master-v1.png",
+      "derivatives": {
+        "featured": "docs/assets/public-site/anam-customer-agent/anam-ca-hero-web-1600-v1.webp",
+        "openGraph": "docs/assets/public-site/anam-customer-agent/anam-ca-hero-og-1440x757-v1.jpg"
+      },
+      "metadata": {
+        "alt": "Una conversación avanza desde 23 fuentes gobernadas y cambia de responsable al llegar a una decisión humana.",
+        "caption": null,
+        "description": "Portada conceptual Efeonce con acentos HubSpot; no representa una interfaz ni una conversación operativa real."
+      },
+      "qa": {
+        "status": "pass",
+        "cropProof": "docs/assets/public-site/anam-customer-agent/anam-ca-hero-square-proof-v1.png"
+      },
+      "media": {
+        "featured": { "id": 251417, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-hero-web-1600-v1.webp", "mime": "image/webp" },
+        "openGraph": { "id": 251418, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-hero-og-1440x757-v1.jpg", "mime": "image/jpeg" }
+      }
+    },
+    {
+      "conceptId": "ANAM-CA-V02",
+      "slot": "body_diagram",
+      "function": "Reconstruct a mixed conversation and show how context survives the change of responsibility",
+      "explanatoryDelta": "Hace visible cómo dos intenciones se separan, comparten memoria y cambian de responsable dentro de una misma conversación.",
+      "status": "integrated_public",
+      "canvas": "transparent",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "light_dark",
+        "canvas": "transparent",
+        "skin": "contextual_platform",
+        "rationale": "Las cuatro zonas requieren composición horizontal en desktop, vertical en móvil y convivencia con ambos temas."
+      },
+      "variants": {
+        "desktopLight": "docs/assets/public-site/anam-customer-agent/anam-ca-autonomy-desktop-web-1600-v2.webp",
+        "mobileLight": "docs/assets/public-site/anam-customer-agent/anam-ca-autonomy-mobile-web-1200-v2.webp",
+        "desktopDark": "docs/assets/public-site/anam-customer-agent/anam-ca-autonomy-desktop-dark-web-1600-v2.webp",
+        "mobileDark": "docs/assets/public-site/anam-customer-agent/anam-ca-autonomy-mobile-dark-web-1200-v2.webp"
+      },
+      "metadata": {
+        "alt": "Una consulta combina cotización y facturación: el agente aclara la primera, prepara la segunda y transfiere la decisión a una persona con empresa, servicio, referencia y resumen.",
+        "caption": "Un buen handoff conserva el contexto y cambia la responsabilidad sin obligar al cliente a empezar de nuevo.",
+        "description": "Reconstrucción editorial de una conversación mixta; no es una transcripción ni evidencia de runtime."
+      },
+      "qa": { "status": "pass", "responsive": true, "themeVariants": true, "alpha": true },
+      "media": {
+        "desktopLight": { "id": 251438, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-web-1600-v2.webp" },
+        "mobileLight": { "id": 251439, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-mobile-web-1200-v2.webp" },
+        "desktopDark": { "id": 251440, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-dark-web-1600-v2.webp" },
+        "mobileDark": { "id": 251441, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-mobile-dark-web-1200-v2.webp" }
+      }
+    },
+    {
+      "conceptId": "ANAM-CA-V03",
+      "slot": "body_diagram",
+      "function": "Show how 23 sources pass through governance before shaping answers or handoff",
+      "explanatoryDelta": "Transforma un inventario de fuentes en un mecanismo gobernado que conecta propósito, vigencia, responsabilidad y conducta.",
+      "status": "integrated_public",
+      "canvas": "transparent",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "light_dark",
+        "canvas": "transparent",
+        "skin": "contextual_platform",
+        "rationale": "La secuencia fuentes, gobierno y conducta necesita reordenarse en móvil y conservar contraste en ambos temas."
+      },
+      "variants": {
+        "desktopLight": "docs/assets/public-site/anam-customer-agent/anam-ca-knowledge-desktop-web-1600-v2.webp",
+        "mobileLight": "docs/assets/public-site/anam-customer-agent/anam-ca-knowledge-mobile-web-1200-v2.webp",
+        "desktopDark": "docs/assets/public-site/anam-customer-agent/anam-ca-knowledge-desktop-dark-web-1600-v2.webp",
+        "mobileDark": "docs/assets/public-site/anam-customer-agent/anam-ca-knowledge-mobile-dark-web-1200-v2.webp"
+      },
+      "metadata": {
+        "alt": "Veintitrés fuentes —seis archivos privados y diecisiete respuestas cortas— pasan por cuatro controles antes de responder, preguntar o transferir; 356 registros técnicos no equivalen a servicios disponibles.",
+        "caption": "Las fuentes sólo se vuelven conocimiento útil cuando tienen propósito, vigencia, responsable y reglas para resolver contradicciones.",
+        "description": "Arquitectura editorial de las 23 fuentes; 356 registros técnicos pertenecen a un catálogo y no representan capacidades activas."
+      },
+      "qa": { "status": "pass", "responsive": true, "themeVariants": true, "alpha": true, "exactSourceCount": "6 + 17 = 23" },
+      "media": {
+        "desktopLight": { "id": 251434, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-web-1600-v2.webp" },
+        "mobileLight": { "id": 251435, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-mobile-web-1200-v2.webp" },
+        "desktopDark": { "id": 251436, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-dark-web-1600-v2.webp" },
+        "mobileDark": { "id": 251437, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-mobile-dark-web-1200-v2.webp" }
+      }
+    },
+    {
+      "conceptId": "ANAM-CA-V04",
+      "slot": "body_diagram_social_source",
+      "function": "Separate vendor documentation, eligibility, configuration, preview testing and runtime verification",
+      "explanatoryDelta": "Muestra la cadena de evidencia y el punto exacto donde una dependencia impide convertir configuración y preview en operación verificada.",
+      "status": "integrated_public",
+      "canvas": "transparent",
+      "deliveryContract": {
+        "viewport": "art_directed",
+        "theme": "light_dark",
+        "canvas": "transparent",
+        "skin": "contextual_platform",
+        "rationale": "La escalera horizontal pierde legibilidad en móvil y sus estados necesitan tratamientos deliberados para light y dark."
+      },
+      "variants": {
+        "desktopLight": "docs/assets/public-site/anam-customer-agent/anam-ca-evidence-desktop-web-1600-v2.webp",
+        "mobileLight": "docs/assets/public-site/anam-customer-agent/anam-ca-evidence-mobile-web-1200-v2.webp",
+        "desktopDark": "docs/assets/public-site/anam-customer-agent/anam-ca-evidence-desktop-dark-web-1600-v2.webp",
+        "mobileDark": "docs/assets/public-site/anam-customer-agent/anam-ca-evidence-mobile-dark-web-1200-v2.webp"
+      },
+      "metadata": {
+        "alt": "La evidencia llega desde documentación y configuración hasta pruebas en vista previa; una dependencia administrativa de facturación interrumpe la verificación de conversaciones nuevas, resolución, handoff y medición en operación real.",
+        "caption": "Una configuración visible no demuestra que una conversación nueva pueda entrar, resolverse, transferirse y medirse.",
+        "description": "Escalera de evidencia operativa con estado ANAM al corte del 17 de julio de 2026."
+      },
+      "qa": { "status": "pass", "responsive": true, "themeVariants": true, "alpha": true, "runtimeClaim": "not verified" },
+      "media": {
+        "desktopLight": { "id": 251442, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-web-1600-v2.webp" },
+        "mobileLight": { "id": 251443, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-mobile-web-1200-v2.webp" },
+        "desktopDark": { "id": 251444, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-dark-web-1600-v2.webp" },
+        "mobileDark": { "id": 251445, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-mobile-dark-web-1200-v2.webp" }
+      }
+    }
+  ],
+  "wordpress": {
+    "postId": 251432,
+    "status": "publish",
+    "author": { "id": 1, "name": "Julio Reyes" },
+    "category": { "id": 19, "name": "HubSpot" },
+    "tags": [],
+    "slug": "ia-atencion-cliente-caso-anam",
+    "permalink": "https://efeoncepro.com/hubspot/ia-atencion-cliente-caso-anam/",
+    "editUrl": "https://efeoncepro.com/wp-admin/post.php?post=251432&action=edit",
+    "manifestId": "greenhouse-cf-ia-atencion-cliente-caso-anam-v1",
+    "contentSha256": "845f31055ef18c95328a104fb768410963ac030f73241986ee53efd79f718b42",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+    "featuredMediaId": 251417,
+    "openGraphMediaId": 251418,
+    "deepInspection": "docs/operations/public-site-content-factory/post-deep-inspection-251432-2026-07-17T18-15-26+00-00.json"
+  },
+  "runtimeQa": {
+    "generatedDraft": { "status": "pass", "semanticBlockCount": 114, "media": true },
+    "deepInspection": { "status": "pass", "mediaIssueCount": 0, "nonEmptyFreeformCount": 0, "linkCount": 32 },
+    "anonymousPermalink": { "status": "pass", "httpStatus": 200, "reason": "published URL is anonymously accessible and indexable" },
+    "mediaHttp": { "status": "pass", "hero": 200, "openGraph": 200, "bodyVariants": 200 },
+    "privateRenderFixture": {
+      "status": "pass",
+      "viewports": ["1440x1000", "390x844"],
+      "themes": ["light", "dark"],
+      "horizontalOverflow": false,
+      "brokenImages": 0,
+      "sourceSelection": "desktop/mobile and light/dark variants selected as declared"
+    },
+    "authenticatedOhioTemplate": "superseded_by_public_render",
+    "publicVerification": {
+      "status": "pass",
+      "viewports": ["1440x1000", "390x844"],
+      "themes": ["light", "dark"],
+      "horizontalOverflow": false,
+      "brokenImages": 0,
+      "consoleErrors": 0,
+      "pageErrors": 0,
+      "archiveCard": "pass",
+      "sitemap": "pass",
+      "report": ".captures/anam-customer-agent-public-2026-07-17/report.json",
+      "audit": "docs/public-site/HUBSPOT_CUSTOMER_AGENT_ANAM_WORDPRESS_PRIVATE_AUDIT_V1.md"
+    }
+  },
+  "pictureContract": {
+    "breakpoint": "860px",
+    "sourceOrder": [
+      "(prefers-color-scheme: dark) and (max-width: 860px) -> mobileDark",
+      "(max-width: 860px) -> mobileLight",
+      "(prefers-color-scheme: dark) -> desktopDark",
+      "fallback img -> desktopLight"
+    ],
+    "accessibility": "one img fallback, one ALT and one caption per concept; never duplicate hidden img elements"
+  }
+}

@@ -1,11 +1,12 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.0
-> **Actualizado:** 2026-07-16
+> **Versión:** 1.3
+> **Actualizado:** 2026-07-17
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
 > **Manual:** [`../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
+> **Servicios:** [Customer Agent gestionado](../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md) · [RevOps, automatización y paneles](../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
 
 ## Qué es
 
@@ -29,23 +30,24 @@ un ítem fuente de facturación. No se deben aplanar estos hechos en Company o D
 
 La landing live abre el chat oficial con tres intenciones: cotizar, seguimiento del servicio y requerimientos de
 calidad. Customer Agent responde conocimiento documentado, reúne contexto y deriva a Maria Paz Haeger cuando
-hace falta una acción humana. La licencia y 30.000 créditos pagados fueron confirmados; el consumo sigue siendo
-una métrica operativa.
+hace falta una acción humana. El source pack independiente y reconciliado versiona las 23 fuentes en uso, las
+17 respuestas cortas, el catálogo de 356 registros y el contrato de identidad/directrices/handoff/canales.
 
-La configuración live y QA están documentadas, pero al cierre no se localizó un source pack Markdown ANAM
-independiente que refleje todo el knowledge cargado. Hasta crearlo, el runtime del portal, `customer-agent.md`,
-la documentación CMS y el informe QA son el conjunto de evidencia. Owner: servicio gestionado Efeonce.
-Condición de retiro: source pack versionado y reconciliado antes del próximo cambio de knowledge.
+Aunque la compra de Customer Agent y 30.000 créditos adicionales fue confirmada el 16 de julio, el readback live
+del 17 de julio mostró 33.000 créditos mensuales, `El acceso gratuito terminó`, agente pausado y conversaciones
+nuevas en pausa. La cuenta está vencida por la factura `#760627868` (venció el 7 de junio de 2026) y HubSpot
+rechazó dos intentos confirmados de activar el uso de créditos. Es un bloqueo administrativo de facturación, no
+una eliminación de la configuración ni falta nominal de créditos. No hubo mutación efectiva durante los intentos.
 
 ## Estado por fase
 
 | Fase | Estado | Resultado vigente |
 |---|---|---|
-| Customer Agent y landing | Cerrada, en operación | Landing, tres intents, handoff y QA conversacional. |
+| Customer Agent y landing | Configuración cerrada; runtime bloqueado | Landing, tres intents, 23 fuentes, handoff y QA; agente pausado por acceso al 2026-07-17. |
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |
-| Renovación | Bloqueada | Requiere hechos reales, materialización por línea y reglas aprobadas. |
+| Renovación | Pipeline gobernado; medición bloqueada | Etapas semánticas, creación en `Por revisar` y compuertas live. GRR/NRR y lineage de Service siguen bloqueados por hechos reales y materialización por línea. |
 | Retención/Fidelización | Piloto, no oficial | Retención `21152855` (4 reports); Fidelización `21152950` (3). |
 | Tickets/SLA | Planificada | Se ejecuta después de las bases comerciales. |
 | Facturación | Diseño listo; construcción pendiente | Intake tenant-scoped, Account Unit + Billing Event y profiler read-only. |
@@ -59,6 +61,31 @@ empresa; no facturación, ingreso reconocido, TAM/SAM ni población completa.
 La cobertura Deal→Company pasó de 595/1.240 a 629/1.240 tras 34 asociaciones determinísticas. El saldo sin
 Company es **611 calculado**, no un nuevo readback del widget DQ: el reporte conserva baseline live 645. El gate
 oficial sigue siendo al menos 95% de cobertura elegible y dimensional.
+
+### Geografía de ejecución del Deal
+
+La sede y la ejecución se modelan por separado. `region_de_chile` en Company conserva la región de sede;
+`zona` (`Región`) en Deal registra una o más regiones donde se ejecuta el negocio dentro de Chile; y
+`ef_paises_de_ejecucion` (`Países de ejecución`) registra uno o más países de Latinoamérica donde se presta el
+negocio. Esta última propiedad quedó live el 2026-07-17 como multiselección de 20 países y su schema fue leído de
+vuelta desde HubSpot.
+
+La creación fue prospectiva y existen cero Deals poblados; no se agregó backfill, workflow ni reporte. Desde el
+2026-07-17 `Países de ejecución` es obligatorio al mover Growth a `Cierre ganado 100%` o Renovación a `Renovado`.
+La captura corresponde al owner/equipo comercial antes o durante la adjudicación. Como un Deal puede seleccionar varios países o regiones, estas dimensiones sirven para slicing
+diagnóstico, pero sus grupos no pueden sumarse como un total consolidado sin deduplicar por Deal.
+
+## Gobierno de los pipelines comerciales
+
+Los Deals nuevos requieren Company y una fecha de cierre elegida conscientemente; se retiró la fecha automática
+a 60 días. Growth sólo permite creación ordinaria en `Potencial 10%`. `Radar 0%` no cambió porque la
+precalificación ocurre en Lead. Calificado e Interesado exigen `Paso siguiente`; Hot agrega `Monto original`; el
+cierre ganado exige países, monto original y variación; los cierres negativos exigen motivo.
+
+Renovación conserva los stage IDs y ahora expresa el proceso real desde `Por revisar` hasta `Renovado`, `No
+renovado` o `No aplica / Desestimado`. La creación ordinaria parte en `Por revisar`; las cuatro etapas abiertas
+exigen `Paso siguiente`. Las automatizaciones de tareas por entrada futura a etapa quedaron diseñadas, no
+publicadas: requieren un slice con owner, vencimiento, notificación y prueba sin enrolamiento histórico.
 
 ## Calidad de datos y disciplina comercial
 
@@ -99,6 +126,11 @@ Billing es el siguiente slice de construcción comprometido, no “lo único pen
 la ratificación de Services, asociaciones restantes, KPI oficiales y automatizaciones; Tickets/SLA y otras fases
 permanecen en backlog.
 
+El inventario completo de trabajo abierto, su prioridad, owner, dependencias, aprobación y criterio de cierre
+vive en el [backlog canónico ANAM](../../architecture/kortex/hubspot-as-a-service/anam-open-work-and-exit-gates-2026-07-17.md).
+Incluye automatizaciones de pipeline, QA controlada, Calidad de Datos (DQ), Service/renovación, KPI oficiales,
+Customer Agent, facturación y Tickets/SLA. Ningún ítem documentado equivale por sí solo a autorización de write.
+
 ## Reglas de confianza
 
 - Un KPI oficial necesita período, definición, denominador, cobertura y owner.
@@ -109,7 +141,9 @@ permanecen en backlog.
 
 ## Referencias
 
+- [Catálogo HubSpot as a Service](../../services/hubspot-as-a-service/README.md)
 - [Roadmap](../../architecture/kortex/hubspot-as-a-service/anam-revops-implementation-roadmap-phases-2026-07-16.md)
 - [Modelo vivo](../../architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md)
 - [Handoff](../../architecture/kortex/hubspot-as-a-service/anam-next-session-handoff-2026-07-16.md)
 - [QA Customer Agent](../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)
+- [Customer Agent live source pack](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md)

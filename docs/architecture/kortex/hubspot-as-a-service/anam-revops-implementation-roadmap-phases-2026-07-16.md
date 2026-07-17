@@ -7,6 +7,10 @@
 
 > **Client boundary:** ANAM is an Efeonce client. This roadmap governs work in ANAM's HubSpot portal; it does not define a Greenhouse product capability, tenant dashboard or Efeonce CRM dataset.
 
+The consolidated backlog after the 2026-07-17 pipeline rollout lives in
+[`anam-open-work-and-exit-gates-2026-07-17.md`](anam-open-work-and-exit-gates-2026-07-17.md). It is the current
+source for priorities, owners, approvals and definition of done; this roadmap continues to own phase sequencing.
+
 ## Outcome
 
 HubSpot must connect the complete ANAM lifecycle:
@@ -22,11 +26,11 @@ The phases below are delivery increments, not separate projects. Each phase must
 
 | Phase | Purpose | Principal output | Current state |
 |---|---|---|---|
-| 0. Customer Agent and landing | Resolve documented demand and gather context before human handoff. | Live landing, configured agent, Markdown knowledge, QA and Maria Paz handoff. | Complete; monitor in operation. |
+| 0. Customer Agent and landing | Resolve documented demand and gather context before human handoff. | Live landing, configured agent, Markdown knowledge, QA and Maria Paz handoff. | Configuration complete; runtime blocked by ANAM billing administration until credit usage and a new conversation are verified. |
 | 1. Commercial reporting foundation | Turn already-ratified business definitions into trustworthy current-state reports. | Existing-report inventory, Data Quality control tower and Commercial Growth dashboard. | Complete: Data Quality, Growth, Renewal proxy, Q1-Q2 queue and exact-stage outcome reporting are published and verified. |
 | 2. Catalog and sale composition | Confirm what each Deal sold without relying on uncontrolled free text. | Product/line-item mapping and governed service-family catalog. | Minimum mapping is sufficient: 505/506 line items reference Products and all 220 Closed Won line items resolve to known Products. Full catalog rebuild is deferred. |
 | 3. Service and contract portfolio | Represent each awarded service after the Deal is won. | Approved Service dictionary, controlled pilot and activation review. | Pilot live: group + 10 properties, association labels, five controlled Services and activation-review workflow are live/read back. Synthetic activation inputs make the five calculate `fields_ready` for QA only; ANAM ratification and historical migration remain pending/`NO-GO`. |
-| 4. Renewal automation | Create a controlled path from expiring Service to renewal Deal and renewed Service. | Expiry queue, owner tasks, renewal linkage and exception handling. | Blocked by Phase 3. |
+| 4. Renewal automation | Create a controlled path from expiring Service to renewal Deal and renewed Service. | Expiry queue, owner tasks, renewal linkage and exception handling. | Pipeline foundation live: semantic stages, `Por revisar` entry rule and stage gates. Service-triggered creation, lineage and owner-task workflow remain blocked by Phase 3 facts/materializer. |
 | 5. Commercial management dashboards | Measure portfolio, renewal, Retention and Loyalty from reliable Services. | Service portfolio, Renewal, Retention and Loyalty dashboards. | Pilot live: Retention has four verified reports and Fidelización three. They use five synthetic-marked QA Services and are not official; production KPIs remain blocked by ratified coverage, periods and denominators. |
 | 6. Tickets and operational cases | Connect customer cases to the right Company, Contact and Service. | Ticket taxonomy, routing, SLA, resolution and Customer Agent escalation evidence. | Planned after commercial foundations. |
 | 7. Billing integration | Connect sold and contracted value with billing execution. | Governed Billing Event sync and billing/EDP dashboards. | Proposed; 16,898-row migration remains no-go. |
@@ -81,6 +85,14 @@ The five-row simulation in [`anam-phase-3-forward-pilot-dry-run-2026-07-16.md`](
 ## Phase 4 - Renewal automation
 
 An expiring Service creates a review queue and owner task. A renewal Deal is opened or linked only under approved rules. Winning it creates a new Service linked to the prior Service; historical Services are never overwritten. Automation must not mark a renewal won or invent value.
+
+The 2026-07-17 governance slice completed the Deal-side foundation without claiming Service automation: the
+same Renewal stage IDs now express `Por revisar`, eligibility, contact, negotiation and the three terminal
+outcomes; normal creation is limited to `Por revisar`; open stages require `Paso siguiente`; positive/negative
+outcomes require geography or loss reason. Growth received equivalent capture gates while `Radar 0%` remained
+unchanged because pre-qualification belongs to Lead. The eight owner-task actions remain designed but
+unpublished until their due-date/notification/dedupe contract and a future-entry test are approved. Canon:
+[`anam-commercial-pipeline-governance-change-set-2026-07-17.md`](anam-commercial-pipeline-governance-change-set-2026-07-17.md).
 
 ## Phase 5 - Commercial management dashboards
 

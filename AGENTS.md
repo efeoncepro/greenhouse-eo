@@ -13,6 +13,9 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Convencion documental vigente:
   - `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md` quedan en raiz.
   - specs, tasks, roadmap y guias especializadas viven bajo `docs/`.
+  - `docs/services/` es el catálogo canónico de servicios que Efeonce ofrece y opera para clientes: resultado,
+    alcance, entregables, responsabilidades, evidencia y continuidad. No reemplaza arquitectura, documentación
+    funcional/manuales, propuestas comerciales, catálogos runtime ni objetos CRM. Índice: `docs/services/README.md`.
   - `docs/context/` vive bajo `docs/` como el **context pack de negocio, marca, GTM, producto y experiencia cliente** de Efeonce/Greenhouse. El indice vigente es `docs/context/00_INDEX.md`; no reemplaza arquitectura, runtime, `DESIGN.md` ni specs tecnicas, pero debe consultarse antes de proponer o construir features con impacto de producto, copy, naming, metricas, HubSpot/Account 360, onboarding, cliente o estrategia comercial.
   - `docs/audits/` vive bajo `docs/` como categoria formal para auditorias tecnicas y operativas versionadas. El indice vigente es `docs/audits/README.md`.
   - las auditorias deben consumirse como input operativo frecuente cuando un cambio toca el sistema auditado, pero nunca asumirse vigentes a ciegas: antes de apoyarse en una auditoria hay que verificar si el runtime, el codigo o la arquitectura siguen reflejando lo que documento, o si hace falta abrir una auditoria nueva/refresh.
@@ -358,6 +361,7 @@ El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capa
 - Tres capas de documentacion, cada una con su proposito:
   - `docs/architecture/` — contratos tecnicos para agentes y desarrolladores (schemas, APIs, decisiones de diseno)
   - `docs/architecture/DECISIONS_INDEX.md` — indice maestro de ADRs y decisiones aceptadas; no duplica specs, enlaza el contrato canonico.
+  - `docs/services/` — fichas de servicios operables/comercializables: outcome, alcance, entregables, evidencia, responsabilidades y continuidad; enlazan las tres capas sin duplicarlas.
   - `docs/documentation/` — explicaciones funcionales en lenguaje simple (roles, flujos, reglas de negocio). Cada documento enlaza a su spec tecnica
   - `docs/manual-de-uso/` — guias operativas paso a paso para usuarios del portal (como usar, permisos, cuidados, troubleshooting)
   - `docs/audits/` — auditorias tecnicas y operativas reutilizables, fechadas y acotadas por scope. Se consumen frecuentemente como contexto para decisiones, pero siempre deben revalidarse contra el estado actual antes de tratarlas como vigentes.

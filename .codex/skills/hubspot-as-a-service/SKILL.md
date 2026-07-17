@@ -50,6 +50,8 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 
 - Never create a property because an email names a field. Confirm object, internal name, type, options, source, owner, requiredness, backfill and downstream consumers.
 - Never treat Customer Agent persona, knowledge, actions and handoff as one prompt. They are separate contracts.
+- Never conflate Customer Agent `Deployment > Workflows and bots` with agent knowledge, Customer Agent actions, or the workflow action that runs a Breeze Studio agent. It is a selective conversation-assignment layer; inventory and test its routing separately.
+- Never present a Customer Agent feature as available because HubSpot documents it. Classify it as vendor-documented, portal-eligible, configured/draft, published, and runtime-verified; keep betas, credits, seats, permissions and account state explicit.
 - Keep Customer Agent knowledge sources in Markdown when this service owns the content.
 - Do not promise API parity. Verify whether a setting is available through CRM APIs, Customer Agent APIs, Agent CLI, CMS APIs or only the authenticated UI.
 - Do not publish, activate workflows, change licenses/permissions, or perform destructive writes without explicit approval.
