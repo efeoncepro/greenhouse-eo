@@ -1,20 +1,20 @@
-# Customer Agent ANAM — auditoría del borrador privado en WordPress
+# Customer Agent ANAM — auditoría WordPress privada y cierre de publicación
 
-> **Estado:** `private content + SEO + evidence package complete; authenticated Ohio render pending`
+> **Estado:** `publicado y verificado`; este documento conserva la auditoría privada y el cierre live
 > **Fecha:** 2026-07-17
 > **Post:** `251432`
-> **Publicación:** no autorizada ni ejecutada
+> **Publicación:** autorizada y ejecutada el 2026-07-17
 
-## Resultado
+## Resultado de la fase privada
 
-El segundo artículo del caso ANAM quedó integrado como post privado en WordPress. La operación fue autorizada por
-el operador en esta tarea después del commit editorial `f09ec6d3e`. No se envió nada a ANAM y no se publicó el
-artículo.
+El segundo artículo del caso ANAM quedó integrado inicialmente como post privado en WordPress. Esa operación fue
+autorizada por el operador en esta tarea después del commit editorial `f09ec6d3e`. En esa fase no se envió nada a
+ANAM ni se publicó el artículo; el cierre live se documenta más adelante.
 
 - Título: `¿Qué necesita una IA para atender bien a tus clientes? Lo que aprendimos diseñando el Customer Agent de ANAM`.
 - Slug: `ia-atencion-cliente-caso-anam`.
-- URL futura: `https://efeoncepro.com/hubspot/ia-atencion-cliente-caso-anam/`.
-- Estado: `private`; el permalink respondió `404` sin autenticación.
+- URL prevista en esa fase: `https://efeoncepro.com/hubspot/ia-atencion-cliente-caso-anam/`.
+- Estado de esa fase: `private`; el permalink respondió `404` sin autenticación.
 - Autor: Julio Reyes (`1`).
 - Categoría y primaria Yoast: HubSpot (`19`).
 - Tags: ninguno.
@@ -133,5 +133,80 @@ El artículo conserva explícitamente que el Customer Agent estaba configurado y
 verificado para conversaciones nuevas en operación real al corte. También mantiene el bloqueo administrativo de
 facturación sin exponer montos ni datos sensibles. Nada en esta integración convierte al agente en activo.
 
-Para publicar todavía se requiere autorización humana explícita, snapshot/rollback de publicación, QA live,
-canonical/indexación final y comprobación del template público. No ejecutar `publish` a partir de este estado.
+Este fue el estado previo a la autorización final. La publicación, sus guards, el rollback preparado y la
+verificación anónima quedaron registrados en el cierre siguiente.
+
+## Cierre de publicación — 2026-07-17
+
+El operador autorizó explícitamente publicar y luego hacer commit. La publicación se ejecutó sobre el mismo post
+`251432`, sin crear una segunda entrada y después de aprobar `public-website:ssh-check`.
+
+- Snapshot recuperable previo a publicación:
+  `/tmp/greenhouse-anam-customer-agent-251432-before-publish-20260717-180700.json`.
+- SHA-256 del snapshot:
+  `464f3a8f34628beeb562044905061c8eea7935550d9ecaa641be70235b644b07`.
+- Rollback preparado: restaurar `private`, `noindex` y el estado completo registrado en el snapshot.
+- Estado final: `publish`; autor `1`; categoría `19`; categoría primaria Yoast `19`; tags vacíos.
+- Featured: `251417`; Open Graph/Twitter: `251418`.
+- Contenido publicado inicialmente con SHA-256
+  `6bfa99a5bbbc672ef5c9edd47041419bd687a17183462aa1b9e9bdec6b8554f2`.
+- Spec Gutenberg de la aprobación inicial con SHA-256
+  `11acacc807cc1b0cbc0f74eb1bfb42c26d10d71d5cf9826f817af6b0bee20599`.
+- Cache Kinsta purgada después del cambio.
+
+### Verificación live
+
+La URL pública es
+`https://efeoncepro.com/hubspot/ia-atencion-cliente-caso-anam/`. Dos lecturas anónimas sin cache y cuatro renders
+Playwright devolvieron `200` estable y confirmaron:
+
+- un canonical único y exacto, sin redirect ni copia pública equivalente detectada en Think;
+- robots `index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1` y ausencia de `noindex`;
+- meta title renderizado `IA para atención al cliente: caso ANAM - Efeonce`;
+- Open Graph `article` y Twitter `summary_large_image`, ambos con el JPEG social `1440×757`;
+- grafo Yoast con `Article` + `BlogPosting`, `WebPage` + `ItemPage`, `ImageObject`, `BreadcrumbList`, `WebSite`,
+  `Organization` y `Person`; autor `Julio Reyes` y `articleSection: HubSpot`;
+- un H1, once H2 editoriales, cuatro H3 y quince anchors de TOC únicos y resolubles;
+- tres figuras, tres `<picture>`, tres captions y selección correcta de variantes desktop/móvil × light/dark;
+- cero imágenes rotas, cero errores de consola, cero errores de página y cero overflow horizontal en
+  `1440×1000` y `390×844`;
+- presencia literal de las fronteras sobre 23 fuentes, tres intenciones, pruebas, handoff, seis limitaciones,
+  bloqueo de facturación y estado no operativo del agente al corte.
+
+La tarjeta editorial aparece con título, featured y ALT correcto en el archivo de HubSpot, sin overflow en
+desktop ni móvil. La URL ya figura en `post-sitemap.xml`. Las diez URL HTTP únicas del artículo respondieron
+`200`, incluidas las fuentes oficiales de HubSpot, DOI, Zendesk, el primer artículo ANAM y los medios.
+
+El readback autenticado final quedó versionado en
+[post-deep-inspection-251432-2026-07-17T18-15-26+00-00.json](../operations/public-site-content-factory/post-deep-inspection-251432-2026-07-17T18-15-26+00-00.json):
+estado `publish`, 227 bloques inspeccionados, 32 enlaces, cero problemas de medios y cero `core/freeform` no
+vacíos. La evidencia visual y los reportes locales viven en
+`.captures/anam-customer-agent-public-2026-07-17/` y permanecen ignorados por Git.
+
+### Corrección post-publicación de la nota de autoría
+
+El primer render público reveló que la nota de autoría todavía decía `Este borrador` y trataba la aprobación de
+publicación como un evento futuro. Se corrigió únicamente ese párrafo para reflejar el estado real, manteniendo el
+disclosure de apoyo de IA y la dirección editorial humana.
+
+- Snapshot recuperable:
+  `/tmp/greenhouse-anam-customer-agent-251432-before-authorship-note-20260717.json`.
+- SHA-256 del snapshot:
+  `e064fb64bcb5d1dc5bd269b645f87bd8e9740608e4fd35f92bceff7d5fda2e7b`.
+- SHA-256 final del contenido:
+  `845f31055ef18c95328a104fb768410963ac030f73241986ee53efd79f718b42`.
+- SHA-256 final de la spec Gutenberg:
+  `c997280a96e50b3b06b50b6623d8e90113719bfdf657daf2641f8042d6ff1c6b`.
+- La spec local quedó sincronizada con la política pública `index`.
+- Cache Kinsta purgada y readback anónimo confirmado con la nota final visible.
+
+Después de la corrección se repitieron los cuatro renders, las dos lecturas sin cache y la inspección profunda.
+Canonical, robots, schema, metadata social, TOC, imágenes art-directed, contenido crítico y responsive conservaron
+el mismo resultado satisfactorio.
+
+## Estado operativo que el artículo preserva
+
+Publicar el artículo no modifica el runtime del Customer Agent. El texto continúa afirmando, de manera visible y
+verificada, que estaba **configurado y probado en vista previa, pero no operativo para conversaciones nuevas al
+corte** por una dependencia administrativa de facturación. No se presenta el agente como activo ni se atribuyen
+a ANAM los resultados agregados informados por HubSpot.

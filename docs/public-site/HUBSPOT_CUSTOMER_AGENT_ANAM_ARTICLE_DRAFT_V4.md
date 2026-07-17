@@ -1,19 +1,19 @@
 # ¿Qué necesita una IA para atender bien a tus clientes? Lo que aprendimos diseñando el Customer Agent de ANAM
 
-> **Estado editorial:** draft privado v4 — pasada autoral en voz de Julio; no autorizado para publicar.
+> **Estado editorial:** versión publicada y verificada el 2026-07-17.
 > **Auditoría editorial:** [copywriting, SEO y AEO — 2026-07-17](../audits/public-site/2026-07-17-anam-customer-agent-copy-seo-aeo.md).
 > **Aprobación del caso:** [confirmada; registro interno](./HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md).
 > **Spec Gutenberg:** [versión local validada](./HUBSPOT_CUSTOMER_AGENT_ANAM_GUTENBERG_SPEC_V1.json).
-> **Autor/byline previsto:** Julio Reyes.
-> **Aprobación editorial:** Julio Reyes autorizó avanzar a validación de cliente el 2026-07-17; no equivale a autorización de publicación.
+> **Autor/byline:** Julio Reyes.
+> **Aprobación editorial:** publicación autorizada expresamente por Julio Reyes el 2026-07-17.
 > **Fecha de corte de la evidencia:** 2026-07-17.
 > **Estado operativo al corte:** configurado y probado en vista previa, pero no operativo para conversaciones nuevas.
-> **Pendientes:** activos, CTA comercial si se incorpora, carga y validación de metadata en el CMS, y publicación.
-> **SEO title:** IA para atención al cliente: caso Customer Agent de HubSpot
-> **OG title:** Una IA puede responder. ¿Sabe cuándo detenerse?
+> **Pendiente operativo ajeno a la publicación:** verificar el Customer Agent en conversaciones nuevas cuando se resuelva la dependencia de facturación.
+> **SEO title:** IA para atención al cliente: caso ANAM - Efeonce
+> **OG title:** ¿Qué necesita una IA para atender bien? | Caso ANAM
 > **Meta description:** Qué necesita una IA para atender bien a tus clientes: conocimiento, límites, pruebas y transferencia humana en el caso Customer Agent de ANAM.
 > **Excerpt:** El caso ANAM muestra qué necesita un Customer Agent de HubSpot para responder consultas sin perder contexto, inventar compromisos ni reemplazar decisiones humanas.
-> **Slug propuesto:** `ia-atencion-cliente-caso-anam`.
+> **Slug publicado:** `ia-atencion-cliente-caso-anam`.
 > **Categoría:** `HubSpot`; sin tags nuevos por defecto.
 > **Focus keyphrase de trabajo:** `IA para atención al cliente`.
 > **Entidad secundaria:** `Customer Agent de HubSpot`.
@@ -376,6 +376,6 @@ revisó nuevamente el 17 de julio de 2026.
 
 ### Nota de autoría
 
-Este borrador fue desarrollado con apoyo de IA a partir de la tesis y la dirección editorial aprobadas por Julio
-Reyes. La selección final de fuentes, la verificación de afirmaciones, la versión definitiva y cualquier decisión
-de publicación requieren su aprobación expresa.
+Este artículo fue desarrollado con apoyo de IA a partir de la tesis y la dirección editorial de Julio Reyes. La
+selección final de fuentes, la verificación de afirmaciones y esta versión se revisaron bajo su dirección; la
+publicación se realizó con su aprobación expresa.

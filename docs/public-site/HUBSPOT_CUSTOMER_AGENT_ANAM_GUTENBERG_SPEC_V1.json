@@ -5,7 +5,7 @@
   "seo": {
     "title": "IA para atención al cliente: caso ANAM %%sep%% %%sitename%%",
     "description": "Qué necesita una IA para atender bien a tus clientes: conocimiento, límites, pruebas y transferencia humana en el caso Customer Agent de ANAM.",
-    "indexPolicy": "noindex"
+    "indexPolicy": "index"
   },
   "intro": [
     "La idea suele llegar expresada más o menos así: “Queremos que la IA responda las consultas frecuentes de nuestros clientes”.",
@@ -1094,7 +1094,7 @@
       "blocks": [
         {
           "kind": "paragraph",
-          "text": "Este borrador fue desarrollado con apoyo de IA a partir de la tesis y la dirección editorial aprobadas por Julio Reyes. La selección final de fuentes, la verificación de afirmaciones, la versión definitiva y cualquier decisión de publicación requieren su aprobación expresa."
+          "text": "Este artículo fue desarrollado con apoyo de IA a partir de la tesis y la dirección editorial de Julio Reyes. La selección final de fuentes, la verificación de afirmaciones y esta versión se revisaron bajo su dirección; la publicación se realizó con su aprobación expresa."
         }
       ]
     }

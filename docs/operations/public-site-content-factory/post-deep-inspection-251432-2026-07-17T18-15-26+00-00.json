@@ -1,0 +1,2856 @@
+{
+  "contractVersion": "contentFactoryPostDeepInspection.v1",
+  "scannedAt": "2026-07-17T18:15:26+00:00",
+  "source": "wp_cli_parse_blocks",
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "post": {
+    "id": 251432,
+    "type": "post",
+    "status": "publish",
+    "slug": "ia-atencion-cliente-caso-anam",
+    "title": "¿Qué necesita una IA para atender bien a tus clientes? Lo que aprendimos diseñando el Customer Agent de ANAM",
+    "modified": "2026-07-17T18:15:13+00:00",
+    "permalink": "https://efeoncepro.com/hubspot/ia-atencion-cliente-caso-anam/",
+    "contentLength": 39234
+  },
+  "seo": {
+    "yoastTitle": "IA para atención al cliente: caso ANAM %%sep%% %%sitename%%",
+    "yoastDescription": "Qué necesita una IA para atender bien a tus clientes: conocimiento, límites, pruebas y transferencia humana en el caso Customer Agent de ANAM.",
+    "primaryCategory": "19"
+  },
+  "summary": {
+    "totalBlocks": 227,
+    "topLevelBlocks": 227,
+    "counts": {
+      "core/freeform": 113,
+      "core/heading": 15,
+      "core/image": 3,
+      "core/list": 11,
+      "core/paragraph": 80,
+      "core/pullquote": 1,
+      "core/separator": 1,
+      "core/table": 2,
+      "yoast-seo/table-of-contents": 1
+    },
+    "maxDepth": 0,
+    "linkCount": 32,
+    "nonEmptyFreeformCount": 0,
+    "mediaIssueCount": 0
+  },
+  "headingOutline": [
+    {
+      "path": "18",
+      "level": 2,
+      "text": "¿Qué es un Customer Agent y en qué se diferencia de un chatbot?"
+    },
+    {
+      "path": "36",
+      "level": 2,
+      "text": "¿Qué problema debía resolver el Customer Agent de ANAM?"
+    },
+    {
+      "path": "50",
+      "level": 2,
+      "text": "¿Por qué cargar documentos no crea una buena respuesta?"
+    },
+    {
+      "path": "66",
+      "level": 2,
+      "text": "¿Cómo se diseñó una base de conocimiento de 23 fuentes?"
+    },
+    {
+      "path": "86",
+      "level": 2,
+      "text": "¿Por qué el cliente ve tres intenciones y el agente opera con cinco?"
+    },
+    {
+      "path": "100",
+      "level": 2,
+      "text": "¿Qué debe recordar y qué no puede prometer una IA?"
+    },
+    {
+      "path": "118",
+      "level": 2,
+      "text": "¿Cuándo transferir a una persona es la respuesta correcta?"
+    },
+    {
+      "path": "144",
+      "level": 2,
+      "text": "¿Cómo se prueba una conversación y no sólo una respuesta?"
+    },
+    {
+      "path": "162",
+      "level": 2,
+      "text": "¿Qué limitaciones aparecieron durante la implementación?"
+    },
+    {
+      "path": "172",
+      "level": 2,
+      "text": "¿Por qué configurado, probado y operativo son estados distintos?"
+    },
+    {
+      "path": "194",
+      "level": 2,
+      "text": "Entonces, ¿qué necesita una IA para atender bien a tus clientes?"
+    },
+    {
+      "path": "212",
+      "level": 3,
+      "text": "Nota metodológica"
+    },
+    {
+      "path": "216",
+      "level": 3,
+      "text": "Fuentes oficiales de producto"
+    },
+    {
+      "path": "220",
+      "level": 3,
+      "text": "Evidencia externa consultada"
+    },
+    {
+      "path": "224",
+      "level": 3,
+      "text": "Nota de autoría"
+    }
+  ],
+  "blocks": [
+    {
+      "path": "0",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La idea suele llegar expresada más o menos así: “Queremos que la IA responda las consultas frecuentes de nuestros clientes”.",
+      "innerBlockCount": 0,
+      "fingerprint": "0060680877fe18731b1337c3079a3ca7fe3a369cd5c966f01c1b46c12b67ec55",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "1",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2da24f92367f7c2b0e4f76ad392b66fce9027bfa35a81485910e5d0ae882d5b9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "2",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Suena razonable. Incluso simple. Conectamos el chat, cargamos los documentos de la empresa y dejamos que la IA haga lo suyo.",
+      "innerBlockCount": 0,
+      "fingerprint": "799e86ecfd9f3a99e43c80f05c791d41e0f284fa93177245b5f482139dcdb3c0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "3",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4b5c99f6fafba03d9973d68018f691c628527b5b6e25c9e4fe26fedf312548a7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "4",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Hasta ahí, todo bien. El problema aparece después.",
+      "innerBlockCount": 0,
+      "fingerprint": "c54a61b18344bd2c6da69b7274e25150dd89a79fb1d034970f121827ae2beec4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "5",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "62db42a028e487a080771dcb8308c877e830521c7e072b6dbfb3206756272e1f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "6",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Una conversación real no llega ordenada como una pregunta frecuente. Puede mezclar una cotización con una factura, omitir un antecedente técnico o pedir una decisión que compromete a la organización. Entonces la pregunta cambia: ya no es sólo qué puede respond…",
+      "innerBlockCount": 0,
+      "fingerprint": "fde548077742fd78ae7bbbc0e4164d60bb3cce1f30ff8c6870530873033771bd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "7",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c284c4c12aefa43352f47d5ae193ebd4c3db1e74bc665ace910fdbfd6b7ca2b5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "8",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "HubSpot llama Customer Agent al agente de IA que conecta conocimiento y canales de atención. El caso ANAM nos permitió llevar esa idea a terreno concreto: fuentes, instrucciones, memoria, transferencias, pruebas y una operación que también tenía que demostrar …",
+      "innerBlockCount": 0,
+      "fingerprint": "8a2cbdcc80b6ed28e5ee8f887747536faf2059fa0f16841a005bd9e6a87f4369",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "9",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "83858823bfd43358305f10f00874c21d546e0764e53e599d4a1bd2a8983cbaf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "10",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Mi lectura de este caso es simple: el trabajo difícil no es enseñarle a la IA a responder. Es decidir con evidencia qué puede responder sola y qué debe conservar para una persona.",
+      "innerBlockCount": 0,
+      "fingerprint": "14067e8b34eb226126011db06165b0c4cb400a125eff5c6eb1507275f60b2c21",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "11",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4dca91fafb9af976b35ddc2b0ddb37e1f98fde38c886593c5707d32d12d69ea5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "12",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Respuesta corta: para atender bien, una IA necesita fuentes gobernadas, memoria conversacional, límites explícitos, transferencia humana con contexto, pruebas de varios turnos y un canal realmente disponible. Si falta una de esas piezas, puede producir respues…",
+      "innerBlockCount": 0,
+      "fingerprint": "491278413495b30587b7cdf15fc6b42df97f445691b1ba3968f34b2a11385b30",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "13",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e84eb997543a7dd41514d773b9cbe2137fd6e32c2a54cbfc9ac8bcce9e94bbd1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "14",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ahí está el criterio: la IA para atención al cliente no se vuelve confiable por responder más. Se vuelve confiable cuando también reconoce qué necesita preguntar, qué no puede prometer y cuándo debe detenerse.",
+      "innerBlockCount": 0,
+      "fingerprint": "2ee6ffa5fe1791e732c2144da623f72ee368aa5491d87c5f5ade34e300afb78e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "15",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "661e12f5c6529bc71e7e349b071d9e1cb7932b3ca81965ead12f9a6463eb2414",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "16",
+      "depth": 0,
+      "blockName": "yoast-seo/table-of-contents",
+      "attrs": {},
+      "text": "Tabla de contenidos¿Qué es un Customer Agent y en qué se diferencia de un chatbot?¿Qué problema debía resolver el Customer Agent de ANAM?¿Por qué cargar documentos no crea una buena respuesta?¿Cómo se diseñó una base de conocimiento de 23 fuentes?¿Por qué el c…",
+      "innerBlockCount": 0,
+      "fingerprint": "14f11258fc6a9c84b10189a92f1c4110c355c97d3fb64774bfcf625591139881",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "#h-que-es-un-customer-agent-y-en-que-se-diferencia-de-un-chatbot"
+    },
+    {
+      "path": "17",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c423d4f29c415e75245bec0f0485223b01d85f2f11644b45cb4ac281d90df4a9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "18",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Qué es un Customer Agent y en qué se diferencia de un chatbot?",
+      "innerBlockCount": 0,
+      "fingerprint": "03be90df9bff972d4b8be8e86962744b72fea0a27b58a7bcf6de3fe18b40038d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "19",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd6e2c3c76a82830321d48de818f635d83749645c0a63b252f31832eb9b0e432",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "20",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Vamos por partes.",
+      "innerBlockCount": 0,
+      "fingerprint": "1dea81f43764c299481800429cc3be6ae1d7d08d7bf63e0a1a2d2bcf116ee7b6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "21",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "657f90f2163e0fe357d624219a016dabec7eba7d57a79f1d2f960c7347b2f9c0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "22",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Customer Agent de HubSpot es un agente de IA conectado a los canales y al conocimiento de una empresa. Puede responder consultas, reunir antecedentes y transferir la conversación cuando se necesita intervención humana.",
+      "innerBlockCount": 0,
+      "fingerprint": "954696b9ea0945788bdba24fd20956aee6923fa4c0e9d69f0c390a33002d80b2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "23",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7d6d371d4dbfcfb1428409fff1c4c0037a77055eea9e723c3624f004292b3ab9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "24",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "HubSpot lo describe como un agente impulsado por Breeze que utiliza el contenido existente de la organización para responder preguntas. Si no conoce una respuesta, puede pedir que se reformule la consulta o transferir la conversación a una persona. La platafor…",
+      "innerBlockCount": 0,
+      "fingerprint": "7e26845f7a8352245f27fc63cfe653610e33f8361e387699ffa3535adb4c0a74",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent"
+    },
+    {
+      "path": "25",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ac173ffb8869f6666f0831d325010b26566cbc77a3518c6dd8636efafccb6d9f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "26",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "¿Dónde está la diferencia? Un chatbot tradicional suele conducir al visitante por árboles, botones o respuestas predefinidas. Un agente interpreta lenguaje natural y recupera información desde distintas fuentes. Puede manejar más variaciones y conversaciones m…",
+      "innerBlockCount": 0,
+      "fingerprint": "6f7ec33c6f1001ec3139b42b94b6217b13ef847c192c3e4252e7d6f3123b546c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "27",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "34b63d36ab5e5d57165076da458251645e23ae7836216c9ccd095ad047698b78",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "28",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esa flexibilidad es justamente lo que lo vuelve más útil. Y también más delicado. Si interpreta mal una intención, elige una fuente incorrecta o avanza más allá de lo que la empresa puede respaldar, el problema ya no es una mala respuesta automática. Es una co…",
+      "innerBlockCount": 0,
+      "fingerprint": "56d24eedbf6009511a5a2a22789a1ba83d3f83fd63cece5e930be1797de2e586",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "29",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2c9b09a2ebe532e3b49c51beea30f1663a68278c4920f7d960e01431c62b5ad5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "30",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Por eso no basta con preguntar qué sabe hacer la IA. También hay que resolver cuatro preguntas:",
+      "innerBlockCount": 0,
+      "fingerprint": "11366eb19dedadd409996955d5d6b9a7e2b762db0111789456862780c8650db8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "31",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c50c720347dfe52776431315bb77275805c25a8c8e5cf37883a52413c5ae9cf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "32",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "¿Con qué fuentes puede responder?¿Qué contexto debe pedir y recordar?¿Qué no puede prometer y cuándo debe transferir?¿Cómo comprobaremos que la operación funciona de verdad?",
+      "innerBlockCount": 0,
+      "fingerprint": "b1832a195d7ef295b9bfacec0717b46cb6031377f03e34a5234d74c6eb680613",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "33",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ea2bb7516e325cff7952d2b45196e71af3c6fb7d59bbe5d55cbea5e58566194",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "34",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Prefiero, entonces, pensar en un Customer Agent como una operación, no como una caja de respuestas. Tiene que saber qué responder, pero también hasta dónde puede llegar.",
+      "innerBlockCount": 0,
+      "fingerprint": "6bf43bac929159e621b2b943327302800512c9d5e2cffc397b2632761e587e07",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "35",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e26d65395fc27b4cdb43da753a28c83ff1ed8e1720f59373d9f081535d704e9b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "36",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Qué problema debía resolver el Customer Agent de ANAM?",
+      "innerBlockCount": 0,
+      "fingerprint": "96e9d86d5a4cd2c1e1b7894d8f474e794a2716a43ec785c9c44dbc9362618244",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "37",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a41c767a763d456d376dc318669e5ccca6a466b5acc4b23642d9b763fa2e27b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "38",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "ANAM necesitaba orientar consultas técnicas y administrativas, reunir el contexto mínimo para avanzar y transferir sólo las acciones que requerían intervención humana. El desafío era hacerlo sin convertir el chat en un formulario interminable y sin pedirle al …",
+      "innerBlockCount": 0,
+      "fingerprint": "95c221fd7836669876d33591ee844c265daec7dd6e3fc41ccfebe4e2037b1b11",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "39",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2afbc9c9b8b1f9a4db9b0885d7a6a3c499d8d7c426782fa741759d88ba945d32",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "40",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el primer artículo de esta serie sobre dashboards confiables en HubSpot mostramos por qué un dashboard convincente no demuestra que los datos debajo sean confiables. Con el Customer Agent apareció el mismo principio en otra superficie: una respuesta convinc…",
+      "innerBlockCount": 0,
+      "fingerprint": "f4677be141726d1c60a15148308bc4ac06fd495c5be659ae900d89096b36677a",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/hubspot/dashboards-hubspot-confiables-caso-anam/"
+    },
+    {
+      "path": "41",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2aefea39ecf1a11ef2f202e026852cabf742c3f2d9ea99480c5d5e3e7c11600a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "42",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Las conversaciones podían seguir rutas técnicas o administrativas. Algunas llegaban limpias. Otras mezclaban necesidades: por ejemplo, solicitar una cotización y corregir una factura anterior dentro del mismo mensaje.",
+      "innerBlockCount": 0,
+      "fingerprint": "67075396de5b92546ba331036e47de0d69d6087b31afd6539907f01ca8eac9cd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "43",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "053abf8768233eaab98513ddafe75724ac6e5a9754b362a36113ff86ff23aa9c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "44",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ahí aparece una diferencia que me parece central: automatizar respuestas no es lo mismo que diseñar atención. Una respuesta puede ser correcta de forma aislada y aun así producir una mala experiencia. Basta con que el agente pregunte lo mismo dos veces, transf…",
+      "innerBlockCount": 0,
+      "fingerprint": "a36699b3657b5b5fd9dae2e37b768bf3067e8bb1f7786e2eca4c0179daa616ce",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "45",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "68a75eb3f45f83dd0fe0c8e79b4d72535a63bf009602dcfaf8963630ec2959fd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "46",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En Efeonce abordamos el Customer Agent separando el problema en piezas. La identidad y el tono eran una; el conocimiento, otra. Las instrucciones, la memoria, las acciones, la transferencia humana, el canal y la medición también necesitaban su propio diseño y …",
+      "innerBlockCount": 0,
+      "fingerprint": "7ec0a3a5139f7cfd3b5300cd5283855bf49dab8776246bd207ecd7076cc14176",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "47",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd8802fd51e15ee6daa5843253bfee36601c7e5d5c167c34afb0e54024ba8074",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "48",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Un prompt no reemplaza una arquitectura operativa.",
+      "innerBlockCount": 0,
+      "fingerprint": "13b44e85656424c38e6462aa304fb098c9f8c14cb147c310020760f77bfd6a79",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "49",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "51d2e1d1ec468a4a30e27f807594cf18daf531538b5a74412f461defc02da878",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "50",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Por qué cargar documentos no crea una buena respuesta?",
+      "innerBlockCount": 0,
+      "fingerprint": "e99def24d0d2e1369d56f2dd035125325f0bec56ba0204836305253bfb5008ad",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "51",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7ba90849d64f044316abde25f63291386e97caf3d0b2f4bc32e552b379c84d6e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "52",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Cargar documentos se siente como progreso porque es visible: antes no había fuentes; ahora las hay. Pero los documentos sólo cubren aquello que el agente puede recuperar. No definen por sí solos cómo debe preguntar, qué debe recordar, cuándo necesita detenerse…",
+      "innerBlockCount": 0,
+      "fingerprint": "3bee669c1f6d210dbaf051b9a7a62f562c82438c953669a135040b41e1206825",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "53",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b119eb48acea4a3b75f200a5ef0ca220944809eb1d1e82d6e4522038affe3534",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "54",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Imaginemos que una fuente describe los plazos estándar de un análisis y otra conversación pregunta por la fecha de entrega de un servicio ya contratado. El agente puede conocer el plazo de referencia y, al mismo tiempo, no tener autoridad para comprometer una …",
+      "innerBlockCount": 0,
+      "fingerprint": "45edec0742f838d6d70d9ac4af41a37819e9c86e6512cc93251836abdcd7a3da",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "55",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a6da1b32f6ea8e7fd1c94a558978854bfa24ac0739e981e4cc06507499a05ec1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "56",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Lo mismo ocurre con una factura. El agente puede explicar condiciones administrativas documentadas o reunir una referencia. Eso no significa que pueda corregir un documento, confirmar una refacturación o asegurar el resultado de una revisión.",
+      "innerBlockCount": 0,
+      "fingerprint": "7b7d7871491ef74b5e36ec7b4a7ca3b526eab955790aec1ffbd99d33560ec98b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "57",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "75037fef1c327667189dd5ef37d294d327bade37501c34cce9bcc52874496345",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "58",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La forma más clara de verlo es separar siete piezas:",
+      "innerBlockCount": 0,
+      "fingerprint": "c4469ce1ca0e23eeb1dbe689e7ca764698faa179eb932a3abe9288fde6dac390",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "59",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e6a500b950175889a31e84bef00f32729137a3e72a0ae1cf00247d3fe075d19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "60",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Identidad y tono: cómo se presenta y conversa.Conocimiento: qué fuentes puede utilizar.Instrucciones: cómo clasifica, pregunta y resume.Memoria conversacional: qué antecedentes conserva durante el diálogo.Acciones: qué puede ejecutar realmente en un sistema.Tr…",
+      "innerBlockCount": 0,
+      "fingerprint": "e7436bbc52951fed3f7f1beb7bb410d03fc14545c9e88647a7da24cf6b41e3a9",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "61",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "46f36295e3cbaa7c9e9ad0514540c3421360fd75423cf1ea4fe33e95b0faa19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "62",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el corte revisado, ANAM tenía conocimiento, directrices, transferencia humana y canal configurados. No tenía acciones publicadas. Había dos borradores, sí, pero un borrador todavía no hace nada.",
+      "innerBlockCount": 0,
+      "fingerprint": "f579d51db91d2596362530910873bfd2208c0b30dddbb49f471c875c070152e8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "63",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5503c0d261d1094800218d8e78d04fb56062b8419231c2207c9ffbe69e5804dd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "64",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Parece una precisión menor. No lo es. Tratar un borrador como capacidad activa nos llevaría a decir que el agente puede consultar facturas, servicios o sistemas externos cuando, en realidad, todavía no tiene ese acceso.",
+      "innerBlockCount": 0,
+      "fingerprint": "8d368804c9acb501d5b1a5a6985a721b7d7ff1e61432aa499c09c2caf4fd0469",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "65",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a5f8311ec9417dccecf2995f705067795727f7edef69c275364ed0defcc1ddef",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "66",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Cómo se diseñó una base de conocimiento de 23 fuentes?",
+      "innerBlockCount": 0,
+      "fingerprint": "5b4592c1b33fe6e4e1aa1abc65ababc7b728611267505d9264e8a7b1393c5d04",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "67",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "af5e91bed563afbeea9b1cddea107c5d64754d0a04856862e6fab84195a380a2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "68",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La base de conocimiento se diseñó organizando cada fuente por función, autoridad y vigencia, no por la carpeta o el correo donde apareció.",
+      "innerBlockCount": 0,
+      "fingerprint": "641b7366e96095c6fdc1af52ae542802ae2efa66781cb5e5ebf13a4bd5d16376",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "69",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ca60a7609bbfb11d8627a3d860f2a22668122c737494981d54b2a242342d3c40",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "70",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Veintitrés fuentes suena a una base robusta. Puede serlo. Pero el número, por sí solo, dice poco. Lo que importa es si esas fuentes se contradicen, quién responde por su vigencia y para qué tipo de decisión sirve cada una.",
+      "innerBlockCount": 0,
+      "fingerprint": "e0a6b1762632e015a1c156aacf9438d570deb03fc18beaf01942059452695d73",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "71",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "105166651fb600bf3c74595e4f3f53ff5313c12bd32f55b2f008e23c26c97583",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "72",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El inventario verificado contenía 23 fuentes en uso:",
+      "innerBlockCount": 0,
+      "fingerprint": "dbee4cdf4b1a4d08a60a3b4bc695aeb839f530aae0f72aeca1b818bd7b129575",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "73",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d6367186a13e4adf1313064870ec2f9d5efbcf34905718193c8bafc772658859",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "74",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "seis archivos privados en Markdown;17 respuestas cortas para situaciones críticas o formulaciones recurrentes.",
+      "innerBlockCount": 0,
+      "fingerprint": "34a64672cccd5f8a92bf3348f422741ffb56844428f6361b052aacdf98f967fc",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "75",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "21d5b1cde23c059d575b599a99f6b62c70c799468fe8461ce8b71605710aef0e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "76",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Los seis archivos cubrían empresa, servicios y normas, preguntas frecuentes, cotización y captura de antecedentes, seguimiento/facturación/calidad y un catálogo técnico. Este último conservaba 356 registros técnicos. No eran 356 servicios ni 356 promesas de di…",
+      "innerBlockCount": 0,
+      "fingerprint": "f086fd012ec0bd6a851093605b46b9c78804ea6704289fc4c59b4bbe9b0baa13",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "77",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "30bd06b0c23989fc42cec59b28bf9d88f3bd5114f51c7bdf3666368594a25612",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "78",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Las respuestas cortas cumplían otro trabajo. Permitían tratar situaciones específicas —especialmente administrativas— con un lenguaje más directo. Aun así, no se asumió que una respuesta entrenada aparecería ante cualquier formulación humana. Esa conducta debí…",
+      "innerBlockCount": 0,
+      "fingerprint": "e9c8923b8db246f667efd082e1562c90ecb1804db423fb89add37903c29fec92",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "79",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "531cc3f2648ef4e2beed396e1be6521a6ee1e794405a59b6466133fda5d9f05a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "80",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251434,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "Las fuentes sólo se vuelven conocimiento útil cuando tienen propósito, vigencia, responsable y reglas para resolver contradicciones.",
+      "innerBlockCount": 0,
+      "fingerprint": "137c6327f720af5ca7779e6e0d95dfbf34954f50c7de78fb5899168c24098e86",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251434,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-web-1600-v2.webp",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-web-1600-v2.webp",
+        "alt": "Veintitrés fuentes —seis archivos privados y diecisiete respuestas cortas— pasan por cuatro controles antes de responder, preguntar o transferir; 356 registros técnicos no equivalen a servicios disponibles.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-web-1600-v2.webp"
+    },
+    {
+      "path": "81",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "edf656e8ae68f518cb6260d407b80f346334dc715042fa2ba07031b95b6b4659",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "82",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Antes de sincronizar, las fuentes se reconciliaron para evitar contradicciones. También se mantuvieron privadas: podían alimentar las respuestas, pero no aparecerían como citas públicas para el visitante. HubSpot advierte que el contenido privado puede utiliza…",
+      "innerBlockCount": 0,
+      "fingerprint": "1d2dfbd4ab1909f6ea995bdbb544fbbedce4f90292e8d537c300c5566cecbabc",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://knowledge.hubspot.com/customer-agent/manage-the-customer-agents-content-sources"
+    },
+    {
+      "path": "83",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4d895cca29deb52cf5cc39c09167eeefe4a1b73c382911c8c0246b8e59ac92f6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "84",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Mi forma de resumirlo es ésta: una base de conocimiento no es un depósito de documentos. Es una arquitectura de decisiones. Cada fuente necesita propósito, vigencia, responsable y una regla para resolver contradicciones.",
+      "innerBlockCount": 0,
+      "fingerprint": "e7958086ef098558e8670bec9a1779dd334e39e3f7eeff8c1b75bd24ff475afb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "85",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e52f8a52551e6ae5e34e99987696aa1dbcd9a5954928292d8c03ebacb72215c5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "86",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Por qué el cliente ve tres intenciones y el agente opera con cinco?",
+      "innerBlockCount": 0,
+      "fingerprint": "160481a3a1cb5ba45c1dd3b1e6f02eca944e2e17fe6bfac111759f9e853a418a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "87",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "36cf66906e25b0a6dfc7c1e530ac775708d129ab1b67eafc44c250585befb53f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "88",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El cliente ve tres intenciones porque la interfaz debe simplificar la entrada; el agente conserva cinco rutas porque la operación necesita distinguirlas. Parece un detalle de interfaz. En realidad, define cuánto trabajo le traspasamos al cliente.",
+      "innerBlockCount": 0,
+      "fingerprint": "b31f76dac722efc3217d552f642937c9b8db06e0fc8509ec7412c185a303a6d9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "89",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "287605b0d2f91e486ba16b88b418797425d607bc5d7a34631202951d8b40e187",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "90",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La página de entrada de ANAM ofrecía tres puertas visibles:",
+      "innerBlockCount": 0,
+      "fingerprint": "86faba75a39f0c28769ac8d74e0de6d22c9dca624ad57924ef29dd4e566e444f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "91",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9c6d7b896a27b18208a07cbac18aa839f6278ce7b773532190a8fff22aa914cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "92",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Cotizar;Seguimiento del Servicio;Requerimientos de Calidad.",
+      "innerBlockCount": 0,
+      "fingerprint": "4f46f38b6dee312a700fead61d67bf407f3d4c2ced6bfde7eda3b309e7e562e3",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "93",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ed3fc775d6bb7ad3db99d75e8c04e6f24fa56c04d9760d4e6cecf0d97e12e945",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "94",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El agente, en cambio, clasificaba cinco rutas: Información, Cotización, Seguimiento, Facturación y Calidad. La diferencia era deliberada. Una consulta de facturación podía aparecer dentro de un seguimiento o en un mensaje libre. La información general tampoco …",
+      "innerBlockCount": 0,
+      "fingerprint": "24f6a299a728a085e1f9d7ddbf0c05bc83ab035e5ad095b8c34fecde3707679d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "95",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1ddea7324634514aa124d436a81cf3e415d0fd7360be45ffde752f239d2e584b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "96",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El cliente no debería aprender nuestro organigrama ni escoger la ruta interna correcta para obtener ayuda. Debería poder explicar lo que necesita. El trabajo de separar las rutas le corresponde al sistema.",
+      "innerBlockCount": 0,
+      "fingerprint": "0e7816a387fc81c483c2b6737a73aed8588b24d3a768fa70bc825c593349a928",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "97",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "17e26bb627e0497b9be3bcaac2a3f7e56f1365f0c71328adaa2b00fc39fc93fb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "98",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Una de las pruebas combinó una cotización de agua potable con la corrección de una factura anterior. El agente distinguió la necesidad técnica de la gestión administrativa en vez de tratarlas como una sola solicitud. Esa capacidad es más valiosa que un menú pe…",
+      "innerBlockCount": 0,
+      "fingerprint": "eb3b5b3b2c730ce615920ca711338067bfcce9ecd69b338a4d55068f14329c89",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "99",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a46f77a24f2314e2fd5bf7725c605caa94c3d9150085a29b1aa0f18e3743274a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "100",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Qué debe recordar y qué no puede prometer una IA?",
+      "innerBlockCount": 0,
+      "fingerprint": "74b12e4cba4d3de83cd2a2e880e4e11edd847296fdff5ce68038a6e4bd468882",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "101",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "db7925d6b513298e9ea46e69f85b5845985facfab1aa040002acc371f5a2b9e6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "102",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El agente debía recordar los antecedentes relevantes que el cliente ya había entregado, sin convertir esa memoria en autoridad para decidir. En el diseño de ANAM eso incluía, según la conversación, empresa, identificación proporcionada, servicio, matriz, norma…",
+      "innerBlockCount": 0,
+      "fingerprint": "ffecacafed4ba66c3fe9bf880f6bd13f46e3f1cb68b2821fd4eff0d12eb724cb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "103",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1959bf9e19c1edd11f2267ce3b54644c6ba4c12aa8f4ab41e8deb0025330d067",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "104",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Es algo que cualquier persona espera de una conversación: no tener que repetir lo que acaba de decir. Con una IA debería ocurrir lo mismo.",
+      "innerBlockCount": 0,
+      "fingerprint": "86b858e7e652c8ab52c4a0874189fd8cfeb56ab15300c4f436faa698356e8513",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "105",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ced5d98af983eb64e922fdd84692386306703c12f3f1d5cf40820c5602bebaf",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "106",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La memoria evita preguntas repetidas y mejora el resumen antes de una transferencia. Pero recordar un dato no le da autoridad para decidir sobre él.",
+      "innerBlockCount": 0,
+      "fingerprint": "988e64ad39185b4530f37c725239221dbc9f5086d7824d567bea0a5b595f85da",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "107",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "87f0142c5e3df57803f7f74b79e46f3248ccbaacac9b26151406b05336b84bbd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "108",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Pedir una aclaración tampoco equivale a fallar. En dos experimentos publicados en Journal of Business Research —con 386 casos analizados entre participantes estadounidenses—, un chatbot que pedía aclarar un malentendido obtuvo resultados perceptuales similares…",
+      "innerBlockCount": 0,
+      "fingerprint": "efad2e69aee999b5567d3d461e99037c9d5ff327c6c3d323f545d41ac7ee7392",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://doi.org/10.1016/j.jbusres.2020.04.030"
+    },
+    {
+      "path": "109",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e1b837899b752aeeb8cd013957906ad6fbbaf1c724bbdf66cb10bc914bd0c36f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "110",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ojo: memoria no es autoridad.",
+      "innerBlockCount": 0,
+      "fingerprint": "ace71b533b8ba208db28704d272d71f3d5d9b68027e3292fdff0047939c225e1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "111",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9cf788d29fec49f8018b7d53e14c3fc1c7bb2af271d22775a0a0ff9c73ff4ec3",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "112",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El agente no debía prometer:",
+      "innerBlockCount": 0,
+      "fingerprint": "27238a78bc4a919600d4a9d87da2d742ec24003cfcacce35292b4c669ea002ed",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "113",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "95cb33b8bebf19d5c934600164126ebf6728802a2624e38101c49fe3cc8105c2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "114",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "precios finales;fechas comprometidas;refacturaciones o correcciones;la solución de un reclamo;interpretaciones legales o de cumplimiento;resultados técnicos;disponibilidad no documentada;acciones que todavía no había ejecutado.",
+      "innerBlockCount": 0,
+      "fingerprint": "897e203e5c3740ac7cce4a3739bddceb01e126473d7cb4d6415283c8fee6d942",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "115",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7c5479807141885b2c36596d125591d304e01f0a310426b9837ae9d479f9af82",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "116",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esta última regla es especialmente importante. Decir “registré tu solicitud” parece una cortesía inocente, pero se convierte en una afirmación falsa si ninguna acción creó el registro. Un agente confiable distingue entre lo que explicó, lo que reunió y lo que …",
+      "innerBlockCount": 0,
+      "fingerprint": "13f5384471c66c89256c398d45a50bb13e0fe7e2fd1ced3cfa0ea109e1e8447b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "117",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6622ba2ebe1cf9fe53fd8e10ce2f57552747e2cf74d1d6b70be576b9711f106c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "118",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Cuándo transferir a una persona es la respuesta correcta?",
+      "innerBlockCount": 0,
+      "fingerprint": "1b026b44cc704492ff3e04ddaf2c15d03ac27357f28fdbba906719e18843e627",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "119",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3ca2b238e216764b7f46b31a9322ff950a2dc80d81fc6b29f46c49d09cc37ae8",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "120",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Una transferencia es correcta cuando la conversación requiere juicio, acceso operativo o capacidad de comprometer a la organización, y el agente ya reunió el contexto mínimo para que una persona pueda continuar.",
+      "innerBlockCount": 0,
+      "fingerprint": "86d0e9cd0dc7e40d78542108f06f23373fdb05a49524711a58a0aadc79c555a6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "121",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "009639836dc483ec5c02bb5e9898398a96830d008e8d82501c9a16e359a91df9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "122",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Es fácil leer esa transferencia como una falla: si llegó a una persona, la IA no resolvió. Yo la veo de otra manera.",
+      "innerBlockCount": 0,
+      "fingerprint": "d0ab620e6b550aabfe535571262038b7963adf535bc5f2eec2d3bde7c9ae9fd1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "123",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3881fd435acf85c67ae5b3a334de9d356bcdc0da442f9e8e886a8d885e5e8246",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "124",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No debería ocurrir sólo porque el visitante escribió “factura”, “urgente”, “reclamo” o “cotización”. Primero puede existir información útil que el agente sí está en condiciones de entregar. Transferir ante la primera palabra sensible aumenta la carga del equip…",
+      "innerBlockCount": 0,
+      "fingerprint": "ec60018a310144af3efb912ef70054f55bc619d5799a030d0c3c3448285808f4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "125",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b0c539d38d5ec2644dac80d0619c8448f39d709a8fd52772a758df4d3fbd5ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "126",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En Efeonce usamos una frontera de autonomía conversacional para ordenar esa decisión:",
+      "innerBlockCount": 0,
+      "fingerprint": "6b727815dcdbcfd0a2c7e9a465803a59ac25463b875202704460679c6f0db3f9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "127",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6b680ddb15dc40099b3c99799ecbe4e2d028a327d564cd6f7900c203bbc09f2d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "128",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "ZonaQué ocurreQuién conserva la responsabilidadSaberLa respuesta está documentada y no implica una decisión sensible.AgenteAclararExiste conocimiento, pero faltan antecedentes para aplicarlo.AgentePrepararSe necesita una acción humana; el agente reúne y resume…",
+      "innerBlockCount": 0,
+      "fingerprint": "b296b20cbf75ccc1e183ddeec0add7e2f7466dd667312ae2e762aa25fe35d6fd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "129",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "da5d3241cb2c536a1be47a54db49d9e3bc6478765dc712651867f323d2c164e0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "130",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No es un embudo ni obliga a que cada conversación pase por las cuatro zonas. Sirve para reconocer dónde está la responsabilidad en cada momento.",
+      "innerBlockCount": 0,
+      "fingerprint": "936e889cd8832881f7b2257e768a9cb40237f668ffdd7c5eabf4a50ba5b75b44",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "131",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7fef66948211ecbada4de13e162bbba23d3a1adc739239b3c5dd5b00b0b8c28f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "132",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251438,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "Un buen handoff conserva el contexto y cambia la responsabilidad sin obligar al cliente a empezar de nuevo.",
+      "innerBlockCount": 0,
+      "fingerprint": "e599f0ea7fece338279755a963bf684eefb047b82a4a0d1080545c89d953b620",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251438,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-web-1600-v2.webp",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-web-1600-v2.webp",
+        "alt": "Una consulta combina cotización y facturación: el agente aclara la primera, prepara la segunda y transfiere la decisión a una persona con empresa, servicio, referencia y resumen.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-web-1600-v2.webp"
+    },
+    {
+      "path": "133",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a0637bbada41357a6850030ebcbce8af4913f2e33a38f6f782c27f7047ce496",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "134",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Una buena transferencia puede evaluarse con cinco preguntas:",
+      "innerBlockCount": 0,
+      "fingerprint": "090fbaf8bdf9d603d962c579606dd1755fe7ddfac16c171814154e6071476ab4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "135",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "15f118194aa682ad05207926a72fd00b64a43e15ee33f6c2d0b2b33067b84f6d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "136",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "¿Era realmente necesario?¿Ocurrió en el momento correcto?¿El agente reunió el contexto mínimo?¿Entregó un resumen útil?¿La persona puede continuar sin pedir que el cliente repita todo?",
+      "innerBlockCount": 0,
+      "fingerprint": "cccbe70c29bcdf4a51470b29428bd4f123d4d64cba106d2e5ec9ee82a1e9d4bc",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "137",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "32a95ae48e3d9252220f0ddc2faa1741c07518eeb2ef56e5c6ef96f2eb1a6b05",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "138",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esa continuidad importa también fuera de este caso. En una encuesta realizada por Zendesk en junio de 2025 a 6.182 consumidores de 22 países —entre ellos Chile—, 74% declaró frustrarse cuando debe repetir información durante la atención. Es una percepción decl…",
+      "innerBlockCount": 0,
+      "fingerprint": "ac3b8e544019168b8f0f6a1e62e64ba45df2feb8bfb46e9b648cb3be38c12aed",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://cxtrends.zendesk.com/"
+    },
+    {
+      "path": "139",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9b9c3a65a2df3a5cb7cf7ccb2169bc4f219252abe0b305cdcc17db3b4354a24e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "140",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "HubSpot permite configurar guías personalizadas de transferencia y contempla disparadores por defecto cuando el agente no puede responder, el visitante pide hablar con una persona o el agente está pausado. En ANAM, además, se diseñó una transferencia hacia Hel…",
+      "innerBlockCount": 0,
+      "fingerprint": "d9fc31bff5ec5d577d17ba3d4ffcba981e45ee0364c6bc93283e637cca7ff3d7",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process"
+    },
+    {
+      "path": "141",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6e7d637f57e683b96f493a2f0ad3d26f56840948b6bcb47aed3c6a0447be7726",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "142",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Hasta acá llega el punto que me interesa: transferir no es fracasar. Es preservar la responsabilidad cuando la conversación cruza el límite de la evidencia.",
+      "innerBlockCount": 0,
+      "fingerprint": "5c5e6275953e854d4216ec57c1668524e44dbc7acb8df89ba10c0a2fa93e149c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "143",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "41b0089c4c96bc1e59cf38c2b12a8870d533ed9211c0e0762fd42db8faa31d12",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "144",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Cómo se prueba una conversación y no sólo una respuesta?",
+      "innerBlockCount": 0,
+      "fingerprint": "73a0c4dbbc54e3ac41863a11dac7cf8cc9f8de040bb72ba751d16065570839c0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "145",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cbd6f54bc110dc810e2b8ae8dfb7c77a17cbbbf49ee90578cdea9928e586b4d5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "146",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Se prueba con escenarios de varios turnos que exijan memoria, lenguaje natural, intención mixta, manejo de frustración, transferencia y recuperación ante fallas. Aquí es donde una demo y un sistema empiezan a separarse: una respuesta correcta, aislada, no demu…",
+      "innerBlockCount": 0,
+      "fingerprint": "ad54145c6d7f727011b1d1c4364ecdfddd696d8474f72651389da8b9613a61fd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "147",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d75b590cb7556b082384145305e5dddca92e6cdc619599ee7f10bf53b94ce5c7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "148",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Para ANAM se definió un guion de 39 escenarios. Esa cifra describe el diseño de la batería, no 39 pruebas ejecutadas. La evidencia recuperable permite sostener un mínimo de 24 escenarios distintos y 35 turnos o ejecuciones durante la sesión revisada.",
+      "innerBlockCount": 0,
+      "fingerprint": "467403170a38f4baf9fdee7976208caabdbaa90fd1dfde41facfb45342bd6943",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "149",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "521bc0a7adc61e03aaf6b5e7080eeb206faa8751b3b896eabde7beb110a08c35",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "150",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La batería técnica conjunta acreditó 19 escenarios satisfactorios después de ajustes. Las pruebas cubrieron también materias administrativas, facturación, reclamos, seguimiento e intención mixta.",
+      "innerBlockCount": 0,
+      "fingerprint": "dbde8b1bdf9d1682e930772bd1ac6dbeb2659ccd06a7122badf9c19096b8529a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "151",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "bc14d10da8f146e862ddcc728896dc12367678986cc6c73d8aa8e339046a9ebc",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "152",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Los resultados no fueron uniformes:",
+      "innerBlockCount": 0,
+      "fingerprint": "0da2d58867a7782ee8174e4ec0e83591618741e91810faf9b81e7243b4f00853",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "153",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "69f20b3131d645c056e00882206f24e09e41e28da49e860c16265be56f218cd5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "154",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "el comportamiento administrativo general resultó satisfactorio;la intención mixta separó correctamente las dos necesidades;reclamo y seguimiento resultaron satisfactorios con una limitación;facturación mostró un resultado favorable y otro parcial.",
+      "innerBlockCount": 0,
+      "fingerprint": "4e5d73ccaeb66b4f621c0708b458bcd8146298eb3cb0ad14e49e73c05286ebb3",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "155",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "eb2daf953c2ec62283a593c100d293851988124394a4c23f06a0ef47effd8619",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "156",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En algunas iteraciones, el agente reunió contexto antes de transferir. En otras, la transferencia nativa de HubSpot se anticipó a la aclaración que habíamos diseñado. Esa limitación no se ocultó ni se convirtió en una conclusión universal sobre la plataforma. …",
+      "innerBlockCount": 0,
+      "fingerprint": "f005e4147d8776138cd5a8cf4d16f70f6697a4cb8ad6ad04aec6a0b545eef496",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "157",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e2c0d23f0f9bf103e3abc39054d38418e186c6cdc116ca027ead1af85ce073ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "158",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Tampoco contábamos con una exportación completa de las transcripciones para reconstruir cada conversación. Por eso el informe utiliza la fórmula mínimo verificable y evita presentar una cobertura estimada como una medición.",
+      "innerBlockCount": 0,
+      "fingerprint": "c4fbd37e55b36bb2dedc46925f5b05256ddb9553e38bdda68e05e06da3c71829",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "159",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ffc95905b9883d101f588ce46aa9b274976931b345af7aad4c06dfe2e7c83e49",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "160",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Lo valioso del QA no fue confirmar que la respuesta ideal aparecía ante la pregunta ideal. Fue encontrar estos bordes. Si una prueba no incomoda al agente, probablemente está evaluando una demo, no una atención real.",
+      "innerBlockCount": 0,
+      "fingerprint": "d04d721bb1ae84e97d6baf444ee18e725eae366f48c4a29d891892a6dde3ffd3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "161",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "02d56a21a10524525b1d41e74d1466ca6d25e675a85ed32f85a987d45060c6e9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "162",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Qué limitaciones aparecieron durante la implementación?",
+      "innerBlockCount": 0,
+      "fingerprint": "a622345f662ee2d385025a91b83575588cc11b97b0cc0bf0d5712cc05704e4b1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "163",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0299399a422e6558dbe987753bdd46e025543e34e8dddfd2bfb6fd8c2c417512",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "164",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Encontramos seis límites que afectaban lo que podíamos afirmar sobre el agente. No invalidaban la implementación, pero sí obligaban a describirla con precisión:",
+      "innerBlockCount": 0,
+      "fingerprint": "69b821acd9da75888b62448ef963a56eccc49d96f88c1acf2acf52791874ee73",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "165",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0c31b73f5141f4b7c20509437d2c273383fd3712744c54c462e917e4f7b3888c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "166",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "la transferencia nativa podía anticiparse a una aclaración entrenada;la vista previa no representaba toda la identidad CRM de un cliente real;una respuesta corta no garantizaba el mismo comportamiento ante cualquier formulación;el mensaje prellenado desde la p…",
+      "innerBlockCount": 0,
+      "fingerprint": "9e2c4c23328da221f8d766f4c456931d451bdf12692cf70dfd1516d2a1579356",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "167",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "64da2dc65d80c38f3eae39e4e88b56930336e69638990589418b765dbd24f4da",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "168",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ojo con el alcance: son observaciones del corte evaluado, no defectos universales de HubSpot. Algunas pueden cambiar con nuevas versiones, configuración adicional o pruebas desde un contacto real.",
+      "innerBlockCount": 0,
+      "fingerprint": "8802c21f302379b35f77846692b18def1cbd20a010e86a9e130e0af64715dd39",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "169",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e93ca3e048e5d4e2c8e5102e19dadf806759335dfa4381897a23c0e3a5183f66",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "170",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Hasta aquí podemos decir qué ocurrió en ANAM. No podemos transformar ese recorte en una verdad general sobre la plataforma. Lo que sí corresponde es documentar la frontera y evitar que una posibilidad del producto se presente como una capacidad ya disponible e…",
+      "innerBlockCount": 0,
+      "fingerprint": "395e690f8d5490a689e683060b4c9ef9f9f7e1ebf76032516f14ca73044421c8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "171",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d738bc9f05e2f3e14d5aa101abd28e2263da41caef8c7d9fc66e77b580b7236c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "172",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Por qué configurado, probado y operativo son estados distintos?",
+      "innerBlockCount": 0,
+      "fingerprint": "d75fa09cd0c6956c30ab3959e5c3ee15bcdf504d67f8215e32e591fee020a1fb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "173",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "05c0c2e56395d04375de2abc889414ae44d64fe1334f008fd1157523cb6307b8",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "174",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Configurado, probado y operativo son estados distintos porque cada uno exige una evidencia diferente. Tener una configuración visible no demuestra que una conversación nueva pueda entrar, resolverse, transferirse y medirse.",
+      "innerBlockCount": 0,
+      "fingerprint": "512e009075862b237ab468ebd0bb4b98c3569b4da4f186ca4f7cc6a289e48b95",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "175",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9c213d587166d347133b7879881c8e4a9c8ec278b50c1fec8cad97861524938f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "176",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El contraste con las cifras agregadas del proveedor es útil. HubSpot reportó en abril de 2026 que Customer Agent resolvía 65% de las conversaciones y reducía 39% el tiempo de resolución entre más de 8.000 clientes que lo habían activado. Son resultados informa…",
+      "innerBlockCount": 0,
+      "fingerprint": "e02e827f12cf01446f2f13b178885d9e5c948502baa5e9fb3b3a6a0d08f3fcbe",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.hubspot.com/company-news/hubspots-customer-agent-and-prospecting-agent-now-you-pay-when-the-task-is-complete"
+    },
+    {
+      "path": "177",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dda9be2f07d28edfe71022796d240a0b562fad5d407713c3d8f0cebbfb6ea3ff",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "178",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "También importa qué significa resolver. En la documentación vigente de HubSpot, la plataforma evalúa una conversación 72 horas después de la última respuesta del agente y exige que no haya ocurrido una transferencia humana durante esa ventana. Una cifra de res…",
+      "innerBlockCount": 0,
+      "fingerprint": "826112715fa1d63ea0d2b8171fe1d22f91f075d7026b5b3d2f091e9f1077fb7b",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent"
+    },
+    {
+      "path": "179",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "20c228daf7c972ee6a18c8d810ae9351f1c36d1b82b9d877c2328000e3179011",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "180",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Y después llegó la prueba más incómoda: la que no se resuelve dentro de la vista previa.",
+      "innerBlockCount": 0,
+      "fingerprint": "75c84caca1cdc2bd0fb393713684258fa872ff21322c75357269fbd22df14e31",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "181",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b7ad09ce50d1d59cdc461d4433a63209a38725778c1afd7b0ba5d63e7b70533",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "182",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "EstadoPregunta que debe responder la evidenciaANAM al corteDocumentado por el proveedor¿HubSpot describe la capacidad?SíElegible en el portal¿La cuenta muestra la superficie?SíConfigurado¿Conocimiento, directrices, transferencia y canal están presentes?SíProba…",
+      "innerBlockCount": 0,
+      "fingerprint": "36b1fe3f549f53b130124bdc68c084091803e7297950aad608afb7e963323c50",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "183",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "8dc68400d767be958d1ae88d43305378c5fa3828d162feb80d364ccc7ad6b3d7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "184",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 251442,
+        "sizeSlug": "large",
+        "linkDestination": "media"
+      },
+      "text": "Una configuración visible no demuestra que una conversación nueva pueda entrar, resolverse, transferirse y medirse.",
+      "innerBlockCount": 0,
+      "fingerprint": "67ad85135a95b09a172dcd3b5158189565251c1255d1e3706e7f4da4cd986d78",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 251442,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-web-1600-v2.webp",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-web-1600-v2.webp",
+        "alt": "La evidencia llega desde documentación y configuración hasta pruebas en vista previa; una dependencia administrativa de facturación interrumpe la verificación de conversaciones nuevas, resolución, handoff y medición en operación real.",
+        "width": null,
+        "height": null
+      },
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-web-1600-v2.webp"
+    },
+    {
+      "path": "185",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "53b6001c270f82b054fbba177e5bbea9aec2e6a585a7a6b1e1f57b4f085895f4",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "186",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Al 17 de julio de 2026, el agente conservaba sus 23 fuentes, directrices, transferencia y canal. El canal de chat estaba configurado para todas las horas y 100% de cobertura. Eso describe la configuración, no una atención efectiva 24/7.",
+      "innerBlockCount": 0,
+      "fingerprint": "971add6bebb6ed9d024e518fc9cd54c380b1e1e607077ce6ff8eda3fc7ae22be",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "187",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "77103d287a1ef7a689b77335e0f88335c9147ba4962b0713a13fe226dbb2c675",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "188",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El portal mostraba las conversaciones nuevas en pausa. El bloqueo observado era una dependencia administrativa de facturación que debía resolver ANAM antes de reactivar el uso, reanudar el agente y verificar una conversación nueva real. Este artículo no public…",
+      "innerBlockCount": 0,
+      "fingerprint": "918291b4164d1bb09b4597484c6a143867b7335cec137fcc852304e7eeb816c3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "189",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cd4d942c145e423361b48260f9795a168d162b4f51a20fb323d44fb4c9c673ab",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "190",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Por eso, aunque resulte menos atractivo para un caso de éxito, el estado correcto es éste: Customer Agent configurado y probado en vista previa, pero no operativo para conversaciones nuevas al corte.",
+      "innerBlockCount": 0,
+      "fingerprint": "c5d69203a0c30b61bc1d031ea30487dcf8739c57662e12317aca7f2c96d035df",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "191",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b72086421a42db763c62af947996b5499b6c6e4657eb982b42fb485ace922883",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "192",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Y precisamente por eso vale la pena contarla. Un sistema no se vuelve operativo porque completamos la configuración o porque una demo funcionó. La operación real también forma parte del resultado.",
+      "innerBlockCount": 0,
+      "fingerprint": "875278e9d70be491885fc5f59358e7068c43a3408880b183cfba5c8eb0575a09",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "193",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7f9a2b5f235c4ce2db5d3b750c836a1984527076488f865bbc649dd2c322e65f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "194",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Entonces, ¿qué necesita una IA para atender bien a tus clientes?",
+      "innerBlockCount": 0,
+      "fingerprint": "20a9fe57d8a17109f39ff75c848a89aa62a3d27bbeea0667d38de71e2a8ad83e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "195",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0a946544ca833faf1aee127c32dbd7d186d20b78b8b6da12a4192b54222414dc",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "196",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si tuviera que condensar todo el caso en una respuesta, sería ésta: necesita mucho más que documentos y un chat.",
+      "innerBlockCount": 0,
+      "fingerprint": "8f4b79911003c9a6cacfcde986bb7e6e129ede4d280c4e103525665673e6f0f0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "197",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "15c81da7bb7ef8a8860a0f2593720758af1a0666b6466e4aea0f603019a67195",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "198",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Necesita conocimiento gobernado. Instrucciones que separen intención y responsabilidad. Memoria suficiente para no empezar de nuevo. Límites explícitos, transferencia con contexto, pruebas de varios turnos y una operación disponible para recibir conversaciones…",
+      "innerBlockCount": 0,
+      "fingerprint": "e577bd7a0eb491a6b04b814fb640a9543564f8cfd5a912098db7fc5a229ec13a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "199",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9598c7c14252537506d2c80e24e82898da9ffd5a33b7b9fff5cf8a788578659b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "200",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El caso ANAM no demuestra que un agente deba resolver cada consulta. Demuestra algo más útil: que la autonomía puede diseñarse.",
+      "innerBlockCount": 0,
+      "fingerprint": "d6d48d9cf6638184f1561ad77760b7cc261f6388d89fa0ff4d5810c48cf0c8df",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "201",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "bbafb267b9b03117ab17391cdc1e147468809d8d78a22d46f41a12ff6d29a8a2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "202",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ahí está la frontera: el agente responde donde existe conocimiento confiable, pregunta donde falta contexto, prepara lo que necesita una persona y se detiene antes de decidir por la organización.",
+      "innerBlockCount": 0,
+      "fingerprint": "1945d1c30df2a9f95bc586db14244fd0588bad4ee3066d3698a620634c069a05",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "203",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "fa77ab60d4363d95b1d02c1a05d3ccc25976ce10788f14ae8a0b8bd8c381ca10",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "204",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Antes de activar un Customer Agent, revisa cuatro zonas con tu equipo:",
+      "innerBlockCount": 0,
+      "fingerprint": "6fa3caf3959419c561ff804b7688cce429c4ca1a372d7c14962d2da451af010e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "205",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b4acaae53991c580bc9fb2e1e5fc48ba9b9bb889b8320bb3462aadc830e59955",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "206",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Saber: ¿qué puede responder con evidencia?Aclarar: ¿qué antecedentes necesita pedir?Preparar: ¿qué contexto puede reunir para una persona?Decidir: ¿qué compromisos y acciones deben seguir siendo humanos?",
+      "innerBlockCount": 0,
+      "fingerprint": "a4e84e294fe92a403c18dfd9a95f4bdbd2104a247b0b9fb726c6002777e2c899",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "207",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6646a56de4c9aecba76a7f9629f3dc3c55ec3cfccb58760608ff302b2cc4b2c6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "208",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si esa frontera no está escrita, cargar más contenido sólo hará que la IA responda con más material. No necesariamente con más criterio.",
+      "innerBlockCount": 0,
+      "fingerprint": "73f90442b2116cfef6d20d7f354393b968dc10e200c1aac00d89d72cd585f468",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "209",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "accc57a308ddb739200dc548b2b63b0f0f7b174bdb23749ebf1b6c4856e8a392",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "210",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "f505145f5b17aefd5373b52fe1b537678a6903c85972a0e5ebbe39f407f65294",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "211",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "de6cb3f3fc394a4ddd8236f4cef424a78e885d37fd023ead99002110e6144773",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "212",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Nota metodológica",
+      "innerBlockCount": 0,
+      "fingerprint": "7cbccc832bf223b3e6b60c34aa3d2913bd3184250554e28b9e59f3d265a1d1a0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "213",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a3e042bf523ce176cb4461d1fdc501d93659be2455aa033e6a897b53bb2d4b7d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "214",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Este artículo se basa en el inventario autenticado del portal ANAM, un paquete versionado de las 23 fuentes, las directrices publicadas y el informe de QA del 16 de julio de 2026. Los conteos de prueba se presentan como mínimos verificables cuando no existe ev…",
+      "innerBlockCount": 0,
+      "fingerprint": "8a42389632ebf06a313af6218bd731b7084fd5d59b7ab394de6ab3f73577983a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "215",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "06f4e175ff00817e2c0dfc2cf81b7d006c7a9cf425941fbd5148b2ffb1f96dc3",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "216",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Fuentes oficiales de producto",
+      "innerBlockCount": 0,
+      "fingerprint": "81e65bd6c5d9daf3922b258c358f45d82c924c9c7ee0ed0992d133e0ca046d5c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "217",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "47170f5dfeff9e455afa195331b0f83c84e548596df9d07e6173b4c0314b2080",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "218",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "HubSpot: entender Customer AgentHubSpot: gestionar las fuentes de contenidoHubSpot: configurar la transferencia humanaHubSpot: resultados agregados y modelo por resolución, abril de 2026",
+      "innerBlockCount": 0,
+      "fingerprint": "c3e466f39ae9a445be92460f89865ff93bc279e90082fd690dd0b09d9481eae6",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent"
+    },
+    {
+      "path": "219",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7378d841a08238d91cbbf370c685de2bbb697f47481ca62fdc511989580dcb5e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "220",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Evidencia externa consultada",
+      "innerBlockCount": 0,
+      "fingerprint": "a69920df1b9507c033756937f8b94cee21d942149d614e4e7d514dae345ab0f5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "221",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a1a36f2bb7f906f686abecbad5c03bbe23c63a606d8130bf5b2d15938028e5cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "222",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Sheehan, Jin y Gottlieb: efecto de los errores y las aclaraciones en la adopción de chatbotsZendesk CX Trends 2026: contexto continuo en la atención al cliente",
+      "innerBlockCount": 0,
+      "fingerprint": "54bc600d06a70d2151995f6cdcd668a2ad7355821647da6d01cb223dfda4e93e",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "https://doi.org/10.1016/j.jbusres.2020.04.030"
+    },
+    {
+      "path": "223",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3e0271bf3b1fca7c9c389a133c375e7c77ccc57a6c48a30277a4adff2508ee2d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "224",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "Nota de autoría",
+      "innerBlockCount": 0,
+      "fingerprint": "6cec6e24ad79ef19d53c179096977432228a5fbb36e4eaa55729305338f8fcbb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "225",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c12ae0a8a458a64ddf94c5c5eeb14f27ef2c0f23b7715b6d945b425b3eb7a8cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "226",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Este artículo fue desarrollado con apoyo de IA a partir de la tesis y la dirección editorial de Julio Reyes. La selección final de fuentes, la verificación de afirmaciones y esta versión se revisaron bajo su dirección; la publicación se realizó con su aprobaci…",
+      "innerBlockCount": 0,
+      "fingerprint": "ac794cbbe9a6996767110a8e877ce78389826b6500136bddcb9f98bb8789c739",
+      "editability": "safe_text_edit",
+      "risks": []
+    }
+  ],
+  "links": [
+    {
+      "href": "#h-que-es-un-customer-agent-y-en-que-se-diferencia-de-un-chatbot",
+      "text": "¿Qué es un Customer Agent y en qué se diferencia de un chatbot?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-problema-debia-resolver-el-customer-agent-de-anam",
+      "text": "¿Qué problema debía resolver el Customer Agent de ANAM?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-por-que-cargar-documentos-no-crea-una-buena-respuesta",
+      "text": "¿Por qué cargar documentos no crea una buena respuesta?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-se-diseno-una-base-de-conocimiento-de-23-fuentes",
+      "text": "¿Cómo se diseñó una base de conocimiento de 23 fuentes?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-por-que-el-cliente-ve-tres-intenciones-y-el-agente-opera-con-cinco",
+      "text": "¿Por qué el cliente ve tres intenciones y el agente opera con cinco?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-debe-recordar-y-que-no-puede-prometer-una-ia",
+      "text": "¿Qué debe recordar y qué no puede prometer una IA?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-cuando-transferir-a-una-persona-es-la-respuesta-correcta",
+      "text": "¿Cuándo transferir a una persona es la respuesta correcta?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-se-prueba-una-conversacion-y-no-solo-una-respuesta",
+      "text": "¿Cómo se prueba una conversación y no sólo una respuesta?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-limitaciones-aparecieron-durante-la-implementacion",
+      "text": "¿Qué limitaciones aparecieron durante la implementación?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-por-que-configurado-probado-y-operativo-son-estados-distintos",
+      "text": "¿Por qué configurado, probado y operativo son estados distintos?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-entonces-que-necesita-una-ia-para-atender-bien-a-tus-clientes",
+      "text": "Entonces, ¿qué necesita una IA para atender bien a tus clientes?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-nota-metodologica",
+      "text": "Nota metodológica",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-fuentes-oficiales-de-producto",
+      "text": "Fuentes oficiales de producto",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-evidencia-externa-consultada",
+      "text": "Evidencia externa consultada",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-nota-de-autoria",
+      "text": "Nota de autoría",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent",
+      "text": "HubSpot lo describe",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/hubspot/dashboards-hubspot-confiables-caso-anam/",
+      "text": "dashboards confiables en HubSpot",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-web-1600-v2.webp",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://knowledge.hubspot.com/customer-agent/manage-the-customer-agents-content-sources",
+      "text": "HubSpot advierte",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://doi.org/10.1016/j.jbusres.2020.04.030",
+      "text": "dos experimentos publicados en Journal of Business Research",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-web-1600-v2.webp",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://cxtrends.zendesk.com/",
+      "text": "encuesta realizada por Zendesk en junio de 2025",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process",
+      "text": "HubSpot permite configurar guías personalizadas de transferencia",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.hubspot.com/company-news/hubspots-customer-agent-and-prospecting-agent-now-you-pay-when-the-task-is-complete",
+      "text": "HubSpot reportó en abril de 2026",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent",
+      "text": "documentación vigente de HubSpot",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-web-1600-v2.webp",
+      "text": "",
+      "kind": "internal_url"
+    },
+    {
+      "href": "https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent",
+      "text": "HubSpot: entender Customer Agent",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://knowledge.hubspot.com/customer-agent/manage-the-customer-agents-content-sources",
+      "text": "HubSpot: gestionar las fuentes de contenido",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process",
+      "text": "HubSpot: configurar la transferencia humana",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.hubspot.com/company-news/hubspots-customer-agent-and-prospecting-agent-now-you-pay-when-the-task-is-complete",
+      "text": "HubSpot: resultados agregados y modelo por resolución, abril de 2026",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://doi.org/10.1016/j.jbusres.2020.04.030",
+      "text": "Sheehan, Jin y Gottlieb: efecto de los errores y las aclaraciones en la adopción de chatbots",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://cxtrends.zendesk.com/",
+      "text": "Zendesk CX Trends 2026: contexto continuo en la atención al cliente",
+      "kind": "external_url"
+    }
+  ],
+  "mediaIssues": [],
+  "editabilityLegend": {
+    "safe_text_edit": "Agent may propose text changes while preserving block type, path and surrounding structure.",
+    "safe_attrs_edit": "Agent may propose constrained attribute changes after validating the native block setting.",
+    "media_requires_reconcile": "Agent must reconcile WordPress media id, rendered src, alt text and source brief before write.",
+    "preserve_structure": "Agent should preserve structure and patch child blocks or attrs only with explicit intent.",
+    "inspect_only": "Agent should preserve by default until serialization/plugin behavior is understood."
+  }
+}
