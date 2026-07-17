@@ -1,3 +1,15 @@
+## Sesión 2026-07-17 — TASK-1276 code complete (rollout pendiente)
+
+> **Implementados los 7 slices** de la vista operador AEO en `develop` local (6 commits, sin push):
+> cockpit + detalle (reuso masterDetail TASK-1248 con extensiones aditivas) + control de estado Plan
+> AEO + picker run operador + composer envío/Lead (flag OFF) + facet Account 360 + viewCode
+> `gestion.growth_aeo` (seed migration aplicada a greenhouse-pg-dev). Bugfix raíz: timestamptz como
+> `Date` bajo cast `as string` en el store del grader (500 con data real; normalizado ISO). GVC
+> desktop+mobile mirado con data real (scenarios `growth-aeo-operator` + `-compact`), scroll
+> horizontal 0. Gates: task/wireframe/flow lint 0 findings, reachability 0 orphans, tsc/lint verdes.
+> **Pendiente**: push a develop → staging → GVC staging + smoke status write → prod (esperando
+> instrucción del operador). Envío S11 depende además del rollout de TASK-1279 (flag + property HubSpot).
+
 ## Sesión 2026-07-17 — TASK-1276 AEO Operator View (in-progress)
 
 > **Task tomada:** `TASK-1276` (vista operador AEO: cockpit `/growth/aeo` + detalle por-org + facet Account 360

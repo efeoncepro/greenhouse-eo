@@ -147,8 +147,12 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
     return base.filter(r => r.organizationName.toLowerCase().includes(q))
   }, [rows, q, filter])
 
+  // Los targets de cross-sell NO inundan la vista default (pueden ser cientos de orgs sincronizadas):
+  // aparecen solo bajo su pill (Expansión / Prospecto) o cuando hay búsqueda activa en "Todos".
   const filteredTargets = useMemo(() => {
-    const base = filter === 'all' ? targets : targets.filter(t => t.motion === filter)
+    if (filter === 'all' && !q) return []
+
+    const base = filter === 'all' ? targets : filter === 'aeo' ? [] : targets.filter(t => t.motion === filter)
 
     if (!q) return base
 
@@ -195,6 +199,7 @@ const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) 
           </Stack>
           <Button
             variant='contained'
+            data-capture='aeo-run-header-cta'
             startIcon={<i className='tabler-player-play-filled' />}
             onClick={() => openPicker(null)}
             sx={{ flexShrink: 0 }}

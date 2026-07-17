@@ -162,11 +162,13 @@ const PlanStatusSection = ({ current, busy, onSetStatus }: PlanStatusSectionProp
                 key={status}
                 size='small'
                 variant={active ? 'contained' : 'outlined'}
-                color={active ? 'primary' : 'secondary'}
+                color={active ? 'primary' : 'inherit'}
                 disabled={busy}
                 aria-pressed={active}
                 startIcon={<i className={STATUS_ICON[status]} />}
                 onClick={() => choose(status)}
+                // Neutro (NUNCA secondary olivo para affordances): borde divider + texto secundario.
+                sx={active ? undefined : { color: 'text.secondary', borderColor: 'divider' }}
               >
                 {P.status[status]}
               </Button>
@@ -202,7 +204,8 @@ const PlanStatusSection = ({ current, busy, onSetStatus }: PlanStatusSectionProp
               <Button
                 size='small'
                 variant='outlined'
-                color='secondary'
+                color='inherit'
+                sx={{ color: 'text.secondary', borderColor: 'divider' }}
                 disabled={busy}
                 onClick={() => {
                   setPendingStatus(null)

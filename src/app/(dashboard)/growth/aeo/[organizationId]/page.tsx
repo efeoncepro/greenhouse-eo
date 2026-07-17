@@ -10,6 +10,7 @@ import { modelFromClientReport } from '@/components/growth/ai-visibility/report-
 import { getOrganizationDetail } from '@/lib/account-360/organization-store'
 import { GH_GROWTH_AEO_OPERATOR } from '@/lib/copy/growth'
 import { can } from '@/lib/entitlements/runtime'
+import { formatDate } from '@/lib/format/date'
 import { resolveAeoEntitlement, type AeoEntitlement } from '@/lib/growth/ai-visibility/entitlement'
 import { isOperatorSendEnabled } from '@/lib/growth/ai-visibility/flags'
 import { getLatestReportTokenForRun } from '@/lib/growth/ai-visibility/hubspot/report-link'
@@ -172,11 +173,14 @@ export default async function AeoOperatorDetailPage({
       }
     }
 
+    // asOfDate viaja como ISO string (contrato normalizado en el store) → label legible es-CL.
+    const asOfLabel = report.provenance.asOfDate ? formatDate(report.provenance.asOfDate) : null
+
     return (
       <AeoOperatorDetailView
-        band={{ ...band, lastRunLabel: report.provenance.asOfDate }}
+        band={{ ...band, lastRunLabel: asOfLabel }}
         model={model}
-        asOfLabel={report.provenance.asOfDate}
+        asOfLabel={asOfLabel}
         initialStatuses={initialStatuses}
         canSetStatus={canSetStatus}
         send={send}

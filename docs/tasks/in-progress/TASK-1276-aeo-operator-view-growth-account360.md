@@ -13,7 +13,7 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1276-aeo-operator-view.md`
 - Flow: `docs/ui/flows/TASK-1276-aeo-operator-view-flow.md`
 - Motion: `none`
@@ -343,6 +343,50 @@ Ver el wireframe + flow contract declarados. El detalle por-cliente reusa el `ma
 - ~~¿El detalle operador usa un reader operador-scoped distinto del client-scoped (TASK-1243)?~~ **Resuelto 2026-06-29:** sí → `readOperatorScopedAeoReport` en **TASK-1287**.
 - ~~¿El cockpit cross-cliente necesita su propio reader agregado de scores por org?~~ **Resuelto 2026-06-29:** sí → `readOperatorCrossOrgAeoScores` en **TASK-1287**.
 - El subject picker de cross-sell (Slice 5) necesita listar también orgs **sin** AEO + prospectos; TASK-1287 acota su agregado a orgs CON AEO. ¿De dónde sale el listado de targets sin AEO (reader de orgs/prospectos general vs extender TASK-1287)? Resolver en Discovery.
+
+## Delta 2026-07-17 — implementación completa local-first (code complete, rollout pendiente)
+
+Implementados los 7 slices en `develop` local (sin push), con el **mockup aprobado de Claude Design
+"AEO Operator View"** (proyecto `f146e98a-fd29-407d-8f9e-2c4782fcb76a`) como contrato visual:
+
+- **S8 cockpit** `/growth/aeo`: KPIs + tabla (score semáforo honesto null≠0, tier, último run) +
+  filter pills por motion + targets cross-sell (solo bajo su pill o búsqueda — con ~150 orgs
+  sincronizadas el default "Todos" lista solo clientes del programa) + CTA "Correr AEO".
+- **S9 detalle** `/growth/aeo/[organizationId]`: banda de cliente (tier + allowance + Account 360)
+  con REUSO de `AiVisibilityClientReportView` vía extensiones ADITIVAS `chrome`/`plan` (cero cambio
+  sin props; `/aeo` intacto). Estados denied/not-found/empty/preparing/error.
+- **S7 control de estado**: `PlanStatusSection` (5 estados TASK-1275 — el mockup mostraba 4; el
+  contrato manda e incluye `blocked` — reason obligatorio en blocked/dismissed, aria-pressed,
+  aria-live, color-independiente, botones neutros NUNCA secondary olivo).
+- **S10 picker** (`AeoOperatorRunPicker`, drawer): grupos Con AEO/Expansión/Prospecto + run
+  gobernado `operator-run` con estado honesto "encolado" (el motor tarda minutos; NO se simula
+  ready). En el detalle, `AeoOperatorRunButton` re-corre la org actual (patrón AeoRunCta).
+- **S11 composer** (`AeoOperatorSendComposer`): compose→confirm→submitting→accepted (202 async
+  honesto — el Lead se crea en el reactive consumer; sin link al Lead en este punto). Consent gate
+  prospecto (checkbox + consentRef requerido). **`legalBasis`/`dealIntent` NO se capturan** (el
+  command TASK-1279 los deriva server-side; se muestran read-only en el confirm — contrato > mockup).
+  CTA gateado por capability `lead.open` + flag `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` (OFF,
+  hint honesto) + informe publicado.
+- **S12 facet** "AEO" en Organization Workspace (receta canónica; capability reusada
+  `report.read_operator`, sin capability nueva; `fetchAeoFacet` data-plane reusa el agregado cockpit).
+- **viewCode** `gestion.growth_aeo` + seed migration `20260717193245699` (aplicada a
+  `greenhouse-pg-dev`; roles: efeonce_admin/account/operations/ai_tooling_admin) + nav child Growth.
+- **Bugfix raíz** (bug class TASK-893): `store.ts` casteaba `finished_at as string` pero pg entrega
+  `Date` → React 500 ("Objects are not valid as a React child") en el detalle CON DATA REAL; también
+  latente en `/aeo` cliente. Normalizado a ISO en el mapper (`toIsoOrNull`) + labels con `formatDate`.
+- **GVC mirado** (desktop 1440 + iPhone 13, data real Sky Airlines/Grupo Berel): scenarios
+  `growth-aeo-operator` (cockpit→picker→detalle→status) + `growth-aeo-operator-compact` (drawer
+  "Ver detalle" con el control adentro). Scroll horizontal 0 en 4/4 rutas×viewports (fix sr-only
+  `width:'1px'` — `width:1` en sx es 100%).
+- **Desviación honesta vs mockup**: SoV per-motor con competidores NO existe en el
+  `ReportArtifactModel` (solo SoV agregado + presencia por motor) → se renderiza lo que el modelo
+  tiene. Follow-up backend si se quiere el per-motor. El "Historial" del mockup requiere reader de
+  history que TASK-1275 no expone vía API → degradado (reason + provenance mínima); follow-up.
+
+**Rollout pendiente** (esperando instrucción de push del operador): push a develop → staging
+(migration ya aplicada al Cloud SQL dev compartido) → GVC staging → smoke write de status → prod
+(release control plane) con seed migration + grants verificados. El envío S11 además depende del
+rollout de TASK-1279 (flag OFF + property HubSpot `aeo_check_result` out-of-band).
 
 ## Delta 2026-06-29 — backend del cross-sell (S11) disponible — cerrado por TASK-1279
 

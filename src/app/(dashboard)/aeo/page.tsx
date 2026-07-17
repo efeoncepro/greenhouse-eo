@@ -162,7 +162,9 @@ export default async function AiVisibilityClientReportPage() {
         <AiVisibilityClientReportView
           model={model}
           organizationName={tenant.organizationName ?? tenant.clientName}
-          asOfLabel={report.provenance.asOfDate}
+          // ISO → label legible (el store normaliza timestamptz a ISO string; TASK-1276 fix del
+          // bug class TASK-893: el cast crudo dejaba un Date que rompía el render con data real).
+          asOfLabel={report.provenance.asOfDate ? formatDate(report.provenance.asOfDate) : null}
         />
       </>
     )

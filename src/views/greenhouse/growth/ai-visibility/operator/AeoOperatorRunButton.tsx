@@ -101,7 +101,8 @@ const AeoOperatorRunButton = ({ organizationId }: { organizationId: string }) =>
     <Stack spacing={1} alignItems='flex-end'>
       <Button
         variant='outlined'
-        color='secondary'
+        color='inherit'
+        sx={{ color: 'text.secondary', borderColor: 'divider' }}
         onClick={handleRun}
         disabled={phase === 'submitting'}
         startIcon={

@@ -166,10 +166,20 @@ const projectRun = (row: RawRun): GraderRunRow => ({
   costAttribution: (row.cost_attribution as GraderCostAttribution | null) ?? null,
   promptSetId: (row.prompt_set_id as string | null) ?? null,
   promptSetVersion: row.prompt_set_version != null ? Number(row.prompt_set_version) : null,
-  startedAt: (row.started_at as string | null) ?? null,
-  finishedAt: (row.finished_at as string | null) ?? null,
-  createdAt: String(row.created_at)
+  startedAt: toIsoOrNull(row.started_at),
+  finishedAt: toIsoOrNull(row.finished_at),
+  createdAt: toIsoOrNull(row.created_at) ?? String(row.created_at)
 })
+
+// TASK-1276 (bug class TASK-893/db.d.ts): pg-node entrega `Date` para timestamptz — el cast ciego
+// `as string` mentía y un consumer que renderice el valor crudo revienta React ("Objects are not
+// valid as a React child: [object Date]"). El contrato GraderRunRow declara string ISO: normalizar acá.
+function toIsoOrNull(value: unknown): string | null {
+  if (value == null) return null
+  if (value instanceof Date) return value.toISOString()
+
+  return String(value)
+}
 
 const projectObservation = (row: RawObservation): GrowthAiVisibilityProviderObservation => ({
   observationId: String(row.observation_id),
@@ -464,7 +474,7 @@ export const listOperatorCrossOrgAeoScores = async (): Promise<OperatorAeoCockpi
     aeoTier: (row.aeo_tier as string | null) ?? null,
     assignmentStatus: String(row.assignment_status),
     latestRunId: (row.latest_run_id as string | null) ?? null,
-    latestRunAt: (row.latest_run_at as string | null) ?? null,
+    latestRunAt: toIsoOrNull(row.latest_run_at),
     latestScore: row.latest_score != null ? Number(row.latest_score) : null
   }))
 }

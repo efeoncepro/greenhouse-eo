@@ -1,5 +1,20 @@
 # changelog.md
 
+## 2026-07-17 — TASK-1276: AEO Operator View (Growth + Account 360) — code complete local
+
+- Vista operador del programa AEO (nodos S8-S12 del EPIC-020), implementada desde el mockup aprobado de
+  Claude Design "AEO Operator View": cockpit `/growth/aeo` (KPIs + tabla score/tier/último run + filter
+  pills por motion + targets de cross-sell), detalle `/growth/aeo/[organizationId]` (banda de cliente +
+  reuso del workbench masterDetail de TASK-1248 vía extensiones aditivas `chrome`/`plan`), control de
+  estado del Plan AEO (5 estados TASK-1275, reason obligatorio en blocked/dismissed, a11y completo),
+  picker de run operador agrupado por motion (TASK-1277), composer de envío + Lead HubSpot con consent
+  gate (TASK-1279, flag OFF) y facet "AEO" en el Organization Workspace (Account 360).
+- viewCode `gestion.growth_aeo` + seed migration (roles operador; NUNCA client_*) + nav Growth; el facet
+  reusa la capability `report.read_operator` (sin capability nueva). Bugfix raíz en el store del grader
+  (timestamptz llegaba como `Date` bajo cast `as string` → 500 con data real; normalizado a ISO — también
+  cubría a `/aeo` cliente). GVC desktop+mobile mirado con data real (Sky Airlines/Grupo Berel), scroll
+  horizontal 0. Estado: code complete, rollout pendiente (push/staging/prod por instrucción del operador).
+
 ## 2026-07-17 — Cierre de aprendizaje editorial del Customer Agent ANAM
 
 - El runbook agentic de blogposts incorpora un scan de lenguaje de lifecycle, clasificación explícita del alcance

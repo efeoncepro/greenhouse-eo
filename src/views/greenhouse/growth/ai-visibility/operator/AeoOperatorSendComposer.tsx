@@ -342,7 +342,7 @@ const AeoOperatorSendComposer = ({
         >
           {step.kind === 'compose' ? (
             <>
-              <Button variant='outlined' color='secondary' onClick={handleClose}>
+              <Button variant='outlined' color='inherit' sx={{ color: 'text.secondary', borderColor: 'divider' }} onClick={handleClose}>
                 {S.cancelCta}
               </Button>
               <Button variant='contained' endIcon={<i className='tabler-arrow-right' />} onClick={handleContinue}>
@@ -352,7 +352,7 @@ const AeoOperatorSendComposer = ({
           ) : null}
           {step.kind === 'confirm' ? (
             <>
-              <Button variant='outlined' color='secondary' onClick={() => setStep({ kind: 'compose' })}>
+              <Button variant='outlined' color='inherit' sx={{ color: 'text.secondary', borderColor: 'divider' }} onClick={() => setStep({ kind: 'compose' })}>
                 {S.backCta}
               </Button>
               <Button variant='contained' startIcon={<i className='tabler-send' />} onClick={handleConfirm}>

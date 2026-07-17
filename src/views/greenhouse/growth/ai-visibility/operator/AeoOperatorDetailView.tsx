@@ -137,7 +137,8 @@ const SubjectBand = ({
         <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap sx={{ flexShrink: 0 }}>
           <Button
             variant='outlined'
-            color='secondary'
+            color='inherit'
+            sx={{ color: 'text.secondary', borderColor: 'divider' }}
             endIcon={<i className='tabler-external-link' />}
             href={band.account360Href}
           >
@@ -240,7 +241,21 @@ const AeoOperatorDetailView = ({
 
   return (
     <Stack spacing={5} data-capture='aeo-operator-detail' sx={{ minWidth: 0 }}>
-      <Box aria-live='polite' sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
+      {/* sr-only canónico: 1px real (OJO: width numérico en sx = porcentaje; width:1 sería 100%). */}
+      <Box
+        aria-live='polite'
+        sx={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          m: '-1px',
+          p: 0,
+          overflow: 'hidden',
+          clip: 'rect(0 0 0 0)',
+          whiteSpace: 'nowrap',
+          border: 0
+        }}
+      >
         {liveMessage}
       </Box>
 
