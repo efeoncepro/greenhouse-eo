@@ -337,6 +337,34 @@
           "text": "Las respuestas cortas cumplían otro trabajo. Permitían tratar situaciones específicas —especialmente administrativas— con un lenguaje más directo. Aun así, no se asumió que una respuesta entrenada aparecería ante cualquier formulación humana. Esa conducta debía comprobarse conversando."
         },
         {
+          "kind": "image",
+          "mediaId": 251423,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-web-1600-v1.webp",
+          "alt": "Seis archivos y diecisiete respuestas cortas pasan por reglas de gobierno antes de orientar, aclarar o transferir una consulta.",
+          "width": 1600,
+          "height": 1000,
+          "sizeSlug": "large",
+          "caption": "Las fuentes sólo se vuelven conocimiento útil cuando tienen propósito, vigencia, responsable y reglas para resolver contradicciones.",
+          "linkDestination": "media",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-mobile-dark-web-1200-v1.webp",
+              "type": "image/webp"
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-mobile-web-1200-v1.webp",
+              "type": "image/webp"
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-knowledge-desktop-dark-web-1600-v1.webp",
+              "type": "image/webp"
+            }
+          ]
+        },
+        {
           "kind": "paragraph",
           "text": [
             {
@@ -537,6 +565,34 @@
         {
           "kind": "paragraph",
           "text": "No es un embudo ni obliga a que cada conversación pase por las cuatro zonas. Sirve para reconocer dónde está la responsabilidad en cada momento."
+        },
+        {
+          "kind": "image",
+          "mediaId": 251419,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-web-1600-v1.webp",
+          "alt": "Cuatro zonas de autonomía: saber y aclarar quedan con el agente; preparar transfiere contexto; decidir corresponde a una persona.",
+          "width": 1600,
+          "height": 1000,
+          "sizeSlug": "large",
+          "caption": "La autonomía cambia cuando cambia la responsabilidad, no cuando la conversación acumula más turnos.",
+          "linkDestination": "media",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-mobile-dark-web-1200-v1.webp",
+              "type": "image/webp"
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-mobile-web-1200-v1.webp",
+              "type": "image/webp"
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-autonomy-desktop-dark-web-1600-v1.webp",
+              "type": "image/webp"
+            }
+          ]
         },
         {
           "kind": "paragraph",
@@ -766,6 +822,34 @@
                 }
               ]
             ]
+          ]
+        },
+        {
+          "kind": "image",
+          "mediaId": 251427,
+          "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-web-1600-v1.webp",
+          "alt": "Escalera de cinco estados: ANAM estaba configurado y probado en vista previa, pero no verificado en operación real.",
+          "width": 1600,
+          "height": 1000,
+          "sizeSlug": "large",
+          "caption": "Una configuración visible no demuestra que una conversación nueva pueda entrar, resolverse, transferirse y medirse.",
+          "linkDestination": "media",
+          "sources": [
+            {
+              "media": "(prefers-color-scheme: dark) and (max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-mobile-dark-web-1200-v1.webp",
+              "type": "image/webp"
+            },
+            {
+              "media": "(max-width: 860px)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-mobile-web-1200-v1.webp",
+              "type": "image/webp"
+            },
+            {
+              "media": "(prefers-color-scheme: dark)",
+              "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-ca-evidence-desktop-dark-web-1600-v1.webp",
+              "type": "image/webp"
+            }
           ]
         },
         {

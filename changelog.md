@@ -29,6 +29,13 @@
   Cada frente explicita owner, dependencias, aprobación y exit gate; el cambio es documental y no autoriza ni
   ejecuta nuevos writes en HubSpot.
 
+## 2026-07-17 — Borrador privado del artículo Customer Agent de ANAM
+
+- El segundo artículo de la serie ANAM quedó integrado como post privado `251432`, con autor Julio Reyes,
+  categoría HubSpot, `noindex`, featured/OG y tres diagramas responsive light/dark desde Media Library.
+- La validación autoral, inspección profunda, acceso anónimo `404` y QA visual desktop/móvil pasaron. La revisión
+  autenticada del template Ohio y cualquier publicación continúan pendientes y requieren un paso separado.
+
 ## 2026-07-17 — Escenas editoriales de producto: método agnóstico y skin contextual
 
 - `design-studio` suma un módulo espejo Codex/Claude para auditar referencias desde sus assets originales,

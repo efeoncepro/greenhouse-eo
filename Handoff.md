@@ -29,6 +29,19 @@
 > **ANAM:** la corrida V6 conserva SVG, master, WebP, OG y crop `1:1`, con manifest y auditoría actualizados. Sigue
 > en `candidate-awaiting-operator-approval`; no se cambió la portada del post privado ni se publicó WordPress.
 
+## Sesión 2026-07-17 — Segundo artículo ANAM integrado como borrador privado
+
+> **Runtime:** el artículo del Customer Agent quedó en WordPress como post `251432`, estado `private`, autor
+> Julio Reyes, categoría HubSpot, `noindex`, featured `251417` y OG/Twitter `251418`. Las tres figuras responsive
+> usan media `251419–251430`; el permalink anónimo devuelve `404`.
+>
+> **QA:** Content Factory e inspección profunda pasan; el render filtrado por WordPress pasa `1440×1000` y
+> `390×844`, light/dark, sin imágenes rotas ni overflow y con selección correcta de cada `<picture>`. Falta sólo
+> revisar el template Ohio con sesión autenticada. No publicar sin autorización explícita.
+>
+> **Frontera:** el Customer Agent sigue descrito como configurado y probado en vista previa, no verificado en
+> operación real. Canon: `docs/public-site/HUBSPOT_CUSTOMER_AGENT_ANAM_WORDPRESS_PRIVATE_AUDIT_V1.md`.
+
 ## Sesión 2026-07-17 — ANAM: gobierno live de pipelines comerciales
 
 > **Runtime:** portal ANAM `19893546`. Se hizo obligatoria la Company al crear Deal, se apagó la fecha de cierre

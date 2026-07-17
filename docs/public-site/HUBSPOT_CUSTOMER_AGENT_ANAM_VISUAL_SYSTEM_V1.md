@@ -150,8 +150,7 @@ OG permanecen opacos porque necesitan una composición cromática estable fuera 
 - El caso y el uso editorial del nombre ANAM están aprobados; no se requiere un nuevo envío al cliente.
 - No se utiliza logotipo de ANAM ni captura de su portal.
 - La producción local está autorizada y completa.
-- La subida a Media Library y la escritura del post siguen siendo pasos operativos separados; no ocurrieron en
-  esta fase.
+- Los activos se integraron en Media Library y en el post privado `251432`; este paso no publica el artículo.
 - Publicación o promoción pública requieren la autorización humana propia del runbook, no una nueva aprobación de ANAM.
 
 ## Producción técnica ejecutada
@@ -174,7 +173,11 @@ OG permanecen opacos porque necesitan una composición cromática estable fuera 
 | Permiso del caso | PASS | ANAM ya aprobó el caso y su uso editorial |
 | Logo y capturas | NOT REQUESTED | No son necesarios para producir la versión conceptual |
 | Producción de masters | PASS | 13 masters; 12 variantes de cuerpo con transparencia real |
-| Media/CMS | PENDING | No se subieron assets ni se mutó WordPress en esta fase |
+| Media/CMS | PASS | 14 attachments canónicos; portada, OG y tres `<picture>` integrados en el post privado `251432` |
+| Render privado | CONDITIONAL PASS | Fixture filtrado por WordPress pasó desktop/móvil × light/dark; falta revisar el template Ohio con sesión autenticada |
 | Verificación pública | PENDING | Sólo aplica después de una publicación autorizada |
 
-**Estado honesto:** dirección y producción local completas; integración en Media Library/CMS y readback runtime pendientes.
+**Estado honesto:** producción, Media Library, integración privada y readback estructural completos. El artículo
+sigue privado y `noindex`; la revisión autenticada del template Ohio y cualquier verificación pública permanecen
+pendientes. El estado del Customer Agent no cambia: configurado y probado en vista previa, no verificado en
+operación real al corte.
