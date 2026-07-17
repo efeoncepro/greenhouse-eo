@@ -143,6 +143,25 @@ Definición ✅ de "resuelta": el agente respondió o ejecutó una acción **y n
 Cita utilizable (Jon Dick, CCO): *"Outcome-based pricing removes that risk. You pay when it works, full stop."*
 ✅ [company-news — outcome-based agent pricing](https://www.hubspot.com/company-news/hubspots-customer-agent-and-prospecting-agent-now-you-pay-when-the-task-is-complete)
 
+### Prospecting Agent — superficie vigente y beta de buying signals ✅ (as-of 2026-07-17)
+- Superficie general: Sales Hub Starter/Professional/Enterprise + HubSpot Credits; enrollment manual,
+  rulesets, workflows y Target Accounts; `Review before sending` o `Send automatically`; outreach adaptativo
+  o programado; selling profiles, exclusiones, digest diario y analítica de enrollments.
+- El editor denomina `Sources and training` a selling information, website analysis y CTA. Permite custom
+  instructions con preview. Los documents/URLs descritos en esa superficie viven bajo `Call to action`; el KB
+  no los describe como un corpus indexado equivalente a las content sources del Customer Agent.
+- Beta `Prospecting Agent Gets Smarter: Buying Signals and Contact Sourcing`: plays por audiencia/persona,
+  señales de intención, recomendaciones de empresas y sourcing de hasta tres contactos que coincidan con las
+  personas objetivo por empresa,
+  outreach `Sequence` o `Adaptive` e integraciones externas compatibles. La beta exige opt-in de Super Admin.
+- El rate sheet legal es la fuente de verdad del costo: **100 créditos por `Recommend outreach for one lead`**.
+  El KB de la beta describe el disparador como generación de outreach personalizado y advierte pasos
+  adicionales según el play; revisar el estimador live antes de activar una cohorte.
+✅ [KB — Set up and use the prospecting agent](https://knowledge.hubspot.com/prospecting/use-the-prospecting-agent) (act. 2026-06-18)
+✅ [KB — Use buying signals in the prospecting agent](https://knowledge.hubspot.com/prospecting/prospect-companies-with-buying-signals) (act. 2026-07-02)
+✅ [KB — Set up the customer agent](https://knowledge.hubspot.com/customer-agent/set-up-the-customer-agent) (act. 2026-07-02; comparación de training/content sources)
+✅ [Legal — Product & Services Catalog / HubSpot Credits Rate Sheet](https://legal.hubspot.com/hubspot-product-and-services-catalog) (verif. 2026-07-17)
+
 ### Breeze ✅ — solo TRES agentes en GA
 GA: **Customer Agent · Prospecting Agent · Data Agent**. El KB clasifica el resto como **"Mostly Beta"**
 (ABM Landing Page, Blog Research, Closing, Company Research, Cross-sell/Upsell, Customer Health, Deal Loss,

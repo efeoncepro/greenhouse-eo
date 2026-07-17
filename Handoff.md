@@ -1,3 +1,21 @@
+## Sesión 2026-07-17 — Prospecting Agent canonizado de forma agnóstica
+
+> **Qué cambió:** la skill espejo `hubspot-solutions-partner` ahora enruta Prospecting Agent explícitamente y
+> carga `references/prospecting-agent.md` como contrato reusable. La referencia separa GA vs beta de buying
+> signals/contact sourcing y cubre contexto CRM, selling profiles/plays, enrollment, sourcing, modos de outreach,
+> guardrails, créditos, readiness gate, piloto supervisado, funnel/KPIs, anti-patrones y refresh de evidencia.
+> También quedó explícito que `Sources and training` es grounding/configuración comercial, no fine-tuning ni
+> autoaprendizaje: se comparó contra el corpus, guidelines, acciones y handoff del Customer Agent; documents/URLs
+> de Prospecting Agent se tratan como CTA hasta que una fuente o readback pruebe otro contrato.
+>
+> **Frontera:** no contiene clientes, portales ni conclusiones de un caso particular; no activa features, beta,
+> créditos, automatizaciones ni envíos. Los datos perecederos quedaron fechados y enlazados desde `SOURCES.md`.
+>
+> **Evidencia:** `quick_validate.py` PASS para la skill Codex; referencia y módulo 13 byte-equivalentes entre
+> Codex/Claude; búsqueda negativa sin clientes/portal IDs en la referencia; `git diff --check` PASS;
+> `pnpm docs:closure-check` sin warnings. `pnpm docs:context-check` quedó sin errores y con dos warnings históricos
+> por el tamaño de `Handoff.md`, no causados por este cambio.
+
 ## Sesión 2026-07-17 — ANAM convertido en dos servicios canónicos de HubSpot as a Service
 
 > **Qué cambió:** se creó `docs/services/` como catálogo de servicios operables de Efeonce, explícitamente

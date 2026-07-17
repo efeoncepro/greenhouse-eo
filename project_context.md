@@ -1,5 +1,13 @@
 ## Estado vigente para agentes
 
+- **Prospecting Agent canon reusable (2026-07-17):** `hubspot-solutions-partner` tiene una referencia
+  client-agnostic compartida por Codex/Claude en `references/prospecting-agent.md`. Separa la superficie general
+  de la beta Buying Signals/Contact Sourcing y gobierna readiness, selling profiles/plays, señales, sourcing,
+  outreach, exclusiones, créditos, piloto, KPIs y autonomía gradual. Distingue además entrenamiento comercial/
+  grounding de fine-tuning: Customer Agent usa content sources para respuestas; Prospecting Agent configura
+  selling context, audiencia, señales e instrucciones, sin prometer autoaprendizaje no documentado. `SOURCES.md`
+  conserva packaging, límites y precios con `as-of`; cualquier propuesta o rollout debe revalidarlos.
+
 - **Catálogo de servicios Efeonce activo (2026-07-17):** `docs/services/` define las capacidades que Efeonce
   entrega y opera para clientes, separadas de arquitectura, documentación funcional/manuales, propuestas y
   catálogos runtime. HubSpot as a Service tiene dos servicios canónicos independientes: Customer Agent

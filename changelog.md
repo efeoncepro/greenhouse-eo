@@ -1,5 +1,15 @@
 # changelog.md
 
+## 2026-07-17 — Prospecting Agent: contrato reusable de implementación
+
+- `hubspot-solutions-partner` incorpora una referencia client-agnostic para evaluar e implementar Prospecting
+  Agent con separación explícita entre superficie general y beta Buying Signals/Contact Sourcing. Canoniza
+  readiness, plays/perfiles, sourcing, outreach, exclusiones, créditos, piloto, KPIs y gobierno humano. También
+  distingue entrenamiento comercial/grounding de fine-tuning y autoaprendizaje, comparándolo con las content
+  sources y el coaching del Customer Agent.
+- Los mirrors Codex/Claude y `SOURCES.md` quedan sincronizados para esta capacidad. No hubo cambios en portales,
+  enrollments, automatizaciones, créditos ni envíos.
+
 ## 2026-07-17 — Customer Agent: canon de Workflows y bots
 
 - Las skills espejo de HubSpot as a Service distinguen `Deployment > Workflows and bots` como enrutamiento

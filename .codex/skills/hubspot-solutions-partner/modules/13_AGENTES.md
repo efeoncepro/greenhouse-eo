@@ -57,6 +57,14 @@ RFP, Sales-to-Marketing Feedback).
 
 🔴 **NUNCA firmes un SLA sobre un agente en beta.**
 
+### Prospecting Agent — contrato reusable
+
+Para discovery, entrenamiento/grounding, disponibilidad, selling profiles/plays, señales de compra, sourcing
+de contactos, modos de outreach, créditos, guardrails, piloto y medición del Prospecting Agent, cargar
+`../references/prospecting-agent.md` junto con `../SOURCES.md`. Esa referencia es deliberadamente agnóstica
+al cliente; no derivar un rollout productivo desde un caso particular ni confundir la superficie general con
+la beta de buying signals.
+
 ### El costo real — outcome-based ✅ (desde 2026-04-14)
 | Agente | Cobro | En USD |
 |---|---|---|

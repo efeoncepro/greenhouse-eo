@@ -5,7 +5,8 @@ description: >-
   Cubre licencias, implementación, Managed CRM Ops, CRM Intelligence, sourced/managed MRR, economía del
   programa, tiers, deal registration, pricing, battlecards, AEO, discovery, scoping y descalificación.
   Incluye la narrativa Agentic Customer Platform 2026: Growth Context, Breeze, workspaces, MCP/API,
-  Agent CLI, agentes, gobierno e incentivos. Usar ante HubSpot, Solutions Partner, vender o implementar
+  Agent CLI, Customer Agent, Prospecting Agent, Data Agent, agentes, gobierno e incentivos. Usar ante HubSpot,
+  Solutions Partner, vender o implementar
   HubSpot, tier points, comisión/revenue share, Best Partner Wins, Marketing Studio, Sales Workspace,
   Customer Success Workspace, Breeze Studio, Agent CLI, Angela O'Dowd, Duncan Lennox, Yamini Rangan,
   Dharmesh Shah, PDM, Simón Suárez o portal 48713323. Aporta dominio; el método de venta es de
@@ -157,6 +158,7 @@ rehacerla, no memorizarla. Por eso la calculadora vive en `templates/tier-calcul
 | Armar la oferta, el arbitraje del onboarding fee, negociar **con** HubSpot, objeciones | `modules/11_PROPUESTA_PRICING.md` |
 | La implementación como argumento de venta y como negocio | `modules/12_IMPLEMENTACION.md` |
 | 🎯 **Agentes** — implementar los 3 GA · operar con la **Agent CLI** · construir **Agent Tools** · el gobierno · **el caso ANAM** | `modules/13_AGENTES.md` |
+| **Prospecting Agent / agente de prospección** — entrenamiento/grounding, disponibilidad, plays/perfiles, señales, sourcing, outreach, créditos, guardrails, piloto, KPIs y gobierno | `references/prospecting-agent.md` + `SOURCES.md` |
 | **Cómo se vende HubSpot ahora** — narrativa ejecutiva · Growth Context · workspaces · motion por outcome · Champion-led prospecting · multithreading · incentivos H2 2026 | `modules/14_NARRATIVA_AGENTICA_Y_MOTION_2026.md` |
 | **El estado real de Efeonce hoy y el plan de rescate** | `efeonce/ESTADO_ACTUAL.md` · `efeonce/PLAN_RESCATE_6M.md` |
 
