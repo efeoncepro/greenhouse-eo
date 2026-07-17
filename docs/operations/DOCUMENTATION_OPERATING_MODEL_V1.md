@@ -46,6 +46,7 @@ Una task o cierre no debe declararse `complete` si falta una de las tres capas p
 ### 2. Carpeta `docs/`
 - Aqui viven specs, roadmap, tasks y guias especializadas.
 - La taxonomia vigente es:
+  - `docs/services/`
   - `docs/architecture/`
   - `docs/api/`
   - `docs/audits/`
@@ -65,6 +66,16 @@ Una task o cierre no debe declararse `complete` si falta una de las tres capas p
 | Tecnica | devs, agentes, operadores tecnicos, auditorias | Como esta construido y que contratos no se deben romper | `docs/architecture/`, `docs/api/`, ADRs, specs tecnicas |
 | Funcional | producto, operaciones, soporte, liderazgo, clientes internos | Que hace, por que existe y como se comporta | `docs/documentation/<dominio>/` |
 | Manual de uso | usuario-operador, soporte, agentes ejecutores | Como lo uso o diagnostico paso a paso | `docs/manual-de-uso/<dominio>/` |
+
+### Capa adicional para servicios comercializables
+
+Cuando una capacidad se ofrece y opera para clientes como servicio, debe tener además una ficha en
+`docs/services/<familia>/`. Esta ficha responde qué resultado asume Efeonce, qué incluye/excluye, cuáles son sus
+entregables, responsabilidades, métricas, dependencias, evidencia y modelo de continuidad. No sustituye ninguna
+de las tres capas obligatorias y no debe duplicar su detalle técnico u operativo.
+
+`docs/services/` tampoco es el catálogo runtime de productos/componentes de Greenhouse ni un objeto CRM. Precios
+y términos comerciales siguen viviendo en propuestas/contratos; la ficha define el servicio operable.
 
 No mezclar las capas:
 

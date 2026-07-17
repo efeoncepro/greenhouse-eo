@@ -1,3 +1,17 @@
+## Sesión 2026-07-17 — ANAM convertido en dos servicios canónicos de HubSpot as a Service
+
+> **Qué cambió:** se creó `docs/services/` como catálogo de servicios operables de Efeonce, explícitamente
+> separado de arquitectura, documentación funcional/manuales, propuestas, catálogos runtime y el objeto Service
+> de HubSpot. Se registraron dos servicios: `hubspot.customer-agent-managed` y `hubspot.revops-managed`.
+>
+> **Evidencia:** las fichas enlazan los informes Word detallados, source pack/QA, modelo RevOps, roadmap,
+> documentación funcional y manual ANAM. ANAM `19893546` queda como implementación de referencia, no como dato
+> interno de Greenhouse. Se actualizaron los índices y el modelo documental del repo.
+>
+> **Pendientes:** ninguno documental. El estado runtime no cambió: Customer Agent continúa bloqueado por
+> facturación ANAM; Retención/Fidelización y los cinco Services siguen piloto; billing continúa como siguiente
+> slice diseñado y no desplegado.
+
 ## Sesión 2026-07-17 — Notion webhook burst protection — código completo, rollout pendiente
 
 > **Causa validada:** el burst/retry storm de `notion-tasks-demo` y
@@ -32,6 +46,21 @@
 > smoke OIDC del worker, activar el flag sólo en staging, reproducir burst y medir
 > ACK/backlog/`pg_stat_activity`; luego decidir producción. Rollback: flag OFF +
 > pausar queue. Estado correcto: **code complete, rollout pendiente**.
+
+## Sesión 2026-07-17 — ANAM Customer Agent — activación bloqueada por facturación
+
+> **Objetivo:** reanudar `Agente de clientes de ANAM` en portal `19893546`, autorizado explícitamente por el
+> operador. **Resultado runtime:** no activado. Cuenta y facturación muestra `33.000` créditos mensuales, pero
+> también cuenta vencida y una factura atrasada `#760627868`, emitida el `2026-05-08` y vencida el `2026-06-07`.
+> El usuario Julio Reyes Rangel tiene acceso restringido a facturación. Dos intentos llegaron al diálogo oficial
+> `¿Quieres activar el uso de esta función?`; tras confirmar `Activar`, HubSpot respondió `No se pudo reanudar el
+> uso de Agente de clientes` y mantuvo el toggle `DESACTIVADA`. No hubo mutación efectiva, pago ni cambio de plan.
+>
+> **Owner/próximo paso:** un administrador de facturación de ANAM debe regularizar la factura. Después, Efeonce
+> debe repetir `Créditos de HubSpot -> Agente de clientes -> Uso de créditos`, exigir readback `ACTIVADA`, volver
+> al agente, pulsar `Reanudar` si corresponde y verificar que el chatflow acepte conversaciones nuevas. Hasta
+> entonces el estado es `operativamente bloqueado`. Evidencia canonizada en
+> `docs/architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md`.
 
 ## Sesión 2026-07-16 — Release develop→main prep (Claude) — release-coupled documentation
 
@@ -272,8 +301,12 @@
 > `docs/manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md` y este canon técnico. Las
 > skills espejo incorporan calidad como cola con owner/cadencia, atribución causal prudente, matching acotado,
 > snapshots/manifests inmutables, cobertura cross-object, geografía multi-select no aditiva y moneda explícita.
-> Se registra una excepción: no se localizó un source pack Markdown ANAM independiente para todo el knowledge
-> live del Customer Agent; el servicio gestionado Efeonce debe versionarlo antes del próximo cambio de knowledge.
+> **Excepción retirada 2026-07-17:** se creó y reconcilió el source pack independiente
+> `docs/architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/`. Conserva las 23 fuentes
+> en uso (6 archivos + 17 respuestas cortas), el catálogo técnico de 356 registros, identidad, directrices,
+> transferencia, canal y acciones. Readback autenticado detectó además drift: `El acceso gratuito terminó`,
+> agente y conversaciones nuevas pausados, con `Reanudar` deshabilitado. Configuración y chatflow permanecen,
+> pero un administrador ANAM debe reconciliar entitlement/acceso antes de declarar continuidad operativa.
 >
 > **Canon y ownership:** Greenhouse es el repositorio canónico y visible para la documentación del servicio,
 > el caso ANAM, Customer Agent, RevOps, QA y las skills espejo Codex/Claude. Kortex conserva únicamente su

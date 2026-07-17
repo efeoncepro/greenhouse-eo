@@ -1,11 +1,12 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.0
-> **Actualizado:** 2026-07-16
+> **Versión:** 1.1
+> **Actualizado:** 2026-07-17
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
 > **Manual:** [`../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
+> **Servicios:** [Customer Agent gestionado](../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md) · [RevOps, automatización y paneles](../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
 
 ## Qué es
 
@@ -29,19 +30,20 @@ un ítem fuente de facturación. No se deben aplanar estos hechos en Company o D
 
 La landing live abre el chat oficial con tres intenciones: cotizar, seguimiento del servicio y requerimientos de
 calidad. Customer Agent responde conocimiento documentado, reúne contexto y deriva a Maria Paz Haeger cuando
-hace falta una acción humana. La licencia y 30.000 créditos pagados fueron confirmados; el consumo sigue siendo
-una métrica operativa.
+hace falta una acción humana. El source pack independiente y reconciliado versiona las 23 fuentes en uso, las
+17 respuestas cortas, el catálogo de 356 registros y el contrato de identidad/directrices/handoff/canales.
 
-La configuración live y QA están documentadas, pero al cierre no se localizó un source pack Markdown ANAM
-independiente que refleje todo el knowledge cargado. Hasta crearlo, el runtime del portal, `customer-agent.md`,
-la documentación CMS y el informe QA son el conjunto de evidencia. Owner: servicio gestionado Efeonce.
-Condición de retiro: source pack versionado y reconciliado antes del próximo cambio de knowledge.
+Aunque la compra de Customer Agent y 30.000 créditos adicionales fue confirmada el 16 de julio, el readback live
+del 17 de julio mostró 33.000 créditos mensuales, `El acceso gratuito terminó`, agente pausado y conversaciones
+nuevas en pausa. La cuenta está vencida por la factura `#760627868` (venció el 7 de junio de 2026) y HubSpot
+rechazó dos intentos confirmados de activar el uso de créditos. Es un bloqueo administrativo de facturación, no
+una eliminación de la configuración ni falta nominal de créditos. No hubo mutación efectiva durante los intentos.
 
 ## Estado por fase
 
 | Fase | Estado | Resultado vigente |
 |---|---|---|
-| Customer Agent y landing | Cerrada, en operación | Landing, tres intents, handoff y QA conversacional. |
+| Customer Agent y landing | Configuración cerrada; runtime bloqueado | Landing, tres intents, 23 fuentes, handoff y QA; agente pausado por acceso al 2026-07-17. |
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |
@@ -109,7 +111,9 @@ permanecen en backlog.
 
 ## Referencias
 
+- [Catálogo HubSpot as a Service](../../services/hubspot-as-a-service/README.md)
 - [Roadmap](../../architecture/kortex/hubspot-as-a-service/anam-revops-implementation-roadmap-phases-2026-07-16.md)
 - [Modelo vivo](../../architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md)
 - [Handoff](../../architecture/kortex/hubspot-as-a-service/anam-next-session-handoff-2026-07-16.md)
 - [QA Customer Agent](../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)
+- [Customer Agent live source pack](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md)

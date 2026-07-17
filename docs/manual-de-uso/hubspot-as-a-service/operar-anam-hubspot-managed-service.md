@@ -1,10 +1,11 @@
 # Operar ANAM HubSpot Managed Service
 
 > **Tipo:** Manual de uso / runbook
-> **Versión:** 1.0
-> **Actualizado:** 2026-07-16
+> **Versión:** 1.1
+> **Actualizado:** 2026-07-17
 > **Portal obligatorio:** ANAM `19893546`
 > **Funcional:** [`../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
+> **Servicios:** [Customer Agent gestionado](../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md) · [RevOps, automatización y paneles](../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
 
 ## Antes de empezar
 
@@ -70,10 +71,13 @@ esperado/calculado.
 
 ## Monitorear Customer Agent
 
+- Abre el [source pack live](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md) y compara inventario, fecha de sincronización y directrices publicadas contra HubSpot.
 - Prueba lenguaje natural, memoria multi-turno, exactitud, administración/facturación, reclamos y mixed intent.
 - Distingue limitación nativa de transferencia de defecto de configuración.
 - Antes de cambiar knowledge, reconcilia el source pack; no lo reconstruyas desde memoria o adjuntos no clasificados.
 - Publicación, permisos, acciones y handoff requieren aprobación explícita.
+- El readback del 2026-07-17 mostró el agente pausado, uso de créditos `DESACTIVADA`, cuenta vencida y factura `#760627868` vencida desde el 2026-06-07. Dos activaciones confirmadas fallaron en HubSpot. Escala la regularización a un administrador de facturación ANAM; no pagues ni cambies la suscripción con permisos operativos.
+- Tras la regularización, activa `Uso de créditos`, exige readback `ACTIVADA`, vuelve al agente, pulsa `Reanudar` si aparece habilitado y verifica que el canal acepte conversaciones nuevas. La presencia del chatflow por sí sola no demuestra disponibilidad.
 
 ## Facturación prevista
 
@@ -95,8 +99,10 @@ y a plataforma sólo con evidencia runtime de defecto. Incluye IDs, período, es
 
 ## Referencias
 
+- [Catálogo HubSpot as a Service](../../services/hubspot-as-a-service/README.md)
 - [Modelo vivo](../../architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md)
 - [Roadmap](../../architecture/kortex/hubspot-as-a-service/anam-revops-implementation-roadmap-phases-2026-07-16.md)
 - [Sector/geografía](../../architecture/kortex/hubspot-as-a-service/anam-sector-geography-kpi-slice-change-set-2026-07-16.md)
 - [Deal→Company](../../architecture/kortex/hubspot-as-a-service/anam-deal-company-association-remediation-dry-run-2026-07-16.md)
 - [Paneles piloto](../../architecture/kortex/hubspot-as-a-service/anam-phase-3-pilot-dashboard-execution-2026-07-16.md)
+- [Customer Agent source pack](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md)

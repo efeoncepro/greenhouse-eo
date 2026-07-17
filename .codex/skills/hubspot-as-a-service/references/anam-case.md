@@ -16,6 +16,7 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 ## Canonical documentation
 
 - `docs/architecture/kortex/hubspot-cms/anam-chat-landing.md`
+- `docs/architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md`
 - `docs/architecture/kortex/hubspot-cms/anam-portal-access.md`
 - `docs/architecture/kortex/hubspot-cms/landing-page-runbook.md`
 - `docs/architecture/kortex/hubspot-as-a-service/README.md`
@@ -81,7 +82,7 @@ Landing intents are `cotizar`, `seguimiento_servicio` and `requerimiento_calidad
 - Billing/administrative information should be answered when documented. Escalate only the action requiring a person.
 - Technical quotation needs service-specific intake and can require more than two questions.
 - Native transfer can pre-empt short answers. Transfer copy is part of the experience.
-- Customer Agent and 30,000 credits were confirmed purchased on 2026-07-16. There is no current deactivation blocker; monitor paid-credit consumption and the assignee's Service access as separate runtime dependencies.
+- Customer Agent and 30,000 additional credits were confirmed purchased on 2026-07-16. Live readback on 2026-07-17 showed 33,000 monthly credits, but the account is overdue on invoice `#760627868` (due 2026-06-07) and the operator has restricted billing access. Two approved activation attempts failed server-side and credit usage remained off. Treat this as an ANAM billing-administration blocker: do not pay or change subscriptions; after ANAM regularizes the invoice, retry activation, require `ACTIVADA`, resume the agent and verify new-conversation handling. Configuration, 23 sources and the chatflow remain present; load the independent source pack before any knowledge change.
 - Classify client attachments before modeling: migration source records, configuration inputs, reference-only evidence and exclusions are different contracts. For ANAM, only the billing ledger and customer-segmentation workbook are migration candidates. Billing remains no-go; segmentation has one approved exact/unique slice live, while held, unmatched and ambiguous rows remain no-go until separate identity, mapping, dry-run and approval gates close.
 - Do not upload vendor subscription PDFs, presentation slides, email signatures, voicemail artifacts or superseded process documents into CRM records or Customer Agent knowledge merely because they were attached to a client email.
 - For client-facing custom properties, use a natural visible label and a stable snake_case internal name. ANAM's governed example is label `Segmento de mercado` with internal name `segmento_de_mercado_anam`; do not expose implementation qualifiers in the label unless users need them.

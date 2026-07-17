@@ -1,5 +1,12 @@
 ## Estado vigente para agentes
 
+- **Catálogo de servicios Efeonce activo (2026-07-17):** `docs/services/` define las capacidades que Efeonce
+  entrega y opera para clientes, separadas de arquitectura, documentación funcional/manuales, propuestas y
+  catálogos runtime. HubSpot as a Service tiene dos servicios canónicos independientes: Customer Agent
+  gestionado (`hubspot.customer-agent-managed`) y arquitectura RevOps, automatización y paneles
+  (`hubspot.revops-managed`). ANAM/portal `19893546` es implementación de referencia; sus datos siguen siendo
+  del cliente. Índice: `docs/services/hubspot-as-a-service/README.md`.
+
 - **Webhooks Notion — Cloud Tasks preparado pero no activo (2026-07-17):**
   `notion-tasks-demo` y `notion-status-transitions` tienen un path asíncrono
   opt-in que valida HMAC, encola y ACKea antes de tocar PostgreSQL; el worker OIDC
@@ -16,6 +23,12 @@
   una copia divergente. Índice: `docs/architecture/kortex/hubspot-as-a-service/README.md`; overview funcional:
   `docs/documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`; manual:
   `docs/manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`.
+  Source pack Customer Agent reconciliado el 2026-07-17:
+  `docs/architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/`, con 23 fuentes en uso,
+  17 respuestas cortas y catálogo técnico de 356 registros. El mismo readback mostró 33.000 créditos mensuales,
+  pero cuenta vencida por factura `#760627868` (vencimiento 2026-06-07), uso de créditos `DESACTIVADA` y dos
+  intentos de activación rechazados por HubSpot. El bloqueo actual es administrativo de facturación; un
+  administrador ANAM debe regularizarlo antes del retry/readback, aunque fuentes y chatflow permanezcan presentes.
   La próxima continuación ANAM debe comenzar con una búsqueda live de reuniones y tareas en Notion y producir
   una matriz reunión→decisión/owner→fase→evidencia runtime→gap/aprobación antes de cualquier write. La síntesis
   fechada sirve como índice, no reemplaza el readback de Notion ni constituye autorización. Contrato de entrada:

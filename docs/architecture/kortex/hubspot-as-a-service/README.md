@@ -66,6 +66,10 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 
 ## Current ANAM artifacts
 
+- Service catalog — Customer Agent managed service: [`../../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md`](../../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md)
+- Service catalog — RevOps architecture, automation and dashboards: [`../../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md`](../../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
+- Detailed Word report — Customer Agent implementation and operation: [`reports/ANAM_Informe_Detallado_Customer_Agent_2026-07-17.docx`](reports/ANAM_Informe_Detallado_Customer_Agent_2026-07-17.docx)
+- Detailed Word report — RevOps architecture, dashboards, data quality and future model: [`reports/ANAM_Informe_Detallado_Arquitectura_RevOps_Paneles_2026-07-17.docx`](reports/ANAM_Informe_Detallado_Arquitectura_RevOps_Paneles_2026-07-17.docx)
 - Functional overview: [`../../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
 - Operator manual: [`../../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
 - Fresh-session continuation entry point: [`anam-next-session-handoff-2026-07-16.md`](anam-next-session-handoff-2026-07-16.md)
@@ -73,6 +77,7 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 - Landing/runtime: [`../hubspot-cms/anam-chat-landing.md`](../hubspot-cms/anam-chat-landing.md)
 - Portal access: [`../hubspot-cms/anam-portal-access.md`](../hubspot-cms/anam-portal-access.md)
 - QA report: [`../../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`](../../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)
+- Customer Agent live source pack, 23 sources and 356-row technical catalogue: [`anam-customer-agent-source-pack/`](anam-customer-agent-source-pack/)
 - RevOps discovery: [`anam-revops-discovery-2026-07-16.md`](anam-revops-discovery-2026-07-16.md)
 - Non-agent email attachment synthesis for Tickets, billing and market KPIs: [`anam-email-attachment-synthesis-2026-07-16.md`](anam-email-attachment-synthesis-2026-07-16.md)
 - Original non-agent Outlook attachment archive and provenance manifest: [`anam-source-attachments-2026-07-16/`](anam-source-attachments-2026-07-16/)
@@ -110,4 +115,4 @@ The native Service schema, five-record controlled pilot, activation-review queue
 
 ## Operational dependency
 
-ANAM confirmed on 2026-07-16 that Customer Agent and 30,000 credits were purchased. The one-day notice observed during QA preceded the start of paid-credit consumption; it was not a trial-expiry or agent-deactivation warning. There is no current licensing continuity blocker, but credit consumption remains an operating metric.
+ANAM confirmed on 2026-07-16 that Customer Agent and 30,000 additional credits were purchased. Authenticated runtime readback on 2026-07-17 shows 33,000 monthly credits, but also an overdue account and invoice `#760627868` due since 2026-06-07. Two approved activation attempts reached HubSpot confirmation and failed server-side; credit usage remained off, the agent paused and new conversations paused. This is an administrative billing blocker, not missing knowledge or nominal credit capacity. An ANAM billing administrator must regularize the overdue invoice before Efeonce retries activation and verifies the channel. The 23 sources and channel configuration remain present; do not infer that the agent is serving new conversations merely because configuration exists.

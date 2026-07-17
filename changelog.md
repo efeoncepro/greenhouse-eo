@@ -1,5 +1,14 @@
 # changelog.md
 
+## 2026-07-17 — Catálogo de servicios Efeonce y dos servicios HubSpot as a Service
+
+- Se creó `docs/services/` como capa canónica para definir resultados, alcance, entregables, responsabilidades,
+  evidencia y continuidad de servicios operables, sin confundirlos con arquitectura, manuales, propuestas,
+  catálogos runtime u objetos CRM.
+- Customer Agent gestionado y arquitectura RevOps/automatización/paneles quedaron registrados como dos servicios
+  separados y reutilizables, con ANAM `19893546` como implementación de referencia y los informes Word como
+  evidencia detallada.
+
 ## 2026-07-17 — Backpressure de webhooks Notion con Cloud Tasks
 
 - Se agregó un path asíncrono opt-in para `notion-tasks-demo` y
@@ -10,6 +19,20 @@
   kill-switch en `false`; no hubo deploy ni tráfico real por el nuevo path.
 - Estado: código completo, rollout pendiente. El objetivo es absorber bursts sin
   comprar PgBouncer; se mantiene rollback inmediato al path síncrono.
+
+## 2026-07-17 — ANAM Customer Agent: source pack live independiente
+
+- Se retiró la excepción documental del Customer Agent con un source pack Markdown independiente bajo
+  `docs/architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/`: 23 fuentes privadas en uso,
+  seis documentos de dominio, 17 respuestas cortas completas y catálogo técnico de 356 registros/métodos/plazos.
+- El pack separa knowledge de identidad, directrices, handoff, canales y acciones; incorpora IDs de archivo,
+  fechas de sincronización, reglas de sincronización y checks de republicación. No se mutó HubSpot.
+- El readback autenticado del portal ANAM `19893546` reveló drift de continuidad: HubSpot muestra término de
+  acceso gratuito, agente pausado, nuevas conversaciones pausadas y `Reanudar` deshabilitado, pese a la compra y
+  30.000 créditos confirmados el día anterior. Configuración, 23 fuentes y chatflow 24/7/100% siguen presentes;
+  la cuenta sí muestra 33.000 créditos mensuales, pero está vencida por la factura `#760627868` (venció el
+  2026-06-07). Dos intentos confirmados de activar el uso fallaron en HubSpot; facturación ANAM debe regularizarla
+  antes del retry y readback. No se pagó ni cambió la suscripción.
 
 ## 2026-07-16 — TASK-1422: UI de redacción del aviso con IA en el Publication Desk
 
