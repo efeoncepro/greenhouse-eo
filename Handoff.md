@@ -1,3 +1,14 @@
+## Sesión 2026-07-17 — TASK-1276 RELEASED a producción
+
+> Release develop→main PR #157 (squash `83e4926f83dd`, 139 commits de develop, cabeza TASK-1276).
+> Orquestador `29616458382` completo: preflight (bypass batch-policy documentado por la seed
+> migration idempotente), 2 gates `production` aprobados al toque (watcher de pending_deployments),
+> workers 4/4, Azure no-op, Vercel READY, health OK → manifest
+> `83e4926f83dd-bfc135d8-e89b-4efe-82c4-7e26105b8e5f` **released**. Prod `/growth/aeo` = 307 anon.
+> Watchdog: residual conocido `ops-worker` change-gated (diff runtime vacío, Ready=True) — NO drift,
+> sin redeploy. CI `Test` volvió a pisar su timeout de 8 min con suite verde (2do release del día) —
+> candidato a subir timeout-minutes. Cero flags a prender. TASK-1276 movida a `complete/`.
+
 ## Sesión 2026-07-17 — TASK-1276 rollout a staging VERIFICADO
 
 > Push `develop` (7 commits TASK-1276) → staging Ready. **Incidente menor**: el alias

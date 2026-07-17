@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -397,8 +397,13 @@ Implementados los 7 slices en `develop` local (sin push), con el **mockup aproba
 - Nota: el flag `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` está ON en staging → el CTA de envío
   aparece habilitado (no se ejercitó: enviaría email real). En prod sigue el rollout de TASK-1279.
 
-**Pendiente**: promoción a producción vía release control plane (promueve TODO develop, no solo esta
-task — requiere confirmación del operador + skill `greenhouse-production-release` + gates humanos).
+**PRODUCCIÓN 2026-07-17 — RELEASED.** PR #157 squash `83e4926f83dd` → orquestador `29616458382`
+(preflight con bypass documentado del batch-policy por la seed migration idempotente) → workers 4/4 +
+Azure no-op (`no_infra_diff`) + Vercel READY + health OK → manifest
+`83e4926f83dd-bfc135d8-e89b-4efe-82c4-7e26105b8e5f` en `released`. Prod `/growth/aeo` responde 307
+anónimo (ruta live tras login). Watchdog: residual conocido `ops-worker` change-gated (diff runtime
+vacío + Ready=True) — no drift. Cero flags a prender (OPERATOR_SEND ya ON en prod). Timing en
+`PRODUCTION_RELEASE_TIMING_LEDGER.md`.
 
 ## Delta 2026-06-29 — backend del cross-sell (S11) disponible — cerrado por TASK-1279
 
