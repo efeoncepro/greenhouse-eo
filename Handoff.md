@@ -245,14 +245,14 @@
 > facturación ANAM; Retención/Fidelización y los cinco Services siguen piloto; billing continúa como siguiente
 > slice diseñado y no desplegado.
 
-## Sesión 2026-07-17 — Notion webhook burst protection — código completo, rollout pendiente
+## Sesión 2026-07-17 — Notion webhook burst protection — capacidad desplegada, activación pendiente
 
 > **Causa validada:** el burst/retry storm de `notion-tasks-demo` y
 > `notion-status-transitions` hacía que cada request Vercel tocara PostgreSQL
 > antes del ACK y agotara `max_connections`; Notion terminaba pausando las
 > suscripciones por fallos reiterados.
 >
-> **Cambio local:** recepción asíncrona opt-in con Cloud Tasks. La ruta pública
+> **Cambio desplegado:** recepción asíncrona opt-in con Cloud Tasks. La ruta pública
 > valida HMAC, crea una tarea determinística y responde `200`; el worker interno
 > exige OIDC Google, reconstruye el request y reusa `processInboundWebhook`, inbox,
 > dedupe y handlers existentes. Los retries pueden reclamar inbox events fallidos.
@@ -267,18 +267,24 @@
 > Vercel staging/production ya tiene queue/location/base URL/SA y
 > `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=false`.
 >
-> **Evidencia:** smoke real de `CreateTask` PASS con payload ficticio y cero
-> dispatch; tarea eliminada después. 53 tests focales PASS; ESLint focal PASS;
-> typecheck PASS con heap 8GB; `pnpm build` compiló y registró la nueva route;
-> `git diff --check` PASS. El audit local de secretos no cargó env runtime y
-> reportó 8/8 unconfigured, por lo que no cuenta como evidencia Vercel.
+> **Release productivo:** PR #156 squash-merged a
+> `416b12ad140c7558e7c57d62947fd2afd23f1259`. Orquestador `29609025464` y
+> manifest `416b12ad140c-143c9c6c-8659-4187-8b1e-6543e5be1036` cerraron
+> `success/released`; Vercel Production quedó READY, `/api/auth/health` respondió
+> `200` y los workers terminaron verdes. `ops-worker-00492-t4c` está `Ready=True`;
+> el watchdog sólo ve drift de etiqueta `b328cc1c`→`416b12ad`, con diff runtime
+> vacío, por lo que no se forzó un redeploy cosmético.
 >
-> **Pendiente/owner:** no se hizo commit, push ni deployment porque el checkout
-> `develop` contiene cambios ajenos ANAM/HubSpot. Siguiente paso humano/agente:
-> aislar este diff, desplegar staging con flag OFF, reanudar la queue, ejecutar
-> smoke OIDC del worker, activar el flag sólo en staging, reproducir burst y medir
-> ACK/backlog/`pg_stat_activity`; luego decidir producción. Rollback: flag OFF +
-> pausar queue. Estado correcto: **code complete, rollout pendiente**.
+> **Estado seguro actual:** `NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED=false` en
+> staging/production y queue `notion-webhook-ingestion` **PAUSED**, backlog cero.
+> La ruta interna existe y falla cerrada (`403` sin identidad Cloud Run; `401`
+> tras transporte OIDC no autorizado). No hubo tráfico Notion por el path nuevo.
+>
+> **Pendiente/owner:** la activación es un rollout separado: reanudar queue,
+> activar primero staging, ejecutar smoke OIDC/burst y medir ACK, backlog y
+> `pg_stat_activity`; sólo después decidir producción. Rollback operativo ante
+> degradación: pausar queue primero para preservar recepción durable; el flag OFF
+> vuelve al path síncrono. Estado correcto: **capacidad desplegada, activación pendiente**.
 
 ## Sesión 2026-07-17 — ANAM Customer Agent — activación bloqueada por facturación
 

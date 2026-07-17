@@ -168,9 +168,11 @@
   worker OIDC y procesamiento posterior reutilizando el inbox/handlers canónicos.
 - Cloud Tasks quedó provisionado en `us-east4` con concurrencia global 5 y queue
   pausada. Vercel staging/production tiene la configuración no sensible y el
-  kill-switch en `false`; no hubo deploy ni tráfico real por el nuevo path.
-- Estado: código completo, rollout pendiente. El objetivo es absorber bursts sin
-  comprar PgBouncer; se mantiene rollback inmediato al path síncrono.
+  kill-switch en `false`.
+- La capacidad fue desplegada a producción en el release `416b12ad140c` y pasó
+  health/control-plane; no hubo tráfico real por el path nuevo. Estado:
+  capacidad desplegada, activación pendiente. El objetivo es absorber bursts sin
+  comprar PgBouncer; el rollout de flags/queue se mantiene como paso separado.
 
 ## 2026-07-17 — ANAM Customer Agent: source pack live independiente
 
