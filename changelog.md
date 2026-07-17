@@ -1,5 +1,14 @@
 # changelog.md
 
+## 2026-07-17 — Customer Agent: canon de Workflows y bots
+
+- Las skills espejo de HubSpot as a Service distinguen `Deployment > Workflows and bots` como enrutamiento
+  selectivo de conversaciones, separado de knowledge, acciones del Customer Agent y `Run Agent` en workflows.
+  Se agregó el contrato de diseño/QA y el patrón ANAM por intención sin afirmar ni activar un despliegue live.
+- Se canonizó además el mapa 2026 de capacidades no exploradas —reply recommendations, permisos Contact, acciones
+  API, QA contextual, analítica/coaching, rollout escalonado y multicanal— con estados de evidencia, límites de
+  seguridad y un backlog ANAM que mantiene betas, writes y publicación bajo aprobación separada.
+
 ## 2026-07-17 — Catálogo de servicios Efeonce y dos servicios HubSpot as a Service
 
 - Se creó `docs/services/` como capa canónica para definir resultados, alcance, entregables, responsabilidades,

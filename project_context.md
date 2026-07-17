@@ -29,6 +29,12 @@
   pero cuenta vencida por factura `#760627868` (vencimiento 2026-06-07), uso de créditos `DESACTIVADA` y dos
   intentos de activación rechazados por HubSpot. El bloqueo actual es administrativo de facturación; un
   administrador ANAM debe regularizarlo antes del retry/readback, aunque fuentes y chatflow permanezcan presentes.
+  Las skills espejo distinguen `Deployment > Workflows and bots` como enrutamiento selectivo de conversaciones:
+  no es knowledge, una acción externa del Customer Agent ni `Run Agent` dentro de una automatización. Para ANAM,
+  cualquier pre-flow por intención continúa como diseño approval-gated y requiere inventario/readback runtime.
+  El discovery de capacidades 2026 también canoniza reply recommendations, permisos Contact (máximo documentado
+  de 10), acciones API, QA por Contact/segmento, analítica/coaching, cobertura escalonada y nuevos canales. Ninguna
+  está asumida live: el backlog ANAM exige elegibilidad/readback, aprobación y prueba runtime por separado.
   La próxima continuación ANAM debe comenzar con una búsqueda live de reuniones y tareas en Notion y producir
   una matriz reunión→decisión/owner→fase→evidencia runtime→gap/aprobación antes de cualquier write. La síntesis
   fechada sirve como índice, no reemplaza el readback de Notion ni constituye autorización. Contrato de entrada:

@@ -74,6 +74,27 @@ When resuming ANAM from a handoff or deciding whether to advance a phase, first 
 
 Landing intents are `cotizar`, `seguimiento_servicio` and `requerimiento_calidad`. The supported seam is URL intent + `HubSpotConversations.widget.refresh({ openToNewThread: true })` and chatflow targeting. Composer prefill is not reliable in the current widget, especially before privacy consent.
 
+`Deployment > Workflows and bots` is the governed seam for routing only selected ANAM conversations to the Customer Agent. A candidate design is a short rule-based pre-flow that identifies one of the three landing intents, captures the minimum identifying/service context and then sends documented, repeatable needs to the agent while preserving explicit-person requests, commercial commitments, investigations, complaints/appeals and sensitive actions for human handling. This is a design pattern, not evidence of a live deployment: inventory the authenticated portal before proposing it, publish only with separate approval and verify positive, excluded, human-fallback and unavailable paths after activation.
+
+Do not confuse this feature with workflow `1852406585`: that workflow is the controlled Service activation-review queue and does not route conversations or deploy the Customer Agent. Do not infer that the existing 24/7/100% chatflow configuration proves a `Workflows and bots` assignment or effective handling while the Customer Agent remains paused by the documented billing blocker.
+
+## Customer Agent capability backlog
+
+The live 2026-07-17 baseline is knowledge-and-handoff heavy: 23 active sources, one live-chat channel configured all hours/100%, direct Help Desk handoff to Maria Paz Haeger, zero published actions and two unnamed action drafts. There is no documented runtime proof yet for CRM permissions, reply recommendations, contact/segment-aware testing, analytics/coaching, lead qualification or additional channels. Absence from the local pack is a discovery gap, not proof that the portal is ineligible.
+
+Use this sequence after a read-only portal inventory:
+
+1. Verify `Define > Permissions`, `Train > Actions`, `Analyze`, reply recommendations, channel settings and beta eligibility without changing them.
+2. Pilot reply recommendations for Maria Paz and repeat QA as a governed CRM test Contact/segment, including safe attachments and Testing Insights. These are human-in-the-loop/preview experiments, not autonomous rollout.
+3. Inspect historical reports, knowledge gaps, coaching opportunities and source usage. Establish resolution, necessary/premature handoff, unresolved, feedback and source-quality baselines; never equate deflection with resolution.
+4. Propose a small, separately approved Contact-property allowlist. Default to view-only; HubSpot's documented native permission does not expose Company, Deal, Ticket, Service or billing ledgers.
+5. Design the first external action as a read-only `GET` status lookup through a portal-bound Kortex endpoint with verified email, response allowlist, audit and human fallback. Do not publish either existing `Nueva acción` draft until its purpose, endpoint and security contract are known.
+6. After ANAM resolves billing and activation is read back, use a reversible coverage cohort or bounded hours before returning to 100%; verify real conversations and credit behavior.
+7. Evaluate email/form deployment, then WhatsApp. Treat calling and custom channels as eligibility-dependent betas and prove whether they satisfy the separate 600-number requirement.
+8. Keep lead qualification beta last. The current operating model assigns qualification, commitments and exceptions to people; changing lifecycle or routing from the agent requires explicit ANAM ratification and CRM-write QA.
+
+No item in this backlog authorizes a CRM permission, action publication, beta opt-in, new channel, handoff rewrite or deployment change. The current billing blocker still prevents claiming autonomous runtime even if configuration remains visible.
+
 ## Operational lessons
 
 - HubSpot may return the same Company under labeled and unlabeled association types. Deduplicate associations by target object ID before deciding that a Deal has multiple Companies.

@@ -8,6 +8,15 @@
 > documentación funcional y manual ANAM. ANAM `19893546` queda como implementación de referencia, no como dato
 > interno de Greenhouse. Se actualizaron los índices y el modelo documental del repo.
 >
+> **Clarificación Customer Agent:** las skills Codex/Claude ahora canonizan `Workflows y bots` como despliegue y
+> enrutamiento selectivo. Workflow usa `Assign to Customer Agent`; bot basado en reglas usa `Send to Customer
+> Agent`. No se confunde con knowledge, acciones/API, `Run Agent` ni con el workflow ANAM `1852406585`. El patrón
+> ANAM por `cotizar`/`seguimiento_servicio`/`requerimiento_calidad` sigue sólo diseñado y approval-gated.
+> La misma referencia ahora incluye el mapa de capacidades no exploradas: reply recommendations, permisos Contact,
+> acciones externas, pruebas por Contact/segmento, analítica/coaching, cobertura escalonada, canales adicionales y
+> lead qualification beta. Cada una debe avanzar de vendor-documented a portal-eligible/configured/published/runtime-
+> verified; el backlog prioriza copiloto humano y QA antes de acciones, multicanal o calificación automática.
+>
 > **Pendientes:** ninguno documental. El estado runtime no cambió: Customer Agent continúa bloqueado por
 > facturación ANAM; Retención/Fidelización y los cinco Services siguen piloto; billing continúa como siguiente
 > slice diseñado y no desplegado.
