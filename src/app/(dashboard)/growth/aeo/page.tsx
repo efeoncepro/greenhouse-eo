@@ -6,6 +6,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { getOrganizationList } from '@/lib/account-360/organization-store'
 import { GH_GROWTH_AEO_OPERATOR } from '@/lib/copy/growth'
 import { can } from '@/lib/entitlements/runtime'
 import { formatDate } from '@/lib/format/date'
@@ -16,6 +17,7 @@ import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import AeoOperatorCockpitView, {
   type AeoCockpitRowVM
 } from '@/views/greenhouse/growth/ai-visibility/operator/AeoOperatorCockpitView'
+import type { AeoRunTargetVM } from '@/views/greenhouse/growth/ai-visibility/operator/AeoOperatorRunPicker'
 
 /**
  * TASK-1276 — Cockpit operador del programa AEO (nodo S8, EPIC-020). Ruta `internal` en la sección
@@ -66,7 +68,47 @@ export default async function AeoOperatorCockpitPage() {
       lastRunLabel: row.latestRunAt ? formatDate(row.latestRunAt) : null
     }))
 
-    return <AeoOperatorCockpitView rows={rows} />
+    // Targets de cross-sell (Slice 5): orgs activas SIN módulo AEO — clientes (Expansión) y
+    // prospectos HubSpot org-sincronizados (New Business, TASK-706). Degradación honesta: si el
+    // listado falla, el cockpit igual renderiza (targets = []).
+    const aeoIds = new Set(rows.map(r => r.organizationId))
+    let targets: AeoRunTargetVM[] = []
+
+    try {
+      const orgList = await getOrganizationList({ page: 1, pageSize: 200 })
+
+      targets = orgList.items
+        .filter(org => org.active && !org.isOperatingEntity && !aeoIds.has(org.organizationId))
+        .flatMap((org): AeoRunTargetVM[] => {
+          if (org.organizationType === 'client' || org.organizationType === 'both') {
+            return [
+              {
+                organizationId: org.organizationId,
+                organizationName: org.organizationName,
+                motion: 'expansion',
+                subtitle: org.publicId
+              }
+            ]
+          }
+
+          if (org.organizationType === 'other' && org.hubspotCompanyId) {
+            return [
+              {
+                organizationId: org.organizationId,
+                organizationName: org.organizationName,
+                motion: 'new_business',
+                subtitle: org.websiteUrl ? org.websiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '') : org.publicId
+              }
+            ]
+          }
+
+          return []
+        })
+    } catch (error) {
+      captureWithDomain(error, 'growth', { tags: { source: 'aeo_operator_cockpit_targets' } })
+    }
+
+    return <AeoOperatorCockpitView rows={rows} targets={targets} />
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'aeo_operator_cockpit_page' } })
 

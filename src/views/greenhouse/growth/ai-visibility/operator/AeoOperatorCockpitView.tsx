@@ -19,6 +19,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import Button from '@mui/material/Button'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -26,6 +28,7 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_AEO_OPERATOR } from '@/lib/copy/growth'
 import { formatNumber } from '@/lib/format/number'
+import AeoOperatorRunPicker, { type AeoRunTargetVM } from './AeoOperatorRunPicker'
 
 /**
  * TASK-1276 Slice 3 — Cockpit cross-cliente del programa AEO (nodo S8, ruta /growth/aeo).
@@ -50,7 +53,12 @@ export interface AeoCockpitRowVM {
 
 export interface AeoOperatorCockpitViewProps {
   rows: AeoCockpitRowVM[]
+  /** Targets de cross-sell (clientes sin AEO = expansión; prospectos HubSpot = new business). */
+  targets: AeoRunTargetVM[]
 }
+
+// Filtros del cockpit (pills del mockup): todos / por tier / por motion de cross-sell.
+type CockpitFilter = 'all' | 'aeo' | 'expansion' | 'new_business'
 
 const initialsOf = (name: string): string =>
   name
@@ -103,19 +111,58 @@ const ScoreCell = ({ score }: { score: number | null }) => {
   )
 }
 
-const AeoOperatorCockpitView = ({ rows }: AeoOperatorCockpitViewProps) => {
+const AeoOperatorCockpitView = ({ rows, targets }: AeoOperatorCockpitViewProps) => {
   const router = useRouter()
   const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState<CockpitFilter>('all')
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickerPreselectedId, setPickerPreselectedId] = useState<string | null>(null)
+
+  const openPicker = (preselectedId: string | null) => {
+    setPickerPreselectedId(preselectedId)
+    setPickerOpen(true)
+  }
+
+  // Targets del picker: los clientes con AEO también son target válido de un run operador.
+  const pickerTargets = useMemo<AeoRunTargetVM[]>(
+    () => [
+      ...rows.map(r => ({
+        organizationId: r.organizationId,
+        organizationName: r.organizationName,
+        motion: 'aeo' as const,
+        subtitle: r.tierLabel
+      })),
+      ...targets
+    ],
+    [rows, targets]
+  )
+
+  const q = query.trim().toLowerCase()
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const base = filter === 'all' || filter === 'aeo' ? rows : []
 
-    if (!q) return rows
+    if (!q) return base
 
-    return rows.filter(r => r.organizationName.toLowerCase().includes(q))
-  }, [rows, query])
+    return base.filter(r => r.organizationName.toLowerCase().includes(q))
+  }, [rows, q, filter])
+
+  const filteredTargets = useMemo(() => {
+    const base = filter === 'all' ? targets : targets.filter(t => t.motion === filter)
+
+    if (!q) return base
+
+    return base.filter(t => t.organizationName.toLowerCase().includes(q))
+  }, [targets, q, filter])
 
   const scored = rows.filter(r => r.latestScore !== null)
+
+  const filterPills: Array<{ key: CockpitFilter; label: string }> = [
+    { key: 'all', label: O.cockpit.filterAll },
+    { key: 'aeo', label: O.picker.groupAeo },
+    { key: 'expansion', label: O.picker.groupExpansion },
+    { key: 'new_business', label: O.picker.groupProspects }
+  ]
 
   const avgScore =
     scored.length > 0 ? Math.round(scored.reduce((sum, r) => sum + (r.latestScore ?? 0), 0) / scored.length) : null
@@ -132,13 +179,28 @@ const AeoOperatorCockpitView = ({ rows }: AeoOperatorCockpitViewProps) => {
             { label: O.page.breadcrumbLeaf }
           ]}
         />
-        <Stack spacing={1}>
-          <Typography variant='surfaceHeroTitle' component='h1'>
-            {O.page.cockpitTitle}
-          </Typography>
-          <Typography variant='body1' color='text.secondary' sx={{ maxWidth: '62ch' }}>
-            {O.page.cockpitSubtitle}
-          </Typography>
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={3}
+          alignItems={{ xs: 'flex-start', md: 'center' }}
+          justifyContent='space-between'
+        >
+          <Stack spacing={1}>
+            <Typography variant='surfaceHeroTitle' component='h1'>
+              {O.page.cockpitTitle}
+            </Typography>
+            <Typography variant='body1' color='text.secondary' sx={{ maxWidth: '62ch' }}>
+              {O.page.cockpitSubtitle}
+            </Typography>
+          </Stack>
+          <Button
+            variant='contained'
+            startIcon={<i className='tabler-player-play-filled' />}
+            onClick={() => openPicker(null)}
+            sx={{ flexShrink: 0 }}
+          >
+            {O.cockpit.headerRunCta}
+          </Button>
         </Stack>
       </Stack>
 
@@ -188,12 +250,26 @@ const AeoOperatorCockpitView = ({ rows }: AeoOperatorCockpitViewProps) => {
                 {O.cockpit.tableSubtitle}
               </Typography>
             </Stack>
-            <CustomTextField
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder={O.cockpit.searchPlaceholder}
-              slotProps={{ input: { startAdornment: <i className='tabler-search' style={{ marginInlineEnd: 8 }} /> } }}
-            />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap role='group' aria-label={O.cockpit.tableTitle}>
+                {filterPills.map(pill => (
+                  <Chip
+                    key={pill.key}
+                    size='small'
+                    variant={filter === pill.key ? 'filled' : 'outlined'}
+                    color={filter === pill.key ? 'primary' : undefined}
+                    label={pill.label}
+                    onClick={() => setFilter(pill.key)}
+                  />
+                ))}
+              </Stack>
+              <CustomTextField
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder={O.cockpit.searchPlaceholder}
+                slotProps={{ input: { startAdornment: <i className='tabler-search' style={{ marginInlineEnd: 8 }} /> } }}
+              />
+            </Stack>
           </Stack>
         </CardContent>
         <Divider />
@@ -256,7 +332,68 @@ const AeoOperatorCockpitView = ({ rows }: AeoOperatorCockpitViewProps) => {
                     </TableCell>
                   </TableRow>
                 ))}
-                {filtered.length === 0 ? (
+                {/* Targets de cross-sell (sin AEO): motion hint + CTA "Correr AEO" → picker preseleccionado */}
+                {filteredTargets.map(target => (
+                  <TableRow
+                    key={target.organizationId}
+                    hover
+                    tabIndex={0}
+                    role='button'
+                    aria-label={`${O.cockpit.runCtaAria}: ${target.organizationName}`}
+                    onClick={() => openPicker(target.organizationId)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        openPicker(target.organizationId)
+                      }
+                    }}
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    <TableCell>
+                      <Stack direction='row' spacing={3} alignItems='center'>
+                        <CustomAvatar
+                          skin='light'
+                          color={target.motion === 'expansion' ? 'info' : 'warning'}
+                          variant='rounded'
+                          size={34}
+                        >
+                          {initialsOf(target.organizationName)}
+                        </CustomAvatar>
+                        <Typography variant='body2' sx={{ fontWeight: 600 }} color='text.primary'>
+                          {target.organizationName}
+                        </Typography>
+                      </Stack>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        size='small'
+                        variant='outlined'
+                        icon={<i className='tabler-circle-dashed' />}
+                        label={O.cockpit.noAeoLabel}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant='body2' color='text.secondary'>
+                        {target.motion === 'expansion' ? O.cockpit.motionExpansionHint : O.cockpit.motionProspectHint}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant='body2' color='text.secondary'>
+                        {O.cockpit.lastRunNever}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align='right'>
+                      <Chip
+                        size='small'
+                        variant='tonal'
+                        color='primary'
+                        icon={<i className='tabler-player-play-filled' />}
+                        label={O.cockpit.runCta}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {filtered.length === 0 && filteredTargets.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5}>
                       <Typography variant='body2' color='text.secondary' sx={{ py: 4, textAlign: 'center' }}>
@@ -270,6 +407,13 @@ const AeoOperatorCockpitView = ({ rows }: AeoOperatorCockpitViewProps) => {
           </TableContainer>
         )}
       </Card>
+
+      <AeoOperatorRunPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        targets={pickerTargets}
+        preselectedId={pickerPreselectedId}
+      />
     </Stack>
   )
 }

@@ -20,6 +20,7 @@ import { GH_GROWTH_AEO_OPERATOR } from '@/lib/copy/growth'
 import type { RecommendationStatusValue } from '@/lib/growth/ai-visibility/recommendation-status'
 import AiVisibilityClientReportView from '../client/AiVisibilityClientReportView'
 import type { PlanStatusVM } from '../plan/PlanStatusSection'
+import AeoOperatorRunButton from './AeoOperatorRunButton'
 
 /**
  * TASK-1276 — Detalle operador por-cliente (nodo S9 del EPIC-020, ruta /growth/aeo/[organizationId]).
@@ -113,15 +114,17 @@ const SubjectBand = ({ band }: { band: AeoOperatorSubjectBand }) => (
             </Stack>
           </Stack>
         </Stack>
-        <Button
-          variant='outlined'
-          color='secondary'
-          endIcon={<i className='tabler-external-link' />}
-          href={band.account360Href}
-          sx={{ flexShrink: 0 }}
-        >
-          {O.band.viewInAccount360}
-        </Button>
+        <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap sx={{ flexShrink: 0 }}>
+          <Button
+            variant='outlined'
+            color='secondary'
+            endIcon={<i className='tabler-external-link' />}
+            href={band.account360Href}
+          >
+            {O.band.viewInAccount360}
+          </Button>
+          <AeoOperatorRunButton organizationId={band.organizationId} />
+        </Stack>
       </Stack>
     </CardContent>
   </Card>
