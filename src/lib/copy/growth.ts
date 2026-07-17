@@ -763,3 +763,98 @@ export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
     permissionBody: 'Necesitas el permiso de revisión del AEO Grader. Pídeselo a un administrador.'
   }
 } as const
+
+/**
+ * TASK-1276 — Vista OPERADOR del programa AEO (nodos S8-S12 del EPIC-020): cockpit `/growth/aeo`,
+ * detalle por-cliente `/growth/aeo/[organizationId]`, control de estado del Plan AEO (TASK-1275),
+ * cross-sell (run operador TASK-1277 + enviar informe/crear Lead TASK-1279) y facet Account 360.
+ * Touchpoint INTERNO (operador Growth/Account) → tono operativo claro, es-CL tuteo neutro; los
+ * estados del plan son color-independientes (texto + ícono, nunca color solo). Validado con
+ * `greenhouse-ux-writing`. Diseño aprobado: mockup Claude Design "AEO Operator View".
+ */
+export const GH_GROWTH_AEO_OPERATOR = {
+  page: {
+    breadcrumbRoot: 'Inicio',
+    breadcrumbGrowth: 'Growth',
+    breadcrumbLeaf: 'AEO',
+    cockpitTitle: 'AEO',
+    cockpitSubtitle: 'Programa AEO: gestión del plan por cliente y cross-sell con diagnóstico real.',
+    detailBreadcrumbAria: 'Ruta de navegación del detalle AEO'
+  },
+  cockpit: {
+    kpiClients: 'Clientes con AEO',
+    kpiClientsSub: 'Módulo activo',
+    kpiAvgScore: 'Score AEO promedio',
+    kpiAvgScoreSub: 'Sobre clientes con medición',
+    kpiWithoutScore: 'Sin medición aún',
+    kpiWithoutScoreSub: 'Con módulo, sin run listo',
+    tableTitle: 'Clientes del programa',
+    tableSubtitle: 'Score, tier y último run por cliente',
+    colClient: 'Cliente',
+    colTier: 'Tier',
+    colScore: 'Score AEO',
+    colLastRun: 'Último run',
+    openDetailAria: 'Abrir el detalle AEO del cliente',
+    scoreNoData: 'Sin medición',
+    lastRunNever: 'Sin runs',
+    emptyTitle: 'Aún no hay clientes con AEO',
+    emptyBody: 'Cuando un cliente tenga el módulo AEO activo, aparece aquí con su score y su plan.',
+    errorTitle: 'No pudimos cargar el cockpit',
+    errorBody: 'Ocurrió un problema al traer los clientes del programa. Intenta de nuevo.',
+    retry: 'Reintentar'
+  },
+  tier: {
+    contracted: 'Contratado',
+    trial: 'Trial',
+    pilot: 'Piloto',
+    none: 'Sin AEO',
+    operator: 'Operador · sin tope'
+  },
+  band: {
+    domainAria: 'Dominio del sitio',
+    lastRunLabel: 'Último run:',
+    lastRunNever: 'sin runs',
+    viewInAccount360: 'Ver en Account 360',
+    orgIdAria: 'Identificador de la organización',
+    allowanceRuns: (used: number, cap: number) => `${used}/${cap} runs este mes`
+  },
+  plan: {
+    sectionTitle: 'Estado de ejecución',
+    sectionHelp: 'Registra el avance de este foco del Plan AEO.',
+    groupAria: 'Cambiar estado del foco',
+    status: {
+      not_started: 'Sin empezar',
+      in_progress: 'En curso',
+      blocked: 'Bloqueado',
+      done: 'Hecho',
+      dismissed: 'Descartado'
+    },
+    untracked: 'Sin seguimiento aún',
+    reasonLabel: 'Motivo',
+    reasonRequiredBlocked: 'Bloquear un foco requiere un motivo.',
+    reasonRequiredDismissed: 'Descartar un foco requiere un motivo.',
+    reasonPlaceholder: 'Ej. fuera del alcance del contrato este trimestre',
+    reasonConfirm: 'Guardar estado',
+    reasonCancel: 'Cancelar',
+    saving: 'Guardando estado…',
+    saved: 'Estado guardado.',
+    saveError: 'No pudimos guardar el estado. Intenta de nuevo.',
+    statusAnnouncement: (statusLabel: string) => `Estado del foco actualizado a ${statusLabel}`,
+    updatedBy: (who: string) => `Actualizado por ${who}`,
+    partialTitle: 'Plan con seguimiento parcial',
+    partialBody: 'Algunos focos del Plan AEO todavía no tienen estado registrado. Se muestran como "sin seguimiento aún".'
+  },
+  states: {
+    deniedTitle: 'No tienes acceso a este cliente',
+    deniedBody: 'Tu scope de operador no incluye esta organización. Pide acceso a un administrador de Growth.',
+    emptyTitle: 'Sin runs AEO',
+    emptyBody: 'Este cliente aún no tiene un diagnóstico AEO listo.',
+    preparingTitle: 'El informe se está preparando',
+    preparingBody: 'Hay un run en proceso. Vuelve en unos minutos para ver el diagnóstico.',
+    errorTitle: 'No pudimos cargar el AEO',
+    errorBody: 'Hubo un problema al leer el informe. Intenta de nuevo.',
+    retry: 'Reintentar',
+    notFoundTitle: 'Organización no encontrada',
+    notFoundBody: 'La organización no existe o fue archivada.'
+  }
+} as const

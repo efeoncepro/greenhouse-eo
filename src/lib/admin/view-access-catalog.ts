@@ -587,6 +587,19 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    // TASK-1276 — Vista OPERADOR del programa AEO (nodos S8-S12 EPIC-020): cockpit /growth/aeo +
+    // detalle /growth/aeo/[organizationId]. NO vive en /admin (admin = salud de plataforma; Growth =
+    // programa cross-cliente). Sembrado al set operador (mismos roles con la capability
+    // growth.ai_visibility.report.read_operator de TASK-1287): efeonce_admin + efeonce_account +
+    // efeonce_operations + ai_tooling_admin. NUNCA client_* (vista operador, cross-sell interno).
+    viewCode: 'gestion.growth_aeo',
+    section: 'gestion',
+    label: 'AEO',
+    description: 'Cockpit operador del programa AEO: score y plan por cliente + cross-sell con diagnóstico real.',
+    routePath: '/growth/aeo',
+    routeGroup: 'internal'
+  },
+  {
     // TASK-873 Slice 4 — Workforce Activation workspace V1 (esqueleto admin governance).
     //
     // **Surface canonical**: este es el variant `admin governance / transitional`

@@ -1,3 +1,11 @@
+## Sesión 2026-07-17 — TASK-1276 AEO Operator View (in-progress)
+
+> **Task tomada:** `TASK-1276` (vista operador AEO: cockpit `/growth/aeo` + detalle por-org + facet Account 360
+> + cross-sell). Trabajo en `develop` local-first, sin push hasta instrucción. Blockers TASK-1275/1279/1287
+> todos complete. Referencia de diseño: mockup Claude Design "AEO Operator View.dc.html" (proyecto
+> `f146e98a-fd29-407d-8f9e-2c4782fcb76a`, guardado en scratchpad de sesión). Objetivo: implementar Slices 1-7
+> según spec (gestión Plan AEO + cross-sell/prospección + GVC).
+
 ## Sesión 2026-07-17 — Aprendizajes consolidados del Customer Agent ANAM
 
 > **Editorial/publicación:** el runbook Content Factory ahora exige scan de lenguaje dependiente del lifecycle,

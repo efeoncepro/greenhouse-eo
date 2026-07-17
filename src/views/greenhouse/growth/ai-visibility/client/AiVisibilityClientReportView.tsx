@@ -16,6 +16,7 @@ import { useTheme } from '@mui/material/styles'
 import { Area, AreaChart, Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 
 import { CompositionShell, GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
+import type { GreenhouseBreadcrumbItem } from '@/components/greenhouse/primitives/GreenhouseBreadcrumbs'
 import type { OperationalStatusTone } from '@/components/greenhouse/primitives/OperationalStatusBadge'
 import TeamAvatarGroup, { type TeamAvatarGroupBrand } from '@/components/greenhouse/TeamAvatarGroup'
 import GreenhouseBrandLogoMark from '@/components/greenhouse/primitives/GreenhouseBrandLogoMark'
@@ -27,7 +28,10 @@ import AppRecharts from '@/libs/styles/AppRecharts'
 import { GH_GROWTH_AI_VISIBILITY, GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT } from '@/lib/copy/growth'
 import { formatNumber } from '@/lib/format/number'
 import type { GraderReportSeverity } from '@/lib/growth/ai-visibility/report/contracts'
+// Type-only (erased): el módulo TASK-1275 es server-only; acá solo viaja el union de estados.
+import type { RecommendationStatusValue } from '@/lib/growth/ai-visibility/recommendation-status'
 import type { ScoreDimensionKey } from '@/lib/growth/ai-visibility/scoring/config'
+import PlanStatusSection, { PlanStatusChip, type PlanStatusVM } from '../plan/PlanStatusSection'
 
 /**
  * TASK-1248 — Portal cliente · AI Visibility (Split Workbench, concepto C).
@@ -56,6 +60,26 @@ const severityThemeColor: Record<GraderReportSeverity, OperationalStatusTone> = 
 }
 
 type Selection = { type: 'dimension'; key: ScoreDimensionKey } | { type: 'recommendation'; gapKey: string }
+
+/**
+ * TASK-1276 — Extensiones ADITIVAS del workbench para la vista operador (S9). Sin estas props el
+ * comportamiento cliente es EXACTAMENTE el previo (cero cambio para `/aeo`). No forkea el layout:
+ * la vista operador es el MISMO workbench con chrome propio + control de estado del Plan AEO.
+ */
+export interface AiVisibilityReportChrome {
+  /** Breadcrumb propio de la superficie (default: el del portal cliente "Inicio / AEO"). */
+  breadcrumbItems?: GreenhouseBreadcrumbItem[]
+  /** Oculta el bloque de soporte del cliente (no aplica al operador). */
+  hideSupport?: boolean
+}
+
+export interface AiVisibilityPlanExtension {
+  /** Estado por gapKey; ausencia = "sin seguimiento aún" (degradación honesta). */
+  statuses: Readonly<Partial<Record<string, PlanStatusVM>>>
+  /** gapKey con write en vuelo (deshabilita SU control, no el resto). */
+  busyGapKey: string | null
+  onSetStatus: (gapKey: string, status: RecommendationStatusValue, reason: string | null) => void
+}
 
 // Nombre de producto por proveedor (los isotipos los resuelve TeamAvatarGroup variante brand).
 const ENGINE_DISPLAY_NAME: Record<string, string> = {
@@ -151,11 +175,13 @@ const SeverityChip = ({ severity, size }: { severity: GraderReportSeverity; size
 const NavigatorRail = ({
   model,
   selection,
-  onSelect
+  onSelect,
+  plan
 }: {
   model: ReportArtifactModel
   selection: Selection
   onSelect: (next: Selection) => void
+  plan?: AiVisibilityPlanExtension
 }) => (
   <Stack spacing={5} sx={{ minWidth: 0 }}>
     <Stack spacing={2}>
@@ -256,13 +282,16 @@ const NavigatorRail = ({
                   <Typography variant='monoId' color='text.secondary' sx={{ minWidth: 16 }}>
                     {i + 1}
                   </Typography>
-                  <Typography
-                    variant='body2'
-                    color={selected ? 'text.primary' : 'text.secondary'}
-                    sx={{ fontWeight: selected ? 600 : undefined, flex: 1, minWidth: 0 }}
-                  >
-                    {rec.title}
-                  </Typography>
+                  <Stack spacing={1} sx={{ flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
+                    <Typography
+                      variant='body2'
+                      color={selected ? 'text.primary' : 'text.secondary'}
+                      sx={{ fontWeight: selected ? 600 : undefined }}
+                    >
+                      {rec.title}
+                    </Typography>
+                    {plan ? <PlanStatusChip size='small' status={plan.statuses[rec.gapKey]?.status ?? null} /> : null}
+                  </Stack>
                   <SeverityChip size='small' severity={rec.severity} />
                 </ListItemButton>
               )
@@ -631,7 +660,17 @@ const SignalTiles = ({ model }: { model: ReportArtifactModel }) => {
 }
 
 // ── Detail canvas (primary region — the rich pane) ────────────────────────────
-const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; selection: Selection }) => {
+const DetailCanvas = ({
+  model,
+  selection,
+  plan,
+  hideSupport
+}: {
+  model: ReportArtifactModel
+  selection: Selection
+  plan?: AiVisibilityPlanExtension
+  hideSupport?: boolean
+}) => {
   const theme = useTheme()
 
   const rec =
@@ -753,6 +792,16 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
             </Stack>
           </Stack>
 
+          {/* Estado de ejecución del Plan AEO (solo vista operador — write TASK-1275) */}
+          {plan && rec ? (
+            <PlanStatusSection
+              key={rec.gapKey}
+              current={plan.statuses[rec.gapKey] ?? null}
+              busy={plan.busyGapKey === rec.gapKey}
+              onSetStatus={(status, reason) => plan.onSetStatus(rec.gapKey, status, reason)}
+            />
+          ) : null}
+
           {/* Charts row */}
           <Box
             sx={{
@@ -811,7 +860,8 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
           {/* Señales de respaldo */}
           <SignalTiles model={model} />
 
-          {/* Soporte contextual (NO venta — cliente ya contrató AEO) */}
+          {/* Soporte contextual (NO venta — cliente ya contrató AEO; oculto en la vista operador) */}
+          {hideSupport ? null : (
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={3}
@@ -838,6 +888,7 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
               {C.support.action}
             </Button>
           </Stack>
+          )}
         </Stack>
       </CardContent>
     </Card>
@@ -848,11 +899,13 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
 const SummaryStrip = ({
   model,
   organizationName,
-  asOfLabel
+  asOfLabel,
+  breadcrumbItems
 }: {
   model: ReportArtifactModel
   organizationName: string
   asOfLabel: string | null
+  breadcrumbItems?: GreenhouseBreadcrumbItem[]
 }) => {
   const overall = model.trend.status === 'con_tendencia' ? model.trend.overall : null
   const delta = overall?.delta ?? null
@@ -861,10 +914,12 @@ const SummaryStrip = ({
   return (
     <Stack spacing={3} data-capture='client-ai-visibility-overview'>
       <GreenhouseBreadcrumbs
-        items={[
-          { label: C.page.breadcrumbRoot, href: '/home' },
-          { label: C.page.breadcrumbLeaf }
-        ]}
+        items={
+          breadcrumbItems ?? [
+            { label: C.page.breadcrumbRoot, href: '/home' },
+            { label: C.page.breadcrumbLeaf }
+          ]
+        }
       />
       <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
         <Stack direction='row' spacing={3} alignItems='center' flexWrap='wrap' useFlexGap>
@@ -952,9 +1007,19 @@ export interface AiVisibilityClientReportViewProps {
   model: ReportArtifactModel
   organizationName: string
   asOfLabel: string | null
+  /** TASK-1276 — chrome propio de la superficie operador (breadcrumb + sin bloque de soporte). */
+  chrome?: AiVisibilityReportChrome
+  /** TASK-1276 — control de estado del Plan AEO (solo operador; ausente = workbench cliente puro). */
+  plan?: AiVisibilityPlanExtension
 }
 
-const AiVisibilityClientReportView = ({ model, organizationName, asOfLabel }: AiVisibilityClientReportViewProps) => {
+const AiVisibilityClientReportView = ({
+  model,
+  organizationName,
+  asOfLabel,
+  chrome,
+  plan
+}: AiVisibilityClientReportViewProps) => {
   // Default: la brecha principal (primaryGap) si existe; sino la primera recomendación; sino la 1.ª dimensión.
   const defaultSelection = useMemo<Selection>(() => {
     if (model.primaryGap) {
@@ -973,7 +1038,12 @@ const AiVisibilityClientReportView = ({ model, organizationName, asOfLabel }: Ai
 
   return (
     <Stack spacing={6} sx={{ p: { xs: 4, md: 6 }, minWidth: 0 }} data-capture='client-ai-visibility-report'>
-      <SummaryStrip model={model} organizationName={organizationName} asOfLabel={asOfLabel} />
+      <SummaryStrip
+        model={model}
+        organizationName={organizationName}
+        asOfLabel={asOfLabel}
+        breadcrumbItems={chrome?.breadcrumbItems}
+      />
 
       <CompositionShell
         composition='masterDetail'
@@ -981,8 +1051,10 @@ const AiVisibilityClientReportView = ({ model, organizationName, asOfLabel }: Ai
         asideLabel={C.navigator.ariaLabel}
         detailLabel={C.detail.openDetail}
         regions={{
-          aside: <NavigatorRail model={model} selection={selection} onSelect={setSelection} />,
-          primary: <DetailCanvas model={model} selection={selection} />
+          aside: <NavigatorRail model={model} selection={selection} onSelect={setSelection} plan={plan} />,
+          primary: (
+            <DetailCanvas model={model} selection={selection} plan={plan} hideSupport={chrome?.hideSupport} />
+          )
         }}
       />
     </Stack>
