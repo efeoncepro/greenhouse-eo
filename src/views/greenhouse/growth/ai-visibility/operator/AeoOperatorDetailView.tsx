@@ -21,6 +21,7 @@ import type { RecommendationStatusValue } from '@/lib/growth/ai-visibility/recom
 import AiVisibilityClientReportView from '../client/AiVisibilityClientReportView'
 import type { PlanStatusVM } from '../plan/PlanStatusSection'
 import AeoOperatorRunButton from './AeoOperatorRunButton'
+import AeoOperatorSendComposer, { type AeoSendMotion } from './AeoOperatorSendComposer'
 
 /**
  * TASK-1276 — Detalle operador por-cliente (nodo S9 del EPIC-020, ruta /growth/aeo/[organizationId]).
@@ -50,6 +51,15 @@ export interface AeoOperatorSubjectBand {
   account360Href: string
 }
 
+export interface AeoOperatorSendConfig {
+  /** Run interno del informe a enviar; null = sin run enviable. */
+  runId: string | null
+  motion: AeoSendMotion
+  reportPublished: boolean
+  /** Flag GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED (resuelto server-side). */
+  enabled: boolean
+}
+
 export interface AeoOperatorDetailViewProps {
   band: AeoOperatorSubjectBand
   model: ReportArtifactModel
@@ -58,6 +68,8 @@ export interface AeoOperatorDetailViewProps {
   initialStatuses: Readonly<Partial<Record<string, PlanStatusVM>>>
   /** El operador tiene la capability de write (`recommendation.set_status`); sin ella el plan es read-only. */
   canSetStatus: boolean
+  /** Envío + Lead (Slice 6, TASK-1279); undefined = sin capability lead.open (CTA oculto). */
+  send?: AeoOperatorSendConfig
 }
 
 const initialsOf = (name: string): string =>
@@ -68,8 +80,16 @@ const initialsOf = (name: string): string =>
     .map(w => w[0]?.toUpperCase() ?? '')
     .join('')
 
-// Banda del cliente (mockup: avatar + nombre + tier + allowance + metadatos + Account 360).
-const SubjectBand = ({ band }: { band: AeoOperatorSubjectBand }) => (
+// Banda del cliente (mockup: avatar + nombre + tier + allowance + metadatos + Account 360 + acciones).
+const SubjectBand = ({
+  band,
+  send,
+  onOpenSend
+}: {
+  band: AeoOperatorSubjectBand
+  send?: AeoOperatorSendConfig
+  onOpenSend: () => void
+}) => (
   <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
     <CardContent>
       <Stack
@@ -124,17 +144,47 @@ const SubjectBand = ({ band }: { band: AeoOperatorSubjectBand }) => (
             {O.band.viewInAccount360}
           </Button>
           <AeoOperatorRunButton organizationId={band.organizationId} />
+          {send ? (
+            <Stack spacing={1} alignItems='flex-end'>
+              <Button
+                variant='contained'
+                startIcon={<i className='tabler-send' />}
+                disabled={!send.enabled || send.runId === null || !send.reportPublished}
+                onClick={onOpenSend}
+                aria-label={O.send.ctaAria}
+              >
+                {O.send.cta}
+              </Button>
+              {!send.enabled ? (
+                <Typography variant='caption' color='text.secondary'>
+                  {O.send.ctaDisabledHint}
+                </Typography>
+              ) : send.runId === null || !send.reportPublished ? (
+                <Typography variant='caption' color='text.secondary'>
+                  {O.send.notPublishedHint}
+                </Typography>
+              ) : null}
+            </Stack>
+          ) : null}
         </Stack>
       </Stack>
     </CardContent>
   </Card>
 )
 
-const AeoOperatorDetailView = ({ band, model, asOfLabel, initialStatuses, canSetStatus }: AeoOperatorDetailViewProps) => {
+const AeoOperatorDetailView = ({
+  band,
+  model,
+  asOfLabel,
+  initialStatuses,
+  canSetStatus,
+  send
+}: AeoOperatorDetailViewProps) => {
   const router = useRouter()
   const [statuses, setStatuses] = useState<Partial<Record<string, PlanStatusVM>>>({ ...initialStatuses })
   const [busyGapKey, setBusyGapKey] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [sendOpen, setSendOpen] = useState(false)
 
   // Anuncio aria-live del cambio de estado (flow contract: announcement polite, sin motion gratuito).
   const [liveMessage, setLiveMessage] = useState('')
@@ -195,7 +245,7 @@ const AeoOperatorDetailView = ({ band, model, asOfLabel, initialStatuses, canSet
       </Box>
 
       <Box sx={{ px: { xs: 4, md: 6 }, pt: { xs: 4, md: 6 } }}>
-        <SubjectBand band={band} />
+        <SubjectBand band={band} send={send} onOpenSend={() => setSendOpen(true)} />
       </Box>
 
       <AiVisibilityClientReportView
@@ -223,6 +273,18 @@ const AeoOperatorDetailView = ({ band, model, asOfLabel, initialStatuses, canSet
             : undefined
         }
       />
+
+      {send ? (
+        <AeoOperatorSendComposer
+          open={sendOpen}
+          onClose={() => setSendOpen(false)}
+          organizationId={band.organizationId}
+          organizationName={band.organizationName}
+          runId={send.runId}
+          motion={send.motion}
+          reportPublished={send.reportPublished}
+        />
+      ) : null}
 
       <Snackbar
         open={feedback !== null}

@@ -11,15 +11,20 @@ import { getOrganizationDetail } from '@/lib/account-360/organization-store'
 import { GH_GROWTH_AEO_OPERATOR } from '@/lib/copy/growth'
 import { can } from '@/lib/entitlements/runtime'
 import { resolveAeoEntitlement, type AeoEntitlement } from '@/lib/growth/ai-visibility/entitlement'
+import { isOperatorSendEnabled } from '@/lib/growth/ai-visibility/flags'
+import { getLatestReportTokenForRun } from '@/lib/growth/ai-visibility/hubspot/report-link'
 import {
   OperatorGraderReportError,
   readOperatorScopedAeoReport
 } from '@/lib/growth/ai-visibility/operator/command'
 import { readRecommendationStatuses } from '@/lib/growth/ai-visibility/recommendation-status'
+import { getLatestClientGraderRun } from '@/lib/growth/ai-visibility/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
-import AeoOperatorDetailView from '@/views/greenhouse/growth/ai-visibility/operator/AeoOperatorDetailView'
+import AeoOperatorDetailView, {
+  type AeoOperatorSendConfig
+} from '@/views/greenhouse/growth/ai-visibility/operator/AeoOperatorDetailView'
 import type { PlanStatusVM } from '@/views/greenhouse/growth/ai-visibility/plan/PlanStatusSection'
 
 /**
@@ -137,6 +142,36 @@ export default async function AeoOperatorDetailPage({
       }
     }
 
+    // Slice 6 — envío + Lead (TASK-1279): solo con la capability lead.open. El runId es el interno
+    // del último run reportable; "publicado" = existe snapshot público (gate que el server re-valida).
+    let send: AeoOperatorSendConfig | undefined
+
+    if (can(tenant, 'growth.ai_visibility.lead.open', 'execute', 'tenant')) {
+      let runId: string | null = null
+      let reportPublished = false
+
+      try {
+        const latestRun = await getLatestClientGraderRun(organizationId)
+
+        runId = latestRun?.runId ?? null
+        reportPublished = runId !== null && Boolean(await getLatestReportTokenForRun(runId))
+      } catch (error) {
+        captureWithDomain(error, 'growth', {
+          tags: { source: 'aeo_operator_detail_send_config' },
+          extra: { organizationId }
+        })
+      }
+
+      const isClientOrg = organization.organizationType === 'client' || organization.organizationType === 'both'
+
+      send = {
+        runId,
+        motion: isClientOrg ? 'expansion' : 'new_business',
+        reportPublished,
+        enabled: isOperatorSendEnabled()
+      }
+    }
+
     return (
       <AeoOperatorDetailView
         band={{ ...band, lastRunLabel: report.provenance.asOfDate }}
@@ -144,6 +179,7 @@ export default async function AeoOperatorDetailPage({
         asOfLabel={report.provenance.asOfDate}
         initialStatuses={initialStatuses}
         canSetStatus={canSetStatus}
+        send={send}
       />
     )
   } catch (error) {

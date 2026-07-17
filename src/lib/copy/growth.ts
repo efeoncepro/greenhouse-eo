@@ -886,6 +886,60 @@ export const GH_GROWTH_AEO_OPERATOR = {
     partialTitle: 'Plan con seguimiento parcial',
     partialBody: 'Algunos focos del Plan AEO todavía no tienen estado registrado. Se muestran como "sin seguimiento aún".'
   },
+  // Enviar informe + abrir oportunidad (Slice 6, nodo S11 — command TASK-1279). El objeto comercial
+  // es un LEAD de HubSpot (NUNCA Deal); leadType y base legal se DERIVAN server-side y acá solo se
+  // muestran en la confirmación. Prospecto exige consentimiento capturado — NUNCA cold send.
+  send: {
+    cta: 'Enviar informe + abrir oportunidad',
+    ctaAria: 'Enviar el informe AEO por email y abrir una oportunidad comercial',
+    ctaDisabledHint: 'El envío está apagado en este ambiente.',
+    notPublishedHint: 'Este cliente aún no tiene un informe publicado para enviar.',
+    title: 'Enviar informe + abrir oportunidad',
+    closeAria: 'Cerrar el envío de informe',
+    motionLabel: {
+      expansion: 'Cliente · Expansión',
+      new_business: 'Prospecto · New business'
+    },
+    publishedBanner: 'Informe publicado — listo para enviar',
+    emailLabel: 'Correo del destinatario',
+    emailPlaceholder: 'nombre@empresa.com',
+    emailInvalid: 'Ingresa un correo válido (ej. nombre@empresa.com)',
+    firstNameLabel: 'Nombre',
+    lastNameLabel: 'Apellido',
+    namePlaceholder: 'Opcional',
+    consentTitle: 'Registra el consentimiento del contacto para enviar',
+    consentBody: 'Prospecto sin relación previa: por interés legítimo, nunca envío en frío.',
+    consentCheckbox: 'Tengo el consentimiento / interés legítimo registrado',
+    consentRefLabel: 'Referencia del consentimiento',
+    consentRefPlaceholder: 'Ej. HS-CONSENT-4821',
+    consentMissing: 'Registra la referencia del consentimiento antes de continuar.',
+    continueCta: 'Continuar',
+    backCta: 'Atrás',
+    cancelCta: 'Cancelar',
+    confirmTitle: 'Confirma la acción',
+    confirmSend: (org: string, email: string) => `Enviar el informe AEO de ${org} a ${email}`,
+    confirmLead: {
+      expansion: 'Abrir oportunidad de expansión · objeto comercial: Lead de HubSpot',
+      new_business: 'Abrir oportunidad nueva · objeto comercial: Lead de HubSpot'
+    },
+    confirmLegal: {
+      expansion: 'Base legal derivada: relación de servicio',
+      new_business: 'Base legal derivada: interés legítimo'
+    },
+    confirmNote: 'Queda registrado en el log de envíos con el consentimiento capturado. La acción no es reversible desde aquí.',
+    confirmCta: 'Confirmar y enviar',
+    sending: 'Enviando informe y abriendo la oportunidad…',
+    acceptedTitle: 'Envío en proceso',
+    acceptedBody: (email: string) =>
+      `El informe saldrá a ${email} y el Lead se creará en HubSpot en unos minutos. Quedó registrado en el log de envíos.`,
+    idempotentHint: 'Este envío ya estaba registrado para este destinatario — no se duplica.',
+    closeCta: 'Cerrar',
+    errorConsent: 'El envío requiere el consentimiento registrado del contacto.',
+    errorReportUnavailable: 'No hay un informe publicado para este cliente. Publícalo antes de enviar.',
+    errorDisabled: 'El envío está apagado en este ambiente.',
+    errorInvalid: 'Revisa el correo del destinatario e intenta de nuevo.',
+    errorGeneric: 'No pudimos completar el envío. Intenta de nuevo.'
+  },
   facet: {
     title: 'Diagnóstico y Plan AEO',
     body: 'Score de visibilidad en IA, plan por foco y avance del servicio para este cliente.',
