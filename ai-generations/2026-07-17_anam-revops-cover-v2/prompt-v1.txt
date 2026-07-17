@@ -1,0 +1,38 @@
+Use case: ui-mockup
+Asset type: premium editorial blog cover for an authorized B2B implementation case study
+
+Primary request:
+Create a sophisticated, modern product-showcase image about trustworthy reporting and RevOps architecture in HubSpot. Build a much richer evolution of Image 1, using the real reporting anatomy and warm platform cues from Images 2 and 3, while inheriting the restrained Efeonce editorial hierarchy and blue/green signature from Image 4.
+
+Input images and roles:
+- Image 1 is the composition anchor. Preserve its bright white studio atmosphere, layered depth and premium three-quarter product perspective, but make the main report surface 15% more compact and more precisely centered.
+- Image 2 is a product-anatomy reference. Use its credible report-card proportions, KPI hierarchy, filter chips and spacious HubSpot reporting layout. Do not reproduce its sentences or any metric.
+- Image 3 is a chart-language reference. Use its horizontal bar-chart rhythm, warm coral/orange platform accent and restrained grid structure. Do not reproduce its numbers, labels or exact data.
+- Image 4 is the Efeonce brand-language reference. Use its disciplined editorial hierarchy, deep blue structure, bright blue accents, sparse green validation cues, generous white space and quiet precision. Do not reproduce its words or logo.
+
+Scene and subject:
+A luminous white to warm off-white seamless editorial studio. One hero reporting workspace floats in the center as a premium product object, viewed in a controlled three-quarter perspective. The hero contains a credible abstract reporting system: a primary outcome chart, a compact KPI row, one data-quality status module and a restrained controls rail. Layered report surfaces beneath and behind it suggest definitions, process, CRM data and governance. Add only two or three secondary floating cards near the outer edges for depth; they may crop away.
+
+Composition and crop contract:
+- Landscape 16:9 master.
+- The entire essential product story must fit inside the central square-safe area: the middle 56% of the canvas width and the full canvas height.
+- The main report surface, its strongest chart and its warm accent must remain fully understandable after a centered 1:1 crop.
+- Keep the hero visually centered with dynamic perspective, not dead symmetry.
+- Protect generous white breathing room around the central product.
+- No important content in the outermost 18% on either side.
+
+Color system:
+- Approximately 58% luminous white and pale neutral surfaces.
+- Approximately 20% Efeonce deep/bright blues for structure, navigation and selected chart series.
+- Approximately 14% HubSpot-inspired orange/coral plus a deep wine accent for the primary chart, selected controls and depth.
+- Approximately 8% Efeonce green, used only for two or three meaningful validation states.
+- The deep wine must read as wine, never black. No black or charcoal background.
+
+Finish and lighting:
+Premium contemporary B2B SaaS product advertising, similar in polish to a high-end software launch image without copying any brand campaign. Diffuse high-key studio lighting, precise soft contact shadows, subtle translucent acrylic edges, restrained brushed-white aluminum, controlled reflections, fine natural grain, crisp geometry and realistic depth. Richer and more dimensional than Image 1, but still calm and editorial.
+
+Constraints:
+No readable text, no letters, no exact numbers, no client data, no fake KPI claims, no logos, no watermarks, no people, no robots, no brains, no generic colored bubbles, no dark background, no neon glow, no lens flare, no excessive green checkmarks, no plastic toy finish, no impossible UI geometry, no cropped main panel.
+
+Output:
+2048x1152 opaque PNG, high quality.

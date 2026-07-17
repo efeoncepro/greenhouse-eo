@@ -50,9 +50,13 @@ export type GutenbergArticleBlock =
       mediaId: number
       url: string
       alt: string
+      width?: number
+      height?: number
       sizeSlug?: string
       caption?: GutenbergRichText
       linkDestination?: 'none' | 'media'
+      /** Optional art-directed sources. The fallback attachment remains the Gutenberg image owner. */
+      sources?: Array<{ url: string; media: string; type?: 'image/webp' | 'image/jpeg' | 'image/png' }>
     }
   | { kind: 'embed'; provider: 'youtube'; url: string }
 
@@ -175,15 +179,41 @@ const imageBlock = (block: Extract<GutenbergArticleBlock, { kind: 'image' }>): s
   const sizeSlug = block.sizeSlug ?? 'large'
   const linkDestination = block.linkDestination ?? 'none'
 
+  if ((block.width !== undefined && (!Number.isInteger(block.width) || block.width <= 0)) ||
+      (block.height !== undefined && (!Number.isInteger(block.height) || block.height <= 0))) {
+    throw new Error('content_factory_article_image_dimensions_invalid')
+  }
+
+  const dimensions = block.width && block.height ? ` width="${block.width}" height="${block.height}"` : ''
+
   const caption = block.caption
     ? `<figcaption class="wp-element-caption">${renderRichText(block.caption)}</figcaption>`
     : ''
 
   const image = `<img src="${escapeGutenbergHtml(block.url)}" alt="${escapeGutenbergHtml(
     block.alt
-  )}" class="wp-image-${block.mediaId}"/>`
+  )}" class="wp-image-${block.mediaId}"${dimensions}/>`
 
-  const media = linkDestination === 'media' ? `<a href="${escapeGutenbergHtml(block.url)}">${image}</a>` : image
+  const sources = (block.sources ?? [])
+    .map(source => {
+      const safeMedia = /^\((?:prefers-color-scheme:\s*(?:dark|light)|max-width:\s*\d+px)\)(?:\s+and\s+\((?:prefers-color-scheme:\s*(?:dark|light)|max-width:\s*\d+px)\))*$/
+
+      if (!safeMedia.test(source.media)) {
+        throw new Error(`content_factory_article_image_media_invalid:${source.media}`)
+      }
+
+      const type = source.type ? ` type="${source.type}"` : ''
+
+      return `<source media="${escapeGutenbergHtml(source.media)}" srcset="${escapeGutenbergHtml(source.url)}"${type}/>`
+    })
+    .join('')
+
+  const responsiveImage = sources ? `<picture>${sources}${image}</picture>` : image
+
+  const media =
+    linkDestination === 'media'
+      ? `<a href="${escapeGutenbergHtml(block.url)}">${responsiveImage}</a>`
+      : responsiveImage
 
   return [
     `<!-- wp:image {"id":${block.mediaId},"sizeSlug":"${sizeSlug}","linkDestination":"${linkDestination}"} -->`,

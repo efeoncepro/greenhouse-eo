@@ -1,0 +1,18 @@
+Create a premium editorial cover artwork centered on ONE horizontal bar chart.
+
+REFERENCE ROLES:
+- Reference 1 is the chosen POSITIVE COMPOSITION. Develop its four large horizontal bars, asymmetric lengths, restrained datum lines and flat editorial clarity into a sophisticated final artwork.
+- Reference 2 is POSITIVE evidence for the authentic visual rhythm of a real HubSpot horizontal bar chart and its coral-orange accent. Do not copy UI, labels, numbers or data.
+- Reference 3 is POSITIVE evidence for Efeonce blue hierarchy, disciplined spacing, warm white background and the single green validation accent. Do not reproduce text, metrics, cards or layout.
+- Reference 4 is a REJECTED NEGATIVE REFERENCE. Never reproduce its dashboard, software window, cards, widgets, perspective panel or generic SaaS imagery.
+- Reference 5 is a REJECTED NEGATIVE REFERENCE. Never reproduce its glass sculpture, acrylic bars, equipment rack, 3D product render, frame, cabinet or mechanical construction.
+
+ART DIRECTION: treat the chart like a contemporary Swiss editorial poster or a premium annual-report cover, not like software. Work flat and front-facing. Four bold horizontal bars form one memorable composition. Use subtle misregistration, translucent ink overlaps, offset color plates, razor-sharp crop geometry and a barely visible premium paper grain to reveal that reliable reporting is constructed in layers. The technique should feel intentional and crafted, not distressed or retro.
+
+COLOR AND HIERARCHY: warm white / ivory background. One dominant coral-orange bar with a deep wine-colored leading segment is the focal point. One deep Efeonce navy bar, one vibrant blue-to-cyan bar with a restrained wine-colored leading segment, and one shorter dark blue bar create rhythm. Use bright Efeonce green exactly once as a narrow validation segment at the end of one blue bar. Use pale blue offset underprints sparingly. No black background.
+
+COMPOSITION: landscape 2048x1152, but place the complete bar composition inside the centered square-safe region. Leave generous clean negative space on both sides. A centered 1:1 crop must preserve all four bars, every important color segment and the complete visual idea. The bars may approach the square-safe edges but must not be clipped. Keep the overall artwork calm, bold, elegant, novel and enterprise-grade.
+
+ABSOLUTE EXCLUSIONS: no dashboard, no interface, no browser, no screen, no cards, no KPIs, no widgets, no buttons, no tables, no text, no numbers, no labels, no readable axes, no logos, no pseudo-writing, no 3D, no perspective, no glass, no acrylic, no rack, no cabinet, no product mockup, no people, no robots, no devices, no bubbles, no node network, no neon, no dark background, no generic AI SaaS illustration, no decorative clutter.
+
+Output one borderless high-resolution editorial artwork with no embedded typography.

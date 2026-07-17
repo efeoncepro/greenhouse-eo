@@ -1,0 +1,1901 @@
+{
+  "contractVersion": "contentFactoryPostDeepInspection.v1",
+  "scannedAt": "2026-07-17T09:39:46+00:00",
+  "source": "wp_cli_parse_blocks",
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "post": {
+    "id": 251397,
+    "type": "post",
+    "status": "private",
+    "slug": "dashboards-hubspot-confiables-caso-anam",
+    "title": "Privado: Un dashboard no arregla un proceso comercial: cómo construimos paneles confiables en HubSpot para ANAM",
+    "modified": "2026-07-17T09:38:22+00:00",
+    "permalink": "https://efeoncepro.com/hubspot/dashboards-hubspot-confiables-caso-anam/",
+    "contentLength": 25331
+  },
+  "seo": {
+    "yoastTitle": "Dashboards confiables en HubSpot: el caso ANAM %%sep%% %%sitename%%",
+    "yoastDescription": "Cómo Efeonce acompañó a ANAM a ordenar datos, asociaciones y automatizaciones en HubSpot antes de construir dashboards para decisiones comerciales.",
+    "primaryCategory": "19"
+  },
+  "summary": {
+    "totalBlocks": 155,
+    "topLevelBlocks": 155,
+    "counts": {
+      "core/freeform": 77,
+      "core/heading": 10,
+      "core/list": 5,
+      "core/paragraph": 54,
+      "core/pullquote": 3,
+      "core/quote": 3,
+      "core/separator": 1,
+      "core/table": 1,
+      "yoast-seo/table-of-contents": 1
+    },
+    "maxDepth": 0,
+    "linkCount": 16,
+    "nonEmptyFreeformCount": 0,
+    "mediaIssueCount": 0
+  },
+  "headingOutline": [
+    {
+      "path": "14",
+      "level": 2,
+      "text": "La solicitud visible no siempre es el problema completo"
+    },
+    {
+      "path": "32",
+      "level": 2,
+      "text": "Qué es RevOps y cómo se aplica sin imponer una receta"
+    },
+    {
+      "path": "46",
+      "level": 2,
+      "text": "Por qué un dashboard de HubSpot puede mostrar cifras correctas y aun así no ser confiable"
+    },
+    {
+      "path": "60",
+      "level": 2,
+      "text": "Cómo mejorar la calidad de datos en HubSpot sin inventar asociaciones"
+    },
+    {
+      "path": "76",
+      "level": 2,
+      "text": "Qué es la escala de confianza de un dashboard comercial"
+    },
+    {
+      "path": "94",
+      "level": 2,
+      "text": "Cuándo puedes confiar en un dashboard comercial"
+    },
+    {
+      "path": "106",
+      "level": 2,
+      "text": "Cómo automatizar controles sin convertir un piloto en KPI"
+    },
+    {
+      "path": "118",
+      "level": 2,
+      "text": "Lo que decidimos no publicar también es parte de la implementación"
+    },
+    {
+      "path": "132",
+      "level": 2,
+      "text": "Un dashboard confiable es una consecuencia"
+    },
+    {
+      "path": "144",
+      "level": 2,
+      "text": "Cómo construimos y revisamos este caso"
+    }
+  ],
+  "blocks": [
+    {
+      "path": "0",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Hay dashboards que responden preguntas. Y hay dashboards que sólo consiguen que un dato incompleto se vea más convincente.",
+      "innerBlockCount": 0,
+      "fingerprint": "ac2df4963bc70d434eefc6f36ae7f9aa1bdb5567041a6bb4e7c004d3c1daae82",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "1",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2da24f92367f7c2b0e4f76ad392b66fce9027bfa35a81485910e5d0ae882d5b9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "2",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La diferencia no siempre se nota. Los dos pueden tener buenos gráficos, filtros y cifras perfectamente formateadas. El problema aparece cuando alguien hace una pregunta bastante simple: ¿podemos tomar una decisión con esto?",
+      "innerBlockCount": 0,
+      "fingerprint": "371e1e627ecb1e717c47d191d6795b7aaff95c2ef97ddb8135e2170573cbf5a1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "3",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4b5c99f6fafba03d9973d68018f691c628527b5b6e25c9e4fe26fedf312548a7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "4",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En la implementación de HubSpot para ANAM, esa pregunta cambió el orden del trabajo. Antes de construir más paneles, tuvimos que entender qué significaba cada dato, cuánto podíamos confiar en él y qué cosas todavía no teníamos derecho a llamar resultado.",
+      "innerBlockCount": 0,
+      "fingerprint": "13285eac6eeb21eded45dbc4c743609fe8ddc167bbcf154c9a09ac6d949e6c41",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "5",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "62db42a028e487a080771dcb8308c877e830521c7e072b6dbfb3206756272e1f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "6",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "ANAM S.A. es una empresa chilena de servicios ambientales del Grupo Aguas. Realiza monitoreo, muestreo y análisis de matrices como aguas, residuos, suelos y aire. En una operación así, cotizar, prestar un servicio, responder una consulta de calidad y dar conti…",
+      "innerBlockCount": 0,
+      "fingerprint": "61efd140c101ccfcd9dc941733594d46e7c3024ee844c11d7c0eca0dfb5f46f4",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://cl.linkedin.com/company/anam-s.a"
+    },
+    {
+      "path": "7",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c284c4c12aefa43352f47d5ae193ebd4c3db1e74bc665ace910fdbfd6b7ca2b5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "8",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El punto de partida no fue un brief que dijera «necesitamos rediseñar nuestra operación comercial». Las señales eran mucho más concretas: un Customer Agent, algunos KPI y paneles que ayudaran a mirar mejor el negocio.",
+      "innerBlockCount": 0,
+      "fingerprint": "1c0532a60d785666e19ace8a3046ecd6e7c793e7b61b1d3ba7568c590c2579c2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "9",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "83858823bfd43358305f10f00874c21d546e0764e53e599d4a1bd2a8983cbaf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "10",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Las solicitudes eran correctas. Lo que todavía no estaba formulado era el problema de sistema que las conectaba.",
+      "innerBlockCount": 0,
+      "fingerprint": "f072c23a99b47163892b2526b2699049a8715df58624300638db7a3f7db9b4ce",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "11",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4dca91fafb9af976b35ddc2b0ddb37e1f98fde38c886593c5707d32d12d69ea5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "12",
+      "depth": 0,
+      "blockName": "yoast-seo/table-of-contents",
+      "attrs": {},
+      "text": "Tabla de contenidosLa solicitud visible no siempre es el problema completoQué es RevOps y cómo se aplica sin imponer una recetaPor qué un dashboard de HubSpot puede mostrar cifras correctas y aun así no ser confiableCómo mejorar la calidad de datos en HubSpot …",
+      "innerBlockCount": 0,
+      "fingerprint": "f74c5c5e948d20b12aa67de851dc78f3e5e7283ff3d0e8b0134cc302429f1d18",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "#h-la-solicitud-visible-no-siempre-es-el-problema-completo"
+    },
+    {
+      "path": "13",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e84eb997543a7dd41514d773b9cbe2137fd6e32c2a54cbfc9ac8bcce9e94bbd1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "14",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "La solicitud visible no siempre es el problema completo",
+      "innerBlockCount": 0,
+      "fingerprint": "a0010ffd94a17916e7595a9b67369162739e1d9eb948c968b7768e3198047cce",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "15",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "661e12f5c6529bc71e7e349b071d9e1cb7932b3ca81965ead12f9a6463eb2414",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "16",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un pedido de dashboard, automatización o agente puede ser una necesidad real y, al mismo tiempo, ser sólo la capa visible de un problema operativo más amplio. Antes de configurar la solución conviene entender qué decisión intenta mejorar y cómo funciona hoy el…",
+      "innerBlockCount": 0,
+      "fingerprint": "329d586df912ecd805d0a4774970190f6c2c7e0a825cf03a7ee595ecc881c3e8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "17",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c423d4f29c415e75245bec0f0485223b01d85f2f11644b45cb4ac281d90df4a9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "18",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En Efeonce no partimos de una definición de RevOps para después hacer que ANAM calzara dentro. Recorrimos con su equipo el proceso que ya existía: cómo una necesidad se convierte en cotización, servicio, seguimiento y continuidad; dónde aparecen decisiones; qu…",
+      "innerBlockCount": 0,
+      "fingerprint": "34e974f1564749cc5381f72ca0870c8462543b6ed9296b08a89f465b3aec04df",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "19",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd6e2c3c76a82830321d48de818f635d83749645c0a63b252f31832eb9b0e432",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "20",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "El objetivo no era imponer un modelo. Era hacer visibles las opciones y sus consecuencias.",
+      "innerBlockCount": 0,
+      "fingerprint": "418510a0c423671bd974fac47ee72be435b6c86965a0dd78a82eb906e3359369",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "21",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "657f90f2163e0fe357d624219a016dabec7eba7d57a79f1d2f960c7347b2f9c0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "22",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ese recorrido tuvo cinco movimientos:",
+      "innerBlockCount": 0,
+      "fingerprint": "83669b2a2fd3e6fb50470adde181a4c89d28739c78fa31e158383f92d9a1f1a7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "23",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7d6d371d4dbfcfb1428409fff1c4c0037a77055eea9e723c3624f004292b3ab9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "24",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Escuchar las señales: un agente, nuevos KPI, mejores paneles y automatizaciones concretas.Recorrer el proceso propio: entender cómo ANAM atrae, cotiza, vende, entrega, atiende y sostiene sus servicios.Construir opciones con el cliente: conectar las solicitudes…",
+      "innerBlockCount": 0,
+      "fingerprint": "d627388f21a3ec4d9b7a67391a818c6df9dd1a36bce59974ca7ab12aea6922c5",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "25",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ac173ffb8869f6666f0831d325010b26566cbc77a3518c6dd8636efafccb6d9f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "26",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Es un descubrimiento operativo con doble validación. La primera viene de las personas que conocen la operación. La segunda, de los datos que muestran cómo esa operación quedó registrada.",
+      "innerBlockCount": 0,
+      "fingerprint": "45769dde47bb0c4ae3c5cb2f2266c6c52c23cd5b25dd94bac1996198fc89f976",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "27",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "34b63d36ab5e5d57165076da458251645e23ae7836216c9ccd095ad047698b78",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "28",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ninguna reemplaza a la otra. Las personas pueden explicar con precisión cómo debería funcionar un proceso, mientras el CRM revela excepciones, vacíos o comportamientos heredados. Los datos pueden mostrar un patrón, pero no siempre explican por qué existe ni qu…",
+      "innerBlockCount": 0,
+      "fingerprint": "ac0ff85ec909f5115c57be7e67eccc1f0b7ce4155f7de2e6df84b64752798295",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "29",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2c9b09a2ebe532e3b49c51beea30f1663a68278c4920f7d960e01431c62b5ad5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "30",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Cuando ambas lecturas coinciden, puedes avanzar con más confianza. Cuando no coinciden, la diferencia suele ser el hallazgo más importante.",
+      "innerBlockCount": 0,
+      "fingerprint": "47a4ba8c044f52238733b3aff6ceef8ebe927b6bdaae45c07818a10a69dcf91e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "31",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c50c720347dfe52776431315bb77275805c25a8c8e5cf37883a52413c5ae9cf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "32",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Qué es RevOps y cómo se aplica sin imponer una receta",
+      "innerBlockCount": 0,
+      "fingerprint": "70572300c45946dcee35749c5b54f27fa144301b0661cf0df09cab3152ef9fd9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "33",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ea2bb7516e325cff7952d2b45196e71af3c6fb7d59bbe5d55cbea5e58566194",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "34",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Revenue Operations, o RevOps, es la disciplina que conecta marketing, ventas, servicio, datos y procesos para que la operación comercial pueda medirse y mejorarse como un solo sistema.",
+      "innerBlockCount": 0,
+      "fingerprint": "e1a9c617763fff522e520538942f7bf53159c6d047e316d0ebae365952aa0feb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "35",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e26d65395fc27b4cdb43da753a28c83ff1ed8e1720f59373d9f081535d704e9b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "36",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La definición sirve para nombrar el tipo de trabajo. No obliga a todas las organizaciones a tener el mismo proceso comercial, los mismos KPI ni la misma arquitectura de HubSpot.",
+      "innerBlockCount": 0,
+      "fingerprint": "36ed004382ce8b9209e510d6992babc37a1204c981c8f8edfcc031ec80737d2d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "37",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a41c767a763d456d376dc318669e5ccca6a466b5acc4b23642d9b763fa2e27b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "38",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Cada empresa tiene una forma distinta de llegar al mercado y sostener sus relaciones. Ese proceso comercial y operativo —lo que suele llamarse go-to-market— no termina cuando se cierra un Deal: incluye cómo atrae oportunidades, cotiza, entrega, atiende, renuev…",
+      "innerBlockCount": 0,
+      "fingerprint": "655996207e610e7ffa00ffbede1d518244982f029a7c91cf82c2a3cd2934f169",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "39",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2afbc9c9b8b1f9a4db9b0885d7a6a3c499d8d7c426782fa741759d88ba945d32",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "40",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Como HubSpot Solutions Partner, en Efeonce conocemos las posibilidades y los límites de la plataforma. Pero esa experiencia no reemplaza el descubrimiento. Sirve para traducir el proceso del cliente en opciones viables, explicar sus consecuencias y evitar que …",
+      "innerBlockCount": 0,
+      "fingerprint": "7cf945b07ae23fb9c3771c8cfcc8696e1b5d27c048ba79ad9ed7a2c1f1097ea2",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://ecosystem.hubspot.com/es/marketplace/solutions/efeoncepro"
+    },
+    {
+      "path": "41",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2aefea39ecf1a11ef2f202e026852cabf742c3f2d9ea99480c5d5e3e7c11600a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "42",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el caso de ANAM, el trabajo consistió en descubrir qué combinación de datos, procesos y automatizaciones representaba mejor esa realidad. HubSpot ofrece herramientas para relacionar información de marketing, ventas, ingresos y servicio en sus reportes y das…",
+      "innerBlockCount": 0,
+      "fingerprint": "d0015ffa26d73bd1a6e5605be7cc75010910119c258af4c4eb48038808ca5ad5",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.hubspot.com/products/reporting-dashboards"
+    },
+    {
+      "path": "43",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "053abf8768233eaab98513ddafe75724ac6e5a9754b362a36113ff86ff23aa9c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "44",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ahí aparece el trabajo de operación.",
+      "innerBlockCount": 0,
+      "fingerprint": "406aa270142b5c92a70dc63b7241551aef4c1c0d055cfa414b376552ac86b6d5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "45",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "68a75eb3f45f83dd0fe0c8e79b4d72535a63bf009602dcfaf8963630ec2959fd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "46",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Por qué un dashboard de HubSpot puede mostrar cifras correctas y aun así no ser confiable",
+      "innerBlockCount": 0,
+      "fingerprint": "f56c966d48bfb684b727e5467e5d341039b4efc0fd74d0bff6585eed3a500ece",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "47",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd8802fd51e15ee6daa5843253bfee36601c7e5d5c167c34afb0e54024ba8074",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "48",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un dashboard comercial puede estar bien construido y responder mal la pregunta si mezcla hechos diferentes en un mismo objeto. El modelo debe distinguir quién es el cliente, qué oportunidad se abrió, qué se vendió, qué servicio se presta y qué evento produce u…",
+      "innerBlockCount": 0,
+      "fingerprint": "e7737049d454d56b5b15736ed68d2a7affda23d06910b1fc66ff7835fa5653bb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "49",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "51d2e1d1ec468a4a30e27f807594cf18daf531538b5a74412f461defc02da878",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "50",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Vamos con manzanitas 🍏🍏🍏:",
+      "innerBlockCount": 0,
+      "fingerprint": "e6561fb40f5cd205cb70b41c003cdd4bd8c9fc3bcf1ecf108cfa505e2025f455",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "51",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7ba90849d64f044316abde25f63291386e97caf3d0b2f4bc32e552b379c84d6e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "52",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "Company representa a la organización o cuenta.Deal representa una oportunidad comercial o adjudicación.Line item conserva el producto o servicio incluido en esa oportunidad.Service representa el alcance contratado y su ciclo de activación, entrega o renovación…",
+      "innerBlockCount": 0,
+      "fingerprint": "c2cb816c9a3756a0e86a47c38511efd9d87a100522e3082c63ea46b269164230",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "53",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b119eb48acea4a3b75f200a5ef0ca220944809eb1d1e82d6e4522038affe3534",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "54",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esto importa porque el monto de un Deal no equivale automáticamente a facturación ni a ingresos reconocidos. Tampoco una Company puede cargar, sin perder precisión, todos los hechos comerciales, operativos y financieros que ocurren a su alrededor.",
+      "innerBlockCount": 0,
+      "fingerprint": "83a69c9ce1bbf8ca85cd3362de2bb6f3359ab9b6ba57f6a73de9bf0eb26b2ce8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "55",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a6da1b32f6ea8e7fd1c94a558978854bfa24ac0739e981e4cc06507499a05ec1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "56",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "Si aplanas esos eventos, el dashboard puede sumar correctamente y aun así estar sumando cosas que no responden la misma pregunta.",
+      "innerBlockCount": 0,
+      "fingerprint": "3475bcf6d4656bc1b857471f3d32e9f75e00765ad38b2260481d832e9b4b9f46",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "57",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "75037fef1c327667189dd5ef37d294d327bade37501c34cce9bcc52874496345",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "58",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Por eso una de las primeras decisiones fue separar el pulso ejecutivo, los factores comerciales, la calidad del dato y los pilotos de servicio. El panel no debía esconder la arquitectura que lo sostenía.",
+      "innerBlockCount": 0,
+      "fingerprint": "197d6ebf7ade987f2d20a629da21f43432ad6ad09560c5cf9619125e93f3e1ad",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "59",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e6a500b950175889a31e84bef00f32729137a3e72a0ae1cf00247d3fe075d19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "60",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cómo mejorar la calidad de datos en HubSpot sin inventar asociaciones",
+      "innerBlockCount": 0,
+      "fingerprint": "16bf19d632c6cbd9ec734f102351b12dd336559ba309c5b26effdf44915a51b7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "61",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "46f36295e3cbaa7c9e9ad0514540c3421360fd75423cf1ea4fe33e95b0faa19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "62",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La calidad de los reportes dependía, entre otras cosas, de asociar Deals con sus Companies correctas. El problema es que una asociación incompleta no autoriza a inventar la que falta.",
+      "innerBlockCount": 0,
+      "fingerprint": "7ac655e3cd9ee380beb186b14b5051edc6717fe6558297c39afba0256cece5b6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "63",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5503c0d261d1094800218d8e78d04fb56062b8419231c2207c9ffbe69e5804dd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "64",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el corte del 16 de julio de 2026, había 645 Deals sin Company asociada. Los clasificamos según la evidencia disponible:",
+      "innerBlockCount": 0,
+      "fingerprint": "6aa95d4eaca417a772d6ff33625864f194601e186fb67dc9adbc39229bd674ea",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "65",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a5f8311ec9417dccecf2995f705067795727f7edef69c275364ed0defcc1ddef",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "66",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "34 tenían una ruta explícita y convergente desde el Deal hacia un Contact y desde ese Contact hacia una Company;113 presentaban candidatos basados sólo en dominio y quedaron para revisión manual;447 tenían contactos, pero no una identidad determinística sufici…",
+      "innerBlockCount": 0,
+      "fingerprint": "db9d8d29a37acaff0e0ea9b0e3675ecffa3212227ab4bf5a305d12a8f4dcbb03",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "67",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "af5e91bed563afbeea9b1cddea107c5d64754d0a04856862e6fab84195a380a2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "68",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Sólo ejecutamos las 34 asociaciones determinísticas. La verificación posterior confirmó 34/34, y la cobertura global de Deals con Company pasó de 595/1.240 (47,98%) a 629/1.240 (50,73%). Todavía quedaron 611 Deals sin una Company asociada.",
+      "innerBlockCount": 0,
+      "fingerprint": "eb19fa3588a9c1656be5d42c3166d401e3fee28c1e387e6c55bba95164c64c89",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "69",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ca60a7609bbfb11d8627a3d860f2a22668122c737494981d54b2a242342d3c40",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "70",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Es una mejora comprobable. También está muy por debajo del 95% de cobertura que definimos como condición mínima para publicar esas vistas como KPI oficiales. Hasta alcanzar ese umbral, sirven para diagnosticar; no para representar el negocio completo.",
+      "innerBlockCount": 0,
+      "fingerprint": "ffb7bdd79628cd2b3ad4ac6c6f18b670a60849524f9259e89ac05247e90f7ced",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "71",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "105166651fb600bf3c74595e4f3f53ff5313c12bd32f55b2f008e23c26c97583",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "72",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No fusionamos Companies, no creamos registros para llenar el vacío y no usamos coincidencias aproximadas sobre nombres o títulos. Los casos ambiguos se conservaron como trabajo pendiente porque una relación dudosa puede contaminar reportes, responsabilidades, …",
+      "innerBlockCount": 0,
+      "fingerprint": "69592c03f23a1f0c76e286bf246d5167296701c4e7dd098541f665471cba4cf4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "73",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d6367186a13e4adf1313064870ec2f9d5efbcf34905718193c8bafc772658859",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "74",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Una implementación confiable no se mide por cuántos registros logra tocar, sino por cuántos cambios puede explicar, comprobar y revertir.",
+      "innerBlockCount": 0,
+      "fingerprint": "9bc2df38418018f97ed1601e8e3ef35edc6765f393a241016922d9830e5a58b1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "75",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "21d5b1cde23c059d575b599a99f6b62c70c799468fe8461ce8b71605710aef0e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "76",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Qué es la escala de confianza de un dashboard comercial",
+      "innerBlockCount": 0,
+      "fingerprint": "010093f55bbde987f64bb64b87762f2634fab14fbe82e92c1332c02ae9e82029",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "77",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "30bd06b0c23989fc42cec59b28bf9d88f3bd5114f51c7bdf3666368594a25612",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "78",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La escala de confianza clasifica cada vista como KPI oficial, diagnóstico o piloto según sus definiciones, población, cobertura, fuente y responsabilidad. Un gráfico no cambia de categoría porque funcione técnicamente; cambia cuando la evidencia permite sosten…",
+      "innerBlockCount": 0,
+      "fingerprint": "c1759d1a176c2e04f9c38e90addd2a9865ef19bd5c03865d1193ca64ca98a87d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "79",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "531cc3f2648ef4e2beed396e1be6521a6ee1e794405a59b6466133fda5d9f05a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "80",
+      "depth": 0,
+      "blockName": "core/table",
+      "attrs": {},
+      "text": "NivelQué significaPara qué sirveQué debe mostrarKPI oficialDefinición, período, población, denominador, cobertura, fuente y responsable están resueltos para el alcance declarado.Tomar decisiones y evaluar desempeño dentro de ese alcance.Definición, corte, pobl…",
+      "innerBlockCount": 0,
+      "fingerprint": "3542fbb5d2ae09214714829ad948c5762f05420beb8560331a2a1e80b0f5a34e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "81",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "edf656e8ae68f518cb6260d407b80f346334dc715042fa2ba07031b95b6b4659",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "82",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "No todos los datos incompletos son inútiles. El problema aparece cuando les pedimos que sostengan una conclusión mayor que la evidencia disponible.",
+      "innerBlockCount": 0,
+      "fingerprint": "38c657e54e5f84550971fd571252affa62fe8b460f2348468e19185029c3728a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "83",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4d895cca29deb52cf5cc39c09167eeefe4a1b73c382911c8c0246b8e59ac92f6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "84",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En ANAM encontramos información que ya podía apoyar decisiones, información real que servía para diagnosticar y datos controlados que sólo debían probar una configuración. Si todo hubiera terminado en un mismo dashboard, con el mismo tratamiento visual, habría…",
+      "innerBlockCount": 0,
+      "fingerprint": "9f117a802c0eae99018e05a639e85ff99858425644d6d0fbdd944ced85a807b0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "85",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e52f8a52551e6ae5e34e99987696aa1dbcd9a5954928292d8c03ebacb72215c5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "86",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Las dimensiones de segmento y región se reconciliaron en 471/1.023 Companies (46,04%), mientras el sector estratégico quedó disponible en 65/1.023 (6,35%). Esas cifras permitían empezar a explorar composición y tendencias, pero no representaban la totalidad de…",
+      "innerBlockCount": 0,
+      "fingerprint": "887650c2939b695585214d0579b1c61b95fb933f71d21c0c72f83de04b0d2a02",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "87",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "36cf66906e25b0a6dfc7c1e530ac775708d129ab1b67eafc44c250585befb53f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "88",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Retención y Fidelización quedaron en otro nivel: piloto. Se crearon cinco Services controlados con datos de activación sintéticos y explícitamente rotulados como ejemplo. El objetivo era probar el modelo, el comportamiento del dashboard y la revisión humana. N…",
+      "innerBlockCount": 0,
+      "fingerprint": "ac0a33c8312ed593e3542ae854d35b73ab0d6581a16409c41ba32fc10bccfb20",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "89",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "287605b0d2f91e486ba16b88b418797425d607bc5d7a34631202951d8b40e187",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "90",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Por la misma razón, no publicamos GRR, NRR, churn, tasa de renovación, NPS ni health score como resultados oficiales. Los hechos, períodos y denominadores necesarios todavía no cumplían la condición.",
+      "innerBlockCount": 0,
+      "fingerprint": "f13c3a3603481e0498017571cbf635c0bce7ba33b404a658d617efbe068424ee",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "91",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9c6d7b896a27b18208a07cbac18aa839f6278ce7b773532190a8fff22aa914cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "92",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "Un piloto prueba comportamiento. Todavía no prueba impacto.",
+      "innerBlockCount": 0,
+      "fingerprint": "bd86cb0b79faf651d7f7c0b8172ea7f7793f1fc1a2dfc0243b9550735d704b97",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "93",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ed3fc775d6bb7ad3db99d75e8c04e6f24fa56c04d9760d4e6cecf0d97e12e945",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "94",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cuándo puedes confiar en un dashboard comercial",
+      "innerBlockCount": 0,
+      "fingerprint": "9fb2bdde60a0b8307c3b66ef87d43d55761aa97907a08eb077d4522e79167a96",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "95",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1ddea7324634514aa124d436a81cf3e415d0fd7360be45ffde752f239d2e584b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "96",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Puedes confiar en un dashboard cuando cada indicador responde una pregunta concreta y deja visibles sus condiciones: qué hecho mide, qué período cubre, cuál es su población, cuánto dato utilizable existe y quién debe actuar.",
+      "innerBlockCount": 0,
+      "fingerprint": "b977d3d14640b78d2be0ea6af14e79033156d0fa833a0df88f51810302083814",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "97",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "17e26bb627e0497b9be3bcaac2a3f7e56f1365f0c71328adaa2b00fc39fc93fb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "98",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Antes de usar un panel para decidir, conviene responder estas ocho preguntas:",
+      "innerBlockCount": 0,
+      "fingerprint": "0015044996d70e06d9d829a6ac88ab8037cd91ceaf184929642eb641ba69e095",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "99",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a46f77a24f2314e2fd5bf7725c605caa94c3d9150085a29b1aa0f18e3743274a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "100",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "¿Qué pregunta de negocio responde?¿Qué hecho mide y en qué objeto está registrado?¿Qué período cubre?¿Cuál es la población elegible y cuál es el denominador?¿Qué porcentaje de esa población tiene datos utilizables?¿Cuál es la fuente y con qué frecuencia se act…",
+      "innerBlockCount": 0,
+      "fingerprint": "6a438590ebf255fabd264416b408ef444c337ff024158ea15d9a939a2fc5bd41",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "101",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "db7925d6b513298e9ea46e69f85b5845985facfab1aa040002acc371f5a2b9e6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "102",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si alguna respuesta falta, el dashboard todavía puede ser útil. Quizás permite detectar una brecha, priorizar limpieza o probar una automatización. Lo que no corresponde es pedirle una certeza que aún no puede entregar.",
+      "innerBlockCount": 0,
+      "fingerprint": "8475a4f5dd451e72bd1c83b1db1bf6741b0a02799b41d97873bc2b914c936b1e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "103",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1959bf9e19c1edd11f2267ce3b54644c6ba4c12aa8f4ab41e8deb0025330d067",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "104",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esta lógica también coincide con una idea más amplia de gobierno de datos: la calidad no depende sólo de tecnología, sino de personas, procesos, responsabilidades y controles. La propia documentación de HubSpot sobre gobierno de datos insiste en esa combinació…",
+      "innerBlockCount": 0,
+      "fingerprint": "284d1b6881f5b7b3c4f93ef777be6f4f53c8e93ddd56d3d07d0bc0dfdaffd072",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://blog.hubspot.com/marketing/data-governance"
+    },
+    {
+      "path": "105",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ced5d98af983eb64e922fdd84692386306703c12f3f1d5cf40820c5602bebaf",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "106",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cómo automatizar controles sin convertir un piloto en KPI",
+      "innerBlockCount": 0,
+      "fingerprint": "a0410f14ca3a6dc4bf2c8de89f9f15b3689ab17b5b806e45a04a6f0d5353d2d3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "107",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "87f0142c5e3df57803f7f74b79e46f3248ccbaacac9b26151406b05336b84bbd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "108",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Automatizar no consiste sólo en eliminar clics. Una automatización correcta debe conservar el modelo, respetar sus excepciones y dejar claro cuándo necesita juicio humano.",
+      "innerBlockCount": 0,
+      "fingerprint": "bdc5e6abf907e4fc1cf474faadf2a3e9db8850e69f348b32a794e0c6717e02a8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "109",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e1b837899b752aeeb8cd013957906ad6fbbaf1c724bbdf66cb10bc914bd0c36f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "110",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el piloto de Services de ANAM, la automatización no convertía un dato de prueba en KPI. Generaba una tarea de revisión para una persona. Cinco Services controlados produjeron cinco tareas, permitiendo comprobar que la señal llegaba al responsable sin escond…",
+      "innerBlockCount": 0,
+      "fingerprint": "4d8ace5bb82b5a898ff91ce1d06f12b402395d70f18940e41f6c496951344095",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "111",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9cf788d29fec49f8018b7d53e14c3fc1c7bb2af271d22775a0a0ff9c73ff4ec3",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "112",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "También separamos activación de elegibilidad. Que un servicio esté activo no significa, por sí solo, que ya pueda entrar en una métrica oficial de retención. Para eso hacen falta fechas ratificadas, una población definida, reglas de renovación y cobertura sufi…",
+      "innerBlockCount": 0,
+      "fingerprint": "c68a3bdf42a8a3e78a7874389cd01b0fdfa57924ebe9ac254309587450b83ada",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "113",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "95cb33b8bebf19d5c934600164126ebf6728802a2624e38101c49fe3cc8105c2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "114",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Hubo otra decisión importante: no crear automáticamente un Service por cada Deal. Un Deal puede contener varias líneas, y cada línea puede representar un alcance distinto. Una automatización demasiado simple habría perdido esa cardinalidad y creado registros d…",
+      "innerBlockCount": 0,
+      "fingerprint": "c7f069d4695439c5fea2bd2881da8f722b37cb83091148601b24a09a095a2f44",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "115",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7c5479807141885b2c36596d125591d304e01f0a310426b9837ae9d479f9af82",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "116",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Primero había que preservar la unidad de análisis. Después automatizar.",
+      "innerBlockCount": 0,
+      "fingerprint": "f0f14c74346b7b17efd15b8996c6e8a97246f5f38506dd55634c2a23007dd423",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "117",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6622ba2ebe1cf9fe53fd8e10ce2f57552747e2cf74d1d6b70be576b9711f106c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "118",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Lo que decidimos no publicar también es parte de la implementación",
+      "innerBlockCount": 0,
+      "fingerprint": "8356c2ddcf914c065dd8f5ccd3c087453793a58ce1b648e78ddae82b89e8a810",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "119",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3ca2b238e216764b7f46b31a9322ff950a2dc80d81fc6b29f46c49d09cc37ae8",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "120",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Es fácil mostrar un dashboard terminado. Cuesta más documentar las cifras que se dejaron fuera y explicar por qué.",
+      "innerBlockCount": 0,
+      "fingerprint": "d22cea42f3dd1d984c4dfddda961feb4199fe2fed4b2bec77d0862c37331788b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "121",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "009639836dc483ec5c02bb5e9898398a96830d008e8d82501c9a16e359a91df9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "122",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En este caso decidimos:",
+      "innerBlockCount": 0,
+      "fingerprint": "6fead3dfdf1da15bec83269e1b0075c15b63b7724aec8790a16814e0edd4819b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "123",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3881fd435acf85c67ae5b3a334de9d356bcdc0da442f9e8e886a8d885e5e8246",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "124",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "no tratar el monto de un Deal como facturación o ingresos reconocidos;no asociar registros usando coincidencias débiles de nombre o dominio;no presentar una composición parcial como universo completo;no convertir datos sintéticos en comportamiento real de clie…",
+      "innerBlockCount": 0,
+      "fingerprint": "6ba46cc40f766f4340ac37b05fd31e23c08b3997e7fcaadd874f05711ae6ba6c",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "125",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b0c539d38d5ec2644dac80d0619c8448f39d709a8fd52772a758df4d3fbd5ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "126",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esto no significa que esas métricas no importen. Significa que necesitan otra capa de datos y otro nivel de validación.",
+      "innerBlockCount": 0,
+      "fingerprint": "ab5fb569385b70a7fea105a2783560199f32a7a3655b53430a39a42852a88bef",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "127",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6b680ddb15dc40099b3c99799ecbe4e2d028a327d564cd6f7900c203bbc09f2d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "128",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La arquitectura futura contempla separar los eventos de facturación y seguir desarrollando el modelo de cuenta y servicio. Pero diseño no significa operación. Hasta que esas fuentes estén implementadas, ratificadas y gobernadas, permanecen fuera de los KPI ofi…",
+      "innerBlockCount": 0,
+      "fingerprint": "f57ca96d16b7c2fdc634fbe842d99c749c04db93bbf1e9ab045e6ad2fd8ae0c5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "129",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "da5d3241cb2c536a1be47a54db49d9e3bc6478765dc712651867f323d2c164e0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "130",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "La calidad de una implementación en HubSpot se mide tanto por los paneles que logra publicar como por las métricas que decide no fingir.",
+      "innerBlockCount": 0,
+      "fingerprint": "a675fc8bee18b9882a7c769771d600847fdd8bff2ae927ebe62cea438bce5336",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "131",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7fef66948211ecbada4de13e162bbba23d3a1adc739239b3c5dd5b00b0b8c28f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "132",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Un dashboard confiable es una consecuencia",
+      "innerBlockCount": 0,
+      "fingerprint": "c7acceed11c586a8e7fbc6d99b6984e561b3c9a9910b18890b6bcbd3b2207af0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "133",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a0637bbada41357a6850030ebcbce8af4913f2e33a38f6f782c27f7047ce496",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "134",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El dashboard es la capa visible. Debajo están las definiciones, el proceso, las asociaciones, la cobertura, los responsables y los controles que le dan sentido.",
+      "innerBlockCount": 0,
+      "fingerprint": "73b18e56168a141eae42c7903748c30b861dd35487749e7555a2f478d2a85254",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "135",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "15f118194aa682ad05207926a72fd00b64a43e15ee33f6c2d0b2b33067b84f6d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "136",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En ANAM, empezar por ahí permitió construir paneles operativos, diagnósticos honestos y pilotos claramente separados. También permitió saber qué faltaba sin esconderlo detrás de un gráfico.",
+      "innerBlockCount": 0,
+      "fingerprint": "eb91a424cf7ab60507830f9d955f350977337f86e4f59415913280eac7d4aaf9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "137",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "32a95ae48e3d9252220f0ddc2faa1741c07518eeb2ef56e5c6ef96f2eb1a6b05",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "138",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ese es el punto que me interesa del caso: un pedido de dashboard, KPI o agente puede ser completamente válido y, al mismo tiempo, ser la primera señal de una conversación más amplia sobre cómo funciona la operación.",
+      "innerBlockCount": 0,
+      "fingerprint": "03a53ac67d224b7bad4e4e08b5755f46b2f809a711ef7946364737b7bc6af086",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "139",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9b9c3a65a2df3a5cb7cf7ccb2169bc4f219252abe0b305cdcc17db3b4354a24e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "140",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En Efeonce acompañamos esa conversación sin imponer una receta. Ayudamos al cliente a recorrer su propio proceso, evaluar opciones, contrastarlas con sus datos y decidir qué arquitectura puede sostener de verdad.",
+      "innerBlockCount": 0,
+      "fingerprint": "6273a2af79ce83ddd7dfd69819a206fe14afef8dae6e91a61bd2943a0470eccd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "141",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6e7d637f57e683b96f493a2f0ad3d26f56840948b6bcb47aed3c6a0447be7726",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "142",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si al revisar uno de tus dashboards no puedes responder las ocho preguntas del checklist, probablemente no necesitas otro gráfico todavía. Necesitas ordenar qué representa el dato, quién lo cuida y qué decisión debería habilitar.",
+      "innerBlockCount": 0,
+      "fingerprint": "105ef82f44ea6014a77f56f1264f12891cc00bb2a76733920f4627c20fdc6ca8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "143",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "41b0089c4c96bc1e59cf38c2b12a8870d533ed9211c0e0762fd42db8faa31d12",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "144",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cómo construimos y revisamos este caso",
+      "innerBlockCount": 0,
+      "fingerprint": "334574e87c7530702101f7b4c55dc3b45f2049020ad5b210c759b6b0b4383ca7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "145",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cbd6f54bc110dc810e2b8ae8dfb7c77a17cbbbf49ee90578cdea9928e586b4d5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "146",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Este caso se basa en artefactos de implementación, simulaciones controladas, instantáneas y verificaciones posteriores con corte al 16 de julio de 2026. Las cifras describen el universo observado en ese momento y no representan una garantía de resultados para …",
+      "innerBlockCount": 0,
+      "fingerprint": "ea1869d7b5e1a301a314baee740e496e5eadaf17e7f7caed60d663352964ddf5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "147",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d75b590cb7556b082384145305e5dddca92e6cdc619599ee7f10bf53b94ce5c7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "148",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Este artículo fue desarrollado por Julio Reyes con apoyo de IA en investigación, estructura y edición. Julio definió la tesis y conserva la responsabilidad de verificar las afirmaciones y aprobar la versión final antes de su publicación.",
+      "innerBlockCount": 0,
+      "fingerprint": "3cbff7c50abfebbe4aeea5962293c121c7d57d47d58ff3209537b59a34f183ef",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "149",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "521bc0a7adc61e03aaf6b5e7080eeb206faa8751b3b896eabde7beb110a08c35",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "150",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Customer Agent aparece aquí sólo como una de las señales iniciales. Su implementación, sus fuentes de conocimiento, límites y controles se desarrollarán en un artículo independiente.",
+      "innerBlockCount": 0,
+      "fingerprint": "7223c51ea53bcefe6855da7604ef9a290f32257b640113307bee709b447d0ee3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "151",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "bc14d10da8f146e862ddcc728896dc12367678986cc6c73d8aa8e339046a9ebc",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "152",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d55210e8e8d20dfc8665978d5e1647d262bec990ce7d1b077788adc500bc9336",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "153",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "69f20b3131d645c056e00882206f24e09e41e28da49e860c16265be56f218cd5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "154",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Empieza por aplicar las ocho preguntas a un dashboard que tu equipo ya use. Si el problema no está en el gráfico sino en las definiciones, asociaciones o cobertura, conversemos sobre cómo ordenar tu operación en HubSpot.",
+      "innerBlockCount": 0,
+      "fingerprint": "4516d732f57a37a506d91eb70bb041e0e012211185c45c8cb07f4ff20ba2af3b",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/servicios-contratar-hubspot/?utm_source=efeoncepro&amp;utm_medium=editorial&amp;utm_campaign=hubspot-revops-anam&amp;utm_content=cta-final"
+    }
+  ],
+  "links": [
+    {
+      "href": "https://cl.linkedin.com/company/anam-s.a",
+      "text": "ANAM S.A.",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.aguasandinasinversionistas.cl/es/nuestro-negocio/empresas-del-grupo-aguas",
+      "text": "Grupo Aguas",
+      "kind": "external_url"
+    },
+    {
+      "href": "#h-la-solicitud-visible-no-siempre-es-el-problema-completo",
+      "text": "La solicitud visible no siempre es el problema completo",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-es-revops-y-como-se-aplica-sin-imponer-una-receta",
+      "text": "Qué es RevOps y cómo se aplica sin imponer una receta",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-por-que-un-dashboard-de-hubspot-puede-mostrar-cifras-correctas-y-aun-asi-no-ser-confiable",
+      "text": "Por qué un dashboard de HubSpot puede mostrar cifras correctas y aun así no ser confiable",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-mejorar-la-calidad-de-datos-en-hubspot-sin-inventar-asociaciones",
+      "text": "Cómo mejorar la calidad de datos en HubSpot sin inventar asociaciones",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-que-es-la-escala-de-confianza-de-un-dashboard-comercial",
+      "text": "Qué es la escala de confianza de un dashboard comercial",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-cuando-puedes-confiar-en-un-dashboard-comercial",
+      "text": "Cuándo puedes confiar en un dashboard comercial",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-automatizar-controles-sin-convertir-un-piloto-en-kpi",
+      "text": "Cómo automatizar controles sin convertir un piloto en KPI",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-lo-que-decidimos-no-publicar-tambien-es-parte-de-la-implementacion",
+      "text": "Lo que decidimos no publicar también es parte de la implementación",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-un-dashboard-confiable-es-una-consecuencia",
+      "text": "Un dashboard confiable es una consecuencia",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-construimos-y-revisamos-este-caso",
+      "text": "Cómo construimos y revisamos este caso",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "https://ecosystem.hubspot.com/es/marketplace/solutions/efeoncepro",
+      "text": "HubSpot Solutions Partner",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.hubspot.com/products/reporting-dashboards",
+      "text": "reportes y dashboards",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://blog.hubspot.com/marketing/data-governance",
+      "text": "gobierno de datos",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://efeoncepro.com/servicios-contratar-hubspot/?utm_source=efeoncepro&amp;utm_medium=editorial&amp;utm_campaign=hubspot-revops-anam&amp;utm_content=cta-final",
+      "text": "conversemos sobre cómo ordenar tu operación en HubSpot",
+      "kind": "internal_url"
+    }
+  ],
+  "mediaIssues": [],
+  "editabilityLegend": {
+    "safe_text_edit": "Agent may propose text changes while preserving block type, path and surrounding structure.",
+    "safe_attrs_edit": "Agent may propose constrained attribute changes after validating the native block setting.",
+    "media_requires_reconcile": "Agent must reconcile WordPress media id, rendered src, alt text and source brief before write.",
+    "preserve_structure": "Agent should preserve structure and patch child blocks or attrs only with explicit intent.",
+    "inspect_only": "Agent should preserve by default until serialization/plugin behavior is understood."
+  }
+}

@@ -31,7 +31,9 @@ description: >-
   visual", "creatividad visual", "genera una imagen", "prompt de imagen", "Nano
   Banana", "Midjourney", "Ideogram", "Firefly", "Flux", "Magnific", "upscale",
   "textura", "gradiente", "duotono", "crítica de diseño", "design critique",
-  "completar el visual de la UI", "arte para la UI".
+  "completar el visual de la UI", "arte para la UI", "infografía editorial",
+  "diagrama SVG", "SVG a WebP". Para infografías determinísticas con copy/datos
+  exactos dirige composición y carga el método canónico de `content-marketing-studio`.
 user-invocable: true
 argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una imagen para la campaña del grader', 'dame un concepto visual para Glitch', 'dirige el arte del hero de /aeo-2', 'mood board para SKY']"
 ---
@@ -64,7 +66,7 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 
 1. **Clasifica la intención** (§2). ¿Es dirección de arte / diseño gráfico / auditoría de
    KV / imagen de marketing? Si pertenece a otra skill, **delega explícito** (§5) y para.
-2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 10 — carga lo justo.
+2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 11 — carga lo justo.
 3. **Chequea frescura**: si vas a nombrar una herramienta IA, versión, feature o tendencia
    volátil, reverifica primero (`SOURCES.md`).
 4. **Si hay que ejecutar** (auditar / producir / dirigir), abre `efeonce/STUDIO_TOOLING.md`
@@ -86,6 +88,11 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 - ¿Decisión fina de **tipografía** (peso/variante/escala/tracking/leading)? → **`typography-design`**
   (design-studio hace tipo-como-imagen a nivel dirección de arte).
 - ¿Encoding de un **chart/infografía de datos**? → **`dataviz-design`**.
+- ¿Una **infografía editorial determinística** con copy/cifras/logos exactos, variantes responsive/light-dark y
+  entrega SVG→PNG→WebP? → cargar
+  `../content-marketing-studio/references/deterministic-editorial-infographics.md`; `design-studio` dirige la
+  composición, Content Marketing gobierna función/manifest/integración y `dataviz-design` toma el encoding si
+  existe una decisión analítica compleja.
 - ¿**Motion**/animación/identidad kinética a implementar? → **`motion-design`** (design-studio
   la dirige conceptualmente).
 - ¿Formato/algoritmo/cadencia **por red social**? → **`social-media-studio`** (el KV alimenta
@@ -108,6 +115,7 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 | 08 | `modules/08_AI_IMAGE_CRAFT.md` | prompt para diseño + selección por herramienta + edición/upscale |
 | 09 | `modules/09_PRODUCTION_STUDIO.md` | orquestar generadores + handoff humano + iteración |
 | 10 | `modules/10_FORMATS_DELIVERY.md` | specs de entregable, formatos, safe zones, empaquetado |
+| 11 | `modules/11_PRODUCT_STORY_SCENES.md` | portadas/heroes con producto o analítica, auditoría forense de referencias, anti-referencias y SVG determinístico |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -118,7 +126,13 @@ Cierra el loop **idear → dirigir → producir → auditar → iterar** (detall
 - **Dirigir**: brief + mood board + selección de herramienta por tarea (`modules/06`, `08`).
 - **Producir**: la herramienta correcta para cada trabajo — **UI de Greenhouse →**
   `greenhouse-ai-image-generator`; **marketing/concept →** Nano Banana / Midjourney /
-  Ideogram / Adobe Firefly / Higgsfield / Magnific (upscale) vía sus MCP/skills.
+  Ideogram / Adobe Firefly / Higgsfield / Magnific (upscale) vía sus MCP/skills;
+  **infografía editorial exacta →** SVG determinístico + render Chromium + PNG master + WebP según el método
+  canónico de `content-marketing-studio`.
+- **Escena editorial de producto:** separar siempre la **gramática agnóstica** —jerarquía, gráficos,
+  solapamiento, crop, responsive— del **skin contextual**. Una paleta HubSpot sólo corresponde a piezas cuyo tema
+  sea HubSpot; no es branding Efeonce ni default para dashboards, RevOps o CRM. Antes de emular una referencia,
+  inspeccionar su source y cargar `modules/11_PRODUCT_STORY_SCENES.md`.
 - **Handoff humano**: cuando el craft final lo hace una persona (retoque, ilustración
   propietaria, print), entrega spec + referencias en vez de forzar IA.
 
@@ -172,5 +186,7 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `SOURCES.md` — fuentes + **tabla de volatilidad-por-tema** + `as-of`.
 - `GLOSSARY.md` — vocabulario de diseño 2026 (KV, lockup, duotono, mood board, upscale…).
 - `ANTIPATTERNS.md` — los errores que arruinan un diseño.
+- `../content-marketing-studio/references/deterministic-editorial-infographics.md` — pipeline reusable para
+  infografías exactas SVG→PNG→WebP, responsive/theme, manifest y QA.
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `DESIGN_BOUNDARY.md`,
   `CLIENT_DELIVERY.md`.

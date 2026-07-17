@@ -1,0 +1,17 @@
+{
+  "runId": "2026-07-17_anam-revops-cover-v5-editorial-bars",
+  "status": "rejected-misread-reference-as-isolated-chart",
+  "model": "gpt-image-2",
+  "operation": "edit",
+  "quality": "high",
+  "size": "2048x1152",
+  "direction": "C-editorial-bars",
+  "references": [
+    { "path": "refs/01-positive-editorial-bars-concept.png", "polarity": "positive", "role": "chosen-composition" },
+    { "path": "refs/02-positive-hubspot-bars.png", "polarity": "positive", "role": "authentic-chart-rhythm" },
+    { "path": "refs/03-positive-efeonce-discipline.png", "polarity": "positive", "role": "brand-and-information-design" },
+    { "path": "refs/04-negative-dashboard-v2.png", "polarity": "negative", "role": "rejected-dashboard-territory" },
+    { "path": "refs/05-negative-glass-sculpture-v4.png", "polarity": "negative", "role": "rejected-3d-territory" }
+  ],
+  "note": "Negative polarity is semantic because the API exposes no native negative-image weighting. Rejected after the operator clarified that the HubSpot reference is a layered product-story scene, not a standalone editorial chart."
+}

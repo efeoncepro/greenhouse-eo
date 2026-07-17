@@ -110,6 +110,12 @@ El dossier termina con una decision explicita:
 Cada campo tiene un trabajo distinto. Deben estar alineados, no ser copias
 mecanicas.
 
+Antes de cerrar el set, cargar el **Método de traducción editorial de metadata** en
+`content-marketing-studio/references/metadata-translation-method.md`. El método separa el problema que la
+audiencia ya sabe nombrar del concepto técnico que el artículo enseña, reparte el trabajo entre superficies y
+aplica gates de jerga, categoría, tags, snapshot y readback. `seo-aeo` conserva la decisión final sobre intent,
+canonical, robots, schema y verificación runtime.
+
 | Campo | Contrato |
 |---|---|
 | H1 | Promesa editorial completa y legible para personas; un solo H1 visible |

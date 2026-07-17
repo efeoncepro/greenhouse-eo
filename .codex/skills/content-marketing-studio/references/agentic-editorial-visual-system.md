@@ -6,6 +6,24 @@ Este contrato gobierna la planificación, generación, selección, derivación, 
 
 No partir de un estilo, una herramienta o una cantidad de imágenes. Una imagen existe porque resuelve una comprensión que el texto obliga a imaginar; el sistema común evita que esas respuestas parezcan assets aislados.
 
+## Principio rector: experiencia editorial integrada, no estética universal
+
+La invariante entre artículos es la **experiencia editorial integrada**: texto, imagen, ubicación, ritmo,
+caption, responsive, tema y derivados deben colaborar en una misma lectura. No existe un look obligatorio para
+todo el blog. Una pieza puede pedir fotografía, collage, ilustración, captura, diagrama, fondo inmersivo o
+integración silenciosa con el lienzo; la función contextual y la tesis del artículo deciden.
+
+No convertir una solución local —fondo blanco/plomo, transparencia, cards, gradientes, ausencia de decoración,
+un ratio o una familia de formas— en regla global de marca. Lo reusable es el método: definir el trabajo,
+declarar el sistema propio de la pieza/serie, probarlo dentro de la superficie real y mantener coherencia entre
+palabra, imagen y distribución. Toda regla estética debe declarar su alcance: `asset`, `serie`, `artículo`,
+`territorio editorial` o `marca`.
+
+Separar siempre **gramática** de **skin**. La gramática —jerarquía, relaciones, encoding, solapamiento, crop y
+responsive— debe ser agnóstica al tema. El skin —paleta, tipo, materialidad y firma— puede reconocer una
+plataforma cuando el artículo trata realmente de ella, pero no se hereda como branding general: los colores
+HubSpot, por ejemplo, no son defaults Efeonce para RevOps, CRM ni dashboards.
+
 ## Contenido
 
 - [Frontera y routing](#1-frontera-y-routing)
@@ -131,9 +149,31 @@ Solo después del job map, definir un sistema que permita reconocer la serie:
 - paleta con contraste y función, sin convertir colores raster en tokens de UI;
 - textura, materiales, iluminación y tratamiento de personas;
 - invariantes que deben sobrevivir entre imágenes y derivados;
+- relación con la superficie editorial: integración, contraste deliberado o inmersión, y por qué;
+- alcance de cada regla estética: asset, serie, artículo, territorio editorial o marca;
 - lista de exclusión visual y de afirmaciones prohibidas.
 
 La continuidad debe depender de invariantes controlables: motivo, geometría, materialidad, paleta, foco y lógica compositiva. No exigir identidad perfecta de una persona generada salvo que exista un workflow de referencia/edición diseñado y autorizado para ello.
+
+#### Firma de marca: sistema primero, logo después
+
+Cada visual system brief debe declarar una **brand signature policy** antes de generar o componer activos:
+
+- fuente de verdad y variantes oficiales del logo;
+- ubicación, tamaño relativo, zona de respeto y contraste por superficie;
+- separación entre firma editorial, marca del cliente y marcas de plataforma;
+- tratamiento de capturas/evidencia, donde la firma vive fuera del contenido probatorio;
+- tipografías, paleta y reglas compositivas que hacen reconocible la marca sin depender del logo;
+- usos prohibidos: reconstrucción, deformación, recolor arbitrario, watermark dominante, textura repetida o acumulación de logos.
+
+Para Efeonce, usar exclusivamente los wordmarks oficiales de `public/branding/`; `AxisWordmark` es interno y no
+debe aparecer en piezas públicas. En diagramas de cuerpo la firma es pequeña y periférica; en hero/OG puede
+vivir en una esquina o banda editorial dentro de la zona segura. El logo de un cliente identifica el caso y
+requiere autorización específica; no reemplaza ni se fusiona con la firma de Efeonce. No pedir al generador que
+dibuje un logo: componer el activo oficial de forma determinística después de seleccionar el master.
+
+Dos pruebas de calibración: si al retirar el logo la pieza deja de sentirse de la marca, falta sistema visual;
+si el logo domina la lectura, la firma está sobredimensionada.
 
 ### Paso 4: escribir prompts rigurosos para GPT Image 2
 
@@ -166,12 +206,16 @@ Reglas de prompt:
 - no nombrar artistas vivos como atajo de estilo;
 - usar la herramienta canónica y registrar modelo/configuración real, sin llamadas ad hoc.
 
-GPT Image 2 produce raster. Generar un master suficientemente grande para los derivados previstos; no prometer vector, transparencia o fidelidad exacta que el runtime no soporte. Si se usa una referencia visual, registrar su licencia y revisar drift de identidad, marca y composición.
+GPT Image 2 produce raster. Generar un master suficientemente grande para los derivados previstos; no prometer vector, transparencia o fidelidad exacta que el runtime no soporte. Si se usa una referencia visual, registrar su licencia y revisar drift de identidad, marca y composición. Cuando la referencia sea una página, inspeccionar primero su asset original —SVG/Lottie/CSS/raster—; una captura sola no revela el método de construcción.
 
 **Diagramas con texto:** componer labels, cifras y claims con tipografía determinista. La IA puede producir una
 base conceptual sin texto, pero no debe decidir ni rasterizar contenido que necesita exactitud. Un diagrama
 puede producirse completamente en HTML/CSS, canvas o herramienta de diseño gobernada y luego capturarse como
 raster; registrar fuente, renderer, fonts, hash y versión igual que cualquier master.
+
+Cuando la pieza se resuelva como SVG determinístico con derivados raster, cargar además
+`deterministic-editorial-infographics.md` y aplicar su pipeline `SVG → PNG master → WebP`, art direction,
+manifest y QA de integridad/contexto.
 
 ### Paso 5: generar, seleccionar y auditar masters
 
@@ -229,6 +273,23 @@ Naming sugerido:
 ```
 
 Versionar cuando cambie el contenido visual, crop o tratamiento; no reemplazar silenciosamente un archivo público bajo el mismo nombre si rompe caché o auditabilidad.
+
+#### Art direction responsive para diagramas editoriales
+
+No asumir que un mismo aspect ratio sirve en todas las columnas. Medir el ancho efectivo del contenido en el
+tema real y proyectar la altura y el tamaño tipográfico renderizados antes de seleccionar el master. Si una
+composición horizontal mantiene ritmo en desktop pero vuelve ilegibles sus labels en móvil, producir dos
+composiciones del mismo concept ID: horizontal para desktop/tablet y apilada para móvil.
+
+- servir las variantes dentro de un único `<picture>` con `<source media>`, un solo `<img>` fallback, ALT y caption;
+- usar `srcset` para resolución dentro de una misma composición; no confundirlo con art direction entre ratios;
+- no insertar dos imágenes y ocultar una con CSS: puede descargar ambas y duplica semántica/accesibilidad;
+- no resolverlo con `object-fit`, crop automático o texto microscópico;
+- fijar el breakpoint con la columna real y QA de legibilidad, no con un número de dispositivo por costumbre;
+- registrar source/master/derivados por variante y el contrato de breakpoint en el manifest.
+
+Si el renderer editorial todavía no soporta `<picture>` gobernado, extender su modelo y validador antes de
+integrar; no escapar a HTML arbitrario ni publicar sólo una variante sabiendo que falla en otra superficie.
 
 ### Paso 8: escribir ALT, caption y descripción
 
@@ -336,11 +397,14 @@ Veredictos: `PASS`, `CONDITIONAL PASS` o `BLOCK`. Un gate bloqueado no se compen
 
 - [ ] Cada imagen tiene concept ID, función contextual y criterio de descarte antes de generar.
 - [ ] El conjunto comparte un sistema visual explícito sin sacrificar la función propia de cada asset.
+- [ ] Las reglas estéticas declaran alcance; ninguna solución local fue promovida accidentalmente a look global del blog.
+- [ ] La brand signature policy usa activos oficiales, contraste y espacio de respeto; la firma no invade evidencia.
 - [ ] Prompts GPT Image 2, configuración, provenance y límites quedaron registrados.
 - [ ] No se simula producto, ciencia, dato, cliente, testimonio ni resultado real.
 - [ ] Cada master fue inspeccionado a resolución original y conserva hash/dimensiones/peso.
 - [ ] Anatomía, texto, logos, objetos, reflejos y artefactos pasan QA.
 - [ ] Derivados salen del master, respetan crop/resolución y tienen peso razonable.
+- [ ] Diagramas textuales pasaron medición de columna; si requieren art direction, `<picture>` sirve una sola variante pertinente por viewport.
 - [ ] Hero/featured, body y OG están declarados por separado; no hay duplicación automática.
 - [ ] ALT, caption, descripción, licencia, provenance y disclosure están completos según el caso.
 - [ ] Media Library devolvió IDs/URLs/MIME/dimensiones reales y el readback coincide.

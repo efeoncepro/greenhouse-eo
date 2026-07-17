@@ -1,7 +1,7 @@
 ---
 name: content-marketing-studio
 description: >-
-  Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye el sistema visual editorial: función contextual, coherencia, concept IDs/manifest, prompts GPT Image 2, masters/derivados WebP/JPEG, Media Library y QA público. Complementa `digital-marketing`; encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y assets/publicación a sus skills dueñas. Usar para content marketing, estrategia/calendario editorial, pillar/cluster, topical authority, content ops/engine, repurposing/atomización, distribución, content brief, editorial, featured/OG images, newsletter, ebook, whitepaper, lead magnet, case study, webinar, podcast, thought leadership, content ROI, influenced pipeline, AI content, content factory y content-led growth.
+  Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye sistema visual editorial, infografías determinísticas SVG→PNG→WebP y Método de utilidad citable para link earning, backlinks, menciones y contenido que terceros puedan compartir, enlazar o citar. Encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y publicación a su skill dueña. Usar para estrategia/calendario editorial, pillar/cluster, topical authority, content ops, repurposing, distribución, content brief, newsletter, lead magnet, case study, thought leadership, infografía editorial, diagrama SVG, visualización exacta de datos/copy, linkable assets, contenido enlazable/citable, content ROI, AI content, content factory y content-led growth.
 ---
 
 # Content Marketing Studio — el estudio del motor de contenidos (2026)
@@ -23,9 +23,26 @@ description: >-
 
 **Routing visual:** si una pieza necesita hero, imágenes de cuerpo, diagramas editoriales o derivados sociales/OG, carga `references/agentic-editorial-visual-system.md` **antes** de escribir prompts o generar assets. Este studio define función, sistema, manifest, selección e integración; la skill de imagen/diseño ejecuta el craft visual.
 
+**Routing de infografía determinística:** si el significado depende de texto, cifras, ejes, conectores, logos o
+variantes responsive/theme exactas, carga `references/deterministic-editorial-infographics.md`. El método gobierna
+`contrato → SVG → PNG master → WebP → QA → manifest`; `design-studio` dirige la composición y `dataviz-design`
+gobierna el encoding cuando la visualización analítica lo requiere.
+Para una portada/hero que “parece producto”, el mismo gate sigue vigente: si contiene gráficos o copy exactos,
+usar SVG y cargar `../design-studio/modules/11_PRODUCT_STORY_SCENES.md`; la gramática es agnóstica y el skin se
+decide por tema, sin convertir una paleta contextual de plataforma en branding Efeonce.
+
 **Routing knowledge-to-product:** si una Pillar puede evolucionar a ebook, workbook, tool o soporte intelectual
 de un producto futuro, carga `references/knowledge-to-product-ladder.md`. Esa evolución exige trabajos y gates
 distintos; una tool no se trata como repurposing ni el contenido como product spec.
+
+**Routing link earning/citabilidad:** si el objetivo incluye backlinks, menciones, citación IA, autoridad o que
+colegas compartan/enlacen la pieza, carga `references/citation-utility-method.md` antes del draft y completa
+`templates/citation-utility-contract.md`. El studio diseña el objeto reutilizable; `seo-aeo` valida off-page,
+recuperación y medición. Nunca prometas enlaces.
+
+**Routing metadata/taxonomía:** al cerrar slug, H1, SEO/OG titles, excerpt, descriptions, categoría y tags,
+carga `references/metadata-translation-method.md`. Separa el problema que el lector ya reconoce del concepto
+técnico que la pieza enseña; no conviertas jerga ni taxonomía de una sola pieza en peaje de entrada.
 
 ## Intake (correr SIEMPRE antes de recomendar)
 
@@ -47,6 +64,9 @@ distintos; una tool no se trata como repurposing ni el contenido como product sp
 ├─ Medir contenido→pipeline (leading/lagging, influenced pipeline, content ROI) .... 06_MEASUREMENT
 ├─ Producir con IA sin slop (Content Factory, fidelidad de voz, gobernanza) ........ 07_AI_CONTENT
 ├─ Diseñar/producir el sistema visual editorial, hero/body/OG y Media Library ..... references/agentic-editorial-visual-system
+├─ Producir infografía exacta SVG→PNG→WebP con QA y manifest ....................... references/deterministic-editorial-infographics
+├─ Diseñar utilidad citable para links/menciones/citas ............................. references/citation-utility-method
+├─ Traducir tesis técnica a metadata y taxonomía comprensibles ..................... references/metadata-translation-method
 ├─ Madurar Pillar→ebook→tool→producto sin mezclar sources of truth ................. references/knowledge-to-product-ladder
 ├─ Qué NO hacer .................................................................... ANTIPATTERNS
 ├─ Vocabulario .................................................................... GLOSSARY
@@ -69,6 +89,12 @@ Carga selectiva: no traigas los 7 módulos de una.
 8. **Contenido no es producto.** Una Pillar puede crear lenguaje, demanda e hipótesis; un ebook debe agregar
    método y una tool requiere PDR, modelo, privacidad, analytics, QA y ejecución formal. Nunca conviertas una
    buena respuesta editorial en feature o claim de disponibilidad por inferencia.
+9. **Link earning necesita utilidad transferible.** Si una pieza busca enlaces/citas, debe declarar el usuario
+   de la cita, un objeto reutilizable, evidencia/límites, superficie enlazable, validación por pares, distribución
+   y medición. No confundas una historia interesante con una fuente referenciable ni garantices backlinks.
+10. **Metadata es un sistema de superficies.** H1, SEO title, OG title, excerpt y descriptions comparten tesis,
+    pero no se copian mecánicamente. Prioriza en la entrada el problema que la audiencia reconoce; enseña la
+    jerga dentro, salvo que sea parte comprobada del intent. No crees categorías o tags para una sola pieza.
 
 ## Tabla de sinergias (nombra y encadena el hand-off)
 
@@ -112,7 +138,10 @@ Carga selectiva: no traigas los 7 módulos de una.
 | `modules/06_MEASUREMENT.md` | Leading/lagging, engagement→influenced pipeline, content ROI, atribución — hand-off a gtm-ga4/growth |
 | `modules/07_AI_CONTENT.md` | Content Factory/Media Foundry, contenido asistido por IA, anti AI-slop, fidelidad de voz, gobernanza |
 | `references/agentic-editorial-visual-system.md` | Flujo visual editorial: función contextual→sistema coherente→concept IDs/manifest→GPT Image 2→masters/derivados→Media Library→QA público |
+| `references/deterministic-editorial-infographics.md` | Método exacto: contrato editorial/datos→SVG accesible→Chromium/PNG master→WebP→QA original/contextual→manifest |
+| `references/citation-utility-method.md` | Método de utilidad citable: caso→objeto reutilizable→evidencia/límites→anchors→validación por pares→link earning/medición |
+| `references/metadata-translation-method.md` | Traducción editorial de metadata: problema reconocido→gate de jerga→trabajo por superficie→taxonomía→snapshot/readback |
 | `references/knowledge-to-product-ladder.md` | Escalera Pillar→satélites→ebook/workbook→tool diagnóstica→producto, con separación de evidencia y gates |
 | `ANTIPATTERNS.md` · `GLOSSARY.md` · `SOURCES.md` | Antipatrones, vocabulario, fuentes/benchmarks 2026 |
 | `efeonce/EFEONCE_OVERLAY.md` | Ecosistema Efeonce: Think, Marketing con Manzanitas, Glitch, Content Factory, ebooks/lead magnets, bow-tie, ICPs |
-| `templates/` | content-strategy-brief, pillar-cluster-map, editorial-calendar, content-brief, repurposing-map, distribution-plan, measurement-dashboard |
+| `templates/` | content-strategy-brief, pillar-cluster-map, editorial-calendar, content-brief, citation-utility-contract, repurposing-map, distribution-plan, measurement-dashboard |

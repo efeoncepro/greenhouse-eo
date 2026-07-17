@@ -667,6 +667,18 @@ determinista. Revisar el asset dentro del tema real. Safe area no significa sól
 sticky, barras sociales y overlays del template. Si un diagrama horizontal pierde legibilidad en mobile,
 proveer ALT/caption suficiente y un enlace a la media completa o una variante responsive gobernada.
 
+Separar también **gramática visual** de **skin contextual**. Jerarquía, encoding, solapamiento, crop y responsive
+deben ser agnósticos al tema; paleta, tipo, materialidad y firma se deciden por artículo. Una paleta asociada a
+HubSpot sólo corresponde cuando el contenido trata realmente de HubSpot y nunca se convierte en branding
+general de Efeonce.
+
+Si el operador entrega una página o captura como referencia, auditar primero el source original: tipo de asset
+(SVG/Lottie/CSS/raster), dimensiones/viewBox, geometría, transparencias, roles cromáticos, responsive y motion.
+No intentar “recrear el look” con un modelo antes de saber cómo fue construido. Para escenas editoriales de
+producto y gráficos exactos, cargar `.codex/skills/design-studio/modules/11_PRODUCT_STORY_SCENES.md` y el método
+`.codex/skills/content-marketing-studio/references/deterministic-editorial-infographics.md` —o sus mirrors
+`.claude/` cuando ejecute Claude—.
+
 #### 10.2 Generación
 
 Para GPT Image 2 usar la vía sancionada disponible en el entorno:
@@ -685,6 +697,11 @@ pnpm ai:image \
 
 No declarar GPT Image 2 si la herramienta no confirmó ese modelo/familia. No imprimir keys ni usar scripts ad
 hoc si el helper canónico cubre el caso.
+
+Cuando se usen varias referencias, registrar su orden y rol (`positive-structure`, `positive-palette`,
+`positive-brand`, `negative-cliche`, `negative-contamination`). Una anti-referencia no tiene peso negativo
+nativo: describir el rasgo prohibido y verificar contaminación. Si se requieren texto, datos, logos o geometría
+exactos, cambiar a SVG/composición determinística en vez de seguir refinando por azar.
 
 #### 10.3 QA visual
 

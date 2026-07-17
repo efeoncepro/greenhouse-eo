@@ -132,6 +132,73 @@ describe('authorGutenbergDraft', () => {
     expect(postContent).toContain('class="wp-image-249787"')
   })
 
+  it('renders governed responsive and color-scheme sources inside the owned image block', () => {
+    const withSources = authorGutenbergDraft({
+      ...kungFuSpec,
+      sections: [
+        {
+          heading: 'Con evidencia responsive',
+          level: 2,
+          blocks: [
+            {
+              kind: 'image',
+              mediaId: 42,
+              url: 'https://efeoncepro.com/fallback.webp',
+              alt: 'Evidence diagram',
+              width: 1600,
+              height: 900,
+              sources: [
+                {
+                  media: '(prefers-color-scheme: dark) and (max-width: 860px)',
+                  url: 'https://efeoncepro.com/mobile-dark.webp',
+                  type: 'image/webp'
+                },
+                {
+                  media: '(max-width: 860px)',
+                  url: 'https://efeoncepro.com/mobile.webp',
+                  type: 'image/webp'
+                }
+              ]
+            }
+          ]
+        },
+        ...kungFuSpec.sections.slice(1)
+      ]
+    })
+
+    const postContent = withSources.draft.kind === 'gutenberg_post' ? withSources.draft.postContent : ''
+
+    expect(postContent).toContain('<picture>')
+    expect(postContent).toContain('media="(prefers-color-scheme: dark) and (max-width: 860px)"')
+    expect(postContent).toContain('srcset="https://efeoncepro.com/mobile.webp"')
+    expect(postContent).toContain('class="wp-image-42"')
+    expect(postContent).toContain('width="1600" height="900"')
+  })
+
+  it('rejects unsafe responsive image media expressions', () => {
+    expect(() =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [
+          {
+            heading: 'Con media insegura',
+            level: 2,
+            blocks: [
+              {
+                kind: 'image',
+                mediaId: 42,
+                url: 'https://efeoncepro.com/fallback.webp',
+                alt: 'Evidence diagram',
+                sources: [{ media: '(max-width: 860px); color: red', url: 'https://efeoncepro.com/x.webp' }]
+              }
+            ]
+          },
+          ...kungFuSpec.sections.slice(1)
+        ]
+      })
+    ).toThrow('content_factory_article_image_media_invalid')
+  })
+
   it('renders governed image captions as semantic figcaptions', () => {
     const withCaption = authorGutenbergDraft({
       ...kungFuSpec,

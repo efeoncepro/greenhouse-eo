@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1350" viewBox="0 0 2400 1350" role="img" aria-labelledby="title desc">
+  <title id="title">Las capas que sostienen un dashboard confiable</title>
+  <desc id="desc">Una capa visible de decisión se apoya sobre definiciones, proceso, asociaciones, cobertura y controles.</desc>
+  <defs>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#0375DB"/><stop offset="1" stop-color="#6EC207"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="30" stdDeviation="32" flood-color="#000" flood-opacity=".34"/></filter>
+  </defs>
+  <rect width="2400" height="1350" fill="#111013"/>
+  <text x="150" y="150" font-family="Poppins,Arial,sans-serif" font-size="30" font-weight="600" letter-spacing="5" fill="#79B9F0">CASO ANAM · HUBSPOT</text>
+  <text x="150" y="246" font-family="Poppins,Arial,sans-serif" font-size="68" font-weight="700" fill="#FFF">El dashboard es la capa visible.</text>
+  <text x="150" y="322" font-family="Geist,Arial,sans-serif" font-size="38" fill="#B8C4CF">La confianza se construye debajo.</text>
+  <g filter="url(#shadow)" transform="translate(260 420)">
+    <path d="M0 560 L940 340 L1880 560 L940 820 Z" fill="#171C22" stroke="#3A4650" stroke-width="3"/>
+    <path d="M80 445 L940 244 L1800 445 L940 685 Z" fill="#19242D" stroke="#49606F" stroke-width="3"/>
+    <path d="M160 335 L940 152 L1720 335 L940 552 Z" fill="#182D3E" stroke="#3D759D" stroke-width="3"/>
+    <path d="M240 225 L940 62 L1640 225 L940 420 Z" fill="#123D5F" stroke="#2C8BD9" stroke-width="4"/>
+    <path d="M320 115 L940 -30 L1560 115 L940 288 Z" fill="#F8FBFF" stroke="url(#edge)" stroke-width="8"/>
+    <text x="940" y="85" text-anchor="middle" font-family="Poppins,Arial,sans-serif" font-size="44" font-weight="700" fill="#102A43">DECISIÓN</text>
+    <text x="940" y="140" text-anchor="middle" font-family="Geist,Arial,sans-serif" font-size="28" fill="#52697A">la lectura que el panel promete sostener</text>
+    <g font-family="Poppins,Arial,sans-serif" font-size="29" font-weight="600" fill="#DDE8F0">
+      <text x="940" y="390" text-anchor="middle">DEFINICIONES · PROCESO</text>
+      <text x="940" y="520" text-anchor="middle">ASOCIACIONES · COBERTURA</text>
+      <text x="940" y="652" text-anchor="middle">FUENTE · RESPONSABLE</text>
+      <text x="940" y="786" text-anchor="middle">CONTROLES · VERIFICACIÓN</text>
+    </g>
+  </g>
+  <image href="../../../../public/branding/logo-negative.svg" x="1970" y="1170" width="280" height="68" preserveAspectRatio="xMidYMid meet"/>
+</svg>

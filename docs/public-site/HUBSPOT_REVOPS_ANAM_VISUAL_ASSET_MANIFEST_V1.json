@@ -1,0 +1,418 @@
+{
+  "runId": "2026-07-17_dashboards-hubspot-confiables-caso-anam",
+  "article": {
+    "postId": 251397,
+    "slug": "dashboards-hubspot-confiables-caso-anam",
+    "sourceRef": "docs/public-site/HUBSPOT_REVOPS_ANAM_VISUAL_SYSTEM_V1.md",
+    "status": "published and live-verified"
+  },
+  "visualSystem": {
+    "name": "La capa visible y las capas que la sostienen",
+    "motif": "estratos, recorridos y gates que hacen visible la evidencia detrás del dashboard",
+    "invariants": [
+      "una conclusión por activo",
+      "diagramas y cifras compuestos de forma determinística",
+      "gramática compositiva separada del skin contextual de cada activo",
+      "azul Efeonce como estructura y verde como validación o gate en las infografías de cuerpo; la portada puede reconocer el contexto HubSpot sin convertir su paleta en branding Efeonce",
+      "firma discreta con el wordmark oficial de Efeonce y espacio de respeto",
+      "ningún dashboard, dato o resultado fabricado"
+    ],
+    "forbidden": [
+      "UI falsa de HubSpot",
+      "datos inventados",
+      "claims de ROI o impacto comercial",
+      "logos de terceros sin autorización",
+      "jerarquías que presenten personas y datos como fuerzas opuestas",
+      "convertir la paleta contextual HubSpot en default para RevOps, CRM, dashboards o el blog"
+    ]
+  },
+  "candidates": [
+    {
+      "conceptId": "ANAM-V01-V6",
+      "role": "replacement-featured-and-social",
+      "status": "selected-and-published",
+      "method": "deterministic-svg-product-story",
+      "manifest": "ai-generations/2026-07-17_anam-revops-cover-v6-product-story/manifest.json",
+      "audit": "ai-generations/2026-07-17_anam-revops-cover-v6-product-story/hubspot-aeo-reference-audit.md",
+      "brandBoundary": "HubSpot palette is a local contextual skin; product-story grammar remains theme-agnostic",
+      "wordpressMutated": true,
+      "featuredMediaId": 251415,
+      "openGraphMediaId": 251416,
+      "publishedAt": "2026-07-17T12:23:05+00:00"
+    }
+  ],
+  "assets": [
+    {
+      "conceptId": "ANAM-V02",
+      "slot": "body-method-diagram",
+      "context": "después del descubrimiento operativo y antes de la definición de RevOps",
+      "function": "hacer portable el método de cinco movimientos y su doble validación",
+      "notFunction": "no presentarlo como funnel, metodología propietaria ni sustitución del juicio del cliente",
+      "placement": {
+        "featured": false,
+        "body": true,
+        "og": false,
+        "socialDerivative": "pending",
+        "artDirection": {
+          "desktopAndTablet": "horizontal 3:2",
+          "mobileMaxWidth": "860px",
+          "mobile": "vertical 3:4",
+          "theme": "light by default; dark when Ohio body has dark-scheme",
+          "delivery": "one governed responsive figure selecting viewport and theme source; renderer support and live QA pending"
+        }
+      },
+      "production": {
+        "kind": "deterministic-svg",
+        "renderer": "Chromium via Playwright screenshot",
+        "sources": {
+          "desktop": {
+            "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-desktop-v1.svg",
+            "sha256": "82070ddfe4d6182b89da5cf061785ea6239e76e84a35a7f0bb458e85b59c4043"
+          },
+          "mobile": {
+            "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-v1.svg",
+            "sha256": "9ce9bc2f68d3918fd6d559d310c3ba20208bf7f8630d5b75719a9e52e1aa7914"
+          },
+          "desktopDark": {
+            "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-desktop-dark-v1.svg",
+            "sha256": "b77088618a97d1724c12d33b820e6c519a8bc3f1d66f96b3a8f06395deb6952c"
+          },
+          "mobileDark": {
+            "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-dark-v1.svg",
+            "sha256": "fa319f68268df22841b7ffebc3b1fa388ee503fd10c95e7d8e73dc51f520e137"
+          }
+        },
+        "fonts": [
+          "Poppins",
+          "Geist",
+          "Arial fallback"
+        ]
+      },
+      "master": {
+        "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-desktop-master-v1.png",
+        "sha256": "4d3cd262ecf62dacdd697201fd6f7f2ff531e216c989e847183fa32b55603052",
+        "width": 1440,
+        "height": 960,
+        "mime": "image/png",
+        "colorSpace": "sRGB"
+      },
+      "responsiveMasters": {
+        "mobile": {
+          "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-master-v1.png",
+          "sha256": "f1a15b974e97e0d037c14031bd9ae0abfca5d23f2eb44d2fca370a0638d1ff6a",
+          "width": 1200,
+          "height": 1600,
+          "mime": "image/png",
+          "colorSpace": "sRGB"
+        },
+        "desktopDark": {
+          "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-desktop-dark-master-v1.png",
+          "sha256": "faa0064b4d62c3972d8183219d1e87ebe485f3c2f2e84cce6d2101febb9f8237",
+          "width": 1440,
+          "height": 960,
+          "mime": "image/png",
+          "colorSpace": "sRGB"
+        },
+        "mobileDark": {
+          "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-dark-master-v1.png",
+          "sha256": "24acaec62572972ea4003a1723edb79d70c9da39242ff871215c281fc34f8329",
+          "width": 1200,
+          "height": 1600,
+          "mime": "image/png",
+          "colorSpace": "sRGB"
+        }
+      },
+      "derivatives": [
+        {
+          "role": "body-desktop-default",
+          "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-desktop-web-1440-v1.webp",
+          "sha256": "356bf98de572858511da654785d500befa7a253b691f5f42bcb74c84eb117aa6",
+          "width": 1440,
+          "height": 960,
+          "mime": "image/webp",
+          "bytes": 87614
+        },
+        {
+          "role": "body-mobile-art-directed",
+          "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-web-1200-v1.webp",
+          "sha256": "f32f408ec49cd9ae68d5d8c875edebc8025a6fa873456128f453ea8eff992225",
+          "width": 1200,
+          "height": 1600,
+          "mime": "image/webp",
+          "bytes": 93706
+        },
+        {
+          "role": "body-desktop-dark",
+          "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-desktop-dark-web-1440-v1.webp",
+          "sha256": "4c43f9e72d475c7690e5acd0eb06ed9e13428746a652256eb4976afc4b2cd420",
+          "width": 1440,
+          "height": 960,
+          "mime": "image/webp",
+          "bytes": 76556
+        },
+        {
+          "role": "body-mobile-dark",
+          "path": "docs/assets/public-site/anam-revops/anam-descubrimiento-doble-validacion-dark-web-1200-v1.webp",
+          "sha256": "4ff29aaaaa6179f5e597e5bb12246e7825d52445c5b50c6d0590c1f7a7229768",
+          "width": 1200,
+          "height": 1600,
+          "mime": "image/webp",
+          "bytes": 78456
+        }
+      ],
+      "metadata": {
+        "title": "Descubrimiento operativo con doble validación",
+        "alt": "Cinco movimientos del descubrimiento operativo, validados por las personas y por los datos del CRM.",
+        "caption": "El proceso se valida dos veces: con quienes conocen la operación y con la evidencia registrada en el CRM.",
+        "description": "Diagrama editorial determinístico ANAM-V02 para el caso ANAM. Explica el recorrido desde las señales iniciales hasta una implementación comprobada. No representa una interfaz ni una metodología propietaria."
+      },
+      "rights": {
+        "sourceAssets": [
+          {
+            "path": "public/branding/logo-full.svg",
+            "role": "firma institucional oficial de Efeonce"
+          },
+          {
+            "path": "public/branding/logo-negative.svg",
+            "role": "firma institucional oficial de Efeonce para dark mode"
+          }
+        ],
+        "license": "Efeonce original",
+        "provenance": "Diseñado y compuesto de forma determinística para el artículo; sin generación de imagen ni assets de terceros.",
+        "disclosure": "none: deterministic editorial diagram"
+      },
+      "qa": {
+        "status": "selected",
+        "reviewedAtOriginalResolution": true,
+        "brandSignatureVerified": true,
+        "themeVariantsReviewed": true,
+        "findings": [],
+        "measuredArticleWidths": {
+          "desktop": 1112,
+          "tablet": 736,
+          "mobile": 358
+        },
+        "projectedRenderHeights": {
+          "desktopVerticalRejected": 1483,
+          "desktopHorizontalSelected": 741,
+          "mobileVerticalSelected": 477,
+          "mobileHorizontalRejected": 239
+        },
+        "responsiveComposition": "governed picture integrated; desktop/mobile and light/dark private render verified"
+      },
+      "media": {
+        "id": 251401,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-descubrimiento-doble-validacion-desktop-web-1440-v1.webp",
+        "mime": "image/webp",
+        "responsiveIds": [251402, 251403, 251404]
+      }
+    },
+    {
+      "conceptId": "ANAM-V03",
+      "slot": "body-coverage-chart",
+      "context": "después de los datos 595/1.240, 629/1.240 y 611 Deals pendientes",
+      "function": "mostrar simultáneamente la mejora verificada y la brecha restante hasta el gate de KPI oficial",
+      "notFunction": "no presentarlo como rendimiento comercial, ROI ni un antes/después promocional",
+      "placement": {
+        "featured": false,
+        "body": true,
+        "og": false,
+        "socialDerivative": "pending",
+        "artDirection": {
+          "desktopAndTablet": "horizontal 16:9",
+          "mobileMaxWidth": "860px",
+          "mobile": "vertical 3:4",
+          "theme": "light by default; dark when Ohio body has dark-scheme",
+          "delivery": "one governed responsive figure selecting viewport and theme source; renderer support and live QA pending"
+        }
+      },
+      "production": {
+        "kind": "deterministic-svg",
+        "renderer": "Chromium via Playwright screenshot",
+        "sources": {
+          "desktop": {
+            "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-desktop-v1.svg",
+            "sha256": "693659da39948c5d0633a0faf8c2ded3801dc11e981ef2bf2f9e87212c82b2b6"
+          },
+          "mobile": {
+            "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-v1.svg",
+            "sha256": "4b57064cb2a395a117aa81dea96b600737ff533e130d5621d3034c9e1c61f6df"
+          },
+          "desktopDark": {
+            "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-desktop-dark-v1.svg",
+            "sha256": "d550f00862cb0463625a82db36de9f6243a6ceacaebf25071c06048a56edf70f"
+          },
+          "mobileDark": {
+            "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-dark-v1.svg",
+            "sha256": "5b7a2282324781ce7d3234bbf2d76abb8cc0ea41eb80f436b08c3a31d0a72f82"
+          }
+        },
+        "fonts": [
+          "Poppins",
+          "Geist",
+          "Arial fallback"
+        ]
+      },
+      "master": {
+        "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-desktop-master-v1.png",
+        "sha256": "b43ca9d3e37e6e20d1520b85705765ed1a481b439449465576733dc17fb24253",
+        "width": 1600,
+        "height": 900,
+        "mime": "image/png",
+        "colorSpace": "sRGB"
+      },
+      "responsiveMasters": {
+        "mobile": {
+          "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-master-v1.png",
+          "sha256": "a9966a106af341a396f0f5be10d0a6d9efc0f0b3f484da815f7f67252c6ee178",
+          "width": 1200,
+          "height": 1600,
+          "mime": "image/png",
+          "colorSpace": "sRGB"
+        },
+        "desktopDark": {
+          "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-desktop-dark-master-v1.png",
+          "sha256": "987227914d01fc2da3d7e21d8738bc550ba20315f2720db40416259b37b296c0",
+          "width": 1600,
+          "height": 900,
+          "mime": "image/png",
+          "colorSpace": "sRGB"
+        },
+        "mobileDark": {
+          "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-dark-master-v1.png",
+          "sha256": "dc63c37bda5ee62ef5bdf80353583dac3c01ad54d448c7203851116572f56c62",
+          "width": 1200,
+          "height": 1600,
+          "mime": "image/png",
+          "colorSpace": "sRGB"
+        }
+      },
+      "derivatives": [
+        {
+          "role": "body-desktop-default",
+          "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-desktop-web-1600-v1.webp",
+          "sha256": "49f80ea66af8aa694b87a85ab317fcab629998d91e54665096953b48fbecc947",
+          "width": 1600,
+          "height": 900,
+          "mime": "image/webp",
+          "bytes": 76150
+        },
+        {
+          "role": "body-mobile-art-directed",
+          "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-web-1200-v1.webp",
+          "sha256": "6740c86b94b765dad985f240a3148a19851c81e6068b1d9b52765aceb6b2018a",
+          "width": 1200,
+          "height": 1600,
+          "mime": "image/webp",
+          "bytes": 93196
+        },
+        {
+          "role": "body-desktop-dark",
+          "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-desktop-dark-web-1600-v1.webp",
+          "sha256": "8e5a5d551ba625c7c841b35ba9f7e5d5e468bbd395457f220ab8b5a6672a4da1",
+          "width": 1600,
+          "height": 900,
+          "mime": "image/webp",
+          "bytes": 67926
+        },
+        {
+          "role": "body-mobile-dark",
+          "path": "docs/assets/public-site/anam-revops/anam-cobertura-deals-company-2026-07-16-dark-web-1200-v1.webp",
+          "sha256": "8a7b02fb701baab94097df261713d5c5732162071667bf0b97e01a27d4eb2121",
+          "width": 1200,
+          "height": 1600,
+          "mime": "image/webp",
+          "bytes": 81266
+        }
+      ],
+      "metadata": {
+        "title": "Cobertura de Deals asociados a Company",
+        "alt": "La cobertura de Deals asociados a Company subió de 47,98% a 50,73%, todavía lejos del gate de 95%.",
+        "caption": "Las 34 asociaciones seguras mejoraron la cobertura, pero el dato siguió en categoría diagnóstica.",
+        "description": "Visual cuantitativo determinístico ANAM-V03. Compara 595 y 629 Deals asociados sobre un total de 1.240, explicita 611 pendientes y mantiene una escala completa de 0 a 100%."
+      },
+      "rights": {
+        "sourceAssets": [
+          {
+            "path": "public/branding/logo-full.svg",
+            "role": "firma institucional oficial de Efeonce"
+          },
+          {
+            "path": "public/branding/logo-negative.svg",
+            "role": "firma institucional oficial de Efeonce para dark mode"
+          }
+        ],
+        "license": "Efeonce original",
+        "provenance": "Diseñado y compuesto de forma determinística a partir de cifras verificadas del caso; sin generación de imagen ni assets de terceros.",
+        "disclosure": "none: deterministic quantitative editorial visual"
+      },
+      "qa": {
+        "status": "selected",
+        "reviewedAtOriginalResolution": true,
+        "brandSignatureVerified": true,
+        "themeVariantsReviewed": true,
+        "fullScaleAxisVerified": true,
+        "findings": [],
+        "measuredArticleWidths": {
+          "desktop": 1112,
+          "tablet": 736,
+          "mobile": 358
+        },
+        "projectedRenderHeights": {
+          "desktopHorizontalSelected": 626,
+          "mobileVerticalSelected": 477,
+          "mobileHorizontalRejected": 201
+        },
+        "responsiveComposition": "governed picture integrated; desktop/mobile and light/dark private render verified"
+      },
+      "media": {
+        "id": 251405,
+        "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-cobertura-deals-company-2026-07-16-desktop-web-1600-v1.webp",
+        "mime": "image/webp",
+        "responsiveIds": [251406, 251407, 251408]
+      }
+    },
+    {
+      "conceptId": "ANAM-V01",
+      "slot": "featured-and-social",
+      "function": "instalar la tesis de que el dashboard es la capa visible y la confianza se construye debajo",
+      "production": {
+        "kind": "deterministic-svg",
+        "renderer": "Chromium via Playwright screenshot",
+        "source": { "path": "ai-generations/2026-07-17_anam-revops-cover-v6-product-story/source/anam-revops-product-story-v6.svg", "sha256": "0e752d71d4a8982bab1bd9e8c229cb152b0fa15d40b72fa1574515e97eedf940" },
+        "master": { "path": "ai-generations/2026-07-17_anam-revops-cover-v6-product-story/source/anam-revops-product-story-master-v6.png", "sha256": "ee2574cba8bf7442c963883ac37b69a6328d5cc48ec3858d54fcb3d1d77f61ec", "width": 2048, "height": 1152 }
+      },
+      "derivatives": [
+        { "role": "featured", "path": "ai-generations/2026-07-17_anam-revops-cover-v6-product-story/delivery/anam-revops-product-story-web-1600-v6.webp", "sha256": "7cbf478784c10032a1b67a8cca87e9f340ff0b11f9dffe5ccf80209d6c3e1baf", "width": 1600, "height": 900, "mime": "image/webp", "bytes": 39852 },
+        { "role": "open-graph-twitter", "path": "ai-generations/2026-07-17_anam-revops-cover-v6-product-story/delivery/anam-revops-product-story-og-1440x757-v6.jpg", "sha256": "51027f07b57bfc92193cebcfb2630dd8ebc68aa38f55a36855df675fc401e468", "width": 1440, "height": 757, "mime": "image/jpeg", "bytes": 51770 }
+      ],
+      "metadata": { "alt": "Dos gráficos superpuestos muestran la evolución de cobertura y su clasificación como dato diagnóstico." },
+      "media": { "featuredId": 251415, "ogId": 251416, "featuredUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-dashboard-confiable-product-story-web-1600-v6.webp", "ogUrl": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-dashboard-confiable-product-story-og-1440x757-v6.jpg" },
+      "qa": { "status": "selected_integrated_and_published", "reviewedAtOriginalResolution": true, "brandSignatureVerified": true, "publicRenderVerified": true, "archiveSquareCropVerified": true, "desktopMobileOverflowVerified": true, "socialMetadataVerified": true }
+    },
+    {
+      "conceptId": "ANAM-V04",
+      "slot": "body-confidence-scale",
+      "function": "distinguir piloto, diagnóstico y KPI oficial según la evidencia disponible",
+      "production": {
+        "kind": "deterministic-svg",
+        "renderer": "Chromium via Playwright screenshot",
+        "sources": {
+          "desktop": { "path": "docs/assets/public-site/anam-revops/anam-escala-confianza-dashboard-desktop-v1.svg", "sha256": "fb4b86584ec922f260e28b99f9c4edd62efa495128a8fdbf4b39dcabf1bef2c9" },
+          "desktopDark": { "path": "docs/assets/public-site/anam-revops/anam-escala-confianza-dashboard-desktop-dark-v1.svg", "sha256": "25b944ed30fe30861f31a838b308c39ba108607472feb45aade46535172e8b3e" },
+          "mobile": { "path": "docs/assets/public-site/anam-revops/anam-escala-confianza-dashboard-v1.svg", "sha256": "ba2fd7ead0b02f69a3b0f6d2879602b116e84e9dc914869ac0bb01d6f4a00e94" },
+          "mobileDark": { "path": "docs/assets/public-site/anam-revops/anam-escala-confianza-dashboard-dark-v1.svg", "sha256": "df8193fd19716c92364e3276426b492efbc841a9508d6419219f74800514bbc9" }
+        }
+      },
+      "derivatives": [
+        { "role": "body-desktop-default", "path": "docs/assets/public-site/anam-revops/anam-escala-confianza-dashboard-desktop-web-1600-v1.webp", "sha256": "1a0f80bc657314141d5124ebd2c55ae441775d1fadba86f200a2737381c3442e", "width": 1600, "height": 900, "mime": "image/webp", "bytes": 54074 },
+        { "role": "body-mobile", "path": "docs/assets/public-site/anam-revops/anam-escala-confianza-dashboard-web-1200-v1.webp", "sha256": "bed6bcf7b99e6d6ff24f4e5f148ffff7264bf1e7029971506862e214ea264f9a", "width": 1200, "height": 1600, "mime": "image/webp", "bytes": 51376 },
+        { "role": "body-desktop-dark", "path": "docs/assets/public-site/anam-revops/anam-escala-confianza-dashboard-desktop-dark-web-1600-v1.webp", "sha256": "3a5415ea5889bde92997f141c2c6f11a135b4a273010d88535ba7642f88ea914", "width": 1600, "height": 900, "mime": "image/webp", "bytes": 50714 },
+        { "role": "body-mobile-dark", "path": "docs/assets/public-site/anam-revops/anam-escala-confianza-dashboard-dark-web-1200-v1.webp", "sha256": "120f5fc58f9a26818ddc62ce2442cb1e66c898b46dd937a2bd152e39bd5dd8ab", "width": 1200, "height": 1600, "mime": "image/webp", "bytes": 49056 }
+      ],
+      "metadata": { "alt": "Escala que distingue piloto, diagnóstico y KPI oficial según la evidencia disponible.", "caption": "Un gráfico cambia de categoría cuando la evidencia permite sostener la decisión que promete." },
+      "media": { "id": 251409, "url": "https://efeoncepro.com/wp-content/uploads/2026/07/anam-escala-confianza-dashboard-desktop-web-1600-v1.webp", "mime": "image/webp", "responsiveIds": [251410, 251411, 251412] },
+      "qa": { "status": "selected_and_integrated", "reviewedAtOriginalResolution": true, "brandSignatureVerified": true, "themeVariantsReviewed": true, "privateRenderVerified": true }
+    }
+  ]
+}

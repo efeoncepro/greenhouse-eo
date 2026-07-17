@@ -62,6 +62,13 @@ pnpm ai:image --image <ref.png> --prompt "keep this exact <subject>, change ONLY
 pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (AI matting, soft edges)
 ```
 
+- El cliente acepta hasta **10** `--image` por request y conserva su orden. Cada referencia debe declarar en el
+  prompt su rol: estructura, paleta, identidad, activo oficial o anti-referencia.
+- Una **anti-referencia** no tiene peso negativo nativo: es una instrucción semántica. Nombrar el rasgo excluido
+  y revisar contaminación en la salida; si persiste, retirar la referencia o cambiar de método.
+- Si se exigen cards, gráficos, ejes, microcopy, cifras o logos exactos, detener la generación y usar SVG o
+  composición determinística. Una portada puede seguir siendo un problema vectorial.
+
 - **Engine verdict (bake-off 2026-07-05):** for identity + logo fidelity on an edit, `gpt-image-2` (this CLI, our OpenAI key, zero third-party credits) wins. `nano_banana_pro` (Higgsfield) is a strong plan B (slightly better face/expression, costs credits). Do NOT use text-to-image or "character" models (e.g. Soul) for consistency — they treat the reference as inspiration and drift to a different subject + mangled logo.
 - **Prompt = identity-lock scaffold + one small delta.** Fix everything (face, hair, outfit, the exact logo, framing, lighting) and change ONLY the requested pose/expression. Big deltas break consistency; small deltas hold it. Anchor every variant to the SAME canonical reference, not to a previous generation.
 - **No engine keeps a logo pixel-exact** (~90% redraw). If the mark must be exact, mask its region and re-stamp the real vector (e.g. `public/branding/SVG/isotipo-efeonce-negativo.svg`) by composition. With `gpt-image-2` the logo is faithful enough that this is optional.
@@ -90,13 +97,15 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
 
 1. Normalize the asset brief: target surface, audience, final size, format, alpha needs, style, constraints, and whether it is exploratory or repo-bound.
 2. Build a short art-direction hypothesis: viewer takeaway, silhouette, visual hierarchy, finish, material, lighting, palette, and quality risks.
-3. Load the shared guide for professional prompt recipes, finish playbooks, and quality gate.
-4. Write a prompt with explicit asset intent, subject, composition, style, material, lighting, palette, background, constraints, and output target.
-5. Generate through the canonical helper for repo-bound assets.
-6. Critique the result like production design: small-size readability, crop, alpha edge, material believability, brand fit, and integration fit.
-7. Refine with single-change follow-ups; restate invariants on every edit.
-8. If placed in UI, verify the surface with Greenhouse Visual Capture.
-9. Report paths, model/provider, transparency validation, visual QA, and limitations.
+3. If a visual reference is a webpage, inspect its original SVG/Lottie/CSS/raster source before choosing the
+   engine; load `../design-studio/modules/11_PRODUCT_STORY_SCENES.md` for product/editorial scenes.
+4. Load the shared guide for professional prompt recipes, finish playbooks, and quality gate.
+5. Write a prompt with explicit asset intent, subject, composition, style, material, lighting, palette, background, constraints, and output target.
+6. Generate through the canonical helper for repo-bound assets.
+7. Critique the result like production design: small-size readability, crop, alpha edge, material believability, brand fit, and integration fit.
+8. Refine with single-change follow-ups; restate invariants on every edit.
+9. If placed in UI, verify the surface with Greenhouse Visual Capture.
+10. Report paths, model/provider, transparency validation, visual QA, and limitations.
 
 ## Hard Constraints
 

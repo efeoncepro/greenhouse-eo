@@ -19,13 +19,13 @@
 
 ## 2. Tabla maestra de referencias
 
-| # | Fuente / link | Categoría | Qué tomar | Qué evitar | Uso ético |
-|---|---|---|---|---|---|
-| 1 | [link] | [composición] | [el ángulo bajo] | [la marca visible] | [inspiración estructural] |
-| 2 | [link] | [color] | [el duotono frío] | [___] | [___] |
-| 3 | [link] | [tipo] | [el lockup] | [___] | [___] |
-| 4 | [link] | [textura] | [el grano analógico] | [___] | [___] |
-| 5 | [link] | [concepto] | [la metáfora] | [___] | [___] |
+| # | Fuente / link | Rol | Categoría | Qué tomar | Qué evitar | Uso ético |
+|---|---|---|---|---|---|---|
+| 1 | [link] | [positive-structure] | [composición] | [el solapamiento] | [la marca visible] | [inspiración estructural] |
+| 2 | [link] | [positive-palette] | [color] | [el duotono frío] | [___] | [___] |
+| 3 | [link] | [positive-brand] | [tipo] | [el lockup oficial] | [___] | [___] |
+| 4 | [link] | [positive-material] | [textura] | [el grano analógico] | [___] | [___] |
+| 5 | [link] | [negative-cliche] | [concepto] | [nada] | [la metáfora literal] | [anti-referencia] |
 
 ## 3. Por categoría
 
@@ -55,6 +55,10 @@
 |---|---|---|
 | [link] | [cliché de stock / look IA genérico] | [___] |
 | [___] | [___] | [___] |
+
+> Una anti-referencia no tiene peso negativo automático en un modelo de imagen. Si se adjunta al prompt,
+> nombrarla como `negative-cliche` o `negative-contamination`, describir el rasgo que se excluye y verificar que
+> la salida no lo herede. Para composición exacta, usar layout determinístico.
 
 ## 5. Notas de aplicación a la marca
 
